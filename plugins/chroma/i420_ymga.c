@@ -2,7 +2,7 @@
  * i420_ymga.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_ymga.c,v 1.5 2002/04/19 13:56:10 sam Exp $
+ * $Id: i420_ymga.c,v 1.6 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,10 +28,8 @@
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #define SRC_FOURCC  "I420,IYUV,YV12"
 #define DEST_FOURCC "YMGA"
@@ -140,7 +138,7 @@ static void I420_YMGA( vout_thread_t *p_vout, picture_t *p_source,
     int i_x;
 
     /* Copy the Y part */
-    FAST_MEMCPY( p_dest->Y_PIXELS, p_source->Y_PIXELS,
+    p_vout->p_vlc->pf_memcpy( p_dest->Y_PIXELS, p_source->Y_PIXELS,
                  p_dest->p[Y_PLANE].i_pitch * p_dest->p[Y_PLANE].i_lines );
 
     /* Copy the U:V part */

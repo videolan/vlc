@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.12 2002/05/28 22:49:25 sam Exp $
+ * $Id: deinterlace.c,v 1.13 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,10 +28,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #include "filter_common.h"
 
@@ -75,24 +73,23 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Deinterlace specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     int i_mode;
-    struct vout_thread_s *p_vout;
+    vout_thread_t *p_vout;
     mtime_t last_date;
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
-static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
+static void vout_Display   ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -122,19 +119,18 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     /* Look what method was requested */
-    psz_method = config_GetPszVariable( "deinterlace-mode" );
+    psz_method = config_GetPsz( p_vout, "deinterlace-mode" );
 
     if( psz_method == NULL )
     {
-        intf_ErrMsg( "vout error: configuration variable %s empty",
-                     "deinterlace-mode" );
-        intf_ErrMsg( "filter error: no valid deinterlace mode provided, "
-                     "using deinterlace:bob" );
+        msg_Err( p_vout, "configuration variable %s empty",
+                         "deinterlace-mode" );
+        msg_Err( p_vout, "no valid deinterlace mode provided, using 'bob'" );
         p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
     }
     else
@@ -149,8 +145,8 @@ static int vout_Create( vout_thread_t *p_vout )
         }
         else
         {
-            intf_ErrMsg( "filter error: no valid deinterlace mode provided, "
-                         "using deinterlace:bob" );
+            msg_Err( p_vout, "no valid deinterlace mode provided, "
+                             "using 'bob'" );
             p_vout->p_sys->i_mode = DEINTERLACE_MODE_BOB;
         }
     }
@@ -191,10 +187,10 @@ static int vout_Init( vout_thread_t *p_vout )
     }
 
     /* Try to open the real video output, with half the height our images */
-    psz_filter = config_GetPszVariable( "filter" );
-    config_PutPszVariable( "filter", NULL );
+    psz_filter = config_GetPsz( p_vout, "filter" );
+    config_PutPsz( p_vout, "filter", NULL );
 
-    intf_WarnMsg( 1, "filter: spawning the real video output" );
+    msg_Dbg( p_vout, "spawning the real video output" );
 
     switch( p_vout->render.i_chroma )
     {
@@ -205,14 +201,14 @@ static int vout_Init( vout_thread_t *p_vout )
         {
         case DEINTERLACE_MODE_BOB:
             p_vout->p_sys->p_vout =
-                vout_CreateThread( NULL,
+                vout_CreateThread( p_vout->p_this,
                        p_vout->output.i_width, p_vout->output.i_height / 2,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
 
         case DEINTERLACE_MODE_BLEND:
             p_vout->p_sys->p_vout =
-                vout_CreateThread( NULL,
+                vout_CreateThread( p_vout->p_this,
                        p_vout->output.i_width, p_vout->output.i_height,
                        p_vout->output.i_chroma, p_vout->output.i_aspect );
             break;
@@ -221,7 +217,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     case FOURCC_I422:
         p_vout->p_sys->p_vout =
-            vout_CreateThread( NULL,
+            vout_CreateThread( p_vout->p_this,
                        p_vout->output.i_width, p_vout->output.i_height,
                        FOURCC_I420, p_vout->output.i_aspect );
         break;
@@ -230,13 +226,13 @@ static int vout_Init( vout_thread_t *p_vout )
         break;
     }
 
-    config_PutPszVariable( "filter", psz_filter );
+    config_PutPsz( p_vout, "filter", psz_filter );
     if( psz_filter ) free( psz_filter );
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
     {
-        intf_ErrMsg( "filter error: can't open vout, aborting" );
+        msg_Err( p_vout, "cannot open vout, aborting" );
 
         return( 0 );
     }
@@ -270,7 +266,7 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
-    vout_DestroyThread( p_vout->p_sys->p_vout, NULL );
+    vout_DestroyThread( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }
@@ -345,7 +341,8 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
                 case DEINTERLACE_MODE_BOB:
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
 
                         p_out += p_pic->p[i_plane].i_pitch;
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
@@ -355,7 +352,8 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
                 case DEINTERLACE_MODE_BLEND:
                     if( i_field == 0 )
                     {
-                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
                         p_in += 2 * p_pic->p[i_plane].i_pitch;
                         p_out += p_pic->p[i_plane].i_pitch;
                     }
@@ -364,7 +362,8 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
 
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
 
                         p_out += p_pic->p[i_plane].i_pitch;
 
@@ -380,7 +379,8 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
                     if( i_field == 0 )
                     {
                         p_in -= 2 * p_pic->p[i_plane].i_pitch;
-                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
                     }
 #endif
 
@@ -396,9 +396,11 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
                 {
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
                         p_out += p_pic->p[i_plane].i_pitch;
-                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
                         p_out += p_pic->p[i_plane].i_pitch;
                         p_in += i_increment;
                     }
@@ -407,7 +409,8 @@ static void vout_Render ( vout_thread_t *p_vout, picture_t *p_pic )
                 {
                     for( ; p_out < p_out_end ; )
                     {
-                        FAST_MEMCPY( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
                         p_out += p_pic->p[i_plane].i_pitch;
                         p_in += i_increment;
                     }

@@ -2,7 +2,7 @@
  * aout_spdif.c: AC3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.28 2002/05/18 08:50:54 stef Exp $
+ * $Id: aout_spdif.c,v 1.29 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -25,11 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>                                              /* memset() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -155,7 +154,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
             }
             else
             {
-                intf_WarnMsg( 3, "aout warning: empty spdif fifo" );
+                msg_Warn( p_aout, "empty spdif fifo" );
                 while( AOUT_FIFO_ISEMPTY( p_aout->fifo[i_fifo] ) &&
                        !p_aout->b_die && 
                        !p_aout->fifo[i_fifo].b_die )

@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.31 2002/05/18 13:33:44 massiot Exp $
+ * $Id: mtime.c,v 1.32 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -32,7 +32,7 @@
  *****************************************************************************/
 #include <stdio.h>                                              /* sprintf() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
 #   include <pth.h>

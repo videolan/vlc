@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.8 2002/05/18 17:47:46 sam Exp $
+ * $Id: gtk_common.h,v 1.9 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,23 +42,23 @@ static inline intf_thread_t * GetIntf( GtkWidget *item, char * psz_parent )
 /*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface
  *****************************************************************************/
-typedef struct intf_sys_s
+struct intf_sys_s
 {
     /* special actions */
-    boolean_t           b_playing;
-    boolean_t           b_popup_changed;                   /* display menu ? */
-    boolean_t           b_window_changed;        /* window display toggled ? */
-    boolean_t           b_playlist_changed;    /* playlist display toggled ? */
-    boolean_t           b_slider_free;                      /* slider status */
+    vlc_bool_t          b_playing;
+    vlc_bool_t          b_popup_changed;                   /* display menu ? */
+    vlc_bool_t          b_window_changed;        /* window display toggled ? */
+    vlc_bool_t          b_playlist_changed;    /* playlist display toggled ? */
+    vlc_bool_t          b_slider_free;                      /* slider status */
 
     /* menus handlers */
-    boolean_t           b_program_update;   /* do we need to update programs 
+    vlc_bool_t          b_program_update;   /* do we need to update programs 
                                                                         menu */
-    boolean_t           b_title_update;  /* do we need to update title menus */
-    boolean_t           b_chapter_update;            /* do we need to update
+    vlc_bool_t          b_title_update;  /* do we need to update title menus */
+    vlc_bool_t          b_chapter_update;            /* do we need to update
                                                                chapter menus */
-    boolean_t           b_audio_update;  /* do we need to update audio menus */
-    boolean_t           b_spu_update;      /* do we need to update spu menus */
+    vlc_bool_t          b_audio_update;  /* do we need to update audio menus */
+    vlc_bool_t          b_spu_update;      /* do we need to update spu menus */
 
     /* windows and widgets */
     GtkWidget *         p_window;                             /* main window */
@@ -72,7 +72,10 @@ typedef struct intf_sys_s
     GtkWidget *         p_network;                  /* network stream window */
     GtkWidget *         p_jump;                               /* jump window */
 
-    GtkTooltips *        p_tooltips;                             /* tooltips */
+    GtkTooltips *       p_tooltips;                              /* tooltips */
+
+    /* The input thread */
+    input_thread_t *    p_input;
 
     /* The slider */
     GtkFrame *          p_slider_frame;
@@ -82,7 +85,7 @@ typedef struct intf_sys_s
     /* The messages window */
     GtkWidget *         p_messages;                       /* messages window */
     GtkText *           p_messages_text;                   /* messages frame */
-    intf_subscription_t*p_sub;                     /* interface subscription */
+    msg_subscription_t* p_sub;                  /* message bank subscription */
 
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */
@@ -94,8 +97,7 @@ typedef struct intf_sys_s
 
     /* XXX: Ugly kludge, see gtk.c */
     void             ( *pf_callback[MAX_ATEXIT] ) ( void );
-
-} intf_sys_t;
+};
 
 /*****************************************************************************
  * Prototypes

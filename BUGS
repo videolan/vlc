@@ -1,4 +1,4 @@
-List of known vlc bugs $Id: BUGS,v 1.13 2002/05/20 22:30:19 sam Exp $
+List of known vlc bugs $Id: BUGS,v 1.14 2002/06/01 12:31:57 sam Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -62,4 +62,11 @@ Gtk interface:
 Misc:
 
   * The Jin-Roh DVD seems to segfault.
+
+
+From: David Legg <David.Legg@legg.uklinux.net>
+If I change the value of AOUT_FIFO_SIZE from 255 to 511, vlc segmentation
+faults.
+
+
 

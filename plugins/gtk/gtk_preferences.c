@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.29 2002/05/19 20:26:11 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.30 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -34,7 +34,8 @@
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #ifdef MODULE_NAME_IS_gnome
 #   include <gnome.h>
@@ -43,8 +44,6 @@
 #endif
 
 #include <string.h>
-
-#include "interface.h"
 
 #include "gtk_support.h"
 #include "gtk_common.h"
@@ -177,12 +176,15 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
 
     /* Look for the selected module */
-    for( p_module = p_module_bank->first ; p_module != NULL ;
+    for( p_module = p_intf->p_vlc->module_bank.first ; p_module != NULL ;
          p_module = p_module->next )
     {
 
-        if( psz_module_name && !strcmp( psz_module_name, p_module->psz_name ) )
+        if( psz_module_name
+             && !strcmp( psz_module_name, p_module->psz_object_name ) )
+        {
             break;
+        }
     }
     if( !p_module ) return;
 
@@ -198,7 +200,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     config_dialog_vbox = GTK_DIALOG(config_dialog)->vbox;
 #endif
 
-    category_max_height = config_GetIntVariable( MODULE_STRING "-prefs-maxh" );
+    gtk_object_set_data( GTK_OBJECT(config_dialog), "p_intf", p_intf );
+
+    category_max_height = config_GetInt( p_intf, MODULE_STRING "-prefs-maxh" );
 
     gtk_window_set_policy( GTK_WINDOW(config_dialog), TRUE, TRUE, FALSE );
     gtk_container_set_border_width( GTK_CONTAINER(config_dialog_vbox), 0 );
@@ -305,9 +309,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             {
                 gchar * titles[] = { _("Name"), _("Description") };
 
-                module_clist =
-                    gtk_clist_new_with_titles( 2, titles );
+                module_clist = gtk_clist_new_with_titles( 2, titles );
             }
+            gtk_object_set_data( GTK_OBJECT(module_clist), "p_intf", p_intf );
             gtk_clist_column_titles_passive( GTK_CLIST(module_clist) );
             gtk_clist_set_selection_mode( GTK_CLIST(module_clist),
                                           GTK_SELECTION_SINGLE);
@@ -317,13 +321,13 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             {
                 gchar * entry[2];
 
-                for( p_module_bis = p_module_bank->first ;
+                for( p_module_bis = p_intf->p_vlc->module_bank.first ;
                      p_module_bis != NULL ;
                      p_module_bis = p_module_bis->next )
                 {
                     if( p_module_bis->i_capabilities & (1 << p_item->i_value) )
                     {
-                        entry[0] = p_module_bis->psz_name;
+                        entry[0] = p_module_bis->psz_object_name;
                         entry[1] = p_module_bis->psz_longname;
                         gtk_clist_append( GTK_CLIST(module_clist), entry );
                     }
@@ -577,18 +581,20 @@ static void GtkCreateConfigDialog( char *psz_module_name,
  ****************************************************************************/
 void GtkConfigApply( GtkButton * button, gpointer user_data )
 {
+    intf_thread_t *p_intf;
     GHashTable *hash_table;
     GtkWidget *apply_button;
 
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
-    g_hash_table_foreach_remove( hash_table, GtkSaveHashValue, NULL );
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                   "p_intf" );
+    g_hash_table_foreach_remove( hash_table, GtkSaveHashValue, (void*)p_intf );
 
     /* change the highlight status of the Apply button */
     apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "apply_button" );
     gtk_widget_set_sensitive( apply_button, FALSE );
-
 }
 
 void GtkConfigOk( GtkButton * button, gpointer user_data )
@@ -605,8 +611,12 @@ void GtkConfigCancel( GtkButton * button, gpointer user_data )
 
 void GtkConfigSave( GtkButton * button, gpointer user_data )
 {
+    intf_thread_t *p_intf;
+
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                   "p_intf" );
     GtkConfigApply( button, user_data );
-    config_SaveConfigFile( NULL );
+    config_SaveConfigFile( p_intf->p_this, NULL );
 }
 
 /****************************************************************************
@@ -616,18 +626,22 @@ void GtkConfigSave( GtkButton * button, gpointer user_data )
 void GtkModuleHighlighted( GtkCList *module_clist, int row, int column,
                            GdkEventButton *event, gpointer user_data )
 {
+    intf_thread_t *p_intf;
     GtkWidget *config_button;
     module_t *p_module;
     char *psz_name;
 
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(module_clist),
+                                                   "p_intf" );
+
     if( gtk_clist_get_text( GTK_CLIST(module_clist), row, 0, &psz_name ) )
     {
         /* look for module 'psz_name' */
-        for( p_module = p_module_bank->first ;
+        for( p_module = p_intf->p_vlc->module_bank.first ;
              p_module != NULL ;
              p_module = p_module->next )
         {
-          if( !strcmp( p_module->psz_name, psz_name ) )
+          if( !strcmp( p_module->psz_object_name, psz_name ) )
           {
               gtk_object_set_data( GTK_OBJECT(module_clist),
                                    "module_highlighted", p_module );
@@ -659,7 +673,7 @@ void GtkModuleConfigure( GtkButton *button, gpointer user_data )
     if( !p_module ) return;
     p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(button),
                                                    "p_intf" );
-    GtkCreateConfigDialog( p_module->psz_name, (gpointer)p_intf );
+    GtkCreateConfigDialog( p_module->psz_object_name, (gpointer)p_intf );
 
 }
 
@@ -677,7 +691,7 @@ void GtkModuleSelected( GtkButton *button, gpointer user_data )
                                                "module_entry" );
     if( !p_module ) return;
 
-    gtk_entry_set_text( GTK_ENTRY(widget), p_module->psz_name );
+    gtk_entry_set_text( GTK_ENTRY(widget), p_module->psz_object_name );
 
 }
 
@@ -686,17 +700,19 @@ void GtkModuleSelected( GtkButton *button, gpointer user_data )
  ****************************************************************************/
 static void GtkStringChanged( GtkEditable *editable, gpointer user_data )
 {
+    intf_thread_t *p_intf;
     module_config_t *p_config;
-
     GHashTable *hash_table;
     GtkWidget *apply_button;
 
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                   "p_intf" );
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
     /* free old p_config */
     p_config = (module_config_t *)g_hash_table_lookup( hash_table,
                                                        (gpointer)editable );
-    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, NULL );
+    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, (void *)p_intf );
 
     p_config = malloc( sizeof(module_config_t) );
     p_config->i_type = MODULE_CONFIG_ITEM_STRING;
@@ -718,11 +734,13 @@ static void GtkStringChanged( GtkEditable *editable, gpointer user_data )
  ****************************************************************************/
 static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
 {
+    intf_thread_t *p_intf;
     module_config_t *p_config;
-
     GHashTable *hash_table;
     GtkWidget *apply_button;
 
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                   "p_intf" );
     gtk_spin_button_update( GTK_SPIN_BUTTON(editable) );
 
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
@@ -731,7 +749,7 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
     /* free old p_config */
     p_config = (module_config_t *)g_hash_table_lookup( hash_table,
                                                        (gpointer)editable );
-    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, NULL );
+    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, (void *)p_intf );
 
     p_config = malloc( sizeof(module_config_t) );
     p_config->i_type = MODULE_CONFIG_ITEM_INTEGER;
@@ -754,11 +772,13 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
  ****************************************************************************/
 static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
 {
+    intf_thread_t *p_intf;
     module_config_t *p_config;
-
     GHashTable *hash_table;
     GtkWidget *apply_button;
 
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(editable),
+                                                   "p_intf" );
     gtk_spin_button_update( GTK_SPIN_BUTTON(editable) );
 
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
@@ -767,7 +787,7 @@ static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
     /* free old p_config */
     p_config = (module_config_t *)g_hash_table_lookup( hash_table,
                                                        (gpointer)editable );
-    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, NULL );
+    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, (void *)p_intf );
 
     p_config = malloc( sizeof(module_config_t) );
     p_config->i_type = MODULE_CONFIG_ITEM_FLOAT;
@@ -786,22 +806,24 @@ static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
 }
 
 /****************************************************************************
- * GtkStringChanged: signal called when the user changes a bool value.
+ * GtkBoolChanged: signal called when the user changes a bool value.
  ****************************************************************************/
 static void GtkBoolChanged( GtkToggleButton *button, gpointer user_data )
 {
+    intf_thread_t *p_intf;
     module_config_t *p_config;
-
     GHashTable *hash_table;
     GtkWidget *apply_button;
 
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(button),
+                                                   "p_intf" );
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
 
     /* free old p_config */
     p_config = (module_config_t *)g_hash_table_lookup( hash_table,
                                                        (gpointer)button );
-    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, NULL );
+    if( p_config ) GtkFreeHashValue( NULL, (gpointer)p_config, (void *)p_intf );
 
     p_config = malloc( sizeof(module_config_t) );
     p_config->i_type = MODULE_CONFIG_ITEM_BOOL;
@@ -824,8 +846,10 @@ static void GtkBoolChanged( GtkToggleButton *button, gpointer user_data )
 static void GtkFreeHashTable( gpointer user_data )
 {
     GHashTable *hash_table = (GHashTable *)user_data;
+    intf_thread_t *p_intf =
+      (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(hash_table), "p_intf" );
 
-    g_hash_table_foreach( hash_table, GtkFreeHashValue, NULL );
+    g_hash_table_foreach( hash_table, GtkFreeHashValue, (void *)p_intf );
     g_hash_table_destroy( hash_table );
 }
 
@@ -835,7 +859,7 @@ static void GtkFreeHashTable( gpointer user_data )
  ****************************************************************************/
 static void GtkFreeHashValue( gpointer key, gpointer value, gpointer user_data)
 {
-    module_config_t *p_config = (module_config_t *)value;
+    module_config_t * p_config = (module_config_t *)value;
 
     if( p_config->i_type == MODULE_CONFIG_ITEM_STRING )
         if( p_config->psz_value ) g_free( p_config->psz_value );
@@ -849,7 +873,8 @@ static void GtkFreeHashValue( gpointer key, gpointer value, gpointer user_data)
 static gboolean GtkSaveHashValue( gpointer key, gpointer value,
                                   gpointer user_data )
 {
-    module_config_t *p_config = (module_config_t *)value;
+    intf_thread_t *   p_intf   = (intf_thread_t *)user_data;
+    module_config_t * p_config = (module_config_t *)value;
 
     switch( p_config->i_type )
     {
@@ -857,15 +882,15 @@ static gboolean GtkSaveHashValue( gpointer key, gpointer value,
     case MODULE_CONFIG_ITEM_STRING:
     case MODULE_CONFIG_ITEM_FILE:
     case MODULE_CONFIG_ITEM_MODULE:
-        config_PutPszVariable( p_config->psz_name,
-            *p_config->psz_value? p_config->psz_value : NULL );
+        config_PutPsz( p_intf, p_config->psz_name,
+                       *p_config->psz_value ? p_config->psz_value : NULL );
         break;
     case MODULE_CONFIG_ITEM_INTEGER:
     case MODULE_CONFIG_ITEM_BOOL:
-        config_PutIntVariable( p_config->psz_name, p_config->i_value );
+        config_PutInt( p_intf, p_config->psz_name, p_config->i_value );
         break;
     case MODULE_CONFIG_ITEM_FLOAT:
-        config_PutFloatVariable( p_config->psz_name, p_config->f_value );
+        config_PutFloat( p_intf, p_config->psz_name, p_config->f_value );
         break;
     }
 

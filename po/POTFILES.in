@@ -1,4 +1,5 @@
-src/interface/main.c
+src/libvlc.c
+src/libvlc.h
 src/misc/configuration.c
 plugins/a52/a52.c
 plugins/aa/aa.c

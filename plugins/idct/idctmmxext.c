@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmxext.c,v 1.23 2002/05/18 17:47:46 sam Exp $
+ * $Id: idctmmxext.c,v 1.24 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "mmx.h"
 
@@ -54,7 +54,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( IDCT, 200 )
     ADD_REQUIREMENT( MMXEXT )
     ADD_SHORTCUT( "mmxext" )
-    ADD_SHORTCUT( "idctmmxext" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

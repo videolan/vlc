@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.4 2002/05/27 18:26:31 sam Exp $
+ * $Id: aa.c,v 1.5 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -30,11 +30,9 @@
 
 #include <aalib.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/intf.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -51,7 +49,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("ASCII-art video output module") )
     ADD_CAPABILITY( VOUT, 10 )
-    ADD_SHORTCUT( "aa" )
     ADD_SHORTCUT( "aalib" )
 MODULE_INIT_STOP
 
@@ -70,27 +67,26 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the aa specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     struct aa_context*  aa_context;
     aa_palette          palette;
     int                 i_width;                     /* width of main window */
     int                 i_height;                   /* height of main window */
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
-static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
+static void vout_Display   ( vout_thread_t *, picture_t * );
 
-static void SetPalette     ( struct vout_thread_s *, u16 *, u16 *, u16 * );
+static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -118,7 +114,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
@@ -127,7 +123,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if (!(p_vout->p_sys->aa_context = aa_autoinit(&aa_defparams)))
     {
-        intf_ErrMsg( "vout error: cannot initialize AA-lib. Sorry" );
+        msg_Err( p_vout, "cannot initialize aalib" );
         return( 1 );
     }
 
@@ -221,10 +217,16 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
     case AA_MOUSE:
         aa_getmouse( p_vout->p_sys->aa_context, &x, &y, &b );
-        if ( b & AA_BUTTON3 ) {
-            vlc_mutex_lock( &p_main->p_intf->change_lock );
-            p_main->p_intf->b_menu_change = 1;    
-            vlc_mutex_unlock( &p_main->p_intf->change_lock );
+        if ( b & AA_BUTTON3 )
+        {
+            intf_thread_t *p_intf;
+            p_intf = vlc_object_find( p_vout->p_vlc, VLC_OBJECT_INTF,
+                                                     FIND_CHILD );
+            if( p_intf )
+            {
+                p_intf->b_menu_change = 1;
+                vlc_object_release( p_intf );
+            }
         }
         break;
     case AA_RESIZE:

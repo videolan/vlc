@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.10 2002/05/18 17:47:46 sam Exp $
+ * $Id: ffmpeg.c,v 1.11 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -26,7 +26,10 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
@@ -39,15 +42,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
-#include "input_ext-intf.h"
-#include "input_ext-plugins.h"
-
-
 #include "vdec_ext-plugins.h"
 #include "avcodec.h"                                            /* ffmpeg */
 #include "ffmpeg.h"
@@ -56,7 +50,7 @@
  * Local prototypes
  */
 static int      decoder_Probe   ( u8 * );
-static int      decoder_Run     ( decoder_config_t * );
+static int      decoder_Run     ( decoder_fifo_t * );
 static int      InitThread      ( videodec_thread_t * );
 static void     EndThread       ( videodec_thread_t * );
 static void     DecodeThread    ( videodec_thread_t * );
@@ -83,7 +77,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "ffmpeg video decoder (MSMPEG4v123,MPEG4)" )
     ADD_CAPABILITY( DECODER, 70 )
-    ADD_SHORTCUT( "ffmpeg" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -224,8 +217,7 @@ static inline void __GetFrame( videodec_thread_t *p_vdec )
     p_data = p_pes->p_first;
     do
     {
-        FAST_MEMCPY( p_buffer, 
-                     p_data->p_payload_start, 
+        p_vdec->p_fifo->p_vlc->pf_memcpy( p_buffer, p_data->p_payload_start, 
                      p_data->p_payload_end - p_data->p_payload_start );
         p_buffer += p_data->p_payload_end - p_data->p_payload_start;
         p_data = p_data->p_next;
@@ -249,7 +241,7 @@ static inline void __NextFrame( videodec_thread_t *p_vdec )
 /*****************************************************************************
  * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_fifo_t * p_fifo )
 {
     videodec_thread_t   *p_vdec;
     int b_error;
@@ -257,19 +249,17 @@ static int decoder_Run ( decoder_config_t * p_config )
     if ( (p_vdec = (videodec_thread_t*)malloc( sizeof(videodec_thread_t))) 
                     == NULL )
     {
-        intf_ErrMsg( "vdec error: not enough memory "
-                     "for vdec_CreateThread() to create the new thread");
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return( -1 );
     }
     memset( p_vdec, 0, sizeof( videodec_thread_t ) );
 
-    p_vdec->p_fifo = p_config->p_decoder_fifo;
-    p_vdec->p_config = p_config;
+    p_vdec->p_fifo = p_fifo;
 
     if( InitThread( p_vdec ) != 0 )
     {
-        DecoderError( p_config->p_decoder_fifo );
+        DecoderError( p_fifo );
         return( -1 );
     }
      
@@ -304,14 +294,14 @@ static int decoder_Run ( decoder_config_t * p_config )
 static int InitThread( videodec_thread_t *p_vdec )
 {
     
-    if( p_vdec->p_config->p_demux_data != NULL )
+    if( p_vdec->p_fifo->p_demux_data != NULL )
     {
         __ParseBitMapInfoHeader( &p_vdec->format, 
-                                (byte_t*)p_vdec->p_config->p_demux_data );
+                                (byte_t*)p_vdec->p_fifo->p_demux_data );
     }
     else
     {
-        intf_ErrMsg( "vdec error: cannot get informations" );
+        msg_Err( p_vdec->p_fifo, "cannot get information" );
         return( -1 );
     }
 
@@ -321,14 +311,14 @@ static int InitThread( videodec_thread_t *p_vdec )
         avcodec_init();
         avcodec_register_all();
         b_ffmpeginit = 1;
-        intf_WarnMsg( 1, "vdec init: library ffmpeg initialised" );
+        msg_Dbg( p_vdec->p_fifo, "library ffmpeg initialized" );
    }
    else
    {
-        intf_WarnMsg( 1, "vdec init: library ffmpeg already initialised" );
+        msg_Dbg( p_vdec->p_fifo, "library ffmpeg already initialized" );
    }
 
-    switch( p_vdec->p_config->i_type)
+    switch( p_vdec->p_fifo->i_type )
     {
 #if LIBAVCODEC_BUILD >= 4608 /* what is the true version */
         case( MSMPEG4v1_VIDEO_ES):
@@ -361,8 +351,8 @@ static int InitThread( videodec_thread_t *p_vdec )
 
     if( !p_vdec->p_codec )
     {
-        intf_ErrMsg( "vdec error: codec not found (%s)",
-                     p_vdec->psz_namecodec );
+        msg_Err( p_vdec->p_fifo, "codec not found (%s)",
+                                 p_vdec->psz_namecodec );
         return( -1 );
     }
 
@@ -375,45 +365,34 @@ static int InitThread( videodec_thread_t *p_vdec )
 
     if (avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0)
     {
-        intf_ErrMsg( "vdec error: cannot open codec (%s)",
-                     p_vdec->psz_namecodec );
+        msg_Err( p_vdec->p_fifo, "cannot open codec (%s)",
+                                 p_vdec->psz_namecodec );
         return( -1 );
     }
     else
     {
-        intf_WarnMsg( 1, "vdec info: ffmpeg codec (%s) started",
-                         p_vdec->psz_namecodec );
+        msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) started",
+                                 p_vdec->psz_namecodec );
     }
-    /* create vout */
 
-     p_vdec->p_vout = vout_CreateThread( 
-                                NULL,
+    /* create vout */
+    p_vdec->p_vout = vout_CreateThread( p_vdec->p_fifo->p_this,
                                 p_vdec->format.i_width,
                                 p_vdec->format.i_height,
                                 FOURCC_I420,
                                 VOUT_ASPECT_FACTOR * p_vdec->format.i_width /
                                     p_vdec->format.i_height );
 
-    if( !p_vdec->p_vout )
+    if( p_vdec->p_vout == NULL )
     {
-        intf_ErrMsg( "vdec error: can't open vout, aborting" );
+        msg_Err( p_vdec->p_fifo, "cannot open vout, aborting" );
         avcodec_close( p_vdec->p_context );
-        intf_WarnMsg(1, "vdec info: ffmpeg codec (%s) stopped",
-                            p_vdec->psz_namecodec);
-        return( -1 );
+        msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) stopped",
+                                 p_vdec->psz_namecodec );
+        return -1;
     }
 
-    vlc_mutex_lock( &p_vout_bank->lock );
-    if( p_vout_bank->i_count != 0 )
-    {
-        vlc_mutex_unlock( &p_vout_bank->lock );
-        vout_DestroyThread( p_vout_bank->pp_vout[ 0 ], NULL );
-        vlc_mutex_lock( &p_vout_bank->lock );
-        p_vout_bank->i_count--;
-    }
-    p_vout_bank->i_count++;
-    p_vout_bank->pp_vout[0] = p_vdec->p_vout;
-    vlc_mutex_unlock( &p_vout_bank->lock );
+    vlc_object_yield( p_vdec->p_vout );
 
     return( 0 );
 }
@@ -428,28 +407,20 @@ static void EndThread( videodec_thread_t *p_vdec )
 {
     if( p_vdec == NULL )
     {
-        intf_ErrMsg( "vdec error: cannot free structures" );
+        msg_Err( p_vdec->p_fifo, "cannot free structures" );
         return;
     }
 
     if( p_vdec->p_context != NULL)
     {
         avcodec_close( p_vdec->p_context );
-        intf_WarnMsg(1, "vdec info: ffmpeg codec (%s) stopped",
-                        p_vdec->psz_namecodec);
+        msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) stopped",
+                                 p_vdec->psz_namecodec );
     }
 
-    vlc_mutex_lock( &p_vout_bank->lock );
-    if( p_vout_bank->i_count != 0 )
-    {
-        vlc_mutex_unlock( &p_vout_bank->lock );
-        vout_DestroyThread( p_vout_bank->pp_vout[ 0 ], NULL );
-        vlc_mutex_lock( &p_vout_bank->lock );
-        p_vout_bank->i_count--; 
-        p_vout_bank->pp_vout[ 0 ] = NULL;
-    }
-    vlc_mutex_unlock( &p_vout_bank->lock );
-
+    vlc_object_release( p_vdec->p_vout );
+    vout_DestroyThread( p_vdec->p_vout );
+    
     free( p_vdec );
 }
 
@@ -475,8 +446,8 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
                                          
     if( i_status < 0 )
     {
-        intf_WarnMsg( 2, "vdec error: cannot decode one frame (%d bytes)",
-                         p_vdec->i_framesize );
+        msg_Warn( p_vdec->p_fifo, "cannot decode one frame (%d bytes)",
+                                  p_vdec->i_framesize );
         return;
     }
     if( !b_gotpicture )
@@ -509,7 +480,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
                                  avpicture.linesize[i_plane] );
         for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
-            FAST_MEMCPY( p_dest, p_src, i_size );
+            p_vdec->p_fifo->p_vlc->pf_memcpy( p_dest, p_src, i_size );
             p_dest += p_pic->p[i_plane].i_pitch;
             p_src  += avpicture.linesize[i_plane];
         }

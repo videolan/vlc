@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.15 2002/05/18 15:51:37 gbazin Exp $
+ * $Id: aout_ext-dec.c,v 1.16 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -25,68 +25,53 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "audio_output.h"
 
 /*****************************************************************************
  * aout_CreateFifo
  *****************************************************************************/
-aout_fifo_t * aout_CreateFifo( int i_format, int i_channels, int i_rate,
-                               int i_frame_size, void *p_buffer )
+aout_fifo_t * aout_CreateFifo( vlc_object_t *p_this, int i_format,
+                               int i_channels, int i_rate, int i_frame_size,
+                               void *p_buffer )
 {
     aout_thread_t *p_aout;
     aout_fifo_t   *p_fifo = NULL;
     int i_index;
 
     /* Spawn an audio output if there is none */
-    vlc_mutex_lock( &p_aout_bank->lock );
+    p_aout = vlc_object_find( p_this->p_vlc, VLC_OBJECT_AOUT, FIND_CHILD );
 
-    if( p_aout_bank->i_count == 0 )
+    if( p_aout )
     {
-        intf_WarnMsg( 1, "aout: no aout present, spawning one" );
+        if( p_aout->fifo[0].i_format != i_format )
+        {
+            msg_Dbg( p_this, "changing aout type" );
+            vlc_object_unlink_all( p_aout );
+            vlc_object_release( p_aout );
+            aout_DestroyThread( p_aout );
+            p_aout = NULL;
+        }
+    }
 
-        p_aout = aout_CreateThread( NULL, i_channels, i_rate );
+    if( p_aout == NULL )
+    {
+        msg_Dbg( p_this, "no aout present, spawning one" );
 
+        p_aout = aout_CreateThread( p_this, i_channels, i_rate );
         /* Everything failed */
         if( p_aout == NULL )
         {
-            vlc_mutex_unlock( &p_aout_bank->lock );
             return NULL;
         }
-
-        p_aout_bank->pp_aout[ p_aout_bank->i_count ] = p_aout;
-        p_aout_bank->i_count++;
     }
+
     /* temporary hack to switch output type (mainly for spdif)
      * FIXME: to be adapted when several output are available */
-    else if( p_aout_bank->pp_aout[0]->fifo[0].i_format != i_format )
-    {
-        intf_WarnMsg( 1, "aout: changing aout type" );
-
-        aout_DestroyThread( p_aout_bank->pp_aout[0], NULL );
-
-        p_aout = aout_CreateThread( NULL, i_channels, i_rate );
-
-        /* Everything failed */
-        if( p_aout == NULL )
-        {
-            vlc_mutex_unlock( &p_aout_bank->lock );
-            return NULL;
-        }
-
-        p_aout_bank->pp_aout[0] = p_aout;
-    }
-    else
-    {
-        /* Take the first audio output FIXME: take the best one */
-        p_aout = p_aout_bank->pp_aout[ 0 ];
-    }
-
     /* Take the fifos lock */
     vlc_mutex_lock( &p_aout->fifos_lock );
 
@@ -103,10 +88,9 @@ aout_fifo_t * aout_CreateFifo( int i_format, int i_channels, int i_rate,
 
     if( p_fifo == NULL )
     {
-        intf_ErrMsg( "aout error: no fifo available" );
+        msg_Err( p_aout, "no fifo available" );
         vlc_mutex_unlock( &p_aout->fifos_lock );
-        vlc_mutex_unlock( &p_aout_bank->lock );
-        return( NULL );
+        return NULL;
     }
 
     /* Initialize the new fifo structure */
@@ -132,11 +116,10 @@ aout_fifo_t * aout_CreateFifo( int i_format, int i_channels, int i_rate,
                                    * ( AOUT_FIFO_SIZE + 1 ) );
             if ( p_fifo->date == NULL )
             {
-                intf_ErrMsg( "aout error: cannot create fifo data" );
+                msg_Err( p_aout, "out of memory" );
                 p_fifo->i_format = AOUT_FIFO_NONE;
                 vlc_mutex_unlock( &p_aout->fifos_lock );
-                vlc_mutex_unlock( &p_aout_bank->lock );
-                return( NULL );
+                return NULL;
             }
 
             p_fifo->buffer = (u8 *)p_fifo->date + sizeof(mtime_t)
@@ -157,24 +140,21 @@ aout_fifo_t * aout_CreateFifo( int i_format, int i_channels, int i_rate,
             break;
 
         default:
-            intf_ErrMsg( "aout error: unknown fifo type 0x%x",
-                         p_fifo->i_format );
+            msg_Err( p_aout, "unknown fifo type 0x%x", p_fifo->i_format );
             p_fifo->i_format = AOUT_FIFO_NONE;
             vlc_mutex_unlock( &p_aout->fifos_lock );
-            vlc_mutex_unlock( &p_aout_bank->lock );
-            return( NULL );
+            return NULL;
     }
 
     /* Release the fifos lock */
     vlc_mutex_unlock( &p_aout->fifos_lock );
-    vlc_mutex_unlock( &p_aout_bank->lock );
 
-    intf_WarnMsg( 2, "aout info: fifo #%i allocated, %i channels, rate %li, "
+    msg_Dbg( p_aout, "fifo #%i allocated, %i channels, rate %li, "
                      "frame size %i", p_fifo->i_fifo, p_fifo->i_channels,
                      p_fifo->i_rate, p_fifo->i_frame_size );
 
     /* Return the pointer to the fifo structure */
-    return( p_fifo );
+    return p_fifo;
 }
 
 /*****************************************************************************
@@ -182,7 +162,7 @@ aout_fifo_t * aout_CreateFifo( int i_format, int i_channels, int i_rate,
  *****************************************************************************/
 void aout_DestroyFifo( aout_fifo_t * p_fifo )
 {
-    intf_WarnMsg( 2, "aout info: fifo #%i destroyed", p_fifo->i_fifo );
+//X    intf_Warn( p_fifo, 2, "fifo #%i destroyed", p_fifo->i_fifo );
 
     vlc_mutex_lock( &p_fifo->data_lock );
     p_fifo->b_die = 1;

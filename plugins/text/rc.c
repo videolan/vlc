@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.14 2002/05/19 15:23:35 gbazin Exp $
+ * $Id: rc.c,v 1.15 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -24,14 +24,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <videolan/vlc.h>
-
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
+
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -46,23 +48,13 @@
 #include <winsock2.h>                                            /* select() */
 #endif
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "intf_playlist.h"
-#include "interface.h"
-
-#include "video.h"
-#include "video_output.h"
-
 /*****************************************************************************
  * intf_sys_t: description and status of rc interface
  *****************************************************************************/
-typedef struct intf_sys_s
+struct intf_sys_s
 {
     vlc_mutex_t         change_lock;
-
-} intf_sys_t;
+};
 
 #define MAX_LINE_LENGTH 256
 
@@ -83,7 +75,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("remote control interface module") )
     ADD_CAPABILITY( INTF, 20 )
-    ADD_SHORTCUT( "rc" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -116,7 +107,7 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg( "intf error: %s", strerror(ENOMEM) );
+        msg_Err( p_intf, "out of memory" );
         return( 1 );
     }
 
@@ -125,10 +116,10 @@ static int intf_Open( intf_thread_t *p_intf )
     freopen( "CONOUT$", "w", stdout );
     freopen( "CONOUT$", "w", stderr );
     freopen( "CONIN$", "r", stdin );
-    intf_Msg( VERSION_MESSAGE );
+    printf( VERSION_MESSAGE "\n" );
 #endif
 
-    intf_Msg( "rc: remote control interface initialized, `h' for help" );
+    printf( "remote control interface initialized, `h' for help\n" );
     return( 0 );
 }
 
@@ -149,47 +140,22 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    char      p_cmd[ MAX_LINE_LENGTH + 1 ];
-    int       i_cmd_pos;
-    boolean_t b_complete = 0;
+    char       p_buffer[ MAX_LINE_LENGTH + 1 ];
+    vlc_bool_t b_complete = 0;
 
-    int       i_dummy;
-    off_t     i_oldpos = 0;
-    off_t     i_newpos;
-    fd_set    fds;                                         /* stdin changed? */
+    int        i_dummy;
+    off_t      i_oldpos = 0;
+    off_t      i_newpos;
+    fd_set     fds;                                        /* stdin changed? */
     struct timeval tv;                                   /* how long to wait */
 
-    double    f_cpos;
-    double    f_ratio = 1;
+    double     f_ratio = 1;
+
+    input_thread_t *p_input;
 
     while( !p_intf->b_die )
     {
-        vlc_mutex_lock( &p_input_bank->lock );
-#define S p_input_bank->pp_input[0]->stream
-        if( p_input_bank->pp_input[0] != NULL )
-        {
-            /* Get position */
-            vlc_mutex_lock( &S.stream_lock );
-            if( !p_input_bank->pp_input[0]->b_die && S.i_mux_rate )
-            {
-                f_ratio = 1.0 / ( 50 * S.i_mux_rate );
-                i_newpos = S.p_selected_area->i_tell * f_ratio;
-
-                if( i_oldpos != i_newpos )
-                {
-                    i_oldpos = i_newpos;
-                    intf_Msg( "rc: pos: %li s / %li s", (long int)i_newpos,
-                              (long int)( f_ratio *
-                                          S.p_selected_area->i_size ) );
-                }
-            }
-            vlc_mutex_unlock( &S.stream_lock );
-        }
-#undef S
-        vlc_mutex_unlock( &p_input_bank->lock );
-
         b_complete = 0;
-        i_cmd_pos = 0;
 
         /* Check stdin */
         tv.tv_sec = 0;
@@ -197,79 +163,98 @@ static void intf_Run( intf_thread_t *p_intf )
         FD_ZERO( &fds );
         FD_SET( STDIN_FILENO, &fds );
 
-        if( select( 32, &fds, NULL, NULL, &tv ) )
+        i_dummy = select( 32, &fds, NULL, NULL, &tv );
+        if( i_dummy > 0 )
         {
+            int i_size = 0;
+
             while( !p_intf->b_die
-                    && i_cmd_pos < MAX_LINE_LENGTH
-                    && read( STDIN_FILENO, p_cmd + i_cmd_pos, 1 ) > 0
-                    && p_cmd[ i_cmd_pos ] != '\r'
-                    && p_cmd[ i_cmd_pos ] != '\n' )
+                    && i_size < MAX_LINE_LENGTH
+                    && read( STDIN_FILENO, p_buffer + i_size, 1 ) > 0
+                    && p_buffer[ i_size ] != '\r'
+                    && p_buffer[ i_size ] != '\n' )
             {
-                i_cmd_pos++;
+                i_size++;
             }
 
-            if( i_cmd_pos == MAX_LINE_LENGTH
-                 || p_cmd[ i_cmd_pos ] == '\r'
-                 || p_cmd[ i_cmd_pos ] == '\n' )
+            if( i_size == MAX_LINE_LENGTH
+                 || p_buffer[ i_size ] == '\r'
+                 || p_buffer[ i_size ] == '\n' )
             {
-                p_cmd[ i_cmd_pos ] = 0;
+                p_buffer[ i_size ] = 0;
                 b_complete = 1;
             }
         }
 
-        vlc_mutex_lock( &p_input_bank->lock );
+        /* Manage the input part */
+        p_input = vlc_object_find( p_intf->p_vlc,
+                                   VLC_OBJECT_INPUT, FIND_CHILD );
+
+        if( p_input )
+        {
+            /* Get position */
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            if( !p_input->b_die && p_input->stream.i_mux_rate )
+            {
+#define A p_input->stream.p_selected_area
+                f_ratio = 1.0 / ( 50 * p_input->stream.i_mux_rate );
+                i_newpos = A->i_tell * f_ratio;
+
+                if( i_oldpos != i_newpos )
+                {
+                    i_oldpos = i_newpos;
+                    printf( "pos: %li s / %li s\n", (long int)i_newpos,
+                            (long int)(f_ratio * A->i_size) );
+                }
+#undef S
+            }
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
 
         /* Is there something to do? */
         if( b_complete == 1 )
         {
-            switch( p_cmd[ 0 ] )
+            char *p_cmd = p_buffer;
+
+            switch( p_cmd[0] )
             {
             case 'a':
             case 'A':
-                if( p_cmd[ 1 ] == ' ' )
+                if( p_cmd[1] == ' ' )
                 {
-                    intf_PlaylistAdd( p_main->p_playlist,
-                                      PLAYLIST_END, p_cmd + 2 );
-                    if( p_input_bank->pp_input[0] != NULL )
-                    {
-                        p_input_bank->pp_input[0]->b_eof = 1;
-                    }
-                    intf_PlaylistJumpto( p_main->p_playlist,
-                                         p_main->p_playlist->i_size - 2 );
+//                    playlist_Add( p_intf->p_this, PLAYLIST_END, p_cmd + 2 );
+//                    playlist_Jumpto( p_intf->p_vlc->p_playlist,
+//                                     p_intf->p_vlc->p_playlist->i_size-2 );
                 }
+                break;
+
+            case 'd':
+            case 'D':
+                vlc_dumpstructure( p_intf->p_vlc );
                 break;
 
             case 'p':
             case 'P':
-                if( p_input_bank->pp_input[0] != NULL )
+                if( p_input )
                 {
-                    input_SetStatus( p_input_bank->pp_input[0],
-                                     INPUT_STATUS_PAUSE );
+                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
                 }
                 break;
 
             case 'f':
             case 'F':
-                vlc_mutex_lock( &p_vout_bank->lock );
-                /* XXX: only fullscreen the first video output */
-                if( p_vout_bank->i_count )
+                if( p_input )
                 {
-                    p_vout_bank->pp_vout[0]->i_changes
-                                      |= VOUT_FULLSCREEN_CHANGE;
-                }
-                vlc_mutex_unlock( &p_vout_bank->lock );
-                break;
+                    vout_thread_t *p_vout;
+                    p_vout = vlc_object_find( p_input,
+                                              VLC_OBJECT_VOUT, FIND_CHILD );
 
-            case 'm':
-            case 'M':
-#if 0
-                double picratio = p_intf->p_input->p_default_vout->i_width 
-                    / p_intf->p_input->p_default_vout->i_height;
-                if (picratio
-                p_intf->p_input->p_default_vout->i_width=800
-                p_intf->p_input->p_default_vout->i_changes |= 
-                    VOUT_FULLSCREEN_CHANGE;
-#endif
+                    if( p_vout )
+                    {
+                        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                        vlc_object_release( p_vout );
+                    }
+                }
                 break;
 
             case 's':
@@ -279,12 +264,12 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'q':
             case 'Q':
-                p_intf->b_die = 1;
+                p_intf->p_vlc->b_die = 1;
                 break;
 
             case 'r':
             case 'R':
-                if( p_input_bank->pp_input[0] != NULL )
+                if( p_input )
                 {
                     for( i_dummy = 1;
                          i_dummy < MAX_LINE_LENGTH && p_cmd[ i_dummy ] >= '0'
@@ -295,9 +280,8 @@ static void intf_Run( intf_thread_t *p_intf )
                     }
 
                     p_cmd[ i_dummy ] = 0;
-                    f_cpos = atof( p_cmd + 1 );
-                    input_Seek( p_input_bank->pp_input[0],
-                                (off_t) (f_cpos / f_ratio) );
+                    input_Seek( p_input, (off_t)atoi( p_cmd + 1 ),
+                                INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
                     /* rcreseek(f_cpos); */
                 }
                 break;
@@ -305,25 +289,27 @@ static void intf_Run( intf_thread_t *p_intf )
             case '?':
             case 'h':
             case 'H':
-                intf_Msg( "rc: help for remote control commands" );
-                intf_Msg( "rc: h                                       help" );
-                intf_Msg( "rc: a XYZ                 append XYZ to playlist" );
-                intf_Msg( "rc: p                               toggle pause" );
-                intf_Msg( "rc: f                          toggle fullscreen" );
-                intf_Msg( "rc: r X    seek in seconds, for instance `r 3.5'" );
-                intf_Msg( "rc: q                                       quit" );
-                intf_Msg( "rc: end of help" );
+                printf( "help for remote control commands\n" );
+                printf( "h . . . . . . . . . . . . . . . . . . . . . help\n" );
+                printf( "a XYZ . . . . . . . . . . append XYZ to playlist\n" );
+                printf( "p . . . . . . . . . . . . . . . . . toggle pause\n" );
+                printf( "f . . . . . . . . . . . . . . toggle  fullscreen\n" );
+                printf( "r X . . . seek in seconds,  for instance `r 3.5'\n" );
+                printf( "q . . . . . . . . . . . . . . . . . . . . . quit\n" );
+                printf( "end of help\n" );
                 break;
 
             default:
-                intf_Msg( "rc: unknown command `%s'", p_cmd );
+                printf( "unknown command `%s'\n", p_cmd );
                 break;
             }
         }
 
-        vlc_mutex_unlock( &p_input_bank->lock );
+        if( p_input )
+        {
+            vlc_object_release( p_input );
+        }
 
-        p_intf->pf_manage( p_intf );
         msleep( INTF_IDLE_SLEEP );
     }
 }

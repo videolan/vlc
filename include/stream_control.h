@@ -4,7 +4,7 @@
  * of the reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: stream_control.h,v 1.7 2002/01/07 02:12:29 sam Exp $
+ * $Id: stream_control.h,v 1.8 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -23,6 +23,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef _STREAM_CONTROL_H
+#define _STREAM_CONTROL_H 1
+
 /* Structures exported to interface, input and decoders */
 
 /*****************************************************************************
@@ -30,7 +33,7 @@
  *****************************************************************************
  * Describe the state of a program stream.
  *****************************************************************************/
-typedef struct stream_ctrl_s
+struct stream_ctrl_s
 {
     vlc_mutex_t             control_lock;
 
@@ -38,11 +41,11 @@ typedef struct stream_ctrl_s
     /* if i_status == FORWARD_S or BACKWARD_S */
     int                     i_rate;
 
-    boolean_t               b_mute;
-    boolean_t               b_grayscale;           /* use color or grayscale */
+    vlc_bool_t              b_mute;
+    vlc_bool_t              b_grayscale;           /* use color or grayscale */
     int                     i_smp; /* number of symmetrical threads to launch
                                     * to decode the video | 0 == disabled    */
-} stream_ctrl_t;
+};
 
 /* Possible status : */
 #define UNDEF_S             0
@@ -57,3 +60,5 @@ typedef struct stream_ctrl_s
 #define DEFAULT_RATE        1000
 #define MINIMAL_RATE        31              /* Up to 32/1 */
 #define MAXIMAL_RATE        8000            /* Up to 1/8 */
+
+#endif /* "stream_control.h" */

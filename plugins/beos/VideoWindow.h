@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.20 2002/06/01 08:54:08 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.21 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -91,7 +91,7 @@ public:
     int             colspace_index;
 
 private:
-    struct vout_thread_s   *p_vout;
+    vout_thread_t  *p_vout;
 
 };
 

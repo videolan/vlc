@@ -1,7 +1,7 @@
 /* dvd_demux.c: DVD demux functions.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_demux.c,v 1.6 2002/05/20 22:39:36 sam Exp $
+ * $Id: dvd_demux.c,v 1.7 2002/06/01 12:31:58 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -27,7 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -43,11 +44,6 @@
 #   include <strings.h>
 #endif
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-
 /* how many packets DVDDemux will read in each loop */
 #define DVD_READ_ONCE 64
 
@@ -56,10 +52,10 @@
  *****************************************************************************/
 
 /* called from outside */
-static int  DVDRewind       ( struct input_thread_s * );
-static int  DVDDemux        ( struct input_thread_s * );
-static int  DVDInit         ( struct input_thread_s * );
-static void DVDEnd          ( struct input_thread_s * );
+static int  DVDRewind  ( input_thread_t * );
+static int  DVDDemux   ( input_thread_t * );
+static int  DVDInit    ( input_thread_t * );
+static void DVDEnd     ( input_thread_t * );
 
 void DVDLaunchDecoders( input_thread_t * );
 

@@ -2,7 +2,7 @@
  * ac3_downmix.h : AC3 downmix types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_downmix.h,v 1.3 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_downmix.h,v 1.4 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -22,15 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-typedef struct dm_par_s {
+struct dm_par_s {
     float unit;
     float clev;
     float slev;
-} dm_par_t;
+};
 
-typedef struct downmix_s {
+struct downmix_s {
     /* Module used and shortcuts */
-    struct module_s * p_module;
+    module_t * p_module;
     void (*pf_downmix_3f_2r_to_2ch)(float *, dm_par_t * dm_par);
     void (*pf_downmix_3f_1r_to_2ch)(float *, dm_par_t * dm_par);
     void (*pf_downmix_2f_2r_to_2ch)(float *, dm_par_t * dm_par);
@@ -38,5 +38,5 @@ typedef struct downmix_s {
     void (*pf_downmix_3f_0r_to_2ch)(float *, dm_par_t * dm_par);
     void (*pf_stream_sample_2ch_to_s16)(s16 *, float *left, float *right);
     void (*pf_stream_sample_1ch_to_s16)(s16 *, float *center);
-} downmix_t;
+};
 

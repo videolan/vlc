@@ -2,7 +2,7 @@
  * ac3_imdct_common.c: common ac3 DCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_common.c,v 1.6 2001/12/30 07:09:55 sam Exp $
+ * $Id: ac3_imdct_common.c,v 1.7 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -28,7 +28,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_retables.h"

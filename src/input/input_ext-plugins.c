@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.10 2002/05/21 00:23:37 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.11 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
@@ -91,9 +91,9 @@
 /*****************************************************************************
  * data_buffer_t: shared data type
  *****************************************************************************/
-typedef struct data_buffer_s
+struct data_buffer_s
 {
-    struct data_buffer_s * p_next;
+    data_buffer_t * p_next;
 
     /* number of data packets this buffer is referenced from - when it falls
      * down to 0, the buffer is freed */
@@ -101,7 +101,7 @@ typedef struct data_buffer_s
 
     /* size of the current buffer (starting right after this byte) */
     size_t i_size;
-} data_buffer_t;
+};
 
 /*****************************************************************************
  * input_buffers_t: defines a LIFO per data type to keep
@@ -113,20 +113,20 @@ struct                                                                      \
     unsigned int i_depth;                                                   \
 } NAME;
 
-typedef struct input_buffers_s
+struct input_buffers_s
 {
     vlc_mutex_t lock;
     PACKETS_LIFO( pes_packet_t, pes )
     PACKETS_LIFO( data_packet_t, data )
     PACKETS_LIFO( data_buffer_t, buffers )
     size_t i_allocated;
-} input_buffers_t;
+};
 
 
 /*****************************************************************************
  * input_BuffersInit: initialize the cache structures, return a pointer to it
  *****************************************************************************/
-void * input_BuffersInit( void )
+void * input_BuffersInit( vlc_object_t *p_this )
 {
     input_buffers_t * p_buffers = malloc( sizeof( input_buffers_t ) );
 
@@ -136,7 +136,7 @@ void * input_BuffersInit( void )
     }
 
     memset( p_buffers, 0, sizeof( input_buffers_t ) );
-    vlc_mutex_init( &p_buffers->lock );
+    vlc_mutex_init( p_this, &p_buffers->lock );
 
     return( p_buffers );
 }
@@ -152,19 +152,13 @@ void * input_BuffersInit( void )
         p_packet = p_next;                                                  \
     }
 
-void input_BuffersEnd( input_buffers_t * p_buffers )
+void input_BuffersEnd( input_thread_t * p_input, input_buffers_t * p_buffers )
 {
     if( p_buffers != NULL )
     {
-        if( p_main->b_stats )
-        {
-            intf_StatMsg( "input buffers stats: pes: %d packets",
-                          p_buffers->pes.i_depth );
-            intf_StatMsg( "input buffers stats: data: %d packets",
-                          p_buffers->data.i_depth );
-            intf_StatMsg( "input buffers stats: buffers: %d packets",
-                          p_buffers->buffers.i_depth );
-        }
+        msg_Dbg( p_input, "pes: %d packets", p_buffers->pes.i_depth );
+        msg_Dbg( p_input, "data: %d packets", p_buffers->data.i_depth );
+        msg_Dbg( p_input, "buffers: %d packets", p_buffers->buffers.i_depth );
 
         {
             /* Free PES */
@@ -192,9 +186,8 @@ void input_BuffersEnd( input_buffers_t * p_buffers )
 
         if( p_buffers->i_allocated )
         {
-            intf_ErrMsg( "input buffers error: %d bytes have not been"
-                         " freed, expect memory leak",
-                         p_buffers->i_allocated );
+            msg_Err( p_input, "%d bytes have not been freed, "
+                              "expect memory leak", p_buffers->i_allocated );
         }
 
         vlc_mutex_destroy( &p_buffers->lock );
@@ -213,8 +206,8 @@ static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
     /* Safety check */
     if( p_buffers->i_allocated > INPUT_MAX_ALLOCATION )
     {
-        intf_ErrMsg( "INPUT_MAX_ALLOCATION reached (%d)",
-                     p_buffers->i_allocated );
+//X        intf_Err( "INPUT_MAX_ALLOCATION reached (%d)",
+//X                     p_buffers->i_allocated );
         return NULL;
     } 
 
@@ -233,7 +226,7 @@ static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
             p_buf = malloc( sizeof(input_buffers_t) + i_size );
             if( p_buf == NULL )
             {
-                intf_ErrMsg( "Out of memory" );
+//X                intf_ErrMsg( "Out of memory" );
                 return NULL;
             }
             p_buf->i_size = i_size;
@@ -246,7 +239,7 @@ static inline data_buffer_t * NewBuffer( input_buffers_t * p_buffers,
         p_buf = malloc( sizeof(input_buffers_t) + i_size );
         if( p_buf == NULL )
         {
-            intf_ErrMsg( "Out of memory" );
+//X            intf_ErrMsg( "Out of memory" );
             return NULL;
         }
         p_buf->i_size = i_size;
@@ -325,7 +318,7 @@ static inline data_packet_t * ShareBuffer( input_buffers_t * p_buffers,
         p_data = malloc( sizeof(data_packet_t) );
         if( p_data == NULL )
         {
-            intf_ErrMsg( "Out of memory" );
+//X            intf_ErrMsg( "Out of memory" );
             return NULL;
         }
     }
@@ -441,7 +434,7 @@ static inline pes_packet_t * NewPES( input_buffers_t * p_buffers )
         p_pes = malloc( sizeof(pes_packet_t) );
         if( p_pes == NULL )
         {
-            intf_ErrMsg( "Out of memory" );
+//X            intf_ErrMsg( "Out of memory" );
             return NULL;
         }
     }
@@ -539,8 +532,9 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
     {
         if( i_remains )
         {
-            FAST_MEMCPY( (byte_t *)p_buf + sizeof(data_buffer_t),
-                         p_input->p_current_data, (size_t)i_remains );
+            p_input->p_vlc->pf_memcpy( (byte_t *)p_buf + sizeof(data_buffer_t),
+                                       p_input->p_current_data,
+                                       (size_t)i_remains );
         }
         ReleaseBuffer( p_input->p_method_data, p_input->p_data_buffer );
     }
@@ -625,7 +619,7 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
  *****************************************************************************/
 int input_AccessInit( input_thread_t * p_input )
 {
-    p_input->p_method_data = input_BuffersInit();
+    p_input->p_method_data = input_BuffersInit( p_input->p_this );
     if( p_input->p_method_data == NULL ) return( -1 );
     p_input->p_data_buffer = NULL;
     p_input->p_current_data = NULL;
@@ -657,7 +651,7 @@ void input_AccessEnd( input_thread_t * p_input )
         ReleaseBuffer( p_input->p_method_data, p_input->p_data_buffer );
     }
 
-    input_BuffersEnd( p_input->p_method_data );
+    input_BuffersEnd( p_input, p_input->p_method_data );
 }
 
 
@@ -673,22 +667,22 @@ void input_FDClose( input_thread_t * p_input )
 {
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
 
-    intf_WarnMsg( 2, "input: closing `%s/%s:%s'", 
-                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
+    msg_Info( p_input, "closing `%s/%s:%s'", 
+              p_input->psz_access, p_input->psz_demux, p_input->psz_name );
  
     close( p_access_data->i_handle );
     free( p_access_data );
 }
 
 /*****************************************************************************
- * input_FDNetworkClose: close the target
+ * input_FDNetworkClose: close a network target
  *****************************************************************************/
 void input_FDNetworkClose( input_thread_t * p_input )
 {
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
 
-    intf_WarnMsg( 2, "input: closing network `%s/%s:%s'", 
-                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
+    msg_Info( p_input, "closing network `%s/%s:%s'", 
+              p_input->psz_access, p_input->psz_demux, p_input->psz_name );
  
 #ifdef WIN32
     closesocket( p_access_data->i_handle );
@@ -717,7 +711,7 @@ ssize_t input_FDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len 
  
     if( i_ret < 0 )
     {
-        intf_ErrMsg( "input error: read() failed (%s)", strerror(errno) );
+        msg_Err( p_input, "read failed (%s)", strerror(errno) );
     }
  
     return( i_ret );
@@ -747,7 +741,7 @@ static inline int NetworkSelect( input_thread_t * p_input )
  
     if( i_ret == -1 && errno != EINTR )
     {
-        intf_ErrMsg( "input error: network select error (%s)", strerror(errno) );
+        msg_Err( p_input, "network select error (%s)", strerror(errno) );
     }
 
     return( i_ret );
@@ -776,7 +770,7 @@ ssize_t input_FDNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
 
         if( i_ret < 0 )
         {
-            intf_ErrMsg( "input error: recv() failed (%s)", strerror(errno) );
+            msg_Err( p_input, "recv failed (%s)", strerror(errno) );
         }
 
         return( i_ret );
@@ -799,12 +793,12 @@ void input_FDSeek( input_thread_t * p_input, off_t i_pos )
     S.p_selected_area->i_tell = i_pos;
     if( S.p_selected_area->i_tell > S.p_selected_area->i_size )
     {
-        intf_ErrMsg( "input error: seeking too far" );
+        msg_Err( p_input, "seeking too far" );
         S.p_selected_area->i_tell = S.p_selected_area->i_size;
     }
     else if( S.p_selected_area->i_tell < 0 )
     {
-        intf_ErrMsg( "input error: seeking too early" );
+        msg_Err( p_input, "seeking too early" );
         S.p_selected_area->i_tell = 0;
     }
     vlc_mutex_unlock( &S.stream_lock );

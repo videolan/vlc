@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.28 2002/04/24 00:36:24 sam Exp $
+ * $Id: interface.h,v 1.29 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -29,82 +29,40 @@
  * This structe describes all interface-specific data of the main (interface)
  * thread.
  *****************************************************************************/
-typedef struct intf_thread_s
+struct intf_thread_s
 {
-    boolean_t           b_die;                                 /* `die' flag */
+    VLC_COMMON_MEMBERS
+
+    /* Thread properties and locks */
+    vlc_bool_t          b_block;
 
     /* Specific interfaces */
-    p_intf_console_t    p_console;                                /* console */
-    p_intf_sys_t        p_sys;                           /* system interface */
+    intf_console_t *    p_console;                                /* console */
+    intf_sys_t *        p_sys;                           /* system interface */
     
     /* Plugin used and shortcuts to access its capabilities */
-    struct module_s *   p_module;
-    int              ( *pf_open )   ( struct intf_thread_s * );
-    void             ( *pf_close )  ( struct intf_thread_s * );
-    void             ( *pf_run )    ( struct intf_thread_s * );
-
-    /* Interface callback */
-    void             ( *pf_manage ) ( struct intf_thread_s * );
+    module_t *   p_module;
+    int       ( *pf_open )   ( intf_thread_t * );
+    void      ( *pf_close )  ( intf_thread_t * );
+    void      ( *pf_run )    ( intf_thread_t * );
 
     /* XXX: new message passing stuff will go here */
-    vlc_mutex_t         change_lock;
-    boolean_t           b_menu_change;
-    boolean_t           b_menu;
-    
-} intf_thread_t;
-
-/*****************************************************************************
- * msg_item_t
- *****************************************************************************
- * Store a single message. Messages have a maximal size of INTF_MSG_MSGSIZE.
- *****************************************************************************/
-typedef struct
-{
-    int     i_type;                               /* message type, see below */
-    char *  psz_msg;                                   /* the message itself */
-
-#if 0
-    mtime_t date;                                     /* date of the message */
-    char *  psz_file;               /* file in which the function was called */
-    char *  psz_function;     /* function from which the function was called */
-    int     i_line;                 /* line at which the function was called */
-#endif
-} msg_item_t;
-
-/* Message types */
-#define INTF_MSG_STD    0                                /* standard message */
-#define INTF_MSG_ERR    1                                   /* error message */
-#define INTF_MSG_WARN   2                                 /* warning message */
-#define INTF_MSG_STAT   3                               /* statistic message */
-
-/*****************************************************************************
- * intf_subscription_t
- *****************************************************************************
- * Used by interface plugins which subscribe to the message queue.
- *****************************************************************************/
-typedef struct intf_subscription_s
-{
-    int   i_start;
-    int*  pi_stop;
-
-    msg_item_t*  p_msg;
-    vlc_mutex_t* p_lock;
-} intf_subscription_t;
+    vlc_mutex_t  change_lock;
+    vlc_bool_t   b_menu_change;
+    vlc_bool_t   b_menu;
+};
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-intf_thread_t * intf_Create       ( void );
-void            intf_Destroy      ( intf_thread_t * p_intf );
+intf_thread_t * intf_Create     ( vlc_object_t * );
+vlc_error_t     intf_RunThread  ( intf_thread_t * );
+void            intf_StopThread ( intf_thread_t * );
+void            intf_Destroy    ( intf_thread_t * );
 
-void            intf_MsgCreate    ( void );
-void            intf_MsgDestroy   ( void );
+void            msg_Create      ( vlc_object_t * );
+void            msg_Destroy     ( vlc_object_t * );
 
-#ifndef __PLUGIN__
-intf_subscription_t* intf_MsgSub    ( void );
-void                 intf_MsgUnsub  ( intf_subscription_t * );
-#else
-#   define intf_MsgSub p_symbols->intf_MsgSub
-#   define intf_MsgUnsub p_symbols->intf_MsgUnsub
-#endif
+VLC_EXPORT( msg_subscription_t*, msg_Subscribe, ( vlc_object_t * ) );
+VLC_EXPORT( void, msg_Unsubscribe, ( vlc_object_t *, msg_subscription_t * ) );
 

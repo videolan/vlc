@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.10 2002/05/22 23:11:00 massiot Exp $
+ * $Id: http.c,v 1.11 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,7 +31,8 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -49,21 +50,16 @@
 #   include <sys/socket.h>
 #endif
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-
 #include "network.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void input_getfunctions( function_list_t * );
-static int  HTTPOpen       ( struct input_thread_s * );
-static void HTTPClose      ( struct input_thread_s * );
-static int  HTTPSetProgram ( struct input_thread_s * , pgrm_descriptor_t * );  
-static void HTTPSeek       ( struct input_thread_s *, off_t );
+static int  HTTPOpen       ( input_thread_t * );
+static void HTTPClose      ( input_thread_t * );
+static int  HTTPSetProgram ( input_thread_t *, pgrm_descriptor_t * );  
+static void HTTPSeek       ( input_thread_t *, off_t );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -74,7 +70,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("HTTP access plug-in") )
     ADD_CAPABILITY( ACCESS, 0 )
-    ADD_SHORTCUT( "http" )
     ADD_SHORTCUT( "http4" )
     ADD_SHORTCUT( "http6" )
 MODULE_INIT_STOP
@@ -122,12 +117,12 @@ typedef struct _input_socket_s
 static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 {
     _input_socket_t *   p_access_data = p_input->p_access_data;
-    struct module_s *   p_network;
+    module_t *          p_network;
     char                psz_buffer[256];
     byte_t *            psz_parser;
 
     /* Find an appropriate network module */
-    p_network = module_Need( MODULE_CAPABILITY_NETWORK,
+    p_network = module_Need( p_input, MODULE_CAPABILITY_NETWORK,
                              p_access_data->psz_network,
                              &p_access_data->socket_desc );
     if( p_network == NULL )
@@ -153,7 +148,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     if( send( p_access_data->_socket.i_handle, psz_buffer,
                strlen( psz_buffer ), 0 ) == (-1) )
     {
-        intf_ErrMsg( "http error: cannot send request (%s)", strerror(errno) );
+        msg_Err( p_input, "cannot send request (%s)", strerror(errno) );
         input_FDNetworkClose( p_input );
         return( -1 );
     }
@@ -178,7 +173,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     {
         if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
         {
-            intf_ErrMsg( "http error: not enough data" );
+            msg_Err( p_input, "not enough data" );
             input_FDNetworkClose( p_input );
             return( -1 );
         }
@@ -238,18 +233,18 @@ static int HTTPOpen( input_thread_t * p_input )
     p_access_data = p_input->p_access_data = malloc( sizeof(_input_socket_t) );
     if( p_access_data == NULL )
     {
-        intf_ErrMsg( "http error: Out of memory" );
+        msg_Err( p_input, "out of memory" );
         free(psz_name);
         return( -1 );
     }
 
     p_access_data->psz_name = psz_name;
     p_access_data->psz_network = "";
-    if( config_GetIntVariable( "ipv4" ) )
+    if( config_GetInt( p_input, "ipv4" ) )
     {
         p_access_data->psz_network = "ipv4";
     }
-    if( config_GetIntVariable( "ipv6" ) )
+    if( config_GetInt( p_input, "ipv6" ) )
     {
         p_access_data->psz_network = "ipv6";
     }
@@ -304,8 +299,7 @@ static int HTTPOpen( input_thread_t * p_input )
         i_server_port = strtol( psz_server_port, &psz_parser, 10 );
         if( *psz_parser )
         {
-            intf_ErrMsg( "input error: cannot parse server port near %s",
-                         psz_parser );
+            msg_Err( p_input, "cannot parse server port near %s", psz_parser );
             free( p_input->p_access_data );
             free( psz_name );
             return( -1 );
@@ -319,7 +313,7 @@ static int HTTPOpen( input_thread_t * p_input )
 
     if( !*psz_server_addr )
     {
-        intf_ErrMsg( "input error: no server given" );
+        msg_Err( p_input, "no server given" );
         free( p_input->p_access_data );
         free( psz_name );
         return( -1 );
@@ -382,7 +376,7 @@ static int HTTPOpen( input_thread_t * p_input )
         }
         else
         {
-            intf_ErrMsg( "input error: http_proxy environment variable is invalid !" );
+            msg_Err( p_input, "http_proxy environment variable is invalid!" );
             free( p_input->p_access_data );
             free( psz_name );
             return( -1 );
@@ -409,8 +403,8 @@ static int HTTPOpen( input_thread_t * p_input )
     }
     p_access_data->psz_buffer[sizeof(p_access_data->psz_buffer) - 1] = '\0';
 
-    intf_WarnMsg( 2, "input: opening server=%s port=%d path=%s",
-                  psz_server_addr, i_server_port, psz_path );
+    msg_Dbg( p_input, "opening server=%s port=%d path=%s",
+                      psz_server_addr, i_server_port, psz_path );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_pace_control = 1;
@@ -448,7 +442,7 @@ static void HTTPSeek( input_thread_t * p_input, off_t i_pos )
 {
     _input_socket_t *   p_access_data = p_input->p_access_data;
     close( p_access_data->_socket.i_handle );
-    intf_WarnMsg( 2, "http: seeking to position %lld", i_pos );
+    msg_Dbg( p_input, "seeking to position %lld", i_pos );
     HTTPConnect( p_input, i_pos );
 }
 

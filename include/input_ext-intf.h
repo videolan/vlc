@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.66 2002/04/25 02:10:33 jobi Exp $
+ * $Id: input_ext-intf.h,v 1.67 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -23,6 +23,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef _VLC_INPUT_EXT_INTF_H
+#define _VLC_INPUT_EXT_INTF_H 1
+
 /*
  * Communication input -> interface
  */
@@ -35,38 +38,17 @@
 #define OFFSETTOTIME_MAX_SIZE       10
 
 /*****************************************************************************
- * input_bank_t, p_input_bank (global variable)
- *****************************************************************************
- * This global variable is accessed by any function using the input.
- *****************************************************************************/
-typedef struct input_bank_s
-{
-    /* Array to all the input threads */
-    struct input_thread_s *pp_input[ INPUT_MAX_THREADS ];
-
-    int                   i_count;
-    vlc_mutex_t           lock;                               /* Global lock */
-
-} input_bank_t;
-
-#ifndef __PLUGIN__
-extern input_bank_t *p_input_bank;
-#else
-#   define p_input_bank (p_symbols->p_input_bank)
-#endif
-
-/*****************************************************************************
  * es_descriptor_t: elementary stream descriptor
  *****************************************************************************
  * Describes an elementary stream, and includes fields required to handle and
  * demultiplex this elementary stream.
  *****************************************************************************/
-typedef struct es_descriptor_s
+struct es_descriptor_s
 {
     u16                     i_id;            /* stream ID for PS, PID for TS */
     u8                      i_stream_id;     /* stream ID defined in the PES */
     u8                      i_type;                           /* stream type */
-    boolean_t               b_audio;      /* is the stream an audio stream that
+    vlc_bool_t              b_audio;      /* is the stream an audio stream that
                                            * will need to be discarded with
                                            * fast forward and slow motion ?  */
     u8                      i_cat;        /* stream category: video, audio,
@@ -79,25 +61,22 @@ typedef struct es_descriptor_s
 
     /* Demultiplexer information */
     void *                  p_demux_data;
-    struct pgrm_descriptor_s *
-                            p_pgrm;  /* very convenient in the demultiplexer */
+    pgrm_descriptor_t *     p_pgrm;  /* very convenient in the demultiplexer */
 
     /* PES parser information */
-    struct pes_packet_s *   p_pes;                            /* Current PES */
+    pes_packet_t *          p_pes;                            /* Current PES */
     int                     i_pes_real_size;   /* as indicated by the header */
 
     /* Decoder information */
-    struct decoder_fifo_s * p_decoder_fifo;
+    decoder_fifo_t *        p_decoder_fifo;
     vlc_thread_t            thread_id;                  /* ID of the decoder */
 
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
 
     /* Module properties */
-    struct module_s *         p_module;
-    struct decoder_config_s * p_config;
-
-} es_descriptor_t;
+    module_t *              p_module;
+};
 
 /* Special PID values - note that the PID is only on 13 bits, and that values
  * greater than 0x1fff have no meaning in a stream */
@@ -119,12 +98,12 @@ typedef struct es_descriptor_s
  * Describes a program and list associated elementary streams. It is build by
  * the PSI decoder upon the informations carried in program map sections
  *****************************************************************************/
-typedef struct pgrm_descriptor_s
+struct pgrm_descriptor_s
 {
     /* Program characteristics */
     u16                     i_number;                      /* program number */
     u8                      i_version;                     /* version number */
-    boolean_t               b_is_ok;      /* Is the description up to date ? */
+    vlc_bool_t              b_is_ok;      /* Is the description up to date ? */
 
     /* Service Descriptor (program name) - DVB extension */
     u8                      i_srv_type;
@@ -145,7 +124,7 @@ typedef struct pgrm_descriptor_s
 
     int                     i_es_number;      /* size of the following array */
     es_descriptor_t **      pp_es;                /* array of pointers to ES */
-} pgrm_descriptor_t;
+};
 
 /* Synchro states */
 #define SYNCHRO_OK          0
@@ -157,7 +136,7 @@ typedef struct pgrm_descriptor_s
  *****************************************************************************
  * Attributes for current area (title for DVD)
  *****************************************************************************/
-typedef struct input_area_s
+struct input_area_s
 {
     /* selected area attributes */
     int                     i_id;        /* identificator for area */
@@ -178,7 +157,7 @@ typedef struct input_area_s
 
     /* offset to plugin related data */
     off_t                   i_plugin_data;
-} input_area_t;
+};
 
 /*****************************************************************************
  * stream_descriptor_t
@@ -186,10 +165,10 @@ typedef struct input_area_s
  * Describes a stream and list its associated programs. Build upon
  * the information carried in program association sections (for instance)
  *****************************************************************************/
-typedef struct stream_descriptor_s
+struct stream_descriptor_s
 {
     u16                     i_stream_id;                        /* stream id */
-    boolean_t               b_changed;    /* if stream has been changed,
+    vlc_bool_t              b_changed;    /* if stream has been changed,
                                              we have to inform the interface */
     vlc_mutex_t             stream_lock;  /* to be taken every time you read
                                            * or modify stream, pgrm or es    */
@@ -197,8 +176,8 @@ typedef struct stream_descriptor_s
     /* Input method data */
     int                     i_method;       /* input method for stream: file,
                                                disc or network */
-    boolean_t               b_pace_control;    /* can we read when we want ? */
-    boolean_t               b_seekable;               /* can we do lseek() ? */
+    vlc_bool_t              b_pace_control;    /* can we read when we want ? */
+    vlc_bool_t              b_seekable;               /* can we do lseek() ? */
 
     /* if (b_seekable) : */
     int                     i_area_nb;
@@ -241,7 +220,21 @@ typedef struct stream_descriptor_s
     /* Statistics */
     count_t                 c_packets_read;                  /* packets read */
     count_t                 c_packets_trashed;            /* trashed packets */
-} stream_descriptor_t;
+};
+
+/*****************************************************************************
+ * stream_position_t
+ *****************************************************************************
+ * Describes the current position in the stream.
+ *****************************************************************************/
+struct stream_position_s
+{
+    off_t    i_tell;     /* actual location in the area (in arbitrary units) */
+    off_t    i_size;          /* total size of the area (in arbitrary units) */
+
+    u32      i_mux_rate;                /* the rate we read the stream (in
+                                         * units of 50 bytes/s) ; 0 if undef */
+};
 
 #define MUTE_NO_CHANGE      -1
 
@@ -250,57 +243,53 @@ typedef struct stream_descriptor_s
  *****************************************************************************
  * This structure includes all the local static variables of an input thread
  *****************************************************************************/
-typedef struct input_thread_s
+struct input_thread_s
 {
+    VLC_COMMON_MEMBERS
+
     /* Thread properties and locks */
-    boolean_t               b_die;                             /* 'die' flag */
-    boolean_t               b_error;
-    boolean_t               b_eof;
-    vlc_thread_t            thread_id;            /* id for thread functions */
+    vlc_bool_t              b_eof;
     int                     i_status;                         /* status flag */
 
     /* Access module */
-    struct module_s *       p_access_module;
-    int                  (* pf_open)( struct input_thread_s * );
-    void                 (* pf_close)( struct input_thread_s * );
-    ssize_t              (* pf_read) ( struct input_thread_s *,
-                                       byte_t *, size_t );
-    int                  (* pf_set_program)( struct input_thread_s *,
-                                             struct pgrm_descriptor_s * );
-    int                  (* pf_set_area)( struct input_thread_s *,
-                                          struct input_area_s * );
-    void                 (* pf_seek)( struct input_thread_s *, off_t );
-    void *                  p_access_data;
-    size_t                  i_mtu;
+    module_t *       p_access_module;
+    int           (* pf_open ) ( input_thread_t * );
+    void          (* pf_close )( input_thread_t * );
+    ssize_t       (* pf_read ) ( input_thread_t *, byte_t *, size_t );
+    int           (* pf_set_program )( input_thread_t *, pgrm_descriptor_t * );
+    int           (* pf_set_area )( input_thread_t *, input_area_t * );
+    void          (* pf_seek ) ( input_thread_t *, off_t );
+    void *           p_access_data;
+    size_t           i_mtu;
 
     /* Demux module */
-    struct module_s *       p_demux_module;
-    int                  (* pf_init)( struct input_thread_s * );
-    void                 (* pf_end)( struct input_thread_s * );
-    int                  (* pf_demux)( struct input_thread_s * );
-    int                  (* pf_rewind)( struct input_thread_s * );
+    module_t *       p_demux_module;
+    int           (* pf_init )   ( input_thread_t * );
+    void          (* pf_end )    ( input_thread_t * );
+    int           (* pf_demux )  ( input_thread_t * );
+    int           (* pf_rewind ) ( input_thread_t * );
                                            /* NULL if we don't support going *
                                             * backwards (it's gonna be fun)  */
-    void *                  p_demux_data;               /* data of the demux */
+    void *           p_demux_data;                      /* data of the demux */
 
     /* Buffer manager */
-    struct input_buffers_s *p_method_data;     /* data of the packet manager */
-    struct data_buffer_s *  p_data_buffer;
-    byte_t *                p_current_data;
-    byte_t *                p_last_data;
-    size_t                  i_bufsize;
+    input_buffers_t *p_method_data;     /* data of the packet manager */
+    data_buffer_t *  p_data_buffer;
+    byte_t *         p_current_data;
+    byte_t *         p_last_data;
+    size_t           i_bufsize;
 
     /* General stream description */
     stream_descriptor_t     stream;
 
     /* Playlist item */
-    char *                  psz_source;
-    char *                  psz_access;
-    char *                  psz_demux;
-    char *                  psz_name;
+    char *  psz_source;
+    char *  psz_access;
+    char *  psz_demux;
+    char *  psz_name;
 
-    count_t                 c_loops;
-} input_thread_t;
+    count_t c_loops;
+};
 
 /* Input methods */
 /* The first figure is a general method that can be used in interface plugins ;
@@ -325,39 +314,40 @@ typedef struct input_thread_s
 #define INPUT_STATUS_FASTER         3
 #define INPUT_STATUS_SLOWER         4
 
+/* Seek modes */
+#define INPUT_SEEK_SET       0x00
+#define INPUT_SEEK_CUR       0x01
+#define INPUT_SEEK_END       0x02
+#define INPUT_SEEK_BYTES     0x00
+#define INPUT_SEEK_SECONDS   0x10
+#define INPUT_SEEK_PERCENT   0x20
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef __PLUGIN__
-void   input_InitBank       ( void );
-void   input_EndBank        ( void );
+input_thread_t * input_CreateThread ( vlc_object_t *,
+                                      playlist_item_t *, int * );
+void   input_StopThread     ( input_thread_t *, int *pi_status );
+void   input_DestroyThread  ( input_thread_t * );
 
-struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
-                                             int *pi_status );
-void   input_StopThread     ( struct input_thread_s *, int *pi_status );
-void   input_DestroyThread  ( struct input_thread_s * );
+#define input_SetStatus(a,b) __input_SetStatus(CAST_TO_VLC_OBJECT(a),b)
+VLC_EXPORT( void, __input_SetStatus, ( vlc_object_t *, int ) );
 
-void   input_SetStatus      ( struct input_thread_s *, int );
-void   input_Seek           ( struct input_thread_s *, off_t );
-void   input_DumpStream     ( struct input_thread_s * );
-char * input_OffsetToTime   ( struct input_thread_s *, char *, off_t );
-int    input_ChangeES       ( struct input_thread_s *,
-                              struct es_descriptor_s *, u8 );
-int    input_ToggleES       ( struct input_thread_s *,
-                              struct es_descriptor_s *, boolean_t );
-int    input_ChangeArea     ( struct input_thread_s *, struct input_area_s * );
-int    input_ChangeProgram  ( struct input_thread_s *, u16 );
-int    input_ToggleGrayscale( struct input_thread_s * );
-int    input_ToggleMute     ( struct input_thread_s * );
-int    input_SetSMP         ( struct input_thread_s *, int );
-#else
-#   define input_SetStatus      p_symbols->input_SetStatus
-#   define input_Seek           p_symbols->input_Seek
-#   define input_DumpStream     p_symbols->input_DumpStream
-#   define input_OffsetToTime   p_symbols->input_OffsetToTime
-#   define input_ChangeES       p_symbols->input_ChangeES
-#   define input_ToggleES       p_symbols->input_ToggleES
-#   define input_ChangeArea     p_symbols->input_ChangeArea
-#   define input_ChangeProgram  p_symbols->input_ChangeProgram
-#endif
+#define input_Seek(a,b,c) __input_Seek(CAST_TO_VLC_OBJECT(a),b,c)
+VLC_EXPORT( void, __input_Seek, ( vlc_object_t *, off_t, int ) );
 
+#define input_Tell(a,b) __input_Tell(CAST_TO_VLC_OBJECT(a),b)
+VLC_EXPORT( void, __input_Tell, ( vlc_object_t *, stream_position_t * ) );
+
+VLC_EXPORT( void, input_DumpStream, ( input_thread_t * ) );
+VLC_EXPORT( char *, input_OffsetToTime, ( input_thread_t *, char *, off_t ) );
+VLC_EXPORT( int, input_ChangeES, ( input_thread_t *, es_descriptor_t *, u8 ) );
+VLC_EXPORT( int, input_ToggleES, ( input_thread_t *, es_descriptor_t *, vlc_bool_t ) );
+VLC_EXPORT( int, input_ChangeArea, ( input_thread_t *, input_area_t * ) );
+VLC_EXPORT( int, input_ChangeProgram, ( input_thread_t *, u16 ) );
+
+int    input_ToggleGrayscale( input_thread_t * );
+int    input_ToggleMute     ( input_thread_t * );
+int    input_SetSMP         ( input_thread_t *, int );
+
+#endif /* "input_ext-intf.h" */

@@ -26,21 +26,19 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
+
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
 
 #include <sys/asoundlib.h>
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"                                   /* aout_thread_t */
-
-typedef struct aout_sys_s
+struct aout_sys_s
 {
     snd_pcm_t  * p_pcm_handle;
     int          i_card;
     int          i_device;
-} aout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
@@ -78,8 +76,7 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg( "aout error: unable to allocate memory (%s)",
-                     strerror( ENOMEM ) );
+        msg_Err( p_aout, "out of memory" );
         return( 1 );
     }
 
@@ -89,8 +86,8 @@ static int aout_Open( aout_thread_t *p_aout )
                                           &p_aout->p_sys->i_device,
                                           SND_PCM_OPEN_PLAYBACK ) ) < 0 )
     {
-        intf_ErrMsg( "aout error: unable to open audio device (%s)",
-                      snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to open audio device (%s)",
+                         snd_strerror( i_ret ) );
         free( p_aout->p_sys );
         return( 1 );
     }
@@ -99,8 +96,7 @@ static int aout_Open( aout_thread_t *p_aout )
     if( ( i_ret = snd_pcm_plugin_set_disable( p_aout->p_sys->p_pcm_handle,
                                               PLUGIN_DISABLE_MMAP ) ) < 0 )
     {
-        intf_ErrMsg( "aout error: unable to disable mmap (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to disable mmap (%s)", snd_strerror(i_ret) );
         aout_Close( p_aout );
         free( p_aout->p_sys );
         return( 1 );
@@ -130,8 +126,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( ( i_ret = snd_pcm_plugin_info( p_aout->p_sys->p_pcm_handle,
                                        &pi ) ) < 0 )
     {
-        intf_ErrMsg( "aout error: unable to get plugin info (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to get plugin info (%s)",
+                         snd_strerror( i_ret ) );
         return( 1 );
     }
 
@@ -168,8 +164,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( ( i_ret = snd_pcm_plugin_params( p_aout->p_sys->p_pcm_handle,
                                          &pp ) ) < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set parameters (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to set parameters (%s)", snd_strerror(i_ret) );
         return( 1 );
     }
 
@@ -177,8 +172,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( ( i_ret = snd_pcm_plugin_prepare( p_aout->p_sys->p_pcm_handle,
                                           SND_PCM_CHANNEL_PLAYBACK ) ) < 0 )
     {
-        intf_ErrMsg( "aout error: unable to prepare channel (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to prepare channel (%s)",
+                         snd_strerror( i_ret ) );
         return( 1 );
     }
 
@@ -203,8 +198,8 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
     if( ( i_ret = snd_pcm_plugin_status( p_aout->p_sys->p_pcm_handle,
                                          &status ) ) < 0 )
     {
-        intf_ErrMsg( "aout error: unable to get device status (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to get device status (%s)",
+                         snd_strerror( i_ret ) );
         return( -1 );
     }
 
@@ -216,8 +211,8 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
             if( ( i_ret = snd_pcm_plugin_prepare( p_aout->p_sys->p_pcm_handle,
                                           SND_PCM_CHANNEL_PLAYBACK ) ) < 0 )
             {
-                intf_ErrMsg( "aout error: unable to prepare channel (%s)",
-                             snd_strerror( i_ret ) );
+                msg_Err( p_aout, "unable to prepare channel (%s)",
+                                 snd_strerror( i_ret ) );
             }
             break;
     }
@@ -238,8 +233,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
                                         (void *) buffer, 
                                         (size_t) i_size ) ) <= 0 )
     {
-        intf_ErrMsg( "aout error: unable to write data (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to write data (%s)", snd_strerror(i_ret) );
     }
 }
 
@@ -252,8 +246,8 @@ static void aout_Close( aout_thread_t *p_aout )
 
     if( ( i_ret = snd_pcm_close( p_aout->p_sys->p_pcm_handle ) ) < 0 )
     {
-        intf_ErrMsg( "aout error: unable to close audio device (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "unable to close audio device (%s)",
+                         snd_strerror( i_ret ) );
     }
 
     free( p_aout->p_sys );

@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.13 2002/05/28 22:49:25 sam Exp $
+ * $Id: distort.c,v 1.14 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,10 +30,8 @@
 
 #include <math.h>                                            /* sin(), cos() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #include "filter_common.h"
 
@@ -75,32 +73,29 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Distort specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     int i_mode;
-    struct vout_thread_s *p_vout;
+    vout_thread_t *p_vout;
 
     /* For the wave mode */
     double  f_angle;
     mtime_t last_date;
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
-static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
+static void vout_Display   ( vout_thread_t *, picture_t * );
 
-static void DistortWave    ( struct vout_thread_s *, struct picture_s *,
-                                                     struct picture_s * );
-static void DistortRipple  ( struct vout_thread_s *, struct picture_s *,
-                                                     struct picture_s * );
+static void DistortWave    ( vout_thread_t *, picture_t *, picture_t * );
+static void DistortRipple  ( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -130,16 +125,14 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
     p_vout->p_sys->i_mode = 0;
     /* Look what method was requested from command line*/
-    if( !(psz_method = psz_method_tmp
-          = config_GetPszVariable( "filter" )) )
+    if( !(psz_method = psz_method_tmp = config_GetPsz( p_vout, "filter" )) )
     {
-        intf_ErrMsg( "vout error: configuration variable %s empty",
-                     "filter" );
+        msg_Err( p_vout, "configuration variable %s empty", "filter" );
         return( 1 );
     }
     while( *psz_method && *psz_method != ':' )
@@ -161,11 +154,10 @@ static int vout_Create( vout_thread_t *p_vout )
         /* No method given in commandline. Look what method was
          requested in configuration system */
         if( !(psz_method = psz_method_tmp
-              = config_GetPszVariable( "distort-mode" )) )
+              = config_GetPsz( p_vout, "distort_mode" )) )
         {
-            intf_ErrMsg( "vout error: configuration variable %s empty "
-                         "using wave",
-                         "distort-mode" );
+            msg_Err( p_vout, "configuration variable %s empty, using 'wave'",
+                             "distort_mode" );
             p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
         }
         else {
@@ -181,8 +173,8 @@ static int vout_Create( vout_thread_t *p_vout )
             
             else
             {
-                intf_ErrMsg( "filter error: no valid distort mode provided, "
-                             "using distort:wave" );
+                msg_Err( p_vout, "no valid distort mode provided, "
+                                 "using wave" );
                 p_vout->p_sys->i_mode = DISTORT_MODE_WAVE;
             }
         }
@@ -210,23 +202,23 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPszVariable( "filter" );
-    config_PutPszVariable( "filter", NULL );
+    psz_filter = config_GetPsz( p_vout, "filter" );
+    config_PutPsz( p_vout, "filter", NULL );
 
-    intf_WarnMsg( 1, "filter: spawning the real video output" );
+    msg_Dbg( p_vout, "spawning the real video output" );
 
     p_vout->p_sys->p_vout =
-        vout_CreateThread( NULL,
+        vout_CreateThread( p_vout->p_this,
                            p_vout->render.i_width, p_vout->render.i_height,
                            p_vout->render.i_chroma, p_vout->render.i_aspect );
 
-    config_PutPszVariable( "filter", psz_filter );
+    config_PutPsz( p_vout, "filter", psz_filter );
     if( psz_filter ) free( psz_filter );
 
     /* Everything failed */
     if( p_vout->p_sys->p_vout == NULL )
     {
-        intf_ErrMsg( "filter error: can't open vout, aborting" );
+        msg_Err( p_vout, "cannot open vout, aborting" );
 
         return( 0 );
     }
@@ -261,7 +253,7 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
-    vout_DestroyThread( p_vout->p_sys->p_vout, NULL );
+    vout_DestroyThread( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );
 }
@@ -370,7 +362,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
             {
                 if( i_offset < 0 )
                 {
-                    FAST_MEMCPY( p_out, p_in - i_offset,
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in - i_offset,
                                  p_inpic->p[i_index].i_pitch + i_offset );
                     p_in += p_inpic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
@@ -378,7 +370,7 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
                 }
                 else
                 {
-                    FAST_MEMCPY( p_out + i_offset, p_in,
+                    p_vout->p_vlc->pf_memcpy( p_out + i_offset, p_in,
                                  p_inpic->p[i_index].i_pitch - i_offset );
                     memset( p_out, black_pixel, i_offset );
                     p_in += p_inpic->p[i_index].i_pitch;
@@ -387,7 +379,8 @@ static void DistortWave( vout_thread_t *p_vout, picture_t *p_inpic,
             }
             else
             {
-                FAST_MEMCPY( p_out, p_in, p_inpic->p[i_index].i_pitch );
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_inpic->p[i_index].i_pitch );
                 p_in += p_inpic->p[i_index].i_pitch;
                 p_out += p_outpic->p[i_index].i_pitch;
             }
@@ -425,7 +418,8 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
         p_in = p_inpic->p[i_index].p_pixels;
         p_out = p_outpic->p[i_index].p_pixels;
 
-        FAST_MEMCPY( p_out, p_in, i_first_line * p_inpic->p[i_index].i_pitch );
+        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                  i_first_line * p_inpic->p[i_index].i_pitch );
 
         p_in += i_first_line * p_inpic->p[i_index].i_pitch;
         p_out += i_first_line * p_outpic->p[i_index].i_pitch;
@@ -446,7 +440,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
             {
                 if( i_offset < 0 )
                 {
-                    FAST_MEMCPY( p_out, p_in - i_offset,
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in - i_offset,
                                  p_inpic->p[i_index].i_pitch + i_offset );
                     p_in -= p_inpic->p[i_index].i_pitch;
                     p_out += p_outpic->p[i_index].i_pitch;
@@ -454,7 +448,7 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
                 }
                 else
                 {
-                    FAST_MEMCPY( p_out + i_offset, p_in,
+                    p_vout->p_vlc->pf_memcpy( p_out + i_offset, p_in,
                                  p_inpic->p[i_index].i_pitch - i_offset );
                     memset( p_out, black_pixel, i_offset );
                     p_in -= p_inpic->p[i_index].i_pitch;
@@ -463,7 +457,8 @@ static void DistortRipple( vout_thread_t *p_vout, picture_t *p_inpic,
             }
             else
             {
-                FAST_MEMCPY( p_out, p_in, p_inpic->p[i_index].i_pitch );
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_inpic->p[i_index].i_pitch );
                 p_in -= p_inpic->p[i_index].i_pitch;
                 p_out += p_outpic->p[i_index].i_pitch;
             }

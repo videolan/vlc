@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_decoder.c,v 1.9 2002/05/18 17:47:47 sam Exp $
+ * $Id: video_decoder.c,v 1.10 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -29,17 +29,13 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <errno.h>                                                  /* errno */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* getpid() */
 #endif
-
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
 
 #include "vdec_ext-plugins.h"
 #include "video_decoder.h"
@@ -62,16 +58,12 @@ vdec_thread_t * vdec_CreateThread( vdec_pool_t * p_pool )
     vdec_thread_t *     p_vdec;
 
     /* Allocate the memory needed to store the thread's structure */
-    if ( (p_vdec = (vdec_thread_t *)malloc( sizeof(vdec_thread_t) )) == NULL )
+    p_vdec = vlc_object_create( p_pool->p_vpar->p_fifo, sizeof(vdec_thread_t) );
+    if( p_vdec == NULL )
     {
-        intf_ErrMsg("vdec error: not enough memory for vdec_CreateThread() to create the new thread");
-        return( NULL );
+        msg_Err( p_pool->p_vpar->p_fifo, "out of memory" );
+        return NULL;
     }
-
-    /*
-     * Initialize the thread properties
-     */
-    p_vdec->b_die = 0;
 
     /*
      * Initialize the parser properties
@@ -79,15 +71,14 @@ vdec_thread_t * vdec_CreateThread( vdec_pool_t * p_pool )
     p_vdec->p_pool = p_pool;
 
     /* Spawn the video decoder thread */
-    if ( vlc_thread_create(&p_vdec->thread_id, "video decoder",
-         (vlc_thread_func_t)RunThread, (void *)p_vdec) )
+    if( vlc_thread_create( p_vdec, "video decoder", RunThread, 0 ) )
     {
-        intf_ErrMsg("vdec error: can't spawn video decoder thread");
-        free( p_vdec );
+        msg_Err( p_vdec, "cannot spawn video decoder thread" );
+        vlc_object_destroy( p_vdec );
         return( NULL );
     }
 
-    return( p_vdec );
+    return p_vdec;
 }
 
 /*****************************************************************************
@@ -104,7 +95,10 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec )
     vlc_mutex_unlock( &p_vdec->p_pool->lock );
 
     /* Waiting for the decoder thread to exit */
-    vlc_thread_join( p_vdec->thread_id );
+    vlc_thread_join( p_vdec );
+
+    /* Free the object */
+    vlc_object_destroy( p_vdec );
 }
 
 /* following functions are local */
@@ -117,22 +111,19 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec )
  *****************************************************************************/
 void vdec_InitThread( vdec_thread_t * p_vdec )
 {
-#if !defined(SYS_BEOS) && !defined(SYS_DARWIN)
-#   if VDEC_NICE
     /* Re-nice ourself - otherwise we would steal CPU time from the video
      * output, which would make a poor display. */
-#       if !defined(WIN32)
+#if defined( HAVE_NICE )
     if( nice(VDEC_NICE) == -1 )
-#       else
+#elif defined( WIN32 )
     if( !SetThreadPriority( GetCurrentThread(),
                             THREAD_PRIORITY_BELOW_NORMAL ) )
-#       endif
-    {
-        intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)",
-                      strerror(errno) );
-    }
-#   endif
+#else
+    if( 0 )
 #endif
+    {
+        msg_Warn( p_vdec, "couldn't nice() (%s)", strerror(errno) );
+    }
 
     p_vdec->p_idct_data = NULL;
 
@@ -153,19 +144,17 @@ void vdec_EndThread( vdec_thread_t * p_vdec )
     {
         free( p_vdec->p_idct_data );
     }
-
-    free( p_vdec );
 }
 
 /*****************************************************************************
  * MotionBlock: does one component of the motion compensation
  *****************************************************************************/
-static inline void MotionBlock( vdec_pool_t * p_pool, boolean_t b_average,
+static inline void MotionBlock( vdec_pool_t * p_pool, vlc_bool_t b_average,
                                 int i_x_pred, int i_y_pred,
                                 yuv_data_t * pp_dest[3], int i_dest_offset,
                                 yuv_data_t * pp_src[3], int i_src_offset,
                                 int i_stride, int i_height,
-                                boolean_t b_second_half, int i_chroma_format )
+                                vlc_bool_t b_second_half, int i_chroma_format )
 {
     int             i_xy_half;
     yuv_data_t *    p_src1;

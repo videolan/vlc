@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.28 2002/05/18 17:47:46 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.29 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,109 +38,56 @@
 /*****************************************************************************
  * Prototypes from input_programs.c
  *****************************************************************************/
-#ifndef __PLUGIN__
-int  input_InitStream( struct input_thread_s *, size_t );
-void input_EndStream ( struct input_thread_s * );
-struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
-struct pgrm_descriptor_s * input_AddProgram ( struct input_thread_s *,
-                                              u16, size_t );
-void input_DelProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
-int input_SetProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
-struct input_area_s * input_AddArea( struct input_thread_s * );
-void input_DelArea   ( struct input_thread_s *, struct input_area_s * );
-struct es_descriptor_s * input_FindES( struct input_thread_s *, u16 );
-struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
-struct es_descriptor_s * input_AddES ( struct input_thread_s *,
-                                       struct pgrm_descriptor_s *, u16,
-                                       size_t );
-void input_DelES     ( struct input_thread_s *, struct es_descriptor_s * );
-int  input_SelectES  ( struct input_thread_s *, struct es_descriptor_s * );
-int  input_UnselectES( struct input_thread_s *, struct es_descriptor_s * );
-#else
-#   define input_InitStream p_symbols->input_InitStream
-#   define input_EndStream p_symbols->input_EndStream
-#   define input_SetProgram p_symbols->input_SetProgram
-#   define input_FindES p_symbols->input_FindES
-#   define input_FindProgram p_symbols->input_FindProgram
-#   define input_AddES p_symbols->input_AddES
-#   define input_DelES p_symbols->input_DelES
-#   define input_SelectES p_symbols->input_SelectES
-#   define input_UnselectES p_symbols->input_UnselectES
-#   define input_AddProgram p_symbols->input_AddProgram
-#   define input_DelProgram p_symbols->input_DelProgram
-#   define input_AddArea p_symbols->input_AddArea
-#   define input_DelArea p_symbols->input_DelArea
-#endif
+VLC_EXPORT( int,  input_InitStream,( input_thread_t *, size_t ) );
+VLC_EXPORT( void, input_EndStream, ( input_thread_t * ) );
+VLC_EXPORT( pgrm_descriptor_t *, input_FindProgram,( input_thread_t *, u16 ) );
+VLC_EXPORT( pgrm_descriptor_t *, input_AddProgram, ( input_thread_t *, u16, size_t ) );
+VLC_EXPORT( void, input_DelProgram,( input_thread_t *, pgrm_descriptor_t * ) );
+VLC_EXPORT( int, input_SetProgram,( input_thread_t *, pgrm_descriptor_t * ) );
+VLC_EXPORT( input_area_t *, input_AddArea,( input_thread_t * ) );
+VLC_EXPORT( void, input_DelArea,   ( input_thread_t *, input_area_t * ) );
+VLC_EXPORT( es_descriptor_t *, input_FindES,( input_thread_t *, u16 ) );
+VLC_EXPORT( es_descriptor_t *, input_AddES, ( input_thread_t *, pgrm_descriptor_t *, u16, size_t ) );
+VLC_EXPORT( void, input_DelES,     ( input_thread_t *, es_descriptor_t * ) );
+VLC_EXPORT( int,  input_SelectES,  ( input_thread_t *, es_descriptor_t * ) );
+VLC_EXPORT( int,  input_UnselectES,( input_thread_t *, es_descriptor_t * ) );
 
 /*****************************************************************************
  * Prototypes from input_dec.c
  *****************************************************************************/
-#ifndef __PLUGIN__
-//decoder_capabilities_s * input_ProbeDecoder( void );
-vlc_thread_t input_RunDecoder( struct input_thread_s *,
-                               struct es_descriptor_s * );
-void input_EndDecoder( struct input_thread_s *, struct es_descriptor_s * );
-void input_DecodePES ( struct decoder_fifo_s *, struct pes_packet_s * );
-void input_EscapeDiscontinuity( struct input_thread_s * );
-void input_EscapeAudioDiscontinuity( struct input_thread_s * );
-#else
-#   define input_DecodePES p_symbols->input_DecodePES
-#endif
+//decoder_capabilities_t * input_ProbeDecoder( void );
+decoder_fifo_t * input_RunDecoder( input_thread_t *, es_descriptor_t * );
+void input_EndDecoder( input_thread_t *, es_descriptor_t * );
+VLC_EXPORT( void, input_DecodePES, ( decoder_fifo_t *, pes_packet_t * ) );
+void input_EscapeDiscontinuity( input_thread_t * );
+void input_EscapeAudioDiscontinuity( input_thread_t * );
 
 /*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
-#ifndef __PLUGIN__
-void input_ClockInit( struct pgrm_descriptor_s * );
-int  input_ClockManageControl( struct input_thread_s *,
-                               struct pgrm_descriptor_s *, mtime_t );
-void input_ClockManageRef( struct input_thread_s *,
-                           struct pgrm_descriptor_s *, mtime_t );
-mtime_t input_ClockGetTS( struct input_thread_s *,
-                          struct pgrm_descriptor_s *, mtime_t );
-#else
-#   define input_ClockManageRef p_symbols->input_ClockManageRef
-#   define input_ClockManageControl p_symbols->input_ClockManageControl
-#   define input_ClockGetTS p_symbols->input_ClockGetTS
-#endif
+void input_ClockInit( pgrm_descriptor_t * );
+VLC_EXPORT( int,  input_ClockManageControl, ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) );
+VLC_EXPORT( void, input_ClockManageRef, ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) );
+VLC_EXPORT( mtime_t, input_ClockGetTS, ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) );
 
 /*****************************************************************************
  * Prototypes from input_ext-plugins.h (buffers management)
  *****************************************************************************/
-#ifndef __PLUGIN__
-void * input_BuffersInit( void );
-void input_BuffersEnd( struct input_buffers_s * );
-struct data_buffer_s * input_NewBuffer( struct input_buffers_s *, size_t );
-void input_ReleaseBuffer( struct input_buffers_s *, struct data_buffer_s * );
-struct data_packet_s * input_ShareBuffer( struct input_buffers_s *,
-                                          struct data_buffer_s * );
-struct data_packet_s * input_NewPacket( struct input_buffers_s *, size_t );
-void input_DeletePacket( struct input_buffers_s *, struct data_packet_s * );
-struct pes_packet_s * input_NewPES( struct input_buffers_s * );
-void input_DeletePES( struct input_buffers_s *, struct pes_packet_s * );
-ssize_t input_FillBuffer( struct input_thread_s * );
-ssize_t input_Peek( struct input_thread_s *, byte_t **, size_t );
-ssize_t input_SplitBuffer( struct input_thread_s *, data_packet_t **, size_t );
-int input_AccessInit( struct input_thread_s * );
-void input_AccessReinit( struct input_thread_s * );
-void input_AccessEnd( struct input_thread_s * );
-#else
-#   define input_BuffersInit p_symbols->input_BuffersInit
-#   define input_BuffersEnd p_symbols->input_BuffersEnd
-#   define input_NewBuffer p_symbols->input_NewBuffer
-#   define input_ReleaseBuffer p_symbols->input_ReleaseBuffer
-#   define input_ShareBuffer p_symbols->input_ShareBuffer
-#   define input_NewPacket p_symbols->input_NewPacket
-#   define input_DeletePacket p_symbols->input_DeletePacket
-#   define input_NewPES p_symbols->input_NewPES
-#   define input_DeletePES p_symbols->input_DeletePES
-#   define input_FillBuffer p_symbols->input_FillBuffer
-#   define input_Peek p_symbols->input_Peek
-#   define input_SplitBuffer p_symbols->input_SplitBuffer
-#   define input_AccessInit p_symbols->input_AccessInit
-#   define input_AccessReinit p_symbols->input_AccessReinit
-#   define input_AccessEnd p_symbols->input_AccessEnd
-#endif
+VLC_EXPORT( void *, input_BuffersInit, ( vlc_object_t * ) );
+VLC_EXPORT( void, input_BuffersEnd,    ( input_thread_t *, input_buffers_t * ) );
+VLC_EXPORT( data_buffer_t *, input_NewBuffer,   ( input_buffers_t *, size_t ) );
+VLC_EXPORT( void, input_ReleaseBuffer,          ( input_buffers_t *, data_buffer_t * ) );
+VLC_EXPORT( data_packet_t *, input_ShareBuffer, ( input_buffers_t *, data_buffer_t * ) );
+VLC_EXPORT( data_packet_t *, input_NewPacket,   ( input_buffers_t *, size_t ) );
+VLC_EXPORT( void, input_DeletePacket,           ( input_buffers_t *, data_packet_t * ) );
+VLC_EXPORT( pes_packet_t *, input_NewPES, ( input_buffers_t * ) );
+VLC_EXPORT( void, input_DeletePES,        ( input_buffers_t *, pes_packet_t * ) );
+VLC_EXPORT( ssize_t, input_FillBuffer,  ( input_thread_t * ) );
+VLC_EXPORT( ssize_t, input_Peek,        ( input_thread_t *, byte_t **, size_t ) );
+VLC_EXPORT( ssize_t, input_SplitBuffer, ( input_thread_t *, data_packet_t **, size_t ) );
+VLC_EXPORT( int, input_AccessInit,      ( input_thread_t * ) );
+VLC_EXPORT( void, input_AccessReinit,   ( input_thread_t * ) );
+VLC_EXPORT( void, input_AccessEnd,      ( input_thread_t * ) );
 
 /*****************************************************************************
  * Create a NULL packet for padding in case of a data loss
@@ -154,7 +101,7 @@ static inline void input_NullPacket( input_thread_t * p_input,
     if( (p_pad_data = input_NewPacket( p_input->p_method_data,
                     PADDING_PACKET_SIZE )) == NULL )
     {
-        intf_ErrMsg("input error: no new packet");
+        msg_Err( p_input, "no new packet" );
         p_input->b_error = 1;
         return;
     }
@@ -174,7 +121,7 @@ static inline void input_NullPacket( input_thread_t * p_input,
     {
         if( (p_pes = input_NewPES( p_input->p_method_data )) == NULL )
         {
-            intf_ErrMsg("input error: no PES packet");
+            msg_Err( p_input, "no PES packet" );
             p_input->b_error = 1;
             return;
         }
@@ -216,7 +163,7 @@ typedef void( * psi_callback_t )(
         input_thread_t  * p_input,
         data_packet_t   * p_data,
         es_descriptor_t * p_es,
-        boolean_t         b_unit_start );
+        vlc_bool_t        b_unit_start );
 
 
 /*****************************************************************************
@@ -236,13 +183,13 @@ typedef struct psi_section_s
     u16                     i_read_in_section;
     
     /* the PSI is complete */
-    boolean_t               b_is_complete;
+    vlc_bool_t              b_is_complete;
     
     /* packet missed up ? */
-    boolean_t               b_trash;
+    vlc_bool_t              b_trash;
 
     /*about sections  */ 
-    boolean_t               b_section_complete;
+    vlc_bool_t              b_section_complete;
 
     /* where are we currently ? */
     byte_t                * p_current;
@@ -254,7 +201,7 @@ typedef struct psi_section_s
  *****************************************************************************/
 typedef struct es_ts_data_s
 {
-    boolean_t               b_psi;   /* Does the stream have to be handled by
+    vlc_bool_t              b_psi;   /* Does the stream have to be handled by
                                       *                    the PSI decoder ? */
 
     int                     i_psi_type;  /* There are different types of PSI */
@@ -291,7 +238,7 @@ typedef struct stream_ts_data_s
  *****************************************************************************/
 typedef struct stream_ps_data_s
 {
-    boolean_t               b_has_PSM;                 /* very rare, in fact */
+    vlc_bool_t              b_has_PSM;                 /* very rare, in fact */
 
     u8                      i_PSM_version;
 } stream_ps_data_t;
@@ -303,27 +250,13 @@ typedef struct stream_ps_data_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef __PLUGIN__
-void input_ParsePES  ( struct input_thread_s *, struct es_descriptor_s * );
-void input_GatherPES ( struct input_thread_s *, struct data_packet_s *,
-                       struct es_descriptor_s *, boolean_t, boolean_t );
-ssize_t input_ReadPS ( struct input_thread_s *, struct data_packet_s ** );
-es_descriptor_t * input_ParsePS( struct input_thread_s *,
-                                 struct data_packet_s * );
-ssize_t input_ReadTS ( struct input_thread_s *, struct data_packet_s ** );
-void input_DemuxPS   ( struct input_thread_s *, struct data_packet_s * );
-void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s *, 
-                       psi_callback_t );
-#else
-#   define input_ParsePES p_symbols->input_ParsePES
-#   define input_GatherPES p_symbols->input_GatherPES
-#   define input_ReadPS p_symbols->input_ReadPS
-#   define input_ParsePS p_symbols->input_ParsePS
-#   define input_DemuxPS p_symbols->input_DemuxPS
-#   define input_ReadTS p_symbols->input_ReadTS
-#   define input_DemuxTS p_symbols->input_DemuxTS
-#endif
-
+VLC_EXPORT( void, input_ParsePES,  ( input_thread_t *, es_descriptor_t * ) );
+VLC_EXPORT( void, input_GatherPES, ( input_thread_t *, data_packet_t *, es_descriptor_t *, vlc_bool_t, vlc_bool_t ) );
+VLC_EXPORT( ssize_t, input_ReadPS, ( input_thread_t *, data_packet_t ** ) );
+VLC_EXPORT( es_descriptor_t *, input_ParsePS, ( input_thread_t *, data_packet_t * ) );
+VLC_EXPORT( ssize_t, input_ReadTS, ( input_thread_t *, data_packet_t ** ) );
+VLC_EXPORT( void, input_DemuxPS,   ( input_thread_t *, data_packet_t * ) );
+VLC_EXPORT( void, input_DemuxTS,   ( input_thread_t *, data_packet_t *, void(*) ( input_thread_t *, data_packet_t *, es_descriptor_t *, vlc_bool_t ) ) );
 
 /*
  * Optional standard file descriptor operations (input_ext-plugins.h)
@@ -332,26 +265,18 @@ void input_DemuxTS   ( struct input_thread_s *, struct data_packet_s *,
 /*****************************************************************************
  * input_socket_t: private access plug-in data
  *****************************************************************************/
-typedef struct input_socket_s
+struct input_socket_s
 {
     /* Unbuffered file descriptor */
     int i_handle;
-} input_socket_t;
+};
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef __PLUGIN__
-void input_FDClose( struct input_thread_s * );
-void input_FDNetworkClose( struct input_thread_s * );
-ssize_t input_FDRead( input_thread_t *, byte_t *, size_t );
-ssize_t input_FDNetworkRead( input_thread_t *, byte_t *, size_t );
-void input_FDSeek( struct input_thread_s *, off_t );
-#else
-#   define input_FDClose p_symbols->input_FDClose
-#   define input_FDNetworkClose p_symbols->input_FDNetworkClose
-#   define input_FDRead p_symbols->input_FDRead
-#   define input_FDNetworkRead p_symbols->input_FDNetworkRead
-#   define input_FDSeek p_symbols->input_FDSeek
-#endif
+VLC_EXPORT( void, input_FDClose, ( input_thread_t * ) );
+VLC_EXPORT( void, input_FDNetworkClose, ( input_thread_t * ) );
+VLC_EXPORT( ssize_t, input_FDRead, ( input_thread_t *, byte_t *, size_t ) );
+VLC_EXPORT( ssize_t, input_FDNetworkRead, ( input_thread_t *, byte_t *, size_t ) );
+VLC_EXPORT( void, input_FDSeek, ( input_thread_t *, off_t ) );
 

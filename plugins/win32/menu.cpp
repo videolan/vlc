@@ -23,13 +23,8 @@
 #include <vcl.h>
 //#pragma hdrstop
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "menu.h"
 #include "win32_common.h"
@@ -38,7 +33,7 @@
 /****************************************************************************
  * Local Prototypes
  ****************************************************************************/
-extern  struct intf_thread_s *p_intfGlobal;
+extern  intf_thread_t *p_intfGlobal;
 
 static TMenuItem *Index2Item( TMenuItem *, int, bool );
 static int Item2Index( TMenuItem *, TMenuItem * );
@@ -105,9 +100,9 @@ static void __fastcall LangChange( TMenuItem *RootCurrent, TMenuItem *Item,
     }
     else
     {
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
-        p_es = p_input_bank->pp_input[0]->stream.pp_es[i_es];
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
+        p_es = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_es[i_es];
+        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
     }
 
     /* find the current ES */
@@ -123,8 +118,8 @@ static void __fastcall LangChange( TMenuItem *RootCurrent, TMenuItem *Item,
     }
 
     /* exchange them */
-    input_ToggleES( p_input_bank->pp_input[0], p_es_old, false );
-    input_ToggleES( p_input_bank->pp_input[0], p_es, true );
+    input_ToggleES( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], p_es_old, false );
+    input_ToggleES( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], p_es, true );
 
     Item->Checked = true;
     Index2Item( RootOther, i_index + 1, true )->Checked = true;
@@ -142,7 +137,7 @@ static void __fastcall ProgramChange( TMenuItem *Item, TMenuItem *RootOther )
     int             i_program = Item->Tag;
 
     /* toggle the program */
-    input_ChangeProgram( p_input_bank->pp_input[0], (u16)i_program );
+    input_ChangeProgram( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], (u16)i_program );
 
     /* check selected menu items */
     Item->Checked = true;
@@ -151,13 +146,13 @@ static void __fastcall ProgramChange( TMenuItem *Item, TMenuItem *RootOther )
     /* update audio/subtitles menus */
     p_intf->p_sys->b_audio_update = 1;
     p_intf->p_sys->b_spu_update = 1;
-    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_lock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
     SetupMenus( p_intf );
-    vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
     p_intf->p_sys->b_audio_update = 0;
     p_intf->p_sys->b_spu_update = 0;
 
-    input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+    input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
 }
 
 
@@ -222,10 +217,10 @@ void __fastcall TMainFrameDlg::PopupNavigationClick( TObject *Sender )
     int             i_title   = DATA2TITLE( Item->Tag );
     int             i_chapter = DATA2CHAPTER( Item->Tag );
 
-    p_area = p_input_bank->pp_input[0]->stream.pp_areas[i_title];
+    p_area = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_title];
     p_area->i_part = i_chapter;
 
-    input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+    input_ChangeArea( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], (input_area_t*)p_area );
 
     Item->Checked = true;
     ItemTitle = Index2Item( MenuTitle, i_title - 1, false );
@@ -237,14 +232,14 @@ void __fastcall TMainFrameDlg::PopupNavigationClick( TObject *Sender )
     else
     {
         /* new title => we must rebuild the chapter menu */
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
         RadioMenu( MenuChapter, "Chapter",
-                   p_input_bank->pp_input[0]->stream.p_selected_area->i_part_nb,
+                   p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_part_nb,
                    i_chapter, MenuChapterClick );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
     }
 
-    input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+    input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
 }
 
 /*
@@ -257,13 +252,13 @@ void __fastcall TMainFrameDlg::MenuTitleClick( TObject *Sender )
     TMenuItem     * ItemTitle;
     int             i_title = Item->Tag;
 
-    input_ChangeArea( p_input_bank->pp_input[0],
-                      p_input_bank->pp_input[0]->stream.pp_areas[i_title] );
+    input_ChangeArea( p_intfGlobal->p_vlc->p_input_bank->pp_input[0],
+                      p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_title] );
     Item->Checked = true;
     ItemTitle = Index2Item( PopupNavigation, i_title - 1, false );
     Index2Item( ItemTitle, 0, false )->Checked = true;
 
-    input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+    input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
 }
 
 /*
@@ -278,16 +273,16 @@ void __fastcall TMainFrameDlg::MenuChapterClick( TObject *Sender )
     int             i_title;
     int             i_chapter = Item->Tag;
 
-    p_area = p_input_bank->pp_input[0]->stream.p_selected_area;
+    p_area = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area;
     p_area->i_part = i_chapter;
 
-    input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+    input_ChangeArea( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], (input_area_t*)p_area );
 
-    i_title = p_input_bank->pp_input[0]->stream.p_selected_area->i_id;
+    i_title = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_id;
     ItemTitle = Index2Item( PopupNavigation, i_title - 1, false );
     Index2Item( ItemTitle, i_chapter - 1, false )->Checked = true;
 
-    input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+    input_SetStatus( p_intfGlobal->p_vlc->p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
 }
 
 
@@ -410,10 +405,10 @@ static void __fastcall ProgramMenu( TMenuItem * Root,
     ItemActive = NULL;
 
     /* create a set of program buttons and append them to the container */
-    for( i = 0; i < p_input_bank->pp_input[0]->stream.i_pgrm_number; i++ )
+    for( i = 0; i < p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.i_pgrm_number; i++ )
     {
         Name.sprintf( "id %d",
-            p_input_bank->pp_input[0]->stream.pp_programs[i]->i_number );
+            p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_programs[i]->i_number );
 
         Item = new TMenuItem( Root );
         Item->Caption = Name;
@@ -425,7 +420,7 @@ static void __fastcall ProgramMenu( TMenuItem * Root,
          * It will be used in the callback. */
         Item->Tag = i + 1;
 
-        if( p_pgrm == p_input_bank->pp_input[0]->stream.pp_programs[i] )
+        if( p_pgrm == p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_programs[i] )
         {
             /* don't lose Item when we append into menu */
             ItemActive = Item;
@@ -442,7 +437,7 @@ static void __fastcall ProgramMenu( TMenuItem * Root,
     }
 
     /* be sure that menu is enabled if more than 1 program */
-    if( p_input_bank->pp_input[0]->stream.i_pgrm_number > 1 )
+    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.i_pgrm_number > 1 )
     {
         Root->Enabled = true;
     }
@@ -490,19 +485,19 @@ static void __fastcall LanguageMenu( TMenuItem * Root, es_descriptor_t * p_es,
     ItemActive = NULL;
     i_item = 0;
 
-    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_lock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
 
-#define ES p_input_bank->pp_input[0]->stream.pp_es[i]
+#define ES p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_es[i]
     /* create a set of language buttons and append them to the Root */
-    for( i = 0; i < p_input_bank->pp_input[0]->stream.i_es_number; i++ )
+    for( i = 0; i < p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.i_es_number; i++ )
     {
         if( ( ES->i_cat == i_cat ) &&
             ( !ES->p_pgrm ||
               ES->p_pgrm ==
-                 p_input_bank->pp_input[0]->stream.p_selected_program ) )
+                 p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_program ) )
         {
             i_item++;
-            Name = p_input_bank->pp_input[0]->stream.pp_es[i]->psz_desc;
+            Name = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_es[i]->psz_desc;
             if( Name.IsEmpty() )
             {
                 Name.sprintf( "Language %d", i_item );
@@ -514,7 +509,7 @@ static void __fastcall LanguageMenu( TMenuItem * Root, es_descriptor_t * p_es,
             Item->Caption = Name;
             Item->Tag = i;
 
-            if( p_es == p_input_bank->pp_input[0]->stream.pp_es[i] )
+            if( p_es == p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_es[i] )
             {
                 /* don't lose Item when we append into menu */
                 ItemActive = Item;
@@ -527,7 +522,7 @@ static void __fastcall LanguageMenu( TMenuItem * Root, es_descriptor_t * p_es,
     }
 #undef ES
 
-    vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
 
     /* check currently selected item */
     if( ItemActive != NULL )
@@ -570,7 +565,7 @@ static void __fastcall NavigationMenu( TMenuItem * Root,
     Root->Clear();
 
     ItemActive = NULL;
-    i_title_nb = p_input_bank->pp_input[0]->stream.i_area_nb;
+    i_title_nb = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.i_area_nb;
     
     /* loop on titles */
     for( i_title = 1; i_title < i_title_nb; i_title++ )
@@ -591,7 +586,7 @@ static void __fastcall NavigationMenu( TMenuItem * Root,
         }
 
         Name.sprintf( "Title %d (%d)", i_title,
-            p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb );
+            p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb );
 
         {
             TitleItem = new TMenuItem( Root );
@@ -600,7 +595,7 @@ static void __fastcall NavigationMenu( TMenuItem * Root,
             TitleItem->Caption = Name;
 
             i_chapter_nb =
-                p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb;
+                p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb;
 
             /* loop on chapters */
             for( i_chapter = 0; i_chapter < i_chapter_nb; i_chapter++ )
@@ -631,9 +626,9 @@ static void __fastcall NavigationMenu( TMenuItem * Root,
                  * ChapterItem, since we will need them in the callback */
                  ChapterItem->Tag = (int)POS2DATA( i_title, i_chapter + 1 );
 
-#define p_area p_input_bank->pp_input[0]->stream.pp_areas[i_title]
+#define p_area p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_title]
                 if( ( p_area ==
-                        p_input_bank->pp_input[0]->stream.p_selected_area ) &&
+                        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area ) &&
                     ( p_area->i_part == i_chapter + 1 ) )
                 {
                     ItemActive = ChapterItem;
@@ -658,7 +653,7 @@ static void __fastcall NavigationMenu( TMenuItem * Root,
                 TitleItem->Add( ChapterGroup );
             }
 
-            if( p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb
+            if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb
                 > 1 )
             {
                 /* be sure that menu is sensitive */
@@ -713,13 +708,13 @@ int __fastcall SetupMenus( intf_thread_t * p_intf )
     { 
         pgrm_descriptor_t * p_pgrm;
 
-        if( p_input_bank->pp_input[0]->stream.p_new_program )
+        if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_new_program )
         {
-            p_pgrm = p_input_bank->pp_input[0]->stream.p_new_program;
+            p_pgrm = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_new_program;
         }
         else
         {
-            p_pgrm = p_input_bank->pp_input[0]->stream.p_selected_program;
+            p_pgrm = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_program;
         }
 
         ProgramMenu( p_window->MenuProgram, p_pgrm,
@@ -734,13 +729,13 @@ int __fastcall SetupMenus( intf_thread_t * p_intf )
     {
         RadioMenu( p_window->MenuTitle, "Title",
 //why "-1" ?
-                   p_input_bank->pp_input[0]->stream.i_area_nb - 1,
-                   p_input_bank->pp_input[0]->stream.p_selected_area->i_id,
+                   p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.i_area_nb - 1,
+                   p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_id,
                    p_window->MenuTitleClick );
 
         AnsiString CurrentTitle;
         CurrentTitle.sprintf( "%d",
-                    p_input_bank->pp_input[0]->stream.p_selected_area->i_id );
+                    p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_id );
         p_window->LabelTitleCurrent->Caption = CurrentTitle;
 
         p_intf->p_sys->b_title_update = 0;
@@ -749,8 +744,8 @@ int __fastcall SetupMenus( intf_thread_t * p_intf )
     if( p_intf->p_sys->b_chapter_update )
     {
         RadioMenu( p_window->MenuChapter, "Chapter",
-                   p_input_bank->pp_input[0]->stream.p_selected_area->i_part_nb,
-                   p_input_bank->pp_input[0]->stream.p_selected_area->i_part,
+                   p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_part_nb,
+                   p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_part,
                    p_window->MenuChapterClick );
 
         NavigationMenu( p_window->PopupNavigation,
@@ -758,11 +753,11 @@ int __fastcall SetupMenus( intf_thread_t * p_intf )
 
         AnsiString CurrentChapter;
         CurrentChapter.sprintf( "%d",
-                    p_input_bank->pp_input[0]->stream.p_selected_area->i_part );
+                    p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_part );
         p_window->LabelChapterCurrent->Caption = CurrentChapter;
 
         p_intf->p_sys->i_part =
-                    p_input_bank->pp_input[0]->stream.p_selected_area->i_part;
+                    p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.p_selected_area->i_part;
 
         p_intf->p_sys->b_chapter_update = 0;
     }
@@ -771,24 +766,24 @@ int __fastcall SetupMenus( intf_thread_t * p_intf )
     p_audio_es = NULL;
     p_spu_es = NULL;
 
-     for( i = 0; i < p_input_bank->pp_input[0]->stream.i_selected_es_number; i++ )
+     for( i = 0; i < p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.i_selected_es_number; i++ )
     {
-        if( p_input_bank->pp_input[0]->stream.pp_selected_es[i]->i_cat
+        if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_selected_es[i]->i_cat
             == AUDIO_ES )
         {
-            p_audio_es = p_input_bank->pp_input[0]->stream.pp_selected_es[i];
+            p_audio_es = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_selected_es[i];
             p_intfGlobal->p_sys->p_audio_es_old = p_audio_es;
         }
 
-        if( p_input_bank->pp_input[0]->stream.pp_selected_es[i]->i_cat
+        if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_selected_es[i]->i_cat
             == SPU_ES )
         {
-            p_spu_es = p_input_bank->pp_input[0]->stream.pp_selected_es[i];
+            p_spu_es = p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.pp_selected_es[i];
             p_intfGlobal->p_sys->p_spu_es_old = p_spu_es;
         }
     }
 
-    vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
 
     /* audio menus */
     if( p_intf->p_sys->b_audio_update )
@@ -812,7 +807,7 @@ int __fastcall SetupMenus( intf_thread_t * p_intf )
         p_intf->p_sys->b_spu_update = 0;
     }
 
-    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    vlc_mutex_lock( &p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->stream.stream_lock );
 
     return true;
 }

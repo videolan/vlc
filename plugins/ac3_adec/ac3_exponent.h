@@ -2,7 +2,7 @@
  * ac3_exponent.h: ac3 exponent calculations
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_exponent.h,v 1.2 2002/05/18 17:47:46 sam Exp $
+ * $Id: ac3_exponent.h,v 1.3 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -57,9 +57,9 @@ static const s16 exps_3[128] =
 #define UNPACK_CPL 2 
 #define UNPACK_LFE 4
 
-static inline int exp_unpack_ch (ac3dec_t * p_ac3dec, u16 type,
+static inline int exp_unpack_ch( ac3dec_t * p_ac3dec, u16 type,
                                  u16 expstr, u16 ngrps, u16 initial_exp,
-                                 u16 exps[], u16 * dest)
+                                 u16 exps[], u16 * dest )
 {
     u16 i,j;
     s16 exp_acc;
@@ -88,7 +88,7 @@ static inline int exp_unpack_ch (ac3dec_t * p_ac3dec, u16 type,
         {
             if (exps[i] > 124)
             {
-                intf_ErrMsg ( "ac3dec error: invalid exponent" );
+                msg_Err( p_ac3dec->p_fifo, "invalid exponent" );
                 return 1;
             }
             exp_acc += (exps_1[exps[i]] /*- 2*/);
@@ -105,7 +105,7 @@ static inline int exp_unpack_ch (ac3dec_t * p_ac3dec, u16 type,
         {
             if (exps[i] > 124)
             {
-                intf_ErrMsg ( "ac3dec error: invalid exponent" );
+                msg_Err( p_ac3dec->p_fifo, "invalid exponent" );
                 return 1;
             }
             exp_acc += (exps_1[exps[i]] /*- 2*/);
@@ -125,7 +125,7 @@ static inline int exp_unpack_ch (ac3dec_t * p_ac3dec, u16 type,
         {
             if (exps[i] > 124)
             {
-                intf_ErrMsg ( "ac3dec error: invalid exponent" );
+                msg_Err( p_ac3dec->p_fifo, "invalid exponent" );
                 return 1;
             }
             exp_acc += (exps_1[exps[i]] /*- 2*/);

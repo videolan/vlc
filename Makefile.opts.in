@@ -167,8 +167,8 @@ CFLAGS += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE
 CFLAGS += -DLOCALEDIR=\"$(datadir)/locale\"
 
 # Data and plugin location
-CFLAGS += -DDATA_PATH=\"@prefix@/share/videolan\"
-CFLAGS += -DPLUGIN_PATH=\"@prefix@/lib/videolan/vlc\"
+CFLAGS += -DDATA_PATH=\"@prefix@/share/vlc\"
+CFLAGS += -DPLUGIN_PATH=\"@prefix@/lib/vlc\"
 
 ###############################################################################
 # Tuning and other variables - do not change anything except if you know
@@ -183,12 +183,14 @@ CFLAGS += -Iinclude -Iextras
 #
 # C compiler flags: mainstream compilation
 #
-CFLAGS += -D_REENTRANT
+CFLAGS += -D_REENTRANT -D_THREAD_SAFE
 CFLAGS += -D_GNU_SOURCE
 
 ifeq ($(RELEASE),1)
 CFLAGS += -DHAVE_RELEASE
 endif
+
+CFLAGS += -D__VLC__
 
 # Optimizations : don't compile debug versions with them
 ifeq ($(OPTIMS),1)
@@ -241,9 +243,8 @@ endif
 #
 # C compiler flags: plugins and builtins compilation
 #
-vlc_CFLAGS += -D__VLC__
-plugins_CFLAGS += -D__VLC__ -D__PLUGIN__ -I../../include -I../../extras
-builtins_CFLAGS += -D__VLC__ -D__BUILTIN__ -I../../include -I../../extras
+plugins_CFLAGS += -D__PLUGIN__ -I../../include -I../../extras
+builtins_CFLAGS += -D__BUILTIN__ -I../../include -I../../extras
 
 #
 # Linker flags: plugins and builtins linking

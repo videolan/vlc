@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.36 2002/05/21 00:23:37 sam Exp $
+ * $Id: input_ext-intf.c,v 1.37 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
@@ -37,8 +37,18 @@
 /*****************************************************************************
  * input_SetStatus: change the reading status
  *****************************************************************************/
-void input_SetStatus( input_thread_t * p_input, int i_mode )
+void __input_SetStatus( vlc_object_t * p_this, int i_mode )
 {
+    input_thread_t *p_input;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+
+    if( p_input == NULL )
+    {
+        msg_Err( p_this, "no input found" );
+        return;
+    }
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     switch( i_mode )
@@ -46,19 +56,19 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
     case INPUT_STATUS_END:
         p_input->stream.i_new_status = PLAYING_S;
         p_input->b_eof = 1;
-        intf_WarnMsg( 1, "input: end of stream" );
+        msg_Dbg( p_input, "end of stream" );
         break;
 
     case INPUT_STATUS_PLAY:
         p_input->stream.i_new_status = PLAYING_S;
-        intf_WarnMsg( 1, "input: playing at normal rate" );
+        msg_Dbg( p_input, "playing at normal rate" );
         break;
 
     case INPUT_STATUS_PAUSE:
         /* XXX: we don't need to check i_status, because input_clock.c
          * does it for us */
         p_input->stream.i_new_status = PAUSE_S;
-        intf_WarnMsg( 1, "input: toggling pause" );
+        msg_Dbg( p_input, "toggling pause" );
         break;
 
     case INPUT_STATUS_FASTER:
@@ -66,7 +76,7 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
         if( p_input->stream.control.i_rate * 8 <= DEFAULT_RATE )
         {
             p_input->stream.i_new_status = PLAYING_S;
-            intf_WarnMsg( 1, "input: playing at normal rate" );
+            msg_Dbg( p_input, "playing at normal rate" );
         }
         else
         {
@@ -82,8 +92,8 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
             {
                 p_input->stream.i_new_rate = DEFAULT_RATE / 2;
             }
-            intf_WarnMsg( 1, "input: playing at %i:1 fast forward",
-                          DEFAULT_RATE / p_input->stream.i_new_rate );
+            msg_Dbg( p_input, "playing at %i:1 fast forward",
+                     DEFAULT_RATE / p_input->stream.i_new_rate );
         }
         break;
 
@@ -92,7 +102,7 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
         if( p_input->stream.control.i_rate >= 8 * DEFAULT_RATE )
         {
             p_input->stream.i_new_status = PLAYING_S;
-            intf_WarnMsg( 1, "input: playing at normal rate" );
+            msg_Dbg( p_input, "playing at normal rate" );
         }
         else
         {
@@ -108,8 +118,8 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
             {
                 p_input->stream.i_new_rate = DEFAULT_RATE * 2;
             }
-            intf_WarnMsg( 1, "input: playing at 1:%i slow motion",
-                          p_input->stream.i_new_rate / DEFAULT_RATE );
+            msg_Dbg( p_input, "playing at 1:%i slow motion",
+                      p_input->stream.i_new_rate / DEFAULT_RATE );
         }
         break;
 
@@ -119,35 +129,111 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
 
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    vlc_object_release( p_input );
 }
 
 /*****************************************************************************
  * input_Seek: changes the stream postion
  *****************************************************************************/
-void input_Seek( input_thread_t * p_input, off_t i_position )
+void __input_Seek( vlc_object_t * p_this, off_t i_position, int i_whence )
 {
-    char        psz_time1[OFFSETTOTIME_MAX_SIZE];
-    char        psz_time2[OFFSETTOTIME_MAX_SIZE];
+    input_thread_t *p_input;
+
+    char psz_time1[OFFSETTOTIME_MAX_SIZE];
+    char psz_time2[OFFSETTOTIME_MAX_SIZE];
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+
+    if( p_input == NULL )
+    {
+        msg_Err( p_this, "no input found" );
+        return;
+    }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( i_position < 0 )
+
+#define A p_input->stream.p_selected_area
+    switch( i_whence & 0x30 )
     {
-        i_position = 0;
-    }
-    else if( i_position >= p_input->stream.p_selected_area->i_size )
-    {
-        i_position = p_input->stream.p_selected_area->i_size;
+        case INPUT_SEEK_SECONDS:
+            i_position *= (off_t)50 * p_input->stream.i_mux_rate;
+            break;
+
+        case INPUT_SEEK_PERCENT:
+            i_position = A->i_size * i_position / (off_t)100;
+            break;
+
+        case INPUT_SEEK_BYTES:
+        default:
+            break;
     }
 
-    p_input->stream.p_selected_area->i_seek = i_position;
-    intf_WarnMsg( 3, "input: seeking position %lld/%lld (%s/%s)",
-                  i_position, p_input->stream.p_selected_area->i_size,
-                  input_OffsetToTime( p_input, psz_time1, i_position ),
-                  input_OffsetToTime( p_input, psz_time2,
-                              p_input->stream.p_selected_area->i_size ) );
+    switch( i_whence & 0x03 )
+    {
+        case INPUT_SEEK_CUR:
+            A->i_seek = A->i_tell + i_position;
+            break;
+
+        case INPUT_SEEK_END:
+            A->i_seek = A->i_size + i_position;
+            break;
+
+        case INPUT_SEEK_SET:
+        default:
+            A->i_seek = i_position;
+            break;
+    }
+
+    if( A->i_seek < 0 )
+    {
+        A->i_seek = 0;
+    }
+    else if( A->i_seek > A->i_size )
+    {
+        A->i_seek = A->i_size;
+    }
+
+    msg_Dbg( p_input, "seeking position %lld/%lld (%s/%s)",
+             A->i_seek, A->i_size,
+             input_OffsetToTime( p_input, psz_time1, i_position ),
+             input_OffsetToTime( p_input, psz_time2, A->i_size ) );
+#undef A
 
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    vlc_object_release( p_input );
+}
+
+/*****************************************************************************
+ * input_Tell: requests the stream postion
+ *****************************************************************************/
+void __input_Tell( vlc_object_t * p_this, stream_position_t * p_position )
+{
+    input_thread_t *p_input;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+
+    if( p_input == NULL )
+    {
+        p_position->i_tell = 0;
+        p_position->i_size = 0;
+        p_position->i_mux_rate = 0;
+        msg_Err( p_this, "no input found" );
+        return;
+    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+#define A p_input->stream.p_selected_area
+    p_position->i_tell = A->i_tell;
+    p_position->i_size = A->i_size;
+    p_position->i_mux_rate = p_input->stream.i_mux_rate;
+#undef A
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    vlc_object_release( p_input );
 }
 
 /*****************************************************************************
@@ -192,33 +278,33 @@ void input_DumpStream( input_thread_t * p_input )
     char        psz_time2[OFFSETTOTIME_MAX_SIZE];
 
 #define S   p_input->stream
-    intf_Msg( "input info: Dumping stream ID 0x%x [OK:%d/D:%d]", S.i_stream_id,
-              S.c_packets_read, S.c_packets_trashed );
+    msg_Dbg( p_input, "dumping stream ID 0x%x [OK:%d/D:%d]", S.i_stream_id,
+             S.c_packets_read, S.c_packets_trashed );
     if( S.b_seekable )
-        intf_Msg( "input info: seekable stream, position: %lld/%lld (%s/%s)",
-                  S.p_selected_area->i_tell, S.p_selected_area->i_size,
-                  input_OffsetToTime( p_input, psz_time1,
-                                      S.p_selected_area->i_tell ),
-                  input_OffsetToTime( p_input, psz_time2,
-                                      S.p_selected_area->i_size ) );
+        msg_Dbg( p_input, "seekable stream, position: %lld/%lld (%s/%s)",
+                 S.p_selected_area->i_tell, S.p_selected_area->i_size,
+                 input_OffsetToTime( p_input, psz_time1,
+                                     S.p_selected_area->i_tell ),
+                 input_OffsetToTime( p_input, psz_time2,
+                                     S.p_selected_area->i_size ) );
     else
-        intf_Msg( "input info: %s", S.b_pace_control ? "pace controlled" :
-                  "pace un-controlled" );
+        msg_Dbg( p_input, "pace %scontrolled", S.b_pace_control ? "" : "un-" );
 #undef S
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
 #define P   p_input->stream.pp_programs[i]
-        intf_Msg( "input info: Dumping program 0x%x, version %d (%s)",
-                  P->i_number, P->i_version,
-                  P->b_is_ok ? "complete" : "partial" );
+        msg_Dbg( p_input, "dumping program 0x%x, version %d (%s)",
+                 P->i_number, P->i_version,
+                 P->b_is_ok ? "complete" : "partial" );
 #undef P
         for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
         {
 #define ES  p_input->stream.pp_programs[i]->pp_es[j]
-            intf_Msg( "input info: ES 0x%x, stream 0x%x, type 0x%x, %s [OK:%d/ERR:%d]",
-                      ES->i_id, ES->i_stream_id, ES->i_type,
-                      ES->p_decoder_fifo != NULL ? "selected" : "not selected",
-                      ES->c_packets, ES->c_invalid_packets );
+            msg_Dbg( p_input,
+                     "ES 0x%x, stream 0x%x, type 0x%x, %s [OK:%d/ERR:%d]",
+                     ES->i_id, ES->i_stream_id, ES->i_type,
+                     ES->p_decoder_fifo != NULL ? "selected" : "not selected",
+                     ES->c_packets, ES->c_invalid_packets );
 #undef ES
         }
     }
@@ -262,24 +348,24 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
                 input_UnselectES( p_input,
                                   p_input->stream.pp_selected_es[i_index] );
                 input_SelectES( p_input, p_es );
-                intf_WarnMsg( 3, "input info: es selected -> %s (0x%x)",
-                                                p_es->psz_desc, p_es->i_id );
+                msg_Dbg( p_input, "es selected -> %s (0x%x)",
+                                  p_es->psz_desc, p_es->i_id );
             }
         }
         else
         {
             input_SelectES( p_input, p_es );
-            intf_WarnMsg( 3, "input info: es selected -> %s (0x%x)",
-                          p_es->psz_desc, p_es->i_id );
+            msg_Dbg( p_input, "es selected -> %s (0x%x)",
+                              p_es->psz_desc, p_es->i_id );
         }
     }
     else
     {
         if( i_index != -1 )
         {
-            intf_WarnMsg( 3, "input info: es unselected -> %s (0x%x)",
-                          p_input->stream.pp_selected_es[i_index]->psz_desc,
-                          p_input->stream.pp_selected_es[i_index]->i_id );
+            msg_Dbg( p_input, "es unselected -> %s (0x%x)",
+                     p_input->stream.pp_selected_es[i_index]->psz_desc,
+                     p_input->stream.pp_selected_es[i_index]->i_id );
 
             input_UnselectES( p_input,
                               p_input->stream.pp_selected_es[i_index] );
@@ -299,7 +385,7 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
  * b_select is a boolean to know if we have to select or unselect ES
  *****************************************************************************/
 int input_ToggleES( input_thread_t * p_input, es_descriptor_t * p_es,
-                    boolean_t b_select )
+                    vlc_bool_t b_select )
 {
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -348,7 +434,7 @@ int input_ChangeProgram( input_thread_t * p_input, u16 i_program_number )
 
     if ( p_program == NULL )
     {
-        intf_ErrMsg("input: Could not find selected program");
+        msg_Err( p_input, "could not find selected program" );
         return -1;
     }
 
@@ -370,8 +456,8 @@ int input_ToggleGrayscale( input_thread_t * p_input )
     p_input->stream.control.b_grayscale =
                     !p_input->stream.control.b_grayscale;
 
-    intf_WarnMsg( 3, "input warning: changing to %s output",
-            p_input->stream.control.b_grayscale ? "grayscale" : "color" );
+    msg_Dbg( p_input, "changing to %s output",
+             p_input->stream.control.b_grayscale ? "grayscale" : "color" );
 
     vlc_mutex_unlock( &p_input->stream.control.control_lock );
 
@@ -388,8 +474,8 @@ int input_ToggleMute( input_thread_t * p_input )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.b_new_mute = !p_input->stream.control.b_mute;
 
-    intf_WarnMsg( 3, "input warning: %s mute mode",
-            p_input->stream.control.b_mute ? "activating" : "deactivating" );
+    msg_Dbg( p_input, "%s mute mode",
+             p_input->stream.control.b_mute ? "activating" : "deactivating" );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 

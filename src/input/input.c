@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.197 2002/05/21 01:40:17 sam Exp $
+ * $Id: input.c,v 1.198 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,7 +31,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include <string.h>
 #include <errno.h>
@@ -41,8 +41,7 @@
 #endif
 
 #include "netutils.h"
-
-#include "intf_playlist.h"
+#include "playlist.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -62,41 +61,6 @@ static void DestroyThread   ( input_thread_t *p_input );
 static void EndThread       ( input_thread_t *p_input );
 
 /*****************************************************************************
- * input_InitBank: initialize the input bank.
- *****************************************************************************/
-void input_InitBank ( void )
-{
-    p_input_bank->i_count = 0;
-
-    /* XXX: Workaround for old interface modules */
-    p_input_bank->pp_input[0] = NULL;
-
-    vlc_mutex_init( &p_input_bank->lock );
-}
-
-/*****************************************************************************
- * input_EndBank: empty the input bank.
- *****************************************************************************
- * This function ends all unused inputs and empties the bank in
- * case of success.
- *****************************************************************************/
-void input_EndBank ( void )
-{
-    int i_input;
-
-    /* Ask all remaining video outputs to die */
-    for( i_input = 0; i_input < p_input_bank->i_count; i_input++ )
-    {
-        input_StopThread(
-                p_input_bank->pp_input[ i_input ], NULL );
-        input_DestroyThread(
-                p_input_bank->pp_input[ i_input ] );
-    }
-
-    vlc_mutex_destroy( &p_input_bank->lock );
-}
-
-/*****************************************************************************
  * input_CreateThread: creates a new input thread
  *****************************************************************************
  * This function creates a new input, and returns a pointer
@@ -104,22 +68,20 @@ void input_EndBank ( void )
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
+input_thread_t *input_CreateThread ( vlc_object_t *p_parent,
+                                     playlist_item_t *p_item, int *pi_status )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
 
     /* Allocate descriptor */
-    p_input = (input_thread_t *)malloc( sizeof(input_thread_t) );
+    p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
     if( p_input == NULL )
     {
-        intf_ErrMsg( "input error: can't allocate input thread (%s)",
-                     strerror(errno) );
+        msg_Err( p_parent, "out of memory" );
         return( NULL );
     }
 
     /* Initialize thread properties */
-    p_input->b_die      = 0;
-    p_input->b_error    = 0;
     p_input->b_eof      = 0;
 
     /* Set target */
@@ -153,9 +115,9 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.c_packets_trashed   = 0;
 
     /* Set locks. */
-    vlc_mutex_init( &p_input->stream.stream_lock );
+    vlc_mutex_init( p_input, &p_input->stream.stream_lock );
     vlc_cond_init( &p_input->stream.stream_wait );
-    vlc_mutex_init( &p_input->stream.control.control_lock );
+    vlc_mutex_init( p_input, &p_input->stream.control.control_lock );
 
     /* Initialize stream description */
     p_input->stream.b_changed = 0;
@@ -187,19 +149,19 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.i_status = PLAYING_S;
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
-    p_input->stream.control.b_grayscale = config_GetIntVariable( "grayscale" );
-    p_input->stream.control.i_smp = config_GetIntVariable( "vdec-smp" );
+    p_input->stream.control.b_grayscale = config_GetInt( p_input, "grayscale" );
+    p_input->stream.control.i_smp = config_GetInt( p_input, "vdec-smp" );
 
-    intf_WarnMsg( 1, "input: playlist item `%s'", p_input->psz_source );
+    msg_Info( p_input, "playlist item `%s'", p_input->psz_source );
+
+    vlc_object_attach( p_input, p_parent );
 
     /* Create thread. */
-    if( vlc_thread_create( &p_input->thread_id, "input",
-                           (vlc_thread_func_t)RunThread, (void *) p_input ) )
+    if( vlc_thread_create( p_input, "input", RunThread, 1 ) )
     {
-        intf_ErrMsg( "input error: can't create input thread (%s)",
-                     strerror(errno) );
+        msg_Err( p_input, "cannot create input thread (%s)", strerror(errno) );
         free( p_input );
-        return( NULL );
+        return NULL;
     }
 
 #if 0
@@ -214,7 +176,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     }
 #endif
 
-    return( p_input );
+    return p_input;
 }
 
 /*****************************************************************************
@@ -226,7 +188,6 @@ void input_StopThread( input_thread_t *p_input, int *pi_status )
 {
     /* Make the thread exit from a possible vlc_cond_wait() */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-
     /* Request thread destruction */
     p_input->b_die = 1;
 
@@ -254,7 +215,7 @@ void input_StopThread( input_thread_t *p_input, int *pi_status )
 void input_DestroyThread( input_thread_t *p_input )
 {
     /* Join the thread */
-    vlc_thread_join( p_input->thread_id );
+    vlc_thread_join( p_input );
 
     /* Destroy Mutex locks */
     vlc_mutex_destroy( &p_input->stream.control.control_lock );
@@ -277,10 +238,13 @@ static int RunThread( input_thread_t *p_input )
         /* If we failed, wait before we are killed, and exit */
         p_input->i_status = THREAD_ERROR;
         p_input->b_error = 1;
+        vlc_thread_ready( p_input );
         ErrorThread( p_input );
         DestroyThread( p_input );
         return 0;
     }
+
+    vlc_thread_ready( p_input );
 
     p_input->i_status = THREAD_READY;
 
@@ -413,7 +377,7 @@ static int RunThread( input_thread_t *p_input )
         {
             /* End of file - we do not set b_die because only the
              * interface is allowed to do so. */
-            intf_WarnMsg( 3, "input: EOF reached" );
+            msg_Info( p_input, "EOF reached" );
             p_input->b_eof = 1;
         }
         else if( i_count < 0 )
@@ -450,8 +414,8 @@ static int InitThread( input_thread_t * p_input )
 #ifdef WIN32
     if( psz_parser - p_input->psz_source == 1 )
     {
-        intf_WarnMsg( 2, "Drive letter %c: specified in source string",
-                      p_input->psz_source ) ;
+        msg_Warn( p_input, "drive letter %c: found in source string",
+                           p_input->psz_source ) ;
         psz_parser = "";
     }
 #endif
@@ -513,25 +477,23 @@ static int InitThread( input_thread_t * p_input )
         }
     }
 
-    intf_WarnMsg( 2, "input: access `%s', demux `%s', name `%s'",
-                  p_input->psz_access, p_input->psz_demux,
-                  p_input->psz_name );
+    msg_Dbg( p_input, "access `%s', demux `%s', name `%s'",
+             p_input->psz_access, p_input->psz_demux, p_input->psz_name );
 
     if( input_AccessInit( p_input ) == -1 )
     {
         return( -1 );
     }
 
-    /* Find and open appropriate access plug-in. */
-    p_input->p_access_module = module_Need( MODULE_CAPABILITY_ACCESS,
-                                 p_input->psz_access,
-                                 (void *)p_input );
+    /* Find and open appropriate access module */
+    p_input->p_access_module =
+        module_Need( p_input, MODULE_CAPABILITY_ACCESS,
+                     p_input->psz_access, (void *)p_input );
 
     if( p_input->p_access_module == NULL )
     {
-        intf_ErrMsg( "input error: no suitable access plug-in for `%s/%s:%s'",
-                     p_input->psz_access, p_input->psz_demux,
-                     p_input->psz_name );
+        msg_Err( p_input, "no suitable access module for `%s/%s:%s'",
+                 p_input->psz_access, p_input->psz_demux, p_input->psz_name );
         return( -1 );
     }
 
@@ -566,16 +528,15 @@ static int InitThread( input_thread_t * p_input )
         }
     }
 
-    /* Find and open appropriate demux plug-in. */
-    p_input->p_demux_module = module_Need( MODULE_CAPABILITY_DEMUX,
-                                 p_input->psz_demux,
-                                 (void *)p_input );
+    /* Find and open appropriate demux module */
+    p_input->p_demux_module =
+        module_Need( p_input, MODULE_CAPABILITY_DEMUX,
+                     p_input->psz_demux, (void *)p_input );
 
     if( p_input->p_demux_module == NULL )
     {
-        intf_ErrMsg( "input error: no suitable demux plug-in for `%s/%s:%s'",
-                     p_input->psz_access, p_input->psz_demux,
-                     p_input->psz_name );
+        msg_Err( p_input, "no suitable demux module for `%s/%s:%s'",
+                 p_input->psz_access, p_input->psz_demux, p_input->psz_name );
         module_Unneed( p_input->p_access_module );
         return( -1 );
     }
@@ -609,25 +570,21 @@ static void ErrorThread( input_thread_t *p_input )
  *****************************************************************************/
 static void EndThread( input_thread_t * p_input )
 {
-    /* Store status */
-    p_input->i_status = THREAD_END;
-
-    if( p_main->b_stats )
-    {
 #ifdef HAVE_SYS_TIMES_H
-        /* Display statistics */
-        struct tms  cpu_usage;
-        times( &cpu_usage );
+    /* Display statistics */
+    struct tms  cpu_usage;
+    times( &cpu_usage );
 
-        intf_StatMsg( "input stats: %d loops consuming user: %d, system: %d",
-                      p_input->c_loops,
-                      cpu_usage.tms_utime, cpu_usage.tms_stime );
+    msg_Dbg( p_input, "%d loops consuming user: %d, system: %d",
+             p_input->c_loops, cpu_usage.tms_utime, cpu_usage.tms_stime );
 #else
-        intf_StatMsg( "input stats: %d loops", p_input->c_loops );
+    msg_Dbg( p_input, "%d loops", p_input->c_loops );
 #endif
 
-        input_DumpStream( p_input );
-    }
+    input_DumpStream( p_input );
+
+    /* Store status */
+    p_input->i_status = THREAD_END;
 
     /* Free all ES and destroy all decoder threads */
     input_EndStream( p_input );

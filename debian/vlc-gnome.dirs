@@ -1,7 +1,7 @@
 usr/bin
-usr/lib/videolan/vlc
+usr/lib/vlc
 usr/share/doc
 usr/share/gnome/apps/Multimedia
 usr/share/man/man1
 usr/share/pixmaps
-usr/share/videolan
+usr/share/vlc

@@ -2,7 +2,7 @@
  * imdct3dn.c : accelerated 3D Now! IMDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: imdct3dn.c,v 1.11 2002/04/19 13:56:11 sam Exp $
+ * $Id: imdct3dn.c,v 1.12 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_imdct_common.h"
@@ -49,7 +49,6 @@ MODULE_INIT_START
     ADD_REQUIREMENT( 3DNOW )
     ADD_SHORTCUT( "3dn" )
     ADD_SHORTCUT( "3dnow" )
-    ADD_SHORTCUT( "imdct3dn" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

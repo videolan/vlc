@@ -2,7 +2,7 @@
  * ac3_downmix_c.c: ac3 downmix functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_c.c,v 1.4 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_downmix_c.c,v 1.5 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -27,7 +27,7 @@
  *****************************************************************************/
 #include <string.h>                                              /* memcpy() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_downmix.h"
 

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.59 2002/06/01 09:21:59 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.60 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,16 +36,9 @@
 #include <Application.h>
 #include <Bitmap.h>
 
-extern "C"
-{
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
-
-}
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #include "VideoWindow.h"
 #include "DrawingTidbits.h"
@@ -56,7 +49,7 @@ extern "C"
  * This structure is part of the video output thread descriptor.
  * It describes the BeOS specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     VideoWindow *  p_window;
 
@@ -65,8 +58,7 @@ typedef struct vout_sys_s
 
     u8 *pp_buffer[3];
     int i_index;
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * beos_GetAppWindow : retrieve a BWindow pointer from the window name
@@ -92,6 +84,44 @@ BWindow *beos_GetAppWindow(char *name)
         }
     }
     return window; 
+}
+
+/****************************************************************************
+ * DrawingThread : thread that really does the drawing
+ ****************************************************************************/
+int32 Draw(void *data)
+{
+    VideoWindow* p_win;
+    p_win = (VideoWindow *) data;
+
+    if ( p_win->LockWithTimeout(50000) == B_OK )
+    {
+        if (p_win->vsync)
+        {
+            BScreen *screen;
+            screen = new BScreen(p_win);
+            screen-> WaitForRetrace(22000);
+            delete screen;
+        }
+        if (p_win-> mode == OVERLAY)
+        {
+            rgb_color key;
+            p_win-> view->SetViewOverlay(p_win-> bitmap[p_win-> i_buffer], 
+                                         p_win-> bitmap[p_win-> i_buffer]->Bounds() ,
+                                         p_win-> view->Bounds(),
+                                         &key, B_FOLLOW_ALL,
+		                                 B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|
+		                                 B_OVERLAY_TRANSFER_CHANNEL);
+		    p_win-> view->SetViewColor(key);
+        }
+        else
+        {
+            p_win-> view-> DrawBitmap( p_win-> bitmap[p_win-> i_buffer], 
+                                       p_win-> view->Bounds() );
+        }                                
+        p_win-> Unlock();
+    }
+    return B_OK;
 }
 
 /*****************************************************************************
@@ -284,7 +314,7 @@ int VideoWindow::SelectDrawingMode(int width, int height)
 {
     int drawingMode = BITMAP;
 
-    int noOverlay = !config_GetIntVariable( "overlay" );
+    int noOverlay = !config_GetInt( p_vout, "overlay" );
     for (int i = 0; i < COLOR_COUNT; i++)
     {
         if (noOverlay) break;
@@ -418,7 +448,7 @@ int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = (vout_sys_t*) malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
     p_vout->p_sys->i_width = p_vout->render.i_width;
@@ -440,7 +470,7 @@ int vout_Init( vout_thread_t *p_vout )
     /* Open and initialize device */
     if( BeosOpenDisplay( p_vout ) )
     {
-        intf_ErrMsg("vout error: can't open display");
+        msg_Err( p_vout, "cannot open display" );
         return 0;
     }
     /* Set the buffers */
@@ -583,7 +613,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_window == NULL )
     {
-        intf_ErrMsg( "error: cannot allocate memory for VideoWindow" );
+        msg_Err( p_vout, "cannot allocate VideoWindow" );
         return( 1 );
     }   
     

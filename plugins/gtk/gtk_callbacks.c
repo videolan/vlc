@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.39 2002/05/18 02:12:20 ipkiss Exp $
+ * $Id: gtk_callbacks.c,v 1.40 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -29,23 +29,15 @@
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #include <unistd.h>
 
 #include <gtk/gtk.h>
 
 #include <string.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
-#include "intf_eject.h"
-
-#include "video.h"
-#include "video_output.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
@@ -69,7 +61,7 @@ gboolean GtkExit( GtkWidget       *widget,
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->b_die = 1;
+    p_intf->p_vlc->b_die = 1;
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return TRUE;
@@ -108,20 +100,19 @@ gboolean GtkFullscreen( GtkWidget       *widget,
                         GdkEventButton  *event,
                         gpointer         user_data)
 {
-    if( p_vout_bank->i_count )
+    intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
+    vout_thread_t *p_vout;
+
+    p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_CHILD );
+
+    if( p_vout )
     {
-        vlc_mutex_lock( &p_vout_bank->pp_vout[0]->change_lock );
-
-        p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
-
-        vlc_mutex_unlock( &p_vout_bank->pp_vout[0]->change_lock );
-
+        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+        vlc_object_release( p_vout );
         return TRUE;
     }
-    else
-    {
-        return FALSE;
-    }
+
+    return FALSE;
 }
 
 void GtkWindowDrag( GtkWidget       *widget,
@@ -133,17 +124,19 @@ void GtkWindowDrag( GtkWidget       *widget,
                     guint            time,
                     gpointer         user_data)
 {
+#if 0 /* PLAYLIST TARASS */
     intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
-    int end = p_main->p_playlist->i_size;
+    int end = p_intf->p_vlc->p_playlist->i_size;
     GtkDropDataReceived( p_intf, data, info, PLAYLIST_END );
 
-    if( p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
-       /* FIXME: temporary hack */
-       p_input_bank->pp_input[0]->b_eof = 1;
+        /* FIXME: temporary hack */
+        p_intf->p_sys->p_input->b_eof = 1;
     }
      
-    intf_PlaylistJumpto( p_main->p_playlist, end-1 );
+    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, end-1 );
+#endif
 }
 
 
@@ -185,26 +178,29 @@ gboolean GtkSliderPress( GtkWidget       *widget,
 
 void GtkTitlePrev( GtkButton * button, gpointer user_data )
 {
-    intf_thread_t * p_intf;
-    input_area_t *  p_area;
-    int             i_id;
+    intf_thread_t *  p_intf;
+    input_area_t *   p_area;
+    int              i_id;
 
     p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
-    i_id = p_input_bank->pp_input[0]->stream.p_selected_area->i_id - 1;
+
+    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id - 1;
 
     /* Disallow area 0 since it is used for video_ts.vob */
     if( i_id > 0 )
     {
-        p_area = p_input_bank->pp_input[0]->stream.pp_areas[i_id];
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
+
+    vlc_object_release( p_intf->p_sys->p_input );
 }
 
 
@@ -215,19 +211,19 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
     int             i_id;
 
     p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
-    i_id = p_input_bank->pp_input[0]->stream.p_selected_area->i_id + 1;
+    i_id = p_intf->p_sys->p_input->stream.p_selected_area->i_id + 1;
 
-    if( i_id < p_input_bank->pp_input[0]->stream.i_area_nb )
+    if( i_id < p_intf->p_sys->p_input->stream.i_area_nb )
     {
-        p_area = p_input_bank->pp_input[0]->stream.pp_areas[i_id];   
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        p_area = p_intf->p_sys->p_input->stream.pp_areas[i_id];   
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 
 }
@@ -239,19 +235,19 @@ void GtkChapterPrev( GtkButton * button, gpointer user_data )
     input_area_t *  p_area;
 
     p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
-    p_area = p_input_bank->pp_input[0]->stream.p_selected_area;
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
     if( p_area->i_part > 0 )
     {
         p_area->i_part--;
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 
@@ -262,19 +258,19 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
     input_area_t *  p_area;
 
     p_intf = GetIntf( GTK_WIDGET(button), (char*)user_data );
-    p_area = p_input_bank->pp_input[0]->stream.p_selected_area;
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
 
     if( p_area->i_part < p_area->i_part_nb )
     {
         p_area->i_part++;
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+        input_ChangeArea( p_intf->p_sys->p_input, (input_area_t*)p_area );
 
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
 
@@ -286,7 +282,7 @@ void GtkNetworkJoin( GtkEditable * editable, gpointer user_data )
     int     i_channel;
 
     i_channel = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( editable ) );
-//    intf_WarnMsg( 3, "intf info: joining channel %d", i_channel );
+//    msg_Dbg( "intf info: joining channel %d", i_channel );
 
 //    network_ChannelJoin( i_channel );
 }
@@ -304,35 +300,35 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
                        "network_channel_spinbutton" ) );
 
     i_channel = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( spin ) );
-    intf_WarnMsg( 3, "intf info: joining channel %d", i_channel );
+    msg_Dbg( p_intf, "joining channel %d", i_channel );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    if( p_input_bank->pp_input[0] != NULL )
+    if( p_intf->p_sys->p_input != NULL )
     {
         /* end playing item */
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intf->p_sys->p_input->b_eof = 1;
 
+#if 0 /* PLAYLIST TARASS */
         /* update playlist */
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
 
-        p_main->p_playlist->i_index--;
-        p_main->p_playlist->b_stopped = 1;
+        p_intf->p_vlc->p_playlist->i_index--;
+        p_intf->p_vlc->p_playlist->b_stopped = 1;
 
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-
-        /* FIXME: ugly hack to close input and outputs */
-        p_intf->pf_manage( p_intf );
+        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+#endif
     }
 
-    network_ChannelJoin( i_channel );
+    network_ChannelJoin( p_intf->p_this, i_channel );
 
     /* FIXME 2 */
-    p_main->p_playlist->b_stopped = 0;
-    p_intf->pf_manage( p_intf );
+#if 0 /* PLAYLIST TARASS */
+    p_intf->p_vlc->p_playlist->b_stopped = 0;
+#endif
 
     vlc_mutex_unlock( &p_intf->change_lock );
 
-//    input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+//    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
 }
 
 
@@ -393,37 +389,23 @@ gboolean GtkJumpShow( GtkWidget       *widget,
 void GtkJumpOk( GtkButton       *button,
                 gpointer         user_data)
 {
-    intf_thread_t * p_intf;
-    off_t           i_seek;
-    off_t           i_size;
-    int             i_hours;
-    int             i_minutes;
-    int             i_seconds;
-
-    p_intf = GetIntf( GTK_WIDGET( button ), (char*)user_data );
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET( button ), (char*)user_data );
+    int i_hours, i_minutes, i_seconds;
 
 #define GET_VALUE( name )                                                   \
     gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( gtk_object_get_data( \
         GTK_OBJECT( p_intf->p_sys->p_jump ), name ) ) )
-
     i_hours   = GET_VALUE( "jump_hour_spinbutton" );
     i_minutes = GET_VALUE( "jump_minute_spinbutton" );
     i_seconds = GET_VALUE( "jump_second_spinbutton" );
-
 #undef GET_VALUE
 
-    i_seconds += 60 *i_minutes + 3600* i_hours;
+    input_Seek( p_intf, i_seconds + 60 * i_minutes + 3600 * i_hours,
+                        INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
 
-    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
-    i_seek = i_seconds * 50 * p_input_bank->pp_input[0]->stream.i_mux_rate;
-    i_size = p_input_bank->pp_input[0]->stream.p_selected_area->i_size;
-    vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
-
-    if( i_seek < i_size )
-    {
-        input_Seek( p_input_bank->pp_input[0], i_seek );
-    }
-    p_main->p_playlist->b_stopped = 0;
+#if 0 /* PLAYLIST TARASS */
+    p_intf->p_vlc->p_playlist->b_stopped = 0;
+#endif
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
@@ -480,8 +462,12 @@ void GtkMessagesActivate( GtkMenuItem * menuitem, gpointer user_data )
 gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
                         gpointer user_data )
 {
+#if 0 /* PLAYLIST TARASS */
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+
     char *psz_device = NULL;
     char *psz_parser;
+    char *psz_current = p_intf->p_vlc->p_playlist->current.psz_name;
 
     /*
      * Get the active input
@@ -493,39 +479,39 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
      * Don't really know if I must lock the stuff here, we're using it read-only
      */
 
-    if (p_main->p_playlist->current.psz_name != NULL)
+    if( psz_current != NULL )
     {
-        if( !strncmp(p_main->p_playlist->current.psz_name, "dvd:", 4) )
+        if( !strncmp(psz_current, "dvd:", 4) )
         {
-            switch( p_main->p_playlist->current.psz_name[4] )
+            switch( psz_current[4] )
             {
             case '\0':
             case '@':
-                psz_device = config_GetPszVariable( "dvd" );
+                psz_device = config_GetPsz( p_intf, "dvd" );
                 break;
             default:
                 /* Omit the first 4 characters */
-                psz_device = strdup( p_main->p_playlist->current.psz_name + 4 );
+                psz_device = strdup( psz_current + 4 );
                 break;
             }
         }
-        else if( !strncmp(p_main->p_playlist->current.psz_name, "vcd:", 4) )
+        else if( !strncmp(psz_current, "vcd:", 4) )
         {
-            switch( p_main->p_playlist->current.psz_name[4] )
+            switch( psz_current[4] )
             {
             case '\0':
             case '@':
-                psz_device = config_GetPszVariable( "vcd" );
+                psz_device = config_GetPsz( p_intf, "vcd" );
                 break;
             default:
                 /* Omit the first 4 characters */
-                psz_device = strdup( p_main->p_playlist->current.psz_name + 4 );
+                psz_device = strdup( psz_current + 4 );
                 break;
             }
         }
         else
         {
-            psz_device = strdup( p_main->p_playlist->current.psz_name );
+            psz_device = strdup( psz_current );
         }
     }
 
@@ -546,14 +532,15 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
     }
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-    if( p_input_bank->pp_input[0] == NULL )
+    if( p_intf->p_sys->p_input == NULL )
     {
-        intf_WarnMsg( 4, "intf: ejecting %s", psz_device );
+        msg_Dbg( p_intf, "ejecting %s", psz_device );
 
-        intf_Eject( psz_device );
+        intf_Eject( p_intf->p_this, psz_device );
     }
 
     free(psz_device);
+#endif
     return TRUE;
 }
 

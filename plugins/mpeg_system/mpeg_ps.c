@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.14 2002/05/15 22:53:10 jobi Exp $
+ * $Id: mpeg_ps.c,v 1.15 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,14 +28,10 @@
 #include <string.h>                                              /* strdup() */
 #include <errno.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #include <sys/types.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
 
 /*****************************************************************************
  * Constants
@@ -46,9 +42,9 @@
  * Local prototypes
  *****************************************************************************/
 static void input_getfunctions( function_list_t * p_function_list );
-static int  PSDemux         ( struct input_thread_s * );
-static int  PSInit          ( struct input_thread_s * );
-static void PSEnd           ( struct input_thread_s * );
+static int  PSDemux ( input_thread_t * );
+static int  PSInit  ( input_thread_t * );
+static void PSEnd   ( input_thread_t * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -101,7 +97,7 @@ static int PSInit( input_thread_t * p_input )
     if( input_Peek( p_input, &p_peek, 4 ) < 4 )
     {
         /* Stream shorter than 4 bytes... */
-        intf_ErrMsg( "input error: cannot peek() (mpeg_ps)" );
+        msg_Err( p_input, "cannot peek()" );
         return( -1 );
     }
 
@@ -110,11 +106,12 @@ static int PSInit( input_thread_t * p_input )
         if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "ps", 3 ) )
         {
             /* User forced */
-            intf_ErrMsg( "input error: this doesn't look like an MPEG PS stream, continuing" );
+            msg_Err( p_input, "this does not look like an MPEG PS stream, continuing" );
         }
         else
         {
-            intf_WarnMsg( 2, "input error: this doesn't look like an MPEG PS stream, but continuing anyway" );
+            msg_Warn( p_input, "this does not look like an MPEG PS stream, "
+                               "but continuing anyway" );
         }
     }
     else if( *(p_peek + 3) <= 0xb9 )
@@ -122,13 +119,11 @@ static int PSInit( input_thread_t * p_input )
         if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "ps", 3 ) )
         {
             /* User forced */
-            intf_ErrMsg( "input error: this seems to be an elementary stream (ES plug-in ?),");
-            intf_ErrMsg( "but continuing" );
+            msg_Err( p_input, "this seems to be an elementary stream (ES module?), but continuing" );
         }
         else
         {
-            intf_WarnMsg( 2, "input error: this seems to be an elementary stream (ES plug-in ?),");
-            intf_WarnMsg( 2, "but continuing" );
+            msg_Warn( p_input, "this seems to be an elementary stream (ES module?), but continuing" );
         }
     }
 
@@ -213,11 +208,11 @@ static int PSInit( input_thread_t * p_input )
 
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
-                        if( config_GetIntVariable( "audio-channel" )
+                        if( config_GetInt( p_input, "audio-channel" )
                                 == (p_es->i_id & 0x1F) ||
-                              ( config_GetIntVariable( "audio-channel" ) < 0
-                                && !(p_es->i_id & 0x1F) ) )
-                        switch( config_GetIntVariable( "audio-type" ) )
+                           ( config_GetInt( p_input, "audio-channel" ) < 0
+                              && !(p_es->i_id & 0x1F) ) )
+                        switch( config_GetInt( p_input, "audio-type" ) )
                         {
                         case -1:
                         case REQUESTED_MPEG:
@@ -226,11 +221,11 @@ static int PSInit( input_thread_t * p_input )
                         break;
 
                     case AC3_AUDIO_ES:
-                        if( config_GetIntVariable( "audio-channel" )
+                        if( config_GetInt( p_input, "audio-channel" )
                                 == ((p_es->i_id & 0xF00) >> 8) ||
-                              ( config_GetIntVariable( "audio-channel" ) < 0
-                                && !((p_es->i_id & 0xF00) >> 8) ) )
-                        switch( config_GetIntVariable( "audio-type" ) )
+                           ( config_GetInt( p_input, "audio-channel" ) < 0
+                              && !((p_es->i_id & 0xF00) >> 8) ) )
+                        switch( config_GetInt( p_input, "audio-type" ) )
                         {
                         case -1:
                         case REQUESTED_AC3:
@@ -239,7 +234,7 @@ static int PSInit( input_thread_t * p_input )
                         break;
 
                     case DVD_SPU_ES:
-                        if( config_GetIntVariable( "spu-channel" )
+                        if( config_GetInt( p_input, "spu-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             input_SelectES( p_input, p_es );
@@ -247,11 +242,11 @@ static int PSInit( input_thread_t * p_input )
                         break;
 
                     case LPCM_AUDIO_ES:
-                        if( config_GetIntVariable( "audio-channel" )
+                        if( config_GetInt( p_input, "audio-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) ||
-                              ( config_GetIntVariable( "audio-channel" ) < 0
-                                && !((p_es->i_id & 0x1F00) >> 8) ) )
-                        switch( config_GetIntVariable( "audio-type" ) )
+                           ( config_GetInt( p_input, "audio-channel" ) < 0
+                              && !((p_es->i_id & 0x1F00) >> 8) ) )
+                        switch( config_GetInt( p_input, "audio-type" ) )
                         {
                         case -1:
                         case REQUESTED_LPCM:
@@ -259,14 +254,11 @@ static int PSInit( input_thread_t * p_input )
                         }
                         break;
                 }
+#undef p_es
             }
-                    
         }
 #endif
-        if( p_main->b_stats )
-        {
-            input_DumpStream( p_input );
-        }
+        input_DumpStream( p_input );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else
@@ -301,7 +293,6 @@ static int PSDemux( input_thread_t * p_input )
     {
         data_packet_t *     p_data;
         ssize_t             i_result;
-
         i_result = input_ReadPS( p_input, &p_data );
 
         if( i_result <= 0 )

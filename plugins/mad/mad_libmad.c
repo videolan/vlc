@@ -24,12 +24,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+#include <vlc/decoder.h>
 
 /*****************************************************************************
  * Libmad includes files
@@ -51,12 +48,12 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
     unsigned char     *ReadStart;
 
     if ( p_mad_adec->p_fifo->b_die == 1 ) {
-        intf_ErrMsg( "mad_adec error: libmad_input stopping libmad decoder" );
+        msg_Err( p_mad_adec->p_fifo, "libmad_input stopping libmad decoder" );
         return MAD_FLOW_STOP;
     }
 
     if ( p_mad_adec->p_fifo->b_error == 1 ) {
-        intf_ErrMsg( "mad_adec error: libmad_input ignoring current audio frame" );
+        msg_Err( p_mad_adec->p_fifo, "libmad_input ignoring current audio frame" );
         return MAD_FLOW_IGNORE;
     }
 
@@ -80,8 +77,8 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
             Remaining=p_libmad_stream->bufend-p_libmad_stream->next_frame;
             if( p_mad_adec->buffer != p_libmad_stream->next_frame )
             {
-                FAST_MEMCPY( p_mad_adec->buffer, p_libmad_stream->next_frame,
-                             Remaining );
+                p_mad_adec->p_fifo->p_vlc->pf_memcpy( p_mad_adec->buffer,
+                                    p_libmad_stream->next_frame, Remaining );
             }
             ReadStart=p_mad_adec->buffer+Remaining;
             ReadSize=(MAD_BUFFER_MDLEN)-Remaining;
@@ -109,26 +106,26 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
         {
             ReadSize = p_mad_adec->p_data->p_payload_end
                         - p_mad_adec->p_data->p_payload_start;
-            FAST_MEMCPY( ReadStart, p_mad_adec->p_data->p_payload_start,
-                         ReadSize );
+            p_mad_adec->p_fifo->p_vlc->pf_memcpy( ReadStart,
+                                p_mad_adec->p_data->p_payload_start, ReadSize );
             NextDataPacket( p_mad_adec->p_fifo, &p_mad_adec->p_data );
         }
         else
         {
-            FAST_MEMCPY( ReadStart, p_mad_adec->p_data->p_payload_start,
-                         ReadSize );
+            p_mad_adec->p_fifo->p_vlc->pf_memcpy( ReadStart,
+                         p_mad_adec->p_data->p_payload_start, ReadSize );
             p_mad_adec->p_data->p_payload_start += ReadSize;
         }
 
         if ( p_mad_adec->p_fifo->b_die == 1 )
         {
-            intf_ErrMsg( "mad_adec error: libmad_input stopping libmad decoder" );
+            msg_Dbg( p_mad_adec->p_fifo, "libmad_input stopping libmad decoder" );
             return MAD_FLOW_STOP;
         }
 
         if ( p_mad_adec->p_fifo->b_error == 1 )
         {
-            intf_ErrMsg( "mad_adec error: libmad_input ignoring current audio frame" );    
+            msg_Err( p_mad_adec->p_fifo, "libmad_input ignoring current audio frame" );    
             return MAD_FLOW_IGNORE;
         }
 
@@ -153,7 +150,7 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  *{
  *   mad_adec_thread_t *p_mad_adec = (mad_adec_thread_t *) data;
  *
- *   intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
+ *   msg_Err( p_mad_adec->p_fifo, "libmad_header samplerate %d", p_libmad_header->samplerate);
  *
  *   PrintFrameInfo(p_limad_mad_header)
  *   return MAD_FLOW_CONTINUE;
@@ -291,6 +288,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     if (p_mad_adec->p_aout_fifo==NULL)
     {
     	p_mad_adec->p_aout_fifo = aout_CreateFifo(
+                p_mad_adec->p_fifo->p_this,
                 AOUT_FIFO_PCM,              /* fifo type */
                 2, /*p_libmad_pcm->channels,*/     /* nr. of channels */
                 p_libmad_pcm->samplerate,   /* frame rate in Hz ?*/
@@ -302,15 +300,17 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
         	return( -1 );
     	}
 
-      intf_WarnMsg( 4, "mad_adec debug: in libmad_output aout fifo created");
+        msg_Dbg( p_mad_adec->p_fifo, "aout fifo created");
     }
 
     if (p_mad_adec->p_aout_fifo->i_rate != p_libmad_pcm->samplerate)
     {
-     	intf_ErrMsg( "mad_adec: libmad_output samplerate is changing from [%d] Hz to [%d] Hz, sample size [%d], error_code [%0x]",
-                        p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
-          		     p_libmad_pcm->length, p_mad_adec->libmad_decoder->sync->stream.error);
-     	p_mad_adec->p_aout_fifo->i_rate = p_libmad_pcm->samplerate;
+	msg_Warn( p_mad_adec->p_fifo, "samplerate is changing from [%d] Hz "
+                  "to [%d] Hz, sample size [%d], error_code [%0x]",
+                  p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
+                  p_libmad_pcm->length,
+                  p_mad_adec->libmad_decoder->sync->stream.error );
+	p_mad_adec->p_aout_fifo->i_rate = p_libmad_pcm->samplerate;
     }
 
     if( p_mad_adec->i_current_pts )
@@ -375,7 +375,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     /* DEBUG */
     /*
     if (p_libmad_pcm->channels == 1) {
-       intf_WarnMsg( 4, "mad debug: libmad_output channels [%d]", p_libmad_pcm->channels);
+       msg_Dbg( p_mad_adec->p_fifo, "libmad_output channels [%d]", p_libmad_pcm->channels);
     }
     */
 
@@ -397,88 +397,88 @@ enum mad_flow libmad_error(void *data, struct mad_stream *p_libmad_stream, struc
     switch (p_libmad_stream->error)
     {             
     case MAD_ERROR_BUFLEN:                /* input buffer too small (or EOF) */
-        intf_ErrMsg("libmad error: input buffer too small (or EOF)");
+//X        intf_ErrMsg("libmad error: input buffer too small (or EOF)");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BUFPTR:                /* invalid (null) buffer pointer */
-        intf_ErrMsg("libmad error: invalid (null) buffer pointer");
+//X        intf_ErrMsg("libmad error: invalid (null) buffer pointer");
         result = MAD_FLOW_STOP;
         break;
     case MAD_ERROR_NOMEM:                 /* not enough memory */
-        intf_ErrMsg("libmad error: invalid (null) buffer pointer");
+//X        intf_ErrMsg("libmad error: invalid (null) buffer pointer");
         result = MAD_FLOW_STOP;
         break;
     case MAD_ERROR_LOSTSYNC:            /* lost synchronization */
-        intf_ErrMsg("libmad error: lost synchronization");
+//X        intf_ErrMsg("libmad error: lost synchronization");
         mad_stream_sync(p_libmad_stream);
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADLAYER:            /* reserved header layer value */
-        intf_ErrMsg("libmad error: reserved header layer value");
+//X        intf_ErrMsg("libmad error: reserved header layer value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADBITRATE:        /* forbidden bitrate value */
-        intf_ErrMsg("libmad error: forbidden bitrate value");
+//X        intf_ErrMsg("libmad error: forbidden bitrate value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADSAMPLERATE: /* reserved sample frequency value */
-        intf_ErrMsg("libmad error: reserved sample frequency value");
+//X        intf_ErrMsg("libmad error: reserved sample frequency value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADEMPHASIS:     /* reserved emphasis value */
-        intf_ErrMsg("libmad error: reserverd emphasis value");
+//X        intf_ErrMsg("libmad error: reserverd emphasis value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADCRC:                /* CRC check failed */
-        intf_ErrMsg("libmad error: CRC check failed");
+//X        intf_ErrMsg("libmad error: CRC check failed");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADBITALLOC:     /* forbidden bit allocation value */
-        intf_ErrMsg("libmad error: forbidden bit allocation value");
+//X        intf_ErrMsg("libmad error: forbidden bit allocation value");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADSCALEFACTOR:/* bad scalefactor index */
-        intf_ErrMsg("libmad error: bad scalefactor index");
+//X        intf_ErrMsg("libmad error: bad scalefactor index");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADFRAMELEN:     /* bad frame length */
-        intf_ErrMsg("libmad error: bad frame length");
+//X        intf_ErrMsg("libmad error: bad frame length");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADBIGVALUES:    /* bad big_values count */
-        intf_ErrMsg("libmad error: bad big values count");
+//X        intf_ErrMsg("libmad error: bad big values count");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADBLOCKTYPE:    /* reserved block_type */
-        intf_ErrMsg("libmad error: reserverd block_type");
+//X        intf_ErrMsg("libmad error: reserverd block_type");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADSCFSI:            /* bad scalefactor selection info */
-        intf_ErrMsg("libmad error: bad scalefactor selection info");
+//X        intf_ErrMsg("libmad error: bad scalefactor selection info");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADDATAPTR:        /* bad main_data_begin pointer */
-        intf_ErrMsg("libmad error: bad main_data_begin pointer");
+//X        intf_ErrMsg("libmad error: bad main_data_begin pointer");
         result = MAD_FLOW_STOP;
         break;
     case MAD_ERROR_BADPART3LEN:     /* bad audio data length */
-        intf_ErrMsg("libmad error: bad audio data length");
+//X        intf_ErrMsg("libmad error: bad audio data length");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADHUFFTABLE:    /* bad Huffman table select */
-        intf_ErrMsg("libmad error: bad Huffman table select");
+//X        intf_ErrMsg("libmad error: bad Huffman table select");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADHUFFDATA:     /* Huffman data overrun */
-        intf_ErrMsg("libmad error: Huffman data overrun");
+//X        intf_ErrMsg("libmad error: Huffman data overrun");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADSTEREO:         /* incompatible block_type for JS */
-        intf_ErrMsg("libmad error: incompatible block_type for JS");
+//X        intf_ErrMsg("libmad error: incompatible block_type for JS");
         result = MAD_FLOW_IGNORE;
         break;
     default:
-        intf_ErrMsg("libmad error: unknown error occured stopping decoder");
+//X        intf_ErrMsg("libmad error: unknown error occured stopping decoder");
         result = MAD_FLOW_STOP;
         break;
     }
@@ -561,9 +561,9 @@ static void PrintFrameInfo(struct mad_header *Header)
 			break;
 	}
 
-	intf_ErrMsg("statistics: %lu kb/s audio mpeg layer %s stream %s crc, "
-			"%s with %s emphasis at %d Hz sample rate\n",
-			Header->bitrate,Layer,
-			Header->flags&MAD_FLAG_PROTECTION?"with":"without",
-			Mode,Emphasis,Header->samplerate);
+//X	intf_ErrMsg("statistics: %lu kb/s audio mpeg layer %s stream %s crc, "
+//X			"%s with %s emphasis at %d Hz sample rate\n",
+//X			Header->bitrate,Layer,
+//X			Header->flags&MAD_FLAG_PROTECTION?"with":"without",
+//X			Mode,Emphasis,Header->samplerate);
 }

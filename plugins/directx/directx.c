@@ -2,7 +2,7 @@
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.10 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: directx.c,v 1.11 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -27,12 +27,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -64,7 +59,6 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("DirectX extension module") )
     ADD_CAPABILITY( AOUT, 150 )
     ADD_CAPABILITY( VOUT, 150 )
-    ADD_SHORTCUT( "directx" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

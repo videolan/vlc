@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.20 2002/05/25 16:23:07 fenrir Exp $
+ * $Id: avi.c,v 1.21 2002/06/01 12:31:58 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -28,12 +28,8 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #include "video.h"
 
@@ -44,10 +40,10 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list );
-static int  AVIDemux         ( struct input_thread_s * );
-static int  AVIInit          ( struct input_thread_s * );
-static void AVIEnd           ( struct input_thread_s * );
+static void input_getfunctions( function_list_t * );
+static int  AVIDemux         ( input_thread_t * );
+static int  AVIInit          ( input_thread_t * );
+static void AVIEnd           ( input_thread_t * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -58,7 +54,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "RIFF-AVI Stream input" )
     ADD_CAPABILITY( DEMUX, 150 )
-    ADD_SHORTCUT( "avi" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -277,19 +272,19 @@ static void __AVI_GetIndex( input_thread_t *p_input )
                                    &p_idx1, 
                                    FOURCC_idx1)!=0 )
     {
-        intf_WarnMsg( 1, "input init: cannot find index" );
+        msg_Warn( p_input, "cannot find index" );
         RIFF_GoToChunk( p_input, p_avi_demux->p_hdrl );        
         return;
     }
     p_avi_demux->p_idx1 = p_idx1;
-    intf_WarnMsg( 1, "input init: loading index" ); 
+    msg_Dbg( p_input, "loading index" ); 
     for(;;)
     {
         i_read = __MIN( 16*1024, p_idx1->i_size - i_totalentry *16);
         if( ((i_read = input_Peek( p_input, &p_buff, i_read )) < 16 )
               ||( i_totalentry *16 >= p_idx1->i_size ) )
         {
-            intf_WarnMsg( 1,"input info: read %d idx entries", i_totalentry );
+            msg_Dbg( p_input, "read %d idx entries", i_totalentry );
             return;
         }
         i_read /= 16 ;
@@ -325,7 +320,7 @@ static int __AVI_SeekToChunk( input_thread_t *p_input, AVIStreamInfo_t *p_info )
         return( 0 );
     }
     /* no index can't arrive but ...*/
-    intf_WarnMsg( 1, "input error: can't seek");
+    msg_Warn( p_input, "cannot seek");
     return( -1 );
 }
 
@@ -360,8 +355,7 @@ static void __AVI_UpdateIndexOffset( input_thread_t *p_input )
             {
                 for( i = 0; i < p_info->i_idxnb; i++ )
                 {
-                    p_info->p_index[i].i_pos += 
-                                                p_avi_demux->p_movi->i_pos + 8;
+                    p_info->p_index[i].i_pos += p_avi_demux->p_movi->i_pos + 8;
                 }
             }
         }
@@ -452,14 +446,14 @@ static int AVIInit( input_thread_t *p_input )
     /* we need to seek to be able to readcorrectly */
     if( !p_input->stream.b_seekable ) 
     {
-        intf_WarnMsg( 2,"input: RIFF-AVI plug-in discarded (no seekable)" );
+        msg_Warn( p_input, "RIFF-AVI module discarded (not seekable)" );
         return( -1 );
     }
     p_input->p_demux_data = 
                 p_avi_demux = malloc( sizeof(demux_data_avi_file_t) );
     if( p_avi_demux == NULL )
     {
-        intf_ErrMsg( "input error: not enough memory" );
+        msg_Err( p_input, "out of memory" );
         return( -1 );
     }
     memset( p_avi_demux, 0, sizeof( demux_data_avi_file_t ) );
@@ -475,7 +469,7 @@ static int AVIInit( input_thread_t *p_input )
     if( RIFF_TestFileHeader( p_input, &p_riff, FOURCC_AVI ) != 0 )    
     {
         __AVIFreeDemuxData( p_input );
-        intf_WarnMsg( 2,"input: RIFF-AVI plug-in discarded (avi_file)" );
+        msg_Warn( p_input, "RIFF-AVI module discarded" );
         return( -1 );
     }
     p_avi_demux->p_riff = p_riff;
@@ -483,7 +477,7 @@ static int AVIInit( input_thread_t *p_input )
     if ( RIFF_DescendChunk(p_input) != 0 )
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot look for subchunk (avi_file)" );
+        msg_Err( p_input, "cannot look for subchunk" );
         return ( -1 );
     }
 
@@ -491,7 +485,7 @@ static int AVIInit( input_thread_t *p_input )
     if( RIFF_FindListChunk(p_input ,&p_hdrl,p_riff, FOURCC_hdrl) != 0 )
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot find \"LIST-hdrl\" (avi_file)" );
+        msg_Err( p_input, "cannot find \"LIST-hdrl\"" );
         return( -1 );
     }
     p_avi_demux->p_hdrl = p_hdrl;
@@ -499,7 +493,7 @@ static int AVIInit( input_thread_t *p_input )
     if( RIFF_DescendChunk(p_input) != 0 )
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot look for subchunk (avi_file)" );
+        msg_Err( p_input, "cannot look for subchunk" );
         return ( -1 );
     }
     /* in  LIST-hdrl search avih */
@@ -507,7 +501,7 @@ static int AVIInit( input_thread_t *p_input )
                                     &p_avih, FOURCC_avih ) != 0 )
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot find \"avih\" chunk (avi_file)" );
+        msg_Err( p_input, "cannot find \"avih\" chunk" );
         return( -1 );
     }
     __AVI_Parse_avih( &p_avi_demux->avih, p_avih->p_data->p_payload_start );
@@ -517,24 +511,24 @@ static int AVIInit( input_thread_t *p_input )
     /* no stream found, perhaps it would be cool to find it */
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: no defined stream !" );
+        msg_Err( p_input, "no stream defined!" );
         return( -1 );
     }
 
     /*  create one program */
-    vlc_mutex_lock( &p_input->stream.stream_lock ); 
+    vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot init stream" );
+        msg_Err( p_input, "cannot init stream" );
         return( -1 );
     }
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot add program" );
+        msg_Err( p_input, "cannot add program" );
         return( -1 );
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
@@ -561,7 +555,7 @@ static int AVIInit( input_thread_t *p_input )
                 ||( RIFF_DescendChunk(p_input) != 0 ))
         {
             __AVIFreeDemuxData( p_input );
-            intf_ErrMsg( "input error: cannot find \"LIST-strl\" (avi_file)" );
+            msg_Err( p_input, "cannot find \"LIST-strl\"" );
             return( -1 );
         }
         
@@ -571,7 +565,7 @@ static int AVIInit( input_thread_t *p_input )
         {
             RIFF_DeleteChunk( p_input, p_strl );
             __AVIFreeDemuxData( p_input );
-            intf_ErrMsg( "input error: cannot find \"strh\" (avi_file)" );
+            msg_Err( p_input, "cannot find \"strh\"" );
             return( -1 );
         }
         __AVI_Parse_Header( &p_info->header,
@@ -584,7 +578,7 @@ static int AVIInit( input_thread_t *p_input )
         {
             RIFF_DeleteChunk( p_input, p_strl );
             __AVIFreeDemuxData( p_input );
-            intf_ErrMsg( "input error: cannot find \"strf\" (avi_file)" );
+            msg_Err( p_input, "cannot find \"strf\"" );
             return( -1 );
         }
         /* we don't get strd, it's useless for divx,opendivx,mepgaudio */ 
@@ -593,7 +587,7 @@ static int AVIInit( input_thread_t *p_input )
             RIFF_DeleteChunk( p_input, p_strf );
             RIFF_DeleteChunk( p_input, p_strl );
             __AVIFreeDemuxData( p_input );
-            intf_ErrMsg( "input error: cannot go out (\"strl\") (avi_file)" );
+            msg_Err( p_input, "cannot go out (\"strl\")" );
             return( -1 );
         }
 
@@ -616,9 +610,8 @@ static int AVIInit( input_thread_t *p_input )
                     __AVI_AudioGetType( p_info->audio_format.i_formattag );
                 if( p_es->i_type == 0 )
                 {
-                    intf_ErrMsg( "input error: stream(%d,0x%x) not supported",
-                                    i,
-                                    p_info->audio_format.i_formattag );
+                    msg_Err( p_input, "stream(%d,0x%x) not supported", i,
+                                       p_info->audio_format.i_formattag );
                     p_es->i_cat = UNKNOWN_ES;
                 }
                 break;
@@ -632,15 +625,13 @@ static int AVIInit( input_thread_t *p_input )
                     __AVI_VideoGetType( p_info->video_format.i_compression );
                 if( p_es->i_type == 0 )
                 {
-                    intf_ErrMsg( "input error: stream(%d,%4.4s) not supported",
-                               i,
-                               (char*)&p_info->video_format.i_compression);
+                    msg_Err( p_input, "stream(%d,%4.4s) not supported", i,
+                              (char*)&p_info->video_format.i_compression);
                     p_es->i_cat = UNKNOWN_ES;
                 }
                 break;
             default:
-                intf_ErrMsg( "input error: unknown stream(%d) type",
-                            i );
+                msg_Err( p_input, "unknown stream(%d) type", i );
                 p_es->i_cat = UNKNOWN_ES;
                 break;
         }
@@ -661,14 +652,14 @@ static int AVIInit( input_thread_t *p_input )
     if( RIFF_AscendChunk(p_input, p_hdrl) != 0)
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot go out (\"hdrl\") (avi_file)" );
+        msg_Err( p_input, "cannot go out (\"hdrl\")" );
         return( -1 );
     }
 
     /* go to movi chunk to get it*/
     if( RIFF_FindListChunk(p_input ,&p_movi,p_riff, FOURCC_movi) != 0 )
     {
-        intf_ErrMsg( "input error: cannot find \"LIST-movi\" (avi_file)" );
+        msg_Err( p_input, "cannot find \"LIST-movi\"" );
         __AVIFreeDemuxData( p_input );
         return( -1 );
     }
@@ -684,7 +675,7 @@ static int AVIInit( input_thread_t *p_input )
     }
     else
     {
-        intf_WarnMsg( 1, "input init: no index !" );
+        msg_Warn( p_input, "no index!" );
     }
 
     
@@ -703,7 +694,7 @@ static int AVIInit( input_thread_t *p_input )
             {
                 case( AUDIO_ES ):
                     if( RIFF_FindChunk( p_input, 
-                               MAKEFOURCC('0'+i/10, '0'+i%10,'w','b' ), 
+                               VLC_FOURCC('0'+i/10, '0'+i%10,'w','b' ), 
                                              p_movi ) == 0)
                     {
                        p_chunk = RIFF_ReadChunk( p_input );
@@ -712,7 +703,7 @@ static int AVIInit( input_thread_t *p_input )
                     
                 case( VIDEO_ES ):
                     if( (RIFF_FindChunk( p_input, 
-                                    MAKEFOURCC('0'+i/10, '0'+i%10,'d','c' ),
+                                    VLC_FOURCC('0'+i/10, '0'+i%10,'d','c' ),
                                             p_movi ) == 0) )
                     {
                         p_chunk = RIFF_ReadChunk( p_input ); 
@@ -722,7 +713,7 @@ static int AVIInit( input_thread_t *p_input )
                         RIFF_GoToChunk( p_input, p_avi_demux->p_movi );
                         if( RIFF_DescendChunk(p_input) != 0 ) { continue; }
                         if( (RIFF_FindChunk( p_input,
-                                        MAKEFOURCC('0'+i/10, '0'+i%10,'d','b' ),
+                                        VLC_FOURCC('0'+i/10, '0'+i%10,'d','b' ),
                                             p_movi ) == 0) )
                         {
                             p_chunk = RIFF_ReadChunk( p_input );
@@ -737,9 +728,8 @@ static int AVIInit( input_thread_t *p_input )
                 index.i_pos = p_chunk->i_pos;
                 index.i_length = p_chunk->i_size;
                 __AVI_AddEntryIndex( p_info, &index );
-                intf_WarnMsg( 3, "input init: add index entry (%4.4s) (%d)", 
-                                 (char*)&p_chunk->i_id,
-                                 i); 
+                msg_Dbg( p_input, "add index entry (%4.4s) (%d)", 
+                                  (char*)&p_chunk->i_id, i ); 
                
             }
         }
@@ -751,19 +741,19 @@ static int AVIInit( input_thread_t *p_input )
     if( RIFF_DescendChunk( p_input ) != 0 )
     {
         __AVIFreeDemuxData( p_input );
-        intf_ErrMsg( "input error: cannot go in (\"movi\") (avi_file)" );
+        msg_Err( p_input, "cannot go in (\"movi\")" );
         return( -1 );
     }
 
     /* print informations on streams */
-    intf_Msg( "input init: AVIH: %d stream, flags %s%s%s%s%s%s ", 
-            p_avi_demux->i_streams,
-            p_avi_demux->avih.i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
-            p_avi_demux->avih.i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
-            p_avi_demux->avih.i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
-            p_avi_demux->avih.i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"",
-            p_avi_demux->avih.i_flags&AVIF_WASCAPTUREFILE?" CAPTUREFILE":"",
-            p_avi_demux->avih.i_flags&AVIF_COPYRIGHTED?" COPYRIGHTED":"" );
+    msg_Dbg( p_input, "AVIH: %d stream, flags %s%s%s%s%s%s ", 
+             p_avi_demux->i_streams,
+             p_avi_demux->avih.i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
+             p_avi_demux->avih.i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
+             p_avi_demux->avih.i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
+             p_avi_demux->avih.i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"",
+             p_avi_demux->avih.i_flags&AVIF_WASCAPTUREFILE?" CAPTUREFILE":"",
+             p_avi_demux->avih.i_flags&AVIF_COPYRIGHTED?" COPYRIGHTED":"" );
 
     for( i = 0; i < p_avi_demux->i_streams; i++ )
     {
@@ -771,36 +761,36 @@ static int AVIInit( input_thread_t *p_input )
         switch( p_info->p_es->i_cat )
         {
             case( VIDEO_ES ):
-                intf_Msg("input init: video(%4.4s) %dx%d %dbpp %ffps (size %d)",
-                        (char*)&p_info->video_format.i_compression,
-                        p_info->video_format.i_width,
-                        p_info->video_format.i_height,
-                        p_info->video_format.i_bitcount,
-                        (float)p_info->header.i_rate /
-                            (float)p_info->header.i_scale,
-                        p_info->header.i_samplesize );
+                msg_Dbg( p_input, "video(%4.4s) %dx%d %dbpp %ffps (size %d)",
+                         (char*)&p_info->video_format.i_compression,
+                         p_info->video_format.i_width,
+                         p_info->video_format.i_height,
+                         p_info->video_format.i_bitcount,
+                         (float)p_info->header.i_rate /
+                             (float)p_info->header.i_scale,
+                         p_info->header.i_samplesize );
                 if( (p_avi_demux->p_info_video == NULL) ) 
                 {
                     p_avi_demux->p_info_video = p_info;
-               }
+                }
                 break;
 
             case( AUDIO_ES ):
-                intf_Msg( "input init: audio(0x%x) %d channels %dHz %dbits %ffps (size %d)",
-                        p_info->audio_format.i_formattag,
-                        p_info->audio_format.i_channels,
-                        p_info->audio_format.i_samplespersec,
-                        p_info->audio_format.i_bitspersample,
-                        (float)p_info->header.i_rate /
-                            (float)p_info->header.i_scale,
-                        p_info->header.i_samplesize );
+                msg_Dbg( p_input, "audio(0x%x) %d channels %dHz %dbits %ffps (size %d)",
+                         p_info->audio_format.i_formattag,
+                         p_info->audio_format.i_channels,
+                         p_info->audio_format.i_samplespersec,
+                         p_info->audio_format.i_bitspersample,
+                         (float)p_info->header.i_rate /
+                             (float)p_info->header.i_scale,
+                         p_info->header.i_samplesize );
                 if( (p_avi_demux->p_info_audio == NULL) ) 
                 {
                     p_avi_demux->p_info_audio = p_info;
                 }
                 break;
             case( UNKNOWN_ES ):
-                intf_Msg( "input init: unhanled stream %d", i );
+                msg_Warn( p_input, "unhandled stream %d", i );
         }
 #undef p_info    
     }
@@ -815,15 +805,16 @@ static int AVIInit( input_thread_t *p_input )
     }
     else
     {
-        intf_Msg( "input error: no video stream found !" );
+        msg_Err( p_input, "no video stream found" );
     }
+
     if( p_avi_demux->p_info_audio != NULL ) 
     {
         input_SelectES( p_input, p_avi_demux->p_info_audio->p_es );
     }
     else
     {
-        intf_Msg( "input init: no audio stream found !" );
+        msg_Warn( p_input, "no audio stream found!" );
     }
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -984,7 +975,7 @@ static int __AVI_GoToStreamChunk( input_thread_t    *p_input,
     
     if( !p_input->stream.b_seekable )
     {
-        intf_ErrMsg( "input error: need the ability to seek in stream" );
+        msg_Err( p_input, "need the ability to seek in stream" );
         return( -1 );
     }
 
@@ -1033,7 +1024,7 @@ static int __AVI_GoToStreamBytes( input_thread_t    *p_input,
 
     if( !p_input->stream.b_seekable )
     {
-        intf_ErrMsg( "input error: need the ability to seek in stream" );
+        msg_Err( p_input, "need the ability to seek in stream" );
         return( -1 );
     }
 
@@ -1506,7 +1497,7 @@ static int AVIDemux( input_thread_t *p_input )
 
     if( !p_info_master ) 
     {
-        intf_ErrMsg( "input error: no stream selected" );
+        msg_Err( p_input, "no stream selected" );
         return( -1 );
     }
 

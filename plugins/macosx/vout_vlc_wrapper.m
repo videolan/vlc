@@ -2,7 +2,7 @@
  * vout_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_vlc_wrapper.m,v 1.2 2002/05/18 18:48:24 massiot Exp $
+ * $Id: vout_vlc_wrapper.m,v 1.3 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -28,12 +28,9 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #include "macosx.h"
 #include "vout_vlc_wrapper.h"
@@ -73,8 +70,7 @@ static Vout_VLCWrapper *o_vout = nil;
 
 - (void)mouseEvent:(unsigned int)ui_status forVout:(void *)_p_vout
 {
-    struct vout_thread_s *p_vout =
-        (struct vout_thread_s *)_p_vout;
+    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
 
     if( ui_status & MOUSE_MOVED ) 
         p_vout->p_sys->b_mouse_moved = 1;
@@ -102,8 +98,7 @@ static Vout_VLCWrapper *o_vout = nil;
 {
     unichar key = 0;
 
-    struct vout_thread_s *p_vout =
-        (struct vout_thread_s *)_p_vout;
+    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
 
     if( [[o_event characters] length] )
     {
@@ -117,7 +112,7 @@ static Vout_VLCWrapper *o_vout = nil;
             break;
 
         case 'q': case 'Q':
-            p_main->p_intf->b_die = 1;
+            p_vout->p_vlc->b_die = 1;
             break;
 
         default:

@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.36 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: vout_directx.c,v 1.37 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -38,16 +38,13 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #include <ddraw.h>
 
 #include "netutils.h"
-
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
 
 #include "vout_directx.h"
 
@@ -113,7 +110,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "vout error: can't create p_sys (%s)", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
@@ -128,9 +125,9 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_event_thread_die = 0;
     p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
-    p_vout->p_sys->b_using_overlay = config_GetIntVariable( "overlay" );
-    p_vout->p_sys->b_use_sysmem = config_GetIntVariable( "directx-use-sysmem");
-    p_vout->p_sys->b_hw_yuv = config_GetIntVariable( "directx-hw-yuv" );
+    p_vout->p_sys->b_using_overlay = config_GetInt( p_vout, "overlay" );
+    p_vout->p_sys->b_use_sysmem = config_GetInt( p_vout, "directx-use-sysmem");
+    p_vout->p_sys->b_hw_yuv = config_GetInt( p_vout, "directx-hw-yuv" );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
@@ -140,7 +137,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_window_height = p_vout->i_window_height;
 
     /* Set locks and condition variables */
-    vlc_mutex_init( &p_vout->p_sys->event_thread_lock );
+    vlc_mutex_init( p_vout, &p_vout->p_sys->event_thread_lock );
     vlc_cond_init( &p_vout->p_sys->event_thread_wait );
     p_vout->p_sys->i_event_thread_status = THREAD_CREATE;
 
@@ -151,13 +148,12 @@ static int vout_Create( vout_thread_t *p_vout )
      * DirectXEventThread will take care of the creation of the video
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
-    intf_WarnMsg( 3, "vout: vout_Create creating DirectXEventThread" );
-    if( vlc_thread_create( &p_vout->p_sys->event_thread_id,
+    msg_Dbg( p_vout, "creating DirectXEventThread" );
+    if( vlc_thread_create( p_vout, &p_vout->p_sys->event_thread_id,
                            "DirectX Events Thread",
                            (void *) DirectXEventThread, (void *) p_vout) )
     {
-        intf_ErrMsg( "vout error: can't create DirectXEventThread" );
-        intf_ErrMsg("vout error: %s", strerror(ENOMEM));
+        msg_Err( p_vout, "cannot create DirectXEventThread" );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -172,17 +168,18 @@ static int vout_Create( vout_thread_t *p_vout )
     vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
     if( p_vout->p_sys->i_event_thread_status != THREAD_READY )
     {
-        intf_ErrMsg( "vout error: DirectXEventThread failed" );
+        msg_Err( p_vout, "DirectXEventThread failed" );
         free( p_vout->p_sys );
         return( 1 );
     }
 
-    intf_WarnMsg( 3, "vout: vout_Create DirectXEventThread running" );
+    msg_Dbg( p_vout, "DirectXEventThread running" );
+
 
     /* Initialise DirectDraw */
     if( DirectXInitDDraw( p_vout ) )
     {
-        intf_ErrMsg( "vout error: can't initialise DirectDraw" );
+        msg_Err( p_vout, "cannot initialize DirectDraw" );
         vout_Destroy( p_vout );
         return ( 1 );
     }
@@ -190,7 +187,7 @@ static int vout_Create( vout_thread_t *p_vout )
     /* Create the directx display */
     if( DirectXCreateDisplay( p_vout ) )
     {
-        intf_ErrMsg( "vout error: can't initialise DirectDraw" );
+        msg_Err( p_vout, "cannot initialize DirectDraw" );
         DirectXCloseDDraw( p_vout );
         vout_Destroy( p_vout );
         return ( 1 );
@@ -252,7 +249,7 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
-    intf_WarnMsg( 3, "vout: vout_Destroy" );
+    msg_Dbg( p_vout, "vout_Destroy" );
     DirectXCloseDisplay( p_vout );
     DirectXCloseDDraw( p_vout );
 
@@ -296,7 +293,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_SCALE_CHANGE
         || p_vout->p_sys->i_changes & VOUT_SCALE_CHANGE)
     {
-        intf_WarnMsg( 3, "vout: vout_Manage Scale Change" );
+        msg_Dbg( p_vout, "Scale Change" );
         if( !p_vout->p_sys->b_using_overlay )
             InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
         else
@@ -311,7 +308,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_SIZE_CHANGE
         || p_vout->p_sys->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_WarnMsg( 3, "vout: vout_Manage Size Change" );
+        msg_Dbg( p_vout, "Size Change" );
         if( !p_vout->p_sys->b_using_overlay )
             InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
         else
@@ -392,7 +389,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( (p_vout->p_sys->p_display == NULL) )
     {
-        intf_WarnMsg( 3, "vout error: vout_Display no display!!" );
+        msg_Warn( p_vout, "no display!!" );
         return;
     }
 
@@ -427,7 +424,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( dxresult != DD_OK )
         {
-            intf_WarnMsg( 3, "vout: could not Blit the surface" );
+            msg_Warn( p_vout, "could not Blit the surface" );
             return;
         }
 
@@ -455,20 +452,19 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         }
 
         if( dxresult != DD_OK )
-            intf_WarnMsg( 8, "vout: couldn't flip overlay surface" );
-
+            msg_Warn( p_vout, "could not flip overlay surface" );
 
         if( !DirectXGetSurfaceDesc( p_pic ) )
         {
             /* AAARRGG */
-            intf_ErrMsg( "vout error: vout_Display cannot get surface desc" );
+            msg_Err( p_vout, "cannot get surface desc" );
             return;
         }
 
         if( !UpdatePictureStruct( p_vout, p_pic, p_vout->output.i_chroma ) )
         {
             /* AAARRGG */
-            intf_ErrMsg( "vout error: vout_Display unvalid pic chroma" );
+            msg_Err( p_vout, "invalid pic chroma" );
             return;
         }
 
@@ -492,13 +488,13 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     HRESULT    (WINAPI *OurDirectDrawCreate)(GUID *,LPDIRECTDRAW *,IUnknown *);
     LPDIRECTDRAW  p_ddobject;
 
-    intf_WarnMsg( 3, "vout: DirectXInitDDraw" );
+    msg_Dbg( p_vout, "DirectXInitDDraw" );
 
     /* load direct draw DLL */
     p_vout->p_sys->hddraw_dll = LoadLibrary("DDRAW.DLL");
     if( p_vout->p_sys->hddraw_dll == NULL )
     {
-        intf_WarnMsg( 3, "vout: DirectXInitDDraw failed loading ddraw.dll" );
+        msg_Warn( p_vout, "DirectXInitDDraw failed loading ddraw.dll" );
         return( 1 );
     }
       
@@ -506,7 +502,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
       (void *)GetProcAddress(p_vout->p_sys->hddraw_dll, "DirectDrawCreate");
     if ( OurDirectDrawCreate == NULL )
     {
-        intf_ErrMsg( "vout error: DirectXInitDDraw failed GetProcAddress" );
+        msg_Err( p_vout, "DirectXInitDDraw failed GetProcAddress" );
         FreeLibrary( p_vout->p_sys->hddraw_dll );
         p_vout->p_sys->hddraw_dll = NULL;
         return( 1 );    
@@ -516,7 +512,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     dxresult = OurDirectDrawCreate( NULL, &p_ddobject, NULL );
     if( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: DirectXInitDDraw can't initialize DDraw" );
+        msg_Err( p_vout, "DirectXInitDDraw cannot initialize DDraw" );
         p_vout->p_sys->p_ddobject = NULL;
         FreeLibrary( p_vout->p_sys->hddraw_dll );
         p_vout->p_sys->hddraw_dll = NULL;
@@ -529,7 +525,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
                                            p_vout->p_sys->hwnd, DDSCL_NORMAL );
     if( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: can't set direct draw cooperative level." );
+        msg_Err( p_vout, "cannot set direct draw cooperative level" );
         IDirectDraw_Release( p_ddobject );
         p_vout->p_sys->p_ddobject = NULL;
         FreeLibrary( p_vout->p_sys->hddraw_dll );
@@ -542,7 +538,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
                                         (LPVOID *)&p_vout->p_sys->p_ddobject );
     if( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: can't get IDirectDraw2 interface." );
+        msg_Err( p_vout, "cannot get IDirectDraw2 interface" );
         IDirectDraw_Release( p_ddobject );
         p_vout->p_sys->p_ddobject = NULL;
         FreeLibrary( p_vout->p_sys->hddraw_dll );
@@ -558,7 +554,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     /* Probe the capabilities of the hardware */
     DirectXGetDDrawCaps( p_vout );
 
-    intf_WarnMsg( 3, "vout: End DirectXInitDDraw" );
+    msg_Dbg( p_vout, "End DirectXInitDDraw" );
     return( 0 );
 }
 
@@ -575,7 +571,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     LPDIRECTDRAWSURFACE  p_display;
     DDPIXELFORMAT   pixel_format;
 
-    intf_WarnMsg( 3, "vout: DirectXCreateDisplay" );
+    msg_Dbg( p_vout, "DirectXCreateDisplay" );
 
     /* Now get the primary surface. This surface is what you actually see
      * on your screen */
@@ -589,7 +585,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
                                            &p_display, NULL );
     if( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: can't get direct draw primary surface." );
+        msg_Err( p_vout, "cannot get direct draw primary surface" );
         p_vout->p_sys->p_display = NULL;
         return( 1 );
     }
@@ -599,7 +595,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
                                          (LPVOID *)&p_vout->p_sys->p_display );
     if ( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: can't get IDirectDrawSurface3 interface." );
+        msg_Err( p_vout, "cannot get IDirectDrawSurface3 interface" );
         IDirectDrawSurface_Release( p_display );
         p_vout->p_sys->p_display = NULL;
         return( 1 );
@@ -622,7 +618,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     dxresult = IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
                                                    &pixel_format );
     if( dxresult != DD_OK )
-        intf_WarnMsg( 3, "vout: DirectXUpdateOverlay GetPixelFormat failed" );
+        msg_Warn( p_vout, "DirectXUpdateOverlay GetPixelFormat failed" );
     p_vout->p_sys->i_colorkey = (DWORD)((( p_vout->p_sys->i_rgb_colorkey
                                            * pixel_format.dwRBitMask) / 255)
                                         & pixel_format.dwRBitMask);
@@ -644,14 +640,14 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
 {
     HRESULT dxresult;
 
-    intf_WarnMsg( 3, "vout: DirectXCreateClipper" );
+    msg_Dbg( p_vout, "DirectXCreateClipper" );
 
     /* Create the clipper */
     dxresult = IDirectDraw2_CreateClipper( p_vout->p_sys->p_ddobject, 0,
                                            &p_vout->p_sys->p_clipper, NULL );
     if( dxresult != DD_OK )
     {
-        intf_WarnMsg( 3, "vout: DirectXCreateClipper can't create clipper." );
+        msg_Warn( p_vout, "DirectXCreateClipper cannot create clipper" );
         p_vout->p_sys->p_clipper = NULL;
         return( 1 );
     }
@@ -661,8 +657,8 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
                                           p_vout->p_sys->hwnd);
     if( dxresult != DD_OK )
     {
-        intf_WarnMsg( 3,
-            "vout: DirectXCreateClipper can't attach clipper to window." );
+        msg_Warn( p_vout,
+                  "DirectXCreateClipper cannot attach clipper to window" );
         IDirectDrawSurface_Release( p_vout->p_sys->p_clipper );
         p_vout->p_sys->p_clipper = NULL;
         return( 1 );
@@ -673,8 +669,8 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
                                              p_vout->p_sys->p_clipper);
     if( dxresult != DD_OK )
     {
-        intf_WarnMsg( 3,
-            "vout: DirectXCreateClipper can't attach clipper to surface." );
+        msg_Warn( p_vout,
+                  "DirectXCreateClipper cannot attach clipper to surface" );
         IDirectDrawSurface_Release( p_vout->p_sys->p_clipper );
         p_vout->p_sys->p_clipper = NULL;
         return( 1 );
@@ -786,7 +782,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
     IDirectDrawSurface_Release( p_surface );    /* Release the old interface */
     if ( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: can't get IDirectDrawSurface3 interface." );
+        msg_Err( p_vout, "cannot get IDirectDrawSurface3 interface" );
         *pp_surface_final = NULL;
         return 0;
     }
@@ -833,8 +829,8 @@ void DirectXUpdateOverlay( vout_thread_t *p_vout )
                                          &ddofx );
     if(dxresult != DD_OK)
     {
-        intf_WarnMsg( 3,
-          "vout: DirectXUpdateOverlay can't move or resize overlay" );
+        msg_Warn( p_vout,
+                  "DirectXUpdateOverlay cannot move or resize overlay" );
     }
 
 }
@@ -846,7 +842,7 @@ void DirectXUpdateOverlay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void DirectXCloseDDraw( vout_thread_t *p_vout )
 {
-    intf_WarnMsg(3, "vout: DirectXCloseDDraw" );
+    msg_Dbg( p_vout, "DirectXCloseDDraw" );
     if( p_vout->p_sys->p_ddobject != NULL )
     {
         IDirectDraw2_Release(p_vout->p_sys->p_ddobject);
@@ -867,18 +863,18 @@ static void DirectXCloseDDraw( vout_thread_t *p_vout )
  *****************************************************************************/
 static void DirectXCloseDisplay( vout_thread_t *p_vout )
 {
-    intf_WarnMsg( 3, "vout: DirectXCloseDisplay" );
+    msg_Dbg( p_vout, "DirectXCloseDisplay" );
 
     if( p_vout->p_sys->p_clipper != NULL )
     {
-        intf_WarnMsg( 3, "vout: DirectXCloseDisplay clipper" );
+        msg_Dbg( p_vout, "DirectXCloseDisplay clipper" );
         IDirectDraw2_Release( p_vout->p_sys->p_clipper );
         p_vout->p_sys->p_clipper = NULL;
     }
 
     if( p_vout->p_sys->p_display != NULL )
     {
-        intf_WarnMsg( 3, "vout: DirectXCloseDisplay display" );
+        msg_Dbg( p_vout, "DirectXCloseDisplay display" );
         IDirectDraw2_Release( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
@@ -892,7 +888,7 @@ static void DirectXCloseDisplay( vout_thread_t *p_vout )
 static void DirectXCloseSurface( vout_thread_t *p_vout,
                                  LPDIRECTDRAWSURFACE3 p_surface )
 {
-    intf_WarnMsg( 3, "vout: DirectXCloseSurface" );
+    msg_Dbg( p_vout, "DirectXCloseSurface" );
     if( p_surface != NULL )
     {
         IDirectDraw2_Release( p_surface );
@@ -911,7 +907,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     boolean_t b_result_ok;
     LPDIRECTDRAWSURFACE3 p_surface;
 
-    intf_WarnMsg( 3, "vout: NewPictureVec" );
+    msg_Dbg( p_vout, "NewPictureVec" );
 
     I_OUTPUTPICTURES = 0;
 
@@ -984,8 +980,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                                                 p_surface, &dds_caps,
                                                 &p_pic[0].p_sys->p_surface ) )
             {
-                intf_WarnMsg( 3, "vout: NewPictureVec couldn't get "
-                              "back buffer" );
+                msg_Warn( p_vout, "NewPictureVec could not get back buffer" );
                 /* front buffer is the same as back buffer */
                 p_pic[0].p_sys->p_surface = p_surface;
             }
@@ -1008,11 +1003,11 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
             DirectXUpdateOverlay( p_vout );
             I_OUTPUTPICTURES = 1;
-            intf_WarnMsg( 3,"vout: DirectX YUV overlay created successfully" );
+            msg_Dbg( p_vout, "DirectX YUV overlay created successfully" );
         }
         else
         {
-            intf_WarnMsg( 3, "vout: can't create an YUV overlay surface." );
+            msg_Err( p_vout, "cannot create YUV overlay surface" );
             p_vout->p_sys->b_using_overlay = 0;
         }
     }
@@ -1056,7 +1051,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 case 32:
                     p_vout->output.i_chroma = FOURCC_RV32; break;
                 default:
-                    intf_ErrMsg( "vout error: unknown screen depth" );
+                    msg_Err( p_vout, "unknown screen depth" );
                     return( 0 );
                 }
                 p_vout->output.i_rmask = ddpfPixelFormat.dwRBitMask;
@@ -1114,16 +1109,15 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         {
 
             /* Unknown chroma, tell the guy to get lost */
-            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x (%4.4s)",
-                         p_vout->output.i_chroma,
-                         (char*)&p_vout->output.i_chroma );
+            msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
+                     p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
             FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
             I_OUTPUTPICTURES = 0;
             return -1;
         }
     }
 
-    intf_WarnMsg( 3, "vout: End NewPictureVec");
+    msg_Dbg( p_vout, "End NewPictureVec");
     return 0;
 }
 
@@ -1266,7 +1260,7 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
                                      &ddcaps, NULL );
     if(dxresult != DD_OK )
     {
-        intf_WarnMsg( 3,"vout error: can't get caps." );
+        msg_Warn( p_vout, "cannot get caps" );
     }
     else
     {
@@ -1288,11 +1282,10 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
         /* Determine if the hardware supports scaling of the overlay surface */
         bCanStretch = ((ddcaps.dwCaps & DDCAPS_OVERLAYSTRETCH) ==
                        DDCAPS_OVERLAYSTRETCH) ? TRUE : FALSE;
-        intf_WarnMsg( 3, "vout: DirectDraw Capabilities:" );
-        intf_WarnMsg( 3, "       overlay=%i yuvoverlay=%i can_clip_overlay=%i "
-                         "colorkey=%i stretch=%i",
-                      bHasOverlay, bHasOverlayFourCC, bCanClipOverlay,
-                      bHasColorKey, bCanStretch );
+        msg_Dbg( p_vout, "DirectDraw Capabilities: overlay=%i yuvoverlay=%i "
+                         "can_clip_overlay=%i colorkey=%i stretch=%i",
+                         bHasOverlay, bHasOverlayFourCC, bCanClipOverlay,
+                         bHasColorKey, bCanStretch );
 
         /* Overlay clipping support is interesting for us as it means we can
          * get rid of the colorkey alltogether */
@@ -1330,7 +1323,7 @@ static int DirectXGetSurfaceDesc( picture_t *p_pic )
     }
     if( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout: DirectXGetSurfaceDesc can't lock surface" );
+//X        msg_Err( p_vout, "DirectXGetSurfaceDesc cannot lock surface" );
         return 0;
     }
 

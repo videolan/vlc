@@ -23,9 +23,8 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include <videolan/vlc.h>
-
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "about.h"
 #include "win32_common.h"
@@ -34,7 +33,7 @@
 //#pragma package(smart_init)
 #pragma resource "*.dfm"
 
-extern  struct intf_thread_s *p_intfGlobal;
+extern  intf_thread_t *p_intfGlobal;
 
 //---------------------------------------------------------------------------
 __fastcall TAboutDlg::TAboutDlg( TComponent* Owner )

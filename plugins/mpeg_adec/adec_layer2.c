@@ -2,7 +2,7 @@
  * adec_layer2.c: MPEG Layer II audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: adec_layer2.c,v 1.6 2002/02/24 22:06:50 sam Exp $
+ * $Id: adec_layer2.c,v 1.7 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -25,10 +25,8 @@
 #include <stdlib.h>                                                  /* NULL */
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
 #include "mpeg_adec_generic.h"
 #include "mpeg_adec.h"

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.91 2002/05/18 17:47:47 sam Exp $
+ * $Id: vout_sdl.c,v 1.92 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -30,7 +30,9 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #include <sys/types.h>
 #ifndef WIN32
@@ -41,14 +43,6 @@
 
 #include "netutils.h"
 
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
-
-#include "stream_control.h"                 /* needed by input_ext-intf.h... */
-#include "input_ext-intf.h"
-
 #define SDL_MAX_DIRECTBUFFERS 10
 #define SDL_DEFAULT_BPP 16
 
@@ -58,7 +52,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the SDL specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     SDL_Surface *   p_display;                             /* display device */
 
@@ -71,12 +65,11 @@ typedef struct vout_sys_s
     /* For RGB output */
     int i_surfaces;
 
-    boolean_t   b_cursor;
-    boolean_t   b_cursor_autohidden;
+    vlc_bool_t  b_cursor;
+    vlc_bool_t  b_cursor_autohidden;
     mtime_t     i_lastmoved;
     mtime_t     i_lastpressed;                        /* to track dbl-clicks */
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * picture_sys_t: direct buffer method descriptor
@@ -84,52 +77,26 @@ typedef struct vout_sys_s
  * This structure is part of the picture descriptor, it describes the
  * SDL specific properties of a direct buffer.
  *****************************************************************************/
-typedef struct picture_sys_s
+struct picture_sys_s
 {
     SDL_Overlay *p_overlay;
-
-} picture_sys_t;
-
-/*****************************************************************************
- * Seeking function TODO: put this in a generic location !
- *****************************************************************************/
-static inline void vout_Seek( off_t i_seek )
-{
-    off_t i_tell;
-
-    vlc_mutex_lock( &p_input_bank->lock );
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-#define S p_input_bank->pp_input[0]->stream
-        i_tell = S.p_selected_area->i_tell + i_seek * (off_t)50 * S.i_mux_rate;
-
-        i_tell = ( i_tell <= 0 /*S.p_selected_area->i_start*/ )
-                   ? 0 /*S.p_selected_area->i_start*/
-                   : ( i_tell >= S.p_selected_area->i_size )
-                       ? S.p_selected_area->i_size
-                       : i_tell;
-
-        input_Seek( p_input_bank->pp_input[0], i_tell );
-#undef S
-    }
-    vlc_mutex_unlock( &p_input_bank->lock );
-}
+};
 
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  vout_Create     ( struct vout_thread_s * );
-static int  vout_Init       ( struct vout_thread_s * );
-static void vout_End        ( struct vout_thread_s * );
-static void vout_Destroy    ( struct vout_thread_s * );
-static int  vout_Manage     ( struct vout_thread_s * );
-static void vout_Render     ( struct vout_thread_s *, struct picture_s * );
-static void vout_Display    ( struct vout_thread_s *, struct picture_s * );
+static int  vout_Create     ( vout_thread_t * );
+static int  vout_Init       ( vout_thread_t * );
+static void vout_End        ( vout_thread_t * );
+static void vout_Destroy    ( vout_thread_t * );
+static int  vout_Manage     ( vout_thread_t * );
+static void vout_Render     ( vout_thread_t *, picture_t * );
+static void vout_Display    ( vout_thread_t *, picture_t * );
 
-static int  OpenDisplay     ( struct vout_thread_s * );
-static void CloseDisplay    ( struct vout_thread_s * );
-static int  NewPicture      ( struct vout_thread_s *, struct picture_s * );
-static void SetPalette      ( struct vout_thread_s *, u16 *, u16 *, u16 * );
+static int  OpenDisplay     ( vout_thread_t * );
+static void CloseDisplay    ( vout_thread_t * );
+static int  NewPicture      ( vout_thread_t *, picture_t * );
+static void SetPalette      ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -168,12 +135,12 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "vout error: can't create p_sys (%s)", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
 #ifdef HAVE_SETENV
-    psz_method = config_GetPszVariable( "vout" );
+    psz_method = config_GetPsz( p_vout, "vout" );
     if( psz_method )
     {
         while( *psz_method && *psz_method != ':' )
@@ -201,7 +168,7 @@ static int vout_Create( vout_thread_t *p_vout )
 #endif
                 ) < 0 )
     {
-        intf_ErrMsg( "vout error: can't initialize SDL (%s)", SDL_GetError() );
+        msg_Err( p_vout, "cannot initialize SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -212,7 +179,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( OpenDisplay( p_vout ) )
     {
-        intf_ErrMsg( "vout error: can't set up SDL (%s)", SDL_GetError() );
+        msg_Err( p_vout, "cannot set up SDL (%s)", SDL_GetError() );
         SDL_QuitSubSystem( SDL_INIT_VIDEO );
         free( p_vout->p_sys );
         return( 1 );
@@ -370,7 +337,16 @@ static int vout_Manage( vout_thread_t *p_vout )
             switch( event.button.button )
             {
             case SDL_BUTTON_RIGHT:
-                p_main->p_intf->b_menu_change = 1;
+                {
+                    intf_thread_t *p_intf;
+                    p_intf = vlc_object_find( p_vout->p_vlc, VLC_OBJECT_INTF,
+                                                             FIND_CHILD );
+                    if( p_intf )
+                    {
+                        p_intf->b_menu_change = 1;
+                        vlc_object_release( p_intf );
+                    }
+                }
                 break;
             }
             break;
@@ -390,17 +366,17 @@ static int vout_Manage( vout_thread_t *p_vout )
                 break;
 
             case 4:
-                vout_Seek( 15 );
+                input_Seek( p_vout, 15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case 5:
-                vout_Seek( -15 );
+                input_Seek( p_vout, -15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
             }
             break;
 
         case SDL_QUIT:
-            p_main->p_intf->b_die = 1;
+            p_vout->p_vlc->b_die = 1;
             break;
 
         case SDL_KEYDOWN:                             /* if a key is pressed */
@@ -414,12 +390,12 @@ static int vout_Manage( vout_thread_t *p_vout )
                 }
                 else
                 {
-                    p_main->p_intf->b_die = 1;
+                    p_vout->p_vlc->b_die = 1;
                 }
                 break;
 
             case SDLK_q:                                             /* quit */
-                p_main->p_intf->b_die = 1;
+                p_vout->p_vlc->b_die = 1;
                 break;
 
             case SDLK_f:                             /* switch to fullscreen */
@@ -447,35 +423,44 @@ static int vout_Manage( vout_thread_t *p_vout )
                 break;
             
             case SDLK_MENU:
-                p_main->p_intf->b_menu_change = 1;
+                {
+                    intf_thread_t *p_intf;
+                    p_intf = vlc_object_find( p_vout->p_vlc, VLC_OBJECT_INTF,
+                                                             FIND_CHILD );
+                    if( p_intf )
+                    {
+                        p_intf->b_menu_change = 1;
+                        vlc_object_release( p_intf );
+                    }
+                }
                 break;
 
             case SDLK_LEFT:
-                vout_Seek( -5 );
+                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case SDLK_RIGHT:
-                vout_Seek( 5 );
+                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case SDLK_UP:
-                vout_Seek( 60 );
+                input_Seek( p_vout, 60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case SDLK_DOWN:
-                vout_Seek( -60 );
+                input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
-            case SDLK_F10: network_ChannelJoin( 0 ); break;
-            case SDLK_F1:  network_ChannelJoin( 1 ); break;
-            case SDLK_F2:  network_ChannelJoin( 2 ); break;
-            case SDLK_F3:  network_ChannelJoin( 3 ); break;
-            case SDLK_F4:  network_ChannelJoin( 4 ); break;
-            case SDLK_F5:  network_ChannelJoin( 5 ); break;
-            case SDLK_F6:  network_ChannelJoin( 6 ); break;
-            case SDLK_F7:  network_ChannelJoin( 7 ); break;
-            case SDLK_F8:  network_ChannelJoin( 8 ); break;
-            case SDLK_F9:  network_ChannelJoin( 9 ); break;
+            case SDLK_F10: network_ChannelJoin( p_vout->p_this, 0 ); break;
+            case SDLK_F1:  network_ChannelJoin( p_vout->p_this, 1 ); break;
+            case SDLK_F2:  network_ChannelJoin( p_vout->p_this, 2 ); break;
+            case SDLK_F3:  network_ChannelJoin( p_vout->p_this, 3 ); break;
+            case SDLK_F4:  network_ChannelJoin( p_vout->p_this, 4 ); break;
+            case SDLK_F5:  network_ChannelJoin( p_vout->p_this, 5 ); break;
+            case SDLK_F6:  network_ChannelJoin( p_vout->p_this, 6 ); break;
+            case SDLK_F7:  network_ChannelJoin( p_vout->p_this, 7 ); break;
+            case SDLK_F8:  network_ChannelJoin( p_vout->p_this, 8 ); break;
+            case SDLK_F9:  network_ChannelJoin( p_vout->p_this, 9 ); break;
 
             default:
                 break;
@@ -505,9 +490,8 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_WarnMsg( 3, "vout: video display resized (%dx%d)",
-                      p_vout->p_sys->i_width,
-                      p_vout->p_sys->i_height );
+        msg_Dbg( p_vout, "video display resized (%dx%d)",
+                 p_vout->p_sys->i_width, p_vout->p_sys->i_height );
  
         CloseDisplay( p_vout );
         OpenDisplay( p_vout );
@@ -597,7 +581,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                              SDL_DEFAULT_BPP, i_flags );
     if( i_bpp == 0 )
     {
-        intf_ErrMsg( "vout error: no video mode available" );
+        msg_Err( p_vout, "no video mode available" );
         return( 1 );
     }
 
@@ -607,7 +591,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_display == NULL )
     {
-        intf_ErrMsg( "vout error: cannot set video mode" );
+        msg_Err( p_vout, "cannot set video mode" );
         return( 1 );
     }
 
@@ -669,9 +653,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_overlay == NULL )
     {
-        intf_WarnMsg( 3, "vout warning: no SDL overlay for 0x%.8x (%4.4s)",
-                         p_vout->render.i_chroma,
-                         (char*)&p_vout->render.i_chroma );
+        msg_Warn( p_vout, "no SDL overlay for 0x%.8x (%4.4s)",
+                  p_vout->render.i_chroma, (char*)&p_vout->render.i_chroma );
 
         switch( p_vout->p_sys->p_display->format->BitsPerPixel )
         {
@@ -692,7 +675,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
                 p_vout->output.i_chroma = FOURCC_RV32;
                 break;
             default:
-                intf_ErrMsg( "vout error: unknown screen depth" );
+                msg_Err( p_vout, "unknown screen depth %i",
+                         p_vout->p_sys->p_display->format->BitsPerPixel );
                 SDL_UnlockSurface( p_vout->p_sys->p_display );
                 SDL_FreeSurface( p_vout->p_sys->p_display );
                 return( -1 );
@@ -898,7 +882,7 @@ static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
     /* Set palette */
     if( SDL_SetColors( p_vout->p_sys->p_display, colors, 0, 256 ) == 0 )
     {
-        intf_ErrMsg( "vout error: failed setting palette" );
+        msg_Err( p_vout, "failed setting palette" );
     }
 }
 

@@ -2,7 +2,7 @@
  * ac3_decoder.c: core ac3 decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_decoder.c,v 1.7 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: ac3_decoder.c,v 1.8 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -28,16 +28,11 @@
  *****************************************************************************/
 #include <string.h>                                              /* memcpy() */
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"
-#include "ac3_decoder.h"
 #include "ac3_adec.h"                                     /* ac3dec_thread_t */
 
 #include "ac3_internal.h"
@@ -56,11 +51,10 @@ int _M( ac3_init )(ac3dec_t * p_ac3dec)
 int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
 {
     int i;
-    ac3dec_thread_t * p_ac3thread = (ac3dec_thread_t *) p_ac3dec->bit_stream.p_callback_arg;
     
     if (parse_bsi (p_ac3dec))
     {
-        intf_WarnMsg (3,"ac3dec warn: error during parsing");
+        msg_Warn( p_ac3dec->p_fifo, "parse error" );
         parse_auxdata (p_ac3dec);
         return 1;
     }
@@ -86,26 +80,26 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
                 (p_ac3dec->bsi.nfchans + p_ac3dec->bsi.lfeon));
 
 
-        if( p_ac3thread->p_fifo->b_die || p_ac3thread->p_fifo->b_error )
+        if( p_ac3dec->p_fifo->b_die || p_ac3dec->p_fifo->b_error )
         {        
             return 1;
         }
  
         if( parse_audblk( p_ac3dec, i ) )
         {
-            intf_WarnMsg( 3, "ac3dec warning: error during audioblock" );
+            msg_Warn( p_ac3dec->p_fifo, "audioblock error" );
             parse_auxdata( p_ac3dec );
             return 1;
         }
 
-        if( p_ac3thread->p_fifo->b_die || p_ac3thread->p_fifo->b_error )
+        if( p_ac3dec->p_fifo->b_die || p_ac3dec->p_fifo->b_error )
         {        
             return 1;
         }
 
         if( exponent_unpack( p_ac3dec ) )
         {
-            intf_WarnMsg( 3, "ac3dec warning: error during unpack" );
+            msg_Warn( p_ac3dec->p_fifo, "unpack error" );
             parse_auxdata( p_ac3dec );
             return 1;
         }
@@ -113,7 +107,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
         bit_allocate (p_ac3dec);
         mantissa_unpack (p_ac3dec);
 
-        if( p_ac3thread->p_fifo->b_die || p_ac3thread->p_fifo->b_error )
+        if( p_ac3dec->p_fifo->b_die || p_ac3dec->p_fifo->b_error )
         {        
             return 1;
         }

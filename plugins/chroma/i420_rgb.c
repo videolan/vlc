@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.8 2002/04/19 13:56:10 sam Exp $
+ * $Id: i420_rgb.c,v 1.9 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,10 +29,8 @@
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #include "i420_rgb.h"
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
@@ -355,7 +353,7 @@ static void Set8bppPalette( vout_thread_t *p_vout, u8 *p_rgb8 )
                      * fscked up my code */
                     if( j == 256 )
                     {
-                        intf_ErrMsg( "vout error: no colors left in palette" );
+                        msg_Err( p_vout, "no colors left in palette" );
                         break;
                     }
 

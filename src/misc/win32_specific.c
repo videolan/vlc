@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.7 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: win32_specific.c,v 1.8 2002/06/01 12:32:02 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -28,29 +28,28 @@
 
 #include <winsock2.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
  *****************************************************************************/
-void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
+void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     WSADATA Data;
     int i_err;
     HINSTANCE hInstLib;
 
     /* Allocate structure */
-    p_main->p_sys = malloc( sizeof( main_sys_t ) );
-    if( p_main->p_sys == NULL )
+    p_this->p_vlc->p_sys = malloc( sizeof( main_sys_t ) );
+    if( p_this->p_vlc->p_sys == NULL )
     {
-        intf_ErrMsg( "init error: can't create p_main->p_sys (%s)",
-		     strerror(ENOMEM) );
+        fprintf( stderr, "error: out of memory\n" );
         exit(-1);
     }
 
     /* dynamically get the address of SignalObjectAndWait */
     hInstLib = LoadLibrary( "kernel32" );
-    p_main->p_sys->SignalObjectAndWait =
+    p_this->p_vlc->p_sys->SignalObjectAndWait =
         (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib, "SignalObjectAndWait" );
 
     /* WinSock Library Init. */
@@ -58,7 +57,7 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     if( i_err )
     {
-        fprintf( stderr, "error: can't initiate WinSocks, error %i", i_err );
+        fprintf( stderr, "error: can't initiate WinSocks, error %i\n", i_err );
     }
 
     _fmode = _O_BINARY;  /* sets the default file-translation mode */
@@ -67,15 +66,16 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( void )
+void system_Configure( vlc_object_t *p_this )
 {
-    p_main->p_sys->b_fast_pthread = config_GetIntVariable( "fast_pthread" );
+    p_this->p_vlc->p_sys->b_fast_pthread = config_GetInt( p_this,
+		                                          "fast_pthread" );
 }
 
 /*****************************************************************************
  * system_End: terminate winsock.
  *****************************************************************************/
-void system_End( void )
+void system_End( vlc_object_t * )
 {
     WSACleanup();
 }

@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.34 2002/02/19 00:50:20 sam Exp $
+ * $Id: video_text.c,v 1.35 2002/06/01 12:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,7 +31,7 @@
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                    /* read(), close() */
@@ -43,6 +43,8 @@
 #   include <io.h>
 #endif
 
+#include "video.h"
+#include "video_output.h"
 #include "video_text.h"
 
 /*****************************************************************************
@@ -55,7 +57,7 @@
  * Therefore the border masks can't be complete if the font has pixels on the
  * border.
  *****************************************************************************/
-typedef struct vout_font_s
+struct vout_font_s
 {
     int                 i_type;                                 /* font type */
     int                 i_width;                /* character width in pixels */
@@ -66,7 +68,7 @@ typedef struct vout_font_s
     u16                 i_first;                          /* first character */
     u16                 i_last;                            /* last character */
     byte_t *            p_data;                       /* font character data */
-} vout_font_t;
+};
 
 /* Font types */
 #define VOUT_FIXED_FONT       0                         /* simple fixed font */
@@ -209,7 +211,7 @@ static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border,
  * This function will try to open a .psf font and load it. It will return
  * NULL on error.
  *****************************************************************************/
-vout_font_t *vout_LoadFont( const char *psz_name )
+vout_font_t *vout_LoadFont( vout_thread_t *p_vout, const char *psz_name )
 {
     static char * path[] = { "share", DATA_PATH, NULL, NULL };
 
@@ -262,15 +264,14 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
     if( i_file == -1 )
     {
-        intf_ErrMsg( "vout error: can't open file '%s' (%s)",
-                     psz_name, strerror(errno) );
+        msg_Err( p_vout, "cannot open '%s' (%s)", psz_name, strerror(errno) );
         return( NULL );
     }
 
-    /* Read magick number */
+    /* Read magic number */
     if( read( i_file, pi_buffer, 2 ) != 2 )
     {
-        intf_ErrMsg("vout error: unexpected end of file '%s'", psz_name );
+        msg_Err( p_vout, "unexpected end of file in '%s'", psz_name );
         close( i_file );
         return( NULL );
     }
@@ -279,8 +280,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     p_font = malloc( sizeof( vout_font_t ) );
     if( p_font == NULL )
     {
-        intf_ErrMsg( "vout error: cannot allocate vout_font_t (%s)",
-                     strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         close( i_file );
         return( NULL );
     }
@@ -297,7 +297,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         /* Read font header - two bytes indicate the font properties */
         if( read( i_file, pi_buffer, 2 ) != 2)
         {
-            intf_ErrMsg( "vout error: unexpected end of file '%s'", psz_name );
+            msg_Err( p_vout, "unexpected end of file in '%s'", psz_name );
             free( p_font );
             close( i_file );
             return( NULL );
@@ -317,8 +317,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         p_font->p_data = malloc( 2 * 256 * pi_buffer[1] );
         if( p_font->p_data == NULL )
         {
-            intf_ErrMsg( "vout error: cannot allocate font space (%s)",
-                         strerror(ENOMEM) );
+            msg_Err( p_vout, "out of memory" );
             free( p_font );
             close( i_file );
             return( NULL );
@@ -327,16 +326,16 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         /* Copy raw data */
         if( read( i_file, p_font->p_data, 256 * pi_buffer[1] ) != 256 * pi_buffer[1] )
         {
-            intf_ErrMsg("vout error: unexpected end of file '%s'", psz_name );
+            msg_Err( p_vout, "unexpected end of file in '%s'", psz_name );
             free( p_font->p_data );
             free( p_font );
             close( i_file );
             return( NULL );
         }
 
-        /* Computes border masks - remember that masks have the same matrix as
-         * characters, so an empty character border is required to have a complete
-         * border mask. */
+        /* Compute border masks - remember that masks have the same matrix as
+         * characters, so an empty character border is required to have a
+         * complete border mask. */
         for( i_char = 0; i_char <= 255; i_char++ )
         {
             for( i_line = 0; i_line < pi_buffer[1]; i_line++ )
@@ -353,15 +352,15 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
         break;
     default:
-        intf_ErrMsg("vout error: file '%s' has an unknown format", psz_name );
+        msg_Err( p_vout, "file '%s' has an unknown format", psz_name );
         free( p_font );
         close( i_file );
         return( NULL );
         break;
     }
 
-    intf_ErrMsg( "loaded %s: type %d, %d-%dx%d", psz_name, p_font->i_type,
-                 p_font->i_width, p_font->i_interspacing, p_font->i_height );
+    msg_Err( p_vout, "loaded %s, type %d, %d-%dx%d", psz_name, p_font->i_type,
+             p_font->i_width, p_font->i_interspacing, p_font->i_height );
 
     return( p_font );
 }
@@ -409,11 +408,6 @@ void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int 
             *pi_width = *pi_height / 3;
         }
         break;
-#ifdef DEBUG
-    default:
-        intf_ErrMsg("error: unknown font type %d", p_font->i_type );
-        break;
-#endif
     }
 }
 
@@ -524,14 +518,8 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
                 /* Jump to next character */
                 p_pic += i_interspacing;
                 break;
-#ifdef DEBUG
-            default:
-                intf_ErrMsg("error: unknown font type %d", p_font->i_type );
-                break;
-#endif
             }
         }
-    
     }
 }
 

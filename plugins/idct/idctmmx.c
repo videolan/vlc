@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmx.c,v 1.26 2002/05/18 17:47:46 sam Exp $
+ * $Id: idctmmx.c,v 1.27 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "mmx.h"
 
@@ -54,7 +54,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( IDCT, 150 )
     ADD_REQUIREMENT( MMX )
     ADD_SHORTCUT( "mmx" )
-    ADD_SHORTCUT( "imdctmmx" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

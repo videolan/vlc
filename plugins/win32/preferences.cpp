@@ -1,5 +1,5 @@
 /*****************************************************************************
- * preferences.h: the "Preferences" dialog box
+ * preferences.cpp: the "Preferences" dialog box
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
  *
@@ -26,9 +26,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                                /* strcmp */
 
-#include <videolan/vlc.h>
-
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "preferences.h"
 #include "win32_common.h"
@@ -38,7 +37,7 @@
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
-extern struct intf_thread_s *p_intfGlobal;
+extern intf_thread_t *p_intfGlobal;
 
 
 /****************************************************************************
@@ -191,7 +190,7 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
     if( Name != "" )
     {
         /* look for module 'Name' */
-        for( p_module = p_module_bank->first ;
+        for( p_module = p_intfGlobal->p_vlc->module_bank.first ;
              p_module != NULL ;
              p_module = p_module->next )
         {
@@ -272,6 +271,10 @@ __fastcall TGroupBoxInteger::TGroupBoxInteger( TComponent* Owner,
     /* init spinedit */
     SpinEdit = CreateSpinEdit( this, 16, 164, 24, 21,
                                -1, 100000, p_config->i_value );
+
+    /* init updown */
+    UpDown = CreateUpDown( this, -1, 32767, p_config->i_value, false );
+    UpDown->Associate = Edit;
 
     /* vertical alignment */
     Height = LabelDesc->Height + 24;
@@ -374,7 +377,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TListItem          *ListItem;
 
     /* Look for the selected module */
-    for( p_module = p_module_bank->first ; p_module != NULL ;
+    for( p_module = p_intfGlobal->p_vlc->module_bank.first ; p_module != NULL ;
          p_module = p_module->next )
     {
         if( psz_module_name && !strcmp( psz_module_name, p_module->psz_name ) )
@@ -420,7 +423,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             ADD_PANEL;
 
             /* build a list of available plugins */
-            for( p_module_plugins = p_module_bank->first ;
+            for( p_module_plugins = p_intfGlobal->p_vlc->module_bank.first ;
                  p_module_plugins != NULL ;
                  p_module_plugins = p_module_plugins->next )
             {
@@ -526,7 +529,7 @@ void __fastcall TPreferencesDlg::ButtonApplyClick( TObject *Sender )
 void __fastcall TPreferencesDlg::ButtonSaveClick( TObject *Sender )
 {
     ButtonApplyClick( Sender );
-    config_SaveConfigFile( NULL );
+    config_SaveConfigFile( p_intfGlobal->p_this, NULL );
 }
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::ButtonCancelClick( TObject *Sender )
@@ -541,12 +544,13 @@ void __fastcall TPreferencesDlg::SaveValue( module_config_t *p_config )
         case MODULE_CONFIG_ITEM_STRING:
         case MODULE_CONFIG_ITEM_FILE:
         case MODULE_CONFIG_ITEM_MODULE:
-            config_PutPszVariable( p_config->psz_name,
-                        *p_config->psz_value ? p_config->psz_value : NULL );
+            config_PutPsz( p_intfGlobal, p_config->psz_name,
+                           *p_config->psz_value ? p_config->psz_value : NULL );
             break;
         case MODULE_CONFIG_ITEM_INTEGER:
         case MODULE_CONFIG_ITEM_BOOL:
-            config_PutIntVariable( p_config->psz_name, p_config->i_value );
+            config_PutInt( p_intfGlobal, p_config->psz_name,
+                           p_config->i_value );
             break;
     }
 }

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * memcpyaltivec.c : Altivec memcpy module
+ * memcpyaltivec.c : AltiVec memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpyaltivec.c,v 1.5 2002/04/19 13:56:11 sam Exp $
+ * $Id: memcpyaltivec.c,v 1.6 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -48,7 +48,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( MEMCPY, 100 )
     ADD_REQUIREMENT( ALTIVEC )
     ADD_SHORTCUT( "altivec" )
-    ADD_SHORTCUT( "memcpyaltivec" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

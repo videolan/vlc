@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.13 2002/04/25 21:52:42 sam Exp $
+ * $Id: vout_subpictures.c,v 1.14 2002/06/01 12:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -30,7 +30,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
@@ -48,13 +48,13 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     /* Check if status is valid */
     if( p_subpic->i_status != RESERVED_SUBPICTURE )
     {
-        intf_ErrMsg( "vout error: subpicture %p has invalid status #%d",
-                     p_subpic, p_subpic->i_status );
+        msg_Err( p_vout, "subpicture %p has invalid status #%d",
+                         p_subpic, p_subpic->i_status );
     }
 
     /* If the user requested an SPU margin, we force the position after
      * having checked that it was a valid value. */
-    i_margin = config_GetIntVariable( "spumargin" );
+    i_margin = config_GetInt( p_vout, "spumargin" );
 
     if( i_margin >= 0 )
     {
@@ -133,7 +133,7 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     /* If no free or destroyed subpicture could be found */
     if( p_free_subpic == NULL )
     {
-        intf_ErrMsg( "vout error: subpicture heap is full" );
+        msg_Err( p_vout, "subpicture heap is full" );
         vlc_mutex_unlock( &p_vout->subpicture_lock );
         return( NULL );
     }
@@ -155,11 +155,10 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
     else
     {
         /* Memory allocation failed : set subpicture as empty */
+        msg_Err( p_vout, "out of memory" );
         p_free_subpic->i_type   = EMPTY_SUBPICTURE;
         p_free_subpic->i_status = FREE_SUBPICTURE;
         p_free_subpic           = NULL;
-        intf_ErrMsg( "vout error: spu allocation returned %s",
-                     strerror( ENOMEM ) );
     }
 
     vlc_mutex_unlock( &p_vout->subpicture_lock );
@@ -181,8 +180,8 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
    if( ( p_subpic->i_status != RESERVED_SUBPICTURE )
           && ( p_subpic->i_status != READY_SUBPICTURE ) )
    {
-       intf_ErrMsg( "vout error: subpicture %p has invalid status %d",
-                   p_subpic, p_subpic->i_status );
+       msg_Err( p_vout, "subpicture %p has invalid status %d",
+                        p_subpic, p_subpic->i_status );
    }
 
     p_subpic->i_status = DESTROYED_SUBPICTURE;

@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.17 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: x11.c,v 1.18 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -29,7 +29,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "xcommon.h"
 
@@ -48,7 +48,7 @@
 
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the X11 hardware display you want to use.\nBy default vlc will " \
+    "Specify the X11 hardware display you want to use. By default vlc will " \
     "use the value of the DISPLAY environment variable.")
 
 MODULE_CONFIG_START
@@ -60,7 +60,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("X11 module") )
     ADD_CAPABILITY( VOUT, 50 )
-    ADD_SHORTCUT( "x11" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -69,36 +68,4 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
-
-#if 0
-/*****************************************************************************
- * vout_SetPalette: sets an 8 bpp palette
- *****************************************************************************
- * This function sets the palette given as an argument. It does not return
- * anything, but could later send information on which colors it was unable
- * to set.
- *****************************************************************************/
-static void vout_SetPalette( p_vout_thread_t p_vout,
-                             u16 *red, u16 *green, u16 *blue, u16 *transp )
-{
-    int i, j;
-    XColor p_colors[255];
-
-    /* allocate palette */
-    for( i = 0, j = 255; i < 255; i++, j-- )
-    {
-        /* kludge: colors are indexed reversely because color 255 seems
-         * to be reserved for black even if we try to set it to white */
-        p_colors[ i ].pixel = j;
-        p_colors[ i ].pad   = 0;
-        p_colors[ i ].flags = DoRed | DoGreen | DoBlue;
-        p_colors[ i ].red   = red[ j ];
-        p_colors[ i ].blue  = blue[ j ];
-        p_colors[ i ].green = green[ j ];
-    }
-
-    XStoreColors( p_vout->p_sys->p_display,
-                  p_vout->p_sys->colormap, p_colors, 256 );
-}
-#endif
 

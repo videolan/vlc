@@ -1,12 +1,8 @@
 /*****************************************************************************
- * intf_msg.h: messages interface
- * This library provides basic functions for threads to interact with user
- * interface, such as message output. See config.h for output configuration.
+ * intf.h: interface header for vlc
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_msg.h,v 1.19 2002/04/24 00:36:24 sam Exp $
- *
- * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ * Copyright (C) 2002 VideoLAN
+ * $Id: intf.h,v 1.1 2002/06/01 12:31:58 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,23 +19,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef _VLC_INTF_H
+#define _VLC_INTF_H 1
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /*****************************************************************************
- * Prototypes
+ * Required public headers
  *****************************************************************************/
-#ifndef __PLUGIN__
-void intf_Msg            ( char *psz_format, ... );
-void intf_ErrMsg         ( char *psz_format, ... );
-void intf_WarnMsg        ( int i_level, char *psz_format, ... );
-void intf_StatMsg        ( char *psz_format, ... );
+#include <vlc/vlc.h>
 
-void intf_WarnHexDump    ( int i_level, void *p_data, int i_size );
-#else
-#   define intf_MsgSub p_symbols->intf_MsgSub
-#   define intf_MsgUnsub p_symbols->intf_MsgUnsub
+/*****************************************************************************
+ * Required internal headers
+ *****************************************************************************/
+#include "interface.h"
+#include "intf_eject.h"
+#include "playlist.h"
+#include "stream_control.h"
+#include "input_ext-intf.h"
 
-#   define intf_Msg p_symbols->intf_Msg
-#   define intf_ErrMsg p_symbols->intf_ErrMsg
-#   define intf_StatMsg p_symbols->intf_StatMsg
-#   define intf_WarnMsg p_symbols->intf_WarnMsg
-#endif
+# ifdef __cplusplus
+}
+# endif
 
+#endif /* <vlc/intf.h> */

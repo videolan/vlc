@@ -2,7 +2,7 @@
  * i420_rgb16.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb16.c,v 1.7 2002/06/01 10:47:07 sam Exp $
+ * $Id: i420_rgb16.c,v 1.8 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,10 +28,8 @@
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #include "i420_rgb.h"
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
@@ -40,7 +38,7 @@
 #   include "i420_rgb_mmx.h"
 #endif
 
-static void SetOffset( int, int, int, int, boolean_t *, int *, int * );
+static void SetOffset( int, int, int, int, vlc_bool_t *, int *, int * );
 
 /*****************************************************************************
  * I420_RGB15: color YUV 4:2:0 to RGB 15 bpp
@@ -61,7 +59,7 @@ void _M( I420_RGB15 )( vout_thread_t *p_vout, picture_t *p_src,
     u8  *p_u   = p_src->U_PIXELS;
     u8  *p_v   = p_src->V_PIXELS;
 
-    boolean_t   b_hscale;                         /* horizontal scaling type */
+    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
     int         i_vscale;                           /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_right_margin;
@@ -196,7 +194,7 @@ void _M( I420_RGB16 )( vout_thread_t *p_vout, picture_t *p_src,
     u8  *p_u   = p_src->U_PIXELS;
     u8  *p_v   = p_src->V_PIXELS;
 
-    boolean_t   b_hscale;                         /* horizontal scaling type */
+    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
     int         i_vscale;                           /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_right_margin;
@@ -331,7 +329,7 @@ void _M( I420_RGB32 )( vout_thread_t *p_vout, picture_t *p_src,
     u8  *p_u   = p_src->U_PIXELS;
     u8  *p_v   = p_src->V_PIXELS;
 
-    boolean_t   b_hscale;                         /* horizontal scaling type */
+    vlc_bool_t  b_hscale;                         /* horizontal scaling type */
     int         i_vscale;                           /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_right_margin;
@@ -456,7 +454,7 @@ void _M( I420_RGB32 )( vout_thread_t *p_vout, picture_t *p_src,
  * It will also set horizontal and vertical scaling indicators.
  *****************************************************************************/
 static void SetOffset( int i_width, int i_height, int i_pic_width,
-                       int i_pic_height, boolean_t *pb_hscale,
+                       int i_pic_height, vlc_bool_t *pb_hscale,
                        int *pi_vscale, int *p_offset )
 {
     int i_x;                                    /* x position in destination */

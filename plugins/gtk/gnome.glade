@@ -764,7 +764,7 @@
 	      <last_modification_time>Sat, 19 May 2001 03:13:28 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -783,7 +783,7 @@
 	      <last_modification_time>Sat, 19 May 2001 03:13:23 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_NEXT</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -859,7 +859,7 @@
 	      <last_modification_time>Tue, 29 May 2001 13:13:41 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_DOWN</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -879,7 +879,7 @@
 	      <last_modification_time>Sat, 19 May 2001 03:13:08 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_UP</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>

@@ -2,7 +2,7 @@
  * null.c : NULL module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: null.c,v 1.6 2002/04/19 13:56:10 sam Exp $
+ * $Id: null.c,v 1.7 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Build configuration tree.
@@ -50,7 +50,6 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("the Null module that does nothing") )
-    ADD_SHORTCUT( "null" )
 MODULE_INIT_STOP
 
 

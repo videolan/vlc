@@ -2,7 +2,7 @@
  * motion.c : C motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: motion.c,v 1.16 2002/04/19 13:56:11 sam Exp $
+ * $Id: motion.c,v 1.17 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -28,7 +28,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Local and extern prototypes.
@@ -45,7 +45,6 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("motion compensation module") )
     ADD_CAPABILITY( MOTION, 50 )
     ADD_SHORTCUT( "c" )
-    ADD_SHORTCUT( "motion" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

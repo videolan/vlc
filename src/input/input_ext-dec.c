@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.31 2002/05/18 17:47:47 sam Exp $
+ * $Id: input_ext-dec.c,v 1.32 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-dec.h"
@@ -38,9 +38,8 @@
  * InitBitstream: initialize a bit_stream_t structure
  *****************************************************************************/
 void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
-                    void (* pf_bitstream_callback)( struct bit_stream_s *,
-                                                    boolean_t ),
-                    void * p_callback_arg )
+                void (* pf_bitstream_callback)( bit_stream_t *, vlc_bool_t ),
+                void * p_callback_arg )
 {
     p_bit_stream->p_decoder_fifo = p_fifo;
     p_bit_stream->pf_bitstream_callback = pf_bitstream_callback;
@@ -112,10 +111,10 @@ void DecoderError( decoder_fifo_t * p_fifo )
  * NextDataPacket: go to the data packet after *pp_data, return 1 if we
  * changed PES
  *****************************************************************************/
-static inline boolean_t _NextDataPacket( decoder_fifo_t * p_fifo,
-                                         data_packet_t ** pp_data )
+static inline vlc_bool_t _NextDataPacket( decoder_fifo_t * p_fifo,
+                                          data_packet_t ** pp_data )
 {
-    boolean_t b_new_pes;
+    vlc_bool_t b_new_pes;
 
     /* We are looking for the next data packet that contains real data,
      * and not just a PES header */
@@ -170,7 +169,7 @@ static inline boolean_t _NextDataPacket( decoder_fifo_t * p_fifo,
     return( b_new_pes );
 }
 
-boolean_t NextDataPacket( decoder_fifo_t * p_fifo, data_packet_t ** pp_data )
+vlc_bool_t NextDataPacket( decoder_fifo_t * p_fifo, data_packet_t ** pp_data )
 {
     return( _NextDataPacket( p_fifo, pp_data ) );
 }
@@ -182,7 +181,7 @@ boolean_t NextDataPacket( decoder_fifo_t * p_fifo, data_packet_t ** pp_data )
 static inline void _BitstreamNextDataPacket( bit_stream_t * p_bit_stream )
 {
     decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
-    boolean_t           b_new_pes;
+    vlc_bool_t          b_new_pes;
 
     b_new_pes = _NextDataPacket( p_fifo, &p_bit_stream->p_data );
 

@@ -26,12 +26,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+#include <vlc/decoder.h>
 
 /*****************************************************************************
  * Libmad include files                                                      *
@@ -44,7 +41,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  decoder_Probe  ( u8 * );
-static int  decoder_Run    ( decoder_config_t * );
+static int  decoder_Run    ( decoder_fifo_t * );
 static int  InitThread     ( mad_adec_thread_t * p_mad_adec );
 static void EndThread      ( mad_adec_thread_t * p_mad_adec );
 
@@ -62,8 +59,8 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 #define DOWNSCALE_TEXT N_("Mad audio downscale routine (fast,mp321)")
 #define DOWNSCALE_LONGTEXT N_( \
-    "Specify the mad audio downscale routine you want to use.\nBy default mad plugins will " \
-    "use the fastest routine.")
+    "Specify the mad audio downscale routine you want to use. By default " \
+    "the mad plugin will use the fastest routine.")
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
@@ -73,7 +70,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("libmad MPEG 1/2/3 audio decoder library") )
     ADD_CAPABILITY( DECODER, 100 )
-    ADD_SHORTCUT( "mad" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -102,32 +98,28 @@ static int decoder_Probe( u8 *pi_type )
 /*****************************************************************************
  * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_fifo_t * p_fifo )
 {
     mad_adec_thread_t *   p_mad_adec;
-
-    intf_WarnMsg( 4, "mad_adec debug: mad_adec thread launched, initializing" );
 
     /* Allocate the memory needed to store the thread's structure */
     p_mad_adec = (mad_adec_thread_t *) malloc(sizeof(mad_adec_thread_t));
 
     if (p_mad_adec == NULL)
     {
-        intf_ErrMsg ( "mad_adec error: not enough memory "
-                      "for decoder_Run() to allocate p_mad_adec" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return( -1 );
     }
 
     /*
      * Initialize the thread properties
      */
-    p_mad_adec->p_config = p_config;
-    p_mad_adec->p_fifo = p_mad_adec->p_config->p_decoder_fifo;
+    p_mad_adec->p_fifo = p_fifo;
     if( InitThread( p_mad_adec ) )
     {
-        intf_ErrMsg( "mad_adec error: could not initialize thread" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "could not initialize thread" );
+        DecoderError( p_fifo );
         free( p_mad_adec );
         return( -1 );
     }
@@ -135,10 +127,10 @@ static int decoder_Run ( decoder_config_t * p_config )
     /* mad decoder thread's main loop */
     while ((!p_mad_adec->p_fifo->b_die) && (!p_mad_adec->p_fifo->b_error))
     {
-        intf_ErrMsg( "mad_adec: starting libmad decoder" );
+        msg_Dbg( p_mad_adec->p_fifo, "starting libmad decoder" );
         if (mad_decoder_run(p_mad_adec->libmad_decoder, MAD_DECODER_MODE_SYNC)==-1)
         {
-            intf_ErrMsg( "mad_adec error: libmad decoder returns abnormally");
+            msg_Err( p_mad_adec->p_fifo, "libmad decoder returned abnormally" );
             DecoderError( p_mad_adec->p_fifo );
             EndThread(p_mad_adec);
             return( -1 );
@@ -170,22 +162,22 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
      */
 		
 		/* Look what scaling method was requested by the user */
-    psz_downscale = config_GetPszVariable( "downscale" );
+    psz_downscale = config_GetPsz( p_fifo, "downscale" );
 
     if ( strncmp(psz_downscale,"fast",4)==0 )
     {
         p_mad_adec->audio_scaling = FAST_SCALING;
-        intf_WarnMsg( 4, "mad_adec debug: downscale fast selected" );
+        msg_Dbg( p_fifo, "downscale fast selected" );
     }
     else if ( strncmp(psz_downscale,"mpg321",7)==0 )
     {
         p_mad_adec->audio_scaling = MPG321_SCALING;
-        intf_WarnMsg( 4, "mad_adec debug: downscale mpg321 selected" );
+        msg_Dbg( p_fifo, "downscale mpg321 selected" );
     }
     else
     {
         p_mad_adec->audio_scaling = FAST_SCALING;
-        intf_WarnMsg( 4, "mad_adec debug: downscale default fast selected" );
+        msg_Dbg( p_fifo, "downscale default fast selected" );
     }
 
 		if (psz_downscale) free(psz_downscale);
@@ -194,8 +186,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     p_mad_adec->libmad_decoder = (struct mad_decoder*) malloc(sizeof(struct mad_decoder));
     if (p_mad_adec->libmad_decoder == NULL)
     {
-        intf_ErrMsg ( "mad_adec error: not enough memory "
-                      "for decoder_InitThread() to allocate p_mad_adec->libmad_decder" );
+        msg_Err( p_mad_adec->p_fifo, "out of memory" );
         return -1;
     }
     p_mad_adec->i_current_pts = p_mad_adec->i_next_pts = 0;
@@ -234,8 +225,6 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     vlc_mutex_unlock( &p_fifo->data_lock );
     p_mad_adec->p_data = p_fifo->p_first->p_first;
 
-    intf_WarnMsg( 4, "mad_adec debug: mad decoder thread %p initialized", p_mad_adec);
-
     return( 0 );
 }
 
@@ -244,8 +233,6 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
  *****************************************************************************/
 static void EndThread (mad_adec_thread_t * p_mad_adec)
 {
-    intf_WarnMsg( 4, "mad_adec debug: destroying mad decoder thread %p", p_mad_adec);
-
     /* If the audio output fifo was created, we destroy it */
     if (p_mad_adec->p_aout_fifo != NULL)
     {
@@ -260,10 +247,8 @@ static void EndThread (mad_adec_thread_t * p_mad_adec)
     /* mad_decoder_finish releases the memory allocated inside the struct */
     mad_decoder_finish( p_mad_adec->libmad_decoder );
 
-    /* Unlock the modules, p_mad_adec->p_config is released by the decoder subsystem  */
+    /* Unlock the modules, p_mad_adec->p_fifo is released by the decoder subsystem  */
     free( p_mad_adec->libmad_decoder );
     free( p_mad_adec );
-
-    intf_WarnMsg( 4, "mad_adec debug: mad decoder thread %p destroyed", p_mad_adec);
 }
 

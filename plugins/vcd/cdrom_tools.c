@@ -2,7 +2,7 @@
  * cdrom_tools.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom_tools.c,v 1.4 2002/04/27 02:20:32 jobi Exp $
+ * $Id: cdrom_tools.c,v 1.5 2002/06/01 12:32:00 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *         Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -83,7 +83,7 @@ int ioctl_GetTrackCount( int i_fd, const char *psz_dev )
 
     if( ( pTOC = getTOC( psz_dev ) ) == NULL )
     {
-        intf_ErrMsg( "vcd error: failed to get the TOC" );
+//X        intf_ErrMsg( "vcd error: failed to get the TOC" );
         return( -1 );
     }
 
@@ -97,7 +97,7 @@ int ioctl_GetTrackCount( int i_fd, const char *psz_dev )
     
     if( ioctl( i_fd, CDIOREADTOCHEADER, &tochdr ) == -1 )
     {
-        intf_ErrMsg( "vcd error: could not read TOCHDR" );
+//X        intf_ErrMsg( "vcd error: could not read TOCHDR" );
         return -1;
     }
 
@@ -109,7 +109,7 @@ int ioctl_GetTrackCount( int i_fd, const char *psz_dev )
     /* First we read the TOC header */
     if( ioctl( i_fd, CDROMREADTOCHDR, &tochdr ) == -1 )
     {
-        intf_ErrMsg( "vcd error: could not read TOCHDR" );
+//X        intf_ErrMsg( "vcd error: could not read TOCHDR" );
         return -1;
     }
 
@@ -136,7 +136,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
 
     if( ( pTOC = getTOC( psz_dev ) ) == NULL )
     {
-        intf_ErrMsg( "vcd error: failed to get the TOC" );
+//X        intf_ErrMsg( "vcd error: failed to get the TOC" );
         return( NULL );
     }
 
@@ -146,7 +146,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
     p_sectors = malloc( (i_tracks + 1) * sizeof(int) );
     if( p_sectors == NULL )
     {
-        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
+//X        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
         freeTOC( pTOC );
         return NULL;
     }
@@ -169,7 +169,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
 
     if( i_leadout == -1 )
     {
-        intf_ErrMsg( "vcd error: leadout not found" );
+//X        intf_ErrMsg( "vcd error: leadout not found" );
         free( p_sectors );
         freeTOC( pTOC );
         return( NULL );
@@ -188,7 +188,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
     p_sectors = malloc( (i_tracks + 1) * sizeof(int) );
     if( p_sectors == NULL )
     {
-        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
+//X        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
         return NULL;
     }
 
@@ -198,7 +198,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
     toc_entries.data = (struct cd_toc_entry *) malloc( toc_entries.data_len );
     if( toc_entries.data == NULL )
     {
-        intf_ErrMsg( "vcd error: not enoug memory" );
+//X        intf_ErrMsg( "vcd error: not enoug memory" );
         free( p_sectors );
         return NULL;
     }
@@ -206,7 +206,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
     /* Read the TOC */
     if( ioctl( i_fd, CDIOREADTOCENTRYS, &toc_entries ) == -1 )
     {
-        intf_ErrMsg( "vcd error: could not read the TOC" );
+//X        intf_ErrMsg( "vcd error: could not read the TOC" );
         free( p_sectors );
         free( toc_entries.data );
         return NULL;
@@ -224,7 +224,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
     /* First we read the TOC header */
     if( ioctl( i_fd, CDROMREADTOCHDR, &tochdr ) == -1 )
     {
-        intf_ErrMsg( "vcd error: could not read TOCHDR" );
+//X        intf_ErrMsg( "vcd error: could not read TOCHDR" );
         return NULL;
     }
 
@@ -233,7 +233,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
     p_sectors = malloc( (i_tracks + 1) * sizeof(int) );
     if( p_sectors == NULL )
     {
-        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
+//X        intf_ErrMsg( "vcd error: could not allocate p_sectors" );
         return NULL;
     }
 
@@ -246,7 +246,7 @@ int * ioctl_GetSectors( int i_fd, const char *psz_dev )
 
         if( ioctl( i_fd, CDROMREADTOCENTRY, &tocent ) == -1 )
         {
-            intf_ErrMsg( "vcd error: could not read TOCENTRY" );
+//X            intf_ErrMsg( "vcd error: could not read TOCENTRY" );
             free( p_sectors );
             return NULL;
         }
@@ -281,7 +281,7 @@ int ioctl_ReadSector( int i_fd, int i_sector, byte_t * p_buffer )
 
     if( ioctl( i_fd, DKIOCCDREAD, &cd_read ) == -1 )
     {
-        intf_ErrMsg( "vcd error: could not read block %d", i_sector );
+//X        intf_ErrMsg( "vcd error: could not read block %d", i_sector );
         return( -1 );
     }
 
@@ -291,19 +291,19 @@ int ioctl_ReadSector( int i_fd, int i_sector, byte_t * p_buffer )
 
     if( ioctl( i_fd, CDRIOCSETBLOCKSIZE, &i_size ) == -1 )
     {
-        intf_ErrMsg( "vcd error: Could not set block size" );
+//X        intf_ErrMsg( "vcd error: Could not set block size" );
         return( -1 );
     }
 
     if( lseek( i_fd, i_sector * VCD_SECTOR_SIZE, SEEK_SET ) == -1 )
     {
-        intf_ErrMsg( "vcd error: Could not lseek to sector %d", i_sector );
+//X        intf_ErrMsg( "vcd error: Could not lseek to sector %d", i_sector );
         return( -1 );
     }
 
     if( read( i_fd, p_block, VCD_SECTOR_SIZE ) == -1 )
     {
-        intf_ErrMsg( "vcd error: Could not read sector %d", i_sector );
+//X        intf_ErrMsg( "vcd error: Could not read sector %d", i_sector );
         return( -1 );
     }
 
@@ -318,14 +318,14 @@ int ioctl_ReadSector( int i_fd, int i_sector, byte_t * p_buffer )
 
     if( ioctl(i_fd, CDROMREADRAW, p_block) == -1 )
     {
-        intf_ErrMsg( "vcd error: could not read block %i from disc",
-                     i_sector );
+//X        intf_ErrMsg( "vcd error: could not read block %i from disc",
+//X                     i_sector );
         return( -1 );
     }
 #endif
 
     /* We don't want to keep the header of the read sector */
-    FAST_MEMCPY( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
+    memcpy( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
 
     return( 0 );
 }
@@ -347,7 +347,7 @@ CDTOC *getTOC( const char *psz_dev )
 
     if( psz_dev == NULL )
     {
-        intf_ErrMsg( "vcd error: invalid device path" );
+//X        intf_ErrMsg( "vcd error: invalid device path" );
         return( NULL );
     }
 
@@ -364,7 +364,7 @@ CDTOC *getTOC( const char *psz_dev )
     /* get port for IOKit communication */
     if( ( ret = IOMasterPort( MACH_PORT_NULL, &port ) ) != KERN_SUCCESS )
     {
-        intf_ErrMsg( "vcd error: IOMasterPort: 0x%08x", ret );
+//X        intf_ErrMsg( "vcd error: IOMasterPort: 0x%08x", ret );
         return( NULL );
     }
 
@@ -373,7 +373,7 @@ CDTOC *getTOC( const char *psz_dev )
                     port, IOBSDNameMatching( port, 0, psz_devname ),
                     &iterator ) ) != KERN_SUCCESS )
     {
-        intf_ErrMsg( "vcd error: IOServiceGetMatchingServices: 0x%08x", ret );
+//X        intf_ErrMsg( "vcd error: IOServiceGetMatchingServices: 0x%08x", ret );
         return( NULL );
     }
 
@@ -387,8 +387,8 @@ CDTOC *getTOC( const char *psz_dev )
         if( ( ret = IORegistryEntryGetParentIterator( service, 
                         kIOServicePlane, &iterator ) ) != KERN_SUCCESS )
         {
-            intf_ErrMsg( "vcd error: " \
-                         "IORegistryEntryGetParentIterator: 0x%08x", ret );
+//X            intf_ErrMsg( "vcd error: "
+//X                         "IORegistryEntryGetParentIterator: 0x%08x", ret );
             IOObjectRelease( service );
             return( NULL );
         }
@@ -400,7 +400,7 @@ CDTOC *getTOC( const char *psz_dev )
 
     if( service == NULL )
     {
-        intf_ErrMsg( "vcd error: search for kIOCDMediaClass came up empty" );
+//X        intf_ErrMsg( "vcd error: search for kIOCDMediaClass came up empty" );
         return( NULL );
     }
 
@@ -408,8 +408,8 @@ CDTOC *getTOC( const char *psz_dev )
     if( ( ret = IORegistryEntryCreateCFProperties( service, &properties,
                     kCFAllocatorDefault, kNilOptions ) ) != KERN_SUCCESS )
     {
-        intf_ErrMsg( "vcd error: " \
-                     " IORegistryEntryCreateCFProperties: 0x%08x", ret );
+//X        intf_ErrMsg( "vcd error: "
+//X                     " IORegistryEntryCreateCFProperties: 0x%08x", ret );
         IOObjectRelease( service );
         return( NULL );
     }
@@ -431,7 +431,7 @@ CDTOC *getTOC( const char *psz_dev )
     }
     else
     {
-        intf_ErrMsg( "vcd error: CFDictionaryGetValue failed" );
+//X        intf_ErrMsg( "vcd error: CFDictionaryGetValue failed" );
     }
 
     CFRelease( properties );

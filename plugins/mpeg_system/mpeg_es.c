@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_es.c,v 1.8 2002/04/19 13:56:11 sam Exp $
+ * $Id: mpeg_es.c,v 1.9 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,14 +28,10 @@
 #include <string.h>                                              /* strdup() */
 #include <errno.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #include <sys/types.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
 
 /*****************************************************************************
  * Constants
@@ -47,9 +43,9 @@
  * Local prototypes
  *****************************************************************************/
 static void input_getfunctions( function_list_t * p_function_list );
-static int  ESDemux         ( struct input_thread_s * );
-static int  ESInit          ( struct input_thread_s * );
-static void ESEnd           ( struct input_thread_s * );
+static int  ESDemux ( input_thread_t * );
+static int  ESInit  ( input_thread_t * );
+static void ESEnd   ( input_thread_t * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -107,7 +103,7 @@ static int ESInit( input_thread_t * p_input )
     if( input_Peek( p_input, &p_peek, 4 ) < 4 )
     {
         /* Stream shorter than 4 bytes... */
-        intf_ErrMsg( "input error: cannot peek() (mpeg_es)" );
+        msg_Err( p_input, "cannot peek()" );
         return( -1 );
     }
 
@@ -116,11 +112,11 @@ static int ESInit( input_thread_t * p_input )
         if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "es", 3 ) )
         {
             /* User forced */
-            intf_ErrMsg( "input error: this doesn't look like an MPEG ES stream, continuing" );
+            msg_Err( p_input, "this doesn't look like an MPEG ES stream, continuing" );
         }
         else
         {
-            intf_WarnMsg( 2, "input: ES plug-in discarded (no startcode)" );
+            msg_Warn( p_input, "ES module discarded (no startcode)" );
             return( -1 );
         }
     }
@@ -129,11 +125,11 @@ static int ESInit( input_thread_t * p_input )
         if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "es", 3 ) )
         {
             /* User forced */
-            intf_ErrMsg( "input error: this seems to be a system stream (PS plug-in ?), but continuing" );
+            msg_Err( p_input, "this seems to be a system stream (PS plug-in ?), but continuing" );
         }
         else
         {
-            intf_WarnMsg( 2, "input: ES plug-in discarded (system startcode)" );
+            msg_Warn( p_input, "ES module discarded (system startcode)" );
             return( -1 );
         }
     }
@@ -188,7 +184,7 @@ static int ESDemux( input_thread_t * p_input )
 
     if( p_pes == NULL )
     {
-        intf_ErrMsg("Out of memory");
+        msg_Err( p_input, "out of memory" );
         input_DeletePacket( p_input->p_method_data, p_data );
         return( -1 );
     }
@@ -210,7 +206,7 @@ static int ESDemux( input_thread_t * p_input )
                       p_input->stream.p_selected_program,
                          (mtime_t)0 ) == PAUSE_S) )
     {
-        intf_WarnMsg( 2, "synchro reinit" );
+        msg_Warn( p_input, "synchro reinit" );
         p_pes->i_pts = mdate() + DEFAULT_PTS_DELAY;
         p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
     }

@@ -1,12 +1,8 @@
 /*****************************************************************************
- * vlc.h: global header for vlc
+ * input.h: input modules header for vlc
  *****************************************************************************
- * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.10 2002/04/28 01:26:15 sam Exp $
- *
- * Authors: Samuel Hocevar <sam@via.ecp.fr>
- *          Vincent Seguin <seguin@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ * Copyright (C) 2002 VideoLAN
+ * $Id: input.h,v 1.1 2002/06/01 12:31:58 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,28 +19,28 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef _VLC_INPUT_H
+#define _VLC_INPUT_H 1
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /*****************************************************************************
- * Required vlc headers
+ * Required public headers
  *****************************************************************************/
-#if defined( __VLC__ )
-#   include "defs.h"
-#   include "config.h"
+#include <vlc/vlc.h>
 
-#   if defined( __PLUGIN__ ) || defined( __BUILTIN__ )
-#       include "modules_inner.h"
-#   endif
+/*****************************************************************************
+ * Required internal headers
+ *****************************************************************************/
+#include "stream_control.h"
+#include "input_ext-intf.h" /* input_thread_s */
+#include "input_ext-dec.h" /* data_packet_s */
+#include "input_ext-plugins.h"
 
-#   include "common.h"
+# ifdef __cplusplus
+}
+# endif
 
-#   include "os_specific.h"
-
-#   include "intf_msg.h"
-#   include "threads.h"
-#   include "mtime.h"
-#   include "modules.h"
-
-#   include "main.h"
-#   include "configuration.h"
-#   include "threads_funcs.h"
-#endif
-
+#endif /* <vlc/input.h> */

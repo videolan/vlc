@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.8 2002/05/21 06:55:48 gbazin Exp $
+ * $Id: ipv6.c,v 1.9 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -66,7 +66,7 @@ static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
  * Local prototypes
  *****************************************************************************/
 static void getfunctions( function_list_t * );
-static int  NetworkOpen( struct network_socket_s * );
+static int  NetworkOpen( network_socket_t * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -77,7 +77,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("IPv6 network abstraction layer") )
     ADD_CAPABILITY( NETWORK, 40 )
-    ADD_SHORTCUT( "ipv6" )
 MODULE_INIT_STOP
  
 MODULE_ACTIVATE_START
@@ -174,7 +173,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         /* We have a fqdn, try to find its address */
         if ( (p_hostent = gethostbyname2( psz_address, AF_INET6 )) == NULL )
         {
-            intf_ErrMsg( "ipv6 error: unknown host %s", psz_address );
+//X            intf_ErrMsg( "ipv6 error: unknown host %s", psz_address );
             return( -1 );
         }
 
@@ -194,7 +193,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         _freeaddrinfo( res );
 
 #else
-        intf_ErrMsg( "ipv6 error: IPv6 address %s is invalid", psz_address );
+//X        intf_ErrMsg( "ipv6 error: IPv6 address %s is invalid", psz_address );
         return( -1 );
 #endif
     }
@@ -231,14 +230,14 @@ static int OpenUDP( network_socket_t * p_socket )
 
     if( i_bind_port == 0 )
     {
-        i_bind_port = config_GetIntVariable( "server-port" );
+//X        i_bind_port = config_GetInt( "server-port" );
     }
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET6 domain, automatic (0)
      * protocol */
     if( (i_handle = socket( AF_INET6, SOCK_DGRAM, 0 )) == -1 )
     {
-        intf_ErrMsg( "ipv6 error: cannot create socket (%s)", strerror(errno) );
+//X        intf_ErrMsg( "ipv6 error: cannot create socket (%s)", strerror(errno) );
         return( -1 );
     }
 
@@ -247,7 +246,7 @@ static int OpenUDP( network_socket_t * p_socket )
     if( setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_ErrMsg( "ipv6 error: cannot configure socket (SO_REUSEADDR: %s)",
+//X        intf_ErrMsg( "ipv6 error: cannot configure socket (SO_REUSEADDR: %s)",
                      strerror(errno));
         close( i_handle );
         return( -1 );
@@ -259,7 +258,7 @@ static int OpenUDP( network_socket_t * p_socket )
     if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_WarnMsg( 1,
+//X        intf_WarnMsg( 1,
                       "ipv6 warning: cannot configure socket (SO_RCVBUF: %s)",
                       strerror(errno));
     }
@@ -272,12 +271,12 @@ static int OpenUDP( network_socket_t * p_socket )
     if( getsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void*) &i_opt, &i_opt_size ) == -1 )
     {
-        intf_WarnMsg( 1, "ipv6 warning: cannot query socket (SO_RCVBUF: %s)",
-                         strerror(errno));
+//X        intf_WarnMsg( 1, "ipv6 warning: cannot query socket (SO_RCVBUF: %s)",
+//X                         strerror(errno));
     }
     else if( i_opt < 0x80000 )
     {
-        intf_WarnMsg( 1, "ipv6 warning: socket buffer size is 0x%x"
+//X        intf_WarnMsg( 1, "ipv6 warning: socket buffer size is 0x%x"
                          " instead of 0x%x", i_opt, 0x80000 );
     }
     
@@ -291,7 +290,7 @@ static int OpenUDP( network_socket_t * p_socket )
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
-        intf_ErrMsg( "ipv6 error: cannot bind socket (%s)", strerror(errno) );
+//X        intf_ErrMsg( "ipv6 error: cannot bind socket (%s)", strerror(errno) );
         close( i_handle );
         return( -1 );
     }
@@ -303,9 +302,9 @@ static int OpenUDP( network_socket_t * p_socket )
         if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
                         (void*) &i_opt, sizeof( i_opt ) ) == -1 )
         {
-            intf_WarnMsg( 1,
-                    "ipv6 warning: cannot configure socket (SO_BROADCAST: %s)",
-                    strerror(errno));
+//X            intf_WarnMsg( 1,
+//X                    "ipv6 warning: cannot configure socket (SO_BROADCAST: %s)",
+//X                    strerror(errno));
         }
     }
  
@@ -317,7 +316,7 @@ static int OpenUDP( network_socket_t * p_socket )
         /* Build socket for remote connection */
         if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
         {
-            intf_ErrMsg( "ipv6 error: cannot build remote address" );
+//X            intf_ErrMsg( "ipv6 error: cannot build remote address" );
             close( i_handle );
             return( -1 );
         }
@@ -326,8 +325,8 @@ static int OpenUDP( network_socket_t * p_socket )
         if( connect( i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )
         {
-            intf_ErrMsg( "ipv6 error: cannot connect socket (%s)",
-                         strerror(errno) );
+//X            intf_ErrMsg( "ipv6 error: cannot connect socket (%s)",
+//X                         strerror(errno) );
             close( i_handle );
             return( -1 );
         }
@@ -363,7 +362,7 @@ static int OpenTCP( network_socket_t * p_socket )
      * protocol */
     if( (i_handle = socket( AF_INET6, SOCK_STREAM, 0 )) == -1 )
     {
-        intf_ErrMsg( "ipv6 error: cannot create socket (%s)", strerror(errno) );
+//X        intf_ErrMsg( "ipv6 error: cannot create socket (%s)", strerror(errno) );
         return( -1 );
     }
 
@@ -378,7 +377,7 @@ static int OpenTCP( network_socket_t * p_socket )
     if( connect( i_handle, (struct sockaddr *) &sock,
                  sizeof( sock ) ) == (-1) )
     {
-        intf_ErrMsg( "ipv6 error: cannot connect socket (%s)",
+//X        intf_ErrMsg( "ipv6 error: cannot connect socket (%s)",
                      strerror(errno) );
         close( i_handle );
         return( -1 );

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.88 2002/05/17 00:58:14 sam Exp $
+ * $Id: input_programs.c,v 1.89 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,7 +28,7 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -63,7 +63,7 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
     {
         if ( (p_input->stream.p_demux_data = malloc( i_data_len )) == NULL )
         {
-            intf_ErrMsg( "Unable to allocate memory in input_InitStream");
+            msg_Err( p_input, "out of memory" );
             return 1;
         }
         memset( p_input->stream.p_demux_data, 0, i_data_len );
@@ -147,7 +147,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
                                            * sizeof(pgrm_descriptor_t *) );
     if( p_input->stream.pp_programs == NULL )
     {
-        intf_ErrMsg( "Unable to realloc memory in input_AddProgram" );
+        msg_Err( p_input, "out of memory" );
         return( NULL );
     }
 
@@ -156,7 +156,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
                                         malloc( sizeof(pgrm_descriptor_t) );
     if( p_input->stream.pp_programs[i_pgrm_index] == NULL )
     {
-        intf_ErrMsg( "Unable to allocate memory in input_AddProgram" );
+        msg_Err( p_input, "out of memory" );
         return( NULL );
     }
     
@@ -179,7 +179,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
             malloc( i_data_len );
         if( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data == NULL )
         {
-            intf_ErrMsg( "Unable to allocate memory in input_AddProgram" );
+            msg_Err( p_input, "out of memory" );
             return( NULL );
         }
         memset( p_input->stream.pp_programs[i_pgrm_index]->p_demux_data, 0,
@@ -213,7 +213,7 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
     /* If the program wasn't found, do nothing */
     if( i_pgrm_index == p_input->stream.i_pgrm_number )
     {
-        intf_ErrMsg( "input error: program does not belong to this input" );
+        msg_Err( p_input, "program does not belong to this input" );
         return;
     }
 
@@ -241,8 +241,7 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
                                                * sizeof(pgrm_descriptor_t *) );
         if( p_input->stream.pp_programs == NULL )
         {
-            intf_ErrMsg( "input error: unable to realloc program list"
-                         " in input_DelProgram" );
+            msg_Err( p_input, "cannot realloc memory" );
         }
     }
     else
@@ -272,7 +271,7 @@ input_area_t * input_AddArea( input_thread_t * p_input )
                                         * sizeof(input_area_t *) );
     if( p_input->stream.pp_areas == NULL )
     {
-        intf_ErrMsg( "Unable to realloc memory in input_AddArea" );
+        msg_Err( p_input, "out of memory" );
         return( NULL );
     }
 
@@ -281,7 +280,7 @@ input_area_t * input_AddArea( input_thread_t * p_input )
                                         malloc( sizeof(input_area_t) );
     if( p_input->stream.pp_areas[i_area_index] == NULL )
     {
-        intf_ErrMsg( "Unable to allocate memory in input_AddArea" );
+        msg_Err( p_input, "out of memory" );
         return( NULL );
     }
     
@@ -324,10 +323,10 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
         }
     }
     /* Get the number of the required audio stream */
-    if( p_main->b_audio )
+    if( config_GetInt( p_input, "audio" ) )
     {
         /* Default is the first one */
-        i_required_audio_es = config_GetIntVariable( "audio-channel" );
+        i_required_audio_es = config_GetInt( p_input, "audio-channel" );
         if( i_required_audio_es < 0 )
         {
             i_required_audio_es = 1;
@@ -339,10 +338,10 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
     }
 
     /* Same thing for subtitles */
-    if( p_main->b_video )
+    if( config_GetInt( p_input, "video" ) )
     {
         /* for spu, default is none */
-        i_required_spu_es = config_GetIntVariable( "spu-channel" );
+        i_required_spu_es = config_GetInt( p_input, "spu-channel" );
         if( i_required_spu_es < 0 )
         {
             i_required_spu_es = 0;
@@ -358,16 +357,16 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
         switch( p_new_prg->pp_es[i_es_index]->i_cat )
         {
             case VIDEO_ES:
-                intf_WarnMsg( 4, "Selecting ES %x",
-                            p_new_prg->pp_es[i_es_index]->i_id );
+                msg_Dbg( p_input, "selecting ES %x",
+                         p_new_prg->pp_es[i_es_index]->i_id );
                 input_SelectES( p_input, p_new_prg->pp_es[i_es_index] );
                 break;
             case AUDIO_ES:
                 i_audio_es += 1;
                 if( i_audio_es <= i_required_audio_es )
                 {
-                    intf_WarnMsg( 4, "Selecting ES %x",
-                                p_new_prg->pp_es[i_es_index]->i_id );
+                    msg_Dbg( p_input, "selecting ES %x",
+                             p_new_prg->pp_es[i_es_index]->i_id );
                     input_SelectES( p_input, p_new_prg->pp_es[i_es_index]);
                 }
                 break;
@@ -376,14 +375,14 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                 i_spu_es += 1;
                 if( i_spu_es <= i_required_spu_es )
                 {
-                    intf_WarnMsg( 4, "Selecting ES %x",
-                                p_new_prg->pp_es[i_es_index]->i_id );
+                    msg_Dbg( p_input, "selecting ES %x",
+                             p_new_prg->pp_es[i_es_index]->i_id );
                     input_SelectES( p_input, p_new_prg->pp_es[i_es_index] );
                 }
             break;
             default :
-                intf_WarnMsg( 2, "ES %x has unknown type",
-                            p_new_prg->pp_es[i_es_index]->i_id );
+                msg_Dbg( p_input, "ES %x has unknown type",
+                         p_new_prg->pp_es[i_es_index]->i_id );
                 break;
         }
 
@@ -416,7 +415,7 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
     /* If the area wasn't found, do nothing */
     if( i_area_index == p_input->stream.i_area_nb )
     {
-        intf_ErrMsg( "input error: area does not belong to this input" );
+        msg_Err( p_input, "area does not belong to this input" );
         return;
     }
 
@@ -433,8 +432,7 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 
         if( p_input->stream.pp_areas == NULL )
         {
-            intf_ErrMsg( "input error: unable to realloc area list"
-                         " in input_DelArea" );
+            msg_Err( p_input, "cannot realloc memory" );
         }
     }
     else
@@ -482,7 +480,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es = (es_descriptor_t *)malloc( sizeof(es_descriptor_t) );
     if( p_es == NULL )
     {
-        intf_ErrMsg( "Unable to allocate memory in input_AddES" );
+        msg_Err( p_input, "out of memory" );
         return( NULL);
     }
     p_input->stream.i_es_number++;
@@ -491,7 +489,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
                                       * sizeof(es_descriptor_t *) );
     if( p_input->stream.pp_es == NULL )
     {
-        intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+        msg_Err( p_input, "out of memory" );
         return( NULL );
     }
 
@@ -511,7 +509,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         p_es->p_demux_data = malloc( i_data_len );
         if( p_es->p_demux_data == NULL )
         {
-            intf_ErrMsg( "Unable to allocate memory in input_AddES" );
+            msg_Err( p_input, "out of memory" );
             return( NULL );
         }
         memset( p_es->p_demux_data, 0, i_data_len );
@@ -530,7 +528,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
                                   * sizeof(es_descriptor_t *) );
         if( p_pgrm->pp_es == NULL )
         {
-            intf_ErrMsg( "Unable to realloc memory in input_AddES" );
+            msg_Err( p_input, "out of memory" );
             return( NULL );
         }
 
@@ -564,7 +562,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     /* If the ES wasn't found, do nothing */
     if( i_es_index == p_input->stream.i_es_number )
     {
-        intf_ErrMsg( "input error: ES does not belong to this input" );
+        msg_Err( p_input, "ES does not belong to this input" );
         return;
     }
 
@@ -593,8 +591,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
                                               * sizeof(es_descriptor_t *));
                     if( p_pgrm->pp_es == NULL )
                     {
-                        intf_ErrMsg( "Unable to realloc memory in "
-                                     "input_DelES" );
+                        msg_Err( p_input, "cannot realloc memory" );
                     }
                 }
                 else
@@ -613,6 +610,14 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
         free( p_es->p_demux_data );
     }
 
+    /* Find the ES in the ES table */
+    for( i_es_index = 0; i_es_index < p_input->stream.i_es_number;
+         i_es_index++ )
+    {
+        if( p_input->stream.pp_es[i_es_index] == p_es )
+            break;
+    }
+
     /* Remove this ES from the stream's list of ES */
     p_input->stream.i_es_number--;
     p_input->stream.pp_es[i_es_index] =
@@ -624,7 +629,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
                                           * sizeof(es_descriptor_t *));
         if( p_input->stream.pp_es == NULL )
         {
-            intf_ErrMsg( "Unable to realloc memory in input_DelES" );
+            msg_Err( p_input, "cannot realloc memory" );
         }
     }
     else
@@ -647,19 +652,19 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     if( p_es == NULL )
     {
-        intf_ErrMsg( "input error: nothing to do in input_SelectES" );
+        msg_Err( p_input, "nothing to do in input_SelectES" );
         return -1;
     }
 
-    intf_WarnMsg( 4, "input: selecting ES 0x%x", p_es->i_id );
+    msg_Dbg( p_input, "selecting ES 0x%x", p_es->i_id );
 
     if( p_es->p_decoder_fifo != NULL )
     {
-        intf_ErrMsg( "ES 0x%x is already selected", p_es->i_id );
+        msg_Err( p_input, "ES 0x%x is already selected", p_es->i_id );
         return( -1 );
     }
 
-    p_es->thread_id = 0;
+    p_es->p_decoder_fifo = NULL;
 
     switch( p_es->i_type )
     {
@@ -667,12 +672,12 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case MPEG1_AUDIO_ES:
     case MPEG2_AUDIO_ES:
     case LPCM_AUDIO_ES:
-        if( p_main->b_audio )
+        if( config_GetInt( p_input, "audio" ) )
         {
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( p_input, p_es );
+            p_es->p_decoder_fifo = input_RunDecoder( p_input, p_es );
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
@@ -684,23 +689,23 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case MSMPEG4v2_VIDEO_ES:
     case MSMPEG4v3_VIDEO_ES:
     case DVD_SPU_ES:
-        if( p_main->b_video )
+        if( config_GetInt( p_input, "video" ) )
         {
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( p_input, p_es );
+            p_es->p_decoder_fifo = input_RunDecoder( p_input, p_es );
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
 
     default:
-        intf_ErrMsg( "Unknown stream type 0x%x", p_es->i_type );
+        msg_Err( p_input, "unknown stream type 0x%x", p_es->i_type );
         return( -1 );
         break;
     }
 
-    if( p_es->thread_id == 0 )
+    if( p_es->p_decoder_fifo == NULL )
     {
         return( -1 );
     }
@@ -718,15 +723,15 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     if( p_es == NULL )
     {
-        intf_ErrMsg( "Nothing to do in input_UnselectES" );
+        msg_Err( p_input, "nothing to do in input_UnselectES" );
         return -1;
     }
 
-    intf_WarnMsg( 4, "input: unselecting ES 0x%x", p_es->i_id );
+    msg_Dbg( p_input, "unselecting ES 0x%x", p_es->i_id );
 
     if( p_es->p_decoder_fifo == NULL )
     {
-        intf_ErrMsg( "ES 0x%x is not selected", p_es->i_id );
+        msg_Err( p_input, "ES 0x%x is not selected", p_es->i_id );
         return( -1 );
     }
 
@@ -755,7 +760,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
                                            * sizeof(es_descriptor_t *) );
             if( p_input->stream.pp_selected_es == NULL )
             {
-                intf_ErrMsg( "Unable to realloc memory in input_UnselectES" );
+                msg_Err( p_input, "cannot realloc memory" );
                 return( -1 );
             }
         }
@@ -763,7 +768,8 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             free( p_input->stream.pp_selected_es );   
             p_input->stream.pp_selected_es = NULL;
-            intf_WarnMsg( 4, "input: no more selected ES in input_UnselectES" );            return( 1 );
+            msg_Dbg( p_input, "no more selected ES" );
+            return( 1 );
         }
     }
 

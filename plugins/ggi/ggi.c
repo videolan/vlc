@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.20 2002/04/19 13:56:11 sam Exp $
+ * $Id: ggi.c,v 1.21 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,13 +31,9 @@
 
 #include <ggi/ggi.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "intf_msg.h"
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -72,7 +68,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "General Graphics Interface video output" )
     ADD_CAPABILITY( VOUT, 30 )
-    ADD_SHORTCUT( "ggi" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -88,7 +83,7 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the GGI specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     /* GGI system informations */
     ggi_visual_t        p_display;                         /* display device */
@@ -100,8 +95,8 @@ typedef struct vout_sys_s
     ggi_directbuffer *  pp_buffer[2];                             /* buffers */
     int                 i_index;
 
-    boolean_t           b_must_acquire;   /* must be acquired before writing */
-} vout_sys_t;
+    vlc_bool_t          b_must_acquire;   /* must be acquired before writing */
+};
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -131,14 +126,14 @@ int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "vout error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     /* Open and initialize device */
     if( OpenDisplay( p_vout ) )
     {
-        intf_ErrMsg( "vout error: can't initialize GGI display" );
+        msg_Err( p_vout, "cannot initialize GGI display" );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -180,7 +175,8 @@ int vout_Init( vout_thread_t *p_vout )
         case 32:
             p_vout->output.i_chroma = FOURCC_RV32; break;
         default:
-            intf_ErrMsg( "vout error: unknown screen depth" );
+            msg_Err( p_vout, "unknown screen depth %i",
+                     p_vout->p_sys->i_bits_per_pixel );
             return 0;
     }
 
@@ -314,7 +310,7 @@ int vout_Manage( vout_thread_t *p_vout )
                     case 'Q':
                     case GIIUC_Escape:
                         /* FIXME pass message ! */
-                        p_main->p_intf->b_die = 1;
+                        p_vout->p_vlc->b_die = 1;
                         break;
 
                     default:
@@ -327,8 +323,16 @@ int vout_Manage( vout_thread_t *p_vout )
                 switch( event.pbutton.button )
                 {
                     case GII_PBUTTON_RIGHT:
-                        /* FIXME: need locking ! */
-                        p_main->p_intf->b_menu_change = 1;
+                        {
+                            intf_thread_t *p_intf;
+                            p_intf = vlc_object_find( p_vout->p_vlc,
+                                             VLC_OBJECT_INTF, FIND_CHILD );
+                            if( p_intf )
+                            {
+                                p_intf->b_menu_change = 1;
+                                vlc_object_release( p_intf );
+                            }
+                        }
                         break;
                 }
                 break;
@@ -401,27 +405,27 @@ static int OpenDisplay( vout_thread_t *p_vout )
     /* Initialize library */
     if( ggiInit() )
     {
-        intf_ErrMsg( "vout error: can't initialize GGI library" );
+        msg_Err( p_vout, "cannot initialize GGI library" );
         return( 1 );
     }
 
     /* Open display */
-    psz_display = config_GetPszVariable( "ggi_display" );
+    psz_display = config_GetPsz( p_vout, "ggi_display" );
 
     p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
     if( psz_display ) free( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )
     {
-        intf_ErrMsg( "vout error: can't open GGI default display" );
+        msg_Err( p_vout, "cannot open GGI default display" );
         ggiExit();
         return( 1 );
     }
 
     /* Find most appropriate mode */
     p_vout->p_sys->mode.frames =    2;                          /* 2 buffers */
-    p_vout->p_sys->mode.visible.x = config_GetIntVariable( "width" );
-    p_vout->p_sys->mode.visible.y = config_GetIntVariable( "height" );
+    p_vout->p_sys->mode.visible.x = config_GetInt( p_vout, "width" );
+    p_vout->p_sys->mode.visible.y = config_GetInt( p_vout, "height" );
     p_vout->p_sys->mode.virt.x =    GGI_AUTO;
     p_vout->p_sys->mode.virt.y =    GGI_AUTO;
     p_vout->p_sys->mode.size.x =    GGI_AUTO;
@@ -436,7 +440,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     /* Set mode */
     if( ggiSetMode( p_vout->p_sys->p_display, &p_vout->p_sys->mode ) )
     {
-        intf_ErrMsg( "vout error: can't set GGI mode" );
+        msg_Err( p_vout, "cannot set GGI mode" );
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
         return( 1 );
@@ -452,7 +456,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                                                 i_index );
         if( p_b[ i_index ] == NULL )
         {
-            intf_ErrMsg( "vout error: double buffering is not possible" );
+            msg_Err( p_vout, "double buffering is not possible" );
             ggiClose( p_vout->p_sys->p_display );
             ggiExit();
             return( 1 );
@@ -465,7 +469,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
            || ( p_b[ i_index ]->noaccess != 0 )
            || ( p_b[ i_index ]->align != 0 ) )
         {
-            intf_ErrMsg( "vout error: incorrect video memory type" );
+            msg_Err( p_vout, "incorrect video memory type" );
             ggiClose( p_vout->p_sys->p_display );
             ggiExit();
             return( 1 );
@@ -486,7 +490,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         ggiSetGCBackground(p_vout->p_sys->p_display,
                            ggiMapColor(p_vout->p_sys->p_display,&col_bg)) )
     {
-        intf_ErrMsg( "vout error: can't set colors" );
+        msg_Err( p_vout, "cannot set colors" );
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
         return( 1 );
@@ -497,7 +501,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                           p_vout->p_sys->mode.visible.x,
                           p_vout->p_sys->mode.visible.y ) )
     {
-        intf_ErrMsg( "vout error: can't set clipping" );
+        msg_Err( p_vout, "cannot set clipping" );
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
         return( 1 );
@@ -545,7 +549,7 @@ static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
     /* Set palette */
     if( ggiSetPalette( p_vout->p_sys->p_display, 0, 256, colors ) < 0 )
     {
-        intf_ErrMsg( "vout error: failed setting palette" );
+        msg_Err( p_vout, "failed setting palette" );
     }
 }
 

@@ -2,7 +2,7 @@
  * macosx.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.m,v 1.1 2002/05/12 20:56:34 massiot Exp $
+ * $Id: macosx.m,v 1.2 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -30,7 +30,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -50,7 +50,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( INTF, 100 )
     ADD_CAPABILITY( AOUT, 100 )
     ADD_CAPABILITY( VOUT, 100 )
-    ADD_SHORTCUT( "macosx" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.14 2002/04/19 13:56:11 sam Exp $
+ * $Id: glide.c,v 1.15 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,18 +28,15 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
+
 #ifndef __linux__
 #   include <conio.h>                                         /* for glide ? */
 #endif
 #include <glide.h>
 #include <linutil.h>                            /* Glide kbhit() and getch() */
-
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
 
 #define GLIDE_WIDTH 800
 #define GLIDE_HEIGHT 600
@@ -71,7 +68,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("3dfx Glide module") )
     ADD_CAPABILITY( VOUT, 20 )
-    ADD_SHORTCUT( "glide" )
     ADD_SHORTCUT( "3dfx" )
 MODULE_INIT_STOP
 
@@ -88,14 +84,13 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Glide specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     GrLfbInfo_t                 p_buffer_info;           /* back buffer info */
 
     u8* pp_buffer[2];
     int i_index;
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -123,14 +118,14 @@ int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     /* Open and initialize device */
     if( OpenDisplay( p_vout ) )
     {
-        intf_ErrMsg("vout error: can't open display");
+        msg_Err( p_vout, "cannot open display" );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -231,7 +226,7 @@ int vout_Manage( vout_thread_t *p_vout )
         switch( (char)buf )
         {
         case 'q':
-            p_main->p_intf->b_die = 1;
+            p_vout->p_vlc->b_die = 1;
             break;
 
         default:
@@ -264,7 +259,7 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
                    &p_vout->p_sys->p_buffer_info) == FXFALSE )
     {
-        intf_ErrMsg( "vout error: can't take 3dfx back buffer lock" );
+        msg_Err( p_vout, "cannot take 3dfx back buffer lock" );
     }
 }
 
@@ -286,7 +281,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( !grSstQueryHardware(&hwconfig) )
     {
-        intf_ErrMsg( "vout error: can't get 3dfx hardware config" );
+        msg_Err( p_vout, "cannot get 3dfx hardware config" );
         return( 1 );
     }
 
@@ -294,7 +289,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( !grSstWinOpen( 0, resolution, GR_REFRESH_60Hz,
                        GR_COLORFORMAT_ABGR, GR_ORIGIN_UPPER_LEFT, 2, 1 ) )
     {
-        intf_ErrMsg( "vout error: can't open 3dfx screen" );
+        msg_Err( p_vout, "cannot open 3dfx screen" );
         return( 1 );
     }
 
@@ -316,7 +311,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
                    &p_front_buffer_info) == FXFALSE )
     {
-        intf_ErrMsg( "vout error: can't take 3dfx front buffer lock" );
+        msg_Err( p_vout, "cannot take 3dfx front buffer lock" );
         grGlideShutdown();
         return( 1 );
     }
@@ -326,7 +321,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
                    &p_vout->p_sys->p_buffer_info) == FXFALSE )
     {
-        intf_ErrMsg( "vout error: can't take 3dfx back buffer lock" );
+        msg_Err( p_vout, "cannot take 3dfx back buffer lock" );
         grGlideShutdown();
         return( 1 );
     }

@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.15 2002/05/31 21:56:01 massiot Exp $
+ * $Id: a52.c,v 1.16 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -30,12 +30,9 @@
 #include <string.h>                                              /* strdup() */
 #include <inttypes.h>                                          /* int16_t .. */
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+#include <vlc/decoder.h>
 
 #ifdef USE_A52DEC_TREE                                 /* liba52 header file */
 #include "include/a52.h"
@@ -51,12 +48,12 @@
  * Local prototypes
  *****************************************************************************/
 static int  decoder_Probe  ( u8 * );
-static int  decoder_Run    ( decoder_config_t * );
+static int  decoder_Run    ( decoder_fifo_t * );
 static int  DecodeFrame    ( a52_adec_thread_t * );
 static int  InitThread     ( a52_adec_thread_t * );
 static void EndThread      ( a52_adec_thread_t * );
 
-static void               BitstreamCallback ( bit_stream_t *, boolean_t );
+static void               BitstreamCallback ( bit_stream_t *, vlc_bool_t );
 static void               float2s16_2       ( float *, int16_t * );
 static inline int16_t     convert   ( int32_t );
 
@@ -76,8 +73,8 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
 #define DYNRNG_LONGTEXT N_( \
     "Dynamic range compression makes the loud sounds softer, and the soft " \
     "sounds louder, so you can more easily listen to the stream in a noisy " \
-    "environment without disturbing anyone.\nIf you disable the dynamic range"\
-    " compression the playback will be more adapted to a movie theater or a " \
+    "environment without disturbing anyone. If you disable the dynamic range "\
+    "compression the playback will be more adapted to a movie theater or a " \
     "listening room.")
 
 MODULE_CONFIG_START
@@ -88,7 +85,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("a52 ATSC A/52 aka AC-3 audio decoder module") )
     ADD_CAPABILITY( DECODER, 40 )
-    ADD_SHORTCUT( "a52" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -112,18 +108,16 @@ static int decoder_Probe( u8 *pi_type )
 /*****************************************************************************
  * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_config_t *p_config )
+static int decoder_Run ( decoder_fifo_t *p_fifo )
 {
     a52_adec_thread_t *p_a52_adec;
 
     /* Allocate the memory needed to store the thread's structure */
-    p_a52_adec =
-        (a52_adec_thread_t *)malloc( sizeof(a52_adec_thread_t) );
+    p_a52_adec = (a52_adec_thread_t *)malloc( sizeof(a52_adec_thread_t) );
     if (p_a52_adec == NULL)
     {
-        intf_ErrMsg ( "a52 error: not enough memory "
-                      "for decoder_Run() to allocate p_a52_adec" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return( -1 );
     }
 
@@ -134,12 +128,12 @@ static int decoder_Run ( decoder_config_t *p_config )
      * Initialize the thread properties
      */
     p_a52_adec->p_aout_fifo = NULL;
-    p_a52_adec->p_config = p_config;
-    p_a52_adec->p_fifo = p_a52_adec->p_config->p_decoder_fifo;
+    p_a52_adec->p_fifo = p_fifo;
+
     if( InitThread( p_a52_adec ) )
     {
-        intf_ErrMsg( "a52 error: could not initialize thread" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_a52_adec->p_fifo, "could not initialize thread" );
+        DecoderError( p_fifo );
         free( p_a52_adec );
         return( -1 );
     }
@@ -168,13 +162,13 @@ static int decoder_Run ( decoder_config_t *p_config )
 
         if( !p_a52_adec->frame_size )
         {
-            intf_WarnMsg( 3, "a52: a52_syncinfo failed" );
+            msg_Warn( p_a52_adec->p_fifo, "a52_syncinfo failed" );
             continue;
         }
 
         if( DecodeFrame( p_a52_adec ) && !p_a52_adec->p_fifo->b_die )
         {
-            DecoderError( p_config->p_decoder_fifo );
+            DecoderError( p_fifo );
             free( p_a52_adec );
             return( -1 );
         }
@@ -198,18 +192,15 @@ static int decoder_Run ( decoder_config_t *p_config )
  *****************************************************************************/
 static int InitThread( a52_adec_thread_t * p_a52_adec )
 {
-    intf_WarnMsg( 3, "a52: InitThread" );
-
     /* Initialize liba52 */
     p_a52_adec->p_a52_state = a52_init( 0 );
     if( p_a52_adec->p_a52_state == NULL )
     {
-        intf_ErrMsg ( "a52 error: InitThread() unable to initialize "
-                      "liba52" );
+        msg_Err( p_a52_adec->p_fifo, "unable to initialize liba52" );
         return -1;
     }
 
-    p_a52_adec->b_dynrng = config_GetIntVariable( "a52-dynrng" );
+    p_a52_adec->b_dynrng = config_GetInt( p_a52_adec->p_fifo, "a52-dynrng" );
 
     /* Init the BitStream */
     InitBitstream( &p_a52_adec->bit_stream,
@@ -243,8 +234,8 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     /* Creating the audio output fifo if not created yet */
     if( p_a52_adec->p_aout_fifo == NULL )
     {
-        p_a52_adec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM,
-                                    p_a52_adec->i_channels,
+        p_a52_adec->p_aout_fifo = aout_CreateFifo( p_a52_adec->p_fifo->p_this,
+                                    AOUT_FIFO_PCM, p_a52_adec->i_channels,
                                     p_a52_adec->sample_rate,
                                     AC3DEC_FRAME_SIZE * p_a52_adec->i_channels,
                                     NULL );
@@ -292,7 +283,9 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     for( i = 0; i < 6; i++ )
     {
         if( a52_block( p_a52_adec->p_a52_state ) )
-            intf_WarnMsg( 5, "a52: a52_block failed for block %i", i );
+        {
+            msg_Warn( p_a52_adec->p_fifo, "a52_block failed for block %i", i );
+        }
 
         float2s16_2( a52_samples( p_a52_adec->p_a52_state ),
                      ((int16_t *)p_buffer) + i * 256 * p_a52_adec->i_channels );
@@ -313,8 +306,6 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
  *****************************************************************************/
 static void EndThread (a52_adec_thread_t *p_a52_adec)
 {
-    intf_WarnMsg ( 3, "a52: EndThread" );
-
     /* If the audio output fifo was created, we destroy it */
     if (p_a52_adec->p_aout_fifo != NULL)
     {
@@ -362,7 +353,7 @@ static void float2s16_2 (float * _f, int16_t * s16)
  * This function is called by input's NextDataPacket.
  *****************************************************************************/
 static void BitstreamCallback ( bit_stream_t * p_bit_stream,
-                                boolean_t b_new_pes )
+                                vlc_bool_t b_new_pes )
 {
     if( b_new_pes )
     {

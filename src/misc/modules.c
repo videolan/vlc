@@ -1,8 +1,8 @@
 /*****************************************************************************
- * modules.c : Built-in and plugin modules management functions
+ * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.62 2002/05/22 19:31:33 gbazin Exp $
+ * $Id: modules.c,v 1.63 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -33,7 +33,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include <dirent.h>
 
@@ -53,7 +53,7 @@
 #include "netutils.h"
 
 #include "interface.h"
-#include "intf_playlist.h"
+#include "playlist.h"
 #include "intf_eject.h"
 
 #include "stream_control.h"
@@ -79,13 +79,19 @@
 #endif
 
 /*****************************************************************************
+ * Static variables
+ *****************************************************************************/
+DECLARE_MODULE_CAPABILITY_TABLE;
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void AllocateAllPlugins   ( void );
-static int  AllocatePluginModule ( char * );
+static void AllocateAllPlugins   ( vlc_object_t * );
+static int  AllocatePluginModule ( vlc_object_t *, char * );
 #endif
-static int  AllocateBuiltinModule( int ( * ) ( module_t * ),
+static int  AllocateBuiltinModule( vlc_object_t *,
+                                   int ( * ) ( module_t * ),
                                    int ( * ) ( module_t * ),
                                    int ( * ) ( module_t * ) );
 static int  DeleteModule ( module_t * );
@@ -106,11 +112,11 @@ static module_symbols_t symbols;
  * This function creates a module bank structure which will be filled later
  * on with all the modules found.
  *****************************************************************************/
-void module_InitBank( void )
+void module_InitBank( vlc_object_t *p_this )
 {
-    p_module_bank->first = NULL;
-    p_module_bank->i_count = 0;
-    vlc_mutex_init( &p_module_bank->lock );
+    p_this->p_vlc->module_bank.first = NULL;
+    p_this->p_vlc->module_bank.i_count = 0;
+    vlc_mutex_init( p_this, &p_this->p_vlc->module_bank.lock );
 
     /*
      * Store the symbols to be exported
@@ -123,42 +129,15 @@ void module_InitBank( void )
 }
 
 /*****************************************************************************
- * module_LoadMain: load the main program info into the module bank.
+ * module_ResetBank: reset the module bank.
  *****************************************************************************
- * This function fills the module bank structure with the main module infos.
- * This is very useful as it will allow us to consider the main program just
- * as another module, and for instance the configuration options of main will
- * be available in the module bank structure just as for every other module.
+ * This function resets the module bank by unloading all unused plugin
+ * modules.
  *****************************************************************************/
-void module_LoadMain( void )
+void module_ResetBank( vlc_object_t *p_this )
 {
-    AllocateBuiltinModule( InitModule__MODULE_main,
-                           ActivateModule__MODULE_main,
-                           DeactivateModule__MODULE_main );
-}
-
-/*****************************************************************************
- * module_LoadBuiltins: load all modules which we built with.
- *****************************************************************************
- * This function fills the module bank structure with the built-in modules.
- *****************************************************************************/
-void module_LoadBuiltins( void )
-{
-    intf_WarnMsg( 2, "module: checking built-in modules" );
-    ALLOCATE_ALL_BUILTINS();
-}
-
-/*****************************************************************************
- * module_LoadPlugins: load all plugin modules we can find.
- *****************************************************************************
- * This function fills the module bank structure with the plugin modules.
- *****************************************************************************/
-void module_LoadPlugins( void )
-{
-#ifdef HAVE_DYNAMIC_PLUGINS
-    intf_WarnMsg( 2, "module: checking plugin modules" );
-    AllocateAllPlugins();
-#endif
+    msg_Err( p_this, "FIXME: module_ResetBank unimplemented" );
+    return;
 }
 
 /*****************************************************************************
@@ -167,41 +146,68 @@ void module_LoadPlugins( void )
  * This function unloads all unused plugin modules and empties the module
  * bank in case of success.
  *****************************************************************************/
-void module_EndBank( void )
+void module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next;
 
-    while( p_module_bank->first != NULL )
+    while( p_this->p_vlc->module_bank.first != NULL )
     {
-        if( DeleteModule( p_module_bank->first ) )
+        if( DeleteModule( p_this->p_vlc->module_bank.first ) )
         {
             /* Module deletion failed */
-            intf_ErrMsg( "module error: `%s' can't be removed, trying harder",
-                         p_module_bank->first->psz_name );
+            msg_Err( p_this, "`%s' can't be removed, trying harder",
+                     p_this->p_vlc->module_bank.first->psz_object_name );
 
             /* We just free the module by hand. Niahahahahaha. */
-            p_next = p_module_bank->first->next;
-            free(p_module_bank->first);
-            p_module_bank->first = p_next;
+            p_next = p_this->p_vlc->module_bank.first->next;
+            free( p_this->p_vlc->module_bank.first );
+            p_this->p_vlc->module_bank.first = p_next;
         }
     }
 
     /* Destroy the lock */
-    vlc_mutex_destroy( &p_module_bank->lock );
+    vlc_mutex_destroy( &p_this->p_vlc->module_bank.lock );
 
     return;
 }
 
 /*****************************************************************************
- * module_ResetBank: reset the module bank.
+ * module_LoadMain: load the main program info into the module bank.
  *****************************************************************************
- * This function resets the module bank by unloading all unused plugin
- * modules.
+ * This function fills the module bank structure with the main module infos.
+ * This is very useful as it will allow us to consider the main program just
+ * as another module, and for instance the configuration options of main will
+ * be available in the module bank structure just as for every other module.
  *****************************************************************************/
-void module_ResetBank( void )
+void module_LoadMain( vlc_object_t *p_this )
 {
-    intf_ErrMsg( "FIXME: module_ResetBank unimplemented" );
-    return;
+    AllocateBuiltinModule( p_this, InitModule__MODULE_main,
+                                   ActivateModule__MODULE_main,
+                                   DeactivateModule__MODULE_main );
+}
+
+/*****************************************************************************
+ * module_LoadBuiltins: load all modules which we built with.
+ *****************************************************************************
+ * This function fills the module bank structure with the builtin modules.
+ *****************************************************************************/
+void module_LoadBuiltins( vlc_object_t * p_this )
+{
+    msg_Dbg( p_this, "checking builtin modules" );
+    ALLOCATE_ALL_BUILTINS();
+}
+
+/*****************************************************************************
+ * module_LoadPlugins: load all plugin modules we can find.
+ *****************************************************************************
+ * This function fills the module bank structure with the plugin modules.
+ *****************************************************************************/
+void module_LoadPlugins( vlc_object_t * p_this )
+{
+#ifdef HAVE_DYNAMIC_PLUGINS
+    msg_Dbg( p_this, "checking plugin modules" );
+    AllocateAllPlugins( p_this );
+#endif
 }
 
 /*****************************************************************************
@@ -210,16 +216,16 @@ void module_ResetBank( void )
  * This function parses the module bank and hides modules that have been
  * unused for a while.
  *****************************************************************************/
-void module_ManageBank( void )
+void module_ManageBank( vlc_object_t *p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     module_t * p_module;
 
     /* We take the global lock */
-    vlc_mutex_lock( &p_module_bank->lock );
+    vlc_mutex_lock( &p_this->p_vlc->module_bank.lock );
 
     /* Parse the module list to see if any modules need to be unloaded */
-    for( p_module = p_module_bank->first ;
+    for( p_module = p_this->p_vlc->module_bank.first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -232,8 +238,8 @@ void module_ManageBank( void )
             }
             else
             {
-                intf_WarnMsg( 3, "module: hiding unused plugin module `%s'",
-                              p_module->psz_name );
+                msg_Dbg( p_this, "hiding unused plugin module `%s'",
+                                 p_module->psz_object_name );
                 HideModule( p_module );
 
                 /* Break here, so that we only hide one module at a time */
@@ -243,7 +249,7 @@ void module_ManageBank( void )
     }
 
     /* We release the global lock */
-    vlc_mutex_unlock( &p_module_bank->lock );
+    vlc_mutex_unlock( &p_this->p_vlc->module_bank.lock );
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
     return;
@@ -254,23 +260,30 @@ void module_ManageBank( void )
  *****************************************************************************
  * This function returns the module that best fits the asked capabilities.
  *****************************************************************************/
-module_t * module_Need( int i_capability, char *psz_name, void *p_data )
+module_t * __module_Need( vlc_object_t *p_this,
+                          int i_capability, char *psz_name, void *p_data )
 {
-    typedef struct module_list_s
+    typedef struct module_list_s module_list_t;
+
+    struct module_list_s
     {
-        struct module_s *p_module;
-        struct module_list_s* p_next;
-    } module_list_t;
-    struct module_list_s *p_list, *p_first, *p_tolock;
+        module_t *p_module;
+        module_list_t *p_next;
+    };
+
+    module_list_t *p_list, *p_first, *p_tmp;
 
     int i_ret, i_index = 0;
-    boolean_t  b_intf = 0;
+    vlc_bool_t b_intf = 0;
 
     module_t *p_module;
     char     *psz_realname = NULL;
 
+    msg_Info( p_this, "looking for %s module",
+                      MODULE_CAPABILITY( i_capability ) );
+
     /* We take the global lock */
-    vlc_mutex_lock( &p_module_bank->lock );
+    vlc_mutex_lock( &p_this->p_vlc->module_bank.lock );
 
     if( psz_name != NULL && *psz_name )
     {
@@ -289,11 +302,12 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
     }
 
     /* Sort the modules and test them */
-    p_list = malloc( p_module_bank->i_count * sizeof( module_list_t ) );
+    p_list = malloc( p_this->p_vlc->module_bank.i_count
+                      * sizeof( module_list_t ) );
     p_first = NULL;
 
     /* Parse the module list for capabilities and probe each of them */
-    for( p_module = p_module_bank->first ;
+    for( p_module = p_this->p_vlc->module_bank.first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
@@ -304,7 +318,8 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
         }
 
         /* Test if we have the required CPU */
-        if( (p_module->i_cpu_capabilities & p_main->i_cpu_capabilities)
+        if( (p_module->i_cpu_capabilities
+                & p_this->p_vlc->i_cpu_capabilities)
               != p_module->i_cpu_capabilities )
         {
             continue;
@@ -313,7 +328,7 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
         /* If we required a shortcut, check this plugin provides it. */
         if( psz_name != NULL && *psz_name )
         {
-            boolean_t b_trash = 1;
+            vlc_bool_t b_trash = 1;
             int i_dummy;
 
             for( i_dummy = 0;
@@ -338,7 +353,8 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
         if( i_capability == MODULE_CAPABILITY_INTF )
         {
             if( p_module->psz_program != NULL
-                 && !strcmp( p_module->psz_program, p_main->psz_arg0 ) )
+                 && !strcmp( p_module->psz_program,
+                             p_this->p_vlc->psz_object_name ) )
             {
                 if( !b_intf ) 
                 {
@@ -371,7 +387,7 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
             /* Ok, so at school you learned that quicksort is quick, and
              * bubble sort sucks raw eggs. But that's when dealing with
              * thousands of items. Here we have barely 50. */
-            struct module_list_s *p_newlist = p_first;
+            module_list_t *p_newlist = p_first;
 
             if( p_first->p_module->pi_score[i_capability]
                  < p_module->pi_score[i_capability] )
@@ -397,60 +413,61 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
     }
 
     /* Lock all selected modules */
-    p_tolock = p_first;
-    while( p_tolock != NULL )
+    p_tmp = p_first;
+    while( p_tmp != NULL )
     {
-        LockModule( p_tolock->p_module );
-        p_tolock = p_tolock->p_next;
+        LockModule( p_tmp->p_module );
+        p_tmp = p_tmp->p_next;
     }
 
     /* We can release the global lock, module refcounts were incremented */
-    vlc_mutex_unlock( &p_module_bank->lock );
+    vlc_mutex_unlock( &p_this->p_vlc->module_bank.lock );
 
     /* Parse the linked list and use the first successful module */
-    while( p_first != NULL )
+    p_tmp = p_first;
+    while( p_tmp != NULL )
     {
         /* Test the requested capability */
         switch( i_capability )
         {
             case MODULE_CAPABILITY_ACCESS:
-                i_ret = p_first->p_module->p_functions->access.functions.
-                              access.pf_open( (struct input_thread_s *)p_data );
+                i_ret = p_tmp->p_module->p_functions->access.functions.
+                              access.pf_open( (input_thread_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_DEMUX:
-                i_ret = p_first->p_module->p_functions->demux.functions.
-                              demux.pf_init( (struct input_thread_s *)p_data );
+                i_ret = p_tmp->p_module->p_functions->demux.functions.
+                              demux.pf_init( (input_thread_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_NETWORK:
-                i_ret = p_first->p_module->p_functions->network.functions.
-                              network.pf_open( (struct network_socket_s *)p_data );
+                i_ret = p_tmp->p_module->p_functions->network.functions.
+                         network.pf_open( p_this, (network_socket_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_DECODER:
-                i_ret = p_first->p_module->p_functions->dec.functions.
+                i_ret = p_tmp->p_module->p_functions->dec.functions.
                               dec.pf_probe( (u8 *)p_data );
                 break;
 
             case MODULE_CAPABILITY_INTF:
-                i_ret = p_first->p_module->p_functions->intf.functions.
-                              intf.pf_open( (struct intf_thread_s *)p_data );
+                i_ret = p_tmp->p_module->p_functions->intf.functions.
+                              intf.pf_open( (intf_thread_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_AOUT:
-                i_ret = p_first->p_module->p_functions->aout.functions.
-                              aout.pf_open( (struct aout_thread_s *)p_data );
+                i_ret = p_tmp->p_module->p_functions->aout.functions.
+                              aout.pf_open( (aout_thread_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_VOUT:
-                i_ret = p_first->p_module->p_functions->vout.functions.
-                              vout.pf_create( (struct vout_thread_s *)p_data );
+                i_ret = p_tmp->p_module->p_functions->vout.functions.
+                              vout.pf_create( (vout_thread_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_CHROMA:
-                i_ret = p_first->p_module->p_functions->chroma.functions.
-                              chroma.pf_init( (struct vout_thread_s *)p_data );
+                i_ret = p_tmp->p_module->p_functions->chroma.functions.
+                              chroma.pf_init( (vout_thread_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_IDCT:
@@ -463,8 +480,7 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
                 break;
 
             default:
-                intf_ErrMsg( "module error: unknown module type %i",
-                             i_capability );
+                msg_Err( p_this, "unknown module type %i", i_capability );
                 i_ret = -1;
                 break;
         }
@@ -476,17 +492,17 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
         }
         else
         {
-            UnlockModule( p_first->p_module );
+            UnlockModule( p_tmp->p_module );
         }
 
-        p_first = p_first->p_next;
+        p_tmp = p_tmp->p_next;
     }
 
     /* Store the locked module value */
-    if( p_first != NULL )
+    if( p_tmp != NULL )
     {
-        p_module = p_first->p_module;
-        p_first = p_first->p_next;
+        p_module = p_tmp->p_module;
+        p_tmp = p_tmp->p_next;
     }
     else
     {
@@ -494,24 +510,29 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
     }
 
     /* Unlock the remaining modules */
-    while( p_first != NULL )
+    while( p_tmp != NULL )
     {
-        UnlockModule( p_first->p_module );
-        p_first = p_first->p_next;
+        UnlockModule( p_tmp->p_module );
+        p_tmp = p_tmp->p_next;
     }
 
     free( p_list );
 
     if( p_module != NULL )
     {
-        intf_WarnMsg( 1, "module: locking %s module `%s'",
-                         GetCapabilityName( i_capability ),
-                         p_module->psz_name );
+        msg_Info( p_module, "found and locked %s module `%s'",
+                  MODULE_CAPABILITY( i_capability ),
+                  p_module->psz_object_name );
+    }
+    else if( p_first == NULL )
+    {
+        msg_Err( p_this, "no %s module named `%s'",
+                 MODULE_CAPABILITY( i_capability ), psz_name );
     }
     else if( psz_name != NULL && *psz_name )
     {
-        intf_ErrMsg( "module error: requested %s module `%s' unavailable",
-                     GetCapabilityName( i_capability ), psz_name );
+        msg_Err( p_this, "could not load %s module `%s'",
+                 MODULE_CAPABILITY( i_capability ), psz_name );
     }
 
     if( psz_realname )
@@ -520,7 +541,7 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
     }
 
     /* Don't forget that the module is still locked */
-    return( p_module );
+    return p_module;
 }
 
 /*****************************************************************************
@@ -532,16 +553,16 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
 void module_Unneed( module_t * p_module )
 {
     /* We take the global lock */
-    vlc_mutex_lock( &p_module_bank->lock );
+    vlc_mutex_lock( &p_module->p_vlc->module_bank.lock );
 
     /* Just unlock the module - we can't do anything if it fails,
      * so there is no need to check the return value. */
     UnlockModule( p_module );
 
-    intf_WarnMsg( 1, "module: unlocking module `%s'", p_module->psz_name );
+    msg_Info( p_module, "unlocking module `%s'", p_module->psz_object_name );
 
     /* We release the global lock */
-    vlc_mutex_unlock( &p_module_bank->lock );
+    vlc_mutex_unlock( &p_module->p_vlc->module_bank.lock );
 
     return;
 }
@@ -554,7 +575,7 @@ void module_Unneed( module_t * p_module )
  * AllocateAllPlugins: load all plugin modules we can find.
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void AllocateAllPlugins( void )
+static void AllocateAllPlugins( vlc_object_t *p_this )
 {
     static char * path[] = { ".", "plugins", PLUGIN_PATH, NULL, NULL };
 
@@ -564,7 +585,7 @@ static void AllocateAllPlugins( void )
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN )
     char *          psz_vlcpath = system_GetProgramPath();
     int             i_vlclen = strlen( psz_vlcpath );
-    boolean_t       b_notinroot;
+    vlc_bool_t      b_notinroot;
 #endif
     DIR *           dir;
     struct dirent * file;
@@ -596,7 +617,7 @@ static void AllocateAllPlugins( void )
             psz_fullpath = *ppsz_path;
         }
 
-        intf_WarnMsg( 1, "module: browsing `%s'", psz_fullpath );
+        msg_Dbg( p_this, "browsing `%s'", psz_fullpath );
 
         if( (dir = opendir( psz_fullpath )) )
         {
@@ -618,7 +639,7 @@ static void AllocateAllPlugins( void )
 
                     /* We created a nice filename -- now we just try to load
                      * it as a plugin module. */
-                    AllocatePluginModule( psz_file );
+                    AllocatePluginModule( p_this, psz_file );
 
                     /* We don't care if the allocation succeeded */
                     free( psz_file );
@@ -645,7 +666,7 @@ static void AllocateAllPlugins( void )
  * for its information data. The module can then be handled by module_Need,
  * module_Unneed and HideModule. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocatePluginModule( char * psz_filename )
+static int AllocatePluginModule( vlc_object_t * p_this, char * psz_filename )
 {
     char **pp_shortcut;
     module_t * p_module, * p_othermodule;
@@ -657,48 +678,52 @@ static int AllocatePluginModule( char * psz_filename )
         char psz_buffer[256];
 
         /* The plugin module couldn't be opened */
-        intf_WarnMsg( 1, "module warning: cannot open %s (%s)",
-                         psz_filename, module_error( psz_buffer ) );
-        return( -1 );
+        msg_Warn( p_this, "cannot open %s (%s)",
+                  psz_filename, module_error( psz_buffer ) );
+        return -1;
     }
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */ 
-    p_module = malloc( sizeof( module_t ) );
+    p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE );
     if( p_module == NULL )
     {
-        intf_ErrMsg( "module error: can't allocate p_module" );
+        msg_Err( p_this, "out of memory" );
         module_unload( handle );
-        return( -1 );
+        return -1;
     }
+
+    vlc_object_attach( p_module, p_this );
 
     /* We need to fill these since they may be needed by CallSymbol() */
     p_module->is.plugin.psz_filename = psz_filename;
     p_module->is.plugin.handle = handle;
     p_module->p_symbols = &symbols;
 
-    /* Initialize the module : fill p_module->psz_name, default config, etc. */
+    /* Initialize the module: fill p_module->psz_object_name, default config */
     if( CallSymbol( p_module, "InitModule" MODULE_SUFFIX ) != 0 )
     {
         /* We couldn't call InitModule() */
-        free( p_module );
+        vlc_object_destroy( p_module );
         module_unload( handle );
-        return( -1 );
+        return -1;
     }
 
     /* Check that we don't already have a module with this name */
-    for( p_othermodule = p_module_bank->first ;
+    for( p_othermodule = p_this->p_vlc->module_bank.first ;
          p_othermodule != NULL ;
          p_othermodule = p_othermodule->next )
     {
-        if( !strcmp( p_othermodule->psz_name, p_module->psz_name ) )
+        if( !strcmp( p_othermodule->psz_object_name,
+                     p_module->psz_object_name ) )
         {
-            intf_WarnMsg( 5, "module warning: cannot load %s, a module named "
-                             "`%s' already exists",
-                             psz_filename, p_module->psz_name );
-            free( p_module );
+            msg_Warn( p_this,
+                      "cannot load %s, a module named `%s' already exists",
+                      psz_filename, p_module->psz_object_name );
+            config_Free( p_module );
+            vlc_object_destroy( p_module );
             module_unload( handle );
-            return( -1 );
+            return -1;
         }
     }
 
@@ -706,9 +731,10 @@ static int AllocatePluginModule( char * psz_filename )
     if( CallSymbol( p_module, "ActivateModule" MODULE_SUFFIX ) != 0 )
     {
         /* We couldn't call ActivateModule() */
-        free( p_module );
+        config_Free( p_module );
+        vlc_object_destroy( p_module );
         module_unload( handle );
-        return( -1 );
+        return -1;
     }
 
     for( pp_shortcut = p_module->pp_shortcuts ; *pp_shortcut ; pp_shortcut++ )
@@ -720,23 +746,24 @@ static int AllocatePluginModule( char * psz_filename )
      * module is unloaded. */
     p_module->is.plugin.psz_filename =
             strdup( p_module->is.plugin.psz_filename );
-    p_module->psz_name = strdup( p_module->psz_name );
+    p_module->psz_object_name = strdup( p_module->psz_object_name );
     p_module->psz_longname = strdup( p_module->psz_longname );
 
     if( p_module->is.plugin.psz_filename == NULL 
-            || p_module->psz_name == NULL
+            || p_module->psz_object_name == NULL
             || p_module->psz_longname == NULL )
     {
-        intf_ErrMsg( "module error: can't duplicate strings" );
+        msg_Err( p_this, "out of memory" );
 
         free( p_module->is.plugin.psz_filename );
-        free( p_module->psz_name );
+        free( p_module->psz_object_name );
         free( p_module->psz_longname );
         free( p_module->psz_program );
 
-        free( p_module );
+        config_Free( p_module );
+        vlc_object_destroy( p_module );
         module_unload( handle );
-        return( -1 );
+        return -1;
     }
 
     if( p_module->psz_program != NULL )
@@ -751,31 +778,31 @@ static int AllocatePluginModule( char * psz_filename )
     p_module->b_builtin = 0;
 
     /* Link module into the linked list */
-    if( p_module_bank->first != NULL )
+    if( p_this->p_vlc->module_bank.first != NULL )
     {
-        p_module_bank->first->prev = p_module;
+        p_this->p_vlc->module_bank.first->prev = p_module;
     }
-    p_module->next = p_module_bank->first;
+    p_module->next = p_this->p_vlc->module_bank.first;
     p_module->prev = NULL;
-    p_module_bank->first = p_module;
-    p_module_bank->i_count++;
+    p_this->p_vlc->module_bank.first = p_module;
+    p_this->p_vlc->module_bank.i_count++;
 
-    /* Immediate message so that a slow module doesn't make the user wait */
-    intf_WarnMsg( 2, "module: new plugin module `%s', %s",
-                     p_module->psz_name, p_module->psz_longname );
+    msg_Dbg( p_this, "plugin `%s', %s",
+             p_module->psz_object_name, p_module->psz_longname );
 
-    return( 0 );
+    return 0;
 }
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
 /*****************************************************************************
- * AllocateBuiltinModule: initialize a built-in module.
+ * AllocateBuiltinModule: initialize a builtin module.
  *****************************************************************************
- * This function registers a built-in module and allocates a structure
+ * This function registers a builtin module and allocates a structure
  * for its information data. The module can then be handled by module_Need,
  * module_Unneed and HideModule. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
+static int AllocateBuiltinModule( vlc_object_t * p_this,
+                                  int ( *pf_init ) ( module_t * ),
                                   int ( *pf_activate ) ( module_t * ),
                                   int ( *pf_deactivate ) ( module_t * ) )
 {
@@ -783,35 +810,37 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */ 
-    p_module = malloc( sizeof( module_t ) );
+    p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE );
     if( p_module == NULL )
     {
-        intf_ErrMsg( "module error: can't allocate p_module" );
-        return( -1 );
+        msg_Err( p_this, "out of memory" );
+        return -1;
     }
 
-    /* Initialize the module : fill p_module->psz_name, etc. */
+    /* Initialize the module : fill p_module->psz_object_name, etc. */
     if( pf_init( p_module ) != 0 )
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
-        intf_ErrMsg( "module error: failed calling init in builtin module" );
-        free( p_module );
-        return( -1 );
+        msg_Err( p_this, "failed calling init in builtin module" );
+        vlc_object_destroy( p_module );
+        return -1;
     }
 
     /* Check that we don't already have a module with this name */
-    for( p_othermodule = p_module_bank->first ;
+    for( p_othermodule = p_this->p_vlc->module_bank.first ;
          p_othermodule != NULL ;
          p_othermodule = p_othermodule->next )
     {
-        if( !strcmp( p_othermodule->psz_name, p_module->psz_name ) )
+        if( !strcmp( p_othermodule->psz_object_name,
+                     p_module->psz_object_name ) )
         {
-            intf_WarnMsg( 5, "module warning: cannot load builtin `%s', a "
-                             "module named `%s' already exists",
-                             p_module->psz_name, p_module->psz_name );
-            free( p_module );
-            return( -1 );
+            msg_Warn( p_this, "cannot load builtin `%s', "
+                      "a module named `%s' already exists",
+                      p_module->psz_object_name, p_module->psz_object_name );
+            config_Free( p_module );
+            vlc_object_destroy( p_module );
+            return -1;
         }
     }
 
@@ -819,10 +848,10 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
-        intf_ErrMsg( "module error: failed calling activate "
-                     "in builtin module" );
-        free( p_module );
-        return( -1 );
+        msg_Err( p_this, "failed calling activate in builtin module" );
+        config_Free( p_module );
+        vlc_object_destroy( p_module );
+        return -1;
     }
 
     /* Everything worked fine ! The module is ready to be added to the list. */
@@ -833,20 +862,21 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
     p_module->is.builtin.pf_deactivate = pf_deactivate;
 
     /* Link module into the linked list */
-    if( p_module_bank->first != NULL )
+    if( p_this->p_vlc->module_bank.first != NULL )
     {
-        p_module_bank->first->prev = p_module;
+        p_this->p_vlc->module_bank.first->prev = p_module;
     }
-    p_module->next = p_module_bank->first;
+    p_module->next = p_this->p_vlc->module_bank.first;
     p_module->prev = NULL;
-    p_module_bank->first = p_module;
-    p_module_bank->i_count++;
+    p_this->p_vlc->module_bank.first = p_module;
+    p_this->p_vlc->module_bank.i_count++;
 
-    /* Immediate message so that a slow module doesn't make the user wait */
-    intf_WarnMsg( 2, "module: new builtin module `%s', %s",
-                     p_module->psz_name, p_module->psz_longname );
+    msg_Dbg( p_this, "builtin `%s', %s",
+             p_module->psz_object_name, p_module->psz_longname );
 
-    return( 0 );
+    vlc_object_attach( p_module, p_this );
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -863,9 +893,9 @@ static int DeleteModule( module_t * p_module )
     {
         if( p_module->i_usage != 0 )
         {
-            intf_ErrMsg( "module error: trying to free builtin module `%s' with"
-                         " usage %i", p_module->psz_name, p_module->i_usage );
-            return( -1 );
+            msg_Err( p_module, "trying to free builtin module `%s' with "
+                     "usage %i", p_module->psz_object_name, p_module->i_usage );
+            return -1;
         }
         else
         {
@@ -878,9 +908,9 @@ static int DeleteModule( module_t * p_module )
     {
         if( p_module->i_usage >= 1 )
         {
-            intf_ErrMsg( "module error: trying to free module `%s' which is"
-                         " still in use", p_module->psz_name );
-            return( -1 );
+            msg_Err( p_module, "trying to free module `%s' which is "
+                               "still in use", p_module->psz_object_name );
+            return -1;
         }
 
         /* Two possibilities here: i_usage == -1 and the module is already
@@ -890,11 +920,13 @@ static int DeleteModule( module_t * p_module )
         {
             if( HideModule( p_module ) != 0 )
             {
-                return( -1 );
+                return -1;
             }
         }
     }
 #endif
+
+    vlc_object_unlink_all( p_module );
 
     /* Unlink the module from the linked list. */
     if( p_module->prev != NULL )
@@ -903,7 +935,7 @@ static int DeleteModule( module_t * p_module )
     }
     else
     {
-        p_module_bank->first = p_module->next;
+        p_module->p_vlc->module_bank.first = p_module->next;
     }
 
     if( p_module->next != NULL )
@@ -911,7 +943,7 @@ static int DeleteModule( module_t * p_module )
         p_module->next->prev = p_module->prev;
     }
 
-    p_module_bank->i_count--;
+    p_module->p_vlc->module_bank.i_count--;
 
     /* We free the structures that we strdup()ed in Allocate*Module(). */
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -925,15 +957,16 @@ static int DeleteModule( module_t * p_module )
         }
 
         free( p_module->is.plugin.psz_filename );
-        free( p_module->psz_name );
+        free( p_module->psz_object_name );
         free( p_module->psz_longname );
         free( p_module->psz_program );
     }
 #endif
 
-    free( p_module );
+    config_Free( p_module );
+    vlc_object_destroy( p_module );
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -951,24 +984,24 @@ static int LockModule( module_t * p_module )
     {
         /* This module is already loaded and activated, we can return */
         p_module->i_usage++;
-        return( 0 );
+        return 0;
     }
 
     if( p_module->b_builtin )
     {
-        /* A built-in module should always have a refcount >= 0 ! */
-        intf_ErrMsg( "module error: built-in module `%s' has refcount %i",
-                     p_module->psz_name, p_module->i_usage );
-        return( -1 );
+        /* A builtin module should always have a refcount >= 0 ! */
+        msg_Err( p_module, "builtin module `%s' has refcount %i",
+                           p_module->psz_object_name, p_module->i_usage );
+        return -1;
     }
 
 #ifdef HAVE_DYNAMIC_PLUGINS
     if( p_module->i_usage != -1 )
     {
         /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: plugin module `%s' has refcount %i",
-                     p_module->psz_name, p_module->i_usage );
-        return( -1 );
+        msg_Err( p_module, "plugin module `%s' has refcount %i",
+                           p_module->psz_object_name, p_module->i_usage );
+        return -1;
     }
 
     /* i_usage == -1, which means that the module isn't in memory */
@@ -978,10 +1011,9 @@ static int LockModule( module_t * p_module )
         char psz_buffer[256];
 
         /* The plugin module couldn't be opened */
-        intf_ErrMsg( "module error: cannot open %s (%s)",
-                     p_module->is.plugin.psz_filename,
-                     module_error( psz_buffer ) );
-        return( -1 );
+        msg_Err( p_module, "cannot open %s (%s)",
+                 p_module->is.plugin.psz_filename, module_error(psz_buffer) );
+        return -1;
     }
 
     /* FIXME: what to do if the guy modified the plugin while it was
@@ -995,14 +1027,14 @@ static int LockModule( module_t * p_module )
          * we can't do much about it. Just try to unload module. */
         module_unload( p_module->is.plugin.handle );
         p_module->i_usage = -1;
-        return( -1 );
+        return -1;
     }
 
     /* Everything worked fine ! The module is ready to be used */
     p_module->i_usage = 1;
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -1016,16 +1048,16 @@ static int UnlockModule( module_t * p_module )
     if( p_module->i_usage <= 0 )
     {
         /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: trying to call module_Unneed() on `%s'"
-                     " which isn't even in use", p_module->psz_name );
-        return( -1 );
+        msg_Err( p_module, "trying to call module_Unneed() on `%s' "
+                           "which is not in use", p_module->psz_object_name );
+        return -1;
     }
 
     /* This module is still in use, we can return */
     p_module->i_usage--;
     p_module->i_unused_delay = 0;
 
-    return( 0 );
+    return 0;
 }
 
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -1040,24 +1072,24 @@ static int HideModule( module_t * p_module )
 {
     if( p_module->b_builtin )
     {
-        /* A built-in module should never be hidden. */
-        intf_ErrMsg( "module error: trying to hide built-in module `%s'",
-                     p_module->psz_name );
-        return( -1 );
+        /* A builtin module should never be hidden. */
+        msg_Err( p_module, "trying to hide builtin module `%s'",
+                           p_module->psz_object_name );
+        return -1;
     }
 
     if( p_module->i_usage >= 1 )
     {
-        intf_ErrMsg( "module error: trying to hide module `%s' which is still"
-                     " in use", p_module->psz_name );
-        return( -1 );
+        msg_Err( p_module, "trying to hide module `%s' which is still "
+                           "in use", p_module->psz_object_name );
+        return -1;
     }
 
     if( p_module->i_usage <= -1 )
     {
-        intf_ErrMsg( "module error: trying to hide module `%s' which is already"
-                     " hidden", p_module->psz_name );
-        return( -1 );
+        msg_Err( p_module, "trying to hide module `%s' which is already "
+                           "hidden", p_module->psz_object_name );
+        return -1;
     }
 
     /* Deactivate the module : free the capability structure, etc. */
@@ -1067,14 +1099,14 @@ static int HideModule( module_t * p_module )
          * we can't do much about it. Just try to unload module anyway. */
         module_unload( p_module->is.plugin.handle );
         p_module->i_usage = -1;
-        return( -1 );
+        return -1;
     }
 
     /* Everything worked fine, we can safely unload the module. */
     module_unload( p_module->is.plugin.handle );
     p_module->i_usage = -1;
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -1096,11 +1128,10 @@ static int CallSymbol( module_t * p_module, char * psz_name )
         char psz_buffer[256];
 
         /* We couldn't load the symbol */
-        intf_WarnMsg( 1, "module warning: "
-                         "cannot find symbol %s in module %s (%s)",
-                         psz_name, p_module->is.plugin.psz_filename,
-                         module_error( psz_buffer ) );
-        return( -1 );
+        msg_Warn( p_module, "cannot find symbol %s in module %s (%s)",
+                            psz_name, p_module->is.plugin.psz_filename,
+                            module_error( psz_buffer ) );
+        return -1;
     }
 
     /* We can now try to call the symbol */
@@ -1108,13 +1139,13 @@ static int CallSymbol( module_t * p_module, char * psz_name )
     {
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
-        intf_ErrMsg( "module error: failed calling symbol %s in module %s",
-                     psz_name, p_module->is.plugin.psz_filename );
-        return( -1 );
+        msg_Err( p_module, "failed calling symbol %s in module %s",
+                           psz_name, p_module->is.plugin.psz_filename );
+        return -1;
     }
 
     /* Everything worked fine, we can return */
-    return( 0 );
+    return 0;
 }
 #endif /* HAVE_DYNAMIC_PLUGINS */
 

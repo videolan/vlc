@@ -1,5 +1,5 @@
 #include "QConfigItem.h"
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 QConfigItem::QConfigItem(QObject *parent, QString name, int iType, int i_val) :
     QObject(parent, name)
 {

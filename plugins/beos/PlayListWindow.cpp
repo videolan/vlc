@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.6 2002/06/01 08:54:08 tcastley Exp $
+ * $Id: PlayListWindow.cpp,v 1.7 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -30,16 +30,8 @@
 #include <string.h>
 
 /* VLC headers */
-extern "C"
-{
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
-}
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 /* BeOS interface headers */
 #include "InterfaceWindow.h"

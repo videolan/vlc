@@ -2,7 +2,7 @@
  * adec_test.c: MPEG Layer I-II audio decoder test program
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec_test.c,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: adec_test.c,v 1.2 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -21,14 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/*
- * TODO :
- *
- * - optimiser les NeedBits() et les GetBits() du code là où c'est possible ;
- * - vlc_cond_signal() / vlc_cond_wait() ;
- *
- */
 
 /*****************************************************************************
  * Preamble

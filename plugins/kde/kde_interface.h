@@ -136,14 +136,13 @@ class KInterface : public KMainWindow
 /*****************************************************************************
  * intf_sys_t: description and status of KDE interface
  *****************************************************************************/
-typedef struct intf_sys_s
+struct intf_sys_s
 {
     KThread      *p_thread;
 
     KApplication *p_app;
     KInterface   *p_window;
     KAboutData   *p_about;
-
-} intf_sys_t;
+};
 
 #endif /* _KDE_INTERFACE_H_ */

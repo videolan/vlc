@@ -2,7 +2,7 @@
  * network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: network.h,v 1.1 2002/03/01 00:33:18 massiot Exp $
+ * $Id: network.h,v 1.2 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,7 +25,7 @@
  * network_socket_t: structure passed to a network plug-in to define the
  *                   kind of socket we want
  *****************************************************************************/
-typedef struct network_socket_s
+struct network_socket_s
 {
     unsigned int i_type;
 
@@ -38,7 +38,7 @@ typedef struct network_socket_s
     /* Return values */
     int i_handle;
     size_t i_mtu;
-} network_socket_t;
+};
 
 /* Socket types */
 #define NETWORK_UDP 1

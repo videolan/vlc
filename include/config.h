@@ -51,9 +51,9 @@
 #ifdef SYS_BEOS
 #  define CONFIG_DIR                    "config/settings"
 #elif defined( WIN32 )
-#  define CONFIG_DIR			"videolan"
+#  define CONFIG_DIR			"vlc"
 #else
-#  define CONFIG_DIR                    ".videolan"
+#  define CONFIG_DIR                    ".vlc"
 #endif
 #define CONFIG_FILE                     "vlcrc"
 
@@ -266,4 +266,4 @@
 
 /* Maximal size of the message queue - in case of overflow, all messages in the
  * queue are printed, but not sent to the threads */
-#define INTF_MSG_QSIZE                  256
+#define VLC_MSG_QSIZE                   256

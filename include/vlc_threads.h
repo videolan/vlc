@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.42 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: vlc_threads.h,v 1.1 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -36,17 +36,17 @@
 #elif defined( ST_INIT_IN_ST_H )                            /* State threads */
 #   include <st.h>
 
-#elif defined( WIN32 )
+#elif defined( WIN32 )                                          /* Win32 API */
 #   include <process.h>
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )  /* pthreads (like Linux & BSD) */
 #   include <pthread.h>
 #   ifdef DEBUG
-/* Needed for pthread_cond_timedwait */
+        /* Needed for pthread_cond_timedwait */
 #       include <errno.h>
 #   endif
-/* This is not prototyped under Linux, though it exists. */
-int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
+    /* This is not prototyped under Linux, though it exists. */
+    int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 
 #elif defined( HAVE_CTHREADS_H )                                  /* GNUMach */
 #   include <cthreads.h>
@@ -106,8 +106,9 @@ typedef HANDLE vlc_thread_t;
 
 typedef struct
 {
-    CRITICAL_SECTION csection;
-    HANDLE           mutex;
+    CRITICAL_SECTION    csection;
+    HANDLE              mutex;
+    SIGNALOBJECTANDWAIT SignalObjectAndWait;
 } vlc_mutex_t;
 
 typedef struct
@@ -127,16 +128,18 @@ typedef pthread_cond_t   vlc_cond_t;
 typedef cthread_t        vlc_thread_t;
 
 /* Those structs are the ones defined in /include/cthreads.h but we need
- * to handle (*foo) where foo is a (mutex_t) while they handle (foo) where
+ * to handle (&foo) where foo is a (mutex_t) while they handle (foo) where
  * foo is a (mutex_t*) */
-typedef struct s_mutex {
+typedef struct
+{
     spin_lock_t held;
     spin_lock_t lock;
     char *name;
     struct cthread_queue queue;
 } vlc_mutex_t;
 
-typedef struct s_condition {
+typedef struct
+{
     spin_lock_t lock;
     struct cthread_queue queue;
     char *name;
@@ -164,45 +167,3 @@ typedef struct
 
 #endif
 
-typedef void *(*vlc_thread_func_t)(void *p_data);
-
-
-/*****************************************************************************
- * Prototype for GPROF wrapper
- *****************************************************************************/
-
-#ifdef GPROF
-/* Wrapper function for profiling */
-static void *      vlc_thread_wrapper ( void *p_wrapper );
-
-#   ifdef WIN32
-
-#       define ITIMER_REAL 1
-#       define ITIMER_PROF 2
-
-struct itimerval
-{
-    struct timeval it_value;
-    struct timeval it_interval;
-};
-
-int setitimer(int kind, const struct itimerval* itnew, struct itimerval* itold);
-
-#   endif /* WIN32 */
-
-typedef struct wrapper_s
-{
-    /* Data lock access */
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
-
-    /* Data used to spawn the real thread */
-    vlc_thread_func_t func;
-    void *p_data;
-
-    /* Profiling timer passed to the thread */
-    struct itimerval itimer;
-
-} wrapper_t;
-
-#endif /* GPROF */

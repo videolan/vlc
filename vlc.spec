@@ -245,21 +245,21 @@ EOF
 
 # icons
 mkdir -p %{buildroot}/{%{_miconsdir},%{_liconsdir}}
-install -m 644 %buildroot/%_datadir/videolan/vlc16x16.png %buildroot/%{_miconsdir}/vlc.png
-install -m 644 %buildroot/%_datadir/videolan/vlc32x32.png %buildroot/%{_iconsdir}/vlc.png
-install -m 644 %buildroot/%_datadir/videolan/vlc48x48.png %buildroot/%{_liconsdir}/vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gnome-vlc16x16.png %buildroot/%{_miconsdir}/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gnome-vlc32x32.png %buildroot/%{_iconsdir}/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gnome-vlc48x48.png %buildroot/%{_liconsdir}/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gvlc16x16.png %buildroot/%{_miconsdir}/gvlc.png
-install -m 644 %buildroot/%_datadir/videolan/gvlc32x32.png %buildroot/%{_iconsdir}/gvlc.png
-install -m 644 %buildroot/%_datadir/videolan/gvlc48x48.png %buildroot/%{_liconsdir}/gvlc.png
-install -m 644 %buildroot/%_datadir/videolan/kvlc16x16.png %buildroot/%{_miconsdir}/kvlc.png
-install -m 644 %buildroot/%_datadir/videolan/kvlc32x32.png %buildroot/%{_iconsdir}/kvlc.png
-install -m 644 %buildroot/%_datadir/videolan/kvlc48x48.png %buildroot/%{_liconsdir}/kvlc.png
-install -m 644 %buildroot/%_datadir/videolan/qvlc16x16.png %buildroot/%{_miconsdir}/qvlc.png
-install -m 644 %buildroot/%_datadir/videolan/qvlc32x32.png %buildroot/%{_iconsdir}/qvlc.png
-install -m 644 %buildroot/%_datadir/videolan/qvlc48x48.png %buildroot/%{_liconsdir}/qvlc.png
+install -m 644 %buildroot/%_datadir/vlc/vlc16x16.png %buildroot/%{_miconsdir}/vlc.png
+install -m 644 %buildroot/%_datadir/vlc/vlc32x32.png %buildroot/%{_iconsdir}/vlc.png
+install -m 644 %buildroot/%_datadir/vlc/vlc48x48.png %buildroot/%{_liconsdir}/vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gnome-vlc16x16.png %buildroot/%{_miconsdir}/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gnome-vlc32x32.png %buildroot/%{_iconsdir}/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gnome-vlc48x48.png %buildroot/%{_liconsdir}/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gvlc16x16.png %buildroot/%{_miconsdir}/gvlc.png
+install -m 644 %buildroot/%_datadir/vlc/gvlc32x32.png %buildroot/%{_iconsdir}/gvlc.png
+install -m 644 %buildroot/%_datadir/vlc/gvlc48x48.png %buildroot/%{_liconsdir}/gvlc.png
+install -m 644 %buildroot/%_datadir/vlc/kvlc16x16.png %buildroot/%{_miconsdir}/kvlc.png
+install -m 644 %buildroot/%_datadir/vlc/kvlc32x32.png %buildroot/%{_iconsdir}/kvlc.png
+install -m 644 %buildroot/%_datadir/vlc/kvlc48x48.png %buildroot/%{_liconsdir}/kvlc.png
+install -m 644 %buildroot/%_datadir/vlc/qvlc16x16.png %buildroot/%{_miconsdir}/qvlc.png
+install -m 644 %buildroot/%_datadir/vlc/qvlc32x32.png %buildroot/%{_iconsdir}/qvlc.png
+install -m 644 %buildroot/%_datadir/vlc/qvlc48x48.png %buildroot/%{_liconsdir}/qvlc.png
 
 %post
 %update_menus
@@ -274,37 +274,37 @@ rm -fr %buildroot
 %doc README COPYING
 %{_bindir}/vlc
 
-%dir %{_libdir}/videolan/vlc
-%{_libdir}/videolan/vlc/ac3_spdif.so
-%{_libdir}/videolan/vlc/avi.so
-%{_libdir}/videolan/vlc/dsp.so
-%{_libdir}/videolan/vlc/dummy.so
-%{_libdir}/videolan/vlc/dvd.so
-%{_libdir}/videolan/vlc/fb.so
-%{_libdir}/videolan/vlc/file.so
-%{_libdir}/videolan/vlc/filter_deinterlace.so
-%{_libdir}/videolan/vlc/filter_distort.so
-%{_libdir}/videolan/vlc/filter_invert.so
-%{_libdir}/videolan/vlc/filter_transform.so
-%{_libdir}/videolan/vlc/filter_wall.so
-%{_libdir}/videolan/vlc/fx_scope.so
-%{_libdir}/videolan/vlc/http.so
-%{_libdir}/videolan/vlc/ipv4.so
-%{_libdir}/videolan/vlc/ipv6.so
-%{_libdir}/videolan/vlc/logger.so
-%{_libdir}/videolan/vlc/lpcm_adec.so
-%{_libdir}/videolan/vlc/memcpy.so
-%{_libdir}/videolan/vlc/mga.so
-%{_libdir}/videolan/vlc/mpeg_es.so
-%{_libdir}/videolan/vlc/mpeg_ps.so
-%{_libdir}/videolan/vlc/mpeg_ts.so
-%{_libdir}/videolan/vlc/null.so
-%{_libdir}/videolan/vlc/rc.so
-%{_libdir}/videolan/vlc/spudec.so
-%{_libdir}/videolan/vlc/udp.so
-%{_libdir}/videolan/vlc/vcd.so
-%{_libdir}/videolan/vlc/x11.so
-#%{_libdir}/videolan/vlc/xmga.so
+%dir %{_libdir}/vlc
+%{_libdir}/vlc/ac3_spdif.so
+%{_libdir}/vlc/avi.so
+%{_libdir}/vlc/dsp.so
+%{_libdir}/vlc/dummy.so
+%{_libdir}/vlc/dvd.so
+%{_libdir}/vlc/fb.so
+%{_libdir}/vlc/file.so
+%{_libdir}/vlc/filter_deinterlace.so
+%{_libdir}/vlc/filter_distort.so
+%{_libdir}/vlc/filter_invert.so
+%{_libdir}/vlc/filter_transform.so
+%{_libdir}/vlc/filter_wall.so
+%{_libdir}/vlc/fx_scope.so
+%{_libdir}/vlc/http.so
+%{_libdir}/vlc/ipv4.so
+%{_libdir}/vlc/ipv6.so
+%{_libdir}/vlc/logger.so
+%{_libdir}/vlc/lpcm_adec.so
+%{_libdir}/vlc/memcpy.so
+%{_libdir}/vlc/mga.so
+%{_libdir}/vlc/mpeg_es.so
+%{_libdir}/vlc/mpeg_ps.so
+%{_libdir}/vlc/mpeg_ts.so
+%{_libdir}/vlc/null.so
+%{_libdir}/vlc/rc.so
+%{_libdir}/vlc/spudec.so
+%{_libdir}/vlc/udp.so
+%{_libdir}/vlc/vcd.so
+%{_libdir}/vlc/x11.so
+#%{_libdir}/vlc/xmga.so
 
 %{_mandir}/man1/*
 %{_menudir}/vlc
@@ -317,7 +317,7 @@ rm -fr %buildroot
 %files gtk
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/gtk.so
+%{_libdir}/vlc/gtk.so
 %{_bindir}/gvlc
 %{_menudir}/vlc-gtk
 %{_miconsdir}/gvlc.png
@@ -331,7 +331,7 @@ rm -fr %buildroot
 %files gnome
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/gnome.so
+%{_libdir}/vlc/gnome.so
 %{_bindir}/gnome-vlc
 %{_menudir}/vlc-gnome
 %{_miconsdir}/gnome-vlc.png
@@ -346,7 +346,7 @@ rm -fr %buildroot
 %files qt
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/qt.so
+%{_libdir}/vlc/qt.so
 %{_bindir}/qvlc
 %{_menudir}/vlc-qt
 %{_miconsdir}/qvlc.png
@@ -361,52 +361,52 @@ rm -fr %buildroot
 %files ncurses
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/ncurses.so
+%{_libdir}/vlc/ncurses.so
 
 %if %plugin_lirc
 %files lirc
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/lirc.so
+%{_libdir}/vlc/lirc.so
 %endif
 
 # video plugins
 %files sdl
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/sdl.so
+%{_libdir}/vlc/sdl.so
 
 %files ggi
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/ggi.so
+%{_libdir}/vlc/ggi.so
 
 %files aa
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/aa.so
+%{_libdir}/vlc/aa.so
 
 # codec plugin
 %files mad
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/mad.so
+%{_libdir}/vlc/mad.so
 
 #audio plugins
 %files esd
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/esd.so
+%{_libdir}/vlc/esd.so
 
 %files arts
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/arts.so
+%{_libdir}/vlc/arts.so
 
 %files alsa
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/alsa.so
+%{_libdir}/vlc/alsa.so
 
 %changelog
 * Thu May 23 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.0-1mdk

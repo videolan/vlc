@@ -1,1 +1,1 @@
-esd_SOURCES = esd.c aout_esd.c
+esd_SOURCES = esd.c

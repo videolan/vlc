@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.13 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: xvideo.c,v 1.14 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -30,7 +30,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "xcommon.h"
 
@@ -53,7 +53,7 @@
 
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the X11 hardware display you want to use.\nBy default vlc will " \
+    "Specify the X11 hardware display you want to use. By default vlc will " \
     "use the value of the DISPLAY environment variable.")
 
 #define CHROMA_TEXT N_("XVimage chroma format")
@@ -72,7 +72,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("XVideo extension module") )
     ADD_CAPABILITY( VOUT, 150 )
-    ADD_SHORTCUT( "xvideo" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

@@ -26,7 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -48,11 +49,6 @@
 #   include "input_iovec.h"
 #endif
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-
 #include "input_vcd.h"
 #include "cdrom_tools.h"
 
@@ -65,12 +61,12 @@
  *****************************************************************************/
 /* called from outside */
 
-static int  VCDOpen         ( struct input_thread_s *);
-static void VCDClose        ( struct input_thread_s *);
-static int  VCDRead         ( struct input_thread_s *, byte_t *, size_t );
-static void VCDSeek         ( struct input_thread_s *, off_t );
-static int  VCDSetArea      ( struct input_thread_s *, struct input_area_s * );
-static int  VCDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * );
+static int  VCDOpen         ( input_thread_t *);
+static void VCDClose        ( input_thread_t *);
+static int  VCDRead         ( input_thread_t *, byte_t *, size_t );
+static void VCDSeek         ( input_thread_t *, off_t );
+static int  VCDSetArea      ( input_thread_t *, input_area_t * );
+static int  VCDSetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -95,7 +91,7 @@ void _M( access_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * VCDOpen: open vcd
  *****************************************************************************/
-static int VCDOpen( struct input_thread_s *p_input )
+static int VCDOpen( input_thread_t *p_input )
 {
     char *                  psz_orig;
     char *                  psz_parser;
@@ -147,22 +143,21 @@ static int VCDOpen( struct input_thread_s *p_input )
             free( psz_orig );
             return -1;
         }
-        psz_source = config_GetPszVariable( "vcd" );
+        psz_source = config_GetPsz( p_input, "vcd" );
     }
 
     /* test the type of file given */
     
     if( stat( psz_source, &stat_info ) == -1 )
     {
-        intf_ErrMsg( "input: vcd: cannot stat() source `%s' (%s)",
-                     psz_source, strerror(errno));
+        msg_Err( p_input, "cannot stat() source `%s' (%s)",
+                          psz_source, strerror(errno));
         return( -1 );
     }
     
     if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode))
     {
-        intf_WarnMsg( 3, "input : VCD plugin discarded"
-                         " (not a valid drive)" );
+        msg_Warn( p_input, "vcd module discarded (not a valid drive)" );
         return -1;
     }
     
@@ -171,7 +166,7 @@ static int VCDOpen( struct input_thread_s *p_input )
 
     if( p_vcd == NULL )
     {
-        intf_ErrMsg( "vcd error: out of memory" );
+        msg_Err( p_input, "out of memory" );
         return -1;
     }
     
@@ -193,7 +188,7 @@ static int VCDOpen( struct input_thread_s *p_input )
 
     if( p_vcd->i_handle == -1 )
     {
-        intf_ErrMsg( "input: vcd: Could not open %s\n", psz_source );
+        msg_Err( p_input, "could not open %s\n", psz_source );
         free (p_vcd);
         return -1;
     }
@@ -203,14 +198,14 @@ static int VCDOpen( struct input_thread_s *p_input )
                                             psz_source );
     if( p_vcd->nb_tracks < 0 )
     {
-        intf_ErrMsg( "input: vcd: was unable to count tracks" );
+        msg_Err( p_input, "unable to count tracks" );
         close( p_vcd->i_handle );
         free( p_vcd );
         return -1;
     }
     else if( p_vcd->nb_tracks <= 1 )
     {
-        intf_ErrMsg( "input: vcd: no movie tracks found" );
+        msg_Err( p_input, "no movie tracks found" );
         close( p_vcd->i_handle );
         free( p_vcd );
         return -1;
@@ -220,7 +215,7 @@ static int VCDOpen( struct input_thread_s *p_input )
                                          psz_source );
     if( p_vcd->p_sectors == NULL )
     {
-        input_BuffersEnd( p_input->p_method_data );
+        input_BuffersEnd( p_input, p_input->p_method_data );
         close( p_vcd->i_handle );
         free( p_vcd );
         return -1;
@@ -270,7 +265,7 @@ static int VCDOpen( struct input_thread_s *p_input )
 /*****************************************************************************
  * VCDClose: closes vcd
  *****************************************************************************/
-static void VCDClose( struct input_thread_s *p_input )
+static void VCDClose( input_thread_t *p_input )
 {
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
 
@@ -306,8 +301,7 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
         if ( ioctl_ReadSector( p_vcd->i_handle, p_vcd->i_sector, 
                     p_buffer + i_index * VCD_DATA_SIZE ) < 0 )
         {
-            intf_ErrMsg( "input: vcd: could not read sector %d\n", 
-                    p_vcd->i_sector );
+            msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;
         }
 
@@ -322,7 +316,7 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
             p_area = p_input->stream.pp_areas[
                     p_input->stream.p_selected_area->i_id + 1 ];
             
-            intf_WarnMsg( 4, "input: vcd info: new title" );
+            msg_Dbg( p_input, "new title" );
             
             p_area->i_part = 1;
             VCDSetArea( p_input, p_area );
@@ -336,13 +330,12 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
         if ( ioctl_ReadSector( p_vcd->i_handle, p_vcd->i_sector, 
                     p_last_sector ) < 0 )
         {
-            intf_ErrMsg( "input: vcd: could not read sector %d\n", 
-                    p_vcd->i_sector );
+            msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;
         }
         
-        FAST_MEMCPY( p_buffer + i_blocks * VCD_DATA_SIZE,
-                    p_last_sector, i_len % VCD_DATA_SIZE );
+        p_input->p_vlc->pf_memcpy( p_buffer + i_blocks * VCD_DATA_SIZE,
+                                   p_last_sector, i_len % VCD_DATA_SIZE );
         i_read += i_len % VCD_DATA_SIZE;
     }
     

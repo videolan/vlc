@@ -2,7 +2,7 @@
  * ac3_spdif.h: header for ac3 pass-through
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.h,v 1.3 2002/03/15 01:47:16 stef Exp $
+ * $Id: ac3_spdif.h,v 1.4 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -68,7 +68,6 @@ typedef struct ac3_spdif_thread_s
      * Input properties
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-    decoder_config_t *  p_config;
 
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;

@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.12 2002/05/04 15:49:56 sam Exp $
+ * $Id: ipv4.c,v 1.13 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -65,7 +65,7 @@
  * Local prototypes
  *****************************************************************************/
 static void getfunctions( function_list_t * );
-static int  NetworkOpen( struct network_socket_s * );
+static int  NetworkOpen( vlc_object_t *, network_socket_t * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -76,7 +76,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("IPv4 network abstraction layer") )
     ADD_CAPABILITY( NETWORK, 50 )
-    ADD_SHORTCUT( "ipv4" )
 MODULE_INIT_STOP
  
 MODULE_ACTIVATE_START
@@ -126,7 +125,7 @@ static int BuildAddr( struct sockaddr_in * p_socket,
             /* We have a fqdn, try to find its address */
             if ( (p_hostent = gethostbyname( psz_address )) == NULL )
             {
-                intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_address );
+//X                intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_address );
                 return( -1 );
             }
 
@@ -151,7 +150,7 @@ static int BuildAddr( struct sockaddr_in * p_socket,
  *   Its use leads to great confusion and is currently discouraged.
  * This function returns -1 in case of error.
  *****************************************************************************/
-static int OpenUDP( network_socket_t * p_socket )
+static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 {
     char * psz_bind_addr = p_socket->psz_bind_addr;
     int i_bind_port = p_socket->i_bind_port;
@@ -166,14 +165,14 @@ static int OpenUDP( network_socket_t * p_socket )
 
     if( i_bind_port == 0 )
     {
-        i_bind_port = config_GetIntVariable( "server-port" );
+        i_bind_port = config_GetInt( p_this, "server-port" );
     }
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
     if( (i_handle = socket( AF_INET, SOCK_DGRAM, 0 )) == -1 )
     {
-        intf_ErrMsg( "ipv4 error: cannot create socket (%s)", strerror(errno) );
+        msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
         return( -1 );
     }
 
@@ -182,8 +181,8 @@ static int OpenUDP( network_socket_t * p_socket )
     if( setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_ErrMsg( "ipv4 error: cannot configure socket (SO_REUSEADDR: %s)",
-                     strerror(errno));
+        msg_Err( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
+                          strerror(errno));
         close( i_handle );
         return( -1 );
     }
@@ -194,9 +193,8 @@ static int OpenUDP( network_socket_t * p_socket )
     if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_WarnMsg( 1,
-                      "ipv4 warning: cannot configure socket (SO_RCVBUF: %s)",
-                      strerror(errno));
+        msg_Warn( p_this, "cannot configure socket (SO_RCVBUF: %s)",
+                          strerror(errno));
     }
  
     /* Check if we really got what we have asked for, because Linux, etc.
@@ -207,13 +205,13 @@ static int OpenUDP( network_socket_t * p_socket )
     if( getsockopt( i_handle, SOL_SOCKET, SO_RCVBUF,
                     (void*) &i_opt, &i_opt_size ) == -1 )
     {
-        intf_WarnMsg( 1, "ipv4 warning: cannot query socket (SO_RCVBUF: %s)",
-                         strerror(errno));
+        msg_Warn( p_this, "cannot query socket (SO_RCVBUF: %s)",
+                          strerror(errno) );
     }
     else if( i_opt < 0x80000 )
     {
-        intf_WarnMsg( 1, "ipv4 warning: socket buffer size is 0x%x"
-                         " instead of 0x%x", i_opt, 0x80000 );
+        msg_Warn( p_this, "socket buffer size is 0x%x instead of 0x%x",
+                          i_opt, 0x80000 );
     }
     
     
@@ -241,7 +239,7 @@ static int OpenUDP( network_socket_t * p_socket )
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
-        intf_ErrMsg( "ipv4 error: cannot bind socket (%s)", strerror(errno) );
+        msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
         close( i_handle );
         return( -1 );
     }
@@ -253,9 +251,8 @@ static int OpenUDP( network_socket_t * p_socket )
         if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST,
                         (void*) &i_opt, sizeof( i_opt ) ) == -1 )
         {
-            intf_WarnMsg( 1,
-                    "ipv4 warning: cannot configure socket (SO_BROADCAST: %s)",
-                    strerror(errno));
+            msg_Warn( p_this, "cannot configure socket (SO_BROADCAST: %s)",
+                       strerror(errno) );
         }
     }
  
@@ -280,8 +277,8 @@ static int OpenUDP( network_socket_t * p_socket )
         if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
-            intf_ErrMsg( "ipv4 error: failed to join IP multicast group (%s)",
-                         strerror(errno) );
+            msg_Err( p_this, "failed to join IP multicast group (%s)",
+                             strerror(errno) );
             close( i_handle );
             return( -1 );
         }
@@ -292,7 +289,7 @@ static int OpenUDP( network_socket_t * p_socket )
         /* Build socket for remote connection */
         if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
         {
-            intf_ErrMsg( "ipv4 error: cannot build remote address" );
+            msg_Err( p_this, "cannot build remote address" );
             close( i_handle );
             return( -1 );
         }
@@ -301,8 +298,7 @@ static int OpenUDP( network_socket_t * p_socket )
         if( connect( i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )
         {
-            intf_ErrMsg( "ipv4 error: cannot connect socket (%s)",
-                         strerror(errno) );
+            msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
             close( i_handle );
             return( -1 );
         }
@@ -321,7 +317,7 @@ static int OpenUDP( network_socket_t * p_socket )
  * Other parameters are ignored.
  * This function returns -1 in case of error.
  *****************************************************************************/
-static int OpenTCP( network_socket_t * p_socket )
+static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
 {
     char * psz_server_addr = p_socket->psz_server_addr;
     int i_server_port = p_socket->i_server_port;
@@ -338,7 +334,7 @@ static int OpenTCP( network_socket_t * p_socket )
      * protocol */
     if( (i_handle = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
     {
-        intf_ErrMsg( "ipv4 error: cannot create socket (%s)", strerror(errno) );
+        msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
         return( -1 );
     }
 
@@ -353,8 +349,7 @@ static int OpenTCP( network_socket_t * p_socket )
     if( connect( i_handle, (struct sockaddr *) &sock,
                  sizeof( sock ) ) == (-1) )
     {
-        intf_ErrMsg( "ipv4 error: cannot connect socket (%s)",
-                     strerror(errno) );
+        msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
         close( i_handle );
         return( -1 );
     }
@@ -368,14 +363,14 @@ static int OpenTCP( network_socket_t * p_socket )
 /*****************************************************************************
  * NetworkOpen: wrapper around OpenUDP and OpenTCP
  *****************************************************************************/
-static int NetworkOpen( network_socket_t * p_socket )
+static int NetworkOpen( vlc_object_t * p_this, network_socket_t * p_socket )
 {
     if( p_socket->i_type == NETWORK_UDP )
     {
-        return OpenUDP( p_socket );
+        return OpenUDP( p_this, p_socket );
     }
     else
     {
-        return OpenTCP( p_socket );
+        return OpenTCP( p_this, p_socket );
     }
 }

@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.20 2002/05/29 10:08:03 gbazin Exp $
+ * $Id: dummy.c,v 1.21 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -62,7 +62,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( INTF, 0 )
     ADD_CAPABILITY( ACCESS, 0 )
     ADD_CAPABILITY( DEMUX, 0 )
-    ADD_SHORTCUT( "dummy" )
     ADD_SHORTCUT( "vlc" )
 MODULE_INIT_STOP
 

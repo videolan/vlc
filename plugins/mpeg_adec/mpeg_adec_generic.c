@@ -2,7 +2,7 @@
  * adec_generic.c: MPEG audio decoder
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec_generic.c,v 1.6 2002/01/09 00:33:37 asmax Exp $
+ * $Id: mpeg_adec_generic.c,v 1.7 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -25,10 +25,8 @@
 
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include <videolan/vlc.h>
-
-#include "input_ext-dec.h"
-#include "stream_control.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
 #include "mpeg_adec_generic.h"
 #include "mpeg_adec.h"

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.22 2002/05/30 13:58:17 gbazin Exp $
+ * $Id: vpar_headers.c,v 1.23 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,13 +28,9 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
@@ -118,8 +114,7 @@ u8 pi_scan[2][64] ATTR_ALIGN(16) =
  * ReferenceUpdate : Update the reference pointers when we have a new picture
  *****************************************************************************/
 static void inline ReferenceUpdate( vpar_thread_t * p_vpar,
-                                    int i_coding_type,
-                                    picture_t * p_newref )
+                                    int i_coding_type, picture_t * p_newref )
 {
     if( i_coding_type != B_CODING_TYPE )
     {
@@ -150,8 +145,8 @@ static void inline ReferenceUpdate( vpar_thread_t * p_vpar,
  * ReferenceReplace : Replace the last reference pointer when we destroy
  *                    a picture
  *****************************************************************************/
-static void inline ReferenceReplace( vpar_thread_t * p_vpar, int i_coding_type,
-                                     picture_t * p_newref )
+static void inline ReferenceReplace( vpar_thread_t * p_vpar,
+                                     int i_coding_type, picture_t * p_newref )
 {
     if( i_coding_type != B_CODING_TYPE )
     {
@@ -180,7 +175,7 @@ static inline void LoadMatrix( vpar_thread_t * p_vpar,
         /* Allocate a piece of memory to load the matrix. */
         if( (p_matrix->pi_matrix = (u8 *)malloc( 64*sizeof(u8) )) == NULL )
         {
-            intf_ErrMsg( "vpar error: allocation error in LoadMatrix()" );
+            msg_Err( p_vpar->p_fifo, "out of memory" );
             p_vpar->p_fifo->b_error = 1;
             return;
         }
@@ -264,27 +259,23 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
         p_vpar->c_sequences++;
         SequenceHeader( p_vpar );
         return 0;
-        break;
 
     case GROUP_START_CODE:
         GroupHeader( p_vpar );
         return 0;
-        break;
 
     case PICTURE_START_CODE:
         PictureHeader( p_vpar );
         return 0;
-        break;
 
     case SEQUENCE_END_CODE:
-        intf_WarnMsg(3, "vpar warning: sequence end code received");
-
+        msg_Dbg( p_vpar->p_fifo, "sequence end code received" );
         if( p_vpar->sequence.p_backward != NULL )
+        {
             p_vpar->sequence.p_backward->b_force = 1;
+        }
         ReferenceUpdate( p_vpar, I_CODING_TYPE, NULL );
-
         return 1;
-        break;
 
     default:
         break;
@@ -426,10 +417,10 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     }
 
     /* check whether the input gives a particular aspect ratio */
-    if( p_vpar->p_config->p_demux_data
-         && ( *(int*)(p_vpar->p_config->p_demux_data) & 0x7 ) )
+    if( p_vpar->p_fifo->p_demux_data
+         && ( *(int*)(p_vpar->p_fifo->p_demux_data) & 0x7 ) )
     {
-        i_aspect = *(int*)(p_vpar->p_config->p_demux_data);
+        i_aspect = *(int*)(p_vpar->p_fifo->p_demux_data);
     }
 
     /* Store calculated aspect ratio */
@@ -495,46 +486,39 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     /* Extension and User data */
     ExtensionAndUserData( p_vpar );
 
-    /* XXX: The vout request and fifo opening will eventually be here */
-
     /* Spawn a video output if there is none */
-    vlc_mutex_lock( &p_vout_bank->lock );
-    
-    if( p_vout_bank->i_count != 0 )
-    {
-        /* Take the first video output FIXME: take the best one */
-        p_vpar->p_vout = p_vout_bank->pp_vout[ 0 ];
 
+    p_vpar->p_vout = vlc_object_find( p_vpar->p_fifo->p_vlc, VLC_OBJECT_VOUT,
+                                                             FIND_CHILD );
+    
+    if( p_vpar->p_vout )
+    {
         if( p_vpar->p_vout->render.i_width != p_vpar->sequence.i_width
              || p_vpar->p_vout->render.i_height != p_vpar->sequence.i_height
              || p_vpar->p_vout->render.i_chroma != ChromaToFourCC( p_vpar->sequence.i_chroma_format )
              || p_vpar->p_vout->render.i_aspect != p_vpar->sequence.i_aspect )
         {
-            p_vout_bank->pp_vout[ 0 ] = NULL;
-            p_vout_bank->i_count--;
-            vlc_mutex_unlock( &p_vout_bank->lock );
-            vout_DestroyThread( p_vpar->p_vout, NULL );
-            vlc_mutex_lock( &p_vout_bank->lock );
-
-            /* XXX: race condition here if p_vout_bank->i_count was updated */
-            if( p_vout_bank->i_count )
-            {
-                vlc_mutex_unlock( &p_vout_bank->lock );
-                intf_ErrMsg( "vpar error: can't open vout, aborting" );
-                p_vpar->p_fifo->b_error = 1;
-                return;
-            }
+            /* We are not interested in this format, close this vout */
+            vlc_object_unlink_all( p_vpar->p_vout );
+            vlc_object_release( p_vpar->p_vout );
+            vout_DestroyThread( p_vpar->p_vout );
+            p_vpar->p_vout = NULL;
+        }
+        else
+        {
+            /* This video output is cool! Hijack it. */
+            vlc_object_unlink_all( p_vpar->p_vout );
+            vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo );
+            vlc_object_release( p_vpar->p_vout );
         }
     }
 
-    if( p_vout_bank->i_count == 0 )
+    if( p_vpar->p_vout == NULL )
     {
-        intf_WarnMsg( 1, "vpar: no vout present, spawning one" );
+        msg_Dbg( p_vpar->p_fifo, "no vout present, spawning one" );
 
-        vlc_mutex_unlock( &p_vout_bank->lock );
-
-        p_vpar->p_vout = vout_CreateThread(
-                           NULL, p_vpar->sequence.i_width,
+        p_vpar->p_vout = vout_CreateThread( p_vpar->p_fifo->p_this,
+                           p_vpar->sequence.i_width,
                            p_vpar->sequence.i_height,
                            ChromaToFourCC( p_vpar->sequence.i_chroma_format ),
                            p_vpar->sequence.i_aspect );
@@ -542,18 +526,11 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* Everything failed */
         if( p_vpar->p_vout == NULL )
         {
-            intf_ErrMsg( "vpar error: can't open vout, aborting" );
+            msg_Err( p_vpar->p_fifo, "cannot open vout, aborting" );
             p_vpar->p_fifo->b_error = 1;
             return;
         }
-        
-        vlc_mutex_lock( &p_vout_bank->lock );
-
-        p_vout_bank->pp_vout[ p_vout_bank->i_count ] = p_vpar->p_vout;
-        p_vout_bank->i_count++;
     }
-
-    vlc_mutex_unlock( &p_vout_bank->lock );
 }
 
 /*****************************************************************************
@@ -572,7 +549,7 @@ static void GroupHeader( vpar_thread_t * p_vpar )
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
     int                 i_structure, i_previous_coding_type;
-    boolean_t           b_parsable = 0;
+    vlc_bool_t          b_parsable = 0;
 
     /* Retrieve the PTS. */
     CurrentPTS( &p_vpar->bit_stream, &p_vpar->sequence.next_pts,
@@ -696,7 +673,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
             p_vpar->picture.i_current_structure = 0;
 
-            intf_WarnMsg( 2, "Odd number of field pictures." );
+            msg_Warn( p_vpar->p_fifo, "odd number of field pictures" );
         }
         else
         {
@@ -867,7 +844,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     p_vpar->picture.i_field_width = p_vpar->sequence.i_width
         << ( 1 - p_vpar->picture.b_frame_structure );
 
-    if( !p_vpar->p_config->p_stream_ctrl->b_grayscale )
+    if( !p_vpar->p_fifo->p_stream_ctrl->b_grayscale )
     {
         switch( p_vpar->sequence.i_chroma_format )
         {

@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: clone.c,v 1.4 2002/05/28 22:49:25 sam Exp $
+ * $Id: clone.c,v 1.5 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,10 +28,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #include "filter_common.h"
 
@@ -70,12 +68,11 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Clone specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     int    i_clones;
     vout_thread_t **pp_vout;
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
@@ -117,23 +114,22 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "vout error: out of memory" );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     /* Look what method was requested */
-    p_vout->p_sys->i_clones = config_GetIntVariable( "clone-count" );
+    p_vout->p_sys->i_clones = config_GetInt( p_vout, "clone-count" );
 
     p_vout->p_sys->i_clones = __MAX( 1, __MIN( 99, p_vout->p_sys->i_clones ) );
 
-    intf_WarnMsg( 3, "vout info: spawning %i clone(s)",
-                  p_vout->p_sys->i_clones );
+    msg_Dbg( p_vout, "spawning %i clone(s)", p_vout->p_sys->i_clones );
 
     p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_clones *
                                      sizeof(vout_thread_t *) );
     if( p_vout->p_sys->pp_vout == NULL )
     {
-        intf_ErrMsg( "vout error: out of memory" );
+        msg_Err( p_vout, "out of memory" );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -159,30 +155,30 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPszVariable( "filter" );
-    config_PutPszVariable( "filter", NULL );
+    psz_filter = config_GetPsz( p_vout, "filter" );
+    config_PutPsz( p_vout, "filter", NULL );
 
-    intf_WarnMsg( 3, "vout info: spawning the real video outputs" );
+    msg_Dbg( p_vout, "spawning the real video outputs" );
 
     for( i_vout = 0; i_vout < p_vout->p_sys->i_clones; i_vout++ )
     {
         p_vout->p_sys->pp_vout[ i_vout ] =
-                vout_CreateThread( NULL,
+                vout_CreateThread( p_vout->p_this,
                             p_vout->render.i_width, p_vout->render.i_height,
                             p_vout->render.i_chroma, p_vout->render.i_aspect );
         if( p_vout->p_sys->pp_vout[ i_vout ] == NULL )
         {
-            intf_ErrMsg( "vout error: failed to clone %i vout threads",
-                         p_vout->p_sys->i_clones );
+            msg_Err( p_vout, "failed to clone %i vout threads",
+                             p_vout->p_sys->i_clones );
             p_vout->p_sys->i_clones = i_vout;
             RemoveAllVout( p_vout );
-            config_PutPszVariable( "filter", psz_filter );
+            config_PutPsz( p_vout, "filter", psz_filter );
             if( psz_filter ) free( psz_filter );
             return 0;
         }
     }
 
-    config_PutPszVariable( "filter", psz_filter );
+    config_PutPsz( p_vout, "filter", psz_filter );
     if( psz_filter ) free( psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
@@ -276,7 +272,7 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 
             while( p_in < p_in_end )
             {
-                FAST_MEMCPY( p_out, p_in, i_out_pitch );
+                p_vout->p_vlc->pf_memcpy( p_out, p_in, i_out_pitch );
                 p_in += i_in_pitch;
                 p_out += i_out_pitch;
             }
@@ -307,8 +303,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
     while( p_vout->p_sys->i_clones )
     {
          --p_vout->p_sys->i_clones;
-         vout_DestroyThread(
-                   p_vout->p_sys->pp_vout[ p_vout->p_sys->i_clones ], NULL );
+         vout_DestroyThread( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
     }
 }
 

@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.17 2002/04/19 13:56:11 sam Exp $
+ * $Id: mga.c,v 1.18 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -33,14 +33,12 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <sys/mman.h>                                          /* PROT_WRITE */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #ifdef SYS_BSD
 #include <sys/types.h>                                     /* typedef ushort */
 #endif
-
-#include "video.h"
-#include "video_output.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -66,7 +64,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("Matrox Graphic Array video module") )
     ADD_CAPABILITY( VOUT, 10 )
-    ADD_SHORTCUT( "mga" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -123,19 +120,17 @@ typedef struct mga_vid_config_s
 } mga_vid_config_t;
 #endif
 
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     mga_vid_config_t    mga;
     int                 i_fd;
     byte_t *            p_video;
+};
 
-} vout_sys_t;
-
-typedef struct picture_sys_s
+struct picture_sys_s
 {
     int     i_frame;
-
-} picture_sys_t;
+};
 
 #define CEIL32(x) (((x)+31)&~31)
 
@@ -165,14 +160,14 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("vout error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     p_vout->p_sys->i_fd = open( "/dev/mga_vid", O_RDWR );
     if( p_vout->p_sys->i_fd == -1 )
     {
-        intf_ErrMsg( "vout error: can't open MGA driver /dev/mga_vid" );
+        msg_Err( p_vout, "cannot open MGA driver /dev/mga_vid" );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -217,18 +212,18 @@ static int vout_Init( vout_thread_t *p_vout )
     
     if( ioctl(p_vout->p_sys->i_fd, MGA_VID_CONFIG, &p_vout->p_sys->mga) )
     {
-        intf_ErrMsg( "vout error: MGA config ioctl failed" );
+        msg_Err( p_vout, "MGA config ioctl failed" );
         return -1;
     }
 
     if( p_vout->p_sys->mga.card_type == MGA_G200 )
     {
-        intf_WarnMsg( 3, "vout info: detected MGA G200 (%d MB Ram)",
+        msg_Dbg( p_vout, "detected MGA G200 (%d MB Ram)",
                          p_vout->p_sys->mga.ram_size );
     }
     else
     {
-        intf_WarnMsg( 3, "vout info: detected MGA G400/G450 (%d MB Ram)",
+        msg_Dbg( p_vout, "detected MGA G400/G450 (%d MB Ram)",
                          p_vout->p_sys->mga.ram_size );
     }
 

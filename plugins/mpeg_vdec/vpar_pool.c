@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.8 2002/04/25 21:52:42 sam Exp $
+ * $Id: vpar_pool.c,v 1.9 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,13 +27,9 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <stdlib.h>                                             /* realloc() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
@@ -60,7 +56,7 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
     int j;
 
     /* Initialize mutex and cond. */
-    vlc_mutex_init( &p_vpar->pool.lock );
+    vlc_mutex_init( p_vpar->p_fifo, &p_vpar->pool.lock );
     vlc_cond_init( &p_vpar->pool.wait_empty );
     vlc_cond_init( &p_vpar->pool.wait_undecoded );
 
@@ -75,16 +71,18 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
 
     /* Initialize fake video decoder structure (used when
      * decoder == parser). */
-    if ( (p_vpar->pool.p_vdec =
-                (vdec_thread_t *)malloc( sizeof(vdec_thread_t) )) == NULL )
+    p_vpar->pool.p_vdec = vlc_object_create( p_vpar->p_fifo,
+                                             sizeof(vdec_thread_t) );
+    if ( p_vpar->pool.p_vdec == NULL )
     {
-        intf_ErrMsg("vdec error: not enough memory for vdec_CreateThread() to create the new thread");
+        msg_Err( p_vpar->p_fifo, "out of memory" );
         p_vpar->p_fifo->b_error = 1;
         return;
     }
-    p_vpar->pool.p_vdec->b_die = 0;
     p_vpar->pool.p_vdec->p_pool = &p_vpar->pool;
     vdec_InitThread( p_vpar->pool.p_vdec );
+
+    vlc_object_attach( p_vpar->pool.p_vdec, p_vpar->p_fifo );
 
     for( j = 0; j < 12; j++ )
     {
@@ -107,7 +105,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
     int                 i_new_smp;
     stream_ctrl_t *     p_control;
 
-    p_control = p_vpar->p_config->p_stream_ctrl;
+    p_control = p_vpar->p_fifo->p_stream_ctrl;
     vlc_mutex_lock( &p_control->control_lock );
     i_new_smp = p_control->i_smp;
     vlc_mutex_unlock( &p_control->control_lock );
@@ -127,6 +125,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
             {
                 int j;
 
+                vlc_object_unlink_all( p_vpar->pool.pp_vdec[i] );
                 vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
 
                 for( j = 0; j < 12; j++ )
@@ -173,6 +172,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
                 }
 
                 p_vpar->pool.pp_vdec[i] = vdec_CreateThread( &p_vpar->pool );
+                vlc_object_attach( p_vpar->pool.pp_vdec[i], p_vpar->p_fifo );
             }
 
         }
@@ -218,6 +218,7 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
     {
         int j;
 
+        vlc_object_unlink_all( p_vpar->pool.pp_vdec[i] );
         vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
 
         for( j = 0; j < 12; j++ )
@@ -234,7 +235,9 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
     }
 
     /* Free fake video decoder (used when parser == decoder). */
+    vlc_object_unlink_all( p_vpar->pool.p_vdec );
     vdec_EndThread( p_vpar->pool.p_vdec );
+    vlc_object_destroy( p_vpar->pool.p_vdec );
 
     /* Destroy lock and cond. */
     vlc_mutex_destroy( &p_vpar->pool.lock );

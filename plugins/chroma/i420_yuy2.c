@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.7 2002/05/21 03:37:17 sam Exp $
+ * $Id: i420_yuy2.c,v 1.8 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,10 +28,8 @@
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #include "i420_yuy2.h"
 
@@ -308,8 +306,7 @@ static void I420_IUYV( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
     /* FIXME: TODO ! */
-    intf_ErrMsg( "chroma error: I420_IUYV unimplemented, "
-                 "please harass <sam@zoy.org>" );
+    msg_Err( p_vout, "I420_IUYV unimplemented, please harass <sam@zoy.org>" );
 }
 
 /*****************************************************************************

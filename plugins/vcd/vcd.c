@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.11 2002/05/22 12:50:21 jobi Exp $
+ * $Id: vcd.c,v 1.12 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -43,7 +43,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("VCD input module") )
     ADD_CAPABILITY( ACCESS, 80 )
-    ADD_SHORTCUT( "vcd" )
     ADD_SHORTCUT( "svcd" )
 MODULE_INIT_STOP
 

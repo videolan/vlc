@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.12 2002/05/30 08:59:42 xav Exp $
+ * $Id: intf_eject.c,v 1.13 2002/06/01 12:32:01 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,7 +107,7 @@ static int EjectSCSI ( int i_fd );
  * returns 1 on failure
  * returns -1 if not implemented
  *****************************************************************************/
-int intf_Eject( const char *psz_device )
+int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     int i_ret;
 
@@ -138,7 +138,7 @@ int intf_Eject( const char *psz_device )
             if( i_ret == 0 && ferror( p_eject ) != 0 )
             {
                 pclose( p_eject );
-                return 1;
+                return VLC_EGENERIC;
             }
 
             pclose( p_eject );
@@ -147,7 +147,7 @@ int intf_Eject( const char *psz_device )
 
             if( strstr( psz_result, "Disk Ejected" ) != NULL )
             {
-                return 0;
+                return VLC_SUCCESS;
             }
         }
     }
@@ -226,8 +226,8 @@ int intf_Eject( const char *psz_device )
    
     if( i_fd == -1 )
     {
-        intf_ErrMsg( "intf error: couldn't open device %s", psz_device );
-        return 1;
+        msg_Err( p_this, "could not open device %s", psz_device );
+        return VLC_EGENERIC;
     }
 
 #if defined(SYS_LINUX) && defined(HAVE_LINUX_VERSION_H)
@@ -241,14 +241,14 @@ int intf_Eject( const char *psz_device )
 
     if( i_ret != 0 )
     {
-        intf_ErrMsg( "intf error: couldn't eject %s", psz_device );
+        msg_Err( p_this, "could not eject %s", psz_device );
     }
 
 #elif defined (HAVE_DVD_H)
     i_ret = ioctl( i_fd, CDROMEJECT, 0 );
 
 #else
-    intf_ErrMsg( "intf error: CD-Rom ejection unsupported on this platform" );
+    msg_Warn( p_this, "CD-Rom ejection unsupported on this platform" );
     i_ret = -1;
 
 #endif
@@ -286,7 +286,7 @@ static int EjectSCSI( int i_fd )
     i_status = ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd );
     if( i_status != 0 )
     {
-        return 1;
+        return VLC_EGENERIC;
     }
 
     scsi_cmd.inlen  = 0;
@@ -300,7 +300,7 @@ static int EjectSCSI( int i_fd )
     i_status = ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd );
     if( i_status != 0 )
     {
-        return 1;
+        return VLC_EGENERIC;
     }
   
     scsi_cmd.inlen  = 0;
@@ -314,7 +314,7 @@ static int EjectSCSI( int i_fd )
     i_status = ioctl( i_fd, SCSI_IOCTL_SEND_COMMAND, (void *)&scsi_cmd );
     if( i_status != 0 )
     {
-        return 1;
+        return VLC_EGENERIC;
     }
   
     /* Force kernel to reread partition table when new disc inserted */

@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.11 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: configuration.h,v 1.12 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -45,7 +45,7 @@
 
 #define MODULE_CONFIG_ITEM                  0x00F0
 
-typedef struct module_config_s
+struct module_config_s
 {
     int          i_type;                               /* Configuration type */
     char        *psz_name;                                    /* Option name */
@@ -55,49 +55,43 @@ typedef struct module_config_s
     char        *psz_value;                                  /* Option value */
     int          i_value;                                    /* Option value */
     float        f_value;                                    /* Option value */
-    void        *p_callback;     /* Function to call when commiting a change */
-    vlc_mutex_t *p_lock;            /* lock to use when modifying the config */
-    boolean_t    b_dirty;          /* Dirty flag to indicate a config change */
 
-} module_config_t;
+    /* Function to call when commiting a change */
+    void ( * pf_callback ) ( vlc_object_t * );
+
+    vlc_mutex_t *p_lock;            /* lock to use when modifying the config */
+    vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
+};
 
 /*****************************************************************************
  * Prototypes - these methods are used to get, set or manipulate configuration
  * data.
  *****************************************************************************/
-#ifndef __PLUGIN__
-int    config_GetIntVariable( const char *psz_name );
-float  config_GetFloatVariable( const char *psz_name );
-char * config_GetPszVariable( const char *psz_name );
-void   config_PutIntVariable( const char *psz_name, int i_value );
-void   config_PutFloatVariable( const char *psz_name, float f_value );
-void   config_PutPszVariable( const char *psz_name, char *psz_value );
+VLC_EXPORT( int,    __config_GetInt,   (vlc_object_t *, const char *) );
+VLC_EXPORT( void,   __config_PutInt,   (vlc_object_t *, const char *, int) );
+VLC_EXPORT( float,  __config_GetFloat, (vlc_object_t *, const char *) );
+VLC_EXPORT( void,   __config_PutFloat, (vlc_object_t *, const char *, float) );
+VLC_EXPORT( char *, __config_GetPsz,   (vlc_object_t *, const char *) );
+VLC_EXPORT( void,   __config_PutPsz,   (vlc_object_t *, const char *, char *) );
 
-int    config_LoadConfigFile( const char *psz_module_name );
-int    config_SaveConfigFile( const char *psz_module_name );
-char * config_GetHomeDir( void );
-int    config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
-                           boolean_t b_ignore_errors );
+VLC_EXPORT( int,    config_LoadCmdLine,    ( vlc_object_t *, int *, char *[], vlc_bool_t ) );
+VLC_EXPORT( char *, config_GetHomeDir,     ( void ) );
+VLC_EXPORT( int,    config_LoadConfigFile, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char *psz_name ) );
 
-module_config_t *config_Duplicate     ( module_config_t * );
-module_config_t *config_FindConfig    ( const char * );
-void             config_SetCallbacks  ( module_config_t *, module_config_t * );
-void             config_UnsetCallbacks( module_config_t * );
+VLC_EXPORT( void, config_Duplicate, ( module_t *, module_config_t * ) );
+            void  config_Free       ( module_t * );
 
-#else
-#   define config_GetIntVariable p_symbols->config_GetIntVariable
-#   define config_PutIntVariable p_symbols->config_PutIntVariable
-#   define config_GetFloatVariable p_symbols->config_GetFloatVariable
-#   define config_PutFloatVariable p_symbols->config_PutFloatVariable
-#   define config_GetPszVariable p_symbols->config_GetPszVariable
-#   define config_PutPszVariable p_symbols->config_PutPszVariable
-#   define config_LoadConfigFile p_symbols->config_LoadConfigFile
-#   define config_SaveConfigFile p_symbols->config_SaveConfigFile
-#   define config_Duplicate      p_symbols->config_Duplicate
-#   define config_FindConfig     p_symbols->config_FindConfig
-#   define config_SetCallbacks   p_symbols->config_SetCallbacks
-#   define config_UnsetCallbacks p_symbols->config_UnsetCallbacks
-#endif
+VLC_EXPORT( void, config_SetCallbacks, ( module_config_t *, module_config_t * ) );
+VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
+
+#define config_GetInt(a,b) __config_GetInt(CAST_TO_VLC_OBJECT(a),b)
+#define config_PutInt(a,b,c) __config_PutInt(CAST_TO_VLC_OBJECT(a),b,c)
+#define config_GetFloat(a,b) __config_GetFloat(CAST_TO_VLC_OBJECT(a),b)
+#define config_PutFloat(a,b,c) __config_PutFloat(CAST_TO_VLC_OBJECT(a),b,c)
+#define config_GetPsz(a,b) __config_GetPsz(CAST_TO_VLC_OBJECT(a),b)
+#define config_PutPsz(a,b,c) __config_PutPsz(CAST_TO_VLC_OBJECT(a),b,c)
 
 /*****************************************************************************
  * Macros used to build the configuration structure.

@@ -2,7 +2,7 @@
  * mpeg_adec.h : audio decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_adec.h,v 1.2 2001/12/30 05:38:44 sam Exp $
+ * $Id: mpeg_adec.h,v 1.3 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -37,7 +37,6 @@ typedef struct adec_thread_s
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
     int                 i_read_bits;
-    decoder_config_t *  p_config;
 
     /*
      * Decoder properties
@@ -50,7 +49,7 @@ typedef struct adec_thread_s
     /*
      * Output properties
      */
-    struct aout_fifo_s *    p_aout_fifo;   /* stores the decompressed frames */
+    aout_fifo_t *       p_aout_fifo;   /* stores the decompressed frames */
 
 } adec_thread_t;
 

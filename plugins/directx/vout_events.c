@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.18 2002/05/18 22:41:43 gbazin Exp $
+ * $Id: vout_events.c,v 1.19 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,20 +30,17 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #include "netutils.h"
-
-#include "video.h"
-#include "video_output.h"
 
 #include <windows.h>
 #include <windowsx.h>
 #include <shellapi.h>
 
 #include <ddraw.h>
-
-#include "interface.h"
 
 #include "vout_directx.h"
 
@@ -77,7 +74,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
     vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
     if( DirectXCreateWindow( p_vout ) )
     {
-        intf_ErrMsg( "vout error: can't create window" );
+        msg_Err( p_vout, "out of memory" );
         p_vout->p_sys->i_event_thread_status = THREAD_FATAL;
         p_vout->p_sys->b_event_thread_die = 1;
     }
@@ -122,7 +119,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
             break;
 
         case WM_RBUTTONUP:
-            p_main->p_intf->b_menu_change = 1;
+            p_vout->p_vlc->p_intf->b_menu_change = 1;
             break;
 
         case WM_LBUTTONDOWN:
@@ -136,13 +133,13 @@ void DirectXEventThread( vout_thread_t *p_vout )
             /* the key events are first processed here. The next
              * message processed by this main message loop will be the
              * char translation of the key event */
-            intf_WarnMsg( 3, "vout: vout_Manage WM_KEYDOWN" );
+            msg_Dbg( p_vout, "WM_KEYDOWN" );
             switch( msg.wParam )
             {
             case VK_ESCAPE:
             case VK_F12:
                 /* exit application */
-                p_main->p_intf->b_die = 1;
+                p_vout->p_vlc->b_die = 1;
                 break;
             }
             TranslateMessage(&msg);
@@ -154,7 +151,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
             case 'q':
             case 'Q':
                 /* exit application */
-                p_main->p_intf->b_die = 1;
+                p_vout->p_vlc->b_die = 1;
                 break;
 
             case 'f':                            /* switch to fullscreen */
@@ -185,16 +182,16 @@ void DirectXEventThread( vout_thread_t *p_vout )
                 p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
                 break;
 
-            case '0': network_ChannelJoin( 0 ); break;
-            case '1': network_ChannelJoin( 1 ); break;
-            case '2': network_ChannelJoin( 2 ); break;
-            case '3': network_ChannelJoin( 3 ); break;
-            case '4': network_ChannelJoin( 4 ); break;
-            case '5': network_ChannelJoin( 5 ); break;
-            case '6': network_ChannelJoin( 6 ); break;
-            case '7': network_ChannelJoin( 7 ); break;
-            case '8': network_ChannelJoin( 8 ); break;
-            case '9': network_ChannelJoin( 9 ); break;
+            case '0': network_ChannelJoin( p_vout->p_this, 0 ); break;
+            case '1': network_ChannelJoin( p_vout->p_this, 1 ); break;
+            case '2': network_ChannelJoin( p_vout->p_this, 2 ); break;
+            case '3': network_ChannelJoin( p_vout->p_this, 3 ); break;
+            case '4': network_ChannelJoin( p_vout->p_this, 4 ); break;
+            case '5': network_ChannelJoin( p_vout->p_this, 5 ); break;
+            case '6': network_ChannelJoin( p_vout->p_this, 6 ); break;
+            case '7': network_ChannelJoin( p_vout->p_this, 7 ); break;
+            case '8': network_ChannelJoin( p_vout->p_this, 8 ); break;
+            case '9': network_ChannelJoin( p_vout->p_this, 9 ); break;
 
             default:
                 break;
@@ -213,12 +210,11 @@ void DirectXEventThread( vout_thread_t *p_vout )
 
     if( msg.message == WM_QUIT )
     {
-        intf_WarnMsg( 3, "vout: DirectXEventThread WM_QUIT... "
-                      "shouldn't happen!!" );
+        msg_Warn( p_vout, "WM_QUIT... should not happen!!" );
         p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
     }
 
-    intf_WarnMsg( 3, "vout: DirectXEventThread Terminating" );
+    msg_Dbg( p_vout, "DirectXEventThread Terminating" );
 
     /* clear the changes formerly signaled */
     p_vout->p_sys->i_changes = 0;
@@ -246,7 +242,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     HICON      vlc_icon = NULL;
     char       vlc_path[_MAX_PATH+1];
 
-    intf_WarnMsg( 3, "vout: DirectXCreateWindow" );
+    msg_Dbg( p_vout, "DirectXCreateWindow" );
 
     /* get this module's instance */
     hInstance = GetModuleHandle(NULL);
@@ -269,7 +265,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         if( colorkey == GetNearestColor( hdc, colorkey ) )
           break;
     }
-    intf_WarnMsg(3,"vout: DirectXCreateWindow background color:%i", colorkey);
+    msg_Dbg( p_vout, "background color: %i", colorkey );
 
     /* create the actual brush */  
     p_vout->p_sys->hbrush = CreateSolidBrush(colorkey);
@@ -279,10 +275,10 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     p_vout->p_sys->rect_display.right = GetDeviceCaps( hdc, HORZRES );
     p_vout->p_sys->rect_display.bottom = GetDeviceCaps( hdc, VERTRES );
     p_vout->p_sys->i_display_depth = GetDeviceCaps( hdc, BITSPIXEL );
-    intf_WarnMsg( 3, "vout: Screen dimensions %ix%i colour depth %i",
-                  p_vout->p_sys->rect_display.right,
-                  p_vout->p_sys->rect_display.bottom,
-                  p_vout->p_sys->i_display_depth );
+    msg_Dbg( p_vout, "screen dimensions %ix%i colour depth %i",
+                      p_vout->p_sys->rect_display.right,
+                      p_vout->p_sys->rect_display.bottom,
+                      p_vout->p_sys->i_display_depth );
 
     ReleaseDC( p_vout->p_sys->hwnd, hdc );
 
@@ -326,7 +322,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         /* Check why it failed. If it's because one already exists then fine */
         if( !GetClassInfo( hInstance, "VLC DirectX", &wndclass ) )
         {
-            intf_ErrMsg( "vout: DirectXCreateWindow RegisterClass FAILED" );
+            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED" );
             return (1);
         }
     }
@@ -356,7 +352,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                     NULL);                        /* no additional arguments */
 
     if (p_vout->p_sys->hwnd == NULL) {
-        intf_WarnMsg( 3, "vout: DirectXCreateWindow create window FAILED" );
+        msg_Warn( p_vout, "DirectXCreateWindow create window FAILED" );
         return (1);
     }
 
@@ -378,7 +374,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static void DirectXCloseWindow( vout_thread_t *p_vout )
 {
-    intf_WarnMsg( 3, "vout: DirectXCloseWindow" );
+    msg_Dbg( p_vout, "DirectXCloseWindow" );
 
     vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
 
@@ -432,10 +428,10 @@ static void DirectXUpdateRects( vout_thread_t *p_vout )
     IntersectRect( &rect_dest_clipped, &rect_dest, &rect_display );
 
 #if 0
-    intf_WarnMsg( 3, "vout: DirectXUpdateRects image_dst_clipped coords:"
-                  " %i,%i,%i,%i",
-                  rect_dest_clipped.left, rect_dest_clipped.top,
-                  rect_dest_clipped.right, rect_dest_clipped.bottom);
+    msg_Dbg( p_vout, "DirectXUpdateRects image_dst_clipped coords:"
+                     " %i,%i,%i,%i",
+                     rect_dest_clipped.left, rect_dest_clipped.top,
+                     rect_dest_clipped.right, rect_dest_clipped.bottom );
 #endif
 
     /* the 2 following lines are to fix a bug when clicking on the desktop */
@@ -465,10 +461,10 @@ static void DirectXUpdateRects( vout_thread_t *p_vout )
       (rect_dest.bottom - rect_dest.top);
 
 #if 0
-    intf_WarnMsg( 3, "vout: DirectXUpdateRects image_src_clipped"
-                  " coords: %i,%i,%i,%i",
-                  rect_src_clipped.left, rect_src_clipped.top,
-                  rect_src_clipped.right, rect_src_clipped.bottom);
+    msg_Dbg( p_vout, "DirectXUpdateRects image_src_clipped"
+                     " coords: %i,%i,%i,%i",
+                     rect_src_clipped.left, rect_src_clipped.top,
+                     rect_src_clipped.right, rect_src_clipped.bottom );
 #endif
 
 #undef rect_src
@@ -492,7 +488,8 @@ static void DirectXUpdateRects( vout_thread_t *p_vout )
 static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                                          WPARAM wParam, LPARAM lParam )
 {
-    vout_thread_t *p_vout;
+    vout_thread_t *p_vout =
+            (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
 
     switch( message )
     {
@@ -501,8 +498,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         {
         RECT     rect_window;
         POINT    point_window;
-
-        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
 
         /* update the window position */
         point_window.x = 0;
@@ -532,9 +527,17 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     /* the user wants to close the window */
     case WM_CLOSE:
-        intf_WarnMsg( 4, "vout: WinProc WM_CLOSE" );
+        msg_Dbg( p_vout, "WinProc WM_CLOSE" );
         /* exit application */
-        p_main->p_intf->b_die = 1;
+        p_vout->p_vlc->b_die = 1;
+        return 0;
+        break;
+
+    /* the window has been closed so shut down everything now */
+    case WM_DESTROY:
+        msg_Dbg( p_vout, "WinProc WM_DESTROY" );
+        /* just destroy the window */
+        PostQuitMessage( 0 );
         return 0;
         break;
 
@@ -543,13 +546,12 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         {
             case SC_SCREENSAVE:                     /* catch the screensaver */
             case SC_MONITORPOWER:              /* catch the monitor turn-off */
-            intf_WarnMsg( 3, "vout: WinProc WM_SYSCOMMAND" );
+            msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND" );
             return 0;                      /* this stops them from happening */
         }
         break;
 
     case WM_ERASEBKGND:
-        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
         if( !p_vout->p_sys->b_using_overlay )
         {
             /* We want to eliminate unnecessary background redraws which create
@@ -558,7 +560,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
             RECT rect_temp;
             GetClipBox( (HDC)wParam, &rect_temp );
 #if 0
-            intf_WarnMsg( 4, "vout: WinProc WM_ERASEBKGND %i,%i,%i,%i",
+            msg_Dbg( p_vout, "WinProc WM_ERASEBKGND %i,%i,%i,%i",
                           rect_temp.left, rect_temp.top,
                           rect_temp.right, rect_temp.bottom );
 #endif
@@ -571,7 +573,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         break;
 
     default:
-        //intf_WarnMsg( 4, "vout: WinProc WM Default %i", message );
+        //msg_Dbg( p_vout, "WinProc WM Default %i", message );
         break;
     }
 

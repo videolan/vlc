@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.26 2002/05/27 16:01:42 fenrir Exp $
+ * $Id: ac3_spdif.c,v 1.27 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -31,16 +31,13 @@
 #include <string.h>                                              /* memcpy() */
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
+#include <vlc/aout.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
 
 #include "ac3_spdif.h"
 
@@ -48,10 +45,10 @@
  * Local Prototypes
  ****************************************************************************/
 static int  decoder_Probe     ( u8 * );
-static int  decoder_Run       ( decoder_config_t * );
+static int  decoder_Run       ( decoder_fifo_t * );
 static int  InitThread        ( ac3_spdif_thread_t * );
 static void EndThread         ( ac3_spdif_thread_t * );
-static void BitstreamCallback ( bit_stream_t *, boolean_t );
+static void BitstreamCallback ( bit_stream_t *, vlc_bool_t );
 
 int     ac3_parse_syncinfo   ( struct ac3_spdif_thread_s * );
 
@@ -118,7 +115,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("SPDIF pass-through AC3 decoder") )
     ADD_CAPABILITY( DECODER, 0 )
-    ADD_SHORTCUT( "ac3_spdif" )
     ADD_SHORTCUT( "pass_through" )
     ADD_SHORTCUT( "pass" )
 MODULE_INIT_STOP
@@ -147,11 +143,11 @@ static int decoder_Probe( u8 *pi_type )
  ****************************************************************************
  * This function is called just after the thread is launched.
  ****************************************************************************/
-static int decoder_Run( decoder_config_t * p_config )
+static int decoder_Run( decoder_fifo_t * p_fifo )
 {
     ac3_spdif_thread_t *   p_spdif;
     mtime_t     i_frame_time;
-    boolean_t   b_sync;
+    vlc_bool_t  b_sync;
     /* PTS of the current frame */
     mtime_t     i_current_pts = 0;
     u16         i_length;
@@ -161,18 +157,17 @@ static int decoder_Run( decoder_config_t * p_config )
 
     if( p_spdif == NULL )
     {
-        intf_ErrMsg ( "spdif error: not enough memory "
-                      "for spdif_CreateThread() to create the new thread");
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return( -1 );
     }
   
-    p_spdif->p_config = p_config; 
+    p_spdif->p_fifo = p_fifo; 
     
     if (InitThread( p_spdif ) )
     {
-        intf_ErrMsg( "spdif error: could not initialize thread" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "could not initialize thread" );
+        DecoderError( p_fifo );
         free( p_spdif );
         return( -1 );
     }
@@ -194,8 +189,8 @@ static int decoder_Run( decoder_config_t * p_config )
                                   i_frame_time;
             if( i_delta > i_frame_time || i_delta < -i_frame_time )
             {
-                intf_WarnMsg( 3, "spdif warning: date discontinuity (%d)",
-                              i_delta );
+                msg_Warn( p_fifo,
+                          "date discontinuity (%d)", i_delta );
             }
             i_current_pts = p_spdif->i_real_pts;
             p_spdif->i_real_pts = 0;
@@ -257,7 +252,7 @@ static int decoder_Run( decoder_config_t * p_config )
  ****************************************************************************/
 static int InitThread( ac3_spdif_thread_t * p_spdif )
 {
-    boolean_t b_sync = 0;
+    vlc_bool_t b_sync = 0;
 
     /* Temporary buffer to store first ac3 frame */
     p_spdif->p_ac3 = malloc( SPDIF_FRAME_SIZE );
@@ -271,9 +266,9 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     /*
      * Initialize the thread properties
      */
-    p_spdif->p_fifo = p_spdif->p_config->p_decoder_fifo;
+    p_spdif->p_fifo = p_spdif->p_fifo;
 
-    InitBitstream( &p_spdif->bit_stream, p_spdif->p_config->p_decoder_fifo,
+    InitBitstream( &p_spdif->bit_stream, p_spdif->p_fifo,
                    BitstreamCallback, (void*)p_spdif );
 
     /* Find syncword */
@@ -299,7 +294,7 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     /* Check stream properties */
     if( ac3_parse_syncinfo( p_spdif ) < 0 )
     {
-        intf_ErrMsg( "spdif error: stream not valid");
+        msg_Err( p_spdif->p_fifo, "stream not valid" );
 
         return( -1 );
     }
@@ -309,27 +304,28 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
      * but all rates should be supported by the decoder (32, 44.1, 48) */
     if( p_spdif->ac3_info.i_sample_rate != 48000 )
     {
-        intf_ErrMsg( "spdif error: Only 48000 Hz streams tested"
-                     "expect weird things !" );
+        msg_Err( p_spdif->p_fifo,
+                 "only 48000 Hz streams tested, expect weird things!" );
     }
 
     /* The audio output need to be ready for an ac3 stream */
-    p_spdif->i_previous_format = config_GetIntVariable( "audio-format" );
-    config_PutIntVariable( "audio-format", 8 );
+    p_spdif->i_previous_format = config_GetInt( p_spdif->p_fifo,
+		                                "audio-format" );
+    config_PutInt( p_spdif->p_fifo, "audio-format", 8 );
     
     /* Creating the audio output fifo */
-    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_SPDIF, 1,
-                                            p_spdif->ac3_info.i_sample_rate,
-                                            p_spdif->ac3_info.i_frame_size,
-                                            NULL );
+    p_spdif->p_aout_fifo =
+                    aout_CreateFifo( p_spdif->p_fifo->p_this, AOUT_FIFO_SPDIF,
+                                     1, p_spdif->ac3_info.i_sample_rate,
+                                     p_spdif->ac3_info.i_frame_size, NULL );
 
     if( p_spdif->p_aout_fifo == NULL )
     {
         return( -1 );
     }
 
-    intf_WarnMsg( 3, "spdif: aout fifo #%d created",
-                     p_spdif->p_aout_fifo->i_fifo );
+    msg_Dbg( p_spdif->p_fifo, "aout fifo #%d created",
+                              p_spdif->p_aout_fifo->i_fifo );
 
     /* Put read data into fifo */
     memcpy( (u8*)(p_spdif->p_aout_fifo->buffer) +
@@ -365,7 +361,8 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
     }
 
     /* restore previous setting for output format */
-    config_PutIntVariable( "audio-format", p_spdif->i_previous_format );
+    config_PutInt( p_spdif->p_fifo, "audio-format",
+                                    p_spdif->i_previous_format );
 
     /* Destroy descriptor */
     free( p_spdif );
@@ -377,7 +374,7 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
  * This function is called by input's NextDataPacket.
  *****************************************************************************/
 static void BitstreamCallback( bit_stream_t * p_bit_stream,
-                               boolean_t      b_new_pes )
+                               vlc_bool_t b_new_pes )
 {
     ac3_spdif_thread_t *    p_spdif;
 

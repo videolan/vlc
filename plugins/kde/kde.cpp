@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.12 2002/04/19 13:56:11 sam Exp $
+ * $Id: kde.cpp,v 1.13 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -62,7 +62,6 @@ MODULE_INIT_START
     {
         ADD_CAPABILITY( INTF, 85 )
     }
-    ADD_SHORTCUT( "kde" )
     ADD_PROGRAM( "kvlc" )
 MODULE_INIT_STOP
 
@@ -131,7 +130,7 @@ KThread::KThread(intf_thread_t *p_intf)
     }
 
     int argc = 1;
-    char *argv[] = { p_main->psz_arg0, NULL };
+    char *argv[] = { p_intf->p_vlc->psz_object_name, NULL };
     KCmdLineArgs::init( argc, argv, p_intf->p_sys->p_about );
 
     p_intf->p_sys->p_app = new KApplication();
@@ -160,7 +159,7 @@ int KThread::open(intf_thread_t *p_intf)
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg( "intf error: %s", strerror(ENOMEM) );
+        msg_Err( p_intf, "out of memory" );
         return( 1 );
     }
 

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.47 2002/05/20 22:45:03 sam Exp $
+ * $Id: dvd_ifo.c,v 1.48 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -91,7 +91,7 @@ int IfoCreate( thread_dvd_data_t * p_dvd )
     p_dvd->p_ifo = malloc( sizeof(ifo_t) );
     if( p_dvd->p_ifo == NULL )
     {
-        intf_ErrMsg( "ifo error: unable to allocate memory. aborting" );
+//X        intf_Err( p_input, "unable to allocate memory. aborting" );
         return -1;
     }
 
@@ -203,7 +203,7 @@ int IfoInit( ifo_t * p_ifo )
         TITINF.p_attr = malloc( TITINF.i_title_nb *sizeof(title_attr_t) );
         if( TITINF.p_attr == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
     
@@ -257,7 +257,7 @@ int IfoInit( ifo_t * p_ifo )
                                           * sizeof(parental_desc_t) );
         if( PARINF.p_parental_desc == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -275,7 +275,7 @@ int IfoInit( ifo_t * p_ifo )
                                           * sizeof(parental_mask_t) );
         if( PARINF.p_parental_mask == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -292,7 +292,7 @@ int IfoInit( ifo_t * p_ifo )
 
                 if( PARINF.p_parental_mask[i].ppi_mask[j] == NULL )
                 {
-                    intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+//X                    intf_Err( p_input, "out of memory in IfoInit" );
                     return -1;
                 }
 
@@ -328,7 +328,7 @@ int IfoInit( ifo_t * p_ifo )
                             malloc( VTSINF.i_vts_nb * sizeof(u32) );
         if( VTSINF.pi_vts_attr_start_byte == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -341,7 +341,7 @@ int IfoInit( ifo_t * p_ifo )
         VTSINF.p_vts_attr = malloc( VTSINF.i_vts_nb * sizeof(vts_attr_t) );
         if( VTSINF.p_vts_attr == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoInit" );
+//X            intf_Err( p_input, "out of memory in IfoInit" );
             return -1;
         }
 
@@ -430,7 +430,7 @@ int IfoInit( ifo_t * p_ifo )
 
     p_ifo->vts.b_initialized = 0;
 
-    intf_WarnMsg( 2, "ifo info: vmg initialized" );
+//X    intf_Warn( p_input, 2, "vmg initialized" );
 
     return 0;
 }
@@ -604,7 +604,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         TITINF.pi_start_byte = malloc( TITINF.i_title_nb * sizeof(u32) );
         if( TITINF.pi_start_byte == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -618,7 +618,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
                                          * sizeof(title_start_t) );
         if( TITINF.p_title_start == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -680,7 +680,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         TIMINF.pi_start_byte = malloc( TIMINF.i_nb * sizeof(u32) );
         if( TIMINF.pi_start_byte == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -692,7 +692,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         TIMINF.p_time_map = malloc( TIMINF.i_nb * sizeof(time_map_t) );
         if( TIMINF.p_time_map == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+//X            intf_Err( p_input, "out of memory in IfoTitleSet" );
             return -1;
         }
 
@@ -708,7 +708,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
                      malloc( TIMINF.p_time_map[i].i_entry_nb * sizeof(u32) );
                 if( TIMINF.p_time_map[i].pi_sector == NULL )
                 {
-                    intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+//X                    msg_Err( p_input, "out of memory in IfoTitleSet" );
                     return -1;
                 }
 
@@ -751,8 +751,8 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
     }
 #undef MGINF
 
-    intf_WarnMsg( 4, "ifo info: vts %d initialized",
-         p_ifo->vmg.title_inf.p_attr[i_title-1].i_title_set_num );
+//X    intf_Warn( p_input, 4, "vts %d initialized",
+//X               p_ifo->vmg.title_inf.p_attr[i_title-1].i_title_set_num );
 
     p_ifo->vts.b_initialized = 1;
 
@@ -974,7 +974,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
             if( p_title->command.p_pre_command == NULL )
             {
-                intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+//X                intf_Err( p_input, "out of memory in ReadTitle" );
                 return -1;
             }
 
@@ -998,7 +998,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
             if( p_title->command.p_post_command == NULL )
             {
-                intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+//X                intf_Err( p_input, "out of memory in ReadTitle" );
                 return -1;
             }
 
@@ -1022,7 +1022,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
             if( p_title->command.p_cell_command == NULL )
             {
-                intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+//X                intf_Err( p_input, "out of memory in ReadTitle" );
                 return -1;
             }
 
@@ -1050,7 +1050,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
         
         if( p_title->chapter_map.pi_start_cell == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in Read Title" );
+//X            intf_Err( p_input, "out of memory in Read Title" );
             return -1;
         }
 
@@ -1074,7 +1074,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
     
         if( p_title->p_cell_play == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory in ReadTitle" );
+//X            intf_Err( p_input, "out of memory in ReadTitle" );
             return -1;
         }
 
@@ -1105,7 +1105,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
         if( p_title->p_cell_pos == NULL )
         {
-            intf_ErrMsg( "ifo error: out of memory" );
+//X            intf_Err( p_input, "out of memory" );
             return -1;
         }
 
@@ -1186,7 +1186,7 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
             malloc( p_unit_inf->i_title_nb * sizeof(unit_title_t) );
     if( p_unit_inf->p_title == NULL )
     {
-        intf_ErrMsg( "ifo error: out of memory in ReadUnit" );
+//X        intf_Err( p_input, "out of memory in ReadUnit" );
         return -1;
     }
 
@@ -1257,7 +1257,7 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
     p_title_unit->p_unit = malloc( p_title_unit->i_unit_nb * sizeof(unit_t) );
     if( p_title_unit->p_unit == NULL )
     {
-        intf_ErrMsg( "ifo error: out of memory in ReadTitleUnit" );
+//X        intf_Err( p_input, "out of memory in ReadTitleUnit" );
         return -1;
     }
 
@@ -1277,7 +1277,7 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
                 malloc( p_title_unit->i_unit_nb * sizeof(unit_inf_t) );
     if( p_title_unit->p_unit_inf == NULL )
     {
-        intf_ErrMsg( "ifo error: out of memory in ReadTitleUnit" );
+//X        intf_Err( p_input, "out of memory in ReadTitleUnit" );
         return -1;
     }
 
@@ -1337,7 +1337,7 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
                 malloc( p_cell_inf->i_cell_nb *sizeof(cell_map_t) );
     if( p_cell_inf->p_cell_map == NULL )
     {
-        intf_ErrMsg( "ifo error: out of memory in ReadCellInf" );
+//X        intf_Err( p_input, "out of memory in ReadCellInf" );
         return -1;
     }
 
@@ -1387,7 +1387,7 @@ static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map, int i_block )
     p_vobu_map->pi_vobu_start_sector = malloc( i_max * sizeof(u32) );
     if( p_vobu_map->pi_vobu_start_sector == NULL )
     {
-        intf_ErrMsg( "ifo error: out of memory in ReadVobuMap" );
+//X        intf_Err( p_input, "out of memory in ReadVobuMap" );
         return -1;
     }
 
@@ -2105,7 +2105,7 @@ static void ReadBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp,
 {
     if( i_nb > DVD_LB_SIZE )
     {
-        intf_ErrMsg( "ifo error: excessive ReadBytes call (%i)", i_nb );
+//X        intf_Err( p_input, "excessive ReadBytes call (%i)", i_nb );
     }
 
     if( *pp_tmp + i_nb >= p_buf + DVD_LB_SIZE )
@@ -2131,7 +2131,7 @@ static void DumpBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp, int i_nb )
 {
     if( i_nb > DVD_LB_SIZE )
     {
-        intf_ErrMsg( "ifo error: excessive DumpBytes call (%i)", i_nb );
+//X        intf_Err( p_input, "excessive DumpBytes call (%i)", i_nb );
     }
 
     *pp_tmp += i_nb;

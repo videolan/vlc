@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.97 2002/05/27 16:01:42 fenrir Exp $
+ * $Id: mpeg_system.c,v 1.98 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -32,7 +32,7 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -120,7 +120,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( MoveChunk( p_header, &p_data, &p_byte, PES_HEADER_SIZE )
             != PES_HEADER_SIZE )
     {
-        intf_WarnMsg( 1, "input: PES packet too short to have a header" );
+        msg_Warn( p_input, "PES packet too short to have a header" );
         input_DeletePES( p_input->p_method_data, p_pes );
         p_pes = NULL;
         return;
@@ -138,8 +138,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( (p_header[0] || p_header[1] || (p_header[2] != 1)) )
     {
         /* packet_start_code_prefix != 0x000001 */
-        intf_ErrMsg( "input error: data loss, "
-                     "PES packet doesn't start with 0x000001" );
+        msg_Err( p_input, "data loss, PES packet does not start with 000001" );
         input_DeletePES( p_input->p_method_data, p_pes );
         p_pes = NULL;
     }
@@ -152,8 +151,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             /* PES_packet_length is set and != total received payload */
             /* Warn the decoder that the data may be corrupt. */
-            intf_WarnMsg( 1, "input: packet corrupted, "
-                             "PES sizes do not match" );
+            msg_Warn( p_input, "packet corrupted, PES sizes do not match" );
         }
 
         switch( p_es->i_stream_id )
@@ -176,7 +174,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             {
                 /* MPEG-2 : the PES header contains at least 3 more bytes. */
                 size_t      i_max_len;
-                boolean_t   b_has_pts, b_has_dts;
+                vlc_bool_t  b_has_pts, b_has_dts;
                 byte_t      p_full_header[12];
 
                 p_pes->b_data_alignment = p_header[6] & 0x04;
@@ -184,8 +182,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 i_max_len = MoveChunk( p_full_header, &p_data, &p_byte, 12 );
                 if( i_max_len < 2 )
                 {
-                    intf_WarnMsg( 1,
-                            "PES packet too short to have a MPEG-2 header" );
+                    msg_Warn( p_input, 
+                              "PES packet too short to have a MPEG-2 header" );
                     input_DeletePES( p_input->p_method_data,
                                             p_pes );
                     p_pes = NULL;
@@ -201,8 +199,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 {
                     if( i_max_len < 7 )
                     {
-                        intf_WarnMsg( 1,
-                            "PES packet too short to have a MPEG-2 header" );
+                        msg_Warn( p_input,
+                             "PES packet too short to have a MPEG-2 header" );
                         input_DeletePES( p_input->p_method_data,
                                                 p_pes );
                         p_pes = NULL;
@@ -219,7 +217,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         if( i_max_len < 12 )
                         {
-                            intf_WarnMsg( 1,
+                            msg_Warn( p_input,
                               "PES packet too short to have a MPEG-2 header" );
                             input_DeletePES( p_input->p_method_data,
                                                     p_pes );
@@ -237,7 +235,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             else
             {
                 /* Probably MPEG-1 */
-                boolean_t       b_has_pts, b_has_dts;
+                vlc_bool_t      b_has_pts, b_has_dts;
 
                 i_pes_header_size = 6;
                 p_data = p_pes->p_first;
@@ -250,7 +248,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     i_pes_header_size++;
                     if( MoveChunk( NULL, &p_data, &p_byte, 1 ) != 1 )
                     {
-                        intf_WarnMsg( 1,
+                        msg_Warn( p_input,
                             "PES packet too short to have a MPEG-1 header" );
                         input_DeletePES( p_input->p_method_data, p_pes );
                         p_pes = NULL;
@@ -259,7 +257,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 }
                 if( i_pes_header_size == 23 )
                 {
-                    intf_ErrMsg( "input error: too much MPEG-1 stuffing" );
+                    msg_Err( p_input, "too much MPEG-1 stuffing" );
                     input_DeletePES( p_input->p_method_data, p_pes );
                     p_pes = NULL;
                     return;
@@ -274,8 +272,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     i_pes_header_size += 2;
                     if( MoveChunk( NULL, &p_data, &p_byte, 2 ) != 2 )
                     {
-                        intf_WarnMsg( 1, "input: PES packet too short "
-                                         "to have a MPEG-1 header" );
+                        msg_Warn( p_input,
+                            "PES packet too short to have a MPEG-1 header" );
                         input_DeletePES( p_input->p_method_data, p_pes );
                         p_pes = NULL;
                         return;
@@ -294,8 +292,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     i_pes_header_size += 4;
                     if( MoveChunk( p_ts, &p_data, &p_byte, 5 ) != 5 )
                     {
-                        intf_WarnMsg( 1, "input: PES packet too short "
-                                         "to have a MPEG-1 header" );
+                        msg_Warn( p_input,
+                            "PES packet too short to have a MPEG-1 header" );
                         input_DeletePES( p_input->p_method_data, p_pes );
                         p_pes = NULL;
                         return;
@@ -312,10 +310,9 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         i_pes_header_size += 5;
                         if( MoveChunk( p_ts, &p_data, &p_byte, 5 ) != 5 )
                         {
-                            intf_WarnMsg( 1, "input: PES packet too short "
-                                             "to have a MPEG-1 header" );
-                            input_DeletePES( p_input->p_method_data,
-                                                    p_pes );
+                            msg_Warn( p_input,
+                              "PES packet too short to have a MPEG-1 header" );
+                            input_DeletePES( p_input->p_method_data, p_pes );
                             p_pes = NULL;
                             return;
                         }
@@ -361,7 +358,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             /* Go to the next data packet. */
             if( (p_data = p_data->p_next) == NULL )
             {
-                intf_ErrMsg( "input error: PES header bigger than payload" );
+                msg_Err( p_input, "PES header bigger than payload" );
                 input_DeletePES( p_input->p_method_data, p_pes );
                 p_pes = NULL;
                 return;
@@ -372,7 +369,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         /* This last packet is partly header, partly payload. */
         if( i_payload_size < i_pes_header_size )
         {
-            intf_ErrMsg( "input error: PES header bigger than payload" );
+            msg_Err( p_input, "PES header bigger than payload" );
             input_DeletePES( p_input->p_method_data, p_pes );
             p_pes = NULL;
             return;
@@ -388,8 +385,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         }
         else
         {
-            intf_ErrMsg( "input error: no fifo to receive PES %p "
-                         "(who wrote this damn code ?)", p_pes );
+            msg_Err( p_input, "no fifo to receive PES %p "
+                              "(who wrote this damn code ?)", p_pes );
             input_DeletePES( p_input->p_method_data, p_pes );
         }
         p_pes = NULL;
@@ -405,7 +402,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
  *****************************************************************************/
 void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                       es_descriptor_t * p_es,
-                      boolean_t b_unit_start, boolean_t b_packet_lost )
+                      vlc_bool_t b_unit_start, vlc_bool_t b_packet_lost )
 {
 #define p_pes (p_es->p_pes)
 
@@ -441,7 +438,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
              * started. */
             if( (p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
             {
-                intf_ErrMsg( "input error: out of memory" );
+                msg_Err( p_input, "out of memory" );
                 p_input->b_error = 1;
                 return;
             }
@@ -523,7 +520,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 
     if( p_data->p_demux_start + 10 > p_data->p_payload_end )
     {
-        intf_ErrMsg( "input error: PSM too short : packet corrupt" );
+        msg_Err( p_input, "PSM too short, packet corrupt" );
         return;
     }
 
@@ -543,7 +540,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
               + U16_AT(&p_data->p_demux_start[8]);
     if( p_byte > p_data->p_payload_end )
     {
-        intf_ErrMsg( "input error: PSM too short, packet corrupt" );
+        msg_Err( p_input, "PSM too short, packet corrupt" );
         return;
     }
     /* This is the full size of the elementary_stream_map.
@@ -553,7 +550,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     p_byte += 2;
     if( p_end > p_data->p_payload_end )
     {
-        intf_ErrMsg( "input error: PSM too short, packet corrupt" );
+        msg_Err( p_input, "PSM too short, packet corrupt" );
         return;
     }
 
@@ -627,11 +624,8 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                      p_input->stream.pp_programs[0]->pp_es[i_new_es_number] );
     }
 
-    if( p_main->b_stats )
-    {
-        intf_StatMsg( "input info: The stream map after the PSM is now :" );
-        input_DumpStream( p_input );
-    }
+    msg_Dbg( p_input, "the stream map after the PSM is now:" );
+    input_DumpStream( p_input );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
@@ -667,8 +661,8 @@ ssize_t input_ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
             /* It is common for MPEG-1 streams to pad with zeros
              * (although it is forbidden by the recommendation), so
              * don't bother everybody in this case. */
-            intf_WarnMsg( 3, "input warning: garbage (0x%.2x%.2x%.2x%.2x)",
-                 p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
+            msg_Warn( p_input, "garbage (0x%.2x%.2x%.2x%.2x)",
+                      p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
         }
 
         /* This is not the startcode of a packet. Read the stream
@@ -708,7 +702,7 @@ ssize_t input_ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
             }
             else
             {
-                intf_ErrMsg( "Unable to determine stream type" );
+                msg_Err( p_input, "unable to determine stream type" );
                 return( -1 );
             }
         }
@@ -810,11 +804,11 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
-                        if( config_GetIntVariable( "audio-channel" )
+                        if( config_GetInt( p_input, "audio-channel" )
                                 == (p_es->i_id & 0x1F) ||
-                            ( config_GetIntVariable( "audio-channel" ) < 0
+                            ( config_GetInt( p_input, "audio-channel" ) < 0
                               && !(p_es->i_id & 0x1F) ) )
-                        switch( config_GetIntVariable( "audio-type" ) )
+                        switch( config_GetInt( p_input, "audio-type" ) )
                         {
                         case -1:
                         case REQUESTED_MPEG:
@@ -830,11 +824,11 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
-                        if( config_GetIntVariable( "audio-channel" )
+                        if( config_GetInt( p_input, "audio-channel" )
                                 == ((p_es->i_id & 0xF00) >> 8) ||
-                            ( config_GetIntVariable( "audio-channel" ) < 0
+                            ( config_GetInt( p_input, "audio-channel" ) < 0
                               && !((p_es->i_id & 0xF00) >> 8)) )
-                        switch( config_GetIntVariable( "audio-type" ) )
+                        switch( config_GetInt( p_input, "audio-type" ) )
                         {
                         case -1:
                         case REQUESTED_AC3:
@@ -848,7 +842,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = DVD_SPU_ES;
                         p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
-                        if( config_GetIntVariable( "spu-channel" )
+                        if( config_GetInt( p_input, "spu-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             if( !p_input->stream.b_seekable )
@@ -885,7 +879,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
 void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 {
     u32                 i_code;
-    boolean_t           b_trash = 0;
+    vlc_bool_t          b_trash = 0;
     es_descriptor_t *   p_es = NULL;
 
     i_code = ((u32)p_data->p_demux_start[0] << 24)
@@ -911,8 +905,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 
                     if( MoveChunk( p_header, &p_data, &p_byte, 14 ) != 14 )
                     {
-                        intf_WarnMsg( 1, "input: packet too short "
-                                         "to have a header" );
+                        msg_Warn( p_input,
+                                  "packet too short to have a header" );
                         b_trash = 1;
                         break;
                     }
@@ -930,7 +924,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
                      * This is the biggest kludge ever !
                      * I don't know what's wrong with mux_rate calculation
-                     * but this heuristic work well : */
+                     * but this heuristic works well : */
                     i_mux_rate <<= 1;
                     i_mux_rate /= 3;
                 }
@@ -943,8 +937,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 
                     if( MoveChunk( p_header, &p_data, &p_byte, 12 ) != 12 )
                     {
-                        intf_WarnMsg( 1, "input: packet too short "
-                                         "to have a header" );
+                        msg_Warn( p_input,
+                                  "packet too short to have a header" );
                         b_trash = 1;
                         break;
                     }
@@ -965,8 +959,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 if( i_mux_rate != p_input->stream.i_mux_rate
                      && p_input->stream.i_mux_rate )
                 {
-                    intf_WarnMsg( 2, "input: mux_rate changed, "
-                                     "expect cosmetic errors" );
+                    msg_Warn( p_input,
+                              "mux_rate changed, expect cosmetic errors" );
                 }
                 p_input->stream.i_mux_rate = i_mux_rate;
 
@@ -990,8 +984,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         default:
             /* This should not happen */
             b_trash = 1;
-            intf_WarnMsg( 3, "input: unwanted packet received "
-                             "with start code 0x%.8x", i_code );
+            msg_Warn( p_input, "unwanted packet received "
+                               "with startcode 0x%.8x", i_code );
         }
     }
     else
@@ -1050,7 +1044,7 @@ ssize_t input_ReadTS( input_thread_t * p_input, data_packet_t ** pp_data )
 
     if( *p_peek != TS_SYNC_CODE )
     {
-        intf_WarnMsg( 3, "input warning: garbage at input (%x)", *p_peek );
+        msg_Warn( p_input, "garbage at input (%x)", *p_peek );
 
         if( p_input->i_mtu )
         {
@@ -1091,13 +1085,13 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
 {
     u16                 i_pid;
     int                 i_dummy;
-    boolean_t           b_adaptation;         /* Adaptation field is present */
-    boolean_t           b_payload;                 /* Packet carries payload */
-    boolean_t           b_unit_start;  /* A PSI or a PES start in the packet */
-    boolean_t           b_trash = 0;             /* Is the packet unuseful ? */
-    boolean_t           b_lost = 0;             /* Was there a packet loss ? */
-    boolean_t           b_psi = 0;                        /* Is this a PSI ? */
-    boolean_t           b_pcr = 0;                   /* Does it have a PCR ? */
+    vlc_bool_t          b_adaptation;         /* Adaptation field is present */
+    vlc_bool_t          b_payload;                 /* Packet carries payload */
+    vlc_bool_t          b_unit_start;  /* A PSI or a PES start in the packet */
+    vlc_bool_t          b_trash = 0;             /* Is the packet unuseful ? */
+    vlc_bool_t          b_lost = 0;             /* Was there a packet loss ? */
+    vlc_bool_t          b_psi = 0;                        /* Is this a PSI ? */
+    vlc_bool_t          b_pcr = 0;                   /* Does it have a PCR ? */
     es_descriptor_t *   p_es = NULL;
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
@@ -1185,9 +1179,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * 183 bytes. */
                 if( b_payload ? (p[4] > 182) : (p[4] != 183) )
                 {
-                    intf_WarnMsg( 2,
-                        "input: invalid TS adaptation field (%p)",
-                        p_data );
+                    msg_Warn( p_input, "invalid TS adaptation field (%p)",
+                              p_data );
                     p_data->b_discard_payload = 1;
                     p_es->c_invalid_packets++;
                 }
@@ -1199,10 +1192,9 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                     /* discontinuity_indicator */
                     if( p[5] & 0x80 )
                     {
-                        intf_WarnMsg( 2,
-                            "input: discontinuity_indicator"
-                            " encountered by TS demux (position read: %d,"
-                            " saved: %d)",
+                        msg_Warn( p_input,
+                            "discontinuity_indicator encountered by TS demux "
+                            "(position read: %d, saved: %d)",
                             p[5] & 0x80, p_es_demux->i_continuity_counter );
     
                         /* If the PID carries the PCR, there will be a system
@@ -1234,15 +1226,15 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * draft. As there is nothing interesting in this packet
                  * (except PCR that have already been handled), we can trash
                  * the packet. */
-                intf_WarnMsg( 3, "input: packet without payload received "
-                                 "by TS demux" );
+                msg_Warn( p_input,
+                          "packet without payload received by TS demux" );
                 b_trash = 1;
             }
             else if( i_dummy <= 0 )
             {
                 /* Duplicate packet: mark it as being to be trashed. */
-                intf_WarnMsg( 3, "input: duplicate packet received "
-                                 "by TS demux" );
+                msg_Warn( p_input,
+                          "duplicate packet received by TS demux" );
                 b_trash = 1;
             }
             else if( p_es_demux->i_continuity_counter == 0xFF )
@@ -1251,8 +1243,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * this ES since the continuity counter ranges between 0 and
                  * 0x0F excepts when it has been initialized by the input:
                  * init the counter to the correct value. */
-                intf_WarnMsg( 3, "input: first packet for PID %d received "
-                             "by TS demux", p_es->i_id );
+                msg_Warn( p_input, "first packet for PID %d received "
+                                   "by TS demux", p_es->i_id );
                 p_es_demux->i_continuity_counter = (p[3] & 0x0f);
             }
             else
@@ -1261,10 +1253,10 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * continuity_counter wrapped and we received a dup packet:
                  * as we don't know, do as if we missed a packet to be sure
                  * to recover from this situation */
-                intf_WarnMsg( 2, "input: packet lost by TS demux: "
-                                 "current %d, packet %d",
-                              p_es_demux->i_continuity_counter & 0x0f,
-                              p[3] & 0x0f );
+                msg_Warn( p_input,
+                          "packet lost by TS demux: current %d, packet %d",
+                          p_es_demux->i_continuity_counter & 0x0f,
+                          p[3] & 0x0f );
                 b_lost = 1;
                 p_es_demux->i_continuity_counter = p[3] & 0x0f;
             } /* not continuous */

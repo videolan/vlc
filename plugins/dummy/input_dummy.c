@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_dummy.c,v 1.17 2002/03/02 03:51:23 sam Exp $
+ * $Id: input_dummy.c,v 1.18 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,24 +29,18 @@
 #include <string.h>
 #include <errno.h>
 
-#include <videolan/vlc.h>
-
-#include "interface.h"
-#include "intf_playlist.h"
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/input.h>
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  DummyInit      ( struct input_thread_s * );
-static int  DummyOpen      ( struct input_thread_s * );
-static void DummyClose     ( struct input_thread_s * );
-static void DummyEnd       ( struct input_thread_s * );
-static int  DummyDemux     ( struct input_thread_s * );
+static int  DummyInit   ( input_thread_t * );
+static int  DummyOpen   ( input_thread_t * );
+static void DummyClose  ( input_thread_t * );
+static void DummyEnd    ( input_thread_t * );
+static int  DummyDemux  ( input_thread_t * );
 
 /*****************************************************************************
  * access_sys_t: private input data
@@ -113,7 +107,7 @@ static void DummyClose( input_thread_t * p_input )
 /*****************************************************************************
  * DummyInit: initialize the target, ie. parse the command
  *****************************************************************************/
-static int DummyInit( struct input_thread_s *p_input )
+static int DummyInit( input_thread_t *p_input )
 {
     char * psz_name = p_input->psz_name;
     int i_len = strlen( psz_name );
@@ -125,7 +119,7 @@ static int DummyInit( struct input_thread_s *p_input )
     p_method = malloc( sizeof( struct demux_sys_s ) );
     if( p_method == NULL )
     {
-        intf_ErrMsg( "input: out of memory" );
+        msg_Err( p_input, "out of memory" );
         return( -1 );
     }
 
@@ -135,7 +129,7 @@ static int DummyInit( struct input_thread_s *p_input )
     /* Check for a "vlc:nop" command */
     if( i_len == 3 && !strncasecmp( psz_name, "nop", 3 ) )
     {
-        intf_WarnMsg( 2, "input: command `nop'" );
+        msg_Info( p_input, "command `nop'" );
         p_method->i_command = COMMAND_NOP;
         return( 0 );
     }
@@ -143,7 +137,7 @@ static int DummyInit( struct input_thread_s *p_input )
     /* Check for a "vlc:quit" command */
     if( i_len == 4 && !strncasecmp( psz_name, "quit", 4 ) )
     {
-        intf_WarnMsg( 2, "input: command `quit'" );
+        msg_Info( p_input, "command `quit'" );
         p_method->i_command = COMMAND_QUIT;
         return( 0 );
     }
@@ -151,7 +145,7 @@ static int DummyInit( struct input_thread_s *p_input )
     /* Check for a "vlc:loop" command */
     if( i_len == 4 && !strncasecmp( psz_name, "loop", 4 ) )
     {
-        intf_WarnMsg( 2, "input: command `loop'" );
+        msg_Info( p_input, "command `loop'" );
         p_method->i_command = COMMAND_LOOP;
         return( 0 );
     }
@@ -160,13 +154,13 @@ static int DummyInit( struct input_thread_s *p_input )
     if( i_len > 6 && !strncasecmp( psz_name, "pause:", 6 ) )
     {
         i_arg = atoi( psz_name + 6 );
-        intf_WarnMsg( 2, "input: command `pause %i'", i_arg );
+        msg_Info( p_input, "command `pause %i'", i_arg );
         p_method->i_command = COMMAND_PAUSE;
         p_method->expiration = mdate() + (mtime_t)i_arg * (mtime_t)1000000;
         return( 0 );
     }
 
-    intf_ErrMsg( "input error: unknown command `%s'", psz_name );
+    msg_Err( p_input, "unknown command `%s'", psz_name );
     free( p_input->p_demux_data );
     p_input->b_error = 1;
 
@@ -176,7 +170,7 @@ static int DummyInit( struct input_thread_s *p_input )
 /*****************************************************************************
  * DummyEnd: end the target, ie. do nothing
  *****************************************************************************/
-static void DummyEnd( struct input_thread_s *p_input )
+static void DummyEnd( input_thread_t *p_input )
 {
     free( p_input->p_demux_data );
 }
@@ -184,19 +178,19 @@ static void DummyEnd( struct input_thread_s *p_input )
 /*****************************************************************************
  * DummyDemux: do what the command says
  *****************************************************************************/
-static int DummyDemux( struct input_thread_s *p_input )
+static int DummyDemux( input_thread_t *p_input )
 {
     struct demux_sys_s * p_method = p_input->p_demux_data;
 
     switch( p_method->i_command )
     {
         case COMMAND_QUIT:
-            p_main->p_intf->b_die = 1;
+            p_input->p_vlc->b_die = 1;
             p_input->b_die = 1;
             break;
 
         case COMMAND_LOOP:
-            intf_PlaylistJumpto( p_main->p_playlist, -1 );
+            //playlist_Jumpto( p_input->p_vlc->p_playlist, -1 );
             p_input->b_eof = 1;
             break;
 

@@ -2,7 +2,7 @@
  * i420_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.h,v 1.7 2002/06/01 11:08:24 sam Exp $
+ * $Id: i420_yuy2.h,v 1.8 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,7 +24,7 @@
 #ifdef MODULE_NAME_IS_chroma_i420_yuy2_mmx
 
 #define UNUSED_LONGLONG(foo) \
-    unsigned long long foo __asm__ (#foo) __attribute__((unused))
+    static const unsigned long long foo __asm__ (#foo) __attribute__((unused))
 UNUSED_LONGLONG(woo_00ffw) = 0x00ff00ff00ff00ff;
 UNUSED_LONGLONG(woo_80w)   = 0x0000000080808080;
 

@@ -23,13 +23,8 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "network.h"
 #include "win32_common.h"
@@ -41,7 +36,7 @@
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
-extern struct intf_thread_s *p_intfGlobal;
+extern intf_thread_t *p_intfGlobal;
 
 //---------------------------------------------------------------------------
 __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
@@ -52,24 +47,24 @@ __fastcall TNetworkDlg::TNetworkDlg( TComponent* Owner )
         OldRadioValue = 0;
 
         /* server port */
-        SpinEditUDPPort->Value = config_GetIntVariable( "server-port" );
-        SpinEditMulticastPort->Value = config_GetIntVariable( "server-port" );
+        SpinEditUDPPort->Value = config_GetInt( p_intfGlobal, "server-port" );
+        SpinEditMulticastPort->Value = config_GetInt( p_intfGlobal, "server-port" );
 
         /* channel server */
-        if( config_GetIntVariable( "network-channel" ) )
+        if( config_GetInt( p_intfGlobal, "network-channel" ) )
         {
             RadioButtonCS->Checked = true;
             RadioButtonCSEnter( RadioButtonCS );
         }
 
-        psz_channel_server = config_GetPszVariable( "channel-server" );
+        psz_channel_server = config_GetPsz( p_intfGlobal, "channel-server" );
         if( psz_channel_server )
         {
             ComboBoxCSAddress->Text = psz_channel_server;
             free( psz_channel_server );
         }
 
-        SpinEditCSPort->Value = config_GetIntVariable( "channel-port" );
+        SpinEditCSPort->Value = config_GetInt( p_intfGlobal, "channel-port" );
 }
 //---------------------------------------------------------------------------
 void __fastcall TNetworkDlg::FormShow( TObject *Sender )
@@ -95,14 +90,14 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
     AnsiString      Channel = ComboBoxCSAddress->Text;
     unsigned int    i_channel_port = SpinEditCSPort->Value;
     unsigned int    i_port;
-    int             i_end = p_main->p_playlist->i_size;
+    int             i_end = p_intfGlobal->p_vlc->p_playlist->i_size;
 
     Hide();
 
     /* select added item */
-    if( p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
 
     /* Check which option was chosen */
@@ -126,7 +121,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
 
         /* UDP Multicast */
         case 1:
-            config_PutIntVariable( "network-channel", FALSE );
+            config_PutInt( p_intfGlobal, "network-channel", FALSE );
             Address = ComboBoxMulticastAddress->Text;
             i_port = SpinEditMulticastPort->Value;
 
@@ -143,9 +138,9 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
 
         /* Channel server */
         case 2:
-            config_PutIntVariable( "network-channel", TRUE );
-            config_PutPszVariable( "channel-server", Channel.c_str() );
-            config_PutIntVariable( "channel-port", i_channel_port );
+            config_PutInt( p_intfGlobal, "network-channel", TRUE );
+            config_PutPsz( p_intfGlobal, "channel-server", Channel.c_str() );
+            config_PutInt( p_intfGlobal, "channel-port", i_channel_port );
 
             if( p_main->p_channel == NULL )
             {
@@ -157,7 +152,7 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
 
         /* HTTP */
         case 3:
-            config_PutIntVariable( "network-channel", FALSE );
+            config_PutInt( p_intfGlobal, "network-channel", FALSE );
             Address = EditHTTPURL->Text;
 
             /* Build source name with a basic test */

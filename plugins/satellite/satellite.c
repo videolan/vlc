@@ -26,7 +26,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -77,7 +77,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("satellite input module") )
     ADD_CAPABILITY( ACCESS, 0 )
-    ADD_SHORTCUT( "satellite" )
     ADD_SHORTCUT( "sat" )
 MODULE_INIT_STOP
 

@@ -2,7 +2,7 @@
  * vout_directx.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.h,v 1.6 2002/05/18 13:30:28 gbazin Exp $
+ * $Id: vout_directx.h,v 1.7 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -27,7 +27,7 @@
  * This structure is part of the video output thread descriptor.
  * It describes the DirectX specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
 
     LPDIRECTDRAW2        p_ddobject;                    /* DirectDraw object */
@@ -38,9 +38,9 @@ typedef struct vout_sys_s
     HBRUSH               hbrush;           /* window backgound brush (color) */
     HWND                 hwnd;                  /* Handle of the main window */
 
-    boolean_t    b_using_overlay;         /* Are we using an overlay surface */
-    boolean_t    b_use_sysmem;   /* Should we use system memory for surfaces */
-    boolean_t    b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
+    vlc_bool_t   b_using_overlay;         /* Are we using an overlay surface */
+    vlc_bool_t   b_use_sysmem;   /* Should we use system memory for surfaces */
+    vlc_bool_t   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
 
     /* size of the display */
     RECT         rect_display;
@@ -67,17 +67,16 @@ typedef struct vout_sys_s
     volatile u16 i_changes;             /* changes made to the video display */
 
     /* Mouse */
-    volatile boolean_t b_cursor_hidden;
-    volatile mtime_t   i_lastmoved;
+    volatile vlc_bool_t b_cursor_hidden;
+    volatile mtime_t    i_lastmoved;
 
     vlc_thread_t event_thread_id;                            /* event thread */
     vlc_mutex_t  event_thread_lock;             /* lock for the event thread */
     vlc_cond_t   event_thread_wait;
 
     volatile int i_event_thread_status;         /* DirectXEventThread status */
-    volatile boolean_t b_event_thread_die;  /* flag to kill the event thread */
-
-} vout_sys_t;
+    volatile vlc_bool_t b_event_thread_die; /* flag to kill the event thread */
+};
 
 /*****************************************************************************
  * picture_sys_t: direct buffer method descriptor
@@ -85,13 +84,12 @@ typedef struct vout_sys_s
  * This structure is part of the picture descriptor, it describes the
  * DirectX specific properties of a direct buffer.
  *****************************************************************************/
-typedef struct picture_sys_s
+struct picture_sys_s
 {
     LPDIRECTDRAWSURFACE3 p_surface;
     DDSURFACEDESC        ddsd;
     LPDIRECTDRAWSURFACE3 p_front_surface;
-
-} picture_sys_t;
+};
 
 /*****************************************************************************
  * Prototypes from vout_directx.c

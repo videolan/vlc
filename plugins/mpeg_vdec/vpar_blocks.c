@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_blocks.c,v 1.9 2002/05/18 17:47:47 sam Exp $
+ * $Id: vpar_blocks.c,v 1.10 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -28,13 +28,9 @@
  *****************************************************************************/
 #include <string.h>                                                /* memset */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
@@ -231,7 +227,7 @@ store_coeff:
             if( i_coeff >= 64 )
             {
                 /* Illegal, but needed to avoid overflow */
-                intf_WarnMsg( 2, "Intra-B14 coeff is out of bound" );
+                msg_Warn( p_vpar->p_fifo, "intra-B14 coeff is out of bounds" );
                 p_vpar->picture.b_error = 1;
                 break;
             }
@@ -283,7 +279,7 @@ store_coeff:
             }
         }
 
-        intf_WarnMsg( 2, "Intra-B14 coeff is out of bound" );
+        msg_Warn( p_vpar->p_fifo, "intra-B14 coeff is out of bounds" );
         p_vpar->picture.b_error = 1;
         break;
     }
@@ -374,7 +370,8 @@ store_coeff:
                 if( i_coeff >= 64 )
                 {
                     /* Illegal, but needed to avoid overflow */
-                    intf_WarnMsg( 2, "Intra-B15 coeff is out of bound" );
+                    msg_Warn( p_vpar->p_fifo,
+                              "intra-B15 coeff is out of bounds" );
                     p_vpar->picture.b_error = 1;
                     break;
                 }
@@ -427,7 +424,7 @@ store_coeff:
             }
         }
 
-        intf_WarnMsg( 2, "Intra-B15 coeff is out of bound" );
+        msg_Warn( p_vpar->p_fifo, "intra-B15 coeff is out of bounds" );
         p_vpar->picture.b_error = 1;
         break;
     }
@@ -535,7 +532,8 @@ coeff_2:
             if( i_coeff >= 64 )
             {
                 /* Illegal, but needed to avoid overflow */
-                intf_WarnMsg( 2, "vpar warning: MPEG2NonIntra coeff is out of bound" );
+                msg_Warn( p_vpar->p_fifo,
+                          "MPEG2NonIntra coeff is out of bounds" );
                 p_vpar->picture.b_error = 1;
                 break;
             }
@@ -589,7 +587,7 @@ coeff_2:
             }
         }
 
-        intf_WarnMsg( 2, "vpar warning: MPEG2NonIntra coeff is out of bound" );
+        msg_Warn( p_vpar->p_fifo, "MPEG2NonIntra coeff is out of bounds" );
         p_vpar->picture.b_error = 1;
         break;
     }
@@ -693,7 +691,8 @@ store_coeff:
             if( i_coeff >= 64 )
             {
                 /* Illegal, but needed to avoid overflow */
-                intf_WarnMsg( 2, "vpar warning: MPEG1Intra coeff is out of bound" );
+                msg_Warn( p_vpar->p_fifo,
+                          "MPEG1Intra coeff is out of bounds" );
                 p_vpar->picture.b_error = 1;
                 break;
             }
@@ -755,7 +754,7 @@ store_coeff:
             }
         }
 
-        intf_WarnMsg( 2, "vpar warning: MPEG1Intra coeff is out of bound" );
+        msg_Warn( p_vpar->p_fifo, "MPEG1Intra coeff is out of bounds" );
         p_vpar->picture.b_error = 1;
         break;
     }
@@ -848,7 +847,8 @@ coeff_2:
             if( i_coeff >= 64 )
             {
                 /* Illegal, but needed to avoid overflow */
-                intf_WarnMsg( 2, "vpar warning: MPEG1NonIntra coeff is out of bound" );
+                msg_Warn( p_vpar->p_fifo,
+                          "MPEG1NonIntra coeff is out of bounds" );
                 p_vpar->picture.b_error = 1;
                 break;
             }
@@ -910,7 +910,7 @@ coeff_2:
             }
         }
 
-        intf_WarnMsg( 2, "vpar warning: MPEG1NonIntra coeff is out of bound" );
+        msg_Warn( p_vpar->p_fifo, "MPEG1NonIntra coeff is out of bounds" );
         p_vpar->picture.b_error = 1;
         break;
     }
@@ -1154,7 +1154,7 @@ static inline int GetDMV( vpar_thread_t * p_vpar )
 static void MotionMPEG1( vpar_thread_t * p_vpar,
                                     macroblock_t * p_mb,
                                     motion_t * p_motion,
-                                    boolean_t b_average )
+                                    vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y;
     int i_offset = p_vpar->mb.i_offset;
@@ -1183,7 +1183,7 @@ static void MotionMPEG1( vpar_thread_t * p_vpar,
 static void MotionMPEG1Reuse( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb,
                                          motion_t * p_motion,
-                                         boolean_t b_average )
+                                         vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y;
     int i_offset = p_vpar->mb.i_offset;
@@ -1207,7 +1207,7 @@ static void MotionMPEG1Reuse( vpar_thread_t * p_vpar,
 static void MotionFrameFrame( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb,
                                          motion_t * p_motion,
-                                         boolean_t b_average )
+                                         vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y;
     int i_offset = p_vpar->mb.i_offset;
@@ -1230,7 +1230,7 @@ static void MotionFrameFrame( vpar_thread_t * p_vpar,
 static void MotionFrameField( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb,
                                          motion_t * p_motion,
-                                         boolean_t b_average )
+                                         vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y, i_field_select;
     int i_offset = p_vpar->mb.i_offset;
@@ -1275,7 +1275,7 @@ static void MotionFrameField( vpar_thread_t * p_vpar,
 static void MotionFrameDMV( vpar_thread_t * p_vpar,
                                        macroblock_t * p_mb,
                                        motion_t * p_motion,
-                                       boolean_t b_average )
+                                       vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y;
     int i_dmv_x, i_dmv_y;
@@ -1321,7 +1321,7 @@ static void MotionFrameDMV( vpar_thread_t * p_vpar,
 static void MotionFrameZero( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb,
                                         motion_t * p_motion,
-                                        boolean_t b_average )
+                                        vlc_bool_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
     int i_width = p_vpar->picture.i_lum_stride;
@@ -1333,7 +1333,7 @@ static void MotionFrameZero( vpar_thread_t * p_vpar,
 static void MotionFrameReuse( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb,
                                          motion_t * p_motion,
-                                         boolean_t b_average )
+                                         vlc_bool_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
     int i_width = p_vpar->picture.i_lum_stride;
@@ -1347,10 +1347,10 @@ static void MotionFrameReuse( vpar_thread_t * p_vpar,
 static void MotionFieldField( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb,
                                          motion_t * p_motion,
-                                         boolean_t b_average )
+                                         vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y;
-    boolean_t b_field_select;
+    vlc_bool_t b_field_select;
     int i_offset = p_vpar->mb.i_offset;
     int i_width = p_vpar->picture.i_lum_stride;
 
@@ -1373,10 +1373,10 @@ static void MotionFieldField( vpar_thread_t * p_vpar,
 static void MotionField16x8( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb,
                                         motion_t * p_motion,
-                                        boolean_t b_average )
+                                        vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y;
-    boolean_t b_field_select;
+    vlc_bool_t b_field_select;
     int i_offset = p_vpar->mb.i_offset;
     int i_width = p_vpar->picture.i_lum_stride;
 
@@ -1416,13 +1416,13 @@ static void MotionField16x8( vpar_thread_t * p_vpar,
 static void MotionFieldDMV( vpar_thread_t * p_vpar,
                                        macroblock_t * p_mb,
                                        motion_t * p_motion,
-                                       boolean_t b_average )
+                                       vlc_bool_t b_average )
 {
     int i_motion_x, i_motion_y;
     int i_dmv_x, i_dmv_y;
     int i_offset = p_vpar->mb.i_offset;
     int i_width = p_vpar->picture.i_lum_stride;
-    boolean_t b_current_field = p_vpar->picture.b_current_field;
+    vlc_bool_t b_current_field = p_vpar->picture.b_current_field;
 
     i_motion_x = p_motion->ppi_pmv[0][0]
                         + MotionDelta( p_vpar, p_motion->pi_f_code[0] );
@@ -1453,11 +1453,11 @@ static void MotionFieldDMV( vpar_thread_t * p_vpar,
 static void MotionFieldZero( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb,
                                         motion_t * p_motion,
-                                        boolean_t b_average )
+                                        vlc_bool_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
     int i_width = p_vpar->picture.i_lum_stride;
-    boolean_t b_current_field = p_vpar->picture.b_current_field;
+    vlc_bool_t b_current_field = p_vpar->picture.b_current_field;
 
     MOTION_BLOCK( b_average, 0, 0, i_offset, p_motion->pppi_ref[b_current_field],
                   i_offset, i_width, 16, 0 );
@@ -1466,11 +1466,11 @@ static void MotionFieldZero( vpar_thread_t * p_vpar,
 static void MotionFieldReuse( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb,
                                          motion_t * p_motion,
-                                         boolean_t b_average )
+                                         vlc_bool_t b_average )
 {
     int i_offset = p_vpar->mb.i_offset;
     int i_width = p_vpar->picture.i_lum_stride;
-    boolean_t b_current_field = p_vpar->picture.b_current_field;
+    vlc_bool_t b_current_field = p_vpar->picture.b_current_field;
 
     MOTION_BLOCK( b_average, p_motion->ppi_pmv[0][0], p_motion->ppi_pmv[0][1],
                   i_offset, p_motion->pppi_ref[b_current_field],
@@ -1762,7 +1762,7 @@ mb_intra:
     }
 
 static inline void ParseSlice( vpar_thread_t * p_vpar,
-                               u32 i_vert_code, boolean_t b_mpeg2,
+                               u32 i_vert_code, vlc_bool_t b_mpeg2,
                                int i_coding_type, int i_structure )
 {
     int             i_lum_offset, i_chrom_offset, i_offset, i_lum_vsize, i_chrom_vsize;
@@ -2152,7 +2152,7 @@ static inline void ParseSlice( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * PictureData : Parse off all macroblocks (ISO/IEC 13818-2 6.2.3.7)
  *****************************************************************************/
-static inline void vpar_PictureData( vpar_thread_t * p_vpar, boolean_t b_mpeg2,
+static inline void vpar_PictureData( vpar_thread_t * p_vpar, vlc_bool_t b_mpeg2,
                                      int i_coding_type, int i_structure )
 {
     u32         i_dummy;

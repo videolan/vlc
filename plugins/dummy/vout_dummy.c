@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.23 2002/05/20 19:02:22 sam Exp $
+ * $Id: vout_dummy.c,v 1.24 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,10 +28,8 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #define DUMMY_WIDTH 16
 #define DUMMY_HEIGHT 16
@@ -43,25 +41,24 @@
  * This structure is part of the video output thread descriptor.
  * It describes the dummy specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     /* Nothing needed here. Maybe stats ? */
 
     /* Prevent malloc(0) */
     int i_dummy;
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
-static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
+static void vout_Display   ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -89,7 +86,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
@@ -104,9 +101,9 @@ static int vout_Init( vout_thread_t *p_vout )
     int i_index, i_chroma;
     char *psz_chroma;
     picture_t *p_pic;
-    boolean_t b_chroma = 0;
+    vlc_bool_t b_chroma = 0;
 
-    psz_chroma = config_GetPszVariable( "dummy-chroma" );
+    psz_chroma = config_GetPsz( p_vout, "dummy-chroma" );
     if( psz_chroma )
     {
         if( strlen( psz_chroma ) >= 4 )
@@ -127,7 +124,7 @@ static int vout_Init( vout_thread_t *p_vout )
     /* Initialize the output structure */
     if( b_chroma )
     {
-        intf_WarnMsg( 3, "vout info: forcing chroma 0x%.8x (%4.4s)",
+        msg_Dbg( p_vout, "forcing chroma 0x%.8x (%4.4s)",
                          i_chroma, (char*)&i_chroma );
         p_vout->output.i_chroma = i_chroma;
         p_vout->output.i_width  = p_vout->render.i_width;
@@ -166,9 +163,9 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
         }
 
-        vout_AllocatePicture( p_pic, p_vout->output.i_width,
-                                     p_vout->output.i_height,
-                                     p_vout->output.i_chroma );
+        vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_width,
+                              p_vout->output.i_height,
+                              p_vout->output.i_chroma );
 
         if( p_pic->i_planes == 0 )
         {

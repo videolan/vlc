@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.23 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: mpeg_adec.c,v 1.24 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -30,12 +30,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
+#include <vlc/aout.h>
 
 #include "mpeg_adec_generic.h"
 #include "mpeg_adec.h"
@@ -46,7 +43,7 @@
  * Local Prototypes
  *****************************************************************************/
 static int   decoder_Probe ( u8 * );
-static int   decoder_Run   ( decoder_config_t * );
+static int   decoder_Run   ( decoder_fifo_t * );
 static void  EndThread     ( adec_thread_t * );
 static void  DecodeThread  ( adec_thread_t * );
 
@@ -91,24 +88,22 @@ static int decoder_Probe( u8 *pi_type )
 /*****************************************************************************
  * decoder_Run: initialize, go inside main loop, detroy
  *****************************************************************************/
-static int decoder_Run ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_fifo_t * p_fifo )
 {
     adec_thread_t   * p_adec;
     
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_adec = (adec_thread_t *)malloc (sizeof(adec_thread_t))) == NULL ) 
     {
-        intf_ErrMsg ( "adec error: not enough memory for"
-                      " adec_CreateThread() to create the new thread" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return 0;
     }
     
     /*
      * Initialize the thread properties
      */
-    p_adec->p_config = p_config;
-    p_adec->p_fifo = p_config->p_decoder_fifo;
+    p_adec->p_fifo = p_fifo;
 
     /* 
      * Initilize the banks
@@ -121,8 +116,7 @@ static int decoder_Run ( decoder_config_t * p_config )
     /*
      * Initialize bit stream 
      */
-    InitBitstream( &p_adec->bit_stream, p_adec->p_config->p_decoder_fifo,
-                   NULL, NULL );
+    InitBitstream( &p_adec->bit_stream, p_adec->p_fifo, NULL, NULL );
 
     /* We do not create the audio output fifo now, but
        it will be created when the first frame is received */
@@ -170,9 +164,9 @@ static void DecodeThread( adec_thread_t * p_adec )
         {
             int i_channels;
             
-            if( p_main->b_stereo )
+            if( !config_GetInt( p_adec->p_fifo, "mono" ) )
             {
-                intf_WarnMsg( 4, "adec info: setting stereo output" );
+                msg_Dbg( p_adec->p_fifo, "setting stereo output" );
                 i_channels = 2;
             }
             else if( sync_info.b_stereo )
@@ -183,11 +177,13 @@ static void DecodeThread( adec_thread_t * p_adec )
             {
                 i_channels = 1;
             }
-            p_adec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, i_channels,
-                    sync_info.sample_rate, ADEC_FRAME_SIZE, NULL );
+            p_adec->p_aout_fifo =
+               aout_CreateFifo( p_adec->p_fifo->p_this,
+                                AOUT_FIFO_PCM, i_channels,
+                                sync_info.sample_rate, ADEC_FRAME_SIZE, NULL );
             if( p_adec->p_aout_fifo == NULL)
             {
-                intf_ErrMsg( "adec error: failed to create aout fifo" );
+                msg_Err( p_adec->p_fifo, "failed to create aout fifo" );
                 p_adec->p_fifo->b_error = 1;
                 return;
             }

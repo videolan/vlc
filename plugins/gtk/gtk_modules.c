@@ -2,7 +2,7 @@
  * gtk_modules.c : functions to build modules configuration boxes.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_modules.c,v 1.7 2001/12/30 07:09:55 sam Exp $
+ * $Id: gtk_modules.c,v 1.8 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,7 +28,8 @@
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #ifdef MODULE_NAME_IS_gnome
 #   include <gnome.h>
@@ -37,12 +38,6 @@
 #endif
 
 #include <string.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"

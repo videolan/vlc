@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.8 2002/04/19 13:56:11 sam Exp $
+ * $Id: memcpy.c,v 1.9 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #undef HAVE_MMX
 #undef HAVE_MMX2
@@ -67,7 +67,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( MEMCPY, 50 )
     ADD_SHORTCUT( "c" )
     ADD_SHORTCUT( "libc" )
-    ADD_SHORTCUT( "memcpy" )
 #elif defined( MODULE_NAME_IS_memcpy3dn )
     SET_DESCRIPTION( _("3D Now! memcpy module") )
     ADD_CAPABILITY( MEMCPY, 100 )

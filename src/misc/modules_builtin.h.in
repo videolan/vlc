@@ -21,9 +21,9 @@
  *****************************************************************************/
 
 #define ALLOCATE_BUILTIN( NAME ) \
-    AllocateBuiltinModule( InitModule__MODULE_ ## NAME, \
-                           ActivateModule__MODULE_ ## NAME, \
-                           DeactivateModule__MODULE_ ## NAME );
+    AllocateBuiltinModule( p_this, InitModule__MODULE_ ## NAME, \
+                                   ActivateModule__MODULE_ ## NAME, \
+                                   DeactivateModule__MODULE_ ## NAME );
 
 /* We also consider the main program as a module (useful for config stuff) */
 int InitModule__MODULE_main( module_t* );

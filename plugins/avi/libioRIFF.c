@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.6 2002/05/25 16:23:07 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.7 2002/06/01 12:31:58 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -81,7 +81,7 @@ static int 	__RIFF_SkipBytes(input_thread_t * p_input,int nb)
     }
     else
     {
-        intf_WarnMsg( 1, "input demux: cannot seek, it will take times" );
+        msg_Warn( p_input, "cannot seek, it will take times" );
         if( nb < 0 ) { return( -1 ); }
         i_rest = nb;
         while (i_rest != 0 )
@@ -128,6 +128,7 @@ static riffchunk_t     * RIFF_ReadChunk(input_thread_t * p_input)
  
 	if((p_riff = malloc( sizeof(riffchunk_t))) == NULL)
 	{
+		msg_Err( p_input, "out of memory" );
 		return NULL;
 	}
 	
@@ -138,6 +139,7 @@ static riffchunk_t     * RIFF_ReadChunk(input_thread_t * p_input)
 	count=input_Peek( p_input, &p_peek, 12 );
 	if( count < 8 )
 	{
+		msg_Err( p_input, "cannot peek()" );
 		free(p_riff);
 		return NULL;
 	}
@@ -169,6 +171,7 @@ static int RIFF_NextChunk( input_thread_t * p_input,riffchunk_t *p_rifffather)
 
 	if( ( p_riff = RIFF_ReadChunk( p_input ) ) == NULL )
 	{
+		msg_Err( p_input, "cannot read chunk" );
 		return( -1 );
 	}
 	i_len = p_riff->i_size;
@@ -180,6 +183,7 @@ static int RIFF_NextChunk( input_thread_t * p_input,riffchunk_t *p_rifffather)
         if ( i_lenfather%2 !=0 ) {i_lenfather++;}
 		if ( p_rifffather->i_pos + i_lenfather  <= p_riff->i_pos + i_len + 8 )
 		{
+                        msg_Err( p_input, "next chunk out of bounds" );
 			free( p_riff );
 			return( 1 ); /* pas dans nos frontiere */
 		}
@@ -187,6 +191,7 @@ static int RIFF_NextChunk( input_thread_t * p_input,riffchunk_t *p_rifffather)
 	if ( __RIFF_SkipBytes( p_input,i_len + 8 ) != 0 )
 	{ 
 		free( p_riff );
+		msg_Err( p_input, "cannot go to the next chunk" );
 		return( -1 );
 	}
 	free( p_riff );
@@ -200,6 +205,7 @@ static int	RIFF_DescendChunk(input_thread_t * p_input)
 {
 	if ( __RIFF_SkipBytes(p_input,12) != 0)
 	{
+		msg_Err( p_input, "cannot go into chunk" );
 		return ( -1 );
 	}
 	return( 0 );
@@ -223,6 +229,7 @@ static int	RIFF_AscendChunk(input_thread_t * p_input ,riffchunk_t *p_rifffather)
 
     if (( __RIFF_SkipBytes(p_input,i_skip)) != 0)
 	{
+		msg_Err( p_input, "cannot exit from subchunk" );
 		return( -1 );
 	}
 	return( 0 );
@@ -273,6 +280,7 @@ static int	RIFF_LoadChunkData(input_thread_t * p_input,riffchunk_t *p_riff )
 	RIFF_GoToChunkData(p_input);
 	if ( input_SplitBuffer( p_input, &p_riff->p_data, p_riff->i_size ) != p_riff->i_size )
 	{
+		msg_Err( p_input, "cannot read enough data " );
 		return ( -1 );
 	}
 	if ( p_riff->i_size%2 != 0) 
@@ -392,6 +400,7 @@ static int   RIFF_TestFileHeader( input_thread_t * p_input, riffchunk_t ** pp_ri
     
     if( *pp_riff == NULL )
     {
+        msg_Err( p_input, "cannot retrieve header" );
         return( -1 );
     }
     if( (*pp_riff)->i_id != FOURCC_RIFF ) 

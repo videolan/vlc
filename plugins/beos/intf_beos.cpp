@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.38 2002/02/15 13:32:52 sam Exp $
+ * $Id: intf_beos.cpp,v 1.39 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -32,26 +32,19 @@
 #include <InterfaceKit.h>
 #include <string.h>
 
-extern "C"
-{
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-
-#include "interface.h"
-#include "input_ext-intf.h"
-}
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "InterfaceWindow.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
-typedef struct intf_sys_s
+struct intf_sys_s
 {
     InterfaceWindow * p_window;
     char              i_key;
-} intf_sys_t;
+};
 
 
 extern "C"
@@ -93,7 +86,7 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys = (intf_sys_t*) malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM));
+        msg_Err( p_intf, "out of memory" );
         return( 1 );
     }
     p_intf->p_sys->i_key = -1;
@@ -105,7 +98,7 @@ static int intf_Open( intf_thread_t *p_intf )
     if( p_intf->p_sys->p_window == 0 )
     {
         free( p_intf->p_sys );
-        intf_ErrMsg( "error: cannot allocate memory for InterfaceWindow" );
+        msg_Err( p_intf, "cannot allocate InterfaceWindow" );
         return( 1 );
     }
 
@@ -132,13 +125,13 @@ static void intf_Close( intf_thread_t *p_intf )
 static void intf_Run( intf_thread_t *p_intf )
 {
 
-    while( !p_intf->b_die )
+    while( !p_intf->p_vlc->b_die )
     {
         /* Manage core vlc functions through the callback */
         p_intf->pf_manage( p_intf );
 
         /* Manage the slider */
-        if( p_input_bank->pp_input[0] != NULL
+        if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL
              && p_intf->p_sys->p_window != NULL)
         {
             p_intf->p_sys->p_window->updateInterface();

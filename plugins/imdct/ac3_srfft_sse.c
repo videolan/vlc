@@ -2,7 +2,7 @@
  * ac3_srfft_sse.c: accelerated SSE ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_sse.c,v 1.12 2002/05/14 18:11:15 sam Exp $
+ * $Id: ac3_srfft_sse.c,v 1.13 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -28,7 +28,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"

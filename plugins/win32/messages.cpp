@@ -23,9 +23,8 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include <videolan/vlc.h>
-
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "win32_common.h"
 #include "messages.h"
@@ -34,7 +33,7 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 
-extern  struct intf_thread_s *p_intfGlobal;
+extern intf_thread_t *p_intfGlobal;
 
 //---------------------------------------------------------------------------
 __fastcall TMessagesDlg::TMessagesDlg( TComponent* Owner )
@@ -60,7 +59,7 @@ void __fastcall TMessagesDlg::FormShow( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMessagesDlg::UpdateLog()
 {
-    intf_subscription_t *p_sub = p_intfGlobal->p_sys->p_sub;
+    msg_subscription_t *p_sub = p_intfGlobal->p_sys->p_sub;
     int                 i_start, i_stop, i_del, i_count;
     int                 i_max_lines;
 
@@ -72,15 +71,15 @@ void __fastcall TMessagesDlg::UpdateLog()
     {
         for( i_start = p_sub->i_start;
              i_start != i_stop;
-             i_start = (i_start+1) % INTF_MSG_QSIZE )
+             i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
             /* Append all messages to log window */
             switch( p_sub->p_msg[i_start].i_type )
             {
-            case INTF_MSG_ERR:
+            case VLC_MSG_ERR:
                 RichEditMessages->SelAttributes->Color = clRed;
                 break;
-            case INTF_MSG_WARN:
+            case VLC_MSG_WARN:
                 RichEditMessages->SelAttributes->Color = clBlack;
                 break;
             default:

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.66 2002/05/30 13:22:43 asmax Exp $
+ * $Id: netutils.c,v 1.67 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -33,7 +33,7 @@
 #include <errno.h>                                                /* errno() */
 #include <string.h>                                              /* memset() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                      /* gethostname() */
@@ -76,7 +76,6 @@
 
 #include "netutils.h"
 
-#include "intf_playlist.h"
 #include "network.h"
 
 /*****************************************************************************
@@ -87,16 +86,16 @@
  * as it depends on the VideoLAN channel server, which isn't frozen for
  * the time being.
  *****************************************************************************/
-typedef struct input_channel_s
+struct input_channel_s
 {
     int         i_channel;                         /* current channel number */
     mtime_t     last_change;                             /* last change date */
-} input_channel_t;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int GetMacAddress   ( int i_fd, char *psz_mac );
+static int GetMacAddress   ( vlc_object_t *, int i_fd, char *psz_mac );
 #ifdef WIN32
 static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 #endif
@@ -108,26 +107,26 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
  * once before any input thread is created or any call to other
  * input_Channel*() function is attempted.
  *****************************************************************************/
-int network_ChannelCreate( void )
+int network_ChannelCreate( vlc_object_t *p_this )
 {
 #if !defined( SYS_LINUX ) && !defined( WIN32 )
-    intf_ErrMsg( "channel warning: VLAN-based channels are not supported"
-                 " under this architecture" );
+    msg_Err( p_this, "VLAN-based channels are not supported "
+                     "on this architecture" );
 #endif
 
     /* Allocate structure */
-    p_main->p_channel = malloc( sizeof( input_channel_t ) );
-    if( p_main->p_channel == NULL )
+    p_this->p_vlc->p_channel = malloc( sizeof( input_channel_t ) );
+    if( p_this->p_vlc->p_channel == NULL )
     {
-        intf_ErrMsg( "network error: could not create channel bank" );
+        msg_Err( p_this, "out of memory" );
         return( -1 );
     }
 
     /* Initialize structure */
-    p_main->p_channel->i_channel   = 0;
-    p_main->p_channel->last_change = 0;
+    p_this->p_vlc->p_channel->i_channel   = 0;
+    p_this->p_vlc->p_channel->last_change = 0;
 
-    intf_WarnMsg( 2, "network: channels initialized" );
+    msg_Dbg( p_this, "channels initialized" );
     return( 0 );
 }
 
@@ -142,14 +141,14 @@ int network_ChannelCreate( void )
  * should be unlocked using input_ChannelLeave().
  * Non 0 will be returned in case of error.
  *****************************************************************************/
-int network_ChannelJoin( int i_channel )
+int network_ChannelJoin( vlc_object_t *p_this, int i_channel )
 {
 #define VLCS_VERSION 13
 #define MESSAGE_LENGTH 256
 
-    struct module_s *   p_network;
-    char *              psz_network = NULL;
-    network_socket_t    socket_desc;
+    module_t *       p_network;
+    char *           psz_network = NULL;
+    network_socket_t socket_desc;
     char psz_mess[ MESSAGE_LENGTH ];
     char psz_mac[ 40 ];
     int i_fd, i_port;
@@ -157,43 +156,44 @@ int network_ChannelJoin( int i_channel )
     struct timeval delay;
     fd_set fds;
 
-    if( !config_GetIntVariable( "network-channel" ) )
+    if( !config_GetInt( p_this, "network-channel" ) )
     {
-        intf_ErrMsg( "network: channels disabled, to enable them, use the"
-                     "--channels option" );
+        msg_Err( p_this, "channels disabled, to enable them, use the"
+                         " --channels option" );
         return -1;
     }
 
     /* If last change is too recent, wait a while */
-//    if( mdate() - p_main->p_channel->last_change < INPUT_CHANNEL_CHANGE_DELAY )
+//    if( mdate() - p_this->p_vlc->p_channel->last_change
+//            < INPUT_CHANNEL_CHANGE_DELAY )
 //    {
-//        intf_WarnMsg( 2, "network: waiting before changing channel" );
+//        msg_Warn( p_this, "waiting before changing channel" );
         /* XXX Isn't this completely brain-damaged ??? -- Sam */
         /* Yes it is. I don't think this is still justified with the new
          * vlanserver --Meuuh */
-//        mwait( p_main->p_channel->last_change + INPUT_CHANNEL_CHANGE_DELAY );
+//        mwait( p_this->p_vlc->p_channel->last_change
+//                   + INPUT_CHANNEL_CHANGE_DELAY );
 //    }
 
-    if( config_GetIntVariable( "ipv4" ) )
+    if( config_GetInt( p_this, "ipv4" ) )
     {
         psz_network = "ipv4";
     }
-    if( config_GetIntVariable( "ipv6" ) )
+    if( config_GetInt( p_this, "ipv6" ) )
     {
         psz_network = "ipv6";
     }
 
     /* Getting information about the channel server */
-    if( !(psz_vlcs = config_GetPszVariable( "channel-server" )) )
+    if( !(psz_vlcs = config_GetPsz( p_this, "channel-server" )) )
     {
-        intf_ErrMsg( "network: configuration variable channel_server empty" );
+        msg_Err( p_this, "configuration variable channel-server empty" );
         return -1;
     }
 
-    i_port = config_GetIntVariable( "channel-port" );
+    i_port = config_GetInt( p_this, "channel-port" );
 
-    intf_WarnMsg( 5, "channel: connecting to %s:%d",
-                     psz_vlcs, i_port );
+    msg_Dbg( p_this, "connecting to %s:%d", psz_vlcs, i_port );
 
     /* Prepare the network_socket_t structure */
     socket_desc.i_type = NETWORK_UDP;
@@ -203,7 +203,7 @@ int network_ChannelJoin( int i_channel )
     socket_desc.i_server_port = i_port;
 
     /* Find an appropriate network module */
-    p_network = module_Need( MODULE_CAPABILITY_NETWORK, psz_network,
+    p_network = module_Need( p_this, MODULE_CAPABILITY_NETWORK, psz_network,
                              &socket_desc );
     if( p_network == NULL )
     {
@@ -215,14 +215,14 @@ int network_ChannelJoin( int i_channel )
     i_fd = socket_desc.i_handle;
 
     /* Look for the interface MAC address */
-    if( GetMacAddress( i_fd, psz_mac ) )
+    if( GetMacAddress( p_this, i_fd, psz_mac ) )
     {
-        intf_ErrMsg( "network error: failed getting MAC address" );
+        msg_Err( p_this, "failed getting MAC address" );
         close( i_fd );
         return -1;
     }
 
-    intf_WarnMsg( 6, "network: MAC address is %s", psz_mac );
+    msg_Dbg( p_this, "MAC address is %s", psz_mac );
 
     /* Build the message */
     sprintf( psz_mess, "%d %u %lu %s \n", i_channel, VLCS_VERSION,
@@ -232,11 +232,11 @@ int network_ChannelJoin( int i_channel )
     /* Send the message */
     send( i_fd, psz_mess, MESSAGE_LENGTH, 0 );
 
-    intf_WarnMsg( 2, "network: attempting to join channel %d", i_channel );
+    msg_Dbg( p_this, "attempting to join channel %d", i_channel );
 
     /* We have changed channels ! (or at least, we tried) */
-    p_main->p_channel->last_change = mdate();
-    p_main->p_channel->i_channel = i_channel;
+    p_this->p_vlc->p_channel->last_change = mdate();
+    p_this->p_vlc->p_channel->i_channel = i_channel;
 
     /* Wait 5 sec for an answer from the server */
     delay.tv_sec = 5;
@@ -247,16 +247,14 @@ int network_ChannelJoin( int i_channel )
     switch( select( i_fd + 1, &fds, NULL, NULL, &delay ) )
     {
         case 0:
-            intf_ErrMsg( "network error: no answer from vlcs" );
+            msg_Err( p_this, "no answer from vlcs" );
             close( i_fd );
             return -1;
-            break;
 
         case -1:
-            intf_ErrMsg( "network error: error while listening to vlcs" );
+            msg_Err( p_this, "error while listening to vlcs" );
             close( i_fd );
             return -1;
-            break;
     }
 
     recv( i_fd, psz_mess, MESSAGE_LENGTH, 0 );
@@ -264,32 +262,34 @@ int network_ChannelJoin( int i_channel )
 
     if( !strncasecmp( psz_mess, "E:", 2 ) )
     {
-        intf_ErrMsg( "network error: vlcs said '%s'", psz_mess + 2 );
+        msg_Err( p_this, "vlcs said '%s'", psz_mess + 2 );
         close( i_fd );
         return -1;
     }
     else if( !strncasecmp( psz_mess, "I:", 2 ) )
     {
-        intf_WarnMsg( 2, "network info: vlcs said '%s'", psz_mess + 2 );
+        msg_Dbg( p_this, "vlcs said '%s'", psz_mess + 2 );
     }
     else /* We got something to play ! FIXME: not very nice */
     {
-#   define p_item \
-        (&p_main->p_playlist->p_item[ p_main->p_playlist->i_index + 1])
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+#if 0
+#   define p_item (&p_this->p_vlc->p_playlist->p_item \
+                       [ p_this->p_vlc->p_playlist->i_index + 1])
+        vlc_mutex_lock( &p_this->p_vlc->p_playlist->change_lock );
         if( p_item )
         {
             free( p_item->psz_name );
             p_item->psz_name = strdup( psz_mess );
             /* Unlock _afterwards_ */
-            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+            vlc_mutex_unlock( &p_this->p_vlc->p_playlist->change_lock );
         }
         else
         {
             /* Unlock _before_ */
-            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-            intf_PlaylistAdd( p_main->p_playlist, 0, psz_mess );
+            vlc_mutex_unlock( &p_this->p_vlc->p_playlist->change_lock );
+            intf_PlaylistAdd( p_this->p_vlc->p_playlist, 0, psz_mess );
         }
+#endif
     }
 
     /* Close the socket and return nicely */
@@ -307,7 +307,7 @@ int network_ChannelJoin( int i_channel )
 /*****************************************************************************
  * GetMacAddress: extract the MAC Address
  *****************************************************************************/
-static int GetMacAddress( int i_fd, char *psz_mac )
+static int GetMacAddress( vlc_object_t *p_this, int i_fd, char *psz_mac )
 {
 #if defined( SYS_LINUX )
     struct ifreq interface;
@@ -318,9 +318,9 @@ static int GetMacAddress( int i_fd, char *psz_mac )
      * Looking for information about the eth0 interface
      */
     interface.ifr_addr.sa_family = AF_INET;
-    if( !(psz_interface = config_GetPszVariable( "iface" )) )
+    if( !(psz_interface = config_GetPsz( p_this, "iface" )) )
     {
-        intf_ErrMsg( "network error: configuration variable iface empty" );
+        msg_Err( p_this, "configuration variable iface empty" );
         return -1;
     }
     strcpy( interface.ifr_name, psz_interface );
@@ -330,7 +330,7 @@ static int GetMacAddress( int i_fd, char *psz_mac )
 
     if( i_ret )
     {
-        intf_ErrMsg( "network error: ioctl SIOCGIFHWADDR failed" );
+        msg_Err( p_this, "ioctl SIOCGIFHWADDR failed" );
         return( i_ret );
     }
 
@@ -351,7 +351,7 @@ static int GetMacAddress( int i_fd, char *psz_mac )
     LANA_ENUM AdapterList;
     NCB       Ncb;
 
-    intf_WarnMsg( 2, "network: looking for MAC address" );
+    msg_Dbg( p_this, "looking for MAC address" );
 
     memset( &Ncb, 0, sizeof( NCB ) );
     Ncb.ncb_command = NCBENUM;
@@ -397,7 +397,7 @@ static int GetAdapterInfo( int i_adapter, char *psz_string )
 
     if( Netbios( &Ncb ) != NRC_GOODRET )
     {
-        intf_ErrMsg( "network error: reset returned %i", Ncb.ncb_retcode );
+//X        intf_ErrMsg( "network error: reset returned %i", Ncb.ncb_retcode );
         return -1;
     }
 
@@ -424,13 +424,13 @@ static int GetAdapterInfo( int i_adapter, char *psz_string )
                 (int) ( Adapter.adapt.adapter_address[4] ),
                 (int) ( Adapter.adapt.adapter_address[5] ) );
 
-        intf_WarnMsg( 2, "network: found MAC address %s", psz_string );
+//X        intf_WarnMsg( 2, "network: found MAC address %s", psz_string );
 
         return 0;
     }
     else
     {
-        intf_ErrMsg( "network error: ASTAT returned %i", Ncb.ncb_retcode );
+//X        intf_ErrMsg( "network error: ASTAT returned %i", Ncb.ncb_retcode );
         return -1;
     }
 }

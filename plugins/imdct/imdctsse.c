@@ -2,7 +2,7 @@
  * imdctsse.c : accelerated SSE IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdctsse.c,v 1.12 2002/04/19 13:56:11 sam Exp $
+ * $Id: imdctsse.c,v 1.13 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_imdct_common.h"
@@ -48,7 +48,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( IMDCT, 200 )
     ADD_REQUIREMENT( SSE )
     ADD_SHORTCUT( "sse" )
-    ADD_SHORTCUT( "imdctsse" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

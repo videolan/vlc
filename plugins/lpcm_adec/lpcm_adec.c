@@ -1,8 +1,8 @@
 /*****************************************************************************
- * lpcm_decoder_thread.c: lpcm decoder thread
+ * lpcm_adec.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.15 2002/05/24 12:42:14 gbazin Exp $
+ * $Id: lpcm_adec.c,v 1.16 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -25,20 +25,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <string.h>                                    /* memcpy(), memset() */
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+#include <vlc/decoder.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* getpid() */
 #endif
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
 
 #include "lpcm_adec.h"
 
@@ -46,7 +42,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  decoder_Probe  ( u8 * );
-static int  decoder_Run    ( decoder_config_t * );
+static int  decoder_Run    ( decoder_fifo_t * );
        void DecodeFrame    ( lpcmdec_thread_t * );
 static int  InitThread     ( lpcmdec_thread_t * );
 static void EndThread      ( lpcmdec_thread_t * );
@@ -90,7 +86,7 @@ static int decoder_Probe( u8 *pi_type )
 /*****************************************************************************
  * decoder_Run: the lpcm decoder
  *****************************************************************************/
-static int decoder_Run( decoder_config_t * p_config )
+static int decoder_Run( decoder_fifo_t * p_fifo )
 {
     lpcmdec_thread_t *   p_lpcmdec;
 
@@ -98,20 +94,19 @@ static int decoder_Run( decoder_config_t * p_config )
     if( (p_lpcmdec = (lpcmdec_thread_t *)malloc (sizeof(lpcmdec_thread_t)) )
             == NULL) 
     {
-        intf_ErrMsg( "LPCM : error : cannot create lpcmdec_thread_t" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return( -1 );
     }
 
     /*
      * Initialize the thread properties
      */
-    p_lpcmdec->p_config = p_config;
-    p_lpcmdec->p_fifo = p_config->p_decoder_fifo;
+    p_lpcmdec->p_fifo = p_fifo;
 
     if( InitThread( p_lpcmdec ) )
     {
-        DecoderError( p_config->p_decoder_fifo );
+        DecoderError( p_fifo );
         free( p_lpcmdec );
         return( -1 );
     }
@@ -141,12 +136,13 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
 {
 
     /* Init the BitStream */
-    InitBitstream( &p_lpcmdec->bit_stream, p_lpcmdec->p_config->p_decoder_fifo,
+    InitBitstream( &p_lpcmdec->bit_stream, p_lpcmdec->p_fifo,
                    NULL, NULL);
 
     /* Creating the audio output fifo */
-    p_lpcmdec->p_aout_fifo = aout_CreateFifo( AOUT_FIFO_PCM, 2, 48000,
-                                              LPCMDEC_FRAME_SIZE/2, NULL  );
+    p_lpcmdec->p_aout_fifo =
+                aout_CreateFifo( p_lpcmdec->p_fifo->p_this, AOUT_FIFO_PCM,
+                                 2, 48000, LPCMDEC_FRAME_SIZE / 2, NULL  );
     if ( p_lpcmdec->p_aout_fifo == NULL )
     {
         return( -1 );

@@ -2,7 +2,8 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.8 2002/05/18 17:47:47 sam Exp $
+ * $Id: mpeg_audio.c,v 1.9 2002/06/01 12:32:00 sam Exp $
+ *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -26,21 +27,18 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #include <sys/types.h>
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void input_getfunctions( function_list_t * p_function_list );
-static int  MPEGAudioDemux         ( struct input_thread_s * );
-static int  MPEGAudioInit          ( struct input_thread_s * );
-static void MPEGAudioEnd           ( struct input_thread_s * );
+static void input_getfunctions ( function_list_t * p_function_list );
+static int  MPEGAudioDemux     ( input_thread_t * );
+static int  MPEGAudioInit      ( input_thread_t * );
+static void MPEGAudioEnd       ( input_thread_t * );
 
 /* TODO: support MPEG-2.5, not difficult */
 
@@ -374,7 +372,7 @@ static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
     }
     if( p_xh->i_flags&TOC_FLAG ) 
     {
-        FAST_MEMCPY( p_xh->i_toc, p_buff, 100 );
+        p_input->p_vlc->pf_memcpy( p_xh->i_toc, p_buff, 100 );
         p_buff += 100;
     }
     if( p_xh->i_flags&VBR_SCALE_FLAG ) 
@@ -432,19 +430,19 @@ static int MPEGAudioInit( input_thread_t * p_input )
                                              MPEGAUDIO_MAXTESTPOS) ) 
                     < (b_forced ? 1 : 2)  )
     {
-        intf_WarnMsg( 2,"input: MPEGAudio plug-in discarded" );
+        msg_Warn( p_input, "MPEGAudio module discarded" );
         return( -1 );
     }
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
-        intf_ErrMsg( "input error: cannot init stream" );
+        msg_Err( p_input, "cannot init stream" );
         return( -1 );
     }    
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
-        intf_ErrMsg( "input error: cannot add program" );
+        msg_Err( p_input, "cannot add program" );
         return( -1 );
     }
     p_input->stream.pp_programs[0]->b_is_ok = 0;
@@ -459,7 +457,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
     if( !p_es )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        intf_ErrMsg( "input error: not enough memory." );
+        msg_Err( p_input, "out of memory" );
         return( -1 );
     }
     p_es->i_stream_id = 1;
@@ -477,7 +475,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
 
     if( !p_mpegaudio )
     {
-        intf_ErrMsg( "input error: not enough memory." );
+        msg_Err( p_input, "out of memory" );
         return( -1 );
     }
 
@@ -505,7 +503,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
     /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME */
 
     /* all is ok :)) */
-    intf_Msg( "input init: Audio MPEG-%d layer %d %s %dHz %dKb/s %s",
+    msg_Dbg( p_input, "audio MPEG-%d layer %d %s %dHz %dKb/s %s",
                 mpeg.i_version + 1,
                 mpeg.i_layer +1 ,
                 mpegaudio_mode[mpeg.i_mode],
@@ -544,7 +542,7 @@ static int MPEGAudioDemux( input_thread_t * p_input )
     /*  look for a frame */
     if( !MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, 4096 ) )
     {
-        intf_WarnMsg( 1, "input error: cannot find next frame");
+        msg_Warn( p_input, "cannot find next frame" );
         return( 0 );
     }
     
@@ -553,7 +551,7 @@ static int MPEGAudioDemux( input_thread_t * p_input )
         ||( mpeg.i_layer != p_mpegaudio->mpeg.i_layer )
         ||( mpeg.i_samplingfreq != p_mpegaudio->mpeg.i_samplingfreq ) )
     {
-        intf_WarnMsg( 1, "input demux: stream has changed" );
+        msg_Dbg( p_input, "stream has changed" );
         p_mpegaudio->i_framecount = 0;
         p_mpegaudio->i_pts = 0;
     }
@@ -569,7 +567,7 @@ static int MPEGAudioDemux( input_thread_t * p_input )
     /* create one pes */
     if( !(p_pes = input_NewPES( p_input->p_method_data )) )
     {
-        intf_ErrMsg( "input demux: out of memory" );
+        msg_Err( p_input, "cannot allocate new PES" );
         return( -1 );
     }
 
@@ -608,7 +606,7 @@ static int MPEGAudioDemux( input_thread_t * p_input )
 
     if( !p_mpegaudio->p_es->p_decoder_fifo )
     {
-        intf_ErrMsg( "input demux: no audio decoder" );
+        msg_Err( p_input, "no audio decoder" );
         input_DeletePES( p_input->p_method_data, p_pes );
         return( -1 ); /* perhaps not, it's my choice */
     }

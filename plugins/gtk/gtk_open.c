@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.24 2002/05/18 02:12:20 ipkiss Exp $
+ * $Id: gtk_open.c,v 1.25 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,7 +28,8 @@
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #ifdef MODULE_NAME_IS_gnome
 #   include <gnome.h>
@@ -37,12 +38,6 @@
 #endif
 
 #include <string.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
@@ -72,7 +67,7 @@ gboolean GtkFileOpenShow( GtkWidget       *widget,
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
                              "p_intf", p_intf );
 
-        if( (psz_path = config_GetPszVariable( "search-path" )) )
+        if( (psz_path = config_GetPsz( p_intf, "search-path" )) )
             gtk_file_selection_set_filename( GTK_FILE_SELECTION(
                 p_intf->p_sys->p_fileopen ), psz_path );
         if( psz_path ) free( psz_path );
@@ -93,10 +88,17 @@ void GtkFileOpenCancel( GtkButton * button, gpointer user_data )
 void GtkFileOpenOk( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_fileopen" );
+    playlist_t *    p_playlist;
     GtkCList *      p_playlist_clist;
     GtkWidget *     p_filesel;
     gchar *         psz_filename;
-    int             i_end = p_main->p_playlist->i_size;
+
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
 
     /* hide the file selector */
     p_filesel = gtk_widget_get_toplevel( GTK_WIDGET(button) );
@@ -105,21 +107,24 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
     /* add the new file to the interface playlist */
     psz_filename =
         gtk_file_selection_get_filename( GTK_FILE_SELECTION( p_filesel ) );
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)psz_filename );
+    playlist_Add( p_playlist->p_this, 0, (char*)psz_filename );
 
     /* catch the GTK CList */
     p_playlist_clist = GTK_CLIST( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
     /* update the plugin display */
-    GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+    GtkRebuildCList( p_playlist_clist, p_playlist );
 
+    vlc_object_release( p_playlist );
     /* end current item, select added item  */
-    if( p_input_bank->pp_input[0] != NULL )
+#if 0
+    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
 
-    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, i_end - 1 );
+#endif
 }
 
 /*****************************************************************************
@@ -149,11 +154,13 @@ gboolean GtkDiscOpenShow( GtkWidget       *widget,
 
 void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
 {
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(togglebutton), "intf_disc" );
+
     if( togglebutton->active )
     {
         char *psz_dvd_device;
 
-        if( (psz_dvd_device = config_GetPszVariable( "dvd" )) )
+        if( (psz_dvd_device = config_GetPsz( p_intf, "dvd" )) )
             gtk_entry_set_text(
                 GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                           "disc_name" ) ), psz_dvd_device );
@@ -163,11 +170,13 @@ void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
 
 void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
 {
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(togglebutton), "intf_disc" );
+
     if( togglebutton->active )
     {
         char *psz_vcd_device;
 
-        if( (psz_vcd_device = config_GetPszVariable( "vcd" )) )
+        if( (psz_vcd_device = config_GetPsz( p_intf, "vcd" )) )
             gtk_entry_set_text(
                 GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton),
                                           "disc_name" ) ), psz_vcd_device );
@@ -178,10 +187,17 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
 void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_disc" );
+    playlist_t *    p_playlist;
     GtkCList *      p_playlist_clist;
     char *          psz_device, *psz_source, *psz_method;
-    int             i_end = p_main->p_playlist->i_size;
     int             i_title, i_chapter;
+
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
 
     gtk_widget_hide( p_intf->p_sys->p_disc );
     psz_device = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
@@ -200,7 +216,7 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     }
     else
     {
-        intf_ErrMsg( "intf error: unknown disc type toggle button position" );
+        msg_Err( p_intf, "unknown disc type toggle button position" );
         return;
     }
     
@@ -225,7 +241,7 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%s@%d,%d",
              psz_method, psz_device, i_title, i_chapter );
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+    playlist_Add( p_playlist->p_this, 0, psz_source );
     free( psz_source );
 
     /* catch the GTK CList */
@@ -233,15 +249,19 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
         GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
 
     /* update the display */
-    GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+    GtkRebuildCList( p_playlist_clist, p_playlist );
 
     /* stop current item, select added item */
-    if( p_input_bank->pp_input[0] != NULL )
+#if 0
+    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
 
-    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, i_end - 1 );
+#endif
+
+    vlc_object_release( p_playlist );
 }
 
 
@@ -272,9 +292,9 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
 
         gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_network ), "network_udp_port" ) ),
-            config_GetIntVariable( "server-port" ) );
+            config_GetInt( p_intf, "server-port" ) );
 
-        psz_channel_server = config_GetPszVariable( "channel-server" );
+        psz_channel_server = config_GetPsz( p_intf, "channel-server" );
         if( psz_channel_server )
             gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
                 GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel_address" ) ),
@@ -283,11 +303,11 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
 
         gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_network ), "network_channel_port" ) ),
-            config_GetIntVariable( "channel-port" ) );
+            config_GetInt( p_intf, "channel-port" ) );
 
         gtk_toggle_button_set_active( gtk_object_get_data( GTK_OBJECT(
             p_intf->p_sys->p_network ), "network_channel" ),
-            config_GetIntVariable( "network-channel" ) );
+            config_GetInt( p_intf, "network-channel" ) );
     }
 
     gtk_widget_show( p_intf->p_sys->p_network );
@@ -300,26 +320,35 @@ gboolean GtkNetworkOpenShow( GtkWidget       *widget,
 void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
 {
     intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_network" );
+    playlist_t *    p_playlist;
     GtkCList *      p_playlist_clist;
     char *          psz_source, *psz_address;
     unsigned int    i_port;
-    boolean_t       b_channel;
-    int             i_end = p_main->p_playlist->i_size;
+    vlc_bool_t      b_channel;
+
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
 
     gtk_widget_hide( p_intf->p_sys->p_network );
 //    psz_server = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
 //                                 GTK_WIDGET(button), "network_server" ) ) );
 
     /* select added item */
-    if( p_input_bank->pp_input[0] != NULL )
+#if 0
+    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
+#endif
 
     /* Manage channel server */
     b_channel = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON(
             lookup_widget( GTK_WIDGET(button), "network_channel" ) ) );
-    config_PutIntVariable( "network-channel", b_channel );
+    config_PutInt( p_intf, "network-channel", b_channel );
 
     /* Check which option was chosen */
     /* UDP */
@@ -335,7 +364,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
              lookup_widget( GTK_WIDGET(button), "network_udp_port" ) ) );
         if( i_port > 65535 )
         {
-            intf_ErrMsg( "intf error: invalid port %i", i_port );
+            msg_Err( p_intf, "invalid port %i", i_port );
         }
  
         /* Allocate room for "protocol:@:port" */
@@ -349,16 +378,18 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         /* Build source name and add it to playlist */
         sprintf( psz_source, "udp:@:%i", i_port );
 
-        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+        playlist_Add( p_playlist->p_this, 0, psz_source );
         free( psz_source );
 
         /* catch the GTK CList */
         p_playlist_clist = GTK_CLIST( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
         /* update the display */
-        GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+        GtkRebuildCList( p_playlist_clist, p_playlist );
 
-        intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+#if 0
+        intf_PlaylistJumpto( p_playlist, i_end - 1 );
+#endif
     }
 
     /* UDP Multicast */
@@ -375,7 +406,7 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
              lookup_widget( GTK_WIDGET(button), "network_multicast_port" ) ) );
         if( i_port > 65535 )
         {
-            intf_ErrMsg( "intf error: invalid port %i", i_port );
+            msg_Err( p_intf, "invalid port %i", i_port );
         }
  
         /* Allocate room for "protocol:@address:port" */
@@ -390,16 +421,18 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         /* Build source name and add it to playlist */
         sprintf( psz_source, "udp:@%s:%i", psz_address, i_port );
 
-        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+        playlist_Add( p_playlist->p_this, 0, psz_source );
         free( psz_source );
 
         /* catch the GTK CList */
         p_playlist_clist = GTK_CLIST( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
         /* update the display */
-        GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+        GtkRebuildCList( p_playlist_clist, p_playlist );
 
-        intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+#if 0
+        intf_PlaylistJumpto( p_playlist, i_end - 1 );
+#endif
     }
     
     /* Channel server */
@@ -409,9 +442,9 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         char *          psz_channel;
         unsigned int    i_channel_port;
 
-        if( p_main->p_channel == NULL )
+        if( p_intf->p_vlc->p_channel == NULL )
         {
-            network_ChannelCreate();
+            network_ChannelCreate( p_intf->p_this );
         }
 
         psz_channel = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
@@ -419,10 +452,10 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         i_channel_port = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON(
             lookup_widget( GTK_WIDGET(button), "network_channel_port" ) ) );
 
-        config_PutPszVariable( "channel-server", psz_channel );
+        config_PutPsz( p_intf, "channel-server", psz_channel );
         if( i_channel_port < 65536 )
         {
-            config_PutIntVariable( "channel-port", i_channel_port );
+            config_PutInt( p_intf, "channel-port", i_channel_port );
         }
 
         p_intf->p_sys->b_playing = 1;
@@ -447,22 +480,24 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
         /* Build source name and add it to playlist */
         sprintf( psz_source, "http://%s", psz_address );
 
-        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+        playlist_Add( p_playlist->p_this, 0, psz_source );
         free( psz_source );
 
         /* catch the GTK CList */
         p_playlist_clist = GTK_CLIST( gtk_object_get_data(
             GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
         /* update the display */
-        GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+        GtkRebuildCList( p_playlist_clist, p_playlist );
 
-        intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+#if 0
+        intf_PlaylistJumpto( p_playlist, i_end - 1 );
+#endif
     }
 
     /* This shouldn't occur */
     else
     {
-        intf_ErrMsg( "intf error: unknown protocol toggle button position" );
+        msg_Err( p_intf, "unknown protocol toggle button position" );
         return;
     }
 
@@ -470,6 +505,8 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
     if( !b_channel )
     {
     }
+
+    vlc_object_release( p_playlist );
 }
 
 void GtkNetworkOpenCancel( GtkButton * button, gpointer user_data)
@@ -580,12 +617,19 @@ gboolean GtkSatOpenShow( GtkWidget       *widget,
 void GtkSatOpenOk( GtkButton * button, gpointer user_data )
 {
     intf_thread_t * p_intf = GetIntf( GTK_WIDGET(button), "intf_sat" );
+    playlist_t *    p_playlist;
     GtkCList *      p_playlist_clist;
     char *          psz_source;
-    int             i_end = p_main->p_playlist->i_size;
     int             i_freq, i_srate;
     int             i_fec;
-    boolean_t       b_pol;
+    vlc_bool_t      b_pol;
+
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
 
     gtk_widget_hide( p_intf->p_sys->p_sat );
 
@@ -603,7 +647,7 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     i_fec = strtol( gtk_entry_get_text( GTK_ENTRY( GTK_COMBO( 
                 lookup_widget( GTK_WIDGET( button ), "sat_fec" )
                 )->entry ) ), NULL, 10 );
-        
+
     /* Select frequency and symbol rate */
     i_freq = gtk_spin_button_get_value_as_int(
                               GTK_SPIN_BUTTON( lookup_widget(
@@ -622,7 +666,7 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%d,%d,%d,%d",
              "satellite", i_freq, b_pol, i_fec, i_srate );
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+    playlist_Add( p_playlist->p_this, 0, psz_source );
     free( psz_source );
 
     /* catch the GTK CList */
@@ -630,15 +674,19 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
         GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
 
     /* update the display */
-    GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
+    GtkRebuildCList( p_playlist_clist, p_playlist );
 
     /* stop current item, select added item */
-    if( p_input_bank->pp_input[0] != NULL )
+#if 0
+    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
 
-    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, i_end - 1 );
+#endif
+
+    vlc_object_release( p_playlist );
 }
 
 

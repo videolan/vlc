@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.26 2002/05/28 18:34:42 stef Exp $
+ * $Id: vout_pictures.c,v 1.27 2002/06/01 12:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -30,7 +30,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "video.h"
 #include "video_output.h"
@@ -38,7 +38,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest );
+static void vout_CopyPicture( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * vout_DisplayPicture: display a picture
@@ -59,8 +59,8 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->i_status = READY_PICTURE;
         break;
     default:
-        intf_ErrMsg( "error: picture %p has invalid status %d",
-                     p_pic, p_pic->i_status );
+        msg_Err( p_vout, "picture to display %p has invalid status %d",
+                         p_pic, p_pic->i_status );
         break;
     }
 
@@ -88,8 +88,8 @@ void vout_DatePicture( vout_thread_t *p_vout,
         p_pic->i_status = READY_PICTURE;
         break;
     default:
-        intf_ErrMsg( "error: picture %p has invalid status %d",
-                     p_pic, p_pic->i_status );
+        msg_Err( p_vout, "picture to date %p has invalid status %d",
+                         p_pic, p_pic->i_status );
         break;
     }
 
@@ -105,9 +105,9 @@ void vout_DatePicture( vout_thread_t *p_vout,
  * since several pictures can be created by several producers threads.
  *****************************************************************************/
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
-                               boolean_t b_progressive,
-                               boolean_t b_top_field_first,
-                               boolean_t b_repeat_first_field )
+                               vlc_bool_t b_progressive,
+                               vlc_bool_t b_top_field_first,
+                               vlc_bool_t b_repeat_first_field )
 {
     int         i_pic;                                      /* picture index */
     picture_t * p_pic;
@@ -167,7 +167,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
      */
     if( p_freepic != NULL )
     {
-        vout_AllocatePicture( p_freepic,
+        vout_AllocatePicture( p_vout, p_freepic,
                               p_vout->render.i_width, p_vout->render.i_height,
                               p_vout->render.i_chroma );
 
@@ -194,7 +194,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
             p_freepic->i_status = FREE_PICTURE;
             p_freepic = NULL;
 
-            intf_ErrMsg( "vout error: picture allocation failed" );
+            msg_Err( p_vout, "picture allocation failed" );
         }
 
         vlc_mutex_unlock( &p_vout->picture_lock );
@@ -226,8 +226,8 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
         (p_pic->i_status != RESERVED_DATED_PICTURE) &&
         (p_pic->i_status != RESERVED_DISP_PICTURE) )
     {
-        intf_ErrMsg( "error: picture %p has invalid status %d",
-                     p_pic, p_pic->i_status );
+        msg_Err( p_vout, "picture to destroy %p has invalid status %d",
+                         p_pic, p_pic->i_status );
     }
 #endif
 
@@ -262,7 +262,7 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( p_pic->i_refcount < 0 )
     {
-        intf_ErrMsg( "vout error: picture refcount is %i", p_pic->i_refcount );
+        msg_Err( p_vout, "picture refcount is %i", p_pic->i_refcount );
         p_pic->i_refcount = 0;
     }
 
@@ -305,7 +305,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 /* We have subtitles. First copy the picture to
                  * the spare direct buffer, then render the
                  * subtitles. */
-                vout_CopyPicture( p_pic, PP_OUTPUTPICTURE[0] );
+                vout_CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
 
                 vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
 
@@ -333,7 +333,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
-        vout_CopyPicture( p_pic, PP_OUTPUTPICTURE[0] );
+        vout_CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
 
         vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
 
@@ -413,7 +413,7 @@ void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  *****************************************************************************/
-void vout_AllocatePicture( picture_t *p_pic,
+void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
                            int i_width, int i_height, u32 i_chroma )
 {
     int i_bytes, i_index;
@@ -523,8 +523,8 @@ void vout_AllocatePicture( picture_t *p_pic,
             break;
 
         default:
-            intf_ErrMsg( "vout error: unknown chroma type 0x%.8x (%4.4s)",
-                         i_chroma, (char*)&i_chroma );
+            msg_Err( p_vout, "unknown chroma type 0x%.8x (%4.4s)",
+                             i_chroma, (char*)&i_chroma );
             p_pic->i_planes = 0;
             return;
     }
@@ -563,7 +563,8 @@ void vout_AllocatePicture( picture_t *p_pic,
  * number of calls to memcpy() to the minimum. Source and destination
  * images must have same width, height, and chroma.
  *****************************************************************************/
-static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
+static void vout_CopyPicture( vout_thread_t * p_vout,
+                              picture_t *p_src, picture_t *p_dest )
 {
     int i;
 
@@ -577,7 +578,8 @@ static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
                 if( p_dest->p[i].b_hidden )
                 {
                     /* There are margins, but they are hidden : perfect ! */
-                    FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                    p_vout->p_vlc->pf_memcpy(
+                                 p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
                                  p_src->p[i].i_pitch * p_src->p[i].i_lines );
                     continue;
                 }
@@ -589,8 +591,9 @@ static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
             else
             {
                 /* Same pitch, no margins : perfect ! */
-                FAST_MEMCPY( p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                             p_src->p[i].i_pitch * p_src->p[i].i_lines );
+                p_vout->p_vlc->pf_memcpy(
+                                 p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                                 p_src->p[i].i_pitch * p_src->p[i].i_lines );
                 continue;
             }
         }
@@ -606,7 +609,8 @@ static void vout_CopyPicture( picture_t *p_src, picture_t *p_dest )
 
             for( i_line = p_src->p[i].i_lines; i_line--; )
             {
-                FAST_MEMCPY( p_out, p_in, p_src->p[i].i_visible_bytes );
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_src->p[i].i_visible_bytes );
                 p_in += p_src->p[i].i_pitch;
                 p_out += p_dest->p[i].i_pitch;
             }

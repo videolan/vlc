@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.17 2002/04/21 10:32:20 sam Exp $
+ * $Id: alsa.c,v 1.18 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -27,14 +27,12 @@
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <string.h>                                            /* strerror() */
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+
 #include <alsa/asoundlib.h>
-
-#include <videolan/vlc.h>
-
-#include "audio_output.h"                                   /* aout_thread_t */
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -57,7 +55,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("ALSA audio module") )
     ADD_CAPABILITY( AOUT, 50 )
-    ADD_SHORTCUT( "alsa" )
 MODULE_INIT_STOP
     
 MODULE_ACTIVATE_START
@@ -82,7 +79,7 @@ typedef struct alsa_card_s
 
 /* here we store plugin dependant informations */
 
-typedef struct aout_sys_s
+struct aout_sys_s
 {
     snd_pcm_t   * p_alsa_handle;
     unsigned long buffer_time;
@@ -93,7 +90,7 @@ typedef struct aout_sys_s
     unsigned int  bytes_per_sample;
     unsigned int  samples_per_frame;
     unsigned int  bytes_per_frame;
-} aout_sys_t;
+};
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -122,8 +119,7 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg( "aout error: failed allocating memory for ALSA (%s)",
-                     strerror(ENOMEM) );
+        msg_Err( p_aout, "out of memory" );
         return -1;
     }
 
@@ -147,8 +143,7 @@ static int aout_Open( aout_thread_t *p_aout )
                           psz_alsadev, SND_PCM_STREAM_PLAYBACK, 0);
     if( i_ret != 0 )
     {
-        intf_ErrMsg( "aout error: could not open ALSA device (%s)",
-                     snd_strerror( i_ret ) );
+        msg_Err( p_aout, "cannot open ALSA device (%s)", snd_strerror(i_ret) );
         return -1;
     }
 
@@ -203,7 +198,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     i_rv = snd_pcm_hw_params_any( p_aout->p_sys->p_alsa_handle, p_hw );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to retrieve initial parameters" );
+        msg_Err( p_aout, "unable to retrieve initial parameters" );
         return( -1 );
     }
 
@@ -211,7 +206,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                                          SND_PCM_ACCESS_RW_INTERLEAVED );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set interleaved stream format" );
+        msg_Err( p_aout, "unable to set interleaved stream format" );
         return( -1 );
     }
 
@@ -219,8 +214,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                                          p_hw, i_format );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set stream sample size and word"
-                     " order" );
+        msg_Err( p_aout, "unable to set stream sample size and word order" );
         return( -1 );
     }
 
@@ -228,7 +222,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                                            p_aout->i_channels );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set number of output channels" );
+        msg_Err( p_aout, "unable to set number of output channels" );
         return( -1 );
     }
 
@@ -236,7 +230,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                                             p_aout->i_rate, 0 );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set sample rate" );
+        msg_Err( p_aout, "unable to set sample rate" );
         return( -1 );
     }
     p_aout->p_sys->rate = i_rv;
@@ -247,7 +241,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                                                    0 );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set buffer time" );
+        msg_Err( p_aout, "unable to set buffer time" );
         return( -1 );
     }
     p_aout->p_sys->buffer_time = i_rv;
@@ -256,7 +250,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
          p_hw, p_aout->p_sys->buffer_time / p_aout->p_sys->bytes_per_frame, 0 );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set period time" );
+        msg_Err( p_aout, "unable to set period time" );
         return( -1 );
     }
     p_aout->p_sys->period_time = i_rv;
@@ -264,7 +258,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     i_rv = snd_pcm_hw_params(p_aout->p_sys->p_alsa_handle, p_hw);
     if (i_rv < 0)
     {
-        intf_ErrMsg( "aout error: unable to set hardware configuration" );
+        msg_Err( p_aout, "unable to set hardware configuration" );
         return( -1 );
     }
 
@@ -288,7 +282,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     i_rv = snd_pcm_sw_params( p_aout->p_sys->p_alsa_handle, p_sw );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to set software configuration" );
+        msg_Err( p_aout, "unable to set software configuration" );
         return( -1 );
     }
 
@@ -305,14 +299,14 @@ static void aout_HandleXrun(aout_thread_t *p_aout)
 {
     int i_rv;
 
-    intf_ErrMsg( "aout error: resetting output after buffer underrun" );
+    msg_Err( p_aout, "resetting output after buffer underrun" );
 
 //    i_rv = snd_pcm_reset( p_aout->p_sys->p_alsa_handle );
     i_rv = snd_pcm_prepare( p_aout->p_sys->p_alsa_handle );
     if( i_rv < 0 )
     {
-        intf_ErrMsg( "aout error: unable to recover from buffer underrun (%s)",
-                     snd_strerror( i_rv ) );
+        msg_Err( p_aout, "unable to recover from buffer underrun (%s)",
+                         snd_strerror( i_rv ) );
     }
 }
 
@@ -337,8 +331,8 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 
     if( i_alsa_get_status_returns )
     {
-        intf_ErrMsg ( "aout error: failed getting alsa buffer info (%s)",
-                      snd_strerror ( i_alsa_get_status_returns ) );
+        msg_Err( p_aout, "failed getting alsa buffer info (%s)",
+                         snd_strerror ( i_alsa_get_status_returns ) );
         return ( -1 );
     }
 
@@ -354,8 +348,8 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
             break;
 
         default:
-            intf_ErrMsg( "aout error: unhandled condition %i",
-                         snd_pcm_status_get_state( p_status ) );
+            msg_Err( p_aout, "unhandled condition %i",
+                             snd_pcm_status_get_state( p_status ) );
             break;
     }
 
@@ -385,8 +379,8 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 
         if( (signed int) rv < 0 )
         {
-            intf_ErrMsg( "aout error: failed writing to output (%s)",
-                         snd_strerror( rv ) );
+            msg_Err( p_aout, "failed writing to output (%s)",
+                             snd_strerror( rv ) );
             return;
         }
 
@@ -405,8 +399,8 @@ static void aout_Close( aout_thread_t *p_aout )
 
     if( i_close_returns )
     {
-        intf_ErrMsg( "aout error: failed closing ALSA device (%s)",
-                     i_close_returns, snd_strerror( i_close_returns ) );
+        msg_Err( p_aout, "failed closing ALSA device (%s)",
+                         snd_strerror( i_close_returns ) );
     }
 
     free( p_aout->p_sys );

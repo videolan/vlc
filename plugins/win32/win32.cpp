@@ -26,7 +26,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "win32.h"                                       /* Borland specific */
 
@@ -54,7 +54,6 @@ MODULE_INIT_START
     ADD_CAPABILITY( INTF, 100 )
     ADD_SHORTCUT( "win" )
     ADD_SHORTCUT( "win32" )
-    ADD_SHORTCUT( "intfwin" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

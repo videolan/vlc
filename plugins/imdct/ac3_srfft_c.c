@@ -2,7 +2,7 @@
  * ac3_srfft.c: ac3 FFT in C
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_srfft_c.c,v 1.4 2001/12/30 07:09:55 sam Exp $
+ * $Id: ac3_srfft_c.c,v 1.5 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -28,7 +28,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"

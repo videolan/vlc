@@ -33,12 +33,9 @@
 #include <photon/PtLabel.h>
 #include <photon/PdDirect.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 /*****************************************************************************
  * vout_sys_t: video output QNX method descriptor
@@ -55,7 +52,7 @@
 #define MODE_VIDEO_MEM      2
 #define MODE_VIDEO_OVERLAY  3
 
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     /* video mode */
     int                     i_mode;
@@ -87,7 +84,7 @@ typedef struct vout_sys_s
     PhDim_t                 old_dim;
     PhDim_t                 screen_dim;
     PhRect_t                frame;
-} vout_sys_t;
+};
 
 
 /*****************************************************************************
@@ -96,7 +93,7 @@ typedef struct vout_sys_s
  * This structure is part of the picture descriptor, it describes the
  * XVideo specific properties of a direct buffer.
  *****************************************************************************/
-typedef struct picture_sys_s
+struct picture_sys_s
 {
     /* [shared] memory blit */
     PhImage_t *             p_image;
@@ -104,24 +101,23 @@ typedef struct picture_sys_s
     /* video memory blit and video overlay */
     PdOffscreenContext_t *  p_ctx[3];   /* 0: y, 1: u, 2: v */
     char *                  p_buf[3];
-
-} picture_sys_t;
+};
 
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
 static void vout_Render    ( vout_thread_t *, picture_t * );
 static void vout_Display   ( vout_thread_t *, picture_t * );
 
-static int  QNXInitDisplay ( struct vout_thread_s * );
-static int  QNXCreateWnd   ( struct vout_thread_s * );
-static int  QNXDestroyWnd  ( struct vout_thread_s * );
+static int  QNXInitDisplay ( vout_thread_t * );
+static int  QNXCreateWnd   ( vout_thread_t * );
+static int  QNXDestroyWnd  ( vout_thread_t * );
 
 static int  NewPicture     ( vout_thread_t *, picture_t *, int );
 static void FreePicture    ( vout_thread_t *, picture_t * );
@@ -155,7 +151,7 @@ static int vout_Create( vout_thread_t *p_vout )
     /* init connection to photon */
     if( PtInit( "/dev/photon" ) != 0 )
     {
-        intf_ErrMsg( "vout error: unable to connect to photon" );
+        msg_Err( p_vout, "unable to connect to photon" );
         return( 1 );
     }
 
@@ -163,17 +159,15 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "vout error: %s", strerror( ENOMEM ) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    p_vout->b_fullscreen =
-        config_GetIntVariable( "fullscreen" );
-    p_vout->p_sys->i_mode =
-        config_GetIntVariable( "overlay" ) ?
-        MODE_NORMAL_OVERLAY : MODE_VIDEO_MEM;
+    p_vout->b_fullscreen = config_GetInt( p_vout, "fullscreen" );
+    p_vout->p_sys->i_mode = config_GetInt( p_vout, "overlay" ) ?
+                                MODE_NORMAL_OVERLAY : MODE_VIDEO_MEM;
     p_vout->p_sys->dim.w = p_vout->i_window_width;
     p_vout->p_sys->dim.h = p_vout->i_window_height;
 
@@ -309,9 +303,9 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {
-    int i_ev, i_buflen;
+    int i_ev,  i_buflen;
     PhEvent_t *p_event;
-    boolean_t b_repos = 0;
+    vlc_bool_t b_repos = 0;
 
     if (p_vout->b_die == 1)
     {
@@ -322,7 +316,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     i_buflen = sizeof( PhEvent_t ) * 4;
     if( ( p_event = malloc( i_buflen ) ) == NULL )
     {
-        intf_ErrMsg( "vout error: %s", strerror( ENOMEM ) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
@@ -337,7 +331,7 @@ static int vout_Manage( vout_thread_t *p_vout )
             i_buflen = PhGetMsgSize( p_event );
             if( ( p_event = realloc( p_event, i_buflen ) ) == NULL )
             {
-                intf_ErrMsg( "vout error: %s", strerror( ENOMEM ) );
+                msg_Err( p_vout, "out of memory" );
                 return( 1 );
             }
         }
@@ -352,7 +346,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                 switch( p_ev->event_f )
                 {
                 case Ph_WM_CLOSE:
-                    p_main->p_intf->b_die = 1;
+                    p_vout->p_vlc->b_die = 1;
                     break;
 
                 case Ph_WM_MOVE:
@@ -382,7 +376,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     {
                     case Pk_q:
                     case Pk_Q:
-                        p_main->p_intf->b_die = 1;
+                        p_vout->p_vlc->b_die = 1;
                         break;
 
                     case Pk_f:
@@ -473,14 +467,14 @@ static int vout_Manage( vout_thread_t *p_vout )
             vout_End( p_vout );
             if( vout_Init( p_vout ) )
             {
-                intf_ErrMsg( "vout error: cannot resize display" );
+                msg_Err( p_vout, "cannot resize display" );
                 return( 1 );
             }
         }
 #endif
 
-        intf_Msg( "vout: video display resized (%dx%d)",
-                  p_vout->p_sys->dim.w, p_vout->p_sys->dim.h );
+        msg_Dbg( p_vout, "video display resized (%dx%d)",
+                         p_vout->p_sys->dim.w, p_vout->p_sys->dim.h );
     }
 
     /*
@@ -536,7 +530,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * QNXInitDisplay: check screen resolution, depth, amount of video ram, etc
  *****************************************************************************/
-static int QNXInitDisplay( p_vout_thread_t p_vout )
+static int QNXInitDisplay( vout_thread_t * p_vout )
 {
     PgHWCaps_t hwcaps;
     PgDisplaySettings_t cfg;
@@ -545,21 +539,21 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
     /* get graphics card hw capabilities */
     if( PgGetGraphicsHWCaps( &hwcaps ) != 0 )
     {
-        intf_ErrMsg( "vout error: unable to get gfx card capabilities" );
+        msg_Err( p_vout, "unable to get gfx card capabilities" );
         return( 1 );
     }
 
     /* get current video mode */
     if( PgGetVideoMode( &cfg ) != 0 )
     {
-        intf_ErrMsg( "vout error: unable to get current video mode" );
+        msg_Err( p_vout, "unable to get current video mode" );
         return( 1 );
     }
 
     /* get video mode info */
     if( PgGetVideoModeInfo( cfg.mode, &minfo ) != 0 )
     {
-        intf_ErrMsg( "vout error: unable to get info for video mode" );
+        msg_Err( p_vout, "unable to get info for video mode" );
         return( 1 );
     }
 
@@ -569,7 +563,7 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
     if( p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY &&
         !( minfo.mode_capabilities1 & PgVM_MODE_CAP1_VIDEO_OVERLAY ) )
     {
-        intf_ErrMsg( "vout error: no overlay support detected" );
+        msg_Err( p_vout, "no overlay support detected" );
         p_vout->p_sys->i_mode = MODE_NORMAL_MEM;
     }
 
@@ -581,7 +575,7 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
         if( ( p_vout->p_sys->p_channel =
             PgCreateVideoChannel( Pg_VIDEO_CHANNEL_SCALER, 0 ) ) == NULL )
         {
-            intf_ErrMsg( "vout error: unable to create video channel" );
+            msg_Err( p_vout, "unable to create video channel" );
             printf("errno = %d\n", errno);
             p_vout->p_sys->i_mode = MODE_NORMAL_MEM;
         }
@@ -609,7 +603,7 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
 
             if( p_vout->p_sys->i_vc_format == 0 )
             {
-                intf_ErrMsg( "vout error: need YV12, YUY2 or RGB8888 overlay" );
+                msg_Warn( p_vout, "need YV12, YUY2 or RGB8888 overlay" );
 
                 p_vout->p_sys->i_mode = MODE_NORMAL_MEM;
             }
@@ -679,7 +673,7 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
 /*****************************************************************************
  * QNXCreateWnd: create and realize the main window
  *****************************************************************************/
-static int QNXCreateWnd( p_vout_thread_t p_vout )
+static int QNXCreateWnd( vout_thread_t * p_vout )
 {
     PtArg_t args[8];
     PhPoint_t pos = { 0, 0 };
@@ -718,14 +712,14 @@ static int QNXCreateWnd( p_vout_thread_t p_vout )
     p_vout->p_sys->p_window = PtCreateWidget( PtWindow, Pt_NO_PARENT, 7, args);
     if( p_vout->p_sys->p_window == NULL )
     {
-        intf_ErrMsg( "vout error: unable to create window" );
+        msg_Err( p_vout, "unable to create window" );
         return( 1 );
     }
 
     /* realize the window widget */
     if( PtRealizeWidget( p_vout->p_sys->p_window ) != 0 )
     {
-        intf_ErrMsg( "vout error: unable to realize window widget" );
+        msg_Err( p_vout, "unable to realize window widget" );
         PtDestroyWidget( p_vout->p_sys->p_window );
         return( 1 );
     }
@@ -734,7 +728,7 @@ static int QNXCreateWnd( p_vout_thread_t p_vout )
     if( PtWindowFrameSize( NULL, p_vout->p_sys->p_window,
                            &p_vout->p_sys->frame ) != 0 )
     {
-        intf_ErrMsg( "vout error: unable to get window frame size" );
+        msg_Err( p_vout, "unable to get window frame size" );
         PtDestroyWidget( p_vout->p_sys->p_window );
         return( 1 );
     }
@@ -745,7 +739,7 @@ static int QNXCreateWnd( p_vout_thread_t p_vout )
 /*****************************************************************************
  * QNXDestroyWnd: unrealize and destroy the main window
  *****************************************************************************/
-static int QNXDestroyWnd( p_vout_thread_t p_vout )
+static int QNXDestroyWnd( vout_thread_t * p_vout )
 {
     /* destroy the window widget */
     PtUnrealizeWidget( p_vout->p_sys->p_window );
@@ -786,7 +780,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                     p_vout->p_sys->dim.w, p_vout->p_sys->dim.h,
                     p_vout->p_sys->i_img_type, NULL, 0,
                     p_vout->p_sys->i_mode == MODE_SHARED_MEM ) ) ) {
-            intf_ErrMsg( "vout error: cannot create image" );
+            msg_Err( p_vout, "cannot create image" );
             free( p_pic->p_sys );
             return( -1 );
         }
@@ -816,7 +810,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                         p_vout->p_sys->dim.w, p_vout->p_sys->dim.h,
                        Pg_OSC_MEM_PAGE_ALIGN) ) == NULL )
         {
-            intf_ErrMsg( "vout error: unable to create offscreen context" );
+            msg_Err( p_vout, "unable to create offscreen context" );
             free( p_pic->p_sys );
             return( -1 );
         }
@@ -825,7 +819,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
         if( (  p_pic->p_sys->p_buf[0] =
             PdGetOffscreenContextPtr ( p_pic->p_sys->p_ctx[0] ) ) == NULL )
         {
-            intf_ErrMsg( "vout error: unable to get offscreen context ptr" );
+            msg_Err( p_vout, "unable to get offscreen context ptr" );
             PhDCRelease ( p_pic->p_sys->p_ctx[0] );
             p_pic->p_sys->p_ctx[0] = NULL;
             free( p_pic->p_sys );
@@ -872,7 +866,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
         p_pic->p_sys->p_buf[Y_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[Y_PLANE] );
         if( p_pic->p_sys->p_buf[Y_PLANE] == NULL )
         {
-            intf_ErrMsg( "vout error: unable to get video channel ctx ptr" );
+            msg_Err( p_vout, "unable to get video channel ctx ptr" );
             return( 1 );
         }
 
@@ -887,7 +881,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 if( p_pic->p_sys->p_buf[U_PLANE] == NULL ||
                     p_pic->p_sys->p_buf[V_PLANE] == NULL )
                 {
-                    intf_ErrMsg( "vout error: unable to get video channel ctx ptr" );
+                    msg_Err( p_vout, "unable to get video channel ctx ptr" );
                     return( 1 );
                 }
 
@@ -921,7 +915,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 if( p_pic->p_sys->p_buf[U_PLANE] == NULL ||
                     p_pic->p_sys->p_buf[V_PLANE] == NULL )
                 {
-                    intf_ErrMsg( "vout error: unable to get video channel ctx ptr" );
+                    msg_Err( p_vout, "unable to get video channel ctx ptr" );
                     return( 1 );
                 }
 
@@ -1142,7 +1136,7 @@ static int ResizeOverlayOutput(vout_thread_t *p_vout)
 
     if( i_ret == -1 )
     {
-        intf_ErrMsg( "vout error: unable to configure video channel" );
+        msg_Err( p_vout, "unable to configure video channel" );
         return( 1 );
     }
 

@@ -2,7 +2,7 @@
  * spu_decoder.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spu_decoder.h,v 1.4 2002/05/18 17:47:47 sam Exp $
+ * $Id: spu_decoder.h,v 1.5 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-typedef struct subpicture_sys_s
+struct subpicture_sys_s
 {
     mtime_t i_pts;                                 /* presentation timestamp */
 
@@ -29,11 +29,10 @@ typedef struct subpicture_sys_s
     void *p_data;
 
     /* Color information */
-    boolean_t b_palette;
+    vlc_bool_t b_palette;
     u8    pi_alpha[4];
     u8    pi_yuv[4][3];
-
-} subpicture_sys_t;
+};
 
 /*****************************************************************************
  * spudec_thread_t : sub picture unit decoder thread descriptor
@@ -51,7 +50,6 @@ typedef struct spudec_thread_s
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
-    decoder_config_t *  p_config;
 
     /*
      * Output properties
@@ -102,5 +100,5 @@ static inline unsigned int AddNibble( unsigned int i_code,
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-vlc_thread_t       spudec_CreateThread( decoder_config_t * p_config );
+vlc_thread_t       spudec_CreateThread( decoder_fifo_t * p_fifo );
 

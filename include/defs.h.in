@@ -268,6 +268,9 @@
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
 
+/* Define if you have the <stdint.h> header file.  */
+#undef HAVE_STDINT_H
+
 /* Define if you have the <stdlib.h> header file.  */
 #undef HAVE_STDLIB_H
 
@@ -344,6 +347,9 @@
 /* Define if <pthread.h> defines pthread_cond_t. */
 #undef PTHREAD_COND_T_IN_PTHREAD_H
 
+/* Define if <pthread.h> defines pthread_once. */
+#undef PTHREAD_ONCE_IN_PTHREAD_H
+
 /* Define if <strings.h> defines strncasecmp. */
 #undef STRNCASECMP_IN_STRINGS_H
 
@@ -365,25 +371,16 @@
 /* Maximum supported data alignment */
 #undef ATTRIBUTE_ALIGNED_MAX
 
-/* Define if <sys/types.h> defines boolean_t. */
-#undef BOOLEAN_T_IN_SYS_TYPES_H
-
-/* Define if <pthread.h> defines boolean_t. */
-#undef BOOLEAN_T_IN_PTHREAD_H
-
-/* Define if <cthreads.h> defines boolean_t. */
-#undef BOOLEAN_T_IN_CTHREADS_H
-
 /* Define if $CC groks 3D Now! inline assembly. */
 #undef CAN_COMPILE_3DNOW
 
 /* Define if $CC groks SSE inline assembly. */
 #undef CAN_COMPILE_SSE
 
-/* Define if $CC groks ALTIVEC inline assembly. */
+/* Define if $CC groks AltiVec inline assembly. */
 #undef CAN_COMPILE_ALTIVEC
 
-/* Define if your compiler groks C altivec extensions. */
+/* Define if your compiler groks C AltiVec extensions. */
 #undef CAN_COMPILE_C_ALTIVEC
 
 /* For FreeBSD VCD support */
@@ -406,6 +403,9 @@
 
 /* Copyright string */
 #undef COPYRIGHT_MESSAGE
+
+/* The ./configure command line */
+#undef CONFIGURE_LINE
 
 /* String suffix for module functions */
 #undef MODULE_SUFFIX

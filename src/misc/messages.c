@@ -1,12 +1,13 @@
 /*****************************************************************************
- * intf_msg.c: messages interface
- * This library provides basic functions for threads to interact with user
- * interface, such as message output. See config.h for output configuration.
+ * messages.c: messages interface
+ * This library provides an interface to the message queue to be used by other
+ * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.49 2002/05/17 00:58:13 sam Exp $
+ * Copyright (C) 1998-2002 VideoLAN
+ * $Id: messages.c,v 1.1 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +34,7 @@
 #include <stdlib.h>                                              /* malloc() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                      /* close(), write() */
@@ -41,222 +42,188 @@
 
 #include "interface.h"
 
-
-/*****************************************************************************
- * intf_msg_t
- *****************************************************************************
- * Store all data requiered by messages interfaces. It has a single reference
- * int p_main.
- *****************************************************************************/
-typedef struct msg_bank_s
-{
-    /* Message queue lock */
-    vlc_mutex_t             lock;
-
-    /* Message queue */
-    msg_item_t              msg[INTF_MSG_QSIZE];            /* message queue */
-    int i_start;
-    int i_stop;
-
-    /* Subscribers */
-    int i_sub;
-    intf_subscription_t **pp_sub;
-
-} msg_bank_t;
-
-msg_bank_t msg_bank;
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void QueueMsg ( int, int, char *, va_list );
-static void FlushMsg ( void );
+static void QueueMsg ( vlc_object_t *, int , const char *,
+                       const char *, va_list );
+static void FlushMsg ( msg_bank_t * );
 
 #if defined( WIN32 )
-static char *ConvertPrintfFormatString ( char *psz_format );
+static char *ConvertPrintfFormatString ( const char *psz_format );
 #endif
 
 /*****************************************************************************
- * intf_MsgCreate: initialize messages interface                         (ok ?)
+ * msg_Create: initialize messages interface
  *****************************************************************************
- * This functions has to be called before any call to other intf_*Msg functions.
+ * This functions has to be called before any call to other msg_* functions.
  * It set up the locks and the message queue if it is used.
  *****************************************************************************/
-void intf_MsgCreate( void )
+void msg_Create( vlc_object_t *p_this )
 {
     /* Message queue initialization */
-    vlc_mutex_init( &msg_bank.lock );
-    msg_bank.i_start = 0;
-    msg_bank.i_stop = 0;
+    vlc_mutex_init( p_this, &p_this->p_vlc->msg_bank.lock );
+    p_this->p_vlc->msg_bank.i_start = 0;
+    p_this->p_vlc->msg_bank.i_stop = 0;
 
-    msg_bank.i_sub = 0;
-    msg_bank.pp_sub = NULL;
+    p_this->p_vlc->msg_bank.i_sub = 0;
+    p_this->p_vlc->msg_bank.pp_sub = NULL;
 }
 
 /*****************************************************************************
- * intf_MsgDestroy: free resources allocated by intf_InitMsg            (ok ?)
+ * msg_Destroy: free resources allocated by msg_Create
  *****************************************************************************
  * This functions prints all messages remaining in queue, then free all the
- * resources allocated by intf_InitMsg.
+ * resources allocated by msg_Create.
  * No other messages interface functions should be called after this one.
  *****************************************************************************/
-void intf_MsgDestroy( void )
+void msg_Destroy( vlc_object_t *p_this )
 {
     /* Destroy lock */
-    vlc_mutex_destroy( &msg_bank.lock );
+    vlc_mutex_destroy( &p_this->p_vlc->msg_bank.lock );
 
-    if( msg_bank.i_sub )
+    if( p_this->p_vlc->msg_bank.i_sub )
     {
-        fprintf( stderr, "intf error: stale interface subscribers\n" );
+        fprintf( stderr, "main error: stale interface subscribers\n" );
     }
 
     /* Free remaining messages */
-    FlushMsg( );
+    FlushMsg( &p_this->p_vlc->msg_bank );
 }
 
 /*****************************************************************************
- * intf_MsgSub: subscribe to the message queue.
+ * msg_Subscribe: subscribe to the message queue.
  *****************************************************************************/
-intf_subscription_t *intf_MsgSub( void )
+msg_subscription_t *msg_Subscribe( vlc_object_t *p_this )
 {
-    intf_subscription_t *p_sub = malloc( sizeof( intf_subscription_t ) );
+    msg_subscription_t *p_sub = malloc( sizeof( msg_subscription_t ) );
 
-    vlc_mutex_lock( &msg_bank.lock );
+    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
 
     /* Add subscription to the list */
-    msg_bank.i_sub++;
-    msg_bank.pp_sub = realloc( msg_bank.pp_sub,
-        msg_bank.i_sub * sizeof( intf_subscription_t* ) );
+    p_this->p_vlc->msg_bank.i_sub++;
+    p_this->p_vlc->msg_bank.pp_sub = realloc( p_this->p_vlc->msg_bank.pp_sub,
+        p_this->p_vlc->msg_bank.i_sub * sizeof( msg_subscription_t* ) );
 
-    msg_bank.pp_sub[ msg_bank.i_sub - 1 ] = p_sub;
+    p_this->p_vlc->msg_bank.pp_sub[ p_this->p_vlc->msg_bank.i_sub - 1 ] = p_sub;
 
-    p_sub->i_start = msg_bank.i_start;
-    p_sub->pi_stop = &msg_bank.i_stop;
+    p_sub->i_start = p_this->p_vlc->msg_bank.i_start;
+    p_sub->pi_stop = &p_this->p_vlc->msg_bank.i_stop;
 
-    p_sub->p_msg   = msg_bank.msg;
-    p_sub->p_lock  = &msg_bank.lock;
+    p_sub->p_msg   = p_this->p_vlc->msg_bank.msg;
+    p_sub->p_lock  = &p_this->p_vlc->msg_bank.lock;
 
-    vlc_mutex_unlock( &msg_bank.lock );
+    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
 
     return p_sub;
 }
 
 /*****************************************************************************
- * intf_MsgUnsub: unsubscribe from the message queue.
+ * msg_Unsubscribe: unsubscribe from the message queue.
  *****************************************************************************/
-void intf_MsgUnsub( intf_subscription_t *p_sub )
+void msg_Unsubscribe( vlc_object_t *p_this, msg_subscription_t *p_sub )
 {
     int i_index;
 
-    vlc_mutex_lock( &msg_bank.lock );
+    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
 
     /* Sanity check */
-    if( !msg_bank.i_sub )
+    if( !p_this->p_vlc->msg_bank.i_sub )
     {
-        intf_ErrMsg( "intf error: no subscriber in the list" );
+        msg_Err( p_this, "no subscriber in the list" );
         return;
     }
 
     /* Look for the appropriate subscription */
-    for( i_index = 0; i_index < msg_bank.i_sub; i_index++ )
+    for( i_index = 0; i_index < p_this->p_vlc->msg_bank.i_sub; i_index++ )
     {
-        if( msg_bank.pp_sub[ i_index ] == p_sub )
+        if( p_this->p_vlc->msg_bank.pp_sub[ i_index ] == p_sub )
         {
             break;
         }
     }
 
-    if( msg_bank.pp_sub[ i_index ] != p_sub )
+    if( p_this->p_vlc->msg_bank.pp_sub[ i_index ] != p_sub )
     {
-        intf_ErrMsg( "intf error: subscriber not found" );
-        vlc_mutex_unlock( &msg_bank.lock );
+        msg_Err( p_this, "subscriber not found" );
+        vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
         return;
     }
 
     /* Remove this subscription */
-    for( ; i_index < (msg_bank.i_sub - 1); i_index++ )
+    for( ; i_index < (p_this->p_vlc->msg_bank.i_sub - 1); i_index++ )
     {
-        msg_bank.pp_sub[ i_index ] = msg_bank.pp_sub[ i_index+1 ];
+        p_this->p_vlc->msg_bank.pp_sub[ i_index ] = p_this->p_vlc->msg_bank.pp_sub[ i_index+1 ];
     }
 
-    msg_bank.i_sub--;
-    if( msg_bank.i_sub )
+    p_this->p_vlc->msg_bank.i_sub--;
+    if( p_this->p_vlc->msg_bank.i_sub )
     {
-        msg_bank.pp_sub = realloc( msg_bank.pp_sub,
-            msg_bank.i_sub * sizeof( intf_subscription_t* ) );
+        p_this->p_vlc->msg_bank.pp_sub = realloc( p_this->p_vlc->msg_bank.pp_sub,
+            p_this->p_vlc->msg_bank.i_sub * sizeof( msg_subscription_t* ) );
     }
     else
     {
-        free( msg_bank.pp_sub );
-        msg_bank.pp_sub = NULL;
+        free( p_this->p_vlc->msg_bank.pp_sub );
+        p_this->p_vlc->msg_bank.pp_sub = NULL;
     }
 
-    vlc_mutex_unlock( &msg_bank.lock );
+
+    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
 }
 
 /*****************************************************************************
- * intf_Msg: print a message                                             (ok ?)
+ * __msg_*: print a message
  *****************************************************************************
- * This function queue a message for later printing, or print it immediately
- * if the queue isn't used.
+ * These functions queue a message for later printing.
  *****************************************************************************/
-void intf_Msg( char *psz_format, ... )
+void __msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
+                    const char *psz_format, ... )
 {
-    va_list ap;
+    va_list args;
 
-    va_start( ap, psz_format );
-    QueueMsg( INTF_MSG_STD, 0, psz_format, ap );
-    va_end( ap );
+    va_start( args, psz_format );
+    QueueMsg( p_this, i_type, psz_module, psz_format, args );
+    va_end( args );
 }
 
-/*****************************************************************************
- * intf_ErrMsg : print an error message                                  (ok ?)
- *****************************************************************************
- * This function is the same as intf_Msg, except that it prints its messages
- * on stderr.
- *****************************************************************************/
-void intf_ErrMsg( char *psz_format, ... )
+void __msg_Info( void *p_this, const char *psz_format, ... )
 {
-    va_list ap;
-
-    va_start( ap, psz_format );
-    QueueMsg( INTF_MSG_ERR, 0, psz_format, ap );
-    va_end( ap );
+    va_list args;
+    va_start( args, psz_format );
+    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_INFO, "unknown",
+              psz_format, args );
+    va_end( args );
 }
 
-/*****************************************************************************
- * intf_WarnMsg : print a warning message
- *****************************************************************************
- * This function is the same as intf_Msg, except that it concerns warning
- * messages for testing purpose.
- *****************************************************************************/
-void intf_WarnMsg( int i_level, char *psz_format, ... )
+void __msg_Err( void *p_this, const char *psz_format, ... )
 {
-    va_list ap;
-    
-    va_start( ap, psz_format );
-    QueueMsg( INTF_MSG_WARN, i_level, psz_format, ap );
-    va_end( ap );
+    va_list args;
+    va_start( args, psz_format );
+    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_ERR, "unknown",
+              psz_format, args );
+    va_end( args );
 }
 
-/*****************************************************************************
- * intf_StatMsg : print a statistic message
- *****************************************************************************
- * This function is the same as intf_Msg, except that it concerns statistic
- * messages for testing purpose.
- *****************************************************************************/
-void intf_StatMsg( char *psz_format, ... )
+void __msg_Warn( void *p_this, const char *psz_format, ... )
 {
-    va_list ap;
-    
-    if( p_main->b_stats )
-    {
-        va_start( ap, psz_format );
-        QueueMsg( INTF_MSG_STAT, 0, psz_format, ap );
-        va_end( ap );
-    }
+    va_list args;
+    va_start( args, psz_format );
+    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_WARN, "unknown",
+              psz_format, args );
+    va_end( args );
 }
 
+void __msg_Dbg( void *p_this, const char *psz_format, ... )
+{
+    va_list args;
+    va_start( args, psz_format );
+    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_DBG, "unknown",
+              psz_format, args );
+    va_end( args );
+}
+
+#if 0
 /*****************************************************************************
  * intf_WarnHexDump : print a hexadecimal dump of a memory area
  *****************************************************************************
@@ -269,8 +236,7 @@ void intf_WarnHexDump( int i_level, void *p_data, int i_size )
     char  p_string[75];
     u8   *p_area = (u8 *)p_data;
 
-    intf_WarnMsg( i_level, "hexdump: dumping %i bytes at address %p",
-                           i_size, p_data );
+    msg_Dbg( "dumping %i bytes at address %p", i_size, p_data );
 
     while( i_index < i_size )
     {
@@ -286,96 +252,123 @@ void intf_WarnHexDump( int i_level, void *p_data, int i_size )
 
         /* -1 here is safe because we know we printed at least one */
         p_string[ 3 * i_subindex - 1 ] = '\0';
-        intf_WarnMsg( i_level, "0x%.4x: %s", i_index, p_string );
+        msg_Dbg( "0x%.4x: %s", i_index, p_string );
 
         i_index += 24;
     }
 
-    intf_WarnMsg( i_level, "hexdump: %i bytes dumped", i_size );
+    msg_Dbg( "hexdump: %i bytes dumped", i_size );
 }
-
-/* following functions are local */
+#endif
 
 /*****************************************************************************
  * QueueMsg: add a message to a queue
  *****************************************************************************
- * This function provides basic functionnalities to other intf_*Msg functions.
+ * This function provides basic functionnalities to other msg_* functions.
  * It adds a message to a queue (after having printed all stored messages if it
  * is full). If the message can't be converted to string in memory, it issues
  * a warning.
  *****************************************************************************/
-static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
+static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
+                      const char *psz_format, va_list args )
 {
-    char *                  psz_str;             /* formatted message string */
-    msg_item_t *            p_item;                /* pointer to message */
+    static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
+    char *              psz_str;                 /* formatted message string */
+    msg_item_t *        p_item;                        /* pointer to message */
 #ifdef WIN32
-    char *                  psz_temp;
+    char *              psz_temp;
 #endif
 
     /*
      * Convert message to string
      */
 #ifdef HAVE_VASPRINTF
-    vasprintf( &psz_str, psz_format, ap );
+    vasprintf( &psz_str, psz_format, args );
 #else
     psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
 #endif
 
     if( psz_str == NULL )
     {
-        fprintf(stderr, "intf warning: can't store following message (%s): ",
-                strerror(errno) );
-        vfprintf(stderr, psz_format, ap );
-        fprintf(stderr, "\n" );
+        fprintf( stderr, "main warning: can't store message (%s): ",
+                 strerror(errno) );
+        vfprintf( stderr, psz_format, args );
+        fprintf( stderr, "\n" );
         return;
     }
 
 #ifndef HAVE_VASPRINTF
 #   ifdef WIN32
-    psz_temp = ConvertPrintfFormatString(psz_format);
+    psz_temp = ConvertPrintfFormatString( psz_format );
     if( !psz_temp )
     {
-        fprintf(stderr, "intf warning: couldn't print message");
+        fprintf( stderr, "main warning: couldn't print message\n" );
         return;
     }
-    vsprintf( psz_str, psz_temp, ap );
+    vsprintf( psz_str, psz_temp, args );
     free( psz_temp );
 #   else
-    vsprintf( psz_str, psz_format, ap );
+    vsprintf( psz_str, psz_format, args );
 #   endif
 #endif
 
     /* Put message in queue */
-    vlc_mutex_lock( &msg_bank.lock );
+    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
 
     /* Send the message to stderr */
-    if( i_level <= p_main->i_warning_level )
+    if( (i_type == VLC_MSG_ERR)
+         || ( (i_type == VLC_MSG_INFO) && !p_this->p_vlc->b_quiet )
+         || ( (i_type == VLC_MSG_WARN) && p_this->p_vlc->b_verbose
+                                       && !p_this->p_vlc->b_quiet )
+         || ( (i_type == VLC_MSG_DBG) && p_this->p_vlc->b_verbose
+                                       && !p_this->p_vlc->b_quiet ) )
     {
-        fprintf( stderr, "%s\n", psz_str );
+        if( p_this->p_vlc->b_color )
+        {
+#           define COL(x)  "\033[" #x ";1m"
+#           define RED     COL(31)
+#           define GREEN   COL(32)
+#           define YELLOW  COL(33)
+#           define WHITE   COL(37)
+#           define GRAY    "\033[0m"
+            static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
+
+            fprintf( stderr, "[" GREEN "%.8x" GRAY "] " "%s%s"
+                     ": %s%s" GRAY "\n", p_this->i_object_id, psz_module,
+                     ppsz_type[i_type], ppsz_color[i_type], psz_str );
+        }
+        else
+        {
+            fprintf( stderr, "[%.8x] %s%s: %s\n", p_this->i_object_id,
+                             psz_module, ppsz_type[i_type], psz_str );
+        }
     }
 
     /* Put the message in the queue if there is room for it */
-    if( ((msg_bank.i_stop - msg_bank.i_start + 1) % INTF_MSG_QSIZE) == 0 )
+    if( ((p_this->p_vlc->msg_bank.i_stop - p_this->p_vlc->msg_bank.i_start + 1) % VLC_MSG_QSIZE) == 0 )
     {
-        FlushMsg( );
+        FlushMsg( &p_this->p_vlc->msg_bank );
 
-        if( ((msg_bank.i_stop - msg_bank.i_start + 1) % INTF_MSG_QSIZE) == 0 )
+        if( ((p_this->p_vlc->msg_bank.i_stop - p_this->p_vlc->msg_bank.i_start + 1) % VLC_MSG_QSIZE) == 0 )
         {
-            fprintf( stderr, "intf warning: message queue overflow\n" );
-            vlc_mutex_unlock( &msg_bank.lock );
+            fprintf( stderr, "main warning: message queue overflow\n" );
+            vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
             return;
         }
     }
 
-    p_item = msg_bank.msg + msg_bank.i_stop;
-    msg_bank.i_stop = (msg_bank.i_stop + 1) % INTF_MSG_QSIZE;
+    p_item = p_this->p_vlc->msg_bank.msg + p_this->p_vlc->msg_bank.i_stop;
+    p_this->p_vlc->msg_bank.i_stop = (p_this->p_vlc->msg_bank.i_stop + 1) % VLC_MSG_QSIZE;
 
     /* Fill message information fields */
     p_item->i_type =     i_type;
+    p_item->psz_module = strdup( psz_module );
     p_item->psz_msg =    psz_str;
 
-    vlc_mutex_unlock( &msg_bank.lock );
+    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
 }
+
+/* following functions are local */
 
 /*****************************************************************************
  * FlushMsg
@@ -383,39 +376,40 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
  * Print all messages remaining in queue. MESSAGE QUEUE MUST BE LOCKED, since
  * this function does not check the lock.
  *****************************************************************************/
-static void FlushMsg ( void )
+static void FlushMsg ( msg_bank_t *p_bank )
 {
     int i_index, i_start, i_stop;
 
     /* Get the maximum message index that can be freed */
-    i_stop = msg_bank.i_stop;
+    i_stop = p_bank->i_stop;
 
     /* Check until which value we can free messages */
-    for( i_index = 0; i_index < msg_bank.i_sub; i_index++ )
+    for( i_index = 0; i_index < p_bank->i_sub; i_index++ )
     {
-        i_start = msg_bank.pp_sub[ i_index ]->i_start;
+        i_start = p_bank->pp_sub[ i_index ]->i_start;
 
         /* If this subscriber is late, we don't free messages before
          * his i_start value, otherwise he'll miss messages */
         if(   ( i_start < i_stop
-               && (msg_bank.i_stop <= i_start || i_stop <= msg_bank.i_stop) )
+               && (p_bank->i_stop <= i_start || i_stop <= p_bank->i_stop) )
            || ( i_stop < i_start
-               && (i_stop <= msg_bank.i_stop && msg_bank.i_stop <= i_start) ) )
+               && (i_stop <= p_bank->i_stop && p_bank->i_stop <= i_start) ) )
         {
             i_stop = i_start;
         }
     }
 
     /* Free message data */
-    for( i_index = msg_bank.i_start;
+    for( i_index = p_bank->i_start;
          i_index != i_stop;
-         i_index = (i_index+1) % INTF_MSG_QSIZE )
+         i_index = (i_index+1) % VLC_MSG_QSIZE )
     {
-        free( msg_bank.msg[i_index].psz_msg );
+        free( p_bank->msg[i_index].psz_msg );
+        free( p_bank->msg[i_index].psz_module );
     }
 
     /* Update the new start value */
-    msg_bank.i_start = i_index;
+    p_bank->i_start = i_index;
 }
 
 /*****************************************************************************
@@ -430,7 +424,7 @@ static void FlushMsg ( void )
  * By the way, if we don't do this we can sometimes end up with segfaults.
  *****************************************************************************/
 #if defined( WIN32 )
-static char *ConvertPrintfFormatString( char *psz_format )
+static char *ConvertPrintfFormatString( const char *psz_format )
 {
   int i, i_counter=0, i_pos=0;
   char *psz_dest;
@@ -454,7 +448,7 @@ static char *ConvertPrintfFormatString( char *psz_format )
   psz_dest = malloc( strlen(psz_format) + i_counter + 1 );
   if( psz_dest == NULL )
   {
-      fprintf( stderr, "intf warning: ConvertPrintfFormatString failed\n");
+      fprintf( stderr, "main warning: ConvertPrintfFormatString failed\n" );
       return NULL;
   }
 

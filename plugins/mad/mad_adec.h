@@ -43,7 +43,6 @@ typedef struct mad_adec_thread_s
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
     data_packet_t *     p_data;
-    decoder_config_t *  p_config;
 
     /* Store i_pts for syncing audio frames */
     mtime_t             i_current_pts, i_next_pts;
@@ -59,6 +58,6 @@ typedef struct mad_adec_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-vlc_thread_t            mad_adec_CreateThread( decoder_config_t * p_config );
+vlc_thread_t            mad_adec_CreateThread( decoder_fifo_t * p_fifo );
 
 #endif

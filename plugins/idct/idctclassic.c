@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctclassic.c,v 1.24 2002/05/18 17:47:46 sam Exp $
+ * $Id: idctclassic.c,v 1.25 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "idct.h"
 #include "block_c.h"
@@ -47,7 +47,6 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("classic IDCT module") )
     ADD_CAPABILITY( IDCT, 100 )
     ADD_SHORTCUT( "classic" )
-    ADD_SHORTCUT( "idctclassic" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

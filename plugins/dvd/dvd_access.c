@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.19 2002/05/21 13:34:31 gbazin Exp $
+ * $Id: dvd_access.c,v 1.20 2002/06/01 12:31:58 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -34,7 +34,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -56,11 +57,6 @@
 #   include <dvdcss/dvdcss.h>
 #endif
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-
 #include "dvd.h"
 #include "dvd_es.h"
 #include "dvd_seek.h"
@@ -73,12 +69,12 @@
  *****************************************************************************/
 
 /* called from outside */
-static int  DVDOpen         ( struct input_thread_s * );
-static void DVDClose        ( struct input_thread_s * );
-static int  DVDSetArea      ( struct input_thread_s *, struct input_area_s * );
-static int  DVDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * );
-static ssize_t DVDRead      ( struct input_thread_s *, byte_t *, size_t );
-static void DVDSeek         ( struct input_thread_s *, off_t );
+static int  DVDOpen         ( input_thread_t * );
+static void DVDClose        ( input_thread_t * );
+static int  DVDSetArea      ( input_thread_t *, input_area_t * );
+static int  DVDSetProgram   ( input_thread_t *, pgrm_descriptor_t * );
+static ssize_t DVDRead      ( input_thread_t *, byte_t *, size_t );
+static void DVDSeek         ( input_thread_t *, off_t );
 
 static char * DVDParse( input_thread_t * );
 
@@ -108,7 +104,7 @@ void _M( access_getfunctions)( function_list_t * p_function_list )
 /*****************************************************************************
  * DVDOpen: open dvd
  *****************************************************************************/
-static int DVDOpen( struct input_thread_s *p_input )
+static int DVDOpen( input_thread_t *p_input )
 {
     char *               psz_device;
     thread_dvd_data_t *  p_dvd;
@@ -118,7 +114,7 @@ static int DVDOpen( struct input_thread_s *p_input )
     p_dvd = malloc( sizeof(thread_dvd_data_t) );
     if( p_dvd == NULL )
     {
-        intf_ErrMsg( "dvd error: out of memory" );
+        msg_Err( p_input, "out of memory" );
         return -1;
     }
     p_input->p_access_data = (void *)p_dvd;
@@ -145,14 +141,14 @@ static int DVDOpen( struct input_thread_s *p_input )
 
     if( p_dvd->dvdhandle == NULL )
     {
-        intf_ErrMsg( "dvd error: dvdcss can't open device" );
+        msg_Err( p_input, "dvdcss cannot open device" );
         free( p_dvd );
         return -1;
     }
 
     if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
     {
-        intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+        msg_Err( p_input, "%s", dvdcss_error( p_dvd->dvdhandle ) );
         dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         return -1;
@@ -161,7 +157,7 @@ static int DVDOpen( struct input_thread_s *p_input )
     /* Ifo allocation & initialisation */
     if( IfoCreate( p_dvd ) < 0 )
     {
-        intf_ErrMsg( "dvd error: allcation error in ifo" );
+        msg_Err( p_input, "allcation error in ifo" );
         dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
         return -1;
@@ -169,7 +165,7 @@ static int DVDOpen( struct input_thread_s *p_input )
 
     if( IfoInit( p_dvd->p_ifo ) < 0 )
     {
-        intf_ErrMsg( "dvd error: fatal failure in ifo" );
+        msg_Err( p_input, "fatal failure in ifo" );
         IfoDestroy( p_dvd->p_ifo );
         dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
@@ -189,7 +185,7 @@ static int DVDOpen( struct input_thread_s *p_input )
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
 
 #define title_inf p_dvd->p_ifo->vmg.title_inf
-    intf_WarnMsg( 3, "dvd info: number of titles: %d", title_inf.i_title_nb );
+    msg_Dbg( p_input, "number of titles: %d", title_inf.i_title_nb );
 
 #define area p_input->stream.pp_areas
     /* We start from 1 here since the default area 0
@@ -251,7 +247,7 @@ static int DVDOpen( struct input_thread_s *p_input )
 /*****************************************************************************
  * DVDClose: close dvd
  *****************************************************************************/
-static void DVDClose( struct input_thread_s *p_input )
+static void DVDClose( input_thread_t *p_input )
 {
     thread_dvd_data_t *p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
 
@@ -303,7 +299,7 @@ static int DVDSetProgram( input_thread_t    * p_input,
             p_dvd->i_angle    =  p_program->i_number;
         }
 #undef title
-        intf_WarnMsg( 3, "dvd info: angle %d selected", p_dvd->i_angle );
+        msg_Dbg( p_input, "angle %d selected", p_dvd->i_angle );
     }
 
     return 0;
@@ -395,7 +391,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         if( IfoTitleSet( p_dvd->p_ifo, p_dvd->i_title ) < 0 )
         {
-            intf_ErrMsg( "dvd error: fatal error in vts ifo" );
+            msg_Err( p_input, "fatal error in vts ifo" );
             free( p_dvd );
             return -1;
         }
@@ -405,8 +401,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_title_id =
             vts.title_inf.p_title_start[i_vts_title-1].i_title_id;
 
-        intf_WarnMsg( 3, "dvd: title %d vts_title %d pgc %d",
-                      p_dvd->i_title, i_vts_title, p_dvd->i_title_id );
+        msg_Dbg( p_input, "title %d vts_title %d pgc %d",
+                          p_dvd->i_title, i_vts_title, p_dvd->i_title_id );
 
         /* title set offset XXX: convert to block values */
         p_dvd->i_vts_start =
@@ -435,7 +431,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                                DVDCSS_SEEK_KEY );
         if( i_first < 0 )
         {
-            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+            msg_Err( p_input, "%s", dvdcss_error( p_dvd->dvdhandle ) );
             return -1;
         }
 
@@ -457,8 +453,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         DVDSetProgram( p_input,
                        p_input->stream.pp_programs[p_dvd->i_angle-1] ); 
 
-        intf_WarnMsg( 3, "dvd info: title first %i, last %i, size %i",
-                         i_first, i_last, i_last + 1 - p_dvd->i_vts_lb );
+        msg_Dbg( p_input, "title first %i, last %i, size %i",
+                          i_first, i_last, i_last + 1 - p_dvd->i_vts_lb );
         IfoPrintTitle( p_dvd );
 
         /* No PSM to read in DVD mode, we already have all information */
@@ -564,7 +560,7 @@ static ssize_t DVDRead( input_thread_t * p_input,
         }
 
         /* EOT */
-        intf_WarnMsg( 4, "dvd info: new title" );
+        msg_Dbg( p_input, "new title" );
         p_dvd->i_title++;
         DVDSetArea( p_input, p_input->stream.pp_areas[p_dvd->i_title] );
     }
@@ -609,7 +605,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     if( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_vts_start + p_dvd->i_vts_lb,
                      DVDCSS_SEEK_MPEG ) < 0 )
     {
-        intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+        msg_Err( p_input, "%s", dvdcss_error( p_dvd->dvdhandle ) );
         p_input->b_error = 1;
         return;
     }
@@ -619,8 +615,8 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_input->stream.p_selected_area->i_tell = DVDTell;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    intf_WarnMsg( 4, "Program Cell: %d Cell: %d Chapter: %d tell %lld",
-                     p_dvd->i_prg_cell, p_dvd->i_map_cell, p_dvd->i_chapter, DVDTell );
+    msg_Dbg( p_input, "program cell: %d cell: %d chapter: %d tell %lld",
+             p_dvd->i_prg_cell, p_dvd->i_map_cell, p_dvd->i_chapter, DVDTell );
 
     return;
 }
@@ -636,7 +632,7 @@ static char * DVDParse( input_thread_t * p_input )
     char *               psz_device;
     char *               psz_raw;
     char *               psz_next;
-    boolean_t            b_options = 0;
+    vlc_bool_t           b_options = 0;
     int                  i_title = 1;
     int                  i_chapter = 1;
     int                  i_angle = 1;
@@ -745,9 +741,8 @@ static char * DVDParse( input_thread_t * p_input )
             /* check the raw device */
             if( stat( psz_raw, &stat_info ) == -1 )
             {
-                intf_WarnMsg( 3, "dvd warning: cannot stat() raw"
-                                " device `%s' (%s)",
-                             psz_raw, strerror(errno));
+                msg_Warn( p_input, "cannot stat() raw device `%s' (%s)",
+                                   psz_raw, strerror(errno));
                 /* put back '@' */
                 *(psz_raw - 1) = '@';
                 psz_raw = "";
@@ -759,8 +754,8 @@ static char * DVDParse( input_thread_t * p_input )
 #ifndef WIN32    
                 if( !S_ISCHR(stat_info.st_mode) )
                 {
-                    intf_WarnMsg( 3, "dvd warning: raw device %s is"
-                                     " not a valid char device", psz_raw );
+                    msg_Warn( p_input, "raw device %s is"
+                              " not a valid char device", psz_raw );
                     /* put back '@' */
                     *(psz_raw - 1) = '@';
                     psz_raw = "";
@@ -790,31 +785,31 @@ static char * DVDParse( input_thread_t * p_input )
             /* no device and no access specified: we probably don't want DVD */
             return NULL;
         }
-        psz_device = config_GetPszVariable( "dvd" );
+        psz_device = config_GetPsz( p_input, "dvd" );
     }
 
 #ifndef WIN32    
     /* check block device */
     if( stat( psz_device, &stat_info ) == -1 )
     {
-        intf_ErrMsg( "dvd error: cannot stat() device `%s' (%s)",
-                     psz_device, strerror(errno));
+        msg_Err( p_input, "cannot stat() device `%s' (%s)",
+                          psz_device, strerror(errno));
         free( psz_device );
         return NULL;                    
     }
     
     if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode) )
     {
-        intf_WarnMsg( 3, "input: DVD plugin discarded"
-                         " (not a valid block device)" );
+        msg_Warn( p_input,
+                  "dvd module discarded (not a valid block device)" );
         free( psz_device );
         return NULL;
     }
 #endif
     
-    intf_WarnMsg( 2, "input: dvd=%s raw=%s title=%d chapter=%d angle=%d",
-                  psz_device, psz_raw, p_dvd->i_title,
-                  p_dvd->i_chapter, p_dvd->i_angle );
+    msg_Dbg( p_input, "dvd=%s raw=%s title=%d chapter=%d angle=%d",
+                      psz_device, psz_raw, p_dvd->i_title,
+                      p_dvd->i_chapter, p_dvd->i_angle );
 
     return psz_device;
 } 

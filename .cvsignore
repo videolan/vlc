@@ -5,8 +5,8 @@ conftest
 conftest.*
 .dep
 gmon.out
-vlc-debug.log
-vlc-debug.ct
+vlc-debug.*
+vlc-log.*
 config.log
 config.cache
 config.status

@@ -32,9 +32,6 @@
 #include <Grids.hpp>
 #include <ComCtrls.hpp>
 
-struct playlist_s;
-struct intf_thread_s;
-
 //---------------------------------------------------------------------------
 class TPlaylistDlg : public TForm
 {
@@ -86,8 +83,8 @@ private:	// User declarations
     char * __fastcall rindex( char *s, char c );
 public:		// User declarations
     __fastcall TPlaylistDlg( TComponent* Owner );
-    void __fastcall UpdateGrid( struct playlist_s * p_playlist );
-    void __fastcall Manage( struct intf_thread_s * p_intf );
+    void __fastcall UpdateGrid( playlist_t * p_playlist );
+    void __fastcall Manage( intf_thread_t * p_intf );
     void __fastcall DeleteItem( int i_pos );
     void __fastcall Previous();
     void __fastcall Next();

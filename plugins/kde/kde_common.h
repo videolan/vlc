@@ -9,20 +9,12 @@
 #ifndef _INTF_PLUGIN_H_
 #define _INTF_PLUGIN_H_
 
-extern "C"
-{
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "intf_playlist.h"
-#include "interface.h"
-}
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #endif /* _INTF_PLUGIN_H_ */

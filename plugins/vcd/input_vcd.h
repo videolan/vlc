@@ -2,7 +2,7 @@
  * input_vcd.h: thread structure of the VCD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_vcd.h,v 1.2 2001/12/19 23:19:20 sam Exp $
+ * $Id: input_vcd.h,v 1.3 2002/06/01 12:32:00 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -31,7 +31,7 @@ typedef struct thread_vcd_data_s
     int         i_track;                                    /* Current track */
     int         i_sector;                                  /* Current Sector */
     int *       p_sectors;                                  /* Track sectors */
-    boolean_t   b_end_of_track;           /* If the end of track was reached */
+    vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
 
 } thread_vcd_data_t;
 

@@ -2,7 +2,7 @@
  * macosx.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.h,v 1.9 2002/05/12 01:39:36 massiot Exp $
+ * $Id: macosx.h,v 1.10 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -33,30 +33,30 @@
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
  *****************************************************************************/
-typedef struct intf_sys_s
+struct intf_sys_s
 {
     NSPort *o_port;
     NSAutoreleasePool *o_pool;
 
-    boolean_t b_mute;
+    vlc_bool_t b_mute;
     int i_saved_volume;
     
     int i_part;
-    boolean_t b_disabled_menus;
-} intf_sys_t;
+    vlc_bool_t b_disabled_menus;
+};
 
 /*****************************************************************************
  * vout_sys_t: MacOS X video output method descriptor
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     VLCWindow *o_window;
 
     NSRect s_rect;
     int b_pos_saved;
 
-    boolean_t b_mouse_moved;
-    boolean_t b_mouse_pointer_visible;
+    vlc_bool_t b_mouse_moved;
+    vlc_bool_t b_mouse_pointer_visible;
     mtime_t i_time_mouse_last_moved;
     
     CodecType i_codec;
@@ -65,7 +65,7 @@ typedef struct vout_sys_s
     MatrixRecordPtr p_matrix;
     DecompressorComponent img_dc;
     ImageDescriptionHandle h_img_descr;
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * vout_req_t: MacOS X video output request 
@@ -80,5 +80,5 @@ typedef struct vout_req_s
 
     NSConditionLock *o_lock;
 
-    struct vout_thread_s *p_vout;
+    vout_thread_t *p_vout;
 } vout_req_t;

@@ -4,7 +4,7 @@
  * modules.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.h,v 1.19 2002/04/24 00:36:24 sam Exp $
+ * $Id: netutils.h,v 1.20 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Henri Fallon <henri@videolan.org>
@@ -33,11 +33,6 @@
 struct sockaddr_in;
 int   network_BuildAddr       ( struct sockaddr_in *, char *, int ); 
 
-#ifndef __PLUGIN__
-int   network_ChannelJoin     ( int );
-int   network_ChannelCreate   ( void );
-#else
-#   define network_ChannelCreate p_symbols->network_ChannelCreate
-#   define network_ChannelJoin   p_symbols->network_ChannelJoin
-#endif
+VLC_EXPORT( int,   network_ChannelJoin,     ( vlc_object_t *, int ) );
+VLC_EXPORT( int,   network_ChannelCreate,   ( vlc_object_t * ) );
 

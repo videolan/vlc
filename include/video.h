@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.52 2002/05/28 18:34:42 stef Exp $
+ * $Id: video.h,v 1.53 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -38,11 +38,11 @@ typedef struct plane_s
     int i_pixel_bytes;
 
     /* Is there a margin ? defaults to no */
-    boolean_t b_margin;
+    vlc_bool_t b_margin;
 
     /* Variables used for pictures with margins */
     int i_visible_bytes;                 /* How many real pixels are there ? */
-    boolean_t b_hidden;           /* Are we allowed to write to the margin ? */
+    vlc_bool_t b_hidden;          /* Are we allowed to write to the margin ? */
 
 } plane_t;
 
@@ -54,7 +54,7 @@ typedef struct plane_s
  * Picture type and flags should only be modified by the output thread. Note
  * that an empty picture MUST have its flags set to 0.
  *****************************************************************************/
-typedef struct picture_s
+struct picture_s
 {
     /* Picture data - data can always be freely modified, but p_data may
      * NEVER be modified. A direct buffer can be handled as the plugin
@@ -73,28 +73,27 @@ typedef struct picture_s
      * the video output thread API, but should never be written directly */
     int             i_refcount;                    /* link reference counter */
     mtime_t         date;                                    /* display date */
-    boolean_t       b_force;
+    vlc_bool_t      b_force;
 
     /* Picture dynamic properties - those properties can be changed by the
      * decoder */
-    boolean_t       b_progressive;            /* is it a progressive frame ? */
-    boolean_t       b_repeat_first_field;                         /* RFF bit */
-    boolean_t       b_top_field_first;               /* which field is first */
+    vlc_bool_t      b_progressive;            /* is it a progressive frame ? */
+    vlc_bool_t      b_repeat_first_field;                         /* RFF bit */
+    vlc_bool_t      b_top_field_first;               /* which field is first */
 
     /* The picture heap we are attached to */
-    struct picture_heap_s* p_heap;
+    picture_heap_t* p_heap;
 
     /* Private data - the video output plugin might want to put stuff here to
      * keep track of the picture */
-    struct picture_sys_s *p_sys;
-
-} picture_t;
+    picture_sys_t * p_sys;
+};
 
 /*****************************************************************************
  * picture_heap_t: video picture heap, either render (to store pictures used
  * by the decoder) or output (to store pictures displayed by the vout plugin)
  *****************************************************************************/
-typedef struct picture_heap_s
+struct picture_heap_s
 {
     int i_pictures;                                     /* current heap size */
 
@@ -114,9 +113,8 @@ typedef struct picture_heap_s
     int i_bmask, i_rbshift, i_lbshift;
 
     /* Stuff used for palettized RGB planes */
-    void (* pf_setpalette) ( struct vout_thread_s *, u16 *, u16 *, u16 * );
-
-} picture_heap_t;
+    void (* pf_setpalette) ( vout_thread_t *, u16 *, u16 *, u16 * );
+};
 
 /* RGB2PIXEL: assemble RGB components to a pixel value, returns a u32 */
 #define RGB2PIXEL( p_vout, i_r, i_g, i_b )                                    \
@@ -145,141 +143,141 @@ typedef struct picture_heap_s
 /*****************************************************************************
  * Codes used to describe picture format - see http://www.webartz.com/fourcc/
  *****************************************************************************/
-#define MAKEFOURCC( a, b, c, d ) \
+#define VLC_FOURCC( a, b, c, d ) \
     ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
 
-#define MAKETWOCC( a, b ) \
+#define VLC_TWOCC( a, b ) \
     ( (u16)(a) | ( (u16)(b) << 8 ) )
 
 /* AVI stuff */
-#define FOURCC_RIFF         MAKEFOURCC('R','I','F','F')
-#define FOURCC_LIST         MAKEFOURCC('L','I','S','T')
-#define FOURCC_JUNK         MAKEFOURCC('J','U','N','K')
-#define FOURCC_AVI          MAKEFOURCC('A','V','I',' ')
-#define FOURCC_WAVE         MAKEFOURCC('W','A','V','E')
+#define FOURCC_RIFF         VLC_FOURCC('R','I','F','F')
+#define FOURCC_LIST         VLC_FOURCC('L','I','S','T')
+#define FOURCC_JUNK         VLC_FOURCC('J','U','N','K')
+#define FOURCC_AVI          VLC_FOURCC('A','V','I',' ')
+#define FOURCC_WAVE         VLC_FOURCC('W','A','V','E')
 
-#define FOURCC_avih         MAKEFOURCC('a','v','i','h')
-#define FOURCC_hdrl         MAKEFOURCC('h','d','r','l')
-#define FOURCC_movi         MAKEFOURCC('m','o','v','i')
-#define FOURCC_idx1         MAKEFOURCC('i','d','x','1')
+#define FOURCC_avih         VLC_FOURCC('a','v','i','h')
+#define FOURCC_hdrl         VLC_FOURCC('h','d','r','l')
+#define FOURCC_movi         VLC_FOURCC('m','o','v','i')
+#define FOURCC_idx1         VLC_FOURCC('i','d','x','1')
 
-#define FOURCC_strl         MAKEFOURCC('s','t','r','l')
-#define FOURCC_strh         MAKEFOURCC('s','t','r','h')
-#define FOURCC_strf         MAKEFOURCC('s','t','r','f')
-#define FOURCC_strd         MAKEFOURCC('s','t','r','d')
+#define FOURCC_strl         VLC_FOURCC('s','t','r','l')
+#define FOURCC_strh         VLC_FOURCC('s','t','r','h')
+#define FOURCC_strf         VLC_FOURCC('s','t','r','f')
+#define FOURCC_strd         VLC_FOURCC('s','t','r','d')
 
-#define FOURCC_rec          MAKEFOURCC('r','e','c',' ')
-#define FOURCC_auds         MAKEFOURCC('a','u','d','s')
-#define FOURCC_vids         MAKEFOURCC('v','i','d','s')
+#define FOURCC_rec          VLC_FOURCC('r','e','c',' ')
+#define FOURCC_auds         VLC_FOURCC('a','u','d','s')
+#define FOURCC_vids         VLC_FOURCC('v','i','d','s')
 
-#define TWOCC_wb            MAKETWOCC('w','b')
-#define TWOCC_db            MAKETWOCC('d','b')
-#define TWOCC_dc            MAKETWOCC('d','c')
-#define TWOCC_pc            MAKETWOCC('p','c')
+#define TWOCC_wb            VLC_TWOCC('w','b')
+#define TWOCC_db            VLC_TWOCC('d','b')
+#define TWOCC_dc            VLC_TWOCC('d','c')
+#define TWOCC_pc            VLC_TWOCC('p','c')
 
 /* MPEG4 codec */
-#define FOURCC_DIVX         MAKEFOURCC('D','I','V','X')
-#define FOURCC_divx         MAKEFOURCC('d','i','v','x')
-#define FOURCC_DIV1         MAKEFOURCC('D','I','V','1')
-#define FOURCC_div1         MAKEFOURCC('d','i','v','1')
-#define FOURCC_MP4S         MAKEFOURCC('M','P','4','S')
-#define FOURCC_mp4s         MAKEFOURCC('m','p','4','s')
-#define FOURCC_M4S2         MAKEFOURCC('M','4','S','2')
-#define FOURCC_m4s2         MAKEFOURCC('m','4','s','2')
-#define FOURCC_xvid         MAKEFOURCC('x','v','i','d')
-#define FOURCC_XVID         MAKEFOURCC('X','V','I','D')
-#define FOURCC_XviD         MAKEFOURCC('X','v','i','D')
-#define FOURCC_DX50         MAKEFOURCC('D','X','5','0')
-#define FOURCC_mp4v         MAKEFOURCC('m','p','4','v')
-#define FOURCC_4            MAKEFOURCC( 4,  0,  0,  0 )
-        
+#define FOURCC_DIVX         VLC_FOURCC('D','I','V','X')
+#define FOURCC_divx         VLC_FOURCC('d','i','v','x')
+#define FOURCC_DIV1         VLC_FOURCC('D','I','V','1')
+#define FOURCC_div1         VLC_FOURCC('d','i','v','1')
+#define FOURCC_MP4S         VLC_FOURCC('M','P','4','S')
+#define FOURCC_mp4s         VLC_FOURCC('m','p','4','s')
+#define FOURCC_M4S2         VLC_FOURCC('M','4','S','2')
+#define FOURCC_m4s2         VLC_FOURCC('m','4','s','2')
+#define FOURCC_xvid         VLC_FOURCC('x','v','i','d')
+#define FOURCC_XVID         VLC_FOURCC('X','V','I','D')
+#define FOURCC_XviD         VLC_FOURCC('X','v','i','D')
+#define FOURCC_DX50         VLC_FOURCC('D','X','5','0')
+#define FOURCC_mp4v         VLC_FOURCC('m','p','4','v')
+#define FOURCC_4            VLC_FOURCC( 4,  0,  0,  0 )
+ 
 /* MSMPEG4 v2 */
-#define FOURCC_MPG4         MAKEFOURCC('M','P','G','4')
-#define FOURCC_mpg4         MAKEFOURCC('m','p','g','4')
-#define FOURCC_DIV2         MAKEFOURCC('D','I','V','2')
-#define FOURCC_div2         MAKEFOURCC('d','i','v','2')
-#define FOURCC_MP42         MAKEFOURCC('M','P','4','2')
-#define FOURCC_mp42         MAKEFOURCC('m','p','4','2')
+#define FOURCC_MPG4         VLC_FOURCC('M','P','G','4')
+#define FOURCC_mpg4         VLC_FOURCC('m','p','g','4')
+#define FOURCC_DIV2         VLC_FOURCC('D','I','V','2')
+#define FOURCC_div2         VLC_FOURCC('d','i','v','2')
+#define FOURCC_MP42         VLC_FOURCC('M','P','4','2')
+#define FOURCC_mp42         VLC_FOURCC('m','p','4','2')
 
-/* MSMPEG4 v3 */
-/* M$ mpeg4 v3 */
-#define FOURCC_MPG3         MAKEFOURCC('M','P','G','3')
-#define FOURCC_mpg3         MAKEFOURCC('m','p','g','3')
-#define FOURCC_div3         MAKEFOURCC('d','i','v','3')
-#define FOURCC_MP43         MAKEFOURCC('M','P','4','3')
-#define FOURCC_mp43         MAKEFOURCC('m','p','4','3')
+/* MSMPEG4 v3 / M$ mpeg4 v3 */
+#define FOURCC_MPG3         VLC_FOURCC('M','P','G','3')
+#define FOURCC_mpg3         VLC_FOURCC('m','p','g','3')
+#define FOURCC_div3         VLC_FOURCC('d','i','v','3')
+#define FOURCC_MP43         VLC_FOURCC('M','P','4','3')
+#define FOURCC_mp43         VLC_FOURCC('m','p','4','3')
+
 /* DivX 3.20 */
-#define FOURCC_DIV3         MAKEFOURCC('D','I','V','3')
-#define FOURCC_DIV4         MAKEFOURCC('D','I','V','4')
-#define FOURCC_div4         MAKEFOURCC('d','i','v','4')
-#define FOURCC_DIV5         MAKEFOURCC('D','I','V','5')
-#define FOURCC_div5         MAKEFOURCC('d','i','v','5')
-#define FOURCC_DIV6         MAKEFOURCC('D','I','V','6')
-#define FOURCC_div6         MAKEFOURCC('d','i','v','6')
+#define FOURCC_DIV3         VLC_FOURCC('D','I','V','3')
+#define FOURCC_DIV4         VLC_FOURCC('D','I','V','4')
+#define FOURCC_div4         VLC_FOURCC('d','i','v','4')
+#define FOURCC_DIV5         VLC_FOURCC('D','I','V','5')
+#define FOURCC_div5         VLC_FOURCC('d','i','v','5')
+#define FOURCC_DIV6         VLC_FOURCC('D','I','V','6')
+#define FOURCC_div6         VLC_FOURCC('d','i','v','6')
+
 /* AngelPotion stuff */
-#define FOURCC_AP41         MAKEFOURCC('A','P','4','1')
+#define FOURCC_AP41         VLC_FOURCC('A','P','4','1')
+
 /* ?? */
-#define FOURCC_3IV1         MAKEFOURCC('3','I','V','1')
-
-
+#define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
 
 /* Packed RGB for 8bpp */
-#define FOURCC_BI_RGB       MAKEFOURCC( 0 , 0 , 0 , 0 )
-#define FOURCC_RGB2         MAKEFOURCC('R','G','B','2')
+#define FOURCC_BI_RGB       VLC_FOURCC( 0 , 0 , 0 , 0 )
+#define FOURCC_RGB2         VLC_FOURCC('R','G','B','2')
 
 /* Packed RGB for 16, 24, 32bpp */
-#define FOURCC_BI_BITFIELDS MAKEFOURCC( 0 , 0 , 0 , 3 )
+#define FOURCC_BI_BITFIELDS VLC_FOURCC( 0 , 0 , 0 , 3 )
 
 /* Packed RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
-#define FOURCC_RV15         MAKEFOURCC('R','V','1','5')
+#define FOURCC_RV15         VLC_FOURCC('R','V','1','5')
 
 /* Packed RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */
-#define FOURCC_RV16         MAKEFOURCC('R','V','1','6')
+#define FOURCC_RV16         VLC_FOURCC('R','V','1','6')
 
 /* Packed RGB 24bpp, 0xff, 0xff00, 0xff0000 */
-#define FOURCC_RV24         MAKEFOURCC('R','V','2','4')
+#define FOURCC_RV24         VLC_FOURCC('R','V','2','4')
 
 /* Packed RGB 32bpp, 0xff, 0xff00, 0xff0000 */
-#define FOURCC_RV32         MAKEFOURCC('R','V','3','2')
+#define FOURCC_RV32         VLC_FOURCC('R','V','3','2')
 
 /* Planar YUV 4:2:0, Y:U:V */
-#define FOURCC_I420         MAKEFOURCC('I','4','2','0')
-#define FOURCC_IYUV         MAKEFOURCC('I','Y','U','V')
+#define FOURCC_I420         VLC_FOURCC('I','4','2','0')
+#define FOURCC_IYUV         VLC_FOURCC('I','Y','U','V')
 
 /* Planar YUV 4:2:0, Y:V:U */
-#define FOURCC_YV12         MAKEFOURCC('Y','V','1','2')
+#define FOURCC_YV12         VLC_FOURCC('Y','V','1','2')
 
 /* Packed YUV 4:2:2, U:Y:V:Y, interlaced */
-#define FOURCC_IUYV         MAKEFOURCC('I','U','Y','V')
+#define FOURCC_IUYV         VLC_FOURCC('I','U','Y','V')
 
 /* Packed YUV 4:2:2, U:Y:V:Y */
-#define FOURCC_UYVY         MAKEFOURCC('U','Y','V','Y')
-#define FOURCC_UYNV         MAKEFOURCC('U','Y','N','V')
-#define FOURCC_Y422         MAKEFOURCC('Y','4','2','2')
+#define FOURCC_UYVY         VLC_FOURCC('U','Y','V','Y')
+#define FOURCC_UYNV         VLC_FOURCC('U','Y','N','V')
+#define FOURCC_Y422         VLC_FOURCC('Y','4','2','2')
 
 /* Packed YUV 4:2:2, U:Y:V:Y, reverted */
-#define FOURCC_cyuv         MAKEFOURCC('c','y','u','v')
+#define FOURCC_cyuv         VLC_FOURCC('c','y','u','v')
 
 /* Packed YUV 4:2:2, Y:U:Y:V */
-#define FOURCC_YUY2         MAKEFOURCC('Y','U','Y','2')
-#define FOURCC_YUNV         MAKEFOURCC('Y','U','N','V')
+#define FOURCC_YUY2         VLC_FOURCC('Y','U','Y','2')
+#define FOURCC_YUNV         VLC_FOURCC('Y','U','N','V')
 
 /* Packed YUV 4:2:2, Y:V:Y:U */
-#define FOURCC_YVYU         MAKEFOURCC('Y','V','Y','U')
+#define FOURCC_YVYU         VLC_FOURCC('Y','V','Y','U')
 
 /* Packed YUV 2:1:1, Y:U:Y:V */
-#define FOURCC_Y211         MAKEFOURCC('Y','2','1','1')
+#define FOURCC_Y211         VLC_FOURCC('Y','2','1','1')
 
 /* Custom formats which we use but which don't exist in the fourcc database */
 
 /* Planar Y, packed UV, from Matrox */
-#define FOURCC_YMGA         MAKEFOURCC('Y','M','G','A')
+#define FOURCC_YMGA         VLC_FOURCC('Y','M','G','A')
 
 /* Planar 4:2:2, Y:U:V */
-#define FOURCC_I422         MAKEFOURCC('I','4','2','2')
+#define FOURCC_I422         VLC_FOURCC('I','4','2','2')
 
 /* Planar 4:4:4, Y:U:V */
-#define FOURCC_I444         MAKEFOURCC('I','4','4','4')
+#define FOURCC_I444         VLC_FOURCC('I','4','4','4')
 
 /*****************************************************************************
  * Shortcuts to access image components
@@ -306,18 +304,18 @@ typedef struct picture_heap_s
  * Subtitle type and flags should only be modified by the output thread. Note
  * that an empty subtitle MUST have its flags set to 0.
  *****************************************************************************/
-typedef struct subpicture_s
+struct subpicture_s
 {
     /* Type and flags - should NOT be modified except by the vout thread */
     int             i_type;                                          /* type */
     int             i_status;                                       /* flags */
     int             i_size;                                     /* data size */
-    struct subpicture_s *   p_next;         /* next subtitle to be displayed */
+    subpicture_t *  p_next;                 /* next subtitle to be displayed */
 
     /* Date properties */
     mtime_t         i_start;                    /* beginning of display date */
     mtime_t         i_stop;                           /* end of display date */
-    boolean_t       b_ephemer;             /* does the subtitle have a TTL ? */
+    vlc_bool_t      b_ephemer;             /* does the subtitle have a TTL ? */
 
     /* Display properties - these properties are only indicative and may be
      * changed by the video output thread, or simply ignored depending of the
@@ -335,7 +333,7 @@ typedef struct subpicture_s
          * format */
         struct
         {
-            p_vout_font_t       p_font;            /* font, NULL for default */
+            vout_font_t *       p_font;            /* font, NULL for default */
             int                 i_style;                       /* text style */
             u32                 i_char_color;             /* character color */
             u32                 i_border_color;              /* border color */
@@ -345,15 +343,13 @@ typedef struct subpicture_s
 #endif
 
     /* The subpicture rendering routine */
-    void ( *pf_render ) ( const struct vout_thread_s *, picture_t *,
-                          const struct subpicture_s * );
+    void ( *pf_render ) ( vout_thread_t *, picture_t *, const subpicture_t * );
 
     /* Private data - the subtitle plugin might want to put stuff here to
      * keep track of the subpicture */
-    struct subpicture_sys_s *p_sys;                       /* subpicture data */
-    void                    *p_sys_orig;          /* pointer before memalign */
-
-} subpicture_t;
+    subpicture_sys_t *p_sys;                              /* subpicture data */
+    void             *p_sys_orig;                 /* pointer before memalign */
+};
 
 /* Subpicture type */
 #define EMPTY_SUBPICTURE       0     /* subtitle slot is empty and available */

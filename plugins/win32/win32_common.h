@@ -41,21 +41,21 @@ typedef struct es_descriptor_s es_descriptor_t;
 /*****************************************************************************
  * intf_sys_t: description and status of Win32 interface
  *****************************************************************************/
-typedef struct intf_sys_s
+struct intf_sys_s
 {
     /* special actions */
-    boolean_t           b_playing;
-    boolean_t           b_popup_changed;             /* display popup menu ? */
-    boolean_t           b_slider_free;                      /* slider status */
+    vlc_bool_t          b_playing;
+    vlc_bool_t          b_popup_changed;             /* display popup menu ? */
+    vlc_bool_t          b_slider_free;                      /* slider status */
 
     /* menus handlers */
-    boolean_t           b_program_update;   /* do we need to update programs 
+    vlc_bool_t          b_program_update;   /* do we need to update programs 
                                                                         menu */
-    boolean_t           b_title_update;  /* do we need to update title menus */
-    boolean_t           b_chapter_update;    /* do we need to update chapter
+    vlc_bool_t          b_title_update;  /* do we need to update title menus */
+    vlc_bool_t          b_chapter_update;    /* do we need to update chapter
                                                                        menus */
-    boolean_t           b_audio_update;  /* do we need to update audio menus */
-    boolean_t           b_spu_update;      /* do we need to update spu menus */
+    vlc_bool_t          b_audio_update;  /* do we need to update audio menus */
+    vlc_bool_t          b_spu_update;      /* do we need to update spu menus */
 
     /* windows and widgets */
     TMainFrameDlg     * p_window;                             /* main window */
@@ -71,7 +71,7 @@ typedef struct intf_sys_s
 
     /* The messages window */
     TMessagesDlg      * p_messages;                       /* messages window */
-    intf_subscription_t*p_sub;                     /* interface subscription */
+    msg_subscription_t* p_sub;                  /* message bank subscription */
 
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */
@@ -84,6 +84,5 @@ typedef struct intf_sys_s
     /* Language information */
     es_descriptor_t   * p_audio_es_old;
     es_descriptor_t   * p_spu_es_old;
-
-} intf_sys_t;
+};
 

@@ -16,18 +16,16 @@
 #include <klineedit.h>
 #include <klocale.h>
 #include <knuminput.h>
-#include <videolan/vlc.h>
 
 #include "QConfigItem.h"
 #include "kde_pluginsbox.h"
 #include "kde_preferences.h"
-#include "interface.h"
 
 /*
  construkt a new configuration window for the given module
 */
-KPreferences::KPreferences(const char *psz_module_name, QWidget *parent,
-                           const QString &caption) :
+KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
+                           QWidget *parent, const QString &caption) :
     KDialogBase ( Tabbed, caption, Ok| Apply|Cancel|User1, Ok, parent,
                   "vlc preferences", true, false, "Save")
 {
@@ -36,8 +34,10 @@ KPreferences::KPreferences(const char *psz_module_name, QWidget *parent,
     QVBox *category_table = NULL;
     QString *category_label;
 
+    this->p_intf = p_intf;
+
     /* Look for the selected module */
-    for( p_module = p_module_bank->first ; p_module != NULL ;
+    for( p_module = p_intf->p_vlc->module_bank.first ; p_module != NULL ;
          p_module = p_module->next )
     {
 
@@ -80,7 +80,7 @@ KPreferences::KPreferences(const char *psz_module_name, QWidget *parent,
                 
                 vlc_mutex_lock( p_item->p_lock );
                 KPluginsBox *item_frame =
-                    new KPluginsBox( p_item->psz_text,
+                    new KPluginsBox( p_intf, p_item->psz_text,
                                      p_item->psz_value ? p_item->psz_value :"",
                                      category_table,
                                      spacingHint(),
@@ -95,7 +95,7 @@ KPreferences::KPreferences(const char *psz_module_name, QWidget *parent,
                 
                 /* build a list of available plugins */
                 
-                for( p_module_bis = p_module_bank->first ;
+                for( p_module_bis = p_intf->p_vlc->module_bank.first ;
                      p_module_bis != NULL ;
                      p_module_bis = p_module_bis->next ) {
                     if( p_module_bis->i_capabilities & (1 << p_item->i_value)){
@@ -208,7 +208,7 @@ KPreferences::~KPreferences()
 bool KPreferences::isConfigureable(QString module)
 {
     module_t *p_module;
-    for( p_module = p_module_bank->first ;
+    for( p_module = p_intf->p_vlc->module_bank.first ;
          p_module != NULL ;
          p_module = p_module->next ) {
         if( !module.compare( p_module->psz_name ) ) {
@@ -231,8 +231,8 @@ void KPreferences::slotApply()
     while ( (obj=it.current()) != 0 ) {
         ++it;
         QConfigItem *p_config = (QConfigItem *)obj;
-        intf_WarnMsg(1, const_cast<char *>(p_config->name()));
-        intf_WarnMsg(1, "%d", p_config->getType());
+        msg_Dbg( p_intf, const_cast<char *>(p_config->name()));
+        msg_Dbg( p_intf, "%d", p_config->getType());
 
         switch( p_config->getType() ) {
 
@@ -240,24 +240,19 @@ void KPreferences::slotApply()
         case MODULE_CONFIG_ITEM_FILE:
         case MODULE_CONFIG_ITEM_MODULE:
             if (p_config->sValue()) {
-                config_PutPszVariable( p_config->name(),
-                                       strdup(p_config->sValue().latin1()));
+                config_PutPsz( p_intf, p_config->name(),
+                               strdup(p_config->sValue().latin1()));
             }
             else {
-                config_PutPszVariable( p_config->name(), NULL );
+                config_PutPsz( p_intf, p_config->name(), NULL );
             }
             break;
         case MODULE_CONFIG_ITEM_INTEGER:
         case MODULE_CONFIG_ITEM_BOOL:
-            config_PutIntVariable( p_config->name(), p_config->iValue() );
+            config_PutInt( p_intf, p_config->name(), p_config->iValue() );
             break;
         case MODULE_CONFIG_ITEM_FLOAT:
-            if (config_PutFloatVariable) {
-                config_PutFloatVariable( p_config->name(), p_config->fValue());
-            }
-            else {
-                intf_WarnMsg(1, "config_PutFloatVariable not defined");
-            }
+            config_PutFloat( p_intf, p_config->name(), p_config->fValue() );
             break;
         }
     }
@@ -279,5 +274,5 @@ void KPreferences::slotOk()
 void KPreferences::slotUser1()
 {
     slotApply();
-    config_SaveConfigFile( NULL );
+    config_SaveConfigFile( p_intf->p_this, NULL );
 }

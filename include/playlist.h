@@ -1,8 +1,8 @@
 /*****************************************************************************
- * intf_playlist.h : Playlist functions
+ * vlc_playlist.h : Playlist functions
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.h,v 1.6 2002/04/24 00:36:24 sam Exp $
+ * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
+ * $Id: playlist.h,v 1.3 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,12 +24,12 @@
 /*****************************************************************************
  * playlist_item_t: playlist item
  *****************************************************************************/
-typedef struct playlist_item_s
+struct playlist_item_s
 {
     char*             psz_name;
     int               i_type;   /* unused yet */
     int               i_status; /* unused yet */
-} playlist_item_t;
+};
 
 /*****************************************************************************
  * playlist_t: playlist structure
@@ -38,22 +38,23 @@ typedef struct playlist_item_s
  * the playlist, a change lock, a dynamic array of playlist items, and a
  * current item which is an exact copy of one of the array members.
  *****************************************************************************/
-typedef struct playlist_s
+struct playlist_s
 {
-    int                   i_index;                          /* current index */
-    int                   i_size;                              /* total size */
+    VLC_COMMON_MEMBERS
 
-    int                   i_mode;  /* parse mode (random, forward, backward) */
-    int                   i_seed;               /* seed used for random mode */
-    boolean_t             b_stopped;
-
+    /* Thread properties and lock */
     vlc_mutex_t           change_lock;
 
-    playlist_item_t       current;
-    playlist_item_t*      p_item;
-} playlist_t;
+    int                   i_index;                          /* current index */
+    int                   i_size;                              /* total size */
+    playlist_item_t **    pp_items;
 
-/* Used by intf_PlaylistAdd */
+    int                   i_status;
+
+    input_thread_t *      p_input;
+};
+
+/* Used by playlist_Add */
 #define PLAYLIST_START            0
 #define PLAYLIST_END             -1
 
@@ -66,27 +67,30 @@ typedef struct playlist_s
 #define PLAYLIST_RANDOM           3                          /* Shuffle play */
 #define PLAYLIST_REVERSE_RANDOM  -3                  /* Reverse shuffle play */
 
+/* Playlist commands */
+#define PLAYLIST_PLAY   1                         /* Starts playing. No arg. */
+#define PLAYLIST_PAUSE  2                 /* Toggles playlist pause. No arg. */
+#define PLAYLIST_STOP   3                          /* Stops playing. No arg. */
+#define PLAYLIST_SKIP   4                          /* Skip X items and play. */
+#define PLAYLIST_GOTO   5                                  /* Goto Xth item. */
+#define PLAYLIST_MODE   6                          /* Set playlist mode. ??? */
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef __PLUGIN__
-playlist_t * intf_PlaylistCreate   ( void );
-void         intf_PlaylistInit     ( playlist_t * p_playlist );
-int          intf_PlaylistAdd      ( playlist_t * p_playlist,
-                                     int i_pos, const char * psz_item );
-int          intf_PlaylistDelete   ( playlist_t * p_playlist, int i_pos );
-void         intf_PlaylistNext     ( playlist_t * p_playlist );
-void         intf_PlaylistPrev     ( playlist_t * p_playlist );
-void         intf_PlaylistDestroy  ( playlist_t * p_playlist );
-void         intf_PlaylistJumpto   ( playlist_t * p_playlist , int i_pos);
-void         intf_UrlDecode        ( char * );
-#else
-#   define intf_PlaylistAdd          p_symbols->intf_PlaylistAdd
-#   define intf_PlaylistDelete       p_symbols->intf_PlaylistDelete
-#   define intf_PlaylistNext         p_symbols->intf_PlaylistNext
-#   define intf_PlaylistPrev         p_symbols->intf_PlaylistPrev
-#   define intf_PlaylistDestroy      p_symbols->intf_PlaylistDestroy
-#   define intf_PlaylistJumpto       p_symbols->intf_PlaylistJumpto
-#   define intf_UrlDecode            p_symbols->intf_UrlDecode
-#endif
+playlist_t * playlist_Create   ( vlc_object_t * );
+void         playlist_Destroy  ( playlist_t * );
+
+VLC_EXPORT( void, playlist_Command, ( playlist_t *, int, int ) );
+
+#define playlist_Play(p) playlist_Command(p,PLAYLIST_PLAY,0)
+#define playlist_Pause(p) playlist_Command(p,PLAYLIST_PAUSE,0)
+#define playlist_Stop(p) playlist_Command(p,PLAYLIST_STOP,0)
+#define playlist_Next(p) playlist_Command(p,PLAYLIST_SKIP,1)
+#define playlist_Prev(p) playlist_Command(p,PLAYLIST_SKIP,-1)
+#define playlist_Skip(p,i) playlist_Command(p,PLAYLIST_SKIP,i)
+#define playlist_Goto(p,i) playlist_Command(p,PLAYLIST_GOTO,i)
+
+VLC_EXPORT( int, playlist_Add, ( vlc_object_t *, int, const char * ) );
+VLC_EXPORT( int, playlist_Delete, ( playlist_t *, int ) );
 

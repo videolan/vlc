@@ -2,7 +2,7 @@
  * dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd.h,v 1.4 2002/05/20 22:45:03 sam Exp $
+ * $Id: dvd.h,v 1.5 2002/06/01 12:31:58 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -45,7 +45,7 @@ typedef struct thread_dvd_data_s
 
     int                     i_chapter_nb;
     int                     i_chapter;
-    boolean_t               b_new_chapter;
+    vlc_bool_t              b_new_chapter;
 
     int                     i_angle_nb;
     int                     i_angle;

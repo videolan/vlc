@@ -23,13 +23,8 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "playlist.h"
 #include "win32_common.h"
@@ -38,7 +33,7 @@
 //#pragma package(smart_init)
 #pragma resource "*.dfm"
 
-extern  struct intf_thread_s *p_intfGlobal;
+extern intf_thread_t *p_intfGlobal;
 
 //---------------------------------------------------------------------------
 __fastcall TPlaylistDlg::TPlaylistDlg( TComponent* Owner )
@@ -112,13 +107,13 @@ void __fastcall TPlaylistDlg::ListViewPlaylistDblClick( TObject *Sender )
         }
 
         /* stop current item, select the good one */
-        if( ( p_input_bank->pp_input[0] != NULL ) &&
+        if( ( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL ) &&
             ( Item->Index != p_intfGlobal->p_sys->i_playing ) )
         {
             /* FIXME: temporary hack */
-            p_input_bank->pp_input[0]->b_eof = 1;
+            p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
         }
-        intf_PlaylistJumpto( p_main->p_playlist, Item->Index - 1 );
+        intf_PlaylistJumpto( p_intfGlobal->p_vlc->p_playlist, Item->Index - 1 );
     }
 }
 //---------------------------------------------------------------------------
@@ -186,7 +181,7 @@ void __fastcall TPlaylistDlg::MenuDeleteSelectedClick( TObject *Sender )
 {
     /* user wants to delete a file in the queue */
     int         i_pos;
-    playlist_t *p_playlist = p_main->p_playlist;
+    playlist_t *p_playlist = p_intfGlobal->p_vlc->p_playlist;
 
     /* lock the struct */
     vlc_mutex_lock( &p_intfGlobal->change_lock );
@@ -209,7 +204,7 @@ void __fastcall TPlaylistDlg::MenuDeleteSelectedClick( TObject *Sender )
 void __fastcall TPlaylistDlg::MenuDeleteAllClick( TObject *Sender )
 {
     int         i_pos;
-    playlist_t *p_playlist = p_main->p_playlist;
+    playlist_t *p_playlist = p_intfGlobal->p_vlc->p_playlist;
 
     /* lock the struct */
     vlc_mutex_lock( &p_intfGlobal->change_lock );
@@ -230,7 +225,7 @@ void __fastcall TPlaylistDlg::MenuSelectionInvertClick( TObject *Sender )
 {
 #define NOT( var ) ( (var) ? false : true )
     int         i_pos;
-    playlist_t *p_playlist = p_main->p_playlist;
+    playlist_t *p_playlist = p_intfGlobal->p_vlc->p_playlist;
     TListItems *Items = ListViewPlaylist->Items;
 
     /* delete the items from the last to the first */
@@ -324,7 +319,7 @@ void __fastcall TPlaylistDlg::UpdateGrid( playlist_t * p_playlist )
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Manage( intf_thread_t * p_intf )
 {
-    playlist_t *p_playlist = p_main->p_playlist ;
+    playlist_t *p_playlist = p_intfGlobal->p_vlc->p_playlist ;
 
     vlc_mutex_lock( &p_playlist->change_lock );
 
@@ -341,41 +336,41 @@ void __fastcall TPlaylistDlg::Manage( intf_thread_t * p_intf )
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::DeleteItem( int i_pos )
 {
-    intf_PlaylistDelete( p_main->p_playlist, i_pos );
+    intf_PlaylistDelete( p_intfGlobal->p_vlc->p_playlist, i_pos );
 
     /* are we deleting the current played stream */
     if( p_intfGlobal->p_sys->i_playing == i_pos )
     {
         /* next ! */
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
         /* this has to set the slider to 0 */
         
         /* step minus one */
         p_intfGlobal->p_sys->i_playing-- ;
 
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-        p_main->p_playlist->i_index-- ;
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+        vlc_mutex_lock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
+        p_intfGlobal->p_vlc->p_playlist->i_index-- ;
+        vlc_mutex_unlock( &p_intfGlobal->p_vlc->p_playlist->change_lock );
     }
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Previous()
 {
-    if( p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
-        intf_PlaylistPrev( p_main->p_playlist );
-        intf_PlaylistPrev( p_main->p_playlist );
-        p_input_bank->pp_input[0]->b_eof = 1;
+        intf_PlaylistPrev( p_intfGlobal->p_vlc->p_playlist );
+        intf_PlaylistPrev( p_intfGlobal->p_vlc->p_playlist );
+        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Next()
 {
-    if( p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
 }
 //---------------------------------------------------------------------------

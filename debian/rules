@@ -13,7 +13,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk 
 # Remove --without-dvdcss here in non-totalitarian countries
 export DVDCSS_FLAGS="--enable-dvd --without-dvdcss"
 
-export VIDDIR="usr/share/videolan"
+export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 export GNOMEDIR="usr/share/gnome/apps/Multimedia"
 
@@ -61,8 +61,8 @@ install: build
 	esac ;\
 	for alias in $$ARCH_ALIASES ; do \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
-		mv debian/vlc/usr/lib/videolan/vlc/$$alias.so \
-			debian/vlc-$$alias/usr/lib/videolan/vlc/ ; done
+		mv debian/vlc/usr/lib/vlc/$$alias.so \
+			debian/vlc-$$alias/usr/lib/vlc/ ; done
 
 	mv debian/vlc/usr/bin/gvlc debian/vlc-gtk/usr/bin/
 	mv debian/vlc/usr/bin/gnome-vlc debian/vlc-gnome/usr/bin/

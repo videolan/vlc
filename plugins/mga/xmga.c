@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.15 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: xmga.c,v 1.16 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -30,7 +30,9 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+#include <vlc/vout.h>
 
 #ifdef HAVE_MACHINE_PARAM_H
 /* BSD */
@@ -50,14 +52,7 @@
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/dpms.h>
 
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
 #include "netutils.h"                                 /* network_ChannelJoin */
-
-#include "stream_control.h"                 /* needed by input_ext-intf.h... */
-#include "input_ext-intf.h"
 
 //#include "mga.h"
 
@@ -104,19 +99,18 @@ static void ToggleCursor   ( vout_thread_t * );
 
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the X11 hardware display you want to use.\nBy default vlc will " \
+    "Specify the X11 hardware display you want to use. By default vlc will " \
     "use the value of the DISPLAY environment variable.")
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-ADD_STRING  ( "xmga_display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
-ADD_BOOL    ( "xmga_altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
+ADD_STRING  ( "xmga-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
+ADD_BOOL    ( "xmga-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("X11 MGA module") )
     ADD_CAPABILITY( VOUT, 60 )
-    ADD_SHORTCUT( "xmga" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -132,7 +126,7 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the X11 and XVideo specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     /* Internal settings and properties */
     Display *           p_display;                        /* display pointer */
@@ -142,7 +136,7 @@ typedef struct vout_sys_s
     Window              window;                               /* root window */
     GC                  gc;              /* graphic context instance handler */
 
-    boolean_t           b_shm;               /* shared memory extension flag */
+    vlc_bool_t          b_shm;               /* shared memory extension flag */
 
 #ifdef MODULE_NAME_IS_xvideo
     Window              yuv_window;   /* sub-window for displaying yuv video
@@ -165,7 +159,7 @@ typedef struct vout_sys_s
 
     int                 i_width;                     /* width of main window */
     int                 i_height;                   /* height of main window */
-    boolean_t           b_altfullscreen;          /* which fullscreen method */
+    vlc_bool_t          b_altfullscreen;          /* which fullscreen method */
 
     /* Backup of window position and size before fullscreen switch */
     int                 i_width_backup;
@@ -185,23 +179,12 @@ typedef struct vout_sys_s
     BOOL                b_ss_dpms;                              /* DPMS mode */
 
     /* Mouse pointer properties */
-    boolean_t           b_mouse_pointer_visible;
+    vlc_bool_t          b_mouse_pointer_visible;
     mtime_t             i_time_mouse_last_moved; /* used to auto-hide pointer*/
     Cursor              blank_cursor;                   /* the hidden cursor */
     mtime_t             i_time_button_last_pressed;   /* to track dbl-clicks */
     Pixmap              cursor_pixmap;
-
-} vout_sys_t;
-
-/*****************************************************************************
- * picture_sys_t: direct buffer method descriptor
- *****************************************************************************
- * This structure is part of the picture descriptor, it describes the
- * XVideo specific properties of a direct buffer.
- *****************************************************************************/
-typedef struct picture_sys_s
-{
-} picture_sys_t;
+};
 
 /*****************************************************************************
  * mwmhints_t: window manager hints
@@ -228,31 +211,6 @@ typedef struct mwmhints_s
 #else
 #   define MAX_DIRECTBUFFERS 2
 #endif
-
-/*****************************************************************************
- * Seeking function TODO: put this in a generic location !
- *****************************************************************************/
-static inline void vout_Seek( off_t i_seek )
-{
-    off_t i_tell;
-
-    vlc_mutex_lock( &p_input_bank->lock );
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-#define S p_input_bank->pp_input[0]->stream
-        i_tell = S.p_selected_area->i_tell + i_seek * (off_t)50 * S.i_mux_rate;
-
-        i_tell = ( i_tell <= 0 /*S.p_selected_area->i_start*/ )
-                   ? 0 /*S.p_selected_area->i_start*/
-                   : ( i_tell >= S.p_selected_area->i_size )
-                       ? S.p_selected_area->i_size
-                       : i_tell;
-
-        input_Seek( p_input_bank->pp_input[0], i_tell );
-#undef S
-    }
-    vlc_mutex_unlock( &p_input_bank->lock );
-}
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -284,19 +242,19 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "vout error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     /* Open display, unsing the "display" config variable or the DISPLAY
      * environment variable */
-    psz_display = config_GetPszVariable( "xmga_display" );
+    psz_display = config_GetPsz( p_vout, "xmga-display" );
     p_vout->p_sys->p_display = XOpenDisplay( psz_display );
 
     if( p_vout->p_sys->p_display == NULL )                          /* error */
     {
-        intf_ErrMsg( "vout error: cannot open display %s",
-                     XDisplayName( psz_display ) );
+        msg_Err( p_vout, "cannot open display %s",
+                         XDisplayName( psz_display ) );
         free( p_vout->p_sys );
         if( psz_display ) free( psz_display );
         return( 1 );
@@ -313,7 +271,7 @@ static int vout_Create( vout_thread_t *p_vout )
      * but also command buttons, subtitles and other indicators */
     if( CreateWindow( p_vout ) )
     {
-        intf_ErrMsg( "vout error: cannot create X11 window" );
+        msg_Err( p_vout, "cannot create X11 window" );
         DestroyCursor( p_vout );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
@@ -389,7 +347,8 @@ static int vout_Init( vout_thread_t *p_vout )
         case 32:
             p_vout->output.i_chroma = FOURCC_RV32; break;
         default:
-            intf_ErrMsg( "vout error: unknown screen depth" );
+            msg_Err( p_vout, "unknown screen depth %i",
+                             p_vout->p_sys->i_screen_depth );
             return( 0 );
     }
 
@@ -465,7 +424,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 static int vout_Manage( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
-    boolean_t   b_resized;                        /* window has been resized */
+    vlc_bool_t  b_resized;                        /* window has been resized */
     char        i_key;                                    /* ISO Latin-1 key */
     KeySym      x_key_symbol;
 
@@ -492,24 +451,6 @@ static int vout_Manage( vout_thread_t *p_vout )
             p_vout->p_sys->i_width = xevent.xconfigure.width;
             p_vout->p_sys->i_height = xevent.xconfigure.height;
         }
-        /* MapNotify event: change window status and disable screen saver */
-        else if( xevent.type == MapNotify)
-        {
-            if( (p_vout != NULL) && !p_vout->b_active )
-            {
-                DisableXScreenSaver( p_vout );
-                p_vout->b_active = 1;
-            }
-        }
-        /* UnmapNotify event: change window status and enable screen saver */
-        else if( xevent.type == UnmapNotify )
-        {
-            if( (p_vout != NULL) && p_vout->b_active )
-            {
-                EnableXScreenSaver( p_vout );
-                p_vout->b_active = 0;
-            }
-        }
         /* Keyboard event */
         else if( xevent.type == KeyPress )
         {
@@ -518,78 +459,76 @@ static int vout_Manage( vout_thread_t *p_vout )
                                              xevent.xkey.keycode, 0 );
             switch( x_key_symbol )
             {
-                 case XK_Escape:
-                     p_main->p_intf->b_die = 1;
-                     break;
-                 case XK_Menu:
-                     p_main->p_intf->b_menu_change = 1;
-                     break;
-                 case XK_Left:
-                     vout_Seek( -5 );
-                     break;
-                 case XK_Right:
-                     vout_Seek( 5 );
-                     break;
-                 case XK_Up:
-                     vout_Seek( 60 );
-                     break;
-                 case XK_Down:
-                     vout_Seek( -60 );
-                     break;
-                 case XK_Home:
-                     input_Seek( p_input_bank->pp_input[0],
-                     p_input_bank->pp_input[0]->stream.p_selected_area->i_start );
-                     break;
-                 case XK_End:
-                     input_Seek( p_input_bank->pp_input[0],
-                     p_input_bank->pp_input[0]->stream.p_selected_area->i_size );
-                     break;
-                 case XK_Page_Up:
-                     vout_Seek( 900 );
-                     break;
-                 case XK_Page_Down:
-                     vout_Seek( -900 );
-                     break;
-                 case XK_space:
-                     input_SetStatus( p_input_bank->pp_input[0],
-                                      INPUT_STATUS_PAUSE );
-                     break;
+            case XK_Escape:
+                p_vout->p_vlc->b_die = 1;
+                break;
+            case XK_Menu:
+                p_vout->p_vlc->p_intf->b_menu_change = 1;
+                break;
+            case XK_Left:
+                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case XK_Right:
+                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case XK_Up:
+                input_Seek( p_vout, 60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case XK_Down:
+                input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case XK_Home:
+                input_Seek( p_vout, 0, INPUT_SEEK_BYTES | INPUT_SEEK_SET );
+                break;
+            case XK_End:
+                input_Seek( p_vout, 0, INPUT_SEEK_BYTES | INPUT_SEEK_END );
+                break;
+            case XK_Page_Up:
+                input_Seek( p_vout, 900, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case XK_Page_Down:
+                input_Seek( p_vout, -900, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                break;
+            case XK_space:
+                input_SetStatus( p_input_bank->pp_input[0],
+                                 INPUT_STATUS_PAUSE );
+                break;
 
-                 default:
-                     /* "Normal Keys"
-                      * The reason why I use this instead of XK_0 is that 
-                      * with XLookupString, we don't have to care about
-                      * keymaps. */
+            default:
+                /* "Normal Keys"
+                 * The reason why I use this instead of XK_0 is that 
+                 * with XLookupString, we don't have to care about
+                 * keymaps. */
 
-                    if( XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
+                if( XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
+                {
+                /* FIXME: handle stuff here */
+                    switch( i_key )
                     {
-                        /* FIXME: handle stuff here */
-                        switch( i_key )
-                        {
-                        case 'q':
-                        case 'Q':
-                            p_main->p_intf->b_die = 1;
-                            break;
-                        case 'f':
-                        case 'F':
-                            p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                            break;
+                    case 'q':
+                    case 'Q':
+                        p_vout->p_vlc->b_die = 1;
+                        break;
+                    case 'f':
+                    case 'F':
+                        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                        break;
 
-                        case '0': network_ChannelJoin( 0 ); break;
-                        case '1': network_ChannelJoin( 1 ); break;
-                        case '2': network_ChannelJoin( 2 ); break;
-                        case '3': network_ChannelJoin( 3 ); break;
-                        case '4': network_ChannelJoin( 4 ); break;
-                        case '5': network_ChannelJoin( 5 ); break;
-                        case '6': network_ChannelJoin( 6 ); break;
-                        case '7': network_ChannelJoin( 7 ); break;
-                        case '8': network_ChannelJoin( 8 ); break;
-                        case '9': network_ChannelJoin( 9 ); break;
+                    case '0': network_ChannelJoin( 0 ); break;
+                    case '1': network_ChannelJoin( 1 ); break;
+                    case '2': network_ChannelJoin( 2 ); break;
+                    case '3': network_ChannelJoin( 3 ); break;
+                    case '4': network_ChannelJoin( 4 ); break;
+                    case '5': network_ChannelJoin( 5 ); break;
+                    case '6': network_ChannelJoin( 6 ); break;
+                    case '7': network_ChannelJoin( 7 ); break;
+                    case '8': network_ChannelJoin( 8 ); break;
+                    case '9': network_ChannelJoin( 9 ); break;
 
-                        default:
-                            break;
-                        }
+                    default:
+                        break;
                     }
+                }
                 break;
             }
         }
@@ -614,11 +553,11 @@ static int vout_Manage( vout_thread_t *p_vout )
                     break;
 
                 case Button4:
-                    vout_Seek( 15 );
+                    input_Seek( p_vout, 15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                     break;
 
                 case Button5:
-                    vout_Seek( -15 );
+                    input_Seek( p_vout, -15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                     break;
             }
         }
@@ -629,7 +568,7 @@ static int vout_Manage( vout_thread_t *p_vout )
             {
                 case Button3:
                     /* FIXME: need locking ! */
-                    p_main->p_intf->b_menu_change = 1;
+                    p_vout->p_vlc->p_intf->b_menu_change = 1;
                     break;
             }
         }
@@ -645,7 +584,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Other event */
         else
         {
-            intf_WarnMsg( 3, "vout: unhandled event %d received", xevent.type );
+            msg_Warn( p_vout, "unhandled event %d received", xevent.type );
         }
     }
 
@@ -658,7 +597,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         if( (xevent.xclient.message_type == p_vout->p_sys->wm_protocols)
             && (xevent.xclient.data.l[0] == p_vout->p_sys->wm_delete_window ) )
         {
-            p_main->p_intf->b_die = 1;
+            p_vout->p_vlc->b_die = 1;
         }
     }
 
@@ -681,9 +620,8 @@ static int vout_Manage( vout_thread_t *p_vout )
 
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
-        intf_WarnMsg( 3, "vout: video display resized (%dx%d)",
-                      p_vout->p_sys->i_width,
-                      p_vout->p_sys->i_height );
+        msg_Dbg( p_vout, "video display resized (%dx%d)",
+                 p_vout->p_sys->i_width, p_vout->p_sys->i_height );
  
         vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
                            p_vout->p_sys->i_height,
@@ -733,9 +671,9 @@ static int CreateWindow( vout_thread_t *p_vout )
     XGCValues               xgcvalues;
     XEvent                  xevent;
 
-    boolean_t               b_expose;
-    boolean_t               b_configure_notify;
-    boolean_t               b_map_notify;
+    vlc_bool_t              b_expose;
+    vlc_bool_t              b_configure_notify;
+    vlc_bool_t              b_map_notify;
 
     /* Set main window's size */
     p_vout->p_sys->i_width = p_vout->i_window_width;
@@ -777,7 +715,7 @@ static int CreateWindow( vout_thread_t *p_vout )
     XSetWMNormalHints( p_vout->p_sys->p_display, p_vout->p_sys->window,
                        &xsize_hints );
     XSetCommand( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                 p_main->ppsz_argv, p_main->i_argc );
+                 p_vout->p_vlc->ppsz_argv, p_vout->p_vlc->i_argc );
     XStoreName( p_vout->p_sys->p_display, p_vout->p_sys->window,
                 VOUT_TITLE " (XMGA output)"
               );
@@ -788,7 +726,7 @@ static int CreateWindow( vout_thread_t *p_vout )
                              &p_vout->p_sys->wm_delete_window, 1 ) )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
-        intf_Msg( "vout error: missing or bad window manager" );
+        msg_Err( p_vout, "missing or bad window manager" );
     } 
 
     /* Creation of a graphic context that doesn't generate a GraphicsExpose
@@ -872,25 +810,14 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     /* We know the chroma, allocate a buffer which will be used
      * directly by the decoder */
-    p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
-
-    if( p_pic->p_sys == NULL )
-    {
-        return -1;
-    }
-
-    /* XXX */
-
     switch( p_vout->output.i_chroma )
     {
         /* XXX ?? */
 
         default:
             /* Unknown chroma, tell the guy to get lost */
-            free( p_pic->p_sys );
-            intf_ErrMsg( "vout error: never heard of chroma 0x%.8x (%4.4s)",
-                         p_vout->output.i_chroma,
-                         (char*)&p_vout->output.i_chroma );
+            msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
+                     p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
             p_pic->i_planes = 0;
             return -1;
     }
@@ -908,10 +835,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-
     XSync( p_vout->p_sys->p_display, False );
-
-    free( p_pic->p_sys );
 }
 
 /*****************************************************************************
@@ -935,13 +859,13 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         Window next_parent, parent, *p_dummy, dummy1;
         unsigned int dummy2, dummy3;
 
-        intf_WarnMsg( 3, "vout: entering fullscreen mode" );
+        msg_Dbg( p_vout, "entering fullscreen mode" );
 
         /* Only check the fullscreen method when we actually go fullscreen,
          * because to go back to window mode we need to know in which
          * fullscreen mode we where */
-        p_vout->p_sys->b_altfullscreen =
-            config_GetIntVariable( "xmga_altfullscreen" );
+        p_vout->p_sys->b_altfullscreen = config_GetInt( p_vout,
+                                                        "xmga-altfullscreen" );
 
         /* Save current window coordinates so they can be restored when
          * we exit from fullscreen mode. This is the tricky part because
@@ -1015,7 +939,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     }
     else
     {
-        intf_WarnMsg( 3, "vout: leaving fullscreen mode" );
+        msg_Dbg( p_vout, "leaving fullscreen mode" );
 
         i_xpos = p_vout->p_sys->i_xpos_backup;
         i_ypos = p_vout->p_sys->i_ypos_backup;

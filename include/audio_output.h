@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.46 2002/04/24 00:36:24 sam Exp $
+ * $Id: audio_output.h,v 1.47 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -21,27 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/*****************************************************************************
- * aout_bank_t, p_aout_bank (global variable)
- *****************************************************************************
- * This global variable is accessed by any function using the audio output.
- *****************************************************************************/
-typedef struct aout_bank_s
-{
-    /* Array to all the audio outputs */
-    struct aout_thread_s *pp_aout[ AOUT_MAX_THREADS ];
-
-    int                    i_count;
-    vlc_mutex_t            lock;  /* Global lock */
-
-} aout_bank_t;
-
-#ifndef __PLUGIN__
-extern aout_bank_t *p_aout_bank;
-#else
-#   define p_aout_bank (p_symbols->p_aout_bank)
-#endif
 
 /*****************************************************************************
  * aout_increment_t
@@ -72,7 +51,7 @@ typedef struct aout_increment_s
 /*****************************************************************************
  * aout_fifo_t
  *****************************************************************************/
-typedef struct aout_fifo_s
+struct aout_fifo_s
 {
     /* See the fifo formats below */
     int                 i_format;
@@ -80,7 +59,7 @@ typedef struct aout_fifo_s
     int                 i_rate;
     int                 i_frame_size;
 
-    boolean_t           b_die;
+    vlc_bool_t          b_die;
     int                 i_fifo;      /* Just to keep track of the fifo index */
 
     vlc_mutex_t         data_lock;
@@ -93,11 +72,11 @@ typedef struct aout_fifo_s
      * audio data. It it also the first frame in the current timestamped frame
      * area, ie the first dated frame in the decoded part of the buffer. :-p */
     int                 i_start_frame;
-    boolean_t           b_start_frame;
+    vlc_bool_t          b_start_frame;
     /* The next frame is the end frame of the current timestamped frame area,
      * ie the first dated frame after the start frame. */
     int                 i_next_frame;
-    boolean_t           b_next_frame;
+    vlc_bool_t          b_next_frame;
     /* The end frame is the first frame, after the start frame, that doesn't
      * contain decoded audio data. That's why the end frame is the first frame
      * where the audio decoder can store its decoded audio frames. */
@@ -113,8 +92,7 @@ typedef struct aout_fifo_s
     /* The following variable is used to store the number of remaining audio
      * units in the current timestamped frame area. */
     int                 i_units;
-
-} aout_fifo_t;
+};
 
 #define AOUT_FIFO_ISEMPTY( fifo ) \
   ( (fifo).i_end_frame == (fifo).i_start_frame )
@@ -133,22 +111,20 @@ typedef struct aout_fifo_s
 /*****************************************************************************
  * aout_thread_t : audio output thread descriptor
  *****************************************************************************/
-typedef struct aout_thread_s
+struct aout_thread_s
 {
-    vlc_thread_t        thread_id;
-    boolean_t           b_die;
-    boolean_t           b_active;
+    VLC_COMMON_MEMBERS
 
     vlc_mutex_t         fifos_lock;
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
 
     /* Plugin used and shortcuts to access its capabilities */
-    struct module_s *   p_module;
-    int              ( *pf_open )       ( p_aout_thread_t );
-    int              ( *pf_setformat )  ( p_aout_thread_t );
-    int              ( *pf_getbufinfo ) ( p_aout_thread_t, int );
-    void             ( *pf_play )       ( p_aout_thread_t, byte_t *, int );
-    void             ( *pf_close )      ( p_aout_thread_t );
+    module_t *   p_module;
+    int       ( *pf_open )       ( aout_thread_t * );
+    int       ( *pf_setformat )  ( aout_thread_t * );
+    int       ( *pf_getbufinfo ) ( aout_thread_t * , int );
+    void      ( *pf_play )       ( aout_thread_t * , byte_t *, int );
+    void      ( *pf_close )      ( aout_thread_t * );
 
     void *              buffer;
     /* The s32 buffer is used to mix all the audio fifos together before
@@ -178,9 +154,8 @@ typedef struct aout_thread_s
 
     /* there might be some useful private structure, such as audio_buf_info
      * for the OSS output */
-    p_aout_sys_t        p_sys;
-
-} aout_thread_t;
+    aout_sys_t *        p_sys;
+};
 
 /* Those are from <linux/soundcard.h> but are needed because of formats
  * on other platforms */
@@ -207,18 +182,10 @@ typedef struct aout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef __PLUGIN__
-void            aout_InitBank           ( void );
-void            aout_EndBank            ( void );
+aout_thread_t * aout_CreateThread       ( vlc_object_t *, int, int );
+void            aout_DestroyThread      ( aout_thread_t * );
 
-aout_thread_t * aout_CreateThread       ( int *, int, int );
-void            aout_DestroyThread      ( aout_thread_t *, int * );
-
-aout_fifo_t *   aout_CreateFifo         ( int, int, int, int, void * );
-void            aout_DestroyFifo        ( aout_fifo_t *p_fifo );
+VLC_EXPORT( aout_fifo_t *, aout_CreateFifo,  ( vlc_object_t *, int, int, int, int, void * ) );
+VLC_EXPORT( void,          aout_DestroyFifo, ( aout_fifo_t *p_fifo ) );
 void            aout_FreeFifo           ( aout_fifo_t *p_fifo );
-#else
-#   define aout_CreateFifo p_symbols->aout_CreateFifo
-#   define aout_DestroyFifo p_symbols->aout_DestroyFifo
-#endif
 

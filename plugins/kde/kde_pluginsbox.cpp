@@ -1,7 +1,6 @@
 #include "kde_pluginsbox.h"
 #include "kde_preferences.h"
 
-#include <videolan/vlc.h>
 #include <qgroupbox.h>
 #include <qhbox.h>
 #include <qlabel.h>
@@ -9,11 +8,13 @@
 #include <klistview.h>
 #include <kbuttonbox.h>
 
-KPluginsBox::KPluginsBox(QString text, QString value, QWidget *parent,
+KPluginsBox::KPluginsBox(intf_thread_t *p_intf,
+                         QString text, QString value, QWidget *parent,
                          int spacing, KPreferences *pref) :
     QGroupBox( 1, Vertical, text, parent )
 {
     owner = pref;
+    this->p_intf = p_intf;
     QVBox *item_vbox = new QVBox( this );
     item_vbox->setSpacing(spacing);
     
@@ -56,7 +57,7 @@ void KPluginsBox::selectClicked()
 void KPluginsBox::configureClicked()
 {
     if (listView->selectedItem()) {
-        new KPreferences(listView->selectedItem()->text(0), this);
+        new KPreferences(p_intf, listView->selectedItem()->text(0), this);
     }
 }
 void KPluginsBox::selectionChanged( QListViewItem *item )

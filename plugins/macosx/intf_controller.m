@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.4 2002/05/20 05:20:12 jlj Exp $
+ * $Id: intf_controller.m,v 1.5 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -24,10 +24,8 @@
 
 #import <ApplicationServices/ApplicationServices.h>
 
-#include <videolan/vlc.h>
-
-#include "interface.h"
-#include "intf_playlist.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "macosx.h"
 #include "intf_controller.h"

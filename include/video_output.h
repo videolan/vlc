@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.75 2002/04/25 21:52:42 sam Exp $
+ * $Id: video_output.h,v 1.76 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -25,27 +25,6 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * vout_bank_t, p_vout_bank (global variable)
- *****************************************************************************
- * This global variable is accessed by any function using the video output.
- *****************************************************************************/
-typedef struct vout_bank_s
-{
-    /* Array to all the video outputs */
-    struct vout_thread_s *pp_vout[ VOUT_MAX_THREADS ];
-
-    int                   i_count;
-    vlc_mutex_t           lock;                               /* Global lock */
-
-} vout_bank_t;
-
-#ifndef __PLUGIN__
-extern vout_bank_t *p_vout_bank;
-#else
-#   define p_vout_bank (p_symbols->p_vout_bank)
-#endif
-
-/*****************************************************************************
  * vout_chroma_t: Chroma conversion function
  *****************************************************************************
  * This is the prototype common to all conversion functions.
@@ -54,7 +33,7 @@ extern vout_bank_t *p_vout_bank;
  *      p_dest                          destination picture
  * Picture width and source dimensions must be multiples of 16.
  *****************************************************************************/
-typedef void (vout_chroma_convert_t)( struct vout_thread_s *,
+typedef void (vout_chroma_convert_t)( vout_thread_t *,
                                       picture_t *, picture_t * );
 
 typedef struct vout_chroma_s
@@ -63,12 +42,12 @@ typedef struct vout_chroma_s
     vout_chroma_convert_t *pf_convert;
 
     /* Private module-dependant data */
-    p_chroma_sys_t      p_sys;                               /* private data */
+    chroma_sys_t *      p_sys;                               /* private data */
 
     /* Plugin used and shortcuts to access its capabilities */
-    struct module_s *   p_module;
-    int  ( * pf_init )  ( struct vout_thread_s * );
-    void ( * pf_end )   ( struct vout_thread_s * );
+    module_t * p_module;
+    int  ( * pf_init )  ( vout_thread_t * );
+    void ( * pf_end )   ( vout_thread_t * );
 
 } vout_chroma_t;
 
@@ -79,7 +58,7 @@ typedef struct vout_fifo_s
 {
     /* See the fifo types below */
     int                 i_type;
-    boolean_t           b_die;
+    vlc_bool_t          b_die;
     int                 i_fifo;      /* Just to keep track of the fifo index */
 
     vlc_mutex_t         data_lock;
@@ -98,42 +77,37 @@ typedef struct vout_fifo_s
  * is represented by a video output thread, and described using the following
  * structure.
  *****************************************************************************/
-typedef struct vout_thread_s
+struct vout_thread_s
 {
+    VLC_COMMON_MEMBERS
+
     /* Thread properties and lock */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
-    boolean_t           b_active;                           /* `active' flag */
-    vlc_thread_t        thread_id;               /* id for pthread functions */
     vlc_mutex_t         picture_lock;                   /* picture heap lock */
     vlc_mutex_t         subpicture_lock;             /* subpicture heap lock */
     vlc_mutex_t         change_lock;                   /* thread change lock */
-    int *               pi_status;                  /* temporary status flag */
-    p_vout_sys_t        p_sys;                       /* system output method */
+    vout_sys_t *        p_sys;                       /* system output method */
 
     /* Current display properties */
     u16                 i_changes;             /* changes made to the thread */
     float               f_gamma;                                    /* gamma */
-    boolean_t           b_grayscale;           /* color or grayscale display */
-    boolean_t           b_info;              /* print additional information */
-    boolean_t           b_interface;                     /* render interface */
-    boolean_t           b_scale;                    /* allow picture scaling */
-    boolean_t           b_fullscreen;           /* toogle fullscreen display */
+    vlc_bool_t          b_grayscale;           /* color or grayscale display */
+    vlc_bool_t          b_info;              /* print additional information */
+    vlc_bool_t          b_interface;                     /* render interface */
+    vlc_bool_t          b_scale;                    /* allow picture scaling */
+    vlc_bool_t          b_fullscreen;           /* toogle fullscreen display */
     mtime_t             render_time;             /* last picture render time */
     int                 i_window_width;                /* video window width */
     int                 i_window_height;              /* video window height */
 
     /* Plugin used and shortcuts to access its capabilities */
-    struct module_s *   p_module;
-    int              ( *pf_create )     ( struct vout_thread_s * );
-    int              ( *pf_init )       ( struct vout_thread_s * );
-    void             ( *pf_end )        ( struct vout_thread_s * );
-    void             ( *pf_destroy )    ( struct vout_thread_s * );
-    int              ( *pf_manage )     ( struct vout_thread_s * );
-    void             ( *pf_render )     ( struct vout_thread_s *,
-                                          struct picture_s * );
-    void             ( *pf_display )    ( struct vout_thread_s *,
-                                          struct picture_s * );
+    module_t *   p_module;
+    int       ( *pf_create )     ( vout_thread_t * );
+    int       ( *pf_init )       ( vout_thread_t * );
+    void      ( *pf_end )        ( vout_thread_t * );
+    void      ( *pf_destroy )    ( vout_thread_t * );
+    int       ( *pf_manage )     ( vout_thread_t * );
+    void      ( *pf_render )     ( vout_thread_t *, picture_t * );
+    void      ( *pf_display )    ( vout_thread_t *, picture_t * );
 
     /* Statistics - these numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
@@ -144,7 +118,7 @@ typedef struct vout_thread_s
     int                 i_heap_size;                            /* heap size */
     picture_heap_t      render;                         /* rendered pictures */
     picture_heap_t      output;                            /* direct buffers */
-    boolean_t           b_direct;              /* rendered are like direct ? */
+    vlc_bool_t          b_direct;              /* rendered are like direct ? */
     vout_chroma_t       chroma;                        /* translation tables */
 
     /* Picture and subpicture heaps */
@@ -152,8 +126,8 @@ typedef struct vout_thread_s
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
 
     /* Bitmap fonts */
-    p_vout_font_t       p_default_font;                      /* default font */
-    p_vout_font_t       p_large_font;                          /* large font */
+    vout_font_t *       p_default_font;                      /* default font */
+    vout_font_t *       p_large_font;                          /* large font */
 
     /* Statistics */
     count_t             c_loops;
@@ -161,7 +135,7 @@ typedef struct vout_thread_s
     mtime_t             display_jitter;    /* average deviation from the PTS */
     count_t             c_jitter_samples;  /* number of samples used for the *
                                             * calculation of the jitter      */
-} vout_thread_t;
+};
 
 #define I_OUTPUTPICTURES p_vout->output.i_pictures
 #define PP_OUTPUTPICTURE p_vout->output.pp_picture
@@ -189,52 +163,31 @@ typedef struct vout_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef __PLUGIN__
-void            vout_InitBank       ( void );
-void            vout_EndBank        ( void );
-
-vout_thread_t * vout_CreateThread   ( int *pi_status, int, int, u32, int );
-void            vout_DestroyThread  ( vout_thread_t *, int *pi_status );
+VLC_EXPORT( vout_thread_t *, vout_CreateThread,   ( vlc_object_t *, int, int, u32, int ) );
+VLC_EXPORT( void,            vout_DestroyThread,  ( vout_thread_t * ) );
 
 vout_fifo_t *   vout_CreateFifo     ( void );
 void            vout_DestroyFifo    ( vout_fifo_t * );
 void            vout_FreeFifo       ( vout_fifo_t * );
 
-int             vout_ChromaCmp          ( u32, u32 );
+VLC_EXPORT( int,             vout_ChromaCmp,      ( u32, u32 ) );
 
-picture_t *     vout_CreatePicture  ( vout_thread_t *,
-                                      boolean_t, boolean_t, boolean_t );
-void            vout_AllocatePicture( picture_t *, int, int, u32 );
-void            vout_DestroyPicture ( vout_thread_t *, picture_t * );
-void            vout_DisplayPicture ( vout_thread_t *, picture_t * );
-void            vout_DatePicture    ( vout_thread_t *, picture_t *, mtime_t );
-void            vout_LinkPicture    ( vout_thread_t *, picture_t * );
-void            vout_UnlinkPicture  ( vout_thread_t *, picture_t * );
+VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, vlc_bool_t, vlc_bool_t, vlc_bool_t ) );
+VLC_EXPORT( void,            vout_AllocatePicture,( vout_thread_t *, picture_t *, int, int, u32 ) );
+VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
+VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
+VLC_EXPORT( void,            vout_DatePicture,    ( vout_thread_t *, picture_t *, mtime_t ) );
+VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t * ) );
+VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
+VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, int, int, int *, int *, int *, int * ) );
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
-void            vout_PlacePicture   ( vout_thread_t *, int, int,
-                                      int *, int *, int *, int * );
 
-subpicture_t *  vout_CreateSubPicture   ( vout_thread_t *, int, int );
-void            vout_DestroySubPicture  ( vout_thread_t *, subpicture_t * );
-void            vout_DisplaySubPicture  ( vout_thread_t *, subpicture_t * );
+VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int, int ) );
+VLC_EXPORT( void,            vout_DestroySubPicture,  ( vout_thread_t *, subpicture_t * ) );
+VLC_EXPORT( void,            vout_DisplaySubPicture,  ( vout_thread_t *, subpicture_t * ) );
+
 subpicture_t *  vout_SortSubPictures    ( vout_thread_t *, mtime_t );
 void            vout_RenderSubPictures  ( vout_thread_t *, picture_t *,
                                                            subpicture_t * );
-#else
-#   define vout_CreateThread p_symbols->vout_CreateThread
-#   define vout_DestroyThread p_symbols->vout_DestroyThread
-#   define vout_CreateSubPicture p_symbols->vout_CreateSubPicture
-#   define vout_DestroySubPicture p_symbols->vout_DestroySubPicture
-#   define vout_DisplaySubPicture p_symbols->vout_DisplaySubPicture
-#   define vout_CreatePicture p_symbols->vout_CreatePicture
-#   define vout_AllocatePicture p_symbols->vout_AllocatePicture
-#   define vout_DisplayPicture p_symbols->vout_DisplayPicture
-#   define vout_DestroyPicture p_symbols->vout_DestroyPicture
-#   define vout_DatePicture p_symbols->vout_DatePicture
-#   define vout_LinkPicture p_symbols->vout_LinkPicture
-#   define vout_UnlinkPicture p_symbols->vout_UnlinkPicture
-#   define vout_PlacePicture p_symbols->vout_PlacePicture
-#   define vout_ChromaCmp p_symbols->vout_ChromaCmp
-#endif
 

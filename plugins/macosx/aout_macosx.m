@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.m,v 1.4 2002/05/20 10:44:18 massiot Exp $
+ * $Id: aout_macosx.m,v 1.5 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -27,9 +27,8 @@
  *****************************************************************************/
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"                                   /* aout_thread_t */
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
 
 #include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
@@ -42,7 +41,7 @@
  * This structure is part of the audio output thread descriptor.
  * It describes the CoreAudio specific properties of an output thread.
  *****************************************************************************/
-typedef struct aout_sys_s
+struct aout_sys_s
 {
     AudioDeviceID       device;         // the audio device
     AudioConverterRef   s_converter;    // the AudioConverter
@@ -53,11 +52,11 @@ typedef struct aout_sys_s
 
     Ptr                 p_buffer;       // ptr to the 32 bit float data
     UInt32              ui_buffer_size; // audio device buffer size
-    boolean_t           b_buffer_data;  // available buffer data?
+    vlc_bool_t          b_buffer_data;  // available buffer data?
     vlc_mutex_t         mutex_lock;     // pthread locks for sync of
     vlc_cond_t          cond_sync;      // aout_Play and callback
     mtime_t             clock_diff;     // diff between system clock & audio
-} aout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes.
@@ -105,7 +104,7 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg( "aout error: %s", strerror(ENOMEM) );
+        msg_Err( p_aout, "out of memory" );
         return( 1 );
     }
 
@@ -120,7 +119,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     if( err != noErr ) 
     {
-        intf_ErrMsg( "aout error: failed to get the device: %d", err );
+        msg_Err( p_aout, "failed to get the device: %d", err );
         return( -1 );
     }
 
@@ -133,7 +132,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: failed to get device buffer size: %d", err );
+        msg_Err( p_aout, "failed to get device buffer size: %d", err );
         return( -1 );
     }
 
@@ -146,18 +145,18 @@ static int aout_Open( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: failed to get dst stream format: %d", err );
+        msg_Err( p_aout, "failed to get dst stream format: %d", err );
         return( -1 );
     }
 
     if( p_aout->p_sys->s_dst_stream_format.mFormatID != kAudioFormatLinearPCM )
     {
-        intf_ErrMsg( "aout error: kAudioFormatLinearPCM required" );
+        msg_Err( p_aout, "kAudioFormatLinearPCM required" );
         return( -1 );
     }
 
     /* initialize mutex and cond */
-    vlc_mutex_init( &p_aout->p_sys->mutex_lock );
+    vlc_mutex_init( p_aout, &p_aout->p_sys->mutex_lock );
     vlc_cond_init( &p_aout->p_sys->cond_sync );
 
     /* initialize source stream format */
@@ -167,7 +166,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     if( CABeginFormat( p_aout ) )
     {
-        intf_ErrMsg( "aout error: CABeginFormat failed" );
+        msg_Err( p_aout, "CABeginFormat failed" );
         return( -1 );
     }
 
@@ -181,20 +180,20 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 {
     if( CAEndFormat( p_aout ) )
     {
-        intf_ErrMsg( "aout error: CAEndFormat failed" );
+        msg_Err( p_aout, "CAEndFormat failed" );
         return( -1 );
     }
 
     switch( p_aout->i_format )
     {
         case AOUT_FMT_S8:
-            intf_ErrMsg( "Audio format (Signed 8) not supported now,"
-                         "please report stream" );
+            msg_Err( p_aout,
+                     "Signed 8 not supported yet, please report stream" );
             return( -1 );
                     
         case AOUT_FMT_U8:
-            intf_ErrMsg( "Audio format (Unsigned 8) not supported now,"
-                         "please report stream" );
+            msg_Err( p_aout,
+                     "Unsigned 8 not supported yet, please report stream" );
             return( -1 );
 
         case AOUT_FMT_S16_LE:
@@ -226,8 +225,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
             break;
                     
         default:
-            intf_ErrMsg( "Audio format (0x%08x) not supported now,"
-                         "please report stream", p_aout->i_format );
+            msg_Err( p_aout, "audio format (0x%08x) not supported now,"
+                             "please report stream", p_aout->i_format );
             return( -1 );
     }
 
@@ -253,7 +252,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     if( CABeginFormat( p_aout ) )
     {
-        intf_ErrMsg( "aout error: CABeginFormat failed" );
+        msg_Err( p_aout, "CABeginFormat failed" );
         return( -1 );
     }
 
@@ -299,7 +298,7 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
     else
     {
         memset(outOutputData->mBuffers[ 0 ].mData, 0, p_sys->ui_buffer_size);
-        intf_WarnMsg(1, "aout warning: audio output is starving, expect glitches");
+//X        msg_Warn( p_aout, "audio output is starving, expect glitches" );
     }
 
     /* see aout_Play below */
@@ -312,7 +311,7 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
 }
 
 /*****************************************************************************
- * aout_Play: plays a sound
+ * aout_Play: play a sound
  *****************************************************************************/
 static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
@@ -337,7 +336,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: ConvertBuffer failed: %d", err );
+        msg_Err( p_aout, "ConvertBuffer failed: %d", err );
     }
     else
     {
@@ -352,7 +351,7 @@ static void aout_Close( aout_thread_t *p_aout )
 {
     if( CAEndFormat( p_aout ) )
     {
-        intf_ErrMsg( "aout error: CAEndFormat failed" );
+        msg_Err( p_aout, "CAEndFormat failed" );
     }
 
     /* destroy lock and cond */
@@ -372,7 +371,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
 
     if( p_aout->p_sys->b_format )
     {
-        intf_ErrMsg( "aout error: CABeginFormat (b_format)" );
+        msg_Err( p_aout, "CABeginFormat (b_format)" );
         return( 1 );
     }
 
@@ -389,7 +388,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: AudioDeviceSetProperty failed: %d", err );
+        msg_Err( p_aout, "AudioDeviceSetProperty failed: %d", err );
         return( 1 );
     }
 
@@ -398,7 +397,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
 
     if( p_aout->p_sys->p_buffer == nil )
     {
-        intf_ErrMsg( "aout error: failed to allocate audio buffer" );
+        msg_Err( p_aout, "failed to allocate audio buffer" );
         return( 1 );
     }
 
@@ -409,7 +408,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: AudioConverterNew failed: %d", err );
+        msg_Err( p_aout, "AudioConverterNew failed: %d", err );
         DisposePtr( p_aout->p_sys->p_buffer );
         return( 1 );
     }
@@ -421,7 +420,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: AudioDeviceAddIOProc failed: %d", err );
+        msg_Err( p_aout, "AudioDeviceAddIOProc failed: %d", err );
         AudioConverterDispose( p_aout->p_sys->s_converter );
         DisposePtr( p_aout->p_sys->p_buffer );
         return( 1 );
@@ -433,7 +432,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: AudioDeviceStart failed: %d", err );
+        msg_Err( p_aout, "AudioDeviceStart failed: %d", err );
         AudioConverterDispose( p_aout->p_sys->s_converter );
         DisposePtr( p_aout->p_sys->p_buffer );
         return( 1 );
@@ -459,7 +458,7 @@ static int CAEndFormat( aout_thread_t *p_aout )
 
     if( !p_aout->p_sys->b_format )
     {
-        intf_ErrMsg( "aout error: CAEndFormat (!b_format)" );
+        msg_Err( p_aout, "CAEndFormat (!b_format)" );
         return( 1 );
     }
 
@@ -469,7 +468,7 @@ static int CAEndFormat( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: AudioDeviceStop failed: %d", err );
+        msg_Err( p_aout, "AudioDeviceStop failed: %d", err );
         return( 1 );
     }
 
@@ -479,7 +478,7 @@ static int CAEndFormat( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: AudioDeviceRemoveIOProc failed: %d", err );
+        msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: %d", err );
         return( 1 );
     }
 
@@ -488,7 +487,7 @@ static int CAEndFormat( aout_thread_t *p_aout )
 
     if( err != noErr )
     {
-        intf_ErrMsg( "aout error: AudioConverterDispose failed: %d", err );
+        msg_Err( p_aout, "AudioConverterDispose failed: %d", err );
         return( 1 );
     }
 

@@ -2,7 +2,7 @@
  * qt.cpp : Qt plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: qt.cpp,v 1.10 2002/04/19 13:56:11 sam Exp $
+ * $Id: qt.cpp,v 1.11 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,10 +27,10 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
+#include <vlc/vlc.h>
+
 extern "C"
 {
-#include <videolan/vlc.h>
-
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
@@ -55,7 +55,6 @@ MODULE_INIT_START
         ADD_CAPABILITY( INTF, 80 )
     }
     ADD_PROGRAM( "qvlc" )
-    ADD_SHORTCUT( "qt" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

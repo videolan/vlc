@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.17 2002/05/19 15:23:35 gbazin Exp $
+ * $Id: intf_dummy.c,v 1.18 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,19 +27,17 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "interface.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
-typedef struct intf_sys_s
+struct intf_sys_s
 {
     /* Prevent malloc(0) */
     int i_dummy;
-
-} intf_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes.
@@ -98,11 +96,8 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    while( !p_intf->b_die )
+    while( !p_intf->p_vlc->b_die )
     {
-        /* Manage core vlc functions through the callback */
-        p_intf->pf_manage( p_intf );
-
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
     }

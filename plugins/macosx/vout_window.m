@@ -2,7 +2,7 @@
  * vout_window.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_window.m,v 1.1 2002/05/12 20:56:34 massiot Exp $
+ * $Id: vout_window.m,v 1.2 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *

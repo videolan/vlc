@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.28 2002/05/31 21:37:42 massiot Exp $
+ * $Id: aout_sdl.c,v 1.29 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -30,14 +30,12 @@
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <string.h>                                            /* strerror() */
 #include <unistd.h>                                      /* write(), close() */
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
 
 #include SDL_INCLUDE_FILE
-
-#include "audio_output.h"                                   /* aout_thread_t */
 
 /*****************************************************************************
  * aout_sys_t: dsp audio output method descriptor
@@ -49,14 +47,13 @@
 /* the overflow limit is used to prevent the fifo from growing too big */
 #define OVERFLOWLIMIT 100000
 
-typedef struct aout_sys_s
+struct aout_sys_s
 {
     byte_t  * audio_buf;
     int i_audio_end;
 
-    boolean_t b_active;
-
-} aout_sys_t;
+    vlc_bool_t b_active;
+};
 
 /*****************************************************************************
  * Local prototypes.
@@ -103,7 +100,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg( "aout error: %s", strerror(ENOMEM) );
+        msg_Err( p_aout, "out of memory" );
         return( 1 );
     }
 
@@ -120,7 +117,7 @@ static int aout_Open( aout_thread_t *p_aout )
 #endif
                 ) < 0 )
     {
-        intf_ErrMsg( "aout error: can't initialize SDL (%s)", SDL_GetError() );
+        msg_Err( p_aout, "cannot initialize SDL (%s)", SDL_GetError() );
         free( p_aout->p_sys );
         return( 1 );
     }
@@ -150,7 +147,7 @@ static int aout_Open( aout_thread_t *p_aout )
      */
     if( SDL_OpenAudio( &desired, NULL ) < 0 )
     {
-        intf_ErrMsg( "aout error: SDL_OpenAudio failed (%s)", SDL_GetError() );
+        msg_Err( p_aout, "SDL_OpenAudio failed (%s)", SDL_GetError() );
         SDL_QuitSubSystem( SDL_INIT_AUDIO );
         free( p_aout->p_sys );
         return( -1 );
@@ -267,11 +264,11 @@ static void aout_Close( aout_thread_t *p_aout )
  *****************************************************************************/
 static void aout_SDLCallback( void *userdata, byte_t *stream, int len )
 {
-    struct aout_sys_s * p_sys = userdata;
+    aout_sys_t * p_sys = userdata;
 
     if( p_sys->i_audio_end > OVERFLOWLIMIT )
     {
-        intf_ErrMsg( "aout error: aout_SDLCallback overflowed" );
+//X        msg_Err( p_aout, "aout_SDLCallback overflowed" );
 
         free( p_sys->audio_buf );
         p_sys->audio_buf = NULL;

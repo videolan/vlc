@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.6 2002/04/19 13:56:11 sam Exp $
+ * $Id: scope.c,v 1.7 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,21 +28,13 @@
 #include <string.h>                                              /* strdup() */
 #include <errno.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "audio_output.h"                                   /* aout_thread_t */
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+#include <vlc/vout.h>
 
 #define SCOPE_WIDTH 320
 #define SCOPE_HEIGHT 240
 #define SCOPE_ASPECT (VOUT_ASPECT_FACTOR*SCOPE_WIDTH/SCOPE_HEIGHT)
-
-/*****************************************************************************
- * Capabilities defined in the other files.
- *****************************************************************************/
-static void aout_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * aout_sys_t: scope audio output method descriptor
@@ -50,14 +42,25 @@ static void aout_getfunctions( function_list_t * p_function_list );
  * This structure is part of the audio output thread descriptor.
  * It describes some scope specific variables.
  *****************************************************************************/
-typedef struct aout_sys_s
+struct aout_sys_s
 {
-    struct aout_thread_s aout;
-    struct aout_fifo_s *p_aout_fifo;
+    aout_thread_t aout;
+    aout_fifo_t *p_aout_fifo;
 
-    struct vout_thread_s *p_vout;
+    vout_thread_t *p_vout;
+};
 
-} aout_sys_t;
+/*****************************************************************************
+ * Local prototypes.
+ *****************************************************************************/
+static void    aout_getfunctions( function_list_t * p_function_list );
+
+static int     aout_Open        ( aout_thread_t *p_aout );
+static int     aout_SetFormat   ( aout_thread_t *p_aout );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
+static void    aout_Play        ( aout_thread_t *p_aout,
+                                  byte_t *buffer, int i_size );
+static void    aout_Close       ( aout_thread_t *p_aout );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -77,16 +80,6 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
-
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -112,11 +105,11 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_aout, "out of memory" );
         return -1;
     }
 
-    psz_method = config_GetPszVariable( "aout" );
+    psz_method = config_GetPsz( p_aout, "aout" );
     if( psz_method )
     {
         if( !*psz_method )
@@ -132,12 +125,12 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* Open video output */
     p_aout->p_sys->p_vout =
-        vout_CreateThread( NULL, SCOPE_WIDTH, SCOPE_HEIGHT,
+        vout_CreateThread( p_aout->p_this, SCOPE_WIDTH, SCOPE_HEIGHT,
                            FOURCC_I420, SCOPE_ASPECT );
 
     if( p_aout->p_sys->p_vout == NULL )
     {
-        intf_ErrMsg( "aout scope error: no suitable vout module" );
+        msg_Err( p_aout, "no suitable vout module" );
         free( p_aout->p_sys );
         return -1;
     }
@@ -147,12 +140,13 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys->aout.i_rate     = p_aout->i_rate;
     p_aout->p_sys->aout.i_channels = p_aout->i_channels;
 
-    p_aout->p_sys->aout.p_module = module_Need( MODULE_CAPABILITY_AOUT, "",
-                                    (void *)&p_aout->p_sys->aout );
+    p_aout->p_sys->aout.p_module =
+                  module_Need( p_aout, MODULE_CAPABILITY_AOUT,
+                               "", (void *)&p_aout->p_sys->aout );
     if( p_aout->p_sys->aout.p_module == NULL )
     {
-        intf_ErrMsg( "aout scope error: no suitable aout module" );
-        vout_DestroyThread( p_aout->p_sys->p_vout, NULL );
+        msg_Err( p_aout, "no suitable aout module" );
+        vout_DestroyThread( p_aout->p_sys->p_vout );
         free( p_aout->p_sys );
         return -1;
     }
@@ -193,7 +187,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( p_aout->p_sys->aout.i_format != p_aout->i_format
          || p_aout->p_sys->aout.i_channels != p_aout->i_channels )
     {
-        intf_ErrMsg( "aout error: plugin isn't cooperative" );
+        msg_Err( p_aout, "plugin is not very cooperative" );
         return 0;
     }
 
@@ -315,7 +309,7 @@ static void aout_Close( aout_thread_t *p_aout )
 {
     p_aout->p_sys->aout.pf_close( &p_aout->p_sys->aout );
     module_Unneed( p_aout->p_sys->aout.p_module );
-    vout_DestroyThread( p_aout->p_sys->p_vout, NULL );
+    vout_DestroyThread( p_aout->p_sys->p_vout );
     free( p_aout->p_sys );
 }
 

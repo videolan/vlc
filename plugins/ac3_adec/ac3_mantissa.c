@@ -2,7 +2,7 @@
  * ac3_mantissa.c: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_mantissa.c,v 1.6 2001/12/30 07:09:54 sam Exp $
+ * $Id: ac3_mantissa.c,v 1.7 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -28,16 +28,12 @@
  *****************************************************************************/
 #include <string.h>                                              /* memcpy() */
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"
-#include "ac3_decoder.h"
+#include "ac3_adec.h"
 
 #include "ac3_mantissa.h"
 

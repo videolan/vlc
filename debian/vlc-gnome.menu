@@ -1,3 +1,3 @@
 ?package(vlc-gnome):command="/usr/bin/gnome-vlc" hotkey="V" needs="X11" \
                     section="Apps/Viewers" title="Gnome VideoLAN Client" \
-                    icon="/usr/share/videolan/gnome-vlc.xpm" hints="Video"
+                    icon="/usr/share/vlc/gnome-vlc.xpm" hints="Video"

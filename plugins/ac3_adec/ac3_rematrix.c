@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_rematrix.c,v 1.7 2002/05/18 17:47:46 sam Exp $
+ * $Id: ac3_rematrix.c,v 1.8 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -25,14 +25,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"
-#include "ac3_decoder.h"
+#include "ac3_adec.h"
 
 struct rematrix_band_s {
     u32 start;

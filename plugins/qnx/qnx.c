@@ -26,10 +26,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -47,7 +44,6 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("QNX RTOS module") )
     ADD_CAPABILITY( VOUT, 100 )
     ADD_CAPABILITY( AOUT, 50 )
-    ADD_SHORTCUT( "qnx" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

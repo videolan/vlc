@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_control.c,v 1.9 2002/01/07 02:12:29 sam Exp $
+ * $Id: gtk_control.c,v 1.10 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,7 +28,8 @@
 #include <sys/types.h>                                              /* off_t */
 #include <stdlib.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #ifdef MODULE_NAME_IS_gnome
 #   include <gnome.h>
@@ -37,12 +38,6 @@
 #endif
 
 #include <string.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
@@ -60,7 +55,6 @@ gboolean GtkControlBack( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-
     return FALSE;
 }
 
@@ -69,19 +63,16 @@ gboolean GtkControlStop( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    if( p_input_bank->pp_input[0] != NULL )
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
+
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( p_playlist )
     {
-        /* end playing item */
-        p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
-        p_main->p_playlist->i_index--;
-        p_main->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-
+        playlist_Stop( p_playlist );
+        vlc_object_release( p_playlist );
     }
 
     return TRUE;
@@ -92,36 +83,24 @@ gboolean GtkControlPlay( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    if( p_input_bank->pp_input[0] != NULL )
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
+
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( p_playlist )
     {
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
-        p_main->p_playlist->b_stopped = 0;
+        playlist_Play( p_playlist );
+        vlc_object_release( p_playlist );
     }
-    else
+
+#if 0 /* FIXME: deal with this */
     {
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
-        if( p_main->p_playlist->b_stopped )
-        {
-            if( p_main->p_playlist->i_size )
-            {
-                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-                intf_PlaylistJumpto( p_main->p_playlist,
-                                     p_main->p_playlist->i_index );
-            }
-            else
-            {
-                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-                GtkFileOpenShow( widget, event, user_data );
-            }
-        }
-        else
-        {
-
-            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-        }
-
+        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+        GtkFileOpenShow( widget, event, user_data );
     }
+#endif
 
     return TRUE;
 }
@@ -131,13 +110,16 @@ gboolean GtkControlPause( GtkWidget       *widget,
                           GdkEventButton  *event,
                           gpointer         user_data )
 {
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
 
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-        p_main->p_playlist->b_stopped = 0;
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( p_playlist )
+    {
+        playlist_Pause( p_playlist );
+        vlc_object_release( p_playlist );
     }
 
     return TRUE;
@@ -148,14 +130,19 @@ gboolean GtkControlSlow( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
 
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-        p_main->p_playlist->b_stopped = 0;
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+#if 0
+    if( p_playlist )
+    {
+        playlist_Slow( p_playlist );
+        vlc_object_release( p_playlist );
     }
+#endif
 
     return TRUE;
 }
@@ -165,14 +152,19 @@ gboolean GtkControlFast( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
 
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-        p_main->p_playlist->b_stopped = 0;
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    p_playlist = vlc_object_find( p_intf->p_vlc,
+                                  VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+#if 0
+    if( p_playlist )
+    {
+        playlist_Fast( p_playlist );
+        vlc_object_release( p_playlist );
     }
+#endif
 
     return TRUE;
 }

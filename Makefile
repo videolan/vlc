@@ -96,10 +96,11 @@ PLUGINS_TARGETS := a52/a52 \
 		esd/esd \
 		fb/fb \
 		ffmpeg/ffmpeg \
+		filter/filter_clone \
 		filter/filter_deinterlace \
-		filter/filter_transform \
-		filter/filter_invert \
 		filter/filter_distort \
+		filter/filter_invert \
+		filter/filter_transform \
 		filter/filter_wall \
 		filter/filter_clone \
 		fx/fx_scope \
@@ -132,7 +133,7 @@ PLUGINS_TARGETS := a52/a52 \
 		motion/motionmmxext \
 		motion/motion3dnow \
 		motion/motionaltivec \
-        mpeg_system/mpeg_audio \
+		mpeg_system/mpeg_audio \
 		mpeg_system/mpeg_es \
 		mpeg_system/mpeg_ps \
 		mpeg_system/mpeg_ts \
@@ -159,27 +160,36 @@ PLUGINS_TARGETS := a52/a52 \
 #
 # C Objects
 # 
-INTERFACE := main interface intf_msg intf_playlist intf_eject
+VLC := vlc
+LIBVLC := libvlc
+INTERFACE := interface intf_eject
+PLAYLIST := playlist
 INPUT := input input_ext-plugins input_ext-dec input_ext-intf input_dec input_programs input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_pcm aout_spdif
-MISC := mtime modules configuration netutils iso_lang
+MISC := mtime modules threads cpu configuration netutils iso_lang messages objects
 
-C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
+LIBVLC_OBJ :=	$(LIBVLC:%=src/%.o) \
+		$(INTERFACE:%=src/interface/%.o) \
+		$(PLAYLIST:%=src/playlist/%.o) \
 		$(INPUT:%=src/input/%.o) \
 		$(VIDEO_OUTPUT:%=src/video_output/%.o) \
 		$(AUDIO_OUTPUT:%=src/audio_output/%.o) \
 		$(MISC:%=src/misc/%.o)
 
+VLC_OBJ := $(VLC:%=src/%.o)
+
+C_OBJ := $(VLC_OBJ) $(LIBVLC_OBJ)
+
 #
 # Misc Objects
 # 
 ifeq ($(NEED_GETOPT),1)
-C_OBJ += extras/GNUgetopt/getopt.o extras/GNUgetopt/getopt1.o 
+LIBVLC_OBJ += extras/GNUgetopt/getopt.o extras/GNUgetopt/getopt1.o 
 endif
 
 ifeq ($(NEED_SYMBOLS),1)
-C_OBJ += src/misc/symbols.o
+LIBVLC_OBJ += src/misc/symbols.o
 endif
 
 ifeq ($(SYS),beos)
@@ -187,15 +197,16 @@ CPP_OBJ :=	src/misc/beos_specific.o
 endif
 
 ifneq (,$(findstring darwin,$(SYS)))
-C_OBJ +=	src/misc/darwin_specific.o
+LIBVLC_OBJ +=	src/misc/darwin_specific.o
 endif
 
 ifneq (,$(findstring mingw32,$(SYS)))
-C_OBJ +=	src/misc/win32_specific.o
+LIBVLC_OBJ +=	src/misc/win32_specific.o
 RESOURCE_OBJ :=	share/vlc_win32_rc.o
 endif
 
-VLC_OBJ := $(C_OBJ) $(CPP_OBJ) $(M_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
+LIBVLC_OBJ += $(CPP_OBJ) $(M_OBJ) $(BUILTIN_OBJ)
+VLC_OBJ += $(RESOURCE_OBJ)
 
 #
 # Generated header
@@ -262,7 +273,7 @@ clean: plugins-clean po-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so* lib/*.a
 	rm -f plugins/*.so plugins/*.a plugins/*.lib plugins/*.tds
-	rm -rf extras/MacOSX/build
+	rm -Rf extras/MacOSX/build
 
 po-clean:
 	-cd po && $(MAKE) clean
@@ -302,28 +313,28 @@ vlc-install:
 ifneq (,$(ALIASES))
 	for alias in $(ALIASES) ; do if test $$alias ; then rm -f $(DESTDIR)$(bindir)/$$alias && ln -s vlc $(DESTDIR)$(bindir)/$$alias ; fi ; done
 endif
-	mkdir -p $(DESTDIR)$(datadir)/videolan
-	$(INSTALL) -m 644 share/*.psf $(DESTDIR)$(datadir)/videolan
-	$(INSTALL) -m 644 share/*.png $(DESTDIR)$(datadir)/videolan
-	$(INSTALL) -m 644 share/*.xpm $(DESTDIR)$(datadir)/videolan
+	mkdir -p $(DESTDIR)$(datadir)/vlc
+	$(INSTALL) -m 644 share/*.psf $(DESTDIR)$(datadir)/vlc
+	$(INSTALL) -m 644 share/*.png $(DESTDIR)$(datadir)/vlc
+	$(INSTALL) -m 644 share/*.xpm $(DESTDIR)$(datadir)/vlc
 
 vlc-uninstall:
 	rm -f $(DESTDIR)$(bindir)/vlc
 ifneq (,$(ALIASES))
 	for alias in $(ALIASES) ; do if test $$alias ; then rm -f $(DESTDIR)$(bindir)/$$alias ; fi ; done
 endif
-	rm -f $(DESTDIR)$(datadir)/videolan/*.psf
-	rm -f $(DESTDIR)$(datadir)/videolan/*.png
-	rm -f $(DESTDIR)$(datadir)/videolan/*.xpm
+	rm -f $(DESTDIR)$(datadir)/vlc/*.psf
+	rm -f $(DESTDIR)$(datadir)/vlc/*.png
+	rm -f $(DESTDIR)$(datadir)/vlc/*.xpm
 
 plugins-install:
-	mkdir -p $(DESTDIR)$(libdir)/videolan/vlc
+	mkdir -p $(DESTDIR)$(libdir)/vlc
 ifneq (,$(PLUGINS))
-	$(INSTALL) -m 644 $(PLUGINS:%=plugins/%.so) $(DESTDIR)$(libdir)/videolan/vlc
+	$(INSTALL) -m 644 $(PLUGINS:%=plugins/%.so) $(DESTDIR)$(libdir)/vlc
 endif
 
 plugins-uninstall:
-	rm -f $(DESTDIR)$(libdir)/videolan/vlc/*.so
+	rm -f $(DESTDIR)$(libdir)/vlc/*.so
 
 po-install:
 	-cd po && $(MAKE) install
@@ -386,7 +397,9 @@ dist:
 		cp $$file tmp/vlc/share ; done
 	# Build archives
 	F=vlc-${VERSION}; \
-	mv tmp/vlc tmp/$$F; (cd tmp ; tar czf ../$$F.tar.gz $$F); \
+	mv tmp/vlc tmp/$$F; (cd tmp ; \
+		cd $$F && $(MAKE) distclean && cd .. ; \
+		tar czf ../$$F.tar.gz $$F);
 	# Clean up
 	rm -Rf tmp
 
@@ -495,8 +508,8 @@ FORCE:
 #
 # Generic rules (see below)
 #
-$(H_OBJ): Makefile.opts Makefile.dep Makefile
-#	@echo "regenerating $@"
+src/misc/modules_builtin.h: Makefile.opts Makefile
+	@echo "make[$(MAKELEVEL)]: Creating \`$@'"
 	@rm -f $@ && cp $@.in $@
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
@@ -550,25 +563,41 @@ endif
 #
 # Main application target
 #
-vlc: Makefile.config Makefile.opts Makefile.dep Makefile $(VLC_OBJ) $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) $(builtins_LDFLAGS)
+vlc: Makefile.config Makefile.opts Makefile.dep Makefile $(VLC_OBJ) lib/libvlc.a $(BUILTIN_OBJ)
+	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) lib/libvlc.a $(BUILTIN_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) $(builtins_LDFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@
 endif
 
+# here are the rules for a dynamic link of libvlc:
+#vlc: Makefile.opts Makefile.dep Makefile $(VLC_OBJ) lib/libvlc.so $(BUILTIN_OBJ)
+#	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS) $(builtins_LDFLAGS) -L./lib -lvlc
+
+#
+# Main library target
+#
+lib/libvlc.a: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
+	rm -f $@
+	ar rc $@ $(LIBVLC_OBJ)
+	$(RANLIB) $@
+
+#lib/libvlc.so: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
+#	$(CC) -shared $(LIBVLC_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) -o $@
+#	chmod a-x $@
+
 #
 # Plugins target
 #
 plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
-$(PLUGIN_OBJ): FORCE
+$(PLUGIN_OBJ): $(H_OBJ) FORCE
 	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) -f ../../Makefile.modules $(@:plugins/%=../%)
 
 #
 # Built-in modules target
 #
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
-$(BUILTIN_OBJ): FORCE
+$(BUILTIN_OBJ): $(H_OBJ) FORCE
 	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) -f ../../Makefile.modules $(@:plugins/%=../%)
 
 #

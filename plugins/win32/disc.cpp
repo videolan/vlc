@@ -23,13 +23,8 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include "disc.h"
 #include "win32_common.h"
@@ -39,7 +34,7 @@
 #pragma link "CSPIN"
 #pragma resource "*.dfm"
 
-extern  struct intf_thread_s *p_intfGlobal;
+extern  intf_thread_t *p_intfGlobal;
 
 //---------------------------------------------------------------------------
 __fastcall TDiscDlg::TDiscDlg( TComponent* Owner )
@@ -69,7 +64,7 @@ void __fastcall TDiscDlg::BitBtnCancelClick( TObject *Sender )
 void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
 {
     AnsiString  Device, Source, Method, Title, Chapter;
-    int         i_end = p_main->p_playlist->i_size;
+    int         i_end = p_intfGlobal->p_vlc->p_playlist->i_size;
 
     Hide();
 
@@ -91,18 +86,20 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
 
     /* Build source name and add it to playlist */
     Source = Method + ":" + Device + "@" + Title + "," + Chapter;
-    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
+    intf_PlaylistAdd( p_intfGlobal->p_vlc->p_playlist,
+                      PLAYLIST_END, Source.c_str() );
 
     /* update the display */
-    p_intfGlobal->p_sys->p_playlist->UpdateGrid( p_main->p_playlist );
+    p_intfGlobal->p_sys->p_playlist->
+                            UpdateGrid( p_intfGlobal->p_vlc->p_playlist );
 
     /* stop current item, select added item */
-    if( p_input_bank->pp_input[0] != NULL )
+    if( p_intfGlobal->p_vlc->p_input_bank->pp_input[0] != NULL )
     {
-        p_input_bank->pp_input[0]->b_eof = 1;
+        p_intfGlobal->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
     }
 
-    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+    intf_PlaylistJumpto( p_intfGlobal->p_vlc->p_playlist, i_end - 1 );
 }
 //---------------------------------------------------------------------------
 void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
@@ -112,11 +109,11 @@ void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
 
     if( RadioGroupType->ItemIndex == 0 )
     {
-        psz_device = config_GetPszVariable( "dvd" );
+        psz_device = config_GetPsz( p_intfGlobal, "dvd" );
     }
     else
     {
-        psz_device = config_GetPszVariable( "vcd" );
+        psz_device = config_GetPsz( p_intfGlobal, "vcd" );
     }
 
     if( psz_device )

@@ -2,7 +2,7 @@
  * gtk_dsiplay.h: Gtk+ tools for main interface.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.h,v 1.2 2002/05/04 02:05:03 lool Exp $
+ * $Id: gtk_display.h,v 1.3 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -28,6 +28,6 @@
 
 gint GtkModeManage      ( intf_thread_t * p_intf );
 void GtkDisplayDate     ( GtkAdjustment *p_adj );
-void GtkHideTooltips    ( void );
-void GtkHideToolbarText ( void );
+void GtkHideTooltips    ( vlc_object_t * );
+void GtkHideToolbarText ( vlc_object_t * );
 

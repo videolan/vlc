@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.11 2002/04/15 23:04:08 massiot Exp $
+ * $Id: vdec_ext-plugins.h,v 1.12 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,15 +39,15 @@ typedef struct idct_inner_s
 
 typedef struct motion_inner_s
 {
-    boolean_t               b_average;                          /* 0 == copy */
+    vlc_bool_t              b_average;                          /* 0 == copy */
     int                     i_x_pred, i_y_pred;            /* motion vectors */
     yuv_data_t *            pp_source[3];
     int                     i_dest_offset, i_src_offset;
     int                     i_stride, i_height;
-    boolean_t               b_second_half;
+    vlc_bool_t              b_second_half;
 } motion_inner_t;
 
-typedef struct macroblock_s
+struct macroblock_s
 {
     int                     i_mb_modes;
 
@@ -64,8 +64,7 @@ typedef struct macroblock_s
     motion_inner_t          p_motions[8];
     int                     i_nb_motions;
     yuv_data_t *            pp_dest[3];
-
-} macroblock_t;
+};
 
 /* Macroblock Modes */
 #define MB_INTRA                        1
@@ -78,15 +77,16 @@ typedef struct macroblock_s
 /*****************************************************************************
  * vdec_thread_t: video decoder thread descriptor
  *****************************************************************************/
-typedef struct vdec_thread_s
+typedef struct vdec_thread_s vdec_thread_t;
+
+struct vdec_thread_s
 {
-    vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;
+    VLC_COMMON_MEMBERS
 
     /* IDCT iformations */
-    void *              p_idct_data;
+    void *               p_idct_data;
 
     /* Input properties */
     struct vdec_pool_s * p_pool;
-} vdec_thread_t;
+};
 

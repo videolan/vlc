@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.h : lpcm decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_adec.h,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: lpcm_adec.h,v 1.2 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,7 +38,6 @@ typedef struct lpcmdec_thread_s
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
     int                 sync_ptr;         /* sync ptr from lpcm magic header */
-    decoder_config_t *  p_config;
 
     /*
      * Output properties
@@ -53,4 +52,4 @@ typedef struct lpcmdec_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-vlc_thread_t            lpcmdec_CreateThread( decoder_config_t * p_config );
+vlc_thread_t            lpcmdec_CreateThread( decoder_fifo_t * p_fifo );

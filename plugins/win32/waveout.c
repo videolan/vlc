@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.7 2002/04/19 13:56:11 sam Exp $
+ * $Id: waveout.c,v 1.8 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -28,18 +28,27 @@
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <string.h>                                            /* strerror() */
 
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
+
 #include <mmsystem.h>
 
-#include "audio_output.h"                                   /* aout_thread_t */
-
 /*****************************************************************************
- * Capabilities defined in the other files.
+ * Local prototypes.
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list );
+static void    aout_getfunctions( function_list_t * p_function_list );
+
+static int     aout_Open        ( aout_thread_t *p_aout );
+static int     aout_SetFormat   ( aout_thread_t *p_aout );
+static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
+static void    aout_Play        ( aout_thread_t *p_aout,
+                                  byte_t *buffer, int i_size );
+static void    aout_Close       ( aout_thread_t *p_aout );
+
+/* local functions */
+static int     OpenWaveOutDevice( aout_thread_t *p_aout );
 
 /*****************************************************************************
  * Building configuration tree
@@ -50,11 +59,10 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("Win32 waveOut extension module") )
     ADD_CAPABILITY( AOUT, 250 )
-    ADD_SHORTCUT( "waveout" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
-    _M( aout_getfunctions )( &p_module->p_functions->aout );
+    aout_getfunctions( &p_module->p_functions->aout );
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
@@ -69,7 +77,7 @@ MODULE_DEACTIVATE_STOP
 
 #define NUMBUF 3           /* We use triple buffering to be on the safe side */
 
-typedef struct aout_sys_s
+struct aout_sys_s
 {
     HWAVEOUT h_waveout;                        /* handle to waveout instance */
 
@@ -80,27 +88,13 @@ typedef struct aout_sys_s
     int i_current_buffer;
 
     DWORD dw_counter;              /* Number of bytes played since beginning */
-
-} aout_sys_t;
-
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-static int     aout_Open        ( aout_thread_t *p_aout );
-static int     aout_SetFormat   ( aout_thread_t *p_aout );
-static int     aout_GetBufInfo  ( aout_thread_t *p_aout, int i_buffer_info );
-static void    aout_Play        ( aout_thread_t *p_aout,
-                                  byte_t *buffer, int i_size );
-static void    aout_Close       ( aout_thread_t *p_aout );
-
-/* local functions */
-static int     OpenWaveOutDevice( aout_thread_t *p_aout );
+};
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list )
+static void aout_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->functions.aout.pf_open = aout_Open;
     p_function_list->functions.aout.pf_setformat = aout_SetFormat;
@@ -118,14 +112,12 @@ static int aout_Open( aout_thread_t *p_aout )
 {
     int i;
 
-    intf_WarnMsg( 3, "aout: waveOut aout_Open ");
-
-   /* Allocate structure */
+    /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
 
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg( "aout error: %s", strerror(ENOMEM) );
+        msg_Err( p_aout, "out of memory" );
         return( 1 );
     }
 
@@ -148,7 +140,7 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
-    intf_WarnMsg( 3, "aout: WaveOut aout_SetFormat ");
+    msg_Dbg( p_aout, "aout_SetFormat" );
 
     /* Check if the format has changed */
 
@@ -160,7 +152,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
         if( waveOutClose( p_aout->p_sys->h_waveout ) != MMSYSERR_NOERROR )
         {
-            intf_ErrMsg( "aout error: waveOutClose failed" );
+            msg_Err( p_aout, "waveOutClose failed" );
         }
 
         return OpenWaveOutDevice( p_aout );
@@ -183,14 +175,14 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
     if( (waveOutGetPosition(p_aout->p_sys->h_waveout, &mmtime, sizeof(MMTIME)))
         != MMSYSERR_NOERROR || (mmtime.wType != TIME_BYTES) )
     {
-        intf_WarnMsg( 3, "aout: aout_GetBufInfo waveOutGetPosition failed");
+        msg_Warn( p_aout, "waveOutGetPosition failed" );
         return i_buffer_limit;
     }
 
 
 #if 0
-    intf_WarnMsg( 3, "aout: waveOut aout_GetBufInfo: %i",
-                  p_aout->p_sys->dw_counter - mmtime.u.cb );
+    msg_Dbg( p_aout, "aout_GetBufInfo: %i",
+                      p_aout->p_sys->dw_counter - mmtime.u.cb );
 #endif
 
     return (p_aout->p_sys->dw_counter - mmtime.u.cb);
@@ -213,7 +205,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
         realloc( p_aout->p_sys->waveheader[current_buffer].lpData, i_size );
     if( !p_aout->p_sys->waveheader[current_buffer].lpData )
     {
-        intf_ErrMsg( "aout error: aou_Play couldn't alloc buffer" );
+        msg_Err( p_aout, "could not allocate buffer" );
         return;
     }
     p_aout->p_sys->waveheader[current_buffer].dwBufferLength = i_size;
@@ -224,19 +216,19 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
                                    sizeof(WAVEHDR) );
     if( result != MMSYSERR_NOERROR )
     {
-        intf_ErrMsg( "aout error: waveOutPrepareHeader failed" );
+        msg_Err( p_aout, "waveOutPrepareHeader failed" );
         return;
     }
 
     /* Send the buffer the waveOut queue */
-    FAST_MEMCPY( p_aout->p_sys->waveheader[current_buffer].lpData,
-                 p_buffer, i_size );
+    p_aout->p_vlc->pf_memcpy( p_aout->p_sys->waveheader[current_buffer].lpData,
+                              p_buffer, i_size );
     result = waveOutWrite( p_aout->p_sys->h_waveout,
                            &p_aout->p_sys->waveheader[current_buffer],
                            sizeof(WAVEHDR) );
     if( result != MMSYSERR_NOERROR )
     {
-        intf_ErrMsg( "aout error: waveOutWrite failed" );
+        msg_Err( p_aout, "waveOutWrite failed" );
         return;
     }
 
@@ -252,15 +244,13 @@ static void aout_Close( aout_thread_t *p_aout )
 {
     int i;
 
-    intf_WarnMsg( 3, "aout: waveOut aout_Close ");
-
     /* Before calling waveOutClose we must reset the device */
     waveOutReset( p_aout->p_sys->h_waveout );
 
     /* Close the device */
     if( waveOutClose( p_aout->p_sys->h_waveout ) != MMSYSERR_NOERROR )
     {
-        intf_ErrMsg( "aout error: waveOutClose failed" );
+        msg_Err( p_aout, "waveOutClose failed" );
     }
 
     /* Deallocate memory */
@@ -302,7 +292,7 @@ static int OpenWaveOutDevice( aout_thread_t *p_aout )
                           0 /*callback*/, 0 /*callback data*/, CALLBACK_NULL );
     if( result != MMSYSERR_NOERROR )
     {
-        intf_ErrMsg( "aout error: waveOutOpen failed" );
+        msg_Err( p_aout, "waveOutOpen failed" );
         return( 1 );
     }
 

@@ -2,7 +2,7 @@
  * gtk_menu.h: prototypes for menu functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_menu.h,v 1.6 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: gtk_menu.h,v 1.7 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -22,9 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-struct intf_thread_s;
-
-gint GtkSetupMenus( struct intf_thread_s * );
+gint GtkSetupMenus( intf_thread_t * );
 
 /*****************************************************************************
  * String sizes

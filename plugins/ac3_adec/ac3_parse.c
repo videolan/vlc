@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_parse.c,v 1.8 2002/03/06 03:27:17 sam Exp $
+ * $Id: ac3_parse.c,v 1.9 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -28,17 +28,12 @@
  *****************************************************************************/
 #include <string.h>                                              /* memset() */
 
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"
-#include "ac3_decoder.h"
-#include "ac3_adec.h"                                     /* ac3dec_thread_t */
+#include "ac3_adec.h"
 
 #include "ac3_internal.h"                                       /* EXP_REUSE */
 
@@ -101,15 +96,13 @@ static void parse_audblk_stats (ac3dec_t * p_ac3dec);
 /* Parse a syncinfo structure */
 int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info) 
 {
-    ac3dec_thread_t * p_ac3dec_t = (ac3dec_thread_t *) p_ac3dec->bit_stream.p_callback_arg;
-    
     p_ac3dec->total_bits_read = 0;
     p_ac3dec->i_available = 0;
     
     /* sync word - should be 0x0b77 */
     RealignBits(&p_ac3dec->bit_stream);
     while( (ShowBits (&p_ac3dec->bit_stream,16)) != 0x0b77 && 
-            (!p_ac3dec_t->p_fifo->b_die) && (!p_ac3dec_t->p_fifo->b_error))
+            (!p_ac3dec->p_fifo->b_die) && (!p_ac3dec->p_fifo->b_error))
     {
         RemoveBits (&p_ac3dec->bit_stream,8);
         p_ac3dec->total_bits_read += 8;
@@ -298,10 +291,7 @@ int parse_bsi (ac3dec_t * p_ac3dec)
     }
     p_ac3dec->total_bits_read += 25;
     
-    if( p_main->b_stats )
-    {
-        parse_bsi_stats (p_ac3dec);
-    }
+    parse_bsi_stats (p_ac3dec);
 
     return 0;
 }
@@ -776,10 +766,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
         p_ac3dec->total_bits_read += 8 * p_ac3dec->audblk.skipl + 9;
     }
     
-    if( p_main->b_stats )
-    {
-        parse_audblk_stats(p_ac3dec);
-    }
+    parse_audblk_stats(p_ac3dec);
     
     return 0;
 }

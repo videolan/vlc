@@ -2,7 +2,7 @@
  * adec_math.c: Inverse Discrete Cosine Transform and Pulse Code Modulation
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec_math.c,v 1.3 2002/03/03 04:37:29 sam Exp $
+ * $Id: adec_math.c,v 1.4 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "mpeg_adec_generic.h"
 

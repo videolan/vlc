@@ -1,1 +1,1 @@
-dsp_SOURCES = dsp.c aout_dsp.c
+dsp_SOURCES = dsp.c

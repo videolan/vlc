@@ -2,7 +2,7 @@
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb.h,v 1.5 2002/03/17 17:00:38 sam Exp $
+ * $Id: i420_rgb.h,v 1.6 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,7 +27,7 @@
  * This structure is part of the chroma transformation descriptor, it
  * describes the yuv2rgb specific properties.
  *****************************************************************************/
-typedef struct chroma_sys_s
+struct chroma_sys_s
 {
     u8  *p_buffer;
     int *p_offset;
@@ -39,8 +39,7 @@ typedef struct chroma_sys_s
     u16  *p_rgb16;                                      /* RGB 16 bits table */
     u32  *p_rgb32;                                      /* RGB 32 bits table */
 #endif
-
-} chroma_sys_t;
+};
 
 /*****************************************************************************
  * Prototypes
@@ -250,7 +249,8 @@ void _M( I420_RGB32 )( vout_thread_t *, picture_t *, picture_t * );
         while( (i_scale_count -= p_vout->render.i_height) > 0 )               \
         {                                                                     \
             /* Height increment: copy previous picture line */                \
-            FAST_MEMCPY( p_pic, p_pic_start, p_vout->output.i_width * BPP );  \
+            p_vout->p_vlc->pf_memcpy( p_pic, p_pic_start,                     \
+                                      p_vout->output.i_width * BPP );         \
             (u8*)p_pic += p_dest->p->i_pitch;                                 \
         }                                                                     \
         i_scale_count += p_vout->output.i_height;                             \

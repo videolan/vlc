@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.84 2002/04/23 14:16:20 sam Exp $
+ * $Id: audio_output.c,v 1.85 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -25,11 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* getpid() */
@@ -50,57 +49,27 @@
 static int  aout_SpawnThread ( aout_thread_t * p_aout );
 
 /*****************************************************************************
- * aout_InitBank: initialize the audio output bank.
- *****************************************************************************/
-void aout_InitBank ( void )
-{
-    p_aout_bank->i_count = 0;
-
-    vlc_mutex_init( &p_aout_bank->lock );
-}
-
-/*****************************************************************************
- * aout_EndBank: empty the audio output bank.
- *****************************************************************************
- * This function ends all unused audio outputs and empties the bank in
- * case of success.
- *****************************************************************************/
-void aout_EndBank ( void )
-{
-    /* Ask all remaining audio outputs to die */
-    while( p_aout_bank->i_count )
-    {
-        aout_DestroyThread(
-                p_aout_bank->pp_aout[ --p_aout_bank->i_count ], NULL );
-    }
-
-    vlc_mutex_destroy( &p_aout_bank->lock );
-}
-
-/*****************************************************************************
  * aout_CreateThread: initialize audio thread
  *****************************************************************************/
-aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
+aout_thread_t *aout_CreateThread( vlc_object_t *p_parent,
+                                  int i_channels, int i_rate )
 {
     aout_thread_t * p_aout;                             /* thread descriptor */
-#if 0
-    int             i_status;                               /* thread status */
-#endif
     char *          psz_name;
     int             i_format;
 
     /* Allocate descriptor */
-    p_aout = (aout_thread_t *) malloc( sizeof(aout_thread_t) );
+    p_aout = vlc_object_create( p_parent, VLC_OBJECT_AOUT );
     if( p_aout == NULL )
     {
-        return( NULL );
+        return NULL;
     }
 
     p_aout->i_latency = 0;
-    p_aout->i_rate = config_GetIntVariable( "rate" );
-    p_aout->i_channels = config_GetIntVariable( "mono" ) ? 1 : 2;
+    p_aout->i_rate = config_GetInt( p_aout, "rate" );
+    p_aout->i_channels = config_GetInt( p_aout, "mono" ) ? 1 : 2;
 
-    i_format = config_GetIntVariable( "audio-format" );
+    i_format = config_GetInt( p_aout, "audio-format" );
     if( ( !i_format ) || ( i_format > 8 ) )
     {
         p_aout->i_format = AOUT_FMT_S16_NE;
@@ -112,21 +81,21 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
 
     if( p_aout->i_rate == 0 )
     {
-        intf_ErrMsg( "aout error: null sample rate" );
-        free( p_aout );
-        return( NULL );
+        msg_Err( p_aout, "null sample rate" );
+        vlc_object_destroy( p_aout );
+        return NULL;
     }
 
     /* Choose the best module */
-    psz_name = config_GetPszVariable( "aout" );
-    p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT, psz_name,
-                                    (void *)p_aout );
+    psz_name = config_GetPsz( p_aout, "aout" );
+    p_aout->p_module = module_Need( p_aout, MODULE_CAPABILITY_AOUT,
+                                    psz_name, (void *)p_aout );
     if( psz_name ) free( psz_name );
     if( p_aout->p_module == NULL )
     {
-        intf_ErrMsg( "aout error: no suitable aout module" );
-        free( p_aout );
-        return( NULL );
+        msg_Err( p_aout, "no suitable aout module" );
+        vlc_object_destroy( p_aout );
+        return NULL;
     }
 
 #define aout_functions p_aout->p_module->p_functions->aout.functions.aout
@@ -144,12 +113,12 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     {
         p_aout->pf_close( p_aout );
         module_Unneed( p_aout->p_module );
-        free( p_aout );
-        return( NULL );
+        vlc_object_destroy( p_aout );
+        return NULL;
     }
 
     /* Initialize the volume level */
-    p_aout->i_volume = config_GetIntVariable( "volume" );
+    p_aout->i_volume = config_GetInt( p_aout, "volume" );
     p_aout->i_savedvolume = 0;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype
@@ -159,11 +128,13 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, int i_rate )
     {
         p_aout->pf_close( p_aout );
         module_Unneed( p_aout->p_module );
-        free( p_aout );
-        return( NULL );
+        vlc_object_destroy( p_aout );
+        return NULL;
     }
 
-    return( p_aout );
+    vlc_object_attach( p_aout, p_parent->p_vlc );
+
+    return p_aout;
 }
 
 /*****************************************************************************
@@ -175,18 +146,14 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     void (* pf_aout_thread)( aout_thread_t * ) = NULL;
     char   *psz_format;
 
-    /* We want the audio output thread to live */
-    p_aout->b_die = 0;
-    p_aout->b_active = 1;
-
     /* Initialize the fifos lock */
-    vlc_mutex_init( &p_aout->fifos_lock );
+    vlc_mutex_init( p_aout, &p_aout->fifos_lock );
 
     /* Initialize audio fifos : set all fifos as empty and initialize locks */
     for ( i_index = 0; i_index < AOUT_MAX_FIFOS; i_index++ )
     {
         p_aout->fifo[i_index].i_format = AOUT_FIFO_NONE;
-        vlc_mutex_init( &p_aout->fifo[i_index].data_lock );
+        vlc_mutex_init( p_aout, &p_aout->fifo[i_index].data_lock );
         vlc_cond_init( &p_aout->fifo[i_index].data_wait );
     }
 
@@ -232,8 +199,8 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
             break;
 
         default:
-            intf_ErrMsg( "aout error: unknown audio output format %i",
-                         p_aout->i_format );
+            msg_Err( p_aout, "unknown audio output format %i",
+                             p_aout->i_format );
             return( -1 );
     }
 
@@ -242,7 +209,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     p_aout->buffer = malloc( i_bytes );
     if ( p_aout->buffer == NULL )
     {
-        intf_ErrMsg( "aout error: cannot create output buffer" );
+        msg_Err( p_aout, "out of memory" );
         return( -1 );
     }
 
@@ -250,25 +217,24 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
                                         sizeof(s32) * p_aout->i_channels );
     if ( p_aout->s32_buffer == NULL )
     {
-        intf_ErrMsg( "aout error: cannot create the s32 output buffer" );
+        msg_Err( p_aout, "out of memory" );
         free( p_aout->buffer );
         return( -1 );
     }
 
     /* Rough estimate of the playing date */
-    p_aout->date = mdate() + p_main->i_desync;
+    p_aout->date = mdate() + p_aout->p_vlc->i_desync;
 
     /* Launch the thread */
-    if ( vlc_thread_create( &p_aout->thread_id, "audio output",
-                            (vlc_thread_func_t)pf_aout_thread, p_aout ) )
+    if ( vlc_thread_create( p_aout, "audio output", pf_aout_thread, 0 ) )
     {
-        intf_ErrMsg( "aout error: cannot spawn audio output thread" );
+        msg_Err( p_aout, "cannot spawn audio output thread" );
         free( p_aout->buffer );
         free( p_aout->s32_buffer );
         return( -1 );
     }
 
-    intf_WarnMsg( 2, "aout info: %s thread spawned, %i channels, rate %i",
+    msg_Dbg( p_aout, "%s thread spawned, %i channels, rate %i",
                      psz_format, p_aout->i_channels, p_aout->i_rate );
     return( 0 );
 }
@@ -276,15 +242,14 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
 /*****************************************************************************
  * aout_DestroyThread
  *****************************************************************************/
-void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
+void aout_DestroyThread( aout_thread_t * p_aout )
 {
     int i_index;
     
-    /* FIXME: pi_status is not handled correctly: check vout how to do!?? */
-
     /* Ask thread to kill itself and wait until it's done */
     p_aout->b_die = 1;
-    vlc_thread_join( p_aout->thread_id ); /* only if pi_status is NULL */
+
+    vlc_thread_join( p_aout );
 
     /* Free the allocated memory */
     free( p_aout->buffer );
@@ -305,6 +270,6 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     module_Unneed( p_aout->p_module );
 
     /* Free structure */
-    free( p_aout );
+    vlc_object_destroy( p_aout );
 }
 

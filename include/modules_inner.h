@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.22 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: modules_inner.h,v 1.23 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -22,10 +22,10 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Check that we are within a module.
+ * If we are not within a module, assume we're in the vlc core.
  *****************************************************************************/
-#if !( defined( MODULE_NAME ) || defined( MAKE_DEP ) )
-#  error "You must define MODULE_NAME before using modules_inner.h !"
+#if !defined( __PLUGIN__ ) && !defined( __BUILTIN__ )
+#   define MODULE_NAME main
 #endif
 
 /*****************************************************************************
@@ -36,7 +36,6 @@
  *
  * if user has #defined MODULE_NAME foo, then we will need:
  * #define MODULE_STRING "foo"
- * #define MODULE_VAR(blah) "VLC_MODULE_foo_blah"
  *
  * and, if __BUILTIN__ is set, we will also need:
  * #define MODULE_FUNC( zog ) module_foo_zog
@@ -51,16 +50,14 @@
 #define CONCATENATE( y, z ) CRUDE_HACK( y, z )
 #define CRUDE_HACK( y, z )  y##__MODULE_##z
 
-#define MODULE_VAR( z ) "VLC_MODULE_" #z
-
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
-#ifdef __BUILTIN__
+#if defined( __BUILTIN__ )
 #   define _M( function )          CONCATENATE( function, MODULE_NAME )
 #   define __VLC_SYMBOL( symbol )  CONCATENATE( symbol, MODULE_NAME )
 #   define DECLARE_SYMBOLS         ;
 #   define STORE_SYMBOLS           ;
-#else
+#elif defined( __PLUGIN__ )
 #   define _M( function )          function
 #   define __VLC_SYMBOL( symbol  ) CONCATENATE( symbol, MODULE_SYMBOL )
 #   define DECLARE_SYMBOLS         module_symbols_t* p_symbols;
@@ -80,9 +77,8 @@
     int __VLC_SYMBOL( InitModule ) ( module_t *p_module )                     \
     {                                                                         \
         int i_shortcut = 1;                                                   \
-        struct module_config_s* p_item;                                       \
         STORE_SYMBOLS;                                                        \
-        p_module->psz_name = MODULE_STRING;                                   \
+        p_module->psz_object_name = MODULE_STRING;                            \
         p_module->psz_longname = MODULE_STRING;                               \
         p_module->psz_program = NULL;                                         \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
@@ -93,31 +89,13 @@
 #define MODULE_INIT_STOP                                                      \
         } while( 0 );                                                         \
         p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
-        p_module->i_config_items = p_module->i_bool_items = 0;                \
-        for( p_item = p_config;                                               \
-             p_item->i_type != MODULE_CONFIG_HINT_END;                        \
-             p_item++ )                                                       \
-        {                                                                     \
-            if( p_item->i_type & MODULE_CONFIG_ITEM )                         \
-                p_module->i_config_items++;                                   \
-            if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL )                   \
-                p_module->i_bool_items++;                                     \
-        }                                                                     \
-        vlc_mutex_init( &p_module->config_lock );                             \
-        p_module->p_config = config_Duplicate( p_config );                    \
+        config_Duplicate( p_module, p_config );                               \
         if( p_module->p_config == NULL )                                      \
         {                                                                     \
-            intf_ErrMsg( MODULE_STRING                                        \
-                         " InitModule error: can't duplicate p_config" );     \
-            return( -1 );                                                     \
+/*//X            intf_Err( p_module, "InitModule can't duplicate p_config" );*/      \
+            return -1;                                                        \
         }                                                                     \
-        for( p_item = p_module->p_config;                                     \
-             p_item->i_type != MODULE_CONFIG_HINT_END;                        \
-             p_item++ )                                                       \
-        {                                                                     \
-            p_item->p_lock = &p_module->config_lock;                          \
-        }                                                                     \
-        return( 0 );                                                          \
+        return 0;                                                             \
     }
 
 #define ADD_CAPABILITY( cap, score )                                          \
@@ -158,7 +136,7 @@
 
 #define MODULE_ACTIVATE_STOP                                                  \
         } while( 0 );                                                         \
-        return( 0 );                                                          \
+        return 0;                                                             \
     }
 
 /*
@@ -175,5 +153,5 @@
 #define MODULE_DEACTIVATE_STOP                                                \
         } while( 0 );                                                         \
         config_UnsetCallbacks( p_module->p_config );                          \
-        return( 0 );                                                          \
+        return 0;                                                             \
     }

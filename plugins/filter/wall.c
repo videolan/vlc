@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.20 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: wall.c,v 1.21 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,10 +28,8 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 #include "filter_common.h"
 
@@ -76,20 +74,19 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the Wall specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     int    i_col;
     int    i_row;
     int    i_vout;
     struct vout_list_s
     {
-        boolean_t b_active;
+        vlc_bool_t b_active;
         int i_width;
         int i_height;
-        struct vout_thread_s *p_vout;
+        vout_thread_t *p_vout;
     } *pp_vout;
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
@@ -99,8 +96,8 @@ static int  vout_Init      ( vout_thread_t * );
 static void vout_End       ( vout_thread_t * );
 static void vout_Destroy   ( vout_thread_t * );
 static int  vout_Manage    ( vout_thread_t * );
-static void vout_Render    ( vout_thread_t *, struct picture_s * );
-static void vout_Display   ( vout_thread_t *, struct picture_s * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
+static void vout_Display   ( vout_thread_t *, picture_t * );
 
 static void RemoveAllVout  ( vout_thread_t *p_vout );
 
@@ -133,31 +130,31 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
     /* Look what method was requested */
-    p_vout->p_sys->i_col = config_GetIntVariable( "wall-cols" );
-    p_vout->p_sys->i_row = config_GetIntVariable( "wall-rows" );
+    p_vout->p_sys->i_col = config_GetInt( p_vout, "wall-cols" );
+    p_vout->p_sys->i_row = config_GetInt( p_vout, "wall-rows" );
 
     p_vout->p_sys->i_col = __MAX( 1, __MIN( 15, p_vout->p_sys->i_col ) );
     p_vout->p_sys->i_row = __MAX( 1, __MIN( 15, p_vout->p_sys->i_row ) );
 
-    intf_WarnMsg( 3, "filter info: opening a %i x %i wall",
-                  p_vout->p_sys->i_col, p_vout->p_sys->i_row );
+    msg_Dbg( p_vout, "opening a %i x %i wall",
+             p_vout->p_sys->i_col, p_vout->p_sys->i_row );
 
     p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
                                      p_vout->p_sys->i_col *
                                      sizeof(struct vout_list_s) );
     if( p_vout->p_sys->pp_vout == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_vout, "out of memory" );
         free( p_vout->p_sys );
         return( 1 );
     }
 
-    psz_method_tmp = psz_method = config_GetPszVariable( "wall-active" );
+    psz_method_tmp = psz_method = config_GetPsz( p_vout, "wall-active" );
 
     /* If no trailing vout are specified, take them all */
     if( psz_method == NULL )
@@ -228,10 +225,10 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* Try to open the real video output */
-    psz_filter = config_GetPszVariable( "filter" );
-    config_PutPszVariable( "filter", NULL );
+    psz_filter = config_GetPsz( p_vout, "filter" );
+    config_PutPsz( p_vout, "filter", NULL );
 
-    intf_WarnMsg( 1, "filter: spawning the real video outputs" );
+    msg_Dbg( p_vout, "spawning the real video outputs" );
 
     p_vout->p_sys->i_vout = 0;
 
@@ -274,17 +271,17 @@ static int vout_Init( vout_thread_t *p_vout )
             }
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
-                vout_CreateThread( NULL, i_width, i_height,
+                vout_CreateThread( p_vout->p_this, i_width, i_height,
                                    p_vout->render.i_chroma,
                                    p_vout->render.i_aspect
                                     * p_vout->render.i_height / i_height
                                     * i_width / p_vout->render.i_width );
             if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout == NULL )
             {
-                intf_ErrMsg( "vout error: failed to get %ix%i vout threads",
-                             p_vout->p_sys->i_col, p_vout->p_sys->i_row );
+                msg_Err( p_vout, "failed to get %ix%i vout threads",
+                                 p_vout->p_sys->i_col, p_vout->p_sys->i_row );
                 RemoveAllVout( p_vout );
-                config_PutPszVariable( "filter", psz_filter );
+                config_PutPsz( p_vout, "filter", psz_filter );
                 if( psz_filter ) free( psz_filter );
                 return 0;
             }
@@ -293,7 +290,7 @@ static int vout_Init( vout_thread_t *p_vout )
         }
     }
 
-    config_PutPszVariable( "filter", psz_filter );
+    config_PutPsz( p_vout, "filter", psz_filter );
     if( psz_filter ) free( psz_filter );
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
@@ -417,7 +414,7 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 
                 while( p_in < p_in_end )
                 {
-                    FAST_MEMCPY( p_out, p_in, i_out_pitch );
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in, i_out_pitch );
                     p_in += i_in_pitch;
                     p_out += i_out_pitch;
                 }
@@ -466,7 +463,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
          if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
          {
              vout_DestroyThread(
-               p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout, NULL );
+               p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout );
          }
     }
 }

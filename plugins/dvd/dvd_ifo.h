@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.19 2002/05/20 22:45:03 sam Exp $
+ * $Id: dvd_ifo.h,v 1.20 2002/06/01 12:31:59 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -520,7 +520,7 @@ typedef struct time_inf_s
  */
 typedef struct vts_s
 {
-    boolean_t       b_initialized;
+    vlc_bool_t      b_initialized;
     int             i_pos;
     vts_manager_t   manager_inf;
     vts_title_t     title_inf;
@@ -541,7 +541,7 @@ typedef struct ifo_s
     dvdcss_handle   dvdhandle;      /* File descriptor for the device */
     int             i_start;        /* Offset to video_ts.ifo on the device */
     int             i_pos;          /* Position of stream pointer */
-    boolean_t       b_error;        /* Error Management */
+    vlc_bool_t      b_error;        /* Error Management */
     vmg_t           vmg;            /* Structure described in video_ts */
     vts_t           vts;            /* Vts ifo for current title set */
     

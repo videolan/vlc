@@ -2,8 +2,8 @@
  * main.h: access to all program variables
  * Declaration and extern access to global program object.
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.35 2002/04/27 22:11:22 gbazin Exp $
+ * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
+ * $Id: main.h,v 1.36 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * main_t, p_main (global variable)
+ * vlc_t, p_vlc (global variable)
  *****************************************************************************
  * This structure has an unique instance, declared in main and pointed by the
  * only global variable of the program. It should allow access to any variable
@@ -32,26 +32,24 @@
  * it when you can access the members you need in an other way. In fact, it
  * should only be used by interface thread.
  *****************************************************************************/
-
-typedef struct main_s
+struct vlc_s
 {
-    /* Private data */
-    struct main_sys_s*     p_sys;          /* for system specific properties */
+    VLC_COMMON_MEMBERS
+
+    /* The vlc structure status */
+    int                    i_status;
 
     /* Global properties */
     int                    i_argc;           /* command line arguments count */
     char **                ppsz_argv;              /* command line arguments */
-    char *                 psz_arg0;         /* program name (whithout path) */
     char *                 psz_homedir;             /* user's home directory */
 
     u32                    i_cpu_capabilities;             /* CPU extensions */
-    int                    i_warning_level;        /* warning messages level */
-    boolean_t              b_stats;                  /* display statistics ? */
 
     /* Generic settings */
-    boolean_t              b_audio;             /* is audio output allowed ? */
-    boolean_t              b_video;             /* is video output allowed ? */
-    boolean_t              b_stereo;
+    vlc_bool_t             b_quiet;                            /* be quiet ? */
+    vlc_bool_t             b_verbose;                     /* info messages ? */
+    vlc_bool_t             b_color;                      /* color messages ? */
     mtime_t                i_desync;   /* relative desync of the audio ouput */
 
     /* Fast memcpy plugin used */
@@ -59,27 +57,27 @@ typedef struct main_s
     void* ( *pf_memcpy ) ( void *, const void *, size_t );
     void* ( *pf_memset ) ( void *, int, size_t );    /* FIXME: unimplemented */
 
-    /* Unique threads */
-    p_intf_thread_t        p_intf;                  /* main interface thread */
+    /* The module bank */
+    module_bank_t   module_bank;
 
-    /* Shared data - these structures are accessed directly from p_main by
+    /* The message bank */
+    msg_bank_t      msg_bank;
+
+    /* Shared data - these structures are accessed directly from p_vlc by
      * several modules */
-    p_playlist_t           p_playlist;                           /* playlist */
-    p_intf_msg_t           p_msg;                 /* messages interface data */
-    p_input_channel_t      p_channel;                /* channel library data */
+    intf_msg_t *           p_msg;                 /* messages interface data */
+    input_channel_t *      p_channel;                /* channel library data */
 
     /* Locks */
     vlc_mutex_t            config_lock;          /* lock for the config file */
-} main_t;
+    vlc_mutex_t            structure_lock;        /* lock for the p_vlc tree */
+    int                    i_counter;                      /* object counter */
 
-#ifndef __PLUGIN__
-extern main_t *p_main;
-#else
-#   define p_main (p_symbols->p_main)
-#endif
+    /* Pointer to the big, evil global lock */
+    vlc_mutex_t *          p_global_lock;
+    void **                pp_global_data;
 
-/*****************************************************************************
- * Fast memory operation module
- *****************************************************************************/
-#define FAST_MEMCPY p_main->pf_memcpy
-#define FAST_MEMSET p_main->pf_memset
+    /* Private data */
+    main_sys_t*            p_sys;          /* for system specific properties */
+};
+

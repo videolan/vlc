@@ -2,7 +2,7 @@
  * vpar_pool.h : video parser/video decoders communication
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_pool.h,v 1.2 2002/05/18 17:47:47 sam Exp $
+ * $Id: vpar_pool.h,v 1.3 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,7 +27,9 @@
  * This structure is used for the communication between the parser and the
  * decoders.
  *****************************************************************************/
-typedef struct vdec_pool_s
+typedef struct vdec_pool_s vdec_pool_t;
+
+struct vdec_pool_s
 {
     /* Locks */
     vlc_mutex_t         lock;                         /* Structure data lock */
@@ -60,17 +62,15 @@ typedef struct vdec_pool_s
     struct vdec_thread_s * p_vdec;                     /* Fake video decoder */
 
     /* Pointers to usual pool functions */
-    void             (* pf_wait_pool) ( struct vdec_pool_s * );
-    macroblock_t *   (* pf_new_mb) ( struct vdec_pool_s * );
-    void             (* pf_free_mb) ( struct vdec_pool_s *,
-                                      struct macroblock_s * );
-    void             (* pf_decode_mb) ( struct vdec_pool_s *,
-                                        struct macroblock_s * );
+    void             (* pf_wait_pool) ( vdec_pool_t * );
+    macroblock_t *   (* pf_new_mb) ( vdec_pool_t * );
+    void             (* pf_free_mb) ( vdec_pool_t *, macroblock_t * );
+    void             (* pf_decode_mb) ( vdec_pool_t *, macroblock_t * );
 
     /* Pointer to the decoding function - used for B&W switching */
     void             (* pf_vdec_decode) ( struct vdec_thread_s *,
-                                          struct macroblock_s * );
-    boolean_t           b_bw;                      /* Current value for B&W */
+                                          macroblock_t * );
+    vlc_bool_t          b_bw;                      /* Current value for B&W */
 
     /* Access to the plug-ins needed by the video decoder thread */
     void ( * pf_idct_init )   ( void ** );
@@ -78,20 +78,20 @@ typedef struct vdec_pool_s
                                        int, int );
 
     struct vpar_thread_s * p_vpar;
-} vdec_pool_t;
+};
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vpar_InitPool( struct vpar_thread_s * );
-void vpar_SpawnPool( struct vpar_thread_s * );
-void vpar_EndPool( struct vpar_thread_s * );
+void vpar_InitPool  ( struct vpar_thread_s * );
+void vpar_SpawnPool ( struct vpar_thread_s * );
+void vpar_EndPool   ( struct vpar_thread_s * );
 
 /*****************************************************************************
  * vpar_GetMacroblock: In a vdec thread, get the next available macroblock
  *****************************************************************************/
 static inline macroblock_t * vpar_GetMacroblock( vdec_pool_t * p_pool,
-                                                 boolean_t * pb_die )
+                                                 volatile vlc_bool_t * pb_die )
 {
     macroblock_t *  p_mb;
 

@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.23 2002/02/24 22:06:50 sam Exp $
+ * $Id: aout_beos.cpp,v 1.24 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,9 +39,8 @@
 
 extern "C"
 {
-#include <videolan/vlc.h>
-
-#include "audio_output.h"
+#include <vlc/vlc.h>
+#include <vlc/aout.h>
 }
 
 /*****************************************************************************
@@ -50,15 +49,14 @@ extern "C"
  * This structure is part of the audio output thread descriptor.
  * It describes some BeOS specific variables.
  *****************************************************************************/
-typedef struct aout_sys_s
+struct aout_sys_s
 {
     BPushGameSound * p_sound;
     gs_audio_format * p_format;
     void * p_buffer;
     int i_buffer_size;
     int i_buffer_pos;
-
-} aout_sys_t;
+};
 
 extern "C"
 {
@@ -95,7 +93,7 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM) );
+        msg_Err( p_aout, "out of memory" );
         return( 1 );
     }
 
@@ -104,7 +102,7 @@ static int aout_Open( aout_thread_t *p_aout )
     if( p_aout->p_sys->p_format == NULL )
     {
         free( p_aout->p_sys );
-        intf_ErrMsg("error: cannot allocate memory for gs_audio_format" );
+        msg_Err( p_aout, "out of memory" );
         return( 1 );
     }
 
@@ -124,7 +122,7 @@ static int aout_Open( aout_thread_t *p_aout )
     {
         free( p_aout->p_sys->p_format );
         free( p_aout->p_sys );
-        intf_ErrMsg("error: cannot allocate memory for BPushGameSound" );
+        msg_Err( p_aout, "cannot allocate BPushGameSound" );
         return( 1 );
     }
 
@@ -132,7 +130,7 @@ static int aout_Open( aout_thread_t *p_aout )
     {
         free( p_aout->p_sys->p_format );
         free( p_aout->p_sys );
-        intf_ErrMsg("error: cannot allocate memory for BPushGameSound" );
+        msg_Err( p_aout, "cannot initialize BPushGameSound" );
         return( 1 );
     }
 

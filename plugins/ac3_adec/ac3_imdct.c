@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_imdct.c,v 1.8 2002/04/23 23:44:36 fenrir Exp $
+ * $Id: ac3_imdct.c,v 1.9 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -31,14 +31,12 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/decoder.h>
 
 #include "ac3_imdct.h"
 #include "ac3_downmix.h"
-#include "ac3_decoder.h"
+#include "ac3_adec.h"
 
 #ifndef M_PI
 #   define M_PI 3.14159265358979323846

@@ -2,7 +2,7 @@
  * aout_pcm.c: PCM audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_pcm.c,v 1.7 2002/05/19 00:34:54 massiot Exp $
+ * $Id: aout_pcm.c,v 1.8 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -25,11 +25,10 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "audio_output.h"
 #include "aout_pcm.h"
@@ -55,8 +54,7 @@ void aout_PCMThread( aout_thread_t * p_aout )
 
 #if defined(WIN32)
     if( !SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL) )
-        intf_WarnMsg( 2, "aout warning: couldn't change priority of"
-                      "aout_PCMThread()" );
+        msg_Warn( p_aout, "could not change priority of aout_PCMThread()" );
 #endif
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
@@ -132,7 +130,7 @@ void aout_PCMThread( aout_thread_t * p_aout )
 
             p_aout->date = mdate() + ((((mtime_t)((i_units +
                 p_aout->i_latency) / p_aout->i_channels)) * 1000000) /
-                ((mtime_t)p_aout->i_rate)) + p_main->i_desync;
+                ((mtime_t)p_aout->i_rate)) + p_aout->p_vlc->i_desync;
 
             p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
                              i_buffer_limit );
@@ -146,7 +144,7 @@ void aout_PCMThread( aout_thread_t * p_aout )
 
             p_aout->date = mdate() + ((((mtime_t)((i_units +
                 p_aout->i_latency / 2) / p_aout->i_channels)) * 1000000) /
-                ((mtime_t)p_aout->i_rate)) + p_main->i_desync;
+                ((mtime_t)p_aout->i_rate)) + p_aout->p_vlc->i_desync;
 
             p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
                              i_buffer_limit * 2 );
@@ -174,7 +172,7 @@ void aout_PCMThread( aout_thread_t * p_aout )
 /*****************************************************************************
  * InitializeIncrement: change i_x/i_y to i_a+i_b/i_c
  *****************************************************************************/
-static inline void InitializeIncrement( aout_increment_t * p_inc,
+static inline void InitializeIncrement( aout_increment_t *p_inc,
                                         int i_x, int i_y )
 {
     p_inc->i_r = -i_y;
@@ -193,7 +191,7 @@ static inline void InitializeIncrement( aout_increment_t * p_inc,
 /*****************************************************************************
  * UpdateIncrement
  *****************************************************************************/
-static inline void UpdateIncrement( aout_increment_t * p_inc, int * pi_integer )
+static inline void UpdateIncrement( aout_increment_t *p_inc, int *pi_integer )
 {
     if( (p_inc->i_r += p_inc->i_b) >= 0 )
     {
@@ -253,7 +251,7 @@ static void FillBuffer( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
                 }
                 else
                 {
-                    intf_ErrMsg( "aout error: unsupported number of channels" );
+                    msg_Err( p_aout, "unsupported number of channels" );
                 }
 
                 UpdateIncrement(&p_fifo->unit_increment, &p_fifo->i_unit);

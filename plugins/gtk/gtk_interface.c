@@ -1,6 +1,6 @@
-/* This file was created automatically by glade and fixed by fixfiles.sh */
+/* This file was created automatically by glade and fixed by bootstrap.sh */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -638,7 +638,7 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_next);
 
-  slider_frame = gtk_frame_new (_("-:--:--"));
+  slider_frame = gtk_frame_new ("-:--:--");
   gtk_widget_ref (slider_frame);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "slider_frame", slider_frame,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -698,7 +698,7 @@ create_intf_window (void)
   gtk_widget_show (title);
   gtk_box_pack_start (GTK_BOX (title_box), title, FALSE, FALSE, 5);
 
-  title_label = gtk_label_new (_("--"));
+  title_label = gtk_label_new ("--");
   gtk_widget_ref (title_label);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "title_label", title_label,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -742,7 +742,7 @@ create_intf_window (void)
   gtk_widget_show (chapter);
   gtk_box_pack_start (GTK_BOX (chapter_box), chapter, FALSE, FALSE, 5);
 
-  chapter_label = gtk_label_new (_("---"));
+  chapter_label = gtk_label_new ("---");
   gtk_widget_ref (chapter_label);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "chapter_label", chapter_label,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1592,7 +1592,7 @@ create_intf_disc (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_name);
   gtk_box_pack_start (GTK_BOX (hbox2), disc_name, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd" ));
+  gtk_entry_set_text (GTK_ENTRY (disc_name), "/dev/dvd");
 
   dialog_action_area1 = GTK_DIALOG (intf_disc)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_action_area1", dialog_action_area1);
@@ -2470,7 +2470,7 @@ create_intf_sat (void)
   gtk_table_set_row_spacings (GTK_TABLE (table3), 5);
   gtk_table_set_col_spacings (GTK_TABLE (table3), 5);
 
-  sat_freq_adj = gtk_adjustment_new (config_GetIntVariable( "frequency" ), 10000, 12999, 1, 10, 10);
+  sat_freq_adj = gtk_adjustment_new (11954, 10000, 12999, 1, 10, 10);
   sat_freq = gtk_spin_button_new (GTK_ADJUSTMENT (sat_freq_adj), 1, 0);
   gtk_widget_ref (sat_freq);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_freq", sat_freq,
@@ -2480,7 +2480,7 @@ create_intf_sat (void)
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  sat_srate_adj = gtk_adjustment_new (config_GetIntVariable( "symbol-rate" ), 1000, 30000, 1, 10, 10);
+  sat_srate_adj = gtk_adjustment_new (27500, 1000, 30000, 1, 10, 10);
   sat_srate = gtk_spin_button_new (GTK_ADJUSTMENT (sat_srate_adj), 1, 0);
   gtk_widget_ref (sat_srate);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_srate", sat_srate,
@@ -2558,12 +2558,12 @@ create_intf_sat (void)
   gtk_table_attach (GTK_TABLE (table3), sat_fec, 1, 2, 4, 5,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("1/2"));
-  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("2/3"));
-  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("3/4"));
-  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("4/5"));
-  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("5/6"));
-  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("7/8"));
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) "1/2");
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) "2/3");
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) "3/4");
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) "4/5");
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) "5/6");
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) "7/8");
   gtk_combo_set_popdown_strings (GTK_COMBO (sat_fec), sat_fec_items);
   g_list_free (sat_fec_items);
 
@@ -2572,7 +2572,7 @@ create_intf_sat (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "combo_entry1", combo_entry1,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (combo_entry1);
-  gtk_entry_set_text (GTK_ENTRY (combo_entry1), _("3/4"));
+  gtk_entry_set_text (GTK_ENTRY (combo_entry1), "3/4");
 
   hbox15 = GTK_DIALOG (intf_sat)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_sat), "hbox15", hbox15);

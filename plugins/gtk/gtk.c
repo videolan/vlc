@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.23 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: gtk.c,v 1.24 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,18 +29,10 @@
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
 
 #include <gtk/gtk.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-
-#include "interface.h"
-#include "intf_playlist.h"
-
-#include "video.h"
-#include "video_output.h"
 
 #include "gtk_callbacks.h"
 #include "gtk_interface.h"
@@ -60,6 +52,11 @@ static void intf_Run          ( intf_thread_t *p_intf );
 static gint GtkManage         ( gpointer p_data );
 
 /*****************************************************************************
+ * Local variables (mutex-protected).
+ *****************************************************************************/
+static void ** pp_global_data;
+
+/*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
 #define TOOLTIPS_TEXT N_("show tooltips")
@@ -77,6 +74,7 @@ ADD_INTEGER( "gtk-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT, PREFS_MAXH_LONGTEXT)
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
+    pp_global_data = p_module->p_vlc->pp_global_data;
     SET_DESCRIPTION( _("Gtk+ interface module") )
 #ifndef WIN32
     if( getenv( "DISPLAY" ) == NULL )
@@ -88,7 +86,6 @@ MODULE_INIT_START
     {
         ADD_CAPABILITY( INTF, 90 )
     }
-    ADD_SHORTCUT( "gtk" )
     ADD_PROGRAM( "gvlc" )
 MODULE_INIT_STOP
 
@@ -109,7 +106,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 void g_atexit( GVoidFunc func )
 {
-    intf_thread_t *p_intf = p_main->p_intf;
+    intf_thread_t *p_intf = (intf_thread_t *)*pp_global_data;
     int i_dummy;
 
     for( i_dummy = 0;
@@ -121,7 +118,7 @@ void g_atexit( GVoidFunc func )
 
     if( i_dummy >= MAX_ATEXIT - 1 )
     {
-        intf_ErrMsg( "intf error: too many atexit() callbacks to register" );
+        msg_Err( p_intf, "too many atexit() callbacks to register" );
         return;
     }
 
@@ -149,11 +146,11 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM));
+        msg_Err( p_intf, "out of memory" );
         return( 1 );
     }
 
-    p_intf->p_sys->p_sub = intf_MsgSub();
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_this );
 
     /* Initialize Gtk+ thread */
     p_intf->p_sys->b_playing = 0;
@@ -161,6 +158,7 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
 
+    p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->i_playing = -1;
     p_intf->p_sys->b_slider_free = 1;
 
@@ -176,7 +174,7 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
-    intf_MsgUnsub( p_intf->p_sys->p_sub );
+    msg_Unsubscribe( p_intf->p_this, p_intf->p_sys->p_sub );
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -208,7 +206,13 @@ static void intf_Run( intf_thread_t *p_intf )
     };
 
     /* Initialize Gtk+ */
+
+    /* gtk_init will register stuff with g_atexit, so we need to take
+     * the global lock if we want to be able to intercept the calls */
+    vlc_mutex_lock( p_intf->p_vlc->p_global_lock );
+    *p_intf->p_vlc->pp_global_data = p_intf;
     gtk_init( &i_args, &pp_args );
+    vlc_mutex_unlock( p_intf->p_vlc->p_global_lock );
 
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window();
@@ -269,8 +273,10 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_jump = NULL;
 
     /* Hide tooltips if the option is set */
-    if( !config_GetIntVariable( "gtk-tooltips" ) )
+    if( !config_GetInt( p_intf, "gtk-tooltips" ) )
+    {
         gtk_tooltips_disable( p_intf->p_sys->p_tooltips );
+    }
 
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
@@ -324,11 +330,6 @@ static void intf_Run( intf_thread_t *p_intf )
 static gint GtkManage( gpointer p_data )
 {
 #define p_intf ((intf_thread_t *)p_data)
-    static GdkColor white = { 0, 0xffff, 0xffff, 0xffff };
-    static GdkColor red   = { 0, 0xffff, 0x6666, 0x6666 };
-    static GdkColor gray  = { 0, 0xaaaa, 0xaaaa, 0xaaaa };
-    GdkColor *p_color;
-
     int i_start, i_stop;
 
     vlc_mutex_lock( &p_intf->change_lock );
@@ -354,27 +355,32 @@ static gint GtkManage( gpointer p_data )
 
     if( p_intf->p_sys->p_sub->i_start != i_stop )
     {
+        static GdkColor white  = { 0, 0xffff, 0xffff, 0xffff };
+        static GdkColor gray   = { 0, 0xaaaa, 0xaaaa, 0xaaaa };
+        static GdkColor yellow = { 0, 0xffff, 0xffff, 0x6666 };
+        static GdkColor red    = { 0, 0xffff, 0x6666, 0x6666 };
+
+        static const char * ppsz_type[4] = { ": ", " error: ", " warning: ",
+                                             " debug: " };
+        static GdkColor *   pp_color[4] = { &white, &red, &yellow, &gray };
+
         for( i_start = p_intf->p_sys->p_sub->i_start;
              i_start != i_stop;
-             i_start = (i_start+1) % INTF_MSG_QSIZE )
+             i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
             /* Append all messages to log window */
-            switch( p_intf->p_sys->p_sub->p_msg[i_start].i_type )
-            {
-            case INTF_MSG_ERR:
-                p_color = &red;
-                break;
-            case INTF_MSG_WARN:
-                p_color = &gray;
-                break;
-            default:
-                p_color = &white;
-                break;
-            }
+            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, &gray,
+             NULL, p_intf->p_sys->p_sub->p_msg[i_start].psz_module, -1 );
 
-            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, p_color,
-                NULL, p_intf->p_sys->p_sub->p_msg[i_start].psz_msg, -1 );
-            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, p_color,
+            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, &gray,
+                NULL, ppsz_type[p_intf->p_sys->p_sub->p_msg[i_start].i_type],
+                -1 );
+
+            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL,
+                pp_color[p_intf->p_sys->p_sub->p_msg[i_start].i_type], NULL,
+                p_intf->p_sys->p_sub->p_msg[i_start].psz_msg, -1 );
+
+            gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, &gray,
                 NULL, "\n", -1 );
         }
 
@@ -389,14 +395,32 @@ static gint GtkManage( gpointer p_data )
     /* Update the playlist */
     GtkPlayListManage( p_data );
 
-    if( p_input_bank->pp_input[0] != NULL )
+    /* Update the input */
+    if( p_intf->p_sys->p_input != NULL )
     {
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        if( p_intf->p_sys->p_input->b_dead )
+        {
+            vlc_object_release( p_intf->p_sys->p_input );
+            p_intf->p_sys->p_input = NULL;
+        }
+    }
 
-        if( !p_input_bank->pp_input[0]->b_die )
+    if( p_intf->p_sys->p_input == NULL )
+    {
+        p_intf->p_sys->p_input = vlc_object_find( p_intf->p_vlc,
+                                              VLC_OBJECT_INPUT, FIND_CHILD );
+    }
+
+    if( p_intf->p_sys->p_input )
+    {
+        input_thread_t *p_input = p_intf->p_sys->p_input;
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+
+        if( !p_input->b_die )
         {
             /* New input or stream map change */
-            if( p_input_bank->pp_input[0]->stream.b_changed )
+            if( p_input->stream.b_changed )
             {
                 GtkModeManage( p_intf );
                 GtkSetupMenus( p_intf );
@@ -404,18 +428,18 @@ static gint GtkManage( gpointer p_data )
             }
 
             /* Manage the slider */
-            if( p_input_bank->pp_input[0]->stream.b_seekable &&
-                p_intf->p_sys->b_playing )
+            if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
             {
                 float newvalue = p_intf->p_sys->p_adj->value;
 
-#define p_area p_input_bank->pp_input[0]->stream.p_selected_area
+#define p_area p_input->stream.p_selected_area
                 /* If the user hasn't touched the slider since the last time,
                  * then the input can safely change it */
                 if( newvalue == p_intf->p_sys->f_adj_oldvalue )
                 {
                     /* Update the value */
-                    p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
+                    p_intf->p_sys->p_adj->value =
+                    p_intf->p_sys->f_adj_oldvalue =
                         ( 100. * p_area->i_tell ) / p_area->i_size;
 
                     gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
@@ -428,36 +452,33 @@ static gint GtkManage( gpointer p_data )
                     off_t i_seek = ( newvalue * p_area->i_size ) / 100;
 
                     /* release the lock to be able to seek */
-                    vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
-                    input_Seek( p_input_bank->pp_input[0], i_seek );
-                    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
+                    input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
 
                     /* Update the old value */
                     p_intf->p_sys->f_adj_oldvalue = newvalue;
                 }
-#    undef p_area
+#undef p_area
             }
 
             if( p_intf->p_sys->i_part !=
-                p_input_bank->pp_input[0]->stream.p_selected_area->i_part )
+                p_input->stream.p_selected_area->i_part )
             {
                 p_intf->p_sys->b_chapter_update = 1;
                 GtkSetupMenus( p_intf );
             }
         }
 
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
-    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
+    else if( p_intf->p_sys->b_playing && !p_intf->p_vlc->b_die )
     {
         GtkModeManage( p_intf );
         p_intf->p_sys->b_playing = 0;
     }
 
-    /* Manage core vlc functions through the callback */
-    p_intf->pf_manage( p_intf );
-
-    if( p_intf->b_die )
+    if( p_intf->p_vlc->b_die )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
 

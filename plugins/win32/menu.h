@@ -20,9 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-struct intf_thread_s;
-
-int __fastcall SetupMenus( struct intf_thread_s * );
+int __fastcall SetupMenus( intf_thread_t * );
 
 /*****************************************************************************
  * Convert user_data structures to title and chapter information

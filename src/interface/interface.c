@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.93 2002/04/23 14:16:21 sam Exp $
+ * $Id: interface.c,v 1.94 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -32,7 +32,7 @@
 #include <string.h>                                            /* strerror() */
 #include <sys/types.h>                                              /* off_t */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -40,7 +40,6 @@
 #include "audio_output.h"
 
 #include "interface.h"
-#include "intf_playlist.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -48,7 +47,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void intf_Manage( intf_thread_t *p_intf );
+static void Manager( intf_thread_t *p_intf );
 
 /*****************************************************************************
  * intf_Create: prepare interface before main loop
@@ -56,31 +55,30 @@ static void intf_Manage( intf_thread_t *p_intf );
  * This function opens output devices and creates specific interfaces. It sends
  * its own error messages.
  *****************************************************************************/
-intf_thread_t* intf_Create( void )
+intf_thread_t* intf_Create( vlc_object_t *p_this )
 {
     intf_thread_t * p_intf;
     char *psz_name;
 
     /* Allocate structure */
-    p_intf = malloc( sizeof( intf_thread_t ) );
+    p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
     if( !p_intf )
     {
-        intf_ErrMsg( "intf error: cannot create interface thread (%s)",
-                     strerror( ENOMEM ) );
-        return( NULL );
+        msg_Err( p_this, "out of memory" );
+        return NULL;
     }
 
     /* Choose the best module */
-    psz_name = config_GetPszVariable( "intf" );
-    p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF, psz_name,
-                                    (void *)p_intf );
+    psz_name = config_GetPsz( p_intf, "intf" );
+    p_intf->p_module = module_Need( p_intf, MODULE_CAPABILITY_INTF,
+                                    psz_name, (void *)p_intf );
 
     if( psz_name ) free( psz_name );
     if( p_intf->p_module == NULL )
     {
-        intf_ErrMsg( "intf error: no suitable intf module" );
-        free( p_intf );
-        return( NULL );
+        msg_Err( p_intf, "no suitable intf module" );
+        vlc_object_destroy( p_intf );
+        return NULL;
     }
 
 #define f p_intf->p_module->p_functions->intf.functions.intf
@@ -89,115 +87,72 @@ intf_thread_t* intf_Create( void )
     p_intf->pf_run        = f.pf_run;
 #undef f
 
-    /* Initialize callbacks */
-    p_intf->pf_manage     = intf_Manage;
-
     /* Initialize structure */
-    p_intf->b_die         = 0;
-
     p_intf->b_menu        = 0;
     p_intf->b_menu_change = 0;
 
     /* Initialize mutexes */
-    vlc_mutex_init( &p_intf->change_lock );
+    vlc_mutex_init( p_intf, &p_intf->change_lock );
 
-    intf_WarnMsg( 1, "intf: interface initialized");
-    return( p_intf );
+    msg_Dbg( p_intf, "interface initialized" );
+
+    /* An interface's parent is always the root */
+    vlc_object_attach( p_intf, p_intf->p_vlc );
+
+    return p_intf;
 }
 
 /*****************************************************************************
- * intf_Manage: manage interface
+ * intf_RunThread: launch the interface thread
  *****************************************************************************
- * This function has to be called regularly by the interface plugin. It
- * checks for playlist end, module expiration, message flushing, and a few
- * other useful things.
+ * This function either creates a new thread and runs the interface in it,
+ * or runs the interface in the current thread, depending on b_block.
  *****************************************************************************/
-static void intf_Manage( intf_thread_t *p_intf )
+vlc_error_t intf_RunThread( intf_thread_t *p_intf )
 {
-    /* Manage module bank */
-    module_ManageBank( );
-
-    vlc_mutex_lock( &p_input_bank->lock );
-
-    if( p_input_bank->i_count )
+    if( p_intf->b_block )
     {
-        int i_input;
-        input_thread_t *p_input;
-
-        for( i_input = 0; i_input < p_input_bank->i_count; i_input++ )
+        /* Run a manager thread, launch the interface, kill the manager */
+        if( vlc_thread_create( p_intf, "manager", Manager, 0 ) )
         {
-            p_input = p_input_bank->pp_input[i_input];
-            
-            if( p_input->i_status == THREAD_OVER )
-            {
-                input_DestroyThread( p_input );
-                p_input_bank->pp_input[i_input] = NULL;
-                p_input_bank->i_count--;
-            }
-            else if( ( p_input->i_status == THREAD_READY
-                        || p_input->i_status == THREAD_ERROR )
-                     && ( p_input->b_error || p_input->b_eof ) )
-            {
-                input_StopThread( p_input, NULL );
-            }
+            msg_Err( p_intf, "cannot spawn manager thread" );
+            return VLC_EGENERIC;
         }
 
-        vlc_mutex_unlock( &p_input_bank->lock );
+        p_intf->pf_run( p_intf );
+
+        p_intf->b_die = 1;
+
+        /* Do not join the thread... intf_StopThread will do it for us */
     }
-    /* If no stream is being played, try to find one */
     else
     {
-//        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
-        if( !p_main->p_playlist->b_stopped )
+        /* Run the interface in a separate thread */
+        if( vlc_thread_create( p_intf, "interface", p_intf->pf_run, 0 ) )
         {
-            /* Select the next playlist item */
-            intf_PlaylistNext( p_main->p_playlist );
-
-            /* don't loop by default: stop at playlist end */
-            if( p_main->p_playlist->i_index == -1 )
-            {
-                p_main->p_playlist->b_stopped = 1;
-            }
-            else
-            {
-                input_thread_t *p_input;
-
-                p_main->p_playlist->b_stopped = 0;
-                p_main->p_playlist->i_mode = PLAYLIST_FORWARD + 
-                    config_GetIntVariable( "loop-playlist" );
-                intf_WarnMsg( 3, "intf: creating new input thread" );
-                p_input = input_CreateThread( &p_main->p_playlist->current,
-                                              NULL );
-                if( p_input != NULL )
-                {
-                    p_input_bank->pp_input[ p_input_bank->i_count ] = p_input;
-                    p_input_bank->i_count++;
-                }
-            }
-
-            vlc_mutex_unlock( &p_input_bank->lock );
+            msg_Err( p_intf, "cannot spawn interface thread" );
+            return VLC_EGENERIC;
         }
-        else
-        {
-            vlc_mutex_unlock( &p_input_bank->lock );
-
-            /* playing has been stopped: we no longer need outputs */
-            if( p_aout_bank->i_count )
-            {
-                /* FIXME kludge that does not work with several outputs */
-                aout_DestroyThread( p_aout_bank->pp_aout[0], NULL );
-                p_aout_bank->i_count--;
-            }
-            if( p_vout_bank->i_count )
-            {
-                vout_DestroyThread( p_vout_bank->pp_vout[0], NULL );
-                p_vout_bank->i_count--;
-            }
-        }
-
-//        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * intf_StopThread: end the interface thread
+ *****************************************************************************
+ * This function asks the interface thread to stop.
+ *****************************************************************************/
+void intf_StopThread( intf_thread_t *p_intf )
+{
+    /* Tell the interface to die */
+    if( !p_intf->b_block )
+    {
+        p_intf->b_die = 1;
+    }
+
+    /* Wait for the thread to exit */
+    vlc_thread_join( p_intf );
 }
 
 /*****************************************************************************
@@ -207,16 +162,8 @@ static void intf_Manage( intf_thread_t *p_intf )
  *****************************************************************************/
 void intf_Destroy( intf_thread_t *p_intf )
 {
-    /* Destroy interfaces */
+    /* Destroy interface */
     p_intf->pf_close( p_intf );
-
-#if 0
-    /* Close input thread, if any (blocking) */
-    if( p_intf->p_input )
-    {   
-        input_DestroyThread( p_intf->p_input, NULL );
-    }
-#endif
 
     /* Unlock module */
     module_Unneed( p_intf->p_module );
@@ -224,6 +171,29 @@ void intf_Destroy( intf_thread_t *p_intf )
     vlc_mutex_destroy( &p_intf->change_lock );
 
     /* Free structure */
-    free( p_intf );
+    vlc_object_destroy( p_intf );
+}
+
+/* Following functions are local */
+
+/*****************************************************************************
+ * Manager: helper thread for blocking interfaces
+ *****************************************************************************
+ * If the interface is launched in the main thread, it will not listen to
+ * p_vlc->b_die events because it is only supposed to listen to p_intf->b_die.
+ * This thread takes care of the matter.
+ *****************************************************************************/
+static void Manager( intf_thread_t *p_intf )
+{
+    while( !p_intf->b_die )
+    {
+        msleep( INTF_IDLE_SLEEP );
+
+        if( p_intf->p_vlc->b_die )
+        {
+            p_intf->b_die = 1;
+            return;
+        }
+    }
 }
 

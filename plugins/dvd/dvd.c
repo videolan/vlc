@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.31 2002/04/19 13:56:10 sam Exp $
+ * $Id: dvd.c,v 1.32 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef GOD_DAMN_DMCA
 #   include <stdio.h>
@@ -75,7 +75,6 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("DVD input module, uses libdvdcss") )
     ADD_CAPABILITY( ACCESS, 100 )
 #endif
-    ADD_SHORTCUT( "dvd" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -120,8 +119,8 @@ static void ProbeLibDVDCSS( void )
         p_libdvdcss = dlopen( *pp_file, RTLD_LAZY );
         if( p_libdvdcss != NULL )
         {
-            intf_WarnMsg( 2, "module: builtin module `dvd' found libdvdcss "
-                             "in `%s'", *pp_file );
+//X            intf_WarnMsg( 2, "module: builtin module `dvd' found libdvdcss "
+//X                             "in `%s'", *pp_file );
             break;
         }
         pp_file++;
@@ -131,7 +130,7 @@ static void ProbeLibDVDCSS( void )
     /* If libdvdcss.so was found, check that it's valid */
     if( p_libdvdcss == NULL )
     {
-        intf_ErrMsg( "dvd warning: libdvdcss.so.2 not present" );
+//X        intf_ErrMsg( "dvd warning: libdvdcss.so.2 not present" );
     }
     else
     {
@@ -148,8 +147,8 @@ static void ProbeLibDVDCSS( void )
              || ____dvdcss_read == NULL || ____dvdcss_readv == NULL
              || ____dvdcss_error == NULL )
         {
-            intf_ErrMsg( "dvd warning: missing symbols in libdvdcss.so.2, "
-                         "this shouldn't happen !" );
+//X            intf_ErrMsg( "dvd warning: missing symbols in libdvdcss.so.2, "
+//X                         "this shouldn't happen !" );
             dlclose( p_libdvdcss );
             p_libdvdcss = NULL;
         }
@@ -159,10 +158,10 @@ static void ProbeLibDVDCSS( void )
      * replacement functions. */
     if( p_libdvdcss == NULL )
     {
-        intf_ErrMsg( "dvd warning: no valid libdvdcss found, "
-                     "I will only play unencrypted DVDs" );
-        intf_ErrMsg( "dvd warning: get libdvdcss at "
-                     "http://www.videolan.org/libdvdcss/" );
+//X        intf_ErrMsg( "dvd warning: no valid libdvdcss found, "
+//X                     "I will only play unencrypted DVDs" );
+//X        intf_ErrMsg( "dvd warning: get libdvdcss at "
+//X                     "http://www.videolan.org/libdvdcss/" );
 
         ____dvdcss_open = dummy_dvdcss_open;
         ____dvdcss_close = dummy_dvdcss_close;

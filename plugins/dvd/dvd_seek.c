@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.10 2002/05/22 21:42:47 sam Exp $
+ * $Id: dvd_seek.c,v 1.11 2002/06/01 12:31:59 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -27,7 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -48,11 +49,6 @@
 #else
 #   include <dvdcss/dvdcss.h>
 #endif
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
 
 #include "dvd.h"
 #include "dvd_seek.h"
@@ -227,8 +223,8 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
                          p_dvd->i_vts_start + p_dvd->i_vts_lb,
                          DVDCSS_SEEK_MPEG ) < 0 )
         {
-            intf_ErrMsg( "dvd error: %s",
-                         dvdcss_error( p_dvd->dvdhandle ) );
+//X            intf_ErrMsg( "dvd error: %s",
+//X                         dvdcss_error( p_dvd->dvdhandle ) );
             return 0;
         }
 
@@ -312,12 +308,12 @@ int DVDSetChapter( thread_dvd_data_t * p_dvd, int i_chapter )
                          p_dvd->i_vts_start + p_dvd->i_vts_lb,
                          DVDCSS_SEEK_MPEG ) < 0 )
         {
-            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+//X            intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
             return -1;
         }
         
-        intf_WarnMsg( 4, "dvd info: chapter %d prg_cell %d map_cell %d",
-                i_chapter, p_dvd->i_prg_cell, p_dvd->i_map_cell );
+//X        intf_WarnMsg( 4, "dvd info: chapter %d prg_cell %d map_cell %d",
+//X                i_chapter, p_dvd->i_prg_cell, p_dvd->i_map_cell );
     }
     
     return i_chapter;

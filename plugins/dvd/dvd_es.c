@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.11 2002/05/18 14:03:13 gbazin Exp $
+ * $Id: dvd_es.c,v 1.12 2002/06/01 12:31:58 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -27,7 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -48,11 +49,6 @@
 #else
 #   include <dvdcss/dvdcss.h>
 #endif
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
 
 #include "dvd.h"
 #include "dvd_ifo.h"
@@ -163,12 +159,11 @@ void DVDReadAudio( input_thread_t * p_input )
                 break;
             case 0x06:              /* DTS */
                 i_id = ( ( 0x88 + audio_status.i_position ) << 8 ) | 0xbd;
-                intf_ErrMsg( "dvd warning: DTS audio not handled yet"
-                             "(0x%x)", i_id );
+                msg_Err( p_input, "DTS audio not handled yet (0x%x)", i_id );
                 break;
             default:
                 i_id = 0;
-                intf_ErrMsg( "dvd warning: unknown audio type %.2x",
+                msg_Err( p_input, "unknown audio type %.2x",
                          vts.manager_inf.p_audio_attr[i-1].i_coding_mode );
             }
         }
@@ -260,23 +255,24 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
 
     /* Select Video stream (always 0) */
-    if( p_main->b_video )
+    if( !config_GetInt( p_input, "novideo" ) )
     {
         input_SelectES( p_input, p_input->stream.pp_es[0] );
     }
 
     /* Select audio stream */
-    if( p_main->b_audio && p_dvd->i_audio_nb > 0 )
+    if( p_dvd->i_audio_nb > 0 && !config_GetInt( p_input, "noaudio" ) )
     {
         /* For audio: first one if none or a not existing one specified */
-        i_audio = config_GetIntVariable( "audio-channel" );
+        i_audio = config_GetInt( p_input, "audio-channel" );
         if( i_audio <= 0 || i_audio > p_dvd->i_audio_nb )
         {
-            config_PutIntVariable( "audio-channel", 1 );
+            config_PutInt( p_input, "audio-channel", 1 );
             i_audio = 1;
         }
         
-        if( ( config_GetIntVariable( "audio-type" ) == REQUESTED_AC3 ) )
+        if( ( config_GetInt( p_input, "audio-type" )
+               == REQUESTED_AC3 ) )
         {
             int     i_ac3 = i_audio;
             while( ( p_input->stream.pp_es[i_ac3]->i_type !=
@@ -299,13 +295,13 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     }
 
     /* Select subtitle */
-    if( p_main->b_video && p_dvd->i_spu_nb > 0 )
+    if( p_dvd->i_spu_nb > 0 && !config_GetInt( p_input, "novideo" ) )
     {
         /* for spu, default is none */
-        i_spu = config_GetIntVariable( "spu-channel" );
+        i_spu = config_GetInt( p_input, "spu-channel" );
         if( i_spu < 0 || i_spu > p_dvd->i_spu_nb )
         {
-            config_PutIntVariable( "spu-channel", 0 );
+            config_PutInt( p_input, "spu-channel", 0 );
             i_spu = 0;
         }
         if( i_spu > 0 )

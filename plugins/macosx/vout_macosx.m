@@ -29,48 +29,40 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "interface.h"
-
 #include "macosx.h"
 
 #define QT_MAX_DIRECTBUFFERS 10
 
-typedef struct picture_sys_s
+struct picture_sys_s
 {
     void *p_info;
     unsigned int i_size;
 
     /* When using I420 output */
     PlanarPixmapInfoYUV420 pixmap_i420;
-
-} picture_sys_t;
+};
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  vout_Create    ( struct vout_thread_s * );
-static int  vout_Init      ( struct vout_thread_s * );
-static void vout_End       ( struct vout_thread_s * );
-static void vout_Destroy   ( struct vout_thread_s * );
-static int  vout_Manage    ( struct vout_thread_s * );
-static void vout_Render    ( struct vout_thread_s *, struct picture_s * );
-static void vout_Display   ( struct vout_thread_s *, struct picture_s * );
+static int  vout_Create    ( vout_thread_t * );
+static int  vout_Init      ( vout_thread_t * );
+static void vout_End       ( vout_thread_t * );
+static void vout_Destroy   ( vout_thread_t * );
+static int  vout_Manage    ( vout_thread_t * );
+static void vout_Render    ( vout_thread_t *, picture_t * );
+static void vout_Display   ( vout_thread_t *, picture_t * );
 
-static int  CoSendRequest      ( struct vout_thread_s *, long i_request );
-static int  CoCreateWindow     ( struct vout_thread_s * );
-static int  CoDestroyWindow    ( struct vout_thread_s * );
-static int  CoToggleFullscreen ( struct vout_thread_s * );
+static int  CoSendRequest      ( vout_thread_t *, long );
+static int  CoCreateWindow     ( vout_thread_t * );
+static int  CoDestroyWindow    ( vout_thread_t * );
+static int  CoToggleFullscreen ( vout_thread_t * );
 
-static void QTScaleMatrix      ( struct vout_thread_s * );
-static int  QTCreateSequence   ( struct vout_thread_s * );
-static void QTDestroySequence  ( struct vout_thread_s * );
-static int  QTNewPicture       ( struct vout_thread_s *, struct picture_s * );
-static void QTFreePicture      ( struct vout_thread_s *, struct picture_s * );
+static void QTScaleMatrix      ( vout_thread_t * );
+static int  QTCreateSequence   ( vout_thread_t * );
+static void QTDestroySequence  ( vout_thread_t * );
+static int  QTNewPicture       ( vout_thread_t *, picture_t * );
+static void QTFreePicture      ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -96,17 +88,17 @@ static int vout_Create( vout_thread_t *p_vout )
 {
     OSErr err;
 
-    if( !p_main->p_intf || !p_main->p_intf->p_module ||
-        strcmp( p_main->p_intf->p_module->psz_name, MODULE_STRING ) != 0 )
+    if( !p_vout->p_vlc->p_intf || !p_vout->p_vlc->p_intf->p_module ||
+      strcmp( p_vout->p_vlc->p_intf->p_module->psz_name, MODULE_STRING ) != 0 )
     {
-        intf_ErrMsg( "vout error: MacOS X interface module required" );
+        msg_Err( p_vout, "MacOS X interface module required" );
         return( 1 );
     }
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg( "vout error: %s", strerror( ENOMEM ) );
+        msg_Err( p_vout, "out of memory" );
         return( 1 );
     }
 
@@ -124,7 +116,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( ( err = EnterMovies() ) != noErr )
     {
-        intf_ErrMsg( "vout error: EnterMovies failed: %d", err );
+        msg_Err( p_vout, "EnterMovies failed: %d", err );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
         free( p_vout->p_sys );
@@ -142,13 +134,13 @@ static int vout_Create( vout_thread_t *p_vout )
         }
         else
         {
-            intf_ErrMsg( "vout error: failed to find an appropriate codec" );
+            msg_Err( p_vout, "failed to find an appropriate codec" );
         }
     }
     else
     {
-        intf_ErrMsg( "vout error: chroma 0x%08x not supported",
-                     p_vout->render.i_chroma );
+        msg_Err( p_vout, "chroma 0x%08x not supported",
+                         p_vout->render.i_chroma );
     }
 
     if( p_vout->p_sys->img_dc == 0 )
@@ -161,7 +153,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( CoCreateWindow( p_vout ) )
     {
-        intf_ErrMsg( "vout error: unable to create window" );
+        msg_Err( p_vout, "unable to create window" );
         free( p_vout->p_sys->p_matrix );
         DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
         free( p_vout->p_sys ); 
@@ -193,7 +185,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     if( QTCreateSequence( p_vout ) )
     {
-        intf_ErrMsg( "vout error: unable to create sequence" );
+        msg_Err( p_vout, "unable to create sequence" );
         return( 1 );
     }
 
@@ -253,7 +245,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
 {
     if( CoDestroyWindow( p_vout ) )
     {
-        intf_ErrMsg( "vout error: unable to destroy window" );
+        msg_Err( p_vout, "unable to destroy window" );
     }
 
     ExitMovies();
@@ -294,7 +286,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->b_mouse_moved ||
         p_vout->p_sys->i_time_mouse_last_moved )
     {
-        boolean_t b_change = 0;
+        vlc_bool_t b_change = 0;
 
         if( !p_vout->p_sys->b_mouse_pointer_visible )
         {
@@ -347,7 +339,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                     p_pic->p_sys->i_size,                    
                     codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
     {
-        intf_ErrMsg( "DecompressSequenceFrameS failed: %d", err );
+        msg_Err( p_vout, "DecompressSequenceFrameS failed: %d", err );
     }
 }
 
@@ -374,7 +366,7 @@ static int CoSendRequest( vout_thread_t *p_vout, long i_request )
     o_array = [NSArray arrayWithObject:
         [NSData dataWithBytes: &p_req length: sizeof(void *)]];
     o_msg = [[NSPortMessage alloc]
-        initWithSendPort: p_main->p_intf->p_sys->o_port
+        initWithSendPort: p_vout->p_vlc->p_intf->p_sys->o_port
         receivePort: recvPort
         components: o_array];
 
@@ -400,7 +392,7 @@ static int CoCreateWindow( vout_thread_t *p_vout )
 {
     if( CoSendRequest( p_vout, VOUT_REQ_CREATE_WINDOW ) )
     {
-        intf_ErrMsg( "CoSendRequest (CREATE_WINDOW) failed" );
+        msg_Err( p_vout, "CoSendRequest (CREATE_WINDOW) failed" );
         return( 1 );
     }
 
@@ -422,7 +414,7 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
 
     if( CoSendRequest( p_vout, VOUT_REQ_DESTROY_WINDOW ) )
     {
-        intf_ErrMsg( "CoSendRequest (DESTROY_WINDOW) failed" );
+        msg_Err( p_vout, "CoSendRequest (DESTROY_WINDOW) failed" );
         return( 1 );
     }
 
@@ -440,7 +432,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 
     if( CoDestroyWindow( p_vout ) )
     {
-        intf_ErrMsg( "vout error: unable to destroy window" );
+        msg_Err( p_vout, "unable to destroy window" );
         return( 1 );
     }
     
@@ -448,7 +440,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 
     if( CoCreateWindow( p_vout ) )
     {
-        intf_ErrMsg( "vout error: unable to create window" );
+        msg_Err( p_vout, "unable to create window" );
         return( 1 );
     }
 
@@ -457,7 +449,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 
     if( QTCreateSequence( p_vout ) )
     {
-        intf_ErrMsg( "vout error: unable to create sequence" );
+        msg_Err( p_vout, "unable to create sequence" );
         return( 1 ); 
     } 
 
@@ -558,7 +550,7 @@ static int QTCreateSequence( vout_thread_t *p_vout )
                               codecLosslessQuality,
                               p_vout->p_sys->img_dc ) ) )
     {
-        intf_ErrMsg( "DecompressSequenceBeginS failed: %d", err );
+        msg_Err( p_vout, "DecompressSequenceBeginS failed: %d", err );
         return( 1 );
     }
 
@@ -645,9 +637,8 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     default:
         /* Unknown chroma, tell the guy to get lost */
         free( p_pic->p_sys );
-        intf_ErrMsg( "vout error: never heard of chroma 0x%.8x (%4.4s)",
-                     p_vout->output.i_chroma, 
-                     (char*)&p_vout->output.i_chroma );
+        msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
+                 p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
         p_pic->i_planes = 0;
         return( -1 );
     }

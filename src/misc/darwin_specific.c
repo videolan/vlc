@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.9 2002/05/19 23:51:37 massiot Exp $
+ * $Id: darwin_specific.c,v 1.10 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -23,7 +23,7 @@
 #include <string.h>                                              /* strdup() */
 #include <stdlib.h>                                                /* free() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 /*****************************************************************************
  * Static vars
@@ -33,7 +33,7 @@ static char * psz_program_path;
 /*****************************************************************************
  * system_Init: fill in program path.
  *****************************************************************************/
-void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
+void system_Init( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
     char i_dummy;
     char *p_char, *p_oldchar = &i_dummy;
@@ -68,7 +68,7 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( void )
+void system_Configure( vlc_object_t *p_this )
 {
 
 }
@@ -76,7 +76,7 @@ void system_Configure( void )
 /*****************************************************************************
  * system_End: free the program path.
  *****************************************************************************/
-void system_End( void )
+void system_End( vlc_object_t * )
 {
     free( psz_program_path );
 }

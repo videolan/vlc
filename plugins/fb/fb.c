@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.18 2002/04/23 14:16:20 sam Exp $
+ * $Id: fb.c,v 1.19 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -39,10 +39,8 @@
 #include <linux/vt.h>                                                /* VT_* */
 #include <linux/kd.h>                                                 /* KD* */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -76,7 +74,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("Linux console framebuffer module") )
     ADD_CAPABILITY( VOUT, 30 )
-    ADD_SHORTCUT( "fb" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -92,7 +89,7 @@ MODULE_DEACTIVATE_STOP
  * This structure is part of the video output thread descriptor.
  * It describes the FB specific properties of an output thread.
  *****************************************************************************/
-typedef struct vout_sys_s
+struct vout_sys_s
 {
     /* System informations */
     int                 i_tty;                          /* tty device handle */
@@ -107,7 +104,7 @@ typedef struct vout_sys_s
     int                         i_fd;                       /* device handle */
     struct fb_var_screeninfo    old_info;      /* original mode informations */
     struct fb_var_screeninfo    var_info;       /* current mode informations */
-    boolean_t                   b_pan;     /* does device supports panning ? */
+    vlc_bool_t                  b_pan;     /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     u16                         *p_palette;              /* original palette */
 
@@ -119,8 +116,7 @@ typedef struct vout_sys_s
     /* Video memory */
     byte_t *    p_video;                                      /* base adress */
     size_t      i_page_size;                                    /* page size */
-
-} vout_sys_t;
+};
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -163,12 +159,12 @@ static int vout_Create( vout_thread_t *p_vout )
     /* Set keyboard settings */
     if (tcgetattr(0, &p_vout->p_sys->old_termios) == -1)
     {
-        intf_ErrMsg( "intf error: tcgetattr" );
+        msg_Err( p_vout, "tcgetattr failed" );
     }
 
     if (tcgetattr(0, &new_termios) == -1)
     {
-        intf_ErrMsg( "intf error: tcgetattr" );
+        msg_Err( p_vout, "tcgetattr failed" );
     }
 
  /* new_termios.c_lflag &= ~ (ICANON | ISIG);
@@ -181,7 +177,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if (tcsetattr(0, TCSAFLUSH, &new_termios) == -1)
     {
-        intf_ErrMsg( "intf error: tcsetattr" );
+        msg_Err( p_vout, "tcsetattr failed" );
     }
 
     ioctl( p_vout->p_sys->i_tty, VT_RELDISP, VT_ACKACQ );
@@ -193,8 +189,7 @@ static int vout_Create( vout_thread_t *p_vout )
     if( sigaction( SIGUSR1, &sig_tty, &p_vout->p_sys->sig_usr1 ) ||
         sigaction( SIGUSR2, &sig_tty, &p_vout->p_sys->sig_usr2 ) )
     {
-        intf_ErrMsg( "intf error: can't set up signal handler (%s)",
-                     strerror(errno) );
+        msg_Err( p_vout, "cannot set signal handler (%s)", strerror(errno) );
         tcsetattr(0, 0, &p_vout->p_sys->old_termios);
         TextMode( p_vout->p_sys->i_tty );
         free( p_vout->p_sys );
@@ -205,8 +200,7 @@ static int vout_Create( vout_thread_t *p_vout )
     if( -1 == ioctl( p_vout->p_sys->i_tty,
                      VT_GETMODE, &p_vout->p_sys->vt_mode ) )
     {
-        intf_ErrMsg( "intf error: cant get terminal mode (%s)",
-                     strerror(errno) );
+        msg_Err( p_vout, "cannot get terminal mode (%s)", strerror(errno) );
         sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
         sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
         tcsetattr(0, 0, &p_vout->p_sys->old_termios);
@@ -222,8 +216,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( -1 == ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &vt_mode ) )
     {
-        intf_ErrMsg( "intf error: can't set terminal mode (%s)",
-                     strerror(errno) );
+        msg_Err( p_vout, "cannot set terminal mode (%s)", strerror(errno) );
         sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
         sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
         tcsetattr(0, 0, &p_vout->p_sys->old_termios);
@@ -271,7 +264,8 @@ static int vout_Init( vout_thread_t *p_vout )
         case 32:
             p_vout->output.i_chroma = FOURCC_RV32; break;
         default:
-            intf_ErrMsg( "vout error: unknown screen depth" );
+            msg_Err( p_vout, "unknown screen depth %i",
+                     p_vout->p_sys->var_info.bits_per_pixel );
             return 0;
     }
 
@@ -397,7 +391,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         switch( buf )
         {
         case 'q':
-            p_main->p_intf->b_die = 1;
+            p_vout->p_vlc->b_die = 1;
             break;
 
         default:
@@ -411,7 +405,7 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_WarnMsg( 3, "vout: reinitializing framebuffer screen" );
+        msg_Dbg( p_vout, "reinitializing framebuffer screen" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Destroy XImages to change their size */
@@ -420,7 +414,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
         if( vout_Init( p_vout ) )
         {
-            intf_ErrMsg("error: cannot reinit framebuffer screen" );
+            msg_Err( p_vout, "cannot reinit framebuffer screen" );
             return( 1 );
         }
 
@@ -469,7 +463,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 #if 0
-static void vout_SetPalette( p_vout_thread_t p_vout,
+static void vout_SetPalette( vout_thread_t *p_vout,
                              u16 *red, u16 *green, u16 *blue, u16 *transp )
 {
     struct fb_cmap cmap = { 0, 256, red, green, blue, transp };
@@ -489,9 +483,9 @@ static int OpenDisplay( vout_thread_t *p_vout )
     struct fb_fix_screeninfo    fix_info;     /* framebuffer fix information */
 
     /* Open framebuffer device */
-    if( !(psz_device = config_GetPszVariable( FB_DEV_VAR )) )
+    if( !(psz_device = config_GetPsz( p_vout, FB_DEV_VAR )) )
     {
-        intf_ErrMsg( "vout error: don't know which fb device to open" );
+        msg_Err( p_vout, "don't know which fb device to open" );
         return( 1 );
     }
 
@@ -499,8 +493,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->i_fd == -1 )
     {
-        intf_ErrMsg("vout error: can't open %s (%s)",
-                    psz_device, strerror(errno) );
+        msg_Err( p_vout, "cannot open %s (%s)", psz_device, strerror(errno) );
         free( psz_device );
         return( 1 );
     }
@@ -510,7 +503,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( ioctl( p_vout->p_sys->i_fd,
                FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        intf_ErrMsg("vout error: can't get fb info (%s)", strerror(errno) );
+        msg_Err( p_vout, "cannot get fb info (%s)", strerror(errno) );
         close( p_vout->p_sys->i_fd );
         return( 1 );
     }
@@ -518,7 +511,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( ioctl( p_vout->p_sys->i_fd,
                FBIOGET_VSCREENINFO, &p_vout->p_sys->old_info ) )
     {
-        intf_ErrMsg("vout error: can't get 2nd fb info (%s)", strerror(errno) );
+        msg_Err( p_vout, "cannot get 2nd fb info (%s)", strerror(errno) );
         close( p_vout->p_sys->i_fd );
         return( 1 );
     }
@@ -531,7 +524,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( ioctl( p_vout->p_sys->i_fd,
                FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        intf_ErrMsg(" vout error: can't set fb info (%s)", strerror(errno) );
+        msg_Err( p_vout, "cannot set fb info (%s)", strerror(errno) );
         close( p_vout->p_sys->i_fd );
         return( 1 );
     }
@@ -541,8 +534,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
          || ioctl( p_vout->p_sys->i_fd,
                    FBIOGET_VSCREENINFO, &p_vout->p_sys->var_info ) )
     {
-        intf_ErrMsg( "vout error: can't get additional fb info (%s)",
-                     strerror(errno) );
+        msg_Err( p_vout, "cannot get additional fb info (%s)",
+                          strerror(errno) );
 
         /* Restore fb config */
         ioctl( p_vout->p_sys->i_fd,
@@ -554,10 +547,10 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     /* FIXME: if the image is full-size, it gets cropped on the left
      * because of the xres / xres_virtual slight difference */
-    intf_WarnMsg( 3, "vout: %ix%i (virtual %ix%i)",
-                  p_vout->p_sys->var_info.xres, p_vout->p_sys->var_info.yres,
-                  p_vout->p_sys->var_info.xres_virtual,
-                  p_vout->p_sys->var_info.yres_virtual );
+    msg_Dbg( p_vout, "%ix%i (virtual %ix%i)",
+             p_vout->p_sys->var_info.xres, p_vout->p_sys->var_info.yres,
+             p_vout->p_sys->var_info.xres_virtual,
+             p_vout->p_sys->var_info.yres_virtual );
 
     p_vout->p_sys->i_height = p_vout->p_sys->var_info.yres;
     p_vout->p_sys->i_width  = p_vout->p_sys->var_info.xres_virtual
@@ -598,8 +591,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
         break;
 
     default:
-        intf_ErrMsg( "vout error: screen depth %d is not supported",
-                     p_vout->p_sys->var_info.bits_per_pixel );
+        msg_Err( p_vout, "screen depth %d is not supported",
+                         p_vout->p_sys->var_info.bits_per_pixel );
 
         /* Restore fb config */
         ioctl( p_vout->p_sys->i_fd,
@@ -619,8 +612,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_video == ((void*)-1) )
     {
-        intf_ErrMsg( "vout error: can't map video memory (%s)",
-                     strerror(errno) );
+        msg_Err( p_vout, "cannot map video memory (%s)", strerror(errno) );
 
         if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
         {
@@ -635,9 +627,9 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    intf_WarnMsg( 4, "vout: framebuffer type=%d, visual=%d, ypanstep=%d, "
-                     "ywrap=%d, accel=%d", fix_info.type, fix_info.visual,
-                     fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
+    msg_Dbg( p_vout, "framebuffer type=%d, visual=%d, ypanstep=%d, "
+             "ywrap=%d, accel=%d", fix_info.type, fix_info.visual,
+             fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
     return( 0 );
 }
 
@@ -714,7 +706,7 @@ static void TextMode( int i_tty )
     /* return to text mode */
     if( -1 == ioctl(i_tty, KDSETMODE, KD_TEXT) )
     {
-        intf_ErrMsg( "intf error: failed ioctl KDSETMODE KD_TEXT" );
+//X        msg_Err( p_vout, "failed ioctl KDSETMODE KD_TEXT" );
     }
 }
 
@@ -723,7 +715,7 @@ static void GfxMode( int i_tty )
     /* switch to graphic mode */
     if( -1 == ioctl(i_tty, KDSETMODE, KD_GRAPHICS) )
     {
-        intf_ErrMsg( "intf error: failed ioctl KDSETMODE KD_GRAPHICS" );
+//X        msg_Err( p_vout, "failed ioctl KDSETMODE KD_GRAPHICS" );
     }
 }
 

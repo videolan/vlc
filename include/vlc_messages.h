@@ -1,0 +1,123 @@
+/*****************************************************************************
+ * messages.h: messages interface
+ * This library provides basic functions for threads to interact with user
+ * interface, such as message output.
+ *****************************************************************************
+ * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
+ * $Id: vlc_messages.h,v 1.1 2002/06/01 12:31:58 sam Exp $
+ *
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+#include <stdarg.h>
+
+/*****************************************************************************
+ * msg_item_t
+ *****************************************************************************
+ * Store a single message.
+ *****************************************************************************/
+typedef struct
+{
+    int     i_type;                               /* message type, see below */
+    char *  psz_module;
+    char *  psz_msg;                                   /* the message itself */
+
+#if 0
+    mtime_t date;                                     /* date of the message */
+    char *  psz_file;               /* file in which the function was called */
+    char *  psz_function;     /* function from which the function was called */
+    int     i_line;                 /* line at which the function was called */
+#endif
+} msg_item_t;
+
+/* Message types */
+#define VLC_MSG_INFO  0                                 /* standard messages */
+#define VLC_MSG_ERR   1                                    /* error messages */
+#define VLC_MSG_WARN  2                                  /* warning messages */
+#define VLC_MSG_DBG   3                                    /* debug messages */
+
+/*****************************************************************************
+ * msg_bank_t
+ *****************************************************************************
+ * Store all data requiered by messages interfaces.
+ *****************************************************************************/
+struct msg_bank_s
+{
+    /* Message queue lock */
+    vlc_mutex_t             lock;
+
+    /* Message queue */
+    msg_item_t              msg[VLC_MSG_QSIZE];             /* message queue */
+    int i_start;
+    int i_stop;
+
+    /* Subscribers */
+    int i_sub;
+    msg_subscription_t **pp_sub;
+};
+
+/*****************************************************************************
+ * msg_subscription_t
+ *****************************************************************************
+ * Used by interface plugins which subscribe to the message bank.
+ *****************************************************************************/
+struct msg_subscription_s
+{
+    int   i_start;
+    int*  pi_stop;
+
+    msg_item_t*  p_msg;
+    vlc_mutex_t* p_lock;
+};
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) );
+VLC_EXPORT( void, __msg_Info,    ( void *, const char *, ... ) );
+VLC_EXPORT( void, __msg_Err,     ( void *, const char *, ... ) );
+VLC_EXPORT( void, __msg_Warn,    ( void *, const char *, ... ) );
+VLC_EXPORT( void, __msg_Dbg,    ( void *, const char *, ... ) );
+
+#ifdef HAVE_VARIADIC_MACROS
+
+#   define msg_Info( p_this, psz_format, args... ) \
+      __msg_Generic( CAST_TO_VLC_OBJECT(p_this), VLC_MSG_INFO, MODULE_STRING, \
+                     psz_format, ## args )
+
+#   define msg_Err( p_this, psz_format, args... ) \
+      __msg_Generic( CAST_TO_VLC_OBJECT(p_this), VLC_MSG_ERR, MODULE_STRING, \
+                     psz_format, ## args )
+
+#   define msg_Warn( p_this, psz_format, args... ) \
+      __msg_Generic( CAST_TO_VLC_OBJECT(p_this), VLC_MSG_WARN, MODULE_STRING, \
+                     psz_format, ## args )
+
+#   define msg_Dbg( p_this, psz_format, args... ) \
+      __msg_Generic( CAST_TO_VLC_OBJECT(p_this), VLC_MSG_DBG, MODULE_STRING, \
+                     psz_format, ## args )
+
+#else /* HAVE_VARIADIC_MACROS */
+
+#   define msg_Info __msg_Info
+#   define msg_Err __msg_Err
+#   define msg_Warn __msg_Warn
+#   define msg_Dbg __msg_Dbg
+
+#endif /* HAVE_VARIADIC_MACROS */
+

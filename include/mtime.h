@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.11 2002/04/24 00:36:24 sam Exp $
+ * $Id: mtime.h,v 1.12 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -50,14 +50,8 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#ifndef __PLUGIN__
-char *  mstrtime ( char *psz_buffer, mtime_t date );
-mtime_t mdate    ( void );
-void    mwait    ( mtime_t date );
-void    msleep   ( mtime_t delay );
-#else
-#   define msleep    p_symbols->msleep
-#   define mdate     p_symbols->mdate
-#   define mstrtime  p_symbols->mstrtime
-#endif
+VLC_EXPORT( char *,  mstrtime, ( char *psz_buffer, mtime_t date ) );
+VLC_EXPORT( mtime_t, mdate,    ( void ) );
+VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
+VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
 

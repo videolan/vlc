@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.24 2002/05/24 12:42:14 gbazin Exp $
+ * $Id: spu_decoder.c,v 1.25 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -28,7 +28,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* getpid() */
@@ -38,19 +40,13 @@
 #   include <process.h>
 #endif
 
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
-
 #include "spu_decoder.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  decoder_Probe ( u8 * );
-static int  decoder_Run   ( decoder_config_t * );
+static int  decoder_Run   ( decoder_fifo_t * );
 static int  InitThread    ( spudec_thread_t * );
 static void EndThread     ( spudec_thread_t * );
 
@@ -58,7 +54,7 @@ static int  SyncPacket           ( spudec_thread_t * );
 static void ParsePacket          ( spudec_thread_t * );
 static int  ParseControlSequences( spudec_thread_t *, subpicture_t * );
 static int  ParseRLE             ( spudec_thread_t *, subpicture_t *, u8 * );
-static void RenderSPU            ( const vout_thread_t *, picture_t *,
+static void RenderSPU            ( vout_thread_t *, picture_t *,
                                    const subpicture_t * );
 
 /*****************************************************************************
@@ -102,20 +98,17 @@ static int decoder_Probe( u8 *pi_type )
 /*****************************************************************************
  * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run( decoder_config_t * p_config )
+static int decoder_Run( decoder_fifo_t * p_fifo )
 {
     spudec_thread_t *     p_spudec;
    
-    intf_WarnMsg( 3, "spudec: thread launched. Initializing ..." );
-
     /* Allocate the memory needed to store the thread's structure */
     p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
 
     if ( p_spudec == NULL )
     {
-        intf_ErrMsg( "spudec error: not enough memory "
-                     "for spudec_CreateThread() to create the new thread" );
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return( -1 );
     }
     
@@ -123,10 +116,7 @@ static int decoder_Run( decoder_config_t * p_config )
      * Initialize the thread properties
      */
     p_spudec->p_vout = NULL;
-
-    p_spudec->p_config = p_config;
-
-    p_spudec->p_fifo = p_config->p_decoder_fifo;
+    p_spudec->p_fifo = p_fifo;
         
     /*
      * Initialize thread and free configuration
@@ -151,21 +141,15 @@ static int decoder_Run( decoder_config_t * p_config )
     if( p_spudec->p_fifo->b_error )
     {
         DecoderError( p_spudec->p_fifo );
-    }
-
-    {
-        boolean_t b_error = p_spudec->p_fifo->b_error;
 
         /* End of thread */
         EndThread( p_spudec );
-
-        if( b_error )
-        {
-            return( -1 );
-        }
+        return -1;
     }
-   
-    return( 0 );
+
+    /* End of thread */
+    EndThread( p_spudec );
+    return 0;
 }
 
 /* following functions are local */
@@ -180,29 +164,29 @@ static int decoder_Run( decoder_config_t * p_config )
 static int InitThread( spudec_thread_t *p_spudec )
 {
     /* Find an available video output */
-    vlc_mutex_lock( &p_vout_bank->lock );
-
-    while( p_vout_bank->i_count == 0 )
+    do
     {
-        vlc_mutex_unlock( &p_vout_bank->lock );
-
         if( p_spudec->p_fifo->b_die || p_spudec->p_fifo->b_error )
         {
-            return( -1 );
+            return -1;
+        }
+
+        p_spudec->p_vout = vlc_object_find( p_spudec->p_fifo, VLC_OBJECT_VOUT,
+                                                              FIND_CHILD );
+
+        if( p_spudec->p_vout )
+        {
+            break;
         }
 
         msleep( VOUT_OUTMEM_SLEEP );
-        vlc_mutex_lock( &p_vout_bank->lock );
     }
+    while( 1 );
 
-    /* Take the first video output FIXME: take the best one */
-    p_spudec->p_vout = p_vout_bank->pp_vout[ 0 ];
-    vlc_mutex_unlock( &p_vout_bank->lock );
-    InitBitstream( &p_spudec->bit_stream,
-                   p_spudec->p_config->p_decoder_fifo, NULL, NULL );
+    InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo, NULL, NULL );
 
     /* Mark thread as running and return */
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -276,19 +260,19 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     u8           * p_src;
     unsigned int   i_offset;
 
-    intf_WarnMsg( 3, "spudec: trying to gather a 0x%.2x long subtitle",
-                  p_spudec->i_spu_size );
+    msg_Dbg( p_spudec->p_fifo, "trying to gather a 0x%.2x long subtitle",
+                               p_spudec->i_spu_size );
 
     /* We cannot display a subpicture with no date */
     if( p_spudec->p_fifo->p_first->i_pts == 0 )
     {
-        intf_WarnMsg( 3, "spudec error: subtitle without a date" );
+        msg_Warn( p_spudec->p_fifo, "subtitle without a date" );
         return;
     }
 
     /* Allocate the subpicture internal data. */
     p_spu = vout_CreateSubPicture( p_spudec->p_vout, MEMORY_SUBPICTURE,
-                                   sizeof( struct subpicture_sys_s )
+                                   sizeof( subpicture_sys_t )
                                     + p_spudec->i_rle_size * 4 );
     /* Rationale for the "p_spudec->i_rle_size * 4": we are going to
      * expand the RLE stuff so that we won't need to read nibbles later
@@ -302,8 +286,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 
     /* Fill the p_spu structure */
     p_spu->pf_render = RenderSPU;
-    p_spu->p_sys->p_data = (u8*)p_spu->p_sys
-                            + sizeof( struct subpicture_sys_s );
+    p_spu->p_sys->p_data = (u8*)p_spu->p_sys + sizeof( subpicture_sys_t );
     p_spu->p_sys->b_palette = 0;
 
     /* Get display time now. If we do it later, we may miss the PTS. */
@@ -314,7 +297,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 
     if( p_src == NULL )
     {
-        intf_ErrMsg( "spudec error: could not allocate p_src" );
+        msg_Err( p_spudec->p_fifo, "out of memory" );
         vout_DestroySubPicture( p_spudec->p_vout, p_spu );
         return;
     }
@@ -362,9 +345,9 @@ static void ParsePacket( spudec_thread_t *p_spudec )
         return;
     }
 
-    intf_WarnMsg( 3, "spudec: total size: 0x%x, RLE offsets: 0x%x 0x%x",
-                  p_spudec->i_spu_size,
-                  p_spu->p_sys->pi_offset[0], p_spu->p_sys->pi_offset[1] );
+    msg_Dbg( p_spudec->p_fifo, "total size: 0x%x, RLE offsets: 0x%x 0x%x",
+             p_spudec->i_spu_size,
+             p_spu->p_sys->pi_offset[0], p_spu->p_sys->pi_offset[1] );
 
     /* SPU is finished - we can ask the video output to display it */
     vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
@@ -396,7 +379,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     int i;
 
     /* XXX: temporary variables */
-    boolean_t b_force_display = 0;
+    vlc_bool_t b_force_display = 0;
 
     /* Initialize the structure */
     p_spu->i_start = p_spu->i_stop = 0;
@@ -447,15 +430,15 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_SET_PALETTE:
  
                     /* 03xxxx (palette) */
-                    if( p_spudec->p_config->p_demux_data &&
-                         *(int*)p_spudec->p_config->p_demux_data == 0xBeeF )
+                    if( p_spudec->p_fifo->p_demux_data &&
+                         *(int*)p_spudec->p_fifo->p_demux_data == 0xBeeF )
                     {
                         u32 i_color;
 
                         p_spu->p_sys->b_palette = 1;
                         for( i = 0; i < 4 ; i++ )
                         {
-                            i_color = ((u32*)((char*)p_spudec->p_config->
+                            i_color = ((u32*)((char*)p_spudec->p_fifo->
                                         p_demux_data + sizeof(int)))[
                                           GetBits(&p_spudec->bit_stream, 4) ];
 
@@ -520,8 +503,8 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 default:
  
                     /* xx (unknown command) */
-                    intf_ErrMsg( "spudec error: unknown command 0x%.2x",
-                                 i_command );
+                    msg_Err( p_spudec->p_fifo, "unknown command 0x%.2x",
+                                               i_command );
                     return( 1 );
             }
 
@@ -538,21 +521,21 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     /* Check that the next sequence index matches the current one */
     if( i_next_seq != i_cur_seq )
     {
-        intf_ErrMsg( "spudec error: index mismatch (0x%.4x != 0x%.4x)",
-                     i_next_seq, i_cur_seq );
+        msg_Err( p_spudec->p_fifo, "index mismatch (0x%.4x != 0x%.4x)",
+                                   i_next_seq, i_cur_seq );
         return( 1 );
     }
 
     if( i_index > p_spudec->i_spu_size )
     {
-        intf_ErrMsg( "spudec error: uh-oh, we went too far (0x%.4x > 0x%.4x)",
-                     i_index, p_spudec->i_spu_size );
+        msg_Err( p_spudec->p_fifo, "uh-oh, we went too far (0x%.4x > 0x%.4x)",
+                                   i_index, p_spudec->i_spu_size );
         return( 1 );
     }
 
     if( !p_spu->i_start )
     {
-        intf_ErrMsg( "spudec error: no `start display' command" );
+        msg_Err( p_spudec->p_fifo, "no `start display' command" );
     }
 
     if( !p_spu->i_stop )
@@ -575,9 +558,9 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
         /* More than one padding byte - this is very strange, but
          * we can deal with it */
         default:
-            intf_WarnMsg( 2, "spudec warning: %i padding bytes, we usually "
-                             "get 0 or 1 of them",
-                          p_spudec->i_spu_size - i_index );
+            msg_Warn( p_spudec->p_fifo,
+                      "%i padding bytes, we usually get 0 or 1 of them",
+                      p_spudec->i_spu_size - i_index );
 
             while( i_index < p_spudec->i_spu_size )
             {
@@ -590,9 +573,9 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
 
     if( b_force_display )
     {
-        intf_ErrMsg( "spudec: \"force display\" command" );
-        intf_ErrMsg( "spudec: send mail to <sam@zoy.org> if you "
-                     "want to help debugging this" );
+        msg_Err( p_spudec->p_fifo, "\"force display\" command" );
+        msg_Err( p_spudec->p_fifo, "send mail to <sam@zoy.org> if you "
+                                   "want to help debugging this" );
     }
 
     /* Successfully parsed ! */
@@ -622,8 +605,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
     unsigned int  pi_table[ 2 ];
     unsigned int *pi_offset;
 
-    boolean_t b_empty_top = 1,
-              b_empty_bottom = 0;
+    vlc_bool_t b_empty_top = 1,
+               b_empty_bottom = 0;
     unsigned int i_skipped_top = 0,
                  i_skipped_bottom = 0;
 
@@ -665,8 +648,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
                             else
                             {
                                 /* We have a boo boo ! */
-                                intf_ErrMsg( "spudec error: unknown RLE code "
-                                             "0x%.4x", i_code );
+                                msg_Err( p_spudec->p_fifo, "unknown RLE code "
+                                         "0x%.4x", i_code );
                                 return( 1 );
                             }
                         }
@@ -676,9 +659,9 @@ static int ParseRLE( spudec_thread_t *p_spudec,
 
             if( ( (i_code >> 2) + i_x + i_y * i_width ) > i_height * i_width )
             {
-                intf_ErrMsg( "spudec error: out of bounds, %i at (%i,%i) is "
-                             "out of %ix%i",
-                             i_code >> 2, i_x, i_y, i_width, i_height );
+                msg_Err( p_spudec->p_fifo,
+                         "out of bounds, %i at (%i,%i) is out of %ix%i",
+                         i_code >> 2, i_x, i_y, i_width, i_height );
                 return( 1 );
             }
 
@@ -722,8 +705,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
         /* Check that we didn't go too far */
         if( i_x > i_width )
         {
-            intf_ErrMsg( "spudec error: i_x overflowed, %i > %i",
-                         i_x, i_width );
+            msg_Err( p_spudec->p_fifo, "i_x overflowed, %i > %i",
+                                       i_x, i_width );
             return( 1 );
         }
 
@@ -740,9 +723,9 @@ static int ParseRLE( spudec_thread_t *p_spudec,
     /* We shouldn't get any padding bytes */
     if( i_y < i_height )
     {
-        intf_ErrMsg( "spudec: padding bytes found in RLE sequence" );
-        intf_ErrMsg( "spudec: send mail to <sam@zoy.org> if you "
-                     "want to help debugging this" );
+        msg_Err( p_spudec->p_fifo, "padding bytes found in RLE sequence" );
+        msg_Err( p_spudec->p_fifo, "send mail to <sam@zoy.org> if you "
+                                   "want to help debugging this" );
 
         /* Skip them just in case */
         while( i_y < i_height )
@@ -754,8 +737,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
         return( 1 );
     }
 
-    intf_WarnMsg( 3, "spudec: valid subtitle, size: %ix%i, position: %i,%i",
-                  p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
+    msg_Dbg( p_spudec->p_fifo, "valid subtitle, size: %ix%i, position: %i,%i",
+             p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
 
     /* Crop if necessary */
     if( i_skipped_top || i_skipped_bottom )
@@ -763,8 +746,8 @@ static int ParseRLE( spudec_thread_t *p_spudec,
         p_spu->i_y += i_skipped_top;
         p_spu->i_height -= i_skipped_top + i_skipped_bottom;
 
-        intf_WarnMsg( 3, "spudec: cropped to: %ix%i, position: %i,%i",
-                      p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
+        msg_Dbg( p_spudec->p_fifo, "cropped to: %ix%i, position: %i,%i",
+                 p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y );
     }
 
     /* Handle color if no palette was found */
@@ -819,8 +802,9 @@ static int ParseRLE( spudec_thread_t *p_spudec,
             p_spu->p_sys->pi_yuv[i_shade][2] = 0x80;
         }
 
-        intf_WarnMsg( 3, "spudec: using custom palette (border %i, inner %i, "
-                         "shade %i)", i_border, i_inner, i_shade );
+        msg_Dbg( p_spudec->p_fifo,
+                 "using custom palette (border %i, inner %i, shade %i)",
+                 i_border, i_inner, i_shade );
     }
 
     return( 0 );
@@ -834,7 +818,7 @@ static int ParseRLE( spudec_thread_t *p_spudec,
  * and again. Most sanity checks are already done so that this routine can be
  * as fast as possible.
  *****************************************************************************/
-static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
+static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
                        const subpicture_t *p_spu )
 {
     /* Common variables */
@@ -1196,7 +1180,7 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
 
 
     default:
-        intf_ErrMsg( "vout error: unknown chroma, can't render SPU" );
+        msg_Err( p_vout, "unknown chroma, can't render SPU" );
         break;
     }
 }

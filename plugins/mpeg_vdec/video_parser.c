@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.20 2002/05/19 12:57:32 gbazin Exp $
+ * $Id: video_parser.c,v 1.21 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -27,7 +27,9 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                              /* getpid() */
@@ -40,12 +42,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
-
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
@@ -54,10 +50,10 @@
  * Local prototypes
  */
 static int      decoder_Probe     ( u8 * );
-static int      decoder_Run       ( decoder_config_t * );
+static int      decoder_Run       ( decoder_fifo_t * );
 static int      InitThread        ( vpar_thread_t * );
 static void     EndThread         ( vpar_thread_t * );
-static void     BitstreamCallback ( bit_stream_t *, boolean_t );
+static void     BitstreamCallback ( bit_stream_t *, vlc_bool_t );
 
 /*****************************************************************************
  * Capabilities
@@ -74,16 +70,14 @@ void _M( vdec_getfunctions )( function_list_t * p_function_list )
 #define VDEC_IDCT_TEXT N_("IDCT module")
 #define VDEC_IDCT_LONGTEXT N_( \
     "This option allows you to select the IDCT module used by this video " \
-    "decoder.\n" \
-    "Note that the default behavior is to automatically select the best " \
+    "decoder. The default behavior is to automatically select the best " \
     "module available.")
 
 #define VDEC_MOTION_TEXT N_("motion compensation module")
 #define VDEC_MOTION_LONGTEXT N_( \
     "This option allows you to select the motion compensation module used by "\
-    "this video decoder.\n" \
-    "Note that the default behavior is to automatically select the best " \
-    "module available.")
+    "this video decoder. The default behavior is to automatically select the "\
+    "best module available.")
 
 #define VDEC_SMP_TEXT N_("use additional processors")
 #define VDEC_SMP_LONGTEXT N_( \
@@ -136,25 +130,23 @@ static int decoder_Probe( u8 *pi_type )
 /*****************************************************************************
  * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int decoder_Run ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_fifo_t * p_fifo )
 {
     vpar_thread_t *     p_vpar;
-    boolean_t           b_error;
+    vlc_bool_t          b_error;
 
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_vpar = (vpar_thread_t *)malloc( sizeof(vpar_thread_t) )) == NULL )
     {
-        intf_ErrMsg( "vpar error: not enough memory "
-                     "for vpar_CreateThread() to create the new thread");
-        DecoderError( p_config->p_decoder_fifo );
+        msg_Err( p_fifo, "out of memory" );
+        DecoderError( p_fifo );
         return( -1 );
     }
 
     /*
      * Initialize the thread properties
      */
-    p_vpar->p_fifo = p_config->p_decoder_fifo;
-    p_vpar->p_config = p_config;
+    p_vpar->p_fifo = p_fifo;
     p_vpar->p_vout = NULL;
 
     /*
@@ -218,14 +210,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best motion compensation module
      */
-    psz_name = config_GetPszVariable( "mpeg-motion" );
-    p_vpar->p_motion_module = module_Need( MODULE_CAPABILITY_MOTION, psz_name,
-                                           NULL );
+    psz_name = config_GetPsz( p_vpar->p_fifo, "mpeg-motion" );
+    p_vpar->p_motion_module = module_Need( p_vpar->p_fifo,
+                     MODULE_CAPABILITY_MOTION, psz_name, NULL );
     if( psz_name ) free( psz_name );
 
     if( p_vpar->p_motion_module == NULL )
     {
-        intf_ErrMsg( "vpar error: no suitable motion compensation module" );
+        msg_Err( p_vpar->p_fifo, "no suitable motion compensation module" );
         free( p_vpar );
         return( -1 );
     }
@@ -237,14 +229,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Choose the best IDCT module
      */
-    psz_name = config_GetPszVariable( "mpeg-idct" );
-    p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT, psz_name,
-                                         NULL );
+    psz_name = config_GetPsz( p_vpar->p_fifo, "mpeg-idct" );
+    p_vpar->p_idct_module = module_Need( p_vpar->p_fifo,
+                                MODULE_CAPABILITY_IDCT, psz_name, NULL );
     if( psz_name ) free( psz_name );
 
     if( p_vpar->p_idct_module == NULL )
     {
-        intf_ErrMsg( "vpar error: no suitable IDCT module" );
+        msg_Err( p_vpar->p_fifo, "no suitable IDCT module" );
         module_Unneed( p_vpar->p_motion_module );
         free( p_vpar );
         return( -1 );
@@ -260,7 +252,7 @@ static int InitThread( vpar_thread_t *p_vpar )
 #undef f
 
     /* Initialize input bitstream */
-    InitBitstream( &p_vpar->bit_stream, p_vpar->p_config->p_decoder_fifo,
+    InitBitstream( &p_vpar->bit_stream, p_vpar->p_fifo,
                    BitstreamCallback, (void *)p_vpar );
 
     /* Initialize parsing data */
@@ -312,6 +304,11 @@ static int InitThread( vpar_thread_t *p_vpar )
  *****************************************************************************/
 static void EndThread( vpar_thread_t *p_vpar )
 {
+#ifdef HAVE_SYS_TIMES_H
+    struct tms cpu_usage;
+    times( &cpu_usage );
+#endif
+
     /* Release used video buffers. */
     if( p_vpar->sequence.p_forward != NULL )
     {
@@ -328,53 +325,50 @@ static void EndThread( vpar_thread_t *p_vpar )
         vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
     }
 
-    if( p_main->b_stats )
-    {
-#ifdef HAVE_SYS_TIMES_H
-        struct tms cpu_usage;
-        times( &cpu_usage );
-#endif
+    /* We are about to die. Reattach video output to p_vlc. */
+    vlc_object_unlink( p_vpar->p_vout, p_vpar->p_fifo );
+    vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo->p_vlc );
 
-        intf_StatMsg( "vpar stats: %d loops among %d sequence(s)",
-                      p_vpar->c_loops, p_vpar->c_sequences );
+    msg_Dbg( p_vpar->p_fifo, "%d loops among %d sequence(s)",
+             p_vpar->c_loops, p_vpar->c_sequences );
 
 #ifdef HAVE_SYS_TIMES_H
-        intf_StatMsg( "vpar stats: cpu usage (user: %d, system: %d)",
-                      cpu_usage.tms_utime, cpu_usage.tms_stime );
+    msg_Dbg( p_vpar->p_fifo, "cpu usage (user: %d, system: %d)",
+             cpu_usage.tms_utime, cpu_usage.tms_stime );
 #endif
 
-        intf_StatMsg( "vpar stats: Read %d frames/fields (I %d/P %d/B %d)",
-                      p_vpar->pc_pictures[I_CODING_TYPE]
-                      + p_vpar->pc_pictures[P_CODING_TYPE]
-                      + p_vpar->pc_pictures[B_CODING_TYPE],
-                      p_vpar->pc_pictures[I_CODING_TYPE],
-                      p_vpar->pc_pictures[P_CODING_TYPE],
-                      p_vpar->pc_pictures[B_CODING_TYPE] );
-        intf_StatMsg( "vpar stats: Decoded %d frames/fields (I %d/P %d/B %d)",
-                      p_vpar->pc_decoded_pictures[I_CODING_TYPE]
-                      + p_vpar->pc_decoded_pictures[P_CODING_TYPE]
-                      + p_vpar->pc_decoded_pictures[B_CODING_TYPE],
-                      p_vpar->pc_decoded_pictures[I_CODING_TYPE],
-                      p_vpar->pc_decoded_pictures[P_CODING_TYPE],
-                      p_vpar->pc_decoded_pictures[B_CODING_TYPE] );
-        intf_StatMsg( "vpar stats: Read %d malformed frames/fields (I %d/P %d/B %d)",
-                      p_vpar->pc_malformed_pictures[I_CODING_TYPE]
-                      + p_vpar->pc_malformed_pictures[P_CODING_TYPE]
-                      + p_vpar->pc_malformed_pictures[B_CODING_TYPE],
-                      p_vpar->pc_malformed_pictures[I_CODING_TYPE],
-                      p_vpar->pc_malformed_pictures[P_CODING_TYPE],
-                      p_vpar->pc_malformed_pictures[B_CODING_TYPE] );
+    msg_Dbg( p_vpar->p_fifo, "read %d frames/fields (I %d/P %d/B %d)",
+             p_vpar->pc_pictures[I_CODING_TYPE]
+             + p_vpar->pc_pictures[P_CODING_TYPE]
+             + p_vpar->pc_pictures[B_CODING_TYPE],
+             p_vpar->pc_pictures[I_CODING_TYPE],
+             p_vpar->pc_pictures[P_CODING_TYPE],
+             p_vpar->pc_pictures[B_CODING_TYPE] );
+    msg_Dbg( p_vpar->p_fifo, "decoded %d frames/fields (I %d/P %d/B %d)",
+             p_vpar->pc_decoded_pictures[I_CODING_TYPE]
+             + p_vpar->pc_decoded_pictures[P_CODING_TYPE]
+             + p_vpar->pc_decoded_pictures[B_CODING_TYPE],
+             p_vpar->pc_decoded_pictures[I_CODING_TYPE],
+             p_vpar->pc_decoded_pictures[P_CODING_TYPE],
+             p_vpar->pc_decoded_pictures[B_CODING_TYPE] );
+    msg_Dbg( p_vpar->p_fifo,
+             "read %d malformed frames/fields (I %d/P %d/B %d)",
+             p_vpar->pc_malformed_pictures[I_CODING_TYPE]
+             + p_vpar->pc_malformed_pictures[P_CODING_TYPE]
+             + p_vpar->pc_malformed_pictures[B_CODING_TYPE],
+             p_vpar->pc_malformed_pictures[I_CODING_TYPE],
+             p_vpar->pc_malformed_pictures[P_CODING_TYPE],
+             p_vpar->pc_malformed_pictures[B_CODING_TYPE] );
 #define S   p_vpar->sequence
-        intf_StatMsg( "vpar info: %s stream (%dx%d), %d.%d pi/s",
-                      S.b_mpeg2 ? "MPEG-2" : "MPEG-1",
-                      S.i_width, S.i_height, S.i_frame_rate/1001,
-                      S.i_frame_rate % 1001 );
-        intf_StatMsg( "vpar info: %s, %s, matrix_coeff: %d",
-                      S.b_progressive ? "Progressive" : "Non-progressive",
-                      S.i_scalable_mode ? "scalable" : "non-scalable",
-                      S.i_matrix_coefficients );
+    msg_Dbg( p_vpar->p_fifo, "%s stream (%dx%d), %d.%d pi/s",
+             S.b_mpeg2 ? "MPEG-2" : "MPEG-1",
+             S.i_width, S.i_height, S.i_frame_rate/1001,
+             S.i_frame_rate % 1001 );
+    msg_Dbg( p_vpar->p_fifo, "%s, %s, matrix_coeff: %d",
+             S.b_progressive ? "Progressive" : "Non-progressive",
+             S.i_scalable_mode ? "scalable" : "non-scalable",
+             S.i_matrix_coefficients );
 #undef S
-    }
 
     /* Dispose of matrices if they have been allocated. */
     if( p_vpar->sequence.intra_quant.b_allocated )
@@ -408,7 +402,7 @@ static void EndThread( vpar_thread_t *p_vpar )
  * This function is called by input's NextDataPacket.
  *****************************************************************************/
 static void BitstreamCallback ( bit_stream_t * p_bit_stream,
-                                boolean_t b_new_pes )
+                                vlc_bool_t b_new_pes )
 {
     vpar_thread_t * p_vpar = (vpar_thread_t *)p_bit_stream->p_callback_arg;
 

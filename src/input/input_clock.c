@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.31 2002/05/17 18:06:34 stef Exp $
+ * $Id: input_clock.c,v 1.32 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -258,7 +258,7 @@ void input_ClockManageRef( input_thread_t * p_input,
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
              * stream ?). */
-            intf_WarnMsg( 1, "Clock gap, unexpected stream discontinuity" );
+            msg_Warn( p_input, "clock gap, unexpected stream discontinuity" );
             input_ClockInit( p_pgrm );
             p_pgrm->i_synchro_state = SYNCHRO_START;
             input_EscapeDiscontinuity( p_input );
@@ -323,7 +323,8 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
     {
         return( ClockToSysdate( p_input, p_pgrm, i_ts + p_pgrm->delta_cr )
                  + DEFAULT_PTS_DELAY
-                 + (p_main->i_desync > 0 ? p_main->i_desync : 0) );
+                 + (p_input->p_vlc->i_desync > 0
+                       ? p_input->p_vlc->i_desync : 0) );
     }
     else
     {

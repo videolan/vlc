@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.5 2002/05/18 17:47:47 sam Exp $
+ * $Id: video_parser.h,v 1.6 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -96,7 +96,7 @@ PROTO_PICD( vpar_PictureData1D )
 typedef struct quant_matrix_s
 {
     u8 *        pi_matrix;
-    boolean_t   b_allocated;
+    vlc_bool_t  b_allocated;
                           /* Has the matrix been allocated by vpar_headers ? */
 } quant_matrix_t;
 
@@ -117,10 +117,10 @@ typedef struct sequence_s
     unsigned int        i_matrix_coefficients;/* coeffs of the YUV transform */
     int                 i_chroma_format, i_scalable_mode;
     int                 i_chroma_nb_blocks;
-    boolean_t           b_chroma_h_subsampled, b_chroma_v_subsampled;
+    vlc_bool_t          b_chroma_h_subsampled, b_chroma_v_subsampled;
     int                 i_frame_rate;  /* theoritical frame rate in fps*1001 */
-    boolean_t           b_mpeg2;                                    /* guess */
-    boolean_t           b_progressive;              /* progressive (ie.
+    vlc_bool_t          b_mpeg2;                                    /* guess */
+    vlc_bool_t          b_progressive;              /* progressive (ie.
                                                      * non-interlaced) frame */
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
@@ -131,15 +131,15 @@ typedef struct sequence_s
     picture_t *         p_backward;      /* current backward reference frame */
     mtime_t             next_pts, next_dts;
     int                 i_current_rate;
-    boolean_t           b_expect_discontinuity; /* reset the frame predictors
+    vlc_bool_t          b_expect_discontinuity; /* reset the frame predictors
                                                  * after the current frame   */
 
     /* Copyright extension */
-    boolean_t           b_copyright_flag;     /* Whether the following
+    vlc_bool_t          b_copyright_flag;     /* Whether the following
                                                  information is significant
                                                  or not. */
     u8                  i_copyright_id;
-    boolean_t           b_original;
+    vlc_bool_t          b_original;
     u64                 i_copyright_nb;
 } sequence_t;
 
@@ -153,22 +153,22 @@ typedef struct picture_parsing_s
     /* Values from the picture_coding_extension. */
     int                 ppi_f_code[2][2];
     int                 i_intra_dc_precision;
-    boolean_t           b_frame_pred_frame_dct, b_q_scale_type;
-    boolean_t           b_intra_vlc_format;
-    boolean_t           b_progressive;
+    vlc_bool_t          b_frame_pred_frame_dct, b_q_scale_type;
+    vlc_bool_t          b_intra_vlc_format;
+    vlc_bool_t          b_progressive;
     u8 *                pi_scan;
-    boolean_t           b_top_field_first, b_concealment_mv;
-    boolean_t           b_repeat_first_field;
+    vlc_bool_t          b_top_field_first, b_concealment_mv;
+    vlc_bool_t          b_repeat_first_field;
     /* Relative to the current field */
     int                 i_coding_type, i_structure, i_field_width;
-    boolean_t           b_frame_structure; /* i_structure == FRAME_STRUCTURE */
-    boolean_t           b_current_field;         /* i_structure == TOP_FIELD */
-    boolean_t           b_second_field;
+    vlc_bool_t          b_frame_structure; /* i_structure == FRAME_STRUCTURE */
+    vlc_bool_t          b_current_field;         /* i_structure == TOP_FIELD */
+    vlc_bool_t          b_second_field;
 
     picture_t *         p_picture;               /* picture buffer from vout */
     int                 i_current_structure;   /* current parsed structure of
                                                 * p_picture (second field ?) */
-    boolean_t           b_error;            /* parsing error, try to recover */
+    vlc_bool_t          b_error;            /* parsing error, try to recover */
 
     /* Given by the video output */
     int                 i_lum_stride, i_chrom_stride;
@@ -264,7 +264,7 @@ typedef struct video_synchro_s
 
     /* stream context */
     unsigned int    i_eta_p, i_eta_b;
-    boolean_t       b_dropped_last;            /* for special synchros below */
+    vlc_bool_t      b_dropped_last;            /* for special synchros below */
     mtime_t         backward_pts, current_pts;
     int             i_current_period;   /* period to add to the next picture */
     int             i_backward_period;  /* period to add after the next
@@ -287,7 +287,7 @@ typedef struct video_synchro_s
  * Prototypes
  *****************************************************************************/
 void vpar_SynchroInit           ( struct vpar_thread_s * p_vpar );
-boolean_t vpar_SynchroChoose    ( struct vpar_thread_s * p_vpar,
+vlc_bool_t vpar_SynchroChoose   ( struct vpar_thread_s * p_vpar,
                                   int i_coding_type, int i_structure );
 void vpar_SynchroTrash          ( struct vpar_thread_s * p_vpar,
                                   int i_coding_type, int i_structure );
@@ -317,7 +317,6 @@ typedef struct vpar_thread_s
 
     /* Input properties */
     decoder_fifo_t *        p_fifo;                        /* PES input fifo */
-    decoder_config_t *      p_config;
 
     /* Output properties */
     vout_thread_t *         p_vout;                   /* video output thread */
@@ -338,10 +337,10 @@ typedef struct vpar_thread_s
     u8                      pi_default_nonintra_quant[64];
 
     /* Motion compensation plug-in used and shortcuts */
-    struct module_s *       p_motion_module;
+    module_t *       p_motion_module;
 
     /* IDCT plug-in used and shortcuts */
-    struct module_s *       p_idct_module;
+    module_t *       p_idct_module;
     void ( * pf_sparse_idct_add )( dctelem_t *, yuv_data_t *, int,
                                  void *, int );
     void ( * pf_idct_add )     ( dctelem_t *, yuv_data_t *, int,

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.180 2002/05/29 18:39:14 sam Exp $
+ * $Id: video_output.c,v 1.181 2002/06/01 12:32:02 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -32,7 +32,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>
@@ -44,11 +44,11 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int      InitThread        ( vout_thread_t *p_vout );
-static void     RunThread         ( vout_thread_t *p_vout );
-static void     ErrorThread       ( vout_thread_t *p_vout );
-static void     EndThread         ( vout_thread_t *p_vout );
-static void     DestroyThread     ( vout_thread_t *p_vout, int i_status );
+static int      InitThread        ( vout_thread_t * );
+static void     RunThread         ( vout_thread_t * );
+static void     ErrorThread       ( vout_thread_t * );
+static void     EndThread         ( vout_thread_t * );
+static void     DestroyThread     ( vout_thread_t * );
 
 static int      ReduceHeight      ( int );
 static int      BinaryLog         ( u32 );
@@ -56,72 +56,32 @@ static void     MaskToShift       ( int *, int *, u32 );
 static void     InitWindowSize    ( vout_thread_t *, int *, int * );
 
 /*****************************************************************************
- * vout_InitBank: initialize the video output bank.
- *****************************************************************************/
-void vout_InitBank ( void )
-{
-    p_vout_bank->i_count = 0;
-
-    vlc_mutex_init( &p_vout_bank->lock );
-}
-
-/*****************************************************************************
- * vout_EndBank: empty the video output bank.
- *****************************************************************************
- * This function ends all unused video outputs and empties the bank in
- * case of success.
- *****************************************************************************/
-void vout_EndBank ( void )
-{
-    /* Ask all remaining video outputs to die */
-    while( p_vout_bank->i_count )
-    {
-        vout_DestroyThread(
-                p_vout_bank->pp_vout[ --p_vout_bank->i_count ], NULL );
-    }
-
-    vlc_mutex_destroy( &p_vout_bank->lock );
-}
-
-/*****************************************************************************
  * vout_CreateThread: creates a new video output thread
  *****************************************************************************
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
- * If pi_status is NULL, then the function will block until the thread is ready.
- * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-vout_thread_t * vout_CreateThread   ( int *pi_status,
+vout_thread_t * vout_CreateThread   ( vlc_object_t *p_parent,
                                       int i_width, int i_height,
                                       u32 i_chroma, int i_aspect )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
-    int             i_status;                               /* thread status */
     int             i_index;                                /* loop variable */
     char          * psz_plugin;
 
     /* Allocate descriptor */
-    p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
+    p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
     if( p_vout == NULL )
     {
-        intf_ErrMsg( "vout error: vout thread creation returned %s",
-                     strerror(ENOMEM) );
+        msg_Err( p_parent, "out of memory" );
         return( NULL );
     }
 
     /* Choose the best module */
-    if( !(psz_plugin = config_GetPszVariable( "filter" )) )
+    if( !(psz_plugin = config_GetPsz( p_vout, "filter" )) )
     {
-        psz_plugin = config_GetPszVariable( "vout" );
+        psz_plugin = config_GetPsz( p_vout, "vout" );
     }
-
-    /* Initialize thread properties - thread id and locks will be initialized
-     * later */
-    p_vout->b_die               = 0;
-    p_vout->b_error             = 0;
-    p_vout->b_active            = 0;
-    p_vout->pi_status           = (pi_status != NULL) ? pi_status : &i_status;
-    *p_vout->pi_status          = THREAD_CREATE;
 
     /* Initialize pictures and subpictures - translation tables and functions
      * will be initialized later in InitThread */
@@ -174,22 +134,24 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
     p_vout->c_fps_samples= 0;
 
     /* user requested fullscreen? */
-    if( config_GetIntVariable( "fullscreen" ) )
+    if( config_GetInt( p_vout, "fullscreen" ) )
+    {
         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    }
 
     /* Initialize the dimensions of the video window */
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
 
 
-    p_vout->p_module
-        = module_Need( MODULE_CAPABILITY_VOUT, psz_plugin, (void *)p_vout );
+    p_vout->p_module = module_Need( p_vout, MODULE_CAPABILITY_VOUT,
+                                    psz_plugin, (void *)p_vout );
 
     if( psz_plugin ) free( psz_plugin );
     if( p_vout->p_module == NULL )
     {
-        intf_ErrMsg( "vout error: no suitable vout module" );
-        free( p_vout );
+        msg_Err( p_vout, "no suitable vout module" );
+        vlc_object_destroy( p_vout );
         return( NULL );
     }
 
@@ -204,35 +166,22 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
 #undef f
 
     /* Create thread and set locks */
-    vlc_mutex_init( &p_vout->picture_lock );
-    vlc_mutex_init( &p_vout->subpicture_lock );
-    vlc_mutex_init( &p_vout->change_lock );
+    vlc_mutex_init( p_vout, &p_vout->picture_lock );
+    vlc_mutex_init( p_vout, &p_vout->subpicture_lock );
+    vlc_mutex_init( p_vout, &p_vout->change_lock );
 
-    if( vlc_thread_create( &p_vout->thread_id, "video output",
-                           (void *) RunThread, (void *) p_vout) )
+    vlc_object_attach( p_vout, p_parent );
+
+    if( vlc_thread_create( p_vout, "video output", RunThread, 0 ) )
     {
-        intf_ErrMsg("vout error: %s", strerror(ENOMEM));
+        msg_Err( p_vout, "%s", strerror(ENOMEM) );
         p_vout->pf_destroy( p_vout );
         module_Unneed( p_vout->p_module );
-        free( p_vout );
-        return( NULL );
+        vlc_object_destroy( p_vout );
+        return NULL;
     }
 
-    /* If status is NULL, wait until the thread is created */
-    if( pi_status == NULL )
-    {
-        do
-        {
-            msleep( THREAD_SLEEP );
-        }while( (i_status != THREAD_READY) && (i_status != THREAD_ERROR)
-                && (i_status != THREAD_FATAL) );
-        if( i_status != THREAD_READY )
-        {
-            return( NULL );
-        }
-    }
-
-    return( p_vout );
+    return p_vout;
 }
 
 /*****************************************************************************
@@ -243,21 +192,17 @@ vout_thread_t * vout_CreateThread   ( int *pi_status,
  * is NULL, it will return once the thread is destroyed. Else, it will be
  * update using one of the THREAD_* constants.
  *****************************************************************************/
-void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
+void vout_DestroyThread( vout_thread_t *p_vout )
 {
-    int     i_status;                                       /* thread status */
-
-    /* Set status */
-    p_vout->pi_status = (pi_status != NULL) ? pi_status : &i_status;
-    *p_vout->pi_status = THREAD_DESTROY;
+    /* Unlink object */
+    vlc_object_unlink_all( p_vout );
 
     /* Request thread destruction */
     p_vout->b_die = 1;
-    /* only if pi_status is NULL */
-    vlc_thread_join( p_vout->thread_id );
+    vlc_thread_join( p_vout );
 
     /* Free structure */
-    free( p_vout );
+    vlc_object_destroy( p_vout );
 }
 
 /*****************************************************************************
@@ -333,9 +278,6 @@ static int InitThread( vout_thread_t *p_vout )
 {
     int i, i_pgcd;
 
-    /* Update status */
-    *p_vout->pi_status = THREAD_START;
-
     vlc_mutex_lock( &p_vout->change_lock );
 
 #ifdef STATS
@@ -351,30 +293,28 @@ static int InitThread( vout_thread_t *p_vout )
 
     if( !I_OUTPUTPICTURES )
     {
-        intf_ErrMsg( "vout error: plugin was unable to allocate at least "
-                     "one direct buffer" );
+        msg_Err( p_vout, "plugin was unable to allocate at least "
+                         "one direct buffer" );
         p_vout->pf_end( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
         return( 1 );
     }
 
-    intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
+    msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
 
     i_pgcd = ReduceHeight( p_vout->render.i_aspect );
-    intf_WarnMsg( 1, "vout info: picture in %ix%i, chroma 0x%.8x (%4.4s), "
-                     "aspect ratio %i:%i",
-                  p_vout->render.i_width, p_vout->render.i_height,
-                  p_vout->render.i_chroma, (char*)&p_vout->render.i_chroma,
-                  p_vout->render.i_aspect / i_pgcd,
-                  VOUT_ASPECT_FACTOR / i_pgcd );
+    msg_Dbg( p_vout,
+             "picture in %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
+             p_vout->render.i_width, p_vout->render.i_height,
+             p_vout->render.i_chroma, (char*)&p_vout->render.i_chroma,
+             p_vout->render.i_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
 
     i_pgcd = ReduceHeight( p_vout->output.i_aspect );
-    intf_WarnMsg( 1, "vout info: picture out %ix%i, chroma 0x%.8x (%4.4s), "
-                     "aspect ratio %i:%i",
-                  p_vout->output.i_width, p_vout->output.i_height,
-                  p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma,
-                  p_vout->output.i_aspect / i_pgcd,
-                  VOUT_ASPECT_FACTOR / i_pgcd );
+    msg_Dbg( p_vout,
+             "picture out %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
+             p_vout->output.i_width, p_vout->output.i_height,
+             p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma,
+             p_vout->output.i_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
 
     /* Calculate shifts from system-updated masks */
     MaskToShift( &p_vout->output.i_lrshift, &p_vout->output.i_rrshift,
@@ -397,9 +337,9 @@ static int InitThread( vout_thread_t *p_vout )
          * for memcpy operations */
         p_vout->b_direct = 1;
 
-        intf_WarnMsg( 2, "vout info: direct render, mapping "
-                         "render pictures 0-%i to system pictures 1-%i",
-                         VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
+        msg_Dbg( p_vout, "direct render, mapping "
+                 "render pictures 0-%i to system pictures 1-%i",
+                 VOUT_MAX_PICTURES - 2, VOUT_MAX_PICTURES - 1 );
 
         for( i = 1; i < VOUT_MAX_PICTURES; i++ )
         {
@@ -415,13 +355,14 @@ static int InitThread( vout_thread_t *p_vout )
         p_vout->b_direct = 0;
 
         /* Choose the best module */
-        p_vout->chroma.p_module
-            = module_Need( MODULE_CAPABILITY_CHROMA, NULL, (void *)p_vout );
+        p_vout->chroma.p_module =
+            module_Need( p_vout, MODULE_CAPABILITY_CHROMA,
+                         NULL, (void *)p_vout );
 
         if( p_vout->chroma.p_module == NULL )
         {
-            intf_ErrMsg( "vout error: no chroma module for %4.4s to %4.4s",
-                         &p_vout->render.i_chroma, &p_vout->output.i_chroma );
+            msg_Err( p_vout, "no chroma module for %4.4s to %4.4s",
+                     &p_vout->render.i_chroma, &p_vout->output.i_chroma );
             p_vout->pf_end( p_vout );
             vlc_mutex_unlock( &p_vout->change_lock );
             return( 1 );
@@ -434,18 +375,17 @@ static int InitThread( vout_thread_t *p_vout )
 
         if( I_OUTPUTPICTURES < 2 * VOUT_MAX_PICTURES )
         {
-            intf_WarnMsg( 2, "vout info: indirect render, mapping "
-                             "render pictures %i-%i to system pictures %i-%i",
-                             I_OUTPUTPICTURES - 1, 2 * VOUT_MAX_PICTURES - 2,
-                             I_OUTPUTPICTURES, 2 * VOUT_MAX_PICTURES - 1 );
+            msg_Dbg( p_vout, "indirect render, mapping "
+                     "render pictures %i-%i to system pictures %i-%i",
+                     I_OUTPUTPICTURES - 1, 2 * VOUT_MAX_PICTURES - 2,
+                     I_OUTPUTPICTURES, 2 * VOUT_MAX_PICTURES - 1 );
         }
         else
         {
-            /* FIXME: if this happens, we don't have any render picture left */
-            intf_WarnMsg( 2, "vout info: indirect render, no system "
-                             "pictures needed, we have %i directbuffers",
-                             I_OUTPUTPICTURES );
-            intf_ErrMsg( "vout: this is a bug!\n");
+            /* FIXME: if this happens, we don't have any render pictures left */
+            msg_Dbg( p_vout, "indirect render, no system pictures needed,"
+                     " we have %i directbuffers", I_OUTPUTPICTURES );
+            msg_Err( p_vout, "this is a bug!" );
         }
 
         /* Append render buffers after the direct buffers */
@@ -467,10 +407,7 @@ static int InitThread( vout_thread_t *p_vout )
         PP_OUTPUTPICTURE[ i ]->p_heap = &p_vout->output;
     }
 
-    /* Mark thread as running and return */
-    p_vout->b_active = 1;
-    *p_vout->pi_status = THREAD_READY;
-
+/* XXX XXX mark thread ready */
     return( 0 );
 }
 
@@ -503,7 +440,7 @@ static void RunThread( vout_thread_t *p_vout)
         /* Destroy thread structures allocated by Create and InitThread */
         p_vout->pf_destroy( p_vout );
 
-        DestroyThread( p_vout, THREAD_ERROR );
+        DestroyThread( p_vout );
         return;
     }
 
@@ -521,8 +458,8 @@ static void RunThread( vout_thread_t *p_vout)
         p_vout->c_loops++;
         if( !(p_vout->c_loops % VOUT_STATS_NB_LOOPS) )
         {
-            intf_Msg( "vout stats: picture heap: %d/%d",
-                      I_RENDERPICTURES, p_vout->i_heap_size );
+            msg_Dbg( p_vout, "picture heap: %d/%d",
+                     I_RENDERPICTURES, p_vout->i_heap_size );
         }
 #endif
 
@@ -601,8 +538,8 @@ static void RunThread( vout_thread_t *p_vout)
                     p_picture->i_status = DESTROYED_PICTURE;
                     p_vout->i_heap_size--;
                 }
-                intf_WarnMsg( 1, "vout warning: late picture skipped (%lld)",
-                              current_date - display_date );
+                msg_Warn( p_vout, "late picture skipped (%lld)",
+                                  current_date - display_date );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;
@@ -643,10 +580,10 @@ static void RunThread( vout_thread_t *p_vout)
             }
             else if( p_picture == p_last_picture )
             {
+                /* We are asked to repeat the previous picture, but we first
+                 * wait for a couple of idle loops */
                 if( i_idle_loops < 4 )
                 {
-                    /* We are asked to repeat the previous picture, but we first
-                     * wait for a couple of idle loops */
                     p_picture    = NULL;
                     display_date = 0;
                 }
@@ -753,7 +690,7 @@ static void RunThread( vout_thread_t *p_vout)
             I_OUTPUTPICTURES = 0;
             if( p_vout->pf_init( p_vout ) )
             {
-                intf_ErrMsg( "vout error: cannot resize display" );
+                msg_Err( p_vout, "cannot resize display" );
                 /* FixMe: p_vout->pf_end will be called again in EndThread() */
                 p_vout->b_error = 1;
             }
@@ -780,7 +717,7 @@ static void RunThread( vout_thread_t *p_vout)
     p_vout->pf_destroy( p_vout );
 
     /* Destroy thread structures allocated by CreateThread */
-    DestroyThread( p_vout, THREAD_OVER );
+    DestroyThread( p_vout );
 }
 
 /*****************************************************************************
@@ -810,16 +747,13 @@ static void EndThread( vout_thread_t *p_vout )
 {
     int     i_index;                                        /* index in heap */
 
-    /* Store status */
-    *p_vout->pi_status = THREAD_END;
-
 #ifdef STATS
     {
         struct tms cpu_usage;
         times( &cpu_usage );
 
-        intf_Msg( "vout stats: cpu usage (user: %d, system: %d)",
-                  cpu_usage.tms_utime, cpu_usage.tms_stime );
+        msg_Dbg( p_vout, "cpu usage (user: %d, system: %d)",
+                 cpu_usage.tms_utime, cpu_usage.tms_stime );
     }
 #endif
 
@@ -860,13 +794,8 @@ static void EndThread( vout_thread_t *p_vout )
  * This function is called when the thread ends. It frees all ressources
  * allocated by CreateThread. Status is available at this stage.
  *****************************************************************************/
-static void DestroyThread( vout_thread_t *p_vout, int i_status )
+static void DestroyThread( vout_thread_t *p_vout )
 {
-    int *pi_status;                                         /* status adress */
-
-    /* Store status adress */
-    pi_status = p_vout->pi_status;
-
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->subpicture_lock );
@@ -874,8 +803,6 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
 
     /* Release the module */
     module_Unneed( p_vout->p_module );
-
-    *pi_status = i_status;
 }
 
 /* following functions are local */
@@ -925,16 +852,13 @@ static int BinaryLog(u32 i)
 {
     int i_log = 0;
 
-    if(i & 0xffff0000) i_log += 16;
-    if(i & 0xff00ff00) i_log += 8;
-    if(i & 0xf0f0f0f0) i_log += 4;
-    if(i & 0xcccccccc) i_log += 2;
-    if(i & 0xaaaaaaaa) i_log += 1;
+    if( i == 0 ) return -31337;
 
-    if (i != ((u32)1 << i_log))
-    {
-        intf_ErrMsg( "vout error: binary log overflow for %i", i );
-    }
+    if( i & 0xffff0000 ) i_log += 16;
+    if( i & 0xff00ff00 ) i_log += 8;
+    if( i & 0xf0f0f0f0 ) i_log += 4;
+    if( i & 0xcccccccc ) i_log += 2;
+    if( i & 0xaaaaaaaa ) i_log += 1;
 
     return( i_log );
 }
@@ -979,9 +903,9 @@ static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
     int i_width, i_height;
     double f_zoom;
 
-    i_width = config_GetIntVariable( "width" );
-    i_height = config_GetIntVariable( "height" );
-    f_zoom = config_GetFloatVariable( "zoom" );
+    i_width = config_GetInt( p_vout, "width" );
+    i_height = config_GetInt( p_vout, "height" );
+    f_zoom = config_GetFloat( p_vout, "zoom" );
 
     if( (i_width >= 0) && (i_height >= 0))
     {

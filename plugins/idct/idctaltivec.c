@@ -1,8 +1,8 @@
 /*****************************************************************************
- * idctaltivec.c : Altivec IDCT module
+ * idctaltivec.c : AltiVec IDCT module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: idctaltivec.c,v 1.24 2002/04/19 13:56:11 sam Exp $
+ * $Id: idctaltivec.c,v 1.25 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -30,7 +30,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "idct.h"
 
@@ -46,11 +46,10 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( _("Altivec IDCT module") )
+    SET_DESCRIPTION( _("AltiVec IDCT module") )
     ADD_CAPABILITY( IDCT, 200 )
     ADD_REQUIREMENT( ALTIVEC )
     ADD_SHORTCUT( "altivec" )
-    ADD_SHORTCUT( "idctaltivec" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -87,7 +86,7 @@ static void InitIDCT( void ** pp_idct_data )
 }
 
 /*****************************************************************************
- * IDCT in Altivec
+ * IDCT in AltiVec
  *****************************************************************************/
 
 #ifndef CAN_COMPILE_C_ALTIVEC

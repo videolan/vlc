@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.27 2002/05/15 13:07:18 marcari Exp $
+ * $Id: modules_plugin.h,v 1.28 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,8 +31,7 @@
  * This function loads a dynamically linked library using a system dependant
  * method, and returns a non-zero value on error, zero otherwise.
  *****************************************************************************/
-static __inline__ int
-module_load( char * psz_filename, module_handle_t * handle )
+static inline int module_load( char * psz_filename, module_handle_t * handle )
 {
 #ifdef SYS_BEOS
     *handle = load_add_on( psz_filename );
@@ -70,8 +69,7 @@ module_load( char * psz_filename, module_handle_t * handle )
  * using a system dependant method. No return value is taken in consideration,
  * since some libraries sometimes refuse to close properly.
  *****************************************************************************/
-static __inline__ void
-module_unload( module_handle_t handle )
+static inline void module_unload( module_handle_t handle )
 {
 #ifdef SYS_BEOS
     unload_add_on( handle );
@@ -93,8 +91,8 @@ module_unload( module_handle_t handle )
  * string, and returns a pointer to it. We don't check for dlerror() or
  * similar functions, since we want a non-NULL symbol anyway.
  *****************************************************************************/
-static __inline__ void *
-module_getsymbol_inner( module_handle_t handle, char * psz_function )
+static inline void * _module_getsymbol( module_handle_t handle,
+                                        char * psz_function )
 {
 #ifdef SYS_BEOS
     void * p_symbol;
@@ -117,10 +115,10 @@ module_getsymbol_inner( module_handle_t handle, char * psz_function )
 #endif
 }
 
-static __inline__ void *
-module_getsymbol( module_handle_t handle, char * psz_function )
+static inline void * module_getsymbol( module_handle_t handle,
+                                       char * psz_function )
 {
-    void * p_symbol = module_getsymbol_inner( handle, psz_function );
+    void * p_symbol = _module_getsymbol( handle, psz_function );
 
     /* MacOS X dl library expects symbols to begin with "_". So do
      * some other operating systems. That's really lame, but hey, what
@@ -131,7 +129,7 @@ module_getsymbol( module_handle_t handle, char * psz_function )
 
         strcpy( psz_call + 1, psz_function );
         psz_call[ 0 ] = '_';
-        p_symbol = module_getsymbol_inner( handle, psz_call );
+        p_symbol = _module_getsymbol( handle, psz_call );
         free( psz_call );
     }
 
@@ -146,8 +144,7 @@ module_getsymbol( module_handle_t handle, char * psz_function )
  * function. psz_buffer can be used to store temporary data, it is guaranteed
  * to be kept intact until the return value of module_error has been used.
  *****************************************************************************/
-static __inline__ const char *
-module_error( char *psz_buffer )
+static inline const char * module_error( char *psz_buffer )
 {
 #if defined(SYS_BEOS)
     return( "failed" );
@@ -182,121 +179,136 @@ module_error( char *psz_buffer )
  * STORE_SYMBOLS: store known symbols into p_symbols for plugin access.
  *****************************************************************************/
 #define STORE_SYMBOLS( p_symbols ) \
-    (p_symbols)->p_main = p_main; \
-    (p_symbols)->p_module_bank = p_module_bank; \
-    (p_symbols)->p_input_bank = p_input_bank; \
-    (p_symbols)->p_aout_bank = p_aout_bank; \
-    (p_symbols)->p_vout_bank = p_vout_bank; \
-    (p_symbols)->config_GetIntVariable = config_GetIntVariable; \
-    (p_symbols)->config_GetPszVariable = config_GetPszVariable; \
-    (p_symbols)->config_GetFloatVariable = config_GetFloatVariable; \
-    (p_symbols)->config_PutIntVariable = config_PutIntVariable; \
-    (p_symbols)->config_PutPszVariable = config_PutPszVariable; \
-    (p_symbols)->config_PutFloatVariable = config_PutFloatVariable; \
-    (p_symbols)->config_LoadConfigFile = config_LoadConfigFile; \
-    (p_symbols)->config_SaveConfigFile = config_SaveConfigFile; \
-    (p_symbols)->config_Duplicate = config_Duplicate; \
-    (p_symbols)->config_FindConfig = config_FindConfig; \
-    (p_symbols)->config_SetCallbacks = config_SetCallbacks; \
-    (p_symbols)->config_UnsetCallbacks = config_UnsetCallbacks; \
-    (p_symbols)->intf_MsgSub = intf_MsgSub; \
-    (p_symbols)->intf_MsgUnsub = intf_MsgUnsub; \
-    (p_symbols)->intf_Msg = intf_Msg; \
-    (p_symbols)->intf_ErrMsg = intf_ErrMsg; \
-    (p_symbols)->intf_StatMsg = intf_StatMsg;\
-    (p_symbols)->intf_WarnMsg = intf_WarnMsg; \
-    (p_symbols)->intf_PlaylistAdd = intf_PlaylistAdd; \
-    (p_symbols)->intf_PlaylistDelete = intf_PlaylistDelete; \
-    (p_symbols)->intf_PlaylistNext = intf_PlaylistNext; \
-    (p_symbols)->intf_PlaylistPrev = intf_PlaylistPrev; \
-    (p_symbols)->intf_PlaylistDestroy = intf_PlaylistDestroy; \
-    (p_symbols)->intf_PlaylistJumpto = intf_PlaylistJumpto; \
-    (p_symbols)->intf_UrlDecode = intf_UrlDecode; \
-    (p_symbols)->intf_Eject = intf_Eject; \
-    (p_symbols)->msleep = msleep; \
-    (p_symbols)->mdate = mdate; \
-    (p_symbols)->mstrtime = mstrtime; \
-    (p_symbols)->network_ChannelCreate = network_ChannelCreate; \
-    (p_symbols)->network_ChannelJoin = network_ChannelJoin; \
-    (p_symbols)->input_SetProgram = input_SetProgram; \
-    (p_symbols)->input_SetStatus = input_SetStatus; \
-    (p_symbols)->input_Seek = input_Seek; \
-    (p_symbols)->input_DumpStream = input_DumpStream; \
-    (p_symbols)->input_OffsetToTime = input_OffsetToTime; \
-    (p_symbols)->input_ChangeES = input_ChangeES; \
-    (p_symbols)->input_ToggleES = input_ToggleES; \
-    (p_symbols)->input_ChangeProgram = input_ChangeProgram; \
-    (p_symbols)->input_ChangeArea = input_ChangeArea; \
-    (p_symbols)->input_FindProgram = input_FindProgram; \
-    (p_symbols)->input_FindES = input_FindES; \
-    (p_symbols)->input_AddES = input_AddES; \
-    (p_symbols)->input_DelES = input_DelES; \
-    (p_symbols)->input_SelectES = input_SelectES; \
-    (p_symbols)->input_UnselectES = input_UnselectES; \
-    (p_symbols)->input_AddProgram = input_AddProgram; \
-    (p_symbols)->input_DelProgram = input_DelProgram; \
-    (p_symbols)->input_AddArea = input_AddArea; \
-    (p_symbols)->input_DelArea = input_DelArea; \
-    (p_symbols)->InitBitstream = InitBitstream; \
-    (p_symbols)->NextDataPacket = NextDataPacket; \
-    (p_symbols)->BitstreamNextDataPacket = BitstreamNextDataPacket; \
-    (p_symbols)->DecoderError = DecoderError; \
-    (p_symbols)->input_InitStream = input_InitStream; \
-    (p_symbols)->input_EndStream = input_EndStream; \
-    (p_symbols)->input_ParsePES = input_ParsePES; \
-    (p_symbols)->input_GatherPES = input_GatherPES; \
-    (p_symbols)->input_DecodePES = input_DecodePES; \
-    (p_symbols)->input_ReadPS = input_ReadPS; \
-    (p_symbols)->input_ParsePS = input_ParsePS; \
-    (p_symbols)->input_DemuxPS = input_DemuxPS; \
-    (p_symbols)->input_ReadTS = input_ReadTS; \
-    (p_symbols)->input_DemuxTS = input_DemuxTS; \
-    (p_symbols)->input_ClockManageRef = input_ClockManageRef; \
-    (p_symbols)->input_ClockManageControl = input_ClockManageControl; \
-    (p_symbols)->input_ClockGetTS = input_ClockGetTS; \
-    (p_symbols)->input_FDSeek = input_FDSeek; \
-    (p_symbols)->input_FDClose = input_FDClose; \
-    (p_symbols)->input_FDNetworkClose = input_FDNetworkClose; \
-    (p_symbols)->input_FDRead = input_FDRead; \
-    (p_symbols)->input_FDNetworkRead = input_FDNetworkRead; \
-    (p_symbols)->input_BuffersInit = input_BuffersInit; \
-    (p_symbols)->input_BuffersEnd = input_BuffersEnd; \
-    (p_symbols)->input_NewBuffer = input_NewBuffer; \
-    (p_symbols)->input_ReleaseBuffer = input_ReleaseBuffer; \
-    (p_symbols)->input_ShareBuffer = input_ShareBuffer; \
-    (p_symbols)->input_NewPacket = input_NewPacket; \
-    (p_symbols)->input_DeletePacket = input_DeletePacket; \
-    (p_symbols)->input_NewPES = input_NewPES; \
-    (p_symbols)->input_DeletePES = input_DeletePES; \
-    (p_symbols)->input_FillBuffer = input_FillBuffer; \
-    (p_symbols)->input_Peek = input_Peek; \
-    (p_symbols)->input_SplitBuffer = input_SplitBuffer; \
-    (p_symbols)->input_AccessInit = input_AccessInit; \
-    (p_symbols)->input_AccessReinit = input_AccessReinit; \
-    (p_symbols)->input_AccessEnd = input_AccessEnd; \
-    (p_symbols)->aout_CreateFifo = aout_CreateFifo; \
-    (p_symbols)->aout_DestroyFifo = aout_DestroyFifo; \
-    (p_symbols)->vout_CreateThread = vout_CreateThread; \
-    (p_symbols)->vout_DestroyThread = vout_DestroyThread; \
-    (p_symbols)->vout_CreateSubPicture = vout_CreateSubPicture; \
-    (p_symbols)->vout_DestroySubPicture = vout_DestroySubPicture; \
-    (p_symbols)->vout_DisplaySubPicture = vout_DisplaySubPicture; \
-    (p_symbols)->vout_CreatePicture = vout_CreatePicture; \
-    (p_symbols)->vout_AllocatePicture = vout_AllocatePicture; \
-    (p_symbols)->vout_DisplayPicture = vout_DisplayPicture; \
-    (p_symbols)->vout_DestroyPicture = vout_DestroyPicture; \
-    (p_symbols)->vout_DatePicture = vout_DatePicture; \
-    (p_symbols)->vout_LinkPicture = vout_LinkPicture; \
-    (p_symbols)->vout_UnlinkPicture = vout_UnlinkPicture; \
-    (p_symbols)->vout_PlacePicture = vout_PlacePicture; \
-    (p_symbols)->vout_ChromaCmp = vout_ChromaCmp; \
-    (p_symbols)->UnalignedGetBits = UnalignedGetBits; \
-    (p_symbols)->UnalignedRemoveBits = UnalignedRemoveBits; \
-    (p_symbols)->UnalignedShowBits = UnalignedShowBits; \
-    (p_symbols)->CurrentPTS = CurrentPTS; \
-    (p_symbols)->GetLang_1 = GetLang_1; \
-    (p_symbols)->GetLang_2T = GetLang_2T; \
-    (p_symbols)->GetLang_2B = GetLang_2B; \
-    (p_symbols)->DecodeLanguage = DecodeLanguage; \
-    (p_symbols)->module_Need = module_Need; \
-    (p_symbols)->module_Unneed = module_Unneed;
+    (p_symbols)->aout_CreateFifo_inner = aout_CreateFifo; \
+    (p_symbols)->aout_DestroyFifo_inner = aout_DestroyFifo; \
+    (p_symbols)->__config_GetInt_inner = __config_GetInt; \
+    (p_symbols)->__config_PutInt_inner = __config_PutInt; \
+    (p_symbols)->__config_GetFloat_inner = __config_GetFloat; \
+    (p_symbols)->__config_PutFloat_inner = __config_PutFloat; \
+    (p_symbols)->__config_GetPsz_inner = __config_GetPsz; \
+    (p_symbols)->__config_PutPsz_inner = __config_PutPsz; \
+    (p_symbols)->config_LoadCmdLine_inner = config_LoadCmdLine; \
+    (p_symbols)->config_GetHomeDir_inner = config_GetHomeDir; \
+    (p_symbols)->config_LoadConfigFile_inner = config_LoadConfigFile; \
+    (p_symbols)->config_SaveConfigFile_inner = config_SaveConfigFile; \
+    (p_symbols)->config_FindConfig_inner = config_FindConfig; \
+    (p_symbols)->config_Duplicate_inner = config_Duplicate; \
+    (p_symbols)->config_SetCallbacks_inner = config_SetCallbacks; \
+    (p_symbols)->config_UnsetCallbacks_inner = config_UnsetCallbacks; \
+    (p_symbols)->InitBitstream_inner = InitBitstream; \
+    (p_symbols)->NextDataPacket_inner = NextDataPacket; \
+    (p_symbols)->BitstreamNextDataPacket_inner = BitstreamNextDataPacket; \
+    (p_symbols)->UnalignedShowBits_inner = UnalignedShowBits; \
+    (p_symbols)->UnalignedRemoveBits_inner = UnalignedRemoveBits; \
+    (p_symbols)->UnalignedGetBits_inner = UnalignedGetBits; \
+    (p_symbols)->CurrentPTS_inner = CurrentPTS; \
+    (p_symbols)->DecoderError_inner = DecoderError; \
+    (p_symbols)->__input_SetStatus_inner = __input_SetStatus; \
+    (p_symbols)->__input_Seek_inner = __input_Seek; \
+    (p_symbols)->__input_Tell_inner = __input_Tell; \
+    (p_symbols)->input_DumpStream_inner = input_DumpStream; \
+    (p_symbols)->input_OffsetToTime_inner = input_OffsetToTime; \
+    (p_symbols)->input_ChangeES_inner = input_ChangeES; \
+    (p_symbols)->input_ToggleES_inner = input_ToggleES; \
+    (p_symbols)->input_ChangeArea_inner = input_ChangeArea; \
+    (p_symbols)->input_ChangeProgram_inner = input_ChangeProgram; \
+    (p_symbols)->input_InitStream_inner = input_InitStream; \
+    (p_symbols)->input_EndStream_inner = input_EndStream; \
+    (p_symbols)->input_FindProgram_inner = input_FindProgram; \
+    (p_symbols)->input_AddProgram_inner = input_AddProgram; \
+    (p_symbols)->input_DelProgram_inner = input_DelProgram; \
+    (p_symbols)->input_SetProgram_inner = input_SetProgram; \
+    (p_symbols)->input_AddArea_inner = input_AddArea; \
+    (p_symbols)->input_DelArea_inner = input_DelArea; \
+    (p_symbols)->input_FindES_inner = input_FindES; \
+    (p_symbols)->input_AddES_inner = input_AddES; \
+    (p_symbols)->input_DelES_inner = input_DelES; \
+    (p_symbols)->input_SelectES_inner = input_SelectES; \
+    (p_symbols)->input_UnselectES_inner = input_UnselectES; \
+    (p_symbols)->input_DecodePES_inner = input_DecodePES; \
+    (p_symbols)->input_ClockManageControl_inner = input_ClockManageControl; \
+    (p_symbols)->input_ClockManageRef_inner = input_ClockManageRef; \
+    (p_symbols)->input_ClockGetTS_inner = input_ClockGetTS; \
+    (p_symbols)->input_BuffersInit_inner = input_BuffersInit; \
+    (p_symbols)->input_BuffersEnd_inner = input_BuffersEnd; \
+    (p_symbols)->input_NewBuffer_inner = input_NewBuffer; \
+    (p_symbols)->input_ReleaseBuffer_inner = input_ReleaseBuffer; \
+    (p_symbols)->input_ShareBuffer_inner = input_ShareBuffer; \
+    (p_symbols)->input_NewPacket_inner = input_NewPacket; \
+    (p_symbols)->input_DeletePacket_inner = input_DeletePacket; \
+    (p_symbols)->input_NewPES_inner = input_NewPES; \
+    (p_symbols)->input_DeletePES_inner = input_DeletePES; \
+    (p_symbols)->input_FillBuffer_inner = input_FillBuffer; \
+    (p_symbols)->input_Peek_inner = input_Peek; \
+    (p_symbols)->input_SplitBuffer_inner = input_SplitBuffer; \
+    (p_symbols)->input_AccessInit_inner = input_AccessInit; \
+    (p_symbols)->input_AccessReinit_inner = input_AccessReinit; \
+    (p_symbols)->input_AccessEnd_inner = input_AccessEnd; \
+    (p_symbols)->input_ParsePES_inner = input_ParsePES; \
+    (p_symbols)->input_GatherPES_inner = input_GatherPES; \
+    (p_symbols)->input_ReadPS_inner = input_ReadPS; \
+    (p_symbols)->input_ParsePS_inner = input_ParsePS; \
+    (p_symbols)->input_ReadTS_inner = input_ReadTS; \
+    (p_symbols)->input_DemuxPS_inner = input_DemuxPS; \
+    (p_symbols)->input_DemuxTS_inner = input_DemuxTS; \
+    (p_symbols)->input_FDClose_inner = input_FDClose; \
+    (p_symbols)->input_FDNetworkClose_inner = input_FDNetworkClose; \
+    (p_symbols)->input_FDRead_inner = input_FDRead; \
+    (p_symbols)->input_FDNetworkRead_inner = input_FDNetworkRead; \
+    (p_symbols)->input_FDSeek_inner = input_FDSeek; \
+    (p_symbols)->msg_Subscribe_inner = msg_Subscribe; \
+    (p_symbols)->msg_Unsubscribe_inner = msg_Unsubscribe; \
+    (p_symbols)->intf_Eject_inner = intf_Eject; \
+    (p_symbols)->GetLang_1_inner = GetLang_1; \
+    (p_symbols)->GetLang_2T_inner = GetLang_2T; \
+    (p_symbols)->GetLang_2B_inner = GetLang_2B; \
+    (p_symbols)->DecodeLanguage_inner = DecodeLanguage; \
+    (p_symbols)->__module_Need_inner = __module_Need; \
+    (p_symbols)->module_Unneed_inner = module_Unneed; \
+    (p_symbols)->mstrtime_inner = mstrtime; \
+    (p_symbols)->mdate_inner = mdate; \
+    (p_symbols)->mwait_inner = mwait; \
+    (p_symbols)->msleep_inner = msleep; \
+    (p_symbols)->network_ChannelJoin_inner = network_ChannelJoin; \
+    (p_symbols)->network_ChannelCreate_inner = network_ChannelCreate; \
+    (p_symbols)->playlist_Command_inner = playlist_Command; \
+    (p_symbols)->playlist_Add_inner = playlist_Add; \
+    (p_symbols)->playlist_Delete_inner = playlist_Delete; \
+    (p_symbols)->__vlc_threads_init_inner = __vlc_threads_init; \
+    (p_symbols)->vlc_threads_end_inner = vlc_threads_end; \
+    (p_symbols)->__vlc_mutex_init_inner = __vlc_mutex_init; \
+    (p_symbols)->__vlc_mutex_destroy_inner = __vlc_mutex_destroy; \
+    (p_symbols)->vlc_cond_init_inner = vlc_cond_init; \
+    (p_symbols)->__vlc_cond_destroy_inner = __vlc_cond_destroy; \
+    (p_symbols)->__vlc_thread_create_inner = __vlc_thread_create; \
+    (p_symbols)->__vlc_thread_ready_inner = __vlc_thread_ready; \
+    (p_symbols)->__vlc_thread_join_inner = __vlc_thread_join; \
+    (p_symbols)->vout_CreateThread_inner = vout_CreateThread; \
+    (p_symbols)->vout_DestroyThread_inner = vout_DestroyThread; \
+    (p_symbols)->vout_ChromaCmp_inner = vout_ChromaCmp; \
+    (p_symbols)->vout_CreatePicture_inner = vout_CreatePicture; \
+    (p_symbols)->vout_AllocatePicture_inner = vout_AllocatePicture; \
+    (p_symbols)->vout_DestroyPicture_inner = vout_DestroyPicture; \
+    (p_symbols)->vout_DisplayPicture_inner = vout_DisplayPicture; \
+    (p_symbols)->vout_DatePicture_inner = vout_DatePicture; \
+    (p_symbols)->vout_LinkPicture_inner = vout_LinkPicture; \
+    (p_symbols)->vout_UnlinkPicture_inner = vout_UnlinkPicture; \
+    (p_symbols)->vout_PlacePicture_inner = vout_PlacePicture; \
+    (p_symbols)->vout_CreateSubPicture_inner = vout_CreateSubPicture; \
+    (p_symbols)->vout_DestroySubPicture_inner = vout_DestroySubPicture; \
+    (p_symbols)->vout_DisplaySubPicture_inner = vout_DisplaySubPicture; \
+    (p_symbols)->__msg_Generic_inner = __msg_Generic; \
+    (p_symbols)->__msg_Info_inner = __msg_Info; \
+    (p_symbols)->__msg_Err_inner = __msg_Err; \
+    (p_symbols)->__msg_Warn_inner = __msg_Warn; \
+    (p_symbols)->__msg_Dbg_inner = __msg_Dbg; \
+    (p_symbols)->__vlc_object_create_inner = __vlc_object_create; \
+    (p_symbols)->__vlc_object_destroy_inner = __vlc_object_destroy; \
+    (p_symbols)->__vlc_object_find_inner = __vlc_object_find; \
+    (p_symbols)->__vlc_object_yield_inner = __vlc_object_yield; \
+    (p_symbols)->__vlc_object_release_inner = __vlc_object_release; \
+    (p_symbols)->__vlc_object_unlink_inner = __vlc_object_unlink; \
+    (p_symbols)->__vlc_object_unlink_all_inner = __vlc_object_unlink_all; \
+    (p_symbols)->__vlc_object_attach_inner = __vlc_object_attach; \
+    (p_symbols)->__vlc_dumpstructure_inner = __vlc_dumpstructure; \
+

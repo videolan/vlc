@@ -2,7 +2,7 @@
  * symbols.c : Extra file used to force linking with some shared symbols
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: symbols.c,v 1.1 2002/01/21 00:52:07 sam Exp $
+ * $Id: symbols.c,v 1.2 2002/06/01 12:32:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,7 +35,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>

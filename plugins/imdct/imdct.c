@@ -2,7 +2,7 @@
  * imdct.c : IMDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: imdct.c,v 1.9 2002/04/19 13:56:11 sam Exp $
+ * $Id: imdct.c,v 1.10 2002/06/01 12:31:59 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_imdct.h"
 #include "ac3_imdct_common.h"
@@ -47,7 +47,6 @@ MODULE_INIT_START
     SET_DESCRIPTION( _("AC3 IMDCT module") )
     ADD_CAPABILITY( IMDCT, 50 )
     ADD_SHORTCUT( "c" )
-    ADD_SHORTCUT( "imdct" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

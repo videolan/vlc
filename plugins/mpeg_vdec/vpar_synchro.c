@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_synchro.c,v 1.9 2002/04/23 14:16:20 sam Exp $
+ * $Id: vpar_synchro.c,v 1.10 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -97,13 +97,9 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include <videolan/vlc.h>
-
-#include "video.h"
-#include "video_output.h"
-
-#include "stream_control.h"
-#include "input_ext-dec.h"
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/decoder.h>
 
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
@@ -112,7 +108,7 @@
 /*
  * Local prototypes
  */
-static int  SynchroType( void );
+static int  SynchroType( vlc_object_t * );
 
 /* Error margins */
 #define DELTA                   (int)(0.075*CLOCK_FREQ)
@@ -125,7 +121,7 @@ static int  SynchroType( void );
  *****************************************************************************/
 void vpar_SynchroInit( vpar_thread_t * p_vpar )
 {
-    p_vpar->synchro.i_type = SynchroType();
+    p_vpar->synchro.i_type = SynchroType( p_vpar->p_fifo->p_this );
 
     /* We use a fake stream pattern, which is often right. */
     p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p = DEFAULT_NB_P;
@@ -143,8 +139,8 @@ void vpar_SynchroInit( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * vpar_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
-boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
-                              int i_structure )
+vlc_bool_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
+                               int i_structure )
 {
     /* For clarity reasons, we separated the special synchros code from the
      * mathematical synchro */
@@ -206,7 +202,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         /* VPAR_SYNCHRO_DEFAULT */
         mtime_t         now, period, tau_yuv;
         mtime_t         pts = 0;
-        boolean_t       b_decode = 0;
+        vlc_bool_t      b_decode = 0;
 
         now = mdate();
         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate
@@ -243,8 +239,8 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 b_decode = (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA);
             }
             if( !b_decode )
-                intf_WarnMsg( 1, "vpar synchro warning: trashing I (%lld)",
-                             pts - now);
+                msg_Warn( p_vpar->p_fifo,
+                          "synchro trashing I (%lld)", pts - now );
             break;
 
         case P_CODING_TYPE:
@@ -380,16 +376,16 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         if( p_vpar->synchro.i_eta_p
              && p_vpar->synchro.i_eta_p != p_vpar->synchro.i_n_p )
         {
-            intf_WarnMsg( 3, "vpar info: stream periodicity changed "
-                          "from P[%d] to P[%d]",
-                          p_vpar->synchro.i_n_p, p_vpar->synchro.i_eta_p );
+            msg_Warn( p_vpar->p_fifo,
+                      "stream periodicity changed from P[%d] to P[%d]",
+                      p_vpar->synchro.i_n_p, p_vpar->synchro.i_eta_p );
             p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p;
         }
         p_vpar->synchro.i_eta_p = p_vpar->synchro.i_eta_b = 0;
 
-        if( p_main->b_stats && p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
+        if( p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
         {
-            intf_Msg( "vpar synchro stats: I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : trashed %d:%d/%d",
+            msg_Dbg( p_vpar->p_fifo, "I(%lld) P(%lld)[%d] B(%lld)[%d] YUV(%lld) : trashed %d:%d/%d",
                   p_vpar->synchro.p_tau[I_CODING_TYPE],
                   p_vpar->synchro.p_tau[P_CODING_TYPE],
                   p_vpar->synchro.i_n_p,
@@ -410,9 +406,9 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         if( p_vpar->synchro.i_eta_b
              && p_vpar->synchro.i_eta_b != p_vpar->synchro.i_n_b )
         {
-            intf_WarnMsg( 3, "vpar info: stream periodicity changed "
-                          "from B[%d] to B[%d]",
-                          p_vpar->synchro.i_n_b, p_vpar->synchro.i_eta_b );
+            msg_Warn( p_vpar->p_fifo,
+                      "stream periodicity changed from B[%d] to B[%d]",
+                      p_vpar->synchro.i_n_b, p_vpar->synchro.i_eta_b );
             p_vpar->synchro.i_n_b = p_vpar->synchro.i_eta_b;
         }
         p_vpar->synchro.i_eta_b = 0;
@@ -440,10 +436,10 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                  || p_vpar->synchro.current_pts - p_vpar->sequence.next_pts
                     > PTS_THRESHOLD )
             {
-                intf_WarnMsg( 2,
-                        "vpar synchro warning: pts != current_date (%lld)",
-                        p_vpar->synchro.current_pts
-                            - p_vpar->sequence.next_pts );
+                msg_Warn( p_vpar->p_fifo,
+                          "vpar synchro warning: pts != current_date (%lld)",
+                          p_vpar->synchro.current_pts
+                              - p_vpar->sequence.next_pts );
             }
             p_vpar->synchro.current_pts = p_vpar->sequence.next_pts;
             p_vpar->sequence.next_pts = 0;
@@ -462,19 +458,19 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
               || p_vpar->synchro.backward_pts - p_vpar->sequence.next_dts
                     > PTS_THRESHOLD) )
             {
-                intf_WarnMsg( 2,
-                        "vpar synchro warning: backward_pts != dts (%lld)",
-                        p_vpar->sequence.next_dts
-                            - p_vpar->synchro.backward_pts );
+                msg_Warn( p_vpar->p_fifo, "backward_pts != dts (%lld)",
+                           p_vpar->sequence.next_dts
+                               - p_vpar->synchro.backward_pts );
             }
             if( p_vpar->synchro.backward_pts - p_vpar->synchro.current_pts
                     > PTS_THRESHOLD
                  || p_vpar->synchro.current_pts - p_vpar->synchro.backward_pts
                     > PTS_THRESHOLD )
             {
-                intf_WarnMsg( 2,
-                   "vpar synchro warning: backward_pts != current_pts (%lld)",
-                   p_vpar->synchro.current_pts - p_vpar->synchro.backward_pts );
+                msg_Warn( p_vpar->p_fifo,
+                          "backward_pts != current_pts (%lld)",
+                          p_vpar->synchro.current_pts
+                              - p_vpar->synchro.backward_pts );
             }
             p_vpar->synchro.current_pts = p_vpar->synchro.backward_pts;
             p_vpar->synchro.backward_pts = 0;
@@ -486,10 +482,9 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                  || p_vpar->synchro.current_pts - p_vpar->sequence.next_dts
                     > PTS_THRESHOLD )
             {
-                intf_WarnMsg( 2,
-                        "vpar synchro warning: dts != current_pts (%lld)",
-                        p_vpar->synchro.current_pts
-                            - p_vpar->sequence.next_dts );
+                msg_Warn( p_vpar->p_fifo, "dts != current_pts (%lld)",
+                          p_vpar->synchro.current_pts
+                              - p_vpar->sequence.next_dts );
             }
             /* By definition of a DTS. */
             p_vpar->synchro.current_pts = p_vpar->sequence.next_dts;
@@ -511,8 +506,8 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
     {
         /* We cannot be _that_ late, something must have happened, reinit
          * the dates. */
-        intf_WarnMsg( 2, "PTS << now (%lld), resetting",
-                      now - p_vpar->synchro.current_pts - DEFAULT_PTS_DELAY );
+        msg_Warn( p_vpar->p_fifo, "PTS << now (%lld), resetting",
+                   now - p_vpar->synchro.current_pts - DEFAULT_PTS_DELAY );
         p_vpar->synchro.current_pts = now + DEFAULT_PTS_DELAY;
     }
     if( p_vpar->synchro.backward_pts
@@ -531,10 +526,10 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
  *****************************************************************************
  * This function is called at initialization.
  *****************************************************************************/
-static int SynchroType( void )
+static int SynchroType( vlc_object_t *p_this )
 {
     char psz_synchro_tmp[5];
-    char * psz_synchro = config_GetPszVariable( "vpar-synchro" );
+    char * psz_synchro = config_GetPsz( p_this, "vpar-synchro" );
 
     if( psz_synchro == NULL )
     {

@@ -9,8 +9,8 @@ class KPluginsBox : public QGroupBox
 {
     Q_OBJECT
  public:
-    KPluginsBox(QString title, QString value, QWidget *parent, int spacing,
-                KPreferences *pref);
+    KPluginsBox(intf_thread_t *p_intf, QString title, QString value,
+                QWidget *parent, int spacing, KPreferences *pref);
     ~KPluginsBox();
 
     QListView *getListView(void);
@@ -24,6 +24,7 @@ class KPluginsBox : public QGroupBox
     void selectionChanged(const QString &text);
     
  private:
+    intf_thread_t *p_intf;
     KListView *listView;
     QPushButton *configure;
     QPushButton *selectButton;

@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.13 2002/05/21 01:27:26 sam Exp $
+ * $Id: mpeg_ts.c,v 1.14 2002/06/01 12:32:00 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -29,12 +29,8 @@
 #include <string.h>
 #include <errno.h>
 
-#include <videolan/vlc.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #include "iso_lang.h"
 
@@ -54,24 +50,21 @@
  * Local prototypes
  *****************************************************************************/
 static void input_getfunctions( function_list_t * p_function_list );
-static int  TSInit      ( struct input_thread_s * );
-static void TSEnd       ( struct input_thread_s * );
-static int  TSDemux     ( struct input_thread_s * );
+static int  TSInit  ( input_thread_t * );
+static void TSEnd   ( input_thread_t * );
+static int  TSDemux ( input_thread_t * );
 
 #if defined MODULE_NAME_IS_mpeg_ts
-static void TSDemuxPSI  ( struct input_thread_s *, struct data_packet_s *,
-                          struct es_descriptor_s *, boolean_t );
+static void TSDemuxPSI ( input_thread_t *, data_packet_t *,
+                          es_descriptor_t *, vlc_bool_t );
 static void TSDecodePAT( input_thread_t *, es_descriptor_t *);
 static void TSDecodePMT( input_thread_t *, es_descriptor_t *);
 #define PSI_CALLBACK TSDemuxPSI
 #elif defined MODULE_NAME_IS_mpeg_ts_dvbpsi
-static void TS_DVBPSI_DemuxPSI  
-                        ( struct input_thread_s *, struct data_packet_s *,
-                          struct es_descriptor_s *, boolean_t );
-static void TS_DVBPSI_HandlePAT
-                        ( struct input_thread_s *, dvbpsi_pat_t * );
-static void TS_DVBPSI_HandlePMT
-                        ( struct input_thread_s *, dvbpsi_pmt_t * );
+static void TS_DVBPSI_DemuxPSI  ( input_thread_t *, data_packet_t *,
+                                  es_descriptor_t *, vlc_bool_t );
+static void TS_DVBPSI_HandlePAT ( input_thread_t *, dvbpsi_pat_t * );
+static void TS_DVBPSI_HandlePMT ( input_thread_t *, dvbpsi_pmt_t * );
 #define PSI_CALLBACK TS_DVBPSI_DemuxPSI
 #endif
 
@@ -134,7 +127,7 @@ static int TSInit( input_thread_t * p_input )
     /* Have a peep at the show. */
     if( input_Peek( p_input, &p_peek, 1 ) < 1 )
     {
-        intf_ErrMsg( "input error: cannot peek() (mpeg_ts)" );
+        msg_Err( p_input, "cannot peek()" );
         return( -1 );
     }
 
@@ -143,11 +136,11 @@ static int TSInit( input_thread_t * p_input )
         if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "ts", 3 ) )
         {
             /* User forced */
-            intf_ErrMsg( "input error: this doesn't look like a TS stream, continuing" );
+            msg_Err( p_input, "this does not look like a TS stream, continuing" );
         }
         else
         {
-            intf_WarnMsg( 2, "input: TS plug-in discarded (no sync)" );
+            msg_Warn( p_input, "TS module discarded (no sync)" );
             return( -1 );
         }
     }
@@ -175,7 +168,7 @@ static int TSInit( input_thread_t * p_input )
 
     if( p_stream_data->p_pat_handle == NULL )
     {
-        intf_ErrMsg( "input: ts: could not create PAT decoder" );
+        msg_Err( p_input, "could not create PAT decoder" );
         return( -1 );
     }
 #endif
@@ -244,7 +237,7 @@ static int TSDemux( input_thread_t * p_input )
  * DemuxPSI : makes up complete PSI data
  *****************************************************************************/
 static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data, 
-        es_descriptor_t * p_es, boolean_t b_unit_start )
+        es_descriptor_t * p_es, vlc_bool_t b_unit_start )
 {
     es_ts_data_t  * p_demux_data;
     
@@ -259,8 +252,8 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
          * (see ISO/IEC 13818 (2.4.4.2) which should be set to 0x00 */
         if( (u8)p[0] != 0x00 )
         {
-            intf_WarnMsg( 2, "input: non zero pointer field found, "
-                             "trying to continue" );
+            msg_Warn( p_input,
+                      "non-zero pointer field found, trying to continue" );
             p+=(u8)p[0];
         }
         else
@@ -272,7 +265,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
 
         if( ((u8)(p[1]) & 0xc0) != 0x80 ) 
         {
-            intf_WarnMsg( 2, "input: invalid PSI packet" );
+            msg_Warn( p_input, "invalid PSI packet" );
             p_psi->b_trash = 1;
         }
         else 
@@ -302,14 +295,14 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                     
                     if( p_psi->i_version_number != (( p[5] >> 1 ) & 0x1f) )
                     {
-                        intf_WarnMsg( 2, "input: PSI version differs "
-                                         "inside same PAT" );
+                        msg_Warn( p_input,
+                                  "PSI version differs inside same PAT" );
                         p_psi->b_trash = 1;
                     }
                     if( p_psi->i_section_number + 1 != (u8)p[6] )
                     {
-                        intf_WarnMsg( 2, "input: PSI Section discontinuity, "
-                                         "packet lost ?" );
+                        msg_Warn( p_input,
+                                  "PSI Section discontinuity, packet lost?" );
                         p_psi->b_trash = 1;
                     }
                     else
@@ -317,7 +310,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                 }
                 else
                 {
-                    intf_WarnMsg( 2, "input: got unexpected new PSI section" );
+                    msg_Warn( p_input, "got unexpected new PSI section" );
                     p_psi->b_trash = 1;
                 }
             }
@@ -352,7 +345,7 @@ static void TSDemuxPSI( input_thread_t * p_input, data_packet_t * p_data,
                     TSDecodePMT( p_input, p_es );
                     break;
                 default:
-                    intf_WarnMsg(2, "Received unknown PSI in DemuxPSI");
+                    msg_Warn( p_input, "received unknown PSI in DemuxPSI" );
                 }
             }
         }
@@ -388,7 +381,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
     int                 i_section_length, i_program_id, i_pmt_pid;
     int                 i_loop, i_current_section;
 
-    boolean_t           b_changed = 0;
+    vlc_bool_t          b_changed = 0;
 
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
@@ -639,7 +632,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         if( !p_input->stream.p_selected_program )
         {
             pgrm_descriptor_t *     p_pgrm_to_select;
-            u16 i_id = (u16)config_GetIntVariable( "program" );
+            u16 i_id = (u16)config_GetInt( p_input, "program" );
 
             if( i_id != 0 ) /* if user specified a program */
             {
@@ -672,7 +665,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 static void TS_DVBPSI_DemuxPSI( input_thread_t  * p_input, 
                                 data_packet_t   * p_data, 
                                 es_descriptor_t * p_es, 
-                                boolean_t         b_unit_start )
+                                vlc_bool_t        b_unit_start )
 {
     es_ts_data_t        * p_es_demux_data;
     pgrm_ts_data_t      * p_pgrm_demux_data;
@@ -695,7 +688,7 @@ static void TS_DVBPSI_DemuxPSI( input_thread_t  * p_input,
                     p_data->p_demux_start );
             break;
         default:
-            intf_WarnMsg( 2, "Received unknown PSI in DemuxPSI" );
+            msg_Warn( p_input, "received unknown PSI in DemuxPSI" );
     }
     
     input_DeletePacket( p_input->p_method_data, p_data );
@@ -753,7 +746,7 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
                 p_es_demux->p_psi_section = malloc( sizeof( psi_section_t ) );
                 if ( p_es_demux->p_psi_section == NULL )
                 {
-                    intf_ErrMsg( "input: ts: could not malloc pmt section" );
+                    msg_Err( p_input, "out of memory" );
                     p_input->b_error = 1;
                     return;
                 }
@@ -768,7 +761,7 @@ void TS_DVBPSI_HandlePAT( input_thread_t * p_input, dvbpsi_pat_t * p_new_pat )
 
                 if( p_pgrm_demux->p_pmt_handle == NULL )
                 {
-                    intf_ErrMsg( "input: ts: could not create PMT decoder" );
+                    msg_Err( p_input, "could not create PMT decoder" );
                     p_input->b_error = 1;
                     return;
                 }
@@ -798,7 +791,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
 
     if( p_pgrm == NULL )
     {
-        intf_WarnMsg( 2, "input: ts: PMT of unreferenced program found" );
+        msg_Warn( p_input, "PMT of unreferenced program found" );
         return;
     }
 
@@ -816,7 +809,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                             (u16)p_es->i_pid, sizeof( es_ts_data_t ) );
             if( p_new_es == NULL )
             {
-                intf_ErrMsg( "input: ts: Could not add ES %d", p_es->i_pid );
+                msg_Err( p_input, "could not add ES %d", p_es->i_pid );
                 p_input->b_error = 1;
                 return;
             }
@@ -897,7 +890,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
         if( !p_input->stream.p_selected_program )
         {
             pgrm_descriptor_t *     p_pgrm_to_select;
-            u16 i_id = (u16)config_GetIntVariable( "program" );
+            u16 i_id = (u16)config_GetInt( p_input, "program" );
 
             if( i_id != 0 ) /* if user specified a program */
             {

@@ -2,7 +2,7 @@
  * ac3_mantissa.h: ac3 mantissa computation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_mantissa.h,v 1.2 2002/05/18 17:47:46 sam Exp $
+ * $Id: ac3_mantissa.h,v 1.3 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -245,8 +245,8 @@ static inline u16 dither_gen (mantissa_t * p_mantissa)
 
 
 /* Fetch an unpacked, left justified, and properly biased/dithered mantissa value */
-static inline float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
-                                     u16 exp)
+static inline float coeff_get_float( ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
+                                     u16 exp )
 {
     u16 group_code = 0;
 
@@ -270,7 +270,7 @@ static inline float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
             p_ac3dec->total_bits_read += 5;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,5)) > 26)
             {
-                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (1)" );
+                msg_Warn( p_ac3dec->p_fifo, "invalid mantissa (1)" );
                 return 0;
             }
     
@@ -291,7 +291,7 @@ static inline float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
             p_ac3dec->total_bits_read += 7;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) > 124)
             {
-                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (2)" );
+                msg_Warn( p_ac3dec->p_fifo, "invalid mantissa (2)" );
                 return 0;
             }
 
@@ -306,7 +306,7 @@ static inline float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
             p_ac3dec->total_bits_read += 3;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,3)) > 6)
             {
-                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (3)" );
+                msg_Warn( p_ac3dec->p_fifo, "invalid mantissa (3)" );
                 return 0;
             }
 
@@ -322,7 +322,7 @@ static inline float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
             p_ac3dec->total_bits_read += 7;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,7)) > 120)
             {
-                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (4)" );
+                msg_Warn( p_ac3dec->p_fifo, "invalid mantissa (4)" );
                 return 0;
             }
 
@@ -336,7 +336,7 @@ static inline float coeff_get_float (ac3dec_t * p_ac3dec, u16 bap, u16 dithflag,
             p_ac3dec->total_bits_read += 4;
             if ((group_code = GetBits (&p_ac3dec->bit_stream,4)) > 14)
             {
-                intf_WarnMsg ( 3, "ac3dec warn: invalid mantissa (5)" );
+                msg_Warn( p_ac3dec->p_fifo, "invalid mantissa (5)" );
                 return 0;
             }
 

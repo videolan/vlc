@@ -2,7 +2,7 @@
  * downmix3dn.c : accelerated 3D Now! AC3 downmix module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: downmix3dn.c,v 1.9 2002/04/19 13:56:10 sam Exp $
+ * $Id: downmix3dn.c,v 1.10 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Renaud Dartus <reno@via.ecp.fr>
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
 
 #include "ac3_downmix.h"
 #include "ac3_downmix_common.h"
@@ -49,7 +49,6 @@ MODULE_INIT_START
     ADD_REQUIREMENT( 3DNOW )
     ADD_SHORTCUT( "3dn" )
     ADD_SHORTCUT( "3dnow" )
-    ADD_SHORTCUT( "downmix3dn" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

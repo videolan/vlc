@@ -2,7 +2,7 @@
  * ac3_imdct.h : AC3 IMDCT types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.h,v 1.7 2002/04/05 01:05:22 gbazin Exp $
+ * $Id: ac3_imdct.h,v 1.8 2002/06/01 12:31:57 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -22,14 +22,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-typedef struct complex_s {
+struct complex_s {
     float real;
     float imag;
-} complex_t;
+};
 
 #define N 512
 
-typedef struct imdct_s
+struct imdct_s
 {
     complex_t * buf;
     void *      buf_orig;                         /* pointer before memalign */
@@ -69,13 +69,12 @@ typedef struct imdct_s
     void *      w_1_orig;                         /* pointer before memalign */
     
     /* Module used and shortcuts */
-    struct module_s * p_module;
-    void (*pf_imdct_init) (struct imdct_s *);
+    module_t * p_module;
+    void (*pf_imdct_init)    ( imdct_t * );
     //void (*pf_fft_64p) (complex_t *a);
-    void (*pf_imdct_256)(struct imdct_s *, float data[], float delay[]);
-    void (*pf_imdct_256_nol)(struct imdct_s *, float data[], float delay[]);
-    void (*pf_imdct_512)(struct imdct_s *, float data[], float delay[]);
-    void (*pf_imdct_512_nol)(struct imdct_s *, float data[], float delay[]);
-
-} imdct_t;
+    void (*pf_imdct_256)     ( imdct_t *, float [], float [] );
+    void (*pf_imdct_256_nol) ( imdct_t *, float [], float [] );
+    void (*pf_imdct_512)     ( imdct_t *, float [], float [] );
+    void (*pf_imdct_512_nol) ( imdct_t *, float [], float [] );
+};
 

@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.6 2002/05/22 17:17:45 sam Exp $
+ * $Id: file.c,v 1.7 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,7 +31,8 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -39,16 +40,11 @@
 #   include <io.h>
 #endif
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void input_getfunctions( function_list_t * );
-static int  FileOpen       ( struct input_thread_s * );
+static int  FileOpen       ( input_thread_t * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -59,7 +55,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("Standard filesystem file reading") )
     ADD_CAPABILITY( ACCESS, 50 )
-    ADD_SHORTCUT( "file" )
     ADD_SHORTCUT( "stream" )
 MODULE_INIT_STOP
  
@@ -95,7 +90,7 @@ static int FileOpen( input_thread_t * p_input )
     int                 i_stat;
     struct stat         stat_info;                                              
     input_socket_t *    p_access_data;
-    boolean_t           b_stdin;
+    vlc_bool_t          b_stdin;
 
     p_input->i_mtu = 0;
 
@@ -103,8 +98,8 @@ static int FileOpen( input_thread_t * p_input )
 
     if( !b_stdin && (i_stat = stat( psz_name, &stat_info )) == (-1) )
     {
-        intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
-                     psz_name, strerror(errno));
+        msg_Err( p_input, "cannot stat() file `%s' (%s)",
+                          psz_name, strerror(errno));
         return( -1 );
     }
 
@@ -145,8 +140,7 @@ static int FileOpen( input_thread_t * p_input )
         else
         {
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            intf_ErrMsg( "input error: unknown file type for `%s'",
-                         psz_name );
+            msg_Err( p_input, "unknown file type for `%s'", psz_name );
             return( -1 );
         }
     }
@@ -155,12 +149,12 @@ static int FileOpen( input_thread_t * p_input )
     p_input->stream.i_method = INPUT_METHOD_FILE;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
  
-    intf_WarnMsg( 2, "input: opening file `%s'", psz_name );
+    msg_Dbg( p_input, "opening file `%s'", psz_name );
     p_access_data = malloc( sizeof(input_socket_t) );
     p_input->p_access_data = (void *)p_access_data;
     if( p_access_data == NULL )
     {
-        intf_ErrMsg( "input error: Out of memory" );
+        msg_Err( p_input, "out of memory" );
         return( -1 );
     }
 
@@ -171,8 +165,8 @@ static int FileOpen( input_thread_t * p_input )
     else if( (p_access_data->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/ 0 )) == (-1) )
     {
-        intf_ErrMsg( "input error: cannot open file %s (%s)", psz_name,
-                     strerror(errno) );
+        msg_Err( p_input, "cannot open file %s (%s)", psz_name,
+                          strerror(errno) );
         free( p_access_data );
         return( -1 );
     }

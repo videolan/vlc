@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.10 2002/05/15 13:07:18 marcari Exp $
+ * $Id: udp.c,v 1.11 2002/06/01 12:31:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,7 +31,8 @@
 #include <errno.h>
 #include <fcntl.h>
 
-#include <videolan/vlc.h>
+#include <vlc/vlc.h>
+#include <vlc/input.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -39,18 +40,13 @@
 #   include <io.h>
 #endif
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-
 #include "network.h"
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void input_getfunctions( function_list_t * );
-static int  UDPOpen       ( struct input_thread_s * );
+static int  UDPOpen       ( input_thread_t * );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -61,7 +57,6 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( _("Raw UDP access plug-in") )
     ADD_CAPABILITY( ACCESS, 0 )
-    ADD_SHORTCUT( "udp" )
     ADD_SHORTCUT( "udpstream" )
     ADD_SHORTCUT( "udp4" )
     ADD_SHORTCUT( "udp6" )
@@ -96,7 +91,7 @@ static void input_getfunctions( function_list_t * p_function_list )
 static int UDPOpen( input_thread_t * p_input )
 {
     input_socket_t *    p_access_data;
-    struct module_s *   p_network;
+    module_t *          p_network;
     char *              psz_network = "";
     char *              psz_name = strdup(p_input->psz_name);
     char *              psz_parser = psz_name;
@@ -107,11 +102,11 @@ static int UDPOpen( input_thread_t * p_input )
     int                 i_bind_port = 0, i_server_port = 0;
     network_socket_t    socket_desc;
 
-    if( config_GetIntVariable( "ipv4" ) )
+    if( config_GetInt( p_input, "ipv4" ) )
     {
         psz_network = "ipv4";
     }
-    if( config_GetIntVariable( "ipv6" ) )
+    if( config_GetInt( p_input, "ipv6" ) )
     {
         psz_network = "ipv6";
     }
@@ -205,8 +200,7 @@ static int UDPOpen( input_thread_t * p_input )
         i_server_port = strtol( psz_server_port, &psz_parser, 10 );
         if( *psz_parser )
         {
-            intf_ErrMsg( "input error: cannot parse server port near %s",
-                         psz_parser );
+            msg_Err( p_input, "cannot parse server port near %s", psz_parser );
             free(psz_name);
             return( -1 );
         }
@@ -217,8 +211,7 @@ static int UDPOpen( input_thread_t * p_input )
         i_bind_port = strtol( psz_bind_port, &psz_parser, 10 );
         if( *psz_parser )
         {
-            intf_ErrMsg( "input error: cannot parse bind port near %s",
-                         psz_parser );
+            msg_Err( p_input, "cannot parse bind port near %s", psz_parser );
             free(psz_name);
             return( -1 );
         }
@@ -233,19 +226,19 @@ static int UDPOpen( input_thread_t * p_input )
 
     if( *psz_server_addr || i_server_port )
     {
-        intf_ErrMsg("input warning: this UDP syntax is deprecated ; the server argument will be");
-        intf_ErrMsg("ignored (%s:%d). If you wanted to enter a multicast address",
-                    psz_server_addr, i_server_port);
-        intf_ErrMsg("or local port, type : %s:@%s:%d",
-                    *p_input->psz_access ? p_input->psz_access : "udp",
-                    psz_server_addr, i_server_port );
+        msg_Err( p_input, "this UDP syntax is deprecated; the server argument will be");
+        msg_Err( p_input, "ignored (%s:%d). If you wanted to enter a multicast address",
+                          psz_server_addr, i_server_port);
+        msg_Err( p_input, "or local port, type : %s:@%s:%d",
+                          *p_input->psz_access ? p_input->psz_access : "udp",
+                          psz_server_addr, i_server_port );
 
         i_server_port = 0;
         psz_server_addr = "";
     }
  
-    intf_WarnMsg( 2, "input: opening server=%s:%d local=%s:%d",
-                  psz_server_addr, i_server_port, psz_bind_addr, i_bind_port );
+    msg_Dbg( p_input, "opening server=%s:%d local=%s:%d",
+             psz_server_addr, i_server_port, psz_bind_addr, i_bind_port );
 
     /* Prepare the network_socket_t structure */
     socket_desc.i_type = NETWORK_UDP;
@@ -255,8 +248,8 @@ static int UDPOpen( input_thread_t * p_input )
     socket_desc.i_server_port = i_server_port;
 
     /* Find an appropriate network module */
-    p_network = module_Need( MODULE_CAPABILITY_NETWORK, psz_network,
-                             &socket_desc );
+    p_network = module_Need( p_input, MODULE_CAPABILITY_NETWORK,
+                             psz_network, &socket_desc );
     free(psz_name);
     if( p_network == NULL )
     {
@@ -267,7 +260,7 @@ static int UDPOpen( input_thread_t * p_input )
     p_access_data = p_input->p_access_data = malloc( sizeof(input_socket_t) );
     if( p_access_data == NULL )
     {
-        intf_ErrMsg( "input error: Out of memory" );
+        msg_Err( p_input, "out of memory" );
         return( -1 );
     }
 
