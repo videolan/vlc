@@ -2,7 +2,7 @@
  * macosx.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.c,v 1.10 2001/12/30 07:09:55 sam Exp $
+ * $Id: macosx.c,v 1.11 2002/01/19 19:54:01 gbazin Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -42,16 +42,16 @@ void _M( intf_getfunctions )( function_list_t * p_function_list );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for MacOS X module" )
+    ADD_WINDOW( "Configuration for MacOS X module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_VOUT
-                                | MODULE_CAPABILITY_AOUT
-                                | MODULE_CAPABILITY_INTF;
-    p_module->psz_longname = "MacOS X interface, sound and video module";
+    SET_DESCRIPTION( "MacOS X interface, sound and video module" )
+    ADD_CAPABILITY( INTF, 100 )
+    ADD_CAPABILITY( AOUT, 100 )
+    ADD_CAPABILITY( VOUT, 100 )
+    ADD_SHORTCUT( "macosx" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

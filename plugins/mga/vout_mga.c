@@ -2,7 +2,7 @@
  * vout_mga.c: MGA video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_mga.c,v 1.13 2002/01/05 15:17:12 sam Exp $
+ * $Id: vout_mga.c,v 1.14 2002/01/19 19:54:01 gbazin Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -103,11 +103,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_METHOD_VAR, "mga" ) )
-    {
-        return( 999 );
-    }
-
     return( 10 );
 }
 

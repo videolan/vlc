@@ -73,11 +73,6 @@ void _M( intf_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Probe( probedata_t *p_data )
 {
-    if( TestMethod( INTF_METHOD_VAR, "macosx" ) )
-    {
-        return( 999 );
-    }
-
     /* Under MacOS X, this plugin always works */
     return( 100 );
 }

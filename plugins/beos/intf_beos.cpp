@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.36 2002/01/07 02:12:29 sam Exp $
+ * $Id: intf_beos.cpp,v 1.37 2002/01/19 19:54:01 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -85,11 +85,6 @@ void _M( intf_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Probe( probedata_t *p_data )
 {
-    if( TestMethod( INTF_METHOD_VAR, "beos" ) )
-    {
-        return( 999 );
-    }
-
     return( 100 );
 }
 

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.37 2002/01/05 18:25:48 sam Exp $
+ * $Id: vout_beos.cpp,v 1.38 2002/01/19 19:54:01 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -420,10 +420,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_METHOD_VAR, "beos" ) )
-    {
-        return( 999 );
-    }
     return( 100 );
 }
 

@@ -96,11 +96,6 @@ static int aout_Probe( probedata_t *p_data )
         return( 0 );
     }
 
-    if( TestMethod( AOUT_METHOD_VAR, "qnx" ) )
-    {
-        return( 999 );
-    }
-
     /* return score */
     return( 50 );
 }    

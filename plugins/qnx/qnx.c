@@ -46,10 +46,10 @@ ADD_WINDOW( "Configuration for QNX RTOS module" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->psz_longname = "QNX RTOS module";
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_AOUT
-                                | MODULE_CAPABILITY_VOUT;
+    SET_DESCRIPTION( "QNX RTOS module" )
+    ADD_CAPABILITY( VOUT, 100 )
+    ADD_CAPABILITY( AOUT, 50 )
+    ADD_SHORTCUT( "qnx" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

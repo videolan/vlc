@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.9 2001/12/30 07:09:55 sam Exp $
+ * $Id: aout_macosx.c,v 1.10 2002/01/19 19:54:01 gbazin Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -118,11 +118,6 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( AOUT_METHOD_VAR, "macosx" ) )
-    {
-        return( 999 );
-    }
-
     /* This plugin always works under OS X */
     return( 100 );
 }

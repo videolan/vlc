@@ -102,11 +102,6 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( VOUT_METHOD_VAR, "macosx" ) )
-    {
-        return( 999 );
-    }
-
     return( 100 );
 }
 
