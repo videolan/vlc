@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.84 2004/02/26 13:24:55 hartman Exp $
+ * $Id: vout.m,v 1.85 2004/02/28 13:53:35 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -328,9 +328,9 @@ static int vout_Init( vout_thread_t *p_vout )
         {
             /* Nothing special to do, we just need a basic allocated
                picture_t */
-            vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,
-                    p_vout->output.i_width, p_vout->output.i_height,
-                    p_vout->output.i_aspect );
+            vout_AllocatePicture( VLC_OBJECT( p_vout ), p_pic,
+                    p_vout->output.i_chroma, p_vout->output.i_width,
+                    p_vout->output.i_height, p_vout->output.i_aspect );
         }
 
         p_pic->i_status = DESTROYED_PICTURE;
@@ -345,6 +345,7 @@ static int vout_Init( vout_thread_t *p_vout )
     {
         [p_vout->p_sys->o_glview lockFocus];
         [p_vout->p_sys->o_glview initTextures];
+        [p_vout->p_sys->o_glview reshape];
         [p_vout->p_sys->o_glview unlockFocus];
     }
 
@@ -361,6 +362,10 @@ static void vout_End( vout_thread_t *p_vout )
     if( !p_vout->p_sys->i_opengl )
     {
         QTDestroySequence( p_vout );
+    }
+    else
+    {
+        [p_vout->p_sys->o_glview cleanUp];
     }
 
     /* Free the direct buffers we allocated */
@@ -1365,17 +1370,23 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         glTranslatef( 0.0, 0.0, - 5.0 );
     }
 
-    b_init_done = 0;
+    i_texture    = 0;
+    initDone     = 0;
+    isFullScreen = 0;
 
     return self;
 }
 
 - (void) reshape
 {
+    if( !initDone )
+    {
+        return;
+    }
+    
     [currentContext makeCurrentContext];
 
     NSRect bounds = [self bounds];
-
     glViewport( 0, 0, (GLint) bounds.size.width,
                 (GLint) bounds.size.height );
 
@@ -1385,10 +1396,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         f_x = 1.0;
         f_y = 1.0;
     }
-    else if( bounds.size.height * p_vout->render.i_aspect <
+    else if( bounds.size.height * p_vout->output.i_aspect <
         bounds.size.width * VOUT_ASPECT_FACTOR )
     {
-        f_x = bounds.size.height * p_vout->render.i_aspect /
+        f_x = bounds.size.height * p_vout->output.i_aspect /
             VOUT_ASPECT_FACTOR / bounds.size.width;
         f_y = 1.0;
     }
@@ -1396,7 +1407,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         f_x = 1.0;
         f_y = bounds.size.width * VOUT_ASPECT_FACTOR /
-            p_vout->render.i_aspect / bounds.size.height;
+            p_vout->output.i_aspect / bounds.size.height;
     }
 }
 
@@ -1404,6 +1415,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     [currentContext makeCurrentContext];
 
+    /* Free previous texture if any */
+    if( i_texture )
+    {
+        glDeleteTextures( 1, &i_texture );
+    }
+    
     /* Create textures */
     glGenTextures( 1, &i_texture );
 
@@ -1439,11 +1456,16 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
             PP_OUTPUTPICTURE[0]->p_data );
 
-    b_init_done = 1;
+    initDone = 1;
 }
 
 - (void) reloadTexture
 {
+    if( !initDone )
+    {
+        return;
+    }
+    
     [currentContext makeCurrentContext];
 
     glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
@@ -1459,6 +1481,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) goFullScreen
 {
+    /* Create the new pixel format */
     NSOpenGLPixelFormatAttribute attribs[] =
     {
         NSOpenGLPFAAccelerated,
@@ -1469,47 +1492,47 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         NSOpenGLPFADepthSize, 24,
         NSOpenGLPFAFullScreen,
         NSOpenGLPFAScreenMask,
+        /* TODO handle macosxx-vdev */
         CGDisplayIDToOpenGLDisplayMask( kCGDirectMainDisplay ),
         0
     };
-
     NSOpenGLPixelFormat * fmt = [[NSOpenGLPixelFormat alloc]
         initWithAttributes: attribs];
-
     if( !fmt )
     {
         msg_Warn( p_vout, "Cannot create NSOpenGLPixelFormat" );
         return;
     }
 
+    /* Create the new OpenGL context */
     fullScreenContext = [[NSOpenGLContext alloc]
-        initWithFormat: fmt shareContext: [self openGLContext]];
-
+        initWithFormat: fmt shareContext: nil];
     if( !fullScreenContext )
     {
         msg_Warn( p_vout, "Failed to create new NSOpenGLContext" );
         return;
     }
-
     currentContext = fullScreenContext;
 
+    /* Capture display, switch to fullscreen */
     if( CGCaptureAllDisplays() != CGDisplayNoErr )
     {
         msg_Warn( p_vout, "CGCaptureAllDisplays() failed" );
         return;
     }
-
     [fullScreenContext setFullScreen];
     [fullScreenContext makeCurrentContext];
+
+    /* Fix ratio */
     unsigned width  = CGDisplayPixelsWide( kCGDirectMainDisplay );
     unsigned height = CGDisplayPixelsHigh( kCGDirectMainDisplay );
-    
     if( config_GetInt( p_vout, "macosx-stretch" ) )
     {
         f_x = 1.0;
         f_y = 1.0;
     }
-    else if( height * p_vout->output.i_aspect < width * VOUT_ASPECT_FACTOR )
+    else if( height * p_vout->output.i_aspect <
+                 width * VOUT_ASPECT_FACTOR )
     {
         f_x = (float) height * p_vout->output.i_aspect /
             width / VOUT_ASPECT_FACTOR;
@@ -1519,20 +1542,44 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         f_x = 1.0;
         f_y = (float) width * VOUT_ASPECT_FACTOR /
-            p_vout->output.i_aspect / height;
+        p_vout->output.i_aspect / height;
     }
+
+    /* Update viewport, re-init textures */
     glViewport( 0, 0, width, height );
     [self initTextures];
+
+    /* Redraw the last picture */
+    [self setNeedsDisplay: YES];
+
+    isFullScreen = 1;
 }
 
 - (void) exitFullScreen
 {
+    /* Free current OpenGL context */
     [NSOpenGLContext clearCurrentContext];
     [fullScreenContext clearDrawable];
     [fullScreenContext release];
     CGReleaseAllDisplays();
+
     currentContext = [self openGLContext];
+    [self initTextures];
     [self reshape];
+
+    /* Redraw the last picture */
+    [self setNeedsDisplay: YES];
+
+    isFullScreen = 0;
+}
+
+- (void) cleanUp
+{
+    if( isFullScreen )
+    {
+        [self exitFullScreen];
+    }
+    initDone = 0;
 }
 
 - (void) drawQuad
@@ -1639,7 +1686,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     /* Black background */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    if( !b_init_done )
+    if( !initDone )
     {
         [currentContext flushBuffer];
         return;
