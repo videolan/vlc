@@ -1211,7 +1211,7 @@ then
   if test "x${with_qte}" = "x"
   then
     test_LDFLAGS="-L${QTDIR}/lib"
-    test_CFLAGS="-I$(QTDIR)/include"
+    test_CFLAGS="-I${QTDIR}/include"
   else
     test_LDFLAGS="-L${with_qte}/lib"
     test_CFLAGS="-I${with_qte}/include"
@@ -1584,7 +1584,7 @@ AC_ARG_ENABLE(opie,
      [    --with-qte=PATH    Qt Embedded headers and libraries])
      if test "x${with_qte}" = "x"
      then
-       test_LDFLAGS="-L$(QTDIR)/lib"
+       test_LDFLAGS="-L${QTDIR}/lib"
        test_CFLAGS="-I${QTDIR}/include"
      else
        test_LDFLAGS="-L${with_qte}/lib"
