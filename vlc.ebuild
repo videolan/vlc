@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.19 2003/08/24 08:12:01 hartman Exp $
+# $Id: vlc.ebuild,v 1.20 2004/01/08 19:07:42 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -32,21 +32,21 @@
 
 IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi
       oggvorbis gnome xv oss sdl aalib slp truetype v4l xvid lirc 
-	  wxwindows imlib matroska dvb mozilla debug faad xosd altivec"
+	  wxwindows imlib matroska dvb mozilla debug faad xosd altivec png"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
-PFFMPEG=ffmpeg-20030813
-PLIBMPEG2=mpeg2dec-20030612
+PFFMPEG=ffmpeg-20040103
+PLIVEDOTCOM=live
 
 S=${WORKDIR}/${P}
 SFFMPEG=${WORKDIR}/${PFFMPEG}
-SLIBMPEG2=${WORKDIR}/${PLIBMPEG2}
+SLIVEDOTCOM=${WORKDIR}/${PLIVEDOTCOM}
 
 DESCRIPTION="VLC media player - Video player and streamer"
-SRC_URI="http://www.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
-		 http://www.videolan.org/pub/${PN}/${PV}/contrib/mpeg2dec-20030612.tar.bz2
-		 http://www.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20030813.tar.bz2"
+SRC_URI="http://download.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
+		 http://download.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20040103.tar.bz2
+		 http://download.videolan.org/pub/${PN}/${PV}/contrib/live.2003.11.06.tar.gz"
 
 HOMEPAGE="http://www.videolan.org/vlc"
 
@@ -59,11 +59,11 @@ DEPEND="X? ( virtual/x11 )
 	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
 	dvb? ( media-libs/libdvb
 		media-tv/linuxtv-dvb )
-	dvd? ( >=media-libs/libdvdread-0.9.3
+	dvd? ( >=media-libs/libdvdread-0.9.4
 		>=media-libs/libdvdcss-1.2.8
 		>=media-libs/libdvdplay-1.0.1 )
 	esd? ( >=media-sound/esound-0.2.22 )
-	faad? ( >=media-libs/faad2-1.1 )
+	faad? ( >=media-libs/faad2-2.0-rc3 )
 	ggi? ( >=media-libs/libggi-2.0_beta3 )
 	gnome? ( >=gnome-base/gnome-libs-1.4.1.2-r1 )
 	gtk? ( =x11-libs/gtk+-1.2* )
@@ -71,22 +71,25 @@ DEPEND="X? ( virtual/x11 )
 	lirc? ( app-misc/lirc )
 	mad? ( media-libs/libmad
 		media-libs/libid3tag )
-	matroska? ( >=media-libs/libmatroska-0.4.4 )
+	matroska? ( >=media-libs/libmatroska-0.6.2 )
 	mozilla? ( >=net-www/mozilla-1.4 )
 	ncurses? ( sys-libs/ncurses )
-	nls? ( sys-devel/gettext )
+	nls? ( >=sys-devel/gettext-0.12.1 )
 	oggvorbis? ( >=media-libs/libvorbis-1.0
 		>=media-libs/libogg-1.0 )
 	sdl? ( >=media-libs/libsdl-1.2.5 )
 	slp? ( >=net-libs/openslp-1.0.10 )
-	truetype? ( >=media-libs/freetype-2.1.4 )
+	truetype? ( >=dev-libs/fribidi-0.10.4
+				>=media-libs/freetype-2.1.4 )
 	wxwindows? ( >=x11-libs/wxGTK-2.4.1 )
 	xosd? ( >=x11-libs/xosd-2.0 )
 	xvid? ( >=media-libs/xvid-0.9.1 )
 	3dfx? ( media-libs/glide-v3 )
+	png? ( >=media-libs/libpng-1.2.5 )
 	>=media-sound/lame-3.93.1
 	>=media-libs/libdvbpsi-0.1.3
 	>=media-libs/a52dec-0.7.4
+	>=media-libs/mpeg2dec-0.4.0
 	>=media-libs/flac-1.1.0"
 
 inherit gcc
@@ -103,21 +106,14 @@ src_unpack() {
 	cd ${S}/modules/video_output
 	epatch ${FILESDIR}/glide.patch
 	cd ${S}
-	
-	# patch libmpeg2
-	cd ${SLIBMPEG2}
-	sed -i -e 's:OPT_CFLAGS=\"$CFLAGS -mcpu=.*\":OPT_CFLAGS=\"$CFLAGS\":g' configure
-
 }
 
 src_compile(){
-	# configure and building of libmpeg2
-	cd ${SLIBMPEG2}
-	econf --disable-sdl --without-x \
-		|| die "./configure of libmpeg2 failed"
+	# configure and building of livedotcom
+	cd ${SLIVEDOTCOM}
+	./genMakefiles linux
+	make
 	
-	emake || make || die "make of libmpeg2 failed"
-
 	# configure and building of ffmpeg
 	cd ${SFFMPEG}
 	local myconf
@@ -125,6 +121,7 @@ src_compile(){
 
 	./configure ${myconf} \
 		--enable-mp3lame \
+		--enable-pp \
 		--disable-vorbis || die "./configure of ffmpeg failed"
 	
 	cd libpostproc
@@ -239,7 +236,8 @@ src_compile(){
 
 	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
 		--with-ffmpeg-mp3lame \
-		--enable-libmpeg2 --with-libmpeg2-tree=${SLIBMPEG2} \
+		--enable-libmpeg2 \
+		--enable-livedotcom --with-livedotcom-tree=${SLIVEDOTCOM} \
 		--enable-flac \
 		--disable-kde \
 		--disable-qt"
