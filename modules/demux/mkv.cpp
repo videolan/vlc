@@ -2583,6 +2583,8 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
                     msg_Dbg( p_demux, "|   |   |   |   + Unknown (%s)", typeid(*l).name() );
                 }
             }
+            if ( tk->fmt.video.i_visible_height && tk->fmt.video.i_visible_width )
+                tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * tk->fmt.video.i_visible_width / tk->fmt.video.i_visible_height;
         }
         else  if( MKV_IS_ID( l, KaxTrackAudio ) )
         {
