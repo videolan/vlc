@@ -61,11 +61,9 @@ static int      VCDControl      ( access_t *p_access, int i_query,
 static void VCDSetOrigin    ( access_t *p_access, lsn_t i_lsn, 
                               track_t track,  
 			      const vcdinfo_itemid_t * p_itemid );
-static int  VCDEntryPoints  ( access_t * );
-static int  VCDLIDs         ( access_t * );
-#ifdef FIXED
-static int  VCDSegments     ( access_t * );
-#endif
+static vlc_bool_t  VCDEntryPoints  ( access_t * );
+static vlc_bool_t  VCDLIDs         ( access_t * );
+static vlc_bool_t  VCDSegments     ( access_t * );
 static int  VCDTitles       ( access_t * );
 static int  VCDReadSector   ( vlc_object_t *p_this,
                               const vcdinfo_obj_t *p_vcd, lsn_t i_lsn,
@@ -204,7 +202,7 @@ VCDReadBlock( access_t * p_access )
             *p_buf = 0x01;
             dbg_print(INPUT_DBG_STILL, "Handled still event");
 
-            p_vcd->p_intf->p_sys->b_still = VLC_TRUE;
+            p_vcd->in_still = VLC_TRUE;
             var_SetInteger( p_access, "state", PAUSE_S );
 
             return p_block;
@@ -483,10 +481,10 @@ VCDPlay( access_t *p_access, vcdinfo_itemid_t itemid )
   and initializes area information with that.
   Before calling this track information should have been read in.
  *****************************************************************************/
-static int
+static vlc_bool_t
 VCDEntryPoints( access_t * p_access )
 {
-  if (!p_access || !p_access->p_sys) return VLC_EGENERIC;
+  if (!p_access || !p_access->p_sys) return VLC_FALSE;
   
   {
     vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
@@ -498,7 +496,7 @@ VCDEntryPoints( access_t * p_access )
    
     if (0 == i_entries) {
       LOG_ERR ("no entires found -- something is wrong" );
-      return VLC_EGENERIC;
+      return VLC_FALSE;
     }
     
     p_vcd->p_entries  = malloc( sizeof( lsn_t ) * i_entries );
@@ -506,7 +504,7 @@ VCDEntryPoints( access_t * p_access )
     if( p_vcd->p_entries == NULL )
       {
 	LOG_ERR ("not enough memory for entry points treatment" );
-	return VLC_EGENERIC;
+	return VLC_FALSE;
       }
     
     p_vcd->i_entries = i_entries;
@@ -538,86 +536,63 @@ VCDEntryPoints( access_t * p_access )
 	  msg_Warn( p_access, "wrong track number found in entry points" );
     }
     p_vcd->b_valid_ep = VLC_TRUE;
-    return 0;
+    return VLC_TRUE;
   }
 }
 
-/*????? FIXME!!! */
-#ifdef FIXED 
 /*****************************************************************************
  * VCDSegments: Reads the information about the segments the disc.
  *****************************************************************************/
-static int
+static vlc_bool_t
 VCDSegments( access_t * p_access )
 {
-    vcdplayer_t  *p_vcd;
-    unsigned int  i;
-    unsigned int  i_segments;
+    vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
+    unsigned int i;
+    input_title_t *t;
 
+    p_vcd->i_segments = vcdinfo_get_num_segments(p_vcd->vcd);
 
-    p_vcd = (vcdplayer_t *) p_access->p_sys;
-    i_segments = p_vcd->num_segments = vcdinfo_get_num_segments(p_vcd->vcd);
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_MRL),
+               "num LIDs=%d", p_vcd->i_segments);
 
-#define area p_access->stream.pp_areas
+    if ( 0 == p_vcd->i_segments ) return VLC_FALSE;
 
-    /* area 0 is reserved for segments. Set Absolute start offset
-         and size */
-    area[0]->i_plugin_data = 0;
-    input_DelArea( p_access, area[0] );
-    input_AddArea( p_access, 0, 0 );
+    t = p_vcd->p_title[p_vcd->i_titles] = vlc_input_title_New();
+    p_vcd->i_titles++;
 
-    area[0]->i_start = (off_t)p_vcd->p_sectors[0]
-      * (off_t)M2F2_SECTOR_SIZE;
-    area[0]->i_size = (off_t)(p_vcd->p_sectors[1] - p_vcd->p_sectors[0])
-      * (off_t)M2F2_SECTOR_SIZE;
-
-    /* Default Segment  */
-    area[0]->i_part = 0;
-
-    /* i_plugin_data is used to store which entry point is the first
-       of the track (area) */
-    area[0]->i_plugin_data = 0;
-
-    area[0]->i_part_nb = 0;
-
-    dbg_print( INPUT_DBG_MRL,
-               "area[0] id: %d, i_start: %lld, i_size: %lld",
-               area[0]->i_id, area[0]->i_start, area[0]->i_size );
-
-    if (i_segments == 0) return 0;
-
+    t->i_size    = 0; /* Not sure Segments have a size associated */
+    t->psz_name  = strdup(_("Segments"));
+    
     /* We have one additional segment allocated so we can get the size
        by subtracting seg[i+1] - seg[i].
      */
-    p_vcd->p_segments = malloc( sizeof( lsn_t ) * (i_segments+1) );
+    p_vcd->p_segments = malloc( sizeof( lsn_t ) * (p_vcd->i_segments+1) );
     if( p_vcd->p_segments == NULL )
     {
         LOG_ERR ("not enough memory for segment treatment" );
-        return -1;
+        return VLC_FALSE;
     }
 
-    /* Update the navigation variables without triggering a callback */
-    VCDUpdateVar( p_access, 0, VLC_VAR_SETVALUE, "title", _("Track"),
-		  "Setting track" );
-
-    var_Change( p_access, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
-
-    for( i = 0 ; i < i_segments ; i++ )
+    for( i = 0 ; i < p_vcd->i_segments ; i++ )
     {
-      p_vcd->p_segments[i] = vcdinfo_get_seg_lsn(p_vcd->vcd, i);
-      area[0]->i_part_nb ++;
-      VCDUpdateVar( p_access, i , VLC_VAR_ADDCHOICE,
-                    "chapter", _("Segment"), "Adding segment choice");
+        char psz_segment[100];
+	seekpoint_t *s = vlc_seekpoint_New();
+	p_vcd->p_segments[i] = vcdinfo_get_seg_lsn(p_vcd->vcd, i);
+	
+	snprintf( psz_segment, sizeof(psz_segment), "%s%02d", _("Segment "), 
+		  i );
+	
+	s->i_byte_offset = 0; /* Not sure what this would mean here */
+	s->psz_name  = strdup(psz_segment);
+	TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
     }
 
-#undef area
+    p_vcd->p_segments[p_vcd->i_segments] = 
+      p_vcd->p_segments[p_vcd->i_segments-1]+
+      vcdinfo_get_seg_sector_count(p_vcd->vcd, p_vcd->i_segments-1);
 
-    p_vcd->p_segments[i_segments] = p_vcd->p_segments[i_segments-1]+
-      vcdinfo_get_seg_sector_count(p_vcd->vcd, i_segments-1);
-
-    return 0;
+    return VLC_TRUE;
 }
-#endif
 
 /*****************************************************************************
  Build title table which will be returned via ACCESS_GET_TITLE_INFO.
@@ -666,14 +641,21 @@ VCDTitles( access_t * p_access )
 /*****************************************************************************
   VCDLIDs: Reads the LIST IDs from the LOT.
  *****************************************************************************/
-static int
+static vlc_bool_t
 VCDLIDs( access_t * p_access )
 {
     vcdplayer_t *p_vcd = (vcdplayer_t *) p_access->p_sys;
+    input_title_t *t;
+    unsigned int i_lid, i_title;
 
     p_vcd->i_lids = vcdinfo_get_num_LIDs(p_vcd->vcd);
     p_vcd->i_lid  = VCDINFO_INVALID_ENTRY;
 
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_MRL),
+               "num LIDs=%d", p_vcd->i_lids);
+
+    if ( 0 == p_vcd->i_lids ) return VLC_FALSE;
+    
     if (vcdinfo_read_psd (p_vcd->vcd)) {
 
       vcdinfo_visit_lot (p_vcd->vcd, VLC_FALSE);
@@ -690,10 +672,35 @@ VCDLIDs( access_t * p_access )
 #endif
     }
 
-    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_MRL),
-               "num LIDs=%d", p_vcd->i_lids);
+    /* Set up LIDs Navigation Menu */
+    t = vlc_input_title_New();
+    t->b_menu = VLC_TRUE;
+    t->psz_name = strdup( "LIDs" );
 
-    return 0;
+    i_title = p_vcd->i_tracks;
+    for( i_lid =  1 ; i_lid <=  p_vcd->i_lids ; i_lid++ )
+    {
+	char psz_lid[100];
+	seekpoint_t *s = vlc_seekpoint_New();
+	    
+	snprintf( psz_lid, sizeof(psz_lid), "%s%02d", _("LID "), 
+		  i_lid );
+	
+	s->i_byte_offset = 0; /*  A lid doesn't have an offset
+				  size associated with it */
+	s->psz_name  = strdup(psz_lid);
+	TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
+	
+    }
+
+#if DYNAMICALLY_ALLOCATED
+    TAB_APPEND( p_vcd->i_titles, p_vcd->p_title, t );
+#else 
+    p_vcd->p_title[p_vcd->i_titles] = t;
+    p_vcd->i_titles++;
+#endif
+
+    return VLC_TRUE;
 }
 
 /*****************************************************************************
@@ -840,8 +847,6 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
 
   vcdplayer_set_origin(p_access);
 
-  p_access->info.i_title     = i_track-1;
-  p_access->info.i_size      = p_vcd->p_title[i_title]->i_size;
   p_access->info.i_pos       = ( i_lsn - p_vcd->track_lsn ) 
                              * M2F2_SECTOR_SIZE;
   p_access->info.i_update   |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE
@@ -850,11 +855,20 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
   if (p_itemid->type == VCDINFO_ITEM_TYPE_ENTRY) {
     VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
 		  "chapter", _("Entry"), "Setting entry/segment");
+    p_access->info.i_title     = i_track-1;
+    p_access->info.i_size      = p_vcd->p_title[i_title]->i_size;
     p_access->info.i_seekpoint = p_itemid->num;
-  } else {
+  } else if (p_itemid->type == VCDINFO_ITEM_TYPE_SEGMENT) {
     VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
 		  "chapter", _("Segment"),  "Setting entry/segment");
-    /* seekpoint is what? ??? */ 
+    /* The last title entry is the for segments (when segments exist
+       and they must here. The segment seekpoints are stored after
+       the entry seepoints. 
+    */
+    p_access->info.i_title     = p_vcd->i_titles - 1;
+    p_access->info.i_size      = 150 * M2F2_SECTOR_SIZE;
+    p_access->info.i_seekpoint = p_vcd->i_entries + p_itemid->num;
+
   }
 
   VCDUpdateTitle( p_access );
@@ -921,7 +935,7 @@ vcd_Open( vlc_object_t *p_this, const char *psz_dev )
       
       for (i=0; i<p_vcd->i_segments; i++) { 
 	p_vcd->segment[i].size = vcdinfo_get_seg_sector_count(p_vcdobj, i);
-	p_vcd->segment[i].start_LSN = vcdinfo_get_seg_lba(p_vcdobj, i);
+	p_vcd->segment[i].start_LSN = vcdinfo_get_seg_lsn(p_vcdobj, i);
       }
     } else 
       p_vcd->segment = NULL;
@@ -984,43 +998,6 @@ VCDUpdateVar( access_t *p_access, int i_num, int i_action,
 /*****************************************************************************
  * Public routines.
  *****************************************************************************/
-int
-E_(DebugCallback)   ( vlc_object_t *p_this, const char *psz_name,
-                      vlc_value_t oldval, vlc_value_t val, void *p_data )
-{
-  vcdplayer_t *p_vcd;
-
-  if (NULL == p_vcd_access) return VLC_EGENERIC;
-
-  p_vcd = (vcdplayer_t *)p_vcd_access->p_sys;
-
-  if (p_vcd->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_vcd_access, "Old debug (x%0x) %d, new debug (x%0x) %d",
-             p_vcd->i_debug, p_vcd->i_debug, val.i_int, val.i_int);
-  }
-  p_vcd->i_debug = val.i_int;
-  return VLC_SUCCESS;
-}
-
-int
-E_(BlocksPerReadCallback)   ( vlc_object_t *p_this, const char *psz_name,
-			      vlc_value_t oldval, vlc_value_t val, 
-			      void *p_data )
-{
-  vcdplayer_t *p_vcd;
-
-  if (NULL == p_vcd_access) return VLC_EGENERIC;
-
-  p_vcd = (vcdplayer_t *)p_vcd_access->p_sys;
-
-  if (p_vcd->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_vcd_access, "Old debug (x%0x) %d, new debug (x%0x) %d",
-             p_vcd->i_debug, p_vcd->i_debug, val.i_int, val.i_int);
-  }
-  p_vcd->i_debug = val.i_int;
-  return VLC_SUCCESS;
-}
-
 
 /*****************************************************************************
   VCDOpen: open VCD.
@@ -1111,25 +1088,24 @@ E_(VCDOpen) ( vlc_object_t *p_this )
         goto err_exit;
     }
     
-#ifdef FIXED
-    /* Initialize segment information. */
-    VCDSegments( p_access );
-#endif
-
-    /* Build Navigation Title table. */
+    /* Build Navigation Title table for the tracks. */
     VCDTitles( p_access );
 
-    /* Map entry points into Chapters */
-    if( VCDEntryPoints( p_access ) < 0 )
+    /* Add into the above entry points as "Chapters". */
+    if( ! VCDEntryPoints( p_access ) )
     {
         msg_Warn( p_access, "could not read entry points, will not use them" );
         p_vcd->b_valid_ep = VLC_FALSE;
     }
 
-    if( VCDLIDs( p_access ) < 0 )
+    /* Initialize LID info and add that as a menu item */
+    if( ! VCDLIDs( p_access ) )
     {
         msg_Warn( p_access, "could not read entry LIDs" );
     }
+
+    /* Initialize segment information and add that a "Track". */
+    VCDSegments( p_access );
 
     b_play_ok = (VLC_SUCCESS == VCDPlay( p_access, itemid ));
 

@@ -102,12 +102,12 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     /* Configuration options */
-    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback),
+    add_integer ( MODULE_STRING "-debug", 0, NULL,
                   N_("If nonzero, this gives additional debug information."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
     add_integer ( MODULE_STRING "-blocks-per-read", 20, 
-		  E_(BlocksPerReadCallback),
+		  NULL,
                   N_("Number of CD blocks to get in a single read."),
                   N_("Number of CD blocks to get in a single read."),
 		  VLC_TRUE );

@@ -135,7 +135,10 @@ typedef struct thread_vcd_data_s
 
   unsigned int i_titles;                /* # of navigatable titles. */
 
-  input_title_t *p_title[CDIO_CD_MAX_TRACKS];
+  /* 
+     # tracks + menu for segments + menu for LIDs
+   */
+  input_title_t *p_title[CDIO_CD_MAX_TRACKS+2];
 
   /* Probably gets moved into another structure...*/
   intf_thread_t *p_intf;
