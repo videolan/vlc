@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.40 2003/11/02 12:22:45 gbazin Exp $
+ * $Id: input.c,v 1.41 2003/12/17 23:21:15 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -88,8 +88,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         val.psz_string = "spectrum"; text.psz_string = _("Spectrum");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        val.psz_string = "goom"; text.psz_string = _("Goom");
-        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        /* val.psz_string = "goom"; text.psz_string = _("Goom");
+        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );*/
         if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
         {
             var_Set( p_aout, "visual", val );
