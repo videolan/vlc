@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.6 2001/07/12 23:06:54 gbazin Exp $
+ * $Id: libdvdcss.c,v 1.7 2001/07/15 09:49:09 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -647,12 +647,6 @@ static int _win32_dvdcss_aopen( char c_drive, dvdcss_handle dvdcss )
     fd->i_blocks = 0;
     fd->hASPI = (long) hASPI;
     fd->lpSendCommand = lpSendCommand;
-
-    if( !WIN2K )
-    {
-        fd->i_sid = MAKEWORD( ASPI_HAID, ASPI_TARGET );
-        return (int) fd;
-    }
 
     c_drive = c_drive > 'Z' ? c_drive - 'a' : c_drive - 'A';
 
