@@ -43,6 +43,11 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#define CACHING_TEXT N_("Caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for pvr streams. This " \
+    "value should be set in millisecond units." )
+
 #define DEVICE_TEXT N_( "Device" )
 #define DEVICE_LONGTEXT N_( "PVR video device" )
 
@@ -110,6 +115,7 @@ vlc_module_begin();
     set_capability( "access2", 0 );
     add_shortcut( "pvr" );
 
+    add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_string( "pvr-device", "/dev/video0", NULL, DEVICE_TEXT,
                  DEVICE_LONGTEXT, VLC_FALSE );
     add_integer( "pvr-norm", V4L2_STD_UNKNOWN , NULL, NORM_TEXT,
