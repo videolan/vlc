@@ -316,14 +316,6 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
         p_arg->pf_callback( p_arg );
     }
 
-    /* Blocking or not ? */
-    if( p_arg->b_blocking )
-    {
-        vlc_mutex_lock( &p_arg->lock );
-        p_arg->b_ready = 1;
-        vlc_cond_signal( &p_arg->wait );
-    }
-
     if( p_arg->psz_results )
     {
         for( int i = 0; i < p_arg->i_results; i++ )
@@ -335,14 +327,7 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
     if( p_arg->psz_title ) free( p_arg->psz_title );
     if( p_arg->psz_extensions ) free( p_arg->psz_extensions );
 
-    if( p_arg->b_blocking )
-    {
-        vlc_mutex_unlock( &p_arg->lock );
-    }
-    else
-    {
-        free( p_arg );
-    }
+    free( p_arg );
 }
 
 void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )

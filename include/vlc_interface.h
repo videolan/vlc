@@ -90,11 +90,6 @@ struct intf_dialog_args_t
 {
     char *psz_title;
 
-    vlc_bool_t  b_blocking;
-    vlc_bool_t  b_ready;
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
-
     char **psz_results;
     int  i_results;
 

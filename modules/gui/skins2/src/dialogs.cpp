@@ -167,8 +167,6 @@ void Dialogs::showChangeSkin()
             (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
         memset( p_arg, 0, sizeof(intf_dialog_args_t) );
 
-        p_arg->b_blocking = false;
-
         p_arg->psz_title = strdup( _("Open a skin file") );
         p_arg->psz_extensions =
             strdup( _("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|") );
