@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.5 2003/08/03 16:36:20 bigben Exp $
+ * $Id: http.c,v 1.6 2003/08/24 16:24:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -96,6 +96,8 @@ static struct
     { ".moov",  "video/quicktime" },
     { ".ogg",   "application/ogg" },
     { ".ogm",   "application/ogg" },
+    { ".wma",   "audio/x-ms-wma" },
+    { ".wmv",   "video/x-ms-wmv" },
     { ".wav",   "audio/wav" },
     { NULL,     NULL }
 };
