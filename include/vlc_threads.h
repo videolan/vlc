@@ -3,7 +3,7 @@
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads.h,v 1.10 2002/08/29 23:53:22 massiot Exp $
+ * $Id: vlc_threads.h,v 1.11 2002/08/30 12:23:23 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -105,15 +105,15 @@ typedef struct
 } vlc_cond_t;
 
 #elif defined( ST_INIT_IN_ST_H )
-typedef st_thread_t *    vlc_thread_t;
+typedef st_thread_t      vlc_thread_t;
 typedef struct
 {
-    st_mutex_t * mutex;
+    st_mutex_t mutex;
     vlc_object_t * p_this;
 } vlc_mutex_t;
 typedef struct
 {
-    st_cond_t * cond;
+    st_cond_t cond;
     vlc_object_t * p_this;
 } vlc_cond_t;
 

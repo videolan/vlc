@@ -156,9 +156,9 @@ AC_CHECK_FUNC(gethostbyname,,[
 have_nanosleep=0
 AC_CHECK_FUNC(nanosleep,have_nanosleep=1,[
   AC_CHECK_LIB(rt,nanosleep,
-    [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"; have_nanosleep=1],
+    [pthread_LDFLAGS="${pthread_LDFLAGS} -lrt"; have_nanosleep=1],
     [AC_CHECK_LIB(posix4,nanosleep,
-        [vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4"; have_nanosleep=1])]
+        [pthread_LDFLAGS="${pthread_LDFLAGS} -lposix4"; have_nanosleep=1])]
   )
 ])
 if test x$have_nanosleep = x1; then
@@ -166,7 +166,7 @@ if test x$have_nanosleep = x1; then
             Define if nanosleep is available.)
 fi
 # HP/UX port
-AC_CHECK_LIB(rt,sem_init, [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"])
+AC_CHECK_LIB(rt,sem_init, [pthread_LDFLAGS="${pthread_LDFLAGS} -lrt"])
 
 AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
@@ -203,10 +203,10 @@ AC_CHECK_LIB(m,pow,
 dnl Check for pthreads - borrowed from XMMS
 THREAD_LIB=error
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_LIB(pthread,main,THREAD_LIB="-lpthread")
+  AC_CHECK_LIB(pthread,main,THREAD_LIB="-lpthread ${pthread_LDFLAGS}")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_LIB(pthreads,main,THREAD_LIB="-lpthreads")
+  AC_CHECK_LIB(pthreads,main,THREAD_LIB="-lpthreads ${pthread_LDFLAGS}")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
   AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")

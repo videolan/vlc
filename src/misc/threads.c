@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.13 2002/08/29 23:53:22 massiot Exp $
+ * $Id: threads.c,v 1.14 2002/08/30 12:23:23 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -224,8 +224,8 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     return pth_mutex_init( &p_mutex->mutex );
 
 #elif defined( ST_INIT_IN_ST_H )
-    *p_mutex->mutex = st_mutex_new();
-    return ( *p_mutex == NULL ) ? errno : 0;
+    p_mutex->mutex = st_mutex_new();
+    return ( p_mutex == NULL ) ? errno : 0;
 
 #elif defined( WIN32 )
     /* We use mutexes on WinNT/2K/XP because we can use the SignalObjectAndWait
@@ -254,7 +254,7 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
 
         pthread_mutexattr_init( &attr );
         pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
-        i_result = pthread_mutex_init( p_mutex, &attr );
+        i_result = pthread_mutex_init( &p_mutex->mutex, &attr );
         pthread_mutexattr_destroy( &attr );
         return( i_result );
     }
@@ -303,7 +303,7 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
     return 0;
 
 #elif defined( ST_INIT_IN_ST_H )
-    i_result = st_mutex_destroy( *p_mutex );
+    i_result = st_mutex_destroy( p_mutex->mutex );
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
@@ -357,8 +357,8 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     return pth_cond_init( &p_condvar->cond );
 
 #elif defined( ST_INIT_IN_ST_H )
-    *p_condvar->cond = st_cond_new();
-    return ( *p_condvar->cond == NULL ) ? errno : 0;
+    p_condvar->cond = st_cond_new();
+    return ( p_condvar->cond == NULL ) ? errno : 0;
 
 #elif defined( WIN32 )
     /* Initialize counter */
@@ -441,7 +441,7 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
     return 0;
 
 #elif defined( ST_INIT_IN_ST_H )
-    i_result = st_cond_destroy( *p_condvar->cond );
+    i_result = st_cond_destroy( p_condvar->cond );
 
 #elif defined( WIN32 )
     if( !p_condvar->semaphore )

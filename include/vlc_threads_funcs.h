@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.1 2002/08/29 23:53:22 massiot Exp $
+ * $Id: vlc_threads_funcs.h,v 1.2 2002/08/30 12:23:23 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -74,7 +74,7 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
     i_result = pth_mutex_acquire( &p_mutex->mutex, TRUE, NULL );
 
 #elif defined( ST_INIT_IN_ST_H )
-    i_result = st_mutex_lock( *p_mutex->mutex );
+    i_result = st_mutex_lock( p_mutex->mutex );
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
@@ -141,7 +141,7 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
     i_result = pth_mutex_release( &p_mutex->mutex );
 
 #elif defined( ST_INIT_IN_ST_H )
-    i_result = st_mutex_unlock( *p_mutex->mutex );
+    i_result = st_mutex_unlock( p_mutex->mutex );
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
@@ -222,7 +222,7 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
     i_result = pth_cond_notify( &p_condvar->cond, FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
-    i_result = st_cond_signal( *p_condvar->cond );
+    i_result = st_cond_signal( p_condvar->cond );
 
 #elif defined( WIN32 )
     /* Release one waiting thread if one is available. */
@@ -352,7 +352,7 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
     i_result = pth_cond_notify( &p_condvar->cond, FALSE );
 
 #elif defined( ST_INIT_IN_ST_H )
-    i_result = st_cond_broadcast( *p_condvar->cond );
+    i_result = st_cond_broadcast( p_condvar->cond );
 
 #elif defined( WIN32 )
     /* Release all waiting threads. */
@@ -479,9 +479,9 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
     i_result = pth_cond_await( &p_condvar->cond, &p_mutex->mutex, NULL );
 
 #elif defined( ST_INIT_IN_ST_H )
-    st_mutex_unlock( *p_mutex->mutex );
-    i_result = st_cond_wait( *p_condvar->cond );
-    st_mutex_lock( *p_mutex->mutex );
+    st_mutex_unlock( p_mutex->mutex );
+    i_result = st_cond_wait( p_condvar->cond );
+    st_mutex_lock( p_mutex->mutex );
 
 #elif defined( WIN32 )
     if( !p_condvar->semaphore )
