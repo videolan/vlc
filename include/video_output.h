@@ -278,6 +278,7 @@ VLC_EXPORT( void, __spu_DestroyRegion, ( vlc_object_t *, subpicture_region_t * )
 
 void           vout_InitSPU( vout_thread_t * );
 void           vout_DestroySPU( vout_thread_t * );
+void           vout_AttachSPU( vout_thread_t *, vlc_bool_t );
 subpicture_t * vout_SortSubPictures  ( vout_thread_t *, mtime_t );
 void           vout_RenderSubPictures( vout_thread_t *, picture_t *,
                                        picture_t *, subpicture_t * );

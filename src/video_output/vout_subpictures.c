@@ -51,7 +51,6 @@ static void spu_del_buffer( filter_t *, subpicture_t * );
  */
 void vout_InitSPU( vout_thread_t *p_vout )
 {
-    vlc_object_t *p_input;
     int i_index;
 
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
@@ -83,14 +82,7 @@ void vout_InitSPU( vout_thread_t *p_vout )
     p_vout->b_force_alpha = VLC_FALSE;
     p_vout->b_force_crop = VLC_FALSE;
 
-    /* Create callback */
-    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input )
-    {
-        UpdateSPU( p_vout, VLC_OBJECT(p_input) );
-        var_AddCallback( p_input, "highlight", CropCallback, p_vout );
-        vlc_object_release( p_input );
-    }
+    vout_AttachSPU( p_vout, VLC_TRUE );
 }
 
 /**
@@ -100,7 +92,6 @@ void vout_InitSPU( vout_thread_t *p_vout )
  */
 void vout_DestroySPU( vout_thread_t *p_vout )
 {
-    vlc_object_t *p_input;
     int i_index;
 
     /* Destroy all remaining subpictures */
@@ -131,13 +122,35 @@ void vout_DestroySPU( vout_thread_t *p_vout )
         vlc_object_destroy( p_vout->p_blend );
     }
 
-    /* Delete callback */
+    vout_AttachSPU( p_vout, VLC_FALSE );
+}
+
+/**
+ * Attach/Detach the SPU from any input
+ *
+ * \param p_vout the vout in which to destroy the subpicture unit
+ * \param b_attach to select attach or detach
+ */
+void vout_AttachSPU( vout_thread_t *p_vout, vlc_bool_t b_attach )
+{
+    vlc_object_t *p_input;
+
     p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( p_input )
+    if( !p_input ) return;
+
+    if( b_attach )
     {
+        UpdateSPU( p_vout, VLC_OBJECT(p_input) );
+        var_AddCallback( p_input, "highlight", CropCallback, p_vout );
+        vlc_object_release( p_input );
+    }
+    else
+    {
+        /* Delete callback */
         var_DelCallback( p_input, "highlight", CropCallback, p_vout );
         vlc_object_release( p_input );
     }
+
 }
 
 /**

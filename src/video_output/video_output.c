@@ -94,11 +94,12 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
         {
             vlc_object_t *p_playlist;
 
-            p_playlist = vlc_object_find( p_this,
-                                          VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+            p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
 
             if( p_playlist )
             {
+                vout_AttachSPU( p_vout, VLC_FALSE );
                 vlc_object_detach( p_vout );
                 vlc_object_attach( p_vout, p_playlist );
 
@@ -194,6 +195,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
             /* This video output is cool! Hijack it. */
             vlc_object_detach( p_vout );
             vlc_object_attach( p_vout, p_this );
+            vout_AttachSPU( p_vout, VLC_TRUE );
             vlc_object_release( p_vout );
         }
     }
@@ -1420,4 +1422,3 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
 }
-
