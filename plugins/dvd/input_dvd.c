@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.21 2001/02/26 12:16:28 sam Exp $
+ * $Id: input_dvd.c,v 1.22 2001/03/02 03:32:46 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -65,8 +65,8 @@
 #include "input_ext-dec.h"
 
 #include "input.h"
-#include "input_netlist.h"
 
+#include "dvd_netlist.h"
 #include "dvd_ifo.h"
 #include "dvd_css.h"
 #include "input_dvd.h"
@@ -262,10 +262,10 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_read             = DVDRead;
     input.pf_set_area         = DVDSetArea;
     input.pf_demux            = input_DemuxPS;
-    input.pf_new_packet       = input_NetlistNewPacket;
-    input.pf_new_pes          = input_NetlistNewPES;
-    input.pf_delete_packet    = input_NetlistDeletePacket;
-    input.pf_delete_pes       = input_NetlistDeletePES;
+    input.pf_new_packet       = DVDNewPacket;
+    input.pf_new_pes          = DVDNewPES;
+    input.pf_delete_packet    = DVDDeletePacket;
+    input.pf_delete_pes       = DVDDeletePES;
     input.pf_rewind           = DVDRewind;
     input.pf_seek             = DVDSeek;
 #undef input
@@ -487,7 +487,8 @@ static int DVDSetArea( input_thread_t * p_input,
         {
 
 #if 0
-    fprintf( stderr, "Audio %d: %x %x %x %x %x %x\n", i,
+    fprintf( stderr, "Audio %d: %x %x %x %x %x %x %x\n", i,
+            p_method->ifo.vts.mat.p_audio_atrt[i].i_num_channels,
             p_method->ifo.vts.mat.p_audio_atrt[i].i_coding_mode,
             p_method->ifo.vts.mat.p_audio_atrt[i].i_multichannel_extension,
             p_method->ifo.vts.mat.p_audio_atrt[i].i_type,
@@ -674,15 +675,17 @@ static void DVDInit( input_thread_t * p_input )
     p_input->p_method_data = NULL;
 
     p_method->i_fd = p_input->i_handle;
-    /* FIXME: read several packets once */
-    p_method->i_read_once = 1; 
+
+    p_method->i_block_once = 32;
+    p_input->i_read_once = 128;
+
     p_method->b_encrypted = DVDCheckCSS( p_input );
 
     lseek( p_input->i_handle, 0, SEEK_SET );
 
     /* Reading structures initialisation */
-    input_NetlistInit( p_input, 4096, 4096, DVD_LB_SIZE,
-                       p_method->i_read_once ); 
+    DVDNetlistInit( p_input, 4096, 16384, 4096, DVD_LB_SIZE,
+                    p_method->i_block_once ); 
     intf_WarnMsg( 2, "DVD: Netlist initialized" );
 
     /* Ifo initialisation */
@@ -781,7 +784,7 @@ static void DVDEnd( input_thread_t * p_input )
 //    IfoEnd( (ifo_t*)(&p_input->p_plugin_data->ifo ) );
     free( p_input->stream.p_demux_data );
     free( p_input->p_plugin_data );
-    input_NetlistEnd( p_input );
+    DVDNetlistEnd( p_input );
 }
 
 /*****************************************************************************
@@ -791,59 +794,57 @@ static void DVDEnd( input_thread_t * p_input )
  * EOF.
  *****************************************************************************/
 static int DVDRead( input_thread_t * p_input,
-                   data_packet_t ** pp_packets )
+                    data_packet_t ** pp_packets )
 {
     thread_dvd_data_t *     p_method;
     netlist_t *             p_netlist;
     struct iovec *          p_vec;
-    struct data_packet_s *  p_data;
+    struct data_packet_s *  pp_data[p_input->i_read_once];
     u8 *                    pi_cur;
     int                     i_packet_size;
+    int                     i_iovec;
     int                     i_packet;
     int                     i_pos;
-    int                     i;
-    boolean_t               b_first_packet;
 
     p_method = ( thread_dvd_data_t * ) p_input->p_plugin_data;
     p_netlist = ( netlist_t * ) p_input->p_method_data;
 
     /* Get an iovec pointer */
-    if( ( p_vec = input_NetlistGetiovec( p_netlist ) ) == NULL )
+    if( ( p_vec = DVDGetiovec( p_netlist ) ) == NULL )
     {
         intf_ErrMsg( "DVD: read error" );
         return -1;
     }
 
     /* Reads from DVD */
-    readv( p_input->i_handle, p_vec, p_method->i_read_once );
-
-    if( p_method->b_encrypted )
-    {
-        for( i=0 ; i<p_method->i_read_once ; i++ )
-        {
-            CSSDescrambleSector( p_method->css.pi_title_key, 
-                                 p_vec[i].iov_base );
-            ((u8*)(p_vec[i].iov_base))[0x14] &= 0x8F;
-        }
-    }
+    readv( p_input->i_handle, p_vec, p_method->i_block_once );
 
     /* Update netlist indexes */
-    input_NetlistMviovec( p_netlist, p_method->i_read_once, &p_data );
-
+    DVDMviovec( p_netlist, p_method->i_block_once, pp_data );
     i_packet = 0;
+
     /* Read headers to compute payload length */
-    for( i = 0 ; i < p_method->i_read_once ; i++ )
+    for( i_iovec = 0 ; i_iovec < p_method->i_block_once ; i_iovec++ )
     {
+        if( p_method->b_encrypted )
+        {
+            CSSDescrambleSector( p_method->css.pi_title_key, 
+                                 p_vec[i_iovec].iov_base );
+            ((u8*)(p_vec[i_iovec].iov_base))[0x14] &= 0x8F;
+        }
+
         i_pos = 0;
-        b_first_packet = 1;
+
         while( i_pos < p_netlist->i_buffer_size )
         {
-            pi_cur = (u8*)(p_vec[i].iov_base + i_pos);
+            pi_cur = (u8*)(p_vec[i_iovec].iov_base + i_pos);
+
             /*default header */
             if( U32_AT( pi_cur ) != 0x1BA )
             {
                 /* That's the case for all packets, except pack header. */
                 i_packet_size = U16_AT( pi_cur + 4 );
+                pp_packets[i_packet] = DVDNewPtr( p_netlist );
             }
             else
             {
@@ -863,31 +864,33 @@ static int DVDRead( input_thread_t * p_input,
                     intf_ErrMsg( "Unable to determine stream type" );
                     return( -1 );
                 }
-            }
-            if( b_first_packet )
-            {
-                p_data->b_discard_payload = 0;
-                b_first_packet = 0;
-            }
-            else
-            { 
-                p_data = input_NetlistNewPacket( p_netlist ,
-                                                 i_packet_size + 6 );
-                memcpy( p_data->p_buffer,
-                        p_vec[i].iov_base + i_pos , i_packet_size + 6 );
+
+                pp_packets[i_packet] = pp_data[i_iovec];
+
             }
 
-            p_data->p_payload_end = p_data->p_payload_start + i_packet_size + 6;
-            pp_packets[i_packet] = p_data;
+            (*pp_data[i_iovec]->pi_refcount)++;
+
+            pp_packets[i_packet]->pi_refcount = pp_data[i_iovec]->pi_refcount;
+
+            pp_packets[i_packet]->p_buffer = pp_data[i_iovec]->p_buffer;
+
+            pp_packets[i_packet]->p_payload_start =
+                    pp_packets[i_packet]->p_buffer + i_pos;
+
+            pp_packets[i_packet]->p_payload_end =
+                    pp_packets[i_packet]->p_payload_start + i_packet_size + 6;
+
             i_packet++;
             i_pos += i_packet_size + 6;
         }
     }
+
     pp_packets[i_packet] = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_tell +=
-                                        p_method->i_read_once *DVD_LB_SIZE;
+                                        p_method->i_block_once *DVD_LB_SIZE;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );

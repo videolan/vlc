@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.22 2001/02/08 17:44:12 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.23 2001/03/02 03:32:46 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -39,6 +39,8 @@ typedef struct data_packet_s
                                   /* start of the PES payload in this packet */
     byte_t *                p_payload_end;                    /* guess ? :-) */
     boolean_t               b_discard_payload;  /* is the packet messed up ? */
+
+    int *                   pi_refcount;
 
     /* Used to chain the TS packets that carry data for a same PES or PSI */
     struct data_packet_s *  p_next;

@@ -300,6 +300,7 @@ PLUGIN_DUMMY =	plugins/dummy/dummy.o \
 
 PLUGIN_DVD =	plugins/dvd/dvd.o \
 		plugins/dvd/input_dvd.o \
+		plugins/dvd/dvd_netlist.o \
 		plugins/dvd/dvd_ioctl.o \
 		plugins/dvd/dvd_ifo.o \
 		plugins/dvd/dvd_udf.o \

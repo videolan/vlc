@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.87 2001/02/20 09:10:36 sam Exp $
+ * $Id: input.c,v 1.88 2001/03/02 03:32:46 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -88,6 +88,9 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
                      strerror(errno) );
         return( NULL );
     }
+
+    /* Packets read once */
+    p_input->i_read_once = INPUT_READ_ONCE;
 
     /* Initialize thread properties */
     p_input->b_die              = 0;
@@ -193,7 +196,6 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
  *****************************************************************************/
 static void RunThread( input_thread_t *p_input )
 {
-    data_packet_t *         pp_packets[INPUT_READ_ONCE];
     int                     i_error, i;
 
     if( InitThread( p_input ) )
@@ -209,6 +211,7 @@ static void RunThread( input_thread_t *p_input )
 
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
+        data_packet_t *         pp_packets[p_input->i_read_once];
 
 #ifdef STATS
         p_input->c_loops++;
@@ -241,7 +244,7 @@ static void RunThread( input_thread_t *p_input )
         i_error = p_input->pf_read( p_input, pp_packets );
 
         /* Demultiplex read packets. */
-        for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
+        for( i = 0; i < p_input->i_read_once && pp_packets[i] != NULL; i++ )
         {
             p_input->pf_demux( p_input, pp_packets[i] );
         }

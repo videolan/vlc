@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.38 2001/02/21 04:38:59 henri Exp $
+ * $Id: mpeg_system.c,v 1.39 2001/03/02 03:32:46 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -500,11 +500,11 @@ static u16 GetID( data_packet_t * p_data )
 {
     u16         i_id;
 
-    i_id = p_data->p_buffer[3];                                 /* stream_id */
+    i_id = p_data->p_payload_start[3];                                 /* stream_id */
     if( i_id == 0xBD )
     {
         /* stream_private_id */
-        i_id |= p_data->p_buffer[ 9 + p_data->p_buffer[8] ] << 8;
+        i_id |= p_data->p_payload_start[ 9 + p_data->p_payload_start[8] ] << 8;
     }
     return( i_id );
 }
@@ -528,7 +528,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     }
 
     if( p_demux->b_has_PSM
-        && p_demux->i_PSM_version == (p_data->p_buffer[6] & 0x1F) )
+        && p_demux->i_PSM_version == (p_data->p_payload_start[6] & 0x1F) )
     {
         /* Already got that one. */
         return;
@@ -536,7 +536,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 
     intf_DbgMsg( "Building PSM" );
     p_demux->b_has_PSM = 1;
-    p_demux->i_PSM_version = p_data->p_buffer[6] & 0x1F;
+    p_demux->i_PSM_version = p_data->p_payload_start[6] & 0x1F;
 
     /* Go to elementary_stream_map_length, jumping over
      * program_stream_info. */
@@ -647,7 +647,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
     u32                 i_code;
     es_descriptor_t *   p_es = NULL;
 
-    i_code = U32_AT( p_data->p_buffer );
+    i_code = U32_AT( p_data->p_payload_start );
     if( i_code > 0x1BC ) /* ES start code */
     {
         u16                 i_id;
@@ -685,7 +685,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                                     i_id, 0 );
                 if( p_es != NULL )
                 {
-                    p_es->i_stream_id = p_data->p_buffer[3];
+                    p_es->i_stream_id = p_data->p_payload_start[3];
 
                     /* Set stream type and auto-spawn. */
                     if( (i_id & 0xF0) == 0xE0 )
@@ -777,7 +777,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     boolean_t           b_trash = 0;
     es_descriptor_t *   p_es = NULL;
 
-    i_code = U32_AT( p_data->p_buffer );
+    i_code = U32_AT( p_data->p_payload_start );
     if( i_code <= 0x1BC )
     {
         switch( i_code )
@@ -788,30 +788,30 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 mtime_t         scr_time;
                 u32             i_mux_rate;
 
-                if( (p_data->p_buffer[4] & 0xC0) == 0x40 )
+                if( (p_data->p_payload_start[4] & 0xC0) == 0x40 )
                 {
                     /* MPEG-2 */
                     scr_time =
-                         ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
-                         ((mtime_t)(U32_AT(p_data->p_buffer + 4) & 0x03FFF800)
+                         ((mtime_t)(p_data->p_payload_start[4] & 0x38) << 27) |
+                         ((mtime_t)(U32_AT(p_data->p_payload_start + 4) & 0x03FFF800)
                                         << 4) |
-                         ((mtime_t)(U32_AT(p_data->p_buffer + 6) & 0x03FFF800)
+                         ((mtime_t)(U32_AT(p_data->p_payload_start + 6) & 0x03FFF800)
                                         >> 11);
 
                     /* mux_rate */
-                    i_mux_rate = (U32_AT(p_data->p_buffer + 10) & 0xFFFFFC00);
+                    i_mux_rate = (U32_AT(p_data->p_payload_start + 10) & 0xFFFFFC00);
                 }
                 else
                 {
                     /* MPEG-1 SCR is like PTS. */
                     scr_time =
-                         ((mtime_t)(p_data->p_buffer[4] & 0x0E) << 29) |
-                         (((mtime_t)U16_AT(p_data->p_buffer + 5) << 14)
+                         ((mtime_t)(p_data->p_payload_start[4] & 0x0E) << 29) |
+                         (((mtime_t)U16_AT(p_data->p_payload_start + 5) << 14)
                            - (1 << 14)) |
-                         ((mtime_t)U16_AT(p_data->p_buffer + 7) >> 1);
+                         ((mtime_t)U16_AT(p_data->p_payload_start + 7) >> 1);
 
                     /* mux_rate */
-                    i_mux_rate = (U32_AT(p_data->p_buffer + 8) & 0x8FFFFE);
+                    i_mux_rate = (U32_AT(p_data->p_payload_start + 8) & 0x8FFFFE);
                 }
                 /* Call the pace control. */
                 input_ClockManageRef( p_input, p_input->stream.pp_programs[0],
