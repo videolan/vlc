@@ -373,6 +373,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
         case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
         case VLC_FOURCC( 'm', 'j', 'p', 'b' ):
+        case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
         case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
             break;
         default:
@@ -850,6 +851,10 @@ static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
     case VLC_FOURCC('M','J','P','G'):
         memcpy( fcc, "mjpa", 4 );
+        break;
+
+    case VLC_FOURCC('S','V','Q','1'):
+        memcpy( fcc, "SVQ1", 4 );
         break;
 
     case VLC_FOURCC('S','V','Q','3'):
