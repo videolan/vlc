@@ -4,7 +4,7 @@ struct module_symbols_t
 {
     aout_buffer_t * (* aout_BufferNew_inner) ( aout_instance_t *, aout_input_t *, size_t ) ;
     aout_buffer_t * (* aout_FifoPop_inner) ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) ;
-    aout_buffer_t * (* aout_OutputNextBuffer_inner) ( aout_instance_t *, mtime_t, mtime_t, vlc_bool_t ) ;
+    aout_buffer_t * (* aout_OutputNextBuffer_inner) ( aout_instance_t *, mtime_t, vlc_bool_t ) ;
     aout_input_t * (* __aout_InputNew_inner) ( vlc_object_t *, aout_instance_t **, audio_sample_format_t * ) ;
     aout_instance_t * (* __aout_NewInstance_inner) ( vlc_object_t * ) ;
     char * (* __config_GetPsz_inner) (vlc_object_t *, const char *) ;

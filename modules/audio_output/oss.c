@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.17 2002/08/24 21:11:21 sam Exp $
+ * $Id: oss.c,v 1.18 2002/08/25 09:40:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -318,29 +318,29 @@ static int OSSThread( aout_instance_t * p_aout )
 
         if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
         {
-            mtime_t buffered = (mtime_t)GetBufInfo( p_aout ) * 1000000
-                                / p_aout->output.output.i_bytes_per_frame
-                                / p_aout->output.output.i_rate
-                                * p_aout->output.output.i_frame_length;
+            mtime_t buffered;
 
-            while( buffered > 50000 )
+            do
             {
-                msleep( buffered / 2 - 10000 );
                 buffered = (mtime_t)GetBufInfo( p_aout ) * 1000000
                             / p_aout->output.output.i_bytes_per_frame
                             / p_aout->output.output.i_rate
                             * p_aout->output.output.i_frame_length;
-            }
+                if( buffered < 50000 )
+                {
+                    break;
+                }
+                msleep( buffered / 2 - 10000 );
 
-            /* Next buffer will be played at mdate()+buffered, and we tell
-             * the audio output that it can wait for a new packet for
-             * 20000 microseconds. */
+            } while( VLC_TRUE );
+
+            /* Next buffer will be played at mdate()+buffered */
             p_buffer = aout_OutputNextBuffer( p_aout, mdate() + buffered,
-                                              20000, VLC_FALSE );
+                                              VLC_FALSE );
         }
         else
         {
-            p_buffer = aout_OutputNextBuffer( p_aout, 0, 0, VLC_TRUE );
+            p_buffer = aout_OutputNextBuffer( p_aout, 0, VLC_TRUE );
         }
 
         if ( p_buffer != NULL )

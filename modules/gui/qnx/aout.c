@@ -306,11 +306,11 @@ static int QNXaoutThread( aout_instance_t * p_aout )
                       * p_aout->output.output.i_frame_length;
             next_date += mdate();
 
-            p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0, VLC_FALSE );
+            p_buffer = aout_OutputNextBuffer( p_aout, next_date, VLC_FALSE );
         }
         else
         {
-            p_buffer = aout_OutputNextBuffer( p_aout, 0, 0, VLC_TRUE );
+            p_buffer = aout_OutputNextBuffer( p_aout, 0, VLC_TRUE );
         }
 
         if ( p_buffer != NULL )

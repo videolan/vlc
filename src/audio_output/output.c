@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.10 2002/08/24 10:19:43 sam Exp $
+ * $Id: output.c,v 1.11 2002/08/25 09:40:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -164,28 +164,16 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
  *****************************************************************************/
 aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                                        mtime_t start_date,
-                                       mtime_t timeout,
                                        vlc_bool_t b_can_sleek )
 {
     aout_buffer_t * p_buffer;
-    mtime_t         now = mdate();
 
     vlc_mutex_lock( &p_aout->mixer_lock );
 
-    timeout += now;
-
-    while( p_aout->output.fifo.p_first == NULL && timeout > now )
-    {
-        vlc_mutex_unlock( &p_aout->mixer_lock );
-        msleep( AOUT_PTS_TOLERANCE / 2 );
-        vlc_mutex_lock( &p_aout->mixer_lock );
-        now = mdate();
-    }
-
     p_buffer = p_aout->output.fifo.p_first;
-    while ( p_buffer != NULL && p_buffer->start_date < start_date )
+    while ( p_buffer && p_buffer->start_date < start_date && p_buffer->p_next )
     {
-        msg_Dbg( p_aout, "audio output is too slow (%lld), trashing %lldms",
+        msg_Dbg( p_aout, "audio output is too slow (%lld), trashing %lldus",
                  start_date - p_buffer->start_date,
                  p_buffer->end_date - p_buffer->start_date );
         p_buffer = p_buffer->p_next;
@@ -198,7 +186,8 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         vlc_mutex_unlock( &p_aout->mixer_lock );
-        msg_Dbg( p_aout, "audio output is starving, waited too long" );
+        msg_Dbg( p_aout,
+                 "audio output is starving (no input), playing silence" );
         return NULL;
     }
 
@@ -208,7 +197,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                          + (p_buffer->end_date - p_buffer->start_date) )
     {
         vlc_mutex_unlock( &p_aout->mixer_lock );
-        msg_Dbg( p_aout, "audio output is starving (%lld)",
+        msg_Dbg( p_aout, "audio output is starving (%lld), playing silence",
                  p_buffer->start_date - start_date );
         return NULL;
     }

@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.5 2002/08/24 10:19:42 sam Exp $
+ * $Id: sdl.c,v 1.6 2002/08/25 09:40:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,7 +38,19 @@
 
 #include SDL_INCLUDE_FILE
 
-#define FRAME_SIZE 2048*2
+#define FRAME_SIZE 2048
+
+/*****************************************************************************
+ * aout_sys_t: SDL audio output method descriptor
+ *****************************************************************************
+ * This structure is part of the audio output thread descriptor.
+ * It describes the specific properties of an audio device.
+ *****************************************************************************/
+struct aout_sys_t
+{   
+    mtime_t call_time;
+    mtime_t buffer_time;
+};
 
 /*****************************************************************************
  * Local prototypes
@@ -66,12 +78,21 @@ vlc_module_end();
 static int Open ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    aout_sys_t * p_sys;
 
     Uint32 i_flags = SDL_INIT_AUDIO;
 
     if( SDL_WasInit( i_flags ) )
     {
-        return 1;
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate structure */
+    p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
+    if( p_sys == NULL )
+    {
+        msg_Err( p_aout, "out of memory" );
+        return VLC_ENOMEM;
     }
 
     p_aout->output.pf_setformat = SetFormat;
@@ -91,10 +112,11 @@ static int Open ( vlc_object_t *p_this )
     if( SDL_Init( i_flags ) < 0 )
     {
         msg_Err( p_aout, "cannot initialize SDL (%s)", SDL_GetError() );
-        return 1;
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -102,6 +124,8 @@ static int Open ( vlc_object_t *p_this )
  *****************************************************************************/
 static int SetFormat( aout_instance_t *p_aout )
 {
+    aout_sys_t * p_sys = p_aout->output.p_sys;
+
     /* TODO: finish and clean this */
     SDL_AudioSpec desired;
 
@@ -115,15 +139,19 @@ static int SetFormat( aout_instance_t *p_aout )
     /* Open the sound device - FIXME : get the "natural" parameters */
     if( SDL_OpenAudio( &desired, NULL ) < 0 )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
     p_aout->output.i_nb_samples = FRAME_SIZE;
 
+    p_sys->call_time = 0;
+    p_sys->buffer_time = (mtime_t)FRAME_SIZE * 1000000
+                          / p_aout->output.output.i_rate;
+
     SDL_PauseAudio( 0 );
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -138,9 +166,14 @@ static void Play( aout_instance_t * p_aout )
  *****************************************************************************/
 static void Close ( vlc_object_t *p_this )
 {
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    aout_sys_t * p_sys = p_aout->output.p_sys;
+
     SDL_PauseAudio( 1 );
     SDL_CloseAudio();
     SDL_QuitSubSystem( SDL_INIT_AUDIO );
+
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -149,16 +182,29 @@ static void Close ( vlc_object_t *p_this )
 static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
 {
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
-//static mtime_t old = 0;
-//static mtime_t diff = 0;
-//mtime_t foo = mdate();
+    aout_sys_t * p_sys = p_aout->output.p_sys;
+
     aout_buffer_t * p_buffer;
-//if(old) diff = (9 * diff + (foo-old))/10;
-    /* FIXME : take into account SDL latency instead of mdate() */
-    p_buffer = aout_OutputNextBuffer( p_aout, mdate(), 0, VLC_TRUE );
-    //p_buffer = aout_OutputNextBuffer( p_aout, foo - diff, 0, VLC_TRUE );
-//fprintf(stderr, "foo - old : %lli, diff : %lli\n", foo-old, diff);
-//old=foo;
+
+    /* We try to stay around call_time + buffer_time/2. This is kludgy but
+     * unavoidable because SDL is completely unable to 1. tell us about its
+     * latency, and 2. call SDLCallback at regular intervals. */
+    if( mdate() < p_sys->call_time + p_sys->buffer_time / 2 )
+    {
+        /* We can't wait too much, because SDL will be lost, and we can't
+         * wait too little, because we are not sure that there will be
+         * samples in the queue. */
+        mwait( p_sys->call_time + p_sys->buffer_time / 4 );
+        p_sys->call_time += p_sys->buffer_time;
+    }
+    else
+    {
+        p_sys->call_time = mdate() + p_sys->buffer_time / 4;
+    }
+
+    /* Tell the output we're playing samples at call_time + 2*buffer_time */
+    p_buffer = aout_OutputNextBuffer( p_aout, p_sys->call_time
+                                       + 2 * p_sys->buffer_time, VLC_TRUE );
 
     if ( i_len != FRAME_SIZE * sizeof(s16)
                     * p_aout->output.output.i_channels )
@@ -168,14 +214,11 @@ static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
 
     if ( p_buffer != NULL )
     {
-//fprintf(stderr, "got buffer %lli\n", p_buffer->end_date - p_buffer->start_date);
-
         p_aout->p_vlc->pf_memcpy( p_stream, p_buffer->p_buffer, i_len );
         aout_BufferFree( p_buffer );
     }
     else
     {
-//fprintf(stderr, "NO BUFFER !\n");
         p_aout->p_vlc->pf_memset( p_stream, 0, i_len );
     }
 }
