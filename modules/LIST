@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.15 2003/11/06 22:23:27 zorglub Exp $
+$Id: LIST,v 1.16 2003/11/07 13:31:26 massiot Exp $
 
  * a52: A/52 basic parser/packetizer
 
@@ -78,6 +78,8 @@ $Id: LIST,v 1.15 2003/11/06 22:23:27 zorglub Exp $
  * deinterlace: naive deinterlacing filter.
 
  * demuxdump: Pseudo-demuxer that dumps the stream
+
+ * demuxstream: MPEG TS demuxer which also sends the stream to the network
 
  * demuxsub: Text subtitles demuxer
 
