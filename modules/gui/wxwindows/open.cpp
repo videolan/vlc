@@ -785,7 +785,7 @@ void OpenDialog::UpdateMRL()
 
 void OpenDialog::UpdateMRL( int i_access_method )
 {
-    wxString demux, mrltemp, caching_name;
+    wxString mrltemp, caching_name;
 
     i_current_access_method = i_access_method;
 
@@ -866,7 +866,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
         switch( i_net_type )
         {
         case 0:
-            mrltemp = wxT("udp") + demux + wxT("://");
+            mrltemp = wxT("udp://");
             if ( net_ipv6->GetValue() )
             {
                 mrltemp += wxT("@[::]");
@@ -881,7 +881,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
             break;
 
         case 1:
-            mrltemp = wxT("udp") + demux + wxT("://@");
+            mrltemp = wxT("udp://@");
             if ((net_addrs[1]->GetLineText(0).Find (':') != -1)
                 && (net_addrs[1]->GetLineText(0)[0u] != '['))
             {
@@ -903,10 +903,9 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
         case 2:
             /* http access */
-            if( net_addrs[2]->GetLineText(0).Find(wxT("http://")) )
-            {
-                mrltemp = wxT("http") + demux + wxT("://");
-            }
+            if( net_addrs[2]->GetLineText(0).Find(wxT("://")) == -1 )
+                mrltemp = wxT("http://");
+
             mrltemp += net_addrs[2]->GetLineText(0);
 
             caching_name = wxT("http-caching");
@@ -916,7 +915,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
             /* RTSP access */
             if( net_addrs[3]->GetLineText(0).Find(wxT("rtsp://")) != 0 )
             {
-                mrltemp = wxT("rtsp") + demux + wxT("://");
+                mrltemp = wxT("rtsp://");
             }
             mrltemp += net_addrs[3]->GetLineText(0);
 
