@@ -2,7 +2,7 @@
  * vlc_meta.h
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: vlc_meta.h,v 1.2 2004/03/03 12:01:17 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,7 +39,6 @@
 #define VLC_META_CODEC_NAME         N_("Codec Name")
 #define VLC_META_CODEC_DESCRIPTION  N_("Codec Description")
 
-typedef struct vlc_meta_t vlc_meta_t;
 struct vlc_meta_t
 {
     /* meta name/value pairs */

@@ -233,20 +233,23 @@ struct sout_instance_t
 {
     VLC_COMMON_MEMBERS
 
-    char * psz_sout;
-    char * psz_chain;
+    char *psz_sout;
+    char *psz_chain;
+
+    /* meta data (Read only) XXX it won't be set before the first packet received */
+    vlc_meta_t          *p_meta;
 
     /* muxer data */
-    int                     i_preheader;    /* max over all muxer */
+    int                 i_preheader;    /* max over all muxer */
 
-    int                     i_padding;      /* needed by some decoders */
-    int                     i_out_pace_nocontrol;   /* count of output that can't control the space */
+    int                 i_padding;      /* needed by some decoders */
+    int                 i_out_pace_nocontrol;   /* count of output that can't control the space */
 
-    vlc_mutex_t             lock;
-    sout_stream_t           *p_stream;
+    vlc_mutex_t         lock;
+    sout_stream_t       *p_stream;
 
     /* sout private */
-    sout_instance_sys_t     *p_sys;
+    sout_instance_sys_t *p_sys;
 };
 
 static inline sout_cfg_t *sout_cfg_find( sout_cfg_t *p_cfg, char *psz_name )
