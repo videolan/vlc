@@ -1799,7 +1799,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
     {
         struct stat st;
 
-        if( !fstat( fileno( file ), &st ) )
+        if( !fstat( fileno( file ), &st ) && st.st_size >= 4 )
         {
             *pp_sci = malloc( st.st_size );
             if( *pp_sci != NULL )
