@@ -47,7 +47,8 @@
 enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
 {
     mad_adec_thread_t *p_mad_adec = (mad_adec_thread_t *) data;
-    byte_t buffer[ADEC_FRAME_SIZE];
+    size_t ReadSize, Remaining;
+    unsigned char      *ReadStart;
 
     /* Store time stamp of current frame */
     if ( p_mad_adec->p_fifo->p_first->i_pts ) {
@@ -58,20 +59,62 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
          p_mad_adec->i_pts_save = LAST_MDATE;
     }
 
-    GetChunk( &p_mad_adec->bit_stream, buffer, ADEC_FRAME_SIZE );
+    /* libmad_stream_buffer does not consume the total buffer, it consumes only data
+     * for one frame only. So all data left in the buffer should be put back in front.
+     */
+    if ((p_libmad_stream->buffer==NULL) || (p_libmad_stream->error==MAD_ERROR_BUFLEN))
+    {
 
-    if ( p_mad_adec->p_fifo->b_die == 1 ) {
-        intf_ErrMsg( "mad_adec error: libmad_input stopping libmad decoder" );
-        return MAD_FLOW_STOP;
+	/* libmad does not consume all the buffer it's given. Some
+     	 * datas, part of a truncated frame, is left unused at the
+     	 * end of the buffer. Those datas must be put back at the
+     	 * beginning of the buffer and taken in account for
+     	 * refilling the buffer. This means that the input buffer
+     	 * must be large enough to hold a complete frame at the
+     	 * highest observable bit-rate (currently 448 kb/s). XXX=XXX
+     	 * Is 2016 bytes the size of the largest frame?
+     	 * (448000*(1152/32000))/8
+     	 */
+     	if(p_libmad_stream->next_frame!=NULL)
+     	{
+     		Remaining=p_libmad_stream->bufend-p_libmad_stream->next_frame;
+     		memmove(p_mad_adec->buffer,p_libmad_stream->next_frame,Remaining);
+     		ReadStart=p_mad_adec->buffer+Remaining;
+     		ReadSize=(MAD_BUFFER_SIZE)-Remaining;
+     	}
+     	else
+	{
+     		ReadSize=(MAD_BUFFER_SIZE);
+     		ReadStart=p_mad_adec->buffer;
+     		Remaining=0;
+	}
+	//intf_ErrMsg( "mad_adec debug: buffer size remaining [%d] and readsize [%d] total [%d]", 
+	//		Remaining, ReadSize, ReadSize+Remaining);
+
+     	/* Fill-in the buffer. If an error occurs print a message
+   	 * and leave the decoding loop. If the end of stream is
+     	 * reached we also leave the loop but the return status is
+     	 * left untouched.
+     	 */
+     	GetChunk( &p_mad_adec->bit_stream, ReadStart, ReadSize );
+
+        if ( p_mad_adec->p_fifo->b_die == 1 ) {
+            intf_ErrMsg( "mad_adec error: libmad_input stopping libmad decoder" );
+            return MAD_FLOW_STOP;
+        }
+
+        if ( p_mad_adec->p_fifo->b_error == 1 ) {
+            intf_ErrMsg( "mad_adec error: libmad_input ignoring current audio frame" );	
+            return MAD_FLOW_IGNORE;
+        }
+
+     	/* Pipe the new buffer content to libmad's stream decoder facility.
+         * Libmad never copies the buffer, but just references it. So keep it in 
+	 * mad_adec_thread_t structure.
+     	 */
+     	mad_stream_buffer(p_libmad_stream,(unsigned char*) &p_mad_adec->buffer,ReadSize+Remaining);
+     	p_libmad_stream->error=0;
     }
-
-    if ( p_mad_adec->p_fifo->b_error == 1 ) {
-        intf_ErrMsg( "mad_adec error: libmad_input ignoring current audio frame" );	
-        return MAD_FLOW_IGNORE;
-    }
-
-    /* the length meant to be in bytes */
-    mad_stream_buffer(p_libmad_stream, (unsigned char*) &buffer, ADEC_FRAME_SIZE );
 
     return MAD_FLOW_CONTINUE;
 }
@@ -80,17 +123,19 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  * libmad_header: this function is called just after the header of a frame is
  * decoded
  *****************************************************************************/
-/* enum mad_flow libmad_header(void *data, struct mad_header const *p_libmad_header)
- * {
+/*
+ *enum mad_flow libmad_header(void *data, struct mad_header const *p_libmad_header)
+ *{
  *   mad_adec_thread_t *p_mad_adec = (mad_adec_thread_t *) data;
  *
  *   intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
  *   intf_DbgMsg( "mad_adec: libmad_header bitrate %d", p_libmad_header->bitrate);	
  *
  *   p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
+ *   mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration); 
  *
  *   return MAD_FLOW_CONTINUE;
- * }
+ *}
  */
 
 /*****************************************************************************
@@ -137,7 +182,7 @@ static __inline__ unsigned long prng(unsigned long state)
 * NAME:                audio_linear_dither()
 * DESCRIPTION: generic linear sample quantize and dither routine
 */
-static __inline__ signed long audio_linear_dither(unsigned int bits, mad_fixed_t sample,
+static __inline__ signed int audio_linear_dither(unsigned int bits, mad_fixed_t sample,
                                     struct audio_dither *dither)
 {
     unsigned int scalebits;
@@ -145,7 +190,7 @@ static __inline__ signed long audio_linear_dither(unsigned int bits, mad_fixed_t
 
     enum {
         MIN = -MAD_F_ONE,
-        MAX =    MAD_F_ONE - 1
+        MAX = MAD_F_ONE - 1
     };
 
     /* noise shape */
@@ -231,7 +276,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 		p_libmad_pcm->channels,         /* nr. of channels */
 		p_libmad_pcm->samplerate,       /* frame rate in Hz ?*/
 		0,                     		/* units */
-                ADEC_FRAME_SIZE/2,     		/* frame size */
+                ADEC_FRAME_SIZE,     		/* frame size */
 		NULL  );               		/* buffer */
 
     	if ( p_mad_adec->p_aout_fifo == NULL )
@@ -241,13 +286,30 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 
 	intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
     }
+    else {
+	p_mad_adec->p_aout_fifo->l_rate = p_libmad_pcm->samplerate;
+    }
+
+/* Some frames are nog quite right. Why ??? I do not know. Probably syncing and CRC errors ??
+ * Leaving those frames out futher removes the jitter in the sound and makes it more fluent.
+ * Still I am missing something, because it is not completely fluent.
+ */
+    if ((p_mad_adec->libmad_decoder->sync->stream.error==MAD_ERROR_BADCRC) ||
+	(p_mad_adec->libmad_decoder->sync->stream.error==MAD_ERROR_BADBITRATE) ||
+	(p_mad_adec->libmad_decoder->sync->stream.error==MAD_ERROR_BADSCALEFACTOR)
+       ) {
+//	intf_ErrMsg( "LIBMAD_OUTPUT: nr of channels [%d], samplerate in Hz [%d,%d], sample size [%d], error_code [%0x]",
+//	         p_libmad_pcm->channels, p_libmad_pcm->samplerate, p_libmad_header->samplerate,
+//     		 p_libmad_pcm->length, p_mad_adec->libmad_decoder->sync->stream.error);
+//      PrintFrameInfo(&p_libmad_header);
+    	return MAD_FLOW_IGNORE;
+    }
 
     /* Set timestamp to synchronize audio and video decoder fifo's */
-    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
-    p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
     p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->l_end_frame] = p_mad_adec->i_pts_save;
+    mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
 
-    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
+    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->l_end_frame * MAD_OUTPUT_SIZE);
 
     while (nsamples--)
     {
@@ -258,11 +320,11 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 #endif
 
 #ifndef WORDS_BIGENDIAN
-        *buffer++ = (byte_t) (sample) & 0xFF;
-        *buffer++ = (byte_t) (sample >> 8) & 0xFF;
+        *buffer++ = (byte_t) (sample >> 0);
+        *buffer++ = (byte_t) (sample >> 8);
 #else
      	*buffer++ = (byte_t) (sample >> 8);
-    	*buffer++ = (byte_t) (sample);
+    	*buffer++ = (byte_t) (sample >> 0);
 #endif
 	if (p_libmad_pcm->channels == 2) {
 
@@ -274,16 +336,28 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 #endif
 
 #ifndef WORDS_BIGENDIAN
-            *buffer++ = (byte_t) (sample) & 0xFF;
-            *buffer++ = (byte_t) (sample >> 8) & 0xFF;
+            *buffer++ = (byte_t) (sample >> 0);
+            *buffer++ = (byte_t) (sample >> 8);
 #else
             *buffer++ = (byte_t) (sample >> 8);
-            *buffer++ = (byte_t) (sample);
+            *buffer++ = (byte_t) (sample >> 0);
 #endif						
         }
+	else {
+	    /* Somethimes a single channel frame is found, while the rest of the movie are
+             * stereo channel frames. How to deal with this ??
+             * One solution is to silence the second channel.
+             */
+            *buffer++ = (byte_t) (0);
+            *buffer++ = (byte_t) (0);
+	}
+    }
+    /* DEBUG */
+    if (p_libmad_pcm->channels == 1) {
+       intf_ErrMsg( "mad debug: libmad_output channels [%d]", p_libmad_pcm->channels);
     }
 
-//    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
+    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
     p_mad_adec->p_aout_fifo->l_end_frame = (p_mad_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
     vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
     vlc_mutex_unlock (&p_mad_adec->p_aout_fifo->data_lock);

@@ -165,7 +165,11 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
 	
     /* Initialize the libmad decoder structures */
     p_mad_adec->libmad_decoder = (struct mad_decoder*) malloc(sizeof(struct mad_decoder));
-
+    if (p_mad_adec->libmad_decoder == NULL) {
+        intf_ErrMsg ( "mad_adec error: not enough memory "
+                      "for decoder_InitThread() to allocate p_mad_adec->libmad_decder" );
+    	return -1;
+    }
     /*
      * Initialize bit stream
      */
@@ -179,31 +183,19 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     mad_decoder_init( p_mad_adec->libmad_decoder,
     		      p_mad_adec, 	/* vlc's thread structure and p_fifo playbuffer */
 		      libmad_input,  	/* input_func */
-		      0, 		/* header_func */
+		      0,		/* header_func */
 		      0,		/* filter */
 		      libmad_output, 	/* output_func */
 		      0,  		/* error */
 		      0);            	/* message */
 
     mad_decoder_options(p_mad_adec->libmad_decoder, MAD_OPTION_IGNORECRC);
- 	
+    mad_timer_reset(&p_mad_adec->libmad_timer);
+
     /*
      * Initialize the output properties
      */
     p_mad_adec->p_aout_fifo=NULL;
-
-    /* Creating the audio output fifo */
-//    p_mad_adec->p_aout_fifo = aout_CreateFifo(  AOUT_ADEC_STEREO_FIFO, /* fifo type */
-//						2,                     /* nr. of channels */
-//						48000,	 	       /* frame rate in Hz ?*/
-//						0,                     /* units */
-//                                                ADEC_FRAME_SIZE/2,     /* frame size */
-//						NULL  );               /* buffer */
-//
-//    if ( p_mad_adec->p_aout_fifo == NULL )
-//    {
-//        return( -1 );
-//    }
 
     intf_ErrMsg("mad_adec debug: mad decoder thread %p initialized", p_mad_adec);
 

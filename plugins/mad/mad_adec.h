@@ -22,7 +22,10 @@
  *****************************************************************************/
 
 // FIXME: Ugly define inside a decoder
-#define ADEC_FRAME_SIZE (4*1152)
+#define ADEC_FRAME_SIZE (2*1152)
+#define MAD_BUFFER_SIZE (ADEC_FRAME_SIZE*2)
+//#define MAD_BUFFER_SIZE (MAD_BUFFER_MDLEN*2)
+#define MAD_OUTPUT_SIZE (ADEC_FRAME_SIZE*2)
 
 typedef struct mad_adec_thread_s
 {
@@ -30,7 +33,9 @@ typedef struct mad_adec_thread_s
      * Decoder properties
      */
     struct mad_decoder *libmad_decoder;
-
+    mad_timer_t 	libmad_timer;  
+    byte_t 		buffer[MAD_BUFFER_SIZE]; 
+   
     /*
      * Thread properties
      */
@@ -43,6 +48,7 @@ typedef struct mad_adec_thread_s
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
     decoder_config_t *  p_config;
+
     /* Store i_pts for syncing audio frames */
     mtime_t		i_pts_save;
 
