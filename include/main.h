@@ -44,6 +44,7 @@ typedef struct
     boolean_t              b_audio;             /* is audio output allowed ? */
     boolean_t              b_video;             /* is video output allowed ? */
     boolean_t              b_vlans;                 /* are vlans supported ? */
+    boolean_t              b_dvd;                              /* DVD mode ? */
 
     /* Unique threads */
     p_aout_thread_t        p_aout;                    /* audio output thread */

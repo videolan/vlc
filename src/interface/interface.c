@@ -202,6 +202,23 @@ void intf_Run( intf_thread_t *p_intf )
             p_intf->p_input = input_CreateThread( p_input_config, NULL );
         }
     }
+    /* DVD mode */
+    else if( p_main->b_dvd )
+    {
+        if( (p_input_config =
+              (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
+        {
+            intf_ErrMsg( "intf error: cannot create input_config_t" );
+        }
+        else
+        {
+            p_input_config->i_method = INPUT_METHOD_DVD;
+            p_input_config->p_source = main_GetPszVariable( INPUT_DVD_DEVICE_VAR, INPUT_DVD_DEVICE_DEFAULT );
+            p_input_config->p_default_aout = p_main->p_aout;
+            p_input_config->p_default_vout = p_intf->p_vout;
+            p_intf->p_input = input_CreateThread( p_input_config, NULL );
+        }
+    }
     /* Or if a file was specified */
     else if( p_main->p_playlist->p_list != NULL )
     {
@@ -452,15 +469,15 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
          * its own error messages */
         intf_SelectChannel( p_intf, k_reply.param );
         break;
-    case INTF_KEY_INC_VOLUME:                                                    /* volume + */
+    case INTF_KEY_INC_VOLUME:                                    /* volume + */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLUME_MAX) )
             p_main->p_aout->vol += VOLUME_STEP;
         break;
-    case INTF_KEY_DEC_VOLUME:                                                    /* volume - */
+    case INTF_KEY_DEC_VOLUME:                                    /* volume - */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol > VOLUME_STEP) )
             p_main->p_aout->vol -= VOLUME_STEP;
         break;
-    case INTF_KEY_TOGGLE_VOLUME:                                                 /* toggle mute */
+    case INTF_KEY_TOGGLE_VOLUME:                              /* toggle mute */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol))
         {
             i_volbackup = p_main->p_aout->vol;
@@ -469,7 +486,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
         else if( (p_main->p_aout != NULL) && (!p_main->p_aout->vol))
             p_main->p_aout->vol = i_volbackup;
         break;
-    case INTF_KEY_DEC_GAMMA:                                                     /* gamma - */
+    case INTF_KEY_DEC_GAMMA:                                      /* gamma - */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -478,7 +495,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case INTF_KEY_INC_GAMMA:                                                     /* gamma + */
+    case INTF_KEY_INC_GAMMA:                                      /* gamma + */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma < INTF_GAMMA_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -487,7 +504,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case INTF_KEY_TOGGLE_GRAYSCALE:                                            /* toggle grayscale */
+    case INTF_KEY_TOGGLE_GRAYSCALE:                      /* toggle grayscale */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -496,7 +513,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case INTF_KEY_TOGGLE_INTERFACE:                                            /* toggle interface */
+    case INTF_KEY_TOGGLE_INTERFACE:                      /* toggle interface */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -505,7 +522,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case INTF_KEY_TOGGLE_INFO:                                                 /* toggle info */
+    case INTF_KEY_TOGGLE_INFO:                                /* toggle info */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -514,7 +531,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case INTF_KEY_TOGGLE_SCALING:                                              /* toggle scaling */
+    case INTF_KEY_TOGGLE_SCALING:                          /* toggle scaling */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.67 2001/01/07 04:31:18 henri Exp $
+ * $Id: input.c,v 1.68 2001/01/14 07:08:00 stef Exp $
  *
  * Authors: 
  *
@@ -62,6 +62,7 @@ static void ErrorThread ( input_thread_t *p_input );
 static void EndThread   ( input_thread_t *p_input );
 static void NetworkOpen ( input_thread_t *p_input );
 static void FileOpen    ( input_thread_t *p_input );
+static void DvdOpen     ( input_thread_t *p_input );
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
@@ -223,6 +224,7 @@ static void RunThread( input_thread_t *p_input )
  * InitThread: init the input thread
  *****************************************************************************/
 input_capabilities_t * PSKludge( void );
+input_capabilities_t * DVDKludge( void );
 static void InitThread( input_thread_t * p_input )
 {
     /* Initialize default settings for spawned decoders */
@@ -243,6 +245,13 @@ static void InitThread( input_thread_t * p_input )
     {
     case INPUT_METHOD_FILE:                                  /* file methods */
         FileOpen( p_input );
+        /* Probe plugin (FIXME: load plugins before & write this) */
+        p_input->p_plugin = PSKludge();
+       break;
+    case INPUT_METHOD_DVD:                                     /* DVD method */
+        DvdOpen( p_input );
+        /* DVD plugin */
+        p_input->p_plugin = DVDKludge();
         break;
     case INPUT_METHOD_VLAN_BCAST:                     /* vlan network method */
 /*        if( !p_main->b_vlans )
@@ -269,8 +278,6 @@ static void InitThread( input_thread_t * p_input )
 
     free( p_input->p_config );
 
-    /* Probe plugin (FIXME: load plugins before & write this) */
-    p_input->p_plugin = PSKludge();
     p_input->p_plugin->pf_init( p_input );
 
     *p_input->pi_status = THREAD_READY;
@@ -397,4 +404,28 @@ static void FileOpen( input_thread_t * p_input )
     }
 
 #undef p_config
+}
+
+/*****************************************************************************
+ * DvdOpen : open the dvd device
+ *****************************************************************************/
+static void DvdOpen( input_thread_t * p_input )
+{
+    intf_Msg( "Opening DVD %s", p_input->p_config->p_source );
+    if( (p_input->i_handle = open( p_input->p_config->p_source,
+                                   O_RDONLY|O_LARGEFILE )) == (-1) )
+    {
+        intf_ErrMsg( "input error: cannot open device %s", strerror(errno) );
+        p_input->b_error = 1;
+        return;
+    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_input->stream.b_pace_control = 1;
+    p_input->stream.b_seekable = 1;
+    p_input->stream.i_size = 0;
+    p_input->stream.i_tell = 0;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 }

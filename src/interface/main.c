@@ -85,6 +85,7 @@
 #define OPT_SERVER              171
 #define OPT_PORT                172
 #define OPT_BROADCAST           173
+#define OPT_DVD                 174
 
 #define OPT_SYNCHRO             180
 
@@ -132,6 +133,7 @@ static const struct option longopts[] =
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
     {   "broadcast",        0,          0,      OPT_BROADCAST },
+    {   "dvd",              0,          0,      OPT_DVD },
 
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
@@ -458,6 +460,7 @@ static void SetDefaultConfiguration( void )
     p_main->b_audio  = 1;
     p_main->b_video  = 1;
     p_main->b_vlans  = 0;
+    p_main->b_dvd    = 0;
 }
 
 /*****************************************************************************
@@ -589,6 +592,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_BROADCAST:                                   /* --broadcast */
             main_PutIntVariable( INPUT_BROADCAST_VAR, 1 );
             break;
+        case OPT_DVD:                                               /* --dvd */
+            p_main->b_dvd = 1;
+            break;
 
         /* Synchro options */
         case OPT_SYNCHRO:                                      
@@ -658,6 +664,7 @@ static void Usage( int i_fashion )
               "\n      --server <host>            \tvideo server address"
               "\n      --port <port>              \tvideo server port"
               "\n      --broadcast                \tlisten to a broadcast"
+              "\n      --dvd                      \tread dvd"
               "\n"
               "\n      --synchro <type>           \tforce synchro algorithm"
               "\n"
@@ -705,7 +712,9 @@ static void Usage( int i_fashion )
               "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
               "\n  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode"
               "\n  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server"
-              "\n  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port" );
+              "\n  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port"
+              "\n  " INPUT_DVD_DEVICE_VAR "=<device>        \tDVD device"
+ );
 
     /* Synchro parameters */
     intf_Msg( "\nSynchro parameters:"

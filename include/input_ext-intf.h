@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.8 2000/12/21 19:24:26 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.9 2001/01/14 07:08:00 stef Exp $
  *
  * Authors:
  *
@@ -255,6 +255,7 @@ typedef struct input_config_s
 /* Input methods */
 #define INPUT_METHOD_NONE           0            /* input thread is inactive */
 #define INPUT_METHOD_FILE          10   /* stream is read from file p_source */
+#define INPUT_METHOD_DVD           11      /* stream is read from dvd device */
 #define INPUT_METHOD_UCAST         20                         /* UDP unicast */
 #define INPUT_METHOD_MCAST         21                       /* UDP multicast */
 #define INPUT_METHOD_BCAST         22                       /* UDP broadcast */
