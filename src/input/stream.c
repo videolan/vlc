@@ -27,6 +27,10 @@
 
 #include "input_internal.h"
 
+#ifdef UNDER_CE
+#   define LOW_MEM
+#endif
+
 /* TODO:
  *  - tune the 2 methods
  *  - compute cost for seek
@@ -42,14 +46,20 @@
  */
 
 /* How many track we have, currently only used for stream mode */
-#define STREAM_CACHE_TRACK 3
-/* Max size of our cache 4Mo per track */
-#define STREAM_CACHE_SIZE  (4*STREAM_CACHE_TRACK*1024*1024)
-  /* How many data we try to prebuffer */
+#ifdef LOW_MEM
+#   define STREAM_CACHE_TRACK 1
+    /* Max size of our cache 128Ko per track */
+#   define STREAM_CACHE_SIZE  (STREAM_CACHE_TRACK*1024*128)
+#else
+#   define STREAM_CACHE_TRACK 3
+    /* Max size of our cache 4Mo per track */
+#   define STREAM_CACHE_SIZE  (4*STREAM_CACHE_TRACK*1024*1024)
+#endif
+
+/* How many data we try to prebuffer */
 #define STREAM_CACHE_PREBUFFER_SIZE (32767)
 /* Maximum time we take to pre-buffer */
 #define STREAM_CACHE_PREBUFFER_LENGTH (100*1000)
-
 
 /* Method1: Simple, for pf_block.
  *  We get blocks and put them in the linked list.
