@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.13 2001/05/25 13:20:09 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.14 2001/05/27 15:16:58 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -66,6 +66,7 @@ static void BeInitRDC ( raw_device_command *, int );
 #define INIT_RDC( TYPE, SIZE ) \
     raw_device_command rdc; \
     u8 p_buffer[ (SIZE) ]; \
+    memset( &rdc, 0, sizeof( raw_device_command ) ); \
     rdc.data = (char *)p_buffer; \
     rdc.data_length = (SIZE); \
     BeInitRDC( &rdc, (TYPE) );
@@ -595,7 +596,6 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
  *****************************************************************************/
 static void BeInitRDC( raw_device_command *p_rdc, int i_type )
 {
-    memset( p_rdc, 0, sizeof( raw_device_command ) );
     memset( p_rdc->data, 0, p_rdc->data_length );
 
     switch( i_type )
