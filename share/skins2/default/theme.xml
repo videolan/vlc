@@ -118,7 +118,7 @@
       <Image image="playlist7" x="0" y="200" lefttop="leftbottom" rightbottom="leftbottom" action="move"/>
       <Image image="playlist8" x="17" y="200" lefttop="leftbottom" rightbottom="rightbottom" action="move"/>
       <Image image="playlist9" x="350" y="200" lefttop="rightbottom" rightbottom="rightbottom" action="move"/> 
-      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" action="resize"/>
+      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" action="resizeSE"/>
 
       <Button x="374" y="12" lefttop="righttop" rightbottom="righttop" up="add_item" down="add_item_onclick" over="add_item" action="playlist.add()" tooltiptext="Add item"/>
       <Button x="374" y="40" up="delete_item" lefttop="righttop" rightbottom="righttop" down="delete_item_onclick" over="delete_item" action="playlist.del()" tooltiptext="Del item"/>
@@ -143,7 +143,7 @@
       <Image image="voutbody7" x="0" y="200" lefttop="leftbottom" rightbottom="leftbottom" action="move"/>
       <Image image="voutbody8" x="17" y="200" lefttop="leftbottom" rightbottom="rightbottom" action="move"/>
       <Image image="voutbody9" x="350" y="200" lefttop="rightbottom" rightbottom="rightbottom" action="move"/>
-      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" action="resize"/>
+      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" action="resizeSE"/>
       <Video x="15" y="24" width="350" height="210" lefttop="lefttop" rightbottom="rightbottom"/>
 
       <Checkbox x="15" y="5" up1="close" down1="close_onclick" up2="close" down2="close_onclick" over1="close_mouseover" over2="close_mouseover" state="vout_window.isVisible" action1="vout_window.show()" action2="vout_window.hide()" tooltiptext1="Show Video Window" tooltiptext2="Hide Video Window"/>

@@ -397,7 +397,7 @@ void Builder::addImage( const BuilderData::Image &rData )
              NULL);
         pLayout->addControl( pMove, pos, rData.m_layer );
     }
-    else if( rData.m_actionId == "resize" )
+    else if( rData.m_actionId == "resizeSE" )
     {
         CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
                 UString( getIntf(), rData.m_help.c_str() ), NULL );

@@ -254,7 +254,7 @@ vlc_module_begin();
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 VLC_TRUE );
 #ifdef WIN32
-    add_bool( "skins2-transparency", VLC_TRUE, NULL, SKINS2_TRANSPARENCY,
+    add_bool( "skins2-transparency", VLC_FALSE, NULL, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, VLC_FALSE );
 #endif
     set_description( _("Skinnable Interface") );
