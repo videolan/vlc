@@ -1036,7 +1036,7 @@ vlc_module_begin();
     add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT,
               ONEINSTANCE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 0, NULL, HPRIORITY_TEXT,
-              HPRIORITY_LONGTEXT, VLC_TRUE );
+              HPRIORITY_LONGTEXT, VLC_FALSE );
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT,
               FAST_MUTEX_LONGTEXT, VLC_TRUE );
     add_integer( "win9x-cv-method", 1, NULL, WIN9X_CV_TEXT,
