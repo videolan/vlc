@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.4 2003/07/22 13:58:23 bigben Exp $
+ * $Id: pvr.c,v 1.5 2003/07/22 20:25:07 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -180,8 +180,8 @@ static int Open( vlc_object_t * p_this )
                                strlen( "frequency=" ) ) )
             {
                 p_sys->i_frequency =
-                    strtol( psz_parser + strlen( "frequency=" ),
-                            &psz_parser, 0 );
+                    1000 * strtol( psz_parser + strlen( "frequency=" ),
+                            &psz_parser, 0 ) / 16;
             }
             else if( !strncmp( psz_parser, "framerate=",
                                strlen( "framerate=" ) ) )
