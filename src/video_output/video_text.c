@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: video_text.c,v 1.50 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: video_text.c,v 1.51 2004/02/15 18:22:26 sigmunau Exp $
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -90,9 +90,11 @@ void vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
  * \param p_caller The object that called the function.
  * \param psz_string The text to be shown
  **/
-void vout_OSDMessage( vlc_object_t *p_caller, char *psz_string )
+void __vout_OSDMessage( vlc_object_t *p_caller, char *psz_format, ... )
 {
     vout_thread_t *p_vout;
+    char *psz_string;
+    va_list args;
 
     if( !config_GetInt( p_caller, "osd" ) ) return;
 
@@ -100,6 +102,8 @@ void vout_OSDMessage( vlc_object_t *p_caller, char *psz_string )
 
     if( p_vout )
     {
+        va_start( args, psz_format );
+        vasprintf( &psz_string, psz_format, args );
         vlc_mutex_lock( &p_vout->change_lock );
 
         if( p_vout->p_last_osd_message )
@@ -113,6 +117,8 @@ void vout_OSDMessage( vlc_object_t *p_caller, char *psz_string )
         vlc_mutex_unlock( &p_vout->change_lock );
 
         vlc_object_release( p_vout );
+        free( psz_string );
+        va_end( args );
     }
 }
 

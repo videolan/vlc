@@ -2,7 +2,7 @@
  * osd.h : Constants for use with osd modules
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: osd.h,v 1.6 2003/12/08 17:48:13 yoann Exp $
+ * $Id: osd.h,v 1.7 2004/02/15 18:22:26 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -47,4 +47,12 @@ static const text_style_t default_text_style = { 22, 0xffffff, VLC_FALSE, VLC_FA
 
 VLC_EXPORT( subpicture_t *, vout_ShowTextRelative, ( vout_thread_t *, char *, text_style_t *, int, int, int, mtime_t ) );
 VLC_EXPORT( void,  vout_ShowTextAbsolute, ( vout_thread_t *, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
-VLC_EXPORT( void,  vout_OSDMessage, ( vlc_object_t *, char * ) );
+VLC_EXPORT( void,  __vout_OSDMessage, ( vlc_object_t *, char *, ... ) );
+/**
+ * Same as __vlc_OSDMessage() but with automatic casting
+ */
+#if defined(HAVE_VARIADIC_MACROS)
+#    define vout_OSDMessage( obj, fmt, args...) __vout_OSDMessage( VLC_OBJECT(obj), fmt, ## args )
+#else
+#    define vout_OSDMessage __vout_OSDMessage
+#endif
