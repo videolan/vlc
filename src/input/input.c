@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.261 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: input.c,v 1.262 2003/11/24 19:20:19 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1128,6 +1128,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             break;
     }
 
+    id->p_es->fmt = *fmt;
+
     if( fmt->i_cat == AUDIO_ES && fmt->i_priority > out->p_sys->i_audio )
     {
         if( out->p_sys->i_audio >= 0 )
@@ -1213,9 +1215,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    id->p_es->fmt = *fmt;
-
     TAB_APPEND( out->p_sys->i_id, out->p_sys->id, id );
+
     return id;
 }
 
