@@ -1276,7 +1276,7 @@ then
   [    --with-dvdread-tree=PATH libdvdread tree for static linking])
 
   dnl Temporary hack (yeah, sure ;)
-  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin"; then
+  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin" || test "${SYS}" = "beos" ; then
       VLC_ADD_LDFLAGS([dvdread],[-ldvdcss])
   fi
 

@@ -59,7 +59,8 @@ endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ffmpeg .dvdcss .dvdread
+	.FLAC .speex .faad .faac .lame .ffmpeg .dvdcss .dvdread .dvbpsi \
+	.dts
 endif
 
 FORCE:
@@ -570,7 +571,7 @@ lame: lame-$(LAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .lame: lame
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .lame
@@ -801,8 +802,13 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 libdts-$(LIBDTS_VERSION).tar.gz:
 	$(WGET) $(LIBDTS_URL)
 
-libdts: libdts-$(LIBDTS_VERSION).tar.gz
-	$(EXTRACT_GZ)
+# libdts 0.0.2 doesn't compile on BeOS
+#libdts: libdts-$(LIBDTS_VERSION).tar.gz
+#	$(EXTRACT_GZ)
+
+libdts:
+	svn co svn://svn.videolan.org/libdts/trunk libdts
+	(cd $@; ./bootstrap)
 
 .dts: libdts
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)

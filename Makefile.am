@@ -406,7 +406,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 
 if HAVE_BEOS
 vlc-bundle: vlc
-	rm -rf $(srcdir)/vlc-bundle ; mkdir -p $(srcdir)/vlc-bundle
+	rm -Rf $(srcdir)/vlc-bundle ; mkdir -p $(srcdir)/vlc-bundle
 	cp $(srcdir)/vlc $(srcdir)/vlc-bundle/
 	xres -o $(srcdir)/vlc-bundle/vlc $(srcdir)/share/vlc_beos.rsrc
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
@@ -426,7 +426,7 @@ vlc-bundle: vlc
 	  cp "$(srcdir)/po/$$i.gmo" \
 	    "$(srcdir)/vlc-bundle/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
 	done
-	find $(srcdir)/vlc-bundle -type f $(srcdir)/vlc-bundle -exec mimeset -f "{}" \;
+	find $(srcdir)/vlc-bundle -type f -exec mimeset -f "{}" \;
 endif
 
 # Install the modules and the symlinks
@@ -695,23 +695,21 @@ package-beos:
 
 # Copy relevant files
 	mkdir -p $(srcdir)/tmp/vlc ;
-	cd $(srcdir) && \
-	  cp vlc AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/ ;
-# We cannot use ${PLUGIN_FILES} as it looks like it is too "long" for the BeOS shell...
-	if [ `find $(srcdir)/modules -name "lib*_plugin.so" | wc -l` -gt 0 ]; then \
-	  mkdir -p $(srcdir)/tmp/vlc/plugins ; \
-	  find $(srcdir)/modules -name "lib*_plugin.so" -exec cp {} $(srcdir)/tmp/vlc/plugins/ \; ; \
-	fi
-	for i in $(ALL_LINGUAS); do \
-	  mkdir -p $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES ; \
-	  cp $(srcdir)/po/$${i}.gmo $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
-	done
+	cd $(srcdir) && cp -R vlc-bundle/* AUTHORS COPYING ChangeLog README \
+	  THANKS NEWS tmp/vlc/ ;
 
-# Strip files and create package
+# Create debug package
+	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc ;
+	find $(srcdir)/tmp/vlc -exec mimeset -f {} \; ;
+	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION} ;
+	(cd $(srcdir)/tmp ; zip -9 -r vlc-${VERSION}-BeOS-debug.zip vlc-${VERSION} )
+	mv $(srcdir)/tmp/vlc-${VERSION}-BeOS-debug.zip $(srcdir)/ ;
+	mv $(srcdir)/tmp/vlc-${VERSION} $(srcdir)/tmp/vlc ;
+
+# Create normal package
 	strip --strip-debug --strip-unneeded $(srcdir)/tmp/vlc/vlc ;
-	if [ -d $(srcdir)/tmp/vlc/plugins ]; then \
-	  strip --strip-debug --strip-unneeded $(srcdir)/tmp/vlc/plugins/lib*_plugin.so ; \
-	fi
+	find $(srcdir)/tmp/vlc -name 'lib*.so' -exec strip \
+	  --strip-debug --strip-unneeded "{}" \; ;
 	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc ;
 	find $(srcdir)/tmp/vlc -exec mimeset -f {} \; ;
 	mv $(srcdir)/tmp/vlc $(srcdir)/tmp/vlc-${VERSION} ;
