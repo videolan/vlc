@@ -303,7 +303,7 @@ void AutoBuiltPanel::UpdateAdvancedMRL()
     {
         ConfigControl *control = advanced_config_array.Item(i);
 
-        mrltemp += wxT(":");
+        mrltemp += (i ? wxT(" :") : wxT(":"));
 
         if( control->GetType() == CONFIG_ITEM_BOOL &&
             !control->GetIntValue() ) mrltemp += wxT("no-");
