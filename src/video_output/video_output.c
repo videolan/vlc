@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.135 2001/07/18 14:21:00 massiot Exp $
+ * $Id: video_output.c,v 1.136 2001/08/03 18:03:32 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -1159,14 +1159,14 @@ static void RunThread( vout_thread_t *p_vout)
             p_vout->last_display_date = display_date;
             p_vout->p_rendered_pic = p_pic;
 
-            /* Set picture dimensions and clear buffer */
-            SetBufferPicture( p_vout, p_pic );
-
             /* FIXME: if b_need_render == 0 we need to do something with
              * the subpictures one day. */
 
             if( p_vout->b_need_render && b_display )
             {
+                /* Set picture dimensions and clear buffer */
+                SetBufferPicture( p_vout, p_pic );
+
                 /* Render picture and information */
                 RenderPicture( p_vout, p_pic );
                 if( p_vout->b_info )
