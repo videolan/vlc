@@ -985,7 +985,7 @@ then
 
   if test "x${SYS}" = "xdarwin"
   then
-    # No need to add vcd to PLUGINS, Darwin is already based on FreeBSD
+    PLUGINS="${PLUGINS} vcd"
     LDFLAGS_vcd="${LDFLAGS_vcd} -framework IOKit -framework CoreFoundation"
   fi
 fi

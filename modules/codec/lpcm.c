@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.4 2002/09/30 21:32:32 massiot Exp $
+ * $Id: lpcm.c,v 1.5 2002/10/15 23:10:54 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -127,7 +127,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     /* FIXME : I suppose the number of channel and sampling rate 
      * are somewhere in the headers */
     p_dec->output_format.i_format = VLC_FOURCC('s','1','6','b');
-    p_dec->output_format.i_channels = 2;
+    p_dec->output_format.i_channels = AOUT_CHAN_STEREO;
     p_dec->output_format.i_rate = 48000;
     
     aout_DateInit( &p_dec->end_date, 48000 );

@@ -2,7 +2,7 @@
  * float32.c : precise float32 audio mixer implementation
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32.c,v 1.5 2002/09/30 21:32:32 massiot Exp $
+ * $Id: float32.c,v 1.6 2002/10/15 23:10:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -112,11 +112,11 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     int i_nb_inputs = p_aout->i_nb_inputs;
     float f_multiplier = p_aout->mixer.f_multiplier;
     int i_input;
+    int i_nb_channels = aout_FormatNbChannels( &p_aout->mixer.mixer );
 
     for ( i_input = 0; i_input < i_nb_inputs; i_input++ )
     {
-        int i_nb_words = p_buffer->i_nb_samples
-                          * p_aout->mixer.mixer.i_channels;
+        int i_nb_words = p_buffer->i_nb_samples * i_nb_channels;
         aout_input_t * p_input = p_aout->pp_inputs[i_input];
         float * p_out = (float *)p_buffer->p_buffer;
         float * p_in = (float *)p_input->p_first_byte_to_mix;
@@ -128,7 +128,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
             ptrdiff_t i_available_words = (
                  (float *)p_input->fifo.p_first->p_buffer - p_in)
                                    + p_input->fifo.p_first->i_nb_samples
-                                   * p_aout->mixer.mixer.i_channels;
+                                   * i_nb_channels;
 
             if ( i_available_words < i_nb_words )
             {

@@ -3,7 +3,7 @@
  *                      with endianness change
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32swab.c,v 1.6 2002/09/30 21:32:32 massiot Exp $
+ * $Id: s16tofloat32swab.c,v 1.7 2002/10/15 23:10:54 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -95,7 +95,7 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    int i = p_in_buf->i_nb_samples * p_filter->input.i_channels;
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
     s16 * p_in;

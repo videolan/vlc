@@ -2,7 +2,7 @@
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ugly.c,v 1.3 2002/09/30 21:32:32 massiot Exp $
+ * $Id: ugly.c,v 1.4 2002/10/15 23:10:54 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -80,25 +80,26 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     s32* p_in = (s32*)p_in_buf->p_buffer;
     s32* p_out = (s32*)p_out_buf->p_buffer;
 
+    int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_out_nb = i_in_nb * p_filter->output.i_rate
                     / p_filter->input.i_rate;
-    int i_frame_bytes = p_filter->input.i_channels * sizeof(s32);
+    int i_frame_bytes = i_nb_channels * sizeof(s32);
     int i_out, i_chan, i_remainder = 0;
 
     for( i_out = i_out_nb ; i_out-- ; )
     {
-        for( i_chan = p_filter->input.i_channels ; i_chan ; )
+        for( i_chan = i_nb_channels ; i_chan ; )
         {
             i_chan--;
             p_out[i_chan] = p_in[i_chan];
         }
-        p_out += p_filter->input.i_channels;
+        p_out += i_nb_channels;
 
         i_remainder += p_filter->input.i_rate;
         while( i_remainder >= p_filter->output.i_rate )
         {
-            p_in += p_filter->input.i_channels;
+            p_in += i_nb_channels;
             i_remainder -= p_filter->output.i_rate;
         }
     }

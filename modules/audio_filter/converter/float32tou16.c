@@ -2,7 +2,7 @@
  * float32tou16.c : converter from float32 to unsigned 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tou16.c,v 1.5 2002/09/30 21:32:32 massiot Exp $
+ * $Id: float32tou16.c,v 1.6 2002/10/15 23:10:54 massiot Exp $
  *
  * Authors: Xavier Maillard <zedek@fxgsproject.org>
  *
@@ -85,7 +85,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     float * p_in = (float *)p_in_buf->p_buffer;
     u16 * p_out = (u16 *)p_out_buf->p_buffer;
 
-    for ( i = 0; i < p_in_buf->i_nb_samples * p_filter->input.i_channels; i++ )
+    for ( i = p_in_buf->i_nb_samples
+               * aout_FormatNbChannels( &p_filter->input ); i-- ; )
     {
         if ( *p_in >= 1.0 ) *p_out = 65535;
         else if ( *p_in < -1.0 ) *p_out = 0;

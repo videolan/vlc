@@ -2,7 +2,7 @@
  * trivial.c : trivial resampler (skips samples or pads with zeroes)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.6 2002/09/30 21:32:32 massiot Exp $
+ * $Id: trivial.c,v 1.7 2002/10/15 23:10:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -80,7 +80,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_out_nb = i_in_nb * p_filter->output.i_rate
                     / p_filter->input.i_rate;
-    int i_frame_bytes = p_filter->input.i_channels * sizeof(s32);
+    int i_frame_bytes = aout_FormatNbChannels( &p_filter->input ) * sizeof(s32);
 
     if ( p_out_buf != p_in_buf )
     {
