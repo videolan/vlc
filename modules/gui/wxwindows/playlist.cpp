@@ -181,12 +181,11 @@ END_EVENT_TABLE()
  *****************************************************************************/
 Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxFrame( p_parent, -1, wxU(_("Playlist")), wxDefaultPosition,
-             wxSize(345,400), wxDEFAULT_FRAME_STYLE )
+             wxSize(345,400), wxDEFAULT_FRAME_STYLE ), listview(NULL)
 {
     vlc_value_t val;
 
     /* Initializations */
-    iteminfo_dialog = NULL;
     p_intf = _p_intf;
     i_update_counter = 0;
     i_sort_mode = MODE_NONE;
@@ -263,55 +262,45 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create the toolbar */
     wxToolBar *toolbar =
-             CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
+        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
 
     /* Create the random tool */
     toolbar->AddTool( Random_Event, wxT(""), wxBitmap(shuffle_on_xpm),
                        wxBitmap(shuffle_on_xpm), wxITEM_CHECK,
                        wxU(_(HELP_SHUFFLE) ) );
     var_Get( p_intf, "random", &val );
-    vlc_bool_t b_random = val.b_bool;
-    toolbar->ToggleTool( Random_Event ,  b_random  );
+    toolbar->ToggleTool( Random_Event, val.b_bool );
 
     /* Create the Loop tool */
     toolbar->AddTool( Loop_Event, wxT(""), wxBitmap( loop_xpm),
                       wxBitmap( loop_xpm), wxITEM_CHECK,
                       wxU(_(HELP_LOOP )  ) );
     var_Get( p_intf, "loop", &val );
-    int b_loop = val.b_bool ;
-    toolbar->ToggleTool( Loop_Event,  b_loop );
+    toolbar->ToggleTool( Loop_Event, val.b_bool );
 
     /* Create the Repeat one checkbox */
     toolbar->AddTool( Repeat_Event, wxT(""), wxBitmap( repeat_xpm),
                       wxBitmap( repeat_xpm), wxITEM_CHECK,
                       wxU(_(HELP_REPEAT )  ) );
-
     var_Get( p_intf, "repeat", &val );
-    int b_repeat = val.b_bool ;
-    toolbar->ToggleTool( Repeat_Event, b_repeat) ;
+    toolbar->ToggleTool( Repeat_Event, val.b_bool ) ;
 
     /* Create the Search Textbox */
-    search_text =
-        new wxTextCtrl( toolbar, SearchText_Event, wxT(""),
-                        wxDefaultPosition, wxSize(100, -1),
-                        wxTE_PROCESS_ENTER);
+    search_text = new wxTextCtrl( toolbar, SearchText_Event, wxT(""),
+                                  wxDefaultPosition, wxSize(100, -1),
+                                  wxTE_PROCESS_ENTER);
 
     /* Create the search button */
-    search_button =
-        new wxButton( toolbar , Search_Event, wxU(_("Search")) );
+    search_button = new wxButton( toolbar , Search_Event, wxU(_("Search")) );
 
-    search_button->SetDefault();
-    wxControl *p_dummy_ctrl =
-            new wxControl( toolbar, -1, wxDefaultPosition,
-                           wxSize(16, 16 ), wxBORDER_NONE );
-
-    toolbar->AddSeparator();
-    toolbar->AddControl( p_dummy_ctrl );
+    toolbar->AddControl( new wxControl( toolbar, -1, wxDefaultPosition,
+                         wxSize(16, 16), wxBORDER_NONE ) );
     toolbar->AddControl( search_text );
+    toolbar->AddControl( new wxControl( toolbar, -1, wxDefaultPosition,
+                         wxSize(5, 5), wxBORDER_NONE ) );
     toolbar->AddControl( search_button );
-
+    search_button->SetDefault();
     toolbar->Realize();
-
 
     /* Create the listview */
     /* FIXME: the given size is arbitrary, and prevents us from resizing
@@ -319,66 +308,33 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
      * themselves to the size of a listview, and with a wxDefaultSize the
      * playlist window is ridiculously small */
     listview = new wxListView( playlist_panel, ListView_Event,
-                               wxDefaultPosition, wxDefaultSize,// wxSize(-1,50),
+                               wxDefaultPosition, wxDefaultSize,
                                wxLC_REPORT | wxSUNKEN_BORDER );
 
+    /* Reduce font size */
     wxFont font= listview->GetFont();
     font.SetPointSize(8);
     listview->SetFont( font );
+
     listview->InsertColumn( 0, wxU(_("Name")) );
-#if 0
-    listview->InsertColumn( 1, wxU(_("Author")) );
-#endif
+    listview->SetColumnWidth( 0, 250 );
     listview->InsertColumn( 1, wxU(_("Duration")) );
-#if 0
-    listview->InsertColumn( 3, wxU(_("Group")) );
-#endif
-   listview->SetColumnWidth( 0, 250 );
-   listview->SetColumnWidth( 1, 75 );
+    listview->SetColumnWidth( 1, 75 );
 
     /* Create the Up-Down buttons */
     wxButton *up_button =
         new wxButton( playlist_panel, Up_Event, wxU(_("Up") ) );
-
     wxButton *down_button =
         new wxButton( playlist_panel, Down_Event, wxU(_("Down") ) );
 
-#if 0
-    /* Create the iteminfo button */
-    wxButton *iteminfo_button =
-        new wxButton( playlist_panel, Infos_Event, wxU(_("Item info") ) );
-
-    /* Place everything in sizers */
-    wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
-    button_sizer->Add( iteminfo_button, 0, wxALIGN_CENTER|wxLEFT, 5);
-    button_sizer->Layout();
-#endif
-
     wxBoxSizer *updown_sizer = new wxBoxSizer( wxHORIZONTAL );
-    updown_sizer->Add( up_button, 0, wxALIGN_LEFT|wxRIGHT, 3);
-    updown_sizer->Add( down_button, 0, wxALIGN_LEFT|wxLEFT, 3);
     updown_sizer->Layout();
 
     /* The top and bottom sizers */
-#if 0
-    wxBoxSizer *top_sizer = new wxBoxSizer( wxHORIZONTAL );
-   top_sizer->Add( checkbox_sizer, 1, wxLEFT|wxRIGHT|wxALIGN_LEFT, 4 );
-    top_sizer->Add( search_sizer, 1, wxLEFT|wxRIGHT|wxALIGN_RIGHT, 4 );
-    top_sizer->Layout();
-#endif
     wxBoxSizer *bottom_sizer = new wxBoxSizer( wxHORIZONTAL );
-    bottom_sizer->Add( updown_sizer, 0,
-                       wxEXPAND |wxRIGHT | wxLEFT | wxALIGN_LEFT, 4 );
-#if 0
-    bottom_sizer->Add( button_sizer, 0,
-                       wxEXPAND|wxLEFT | wxRIGHT | wxALIGN_RIGHT, 4 );
-#endif
-
+    bottom_sizer->Add( up_button, 0, wxALIGN_LEFT | wxRIGHT, 3);
+    bottom_sizer->Add( down_button, 0, wxALIGN_LEFT | wxLEFT, 3);
     bottom_sizer->Layout();
-
-#if 0
-    wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
-#endif
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
@@ -386,12 +342,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     panel_sizer->Layout();
 
     playlist_panel->SetSizerAndFit( panel_sizer );
-    DoSize();
-#if 0
-    main_sizer->Add( playlist_panel, 1, wxGROW, 0 );
-    main_sizer->Layout();
-    SetSizerAndFit( main_sizer );
-#endif
+
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the playlist */
     SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
@@ -416,11 +367,11 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* One item has been updated */
     var_AddCallback( p_playlist, "item-change", ItemChanged, this );
 
-
     vlc_object_release( p_playlist );
 
     /* Update the playlist */
     Rebuild();
+    DoSize();
 }
 
 void Playlist::OnSize( wxSizeEvent& event)
@@ -432,9 +383,8 @@ void Playlist::OnSize( wxSizeEvent& event)
 void Playlist::DoSize()
 {
     wxSize size = GetClientSize();
-    listview->SetSize( 0,0, size.x ,size.y * 4 / 5);
+    if( listview ) listview->SetSize( 0,0, size.x ,size.y * 4 / 5);
 }
-
 
 Playlist::~Playlist()
 {
@@ -445,8 +395,6 @@ Playlist::~Playlist()
     {
         return;
     }
-
-    delete iteminfo_dialog;
 
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
     var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
@@ -1152,21 +1100,17 @@ void Playlist::ShowInfos( int i_item )
         return;
     }
 
-    if( iteminfo_dialog == NULL )
-    {
-        vlc_mutex_lock( &p_playlist->object_lock);
-        playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, i_item );
-        vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_mutex_lock( &p_playlist->object_lock);
+    playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, i_item );
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
-        if( p_item )
-        {
-            iteminfo_dialog = new ItemInfoDialog( p_intf, p_item, this );
-            if( iteminfo_dialog->ShowModal() == wxID_OK )
-                UpdateItem( i_item );
-            delete iteminfo_dialog;
-            iteminfo_dialog = NULL;
-        }
+    if( p_item )
+    {
+        iteminfo_dialog = new ItemInfoDialog( p_intf, p_item, this );
+        if( iteminfo_dialog->ShowModal() == wxID_OK ) UpdateItem( i_item );
+        delete iteminfo_dialog;
     }
+
     vlc_object_release( p_playlist );
 }
 
