@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.7 2003/04/16 19:22:53 karibu Exp $
+ * $Id: button.cpp,v 1.8 2003/04/16 21:39:00 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -137,7 +137,6 @@ bool ControlButton::MouseUp( int x, int y, int button )
     // If hit in the button
     if( Img[1]->Hit( x - Left, y - Top ) )
     {
-        fprintf( stderr, "    Button up ! (%i;%i)\n", button, (int)Selected );
         if( !Enabled )
             return true;
 
@@ -161,18 +160,14 @@ bool ControlButton::MouseDown( int x, int y, int button )
 {
     if( Img[0]->Hit( x - Left, y - Top ) )
     {
-        fprintf( stderr, "    Button down ! (%i)\n", button );
         if( !Enabled )
             return true;
 
-        fprintf( stderr, "    Button down ! (%i)\n", button );
         if( button == 1 )
         {
             State = 0;
             Selected = true;
-            fprintf( stderr, "    Button down ! (%i)\n", (int)Selected );
             ParentWindow->Refresh( Left, Top, Width, Height );
-            fprintf( stderr, "    Button down ! (%i)\n", (int)Selected );
             return true;
         }
     }

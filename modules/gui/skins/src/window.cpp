@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.14 2003/04/16 19:22:53 karibu Exp $
+ * $Id: window.cpp,v 1.15 2003/04/16 21:39:00 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -271,7 +271,6 @@ void Window::RefreshImage( int x, int y, int w, int h )
 {
     unsigned int i;
 
-fprintf(stderr, "refr %d %d %d %d\n", x,y,w,h);
     // Create Bitmap Buffer
     Graphics *Buffer = (Graphics *)new OSGraphics( w, h, this );
 
@@ -296,8 +295,6 @@ void Window::Refresh( int x, int y, int w, int h )
 
     if( Hidden )
         return;
-
-    fprintf( stderr, "Refresh: %i %i %i %i\n", x, y, w, h );
 
     // And copy buffer to window
     RefreshFromImage( x, y, w, h );
@@ -388,14 +385,8 @@ void Window::MouseUp( int x, int y, int button )
     // Checking event in controls
     for( i = ControlList.size() - 1; i >= 0 ; i-- )
     {
-        fprintf( stderr, "  -> Control\n" );
         if( ControlList[i]->MouseUp( x, y, button ) )
         {
-            int x, y;
-            //ControlList[i]->GetSize( x, y );
-            fprintf( stderr, "    x: %i\n    y: %i\n",
-                ControlList[i]->Left, ControlList[i]->Top );
-                
             return;
         }
     }
