@@ -59,6 +59,14 @@ static void UpdateFromDemux( input_thread_t * );
 static void ParseOption( input_thread_t *p_input, const char *psz_option );
 
 static void DecodeUrl  ( char * );
+static void MRLSplit( char *, char **, char **, char ** );
+
+static input_source_t *InputSourceNew( input_thread_t *);
+static int  InputSourceInit( input_thread_t *, input_source_t *, char * );
+static void InputSourceClean( input_thread_t *, input_source_t * );
+
+static void SlaveDemux( input_thread_t *p_input );
+static void SlaveSeek( input_thread_t *p_input );
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
@@ -130,6 +138,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->input.b_can_pace_control = VLC_TRUE;
     p_input->input.b_eof = VLC_FALSE;
     p_input->input.i_cr_average = 0;
+
+    /* No slave */
+    p_input->i_slave = 0;
+    p_input->slave   = NULL;
 
     /* Init control buffer */
     vlc_mutex_init( p_input, &p_input->lock_control );
@@ -308,7 +320,7 @@ static int Run( input_thread_t *p_input )
     }
 
     /* Main loop */
-    while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
+    while( !p_input->b_die && !p_input->b_error && !p_input->input.b_eof )
     {
         vlc_bool_t b_force_update = VLC_FALSE;
         int i_ret;
@@ -350,7 +362,6 @@ static int Run( input_thread_t *p_input )
                     /* End of file - we do not set b_die because only the
                      * playlist is allowed to do so. */
                     msg_Dbg( p_input, "EOF reached" );
-                    p_input->b_eof = VLC_TRUE;
                     p_input->input.b_eof = VLC_TRUE;
                 }
                 else
@@ -382,6 +393,11 @@ static int Run( input_thread_t *p_input )
             else if( i_ret < 0 )
             {
                 p_input->b_error = VLC_TRUE;
+            }
+
+            if( i_ret > 0 && p_input->i_slave > 0 )
+            {
+                SlaveDemux( p_input );
             }
         }
         else
@@ -447,6 +463,22 @@ static int Run( input_thread_t *p_input )
         }
     }
 
+    if( !p_input->b_eof && !p_input->b_error && p_input->input.b_eof )
+    {
+        /* We have finish to demux data but not to play them */
+        while( !p_input->b_die )
+        {
+            if( input_EsOutDecodersEmpty( p_input->p_es_out ) )
+                break;
+            msg_Dbg( p_input, "waiting decoder fifos to empty" );
+
+            msleep( INPUT_IDLE_SLEEP );
+        }
+
+        /* We have finished */
+        p_input->b_eof = VLC_TRUE;
+    }
+
     /* Wait we are asked to die */
     if( !p_input->b_die )
     {
@@ -457,129 +489,6 @@ static int Run( input_thread_t *p_input )
     End( p_input );
 
     return 0;
-
-#if 0
-    while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
-    {
-        if( p_input->stream.p_selected_area->i_seek != NO_SEEK )
-        {
-            if( p_input->stream.p_selected_area->i_size > 0 )
-            {
-                unsigned int i;
-                mtime_t      i_time;
-                double f = (double)p_input->stream.p_selected_area->i_seek /
-                           (double)p_input->stream.p_selected_area->i_size;
-
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
-                demux_Control( p_input, DEMUX_SET_POSITION, f );
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-
-                /* Escape all decoders for the stream discontinuity they
-                 * will encounter. */
-                input_EscapeDiscontinuity( p_input );
-
-                for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
-                {
-                    pgrm_descriptor_t * p_pgrm=p_input->stream.pp_programs[i];
-
-                    /* Reinitialize synchro. */
-                    p_pgrm->i_synchro_state = SYNCHRO_REINIT;
-                }
-
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
-                if( !demux_Control( p_input, DEMUX_GET_TIME, &i_time ) )
-                {
-                    int i;
-                    vlc_value_t val;
-
-                    /* Help in bar display */
-                    val.i_time = i_time;
-                    var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
-
-                    /* Seek subs */
-                    for( i = 0; i < p_input->p_sys->i_sub; i++ )
-                    {
-                        subtitle_Seek( p_input->p_sys->sub[i], i_time );
-                    }
-                }
-                if( !demux_Control( p_input, DEMUX_GET_POSITION, &f ) )
-                {
-                    val.f_float = (float)f;
-                    var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
-                }
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-            }
-            p_input->stream.p_selected_area->i_seek = NO_SEEK;
-        }
-
-        /* Read and demultiplex some data. */
-        i_count = p_input->pf_demux( p_input );
-
-        XXXXX
-
-        if( !p_input->b_error && !p_input->b_eof && i_update_next < mdate() )
-        {
-            int i;
-            mtime_t i_time;
-            mtime_t i_length;
-            double  d_pos;
-
-            /* update input status variables */
-            if( !demux_Control( p_input, DEMUX_GET_POSITION, &d_pos ) )
-            {
-                val.f_float = (float)d_pos;
-                var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
-            }
-            if( !demux_Control( p_input, DEMUX_GET_TIME, &i_time ) )
-            {
-                val.i_time = i_time;
-                var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
-            }
-            if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) )
-            {
-                vlc_value_t old_val;
-                var_Get( p_input, "length", &old_val );
-                val.i_time = i_length;
-                var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
-                if( old_val.i_time != val.i_time )
-                {
-                    char psz_buffer[MSTRTIME_MAX_SIZE];
-
-                    vlc_mutex_lock( &p_input->p_item->lock );
-                    p_input->p_item->i_duration = i_length;
-                    vlc_mutex_unlock( &p_input->p_item->lock );
-
-                    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
-                       msecstotimestr( psz_buffer, i_length / 1000 ) );
-                }
-            }
-
-            /* Check stop-time */
-            if( p_input->p_sys->i_stop_time > 0 && p_input->p_sys->i_stop_time < i_time )
-            {
-                msg_Warn( p_input, "EOF reached because of stop-time" );
-                p_input->b_eof = 1;
-            }
-
-            /* update subs */
-            for( i = 0; i < p_input->p_sys->i_sub; i++ )
-            {
-                subtitle_Demux( p_input->p_sys->sub[i], i_time );
-            }
-
-            i_update_next = mdate() + I64C(150000);
-        }
-    }
-
-    if( p_input->b_error || p_input->b_eof )
-    {
-        ErrorThread( p_input );
-    }
-
-    EndThread( p_input );
-
-    return 0;
-#endif
 }
 
 /*****************************************************************************
@@ -587,52 +496,8 @@ static int Run( input_thread_t *p_input )
  *****************************************************************************/
 static int Init( input_thread_t * p_input )
 {
-    char *psz_dup = strdup( p_input->input.p_item->psz_uri );
-    char *psz_access = NULL;
-    char *psz_demux  = NULL;
-    char *psz_path   = NULL;
     char *psz;
     vlc_value_t val;
-
-    /* Open access/stream/demux */
-    psz = strchr( psz_dup, ':' );
-#if defined( WIN32 ) || defined( UNDER_CE )
-    if( psz - psz_dup == 1 )
-    {
-        msg_Warn( p_input, "drive letter %c: found in source string", psz_dup[0] );
-        psz_path = psz_dup;
-    }
-    else
-#endif
-    if( psz )
-    {
-        *psz++ = '\0';
-        if( psz[0] == '/' && psz[1] == '/' )
-            psz += 2;
-
-        psz_path = psz;
-
-        psz = strchr( psz_dup, '/' );
-        if( psz )
-        {
-            *psz++ = '\0';
-            psz_demux = psz;
-        }
-
-        psz_access = psz_dup;
-    }
-    else
-    {
-        psz_path = psz_dup;
-    }
-
-    if( psz_access == NULL ) psz_access = "";
-    if( psz_demux == NULL )  psz_demux = "";
-    if( psz_path == NULL )   psz_path = "";
-
-    msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
-            p_input->input.p_item->psz_uri,
-             psz_access, psz_demux, psz_path );
 
     /* Initialize optional stream output. (before access/demuxer) */
     psz = var_GetString( p_input, "sout" );
@@ -643,8 +508,6 @@ static int Init( input_thread_t * p_input )
         {
             msg_Err( p_input, "cannot start stream output instance, aborting" );
             free( psz );
-            free( psz_dup );
-
             return VLC_EGENERIC;
         }
     }
@@ -655,147 +518,35 @@ static int Init( input_thread_t * p_input )
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_FALSE );
     es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
-    /* Try access_demux if no demux given */
-    if( *psz_access && *psz_demux == '\0' )
+    if( InputSourceInit( p_input, &p_input->input,
+                         p_input->input.p_item->psz_uri ) )
     {
-        p_input->input.p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
-                                             NULL, p_input->p_es_out );
+        goto error;
     }
 
-    if( p_input->input.p_demux )
+#if 0
     {
-        /* Get infos from access_demux */
-        demux2_Control( p_input->input.p_demux,
-                        DEMUX_GET_PTS_DELAY, &p_input->i_pts_delay );
-        p_input->input.b_title_demux = VLC_TRUE;
-        if( demux2_Control( p_input->input.p_demux,
-                            DEMUX_GET_TITLE_INFO,
-                            &p_input->input.title, &p_input->input.i_title ) )
-        {
-            p_input->input.i_title = 0;
-            p_input->input.title   = NULL;
-        }
-        demux2_Control( p_input->input.p_demux, DEMUX_CAN_CONTROL_PACE,
-                        &p_input->input.b_can_pace_control );
-        demux2_Control( p_input->input.p_demux, DEMUX_CAN_PAUSE,
-                        &p_input->input.b_can_pause );
+        input_source_t *extra;
+        char *psz_extra = "/home/fenrir/a.avi";
 
-        /* FIXME todo
-        demux2_Control( p_input->input.p_demux, DEMUX_CAN_SEEK,
-                        &val.b_bool );
-        */
+        extra = InputSourceNew( p_input );
+        if( !InputSourceInit( p_input, extra, psz_extra ) )
+        {
+            TAB_APPEND( p_input->i_slave, p_input->slave, extra );
+        }
     }
-    else
-    {
-        /* Now try a real access */
-        p_input->input.p_access = access2_New( p_input, psz_access, psz_demux, psz_path );
-
-        /* Access failed, URL encoded ? */
-        if( p_input->input.p_access == NULL && strchr( psz_path, '%' ) )
-        {
-            DecodeUrl( psz_path );
-
-            msg_Dbg( p_input, "retying with access `%s' demux `%s' path `%s'",
-                     psz_access, psz_demux, psz_path );
-
-            p_input->input.p_access = access2_New( p_input, psz_access, psz_demux, psz_path );
-        }
-#ifndef WIN32      /* Remove this gross hack from the win32 build as colons
-                        * are forbidden in filenames on Win32. */
-
-        /* Maybe we got something like: /Volumes/toto:titi/gabu.mpg */
-        if( p_input->input.p_access == NULL &&
-            *psz_access == '\0' && ( *psz_demux || *psz_path ) )
-        {
-            free( psz_dup );
-            psz_dup = strdup( p_input->input.p_item->psz_uri );
-            psz_access = "";
-            psz_demux = "";
-            psz_path = psz_dup;
-
-            p_input->input.p_access = access2_New( p_input, psz_access, psz_demux, psz_path );
-        }
 #endif
 
-        if( p_input->input.p_access == NULL )
-        {
-            msg_Err( p_input, "no suitable access module for `%s'",
-                     p_input->input.p_item->psz_uri );
-            goto error;
-        }
-
-        /* Get infos from access */
-        access2_Control( p_input->input.p_access,
-                         ACCESS_GET_PTS_DELAY, &p_input->i_pts_delay );
-        p_input->input.b_title_demux = VLC_FALSE;
-        if( access2_Control( p_input->input.p_access,
-                             ACCESS_GET_TITLE_INFO,
-                             &p_input->input.title, &p_input->input.i_title ) )
-        {
-            p_input->input.i_title = 0;
-            p_input->input.title   = NULL;
-        }
-        access2_Control( p_input->input.p_access, ACCESS_CAN_CONTROL_PACE,
-                         &p_input->input.b_can_pace_control );
-        access2_Control( p_input->input.p_access, ACCESS_CAN_PAUSE,
-                         &p_input->input.b_can_pace_control );
-        access2_Control( p_input->input.p_access, ACCESS_CAN_SEEK,
-                         &val.b_bool );
-        var_Set( p_input, "seekable", val );
-
-        /* Create the stream_t */
-        p_input->input.p_stream = stream_AccessNew( p_input->input.p_access );
-        if( p_input->input.p_stream == NULL )
-        {
-            msg_Warn( p_input, "cannot create a stream_t from access" );
-            goto error;
-        }
-
-        /* Open a demuxer */
-        if( *psz_demux == '\0' && *p_input->input.p_access->psz_demux )
-        {
-            psz_demux = p_input->input.p_access->psz_demux;
-        }
-        p_input->input.p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
-                                             p_input->input.p_stream,
-                                             p_input->p_es_out );
-        if( p_input->input.p_demux == NULL )
-        {
-            msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
-                     psz_access, psz_demux, psz_path );
-            goto error;
-        }
-
-        /* TODO get title from demux */
-        if( p_input->input.i_title <= 0 )
-        {
-            if( demux2_Control( p_input->input.p_demux, DEMUX_GET_TITLE_INFO,
-                                &p_input->input.title, &p_input->input.i_title ) )
-            {
-                p_input->input.i_title = 0;
-                p_input->input.title   = NULL;
-            }
-            else
-            {
-                p_input->input.b_title_demux = VLC_TRUE;
-            }
-        }
-    }
-    /* Create global title (for now, just a copy) */
+    /* Create global title (from master) */
     p_input->i_title = p_input->input.i_title;
+    p_input->title   = p_input->input.title;
     if( p_input->i_title > 0 )
     {
-        int i;
-        p_input->title = malloc( sizeof( input_title_t *) * p_input->i_title );
-        for( i = 0; i < p_input->i_title; i++ )
-        {
-            p_input->title[i] = vlc_input_title_Duplicate( p_input->input.title[i] );
-        }
-
         /* Setup variables */
         input_ControlVarNavigation( p_input );
         input_ControlVarTitle( p_input, 0 );
     }
+
     /* Global flag */
     p_input->b_can_pace_control = p_input->input.b_can_pace_control;
     p_input->b_can_pause        = p_input->input.b_can_pause;
@@ -819,6 +570,7 @@ static int Init( input_thread_t * p_input )
 
     /* TODO: get meta data from demuxer */
 
+    /* Load master infos */
     /* Init length */
     if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_LENGTH, &val.i_time ) && val.i_time > 0 )
     {
@@ -856,7 +608,7 @@ static int Init( input_thread_t * p_input )
     }
 
 
-    /* TODO: do subtitle loading */
+    /* TODO: do subtitle loading (and slave) */
 
 
     /* Set up es_out */
@@ -904,15 +656,6 @@ static int Init( input_thread_t * p_input )
     return VLC_SUCCESS;
 
 error:
-    if( p_input->input.p_demux )
-        demux2_Delete( p_input->input.p_demux );
-
-    if( p_input->input.p_stream )
-        stream_AccessDelete( p_input->input.p_stream );
-
-    if( p_input->input.p_access )
-        access2_Delete( p_input->input.p_access );
-
     if( p_input->p_es_out )
         input_EsOutDelete( p_input->p_es_out );
 
@@ -1176,6 +919,7 @@ static void Error( input_thread_t *p_input )
 static void End( input_thread_t * p_input )
 {
     vlc_value_t val;
+    int i;
 
     msg_Dbg( p_input, "closing `%s'",
              p_input->input.p_item->psz_uri );
@@ -1189,16 +933,18 @@ static void End( input_thread_t * p_input )
     /* Clean control variables */
     input_ControlVarClean( p_input );
 
+    /* Clean up master */
+    InputSourceClean( p_input, &p_input->input );
+
+    /* Delete slave */
+    for( i = 0; i < p_input->i_slave; i++ )
+    {
+        InputSourceClean( p_input, p_input->slave[i] );
+        free( p_input->slave[i] );
+    }
+    if( p_input->slave ) free( p_input->slave );
+
     /* Unload all modules */
-    if( p_input->input.p_demux )
-        demux2_Delete( p_input->input.p_demux );
-
-    if( p_input->input.p_stream )
-        stream_AccessDelete( p_input->input.p_stream );
-
-    if( p_input->input.p_access )
-        access2_Delete( p_input->input.p_access );
-
     if( p_input->p_es_out )
         input_EsOutDelete( p_input->p_es_out );
 
@@ -1358,6 +1104,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
             }
             else
             {
+                if( p_input->i_slave > 0 )
+                    SlaveSeek( p_input );
+
                 input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
                 es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
                 b_force_update = VLC_TRUE;
@@ -1406,6 +1155,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
             }
             else
             {
+                if( p_input->i_slave > 0 )
+                    SlaveSeek( p_input );
+
                 input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
 
                 es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
@@ -1717,6 +1469,297 @@ static void UpdateFromAccess( input_thread_t *p_input )
 }
 
 /*****************************************************************************
+ * InputSourceNew:
+ *****************************************************************************/
+static input_source_t *InputSourceNew( input_thread_t *p_input )
+{
+    input_source_t *in = malloc( sizeof( input_source_t ) );
+
+    in->p_item   = NULL;
+    in->p_access = NULL;
+    in->p_stream = NULL;
+    in->p_demux  = NULL;
+    in->b_title_demux = VLC_FALSE;
+    in->i_title  = 0;
+    in->title    = NULL;
+    in->b_can_pace_control = VLC_TRUE;
+    in->b_eof = VLC_FALSE;
+    in->i_cr_average = 0;
+
+    return in;
+}
+
+/*****************************************************************************
+ * InputSourceInit:
+ *****************************************************************************/
+static int InputSourceInit( input_thread_t *p_input,
+                            input_source_t *in, char *psz_mrl )
+{
+    char *psz_dup = strdup( psz_mrl );
+    char *psz_access;
+    char *psz_demux;
+    char *psz_path;
+    vlc_value_t val;
+
+    /* Split uri */
+    MRLSplit( psz_dup, &psz_access, &psz_demux, &psz_path );
+
+    msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
+             psz_mrl, psz_access, psz_demux, psz_path );
+
+
+    /* Try access_demux if no demux given */
+    if( *psz_access && *psz_demux == '\0' )
+    {
+        in->p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
+                                  NULL, p_input->p_es_out );
+    }
+
+    if( in->p_demux )
+    {
+        int64_t i_pts_delay;
+
+        /* Get infos from access_demux */
+        demux2_Control( in->p_demux,
+                        DEMUX_GET_PTS_DELAY, &i_pts_delay );
+        p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
+
+        in->b_title_demux = VLC_TRUE;
+        if( demux2_Control( in->p_demux,
+                            DEMUX_GET_TITLE_INFO,
+                            &in->title, &in->i_title ) )
+        {
+            in->i_title = 0;
+            in->title   = NULL;
+        }
+        demux2_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
+                        &in->b_can_pace_control );
+        demux2_Control( in->p_demux, DEMUX_CAN_PAUSE,
+                        &in->b_can_pause );
+
+        /* FIXME todo
+        demux2_Control( in->p_demux, DEMUX_CAN_SEEK,
+                        &val.b_bool );
+        */
+    }
+    else
+    {
+        int64_t i_pts_delay;
+
+        /* Now try a real access */
+        in->p_access = access2_New( p_input, psz_access, psz_demux, psz_path );
+
+        /* Access failed, URL encoded ? */
+        if( in->p_access == NULL && strchr( psz_path, '%' ) )
+        {
+            DecodeUrl( psz_path );
+
+            msg_Dbg( p_input, "retying with access `%s' demux `%s' path `%s'",
+                     psz_access, psz_demux, psz_path );
+
+            in->p_access = access2_New( p_input,
+                                        psz_access, psz_demux, psz_path );
+        }
+#ifndef WIN32      /* Remove this gross hack from the win32 build as colons
+                        * are forbidden in filenames on Win32. */
+
+        /* Maybe we got something like: /Volumes/toto:titi/gabu.mpg */
+        if( in->p_access == NULL &&
+            *psz_access == '\0' && ( *psz_demux || *psz_path ) )
+        {
+            free( psz_dup );
+            psz_dup = strdup( in->p_item->psz_uri );
+            psz_access = "";
+            psz_demux = "";
+            psz_path = psz_dup;
+
+            in->p_access = access2_New( p_input,
+                                        psz_access, psz_demux, psz_path );
+        }
+#endif
+
+        if( in->p_access == NULL )
+        {
+            msg_Err( p_input, "no suitable access module for `%s'",
+                     in->p_item->psz_uri );
+            goto error;
+        }
+
+        /* Get infos from access */
+        access2_Control( in->p_access,
+                         ACCESS_GET_PTS_DELAY, &i_pts_delay );
+        p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
+
+        in->b_title_demux = VLC_FALSE;
+        if( access2_Control( in->p_access,
+                             ACCESS_GET_TITLE_INFO,
+                             &in->title, &in->i_title ) )
+        {
+            in->i_title = 0;
+            in->title   = NULL;
+        }
+        access2_Control( in->p_access, ACCESS_CAN_CONTROL_PACE,
+                         &in->b_can_pace_control );
+        access2_Control( in->p_access, ACCESS_CAN_PAUSE,
+                         &in->b_can_pause );
+        access2_Control( in->p_access, ACCESS_CAN_SEEK,
+                         &val.b_bool );
+        var_Set( p_input, "seekable", val );
+
+        /* Create the stream_t */
+        in->p_stream = stream_AccessNew( in->p_access );
+        if( in->p_stream == NULL )
+        {
+            msg_Warn( p_input, "cannot create a stream_t from access" );
+            goto error;
+        }
+
+        /* Open a demuxer */
+        if( *psz_demux == '\0' && *in->p_access->psz_demux )
+        {
+            psz_demux = in->p_access->psz_demux;
+        }
+        in->p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
+                                  in->p_stream, p_input->p_es_out );
+        if( in->p_demux == NULL )
+        {
+            msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
+                     psz_access, psz_demux, psz_path );
+            goto error;
+        }
+
+        /* TODO get title from demux */
+        if( in->i_title <= 0 )
+        {
+            if( demux2_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
+                                &in->title, &in->i_title ) )
+            {
+                in->i_title = 0;
+                in->title   = NULL;
+            }
+            else
+            {
+                in->b_title_demux = VLC_TRUE;
+            }
+        }
+    }
+    free( psz_dup );
+    return VLC_SUCCESS;
+
+error:
+    if( in->p_demux )
+        demux2_Delete( in->p_demux );
+
+    if( in->p_stream )
+        stream_AccessDelete( in->p_stream );
+
+    if( in->p_access )
+        access2_Delete( in->p_access );
+    free( psz_dup );
+
+    return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * InputSourceClean:
+ *****************************************************************************/
+static void InputSourceClean( input_thread_t *p_input, input_source_t *in )
+{
+    if( in->p_demux )
+        demux2_Delete( in->p_demux );
+
+    if( in->p_stream )
+        stream_AccessDelete( in->p_stream );
+
+    if( in->p_access )
+        access2_Delete( in->p_access );
+
+    if( in->i_title > 0 )
+    {
+        int i;
+        for( i = 0; i < in->i_title; i++ )
+        {
+            vlc_input_title_Delete( in->title[i] );
+        }
+        free( in->title );
+    }
+}
+
+static void SlaveDemux( input_thread_t *p_input )
+{
+    int64_t i_time;
+    int i;
+    if( demux2_Control( p_input->input.p_demux, DEMUX_GET_TIME, &i_time ) )
+    {
+        msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
+        return;
+    }
+
+    for( i = 0; i < p_input->i_slave; i++ )
+    {
+        input_source_t *in = p_input->slave[i];
+        int i_ret = 1;
+
+        if( in->b_eof )
+            continue;
+
+        if( demux2_Control( in->p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_time ) )
+        {
+            for( ;; )
+            {
+                int64_t i_stime;
+                if( demux2_Control( in->p_demux, DEMUX_GET_TIME, &i_stime ) )
+                {
+                    msg_Err( p_input, "slave[%d] doesn't like DEMUX_GET_TIME -> EOF", i );
+                    i_ret = 0;
+                    break;
+                }
+                msg_Dbg( p_input, "slave time=%lld input=%lld", i_stime, i_time );
+                if( i_stime >= i_time )
+                    break;
+
+                if( ( i_ret = in->p_demux->pf_demux( in->p_demux ) ) <= 0 )
+                    break;
+            }
+        }
+        else
+        {
+            i_ret = in->p_demux->pf_demux( in->p_demux );
+        }
+
+        if( i_ret <= 0 )
+        {
+            msg_Dbg( p_input, "slave %d EOF", i );
+            in->b_eof = VLC_TRUE;
+        }
+    }
+}
+
+static void SlaveSeek( input_thread_t *p_input )
+{
+    int64_t i_time;
+    int i;
+
+    if( demux2_Control( p_input->input.p_demux, DEMUX_GET_TIME, &i_time ) )
+    {
+        msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
+        return;
+    }
+
+    for( i = 0; i < p_input->i_slave; i++ )
+    {
+        input_source_t *in = p_input->slave[i];
+
+        if( demux2_Control( in->p_demux, DEMUX_SET_TIME, i_time ) )
+        {
+            msg_Err( p_input, "seek failed for slave %d -> EOF", i );
+            in->b_eof = VLC_TRUE;
+        }
+    }
+}
+
+
+/*****************************************************************************
  * DecodeUrl: decode a given encoded url
  *****************************************************************************/
 static void DecodeUrl( char *psz )
@@ -1852,4 +1895,58 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
     return;
 }
 
+static void MRLSplit( char *psz_dup,
+                      char **ppsz_access, char **ppsz_demux, char **ppsz_path )
+{
+    char *psz_access = NULL;
+    char *psz_demux  = NULL;
+    char *psz_path   = NULL;
+    char *psz;
+
+    psz = strchr( psz_dup, ':' );
+#if defined( WIN32 ) || defined( UNDER_CE )
+    if( psz - psz_dup == 1 )
+    {
+        msg_Warn( p_input, "drive letter %c: found in source string", psz_dup[0] );
+        psz_path = psz_dup;
+    }
+    else
+#endif
+    if( psz )
+    {
+        *psz++ = '\0';
+        if( psz[0] == '/' && psz[1] == '/' )
+            psz += 2;
+
+        psz_path = psz;
+
+        psz = strchr( psz_dup, '/' );
+        if( psz )
+        {
+            *psz++ = '\0';
+            psz_demux = psz;
+        }
+
+        psz_access = psz_dup;
+    }
+    else
+    {
+        psz_path = psz_dup;
+    }
+
+    if( psz_access == NULL )
+        *ppsz_access = "";
+    else
+        *ppsz_access = psz_access;
+
+    if( psz_demux == NULL )
+        *ppsz_demux = "";
+    else
+        *ppsz_demux = psz_demux;
+
+    if( psz_path == NULL )
+        *ppsz_path = "";
+    else
+        *ppsz_path = psz_path;
+}
 
