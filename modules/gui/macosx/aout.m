@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.26 2003/03/14 01:08:38 jlj Exp $
+ * $Id: aout.m,v 1.27 2003/03/15 19:21:49 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -161,6 +161,9 @@ struct aout_sys_t
     AudioDeviceID               devid;
     AudioStreamBasicDescription stream_format;
     UInt32                      b_dev_alive;
+
+    vlc_bool_t                  b_revert_sfmt;
+    AudioStreamBasicDescription sfmt_revert;
 
     UInt32                      i_buffer_size;
     mtime_t                     clock_diff;
@@ -1090,7 +1093,6 @@ static int InitDevice( aout_instance_t * p_aout )
     unsigned int i_option;
     vlc_bool_t b_found = VLC_FALSE;
     UInt32 i, i_stream, i_param_size;
-    AudioStreamBasicDescription desc;
 
     struct aout_dev_t * p_dev;
     struct aout_option_t * p_option;
@@ -1144,11 +1146,11 @@ static int InitDevice( aout_instance_t * p_aout )
 
     i_stream = b_found ? i : p_option->i_sdx;
 
-    i_param_size = sizeof( desc );
-    memset( &desc, 0, i_param_size );
+    i_param_size = sizeof( p_sys->sfmt_revert );
     err = AudioStreamGetProperty( p_option->i_sid, 0,
                                   kAudioStreamPropertyPhysicalFormat,
-                                  &i_param_size, (void *)&desc );
+                                  &i_param_size, 
+                                  (void *)&p_sys->sfmt_revert );
     if( err != noErr )
     {
         msg_Err( p_aout, "AudioStreamGetPropertyInfo failed: [%4.4s]",
@@ -1156,12 +1158,16 @@ static int InitDevice( aout_instance_t * p_aout )
         return( VLC_EGENERIC ); 
     }
 
-    if( memcmp( &P_STREAMS[i_stream], &desc, sizeof( desc ) ) != 0 ) 
+    if( memcmp( &P_STREAMS[i_stream], &p_sys->sfmt_revert, 
+                sizeof( p_sys->sfmt_revert ) ) != 0 ) 
     {
         struct { vlc_mutex_t lock; vlc_cond_t cond; } w;
 
         vlc_cond_init( p_aout, &w.cond );
         vlc_mutex_init( p_aout, &w.lock );
+
+        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "stream format",
+                                            p_sys->sfmt_revert ) );
 
         err = AudioStreamAddPropertyListener( p_option->i_sid, 0,
                                           kAudioStreamPropertyPhysicalFormat,
@@ -1218,6 +1224,8 @@ static int InitDevice( aout_instance_t * p_aout )
 
             return( VLC_EGENERIC );
         }
+
+        p_sys->b_revert_sfmt = VLC_TRUE;
     }
 
 #undef I_STREAMS
@@ -1249,6 +1257,37 @@ static void FreeDevice( aout_instance_t * p_aout )
     OSStatus err;
 
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    if( p_sys->b_revert_sfmt )
+    {
+        struct aout_dev_t * p_dev;
+        struct aout_option_t * p_option;
+
+        p_option = &p_sys->p_options[p_sys->i_sel_opt];
+        p_dev = &p_sys->p_devices[p_option->i_dev];
+
+        msg_Dbg( p_aout, STREAM_FORMAT_MSG( "reverting to format",
+                                            p_sys->sfmt_revert ) );
+
+        if( GetStreamID( p_dev->devid, p_option->i_idx + 1,
+                         &p_option->i_sid ) )
+        {
+            msg_Err( p_aout, "GetStreamID(%ld, %ld) failed", 
+                     p_option->i_dev, p_option->i_idx );
+        }
+        else
+        {
+            err = AudioStreamSetProperty( p_option->i_sid, 0, 0,
+                                          kAudioStreamPropertyPhysicalFormat,
+                                          sizeof( p_sys->sfmt_revert ),
+                                          &p_sys->sfmt_revert ); 
+            if( err != noErr )
+            {
+                msg_Err( p_aout, "AudioStreamSetProperty failed: [%4.4s]",
+                         (char *)&err );
+            }
+        }
+    }
 
     err = AudioDeviceRemovePropertyListener( p_sys->devid, 0, FALSE,
                                              kAudioDevicePropertyDeviceIsAlive,
