@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.72 2002/03/03 20:42:21 gbazin Exp $
+ * $Id: input_programs.c,v 1.73 2002/03/05 17:46:33 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -283,8 +283,6 @@ input_area_t * input_AddArea( input_thread_t * p_input )
     p_input->stream.pp_areas[i_area_index]->i_seek = NO_SEEK;
     p_input->stream.pp_areas[i_area_index]->i_part_nb = 1;
     p_input->stream.pp_areas[i_area_index]->i_part= 0;
-    p_input->stream.pp_areas[i_area_index]->i_angle_nb = 1;
-    p_input->stream.pp_areas[i_area_index]->i_angle = 0;
 
     return p_input->stream.pp_areas[i_area_index];
 }

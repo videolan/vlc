@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.82 2002/03/04 23:56:37 massiot Exp $
+ * $Id: mpeg_system.c,v 1.83 2002/03/05 17:46:33 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -960,7 +960,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     i_mux_rate = (U32_AT(p_header + 8) & 0x7FFFFE) >> 1;
                 }
                 /* Call the pace control. */
-                input_ClockManageRef( p_input, p_input->stream.pp_programs[0],
+                input_ClockManageRef( p_input,
+                                      p_input->stream.p_selected_program,
                                       scr_time );
 
                 if( i_mux_rate != p_input->stream.i_mux_rate

@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.20 2002/02/25 04:30:03 sam Exp $
+ * $Id: gtk_menu.c,v 1.21 2002/03/05 17:46:33 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -95,7 +95,8 @@ gint GtkSetupMenus( intf_thread_t * p_intf );
                    GTK_OBJECT( p_intf->p_sys->window ), (menu) ) );     \
         p_es = (es_descriptor_t*)user_data;                             \
                                                                         \
-        input_ToggleES( p_input_bank->pp_input[0], p_es, menuitem->active );      \
+        input_ToggleES( p_input_bank->pp_input[0],                      \
+                        p_es, menuitem->active );                       \
                                                                         \
         p_intf->p_sys->b_update = menuitem->active;                     \
                                                                         \
@@ -183,30 +184,35 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
 /*
  * Program
  */
+#define GTKPROGRAMTOGGLE( intf )                                            \
+    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), intf );         \
+                                                                            \
+    if( menuitem->active && !p_intf->p_sys->b_program_update )              \
+    {                                                                       \
+        u16 i_program_id = (ptrdiff_t)user_data;                            \
+                                                                            \
+        input_ChangeProgram( p_input_bank->pp_input[0], i_program_id );     \
+                                                                            \
+        p_intf->p_sys->b_program_update = 1;                                \
+                                                                            \
+        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );   \
+        GtkSetupMenus( p_intf );                                            \
+        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock ); \
+                                                                            \
+        p_intf->p_sys->b_program_update = 0;                                \
+                                                                            \
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );    \
+    }
 
 void GtkMenubarProgramToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    if( menuitem->active && !p_intf->p_sys->b_program_update )
-    {
-        u16 i_program_id = (ptrdiff_t)user_data;
-        
-        input_ChangeProgram( p_input_bank->pp_input[0], i_program_id );
-        
-        p_intf->p_sys->b_program_update = 1;
-        
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
-        GtkSetupMenus( p_intf );
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
-        
-        p_intf->p_sys->b_title_update = 0;
-
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
-
-    }
+    GTKPROGRAMTOGGLE( "intf_window" );
 }
 
+void GtkPopupProgramToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
+{
+    GTKPROGRAMTOGGLE( "intf_popup" );
+}
 
 /*
  * Title
@@ -277,6 +283,7 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
  * Angle
  */
 
+#if 0
 #define GTKANGLETOGGLE( intf, window, menu, callback )                      \
     intf_thread_t * p_intf;                                                 \
     GtkWidget *     p_menu;                                                 \
@@ -314,7 +321,7 @@ void GtkPopupAngleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 }
 
 #undef GTKANGLETOGGLE
-
+#endif
 /****************************************************************************
  * Functions to generate menus
  ****************************************************************************/
@@ -441,9 +448,10 @@ static gint GtkRadioMenu( intf_thread_t * p_intf,
  * Builds the program menu according to what have been found in the PAT 
  * by the input. Usefull for multi-programs streams such as DVB ones.
  *****************************************************************************/
-static gint GtkProgramMenu( gpointer          p_data,
-                                GtkWidget *       p_root,
-                          void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
+static gint GtkProgramMenu( gpointer            p_data,
+                            GtkWidget *         p_root,
+                            pgrm_descriptor_t * p_pgrm,
+                      void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
     GtkWidget *         p_menu;
@@ -451,7 +459,6 @@ static gint GtkProgramMenu( gpointer          p_data,
     GtkWidget *         p_item_active;
     GSList *            p_group;
     char                psz_name[ GTK_MENU_LABEL_SIZE ];
-    gint                i_item;
     gint                i;
 
     /* cast */
@@ -472,30 +479,19 @@ static gint GtkProgramMenu( gpointer          p_data,
     p_menu = gtk_menu_new();
 
     p_item_active = NULL;
-    i_item = 0;
 
     /* create a set of program buttons and append them to the container */
     for( i = 0 ; i < p_input_bank->pp_input[0]->stream.i_pgrm_number ; i++ )
     {
-        i_item++;
-        snprintf( psz_name, GTK_MENU_LABEL_SIZE, "id %x",
+        snprintf( psz_name, GTK_MENU_LABEL_SIZE, "id %d",
             p_input_bank->pp_input[0]->stream.pp_programs[i]->i_number );
+        psz_name[GTK_MENU_LABEL_SIZE-1] = '\0';
             
-        if( psz_name[0] == '\0' )
-        {
-            snprintf( psz_name, GTK_MENU_LABEL_SIZE,
-                      "Program %d", i_item );
-            psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
-        }
-
         p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
         p_group =
             gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
 
-        if( p_input_bank->pp_input[0]->stream.p_new_program ==
-                p_input_bank->pp_input[0]->stream.pp_programs[i] ||
-                p_input_bank->pp_input[0]->stream.p_selected_program == 
-                p_input_bank->pp_input[0]->stream.pp_programs[i] )
+        if( p_pgrm == p_input_bank->pp_input[0]->stream.pp_programs[i] )
         {
             /* don't lose p_item when we append into menu */
             p_item_active = p_item;
@@ -525,7 +521,7 @@ static gint GtkProgramMenu( gpointer          p_data,
     }
 
     /* be sure that menu is sensitive if more than 1 program */
-    if( i_item > 1 )
+    if( p_input_bank->pp_input[0]->stream.i_pgrm_number > 1 )
     {
         gtk_widget_set_sensitive( p_root, TRUE );
     }
@@ -602,13 +598,18 @@ static gint GtkLanguageMenus( gpointer          p_data,
 
     vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
 
+#define ES p_input_bank->pp_input[0]->stream.pp_es[i]
     /* create a set of language buttons and append them to the container */
     for( i = 0 ; i < p_input_bank->pp_input[0]->stream.i_es_number ; i++ )
     {
-        if( p_input_bank->pp_input[0]->stream.pp_es[i]->i_cat == i_cat )
+        if( ( ES->i_cat == i_cat ) &&
+            ( !ES->p_pgrm ||
+              ES->p_pgrm ==
+                 p_input_bank->pp_input[0]->stream.p_selected_program ) )
         {
             i_item++;
-            strcpy( psz_name, p_input_bank->pp_input[0]->stream.pp_es[i]->psz_desc );
+            strcpy( psz_name,
+                    p_input_bank->pp_input[0]->stream.pp_es[i]->psz_desc );
             if( psz_name[0] == '\0' )
             {
                 snprintf( psz_name, GTK_MENU_LABEL_SIZE,
@@ -805,7 +806,8 @@ static gint GtkTitleMenu( gpointer       p_data,
                 gtk_widget_show( p_item );
 
 #define p_area p_input_bank->pp_input[0]->stream.pp_areas[i_title]
-                if( ( p_area == p_input_bank->pp_input[0]->stream.p_selected_area ) &&
+                if( ( p_area ==
+                        p_input_bank->pp_input[0]->stream.p_selected_area ) &&
                     ( p_area->i_part == i_chapter + 1 ) )
                 {
                     p_item_active = p_item;
@@ -846,12 +848,12 @@ static gint GtkTitleMenu( gpointer       p_data,
                 gtk_widget_set_sensitive( p_navigation, TRUE );
             }
 #else
-        GtkRadioMenu( p_intf, p_title_item, p_chapter_group, "Chapter",
-                        p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb,
-                        i_title * 100,
-                        p_input_bank->pp_input[0]->stream.p_selected_area->i_part +
-                            p_input_bank->pp_input[0]->stream.p_selected_area->i_id *100,
-                        pf_toggle );
+            GtkRadioMenu( p_intf, p_title_item, p_chapter_group, "Chapter",
+                p_input_bank->pp_input[0]->stream.pp_areas[i_title]->i_part_nb,
+                i_title * 100,
+                p_input_bank->pp_input[0]->stream.p_selected_area->i_part +
+                p_input_bank->pp_input[0]->stream.p_selected_area->i_id *100,
+                pf_toggle );
 
 #endif
         }
@@ -903,6 +905,8 @@ static gint GtkTitleMenu( gpointer       p_data,
 /*****************************************************************************
  * GtkSetupMenus: function that generates title/chapter/audio/subpic
  * menus with help from preceding functions
+ *****************************************************************************
+ * Function called with the lock on stream
  *****************************************************************************/
 gint GtkSetupMenus( intf_thread_t * p_intf )
 {
@@ -912,21 +916,36 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
     GtkWidget *         p_popup_menu;
     gint                i;
 
-    p_intf->p_sys->b_title_update |= p_intf->p_sys->b_program_update;
     p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
-    p_intf->p_sys->b_angle_update |= p_intf->p_sys->b_title_update;
-    p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
-    p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update;
-
-//    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update |
+                                     p_intf->p_sys->b_program_update;
+    p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update |
+                                   p_intf->p_sys->b_program_update;
 
     if( p_intf->p_sys->b_program_update )
     { 
+        pgrm_descriptor_t * p_pgrm;
+        
+        if( p_input_bank->pp_input[0]->stream.p_new_program )
+        {
+            p_pgrm = p_input_bank->pp_input[0]->stream.p_new_program;
+        }
+        else
+        {
+            p_pgrm = p_input_bank->pp_input[0]->stream.p_selected_program;
+        }
+
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                             p_intf->p_sys->p_window ), "menubar_program" ) );
+        GtkProgramMenu( p_intf, p_menubar_menu, p_pgrm,
+                        GtkMenubarProgramToggle );
         
-        GtkProgramMenu( p_intf, p_menubar_menu, GtkMenubarProgramToggle );
-        
+        p_intf->p_sys->b_program_update = 1;
+        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                            p_intf->p_sys->p_popup ), "popup_program" ) );
+        GtkProgramMenu( p_intf, p_popup_menu, p_pgrm,
+                        GtkPopupProgramToggle );
+
         p_intf->p_sys->b_program_update = 0;
     }
     
@@ -983,25 +1002,6 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
         p_intf->p_sys->b_chapter_update = 0;
     }
 
-    if( p_intf->p_sys->b_angle_update )
-    {
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                             p_intf->p_sys->p_window ), "menubar_angle" ) );
-        GtkRadioMenu( p_intf, p_menubar_menu, NULL, "Angle",
-                        p_input_bank->pp_input[0]->stream.p_selected_area->i_angle_nb,
-                        p_input_bank->pp_input[0]->stream.p_selected_area->i_angle,
-                        GtkMenubarAngleToggle );
-
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                             p_intf->p_sys->p_popup ), "popup_angle" ) );
-        GtkRadioMenu( p_intf, p_popup_menu, NULL, "Angle",
-                        p_input_bank->pp_input[0]->stream.p_selected_area->i_angle_nb,
-                        p_input_bank->pp_input[0]->stream.p_selected_area->i_angle,
-                        GtkPopupAngleToggle );
-
-        p_intf->p_sys->b_angle_update = 0;
-    }
-    
     /* look for selected ES */
     p_audio_es = NULL;
     p_spu_es = NULL;

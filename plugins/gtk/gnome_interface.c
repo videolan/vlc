@@ -87,13 +87,6 @@ static GnomeUIInfo menubar_view_menu_uiinfo[] =
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
-  {
-    GNOME_APP_UI_ITEM, N_("An_gle"),
-    N_("Choose angle"),
-    (gpointer) NULL, NULL, NULL,
-    GNOME_APP_PIXMAP_NONE, NULL,
-    0, (GdkModifierType) 0, NULL
-  },
   GNOMEUIINFO_SEPARATOR,
   {
     GNOME_APP_UI_ITEM, N_("_Playlist..."),
@@ -296,30 +289,24 @@ create_intf_window (void)
   gtk_widget_set_sensitive (menubar_view_menu_uiinfo[5].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[6].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_angle",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator7",
                             menubar_view_menu_uiinfo[6].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[6].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[7].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator7",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_playlist",
                             menubar_view_menu_uiinfo[7].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[8].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_playlist",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_modules",
                             menubar_view_menu_uiinfo[8].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[8].widget, FALSE);
 
   gtk_widget_ref (menubar_view_menu_uiinfo[9].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_modules",
-                            menubar_view_menu_uiinfo[9].widget,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_set_sensitive (menubar_view_menu_uiinfo[9].widget, FALSE);
-
-  gtk_widget_ref (menubar_view_menu_uiinfo[10].widget);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_messages",
-                            menubar_view_menu_uiinfo[10].widget,
+                            menubar_view_menu_uiinfo[9].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_uiinfo[2].widget);
@@ -613,6 +600,7 @@ create_intf_window (void)
   gtk_widget_show (button_title_prev);
   gtk_box_pack_start (GTK_BOX (title_chapter_box), button_title_prev, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, button_title_prev, _("Select previous title"), NULL);
+  gtk_button_set_relief (GTK_BUTTON (button_title_prev), GTK_RELIEF_NONE);
 
   button_title_next = gnome_stock_button (GNOME_STOCK_BUTTON_NEXT);
   gtk_widget_ref (button_title_next);
@@ -620,6 +608,7 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (button_title_next);
   gtk_box_pack_start (GTK_BOX (title_chapter_box), button_title_next, FALSE, FALSE, 0);
+  gtk_button_set_relief (GTK_BUTTON (button_title_next), GTK_RELIEF_NONE);
 
   vseparator1 = gtk_vseparator_new ();
   gtk_widget_ref (vseparator1);
@@ -656,6 +645,7 @@ create_intf_window (void)
   gtk_widget_show (button_chapter_prev);
   gtk_box_pack_start (GTK_BOX (dvd_chapter_box), button_chapter_prev, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, button_chapter_prev, _("Select previous chapter"), NULL);
+  gtk_button_set_relief (GTK_BUTTON (button_chapter_prev), GTK_RELIEF_NONE);
 
   button_chapter_next = gnome_stock_button (GNOME_STOCK_BUTTON_UP);
   gtk_widget_ref (button_chapter_next);
@@ -664,6 +654,7 @@ create_intf_window (void)
   gtk_widget_show (button_chapter_next);
   gtk_box_pack_start (GTK_BOX (dvd_chapter_box), button_chapter_next, FALSE, FALSE, 0);
   gtk_tooltips_set_tip (tooltips, button_chapter_next, _("Select next chapter"), NULL);
+  gtk_button_set_relief (GTK_BUTTON (button_chapter_next), GTK_RELIEF_NONE);
 
   network_box = gtk_hbox_new (TRUE, 0);
   gtk_widget_ref (network_box);
@@ -902,17 +893,17 @@ static GnomeUIInfo intf_popup_uiinfo[] =
     0, (GdkModifierType) 0, NULL
   },
   {
+    GNOME_APP_UI_ITEM, N_("Program"),
+    N_("Switch program"),
+    (gpointer) NULL, NULL, NULL,
+    GNOME_APP_PIXMAP_NONE, NULL,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
     GNOME_APP_UI_ITEM, N_("_Navigation"),
     N_("Navigate through titles and chapters"),
     (gpointer) NULL, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_SEARCH,
-    0, (GdkModifierType) 0, NULL
-  },
-  {
-    GNOME_APP_UI_ITEM, N_("An_gle"),
-    NULL,
-    (gpointer) NULL, NULL, NULL,
-    GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
@@ -1021,13 +1012,13 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[13].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_navigation",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_program",
                             intf_popup_uiinfo[13].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (intf_popup_uiinfo[13].widget, FALSE);
 
   gtk_widget_ref (intf_popup_uiinfo[14].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_angle",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_navigation",
                             intf_popup_uiinfo[14].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_set_sensitive (intf_popup_uiinfo[14].widget, FALSE);

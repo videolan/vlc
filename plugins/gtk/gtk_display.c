@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.16 2002/03/01 00:33:18 massiot Exp $
+ * $Id: gtk_display.c,v 1.17 2002/03/05 17:46:33 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -184,7 +184,6 @@ gint GtkModeManage( intf_thread_t * p_intf )
         p_intf->p_sys->b_program_update = 1;
         p_intf->p_sys->b_title_update = 1;
         p_intf->p_sys->b_chapter_update = 1;
-        p_intf->p_sys->b_angle_update = 1;
         p_intf->p_sys->b_audio_update = 1;
         p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->i_part = 0;

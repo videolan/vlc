@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.12 2001/12/30 07:09:55 sam Exp $
+ * $Id: dvd_summary.c,v 1.13 2002/03/05 17:46:33 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -98,8 +98,8 @@ void IfoPrintVideo( thread_dvd_data_t * p_dvd )
                 "352x240 ntsc or 352x288 pal"
              };
 
-    intf_WarnMsg( 5, "dvd info: MPEG-%d video, %sHz, aspect ratio %s"
-                     "display mode %s", video.i_compression + 1,
+    intf_WarnMsg( 5, "dvd info: MPEG-%d video, %sHz, aspect ratio %s",
+                     video.i_compression + 1,
                      video.i_system ? "pal 625 @50" : "ntsc 525 @60",
                      video.i_ratio ? (video.i_ratio == 3) ? "16:9"
                                                           : "unknown"

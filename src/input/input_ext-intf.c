@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.34 2002/02/24 21:36:20 jobi Exp $
+ * $Id: input_ext-intf.c,v 1.35 2002/03/05 17:46:33 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -330,8 +330,7 @@ int input_ChangeArea( input_thread_t * p_input, input_area_t * p_area )
 /****************************************************************************
  * input_ChangeProgram: interface request a program change
  ****************************************************************************/
-int input_ChangeProgram( input_thread_t * p_input, 
-             u16 i_program_number )
+int input_ChangeProgram( input_thread_t * p_input, u16 i_program_number )
 {
     pgrm_descriptor_t *       p_program;
     

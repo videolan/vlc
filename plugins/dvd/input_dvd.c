@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.131 2002/03/05 00:50:37 stef Exp $
+ * $Id: input_dvd.c,v 1.132 2002/03/05 17:46:33 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -236,19 +236,6 @@ static int DVDRewind( input_thread_t * p_input )
 /*
  * Data access functions
  */
-
-#define PARSE( chr, action )                            \
-    psz_parser = p_input->psz_name;                     \
-    while( *(psz_parser) && *(psz_parser) != (chr) )    \
-    {                                                   \
-        (psz_parser)++;                                 \
-    }                                                   \
-                                                        \
-    if( *(psz_parser) == (chr) )                        \
-    {                                                   \
-        *(psz_parser) = '\0';                           \
-        (action);                                       \
-    }
 
 /*****************************************************************************
  * DVDOpen: open dvd
@@ -483,10 +470,6 @@ static int DVDOpen( struct input_thread_s *p_input )
     p_dvd->dvdhandle = (dvdcss_handle) dvdhandle;
     p_input->p_access_data = (void *)p_dvd;
 
-    p_dvd->i_title = i_title;
-    p_dvd->i_chapter = i_chapter;
-    p_dvd->i_angle = i_angle;
-
     if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
     {
         intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
@@ -538,19 +521,22 @@ static int DVDOpen( struct input_thread_s *p_input )
         area[i]->i_part_nb = title_inf.p_attr[i-1].i_chapter_nb;
         area[i]->i_part = 1;
 
-        /* Number of angles */
-        area[i]->i_angle_nb = 0;
-        area[i]->i_angle = 1;
-
         /* Offset to vts_i_0.ifo */
         area[i]->i_plugin_data = p_dvd->p_ifo->i_start +
                        title_inf.p_attr[i-1].i_start_sector;
     }   
 #undef area
+    
+    p_dvd->i_title = i_title <= title_inf.i_title_nb ? i_title : 1;
 #undef title_inf
 
-    p_area = p_input->stream.pp_areas[i_title];
-    p_area->i_part = i_chapter;
+
+    p_area = p_input->stream.pp_areas[p_dvd->i_title];
+    
+    p_dvd->i_chapter = i_chapter < p_area->i_part_nb ? i_chapter : 1;
+    p_area->i_part = p_dvd->i_chapter;
+    
+    p_dvd->i_angle = i_angle;
 
     /* set title, chapter, audio and subpic */
     if( DVDSetArea( p_input, p_area ) )
@@ -586,9 +572,44 @@ static void DVDClose( struct input_thread_s *p_input )
 /*****************************************************************************
  * DVDSetProgram: Does nothing, a DVD is mono-program
  *****************************************************************************/
-static int DVDSetProgram( input_thread_t * p_input, 
-            pgrm_descriptor_t * p_program ) 
+static int DVDSetProgram( input_thread_t    * p_input,
+                          pgrm_descriptor_t * p_program ) 
 {
+    if( p_input->stream.p_selected_program != p_program )
+    {
+        thread_dvd_data_t *  p_dvd;
+        int                  i_angle;
+    
+        p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
+        i_angle = p_program->i_number;
+
+        memcpy( p_program, p_input->stream.p_selected_program,
+                sizeof(pgrm_descriptor_t) );
+        p_program->i_number = i_angle;
+        p_input->stream.p_selected_program = p_program;
+
+#define title \
+    p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_title_id-1].title
+        if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
+        {
+            if( ( p_program->i_number - p_dvd->i_angle ) < 0 )
+            {
+                p_dvd->i_cell = 0;
+            }
+            p_dvd->i_prg_cell += ( p_program->i_number - p_dvd->i_angle );
+            p_dvd->i_angle = p_program->i_number;
+    
+            DVDFindSector( p_dvd );
+            p_dvd->i_cell += p_dvd->i_angle_cell;
+        }
+        else
+        {
+            p_dvd->i_angle = p_program->i_number;
+        }
+#undef title
+        intf_WarnMsg( 3, "dvd info: angle %d selected", p_dvd->i_angle );
+    }
+
     return 0;
 }
 
@@ -716,8 +737,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         /* Area definition */
         p_input->stream.p_selected_area->i_start = LB2OFF( p_dvd->i_start );
         p_input->stream.p_selected_area->i_size = LB2OFF( p_dvd->i_size );
-        p_input->stream.p_selected_area->i_angle_nb = p_dvd->i_angle_nb;
-        p_input->stream.p_selected_area->i_angle = p_dvd->i_angle;
 
 #if 0
         /* start at the beginning of the title */
@@ -728,7 +747,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 #endif
 
         /*
-         * Destroy obsolete ES by reinitializing program 0
+         * Destroy obsolete ES by reinitializing programs
          * and find all ES in title with ifo data
          */
         if( p_input->stream.pp_programs != NULL )
@@ -736,21 +755,45 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             /* We don't use input_EndStream here since
              * we keep area structures */
 
+            /* Unselect all ES */
+            /*
             for( i = 0 ; i < p_input->stream.i_selected_es_number ; i++ )
             {
                 input_UnselectES( p_input, p_input->stream.pp_selected_es[i] );
             }
+*/
+            
+            for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
+            {
+                input_DelES( p_input, p_input->stream.pp_es[i] );
+            }
+            
+            for( i = 0 ; i < p_input->stream.i_pgrm_number ; i++ )
+            {
+                input_DelProgram( p_input, p_input->stream.pp_programs[i] );
+            }
 
-            free( p_input->stream.pp_selected_es );
-            input_DelProgram( p_input, p_input->stream.p_selected_program );
-
-            p_input->stream.pp_selected_es = NULL;
+            if( p_input->stream.pp_selected_es )
+            {
+                free( p_input->stream.pp_selected_es );
+                p_input->stream.pp_selected_es = NULL;
+            }
             p_input->stream.i_selected_es_number = 0;
         }
+        
+        /* angle */
 
-        input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
+        input_AddProgram( p_input, 1, sizeof( stream_ps_data_t ) );
         p_input->stream.p_selected_program = p_input->stream.pp_programs[0]; 
-//        p_input->stream.p_new_program = p_input->stream.pp_programs[0]; 
+
+        for( i = 1 ; i < p_dvd->i_angle_nb ; i++ )
+        {
+            input_AddProgram( p_input, i+1, 0 );
+        }
+        
+        DVDSetProgram( p_input,
+                       p_input->stream.pp_programs[p_dvd->i_angle-1] ); 
+        
 
         /* No PSM to read in DVD mode, we already have all information */
         p_input->stream.p_selected_program->b_is_ok = 1;
@@ -760,8 +803,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         /* ES 0 -> video MPEG2 */
         IfoPrintVideo( p_dvd );
 
-        p_es = input_AddES( p_input, p_input->stream.p_selected_program, 
-                0xe0, 0 );
+        p_es = input_AddES( p_input, NULL, 0xe0, 0 );
         p_es->i_stream_id = 0xe0;
         p_es->i_type = MPEG2_VIDEO_ES;
         p_es->i_cat = VIDEO_ES;
@@ -782,8 +824,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 {
                 case 0x00:              /* AC3 */
                     i_id = ( ( 0x80 + audio_status.i_position ) << 8 ) | 0xbd;
-                    p_es = input_AddES( p_input,
-                               p_input->stream.p_selected_program, i_id, 0 );
+                    p_es = input_AddES( p_input, NULL, i_id, 0 );
                     p_es->i_stream_id = 0xbd;
                     p_es->i_type = AC3_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -796,9 +837,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 case 0x02:
                 case 0x03:              /* MPEG audio */
                     i_id = 0xc0 + audio_status.i_position;
-                    p_es = input_AddES( p_input,
-                                    p_input->stream.p_selected_program, i_id
-                                    , 0 );
+                    p_es = input_AddES( p_input, NULL, i_id, 0 );
                     p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -811,9 +850,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 case 0x04:              /* LPCM */
     
                     i_id = ( ( 0xa0 + audio_status.i_position ) << 8 ) | 0xbd;
-                    p_es = input_AddES( p_input,
-                                    p_input->stream.p_selected_program,
-                                    i_id, 0 );
+                    p_es = input_AddES( p_input, NULL, i_id, 0 );
                     p_es->i_stream_id = 0xbd;
                     p_es->i_type = LPCM_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -875,9 +912,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     i_id = ( ( 0x20 + spu_status.i_position_43 ) << 8 )
                            | 0xbd;
                 }
-                p_es = input_AddES( p_input,
-                                    p_input->stream.p_selected_program,
-                                    i_id, 0 );
+                p_es = input_AddES( p_input, NULL, i_id, 0 );
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
                 p_es->i_cat = SPU_ES;
@@ -934,27 +969,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
 #define title \
     p_dvd->p_ifo->vts.title_unit.p_title[p_dvd->i_title_id-1].title
-    if( p_area->i_angle != p_dvd->i_angle )
-    {
-        if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
-        {
-            if( ( p_area->i_angle - p_dvd->i_angle ) < 0 )
-            {
-                p_dvd->i_cell = 0;
-            }
-            p_dvd->i_prg_cell += ( p_area->i_angle - p_dvd->i_angle );
-            p_dvd->i_angle = p_area->i_angle;
-    
-            DVDFindSector( p_dvd );
-            p_dvd->i_cell += p_dvd->i_angle_cell;
-        }
-        else
-        {
-            p_dvd->i_angle = p_area->i_angle;
-        }
-
-        intf_WarnMsg( 3, "dvd info: angle %d selected", p_area->i_angle );
-    }
 
     /* warn interface that something has changed */
     p_input->stream.b_seekable = 1;

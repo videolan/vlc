@@ -41,7 +41,6 @@ create_intf_window (void)
   GtkWidget *menubar_program;
   GtkWidget *menubar_title;
   GtkWidget *menubar_chapter;
-  GtkWidget *menubar_angle;
   GtkWidget *separator11;
   GtkWidget *menubar_playlist;
   GtkWidget *menubar_modules;
@@ -322,18 +321,6 @@ create_intf_window (void)
   gtk_widget_show (menubar_chapter);
   gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_chapter);
   gtk_widget_set_sensitive (menubar_chapter, FALSE);
-
-  menubar_angle = gtk_menu_item_new_with_label ("");
-  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_angle)->child),
-                                   _("An_gle"));
-  gtk_widget_add_accelerator (menubar_angle, "activate_item", menubar_view_menu_accels,
-                              tmp_key, 0, 0);
-  gtk_widget_ref (menubar_angle);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_angle", menubar_angle,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (menubar_angle);
-  gtk_container_add (GTK_CONTAINER (menubar_view_menu), menubar_angle);
-  gtk_widget_set_sensitive (menubar_angle, FALSE);
 
   separator11 = gtk_menu_item_new ();
   gtk_widget_ref (separator11);
@@ -950,8 +937,8 @@ create_intf_popup (void)
   GtkWidget *popup_next;
   GtkWidget *popup_prev;
   GtkWidget *popup_jump;
+  GtkWidget *popup_program;
   GtkWidget *popup_navigation;
-  GtkWidget *popup_angle;
   GtkWidget *popup_audio;
   GtkWidget *popup_subpictures;
   GtkWidget *popup_open;
@@ -1087,6 +1074,14 @@ create_intf_popup (void)
   gtk_widget_show (popup_jump);
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_jump);
 
+  popup_program = gtk_menu_item_new_with_label (_("Program"));
+  gtk_widget_ref (popup_program);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_program", popup_program,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (popup_program);
+  gtk_container_add (GTK_CONTAINER (intf_popup), popup_program);
+  gtk_widget_set_sensitive (popup_program, FALSE);
+
   popup_navigation = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_navigation)->child),
                                    _("_Navigation"));
@@ -1098,18 +1093,6 @@ create_intf_popup (void)
   gtk_widget_show (popup_navigation);
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_navigation);
   gtk_widget_set_sensitive (popup_navigation, FALSE);
-
-  popup_angle = gtk_menu_item_new_with_label ("");
-  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_angle)->child),
-                                   _("An_gle"));
-  gtk_widget_add_accelerator (popup_angle, "activate_item", intf_popup_accels,
-                              tmp_key, 0, 0);
-  gtk_widget_ref (popup_angle);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_angle", popup_angle,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (popup_angle);
-  gtk_container_add (GTK_CONTAINER (intf_popup), popup_angle);
-  gtk_widget_set_sensitive (popup_angle, FALSE);
 
   popup_audio = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_audio)->child),
@@ -1247,58 +1230,58 @@ create_intf_popup (void)
 
   gtk_signal_connect (GTK_OBJECT (popup_play), "activate",
                       GTK_SIGNAL_FUNC (GtkPlayActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_pause), "activate",
                       GTK_SIGNAL_FUNC (GtkPauseActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_stop), "activate",
                       GTK_SIGNAL_FUNC (GtKStopActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_back), "activate",
                       GTK_SIGNAL_FUNC (GtkBackActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_slow), "activate",
                       GTK_SIGNAL_FUNC (GtkSlowActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_fast), "activate",
                       GTK_SIGNAL_FUNC (GtkFastActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_interface_toggle), "activate",
                       GTK_SIGNAL_FUNC (GtkWindowToggleActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_fullscreen), "activate",
                       GTK_SIGNAL_FUNC (GtkFullscreenActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_next), "activate",
                       GTK_SIGNAL_FUNC (GtkNextActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_prev), "activate",
                       GTK_SIGNAL_FUNC (GtkPrevActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_jump), "activate",
                       GTK_SIGNAL_FUNC (GtkJumpActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_file), "activate",
                       GTK_SIGNAL_FUNC (GtkFileOpenActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_disc), "activate",
                       GTK_SIGNAL_FUNC (GtkDiscOpenActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_network), "activate",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_about), "activate",
                       GTK_SIGNAL_FUNC (GtkAboutActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_playlist), "activate",
                       GTK_SIGNAL_FUNC (GtkPlaylistActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_preferences), "activate",
                       GTK_SIGNAL_FUNC (GtkPreferencesActivate),
-                      "intf_popup");
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (popup_exit), "activate",
                       GTK_SIGNAL_FUNC (GtkExitActivate),
-                      "intf_popup");
+                      NULL);
 
   gtk_object_set_data (GTK_OBJECT (intf_popup), "tooltips", tooltips);
 

@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.28 2001/12/30 07:09:56 sam Exp $
+ * $Id: input_clock.c,v 1.29 2002/03/05 17:46:33 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -219,6 +219,12 @@ int input_ClockManageControl( input_thread_t * p_input,
 void input_ClockManageRef( input_thread_t * p_input,
                            pgrm_descriptor_t * p_pgrm, mtime_t i_clock )
 {
+    /* take selected program if none specified */
+    if( !p_pgrm )
+    {
+        p_pgrm = p_input->stream.p_selected_program;
+    }
+
     if( ( p_pgrm->i_synchro_state != SYNCHRO_OK ) || ( i_clock == 0 ) )
     {
         /* Feed synchro with a new reference point. */
@@ -303,6 +309,12 @@ void input_ClockManageRef( input_thread_t * p_input,
 mtime_t input_ClockGetTS( input_thread_t * p_input,
                           pgrm_descriptor_t * p_pgrm, mtime_t i_ts )
 {
+    /* take selected program if none specified */
+    if( !p_pgrm )
+    {
+        p_pgrm = p_input->stream.p_selected_program;
+    }
+
     if( p_pgrm->i_synchro_state == SYNCHRO_OK )
     {
         return( ClockToSysdate( p_input, p_pgrm, i_ts + p_pgrm->delta_cr )

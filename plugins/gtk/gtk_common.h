@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.3 2002/02/24 21:36:20 jobi Exp $
+ * $Id: gtk_common.h,v 1.4 2002/03/05 17:46:33 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,7 +57,6 @@ typedef struct intf_sys_s
     boolean_t           b_title_update;  /* do we need to update title menus */
     boolean_t           b_chapter_update;            /* do we need to update
                                                                chapter menus */
-    boolean_t           b_angle_update;  /* do we need to update angle menus */
     boolean_t           b_audio_update;  /* do we need to update audio menus */
     boolean_t           b_spu_update;      /* do we need to update spu menus */
 
