@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
+ * $Id: alsa.c,v 1.6 2002/08/19 23:07:30 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -88,8 +88,8 @@ static void ALSAFill     ( aout_instance_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Audio"), NULL );
-    add_string( "alsa-device", NULL, NULL, N_("Name"), NULL );
+    add_category_hint( N_("ALSA"), NULL );
+    add_string( "alsa-device", NULL, NULL, N_("device name"), NULL );
     set_description( _("ALSA audio module") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
@@ -234,9 +234,8 @@ static int SetFormat( aout_instance_t * p_aout )
             p_sys->b_can_sleek = VLC_TRUE;
             i_format = SND_PCM_FORMAT_S16_LE;
             i_channels = 2;
-            p_aout->output.output.i_bytes_per_sec =
-                    p_aout->output.output.i_rate * AOUT_SPDIF_SIZE /
-                    ALSA_SPDIF_PERIOD_SIZE;
+            p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+            p_aout->output.output.i_frame_length = ALSA_SPDIF_PERIOD_SIZE;
             break;
         case AOUT_FMT_FIXED32:
         default:

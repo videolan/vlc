@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.6 2002/08/19 21:31:11 massiot Exp $
+ * $Id: file.c,v 1.7 2002/08/19 23:07:30 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,7 +47,7 @@ static void    Play        ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FORMAT_TEXT N_("Output format")
+#define FORMAT_TEXT N_("output format")
 #define FORMAT_LONGTEXT N_("one of \"u8\", \"s8\", \"u16\", \"s16\"," \
                            " \"u16_le\", \"s16_le\", \"u16_be\"," \
                            " \"s16_be\", \"fixed32\", \"float32\" or \"spdif\"")
@@ -60,7 +60,7 @@ static int format_int[] = { AOUT_FMT_U8, AOUT_FMT_S8, AOUT_FMT_U16_NE,
                             AOUT_FMT_U16_BE, AOUT_FMT_S16_BE, AOUT_FMT_FIXED32,
                             AOUT_FMT_FLOAT32, AOUT_FMT_SPDIF };
 
-#define PATH_TEXT N_("Path of the output file")
+#define PATH_TEXT N_("path of the output file")
 #define PATH_LONGTEXT N_("By default samples.raw")
 
 vlc_module_begin();

@@ -159,8 +159,9 @@ static int SetFormat( aout_instance_t *p_aout )
 /*****************************************************************************
  * Play: queue a buffer for playing by aRtsThread
  *****************************************************************************/
-static void Play( aout_instance_t *p_aout );
+static void Play( aout_instance_t *p_aout )
 {
+    ;
 }
 
 /*****************************************************************************
@@ -213,9 +214,8 @@ static int aRtsThread( aout_instance_t * p_aout )
         }
         else
         {
-            i_size = aout_FormatToByterate( &p_aout->output.output )
-                      * p_sys->i_size
-                      / p_aout->output.output.i_rate;
+            i_size = p_sys->i_size / p_aout->output.output.i_frame_length
+                      * p_aout->output.output.i_bytes_per_frame;
             p_bytes = alloca( i_size );
             memset( p_bytes, 0, i_size );
         }

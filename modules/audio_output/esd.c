@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.7 2002/08/19 21:31:11 massiot Exp $
+ * $Id: esd.c,v 1.8 2002/08/19 23:07:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -147,10 +147,14 @@ static int SetFormat( aout_instance_t *p_aout )
      * number of buffered samples, so I assume ESD_BUF_SIZE/2 */
     p_sys->latency =
         (mtime_t)( esd_get_latency( esd_open_sound(NULL) ) + ESD_BUF_SIZE/2
-                    * aout_FormatToByterate( &p_aout->output.output )
+                    * p_aout->output.output.i_bytes_per_frame
+                    * p_aout->output.output.i_rate
+                    / p_aout->output.output.i_frame_length
                     / ESD_DEFAULT_RATE )
       * (mtime_t)1000000
-      / (mtime_t)aout_FormatToByterate( &p_aout->output.output );
+      / p_aout->output.output.i_bytes_per_frame
+      / p_aout->output.output.i_rate
+      * p_aout->output.output.i_frame_length;
 
     p_sys->b_initialized = VLC_TRUE;
 
@@ -209,9 +213,9 @@ static int ESDThread( aout_instance_t * p_aout )
         }
         else
         {
-            i_size = aout_FormatToByterate( &p_aout->output.output )
-                      * ESD_BUF_SIZE * 2
-                      / p_aout->output.output.i_rate;
+            i_size = ESD_BUF_SIZE * 2
+                      / p_aout->output.output.i_frame_length
+                      * p_aout->output.output.i_bytes_per_frame;
             p_bytes = alloca( i_size );
             memset( p_bytes, 0, i_size );
         }

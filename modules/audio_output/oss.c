@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.11 2002/08/19 21:31:11 massiot Exp $
+ * $Id: oss.c,v 1.12 2002/08/19 23:07:30 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -82,7 +82,7 @@ static int  OSSThread    ( aout_instance_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Audio"), NULL );
+    add_category_hint( N_("OSS"), NULL );
     add_file( "dspdev", "/dev/dsp", NULL, N_("OSS dsp device"), NULL );
     set_description( _("Linux OSS /dev/dsp module") );
     set_capability( "audio output", 100 );
@@ -132,6 +132,7 @@ static int Open( vlc_object_t *p_this )
     if( vlc_thread_create( p_aout, "aout", OSSThread, VLC_FALSE ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%s)", strerror(errno) );
+        close( p_sys->i_fd );
         free( psz_device );
         free( p_sys );
         return -1;
@@ -309,14 +310,16 @@ static int OSSThread( aout_instance_t * p_aout )
              * Order is important here, since GetBufInfo is believed to take
              * more time than mdate(). */
             next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
-                      / aout_FormatToByterate( &p_aout->output.output );
+                      / p_aout->output.output.i_bytes_per_frame
+                      / p_aout->output.output.i_rate
+                      * p_aout->output.output.i_frame_length;
             next_date += mdate();
 
-            p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0 );
+            p_buffer = aout_OutputNextBuffer( p_aout, next_date, VLC_FALSE );
         }
         else
         {
-            p_buffer = aout_OutputNextBuffer( p_aout, 0, 1 );
+            p_buffer = aout_OutputNextBuffer( p_aout, 0, VLC_TRUE );
         }
 
         if ( p_buffer != NULL )
@@ -326,9 +329,8 @@ static int OSSThread( aout_instance_t * p_aout )
         }
         else
         {
-            i_size = aout_FormatToByterate( &p_aout->output.output )
-                      * FRAME_SIZE
-                      / p_aout->output.output.i_rate;
+            i_size = FRAME_SIZE / p_aout->output.output.i_frame_length
+                      * p_aout->output.output.i_bytes_per_frame;
             p_bytes = alloca( i_size );
             memset( p_bytes, 0, i_size );
         }
