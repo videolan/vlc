@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.33 2003/04/30 14:04:53 hartman Exp $
+ * $Id: controls.m,v 1.34 2003/05/01 01:11:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -385,6 +385,21 @@
     }
 }
 
+- (IBAction)floatOnTop:(id)sender
+{
+    id o_window = [NSApp keyWindow];
+    NSArray *o_windows = [NSApp windows];
+    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+    
+    while ((o_window = [o_enumerator nextObject]))
+    {
+        if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        {
+            [o_window toggleFloatOnTop];
+        }
+    }
+}
+
 - (IBAction)deinterlace:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
@@ -705,12 +720,20 @@
     else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] ||
                 [[o_mi title] isEqualToString: _NS("Half Size")] ||
                 [[o_mi title] isEqualToString: _NS("Normal Size")] ||
-                [[o_mi title] isEqualToString: _NS("Double Size")])    
+                [[o_mi title] isEqualToString: _NS("Double Size")] ||
+                [[o_mi title] isEqualToString: _NS("Float On Top")] )
     {
         id o_window;
         NSArray *o_windows = [NSApp windows];
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
+        
+        if ( [[o_mi title] isEqualToString: _NS("Float On Top")] )
+        {
+            int i_state = config_GetInt( p_playlist, "macosx-float" ) ?
+                      NSOnState : NSOffState;
+            [o_mi setState: i_state];
+        }
         
         while ((o_window = [o_enumerator nextObject]))
         {
@@ -720,6 +743,11 @@
                 break;
             }
         }
+    }
+    else if( [[o_mi title] isEqualToString: _NS("Float On Top")] )
+    {
+        
+        bEnabled = TRUE;
     }
     else if( o_menu != nil && 
              [[o_menu title] isEqualToString: _NS("Deinterlace")] )

@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.44 2003/04/19 13:55:56 hartman Exp $
+ * $Id: vout.m,v 1.45 2003/05/01 01:11:17 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -818,6 +818,20 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 }
 
+- (void)toggleFloatOnTop
+{
+    if( config_GetInt( p_vout, "macosx-float" ) )
+    {
+        config_PutInt( p_vout, "macosx-float", 0 );
+        [p_vout->p_sys->o_window setLevel: NSNormalWindowLevel];
+    }
+    else
+    {
+        config_PutInt( p_vout, "macosx-float", 1 );
+        [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
+    }
+}
+
 - (void)toggleFullscreen
 {
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
@@ -1256,8 +1270,13 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             backing: NSBackingStoreBuffered
             defer: NO screen: o_screen];
 
-        [p_vout->p_sys->o_window setAlphaValue: config_GetFloat( p_vout, "opaqueness" )];
-
+        [p_vout->p_sys->o_window setAlphaValue: config_GetFloat( p_vout, "macosx-opaqueness" )];
+        
+        if( config_GetInt( p_vout, "macosx-float" ) )
+        {
+            [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
+        }
+        
         if( !p_vout->p_sys->b_pos_saved )   
         {
             [p_vout->p_sys->o_window center];

@@ -22,6 +22,7 @@
                 deinterlace = id; 
                 doubleWindow = id; 
                 faster = id; 
+                floatOnTop = id; 
                 forward = id; 
                 fullscreen = id; 
                 halfWindow = id; 
@@ -108,6 +109,7 @@
                 "o_mi_device" = id; 
                 "o_mi_double_window" = id; 
                 "o_mi_faster" = id; 
+                "o_mi_floatontop" = id; 
                 "o_mi_fullscreen" = id; 
                 "o_mi_fwd" = id; 
                 "o_mi_half_window" = id; 
