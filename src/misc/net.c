@@ -296,8 +296,8 @@ void net_Close( int fd )
  * If b_rety is true, then we repeat until we have read the right amount of
  * data
  *****************************************************************************/
-int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
-                vlc_bool_t b_retry )
+int __net_Read( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+                uint8_t *p_data, int i_data, vlc_bool_t b_retry )
 {
     struct timeval  timeout;
     fd_set          fds_r, fds_e;
@@ -338,7 +338,9 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
             return i_total > 0 ? i_total : -1;
         }
 
-        if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) < 0 )
+        if( ( i_recv = (p_vs != NULL)
+              ? p_vs->pf_recv( p_vs->p_sys, p_data, i_data )
+              : recv( fd, p_data, i_data, 0 ) ) < 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
             /* For udp only */
@@ -380,8 +382,8 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
  *****************************************************************************
  * Read from a network socket, non blocking mode (with timeout)
  *****************************************************************************/
-int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
-                        int i_data, mtime_t i_wait)
+int __net_ReadNonBlock( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+                        uint8_t *p_data, int i_data, mtime_t i_wait)
 {
     struct timeval  timeout;
     fd_set          fds_r, fds_e;
@@ -421,7 +423,9 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
 #if !defined(UNDER_CE)
         if( fd == 0/*STDIN_FILENO*/ ) i_recv = read( fd, p_data, i_data ); else
 #endif
-        if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) <= 0 )
+        if( ( i_recv = (p_vs != NULL)
+              ? p_vs->pf_recv( p_vs->p_sys, p_data, i_data )
+              : recv( fd, p_data, i_data, 0 ) ) <= 0 )
         {
 #if defined(WIN32) || defined(UNDER_CE)
             /* For udp only */
@@ -454,8 +458,8 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
  * Read from several sockets (with timeout). Takes data from the first socket
  * that has some.
  *****************************************************************************/
-int __net_Select( vlc_object_t *p_this, int *pi_fd, int i_fd, uint8_t *p_data,
-                      int i_data, mtime_t i_wait )
+int __net_Select( vlc_object_t *p_this, int *pi_fd, v_socket_t **pp_vs,
+                  int i_fd, uint8_t *p_data, int i_data, mtime_t i_wait )
 {
     struct timeval  timeout;
     fd_set          fds_r, fds_e;
@@ -499,7 +503,9 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, int i_fd, uint8_t *p_data,
         {
             if( FD_ISSET( pi_fd[i], &fds_r ) )
             {
-                i_recv = recv( pi_fd[i], p_data, i_data, 0 );
+                i_recv = ((pp_vs != NULL) && (pp_vs[i] != NULL))
+                         ? pp_vs[i]->pf_recv( pp_vs[i]->p_sys, p_data, i_data )
+                         : recv( pi_fd[i], p_data, i_data, 0 );
                 if( i_recv <= 0 )
                 {
 #ifdef WIN32
@@ -532,7 +538,8 @@ int __net_Select( vlc_object_t *p_this, int *pi_fd, int i_fd, uint8_t *p_data,
 
 
 /* Write exact amount requested */
-int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
+int __net_Write( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+                 uint8_t *p_data, int i_data )
 {
     struct timeval  timeout;
     fd_set          fds_w, fds_e;
@@ -574,7 +581,9 @@ int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
             return i_total > 0 ? i_total : -1;
         }
 
-        if( ( i_send = send( fd, p_data, i_data, 0 ) ) < 0 )
+        if( ( i_send = (p_vs != NULL)
+                       ? p_vs->pf_send( p_vs->p_sys, p_data, i_data )
+                       : send( fd, p_data, i_data, 0 ) ) < 0 )
         {
             /* XXX With udp for example, it will issue a message if the host
              * isn't listening */
@@ -589,7 +598,7 @@ int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
     return i_total;
 }
 
-char *__net_Gets( vlc_object_t *p_this, int fd )
+char *__net_Gets( vlc_object_t *p_this, int fd, v_socket_t *p_vs )
 {
     char *psz_line = malloc( 1024 );
     int  i_line = 0;
@@ -598,7 +607,7 @@ char *__net_Gets( vlc_object_t *p_this, int fd )
 
     for( ;; )
     {
-        if( net_Read( p_this, fd, &psz_line[i_line], 1, VLC_TRUE ) != 1 )
+        if( net_Read( p_this, fd, p_vs, &psz_line[i_line], 1, VLC_TRUE ) != 1 )
         {
             psz_line[i_line] = '\0';
             break;
@@ -633,26 +642,27 @@ char *__net_Gets( vlc_object_t *p_this, int fd )
     return psz_line;
 }
 
-int net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, ... )
+int net_Printf( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+                const char *psz_fmt, ... )
 {
     int i_ret;
     va_list args;
     va_start( args, psz_fmt );
-    i_ret = net_vaPrintf( p_this, fd, psz_fmt, args );
+    i_ret = net_vaPrintf( p_this, fd, p_vs, psz_fmt, args );
     va_end( args );
 
     return i_ret;
 }
 
-int __net_vaPrintf( vlc_object_t *p_this, int fd, const char *psz_fmt,
-                    va_list args )
+int __net_vaPrintf( vlc_object_t *p_this, int fd, v_socket_t *p_vs,
+                    const char *psz_fmt, va_list args )
 {
     char    *psz;
     int     i_size, i_ret;
 
     vasprintf( &psz, psz_fmt, args );
     i_size = strlen( psz );
-    i_ret = __net_Write( p_this, fd, psz, i_size ) < i_size ? -1 : i_size;
+    i_ret = __net_Write( p_this, fd, p_vs, psz, i_size ) < i_size ? -1 : i_size;
     free( psz );
 
     return i_ret;

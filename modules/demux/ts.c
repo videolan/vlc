@@ -769,7 +769,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_udp_out )
     {
         /* Send the complete block */
-        net_Write( p_demux, p_sys->fd, p_sys->buffer,
+        net_Write( p_demux, p_sys->fd, NULL, p_sys->buffer,
                    p_sys->i_ts_read * p_sys->i_packet_size );
     }
 

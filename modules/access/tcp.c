@@ -155,7 +155,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     if( p_access->info.b_eof )
         return 0;
 
-    i_read = net_Read( p_access, p_sys->fd, p_buffer, i_len, VLC_FALSE );
+    i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len,
+                       VLC_FALSE );
     if( i_read == 0 )
         p_access->info.b_eof = VLC_TRUE;
     else if( i_read > 0 )

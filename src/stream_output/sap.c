@@ -454,7 +454,7 @@ static int announce_SendSAPAnnounce( sap_handler_t *p_sap,
 #ifdef EXTRA_DEBUG
         msg_Dbg( p_sap, "Sending announce");
 #endif
-        i_ret = net_Write( p_sap, p_session->p_address->i_wfd,
+        i_ret = net_Write( p_sap, p_session->p_address->i_wfd, NULL,
                            p_session->psz_data,
                            p_session->i_length );
         if( i_ret  != p_session->i_length )
@@ -541,7 +541,7 @@ static int CalculateRate( sap_handler_t *p_sap, sap_address_t *p_address )
     do
     {
         /* Might be too slow if we have huge data */
-        i_read = net_ReadNonBlock( p_sap, p_address->i_rfd, buffer,
+        i_read = net_ReadNonBlock( p_sap, p_address->i_rfd, NULL, buffer,
                                    SAP_MAX_BUFFER, 0 );
         i_tot += i_read;
     } while( i_read > 0 && i_tot < SAP_MAX_BUFFER );

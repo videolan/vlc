@@ -374,7 +374,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     }
 
     /* send first request */
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "GET %s HTTP/1.0\r\n"
                 "Accept: */*\r\n"
                 "User-Agent: NSPlayer/4.1.0.3856\r\n"
@@ -387,14 +387,14 @@ static int Describe( access_t  *p_access, char **ppsz_location )
                 p_sys->i_request_context++,
                 GUID_PRINT( p_sys->guid ) );
 
-    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, "\r\n" ) < 0 )
+    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
         goto error;
     }
 
     /* Receive the http header */
-    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd ) ) == NULL )
+    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL ) ) == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -417,7 +417,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     free( psz );
     for( ;; )
     {
-        char *psz = net_Gets( p_access, p_sys->fd );
+        char *psz = net_Gets( p_access, p_sys->fd, NULL );
         char *p;
 
         if( psz == NULL )
@@ -575,7 +575,7 @@ static int Start( access_t *p_access, off_t i_pos )
         msg_Err( p_access, "no stream selected" );
         return VLC_EGENERIC;
     }
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "GET %s HTTP/1.0\r\n"
                 "Accept: */*\r\n"
                 "User-Agent: NSPlayer/4.1.0.3856\r\n"
@@ -584,19 +584,19 @@ static int Start( access_t *p_access, off_t i_pos )
                 p_sys->url.psz_host, p_sys->url.i_port );
     if( p_sys->b_broadcast )
     {
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                     "Pragma: no-cache,rate=1.000000,request-context=%d\r\n",
                     p_sys->i_request_context++ );
     }
     else
     {
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                     "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=%u:%u,request-context=%d,max-duration=0\r\n",
                     (uint32_t)((i_pos >> 32)&0xffffffff),
                     (uint32_t)(i_pos&0xffffffff),
                     p_sys->i_request_context++ );
     }
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                 "Pragma: xPlayStrm=1\r\n"
                 "Pragma: xClientGUID={"GUID_FMT"}\r\n"
                 "Pragma: stream-switch-count=%d\r\n"
@@ -614,20 +614,21 @@ static int Start( access_t *p_access, off_t i_pos )
                 i_select = 0;
             }
 
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                         "ffff:%d:%d ", i, i_select );
         }
     }
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, "\r\n" );
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, "Connection: Close\r\n" );
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" );
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+                "Connection: Close\r\n" );
 
-    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, "\r\n" ) < 0 )
+    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
         return VLC_EGENERIC;
     }
 
-    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd ) ) == NULL )
+    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL ) ) == NULL )
     {
         msg_Err( p_access, "cannot read data" );
         return VLC_EGENERIC;
@@ -644,7 +645,7 @@ static int Start( access_t *p_access, off_t i_pos )
     /* FIXME check HTTP code */
     for( ;; )
     {
-        char *psz = net_Gets( p_access, p_sys->fd );
+        char *psz = net_Gets( p_access, p_sys->fd, NULL );
         if( psz == NULL )
         {
             msg_Err( p_access, "cannot read data" );
@@ -691,7 +692,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
     memset( p_ck, 0, sizeof( chunk_t ) );
 
     /* Read the chunk header */
-    if( net_Read( p_access, p_sys->fd, p_sys->buffer, 12, VLC_TRUE ) < 12 )
+    if( net_Read( p_access, p_sys->fd, NULL, p_sys->buffer, 12, VLC_TRUE ) < 12 )
     {
         /* msg_Err( p_access, "cannot read data" ); */
         return VLC_EGENERIC;
@@ -725,7 +726,7 @@ static int GetPacket( access_t * p_access, chunk_t *p_ck )
     }
 
     if( p_ck->i_data > 0 &&
-        net_Read( p_access, p_sys->fd, &p_sys->buffer[12], p_ck->i_data, VLC_TRUE ) < p_ck->i_data )
+        net_Read( p_access, p_sys->fd, NULL, &p_sys->buffer[12], p_ck->i_data, VLC_TRUE ) < p_ck->i_data )
     {
         msg_Err( p_access, "cannot read data" );
         return VLC_EGENERIC;

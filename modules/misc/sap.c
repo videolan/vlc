@@ -377,7 +377,7 @@ static void Run( intf_thread_t *p_intf )
             continue;
         }
 
-        int i_read = net_Select( p_intf, p_intf->p_sys->pi_fd,
+        int i_read = net_Select( p_intf, p_intf->p_sys->pi_fd, NULL,
                                  p_intf->p_sys->i_fd, p_buffer,
                                  MAX_SAP_BUFFER, 500000 );
 #if 0

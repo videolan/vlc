@@ -319,7 +319,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     if( p_access->info.b_eof )
         return 0;
 
-    i_read = net_Read( p_access, p_sys->fd_data, p_buffer, i_len, VLC_FALSE );
+    i_read = net_Read( p_access, p_sys->fd_data, NULL, p_buffer, i_len,
+                       VLC_FALSE );
     if( i_read == 0 )
         p_access->info.b_eof = VLC_TRUE;
     else if( i_read > 0 )
@@ -404,10 +405,11 @@ static int ftp_SendCommand( access_t *p_access, char *psz_fmt, ... )
     va_end( args );
 
     msg_Dbg( p_access, "ftp_SendCommand:\"%s\"", psz_cmd);
-    if( ( i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd,
+    if( ( i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, NULL,
                               "%s", psz_cmd ) ) > 0 )
     {
-        i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, "\r\n" );
+        i_ret = net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, NULL,
+                            "\r\n" );
     }
 
     if( i_ret < 0 )
@@ -440,7 +442,7 @@ static int ftp_ReadCommand( access_t *p_access,
     char         *psz_line;
     int          i_answer;
 
-    psz_line = net_Gets( p_access, p_sys->fd_cmd );
+    psz_line = net_Gets( p_access, p_sys->fd_cmd, NULL );
     msg_Dbg( p_access, "answer=%s", psz_line );
     if( psz_line == NULL || strlen( psz_line ) < 3 )
     {
@@ -460,7 +462,7 @@ static int ftp_ReadCommand( access_t *p_access,
 
         for( ;; )
         {
-            char *psz_tmp = net_Gets( p_access, p_sys->fd_cmd );
+            char *psz_tmp = net_Gets( p_access, p_sys->fd_cmd, NULL );
 
             if( psz_tmp == NULL )   /* Error */
                 break;

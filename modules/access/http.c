@@ -415,7 +415,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
 
         if( p_sys->i_chunk <= 0 )
         {
-            char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd );
+            char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
             /* read the chunk header */
             if( psz == NULL )
             {
@@ -440,7 +440,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     }
 
 
-    i_read = net_Read( p_access, p_sys->fd, p_buffer, i_len, VLC_FALSE );
+    i_read = net_Read( p_access, p_sys->fd, NULL, p_buffer, i_len,
+                       VLC_FALSE );
     if( i_read > 0 )
     {
         p_access->info.i_pos += i_read;
@@ -451,7 +452,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             if( p_sys->i_chunk <= 0 )
             {
                 /* read the empty line */
-                char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd );
+                char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
                 if( psz ) free( psz );
             }
         }
@@ -642,14 +643,14 @@ static int Connect( access_t *p_access, int64_t i_tell )
     {
         if( p_sys->url.psz_path )
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                         "GET http://%s:%d%s HTTP/1.%d\r\n",
                         p_sys->url.psz_host, p_sys->url.i_port,
                         p_sys->url.psz_path, p_sys->i_version );
         }
         else
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                         "GET http://%s:%d/ HTTP/1.%d\r\n",
                         p_sys->url.psz_host, p_sys->url.i_port,
                         p_sys->i_version );
@@ -664,25 +665,25 @@ static int Connect( access_t *p_access, int64_t i_tell )
         }
         if( p_sys->url.i_port != 80)
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                         "GET %s HTTP/1.%d\r\nHost: %s:%d\r\n",
                         psz_path, p_sys->i_version, p_sys->url.psz_host,
                         p_sys->url.i_port );
         }
         else
         {        
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                         "GET %s HTTP/1.%d\r\nHost: %s\r\n",
                         psz_path, p_sys->i_version, p_sys->url.psz_host );
         }
     }
     /* User Agent */
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, "User-Agent: %s\r\n",
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
     /* Offset */
     if( p_sys->i_version == 1 )
     {
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                     "Range: bytes="I64Fd"-\r\n", i_tell );
     }
     /* Authentification */
@@ -696,13 +697,14 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
         b64 = vlc_b64_encode( buf );
 
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd,
+        net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
                     "Authorization: Basic %s\r\n", b64 );
         free( b64 );
     }
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, "Connection: Close\r\n" );
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+                "Connection: Close\r\n" );
 
-    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, "\r\n" ) < 0 )
+    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
         net_Close( p_sys->fd ); p_sys->fd = -1;
@@ -710,7 +712,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
     }
 
     /* Read Answer */
-    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd ) ) == NULL )
+    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL ) ) == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -752,7 +754,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
     for( ;; )
     {
-        char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd );
+        char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
         char *p;
 
         if( psz == NULL )

@@ -313,7 +313,9 @@ static block_t *BlockUDP( access_t *p_access )
 
     /* Read data */
     p_block = block_New( p_access, p_sys->i_mtu );
-    p_block->i_buffer = net_Read( p_access, p_sys->fd, p_block->p_buffer, p_sys->i_mtu, VLC_FALSE );
+    p_block->i_buffer = net_Read( p_access, p_sys->fd, NULL,
+                                  p_block->p_buffer, p_sys->i_mtu,
+                                  VLC_FALSE );
     if( p_block->i_buffer <= 0 )
     {
         block_Release( p_block );

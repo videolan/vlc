@@ -112,8 +112,8 @@ void Printf( intf_thread_t *p_intf, const char *psz_fmt, ... )
     va_start( args, psz_fmt );
     if( p_intf->p_sys->i_socket == -1 ) vprintf( psz_fmt, args );
     else
-    { net_vaPrintf( p_intf, p_intf->p_sys->i_socket, psz_fmt, args );
-      net_Printf( VLC_OBJECT(p_intf), p_intf->p_sys->i_socket, "\r" ); }
+    { net_vaPrintf( p_intf, p_intf->p_sys->i_socket, NULL, psz_fmt, args );
+      net_Printf( VLC_OBJECT(p_intf), p_intf->p_sys->i_socket, NULL, "\r" ); }
     va_end( args );
 }
 
@@ -1167,7 +1167,7 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 
     while( !p_intf->b_die && *pi_size < MAX_LINE_LENGTH &&
            (i_read = net_ReadNonBlock( p_intf, p_intf->p_sys->i_socket == -1 ?
-                       0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket,
+                       0 /*STDIN_FILENO*/ : p_intf->p_sys->i_socket, NULL,
                        p_buffer + *pi_size, 1, INTF_IDLE_SLEEP ) ) > 0 )
     {
         if( p_buffer[ *pi_size ] == '\r' || p_buffer[ *pi_size ] == '\n' )
