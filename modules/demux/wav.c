@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.4 2003/08/18 00:17:44 fenrir Exp $
+ * $Id: wav.c,v 1.5 2003/08/22 20:32:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -164,7 +164,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    stream_Control( p_sys->s, STREAM_GET_POSITION, &p_sys->i_data_pos );
+    p_sys->i_data_pos = stream_Tell( p_sys->s );
 
     stream_Read( p_sys->s, NULL, 8 );   /* cannot fail */
 
@@ -276,13 +276,13 @@ static int Demux( input_thread_t *p_input )
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
-        stream_Control( p_sys->s, STREAM_GET_POSITION, &i_pos );
+        i_pos = stream_Tell( p_sys->s );
         if( p_sys->p_wf->nBlockAlign != 0 )
         {
             i_pos += p_sys->p_wf->nBlockAlign - i_pos % p_sys->p_wf->nBlockAlign;
-            if( stream_Control( p_sys->s, STREAM_SET_POSITION, i_pos ) )
+            if( stream_Seek( p_sys->s, i_pos ) )
             {
-                msg_Err( p_input, "STREAM_SET_POSITION failed (cannot resync)" );
+                msg_Err( p_input, "stream_Sekk failed (cannot resync)" );
             }
         }
     }
@@ -291,7 +291,7 @@ static int Demux( input_thread_t *p_input )
                           p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
-    stream_Control( p_sys->s, STREAM_GET_POSITION, &i_pos );
+    i_pos = stream_Tell( p_sys->s );
 
     if( p_sys->i_data_size > 0 &&
         i_pos >= p_sys->i_data_pos + p_sys->i_data_size )

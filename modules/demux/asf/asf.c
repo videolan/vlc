@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.34 2003/08/18 19:18:47 fenrir Exp $
+ * $Id: asf.c,v 1.35 2003/08/22 20:32:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -317,26 +317,25 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
     if( p_sys->p_root->p_data->i_object_size != 0 )
-    { // local file
+    { /* local file */
         p_sys->i_data_end = p_sys->p_root->p_data->i_object_pos +
                                     p_sys->p_root->p_data->i_object_size;
     }
     else
-    { // live/broacast
+    { /* live/broacast */
         p_sys->i_data_end = -1;
     }
 
 
-    // go to first packet
-    stream_Control( p_sys->s, STREAM_SET_POSITION, (int64_t)p_sys->i_data_begin );
+    /* go to first packet */
+    stream_Seek( p_sys->s, p_sys->i_data_begin );
 
     /* try to calculate movie time */
     if( p_sys->p_fp->i_data_packets_count > 0 )
     {
         int64_t i_count;
-        int64_t i_size;
+        int64_t i_size = stream_Tell( p_sys->s );
 
-        stream_Control( p_sys->s, STREAM_GET_SIZE, &i_size );
         if( p_sys->i_data_end > 0 && i_size > p_sys->i_data_end )
         {
             i_size = p_sys->i_data_end;
@@ -487,8 +486,7 @@ static int Demux( input_thread_t *p_input )
 
         msleep( p_input->i_pts_delay );
 
-        stream_Control( p_sys->s, STREAM_GET_POSITION, &i_offset );
-        i_offset -= p_sys->i_data_begin;
+        i_offset = stream_Tell( p_sys->s ) - p_sys->i_data_begin;
         if( i_offset  < 0 )
         {
             i_offset = 0;
@@ -497,9 +495,8 @@ static int Demux( input_thread_t *p_input )
         {
             i_offset -= i_offset % p_sys->p_fp->i_min_data_packet_size;
         }
-        i_offset += p_sys->i_data_begin;
 
-        if( stream_Control( p_sys->s, STREAM_SET_POSITION, i_offset ) )
+        if( stream_Seek( p_sys->s, i_offset + p_sys->i_data_begin ) )
         {
             msg_Warn( p_input, "cannot resynch after seek (EOF?)" );
             return -1;

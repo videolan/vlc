@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.15 2003/08/18 19:18:47 fenrir Exp $
+ * $Id: libasf.c,v 1.16 2003/08/22 20:32:27 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -86,7 +86,7 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
     }
     ASF_GetGUID( &p_common->i_object_id, p_peek );
     p_common->i_object_size = GetQWLE( p_peek + 16 );
-    stream_Control( s, STREAM_GET_POSITION, &p_common->i_object_pos );
+    p_common->i_object_pos  = stream_Tell( s );
     p_common->p_next = NULL;
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
@@ -125,8 +125,9 @@ static int ASF_NextObject( stream_t *s, asf_object_t *p_obj )
 
     }
 
-    return( stream_Control( s, STREAM_SET_POSITION,
-                            p_obj->common.i_object_pos + p_obj->common.i_object_size ) );
+    return stream_Seek( s,
+                        p_obj->common.i_object_pos +
+                           p_obj->common.i_object_size );
 }
 
 static void ASF_FreeObject_Null( asf_object_t *pp_obj )
@@ -721,7 +722,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
     p_root->i_type = ASF_OBJECT_TYPE_ROOT;
     memcpy( &p_root->i_object_id, &asf_object_null_guid, sizeof( guid_t ) );
     p_root->i_object_pos = 0;
-    stream_Control( s, STREAM_GET_SIZE, &p_root->i_object_size );
+    p_root->i_object_size = stream_Tell( s );
     p_root->p_first = NULL;
     p_root->p_last  = NULL;
     p_root->p_next  = NULL;
