@@ -891,12 +891,12 @@ void ps_fill( input_file_t * p_if, boolean_t wait )
 {
     in_data_t * p_in_data = &p_if->in_data;
     ps_t * p_ps = &p_if->ps;
-    int i, how_many;
+    int i, howmany;
     int pcr_flag;
     file_ts_packet *ts;
 
     /* How many TS packet for the next UDP packet */
-    how_many = TS_IN_UDP;
+    howmany = TS_IN_UDP;
 
     pcr_flag = 0;
     /* for every single TS packet */
@@ -926,15 +926,15 @@ void ps_fill( input_file_t * p_if, boolean_t wait )
         vlc_mutex_unlock(&p_in_data->lock);
         
         /* read a whole UDP packet from the file */
-        p_ps->ts_to_write = how_many;
-        if( ps_read( &p_if->options, p_ps, ts = (file_ts_packet *)(p_in_data->buf + p_in_data->end) ) != how_many )
+        p_ps->ts_to_write = howmany;
+        if( ps_read( &p_if->options, p_ps, ts = (file_ts_packet *)(p_in_data->buf + p_in_data->end) ) != howmany )
         {
             msleep( 50000 ); /* XXX we need an INPUT_IDLE */
             return;
         }
         
         /* Scan to mark TS packets containing a PCR */
-        for( i = 0 ; i < how_many ; i++ , ts++ )
+        for( i = 0 ; i < howmany ; i++ , ts++ )
         {
             pcr_flag |= keep_pcr( p_ps->pcr_pid, ts );
         }

@@ -168,7 +168,7 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
 #ifdef SYS_BEOS
         if( *p_plugin_id >= 0 )
 #else
-	if( *p_plugin_id != NULL )
+        if( *p_plugin_id != NULL )
 #endif
         {
             /* plugin successfuly dlopened */

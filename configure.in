@@ -11,8 +11,12 @@ AC_SUBST(VLC_CODENAME)
 
 dnl Check for tools
 AC_PROG_MAKE_SET
-AC_PROG_CC
-AC_PROG_CPP
+if test -z "$CC"; then
+  AC_PROG_CC
+fi
+if test -z "$CPP"; then
+  AC_PROG_CPP
+fi
 
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL

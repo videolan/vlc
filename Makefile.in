@@ -375,7 +375,8 @@ distclean: clean
 install:
 	mkdir -p $(prefix)/bin
 	$(INSTALL) vlc $(prefix)/bin
-	for alias in @ALIASES@ ; do ln -s vlc $(prefix)/bin/$$alias ; done
+	# ugly
+	for alias in "" @ALIASES@ ; do if test $$alias ; then ln -s vlc $(prefix)/bin/$$alias ; fi ; done
 	mkdir -p $(prefix)/lib/videolan/vlc
 	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
 	mkdir -p $(prefix)/share/videolan
