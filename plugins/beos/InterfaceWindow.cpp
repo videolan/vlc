@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.16 2002/05/16 11:38:42 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.17 2002/06/01 09:21:59 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,8 +53,9 @@ extern "C"
 /* BeOS interface headers */
 #include "MsgVals.h"
 #include "MediaControlView.h"
-#include "InterfaceWindow.h"
 #include "PlayListWindow.h"
+#include "InterfaceWindow.h"
+
 
 /*****************************************************************************
  * InterfaceWindow
@@ -67,6 +68,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
                 | B_ASYNCHRONOUS_CONTROLS )
 {
     file_panel = NULL;
+    playlist_window = NULL;
     p_intf = p_interface;
     BRect controlRect(0,0,0,0);
     b_empty_playlist = (p_main->p_playlist->i_size < 0);
@@ -149,6 +151,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 
 InterfaceWindow::~InterfaceWindow()
 {
+    if (playlist_window) playlist_window->ReallyQuit();
 }
 
 /*****************************************************************************
@@ -208,9 +211,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 	case OPEN_PLAYLIST:
 		{
 		    BRect rect(20,20,320,420);
-            PlayListWindow* playlist_window = new PlayListWindow(rect,
-                         "Playlist", (playlist_t *)p_main->p_playlist);
-            playlist_window->Show();
+            playlist_window = PlayListWindow::getPlayList(rect,
+                                "Playlist", (playlist_t *)p_main->p_playlist);
+            playlist_window->Show();                    
         }
 		break;
     case OPEN_DVD:
