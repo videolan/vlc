@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item.c,v 1.3 2003/11/23 16:24:20 garf Exp $
+ * $Id: item.c,v 1.4 2003/11/25 00:56:35 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -75,7 +75,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
 
     p_item->psz_name   = strdup( psz_name );
     p_item->psz_uri    = strdup( psz_uri );
-    p_item->psz_author = strdup( "" );
+    p_item->psz_author = strdup( "Arg" );
     p_item->i_duration = i_duration;
     p_item->i_type = 0;
     p_item->i_status = 0;
@@ -86,13 +86,15 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     p_item->ppsz_options = NULL;
     p_item->i_options = i_options;
 
-    if( i_options )
+    if( i_options > 0 )
     {
         int i;
 
-        p_item->ppsz_options = (char **)malloc( i_options * sizeof(char *) );
+        p_item->ppsz_options = malloc( i_options * sizeof(char *) );
         for( i = 0; i < i_options; i++ )
+        {
             p_item->ppsz_options[i] = strdup( ppsz_options[i] );
+        }
 
     }
 
@@ -220,6 +222,10 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
         {
             free( p_playlist->pp_items[i_pos]->psz_uri );
         }
+        if( p_playlist->pp_items[i_pos]->psz_author )
+        {
+            free( p_playlist->pp_items[i_pos]->psz_author );
+        }
         /* XXX: what if the item is still in use? */
         free( p_playlist->pp_items[i_pos] );
         p_playlist->pp_items[i_pos] = p_item;
@@ -253,7 +259,6 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
 int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
     vlc_value_t     val;
-    vlc_mutex_lock( &p_playlist->object_lock );
 
     /* if i_pos is the current played item, playlist should stop playing it */
     if( ( p_playlist->i_status == PLAYLIST_RUNNING) && (p_playlist->i_index == i_pos) )
@@ -261,35 +266,40 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         playlist_Command( p_playlist, PLAYLIST_STOP, 0 );
     }
 
+    vlc_mutex_lock( &p_playlist->object_lock );
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
-        msg_Dbg( p_playlist, "deleting playlist item « %s »",
-                             p_playlist->pp_items[i_pos]->psz_name );
+        playlist_item_t *p_item = p_playlist->pp_items[i_pos];
 
-        if( p_playlist->pp_items[i_pos]->psz_name )
+        msg_Dbg( p_playlist, "deleting playlist item « %s »",
+                 p_item->psz_name );
+
+        if( p_item->psz_name )
         {
-            free( p_playlist->pp_items[i_pos]->psz_name );
+            free( p_item->psz_name );
         }
-        if( p_playlist->pp_items[i_pos]->psz_uri )
+        if( p_item->psz_uri )
         {
-            free( p_playlist->pp_items[i_pos]->psz_uri );
+            free( p_item->psz_uri );
         }
-        if( p_playlist->pp_items[i_pos]->psz_author )
+        if( p_item->psz_author )
         {
-            free( p_playlist->pp_items[i_pos]->psz_author );
+            free( p_item->psz_author );
         }
-        if( p_playlist->pp_items[i_pos]->i_options )
+        if( p_item->i_options > 0 )
         {
             int i;
 
-            for( i = 0; i < p_playlist->pp_items[i_pos]->i_options; i++ )
-                free( p_playlist->pp_items[i_pos]->ppsz_options[i] );
+            for( i = 0; i < p_item->i_options; i++ )
+            {
+                free( p_item->ppsz_options[i] );
+            }
 
-            free( p_playlist->pp_items[i_pos]->ppsz_options );
+            free( p_item->ppsz_options );
         }
 
         /* XXX: what if the item is still in use? */
-        free( p_playlist->pp_items[i_pos] );
+        free( p_item );
 
         if( i_pos <= p_playlist->i_index )
         {

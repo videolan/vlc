@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: group.c,v 1.2 2003/11/12 08:10:21 zorglub Exp $
+ * $Id: group.c,v 1.3 2003/11/25 00:56:35 fenrir Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -42,11 +42,11 @@
 playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
 {
     playlist_group_t *p_group;
-
     int i;
-    for( i=0 ; i< p_playlist->i_groups; i++ )
+
+    for( i = 0 ; i < p_playlist->i_groups; i++ )
     {
-        if( !strcasecmp(p_playlist->pp_groups[i]->psz_name , psz_name ) )
+        if( !strcasecmp( p_playlist->pp_groups[i]->psz_name , psz_name ) )
         {
             msg_Info( p_playlist, "This group already exists !");
             return NULL;
@@ -54,8 +54,7 @@ playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
     }
 
     /* Allocate the group structure */
-    p_group = (playlist_group_t *)malloc( sizeof(playlist_group_t) );
-    if( !p_group )
+    if( ( p_group = malloc( sizeof(playlist_group_t) ) ) == NULL )
     {
         msg_Err( p_playlist, "out of memory" );
         return NULL;
@@ -90,18 +89,24 @@ int playlist_DeleteGroup( playlist_t *p_playlist, int i_id )
 
     for( i=0 ; i<= p_playlist->i_groups; i++ )
     {
-        if( p_playlist->pp_groups[i]->i_id == i_id )
+        playlist_group_t *p_group = p_playlist->pp_groups[i];
+
+        if( p_group->i_id == i_id )
         {
-            if( p_playlist->pp_groups[i]->psz_name )
+
+            if( p_group->psz_name )
             {
-                free( p_playlist->pp_groups[i]->psz_name );
+                free( p_group->psz_name );
             }
             REMOVE_ELEM( p_playlist->pp_groups,
                          p_playlist->i_groups,
-                         i);
+                         i );
+            free( p_group );
+
+            return VLC_SUCCESS;
         }
     }
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /**

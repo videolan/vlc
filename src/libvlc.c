@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.102 2003/11/23 18:31:55 alexis Exp $
+ * $Id: libvlc.c,v 1.103 2003/11/25 00:56:34 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -569,7 +569,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     var_Create( p_vlc, "key-pressed", VLC_VAR_INTEGER );
     p_vlc->p_hotkeys = malloc( sizeof(p_hotkeys) );
     /* Do a copy (we don't need to modify the strings) */
-    p_vlc->p_hotkeys = p_hotkeys;
+    memcpy( p_vlc->p_hotkeys, p_hotkeys, sizeof(p_hotkeys) );
 
     /*
      * Initialize playlist and get commandline files
@@ -723,6 +723,12 @@ int VLC_Destroy( int i_object )
     {
         free( p_vlc->psz_configfile );
         p_vlc->psz_configfile = NULL;
+    }
+
+    if( p_vlc->p_hotkeys )
+    {
+        free( p_vlc->p_hotkeys );
+        p_vlc->p_hotkeys = NULL;
     }
 
     /*

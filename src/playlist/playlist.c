@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.64 2003/11/14 03:51:39 hartman Exp $
+ * $Id: playlist.c,v 1.65 2003/11/25 00:56:35 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -89,7 +89,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->pp_groups = NULL;
     p_playlist->i_max_id = 0;
 
-    playlist_CreateGroup( p_playlist, strdup("Normal") );
+    playlist_CreateGroup( p_playlist, "Normal" );
 
     if( vlc_thread_create( p_playlist, "playlist", RunThread,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
@@ -118,6 +118,16 @@ void playlist_Destroy( playlist_t * p_playlist )
     vlc_thread_join( p_playlist );
 
     var_Destroy( p_playlist, "intf-change" );
+
+    while( p_playlist->i_groups > 0 )
+    {
+        playlist_DeleteGroup( p_playlist, p_playlist->pp_groups[0]->i_id );
+    }
+
+    while( p_playlist->i_size > 0 )
+    {
+        playlist_Delete( p_playlist, 0 );
+    }
 
     vlc_object_destroy( p_playlist );
 }

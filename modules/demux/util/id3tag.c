@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.15 2003/11/02 22:15:14 gbazin Exp $
+ * $Id: id3tag.c,v 1.16 2003/11/25 00:56:34 fenrir Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -61,22 +61,22 @@ vlc_module_end();
  *****************************************************************************/
 static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
 {
-    playlist_t * p_playlist;
-    struct id3_tag * p_id3_tag;
-    struct id3_frame * p_frame;
-    input_info_category_t * p_category;
-    int i_strings;
-    char * psz_temp;
-    int i;
+    playlist_t            *p_playlist;
+    struct id3_tag        *p_id3_tag;
+    struct id3_frame      *p_frame;
+    input_info_category_t *p_category;
+    char                  *psz_temp;
     vlc_value_t val;
+    int i;
 
     var_Get( p_input, "demuxed-id3", &val );
-
     if( val.b_bool )
     {
         msg_Dbg( p_input, "The ID3 tag was already parsed" );
         return;
     }
+
+    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
 
     val.b_bool = VLC_FALSE;
     p_id3_tag = id3_tag_parse( p_data, i_size );
@@ -85,7 +85,9 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
 
     while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
-        i_strings = id3_field_getnstrings( &p_frame->fields[1] );
+        playlist_item_t *p_item = p_playlist ? p_playlist->pp_items[p_playlist->i_index] : NULL;
+        int i_strings = id3_field_getnstrings( &p_frame->fields[1] );
+
         while ( i_strings > 0 )
         {
             psz_temp = id3_ucs4_utf8duplicate( id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
@@ -107,28 +109,30 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
             {
-                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                              FIND_PARENT );
-                if( p_playlist )
+                if( p_item )
                 {
-                    p_playlist->pp_items[p_playlist->i_index]->psz_name =
-                                                       strdup( psz_temp );
+                    if( p_item->psz_name )
+                    {
+                        free( p_item->psz_name );
+                    }
+                    p_item->psz_name = strdup( psz_temp );;
+
                     val.b_bool = VLC_TRUE;
-                    vlc_object_release( p_playlist );
                 }
                 input_AddInfo( p_category, (char *)p_frame->description,
                                             psz_temp );
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
             {
-                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
-                                              FIND_PARENT );
-                if( p_playlist )
+                if( p_item )
                 {
-                    p_playlist->pp_items[p_playlist->i_index]->psz_author =
-                                                strdup( psz_temp );
+                    if( p_item->psz_author )
+                    {
+                        free( p_item->psz_author );
+                    }
+                    p_item->psz_author = strdup( psz_temp );
+
                     val.b_bool = VLC_TRUE;
-                    vlc_object_release( p_playlist );
                 }
                 input_AddInfo( p_category, (char *)p_frame->description,
                                             psz_temp );
@@ -145,17 +149,19 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
     id3_tag_delete( p_id3_tag );
     if(val.b_bool == VLC_TRUE )
     {
-        p_playlist = vlc_object_find( p_input,
-                     VLC_OBJECT_PLAYLIST, FIND_PARENT );
         if( p_playlist )
         {
             val.b_bool = VLC_TRUE;
             var_Set( p_playlist, "intf-change", val );
-            vlc_object_release( p_playlist );
         }
     }
     val.b_bool = VLC_TRUE;
     var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
+
+    if( p_playlist )
+    {
+        vlc_object_release( p_playlist );
+    }
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.123 2003/11/24 03:27:28 rocky Exp $
+ * $Id: input_programs.c,v 1.124 2003/11/25 00:56:35 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -376,6 +376,7 @@ input_area_t * input_AddArea( input_thread_t * p_input,
         }
 
         if( text2.psz_string ) free( text2.psz_string );
+        free( val.psz_string );
     }
 
     if( p_input->stream.i_area_nb == 2 )
@@ -544,6 +545,8 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
         sprintf( val.psz_string, "title %i", p_area->i_id );
         var_Change( p_input, "navigation", VLC_VAR_DELCHOICE, &val, NULL );
         var_Destroy( p_input, val.psz_string );
+
+        free( val.psz_string );
     }
 
     /* Remove this area from the stream's list of areas */
