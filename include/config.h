@@ -73,14 +73,14 @@
  *******************************************************************************/
 
 /* General debugging support */
-#define DEBUG
+//#define DEBUG
 
 /* Modules specific debugging - this will produce a lot of output, but can be
  * usefull to track a bug */
-#define DEBUG_INTF
+/*#define DEBUG_INTF
 #define DEBUG_INPUT
 #define DEBUG_AUDIO
-#define DEBUG_VIDEO
+#define DEBUG_VIDEO*/
 
 /* Debugging log file - if defined, a file can be used to store all messages. If
  * DEBUG_LOG_ONLY is defined, debug messages will only be printed to the log and

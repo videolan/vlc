@@ -14,9 +14,9 @@
 #SHELL = /bin/sh
 
 # Video output settings
-VIDEO=X11
+#VIDEO=X11
 #VIDEO=DGA (not yet supported)
-#VIDEO=FB
+VIDEO=FB
 #VIDEO=GGI
 #VIDEO=BEOS (not yet supported)
 
@@ -89,6 +89,7 @@ CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
 
 # Optimizations : don't compile debug versions with them
+#CCFLAGS += -g
 CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer

@@ -67,6 +67,7 @@ typedef struct vout_sys_s
  ******************************************************************************/
 static int     FBOpenDisplay   ( vout_thread_t *p_vout );
 static void    FBCloseDisplay  ( vout_thread_t *p_vout );
+static void    FBBlankDisplay  ( vout_thread_t *p_vout );
 
 
 /******************************************************************************
@@ -146,7 +147,13 @@ void vout_SysDestroy( vout_thread_t *p_vout )
 int vout_SysManage( vout_thread_t *p_vout )
 {
     /* XXX */
-    
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
+    {
+        intf_DbgMsg("resizing window\n");
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
+	FBBlankDisplay( p_vout );
+    }
+					
     return 0;
 }
 
@@ -160,12 +167,16 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 {
     /* Swap buffers */
     //p_vout->p_sys->i_buffer_index = ++p_vout->p_sys->i_buffer_index & 1;
+    p_vout->p_sys->i_buffer_index = 0;
 
     /* tout est bien affiché, on peut échanger les 2 écrans */
+    p_vout->p_sys->var_info.xoffset = 0;
     p_vout->p_sys->var_info.yoffset =
-        /*p_vout->p_sys->i_buffer_index ?*/ 0 /*: p_vout->p_sys->var_info.yres*/;
+        0;
+        //p_vout->p_sys->i_buffer_index ? 0 : p_vout->p_sys->var_info.yres;
 
-    ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );	
+    //ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );	
+    ioctl( p_vout->p_sys->i_fb_dev, FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );	
 }
 
 /******************************************************************************
@@ -221,6 +232,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->var_info.activate = FB_ACTIVATE_NXTOPEN;
     p_vout->p_sys->var_info.xoffset =  0;
     p_vout->p_sys->var_info.yoffset =  0;
+    fprintf(stderr, "ypanstep is %i\n", fix_info.ypanstep);
     //??ask sam p_vout->p_sys->mode_info.sync = FB_SYNC_VERT_HIGH_ACT;
     //???
     if( ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info ) )
@@ -305,3 +317,13 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
     close( p_vout->p_sys->i_fb_dev );    
 }
 
+/******************************************************************************
+ * FBBlankDisplay: render a blank screen
+ ******************************************************************************
+ * This function is called by all other rendering functions when they arrive on
+ * a non blanked screen.
+ ******************************************************************************/
+static void FBBlankDisplay( vout_thread_t *p_vout )
+{
+    memset( p_vout->p_sys->p_video, 0x00, 2*p_vout->p_sys->i_page_size );
+}
