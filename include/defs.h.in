@@ -226,6 +226,9 @@
 /* Define if you have the <gtk/gtk.h> header file.  */
 #undef HAVE_GTK_GTK_H
 
+/* Define if you have the <id3tag.h> header file.  */
+#undef HAVE_ID3TAG_H
+
 /* Define if you have the <image.h> header file.  */
 #undef HAVE_IMAGE_H
 
@@ -418,6 +421,9 @@
 
 /* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
 #undef SDL_INCLUDE_FILE
+
+/* Define if <xosd.h> is pre-1.0.0 */
+#undef HAVE_OLD_XOSD_H
 
 /* big endian system */
 #undef WORDS_BIGENDIAN

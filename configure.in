@@ -724,7 +724,7 @@ then
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
   AC_CHECK_HEADERS(dvdread/dvd_reader.h, [
      AC_TRY_COMPILE([#include <dvdread/dvd_reader.h>],
-        [void foo() { int i=DVD_VIDEO_LB_LEN; }],[
+        [int foo() { return DVD_VIDEO_LB_LEN; }],[
           PLUGINS="${PLUGINS} access/dvdread/dvdread"
           dvdread_LDFLAGS="${dvdread_LDFLAGS} ${test_LDFLAGS} -ldvdread"
           dvdread_CFLAGS="${dvdread_CFLAGS} ${test_CFLAGS}"
@@ -1800,6 +1800,9 @@ AC_ARG_ENABLE(xosd,
 if test "x${enable_xosd}" = "xyes"
 then
   AC_CHECK_HEADER(xosd.h, have_xosd="true", have_xosd="false")
+  AC_TRY_COMPILE([#include <xosd.h>],
+     [void foo() { xosd_init("foo","bar",12,XOSD_top,2,12,42); }],,
+      AC_DEFINE(HAVE_OLD_XOSD_H, 1, Define if <xosd.h> is pre-1.0.0))
   if test "x${have_xosd}" = "xtrue"
   then
     PLUGINS="${PLUGINS} visualization/xosd/xosd"
