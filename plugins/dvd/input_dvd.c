@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.94 2001/11/11 18:15:41 sam Exp $
+ * $Id: input_dvd.c,v 1.95 2001/11/12 03:07:13 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -603,7 +603,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     i_id = ( ( 0xa0 + audio_status.i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input,
                                     p_input->stream.pp_programs[0], i_id, 0 );
-                    p_es->i_stream_id = i_id;
+                    p_es->i_stream_id = 0xbd;
                     p_es->i_type = LPCM_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;

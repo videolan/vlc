@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.39 2001/10/10 14:25:15 sam Exp $
+ * $Id: netutils.c,v 1.40 2001/11/12 03:07:13 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -446,7 +446,8 @@ static int GetMacAddress( int i_socket, char *psz_mac )
      * Looking for information about the eth0 interface
      */
     interface.ifr_addr.sa_family = AF_INET;
-    strcpy( interface.ifr_name, INPUT_IFACE_DEFAULT );
+    strcpy( interface.ifr_name, 
+            main_GetPszVariable( INPUT_IFACE_VAR, INPUT_IFACE_DEFAULT ) );
 
     i_ret = ioctl( i_socket, SIOCGIFHWADDR, &interface );
 
