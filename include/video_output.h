@@ -50,26 +50,26 @@ typedef void (vout_convert_t)( p_vout_thread_t p_vout, void *p_pic,
                                int i_scale, int i_matrix_coefficients );
 
 /*******************************************************************************
- * vout_scale_t: scaling function
+ * vout_scale_t: horizontal scaling function
  *******************************************************************************
- * When a picture can't be scaled unsing the fast i_y_scale parameter of a
- * transformation, it is rendered in a temporary buffer then scaled using a
- * totally accurate (but also very slow) method.
- * This is the prototype common to all scaling functions. The types of p_buffer
- * and p_pic will change depending of the screen depth treated.
+ * The convertion function only perform a vertical scaling. Horizontal scaling
+ * is done later using this function.
  * Parameters:
  *      p_vout                  video output thread
- *      p_pic                   picture address (start address in picture)
- *      p_buffer                source picture
- *      i_width                 buffer width
- *      i_height                buffer height
- *      i_eol                   number of pixels to reach next buffer line
- *      i_pic_eol               number of pixels to reach next picture line
- *      f_alpha, f_beta         horizontal and vertical scaling factors
+ *      p_src                   source address (start address in picture)
+ *      p_dst                   destination address (start address in picture)
+ *      i_width                 source width
+ *      i_height                source height
+ *      i_line_width            source total pixels per line              
+ *      i_dst_line_width        destination total pixels per line          
+ *      i_scale                 if non 0, horizontal scaling is 1 - 1/i_scale
+ * Conditions:      
+ *      i_height % 16
+ *      i_scale < 0             if p_src == p_dst
  *******************************************************************************/
-typedef void (vout_scale_t)( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
-                             int i_width, int i_height, int i_eol, int i_pic_eol,
-                             float f_alpha, float f_beta );
+typedef void (vout_scale_t)( p_vout_thread_t p_vout, void *p_src, void *p_dst, 
+                             int i_width, int i_height, int i_line_width, 
+                             int i_dst_line_width, int i_scale );
 
 /*******************************************************************************
  * vout_thread_t: video output thread descriptor
@@ -99,8 +99,8 @@ typedef struct vout_thread_s
     int                 i_bytes_per_line;/* bytes per line (including virtual) */
     int                 i_screen_depth;                      /* bits per pixel */
     int                 i_bytes_per_pixel;                /* real screen depth */
-    float               f_x_ratio;                 /* horizontal display ratio */
-    float               f_y_ratio;                   /* vertical display ratio */
+    int                 i_horizontal_scale;        /* horizontal display scale */
+    int                 i_vertical_scale;            /* vertical display scale */
     float               f_gamma;                                      /* gamma */
 
 #ifdef STATS    
@@ -146,6 +146,7 @@ picture_t *     vout_CreatePicture      ( vout_thread_t *p_vout, int i_type,
                                           int i_width, int i_height );
 void            vout_DestroyPicture     ( vout_thread_t *p_vout, picture_t *p_pic );
 void            vout_DisplayPicture     ( vout_thread_t *p_vout, picture_t *p_pic );
+void            vout_DatePicture        ( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date );
 void            vout_LinkPicture        ( vout_thread_t *p_vout, picture_t *p_pic );
 void            vout_UnlinkPicture      ( vout_thread_t *p_vout, picture_t *p_pic );
 subtitle_t *    vout_CreateSubtitle     ( vout_thread_t *p_vout, int i_type, int i_size );

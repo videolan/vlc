@@ -83,13 +83,13 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     p_vout->i_bytes_per_line    = i_width * 2;    
     p_vout->i_screen_depth      = 15;
     p_vout->i_bytes_per_pixel   = 2;
-    p_vout->f_x_ratio           = 1;
-    p_vout->f_y_ratio           = 1;
+    p_vout->i_horizontal_scale  = 0;
+    p_vout->i_vertical_scale    = 0;
     p_vout->f_gamma             = VOUT_GAMMA;    
-    intf_DbgMsg("wished configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line), ratio %.2f:%.2f, gray=%d\n",
+    intf_DbgMsg("wished configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line), scaling %+d:%+d, gray=%d\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                p_vout->f_x_ratio, p_vout->f_y_ratio, p_vout->b_grayscale );
+                p_vout->i_horizontal_scale, p_vout->i_vertical_scale, p_vout->b_grayscale );
    
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
@@ -98,11 +98,11 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
       free( p_vout );
       return( NULL );
     }
-    intf_DbgMsg("actual configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line), ratio %.2f:%.2f, gray=%d\n",
+    intf_DbgMsg("actual configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line), scaling %+d:%+d, gray=%d\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
-                p_vout->f_x_ratio, p_vout->f_y_ratio, p_vout->b_grayscale );
-
+                p_vout->i_horizontal_scale, p_vout->i_vertical_scale, p_vout->b_grayscale );
+ 
 #ifdef STATS
     /* Initialize statistics fields */
     p_vout->render_time           = 0;    
@@ -253,7 +253,8 @@ void vout_DestroySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
  *******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
  * display. The picture does not need to be locked, since it is ignored by
- * the output thread if is reserved.
+ * the output thread if is reserved. The picture won't be displayed until 
+ * vout_DatePicture has been called.
  *******************************************************************************/
 void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -277,6 +278,19 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     intf_DbgMsg("picture %p: type=%d, %dx%d, date=%s\n", p_pic, p_pic->i_type, 
                 p_pic->i_width,p_pic->i_height, mstrtime( psz_date, p_pic->date ) );    
 #endif
+}
+
+/*******************************************************************************
+ * vout_DatePicture: date a picture
+ *******************************************************************************
+ * Remove the reservation flag of a picture, which will cause it to be ready for
+ * display. The picture does not need to be locked, since it is ignored by
+ * the output thread if is reserved. The picture won't be displayed until
+ * vout_DisplayPicture has been called.
+ *******************************************************************************/
+void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
+{
+    //??
 }
 
 /*******************************************************************************
@@ -996,11 +1010,11 @@ static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
             break;            
         }        
     }
-    sprintf( psz_buffer, "%s %dx%d:%d %.2f:%.2f g%+.2f   pic: %d/%d/%d", 
+    sprintf( psz_buffer, "%s %dx%d:%d scaling %+d:%+d g%+.2f   pic: %d/%d/%d", 
              p_vout->b_grayscale ? "gray" : "rgb", 
-             p_vout->i_width, p_vout->i_height,
-             p_vout->i_screen_depth, p_vout->f_x_ratio, p_vout->f_y_ratio, p_vout->f_gamma,
-             i_reserved_pic, i_ready_pic,
+             p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth, 
+             p_vout->i_horizontal_scale, p_vout->i_vertical_scale, 
+             p_vout->f_gamma, i_reserved_pic, i_ready_pic,
              VOUT_MAX_PICTURES );
     vout_SysPrint( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
 #endif

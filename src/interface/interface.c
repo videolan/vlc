@@ -196,7 +196,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
         // ??
         break;	    
     case 'g':                                                       /* gamma - */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_MAX) )
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
             p_intf->p_vout->f_gamma   -= INTF_GAMMA_STEP;                        
@@ -205,7 +205,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
         }                    
         break;                                        
     case 'G':                                                       /* gamma + */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma < INTF_GAMMA_MAX) )
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma < INTF_GAMMA_LIMIT) )
         {       
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
             p_intf->p_vout->f_gamma   += INTF_GAMMA_STEP;
@@ -223,37 +223,37 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
         }
         break;  
     case 'x':                                     /* horizontal aspect ratio - */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_x_ratio > INTF_RATIO_MIN) )
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_horizontal_scale > -INTF_SCALE_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->f_x_ratio /= INTF_RATIO_FACTOR;                        
+            p_intf->p_vout->i_horizontal_scale--;                        
             p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }                    
         break;                                        
     case 'X':                                     /* horizontal aspect ratio + */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_x_ratio < INTF_RATIO_MAX) )
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_horizontal_scale < INTF_SCALE_LIMIT) )
         {       
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->f_x_ratio *= INTF_RATIO_FACTOR;
+            p_intf->p_vout->i_horizontal_scale++;
             p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }                    
         break;  
     case 'y':                                       /* vertical aspect ratio - */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_y_ratio > INTF_RATIO_MIN) )
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_vertical_scale > -INTF_SCALE_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->f_y_ratio /= INTF_RATIO_FACTOR;                        
+            p_intf->p_vout->i_vertical_scale--;
             p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }                    
         break;                                        
     case 'Y':                                     /* horizontal aspect ratio + */
-        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_y_ratio < INTF_RATIO_MAX) )
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->i_vertical_scale < INTF_SCALE_LIMIT) )
         {       
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
-            p_intf->p_vout->f_y_ratio *= INTF_RATIO_FACTOR;
+            p_intf->p_vout->i_vertical_scale++;
             p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }

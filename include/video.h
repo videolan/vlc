@@ -30,6 +30,11 @@ typedef struct picture_s
     int             i_type;                                    /* picture type */
     int             i_status;                                 /* picture flags */
     int             i_matrix_coefficients;       /* in YUV type, encoding type */    
+
+    /* Picture management properties - these properties can be modified using
+     * the video output thread API, but should ne be written directly */
+    int             i_refcount;                      /* link reference counter */
+    mtime_t         date;                                      /* display date */
     
     /* Picture static properties - those properties are fixed at initialization
      * and should NOT be modified */
@@ -45,20 +50,11 @@ typedef struct picture_s
     int             i_display_height;                 /* useful picture height */
     int             i_aspect_ratio;                            /* aspect ratio */  
     
-    /* Link reference counter - it can be modified using vout_Link and 
-     * vout_Unlink functions, or directly if the picture is independant */
-    int             i_refcount;                      /* link reference counter */
-
     /* Macroblock counter - the decoder use it to verify if it has
      * decoded all the macroblocks of the picture */
     int             i_deccount;
     vlc_mutex_t     lock_deccount;
     
-    /* Video properties - those properties should not be modified once 
-     * the picture is in a heap, but can be freely modified if it is 
-     * independant */
-    mtime_t         date;                                      /* display date */
-
     /* Picture data - data can always be freely modified. p_data itself 
      * (the pointer) should NEVER be modified. In YUV format, the p_y, p_u and
      * p_v data pointers refers to different areas of p_data, and should not

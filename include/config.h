@@ -121,12 +121,10 @@
 
 /* Step for changing gamma, and minimum and maximum values */
 #define INTF_GAMMA_STEP                 .1
-#define INTF_GAMMA_MAX                  3
+#define INTF_GAMMA_LIMIT                3
 
-/* Factor for changing aspect ratio, and minimum and maximum values */
-#define INTF_RATIO_FACTOR               1.1
-#define INTF_RATIO_MIN                  .1
-#define INTF_RATIO_MAX                  10
+/* Scaling modifier limits */
+#define INTF_SCALE_LIMIT                10
 
 /*
  * X11 settings
