@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.78 2003/11/27 04:11:40 fenrir Exp $
+ * $Id: avi.c,v 1.79 2003/11/28 13:24:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2055,6 +2055,7 @@ static int AVI_TrackStopFinishedStreams( input_thread_t *p_input )
         if( tk->i_idxposc >= tk->i_idxnb )
         {
             tk->b_activated = VLC_FALSE;
+            es_out_Control( p_input->p_es_out, ES_OUT_SET_ES_STATE, tk->p_es, VLC_FALSE );
         }
         else
         {
