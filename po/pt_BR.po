@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt_BR\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-13 13:34+0100\n"
+"POT-Creation-Date: 2004-11-15 09:51+0100\n"
 "PO-Revision-Date: 2004-04-06 11:41-0300\n"
 "Last-Translator: André de Barros Martins Ribeiro <andrerib@ajato.com.br>\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -239,7 +239,7 @@ msgstr ""
 "janela do dos, vá para o diretório onde instalou o VLC e execute \"vlc -I "
 "wxwin\"\n"
 
-#: include/vlc_interface.h:162
+#: include/vlc_interface.h:164
 msgid ""
 "VLC is an open-source and cross-platform multimedia player for various audio "
 "and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, etc.) as well as "
@@ -272,12 +272,10 @@ msgstr ""
 msgid "Title"
 msgstr "Título"
 
-#: include/vlc_meta.h:29 src/input/input.c:854 src/playlist-oldnew/sort.c:119
-#: src/playlist-oldnew/sort.c:121 src/playlist-oldold/sort.c:108
-#: src/playlist-oldold/sort.c:110 modules/access/vcdx/access.c:1326
-#: modules/gui/macosx/playlist.m:181 modules/gui/macosx/playlist.m:511
-#: modules/gui/macosx/playlistinfo.m:63 modules/gui/macosx/playlistinfo.m:140
-#: modules/gui/macosx/playlistinfo.m:179
+#: include/vlc_meta.h:29 src/input/input.c:854
+#: modules/access/vcdx/access.c:1326 modules/gui/macosx/playlist.m:181
+#: modules/gui/macosx/playlist.m:511 modules/gui/macosx/playlistinfo.m:63
+#: modules/gui/macosx/playlistinfo.m:140 modules/gui/macosx/playlistinfo.m:179
 #: modules/gui/wxwindows/iteminfo.cpp:160
 #: modules/gui/wxwindows/iteminfo.cpp:164 modules/misc/playlist/m3u.c:67
 #: modules/mux/asf.c:50
@@ -285,7 +283,7 @@ msgid "Author"
 msgstr "Autor"
 
 #: include/vlc_meta.h:30 src/playlist/sort.c:193 modules/codec/vorbis.c:583
-#: modules/gui/macosx/playlist.m:891 modules/gui/wxwindows/playlist.cpp:617
+#: modules/gui/macosx/playlist.m:891 modules/gui/wxwindows/playlist.cpp:620
 msgid "Artist"
 msgstr "Artista"
 
@@ -638,12 +636,8 @@ msgstr "Resolução do monitor"
 msgid "Subtitle"
 msgstr "Legenda"
 
-#: src/input/input.c:853 src/input/input.c:1550
-#: src/playlist-oldnew/item-ext.c:302 src/playlist-oldnew/item.c:67
-#: src/playlist-oldnew/sort.c:119 src/playlist-oldnew/sort.c:121
-#: src/playlist-oldold/item-ext.c:302 src/playlist-oldold/item.c:67
-#: src/playlist-oldold/sort.c:108 src/playlist-oldold/sort.c:110
-#: src/playlist/item.c:77 src/playlist/item.c:255 src/playlist/playlist.c:122
+#: src/input/input.c:853 src/input/input.c:1550 src/playlist/item.c:77
+#: src/playlist/item.c:255 src/playlist/playlist.c:122
 #: modules/access/vcdx/access.c:1051 modules/access/vcdx/access.c:1326
 #: modules/gui/macosx/playlist.m:511 modules/gui/macosx/playlistinfo.m:140
 #: modules/gui/macosx/playlistinfo.m:179
@@ -652,7 +646,7 @@ msgid "General"
 msgstr "Geral"
 
 #: src/input/input.c:856 src/playlist/sort.c:193 modules/codec/vorbis.c:582
-#: modules/gui/macosx/playlist.m:891 modules/gui/wxwindows/playlist.cpp:616
+#: modules/gui/macosx/playlist.m:891 modules/gui/wxwindows/playlist.cpp:619
 #, fuzzy
 msgid "Meta-information"
 msgstr "Alvo de destino:"
@@ -662,8 +656,7 @@ msgstr "Alvo de destino:"
 msgid "Stream"
 msgstr "stream"
 
-#: src/input/input.c:1550 src/playlist-oldnew/item-ext.c:302
-#: src/playlist-oldold/item-ext.c:302 src/playlist/item.c:255
+#: src/input/input.c:1550 src/playlist/item.c:255
 #: modules/access/cdda/info.c:254 modules/access/cdda/info.c:290
 #: modules/gui/gtk/gnome_interface.c:2448 modules/gui/gtk/gtk_interface.c:2869
 #: modules/gui/macosx/playlist.m:182
@@ -2260,7 +2253,7 @@ msgstr "Apenas tocar"
 msgid "Select the hotkey to use to play."
 msgstr "Selecione o atalho a ser usado para tocar."
 
-#: src/libvlc.h:668 modules/control/hotkeys.c:569
+#: src/libvlc.h:668 modules/control/hotkeys.c:559
 #: modules/gui/macosx/controls.m:564 modules/gui/macosx/intf.m:440
 msgid "Faster"
 msgstr "Mais Rápido"
@@ -2269,7 +2262,7 @@ msgstr "Mais Rápido"
 msgid "Select the hotkey to use for fast forward playback."
 msgstr "Selecione o atalho a ser usado para tocar mais rápido."
 
-#: src/libvlc.h:670 modules/control/hotkeys.c:575
+#: src/libvlc.h:670 modules/control/hotkeys.c:565
 #: modules/gui/macosx/controls.m:565 modules/gui/macosx/intf.m:441
 msgid "Slower"
 msgstr "Mais Devagar"
@@ -2278,7 +2271,7 @@ msgstr "Mais Devagar"
 msgid "Select the hotkey to use for slow motion playback."
 msgstr "Selecione o atalho a ser usado para tocar em câmera lenta."
 
-#: src/libvlc.h:672 modules/control/hotkeys.c:539
+#: src/libvlc.h:672 modules/control/hotkeys.c:529
 #: modules/gui/gtk/gnome_interface.c:667
 #: modules/gui/gtk/gnome_interface.c:1056 modules/gui/gtk/gtk_interface.c:769
 #: modules/gui/gtk/gtk_interface.c:852 modules/gui/gtk/gtk_interface.c:896
@@ -2295,7 +2288,7 @@ msgstr ""
 "Selecione o atalho a ser usado para passar para o próximo ítem na lista de "
 "reprodução."
 
-#: src/libvlc.h:674 modules/control/hotkeys.c:550
+#: src/libvlc.h:674 modules/control/hotkeys.c:540
 #: modules/gui/macosx/controls.m:583 modules/gui/macosx/intf.m:397
 #: modules/gui/macosx/intf.m:442 modules/gui/macosx/intf.m:510
 #: modules/gui/wxwindows/menus.cpp:274
@@ -2694,56 +2687,56 @@ msgstr "CPU"
 #: modules/gui/macosx/playlist.m:170 modules/gui/macosx/playlist.m:185
 #: modules/gui/pda/pda_interface.c:1265
 #: modules/gui/wxwindows/interface.cpp:438
-#: modules/gui/wxwindows/playlist.cpp:201
+#: modules/gui/wxwindows/playlist.cpp:203
 msgid "Playlist"
 msgstr "Lista de reprodução"
 
-#: src/libvlc.h:1013 modules/gui/wxwindows/menus.cpp:298
+#: src/libvlc.h:1014 modules/gui/wxwindows/menus.cpp:298
 msgid "Miscellaneous"
 msgstr "Variados"
 
-#: src/libvlc.h:1054
+#: src/libvlc.h:1055
 msgid "Hot keys"
 msgstr "Endereço do host"
 
-#: src/libvlc.h:1278
+#: src/libvlc.h:1279
 msgid "main program"
 msgstr "Programa principal"
 
-#: src/libvlc.h:1285
+#: src/libvlc.h:1286
 msgid "print help (can be combined with --advanced)"
 msgstr "Imprimir ajuda (pode ser combinado com --advanced)"
 
-#: src/libvlc.h:1287
+#: src/libvlc.h:1288
 msgid "print detailed help (can be combined with --advanced)"
 msgstr "Imprimir ajuda detalhada (pode ser combinado com --advanced)"
 
-#: src/libvlc.h:1289
+#: src/libvlc.h:1290
 msgid "print a list of available modules"
 msgstr "imprimir lista dos módulos disponíveis"
 
-#: src/libvlc.h:1291
+#: src/libvlc.h:1292
 msgid "print help on module (can be combined with --advanced)"
 msgstr "Imprimir ajuda sobre o módulo (pode ser combinado com --advanced)"
 
-#: src/libvlc.h:1293
+#: src/libvlc.h:1294
 msgid "save the current command line options in the config"
 msgstr "salvar as opções de linha de comando atuais na configuração"
 
-#: src/libvlc.h:1295
+#: src/libvlc.h:1296
 msgid "reset the current config to the default values"
 msgstr "reinicializar a configuração atual para os valores padrão"
 
-#: src/libvlc.h:1297
+#: src/libvlc.h:1298
 msgid "use alternate config file"
 msgstr "usar arquivo de configuração alternativo"
 
-#: src/libvlc.h:1299
+#: src/libvlc.h:1300
 #, fuzzy
 msgid "resets the current plugins cache"
 msgstr "Repetir ítem atual."
 
-#: src/libvlc.h:1301
+#: src/libvlc.h:1302
 msgid "print version information"
 msgstr "imprimir informações de versão"
 
@@ -3432,25 +3425,20 @@ msgstr ""
 msgid "Unknown"
 msgstr "<desconhecido>"
 
-#: src/playlist-oldnew/playlist.c:104 src/playlist-oldold/playlist.c:104
-#: modules/misc/freetype.c:89
-msgid "Normal"
-msgstr "Normal"
-
-#: src/playlist/playlist.c:35 modules/gui/wxwindows/playlist.cpp:1329
+#: src/playlist/playlist.c:35 modules/gui/wxwindows/playlist.cpp:1338
 #, fuzzy
 msgid "By category"
 msgstr "Categoria CDDB do Dico"
 
-#: src/playlist/playlist.c:36 modules/gui/wxwindows/playlist.cpp:1331
+#: src/playlist/playlist.c:36 modules/gui/wxwindows/playlist.cpp:1340
 msgid "Manually added"
 msgstr ""
 
-#: src/playlist/playlist.c:37 modules/gui/wxwindows/playlist.cpp:1333
+#: src/playlist/playlist.c:37 modules/gui/wxwindows/playlist.cpp:1342
 msgid "All items, unsorted"
 msgstr ""
 
-#: src/playlist/sort.c:199 src/playlist/view.c:79 src/playlist/view.c:255
+#: src/playlist/sort.c:199 src/playlist/view.c:81 src/playlist/view.c:257
 msgid "Undefined"
 msgstr ""
 
@@ -3509,9 +3497,8 @@ msgstr ""
 #: modules/access/dvb/access.c:50 modules/access/dvdnav.c:59
 #: modules/access/dvdread.c:61 modules/access/file.c:78
 #: modules/access/ftp.c:40 modules/access/http.c:48
-#: modules/access/mms/mms.c:46 modules/access/screen.c:40
-#: modules/access/screen/screen.c:37 modules/access/tcp.c:37
-#: modules/access/udp.c:41 modules/access/v4l/v4l.c:72
+#: modules/access/mms/mms.c:46 modules/access/screen/screen.c:37
+#: modules/access/tcp.c:37 modules/access/udp.c:41 modules/access/v4l/v4l.c:72
 #: modules/access/vcd/vcd.c:40
 msgid "Caching value in ms"
 msgstr "Valor de cache em ms"
@@ -4516,7 +4503,7 @@ msgstr "Use diseqc with antenna"
 msgid "Satellite input"
 msgstr "Entrada de satélite"
 
-#: modules/access/screen.c:42 modules/access/screen/screen.c:39
+#: modules/access/screen/screen.c:39
 #, fuzzy
 msgid ""
 "Allows you to modify the default caching value for screen capture streams. "
@@ -4525,21 +4512,16 @@ msgstr ""
 "Permite que você modifique os valores padrão de cache para streams cdda. "
 "Este valor deverá ser ajustado em unidades de milisegundos"
 
-#: modules/access/screen.c:44 modules/access/screen/screen.c:41
+#: modules/access/screen/screen.c:41
 #, fuzzy
 msgid "Frame rate"
 msgstr "Taxa de Amostra:"
 
-#: modules/access/screen.c:46 modules/access/screen/screen.c:43
+#: modules/access/screen/screen.c:43
 #, fuzzy
 msgid "Allows you to set the desired frame rate for the capture."
 msgstr ""
 "Permite que você modifique o nome de usuário que será usado para a conexão."
-
-#: modules/access/screen.c:52 modules/access/screen/screen.c:62
-#, fuzzy
-msgid "Screen Input"
-msgstr "Tela"
 
 #: modules/access/screen/screen.c:46
 msgid "Capture fragment size"
@@ -4550,6 +4532,11 @@ msgid ""
 "Allows you optimize the capture by fragmenting the screen in chunks of "
 "predefined height (16 might be a good value, and 0 means disabled)."
 msgstr ""
+
+#: modules/access/screen/screen.c:62
+#, fuzzy
+msgid "Screen Input"
+msgstr "Tela"
 
 #: modules/access/slp.c:60
 msgid "SLP attribute identifiers"
@@ -6478,18 +6465,18 @@ msgstr "Esta opção permite definir os marcadores da lista de reprodução"
 msgid "Hotkeys management interface"
 msgstr "Interface de gerenciamento de atalhos"
 
-#: modules/control/hotkeys.c:488 modules/control/lirc.c:373
+#: modules/control/hotkeys.c:478 modules/control/lirc.c:373
 #, c-format
 msgid "Audio track: %s"
 msgstr "Faixa de audio: %s"
 
-#: modules/control/hotkeys.c:502 modules/control/hotkeys.c:530
+#: modules/control/hotkeys.c:492 modules/control/hotkeys.c:520
 #: modules/control/lirc.c:409
 #, c-format
 msgid "Subtitle track: %s"
 msgstr "Faixa de Legendas: %s"
 
-#: modules/control/hotkeys.c:502
+#: modules/control/hotkeys.c:492
 msgid "N/A"
 msgstr ""
 
@@ -6624,7 +6611,7 @@ msgstr "Pausar"
 #: modules/gui/pda/pda_interface.c:263 modules/gui/wxwindows/interface.cpp:436
 #: modules/gui/wxwindows/interface.cpp:1055
 #: modules/gui/wxwindows/menus.cpp:279 modules/gui/wxwindows/menus.cpp:293
-#: modules/gui/wxwindows/playlist.cpp:274
+#: modules/gui/wxwindows/playlist.cpp:277
 msgid "Play"
 msgstr "Tocar"
 
@@ -7711,7 +7698,7 @@ msgstr "Arquivo"
 #: modules/gui/beos/PlayListWindow.cpp:87
 #: modules/gui/gtk/gnome_interface.c:2191 modules/gui/macosx/open.m:415
 #: modules/gui/macosx/open.m:714 modules/gui/macosx/open.m:760
-#: modules/gui/wxwindows/dialogs.cpp:344 modules/gui/wxwindows/open.cpp:1092
+#: modules/gui/wxwindows/dialogs.cpp:348 modules/gui/wxwindows/open.cpp:1092
 #: modules/gui/wxwindows/wizard.cpp:1254
 msgid "Open File"
 msgstr "Abrir Arquivo"
@@ -8168,7 +8155,7 @@ msgstr "Tocar mais rápido"
 
 #: modules/gui/gtk/gnome_interface.c:644
 #: modules/gui/skins2/src/dialogs.cpp:233
-#: modules/gui/wxwindows/playlist.cpp:840
+#: modules/gui/wxwindows/playlist.cpp:843
 msgid "Open playlist"
 msgstr "Abrir lista de reprodução"
 
@@ -8437,7 +8424,7 @@ msgstr "Adicionar"
 
 #: modules/gui/gtk/gnome_interface.c:2364 modules/gui/gtk/gtk_interface.c:2766
 #: modules/gui/macosx/playlist.m:173 modules/gui/pda/pda_interface.c:1255
-#: modules/gui/wxwindows/playlist.cpp:276
+#: modules/gui/wxwindows/playlist.cpp:279
 msgid "Delete"
 msgstr "Apagar"
 
@@ -9092,7 +9079,7 @@ msgstr "Controlador"
 
 #: modules/gui/macosx/intf.m:494 modules/gui/macosx/intf.m:521
 #: modules/gui/macosx/playlistinfo.m:337
-#: modules/gui/wxwindows/playlist.cpp:278
+#: modules/gui/wxwindows/playlist.cpp:281
 msgid "Info"
 msgstr "Info"
 
@@ -9371,7 +9358,7 @@ msgstr "&Desalilitar todos os ítens do grupo"
 msgid "Properties"
 msgstr "Propriedades do dispositivo"
 
-#: modules/gui/macosx/playlist.m:184 modules/gui/wxwindows/playlist.cpp:315
+#: modules/gui/macosx/playlist.m:184 modules/gui/wxwindows/playlist.cpp:318
 msgid "Search"
 msgstr "Procurar"
 
@@ -9936,7 +9923,7 @@ msgid "All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"
 msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:241
-#: modules/gui/wxwindows/playlist.cpp:814
+#: modules/gui/wxwindows/playlist.cpp:817
 msgid "Save playlist"
 msgstr "Salvar lista"
 
@@ -10485,129 +10472,135 @@ msgstr ""
 msgid "Repeat"
 msgstr "Repetir Tudo"
 
-#: modules/gui/wxwindows/playlist.cpp:229
-msgid "&Simple Add..."
+#: modules/gui/wxwindows/playlist.cpp:231
+#, fuzzy
+msgid "&Simple Add File..."
 msgstr "Adicionar Bá&sico..."
 
-#: modules/gui/wxwindows/playlist.cpp:230
+#: modules/gui/wxwindows/playlist.cpp:232
+#, fuzzy
+msgid "Add &Directory..."
+msgstr "Entrada DirectShow"
+
+#: modules/gui/wxwindows/playlist.cpp:233
 msgid "&Add MRL..."
 msgstr "&Adicionar MRL..."
 
-#: modules/gui/wxwindows/playlist.cpp:232
+#: modules/gui/wxwindows/playlist.cpp:235
 #, fuzzy
 msgid "Services discovery"
 msgstr "Diretório fonte"
 
-#: modules/gui/wxwindows/playlist.cpp:235
+#: modules/gui/wxwindows/playlist.cpp:238
 msgid "&Open Playlist..."
 msgstr "Abrir Lista de Repr&odução"
 
-#: modules/gui/wxwindows/playlist.cpp:236
+#: modules/gui/wxwindows/playlist.cpp:239
 msgid "&Save Playlist..."
 msgstr "&Salvar Lista de Reprodução"
 
-#: modules/gui/wxwindows/playlist.cpp:238
+#: modules/gui/wxwindows/playlist.cpp:241
 msgid "&Close"
 msgstr "Fe&char"
 
-#: modules/gui/wxwindows/playlist.cpp:242
+#: modules/gui/wxwindows/playlist.cpp:245
 msgid "Sort by &title"
 msgstr "&Org. por título"
 
-#: modules/gui/wxwindows/playlist.cpp:243
+#: modules/gui/wxwindows/playlist.cpp:246
 msgid "&Reverse sort by title"
 msgstr "Ordenar &Reverso por título"
 
-#: modules/gui/wxwindows/playlist.cpp:245
+#: modules/gui/wxwindows/playlist.cpp:248
 msgid "Sort by &author"
 msgstr "Org. por &Autor"
 
-#: modules/gui/wxwindows/playlist.cpp:246
+#: modules/gui/wxwindows/playlist.cpp:249
 msgid "Reverse sort by author"
 msgstr "Ordenar Reverso por autor"
 
-#: modules/gui/wxwindows/playlist.cpp:248
+#: modules/gui/wxwindows/playlist.cpp:251
 msgid "&Shuffle Playlist"
 msgstr "&Embaralhar a Lista de Reprodução"
 
-#: modules/gui/wxwindows/playlist.cpp:252
+#: modules/gui/wxwindows/playlist.cpp:255
 msgid "&Enable"
 msgstr "&Habilitar"
 
-#: modules/gui/wxwindows/playlist.cpp:253
+#: modules/gui/wxwindows/playlist.cpp:256
 msgid "&Disable"
 msgstr "&Desabilitar"
 
-#: modules/gui/wxwindows/playlist.cpp:255
+#: modules/gui/wxwindows/playlist.cpp:258
 msgid "&Invert"
 msgstr "&Inverter"
 
-#: modules/gui/wxwindows/playlist.cpp:256
+#: modules/gui/wxwindows/playlist.cpp:259
 msgid "D&elete"
 msgstr "&Apagar"
 
-#: modules/gui/wxwindows/playlist.cpp:257
+#: modules/gui/wxwindows/playlist.cpp:260
 msgid "&Select All"
 msgstr "&Selecionar Tudo"
 
-#: modules/gui/wxwindows/playlist.cpp:264
+#: modules/gui/wxwindows/playlist.cpp:267
 msgid "&Manage"
 msgstr "Gere&nciar"
 
-#: modules/gui/wxwindows/playlist.cpp:265
+#: modules/gui/wxwindows/playlist.cpp:268
 msgid "S&ort"
 msgstr "&Ordenar"
 
-#: modules/gui/wxwindows/playlist.cpp:266
+#: modules/gui/wxwindows/playlist.cpp:269
 msgid "&Selection"
 msgstr "&Seleção"
 
-#: modules/gui/wxwindows/playlist.cpp:267
+#: modules/gui/wxwindows/playlist.cpp:270
 #, fuzzy
 msgid "&View items"
 msgstr "Tamanho do vídeo"
 
-#: modules/gui/wxwindows/playlist.cpp:275
+#: modules/gui/wxwindows/playlist.cpp:278
 msgid "Play this branch"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:277
+#: modules/gui/wxwindows/playlist.cpp:280
 #, fuzzy
 msgid "Enable/Disable"
 msgstr "Desabilitar"
 
-#: modules/gui/wxwindows/playlist.cpp:353
-#: modules/gui/wxwindows/playlist.cpp:679
+#: modules/gui/wxwindows/playlist.cpp:356
+#: modules/gui/wxwindows/playlist.cpp:682
 #, fuzzy
 msgid "root"
 msgstr "Raiz"
 
-#: modules/gui/wxwindows/playlist.cpp:363
+#: modules/gui/wxwindows/playlist.cpp:366
 msgid "Up"
 msgstr "Subir"
 
-#: modules/gui/wxwindows/playlist.cpp:365
+#: modules/gui/wxwindows/playlist.cpp:368
 msgid "Down"
 msgstr "Descer"
 
-#: modules/gui/wxwindows/playlist.cpp:786
+#: modules/gui/wxwindows/playlist.cpp:789
 msgid "M3U file"
 msgstr "arquivo M3U"
 
-#: modules/gui/wxwindows/playlist.cpp:787
+#: modules/gui/wxwindows/playlist.cpp:790
 msgid "PLS file"
 msgstr "Arquivo PLS"
 
-#: modules/gui/wxwindows/playlist.cpp:801
+#: modules/gui/wxwindows/playlist.cpp:804
 #, fuzzy
 msgid "Playlist is empty"
 msgstr "Ítem da lista de reprodução"
 
-#: modules/gui/wxwindows/playlist.cpp:801
+#: modules/gui/wxwindows/playlist.cpp:804
 msgid "Can't save"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:1335
+#: modules/gui/wxwindows/playlist.cpp:1344
 #, fuzzy
 msgid "Sorted by author"
 msgstr "Org. por &Autor"
@@ -11262,6 +11255,10 @@ msgstr "Menor"
 #: modules/misc/freetype.c:89
 msgid "Small"
 msgstr "Pequeno"
+
+#: modules/misc/freetype.c:89
+msgid "Normal"
+msgstr "Normal"
 
 #: modules/misc/freetype.c:90
 msgid "Large"
@@ -13201,10 +13198,6 @@ msgstr "Interface XOSD"
 
 #~ msgid "Track Title"
 #~ msgstr "Título da Faixa"
-
-#, fuzzy
-#~ msgid "Directory EOF"
-#~ msgstr "Entrada DirectShow"
 
 #, fuzzy
 #~ msgid "Program to decode"
