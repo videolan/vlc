@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.10 2003/12/04 16:02:54 sam Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -146,12 +146,11 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     /* Pasted from float32tos16.c */
     for (i = p_buffer->i_nb_samples * p_effect->i_nb_chans; i--; )
     {
-        float f_in = *p_buffl + 384.0;
-        int32_t i_in;
-        i_in = *(int32_t *)(intptr_t)&f_in;
-        if(i_in >  0x43c07fff ) * p_buffs = 32767;
-        else if ( i_in < 0x43bf8000 ) *p_buffs = -32768;
-        else *p_buffs = i_in - 0x43c00000;
+        union { float f; int32_t i; } u;
+        u.f = *p_buffl + 384.0;
+        if(u.i >  0x43c07fff ) * p_buffs = 32767;
+        else if ( u.i < 0x43bf8000 ) *p_buffs = -32768;
+        else *p_buffs = u.i - 0x43c00000;
 
         p_buffl++ ; p_buffs++ ;
     }

@@ -176,7 +176,10 @@ void X11Window::toggleOnTop( bool onTop ) const
 {
     int i_ret, i_format;
     unsigned long i, i_items, i_bytesafter;
-    Atom net_wm_supported, net_wm_state, net_wm_state_on_top, *p_args = NULL;
+    Atom net_wm_supported, net_wm_state, net_wm_state_on_top;
+    union { Atom *p_atom; unsigned char *p_char; } p_args;
+
+    p_args.p_atom = NULL;
 
     net_wm_supported = XInternAtom( XDISPLAY, "_NET_SUPPORTED", False );
 
@@ -185,7 +188,7 @@ void X11Window::toggleOnTop( bool onTop ) const
                                 0, 16384, False, AnyPropertyType,
                                 &net_wm_supported,
                                 &i_format, &i_items, &i_bytesafter,
-                                (unsigned char **)(intptr_t)&p_args );
+                                (unsigned char **)&p_args );
 
     if( i_ret != Success || i_items == 0 ) return; /* Not supported */
 
@@ -195,10 +198,10 @@ void X11Window::toggleOnTop( bool onTop ) const
 
     for( i = 0; i < i_items; i++ )
     {
-        if( p_args[i] == net_wm_state_on_top ) break;
+        if( p_args.p_atom[i] == net_wm_state_on_top ) break;
     }
 
-    XFree( p_args );
+    XFree( p_args.p_atom );
     if( i == i_items ) return; /* Not supported */
 
     /* Switch "on top" status */

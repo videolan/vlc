@@ -2187,7 +2187,10 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
 {
     int i_ret, i_format;
     unsigned long i, i_items, i_bytesafter;
-    Atom net_wm_supported, *p_args = NULL;
+    Atom net_wm_supported;
+    union { Atom *p_atom; unsigned char *p_char; } p_args;
+
+    p_args.p_atom = NULL;
 
     p_vout->p_sys->b_net_wm_state_fullscreen = VLC_FALSE;
     p_vout->p_sys->b_net_wm_state_above = VLC_FALSE;
@@ -2203,7 +2206,7 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
                                 0, 16384, False, AnyPropertyType,
                                 &net_wm_supported,
                                 &i_format, &i_items, &i_bytesafter,
-                                (unsigned char **)(intptr_t)&p_args );
+                                (unsigned char **)&p_args );
 
     if( i_ret != Success || i_items == 0 ) return;
 
@@ -2224,23 +2227,23 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
 
     for( i = 0; i < i_items; i++ )
     {
-        if( p_args[i] == p_vout->p_sys->net_wm_state_fullscreen )
+        if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_fullscreen )
         {
             msg_Dbg( p_vout,
                      "Window manager supports _NET_WM_STATE_FULLSCREEN" );
             p_vout->p_sys->b_net_wm_state_fullscreen = VLC_TRUE;
         }
-        else if( p_args[i] == p_vout->p_sys->net_wm_state_above )
+        else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_above )
         {
             msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_ABOVE" );
             p_vout->p_sys->b_net_wm_state_above = VLC_TRUE;
         }
-        else if( p_args[i] == p_vout->p_sys->net_wm_state_below )
+        else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_below )
         {
             msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_BELOW" );
             p_vout->p_sys->b_net_wm_state_below = VLC_TRUE;
         }
-        else if( p_args[i] == p_vout->p_sys->net_wm_state_stays_on_top )
+        else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_stays_on_top )
         {
             msg_Dbg( p_vout,
                      "Window manager supports _NET_WM_STATE_STAYS_ON_TOP" );
@@ -2248,7 +2251,7 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
         }
     }
 
-    XFree( p_args );
+    XFree( p_args.p_atom );
 }
 
 /*****************************************************************************
