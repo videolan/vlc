@@ -1,8 +1,8 @@
 /*****************************************************************************
- * float32tos16.c : trivial mixer plug-in (1 input, no downmixing)
+ * float32tos16.c : converter from float32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
+ * $Id: float32tos16.c,v 1.1 2002/08/08 22:26:56 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
