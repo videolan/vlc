@@ -78,6 +78,12 @@ typedef struct
 
     vod_media_t *p_media;
 
+    es_format_t fmt;
+    int         i_port;
+    uint8_t     i_payload_type;
+    char        *psz_rtpmap;
+    char        *psz_fmtp;
+
 } media_es_t;
 
 struct vod_media_t
@@ -95,6 +101,12 @@ struct vod_media_t
     int  i_port_audio;
     int  i_port_video;
     int  i_ttl;
+    int  i_payload_type;
+
+    int64_t i_sdp_id;
+    int     i_sdp_version;
+
+    vlc_mutex_t lock;
 
     /* ES list */
     int        i_es;
@@ -103,6 +115,12 @@ struct vod_media_t
     /* RTSP client */
     int           i_rtsp;
     rtsp_client_t **rtsp;
+
+    /* Infos */
+    char *psz_session_name;
+    char *psz_session_description;
+    char *psz_session_url;
+    char *psz_session_email;
 };
 
 struct vod_sys_t
@@ -129,10 +147,23 @@ static void           RtspClientDel( vod_media_t *, rtsp_client_t * );
 
 static int RtspCallback( httpd_callback_sys_t *, httpd_client_t *,
                          httpd_message_t *, httpd_message_t * );
-static int RtspCallbackId( httpd_callback_sys_t *, httpd_client_t *,
+static int RtspCallbackES( httpd_callback_sys_t *, httpd_client_t *,
                            httpd_message_t *, httpd_message_t * );
 
 static char *SDPGenerate( vod_media_t *, char * );
+
+static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
+{
+    static const char hex[16] = "0123456789abcdef";
+    int i;
+
+    for( i = 0; i < i_data; i++ )
+    {
+        s[2*i+0] = hex[(p_data[i]>>4)&0xf];
+        s[2*i+1] = hex[(p_data[i]   )&0xf];
+    }
+    s[2*i_data] = '\0';
+}
 
 /*****************************************************************************
  * Open: Starts the RTSP server module
@@ -217,14 +248,16 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
     int i;
 
     memset( p_media, 0, sizeof(vod_media_t) );
-    asprintf( &p_media->psz_rtsp_path, "%s%s", p_sys->psz_path, psz_name );
+    p_media->es = 0;
+    p_media->rtsp = 0;
 
+    asprintf( &p_media->psz_rtsp_path, "%s%s", p_sys->psz_path, psz_name );
     p_media->p_rtsp_url =
         httpd_UrlNewUnique( p_sys->p_rtsp_host, p_media->psz_rtsp_path, 0, 0 );
 
     if( !p_media->p_rtsp_url )
     {
-        msg_Err( p_vod, "cannot create http url" );
+        msg_Err( p_vod, "cannot create http url (%s)", p_media->psz_rtsp_path);
         free( p_media->psz_rtsp_path );
         free( p_media );
         return 0;
@@ -248,10 +281,26 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
 
     TAB_APPEND( p_sys->i_media, p_sys->media, p_media );
 
+    vlc_mutex_init( p_vod, &p_media->lock );
+    p_media->psz_session_name = strdup("");
+    p_media->psz_session_description = strdup("");
+    p_media->psz_session_url = strdup("");
+    p_media->psz_session_email = strdup("");
+
+    p_media->i_port_audio = 1234;
+    p_media->i_port_video = 1236;
+    p_media->i_port       = 1238;
+    p_media->i_payload_type = 96;
+
+    p_media->i_sdp_id = mdate();
+    p_media->i_sdp_version = 1;
+
     vlc_mutex_lock( &p_item->lock );
     msg_Dbg( p_vod, "media has %i declared ES", p_item->i_es );
     for( i = 0; i < p_item->i_es; i++ )
-    msg_Dbg( p_vod, "  - ES %i: %4.4s", i, (char *)&p_item->es[i]->i_codec );
+    {
+        MediaAddES( p_vod, p_media, p_item->es[i] );
+    }
     vlc_mutex_unlock( &p_item->lock );
 
     return p_media;
@@ -261,50 +310,159 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 {
     vod_sys_t *p_sys = p_vod->p_sys;
 
+    msg_Dbg( p_vod, "deleting media: %s", p_media->psz_rtsp_path );
+
     while( p_media->i_rtsp > 0 ) RtspClientDel( p_media, p_media->rtsp[0] );
     httpd_UrlDelete( p_media->p_rtsp_url );
     if( p_media->psz_rtsp_path ) free( p_media->psz_rtsp_path );
     if( p_media->psz_rtsp_control ) free( p_media->psz_rtsp_control );
 
     TAB_REMOVE( p_sys->i_media, p_sys->media, p_media );
+
+    while( p_media->i_es ) MediaDelES( p_vod, p_media, &p_media->es[0]->fmt );
+
+    vlc_mutex_destroy( &p_media->lock );
     free( p_media );
 }
 
 static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 {
     media_es_t *p_es = malloc( sizeof(media_es_t) );
+    char *psz_urlc;
+
     memset( p_es, 0, sizeof(media_es_t) );
 
-    TAB_APPEND( p_media->i_es, p_media->es, p_es );
-
     /* TODO: update SDP, etc... */
+    asprintf( &psz_urlc, "%s/trackid=%d",
+              p_media->psz_rtsp_path, p_media->i_es );
+    msg_Dbg( p_vod, "  - ES %4.4s (%s)", (char *)&p_fmt->i_codec, psz_urlc );
 
-    if( p_media->p_rtsp_url )
+    switch( p_fmt->i_codec )
     {
-        char psz_urlc[strlen( p_media->psz_rtsp_control ) + 1 + 10];
-
-        sprintf( psz_urlc, "%s/trackid=%d",
-                 p_media->psz_rtsp_path, p_media->i_es );
-        fprintf( stderr, "rtsp: adding %s\n", psz_urlc );
-
-        p_es->p_rtsp_url =
-            httpd_UrlNewUnique( p_vod->p_sys->p_rtsp_host, psz_urlc, 0, 0 );
-
-        if( p_es->p_rtsp_url )
+    case VLC_FOURCC( 's', '1', '6', 'b' ):
+        if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
         {
-            httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_SETUP,
-                            RtspCallbackId, (void*)p_es );
-#if 0
-            httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_PLAY,
-                            RtspCallback, (void*)p_es );
-            httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_PAUSE,
-                            RtspCallback, (void*)p_es );
-#endif
+            p_es->i_payload_type = 11;
         }
+        else if( p_fmt->audio.i_channels == 2 && p_fmt->audio.i_rate == 44100 )
+        {
+            p_es->i_payload_type = 10;
+        }
+        else
+        {
+            p_es->i_payload_type = p_media->i_payload_type++;
+        }
+
+        p_es->psz_rtpmap = malloc( strlen( "L16/*/*" ) + 20+1 );
+        sprintf( p_es->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
+                 p_fmt->audio.i_channels );
+        break;
+    case VLC_FOURCC( 'u', '8', ' ', ' ' ):
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = malloc( strlen( "L8/*/*" ) + 20+1 );
+        sprintf( p_es->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
+                 p_fmt->audio.i_channels );
+        break;
+    case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        p_es->i_payload_type = 14;
+        p_es->psz_rtpmap = strdup( "MPA/90000" );
+        break;
+    case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+        p_es->i_payload_type = 32;
+        p_es->psz_rtpmap = strdup( "MPV/90000" );
+        break;
+    case VLC_FOURCC( 'a', '5', '2', ' ' ):
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = strdup( "ac3/90000" );
+        break;
+    case VLC_FOURCC( 'H', '2', '6', '3' ):
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = strdup( "H263-1998/90000" );
+        break;
+    case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = strdup( "MP4V-ES/90000" );
+        if( p_fmt->i_extra > 0 )
+        {
+            char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
+            p_es->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
+            sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
+            sprintf( p_es->psz_fmtp,
+                     "profile-level-id=3; config=%s;", p_hexa );
+            free( p_hexa );
+        }
+        break;
+    case VLC_FOURCC( 'm', 'p', '4', 'a' ):
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = malloc( strlen( "mpeg4-generic/" ) + 12 );
+        sprintf( p_es->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate );
+        if( p_fmt->i_extra > 0 )
+        {
+            char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
+            p_es->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
+            sprintf_hexa( p_hexa, p_fmt->p_extra, p_fmt->i_extra );
+            sprintf( p_es->psz_fmtp,
+                     "streamtype=5; profile-level-id=15; mode=AAC-hbr; "
+                     "config=%s; SizeLength=13;IndexLength=3; "
+                     "IndexDeltaLength=3; Profile=1;", p_hexa );
+            free( p_hexa );
+        }
+        break;
+
+    default:
+        msg_Err( p_vod, "cannot add this stream (unsupported "
+                 "codec: %4.4s)", (char*)&p_fmt->i_codec );
+        free( p_es );
+        return VLC_EGENERIC;
     }
 
+    p_es->p_rtsp_url =
+        httpd_UrlNewUnique( p_vod->p_sys->p_rtsp_host, psz_urlc, 0, 0 );
+
+    if( !p_es->p_rtsp_url )
+    {
+        msg_Err( p_vod, "cannot create http url (%s)", psz_urlc );
+        free( psz_urlc );
+        free( p_es );
+        return VLC_EGENERIC;
+    }
+    free( psz_urlc );
+
+    httpd_UrlCatch( p_es->p_rtsp_url, HTTPD_MSG_SETUP,
+                    RtspCallbackES, (void*)p_es );
+
+    es_format_Copy( &p_es->fmt, p_fmt );
     p_es->p_vod = p_vod;
     p_es->p_media = p_media;
+
+    /* Choose the port */
+    if( p_fmt->i_cat == AUDIO_ES && p_media->i_port_audio > 0 )
+    {
+        p_es->i_port = p_media->i_port_audio;
+        p_media->i_port_audio = 0;
+    }
+    else if( p_fmt->i_cat == VIDEO_ES && p_media->i_port_video > 0 )
+    {
+        p_es->i_port = p_media->i_port_video;
+        p_media->i_port_video = 0;
+    }
+    while( !p_es->i_port )
+    {
+        if( p_media->i_port != p_media->i_port_audio &&
+            p_media->i_port != p_media->i_port_video )
+        {
+            p_es->i_port = p_media->i_port;
+            p_media->i_port += 2;
+            break;
+        }
+        p_media->i_port += 2;
+    }
+
+    vlc_mutex_lock( &p_media->lock );
+    TAB_APPEND( p_media->i_es, p_media->es, p_es );
+    vlc_mutex_unlock( &p_media->lock );
+
+    p_media->i_sdp_version++;
 
     return VLC_SUCCESS;
 }
@@ -312,12 +470,32 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
 {
     media_es_t *p_es = 0;
+    int i;
 
+    /* Find the ES */
+    for( i = 0; i < p_media->i_es; i++ )
+    {
+        if( p_media->es[i]->fmt.i_cat == p_fmt->i_cat &&
+            p_media->es[i]->fmt.i_codec == p_fmt->i_codec &&
+            p_media->es[i]->fmt.i_id == p_fmt->i_id )
+        {
+            p_es = p_media->es[i];
+        }
+    }
+    if( !p_es ) return;
+
+    msg_Dbg( p_vod, "  - Removing ES %4.4s", (char *)&p_fmt->i_codec );
+
+    vlc_mutex_lock( &p_media->lock );
     TAB_REMOVE( p_media->i_es, p_media->es, p_es );
+    vlc_mutex_unlock( &p_media->lock );
 
-    /* TODO do something useful */
+    if( p_es->psz_rtpmap ) free( p_es->psz_rtpmap );
+    if( p_es->psz_fmtp ) free( p_es->psz_fmtp );
+    p_media->i_sdp_version++;
 
     if( p_es->p_rtsp_url ) httpd_UrlDelete( p_es->p_rtsp_url );
+    es_format_Clean( &p_es->fmt );
 }
 
 /****************************************************************************
@@ -325,24 +503,24 @@ static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
  ****************************************************************************/
 static rtsp_client_t *RtspClientNew( vod_media_t *p_media, char *psz_session )
 {
-    rtsp_client_t *rtsp = malloc( sizeof(rtsp_client_t) );
+    rtsp_client_t *p_rtsp = malloc( sizeof(rtsp_client_t) );
 
-    rtsp->psz_session = psz_session;
-    rtsp->i_last = 0;
-    rtsp->b_playing = VLC_FALSE;
+    p_rtsp->psz_session = psz_session;
+    p_rtsp->i_last = 0;
+    p_rtsp->b_playing = VLC_FALSE;
 
-    TAB_APPEND( p_media->i_rtsp, p_media->rtsp, rtsp );
+    TAB_APPEND( p_media->i_rtsp, p_media->rtsp, p_rtsp );
 
     msg_Dbg( p_media->p_vod, "new session: %s", psz_session );
 
-    return rtsp;
+    return p_rtsp;
 }
 
 static rtsp_client_t *RtspClientGet( vod_media_t *p_media, char *psz_session )
 {
     int i;
 
-    for( i = 0; i < p_media->i_rtsp; i++ )
+    for( i = 0; psz_session && i < p_media->i_rtsp; i++ )
     {
         if( !strcmp( p_media->rtsp[i]->psz_session, psz_session ) )
         {
@@ -353,14 +531,14 @@ static rtsp_client_t *RtspClientGet( vod_media_t *p_media, char *psz_session )
     return NULL;
 }
 
-static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *rtsp )
+static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 {
-    msg_Dbg( p_media->p_vod, "closing session: %s", rtsp->psz_session );
+    msg_Dbg( p_media->p_vod, "closing session: %s", p_rtsp->psz_session );
 
-    TAB_REMOVE( p_media->i_rtsp, p_media->rtsp, rtsp );
+    TAB_REMOVE( p_media->i_rtsp, p_media->rtsp, p_rtsp );
 
-    free( rtsp->psz_session );
-    free( rtsp );
+    free( p_rtsp->psz_session );
+    free( p_rtsp );
 }
 
 static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
@@ -464,10 +642,11 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     return VLC_SUCCESS;
 }
 
-static int RtspCallbackId( httpd_callback_sys_t *p_args, httpd_client_t *cl,
+static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                            httpd_message_t *answer, httpd_message_t *query )
 {
-    vod_media_t *p_media = (vod_media_t*)p_args;
+    media_es_t *p_es = (media_es_t*)p_args;
+    vod_media_t *p_media = p_es->p_media;
     vod_t *p_vod = p_media->p_vod;
     char *psz_session = NULL;
     char *psz_transport = NULL;
@@ -497,7 +676,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             psz_session = httpd_MsgGet( query, "Session" );
             if( !psz_session || !*psz_session )
             {
-                if( psz_session ) free( psz_session );
                 asprintf( &psz_session, "%d", rand() );
             }
 
@@ -529,7 +707,6 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             psz_session = httpd_MsgGet( query, "Session" );
             if( !psz_session || !*psz_session )
             {
-                if( psz_session ) free( psz_session );
                 asprintf( &psz_session, "%d", rand() );
                 rtsp = RtspClientNew( p_media, psz_session );
             }
@@ -592,5 +769,99 @@ static int RtspCallbackId( httpd_callback_sys_t *p_args, httpd_client_t *cl,
  *****************************************************************************/
 static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
 {
+#if 0
     return strdup( "" );
+
+#else
+    int i, i_size;
+    char *p, *psz_sdp;
+
+    /* Calculate size */
+    i_size = strlen( "v=0\r\n" ) +
+        strlen( "o=- * * IN IP4 127.0.0.1\r\n" ) + 10 + 10 +
+        strlen( "s=*\r\n" ) + strlen( p_media->psz_session_name ) +
+        strlen( "i=*\r\n" ) + strlen( p_media->psz_session_description ) +
+        strlen( "u=*\r\n" ) + strlen( p_media->psz_session_url ) +
+        strlen( "e=*\r\n" ) + strlen( p_media->psz_session_email ) +
+        strlen( "t=0 0\r\n" ) + /* FIXME */
+        strlen( "a=tool:"PACKAGE_STRING"\r\n" ) +
+        strlen( "c=IN IP4 */*\r\n" ) + 20 + 10 +
+        strlen( psz_destination ? psz_destination : "0.0.0.0" ) ;
+
+    for( i = 0; i < p_media->i_es; i++ )
+    {
+        media_es_t *p_es = p_media->es[i];
+
+        i_size += strlen( "m=**d*o * RTP/AVP *\r\n" ) + 10 + 10;
+        if( p_es->psz_rtpmap )
+        {
+            i_size += strlen( "a=rtpmap:* *\r\n" ) +
+                strlen( p_es->psz_rtpmap ) + 10;
+        }
+        if( p_es->psz_fmtp )
+        {
+            i_size += strlen( "a=fmtp:* *\r\n" ) +
+                strlen( p_es->psz_fmtp ) + 10;
+        }
+
+        i_size += strlen( "a=control:*/trackid=*\r\n" ) +
+            strlen( p_media->psz_rtsp_control ) + 10;
+    }
+
+    p = psz_sdp = malloc( i_size );
+    p += sprintf( p, "v=0\r\n" );
+    p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n",
+                  p_media->i_sdp_id, p_media->i_sdp_version );
+    if( *p_media->psz_session_name )
+        p += sprintf( p, "s=%s\r\n", p_media->psz_session_name );
+    if( *p_media->psz_session_description )
+        p += sprintf( p, "i=%s\r\n", p_media->psz_session_description );
+    if( *p_media->psz_session_url )
+        p += sprintf( p, "u=%s\r\n", p_media->psz_session_url );
+    if( *p_media->psz_session_email )
+        p += sprintf( p, "e=%s\r\n", p_media->psz_session_email );
+
+    p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
+    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
+
+    p += sprintf( p, "c=IN IP4 %s/%d\r\n", psz_destination ?
+                  psz_destination : "0.0.0.0", p_media->i_ttl );
+
+    for( i = 0; i < p_media->i_es; i++ )
+    {
+        media_es_t *p_es = p_media->es[i];
+
+        if( p_es->fmt.i_cat == AUDIO_ES )
+        {
+            p += sprintf( p, "m=audio %d RTP/AVP %d\r\n",
+                          p_es->i_port, p_es->i_payload_type );
+        }
+        else if( p_es->fmt.i_cat == VIDEO_ES )
+        {
+            p += sprintf( p, "m=video %d RTP/AVP %d\r\n",
+                          p_es->i_port, p_es->i_payload_type );
+        }
+        else
+        {
+            continue;
+        }
+
+        if( p_es->psz_rtpmap )
+        {
+            p += sprintf( p, "a=rtpmap:%d %s\r\n", p_es->i_payload_type,
+                          p_es->psz_rtpmap );
+        }
+        if( p_es->psz_fmtp )
+        {
+            p += sprintf( p, "a=fmtp:%d %s\r\n", p_es->i_payload_type,
+                          p_es->psz_fmtp );
+        }
+
+        p += sprintf( p, "a=control:%s/trackid=%d\r\n",
+                      p_media->psz_rtsp_control, i );
+    }
+
+    fprintf( stderr, psz_sdp );
+    return psz_sdp;
+#endif
 }

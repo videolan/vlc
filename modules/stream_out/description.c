@@ -126,7 +126,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     block_ChainRelease( p_buffer );
 
-    if( p_sys->i_stream_start + 1500000 > mdate() )
+    if( p_sys->i_stream_start + 1500000 < mdate() )
     {
         p_sys->p_input->b_eof = VLC_TRUE;
     }
