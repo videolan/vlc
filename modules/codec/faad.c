@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.5 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: faad.c,v 1.6 2003/11/27 20:51:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -163,6 +163,12 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
+
+    if( p_block->b_discontinuity )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
 
     /* Append the block to the temporary buffer */
     if( p_sys->i_buffer_size < p_sys->i_buffer + p_block->i_buffer )
