@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.5 2001/03/25 17:09:14 richards Exp $
+ * $Id: MsgVals.h,v 1.6 2001/06/15 09:07:10 tcastley Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *
@@ -27,6 +27,7 @@
 
 const uint32 OPEN_FILE      = 'OPFL';
 const uint32 OPEN_DVD       = 'OPDV';
+const uint32 OPEN_PLAYLIST  = 'OPPL';
 const uint32 STOP_PLAYBACK  = 'STPL';
 const uint32 START_PLAYBACK = 'PLAY';
 const uint32 PAUSE_PLAYBACK = 'PAPL';

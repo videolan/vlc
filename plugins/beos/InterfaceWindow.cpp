@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.1 2001/06/02 09:42:26 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.2 2001/06/15 09:07:10 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -25,7 +25,6 @@
  *****************************************************************************/
 #include "defs.h"
 
- 
 /* System headers */
 #include <kernel/OS.h>
 #include <InterfaceKit.h>
@@ -54,9 +53,9 @@ extern "C"
 
 /* BeOS interface headers */
 #include "MsgVals.h"
+#include "MediaControlView.h"
 #include "InterfaceWindow.h"
-#include "Bitmaps.h"
-#include "TransportButton.h"
+#include "PlayListWindow.h"
 
 /*****************************************************************************
  * InterfaceWindow
@@ -70,30 +69,36 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 {
     file_panel = NULL;
     p_intf = p_interface;
-    BRect ButtonRect;
-    float xStart = 5.0;
-    float yStart = 20.0;
+    BRect controlRect(0,0,0,0);
+    b_empty_playlist = (p_main->p_playlist->i_size < 0);
 
+    /* set the title bar */
     SetName( "interface" );
-    SetTitle(VOUT_TITLE " (BeOS interface)");
-    BRect rect(0, 0, 0, 0);
+    SetTitle(VOUT_TITLE);
 
+    /* set up the main menu */
     BMenuBar *menu_bar;
-    menu_bar = new BMenuBar(rect, "main menu");
+    menu_bar = new BMenuBar(controlRect, "main menu");
     AddChild( menu_bar );
 
     BMenu *mFile;
     BMenu *mAudio;
     CDMenu *cd_menu;
-
+    
+    /* Add the file Menu */
     BMenuItem *mItem;
-
     menu_bar->AddItem( mFile = new BMenu( "File" ) );
     menu_bar->ResizeToPreferred();
     mFile->AddItem( mItem = new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
                                            new BMessage(OPEN_FILE), 'O') );
+    
     cd_menu = new CDMenu( "Open Disc" );
     mFile->AddItem( cd_menu );
+    
+    mFile->AddSeparatorItem();
+    mFile->AddItem( mItem = new BMenuItem( "Play List" B_UTF8_ELLIPSIS,
+                                           new BMessage(OPEN_PLAYLIST), 'P') );
+    
     mFile->AddSeparatorItem();
     mFile->AddItem( mItem = new BMenuItem( "About" B_UTF8_ELLIPSIS,
                                        new BMessage(B_ABOUT_REQUESTED), 'A') );
@@ -101,101 +106,23 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     mFile->AddItem(mItem = new BMenuItem( "Quit",
                                         new BMessage(B_QUIT_REQUESTED), 'Q') );
 
+    /* Add the Audio menu */
     menu_bar->AddItem ( mAudio = new BMenu( "Audio" ) );
     menu_bar->ResizeToPreferred();
     mAudio->AddItem( new LanguageMenu( "Language", AUDIO_ES, p_intf ) );
     mAudio->AddItem( new LanguageMenu( "Subtitles", SPU_ES, p_intf ) );
 
-
-    rect = Bounds();
-    rect.top += menu_bar->Bounds().IntegerHeight() + 1;
-
-    BBox* p_view;
-    p_view = new BBox( rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER );
-    p_view->SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
-
-    /* Buttons */
-    /* Slow play */
-    ButtonRect.SetLeftTop(BPoint(xStart, yStart));
-    ButtonRect.SetRightBottom(ButtonRect.LeftTop() + kSkipButtonSize);
-    xStart += kRewindBitmapWidth;
-    TransportButton* p_slow = new TransportButton(ButtonRect, B_EMPTY_STRING,
-                                            kSkipBackBitmapBits,
-                                            kPressedSkipBackBitmapBits,
-                                            kDisabledSkipBackBitmapBits,
-                                            new BMessage(SLOWER_PLAY));
-    p_view->AddChild( p_slow );
-
-    /* Play Pause */
-    ButtonRect.SetLeftTop(BPoint(xStart, yStart));
-    ButtonRect.SetRightBottom(ButtonRect.LeftTop() + kPlayButtonSize);
-    xStart += kPlayPauseBitmapWidth + 1.0;
-    PlayPauseButton* p_play = new PlayPauseButton(ButtonRect, B_EMPTY_STRING,
-                                            kPlayButtonBitmapBits,
-                                            kPressedPlayButtonBitmapBits,
-                                            kDisabledPlayButtonBitmapBits,
-                                            kPlayingPlayButtonBitmapBits,
-                                            kPressedPlayingPlayButtonBitmapBits,
-                                            kPausedPlayButtonBitmapBits,
-                                            kPressedPausedPlayButtonBitmapBits,
-                                            new BMessage(START_PLAYBACK));
-
-    p_view->AddChild( p_play );
-    /* p_play->SetPlaying(); */
-
-    /* Fast Foward */
-    ButtonRect.SetLeftTop(BPoint(xStart, yStart));
-    ButtonRect.SetRightBottom(ButtonRect.LeftTop() + kSkipButtonSize);
-    xStart += kRewindBitmapWidth;
-    TransportButton* p_fast = new TransportButton(ButtonRect, B_EMPTY_STRING,
-                                            kSkipForwardBitmapBits,
-                                            kPressedSkipForwardBitmapBits,
-                                            kDisabledSkipForwardBitmapBits,
-                                            new BMessage(FASTER_PLAY));
-    p_view->AddChild( p_fast );
-
-    /* Stop */
-    ButtonRect.SetLeftTop(BPoint(xStart, yStart));
-    ButtonRect.SetRightBottom(ButtonRect.LeftTop() + kStopButtonSize);
-    xStart += kStopBitmapWidth;
-    TransportButton* p_stop = new TransportButton(ButtonRect, B_EMPTY_STRING,
-                                            kStopButtonBitmapBits,
-                                            kPressedStopButtonBitmapBits,
-                                            kDisabledStopButtonBitmapBits,
-                                            new BMessage(STOP_PLAYBACK));
-    p_view->AddChild( p_stop );
-
-    ButtonRect.SetLeftTop(BPoint(xStart + 5, yStart + 6));
-    ButtonRect.SetRightBottom(ButtonRect.LeftTop() + kSpeakerButtonSize);
-    xStart += kSpeakerIconBitmapWidth;
-
-    TransportButton* p_mute = new TransportButton(ButtonRect, B_EMPTY_STRING,
-                                            kSpeakerIconBits,
-                                            kPressedSpeakerIconBits,
-                                            kSpeakerIconBits,
-                                            new BMessage(VOLUME_MUTE));
-
-    p_view->AddChild( p_mute );
-
-    /* Seek Status */
-    rgb_color fill_color = {0,255,0};
-    p_seek = new SeekSlider(BRect(5,2,255,15), this, 0, 100,
-                        B_TRIANGLE_THUMB);
-    p_seek->SetValue(0);
-    p_seek->UseFillColor(true, &fill_color);
-    p_view->AddChild( p_seek );
-
-    /* Volume Slider */
-    p_vol = new MediaSlider(BRect(xStart,20,255,30), new BMessage(VOLUME_CHG),
-                            0, VOLUME_MAX);
-    p_vol->SetValue(VOLUME_DEFAULT);
-    p_vol->UseFillColor(true, &fill_color);
-    p_view->AddChild( p_vol );
-
-    /* Set size and Show */
-    AddChild( p_view );
     ResizeTo(260,50 + menu_bar->Bounds().IntegerHeight()+1);
+    controlRect = Bounds();
+    controlRect.top += menu_bar->Bounds().IntegerHeight() + 1;
+
+    p_mediaControl = new MediaControlView( controlRect );
+    p_mediaControl->SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
+
+    /* Show */
+    AddChild( p_mediaControl );
     Show();
+    
 }
 
 InterfaceWindow::~InterfaceWindow()
@@ -207,12 +134,20 @@ InterfaceWindow::~InterfaceWindow()
  *****************************************************************************/
 void InterfaceWindow::MessageReceived( BMessage * p_message )
 {
-    int vol_val = p_vol->Value();    // remember the current volume
-    static int playback_status;      // remember playback state
+    int vol_val = p_mediaControl->GetVolume();    // remember the current volume
+    int playback_status;      // remember playback state
     int     i_index;
     BAlert *alert;
 
     Activate();
+    if (p_intf->p_input)
+    {
+	    playback_status = p_intf->p_input->stream.control.i_status;
+	}
+	else
+	{
+	    playback_status = UNDEF_S;
+	}
 
     switch( p_message->what )
     {
@@ -232,6 +167,14 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         file_panel->Show();
         break;
 
+	case OPEN_PLAYLIST:
+		{
+		    BRect rect(20,20,320,420);
+            PlayListWindow* playlist_window = new PlayListWindow(rect,
+                         "Playlist", (playlist_t *)p_main->p_playlist);
+            playlist_window->Show();
+        }
+		break;
     case OPEN_DVD:
         const char *psz_device;
         char psz_source[ B_FILE_NAME_LENGTH + 4 ];
@@ -241,6 +184,12 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                       "dvd:%s", psz_device );
             psz_source[ strlen(psz_source) ] = '\0';
             intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)psz_source );
+            if( p_intf->p_input != NULL )
+            {
+                p_intf->p_input->b_eof = 1;
+            }
+            intf_PlaylistJumpto( p_main->p_playlist, 
+                                 p_main->p_playlist->i_size - 1 );
         }
         break;
 
@@ -271,25 +220,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case START_PLAYBACK:
         /*  starts playing in normal mode */
-/*        if (p_intf->p_input != NULL )
-
-            if (p_main->p_aout != NULL)
-            {
-                p_main->p_aout->i_vol = vol_val;
-            }
-            snooze(400000);
-            input_SetStatus(p_intf->p_input, INPUT_STATUS_PLAY);
-            playback_status = PLAYING;
-        }
-        break;
-*/
 
     case PAUSE_PLAYBACK:
         /* toggle between pause and play */
         if( p_intf->p_input != NULL )
         {
             /* pause if currently playing */
-            if( playback_status == PLAYING )
+            if( playback_status == PLAYING_S )
             {
                 /* mute the sound */
                 vlc_mutex_lock( &p_aout_bank->lock );
@@ -300,13 +237,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     p_aout_bank->pp_aout[i_index]->i_volume = 0;
                 }
                 vlc_mutex_unlock( &p_aout_bank->lock );
+                snooze( 400000 );
                 
                 /* pause the movie */
                 input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
                 vlc_mutex_lock( &p_main->p_playlist->change_lock );
                 p_main->p_playlist->b_stopped = 0;
                 vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-                playback_status = PAUSED;
             }
             else
             {
@@ -325,7 +262,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 /* Start playing */
                 input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
                 p_main->p_playlist->b_stopped = 0;
-                playback_status = PLAYING;
             }
         }
         else
@@ -339,7 +275,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     vlc_mutex_unlock( &p_main->p_playlist->change_lock );
                     intf_PlaylistJumpto( p_main->p_playlist, 
                                          p_main->p_playlist->i_index );
-                    playback_status = PLAYING;
+                    p_main->p_playlist->b_stopped = 0;
                 }
                 else
                 {
@@ -476,6 +412,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 BPath path( &ref );
                 intf_PlaylistAdd( p_main->p_playlist,
                                   PLAYLIST_END, (char*)path.Path() );
+                if( p_intf->p_input != NULL )
+                {
+                    p_intf->p_input->b_eof = 1;
+                }
+                intf_PlaylistJumpto( p_main->p_playlist, 
+                                     p_main->p_playlist->i_size - 1 );
+                                  
              }
         }
         break;
@@ -484,6 +427,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         BWindow::MessageReceived( p_message );
         break;
     }
+
 }
 
 /*****************************************************************************
@@ -492,25 +436,33 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 void InterfaceWindow::updateInterface()
 {
     float progress;
-    bool seekNeeded = false;
-
-    if( acquire_sem(fScrubSem) == B_OK )
-    {
-        seekNeeded = true;
+    
+	if ( p_intf->p_input )
+	{
+        if ( acquire_sem(p_mediaControl->fScrubSem) == B_OK )
+        {
+            uint32 seekTo = (p_mediaControl->GetSeekTo() *
+                        p_intf->p_input->stream.p_selected_area->i_size) / 100;
+            input_Seek( p_intf->p_input, seekTo );
+        }
+        else if( Lock() )
+        {
+            progress = (100. * p_intf->p_input->stream.p_selected_area->i_tell) /
+                        p_intf->p_input->stream.p_selected_area->i_size;
+            p_mediaControl->SetStatus(p_intf->p_input->stream.control.i_status, 
+                                      p_intf->p_input->stream.control.i_rate);
+            p_mediaControl->SetProgress(progress);
+            Unlock();
+        }
     }
-    if( seekNeeded )
+    if ( b_empty_playlist != (p_main->p_playlist->i_size < 1) )
     {
-        uint32 seekTo = (p_seek->Value() *
-                    p_intf->p_input->stream.p_selected_area->i_size) / 100;
-        input_Seek( p_intf->p_input, seekTo );
-        seekNeeded = false;
-    }
-    else if( Lock() )
-    {
-        progress = (100. * p_intf->p_input->stream.p_selected_area->i_tell) /
-                    p_intf->p_input->stream.p_selected_area->i_size;
-        p_seek->SetValue(progress);
-        Unlock();
+        if (Lock())
+        {
+            b_empty_playlist = !b_empty_playlist;
+            p_mediaControl->SetEnabled( !b_empty_playlist );
+            Unlock();
+        }
     }
 }
 
@@ -643,7 +595,8 @@ int CDMenu::GetCD( const char *directory )
 /*****************************************************************************
  * LanguageMenu::LanguageMenu
  *****************************************************************************/
-LanguageMenu::LanguageMenu(const char *name, int menu_kind, intf_thread_t  *p_interface)
+LanguageMenu::LanguageMenu(const char *name, int menu_kind, 
+                            intf_thread_t  *p_interface)
     :BMenu(name)
 {
     kind = menu_kind;
@@ -740,100 +693,5 @@ int LanguageMenu::GetChannels()
 
 }
 
-/*****************************************************************************
- * MediaSlider
- *****************************************************************************/
-MediaSlider::MediaSlider( BRect frame, BMessage *p_message,
-                          int32 i_min, int32 i_max )
-            :BSlider(frame, NULL, NULL, p_message, i_min, i_max )
-{
-
-}
-
-MediaSlider::~MediaSlider()
-{
-
-}
-
-void MediaSlider::DrawThumb(void)
-{
-    BRect r;
-    BView *v;
-
-    rgb_color black = {0,0,0};
-    r = ThumbFrame();
-    v = OffscreenView();
-
-    if(IsEnabled())
-    {
-        v->SetHighColor(black);
-    }
-    else
-    {
-        v->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
-    }
-
-    r.InsetBy(r.IntegerWidth()/4, r.IntegerHeight()/(4 * r.IntegerWidth() / r.IntegerHeight()));
-    v->StrokeEllipse(r);
-
-    if(IsEnabled())
-    {
-        v->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-    }
-    else
-    {
-        v->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
-    }
-
-    r.InsetBy(1,1);
-    v->FillEllipse(r);
-}
-
-/*****************************************************************************
- * SeekSlider
- *****************************************************************************/
-SeekSlider::SeekSlider( BRect frame, InterfaceWindow *p_owner, int32 i_min,
-                        int32 i_max, thumb_style thumbType = B_TRIANGLE_THUMB )
-           :MediaSlider( frame, NULL, i_min, i_max )
-{
-    fOwner = p_owner;
-    fMouseDown = false;
-}
-
-SeekSlider::~SeekSlider()
-{
-}
-
-/*****************************************************************************
- * SeekSlider::MouseDown
- *****************************************************************************/
-void SeekSlider::MouseDown(BPoint where)
-{
-    BSlider::MouseDown(where);
-    fOwner->fScrubSem = create_sem(1, "Vlc::fScrubSem");
-    fMouseDown = true;
-}
-
-/*****************************************************************************
- * SeekSlider::MouseUp
- *****************************************************************************/
-void SeekSlider::MouseMoved(BPoint where, uint32 code, const BMessage *message)
-{
-    BSlider::MouseMoved(where, code, message);
-    if (!fMouseDown)
-        return;
-    release_sem(fOwner->fScrubSem);
-}
-
-/*****************************************************************************
- * SeekSlider::MouseUp
- *****************************************************************************/
-void SeekSlider::MouseUp(BPoint where)
-{
-    BSlider::MouseUp(where);
-    delete_sem(fOwner->fScrubSem);
-    fOwner->fScrubSem = B_ERROR;
-    fMouseDown = false;
-}
 
 
