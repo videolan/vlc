@@ -2,7 +2,7 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_common.h,v 1.4 2001/05/01 04:18:18 sam Exp $
+ * $Id: aout_common.h,v 1.5 2001/11/01 00:29:54 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -20,6 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+
+/* Biggest difference allowed between scheduled playing date and actual date 
+   (in microseconds) */
+#define MAX_DELTA 10000
+
 
 /* Creating as many aout_Thread functions as configurations was one solution,
  * examining the different cases in the Thread loop of an unique function was
@@ -73,6 +79,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
                                  mtime_t aout_date )
 {
     long l_units, l_rate;
+    long long l_delta;    
 
     /* We take the lock */
     vlc_mutex_lock( &p_fifo->data_lock );
@@ -126,7 +133,18 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
 
     l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> (p_fifo->b_stereo));
 
-    l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 256);
+    l_delta = aout_date - p_fifo->date[p_fifo->l_start_frame];
+
+/* Resample if delta is too long */
+    if( abs(l_delta) > MAX_DELTA )
+    {
+        l_rate = p_fifo->l_rate + (l_delta / 256);
+    }
+    else
+    {
+        l_rate = p_fifo->l_rate;
+    }
+
     intf_DbgMsg( "aout debug: %lli (%li);", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->l_rate );
