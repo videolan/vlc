@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.45 2004/01/17 13:25:21 gbazin Exp $
+ * $Id: http.c,v 1.46 2004/01/17 15:17:02 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -2867,7 +2867,7 @@ playlist_item_t * parse_MRL( char *psz )
     char *s_temp;
     int i = 0;
     int i_options = 0;
-    playlist_item_t * p_item;
+    playlist_item_t * p_item = NULL;
 
     /* In case there is spaces before the mrl */
     while( ( *s_mrl == ' ' ) && ( *s_mrl != '\0' ) )
@@ -2975,6 +2975,5 @@ playlist_item_t * parse_MRL( char *psz )
     }
     free( ppsz_options );
 
-    if( i_error != 0 ) return NULL;
-    else return p_item;
+    return p_item;
 }
