@@ -307,10 +307,10 @@ static int  AllocatePID( sout_mux_sys_t *p_sys, int i_cat )
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     Capability(sout_mux_t *, int, void *, void * );
-static int     AddStream( sout_mux_t *, sout_input_t * );
-static int     DelStream( sout_mux_t *, sout_input_t * );
-static int     Mux      ( sout_mux_t * );
+static int Control  ( sout_mux_t *, int, va_list );
+static int AddStream( sout_mux_t *, sout_input_t * );
+static int DelStream( sout_mux_t *, sout_input_t * );
+static int Mux      ( sout_mux_t * );
 
 static void TSSchedule  ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
                           mtime_t i_pcr_length, mtime_t i_pcr_dts );
@@ -334,11 +334,11 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t         val;
 
     msg_Dbg( p_mux, "Open" );
-    sout_ParseCfg( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
+    sout_CfgParse( p_mux, SOUT_CFG_PREFIX, ppsz_sout_options, p_mux->p_cfg );
 
     p_sys = malloc( sizeof( sout_mux_sys_t ) );
 
-    p_mux->pf_capacity  = Capability;
+    p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
@@ -493,18 +493,32 @@ static void Close( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
- * Capability:
+ * Control:
  *****************************************************************************/
-static int Capability( sout_mux_t *p_mux, int i_query, void *p_args,
-                       void *p_answer )
+static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    vlc_bool_t *pb_bool;
+    char **ppsz;
+
    switch( i_query )
    {
-        case SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:
-            *(vlc_bool_t*)p_answer = VLC_TRUE;
-            return( SOUT_MUX_CAP_ERR_OK );
+       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+           *pb_bool = VLC_TRUE;
+           return VLC_SUCCESS;
+
+       case MUX_GET_ADD_STREAM_WAIT:
+           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+           *pb_bool = VLC_FALSE;
+           return VLC_SUCCESS;
+
+       case MUX_GET_MIME:
+           ppsz = (char**)va_arg( args, char ** );
+           *ppsz = strdup( "video/mpeg" );  /* FIXME not sure */
+           return VLC_SUCCESS;
+
         default:
-            return( SOUT_MUX_CAP_ERR_UNIMPLEMENTED );
+            return VLC_EGENERIC;
    }
 }
 

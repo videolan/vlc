@@ -49,10 +49,10 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static int  Capability(sout_mux_t *, int, void *, void * );
-static int  AddStream( sout_mux_t *, sout_input_t * );
-static int  DelStream( sout_mux_t *, sout_input_t * );
-static int  Mux      ( sout_mux_t * );
+static int Control( sout_mux_t *, int, va_list );
+static int AddStream( sout_mux_t *, sout_input_t * );
+static int DelStream( sout_mux_t *, sout_input_t * );
+static int Mux      ( sout_mux_t * );
 
 struct sout_mux_sys_t
 {
@@ -72,7 +72,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_mux, "Dummy/Raw muxer opened" );
     msg_Info( p_mux, "Open" );
 
-    p_mux->pf_capacity  = Capability;
+    p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
@@ -96,16 +96,25 @@ static void Close( vlc_object_t * p_this )
     free( p_sys );
 }
 
-static int Capability( sout_mux_t *p_mux, int i_query,
-                       void *p_args, void *p_answer )
+static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    vlc_bool_t *pb_bool;
+
    switch( i_query )
    {
-        case SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:
-            *(vlc_bool_t*)p_answer = VLC_TRUE;
-            return( SOUT_MUX_CAP_ERR_OK );
+       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+           *pb_bool = VLC_TRUE;
+           return VLC_SUCCESS;
+
+       case MUX_GET_ADD_STREAM_WAIT:
+           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+           *pb_bool = VLC_FALSE;
+           return VLC_SUCCESS;
+
+       case MUX_GET_MIME:   /* Unknown */
         default:
-            return( SOUT_MUX_CAP_ERR_UNIMPLEMENTED );
+            return VLC_EGENERIC;
    }
 }
 

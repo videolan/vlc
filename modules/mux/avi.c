@@ -51,10 +51,10 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Capability(sout_mux_t *, int , void *, void * );
-static int  AddStream( sout_mux_t *, sout_input_t * );
-static int  DelStream( sout_mux_t *, sout_input_t * );
-static int  Mux      ( sout_mux_t * );
+static int Control( sout_mux_t *, int, va_list );
+static int AddStream( sout_mux_t *, sout_input_t * );
+static int DelStream( sout_mux_t *, sout_input_t * );
+static int Mux      ( sout_mux_t * );
 
 typedef struct avi_stream_s
 {
@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_write_header = VLC_TRUE;
 
 
-    p_mux->pf_capacity  = Capability;
+    p_mux->pf_control   = Control;
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
@@ -212,16 +212,30 @@ static void Close( vlc_object_t * p_this )
     sout_AccessOutWrite( p_mux->p_access, p_hdr );
 }
 
-static int Capability( sout_mux_t *p_mux, int i_query,
-                       void *p_args, void *p_answer )
+static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 {
+    vlc_bool_t *pb_bool;
+    char **ppsz;
+
    switch( i_query )
    {
-        case SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:
-            *(vlc_bool_t*)p_answer = VLC_FALSE;
-            return( SOUT_MUX_CAP_ERR_OK );
+       case MUX_CAN_ADD_STREAM_WHILE_MUXING:
+           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+           *pb_bool = VLC_FALSE;
+           return VLC_SUCCESS;
+
+       case MUX_GET_ADD_STREAM_WAIT:
+           pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+           *pb_bool = VLC_TRUE;
+           return VLC_SUCCESS;
+
+       case MUX_GET_MIME:
+           ppsz = (char**)va_arg( args, char ** );
+           *ppsz = strdup( "video/avi" );
+           return VLC_SUCCESS;
+
         default:
-            return( SOUT_MUX_CAP_ERR_UNIMPLEMENTED );
+            return VLC_EGENERIC;
    }
 }
 
