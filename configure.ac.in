@@ -915,7 +915,8 @@ then
   PLUGINS="${PLUGINS} access_output_dummy access_output_udp access_output_file"
   PLUGINS="${PLUGINS} mux_ts mux_ps mux_dummy"
   PLUGINS="${PLUGINS} packetizer_mpegaudio packetizer_mpegvideo packetizer_a52"
-  PLUGINS="${PLUGINS} packetizer_mpeg4video packetizer_copy"
+  PLUGINS="${PLUGINS} packetizer_mpeg4video packetizer_mpeg4audio"
+  PLUGINS="${PLUGINS} packetizer_copy"
 fi
 
 
@@ -1121,10 +1122,10 @@ then
 fi
 
 dnl
-dnl  libdvbpsi ts demux
+dnl  libdvbpsi ts demux/mux
 dnl
 AC_ARG_ENABLE(dvbpsi,
-[  --enable-dvbpsi         dvbpsi ts demux module (default enabled)])
+[  --enable-dvbpsi         dvbpsi ts mux and demux module (default enabled)])
 if test "x${enable_dvbpsi}" != "xno"
 then
   AC_ARG_WITH(dvbpsi,
@@ -1137,7 +1138,9 @@ then
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
         [ PLUGINS="${PLUGINS} ts_dvbpsi"
-          LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} -ldvbpsi" ],
+          LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} -ldvbpsi" 
+          PLUGINS="${PLUGINS} mux_ts_dvbpsi"
+          LDFLAGS_mux_ts_dvbpsi="${LDFLAGS_mux_ts_dvbpsi} -ldvbpsi" ],
         [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
         [#include <stdint.h>
 #include <dvbpsi/dvbpsi.h>
@@ -1160,6 +1163,11 @@ then
         BUILTINS="${BUILTINS} ts_dvbpsi"
         LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
         CPPFLAGS_ts_dvbpsi="${CPPFLAGS_ts_dvbpsi} -I${real_dvbpsi_tree}/src"
+
+        BUILTINS="${BUILTINS} mux_ts_dvbpsi"
+        LDFLAGS_mux_ts_dvbpsi="${LDFLAGS_mux_ts_dvbpsi} ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
+        CPPFLAGS_mux_ts_dvbpsi="${CPPFLAGS_mux_ts_dvbpsi} -I${real_dvbpsi_tree}/src"
+
       else
         dnl  The given libdvbpsi wasn't built
         AC_MSG_RESULT(no)
@@ -1185,6 +1193,10 @@ then
       PLUGINS="${PLUGINS} ts_dvbpsi"
       LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} ${LDFLAGS_test} -ldvbpsi"
       CPPFLAGS_ts_dvbpsi="${CPPFLAGS_ts_dvbpsi} ${CPPFLAGS_test}"
+      PLUGINS="${PLUGINS} mux_ts_dvbpsi"
+      LDFLAGS_mux_ts_dvbpsi="${LDFLAGS_mux_ts_dvbpsi} ${LDFLAGS_test} -ldvbpsi"
+      CPPFLAGS_mux_ts_dvbpsi="${CPPFLAGS_mux_ts_dvbpsi} ${CPPFLAGS_test}"
+
       ],[
       if test "x${enable_dvbpsi}" != "x"
       then

@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.13 2003/01/08 03:01:55 ipkiss Exp $
+ * $Id: ts.c,v 1.14 2003/01/08 16:40:29 fenrir Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -54,6 +54,7 @@
 #endif
 
 #include "system.h"
+#include "codecs.h"
 
 /*****************************************************************************
  * Constants
@@ -687,17 +688,6 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                             p_new_es->i_cat = SPU_ES;
                             break;
 
-                        case 0x10:
-                            p_new_es->i_fourcc = VLC_FOURCC('m','p','4','v');
-                            p_new_es->i_stream_id = 0xfa;   // ???
-                            p_new_es->i_cat = VIDEO_ES;
-                            break;
-                        case 0x11:
-                            p_new_es->i_fourcc = VLC_FOURCC('m','p','4','a');
-                            p_new_es->i_stream_id = 0xfa;   // ???
-                            p_new_es->i_cat = AUDIO_ES;
-                            break;
-
                         default :
                             p_new_es->i_fourcc = 0;
                             p_new_es->i_cat = UNKNOWN_ES;
@@ -782,6 +772,358 @@ static void TS_DVBPSI_DemuxPSI( input_thread_t  * p_input,
 
     input_DeletePacket( p_input->p_method_data, p_data );
 }
+/*****************************************************************************
+ * MP4 specific functions
+ *****************************************************************************/
+static int  MP4_DescriptorLength( int *pi_data, uint8_t **pp_data )
+{
+    unsigned int i_b;
+    unsigned int i_len = 0;
+    do
+    {
+        i_b = **pp_data;
+        (*pp_data)++;
+        (*pi_data)--;
+        i_len = ( i_len << 7 ) + ( i_b&0x7f );
+
+    } while( i_b&0x80 );
+
+    return( i_len );
+}
+static int MP4_GetByte( int *pi_data, uint8_t **pp_data )
+{
+    if( *pi_data > 0 )
+    {
+        int i_b = **pp_data;
+        (*pp_data)++;
+        (*pi_data)--;
+        return( i_b );
+    }
+    else
+    {
+        return( 0 );
+    }
+}
+
+static int MP4_GetWord( int *pi_data, uint8_t **pp_data )
+{
+    int i1, i2;
+    i1 = MP4_GetByte( pi_data, pp_data );
+    i2 = MP4_GetByte( pi_data, pp_data );
+    return( ( i1 << 8 ) | i2 );
+}
+static int MP4_Get3Bytes( int *pi_data, uint8_t **pp_data )
+{
+    int i1, i2, i3;
+    i1 = MP4_GetByte( pi_data, pp_data );
+    i2 = MP4_GetByte( pi_data, pp_data );
+    i3 = MP4_GetByte( pi_data, pp_data );
+    return( ( i1 << 16 ) | ( i2 << 8) | i3 );
+}
+
+static uint32_t MP4_GetDWord( int *pi_data, uint8_t **pp_data )
+{
+    uint32_t i1, i2;
+    i1 = MP4_GetWord( pi_data, pp_data );
+    i2 = MP4_GetWord( pi_data, pp_data );
+    return( ( i1 << 16 ) | i2 );
+}
+
+static char* MP4_GetURL( int *pi_data, uint8_t **pp_data )
+{
+    char *url;
+    int i_url_len, i;
+
+    i_url_len = MP4_GetByte( pi_data, pp_data );
+    url = malloc( i_url_len + 1 );
+    for( i = 0; i < i_url_len; i++ )
+    {
+        url[i] = MP4_GetByte( pi_data, pp_data );
+    }
+    url[i_url_len] = '\0';
+    return( url );
+}
+
+static void MP4_IODParse( iod_descriptor_t *p_iod, int i_data, uint8_t *p_data )
+{
+    int i;
+    int i_es_index;
+    uint8_t     i_flags;
+    vlc_bool_t  b_url;
+    int         i_iod_length;
+
+    fprintf( stderr, "\n************ IOD ************" );
+    for( i = 0; i < 255; i++ )
+    {
+        p_iod->es_descr[i].b_ok = 0;
+    }
+    i_es_index = 0;
+
+    if( i_data < 3 )
+    {
+        return;
+    }
+
+    p_iod->i_iod_label = MP4_GetByte( &i_data, &p_data );
+    fprintf( stderr, "\n* iod_label:%d", p_iod->i_iod_label );
+    fprintf( stderr, "\n* ===========" );
+    fprintf( stderr, "\n* tag:0x%x", p_data[0] );
+
+    if( MP4_GetByte( &i_data, &p_data ) != 0x02 )
+    {
+        fprintf( stderr, "\n ERR: tag != 0x02" );
+        return;
+    }
+
+    i_iod_length = MP4_DescriptorLength( &i_data, &p_data );
+    fprintf( stderr, "\n* length:%d", i_iod_length );
+    if( i_iod_length > i_data )
+    {
+        i_iod_length = i_data;
+    }
+
+    p_iod->i_od_id = ( MP4_GetByte( &i_data, &p_data ) << 2 );
+    i_flags = MP4_GetByte( &i_data, &p_data );
+    p_iod->i_od_id |= i_flags >> 6;
+    b_url = ( i_flags >> 5  )&0x01;
+
+    fprintf( stderr, "\n* od_id:%d", p_iod->i_od_id );
+    fprintf( stderr, "\n* url flag:%d", b_url );
+    fprintf( stderr, "\n* includeInlineProfileLevel flag:%d", ( i_flags >> 4 )&0x01 );
+
+    if( b_url )
+    {
+        p_iod->psz_url = MP4_GetURL( &i_data, &p_data );
+        fprintf( stderr, "\n* url string:%s", p_iod->psz_url );
+        fprintf( stderr, "\n*****************************\n" );
+        return;
+    }
+    else
+    {
+        p_iod->psz_url = NULL;
+    }
+
+    p_iod->i_ODProfileLevelIndication = MP4_GetByte( &i_data, &p_data );
+    p_iod->i_sceneProfileLevelIndication = MP4_GetByte( &i_data, &p_data );
+    p_iod->i_audioProfileLevelIndication = MP4_GetByte( &i_data, &p_data );
+    p_iod->i_visualProfileLevelIndication = MP4_GetByte( &i_data, &p_data );
+    p_iod->i_graphicsProfileLevelIndication = MP4_GetByte( &i_data, &p_data );
+
+    fprintf( stderr, "\n* ODProfileLevelIndication:%d", p_iod->i_ODProfileLevelIndication );
+    fprintf( stderr, "\n* sceneProfileLevelIndication:%d", p_iod->i_sceneProfileLevelIndication );
+    fprintf( stderr, "\n* audioProfileLevelIndication:%d", p_iod->i_audioProfileLevelIndication );
+    fprintf( stderr, "\n* visualProfileLevelIndication:%d", p_iod->i_visualProfileLevelIndication );
+    fprintf( stderr, "\n* graphicsProfileLevelIndication:%d", p_iod->i_graphicsProfileLevelIndication );
+
+
+    while( i_data > 0 && i_es_index < 255)
+    {
+        int i_tag, i_length;
+        int     i_data_sav;
+        uint8_t *p_data_sav;
+
+        i_tag = MP4_GetByte( &i_data, &p_data );
+        i_length = MP4_DescriptorLength( &i_data, &p_data );
+
+        i_data_sav = i_data;
+        p_data_sav = p_data;
+
+        i_data = i_length;
+
+        switch( i_tag )
+        {
+            case 0x03:
+                {
+#define es_descr    p_iod->es_descr[i_es_index]
+                    int i_decoderConfigDescr_length;
+                    fprintf( stderr, "\n* - ES_Descriptor length:%d", i_length );
+                    es_descr.b_ok = 1;
+
+                    es_descr.i_es_id = MP4_GetWord( &i_data, &p_data );
+                    i_flags = MP4_GetByte( &i_data, &p_data );
+                    es_descr.b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
+                    b_url = ( i_flags >> 6 )&0x01;
+                    es_descr.b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
+                    es_descr.i_streamPriority = i_flags & 0x1f;
+                    fprintf( stderr, "\n*   * streamDependenceFlag:%d", es_descr.b_streamDependenceFlag );
+                    fprintf( stderr, "\n*   * OCRStreamFlag:%d", es_descr.b_OCRStreamFlag );
+                    fprintf( stderr, "\n*   * streamPriority:%d", es_descr.i_streamPriority );
+
+                    if( es_descr.b_streamDependenceFlag )
+                    {
+                        es_descr.i_dependOn_es_id = MP4_GetWord( &i_data, &p_data );
+                        fprintf( stderr, "\n*   * dependOn_es_id:%d", es_descr.i_dependOn_es_id );
+                    }
+
+                    if( b_url )
+                    {
+                        es_descr.psz_url = MP4_GetURL( &i_data, &p_data );
+                        fprintf( stderr, "\n* url string:%s", es_descr.psz_url );
+                    }
+                    else
+                    {
+                        es_descr.psz_url = NULL;
+                    }
+
+                    if( es_descr.b_OCRStreamFlag )
+                    {
+                        es_descr.i_OCR_es_id = MP4_GetWord( &i_data, &p_data );
+                        fprintf( stderr, "\n*   * OCR_es_id:%d", es_descr.i_OCR_es_id );
+                    }
+
+                    if( MP4_GetByte( &i_data, &p_data ) != 0x04 )
+                    {
+                        fprintf( stderr, "\n* ERR missing DecoderConfigDescr" );
+                        es_descr.b_ok = 0;
+                        break;
+                    }
+                    i_decoderConfigDescr_length = MP4_DescriptorLength( &i_data, &p_data );
+
+                    fprintf( stderr, "\n*   - DecoderConfigDesc length:%d", i_decoderConfigDescr_length );
+#define dec_descr   es_descr.dec_descr
+                    dec_descr.i_objectTypeIndication = MP4_GetByte( &i_data, &p_data );
+                    i_flags = MP4_GetByte( &i_data, &p_data );
+                    dec_descr.i_streamType = i_flags >> 2;
+                    dec_descr.b_upStream = ( i_flags >> 1 )&0x01;
+                    dec_descr.i_bufferSizeDB = MP4_Get3Bytes( &i_data, &p_data );
+                    dec_descr.i_maxBitrate = MP4_GetDWord( &i_data, &p_data );
+                    dec_descr.i_avgBitrate = MP4_GetDWord( &i_data, &p_data );
+                    fprintf( stderr, "\n*     * objectTypeIndication:0x%x", dec_descr.i_objectTypeIndication  );
+                    fprintf( stderr, "\n*     * streamType:0x%x", dec_descr.i_streamType );
+                    fprintf( stderr, "\n*     * upStream:%d", dec_descr.b_upStream );
+                    fprintf( stderr, "\n*     * bufferSizeDB:%d", dec_descr.i_bufferSizeDB );
+                    fprintf( stderr, "\n*     * maxBitrate:%d", dec_descr.i_maxBitrate );
+                    fprintf( stderr, "\n*     * avgBitrate:%d", dec_descr.i_avgBitrate );
+                    if( i_decoderConfigDescr_length > 13 && MP4_GetByte( &i_data, &p_data ) == 0x05 )
+                    {
+                        int i;
+                        dec_descr.i_decoder_specific_info_len =
+                            MP4_DescriptorLength( &i_data, &p_data );
+                        if( dec_descr.i_decoder_specific_info_len > 0 )
+                        {
+                            dec_descr.p_decoder_specific_info =
+                                malloc( dec_descr.i_decoder_specific_info_len );
+                        }
+                        for( i = 0; i < dec_descr.i_decoder_specific_info_len; i++ )
+                        {
+                            dec_descr.p_decoder_specific_info[i] = MP4_GetByte( &i_data, &p_data );
+                        }
+                    }
+                    else
+                    {
+                        dec_descr.i_decoder_specific_info_len = 0;
+                        dec_descr.p_decoder_specific_info = NULL;
+                    }
+                }
+#undef  dec_descr
+#define sl_descr    es_descr.sl_descr
+                {
+                    int i_SLConfigDescr_length;
+                    int i_predefined;
+
+                    if( MP4_GetByte( &i_data, &p_data ) != 0x06 )
+                    {
+                        fprintf( stderr, "\n* ERR missing SLConfigDescr" );
+                        es_descr.b_ok = 0;
+                        break;
+                    }
+                    i_SLConfigDescr_length = MP4_DescriptorLength( &i_data, &p_data );
+
+                    fprintf( stderr, "\n*   - SLConfigDescr length:%d", i_SLConfigDescr_length );
+                    i_predefined = MP4_GetByte( &i_data, &p_data );
+                    fprintf( stderr, "\n*     * i_predefined:0x%x", i_predefined  );
+                    switch( i_predefined )
+                    {
+                        case 0x01:
+                            {
+                                sl_descr.b_useAccessUnitStartFlag   = 0;
+                                sl_descr.b_useAccessUnitEndFlag     = 0;
+                                sl_descr.b_useRandomAccessPointFlag = 0;
+                                //sl_descr.b_useRandomAccessUnitsOnlyFlag = 0;
+                                sl_descr.b_usePaddingFlag           = 0;
+                                sl_descr.b_useTimeStampsFlags       = 0;
+                                sl_descr.b_useIdleFlag              = 0;
+                                sl_descr.b_durationFlag     = 0;    // FIXME FIXME
+                                sl_descr.i_timeStampResolution      = 1000;
+                                sl_descr.i_OCRResolution    = 0;    // FIXME FIXME
+                                sl_descr.i_timeStampLength          = 32;
+                                sl_descr.i_OCRLength        = 0;    // FIXME FIXME
+                                sl_descr.i_AU_Length                = 0;
+                                sl_descr.i_instantBitrateLength= 0; // FIXME FIXME
+                                sl_descr.i_degradationPriorityLength= 0;
+                                sl_descr.i_AU_seqNumLength          = 0;
+                                sl_descr.i_packetSeqNumLength       = 0;
+                                if( sl_descr.b_durationFlag )
+                                {
+                                    sl_descr.i_timeScale            = 0;    // FIXME FIXME
+                                    sl_descr.i_accessUnitDuration   = 0;    // FIXME FIXME
+                                    sl_descr.i_compositionUnitDuration= 0;    // FIXME FIXME
+                                }
+                                if( !sl_descr.b_useTimeStampsFlags )
+                                {
+                                    sl_descr.i_startDecodingTimeStamp   = 0;    // FIXME FIXME
+                                    sl_descr.i_startCompositionTimeStamp= 0;    // FIXME FIXME
+                                }
+                            }
+                            break;
+                        default:
+                            fprintf( stderr, "\n* ERR unsupported SLConfigDescr predefined" );
+                            es_descr.b_ok = 0;
+                            break;
+                    }
+                }
+                break;
+#undef  sl_descr
+#undef  es_descr
+            default:
+                fprintf( stderr, "\n* - OD tag:0x%x length:%d (Unsupported)", i_tag, i_length );
+                break;
+        }
+
+        p_data = p_data_sav + i_length;
+        i_data = i_data_sav - i_length;
+        i_es_index++;
+    }
+
+
+    fprintf( stderr, "\n*****************************\n" );
+}
+
+static void MP4_IODClean( iod_descriptor_t *p_iod )
+{
+    int i;
+
+    if( p_iod->psz_url )
+    {
+        free( p_iod->psz_url );
+        p_iod->psz_url = NULL;
+        return;
+    }
+
+    for( i = 0; i < 255; i++ )
+    {
+#define es_descr p_iod->es_descr[i]
+        if( es_descr.b_ok )
+        {
+            if( es_descr.psz_url )
+            {
+                free( es_descr.psz_url );
+                es_descr.psz_url = NULL;
+            }
+            else
+            {
+                if( es_descr.dec_descr.p_decoder_specific_info != NULL )
+                {
+                    free( es_descr.dec_descr.p_decoder_specific_info );
+                    es_descr.dec_descr.p_decoder_specific_info = NULL;
+                    es_descr.dec_descr.i_decoder_specific_info_len = 0;
+                }
+            }
+        }
+        es_descr.b_ok = 0;
+#undef  es_descr
+    }
+}
 
 /*****************************************************************************
  * HandlePAT: will treat a PAT returned by dvbpsi
@@ -806,6 +1148,14 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
         /* Delete all programs */
         while( p_input->stream.i_pgrm_number )
         {
+            pgrm_ts_data_t *p_pgrm_demux_old =
+                (pgrm_ts_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
+
+            if( p_pgrm_demux_old->b_mpeg4 )
+            {
+                MP4_IODClean( &p_pgrm_demux_old->iod );
+            }
+
             input_DelProgram( p_input, p_input->stream.pp_programs[0] );
         }
 
@@ -864,6 +1214,7 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
+
 /*****************************************************************************
  * HandlePMT: will treat a PMT returned by dvbpsi
  *****************************************************************************/
@@ -892,6 +1243,16 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
     if( !p_new_pmt->b_current_next ||
             p_pgrm_demux->i_pmt_version == PMT_UNINITIALIZED )
     {
+        dvbpsi_descriptor_t *p_dr = p_new_pmt->p_first_descriptor;
+        /* IOD */
+        while( p_dr && ( p_dr->i_tag != 0x1d ) )
+            p_dr = p_dr->p_next;
+        if( p_dr)
+        {
+            msg_Warn( p_input, "found IOD descriptor" );
+            MP4_IODParse( &p_pgrm_demux->iod, p_dr->i_length, p_dr->p_data );
+        }
+
         p_es = p_new_pmt->p_first_es;
         while( p_es )
         {
@@ -904,7 +1265,6 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                 p_input->b_error = 1;
                 return;
             }
-
             switch( p_es->i_type )
             {
                 case MPEG1_VIDEO_ES:
@@ -964,15 +1324,172 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     p_new_es->i_cat = AUDIO_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
-
-                case 0xfa:
+                case MPEG4_VIDEO_ES:
                     p_new_es->i_fourcc = VLC_FOURCC('m','p','4','v');
                     p_new_es->i_cat = VIDEO_ES;
+                    p_new_es->i_stream_id = 0xfa;
+                    break;
+                case MPEG4_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('m','p','4','a');
+                    p_new_es->i_cat = AUDIO_ES;
+                    p_new_es->i_stream_id = 0xfa;
                     break;
 
                 default:
                     p_new_es->i_fourcc = 0;
                     p_new_es->i_cat = UNKNOWN_ES;
+            }
+
+            if( p_es->i_type == MPEG4_VIDEO_ES || p_es->i_type == MPEG4_AUDIO_ES )
+            {
+                /* mpeg4 stream, search sl_descriptor */
+                dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;
+                es_ts_data_t        *p_es_demux =
+                                        (es_ts_data_t*)p_new_es->p_demux_data;
+
+                while( p_dr && ( p_dr->i_tag != 0x1f ) )
+                    p_dr = p_dr->p_next;
+                if( p_dr && p_dr->i_length == 2 )
+                {
+                    int i_es_descr_index;
+
+                    p_es_demux->i_es_id =
+                        ( p_dr->p_data[0] << 8 ) | p_dr->p_data[1];
+                    p_es_demux->p_es_descr = NULL;
+
+                    msg_Warn( p_input, "found SL_descriptor" );
+                    for( i_es_descr_index = 0; i_es_descr_index < 255; i_es_descr_index++ )
+                    {
+                        if( p_pgrm_demux->iod.es_descr[i_es_descr_index].b_ok &&
+                            p_pgrm_demux->iod.es_descr[i_es_descr_index].i_es_id == p_es_demux->i_es_id )
+                        {
+                            p_es_demux->p_es_descr = &p_pgrm_demux->iod.es_descr[i_es_descr_index];
+                            break;
+                        }
+                    }
+                }
+                if( p_es_demux->p_es_descr != NULL )
+                {
+                    vlc_fourcc_t i_fourcc;
+                    int          i_cat;
+                    p_es_demux->b_mpeg4 = 1;
+
+                    /* fix fourcc */
+                    switch( p_es_demux->p_es_descr->dec_descr.i_streamType )
+                    {
+                        case 0x04:  /* VisualStream */
+                            i_cat = VIDEO_ES;
+                            switch( p_es_demux->p_es_descr->dec_descr.i_objectTypeIndication )
+                            {
+                                case 0x20:
+                                    i_fourcc = VLC_FOURCC('m','p','4','v');     // mpeg4
+                                    break;
+                                case 0x60:
+                                case 0x61:
+                                case 0x62:
+                                case 0x63:
+                                case 0x64:
+                                case 0x65:
+                                    i_fourcc = VLC_FOURCC( 'm','p','g','v' );   // mpeg2
+                                    break;
+                                case 0x6a:
+                                    i_fourcc = VLC_FOURCC( 'm','p','g','v' );   // mpeg1
+                                    break;
+                                case 0x6c:
+                                    i_fourcc = VLC_FOURCC( 'j','p','e','g' );   // mpeg1
+                                    break;
+                                default:
+                                    i_fourcc = 0;
+                                    break;
+                            }
+                            break;
+                        case 0x05:  /* AudioStream */
+                            i_cat = AUDIO_ES;
+                            switch( p_es_demux->p_es_descr->dec_descr.i_objectTypeIndication )
+                            {
+                                case 0x40:
+                                    i_fourcc = VLC_FOURCC('m','p','4','a');     // mpeg4
+                                    break;
+                                case 0x66:
+                                case 0x67:
+                                case 0x68:
+                                    i_fourcc = VLC_FOURCC('m','p','4','a');     // mpeg2 aac
+                                    break;
+                                case 0x69:
+                                    i_fourcc = VLC_FOURCC('m','p','g','a');     // mpeg2
+                                    break;
+                                case 0x6b:
+                                    i_fourcc = VLC_FOURCC('m','p','g','a');     // mpeg1
+                                    break;
+                                default:
+                                    i_fourcc = 0;
+                                    break;
+                            }
+                            break;
+                        default:
+                            i_cat = UNKNOWN_ES;
+                            i_fourcc = 0;
+                            break;
+                    }
+
+                    p_new_es->i_fourcc = i_fourcc;
+                    p_new_es->i_cat    = i_cat;
+                    switch( i_cat )
+                    {
+                        case VIDEO_ES:
+                            {
+                                int i_size;
+                                BITMAPINFOHEADER *p_bih;
+
+                                i_size = sizeof( BITMAPINFOHEADER ) +
+                                                 p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len;
+                                p_new_es->p_bitmapinfoheader = (void*)p_bih = malloc( i_size );
+                                p_bih->biSize = i_size;
+                                p_bih->biWidth = 0;
+                                p_bih->biHeight = 0;
+                                p_bih->biPlanes = 1;
+                                p_bih->biBitCount = 0;
+                                p_bih->biCompression = 0;
+                                p_bih->biSizeImage = 0;
+                                p_bih->biXPelsPerMeter = 0;
+                                p_bih->biYPelsPerMeter = 0;
+                                p_bih->biClrUsed = 0;
+                                p_bih->biClrImportant = 0;
+                                memcpy( &p_bih[1],
+                                        p_es_demux->p_es_descr->dec_descr.p_decoder_specific_info,
+                                        p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len );
+                            }
+                            break;
+                        case AUDIO_ES:
+                            {
+                                int i_size;
+                                WAVEFORMATEX *p_wf;
+
+                                i_size = sizeof( WAVEFORMATEX ) +
+                                                 p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len;
+                                p_new_es->p_waveformatex = (void*)p_wf = malloc( i_size );
+                                p_wf->wFormatTag = 0xffff;
+                                p_wf->nChannels = 0;
+                                p_wf->nSamplesPerSec = 0;
+                                p_wf->nAvgBytesPerSec = 0;
+                                p_wf->nBlockAlign = 1;
+                                p_wf->wBitsPerSample = 0;
+                                p_wf->cbSize = p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len;
+                                memcpy( &p_wf[1],
+                                        p_es_demux->p_es_descr->dec_descr.p_decoder_specific_info,
+                                        p_es_demux->p_es_descr->dec_descr.i_decoder_specific_info_len );
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    msg_Warn( p_input, "mpeg4 stream without (valid) sl_descriptor" );
+                    p_es_demux->b_mpeg4 = 0;
+                }
+
             }
 
             if(    ( p_new_es->i_cat == AUDIO_ES )
@@ -1019,6 +1536,9 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     case A52DVB_AUDIO_ES:
                     case A52B_AUDIO_ES:
                         strcat( p_new_es->psz_desc, " (A52)" );
+                        break;
+                    case MPEG4_AUDIO_ES:
+                        strcat( p_new_es->psz_desc, " (aac)" );
                         break;
                 }
             }

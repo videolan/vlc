@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.3 2002/10/20 12:23:48 massiot Exp $
+ * $Id: system.h,v 1.4 2003/01/08 16:40:29 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,6 +47,10 @@
 #define MPEG1_AUDIO_ES      0x03
 #define MPEG2_AUDIO_ES      0x04
 #define A52DVB_AUDIO_ES     0x06
+
+#define MPEG4_VIDEO_ES      0x10
+#define MPEG4_AUDIO_ES      0x11
+
 #define A52_AUDIO_ES        0x81
 /* These ones might violate the usage : */
 #define DVD_SPU_ES          0x82
@@ -125,6 +129,97 @@ typedef struct psi_section_t
 } psi_section_t;
 
 /*****************************************************************************
+ * decoder_descriptor_t
+ *****************************************************************************/
+typedef struct decoder_config_descriptor_s
+{
+    uint8_t                 i_objectTypeIndication;
+    uint8_t                 i_streamType;
+    vlc_bool_t              b_upStream;
+    uint32_t                i_bufferSizeDB;
+    uint32_t                i_maxBitrate;
+    uint32_t                i_avgBitrate;
+
+    int                     i_decoder_specific_info_len;
+    uint8_t                 *p_decoder_specific_info;
+
+} decoder_config_descriptor_t;
+
+/*****************************************************************************
+ * sl_descriptor_t:
+ *****************************************************************************/
+typedef struct sl_config_descriptor_s
+{
+    vlc_bool_t              b_useAccessUnitStartFlag;
+    vlc_bool_t              b_useAccessUnitEndFlag;
+    vlc_bool_t              b_useRandomAccessPointFlag;
+    vlc_bool_t              b_useRandomAccessUnitsOnlyFlag;
+    vlc_bool_t              b_usePaddingFlag;
+    vlc_bool_t              b_useTimeStampsFlags;
+    vlc_bool_t              b_useIdleFlag;
+    vlc_bool_t              b_durationFlag;
+    uint32_t                i_timeStampResolution;
+    uint32_t                i_OCRResolution;
+    uint8_t                 i_timeStampLength;
+    uint8_t                 i_OCRLength;
+    uint8_t                 i_AU_Length;
+    uint8_t                 i_instantBitrateLength;
+    uint8_t                 i_degradationPriorityLength;
+    uint8_t                 i_AU_seqNumLength;
+    uint8_t                 i_packetSeqNumLength;
+
+    uint32_t                i_timeScale;
+    uint16_t                i_accessUnitDuration;
+    uint16_t                i_compositionUnitDuration;
+
+    uint64_t                i_startDecodingTimeStamp;
+    uint64_t                i_startCompositionTimeStamp;
+
+} sl_config_descriptor_t;
+
+/*****************************************************************************
+ * es_mpeg4_descriptor_t: XXX it's not complete but should be enough
+ *****************************************************************************/
+typedef struct es_mpeg4_descriptor_s
+{
+    vlc_bool_t              b_ok;
+    uint16_t                i_es_id;
+
+    vlc_bool_t              b_streamDependenceFlag;
+    vlc_bool_t              b_OCRStreamFlag;
+    uint8_t                 i_streamPriority;
+
+    char                    *psz_url;
+
+    uint16_t                i_dependOn_es_id;
+    uint16_t                i_OCR_es_id;
+
+    decoder_config_descriptor_t    dec_descr;
+    sl_config_descriptor_t         sl_descr;
+} es_mpeg4_descriptor_t;
+
+/*****************************************************************************
+ * iod_descriptor_t: XXX it's not complete but should be enough
+ *****************************************************************************/
+typedef struct iod_descriptor_s
+{
+    uint8_t                i_iod_label;
+
+    /* IOD */
+    uint16_t                i_od_id;
+    char                    *psz_url;
+
+    uint8_t                 i_ODProfileLevelIndication;
+    uint8_t                 i_sceneProfileLevelIndication;
+    uint8_t                 i_audioProfileLevelIndication;
+    uint8_t                 i_visualProfileLevelIndication;
+    uint8_t                 i_graphicsProfileLevelIndication;
+
+    es_mpeg4_descriptor_t   es_descr[255];
+
+} iod_descriptor_t;
+
+/*****************************************************************************
  * es_ts_data_t: extension of es_descriptor_t
  *****************************************************************************/
 typedef struct es_ts_data_t
@@ -133,11 +228,18 @@ typedef struct es_ts_data_t
                                       *                    the PSI decoder ? */
 
     int                     i_psi_type;  /* There are different types of PSI */
-    
+
     psi_section_t *         p_psi_section;                    /* PSI packets */
 
     /* Markers */
     int                     i_continuity_counter;
+
+    /* mpeg4 in TS data specific */
+    int                     b_mpeg4;
+    uint16_t                i_es_id;
+
+    es_mpeg4_descriptor_t   *p_es_descr;   /* es_descr of IOD */
+
 } es_ts_data_t;
 
 /*****************************************************************************
@@ -149,6 +251,11 @@ typedef struct pgrm_ts_data_t
     int                     i_pmt_version;
     /* libdvbpsi pmt decoder handle */
     void *                  p_pmt_handle;
+
+    /* mpeg4 in TS data specific */
+    vlc_bool_t              b_mpeg4;
+    iod_descriptor_t        iod;
+
 } pgrm_ts_data_t;
 
 /*****************************************************************************
