@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.7 2000/12/20 16:04:31 massiot Exp $
+ * $Id: input_ps.c,v 1.8 2000/12/20 18:45:43 massiot Exp $
  *
  * Authors: 
  *
@@ -126,6 +126,12 @@ static void PSInit( input_thread_t * p_input )
             {
                 /* FIXME: use i_p_config_t */
                 input_ParsePS( p_input, pp_packets[i] );
+            }
+
+            /* File too big. */
+            if( p_input->stream.i_tell > INPUT_PREPARSE_LENGTH )
+            {
+                break;
             }
         }
         fseek( p_method->stream, 0, SEEK_SET );
