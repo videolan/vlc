@@ -334,7 +334,71 @@ that there will not be covered below. But the below is a start.
 This gives higher-level troubleshooting. More detailed and
 lower-level information is given in the next section DEBUGGING. 
 
-1. Do you even have the plugin loaded? 
+Problem: something doesn't work. Start at step -1.
+
+Problem: The program gets a SEGFAULT or gives core dump. Start at step
+0.
+
+Problem: I don't get anything playing. I can't even get information 
+listed in "Media and Stream Information" or the playlist.
+Determination: start at step 1.
+
+Problem: Okay, I something plays menu now. But I don't see information
+about the CD in the playlist.
+Determination: start at step 5.
+
+
+-1. (Something doesn't work.)
+
+   A lot of what is put here really is applicable to reporting
+   problems and troubleshooting in vlc and the concepts really
+   apply to any sort of bug reporting. 
+
+   When reporting a problem it's helpful to have facts:
+
+     a) the version of vlc) you are using
+
+     b) the OS you are running on 
+
+     c) the version of libcdio and/or libcddb you are using 
+        versions of libcdio and libcddb can be obtained by running 
+          pkg-config --modversion libcdio
+          pkg-config --modversion libcddb
+     d) what you input or requested (e.g. the full command line entered -
+        if it is possible to reproduce the problem by giving a
+        commandline that is desirable since it is probably the simplest
+        way to convey exactly what was requested)
+   
+        People often give (some part) of an error message neglecting
+        to also include what was requested or entered that led to the
+        output.
+  
+  
+     e) Exactly the messages that were what given. You can turn
+        increase the verbosity level by setting "verbosity=2" in the
+        vlc preferences files. On Unix the preferences file is
+        generally in ~/vlc/.vlcrc but there are GUI ways to set this
+        too. Give everything that is in the message log.
+
+0. (The program gets a SEGFAULT or gives core dump.)
+
+   Get and send a stack trace. 
+
+   In addition to -1. Make sure the program has been compiled with
+   debugging symbols put into the code. This is usually done by having
+   the "-g" flag set when compiling the program.
+
+   You can get a strack trace the GNU debugger using the "where"
+   command. For example on this might work:
+
+     gdb vlc *name-of-corefile*
+     where
+
+
+1. (I don't get anything playing. I can't even get information 
+    listed in "Media and Stream Information" or the playlist)
+
+   Do you even have the plugin loaded? 
 
    When you run the vlc GUI, under Settings/Preferences you should see
    a "plugins" expandable list and under that another "access" list do
@@ -475,4 +539,4 @@ http://www.vcdhelp.com/
 http://www.vcdimager.org/
 http://www.vcdimager.org/guides/#guides
 
-$Id: intf-vcd.txt,v 1.3 2004/01/25 14:18:40 rocky Exp $
+$Id: intf-vcd.txt,v 1.4 2004/02/11 12:26:38 rocky Exp $

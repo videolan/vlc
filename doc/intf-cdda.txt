@@ -1,6 +1,6 @@
 This file documents the ``Extended'' VLC CD-DA Plugin
 
-Copyright (C) 2003 Rocky Bernstein (rocky@panix.com)
+Copyright (C) 2003, 2004 Rocky Bernstein (rocky@panix.com)
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -261,6 +261,11 @@ Troubleshooting Guide
 This gives higher-level troubleshooting. More detailed and
 lower-level information is given in the next section DEBUGGING. 
 
+Problem: something doesn't work. Start at step -1.
+
+Problem: The program gets a SEGFAULT or gives core dump. Start at step
+0.
+
 Problem: I don't get anything playing. I can't even get a playlist of
 the CD.
 Determination: start at step 1.
@@ -269,7 +274,57 @@ Problem: Okay, I something plays menu now. But I don't see information
 about the CD in the playlist.
 Determination: start at step 5.
 
-1. Do you even have the plugin loaded? 
+-1. (Something doesn't work.)
+
+   A lot of what is put here really is applicable to reporting
+   problems and troubleshooting in vlc and the concepts really
+   apply to any sort of bug reporting. 
+
+   When reporting a problem it's helpful to have facts:
+
+     a) the version of vlc) you are using
+
+     b) the OS you are running on 
+
+     c) the version of libcdio and/or libcddb you are using 
+        versions of libcdio and libcddb can be obtained by running 
+          pkg-config --modversion libcdio
+          pkg-config --modversion libcddb
+     d) what you input or requested (e.g. the full command line entered -
+        if it is possible to reproduce the problem by giving a
+        commandline that is desirable since it is probably the simplest
+        way to convey exactly what was requested)
+   
+        People often give (some part) of an error message neglecting
+        to also include what was requested or entered that led to the
+        output.
+  
+  
+     e) Exactly the messages that were what given. You can turn
+        increase the verbosity level by setting "verbosity=2" in the
+        vlc preferences files. On Unix the preferences file is
+        generally in ~/vlc/.vlcrc but there are GUI ways to set this
+        too. Give everything that is in the message log.
+
+0. (The program gets a SEGFAULT or gives core dump.)
+
+   Get and send a stack trace. 
+
+   In addition to -1. Make sure the program has been compiled with
+   debugging symbols put into the code. This is usually done by having
+   the "-g" flag set when compiling the program.
+
+   You can get a strack trace the GNU debugger using the "where"
+   command. For example on this might work:
+
+     gdb vlc *name-of-corefile*
+     where
+
+
+1. (I don't get anything playing. I can't even get a playlist of
+    the CD.)
+
+   Do you even have the plugin loaded? 
 
    When you run the vlc GUI, under Settings/Preferences you should see
    a "plugins" expandable list and under that another "access" list do
@@ -304,7 +359,7 @@ Determination: start at step 5.
   
    There may also be a message may under "setup/logs".
 
-2. (There plugin was loaded and preferences found).  In the "cddax" tab
+2. (There plugin was loaded and preferences found.)  In the "cddax" tab
    of preference. An important selection is "cddax-device."  If this is
    set to the empty string, CDDAX will try to scan your drives for a
    suitable device if the driver has the capability to scan for
@@ -316,7 +371,7 @@ Determination: start at step 5.
    rather than /dev/cdrom.
 
 3. (CD-DA Setup devices seems correct and there is a CD in the
-   drive).  Bring up the playlist. If you specified only a drive and
+   drive.)  Bring up the playlist. If you specified only a drive and
    no track, you should see in the playlist a list of tracks on the CD.
    
    a. If not something's wrong like step 2. Another tack may be to try
@@ -388,4 +443,4 @@ analyze the contents of a CD.
 The tool cd-read from libcdio can be used to show the sectors of 
 the CD or CD image or extract sectors. 
 
-$Id: intf-cdda.txt,v 1.4 2003/12/18 12:35:26 rocky Exp $
+$Id: intf-cdda.txt,v 1.5 2004/02/11 12:23:07 rocky Exp $
