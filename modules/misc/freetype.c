@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.6 2003/07/20 21:41:13 hartman Exp $
+ * $Id: freetype.c,v 1.7 2003/07/20 23:05:24 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -54,7 +54,8 @@ static void RenderI420( vout_thread_t *, picture_t *,
                         const subpicture_t * );
 static int  AddText   ( vout_thread_t *, byte_t *, text_style_t *, int,
                         int, int, mtime_t, mtime_t );
-static int GetUnicodeCharFromUTF8( byte_t ** );
+static int  GetUnicodeCharFromUTF8( byte_t ** );
+static void FreeString( subpicture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -75,9 +76,8 @@ vlc_module_begin();
 vlc_module_end();
 
 /**
- Describes a string to be displayed on the video, or a linked list of
- such
-*/
+ * Private data in a aubpicture. Describes a string.
+ */
 struct subpicture_sys_t
 {
     int            i_x_margin;
@@ -94,10 +94,10 @@ struct subpicture_sys_t
 };
 
 /*****************************************************************************
- * vout_sys_t: osd_text local data
+ * text_remderer_sys_t: freetype local data
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
- * It describes the osd-text specific properties of an output thread.
+ * It describes the freetype specific properties of an output thread.
  *****************************************************************************/
 struct text_renderer_sys_t
 {
@@ -107,9 +107,6 @@ struct text_renderer_sys_t
     vlc_bool_t     i_use_kerning;
     uint8_t        pi_gamma[256];
 };
-/* more prototypes */
-//static void ComputeBoundingBox( subpicture_sys_t * );
-static void FreeString( subpicture_t * );
 
 /*****************************************************************************
  * Create: allocates osd-text video thread output method
@@ -135,7 +132,6 @@ static int Create( vlc_object_t *p_this )
     for (i = 0; i < 256; i++) {
         p_vout->p_text_renderer_data->pi_gamma[i] =
             (uint8_t)( pow( (double)i / 255.0f, gamma_inv) * 255.0f );
-        //msg_Dbg( p_vout, "%d", p_vout->p_text_renderer_data->pi_gamma[i]);
     }
 
     /* Look what method was requested */
@@ -243,6 +239,9 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
+/**
+ * Draw a string on a i420 (or similar) picture
+ */
 static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     const subpicture_t *p_subpic )
 {
@@ -289,8 +288,6 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
                         {
-                            // pixel = alpha;
-                            // pixel = (pixel^alpha)^pixel;
                             pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 ) +
                                 ( 255 * alpha >> 8 );
 #undef alpha
@@ -332,8 +329,6 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x+=2 )
                         {
-                            // pixel = alpha;
-                            // pixel = (pixel^alpha)^pixel;
                             pixel = ( ( pixel * ( 0xFF - alpha ) ) >> 8 ) +
                                 ( 0x80 * alpha >> 8 );
 #undef alpha
