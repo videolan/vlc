@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.10 2003/04/28 00:18:27 ipkiss Exp $
+ * $Id: win32_run.cpp,v 1.11 2003/04/28 22:44:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -65,7 +65,19 @@ public:
     Instance( intf_thread_t *_p_intf );
 
     bool OnInit();
+    int  OnExit();
     OpenDialog *open;
+
+private:
+    intf_thread_t *p_intf;
+};
+
+class ExitTimer: public wxTimer
+{
+public:
+    ExitTimer( intf_thread_t *_p_intf );
+
+    void Notify();
 
 private:
     intf_thread_t *p_intf;
@@ -90,17 +102,56 @@ IMPLEMENT_APP_NO_MAIN(Instance)
 bool Instance::OnInit()
 {
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
+
+    // Create all the dialog boxes
     p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
     p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
     p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
     p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
     p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
 
+    // Start a timer checking if we must exit the main loop
+    p_intf->p_sys->b_wx_die = 0;
+    p_intf->p_sys->p_kludgy_timer = new ExitTimer( p_intf );
+    p_intf->p_sys->p_kludgy_timer->Start( 100 );
+
+    // OK, initialization is over, now the other thread can go on working...
     vlc_mutex_lock( &p_intf->p_sys->init_lock );
     vlc_cond_signal( &p_intf->p_sys->init_cond );
     vlc_mutex_unlock( &p_intf->p_sys->init_lock );
 
     return TRUE;
+}
+
+int Instance::OnExit()
+{
+    // Delete evertything
+    delete p_intf->p_sys->p_kludgy_timer;
+    delete p_intf->p_sys->InfoDlg;
+    delete p_intf->p_sys->PrefsDlg;
+    delete p_intf->p_sys->SoutDlg;
+    delete p_intf->p_sys->MessagesDlg;
+    delete p_intf->p_sys->OpenDlg;
+    delete p_intf->p_sys->p_icon;
+
+    return 0;
+}
+
+
+//---------------------------------------------------------------------------
+// Implementation of ExitTimer class
+// This timer is only there to call wxApp::ExitMainLoop() from the wxWindows
+// thread (otherwise we never exit from the wxEntry call).
+//---------------------------------------------------------------------------
+ExitTimer::ExitTimer( intf_thread_t *_p_intf ) : wxTimer()
+{
+    p_intf = _p_intf;
+}
+
+void ExitTimer::Notify()
+{
+    if( p_intf->p_sys->b_wx_die )
+        wxTheApp->ExitMainLoop();
 }
 
 
@@ -171,9 +222,9 @@ void OSRun( intf_thread_t *p_intf )
         // Don't even enter the main loop
         return;
     }
-//    vlc_mutex_lock( &p_intf->p_sys->init_lock );
-//    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
-//    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
 
      // Create refresh timer
     SetTimer( ((OSTheme *)p_intf->p_sys->p_theme)->GetParentWindow(), 42, 200,
@@ -287,6 +338,9 @@ void OSRun( intf_thread_t *p_intf )
         // Check if vlc is closing
         Proc->IsClosing();
     }
+
+    // Tell wxWindows it's time to exit
+    p_intf->p_sys->b_wx_die = 1;
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.6 2003/04/28 14:12:33 asmax Exp $
+ * $Id: skin_common.h,v 1.7 2003/04/28 22:44:26 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -38,6 +38,9 @@ class Messages;
 class SoutDialog;
 class PrefsDialog;
 class FileInfo;
+#ifdef WIN32
+    class ExitTimer;
+#endif
 
 #ifdef X11_SKINS
 #include <X11/Xlib.h>
@@ -84,6 +87,11 @@ struct intf_sys_t
 
 #ifdef X11_SKINS
     Display *display;
+#endif
+
+#ifdef WIN32
+    bool b_wx_die;
+    ExitTimer *p_kludgy_timer;
 #endif
 
 };
