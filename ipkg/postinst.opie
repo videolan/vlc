@@ -1,0 +1,3 @@
+#!/bin/sh
+ln -s /usr/share/vlc /opt/QtPalmtop/pics/vlc
+exit 0

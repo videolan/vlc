@@ -47,7 +47,7 @@ Urgency: Wishlist
 Description: Share stream information between vlc and vls
  vls should send misc TS packets to let us know what the stream PID
  contain, such as the language, or the subtitle palette.
-Status: Todo
+Status: Done (collective work)
 
 Task: 0x59
 Difficulty: Hard
@@ -137,7 +137,7 @@ Description: Fix all known DVD playback issues
  A few DVDs are still reported not to work at all. Try to find what is
  causing this, have a more robust DVD input, and list all discs reported
  to work flawlessly to prevent bug regression.
-Status: Todo
+Status: Done (collective work)
 
 Task: 0x4e
 Difficulty: Hard
@@ -169,7 +169,7 @@ Urgency: Normal
 Description: Write AVI input plugin
  .avi files can use MPEG codec, if this is the case it shouldn't be
  hard to read those files -> Meuuh
-Status: Todo
+Status: Done 23 Apr 2002 (fenrir)
 
 Task: 0x4a
 Difficulty: Medium
@@ -459,7 +459,7 @@ Difficulty: Hard
 Urgency: Wishlist
 Description: MP3 support
  The vlc cannot play MPEG1/2 layer 3 yet. It might be nice to fix that.
-Status: Todo
+Status: Done 10 May 2002 (fenrir)
 
 Task: 0x25
 Difficulty: Hard

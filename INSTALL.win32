@@ -16,8 +16,6 @@ disable the GUI. You will end-up with a vlc.log file in your current directory.
 If you want to play a DVD, run vlc and click on the Disc option in the
 interface. You then have to type your drive letter in the 'Device name'
 box (eg. 'D' if this is the letter for your dvdrom drive).
-( !WARNING: you have to be in administrator mode (for now) on Win2k/XP or the
-  DVD won't play. )
 
 Building VideoLAN Client from the source code
 =============================================
