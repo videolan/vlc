@@ -1,28 +1,41 @@
 /*****************************************************************************
  * vpar_headers.c : headers parsing
- * (c)1999 VideoLAN
+ *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/uio.h>
+#include <stdlib.h>                                                /* free() */
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/uio.h>                                            /* "input.h" */
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 
 #include "intf_msg.h"
-#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
-#include "input_netlist.h"
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
@@ -218,7 +231,7 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
         /* Allocate a piece of memory to load the matrix. */
         if( (p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) )) == NULL )
         {
-            intf_ErrMsg("vpar error: allocation error in LoadMatrix()\n");
+            intf_ErrMsg( "vpar error: allocation error in LoadMatrix()\n" );
             p_vpar->b_error = 1;
             return;
         }
@@ -762,7 +775,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* Try to find an optimized function. */
         if( ppf_picture_data[p_vpar->picture.i_structure][p_vpar->picture.i_coding_type] == NULL )
         {
-            fprintf( stderr, "vpar error: bad ppf_picture_data function pointer (struct:%d, coding type:%d)\n",
+            intf_ErrMsg( "vpar error: bad ppf_picture_data function pointer (struct:%d, coding type:%d)\n",
                      p_vpar->picture.i_structure, p_vpar->picture.i_coding_type );
         }
         else

@@ -1,7 +1,5 @@
 /*****************************************************************************
  * intf_ctrl.c: interface commands access to control functions
- * (c)1999 VideoLAN
- *****************************************************************************
  * Library of functions common to all interfaces, allowing access to various
  * structures and settings. Interfaces should only use those functions
  * to read or write informations from other threads.
@@ -19,24 +17,43 @@
  * error codes defined in command.h. Custom error codes are allowed, but should
  * be positive.
  * More informations about parameters stand in `list of commands' section.
+ *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/uio.h>
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/stat.h>                        /* on BSD, fstat() needs stat.h */
+#include <sys/uio.h>                                            /* "input.h" */
+#include <stdio.h>                                              /* fprintf() */
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <unistd.h>                                       /* close(), read() */
+#include <fcntl.h>                                                 /* open() */
 
 /* Common headers */
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 #include "debug.h"
 #include "intf_msg.h"
 

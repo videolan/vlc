@@ -1,29 +1,47 @@
 /*****************************************************************************
  * intf_msg.c: messages interface
- * (c)1998 VideoLAN
- *****************************************************************************
  * This library provides basic functions for threads to interact with user
  * interface, such as message output. See config.h for output configuration.
+ *****************************************************************************
+ * Copyright (C) 1998, 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include <errno.h>                                                  /* errno */
+#include <fcntl.h>                     /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */
+#include <stdio.h>                                               /* required */
+#include <stdarg.h>                                       /* va_list for BSD */
+#include <stdlib.h>                                              /* malloc() */
+#include <string.h>                                            /* strerror() */
+#include <unistd.h>                                      /* close(), write() */
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 #include "intf_msg.h"
 #include "interface.h"
 #include "intf_console.h"
+
 #include "main.h"
 
 /*****************************************************************************
@@ -127,9 +145,14 @@ p_intf_msg_t intf_MsgCreate( void )
         /* Log file initialization - on failure, file pointer will be null,
          * and no log will be issued, but this is not considered as an
          * error */
-        p_msg->i_log_file = open( DEBUG_LOG,
-                                  O_CREAT | O_TRUNC | O_SYNC | O_WRONLY,
-                                  0666 );
+        p_msg->i_log_file = open( DEBUG_LOG, O_CREAT | O_TRUNC |
+#ifndef SYS_BSD
+                                  O_SYNC |
+#else
+                                  O_ASYNC |
+#endif /* SYS_BSD */
+                                  O_WRONLY, 0666 );
+
 #endif
     }
     return( p_msg );

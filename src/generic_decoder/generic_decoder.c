@@ -1,7 +1,5 @@
 /*****************************************************************************
  * generic_decoder.c : generic decoder thread
- * (c)1999 VideoLAN
- *****************************************************************************
  * This decoder provides a way to parse packets which do not belong to any
  * known stream type, or to redirect packets to files. It can extract PES files
  * from a multiplexed stream, identify automatically ES in a stream missing
@@ -10,40 +8,54 @@
  * mode.
  * A single generic decoder is able to handle several ES, therefore it can be
  * used as a 'default' decoder by the input thread.
+ *****************************************************************************
+ * Copyright (C) 1998, 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include "vlc.h"
-
-/*#include <errno.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "vlc_thread.h"
-#include "thread.h"
+#include "threads.h"
+#include "threads.h"
 
 #include "intf_msg.h"
-#include "debug.h"   */
-/*
+#include "debug.h"
+
 #include "input.h"
 #include "input_netlist.h"
 #include "decoder_fifo.h"
 
 #include "generic_decoder.h"
-
-#include "video.h"
-#include "video_output.h"
-#include "video_decoder.h"*/
 
 /*
  * Local prototypes

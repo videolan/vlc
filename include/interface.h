@@ -1,10 +1,29 @@
 /*****************************************************************************
  * interface.h: interface access for other threads
- * (c)1999 VideoLAN
- *****************************************************************************
  * This library provides basic functions for threads to interact with user
  * interface, such as message output.
  *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
  * Required headers:
  *  <sys/uio.h>
  *  <X11/Xlib.h>
@@ -12,7 +31,7 @@
  *  "config.h"
  *  "common.h"
  *  "mtime.h"
- *  "vlc_thread.h"
+ *  "threads.h"
  *  "input.h"
  *  "video.h"
  *  "video_output.h"

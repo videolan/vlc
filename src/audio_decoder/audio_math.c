@@ -1,35 +1,47 @@
 /*****************************************************************************
  * audio_math.c: Inverse Discrete Cosine Transform and Pulse Code Modulation
- * (c)1999 VideoLAN
+ *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <unistd.h>
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>                                           /* ntohl() */
-#include <sys/uio.h>
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/uio.h>                                            /* "input.h" */
 
 #include "config.h"
 #include "common.h"
-#include "mtime.h"
-#include "vlc_thread.h"
-#include "debug.h"
+#include "mtime.h"                                                /* mtime_t */
+#include "threads.h"
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
-#include "input.h"
-#include "input_netlist.h"
-#include "decoder_fifo.h"
+#include "input.h"                      /* pes_packet_t (for decoder_fifo.h) */
+#include "decoder_fifo.h"            /* decoder_fifo_t (for audio_decoder.h) */
 
-#include "audio_output.h"
+#include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
 
-#include "audio_constants.h"
-#include "audio_decoder.h"
-#include "audio_math.h"
+#include "audio_decoder.h"                                    /* adec_bank_t */
 
 /*****************************************************************************
  * DCT32: Fast 32 points Discrete Cosine Transform

@@ -1,16 +1,34 @@
 /*****************************************************************************
  * input.c: input thread
- * (c)1998 VideoLAN
- *****************************************************************************
  * Read an MPEG2 stream, demultiplex and parse it before sending it to
  * decoders.
+ *****************************************************************************
+ * Copyright (C) 1998, 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include <errno.h>                                                  /* errno */
-#include <sys/uio.h>                                             /* required */
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/uio.h>                                            /* "input.h" */
 #include <string.h>                                            /* strerror() */
 
 #include <stdlib.h>                                                /* free() */
@@ -19,7 +37,7 @@
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 #include "intf_msg.h"
 #include "debug.h"
 
@@ -32,7 +50,11 @@
 #include "input_network.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
+
 #include "audio_decoder.h"                                  /* adec_thread_t */
+
+#include "ac3_decoder.h"              /* ac3dec_t (for ac3_decoder_thread.h) */
+#include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
 
 #include "video.h"                          /* picture_t (for video_output.h) */
 #include "video_output.h"                                   /* vout_thread_t */
@@ -43,9 +65,6 @@
 #include "vpar_headers.h"                 /* sequence_t (for video_parser.h) */
 #include "vpar_synchro.h"            /* video_synchro_t (for video_parser.h) */
 #include "video_parser.h"                                   /* vpar_thread_t */
-
-#include "ac3_decoder.h"              /* ac3dec_t (for ac3_decoder_thread.h) */
-#include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
 
 #include "spu_decoder.h"                                  /* spudec_thread_t */
 

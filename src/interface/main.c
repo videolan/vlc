@@ -1,29 +1,50 @@
 /*****************************************************************************
  * main.c: main vlc source
- * (c)1998 VideoLAN
- *****************************************************************************
  * Includes the main() function for vlc. Parses command line, start interface
  * and spawn threads.
+ *****************************************************************************
+ * Copyright (C) 1998, 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
-#include <getopt.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <getopt.h>                                              /* getopt() */
+#include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
+#include <stdio.h>                                              /* sprintf() */
+
+#include <errno.h>                                                 /* ENOMEM */
+#include <stdlib.h>                                  /* getenv(), strtol(),  */
+#include <string.h>                                            /* strerror() */
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 #include "input_vlan.h"
+
 #include "intf_msg.h"
 #include "interface.h"
+
 #include "audio_output.h"
+
 #include "main.h"
 
 /*****************************************************************************

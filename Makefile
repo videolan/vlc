@@ -11,6 +11,7 @@
 
 # Environment
 CC=egcc
+#CC=gcc295
 SHELL=/bin/sh
 
 # Audio output settings
@@ -82,7 +83,9 @@ PROGRAM_OPTIONS += DEBUG
 endif
 
 # PROGRAM_BUILD is a complete identification of the build
-PROGRAM_BUILD = `date -R` $(USER)@`hostname`
+# ( we can't use fancy options with date since OSes like Solaris
+# or FreeBSD have strange date implementations )
+PROGRAM_BUILD = `date` $(USER)@`hostname`
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including ARCH_xx and SYS_xx. It will be passed to C compiler.
@@ -105,12 +108,18 @@ endif
 #
 # C headers directories
 #
-INCLUDE += -Iinclude
+INCLUDE += -Iinclude -I/usr/local/include -I/usr/X11R6/include
 
 #
 # Libraries
 #
+LIB += -L/usr/local/lib
+
+ifeq ($(SYS),GNU)
+LIB += -lthreads
+else
 LIB += -lpthread
+endif
 LIB += -lm
 LIB += -ldl
 
@@ -132,7 +141,9 @@ ifeq ($(ARCH),X86)
 CCFLAGS += -malign-double
 #CCFLAGS += -march=pentium
 ifeq ($(PPRO), YES)
+ifneq ($(SYS), BSD)
 CCFLAGS += -march=pentiumpro
+endif
 endif
 # Eventual MMX optimizations for x86
 ifeq ($(MMX), YES)
@@ -327,7 +338,7 @@ FORCE:
 # Real targets
 #
 vlc: $(C_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
-	$(CC) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(ASM_OBJ)	
+	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(ASM_OBJ)	
 
 #
 # Generic rules (see below)

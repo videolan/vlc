@@ -1,52 +1,65 @@
 /*****************************************************************************
- * input_ctrl.c: Decodeur control
- * (c)1999 VideoLAN
+ * input_ctrl.c: Decoder control
+ * Controls the extraction and the decoding of the programs elements carried
+ * within a stream.
  *****************************************************************************
- * Control the extraction and the decoding of the programs elements carried in
- * a stream.
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
-#include <errno.h>
-#include <sys/uio.h>                                                /* iovec */
-#include <stdlib.h>                              /* atoi(), malloc(), free() */
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/uio.h>                                            /* "input.h" */
 
 #include <netinet/in.h>                                             /* ntohs */
 
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 #include "intf_msg.h"
 #include "debug.h"
 
 #include "input.h"
 #include "input_netlist.h"
-
 #include "decoder_fifo.h"
 
-#include "audio_output.h"
-#include "audio_decoder.h"
-#include "ac3_decoder.h"
-#include "ac3_decoder_thread.h"
+#include "audio_output.h"                                   /* aout_thread_t */
 
-#include "video.h"
-#include "video_output.h"
-#include "vdec_idct.h"
-//#include "video_decoder.h"
-#include "vdec_motion.h"
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
+#include "audio_decoder.h"                                  /* adec_thread_t */
 
-#include "spu_decoder.h"
+#include "ac3_decoder.h"              /* ac3dec_t (for ac3_decoder_thread.h) */
+#include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
+
+#include "video.h"                          /* picture_t (for video_output.h) */
+#include "video_output.h"                                   /* vout_thread_t */
+
+#include "vdec_idct.h"                     /* dctelem_t (for video_parser.h) */
+#include "vdec_motion.h"                  /* f_motion_t (for video_parser.h) */
+#include "vpar_blocks.h"                /* macroblock_t (for video_parser.h) */
+#include "vpar_headers.h"                 /* sequence_t (for video_parser.h) */
+#include "vpar_synchro.h"            /* video_synchro_t (for video_parser.h) */
+#include "video_parser.h"                                   /* vpar_thread_t */
+
+#include "spu_decoder.h"                                  /* spudec_thread_t */
 
 /*****************************************************************************
  * input_AddPgrmElem: Start the extraction and the decoding of a program element

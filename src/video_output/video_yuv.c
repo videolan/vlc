@@ -1,27 +1,45 @@
 /*****************************************************************************
  * video_yuv.c: YUV transformation functions
- * (c)1999 VideoLAN
- *****************************************************************************
  * Provides functions to perform the YUV conversion. The functions provided here
  * are a complete and portable C implementation, and may be replaced in certain
  * case by optimized functions.
+ *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <math.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
+#include <math.h>                                            /* exp(), pow() */
+#include <errno.h>                                                 /* ENOMEM */
+#include <stdlib.h>                                                /* free() */
+#include <string.h>                                            /* strerror() */
 
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 #include "video.h"
 #include "video_output.h"
 #include "video_yuv.h"
+
 #include "intf_msg.h"
 
 /*****************************************************************************

@@ -1,22 +1,36 @@
 /*****************************************************************************
  * vpar_blocks.c : blocks parsing
- * (c)1999 VideoLAN
+ *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/uio.h>
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/uio.h>                                            /* "input.h" */
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 
 #include "intf_msg.h"
 #include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
@@ -37,18 +51,7 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
-
-
-
-
-
-
 static int i_count = 0;
-
-
-
-
-
 
 /*
  * Welcome to vpar_blocks.c ! Here's where the heavy processor-critical parsing
@@ -1642,7 +1645,7 @@ i_count++;
 
     if( i_inc < 0 )
     {
-        fprintf( stderr, "vpar error: bad address increment (%d)\n", i_inc );
+        intf_ErrMsg( "vpar error: bad address increment (%d)\n", i_inc );
         p_vpar->picture.b_error = 1;
         return;
     }
@@ -1863,7 +1866,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
 
     if( *pi_mb_address < i_mb_address_save )
     {
-        fprintf( stderr, "vpar error: slices do not follow, maybe a PES has been trashed\n" );
+        intf_ErrMsg( "vpar error: slices do not follow, maybe a PES has been trashed\n" );
         p_vpar->picture.b_error = 1;
         return;
     }

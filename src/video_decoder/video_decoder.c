@@ -1,6 +1,24 @@
 /*****************************************************************************
  * video_decoder.c : video decoder thread
- * (c)1999 VideoLAN
+ *****************************************************************************
+ * Copyright (C) 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 /* FIXME: passer en terminate/destroy avec les signaux supplémentaires ?? */
@@ -8,25 +26,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-//#include "vlc.h"
-
-#include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/uio.h>
+#include <stdlib.h>                                                /* free() */
+#include <unistd.h>                                              /* getpid() */
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/uio.h>                                          /* for input.h */
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "vlc_thread.h"
+#include "threads.h"
 
 #include "intf_msg.h"
-#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
-#include "input_netlist.h"
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
@@ -445,7 +457,7 @@ void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
          */
         if( p_mb->pf_motion == 0 )
         {
-            fprintf( stderr, "vdec error: pf_motion set to NULL\n" );
+            intf_ErrMsg( "vdec error: pf_motion set to NULL\n" );
         }
         else
         {

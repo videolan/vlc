@@ -1,7 +1,5 @@
 /*****************************************************************************
- * mtime.h: high rezolution time management functions
- * (c)1999 VideoLAN
- *****************************************************************************
+ * mtime.h: high resolution time management functions
  * This header provides portable high precision time management functions,
  * which should be the only ones used in other segments of the program, since
  * functions like gettimeofday() and ftime() are not always supported.
@@ -10,6 +8,27 @@
  * 'm' stands for 'micro', since maximum resolution is the microsecond.
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
  * Required headers:
  *  none
  * this header includes inline functions

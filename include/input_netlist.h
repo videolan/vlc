@@ -1,10 +1,27 @@
 /*****************************************************************************
  * input_netlist.h: netlist interface
- * (c)1998 VideoLAN
- *****************************************************************************
  * The netlists are an essential part of the input structure. We maintain a
  * list of free TS packets and free PES packets to avoid continuous malloc
  * and free.
+ *****************************************************************************
+ * Copyright (C) 1998, 1999, 2000 VideoLAN
+ *
+ * Authors:
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
 #include "intf_msg.h"
