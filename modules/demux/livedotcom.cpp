@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.1 2003/11/06 22:14:57 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.2 2003/11/07 00:28:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -196,6 +196,8 @@ static int  AccessOpen( vlc_object_t *p_this )
     p_input->pf_set_area = NULL;
     p_input->p_private = NULL;
 
+    p_input->psz_demux = "live";
+
     /* Finished to set some variable */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     /* FIXME that's not true but eg over tcp, server send data too fast */
@@ -266,7 +268,9 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         msg_Err( p_input, "cannot peek" );
         return VLC_EGENERIC;
     }
-    if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) && strncmp( (char*)p_peek, "v=0\n", 4 ) )
+    if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) && strncmp( (char*)p_peek, "v=0\n", 4 ) &&
+        ( p_input->psz_access == NULL || strcasecmp( p_input->psz_access, "rtsp" ) ||
+          p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
     {
         msg_Warn( p_input, "SDP module discarded" );
         return VLC_EGENERIC;
