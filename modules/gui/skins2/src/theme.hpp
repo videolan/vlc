@@ -2,7 +2,7 @@
  * theme.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.hpp,v 1.2 2004/01/25 23:04:06 asmax Exp $
+ * $Id: theme.hpp,v 1.3 2004/02/01 16:15:40 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include "../src/generic_layout.hpp"
 #include "../src/window_manager.hpp"
 #include "../commands/cmd_generic.hpp"
+#include "../utils/bezier.hpp"
 #include "../utils/variable.hpp"
 #include "../controls/ctrl_generic.hpp"
 #include <string>
@@ -72,6 +73,8 @@ class Theme: public SkinObject
         map<string, CtrlGenericPtr> m_controls;
         /// Store the commands
         list<CmdGenericPtr> m_commands;
+        /// Store the Bezier curves
+        list<BezierPtr> m_curves;
         /// Store the variables
         list<VariablePtr> m_vars;
 

@@ -2,7 +2,7 @@
  * bezier.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: bezier.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: bezier.hpp,v 1.3 2004/02/01 16:15:40 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -26,8 +26,8 @@
 #define BEZIER_HPP
 
 #include "../src/skin_common.hpp"
+#include "pointer.hpp"
 #include <vector>
-using namespace std;
 
 #define MAX_BEZIER_POINT 1023
 
@@ -92,5 +92,7 @@ class Bezier: public SkinObject
         inline float power( float x, int n ) const;
 };
 
+
+typedef CountedPtr<Bezier> BezierPtr;
 
 #endif

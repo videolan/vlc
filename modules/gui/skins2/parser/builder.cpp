@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.4 2004/01/25 17:20:18 kuehne Exp $
+ * $Id: builder.cpp,v 1.5 2004/02/01 16:15:40 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -448,7 +448,6 @@ void Builder::addSlider( const BuilderData::Slider &rData )
         return;
     }
 
-    // XXX: memory leak!
     Bezier *pCurve = getPoints( rData.m_points.c_str() );
     if( pCurve == NULL )
     {
@@ -456,6 +455,7 @@ void Builder::addSlider( const BuilderData::Slider &rData )
                  rData.m_points.c_str() );
         return;
     }
+    m_pTheme->m_curves.push_back( BezierPtr( pCurve ) );
 
     // Get the visibility variable
     // XXX check when it is null
