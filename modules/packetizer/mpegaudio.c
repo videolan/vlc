@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.9 2003/09/10 21:56:44 fenrir Exp $
+ * $Id: mpegaudio.c,v 1.10 2003/09/10 22:59:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -25,15 +25,24 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
 #include <vlc/vlc.h>
-#include <vlc/aout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include "codecs.h"                         /* WAVEFORMATEX BITMAPINFOHEADER */
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open    ( vlc_object_t * );
+static int  Run     ( decoder_fifo_t * );
+
+vlc_module_begin();
+    set_description( _("MPEG-I/II audio packetizer") );
+    set_capability( "packetizer", 50 );
+    set_callbacks( Open, NULL );
+vlc_module_end();
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -47,30 +56,13 @@ typedef struct packetizer_s
     sout_packetizer_input_t *p_sout_input;
     sout_format_t           output_format;
 
-    uint64_t                i_samplescount;
-    uint32_t                i_samplespersecond;
-
     mtime_t                 i_last_pts;
 } packetizer_t;
 
-static int  Open    ( vlc_object_t * );
-static int  Run     ( decoder_fifo_t * );
-
 static int  InitThread     ( packetizer_t * );
-static void PacketizeThread   ( packetizer_t * );
+static void PacketizeThread( packetizer_t * );
 static void EndThread      ( packetizer_t * );
 
-#define FREE( p ) if( p ) free( p ); p = NULL
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-
-vlc_module_begin();
-    set_description( _("MPEG-I/II audio packetizer") );
-    set_capability( "packetizer", 50 );
-    set_callbacks( Open, NULL );
-vlc_module_end();
 
 
 static int mpegaudio_bitrate[2][3][16] =
@@ -81,18 +73,16 @@ static int mpegaudio_bitrate[2][3][16] =
     /* v1 l2 */
     { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384, 0},
     /* v1 l3 */
-    { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0} 
+    { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 0}
   },
-
   {
      /* v2 l1 */
     { 0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256, 0},
     /* v2 l2 */
     { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0},
     /* v2 l3 */
-    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0} 
+    { 0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160, 0}
   }
-
 };
 
 static int mpegaudio_samplerate[2][4] = /* version 1 then 2 */
@@ -130,12 +120,8 @@ static int Run( decoder_fifo_t *p_fifo )
     int b_error;
 
     msg_Info( p_fifo, "Running mpegaudio packetizer" );
-    if( !( p_pack = malloc( sizeof( packetizer_t ) ) ) )
-    {
-        msg_Err( p_fifo, "out of memory" );
-        DecoderError( p_fifo );
-        return( -1 );
-    }
+
+    p_pack = malloc( sizeof( packetizer_t ) );
     memset( p_pack, 0, sizeof( packetizer_t ) );
 
     p_pack->p_fifo = p_fifo;
@@ -143,7 +129,7 @@ static int Run( decoder_fifo_t *p_fifo )
     if( InitThread( p_pack ) != 0 )
     {
         DecoderError( p_fifo );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
     while( ( !p_pack->p_fifo->b_die )&&( !p_pack->p_fifo->b_error ) )
@@ -159,14 +145,14 @@ static int Run( decoder_fifo_t *p_fifo )
 
     EndThread( p_pack );
 
-    FREE( p_pack );
+    free( p_pack );
 
     if( b_error )
     {
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 
@@ -190,18 +176,16 @@ static int InitThread( packetizer_t *p_pack )
 
     p_pack->p_sout_input = NULL;
 
-    p_pack->i_samplescount = 0;
-    p_pack->i_samplespersecond = 0;
     p_pack->i_last_pts = 0;
 
     if( InitBitstream( &p_pack->bit_stream, p_pack->p_fifo,
                        NULL, NULL ) != VLC_SUCCESS )
     {
         msg_Err( p_pack->p_fifo, "cannot initialize bitstream" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -358,7 +342,7 @@ static void PacketizeThread( packetizer_t *p_pack )
         return;
     }
     p_sout_buffer->p_buffer[0] = ( i_sync >> 4 )&0xff;
-    p_sout_buffer->p_buffer[1] = 
+    p_sout_buffer->p_buffer[1] =
         ( ( i_sync << 4 )&0xf0 ) | ( ( i_header >> 16 )&0x0f );
     p_sout_buffer->p_buffer[2] = ( i_header >> 8 )&0xff;
     p_sout_buffer->p_buffer[3] = ( i_header      )&0xff;
@@ -371,8 +355,6 @@ static void PacketizeThread( packetizer_t *p_pack )
             (uint64_t)1000000 *
             (uint64_t)i_samplesperframe /
             (uint64_t)i_samplerate;
-
-    p_pack->i_samplescount += i_samplesperframe;
 
     /* we are already aligned */
     GetChunk( &p_pack->bit_stream,
