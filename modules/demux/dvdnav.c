@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.11 2004/01/30 14:45:27 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -41,7 +41,7 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for dvdnav streams. This " \
+    "Allows you to modify the default caching value for dvdnav streams. This "\
     "value should be set in miliseconds units." )
 
 static int  AccessOpen ( vlc_object_t * );
@@ -164,8 +164,8 @@ static int AccessOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    b_force = (p_input->psz_access && !strncmp(p_input->psz_access, "dvdnav", 6)) ?
-        VLC_TRUE : VLC_FALSE;
+    b_force = p_input->psz_access &&
+              !strncmp( p_input->psz_access, "dvdnav", 6 );
 
     psz_name = ParseCL( VLC_OBJECT(p_input), p_input->psz_name, b_force,
                         &i_title, &i_chapter, &i_angle );
@@ -178,6 +178,7 @@ static int AccessOpen( vlc_object_t *p_this )
     if( dvdnav_open( &dvdnav, psz_name ) != DVDNAV_STATUS_OK )
     {
         msg_Warn( p_input, "cannot open dvdnav" );
+        free( psz_name );
         return VLC_EGENERIC;
     }
     dvdnav_close( dvdnav );
@@ -193,20 +194,16 @@ static int AccessOpen( vlc_object_t *p_this )
     p_input->stream.b_pace_control = VLC_TRUE;
     p_input->stream.b_seekable = VLC_TRUE;
     p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.p_selected_area->i_size = 1000;
-    p_input->stream.i_method = INPUT_METHOD_NETWORK;
+    p_input->stream.p_selected_area->i_size = 0;
+    p_input->stream.i_method = INPUT_METHOD_DVD;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     p_input->i_mtu = 0;
 
-    /* force dvdnav plugin */
+    /* Force dvdnav demux */
     if( p_input->psz_access && !strncmp(p_input->psz_access, "dvdnav", 6 ) )
-    {
         p_input->psz_demux = strdup( p_input->psz_access );
-    }
     else
-    {
         p_input->psz_demux = strdup( "dvdnav" );
-    }
 
     /* Update default_pts to a suitable value for udp access */
     var_Create( p_input, "dvdnav-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
@@ -323,23 +320,23 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
-    p_sys->b_simple = strcmp( p_demux->psz_access, "dvdnavsimple" ) ? VLC_FALSE : VLC_TRUE;
+    p_sys->b_simple =
+        strcmp( p_demux->psz_access, "dvdnavsimple" ) ? VLC_FALSE : VLC_TRUE;
     if( p_sys->b_simple && i_title < 1 )
     {
-        /* skip menu part */
+        /* Skip menu part */
         i_title = 1;
     }
 
     ps_track_init( p_sys->tk );
-
     p_sys->i_aspect = -1;
-
     p_sys->b_es_out_ok = VLC_FALSE;
 
     /* Open dvdnav */
     if( dvdnav_open( &p_sys->dvdnav, psz_name ) != DVDNAV_STATUS_OK )
     {
         msg_Warn( p_demux, "cannot open dvdnav" );
+        free( psz_name );
         return VLC_EGENERIC;
     }
     free( psz_name );
@@ -431,7 +428,6 @@ static int DemuxOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static void DemuxClose( vlc_object_t *p_this )
 {
-
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -800,7 +796,8 @@ static void ESSubtitleUpdate( demux_t *p_demux )
             ESNew( p_demux, 0xbd20 + i_spu);
         }
         /* be sure to unselect it (reset) */
-        es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es, (vlc_bool_t)VLC_FALSE );
+        es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
+                        (vlc_bool_t)VLC_FALSE );
 
         /* now select it */
         es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
@@ -812,7 +809,8 @@ static void ESSubtitleUpdate( demux_t *p_demux )
             ps_track_t *tk = &p_sys->tk[PS_ID_TO_TK(0xbd20 + i_spu)];
             if( tk->b_seen )
             {
-                es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es, (vlc_bool_t)VLC_FALSE );
+                es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->es,
+                                (vlc_bool_t)VLC_FALSE );
             }
         }
     }
@@ -903,6 +901,9 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * ESNew: register a new elementary stream
+ *****************************************************************************/
 static void ESNew( demux_t *p_demux, int i_id )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -976,9 +977,11 @@ static void ESNew( demux_t *p_demux, int i_id )
             tk->fmt.psz_language[1] = (i_lang     )&0xff;
             tk->fmt.psz_language[2] = 0;
         }
-        /* palette */
+
+        /* Palette */
         tk->fmt.subs.spu.palette[0] = 0xBeef;
-        memcpy( &tk->fmt.subs.spu.palette[1], p_sys->clut, 16 * sizeof( uint32_t ) );
+        memcpy( &tk->fmt.subs.spu.palette[1], p_sys->clut,
+                16 * sizeof( uint32_t ) );
 
         /* We select only when we are not in the menu */
         dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
