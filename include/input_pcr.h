@@ -9,8 +9,13 @@
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1) */
 #define PCR_MAX_AVERAGE_COUNTER 40
 
-/* Maximum allowed gap between two PCRs. */
+/* Maximum gap allowed between two PCRs. */
 #define PCR_MAX_GAP 1000000
+
+/* synchro states */
+#define SYNCHRO_NOT_STARTED 1
+#define SYNCHRO_START       2
+#define SYNCHRO_REINIT      3
 
 /******************************************************************************
  * Prototypes

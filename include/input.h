@@ -207,23 +207,15 @@ typedef struct
 
 typedef struct pcr_descriptor_struct
 {
-    vlc_mutex_t             lock;                    /* pcr modification lock */
+    /* system_date = PTS_date + delta_pcr + delta_absolute */
+    mtime_t                 delta_pcr;
+    mtime_t                 delta_absolute;
 
-    mtime_t                 delta_clock;
-    mtime_t                 delta_decode;
-                           /* represents decoder_time - pcr_time in usecondes */
     mtime_t                 last_pcr;
 
-    count_t                 c_average;
+    u32                     i_synchro_state;
+    count_t                 c_average_count;
                             /* counter used to compute dynamic average values */
-    count_t                 c_pts;
-#ifdef STATS
-    /* Stats */
-    count_t     c_average_jitter;
-    mtime_t     max_jitter;                   /* the evalueted maximum jitter */
-    mtime_t     average_jitter;               /* the evalueted average jitter */
-    count_t     c_pcr;           /* the number of PCR which have been decoded */
-#endif
 } pcr_descriptor_t;
 
 /******************************************************************************

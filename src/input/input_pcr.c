@@ -22,25 +22,38 @@
 #include "intf_msg.h"
 #include "input_pcr.h"
 
+/* Note:
+ *   
+ *   SYNCHRONIZATION METHOD
+ *   
+ *   We compute an average for the pcr because we want to eliminate the
+ *   network jitter and keep the low frequency variations. The average is
+ *   in fact a low pass filter and the jitter is a high frequency signal
+ *   that is why it is eliminated by the filter/average.
+ *   
+ *   The low frequency variations enable us to synchronize the client clock
+ *   with the server clock because they represent the time variation between
+ *   the 2 clocks. Those variations (ie the filtered pcr) are used to compute
+ *   the presentation dates for the audio and video frames. With those dates
+ *   we can decoding (or trashing) the MPEG2 stream at "exactly" the same rate
+ *   as it is sent by the server and so we keep the synchronization between
+ *   the server and the client.
+ *   
+ *   It is a very important matter if you want to avoid underflow or overflow
+ *   in all the FIFOs, but it may be not enough.
+ *
+ */
+
 /******************************************************************************
  * input_PcrReInit : Reinitialize the pcr_descriptor
  ******************************************************************************/
 void input_PcrReInit( input_thread_t *p_input )
 {
-    ASSERT(p_input);
+    ASSERT( p_input );
 
-    p_input->p_pcr->delta_clock = 0;
-    p_input->p_pcr->c_average = 0;
-    p_input->p_pcr->c_pts = 0;
-    p_input->p_pcr->last_pcr = 0;
-
-#ifdef STATS
-    p_input->p_pcr->c_average_jitter = 0;
-    p_input->p_pcr->c_pcr = 0;
-    p_input->p_pcr->max_jitter = 0;
-    /* For the printf in input_PcrDecode() (for debug purpose only) */
-    printf("\n");
-#endif
+    p_input->p_pcr->delta_pcr       = 0;
+    p_input->p_pcr->last_pcr        = 0;
+    p_input->p_pcr->c_average_count = 0;
 }
 
 /******************************************************************************
@@ -48,14 +61,14 @@ void input_PcrReInit( input_thread_t *p_input )
  ******************************************************************************/
 int input_PcrInit( input_thread_t *p_input )
 {
-    ASSERT(p_input);
+    ASSERT( p_input );
 
     if( (p_input->p_pcr = malloc(sizeof(pcr_descriptor_t))) == NULL )
     {
         return( -1 );
     }
-    vlc_mutex_init( &p_input->p_pcr->lock );
     input_PcrReInit(p_input);
+    p_input->p_pcr->i_synchro_state = SYNCHRO_NOT_STARTED;
     
     return( 0 );
 }
@@ -66,91 +79,51 @@ int input_PcrInit( input_thread_t *p_input )
 void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
                       u8* p_pcr_data )
 {
-    mtime_t pcr_time, sys_time, delta_clock;
+    mtime_t pcr_time, sys_time, delta_pcr;
     pcr_descriptor_t *p_pcr;
         
-    ASSERT(p_pcr_data);
-    ASSERT(p_input);
-    ASSERT(p_es);
+    ASSERT( p_pcr_data );
+    ASSERT( p_input );
+    ASSERT( p_es );
 
     p_pcr = p_input->p_pcr;
     
-    /* Express the PCR in microseconde
+    /* Convert the PCR in microseconde
      * WARNING: do not remove the casts in the following calculation ! */
-    pcr_time = ( (( (mtime_t)U32_AT((u32*)p_pcr_data) << 1 ) | ( p_pcr_data[4] >> 7 )) * 300 ) / 27;
-    sys_time = mdate();
-    delta_clock = sys_time - pcr_time;
-    
-    vlc_mutex_lock( &p_pcr->lock );
+    pcr_time  = ( (( (mtime_t)U32_AT((u32*)p_pcr_data) << 1 ) | ( p_pcr_data[4] >> 7 )) * 300 ) / 27;
+    sys_time  = mdate();
+    delta_pcr = sys_time - pcr_time;
     
     if( p_es->b_discontinuity ||
         ( p_pcr->last_pcr != 0 && 
-	  ( (p_pcr->last_pcr - pcr_time) > PCR_MAX_GAP
-	    || (p_pcr->last_pcr - pcr_time) < - PCR_MAX_GAP ) ) )
+	      (    (p_pcr->last_pcr - pcr_time) > PCR_MAX_GAP
+	        || (p_pcr->last_pcr - pcr_time) < - PCR_MAX_GAP ) ) )
     {
         intf_DbgMsg("input debug: input_PcrReInit()\n");
         input_PcrReInit(p_input);
+        p_pcr->i_synchro_state = SYNCHRO_REINIT;
         p_es->b_discontinuity = 0;
     }
     p_pcr->last_pcr = pcr_time;
 
-    if( p_pcr->c_average == PCR_MAX_AVERAGE_COUNTER )
+    if( p_pcr->c_average_count == PCR_MAX_AVERAGE_COUNTER )
     {
-        p_pcr->delta_clock = (delta_clock + (p_pcr->delta_clock * (PCR_MAX_AVERAGE_COUNTER-1)))
-                             / PCR_MAX_AVERAGE_COUNTER;
+        p_pcr->delta_pcr = 
+            ( delta_pcr + (p_pcr->delta_pcr * (PCR_MAX_AVERAGE_COUNTER-1)) )
+            / PCR_MAX_AVERAGE_COUNTER;
     }
     else
     {
-        p_pcr->delta_clock = (delta_clock + (p_pcr->delta_clock *  p_pcr->c_average))
-                             / (p_pcr->c_average + 1);
-        p_pcr->c_average++;
+        p_pcr->delta_pcr =
+            ( delta_pcr + (p_pcr->delta_pcr * p_pcr->c_average_count) )
+            / ( p_pcr->c_average_count + 1 );
+        p_pcr->c_average_count++;
     }
 
-    vlc_mutex_unlock( &p_pcr->lock );
-    
-#ifdef STATS
+    if( p_pcr->i_synchro_state == SYNCHRO_NOT_STARTED )
     {
-        mtime_t jitter;
-        
-        jitter = delta_clock - p_pcr->delta_clock;
-        /* Compute the maximum jitter */
-        if( jitter < 0 )
-        {
-            if( (p_pcr->max_jitter <= 0 && p_pcr->max_jitter >= jitter) ||
-                (p_pcr->max_jitter >= 0 && p_pcr->max_jitter <= -jitter))
-                {
-                    p_pcr->max_jitter = jitter;
-                }
-        }
-        else
-        {
-            if( (p_pcr->max_jitter <= 0 && -p_pcr->max_jitter <= jitter) ||
-                (p_pcr->max_jitter >= 0 && p_pcr->max_jitter <= jitter))
-                {
-                    p_pcr->max_jitter = jitter;
-                }
-        }        
-                    
-        /* Compute the average jitter */
-        if( p_pcr->c_average_jitter == PCR_MAX_AVERAGE_COUNTER )
-        {
-            p_pcr->average_jitter = (jitter + (p_pcr->average_jitter * (PCR_MAX_AVERAGE_COUNTER-1)))
-                                    / PCR_MAX_AVERAGE_COUNTER;
-        }
-        else
-        {
-            p_pcr->average_jitter = (jitter + (p_pcr->average_jitter *  p_pcr->c_average_jitter))
-                                    / (p_pcr->c_average + 1);
-            p_pcr->c_average_jitter++;
-        }
-        
-        printf("delta: % 13Ld, max_jitter: % 9Ld, av. jitter: % 6Ld, PCR %6ld \r",
-               p_pcr->delta_clock , p_pcr->max_jitter, p_pcr->average_jitter, p_pcr->c_pcr);    
-        fflush(stdout);
-        
-        p_pcr->c_pcr++;
+        p_pcr->i_synchro_state = SYNCHRO_START;
     }
-#endif
 }
 
 /******************************************************************************
