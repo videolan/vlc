@@ -549,6 +549,12 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     }
     else if( i_read == 0 )
     {
+        /*
+         * I very much doubt that this will work.
+         * If i_read == 0, the connection *IS* dead, so the only
+         * sensible thing to do is Disconnect() and then retry.
+         * Otherwise, I got recv() completely wrong. -- Courmisch
+         */
         if( p_sys->b_continuous )
         {
             Request( p_access, 0 );
@@ -556,10 +562,10 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
             i_read = Read( p_access, p_buffer, i_len );
             p_sys->b_continuous = VLC_TRUE;
         }
+        Disconnect( p_access );
         if( p_sys->b_reconnect )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
-            Disconnect( p_access );
             if( Connect( p_access, p_access->info.i_pos ) )
             {
                 msg_Dbg( p_access, "reconnection failed" );
