@@ -1658,7 +1658,6 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
 {
     sout_stream_id_t *id = p_sys->id_video;
     picture_t *p_pic;
-    int i_plane;
 
     while( !p_sys->b_die && !p_sys->b_error )
     {
@@ -1683,13 +1682,23 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
         vlc_mutex_lock( &p_sys->lock_out );
         block_ChainAppend( &p_sys->p_buffers, p_block );
+
+        if( p_sys->b_master_sync )
+            date_Increment( &id->interpolated_pts, 1 );
+
+#if 0
+        if( p_sys->b_master_sync && i_duplicate > 1 )
+        {
+            mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
+            date_Increment( &id->interpolated_pts, 1 );
+            p_pic->date = i_pts;
+            p_block = id->p_encoder->pf_encode_video(id->p_encoder, p_pic);
+            block_ChainAppend( &p_sys->p_buffers, p_block );
+        }
+#endif
         vlc_mutex_unlock( &p_sys->lock_out );
 
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-        {
-            free( p_pic->p[i_plane].p_pixels );
-        }
-        free( p_pic );
+        p_pic->pf_release( p_pic );
     }
 
     while( p_sys->i_last_pic != p_sys->i_first_pic )
@@ -1697,11 +1706,7 @@ static int EncoderThread( sout_stream_sys_t *p_sys )
         p_pic = p_sys->pp_pics[p_sys->i_first_pic++];
         p_sys->i_first_pic %= PICTURE_RING_SIZE;
 
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-        {
-            free( p_pic->p[i_plane].p_pixels );
-        }
-        free( p_pic );
+        p_pic->pf_release( p_pic );
     }
 
     block_ChainRelease( p_sys->p_buffers );
