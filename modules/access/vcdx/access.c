@@ -1376,8 +1376,6 @@ VCDFixupPlayList( input_thread_t *p_input, thread_vcd_data_t *p_vcd,
       return -1;
     }
 
-  InformationCreate( p_input );
-
   if ( play_single_item ) 
     {
     /* May fill out more information when the playlist user interface becomes
@@ -1576,8 +1574,11 @@ E_(Open) ( vlc_object_t *p_this )
     p_vcd->p_intf->b_block = VLC_FALSE;
     intf_RunThread( p_vcd->p_intf );
 
+    InformationCreate( p_input );
+
     if (play_single_item)
-      VCDFixupPlayList( p_input, p_vcd, psz_source, &itemid, play_single_item );
+      VCDFixupPlayList( p_input, p_vcd, psz_source, &itemid, 
+			play_single_item );
 
     free( psz_source );
 
