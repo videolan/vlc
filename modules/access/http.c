@@ -368,26 +368,33 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    if( ( !strcmp( p_sys->psz_protocol, "ICY" ) || p_sys->b_icecast ) &&
-        ( strcasecmp( p_sys->psz_mime, "application/ogg" ) ) )
+    if( !strcmp( p_sys->psz_protocol, "ICY" ) || p_sys->b_icecast )
     {
-        if( p_sys->psz_mime && ( !strcasecmp( p_sys->psz_mime, "video/nsv" ) ||
-                                 !strcasecmp( p_sys->psz_mime, "video/nsa") ) )
-            p_access->psz_demux = strdup( "nsv" );
-        else if( p_sys->psz_mime &&
-                 ( !strcasecmp( p_sys->psz_mime, "audio/aac" ) ||
-                   !strcasecmp( p_sys->psz_mime, "audio/aacp" ) ) )
-            p_access->psz_demux = strdup( "m4a" );
-        else if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "audio/mpeg" ) )
-            p_access->psz_demux = strdup( "mp3" );
+        if( p_sys->psz_mime && strcasecmp( p_sys->psz_mime, "application/ogg" ) )
+        { 
+            if( !strcasecmp( p_sys->psz_mime, "video/nsv" ) ||
+                   !strcasecmp( p_sys->psz_mime, "video/nsa") )
+                p_access->psz_demux = strdup( "nsv" );
+            else if( !strcasecmp( p_sys->psz_mime, "audio/aac" ) ||
+                     !strcasecmp( p_sys->psz_mime, "audio/aacp" ) )
+                p_access->psz_demux = strdup( "m4a" );
+            else if( !strcasecmp( p_sys->psz_mime, "audio/mpeg" ) )
+                p_access->psz_demux = strdup( "mp3" );
 
-        msg_Info( p_access, "Raw-audio server found, %s demuxer selected",
-                  p_access->psz_demux );
+            msg_Info( p_access, "Raw-audio server found, %s demuxer selected",
+                      p_access->psz_demux );
 
-#if 0   /* Doesn't work really well because of the pre-buffering in shoutcast
-         * servers (the buffer content will be sent as fast as possible). */
-        p_sys->b_pace_control = VLC_FALSE;
+#if 0       /* Doesn't work really well because of the pre-buffering in shoutcast
+             * servers (the buffer content will be sent as fast as possible). */
+            p_sys->b_pace_control = VLC_FALSE;
 #endif
+        }
+        else if( !p_sys->psz_mime )
+        {
+             /* Shoutcast */
+             p_access->psz_demux = strdup( "mp3" );
+        }
+        /* else probably Ogg Vorbis */
     }
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
