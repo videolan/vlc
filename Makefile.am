@@ -11,8 +11,8 @@ NULL =
 #  - modules should come before . because vlc needs the builtins
 #  - . should come before mozilla because the plugin needs libvlc_pic.a
 #  - po should come before . because VLC.app needs the pofiles
-SUBDIRS = intl modules po . mozilla share m4
-DIST_SUBDIRS = $(SUBDIRS) src debian doc ipkg lib autotools
+SUBDIRS = intl modules po . mozilla share m4 doc
+DIST_SUBDIRS = $(SUBDIRS) src debian ipkg lib autotools
 
 EXTRA_DIST = \
 	HACKING \
