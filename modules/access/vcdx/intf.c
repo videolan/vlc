@@ -93,7 +93,7 @@ RunIntf( intf_thread_t *p_intf )
     vlc_object_t      * p_vout = NULL;
     mtime_t             mtime = 0;
     mtime_t             mlast = 0;
-    vcdplayer_t       * p_vcd;
+    vcdplayer_t       * p_vcdplayer;
     input_thread_t    * p_input;
     access_t          * p_access;
 
@@ -109,13 +109,13 @@ RunIntf( intf_thread_t *p_intf )
 
     p_input = p_intf->p_sys->p_input;
 
-    while ( !p_intf->p_sys->p_vcd )
+    while ( !p_intf->p_sys->p_vcdplayer )
     {
         msleep( INTF_IDLE_SLEEP );
     }
     
-    p_vcd    = p_intf->p_sys->p_vcd;
-    p_access = p_vcd->p_access;
+    p_vcdplayer = p_intf->p_sys->p_vcdplayer;
+    p_access    = p_vcdplayer->p_access;
 
     dbg_print( INPUT_DBG_CALL, "intf initialized" );
 
@@ -210,13 +210,14 @@ RunIntf( intf_thread_t *p_intf )
             case ACTIONID_NAV_ACTIVATE:
               {
                 vcdinfo_itemid_t itemid;
-                itemid.type=p_vcd->play_item.type;
+                itemid.type=p_vcdplayer->play_item.type;
 
                 dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_ACTIVATE" );
 
-                if ( vcdplayer_pbc_is_on( p_vcd ) && number_addend != 0 ) {
-                  lid_t next_num=vcdinfo_selection_get_lid(p_vcd->vcd,
-                                                           p_vcd->i_lid,
+                if ( vcdplayer_pbc_is_on( p_vcdplayer ) 
+		     && number_addend != 0 ) {
+                  lid_t next_num=vcdinfo_selection_get_lid(p_vcdplayer->vcd,
+                                                           p_vcdplayer->i_lid,
                                                            number_addend);
                   if (VCDINFO_INVALID_LID != next_num) {
                     itemid.num  = next_num;
@@ -326,8 +327,8 @@ static int InitThread( intf_thread_t * p_intf )
 
         vlc_mutex_lock( &p_intf->change_lock );
 
-        p_intf->p_sys->p_input = p_input;
-        p_intf->p_sys->p_vcd   = NULL;
+        p_intf->p_sys->p_input     = p_input;
+        p_intf->p_sys->p_vcdplayer = NULL;
 
         p_intf->p_sys->b_move  = VLC_FALSE;
         p_intf->p_sys->b_click = VLC_FALSE;

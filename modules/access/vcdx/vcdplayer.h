@@ -33,7 +33,7 @@
 #define INPUT_DBG_EVENT       2 /* input (keyboard/mouse) events */
 #define INPUT_DBG_MRL         4 /* MRL parsing */
 #define INPUT_DBG_EXT         8 /* Calls from external routines */
-#define INPUT_DBG_CALL       16 /* all calls */
+#define INPUT_DBG_CALL       16 /* routine calls */
 #define INPUT_DBG_LSN        32 /* LSN changes */
 #define INPUT_DBG_PBC        64 /* Playback control */
 #define INPUT_DBG_CDIO      128 /* Debugging from CDIO */
@@ -45,7 +45,7 @@
 #define INPUT_DEBUG 1
 #if INPUT_DEBUG
 #define dbg_print(mask, s, args...) \
-   if (p_vcd && p_vcd->i_debug & mask) \
+   if (p_vcdplayer && p_vcdplayer->i_debug & mask) \
      msg_Dbg(p_access, "%s: "s, __func__ , ##args)
 #else
 #define dbg_print(mask, s, args...) 
@@ -65,26 +65,22 @@ typedef struct {
   size_t size;      /* size in sector units of play item. */
 } vcdplayer_play_item_info_t;
 
-/* vcdplayer_read return status */
-typedef enum {
-  READ_BLOCK,
-  READ_STILL_FRAME,
-  READ_ERROR,
-  READ_END,
-} vcdplayer_read_status_t;
-
 /*****************************************************************************
  * vcdplayer_t: VCD information
  *****************************************************************************/
-typedef struct thread_vcd_data_s
+typedef struct vcdplayer_input_s
 {
   vcdinfo_obj_t *vcd;                   /* CD device descriptor */
 
-  /* User-settable options */
+  /*------------------------------------------------------------------
+    User-settable options 
+   --------------------------------------------------------------*/
   unsigned int i_debug;                 /* Debugging mask */
   unsigned int i_blocks_per_read;       /* number of blocks per read */
 
-  /* Current State: position */
+  /*-------------------------------------------------------------
+     Playback control fields 
+   --------------------------------------------------------------*/
   bool         in_still;                /* true if in still */
   int          i_lid;                   /* LID that play item is in. Implies 
                                            PBC is on. VCDPLAYER_BAD_ENTRY if 
@@ -98,11 +94,15 @@ typedef struct thread_vcd_data_s
   vcdinfo_itemid_t loop_item;           /* Where do we loop back to? 
                                            Meaningful only in a selection 
                                            list */
-  int          loop_count;              /* # of times play-item has been 
+  int          i_loop;                  /* # of times play-item has been 
                                            played. Meaningful only in a 
                                            selection list.              */
-  track_t      i_track;                 /* Current track number */
-  lsn_t        i_lsn;                   /* Current logical sector number */
+  track_t      i_track;                 /* current track number */
+
+  /*-----------------------------------
+     location fields
+   ------------------------------------*/
+  lsn_t        i_lsn;                   /* LSN of where we are right now */
   lsn_t        end_lsn;                 /* LSN of end of current 
                                            entry/segment/track. This block
                                            can be read (and is not one after 
@@ -118,8 +118,11 @@ typedef struct thread_vcd_data_s
   bool         b_valid_ep;              /* Valid entry points flag */
   bool         b_end_of_track;          /* If the end of track was reached */
 
-  /* Information about (S)VCD */
-  char *       psz_source;              /* (S)VCD drive or image filename */
+  /*--------------------------------------------------------------
+    (S)VCD Medium information
+   ---------------------------------------------------------------*/
+
+  char        *psz_source;              /* (S)VCD drive or image filename */
   bool         b_svd;                   /* true if we have SVD info */
   vlc_meta_t  *p_meta;
   track_t      i_tracks;                /* # of playable MPEG tracks. This is 
@@ -133,7 +136,7 @@ typedef struct thread_vcd_data_s
   unsigned int i_lids;                  /* # of List IDs */
 
   /* Tracks, segment, and entry information. The number of entries for
-     each is given by the corresponding num_* field above.  */
+     each is given by the corresponding i_* field above.  */
   vcdplayer_play_item_info_t *track;
   vcdplayer_play_item_info_t *segment;
   vcdplayer_play_item_info_t *entry;
@@ -156,18 +159,23 @@ typedef struct thread_vcd_data_s
   
 } vcdplayer_t;
 
-/*!
-  Get the next play-item in the list given in the LIDs. Note play-item
-  here refers to list of play-items for a single LID It shouldn't be
-  confused with a user's list of favorite things to play or the 
-  "next" field of a LID which moves us to a different LID.
- */
-bool vcdplayer_inc_play_item( access_t *p_access );
+/* vcdplayer_read return status */
+typedef enum {
+  READ_BLOCK,
+  READ_STILL_FRAME,
+  READ_ERROR,
+  READ_END,
+} vcdplayer_read_status_t;
+
+
+/* ----------------------------------------------------------------------
+   Function Prototypes 
+  -----------------------------------------------------------------------*/
 
 /*!
   Return true if playback control (PBC) is on
 */
-bool vcdplayer_pbc_is_on(const vcdplayer_t *p_this);
+bool vcdplayer_pbc_is_on(const vcdplayer_t *p_vcdplayer);
 
 /*!
   Play item assocated with the "default" selection.
@@ -206,11 +214,6 @@ void vcdplayer_set_origin(access_t *p_access, lsn_t i_lsn, track_t i_track,
                           const vcdinfo_itemid_t *p_itemid);
 
 void vcdplayer_play(access_t *p_access, vcdinfo_itemid_t itemid);
-
-vcdplayer_read_status_t vcdplayer_pbc_nav     ( access_t * p_access,
-                                                uint8_t  *wait_time );
-vcdplayer_read_status_t vcdplayer_non_pbc_nav ( access_t * p_access,
-                                                uint8_t  *wait_time );
 
 vcdplayer_read_status_t vcdplayer_read (access_t * p_access_t, uint8_t *p_buf);
 

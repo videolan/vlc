@@ -27,7 +27,7 @@
 struct intf_sys_t
 {
   input_thread_t *p_input;
-  vcdplayer_t    *p_vcd;
+  vcdplayer_t    *p_vcdplayer;
 
   vlc_bool_t      b_still;           /* True if we are in a still frame */
   vlc_bool_t      b_infinite_still;  /* True if still wait time is infinite */

@@ -32,7 +32,7 @@
 void VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl );
 
 
-char * VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcd,
+char * VCDFormatStr(const access_t *p_access, vcdplayer_t *p_vcdplayer,
 		    const char format_str[], const char *mrl,
 		    const vcdinfo_itemid_t *itemid);
 
