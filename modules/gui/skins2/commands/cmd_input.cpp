@@ -24,6 +24,7 @@
 
 #include <vlc/aout.h>
 #include "cmd_input.hpp"
+#include "cmd_dialogs.hpp"
 
 
 void CmdPlay::execute()
@@ -34,7 +35,16 @@ void CmdPlay::execute()
         return;
     }
 
-    playlist_Play( pPlaylist );
+    if( pPlaylist->i_size )
+    {
+        playlist_Play( pPlaylist );
+    }
+    else
+    {
+        // If the playlist is empty, open a file requester instead
+        CmdDlgFile cmd( getIntf() );
+        cmd.execute();
+    }
 }
 
 
