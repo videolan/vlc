@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.31 2003/03/13 15:50:17 marcari Exp $
+ * $Id: familiar.c,v 1.32 2003/03/17 13:49:14 marcari Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -170,12 +170,12 @@ static void Run( intf_thread_t *p_intf )
 // FIXME: magic path
     add_pixmap_directory("share");
     add_pixmap_directory("/usr/share/vlc");
-    /* Path for pixmaps under linupy */
+    /* Path for pixmaps under linupy 1.4 */
     add_pixmap_directory("/usr/local/share/pixmaps/vlc");
 
 
-    /* Path for pixmaps under linupy */
-    add_pixmap_directory("/usr/local/share/pixmaps/vlc");
+    /* Path for pixmaps under linupy 2.0 */
+    add_pixmap_directory("/usr/share/pixmaps/vlc");
 
     p_intf->p_sys->p_window = create_familiar();
     if (p_intf->p_sys->p_window == NULL)
