@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.20 2003/06/03 12:06:29 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.21 2003/06/14 12:32:16 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1198,7 +1198,9 @@ VLCView::MouseDown(BPoint where)
 
 				menu->SetTargetForItems( this );
 				ConvertToScreen( &where );
-				menu->Go( where, true, false, true );
+				BRect mouseRect( where.x - 5, where.y - 5,
+				                 where.x + 5, where.y + 5 );
+				menu->Go( where, true, false, mouseRect, true );
 	        }
 		}
 	}
