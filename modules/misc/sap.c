@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.25 2003/10/08 10:07:22 zorglub Exp $
+ * $Id: sap.c,v 1.26 2003/10/08 18:26:58 gbazin Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -65,9 +65,9 @@
 #endif
 
 #ifdef UNDER_CE
-#   define close(a) CloseHandle(a);
+#   define close(a) CloseHandle(a)
 #elif defined( WIN32 )
-#   define close(a) closesocket(a);
+#   define close(a) closesocket(a)
 #endif
 
 #include "network.h"
@@ -326,14 +326,14 @@ static void Run( intf_thread_t *p_intf )
     {
         if( close( fd ) )
         {
-            msg_Warn( p_intf, "Ohoh, unable to close the socket") ;
+            msg_Warn( p_intf, "Ohoh, unable to close the socket" );
         }
     }
     if( fdv6 )
     {
         if( close( fdv6 ) )
         {
-            msg_Warn( p_intf, "Ohoh, unable to close the socket") ;
+            msg_Warn( p_intf, "Ohoh, unable to close the socket" );
         }
     }
 }
