@@ -977,13 +977,14 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     }
     else
     {
+        Window dummy1;
+        unsigned int dummy2, dummy3;
+
         /* Select events we are interested in. */
         XSelectInput( p_vout->p_sys->p_display, p_win->owner_window,
                       StructureNotifyMask );
 
         /* Get the parent window's geometry information */
-        Window dummy1;
-        unsigned int dummy2, dummy3;
         XGetGeometry( p_vout->p_sys->p_display, p_win->owner_window,
                       &dummy1, &dummy2, &dummy3,
                       &p_win->i_width,
