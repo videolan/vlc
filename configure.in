@@ -343,7 +343,7 @@ AC_ARG_WITH(sdl,
       PLUGINS="${PLUGINS} sdl";
       if test "x$withval" != "xyes";
       then
-        LIB_SDL="${LIB_SDL} -L/usr/X11R6/lib -L"$withval"/lib -l"$withval
+        LIB_SDL="${LIB_SDL} -L/usr/X11R6/lib -L"$withval"/lib -lSDL"
         INCLUDE="${INCLUDE} -I"$withval"/include"
       else
         AC_CHECK_HEADERS(SDL/SDL.h, , [echo "Cannot find SDL headers !"; exit])

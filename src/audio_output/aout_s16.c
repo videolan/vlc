@@ -80,28 +80,45 @@ void aout_S16StereoThread( aout_thread_t * p_aout )
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
         {
-            ((s16 *)p_aout->buffer)[l_buffer] = (s16)( ( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS ) * p_aout->vol / 256 ) ;
+            ((s16 *)p_aout->buffer)[l_buffer] =
+                     (s16)( ( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS )
+                            * p_aout->vol / 256 ) ;
             p_aout->s32_buffer[l_buffer] = 0;
         }
 
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
-	//fprintf(stderr,"l_bytes 1: %li\n",l_bytes);
-	//fprintf(stderr,"  playing...\n");
-        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(s16) << (p_aout->b_stereo) == 4 */
-        p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(s16) );
-	//fprintf(stderr,"l_bytes #: %li\n",p_aout->pf_getbufinfo( p_aout, l_buffer_limit ));
+#if 0
+        fprintf(stderr,"l_bytes 1: %li\n",l_bytes);
+        fprintf(stderr,"  playing...\n");
+#endif
+
+        /* sizeof(s16) << (p_aout->b_stereo) == 4 */
+        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000)
+                                   / ((mtime_t)p_aout->l_rate));
+        p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
+                         l_buffer_limit * sizeof(s16) );
+#if 0
+        fprintf( stderr,"l_bytes #: %li\n",
+                 p_aout->pf_getbufinfo( p_aout, l_buffer_limit ) );
+#endif
+
         if ( l_bytes > (l_buffer_limit * sizeof(s16)) )
         {
-	//fprintf(stderr,"  sleeping...\n");
+            msleep( p_aout->l_msleep );
+#if 0
+            fprintf(stderr,"  sleeping...\n");
             msleep( p_aout->l_msleep / 2);
-        l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
-	//fprintf(stderr,"l_bytes *: %li\n",l_bytes);
+            l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
+            fprintf(stderr,"l_bytes *: %li\n",l_bytes);
             msleep( p_aout->l_msleep / 2);
         }
-	else
-	//fprintf(stderr,"  not sleeping.\n");
-        l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
-	//fprintf(stderr,"l_bytes 2: %li\n\n",l_bytes);
+        else
+        {
+            fprintf(stderr,"  not sleeping.\n");
+            l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
+            fprintf(stderr,"l_bytes 2: %li\n\n",l_bytes);
+#endif
+        }
     }
 
     vlc_mutex_lock( &p_aout->fifos_lock );
