@@ -1,6 +1,6 @@
 /*****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein (for VideoLAN)
- * $Id: vcdplayer.h,v 1.4 2003/12/05 05:01:17 rocky Exp $
+ * $Id: vcdplayer.h,v 1.5 2004/01/03 20:43:24 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -66,6 +66,7 @@ typedef struct thread_vcd_data_s
 {
   vcdinfo_obj_t *vcd;                   /* CD device descriptor */
   bool           in_still;              /*  true if in still */
+  bool           b_svd;                 /*  true if we have SVD info */
   unsigned int num_tracks;              /* Nb of tracks (titles) */
   unsigned int num_segments;            /* Nb of segments */
   unsigned int num_entries;             /* Nb of entries */

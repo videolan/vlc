@@ -3,8 +3,8 @@
  *         using libcdio, libvcd and libvcdinfo. vlc-specific things tend
  *         to go here.
  *****************************************************************************
- * Copyright (C) 2000, 2003 VideoLAN
- * $Id: access.c,v 1.13 2003/12/22 14:32:55 sam Exp $
+ * Copyright (C) 2000, 2003, 2004 VideoLAN
+ * $Id: access.c,v 1.14 2004/01/03 20:43:24 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -330,6 +330,7 @@ VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_input->stream.p_selected_area = p_area;
 
         /* Update the navigation variables without triggering a callback */
+
         VCDUpdateVar( p_input, i_track, VLC_VAR_SETVALUE, "title",
                       "Setting track");
 
@@ -339,6 +340,23 @@ VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
           VCDUpdateVar( p_input, i , VLC_VAR_ADDCHOICE,
                         "chapter",  "Adding entry choice");
         }
+
+	if (p_vcd->b_svd) {
+	  unsigned int audio_type = 
+	    vcdinfo_get_track_audio_type(p_vcd->vcd, i_track);
+	  unsigned int i_channels = 
+	    vcdinfo_audio_type_num_channels(p_vcd->vcd, audio_type);
+	  
+	  var_Change( p_input, "audio_channels", VLC_VAR_CLEARCHOICES, NULL, 
+		      NULL );
+	  
+	  for( i = 0;  i < i_channels; i++ )
+	    {
+	      VCDUpdateVar( p_input, i , VLC_VAR_ADDCHOICE,
+			    "audio_channels",  "Adding audio choice");
+	    }
+	}
+
     }
 
     if (i_track == 0)
@@ -971,51 +989,90 @@ VCDUpdateVar( input_thread_t *p_input, int i_num, int i_action,
 static void InformationCreate( input_thread_t *p_input  )
 {
   thread_vcd_data_t *p_vcd = (thread_vcd_data_t *) p_input->p_access_data;
+  unsigned int i_nb = vcdinfo_get_num_entries(p_vcd->vcd);
+  unsigned int last_entry = 0;
   input_info_category_t *p_cat;
+  track_t i_track;
 
   p_cat = input_InfoCategory( p_input, "General" );
 
-  meta_info_add_str( "VCD Format", vcdinfo_get_format_version_str(p_vcd->vcd));
-  meta_info_add_str( "Album",      vcdinfo_get_album_id(p_vcd->vcd));
-  meta_info_add_str( "Application",vcdinfo_get_application_id(p_vcd->vcd));
-  meta_info_add_str( "Preparer",   vcdinfo_get_preparer_id(p_vcd->vcd));
-  meta_info_add_num( "Vol #",      vcdinfo_get_volume_num(p_vcd->vcd));
-  meta_info_add_num( "Vol max #",  vcdinfo_get_volume_count(p_vcd->vcd));
-  meta_info_add_str( "Volume Set", vcdinfo_get_volumeset_id(p_vcd->vcd));
-  meta_info_add_str( "Volume",     vcdinfo_get_volume_id(p_vcd->vcd));
-  meta_info_add_str( "Publisher",  vcdinfo_get_publisher_id(p_vcd->vcd));
-  meta_info_add_str( "System Id",  vcdinfo_get_system_id(p_vcd->vcd));
+  meta_info_add_str( _("VCD Format"), 
+		     vcdinfo_get_format_version_str(p_vcd->vcd));
+  meta_info_add_str( _("Album"), 
+		     vcdinfo_get_album_id(p_vcd->vcd));
+  meta_info_add_str( _("Application"),
+		     vcdinfo_get_application_id(p_vcd->vcd));
+  meta_info_add_str( _("Preparer"),
+		     vcdinfo_get_preparer_id(p_vcd->vcd));
+  meta_info_add_num( _("Vol #"),
+		     vcdinfo_get_volume_num(p_vcd->vcd));
+  meta_info_add_num( _("Vol max #"),
+		     vcdinfo_get_volume_count(p_vcd->vcd));
+  meta_info_add_str( _("Volume Set"), 
+		     vcdinfo_get_volumeset_id(p_vcd->vcd));
+  meta_info_add_str( _("Volume"),
+		     vcdinfo_get_volume_id(p_vcd->vcd));
+  meta_info_add_str( _("Publisher"),
+		     vcdinfo_get_publisher_id(p_vcd->vcd));
+  meta_info_add_str( _("System Id"),
+		     vcdinfo_get_system_id(p_vcd->vcd));
   meta_info_add_num( "LIDs",       vcdinfo_get_num_LIDs(p_vcd->vcd));
-  meta_info_add_num( "Entries",    vcdinfo_get_num_entries(p_vcd->vcd));
-  meta_info_add_num( "Segments",   vcdinfo_get_num_segments(p_vcd->vcd));
-  meta_info_add_num( "Tracks",     vcdinfo_get_num_tracks(p_vcd->vcd));
+  meta_info_add_num( _("Entries"),
+		     vcdinfo_get_num_entries(p_vcd->vcd));
+  meta_info_add_num( _("Segments"),
+		     vcdinfo_get_num_segments(p_vcd->vcd));
+  meta_info_add_num( _("Tracks"),
+		     vcdinfo_get_num_tracks(p_vcd->vcd));
 
+  /* Spit out track information. Could also include MSF info.
+   */
+
+#define TITLE_MAX 30
+  for( i_track = 1 ; i_track < p_vcd->num_tracks ; i_track++ ) {
+    char track_str[TITLE_MAX];
+    unsigned int audio_type = vcdinfo_get_track_audio_type(p_vcd->vcd, 
+							   i_track);
+    snprintf(track_str, TITLE_MAX, "%s%02d", _("Track"), i_track);
+    p_cat = input_InfoCategory( p_input, track_str );
+
+    if (p_vcd->b_svd) {
+      meta_info_add_num( _("Audio Channels"),  
+			 vcdinfo_audio_type_num_channels(p_vcd->vcd, 
+							 audio_type) );
+    }
+
+    meta_info_add_num( _("First Entry Point"),  last_entry );
+    for ( ; last_entry < i_nb 
+	    && vcdinfo_get_track(p_vcd->vcd, last_entry) == i_track;
+	  last_entry++ ) ;
+    meta_info_add_num( _("Last Entry Point"),  last_entry-1 );
+  }
 }
 
-#define add_format_str_info(val)                        \
-  {                                                        \
-    const char *str = val;                                \
-    unsigned int len;                                        \
-    if (val != NULL) {                                        \
-      len=strlen(str);                                        \
-      if (len != 0) {                                        \
-        strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));        \
-        tp += len;                                        \
+#define add_format_str_info(val)			       \
+  {							       \
+    const char *str = val;				       \
+    unsigned int len;					       \
+    if (val != NULL) {					       \
+      len=strlen(str);					       \
+      if (len != 0) {					       \
+        strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));	       \
+        tp += len;					       \
       }                                                        \
-      saw_control_prefix = false;                        \
-    }                                                        \
+      saw_control_prefix = false;			       \
+    }							       \
   }
 
-#define add_format_num_info(val, fmt)                        \
-  {                                                        \
-    char num_str[10];                                        \
-    unsigned int len;                                   \
+#define add_format_num_info(val, fmt)			       \
+  {							       \
+    char num_str[10];					       \
+    unsigned int len;					       \
     sprintf(num_str, fmt, val);                                \
-    len=strlen(num_str);                                \
-    if (len != 0) {                                        \
+    len=strlen(num_str);				       \
+    if (len != 0) {					       \
       strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));        \
-      tp += len;                                        \
-    }                                                        \
+      tp += len;					       \
+    }							       \
     saw_control_prefix = false;                                \
   }
 
@@ -1389,6 +1446,8 @@ E_(Open) ( vlc_object_t *p_this )
         goto err_exit;
     }
 
+    p_vcd->b_svd= vcdinfo_get_tracksSVD(p_vcd->vcd);;
+    
     /* Get track information. */
     p_vcd->num_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
                                             vcdinfo_get_cd_image(p_vcd->vcd),
