@@ -69,7 +69,7 @@ CONFIG_FFMPEG_TREE="/home/cyril/ffmpeg"
 # CONFIG_XVID is not set
 # CONFIG_DV is not set
 # CONFIG_FLAC is not set
-# CONFIG_LIBMPEG2 is not set
+CONFIG_LIBMPEG2=y
 CONFIG_VORBIS=y
 # CONFIG_TREMOR is not set
 # CONFIG_TARKIN is not set

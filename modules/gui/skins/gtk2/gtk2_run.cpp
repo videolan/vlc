@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.15 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: gtk2_run.cpp,v 1.16 2003/04/21 01:47:42 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -121,8 +121,32 @@ void GTK2Proc( GdkEvent *event, gpointer data )
             ((GdkEventAny *)event)->window, msg, 0, (long)event );
     }
 
+    // Process keyboard shortcuts
+    if( msg == GDK_KEY_PRESS )
+    {
+        int KeyModifier = 0;
+        // If key is ALT
+        if( ((GdkEventKey *)event)->state & GDK_MOD1_MASK )
+        {
+            KeyModifier = 1;
+        }
+        // If key is CTRL
+        else if( ((GdkEventKey *)event)->state & GDK_CONTROL_MASK )
+        {
+            KeyModifier = 2;
+        }
+        int key = ((GdkEventKey *)event)->keyval;
+        // Translate into lower case
+        if( key >= 'a' && key <= 'z' )
+        {
+            key -= ('a' - 'A');
+        }
+        if( KeyModifier > 0 )
+            p_intf->p_sys->p_theme->EvtBank->TestShortcut( key , KeyModifier );
+    }
+
     // Send event
-    if( IsVLCEvent( msg ) )
+    else if( IsVLCEvent( msg ) )
     {
         if( !proc->EventProc( evt ) )
         {
