@@ -1442,6 +1442,11 @@ http://www.videolan.org/</label>
   <class>GtkDialog</class>
   <name>intf_open</name>
   <border_width>5</border_width>
+  <signal>
+    <name>delete_event</name>
+    <handler>gtk_widget_hide</handler>
+    <last_modification_time>Mon, 16 Sep 2002 07:48:17 GMT</last_modification_time>
+  </signal>
   <title>Open Target</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>

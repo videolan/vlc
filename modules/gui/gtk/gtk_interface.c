@@ -2091,6 +2091,9 @@ create_intf_open (void)
                               GDK_Escape, 0,
                               GTK_ACCEL_VISIBLE);
 
+  gtk_signal_connect (GTK_OBJECT (intf_open), "delete_event",
+                      GTK_SIGNAL_FUNC (gtk_widget_hide),
+                      NULL);
   gtk_signal_connect_after (GTK_OBJECT (open_notebook), "switch_page",
                             GTK_SIGNAL_FUNC (GtkOpenNotebookChanged),
                             NULL);
