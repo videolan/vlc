@@ -17,7 +17,6 @@ conftest.cc
 autom4te.cache
 Makefile.in
 Makefile
-Modules.am
 build-stamp
 configure-stamp
 stamp-h*
