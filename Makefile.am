@@ -253,7 +253,9 @@ if BUILD_GETOPT
 OPT_SOURCES_libvlc_getopt = $(SOURCES_libvlc_getopt)
 endif
 if BUILD_MOZILLA
+if !HAVE_WIN32
 LIBRARIES_libvlc_pic = lib/libvlc_pic.a
+endif
 endif
 
 EXTRA_DIST += \

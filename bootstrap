@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.72 2003/10/07 21:13:01 sam Exp $
+##  $Id: bootstrap,v 1.73 2003/10/20 10:37:56 gbazin Exp $
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
 
@@ -89,6 +89,12 @@ SUBDIRS = ${subdirs}
 #DIST_SUBDIRS = \$(SUBDIRS)
 libvlcdir = \$(libdir)/vlc/${basedir}
 include Modules.am
+
+if HAVE_WIN32
+# There's no need for pic code on win32 so get rid of this to substantially
+# reduce the compilation time.
+pic = no
+endif
 
 clean: clean-local
 clean-local:
