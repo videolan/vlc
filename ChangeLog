@@ -67,7 +67,7 @@ Not released yet
   * ALL: the first libvlc commit.
 
 0.4.2
-Not released yet
+Sun,  7 Jul 2002 22:15:33 +0200
 
   * ./plugins/dvd/dvd_es.c: error in selecting SPU stream.
   * ./plugins/spudec/spu_decoder.c: endianness fix for subtitles colour.
