@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.15 2003/01/11 18:10:49 fenrir Exp $
+ * $Id: asf.c,v 1.16 2003/01/20 13:04:03 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -490,7 +490,7 @@ static int Demux( input_thread_t *p_input )
         if( input_Peek( p_input, &p_peek, i_data_packet_min ) < i_data_packet_min )
         {
             // EOF ?
-            msg_Err( p_input, "cannot peek while getting new packet, EOF ?" );
+            msg_Warn( p_input, "cannot peek while getting new packet, EOF ?" );
             return( 0 );
         }
         i_skip = 0;
@@ -697,7 +697,7 @@ static int Demux( input_thread_t *p_input )
                 i_read = i_sub_payload_data_length + i_skip;
                 if( input_SplitBuffer( p_input, &p_data, i_read ) < i_read )
                 {
-                    msg_Err( p_input, "cannot read data" );
+                    msg_Warn( p_input, "cannot read data" );
                     return( 0 );
                 }
                 p_data->p_payload_start += i_skip;
