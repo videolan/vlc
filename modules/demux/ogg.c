@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.1 2002/10/24 09:30:48 gbazin Exp $
+ * $Id: ogg.c,v 1.2 2002/10/27 16:59:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -422,7 +422,7 @@ static int Activate( vlc_object_t * p_this )
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
         goto error;
-    }    
+    }
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -430,7 +430,8 @@ static int Activate( vlc_object_t * p_this )
         goto error;
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    vlc_mutex_unlock( &p_input->stream.stream_lock ); 
+    p_input->stream.i_mux_rate = 0;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     for( i_stream = 0 ; i_stream < p_ogg->i_streams; i_stream++ )
     {
@@ -439,16 +440,13 @@ static int Activate( vlc_object_t * p_this )
         p_stream->p_es = input_AddES( p_input,
                                       p_input->stream.p_selected_program,
                                       p_ogg->i_streams + 1, 0 );
+        p_input->stream.i_mux_rate += (p_stream->i_bitrate / ( 8 * 50 ));
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         p_stream->p_es->i_stream_id = i_stream;
         p_stream->p_es->i_fourcc = p_stream->i_fourcc;
         p_stream->p_es->i_cat = p_stream->i_cat;
 #undef p_stream
     }
-
-    vlc_mutex_lock( &p_input->stream.stream_lock ); 
-    p_input->stream.i_mux_rate = 0;
-    vlc_mutex_unlock( &p_input->stream.stream_lock ); 
 
     for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
     {
@@ -466,7 +464,7 @@ static int Activate( vlc_object_t * p_this )
                 break;
 
             case( AUDIO_ES ):
-                if( (p_ogg->p_stream_audio == NULL) ) 
+                if( (p_ogg->p_stream_audio == NULL) )
                 {
                     p_ogg->p_stream_audio = p_stream;
                     Ogg_StreamStart( p_input, p_ogg, i_stream );
@@ -592,9 +590,9 @@ static int Demux( input_thread_t * p_input )
     p_ogg->i_pcr = p_ogg->i_time * 9 / 100;
 
     if( (p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT)
-         || (input_ClockManageControl( p_input, 
-                      p_input->stream.p_selected_program,
-                         (mtime_t)0 ) == PAUSE_S) )
+         || (input_ClockManageControl( p_input,
+				       p_input->stream.p_selected_program,
+				       (mtime_t)0 ) == PAUSE_S) )
     {
         msg_Warn( p_input, "synchro reinit" );
         p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
