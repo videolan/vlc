@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-
 #define PES_PROGRAM_STREAM_MAP          0xbc
 #define PES_PRIVATE_STREAM_1            0xbd
 #define PES_PADDING                     0xbe
@@ -33,8 +32,6 @@
 #define PES_DSMCC_STREAM                0xf2
 #define PES_ITU_T_H222_1_TYPE_E_STREAM  0xf8
 
-
-int E_( EStoPES )( sout_instance_t *p_sout,
-                   block_t **pp_pes, block_t *p_es,
-                   int i_stream_id, int b_mpeg2, int b_data_alignment,
-                   int i_header_size );
+int E_( EStoPES )( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
+                   es_format_t *p_fmt, int i_stream_id,
+                   int b_mpeg2, int b_data_alignment, int i_header_size );

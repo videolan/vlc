@@ -1095,6 +1095,7 @@ static int Mux( sout_mux_t *p_mux )
                                     p_spu->p_buffer[2] = ' ';
 
                                     E_(EStoPES)( p_mux->p_sout, &p_spu, p_spu,
+                                                 p_input->p_fmt,
                                                  p_stream->i_stream_id, 1,
                                                  0, 0 );
                                     p_data->p_next = p_spu;
@@ -1131,8 +1132,8 @@ static int Mux( sout_mux_t *p_mux )
                             p_data->i_pts = p_data->i_dts;
                         }
                         E_( EStoPES )( p_mux->p_sout, &p_data, p_data,
-                                       p_stream->i_stream_id, 1,
-                                       b_data_alignment, i_header_size );
+                                       p_input->p_fmt, p_stream->i_stream_id,
+                                       1, b_data_alignment, i_header_size );
 
                         BufferChainAppend( &p_stream->chain_pes, p_data );
 
