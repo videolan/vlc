@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.9 2002/12/18 14:17:10 sam Exp $
+ * $Id: libasf.c,v 1.10 2003/01/05 21:03:58 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -605,8 +605,15 @@ int  ASF_ReadObject_codec_list( input_thread_t *p_input,
             p_cl->i_codec_entries_count );
     for( i_codec = 0; i_codec < p_cl->i_codec_entries_count; i_codec++ )
     {
+        char psz_cat[sizeof("Stream ")+10];
+        input_info_category_t *p_cat;
+        sprintf( psz_cat, "Stream %d", i_codec );
+        p_cat = input_InfoCategory( p_input, psz_cat);
+
 #define codec p_cl->codec[i_codec]
-         msg_Dbg( p_input,
+        input_AddInfo( p_cat, "Codec name", codec.psz_name );
+        input_AddInfo( p_cat, "Codec description", codec.psz_description );
+        msg_Dbg( p_input,
                  "Read \"Codec List Object\" codec[%d] %s name:\"%s\" description:\"%s\" information_length:%d",
                  i_codec,
                  ( codec.i_type == ASF_CODEC_TYPE_VIDEO ) ? "video" : ( ( codec.i_type == ASF_CODEC_TYPE_AUDIO ) ? "audio" : "unknown" ),
@@ -684,6 +691,14 @@ int  ASF_ReadObject_content_description( input_thread_t *p_input,
 #undef  GETSTRINGW
 
 #ifdef ASF_DEBUG
+    {
+        input_info_category_t *p_cat = input_InfoCategory( p_input, "Asf" );
+        input_AddInfo( p_cat, "Title", p_cd->psz_title );
+        input_AddInfo( p_cat, "Author", p_cd->psz_author );
+        input_AddInfo( p_cat, "Copyright", p_cd->psz_copyright );
+        input_AddInfo( p_cat, "Description", p_cd->psz_description );
+        input_AddInfo( p_cat, "Rating", p_cd->psz_rating );
+    }
     msg_Dbg( p_input,
              "Read \"Content Description Object\" title:\"%s\" author:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",
              p_cd->psz_title,

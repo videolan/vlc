@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.2 2002/10/13 14:26:48 sigmunau Exp $
+ * $Id: id3tag.c,v 1.3 2003/01/05 21:03:58 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -115,6 +115,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
     }
 
     i_size = id3_tag_query( p_peek, 10 );
+#if 0
     if ( p_input->stream.b_seekable )
     {        
         /*look for a id3v1 tag at the end of the file*/
@@ -171,6 +172,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
         p_input->pf_seek( p_input, 0 );
         input_AccessReinit( p_input );    
     }
+#endif
     if ( i_size <= 0 )
     {
         return( VLC_SUCCESS );
