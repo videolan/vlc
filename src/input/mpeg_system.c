@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.66 2001/12/03 11:49:04 massiot Exp $
+ * $Id: mpeg_system.c,v 1.67 2001/12/03 17:55:45 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -708,10 +708,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = MPEG2_VIDEO_ES;
                         p_es->i_cat = VIDEO_ES;
 #ifdef AUTO_SPAWN
-                        if( p_main->b_video )
-                        {
+                        if( !p_input->stream.b_seekable )
                             input_SelectES( p_input, p_es );
-                        }
 #endif
                     }
                     else if( (i_id & 0xE0) == 0xC0 )
@@ -721,18 +719,16 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->b_audio = 1;
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
-                        if( p_main->b_audio )
+                        if( !p_input->stream.b_seekable )
+                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
+                                == (p_es->i_id & 0x1F) )
+                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
                         {
-                            if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                    == (p_es->i_id & 0x1F) )
-                            switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                            {
-                            case 0:
-                                main_PutIntVariable( INPUT_CHANNEL_VAR,
-                                                     REQUESTED_MPEG );
-                            case REQUESTED_MPEG:
-                                input_SelectES( p_input, p_es );
-                            }
+                        case 0:
+                            main_PutIntVariable( INPUT_CHANNEL_VAR,
+                                                 REQUESTED_MPEG );
+                        case REQUESTED_MPEG:
+                            input_SelectES( p_input, p_es );
                         }
 #endif
                     }
@@ -743,18 +739,16 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->b_audio = 1;
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
-                        if( p_main->b_audio )
+                        if( !p_input->stream.b_seekable )
+                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
+                                == ((p_es->i_id & 0xF00) >> 8) )
+                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
                         {
-                            if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                    == ((p_es->i_id & 0xF00) >> 8) )
-                            switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                            {
-                            case 0:
-                                main_PutIntVariable( INPUT_CHANNEL_VAR,
-                                                     REQUESTED_AC3 );
-                            case REQUESTED_AC3:
-                                input_SelectES( p_input, p_es );
-                            }
+                        case 0:
+                            main_PutIntVariable( INPUT_CHANNEL_VAR,
+                                                 REQUESTED_AC3 );
+                        case REQUESTED_AC3:
+                            input_SelectES( p_input, p_es );
                         }
 #endif
                     }
@@ -764,13 +758,11 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = DVD_SPU_ES;
                         p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
-                        if( p_main->b_video )
+                        if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
+                                == ((p_es->i_id & 0x1F00) >> 8) )
                         {
-                            if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
-                                    == ((p_es->i_id & 0x1F00) >> 8) )
-                            {
+                            if( !p_input->stream.b_seekable )
                                 input_SelectES( p_input, p_es );
-                            }
                         }
 #endif
                     }
@@ -781,21 +773,6 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->b_audio = 1;
                         p_es->i_cat = AUDIO_ES;
                         /* FIXME : write the decoder */
-#ifdef AUTO_SPAWN
-                        if( p_main->b_audio )
-                        {
-                            if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                    == ((p_es->i_id & 0x1F00) >> 8) )
-                            switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                            {
-                            case 0:
-                                main_PutIntVariable( INPUT_CHANNEL_VAR,
-                                                     REQUESTED_LPCM );
-                            case REQUESTED_LPCM:
-                                input_SelectES( p_input, p_es );
-                            }
-                        }
-#endif
                     }
                     else
                     {
@@ -803,7 +780,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     }
                 }
 
-                /* Inform the interface that the stream has changed */
+                /* Tell the interface the stream has changed */
                 p_input->stream.b_changed = 1;
             }
         } /* stream.b_is_ok */
