@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.7 2003/08/25 01:33:25 fenrir Exp $
+ * $Id: http.c,v 1.8 2003/12/06 22:50:08 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -298,7 +298,7 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
                 p_sys->i_header_size = 0;
                 p_sys->b_header_complete = VLC_FALSE;
             }
-            if( p_buffer->i_size + p_sys->i_header_size > p_sys->i_header_allocated )
+            if( (int)(p_buffer->i_size + p_sys->i_header_size) > p_sys->i_header_allocated )
             {
                 p_sys->i_header_allocated = p_buffer->i_size + p_sys->i_header_size + 1024;
                 p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_allocated );

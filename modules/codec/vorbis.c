@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vorbis.c,v 1.25 2003/11/23 15:50:07 gbazin Exp $
+ * $Id: vorbis.c,v 1.26 2003/12/06 22:50:08 jpsaman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -642,7 +642,8 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     ogg_packet oggpacket;
     block_t *p_block, *p_chain = NULL;
     float **buffer;
-    int i, j;
+    int i;
+    unsigned int j;
 
     p_sys->i_pts = p_aout_buf->start_date -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
