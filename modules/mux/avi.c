@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.6 2003/02/24 10:45:55 fenrir Exp $
+ * $Id: avi.c,v 1.7 2003/02/24 12:34:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -65,6 +65,7 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
+static int Capability( int , void *, void * );
 static int AddStream( sout_instance_t *, sout_input_t * );
 static int DelStream( sout_instance_t *, sout_input_t * );
 static int Mux      ( sout_instance_t * );
@@ -170,7 +171,7 @@ static int Open( vlc_object_t *p_this )
 
     msg_Info( p_sout, "Open" );
 
-    p_sout->pf_mux_capacity  = NULL;
+    p_sout->pf_mux_capacity  = Capability;
     p_sout->pf_mux_addstream = AddStream;
     p_sout->pf_mux_delstream = DelStream;
     p_sout->pf_mux           = Mux;
@@ -237,6 +238,17 @@ static void Close( vlc_object_t * p_this )
     sout_AccessOutWrite( p_sout->p_access, p_hdr );
 }
 
+static int Capability( int i_query, void *p_args, void *p_answer )
+{
+   switch( i_query )
+   {
+        case SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME:
+            *(vlc_bool_t*)p_answer = VLC_TRUE;
+            return( SOUT_MUX_CAP_ERR_OK );
+        default:
+            return( SOUT_MUX_CAP_ERR_UNIMPLEMENTED );
+   }
+}
 
 static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
 {

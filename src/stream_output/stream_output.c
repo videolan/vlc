@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.13 2003/02/16 14:10:44 fenrir Exp $
+ * $Id: stream_output.c,v 1.14 2003/02/24 12:34:29 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -38,6 +38,18 @@
  * Local prototypes
  *****************************************************************************/
 static int      InitInstance      ( sout_instance_t * );
+
+struct sout_instance_sys_t
+{
+    /* if muxer doesn't support adding stream at any time then we first wait
+     *  for stream then we refuse all stream and start muxing */
+    vlc_bool_t  b_add_stream_any_time;
+    vlc_bool_t  b_waiting_stream;
+
+    /* we wait one second after first stream added */
+    mtime_t     i_add_stream_start;
+};
+
 
 /*****************************************************************************
  * sout_NewInstance: creates a new stream output instance
@@ -86,6 +98,11 @@ static int InitInstance( sout_instance_t * p_sout )
     p_sout->i_nb_inputs = 0;
     p_sout->pp_inputs = NULL;
     vlc_mutex_init( p_sout, &p_sout->lock );
+    p_sout->p_sys = malloc( sizeof( sout_instance_sys_t ) );
+    /* fixed after opening muxer */
+    p_sout->p_sys->b_add_stream_any_time = VLC_FALSE;
+    p_sout->p_sys->b_waiting_stream = VLC_TRUE;
+    p_sout->p_sys->i_add_stream_start = -1;
 
     /* Skip the plug-in names */
     while( *psz_parser && *psz_parser != ':' )
@@ -182,10 +199,30 @@ static int InitInstance( sout_instance_t * p_sout )
         msg_Err( p_sout, "no suitable mux module for `%s/%s://%s'",
                  p_sout->psz_access, p_sout->psz_mux, p_sout->psz_name );
 
-        sout_AccessDelete( p_sout->p_access );
+        sout_AccessOutDelete( p_sout->p_access );
         return -1;
     }
-
+    if( p_sout->pf_mux_capacity )
+    {
+        int b_answer;
+        if( p_sout->pf_mux_capacity( p_sout,
+                                       SOUT_MUX_CAP_GET_ADD_STREAM_ANY_TIME,
+                                       NULL, (void*)&b_answer ) != SOUT_MUX_CAP_ERR_OK )
+        {
+            b_answer = VLC_FALSE;
+        }
+        if( b_answer )
+        {
+            msg_Dbg( p_sout, "muxer support adding stream at any time" );
+            p_sout->p_sys->b_add_stream_any_time = VLC_TRUE;
+            p_sout->p_sys->b_waiting_stream = VLC_FALSE;
+        }
+        else
+        {
+            p_sout->p_sys->b_add_stream_any_time = VLC_FALSE;
+            p_sout->p_sys->b_waiting_stream = VLC_TRUE;
+        }
+    }
     p_sout->i_nb_inputs = 0;
     p_sout->pp_inputs = NULL;
 
@@ -206,7 +243,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     }
     if( p_sout->p_access )
     {
-        sout_AccessDelete( p_sout->p_access );
+        sout_AccessOutDelete( p_sout->p_access );
     }
 
     vlc_mutex_destroy( &p_sout->lock );
@@ -251,7 +288,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
 /*****************************************************************************
  * sout_AccessDelete: delete an access out
  *****************************************************************************/
-void sout_AccessDelete( sout_access_out_t *p_access )
+void sout_AccessOutDelete( sout_access_out_t *p_access )
 {
     if( p_access->p_module )
     {
@@ -266,7 +303,7 @@ void sout_AccessDelete( sout_access_out_t *p_access )
 /*****************************************************************************
  * sout_AccessSeek:
  *****************************************************************************/
-int  sout_AccessSeek( sout_access_out_t *p_access, off_t i_pos )
+int  sout_AccessOutSeek( sout_access_out_t *p_access, off_t i_pos )
 {
     return( p_access->pf_seek( p_access, i_pos ) );
 }
@@ -274,7 +311,7 @@ int  sout_AccessSeek( sout_access_out_t *p_access, off_t i_pos )
 /*****************************************************************************
  * sout_AccessWrite:
  *****************************************************************************/
-int  sout_AccessWrite( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
+int  sout_AccessOutWrite( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
 {
     return( p_access->pf_write( p_access, p_buffer ) );
 }
@@ -292,7 +329,7 @@ sout_input_t *__sout_InputNew( vlc_object_t *p_this,
     int             i_try;
 
     /* search an stream output */
-    for( i_try = 0; i_try < 200; i_try++ )
+    for( i_try = 0; i_try < 12; i_try++ )
     {
         p_sout = vlc_object_find( p_this, VLC_OBJECT_SOUT, FIND_ANYWHERE );
         if( !p_sout )
@@ -311,8 +348,18 @@ sout_input_t *__sout_InputNew( vlc_object_t *p_this,
         msg_Err( p_this, "cannot find any stream ouput" );
         return( NULL );
     }
+    if( !p_sout->p_sys->b_add_stream_any_time && !p_sout->p_sys->b_waiting_stream)
+    {
+        msg_Err( p_sout, "cannot add a new stream (unsuported while muxing for this format)" );
+        return( NULL );
+    }
 
     msg_Dbg( p_sout, "adding a new input" );
+    if( p_sout->p_sys->i_add_stream_start < 0 )
+    {
+        /* we wait for one second */
+        p_sout->p_sys->i_add_stream_start = mdate();
+    }
 
     /* create a new sout input */
     p_input = malloc( sizeof( sout_input_t ) );
@@ -421,6 +468,7 @@ int sout_InputDelete( sout_input_t *p_input )
 
 int sout_InputSendBuffer( sout_input_t *p_input, sout_buffer_t *p_buffer )
 {
+    sout_instance_sys_t *p_sys = p_input->p_sout->p_sys;
 /*    msg_Dbg( p_input->p_sout,
              "send buffer, size:%d", p_buffer->i_size ); */
 
@@ -428,10 +476,22 @@ int sout_InputSendBuffer( sout_input_t *p_input, sout_buffer_t *p_buffer )
     {
         sout_FifoPut( p_input->p_fifo, p_buffer );
 
+        if( p_sys->b_waiting_stream )
+        {
+            if( p_sys->i_add_stream_start > 0 &&
+                p_sys->i_add_stream_start + (mtime_t)1000000 < mdate() )
+            {
+                /* more than 1 second, start muxing */
+                p_sys->b_waiting_stream = VLC_FALSE;
+            }
+            else
+            {
+                return( 0 );
+            }
+        }
         vlc_mutex_lock( &p_input->p_sout->lock );
         p_input->p_sout->pf_mux( p_input->p_sout );
         vlc_mutex_unlock( &p_input->p_sout->lock );
-
     }
     else
     {
