@@ -68,7 +68,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("HTTP input") );
-    set_capability( "access2", 0 );
+    set_capability( "access2", 1 );
 
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 VLC_FALSE );
@@ -267,6 +267,17 @@ static int  Open ( vlc_object_t *p_this )
         }
     }
 
+    if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/x-ms-asf" ) )
+    {
+        char *p = strcasestr( p_access->psz_path, "asx" );
+
+        if( p == NULL )
+        {
+            msg_Dbg( p_access, "This isn't http, it's mms" );
+            goto error;
+        }
+    }
+
     if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
           p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
         p_sys->psz_location && *p_sys->psz_location )
@@ -284,7 +295,7 @@ static int  Open ( vlc_object_t *p_this )
         }
         p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
         playlist_Add( p_playlist, p_sys->psz_location, p_sys->psz_location,
-                      PLAYLIST_INSERT | PLAYLIST_GO,
+                      PLAYLIST_INSERT,
                       p_playlist->i_index + 1 );
         vlc_object_release( p_playlist );
 
@@ -295,6 +306,8 @@ static int  Open ( vlc_object_t *p_this )
     {
         if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/nsv" ) )
             p_access->psz_demux = strdup( "nsv" );
+        else if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "audio/aacp" ) )
+            p_access->psz_demux = strdup( "aac" );
         else
             p_access->psz_demux = strdup( "mp3" );
 
