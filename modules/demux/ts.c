@@ -2285,7 +2285,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         p_es->fmt.subs.dvb.i_id =
                             sub->p_subtitle[n].i_composition_page_id;
                         /* Hack, FIXME */
-                        pid->es->fmt.subs.dvb.i_id |=
+                        p_es->fmt.subs.dvb.i_id |=
                           ((int)sub->p_subtitle[n].i_ancillary_page_id << 16);
 
                         TAB_APPEND( pid->i_extra_es, pid->extra_es, p_es );
