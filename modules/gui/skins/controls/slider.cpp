@@ -2,7 +2,7 @@
  * slider.cpp: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: slider.cpp,v 1.2 2003/03/21 00:17:00 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -279,6 +279,8 @@ bool ControlSlider::MouseDown( int x, int y, int button )
     {
         State = 0;
         Selected = true;
+        ParentWindow->Refresh( Left + CursorX[Value],
+            Top + CursorY[Value], CWidth, CHeight );
         MoveCursor( FindNearestPoint( x, y ) );
         UpdateEvent->SetParam2( GetCursorPosition() );
         UpdateEvent->SendEvent();

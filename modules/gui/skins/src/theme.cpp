@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.4 2003/03/21 00:00:19 karibu Exp $
+ * $Id: theme.cpp,v 1.5 2003/03/21 00:17:00 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -359,8 +359,6 @@ void Theme::HangToAnchors( Window *wnd, int &x, int &y, bool init )
                         // If parent hang child and child is not still in list
                         if( !(*win_anchor)->IsInList( (*wnd_anchor) ) )
                         {
-                            if( init )
-                                msg_Err( p_intf, "Add" );
                             (*win_anchor)->Add( (*wnd_anchor) );
                         }
 
