@@ -111,7 +111,8 @@ typedef struct
     FramedSource *readSource;
     vlc_bool_t   b_rtcp_sync;
 
-    uint8_t      buffer[65536];
+    uint8_t      *p_buffer;
+    unsigned int  i_buffer;
 
     char         waiting;
 
@@ -366,6 +367,8 @@ static int  Open ( vlc_object_t *p_this )
         tk->b_rtcp_sync = VLC_FALSE;
         tk->p_out_muxed = NULL;
         tk->p_es        = NULL;
+        tk->i_buffer    = 65535;
+        tk->p_buffer    = (uint8_t *)malloc( 65535 );
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
@@ -595,7 +598,7 @@ static void Close( vlc_object_t *p_this )
         {
             stream_DemuxDelete( tk->p_out_muxed );
         }
-
+        free( tk->p_buffer );
         free( tk );
     }
     if( p_sys->i_track )
@@ -688,7 +691,7 @@ static int Demux( demux_t *p_demux )
         if( tk->waiting == 0 )
         {
             tk->waiting = 1;
-            tk->readSource->getNextFrame( tk->buffer, 65536,
+            tk->readSource->getNextFrame( tk->p_buffer, tk->i_buffer,
                                           StreamRead, tk,
                                           StreamClose, tk );
         }
@@ -895,7 +898,25 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
              i_size,
              pts.tv_sec * 1000000LL + pts.tv_usec );
 #endif
-    if( i_size > 65536 )
+
+    /* grow buffer if it looks like buffer is too small, but don't eat
+     * up all the memory on strange streams */
+    if( tk->i_buffer < i_size + 1500 && tk->i_buffer < 2000000 )
+    {
+        void *p_tmp;
+        msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer + 2000 );
+        tk->i_buffer += 2000;
+        p_tmp = realloc( tk->p_buffer, tk->i_buffer );
+        if (p_tmp == NULL)
+        {
+            msg_Warn( p_demux, "realloc failed" );
+        }
+        else
+        {
+            tk->p_buffer = (uint8_t*)p_tmp;
+        }
+    }
+    if( i_size > tk->i_buffer )
     {
         msg_Warn( p_demux, "buffer overflow" );
     }
@@ -911,19 +932,19 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 #endif
         p_block = block_New( p_demux, i_size + 4 );
         memcpy( p_block->p_buffer, &header, 4 );
-        memcpy( p_block->p_buffer + 4, tk->buffer, i_size );
+        memcpy( p_block->p_buffer + 4, tk->p_buffer, i_size );
     }
     else if( tk->b_asf )
     {
         int i_copy = __MIN( p_sys->asfh.i_min_data_packet_size, i_size );
         p_block = block_New( p_demux, p_sys->asfh.i_min_data_packet_size );
 
-        memcpy( p_block->p_buffer, tk->buffer, i_copy );
+        memcpy( p_block->p_buffer, tk->p_buffer, i_copy );
     }
     else
     {
         p_block = block_New( p_demux, i_size );
-        memcpy( p_block->p_buffer, tk->buffer, i_size );
+        memcpy( p_block->p_buffer, tk->p_buffer, i_size );
     }
     if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') &&
         tk->rtpSource->curPacketMarkerBit() )
