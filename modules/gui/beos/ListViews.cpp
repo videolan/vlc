@@ -2,7 +2,7 @@
  * ListViews.h: BeOS interface list view class implementation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ListViews.cpp,v 1.3 2003/02/01 12:01:11 stippi Exp $
+ * $Id: ListViews.cpp,v 1.4 2003/02/02 11:29:12 stippi Exp $
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>
  *
@@ -370,6 +370,7 @@ DragSortableListView::MouseMoved(BPoint where, uint32 transit, const BMessage *m
 	else
 	{
 		_RemoveDropAnticipationRect();
+		fDragMessageCopy.what = 0;
 		BListView::MouseMoved(where, transit, msg);
 	}
 }
@@ -382,6 +383,7 @@ DragSortableListView::MouseUp( BPoint where )
 {
 	// remove drop mark
 	_SetDropAnticipationRect( BRect( 0.0, 0.0, -1.0, -1.0 ) );
+	fDragMessageCopy.what = 0;
 	BListView::MouseUp( where );
 }
 
