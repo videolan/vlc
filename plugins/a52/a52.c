@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.19 2002/06/02 10:28:48 gbazin Exp $
+ * $Id: a52.c,v 1.20 2002/07/19 22:04:37 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -48,6 +48,18 @@
 
 #define AC3DEC_FRAME_SIZE 1536 
 
+/*
+ * Global lock for accessing liba52 functions.
+ * Currently, liba52 isn't thread-safe. So to prevent two threads from
+ * using liba52 at the same time, we have to set up a global lock.
+ * I know static variables aren't a good idea in multi-threaded programs,
+ * but believe me, this is the way to go.
+ * --Meuuh 2002-07-19
+ */
+static vlc_mutex_t a52_lock;
+static vlc_bool_t  b_liba52_initialized = 0;
+
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -88,7 +100,7 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( _("a52 ATSC A/52 aka AC-3 audio decoder module") )
-    ADD_CAPABILITY( DECODER, 40 )
+    ADD_CAPABILITY( DECODER, 60 )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -156,13 +168,15 @@ static int decoder_Run ( decoder_fifo_t *p_fifo )
 
         /* get a52 frame header */
         GetChunk( &p_a52_adec->bit_stream, p_a52_adec->p_frame_buffer, 7 );
-	if( p_a52_adec->p_fifo->b_die ) break;
+        if( p_a52_adec->p_fifo->b_die ) break;
 
         /* check if frame is valid and get frame info */
+        vlc_mutex_lock( &a52_lock );
         p_a52_adec->frame_size = a52_syncinfo( p_a52_adec->p_frame_buffer,
                                                &p_a52_adec->flags,
                                                &p_a52_adec->sample_rate,
                                                &p_a52_adec->bit_rate );
+        vlc_mutex_unlock( &a52_lock );
 
         if( !p_a52_adec->frame_size )
         {
@@ -196,8 +210,19 @@ static int decoder_Run ( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 static int InitThread( a52_adec_thread_t * p_a52_adec )
 {
+    /* Initialize the global lock */
+    vlc_mutex_lock( p_a52_adec->p_fifo->p_vlc->p_global_lock );
+    if ( !b_liba52_initialized )
+    {
+        vlc_mutex_init( p_a52_adec->p_fifo, &a52_lock );
+        b_liba52_initialized = 1;
+    }
+    vlc_mutex_unlock( p_a52_adec->p_fifo->p_vlc->p_global_lock );
+
     /* Initialize liba52 */
+    vlc_mutex_lock( &a52_lock );
     p_a52_adec->p_a52_state = a52_init( 0 );
+    vlc_mutex_unlock( &a52_lock );
     if( p_a52_adec->p_a52_state == NULL )
     {
         msg_Err( p_a52_adec->p_fifo, "unable to initialize liba52" );
@@ -278,6 +303,7 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
     if( p_a52_adec->p_fifo->b_die ) return( -1 );
 
     /* do the actual decoding now */
+    vlc_mutex_lock( &a52_lock );
     a52_frame( p_a52_adec->p_a52_state, p_a52_adec->p_frame_buffer,
                &p_a52_adec->flags, &sample_level, 384 );
 
@@ -294,6 +320,7 @@ static int DecodeFrame( a52_adec_thread_t * p_a52_adec )
         float2s16_2( a52_samples( p_a52_adec->p_a52_state ),
                      ((int16_t *)p_buffer) + i * 256 * p_a52_adec->i_channels );
     }
+    vlc_mutex_unlock( &a52_lock );
 
 
     vlc_mutex_lock( &p_a52_adec->p_aout_fifo->data_lock );
@@ -321,7 +348,9 @@ static void EndThread (a52_adec_thread_t *p_a52_adec)
         vlc_mutex_unlock (&(p_a52_adec->p_aout_fifo->data_lock));
     }
 
+    vlc_mutex_lock( &a52_lock );
     a52_free( p_a52_adec->p_a52_state );
+    vlc_mutex_unlock( &a52_lock );
     free( p_a52_adec );
 
 }
