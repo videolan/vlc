@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.11 2003/12/03 13:49:12 rocky Exp $
+ * $Id: access.c,v 1.12 2003/12/05 01:56:24 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -317,23 +317,11 @@ static void InformationCreate( input_thread_t *p_input  )
 {
   cdda_data_t *p_cdda = (cdda_data_t *) p_input->p_access_data;
   input_info_category_t *p_cat;
-  int use_cddb = p_cdda->i_cddb_enabled;
   
   p_cat = input_InfoCategory( p_input, "General" );
 
 #ifdef HAVE_LIBCDDB
-  if (use_cddb) {
-    
-    if( p_cdda->cddb.disc->length > 1000 )
-      {
-	int64_t i_sec = (int64_t) p_cdda->cddb.disc->length;
-	char psz_buffer[MSTRTIME_MAX_SIZE];
-	input_AddInfo( p_cat, _("Duration"), "%s", 
-		       secstotimestr( psz_buffer, i_sec ) );
-      } else 
-      {
-	use_cddb = 0;
-      }
+  if (p_cdda->i_cddb_enabled) {
     
     meta_info_add_str( "Title", p_cdda->cddb.disc->title );
     meta_info_add_str( "Artist", p_cdda->cddb.disc->artist );
@@ -360,14 +348,14 @@ static void InformationCreate( input_thread_t *p_input  )
 
 #endif /*HAVE_LIBCDDB*/
 
-  if (!use_cddb)
   {
     track_t i_track = p_cdda->i_nb_tracks;
     char psz_buffer[MSTRTIME_MAX_SIZE];
     mtime_t i_duration = 
-      (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[i_track-1]) 
+      (p_cdda->p_sectors[i_track] - p_cdda->p_sectors[0]) 
       / CDIO_CD_FRAMES_PER_SEC;
 
+    dbg_print( INPUT_DBG_META, "Duration %ld", (long int) i_duration );
     input_AddInfo( p_cat, _("Duration"), "%s", 
 		   secstotimestr( psz_buffer, i_duration ) );
   }
@@ -658,7 +646,9 @@ CDDACreatePlayListItem(const input_thread_t *p_input, cdda_data_t *p_cdda,
 			  config_GetPsz( p_input, config_varname ), 
 			  psz_mrl, i_track);
 
-  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration, 
+  dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld, pos %d",
+	     psz_mrl, p_title, (long int) i_duration, i_pos );
+  playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration * 1000000, 
 		   0, 0, playlist_operation, i_pos );
 }
 
