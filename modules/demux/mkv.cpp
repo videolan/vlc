@@ -1074,10 +1074,12 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         DataBuffer &data = block->GetBuffer(i);
 
         p_block = MemToBlock( p_demux, data.Buffer(), data.Size() );
+#if defined(HAVE_ZLIB_H)
         if( p_block != NULL && tk.b_compression_zlib )
         {
             p_block = block_zlib_decompress( VLC_OBJECT(p_demux), p_block );
         }
+#endif
         if( p_block == NULL )
         {
             break;
