@@ -22,6 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef __VLC_NETWORK_H
+# define __VLC_NETWORK_H
 /*****************************************************************************
  * network_socket_t: structure passed to a network plug-in to define the
  *                   kind of socket we want
@@ -243,3 +245,5 @@ VLC_EXPORT( int, net_Printf, ( vlc_object_t *p_this, int fd, const char *psz_fmt
 
 #define net_vaPrintf(a,b,c,d) __net_vaPrintf(VLC_OBJECT(a),b,c,d)
 VLC_EXPORT( int, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const char *psz_fmt, va_list args ) );
+
+#endif
