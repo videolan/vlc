@@ -170,7 +170,7 @@ vlc_module_begin();
     add_integer( "dvb-hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
                  VLC_TRUE );
 
-    set_capability( "access", 0 );
+    set_capability( "access2", 0 );
     add_shortcut( "dvb" );
     add_shortcut( "dvb-s" );
     add_shortcut( "qpsk" );
