@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.25 2003/09/30 20:36:46 gbazin Exp $
+ * $Id: a52.c,v 1.26 2003/10/01 18:32:13 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -81,7 +81,6 @@ struct decoder_sys_t
      * Common properties
      */
     uint8_t               *p_out_buffer;                    /* output buffer */
-    int                   i_out_buffer;         /* position in output buffer */
     audio_date_t          end_date;
 
     mtime_t pts;
@@ -178,7 +177,6 @@ static int InitDecoder( decoder_t *p_dec )
     p_dec->p_sys->b_synchro = VLC_FALSE;
 
     p_dec->p_sys->p_out_buffer = NULL;
-    p_dec->p_sys->i_out_buffer = 0;
     aout_DateSet( &p_dec->p_sys->end_date, 0 );
 
     p_dec->p_sys->p_aout = NULL;
@@ -206,6 +204,13 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[A52_HEADER_SIZE];
 
+    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
+    {
+        /* We've just started the stream, wait for the first PTS. */
+        block_Release( p_block );
+        return VLC_SUCCESS;
+    }
+
     if( p_sys->p_chain )
     {
         block_ChainAppend( &p_sys->p_chain, p_block );
@@ -231,7 +236,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                     break;
                 }
                 block_SkipByte( &p_sys->bytestream );
-                p_dec->p_sys->b_synchro = VLC_FALSE;
+                p_sys->b_synchro = VLC_FALSE;
             }
             if( p_sys->i_state != STATE_SYNC )
             {
@@ -273,7 +278,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 msg_Dbg( p_dec, "emulated sync word" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
-                p_dec->p_sys->b_synchro = VLC_FALSE;
+                p_sys->b_synchro = VLC_FALSE;
                 break;
             }
             p_sys->i_state = STATE_DATA;
@@ -282,7 +287,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             /* TODO: If p_block == NULL, flush the buffer without checking the
              * next sync word */
 
-            if( !p_dec->p_sys->b_synchro )
+            if( !p_sys->b_synchro )
             {
                 /* Check if next expected frame contains the sync word */
                 if( block_PeekOffsetBytes( &p_sys->bytestream,
@@ -299,12 +304,12 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                              "(no sync on following frame)" );
                     p_sys->i_state = STATE_NOSYNC;
                     block_SkipByte( &p_sys->bytestream );
-                    p_dec->p_sys->b_synchro = VLC_FALSE;
+                    p_sys->b_synchro = VLC_FALSE;
                     break;
                 }
             }
 
-            if( !p_dec->p_sys->p_out_buffer )
+            if( !p_sys->p_out_buffer )
             if( GetOutBuffer( p_dec, &p_sys->p_out_buffer ) != VLC_SUCCESS )
             {
                 return VLC_EGENERIC;
@@ -322,7 +327,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
             SendOutBuffer( p_dec );
             p_sys->i_state = STATE_NOSYNC;
-            p_dec->p_sys->b_synchro = VLC_TRUE;
+            p_sys->b_synchro = VLC_TRUE;
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->pts == p_sys->bytestream.p_block->i_pts )
@@ -378,7 +383,7 @@ static int GetOutBuffer( decoder_t *p_dec, uint8_t **pp_out_buffer )
 
     if( p_sys->b_packetizer )
     {
-        i_ret= GetSoutBuffer( p_dec, &p_sys->p_sout_buffer );
+        i_ret = GetSoutBuffer( p_dec, &p_sys->p_sout_buffer );
         *pp_out_buffer =
             p_sys->p_sout_buffer ? p_sys->p_sout_buffer->p_buffer : NULL;
     }
@@ -423,26 +428,18 @@ static int GetAoutBuffer( decoder_t *p_dec, aout_buffer_t **pp_buffer )
         p_sys->p_aout_input = aout_DecNew( p_dec,
                                            &p_sys->p_aout,
                                            &p_sys->aout_format );
-
-        if ( p_sys->p_aout_input == NULL )
+        if( p_sys->p_aout_input == NULL )
         {
             *pp_buffer = NULL;
-            return VLC_SUCCESS;
+            return VLC_EGENERIC;
         }
-    }
-
-    if( !aout_DateGet( &p_sys->end_date ) )
-    {
-        /* We've just started the stream, wait for the first PTS. */
-        *pp_buffer = NULL;
-        return VLC_SUCCESS;
     }
 
     *pp_buffer = aout_DecNewBuffer( p_sys->p_aout, p_sys->p_aout_input,
                                     A52_FRAME_NB );
     if( *pp_buffer == NULL )
     {
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     }
 
     (*pp_buffer)->start_date = aout_DateGet( &p_sys->end_date );
@@ -490,18 +487,11 @@ static int GetSoutBuffer( decoder_t *p_dec, sout_buffer_t **pp_buffer )
                   p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
     }
 
-    if( !aout_DateGet( &p_sys->end_date ) )
-    {
-        /* We've just started the stream, wait for the first PTS. */
-        *pp_buffer = NULL;
-        return VLC_SUCCESS;
-    }
-
     *pp_buffer = sout_BufferNew( p_sys->p_sout_input->p_sout,
                                  p_sys->i_frame_size );
     if( *pp_buffer == NULL )
     {
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     }
 
     (*pp_buffer)->i_pts =
