@@ -36,10 +36,7 @@ static const GUID MEDIASUBTYPE_YV12 = {0x32315659, 0x0000, 0x0010, {0x80, 0x00, 
 #ifdef WIN32
 #   define IUnknown IUnknownHack
 #endif
-typedef struct _IUnknown IUnknown;
-typedef struct _IEnumDMO IEnumDMO;
-typedef struct _IMediaBuffer IMediaBuffer;
-typedef struct _IMediaObject IMediaObject;
+
 #ifndef STDCALL
 #define STDCALL __stdcall
 #endif
@@ -61,6 +58,25 @@ typedef struct
     GUID subtype;
 
 } DMO_PARTIAL_MEDIATYPE;
+
+/* Implementation of IMediaBuffer */
+typedef struct _CMediaBuffer
+{
+    IMediaBuffer_vt *vt;
+    int i_ref;
+    block_t *p_block;
+    int i_max_size;
+    vlc_bool_t b_own;
+
+} CMediaBuffer;
+
+CMediaBuffer *CMediaBufferCreate( block_t *, int, vlc_bool_t );
+
+#ifndef LOADER
+typedef struct _IUnknown IUnknown;
+typedef struct _IEnumDMO IEnumDMO;
+typedef struct _IMediaBuffer IMediaBuffer;
+typedef struct _IMediaObject IMediaObject;
 
 typedef struct
 #ifdef HAVE_ATTRIBUTE_PACKED
@@ -229,16 +245,5 @@ typedef struct IMediaObject_vt
 
 } IMediaObject_vt;
 struct _IMediaObject { IMediaObject_vt* vt; };
+#endif  /* !define LOADER */
 
-/* Implementation of IMediaBuffer */
-typedef struct _CMediaBuffer
-{
-    IMediaBuffer_vt *vt;
-    int i_ref;
-    block_t *p_block;
-    int i_max_size;
-    vlc_bool_t b_own;
-
-} CMediaBuffer;
-
-CMediaBuffer *CMediaBufferCreate( block_t *, int, vlc_bool_t );

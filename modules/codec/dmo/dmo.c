@@ -32,9 +32,44 @@
 #include <vlc/decoder.h>
 #include <vlc/vout.h>
 
-#include <objbase.h>
-#include "codecs.h"
+#define LOADER
+#ifdef LOADER
+/* Need the w32dll loader from mplayer */
+#   include <wine/winerror.h>
+#   include <dmo/dmo.h>
+#   include <dmo/dmo_interfaces.h>
+#   include <dmo/dmo_guids.h>
+#   include <ldt_keeper.h>
+
+/* Avoid  codecs.h to redefine a few symbols */
+#   define _RECT32_
+#   define _GUID_DEFINED
+#   define _REFERENCE_TIME_
+#   define _VIDEOINFOHEADER_
+
+/* Ugly, wine loader and vlc doesn't use the same field name for GUID */
+#define Data1 f1
+#define Data2 f2
+#define Data3 f3
+#define Data4 f4
+
+/* Not Needed */
+HRESULT CoInitialize( LPVOID pvReserved ) { return (HRESULT)-1; }
+void CoUninitialize(void) { }
+
+/* */
+HMODULE   WINAPI LoadLibraryA(LPCSTR);
+FARPROC   WINAPI GetProcAddress(HMODULE,LPCSTR);
+int       WINAPI FreeLibrary(HMODULE);
+
+typedef long STDCALL (*GETCLASS) (const GUID*, const GUID*, void**);
+
+#else
+#   include <objbase.h>
+#endif
+
 #include "dmo.h"
+#include "codecs.h"
 
 static int pi_channels_maps[7] =
 {
@@ -53,6 +88,7 @@ static int pi_channels_maps[7] =
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open         ( vlc_object_t * );
 static int  DecoderOpen  ( vlc_object_t * );
 static void DecoderClose ( vlc_object_t * );
 static void *DecodeBlock ( decoder_t *, block_t ** );
@@ -63,7 +99,7 @@ vlc_module_begin();
     set_description( _("DirectMedia Object decoder") );
     add_shortcut( "dmo" );
     set_capability( "decoder", 1 );
-    set_callbacks( DecoderOpen, DecoderClose );
+    set_callbacks( Open, DecoderClose );
 vlc_module_end();
 
 /*****************************************************************************
@@ -82,7 +118,80 @@ struct decoder_sys_t
     uint8_t *p_buffer;
 
     audio_date_t end_date;
+
+#ifdef LOADER
+    ldt_fs_t    *ldt_fs;
+#endif
 };
+
+#ifdef LOADER
+static const GUID guid_wmv9 = { 0x724bb6a4, 0xe526, 0x450f, { 0xaf, 0xfa, 0xab, 0x9b, 0x45, 0x12, 0x91, 0x11 } };
+static const GUID guid_wma9 = { 0x27ca0808, 0x01f5, 0x4e7a, { 0x8b, 0x05, 0x87, 0xf8, 0x07, 0xa2, 0x33, 0xd1 } };
+
+static const GUID guid_wmv = { 0x82d353df, 0x90bd, 0x4382, { 0x8b, 0xc2, 0x3f, 0x61, 0x92, 0xb7, 0x6e, 0x34 } };
+static const GUID guid_wma = { 0x874131cb, 0x4ecc, 0x443b, { 0x89, 0x48, 0x74, 0x6b, 0x89, 0x59, 0x5d, 0x20 } };
+
+static const struct
+{
+    vlc_fourcc_t i_fourcc;
+    const char   *psz_dll;
+    const GUID   *p_guid;
+} codecs_table[] =
+{
+    /* WM3 */
+    { VLC_FOURCC('W','M','V','3'), "wmv9dmod.dll", &guid_wmv9 },
+    { VLC_FOURCC('w','m','v','3'), "wmv9dmod.dll", &guid_wmv9 },
+    /* WMV2 */
+    { VLC_FOURCC('W','M','V','2'), "wmvdmod.dll", &guid_wmv },
+    { VLC_FOURCC('w','m','v','2'), "wmvdmod.dll", &guid_wmv },
+    /* WMV1 */
+    { VLC_FOURCC('W','M','V','1'), "wmvdmod.dll", &guid_wmv },
+    { VLC_FOURCC('w','m','v','1'), "wmvdmod.dll", &guid_wmv },
+
+    /* WMA 3*/
+    { VLC_FOURCC('W','M','A','3'), "wma9dmod.dll", &guid_wma9 },
+    { VLC_FOURCC('w','m','a','3'), "wma9dmod.dll", &guid_wma9 },
+
+    /* */
+    { 0, NULL, NULL }
+};
+
+#endif
+
+/*****************************************************************************
+ * Open: open dmo codec
+ *****************************************************************************/
+static int Open( vlc_object_t *p_this )
+{
+#ifndef LOADER
+    return DecoderOpen( p_this );
+#else
+    decoder_t *p_dec = (decoder_t*)p_this;
+    int i;
+    /* We can't open it now, because of ldt_keeper or something
+     * Open/Decode/Close has to be done in the same thread */
+
+    p_dec->p_sys = NULL;
+
+
+    /* Probe if we support it */
+    for( i = 0; codecs_table[i].i_fourcc != 0; i++ )
+    {
+        if( codecs_table[i].i_fourcc == p_dec->fmt_in.i_codec )
+        {
+            msg_Dbg( p_dec, "DMO codec for %4.4s may work with dll=%s",
+                     (char*)&p_dec->fmt_in.i_codec,
+                     codecs_table[i].psz_dll );
+
+            /* Set callbacks */
+            p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))DecodeBlock;
+            p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))DecodeBlock;
+            return VLC_SUCCESS;
+        }
+    }
+    return VLC_EGENERIC;
+#endif
+}
 
 /*****************************************************************************
  * DecoderOpen: open dmo codec
@@ -94,33 +203,16 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     DMO_PARTIAL_MEDIATYPE dmo_partial_type;
     DMO_MEDIA_TYPE dmo_input_type, dmo_output_type;
-    IEnumDMO *p_enum_dmo = NULL; 
     IMediaObject *p_dmo = NULL;
-    WCHAR *psz_dmo_name;
-    GUID clsid_dmo;
 
     VIDEOINFOHEADER *p_vih = NULL;
     WAVEFORMATEX *p_wf = NULL;
 
-    HRESULT (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
-                           const DMO_PARTIAL_MEDIATYPE *,
-                           uint32_t, const DMO_PARTIAL_MEDIATYPE *,
-                           IEnumDMO ** );
+#ifdef LOADER
+    ldt_fs_t *ldt_fs = Setup_LDT_Keeper();
+#endif /* LOADER */
 
-    /* Load msdmo DLL */
-    HINSTANCE hmsdmo_dll = LoadLibrary( "msdmo.dll" );
-    if( hmsdmo_dll == NULL )
-    {
-        msg_Dbg( p_dec, "failed loading msdmo.dll" );
-        return VLC_EGENERIC;
-    }
-    OurDMOEnum = (void *)GetProcAddress( hmsdmo_dll, "DMOEnum" );
-    if( OurDMOEnum == NULL )
-    {
-        msg_Dbg( p_dec, "GetProcAddress failed to find DMOEnum()" );
-        FreeLibrary( hmsdmo_dll );
-        return VLC_EGENERIC;
-    }
+    HINSTANCE hmsdmo_dll = NULL;
 
     /* Look for a DMO which can handle the requested codec */
     if( p_dec->fmt_in.i_cat == AUDIO_ES )
@@ -138,6 +230,33 @@ static int DecoderOpen( vlc_object_t *p_this )
         dmo_partial_type.subtype = dmo_partial_type.type;
         dmo_partial_type.subtype.Data1 = p_dec->fmt_in.i_codec;
     }
+
+#ifndef LOADER
+  { /* <- ugly ? yes */
+    IEnumDMO *p_enum_dmo = NULL;
+    WCHAR *psz_dmo_name;
+    GUID clsid_dmo;
+    HRESULT (STDCALL *OurDMOEnum)( const GUID *, uint32_t, uint32_t,
+                           const DMO_PARTIAL_MEDIATYPE *,
+                           uint32_t, const DMO_PARTIAL_MEDIATYPE *,
+                           IEnumDMO ** );
+
+
+    /* Load msdmo DLL */
+    hmsdmo_dll = LoadLibrary( "msdmo.dll" );
+    if( hmsdmo_dll == NULL )
+    {
+        msg_Dbg( p_dec, "failed loading msdmo.dll" );
+        return VLC_EGENERIC;
+    }
+    OurDMOEnum = (void *)GetProcAddress( hmsdmo_dll, "DMOEnum" );
+    if( OurDMOEnum == NULL )
+    {
+        msg_Dbg( p_dec, "GetProcAddress failed to find DMOEnum()" );
+        FreeLibrary( hmsdmo_dll );
+        return VLC_EGENERIC;
+    }
+
 
     /* Initialize OLE/COM */
     CoInitialize( 0 );
@@ -173,6 +292,76 @@ static int DecoderOpen( vlc_object_t *p_this )
         msg_Err( p_dec, "can't create DMO" );
         goto error;
     }
+  }
+#else   /* LOADER */
+  {
+    GETCLASS GetClass;
+    struct IClassFactory* cFactory = NULL;
+    struct IUnknown* cObject = NULL;
+
+    int i_err;
+    int i_codec;
+    for( i_codec = 0; codecs_table[i_codec].i_fourcc != 0; i_codec++ )
+    {
+        if( codecs_table[i_codec].i_fourcc == p_dec->fmt_in.i_codec )
+            break;
+    }
+    if( codecs_table[i_codec].i_fourcc == 0 )
+        return VLC_EGENERIC;    /* Can't happen */
+
+    hmsdmo_dll = LoadLibrary( codecs_table[i_codec].psz_dll );
+    if( hmsdmo_dll == NULL )
+    {
+        msg_Dbg( p_dec, "failed loading '%s'", codecs_table[i_codec].psz_dll );
+        return VLC_EGENERIC;
+    }
+
+    GetClass = (GETCLASS)GetProcAddress( hmsdmo_dll, "DllGetClassObject");
+    if (!GetClass)
+    {
+        msg_Dbg( p_dec, "GetProcAddress failed to find DllGetClassObject()" );
+        FreeLibrary( hmsdmo_dll );
+        return VLC_EGENERIC;
+    }
+
+    i_err = GetClass( codecs_table[i_codec].p_guid, &IID_IClassFactory, (void**)&cFactory );
+    if( i_err || cFactory == NULL )
+    {
+        msg_Dbg( p_dec, "no such class object" );
+        FreeLibrary( hmsdmo_dll );
+        return VLC_EGENERIC;
+    }
+
+    i_err = cFactory->vt->CreateInstance( cFactory, 0, &IID_IUnknown, (void**)&cObject );
+    cFactory->vt->Release((IUnknown*)cFactory );
+    if( i_err || !cObject )
+    {
+        msg_Dbg( p_dec, "class factory failure" );
+        FreeLibrary( hmsdmo_dll );
+        return VLC_EGENERIC;
+    }
+    i_err = cObject->vt->QueryInterface( cObject, &IID_IMediaObject, (void**)&p_dmo );
+#if 0
+    if (hr == 0)
+    {
+            /* query for some extra available interface */
+        HRESULT r = object->vt->QueryInterface(object, &IID_IMediaObjectInPlace, (void**)&This->m_pInPlace);
+            if (r == 0 && This->m_pInPlace)
+        printf("DMO dll supports InPlace - PLEASE REPORT to developer\n");
+        r = object->vt->QueryInterface(object, &IID_IDMOVideoOutputOptimizations, (void**)&This->m_pOptim);
+        if (r == 0 && This->m_pOptim)
+        {
+                unsigned long flags;
+        r = This->m_pOptim->vt->QueryOperationModePreferences(This->m_pOptim, 0, &flags);
+        printf("DMO dll supports VO Optimizations %ld %lx\n", r, flags);
+        if (flags & DMO_VOSF_NEEDS_PREVIOUS_SAMPLE)
+            printf("DMO dll might use previous sample when requested\n");
+        }
+    }
+#endif
+    cObject->vt->Release((IUnknown*)cObject );
+  }
+#endif  /* LOADER */
 
     /* Setup input format */
     memset( &dmo_input_type, 0, sizeof(dmo_input_type) );
@@ -195,7 +384,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_wf->wBitsPerSample = p_dec->fmt_in.audio.i_bitspersample;
         p_wf->nBlockAlign = p_dec->fmt_in.audio.i_blockalign;
         p_wf->nAvgBytesPerSec = p_dec->fmt_in.i_bitrate / 8;
-        p_wf->cbSize = i_size;
+        p_wf->cbSize = p_dec->fmt_in.i_extra;
 
         dmo_input_type.formattype = FORMAT_WaveFormatEx;
         dmo_input_type.cbFormat   = i_size;
@@ -255,8 +444,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
         p_dec->fmt_out.audio.i_rate     = p_dec->fmt_in.audio.i_rate;
         p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
-        p_dec->fmt_out.audio.i_bitspersample =
-            p_dec->fmt_in.audio.i_bitspersample;
+        p_dec->fmt_out.audio.i_bitspersample = 16;//p_dec->fmt_in.audio.i_bitspersample; We request 16
         p_dec->fmt_out.audio.i_physical_channels =
             p_dec->fmt_out.audio.i_original_channels =
                 pi_channels_maps[p_dec->fmt_out.audio.i_channels];
@@ -269,7 +457,7 @@ static int DecoderOpen( vlc_object_t *p_this )
             p_wf->wBitsPerSample / 8 * p_wf->nChannels;
         p_wf->nAvgBytesPerSec =
             p_wf->nSamplesPerSec * p_wf->nBlockAlign;
-        p_wf->cbSize = sizeof(WAVEFORMATEX);
+        p_wf->cbSize = 0;
 
         dmo_output_type.formattype = FORMAT_WaveFormatEx;
         dmo_output_type.subtype    = MEDIASUBTYPE_PCM;
@@ -359,6 +547,9 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     p_sys->hmsdmo_dll = hmsdmo_dll;
     p_sys->p_dmo = p_dmo;
+#ifdef LOADER
+    p_sys->ldt_fs = ldt_fs;
+#endif
 
     /* Find out some properties of the output */
     {
@@ -424,6 +615,12 @@ void DecoderClose( vlc_object_t *p_this )
 
     FreeLibrary( p_sys->hmsdmo_dll );
 
+#if 0
+#ifdef LOADER
+    Restore_LDT_Keeper( p_sys->ldt_fs );
+#endif
+#endif
+
     if( p_sys->p_buffer ) free( p_sys->p_buffer );
     free( p_sys );
 }
@@ -444,6 +641,16 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     block_t block_out;
     uint32_t i_status, i_buffer_out;
     uint8_t *p_buffer_out;
+
+    if( p_sys == NULL )
+    {
+        if( DecoderOpen( VLC_OBJECT(p_dec) ) )
+        {
+            msg_Err( p_dec, "DecoderOpen failed" );
+            return NULL;
+        }
+        p_sys = p_dec->p_sys;
+    }
 
     if( !pp_block ) return NULL;
 
@@ -580,8 +787,8 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         aout_buffer_t *p_aout_buffer;
         int i_samples = i_buffer_out /
-            ( p_dec->fmt_in.audio.i_bitspersample *
-              p_dec->fmt_in.audio.i_channels / 8 );
+            ( p_dec->fmt_out.audio.i_bitspersample *
+              p_dec->fmt_out.audio.i_channels / 8 );
 
         p_aout_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples );
         memcpy( p_aout_buffer->p_buffer, p_buffer_out, i_buffer_out );
