@@ -358,7 +358,7 @@ static int Open( vlc_object_t *p_this )
         {
             if( url.i_port == 0 ) url.i_port = DEFAULT_PORT;
 
-            p_session->psz_uri = url.psz_host;
+            p_session->psz_uri = strdup( url.psz_host );
             p_session->i_port = url.i_port;
             p_session->psz_sdp = NULL;
 
