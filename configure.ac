@@ -1842,7 +1842,7 @@ then
     AC_ARG_WITH(ffmpeg-dts,
       [    --with-ffmpeg-dts   if ffmpeg has been compiled with dts support],
       [
-        VLC_ADD_LDFLAGS([ffmpeg],[-lz]) ])
+        VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
 
     AC_ARG_WITH(ffmpeg-zlib,
       [    --with-ffmpeg-zlib   if ffmpeg has been compiled with zlib support],

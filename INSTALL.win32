@@ -94,13 +94,13 @@ http://download.videolan.org/pub/testing/contrib/
 We also provide a package with all the libraries already compiled so it is
 actually really easy to compile a full-featured version of vlc (these compiled
 libraries will only work with mingw or cygwin):
-http://download.videolan.org/pub/testing/win32/contrib-20040510-win32-bin-gcc3.3.1-only.tar.bz2 (Check out fo more recent versions at the same location). 
+http://download.videolan.org/pub/testing/win32/contrib-20040902-win32-bin-gcc3.3.1-only.tar.bz2 (Check out fo more recent versions at the same location). 
 
 All you need to do is extract it in your root directory (the include files
 and libraries will be put in /usr/win32). You can do this with the following
 command: 
 
-  tar xjvf contrib-20040510-win32-bin-gcc3.3.1-only.tar.bz2 -C /
+  tar xjvf contrib-20040902-win32-bin-gcc3.3.1-only.tar.bz2 -C /
 
 Please note the "-C /". 
 
@@ -127,7 +127,7 @@ along those lines:
       --disable-sdl --disable-gtk \
       --enable-nls \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --enable-faad --enable-flac --enable-theora \
+      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
@@ -136,6 +136,7 @@ along those lines:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
+      --enable-toolame --enable-dvdread \
       --enable-debug
 
 If you are cross-compiling with our gcc-3.3.1 package, you can use something
@@ -150,7 +151,7 @@ along those lines:
       --disable-sdl --disable-gtk \
       --enable-nls \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --enable-faad --enable-flac --enable-theora \
+      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
@@ -159,6 +160,7 @@ along those lines:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
+      --enable-toolame --enable-dvdread \
       --enable-debug
 
 If you are using cygwin, you can build VLC with or without the POSIX
@@ -174,7 +176,7 @@ emulation layer, use something like this:
       --disable-sdl --disable-gtk \
       --enable-nls \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --enable-faad --enable-flac --enable-theora \
+      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
@@ -183,6 +185,7 @@ emulation layer, use something like this:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
+      --enable-toolame --enable-dvdread \
       --enable-debug
 
 If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
@@ -197,7 +200,7 @@ lines:
       --disable-sdl --disable-gtk \
       --enable-nls \
       --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --enable-faad --enable-flac --enable-theora \
+      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
@@ -205,6 +208,7 @@ lines:
       --with-xml2-config-path=/usr/win32/bin \
       --with-dvdnav-config-path=/usr/win32/bin \
       --disable-cddax --disable-vcdx --enable-goom \
+      --enable-toolame --enable-dvdread \
       --disable-mkv \
       --enable-debug
 
