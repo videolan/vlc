@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.24 2004/02/01 14:43:08 alexis Exp $
+ * $Id: ipv4.c,v 1.25 2004/02/22 23:09:25 titer Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -196,11 +196,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
      * packet loss caused by scheduling problems */
     i_opt = 0x80000;
-#if defined( SYS_BEOS )
-    if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK, (void *) &i_opt, sizeof( i_opt ) ) == -1 )
-#else
+#if !defined( SYS_BEOS )
     if( setsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void *) &i_opt, sizeof( i_opt ) ) == -1 )
-#endif
     {
 #ifdef HAVE_ERRNO_H
         msg_Dbg( p_this, "cannot configure socket (SO_RCVBUF: %s)",
@@ -209,17 +206,15 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         msg_Warn( p_this, "cannot configure socket (SO_RCVBUF)" );
 #endif
     }
+#endif
 
+#if !defined( SYS_BEOS )
     /* Check if we really got what we have asked for, because Linux, etc.
      * will silently limit the max buffer size to net.core.rmem_max which
      * is typically only 65535 bytes */
     i_opt = 0;
     i_opt_size = sizeof( i_opt );
-#if defined( SYS_BEOS )
-    if( getsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK, (void*) &i_opt, &i_opt_size ) == -1 )
-#else
     if( getsockopt( i_handle, SOL_SOCKET, SO_RCVBUF, (void*) &i_opt, &i_opt_size ) == -1 )
-#endif
     {
 #ifdef HAVE_ERRNO_H
         msg_Warn( p_this, "cannot query socket (SO_RCVBUF: %s)",
@@ -233,6 +228,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         msg_Dbg( p_this, "socket buffer size is 0x%x instead of 0x%x",
                          i_opt, 0x80000 );
     }
+#endif
 
 
     /* Build the local socket */
@@ -276,15 +272,12 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
 #endif
 
+#if !defined( SYS_BEOS )
     /* Allow broadcast reception if we bound on INADDR_ANY */
     if( !*psz_bind_addr )
     {
         i_opt = 1;
-#if defined( SYS_BEOS )
-        if( setsockopt( i_handle, SOL_SOCKET, SO_NONBLOCK, (void*) &i_opt, sizeof( i_opt ) ) == -1 )
-#else
         if( setsockopt( i_handle, SOL_SOCKET, SO_BROADCAST, (void*) &i_opt, sizeof( i_opt ) ) == -1 )
-#endif
         {
 #ifdef HAVE_ERRNO_H
             msg_Warn( p_this, "cannot configure socket (SO_BROADCAST: %s)",
@@ -294,6 +287,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 #endif
         }
     }
+#endif
 
 #if !defined( UNDER_CE ) && !defined( SYS_BEOS )
     /* Join the multicast group if the socket is a multicast address */
@@ -540,12 +534,14 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
                 goto error;
             }
 
+#if !defined( SYS_BEOS )
             if( getsockopt( i_handle, SOL_SOCKET, SO_ERROR, (void*)&i_opt,
                             &i_opt_size ) == -1 || i_opt != 0 )
             {
                 msg_Warn( p_this, "cannot connect socket (SO_ERROR)" );
                 goto error;
             }
+#endif
         }
         else
         {
