@@ -217,7 +217,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         {
             p_dec->fmt_out.video.i_aspect = ((int64_t)VOUT_ASPECT_FACTOR) *
                 ( p_sys->ti.aspect_numerator * p_sys->ti.width ) /
-                ( p_sys->ti.aspect_denominator * p_sys->ti_height );
+                ( p_sys->ti.aspect_denominator * p_sys->ti.height );
         }
         else
         {
@@ -521,7 +521,8 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.video.i_aspect )
     {
-        p_sys->ti.aspect_numerator = p_enc->fmt_in.video.i_aspect;
+        p_sys->ti.aspect_numerator =
+            p_enc->fmt_in.video.i_aspect * p_sys->ti.height / p_sys->ti.width;
         p_sys->ti.aspect_denominator = VOUT_ASPECT_FACTOR;
     }
     else
