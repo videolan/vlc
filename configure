@@ -3056,19 +3056,22 @@ fi
 
 
 PLUGINS=${PLUGINS}"yuv ";
-OPTIMS=1;
 
 ARCH=${host_cpu}
 # Check whether --enable-ppro or --disable-ppro was given.
 if test "${enable_ppro+set}" = set; then
   enableval="$enable_ppro"
    if test x$enableval = xyes; then ARCH=${ARCH}" ppro"; fi 
+else
+   if test x${host_cpu} = xi686; then ARCH=${ARCH}" ppro"; fi 
 fi
 
 # Check whether --enable-mmx or --disable-mmx was given.
 if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
    if test x`echo $ARCH | cut -b3-4` = x86 ; then if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi; fi 
+else
+   if test x${host_cpu} = xi686 -o x${host_cpu} = xi586; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi  
 fi
 
 # Check whether --enable-debug or --disable-debug was given.
@@ -3087,6 +3090,8 @@ fi
 if test "${enable_optimizations+set}" = set; then
   enableval="$enable_optimizations"
    if test x$enableval = xno; then OPTIMS=0; fi 
+else
+   OPTIMS=1 
 fi
 
 
@@ -3159,17 +3164,17 @@ if test "${enable_alsa+set}" = set; then
   enableval="$enable_alsa"
   if test x$enable_alsa = xyes; then ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:3163: checking for sys/asoundlib.h" >&5
+echo "configure:3168: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3168 "configure"
+#line 3173 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3173: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3178: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3186,7 +3191,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:3190: checking for main in -lasound" >&5
+echo "configure:3195: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3194,14 +3199,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3198 "configure"
+#line 3203 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:3205: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3210: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else

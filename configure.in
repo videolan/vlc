@@ -64,15 +64,16 @@ AC_HEADER_TIME
 
 dnl default plugins 
 PLUGINS=${PLUGINS}"yuv ";
-OPTIMS=1;
 
 ARCH=${host_cpu}
 AC_ARG_ENABLE(ppro,
 [  --enable-ppro           Enable PentiumPro optimizations (default is no)],
-[ if test x$enableval = xyes; then ARCH=${ARCH}" ppro"; fi ])
+[ if test x$enableval = xyes; then ARCH=${ARCH}" ppro"; fi ],
+[ if test x${host_cpu} = xi686; then ARCH=${ARCH}" ppro"; fi ])
 AC_ARG_ENABLE(mmx,
 [  --enable-mmx            Enable MMX optimizations (default is no)],
-[ if test x`echo $ARCH | cut -b3-4` = x86 ; then if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi; fi ])
+[ if test x`echo $ARCH | cut -b3-4` = x86 ; then if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi; fi ],
+[ if test x${host_cpu} = xi686 -o x${host_cpu} = xi586; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi ] )
 AC_ARG_ENABLE(debug,
 [  --enable-debug          Enable debug mode (default is no)],
 [ if test x$enableval = xyes; then DEBUG=1; fi ])
@@ -81,7 +82,8 @@ AC_ARG_ENABLE(stats,
 [ if test x$enableval = xyes; then STATS=1; fi ])
 AC_ARG_ENABLE(optimizations,
 [  --enable-optimizations  Enable compiler optimizations (default enabled)],
-[ if test x$enableval = xno; then OPTIMS=0; fi ])
+[ if test x$enableval = xno; then OPTIMS=0; fi ],
+[ OPTIMS=1 ])
 
 SYS=${host_os}
 
