@@ -2607,6 +2607,9 @@ then
     then
       PLUGINS="${PLUGINS} slp"
       LDFLAGS_slp="${LDFLAGS_slp} -lslp"
+      if test "x${SYS}" != "xmingw32"; then
+        LDFLAGS_slp="${LDFLAGS_slp} -lws2_32"
+      fi
     fi
   else
     AC_MSG_CHECKING(for slp headers in ${with_slp})
@@ -2616,6 +2619,9 @@ then
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} slp"
       LDFLAGS_slp="${LDFLAGS_slp} -L${with_slp} -lslp"
+      if test "x${SYS}" != "xmingw32"; then
+        LDFLAGS_slp="${LDFLAGS_slp} -lws2_32"
+      fi
       CPPFLAGS_slp="${CPPFLAGS_slp} -I${with_slp}"
     else
       dnl  No libslp could be found, sorry

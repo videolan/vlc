@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.7 2003/01/27 21:35:06 jobi Exp $
+ * $Id: cdrom.c,v 1.8 2003/03/10 00:12:53 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1198,7 +1198,7 @@ static int win32_vcd_open( vlc_object_t * p_this, const char *psz_dev,
                   else
                   {
                       FreeLibrary( hASPI );
-                      msg_Dbg( p_this, "%s: is not a cdrom drive",
+                      msg_Dbg( p_this, "%c: is not a cdrom drive",
                                psz_dev[0] );
                       return -1;
                   }
