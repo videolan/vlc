@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.1 2003/01/31 22:34:07 sam Exp $
+$Id: THANKS,v 1.2 2003/02/27 12:44:01 marcari Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -49,6 +49,7 @@ Remco Poortinga <poortinga@telin.nl> - IPv6 multicast patch
 Rene Gollent <rgollent@u.arizona.edu> - BeOS interface fix
 Roine Gustafsson <roine@popstar.com> - spudec bug fixes
 Rudolf Cornelissen <rag.cornelissen@inter.nl.net> - BeOS fixes
+Sebastien Chaumat <Sebastien.Chaumat@ens-lyon.fr> - YOPY port tests
 Steve Brown <sbrown@cortland.com> - fix for optional PES size bug
 Steven M. Schultz <sms@TO.GD-ES.COM> - BSD/OS port
 Thomas Graf <tgraf@europe.com> - gettext support, german translation

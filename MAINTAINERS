@@ -1,4 +1,4 @@
-# $Id: MAINTAINERS,v 1.5 2002/12/08 16:16:19 jpsaman Exp $
+# $Id: MAINTAINERS,v 1.6 2003/02/27 12:44:01 marcari Exp $
 #
 #                            VLC MAINTAINERS
 #
@@ -30,7 +30,8 @@
   - Solaris : [meuuh]
   - *BSD : [meuuh]
   - GNU/Hurd : [sam]
-  - iPAQ Familiar Linux : [saman] ([meuuh])
+  - iPAQ Familiar Linux : [saman] & [marcari] ([meuuh])
+  - YOPY/Linupy : [marcari]
   - BSD/OS : Steven M. Schultz
 
 * INTERFACE

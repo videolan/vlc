@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.91 2003/02/01 23:15:27 sam Exp $
+# $Id: AUTHORS,v 1.92 2003/02/27 12:44:01 marcari Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -22,6 +22,7 @@ N: Marc Ariberti
 E: marcari@via.ecp.fr
 C: marcari
 D: communication with channel server
+D: YOPY port
 S: France
 
 N: Stephan Assmus
