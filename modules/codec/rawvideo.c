@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo audio decoder; for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.1 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: rawvideo.c,v 1.2 2003/04/26 12:26:46 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -82,6 +82,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         case VLC_FOURCC('I','4','2','0'):
         case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('Y','U','Y','2'):
             p_fifo->pf_run = RunDecoder;
             return VLC_SUCCESS;
 
@@ -167,6 +168,14 @@ static int InitThread( vdec_thread_t * p_vdec )
             i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
             p_vdec->i_raw_size = bih->biWidth * bih->biHeight * 3 / 2;
             break;
+        case VLC_FOURCC( 'I', '4', '2', '2' ):
+            i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
+            p_vdec->i_raw_size = bih->biWidth * bih->biHeight * 2;
+            break;
+        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
+            i_chroma = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
+            p_vdec->i_raw_size = bih->biWidth * bih->biHeight * 2;
+            break;
         default:
             msg_Err( p_vdec->p_fifo, "invalid codec=%4.4s", (char*)&p_vdec->p_fifo->i_fourcc );
             return( VLC_EGENERIC );
@@ -219,6 +228,7 @@ static void FillPicture( pes_packet_t *p_pes, picture_t *p_pic )
                 memcpy( p_dst, p_src, i_copy );
             }
             i_dst -= i_copy;
+            p_dst += i_copy;
 
             i_src -= i_copy;
             if( i_src <= 0 )
@@ -300,5 +310,3 @@ static void EndThread (vdec_thread_t *p_vdec)
 
     free( p_vdec );
 }
-
-
