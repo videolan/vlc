@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.24 2003/02/23 05:53:53 jlj Exp $
+ * $Id: aout.m,v 1.25 2003/03/14 00:06:02 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -325,6 +325,10 @@ int E_(OpenAudio)( vlc_object_t * p_this )
 
         switch( p_sys->stream_format.mChannelsPerFrame )
         {
+        case 1:
+            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+            break;
+
         case 2:
             p_aout->output.output.i_physical_channels =
                 AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
