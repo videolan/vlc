@@ -477,8 +477,8 @@ Difficulty: Hard
 Urgency: Wishlist
 Platform: Windows
 Description: ActiveX control for VLC
- We need an ActiveX version of VLC for IE intergration
-Status: Todo
+ We need an ActiveX version of VLC for IE integration
+Status: Done by damienf
 
 Task
 Difficulty: Easy
