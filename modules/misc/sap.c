@@ -1,13 +1,10 @@
 /*****************************************************************************
  * sap.c :  SAP interface module
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
+ * Copyright (C) 2004 VideoLAN
  * $Id$
  *
- * Authors: Arnaud Schauly <gitan@via.ecp.fr>
- *          Clément Stenac <zorglub@via.ecp.fr>
- *          Damien Lucas <nitrox@videolan.org>
- *          Laurent Aimar <fenrir@via.ecp.fr>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,16 +22,18 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Preamble
+ * Includes
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+
 #include <vlc/input.h>
 
+#include "network.h"
+
 #include <errno.h>                                                 /* ENOMEM */
-#include <ctype.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -43,39 +42,19 @@
 #    include <sys/time.h>
 #endif
 
-#ifdef WIN32
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
-#else
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   if HAVE_ARPA_INET_H
-#      include <arpa/inet.h>
-#   elif defined( SYS_BEOS )
-#      include <net/netdb.h>
-#   endif
-#endif
-
-#ifdef UNDER_CE
-#   define close(a) CloseHandle(a)
-#elif defined( WIN32 )
-#   define close(a) closesocket(a)
-#endif
-
-#include "network.h"
-
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
 #endif
 
+/************************************************************************
+ * Macros and definitions
+ ************************************************************************/
+
 #define MAX_LINE_LENGTH 256
 
 /* SAP is always on that port */
-#define HELLO_PORT 9875
-#define HELLO_GROUP "224.2.127.254"
+#define SAP_PORT 9875
+#define SAP_V4_ADDRESS "224.2.127.254"
 #define ADD_SESSION 1
 
 #define IPV6_ADDR_1 "FF0"  /* Scope is inserted between them */
@@ -102,13 +81,14 @@
        "is received." )
 #define SAP_PARSE_TEXT N_( "Try to parse the SAP" )
 #define SAP_PARSE_LONGTEXT N_( \
-       "When SAP can it will try to parse the SAP. Normal behavior is " \
-       "to have livedotcom parse the announce." )
+       "When SAP can it will try to parse the SAP. If you don't select " \
+       "this, all announces will be parsed by the livedotcom module" )
 
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
-static int  OpenSDP ( vlc_object_t * );
-static void CloseSDP( vlc_object_t * );
+/* Callbacks */
+    static int  Open ( vlc_object_t * );
+    static void Close( vlc_object_t * );
+    static int  OpenDemux ( vlc_object_t * );
+    static void CloseDemux ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("SAP interface") );
@@ -128,63 +108,47 @@ vlc_module_begin();
 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
-    
+
     add_submodule();
-        /* TODO FIXME
-         * This submodule is temporary and has a very high duplicate code rate
-         * This needs to be removed when SDP UDP parsing is fixed in liveMedia
-         */
-        set_description( _("SDP file parser (UDP only)") );
+        set_description( _("SDP file parser for UDP") );
         add_shortcut( "sdp" );
         set_capability( "demux2", 51 );
-        set_callbacks( OpenSDP, CloseSDP );
-        
+        set_callbacks( OpenDemux, CloseDemux );
 vlc_module_end();
 
+
 /*****************************************************************************
- * Local prototypes
+ * Local structures
  *****************************************************************************/
 
-static void Run    ( intf_thread_t *p_intf );
-static ssize_t NetRead( intf_thread_t *, int fd[2], uint8_t *, int );
+typedef struct sdp_t sdp_t;
+typedef struct attribute_t attribute_t;
+typedef struct sap_announce_t sap_announce_t;
 
-static int Demux( demux_t *p_demux );
-static int Control( demux_t *, int, va_list );
-
-typedef struct media_descr_t media_descr_t;
-typedef struct sess_descr_t sess_descr_t;
-typedef struct attr_descr_t attr_descr_t;
-
-static void sess_toitem( intf_thread_t *, sess_descr_t * );
-
-static sess_descr_t *  parse_sdp( vlc_object_t *, char * ) ;
-static void free_sd( sess_descr_t * );
-
-/* Detect multicast addresses */
-static int  ismult( char * );
-
-/* The struct that contains sdp information */
-struct  sess_descr_t
+/* The structure that contains sdp information */
+struct  sdp_t
 {
-    int  i_version;
-    char *psz_sessionname;
-    char *psz_connection;
     char *psz_sdp;
 
+    /* s= field */
+    char *psz_sessionname;
+
+    /* Raw m= and c= fields */
+    char *psz_connection;
+    char *psz_media;
+
+    /* "computed" URI */
+    char *psz_uri;
+
+    int         i_in; /* IP version */
+
     int           i_media;
-    media_descr_t **pp_media;
+
     int           i_attributes;
-    attr_descr_t  **pp_attributes;
+    attribute_t  **pp_attributes;
 };
 
-/* All this information is not useful yet.  */
-struct media_descr_t
-{
-    char *psz_medianame;
-    char *psz_mediaconnection;
-};
-
-struct attr_descr_t
+struct attribute_t
 {
     char *psz_field;
     char *psz_value;
@@ -193,70 +157,64 @@ struct attr_descr_t
 struct sap_announce_t
 {
     mtime_t i_last;
-    int i_id;
-    char *psz_name;
-    char *psz_uri;
+
+    uint16_t    i_hash;
+    uint32_t    i_source[4];
+
+    /* SAP annnounces must only contain one SDP */
+    sdp_t       *p_sdp;
+
+    playlist_item_t *p_item;
 };
 
 struct intf_sys_t
 {
-    /* IPV4 and IPV6 */
-    int fd[2];
+    /* Socket descriptors */
+    int i_fd;
+    int *pi_fd;
 
-    /* playlist group */
-    int i_group;
+    /* playlist node */
+    playlist_item_t *p_node;
 
     /* Table of announces */
     int i_announces;
     struct sap_announce_t **pp_announces;
 
+    /* Modes */
+    vlc_bool_t  b_strict;
+    vlc_bool_t  b_parse;
+
     int i_timeout;
 };
 
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+
+
+/* Main functions */
+    static int Demux( demux_t *p_demux );
+    static int Control( demux_t *, int, va_list );
+    static void Run    ( intf_thread_t *p_intf );
+
+/* Main parsing functions */
+    static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp );
+    static int ParseSAP( intf_thread_t *p_intf, uint8_t *p_buffer, int i_read );
+    static sdp_t *  ParseSDP( vlc_object_t *p_intf, char* psz_sdp );
+    static sap_announce_t *CreateAnnounce( intf_thread_t *, uint16_t, sdp_t * );
+
+/* Cache */
+    static void CacheLoad( intf_thread_t *p_intf );
+    static void CacheSave( intf_thread_t *p_intf );
+/* Helper functions */
+   static char *GetAttribute( sdp_t *p_sdp, const char *psz_search );
+   static int InitSocket( intf_thread_t *p_intf, char *psz_address, int i_port );
 #ifdef HAVE_ZLIB_H
-int do_decompress( unsigned char *src, unsigned char **_dst, int slen ) {
-    int result, dstsize, n;
-    unsigned char *dst;
-    z_stream d_stream;
-
-    d_stream.zalloc = (alloc_func)0;
-    d_stream.zfree = (free_func)0;
-    d_stream.opaque = (voidpf)0;
-    result = inflateInit(&d_stream);
-    if( result != Z_OK )
-    {
-        printf( "inflateInit() failed. Result: %d\n", result );
-        return( -1 );
-    }
-
-    d_stream.next_in = (Bytef *)src;
-    d_stream.avail_in = slen;
-    n = 0;
-    dst = NULL;
-    do
-    {
-        n++;
-        dst = (unsigned char *)realloc(dst, n * 1000);
-        d_stream.next_out = (Bytef *)&dst[(n - 1) * 1000];
-        d_stream.avail_out = 1000;
-        result = inflate(&d_stream, Z_NO_FLUSH);
-        if( ( result != Z_OK ) && ( result != Z_STREAM_END ) )
-        {
-            printf( "Zlib decompression failed. Result: %d\n", result );
-            return( -1 );
-        }
-    }
-    while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&
-           ( result != Z_STREAM_END ) );
-
-    dstsize = d_stream.total_out;
-    inflateEnd( &d_stream );
-
-    *_dst = (unsigned char *)realloc( dst, dstsize );
-
-    return dstsize;
-}
+   static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
 #endif
+
+/* Detect multicast addresses */
+static int  ismult( char * );
 
 /*****************************************************************************
  * Open: initialize and create stuff
@@ -267,98 +225,87 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t    *p_sys  = malloc( sizeof( intf_sys_t ) );
 
     playlist_t          *p_playlist;
+    playlist_view_t     *p_view;
 
     p_sys->i_timeout = config_GetInt( p_intf,"sap-timeout" );
-    p_sys->fd[0] = -1;
-    p_sys->fd[1] = -1;
+
+
+    p_intf->pf_run = Run;
+    p_intf->p_sys  = p_sys;
+
+    p_sys->pi_fd = NULL;
+    p_sys->i_fd = 0;
+
+    if( config_GetInt( p_intf, "sap-use-cache" ) )
+    {
+        CacheLoad( p_intf );
+    }
+
     if( config_GetInt( p_intf, "sap-ipv4" ) )
     {
-        char *psz_address = config_GetPsz( p_intf, "sap-addr" );
-        network_socket_t    sock;
-        module_t            *p_network;
-        if( psz_address == NULL || *psz_address == '\0' )
-        {
-            psz_address = strdup( HELLO_GROUP );
-        }
-
-        /* Prepare the network_socket_t structure */
-        sock.i_type            = NETWORK_UDP;
-        sock.psz_bind_addr     = psz_address;
-        sock.i_bind_port       = HELLO_PORT;
-        sock.psz_server_addr   = "";
-        sock.i_server_port     = 0;
-        sock.i_ttl             = 0;
-        p_intf->p_private = ( void* ) &sock;
-
-        p_network = module_Need( p_intf, "network", "ipv4", VLC_TRUE );
-        if( p_network )
-        {
-            p_sys->fd[0] = sock.i_handle;
-            module_Unneed( p_intf, p_network );
-        }
-        else
-        {
-            msg_Warn( p_intf, "failed to open %s:%d", psz_address, HELLO_PORT );
-        }
-        free( psz_address );
+        InitSocket( p_intf, SAP_V4_ADDRESS, SAP_PORT );
     }
-
     if( config_GetInt( p_intf, "sap-ipv6" ) )
     {
-        char psz_address[100];
-        char *psz_scope = config_GetPsz( p_intf, "sap-ipv6-scope" );
-        network_socket_t    sock;
-        module_t            *p_network;
-
-        if( psz_scope == NULL || *psz_scope == '\0' )
-        {
-            psz_scope = strdup( "8" );
-        }
-        snprintf( psz_address, 100, "[%s%c%s]",IPV6_ADDR_1,
-                  psz_scope[0], IPV6_ADDR_2 );
-        free( psz_scope );
-
-        sock.i_type            = NETWORK_UDP;
-        sock.psz_bind_addr     = psz_address;
-        sock.i_bind_port       = HELLO_PORT;
-        sock.psz_server_addr   = "";
-        sock.i_server_port     = 0;
-        sock.i_ttl             = 0;
-        p_intf->p_private = (void*) &sock;
-
-        p_network = module_Need( p_intf, "network", "ipv6", VLC_TRUE );
-        if( p_network )
-        {
-            p_sys->fd[1] = sock.i_handle;
-            module_Unneed( p_intf, p_network );
-        }
-        else
-        {
-            msg_Warn( p_intf, "failed to open %s:%d", psz_address, HELLO_PORT );
-        }
+        /* TODO */
     }
-    if( p_sys->fd[0] <= 0 && p_sys->fd[1] <= 0 )
+
+    /* TODO : Handle additionnal adresses */
+
+    if( p_sys->i_fd == 0 )
     {
-        msg_Warn( p_intf, "IPV4 and IPV6 failed" );
-        free( p_sys );
+        msg_Err( p_intf, "unable to read on any address");
         return VLC_EGENERIC;
     }
 
-    /* Create our playlist group */
+    /* Create our playlist node */
     p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
-    if( p_playlist )
+    if( !p_playlist )
     {
-        playlist_group_t *p_group = playlist_CreateGroup( p_playlist , "SAP" );
-        p_sys->i_group = p_group->i_id;
-        vlc_object_release( p_playlist );
+        msg_Warn( p_intf, "unable to find playlist, cancelling SAP listening");
+        return VLC_EGENERIC;
     }
+
+    p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
+    p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
+                                         _("SAP"), p_view->p_root );
+
+    vlc_object_release( p_playlist );
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
 
-    p_intf->pf_run = Run;
-    p_intf->p_sys  = p_sys;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * OpenDemux: initialize and create stuff
+ *****************************************************************************/
+static int OpenDemux( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t *)p_this;
+    uint8_t *p_peek;
+
+    /* Probe for SDP */
+    if( p_demux->s )
+    {
+        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
+        {
+            msg_Err( p_demux, "cannot peek" );
+            return VLC_EGENERIC;
+        }
+        if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) &&
+            strncmp( (char*)p_peek, "v=0\n", 4 ) &&
+            ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
+        {
+            msg_Warn( p_demux, "SDP (UDP) module discarded" );
+            return VLC_EGENERIC;
+        }
+    }
+
+    p_demux->pf_control = Control;
+    p_demux->pf_demux = Demux;
 
     return VLC_SUCCESS;
 }
@@ -372,30 +319,34 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t    *p_sys  = p_intf->p_sys;
     int i;
 
-    if( p_sys->fd[0] > 0 )
+    for( i = p_sys->i_fd-1 ; i >= 0 ; i-- )
     {
-        close( p_sys->fd[0] );
-    }
-    if( p_sys->fd[1] > 0 )
-    {
-        close( p_sys->fd[1] );
+        net_Close( p_sys->pi_fd[i] );
     }
 
-    for( i = 0 ; i< p_sys->i_announces ; i++ )
+    if( config_GetInt( p_intf, "sap-use-cache" ) )
     {
-        if( p_sys->pp_announces[i]->psz_name )
-           free( p_sys->pp_announces[i]->psz_name );
-        if( p_sys->pp_announces[i]->psz_uri )
-           free( p_sys->pp_announces[i]->psz_uri );
-        free( p_sys->pp_announces[i] );
+        CacheSave( p_intf );
     }
-    free( p_sys->pp_announces );
+
+    for( i = p_sys->i_announces  - 1;  i>= 0; i-- )
+    {
+        RemoveAnnounce( p_intf, p_sys->pp_announces[i] );
+    }
 
     free( p_sys );
 }
 
 /*****************************************************************************
- * Run: sap thread
+ * CloseDemux: Close the demuxer
+ *****************************************************************************/
+static void CloseDemux( vlc_object_t *p_this )
+{
+
+}
+
+/*****************************************************************************
+ * Run: main SAP thread
  *****************************************************************************
  * Listens to SAP packets, and sends them to packet_handle
  *****************************************************************************/
@@ -403,29 +354,27 @@ static void Close( vlc_object_t *p_this )
 
 static void Run( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys  = p_intf->p_sys;
-    uint8_t     buffer[MAX_SAP_BUFFER + 1];
-    uint8_t    *p_end;
-    
-    /* Dirty hack to slow down the startup of the sap interface */ 
-    msleep( 500000 );
+    uint8_t     *p_buffer;
+    /* Dirty hack to slow down the startup of the sap interface */
+    /* Unneeded now : our node is in no_select mode */
+    //    msleep( 500000 );
 
     /* read SAP packets */
     while( !p_intf->b_die )
     {
-        playlist_t *p_playlist= NULL;
-        int i;
-        int i_read = NetRead( p_intf, p_sys->fd, buffer, MAX_SAP_BUFFER );
-        uint8_t *p_sdp;
-        int i_version;
-        int i_address_type;
-        int b_reserved;
-        int b_message_type;
-        int b_encrypted;
-        int b_compressed;
-        unsigned char *p_decompressed_buffer;
-        int i_decompressed_size;
+        p_buffer = (uint8_t *)malloc( MAX_SAP_BUFFER );
 
+        if( !p_buffer )
+        {
+            msg_Err( p_intf, "out of memory");
+            p_intf->b_die = VLC_TRUE;
+            continue;
+        }
+
+        int i_read = net_Select( p_intf, p_intf->p_sys->pi_fd,
+                                 p_intf->p_sys->i_fd, p_buffer,
+                                 MAX_SAP_BUFFER, 500000 );
+#if 0
         /* Check for items that need deletion */
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
@@ -437,7 +386,7 @@ static void Run( intf_thread_t *p_intf )
                         p_intf->p_sys->pp_announces[i]->psz_name,
                         i , p_intf->p_sys->i_announces );
 
-               /* Remove the playlist item */
+             /* Remove the playlist item */
                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                               FIND_ANYWHERE );
                if( p_playlist )
@@ -464,562 +413,556 @@ static void Run( intf_thread_t *p_intf )
 
            }
         }
+#endif
 
         /* Minimum length is > 6 */
         if( i_read <= 6 )
         {
             if( i_read < 0 )
             {
-                msg_Warn( p_intf, "Cannot read in the socket" );
+                msg_Warn( p_intf, "socket read error" );
             }
             continue;
         }
 
-        buffer[i_read] = '\0';
-        p_end = &buffer[i_read];
+        p_buffer[i_read] = '\0';
 
-        /* Parse the SAP header */
-        i_version = buffer[0] >> 5;
-        if( i_version != 1 )
+        /* Parse the packet */
+        ParseSAP( p_intf, p_buffer, i_read );
+    }
+}
+
+/**********************************************************************
+ * Demux: reads and demuxes data packets
+ * Return -1 if error, 0 if EOF, 1 else
+ **********************************************************************/
+static int Demux( demux_t *p_demux )
+{
+   int i_max_sdp = 1024;
+   int i_sdp = 0;
+   char *psz_sdp = (char *)malloc( i_max_sdp );
+   sdp_t *p_sdp;
+
+   playlist_t *p_playlist;
+
+   /* Gather the complete sdp file */
+   for( ;; )
+   {
+        int i_read = stream_Read( p_demux->s,
+                                  &psz_sdp[i_sdp], i_max_sdp - i_sdp - 1 );
+
+
+        if( i_read < 0 )
+
         {
-            msg_Dbg( p_intf, "strange sap version %d found", i_version );
+            msg_Err( p_demux, "failed to read SDP" );
+            return VLC_EGENERIC;
         }
-        i_address_type = buffer[0] & 0x10;
-        b_reserved = buffer[0] & 0x08;
-        if( b_reserved != 0 )
+
+        i_sdp += i_read;
+
+        if( i_read < i_max_sdp - i_sdp - 1 )
         {
-            msg_Dbg( p_intf, "reserved bit incorrectly set" );
+            psz_sdp[i_sdp] = '\0';
+            break;
         }
-        b_message_type = buffer[0] & 0x04;
-        if( b_message_type != 0 )
-        {
-            msg_Dbg( p_intf, "got session deletion packet" );
-        }
-        b_encrypted = buffer[0] & 0x02;
-        if( b_encrypted )
-        {
-            msg_Dbg( p_intf, "encrypted packet" );
-        }
-        b_compressed = buffer[0] & 0x01;
-        p_sdp  = &buffer[4];
-        if( i_address_type == 0 ) /* ipv4 source address */
-        {
-            p_sdp += 4;
-        }
-        else /* ipv6 source address */
-        {
-            p_sdp += 16;
-        }
-        if( b_compressed )
-        {
+
+        i_max_sdp += 1000;
+        psz_sdp = (uint8_t*)realloc( psz_sdp, i_max_sdp );
+   }
+
+   p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
+
+   if( !p_sdp ) return -1;
+
+   if( p_sdp->i_media > 1 )
+   {
+        return -1;
+   }
+
+   if( ParseConnection( VLC_OBJECT( p_demux ), p_sdp ) )
+   {
+       p_sdp->psz_uri = NULL;
+   }
+
+   if( p_sdp->psz_uri == NULL ) return VLC_EGENERIC;
+
+   p_playlist = (playlist_t *)vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+
+   playlist_Add( p_playlist, p_sdp->psz_uri, p_sdp->psz_sessionname,
+                 PLAYLIST_APPEND, PLAYLIST_END );
+
+   vlc_object_release( p_playlist );
+
+   return VLC_SUCCESS;
+}
+
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    return VLC_EGENERIC;
+}
+
+/**************************************************************
+ * Local functions
+ **************************************************************/
+
+static int ParseSAP( intf_thread_t *p_intf, uint8_t *p_buffer, int i_read )
+{
+    int                 i_version, i_address_type, i_hash, i;
+    uint8_t             *psz_sdp;
+    sdp_t               *p_sdp;
+    vlc_bool_t          b_compressed;
+    vlc_bool_t          b_need_delete = VLC_FALSE;
 #ifdef HAVE_ZLIB_H
-            i_decompressed_size = do_decompress( p_sdp, &p_decompressed_buffer,
-                                      i_read - ( p_sdp - buffer ) );
-            if( i_decompressed_size > 0 && i_decompressed_size < MAX_SAP_BUFFER )
-            {
-                memcpy( p_sdp, p_decompressed_buffer, i_decompressed_size );
-                p_sdp[i_decompressed_size] = '\0';
-                p_end = &p_sdp[i_decompressed_size];
-                free( p_decompressed_buffer );
-            }
-#else
-            msg_Warn( p_intf, "Ignoring compressed sap packet" );
+    int                 i_decompressed_size;
+    uint8_t             *p_decompressed_buffer;
 #endif
-        }
-        p_sdp += buffer[1]; /* size of signature */
-        while( p_sdp < p_end - 1 && *p_sdp != '\0' && p_sdp[0] != 'v' && p_sdp[1] != '=' )
-        {
-            p_sdp++;
-        }
-        if( *p_sdp == '\0' )
-        {
-            p_sdp++;
-        }
 
-        if( p_sdp < p_end )
-        {
-            sess_descr_t *p_sd = parse_sdp( (vlc_object_t *)p_intf, p_sdp );
-            if( p_sd )
-            {
-                sess_toitem ( p_intf, p_sd );
-                free_sd ( p_sd );
-            }
-        }
-        else
-        {
-            msg_Warn( p_intf, "ditching sap packet" );
-        }
+    /* First, check the sap announce is correct */
+    i_version = p_buffer[0] >> 5;
 
-        memset( buffer, 0, MAX_SAP_BUFFER );
-    }
-}
-
-/**********************************************************************
- * cfield_parse
- *********************************************************************
- * put into *ppsz_uri, the the uri in the cfield, psz_cfield.
- *********************************************************************/
-
-static void cfield_parse( char *psz_cfield, char **ppsz_uri )
-{
-    char *psz_pos;
-    if( psz_cfield )
+    if( i_version != 1 )
     {
-        psz_pos = psz_cfield;
-
-        while( *psz_pos != ' ' && *psz_pos !='\0' )
-        {
-            psz_pos++;
-        }
-        psz_pos++;
-        while( *psz_pos != ' ' && *psz_pos !='\0' )
-        {
-            psz_pos++;
-        }
-        psz_pos++;
-        *ppsz_uri = psz_pos;
-        while( *psz_pos != ' ' && *psz_pos !='/'
-                        && *psz_pos != '\0' )
-        {
-            psz_pos++;
-        }
-        *psz_pos = '\0';
-
-    }
-    else
-    {
-        ppsz_uri = NULL;
+       msg_Dbg( p_intf, "strange sap version %d found", i_version );
     }
 
-    return;
-}
+    i_address_type = p_buffer[0] & 0x10;
 
-/**********************************************************************
- * mfield_parse
- *********************************************************************
- * put into *ppsz_proto, and *ppsz_port, the protocol and the port.
- *********************************************************************/
-
-
-static void mfield_parse( char *psz_mfield, char **ppsz_proto,
-               char **ppsz_port )
-{
-    char *psz_pos;
-    char *psz_media;
-    if( psz_mfield )
+    if( (p_buffer[0] & 0x08) != 0 )
     {
-        psz_pos = psz_mfield;
-        psz_media = psz_mfield;
-        while( *psz_pos != '\0' && *psz_pos != ' ' )
+        msg_Dbg( p_intf, "reserved bit incorrectly set" );
+        return VLC_EGENERIC;
+    }
+
+    if( (p_buffer[0] & 0x04) != 0 )
+    {
+        msg_Dbg( p_intf, "session deletion packet" );
+        b_need_delete = VLC_TRUE;
+    }
+
+    if( p_buffer[0] & 0x02  )
+    {
+        msg_Dbg( p_intf, "encrypted packet, unsupported" );
+        return VLC_EGENERIC;
+    }
+
+    b_compressed = p_buffer[0] & 0x01;
+
+    i_hash = ( p_buffer[2] << 8 ) + p_buffer[3];
+
+    if( p_intf->p_sys->b_strict && i_hash == 0 )
+    {
+        msg_Dbg( p_intf, "strict mode, discarding announce with null id hash");
+        return VLC_EGENERIC;
+    }
+
+    psz_sdp  = &p_buffer[4];
+
+    if( i_address_type == 0 ) /* ipv4 source address */
+    {
+        psz_sdp += 4;
+    }
+    else /* ipv6 source address */
+    {
+        psz_sdp += 16;
+    }
+
+    if( b_compressed )
+    {
+#ifdef HAVE_ZLIB_H
+        i_decompressed_size = Decompress( psz_sdp,
+                   &p_decompressed_buffer,i_read - ( psz_sdp - p_buffer ) );
+        if( i_decompressed_size > 0 && i_decompressed_size < MAX_SAP_BUFFER )
         {
-            psz_pos++;
+            memcpy( psz_sdp, p_decompressed_buffer, i_decompressed_size );
+            psz_sdp[i_decompressed_size] = '\0';
+            free( p_decompressed_buffer );
         }
-        if( *psz_pos != '\0' )
-        {
-            *psz_pos = '\0';
-            if( strcmp( psz_media, "video" ) && strcmp( psz_media, "audio" ) )
-            {
-                *ppsz_proto = NULL;
-                *ppsz_port = NULL;
-                return;
-            }
-        }
-        psz_pos++;
-        *ppsz_port = psz_pos;
-        while( *psz_pos != '\0' && *psz_pos !=' ' && *psz_pos!='/' )
-        {
-            psz_pos++;
-        }
-        if( *psz_pos == '/' )  // FIXME does not support multi-port
-        {
-            *psz_pos = '\0';
-            psz_pos++;
-            while( *psz_pos != '\0' && *psz_pos !=' ' )
-            {
-            psz_pos++;
-            }
-        }
-        *psz_pos = '\0';
-        psz_pos++;
-        *ppsz_proto = psz_pos;
-        while( *psz_pos!='\0' && *psz_pos !=' ' &&
-                        *psz_pos!='/' )
-        {
-            *psz_pos = tolower( *psz_pos );
-            psz_pos++;
-        }
-        *psz_pos = '\0';
+#else
+        msg_Warn( p_intf, "Ignoring compressed sap packet" );
+        return VLC_EGENERIC;
+#endif
+    }
+
+    /* Add the size of authentification info */
+    psz_sdp += p_buffer[1];
+
+    /* Skip payload type */
+    /* Handle announces without \0 between SAP and SDP */
+    while( *psz_sdp != '\0' && ( psz_sdp[0] != 'v' && psz_sdp[1] != '=' ) )
+    {
+        psz_sdp++;
+    }
+
+    if( *psz_sdp == '\0' )
+    {
+        psz_sdp++;
+    }
+
+    fprintf(stderr,"\n\n%s\n\n", psz_sdp);
+
+    /* Parse SDP info */
+    p_sdp = ParseSDP( VLC_OBJECT(p_intf), psz_sdp );
+
+    if( p_sdp == NULL )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Decide whether we should add a playlist item for this SDP */
+
+    /* Multi-media or no-parse -> pass to LIVE.COM */
+    if( p_sdp->i_media > 1 || p_intf->p_sys->b_parse == VLC_FALSE )
+    {
+        asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp );
     }
     else
     {
-        *ppsz_proto = NULL;
-        *ppsz_port = NULL;
-    }
-    return;
-}
-
-
-/*******************************************************************
- * sess_toitem : changes a sess_descr_t into a hurd of
- * playlist_item_t, which are enqueued.
- *******************************************************************
- * Note : does not support sessions that take place on consecutive
- * port or adresses yet.
- *******************************************************************/
-
-static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
-{
-    struct sap_announce_t *p_announce;
-    char *psz_uri, *psz_proto, *psz_item_uri;
-    char *psz_port;
-    char *psz_uri_default;
-    int i_count, i, i_id = 0;
-    vlc_bool_t b_http = VLC_FALSE;
-    char *psz_http_path = NULL;
-    playlist_t *p_playlist = NULL;
-    playlist_item_t *p_item;
-
-    psz_uri_default = NULL;
-    if( p_sd->i_media > 1 || !config_GetInt( p_intf, "sap-parse" ) )
-    {
-        asprintf( &psz_uri, "sdp://%s", p_sd->psz_sdp );
-        /* Check if we have already added the item */
-        for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
+        /* Parse connection information (c= & m= ) */
+        if( ParseConnection( VLC_OBJECT(p_intf), p_sdp ) )
         {
-            if( !strcmp( p_intf->p_sys->pp_announces[i]->psz_uri,
-                         psz_uri ) )
-            {
-                p_intf->p_sys->pp_announces[i]->i_last = mdate();
-                free( psz_uri );
-                return;
-            }
+            p_sdp->psz_uri = NULL;
         }
-        /* Add it to the playlist */
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                      FIND_ANYWHERE );
-        i_id = playlist_Add( p_playlist, psz_uri, p_sd->psz_sessionname ,
-                      PLAYLIST_CHECK_INSERT, PLAYLIST_END );
-        if( i_id != -1 )
-        {
-            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
-            playlist_ItemSetGroup( p_item, p_intf->p_sys->i_group );
-        }
-
-        /* Remember it */
-        p_announce = ( struct sap_announce_t * )malloc(
-                      sizeof( struct sap_announce_t ) );
-        if( p_sd->psz_sessionname )
-        {
-            p_announce->psz_name = strdup(  p_sd->psz_sessionname );
-        }
-        else
-        {
-            p_announce->psz_name = strdup( "" );
-        }
-        if( psz_uri )
-        {
-            p_announce->psz_uri  = strdup( psz_uri );
-        }
-        else
-        {
-            p_announce->psz_uri = strdup( "" );
-        }
-        p_announce->i_id = i_id;
-        p_announce->i_last = mdate();
-
-        INSERT_ELEM( p_intf->p_sys->pp_announces,
-                     p_intf->p_sys->i_announces,
-                     p_intf->p_sys->i_announces,
-                     p_announce );
-
-        vlc_object_release( p_playlist );
-        free( psz_uri );
-        return;
     }
 
-    cfield_parse( p_sd->psz_connection, &psz_uri_default );
+    if( p_sdp->psz_uri == NULL ) return VLC_EGENERIC;
 
-    for( i_count = 0 ; i_count < p_sd->i_media ; i_count++ )
+    for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
     {
-        int i_group = p_intf->p_sys->i_group;
-        int i_packetsize = config_GetInt( p_intf, "mtu" );
-
-        /* Build what we have to put in psz_item_uri, with the m and
-         * c fields  */
-
-        if( !p_sd->pp_media[i_count] )
+        /* FIXME: slow */
+        /* FIXME: we create a new announce each time the sdp changes */
+        if( !strcmp( p_intf->p_sys->pp_announces[i]->p_sdp->psz_sdp,
+                    p_sdp->psz_sdp ) )
         {
-            return;
-        }
-
-        mfield_parse( p_sd->pp_media[i_count]->psz_medianame,
-                        & psz_proto, & psz_port );
-
-        if( !psz_proto || !psz_port )
-        {
-            return;
-        }
-
-        if( p_sd->pp_media[i_count]->psz_mediaconnection )
-        {
-            cfield_parse( p_sd->pp_media[i_count]->psz_mediaconnection,
-                            & psz_uri );
-        }
-        else
-        {
-            psz_uri = psz_uri_default;
-        }
-
-        if( psz_uri == NULL )
-        {
-            return;
-        }
-
-        for( i = 0 ; i< p_sd->i_attributes ; i++ )
-        {
-            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "type" ) &&
-                strstr( p_sd->pp_attributes[i]->psz_value, "http" ) )
+            if( b_need_delete )
             {
-                b_http = VLC_TRUE;
-            }
-            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path" ) )
-            {
-                psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
-            }
-            if( ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup" ) ) ||
-                ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "x-plgroup" ) ) )
-            {
-                int i_group_id;
-                p_playlist =
-                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                        FIND_ANYWHERE );
-                if( p_playlist == NULL )
-                {
-                    return;
-                }
-
-                i_group_id = playlist_GroupToId( p_playlist,
-                                 p_sd->pp_attributes[i]->psz_value );
-                if( i_group_id != 0 )
-                {
-                    i_group = i_group_id;
-                }
-                else
-                {
-                    playlist_group_t *p_group =
-                            playlist_CreateGroup( p_playlist,
-                                       p_sd->pp_attributes[i]->psz_value );
-                    i_group = p_group->i_id;
-                }
-                vlc_object_release( p_playlist );
-            }
-            if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "packetsize" ) )
-            {
-                i_packetsize = strtol( p_sd->pp_attributes[i]->psz_value, NULL, 10 );
-            }
-        }
-
-        /* Filling psz_uri */
-        if( b_http == VLC_FALSE )
-        {
-            if( ismult( psz_uri ) )
-            {
-                asprintf( &psz_item_uri, "%s://@%s:%s",
-                         psz_proto, psz_uri, psz_port );
+                RemoveAnnounce( p_intf, p_intf->p_sys->pp_announces[i]);
+                return VLC_SUCCESS;
             }
             else
             {
-                asprintf( &psz_item_uri, "%s://%s:%s",
-                         psz_proto, psz_uri, psz_port );
-            }
-        }
-        else
-        {
-            if( psz_http_path == NULL )
-            {
-                psz_http_path = strdup( "/" );
-            }
-            if( *psz_http_path == '/' )
-            {
-                asprintf( &psz_item_uri, "%s://%s:%s%s", psz_proto,
-                         psz_uri, psz_port,psz_http_path );
-            }
-            else
-            {
-                asprintf( &psz_item_uri, "%s://%s:%s/%s", psz_proto, psz_uri,
-                          psz_port, psz_http_path );
-            }
-
-            if( psz_http_path )
-            {
-                free( psz_http_path );
-            }
-        }
-
-        /* Check if we already know this item */
-         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
-         {
-            if( !strcmp( p_intf->p_sys->pp_announces[i]->psz_uri,
-                         psz_item_uri ) )
-            {
                 p_intf->p_sys->pp_announces[i]->i_last = mdate();
-
-                /* Check if the name changed */
-                if( strcmp( p_intf->p_sys->pp_announces[i]->psz_name,
-                             p_sd->psz_sessionname ) )
-                {
-                    playlist_item_t *p_item;
-                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                  FIND_ANYWHERE );
-
-                    msg_Dbg(p_intf, "Name changed (%s -> %s) for %s",
-                            p_intf->p_sys->pp_announces[i]->psz_name,
-                            p_sd->psz_sessionname,
-                            psz_item_uri );
-
-                    p_item = playlist_ItemGetById( p_playlist,
-                                    p_intf->p_sys->pp_announces[i]->i_id );
-
-                    /* Change the name in the item */
-                    if( p_item )
-                    {
-                        vlc_mutex_lock( &p_item->input.lock );
-                        if( p_item->input.psz_name )
-                            free( p_item->input.psz_name );
-                        p_item->input.psz_name = strdup( p_sd->psz_sessionname );
-                        vlc_mutex_unlock( &p_item->input.lock );
-                    }
-
-                    /* Update the stored name */
-                    if( p_intf->p_sys->pp_announces[i]->psz_name )
-                        free( p_intf->p_sys->pp_announces[i]->psz_name );
-                    p_intf->p_sys->pp_announces[i]->psz_name =
-                                   strdup( p_sd->psz_sessionname );
-
-                    vlc_object_release( p_playlist );
-                }
-                free( psz_item_uri );
-                return;
             }
+            return VLC_SUCCESS;
         }
-
-        /* Add the item in the playlist */
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                      FIND_ANYWHERE );
-
-        p_item = playlist_ItemNew( p_intf, psz_item_uri, p_sd->psz_sessionname );
-
-        if( p_item )
-        {
-            playlist_ItemSetGroup( p_item, i_group );
-            if( i_packetsize > config_GetInt( p_intf, "mtu" ) )
-            {
-                char *psz_packetsize_option;
-                asprintf( &psz_packetsize_option, "mtu=%i", i_packetsize );
-                playlist_ItemAddOption( p_item, psz_packetsize_option );
-                free( psz_packetsize_option );
-            }
-            playlist_AddItem( p_playlist , p_item , PLAYLIST_CHECK_INSERT, PLAYLIST_END );
-        }
-
-        /* Then remember it */
-        p_announce = (struct sap_announce_t *)malloc(
-                      sizeof( struct sap_announce_t ) );
-        if(  p_sd->psz_sessionname )
-        {
-            p_announce->psz_name = strdup(  p_sd->psz_sessionname );
-        }
-        else
-        {
-            p_announce->psz_name = strdup( "" );
-        }
-        if( psz_item_uri )
-        {
-            p_announce->psz_uri  = strdup( psz_item_uri );
-        }
-        else
-        {
-            p_announce->psz_uri = strdup( "" );
-        }
-        p_announce->i_id = i_id;
-
-        p_announce->i_last = mdate();
-
-        vlc_object_release( p_playlist );
-
-        INSERT_ELEM( p_intf->p_sys->pp_announces,
-                     p_intf->p_sys->i_announces,
-                     p_intf->p_sys->i_announces,
-                     p_announce );
-        free( psz_item_uri );
     }
+    /* Add item */
+    if( p_sdp->i_media > 1 )
+    {
+        msg_Dbg( p_intf, "passing to LIVE.COM" );
+    }
+
+    CreateAnnounce( p_intf, i_hash, p_sdp );
+
+    return VLC_SUCCESS;
 }
 
-/***********************************************************************
- * parse_sdp : SDP parsing
- * *********************************************************************
- * Make a sess_descr_t with a psz
- ***********************************************************************/
-
-static sess_descr_t *  parse_sdp( vlc_object_t * p_parent, char *p_packet )
+sap_announce_t *CreateAnnounce( intf_thread_t *p_intf, uint16_t i_hash,
+                                sdp_t *p_sdp )
 {
-    sess_descr_t *  sd;
-
-    if( p_packet[0] != 'v' || p_packet[1] != '=' )
+    playlist_t          *p_playlist;
+    playlist_item_t     *p_item, *p_child;
+    char                *psz_value;
+    sap_announce_t *p_sap = (sap_announce_t *)malloc(
+                                        sizeof(sap_announce_t ) );
+    if( !p_sap )
     {
-        msg_Warn( p_parent, "bad SDP packet" );
+        msg_Err( p_intf, "out of memory");
+        p_intf->b_die = VLC_TRUE;
+        return NULL;
+    }
+    p_sap->i_last = mdate();
+    p_sap->i_hash = i_hash;
+    p_sap->p_sdp = p_sdp;
+    p_sap->p_item = NULL;
+
+    /* Create the playlist item here */
+    p_item = playlist_ItemNew( p_intf, p_sap->p_sdp->psz_uri,
+                               p_sap->p_sdp->psz_sessionname );
+
+    if( !p_item )
+    {
         return NULL;
     }
 
-    sd = malloc( sizeof( sess_descr_t ) );
-    sd->psz_sessionname = NULL;
-    sd->psz_connection  = NULL;
-    sd->psz_sdp         = strdup( p_packet );
+    psz_value = GetAttribute( p_sap->p_sdp, "x-plgroup" );
 
-    sd->i_media         = 0;
-    sd->pp_media        = NULL;
-    sd->i_attributes    = 0;
-    sd->pp_attributes   = NULL;
-
-    while( *p_packet != '\0'  )
+    if( psz_value == NULL )
     {
-        char *psz_end;
+        psz_value = GetAttribute( p_sap->p_sdp, "plgroup" );
+    }
 
-        /* Search begin of field */
-        while( *p_packet == '\r' || *p_packet == '\n' || *p_packet == ' ' || *p_packet == '\t' )
+    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                FIND_ANYWHERE );
+    if( !p_playlist )
+    {
+        msg_Err( p_intf, "playlist not found" );
+        /* FIXME : Free */
+        return NULL;
+    }
+
+    if( psz_value != NULL )
+    {
+        p_child = playlist_ChildSearchName( p_intf->p_sys->p_node, psz_value );
+
+        if( p_child == NULL )
         {
-            p_packet++;
+            p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
+                                           psz_value, p_intf->p_sys->p_node );
         }
-        /* search end of line */
-        if( ( psz_end = strchr( p_packet, '\n' ) ) == NULL )
+    }
+    else
+    {
+        p_child = p_intf->p_sys->p_node;
+    }
+
+    p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
+
+    playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY, p_child,
+                          PLAYLIST_APPEND, PLAYLIST_END );
+
+    vlc_object_release( p_playlist );
+
+    p_sap->p_item = p_item;
+
+    TAB_APPEND( p_intf->p_sys->i_announces,
+                p_intf->p_sys->pp_announces,
+                p_sap );
+
+    return p_sap;
+}
+
+static char *GetAttribute( sdp_t *p_sdp, const char *psz_search )
+{
+    int i;
+
+    for( i = 0 ; i< p_sdp->i_attributes; i++ )
+    {
+        if( !strncmp( p_sdp->pp_attributes[i]->psz_field, psz_search,
+                      strlen( p_sdp->pp_attributes[i]->psz_field ) ) )
         {
-            psz_end = p_packet + strlen( p_packet );
+            return p_sdp->pp_attributes[i]->psz_value;
         }
-        if( psz_end > p_packet && *( psz_end - 1 ) == '\r' )
+    }
+    return NULL;
+}
+
+
+/* Fill p_sdp->psz_uri */
+static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
+{
+    char *psz_eof;
+    char *psz_parse;
+    char *psz_uri = NULL;
+    char *psz_proto = NULL;
+    int i_port = 0;
+
+    /* Parse c= field */
+    if( p_sdp->psz_connection )
+    {
+        psz_parse = p_sdp->psz_connection;
+
+        psz_eof = strchr( psz_parse, ' ' );
+
+        if( psz_eof )
         {
-            psz_end--;
+            *psz_eof = '\0';
+            psz_parse = psz_eof + 1;
+        }
+        else
+        {
+            msg_Warn( p_obj, "unable to parse c field (1)");
+            return VLC_EGENERIC;
         }
 
-        if( psz_end <= p_packet )
+        psz_eof = strchr( psz_parse, ' ' );
+
+        if( psz_eof )
+        {
+            *psz_eof = '\0';
+            if( !strncmp( psz_parse, "IP4", 3 ) )
+            {
+                p_sdp->i_in = 4;
+            }
+            else if( !strncmp( psz_parse, "IP6", 3 ) )
+            {
+                p_sdp->i_in = 6;
+            }
+            else
+            {
+                p_sdp->i_in = 0;
+            }
+            psz_parse = psz_eof + 1;
+        }
+        else
+        {
+            msg_Warn( p_obj, "unable to parse c field (2)");
+            return VLC_EGENERIC;
+        }
+
+        psz_eof = strchr( psz_parse, '/' );
+
+        if( psz_eof )
+        {
+            *psz_eof = 0;
+            psz_uri = strdup( psz_parse );
+        }
+
+        else
+        {
+            msg_Warn( p_obj, "unable to parse c field (3)");
+            return VLC_EGENERIC;
+        }
+
+    }
+
+    /* Parse m= field */
+    if( p_sdp->psz_media )
+    {
+        psz_parse = p_sdp->psz_media;
+
+        psz_eof = strchr( psz_parse, ' ' );
+
+        if( psz_eof )
+        {
+            *psz_eof = '\0';
+
+            if( strncmp( psz_parse, "audio", 5 )  &&
+                strncmp( psz_parse, "video",5 ) )
+            {
+                msg_Warn( p_obj, "unhandled media type -%s-", psz_parse );
+                return VLC_EGENERIC;
+            }
+
+            psz_parse = psz_eof + 1;
+        }
+        else
+        {
+            msg_Warn( p_obj, "unable to parse m field (1)");
+            return VLC_EGENERIC;
+        }
+
+        psz_eof = strchr( psz_parse, ' ' );
+
+        if( psz_eof )
+        {
+            *psz_eof = '\0';
+
+            /* FIXME : multiple port ! */
+            i_port = atoi( psz_parse );
+
+            if( i_port <= 0 || i_port >= 65536 )
+            {
+                msg_Warn( p_obj, "invalid transport port %i", i_port );
+            }
+
+            psz_parse = psz_eof + 1;
+        }
+        else
+        {
+            msg_Warn( p_obj, "unable to parse m field (2)");
+            return VLC_EGENERIC;
+        }
+
+        psz_eof = strchr( psz_parse, ' ' );
+
+        if( psz_eof )
+        {
+            *psz_eof = '\0';
+
+            psz_proto = strdup( psz_parse );
+        }
+        else
+        {
+            msg_Warn( p_obj, "unable to parse m field (3)");
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* FIXME: HTTP support */
+
+    if( i_port == 0 )
+    {
+        i_port = 1234;
+    }
+
+    if( ismult( psz_uri ) )
+    {
+        asprintf( &p_sdp->psz_uri, "%s://@%s:%i", psz_proto, psz_uri, i_port );
+    }
+    else
+    {
+        asprintf( &p_sdp->psz_uri, "%s://%s:%i", psz_proto, psz_uri, i_port );
+    }
+    return VLC_SUCCESS;
+}
+
+/***********************************************************************
+ * ParseSDP : SDP parsing
+ * *********************************************************************
+ * Validate SDP and parse all fields
+ ***********************************************************************/
+static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
+{
+    sdp_t *p_sdp;
+
+    if( psz_sdp[0] != 'v' || psz_sdp[1] != '=' )
+    {
+        msg_Warn( p_obj, "bad SDP packet" );
+        return NULL;
+    }
+
+    p_sdp = (sdp_t *)malloc( sizeof( sdp_t ) );
+
+    p_sdp->psz_sdp = strdup( psz_sdp );
+
+    p_sdp->psz_sessionname = NULL;
+    p_sdp->psz_media       = NULL;
+    p_sdp->psz_connection  = NULL;
+
+    p_sdp->i_media         = 0;
+    p_sdp->i_attributes    = 0;
+    p_sdp->pp_attributes   = NULL;
+
+    while( *psz_sdp != '\0'  )
+    {
+        char *psz_eol;
+        while( *psz_sdp == '\r' || *psz_sdp == '\n' || *psz_sdp == ' ' || *psz_sdp == '\t' )
+        {
+            psz_sdp++;
+        }
+
+        if( ( psz_eol = strchr( psz_sdp, '\n' ) ) == NULL )
+        {
+            psz_eol = psz_sdp + strlen( psz_sdp );
+        }
+        if( psz_eol > psz_sdp && *( psz_eol - 1 ) == '\r' )
+        {
+            psz_eol--;
+        }
+
+        if( psz_eol <= psz_sdp )
         {
             break;
         }
-        *psz_end++ = '\0';
+        *psz_eol++ = '\0';
 
-        if( p_packet[1] != '=' )
+        /* no space allowed between fields */
+        if( psz_sdp[1] != '=' )
         {
-            msg_Warn( p_parent, "invalid packet" ) ;
-            free_sd( sd );
+            msg_Warn( p_obj, "invalid packet" ) ;
+            /* MEMLEAK ! */
             return NULL;
         }
 
-        switch( p_packet[0] )
+        /* Now parse each line */
+        switch( psz_sdp[0] )
         {
             case( 'v' ):
-                sd->i_version = atoi( &p_packet[2] );
                 break;
             case( 's' ):
-                sd->psz_sessionname = strdup( &p_packet[2] );
+                p_sdp->psz_sessionname = strdup( &psz_sdp[2] );
                 break;
             case ( 'o' ):
             case( 'i' ):
@@ -1029,87 +972,69 @@ static sess_descr_t *  parse_sdp( vlc_object_t * p_parent, char *p_packet )
             case( 't' ):
             case( 'r' ):
                 break;
-            case( 'a' ):
+            case( 'a' ): /* attribute */
             {
-                char *psz_eof = strchr( &p_packet[2], ':' );
+                char *psz_eon = strchr( &psz_sdp[2], ':' );
 
-                if( psz_eof && psz_eof[1] != '\0' )
+                 attribute_t *p_attr = (attribute_t *)malloc(
+                                        sizeof( attribute_t ) );
+
+                /* Attribute with value */
+                if( psz_eon )
                 {
-                    attr_descr_t *attr = malloc( sizeof( attr_descr_t ) );
+                    *psz_eon++ = '\0';
 
-                    *psz_eof++ = '\0';
-
-                    attr->psz_field = strdup( &p_packet[2] );
-                    attr->psz_value = strdup( psz_eof );
-
-                    TAB_APPEND( sd->i_attributes, sd->pp_attributes, attr );
+                    p_attr->psz_field = strdup( &psz_sdp[2] );
+                    p_attr->psz_value = strdup( psz_eon );
                 }
+                else /* Attribute without value */
+                {
+                    p_attr->psz_field = strdup( &psz_sdp[2] );
+                    p_attr->psz_value = NULL;
+                }
+
+                TAB_APPEND( p_sdp->i_attributes, p_sdp->pp_attributes, p_attr );
                 break;
             }
 
-            case( 'm' ):
+            case( 'm' ): /* Media announcement */
             {
-                media_descr_t *media = malloc( sizeof( media_descr_t ) );
-
-                media->psz_medianame = strdup( &p_packet[2] );
-                media->psz_mediaconnection = NULL;
-
-                TAB_APPEND( sd->i_media, sd->pp_media, media );
+                /* If we have several medias, we pass the announcement to
+                 * LIVE.COM, so just count them */
+                p_sdp->i_media++;
+                if( p_sdp->i_media == 1 )
+                {
+                    p_sdp->psz_media = strdup( &psz_sdp[2] );
+                }
                 break;
             }
 
             case( 'c' ):
-                if( sd->i_media <= 0 )
-                {
-                    sd->psz_connection = strdup( &p_packet[2] );
-                }
-                else
-                {
-                    sd->pp_media[sd->i_media-1]->psz_mediaconnection = strdup( &p_packet[2] );
-                }
-               break;
+            {
+                if( p_sdp->i_media > 1 )
+                    break;
+
+                p_sdp->psz_connection = strdup( &psz_sdp[2] );
+                break;
+            }
 
             default:
                break;
         }
 
-        p_packet = psz_end;
+        psz_sdp = psz_eol;
     }
 
-    return sd;
+    return p_sdp;
 }
 
 #define FREE( p ) \
     if( p ) { free( p ); (p) = NULL; }
-static void free_sd( sess_descr_t * p_sd )
-{
-    int i;
-
-    FREE( p_sd->psz_sessionname );
-    FREE( p_sd->psz_connection );
-    FREE( p_sd->psz_sdp );
-
-    for( i = 0; i < p_sd->i_media ; i++ )
-    {
-        FREE( p_sd->pp_media[i]->psz_medianame );
-        FREE( p_sd->pp_media[i]->psz_mediaconnection );
-        FREE( p_sd->pp_media[i] );
-    }
-    for( i = 0; i < p_sd->i_attributes ; i++ )
-    {
-        FREE( p_sd->pp_attributes[i]->psz_field );
-        FREE( p_sd->pp_attributes[i]->psz_value );
-        FREE( p_sd->pp_attributes[i] );
-    }
-    FREE( p_sd->pp_attributes );
-    FREE( p_sd->pp_media );
-
-    free( p_sd );
-}
 
 /***********************************************************************
  * ismult: returns true if we have a multicast address
  ***********************************************************************/
+
 static int ismult( char *psz_uri )
 {
     char *psz_end;
@@ -1132,113 +1057,40 @@ static int ismult( char *psz_uri )
     return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
 }
 
-/*****************************************************************************
- * NetRead: read on a file descriptor, checking b_die periodically
- *****************************************************************************
- * Taken from net.c
- * Code duplication because of select(). We need a net_Select() but that's 
- * quite difficult.
- *****************************************************************************/
-static ssize_t NetRead( intf_thread_t *p_intf,
-                        int fd[2], uint8_t *p_buffer, int i_len )
+static int InitSocket( intf_thread_t *p_intf, char *psz_address, int i_port )
 {
-#ifdef UNDER_CE
-    return -1;
-#else
-    struct timeval  timeout;
-    fd_set          fds;
-    int             i_ret;
-    int             i_handle_max = __MAX( fd[0], fd[1] );
+    int i_fd = net_OpenUDP( p_intf, psz_address, i_port, "", 0 );
 
-    /* Initialize file descriptor set */
-
-    FD_ZERO( &fds );
-    if( fd[0] > 0 ) FD_SET( fd[0], &fds );
-    if( fd[1] > 0 ) FD_SET( fd[1], &fds );
-
-    /* We'll wait 0.5 second if nothing happens */
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000;
-
-    /* Find if some data is available */
-    i_ret = select( i_handle_max + 1, &fds, NULL, NULL, &timeout );
-
-    if( i_ret == -1 && errno != EINTR )
+    if( i_fd != -1 )
     {
-        msg_Err( p_intf, "network select error (%s)", strerror(errno) );
+        INSERT_ELEM(  p_intf->p_sys->pi_fd,
+                      p_intf->p_sys->i_fd,
+                      p_intf->p_sys->i_fd,
+                      i_fd );
+        return VLC_SUCCESS;
     }
-    else if( i_ret > 0 )
-    {
-        if( fd[0] > 0 && FD_ISSET( fd[0], &fds ) )
-        {
-             return recv( fd[0], p_buffer, i_len, 0 );
-        }
-        else if( fd[1] > 0 && FD_ISSET( fd[1], &fds ) )
-        {
-             return recv( fd[1], p_buffer, i_len, 0 );
-        }
-    }
-    return 0;
-#endif
+
+    return VLC_EGENERIC;
 }
 
-/*
- * This submodule is temporary and has a very high duplicate code rate
- * This needs to be removed when SDP UDP parsing is fixed in liveMedia
- */
-static int OpenSDP( vlc_object_t * p_this )
+#ifdef HAVE_ZLIB_H
+static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len )
 {
-    demux_t *p_demux = (demux_t *)p_this;
-    uint8_t *p_peek;
+    int i_result, i_dstsize, n;
+    unsigned char *psz_dst;
+    z_stream d_stream;
 
-    if( p_demux->s )
+    d_stream.zalloc = (alloc_func)0;
+    d_stream.zfree = (free_func)0;
+    d_stream.opaque = (voidpf)0;
+
+    i_result = inflateInit(&d_stream);
+    if( i_result != Z_OK )
     {
-        /* See if it looks like a SDP
-           v, o, s fields are mandatory and in this order */
-        if( stream_Peek( p_demux->s, &p_peek, 7 ) < 7 )
-        {
-            msg_Err( p_demux, "cannot peek" );
-            return VLC_EGENERIC;
-        }
-        if( strncmp( (char*)p_peek, "v=0\r\n", 5 ) && strncmp( (char*)p_peek, "v=0\n", 4 ) &&
-            ( p_peek[0] < 'a' || p_peek[0] > 'z' || p_peek[1] != '=' ) )
-        {
-            msg_Warn( p_demux, "SDP (UDP) module discarded" );
-            return VLC_EGENERIC;
-        }
+        printf( "inflateInit() failed. Result: %d\n", i_result );
+        return( -1 );
     }
-    
-    p_demux->pf_control = Control;
-    p_demux->pf_demux = Demux;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Demux: reads and demuxes data packets
- * This submodule is temporary and has a very high duplicate code rate
- * This needs to be removed when SDP UDP parsing is fixed in liveMedia
- *****************************************************************************
- * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
- *****************************************************************************/
-static int Demux( demux_t *p_demux )
-{
-    sess_descr_t *p_sd = NULL;
-    playlist_t *p_playlist = NULL;
-    int i_sdp = 0;
-    int i_sdp_max = 1000;
-    int i_position = -1;
-    char *p_sdp = (uint8_t*)malloc( i_sdp_max );
-    
-    p_playlist = vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
-                                          FIND_ANYWHERE );
-    
-    if( !p_playlist )
-    {
-        msg_Err( p_demux, "can't find playlist" );
-        return -1;
-    }
-    
+#if 0
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
     i_position = p_playlist->i_index;
     
@@ -1246,195 +1098,51 @@ static int Demux( demux_t *p_demux )
     for( ;; )
     {
         int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp], i_sdp_max - i_sdp - 1 );
+#endif
+    d_stream.next_in = (Bytef *)psz_src;
+    d_stream.avail_in = i_len;
+    n = 0;
 
-        if( i_read < 0 )
-        {
-            msg_Err( p_demux, "failed to read SDP" );
-            return VLC_EGENERIC;
-        }
+    psz_dst = NULL;
 
-        i_sdp += i_read;
-
-        if( i_read < i_sdp_max - i_sdp - 1 )
-        {
-            p_sdp[i_sdp] = '\0';
-            break;
-        }
-
-        i_sdp_max += 1000;
-        p_sdp = (uint8_t*)realloc( p_sdp, i_sdp_max );
-    }
-
-    msg_Dbg( p_demux, "sdp=%s\n", p_sdp );
-    
-    p_sd = parse_sdp( (vlc_object_t *)p_demux, p_sdp );
-    if( p_sd )
+    do
     {
-        char *psz_uri, *psz_proto, *psz_item_uri;
-        char *psz_port;
-        char *psz_uri_default;
-        int i_count, i, i_id = 0;
-        vlc_bool_t b_http = VLC_FALSE;
-        char *psz_http_path = NULL;
-        playlist_item_t *p_item;
-        psz_uri_default = NULL;
-        
-        if( p_sd->i_media > 1 || !config_GetInt( p_demux, "sap-parse" ) )
+        n++;
+        psz_dst = (unsigned char *)realloc( psz_dst, n * 1000 );
+        d_stream.next_out = (Bytef *)&psz_dst[(n - 1) * 1000];
+        d_stream.avail_out = 1000;
+
+        i_result = inflate(&d_stream, Z_NO_FLUSH);
+        if( ( i_result != Z_OK ) && ( i_result != Z_STREAM_END ) )
         {
-            /* Let another module try this */
-            asprintf( &psz_uri, "sdp://%s", p_sd->psz_sdp );
-            i_id = playlist_Add( p_playlist, psz_uri, p_sd->psz_sessionname ,
-                          PLAYLIST_CHECK_INSERT, i_position );
-            free( psz_uri );
-            vlc_object_release( p_playlist );
-            return 0;
+            printf( "Zlib decompression failed. Result: %d\n", i_result );
+            return( -1 );
         }
-        
-        /* We try to parse it ourselves */
-        cfield_parse( p_sd->psz_connection, &psz_uri_default );
-
-        for( i_count = 0 ; i_count < p_sd->i_media ; i_count++ )
-        {
-            int i_group = 0;
-            int i_packetsize = config_GetInt( p_demux, "mtu" );
-
-            /* Build what we have to put in psz_item_uri, with the m and
-             * c fields  */
-
-            if( !p_sd->pp_media[i_count] )
-            {
-                vlc_object_release( p_playlist );
-                return -1;
-            }
-
-            mfield_parse( p_sd->pp_media[i_count]->psz_medianame,
-                            &psz_proto, &psz_port );
-
-            if( !psz_proto || !psz_port )
-            {
-                vlc_object_release( p_playlist );
-                return -1;
-            }
-
-            if( p_sd->pp_media[i_count]->psz_mediaconnection )
-            {
-                cfield_parse( p_sd->pp_media[i_count]->psz_mediaconnection,
-                                & psz_uri );
-            }
-            else
-            {
-                psz_uri = psz_uri_default;
-            }
-
-            if( psz_uri == NULL )
-            {
-                vlc_object_release( p_playlist );
-                return -1;
-            }
-
-            for( i = 0 ; i< p_sd->i_attributes ; i++ )
-            {
-                if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "type" ) &&
-                    strstr( p_sd->pp_attributes[i]->psz_value, "http" ) )
-                {
-                    b_http = VLC_TRUE;
-                }
-                if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path" ) )
-                {
-                    psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
-                }
-                if( ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup" ) ) ||
-                    ( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "x-plgroup" ) ) )
-                {
-                    int i_group_id;
-
-                    i_group_id = playlist_GroupToId( p_playlist,
-                                     p_sd->pp_attributes[i]->psz_value );
-                    if( i_group_id != 0 )
-                    {
-                        i_group = i_group_id;
-                    }
-                    else
-                    {
-                        playlist_group_t *p_group =
-                                playlist_CreateGroup( p_playlist,
-                                           p_sd->pp_attributes[i]->psz_value );
-                        i_group = p_group->i_id;
-                    }
-                }
-                if( !strcasecmp( p_sd->pp_attributes[i]->psz_field , "packetsize" ) )
-                {
-                    i_packetsize = strtol( p_sd->pp_attributes[i]->psz_value, NULL, 10 );
-                }
-            }
-
-            /* Filling psz_uri */
-            if( b_http == VLC_FALSE )
-            {
-                if( ismult( psz_uri ) )
-                {
-                    asprintf( &psz_item_uri, "%s://@%s:%s",
-                             psz_proto, psz_uri, psz_port );
-                }
-                else
-                {
-                    asprintf( &psz_item_uri, "%s://%s:%s",
-                             psz_proto, psz_uri, psz_port );
-                }
-            }
-            else
-            {
-                if( psz_http_path == NULL )
-                {
-                    psz_http_path = strdup( "/" );
-                }
-                if( *psz_http_path == '/' )
-                {
-                    asprintf( &psz_item_uri, "%s://%s:%s%s", psz_proto,
-                             psz_uri, psz_port,psz_http_path );
-                }
-                else
-                {
-                    asprintf( &psz_item_uri, "%s://%s:%s/%s", psz_proto, psz_uri,
-                              psz_port, psz_http_path );
-                }
-
-                if( psz_http_path )
-                {
-                    free( psz_http_path );
-                }
-            }
-
-            /* Add the item in the playlist */
-            p_item = playlist_ItemNew( p_demux, psz_item_uri, p_sd->psz_sessionname );
-
-            if( p_item )
-            {
-                playlist_ItemSetGroup( p_item, i_group );
-                if( i_packetsize > config_GetInt( p_demux, "mtu" ) )
-                {
-                    char *psz_packetsize_option;
-                    asprintf( &psz_packetsize_option, "mtu=%i", i_packetsize );
-                    playlist_ItemAddOption( p_item, psz_packetsize_option );
-                    free( psz_packetsize_option );
-                }
-                playlist_AddItem( p_playlist , p_item , PLAYLIST_CHECK_INSERT, i_position );
-            }
-
-            free( psz_item_uri );
-        }
-
-        free_sd ( p_sd );
     }
-    vlc_object_release( p_playlist );
-    return 0;
-}    
+    while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&
+           ( i_result != Z_STREAM_END ) );
 
-static int Control( demux_t *p_demux, int i_query, va_list args )
+    i_dstsize = d_stream.total_out;
+    inflateEnd( &d_stream );
+
+    *_dst = (unsigned char *)realloc( psz_dst, i_dstsize );
+
+    return i_dstsize;
+}
+#endif
+
+static int RemoveAnnounce( intf_thread_t *p_intf, sap_announce_t *p_announce )
 {
-    return VLC_EGENERIC;
+    msg_Err( p_intf, "remove not implemented");
+    return VLC_SUCCESS;
 }
 
-static void CloseSDP( vlc_object_t *p_this )
+
+static void CacheLoad( intf_thread_t *p_intf )
 {
+    msg_Warn( p_intf, "Cache not implemented") ;
+}
+static void CacheSave( intf_thread_t *p_intf )
+{
+    msg_Warn( p_intf, "Cache not implemented") ;
 }
