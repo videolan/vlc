@@ -7,6 +7,11 @@ SOURCES_es = \
 	modules/demux/mpeg/es.c \
 	$(NULL)
 
+SOURCES_m4v = \
+	modules/demux/mpeg/m4v.c \
+	$(NULL)
+
+
 SOURCES_ps = \
 	modules/demux/mpeg/ps.c \
 	$(NULL)

@@ -721,7 +721,7 @@ dnl
 dnl  default modules
 dnl
 PLUGINS="${PLUGINS} dummy rc logger access_file memcpy"
-PLUGINS="${PLUGINS} es audio mpeg_system ps ts"
+PLUGINS="${PLUGINS} es audio m4v mpeg_system ps ts"
 PLUGINS="${PLUGINS} idct idctclassic motion mpeg_video spudec mpeg_audio"
 #PLUGINS="${PLUGINS} a52old imdct downmix imdct3dn downmix3dn imdctsse downmixsse"
 PLUGINS="${PLUGINS} lpcm a52"
