@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.55 2003/08/18 00:17:44 fenrir Exp $
+ * $Id: avi.c,v 1.56 2003/08/20 01:10:54 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -458,7 +458,8 @@ static int AVI_IndexLoad_idx1( input_thread_t *p_input )
 
     unsigned int i_stream;
     unsigned int i_index;
-    off_t   i_offset;
+    off_t        i_offset;
+    unsigned int i;
 
     p_riff = (avi_chunk_list_t*)AVI_ChunkFind( &p_avi->ck_root,
                                                AVIFOURCC_RIFF, 0);
@@ -473,14 +474,16 @@ static int AVI_IndexLoad_idx1( input_thread_t *p_input )
     }
 
     /* *** calculate offset *** */
-    if( p_idx1->i_entry_count > 0 &&
-        p_idx1->entry[0].i_pos < p_movi->i_chunk_pos )
+    /* Well, avi is __SHIT__ so test more than one entry 
+     * (needed for some avi files) */
+    i_offset = 0;
+    for( i = 0; i < __MIN( p_idx1->i_entry_count, 10 ); i++ )
     {
-        i_offset = p_movi->i_chunk_pos + 8;
-    }
-    else
-    {
-        i_offset = 0;
+        if( p_idx1->entry[i].i_pos < p_movi->i_chunk_pos )
+        {
+            i_offset = p_movi->i_chunk_pos + 8;
+            break;
+        }
     }
 
     for( i_index = 0; i_index < p_idx1->i_entry_count; i_index++ )
@@ -590,6 +593,7 @@ static void AVI_IndexLoad_indx( input_thread_t *p_input )
                 {
                     break;
                 }
+                __Parse_indx( p_input, i_stream, &ck_sub );
             }
         }
         else
@@ -631,6 +635,16 @@ static void AVI_IndexLoad( input_thread_t *p_input )
                 "stream[%d] created %d index entries",
                 i_stream,
                 p_avi->pp_info[i_stream]->i_idxnb );
+#if 0
+        for( i = 0; i < p_avi->pp_info[i_stream]->i_idxnb; i++ )
+        {
+            msg_Dbg( p_input, "stream[%d] idx[%d] pos=%lld size=%d",
+                     i_stream,
+                     i,
+                     p_avi->pp_info[i_stream]->p_index[i].i_pos,
+                     p_avi->pp_info[i_stream]->p_index[i].i_length );
+        }
+#endif
     }
 }
 
@@ -1228,7 +1242,7 @@ static int AVIInit( vlc_object_t * p_this )
         p_es->i_fourcc = p_info->i_fourcc;
         if( p_es->i_cat == AUDIO_ES )
         {
-            if( i_init_size < sizeof( WAVEFORMATEX ) )
+            if( i_init_size < (int)sizeof( WAVEFORMATEX ) )
             {
                 i_init_size = sizeof( WAVEFORMATEX );
             }
