@@ -2,7 +2,7 @@
  * i420_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.h,v 1.4 2002/04/30 20:21:25 sam Exp $
+ * $Id: i420_yuy2.h,v 1.5 2002/05/21 02:46:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,12 +27,6 @@
     unsigned long long foo __asm__ (#foo) __attribute__((unused))
 UNUSED_LONGLONG(woo_00ffw) = 0x00ff00ff00ff00ff;
 UNUSED_LONGLONG(woo_80w)   = 0x0000000080808080;
-
-#ifdef SYS_BEOS
-#   define MMX_CONSTRAINTS "memory"
-#else
-#   define MMX_CONSTRAINTS "eax"
-#endif
 
 #define MMX_LOAD "                                                        \n\
 pushl     %%ebx                                                           \n\
@@ -68,7 +62,7 @@ addl         $2, %%ebx                                                    \n\
         : "=c" (p_line1), "=d" (p_line2), "=D" (p_y1), "=S" (p_y2)  \
         :  "c" (p_line1),  "d" (p_line2),  "D" (p_y1),  "S" (p_y2), \
           "m" (p_u), "m" (p_v)                                      \
-        : MMX_CONSTRAINTS );
+        : "eax", "memory" );
 
 #define MMX_YUV420_YUYV "                                                 \n\
 movq       (%2), %%mm0  # Load 8 Y            y7 y6 y5 y4 y3 y2 y1 y0     \n\
