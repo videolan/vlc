@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.59 2003/07/28 18:02:06 massiot Exp $
+$Id: NEWS,v 1.60 2003/07/28 20:23:58 jpsaman Exp $
 
 Changes between 0.6.0 and 0.6.1:
 ---------------------------------
@@ -24,6 +24,13 @@ UNIX ports:
  * Fixed/improved ALSA support and enabled multi-channel audio output.
  * X11/Xvideo: Should now work on big endian machines, and you can now
    use the arrow keys to browse through the DVD menus.
+
+iPaq port:
+ * Gtk+2 interface called PDA
+ * Familiar Gtk+ is now deprecreated
+ * Codec a52, Faad2 and flac added
+ * Video4Linux enabled (demux and transcode)
+ * Stream Out with transcode support enabled (use codecs: HuffYuvv and A-law).
 
 Interfaces:
  * Small updates/fixes to the wxWindows interface.
