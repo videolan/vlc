@@ -717,62 +717,81 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     _FreeBuffers();
     // set default mode
     *mode = BITMAP;
+    bitmap_count = 3;
 
     BRect bitmapFrame( 0, 0, width, height );
     // read from config, if we are supposed to use overlay at all
     int noOverlay = !config_GetInt( p_vout, "overlay" );
-    // test for overlay capability
-    for (int i = 0; i < COLOR_COUNT; i++)
+
+    /* Test for overlay capability: for every chroma in colspace,
+       we try to do double-buffered overlay, or we fallback on
+       single-buffered overlay. In nothing worked, we then have
+       to work with a non-overlay BBitmap. */
+    for( int i = 0; i < COLOR_COUNT; i++ )
     {
         if (noOverlay) break;
-        bitmap[0] = new BBitmap ( bitmapFrame,
-                                  B_BITMAP_WILL_OVERLAY |
-                                  B_BITMAP_RESERVE_OVERLAY_CHANNEL,
-                                  colspace[i].colspace);
 
-        if(bitmap[0] && bitmap[0]->InitCheck() == B_OK)
+        bitmap[0] = new BBitmap( bitmapFrame,
+                                 B_BITMAP_WILL_OVERLAY |
+                                 B_BITMAP_RESERVE_OVERLAY_CHANNEL,
+                                 colspace[i].colspace );
+        if( bitmap[0] && bitmap[0]->InitCheck() == B_OK )
         {
             colspace_index = i;
 
             bitmap[1] = new BBitmap( bitmapFrame, B_BITMAP_WILL_OVERLAY,
                                      colspace[colspace_index].colspace);
-            bitmap[2] = new BBitmap( bitmapFrame, B_BITMAP_WILL_OVERLAY,
-                                     colspace[colspace_index].colspace);
-            if ( (bitmap[2] && bitmap[2]->InitCheck() == B_OK) )
+            if( bitmap[1] && bitmap[1]->InitCheck() == B_OK )
             {
-               *mode = OVERLAY;
-               rgb_color key;
-               view->SetViewOverlay(bitmap[0],
-                                    bitmap[0]->Bounds() ,
-                                    view->Bounds(),
-                                    &key, B_FOLLOW_ALL,
-                                    B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
-               view->SetViewColor(key);
-               SetTitle("VLC " PACKAGE_VERSION " (Overlay)");
-               break;
+                *mode = OVERLAY;
+                rgb_color key;
+                view->SetViewOverlay( bitmap[0], bitmap[0]->Bounds(),
+                                      view->Bounds(), &key, B_FOLLOW_ALL,
+                                      B_OVERLAY_FILTER_HORIZONTAL |
+                                      B_OVERLAY_FILTER_VERTICAL );
+                view->SetViewColor( key );
+                SetTitle( "VLC " PACKAGE_VERSION " (Overlay)" );
+
+                bitmap[2] = new BBitmap( bitmapFrame, B_BITMAP_WILL_OVERLAY,
+                                         colspace[colspace_index].colspace);
+                if( bitmap[2] && bitmap[2]->InitCheck() == B_OK )
+                {
+                    msg_Dbg( p_vout, "using double-buffered overlay" );
+                }
+                else
+                {
+                    msg_Dbg( p_vout, "using single-buffered overlay" );
+                    bitmap_count = 2;
+                    if( bitmap[2] ) delete bitmap[2];
+                }
+                break;
             }
             else
             {
-               _FreeBuffers();
-               *mode = BITMAP; // might want to try again with normal bitmaps
+                *mode = BITMAP;
+                _FreeBuffers();
             }
         }
         else
+        {
             delete bitmap[0];
+        }
     }
 
     if (*mode == BITMAP)
     {
+        msg_Warn( p_vout, "no possible overlay" );
+
         // fallback to RGB
         colspace_index = DEFAULT_COL;    // B_RGB32
-        SetTitle( "VLC " PACKAGE_VERSION " (Bitmap)" );
         bitmap[0] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
         bitmap[1] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
         bitmap[2] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
+        SetTitle( "VLC " PACKAGE_VERSION " (Bitmap)" );
     }
     // see if everything went well
     status_t status = B_ERROR;
-    for (int32_t i = 0; i < 3; i++)
+    for (int32_t i = 0; i < bitmap_count; i++)
     {
         if (bitmap[i])
             status = bitmap[i]->InitCheck();
@@ -782,7 +801,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     if (status >= B_OK)
     {
         // clear bitmaps to black
-        for (int32_t i = 0; i < 3; i++)
+        for (int32_t i = 0; i < bitmap_count; i++)
             _BlankBitmap(bitmap[i]);
     }
     return status;
@@ -794,12 +813,9 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
 void
 VideoWindow::_FreeBuffers()
 {
-    delete bitmap[0];
-    bitmap[0] = NULL;
-    delete bitmap[1];
-    bitmap[1] = NULL;
-    delete bitmap[2];
-    bitmap[2] = NULL;
+    if( bitmap[0] ) { delete bitmap[0]; bitmap[0] = NULL; }
+    if( bitmap[1] ) { delete bitmap[1]; bitmap[1] = NULL; }
+    if( bitmap[2] ) { delete bitmap[2]; bitmap[2] = NULL; }
     fInitStatus = B_ERROR;
 }
 
@@ -1448,7 +1464,9 @@ int Init( vout_thread_t *p_vout )
     p_vout->output.i_gmask  = 0x0000ff00;
     p_vout->output.i_bmask  = 0x000000ff;
 
-    for (int buffer_index = 0 ; buffer_index < 3; buffer_index++)
+    for( int buffer_index = 0 ;
+         buffer_index < p_vout->p_sys->p_window->bitmap_count;
+         buffer_index++ )
     {
        p_pic = NULL;
        /* Find an empty picture slot */
@@ -1536,7 +1554,8 @@ void Display( vout_thread_t *p_vout, picture_t *p_pic )
        p_win->drawBuffer(p_vout->p_sys->i_index);
     }
     /* change buffer */
-    p_vout->p_sys->i_index = ++p_vout->p_sys->i_index % 3;
+    p_vout->p_sys->i_index = ++p_vout->p_sys->i_index %
+        p_vout->p_sys->p_window->bitmap_count;
     p_pic->p->p_pixels = (uint8_t*)p_vout->p_sys->p_window->bitmap[p_vout->p_sys->i_index]->Bits();
 }
 

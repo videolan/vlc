@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.11 2003/12/28 01:49:12 titer Exp $
+ * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -178,6 +178,7 @@ public:
 	volatile bool	teardownwindow;
     thread_id       fDrawThreadID;
     int             mode;
+    int             bitmap_count;
     int             colspace_index;
 
 private:
