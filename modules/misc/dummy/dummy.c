@@ -2,7 +2,7 @@
  * dummy.c : dummy plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: dummy.c,v 1.6 2003/05/04 22:42:17 gbazin Exp $
+ * $Id: dummy.c,v 1.7 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,14 +34,14 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CHROMA_TEXT N_("dummy image chroma format")
+#define CHROMA_TEXT N_("Dummy image chroma format")
 #define CHROMA_LONGTEXT N_( \
     "Force the dummy video output to create images using a specific chroma " \
     "format instead of trying to improve performances by using the most " \
     "efficient one.")
 
 #ifdef WIN32
-#define QUIET_TEXT N_("don't open a dos command box interface")
+#define QUIET_TEXT N_("Don't open a dos command box interface")
 #define QUIET_LONGTEXT N_( \
     "By default the dummy interface plugin will start a dos command box. " \
     "Enabling the quiet mode will not bring this command box but can also " \

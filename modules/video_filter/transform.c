@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: transform.c,v 1.11 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: transform.c,v 1.12 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,7 +54,7 @@ static int  SendEvents( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define TYPE_TEXT N_("transform type")
+#define TYPE_TEXT N_("Transform type")
 #define TYPE_LONGTEXT N_("One of '90', '180', '270', 'hflip' and 'vflip'")
 
 static char *type_list[] = { "90", "180", "270", "hflip", "vflip", NULL };

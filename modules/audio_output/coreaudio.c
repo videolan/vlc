@@ -2,7 +2,7 @@
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.4 2003/05/11 01:00:26 massiot Exp $
+ * $Id: coreaudio.c,v 1.5 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -215,7 +215,7 @@ static OSStatus StreamListener   ( AudioStreamID inStream,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADEV_TEXT N_("audio device")
+#define ADEV_TEXT N_("Audio device")
 
 vlc_module_begin();
     set_description( _("CoreAudio output") );

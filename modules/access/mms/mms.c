@@ -2,7 +2,7 @@
  * mms.c: MMS over tcp, udp and http access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.33 2003/05/06 02:01:35 fenrir Exp $
+ * $Id: mms.c,v 1.34 2003/05/15 22:27:36 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,7 +54,7 @@ static void Close       ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for mms streams. This " \
     "value should be set in miliseconds units." )

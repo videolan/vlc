@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: adjust.c,v 1.11 2003/03/18 23:30:28 gbazin Exp $
+ * $Id: adjust.c,v 1.12 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>
  *
@@ -57,13 +57,13 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 
-#define CONT_TEXT N_("set image contrast")
+#define CONT_TEXT N_("Set image contrast")
 #define CONT_LONGTEXT N_("Set the image contrast. Defaults to 1")
-#define HUE_TEXT N_("set image hue")
+#define HUE_TEXT N_("Set image hue")
 #define HUE_LONGTEXT N_("Set the image hue, between 0 and 360. Defaults to 0")
-#define SAT_TEXT N_("set image saturation")
+#define SAT_TEXT N_("Set image saturation")
 #define SAT_LONGTEXT N_("Set the image saturation. Defaults to 1")
-#define LUM_TEXT N_("set image brightness")
+#define LUM_TEXT N_("Set image brightness")
 #define LUM_LONGTEXT N_("Set the image brightness. Defaults to 1")
 
 

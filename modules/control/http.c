@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.5 2003/05/09 16:01:17 gbazin Exp $
+ * $Id: http.c,v 1.6 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -71,10 +71,10 @@ struct intf_sys_t
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define PORT_TEXT N_( "http interface bind port" )
+#define PORT_TEXT N_( "HTTP interface bind port" )
 #define PORT_LONGTEXT N_( \
     "You can set the port on which the http interface will accept connections" )
-#define ADDR_TEXT N_( "http interface bind address" )
+#define ADDR_TEXT N_( "HTTP interface bind address" )
 #define ADDR_LONGTEXT N_( \
     "You can set the address on which the http interface will bind" )
 

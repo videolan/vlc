@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.10 2003/03/30 18:14:35 gbazin Exp $
+ * $Id: slp.c,v 1.11 2003/05/15 22:27:36 massiot Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -69,7 +69,7 @@ static int  Demux ( input_thread_t * );
 #define FILTER_LONGTEXT "This is a query formulated of attribute pattern " \
                         "matching expressions in the form of an LDAPv3 "   \
                         "search filter or empty for all answers"
-#define LANG_TEXT     "language requested in SLP requests"
+#define LANG_TEXT     "Language requested in SLP requests"
 #define LANG_LONGTEXT "RFC 1766 Language Tag for the natural language " \
                       "locale of requests, leave empty to use the "     \
                       "default locale; it is used in all SLP queries"

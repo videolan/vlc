@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.9 2003/03/30 18:14:39 gbazin Exp $
+ * $Id: xosd.c,v 1.10 2003/05/15 22:27:38 massiot Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -58,17 +58,17 @@ static void Run          ( intf_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define POSITION_TEXT N_("flip vertical position")
+#define POSITION_TEXT N_("Flip vertical position")
 #define POSITION_LONGTEXT N_("Display xosd output on the bottom of the " \
                              "screen instead of the top")
 
-#define TXT_OFS_TEXT N_("vertical offset")
+#define TXT_OFS_TEXT N_("Vertical offset")
 #define TXT_OFS_LONGTEXT N_("Vertical offset in pixels of the displayed text")
 
-#define SHD_OFS_TEXT N_("shadow offset")
+#define SHD_OFS_TEXT N_("Shadow offset")
 #define SHD_OFS_LONGTEXT N_("Offset in pixels of the shadow")
 
-#define FONT_TEXT N_("font")
+#define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Font used to display text in the xosd output")
 
 vlc_module_begin();

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.18 2003/05/05 16:09:37 gbazin Exp $
+ * $Id: directx.c,v 1.19 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -87,19 +87,19 @@ static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ON_TOP_TEXT N_("always on top")
-#define ON_TOP_LONGTEXT N_("place the directx window on top of other windows")
-#define HW_YUV_TEXT N_("use hardware YUV->RGB conversions")
+#define ON_TOP_TEXT N_("Always on top")
+#define ON_TOP_LONGTEXT N_("Place the directx window on top of other windows")
+#define HW_YUV_TEXT N_("Use hardware YUV->RGB conversions")
 #define HW_YUV_LONGTEXT N_( \
     "Try to use hardware acceleration for YUV->RGB conversions. " \
     "This option doesn't have any effect when using overlays." )
-#define SYSMEM_TEXT N_("use video buffers in system memory")
+#define SYSMEM_TEXT N_("Use video buffers in system memory")
 #define SYSMEM_LONGTEXT N_( \
     "Create video buffers in system memory instead of video memory. This " \
     "isn't recommended as usually using video memory allows to benefit from " \
     "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
     "This option doesn't have any effect when using overlays." )
-#define TRIPLEBUF_TEXT N_("use triple buffering for overlays")
+#define TRIPLEBUF_TEXT N_("Use triple buffering for overlays")
 #define TRIPLEBUF_LONGTEXT N_( \
     "Try to use triple bufferring when using YUV overlays. That results in " \
     "much better video quality (no flickering)." )

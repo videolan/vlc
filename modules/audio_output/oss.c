@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.59 2003/05/09 22:03:06 sigmunau Exp $
+ * $Id: oss.c,v 1.60 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -98,7 +98,7 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define BUGGY_TEXT N_("try to work around buggy OSS drivers")
+#define BUGGY_TEXT N_("Try to work around buggy OSS drivers")
 #define BUGGY_LONGTEXT N_( \
     "Some buggy OSS drivers just don't like when their internal buffers " \
     "are completely filled (the sound gets heavily hashed). If you have one " \

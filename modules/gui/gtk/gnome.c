@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.15 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: gnome.c,v 1.16 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,13 +52,13 @@ static void Manage       ( intf_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define TOOLTIPS_TEXT N_("show tooltips")
+#define TOOLTIPS_TEXT N_("Show tooltips")
 #define TOOLTIPS_LONGTEXT N_("Show tooltips for configuration options.")
 
-#define TOOLBAR_TEXT N_("show text on toolbar buttons")
+#define TOOLBAR_TEXT N_("Show text on toolbar buttons")
 #define TOOLBAR_LONGTEXT N_("Show the text below icons on the toolbar.")
 
-#define PREFS_MAXH_TEXT N_("maximum height for the configuration windows")
+#define PREFS_MAXH_TEXT N_("Maximum height for the configuration windows")
 #define PREFS_MAXH_LONGTEXT N_( \
     "You can set the maximum height that the configuration windows in the " \
     "preferences menu will occupy.")

@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ftp.c,v 1.18 2003/05/08 19:51:38 fenrir Exp $
+ * $Id: ftp.c,v 1.19 2003/05/15 22:27:36 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -83,7 +83,7 @@ static int  ftp_StopStream ( input_thread_t *);
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for ftp streams. This " \
     "value should be set in miliseconds units." )

@@ -3,7 +3,7 @@
  *               -> gives the feeling of a real room with a simple headphone
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: headphone.c,v 1.4 2003/03/29 12:22:15 gbazin Exp $
+ * $Id: headphone.c,v 1.5 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
@@ -45,7 +45,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define HEADPHONE_DIM_TEXT N_("characteristic dimension")
+#define HEADPHONE_DIM_TEXT N_("Characteristic dimension")
 #define HEADPHONE_DIM_LONGTEXT N_( \
      "Headphone virtual spatialization effect parameter: "\
      "distance between front left speaker and listener in meters.")

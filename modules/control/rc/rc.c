@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.33 2003/05/13 12:09:29 gbazin Exp $
+ * $Id: rc.c,v 1.34 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -74,10 +74,10 @@ static int  AudioConfig  ( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define POS_TEXT N_("show stream position")
+#define POS_TEXT N_("Show stream position")
 #define POS_LONGTEXT N_("Show the current position in seconds within the stream from time to time.")
 
-#define TTY_TEXT N_("fake TTY")
+#define TTY_TEXT N_("Fake TTY")
 #define TTY_LONGTEXT N_("Force the rc plugin to use stdin as if it was a TTY.")
 
 vlc_module_begin();

@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.6 2003/03/30 18:14:39 gbazin Exp $
+ * $Id: xvideo.c,v 1.7 2003/05/15 22:27:38 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -46,7 +46,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "If you graphics card provides several adaptors, this option allows you " \
     "to choose which one will be used (you shouldn't have to change this).")
 
-#define ALT_FS_TEXT N_("alternate fullscreen method")
+#define ALT_FS_TEXT N_("Alternate fullscreen method")
 #define ALT_FS_LONGTEXT N_( \
     "There are two ways to make a fullscreen window, unfortunately each one " \
     "has its drawbacks.\n" \
@@ -65,7 +65,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "Force the XVideo renderer to use a specific chroma format instead of " \
     "trying to improve performances by using the most efficient one.")
 
-#define SHM_TEXT N_("use shared memory")
+#define SHM_TEXT N_("Use shared memory")
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
 

@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.21 2003/04/20 22:52:03 gbazin Exp $
+ * $Id: file.c,v 1.22 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -79,12 +79,12 @@ static void    Play        ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FORMAT_TEXT N_("output format")
-#define FORMAT_LONGTEXT N_("one of \"u8\", \"s8\", \"u16\", \"s16\", " \
+#define FORMAT_TEXT N_("Output format")
+#define FORMAT_LONGTEXT N_("One of \"u8\", \"s8\", \"u16\", \"s16\", " \
                         "\"u16_le\", \"s16_le\", \"u16_be\", " \
                         "\"s16_be\", \"fixed32\", \"float32\" or \"spdif\"")
-#define WAV_TEXT N_("add wave header")
-#define WAV_LONGTEXT N_("instead of writing a raw file, you can add a wav " \
+#define WAV_TEXT N_("Add wave header")
+#define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a wav " \
                         "header to the file")
 
 static char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le", "s16_le",
@@ -101,8 +101,8 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
                             VLC_FOURCC('f','l','3','2'),
                             VLC_FOURCC('s','p','i','f') };
 
-#define FILE_TEXT N_("output file")
-#define FILE_LONGTEXT N_("file to which the audio samples will be written to")
+#define FILE_TEXT N_("Output file")
+#define FILE_LONGTEXT N_("File to which the audio samples will be written to")
 
 vlc_module_begin();
     add_category_hint( N_("Audio"), NULL, VLC_FALSE );

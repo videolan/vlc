@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.34 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: familiar.c,v 1.35 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -59,8 +59,8 @@ gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define AUTOPLAYFILE_TEXT  N_("autoplay selected file")
-#define AUTOPLAYFILE_LONGTEXT N_("automatically play a file when selected in the "\
+#define AUTOPLAYFILE_TEXT  N_("Autoplay selected file")
+#define AUTOPLAYFILE_LONGTEXT N_("Automatically play a file when selected in the "\
         "file selection list")
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.18 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: win32.cpp,v 1.19 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -299,11 +299,11 @@ int Win32Manage( intf_thread_t *p_intf )
  * Module descriptor
  *****************************************************************************/
 
-#define MAX_LINES_TEXT N_( "maximum number of lines in the log window" )
+#define MAX_LINES_TEXT N_( "Maximum number of lines in the log window" )
 #define MAX_LINES_LONGTEXT N_( \
     "You can set the maximum number of lines that the log window will display."\
     " Enter -1 if you want to keep all messages." )
-#define SHOW_CAPTIONS_TEXT N_( "display text under images in the toolbar" )
+#define SHOW_CAPTIONS_TEXT N_( "Display text under images in the toolbar" )
 #define SHOW_CAPTIONS_LONGTEXT N_( \
     "Check this option if you want to display the caption of the buttons in " \
     "the toolbar. Beware, the display may be messed up" )

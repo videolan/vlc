@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.23 2003/05/06 21:01:58 gbazin Exp $
+ * $Id: ts.c,v 1.24 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -94,13 +94,13 @@ static void TS_DVBPSI_HandlePMT ( input_thread_t *, dvbpsi_pmt_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define VLS_BACKWARDS_COMPAT_TEXT N_("compatibility with pre-0.4 VLS")
+#define VLS_BACKWARDS_COMPAT_TEXT N_("Compatibility with pre-0.4 VLS")
 #define VLS_BACKWARDS_COMPAT_LONGTEXT N_( \
     "The protocol for transmitting A/52 audio streams changed between VLC " \
     "0.3.x and 0.4. By default VLC assumes you have the latest VLS. In case " \
     "you're using an old version, select this option.")
 
-#define BUGGY_PSI_TEXT N_("buggy PSI")
+#define BUGGY_PSI_TEXT N_("Buggy PSI")
 #define BUGGY_PSI_LONGTEXT N_( \
     "If you have a stream whose PSI packets do not feature incremented " \
     "continuity counters, select this option.")

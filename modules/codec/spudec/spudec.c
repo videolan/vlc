@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.17 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: spudec.c,v 1.18 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,7 @@ static vout_thread_t *FindVout( spudec_thread_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-#define FONT_TEXT N_("font used by the text subtitler")
+#define FONT_TEXT N_("Font used by the text subtitler")
 #define FONT_LONGTEXT N_(\
     "When the subtitles are coded in text form then, you can choose " \
     "which font will be used to display them.")

@@ -2,7 +2,7 @@
  * macosx.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.9 2003/05/09 01:19:43 hartman Exp $
+ * $Id: macosx.m,v 1.10 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -44,14 +44,14 @@ void E_(CloseVideo)   ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define VDEV_TEXT N_("video device")
+#define VDEV_TEXT N_("Video device")
 
-#define OPAQUENESS_TEXT N_("opaqueness")
+#define OPAQUENESS_TEXT N_("Opaqueness")
 #define OPAQUENESS_LONGTEXT N_( \
     "Set the transparency of the video output. 1 is non-transparent (default) " \
     "0 is fully transparent.")
     
-#define FLOAT_TEXT N_("float on top")
+#define FLOAT_TEXT N_("Float on top")
 #define FLOAT_LONGTEXT N_( \
     "Let the video window float on top of other windows.")
 

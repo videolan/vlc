@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.5 2003/05/05 16:09:37 gbazin Exp $
+ * $Id: xmga.c,v 1.6 2003/05/15 22:27:38 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -84,7 +84,7 @@ static void ToggleCursor   ( vout_thread_t * );
  * Module descriptor
  *****************************************************************************/
 
-#define ALT_FS_TEXT N_("alternate fullscreen method")
+#define ALT_FS_TEXT N_("Alternate fullscreen method")
 #define ALT_FS_LONGTEXT N_( \
     "There are two ways to make a fullscreen window, unfortunately each one " \
     "has its drawbacks.\n" \

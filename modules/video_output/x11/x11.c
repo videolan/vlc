@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.6 2003/03/30 18:14:39 gbazin Exp $
+ * $Id: x11.c,v 1.7 2003/05/15 22:27:38 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -40,7 +40,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ALT_FS_TEXT N_("alternate fullscreen method")
+#define ALT_FS_TEXT N_("Alternate fullscreen method")
 #define ALT_FS_LONGTEXT N_( \
     "There are two ways to make a fullscreen window, unfortunately each one " \
     "has its drawbacks.\n" \
@@ -54,7 +54,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "Specify the X11 hardware display you want to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 
-#define SHM_TEXT N_("use shared memory")
+#define SHM_TEXT N_("Use shared memory")
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
 

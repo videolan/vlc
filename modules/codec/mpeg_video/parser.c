@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.12 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: parser.c,v 1.13 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -62,18 +62,18 @@ static void     BitstreamCallback ( bit_stream_t *, vlc_bool_t );
     "decoder. The default behavior is to automatically select the best " \
     "module available.")
 
-#define VDEC_MOTION_TEXT N_("motion compensation module")
+#define VDEC_MOTION_TEXT N_("Motion compensation module")
 #define VDEC_MOTION_LONGTEXT N_( \
     "This option allows you to select the motion compensation module used by "\
     "this video decoder. The default behavior is to automatically select the "\
     "best module available.")
 
-#define VDEC_SMP_TEXT N_("use additional processors")
+#define VDEC_SMP_TEXT N_("Use additional processors")
 #define VDEC_SMP_LONGTEXT N_( \
     "This video decoder can benefit from a multiprocessor computer. If you " \
     "have one, you can specify the number of processors here.")
 
-#define VPAR_SYNCHRO_TEXT N_("force synchro algorithm {I|I+|IP|IP+|IPB}")
+#define VPAR_SYNCHRO_TEXT N_("Force synchro algorithm {I|I+|IP|IP+|IPB}")
 #define VPAR_SYNCHRO_LONGTEXT N_( \
     "This allows you to force the synchro algorithm, by directly selecting " \
     "the types of picture you want to decode. Please bear in mind that if " \

@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: clone.c,v 1.9 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: clone.c,v 1.10 2003/05/15 22:27:37 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,11 +52,11 @@ static int  SendEvents( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define COUNT_TEXT N_("number of clones")
+#define COUNT_TEXT N_("Number of clones")
 #define COUNT_LONGTEXT N_("Select the number of video windows in which to "\
     "clone the video")
 
-#define VOUTLIST_TEXT N_("list of vout modules")
+#define VOUTLIST_TEXT N_("List of vout modules")
 #define VOUTLIST_LONGTEXT N_("Select the specific vout modules that you want to activate")
 
 vlc_module_begin();
