@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.43 2003/08/02 19:30:35 bigben Exp $
+ * $Id: http.c,v 1.44 2003/09/10 13:39:29 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -214,6 +214,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 
         psz_parser += strlen("HTTP/1.x");
         i_size -= strlen("HTTP/1.x");
+        
     }
     else if( ( (size_t)i_size >= strlen("ICY") &&
              !strncmp( psz_parser, "ICY", strlen("ICY") ) ) )
@@ -233,7 +234,18 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         msg_Err( p_input, "invalid HTTP reply '%s'", psz_parser );
         return VLC_EGENERIC;
     }
-
+    
+    /* Check for buggy Icecast servers */
+    if( strstr( psz_parser , "x-audiocast") )
+    {
+        i_protocol = ICY_PROTOCOL;
+        if( !p_input->psz_demux || !*p_input->psz_demux  )
+        {
+            msg_Info( p_input, "ICY server found, mp3 demuxer selected" );
+            p_input->psz_demux = "mp3";    // FIXME strdup ?
+        }
+    }
+    
     /* Check the HTTP return code */
     i_code = atoi( (char*)psz_parser );
     msg_Dbg( p_input, "%s server replied: %i",
@@ -719,7 +731,8 @@ static int Open( vlc_object_t *p_this )
         p_access_data->socket_desc.i_ttl           = 0;
 
         snprintf( p_access_data->psz_buffer, MAX_QUERY_SIZE,
-                  "GET http://%s:%d/%s HTTP/1.0\r\n",
+                  "GET http://%s:%d/%s HTTP/1.0\r\n"  \
+                  "Icy-Metadata:0\r\n",
                   psz_server_addr, i_server_port, psz_path );
     }
     else
@@ -731,7 +744,8 @@ static int Open( vlc_object_t *p_this )
         p_access_data->socket_desc.i_ttl           = 0;
 
         snprintf( p_access_data->psz_buffer, MAX_QUERY_SIZE,
-                  "GET /%s HTTP/1.1\r\nHost: %s\r\n",
+                  "GET /%s HTTP/1.1\r\nHost: %s\r\n" \
+                  "Icy-Metadata:0\r\n",
                   psz_path, psz_server_addr );
     }
     p_access_data->psz_buffer[MAX_QUERY_SIZE - 1] = '\0';
