@@ -307,6 +307,28 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height )
     /// List
     list<List> m_listList;
 
+    /// Type definition
+    struct Video
+    {
+        Video( const string & id, int xPos, int yPos, int width, int height, const string & leftTop, const string & rightBottom, bool visible, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_width( width ), m_height( height ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+
+        const string m_id;
+        int m_xPos;
+        int m_yPos;
+        int m_width;
+        int m_height;
+        const string m_leftTop;
+        const string m_rightBottom;
+        bool m_visible;
+        const string m_help;
+        int m_layer;
+        const string m_windowId;
+        const string m_layoutId;
+    };
+    /// List
+    list<Video> m_listVideo;
+
 
 };
 

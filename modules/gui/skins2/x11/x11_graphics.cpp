@@ -2,7 +2,7 @@
  * x11_graphics.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.2 2004/01/25 18:41:08 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -53,7 +53,6 @@ X11Graphics::X11Graphics( intf_thread_t *pIntf, X11Display &rDisplay,
     XGCValues xgcvalues;
     xgcvalues.graphics_exposures = False;
     m_gc = XCreateGC( XDISPLAY, m_pixmap, GCGraphicsExposures, &xgcvalues );
-
 }
 
 

@@ -2,7 +2,7 @@
  * x11_display.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_display.hpp,v 1.2 2004/01/25 18:41:08 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -67,6 +67,9 @@ class X11Display: public SkinObject
 
         /// Get the pixel value corresponding to the given colors
         unsigned long getPixelValue( uint8_t r, uint8_t g, uint8_t b ) const;
+
+        //XXX
+        Window m_voutWindow;
 
     private:
         /// Display parameters

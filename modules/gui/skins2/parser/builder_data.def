@@ -11,3 +11,4 @@ Text id:string xPos:int yPos:int fontId:string text:string width:int color:uint3
 RadialSlider id:string visible:string xPos:int yPos:int leftTop:string rightBottom:string sequence:string nbImages:int minAngle:float maxAngle:float value:string tooltip:string help:string layer:int windowId:string layoutId:string
 Slider id:string visible:string xPos:int yPos:int leftTop:string rightBottom:string upId:string downId:string overId:string points:string thickness:int value:string tooltip:string help:string layer:int windowId:string layoutId:string
 List id:string xPos:int yPos:int width:int height:int leftTop:string rightBottom:string fontId:string var:string fgColor:uint32_t playColor:uint32_t bgColor1:uint32_t bgColor2:uint32_t selColor:uint32_t help:string layer:int windowId:string layoutId:string
+Video id:string xPos:int yPos:int width:int height:int leftTop:string rightBottom:string visible:bool help:string layer:int windowId:string layoutId:string

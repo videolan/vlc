@@ -192,6 +192,18 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
                   attr["author"] );
     }
 
+    else if( rName == "Video" )
+    {
+        const BuilderData::Video videoData( uniqueId( attr["id"] ),
+                atoi( attr["x"] ) + m_xOffset, atoi( attr["y"] ) + m_yOffset,
+                atoi( attr["width"] ), atoi( attr["height" ]),
+                attr["lefttop"], attr["rightbottom"],
+                ConvertBoolean( attr["visible"] ), attr["help"], m_curLayer,
+                m_curWindowId, m_curLayoutId );
+        m_curLayer++;
+        m_data.m_listVideo.push_back( videoData );
+    }
+
     else if( rName == "Window" )
     {
         m_curWindowId = uniqueId( attr["id"] );

@@ -58,7 +58,8 @@ class Win32Factory: public OSFactory
 
         /// Instantiate an OSWindow object
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,
-                                          bool dragDrop, bool playOnDrop );
+                                          bool dragDrop, bool playOnDrop,
+                                          OSWindow *pParent );
 
         /// Instantiate an object OSTooltip.
         virtual OSTooltip *createOSTooltip();

@@ -61,6 +61,8 @@
   <Bitmap id="stop_disabled" file="stop_disabled.png" alphacolor="#FF0000"/>
   <Bitmap id="stop_onclick" file="stop_onclick.png" alphacolor="#FF0000"/>
   <Bitmap id="volume_radial" file="volume.png" alphacolor="#FF0000"/>
+  <Bitmap id="vout" file="vout.png" alphacolor="#FF0000"/>
+
   <Font id="default_font" font="FreeSansBold.ttf" size="15"/> 
   <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/> 
 
@@ -116,5 +118,15 @@
     </Group>
    </Layout>
   </Window>
+
+  <Window x="10" y="10" dragdrop="false">
+    <Layout width="410" height="250">
+      <Group x="0" y="0">
+        <Image x="0" y="0" image="vout" action="move"/>
+        <Video x="15" y="13" width="350" height="220"/>
+      </Group>
+   </Layout>
+  </Window>
+
 </Theme>
 

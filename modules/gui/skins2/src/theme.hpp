@@ -2,7 +2,7 @@
  * theme.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.hpp,v 1.3 2004/02/01 16:15:40 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,7 +27,7 @@
 
 #include "../src/generic_bitmap.hpp"
 #include "../src/generic_font.hpp"
-#include "../src/generic_window.hpp"
+#include "../src/vout_window.hpp"
 #include "../src/generic_layout.hpp"
 #include "../src/window_manager.hpp"
 #include "../commands/cmd_generic.hpp"
@@ -77,6 +77,8 @@ class Theme: public SkinObject
         list<BezierPtr> m_curves;
         /// Store the variables
         list<VariablePtr> m_vars;
+        /// Store the vout windows
+        list<VoutWindowPtr> m_vouts;
 
     private:
         WindowManager m_windowManager;

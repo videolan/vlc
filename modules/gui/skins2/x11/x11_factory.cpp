@@ -2,7 +2,7 @@
  * x11_factory.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_factory.cpp,v 1.2 2004/01/25 13:59:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -98,10 +98,10 @@ OSTimer *X11Factory::createOSTimer( const Callback &rCallback )
 
 
 OSWindow *X11Factory::createOSWindow( GenericWindow &rWindow, bool dragDrop,
-                                      bool playOnDrop )
+                                      bool playOnDrop, OSWindow *pParent )
 {
     return new X11Window( getIntf(), rWindow, *m_pDisplay, dragDrop,
-                          playOnDrop );
+                          playOnDrop, (X11Window*)pParent );
 }
 
 

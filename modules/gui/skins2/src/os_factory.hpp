@@ -76,7 +76,8 @@ class OSFactory: public SkinObject
 
         /// Instantiate an object OSWindow.
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,
-                                          bool dragDrop, bool playOnDrop ) = 0;
+                                          bool dragDrop, bool playOnDrop,
+                                          OSWindow *pParent ) = 0;
 
         /// Instantiate an object OSTooltip.
         virtual OSTooltip *createOSTooltip() = 0;

@@ -38,7 +38,8 @@ class X11Window: public OSWindow
 {
     public:
         X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
-                   X11Display &rDisplay, bool dragDrop, bool playOnDrop );
+                   X11Display &rDisplay, bool dragDrop, bool playOnDrop,
+                   X11Window *pParentWindow );
 
         virtual ~X11Window();
 

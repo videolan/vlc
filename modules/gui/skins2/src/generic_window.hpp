@@ -52,7 +52,8 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
     public:
         GenericWindow( intf_thread_t *pIntf, int xPos, int yPos,
                        WindowManager &rWindowManager,
-                       bool dragDrop, bool playOnDrop );
+                       bool dragDrop, bool playOnDrop,
+                       GenericWindow *pParent = NULL );
         virtual ~GenericWindow();
 
         /// Methods to process OS events.
@@ -126,6 +127,8 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         WindowManager &m_rWindowManager;
         /// Window position and size
         int m_left, m_top, m_width, m_height;
+        /// Flag set if the window has a parent
+        bool m_isChild;
         /// OS specific implementation
         OSWindow *m_pOsWindow;
         /// Current active layout of the window

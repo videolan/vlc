@@ -30,6 +30,7 @@
 #include "../src/os_factory.hpp"
 #include "../src/generic_bitmap.hpp"
 #include "../src/generic_window.hpp"
+#include "../src/vout_window.hpp"
 #include "../src/anchor.hpp"
 #include "../src/ft2_font.hpp"
 #include "../src/theme.hpp"
@@ -91,6 +92,7 @@ Theme *Builder::build()
     ADD_OBJECTS( RadialSlider );
     ADD_OBJECTS( Slider );
     ADD_OBJECTS( List );
+    ADD_OBJECTS( Video );
 
     return m_pTheme;
 }
@@ -555,6 +557,22 @@ void Builder::addList( const BuilderData::List &rData )
     pLayout->addControl( pList, pos, rData.m_layer );
 
     m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pList );
+}
+
+
+void Builder::addVideo( const BuilderData::Video &rData )
+{
+    GenericWindow *pWindow = m_pTheme->m_windows[rData.m_windowId].get();
+    if( pWindow == NULL )
+    {
+        msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
+        return;
+    }
+
+    VoutWindow *pVout = new VoutWindow( getIntf(), rData.m_xPos,
+            rData.m_yPos, m_pTheme->getWindowManager(), false, false,
+            *pWindow );
+    m_pTheme->m_vouts.push_back( VoutWindowPtr( pVout ) );
 }
 
 

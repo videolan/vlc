@@ -15,7 +15,7 @@ hppfile.write(
  * builder_data.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gen_builder.py,v 1.2 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>

@@ -2,7 +2,7 @@
  * theme.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.4 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -30,6 +30,7 @@ Theme::~Theme()
     saveConfig();
 
     // Be sure things are destroyed in the right order (XXX check)
+    m_vouts.clear();
     m_layouts.clear();
     m_controls.clear();
     m_windows.clear();

@@ -49,21 +49,35 @@
 
 GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
                               WindowManager &rWindowManager,
-                              bool dragDrop, bool playOnDrop ):
+                              bool dragDrop, bool playOnDrop,
+                              GenericWindow *pParent ):
     SkinObject( pIntf ), m_rWindowManager( rWindowManager ),
     m_left( left ), m_top( top ), m_width( 0 ), m_height( 0 ),
-    m_pActiveLayout( NULL ), m_pLastHitControl( NULL ),
+    m_isChild( true ), m_pActiveLayout( NULL ), m_pLastHitControl( NULL ),
     m_pCapturingControl( NULL ), m_pFocusControl( NULL ), m_varVisible( pIntf ),
     m_currModifier( 0 )
 {
-    // Register as a moving window
-    m_rWindowManager.registerWindow( *this );
-
-    // Get the OSFactory
+   // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
 
+    // Get the parent OSWindow, if any
+    OSWindow *pOSParent = NULL;
+    if( pParent )
+    {
+        pOSParent = pParent->m_pOsWindow;
+    }
+
     // Create an OSWindow to handle OS specific processing
-    m_pOsWindow = pOsFactory->createOSWindow( *this, dragDrop, playOnDrop );
+    m_pOsWindow = pOsFactory->createOSWindow( *this, dragDrop, playOnDrop,
+                                              pOSParent );
+
+    // Child windows don't need that
+    if( !pParent )
+    {
+        m_isChild = false;
+        // Register as a moving window
+        m_rWindowManager.registerWindow( *this );
+    }
 
     // Observe the visibility variable
     m_varVisible.addObserver( this );
@@ -72,9 +86,12 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
 
 GenericWindow::~GenericWindow()
 {
+    if( !m_isChild )
+    {
+        // Unregister from the window manager
+        m_rWindowManager.unregisterWindow( *this );
+    }
     m_varVisible.delObserver( this );
-    // Unregister from the window manager
-    m_rWindowManager.unregisterWindow( *this );
 
     if( m_pOsWindow )
     {

@@ -35,14 +35,23 @@
 
 
 X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
-                      X11Display &rDisplay, bool dragDrop, bool playOnDrop ):
+                      X11Display &rDisplay, bool dragDrop, bool playOnDrop,
+                      X11Window *pParentWindow ):
     OSWindow( pIntf ), m_rDisplay( rDisplay ), m_dragDrop( dragDrop )
 {
-    Window root = DefaultRootWindow( XDISPLAY );
+    Window parent;
+    if (pParentWindow)
+    {
+        parent = pParentWindow->m_wnd;
+    }
+    else
+    {
+        parent = DefaultRootWindow( XDISPLAY );
+    }
     XSetWindowAttributes attr;
 
     // Create the window
-    m_wnd = XCreateWindow( XDISPLAY, root, 0, 0, 1, 1, 0, 0,
+    m_wnd = XCreateWindow( XDISPLAY, parent, 0, 0, 1, 1, 0, 0,
                            InputOutput, CopyFromParent, 0, &attr );
 
     // Set the colormap for 8bpp mode
@@ -52,9 +61,9 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     }
 
     // Select events received by the window
-    XSelectInput( XDISPLAY, m_wnd, ExposureMask|KeyPressMask|PointerMotionMask|
-                  ButtonPressMask|ButtonReleaseMask|LeaveWindowMask|
-                  FocusChangeMask );
+    XSelectInput( XDISPLAY, m_wnd, ExposureMask|KeyPressMask|
+                  PointerMotionMask|ButtonPressMask|ButtonReleaseMask|
+                  LeaveWindowMask|FocusChangeMask );
 
     // Store a pointer on the generic window in a map
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );
@@ -94,6 +103,14 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
     // Change the window title XXX
     XStoreName( XDISPLAY, m_wnd, "VLC" );
+
+    // XXX Kludge to tell VLC that this window is the vout
+    if (pParentWindow)
+    {
+        vlc_value_t value;
+        value.i_int = (int) (ptrdiff_t) (void *) m_wnd;
+        var_Set( getIntf()->p_vlc, "drawable", value );
+    }
 }
 
 

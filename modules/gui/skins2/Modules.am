@@ -114,6 +114,8 @@ SOURCES_skins2 = \
 	src/var_manager.hpp \
 	src/vlcproc.cpp \
 	src/vlcproc.hpp \
+	src/vout_window.cpp \
+	src/vout_window.hpp \
 	src/window_manager.cpp \
 	src/window_manager.hpp \
 	\

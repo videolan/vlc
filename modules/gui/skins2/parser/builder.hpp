@@ -2,7 +2,7 @@
  * builder.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.hpp,v 1.4 2004/03/01 18:33:31 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -76,6 +76,7 @@ class Builder: public SkinObject
         void addRadialSlider( const BuilderData::RadialSlider &rData );
         void addSlider( const BuilderData::Slider &rData );
         void addList( const BuilderData::List &rData );
+        void addVideo( const BuilderData::Video &rData );
 
        /// Compute the position of a control
         const Position makePosition( const string &rLeftTop,

@@ -2,7 +2,7 @@
  * x11_display.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_display.cpp,v 1.4 2004/01/25 18:46:37 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -36,6 +36,7 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 {
     // Open a connection to the X Server
     m_pDisplay = XOpenDisplay( NULL );
+
     if( m_pDisplay == NULL )
     {
         MSG_ERR( "Cannot open display" );
