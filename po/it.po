@@ -4629,7 +4629,7 @@ msgstr "| f  . . . . . . . . . . . . . . schermo intero\n"
 
 #: modules/control/rc.c:471
 msgid "| info . . .  information about the current stream\n"
-msgstr "| info . . .  informazioni sull'elemento corrente"
+msgstr "| info . . .  informazioni sull'elemento corrente\n"
 
 #: modules/control/rc.c:473
 msgid "| volume [X] . . . . . . . .  set/get audio volume\n"
@@ -4645,11 +4645,11 @@ msgstr "| voldown [X]  . . . . .  diminuisce volume di X passi\n"
 
 #: modules/control/rc.c:476
 msgid "| adev [X] . . . . . . . . .  set/get audio device\n"
-msgstr "| adev [X] . . . . . . . . .  sceglie/mostra periferica audio"
+msgstr "| adev [X] . . . . . . . . .  sceglie/mostra periferica audio\n"
 
 #: modules/control/rc.c:477
 msgid "| achan [X]. . . . . . . .  set/get audio channels\n"
-msgstr "| achan [X] . . . . . . . . .  sceglie/mostra canali audio"
+msgstr "| achan [X] . . . . . . . . .  sceglie/mostra canali audio\n"
 
 #: modules/control/rc.c:479
 msgid "| help . . . . . . . . . . . . . this help message\n"
