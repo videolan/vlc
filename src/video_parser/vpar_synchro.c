@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.81 2001/02/11 01:15:12 sam Exp $
+ * $Id: vpar_synchro.c,v 1.82 2001/02/12 10:46:26 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -380,20 +380,27 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
 
     vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
 
-    if (!i_garbage)
+    if( !i_garbage )
     {
         tau = mdate() - p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_start];
         i_coding_type = p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_start];
 
-        /* Mean with average tau, to ensure stability. */
-        p_vpar->synchro.p_tau[i_coding_type] =
-            (p_vpar->synchro.pi_meaningful[i_coding_type]
-             * p_vpar->synchro.p_tau[i_coding_type] + tau)
-            / (p_vpar->synchro.pi_meaningful[i_coding_type] + 1);
-        if( p_vpar->synchro.pi_meaningful[i_coding_type] < MAX_PIC_AVERAGE )
+        /* If duration too high, something happened (pause ?), so don't
+         * take it into account. */
+        if( tau < 3 * p_vpar->synchro.p_tau[i_coding_type]
+             || !p_vpar->synchro.pi_meaningful[i_coding_type] )
         {
-            p_vpar->synchro.pi_meaningful[i_coding_type]++;
+            /* Mean with average tau, to ensure stability. */
+            p_vpar->synchro.p_tau[i_coding_type] =
+                (p_vpar->synchro.pi_meaningful[i_coding_type]
+                 * p_vpar->synchro.p_tau[i_coding_type] + tau)
+                / (p_vpar->synchro.pi_meaningful[i_coding_type] + 1);
+            if( p_vpar->synchro.pi_meaningful[i_coding_type] < MAX_PIC_AVERAGE )
+            {
+                p_vpar->synchro.pi_meaningful[i_coding_type]++;
+            }
         }
+
 #ifdef DEBUG_VPAR
         intf_DbgMsg("vpar synchro debug: finished decoding %s (%lld)",
                     i_coding_type == B_CODING_TYPE ? "B" :
