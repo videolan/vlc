@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.25 2003/11/21 13:20:41 zorglub Exp $
+ * $Id: playlist.cpp,v 1.26 2003/11/21 18:55:40 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -222,9 +222,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Create the Random checkbox */
     wxCheckBox *random_checkbox =
         new wxCheckBox( playlist_panel, Random_Event, wxU(_("Random")) );
-    var_Get( p_intf, "random", &val);
+    var_Get( p_intf, "random", &val );
     vlc_bool_t b_random = val.b_bool;
-    random_checkbox->SetValue( b_random == VLC_FALSE ? 0 : 1);
+    random_checkbox->SetValue( b_random == VLC_FALSE ? 0 : 1 );
 
     /* Create the Loop Checkbox */
     wxCheckBox *loop_checkbox =
@@ -243,7 +243,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Create the Search Textbox */
     search_text =
         new wxTextCtrl( playlist_panel, SearchText_Event, wxT(""),
-                        wxDefaultPosition, wxSize( 140, -1),
+                        wxDefaultPosition, wxSize(140, -1),
                         wxTE_PROCESS_ENTER);
 
     /* Create the search button */
@@ -292,11 +292,11 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     wxBoxSizer *checkbox_sizer = new wxBoxSizer( wxHORIZONTAL );
     checkbox_sizer->Add( random_checkbox, 0,
-                       wxEXPAND|wxALIGN_RIGHT, 5);
+                         wxEXPAND | wxALIGN_RIGHT | wxALL, 5);
     checkbox_sizer->Add( loop_checkbox, 0,
-                       wxEXPAND|wxALIGN_RIGHT, 5);
+                         wxEXPAND | wxALIGN_RIGHT | wxALL, 5);
     checkbox_sizer->Add( repeat_checkbox, 0,
-                       wxEXPAND|wxALIGN_RIGHT, 5);
+                         wxEXPAND | wxALIGN_RIGHT | wxALL, 5);
     checkbox_sizer->Layout();
 
     wxBoxSizer *search_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -306,8 +306,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* The top and bottom sizers */
     wxBoxSizer *top_sizer = new wxBoxSizer( wxHORIZONTAL );
-    top_sizer->Add( checkbox_sizer, 0, wxLEFT|wxRIGHT|wxALIGN_LEFT, 4 );
-    top_sizer->Add( search_sizer, 0, wxLEFT|wxRIGHT|wxALIGN_RIGHT, 4 );
+    top_sizer->Add( checkbox_sizer, 1, wxLEFT|wxRIGHT|wxALIGN_LEFT, 4 );
+    top_sizer->Add( search_sizer, 1, wxLEFT|wxRIGHT|wxALIGN_RIGHT, 4 );
     top_sizer->Layout();
 
     wxBoxSizer *bottom_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -330,7 +330,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
 #if !defined(__WXX11__)
     /* Associate drop targets with the playlist */
-    SetDropTarget( new DragAndDrop( p_intf ) );
+    SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
 #endif
 
     playlist_t *p_playlist =

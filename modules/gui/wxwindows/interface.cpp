@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.70 2003/10/29 18:54:45 gbazin Exp $
+ * $Id: interface.cpp,v 1.71 2003/11/21 18:55:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1303,9 +1303,10 @@ void Interface::TogglePlayButton( int i_playing_status )
 /*****************************************************************************
  * Definition of DragAndDrop class.
  *****************************************************************************/
-DragAndDrop::DragAndDrop( intf_thread_t *_p_intf )
+DragAndDrop::DragAndDrop( intf_thread_t *_p_intf, vlc_bool_t _b_enqueue )
 {
     p_intf = _p_intf;
+    b_enqueue = _b_enqueue;
 }
 
 bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
@@ -1323,7 +1324,8 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
     for( size_t i = 0; i < filenames.GetCount(); i++ )
         playlist_Add( p_playlist, (const char *)filenames[i].mb_str(), 0, 0,
-                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+                      PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
+                      PLAYLIST_END );
 
     vlc_object_release( p_playlist );
 

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.71 2003/11/21 13:20:41 zorglub Exp $
+ * $Id: wxwindows.h,v 1.72 2003/11/21 18:55:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -880,13 +880,14 @@ private:
 class DragAndDrop: public wxFileDropTarget
 {
 public:
-    DragAndDrop( intf_thread_t *_p_intf );
+    DragAndDrop( intf_thread_t *_p_intf, vlc_bool_t b_enqueue = VLC_FALSE );
 
     virtual bool OnDropFiles( wxCoord x, wxCoord y,
                               const wxArrayString& filenames );
 
 private:
     intf_thread_t *p_intf;
+    vlc_bool_t b_enqueue;
 };
 #endif
 
