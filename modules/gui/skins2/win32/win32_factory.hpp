@@ -53,6 +53,9 @@ class Win32Factory: public OSFactory
         /// Destroy the instance of OSLoop.
         virtual void destroyOSLoop();
 
+        ///
+        virtual void minimize();
+
         /// Instantiate an OSTimer with the given callback
         virtual OSTimer *createOSTimer( const Callback &rCallback );
 

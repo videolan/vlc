@@ -29,6 +29,7 @@
 #include "../commands/cmd_dummy.hpp"
 #include "../commands/cmd_layout.hpp"
 #include "../commands/cmd_quit.hpp"
+#include "../commands/cmd_minimize.hpp"
 #include "../commands/cmd_input.hpp"
 #include "../commands/cmd_fullscreen.hpp"
 #include "../commands/cmd_show_window.hpp"
@@ -75,6 +76,7 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "vlc.faster()", CmdFaster )
     REGISTER_CMD( "vlc.slower()", CmdSlower )
     REGISTER_CMD( "vlc.mute()", CmdMute )
+    REGISTER_CMD( "vlc.minimize()", CmdMinimize )
     REGISTER_CMD( "vlc.quit()", CmdQuit )
 
     // Register the constant bool variables in the var manager

@@ -62,6 +62,9 @@ class X11Factory: public OSFactory
         /// Instantiate an OSTimer with the given callback
         virtual OSTimer *createOSTimer( const Callback &rCallback );
 
+        ///
+        virtual void minimize();
+
         /// Instantiate an OSWindow object
         virtual OSWindow *createOSWindow( GenericWindow &rWindow,
                                           bool dragDrop, bool playOnDrop,

@@ -72,6 +72,9 @@ class OSFactory: public SkinObject
         /// Destroy the instance of OSLoop.
         virtual void destroyOSLoop() = 0;
 
+        ///
+        virtual void minimize() = 0;
+
         /// Instantiate an OSTimer with the given callback
         virtual OSTimer *createOSTimer( const Callback &rCallback ) = 0;
 

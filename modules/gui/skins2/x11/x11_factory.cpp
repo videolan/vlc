@@ -96,6 +96,11 @@ void X11Factory::destroyOSLoop()
     X11Loop::destroy( getIntf() );
 }
 
+void X11Factory::minimize()
+{
+    XIconifyWindow( m_pDisplay->getDisplay(), m_pDisplay->getMainWindow(),
+                    DefaultScreen( m_pDisplay->getDisplay() ) );
+}
 
 OSTimer *X11Factory::createOSTimer( const Callback &rCallback )
 {

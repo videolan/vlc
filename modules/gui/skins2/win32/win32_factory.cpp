@@ -223,6 +223,9 @@ void Win32Factory::destroyOSLoop()
     Win32Loop::destroy( getIntf() );
 }
 
+void Win32Factory::minimize()
+{
+}
 
 OSTimer *Win32Factory::createOSTimer( const Callback &rCallback )
 {
