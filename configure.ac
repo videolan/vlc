@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.49 2003/07/31 15:31:58 jpsaman Exp $
+dnl $Id: configure.ac,v 1.50 2003/08/01 00:26:22 fenrir Exp $
 
 AC_INIT(vlc,0.6.1)
 
@@ -3305,13 +3305,11 @@ AC_OUTPUT([
   modules/control/lirc/Makefile
   modules/control/rc/Makefile
   modules/demux/Makefile
-  modules/demux/aac/Makefile
   modules/demux/asf/Makefile
   modules/demux/avi/Makefile
   modules/demux/mp4/Makefile
   modules/demux/mpeg/Makefile
   modules/demux/util/Makefile
-  modules/demux/wav/Makefile
   modules/encoder/Makefile
   modules/encoder/ffmpeg/Makefile
   modules/gui/Makefile
