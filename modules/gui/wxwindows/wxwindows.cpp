@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.7 2002/12/08 19:56:04 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.8 2002/12/13 01:50:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -118,7 +118,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->b_slider_free = 1;
     p_intf->p_sys->i_slider_pos = p_intf->p_sys->i_slider_oldpos = 0;
 
-    p_intf->p_sys->i_part = -1;
+    p_intf->p_sys->i_part = 0;
 
     return VLC_SUCCESS;
 }

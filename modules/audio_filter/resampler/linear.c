@@ -2,7 +2,7 @@
  * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.6 2002/11/20 16:43:32 sam Exp $
+ * $Id: linear.c,v 1.7 2002/12/13 01:50:31 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -47,7 +47,7 @@ struct aout_filter_sys_t
 {
     int32_t *p_prev_sample;       /* this filter introduces a 1 sample delay */
 
-    int     i_remainder;                     /* remainder of previous sample */
+    unsigned int i_remainder;                /* remainder of previous sample */
 
     audio_date_t end_date;
 };

@@ -2,7 +2,8 @@ SOURCES_wxwindows = \
 	modules/gui/wxwindows/wxwindows.cpp \
 	modules/gui/wxwindows/wxwindows.h \
 	modules/gui/wxwindows/interface.cpp \
-    modules/gui/wxwindows/playlist.cpp \
+	modules/gui/wxwindows/playlist.cpp \
+	modules/gui/wxwindows/popup.cpp \
 	modules/gui/wxwindows/timer.cpp \
 	$(NULL)
 

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.4 2002/12/08 19:56:04 gbazin Exp $
+ * $Id: wxwindows.h,v 1.5 2002/12/13 01:50:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -71,7 +71,7 @@ struct intf_sys_t
     int                 i_playing;                 /* playlist selected item */
 
     /* The window labels for DVD mode */
-    int                 i_part;                           /* current chapter */
+    unsigned int        i_part;                           /* current chapter */
 };
 
 /*****************************************************************************
@@ -180,3 +180,24 @@ private:
     intf_thread_t *p_intf;
 };
 #endif
+
+/* Popup contextual menu */
+class PopupMenu: public wxMenu
+{
+public:
+    /* Constructor */
+    PopupMenu( intf_thread_t *p_intf, Interface *p_main_interface );
+    virtual ~PopupMenu();
+
+private:
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnClose( wxCommandEvent& event );
+    void OnEntrySelected( wxCommandEvent& event );
+
+    wxMenu *PopupMenu::CreateDummyMenu();
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
+};
