@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.12 2002/05/07 20:17:07 massiot Exp $
+ * $Id: intf_vlc_wrapper.c,v 1.13 2002/05/09 16:15:15 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -492,23 +492,28 @@ static Intf_VLCWrapper *o_intf = nil;
 
 - (void)setupMenus
 {
-#if 0
-    NSMenu * o_main_menu = [NSApp mainMenu];
-    NSMenuItem * o_program_item = [o_main_menu itemWithTitle:@"Program"];
+#if 0 
+    NSMenu *o_main_menu;
+    NSMenuItem *o_controls_item;
+    NSMenuItem *o_program_item;
+
+    o_main_menu  = [NSApp mainMenu];
+    o_controls_item  = [o_main_menu itemWithTitle: @"Controls"];
+    o_program_item = [[o_controls_item submenu] itemWithTitle: @"Program"]; 
 
     if( p_input_bank->pp_input[0] == NULL )
     {
         NSMenu * o_program = [o_program_item submenu];
 //        [o_program_item setEnabled:0];
 //        [o_program removeItemAtIndex:0];
-[o_program addItemWithTitle:@"Toto" action:nil keyEquivalent:@""]
+        [o_program addItemWithTitle: @"Toto" action: nil keyEquivalent: @""];
     }
     else
     {
         NSMenu * o_program = [o_program_item submenu];
 //        [o_program_item setEnabled:1];
 //        [o_program removeItemAtIndex:0];
-[o_program addItemWithTitle:@"Toto" action:nil keyEquivalent:@""]
+        [o_program addItemWithTitle: @"Toto" action: nil keyEquivalent: @""];
     }
 #endif
 }
