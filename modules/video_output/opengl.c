@@ -32,12 +32,21 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
-#ifndef SYS_DARWIN
-#include <GL/gl.h>
-#else
-/* Mac OS X < 10.3 does not have GL/gl.h */
+#ifdef SYS_DARWIN
 #include <OpenGL/gl.h>
-#endif
+#include <OpenGL/glext.h>
+
+/* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
+   This allows sizes which are not powers of 2 */
+#define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
+
+/* OS X OpenGL supports YUV. Hehe. */
+#define VLCGL_FORMAT GL_YCBCR_422_APPLE
+#define VLCGL_TYPE   GL_UNSIGNED_SHORT_8_8_APPLE
+#else
+
+#include <GL/gl.h>
+#define VLCGL_TARGET GL_TEXTURE_2D
 
 /* RV16 */
 #ifndef GL_UNSIGNED_SHORT_5_6_5
@@ -53,6 +62,11 @@
 /* RV32 */
 #define VLCGL_RGB_FORMAT GL_RGBA
 #define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
+
+/* Use RGB on Win32/GLX */
+#define VLCGL_FORMAT VLCGL_RGB_FORMAT
+#define VLCGL_TYPE   VLCGL_RGB_TYPE
+#endif
 
 /* OpenGL effects */
 #define OPENGL_EFFECT_NONE             1
@@ -103,11 +117,11 @@ struct vout_sys_t
 {
     vout_thread_t *p_vout;
 
-    uint8_t     *p_buffer;
+    uint8_t    *pp_buffer[2];
     int         i_index;
     int         i_tex_width;
     int         i_tex_height;
-    GLuint      texture;
+    GLuint      p_textures[2];
 
     int         i_effect;
 };
@@ -130,9 +144,14 @@ static int CreateVout( vlc_object_t *p_this )
 
     var_Create( p_vout, "opengl-effect", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
+#ifdef SYS_DARWIN
+    p_sys->i_tex_width  = p_vout->render.i_width;
+    p_sys->i_tex_height = p_vout->render.i_height;
+#else
     /* A texture must have a size aligned on a power of 2 */
     p_sys->i_tex_width  = GetAlignedSize( p_vout->render.i_width );
     p_sys->i_tex_height = GetAlignedSize( p_vout->render.i_height );
+#endif
 
     msg_Dbg( p_vout, "Texture size: %dx%d", p_sys->i_tex_width,
              p_sys->i_tex_height );
@@ -188,13 +207,18 @@ static int CreateVout( vlc_object_t *p_this )
 static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    int i_pixel_pitch;
+    int i_pixel_pitch, i_index;
     vlc_value_t val;
 
     p_sys->p_vout->pf_init( p_sys->p_vout );
 
-    /* No YUV textures :( */
-
+#ifdef SYS_DARWIN
+    p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+    p_vout->output.i_rmask = 0x00ff0000;
+    p_vout->output.i_gmask = 0x0000ff00;
+    p_vout->output.i_bmask = 0x000000ff;
+    i_pixel_pitch = 2;
+#else
 #if VLCGL_RGB_FORMAT == GL_RGB
 #   if VLCGL_RGB_TYPE == GL_UNSIGNED_BYTE
     p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
@@ -216,6 +240,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_bmask = 0x00ff0000;
     i_pixel_pitch = 4;
 #endif
+#endif
 
     /* Since OpenGL can do rescaling for us, stick to the default
      * coordinates and aspect. */
@@ -223,18 +248,25 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
-    /* We know the chroma, allocate a buffer which will be used
+    /* We know the chroma, allocate one buffer which will be used
      * directly by the decoder */
-    p_vout->p_picture[0].i_planes = 1;
-    p_sys->p_buffer =
+    p_sys->pp_buffer[0] =
         malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
-    if( !p_sys->p_buffer )
+    if( !p_sys->pp_buffer[0] )
+    {
+        msg_Err( p_vout, "Out of memory" );
+        return -1;
+    }
+    p_sys->pp_buffer[1] =
+        malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
+    if( !p_sys->pp_buffer[1] )
     {
         msg_Err( p_vout, "Out of memory" );
         return -1;
     }
 
-    p_vout->p_picture[0].p->p_pixels = p_sys->p_buffer;
+    p_vout->p_picture[0].i_planes = 1;
+    p_vout->p_picture[0].p->p_pixels = p_sys->pp_buffer[0];
     p_vout->p_picture[0].p->i_lines = p_vout->output.i_height;
     p_vout->p_picture[0].p->i_pixel_pitch = i_pixel_pitch;
     p_vout->p_picture[0].p->i_pitch = p_vout->output.i_width *
@@ -246,23 +278,48 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_picture[0].i_type   = DIRECT_PICTURE;
 
     PP_OUTPUTPICTURE[ 0 ] = &p_vout->p_picture[0];
+
     I_OUTPUTPICTURES = 1;
 
-    /* Set the texture parameters */
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_PRIORITY, 1.0 );
+    glGenTextures( 2, p_sys->p_textures );
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    for( i_index = 0; i_index < 2; i_index++ )
+    {
+        glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_index] );
+    
+        /* Set the texture parameters */
+        glTexParameterf( VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0 );
+    
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP );
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    
+        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+#ifdef SYS_DARWIN
+        /* Tell the driver not to make a copy of the texture but to use
+           our buffer */
+        glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
+        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+    
+#if 0
+        /* Use VRAM texturing */
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+                         GL_STORAGE_CACHED_APPLE );
+#else
+        /* Use AGP texturing */
+        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
+                         GL_STORAGE_SHARED_APPLE );
+#endif
+#endif
 
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-    /* Allocate the OpenGL texture */
-    glTexImage2D( GL_TEXTURE_2D, 0, 3,
-                  p_sys->i_tex_width, p_sys->i_tex_height , 0,
-                  VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, NULL );
+        /* Call glTexImage2D only once, and use glTexSubImage2D later */
+        glTexImage2D( VLCGL_TARGET, 0, 3, p_sys->i_tex_width,
+                      p_sys->i_tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
+                      p_sys->pp_buffer[i_index] );
+    }
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -338,7 +395,8 @@ static void DestroyVout( vlc_object_t *p_this )
     vlc_object_destroy( p_sys->p_vout );
 
     /* Free the texture buffer*/
-    if( p_sys->p_buffer ) free( p_sys->p_buffer );
+    if( p_sys->pp_buffer[0] ) free( p_sys->pp_buffer[0] );
+    if( p_sys->pp_buffer[1] ) free( p_sys->pp_buffer[1] );
 
     free( p_sys );
 }
@@ -352,7 +410,6 @@ static void DestroyVout( vlc_object_t *p_this )
 static int Manage( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-
     return p_sys->p_vout->pf_manage( p_sys->p_vout );
 }
 
@@ -362,19 +419,49 @@ static int Manage( vout_thread_t *p_vout )
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    float f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
-    float f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
+    float f_width, f_height;
+
+    /* glTexCoord works differently with GL_TEXTURE_2D and
+       GL_TEXTURE_RECTANGLE_EXT */
+#ifdef SYS_DARWIN
+    f_width = (float)p_vout->output.i_width;
+    f_height = (float)p_vout->output.i_height;
+#else
+    f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
+    f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
+#endif
 
     glClear( GL_COLOR_BUFFER_BIT );
 
+    /* On Win32/GLX, we do this the usual way:
+       + Fill the buffer with new content,
+       + Reload the texture,
+       + Use the texture.
+
+       On OS X with VRAM or AGP texturing, the order has to be:
+       + Reload the texture,
+       + Fill the buffer with new content,
+       + Use the texture.
+
+       (Thanks to gcc from the Arstechnica forums for the tip)
+
+       Therefore, we have to use two buffers and textures. On Win32/GLX,
+       we reload the texture to be displayed and use it right away. On
+       OS X, we first render, then reload the texture to be used next
+       time. */
+
+    glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
+
+#ifndef SYS_DARWIN
     /* Update the texture */
     glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,
                      p_vout->render.i_width, p_vout->render.i_height,
                      VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->p_buffer );
+#endif
 
     if( p_sys->i_effect == OPENGL_EFFECT_NONE )
     {
-        glEnable( GL_TEXTURE_2D );
+        glEnable( VLCGL_TARGET );
         glBegin( GL_POLYGON );
         glTexCoord2f( 0.0, 0.0 ); glVertex2f( -1.0, 1.0 );
         glTexCoord2f( f_width, 0.0 ); glVertex2f( 1.0, 1.0 );
@@ -386,7 +473,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     {
         glRotatef( 1.0, 0.3, 0.5, 0.7 );
 
-        glEnable( GL_TEXTURE_2D );
+        glEnable( VLCGL_TARGET );
         glBegin( GL_QUADS );
 
         /* Front */
@@ -427,7 +514,19 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         glEnd();
     }
 
-    glDisable( GL_TEXTURE_2D);
+    glDisable( VLCGL_TARGET );
+
+    /* Switch buffers */
+    p_sys->i_index = ( p_sys->i_index + 1 ) & 1;
+    p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
+
+#ifdef SYS_DARWIN
+    /* Update the texture */
+    glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
+    glTexSubImage2D( VLCGL_TARGET, 0, 0, 0, p_sys->i_tex_width,
+                     p_sys->i_tex_height, VLCGL_FORMAT, VLCGL_TYPE,
+                     p_sys->pp_buffer[p_sys->i_index] );
+#endif
 }
 
 /*****************************************************************************
