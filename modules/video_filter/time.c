@@ -64,9 +64,9 @@ struct filter_sys_t
 vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
-    add_string( "text-message", NULL, NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
-    add_integer( "timestamp-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( "timestamp-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_string( "time-text", NULL, NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
+    add_integer( "time-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+    add_integer( "time-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     set_description( _("Time display sub filter") );
     add_shortcut( "time" );
 vlc_module_end();
@@ -88,15 +88,14 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    var_Create( p_this, "timestamp-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "timestamp-x", &val );
+    var_Create( p_this, "time-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_filter, "time-x", &val );
     p_sys->i_xoff = val.i_int;
-    var_Create( p_this, "timestamp-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "timestamp-y", &val );
+    var_Create( p_this, "time-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_filter, "time-y", &val );
     p_sys->i_yoff = val.i_int;
-    p_sys->psz_head = strdup(var_CreateGetString( p_this, "text-message" ));
+    p_sys->psz_head = var_CreateGetString( p_this, "time-text" );
 
-    
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
 
@@ -110,6 +109,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    if( p_sys->psz_head ) free( p_sys->psz_head );
     free( p_sys );
 }
 
@@ -120,7 +120,7 @@ char *myCtime( time_t *t )
     ctime_r( t, tmp );
     return strdup( tmp );
 #else
-    return strdup(ctime(t));
+    return strdup( ctime(t) );
 #endif
 }
 
@@ -155,12 +155,11 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
     t = time(NULL);
-    
  
     psz_time = myCtime( &t );
     asprintf( &psz_string, "%s%s", p_sys->psz_head, psz_time );
-    
     free( psz_time );
+
     p_spu->p_region->psz_text = psz_string;
     p_spu->i_start = date;
     p_spu->i_stop  = date + 1000000;
@@ -168,7 +167,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->b_absolute = VLC_FALSE;
     p_spu->i_x = p_sys->i_xoff;
     p_spu->i_y = p_sys->i_yoff;
-           
+
     p_spu->i_flags = OSD_ALIGN_LEFT|OSD_ALIGN_TOP ;
     return p_spu;
 }
