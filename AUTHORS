@@ -1,7 +1,7 @@
-# $Id: AUTHORS
+# $Id: AUTHORS,v 1.90 2003/01/31 22:35:44 sam Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
-# Authors and contributors are listed alphabetically.
+# Authors are listed alphabetically.
 # 
 # The fields are: name (N), email (E), web-address (W), CVS account login (C),
 # PGP key ID and fingerprint (P), description (D), and snail-mail address (S).
@@ -44,16 +44,6 @@ C: octplane
 D: SDL audio and video output
 S: France
 
-N: Jeffrey Baker
-E: jwbaker@acm.org
-D: port of the ALSA plugin to the ALSA 1.0 API
-S: USA, California
-
-N: Ethan C. Baldridge
-E: BaldridgeE@cadmus.com
-D: directory browsing code in modules.c
-S: USA
-
 N: Gildas Bazin
 E: gbazin@netcourrier.com
 C: gbazin
@@ -72,21 +62,12 @@ D: Satellite input
 D: libdvbpsi support
 S: France
 
-N: Julien Blache
-E: jb@technologeek.org
-D: Disc ejection code
-S: France
-
-N: Emmanuel Blindauer
-E: manu@agat.net
-D: aRts audio output
-S: France
-
 N: Stéphane Borel
 E: stef@via.ecp.fr
 C: stef
 D: MPEG video decoder
 D: DVD input, IFO parsing, CSS decryption
+D: DVD navigation
 S: France
 
 N: Arnaud de Bossoreille de Ribou
@@ -101,21 +82,11 @@ C: tcastley
 D: BeOS interface, BeOS Video
 S: Australia
 
-N: Rudolf Cornelissen
-E: rag.cornelissen@inter.nl.net
-D: BeOS fixes
-S: Netherlands
-
 N: Renaud Dartus
 E: reno@via.ecp.fr
 C: reno
 D: AC3 decoder
 S: France
-
-N: Nilmoni Deb
-E: ndeb@ece.cmu.edu
-D: Minor autoconf and Makefile fixes
-S: USA, Pennsylvania
 
 N: Cyril Deguet
 E: asmax@via.ecp.fr
@@ -144,21 +115,6 @@ D: BeOS port
 D: MPEG video decoder
 S: France
 
-N: Régis Duchesne
-E: regis@via.ecp.fr
-C: regis
-S: USA, California
-
-N: Yves Duret
-E: yves@zarb.org
-C: yves
-D: RPM package
-S: Strasbourg, France
-
-N: Bill Eldridge
-E: bill@rfa.org
-D: Documentation
-
 N: Henri Fallon
 E: henri@via.ecp.fr
 C: henri
@@ -167,40 +123,15 @@ D: MPEG TS input
 D: Decoder modularization
 S: USA
 
-N: Valek Filippov
-E: frob@df.ru
-D: Russian translation
-S: Russia
-
 N: Andrew Flintham
 E: amf@cus.org.uk
 D: text subtitler and font scripts
 S: United Kingdom
 
-N: Arnaud Gomes-do-Vale
-E: arnaud@carrosse.frmug.org
-D: autoconf patches
-S: France
-
-N: Thomas Graf
-E: tgraf@europe.com
-D: gettext support, german translation
-S: Switzerland
-
-N: Jean-Philippe Grimaldi
-E: jeanphi@via.ecp.fr
-C: jeanphi
-D: Bug fixes
-S: France
-
 N: Alexis Guillard
 E: alexis.guillard@bt.com
-D: IPv6
+D: IPv6 support
 S: United Kingdom
-
-N: Roine Gustafsson
-E: roine@popstar.com
-D: spudec bug fixes
 
 N: Gerald Hansink
 E: gerald.hansink@ordina.nl
@@ -225,37 +156,21 @@ C: jimmy
 D: IDCT and YUV transforms
 S: France
 
-N: Sam Hocevar
+N: Samuel Hocevar
 E: sam@zoy.org
 C: sam
 D: playlist and modules system
 D: Gnome and Gtk+ interfaces, Glide and fb video outputs, Esound audio output
 D: DVD subtitles decoder
 D: Video output
+D: Mozilla plug-in
 S: France
-
-N: Aaron Holtzman
-E: aholtzma@ess.engr.uvic.ca
-D: AC3 decoder
-D: MPEG video decoder
-S: Canada
-
-N: Hans-Peter Jansen
-E: hpj@urpla.net
-D: patch for module options handling
-S: Germany
 
 N: Eugenio Jarosiewicz
 E: ej0@cise.ufl.edu
 C: ej
 D: MacOS X interface, and various fixes
 S: USA, Florida
-
-N: Brieuc Jeunhomme
-E: bbp@via.ecp.fr
-C: bbp
-D: Bug fixes
-S: France
 
 N: Jon Lech Johansen
 E: jon-vl@nanocrew.net
@@ -275,75 +190,10 @@ D: AC3 decoder
 D: MPEG audio decoder
 S: France
 
-N: David Kennedy
-E: dkennedy@tinytoad.com
-D: X11 fullscreen patch
-S: Canada
-
-N: Øyvind Kolbu
-E: oyvindk@world-online.no
-D: FreeBSD patches
-S: Norway
-
-N: Andres Krapf
-E: dae@via.ecp.fr
-C: dae
-D: FreeBSD port and tests
-D: KDE interface
-S: France
-
-N: Mathias Kretschmer
-E: mathias@research.att.com
-D: IP Multicast support
-S: USA, New Jersey
-
-N: Felix Kühne
-E: fk@aenneburghardt.de
-D: german translation
-S: Germany
-
-N: Michel Lespinasse
-E: walken@zoy.org
-C: walken
-D: AC3 decoder
-D: MPEG audio decoder
-D: MPEG video decoder
-S: USA, California
-
 N: Pascal Levesque
 E: pascal.levesque@mindready.com
 D: QNX RTOS video output and audio output
 S: Canada, Québec
-
-N: Arkadiusz Lipiec
-E: A.Lipiec@elka.pw.edu.pl
-D: Polish translation
-S: Poland
-
-N: John Paul Lorenti
-E: jpl31@columbia.edu
-D: ALSA device selection patch
-
-N: Paul Mackerras
-E: paulus@linuxcare.com.au
-D: AltiVec IDCT and motion
-S: Australia
-
-N: Xavier Maillard
-E: zedek@fxgsproject.org
-D: audio converters
-S: France, Reims
-
-N: Wade Majors
-E: guru@startrek.com
-D: BeOS testing, icon integration, debugging and fixes
-S: USA, Florida
-
-N: Xavier Marchesini
-E: xav@alarue.net
-C: xav
-D: Win32 fixes
-S: France
 
 N: Christophe Massiot
 E: massiot@via.ecp.fr
@@ -363,20 +213,6 @@ D: xosd interface plug-in
 D: SLP
 S: France
 
-N: Benjamin Mironer
-E: bmironer@noos.fr
-D: Mac OS X fixes
-
-N: Arkadiusz Miskiewicz
-E: misiek@pld.ORG.PL
-D: autoconf and Makefile patches
-S: Poland
-
-N: Fumio Nakayama
-E: endymion@ca2.so-net.ne.jp
-D: Japanese translation
-S: Japan
-
 N: Florian G. Pflug
 E: fgp@phlo.org
 C: fgp
@@ -395,16 +231,6 @@ D: BeOS module fixes and enhancements
 D: Stream output
 S: France
 
-N: Olivier Pomel
-E: pomel@via.ecp.fr
-C: pomel
-S: France
-
-N: Remco Poortinga
-E: poortinga@telin.nl
-D: IPv6 multicast patch
-S: Netherlands
-
 N: Jean-Paul Saman
 E: jpsaman@wxs.nl
 D: libmad plug-in
@@ -419,15 +245,10 @@ C: gitan
 D: SAP module
 S: France
 
-N: Steven M. Schultz
-E: sms@TO.GD-ES.COM
-D: BSD/OS port
-S: USA, California
-
 N: Vincent Seguin
 E: seguin@via.ecp.fr
 C: seguin
-D: core vlc structure
+D: core VLC structure
 D: interface and message queue
 D: video output
 D: YUV transforms
@@ -440,21 +261,9 @@ C: richards
 D: BeOS video output (BBitmap and Overlay)
 S: United Kingdom
 
-N: Espen Skoglund
-E: esk@ira.uka.de
-D: FreeBSD autoconf and Makefile patches
-S: Germany
-
-N: Benoit Steiner
-E: benny@via.ecp.fr
-C: benny
-D: MPEG system input
-D: network input
-S: USA, California
-
 N: Peter Surda
 E: shurdeek@panorama.sth.ac.at
-D: rc plugin for vlc control through /dev/stdin
+D: rc plugin for VLC control through /dev/stdin
 S: Austria
 
 N: Olivier Teulière
@@ -463,12 +272,3 @@ C: ipkiss
 D: Win32 interface
 S: France
 
-N: Bruno Vella
-E: allevb@tin.it
-D: Italian localization
-S: Italy
-
-N: David Weber
-E: david_weber@gmx.de
-D: Mac OS X interface design & graphics
-S: Germany

@@ -8,7 +8,7 @@
 SUBDIRS = po intl m4 share
 DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib
 
-EXTRA_DIST = FAQ HACKING MAINTAINERS STATUS src/extras/COPYING \
+EXTRA_DIST = FAQ HACKING MAINTAINERS THANKS src/extras/COPYING \
              INSTALL.win32 README.MacOSX.rtf vlc.spec install-win32 \
              Modules.am macosx-dmg \
              configure.ac.in mkinstalldirs bootstrap
@@ -32,7 +32,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 # XXX: these flags could be set in configure.ac.in, but we set them here
 # because old versions of automake don't support them in configure.ac.
-AUTOMAKE_OPTIONS = foreign dist-bzip2 subdir-objects
+AUTOMAKE_OPTIONS = dist-bzip2 subdir-objects
 
 ###############################################################################
 # Compilation flags for debug mode, profiling, and others
