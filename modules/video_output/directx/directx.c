@@ -445,7 +445,7 @@ static int Manage( vout_thread_t *p_vout )
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
     vlc_mutex_lock( &p_vout->p_sys->lock );
-    if( p_vout->p_sys->hparent )
+    if( p_vout->p_sys->hparent && !p_vout->b_fullscreen )
     {
         RECT rect_parent;
         POINT point;
@@ -517,7 +517,10 @@ static int Manage( vout_thread_t *p_vout )
         if( p_vout->b_fullscreen )
         {
            if( p_vout->p_sys->hparent )
+           {
                SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
+               SetForegroundWindow( p_vout->p_sys->hwnd );
+           }
 
             /* Maximized window */
             window_placement.showCmd = SW_SHOWMAXIMIZED;
