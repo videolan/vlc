@@ -78,8 +78,6 @@ struct vout_sys_t
 
 #define MOUSE_IDLE_TIMEOUT 2000000    // two seconds
 #define MIN_AUTO_VSYNC_REFRESH 61    // Hz
-#define DEFAULT_SCREEN_SHOT_FORMAT 'PNG '
-#define DEFAULT_SCREEN_SHOT_PATH "/boot/home/vlc screenshot"
 
 /*****************************************************************************
  * beos_GetAppWindow : retrieve a BWindow pointer from the window name
@@ -343,12 +341,6 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
     if (config_GetInt(p_vout, "fullscreen"))
         fSettings->AddFlags(VideoSettings::FLAG_FULL_SCREEN);
 
-    // add a few useful shortcuts
-    // XXX works only with US keymap
-    AddShortcut( '1', 0, new BMessage( RESIZE_50 ) );
-    AddShortcut( '2', 0, new BMessage( RESIZE_100 ) );
-    AddShortcut( '3', 0, new BMessage( RESIZE_200 ) );
-
     _SetToSettings();
 }
 
@@ -403,62 +395,82 @@ VideoWindow::MessageReceived( BMessage *p_message )
         case ASPECT_CORRECT:
             SetCorrectAspectRatio(!CorrectAspectRatio());
             break;
-        case SCREEN_SHOT:
-            // save a screen shot
-            if ( BBitmap* current = bitmap[i_buffer] )
-            {
-// the following line might be tempting, but does not work for some overlay bitmaps!!!
-//                BBitmap* temp = new BBitmap( current );
-// so we clone the bitmap ourselves
-// however, we need to take care of potentially different padding!
-// memcpy() is slow when reading from grafix memory, but what the heck...
-                BBitmap* temp = new BBitmap( current->Bounds(), current->ColorSpace() );
-                if ( temp && temp->IsValid() )
-                {
-                    int32_t height = (int32_t)current->Bounds().Height();
-                    uint8_t* dst = (uint8_t*)temp->Bits();
-                    uint8_t* src = (uint8_t*)current->Bits();
-                    int32_t dstBpr = temp->BytesPerRow();
-                    int32_t srcBpr = current->BytesPerRow();
-                    int32_t validBytes = dstBpr > srcBpr ? srcBpr : dstBpr;
-                    for ( int32_t y = 0; y < height; y++ )
-                    {
-                        memcpy( dst, src, validBytes );
-                        dst += dstBpr;
-                        src += srcBpr;
-                    }
-                    char * path = config_GetPsz( p_vout, "beos-screenshotpath" );
-                    if ( !path )
-                        path = strdup( DEFAULT_SCREEN_SHOT_PATH );
-                    
-                    /* FIXME - we should check which translators are
-                       actually available */
-                    char * psz_format = config_GetPsz( p_vout, "beos-screenshotformat" );
-                    int32_t format = DEFAULT_SCREEN_SHOT_FORMAT;
-                    if( !strcmp( psz_format, "TGA" ) )
-                        format = 'TGA ';
-                    else if( !strcmp( psz_format, "PPM" ) )
-                        format = 'PPM ';
-                    else if( !strcmp( psz_format, "JPEG" ) )
-                        format = 'JPEG';
-                    else if( !strcmp( psz_format, "BMP" ) )
-                        format = 'BMP ';
 
-                    _SaveScreenShot( temp, path, format );
-                }
-                else
-                {
-                    delete temp;
-                }
-            }
-            break;
-        case SHORTCUT:
+        case B_KEY_DOWN:
+        case B_UNMAPPED_KEY_DOWN:
+        case B_KEY_UP:
+        case B_UNMAPPED_KEY_UP:
         {
+            key_map * keys;
+            char    * chars;
+            int32     key, modifiers;
+
+            if( p_message->FindInt32( "key", &key ) != B_OK ||
+                p_message->FindInt32( "modifiers", &modifiers ) != B_OK )
+            {
+                /* Shouldn't happen */
+                break;
+            }
+
+            if( ( p_message->what == B_KEY_UP ||
+                  p_message->what == B_UNMAPPED_KEY_UP ) &&
+                !( modifiers & B_COMMAND_KEY ) )
+            {
+                /* We only use the KEY_UP messages to detect Alt+X
+                   shortcuts (because the KEY_DOWN messages aren't
+                   sent when Alt is pressed) */
+                break;
+            }
+
+            /* Special case for Alt+1, Alt+2 and Alt+3 shortcuts: since
+               the character depends on the keymap, we use the key codes
+               directly (18, 19, 20) */
+            if( ( modifiers & B_COMMAND_KEY ) &&
+                key >= 18 && key <= 20 )
+            {
+                if( key == 18 )
+                    PostMessage( RESIZE_50 );
+                else if( key == 19 )
+                    PostMessage( RESIZE_100 );
+                else
+                    PostMessage( RESIZE_200 );
+
+                break;
+            }
+
+            /* Get the current keymap */
+            get_key_map( &keys, &chars );
+
+            if( key >= 128 || chars[keys->normal_map[key]] != 1 )
+            {
+                /* Weird key or Unicode character */
+                free( keys );
+                free( chars );
+                break;
+            }
+
             vlc_value_t val;
-            p_message->FindInt32( "key", (int32*) &val.i_int );
+            val.i_int = ConvertKeyToVLC( chars[keys->normal_map[key]+1] );
+
+            if( modifiers & B_COMMAND_KEY )
+            {
+                val.i_int |= KEY_MODIFIER_ALT;
+            }
+            if( modifiers & B_SHIFT_KEY )
+            {
+                val.i_int |= KEY_MODIFIER_SHIFT;
+            }
+            if( modifiers & B_CONTROL_KEY )
+            {
+                val.i_int |= KEY_MODIFIER_CTRL;
+            }
             var_Set( p_vout->p_vlc, "key-pressed", val );
+
+            free( keys );
+            free( chars );
             break;
         }
+
         default:
             BWindow::MessageReceived( p_message );
             break;
@@ -961,180 +973,6 @@ VideoWindow::_SetToSettings()
 }
 
 /*****************************************************************************
- * VideoWindow::_SaveScreenShot
- *****************************************************************************/
-void
-VideoWindow::_SaveScreenShot( BBitmap* bitmap, char* path,
-                          uint32_t translatorID ) const
-{
-    // make the info object from the parameters
-    screen_shot_info* info = new screen_shot_info;
-    info->bitmap = bitmap;
-    info->path = path;
-    info->translatorID = translatorID;
-    info->width = CorrectAspectRatio() ? i_width : fTrueWidth;
-    info->height = CorrectAspectRatio() ? i_height : fTrueHeight;
-    // spawn a new thread to take care of the actual saving to disk
-    thread_id thread = spawn_thread( _save_screen_shot,
-                                     "screen shot saver",
-                                     B_LOW_PRIORITY, (void*)info );
-    // start thread or do the job ourself if something went wrong
-    if ( thread < B_OK || resume_thread( thread ) < B_OK )
-        _save_screen_shot( (void*)info );
-}
-
-/*****************************************************************************
- * VideoWindow::_save_screen_shot
- *****************************************************************************/
-int32
-VideoWindow::_save_screen_shot( void* cookie )
-{
-    screen_shot_info* info = (screen_shot_info*)cookie;
-    if ( info && info->bitmap && info->bitmap->IsValid() && info->path )
-    {
-        // try to be as quick as possible creating the file (the user might have
-        // taken the next screen shot already!)
-        // make sure we have a unique name for the screen shot
-        BString path( info->path );
-        // create the folder if it doesn't exist
-        BString folder( info->path );
-        create_directory( folder.String(), 0777 );
-        path << "/vlc screenshot";
-        BEntry entry( path.String() );
-        int32_t appendedNumber = 0;
-        if ( entry.Exists() && !entry.IsSymLink() )
-        {
-            // we would clobber an existing entry
-            bool foundUniqueName = false;
-            appendedNumber = 1;
-            while ( !foundUniqueName ) {
-                BString newName( path.String() );
-                newName << " " << appendedNumber;
-                BEntry possiblyClobberedEntry( newName.String() );
-                if ( possiblyClobberedEntry.Exists()
-                    && !possiblyClobberedEntry.IsSymLink() )
-                    appendedNumber++;
-                else
-                    foundUniqueName = true;
-            }
-        }
-        if ( appendedNumber > 0 )
-            path << " " << appendedNumber;
-        // there is still a slight chance to clobber an existing
-        // file (if it was created in the "meantime"), but we take it...
-        BFile outFile( path.String(),
-                       B_CREATE_FILE | B_WRITE_ONLY | B_ERASE_FILE );
-
-        // make colorspace converted copy of bitmap
-        BBitmap* converted = new BBitmap( BRect( 0.0, 0.0, info->width, info->height ),
-                                          B_RGB32 );
-        status_t status = convert_bitmap( info->bitmap, converted );
-        if ( status == B_OK )
-        {
-            BTranslatorRoster* roster = BTranslatorRoster::Default();
-            uint32_t imageFormat = 0;
-            translator_id translator = 0;
-            bool found = false;
-
-            // find suitable translator
-            translator_id* ids = NULL;
-            int32 count = 0;
-        
-            status = roster->GetAllTranslators( &ids, &count );
-            if ( status >= B_OK )
-            {
-                for ( int tix = 0; tix < count; tix++ )
-                {
-                    const translation_format *formats = NULL;
-                    int32 num_formats = 0;
-                    bool ok = false;
-                    status = roster->GetInputFormats( ids[tix],
-                                                      &formats, &num_formats );
-                    if (status >= B_OK)
-                    {
-                        for ( int iix = 0; iix < num_formats; iix++ )
-                        {
-                            if ( formats[iix].type == B_TRANSLATOR_BITMAP )
-                            {
-                                ok = true;
-                                break;
-                            }
-                        }
-                    }
-                    if ( !ok )
-                        continue;
-                    status = roster->GetOutputFormats( ids[tix],
-                                                       &formats, &num_formats);
-                    if ( status >= B_OK )
-                    {
-                        for ( int32_t oix = 0; oix < num_formats; oix++ )
-                        {
-                             if ( formats[oix].type != B_TRANSLATOR_BITMAP )
-                             {
-                                 if ( formats[oix].type == info->translatorID )
-                                 {
-                                     found = true;
-                                     imageFormat = formats[oix].type;
-                                     translator = ids[tix];
-                                     break;
-                                 }
-                             }
-                        }
-                    }
-                }
-            }
-            delete[] ids;
-            if ( found )
-            {
-                // make bitmap stream
-                BBitmapStream outStream( converted );
-
-                status = outFile.InitCheck();
-                if (status == B_OK) {
-                    status = roster->Translate( &outStream, NULL, NULL,
-                                                &outFile, imageFormat );
-                    if ( status == B_OK )
-                    {
-                        BNodeInfo nodeInfo( &outFile );
-                        if ( nodeInfo.InitCheck() == B_OK )
-                        {
-                            translation_format* formats;
-                            int32 count;
-                            status = roster->GetOutputFormats( translator,
-                                                               (const translation_format **) &formats,
-                                                               &count);
-                            if ( status >= B_OK )
-                            {
-                                const char * mime = NULL;
-                                for ( int ix = 0; ix < count; ix++ ) {
-                                    if ( formats[ix].type == imageFormat ) {
-                                        mime = formats[ix].MIME;
-                                        break;
-                                    }
-                                }
-                                if ( mime )
-                                    nodeInfo.SetType( mime );
-                            }
-                        }
-                    }
-                }
-                outStream.DetachBitmap( &converted );
-                outFile.Unset();
-            }
-        }
-        delete converted;
-    }
-    if ( info )
-    {
-        delete info->bitmap;
-        free( info->path );
-    }
-    delete info;
-    return B_OK;
-}
-
-
-/*****************************************************************************
  * VLCView::VLCView
  *****************************************************************************/
 VLCView::VLCView(BRect bounds, vout_thread_t *p_vout_instance )
@@ -1161,8 +999,6 @@ VLCView::~VLCView()
 void
 VLCView::AttachedToWindow()
 {
-    // in order to get keyboard events
-    MakeFocus(true);
     // periodically check if we want to hide the pointer
     Window()->SetPulseRate(1000000);
 }
@@ -1357,35 +1193,6 @@ VLCView::Pulse()
 }
 
 /*****************************************************************************
- * VLCVIew::KeyUp
- *****************************************************************************/
-void VLCView::KeyUp( const char *bytes, int32 numBytes )
-{
-    if( numBytes < 1 )
-    {
-        return;
-    }
-
-    uint32_t mods = modifiers();
-
-    vlc_value_t val;
-    val.i_int = ConvertKeyToVLC( *bytes );
-    if( mods & B_COMMAND_KEY )
-    {
-        val.i_int |= KEY_MODIFIER_ALT;
-    }
-    if( mods & B_SHIFT_KEY )
-    {
-        val.i_int |= KEY_MODIFIER_SHIFT;
-    }
-    if( mods & B_CONTROL_KEY )
-    {
-        val.i_int |= KEY_MODIFIER_CTRL;
-    }
-    var_Set( p_vout->p_vlc, "key-pressed", val );
-}
-
-/*****************************************************************************
  * VLCVIew::Draw
  *****************************************************************************/
 void
@@ -1403,6 +1210,7 @@ static int  Init       ( vout_thread_t * );
 static void End        ( vout_thread_t * );
 static int  Manage     ( vout_thread_t * );
 static void Display    ( vout_thread_t *, picture_t * );
+static int  Control    ( vout_thread_t *, int, va_list );
 
 static int  BeosOpenDisplay ( vout_thread_t *p_vout );
 static void BeosCloseDisplay( vout_thread_t *p_vout );
@@ -1432,6 +1240,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->pf_manage = Manage;
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
+    p_vout->pf_control = Control;
 
     return( 0 );
 }
@@ -1560,6 +1369,11 @@ void Display( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout->p_sys->i_index = ++p_vout->p_sys->i_index %
         p_vout->p_sys->p_window->bitmap_count;
     p_pic->p->p_pixels = (uint8_t*)p_vout->p_sys->p_window->bitmap[p_vout->p_sys->i_index]->Bits();
+}
+
+static int Control( vout_thread_t * p_vout, int i_query, va_list args )
+{
+    return vout_vaControlDefault( p_vout, i_query, args );
 }
 
 /* following functions are local */

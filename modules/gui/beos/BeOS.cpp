@@ -46,17 +46,10 @@ void E_(CloseVideo)   ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static char * ppsz_screenshotformat[] = { "TGA", "PPM", "PNG", "JPEG", "BMP" };
-
 vlc_module_begin();
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_bool( "beos-dvdmenus", 0, NULL, _("Use DVD Menus"), "", VLC_TRUE );
-    add_string( "beos-screenshotpath", "/boot/home/", NULL,
-                _("Screenshot Path"), "", VLC_TRUE );
-    add_string( "beos-screenshotformat", "PNG",  NULL,
-                _("Screenshot Format"),"", VLC_TRUE );
-    change_string_list( ppsz_screenshotformat, 0, 0 );
     set_description( _("BeOS standard API interface") );
     set_capability( "interface", 100 );
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );

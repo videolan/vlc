@@ -270,7 +270,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         val.psz_string = 0;
     }
 
-#ifdef SYS_DARWIN
+#if defined(SYS_DARWIN) || defined(SYS_BEOS)
     if( !val.psz_string && p_vout->p_vlc->psz_homedir )
     {
         asprintf( &val.psz_string, "%s/Desktop",

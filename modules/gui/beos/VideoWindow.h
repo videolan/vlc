@@ -117,7 +117,6 @@ class VLCView : public BView
 									   const BMessage* dragMessage);
 	virtual	void			Pulse();
 	virtual	void			Draw(BRect updateRect);
-	virtual	void			KeyUp(const char* bytes, int32 numBytes);
 
  private:
             vout_thread_t   *p_vout;
@@ -189,20 +188,6 @@ private:
 			void			_BlankBitmap(BBitmap* bitmap) const;
 			void			_SetVideoSize(uint32_t mode);
 			void			_SetToSettings();
-
-			void			_SaveScreenShot( BBitmap* bitmap,
-											 char* path,
-											 uint32_t translatorID ) const;
-	static	int32			_save_screen_shot( void* cookie );
-
-	struct screen_shot_info
-	{
-		BBitmap*	bitmap;
-		char*		path;
-		uint32_t	translatorID;
-		int32_t		width;
-		int32_t		height;
-	};
 
     vout_thread_t   *p_vout;
 
