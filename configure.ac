@@ -162,7 +162,7 @@ case "${target_os}" in
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
-        VLC_ADD_CPPFLAGS([vlc],[-Dmain=maince])
+        VLC_ADD_CPPFLAGS([vlc],[-Dmain(a,b)=maince(a,b)])
         VLC_ADD_LDFLAGS([vlc],[-lws2 -e WinMainCRTStartup])
         VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
     fi
