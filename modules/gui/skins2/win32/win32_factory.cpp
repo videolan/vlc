@@ -105,7 +105,7 @@ bool Win32Factory::init()
     skinWindowClass.lpszMenuName = NULL;
     skinWindowClass.cbClsExtra = 0;
     skinWindowClass.cbWndExtra = 0;
-    skinWindowClass.hbrBackground = HBRUSH (COLOR_WINDOW);
+    skinWindowClass.hbrBackground = NULL;
     skinWindowClass.hCursor = LoadCursor( NULL , IDC_ARROW );
     skinWindowClass.hIcon = LoadIcon( m_hInst, "VLC_ICON" );
     skinWindowClass.hInstance = m_hInst;

@@ -57,7 +57,8 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     {
         // Normal window
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
-            "default name", WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
+            "default name", WS_POPUP | WS_CLIPCHILDREN,
+            CW_USEDEFAULT, CW_USEDEFAULT,
             CW_USEDEFAULT, CW_USEDEFAULT, hParentWindow, 0, hInst, NULL );
     }
 
