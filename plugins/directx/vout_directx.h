@@ -2,7 +2,7 @@
  * vout_directx.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.h,v 1.6 2002/05/18 13:30:28 gbazin Exp $
+ * $Id: vout_directx.h,v 1.6.2.1 2002/07/29 16:22:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -31,8 +31,8 @@ typedef struct vout_sys_s
 {
 
     LPDIRECTDRAW2        p_ddobject;                    /* DirectDraw object */
-    LPDIRECTDRAWSURFACE3 p_display;                        /* Display device */
-    LPDIRECTDRAWSURFACE3 p_current_surface;   /* surface currently displayed */
+    LPDIRECTDRAWSURFACE2 p_display;                        /* Display device */
+    LPDIRECTDRAWSURFACE2 p_current_surface;   /* surface currently displayed */
     LPDIRECTDRAWCLIPPER  p_clipper;             /* clipper used for blitting */
     HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
     HBRUSH               hbrush;           /* window backgound brush (color) */
@@ -87,9 +87,9 @@ typedef struct vout_sys_s
  *****************************************************************************/
 typedef struct picture_sys_s
 {
-    LPDIRECTDRAWSURFACE3 p_surface;
+    LPDIRECTDRAWSURFACE2 p_surface;
     DDSURFACEDESC        ddsd;
-    LPDIRECTDRAWSURFACE3 p_front_surface;
+    LPDIRECTDRAWSURFACE2 p_front_surface;
 
 } picture_sys_t;
 
