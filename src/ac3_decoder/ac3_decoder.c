@@ -48,11 +48,6 @@ static void     RunThread               ( ac3dec_thread_t * p_adec );
 static void     ErrorThread             ( ac3dec_thread_t * p_adec );
 static void     EndThread               ( ac3dec_thread_t * p_adec );
 
-//static byte_t   GetByte                 ( bit_stream_t * p_bit_stream );
-//static void     NeedBits                ( bit_stream_t * p_bit_stream, int i_bits );
-//static void     DumpBits                ( bit_stream_t * p_bit_stream, int i_bits );
-//static int      FindHeader              ( adec_thread_t * p_adec );
-
 /*****************************************************************************
  * ac3dec_CreateThread: creates an ac3 decoder thread
  *****************************************************************************/
@@ -136,6 +131,10 @@ void ac3dec_DestroyThread( ac3dec_thread_t * p_ac3dec )
  *****************************************************************************/
 static __inline__ int decode_find_sync( ac3dec_thread_t * p_ac3dec )
 {
+#ifdef AC3_SIGSEGV
+    int i = 0;
+#endif
+
     while ( (!p_ac3dec->b_die) && (!p_ac3dec->b_error) )
     {
         NeedBits( &(p_ac3dec->bit_stream), 16 );
@@ -143,9 +142,20 @@ static __inline__ int decode_find_sync( ac3dec_thread_t * p_ac3dec )
         {
             DumpBits( &(p_ac3dec->bit_stream), 16 );
             p_ac3dec->total_bits_read = 16;
+#ifdef AC3_SIGSEGV
+	    if ( i )
+	    {
+		fprintf( stderr, "ac3dec debug: %i bit(s) skipped to synkronize\n", i );
+	    }
+#endif
             return( 0 );
         }
+#ifdef AC3_SIGSEGV
+        DumpBits( &(p_ac3dec->bit_stream), 1 );
+	i += 1;
+#else
         DumpBits( &(p_ac3dec->bit_stream), 8 );
+#endif
     }
     return( -1 );
 }
@@ -190,6 +200,10 @@ static int InitThread( ac3dec_thread_t * p_ac3dec )
  *****************************************************************************/
 static void RunThread( ac3dec_thread_t * p_ac3dec )
 {
+    /*
+    mtime_t mdate = 0;
+    */
+
     intf_DbgMsg( "ac3dec debug: running ac3 decoder thread (%p) (pid == %i)\n", p_ac3dec, getpid() );
 
     /* Initializing the ac3 decoder thread */
@@ -201,8 +215,32 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
     /* ac3 decoder thread's main loop */
     while ( (!p_ac3dec->b_die) && (!p_ac3dec->b_error) )
     {
-	decode_find_sync( p_ac3dec );
+        p_ac3dec->b_invalid = 0;
 
+        decode_find_sync( p_ac3dec );
+	switch ( p_ac3dec->syncinfo.fscod )
+	{
+		case 0:
+			p_ac3dec->p_aout_fifo->l_rate = 48000;
+			break;
+
+		case 1:
+			p_ac3dec->p_aout_fifo->l_rate = 44100;
+			break;
+
+		case 2:
+			p_ac3dec->p_aout_fifo->l_rate = 32000;
+			break;
+
+		default:
+			fprintf( stderr, "ac3dec debug: invalid fscod\n" );
+			break;
+	}
+
+	/*
+	p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = mdate;
+	mdate += 32000;
+	*/
 	if ( DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts )
 	{
 		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_ac3dec->fifo)->i_pts;
@@ -214,26 +252,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	}
 
 	parse_syncinfo( p_ac3dec );
-/*
-        switch ( p_ac3dec->syncinfo.fscod )
-        {
-            case 0:
-                p_ac3dec->p_aout_fifo->l_rate = 48000;
-                break;
 
-            case 1:
-                p_ac3dec->p_aout_fifo->l_rate = 44100;
-                break;
-
-            case 2:
-                p_ac3dec->p_aout_fifo->l_rate = 32000;
-                break;
-
-            default:
-                fprintf( stderr, "ac3dec debug: fscod == `11' (reserved)\n" );
-                break;
-        }
-*/
 	parse_bsi( p_ac3dec );
 
 	/* frame 1 */
@@ -241,6 +260,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	exponent_unpack( p_ac3dec );
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	if ( p_ac3dec->bsi.acmod == 0x2 )
 	{
 		rematrix( p_ac3dec );
@@ -256,6 +279,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	exponent_unpack( p_ac3dec );
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	if ( p_ac3dec->bsi.acmod == 0x2 )
 	{
 		rematrix( p_ac3dec );
@@ -272,6 +299,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	exponent_unpack( p_ac3dec );
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	if ( p_ac3dec->bsi.acmod == 0x2 )
 	{
 		rematrix( p_ac3dec );
@@ -288,6 +319,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	exponent_unpack( p_ac3dec );
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	if ( p_ac3dec->bsi.acmod == 0x2 )
 	{
 		rematrix( p_ac3dec );
@@ -304,6 +339,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	exponent_unpack( p_ac3dec );
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	if ( p_ac3dec->bsi.acmod == 0x2 )
 	{
 		rematrix( p_ac3dec );
@@ -320,6 +359,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	exponent_unpack( p_ac3dec );
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	if ( p_ac3dec->bsi.acmod == 0x2 )
 	{
 		rematrix( p_ac3dec );

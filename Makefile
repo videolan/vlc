@@ -26,8 +26,8 @@ ARCH=MMX
 #ARCH=PPC
 
 # Decoder choice - ?? old decoder will be removed soon
-#DECODER=old
-DECODER=new
+DECODER=old
+#DECODER=new
 # !!! don't forget to run this command after changing decoder type !!!
 # touch input/input.c input/input_ctrl.c include/vlc.h include/video_decoder.h
 
@@ -92,7 +92,6 @@ CCFLAGS += -D_GNU_SOURCE
 CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer
-#CCFLAGS += -fomit-frame-pointer -s
 
 # Optimizations for x86 familiy, without MMX
 ifeq ($(ARCH),)

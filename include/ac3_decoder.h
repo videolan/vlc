@@ -3,6 +3,8 @@
  * (c)1999 VideoLAN
  *****************************************************************************/
 
+#define AC3_SIGSEGV
+
 /* Exponent strategy constants */
 #define EXP_REUSE       (0)
 #define EXP_D15         (1)
@@ -335,6 +337,7 @@ typedef struct ac3dec_thread_s
     vlc_thread_t        thread_id;                /* id for thread functions */
     boolean_t           b_die;                                 /* `die' flag */
     boolean_t           b_error;                             /* `error' flag */
+    boolean_t           b_invalid;                         /* `invalid' flag */
 
     /*
      * Input properties

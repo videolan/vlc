@@ -209,11 +209,14 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 5 );
 			p_ac3dec->total_bits_read += 5;
 
-			/*
-			if(group_code > 26)
+#ifdef AC3_SIGSEGV
+			if ( group_code > 26 )
+			{
 				//FIXME do proper block error handling
-				fprintf( stderr, "!! Invalid mantissa !!\n" );
-			*/
+				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
+				p_ac3dec->b_invalid = 1;
+			}
+#endif
 
 			//q_1[ 0 ] = q_1_0[ group_code ];
 			q_1[ 1 ] = q_1_1[ group_code ];
@@ -233,11 +236,14 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 7 );
 			p_ac3dec->total_bits_read += 7;
 
-			/*
-			if(group_code > 124)
+#ifdef AC3_SIGSEGV
+			if ( group_code > 124 )
+			{
 				//FIXME do proper block error handling
-				fprintf( stderr, "!! Invalid mantissa !!\n" );
-			*/
+				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
+				p_ac3dec->b_invalid = 1;
+			}
+#endif
 
 			//q_2[ 0 ] = q_2_0[ group_code ];
 			q_2[ 1 ] = q_2_1[ group_code ];
@@ -253,11 +259,14 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 3 );
 			p_ac3dec->total_bits_read += 3;
 
-			/*
-			if(group_code > 6)
+#ifdef AC3_SIGSEGV
+			if ( group_code > 6 )
+			{
 				//FIXME do proper block error handling
-				fprintf( stderr, "!! Invalid mantissa !!\n" );
-			*/
+				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
+				p_ac3dec->b_invalid = 1;
+			}
+#endif
 
 			return( q_3[group_code] * exp_lut[exp] );
 
@@ -271,11 +280,14 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 7 );
 			p_ac3dec->total_bits_read += 7;
 
-			/*
-			if(group_code > 120)
+#ifdef AC3_SIGSEGV
+			if ( group_code > 120 )
+			{
 				//FIXME do proper block error handling
-				fprintf( stderr, "!! Invalid mantissa !!\n" );
-			*/
+				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
+				p_ac3dec->b_invalid = 1;
+			}
+#endif
 
 			//q_4[ 0 ] = q_4_0[ group_code ];
 			q_4[ 0 ] = q_4_1[ group_code ];
@@ -290,11 +302,14 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 4 );
 			p_ac3dec->total_bits_read += 4;
 
-			/*
-			if(group_code > 14)
+#ifdef AC3_SIGSEGV
+			if ( group_code > 14 )
+			{
 				//FIXME do proper block error handling
-				fprintf( stderr, "!! Invalid mantissa !!\n" );
-			*/
+				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
+				p_ac3dec->b_invalid = 1;
+			}
+#endif
 
 			return( q_5[group_code] * exp_lut[exp] );
 
