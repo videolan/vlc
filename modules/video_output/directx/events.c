@@ -917,10 +917,13 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         point.x = point.y = 0;
         ClientToScreen( p_vout->p_sys->hwnd, &point );
 
-        SetParent( p_vout->p_sys->hwnd, GetDesktopWindow() );
+        SetParent( p_vout->p_sys->hwnd, 0 );
+        p_vout->p_sys->i_window_style =
+            WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
         SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
-                       WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW |
-                       WS_SIZEBOX | (i_query == VOUT_CLOSE ? 0 : WS_VISIBLE) );
+                       p_vout->p_sys->i_window_style |
+                       (i_query == VOUT_CLOSE ? 0 : WS_VISIBLE) );
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW );
         SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
                       SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
 
