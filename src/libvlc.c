@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.60 2003/01/31 13:52:26 sam Exp $
+ * $Id: libvlc.c,v 1.61 2003/02/01 18:53:03 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -516,6 +516,11 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /*
+     * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin
+     */
+    var_Create( p_vlc, "drawable", VLC_VAR_INTEGER );
+
+    /*
      * Get input filenames given as commandline arguments
      */
     GetFilenames( p_vlc, i_argc, ppsz_argv );
@@ -641,12 +646,14 @@ int VLC_Destroy( int i_object )
 
     vlc_object_detach( p_vlc );
 
+    /* Release object before destroying it */
+    if( i_object ) vlc_object_release( p_vlc );
+
     vlc_object_destroy( p_vlc );
 
     /* Stop thread system: last one out please shut the door! */
     vlc_threads_end( &libvlc );
 
-    if( i_object ) vlc_object_release( p_vlc );
     return VLC_SUCCESS;
 }
 
