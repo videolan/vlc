@@ -28,13 +28,12 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <png.h>
-
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
 #include "vlc_filter.h"
 #include "filter_common.h"
+#include "vlc_image.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -48,9 +47,9 @@ static void Render    ( vout_thread_t *, picture_t * );
 
 static int  SendEvents( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
-static int MouseEvent ( vlc_object_t *, char const *,
+static int  MouseEvent( vlc_object_t *, char const *,
                         vlc_value_t , vlc_value_t , void * );
-static int Control    ( vout_thread_t *, int, va_list );
+static int  Control   ( vout_thread_t *, int, va_list );
 
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
@@ -107,98 +106,19 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * LoadPNG: loads the PNG logo into memory
+ * LoadImage: loads the logo image into memory
  *****************************************************************************/
-static picture_t *LoadPNG( vlc_object_t *p_this, char *psz_filename,
-                           int i_trans )
+static picture_t *LoadImage( vlc_object_t *p_this, char *psz_filename )
 {
     picture_t *p_pic;
-    FILE *file;
-    int i, j;
-    vlc_bool_t b_alpha = VLC_TRUE;
+    image_handler_t *p_image;
+    video_format_t fmt_in = {0}, fmt_out = {0};
 
-    png_uint_32 i_width, i_height;
-    int i_color_type, i_interlace_type, i_compression_type, i_filter_type;
-    int i_bit_depth;
-    png_bytep *p_row_pointers;
-    png_structp p_png;
-    png_infop p_info, p_end_info;
+    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    p_image = image_HandlerCreate( p_this );
+    p_pic = image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
+    image_HandlerDelete( p_image );
 
-    if( !(file = fopen( psz_filename , "rb" )) )
-    {
-        msg_Err( p_this, "logo file (%s) not found", psz_filename );
-        return 0;
-    }
-
-    p_png = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
-    p_info = png_create_info_struct( p_png );
-    p_end_info = png_create_info_struct( p_png );
-    png_init_io( p_png, file );
-    png_read_info( p_png, p_info );
-    png_get_IHDR( p_png, p_info, &i_width, &i_height,
-                  &i_bit_depth, &i_color_type, &i_interlace_type,
-                  &i_compression_type, &i_filter_type);
-
-    if( i_color_type == PNG_COLOR_TYPE_PALETTE )
-        png_set_palette_to_rgb( p_png );
-
-    if( i_color_type == PNG_COLOR_TYPE_GRAY ||
-        i_color_type == PNG_COLOR_TYPE_GRAY_ALPHA )
-          png_set_gray_to_rgb( p_png );
-
-    if( png_get_valid( p_png, p_info, PNG_INFO_tRNS ) )
-    {
-        png_set_tRNS_to_alpha( p_png );
-    }
-    else if( !(i_color_type & PNG_COLOR_MASK_ALPHA) )
-    {
-        b_alpha = VLC_FALSE;
-    }
-
-    p_row_pointers = malloc( sizeof(png_bytep) * i_height );
-    for( i = 0; i < (int)i_height; i++ )
-        p_row_pointers[i] = malloc( 4 * ( i_bit_depth + 7 ) / 8 * i_width );
-
-    png_read_image( p_png, p_row_pointers );
-    png_read_end( p_png, p_end_info );
-
-    fclose( file );
-    png_destroy_read_struct( &p_png, &p_info, &p_end_info );
-
-    /* Convert to YUVA */
-    p_pic = malloc( sizeof(picture_t) );
-    if( vout_AllocatePicture( p_this, p_pic, VLC_FOURCC('Y','U','V','A'),
-                              i_width, i_height, VOUT_ASPECT_FACTOR ) !=
-        VLC_SUCCESS )
-    {
-        for( i = 0; i < (int)i_height; i++ ) free( p_row_pointers[i] );
-        free( p_row_pointers );
-        return 0;
-    }
-
-    for( j = 0; j < (int)i_height ; j++ )
-    {
-        uint8_t *p = (uint8_t *)p_row_pointers[j];
-
-        for( i = 0; i < (int)i_width ; i++ )
-        {
-            int i_offset = i + j * p_pic->p[Y_PLANE].i_pitch;
-
-            p_pic->p[Y_PLANE].p_pixels[i_offset] =
-                (p[0] * 257L + p[1] * 504 + p[2] * 98)/1000 + 16;
-            p_pic->p[U_PLANE].p_pixels[i_offset] =
-                (p[2] * 439L - p[0] * 148 - p[1] * 291)/1000 + 128;
-            p_pic->p[V_PLANE].p_pixels[i_offset] =
-                (p[0] * 439L - p[1] * 368 - p[2] * 71)/1000 + 128;
-            p_pic->p[A_PLANE].p_pixels[i_offset] =
-                b_alpha ? (p[3] * i_trans) / 255 : i_trans;
-
-            p += (b_alpha ? 4 : 3);
-        }
-    }
-
-    for( i = 0; i < (int)i_height; i++ ) free( p_row_pointers[i] );
-    free( p_row_pointers );
     return p_pic;
 }
 
@@ -265,7 +185,7 @@ static int Create( vlc_object_t *p_this )
     var_Get( p_this, "logo-transparency", &val );
     p_sys->i_trans = __MAX( __MIN( val.i_int, 255 ), 0 );
 
-    p_sys->p_pic = LoadPNG( p_this, p_sys->psz_filename, p_sys->i_trans );
+    p_sys->p_pic = LoadImage( p_this, p_sys->psz_filename );
     if( !p_sys->p_pic )
     {
         free( p_sys );
@@ -417,10 +337,7 @@ static void Destroy( vlc_object_t *p_this )
 
     DEL_PARENT_CALLBACKS( SendEventsToChild );
 
-    if( p_sys->p_pic && p_sys->p_pic->p_data_orig )
-        free( p_sys->p_pic->p_data_orig );
-    if( p_sys->p_pic ) free( p_sys->p_pic );
-
+    if( p_sys->p_pic ) p_sys->p_pic->pf_release( p_sys->p_pic );
     free( p_sys );
 }
 
@@ -444,7 +361,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     p_sys->p_blend->pf_video_blend( p_sys->p_blend, p_outpic, p_outpic,
                                     p_sys->p_pic, p_sys->posx, p_sys->posy,
-                                    255 );
+                                    p_sys->i_trans );
 
     vout_DisplayPicture( p_sys->p_vout, p_outpic );
 }
@@ -546,7 +463,7 @@ struct filter_sys_t
 
     /* On the fly control variable */
     vlc_bool_t b_need_update;
-    vlc_bool_t b_new_png;
+    vlc_bool_t b_new_image;
 };
 
 static subpicture_t *Filter( filter_t *, mtime_t );
@@ -576,19 +493,22 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOOBJ;
     }
 
-    p_sys->psz_filename = var_CreateGetString( p_input->p_libvlc , "logo-file" ); 
+    p_sys->psz_filename =
+        var_CreateGetString( p_input->p_libvlc , "logo-file" ); 
     if( !p_sys->psz_filename || !*p_sys->psz_filename )
     {
         msg_Err( p_this, "logo file not specified" );
         vlc_object_release( p_input );
+        if( p_sys->psz_filename ) free( p_sys->psz_filename );
         free( p_sys );
-        return 0;
+        return VLC_EGENERIC;
     }
 
     p_sys->posx = var_CreateGetInteger( p_input->p_libvlc , "logo-x" );
     p_sys->posy = var_CreateGetInteger( p_input->p_libvlc , "logo-y" );
     p_sys->pos = var_CreateGetInteger( p_input->p_libvlc , "logo-position" );
-    p_sys->i_trans = var_CreateGetInteger( p_input->p_libvlc, "logo-transparency");
+    p_sys->i_trans =
+        var_CreateGetInteger( p_input->p_libvlc, "logo-transparency");
     p_sys->i_trans = __MAX( __MIN( p_sys->i_trans, 255 ), 0 );
 
     var_AddCallback( p_input->p_libvlc, "logo-file", LogoCallback, p_sys );
@@ -605,10 +525,11 @@ static int CreateFilter( vlc_object_t *p_this )
         p_sys->posx = 0; p_sys->posy = 0;
     }
 
-    p_sys->p_pic = LoadPNG( p_this, p_sys->psz_filename, p_sys->i_trans );
+    p_sys->p_pic = LoadImage( p_this, p_sys->psz_filename );
     if( !p_sys->p_pic )
     {
         free( p_sys );
+        msg_Err( p_this, "couldn't load logo file" );
         return VLC_EGENERIC;
     }
 
@@ -617,7 +538,7 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
     p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
     p_sys->b_need_update = VLC_TRUE;
-    p_sys->b_new_png = VLC_FALSE;
+    p_sys->b_new_image = VLC_FALSE;
     p_sys->i_last_date = 0;
 
     return VLC_SUCCESS;
@@ -632,12 +553,10 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys = p_filter->p_sys;
     vlc_object_t *p_input;
 
-    if( p_sys->p_pic && p_sys->p_pic->p_data_orig )
-        free( p_sys->p_pic->p_data_orig );
-    if( p_sys->p_pic ) free( p_sys->p_pic );
-
+    if( p_sys->p_pic ) p_sys->p_pic->pf_release( p_sys->p_pic );
+    if( p_sys->psz_filename ) free( p_sys->psz_filename );
     free( p_sys );
-    
+
     /* Delete the logo variables from INPUT */
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
     if( !p_input ) return;
@@ -664,21 +583,18 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     if( !p_sys->b_need_update && p_sys->i_last_date +5000000 > date ) return 0;
 
-    if( p_sys->b_new_png )
+    if( p_sys->b_new_image )
     {
-        if( p_sys->p_pic && p_sys->p_pic->p_data_orig )
-            free( p_sys->p_pic->p_data_orig );
-        if( p_sys->p_pic ) free( p_sys->p_pic );
+        if( p_sys->p_pic ) p_sys->p_pic->pf_release( p_sys->p_pic );
 
-	p_sys->p_pic = LoadPNG( VLC_OBJECT(p_filter), p_sys->psz_filename,
-				p_sys->i_trans );
-	if( p_sys->p_pic )
-	{
-	    p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
-	    p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
-	}
+        p_sys->p_pic = LoadImage( VLC_OBJECT(p_filter), p_sys->psz_filename );
+        if( p_sys->p_pic )
+        {
+            p_sys->i_width = p_sys->p_pic->p[Y_PLANE].i_visible_pitch;
+            p_sys->i_height = p_sys->p_pic->p[Y_PLANE].i_visible_lines;
+        }
 
-        p_sys->b_new_png = VLC_FALSE;
+        p_sys->b_new_image = VLC_FALSE;
     }
 
     p_sys->b_need_update = VLC_FALSE;
@@ -723,6 +639,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_y = p_sys->posy;
     p_spu->i_flags = p_sys->pos;
     p_spu->p_region = p_region;
+    //p_subpic->i_alpha = p_sys->i_trans;
 
     return p_spu;
 }
@@ -739,7 +656,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     {
         if( p_sys->psz_filename ) free( p_sys->psz_filename );
         p_sys->psz_filename = strdup( newval.psz_string ); 
-        p_sys->b_new_png = VLC_TRUE;
+        p_sys->b_new_image = VLC_TRUE;
     }
     else if ( !strncmp( psz_var, "logo-x", 6 ) )
     {
@@ -756,7 +673,6 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     else if ( !strncmp( psz_var, "logo-transparency", 9 ) )
     {
         p_sys->i_trans = __MAX( __MIN( newval.i_int, 255 ), 0 );
-        p_sys->b_new_png = VLC_TRUE;
     }
     p_sys->b_need_update = VLC_TRUE;
     return VLC_SUCCESS;
