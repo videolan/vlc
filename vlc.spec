@@ -44,17 +44,12 @@
 
 %define with_slp 1
 
-## by default we build for MandrakeCooker
-%define	buildfor_rh80	0
-%define	buildfor_mdk82	0
-%define	buildfor_mdk90	0
-
 ## but we try to figure out on wich system we are building
-%{expand:%%define buildfor_mdk82 %(A=$(awk '{print $4}' /etc/mandrake-release); if [ "$A" = 8.2 ]; then echo 1; else echo 0; fi)}
-%{expand:%%define buildfor_mdk90 %(A=$(awk '{print $4}' /etc/mandrake-release); if [ "$A" = 9.0 ]; then echo 1; else echo 0; fi)}
-%{expand:%%define buildfor_mdk91 %(A=$(awk '{print $4}' /etc/mandrake-release); if [ "$A" = 9.1 ]; then echo 1; else echo 0; fi)}
+%define	buildfor_mdk82	%([[ -e /etc/mandrake-release ]] && awk '{print ($4 == "8.2")}' %{_sysconfdir}/mandrake-release || echo 0)
+%define	buildfor_mdk90	%([[ -e /etc/mandrake-release ]] && awk '{print ($4 == "9.0")}' %{_sysconfdir}/mandrake-release || echo 0)
+%define	buildfor_mdk91	%([[ -e /etc/mandrake-release ]] && awk '{print ($4 == "9.1")}' %{_sysconfdir}/mandrake-release || echo 0)
 # not a mandrake one.
-%{expand:%%define buildfor_rh80 %([[ -e /etc/mandrake-release ]] && echo 1 || echo 0)}
+%define buildfor_rh80 %([[ -e /etc/mandrake-release ]] && echo 0 || echo 1)
 
 # new macros
 %if %buildfor_mdk82 || %buildfor_mdk90 || %buildfor_rh80
