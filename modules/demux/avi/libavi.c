@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.16 2003/01/28 16:57:28 sam Exp $
+ * $Id: libavi.c,v 1.17 2003/03/10 01:07:09 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -76,7 +76,6 @@ off_t AVI_TellAbsolute( input_thread_t *p_input )
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     i_pos= p_input->stream.p_selected_area->i_tell;
-//            - ( p_input->p_last_data - p_input->p_current_data  );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -88,7 +87,8 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
 {
     off_t i_filepos;
 
-    if( i_pos >= p_input->stream.p_selected_area->i_size )
+    if( p_input->stream.p_selected_area->i_size > 0 &&
+        i_pos >= p_input->stream.p_selected_area->i_size )
     {
         return VLC_EGENERIC;
     }
@@ -101,13 +101,15 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
     }
 
     if( p_input->stream.b_seekable &&
-        p_input->stream.i_method == INPUT_METHOD_FILE )
+        ( p_input->stream.i_method == INPUT_METHOD_FILE ||
+          i_pos - i_filepos < 0 ||
+          i_pos - i_filepos > 1024 ) )
     {
-        p_input->pf_seek( p_input, i_pos );
         input_AccessReinit( p_input );
+        p_input->pf_seek( p_input, i_pos );
         return VLC_SUCCESS;
     }
-    else
+    else if( i_pos - i_filepos > 0 )
     {
         data_packet_t   *p_data;
         int             i_skip = i_pos - i_filepos;
@@ -135,22 +137,11 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
                 return VLC_EGENERIC;
             }
         }
-#if 0
-        while( i_skip > 0 )
-        {
-            i_peek = input_Peek( p_input, &p_peek, i_skip+1 );
-            i_peek--;
-            i_skip -= i_peek;
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            p_input->p_current_data += i_peek;  // skip them
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            if( i_peek <= 0 )
-            {
-                return VLC_EGENERIC;
-            }
-        }
-#endif
         return VLC_SUCCESS;
+    }
+    else
+    {
+        return VLC_EGENERIC;
     }
 }
 
