@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.171 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: main.c,v 1.172 2002/03/28 21:21:51 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1320,6 +1320,11 @@ static u32 CPUCapabilities( void )
     signal( SIGILL, NULL );
 #   endif
 
+    return( i_capabilities );
+
+#elif defined( __sparc__ )
+
+    i_capabilities |= CPU_CAPABILITY_FPU;
     return( i_capabilities );
 
 #else
