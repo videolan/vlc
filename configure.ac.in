@@ -1789,13 +1789,23 @@ then
     AC_PATH_PROG(SDL_CONFIG, sdl-config, no, ${SDL_PATH})
     SDL_HEADER="SDL/SDL.h"
   fi
+  # check for cross-compiling
+  SDL_PREFIX=
+  AC_ARG_WITH(sdl-prefix,
+    [    --with-sdl-prefix=PATH path to libsdl (needed for cross-compiling),
+                               e.g use as:
+                               --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x${with_sdl_prefix}" != "xno" -a "x${with_sdl_prefix}" != "x"
+  then
+    SDL_PREFIX="--prefix=${with_sdl_prefix}"
+  fi
   if test "x${SDL_CONFIG}" != "xno"
   then
     PLUGINS="${PLUGINS} vout_sdl aout_sdl"
-    CFLAGS_vout_sdl="${CFLAGS_vout_sdl} `${SDL_CONFIG} --cflags`"
-    LDFLAGS_vout_sdl="${LDFLAGS_vout_sdl} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
-    CFLAGS_aout_sdl="${CFLAGS_aout_sdl} `${SDL_CONFIG} --cflags`"
-    LDFLAGS_aout_sdl="${LDFLAGS_aout_sdl} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
+    CFLAGS_vout_sdl="${CFLAGS_vout_sdl} `${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`"
+    LDFLAGS_vout_sdl="${LDFLAGS_vout_sdl} `${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`"
+    CFLAGS_aout_sdl="${CFLAGS_aout_sdl} `${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`"
+    LDFLAGS_aout_sdl="${LDFLAGS_aout_sdl} `${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_vout_sdl}"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
@@ -2148,7 +2158,7 @@ then
     [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
                           e.g use as:
                           --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "x$with_gtk_prefix" != "xno" -a "x$with_gtk_prefix" != "x"
+  if test "x${with_gtk_prefix}" != "xno" -a "x${with_gtk_prefix}" != "x"
   then
     GTK_PREFIX="--prefix=$with_gtk_prefix"
   fi
@@ -2167,6 +2177,12 @@ then
       ac_cv_gtk_headers=no
       echo "Cannot find gtk development headers."
     ])
+    if test "x${ac_cv_gtk_headers}" = "xyes"
+    then
+      PLUGINS="${PLUGINS} familiar"
+      NEED_GTK_MAIN=yes
+    fi
+    CPPFLAGS="${CPPFLAGS_save}"
 
     # now look for gpe support
     AC_ARG_WITH(gpe-prefix,
@@ -2191,15 +2207,10 @@ then
       then
         CFLAGS_familiar="${CFLAGS_familiar} ${CFLAGS_gpe}"
         LDFLAGS_familiar="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
+        NEED_GTK_MAIN=no
       fi
-    fi
-    if test "x${ac_cv_gtk_headers}" = "xyes"
-    then
-      PLUGINS="${PLUGINS} familiar"
-      NEED_GTK_MAIN=yes
-    fi
-    CPPFLAGS="${CPPFLAGS_save}"
-  fi
+    fi # end gpe support
+  fi # end gtk+ support
 fi
 
 dnl
