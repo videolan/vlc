@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.13 2003/07/11 18:19:43 fenrir Exp $
+ * $Id: http.c,v 1.14 2003/07/12 00:56:18 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -88,7 +88,7 @@ typedef struct
 {
     char *stack[STACK_MAX];
     int  i_stack;
-} stack_t;
+} rpn_stack_t;
 
 struct httpd_file_callback_args_t
 {
@@ -100,7 +100,7 @@ struct httpd_file_callback_args_t
     char          *mime;
 
     /* inited for each access */
-    stack_t       stack;
+    rpn_stack_t       stack;
     mvar_t        *vars;
 };
 
@@ -1092,15 +1092,15 @@ static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
     return s;
 }
 
-static void SSInit( stack_t * );
-static void SSClean( stack_t * );
-static void EvaluateRPN( mvar_t  *, stack_t *, char * );
+static void SSInit( rpn_stack_t * );
+static void SSClean( rpn_stack_t * );
+static void EvaluateRPN( mvar_t  *, rpn_stack_t *, char * );
 
-static void SSPush  ( stack_t *, char * );
-static char *SSPop  ( stack_t * );
+static void SSPush  ( rpn_stack_t *, char * );
+static char *SSPop  ( rpn_stack_t * );
 
-static void SSPushN ( stack_t *, int );
-static int  SSPopN  ( stack_t *, mvar_t  * );
+static void SSPushN ( rpn_stack_t *, int );
+static int  SSPopN  ( rpn_stack_t *, mvar_t  * );
 
 
 /****************************************************************************
@@ -1904,12 +1904,12 @@ static void uri_decode_url_encoded( char *psz )
 /****************************************************************************
  * Light RPN evaluator
  ****************************************************************************/
-static void SSInit( stack_t *st )
+static void SSInit( rpn_stack_t *st )
 {
     st->i_stack = 0;
 }
 
-static void SSClean( stack_t *st )
+static void SSClean( rpn_stack_t *st )
 {
     while( st->i_stack > 0 )
     {
@@ -1917,7 +1917,7 @@ static void SSClean( stack_t *st )
     }
 }
 
-static void SSPush( stack_t *st, char *s )
+static void SSPush( rpn_stack_t *st, char *s )
 {
     if( st->i_stack < STACK_MAX )
     {
@@ -1925,7 +1925,7 @@ static void SSPush( stack_t *st, char *s )
     }
 }
 
-static char * SSPop( stack_t *st )
+static char * SSPop( rpn_stack_t *st )
 {
     if( st->i_stack <= 0 )
     {
@@ -1937,7 +1937,7 @@ static char * SSPop( stack_t *st )
     }
 }
 
-static int SSPopN( stack_t *st, mvar_t  *vars )
+static int SSPopN( rpn_stack_t *st, mvar_t  *vars )
 {
     char *name;
     char *value;
@@ -1957,7 +1957,7 @@ static int SSPopN( stack_t *st, mvar_t  *vars )
     return( i );
 }
 
-static void SSPushN( stack_t *st, int i )
+static void SSPushN( rpn_stack_t *st, int i )
 {
     char v[512];
 
@@ -1965,7 +1965,7 @@ static void SSPushN( stack_t *st, int i )
     SSPush( st, v );
 }
 
-static void  EvaluateRPN( mvar_t  *vars, stack_t *st, char *exp )
+static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
 {
     for( ;; )
     {
