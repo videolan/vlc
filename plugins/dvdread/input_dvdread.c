@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.8 2001/12/29 03:07:51 massiot Exp $
+ * $Id: input_dvdread.c,v 1.9 2001/12/29 15:40:53 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -918,10 +918,7 @@ static int DvdReadRead( input_thread_t * p_input,
     }
 
     p_input->pf_delete_packet( p_input->p_method_data, p_data_p );
-    if( i_packet != 0 )
-    {
-        *pp_data = NULL;
-    }
+    *pp_data = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
