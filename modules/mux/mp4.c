@@ -1,8 +1,8 @@
 /*****************************************************************************
- * mp4.c
+ * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.3 2003/08/01 20:06:43 gbazin Exp $
+ * $Id: mp4.c,v 1.4 2003/09/02 16:00:24 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -117,6 +117,7 @@ static void bo_add_64be ( bo_t *, uint64_t );
 static void bo_add_fourcc(bo_t *, char * );
 static void bo_add_bo   ( bo_t *, bo_t * );
 static void bo_add_mem  ( bo_t *, int , uint8_t * );
+static void bo_add_descr ( bo_t *, uint8_t , uint32_t );
 
 static void bo_fix_32be ( bo_t *, int , uint32_t );
 
@@ -169,6 +170,10 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_mdat_pos = p_sys->i_pos;
 
         box_send( p_mux, box );
+
+        /* FIXME FIXME
+         * Quicktime actually doesn't like the 64 bits extensions !!! */
+        p_sys->b_mov = VLC_TRUE;
     }
 
     /* Now add mdat header */
@@ -182,15 +187,16 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static uint32_t GetDescriptorLength24b( int i_length )
+static int GetDescrLength( int i_size )
 {
-    uint32_t    i_l1, i_l2, i_l3;
-
-    i_l1 = i_length&0x7f;
-    i_l2 = ( i_length >> 7 )&0x7f;
-    i_l3 = ( i_length >> 14 )&0x7f;
-
-    return( 0x808000 | ( i_l3 << 16 ) | ( i_l2 << 8 ) | i_l1 );
+    if( i_size < 0x00000080 )
+        return 2 + i_size;
+    else if( i_size < 0x00004000 )
+        return 3 + i_size;
+    else if( i_size < 0x00200000 )
+        return 4 + i_size;
+    else
+        return 5 + i_size;
 }
 
 static bo_t *GetESDS( mp4_stream_t *p_stream )
@@ -202,7 +208,8 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
 
     if( p_stream->p_fmt->i_extra_data > 0 )
     {
-        i_decoder_specific_info_size = p_stream->p_fmt->i_extra_data + 4;
+        i_decoder_specific_info_size =
+            GetDescrLength( p_stream->p_fmt->i_extra_data );
     }
     else
     {
@@ -211,15 +218,15 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
 
     esds = box_full_new( "esds", 0, 0 );
 
-    bo_add_8   ( esds, 0x03 );      // ES_DescrTag
-    bo_add_24be( esds,
-                 GetDescriptorLength24b( 25 + i_decoder_specific_info_size ) );
+    /* ES_Descr */
+    bo_add_descr( esds, 0x03, 3 +
+                  GetDescrLength( 13 + i_decoder_specific_info_size ) +
+                  GetDescrLength( 1 ) );
     bo_add_16be( esds, p_stream->i_track_id );
     bo_add_8   ( esds, 0x1f );      // flags=0|streamPriority=0x1f
 
-    bo_add_8   ( esds, 0x04 );      // DecoderConfigDescrTag
-    bo_add_24be( esds,
-                 GetDescriptorLength24b( 13 + i_decoder_specific_info_size ) );
+    /* DecoderConfigDescr */
+    bo_add_descr( esds, 0x04, 13 + i_decoder_specific_info_size );
 
     switch( p_stream->p_fmt->i_fourcc )
     {
@@ -253,9 +260,9 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     if( p_stream->p_fmt->i_extra_data > 0 )
     {
         int i;
-        bo_add_8   ( esds, 0x05 );  // DecoderSpecificInfo
-        bo_add_24be( esds,
-                     GetDescriptorLength24b( p_stream->p_fmt->i_extra_data ) );
+
+        /* DecoderSpecificInfo */
+        bo_add_descr( esds, 0x05, p_stream->p_fmt->i_extra_data );
 
         for( i = 0; i < p_stream->p_fmt->i_extra_data; i++ )
         {
@@ -264,9 +271,8 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     }
 
     /* SL_Descr mandatory */
-    bo_add_8   ( esds, 0x06 );  // SLConfigDescriptorTag
-    bo_add_24be( esds, GetDescriptorLength24b( 1 ) );
-    bo_add_8   ( esds, 0x02 );  // sl_predefined
+    bo_add_descr( esds, 0x06, 1 );
+    bo_add_8    ( esds, 0x02 );  // sl_predefined
 
     box_fix( esds );
 
@@ -480,7 +486,7 @@ static void Close( vlc_object_t * p_this )
         /* *** add /moov/trak/mdia *** */
         mdia = box_new( "mdia" );
 
-        /* */
+        /* media header */
         if( p_sys->b_mov )
         {
             mdhd = box_full_new( "mdhd", 0, 0 );
@@ -505,9 +511,10 @@ static void Close( vlc_object_t * p_this )
         box_fix( mdhd );
         box_gather( mdia, mdhd );
 
-        /* */
+        /* handler reference */
         hdlr = box_full_new( "hdlr", 0, 0 );
-        bo_add_32be( hdlr, 0 );         // predefined
+
+        bo_add_fourcc( hdlr, "mhlr" );         // media handler
         if( p_stream->p_fmt->i_cat == AUDIO_ES )
         {
             bo_add_fourcc( hdlr, "soun" );
@@ -516,11 +523,19 @@ static void Close( vlc_object_t * p_this )
         {
             bo_add_fourcc( hdlr, "vide" );
         }
-        for( i = 0; i < 3; i++ )
+
+        bo_add_32be( hdlr, 0 );         // reserved
+        bo_add_32be( hdlr, 0 );         // reserved
+        bo_add_32be( hdlr, 0 );         // reserved
+
+        if( p_stream->p_fmt->i_cat == AUDIO_ES )
         {
-            bo_add_32be( hdlr, 0 );     // reserved
+            bo_add_mem( hdlr, 13, "SoundHandler" );
         }
-        bo_add_mem( hdlr, 2, "?" );
+        else
+        {
+            bo_add_mem( hdlr, 13, "VideoHandler" );
+        }
 
         box_fix( hdlr );
         box_gather( mdia, hdlr );
@@ -608,12 +623,15 @@ static void Close( vlc_object_t * p_this )
                 bo_add_8( soun, 0 );        // reserved;
             }
             bo_add_16be( soun, 1 );         // data-reference-index
-            bo_add_32be( soun, 0 );         // reserved;
-            bo_add_32be( soun, 0 );         // reserved;
+
+            /* SoundDescriptionV1 */
+            bo_add_16be( soun, 1 );         // version;
+            bo_add_16be( soun, 0 );         // revision level (0)
+            bo_add_32be( soun, 0 );         // vendor
             bo_add_16be( soun, p_stream->p_fmt->i_channels );   // channel-count
             bo_add_16be( soun, 16);         // FIXME sample size
-            bo_add_16be( soun, 0 );         // predefined
-            bo_add_16be( soun, 0 );         // reserved
+            bo_add_16be( soun, -2 );        // compression id
+            bo_add_16be( soun, 0 );         // packet size (0)
             bo_add_16be( soun, p_stream->p_fmt->i_sample_rate ); // sampleratehi
             bo_add_16be( soun, 0 );                              // sampleratelo
 
@@ -677,12 +695,15 @@ static void Close( vlc_object_t * p_this )
             bo_add_32be( vide, 0x00480000 );                // h 72dpi
             bo_add_32be( vide, 0x00480000 );                // v 72dpi
 
-            bo_add_32be( vide, 0 );         // reserved
-            bo_add_16be( vide, 1 );         // predefined
+            bo_add_32be( vide, 0 );         // data size, always 0
+            bo_add_16be( vide, 1 );         // frames count per sample
+
+            // compressor name;
             for( i = 0; i < 32; i++ )
             {
-                bo_add_8( vide, 0 );        // compressor name;
+                bo_add_8( vide, 0 );
             }
+
             bo_add_16be( vide, 0x18 );      // depth
             bo_add_16be( vide, 0xffff );    // predefined
 
@@ -724,8 +745,10 @@ static void Close( vlc_object_t * p_this )
             i_chunk_count++;
         }
 
-//        if( p_sys->i_pos >= 0xffffffff )
+        /* chunk offset table */
+        if( p_sys->i_pos >= (((uint64_t)0x1) << 32) )
         {
+            /* 64 bits version */
             bo_t *co64;
             bo_t *stsc;
 
@@ -747,7 +770,9 @@ static void Close( vlc_object_t * p_this )
 
                 while( i < p_stream->i_entry_count )
                 {
-                    if( i + 1 < p_stream->i_entry_count && p_stream->entry[i].i_pos + p_stream->entry[i].i_size != p_stream->entry[i + 1].i_pos )
+                    if( i + 1 < p_stream->i_entry_count &&
+                        p_stream->entry[i].i_pos + p_stream->entry[i].i_size
+                        != p_stream->entry[i + 1].i_pos )
                     {
                         i++;
                         break;
@@ -767,10 +792,52 @@ static void Close( vlc_object_t * p_this )
             box_fix( stsc );
             box_gather( stbl, stsc );
         }
-//        else
-//        {
-//              FIXME implement it
-//        }
+        else
+        {
+            /* 32 bits version */
+            bo_t *stco;
+            bo_t *stsc;
+
+            unsigned int  i_chunk;
+
+            msg_Dbg( p_mux, "creating %d chunk (stco)", i_chunk_count );
+
+            stco = box_full_new( "stco", 0, 0 );
+            bo_add_32be( stco, i_chunk_count );
+
+            stsc = box_full_new( "stsc", 0, 0 );
+            bo_add_32be( stsc, i_chunk_count );     // entry-count
+            for( i_chunk = 0, i = 0; i < p_stream->i_entry_count; i_chunk++ )
+            {
+                int i_first;
+                bo_add_32be( stco, p_stream->entry[i].i_pos );
+
+                i_first = i;
+
+                while( i < p_stream->i_entry_count )
+                {
+                    if( i + 1 < p_stream->i_entry_count &&
+                        p_stream->entry[i].i_pos + p_stream->entry[i].i_size
+                        != p_stream->entry[i + 1].i_pos )
+                    {
+                        i++;
+                        break;
+                    }
+
+                    i++;
+                }
+                bo_add_32be( stsc, 1 + i_chunk );   // first-chunk
+                bo_add_32be( stsc, i - i_first ) ;  // samples-per-chunk
+                bo_add_32be( stsc, 1 );             // sample-descr-index
+            }
+            /* append stco to stbl */
+            box_fix( stco );
+            box_gather( stbl, stco );
+
+            /* append stsc to stbl */
+            box_fix( stsc );
+            box_gather( stbl, stsc );
+        }
 
 
         /* add stts */
@@ -1102,6 +1169,47 @@ static void bo_add_mem( bo_t *p_bo, int i_size, uint8_t *p_mem )
         bo_add_8( p_bo, p_mem[i] );
     }
 }
+
+static void bo_add_descr( bo_t *p_bo, uint8_t tag, uint32_t i_size )
+{
+    uint32_t i_length;
+    uint8_t  vals[4];
+
+    i_length = i_size;
+    vals[3] = (unsigned char)(i_length & 0x7f);
+    i_length >>= 7;
+    vals[2] = (unsigned char)((i_length & 0x7f) | 0x80); 
+    i_length >>= 7;
+    vals[1] = (unsigned char)((i_length & 0x7f) | 0x80); 
+    i_length >>= 7;
+    vals[0] = (unsigned char)((i_length & 0x7f) | 0x80);
+
+    bo_add_8( p_bo, tag );
+
+    if( i_size < 0x00000080 )
+    {
+        bo_add_8( p_bo, vals[3] );
+    }
+    else if( i_size < 0x00004000 )
+    {
+        bo_add_8( p_bo, vals[2] );
+        bo_add_8( p_bo, vals[3] );
+    }
+    else if( i_size < 0x00200000 )
+    {
+        bo_add_8( p_bo, vals[1] );
+        bo_add_8( p_bo, vals[2] );
+        bo_add_8( p_bo, vals[3] );
+    }
+    else if( i_size < 0x10000000 )
+    {
+        bo_add_8( p_bo, vals[0] );
+        bo_add_8( p_bo, vals[1] );
+        bo_add_8( p_bo, vals[2] );
+        bo_add_8( p_bo, vals[3] );
+    }
+}
+
 static void bo_add_bo( bo_t *p_bo, bo_t *p_bo2 )
 {
     int i;
