@@ -62,6 +62,7 @@ static int Control  ( sout_mux_t *, int, va_list );
 static int AddStream( sout_mux_t *, sout_input_t * );
 static int DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
+static int MuxBlock ( sout_mux_t *, sout_input_t * );
 
 static block_t *OggCreateHeader( sout_mux_t *, mtime_t );
 static block_t *OggCreateFooter( sout_mux_t *, mtime_t );
@@ -160,14 +161,8 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
         else return -1;
 
     }
-    if( pi_stream )
-    {
-        *pi_stream = i_stream;
-    }
-    if( pi_dts )
-    {
-        *pi_dts = i_dts;
-    }
+    if( pi_stream ) *pi_stream = i_stream;
+    if( pi_dts ) *pi_dts = i_dts;
     return i_stream;
 }
 
@@ -497,6 +492,11 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* flush all remaining data */
     if( p_input->p_sys )
     {
+        if( !p_stream->b_new )
+        {
+            while( p_input->p_fifo->i_depth ) MuxBlock( p_mux, p_input );
+        }
+
         if( !p_stream->b_new &&
             ( p_og = OggStreamFlush( p_mux, &p_stream->os, 0 ) ) )
         {
@@ -908,107 +908,105 @@ static int Mux( sout_mux_t *p_mux )
 
     for( ;; )
     {
-        sout_input_t *p_input;
-        ogg_stream_t *p_stream;
-        block_t *p_data;
-        ogg_packet op;
-
-        if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
-        {
-            return VLC_SUCCESS;
-        }
-
-        p_input  = p_mux->pp_inputs[i_stream];
-        p_stream = (ogg_stream_t*)p_input->p_sys;
-        p_data   = block_FifoGet( p_input->p_fifo );
-
-        if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) &&
-            p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) &&
-            p_stream->i_fourcc != VLC_FOURCC( 's', 'p', 'x', ' ' ) &&
-            p_stream->i_fourcc != VLC_FOURCC( 't', 'h', 'e', 'o' ) )
-        {
-            p_data = block_Realloc( p_data, 1, p_data->i_buffer );
-            p_data->p_buffer[0] = PACKET_IS_SYNCPOINT;      // FIXME
-        }
-
-        op.packet   = p_data->p_buffer;
-        op.bytes    = p_data->i_buffer;
-        op.b_o_s    = 0;
-        op.e_o_s    = 0;
-        op.packetno = p_stream->i_packet_no++;
-
-        if( p_stream->i_cat == AUDIO_ES )
-        {
-            if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
-                p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) ||
-                p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
-            {
-                /* number of sample from begining + current packet */
-                op.granulepos =
-                    ( i_dts - p_sys->i_start_dts + p_data->i_length ) *
-                    (mtime_t)p_input->p_fmt->audio.i_rate / I64C(1000000);
-            }
-            else if( p_stream->p_oggds_header )
-            {
-                /* number of sample from begining */
-                op.granulepos = ( i_dts - p_sys->i_start_dts ) *
-                    p_stream->p_oggds_header->i_samples_per_unit /
-                    I64C(1000000);
-            }
-        }
-        else if( p_stream->i_cat == VIDEO_ES )
-        {
-            if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
-            {
-                /* FIXME, we assume only keyframes */
-                op.granulepos = ( ( i_dts - p_sys->i_start_dts ) *
-                    p_input->p_fmt->video.i_frame_rate /
-                    p_input->p_fmt->video.i_frame_rate_base /
-                    I64C(1000000) ) << p_stream->i_keyframe_granule_shift;
-            }
-            else if( p_stream->p_oggds_header )
-                op.granulepos = ( i_dts - p_sys->i_start_dts ) * I64C(10) /
-                    p_stream->p_oggds_header->i_time_unit;
-        }
-        else if( p_stream->i_cat == SPU_ES )
-        {
-            /* granulepos is in milisec */
-            op.granulepos = ( i_dts - p_sys->i_start_dts ) / 1000;
-        }
-
-        ogg_stream_packetin( &p_stream->os, &op );
-
-        if( p_stream->i_cat == SPU_ES ||
-            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
-        {
-            /* Subtitles or Speex packets are quite small so they 
-             * need to be flushed to be sent on time */
-            p_og = OggStreamFlush( p_mux, &p_stream->os, p_data->i_dts );
-        }
-        else
-        {
-            p_og = OggStreamPageOut( p_mux, &p_stream->os, p_data->i_dts );
-        }
-
-        if( p_og )
-        {
-            OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
-            p_stream->i_dts = -1;
-            p_stream->i_length = 0;
-
-            sout_AccessOutWrite( p_mux->p_access, p_og );
-        }
-        else
-        {
-            if( p_stream->i_dts < 0 )
-            {
-                p_stream->i_dts = p_data->i_dts;
-            }
-            p_stream->i_length += p_data->i_length;
-        }
-
-        block_Release( p_data );
+        if( MuxGetStream( p_mux, &i_stream, 0 ) < 0 ) return VLC_SUCCESS;
+        MuxBlock( p_mux, p_mux->pp_inputs[i_stream] );
     }
 
+    return VLC_SUCCESS;
+}
+
+static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
+    block_t *p_data = block_FifoGet( p_input->p_fifo );
+    block_t *p_og = NULL;
+    ogg_packet op;
+
+    if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 's', 'p', 'x', ' ' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+    {
+        p_data = block_Realloc( p_data, 1, p_data->i_buffer );
+        p_data->p_buffer[0] = PACKET_IS_SYNCPOINT;      // FIXME
+    }
+
+    op.packet   = p_data->p_buffer;
+    op.bytes    = p_data->i_buffer;
+    op.b_o_s    = 0;
+    op.e_o_s    = 0;
+    op.packetno = p_stream->i_packet_no++;
+
+    if( p_stream->i_cat == AUDIO_ES )
+    {
+        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
+            p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) ||
+            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
+        {
+            /* number of sample from begining + current packet */
+            op.granulepos =
+                ( p_data->i_dts - p_sys->i_start_dts + p_data->i_length ) *
+                (mtime_t)p_input->p_fmt->audio.i_rate / I64C(1000000);
+        }
+        else if( p_stream->p_oggds_header )
+        {
+            /* number of sample from begining */
+            op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) *
+                p_stream->p_oggds_header->i_samples_per_unit / I64C(1000000);
+        }
+    }
+    else if( p_stream->i_cat == VIDEO_ES )
+    {
+        if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+        {
+            /* FIXME, we assume only keyframes */
+            op.granulepos = ( ( p_data->i_dts - p_sys->i_start_dts ) *
+                p_input->p_fmt->video.i_frame_rate /
+                p_input->p_fmt->video.i_frame_rate_base /
+                I64C(1000000) ) << p_stream->i_keyframe_granule_shift;
+        }
+        else if( p_stream->p_oggds_header )
+            op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) * I64C(10) /
+                p_stream->p_oggds_header->i_time_unit;
+    }
+    else if( p_stream->i_cat == SPU_ES )
+    {
+        /* granulepos is in milisec */
+        op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) / 1000;
+    }
+
+    ogg_stream_packetin( &p_stream->os, &op );
+
+    if( p_stream->i_cat == SPU_ES ||
+        p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
+    {
+        /* Subtitles or Speex packets are quite small so they 
+         * need to be flushed to be sent on time */
+        p_og = OggStreamFlush( p_mux, &p_stream->os, p_data->i_dts );
+    }
+    else
+    {
+        p_og = OggStreamPageOut( p_mux, &p_stream->os, p_data->i_dts );
+    }
+
+    if( p_og )
+    {
+        OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
+        p_stream->i_dts = -1;
+        p_stream->i_length = 0;
+
+        sout_AccessOutWrite( p_mux->p_access, p_og );
+    }
+    else
+    {
+        if( p_stream->i_dts < 0 )
+        {
+            p_stream->i_dts = p_data->i_dts;
+        }
+        p_stream->i_length += p_data->i_length;
+    }
+
+    block_Release( p_data );
     return VLC_SUCCESS;
 }
