@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.15 2003/03/06 15:30:42 sigmunau Exp $
+ * $Id: m3u.c,v 1.16 2003/03/22 14:35:03 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -91,30 +91,28 @@ static int Activate( vlc_object_t * p_this )
     p_input->pf_demux = Demux;
     p_input->pf_rewind = NULL;
 
-    /* Check for m3u/asx file extension */
+    /* Check for m3u/asx file extension or if the demux has been forced */
     psz_ext = strrchr ( p_input->psz_name, '.' );
-    if( psz_ext )
+
+    if( ( psz_ext && !strcasecmp( psz_ext, ".m3u") ) ||
+        ( p_input->psz_demux && !strcmp(p_input->psz_demux, "m3u") ) )
     {
-        if( !strcasecmp( psz_ext, ".m3u") ||
-            ( p_input->psz_demux && !strncmp(p_input->psz_demux, "m3u", 3) ) )
-        {
-            i_type = TYPE_M3U;
-        }
-        else if( !strcasecmp( psz_ext, ".asx") ||
-                 ( p_input->psz_demux && !strncmp(p_input->psz_demux, "asx", 3) ) )
-        {
-            i_type = TYPE_ASX;
-        }
-        else if( !strcasecmp( psz_ext, ".html") ||
-                 ( p_input->psz_demux && !strncmp(p_input->psz_demux, "html", 4) ) )
-        {
-            i_type = TYPE_HTML;
-        }
-        else if( !strcasecmp( psz_ext, ".pls") ||
-                 ( p_input->psz_demux && !strncmp(p_input->psz_demux, "pls", 3) ) )
-        {
-            i_type = TYPE_PLS;
-        }
+        i_type = TYPE_M3U;
+    }
+    else if( ( psz_ext && !strcasecmp( psz_ext, ".asx") ) ||
+             ( p_input->psz_demux && !strcmp(p_input->psz_demux, "asx") ) )
+    {
+        i_type = TYPE_ASX;
+    }
+    else if( ( psz_ext && !strcasecmp( psz_ext, ".html") ) ||
+             ( p_input->psz_demux && !strcmp(p_input->psz_demux, "html") ) )
+    {
+        i_type = TYPE_HTML;
+    }
+    else if( ( psz_ext && !strcasecmp( psz_ext, ".pls") ) ||
+             ( p_input->psz_demux && !strcmp(p_input->psz_demux, "pls") ) )
+    {
+        i_type = TYPE_PLS;
     }
 
     /* we had no luck looking at the file extention, so we have a look
@@ -153,6 +151,7 @@ static int Activate( vlc_object_t * p_this )
             }
         }
     }
+
     /* Allocate p_m3u */
     if( !( p_m3u = malloc( sizeof( demux_sys_t ) ) ) )
     {
