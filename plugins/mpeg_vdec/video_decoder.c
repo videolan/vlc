@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_decoder.c,v 1.7 2002/04/15 23:04:08 massiot Exp $
+ * $Id: video_decoder.c,v 1.8 2002/05/13 23:15:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -117,7 +117,7 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec )
  *****************************************************************************/
 void vdec_InitThread( vdec_thread_t * p_vdec )
 {
-#if !defined(SYS_BEOS)
+#if !defined(SYS_BEOS) && !defined(SYS_DARWIN)
 #   if VDEC_NICE
     /* Re-nice ourself - otherwise we would steal CPU time from the video
      * output, which would make a poor display. */
