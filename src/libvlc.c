@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.85 2003/05/10 13:40:37 titer Exp $
+ * $Id: libvlc.c,v 1.86 2003/05/11 13:14:04 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -273,7 +273,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     p_help_module = vlc_object_create( p_vlc, VLC_OBJECT_MODULE );
     if( p_help_module == NULL )
     {
-        //module_EndBank( p_vlc );
+        /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -287,7 +287,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        //module_EndBank( p_vlc );
+        /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -316,7 +316,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        //module_EndBank( p_vlc );
+        /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
     }
@@ -394,7 +394,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
     if( b_exit )
     {
-        //module_EndBank( p_vlc );
+        /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
     }
@@ -417,7 +417,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
                  "that they are valid.\nPress the RETURN key to continue..." );
         getchar();
 #endif
-        //module_EndBank( p_vlc );
+        /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -513,7 +513,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         {
             module_Unneed( p_vlc, p_vlc->p_memcpy_module );
         }
-        //module_EndBank( p_vlc );
+        /*module_EndBank( p_vlc );*/
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -641,7 +641,7 @@ int VLC_Destroy( int i_object )
     /*
      * XXX: Free module bank !
      */
-    //module_EndBank( p_vlc );
+    /*module_EndBank( p_vlc );*/
 
     /*
      * System specific cleaning code
