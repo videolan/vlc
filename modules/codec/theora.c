@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include <vlc/sout.h>
 
 #include <ogg/ogg.h>
 
@@ -80,6 +81,11 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ENC_QUALITY_TEXT N_("Encoding quality")
+#define ENC_QUALITY_LONGTEXT N_( \
+  "Allows you to specify a quality between 1 (low) and 10 (high), instead " \
+  "of specifying a particular bitrate. This will produce a VBR stream." )
+
 vlc_module_begin();
     set_description( _("Theora video decoder") );
     set_capability( "decoder", 100 );
@@ -97,7 +103,15 @@ vlc_module_begin();
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
     add_shortcut( "theora" );
+
+#   define ENC_CFG_PREFIX "sout-theora-"
+    add_integer( ENC_CFG_PREFIX "quality", 2, NULL, ENC_QUALITY_TEXT,
+                 ENC_QUALITY_LONGTEXT, VLC_FALSE );
 vlc_module_end();
+
+static const char *ppsz_enc_options[] = {
+    "quality", NULL
+};
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -440,6 +454,8 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
+    vlc_value_t val;
+    int i_quality;
 
     if( p_enc->fmt_out.i_codec != VLC_FOURCC('t','h','e','o') &&
         !p_enc->b_force )
@@ -468,6 +484,13 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->pf_encode_video = Encode;
     p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
     p_enc->fmt_out.i_codec = VLC_FOURCC('t','h','e','o');
+
+    sout_ParseCfg( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+
+    var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
+    i_quality = val.i_int;
+    if( i_quality > 10 ) i_quality = 10;
+    if( i_quality < 0 ) i_quality = 0;
 
 #define frame_x_offset 0
 #define frame_y_offset 0
@@ -498,7 +521,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     }
 
     p_sys->ti.target_bitrate = p_enc->fmt_out.i_bitrate;
-    p_sys->ti.quality = video_q;
+    p_sys->ti.quality = ((float)i_quality) * 6.3;
 
     p_sys->ti.dropframes_p = 0;
     p_sys->ti.quick_p = 1;
