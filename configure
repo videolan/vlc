@@ -7671,7 +7671,7 @@ EOF
  
     BUILTINS="${BUILTINS} xvideo"
     LIB_XVIDEO="-L$x_libraries -lX11 -lXext -lXv"
-    CFLAGS_X11="-I$x_includes"
+    CFLAGS_XVIDEO="-I$x_includes"
   
   CPPFLAGS=$saved_CPPFLAGS
 else
@@ -7776,6 +7776,7 @@ if test "${enable_plugins+set}" = set; then
      PLUGINS=
    fi
 fi
+
 
 
 
@@ -8101,6 +8102,7 @@ s%@CFLAGS_GTK@%$CFLAGS_GTK%g
 s%@CFLAGS_MAD@%$CFLAGS_MAD%g
 s%@CFLAGS_SDL@%$CFLAGS_SDL%g
 s%@CFLAGS_X11@%$CFLAGS_X11%g
+s%@CFLAGS_XVIDEO@%$CFLAGS_XVIDEO%g
 s%@OBJ_DVD@%$OBJ_DVD%g
 s%@OBJ_LIBDVDCSS@%$OBJ_LIBDVDCSS%g
 s%@NEED_LIBDVDCSS@%$NEED_LIBDVDCSS%g

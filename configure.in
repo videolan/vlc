@@ -1179,7 +1179,7 @@ if test x$enable_xvideo != xno &&
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     BUILTINS="${BUILTINS} xvideo"
     LIB_XVIDEO="-L$x_libraries -lX11 -lXext -lXv"
-    CFLAGS_X11="-I$x_includes"
+    CFLAGS_XVIDEO="-I$x_includes"
   ]
   CPPFLAGS=$saved_CPPFLAGS)
 fi
@@ -1284,6 +1284,7 @@ AC_SUBST(CFLAGS_GTK)
 AC_SUBST(CFLAGS_MAD)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
+AC_SUBST(CFLAGS_XVIDEO)
 
 AC_SUBST(OBJ_DVD)
 AC_SUBST(OBJ_LIBDVDCSS)

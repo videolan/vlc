@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.8 2001/12/10 04:53:10 sam Exp $
+ * $Id: modules_inner.h,v 1.9 2001/12/11 15:31:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,7 +24,7 @@
 /*****************************************************************************
  * Check that we are within a module.
  *****************************************************************************/
-#ifndef MODULE_NAME
+#if !( defined( MODULE_NAME ) || defined( MAKE_DEP ) )
 #  error "You must define MODULE_NAME before using modules_inner.h !"
 #endif
 
