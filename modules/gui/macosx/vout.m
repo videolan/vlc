@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.58 2003/10/29 02:13:04 hartman Exp $
+ * $Id: vout.m,v 1.59 2003/10/29 11:54:48 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -143,8 +143,8 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->p_matrix = (MatrixRecordPtr)malloc( sizeof(MatrixRecord) );
     p_vout->p_sys->p_fullscreen_state = NULL;
 
-    p_vout->p_sys->b_mouse_pointer_visible = YES;
-    p_vout->p_sys->b_mouse_moved = YES;
+    p_vout->p_sys->b_mouse_pointer_visible = VLC_TRUE;
+    p_vout->p_sys->b_mouse_moved = VLC_TRUE;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
 
     if( value_drawable.i_int != 0 )
@@ -155,12 +155,12 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         p_vout->p_sys->rect.top = 0 ;
         p_vout->p_sys->rect.bottom = 0 ;
 
-        p_vout->p_sys->isplugin = 1 ;
+        p_vout->p_sys->isplugin = VLC_TRUE ;
     
     } else
     {
         p_vout->p_sys->mask = NULL;
-        p_vout->p_sys->isplugin = 0 ;
+        p_vout->p_sys->isplugin = VLC_FALSE ;
     }
 
     /* set window size */
@@ -406,16 +406,16 @@ static int vout_Manage( vout_thread_t *p_vout )
         {
             val1.i_int = 0;
             var_Set( p_vout->p_vlc, "drawableredraw", val1 );
+            QTScaleMatrix( p_vout );
             SetDSequenceMask( p_vout->p_sys->i_seq , p_vout->p_sys->mask );
         }
         else
         {
+            QTScaleMatrix( p_vout );
+            SetDSequenceMatrix( p_vout->p_sys->i_seq, 
+                                p_vout->p_sys->p_matrix );
             p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
         }
-    
-        QTScaleMatrix( p_vout );
-        SetDSequenceMatrix( p_vout->p_sys->i_seq, 
-                            p_vout->p_sys->p_matrix );
     }
 
     /* hide/show mouse cursor 
@@ -988,7 +988,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_value_t val;
     unsigned int i_pressed_modifiers = 0;
 
-    i_pressed_modifiers = GetCurrentKeyModifiers();
+    i_pressed_modifiers = [o_event modifierFlags];
 
     if( i_pressed_modifiers & NSShiftKeyMask )
         val.i_int |= KEY_MODIFIER_SHIFT;
