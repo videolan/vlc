@@ -48,10 +48,17 @@ typedef int   ( intf_sys_create_t )   ( p_intf_thread_t p_intf );
 typedef void  ( intf_sys_destroy_t )  ( p_intf_thread_t p_intf );
 typedef void  ( intf_sys_manage_t )   ( p_intf_thread_t p_intf );
 
+
+typedef struct _keyparam
+{
+    int key;
+    int param;
+} keyparm;
+
 typedef struct _key
 {
     int received_key;
-    int forwarded_key;
+    keyparm forwarded;
     struct _key *  next;
 } intf_key;
 
@@ -81,6 +88,9 @@ typedef struct intf_thread_s
     p_vout_thread_t     p_vout;
     p_input_thread_t    p_input;
 
+    /* Specific functions */
+    keyparm (*p_intf_getKey)(struct intf_thread_s *p_intf, int r_key) ;
+    
 } intf_thread_t;
 
 /*****************************************************************************
@@ -93,9 +103,11 @@ void            intf_Destroy            ( intf_thread_t * p_intf );
 int             intf_SelectChannel      ( intf_thread_t * p_intf, int i_channel );
 int             intf_ProcessKey         ( intf_thread_t * p_intf, int i_key );
 
-void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key);
+void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key, int param);
 
-int intf_getKey( intf_thread_t *p_intf, int r_key);
+void intf_AssignSKey( intf_thread_t *p_intf, int r_key, int f_key);
+
+keyparm intf_getKey( intf_thread_t *p_intf, int r_key);
 
 void intf_AssignNormalKeys( intf_thread_t *p_intf);
 

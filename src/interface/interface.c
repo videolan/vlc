@@ -48,6 +48,7 @@
 #include "interface.h"
 #include "intf_cmd.h"
 #include "intf_console.h"
+#include "keystrokes.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -123,253 +124,273 @@ intf_thread_t* intf_Create( void )
         }
     }
 
-    if( i_best_score == 0 )
-    {
-        free( p_intf );
-        return( NULL );
-    }
+	    if( i_best_score == 0 )
+	    {
+		free( p_intf );
+		return( NULL );
+	    }
 
-    /* Get the plugin functions */
-    ( (intf_getplugin_t *)
-      p_main->p_bank->p_info[ i_best_index ]->intf_GetPlugin )( p_intf );
+	    /* Get the plugin functions */
+	    ( (intf_getplugin_t *)
+	      p_main->p_bank->p_info[ i_best_index ]->intf_GetPlugin )( p_intf );
 
-    /* Initialize structure */
-    p_intf->b_die =     0;
-    p_intf->p_vout =    NULL;
-    p_intf->p_input =   NULL;
-    p_intf->p_keys =    NULL;
+	    /* Initialize structure */
+	    p_intf->b_die =     0;
+	    p_intf->p_vout =    NULL;
+	    p_intf->p_input =   NULL;
+	    p_intf->p_keys =    NULL;
 
-    /* Load channels - the pointer will be set to NULL on failure. The
-     * return value is ignored since the program can work without
-     * channels */
-    LoadChannels( p_intf, main_GetPszVariable( INTF_CHANNELS_VAR, INTF_CHANNELS_DEFAULT ));
+	    /* Load channels - the pointer will be set to NULL on failure. The
+	     * return value is ignored since the program can work without
+	     * channels */
+	    LoadChannels( p_intf, main_GetPszVariable( INTF_CHANNELS_VAR, INTF_CHANNELS_DEFAULT ));
 
-    /* Start interfaces */
-    p_intf->p_console = intf_ConsoleCreate();
-    if( p_intf->p_console == NULL )
-    {
-        intf_ErrMsg("error: can't create control console\n");
-        free( p_intf );
-        return( NULL );
-    }
-    if( p_intf->p_sys_create( p_intf ) )
-    {
-        intf_ErrMsg("error: can't create interface\n");
-        intf_ConsoleDestroy( p_intf->p_console );
-        free( p_intf );
-        return( NULL );
-    }
+	    /* Start interfaces */
+	    p_intf->p_console = intf_ConsoleCreate();
+	    if( p_intf->p_console == NULL )
+	    {
+		intf_ErrMsg("error: can't create control console\n");
+		free( p_intf );
+		return( NULL );
+	    }
+	    if( p_intf->p_sys_create( p_intf ) )
+	    {
+		intf_ErrMsg("error: can't create interface\n");
+		intf_ConsoleDestroy( p_intf->p_console );
+		free( p_intf );
+		return( NULL );
+	    }
 
-    intf_Msg("Interface initialized\n");
-    return( p_intf );
-}
+	    intf_Msg("Interface initialized\n");
+	    return( p_intf );
+	}
 
-/*****************************************************************************
- * intf_Run
- *****************************************************************************
- * Initialization script and main interface loop.
- *****************************************************************************/
-void intf_Run( intf_thread_t *p_intf )
-{
-    if( p_main->p_playlist->p_list )
-    {
-        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, NULL, 0, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
-    }
-    /* Execute the initialization script - if a positive number is returned,
-     * the script could be executed but failed */
-    else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
-    {
-        intf_ErrMsg("warning: error(s) during startup script\n");
-    }
+	/*****************************************************************************
+	 * intf_Run
+	 *****************************************************************************
+	 * Initialization script and main interface loop.
+	 *****************************************************************************/
+	void intf_Run( intf_thread_t *p_intf )
+	{
+	    if( p_main->p_playlist->p_list )
+	    {
+		p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, NULL, 0, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
+	    }
+	    /* Execute the initialization script - if a positive number is returned,
+	     * the script could be executed but failed */
+	    else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
+	    {
+		intf_ErrMsg("warning: error(s) during startup script\n");
+	    }
 
-    /* Main loop */
-    while(!p_intf->b_die)
-    {
-        /* Flush waiting messages */
-        intf_FlushMsg();
+	    /* Main loop */
+	    while(!p_intf->b_die)
+	    {
+		/* Flush waiting messages */
+		intf_FlushMsg();
 
-        /* Manage specific interface */
-        p_intf->p_sys_manage( p_intf );
+		/* Manage specific interface */
+		p_intf->p_sys_manage( p_intf );
 
-        /* Check attached threads status */
-        if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
-        {
-            /* FIXME: add aout error detection ?? */
-            p_intf->b_die = 1;
-        }
-        if( (p_intf->p_input != NULL) && p_intf->p_input->b_error )
-        {
-            input_DestroyThread( p_intf->p_input, NULL );
-            p_intf->p_input = NULL;
-            intf_DbgMsg("Input thread destroyed\n");
-        }
+		/* Check attached threads status */
+		if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
+		{
+		    /* FIXME: add aout error detection ?? */
+		    p_intf->b_die = 1;
+		}
+		if( (p_intf->p_input != NULL) && p_intf->p_input->b_error )
+		{
+		    input_DestroyThread( p_intf->p_input, NULL );
+		    p_intf->p_input = NULL;
+		    intf_DbgMsg("Input thread destroyed\n");
+		}
 
-        /* Sleep to avoid using all CPU - since some interfaces needs to access
-         * keyboard events, a 100ms delay is a good compromise */
-        msleep( INTF_IDLE_SLEEP );
-    }
-}
+		/* Sleep to avoid using all CPU - since some interfaces needs to access
+		 * keyboard events, a 100ms delay is a good compromise */
+		msleep( INTF_IDLE_SLEEP );
+	    }
+	}
 
-/*****************************************************************************
- * intf_Destroy: clean interface after main loop
- *****************************************************************************
- * This function destroys specific interfaces and close output devices.
- *****************************************************************************/
-void intf_Destroy( intf_thread_t *p_intf )
-{
-    p_intf_key  p_cur;
-    p_intf_key  p_next;
-    /* Destroy interfaces */
-    p_intf->p_sys_destroy( p_intf );
-    intf_ConsoleDestroy( p_intf->p_console );
+	/*****************************************************************************
+	 * intf_Destroy: clean interface after main loop
+	 *****************************************************************************
+	 * This function destroys specific interfaces and close output devices.
+	 *****************************************************************************/
+	void intf_Destroy( intf_thread_t *p_intf )
+	{
+	    p_intf_key  p_cur;
+	    p_intf_key  p_next;
+	    /* Destroy interfaces */
+	    p_intf->p_sys_destroy( p_intf );
+	    intf_ConsoleDestroy( p_intf->p_console );
 
-    /* Unload channels */
-    UnloadChannels( p_intf );
+	    /* Unload channels */
+	    UnloadChannels( p_intf );
 
-    /* Destroy keymap */
-    
-    p_cur = p_intf->p_keys;
-    while( p_cur != NULL)
-    {
-        p_next = p_cur->next;
-        free(p_cur);
-        p_cur = p_next;
-     }
-     
-    
-    /* Free structure */
-    free( p_intf );
-}
+	    /* Destroy keymap */
+	    
+	    p_cur = p_intf->p_keys;
+	    while( p_cur != NULL)
+	    {
+		p_next = p_cur->next;
+		free(p_cur);
+		p_cur = p_next;
+	     }
+	     
+	    
+	    /* Free structure */
+	    free( p_intf );
+	}
 
-/*****************************************************************************
- * intf_SelectChannel: change channel
- *****************************************************************************
- * Kill existing input, if any, and try to open a new one, using an input
- * configuration table.
- *****************************************************************************/
-int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
-{
-    intf_channel_t *    p_channel;                                /* channel */
+	/*****************************************************************************
+	 * intf_SelectChannel: change channel
+	 *****************************************************************************
+	 * Kill existing input, if any, and try to open a new one, using an input
+	 * configuration table.
+	 *****************************************************************************/
+	int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
+	{
+	    intf_channel_t *    p_channel;                                /* channel */
 
-    /* Look for channel in array */
-    if( p_intf->p_channel != NULL )
-    {
-        for( p_channel = p_intf->p_channel; p_channel->i_channel != -1; p_channel++ )
-        {
-            if( p_channel->i_channel == i_channel )
-            {
-                /*
-                 * Change channel
-                 */
+	    /* Look for channel in array */
+	    if( p_intf->p_channel != NULL )
+	    {
+		for( p_channel = p_intf->p_channel; p_channel->i_channel != -1; p_channel++ )
+		{
+		    if( p_channel->i_channel == i_channel )
+		    {
+			/*
+			 * Change channel
+			 */
 
-                /* Kill existing input, if any */
-                if( p_intf->p_input != NULL )
-                {
-                    input_DestroyThread( p_intf->p_input, NULL );
-                }
+			/* Kill existing input, if any */
+			if( p_intf->p_input != NULL )
+			{
+			    input_DestroyThread( p_intf->p_input, NULL );
+			}
 
-                intf_Msg("Channel %d: %s\n", i_channel, p_channel->psz_description );
+			intf_Msg("Channel %d: %s\n", i_channel, p_channel->psz_description );
 
-                /* Open a new input */
-                p_intf->p_input = input_CreateThread( p_channel->i_input_method, p_channel->psz_input_source,
-                                                      p_channel->i_input_port, p_channel->i_input_vlan,
-                                                      p_intf->p_vout, p_main->p_aout, NULL );
-                return( p_intf->p_input == NULL );
-            }
-        }
-    }
+			/* Open a new input */
+			p_intf->p_input = input_CreateThread( p_channel->i_input_method, p_channel->psz_input_source,
+							      p_channel->i_input_port, p_channel->i_input_vlan,
+							      p_intf->p_vout, p_main->p_aout, NULL );
+			return( p_intf->p_input == NULL );
+		    }
+		}
+	    }
 
-    /* Channel does not exist */
-    intf_Msg("Channel %d does not exist\n", i_channel );
-    return( 1 );
-}
+	    /* Channel does not exist */
+	    intf_Msg("Channel %d does not exist\n", i_channel );
+	    return( 1 );
+	}
 
-/*****************************************************************************
- * intf_AssignKey: assign standartkeys                                       *
- *****************************************************************************
- * This function fills in the associative array that links the key pressed   *
- * and the key we use internally.                                            *
- ****************************************************************************/
+	/*****************************************************************************
+	 * intf_AssignKey: assign standartkeys                                       *
+	 *****************************************************************************
+	 * This function fills in the associative array that links the key pressed   *
+	 * and the key we use internally. Support one extra parameter.               *
+	 ****************************************************************************/
 
-void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key)
-{
-    p_intf_key  p_cur =  p_intf->p_keys;
-  
-    if( p_cur == NULL )
-    {
-        p_cur = (p_intf_key )(malloc ( sizeof( intf_key ) ) );
-        p_cur->received_key = r_key;
-        p_cur->forwarded_key = f_key;
-        p_cur->next = NULL;
-        p_intf->p_keys = p_cur;
-    } else {
-        while( p_cur->next != NULL && p_cur ->received_key != r_key)
-        {
-            p_cur = p_cur->next;
-        }
-        if( p_cur->next == NULL )
-        {   
-            p_cur->next  = ( p_intf_key )( malloc( sizeof( intf_key ) ) );
-            p_cur = p_cur->next;
-            p_cur->next = NULL;
-            p_cur->received_key = r_key;
-        }
-        p_cur->forwarded_key = f_key;
-    }        
-}
+	void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key, int param)
+	{
+	    p_intf_key  p_cur =  p_intf->p_keys;
+	  
+	    if( p_cur == NULL )
+	    {
+		p_cur = (p_intf_key )(malloc ( sizeof( intf_key ) ) );
+		p_cur->received_key = r_key;
+		p_cur->forwarded.key = f_key;
+		p_cur->forwarded.param = param; 
+		p_cur->next = NULL;
+		p_intf->p_keys = p_cur;
+	    } else {
+		while( p_cur->next != NULL && p_cur ->received_key != r_key)
+		{
+		    p_cur = p_cur->next;
+		}
+		if( p_cur->next == NULL )
+		{   
+		    p_cur->next  = ( p_intf_key )( malloc( sizeof( intf_key ) ) );
+		    p_cur = p_cur->next;
+		    p_cur->next = NULL;
+		    p_cur->forwarded.param = param; 
+		    p_cur->received_key = r_key;
+		}
+		p_cur->forwarded.key = f_key;
+	    }        
+	}
 
-
-int intf_getKey( intf_thread_t *p_intf, int r_key)
-{
-    p_intf_key current = p_intf->p_keys;
-    while(current != NULL && current->received_key != r_key)
-    {
-        
-        current = current->next;
-    }
-    if(current == NULL)
-       /* didn't find any key in the array */ 
-        return( -1 );
-    else
-        return( current->forwarded_key );
-    /* well, something went wrong */
-    return( -1 );
-}
+	/*****************************************************************************
+	 * intf_AssignSKey: assign standartkeys                                      *
+	 *****************************************************************************
+	 * This function fills in the associative array that links the key pressed   *
+	 * and the key we use internally.                                            *
+	 ****************************************************************************/
+	void intf_AssignSKey(intf_thread_t *p_intf, int r_key, int f_key)
+	{
+	    intf_AssignKey( p_intf, r_key, f_key, 0);
+	}
 
 
-/*****************************************************************************
- * intf_AssignNormalKeys: used for normal interfaces.
- *****************************************************************************
- * This function assign the basic key to the normal keys.
- *****************************************************************************/
+	/* Basic getKey function... */
+	keyparm intf_getKey( intf_thread_t *p_intf, int r_key)
+	{   
+	    keyparm reply;
+	    
+	    p_intf_key current = p_intf->p_keys;
+	    while(current != NULL && current->received_key != r_key)
+	    {    
+		current = current->next;
+	    }
+	    if(current == NULL)
+	    {   /* didn't find any key in the array */ 
+		reply.key=VLC_UNKNOWN;
+		reply.param=0;
+	    }
+	    else
+	    {
+		reply.key = current->forwarded.key;
+		reply.param = current->forwarded.param;
+	    }
+	    return reply;
+	}
+
+	/*****************************************************************************
+	 * intf_AssignNormalKeys: used for normal interfaces.
+	 *****************************************************************************
+	 * This function assign the basic key to the normal keys.
+	 *****************************************************************************/
 
 void intf_AssignNormalKeys( intf_thread_t *p_intf)
-{
-     intf_AssignKey( p_intf , 'q', 'Q');
-     intf_AssignKey( p_intf , 'Q', 'Q');
-     intf_AssignKey( p_intf ,  27, 'Q');
-     intf_AssignKey( p_intf ,   3, 'Q');
-     intf_AssignKey( p_intf , '0', '0');
-     intf_AssignKey( p_intf , '1', '1');
-     intf_AssignKey( p_intf , '2', '2');
-     intf_AssignKey( p_intf , '3', '3');
-     intf_AssignKey( p_intf , '4', '4');
-     intf_AssignKey( p_intf , '5', '5');
-     intf_AssignKey( p_intf , '6', '6');
-     intf_AssignKey( p_intf , '7', '7');
-     intf_AssignKey( p_intf , '8', '8');
-     intf_AssignKey( p_intf , '9', '9');
-     intf_AssignKey( p_intf , '0', '0');
-     intf_AssignKey( p_intf , '+', '+');
-     intf_AssignKey( p_intf , '-', '-');
-     intf_AssignKey( p_intf , 'm', 'M');
-     intf_AssignKey( p_intf , 'M', 'M');
-     intf_AssignKey( p_intf , 'g', 'g');
-     intf_AssignKey( p_intf , 'G', 'G');
-     intf_AssignKey( p_intf , 'c', 'c');
-     intf_AssignKey( p_intf , ' ', ' ');
-     intf_AssignKey( p_intf , 'i', 'i');
-     intf_AssignKey( p_intf , 's', 's');
+	{
+	    p_intf->p_intf_getKey = intf_getKey;
+
+	    intf_AssignSKey( p_intf , 'Q', VLC_QUIT);
+	    intf_AssignSKey( p_intf , 'q', VLC_QUIT);
+	    intf_AssignSKey( p_intf ,  27, VLC_QUIT);
+	    intf_AssignSKey( p_intf ,   3, VLC_QUIT);
+	    intf_AssignKey( p_intf , '0', VLC_CHANNEL, 0);
+	    intf_AssignKey( p_intf , '1', VLC_CHANNEL, 1);
+	    intf_AssignKey( p_intf , '2', VLC_CHANNEL, 2);
+	    intf_AssignKey( p_intf , '3', VLC_CHANNEL, 3);
+	    intf_AssignKey( p_intf , '4', VLC_CHANNEL, 4);
+	    intf_AssignKey( p_intf , '5', VLC_CHANNEL, 5);
+	    intf_AssignKey( p_intf , '6', VLC_CHANNEL, 6);
+	    intf_AssignKey( p_intf , '7', VLC_CHANNEL, 7);
+	    intf_AssignKey( p_intf , '8', VLC_CHANNEL, 8);
+	    intf_AssignKey( p_intf , '9', VLC_CHANNEL, 9);
+	    intf_AssignKey( p_intf , '0', VLC_CHANNEL, 0);
+	    intf_AssignSKey( p_intf , '+', VLC_LOUDER);
+	    intf_AssignSKey( p_intf , '-', VLC_QUIETER);
+	    intf_AssignSKey( p_intf , 'm', VLC_MUTE);
+	    intf_AssignSKey( p_intf , 'M', VLC_MUTE);
+	    intf_AssignSKey( p_intf , 'g', VLC_LESS_GAMMA);
+	    intf_AssignSKey( p_intf , 'G', VLC_MORE_GAMMA);
+	    intf_AssignSKey( p_intf , 'c', VLC_GRAYSCALE);
+	    intf_AssignSKey( p_intf , ' ', VLC_INTERFACE);
+	    intf_AssignSKey( p_intf , 'i', VLC_INFO);
+	    intf_AssignSKey( p_intf , 's', VLC_SCALING);
 }   
 
 /*****************************************************************************
@@ -381,37 +402,29 @@ void intf_AssignNormalKeys( intf_thread_t *p_intf)
 int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
 {
     static int i_volbackup;
-    int i_key;
+    keyparm i_reply;
     
-    i_key = intf_getKey( p_intf, g_key); 
-    switch( i_key )
+    i_reply = intf_getKey( p_intf, g_key); 
+    
+    switch( i_reply.key )
     {
-    case 'Q':                                                  /* quit order */
+    case VLC_QUIT:                                                  /* quit order */
         p_intf->b_die = 1;
         break;
-    case '0':                                               /* source change */
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
+    case VLC_CHANNEL:
         /* Change channel - return code is ignored since SelectChannel displays
          * its own error messages */
-        intf_SelectChannel( p_intf, i_key - '0' );
+        intf_SelectChannel( p_intf, i_reply.param - '0' );
         break;
-    case '+':                                                    /* volume + */
+    case VLC_LOUDER:                                                    /* volume + */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLMAX) )
             p_main->p_aout->vol += VOLSTEP;
         break;
-    case '-':                                                    /* volume - */
+    case VLC_QUIETER:                                                    /* volume - */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol > VOLSTEP) )
             p_main->p_aout->vol -= VOLSTEP;
         break;
-    case 'M':                                                 /* toggle mute */
+    case VLC_MUTE:                                                 /* toggle mute */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol))
         {
             i_volbackup = p_main->p_aout->vol;
@@ -420,7 +433,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
         else if( (p_main->p_aout != NULL) && (!p_main->p_aout->vol))
             p_main->p_aout->vol = i_volbackup;
         break;
-    case 'g':                                                     /* gamma - */
+    case VLC_LESS_GAMMA:                                                     /* gamma - */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -429,7 +442,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case 'G':                                                     /* gamma + */
+    case VLC_MORE_GAMMA:                                                     /* gamma + */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma < INTF_GAMMA_LIMIT) )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -438,7 +451,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case 'c':                                            /* toggle grayscale */
+    case VLC_GRAYSCALE:                                            /* toggle grayscale */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -447,7 +460,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case ' ':                                            /* toggle interface */
+    case VLC_INTERFACE:                                            /* toggle interface */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -456,7 +469,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case 'i':                                                 /* toggle info */
+    case VLC_INFO:                                                 /* toggle info */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );
@@ -465,7 +478,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );
         }
         break;
-    case 's':                                              /* toggle scaling */
+    case VLC_SCALING:                                              /* toggle scaling */
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );

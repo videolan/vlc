@@ -7,6 +7,13 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x36
+Difficulty: Medium
+Urgency: Normal
+Description: Finish the new keyboard input interface to support 
+interfaces that allow modifiers. This will allow the SDL to run 
+properly.
+
 Task: 0x35
 Difficulty: Medium
 Urgency: Important
