@@ -26,8 +26,8 @@
 
 #include "vcd.h"
 #include <vlc_playlist.h> 
-#include "vcdplayer.h"
 #include "vlc_keys.h"
+#include "info.h"
 
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
@@ -35,10 +35,6 @@
 #include <cdio/util.h>
 #include <libvcd/info.h>
 #include <libvcd/logging.h>
-
-static char *VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
-			  const char format_str[], const char *mrl,
-			  const vcdinfo_itemid_t *itemid);
 
 static inline void
 MetaInfoAddStr(access_t *p_access, char *p_cat,

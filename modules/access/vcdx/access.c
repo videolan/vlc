@@ -34,9 +34,8 @@
 #include <vlc/input.h>
 
 #include "vcd.h"
-#include "vcdplayer.h"
-#include "intf.h"
 #include "info.h"
+#include "intf.h"
 #include "vlc_keys.h"
 
 #include <cdio/cdio.h>
@@ -223,15 +222,40 @@ VCDReadBlock( access_t * p_access )
 
       if ( VCDReadSector( VLC_OBJECT(p_access), p_vcd->vcd,
                           p_vcd->i_lsn,
-                          (byte_t *) p_block->p_buffer + (i_index*M2F2_SECTOR_SIZE) ) < 0 )
-        {
+                          (byte_t *) p_block->p_buffer 
+			  + (i_index*M2F2_SECTOR_SIZE) ) < 0 )
+      {
           LOG_ERR ("could not read sector %lu", 
 		   (long unsigned int) p_vcd->i_lsn );
+        /* Try to skip one sector (in case of bad sectors) */
+	  p_vcd->i_lsn ++;
+	  p_access->info.i_pos += M2F2_SECTOR_SIZE;
           return NULL;
-        }
+      }
 
       p_vcd->i_lsn ++;
+      p_access->info.i_pos += M2F2_SECTOR_SIZE;
 
+      /* Update seekpoint */
+      if ( VCDINFO_ITEM_TYPE_ENTRY == p_vcd->play_item.type )
+      {
+        const input_title_t *t = p_vcd->p_title[p_access->info.i_title];
+	
+        if( t->i_seekpoint > 0 &&
+            p_access->info.i_seekpoint + 1 < t->i_seekpoint &&
+            p_access->info.i_pos + i_read * M2F2_SECTOR_SIZE >=
+            t->seekpoint[p_access->info.i_seekpoint+1]->i_byte_offset )
+        {
+	    const track_t i_track = p_vcd->i_track;
+	    const unsigned int i_entry = ++p_vcd->play_item.num;
+            msg_Dbg( p_access, "seekpoint change" );
+	    VCDSetOrigin( p_access, 
+			  vcdinfo_get_track_lsn(p_vcd->vcd, i_track),
+			  vcdinfo_get_entry_lsn(p_vcd->vcd, i_entry),
+			  vcdinfo_get_track_lsn(p_vcd->vcd, i_track+1),
+			  i_track, &(p_vcd->play_item) );
+        }
+      }
     }
 
     if ( i_index != i_blocks ) /* this should not happen */
@@ -243,28 +267,9 @@ VCDReadBlock( access_t * p_access )
 		     (long unsigned int) p_vcd->i_lsn );
         }
 	
+	p_vcd->i_lsn ++;
 	return NULL;
     }
-
-    /* Update seekpoints */
-    for( i_read = 0; i_read < i_blocks; i_read++ )
-    {
-        input_title_t *t = p_vcd->p_title[p_access->info.i_title];
-
-        if( t->i_seekpoint > 0 &&
-            p_access->info.i_seekpoint + 1 < t->i_seekpoint &&
-            p_access->info.i_pos + i_read * M2F2_SECTOR_SIZE >=
-            t->seekpoint[p_access->info.i_seekpoint+1]->i_byte_offset )
-        {
-            msg_Dbg( p_access, "seekpoint change" );
-            p_access->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-            p_access->info.i_seekpoint++;
-        }
-    }
-
-    /* Update a few values */
-    p_vcd->i_lsn += i_blocks;
-    p_access->info.i_pos += p_block->i_buffer;
 
     return p_block;
 }
@@ -844,7 +849,8 @@ VCDSetOrigin( access_t *p_access, lsn_t origin_lsn,
   p_access->info.i_seekpoint = p_itemid->num;
   p_access->info.i_size      = p_vcd->p_title[i_title]->i_size;
   p_access->info.i_pos       = ( i_lsn - origin_lsn ) * M2F2_SECTOR_SIZE;
-  p_access->info.i_update   |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
+  p_access->info.i_update   |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE
+                            |  INPUT_UPDATE_SEEKPOINT;
 
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_LSN),
              "origin: %lu, cur_lsn: %lu, end_lsn: %lu, track: %d",
@@ -852,11 +858,35 @@ VCDSetOrigin( access_t *p_access, lsn_t origin_lsn,
 	     (long unsigned int) i_lsn, 
 	     (long unsigned int) end_lsn, i_track );
 
-  VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
-                "chapter", 
-		p_itemid->type == VCDINFO_ITEM_TYPE_ENTRY ?
-		_("Entry") : _("Segment"), 
-		"Setting entry/segment");
+  if (p_itemid->type == VCDINFO_ITEM_TYPE_ENTRY) {
+    VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
+		  "chapter", _("Entry"), "Setting entry/segment");
+    p_access->info.i_seekpoint = p_itemid->num;
+  } else {
+    VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
+		  "chapter", _("Segment"),  "Setting entry/segment");
+    /* seekpoint is what? ??? */ 
+  }
+  
+  { 
+    unsigned int psz_mrl_max = strlen(VCD_MRL_PREFIX) 
+      + strlen(p_vcd->psz_source) + sizeof("@E999")+3;
+    char *psz_mrl = malloc( psz_mrl_max );
+
+    if( psz_mrl ) 
+    {
+        char *psz_name;
+	snprintf(psz_mrl, psz_mrl_max, "%s%s", 
+		 VCD_MRL_PREFIX, p_vcd->psz_source);
+	psz_name = VCDFormatStr( p_access, p_vcd,
+				 config_GetPsz( p_access, MODULE_STRING 
+						"-title-format" ),
+				psz_mrl, &(p_vcd->play_item) );
+	input_Control( p_vcd->p_input, INPUT_SET_NAME, psz_name );
+	free(psz_mrl);
+    }
+  }
+
 }
 
 /*****************************************************************************
@@ -1060,23 +1090,12 @@ E_(VCDOpen) ( vlc_object_t *p_this )
         msg_Warn( p_access, "could not read entry LIDs" );
     }
 
-#if 1
     b_play_ok = (VLC_SUCCESS == VCDPlay( p_access, itemid ));
 
     if ( ! b_play_ok ) {
       vcdinfo_close( p_vcd->vcd );
       goto err_exit;
     }
-#else 
-    /* We assume playing CD track 2 (1st MPEG data) for now  */
-      
-    p_vcd->origin_lsn = p_vcd->i_lsn = p_vcd->p_sectors[1];
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->info.i_size = p_vcd->p_title[0]->i_size;
-    p_access->info.i_pos = 0;
-    
-#endif
 
     p_access->psz_demux = strdup( "ps" );
 
@@ -1279,6 +1298,8 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         {
             input_title_t *t = p_vcd->p_title[p_access->info.i_title];
             i = (int)va_arg( args, int );
+
+	    dbg_print( INPUT_DBG_EVENT, "set seekpoint" );
             if( t->i_seekpoint > 0 )
             {
 		track_t i_track = p_access->info.i_title+1;
@@ -1300,7 +1321,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         }
 
         case ACCESS_SET_PRIVATE_ID_STATE:
-	    dbg_print( INPUT_DBG_EVENT, "set seekpoint/set private id" );
+	    dbg_print( INPUT_DBG_EVENT, "set private id" );
             return VLC_EGENERIC;
 
         default:

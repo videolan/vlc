@@ -21,6 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#ifndef VCD_INFO_H
+#define VCD_INFO_H
+
+#include "vcdplayer.h"
+
 /*
  Fills out playlist information.
  */
@@ -37,3 +42,5 @@ void VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl );
 char * VCDFormatStr(const access_t *p_access, access_vcd_data_t *p_vcd,
 		    const char format_str[], const char *mrl,
 		    const vcdinfo_itemid_t *itemid);
+
+#endif /* VCD_INFO_H */
