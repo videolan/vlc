@@ -44,7 +44,7 @@
 #include <libvcd/info.h>
 
 #ifdef WIN32
-#define sleep(A) Sleep((A)*1000
+#define sleep(A) Sleep((A)*1000)
 #endif
 
 /*!
