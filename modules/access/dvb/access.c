@@ -158,7 +158,7 @@ int E_(Open) ( vlc_object_t *p_this )
                    (!strncmp( psz_parser_init, "V" ,
                      psz_parser - psz_parser_init ) ) )
                 {
-                    p_dvb->i_polarisation = VLC_FALSE;
+                    p_dvb->i_polarisation = 0;
                 }
                 else if( (!strncmp( psz_parser_init, "H" ,
                      psz_parser - psz_parser_init ) ) ||
@@ -166,7 +166,7 @@ int E_(Open) ( vlc_object_t *p_this )
                      psz_parser - psz_parser_init ) ) )
 
                 {
-                    p_dvb->i_polarisation = VLC_TRUE;
+                    p_dvb->i_polarisation = 1;
                 }
                 else if( (!strncmp( psz_parser_init, "A" ,
                      psz_parser - psz_parser_init ) ) ||
@@ -326,7 +326,7 @@ int E_(Open) ( vlc_object_t *p_this )
     /* Determine frontend device information and capabilities */        
     if( p_dvb->b_probe )
     {
-        if( ioctl_InfoFrontend(p_input, &frontend_info, p_dvb->u_adapter, p_dvb->u_device) < 0 )
+        if( ioctl_InfoFrontend(p_input, &frontend_info) < 0 )
         {
             msg_Err( p_input, "(access) cannot determine frontend info" );
             close( p_dvb->i_frontend );
@@ -470,9 +470,7 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.qpsk.fec_inner = dvb_DecodeFEC( p_input, p_dvb->i_fec ); 
             msg_Dbg( p_input, "DVB-S: satellite (QPSK) frontend %s found", frontend_info.name );
 
-            if( ioctl_SetQPSKFrontend( p_input, fep, p_dvb->i_polarisation,
-                               p_dvb->u_lnb_lof1, p_dvb->u_lnb_lof2, p_dvb->u_lnb_slof,
-                               p_dvb->u_adapter, p_dvb->u_device ) < 0 )
+            if( ioctl_SetQPSKFrontend( p_input, fep ) < 0 )
             {
                 msg_Err( p_input, "DVB-S: tuning failed" );
                 close( p_dvb->i_frontend );
@@ -489,7 +487,7 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.qam.fec_inner = dvb_DecodeFEC( p_input, p_dvb->i_fec ); 
             fep.u.qam.modulation = dvb_DecodeModulation( p_input, p_dvb->i_modulation ); 
             msg_Dbg( p_input, "DVB-C: cable (QAM) frontend %s found", frontend_info.name );
-            if( ioctl_SetQAMFrontend( p_input, fep, p_dvb->u_adapter, p_dvb->u_device ) < 0 )
+            if( ioctl_SetQAMFrontend( p_input, fep ) < 0 )
             {
                 msg_Err( p_input, "DVB-C: tuning failed" );
                 close( p_dvb->i_frontend );
@@ -510,7 +508,7 @@ int E_(Open) ( vlc_object_t *p_this )
             fep.u.ofdm.guard_interval = dvb_DecodeGuardInterval( p_input, p_dvb->i_guard );
             fep.u.ofdm.hierarchy_information = dvb_DecodeHierarchy( p_input, p_dvb->i_hierarchy );
             msg_Dbg( p_input, "DVB-T: terrestrial (OFDM) frontend %s found", frontend_info.name );
-            if( ioctl_SetOFDMFrontend( p_input, fep, p_dvb->u_adapter, p_dvb->u_device ) < 0 )
+            if( ioctl_SetOFDMFrontend( p_input, fep ) < 0 )
             {
                 msg_Err( p_input, "DVB-T: tuning failed" );
                 close( p_dvb->i_frontend );
@@ -564,7 +562,7 @@ int E_(Open) ( vlc_object_t *p_this )
     msg_Dbg( p_input, "setting filter on PAT" );
 
     /* Set Filter on PAT packet */
-    if( ioctl_SetDMXFilter(p_input, 0, &i_fd, 21, p_dvb->u_adapter, p_dvb->u_device ) < 0 )
+    if( ioctl_SetDMXFilter(p_input, 0, &i_fd, 21 ) < 0 )
     {
 #   ifdef HAVE_ERRNO_H
         msg_Err( p_input, "an error occured when setting filter on PAT (%s)", strerror( errno ) );
@@ -653,8 +651,7 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
         if( p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
         {
             ioctl_SetDMXFilter( p_input, p_input->stream.pp_programs[i]->pp_es[0]->i_id,
-                       &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
-                       21, p_dvb->u_adapter, p_dvb->u_device );
+                       &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd, 21 );
         }
     }
 
@@ -724,8 +721,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             case MPEG2_MOTO_VIDEO_ES:
                 if( input_SelectES( p_input , p_es ) == 0 )
                 {
-                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_video_type,
-                                       p_dvb->u_adapter, p_dvb->u_device);
+                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_video_type);
                     u_video_type += 5;
                 }
                 break;
@@ -733,14 +729,13 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             case MPEG2_AUDIO_ES:
                 if( input_SelectES( p_input , p_es ) == 0 )
                 {
-                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_audio_type,
-                                       p_dvb->u_adapter, p_dvb->u_device);
+                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_audio_type);
                     input_SelectES( p_input , p_es );
                     u_audio_type += 5;
                 }
                 break;
             default:
-                ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 21, p_dvb->u_adapter, p_dvb->u_device);
+                ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 21);
                 input_SelectES( p_input , p_es );
                 msg_Warn(p_input, "ES streamtype 0x%d found used as DMX_PES_OTHER !!",(int) p_es->i_cat);
                 break;

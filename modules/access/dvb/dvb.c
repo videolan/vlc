@@ -298,7 +298,7 @@ int ioctl_SetQPSKFrontend( input_thread_t * p_input, struct dvb_frontend_paramet
        local frequencies of the LNB */
     hiband = (fep.frequency >= p_dvb->u_lnb_slof);
 
-    if( (i_ret=ioctl_SetupSwitch (p_input, 0, p_dvb->b_polarisation, hiband)) < 0 )
+    if( (i_ret=ioctl_SetupSwitch (p_input, 0, p_dvb->i_polarisation, hiband)) < 0 )
     {
         msg_Err( p_input, "DVB-S: Setup frontend switch failed (%d)", i_ret );
         return -1;
