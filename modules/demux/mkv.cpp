@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.11 2003/06/24 19:59:27 fenrir Exp $
+ * $Id: mkv.cpp,v 1.12 2003/06/24 23:00:32 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,6 +39,8 @@
 #include <iostream>
 #include <cassert>
 #include <typeinfo>
+
+#include <wchar.h>
 
 /* libebml and matroska */
 #include "ebml/EbmlHead.h"
@@ -455,7 +457,7 @@ static int Activate( vlc_object_t * p_this )
 #endif
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknow (%s)", typeid(*el2).name() );
+                    msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid(*el2).name() );
                 }
             }
             p_sys->ep->Up();
@@ -580,7 +582,7 @@ static int Activate( vlc_object_t * p_this )
                                 }
                                 else
                                 {
-                                    msg_Dbg( p_input, "|   |   |   |   + Unknow (%s)", typeid(*el4).name() );
+                                    msg_Dbg( p_input, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
                                 }
                             }
                             p_sys->ep->Up();
@@ -640,7 +642,7 @@ static int Activate( vlc_object_t * p_this )
                                 }
                                 else
                                 {
-                                    msg_Dbg( p_input, "|   |   |   |   + Unknow (%s)", typeid(*el4).name() );
+                                    msg_Dbg( p_input, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
                                 }
                             }
                             p_sys->ep->Up();
@@ -706,14 +708,14 @@ static int Activate( vlc_object_t * p_this )
                         }
                         else
                         {
-                            msg_Dbg( p_input, "|   |   |   + Unknow (%s)", typeid(*el3).name() );
+                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)", typeid(*el3).name() );
                         }
                     }
                     p_sys->ep->Up();
                 }
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknow (%s)", typeid(*el2).name() );
+                    msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid(*el2).name() );
                 }
 #undef tk
             }
@@ -752,7 +754,7 @@ static int Activate( vlc_object_t * p_this )
                         }
                         else
                         {
-                            msg_Dbg( p_input, "|   |   |   + Unknow (%s)", typeid(*el).name() );
+                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)", typeid(*el).name() );
                         }
                     }
                     p_sys->ep->Up();
@@ -779,7 +781,7 @@ static int Activate( vlc_object_t * p_this )
                 }
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknow (%s)", typeid(*el).name() );
+                    msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid(*el).name() );
                 }
             }
             p_sys->ep->Up();
@@ -812,7 +814,7 @@ static int Activate( vlc_object_t * p_this )
         }
         else
         {
-            msg_Dbg( p_input, "|   + Unknow (%s)", typeid(*el1).name() );
+            msg_Dbg( p_input, "|   + Unknown (%s)", typeid(*el1).name() );
         }
     }
 
@@ -2070,14 +2072,14 @@ static void LoadCues( input_thread_t *p_input )
                         }
                         else
                         {
-                            msg_Dbg( p_input, "         * Unknow (%s)", typeid(*el).name() );
+                            msg_Dbg( p_input, "         * Unknown (%s)", typeid(*el).name() );
                         }
                     }
                     ep->Up();
                 }
                 else
                 {
-                    msg_Dbg( p_input, "     * Unknow (%s)", typeid(*el).name() );
+                    msg_Dbg( p_input, "     * Unknown (%s)", typeid(*el).name() );
                 }
             }
             ep->Up();
@@ -2095,7 +2097,7 @@ static void LoadCues( input_thread_t *p_input )
         }
         else
         {
-            msg_Dbg( p_input, " * Unknow (%s)", typeid(*el).name() );
+            msg_Dbg( p_input, " * Unknown (%s)", typeid(*el).name() );
         }
     }
     delete ep;
