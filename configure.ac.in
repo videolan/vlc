@@ -3,7 +3,7 @@ dnl Autoconf settings for vlc
 AC_INIT(vlc,0.6.0-test2)
 
 CONFIGURE_LINE="$0 $*"
-CODENAME="Natalya"
+CODENAME="Trevelyan"
 
 AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(src/libvlc.c)
