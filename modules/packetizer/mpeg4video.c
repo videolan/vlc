@@ -367,6 +367,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
                 if( p_block->i_pts > 0 )
                     p_sys->i_interpolated_dts = p_block->i_pts;
+                if( p_block->i_dts > 0 )
+                    p_sys->i_interpolated_dts = p_block->i_dts;
 
                 p_sys->i_interpolated_pts = p_sys->i_interpolated_dts;
             }
