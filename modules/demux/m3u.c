@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.11 2003/01/16 21:14:23 babal Exp $
+ * $Id: m3u.c,v 1.12 2003/01/23 09:00:36 fenrir Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -90,20 +90,23 @@ static int Activate( vlc_object_t * p_this )
 
     /* Check for m3u/asx file extension */
     psz_ext = strrchr ( p_input->psz_name, '.' );
-    if( !strcasecmp( psz_ext, ".m3u") ||
-        ( p_input->psz_demux && !strncmp(p_input->psz_demux, "m3u", 3) ) )
+    if( psz_ext )
     {
-        i_type = TYPE_M3U;
-    }
-    else if( !strcasecmp( psz_ext, ".asx") ||
-             ( p_input->psz_demux && !strncmp(p_input->psz_demux, "asx", 3) ) )
-    {
-        i_type = TYPE_ASX;
-    }
-    else if( !strcasecmp( psz_ext, ".html") ||
-             ( p_input->psz_demux && !strncmp(p_input->psz_demux, "html", 4) ) )
-    {
-        i_type = TYPE_HTML;
+        if( !strcasecmp( psz_ext, ".m3u") ||
+            ( p_input->psz_demux && !strncmp(p_input->psz_demux, "m3u", 3) ) )
+        {
+            i_type = TYPE_M3U;
+        }
+        else if( !strcasecmp( psz_ext, ".asx") ||
+                 ( p_input->psz_demux && !strncmp(p_input->psz_demux, "asx", 3) ) )
+        {
+            i_type = TYPE_ASX;
+        }
+        else if( !strcasecmp( psz_ext, ".html") ||
+                 ( p_input->psz_demux && !strncmp(p_input->psz_demux, "html", 4) ) )
+        {
+            i_type = TYPE_HTML;
+        }
     }
 
     /* we had no luck looking at the file extention, so we have a look

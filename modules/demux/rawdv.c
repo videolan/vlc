@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.2 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: rawdv.c,v 1.3 2003/01/23 09:00:36 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -137,7 +137,7 @@ static int Activate( vlc_object_t * p_this )
 
     /* Check for dv file extension */
     psz_ext = strrchr ( p_input->psz_name, '.' );
-    if( strcasecmp( psz_ext, ".dv") &&
+    if( ( !psz_ext || strcasecmp( psz_ext, ".dv") )&&
         ( !p_input->psz_demux || strcmp(p_input->psz_demux, "rawdv") ) )
     {
         return -1;

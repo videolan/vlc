@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.2 2003/01/21 16:46:17 fenrir Exp $
+ * $Id: sub.c,v 1.3 2003/01/23 09:00:36 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -143,7 +143,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     }
 
     /* *** Open the file *** */
-    if( !( p_file = fopen( psz_name, "r" ) ) )
+    if( !( p_file = fopen( psz_name, "rb" ) ) )
     {
         msg_Err( p_sub, "cannot open `%s' subtitle file", psz_name );
 
