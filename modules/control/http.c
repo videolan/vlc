@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.18 2003/07/29 18:51:16 fenrir Exp $
+ * $Id: http.c,v 1.19 2003/07/30 21:09:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -234,7 +234,11 @@ static int Activate( vlc_object_t *p_this )
     {
         char * psz_vlcpath = p_intf->p_libvlc->psz_vlcpath;
         psz_src = malloc( strlen(psz_vlcpath) + strlen("/share/http" ) + 1 );
+#if defined(WIN32)
+        sprintf( psz_src, "%s/http", psz_vlcpath);
+#else
         sprintf( psz_src, "%s/share/http", psz_vlcpath);
+#endif
     }
 #else
     psz_src = config_GetPsz( p_intf, "http-src" );

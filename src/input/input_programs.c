@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.115 2003/07/23 22:01:25 gbazin Exp $
+ * $Id: input_programs.c,v 1.116 2003/07/30 21:09:06 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -676,7 +676,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         }
 
         /* Take care of the ES description */
-        if( psz_desc )
+        if( psz_desc && *psz_desc )
         {
             p_es->psz_desc = strdup( psz_desc );
         }
