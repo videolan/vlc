@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.4 2002/11/02 17:31:37 sigmunau Exp $
+ * $Id: dv.c,v 1.1 2002/11/05 14:52:28 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -40,7 +40,6 @@ static int RunDecoder  ( decoder_fifo_t * );
 static int OpenDecoder ( vlc_object_t * );
 
 static u32 GetFourCC   ( dv_sample_t );
-static pes_packet_t *GetFirstPES( decoder_fifo_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -75,6 +74,7 @@ static int OpenDecoder ( vlc_object_t *p_this )
 static int RunDecoder ( decoder_fifo_t *p_fifo )
 {
     u8 *p_buffer;
+    pes_packet_t *p_pes = NULL;
     int i_data = 120000;
     int i_aspect;
 
@@ -199,14 +199,17 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
         while( !p_fifo->b_die && !p_fifo->b_error )
         {
             mtime_t i_pts = 0;
-            pes_packet_t *p_pes;
 
             GetChunk( &bit_stream, p_buffer + i_data,
                                    p_decoder->frame_size - i_data );
             i_data = p_decoder->frame_size;
 
-            p_pes = GetFirstPES( p_fifo );
+            if( p_pes )
+            {
+                input_DeletePES( p_fifo->p_packets_mgt, p_pes );
+            }
 
+            input_ExtractPES( p_fifo, &p_pes );
             if( p_pes )
             {
                 /* Don't trust the sucker */
@@ -268,6 +271,11 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
         }
     }
 
+    if( p_pes )
+    {
+        input_DeletePES( p_fifo->p_packets_mgt, p_pes );
+    }
+
     free( p_buffer );
     CloseBitstream( &bit_stream );
 
@@ -291,25 +299,3 @@ static u32 GetFourCC( dv_sample_t x )
     }
 }
 
-static pes_packet_t *GetFirstPES( decoder_fifo_t *p_fifo )
-{
-    pes_packet_t *p_pes;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    /* if fifo is empty wait */
-    while( !p_fifo->p_first )
-    {
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return NULL;
-        } 
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    p_pes = p_fifo->p_first;
-
-    vlc_mutex_unlock( &p_fifo->data_lock );
-    
-    return p_pes;
-}

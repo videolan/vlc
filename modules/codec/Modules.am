@@ -2,3 +2,5 @@ SOURCES_a52 = modules/codec/a52.c
 SOURCES_lpcm = modules/codec/lpcm.c
 SOURCES_araw = modules/codec/araw.c
 SOURCES_vorbis = modules/codec/vorbis.c
+SOURCES_dv = modules/codec/dv.c
+#SOURCES_xvid = modules/codec/xvid.c

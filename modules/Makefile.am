@@ -17,7 +17,6 @@ EXTRA_DIST = \
 	codec/a52old/downmix/Modules.am \
 	codec/a52old/imdct/Modules.am \
 	codec/cinepak/Modules.am \
-	codec/dv/Modules.am \
 	codec/faad/Modules.am \
 	codec/ffmpeg/Modules.am \
 	codec/ffmpeg/postprocessing/Modules.am \
