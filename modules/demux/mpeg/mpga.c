@@ -181,20 +181,15 @@ static int Open( vlc_object_t * p_this )
     if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
     {
         p_sys->meta = (vlc_meta_t *)p_demux->p_private;
-        if( p_sys->meta != NULL )
-        {
-            /* temporary */
-            msg_Dbg( p_demux, "Title : %s",
-                     vlc_meta_GetValue( p_sys->meta,VLC_META_TITLE ) );
-            p_demux->p_private = NULL;
-        }
+        p_demux->p_private = NULL;
+
         module_Unneed( p_demux, p_id3 );
     }
 
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
         msg_Err( p_demux, "cannot peek" );
-        Close( p_demux );
+        Close( VLC_OBJECT(p_demux ) );
         return VLC_EGENERIC;
     }
 
@@ -206,7 +201,7 @@ static int Open( vlc_object_t * p_this )
         if( !b_forced && !b_extention )
         {
             msg_Warn( p_demux, "mpga module discarded" );
-            Close( p_demux );
+            Close( VLC_OBJECT(p_demux) );
             return VLC_EGENERIC;
         }
 
@@ -225,7 +220,7 @@ static int Open( vlc_object_t * p_this )
         if( !b_ok && !b_forced )
         {
             msg_Warn( p_demux, "mpga module discarded" );
-            Close( p_demux );
+            Close( VLC_OBJECT(p_demux) );
             return VLC_EGENERIC;
         }
     }
