@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.229 2003/07/14 21:32:59 sigmunau Exp $
+ * $Id: video_output.c,v 1.230 2003/07/23 22:01:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -216,84 +216,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         return NULL;
     }
 
-    var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
-    val.b_bool = VLC_TRUE;
-    var_Set( p_vout, "intf-change", val );
-
-    p_vout->b_override_aspect = VLC_FALSE;
-
-    /* If the parent is not a VOUT object, that means we are at the start of
-     * the video output pipe */
-    if( p_parent->i_object_type != VLC_OBJECT_VOUT )
-    {
-        char *psz_aspect = config_GetPsz( p_parent, "aspect-ratio" );
-
-        /* Check whether the user tried to override aspect ratio */
-        if( psz_aspect )
-        {
-            unsigned int i_new_aspect = i_aspect;
-            char *psz_parser = strchr( psz_aspect, ':' );
-
-            if( psz_parser )
-            {
-                *psz_parser++ = '\0';
-                i_new_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR
-                                                  / atoi( psz_parser );
-            }
-            else
-            {
-                i_new_aspect = i_width * VOUT_ASPECT_FACTOR
-                                       * atof( psz_aspect )
-                                       / i_height;
-            }
-
-            free( psz_aspect );
-
-            if( i_new_aspect && i_new_aspect != i_aspect )
-            {
-                int i_pgcd = ReduceHeight( i_new_aspect );
-
-                msg_Dbg( p_vout, "overriding source aspect ratio to %i:%i",
-                         i_new_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
-
-                i_aspect = i_new_aspect;
-
-                p_vout->b_override_aspect = VLC_TRUE;
-            }
-        }
-
-        /* Look for the default filter configuration */
-        p_vout->psz_filter_chain = config_GetPsz( p_parent, "filter" );
-    }
-    else
-    {
-        /* continue the parent's filter chain */
-        char *psz_end;
-
-        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
-        if( psz_end && *(psz_end+1) )
-            p_vout->psz_filter_chain = strdup( psz_end+1 );
-        else p_vout->psz_filter_chain = NULL;
-    }
-
-    /* Choose the video output module */
-    if( !p_vout->psz_filter_chain || !*p_vout->psz_filter_chain )
-    {
-        psz_plugin = config_GetPsz( p_parent, "vout" );
-    }
-    else
-    {
-        /* the filter chain is a string list of filters separated by double
-         * colons */
-        char *psz_end;
-
-        psz_end = strchr( p_vout->psz_filter_chain, ':' );
-        if( psz_end )
-            psz_plugin = strndup( p_vout->psz_filter_chain,
-                                  psz_end - p_vout->psz_filter_chain );
-        else psz_plugin = strdup( p_vout->psz_filter_chain );
-    }
-
     /* Initialize pictures and subpictures - translation tables and functions
      * will be initialized later in InitThread */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++)
@@ -358,17 +280,107 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
     var_Create( p_vout, "key-pressed", VLC_VAR_STRING );
 
-    /* Initialize the dimensions of the video window */
-    InitWindowSize( p_vout, &p_vout->i_window_width,
-                    &p_vout->i_window_height );
+    var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
 
-    /* Create thread and set locks */
+    /* Initialize locks */
     vlc_mutex_init( p_vout, &p_vout->picture_lock );
     vlc_mutex_init( p_vout, &p_vout->subpicture_lock );
     vlc_mutex_init( p_vout, &p_vout->change_lock );
 
+    /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
 
+    /* Create a few object variables we'll need later on */
+    var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+
+    p_vout->b_override_aspect = VLC_FALSE;
+
+    /* If the parent is not a VOUT object, that means we are at the start of
+     * the video output pipe */
+    if( p_parent->i_object_type != VLC_OBJECT_VOUT )
+    {
+        var_Get( p_vout, "aspect-ratio", &val );
+
+        /* Check whether the user tried to override aspect ratio */
+        if( val.psz_string )
+        {
+            unsigned int i_new_aspect = i_aspect;
+            char *psz_parser = strchr( val.psz_string, ':' );
+
+            if( psz_parser )
+            {
+                *psz_parser++ = '\0';
+                i_new_aspect = atoi( val.psz_string ) * VOUT_ASPECT_FACTOR
+                                                      / atoi( psz_parser );
+            }
+            else
+            {
+                i_new_aspect = i_width * VOUT_ASPECT_FACTOR
+                                       * atof( val.psz_string )
+                                       / i_height;
+            }
+
+            free( val.psz_string );
+
+            if( i_new_aspect && i_new_aspect != i_aspect )
+            {
+                int i_pgcd = ReduceHeight( i_new_aspect );
+
+                msg_Dbg( p_vout, "overriding source aspect ratio to %i:%i",
+                         i_new_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
+
+                p_vout->render.i_aspect = i_new_aspect;
+
+                p_vout->b_override_aspect = VLC_TRUE;
+            }
+        }
+
+        /* Look for the default filter configuration */
+        var_Create( p_vout, "filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Get( p_vout, "filter", &val );
+        p_vout->psz_filter_chain = val.psz_string;
+    }
+    else
+    {
+        /* continue the parent's filter chain */
+        char *psz_end;
+
+        psz_end = strchr( ((vout_thread_t *)p_parent)->psz_filter_chain, ':' );
+        if( psz_end && *(psz_end+1) )
+            p_vout->psz_filter_chain = strdup( psz_end+1 );
+        else p_vout->psz_filter_chain = NULL;
+    }
+
+    /* Choose the video output module */
+    if( !p_vout->psz_filter_chain || !*p_vout->psz_filter_chain )
+    {
+        var_Create( p_vout, "vout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Get( p_vout, "vout", &val );
+        psz_plugin = val.psz_string;
+    }
+    else
+    {
+        /* the filter chain is a string list of filters separated by double
+         * colons */
+        char *psz_end;
+
+        psz_end = strchr( p_vout->psz_filter_chain, ':' );
+        if( psz_end )
+            psz_plugin = strndup( p_vout->psz_filter_chain,
+                                  psz_end - p_vout->psz_filter_chain );
+        else psz_plugin = strdup( p_vout->psz_filter_chain );
+    }
+
+    /* Initialize the dimensions of the video window */
+    InitWindowSize( p_vout, &p_vout->i_window_width,
+                    &p_vout->i_window_height );
+
+    /* Create the vout thread */
     p_vout->p_module = module_Need( p_vout,
                            ( p_vout->psz_filter_chain &&
                                *p_vout->psz_filter_chain ) ?
@@ -1157,14 +1169,18 @@ static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
 static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
                             int *pi_height )
 {
+    vlc_value_t val;
     int i_width, i_height;
     uint64_t ll_zoom;
 
 #define FP_FACTOR 1000                             /* our fixed point factor */
 
-    i_width = config_GetInt( p_vout, "width" );
-    i_height = config_GetInt( p_vout, "height" );
-    ll_zoom = (uint64_t)( FP_FACTOR * config_GetFloat( p_vout, "zoom" ) );
+    var_Get( p_vout, "width", &val );
+    i_width = val.i_int;
+    var_Get( p_vout, "height", &val );
+    i_height = val.i_int;
+    var_Get( p_vout, "zoom", &val );
+    ll_zoom = (uint64_t)( FP_FACTOR * val.f_float );
 
     if( i_width > 0 && i_height > 0)
     {

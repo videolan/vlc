@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.234 2003/07/23 01:13:48 gbazin Exp $
+ * $Id: input.c,v 1.235 2003/07/23 22:01:25 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -86,22 +86,15 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
         ParseOption( p_input, p_item->ppsz_options[i] );
     }
 
-    /* Create a few object variables we'll need later */
-    if( !var_Type( p_input, "sout" ) )
-    {
-        var_Create( p_input, "sout", VLC_VAR_STRING );
-        var_Change( p_input, "sout", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
-    if( !var_Type( p_input, "sout-audio" ) )
-    {
-        var_Create( p_input, "sout-audio", VLC_VAR_BOOL );
-        var_Change( p_input, "sout-audio", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
-    if( !var_Type( p_input, "sout-video" ) )
-    {
-        var_Create( p_input, "sout-video", VLC_VAR_BOOL );
-        var_Change( p_input, "sout-video", VLC_VAR_INHERITVALUE, NULL, NULL );
-    }
+    /* Create a few object variables we'll need later on */
+    var_Create( p_input, "video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "audio-channel", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Create( p_input, "spu-channel", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+
+    var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Initialize thread properties */
     p_input->b_eof      = 0;
@@ -547,7 +540,7 @@ static int InitThread( input_thread_t * p_input )
 
     /* Initialize optional stream output. */
     var_Get( p_input, "sout", &val );
-    if ( val.psz_string != NULL )
+    if( val.psz_string != NULL )
     {
         if ( *val.psz_string && (p_input->stream.p_sout =
              sout_NewInstance( p_input, val.psz_string )) == NULL )

@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.27 2003/07/22 15:59:06 gbazin Exp $
+ * $Id: variables.c,v 1.28 2003/07/23 22:01:25 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -159,7 +159,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     if( i_new >= 0 )
     {
         /* If the types differ, variable creation failed. */
-        if( i_type != p_this->p_vars[i_new].i_type )
+        if( (i_type & ~VLC_VAR_DOINHERIT) != p_this->p_vars[i_new].i_type )
         {
             vlc_mutex_unlock( &p_this->var_lock );
             return VLC_EBADVAR;
@@ -190,7 +190,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->psz_name = strdup( psz_name );
     p_var->psz_text = NULL;
 
-    p_var->i_type = i_type;
+    p_var->i_type = i_type & ~VLC_VAR_DOINHERIT;
     memset( &p_var->val, 0, sizeof(vlc_value_t) );
 
     p_var->pf_dup = DupDummy;
@@ -260,6 +260,22 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 
     /* Duplicate the default data we stored. */
     p_var->pf_dup( &p_var->val );
+
+    if( i_type & VLC_VAR_DOINHERIT )
+    {
+        vlc_value_t val;
+
+        if( InheritValue( p_this, psz_name, &val, p_var->i_type )
+            == VLC_SUCCESS );
+        {
+            /* Free data if needed */
+            p_var->pf_free( &p_var->val );
+            /* Check boundaries and list */
+            CheckValue( p_var, &val );
+            /* Set the variable */
+            p_var->val = val;
+        }
+    }
 
     vlc_mutex_unlock( &p_this->var_lock );
 
@@ -1142,7 +1158,6 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
         p_var->pf_dup( p_val );
 
         vlc_mutex_unlock( &p_this->p_parent->var_lock );
-
         return VLC_SUCCESS;
     }
 

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.114 2003/05/18 23:16:57 fenrir Exp $
+ * $Id: input_programs.c,v 1.115 2003/07/23 22:01:25 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -427,11 +427,14 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 #undef p_es
         }
     }
+
     /* Get the number of the required audio stream */
-    if( config_GetInt( p_input, "audio" ) )
+    var_Get( p_input, "audio", &val );
+    if( val.b_bool )
     {
         /* Default is the first one */
-        i_required_audio_es = config_GetInt( p_input, "audio-channel" );
+        var_Get( p_input, "audio-channel", &val );
+        i_required_audio_es = val.i_int;
         if( i_required_audio_es < 0 )
         {
             i_required_audio_es = 1;
@@ -443,10 +446,12 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
     }
 
     /* Same thing for subtitles */
-    if( config_GetInt( p_input, "video" ) )
+    var_Get( p_input, "video", &val );
+    if( val.b_bool )
     {
         /* for spu, default is none */
-        i_required_spu_es = config_GetInt( p_input, "spu-channel" );
+        var_Get( p_input, "spu-channel", &val );
+        i_required_spu_es = val.i_int;
         if( i_required_spu_es < 0 )
         {
             i_required_spu_es = 0;
@@ -821,19 +826,26 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return -1;
     }
 
-    if( ((p_es->i_cat == VIDEO_ES) || (p_es->i_cat == SPU_ES))
-        && !config_GetInt( p_input, "video" ) )
+    if( p_es->i_cat == VIDEO_ES || p_es->i_cat == SPU_ES )
     {
-        msg_Dbg( p_input,
-                 "video is disabled, not selecting ES 0x%x", p_es->i_id );
-        return -1;
+        var_Get( p_input, "video", &val );
+        if( !val.b_bool )
+        {
+            msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
+                     p_es->i_id );
+            return -1;
+        }
     }
 
-    if( (p_es->i_cat == AUDIO_ES) && !config_GetInt( p_input, "audio" ) )
+    if( p_es->i_cat == AUDIO_ES )
     {
-        msg_Dbg( p_input,
-                 "audio is disabled, not selecting ES 0x%x", p_es->i_id );
-        return -1;
+        var_Get( p_input, "audio", &val );
+        if( !val.b_bool )
+        {
+            msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
+                     p_es->i_id );
+            return -1;
+        }
     }
 
     msg_Dbg( p_input, "selecting ES 0x%x", p_es->i_id );
