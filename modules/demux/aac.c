@@ -2,7 +2,7 @@
  * aac.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aac.c,v 1.1 2003/08/01 00:08:35 fenrir Exp $
+ * $Id: aac.c,v 1.2 2003/08/01 00:40:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -34,14 +34,13 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
-static int  Activate    ( vlc_object_t * );
-static void Deactivate  ( vlc_object_t * );
+static int  Open    ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("AAC demuxer" ) );
     set_capability( "demux", 10 );
-    set_callbacks( Activate, Deactivate );
+    set_callbacks( Open, Close );
     add_shortcut( "aac" );
 vlc_module_end();
 
@@ -53,7 +52,6 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
 static int  Demux       ( input_thread_t * );
 
 struct demux_sys_t
@@ -93,9 +91,9 @@ static inline int HeaderCheck( uint8_t *p )
 
 
 /*****************************************************************************
- * Activate: initializes AAC demux structures
+ * Open: initializes AAC demux structures
  *****************************************************************************/
-static int Activate( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys;
@@ -308,9 +306,9 @@ static int Demux( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * Deactivate: frees unused data
+ * Close: frees unused data
  *****************************************************************************/
-static void Deactivate( vlc_object_t * p_this )
+static void Close( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;

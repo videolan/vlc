@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.1 2003/08/01 00:09:37 fenrir Exp $
+ * $Id: wav.c,v 1.2 2003/08/01 00:40:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,13 +36,13 @@
  * Module descriptor
  *****************************************************************************/
 
-static int  Activate    ( vlc_object_t * );
-static void Deactivate  ( vlc_object_t * );
+static int  Open    ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("WAV demuxer") );
     set_capability( "demux", 142 );
-    set_callbacks( Activate, Deactivate );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 /*****************************************************************************
@@ -90,9 +90,9 @@ static void FrameInfo_MS_ADPCM ( input_thread_t *, unsigned int *, mtime_t * );
 static void FrameInfo_PCM      ( input_thread_t *, unsigned int *, mtime_t * );
 
 /*****************************************************************************
- * Activate: check file and initializes structures
+ * Open: check file and initializes structures
  *****************************************************************************/
-static int Activate( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys;
@@ -341,9 +341,9 @@ static int Demux( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * Deactivate: frees unused data
+ * Close: frees unused data
  *****************************************************************************/
-static void Deactivate ( vlc_object_t * p_this )
+static void Close ( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;
