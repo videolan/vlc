@@ -2,7 +2,7 @@
  * iteminfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: iteminfo.cpp,v 1.1 2003/10/06 16:23:30 zorglub Exp $
+ * $Id: iteminfo.cpp,v 1.2 2003/10/06 17:41:47 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -157,7 +157,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
            new wxStaticText(info_subpanel, -1, wxU(_("URI")) );
 
     uri_text =  new wxTextCtrl( info_subpanel, Uri_Event,
-                                wxT(p_item->psz_uri),
+                                wxU(p_item->psz_uri),
                                 wxDefaultPosition, wxSize( 300, -1 ),
                                 wxTE_PROCESS_ENTER);
 
@@ -173,7 +173,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
 
     name_text =
                    new wxTextCtrl( info_subpanel, Uri_Event,
-                                   wxT(p_item->psz_name),
+                                   wxU(p_item->psz_name),
                                    wxDefaultPosition, wxSize( 300, -1 ),
                                    wxTE_PROCESS_ENTER);
 
@@ -188,7 +188,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
 
     author_text =
                    new wxTextCtrl( info_subpanel, Uri_Event,
-                                   wxT(p_item->psz_author),
+                                   wxU(p_item->psz_author),
                                    wxDefaultPosition, wxSize( 300, -1 ),
                                    wxTE_PROCESS_ENTER);
 
@@ -261,9 +261,9 @@ wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
  *****************************************************************************/
 void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
-    p_item->psz_name = strdup( name_text->GetLineText(0) );
-    p_item->psz_uri = strdup( uri_text->GetLineText(0) );
-    p_item->psz_author = strdup( author_text->GetLineText(0) );
+    p_item->psz_name = strdup( name_text->GetLineText(0).mb_str() );
+    p_item->psz_uri = strdup( uri_text->GetLineText(0).mb_str() );
+    p_item->psz_author = strdup( author_text->GetLineText(0).mb_str() );
     vlc_bool_t b_old_enabled = p_item->b_enabled;
 
     playlist_t * p_playlist =
@@ -291,4 +291,4 @@ void ItemInfoDialog::OnCancel( wxCommandEvent& WXUNUSED(event) )
 
 /******************************************************************************
  * Info panel event methods.
- ******************************************************************************/
+ *****************************************************************************/

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.61 2003/10/06 16:23:30 zorglub Exp $
+ * $Id: interface.cpp,v 1.62 2003/10/06 17:41:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -285,7 +285,7 @@ void Interface::CreateOurMenuBar()
 #define HELP_FILEINFO       N_("Show information about the file being played")
 
 #define HELP_PREFS N_("Go to the preferences menu")
-#define EXTRA_PREFS N_("Open the extended GUI")
+#define EXTRA_PREFS N_("Shows the extended GUI")
 
 #define HELP_ABOUT N_("About this program")
 
@@ -323,8 +323,8 @@ void Interface::CreateOurMenuBar()
     wxMenu *settings_menu = new wxMenu;
     settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
                            wxU(_(HELP_PREFS)) );
-    settings_menu->Append( Extra_Event, wxU(_("&Extra GUI") ),
-                           wxU(_(EXTRA_PREFS)) );
+    settings_menu->AppendCheckItem( Extra_Event, wxU(_("&Extended GUI") ),
+                                    wxU(_(EXTRA_PREFS)) );
 
 
     /* Create the "Audio" menu */
@@ -478,8 +478,7 @@ void Interface::CreateOurExtraPanel()
     wxBoxSizer *extra_sizer = new wxBoxSizer( wxHORIZONTAL );
 
     /* Create static box to surround the adjust controls */
-    adjust_box = new wxStaticBox( extra_frame, -1,
-                  wxT(_("Image adjust")) );
+    adjust_box = new wxStaticBox( extra_frame, -1, wxU(_("Image adjust")) );
 
     /* Create the size for the frame */
     wxStaticBoxSizer *adjust_sizer =
@@ -540,8 +539,7 @@ void Interface::CreateOurExtraPanel()
 
 
     /* Create static box to surround the other controls */
-    other_box = new wxStaticBox( extra_frame, -1,
-                  wxT(_("Video Options")) );
+    other_box = new wxStaticBox( extra_frame, -1, wxU(_("Video Options")) );
 
     /* Create the sizer for the frame */
     wxStaticBoxSizer *other_sizer =
@@ -925,9 +923,8 @@ void Interface::OnContrastUpdate(wxScrollEvent& event)
 
 void Interface::OnRatio( wxCommandEvent& event )
 {
-   config_PutPsz( p_intf, "aspect-ratio", ratio_combo->GetValue() );
+   config_PutPsz( p_intf, "aspect-ratio", ratio_combo->GetValue().mb_str() );
 }
-
 
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 {
