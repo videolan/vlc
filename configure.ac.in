@@ -297,19 +297,6 @@ AC_CHECK_FUNCS(gethostbyname,,[
     AC_CHECK_LIB(bind,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind" LDFLAGS_httpd="${LDFLAGS_httpd} -lbind")])
 ])
 
-have_nanosleep=false
-AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
-  AC_CHECK_LIB(rt,nanosleep,
-    [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"; have_nanosleep=:],
-    [AC_CHECK_LIB(posix4,nanosleep,
-        [LDFLAGS_vlc="${LDFLAGS_vlc} -lposix4"; have_nanosleep=:])]
-  )
-])
-if ${have_nanosleep}; then
-  AC_DEFINE(HAVE_NANOSLEEP, 1,
-            Define if nanosleep is available.)
-fi
-
 dnl Check for socklen_t
 AC_CACHE_CHECK([for socklen_t], ac_cv_type_socklen_t,
   [AC_TRY_COMPILE(
@@ -322,9 +309,6 @@ if test x$ac_cv_type_socklen_t != xno; then
   AC_DEFINE(HAVE_SOCKLEN_T, 1,
             Define if <sys/socket.h> defines socklen_t.)
 fi
-
-dnl HP/UX port
-AC_CHECK_LIB(rt,sem_init, [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"])
 
 AC_CHECK_FUNCS(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lresolv" LDFLAGS_httpd="${LDFLAGS_httpd} -lresolv")
@@ -376,6 +360,68 @@ fi
 
 dnl Check for cthreads under GNU/Hurd for instance
 AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
+
+dnl
+dnl  GNU portable threads
+dnl
+AC_ARG_ENABLE(pth,
+  [  --enable-pth            GNU Pth support (default disabled)],
+  [ if test "x${enable_pth}" = "xyes"; then
+    AC_CHECK_LIB(pth,pth_init)
+    AC_MSG_CHECKING(for pth_init in pth.h)
+    AC_EGREP_HEADER(pth_init,pth.h,[
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(PTH_INIT_IN_PTH_H, 1,
+                Define if <pth.h> defines pth_init)
+      THREAD_LIB="-lpth"
+    ],[
+      AC_MSG_RESULT(no)
+    ])
+    fi
+])
+
+dnl
+dnl  State Threads
+dnl
+AC_ARG_ENABLE(st,
+  [  --enable-st             State Threads (default disabled)],
+  [ if test "x${enable_st}" = "xyes"; then
+    AC_CHECK_LIB(st,st_init)
+    AC_MSG_CHECKING(for st_init in st.h)
+    AC_EGREP_HEADER(st_init,st.h,[
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(ST_INIT_IN_ST_H, 1,
+                Define if <st.h> defines st_init)
+      THREAD_LIB="-lst"
+    ],[
+      AC_MSG_RESULT(yes)
+    ])
+    fi
+])
+
+if test "x${SYS}" != "xmingw32"; then
+  LDFLAGS_vlc="${LDFLAGS_vlc} ${THREAD_LIB}"
+  LDFLAGS_plugins="${LDFLAGS_plugins} ${THREAD_LIB}"
+fi
+
+dnl Don't link with rt when using GNU-pth
+if test "x${THREAD_LIB}" != "x-lpth" && test "x${THREAD_LIB}" != "x-lst"; then
+  dnl HP/UX port
+  AC_CHECK_LIB(rt,sem_init, [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"])
+
+  have_nanosleep=false
+  AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
+    AC_CHECK_LIB(rt,nanosleep,
+      [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"; have_nanosleep=:],
+      [AC_CHECK_LIB(posix4,nanosleep,
+          [LDFLAGS_vlc="${LDFLAGS_vlc} -lposix4"; have_nanosleep=:])]
+    )
+  ])
+  if ${have_nanosleep}; then
+    AC_DEFINE(HAVE_NANOSLEEP, 1,
+              Define if nanosleep is available.)
+  fi
+fi
 
 dnl Check for misc headers
 AC_MSG_CHECKING(for pthread_cond_t in pthread.h)
@@ -753,13 +799,13 @@ dnl
 dnl  default modules
 dnl
 PLUGINS="${PLUGINS} dummy rc logger gestures access_file memcpy"
-PLUGINS="${PLUGINS} es audio m4v mpeg_system ps ts"
+PLUGINS="${PLUGINS} es audio m4v mpeg_system ps ts avi asf aac mp4 rawdv"
 PLUGINS="${PLUGINS} idct idctclassic motion mpeg_video spudec mpeg_audio"
 #PLUGINS="${PLUGINS} a52old imdct downmix imdct3dn downmix3dn imdctsse downmixsse"
-PLUGINS="${PLUGINS} lpcm a52"
+PLUGINS="${PLUGINS} lpcm a52 cinepak"
 PLUGINS="${PLUGINS} deinterlace invert adjust wall transform distort clone crop motionblur"
 PLUGINS="${PLUGINS} float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif fixed32tofloat32 fixed32tos16 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32"
-PLUGINS="${PLUGINS} trivial_resampler ugly_resampler linear_resampler"
+PLUGINS="${PLUGINS} trivial_resampler ugly_resampler linear_resampler bandlimited_resampler"
 PLUGINS="${PLUGINS} trivial_channel_mixer headphone_channel_mixer"
 PLUGINS="${PLUGINS} trivial_mixer spdif_mixer float32_mixer"
 PLUGINS="${PLUGINS} aout_file"
@@ -1349,37 +1395,6 @@ then
     PLUGINS="${PLUGINS} ipv6"],[AC_MSG_RESULT(no)])
 fi
 
-        
-dnl
-dnl  AVI demux plugin
-dnl
-AC_ARG_ENABLE(avi,
-  [  --enable-avi            AVI demux module (default enabled)])
-if test "x${enable_avi}" != "xno"
-then
-  PLUGINS="${PLUGINS} avi"
-fi
-
-dnl
-dnl  ASF demux plugin
-dnl
-AC_ARG_ENABLE(asf,
-  [  --enable-asf            ASF demux module (default enabled)])
-if test "x${enable_asf}" != "xno"
-then
-  PLUGINS="${PLUGINS} asf"
-fi
-
-dnl
-dnl  AAC demux plugin
-dnl
-AC_ARG_ENABLE(aac,
-  [  --enable-aac            AAC demux module (default enabled)])
-if test "x${enable_aac}" != "xno"
-then
-  PLUGINS="${PLUGINS} aac"
-fi
-
 dnl
 dnl  ogg plugin
 dnl
@@ -1394,16 +1409,6 @@ then
       AC_CHECK_LIB( ogg, oggpackB_read, [
         CPPFLAGS_ogg="${CPPFLAGS_ogg} -DHAVE_OGGPACKB"])])
    ],[])
-fi
-
-dnl
-dnl  raw dv demux plugin
-dnl
-AC_ARG_ENABLE(rawdv,
-  [  --enable-rawdv          raw dv demux module (default enabled)])
-if test "x${enable_rawdv}" != "xno"
-then
-  PLUGINS="${PLUGINS} rawdv"
 fi
 
 dnl
@@ -1652,15 +1657,7 @@ fi
 dnl
 dnl MP4 module
 dnl
-AC_ARG_ENABLE(mp4,
-  [  --enable-mp4            MP4 demux module (default enabled)])
-if test "x${enable_mp4}" != "xno"
-then
-
-    PLUGINS="${PLUGINS} mp4"
-    AC_CHECK_HEADERS(zlib.h,
-              [ LDFLAGS_mp4="${LDFLAGS_mp4} -lz" ] )
-fi
+AC_CHECK_HEADERS(zlib.h, [ LDFLAGS_mp4="${LDFLAGS_mp4} -lz" ] )
 
 dnl
 dnl  a52 AC3 decoder plugin
@@ -1730,16 +1727,6 @@ then
     CPPFLAGS="${CPPFLAGS_save}"
     LDFLAGS="${LDFLAGS_save}"
   fi
-fi
-
-dnl
-dnl  cinepak plugin
-dnl
-AC_ARG_ENABLE(cinepak,
-  [  --enable-cinepak        Cinepak decoder (default enabled)])
-if test "x${enable_cinepak}" != "xno"
-then
-  PLUGINS="${PLUGINS} cinepak"
 fi
 
 dnl
@@ -2704,49 +2691,6 @@ dnl  Now we know what to use for endianness, just put it in the header
 if test "${ac_cv_c_bigendian}" = "yes"
 then
   AC_DEFINE(WORDS_BIGENDIAN, 1, big endian system)
-fi
-
-dnl
-dnl  GNU portable threads
-dnl
-AC_ARG_ENABLE(pth,
-  [  --enable-pth            GNU Pth support (default disabled)],
-  [ if test "x${enable_pth}" = "xyes"; then
-    AC_CHECK_LIB(pth,pth_init)
-    AC_MSG_CHECKING(for pth_init in pth.h)
-    AC_EGREP_HEADER(pth_init,pth.h,[
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(PTH_INIT_IN_PTH_H, 1,
-                Define if <pth.h> defines pth_init)
-      THREAD_LIB="-lpth"
-    ],[
-      AC_MSG_RESULT(no)
-    ])
-    fi
-])
-
-dnl
-dnl  State Threads
-dnl
-AC_ARG_ENABLE(st,
-  [  --enable-st             State Threads (default disabled)],
-  [ if test "x${enable_st}" = "xyes"; then
-    AC_CHECK_LIB(st,st_init)
-    AC_MSG_CHECKING(for st_init in st.h)
-    AC_EGREP_HEADER(st_init,st.h,[
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(ST_INIT_IN_ST_H, 1,
-                Define if <st.h> defines st_init)
-      THREAD_LIB="-lst"
-    ],[
-      AC_MSG_RESULT(yes)
-    ])
-    fi
-])
-
-if test "x${SYS}" != "xmingw32"; then
-  LDFLAGS_vlc="${LDFLAGS_vlc} ${THREAD_LIB}"
-  LDFLAGS_plugins="${LDFLAGS_plugins} ${THREAD_LIB}"
 fi
 
 dnl
