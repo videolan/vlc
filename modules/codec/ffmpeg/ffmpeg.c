@@ -733,7 +733,7 @@ static struct
     { VLC_FOURCC('a','5','2','b'), CODEC_ID_AC3, /* VLC specific hack */
       AUDIO_ES, "A52 Audio (aka AC3)" },
 
-#if LIBAVCODEC_BUILD >= 4718
+#if LIBAVCODEC_BUILD >= 4719
     /* DTS Audio */
     { VLC_FOURCC('d','t','s',' '), CODEC_ID_DTS,
       AUDIO_ES, "DTS Audio" },
