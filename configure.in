@@ -93,6 +93,9 @@ AC_ARG_ENABLE(fb,
 AC_ARG_ENABLE(ggi,
   [  --enable-ggi            GGI support (default disabled)],
   [if test x$enable_ggi = xyes; then PLUGINS=${PLUGINS}"ggi "; fi])
+AC_ARG_ENABLE(sdl,
+  [  --enable-sdl			 SDL support (default disabled)],
+  [if test x$enable_sdl = xyes; then PLUGINS=${PLUGINS}"sdl "; ALIASES=${ALIASES}"sdlvlc ";fi])
 AC_ARG_ENABLE(glide,
   [  --enable-glide          Glide (3dfx) support (default disabled)],
   [if test x$enable_glide = xyes; then PLUGINS=${PLUGINS}"glide "; fi])

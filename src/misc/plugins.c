@@ -86,17 +86,29 @@ void bank_Init( plugin_bank_t * p_bank )
     psz_filename = TestPlugin( &tmp, name ); \
     if( psz_filename ) AllocatePlugin( tmp, p_bank, psz_filename );
 
+    /* Arch plugins */
     SEEK_PLUGIN( "beos" );
-    SEEK_PLUGIN( "x11" );
-    SEEK_PLUGIN( "dsp" );
-    SEEK_PLUGIN( "esd" );
+    
+    /* High level Video */
     SEEK_PLUGIN( "gnome" );
     SEEK_PLUGIN( "ggi" );
+    SEEK_PLUGIN( "sdl" );
+    
+    /* Low level Video */
+    SEEK_PLUGIN( "x11" );
     SEEK_PLUGIN( "fb" );
     SEEK_PLUGIN( "glide" );
     SEEK_PLUGIN( "mga" );
+    
+    /* Video calculus */
     SEEK_PLUGIN( "yuvmmx" );
     SEEK_PLUGIN( "yuv" );
+
+    /* Audio pluins */
+    SEEK_PLUGIN( "dsp" );
+    SEEK_PLUGIN( "esd" );
+    
+    /* Dummy plugin */
     SEEK_PLUGIN( "dummy" );
 
 #undef SEEK_PLUGIN

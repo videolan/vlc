@@ -286,6 +286,10 @@ PLUGIN_GGI    = plugins/ggi/ggi.o \
 		plugins/ggi/intf_ggi.o \
 		plugins/ggi/vout_ggi.o
 
+PLUGIN_SDL    = plugins/sdl/sdl.o \
+		plugins/sdl/intf_sdl.o \
+		plugins/sdl/vout_sdl.o
+
 PLUGIN_GLIDE  = plugins/glide/glide.o \
 		plugins/glide/intf_glide.o \
 		plugins/glide/vout_glide.o
@@ -323,7 +327,8 @@ PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
 
 PLUGIN_OBJ = $(PLUGIN_BEOS) $(PLUGIN_DSP) $(PLUGIN_DUMMY) $(PLUGIN_ESD) \
 		$(PLUGIN_FB) $(PLUGIN_GGI) $(PLUGIN_GLIDE) $(PLUGIN_GNOME) \
-		$(PLUGIN_MGA) $(PLUGIN_X11) $(PLUGIN_YUV) $(PLUGIN_YUVMMX)
+		$(PLUGIN_MGA) $(PLUGIN_X11) $(PLUGIN_YUV) $(PLUGIN_YUVMMX) \
+		$(PLUGIN_SDL)	
 #
 # Other lists of files
 #
@@ -404,7 +409,7 @@ else
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
-gvlc xvlc fbvlc: vlc
+sdlvlc gvlc xvlc fbvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
 plugins: $(PLUGINS)
@@ -482,6 +487,11 @@ $(PLUGIN_GLIDE): %.o: %.c
 lib/ggi.so: $(PLUGIN_GGI)
 	ld -shared -lggi -o $@ $^
 $(PLUGIN_GGI): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+
+lib/sdl.so: $(PLUGIN_SDL)
+	ld -shared -lSDL -o $@ $^
+$(PLUGIN_SDL): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 lib/yuv.so: $(PLUGIN_YUV)
