@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.96 2003/09/24 21:31:54 gbazin Exp $
+ * $Id: libvlc.c,v 1.97 2003/09/29 17:36:34 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -472,7 +472,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /*
      * System specific configuration
      */
-    system_Configure( p_vlc );
+    system_Configure( p_vlc, &i_argc, ppsz_argv );
 
     /*
      * Message queue options

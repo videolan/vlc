@@ -1,8 +1,9 @@
 /*****************************************************************************
- * charset.c: Determine a canonical name for the current locale's character encoding.
+ * charset.c: Determine a canonical name for the current locale's character
+ *            encoding.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: charset.c,v 1.2 2003/08/23 22:19:07 fenrir Exp $
+ * $Id: charset.c,v 1.3 2003/09/29 17:36:35 gbazin Exp $
  *
  * Authors: Derk-Jan Hartman <thedj at users.sf.net>
  *
@@ -197,7 +198,7 @@ static const char* vlc_charset_aliases( const char *psz_name )
 }
 
 /* Returns charset from "language_COUNTRY.charset@modifier" string */
-static char* vlc_encoding_from_locale( char *psz_locale )
+static char *vlc_encoding_from_locale( char *psz_locale )
 {
     char *psz_dot = strchr( psz_locale, '.' );
 

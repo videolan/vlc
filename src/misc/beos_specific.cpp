@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.31 2003/05/08 01:05:14 titer Exp $
+ * $Id: beos_specific.cpp,v 1.32 2003/09/29 17:36:35 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -89,7 +89,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( vlc_t * )
+void system_Configure( vlc_t *, int *pi_argc, char *ppsz_argv[] )
 {
 
 }

@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.13 2003/04/08 08:36:00 massiot Exp $
+ * $Id: darwin_specific.m,v 1.14 2003/09/29 17:36:35 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -116,7 +116,7 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 /*****************************************************************************
  * system_Configure: check for system specific configuration options.
  *****************************************************************************/
-void system_Configure( vlc_t *p_this )
+void system_Configure( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 {
 
 }

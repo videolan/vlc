@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.89 2003/09/24 21:31:54 gbazin Exp $
+ * $Id: libvlc.h,v 1.90 2003/09/29 17:36:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -448,6 +448,14 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
+#define ONEINSTANCE_TEXT N_("Allow only one running instance of VLC")
+#define ONEINSTANCE_LONGTEXT N_( \
+    "Allowing only one running instance of VLC can sometimes be useful, " \
+    "for instance if you associated VLC with some media types and you " \
+    "don't want a new instance of VLC to be opened each time you " \
+    "double-click on a file in the explorer. This option will allow you " \
+    "to play the file with the already running instance or enqueue it.")
+
 #define HPRIORITY_TEXT N_("Increase the priority of the process")
 #define HPRIORITY_LONGTEXT N_( \
     "Increasing the priority of the process will very likely improve your " \
@@ -691,6 +699,7 @@ vlc_module_begin();
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_TRUE );
 
 #if defined(WIN32)
+    add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT, ONEINSTANCE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 1, NULL, HPRIORITY_TEXT, HPRIORITY_LONGTEXT, VLC_TRUE );
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT, VLC_TRUE );
     add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
