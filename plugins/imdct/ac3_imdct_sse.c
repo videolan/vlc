@@ -2,7 +2,7 @@
  * ac3_imdct_sse.c: accelerated SSE ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_sse.c,v 1.6 2001/10/30 19:34:53 reno Exp $
+ * $Id: ac3_imdct_sse.c,v 1.7 2001/11/13 18:10:38 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -49,11 +49,13 @@
 void _M( fft_64p )  ( complex_t *x );
 void _M( fft_128p ) ( complex_t *a );
 
-static void imdct512_pre_ifft_twiddle_sse (const int *pmt, complex_t *buf, float *data, float *xcos_sin_sse);
-static void imdct512_post_ifft_twiddle_sse (complex_t *buf, float *xcos_sin_sse);
-static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt);
-static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt);
-
+static void imdct512_pre_ifft_twiddle_sse  ( const int *, complex_t *,
+                                             float *, float * );
+static void imdct512_post_ifft_twiddle_sse ( complex_t *, float * );
+static void imdct512_window_delay_sse      ( complex_t *, float *,
+                                             float *, float * );
+static void imdct512_window_delay_nol_sse  ( complex_t *, float *,
+                                             float *, float * );
 
 void _M( imdct_init ) (imdct_t * p_imdct)
 {
@@ -73,19 +75,21 @@ void _M( imdct_init ) (imdct_t * p_imdct)
 
 void _M( imdct_do_512 ) (imdct_t * p_imdct, float data[], float delay[])
 {
-    imdct512_pre_ifft_twiddle_sse (pm128, p_imdct->buf, data, p_imdct->xcos_sin_sse);
+    imdct512_pre_ifft_twiddle_sse( pm128, p_imdct->buf, data,
+                                   p_imdct->xcos_sin_sse );
     _M( fft_128p ) ( p_imdct->buf );
-    imdct512_post_ifft_twiddle_sse (p_imdct->buf, p_imdct->xcos_sin_sse);
-    imdct512_window_delay_sse (p_imdct->buf, data, window, delay);
+    imdct512_post_ifft_twiddle_sse( p_imdct->buf, p_imdct->xcos_sin_sse );
+    imdct512_window_delay_sse( p_imdct->buf, data, window, delay );
 }
 
 
 void _M( imdct_do_512_nol ) (imdct_t * p_imdct, float data[], float delay[])
 {
-    imdct512_pre_ifft_twiddle_sse (pm128, p_imdct->buf, data, p_imdct->xcos_sin_sse);  
+    imdct512_pre_ifft_twiddle_sse( pm128, p_imdct->buf, data,
+                                   p_imdct->xcos_sin_sse );
     _M( fft_128p ) ( p_imdct->buf );
-    imdct512_post_ifft_twiddle_sse (p_imdct->buf, p_imdct->xcos_sin_sse);
-    imdct512_window_delay_nol_sse (p_imdct->buf, data, window, delay);
+    imdct512_post_ifft_twiddle_sse( p_imdct->buf, p_imdct->xcos_sin_sse );
+    imdct512_window_delay_nol_sse( p_imdct->buf, data, window, delay );
 }
 
 static void imdct512_pre_ifft_twiddle_sse (const int *pmt, complex_t *buf, float *data, float *xcos_sin_sse)
@@ -408,7 +412,8 @@ static void imdct512_window_delay_sse (complex_t *buf, float *data_ptr, float *w
     
 }
 
-static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt)
+static void imdct512_window_delay_nol_sse( complex_t *buf, float *data_ptr,
+                                           float *window_prt, float *delay_prt )
 {
     __asm__ __volatile__ (
     ".align 16\n"
@@ -501,7 +506,6 @@ static void imdct512_window_delay_nol_sse (complex_t *buf, float *data_ptr, floa
     "leal 512(%%ebp), %%esi\n"  /* buf[64].re */
     "leal 508(%%ebp), %%edi\n"  /* buf[63].im */
     "movl $16, %%ebx\n"         /* loop count */
-    "addl  $-1024, %%ecx\n"  /* delay */
     
     ".align 16\n"
 ".first_128_delays:\n"

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.31 2001/11/13 12:09:17 henri Exp $
+ * $Id: modules.h,v 1.32 2001/11/13 18:10:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,7 +41,7 @@ extern module_bank_t *p_module_bank;
  *****************************************************************************/
 
 /* Number of tries before we unload an unused module */
-#define MODULE_HIDE_DELAY 100
+#define MODULE_HIDE_DELAY 10000
 
 /* The module handle type. */
 #ifdef SYS_BEOS

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_adec.c,v 1.1 2001/11/13 12:09:17 henri Exp $
+ * $Id: ac3_adec.c,v 1.2 2001/11/13 18:10:38 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -115,10 +115,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int ac3_adec_Probe( probedata_t *p_data )
 {
-    if( p_data->i_type == AC3_AUDIO_ES )
-        return( 50 );
-    else
-        return( 0 );
+    return ( p_data->i_type == AC3_AUDIO_ES ) ? 50 : 0;
 }
 
 /*****************************************************************************
@@ -134,10 +131,11 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
     /* Allocate the memory needed to store the thread's structure */
     p_ac3thread = (ac3dec_thread_t *)memalign(16, sizeof(ac3dec_thread_t));
 
-    if(p_ac3thread == NULL)
+    if( p_ac3thread == NULL )
     {
         intf_ErrMsg ( "ac3dec error: not enough memory "
                       "for ac3_adec_Run() to allocate p_ac3thread" );
+        free( p_ac3thread->p_config );
         return( -1 );
     }
    
@@ -148,6 +146,8 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
     if( ac3_adec_Init( p_ac3thread ) )
     {
         intf_ErrMsg( "ac3_adec error : could not initialize thread" );
+        free( p_ac3thread->p_config );
+        free( p_ac3thread );
         return( -1 );
     }
 
@@ -227,7 +227,10 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
 
     /* End of the ac3 decoder thread */
     ac3_adec_EndThread (p_ac3thread);
-    
+
+    free( p_ac3thread->p_config );
+    free( p_ac3thread );
+
     return( 0 );
 }
 
@@ -253,7 +256,6 @@ static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
     {
         intf_ErrMsg( "ac3dec error: no suitable downmix module" );
         free( p_ac3thread->ac3_decoder );
-        free( p_ac3thread );
         return( -1 );
     }
 
@@ -282,7 +284,6 @@ static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
         module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
         free( p_ac3thread->ac3_decoder->imdct );
         free( p_ac3thread->ac3_decoder );
-        free( p_ac3thread );
         return( -1 );
     }
 
@@ -293,34 +294,35 @@ static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
     IMDCT->pf_imdct_512     = F.pf_imdct_512;
     IMDCT->pf_imdct_512_nol = F.pf_imdct_512_nol;
 #undef F
-#undef IMDCT
 
     /* Initialize the ac3 decoder structures */
+#define p_dec p_ac3thread->ac3_decoder
 #if defined( __MINGW32__ )
-    p_ac3thread->ac3_decoder->samples_back = memalign(16, 6 * 256 *
-        sizeof(float) + 15);
-    p_ac3thread->ac3_decoder->samples = (float *) (((unsigned long)
-        p_ac3thread->ac3_decoder->samples_back+15) & ~0xFUL);
+    p_dec->samples_back = memalign( 16, 6 * 256 * sizeof(float) + 15 );
+    p_dec->samples = (float *)
+                     (((unsigned long) p_dec->samples_back + 15 ) & ~0xFUL);
 #else
-     p_ac3thread->ac3_decoder->samples = memalign(16, 6 * 256 * sizeof(float));
+    p_dec->samples = memalign( 16, 6 * 256 * sizeof(float) );
 #endif
-    p_ac3thread->ac3_decoder->imdct->buf = memalign(16, N/4 * sizeof(complex_t));
-    p_ac3thread->ac3_decoder->imdct->delay = memalign(16, 6 * 256 * sizeof(float));
-    p_ac3thread->ac3_decoder->imdct->delay1 = memalign(16, 6 * 256 * sizeof(float));
-    p_ac3thread->ac3_decoder->imdct->xcos1 = memalign(16, N/4 * sizeof(float));
-    p_ac3thread->ac3_decoder->imdct->xsin1 = memalign(16, N/4 * sizeof(float));
-    p_ac3thread->ac3_decoder->imdct->xcos2 = memalign(16, N/8 * sizeof(float));
-    p_ac3thread->ac3_decoder->imdct->xsin2 = memalign(16, N/8 * sizeof(float));
-    p_ac3thread->ac3_decoder->imdct->xcos_sin_sse = memalign(16, 128 * 4 * sizeof(float));
-    p_ac3thread->ac3_decoder->imdct->w_2 = memalign(16, 2 * sizeof(complex_t));
-    p_ac3thread->ac3_decoder->imdct->w_4 = memalign(16, 4 * sizeof(complex_t));
-    p_ac3thread->ac3_decoder->imdct->w_8 = memalign(16, 8 * sizeof(complex_t));
-    p_ac3thread->ac3_decoder->imdct->w_16 = memalign(16, 16 * sizeof(complex_t));
-    p_ac3thread->ac3_decoder->imdct->w_32 = memalign(16, 32 * sizeof(complex_t));
-    p_ac3thread->ac3_decoder->imdct->w_64 = memalign(16, 64 * sizeof(complex_t));
-    p_ac3thread->ac3_decoder->imdct->w_1 = memalign(16, sizeof(complex_t));
+#undef p_dec
 
-    ac3_init (p_ac3thread->ac3_decoder);
+    IMDCT->buf    = memalign( 16, N/4 * sizeof(complex_t) );
+    IMDCT->delay  = memalign( 16, 6 * 256 * sizeof(float) );
+    IMDCT->delay1 = memalign( 16, 6 * 256 * sizeof(float) );
+    IMDCT->xcos1  = memalign( 16, N/4 * sizeof(float) );
+    IMDCT->xsin1  = memalign( 16, N/4 * sizeof(float) );
+    IMDCT->xcos2  = memalign( 16, N/8 * sizeof(float) );
+    IMDCT->xsin2  = memalign( 16, N/8 * sizeof(float) );
+    IMDCT->xcos_sin_sse = memalign( 16, 128 * 4 * sizeof(float) );
+    IMDCT->w_1    = memalign( 16, 1  * sizeof(complex_t) );
+    IMDCT->w_2    = memalign( 16, 2  * sizeof(complex_t) );
+    IMDCT->w_4    = memalign( 16, 4  * sizeof(complex_t) );
+    IMDCT->w_8    = memalign( 16, 8  * sizeof(complex_t) );
+    IMDCT->w_16   = memalign( 16, 16 * sizeof(complex_t) );
+    IMDCT->w_32   = memalign( 16, 32 * sizeof(complex_t) );
+    IMDCT->w_64   = memalign( 16, 64 * sizeof(complex_t) );
+
+    ac3_init( p_ac3thread->ac3_decoder );
 
     /*
      * Initialize the output properties
@@ -343,6 +345,30 @@ static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
                                                AC3DEC_FRAME_SIZE, NULL  );
     if ( p_ac3thread->p_aout_fifo == NULL )
     {
+        free( IMDCT->w_1 );
+        free( IMDCT->w_64 );
+        free( IMDCT->w_32 );
+        free( IMDCT->w_16 );
+        free( IMDCT->w_8 );
+        free( IMDCT->w_4 );
+        free( IMDCT->w_2 );
+        free( IMDCT->xcos_sin_sse );
+        free( IMDCT->xsin2 );
+        free( IMDCT->xcos2 );
+        free( IMDCT->xsin1 );
+        free( IMDCT->xcos1 );
+        free( IMDCT->delay1 );
+        free( IMDCT->delay );
+        free( IMDCT->buf );
+#undef IMDCT
+
+#if defined( __MINGW32__ )
+        free( p_ac3thread->ac3_decoder->samples_back );
+#else
+        free( p_ac3thread->ac3_decoder->samples );
+#endif
+        free( p_ac3thread->ac3_decoder->imdct );
+        free( p_ac3thread->ac3_decoder );
         return( -1 );
     }
 
@@ -405,21 +431,24 @@ static void ac3_adec_EndThread (ac3dec_thread_t * p_ac3thread)
     module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
 
     /* Destroy descriptor */
-    free( p_ac3thread->ac3_decoder->imdct->w_1 );
-    free( p_ac3thread->ac3_decoder->imdct->w_64 );
-    free( p_ac3thread->ac3_decoder->imdct->w_32 );
-    free( p_ac3thread->ac3_decoder->imdct->w_16 );
-    free( p_ac3thread->ac3_decoder->imdct->w_8 );
-    free( p_ac3thread->ac3_decoder->imdct->w_4 );
-    free( p_ac3thread->ac3_decoder->imdct->w_2 );
-    free( p_ac3thread->ac3_decoder->imdct->xcos_sin_sse );
-    free( p_ac3thread->ac3_decoder->imdct->xsin2 );
-    free( p_ac3thread->ac3_decoder->imdct->xcos2 );
-    free( p_ac3thread->ac3_decoder->imdct->xsin1 );
-    free( p_ac3thread->ac3_decoder->imdct->xcos1 );
-    free( p_ac3thread->ac3_decoder->imdct->delay1 );
-    free( p_ac3thread->ac3_decoder->imdct->delay );
-    free( p_ac3thread->ac3_decoder->imdct->buf );
+#define IMDCT p_ac3thread->ac3_decoder->imdct
+    free( IMDCT->w_1 );
+    free( IMDCT->w_64 );
+    free( IMDCT->w_32 );
+    free( IMDCT->w_16 );
+    free( IMDCT->w_8 );
+    free( IMDCT->w_4 );
+    free( IMDCT->w_2 );
+    free( IMDCT->xcos_sin_sse );
+    free( IMDCT->xsin2 );
+    free( IMDCT->xcos2 );
+    free( IMDCT->xsin1 );
+    free( IMDCT->xcos1 );
+    free( IMDCT->delay1 );
+    free( IMDCT->delay );
+    free( IMDCT->buf );
+#undef IMDCT
+
 #if defined( __MINGW32__ )
     free( p_ac3thread->ac3_decoder->samples_back );
 #else
@@ -427,17 +456,15 @@ static void ac3_adec_EndThread (ac3dec_thread_t * p_ac3thread)
 #endif
     free( p_ac3thread->ac3_decoder->imdct );
     free( p_ac3thread->ac3_decoder );
-    free( p_ac3thread->p_config );
-    free( p_ac3thread );
 
-    intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p destroyed", p_ac3thread);
+    intf_DbgMsg( "ac3dec debug: ac3 decoder thread %p destroyed", p_ac3thread );
 }
 
 /*****************************************************************************
-* BitstreamCallback: Import parameters from the new data/PES packet
-*****************************************************************************
-* This function is called by input's NextDataPacket.
-*****************************************************************************/
+ * BitstreamCallback: Import parameters from the new data/PES packet
+ *****************************************************************************
+ * This function is called by input's NextDataPacket.
+ *****************************************************************************/
 static void BitstreamCallback ( bit_stream_t * p_bit_stream,
                                         boolean_t b_new_pes)
 {

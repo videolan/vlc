@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.c,v 1.1 2001/11/13 12:09:17 henri Exp $
+ * $Id: ac3_imdct.c,v 1.2 2001/11/13 18:10:38 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -140,10 +140,16 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
         for (i=0; i<p_ac3dec->bsi.nfchans; i++)
         {
             if (p_ac3dec->audblk.blksw[i])
+            {
                 /* There is only a C function */
-                p_ac3dec->imdct->pf_imdct_256_nol (p_ac3dec->imdct, p_ac3dec->samples+256*i, p_ac3dec->imdct->delay1+256*i);
+                p_ac3dec->imdct->pf_imdct_256_nol( p_ac3dec->imdct,
+                     p_ac3dec->samples+256*i, p_ac3dec->imdct->delay1+256*i );
+            }
             else
-                p_ac3dec->imdct->pf_imdct_512_nol (p_ac3dec->imdct, p_ac3dec->samples+256*i, p_ac3dec->imdct->delay1+256*i);
+            {
+                p_ac3dec->imdct->pf_imdct_512_nol( p_ac3dec->imdct,
+                     p_ac3dec->samples+256*i, p_ac3dec->imdct->delay1+256*i );
+            }
         }
 
         /* mix the sample, overlap */
