@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.38 2003/06/12 21:28:39 gbazin Exp $
+ * $Id: interface.cpp,v 1.39 2003/06/12 22:03:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -904,5 +904,6 @@ void wxVolCtrl::Change( int i_volume )
 {
     aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 );
     SetValue( i_volume );
-    SetToolTip( wxString::Format(wxU(_("Volume")) + wxT(" %d"), i_volume ) );
+    SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
+                i_volume ) );
 }
