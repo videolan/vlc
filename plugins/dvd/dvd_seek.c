@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.7 2002/05/20 22:45:03 sam Exp $
+ * $Id: dvd_seek.c,v 1.8 2002/05/21 00:34:41 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -192,7 +192,7 @@ int Lb2CellMap( thread_dvd_data_t * p_dvd )
 
 int LbMaxOnce( thread_dvd_data_t * p_dvd )
 {
-    int i_block_once = p_dvd->i_last_lb - p_dvd->i_vts_lb + 1;
+    int i_block_once = p_dvd->i_last_lb + 1 - p_dvd->i_vts_lb;
 
     /* Get the position of the next cell if we're at cell end */
     if( i_block_once <= 0 )
@@ -229,7 +229,7 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
             return 0;
         }
 
-        i_block_once = p_dvd->i_last_lb - p_dvd->i_vts_lb + 1;
+        i_block_once = p_dvd->i_last_lb + 1 - p_dvd->i_vts_lb;
     }
 
     return i_block_once;

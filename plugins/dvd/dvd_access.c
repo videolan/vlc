@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.16 2002/05/20 22:45:03 sam Exp $
+ * $Id: dvd_access.c,v 1.17 2002/05/21 00:34:41 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -442,7 +442,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         /* Area definition */
         p_input->stream.p_selected_area->i_start = LB2OFF( i_first );
         p_input->stream.p_selected_area->i_size  =
-                                        LB2OFF( i_last - p_dvd->i_vts_lb + 1 );
+                                        LB2OFF( i_last + 1 - p_dvd->i_vts_lb );
 
         /* Destroy obsolete ES by reinitializing programs */
         DVDFlushStream( p_input );
@@ -458,7 +458,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                        p_input->stream.pp_programs[p_dvd->i_angle-1] ); 
 
         intf_WarnMsg( 3, "dvd info: title first %i, last %i, size %i",
-                         i_first, i_last, i_last - p_dvd->i_vts_lb + 1 );
+                         i_first, i_last, i_last + 1 - p_dvd->i_vts_lb );
         IfoPrintTitle( p_dvd );
 
         /* No PSM to read in DVD mode, we already have all information */
