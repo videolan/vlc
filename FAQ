@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.14 2003/01/08 12:13:24 lool Exp $
+$Id: FAQ,v 1.15 2003/01/08 14:31:04 lool Exp $
 
 1. Using VLC
 
@@ -256,6 +256,7 @@ want to distribute with its sources. For example, if you plan to
 distribute the binary version in its 0.4.6 version you should include:
 
    http://www.videolan.org/pub/videolan/vlc/0.4.6/vlc-0.4.6.tar.gz
+   http://www.videolan.org/pub/videolan/vlc/0.4.6/contrib/
 
 You don't need to bother explaining where the sources are, but the
 sources have to share the same media as the products.
