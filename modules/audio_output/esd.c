@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.21 2004/01/25 17:58:29 murray Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -77,6 +77,7 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     int i_nb_channels;
+    int i_newfd = -1;
     int fl;
 
     /* Allocate structure */
@@ -118,7 +119,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Force the rate, otherwise the sound is very noisy */
     p_aout->output.output.i_rate = ESD_DEFAULT_RATE;
-    
+
     /* open a socket for playing a stream
      * and try to open /dev/dsp if there's no EsounD */
     p_sys->i_fd = esd_play_stream_fallback( p_sys->esd_format,
@@ -136,7 +137,8 @@ static int Open( vlc_object_t *p_this )
     /* ESD latency is calculated for 44100 Hz. We don't have any way to get the
      * number of buffered samples, so I assume ESD_BUF_SIZE/2 */
     p_sys->latency =
-        (mtime_t)( esd_get_latency( esd_open_sound(NULL) ) + ESD_BUF_SIZE/2
+        (mtime_t)( esd_get_latency( i_newfd = esd_open_sound(NULL) ) +
+                      ESD_BUF_SIZE/2
                     * p_aout->output.output.i_bytes_per_frame
                     * p_aout->output.output.i_rate
                     / ESD_DEFAULT_RATE )
@@ -144,6 +146,7 @@ static int Open( vlc_object_t *p_this )
       / p_aout->output.output.i_bytes_per_frame
       / p_aout->output.output.i_rate;
 
+    close( i_newfd );
     return VLC_SUCCESS;
 }
 
