@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc-cvs\n"
-"POT-Creation-Date: 2002-06-07 16:50+0200\n"
+"POT-Creation-Date: 2002-06-08 00:25+0200\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1174,7 +1174,7 @@ msgid "File"
 msgstr "Fil"
 
 #: plugins/gtk/gnome_interface.c:378 plugins/gtk/gnome_interface.c:581
-#: plugins/gtk/gnome_interface.c:1707 plugins/gtk/gnome_interface.c:2321
+#: plugins/gtk/gnome_interface.c:1707 plugins/gtk/gnome_interface.c:2322
 #: plugins/gtk/gtk_interface.c:493 plugins/gtk/gtk_interface.c:680
 #: plugins/gtk/gtk_interface.c:2134
 msgid "Disc"
@@ -1370,33 +1370,33 @@ msgstr "Velg fil"
 msgid "Open Disc"
 msgstr "Åpne Disk"
 
-#: plugins/gtk/gnome_interface.c:1261 plugins/gtk/gnome_interface.c:2211
+#: plugins/gtk/gnome_interface.c:1261 plugins/gtk/gnome_interface.c:2212
 #: plugins/gtk/gtk_interface.c:1488
 msgid "Disc type"
 msgstr "Disktype"
 
-#: plugins/gtk/gnome_interface.c:1275 plugins/gtk/gnome_interface.c:2226
+#: plugins/gtk/gnome_interface.c:1275 plugins/gtk/gnome_interface.c:2227
 #: plugins/gtk/gtk_interface.c:1502
 msgid "DVD"
 msgstr "DVD"
 
-#: plugins/gtk/gnome_interface.c:1283 plugins/gtk/gnome_interface.c:2234
+#: plugins/gtk/gnome_interface.c:1283 plugins/gtk/gnome_interface.c:2235
 #: plugins/gtk/gtk_interface.c:1510
 msgid "VCD"
 msgstr "VCD"
 
-#: plugins/gtk/gnome_interface.c:1291 plugins/gtk/gnome_interface.c:2242
+#: plugins/gtk/gnome_interface.c:1291 plugins/gtk/gnome_interface.c:2243
 #: plugins/gtk/gtk_interface.c:1518
 msgid "Starting position"
 msgstr "Startposisjon"
 
-#: plugins/gtk/gnome_interface.c:1318 plugins/gtk/gnome_interface.c:2269
+#: plugins/gtk/gnome_interface.c:1318 plugins/gtk/gnome_interface.c:2270
 #: plugins/gtk/gtk_interface.c:1555 plugins/gtk/gtk_menu.c:787
 #: plugins/gtk/gtk_menu.c:922
 msgid "Chapter"
 msgstr "Kapittel"
 
-#: plugins/gtk/gnome_interface.c:1308 plugins/gtk/gnome_interface.c:2259
+#: plugins/gtk/gnome_interface.c:1308 plugins/gtk/gnome_interface.c:2260
 #: plugins/gtk/gtk_interface.c:1565 plugins/gtk/gtk_menu.c:892
 #: plugins/gtk/gtk_menu.c:913
 msgid "Title"
@@ -1434,20 +1434,20 @@ msgstr ""
 msgid "Channel server "
 msgstr "Kanaltjener:"
 
-#: plugins/gtk/gnome_interface.c:1497 plugins/gtk/gnome_interface.c:2366
+#: plugins/gtk/gnome_interface.c:1497 plugins/gtk/gnome_interface.c:2367
 #: plugins/gtk/gtk_interface.c:1740
 msgid "HTTP"
 msgstr "HTTP"
 
 #: plugins/gtk/gnome_interface.c:1507 plugins/gtk/gnome_interface.c:1593
-#: plugins/gtk/gnome_interface.c:1605 plugins/gtk/gnome_interface.c:2416
-#: plugins/gtk/gnome_interface.c:2521 plugins/gtk/gtk_interface.c:1750
+#: plugins/gtk/gnome_interface.c:1605 plugins/gtk/gnome_interface.c:2417
+#: plugins/gtk/gnome_interface.c:2522 plugins/gtk/gtk_interface.c:1750
 #: plugins/gtk/gtk_interface.c:1836 plugins/gtk/gtk_interface.c:1848
 msgid "Port"
 msgstr "Port"
 
 #: plugins/gtk/gnome_interface.c:1517 plugins/gtk/gnome_interface.c:1529
-#: plugins/gtk/gnome_interface.c:2406 plugins/gtk/gtk_interface.c:1760
+#: plugins/gtk/gnome_interface.c:2407 plugins/gtk/gtk_interface.c:1760
 #: plugins/gtk/gtk_interface.c:1772
 msgid "Address"
 msgstr "Adresse"
@@ -1464,15 +1464,15 @@ msgstr "Hopp"
 msgid "Go to:"
 msgstr "Gå til:"
 
-#: plugins/gtk/gnome_interface.c:2043 plugins/gtk/gtk_interface.c:1996
+#: plugins/gtk/gnome_interface.c:2044 plugins/gtk/gtk_interface.c:1996
 msgid "s."
 msgstr "s."
 
-#: plugins/gtk/gnome_interface.c:2058 plugins/gtk/gtk_interface.c:2011
+#: plugins/gtk/gnome_interface.c:2059 plugins/gtk/gtk_interface.c:2011
 msgid "m:"
 msgstr "m:"
 
-#: plugins/gtk/gnome_interface.c:2073 plugins/gtk/gtk_interface.c:2026
+#: plugins/gtk/gnome_interface.c:2074 plugins/gtk/gtk_interface.c:2026
 msgid "h:"
 msgstr "h:"
 
@@ -1480,12 +1480,12 @@ msgstr "h:"
 msgid "Add"
 msgstr "Legg til"
 
-#: plugins/gtk/gnome_interface.c:1721 plugins/gtk/gnome_interface.c:2536
+#: plugins/gtk/gnome_interface.c:1721 plugins/gtk/gnome_interface.c:2537
 #: plugins/gtk/gtk_interface.c:2148
 msgid "Network"
 msgstr "Nettverk"
 
-#: plugins/gtk/gnome_interface.c:1728 plugins/gtk/gnome_interface.c:1867
+#: plugins/gtk/gnome_interface.c:1728 plugins/gtk/gnome_interface.c:1868
 #: plugins/gtk/gtk_interface.c:2155
 msgid "Url"
 msgstr "Url"
@@ -1518,46 +1518,46 @@ msgstr "_Invertert"
 msgid "_Select"
 msgstr "_Valgt"
 
-#: plugins/gtk/gnome_interface.c:1874 plugins/gtk/gtk_interface.c:2265
+#: plugins/gtk/gnome_interface.c:1875 plugins/gtk/gtk_interface.c:2265
 msgid "Duration"
 msgstr "Varighet"
 
-#: plugins/gtk/gnome_interface.c:2578 plugins/gtk/gtk_interface.c:2355
+#: plugins/gtk/gnome_interface.c:2579 plugins/gtk/gtk_interface.c:2355
 msgid "Messages"
 msgstr "Beskjeder"
 
-#: plugins/gtk/gnome_interface.c:2656 plugins/gtk/gtk_interface.c:2432
+#: plugins/gtk/gnome_interface.c:2657 plugins/gtk/gtk_interface.c:2432
 #, fuzzy
 msgid "Open Satellite Card"
 msgstr "Åpne spilleliste-vinduet"
 
-#: plugins/gtk/gnome_interface.c:2672 plugins/gtk/gtk_interface.c:2456
+#: plugins/gtk/gnome_interface.c:2673 plugins/gtk/gtk_interface.c:2456
 msgid "Transponder settings"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:2740 plugins/gtk/gtk_interface.c:2493
+#: plugins/gtk/gnome_interface.c:2741 plugins/gtk/gtk_interface.c:2493
 msgid "Symbol Rate"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:2689 plugins/gtk/gtk_interface.c:2503
+#: plugins/gtk/gnome_interface.c:2690 plugins/gtk/gtk_interface.c:2503
 #, fuzzy
 msgid "Frequency"
 msgstr "Frekvens:"
 
-#: plugins/gtk/gnome_interface.c:2709 plugins/gtk/gtk_interface.c:2513
+#: plugins/gtk/gnome_interface.c:2710 plugins/gtk/gtk_interface.c:2513
 #, fuzzy
 msgid "Polarization"
 msgstr "_Navigasjon"
 
-#: plugins/gtk/gnome_interface.c:2729 plugins/gtk/gtk_interface.c:2523
+#: plugins/gtk/gnome_interface.c:2730 plugins/gtk/gtk_interface.c:2523
 msgid "Vertical"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:2719 plugins/gtk/gtk_interface.c:2533
+#: plugins/gtk/gnome_interface.c:2720 plugins/gtk/gtk_interface.c:2533
 msgid "Horizontal"
 msgstr ""
 
-#: plugins/gtk/gnome_interface.c:2760 plugins/gtk/gtk_interface.c:2543
+#: plugins/gtk/gnome_interface.c:2761 plugins/gtk/gtk_interface.c:2543
 msgid "FEC"
 msgstr ""
 
@@ -1622,7 +1622,7 @@ msgstr ""
 "Beklager, modul håndtereren virker ikke ennå. Vennligst prøv på nytt i en "
 "senere versjon."
 
-#: plugins/gtk/gnome_interface.c:1355 plugins/gtk/gnome_interface.c:2306
+#: plugins/gtk/gnome_interface.c:1355 plugins/gtk/gnome_interface.c:2307
 msgid "Device name:"
 msgstr "Enhets navn:"
 
@@ -1646,42 +1646,42 @@ msgstr "Inverter"
 msgid "Select"
 msgstr "Velg"
 
-#: plugins/gtk/gnome_interface.c:2026
+#: plugins/gtk/gnome_interface.c:2027
 #, fuzzy
 msgid "Jump to: "
 msgstr "Hopp til: "
 
-#: plugins/gtk/gnome_interface.c:2180
+#: plugins/gtk/gnome_interface.c:2181
 #, fuzzy
 msgid "Open Stream"
 msgstr "Stopp strøm"
 
-#: plugins/gtk/gnome_interface.c:2343
+#: plugins/gtk/gnome_interface.c:2344
 msgid "Protocol"
 msgstr "Protokoll"
 
-#: plugins/gtk/gnome_interface.c:2358
+#: plugins/gtk/gnome_interface.c:2359
 #, fuzzy
 msgid "UDP stream"
 msgstr "Spill strøm"
 
-#: plugins/gtk/gnome_interface.c:2374
+#: plugins/gtk/gnome_interface.c:2375
 msgid "RTP"
 msgstr "RTP"
 
-#: plugins/gtk/gnome_interface.c:2382
+#: plugins/gtk/gnome_interface.c:2383
 msgid "Server"
 msgstr "Tjener"
 
-#: plugins/gtk/gnome_interface.c:2451 plugins/gtk/gnome_interface.c:2466
+#: plugins/gtk/gnome_interface.c:2452 plugins/gtk/gnome_interface.c:2467
 msgid "Broadcast"
 msgstr "Kringkasting"
 
-#: plugins/gtk/gnome_interface.c:2486
+#: plugins/gtk/gnome_interface.c:2487
 msgid "Channels"
 msgstr "Kanaler"
 
-#: plugins/gtk/gnome_interface.c:2501
+#: plugins/gtk/gnome_interface.c:2502
 #, fuzzy
 msgid "Channel server"
 msgstr "Kanaltjener:"
