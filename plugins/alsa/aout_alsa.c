@@ -91,12 +91,12 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  *****************************************************************************/
 void aout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->p_probe = aout_Probe;
-    p_function_list->functions.aout.p_open = aout_Open;
-    p_function_list->functions.aout.p_setformat = aout_SetFormat;
-    p_function_list->functions.aout.p_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.p_play = aout_Play;
-    p_function_list->functions.aout.p_close = aout_Close;
+    p_function_list->pf_probe = aout_Probe;
+    p_function_list->functions.aout.pf_open = aout_Open;
+    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
+    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
+    p_function_list->functions.aout.pf_play = aout_Play;
+    p_function_list->functions.aout.pf_close = aout_Close;
 }
     
 
@@ -148,7 +148,6 @@ static int aout_Probe( probedata_t *p_data )
  *****************************************************************************
  * This function opens an alsa device, through the alsa API
  *****************************************************************************/
-
 static int aout_Open( aout_thread_t *p_aout )
 {
 
@@ -195,8 +194,7 @@ static int aout_Open( aout_thread_t *p_aout )
  * This function prepares the device, sets the rate, format, the mode
  * ("play as soon as you have data"), and buffer information.
  *****************************************************************************/
-
-int aout_SetFormat( aout_thread_t *p_aout )
+static int aout_SetFormat( aout_thread_t *p_aout )
 {
     
     int i_set_param_returns;
@@ -288,7 +286,7 @@ int aout_SetFormat( aout_thread_t *p_aout )
  * of data to play, it switches to the "underrun" status. It has to
  * be flushed and re-prepared
  *****************************************************************************/
-long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     snd_pcm_channel_status_t alsa_channel_status;
     int i_alsa_get_status_returns;
@@ -333,7 +331,7 @@ long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
  *****************************************************************************
  * Plays a sample using the snd_pcm_write function from the alsa API
  *****************************************************************************/
-void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_write_returns;
 
@@ -350,7 +348,7 @@ void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 /*****************************************************************************
  * aout_Close : close the Alsa device
  *****************************************************************************/
-void aout_Close( aout_thread_t *p_aout )
+static void aout_Close( aout_thread_t *p_aout )
 {
     int i_close_returns;
 
@@ -365,3 +363,4 @@ void aout_Close( aout_thread_t *p_aout )
     
     intf_DbgMsg( "Alsa plugin : Alsa device closed");
 }
+

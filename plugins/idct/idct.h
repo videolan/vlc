@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vdec_idct.h : types for the inverse discrete cosine transform
+ * idct.h : macros for the inverse discrete cosine transform
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_idct.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
+ * $Id: idct.h,v 1.1 2001/01/13 12:57:20 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -21,26 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/*****************************************************************************
- * Requires:
- *  "config.h"
- *  "common.h"
- *  "threads.h"
- *  "video_parser.h"
- *****************************************************************************/
-
-/*****************************************************************************
- * Common declarations
- *****************************************************************************/
-
-#ifndef VDEC_DFT
-typedef short dctelem_t;
-#else
-typedef int dctelem_t;
-#endif
-
-struct vdec_thread_s;
 
 #define SPARSE_SCALE_FACTOR 8
 #define DCTSIZE 8 /* 8*8 DCT */
@@ -160,14 +140,3 @@ struct vdec_thread_s;
 #define MULTIPLY(var,const)  ((var) * (const))
 #endif
 
-/*****************************************************************************
- * Function pointers
- *****************************************************************************/
-typedef void (*f_idct_t)( struct vdec_thread_s *, dctelem_t*, int );
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-void vdec_InitIDCT (struct vdec_thread_s * p_vdec);
-void vdec_SparseIDCT( struct vdec_thread_s *, dctelem_t*, int );
-void vdec_IDCT( struct vdec_thread_s *, dctelem_t*, int );

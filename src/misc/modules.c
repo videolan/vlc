@@ -271,7 +271,7 @@ module_t * module_Need( module_bank_t *p_bank,
                 if( ( (1 << i_index) & i_capabilities ) )
                 {
                     i_score = ( (function_list_t *)p_module->p_functions)
-                                                  [i_index].p_probe( p_data );
+                                                  [i_index].pf_probe( p_data );
 
                     if( i_score )
                     {

@@ -238,7 +238,6 @@ endif
 
 VIDEO_DECODER =	src/video_decoder/video_decoder.o \
 		src/video_decoder/vdec_motion.o \
-		src/video_decoder/vdec_idct.o \
 		$(vdec_motion_inner)
 
 MISC =		src/misc/mtime.o \
@@ -276,8 +275,8 @@ endif
 # 
 ifneq (,$(findstring 86,$(ARCH)))
 ifneq (,$(findstring mmx,$(ARCH)))
-ASM_OBJ = 	src/video_decoder/vdec_idctmmx.o \
-		src/video_output/video_yuv_mmx.o
+ASM_OBJ =		src/video_output/video_yuv_mmx.o
+PLUGIN_IDCTMMX_ASM = 	plugins/idct/idctmmx_asm.o
 endif
 endif
 
@@ -351,6 +350,15 @@ PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
 		plugins/yuvmmx/video_yuv24.o \
 		plugins/yuvmmx/video_yuv32.o
 
+PLUGIN_IDCT =	plugins/idct/idct.o \
+		plugins/idct/idct_common.o
+
+PLUGIN_IDCTCLASSIC =	plugins/idct/idctclassic.o \
+			plugins/idct/idct_common.o
+
+PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
+			plugins/idct/idct_common.o
+
 PLUGIN_ALSA =	plugins/alsa/alsa.o \
 		plugins/alsa/aout_alsa.o
 
@@ -364,14 +372,23 @@ STD_PLUGIN_OBJ =$(PLUGIN_BEOS) \
 		$(PLUGIN_X11) \
 		$(PLUGIN_YUV) \
 		$(PLUGIN_YUVMMX) \
+		$(PLUGIN_IDCT) \
+		$(PLUGIN_IDCTMMX) \
 		$(PLUGIN_SDL) \
 		$(PLUGIN_ALSA) \
 		$(PLUGIN_NULL)
 
+STD_PLUGIN_ASM =$(PLUGIN_IDCTMMX_ASM)
+
+STD_PLUGIN_COMMON =	plugins/idct/idct_common.o
+# filter out duplicates from the plugin object lists
+STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON), $(STD_PLUGIN_OBJ)) \
+			$(STD_PLUGIN_COMMON)
+
 #
 # Other lists of files
 #
-objects := $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
+objects := $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ) $(STD_PLUGIN_ASM)
 dependancies := $(objects:%.o=.dep/%.d)
 
 # All symbols must be exported
@@ -467,6 +484,10 @@ $(STD_PLUGIN_OBJ): %.o: .dep/%.d
 $(STD_PLUGIN_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
+$(STD_PLUGIN_ASM): %.o: Makefile.dep
+$(STD_PLUGIN_ASM): %.o: %.S
+	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+
 $(PLUGIN_GNOME): %.o: Makefile.dep
 $(PLUGIN_GNOME): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
@@ -535,17 +556,35 @@ lib/ggi.so: $(PLUGIN_GGI)
 lib/sdl.so: $(PLUGIN_SDL)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_SDL)
 
-lib/yuv.so: $(PLUGIN_YUV)
 ifeq ($(SYS),beos)
+lib/idct.so: $(PLUGIN_IDCT)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-else
-	$(CC) $(PCFLAGS) -shared -o $@ $^
-endif
+
+lib/yuv.so: $(PLUGIN_YUV)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
-ifeq ($(SYS),beos)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+
+lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTMMX_ASM)
 	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
+lib/yuv.so: $(PLUGIN_YUV)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/yuvmmx.so: $(PLUGIN_YUVMMX)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/idct.so: $(PLUGIN_IDCT)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/idctclassic.so: $(PLUGIN_IDCTCLASSIC)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
+
+lib/idctmmx.so: $(PLUGIN_IDCTMMX) $(PLUGIN_IDCTMMX_ASM)
 	$(CC) $(PCFLAGS) -shared -o $@ $^
 endif
 

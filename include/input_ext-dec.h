@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.13 2001/01/12 17:33:18 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.14 2001/01/13 12:57:19 sam Exp $
  *
  * Authors:
  *
@@ -66,7 +66,7 @@ typedef struct pes_packet_s
 
     /* Pointers to packets (packets are then linked by the p_prev and
        p_next fields of the data_packet_t struct) */
-    data_packet_t *         p_first;      /* The first packet containing this
+    data_packet_t *         p_first;      /* The first packet contained by this
                                            * PES (used by decoders). */
 } pes_packet_t;
 

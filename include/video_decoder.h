@@ -2,7 +2,7 @@
  * video_decoder.h : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
+ * $Id: video_decoder.h,v 1.22 2001/01/13 12:57:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

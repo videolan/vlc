@@ -139,11 +139,11 @@ typedef struct aout_thread_s
 
     /* Plugin used and shortcuts to access its capabilities */
     struct module_s *   p_module;
-    aout_open_t *       p_open;
-    aout_setformat_t *  p_setformat;
-    aout_getbufinfo_t * p_getbufinfo;
-    aout_play_t *       p_play;
-    aout_close_t *      p_close;
+    aout_open_t *       pf_open;
+    aout_setformat_t *  pf_setformat;
+    aout_getbufinfo_t * pf_getbufinfo;
+    aout_play_t *       pf_play;
+    aout_close_t *      pf_close;
 
     void *              buffer;
     /* The s32 buffer is used to mix all the audio fifos together before

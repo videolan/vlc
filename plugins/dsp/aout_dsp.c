@@ -92,12 +92,12 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  *****************************************************************************/
 void aout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->p_probe = aout_Probe;
-    p_function_list->functions.aout.p_open = aout_Open;
-    p_function_list->functions.aout.p_setformat = aout_SetFormat;
-    p_function_list->functions.aout.p_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.p_play = aout_Play;
-    p_function_list->functions.aout.p_close = aout_Close;
+    p_function_list->pf_probe = aout_Probe;
+    p_function_list->functions.aout.pf_open = aout_Open;
+    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
+    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
+    p_function_list->functions.aout.pf_play = aout_Play;
+    p_function_list->functions.aout.pf_close = aout_Close;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_beos.cpp,v 1.9 2001/01/12 13:15:42 sam Exp $
+ * $Id: aout_beos.cpp,v 1.10 2001/01/13 12:57:19 sam Exp $
  *
  * Authors:
  * Samuel Hocevar <sam@via.ecp.fr>
@@ -91,18 +91,18 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  *****************************************************************************/
 void aout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->p_probe = aout_Probe;
-    p_function_list->functions.aout.p_open = aout_Open;
-    p_function_list->functions.aout.p_setformat = aout_SetFormat;
-    p_function_list->functions.aout.p_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.p_play = aout_Play;
-    p_function_list->functions.aout.p_close = aout_Close;
+    p_function_list->pf_probe = aout_Probe;
+    p_function_list->functions.aout.pf_open = aout_Open;
+    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
+    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
+    p_function_list->functions.aout.pf_play = aout_Play;
+    p_function_list->functions.aout.pf_close = aout_Close;
 }
 
 /*****************************************************************************
  * aout_Probe: probe the audio device and return a score
  *****************************************************************************/
-int aout_Probe( aout_thread_t *p_aout )
+static int aout_Probe( probedata_t *p_data )
 {
     /* We don't test anything since I don't know what to test. However
      * if the module could be loaded it is quite likely to work. */
@@ -112,7 +112,7 @@ int aout_Probe( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_Open: opens a BPushGameSound
  *****************************************************************************/
-int aout_Open( aout_thread_t *p_aout )
+static int aout_Open( aout_thread_t *p_aout )
 {
     /* Allocate structure */
     p_aout->p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
@@ -175,7 +175,7 @@ int aout_Open( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_SetFormat: sets the dsp output format
  *****************************************************************************/
-int aout_SetFormat( aout_thread_t *p_aout )
+static int aout_SetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
@@ -183,7 +183,7 @@ int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: buffer status query
  *****************************************************************************/
-long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     /* Each value is 4 bytes long (stereo signed 16 bits) */
     long i_hard_pos = 4 * p_aout->p_sys->p_sound->CurrentPosition();
@@ -202,7 +202,7 @@ long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     long i_newbuf_pos;
 
@@ -234,7 +234,7 @@ void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 /*****************************************************************************
  * aout_Close: closes the dsp audio device
  *****************************************************************************/
-void aout_Close( aout_thread_t *p_aout )
+static void aout_Close( aout_thread_t *p_aout )
 {
     p_aout->p_sys->p_sound->UnlockCyclic();
     p_aout->p_sys->p_sound->StopPlaying( );

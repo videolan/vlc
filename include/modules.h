@@ -34,17 +34,18 @@ typedef void *  module_handle_t;
  * Module capabilities.
  *****************************************************************************/
 
-#define MODULE_CAPABILITY_NULL     0       /* The Module can't do anything */
-#define MODULE_CAPABILITY_INTF     1<<0    /* Interface */
-#define MODULE_CAPABILITY_INPUT    1<<1    /* Input */
-#define MODULE_CAPABILITY_DECAPS   1<<2    /* Decaps */
-#define MODULE_CAPABILITY_ADEC     1<<3    /* Audio decoder */
-#define MODULE_CAPABILITY_VDEC     1<<4    /* Video decoder */
-#define MODULE_CAPABILITY_AOUT     1<<5    /* Audio output */
-#define MODULE_CAPABILITY_VOUT     1<<6    /* Video output */
-#define MODULE_CAPABILITY_YUV      1<<7    /* YUV colorspace conversion */
-#define MODULE_CAPABILITY_AFX      1<<8    /* Audio effects */
-#define MODULE_CAPABILITY_VFX      1<<9    /* Video effects */
+#define MODULE_CAPABILITY_NULL     0        /* The Module can't do anything */
+#define MODULE_CAPABILITY_INTF     1 <<  0  /* Interface */
+#define MODULE_CAPABILITY_INPUT    1 <<  1  /* Input */
+#define MODULE_CAPABILITY_DECAPS   1 <<  2  /* Decaps */
+#define MODULE_CAPABILITY_ADEC     1 <<  3  /* Audio decoder */
+#define MODULE_CAPABILITY_VDEC     1 <<  4  /* Video decoder */
+#define MODULE_CAPABILITY_IDCT     1 <<  5  /* IDCT transformation */
+#define MODULE_CAPABILITY_AOUT     1 <<  6  /* Audio output */
+#define MODULE_CAPABILITY_VOUT     1 <<  7  /* Video output */
+#define MODULE_CAPABILITY_YUV      1 <<  8  /* YUV colorspace conversion */
+#define MODULE_CAPABILITY_AFX      1 <<  9  /* Audio effects */
+#define MODULE_CAPABILITY_VFX      1 << 10  /* Video effects */
 
 /* FIXME: not yet used */
 typedef struct probedata_s
@@ -58,20 +59,31 @@ typedef struct probedata_s
 /* FIXME: find a nicer way to do this. */
 typedef struct function_list_s
 {
-    int ( * p_probe ) ( probedata_t * p_data );
+    int ( * pf_probe ) ( probedata_t * p_data );
 
     union
     {
         struct
         {
-            int  ( * p_open )       ( struct aout_thread_s * p_aout );
-            int  ( * p_setformat )  ( struct aout_thread_s * p_aout );
-            long ( * p_getbufinfo ) ( struct aout_thread_s * p_aout,
-                                      long l_buffer_info );
-            void ( * p_play )       ( struct aout_thread_s * p_aout,
-                                      byte_t *buffer, int i_size );
-            void ( * p_close )      ( struct aout_thread_s * p_aout );
-	} aout;
+            int  ( * pf_open )       ( struct aout_thread_s * p_aout );
+            int  ( * pf_setformat )  ( struct aout_thread_s * p_aout );
+            long ( * pf_getbufinfo ) ( struct aout_thread_s * p_aout,
+                                       long l_buffer_info );
+            void ( * pf_play )       ( struct aout_thread_s * p_aout,
+                                       byte_t *buffer, int i_size );
+            void ( * pf_close )      ( struct aout_thread_s * p_aout );
+        } aout;
+
+        struct
+        {
+            void ( * pf_init )         ( struct vdec_thread_s * p_vdec );
+            void ( * pf_sparse_idct )  ( struct vdec_thread_s * p_vdec,
+                                         dctelem_t * p_block,
+                                         int i_sparse_pos );
+            void ( * pf_idct )         ( struct vdec_thread_s * p_vdec,
+                                         dctelem_t * p_block,
+                                         int i_idontcare );
+        } idct;
 
     } functions;
 
@@ -79,12 +91,13 @@ typedef struct function_list_s
 
 typedef struct module_functions_s
 {
-    /* The order here has to be the same as above for the #defines */
+    /* XXX: The order here has to be the same as above for the #defines */
     function_list_t intf;
     function_list_t input;
     function_list_t decaps;
     function_list_t adec;
     function_list_t vdec;
+    function_list_t idct;
     function_list_t aout;
     function_list_t vout;
     function_list_t yuv;

@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.69 2001/01/05 18:46:45 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.70 2001/01/13 12:57:21 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -44,8 +44,8 @@
 #include "video.h"
 #include "video_output.h"
 
+#include "video_decoder.h"
 #include "../video_decoder/vdec_idct.h"
-#include "../video_decoder/video_decoder.h"
 #include "../video_decoder/vdec_motion.h"
 
 #include "../video_decoder/vpar_blocks.h"
@@ -693,12 +693,12 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
 #endif
                 if( i_nc <= 1 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_sparse_idct;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else
                 {
-                    p_mb->pf_idct[i_b] = vdec_IDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_idct;
                 }
                 return;
 
@@ -844,12 +844,12 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
             case DCT_EOB:
                 if( i_nc <= 1 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_sparse_idct;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else
                 {
-                    p_mb->pf_idct[i_b] = vdec_IDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_idct;
                 }
                 return;
 
@@ -966,12 +966,12 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
 #endif
                 if( i_nc <= 1 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_sparse_idct;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else
                 {
-                    p_mb->pf_idct[i_b] = vdec_IDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_idct;
                 }
                 return;
 
@@ -1106,12 +1106,12 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
             case DCT_EOB:
                 if( i_nc <= 1 )
                 {
-                    p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_sparse_idct;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
                 }
                 else
                 {
-                    p_mb->pf_idct[i_b] = vdec_IDCT;
+                    p_mb->pf_idct[i_b] = p_vpar->pf_idct;
                 }
                 return;
 

@@ -1,9 +1,10 @@
 /*****************************************************************************
- * dummy.c : dummy plugin for vlc
+ * idctmmx.c : MMX IDCT module
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
+ * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: idctmmx.c,v 1.1 2001/01/13 12:57:20 sam Exp $
  *
- * Authors:
+ * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,42 +21,56 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME dummy
+#define MODULE_NAME idctmmx
 
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
 
-#include <stdlib.h>                                      /* malloc(), free() */
+#include <stdlib.h>
 
 #include "config.h"
-#include "common.h"                                     /* boolean_t, byte_t */
+#include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "tests.h"
 #include "plugins.h"
 
-#include "interface.h"
-#include "audio_output.h"
+#include "intf_msg.h"
+
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
 #include "video.h"
 #include "video_output.h"
 
+#include "video_decoder.h"
+
 #include "modules.h"
 #include "modules_inner.h"
+
+#include "idct.h"
+
+/*****************************************************************************
+ * Local prototypes.
+ *****************************************************************************/
+static void idct_getfunctions( function_list_t * p_function_list );
+
+static int  idct_Probe      ( probedata_t *p_data );
+static void vdec_InitIDCT   ( vdec_thread_t * p_vdec);
+       void vdec_SparseIDCT ( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                              int i_sparse_pos);
+       void vdec_IDCT       ( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                              int i_idontcare );
+
 
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for dummy module" )
+ADD_WINDOW( "Configuration for MMX IDCT module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_END
-
-/*****************************************************************************
- * Capabilities defined in the other files.
- *****************************************************************************/
-extern void aout_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * InitModule: get the module structure and configuration.
@@ -68,11 +83,11 @@ extern void aout_getfunctions( function_list_t * p_function_list );
 int InitModule( module_t * p_module )
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "dummy functions module";
+    p_module->psz_longname = "MMX IDCT module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_AOUT;
+                                | MODULE_CAPABILITY_IDCT;
 
     return( 0 );
 }
@@ -93,7 +108,7 @@ int ActivateModule( module_t * p_module )
         return( -1 );
     }
 
-    aout_getfunctions( &p_module->p_functions->aout );
+    idct_getfunctions( &p_module->p_functions->idct );
 
     p_module->p_config = p_config;
 
@@ -114,76 +129,44 @@ int DeactivateModule( module_t * p_module )
     return( 0 );
 }
 
-/* OLD MODULE STRUCTURE -- soon to be removed */
+/* Following functions are local */
 
 /*****************************************************************************
- * Exported prototypes
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
  *****************************************************************************/
-static void vout_GetPlugin( p_vout_thread_t p_vout );
-static void intf_GetPlugin( p_intf_thread_t p_intf );
-
-/* Video output */
-int     vout_DummyCreate       ( vout_thread_t *p_vout, char *psz_display,
-                                 int i_root_window, void *p_data );
-int     vout_DummyInit         ( p_vout_thread_t p_vout );
-void    vout_DummyEnd          ( p_vout_thread_t p_vout );
-void    vout_DummyDestroy      ( p_vout_thread_t p_vout );
-int     vout_DummyManage       ( p_vout_thread_t p_vout );
-void    vout_DummyDisplay      ( p_vout_thread_t p_vout );
-void    vout_DummySetPalette   ( p_vout_thread_t p_vout,
-                                 u16 *red, u16 *green, u16 *blue, u16 *transp );
-
-/* Interface */
-int     intf_DummyCreate       ( p_intf_thread_t p_intf );
-void    intf_DummyDestroy      ( p_intf_thread_t p_intf );
-void    intf_DummyManage       ( p_intf_thread_t p_intf );
-
-/*****************************************************************************
- * GetConfig: get the plugin structure and configuration
- *****************************************************************************/
-plugin_info_t * GetConfig( void )
+static void idct_getfunctions( function_list_t * p_function_list )
 {
-    plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
+    p_function_list->pf_probe = idct_Probe;
+    p_function_list->functions.idct.pf_init = vdec_InitIDCT;
+    p_function_list->functions.idct.pf_sparse_idct = vdec_SparseIDCT;
+    p_function_list->functions.idct.pf_idct = vdec_IDCT;
+}
 
-    p_info->psz_name    = "Dummy";
-    p_info->psz_version = VERSION;
-    p_info->psz_author  = "the VideoLAN team <vlc@videolan.org>";
+/*****************************************************************************
+ * idct_Probe: return a preference score
+ *****************************************************************************/
+static int idct_Probe( probedata_t *p_data )
+{
+    /* This plugin always works */
+    return( 100 );
+}
 
-    p_info->aout_GetPlugin = NULL;
-    p_info->vout_GetPlugin = vout_GetPlugin;
-    p_info->intf_GetPlugin = intf_GetPlugin;
-    p_info->yuv_GetPlugin  = NULL;
+/*****************************************************************************
+ * vdec_InitIDCT : initialize datas for vdec_SparceIDCT
+ *****************************************************************************/
+static void vdec_InitIDCT (vdec_thread_t * p_vdec)
+{
+    int i;
 
-    /* The dummy plugin always works, but should have low priority */
-    p_info->i_score = 0x1;
+    dctelem_t * p_pre = p_vdec->p_pre_idct;
+    memset( p_pre, 0, 64*64*sizeof(dctelem_t) );
 
-    /* If this plugin was requested, score it higher */
-    if( TestMethod( VOUT_METHOD_VAR, "dummy" ) )
+    for( i=0 ; i < 64 ; i++ )
     {
-        p_info->i_score += 0x200;
+        p_pre[i*64+i] = 1 << SPARSE_SCALE_FACTOR;
+        vdec_IDCT( p_vdec, &p_pre[i*64], 0) ;
     }
-
-    return( p_info );
-}
-
-/*****************************************************************************
- * Following functions are only called through the p_info structure
- *****************************************************************************/
-
-static void vout_GetPlugin( p_vout_thread_t p_vout )
-{
-    p_vout->p_sys_create  = vout_DummyCreate;
-    p_vout->p_sys_init    = vout_DummyInit;
-    p_vout->p_sys_end     = vout_DummyEnd;
-    p_vout->p_sys_destroy = vout_DummyDestroy;
-    p_vout->p_sys_manage  = vout_DummyManage;
-    p_vout->p_sys_display = vout_DummyDisplay;
-}
-
-static void intf_GetPlugin( p_intf_thread_t p_intf )
-{
-    p_intf->p_sys_create  = intf_DummyCreate;
-    p_intf->p_sys_destroy = intf_DummyDestroy;
-    p_intf->p_sys_manage  = intf_DummyManage;
+    return;
 }
 

@@ -35,6 +35,8 @@
 
 #include "main.h"
 
+#include "modules.h"
+
 /*****************************************************************************
  * vout_dummy_t: dummy video output method descriptor
  *****************************************************************************
@@ -44,13 +46,46 @@
 typedef struct aout_sys_s
 {
 
-
 } aout_sys_t;
 
 /*****************************************************************************
- * aout_DummyOpen: opens a dummy audio device
+ * Local prototypes.
  *****************************************************************************/
-int aout_DummyOpen( aout_thread_t *p_aout )
+static int     aout_Probe       ( probedata_t *p_data );
+static int     aout_Open        ( aout_thread_t *p_aout );
+static int     aout_SetFormat   ( aout_thread_t *p_aout );
+static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static void    aout_Play        ( aout_thread_t *p_aout,
+                                  byte_t *buffer, int i_size );
+static void    aout_Close       ( aout_thread_t *p_aout );
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void aout_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = aout_Probe;
+    p_function_list->functions.aout.pf_open = aout_Open;
+    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
+    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
+    p_function_list->functions.aout.pf_play = aout_Play;
+    p_function_list->functions.aout.pf_close = aout_Close;
+}
+
+/*****************************************************************************
+ * aout_Probe: probe the audio device and return a score
+ *****************************************************************************/
+static int aout_Probe( probedata_t *p_data )
+{
+    /* The dummy plugin always works but give it the lower possible score */
+    return( 1 );
+}
+
+/*****************************************************************************
+ * aout_Open: opens a dummy audio device
+ *****************************************************************************/
+static int aout_Open( aout_thread_t *p_aout )
 {
     /* Initialize some variables */
     p_aout->i_format = AOUT_FORMAT_DEFAULT;
@@ -61,33 +96,33 @@ int aout_DummyOpen( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_DummySetFormat: pretends to set the dsp output format
+ * aout_SetFormat: pretends to set the dsp output format
  *****************************************************************************/
-int aout_DummySetFormat( aout_thread_t *p_aout )
+static int aout_SetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_DummyGetBufInfo: returns available bytes in buffer
+ * aout_GetBufInfo: returns available bytes in buffer
  *****************************************************************************/
-long aout_DummyGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     return( sizeof(s16) * l_buffer_limit + 1 ); /* value big enough to sleep */
 }
 
 /*****************************************************************************
- * aout_DummyPlay: pretends to play a sound
+ * aout_Play: pretends to play a sound
  *****************************************************************************/
-void aout_DummyPlay( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     ;
 }
 
 /*****************************************************************************
- * aout_DummyClose: closes the dummy audio device
+ * aout_Close: closes the dummy audio device
  *****************************************************************************/
-void aout_DummyClose( aout_thread_t *p_aout )
+static void aout_Close( aout_thread_t *p_aout )
 {
     ;
 }

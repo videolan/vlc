@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.23 2001/01/11 15:35:35 sam Exp $
+ * $Id: common.h,v 1.24 2001/01/13 12:57:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -60,6 +60,13 @@ typedef int                 ptrdiff_t;
 
 /* Counter for statistics and profiling */
 typedef unsigned long       count_t;
+
+/* DCT elements types */
+#ifndef VDEC_DFT
+typedef short dctelem_t;
+#else
+typedef int dctelem_t;
+#endif
 
 /*****************************************************************************
  * Classes declaration

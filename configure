@@ -3296,7 +3296,7 @@ EOF
 fi
 
 
-PLUGINS=${PLUGINS}"yuv ";
+PLUGINS=${PLUGINS}"yuv idct idctclassic ";
 
 ARCH=${host_cpu}
 # Check whether --enable-ppro or --disable-ppro was given.
@@ -3310,9 +3310,9 @@ fi
 # Check whether --enable-mmx or --disable-mmx was given.
 if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
-   if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi 
+   if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx idctmmx "; fi 
 else
-   if test x${host_cpu} = xi686 -o x${host_cpu} = xi586; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi 
+   if test x${host_cpu} = xi686 -o x${host_cpu} = xi586; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx idctmmx "; fi 
 fi
 
 # Check whether --enable-debug or --disable-debug was given.

@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.2 2001/01/10 19:22:11 massiot Exp $
+ * $Id: video_parser.h,v 1.3 2001/01/13 12:57:20 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -128,9 +128,13 @@ typedef struct vpar_thread_s
     /* variable length codes for the structure dct_dc_size for intra blocks */
     lookup_t *              pppl_dct_dc_size[2][2];
     /* Structure to store the tables B14 & B15 (ISO/CEI 13818-2 B.4) */
-     dct_lookup_t           ppl_dct_coef[2][16384];
+    dct_lookup_t            ppl_dct_coef[2][16384];
 
-
+    /* IDCT plugin used and shortcuts to access its capabilities */
+    struct module_s *       p_module;
+    idct_init_t             pf_init;
+    f_idct_t                pf_sparse_idct;
+    f_idct_t                pf_idct;
 
 #ifdef STATS
     /* Statistics */

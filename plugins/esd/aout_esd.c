@@ -82,12 +82,12 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  *****************************************************************************/
 void aout_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->p_probe = aout_Probe;
-    p_function_list->functions.aout.p_open = aout_Open;
-    p_function_list->functions.aout.p_setformat = aout_SetFormat;
-    p_function_list->functions.aout.p_getbufinfo = aout_GetBufInfo;
-    p_function_list->functions.aout.p_play = aout_Play;
-    p_function_list->functions.aout.p_close = aout_Close;
+    p_function_list->pf_probe = aout_Probe;
+    p_function_list->functions.aout.pf_open = aout_Open;
+    p_function_list->functions.aout.pf_setformat = aout_SetFormat;
+    p_function_list->functions.aout.pf_getbufinfo = aout_GetBufInfo;
+    p_function_list->functions.aout.pf_play = aout_Play;
+    p_function_list->functions.aout.pf_close = aout_Close;
 }
 
 /*****************************************************************************
@@ -162,7 +162,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 /*****************************************************************************
  * aout_GetBufInfo: buffer status query
  *****************************************************************************/
-long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     /* arbitrary value that should be changed */
     return( l_buffer_limit );
@@ -173,7 +173,7 @@ long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the socket
  *****************************************************************************/
-void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int amount;
 
@@ -200,7 +200,7 @@ void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 /*****************************************************************************
  * aout_Close: close the Esound socket
  *****************************************************************************/
-void aout_Close( aout_thread_t *p_aout )
+static void aout_Close( aout_thread_t *p_aout )
 {
     close( p_aout->i_fd );
 }
