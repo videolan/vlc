@@ -135,7 +135,7 @@ static int Open( vlc_object_t *p_this )
 
     char                *psz_mux_byext = NULL;
 
-    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+    sout_CfgParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "access", &val );

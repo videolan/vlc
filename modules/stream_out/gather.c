@@ -76,7 +76,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys;
 
     p_stream->p_sys = p_sys = malloc( sizeof( sout_stream_sys_t ) );
-    p_sys->p_out    = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
+    p_sys->p_out    = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
     if( p_sys->p_out == NULL )
     {
         free( p_sys );
@@ -108,7 +108,7 @@ static void Close( vlc_object_t * p_this )
     }
     free( p_sys->id );
 
-    sout_stream_delete( p_sys->p_out );
+    sout_StreamDelete( p_sys->p_out );
     free( p_sys );
 }
 

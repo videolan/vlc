@@ -95,7 +95,7 @@ static int Open( vlc_object_t *p_this )
             sout_stream_t *s;
 
             msg_Dbg( p_stream, " * adding `%s'", p_cfg->psz_value );
-            s = sout_stream_new( p_stream->p_sout, p_cfg->psz_value );
+            s = sout_StreamNew( p_stream->p_sout, p_cfg->psz_value );
 
             if( s )
             {
@@ -144,7 +144,7 @@ static void Close( vlc_object_t * p_this )
     msg_Dbg( p_stream, "closing a duplication" );
     for( i = 0; i < p_sys->i_nb_streams; i++ )
     {
-        sout_stream_delete( p_sys->pp_streams[i] );
+        sout_StreamDelete( p_sys->pp_streams[i] );
         if( p_sys->ppsz_select[i] )
         {
             free( p_sys->ppsz_select[i] );

@@ -147,7 +147,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t   *p_sys;
     vlc_value_t         val;
 
-    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+    sout_CfgParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
     p_sys                   = malloc( sizeof( sout_stream_sys_t ) );
 
     p_sys->i_count          = 0;

@@ -251,7 +251,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
 
-    p_sys->p_out = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
+    p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
     if( !p_sys->p_out )
     {
         msg_Err( p_stream, "cannot create chain" );
@@ -262,7 +262,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_input_has_b_frames = VLC_FALSE;
     p_sys->i_output_pts = 0;
 
-    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+    sout_CfgParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
     /* Audio transcoding parameters */
@@ -272,8 +272,8 @@ static int Open( vlc_object_t *p_this )
     if( val.psz_string && *val.psz_string )
     {
         char *psz_next;
-        psz_next = sout_cfg_parser( &p_sys->psz_aenc, &p_sys->p_audio_cfg,
-				    val.psz_string );
+        psz_next = sout_CfgCreate( &p_sys->psz_aenc, &p_sys->p_audio_cfg,
+                                   val.psz_string );
         if( psz_next ) free( psz_next );
     }
     if( val.psz_string ) free( val.psz_string );
@@ -312,8 +312,8 @@ static int Open( vlc_object_t *p_this )
     if( val.psz_string && *val.psz_string )
     {
         char *psz_next;
-        psz_next = sout_cfg_parser( &p_sys->psz_venc, &p_sys->p_video_cfg,
-				    val.psz_string );
+        psz_next = sout_CfgCreate( &p_sys->psz_venc, &p_sys->p_video_cfg,
+                                   val.psz_string );
         if( psz_next ) free( psz_next );
     }
     if( val.psz_string ) free( val.psz_string );
@@ -382,7 +382,7 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
-    sout_stream_delete( p_sys->p_out );
+    sout_StreamDelete( p_sys->p_out );
 
     while( p_sys->p_audio_cfg != NULL )
     {
