@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.48 2003/12/11 19:34:46 hartman Exp $
+ * $Id: playlist.m,v 1.49 2003/12/15 14:25:43 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -284,10 +284,14 @@
     {
         return;
     }
-
-    if ([o_table_view selectedRow] == [o_table_view numberOfRows]-1 )
+    if( [o_table_view numberOfRows] < 1 )
     {
-        i_current =-1;
+        return;
+    }
+
+    if( [o_table_view selectedRow] == [o_table_view numberOfRows]-1 )
+    {
+        i_current = -1;
     }
     else
     {
@@ -313,7 +317,7 @@
              [o_table_view scrollRowToVisible: i_current];
              break;
         }
-    if ( i_current == [o_table_view numberOfRows] - 1 )
+        if( i_current == [o_table_view numberOfRows] - 1 )
         {
              i_current = -1;
         }
