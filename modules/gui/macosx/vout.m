@@ -48,24 +48,34 @@
 - (id)initWithVout:(vout_thread_t *)_p_vout frame:(NSRect *)s_frame
 {
     int i_timeout;
+    vlc_value_t value_drawable;
 
     p_vout = _p_vout;
 
-    /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
-    for( i_timeout = 20 ; i_timeout-- ; )
+    var_Get( p_vout->p_vlc, "drawable", &value_drawable );
+
+    /* We only wait for NSApp to initialise if we're not embedded (as in the
+     * case of the Mozilla plugin).  We can tell whether we're embedded or not
+     * by examining the "drawable" value: if it's zero, we're running in the
+     * main Mac intf; if it's non-zero, we're embedded. */
+    if( value_drawable.i_int == 0 )
     {
+        /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
+        for( i_timeout = 20 ; i_timeout-- ; )
+        {
+            if( NSApp == NULL )
+            {
+                msleep( INTF_IDLE_SLEEP );
+            }
+        }
+
         if( NSApp == NULL )
         {
-            msleep( INTF_IDLE_SLEEP );
+            /* No MacOS X intf, unable to communicate with MT */
+            msg_Err( p_vout, "no MacOS X interface present" );
+            return NULL;
         }
     }
-
-    if( NSApp == NULL )
-    {
-        /* No MacOS X intf, unable to communicate with MT */
-        msg_Err( p_vout, "no MacOS X interface present" );
-        return NULL;
-    }                                                                           
 
     /* p_real_vout: the vout we have to use to check for video-on-top
        and a few other things. If we are the QuickTime output, it's us.
