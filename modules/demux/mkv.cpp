@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.53 2004/01/22 14:27:53 sigmunau Exp $
+ * $Id: mkv.cpp,v 1.54 2004/01/22 20:48:07 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1094,6 +1094,13 @@ static int Open( vlc_object_t * p_this )
         {
             tk.fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
         }
+        else if( !strcmp( tk.psz_codec, "A_FLAC" ) )
+        {
+            tk.fmt.i_codec = VLC_FOURCC( 'f', 'l', 'a', 'c' );
+            tk.fmt.i_extra = tk.i_extra_data;
+            tk.fmt.p_extra = malloc( tk.i_extra_data );
+            memcpy( tk.fmt.p_extra,tk.p_extra_data, tk.i_extra_data );
+        }
         else if( !strcmp( tk.psz_codec, "A_VORBIS" ) )
         {
             tk.fmt.i_codec = VLC_FOURCC( 'v', 'o', 'r', 'b' );
@@ -2013,9 +2020,11 @@ static void LoadCues( input_thread_t *p_input )
             }
             ep->Up();
 
+#if 0
             msg_Dbg( p_input, " * added time="I64Fd" pos="I64Fd
                      " track=%d bnum=%d", idx.i_time, idx.i_position,
                      idx.i_track, idx.i_block_number );
+#endif
 
             p_sys->i_index++;
             if( p_sys->i_index >= p_sys->i_index_max )
@@ -2171,7 +2180,6 @@ static void InformationsCreate( input_thread_t *p_input )
     int                   i_track;
 
     p_cat = input_InfoCategory( p_input, "Matroska" );
-    p_playlist = (playlist_t*)vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
     if( p_sys->f_duration > 1000.1 )
     {
         char psz_buffer[MSTRTIME_MAX_SIZE];
