@@ -131,9 +131,8 @@ deb-src http://www.videolan.org/pub/videolan/debian sources/
 
 <question><para>How can I save my VLC configuration?</para></question>
 
-<answer><para>Currently, the only way to save the configuration options
-in VLC is through the preferences menu in one of the graphical user
-interface plugins.
+<answer><para>In the graphical interface, go to <emphasis>Settings /
+Preferences</emphasis> and click on <emphasis>Save</emphasis>.
 
 </para></answer></qandaentry>
 
@@ -177,6 +176,29 @@ Settings\your_name</filename></para></listitem>
 </qandadiv>
 
 <qandadiv><title>Troubleshooting</title>
+
+<qandaentry>
+
+<question><para>VLC has a strange behavior...</para></question>
+
+<answer><para>The first thing to do is to delete VLC's configuration
+file :</para>
+
+<itemizedlist>
+
+<listitem><para>under unices, remove the file
+<filename>~/.vlc/vlcrc</filename>;</para></listitem>
+
+<listitem><para>under Windows, remove the file
+<filename>vlcrc</filename> in the <filename>vlc</filename> subfolder of
+your <filename>Application Data</filename> directory.</para></listitem>
+
+</itemizedlist>
+
+<para>Then restart VLC ; if it doesn't get any better, read the
+following questions !</para>
+
+</answer></qandaentry>
 
 <qandaentry>
 
@@ -343,18 +365,6 @@ reporting page</ulink>.
 
 <answer><para>Check that as user you have write access to your DVD drive
 / device.
-
-</para></answer></qandaentry>
-
-<qandaentry>
-
-<question><para>I am stuck with option xxx, how do I reset
-options?</para></question>
-
-<answer><para>Under unices, remove your
-<filename>~/.vlc/vlcrc</filename>; for Windows, remove
-<filename>vlcrc</filename> in the videolan subfolder of your
-<filename>Application Data</filename> directory.
 
 </para></answer></qandaentry>
 
