@@ -1066,12 +1066,13 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
        [vec_ld(0, (unsigned char *)0);],
        [ac_cv_c_altivec="-faltivec"],
        [# Linux/PPC test (no flags)
-        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -Werror"
+        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -maltivec -mabi=altivec"
         AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
                         #include <altivec.h>
                         #endif],
           [vec_ld(0, (unsigned char *)0);],
-          [ac_cv_c_altivec=""],
+          [ac_cv_c_altivec=""
+           ac_cv_c_altivec_abi="-maltivec -mabi=altivec"],
           [# Linux/PPC test (old GCC versions)
            CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -fvec"
            AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
@@ -1085,7 +1086,9 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
      CFLAGS="${CFLAGS_save}"])
 if test "${ac_cv_c_altivec}" != "no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
-  VLC_ADD_CFLAGS([vlc idctaltivec motionaltivec memcpyaltivec deinterlace i420_yuy2_altivec],[${ac_cv_c_altivec}])
+  VLC_ADD_CFLAGS([vlc],[${ac_cv_c_altivec}])
+  VLC_ADD_CFLAGS([idctaltivec motionaltivec memcpyaltivec deinterlace],[${ac_cv_c_altivec}])
+  VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
