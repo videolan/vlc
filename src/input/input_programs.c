@@ -3,7 +3,7 @@
  * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.15 2000/12/22 13:04:45 sam Exp $
+ * $Id: input_programs.c,v 1.16 2000/12/22 15:34:24 massiot Exp $
  *
  * Authors:
  *
@@ -175,7 +175,7 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 
     ASSERT( p_pgrm );
 
-    intf_DbgMsg("Deleting description for pgrm %d", p_pgrm->i_stream_id);
+    intf_DbgMsg("Deleting description for pgrm %d", p_pgrm->i_number);
 
     /* Free the structures that describe the es that belongs to that program */
     for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
