@@ -1,4 +1,0 @@
-SOURCES_faad = \
-	decoder.c \
-	decoder.h \
-	$(NULL)
