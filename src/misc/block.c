@@ -130,30 +130,30 @@ static block_t *BlockDuplicate( block_t *p_block )
 
 static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
 {
+    int i_buffer_size = i_prebody + i_body;
+
+    if( i_body < 0 || i_buffer_size <= 0 ) return NULL;
 
     vlc_mutex_lock( &p_block->p_sys->lock );
-    if( i_prebody < 0 || p_block->p_buffer - i_prebody >
-        p_block->p_sys->p_allocated_buffer )
+
+    if( i_prebody < ( p_block->p_buffer - p_block->p_sys->p_allocated_buffer +
+                      p_block->p_sys->i_allocated_buffer ) ||
+        p_block->p_buffer - i_prebody > p_block->p_sys->p_allocated_buffer )
     {
         p_block->p_buffer -= i_prebody;
         p_block->i_buffer += i_prebody;
         i_prebody = 0;
     }
-    if( i_body < 0 ||
-        p_block->p_buffer + i_body < p_block->p_sys->p_allocated_buffer +
+    if( p_block->p_buffer + i_body < p_block->p_sys->p_allocated_buffer +
         p_block->p_sys->i_allocated_buffer )
     {
-        p_block->i_buffer = i_body;
+        p_block->i_buffer = i_buffer_size;
         i_body = 0;
     }
-    vlc_mutex_unlock( &p_block->p_sys->lock );
 
-    if( i_prebody > 0 )
+    if( !i_body || !i_prebody )
     {
-        block_t *p_rea = block_New( p_block->p_manager, i_prebody + i_body );
-
-        fprintf( stderr, "arg i_prebody=%d max is %d\n", i_prebody,
-                 p_block->p_buffer - p_block->p_sys->p_allocated_buffer );
+        block_t *p_rea = block_New( p_block->p_manager, i_buffer_size );
 
         p_rea->i_dts   = p_block->i_dts;
         p_rea->i_pts   = p_block->i_pts;
@@ -161,31 +161,16 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
         p_rea->i_length= p_block->i_length;
         p_rea->i_rate  = p_block->i_rate;
 
-        memcpy( &p_rea->p_buffer[i_prebody], p_block->p_buffer,
-                p_block->i_buffer );
+        memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer,
+                __MIN( p_block->i_buffer, p_rea->i_buffer - i_prebody ) );
 
+        vlc_mutex_unlock( &p_block->p_sys->lock );
         block_Release( p_block );
 
         return p_rea;
     }
 
-    if( i_body > 0 )
-    {
-        int i_start;
-        block_t *p_rea = BlockModify( p_block, VLC_TRUE );
-
-        i_start = p_rea->p_buffer - p_rea->p_sys->p_allocated_buffer;
-
-        p_rea->p_sys->i_allocated_buffer += i_body - p_rea->i_buffer;
-        p_rea->p_sys->p_allocated_buffer =
-            realloc( p_rea->p_sys->p_allocated_buffer,
-                     p_rea->p_sys->i_allocated_buffer );
-
-        p_rea->p_buffer = &p_rea->p_sys->p_allocated_buffer[i_start];
-        p_rea->i_buffer = i_body;
-
-        return p_rea;
-    }
+    vlc_mutex_unlock( &p_block->p_sys->lock );
 
     return p_block;
 }
