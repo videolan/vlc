@@ -224,10 +224,7 @@ int     AVI_ChunkReadRoot( stream_t *, avi_chunk_t *p_root );
 void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 
 #define AVI_ChunkRead( s, p_chk, p_father ) \
-    _AVI_ChunkRead( s, \
-                    (avi_chunk_t*)p_chk, \
-                    (avi_chunk_t*)p_father )
-
+    _AVI_ChunkRead( s, p_chk, (avi_chunk_t*)p_father )
 #define AVI_ChunkCount( p_chk, i_fourcc ) \
     _AVI_ChunkCount( (avi_chunk_t*)p_chk, i_fourcc )
 #define AVI_ChunkFind( p_chk, i_fourcc, i_number ) \
