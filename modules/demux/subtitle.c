@@ -37,11 +37,6 @@
 #include <vlc/input.h>
 #include "vlc_video.h"
 
-
-#if (!defined( WIN32 ) || defined(__MINGW32__))
-#    include <dirent.h>
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/

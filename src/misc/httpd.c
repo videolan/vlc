@@ -56,8 +56,10 @@
 #   endif
 #endif
 
-#if defined(WIN32)
+#if defined(WIN32) && !defined(UNDER_CE)
 static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
+#elif defined(UNDER_CE) && defined(AF_INET6)
+#   undef AF_INET6
 #endif
 
 #ifndef PF_INET
