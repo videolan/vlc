@@ -316,12 +316,12 @@ static void RunInterface( intf_thread_t *p_intf )
             break;
         }
 
+        /* Make sure the old interface is completely uninitialized */
+        module_Unneed( p_intf, p_intf->p_module );
+
         /* Provide ability to switch the main interface on the fly */
         psz_intf = p_intf->psz_switch_intf;
         p_intf->psz_switch_intf = NULL;
-
-        /* Make sure the old interface is completely uninitialized */
-        module_Unneed( p_intf, p_intf->p_module );
 
         vlc_mutex_lock( &p_intf->object_lock );
         p_intf->b_die = VLC_FALSE;
