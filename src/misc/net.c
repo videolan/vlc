@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.5 2004/01/09 12:23:46 gbazin Exp $
+ * $Id: net.c,v 1.6 2004/01/21 10:22:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -111,6 +111,62 @@ int __net_OpenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
 }
 
 /*****************************************************************************
+ * __net_OpenUDP:
+ *****************************************************************************
+ * Open a UDP connection and return a handle
+ *****************************************************************************/
+int __net_OpenUDP( vlc_object_t *p_this, char *psz_bind, int i_bind, char *psz_server, int i_server )
+{
+    vlc_value_t      val;
+    void            *private;
+
+    char            *psz_network = "";
+    network_socket_t sock;
+    module_t         *p_network;
+
+
+    /* Check if we have force ipv4 or ipv6 */
+    var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "ipv4", &val );
+    if( val.b_bool )
+    {
+        psz_network = "ipv4";
+    }
+
+    var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "ipv6", &val );
+    if( val.b_bool )
+    {
+        psz_network = "ipv6";
+    }
+    if( psz_server == NULL ) psz_server = "";
+    if( psz_bind   == NULL ) psz_bind   = "";
+
+    /* Prepare the network_socket_t structure */
+    sock.i_type = NETWORK_UDP;
+    sock.psz_bind_addr   = psz_bind;
+    sock.i_bind_port     = i_bind;
+    sock.psz_server_addr = psz_server;
+    sock.i_server_port   = i_server;
+    sock.i_ttl           = 0;
+
+    msg_Dbg( p_this, "net: connecting to '%s:%d@%s:%d'",
+             psz_server, i_server, psz_bind, i_bind );
+    private = p_this->p_private;
+    p_this->p_private = (void*)&sock;
+    if( ( p_network = module_Need( p_this, "network", psz_network ) ) == NULL )
+    {
+        msg_Dbg( p_this, "net: connection to '%s:%d@%s:%d' failed",
+                 psz_server, i_server, psz_bind, i_bind );
+        return -1;
+    }
+    module_Unneed( p_this, p_network );
+    p_this->p_private = private;
+
+    return sock.i_handle;
+}
+
+/*****************************************************************************
  * __net_Close:
  *****************************************************************************
  * Close a network handle
@@ -169,6 +225,19 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, vlc_b
 
         if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) < 0 )
         {
+#ifdef WIN32
+            /* For udp only */
+            /* On win32 recv() will fail if the datagram doesn't fit inside
+             * the passed buffer, even though the buffer will be filled with
+             * the first part of the datagram. */
+            if( WSAGetLastError() == WSAEMSGSIZE ) 
+            {
+                msg_Err( p_input, "recv() failed. "
+                         "Increase the mtu size (--mtu option)" );
+                i_recv = i_len;
+            }
+            else
+#endif
             msg_Err( p_this, "recv failed (%s)", strerror(errno) );
             return i_total > 0 ? i_total : -1;
         }
