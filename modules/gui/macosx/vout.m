@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.72 2004/01/27 12:11:48 titer Exp $
+ * $Id: vout.m,v 1.73 2004/01/28 14:36:53 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -33,6 +33,7 @@
 
 #include <QuickTime/QuickTime.h>
 
+#include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
 
@@ -1271,11 +1272,18 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         NSOpenGLPFAAccelerated,
         NSOpenGLPFANoRecovery,
         NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAWindow,
         0
     };
 
     NSOpenGLPixelFormat * fmt = [[NSOpenGLPixelFormat alloc]
         initWithAttributes: attribs];
+
+    if( !fmt )
+    {
+        fprintf( stderr, "Cannot create NSOpenGLPixelFormat\n" );
+        return self;
+    }
 
     self = [super initWithFrame:frame pixelFormat: fmt];
 
@@ -1296,7 +1304,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     [[self openGLContext] update];
     NSRect bounds = [self bounds];
-    glViewport( 0, 0, (GLint) bounds.size.width, (GLint) bounds.size.height );
+    glViewport( 0, 0, (GLint) bounds.size.width,
+                (GLint) bounds.size.height );
 }
 
 - (void)drawRect:(NSRect)rect
@@ -1305,9 +1314,14 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     id o_window = [self window];
     p_vout = (vout_thread_t *)[o_window getVout];
 
-
     /* Make this current context */
     [[self openGLContext] makeCurrentContext];
+
+    /* http://developer.apple.com/documentation/GraphicsImaging/
+       Conceptual/OpenGL/chap5/chapter_5_section_44.html */
+    long params[] = { 1 };
+    CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
+                     params );
 
     /* Black background */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
