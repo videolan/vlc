@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.36 2001/05/06 04:32:02 sam Exp $
+ * $Id: input_netlist.c,v 1.37 2001/05/28 04:23:52 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -81,14 +81,20 @@ int input_NetlistInit( input_thread_t * p_input, int i_nb_data, int i_nb_pes,
      * the netlist_t struct */
     /* As i_loop is unsigned int, and i_ns_data int, this shouldn't be a 
      * problem */
-    for( i_loop=1; i_loop < i_nb_data; i_loop*=2 )
+    for( i_loop = 1; i_loop < i_nb_data; i_loop *= 2 )
+    {
         ;
+    }
+
     intf_DbgMsg( "Netlist : Required %i byte, got %u",i_nb_data,i_loop );
     i_nb_data = i_loop;
 
     /* Same thing for i_nb_pes */
-    for( i_loop=1; i_loop < i_nb_data; i_loop*=2 )
+    for( i_loop = 1; i_loop < i_nb_data; i_loop *= 2 )
+    {
         ;
+    }
+
     intf_DbgMsg( "Netlist : Required %i byte, got %u",i_nb_data,i_loop );
     i_nb_data = i_loop;
     

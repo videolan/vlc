@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.19 2001/05/08 12:53:30 bozo Exp $
+ * $Id: input_ts.c,v 1.20 2001/05/28 04:23:52 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -43,8 +43,14 @@
 #include <sys/select.h>
 #endif
 
-#ifndef WIN32
-#include <sys/uio.h>
+#ifndef WIN32 
+#   include <sys/uio.h>                                      /* struct iovec */
+#else
+    struct iovec
+    {
+        void *iov_base; /* Pointer to data.  */
+        size_t iov_len; /* Length of data.  */
+    };
 #endif
 
 #include <sys/stat.h>
@@ -211,7 +217,7 @@ static void TSInit( input_thread_t * p_input )
  *****************************************************************************/
 void TSFakeOpen( input_thread_t * p_input )
 {
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO ) && !defined( WIN32 )
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     char *psz_name = p_input->p_source;
 
     if( ( strlen(psz_name) > 3 ) && !strncasecmp( psz_name, "ts:", 3 ) )
@@ -284,8 +290,8 @@ static int TSRead( input_thread_t * p_input,
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
     
     /* Fill if some data is available */
-    i_data = select(p_input->i_handle + 1, &(p_method->s_fdset), NULL, NULL, 
-                    &s_wait);
+    i_data = select( p_input->i_handle + 1, &(p_method->s_fdset), NULL, NULL, 
+                     &s_wait);
     
     if( i_data == -1 )
     {
@@ -295,11 +301,7 @@ static int TSRead( input_thread_t * p_input,
     
     if( i_data )
     {
-#ifndef WIN32
         i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
-#else
-        i_read = -1;
-#endif
         
         if( i_read == -1 )
         {

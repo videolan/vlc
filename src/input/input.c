@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.110 2001/05/28 03:17:01 xav Exp $
+ * $Id: input.c,v 1.111 2001/05/28 04:23:52 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -570,18 +570,17 @@ void input_NetworkOpen( input_thread_t * p_input )
     int                 i_opt;
     struct sockaddr_in  sock;
 
-	/* WinSock Library Init. */
+#ifdef WIN32
+    /* WinSock Library Init. */
+    WSADATA Data;
+    int i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
 
-	#ifdef WIN32
-		WSADATA				Data;
-		int Result = WSAStartup( MAKEWORD( 1,1 ),&Data );
-		
-		if( Result != 0 )
-		{
-		intf_ErrMsg( "Can't initiate WinSocks : error %i", Result) ;
-		return ;
-		}
-	#endif
+    if( i_err )
+    {
+        intf_ErrMsg( "input: can't initiate WinSocks, error %i", i_err );
+        return ;
+    }
+#endif
     
     /* Get the remote server */
     if( p_input->p_source != NULL )
@@ -688,8 +687,8 @@ void input_NetworkOpen( input_thread_t * p_input )
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_REUSEADDR,
                     &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_ErrMsg("input error: can't configure socket (SO_REUSEADDR: %s)",
-                    strerror(errno));
+        intf_ErrMsg( "input error: can't configure socket (SO_REUSEADDR: %s)",
+                     strerror(errno));
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
@@ -701,17 +700,17 @@ void input_NetworkOpen( input_thread_t * p_input )
     if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF,
                     &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        intf_ErrMsg("input error: can't configure socket (SO_RCVBUF: %s)", 
-                    strerror(errno));
+        intf_ErrMsg( "input error: can't configure socket (SO_RCVBUF: %s)", 
+                     strerror(errno));
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
     }
 
     /* Build the local socket */
-    if ( network_BuildLocalAddr( &sock, i_port, psz_broadcast ) 
-         == -1 )
+    if ( network_BuildLocalAddr( &sock, i_port, psz_broadcast ) == -1 )
     {
+        intf_ErrMsg( "input error: can't build local address" );
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
@@ -730,6 +729,7 @@ void input_NetworkOpen( input_thread_t * p_input )
     /* Build socket for remote connection */
     if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
     {
+        intf_ErrMsg( "input error: can't build remote address" );
         close( p_input->i_handle );
         p_input->b_error = 1;
         return;
@@ -739,7 +739,7 @@ void input_NetworkOpen( input_thread_t * p_input )
     if( connect( p_input->i_handle, (struct sockaddr *) &sock,
                  sizeof( sock ) ) == (-1) )
     {
-        intf_ErrMsg( "NetworkOpen: can't connect socket : %s", 
+        intf_ErrMsg( "input error: can't connect socket, %s", 
                      strerror(errno) );
         close( p_input->i_handle );
         p_input->b_error = 1;
@@ -750,6 +750,8 @@ void input_NetworkOpen( input_thread_t * p_input )
      * with the server. */
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
+
+    intf_WarnMsg( 3, "input: successfully opened network mode" );
     
     return;
 }
@@ -761,9 +763,10 @@ void input_NetworkClose( input_thread_t * p_input )
 {
     close( p_input->i_handle );
 
-	#ifdef WIN32 
-		WSACleanup();
-	#endif
+#ifdef WIN32 
+    WSACleanup();
+#endif
 
 }
 #endif
+
