@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: synchro.c,v 1.7 2003/01/23 21:47:59 massiot Exp $
+ * $Id: synchro.c,v 1.8 2003/04/20 12:59:01 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -437,7 +437,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
     p_vpar->synchro.current_pts += p_vpar->synchro.i_current_period
                                         * (period >> 1);
  
-#define PTS_THRESHOLD   (period >> 2)
+#define PTS_THRESHOLD (period >> 2)
     if( i_coding_type == B_CODING_TYPE )
     {
         /* A video frame can be displayed 1, 2 or 3 times, according to

@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.10 2003/04/15 15:53:42 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.11 2003/04/20 12:59:01 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -254,7 +254,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
 
             p_dec->p_synchro = vout_SynchroInit( p_dec->p_fifo, p_dec->p_vout,
-                1000000 * 27 / p_dec->p_info->sequence->frame_period * 1001 );
+                1001 * 100 * 27 / p_dec->p_info->sequence->frame_period * 10000 );
         }
         break;
 
@@ -288,9 +288,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
             }
         }
-        /* pass-through */
+        break;
 
         case STATE_END:
+        case STATE_SLICE:
             if( p_dec->p_info->display_fbuf
                 && p_dec->p_info->display_fbuf->id )
             {
@@ -315,19 +316,22 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                             p_dec->p_info->display_picture->flags
                              & PIC_MASK_CODING_TYPE,
                             1 );
-                        vout_DestroyPicture( p_dec->p_vout, p_pic );
+                        vout_DatePicture( p_dec->p_vout, p_pic, 0 );
+                        vout_DisplayPicture( p_dec->p_vout, p_pic );
                     }
                 }
-                if( p_dec->p_info->discard_fbuf &&
-                    p_dec->p_info->discard_fbuf->id )
-                {
-                    vout_UnlinkPicture( p_dec->p_vout, p_pic );
-                }
+            }
+
+            if( p_dec->p_info->discard_fbuf &&
+                p_dec->p_info->discard_fbuf->id )
+            {
+                p_pic = (picture_t *)p_dec->p_info->discard_fbuf->id;
+                vout_UnlinkPicture( p_dec->p_vout, p_pic );
             }
             break;
 
         case STATE_INVALID:
-            msg_Warn( p_dec->p_fifo, "Received STATE_INVALID" );
+            msg_Warn( p_dec->p_fifo, "invalid picture encountered" );
             break;
 
         default:

@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.36 2003/03/28 17:02:25 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.37 2003/04/20 12:59:02 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -259,7 +259,8 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( p_pic->i_refcount < 0 )
     {
-        msg_Err( p_vout, "picture refcount is %i", p_pic->i_refcount );
+        msg_Err( p_vout, "picture %p refcount is %i", 
+                 p_pic, p_pic->i_refcount );
         p_pic->i_refcount = 0;
     }
 
