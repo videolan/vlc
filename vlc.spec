@@ -1,5 +1,7 @@
+
+
 %define name 		vlc
-%define vlc_ver 	0.3.1
+%define vlc_ver 	0.4.0
 %define version		%vlc_ver
 
 %define cvs     	0
@@ -12,21 +14,26 @@
 %endif
 
 %define	plugin_qt	0
+%define	plugin_lirc	1
 
-Summary:	VideoLAN is a free MPEG, MPEG2 and DVD software solution.
+Summary:	VideoLAN is a free multimedia software solution.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-Packager:	Samuel Hocevar <sam@zoy.org>
+Packager:	Yves Duret <yduret@mandrakesoft.com>
 
 %if %{cvs} 
-Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.gz
+Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.bz2
 %else
-Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}.tar.gz
+Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}.tar.bz2
 %endif
 License:	GPL
 Group:		Video
-URL:		http://videolan.org/
+URL:		http://www.videolan.org/
+Requires:	vlc-gui
+# yves 0.4.0-1mdk needed by ffmpeg builtin (i want MPEG4 support out of box)
+Requires:	vlc-mad
+
 BuildRoot:	%_tmppath/%name-%version-%release-root
 Buildrequires:	libncurses5-devel
 Buildrequires:	libqt2-devel
@@ -40,9 +47,12 @@ Buildrequires:	aalib-devel
 Buildrequires:	SDL-devel
 Buildrequires:	liba52dec-devel
 Buildrequires:	libmad-devel
+Buildrequires:	liblirc-devel
+Buildrequires:	libffmpeg-devel
 
 %description
-VideoLAN is a free network-aware MPEG and DVD player.
+VideoLAN is a free network-aware MPEG1, MPEG2, MPEG4 (aka DivX)
+and DVD player.
 The VideoLAN Client allows to play MPEG2 Transport Streams from the
 network or from a file, as well as direct DVD playback.
 VideoLAN is a project of students from the Ecole Centrale Paris.
@@ -57,126 +67,159 @@ http://www.videolan.org/libdvdcss/ or http://plf.zarb.org/
 
 # intf plugins
 %package gtk
-Summary: Gtk plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Gtk plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
+Provides: vlc-gui
 %description gtk
-The vlc-gtk package includes the Gtk plug-in for the VideoLAN client.
-If you are going to watch DVD with the Gtk front-end, you should 
-install vlc-gtk.
+VideoLAN is a free multimedia software solution.
+
+This plugin adds a Gtk+ interface to vlc, the VideoLAN Client. To
+activate it, use the `--intf gtk' flag or run the `gvlc' program.
 
 %package gnome
-Summary: Gnome plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Gnome plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
+Provides: vlc-gui
 %description gnome
-The vlc-gnome package includes the Gnome plug-in for the VideoLAN client.
-If you are going to watch DVD with the Gnome front-end, you should 
-install vlc-gnome.
+VideoLAN is a free multimedia software solution.
+
+This plugin adds a Gnome interface to vlc, the VideoLAN Client. To
+activate it, use the `--intf gnome' flag or run the `gnome-vlc' program.
 
 %package qt
-Summary: Qt2 plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Qt2 plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
+Provides: vlc-gui
 %description qt
-The vlc-qt package includes the Qt2 plug-in for the VideoLAN client.
-If you are going to watch DVD with the Qt2 front-end, you should
-install vlc-qt
+VideoLAN is a free multimedia software solution.
+
+This plugin adds a Qt interface to vlc, the VideoLAN Client. To
+activate it, use the `--intf qt' flag or run the `qvlc' program.
 
 %package ncurses
-Summary: Ncurses console-based plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Ncurses console-based plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description ncurses
-The vlc-ncurses package includes the ncurses plug-in for the VideoLAN client.
-If you are going to watch DVD with the ncurses front-end, you should
-install vlc-ncurses
+VideoLAN is a free multimedia software solution.
+
+This plugin adds a ncurses interface to vlc, the VideoLAN Client. To
+activate it, use the `--intf ncurses' flag.
+
+%package lirc
+Summary: Lirc plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description lirc
+VideoLAN is a free multimedia software solution.
+
+This plugin is an infrared lirc interface for vlc, the
+VideoLAN Client. To activate it, use the `--intf lirc' flag.
+
 
 # video plugins
 %package aa
-Summary: ASCII art video plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: ASCII art video plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description aa
-The vlc-aa package includes the aalib plug-in for the VideoLAN client.
-If you are going to watch DVD with the aa video plugin, you should
-install vlc-aa
+VideoLAN is a free multimedia software solution.
+
+This is an ASCII art video output plugin for vlc, the VideoLAN
+Client. To activate it, use the `--vout aa' flag or select the `aa'
+vout plugin from the preferences menu.
+
 
 %package sdl
-Summary: Simple DirectMedia Layer video plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Simple DirectMedia Layer video plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description sdl
-The vlc-sdl package includes the Simple DirectMedia Layer plug-in 
-for the VideoLAN client.
-If you are going to watch DVD with the sdl video plugin, you should
-install vlc-sdl
+VideoLAN is a free multimedia software solution.
+
+This plugin adds support for the Simple DirectMedia Layer library to
+vlc, the VideoLAN Client. To activate it, use the `--vout sdl' or
+`--aout sdl' flags or select the `sdl' vout or aout plugin from the
+preferences menu.
 
 %package ggi
-Summary: GGI video plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: GGI video plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description ggi
-The vlc-ggi package includes the GGI plug-in for the VideoLAN client.
-If you are going to watch DVD with the GGI video plugin, you should
-install vlc-ggi
+VideoLAN is a free multimedia software solution.
 
+This is a GGI plugin for vlc, the VideoLAN Client.  To activate it, use
+the `--vout ggi' flag or select the `ggi' vout plugin from the preferences
+menu.
+     
 # codec plugins
 %package mad
-Summary: MAD audio codec plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: MAD audio codec plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description mad
-The vlc-mad package includes the MAD (MPEG Audio Decoder) plug-in
-for the VideoLAN client.
-If you are going to watch DVD with the mad codec plugin, you should
-install vlc-mad
+VideoLAN is a free multimedia software solution.
+
+This plugin adds support for libmad, the MPEG audio decoder library,
+to the VideoLAN Client. MAD is 100% fixed-point based. To activate
+this plugin, use the `--mpeg_adec mad' flag or select the `mad' MPEG
+decoder from the preferences menu.
 
 # audio plugins
 %package esd
-Summary: Enlightened Sound Daemon audio plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: Enlightened Sound Daemon audio plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description esd
-The vlc-esd package includes the Enlightened Sound Daemon plug-in 
-for the VideoLAN client.
-If you are going to watch DVD with the esd audio plugin, you should
-install vlc-esd
+VideoLAN is a free multimedia software solution.
+
+This plugin adds support for the Enlightened Sound Daemon to vlc, the
+VideoLAN Client. To activate it, use the `--aout esd' flag or select
+the `esd' aout plugin from the preferences menu.
 
 %package arts
-Summary: aRts audio plug-in for VideoLAN, a DVD and MPEG2 player
+Summary: aRts audio plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description arts
-The vlc-arts package includes the aRts audio plug-in
-for the VideoLAN client.
-If you are going to watch DVD with the aRts audio plugin, you should
-install vlc-arts
+VideoLAN is a free multimedia software solution.
+
+This plugin adds support for the aRts Sound System to vlc, the
+VideoLAN Client. To activate it, use the `--aout arts' flag or
+select the `arts' aout plugin from the preferences menu.
 
 %package alsa
-Summary: Advanced Linux Sound Architecture audio plug-in for VideoLAN, a DVD and MPGE2 player
+Summary: Advanced Linux Sound Architecture audio plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 %description alsa
-The vlc-alsa packages includes the Advanced Linux Sound Architecture plug-in 
-for the VideoLAN client.
-If you are going to watch DVD with the ALSA audio plugin, you should 
-install vlc-alsa
+VideoLAN is a free multimedia software solution.
+
+This plugin adds support for the Advanced Linux Sound Architecture to
+vlc, the VideoLAN Client. To activate it, use the `--aout alsa' flag or
+select the `alsa' aout plugin from the preferences menu.
 
 %prep
 %if %{cvs}
 %setup -q -n %{cvs_name}
 %else
-%setup -q -n %{name}-%{vlc_ver}
+%setup -q
 %endif
 
 %build
+# yves 0.4.0-1mdk
+# ffmpeg: static linking cause no official ffmpeg release aith a stable ABI
+# ffmpeg: no plugin posible on ia64 due to the static linking (can not put .a in a .so)
 %configure  --enable-release \
             --enable-dvd --without-dvdcss \
-            --enable-gtk --enable-gnome --disable-qt --disable-kde --enable-ncurses \
+            --enable-gtk --enable-gnome --disable-qt --disable-kde --enable-ncurses --enable-lirc \
             --enable-x11 --enable-xvideo --enable-ggi --enable-sdl --enable-fb --enable-mga --enable-aa \
             --enable-esd --enable-alsa --enable-arts \
-	    --enable-mad
+	    --enable-mad --enable-ffmpeg --with-ffmpeg=%_libdir
 export QTDIR=%{_libdir}/qt2 
 %make
 
@@ -188,16 +231,16 @@ install doc/vlc.1 %buildroot/%_mandir/man1
 # menu
 mkdir -p %buildroot/%{_menudir}
 cat > %buildroot/%{_menudir}/vlc << EOF
-?package(vlc): command="%{_bindir}/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
+?package(vlc): command="%{_bindir}/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
 EOF
 cat > %buildroot/%{_menudir}/vlc-gtk << EOF
-?package(vlc-gtk): command="%{_bindir}/gvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
+?package(vlc-gtk): command="%{_bindir}/gvlc" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
 EOF
 cat > %buildroot/%{_menudir}/vlc-gnome << EOF
-?package(vlc-gnome): command="%{_bindir}/gnome-vlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
+?package(vlc-gnome): command="%{_bindir}/gnome-vlc" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
 EOF
 cat > %buildroot/%{_menudir}/vlc-qt << EOF
-?package(vlc-gnome): command="%{_bindir}/qvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2 and DVD software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
+?package(vlc-gnome): command="%{_bindir}/qvlc" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
 EOF
 
 # icons
@@ -233,6 +276,7 @@ rm -fr %buildroot
 
 %dir %{_libdir}/videolan/vlc
 %{_libdir}/videolan/vlc/ac3_spdif.so
+%{_libdir}/videolan/vlc/avi.so
 %{_libdir}/videolan/vlc/dsp.so
 %{_libdir}/videolan/vlc/dummy.so
 %{_libdir}/videolan/vlc/dvd.so
@@ -260,7 +304,7 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/udp.so
 %{_libdir}/videolan/vlc/vcd.so
 %{_libdir}/videolan/vlc/x11.so
-%{_libdir}/videolan/vlc/xmga.so
+#%{_libdir}/videolan/vlc/xmga.so
 
 %{_mandir}/man1/*
 %{_menudir}/vlc
@@ -319,6 +363,13 @@ rm -fr %buildroot
 %doc README
 %{_libdir}/videolan/vlc/ncurses.so
 
+%if %plugin_lirc
+%files lirc
+%defattr(-,root,root)
+%doc README
+%{_libdir}/videolan/vlc/lirc.so
+%endif
+
 # video plugins
 %files sdl
 %defattr(-,root,root)
@@ -358,13 +409,29 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
-* Thu Apr 18 2002 Samuel Hocevar <sam@zoy.org> 0.3.1
-- version 0.3.1.
-- patch0 is no longer needed.
+* Sat May 18 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.0-1mdk
+- version 0.4.0 with MPEG4 (DivX) support thx ffmpeg.
+  thus s/MPEG, MPEG2 and DVD/multimedia/g
+- sync %%description with debian ones.
+- vlc now requires a vlc-gui (gtk, gnome or qt).
+- removed gcc3.1 patches since merged upstream.
 
-* Wed Apr 17 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.1-1mdk
-- version 0.3.1 (hum soon)
+* Mon May 13 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.1-4mdk
+- removed xmga plugin (currently broken).
+- manual rebuild in gcc3.1 environment aka added Patch0 & Patch1
+- various summary/description changes.
+
+* Fri May 03 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.1-3mdk
+- added vlc-lirc intf plugin rpm.
+
+* Tue Apr 30 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.1-2mdk
+- rebuild against libalsa2 (vlc-sdl)
+
+* Fri Apr 19 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.1-1mdk
+- version 0.3.1.
+- removed patch0 merged upstream.
 - removed old %%ifarch ppc
+- added missing libmad-devel buldrequires
 
 * Wed Apr 17 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.0-4mdk
 - added liba52 support (buildrequires).
@@ -376,22 +443,18 @@ rm -fr %buildroot
 
 * Wed Apr 10 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.0-2mdk
 - added vlc-arts rpm plugin thx blindauer Emmanuel <manu@agat.net>
-- better summary for plug-in
+- better summary for plugin
 - add packager tag to myself
 
 * Sun Apr 07 2002 Yves Duret <yduret@mandrakesoft.com> 0.3.0-1mdk
+- version 0.3.0
 - added aa (Asci Art) plugin in vlc-aa rpm
 - merged with sam's one:
   * using his plugins list into %%files
   * removed libdvdcss from the whole tarball.
   * removed the workaround for vlc's bad /dev/dsp detection.
-- few spelling corrections in all %%description
+- few spell corrections in all %%description
 - added buildrequires on SDL-devel
-
-* Thu Apr 06 2002 Samuel Hocevar <sam@zoy.org> 0.3.0
-- version 0.3.0.
-- removed libdvdcss from the whole tarball.
-- removed the workaround for vlc's bad /dev/dsp detection.
 
 * Tue Mar 05 2002 Yves Duret <yduret@mandrakesoft.com> 0.2.93-0.1mdk
 - new cvs snapshot
@@ -448,11 +511,11 @@ rm -fr %buildroot
 - corrected Summary in vlc-qt
 
 * Wed May 23 2001 Yves Duret <yduret@mandrakesoft.com> 0.2.73-2mdk
-- added qt2 plug-in (vlc-qt)
+- added qt2 plugin (vlc-qt)
 
 * Wed May 16 2001 Yves Duret <yduret@mandrakesoft.com> 0.2.73-1mdk
 - version 0.2.73
-- you can now get decss threw a plug-in
+- you can now get decss threw a plugin
 - rewritte srcipt to build vlc (decss plugin)
 - rebuild with SDL 1.2
 
