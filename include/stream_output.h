@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.21 2004/02/22 16:08:47 fenrir Exp $
+ * $Id: stream_output.h,v 1.22 2004/03/03 11:12:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -45,6 +45,12 @@
  */
 #define SOUT_BUFFER_FLAGS_PRIVATE_MASK  0xffff0000
 #define SOUT_BUFFER_FLAGS_PRIVATE_SHIFT 16
+
+/*
+ * Flags originating from block_t (FIXME: this is temporary).
+ */
+#define SOUT_BUFFER_FLAGS_BLOCK_MASK    0x0000ff00
+#define SOUT_BUFFER_FLAGS_BLOCK_SHIFT   8
 
 struct sout_buffer_t
 {

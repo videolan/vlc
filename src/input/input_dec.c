@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.92 2004/02/25 18:47:02 gbazin Exp $
+ * $Id: input_dec.c,v 1.93 2004/03/03 11:12:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -609,6 +609,9 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                 p_sout_buffer->i_pts = p_sout_block->i_pts;
                 p_sout_buffer->i_dts = p_sout_block->i_dts;
                 p_sout_buffer->i_length = p_sout_block->i_length;
+                p_sout_buffer->i_flags =
+                        (p_sout_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT)
+                          & SOUT_BUFFER_FLAGS_BLOCK_MASK;
 
                 block_Release( p_sout_block );
 
