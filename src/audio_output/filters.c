@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.9 2002/09/02 23:17:06 massiot Exp $
+ * $Id: filters.c,v 1.10 2002/09/22 14:53:52 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -90,25 +90,19 @@ static int SplitConversion( aout_instance_t * p_aout,
 
     if ( i_nb_conversions == 2 )
     {
-        if ( !b_format )
+        if ( !b_format || !b_channels )
         {
             p_middle_format->i_rate = p_input_format->i_rate;
             return 1;
         }
 
-        if ( !b_rate )
-        {
-            p_middle_format->i_channels = p_input_format->i_channels;
-            return 1;
-        }
-
-        /* !b_channels */
-        p_middle_format->i_rate = p_input_format->i_rate;
+        /* !b_rate */
+        p_middle_format->i_channels = p_input_format->i_channels;
         return 1;
     }
 
     /* i_nb_conversion == 3 */
-    p_middle_format->i_channels = p_input_format->i_channels;
+    p_middle_format->i_rate = p_input_format->i_rate;
     return 2;
 }
 
