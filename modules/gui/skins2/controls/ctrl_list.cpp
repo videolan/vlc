@@ -36,6 +36,7 @@
 #include "vlc_keys.h"
 
 #define SCROLL_STEP 0.05
+#define LINE_INTERVAL 1  // Number of pixels inserted between 2 lines
 
 
 CtrlList::CtrlList( intf_thread_t *pIntf, VarList &rList, GenericFont &rFont,
@@ -85,7 +86,7 @@ void CtrlList::onUpdate( Subject<VarPercent> &rPercent )
     int height = pPos->getHeight();
 
     // How many lines can be displayed ?
-    int itemHeight = m_rFont.getSize();
+    int itemHeight = m_rFont.getSize() + LINE_INTERVAL;
     int maxItems = height / itemHeight;
 
     // Determine what is the first item to display
@@ -121,7 +122,7 @@ void CtrlList::onResize()
     int height = pPos->getHeight();
 
     // How many lines can be displayed ?
-    int itemHeight = m_rFont.getSize();
+    int itemHeight = m_rFont.getSize() + LINE_INTERVAL;
     int maxItems = height / itemHeight;
 
     // Update the position variable
@@ -165,8 +166,8 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
     {
         EvtMouse &rEvtMouse = (EvtMouse&)rEvent;
         const Position *pos = getPosition();
-        int yPos = m_lastPos +
-                ( rEvtMouse.getYPos() - pos->getTop() ) / m_rFont.getSize();
+        int yPos = m_lastPos + ( rEvtMouse.getYPos() - pos->getTop() ) /
+            (m_rFont.getSize() + LINE_INTERVAL);
         VarList::Iterator it;
         int index = 0;
 
@@ -335,7 +336,7 @@ void CtrlList::makeImage()
     }
     int width = pPos->getWidth();
     int height = pPos->getHeight();
-    int itemHeight = m_rFont.getSize();
+    int itemHeight = m_rFont.getSize() + LINE_INTERVAL;
 
     // Create an image
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
