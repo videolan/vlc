@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2003 VideoLAN
- * $Id: interface.cpp,v 1.86 2004/01/25 18:18:50 gbazin Exp $
+ * $Id: interface.cpp,v 1.87 2004/03/01 18:31:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -120,7 +120,7 @@ enum
     OpenOther_Event,
     EjectDisc_Event,
 
-    Stream_Event,
+    StreamWizard_Event,
 
     Playlist_Event,
     Logs_Event,
@@ -184,7 +184,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(OpenDisc_Event, Interface::OnShowDialog)
     EVT_MENU(OpenNet_Event, Interface::OnShowDialog)
     EVT_MENU(OpenSat_Event, Interface::OnShowDialog)
-    EVT_MENU(Stream_Event, Interface::OnStream)
+    EVT_MENU(StreamWizard_Event, Interface::OnShowDialog)
     EVT_MENU(StopStream_Event, Interface::OnStopStream)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
     EVT_MENU(PrevStream_Event, Interface::OnPrevStream)
@@ -325,7 +325,7 @@ void Interface::CreateOurMenuBar()
                        wxU(_(HELP_NET)) );
 #endif
     file_menu->AppendSeparator();
-    file_menu->Append( Stream_Event, wxU(_("Streaming Wizard...")),
+    file_menu->Append( StreamWizard_Event, wxU(_("Streaming Wizard...")),
                        wxU(_(HELP_STREAMWIZARD)) );
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, wxU(_("E&xit")), wxU(_(HELP_EXIT)) );
@@ -931,23 +931,17 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         case Prefs_Event:
             i_id = INTF_DIALOG_PREFS;
             break;
+        case StreamWizard_Event:
+            i_id = INTF_DIALOG_STREAMWIZARD;
+            break;
         default:
             i_id = INTF_DIALOG_FILE;
             break;
-
         }
 
         p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1, 0 );
     }
 }
-
-
-void Interface::OnStream( wxCommandEvent& event )
-{
-    StreamDialog *p_stream_dialog = new StreamDialog(p_intf,this);
-    p_stream_dialog->Show();
-}
-
 
 void Interface::OnExtra(wxCommandEvent& event)
 {

@@ -2,7 +2,7 @@
  * stream.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: streamwizard.cpp,v 1.6 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: streamwizard.cpp,v 1.7 2004/03/01 18:31:13 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -36,12 +36,10 @@
 
 #include <wx/statline.h>
 
-
 #define STREAM_INTRO N_( "Stream with VLC in three steps." )
 #define STREAM_STEP1 N_( "Step 1: Select what to stream." )
 #define STREAM_STEP2 N_( "Step 2: Define streaming method." )
 #define STREAM_STEP3 N_( "Step 3: Start streaming." )
-
 
 /*****************************************************************************
  * Event Table.
@@ -110,7 +108,6 @@ StreamDialog::StreamDialog( intf_thread_t *_p_intf, wxWindow *p_parent ):
     start_button = new wxButton( panel,
                    Start_Event, wxU(_("Start!")));
 
-
     step2_label->Disable();
     step3_label->Disable();
 
@@ -167,8 +164,8 @@ void StreamDialog::OnOpen( wxCommandEvent& event )
 {
     if( !p_open_dialog )
     {
-        p_open_dialog = new OpenDialog(
-                    p_intf, this, FILE_ACCESS, 1 , OPEN_STREAM );
+        p_open_dialog =
+            new OpenDialog( p_intf, this, FILE_ACCESS, 1 , OPEN_STREAM );
     }
 
     if( p_open_dialog)
@@ -233,11 +230,12 @@ void StreamDialog::OnStart( wxCommandEvent& event )
             }
         }
 
-         playlist_AddItem( p_playlist, p_item,
-                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+        playlist_AddItem( p_playlist, p_item,
+                          PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO),
+                          PLAYLIST_END );
 
-        msg_Dbg(p_intf,"playings %s",
-                 (const char *)p_open_dialog->mrl[i].mb_str());
+        msg_Dbg( p_intf,"playings %s",
+                 (const char *)p_open_dialog->mrl[i].mb_str() );
 
         i += i_options;
     }
@@ -245,7 +243,6 @@ void StreamDialog::OnStart( wxCommandEvent& event )
 
     Hide();
 }
-
 
 void StreamDialog::OnClose( wxCommandEvent& event )
 {

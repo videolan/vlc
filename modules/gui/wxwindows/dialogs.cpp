@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: dialogs.cpp,v 1.15 2004/01/26 22:10:19 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.16 2004/03/01 18:31:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -60,8 +60,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnMessages)
     EVT_COMMAND(INTF_DIALOG_PREFS, wxEVT_DIALOG,
                 DialogsProvider::OnPreferences)
-    EVT_COMMAND(INTF_DIALOG_STREAM, wxEVT_DIALOG,
-                DialogsProvider::OnStreamDialog)
+    EVT_COMMAND(INTF_DIALOG_STREAMWIZARD, wxEVT_DIALOG,
+                DialogsProvider::OnStreamWizardDialog)
     EVT_COMMAND(INTF_DIALOG_FILEINFO, wxEVT_DIALOG,
                 DialogsProvider::OnFileInfo)
     EVT_COMMAND(INTF_DIALOG_POPUPMENU, wxEVT_DIALOG,
@@ -85,7 +85,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_fileinfo_dialog = NULL;
     p_prefs_dialog = NULL;
     p_file_generic_dialog = NULL;
-    p_stream_dialog = NULL;
+    p_streamwizard_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -107,7 +107,7 @@ DialogsProvider::~DialogsProvider()
     if( p_messages_dialog ) delete p_messages_dialog;
     if( p_fileinfo_dialog ) delete p_fileinfo_dialog;
     if( p_file_generic_dialog ) delete p_file_generic_dialog;
-    if( p_stream_dialog ) delete p_stream_dialog;
+    if( p_streamwizard_dialog ) delete p_streamwizard_dialog;
 
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
@@ -182,15 +182,15 @@ void DialogsProvider::OnPreferences( wxCommandEvent& WXUNUSED(event) )
     }
 }
 
-void DialogsProvider::OnStreamDialog( wxCommandEvent& WXUNUSED(event) )
+void DialogsProvider::OnStreamWizardDialog( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the stream window */
-    if( !p_stream_dialog )
-        p_stream_dialog = new StreamDialog( p_intf, this );
+    if( !p_streamwizard_dialog )
+        p_streamwizard_dialog = new StreamDialog( p_intf, this );
 
-    if( p_stream_dialog )
+    if( p_streamwizard_dialog )
     {
-        p_stream_dialog->Show( !p_stream_dialog->IsShown() );
+        p_streamwizard_dialog->Show( !p_streamwizard_dialog->IsShown() );
     }
 }
 

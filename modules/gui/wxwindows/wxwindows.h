@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: wxwindows.h,v 1.94 2004/02/26 08:24:29 gbazin Exp $
+ * $Id: wxwindows.h,v 1.95 2004/03/01 18:31:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -208,7 +208,6 @@ private:
     void OnOpenNet( wxCommandEvent& event );
     void OnOpenSat( wxCommandEvent& event );
     void OnOpenV4L( wxCommandEvent& event );
-    void OnStream( wxCommandEvent& event );
     void OnExtra( wxCommandEvent& event );
     void OnShowDialog( wxCommandEvent& event );
     void OnPlayStream( wxCommandEvent& event );
@@ -274,7 +273,7 @@ private:
     void OnMessages( wxCommandEvent& event );
     void OnFileInfo( wxCommandEvent& event );
     void OnPreferences( wxCommandEvent& event );
-    void OnStreamDialog( wxCommandEvent& event );
+    void OnStreamWizardDialog( wxCommandEvent& event );
 
     void OnOpenFileGeneric( wxCommandEvent& event );
     void OnOpenFileSimple( wxCommandEvent& event );
@@ -300,7 +299,7 @@ public:
     Playlist            *p_playlist_dialog;
     Messages            *p_messages_dialog;
     FileInfo            *p_fileinfo_dialog;
-    StreamDialog        *p_stream_dialog;
+    StreamDialog        *p_streamwizard_dialog;
     wxFrame             *p_prefs_dialog;
     wxFileDialog        *p_file_generic_dialog;
 };
