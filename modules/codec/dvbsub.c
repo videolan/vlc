@@ -312,7 +312,11 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     p_sys->i_pts = p_block->i_pts;
     if( p_sys->i_pts <= 0 )
     {
+#ifdef DEBUG_DVBSUB
+        /* Some DVB channels send stuffing segments in non-dated packets so
+         * don't complain too loudly. */
         msg_Warn( p_dec, "non dated subtitle" );
+#endif
         block_Release( p_block );
         return NULL;
     }
@@ -326,12 +330,16 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( bs_read( &p_sys->bs, 8 ) != 0x20 && 0 ) /* Subtitle stream id */
+    if( bs_read( &p_sys->bs, 8 ) ) /* Subtitle stream id */
     {
         msg_Dbg( p_dec, "invalid subtitle stream id" );
         block_Release( p_block );
         return NULL;
     }
+
+#ifdef DEBUG_DVBSUB
+    msg_Dbg( p_dec, "subtitle packet received: "I64Fd, p_sys->i_pts );
+#endif
 
     while( bs_show( &p_sys->bs, 8 ) == 0x0f ) /* Sync byte */
     {
@@ -560,25 +568,35 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
         }
         else
         {
-            y  = bs_read( s, 6 );
-            cr = bs_read( s, 4 );
-            cb = bs_read( s, 4 );
-            t  = bs_read( s, 2 );
+            y  = bs_read( s, 6 ) << 2;
+            cr = bs_read( s, 4 ) << 4;
+            cb = bs_read( s, 4 ) << 4;
+            t  = bs_read( s, 2 ) << 6;
             i_processed_length += 4;
         }
 
+        /* We are not entirely compliant here as full transparency is indicated
+         * with a luma value of zero, not a transparency value of 0xff
+         * (full transparency would actually be 0xff + 1). */
+
+        if( y == 0 )
+        {
+            cr = cb = 0;
+            t  = 0xff;
+        }
+
         /* According to EN 300-743 section 7.2.3 note 1, type should
-         * not have more than 1 bit set to one, but some strams don't
+         * not have more than 1 bit set to one, but some streams don't
          * respect this note. */
 
-        if( i_type&0x04)
+        if( i_type & 0x04)
         {
             p_clut->c_2b[i_id].Y = y;
             p_clut->c_2b[i_id].Cr = cr;
             p_clut->c_2b[i_id].Cb = cb;
             p_clut->c_2b[i_id].T = t;
         }
-        if( i_type&0x02)
+        if( i_type & 0x02)
         {
             p_clut->c_4b[i_id].Y = y;
             p_clut->c_4b[i_id].Cr = cr;
@@ -629,6 +647,9 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
 
     if( i_state == DVBSUB_PCS_STATE_ACQUISITION )
     {
+#ifdef DEBUG_DVBSUB
+        msg_Dbg( p_dec, "acquisition page composition" );
+#endif
         /* Make sure we clean up regularly our objects list.
          * Is it the best place to do this ? */
         free_objects( p_dec );
@@ -1231,9 +1252,10 @@ static subpicture_t *render( decoder_t *p_dec )
         dvbsub_region_t     *p_region;
         dvbsub_regiondef_t  *p_regiondef;
         subpicture_region_t *p_spu_region;
-        uint8_t *p_y, *p_u, *p_v, *p_a;
+        dvbsub_color_t      *p_color;
         video_format_t fmt;
-        int i_pitch;
+        uint8_t *p_y;
+        int i_pitch, i_background;
 
         i_timeout = p_sys->p_page->i_timeout;
 
@@ -1259,7 +1281,7 @@ static subpicture_t *render( decoder_t *p_dec )
 
         /* Create new SPU region */
         memset( &fmt, 0, sizeof(video_format_t) );
-        fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+        fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
         fmt.i_aspect = VOUT_ASPECT_FACTOR;
         fmt.i_width = fmt.i_visible_width = p_region->i_width;
         fmt.i_height = fmt.i_visible_height = p_region->i_height;
@@ -1275,12 +1297,29 @@ static subpicture_t *render( decoder_t *p_dec )
         *pp_spu_region = p_spu_region;
         pp_spu_region = &p_spu_region->p_next;
 
+        /* Build palette */
+        p_clut = p_sys->p_clut[p_region->i_clut];
+        if( !p_clut ) p_clut = &p_sys->default_clut;
+        fmt.p_palette->i_entries = p_region->i_depth == 1 ? 4 :
+            p_region->i_depth == 2 ? 16 : 256;
+        p_color = (p_region->i_depth == 1) ? p_clut->c_2b :
+            (p_region->i_depth == 2) ? p_clut->c_4b : p_clut->c_8b;
+        for( j = 0; j < fmt.p_palette->i_entries; j++ )
+        {
+            fmt.p_palette->palette[j][0] = p_color[j].Y;
+            fmt.p_palette->palette[j][1] = p_color[j].Cr;
+            fmt.p_palette->palette[j][2] = p_color[j].Cb;
+            fmt.p_palette->palette[j][3] = 0xff - p_color[j].T;
+        }
+
         p_y = p_spu_region->picture.Y_PIXELS;
-        p_u = p_spu_region->picture.U_PIXELS;
-        p_v = p_spu_region->picture.V_PIXELS;
-        p_a = p_spu_region->picture.A_PIXELS;
         i_pitch = p_spu_region->picture.Y_PITCH;
-        memset( p_a, 0, i_pitch * p_region->i_height );
+
+        /* Erase region */
+        i_background = (p_region->i_depth == 1) ? p_region->i_2bp_code :
+            (p_region->i_depth == 2) ? p_region->i_4bp_code :
+            p_region->i_8bp_code;
+        memset( p_y, i_background, i_pitch * p_region->i_height );
 
         /* Loop on object definitions */
         for( j = 0; j < p_region->i_object_defs; j++ )
@@ -1310,50 +1349,24 @@ static subpicture_t *render( decoder_t *p_dec )
             }
 
             /* Draw SPU region */
-            p_clut = p_sys->p_clut[p_region->i_clut];
-            if( !p_clut ) p_clut = &p_sys->default_clut;
-
             for( k = 0, l = 0, p_c = p_object->topfield->p_codes;
-                 p_c && p_c->p_next; p_c = p_c->p_next )
+                 p_c; p_c = p_c->p_next )
             {
-                /* Compute the color data according to the appropriate CLUT */
-                dvbsub_color_t *p_color = (p_c->i_bpp == 2) ? p_clut->c_2b :
-                    (p_c->i_bpp == 4) ? p_clut->c_4b : p_clut->c_8b;
-
                 x = l + p_objectdef->i_x;
                 y = 2 * k + p_objectdef->i_y;
-                memset( p_y + y * i_pitch + x, p_color[p_c->i_color_code].Y,
-                        p_c->i_num );
-                memset( p_u + y * i_pitch + x, p_color[p_c->i_color_code].Cr,
-                        p_c->i_num );
-                memset( p_v + y * i_pitch + x, p_color[p_c->i_color_code].Cb,
-                        p_c->i_num );
-                memset( p_a + y * i_pitch + x,
-                        255 - p_color[p_c->i_color_code].T, p_c->i_num );
+                memset( p_y + y * i_pitch + x, p_c->i_color_code, p_c->i_num );
 
                 l += p_c->i_num;
                 if( l >= p_object->topfield->i_cols[k] ) { k++; l = 0; }
                 if( k >= p_object->topfield->i_rows) break;
-
             }
 
             for( k = 0, l = 0, p_c = p_object->bottomfield->p_codes;
-                 p_c && p_c->p_next; p_c = p_c->p_next )
+                 p_c; p_c = p_c->p_next )
             {
-                /* Compute the color data according to the appropriate CLUT */
-                dvbsub_color_t *p_color = (p_c->i_bpp == 2) ? p_clut->c_2b :
-                    (p_c->i_bpp == 4) ? p_clut->c_4b : p_clut->c_8b;
-
                 x = l + p_objectdef->i_x;
                 y = 2 * k + 1 + p_objectdef->i_y;
-                memset( p_y + y * i_pitch + x, p_color[p_c->i_color_code].Y,
-                        p_c->i_num );
-                memset( p_u + y * i_pitch + x, p_color[p_c->i_color_code].Cr,
-                        p_c->i_num );
-                memset( p_v + y * i_pitch + x, p_color[p_c->i_color_code].Cb,
-                        p_c->i_num );
-                memset( p_a + y * i_pitch + x,
-                        255 - p_color[p_c->i_color_code].T, p_c->i_num );
+                memset( p_y + y * i_pitch + x, p_c->i_color_code, p_c->i_num );
 
                 l += p_c->i_num;
                 if( l >= p_object->bottomfield->i_cols[k] ) { k++; l = 0; }
@@ -1445,11 +1458,11 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     bs_init( s, p_block->p_buffer, p_block->i_buffer );
 
     bs_write( s, 8, 0x20 ); /* Data identifier */
-    bs_write( s, 8, 0x20 ); /* Subtitle stream id */
+    bs_write( s, 8, 0x0 ); /* Subtitle stream id */
 
     encode_page_composition( p_enc, s, p_subpic );
-    encode_clut( p_enc, s, p_subpic );
     encode_region_composition( p_enc, s, p_subpic );
+    encode_clut( p_enc, s, p_subpic );
     encode_object( p_enc, s, p_subpic );
 
     /* End of display */
@@ -1559,6 +1572,8 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
          p_region = p_region->p_next, i_regions++ )
     {
         video_palette_t *p_pal = p_region->fmt.p_palette;
+        int i_depth = p_pal->i_entries == 4 ? 0x1 :
+            p_pal->i_entries == 16 ? 0x2 : 0x3;
 
         bs_write( s, 8, 0x0f ); /* Sync byte */
         bs_write( s, 8, DVBSUB_ST_REGION_COMPOSITION ); /* Segment type */
@@ -1573,22 +1588,22 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
         bs_write( s, 3, 0 ); /* Reserved */
         bs_write( s, 16, p_region->fmt.i_visible_width );
         bs_write( s, 16, p_region->fmt.i_visible_height );
-        bs_write( s, 3, p_pal->i_entries ); /* Region level of compatibility */
-        bs_write( s, 3, p_pal->i_entries  ); /* Region depth */
+        bs_write( s, 3, i_depth );  /* Region level of compatibility */
+        bs_write( s, 3, i_depth  ); /* Region depth */
         bs_write( s, 2, 0 ); /* Reserved */
         bs_write( s, 8, 1 ); /* Clut id */
-        bs_write( s, 8, 0 /*p_region->i_8bp_code*/ );
-        bs_write( s, 4, 0 /*p_region->i_4bp_code*/ );
-        bs_write( s, 2, 0 /*p_region->i_2bp_code*/ );
+        bs_write( s, 8, 0 ); /* region 8bit pixel code */
+        bs_write( s, 4, 0 ); /* region 4bit pixel code */
+        bs_write( s, 2, 0 ); /* region 2bit pixel code */
         bs_write( s, 2, 0 ); /* Reserved */
 
         /* In our implementation we only have 1 object per region */
         bs_write( s, 16, i_regions );
         bs_write( s, 2, DVBSUB_OT_BASIC_BITMAP );
-        bs_write( s, 2, 0 /*p_obj->i_provider*/ );
-        bs_write( s, 12, 0 /*p_obj->i_x*/ );
+        bs_write( s, 2, 0 ); /* object provider flag */
+        bs_write( s, 12, 0 ); /* object horizontal position */
         bs_write( s, 4, 0 ); /* Reserved */
-        bs_write( s, 12, 0 /*p_obj->i_y*/ );
+        bs_write( s, 12, 0 ); /* object vertical position */
     }
 }
 
@@ -1602,8 +1617,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     subpicture_region_t *p_region;
     int i_regions;
 
-    int i_update_pos;
-    int i_pixel_data_pos;
+    int i_length_pos, i_update_pos, i_pixel_data_pos;
 
     for( i_regions = 0, p_region = p_subpic->p_region; p_region;
          p_region = p_region->p_next, i_regions++ )
@@ -1612,17 +1626,18 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         bs_write( s, 8, DVBSUB_ST_OBJECT_DATA ); /* Segment type */
         bs_write( s, 16, 1 ); /* Page id */
 
-        bs_write( s, 16, 8 ); /* Segment length */
+        i_length_pos = bs_pos( s );
+        bs_write( s, 16, 0 ); /* Segment length */
         bs_write( s, 16, i_regions ); /* Object id */
         bs_write( s, 4, p_sys->i_region_ver++ );
-        bs_write( s, 2, 0 /*i_coding_method*/ );
+        bs_write( s, 2, 0 ); /* object coding method */
 
-        bs_write( s, 1, 0 /*p_obj->b_non_modify_color*/ );
+        bs_write( s, 1, 0 ); /* non modifying color flag */
         bs_write( s, 1, 0 ); /* Reserved */
 
         i_update_pos = bs_pos( s );
-        bs_write( s, 16, 0 /*i_topfield_length*/ );
-        bs_write( s, 16, 0 /*i_bottomfield_length*/ );
+        bs_write( s, 16, 0 ); /* topfield data block length */
+        bs_write( s, 16, 0 ); /* bottomfield data block length */
 
         /* Top field */
         i_pixel_data_pos = bs_pos( s );
@@ -1639,6 +1654,9 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         /* Stuffing for word alignment */
         bs_align_0( s );
         if( bs_pos( s ) % 16 ) bs_write( s, 8, 0 );
+
+        /* Update segment length */
+        SetWBE( &s->p_start[i_length_pos/8], (bs_pos(s) - i_length_pos -2)/8 );
     }
 }
 
