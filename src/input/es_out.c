@@ -1178,11 +1178,18 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
                 if( !es->p_dec ) return VLC_SUCCESS;
 
+#if 1
+                input_DecoderDelete( es->p_dec );
+                es->p_dec = input_DecoderNew( p_sys->p_input,
+                                              &es->fmt, VLC_FALSE );
+
+#else
                 es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
                 es->p_dec->fmt_in.p_extra =
                     realloc( es->p_dec->fmt_in.p_extra, p_fmt->i_extra );
                 memcpy( es->p_dec->fmt_in.p_extra,
                         p_fmt->p_extra, p_fmt->i_extra );
+#endif
             }
 
             return VLC_SUCCESS;
