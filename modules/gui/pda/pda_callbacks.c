@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.10 2003/11/09 15:55:23 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.11 2003/11/09 18:52:29 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -46,6 +46,8 @@
 #include "pda_interface.h"
 #include "pda_support.h"
 #include "pda.h"
+
+#define VLC_MAX_MRL     256
 
 static char* get_file_stat(const char *path, uid_t *uid, gid_t *gid, off_t *size);
 
@@ -582,7 +584,6 @@ NetworkBuildMRL                        (GtkEditable     *editable,
     const gchar   *mrlAddress;
     const gchar   *mrlProtocol;
     gint           mrlPort;
-#define VLC_MAX_MRL     256
     char           text[VLC_MAX_MRL];
     int            pos = 0;
 
@@ -593,7 +594,7 @@ NetworkBuildMRL                        (GtkEditable     *editable,
     networkPort     = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryNetworkPort" );
     networkProtocol = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkProtocolType" );
 
-    mrlNetworkType  = gtk_entry_get_text(GTK_ENTRY(networkType));
+    mrlNetworkType = gtk_entry_get_text(GTK_ENTRY(networkType));
     mrlAddress     = gtk_entry_get_text(GTK_ENTRY(networkAddress));
     mrlPort        = gtk_spin_button_get_value_as_int(networkPort);
     mrlProtocol    = gtk_entry_get_text(GTK_ENTRY(networkProtocol));
@@ -610,7 +611,6 @@ NetworkBuildMRL                        (GtkEditable     *editable,
         text[VLC_MAX_MRL-1]='\0';
 
     gtk_entry_set_text(entryMRL,text);
-#undef VLC_MAX_MRL
 }
 
 void
@@ -753,9 +753,91 @@ void
 V4LBuildMRL                            (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-//    GtkSpinButton *networkPort = NULL;
-//    GtkEntry      *entryMRL = NULL;
+    GtkSpinButton *entryV4LChannel = NULL;
+    GtkSpinButton *entryV4LFrequency = NULL;
+    GtkSpinButton *entryV4LSampleRate = NULL;
+    GtkSpinButton *entryV4LQuality = NULL;
+    GtkSpinButton *entryV4LTuner = NULL;
+    gint    i_v4l_channel;
+    gint    i_v4l_frequency;
+    gint    i_v4l_samplerate;
+    gint    i_v4l_quality;
+    gint    i_v4l_tuner;
 
+    GtkEntry      *entryV4LVideoDevice = NULL;
+    GtkEntry      *entryV4LAudioDevice = NULL;
+    GtkEntry      *entryV4LNorm = NULL;
+    GtkEntry      *entryV4LSize = NULL;
+    GtkEntry      *entryV4LSoundDirection = NULL;
+    const gchar   *p_v4l_video_device;
+    const gchar   *p_v4l_audio_device;
+    const gchar   *p_v4l_norm;
+    const gchar   *p_v4l_size;
+    const gchar   *p_v4l_sound_direction;
+
+    /* MJPEG only */
+    GtkCheckButton *checkV4LMJPEG = NULL;
+    GtkSpinButton  *entryV4LDecimation = NULL;
+    gboolean        b_v4l_mjpeg;
+    gint            i_v4l_decimation;
+    /* end MJPEG only */
+
+    char v4l_mrl[VLC_MAX_MRL];
+    int pos;
+
+    pos = snprintf( &v4l_mrl[0], VLC_MAX_MRL, "v4l://");
+
+    entryV4LChannel    = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LChannel" );
+    entryV4LFrequency  = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LFrequency" );
+    entryV4LSampleRate = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LSampleRate" );
+    entryV4LQuality    = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LQuality" );
+    entryV4LTuner      = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LTuner" );
+
+    entryV4LVideoDevice  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LVideoDevice" );
+    entryV4LAudioDevice  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LAudioDevice" );
+    entryV4LNorm  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LNorm" );
+    entryV4LSize  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LSize" );
+    entryV4LSoundDirection  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryV4LSoundDirection" );
+    
+    i_v4l_channel = gtk_spin_button_get_value_as_int(entryV4LChannel);
+    i_v4l_frequency = gtk_spin_button_get_value_as_int(entryV4LFrequency);
+    i_v4l_samplerate = gtk_spin_button_get_value_as_int(entryV4LSampleRate);
+    i_v4l_quality = gtk_spin_button_get_value_as_int(entryV4LQuality);
+    i_v4l_tuner = gtk_spin_button_get_value_as_int(entryV4LTuner);
+
+    p_v4l_video_device = gtk_entry_get_text(GTK_ENTRY(entryV4LVideoDevice));
+    p_v4l_audio_device = gtk_entry_get_text(GTK_ENTRY(entryV4LAudioDevice));
+    p_v4l_norm = gtk_entry_get_text(GTK_ENTRY(entryV4LNorm));
+    p_v4l_size  = gtk_entry_get_text(GTK_ENTRY(entryV4LSize));
+    p_v4l_sound_direction = gtk_entry_get_text(GTK_ENTRY(entryV4LSoundDirection));
+
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":%s", (char*)p_v4l_video_device );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":adev=%s", (char*)p_v4l_audio_device );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":norm=%s", (char*)p_v4l_norm );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":size=%s", (char*)p_v4l_size );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":%s", (char*)p_v4l_sound_direction );
+
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":channel=%d", (int)i_v4l_channel );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":frequency=%d", (int)i_v4l_frequency );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":samplerate=%d", (int)i_v4l_samplerate );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":quality=%d", (int)i_v4l_quality );
+    pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":tuner=%d", (int)i_v4l_tuner );
+
+    /* MJPEG only */
+    checkV4LMJPEG      = (GtkCheckButton*) lookup_widget( GTK_WIDGET(editable), "checkV4LMJPEG" );
+    b_v4l_mjpeg = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkV4LMJPEG));
+    if (b_v4l_mjpeg)
+    {
+        entryV4LDecimation = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryV4LDecimation" );
+        i_v4l_decimation = gtk_spin_button_get_value_as_int(entryV4LDecimation);
+        pos += snprintf( &v4l_mrl[pos], VLC_MAX_MRL - pos, ":mjpeg:%d", (int)i_v4l_decimation );
+    }
+    /* end MJPEG only */
+
+    if (pos >= VLC_MAX_MRL)
+        v4l_mrl[VLC_MAX_MRL-1]='\0';
+
+    g_print( "%s\n", v4l_mrl );
 }
 
 
