@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.3 2003/08/25 01:31:25 fenrir Exp $
+ * $Id: asf.c,v 1.4 2003/08/25 23:39:20 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -674,7 +674,7 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     /* header object */
     bo_add_guid ( &bo, &asf_object_header_guid );
     bo_addle_u64( &bo, i_size );
-    bo_addle_u32( &bo, 2 + p_sys->i_track );
+    bo_addle_u32( &bo, 2 + p_sys->i_track - 1 );
     bo_add_u8   ( &bo, 1 );
     bo_add_u8   ( &bo, 2 );
 
@@ -684,13 +684,13 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     bo_add_guid ( &bo, &asf_object_file_properties_guid );
     bo_addle_u64( &bo, 104 );
     bo_add_guid ( &bo, &p_sys->fid );
-    bo_addle_u64( &bo, i_size + p_sys->i_packet_count *
+    bo_addle_u64( &bo, i_size + 50 + p_sys->i_packet_count *
                                 p_sys->i_packet_size ); /* file size */
     bo_addle_u64( &bo, 0 );                 /* creation date */
-    bo_addle_u64( &bo, p_sys->i_packet_count );
+    bo_addle_u64( &bo, b_broadcast ? 0xffffffffLL : p_sys->i_packet_count );
     bo_addle_u64( &bo, i_duration * 10 );   /* play duration (100ns) */
     bo_addle_u64( &bo, i_duration * 10 );   /* send duration (100ns) */
-    bo_addle_u64( &bo, 10000 );             /* preroll duration (ms) */
+    bo_addle_u64( &bo, 4000 );              /* preroll duration (ms) */
     bo_addle_u32( &bo, b_broadcast ? 0x01 : 0x00);      /* flags */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size min */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
