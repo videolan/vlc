@@ -39,7 +39,7 @@ else
 fi
 
 dnl Gettext stuff
-ALL_LINGUAS="de en_GB fr ja no ru nl"
+ALL_LINGUAS="de en_GB fr ja no ru nl pl"
 
 AC_DEFINE_UNQUOTED(VLC_PACKAGE, "$PACKAGE", [Package name])
 AC_DEFINE_UNQUOTED(VLC_VERSION, "$VERSION", [Package version])

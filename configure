@@ -1308,7 +1308,7 @@ else
   VLC_MAKE="gmake"
 fi
 
-ALL_LINGUAS="de en_GB fr ja no ru nl"
+ALL_LINGUAS="de en_GB fr ja no ru nl pl"
 
 cat >> confdefs.h <<EOF
 #define VLC_PACKAGE "$PACKAGE"
