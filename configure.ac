@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.68 2003/08/24 11:17:39 gbazin Exp $
+dnl $Id: configure.ac,v 1.69 2003/08/27 08:27:52 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -998,7 +998,7 @@ AC_ARG_ENABLE(sout,
 if test "${enable_sout}" != "no"
 then
   AX_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
-  AX_ADD_PLUGINS([mux_ts mux_ps mux_avi mux_mp4 mux_dummy])
+  AX_ADD_PLUGINS([mux_ts mux_ps mux_avi mux_mp4 mux_asf mux_dummy])
   AX_ADD_PLUGINS([packetizer_mpegaudio packetizer_mpegvideo packetizer_a52])
   AX_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   AX_ADD_PLUGINS([packetizer_copy])
