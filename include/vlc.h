@@ -60,6 +60,7 @@
 #include "decoder_fifo.h"
 #include "input_file.h"
 #include "input_network.h"
+#include "input_ctrl.h"
 
 /* Audio */
 #include "audio_output.h"
