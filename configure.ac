@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.175 2004/02/08 23:39:16 gbazin Exp $
+dnl $Id: configure.ac,v 1.176 2004/02/10 13:29:04 sam Exp $
 
 AC_INIT(vlc,0.7.1-test1)
 
@@ -1681,22 +1681,26 @@ dnl  matroska demux plugin
 dnl
 AC_ARG_ENABLE(mkv,
   [  --enable-mkv            Matroska demux support (default enabled)])
-if test "${enable_mkv}" != "no"
-then
-AC_LANG_PUSH(C++)
-  AC_CHECK_HEADERS(ebml/EbmlVersion.h matroska/KaxVersion.h, [
-    AC_CHECK_HEADERS(matroska/KaxAttachments.h)
-    AX_ADD_PLUGINS([mkv])
-    AX_ADD_CXXFLAGS([mkv],[])
-    AC_CHECK_LIB(ebml_pic,main,[
-      # We have ebml_pic, that's good, we can build an mkv.so plugin !
-      AX_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])
-    ],[
-      AX_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
+if test "${enable_mkv}" != "no"; then
+  AC_LANG_PUSH(C++)
+  AC_CHECK_HEADERS(ebml/EbmlVersion.h, [
+    AC_CHECK_HEADERS(matroska/KaxVersion.h, [
+      AC_CHECK_HEADERS(matroska/KaxAttachments.h)
+      AX_ADD_CXXFLAGS([mkv],[])
+      AC_CHECK_LIB(ebml_pic, main, [
+        # We have ebml_pic, that's good, we can build an mkv.so plugin !
+        AX_ADD_PLUGINS([mkv])
+        AX_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])
+      ], [
+        AC_CHECK_LIB(ebml, main, [
+          # We only have libebml, make mkv.a a builtin
+          AX_ADD_BUILTINS([mkv])
+          AX_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
+        ])
+      ])
     ])
   ])
-  CPPFLAGS="${CPPFLAGS_save}"
-AC_LANG_POP(C++)
+  AC_LANG_POP(C++)
 fi
 
 dnl
