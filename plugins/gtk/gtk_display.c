@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.12 2002/01/09 02:01:14 sam Exp $
+ * $Id: gtk_display.c,v 1.13 2002/01/10 04:11:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -159,7 +159,13 @@ gint GtkModeManage( intf_thread_t * p_intf )
 
                 break;
             default:
-                intf_ErrMsg( "intf error: can't determine input method" );
+                intf_WarnMsg( 3, "intf: can't determine input method" );
+                gtk_widget_show( GTK_WIDGET( p_file_box ) );
+                p_label = gtk_object_get_data( GTK_OBJECT(
+                            p_intf->p_sys->p_window ),
+                            "label_status" );
+                gtk_label_set_text( GTK_LABEL( p_label ),
+                                    p_input_bank->pp_input[0]->p_source );
                 break;
         }
     

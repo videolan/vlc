@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: intf_playlist.c,v 1.12 2001/12/30 07:09:56 sam Exp $
+ * $Id: intf_playlist.c,v 1.13 2002/01/10 04:11:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -245,21 +245,24 @@ void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
 {
     vlc_mutex_lock( &p_playlist->change_lock );
 
-    p_playlist->i_index = i_pos;
+    if( i_pos < -1 )
+    {
+        i_pos = -1;
+    }
 
-    if( p_playlist->i_index != -1 )
+    if( i_pos != -1 )
     {
         if( p_playlist->current.psz_name != NULL )
         {
             free( p_playlist->current.psz_name );
         }
 
-        p_playlist->current = p_playlist->p_item[ p_playlist->i_index ];
-        p_playlist->current.psz_name
-                            = strdup( p_playlist->current.psz_name );
-
+        p_playlist->current = p_playlist->p_item[ i_pos ];
+        p_playlist->current.psz_name = strdup( p_playlist->current.psz_name );
     }
-    p_main->p_playlist->b_stopped = 0;
+
+    p_playlist->i_index = i_pos;
+    p_playlist->b_stopped = 0;
 
     vlc_mutex_unlock( &p_playlist->change_lock );
 }

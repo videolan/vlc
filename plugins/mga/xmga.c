@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.1 2002/01/09 02:01:14 sam Exp $
+ * $Id: xmga.c,v 1.2 2002/01/10 04:11:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -971,118 +971,118 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void ToggleFullScreen ( vout_thread_t *p_vout )
 {
-  Atom prop;
-  mwmhints_t mwmhints;
-  int i_xpos, i_ypos, i_width, i_height;
+    Atom prop;
+    mwmhints_t mwmhints;
+    int i_xpos, i_ypos, i_width, i_height;
 
-  p_vout->b_fullscreen = !p_vout->b_fullscreen;
+    p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
-  if( p_vout->b_fullscreen )
-  {
-      Window next_parent, parent, *p_dummy, dummy1;
-      unsigned int dummy2, dummy3;
-     
-      intf_WarnMsg( 3, "vout: entering fullscreen mode" );
+    if( p_vout->b_fullscreen )
+    {
+        Window next_parent, parent, *p_dummy, dummy1;
+        unsigned int dummy2, dummy3;
 
-      /* Save current window coordinates so they can be restored when
-       * we exit from fullscreen mode */
+        intf_WarnMsg( 3, "vout: entering fullscreen mode" );
 
-      /* find the real parent, which means the which is a direct child of
-       * the root window */
-      next_parent = parent = p_vout->p_sys->window;
-      while( next_parent != DefaultRootWindow( p_vout->p_sys->p_display ) )
-      {
-          parent = next_parent;
-          XQueryTree( p_vout->p_sys->p_display,
-                      parent,
+        /* Save current window coordinates so they can be restored when
+         * we exit from fullscreen mode */
+
+        /* find the real parent, which means the which is a direct child of
+         * the root window */
+        next_parent = parent = p_vout->p_sys->window;
+        while( next_parent != DefaultRootWindow( p_vout->p_sys->p_display ) )
+        {
+            parent = next_parent;
+            XQueryTree( p_vout->p_sys->p_display,
+                        parent,
+                        &dummy1,
+                        &next_parent,
+                        &p_dummy,
+                        &dummy2 );
+            XFree((void *)p_dummy);
+        }
+
+        XGetGeometry( p_vout->p_sys->p_display,
+                      p_vout->p_sys->window,
                       &dummy1,
-                      &next_parent,
-                      &p_dummy,
-                      &dummy2 );
-          XFree((void *)p_dummy);
-      }
+                      &dummy2,
+                      &dummy3,
+                      &p_vout->p_sys->i_width_backup,
+                      &p_vout->p_sys->i_height_backup,
+                      &dummy2, &dummy3 );
 
-      XGetGeometry( p_vout->p_sys->p_display,
-                    p_vout->p_sys->window,
-                    &dummy1,
-                    &dummy2,
-                    &dummy3,
-                    &p_vout->p_sys->i_width_backup,
-                    &p_vout->p_sys->i_height_backup,
-                    &dummy2, &dummy3 );
+        XTranslateCoordinates( p_vout->p_sys->p_display,
+                               parent,
+                               DefaultRootWindow( p_vout->p_sys->p_display ),
+                               0,
+                               0,
+                               &p_vout->p_sys->i_xpos_backup,
+                               &p_vout->p_sys->i_ypos_backup,
+                               &dummy1 );
 
-      XTranslateCoordinates( p_vout->p_sys->p_display,
-                             parent,
-                             DefaultRootWindow( p_vout->p_sys->p_display ),
-                             0,
-                             0,
-                             &p_vout->p_sys->i_xpos_backup,
-                             &p_vout->p_sys->i_ypos_backup,
-                             &dummy1 );
+        mwmhints.flags = MWM_HINTS_DECORATIONS;
+        mwmhints.decorations = 0;
 
-      mwmhints.flags = MWM_HINTS_DECORATIONS;
-      mwmhints.decorations = 0;
-
-      i_xpos = 0;
-      i_ypos = 0;
-      i_width = DisplayWidth( p_vout->p_sys->p_display,
-                              p_vout->p_sys->i_screen );
-      i_height = DisplayHeight( p_vout->p_sys->p_display,
+        i_xpos = 0;
+        i_ypos = 0;
+        i_width = DisplayWidth( p_vout->p_sys->p_display,
                                 p_vout->p_sys->i_screen );
+        i_height = DisplayHeight( p_vout->p_sys->p_display,
+                                  p_vout->p_sys->i_screen );
 
 #if 0
-      /* Being a transient window allows us to really be fullscreen (display
-       * over the taskbar for instance) but then we end-up with the same
-       * result as with the brute force method */
-      XSetTransientForHint( p_vout->p_sys->p_display,
-                            p_vout->p_sys->window, None );
+        /* Being a transient window allows us to really be fullscreen (display
+         * over the taskbar for instance) but then we end-up with the same
+         * result as with the brute force method */
+        XSetTransientForHint( p_vout->p_sys->p_display,
+                              p_vout->p_sys->window, None );
 #endif
-  }
-  else
-  {
-      intf_WarnMsg( 3, "vout: leaving fullscreen mode" );
-      
-      mwmhints.flags = MWM_HINTS_DECORATIONS;
-      mwmhints.decorations = 1;
+    }
+    else
+    {
+        intf_WarnMsg( 3, "vout: leaving fullscreen mode" );
 
-      i_xpos = p_vout->p_sys->i_xpos_backup;
-      i_ypos = p_vout->p_sys->i_ypos_backup;
-      i_width = p_vout->p_sys->i_width_backup;
-      i_height = p_vout->p_sys->i_height_backup;
-  }
+        mwmhints.flags = MWM_HINTS_DECORATIONS;
+        mwmhints.decorations = 1;
 
-  /* To my knowledge there are two ways to create a borderless window.
-   * There's the generic way which is to tell x to bypass the window manager,
-   * but this creates problems with the focus of other applications.
-   * The other way is to use the motif property "_MOTIF_WM_HINTS" which
-   * luckily seems to be supported by most window managers.
-   */
-  prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
-                      False );
-  XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                   prop, prop, 32, PropModeReplace,
-                   (unsigned char *)&mwmhints,
-                   PROP_MWM_HINTS_ELEMENTS );
+        i_xpos = p_vout->p_sys->i_xpos_backup;
+        i_ypos = p_vout->p_sys->i_ypos_backup;
+        i_width = p_vout->p_sys->i_width_backup;
+        i_height = p_vout->p_sys->i_height_backup;
+    }
+
+    /* To my knowledge there are two ways to create a borderless window.
+     * There's the generic way which is to tell x to bypass the window manager,
+     * but this creates problems with the focus of other applications.
+     * The other way is to use the motif property "_MOTIF_WM_HINTS" which
+     * luckily seems to be supported by most window managers.
+     */
+    prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
+                        False );
+    XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                     prop, prop, 32, PropModeReplace,
+                     (unsigned char *)&mwmhints,
+                     PROP_MWM_HINTS_ELEMENTS );
 #if 0 /* brute force way to remove decorations */
-  XSetWindowAttributes attributes;
-  attributes.override_redirect = True;
-  XChangeWindowAttributes( p_vout->p_sys->p_display,
-                           p_vout->p_sys->window,
-                           CWOverrideRedirect,
-                           &attributes);
+    XSetWindowAttributes attributes;
+    attributes.override_redirect = True;
+    XChangeWindowAttributes( p_vout->p_sys->p_display,
+                             p_vout->p_sys->window,
+                             CWOverrideRedirect,
+                             &attributes);
 #endif
 
-  /* We need to unmap and remap the window if we want the window 
-   * manager to take our changes into effect */
-  XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window);
-  XMapRaised( p_vout->p_sys->p_display, p_vout->p_sys->window);
-  XMoveResizeWindow( p_vout->p_sys->p_display,
-                     p_vout->p_sys->window,
-                     i_xpos,
-                     i_ypos,
-                     i_width,
-                     i_height );
-  XFlush( p_vout->p_sys->p_display );
+    /* We need to unmap and remap the window if we want the window 
+     * manager to take our changes into effect */
+    XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window);
+    XMapRaised( p_vout->p_sys->p_display, p_vout->p_sys->window);
+    XMoveResizeWindow( p_vout->p_sys->p_display,
+                       p_vout->p_sys->window,
+                       i_xpos,
+                       i_ypos,
+                       i_width,
+                       i_height );
+     XSync( p_vout->p_sys->p_display, False );
 }
 
 /*****************************************************************************

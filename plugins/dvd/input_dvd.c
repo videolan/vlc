@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.117 2001/12/31 01:13:12 massiot Exp $
+ * $Id: input_dvd.c,v 1.118 2002/01/10 04:11:25 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -303,6 +303,8 @@ static void DVDOpen( struct input_thread_s *p_input )
     char * psz_device;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    p_input->stream.i_method = INPUT_METHOD_DVD;
 
     /* If we are here we can control the pace... */
     p_input->stream.b_pace_control = 1;

@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.32 2001/12/30 07:09:56 sam Exp $
+ * $Id: input_ext-intf.c,v 1.33 2002/01/10 04:11:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,19 +46,19 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
     case INPUT_STATUS_END:
         p_input->stream.i_new_status = PLAYING_S;
         p_input->b_eof = 1;
-        intf_Msg( "input: end of stream" );
+        intf_WarnMsg( 1, "input: end of stream" );
         break;
 
     case INPUT_STATUS_PLAY:
         p_input->stream.i_new_status = PLAYING_S;
-        intf_Msg( "input: playing at normal rate" );
+        intf_WarnMsg( 1, "input: playing at normal rate" );
         break;
 
     case INPUT_STATUS_PAUSE:
         /* XXX: we don't need to check i_status, because input_clock.c
          * does it for us */
         p_input->stream.i_new_status = PAUSE_S;
-        intf_Msg( "input: toggling pause" );
+        intf_WarnMsg( 1, "input: toggling pause" );
         break;
 
     case INPUT_STATUS_FASTER:
@@ -66,7 +66,7 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
         if( p_input->stream.control.i_rate * 8 <= DEFAULT_RATE )
         {
             p_input->stream.i_new_status = PLAYING_S;
-            intf_Msg( "input: playing at normal rate" );
+            intf_WarnMsg( 1, "input: playing at normal rate" );
         }
         else
         {
@@ -82,8 +82,8 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
             {
                 p_input->stream.i_new_rate = DEFAULT_RATE / 2;
             }
-            intf_Msg( "input: playing at %i:1 fast forward",
-                      DEFAULT_RATE / p_input->stream.i_new_rate );
+            intf_WarnMsg( 1, "input: playing at %i:1 fast forward",
+                          DEFAULT_RATE / p_input->stream.i_new_rate );
         }
         break;
 
@@ -92,7 +92,7 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
         if( p_input->stream.control.i_rate >= 8 * DEFAULT_RATE )
         {
             p_input->stream.i_new_status = PLAYING_S;
-            intf_Msg( "input: playing at normal rate" );
+            intf_WarnMsg( 1, "input: playing at normal rate" );
         }
         else
         {
@@ -108,8 +108,8 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
             {
                 p_input->stream.i_new_rate = DEFAULT_RATE * 2;
             }
-            intf_Msg( "input: playing at 1:%i slow motion",
-                      p_input->stream.i_new_rate / DEFAULT_RATE );
+            intf_WarnMsg( 1, "input: playing at 1:%i slow motion",
+                          p_input->stream.i_new_rate / DEFAULT_RATE );
         }
         break;
 

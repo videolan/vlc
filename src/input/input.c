@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.169 2002/01/09 02:01:14 sam Exp $
+ * $Id: input.c,v 1.170 2002/01/10 04:11:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -167,11 +167,17 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.b_new_mute = MUTE_NO_CHANGE;
     p_input->stream.i_mux_rate = 0;
 
-    /* no stream, no area */
+    /* no stream, no program, no area, no es */
+    p_input->stream.p_new_program = NULL;
+
     p_input->stream.i_area_nb = 0;
     p_input->stream.pp_areas = NULL;
     p_input->stream.p_selected_area = NULL;
     p_input->stream.p_new_area = NULL;
+
+    p_input->stream.pp_selected_es = NULL;
+    p_input->stream.p_removed_es = NULL;
+    p_input->stream.p_newly_selected_es = NULL;
 
     /* By default there is one area in a stream */
     input_AddArea( p_input );
@@ -473,7 +479,6 @@ static int InitThread( input_thread_t * p_input )
     if( f.pf_open != NULL )
     {
         f.pf_open( p_input );
-        p_input->stream.i_method = INPUT_METHOD_DVD;
     }
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* FIXME : this is waaaay too kludgy */
