@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.32 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: v4l.c,v 1.33 2003/11/24 16:45:53 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -64,23 +64,14 @@
 #include <sys/soundcard.h>
 
 /*****************************************************************************
- * Local prototypes
+ * Module descriptior
  *****************************************************************************/
-static int  AccessOpen  ( vlc_object_t * );
-static void AccessClose ( vlc_object_t * );
-static int  Read        ( input_thread_t *, byte_t *, size_t );
-
-static void ParseMRL    ( input_thread_t * );
-static int  OpenVideoDev( input_thread_t *, char * );
-static int  OpenAudioDev( input_thread_t *, char * );
+static int  AccessOpen ( vlc_object_t * );
+static void AccessClose( vlc_object_t * );
 
 static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
-static int  Demux      ( input_thread_t * );
 
-/*****************************************************************************
- * Module descriptior
- *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for v4l streams. This " \
@@ -116,9 +107,15 @@ vlc_module_begin();
 vlc_module_end();
 
 
-/****************************************************************************
- * I. Access Part
- ****************************************************************************/
+/*****************************************************************************
+ * Access: local prototypes
+ *****************************************************************************/
+static int  Read        ( input_thread_t *, byte_t *, size_t );
+
+static void ParseMRL    ( input_thread_t * );
+static int  OpenVideoDev( input_thread_t *, char * );
+static int  OpenAudioDev( input_thread_t *, char * );
+
 #define MJPEG_BUFFER_SIZE (256*1024)
 
 struct quicktime_mjpeg_app1
@@ -1451,40 +1448,45 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     return i_data;
 }
 
+
+
+/*****************************************************************************
+ * Demux: local prototypes
+ *****************************************************************************/
+struct demux_sys_t
+{
+    int         i_es;
+    es_out_id_t **es;
+};
+
+static int  Demux      ( input_thread_t * );
+
 /****************************************************************************
- * I. Demux Part
+ * DemuxOpen:
  ****************************************************************************/
 static int DemuxOpen( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t    *p_sys;
 
     uint8_t        *p_peek;
-    int            i_streams;
+    int            i_es;
     int            i;
 
-    data_packet_t  *p_pk;
-
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE ;
-    }
-
     /* a little test to see if it's a v4l stream */
-    if( input_Peek( p_input, &p_peek, 8 ) < 8 )
+    if( stream_Peek( p_input->s, &p_peek, 8 ) < 8 )
     {
         msg_Warn( p_input, "v4l plugin discarded (cannot peek)" );
         return VLC_EGENERIC;
     }
 
-    if( strncmp( p_peek, ".v4l", 4 ) || GetDWBE( &p_peek[4] ) <= 0 )
+    if( strncmp( p_peek, ".v4l", 4 ) ||
+        ( i_es = GetDWBE( &p_peek[4] ) ) <= 0 )
     {
         msg_Warn( p_input, "v4l plugin discarded (not a valid stream)" );
         return VLC_EGENERIC;
     }
 
-    /*  create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
@@ -1492,182 +1494,128 @@ static int DemuxOpen( vlc_object_t *p_this )
         msg_Err( p_input, "cannot init stream" );
         return( VLC_EGENERIC );
     }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        return VLC_EGENERIC;
-    }
+    p_input->stream.i_mux_rate =  0 / 50;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    p_input->stream.i_mux_rate =  0;
+    p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->i_es = 0;
+    p_sys->es   = NULL;
 
-    i_streams = GetDWBE( &p_peek[4] );
-    if( input_Peek( p_input, &p_peek, 8 + 20 * i_streams )
-        < 8 + 20 * i_streams )
+    if( stream_Peek( p_input->s, &p_peek, 8 + 20 * i_es ) < 8 + 20 * i_es )
     {
         msg_Err( p_input, "v4l plugin discarded (cannot peek)" );
         return VLC_EGENERIC;
     }
     p_peek += 8;
 
-    for( i = 0; i < i_streams; i++ )
+    for( i = 0; i < i_es; i++ )
     {
-        es_descriptor_t *p_es;
+        es_format_t fmt;
 
         if( !strncmp( p_peek, "auds", 4 ) )
         {
-#define wf ((WAVEFORMATEX*)p_es->p_waveformatex)
-            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                i + 1, AUDIO_ES, NULL, 0 );
-            p_es->i_stream_id   = i + 1;
-            p_es->i_fourcc      =
-                VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] );
+            es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
+                                                        p_peek[6], p_peek[7] ) );
 
-            p_es->p_waveformatex= malloc( sizeof( WAVEFORMATEX ) );
+            fmt.audio.i_channels = GetDWBE( &p_peek[8] );
+            fmt.audio.i_rate = GetDWBE( &p_peek[12] );
+            fmt.audio.i_bitspersample = GetDWBE( &p_peek[16] );
+            fmt.audio.i_blockalign = fmt.audio.i_channels *
+                                     fmt.audio.i_bitspersample / 8;
+            fmt.i_bitrate = fmt.audio.i_channels *
+                            fmt.audio.i_rate *
+                            fmt.audio.i_bitspersample;
 
-            wf->wFormatTag      = WAVE_FORMAT_UNKNOWN;
-            wf->nChannels       = GetDWBE( &p_peek[8] );
-            wf->nSamplesPerSec  = GetDWBE( &p_peek[12] );
-            wf->wBitsPerSample  = GetDWBE( &p_peek[16] );
-            wf->nBlockAlign     = wf->wBitsPerSample * wf->nChannels / 8;
-            wf->nAvgBytesPerSec = wf->nBlockAlign * wf->nSamplesPerSec;
-            wf->cbSize          = 0;
+            msg_Dbg( p_input, "new audio es %d channels %dHz",
+                     fmt.audio.i_channels, fmt.audio.i_rate );
 
-            msg_Dbg( p_input, "added new audio es %d channels %dHz",
-                     wf->nChannels, wf->nSamplesPerSec );
-
-            input_SelectES( p_input, p_es );
-#undef wf
+            TAB_APPEND( p_sys->i_es, p_sys->es,
+                        es_out_Add( p_input->p_es_out, &fmt ) );
         }
         else if( !strncmp( p_peek, "vids", 4 ) )
         {
-#define bih ((BITMAPINFOHEADER*)p_es->p_bitmapinfoheader)
-            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                i + 1, VIDEO_ES, NULL, 0 );
-            p_es->i_stream_id   = i + 1;
-            p_es->i_fourcc  =
-                VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] );
-
-            p_es->p_bitmapinfoheader = malloc( sizeof( BITMAPINFOHEADER ) );
-
-            bih->biSize     = sizeof( BITMAPINFOHEADER );
-            bih->biWidth    = GetDWBE( &p_peek[8] );
-            bih->biHeight   = GetDWBE( &p_peek[12] );
-            bih->biPlanes   = 0;
-            bih->biBitCount = 0;
-            bih->biCompression      = 0;
-            bih->biSizeImage= 0;
-            bih->biXPelsPerMeter    = 0;
-            bih->biYPelsPerMeter    = 0;
-            bih->biClrUsed  = 0;
-            bih->biClrImportant     = 0;
+            es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
+                                                        p_peek[6], p_peek[7] ) );
+            fmt.video.i_width  = GetDWBE( &p_peek[8] );
+            fmt.video.i_height = GetDWBE( &p_peek[12] );
 
             msg_Dbg( p_input, "added new video es %4.4s %dx%d",
-                     (char*)&p_es->i_fourcc, bih->biWidth, bih->biHeight );
-
-            input_SelectES( p_input, p_es );
-#undef bih
+                     (char*)&fmt.i_codec,
+                     fmt.video.i_width, fmt.video.i_height );
+            TAB_APPEND( p_sys->i_es, p_sys->es,
+                        es_out_Add( p_input->p_es_out, &fmt ) );
         }
 
         p_peek += 20;
     }
 
-    p_input->stream.p_selected_program->b_is_ok = 1;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    /* Skip header */
+    stream_Read( p_input->s, NULL, 8 + 20 * i_es );
 
-    if( input_SplitBuffer( p_input, &p_pk, 8 + i_streams * 20 ) > 0 )
-    {
-        input_DeletePacket( p_input->p_method_data, p_pk );
-    }
-
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
     return VLC_SUCCESS;
 }
 
+/****************************************************************************
+ * DemuxClose:
+ ****************************************************************************/
 static void DemuxClose( vlc_object_t *p_this )
 {
-    return;
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+
+    if( p_sys->i_es > 0 )
+    {
+        free( p_sys->es );
+    }
+    free( p_sys );
 }
 
-#define MAX_PACKETS_IN_FIFO 3
-
+/****************************************************************************
+ * Demux:
+ ****************************************************************************/
 static int Demux( input_thread_t *p_input )
 {
-    es_descriptor_t *p_es;
-    pes_packet_t    *p_pes;
+    demux_sys_t *p_sys = p_input->p_demux_data;
+    block_t     *p_block;
 
-    int i_stream;
+    int i_es;
     int i_size;
 
     uint8_t *p_peek;
     mtime_t i_pts;
 
-    if( input_Peek( p_input, &p_peek, 16 ) < 16 )
+    if( stream_Peek( p_input->s, &p_peek, 16 ) < 16 )
     {
         msg_Warn( p_input, "cannot peek (EOF ?)" );
-        return( 0 );
+        return 0;
     }
 
-    i_stream = GetDWBE( &p_peek[0] );
-    i_size   = GetDWBE( &p_peek[4] );
-    i_pts    = GetQWBE( &p_peek[8] );
-
-    p_es = p_input->stream.p_selected_program->pp_es[i_stream];
-    if( !p_es )
+    i_es   = GetDWBE( &p_peek[0] );
+    if( i_es < 0 || i_es >= p_sys->i_es )
     {
         msg_Err( p_input, "cannot find ES" );
+        return -1;
     }
 
-    p_pes = input_NewPES( p_input->p_method_data );
-    if( p_pes == NULL )
-    {
-        msg_Warn( p_input, "cannot allocate PES" );
-        msleep( 1000 );
-        return( 1 );
-    }
-    i_size += 16;
-    while( i_size > 0 )
-    {
-        data_packet_t   *p_data;
-        int i_read;
+    i_size = GetDWBE( &p_peek[4] );
+    i_pts  = GetQWBE( &p_peek[8] );
 
-        if( (i_read = input_SplitBuffer( p_input, &p_data,
-                                         __MIN( i_size, 10000 ) ) ) <= 0 )
-        {
-            input_DeletePES( p_input->p_method_data, p_pes );
-            return( 0 );
-        }
-        if( !p_pes->p_first )
-        {
-            p_pes->p_first = p_data;
-            p_pes->i_nb_data = 1;
-            p_pes->i_pes_size = i_read;
-        }
-        else
-        {
-            p_pes->p_last->p_next  = p_data;
-            p_pes->i_nb_data++;
-            p_pes->i_pes_size += i_read;
-        }
-        p_pes->p_last  = p_data;
-        i_size -= i_read;
-    }
-    p_pes->p_first->p_payload_start += 16;
-    p_pes->i_pes_size               -= 16;
-
-    if( p_es && p_es->p_dec )
+    if( ( p_block = stream_Block( p_input->s, 16 + i_size ) ) == NULL )
     {
-        p_pes->i_pts =
-        p_pes->i_dts = i_pts + p_input->i_pts_delay;
+        msg_Warn( p_input, "cannot read data" );
+        return 0;
+    }
 
-        input_DecodePES( p_es->p_dec, p_pes );
-    }
-    else
-    {
-        input_DeletePES( p_input->p_method_data, p_pes );
-    }
+    p_block->p_buffer += 16;
+    p_block->i_buffer -= 16;
+
+    p_block->i_dts =
+    p_block->i_pts = i_pts + p_input->i_pts_delay;
+
+    es_out_Send( p_input->p_es_out, p_sys->es[i_es], p_block );
 
     return 1;
 }
+
