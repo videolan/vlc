@@ -420,7 +420,7 @@ void StringListConfigControl::OnAction( wxCommandEvent& event )
 
     vlc_value_t val;
     wxString value = GetPszValue();
-    (const char *)val.psz_string = value.mb_str();
+    *((const char **)&val.psz_string) = value.mb_str();
     p_item->ppf_action[i_action]( p_this, GetName().mb_str(), val, val, 0 );
 
     if( p_item->b_dirty )
