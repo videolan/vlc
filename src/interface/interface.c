@@ -140,6 +140,9 @@ intf_thread_t* intf_Create( void )
     p_intf->p_input =   NULL;
     p_intf->p_keys =    NULL;
 
+    /* Warning level initialisation */
+    p_intf->i_warning_level = main_GetIntVariable( INTF_WARNING_VAR, INTF_WARNING_DEFAULT );
+    
     /* Load channels - the pointer will be set to NULL on failure. The
      * return value is ignored since the program can work without
      * channels */

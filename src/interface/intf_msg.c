@@ -73,6 +73,8 @@ typedef struct
 #define INTF_MSG_ERR    1                                   /* error message */
 #define INTF_MSG_INTF   2                               /* interface message */
 #define INTF_MSG_DBG    3                                   /* debug message */
+#define INTF_MSG_WARN   4                                  /* warning message*/
+
 
 /*****************************************************************************
  * intf_msg_t
@@ -94,12 +96,14 @@ typedef struct intf_msg_s
     int                     i_log_file;                          /* log file */
 #endif
 
+//#if 0
 #if !defined(INTF_MSG_QUEUE) && !defined(DEBUG_LOG)
     /* If neither messages queue, neither log file is used, then the structure
      * is empty. However, empty structures are not allowed in C. Therefore, a
      * dummy integer is used to fill it. */
     int                     i_dummy;                        /* unused filler */
 #endif
+//    int                     i_warning_level;
 } intf_msg_t;
 
 /*****************************************************************************
@@ -143,6 +147,7 @@ p_intf_msg_t intf_MsgCreate( void )
     p_msg->i_count = 0;                                    /* queue is empty */
 #endif
 
+    
 #ifdef DEBUG_LOG
         /* Log file initialization - on failure, file pointer will be null,
          * and no log will be issued, but this is not considered as an
@@ -204,7 +209,7 @@ void intf_Msg( char *psz_format, ... )
  * This function is the same as intf_Msg, except that it prints its messages
  * on stderr.
  *****************************************************************************/
-void intf_ErrMsg( char *psz_format, ...)
+void intf_ErrMsg( char *psz_format, ... )
 {
     va_list ap;
 
@@ -212,6 +217,25 @@ void intf_ErrMsg( char *psz_format, ...)
     QueueMsg( p_main->p_msg, INTF_MSG_ERR, psz_format, ap );
     va_end( ap );
 }
+
+/*****************************************************************************
+ * intf_WarnMsg : print a warning message
+ *****************************************************************************
+ * This function is the same as intf_Msg, except that it concerns warning
+ * messages for testing purpose.
+ *****************************************************************************/
+void intf_WarnMsg( int i_level, char *psz_format, ... )
+{
+    va_list ap;
+    
+    if( i_level >= p_main->p_intf->i_warning_level )
+    {
+        va_start( ap, psz_format );
+        QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );
+        va_end( ap );
+    }
+}
+
 
 /*****************************************************************************
  * intf_IntfMsg : print an interface message                             (ok ?)
@@ -255,7 +279,7 @@ void _intf_DbgMsg( char *psz_file, char *psz_function, int i_line,
 #endif
 
 /*****************************************************************************
- * intf_ErrMsgImm: print a message                                       (ok ?)
+ * intf_MsgImm: print a message                                          (ok ?)
  *****************************************************************************
  * This function prints a message immediately. If the queue is used, all
  * waiting messages are also printed.
@@ -285,6 +309,27 @@ void intf_ErrMsgImm(char *psz_format, ...)
     va_end( ap );
     intf_FlushMsg();
 }
+
+/*****************************************************************************
+ * intf_WarnMsgImm : print a warning message
+ *****************************************************************************
+ * This function is the same as intf_MsgImm, except that it concerns warning
+ * messages for testing purpose.
+ *****************************************************************************/
+void intf_WarnMsgImm( int i_level, char *psz_format, ... )
+{
+    va_list ap;
+
+    if( i_level >= p_main->p_intf->i_warning_level )
+    {
+        va_start( ap, psz_format );
+        QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );
+        va_end( ap );
+    }
+    intf_FlushMsg();
+}
+
+
 
 /*****************************************************************************
  * _intf_DbgMsgImm: print a debugging message immediately                (ok ?)
@@ -501,6 +546,10 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         asprintf( &psz_msg, "%s", p_msg->psz_msg );
         break;
 
+    case INTF_MSG_WARN:                                   /* Warning message */
+        asprintf( &psz_msg, "%s", p_msg->psz_msg );
+        break;
+        
     case INTF_MSG_INTF:                                /* interface messages */
         asprintf( &psz_msg, "%s", p_msg->psz_msg );
         break;
@@ -513,7 +562,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         break;
     }
 
-    /* Check if formatting function suceeded */
+    /* Check if formatting function succeeded */
     if( psz_msg == NULL )
     {
         fprintf( stderr, "error: can not format message (%s): %s\n",
@@ -530,6 +579,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         fprintf( stdout, psz_msg );
         break;
     case INTF_MSG_ERR:                                     /* error messages */
+    case INTF_MSG_WARN:
 #ifndef DEBUG_LOG_ONLY
     case INTF_MSG_DBG:                                 /* debugging messages */
 #endif
@@ -566,7 +616,8 @@ static void PrintMsg( intf_msg_item_t *p_msg )
         fprintf( stdout, p_msg->psz_msg );
         break;
     case INTF_MSG_ERR:                                     /* error messages */
-        fprintf( stderr, p_msg->psz_msg );
+    case INTF_MSG_WARN:
+        fprintf( stderr, p_msg->psz_msg );                /* warning message */
         break;
     case INTF_MSG_INTF:                                /* interface messages */
         intf_ConsolePrint( p_main->p_intf->p_console, p_msg->psz_msg );

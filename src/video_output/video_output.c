@@ -700,7 +700,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             p_free_picture->i_type   =  EMPTY_PICTURE;
             p_free_picture->i_status =  FREE_PICTURE;
             p_free_picture =            NULL;
-            intf_ErrMsg("vout warning: %s\n", strerror( ENOMEM ) );
+            intf_ErrMsg( "vout warning: %s\n", strerror( ENOMEM ) );
         }
 
 #ifdef DEBUG_VIDEO

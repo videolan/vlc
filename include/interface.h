@@ -91,6 +91,8 @@ typedef struct intf_thread_s
     /* Specific functions */
     keyparm (*p_intf_get_key)(struct intf_thread_s *p_intf, int r_key) ;
     
+    /* Warning messages level */
+    int                 i_warning_level;
 } intf_thread_t;
 
 /*****************************************************************************

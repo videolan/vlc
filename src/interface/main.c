@@ -83,6 +83,8 @@
 
 #define OPT_SYNCHRO             180
 
+#define OPT_WARNING             190
+
 /* Usage fashion */
 #define USAGE                     0
 #define SHORT_HELP                1
@@ -128,6 +130,8 @@ static const struct option longopts[] =
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
 
+    /* Interface messages */
+    {   "warning",          1,          0,      OPT_WARNING },
     {   0,                  0,          0,      0 }
 };
 
@@ -411,7 +415,7 @@ void main_PutIntVariable( char *psz_name, int i_value )
 static void SetDefaultConfiguration( void )
 {
     /*
-     * All features are activated by default
+     * All features are activated by default execpted vlans
      */
     p_main->b_audio  = 1;
     p_main->b_video  = 1;
@@ -534,7 +538,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* Input options */
-        case OPT_VLANS:                                       /* --vlans */
+        case OPT_VLANS:                                           /* --vlans */
             p_main->b_vlans = 1;
             break;
         case OPT_SERVER:                                         /* --server */
@@ -548,10 +552,15 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* Synchro options */
-        case OPT_SYNCHRO:
+        case OPT_SYNCHRO:                                      
             main_PutPszVariable( VPAR_SYNCHRO_VAR, optarg );
             break;
 
+        /* Interface warning messages level */
+        case OPT_WARNING:                                       /* --warning */
+            main_PutIntVariable( INTF_WARNING_VAR, atoi(optarg) );
+            break;
+            
         /* Internal error: unknown option */
         case '?':
         default:
@@ -613,6 +622,8 @@ static void Usage( int i_fashion )
               "\n"
               "      --synchro <type>           \tforce synchro algorithm\n"
               "\n"
+              "      --warning <level>          \tdisplay warning messages\n"
+              "\n"
               "  -h, --help                     \tprint help and exit\n"
               "  -H, --longhelp                 \tprint long help and exit\n"
               "  -v, --version                  \toutput version information and exit\n" );
@@ -624,7 +635,8 @@ static void Usage( int i_fashion )
     intf_Msg( "\n"
               "Interface parameters:\n"
               "  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script\n"
-              "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n" );
+              "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n"
+              "  " INTF_WARNING_VAR "=<level>                \twarning level\n" );
 
     /* Audio parameters */
     intf_Msg( "\n"

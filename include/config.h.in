@@ -417,6 +417,10 @@
  * queue are printed by the calling thread */
 #define INTF_MSG_QSIZE                  64
 
+/* Interface warnig message level */
+#define INTF_WARNING_VAR		"warning_level"
+#define INTF_WARNING_DEFAULT		12
+
 /* Define to enable messages queues - disabling messages queue can be usefull
  * when debugging, since it allows messages which would not otherwise be printed,
  * due to a crash, to be printed anyway */
