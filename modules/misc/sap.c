@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.3 2002/12/04 06:23:08 titer Exp $
+ * $Id: sap.c,v 1.4 2002/12/06 22:44:03 gitan Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -66,15 +66,17 @@
 
 #define MAX_LINE_LENGTH 256
 
-#define HELLO_PORT 9875  /* SAP is always on that port */
+/* SAP is always on that port */
+#define HELLO_PORT 9875  
 #define HELLO_GROUP "239.255.255.255"   
-#define ADD_SESSION 1;
+#define ADD_SESSION 1
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 
-
+typedef struct media_descr_t media_descr_t;
+typedef struct sess_descr_t sess_descr_t;
 
 static int  Activate     ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
@@ -82,27 +84,45 @@ static int Kill          ( intf_thread_t * );
         
 static ssize_t NetRead    ( intf_thread_t*, int , byte_t *, size_t );
 
-typedef struct  sess_descr_s {
-    char *psz_origin; /* o field (username sess-id sess-version 
-                         nettype addrtype addr*/
+/* playlist related functions */
+static int  sess_toitem( intf_thread_t *, sess_descr_t * );
+
+/* sap/sdp related functions */
+static int parse_sap ( char ** );
+static int packet_handle ( intf_thread_t *, char ** );
+static sess_descr_t *  parse_sdp( char *,intf_thread_t * ) ;
+
+/* specific sdp fields parsing */
+
+static void cfield_parse( char *, char ** );
+static void mfield_parse( char *psz_mfield, char **ppsz_proto, 
+               char **ppsz_port );
+
+static void free_sd( sess_descr_t * );
+static int  ismult( char * );
+
+/* The struct that contains sdp informations */
+struct  sess_descr_t {
+    char *psz_version;
+    char *psz_origin; 
     char *psz_sessionname; 
     char *psz_information; 
     char *psz_uri; 
     char *psz_emails;
     char *psz_phone;  
-    char *psz_time; /* t start-time stop-time */
-    char *psz_repeat; /* r repeat-interval typed-time */
+    char *psz_time;  
+    char *psz_repeat; 
     char *psz_attribute; 
-    char *psz_media; /* m media port protocol */
-} sess_descr_t;  
+    char *psz_connection; 
+    int  i_media;
+    media_descr_t ** pp_media; 
+};  
+
 /* All this informations are not useful yet.  */
-
-static int parse_sap ( char ** );
-static int packet_handle ( char **, intf_thread_t * );
-
-static sess_descr_t *  parse_sdp( char *,intf_thread_t * ) ;
-static playlist_item_t * sess_toitem( sess_descr_t * );
-
+struct media_descr_t {
+    char *psz_medianame;
+    char *psz_mediaconnection;
+};
 
 /*****************************************************************************
  * Module descriptor
@@ -145,7 +165,8 @@ static void Run( intf_thread_t *p_intf )
     module_t            *p_network;
     network_socket_t    socket_desc;
     
-    
+    psz_buf = NULL;
+
     if( !(psz_addr = config_GetPsz( p_intf, "sap-addr" ) ) )
     {
         psz_addr = strdup( HELLO_GROUP );
@@ -159,8 +180,10 @@ static void Run( intf_thread_t *p_intf )
     socket_desc.i_server_port     = 0;
     p_intf->p_private = (void*) &socket_desc;
 
-    psz_network = "ipv4";
+    psz_network = "ipv4"; // FIXME 
     
+    /* Create, Bind the socket, ... with the appropriate module  */
+
     if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
     {
         msg_Err( p_intf, "failed to open a connection (udp)" );
@@ -170,9 +193,11 @@ static void Run( intf_thread_t *p_intf )
 
     fd = socket_desc.i_handle;
     
-    psz_buf = malloc( 1500 ); // FIXME!!
 
     /* read SAP packets */
+    
+    psz_buf = malloc( 2000 ); 
+
     while( !p_intf->b_die )
     {
         int i_read;
@@ -180,9 +205,9 @@ static void Run( intf_thread_t *p_intf )
         addrlen=sizeof(addr);
     
     
-        memset(psz_buf, 0, 1500);
+        memset(psz_buf, 0, 2000);
         
-        i_read = NetRead( p_intf, fd, psz_buf, 1500 );
+        i_read = NetRead( p_intf, fd, psz_buf, 2000 );
         
         if( i_read < 0 )
         {
@@ -194,11 +219,21 @@ static void Run( intf_thread_t *p_intf )
         }
 
 
-        packet_handle( &psz_buf, p_intf  );
+        packet_handle( p_intf,  &psz_buf );
                                    
     }
     free( psz_buf );
 
+    /* Closing socket */
+    
+#ifdef UNDER_CE
+    CloseHandle( socket_desc.i_handle );
+#elif defined( WIN32 )
+    closesocket( socket_desc.i_handle );
+#else
+    close( socket_desc.i_handle );
+#endif
+                
 }
 
 /********************************************************************
@@ -215,73 +250,243 @@ static int Kill( intf_thread_t *p_intf )
 }
 
 /*******************************************************************
- * sess_toitem : changes a sess_descr_t into a playlist_item_t
+ * sess_toitem : changes a sess_descr_t into a hurd of 
+ * playlist_item_t, which are enqueued.
+ *******************************************************************
+ * Note : does not support sessions that take place on consecutive
+ * port or adresses yet. 
  *******************************************************************/
 
-static playlist_item_t *  sess_toitem( sess_descr_t * p_sd )
+static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 {
     playlist_item_t * p_item;
+    char *psz_uri, *psz_proto;
+    char *psz_port;
+    char *psz_uri_default;
+    int i_multicast;
+    int i_count;
+    playlist_t *p_playlist;
     
-    p_item = malloc( sizeof( playlist_item_t ) );
-    p_item->psz_name = p_sd->psz_sessionname;
-    p_item->psz_uri = p_sd->psz_uri; 
-    p_item->i_type = 0;
-    p_item->i_status = 0;
-    p_item->b_autodeletion = VLC_FALSE; 
+    psz_uri_default = NULL; 
 
-    return p_item;
+    cfield_parse( p_sd->psz_connection, &psz_uri_default );
+    
+    for( i_count=0 ; i_count <= p_sd->i_media ; i_count ++ )
+    {
+
+        p_item = malloc( sizeof( playlist_item_t ) );
+        p_item->psz_name = strdup( p_sd->psz_sessionname );
+        p_item->i_type = 0;
+        p_item->i_status = 0;
+        p_item->b_autodeletion = VLC_FALSE; 
+        p_item->psz_uri = NULL;
+
+        psz_uri = NULL;
+        
+        /* Build what we have to put in p_item->psz_uri, with the m and
+         *  c fields  */
+        
+        if( !p_sd->pp_media[i_count] )
+        {
+            return 0;
+        }
+    
+        mfield_parse( p_sd->pp_media[i_count]->psz_medianame, 
+                        & psz_proto, & psz_port ); 
+    
+        if( !psz_proto || !psz_port )
+        {
+            return 0;
+        }
+
+        if( p_sd->pp_media[i_count]->psz_mediaconnection )
+        {
+            cfield_parse( p_sd->pp_media[i_count]->psz_mediaconnection, 
+                            & psz_uri );
+        }
+        else 
+        {
+            psz_uri = NULL;
+        }
+
+        if( psz_uri == NULL )
+        {
+            if( psz_uri_default )
+            {
+                psz_uri = psz_uri_default;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+
+        /* Filling p_item->psz_uri */
+        i_multicast = ismult( psz_uri );       
+        p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) + 
+                        strlen( psz_port ) + 5 +i_multicast );
+        if( p_item->psz_uri == NULL )
+        {
+            msg_Err( p_intf, "Not enough memory");
+            return 0;
+        }
+        
+        if( i_multicast == 1)
+        {
+            sprintf( p_item->psz_uri, "%s://@%s:%s", psz_proto, 
+                            psz_uri, psz_port );
+        }
+        else 
+        {
+            sprintf( p_item->psz_uri, "%s://%s:%s", psz_proto, 
+                            psz_uri, psz_port );
+        }
+
+        /* Enqueueing p_item in the playlist */
+        
+        if( p_item )
+        {
+            p_playlist = vlc_object_find( p_intf,
+            VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    
+            playlist_AddItem ( p_playlist, p_item,
+            PLAYLIST_CHECK_INSERT, PLAYLIST_END);
+            vlc_object_release( p_playlist );
+        }
+       
+
+    }
+
+
+    return 1;
 
 }
 
-/********************************************************************
- * parse_sap : Takes care of the SAP headers
- ********************************************************************
- * checks if the packet has the true headers ; 
- ********************************************************************/
+/**********************************************************************
+ * cfield_parse
+ *********************************************************************
+ * put into *ppsz_uri, the the uri in the cfield, psz_cfield. 
+ *********************************************************************/
 
-static int parse_sap( char **  ppsz_sa_packet ) {  /* Dummy Parser : does nothing !*/
-/*   int j;
-   
-   for (j=0;j<255;j++) {
-       fprintf(stderr, "%c",(*ppsz_sa_packet)[j]);
-   }*/
-   
-   return ADD_SESSION; //Add this packet
+static void cfield_parse( char *psz_cfield, char **ppsz_uri )
+{
+
+    char *psz_pos; 
+    if( psz_cfield )
+    {
+        psz_pos = psz_cfield;
+        
+        while( *psz_pos && *psz_pos != ' ' && *psz_pos !='\0' )
+        {
+            psz_pos++;
+        }
+        psz_pos++;
+        while( *psz_pos && *psz_pos != ' ' && *psz_pos !='\0' )
+        {
+            psz_pos++;
+        }
+        psz_pos++;
+        *ppsz_uri = psz_pos; 
+        while( *psz_pos && *psz_pos != ' ' && *psz_pos !='/' 
+                        && *psz_pos != '\0' )
+        {
+            psz_pos++;
+        }
+        *psz_pos = '\0';
+
+    }
+    else
+    {
+        ppsz_uri = NULL;
+    }
+    
+    return; 
+
+}
+
+/**********************************************************************
+ * mcfield_parse
+ *********************************************************************
+ * put into *ppsz_proto, and *ppsz_port, the protocol and the port. 
+ *********************************************************************/
+
+
+static void mfield_parse( char *psz_mfield, char **ppsz_proto, 
+               char **ppsz_port )
+{
+    char *psz_pos; 
+    if( psz_mfield )
+    {
+        psz_pos = psz_mfield;
+        while( *psz_pos && *psz_pos != ' ' )
+        {
+            psz_pos++;
+        }
+        psz_pos++;
+        *ppsz_port = psz_pos;
+        while( *psz_pos && *psz_pos !=' ' && *psz_pos!='/' )
+        {
+            psz_pos++;  
+        }
+        if( *psz_pos == '/' )  // FIXME does not support multi-port
+        {
+            *psz_pos = '\0';
+            while( *psz_pos && *psz_pos !=' ' )
+            {
+            psz_pos++;
+            }
+        } 
+        *psz_pos = '\0';
+        psz_pos++;
+        *ppsz_proto = psz_pos;
+        while( *psz_pos && *psz_pos !=' ' && *psz_pos!='\0' &&
+                        *psz_pos!='/' )
+        {
+            *psz_pos = tolower( *psz_pos );
+            psz_pos++; 
+        }
+        *psz_pos = '\0';
+    }
+    else
+    {
+        *ppsz_proto = NULL;
+        *ppsz_port = NULL;
+    }
+    return;
 }
 
 /***********************************************************************
+ * parse_sap : Takes care of the SAP headers
+ ***********************************************************************
+ * checks if the packet has the true headers ; 
+ ***********************************************************************/
+
+static int parse_sap( char **  ppsz_sa_packet ) {  /* Dummy Parser : does nothing !*/
+   if( *ppsz_sa_packet )  return ADD_SESSION; //Add this packet
+   return 0; /* FIXME */
+}
+
+/*************************************************************************
  * packet_handle : handle the received packet and enques the 
  * the understated session
- * ******************************************************************/
+ *************************************************************************/
 
-static int packet_handle( char **  ppsz_packet, intf_thread_t * p_intf )  {
+static int packet_handle( intf_thread_t * p_intf, char **  ppsz_packet )  {
     int j=0;
     sess_descr_t * p_sd;
-    playlist_t *p_playlist;
-    playlist_item_t *p_item;
-    char *  psz_enqueue;
-    int i;
-    
+/*    playlist_t *p_playlist;
+    playlist_item_t *p_item; */
+
     j=parse_sap( ppsz_packet ); 
     
     if(j != 0) {
         p_sd = parse_sdp( *ppsz_packet, p_intf ); 
         
-        i = strlen( "udp://@\0" ) + strlen( p_sd->psz_uri )+1 ;
-        psz_enqueue = malloc ( i * sizeof (char) );
-        memset( psz_enqueue, '\0',i );
-        strcat ( psz_enqueue,"udp://@\0" );
-        strcat ( psz_enqueue,p_sd->psz_uri );
-        free( p_sd->psz_uri );
-        p_sd->psz_uri = psz_enqueue;
         
-        p_item = sess_toitem ( p_sd );
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+        sess_toitem ( p_intf, p_sd );
 
-        playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END);
-        vlc_object_release( p_playlist );
-        
-        free ( p_sd );
+        free_sd ( p_sd );
         return 1;
     }
     return 0; // Invalid Packet 
@@ -290,102 +495,209 @@ static int packet_handle( char **  ppsz_packet, intf_thread_t * p_intf )  {
 
 
 
-/******************************************************
- * parse_sap : SDP parsing
- * ****************************************************
+/***********************************************************************
+ * parse_sdp : SDP parsing
+ * *********************************************************************
  * Make a sess_descr_t with a psz
- ******************************************************/
+ ***********************************************************************/
 
 static sess_descr_t *  parse_sdp( char *  psz_pct, intf_thread_t * p_intf ) 
 {
     int j,k;
-    char **  ppsz_fill;
+    char **  ppsz_fill=NULL;
     sess_descr_t *  sd;
     
-    sd = malloc( sizeof(sess_descr_t) );
-    for (j=0 ; j < 255 ; j++) 
+    sd = malloc( sizeof(sess_descr_t) ); 
+
+
+    if( sd == NULL )
     {
-       if (psz_pct[j] == '=') 
-       {           
-           switch(psz_pct[(j-1)]) {
-/*               case ('v') : {
-                 ppsz_fill = & sd->psz_version;
-                 break;
-            } */
-            case ('o') : {
-               ppsz_fill = & sd->psz_origin;
-               break;
-            }
-            case ('s') : {
-               ppsz_fill = & sd->psz_sessionname;
-               break;
-            }
-            case ('i') : {
-               ppsz_fill = & sd->psz_information;
-               break;
-            }
-            case ('u') : {
-               ppsz_fill = & sd->psz_uri;
-               break;
-            }
-            case ('e') : {
-               ppsz_fill = & sd->psz_emails;
-               break;
-            }
-            case ('p') : {
-               ppsz_fill = & sd->psz_phone;
-               break;
-            }
-            case ('t') : {
-               ppsz_fill = & sd->psz_time;
-               break;
-            }
-            case ('r') : {
-               ppsz_fill = & sd->psz_repeat;
-               break;
-            }
-            case ('a') : {
-               ppsz_fill = & sd->psz_attribute;
-               break;
-            }
-            case ('m') : {
-               ppsz_fill = & sd->psz_media;
-               break;
-            }
+        msg_Err( p_intf, "out of memory" );
+    }
+    else
+    {
+        sd->pp_media = NULL;
+        sd->psz_origin = NULL; 
+        sd->psz_sessionname = NULL; 
+        sd->psz_information = NULL; 
+        sd->psz_uri = NULL;
+        sd->psz_emails = NULL;
+        sd->psz_phone = NULL;
+        sd->psz_time = NULL;
+        sd->psz_repeat = NULL;
+        sd->psz_attribute = NULL;
+        sd->psz_connection = NULL;
 
-            default : { 
-/*               msg_Dbg( p_intf, "Warning : Ignored field \"%c\" \n",psz_pct[j-1] ); */
-               ppsz_fill = NULL;
-            }
+        sd->i_media=-1;
+        j=0; 
+        while( psz_pct[j]!=EOF ) 
+        {
+           j++;
+           if (psz_pct[j] == '=') 
+           { 
+               switch(psz_pct[(j-1)]) {
+               case ('v') : {
+                     ppsz_fill = & sd->psz_version;
+                     break;
+                } 
+                case ('o') : {
+                   ppsz_fill = & sd->psz_origin;
+                   break;
+                }
+                case ('s') : {
+                   ppsz_fill = & sd->psz_sessionname;
+                   break;
+                }
+                case ('i') : {
+                   ppsz_fill = & sd->psz_information;
+                   break;
+                }
+                case ('u') : {
+                   ppsz_fill = & sd->psz_uri;
+                   break;
+                }
+                case ('e') : {
+                   ppsz_fill = & sd->psz_emails;
+                   break;
+                }
+                case ('p') : {
+                   ppsz_fill = & sd->psz_phone;
+                   break;
+                }
+                case ('t') : {
+                   ppsz_fill = & sd->psz_time;
+                   break;
+                }
+                case ('r') : {
+                   ppsz_fill = & sd->psz_repeat;
+                   break;
+                }
+                case ('a') : {
+                   ppsz_fill = & sd->psz_attribute;
+                   break;
+                }
+                case ('m') : {
+                   sd->i_media++;
+                   if( sd->pp_media ) {
+                       sd->pp_media = realloc( sd->pp_media, 
+                                ( sizeof( void * )  * (sd->i_media + 1)) );
+                   }
+                   else  
+                   {
+                       sd->pp_media = malloc( sizeof ( void * ) );
+                   } 
+                   sd->pp_media[sd->i_media] = 
+                           malloc( sizeof( media_descr_t ) );
+                   
+                   sd->pp_media[sd->i_media]->psz_medianame = NULL;
+                   sd->pp_media[sd->i_media]->psz_mediaconnection = NULL;
+
+                   ppsz_fill = & sd->pp_media[sd->i_media]->psz_medianame;
+                   break;
+                }
+                case ('c') : {
+                   if( sd->i_media == -1 ) 
+                   {
+                       ppsz_fill = & sd->psz_connection;
+                   }
+                   else 
+                   {
+                       ppsz_fill = & sd->pp_media[sd->i_media]->
+                               psz_mediaconnection;
+                   }
+                   break;
+                }
+
+                default : { 
+               msg_Info( p_intf, "Warning : Ignored field \"%c\" ",
+                               psz_pct[j-1] ); 
+                   ppsz_fill = NULL;
+                }
 
 
-         } 
-      k=0;j++;
-      while (psz_pct[j] != '\n'&& psz_pct[j] != EOF) {
-         k++; j++;
-      }
-      j--;
-      if( ppsz_fill != NULL )
-      {
-         *ppsz_fill= malloc( sizeof(char) * (k+1) );
-#if defined( SYS_BEOS )
-         /* BeOS doesn't have memccpy. This line probably won't work
-            properly, but BeOS has no multicast support anyway */
-         memcpy(*ppsz_fill, &(psz_pct[j-k+1]), k );
-#else
-         memccpy(*ppsz_fill, &(psz_pct[j-k+1]),'\n',  k );
-#endif
-         (*ppsz_fill)[k]='\0';
-      }
-      ppsz_fill = NULL;
+             } 
+          k=0;j++;
+          while (psz_pct[j] != '\n'&& psz_pct[j] != EOF) {
+             k++; j++;
+          }
+          j--;
+          if( ppsz_fill != NULL )
+          {
+              *ppsz_fill= malloc( sizeof(char) * (k+1) );
+             memcpy(*ppsz_fill, &(psz_pct[j-k+1]), k );
+             (*ppsz_fill)[k]='\0';
+          }
+          ppsz_fill = NULL;
+          } // if
+       } //for
+    } //if
 
-      } // if
-   } //for
-
-   return sd;
+    return sd;
 }
 
+#define FREE( p ) \
+    if( p ) { free( p ); (p) = NULL; }
+static void free_sd( sess_descr_t * p_sd ) 
+{
+    int i;
+    if( p_sd )
+    {
+    FREE( p_sd->psz_origin );
+    FREE( p_sd->psz_sessionname );
+    FREE( p_sd->psz_information );
+    FREE( p_sd->psz_uri );
+    FREE( p_sd->psz_emails );
+    FREE( p_sd->psz_phone );
+    FREE( p_sd->psz_time );
+    FREE( p_sd->psz_repeat );
+    FREE( p_sd->psz_attribute );
+    FREE( p_sd->psz_connection );
 
+    if( p_sd->i_media >= 0 && p_sd->pp_media )
+    {
+        for( i=0; i <= p_sd->i_media ; i++ )
+        {
+            FREE( p_sd->pp_media[i]->psz_medianame );
+            FREE( p_sd->pp_media[i]->psz_mediaconnection );
+        }
+        FREE( p_sd->pp_media );
+    }  
+    free( p_sd );
+    }
+    else
+    {
+        ;
+    }
+    return;
+}
+
+/***********************************************************************
+ * ismult
+ ***********************************************************************/
+
+static int ismult( char *psz_uri )
+{
+    char *psz_c;
+    int i;
+
+    psz_c = malloc( 3 );
+    
+    memcpy( psz_c, psz_uri, 3 );
+    if( psz_c[2] == '.' || psz_c[1] == '.' )
+    {
+        free( psz_c );
+        return 0;
+    }
+    
+    i = atoi( psz_c );
+    if( i < 224 )
+    {
+        free( psz_c );
+        return 0;
+    }
+    free( psz_c );
+    return 1;
+}
 
 /*****************************************************************************
  * Read: read on a file descriptor, checking b_die periodically

@@ -133,6 +133,7 @@ case "x${target_os}" in
         LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lws2_32"
         LDFLAGS_access_udp="${LDFLAGS_access_udp} -lws2_32"
         LDFLAGS_rc="${LDFLAGS_rc} -lws2_32"
+        LDFLAGS_sap="${LDFLAGS_sap} -lws2_32"
     fi
     ;;
   x*nto*)
@@ -268,6 +269,7 @@ AC_CHECK_FUNC(send,,[
     LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket"
     LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lsocket"
     LDFLAGS_access_udp="${LDFLAGS_access_udp} -lsocket"
+    LDFLAGS_sap="${LDFLAGS_sap} -lsocket"
 )])
 
 AC_CHECK_FUNC(gethostbyname,,[

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.27 2002/12/06 10:10:40 sam Exp $
+ * $Id: playlist.c,v 1.28 2002/12/06 22:44:03 gitan Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -111,11 +111,10 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
         msg_Err( p_playlist, "out of memory" );
     }
 
-    p_item->psz_name = strdup( psz_target );
-    p_item->psz_uri  = strdup( psz_target );
+    p_item->psz_name = psz_target;
+    p_item->psz_uri  = psz_target ;
     p_item->i_type = 0;
     p_item->i_status = 0;
-    p_item->b_autodeletion = VLC_FALSE;
 
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
 }
@@ -208,7 +207,14 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
     else
     {
         /* i_mode == PLAYLIST_REPLACE and 0 <= i_pos < p_playlist->i_size */
-        free( p_playlist->pp_items[i_pos]->psz_name );
+        if( p_playlist->pp_items[i_pos]->psz_name )
+        {
+            free( p_playlist->pp_items[i_pos]->psz_name );
+        }
+        if( p_playlist->pp_items[i_pos]->psz_uri )
+        {
+            free( p_playlist->pp_items[i_pos]->psz_uri );
+        }
         /* XXX: what if the item is still in use? */
         free( p_playlist->pp_items[i_pos] );
         p_playlist->pp_items[i_pos] = p_item;
@@ -243,7 +249,15 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         msg_Dbg( p_playlist, "deleting playlist item « %s »",
                              p_playlist->pp_items[i_pos]->psz_name );
 
-        free( p_playlist->pp_items[i_pos]->psz_name );
+        if( p_playlist->pp_items[i_pos]->psz_name )
+        {
+            free( p_playlist->pp_items[i_pos]->psz_name );
+        }
+        if( p_playlist->pp_items[i_pos]->psz_uri )
+        {
+            free( p_playlist->pp_items[i_pos]->psz_uri );
+        }
+
         /* XXX: what if the item is still in use? */
         free( p_playlist->pp_items[i_pos] );
 
