@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.14 2003/06/25 20:37:37 fenrir Exp $
+ * $Id: mkv.cpp,v 1.15 2003/06/26 16:46:19 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -70,6 +70,7 @@
 #include "matroska/KaxTracks.h"
 #include "matroska/KaxTrackAudio.h"
 #include "matroska/KaxTrackVideo.h"
+#include "matroska/KaxTrackEntryData.h"
 
 #include "ebml/StdIOCallback.h"
 
@@ -175,6 +176,7 @@ typedef struct
 {
     int         i_cat;
     vlc_bool_t  b_default;
+    vlc_bool_t  b_enabled;
     int         i_number;
 
     int         i_extra_data;
@@ -186,6 +188,7 @@ typedef struct
     vlc_fourcc_t i_codec;
 
     uint64_t     i_default_duration;
+    float        f_timecodescale;
     /* video */
     int         i_width;
     int         i_height;
@@ -210,6 +213,14 @@ typedef struct
 
     /* hack : it's for seek */
     vlc_bool_t      b_search_keyframe;
+
+    /* informative */
+    char         *psz_name;
+    char         *psz_codec_name;
+    char         *psz_codec_settings;
+    char         *psz_codec_info_url;
+    char         *psz_codec_download_url;
+
 } mkv_track_t;
 
 typedef struct
@@ -478,7 +489,8 @@ static int Activate( vlc_object_t * p_this )
 #define tk  p_sys->track[p_sys->i_track - 1]
                     memset( &tk, 0, sizeof( mkv_track_t ) );
                     tk.i_cat = UNKNOWN_ES;
-                    tk.b_default = VLC_FALSE;
+                    tk.b_default = VLC_TRUE;
+                    tk.b_enabled = VLC_TRUE;
                     tk.i_number = p_sys->i_track - 1;
                     tk.i_extra_data = 0;
                     tk.p_extra_data = NULL;
@@ -486,10 +498,17 @@ static int Activate( vlc_object_t * p_this )
                     tk.psz_codec = NULL;
                     tk.psz_language = NULL;
                     tk.i_default_duration = 0;
+                    tk.f_timecodescale = 1.0;
 
                     tk.b_inited = VLC_FALSE;
                     tk.i_data_init = 0;
                     tk.p_data_init = NULL;
+
+                    tk.psz_name = NULL;
+                    tk.psz_codec_name = NULL;
+                    tk.psz_codec_settings = NULL;
+                    tk.psz_codec_info_url = NULL;
+                    tk.psz_codec_download_url = NULL;
 
                     p_sys->ep->Down();
 
@@ -509,14 +528,6 @@ static int Activate( vlc_object_t * p_this )
                             tuid.ReadData( p_sys->es->I_O() );
 
                             msg_Dbg( p_input, "|   |   |   + Track UID=%u", uint32( tuid ) );
-                        }
-                        else  if( EbmlId( *el3 ) == KaxTrackDefaultDuration::ClassInfos.GlobalId )
-                        {
-                            KaxTrackDefaultDuration &defd = *(KaxTrackDefaultDuration*)el3;
-                            defd.ReadData( p_sys->es->I_O() );
-
-                            tk.i_default_duration = uint64(defd);
-                            msg_Dbg( p_input, "|   |   |   + Track Default Duration=%lld", uint64(defd) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackType::ClassInfos.GlobalId )
                         {
@@ -544,6 +555,239 @@ static int Activate( vlc_object_t * p_this )
                             }
 
                             msg_Dbg( p_input, "|   |   |   + Track Type=%s", psz_type );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackFlagEnabled::ClassInfos.GlobalId )
+                        {
+                            KaxTrackFlagEnabled &fenb = *(KaxTrackFlagEnabled*)el3;
+                            fenb.ReadData( p_sys->es->I_O() );
+
+                            tk.b_enabled = uint32( fenb );
+                            msg_Dbg( p_input, "|   |   |   + Track Enabled=%u", uint32( fenb )  );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackFlagDefault::ClassInfos.GlobalId )
+                        {
+                            KaxTrackFlagDefault &fdef = *(KaxTrackFlagDefault*)el3;
+                            fdef.ReadData( p_sys->es->I_O() );
+
+                            tk.b_default = uint32( fdef );
+                            msg_Dbg( p_input, "|   |   |   + Track Default=%u", uint32( fdef )  );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackFlagLacing::ClassInfos.GlobalId )
+                        {
+                            KaxTrackFlagLacing &lac = *(KaxTrackFlagLacing*)el3;
+                            lac.ReadData( p_sys->es->I_O() );
+
+                            msg_Dbg( p_input, "|   |   |   + Track Lacing=%d", uint32( lac ) );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackMinCache::ClassInfos.GlobalId )
+                        {
+                            KaxTrackMinCache &cmin = *(KaxTrackMinCache*)el3;
+                            cmin.ReadData( p_sys->es->I_O() );
+
+                            msg_Dbg( p_input, "|   |   |   + Track MinCache=%d", uint32( cmin ) );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackMaxCache::ClassInfos.GlobalId )
+                        {
+                            KaxTrackMaxCache &cmax = *(KaxTrackMaxCache*)el3;
+                            cmax.ReadData( p_sys->es->I_O() );
+
+                            msg_Dbg( p_input, "|   |   |   + Track MaxCache=%d", uint32( cmax ) );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackDefaultDuration::ClassInfos.GlobalId )
+                        {
+                            KaxTrackDefaultDuration &defd = *(KaxTrackDefaultDuration*)el3;
+                            defd.ReadData( p_sys->es->I_O() );
+
+                            tk.i_default_duration = uint64(defd);
+                            msg_Dbg( p_input, "|   |   |   + Track Default Duration=%lld", uint64(defd) );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackTimecodeScale::ClassInfos.GlobalId )
+                        {
+                            KaxTrackTimecodeScale &ttcs = *(KaxTrackTimecodeScale*)el3;
+                            ttcs.ReadData( p_sys->es->I_O() );
+
+                            tk.f_timecodescale = float( ttcs );
+                            msg_Dbg( p_input, "|   |   |   + Track TimeCodeScale=%f", tk.f_timecodescale );
+                        }
+                        else if( EbmlId( *el3 ) == KaxTrackName::ClassInfos.GlobalId )
+                        {
+                            KaxTrackName &tname = *(KaxTrackName*)el3;
+                            tname.ReadData( p_sys->es->I_O() );
+
+                            tk.psz_name = UTF8ToStr( UTFstring( tname ) );
+                            msg_Dbg( p_input, "|   |   |   + Track Name=%s", tk.psz_name );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackLanguage::ClassInfos.GlobalId )
+                        {
+                            KaxTrackLanguage &lang = *(KaxTrackLanguage*)el3;
+
+                            lang.ReadData( p_sys->es->I_O() );
+
+                            tk.psz_language = strdup( string( lang ).c_str() );
+                            msg_Dbg( p_input, "|   |   |   + Track Language=`%s'", string( lang ).c_str() );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxCodecID::ClassInfos.GlobalId )
+                        {
+                            KaxCodecID &codecid = *(KaxCodecID*)el3;
+                            codecid.ReadData( p_sys->es->I_O() );
+
+                            tk.psz_codec = strdup( string( codecid ).c_str() );
+                            msg_Dbg( p_input, "|   |   |   + Track CodecId=%s", string( codecid ).c_str() );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxCodecPrivate::ClassInfos.GlobalId )
+                        {
+                            KaxCodecPrivate &cpriv = *(KaxCodecPrivate*)el3;
+                            cpriv.ReadData( p_sys->es->I_O() );
+
+                            tk.i_extra_data = cpriv.GetSize();
+                            if( tk.i_extra_data > 0 )
+                            {
+                                tk.p_extra_data = (uint8_t*)malloc( tk.i_extra_data );
+                                memcpy( tk.p_extra_data, cpriv.GetBuffer(), tk.i_extra_data );
+                            }
+                            msg_Dbg( p_input, "|   |   |   + Track CodecPrivate size=%lld", cpriv.GetSize() );
+                        }
+                        else if( EbmlId( *el3 ) == KaxCodecName::ClassInfos.GlobalId )
+                        {
+                            KaxCodecName &cname = *(KaxCodecName*)el3;
+                            cname.ReadData( p_sys->es->I_O() );
+
+                            tk.psz_codec_name = UTF8ToStr( UTFstring( cname ) );
+                            msg_Dbg( p_input, "|   |   |   + Track Codec Name=%s", tk.psz_codec_name );
+                        }
+                        else if( EbmlId( *el3 ) == KaxCodecSettings::ClassInfos.GlobalId )
+                        {
+                            KaxCodecSettings &cset = *(KaxCodecSettings*)el3;
+                            cset.ReadData( p_sys->es->I_O() );
+
+                            tk.psz_codec_settings = UTF8ToStr( UTFstring( cset ) );
+                            msg_Dbg( p_input, "|   |   |   + Track Codec Settings=%s", tk.psz_codec_settings );
+                        }
+                        else if( EbmlId( *el3 ) == KaxCodecInfoURL::ClassInfos.GlobalId )
+                        {
+                            KaxCodecInfoURL &ciurl = *(KaxCodecInfoURL*)el3;
+                            ciurl.ReadData( p_sys->es->I_O() );
+
+                            tk.psz_codec_info_url = strdup( string( ciurl ).c_str() );
+                            msg_Dbg( p_input, "|   |   |   + Track Codec Info URL=%s", tk.psz_codec_info_url );
+                        }
+                        else if( EbmlId( *el3 ) == KaxCodecDownloadURL::ClassInfos.GlobalId )
+                        {
+                            KaxCodecDownloadURL &cdurl = *(KaxCodecDownloadURL*)el3;
+                            cdurl.ReadData( p_sys->es->I_O() );
+
+                            tk.psz_codec_download_url = strdup( string( cdurl ).c_str() );
+                            msg_Dbg( p_input, "|   |   |   + Track Codec Info URL=%s", tk.psz_codec_download_url );
+                        }
+                        else if( EbmlId( *el3 ) == KaxCodecDecodeAll::ClassInfos.GlobalId )
+                        {
+                            KaxCodecDecodeAll &cdall = *(KaxCodecDecodeAll*)el3;
+                            cdall.ReadData( p_sys->es->I_O() );
+
+                            msg_Dbg( p_input, "|   |   |   + Track Codec Decode All=%u <== UNUSED", uint8( cdall ) );
+                        }
+                        else if( EbmlId( *el3 ) == KaxTrackOverlay::ClassInfos.GlobalId )
+                        {
+                            KaxTrackOverlay &tovr = *(KaxTrackOverlay*)el3;
+                            tovr.ReadData( p_sys->es->I_O() );
+
+                            msg_Dbg( p_input, "|   |   |   + Track Overlay=%u <== UNUSED", uint32( tovr ) );
+                        }
+                        else  if( EbmlId( *el3 ) == KaxTrackVideo::ClassInfos.GlobalId )
+                        {
+                            msg_Dbg( p_input, "|   |   |   + Track Video" );
+                            tk.i_width  = 0;
+                            tk.i_height = 0;
+                            tk.i_display_width  = 0;
+                            tk.i_display_height = 0;
+                            tk.f_fps = 0.0;
+
+                            p_sys->ep->Down();
+
+                            while( ( el4 = p_sys->ep->Get() ) != NULL )
+                            {
+                                if( EbmlId( *el4 ) == KaxVideoFlagInterlaced::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoFlagInterlaced &fint = *(KaxVideoFlagInterlaced*)el4;
+                                    fint.ReadData( p_sys->es->I_O() );
+
+                                    msg_Dbg( p_input, "|   |   |   |   + Track Video Interlaced=%u", uint8( fint ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoStereoMode::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoStereoMode &stereo = *(KaxVideoStereoMode*)el4;
+                                    stereo.ReadData( p_sys->es->I_O() );
+
+                                    msg_Dbg( p_input, "|   |   |   |   + Track Video Stereo Mode=%u", uint8( stereo ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoPixelWidth::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoPixelWidth &vwidth = *(KaxVideoPixelWidth*)el4;
+                                    vwidth.ReadData( p_sys->es->I_O() );
+
+                                    tk.i_width = uint16( vwidth );
+                                    msg_Dbg( p_input, "|   |   |   |   + width=%d", uint16( vwidth ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoPixelHeight::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoPixelWidth &vheight = *(KaxVideoPixelWidth*)el4;
+                                    vheight.ReadData( p_sys->es->I_O() );
+
+                                    tk.i_height = uint16( vheight );
+                                    msg_Dbg( p_input, "|   |   |   |   + height=%d", uint16( vheight ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoDisplayWidth::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoDisplayWidth &vwidth = *(KaxVideoDisplayWidth*)el4;
+                                    vwidth.ReadData( p_sys->es->I_O() );
+
+                                    tk.i_display_width = uint16( vwidth );
+                                    msg_Dbg( p_input, "|   |   |   |   + display width=%d", uint16( vwidth ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoDisplayHeight::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoDisplayWidth &vheight = *(KaxVideoDisplayWidth*)el4;
+                                    vheight.ReadData( p_sys->es->I_O() );
+
+                                    tk.i_display_height = uint16( vheight );
+                                    msg_Dbg( p_input, "|   |   |   |   + display height=%d", uint16( vheight ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoFrameRate::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoFrameRate &vfps = *(KaxVideoFrameRate*)el4;
+                                    vfps.ReadData( p_sys->es->I_O() );
+
+                                    tk.f_fps = float( vfps );
+                                    msg_Dbg( p_input, "   |   |   |   + fps=%f", float( vfps ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoDisplayUnit::ClassInfos.GlobalId )
+                                {
+                                     KaxVideoDisplayUnit &vdmode = *(KaxVideoDisplayUnit*)el4;
+                                    vdmode.ReadData( p_sys->es->I_O() );
+
+                                    msg_Dbg( p_input, "|   |   |   |   + Track Video Display Unit=%s",
+                                             uint8( vdmode ) == 0 ? "pixels" : ( uint8( vdmode ) == 1 ? "centimeters": "inches" ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoAspectRatio::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoAspectRatio &ratio = *(KaxVideoAspectRatio*)el4;
+                                    ratio.ReadData( p_sys->es->I_O() );
+
+                                    msg_Dbg( p_input, "   |   |   |   + Track Video Aspect Ratio Type=%u", uint8( ratio ) );
+                                }
+                                else if( EbmlId( *el4 ) == KaxVideoGamma::ClassInfos.GlobalId )
+                                {
+                                    KaxVideoGamma &gamma = *(KaxVideoGamma*)el4;
+                                    gamma.ReadData( p_sys->es->I_O() );
+
+                                    msg_Dbg( p_input, "   |   |   |   + fps=%f", float( gamma ) );
+                                }
+                                else
+                                {
+                                    msg_Dbg( p_input, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
+                                }
+                            }
+                            p_sys->ep->Up();
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackAudio::ClassInfos.GlobalId )
                         {
@@ -586,125 +830,6 @@ static int Activate( vlc_object_t * p_this )
                                 }
                             }
                             p_sys->ep->Up();
-                        }
-                        else  if( EbmlId( *el3 ) == KaxTrackVideo::ClassInfos.GlobalId )
-                        {
-                            msg_Dbg( p_input, "|   |   |   + Track Video" );
-                            tk.i_width  = 0;
-                            tk.i_height = 0;
-                            tk.i_display_width  = 0;
-                            tk.i_display_height = 0;
-                            tk.f_fps = 0.0;
-
-                            p_sys->ep->Down();
-
-                            while( ( el4 = p_sys->ep->Get() ) != NULL )
-                            {
-                                if( EbmlId( *el4 ) == KaxVideoPixelWidth::ClassInfos.GlobalId )
-                                {
-                                    KaxVideoPixelWidth &vwidth = *(KaxVideoPixelWidth*)el4;
-                                    vwidth.ReadData( p_sys->es->I_O() );
-
-                                    tk.i_width = uint16( vwidth );
-                                    msg_Dbg( p_input, "|   |   |   |   + width=%d", uint16( vwidth ) );
-                                }
-                                else if( EbmlId( *el4 ) == KaxVideoPixelHeight::ClassInfos.GlobalId )
-                                {
-                                    KaxVideoPixelWidth &vheight = *(KaxVideoPixelWidth*)el4;
-                                    vheight.ReadData( p_sys->es->I_O() );
-
-                                    tk.i_height = uint16( vheight );
-                                    msg_Dbg( p_input, "|   |   |   |   + height=%d", uint16( vheight ) );
-                                }
-                                else if( EbmlId( *el4 ) == KaxVideoDisplayWidth::ClassInfos.GlobalId )
-                                {
-                                    KaxVideoDisplayWidth &vwidth = *(KaxVideoDisplayWidth*)el4;
-                                    vwidth.ReadData( p_sys->es->I_O() );
-
-                                    tk.i_display_width = uint16( vwidth );
-                                    msg_Dbg( p_input, "|   |   |   |   + display width=%d", uint16( vwidth ) );
-                                }
-                                else if( EbmlId( *el4 ) == KaxVideoDisplayHeight::ClassInfos.GlobalId )
-                                {
-                                    KaxVideoDisplayWidth &vheight = *(KaxVideoDisplayWidth*)el4;
-                                    vheight.ReadData( p_sys->es->I_O() );
-
-                                    tk.i_display_height = uint16( vheight );
-                                    msg_Dbg( p_input, "|   |   |   |   + display height=%d", uint16( vheight ) );
-                                }
-                                else if( EbmlId( *el4 ) == KaxVideoFrameRate::ClassInfos.GlobalId )
-                                {
-                                    KaxVideoFrameRate &vfps = *(KaxVideoFrameRate*)el4;
-                                    vfps.ReadData( p_sys->es->I_O() );
-
-                                    tk.f_fps = float( vfps );
-                                    msg_Dbg( p_input, "   |   |   |   + fps=%f", float( vfps ) );
-                                }
-                                else
-                                {
-                                    msg_Dbg( p_input, "|   |   |   |   + Unknown (%s)", typeid(*el4).name() );
-                                }
-                            }
-                            p_sys->ep->Up();
-                        }
-                        else  if( EbmlId( *el3 ) == KaxCodecID::ClassInfos.GlobalId )
-                        {
-                            KaxCodecID &codecid = *(KaxCodecID*)el3;
-                            codecid.ReadData( p_sys->es->I_O() );
-
-                            tk.psz_codec = strdup( string( codecid ).c_str() );
-                            msg_Dbg( p_input, "|   |   |   + Track CodecId=%s", string( codecid ).c_str() );
-                        }
-                        else  if( EbmlId( *el3 ) == KaxCodecPrivate::ClassInfos.GlobalId )
-                        {
-                            KaxCodecPrivate &cpriv = *(KaxCodecPrivate*)el3;
-                            cpriv.ReadData( p_sys->es->I_O() );
-
-                            tk.i_extra_data = cpriv.GetSize();
-                            if( tk.i_extra_data > 0 )
-                            {
-                                tk.p_extra_data = (uint8_t*)malloc( tk.i_extra_data );
-                                memcpy( tk.p_extra_data, cpriv.GetBuffer(), tk.i_extra_data );
-                            }
-                            msg_Dbg( p_input, "|   |   |   + Track CodecPrivate size=%lld", cpriv.GetSize() );
-                        }
-                        else  if( EbmlId( *el3 ) == KaxTrackFlagDefault::ClassInfos.GlobalId )
-                        {
-                            KaxTrackFlagDefault &fdef = *(KaxTrackFlagDefault*)el3;
-                            fdef.ReadData( p_sys->es->I_O() );
-
-                            tk.b_default = uint32( fdef );
-                            msg_Dbg( p_input, "|   |   |   + Track Default=%u", uint32( fdef )  );
-                        }
-                        else  if( EbmlId( *el3 ) == KaxTrackLanguage::ClassInfos.GlobalId )
-                        {
-                            KaxTrackLanguage &lang = *(KaxTrackLanguage*)el3;
-
-                            lang.ReadData( p_sys->es->I_O() );
-
-                            tk.psz_language = strdup( string( lang ).c_str() );
-                            msg_Dbg( p_input, "|   |   |   + Track Language=`%s'", string( lang ).c_str() );
-                        }
-                        else  if( EbmlId( *el3 ) == KaxTrackFlagLacing::ClassInfos.GlobalId )
-                        {
-                            KaxTrackFlagLacing &lac = *(KaxTrackFlagLacing*)el3;
-                            lac.ReadData( p_sys->es->I_O() );
-
-                            msg_Dbg( p_input, "|   |   |   + Track Lacing=%d", uint32( lac ) );
-                        }
-                        else  if( EbmlId( *el3 ) == KaxTrackMinCache::ClassInfos.GlobalId )
-                        {
-                            KaxTrackMinCache &cmin = *(KaxTrackMinCache*)el3;
-                            cmin.ReadData( p_sys->es->I_O() );
-
-                            msg_Dbg( p_input, "|   |   |   + Track MinCache=%d", uint32( cmin ) );
-                        }
-                        else  if( EbmlId( *el3 ) == KaxTrackMaxCache::ClassInfos.GlobalId )
-                        {
-                            KaxTrackMaxCache &cmax = *(KaxTrackMaxCache*)el3;
-                            cmax.ReadData( p_sys->es->I_O() );
-
-                            msg_Dbg( p_input, "|   |   |   + Track MaxCache=%d", uint32( cmax ) );
                         }
                         else
                         {
@@ -1289,7 +1414,7 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
 
                 /* add it to the index */
                 if( p_sys->i_index == 0 ||
-                    ( p_sys->i_index > 0 && p_sys->index[p_sys->i_index - 1].i_position < p_sys->cluster->GetElementPosition() ) )
+                    ( p_sys->i_index > 0 && p_sys->index[p_sys->i_index - 1].i_position < (int64_t)p_sys->cluster->GetElementPosition() ) )
                 {
                     IndexAppendCluster( p_input, p_sys->cluster );
                 }
@@ -1547,7 +1672,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     {
         int64_t i_pos = i_percent * p_input->stream.p_selected_area->i_size / 100;
 
-        msg_Warn( p_input, "imprecise way of seeking" );
+        msg_Dbg( p_input, "imprecise way of seeking" );
         for( i_index = 0; i_index < p_sys->i_index; i_index++ )
         {
             if( p_sys->index[i_index].i_position >= i_pos)
@@ -1578,7 +1703,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
                     /* add it to the index */
                     IndexAppendCluster( p_input, cluster );
 
-                    if( cluster->GetElementPosition() >= i_pos )
+                    if( (int64_t)cluster->GetElementPosition() >= i_pos )
                     {
                         p_sys->cluster = cluster;
                         p_sys->ep->Down();
@@ -2289,6 +2414,27 @@ static void InformationsCreate( input_thread_t *p_input )
 
         sprintf( psz_cat, "Stream %d", i_track );
         p_cat = input_InfoCategory( p_input, psz_cat);
+        if( tk.psz_name )
+        {
+            input_AddInfo( p_cat, _("Name"), "%s", tk.psz_name );
+        }
+        if( tk.psz_codec_name )
+        {
+            input_AddInfo( p_cat, _("Codec Name"), "%s", tk.psz_codec_name );
+        }
+        if( tk.psz_codec_settings )
+        {
+            input_AddInfo( p_cat, _("Codec Setting"), "%s", tk.psz_codec_settings );
+        }
+        if( tk.psz_codec_info_url )
+        {
+            input_AddInfo( p_cat, _("Codec Info"), "%s", tk.psz_codec_info_url );
+        }
+        if( tk.psz_codec_download_url )
+        {
+            input_AddInfo( p_cat, _("Codec Download"), "%s", tk.psz_codec_download_url );
+        }
+
         switch( tk.i_cat )
         {
             case AUDIO_ES:
