@@ -240,6 +240,10 @@ N: Arkadiusz Miskiewicz
 E: misiek@pld.ORG.PL
 D: autoconf and Makefile patches
 
+N: Fumio Nakayama
+E: endymion@ca2.so-net.ne.jp
+D: Japanese translation
+
 N: Florian G. Pflug
 E: fgp@phlo.org
 C: fgp

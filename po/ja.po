@@ -1,0 +1,750 @@
+# vlc ja.po
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# Fumio Nakayama <endymion@ca2.so-net.ne.jp>, 2002.
+#, no-wrap
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2002-04-02 23:37+0900\n"
+"PO-Revision-Date: 2002-04-02 03:22+0900\n"
+"Last-Translator: Fumio Nakayama <endymion@ca2.so-net.ne.jp>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=euc-jp\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: plugins/gtk/gnome_interface.c:19 plugins/gtk/gnome_interface.c:801
+#: plugins/gtk/gtk_interface.c:153 plugins/gtk/gtk_interface.c:1156
+msgid "_Open File..."
+msgstr "ファイルを開く(_O)..."
+
+#: plugins/gtk/gnome_interface.c:20 plugins/gtk/gnome_interface.c:367
+#: plugins/gtk/gnome_interface.c:802 plugins/gtk/gtk_interface.c:161
+#: plugins/gtk/gtk_interface.c:483 plugins/gtk/gtk_interface.c:1164
+msgid "Open a File"
+msgstr "ファイルを開く"
+
+#: plugins/gtk/gnome_interface.c:26 plugins/gtk/gnome_interface.c:808
+#: plugins/gtk/gtk_interface.c:168 plugins/gtk/gtk_interface.c:1168
+msgid "Open _Disc..."
+msgstr "ディスクを開く(_D)..."
+
+#: plugins/gtk/gnome_interface.c:27 plugins/gtk/gnome_interface.c:379
+#: plugins/gtk/gnome_interface.c:809 plugins/gtk/gtk_interface.c:176
+#: plugins/gtk/gtk_interface.c:494 plugins/gtk/gtk_interface.c:1176
+msgid "Open a DVD or VCD"
+msgstr "DVDまたはVCDを開く"
+
+#: plugins/gtk/gnome_interface.c:33 plugins/gtk/gnome_interface.c:815
+#: plugins/gtk/gtk_interface.c:183 plugins/gtk/gtk_interface.c:1180
+msgid "_Network Stream..."
+msgstr "ネットワークストリーム(_N)..."
+
+#: plugins/gtk/gnome_interface.c:34 plugins/gtk/gnome_interface.c:391
+#: plugins/gtk/gnome_interface.c:816 plugins/gtk/gtk_interface.c:191
+#: plugins/gtk/gtk_interface.c:505 plugins/gtk/gtk_interface.c:1188
+msgid "Select a Network Stream"
+msgstr "ネットワークストリームを選択する"
+
+#: plugins/gtk/gnome_interface.c:41 plugins/gtk/gtk_interface.c:206
+msgid "_Eject Disc"
+msgstr "ディスクの取出し(_E)"
+
+#: plugins/gtk/gnome_interface.c:42 plugins/gtk/gnome_interface.c:442
+#: plugins/gtk/gtk_interface.c:214
+msgid "Eject disc"
+msgstr "ディスクの取出し"
+
+#: plugins/gtk/gnome_interface.c:55 plugins/gtk/gtk_interface.c:259
+msgid "_Hide interface"
+msgstr "インタフェースを隠す(_H)"
+
+#: plugins/gtk/gnome_interface.c:62 plugins/gtk/gnome_interface.c:879
+#: plugins/gtk/gtk_interface.c:271 plugins/gtk/gtk_interface.c:1050
+msgid "_Fullscreen"
+msgstr "全画面化(_F)"
+
+#: plugins/gtk/gnome_interface.c:70 plugins/gtk/gtk_interface.c:290
+msgid "Progr_am"
+msgstr "プログラム(_a)"
+
+#: plugins/gtk/gnome_interface.c:71 plugins/gtk/gtk_interface.c:299
+msgid "Choose the program"
+msgstr "プログラムの選択"
+
+#: plugins/gtk/gnome_interface.c:77 plugins/gtk/gtk_interface.c:303
+msgid "_Title"
+msgstr "タイトル(_T)"
+
+#: plugins/gtk/gnome_interface.c:78
+msgid "Choose title"
+msgstr "タイトルの選択"
+
+#: plugins/gtk/gnome_interface.c:84 plugins/gtk/gtk_interface.c:316
+msgid "_Chapter"
+msgstr "チャプター(_C)"
+
+#: plugins/gtk/gnome_interface.c:85
+msgid "Choose chapter"
+msgstr "チャプターの選択"
+
+#: plugins/gtk/gnome_interface.c:92 plugins/gtk/gtk_interface.c:336
+msgid "_Playlist..."
+msgstr "プレイリスト(_P)..."
+
+#: plugins/gtk/gnome_interface.c:93 plugins/gtk/gtk_interface.c:344
+msgid "Open the playlist window"
+msgstr "プレイリストを開く"
+
+#: plugins/gtk/gnome_interface.c:99 plugins/gtk/gtk_interface.c:348
+msgid "_Modules..."
+msgstr "モジュール(_M)..."
+
+#: plugins/gtk/gnome_interface.c:100 plugins/gtk/gtk_interface.c:357
+msgid "Open the plugin manager"
+msgstr "プラグインマネージャー"
+
+#: plugins/gtk/gnome_interface.c:106 plugins/gtk/gtk_interface.c:359
+msgid "Messages..."
+msgstr "メッセージ..."
+
+#: plugins/gtk/gnome_interface.c:107 plugins/gtk/gtk_interface.c:365
+msgid "Open the messages window"
+msgstr "メッセージウィンドウを表示"
+
+#: plugins/gtk/gnome_interface.c:118 plugins/gtk/gnome_interface.c:922
+#: plugins/gtk/gtk_interface.c:1114
+msgid "_Audio"
+msgstr "出力音声(_A)"
+
+#: plugins/gtk/gnome_interface.c:119 plugins/gtk/gnome_interface.c:923
+msgid "Select audio channel"
+msgstr "音声チャンネルの選択"
+
+#: plugins/gtk/gnome_interface.c:125 plugins/gtk/gnome_interface.c:929
+#: plugins/gtk/gtk_interface.c:400 plugins/gtk/gtk_interface.c:1126
+msgid "_Subtitles"
+msgstr "字幕(_S)"
+
+#: plugins/gtk/gnome_interface.c:126
+msgid "Select subtitle unit"
+msgstr "字幕の選択"
+
+#: plugins/gtk/gnome_interface.c:202 plugins/gtk/gtk_interface.c:109
+#: plugins/gtk/gtk_interface.c:1338
+msgid "VideoLAN Client"
+msgstr "VideoLANクライアント"
+
+#: plugins/gtk/gnome_interface.c:366 plugins/gtk/gnome_interface.c:1712
+#: plugins/gtk/gtk_interface.c:482 plugins/gtk/gtk_interface.c:2120
+#: plugins/gtk/gtk_interface.c:2237
+msgid "File"
+msgstr "ファイル"
+
+#: plugins/gtk/gnome_interface.c:378 plugins/gtk/gnome_interface.c:581
+#: plugins/gtk/gnome_interface.c:1705 plugins/gtk/gnome_interface.c:2319
+#: plugins/gtk/gtk_interface.c:493 plugins/gtk/gtk_interface.c:680
+#: plugins/gtk/gtk_interface.c:2113
+msgid "Disc"
+msgstr "ディスク"
+
+#: plugins/gtk/gnome_interface.c:390 plugins/gtk/gtk_interface.c:504
+msgid "Net"
+msgstr "Network"
+
+#: plugins/gtk/gnome_interface.c:402 plugins/gtk/gtk_interface.c:515
+msgid "Sat"
+msgstr "衛星"
+
+#: plugins/gtk/gnome_interface.c:403 plugins/gtk/gtk_interface.c:516
+msgid "Open a Satellite Card"
+msgstr "衛星通信カードを開く"
+
+#: plugins/gtk/gnome_interface.c:416 plugins/gtk/gnome_interface.c:850
+#: plugins/gtk/gtk_interface.c:528 plugins/gtk/gtk_interface.c:1005
+msgid "Back"
+msgstr "逆転"
+
+#: plugins/gtk/gnome_interface.c:417 plugins/gtk/gtk_interface.c:529
+msgid "Go Backwards"
+msgstr "逆転再生"
+
+#: plugins/gtk/gnome_interface.c:429 plugins/gtk/gnome_interface.c:843
+#: plugins/gtk/gtk_interface.c:540 plugins/gtk/gtk_interface.c:998
+msgid "Stop"
+msgstr "停止"
+
+#: plugins/gtk/gnome_interface.c:430 plugins/gtk/gtk_interface.c:541
+msgid "Stop Stream"
+msgstr "ストリームの停止"
+
+#: plugins/gtk/gnome_interface.c:441 plugins/gtk/gtk_interface.c:551
+msgid "Eject"
+msgstr "取出し"
+
+#: plugins/gtk/gnome_interface.c:453 plugins/gtk/gnome_interface.c:829
+#: plugins/gtk/gtk_interface.c:562
+msgid "Play"
+msgstr "再生"
+
+#: plugins/gtk/gnome_interface.c:454 plugins/gtk/gtk_interface.c:563
+msgid "Play Stream"
+msgstr "ストリームの再生"
+
+#: plugins/gtk/gnome_interface.c:465 plugins/gtk/gnome_interface.c:836
+#: plugins/gtk/gtk_interface.c:573 plugins/gtk/gtk_interface.c:990
+msgid "Pause"
+msgstr "一時停止"
+
+#: plugins/gtk/gnome_interface.c:466 plugins/gtk/gtk_interface.c:574
+msgid "Pause Stream"
+msgstr "ストリームの一時停止"
+
+#: plugins/gtk/gnome_interface.c:480 plugins/gtk/gnome_interface.c:857
+#: plugins/gtk/gtk_interface.c:587 plugins/gtk/gtk_interface.c:1013
+msgid "Slow"
+msgstr "スロー"
+
+#: plugins/gtk/gnome_interface.c:481 plugins/gtk/gtk_interface.c:588
+msgid "Play Slower"
+msgstr "スロー再生"
+
+#: plugins/gtk/gnome_interface.c:493 plugins/gtk/gnome_interface.c:864
+#: plugins/gtk/gtk_interface.c:599 plugins/gtk/gtk_interface.c:1021
+msgid "Fast"
+msgstr "早送り"
+
+#: plugins/gtk/gnome_interface.c:494 plugins/gtk/gtk_interface.c:600
+msgid "Play Faster"
+msgstr "早送り再生"
+
+#: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1822
+#: plugins/gtk/gnome_interface.c:1846 plugins/gtk/gtk_interface.c:611
+#: plugins/gtk/gtk_interface.c:2084
+msgid "Playlist"
+msgstr "リスト"
+
+#: plugins/gtk/gnome_interface.c:507 plugins/gtk/gtk_interface.c:612
+msgid "Open Playlist"
+msgstr "プレイリストを開く"
+
+#: plugins/gtk/gnome_interface.c:518 plugins/gtk/gnome_interface.c:894
+#: plugins/gtk/gtk_interface.c:622 plugins/gtk/gtk_interface.c:708
+#: plugins/gtk/gtk_interface.c:752 plugins/gtk/gtk_interface.c:1074
+msgid "Prev"
+msgstr "前"
+
+#: plugins/gtk/gnome_interface.c:519 plugins/gtk/gtk_interface.c:623
+msgid "Previous File"
+msgstr "前のファイル"
+
+#: plugins/gtk/gnome_interface.c:530 plugins/gtk/gnome_interface.c:887
+#: plugins/gtk/gtk_interface.c:633 plugins/gtk/gtk_interface.c:716
+#: plugins/gtk/gtk_interface.c:760 plugins/gtk/gtk_interface.c:1067
+msgid "Next"
+msgstr "次"
+
+#: plugins/gtk/gnome_interface.c:531 plugins/gtk/gtk_interface.c:634
+msgid "Next File"
+msgstr "次のファイル"
+
+#: plugins/gtk/gnome_interface.c:545 plugins/gtk/gtk_interface.c:641
+msgid "-:--:--"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:595
+msgid "Title:"
+msgstr "タイトル:"
+
+#: plugins/gtk/gnome_interface.c:602 plugins/gtk/gtk_interface.c:701
+msgid "--"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:615
+msgid "Select previous title"
+msgstr "前のタイトルを選択"
+
+#: plugins/gtk/gnome_interface.c:638
+msgid "Chapter:"
+msgstr "チャプター:"
+
+#: plugins/gtk/gnome_interface.c:645 plugins/gtk/gtk_interface.c:745
+msgid "---"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:658
+msgid "Select previous chapter"
+msgstr "前のチャプターを選択"
+
+#: plugins/gtk/gnome_interface.c:666
+msgid "Select next chapter"
+msgstr "次のチャプターを選択"
+
+#: plugins/gtk/gnome_interface.c:674
+msgid "No server"
+msgstr "サーバー無し"
+
+#: plugins/gtk/gnome_interface.c:688
+msgid "Network Channel:"
+msgstr "通信チャンネル:"
+
+#: plugins/gtk/gnome_interface.c:703 plugins/gtk/gtk_interface.c:804
+msgid "Go!"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:872 plugins/gtk/gtk_interface.c:1039
+msgid "Toggle _Interface"
+msgstr "インタフェースの表示切替え(_I)"
+
+#: plugins/gtk/gnome_interface.c:880
+msgid "Toggle fullscreen mode"
+msgstr "全画面表示の切替え"
+
+#: plugins/gtk/gnome_interface.c:901 plugins/gtk/gtk_interface.c:1083
+msgid "_Jump..."
+msgstr "ジャンプ(_J)..."
+
+#: plugins/gtk/gnome_interface.c:902
+msgid "Got directly so specified point"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:908 plugins/gtk/gtk_interface.c:1092
+msgid "Program"
+msgstr "プログラム"
+
+#: plugins/gtk/gnome_interface.c:909
+msgid "Switch program"
+msgstr "プログラムの切替え"
+
+#: plugins/gtk/gnome_interface.c:915 plugins/gtk/gtk_interface.c:1102
+msgid "_Navigation"
+msgstr "ナビゲーション(_N)"
+
+#: plugins/gtk/gnome_interface.c:916
+msgid "Navigate through titles and chapters"
+msgstr "タイトル/チャプターからナビゲート"
+
+#: plugins/gtk/gnome_interface.c:930
+msgid "Select subtitle channel"
+msgstr "字幕の選択"
+
+#: plugins/gtk/gnome_interface.c:938 plugins/gtk/gtk_interface.c:1209
+msgid "Playlist..."
+msgstr "プレイリスト..."
+
+#: plugins/gtk/gnome_interface.c:1135 plugins/gtk/gtk_interface.c:1346
+msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1137 plugins/gtk/gtk_interface.c:1372
+msgid ""
+"This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and "
+"MPEG 2 files from a file or from a network source."
+msgstr ""
+"このソフトウェアはDVDおよび、MPEGを再生するVideoLANクライアントです。\n"
+"ファイルまたは、ネットワークからMPEG/MPEG 2データを再生することができます。"
+
+#: plugins/gtk/gnome_interface.c:1151
+msgid "Open File"
+msgstr "ファイルを開く"
+
+#: plugins/gtk/gnome_interface.c:1188
+msgid "Modules"
+msgstr "モジュール"
+
+#: plugins/gtk/gnome_interface.c:1196
+msgid ""
+"Sorry, the module manager isn't functional yet. Please retry in a later "
+"version."
+msgstr ""
+"残念ながら、モジュールマネージャの機能はまだ実装されていません。\n"
+"より新しいバージョンで実行してみてください。"
+
+#: plugins/gtk/gnome_interface.c:1262 plugins/gtk/gtk_interface.c:1465
+msgid "Open Disc"
+msgstr "ディスクを開く"
+
+#: plugins/gtk/gnome_interface.c:1278 plugins/gtk/gnome_interface.c:2209
+#: plugins/gtk/gtk_interface.c:1489
+msgid "Disc type"
+msgstr "ディスクの種類"
+
+#: plugins/gtk/gnome_interface.c:1292 plugins/gtk/gnome_interface.c:2224
+#: plugins/gtk/gtk_interface.c:1503
+msgid "DVD"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1300 plugins/gtk/gnome_interface.c:2232
+#: plugins/gtk/gtk_interface.c:1511
+msgid "VCD"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1308 plugins/gtk/gnome_interface.c:2240
+#: plugins/gtk/gtk_interface.c:1519
+msgid "Starting position"
+msgstr "再生開始の位置"
+
+#: plugins/gtk/gnome_interface.c:1325 plugins/gtk/gnome_interface.c:2257
+#: plugins/gtk/gtk_interface.c:1566
+msgid "Title"
+msgstr "タイトル"
+
+#: plugins/gtk/gnome_interface.c:1335 plugins/gtk/gnome_interface.c:2267
+#: plugins/gtk/gtk_interface.c:1556
+msgid "Chapter"
+msgstr "チャプター"
+
+#: plugins/gtk/gnome_interface.c:1372 plugins/gtk/gnome_interface.c:2304
+msgid "Device name:"
+msgstr "デバイスのパス:"
+
+#: plugins/gtk/gnome_interface.c:1463
+msgid "Network Stream"
+msgstr "ネットワークストリーム"
+
+#: plugins/gtk/gnome_interface.c:1479 plugins/gtk/gnome_interface.c:2341
+#: plugins/gtk/gtk_interface.c:1704
+msgid "Protocol"
+msgstr "プロトコル"
+
+#: plugins/gtk/gnome_interface.c:1493 plugins/gtk/gtk_interface.c:1718
+msgid "TS"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1501 plugins/gtk/gnome_interface.c:2372
+#: plugins/gtk/gtk_interface.c:1726
+msgid "RTP"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1510 plugins/gtk/gnome_interface.c:2364
+#: plugins/gtk/gtk_interface.c:1735
+msgid "HTTP"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1518 plugins/gtk/gnome_interface.c:2380
+#: plugins/gtk/gtk_interface.c:1743
+msgid "Server"
+msgstr "サーバー"
+
+#: plugins/gtk/gnome_interface.c:1535 plugins/gtk/gnome_interface.c:2404
+#: plugins/gtk/gtk_interface.c:1780
+msgid "Address"
+msgstr "ホスト名/アドレス"
+
+#: plugins/gtk/gnome_interface.c:1545 plugins/gtk/gnome_interface.c:2414
+#: plugins/gtk/gnome_interface.c:2519 plugins/gtk/gtk_interface.c:1770
+msgid "Port"
+msgstr "ポート番号"
+
+#: plugins/gtk/gnome_interface.c:1564
+msgid "Port of the stream server"
+msgstr "ストリームサーバーのポート番号"
+
+#: plugins/gtk/gnome_interface.c:1566 plugins/gtk/gnome_interface.c:2449
+#: plugins/gtk/gnome_interface.c:2464 plugins/gtk/gtk_interface.c:1790
+msgid "Broadcast"
+msgstr "ブロードキャスト"
+
+#: plugins/gtk/gnome_interface.c:1590 plugins/gtk/gtk_interface.c:1815
+msgid "138.195.143.255"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1606 plugins/gtk/gtk_interface.c:1825
+#: plugins/gtk/gtk_interface.c:1834
+msgid "vls"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1608 plugins/gtk/gnome_interface.c:2484
+#: plugins/gtk/gtk_interface.c:1836
+msgid "Channels"
+msgstr "チャンネル"
+
+#: plugins/gtk/gnome_interface.c:1623 plugins/gtk/gtk_interface.c:1851
+msgid "Channel server:"
+msgstr "チャンネルサーバー:"
+
+#: plugins/gtk/gnome_interface.c:1643 plugins/gtk/gtk_interface.c:1870
+msgid "138.195.143.120"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1645 plugins/gtk/gtk_interface.c:1872
+msgid "port:"
+msgstr "ポート番号:"
+
+#: plugins/gtk/gnome_interface.c:1719 plugins/gtk/gnome_interface.c:2534
+#: plugins/gtk/gtk_interface.c:2127
+msgid "Network"
+msgstr "ネットワーク"
+
+#: plugins/gtk/gnome_interface.c:1726 plugins/gtk/gnome_interface.c:1865
+#: plugins/gtk/gtk_interface.c:2134
+msgid "Url"
+msgstr "URL"
+
+#: plugins/gtk/gnome_interface.c:1738 plugins/gtk/gtk_interface.c:2155
+msgid "All"
+msgstr "すべて"
+
+#: plugins/gtk/gnome_interface.c:1745
+msgid "Item"
+msgstr "項目"
+
+#: plugins/gtk/gnome_interface.c:1757
+msgid "Crop"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1764
+msgid "Invert"
+msgstr ""
+
+#: plugins/gtk/gnome_interface.c:1771
+msgid "Select"
+msgstr "選択"
+
+#: plugins/gtk/gnome_interface.c:1783 plugins/gtk/gtk_interface.c:2099
+msgid "Add"
+msgstr "追加"
+
+#: plugins/gtk/gnome_interface.c:1790 plugins/gtk/gtk_interface.c:2141
+msgid "Delete"
+msgstr "削除"
+
+#: plugins/gtk/gnome_interface.c:1797 plugins/gtk/gtk_interface.c:2169
+msgid "Selection"
+msgstr "選択"
+
+#: plugins/gtk/gnome_interface.c:1872 plugins/gtk/gtk_interface.c:2244
+#, fuzzy
+msgid "Duration"
+msgstr "極性"
+
+#: plugins/gtk/gnome_interface.c:2024
+#, fuzzy
+msgid "Jump to: "
+msgstr "ジャンプ"
+
+#: plugins/gtk/gnome_interface.c:2041 plugins/gtk/gtk_interface.c:1975
+msgid "s."
+msgstr "秒"
+
+#: plugins/gtk/gnome_interface.c:2056 plugins/gtk/gtk_interface.c:1990
+msgid "m:"
+msgstr "分"
+
+#: plugins/gtk/gnome_interface.c:2071 plugins/gtk/gtk_interface.c:2005
+msgid "h:"
+msgstr "時"
+
+#: plugins/gtk/gnome_interface.c:2178
+msgid "Open Stream"
+msgstr "ストリームを開く"
+
+#: plugins/gtk/gnome_interface.c:2356
+msgid "UDP stream"
+msgstr "UDPストリーム"
+
+#: plugins/gtk/gnome_interface.c:2499
+msgid "Channel server"
+msgstr "チャンネルサーバー"
+
+#: plugins/gtk/gnome_interface.c:2576 plugins/gtk/gtk_interface.c:2334
+msgid "Messages"
+msgstr "メッセージ"
+
+#: plugins/gtk/gnome_interface.c:2650
+msgid "Open Satellite Card"
+msgstr "衛星通信カードを開く"
+
+#: plugins/gtk/gnome_interface.c:2666
+msgid "Transponder Settings"
+msgstr "転送に関する設定"
+
+#: plugins/gtk/gnome_interface.c:2683 plugins/gtk/gtk_interface.c:2478
+msgid "Frequency"
+msgstr "周波数"
+
+#: plugins/gtk/gnome_interface.c:2703 plugins/gtk/gtk_interface.c:2488
+msgid "Polarization"
+msgstr "極性"
+
+#: plugins/gtk/gnome_interface.c:2713 plugins/gtk/gtk_interface.c:2508
+msgid "Horizontal"
+msgstr "水平"
+
+#: plugins/gtk/gnome_interface.c:2723 plugins/gtk/gtk_interface.c:2498
+msgid "Vertical"
+msgstr "垂直"
+
+#: plugins/gtk/gnome_interface.c:2734 plugins/gtk/gtk_interface.c:2468
+msgid "Symbol Rate"
+msgstr "シンボルレート"
+
+#: plugins/gtk/gtk_interface.c:135 plugins/gtk/gtk_interface.c:1138
+msgid "_File"
+msgstr "ファイル(_F)"
+
+#: plugins/gtk/gtk_interface.c:226 plugins/gtk/gtk_interface.c:1237
+msgid "E_xit"
+msgstr "終了(_x)"
+
+#: plugins/gtk/gtk_interface.c:234
+msgid "Exit the program"
+msgstr "プログラムの終了"
+
+#: plugins/gtk/gtk_interface.c:241
+msgid "_View"
+msgstr "表示(_V)"
+
+#: plugins/gtk/gtk_interface.c:267
+msgid "Hide the main interface window"
+msgstr "インタフェースを隠す"
+
+#: plugins/gtk/gtk_interface.c:312
+msgid "Navigate through the stream"
+msgstr "ストリームをナビゲートする"
+
+#: plugins/gtk/gtk_interface.c:369
+msgid "_Settings"
+msgstr "設定(_S)"
+
+#: plugins/gtk/gtk_interface.c:387
+msgid "A_udio"
+msgstr "出力音声(_u)"
+
+#: plugins/gtk/gtk_interface.c:396
+msgid "Select audio language"
+msgstr "出力音声の選択"
+
+#: plugins/gtk/gtk_interface.c:409
+msgid "Select sub-title"
+msgstr "字幕の選択"
+
+#: plugins/gtk/gtk_interface.c:421 plugins/gtk/gtk_interface.c:1218
+msgid "_Preferences..."
+msgstr "設定..."
+
+#: plugins/gtk/gtk_interface.c:429
+msgid "Configure the application"
+msgstr "アプリケーションの設定"
+
+#: plugins/gtk/gtk_interface.c:433
+msgid "_Help"
+msgstr "ヘルプ(_H)"
+
+#: plugins/gtk/gtk_interface.c:451 plugins/gtk/gtk_interface.c:1200
+msgid "_About..."
+msgstr "VideoLANについて(_A)..."
+
+#: plugins/gtk/gtk_interface.c:459
+msgid "About this application"
+msgstr "このアプリケーションについて"
+
+#: plugins/gtk/gtk_interface.c:694
+msgid "Title:  "
+msgstr "タイトル:  "
+
+#: plugins/gtk/gtk_interface.c:738
+msgid "Chapter:  "
+msgstr "チャプター:  "
+
+#: plugins/gtk/gtk_interface.c:775
+msgid "No server !"
+msgstr "サーバーがありません!!"
+
+#: plugins/gtk/gtk_interface.c:789
+msgid "Channel:  "
+msgstr "チャンネル:  "
+
+#: plugins/gtk/gtk_interface.c:981
+msgid "_Play"
+msgstr "再生(_P)"
+
+#: plugins/gtk/gtk_interface.c:1323
+msgid "About"
+msgstr "VideoLANについて"
+
+#: plugins/gtk/gtk_interface.c:1355
+msgid "Authors"
+msgstr "作成者"
+
+#: plugins/gtk/gtk_interface.c:1362
+msgid ""
+"Rgis Duchesne <regis@via.ecp.fr>\n"
+"Michel Lespinasse <walken@zoy.org>\n"
+"Olivier Pomel <pomel@via.ecp.fr>\n"
+"Pierre Baillet <oct@zoy.org>\n"
+"Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>\n"
+"Andres Krapf <dae@via.ecp.fr>\n"
+"Christophe Massiot <massiot@via.ecp.fr>\n"
+"Vincent Seguin <seguin@via.ecp.fr>\n"
+"Benoit Steiner <benny@via.ecp.fr>\n"
+"Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>\n"
+"Jean-Marc Dressler <polux@via.ecp.fr>\n"
+"Gal Hendryckx <jimmy@via.ecp.fr>\n"
+"Samuel Hocevar <sam@zoy.org>\n"
+"Brieuc Jeunhomme <bbp@via.ecp.fr>\n"
+"Michel Kaempf <maxx@via.ecp.fr>\n"
+"Stphane Borel <stef@via.ecp.fr>\n"
+"Renaud Dartus <reno@via.ecp.fr>\n"
+"Henri Fallon <henri@via.ecp.fr>"
+msgstr ""
+
+#: plugins/gtk/gtk_interface.c:1387 plugins/gtk/gtk_interface.c:1610
+#: plugins/gtk/gtk_interface.c:1900 plugins/gtk/gtk_interface.c:2362
+#: plugins/gtk/gtk_interface.c:2530
+msgid "OK"
+msgstr ""
+
+#: plugins/gtk/gtk_interface.c:1410
+msgid "Select File"
+msgstr "ファイルの選択"
+
+#: plugins/gtk/gtk_interface.c:1583
+msgid "Device name"
+msgstr "デバイス名"
+
+#: plugins/gtk/gtk_interface.c:1617 plugins/gtk/gtk_interface.c:1907
+#: plugins/gtk/gtk_interface.c:2032 plugins/gtk/gtk_interface.c:2263
+#: plugins/gtk/gtk_interface.c:2537
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: plugins/gtk/gtk_interface.c:1680
+msgid "Open Network"
+msgstr "ネットワークを開く"
+
+#: plugins/gtk/gtk_interface.c:1952
+msgid "Jump"
+msgstr "ジャンプ"
+
+#: plugins/gtk/gtk_interface.c:1959
+msgid "Go to:"
+msgstr ""
+
+#: plugins/gtk/gtk_interface.c:2025 plugins/gtk/gtk_interface.c:2256
+msgid "Ok"
+msgstr ""
+
+#: plugins/gtk/gtk_interface.c:2162
+msgid "Selected"
+msgstr "選択済み"
+
+#: plugins/gtk/gtk_interface.c:2185
+msgid "_Crop"
+msgstr ""
+
+#: plugins/gtk/gtk_interface.c:2196
+msgid "_Invert"
+msgstr ""
+
+#: plugins/gtk/gtk_interface.c:2207
+msgid "_Select"
+msgstr "選択(_S)"
+
+#: plugins/gtk/gtk_interface.c:2407
+msgid "Open Satellite card"
+msgstr "衛星通信カードを開く"
+
+#: plugins/gtk/gtk_interface.c:2431
+msgid "Transponder settings"
+msgstr "転送に関する設定"

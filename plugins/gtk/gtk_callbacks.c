@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.34 2002/03/25 02:06:24 jobi Exp $
+ * $Id: gtk_callbacks.c,v 1.35 2002/04/03 02:43:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -480,48 +480,74 @@ void GtkMessagesActivate( GtkMenuItem * menuitem, gpointer user_data )
 gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
                         gpointer user_data )
 {
-  char *psz_device = NULL;
+    char *psz_device = NULL;
 
-  /*
-   * Get the active input
-   * Determine whether we can eject a media, ie it's a VCD or DVD
-   * If it's neither a VCD nor a DVD, then return
-   */
+    /*
+     * Get the active input
+     * Determine whether we can eject a media, ie it's a VCD or DVD
+     * If it's neither a VCD nor a DVD, then return
+     */
 
-  /*
-   * Don't really know if I must lock the stuff here, we're using it read-only
-   */
+    /*
+     * Don't really know if I must lock the stuff here, we're using it read-only
+     */
 
-  if (p_main->p_playlist->current.psz_name != NULL)
-  {
-      if (strncmp(p_main->p_playlist->current.psz_name, "dvd", 3)
-          || strncmp(p_main->p_playlist->current.psz_name, "vcd", 3))
-      {
-          /* Determine the device name by omitting the first 4 characters */
-          psz_device = strdup((p_main->p_playlist->current.psz_name + 4));
-      }
-  }
+    if (p_main->p_playlist->current.psz_name != NULL)
+    {
+        if( !strncmp(p_main->p_playlist->current.psz_name, "dvd:", 4) )
+        {
+            switch( p_main->p_playlist->current.psz_name[4] )
+            {
+            case '\0':
+            case '@':
+                psz_device = strdup( DVD_DEVICE );
+                break;
+            default:
+                /* Omit the first 4 characters */
+                psz_device = strdup( p_main->p_playlist->current.psz_name + 4 );
+                break;
+            }
+        }
+        else if( !strncmp(p_main->p_playlist->current.psz_name, "vcd:", 4) )
+        {
+            switch( p_main->p_playlist->current.psz_name[4] )
+            {
+            case '\0':
+            case '@':
+                psz_device = strdup( VCD_DEVICE );
+                break;
+            default:
+                /* Omit the first 4 characters */
+                psz_device = strdup( p_main->p_playlist->current.psz_name + 4 );
+                break;
+            }
+        }
+        else
+        {
+            psz_device = strdup( p_main->p_playlist->current.psz_name );
+        }
+    }
 
-  if( psz_device == NULL )
-  {
-      return TRUE;
-  }
+    if( psz_device == NULL )
+    {
+        return TRUE;
+    }
 
-  /* If there's a stream playing, we aren't allowed to eject ! */
-  if( p_input_bank->pp_input[0] == NULL )
-  {
-      intf_WarnMsg( 4, "intf: ejecting %s", psz_device );
+    /* If there's a stream playing, we aren't allowed to eject ! */
+    if( p_input_bank->pp_input[0] == NULL )
+    {
+        intf_WarnMsg( 4, "intf: ejecting %s", psz_device );
 
-      intf_Eject( psz_device );
-  }
+        intf_Eject( psz_device );
+    }
 
-  free(psz_device);
-  return TRUE;
+    free(psz_device);
+    return TRUE;
 }
 
 void GtkEjectDiscActivate ( GtkMenuItem *menuitem, gpointer user_data )
 {
-  GtkDiscEject( GTK_WIDGET( menuitem ), NULL, user_data );
+    GtkDiscEject( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 
 /****************************************************************************

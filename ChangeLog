@@ -4,105 +4,876 @@
 
 HEAD
 
-  * Fixed detection of the esd plugin.
-  * Fixed the ts plugin's input type detection.
-  * Fixed the BadCursor error in the x11 and xvideo plugins. For real this
-    time (unlike my 2001/08/03 fix :p).
-  * Made the wall filter work a bit better. It now spawns a 3x2 mosaic,
-    but this will eventually be configurable, à la `--filter wall:3x3'.
-  * Removed duplicate function checks from configure.in.   
-  * Added extra magic to Makefile.modules so that the module Makefiles
-    are now ridiculously simple. And I mean *simple*. Check it! This will
-    make a possible switch to full autoconf/automake a lot easier.
-  * Added the vlc version name to the plugin symbols, to be sure we only load
-    plugins with the same version number. A nasty consequence is that you
-    need to rebuild your tree after midnight if you are using a CVS tree :-)
-  * Got rid of modules_export.h by #defining exported functions in the same
-    header as their prototype.
-  * Added modules_inner.h and other commonly used .h files to common.h so
-    there are less and less files to include, and renamed common.h to
-    <videolan/vlc.h>.
-  * First modifications to the module handling system towards my ultimate
-    goal to get rid of the *_Probe functions. Got rid of TestMethod and
-    TestCPU, as well as src/misc/tests.c.
-  * Wrote the chroma plugin handling functions. No YUV functions have been
-    ported yet because it'ls a lot of work, but the core system works, I
-    tried it with a naive yv12->rgb16 plugin (which will disappear when the
-    real functions are ready).
-  * Made a lot of functions in dvd_summary.c one-liners to avoid wasting
-    too many output lines.
-  * Fixed a segfault in input_dvd.c:DVDInit.
-  * Added a fixfiles.sh script in plugins/gtk to be run after Glade has
-    generated its C files.
-  * Did some work on the KDE interface to make it suck a bit less. It still
-    segfaults, but at least it runs and it looks less ugly.
-  * RGB SDL rendering works again, though in 16bpp only. 
-  * Made plugins/vcd/linux_cdrom_tools.c independent of any vlc structure
-    so that it'll be easily put in a library. Maybe libdvdcss?
-  * Fixed VCD date display.
-  * Merged vout_xvideo.c, vout_x11.c and vout_common.c into xcommon.c.
-  * Wrote non-Shm XVideo output.
-  * Made X11 output work again. Still pretty unstable, only works for 16bpp.
-  * Additional french translation in po/fr.po. Any taker for the rest?
-  * Fixed a segfault in video_output.c when the allocated pictures were
-    not direct buffers.
-  * Replaced 48x48 .xpm images with 32x32 ones to conform to Debian policy
-    (Closes Debian bug #126939).
-  * Removed the automatic ./configure launch when running `make all' for
-    the first time.
-  * --filter distort:ripple (Ok, ok, I promise it's the last one !! :-)
-  * Fixed compilation with dvdcss disabled.
-  * Fixed compilation with plugins disabled.
-  * Removed useless variables in the VCD and DVD plugins.
-  * Fixed a function which was returning "struct foo" in the VCD plugin.
-  * Fixed the old « XVideo eats more and more CPU » bug I mistakenly
-    reintroduced in my first vout4 commit.
-  * We now stop at the first ':' when looking for a module name, to easily
-    pass information to the modules. Possible example: --vout sdl:software,
-    implementation of such an option is left as an exercise.
-  * Merged filter_bob and filter_bob422 into filter_bob. Use --filter bob
-    to deinterlace 422 into 420 as well.
-  * Factorized code common to most filters and the video output, optimized
+  * ./po/ja.po: added Japanese translation from Fumio Nakayama
+    <endymion@ca2.so-net.ne.jp>.
+  * ./plugins/gtk/gtk_callbacks.c: fixed disc ejection code.
+  * ./include/threads.h: new pthread implementation for WinNT/2K/XP. This
+    implementation shouldn't be subject to race conditions as it is using
+    SignalObjectAndWait() from the Win32 API. As this should be somehow slower
+    than the old method (still used on Win9x), you can specify that you want
+    to use the old method with the "fast_pthread" config option.
+  * ./include/videolan/vlc.h: added a new p_main_sys global variable. This
+    variable is a pointer to an OS specific structure which is defined in
+    *_specific.h. This structure can be filled by the already existing
+    System_Init() function and is a nice way to avoid too many #ifdefs.
+  * ./include/defs.h.in: got rid of the DVD_DEVICE macro. We now use the
+    dvd_device config option. This creates a small memory leak as we don't free
+    the string obtained from config_GetPszVariable, but I think we can live
+    with it for now.
+  * ./configure.in: the SSE plugins are disabled on the mingw32 build as they
+    don't work (because memalign is not implemented on win32, and malloc only
+    aligns on an 8 bytes boundary).
+  * ./INSTALL.win32: fixed a small mistake.
+  * ./include/config.h: fixed config directory name for windows.
+  * ./plugins/win32: the network dialog now respects the preferences settings.
+  * ./src/input/input_ext-plugins.c: compilation fix. :-ppppp
+  * ./plugins/memcpy/fastmemcpy.h: AltiVec-enabled version of fastmemcpy.
+  * ./plugins/macosx/vout_macosx.c: use ImageBuffer instead of ScreenBuffer in
+    OS X video output (should be faster).
+  * ./src/interface/main.c: check that channels have been created before
+    the call to network_ChannelJoin.
+  * ./plugins/win32/*: fixed a few bugs in the preferences.
+  * ./plugins/win32/*: better auto-resizing of the main window.
+  * ./plugins/win32/*: the disc dialog now respects the preferences settings.
+  * ./src/misc/configuration.c: small compilation fix.
+  * ./plugins/beos/vout_beos.cpp: added a test for the nooverlay option.
+  * ./include/config.h: changed directory of the config file for BeOS to be
+    consistant with OS standard.
+  * ./configure.in: BeOS, liba52 and chroma plugin compilation fixes.
+  * ./plugins/dvd/dvd_access.c: removed a warning.
+  * ./src/misc/configuration.c: Solaris fixes by Meuuh.
+  * ./FAQ: removed outdated stuff.
+  * ./plugins/directx/vout_events.c: fixed yet another bug related to the event
+    thread creation.
+  * ./plugins/directx/vout_events.c: removed a few debug messages.
+  * ./extras/Win32_msvc/*: Microsoft Visual Studio C++ 6 project files. This
+    is useful mainly for debugging as the hardware accelerated plugins can't
+    be compiled with msvc.
+  * ./plugins/downmix/ac3_downmix_sse.c, ./plugins/downmix/ac3_downmix_3dn.c:
+    Win32 compilation fixes when downmixsse and downmix3dn are declared as
+    plugins.
+  * ./plugins/directx/vout_events.c: fixed the waiting on the event thread
+    creation in the directx plugin.
+  * ./Makefile: updated the "package-win32" rule.
+  * ./install-win32: all txt files are now converted to dos format (CRLF).
+  * ./doc/win32/Cross-Compile-Howto.txt: VLC-Win32 Cross-Compile Howto,
+    courtesy of Bill Eldridge.
+  * ./plugins/beos/vout_beos.cpp: improved overlay detection, default colour
+    space selection.
+  * ./plugins/gtk/gtk_preferences.c: allow the user to resize the configuration
+    windows.
+  * ./plugins/gtk/gtk_preferences.c: moved config_GetIntVariable out of the
+    loop.
+  * ./plugins/gtk/gtk_preferences.c: you can now set a maximum height for the
+    configuration windows in the gtk and gnome plugins. This patch _doesn't
+    change_ the look of the interface unless this interface tries to use more
+    space than allowed, in which case scrollbars are added to make the
+    navigation easy. Note that this setting only affects the default size the
+    interface will use, the user is then free to change the size of the window
+    as he wants.
+  * ./plugins/gtk/gtk_preferences.c: tooltips are now triggered only in
+    specific places. This is a lot less intrusive and annoying for the users.
+  * ./plugins/win32: fixed the bug on exiting the vout pressing 'q'.
+  * ./plugins/beos/*: implemented an "always-on-top" feature for the interface
+    window, RGB16 Overlay supported again, resizing is now implemented
+    consistantly.
+  * ./plugins/win32: subtitles should work, now.
+  * ./plugins/access/udp.c: disabled the server argument in udpstream: because
+    it confuses users and is not of any practical use.
+  * ./src/interface/main.c: fix for sparc.
+  * ./plugins/dvd/dvd_access.c: don't try to stat() the dvd drive letter on
+    win32.
+  * ./plugins/directx/vout_directx.c: disabled YUV overlay double buffering for
+    now, as it seems to actually be slower.
+  * ./include/threads.h: temporary fix in vlc_cond_signal() for win32 (I really
+    should use SignalObjectAndWait() on WinNT so we can avoid race conditions
+    in the pthread code). This fixes a problem noticed on WinXP where vlc would
+    freeze regularly and eat-up all the CPU (fun no?).
+  * ./src/input/input_programs.c: when unselecting an ES, we must ged rid of
+    p_es->p_pes so that it is regererated when we select this ES again. It made
+    vlc segfault when switching from some stream to another, or when switching
+    program in satellite input.
+  * ./plugins/access/udp.c: UDP access plug-in can now receive MPTS (Multiple
+    Program TS) and switch programs.
+  * ./plugins/macosx/*: audio and video output go to time-constrained
+    scheduling [OS X port].
+  * ./plugins/gtk/gtk_preferences.c: some dirty ifdefs for a nicer gnome
+    interface (gnome buttons, gnome dialogs).
+  * ./po/nl.po: translation of user interface messages to Netherlands.
+  * ./plugins/gtk/gnome.c, ./plugins/gtk/gtk.c: new options "gtk_hide_toltips"
+    or "gnome_hide_tooltips". Tooltips are enabled by default. This option is
+    only considered on module initialization.
+  * ./configure.in: GNU make detection.
+  * ./extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib: deleted
+    non-working fullscreen menu item [OS X].
+  * ./plugins/access/http.c, ./plugins/access/udp.c: udp and http no longer
+    modify p_input->psz_name.
+  * ALL: various little portability fixes.
+  * ./src/misc/configuration.c: changed the behaviour of the config file:
+    now all the config options are saved. <string> config options which have
+    no default value are also saved in the config file but as an empty string,
+    and config_LoadConfigFile will ignore empty config options, which also
+    means we cannot pass an empty string as a <string> config option. (this
+    shouldn't matter anyway).
+  * ./plugins/gtk/gtk_preferences.c: modified the gtk interface to save an
+    empty <string> option as a NULL pointer.
+  * ./src/misc/configuration.c: modified config_LoadConfigFile to consider an
+    empty <string> option as a NULL pointer.
+  * ./plugins/gtk/gtk_preferences.c: save button (inadvertently suppressed).
+  * ./plugins/win32: added toolbar icons (thanks xav), we can no longer edit
+    plugin names in the preferences :)
+  * ./plugins/win32: the tool button for playlist is now a toggle button.
+  * ./plugins/beos/InterfaceWindow.cpp: disabled controls if the playlist was
+    empty.
+  * ./plugins/win32/*: added a win32 interface plugin, developed with Borland
+    C++ Builder. To build the plugin, follow the instructions in
+    INSTALL-win32.txt.
+  * ./plugins/gtk/gtk_preferences.c: fixed an ugly structure, the tabs are not
+    verticaly expanded as they were, small enhancements.
+  * ./plugins/gtk/gnome.c, ./plugins/gtk/gtk.c, ./plugins/gtk/gtk_common.h: new
+    Tooltips structure.
+  * ./plugins/gtk/gtk_preferences.c: modifications of some widgets, the
+    structure, cosmetic changes.
+  * ./src/interface/main.c: typos, a couple of new descriptions.
+  * ./src/interface/main.c: moved the "display" option from main to the
+    relevant plugins. ( We now have the x11_display, xvideo_display,
+    xmga_display and ggi_display options ).
+  * ./INSTALL-win32.txt: fixed a little omission.
+  * ./src/plugins/gtk/*: fixed a bug that made vlc segfault when choosing a
+    program, change to another and come back to the first one.
+  * ./src/plugins/gtk/*: added gtk and gnome interfaces for satellite input. We
+    should find a way to hide the button if satellite support is not compiled.
+  * ./plugins/beos/vout_beos.cpp: implemented correct scaling and used new
+    window size variables. Beta always on top for the interface window. New
+    cursor handling.
+  * ./plugins/macosx/aout_macosx.c: fixed a problem in the MacOS X aout which
+    caused the previously played audio frames to be played when there were no
+    new frames available.
+  * ./plugins/macosx/vout_macosx.c: MacOS X vout now uses the height/width
+    calculated in video_output.c.
+  * ./configure.in: Win32 fix.
+  * ./configure.in: miscellaneous fixes for the OS X port.
+  * ./src/video_output/video_output.c: the calculation for the initial video
+    window dimensions is now done in video_output.c and made available into
+    p_vout->i_window_height/width. This allows to get rid of duplicated code
+    and unify the behaviour of the video output plugins. (not all the plugins
+    have been modified because I didn't want to break anything).
+  * ./src/misc/configuration.c: moved GetConfigurationFromCmdLine() into
+    configuration.c and renamed it to config_LoadCmdLine().
+  * ./src/misc/configuration.c: config_GetHomeDir doesn't use getpwuid_r
+    anymore as this was creating some problems on solaris. This function now
+    uses getpwuid and is called only once to store the home directory into the
+    p_main structure.
+  * ./plugins/satellite/*: added satellite input. It works with WinTV Nova
+    card, and siemens 0.9.4 drivers from www.linuxtv.org.
+  * ./src/interface/intf_msg.c: fixed stupid bug in stupid
+    ConvertPrintfFormatString() function.
+  * ./plugins/win32/waveout.c: fixed the "waveout not closing" bug. We need to
+    reset the waveout device before closing it.
+  * ./src/input/mpeg_system.c: fixed a bus error on UltraSparc.
+  * ./plugins/sdl/vout_sdl.c: Win32 and Solaris compilation fix.
+  * ./plugins/beos/vout_beos.cpp: improved scaling, correct aspect ratio even
+    in full screen mode, duplicate code reduces and framework for Overlay and
+    OpenGL modes in place.
+  * ./src/misc/modules_plugin.h: kludge to allow the ALSA module to be
+    compiled as a plugin. Please test.
+  * ./include/modules.h: fixed a C++ warning.
+  * ./plugins/vcd/input_vcd.c: VCD raw device fix, courtesy of Steven Schultz.
+  * ./configure.in: better IPv6 detection. IPv6 is disabled under MacOS X (no
+    inet_pton call).
+  * ./src/input/input_programs.c: fixed some bugs in program management:
+    selected ESs must be attached to the selected program.
+  * ./plugins/aa: aalib output plugin courtesy of Sigmund Augdal.
+  * ./configure.in: fixed a few bashisms.
+  * ./src/misc/configuration.c: fixed build under Solaris.
+  * ./TODO: updated todo list.
+  * ./plugins/dvd/dvd_access.c: fixed a memory leak.
+  * ./plugins/mpeg_vdec/vpar_pool.c: fixed a memory leak.
+  * plugins/win32/waveout.c: fixed typo.
+  * ./configure.in: BeOS compilation fixes.
+  * ./debian/rules: activated (broken) KDE interface.
+  * ./plugins/access/http.c: fixed a segfault.
+  * ./plugins/alsa/aout_alsa.c: fixed a segfault.
+  * ./include/common.h: fixed the compilation fix for Borland C++ :)
+  * ./include/common.h: compilation fix for Borland C++.
+  * ./plugins/macosx/aout_macosx.c: MacOS X aout now uses AudioConverter for
+    int->float.
+  * ./plugins/macosx/*:Various MacOS X intf improvements and bug fixes.
+  * ./plugins/chroma/i420_rgb8.c: fixed a warning.
+  * ./plugins/filter/deinterlace.c: fixed chroma deinterlacing.
+  * ./plugins/kde/kde.cpp: the KDE interface compiles again.
+  * ./plugins/mpeg_system/mpeg_es.c: fixed a segfault I introduced today.
+  * ./plugins/network/ipv4.c: cosmetic fix.
+  * ./src/interface/main.c: fixed a typo in the --help output.
+  * ./src/misc/netutils.c: fixed a segfault in the vlcs communication; still
+    unstable but solving other bugs won't do any good without rewriting the
+    whole playlist code. Which I'm doing right now.
+  * ./configure.in: MacOS X compile fixes.
+  * ./src/input/input.c: skip "//" if we find "://" in a resource we have to
+    play : this allows us touse the syntax udpstream://host.
+  * ./extras/MacOSX_dvdioctl: removed outdated files.
+  * ./plugins/fx/scope.c: fixed an infinite loop error.
+  * ./plugins: fixed segfaults in various demux plugins.
+  * ./plugins/sdl/vout_sdl.c: SDL_VIDEODRIVER can be specified from the
+    command line; try "--vout sdl:aalib"
+  * ./configure.in: fixed linking of the ipv4 plugin.
+  * ./configure.in: DirectX plugin is now correctly detected and configured.
+  * ./BUGS: updated bug list.
+  * ./configure.in: ./configure --help should be a lot clearer now.
+  * ./plugins/chroma/i420_rgb8.c: plain C 8 bpp transformation.
+  * ./plugins/chroma/i420_rgb16.c: plain C 24/32 bpp transformations.
+  * ./plugins/ggi/ggi.c: support for 8 bpp displays.
+  * ./plugins/sdl/vout_sdl.c: support for 8 bpp displays.
+  * ./plugins/x11/xcommon.c: support for 8 bpp displays.
+  * ./src/video_output/video_output.c: fixed a segfault.
+  * ./plugins/x11/xcommon.c: added an alternate fullscreen method. With this
+    method, _nothing_ is allowed to be displayed on top of the video
+    (especially not taskbars, etc...). Of course this can also be annoying
+    sometimes, this is why it's an option.
+  * ./src/misc/configuration.c: small fix for the config file. The parser
+    assumes that the config file is divided into sections (a section is the
+    config data for a plugin and begins with something like [foo]), so the
+    comment for the beginning of the section must be after the section marker
+    and not before.
+  * ./plugins/beos/vout_beos.cpp: tidied code and prevented curruption on
+    window not containing the video. Video window now returns to correct size
+    and position after toggling full screen.
+  * ./configure.in: more modules are plugins.
+  * ./src/misc/configuration.c: changed ~/.VideoLan/vlc to ~/.videolan/vlcrc,
+    and a few cosmetic changes (sorry Gildas for the butchery).
+  * ./plugins/chroma/i420_rgb16.c: C version of the I420 to RV15/16 chroma.
+  * ./src/misc/configuration.c: this the last piece of the new configuration
+    module. You can now save your configuration options (only from the
+    gtk/gnome interface for now). The config file will be saved as
+    ~/.VideoLan/vlc.
+  * ./plugins/spudec/spu_decoder.c: we now analyze the subtitle image
+    data to find the border color and the inner colors when there was
+    no way to find the palette data (network stream).
+  * ./plugins/mpeg_system: fixed a parsing bug I introduced yesterday.
+  * ./Makefile: fixed OS X vlc.app compilation dependencies.
+  * ./configure.in: fixed the endianness check under Solaris.
+  * ./src/input/input.c: strings are now initialized to "" instead of NULL.
+  * ./plugins/spudec/spu_decoder.c: we now properly support the subtitle
+    palette information we get from the DVD. Subtitles rox !
+  * ./src/video_output/vout_subpictures.c: removed all DVD-specific routines
+    and put them into spu_decoder.c.
+  * ./plugins/audio_output/aout_spdif.c: removed an ugly loop.
+  * ./plugins/audio_output/aout_spdif.c: moved iec958/spdif encapsulation from
+    ac3_spdif to aout_spdif. It will eventually allows to use ac3_adec or a52
+    for spdif output.
+  * ./plugins/dvd/dvd_access.c: fixed chapter selection at startup.
+  * ./src/input/input_dec.c: p_es->p_demux_data is available in
+    p_config->p_demux_data so that the input can pass information directly to
+    the decoder. First application: aspect ratio for DVD is read from the ifo
+    (should fix the buf with aspect ratio in anamorphic DVDs).
+  * ./plugins/dvd/dvd_es.c: the DVD plugin also copies the spu yuv palette in
+    p_demux_data so that the spudec can display subtitle with the right color
+    (sam !).
+  * ./plugins/gtk/gtk_menu.c: removed duplicate code and useless lock in gtk.
+  * ./plugins/vcd/input_vcd.c: fixed EOF and Stop segfault in VCD input:
+    input_BuffersEnd was being called twice.
+  * ./AUTHORS: updated Tony Castley's e-mail.
+  * ./plugins/beos/vout_beos.cpp: new resizing and scaling code. More in line
+    with BeOS standards.
+  * ./plugins/a52/a52.c: a52 plugin updated to use liba52-0.7.3 (which is now
+    available in debian :)
+  * ./src/interface/main.c: new configuration option to choose audio output
+    format at runtime. It allows to select spdif pass-through decoder with
+    --ac3_adec and to remove the ugly b_ac3 in main.h. As a consequence --spdif
+    doesn't work anymore: you should use --ac3_adec pass.
+  * ./src/interface/main.c: return the option name in error message for
+    unknown option intead of the argument.
+  * ./plugins/gtk/gtk_preferences.c: gtk config interface modified so you can
+    only have one instance of a plugin config dialog box displayed at one time.
+  * ./plugins/gtk/gtk_preferences.c: new GTK configuration interface. This
+    interface is generated dynamically at run-time from the configuration data
+    contained in each plugin.
+  * ./src/misc/configuration.c: config_PutPszVariable and config_GetPszVariable
+    are now thread safe.
+  * ./src/misc/configuration.c: few modifications/optimizations to the config
+    module.
+  * ./include/config.h: got rid of all the _VAR macros in config.h.
+  * ./plugins/vcd/input_vcd.c: added missing include (MacOS X port).
+  * ./plugins/dvd/*: fixed EOF segfault at end of DVD.
+  * ./src/input/input.c: buffer manager is renintialised at area change.
+  * ./plugins/dvd/dvd_access.c, ./plugins/vcd/input_vcd.c: we now exit more
+    cleanly on initialization error.
+  * ./plugins/dvd/*: rewrote most functions in DVD plugin. Some old bugs might
+    have been solved in the operation. The plugin some be more readable now,
+    and should produce fewaer segfaults (I hope so :p)
+  * ./plugins/vcd/input_vcd.c: added some tests in open.
+  * ./plugins/alsa/aout_alsa.c: spdif support in the ALSA plugin.
+  * ./plugins/vcd/input_vcd.c: when reaching the end of a track, moves to the
+    following one.
+  * ./src/interface/main.c: disabled the GNOME segfault dialog in debug
+    mode. We want nice, clean segfaults, with huge core files and a lot
+    of rattle noise.
+  * ./plugins/dvd/dvd.c: I hope you liked this bug: DVD demux was always used.
+  * ./plugins/dvd/dvd_demux.c: fixed demux plugin selection.
+  * ./plugins/vcd/input_vcd.c: take the lock on stream in VCDInit. Please
+    test, as I don't have any VCD to do it.
+  * ./plugins/ac3_adec/ac3_parse.c: ac3dec is now less verbose.
+  * ./src/interface/interface.c: fixed a deadlock when seeking the
+    stream using the keyboard arrows.
+  * ./plugins/gtk/gtk_display.c: removed an occurance of former angle item in
+    gtk.
+  * ./plugins/dvd/input_dvd.c, ./plugins/dvdread/input_dvdread.c: fixed a bug
+    in ES management introduced lately in DVD/DvdRead.
+  * ./plugins/dvd/*: beginning of reorganisation in DVD plugin source files,
+    in order to try to make it easier to understand. There is some work left
+    though :p.
+  * ./plugins/vcd/vcd.c: decreased the score for VCD plugin, as the VCD demuxer
+    was used even for DVD :p. It should make autodetection work.
+  * ./plugins/vcd/input_vcd.c: modified vcd input for the new input III. Still
+    have problems with end of tracks.
+  * ./plugins/vcd/vcd.c: modified the command line, as stef did for the DVD.
+  * ./plugins/dvd/input_dvd.c: DVD demux was no longer selected under win32.
+  * ./plugins/dvd/dvd_summary.c, ./plugins/dvdread/input_dvdread.c: DVD angle
+    is now handled through a program structure, so that the interface needs
+    nothing specific to change angle.
+  * ./src/input/input_clock.c: fixed a bug in clock management where ES without
+    a program couldn't get timestamped.
+  * ./plugins/gtk/*: fixed program management in gnome/gtk. Program now also
+    appears in popup.
+  * ./plugins/gtk/gtk_menu.c: in interface, only display ES associated with
+    the selected program, or with no program at all.
+  * ./src/input/input.c: fixed typo in the win32 change to the input parser.
+  * ./plugins/dvd/input_dvd.c, ./plugins/dvdread/input_dvdread.c: more complete
+    command line parsing for DVD, hopefully working this time.
+  * ./plugins/network/ipv6.c: IPv6 network module, courtesy of Alexis Guillard
+    <alexis.guillard@bt.com>, for BT.
+  * ./src/interface/main.c: --6 and --4 options to force IPv6 or IPv4 (FIXME:
+    it should be -6 and -4 but I don't know how to do it with the new
+    configuration module).
+  * ./src/misc/netutils.c: channel manager now uses a socket from the network
+    plug-in and is more portable (and probably broken, too :)
+  * ./plugins/mpeg_system/mpeg_ps.c, ./plugins/mpeg_system/mpeg_ts.c:
+    input_ReadPS and input_ReadTS are now in mpeg_system.c to be more easily
+    reused by plug-ins other than mpeg_ps and mpeg_ts.
+  * ./src/audio_output/audio_output.c: we now make sure the aout plugin buffers
+    always contain between AOUT_BUFFER_DURATION/2 and AOUT_BUFFER_DURATION*3/2
+    worth of audio. This should solve the audio buffer underruns.
+  * ./src/input/input.c: fix for the bug in input when filename contains a '@'
+    character.
+  * ./src/input/input.c: simplified the win32 specific changes to the input
+    parser. (I think we can safely assume that no access plugin name will have
+    a length of one character).
+  * ./plugins/dvd/dvd.c: DVD access plugin is only called if specified under
+    windows (no automatic detection).
+  * ./plugins/dvd/input_dvd.c: replaced setenv with putenv.
+  * ./plugins/gtk/gtk_open.c: fixed a bug in gtk.
+  * ./plugins/dvd/input_dvd.c: new command line for DVD, to get rid of global
+    options input_title or so.
+  * ./Makefile: added network to the list of the plugins directories.
+  * ./plugins/dvd/input_dvd.c: fixed DVD input under Win32.
+  * ./src/input/input.c: fixed input parser under win32, chich couldn't
+    understand that c:\windows\bureau is a valid file and doesn't need to be
+    accessed with the plugin 'C' :-)
+  * ./AUTHORS: added xav.
+  * ./include/videolan/vlc.h: got rid of int_types.h and did a few changes
+    Ipkiss will need. Hope I did not break other platforms.
+  * ./include/common.h: fixed compilation problem related to ssize_t.
+  * ./include/common.h: various Win32 compilation fixes.
+  * ./include/input_ext-plugins.h: DVD compiles, but doesn't work yet.
+  * ./plugins/network/ipv4.c: fixed some typos in my previous Win32 multicast
+    commit.
+  * ./plugins/dummy/input_dummy.c: fixed `vlc vlc:quit'.
+  * ./src/input/input.c: initialized uninitialized variables.
+  * ./src/input/input.c: initialize p_access_module & p_demux_modules to NULL
+    when input thread is created.
+  * ./po/no.po: Norwegian translation by Sigmund Augdal. Berdå ka pø tüt.
+  * ./src/misc/modules.c: shortcuts for --intf work again, gvlc launches the
+    Gtk interface, qvlc launches the Qt interface, etc.
+  * ./plugins/fx/scope.c: we now have sound together with --aout scope.
+  * ./plugins/dvd/dvd.c, ./plugins/dvdread/dvdread.c: removed numerous
+    deadlocks.
+  * ./plugins/network/ipv4.c: multicast under Win32 now works with the new
+    input.
+  * ./plugins/dvd/dvd.c, ./plugins/dvdread/dvdread.c: dvd and dvdread support
+    for input III.
+  * ./src/input/*, ./plugins/network/*, ./plugins/access/*: Input III
+    (Episode 1). Major rewrite of the buffer core functions, modularity of
+    access plugins (file, udp, http), modularity of network stack (ipv4, soon
+    ipv6), autodetection of the type of stream.
+  * ./plugins/mpeg_vdec/vpar_headers.c: we no longer crash when the next
+    stream doesn't have the same image size as the previous one.
+  * ./src/audio_output/aout_pcm.c: another overrun fix; please test.
+  * ./configure.in: fixed a plugins/dsp.so compilation issue under OpenBSD.
+  * ./plugins/dsp/aout_dsp.c: OpenBSD compilation fix.
+  * ./src/video_output/video_output.c: fixed a segfault on exit.
+  * ./src/input/input.c: BeOS network support (no idea if it works when you
+    don't have BONE, though).
+  * ./include/common.h: BeOS compile fixes.
+  * ./plugins/beos/vout_beos.cpp: fixed BeOS video output.
+  * ./src/misc/configuration.c: fixed uninitialized variable in
+    config_Duplicate().
+  * ./src/audio_output/audio_output.c: char pointers obtained by
+    config_GetPszVariable need to be freed.
+  * ./src/interface/main.c: forgot to add the declaration of server_port.
+  * ./src/input/input.c: multicast now works under Win32, but this is a _bad_
+    kludge.
+  * ./include/threads.h: support for the State Threads Library, a userland
+    threads library (http://state-threads.sourceforge.net/). Useless to most
+    people, but can be handy to debug stuff. Activate with `--enable-st'.
+  * ./plugins/ac3_spdif/ac3_spdif.c, ./plugins/dvdread/dvdread.c,
+    ./plugins/dvd/dvd.c: adaptation to new configuration scheme for dvd,
+    dvdread and spdif.
+  * ./plugins/lirc/lirc.c: removed CVS garbage.
+  * ./plugins/gtk/gtk_menu.c: fixed a compile issue on IA64.
+  * ./plugins/fx/scope.c: new toy plugin, an audio scope module.
+  * ./src/audio_output/aout_spdif.h: replacement header for aout_common.h.
+  * ./src/audio_output/audio_output.c: fixed a quite old bug in the audio
+    output which made the sound stutter when wrapping around the audio output
+    fifo.
+  * ./src/audio_output/audio_output.c: lots of simplifications in the audio
+    output, got rid of b_stereo.
+  * ./plugins/gtk/*: added a menu in the GTK and gnome interfaces to change
+    the current program in multi-program streams (such as ones provided by a
+    DVB-S card).
+  * ./src/misc/configuration.c: new configuration architecture for vlc.
+  * ./src/interface/intf_msg.c: fixed array over-run bug in intf_MsgUnsub.
+  * ./configure.in: don't try to grok altivec with mingw32.
+  * ./configure.in: --with-directx-path should now indicate the path where the
+    actual headers are (before the headers had to be in an include subdir). By
+    the way you can download these header files from the videolan web site.
+  * ./src/misc/modules_plugin.h: if symbol foo isn't found in the
+    plugin, we always try to open _foo, whatever the architecture.
+  * ./plugins/lirc/lirc.c: non-blocking patch from Sigmund Augdal
+    <sigmunau@stud.ntnu.no>; hope this time my enhancements don't break
+    everything :-)
+  * ./configure.in: gtk*-config detection fix for FreeBSD.
+  * ./configure.in: removed a bashism.
+  * ./plugins/x11/xcommon.c: support for systems without shm.h.
+  * ALL: QNX compilation fixes here and there; the qnx plugin still doesn't
+    work.
+  * ./Makefile: the win32 port now uses a more recent version of gtk+.
+  * ./plugins/gtk/gtk.c: the log window is now black with colourful text.
+  * ./plugins/gtk/gnome.c: ported the log window to the GNOME interface.
+  * ./src/interface/intf_msg.c: messages are sent to the queue even if
+    -vvvv* wasn't specified.
+  * ./plugins/vcd/cdrom_tools.c: MacOS X VCD support.
+  * ./plugins/lirc/lirc.: various fixes, thanks to Sigmund Augdal.
+  * ./plugins/text/logger.c: rewrote an ugly loop.
+  * ./plugins/gtk/gtk.c: added a Gtk+ window containing all the log
+    messages; updated in real time. To open it, go to "view"->"messages".
+  * ./src/interface/intf_msg.c: got rid of TRACE and intf_DbgMsg which were
+    seldom used anyway.
+  * ./src/interface/intf_msg.c: all intf_*Msg functions now write to stderr.
+  * ./src/interface/intf_msg.c: implemented a message queue interface plugins
+    can subscribe to.
+  * ./plugins/text/logger.c: wrote the logger interface plugin. Usage:
+    vlc -I logger:filename.log.
+  * ./src/video_output/vout_subpictures.c: lots of fixes in the SPU renderer.
+  * ./src/video_output/video_output.c: fixed a typo in aspect ratio
+    calculation.
+  * ./plugins/macosx/vout_macosx.c: MacOS X vout improvements.
+  * ./plugins/macosx/intf_macosx.c: MacOS X intf now returns, allowing vlc to
+    terminate properly.
+  * ./Makefile: added a new make target: package-macosx.
+  * ./plugins/gtk/gtk_playlist.c: Win32 compilation fixes (mingw includes
+    dirent).
+  * ./configure.in: configure now checks for ddraw.h and not directx.h.
+  * ./plugins/directx/vout_directx.c: don't include directx.h anymore (this
+    file isn't part of the directx sdk).
+  * ./plugins/waveout/waveout.c: moved all the stuff from aout_waveout.c
+    directly into waveout.c (I don't know what I was thinking about when I
+    created these two files ;-)
+  * ./plugins/waveout/waveout.c: until we fix the audio buffer underrun
+    problem, waveout will be the default audio output on win32 (instead of
+    directx).
+  * ALL: got rid of *_Probe functions because most of them were duplicates
+    of the real _Init or _Create functions. That's 1000 lines of code gained.
+  * ./src/misc/modules.c: we try not to keep the global lock in module_Need,
+    which should speed up output spawning.
+  * ./plugins/dummy/input_dummy.c: fixed vlc:quit command.
+  * ./plugins/gtk/gtk_playlist.c: compilation fix.
+  * ./plugins/macosx/*: preliminary fixes for the vout4 port.
+  * ./plugins/gtk/*: Win32 fixes.
+  * ./plugins/beos/*: BeOS fixes from Rudolf Cornelissen.
+  * ./src/interface/main.c: --desync now really accepts a value in ms.
+  * ./plugins/vcd/input_vcd.c: fixed a crash when not opening a VCD.
+  * ./src/video_output/vout_subpictures.c: fixed subtitles under BeOS and
+    other architectures which don't support overlay.
+  * ./plugins/a52/a52.c: compilation fix (include stdint.h).
+  * ./plugins/a52/a52.c: fixed a SEGV.
+  * ./plugins/beos/vout_beos.cpp: ported the BeOS RGB video output to
+    vout4. The overlay video output still needs to be written though.
+  * ./plugins/a52/*: just renamed the liba52_adec plugin into a52 to comply
+    with the naming convention used by the other plugins.
+  * ./plugins/lirc/lirc.c: IR remote control plugin by Sigmund Augdal
+    <sigmunau@stud.ntnu.no>, activate with --enable-lirc.
+  * ./configure.in: put liba52_adec in a builtin for PIC/non-PIC reasons.
+  * ./plugins/liba52_adec/*: new AC3 decoder plugin using liba52 from Aaron
+    Holtzman and Michel Lespinasse.  This plugin isn't used by default, you
+    have to specify: --ac3_adec liba52.
+  * ./src/misc/modules.c: changed module_Need to make it possible to
+    have several modules with the same shortcut name.
+  * ./plugins/gtk/gtk_open.c: fixed a bug in the network dialog.
+  * ./src/misc/modules_plugin.h: added mstrtime() to module_symbols_t so we
+    can compile the mpeg_vdec plugin with TRACE mode enabled.
+  * ./plugins/ac3_spdif/ac3_spdif.c: fixed ac3_spdif which has been broken
+    recently.
+  * ./plugins/ac3_adec/ac3_adec.c: check frequency in ac3_adec and change fifo
+    if needed.
+  * ./src/audio_output/audio_output.c: moved initialisation of p_aout from
+    plugins to audio_output.c; if audio output rate is specified at launch
+    time, we try to use it by default.
+  * ./plugins/chroma/i420_rgb16.c: MMX YUV to RGB transformation for 15bpp.
+  * ./plugins/directx/vout_directx.c: added double-buffering for the directx
+    plugin in overlay mode.
+  * ./plugins/directx/vout_directx.c: several directx bug-fixes: implemented
+    the right behaviour on exit, fixed bug preventing the creation of several
+    windows  (the wall filter is working now :-)), fixed unnecessary background
+    redraws (it made the video flicker), fixed bug where we were losing the
+    video display because of lost surfaces in video memory, when using hardware
+    overlay, the output window will now specify "(using hardware overlay)".
+  * ./plugins/x11/xcommon.c: we don't use DPMS functions if they are
+    not available.
+  * ./plugins/win32/waveout.c: added a new very simple audio plugin for
+    Win32. This plugin uses the waveOut API which is a lot easier to use for
+    streaming stuff than directsound. (you don't have to take care of
+    underflows anymore because it doesn't use circular buffers). If you are
+    having a lot of underflows, this plugin is currently better adapted than
+    the directx plugin.
+  * ./src/audio_output/audio_output.c: moved some initialization stuff in
+    audio_out.c so we can now the caracteristics of the audio stream before
+    calling aout_Open().
+  * ./configure.in, Makefile: configure and Makefile tweaking for dvdread
+    module.
+  * ./src/misc/modules_plugin.h: fixed a missing function initialization
+    which made decoder plugins segfault in GetChunk calls.
+  * ./configure.in: proper soundcard.h check from Yves Duret.
+  * ./plugins/mpeg_adec/mpeg_adec.c: enabled --stereo option for streams that
+    pretend to be mono while they are not.
+  * ./plugins/ac3_adec/ac3_adec.c: fixed an alignment issue in the ac3 decoder.
+  * ./src/input/input_dec.c: decoders do not necessarily use bit stream (see
+    mad plug-in).
+  * ./plugins/mad/mad_adec.c: mad PTS should finally be accurate.
+  * ./configure.in: some configure changes.
+  * ./plugins/mad/mad_adec.c: libmad_input now takes one frame at a time (see
+    mad_adec.h for defines)
+  * ./plugins/mad/mad_libmad.c: audio_linear_dither() gives better sound
+    quality then s24_to_s16_pcm(), but also makes audio artefacts louder so
+    disabled it for now.
+  * ./plugins/mad/mad_libmad.c: cleaned up libmad_output.
+  * ./plugins/mad/mad_adec.c: cleaned up InitThread.
+  * ./plugins/mad/mad_adec.h: made buffer size match libmad's expectations.
+  * ./plugins/mad/DESIGN: updated documentation.
+  * ./plugins/directx/vout_events.c: fixed crashes on exit in the directx
+    plugin.
+  * ./src/video_output/vout_pictures.c: vout_PlacePicture is now accepting
+    picture width=height=0.
+  * ./configure.in: added extra checks for strange compilers such as
+    Borland C++ which do not support all gcc options. Note that vlc does
+    not compile with bcc32 yet, but is getting closer and closer to.
+  * ./plugins/win32: skeleton for the win32 interface Ipkiss is developing.
+  * ./config.guess ./config.sub: latest GNU versions.
+  * ./configure.in: when possible, xvideo is compiled as a plugin.
+  * ./vlc.spec: fixed a few minor inaccuracies.
+  * ./debian/control: vlc-gui is no longer depended on, but rather recommended.
+  * ./src/interface/main.c: --spumargin flag; use this to force displaying
+    subtitles at the bottom of the screen instead of putting them in the
+    middle, for instance: `--spumargin 5'.
+  * ./plugins/qnx/qnx.c, ./plugins/macosx/macosx.c, ./plugins/beos/beos.cpp:
+    converted the plugin initialization code of the macosx, beos and qnx
+    code. (please note that they should still not compile as they need
+    to be adapted to the new Vout4 architecture)
+  * ./plugins/directx/vout_directx.c: major rewrite of the directx video
+    plugin to adapt it to the new vout4 architecture. This plugin has also
+    been through a major clean-up and it is now much more robust and optimized.
+  * ./plugins/gtk/gtk_playlist.c: fixed a few problems with the win32 build.
+  * ./src/interface/main.c: replaced the "overlay" command line option with
+    "nooverlay". The former was confusing and useless because overlays were
+    used by default anyway.
+  * ./vlc.spec: imported MandrakeSoft's new spec file.
+  * ./debian/control: fixed build-dependencies for vlc-mad.
+  * ./debian/rules: fixed the vlc-arts and vlc-mad package builds.
+  * ./plugins/gtk/{gtk|gnome}.c: the gnome/gtk interface should no longer user
+    p_input->stream before it has been initialized.
+  * ./src/input/input.c: stream lock is initialized in input_CreateThread
+    instead of initThread, to have it initialized when we call it in the
+    interface.
+  * ./src/audio_output/audio_output.c: added support for S8 and U16 aout.
+  * ./debian/control: fixed Debian build-depends.
+  * ./include/config.h: changed RELEASE to HAVE_RELEASE because RELEASE
+    is already defined in <scsi/scsi.h> under Linux.
+  * ./plugins/mad/mad_adec.c: fixed issues in the PTS handling of the mad
+    plug-in (incomplete).
+  * ./src/input/input_ext-dec.c: more precise way to retrieve a PTS from the
+    bit stream.
+  * ./INSTALL.libmad: configure, build and install instructions for libmad
+    library and mad plugin.
+  * ./plugins/mad/mad_adec.c: smooth sound (not tested on iPaq).
+  * ./src/audio_output/aout_common.c: le coup de grâce: all the code in audio
+    output is now factorized (except for ac3 spdif) in aout_common.c/.h.
+  * ./src/audio_output/aout_common.h: aout thread functions are declared with
+    a macro.
+  * ./src/audio_output/audio_output.c: HUGE cleanings in audio output: removed
+    AOUT_INTF_*_FIFO, which where not used.
+  * ./src/audio_output/aout_common.c: factored S16StereoPlay, U8MonoPlay, and
+    so on.., in a single function aout_FillBuffer (unsigned 8bit may be broken,
+    but I have no stream to test with :(
+  * ./configure.in: a few fixes for the Win32 build.
+  * ./src/video_output/video_output.c: fixed all the problems related to
+    ToggleFullScreen().
+  * ./src/misc/modules.c: fixed a compile issue under platforms without
+    HAVE_DYNAMIC_PLUGINS.
+  * ./src/interface/intf_eject.c: MacOS X port.
+  * ./plugins/chroma/i420_rgb16.c: 24/32 bpp software YUV.
+  * ./plugins/ggi/ggi.c: activated double buffering.
+  * ./src/video_output/vout_pictures.c: we create more Xv pictures to
+    get smoother rendering.
+  * ./plugins/mad/mad_libmad.c: removed aout_CreateFifo from mad_adec.c
+    InitThread() and added it to mad_libmad.c.
+  * ./src/interface/intf_eject.c: BSD compilation fix suggested by Steven M.
+    Schultz.
+  * ./src/audio_output/aout_s16.c: beginning of code factorization in
+    aout_s16 (more cleaning will come). As for libmad, I have tried to create
+    the aout fifo in libmad_output, to open it with the right sample rate, but
+    strangely it didn't work.
+  * ./src/input/input.c: fixed a few segfaults caused by the dummy plugin.
+  * ./plugins/mpeg_adec/mpeg_adec.c: fixed a segfault due to misuse of
+    DecoderError.
+  * ./plugins/x11/xcommon.c: replaced XFlush with XSync. This must be the
+    fourth time someone has to commit this, so I added a reminder :-)
+  * ./plugins/mpeg_system/input_ts.c: hopefully fixed a bug in TS input, that
+    caused a segfault when there was no network stream.
+  * ./src/interface/intf_eject.c: BSD/OS port by Steven M. Schultz.
+  * ./include/modules_inner.h: replaced _X with __VLC_SYMBOL because _X was
+    already a system macro under MacOS X.
+  * ./plugins/dummy/dummy.c: fixed vlc:loop, vlc:quit, etc. entries.
+  * ./plugins/glide/glide.c: activated double buffering.
+  * ./plugins/mga/xmga.c: started writing an xmga plugin; doesn't work yet.
+  * ./src/input/input.c: fixed the input memory leak, and the insane thread
+    spawning we got with vlc:loop.
+  * ./src/misc/intf_eject.c: disc ejection routine courtesy of Julien Blache,
+    currently Linux-only.
+  * ./src/audio_output/aout_ext-dec.c: better communication between audio
+    decoder and output: aout plugins are now opened directly in the right
+    mode (works with mpeg_adec and ac3_adec, not tested with mad).
+  * ./src/audio_output/audio_output.c: first attempt to implement mono output
+    (doesn't work yet).
+  * ./plugins/dvdread/input_dvdread.c: DVDRead plugins works again more or
+    less ; major bugs remain but it is usable. It is selected by default if
+    you have it compiled.
+  * ./plugins/mpeg_vdec/vpar_headers.c: fixed a bug in QuantMatrixExtension,
+    many thanks to "Thomas L. Wood" <twood@lucent.com> !
+  * ./debian/control: updated list of supported architectures.
+  * ./share/*: added 16x16 and 32x32 versions of PNG icons.
+  * ./plugins/mga/mga.c: removed the mgammx module and put the code in
+    the chroma_i420_ymga module instead. This introduces a slight
+    performance issue as we now need to memcpy() the Y plane, but I have
+    some vout4 enhancements on their way which make this point moot.
+  * ./debian/changelog: imported official Debian changelog.
+  * ./debian/control: activated the vlc-mad and vlc-arts packages; package
+    builds should now work again.
+  * ./plugins/dvd/dvd.c: solved a symbol resolution issue when vlc was
+    compiled without libdvdcss which overflowed the return stack.
+  * ./plugins/ggi/ggi.c: ported the GGI plugin to vout4.
+  * ./plugins/glide/glide.c: ported the Glide plugin to vout4 (untested).
+  * ./src/input/input.c: prepared everything for multi-input mode; since
+    no interface is yet prepared to handle this, I changed them so that
+    they just use the first available input for now. This may break other
+    things, but I promise I'll eventually repair everything :-)
+  * ./plugins/mga/mga.c: pipeline and cache optimizations.
+  * ./plugins/mga/mga.c: MMX-accelerated version of the MGA plugin.
+  * ./plugins/mpeg_vdec/Makefile: little workaround for PA-Risc compilation.
+  * ./plugins/mad/mad_libmad.c: optimized libmad_output() for smoother sound.
+    It is still not optimal.
+  * ./plugins/fb/fb.c: ported the framebuffer video output to vout4.
+  * ./src/audio_output/aout_s16.c: fixed a segfault. It may have unexpected
+    side effects because I don't know this part of the code, but at least
+    it doesn't crash anymore.
+  * ./plugins/beos/beos.cpp: first attempt at porting the BeOS plugin to the
+    new video output and module systems. Doesn't work nor even compile yet.
+  * ./configure.in: we now check the gtk-config version.
+  * ./plugins/mga/mga.c: we use the MGA_VID_FSEL ioctl to select the
+    frame to be displayed. Unfortunately, increasing the number of
+    frames doesn't seem to work and makes the picture stutter...
+  * ./Makefile: fixed a bug when no builtins were selected.
+  * ./plugins/mga/mga.c: ported the MGA video output to vout4. Only does YV12
+    for the moment, and there is a strange bug with some streams which gives
+    only a green image. Needs to be looked at.
+  * ./plugins/x11/xcommon.c: fixed a few typos.
+  * ./plugins/mad/DESIGN: updated documentation.
+  * ./plugins/mad/TODO: updated TODO list.
+  * ./plugins/mad/BUGS: updated documentation.
+  * ./plugins/mad/mad_libmad.h: removed unused prototype from headerfile.
+  * ./configure.in: fix for obscure architectures like hppa where target_os
+    isn't properly detected.
+  * ./include/video_output.h: got rid of pf_setpalette; I'll find a nicer way.
+  * ./plugins/mga.c: fixed MGA module compilation. Doesn't work yet, though.
+  * ./include/common.h: hton64 is now an inline function.
+  * ./src/video_output/vout_pictures.c et al.: vout4 now automatically
+    detects when two chroma formats are the same, such as UYVY/Y422, or
+    roughly equivalent, such as I420/YV12. Plugins need not worry about
+    conversion anymore.
+  * ./BUGS: added a list of known bugs. Please add your findings!
+  * ./MODULES: added a short description of each module. Maybe we should
+    add more details to make this file really useful.
+  * ./doc/bugreport-howto.txt: wishful thinking...
+  * ./Makefile: added a workaround for the fact that .c files don't depend
+    on <videolan/vlc.h>.
+  * ./plugins/memcpy/memcpy.c: all memcpy modules are now built from the same
+    single file.
+  * ./src/interface/main.c: added the --nommx, --no3dnow, --nommxext, --nosse
+    and --noaltivec options to vlc.
+  * ./configure.in: removed the --disable-mmx option, now useless because
+    of the vlc --no* options.
+  * ./src/interface/main.c: fixed a crash caused by the memcpy module
+    being released too early.
+  * ./include/video.h: more vout4 changes, including margin support, more
+    FOURCC formats recognized, transparent support of identical or almost
+    identical FOURCC formats.
+  * ./include/video_output.h: added a vout_Render function to video output
+    modules which is to be executed before vout_Display.
+  * ./include/common.h: this header is back.
+  * ./plugins/chroma/i420_rgb.c: planar YUV 4:2:0 to packed RGB conversion
+    functions, mostly taken from vout3's yuv functions, but heavily modified
+    to use FAST_MEMCPY and to handle image dimensions which are not multiples
+    of 16. Not all functions have been written yet, though.
+  * ./plugins/chroma/i420_yuy2.c: planar YUV 4:2:0 to packed YUV conversion
+    functions, various targets such as 4:2:2 YUYV, YVYU, UYVY, or 2:1:1 YUYV,
+    with accelerated MMX versions.
+  * ./plugins/chroma/i422_yuy2.c: same as i420_yuy2.c but takes planar YUV
+    4:2:2 pictures in input. With accelerated MMX versions as well. This plugin
+    makes it possible to display 4:2:2 files on most video cards without the
+    quality loss of 4:2:0 downsampling.
+  * ./plugins/filter/*: thanks to the vout_Render function, all filters now
+    output their data perfectly in sync.
+  * ./plugins/dvdread/Makefile: fix to prevent unnecessary target rebuilds.
+  * ./plugins/sdl/vout_sdl.c: support for YV12, UYVY, YUY2 and YVYU overlays.
+  * ./plugins/x11/xcommon.c: support for I420, YV12, YUY2 and Y211 overlays.
+  * ./ChangeLog: imported the 0.2.92 changes, unrolled current CVS changes.
+  * ./include/config.h et al.: this file is no longer generated.
+  * ./include/video.h: we use the FOURCC definition of a chroma format to
+    describe picture types (see http://www.webartz.com/fourcc/).
+  * ./plugins/dvdread/input_dvdread.c: compilation fix by Eyal Lebedinsky.
+  * ./plugins/x11/xcommon.c: fixed the XShm operations order.
+  * ./plugins/x11/xcommon.c: small optimizations.
+  * ./plugins/x11/xcommon.c: removed unused code.
+  * ./plugins/x11/xcommon.c: your old window position and size are now restored
+    when you come out of fullscreen mode.
+  * ./plugins/esd/esd.c: fixed detection of the esd plugin.
+  * ./plugins/mpeg_system/input_ts.c: fixed the ts plugin's input type
+    detection.
+  * ./plugins/x11/xcommon.c: fixed the BadCursor error in the x11 and xvideo
+    plugins. For real this time (unlike my 2001/08/03 fix :p).
+  * ./plugins/filter/wall.c: made the wall filter work a bit better. It now
+    spawns a 3x2 mosaic, but this will eventually be configurable, à la
+    `--filter wall:3x3'.
+  * ./plugins/arts/arts.c: fixed the aRts audio output plugin.
+  * ./configure.in: removed duplicate function checks.
+  * ./Makefile.modules: added extra magic so that the module Makefiles are now
+    ridiculously simple. And I mean *simple*. Check it! This will make a
+    possible switch to full autoconf/automake a lot easier.
+  * ./include/modules_inner.h: added the vlc version name to the plugin
+    symbols, to be sure we only load plugins with the same version number. A
+    nasty consequence is that you need to rebuild your tree after midnight if
+    you are using a CVS tree :-)
+  * ./include/modules_export.h: got rid of modules_export.h by #defining
+    exported functions in the same header as their prototype.
+  * ./include/videolan/vlc.h: added modules_inner.h and other commonly used .h
+    files to common.h so there are less and less files to include, and renamed
+    common.h to <videolan/vlc.h>.
+  * ./src/misc/tests.c: first modifications to the module handling system
+    towards my ultimate goal to get rid of the *_Probe functions. Got rid of
+    TestMethod and TestCPU, as well as src/misc/tests.c.
+  * ./plugins/chroma/yv12_rgb8.c, ./plugins/chroma/yv12_rgb16.c: wrote the
+    chroma plugin handling functions. No YUV functions have been ported yet
+    because it'ls a lot of work, but the core system works, I tried it with a
+    naive yv12->rgb16 plugin (which will disappear when the real functions are
+    ready).
+  * ./plugins/dvd/dvd_summary.c: made a lot of functions one-liners to avoid
+    wasting too many output lines.
+  * ./plugins/dvd/input_dvd.c: fixed a segfault in DVDInit.
+  * ./plugins/gtk/fixfiles.sh: Added a fixfiles.sh script to be run after Glade
+    has generated its C files.
+  * ./plugins/kde/*: did some work on the KDE interface to make it suck a bit
+    less. It still segfaults, but at least it runs and it looks less ugly.
+  * ./plugins/sdl/vout_sdl.c: RGB SDL rendering works again, though in 16bpp
+    only.
+  * ./plugins/vcd/linux_cdrom_tools.c: made this file independent of any vlc
+    structure so that it'll be easily put in a library. Maybe libdvdcss?
+  * ./plugins/vcd/input_vcd.c: fixed VCD date display.
+  * ./plugins/x11/*: merged vout_xvideo.c, vout_x11.c and vout_common.c into
+    xcommon.c.
+  * ./plugins/x11/xcommon.c: wrote non-Shm XVideo output.
+  * ./plugins/x11/xcommon.c: made X11 output work again. Still pretty unstable,
+    only works for 16bpp.
+  * ./po/fr.po: additional french translation. Any taker for the rest?
+  * ./src/video_output/video_output.c: fixed a segfault when the allocated
+    pictures were not direct buffers.
+  * ./share/*: replaced 48x48 .xpm images with 32x32 ones to conform to Debian
+    policy (Closes Debian bug #126939).
+  * ./Makefile: removed the automatic ./configure launch when running
+    `make all' for the first time.
+  * ./plugins/filter/distort.c: --filter distort:ripple (Ok, ok, I promise it's
+    the last one !! :-)
+  * ./configure.in: fixed compilation with dvdcss disabled.
+  * ./configure.in: fixed compilation with plugins disabled.
+  * ./plugins/dvd/input_dvd.c, ./plugins/vcd/input_vcd.c: removed useless
+    variables in the VCD and DVD plugins.
+  * ./plugins/vcd/input_vcd.c: fixed a function which was returning
+    "struct foo" in the VCD plugin.
+  * ./plugins/x11/xcommon.c: fixed the old « XVideo eats more and more CPU »
+    bug I mistakenly reintroduced in my first vout4 commit.
+  * ./src/misc/modules: we now stop at the first ':' when looking for a module
+    name, to easily pass information to the modules. Possible example:
+    --vout sdl:software, implementation of such an option is left as an
+    exercise.
+  * ./plugins/filter/filter.c: merged filter_bob and filter_bob422 into
+    filter_bob. Use --filter bob to deinterlace 422 into 420 as well.
+  * ALL: factorized code common to most filters and the video output, optimized
     a few filters by aligning data and reading 64 bits at a time.
-  * Two new absolutely useless, CPU-eating, resource-wasting, but fun
-    filters: enjoy `transform', which performs flips and 90° rotations, and
-    `distort', which performs animated image effects (currently only a naive
-    sine wave is implemented). Usage examples: --filter transform:hflip,
+  * ./plugins/filter/transform.c, ./plugins/filter/distort.c: two new
+    absolutely useless, CPU-eating, resource-wasting, but fun filters: enjoy
+    `transform', which performs flips and 90° rotations, and `distort', which
+    performs animated image effects (currently only a naive sine wave is
+    implemented). Usage examples: --filter transform:hflip,
     --filter transform:vflip, --filter transform:90, --filter transform:180,
     --filter transform:270, --filter distort:wave.
-  * Added missing XSync() in the XVideo plugin.
-  * Pathetic attempt at a 4:2:2 renderer and deinterlacer, combining the
-    most awful line dropping techniques of both BOB and 422 to 420
-    downscaling. Don't worry, it should only survive for a couple of days.
-  * New stupid plugin: "--filter wall" for split-image playback :-)
-     (will evolve into a real image wall plugin when I have time)
-  * Filter plugins. Not very polished (please don't look at how the dates are
-    calculated!), but worth a try. Use the following flags:
-     "--filter invert" for inverse video
-     "--filter bob" for BOB deinterlacing
-  * Buffer choice optimizations - vout4 should eat even less CPU now.
-  * Fixed aspect ratio handling.
-  * Additional fixes for OSes with no gettext (thanks to ej0).
-  * Don't try to use gettext if we don't have GNU gettext. This may change
-    in the future though (most GNU software seems to include a local copy of
-    gettext in case the operating system doesn't provide it).
-  * Added vlc-arts to the debian package generation.
-  * (very old) russian translation courtesy of Valek Filippov <frob@df.ru>.
-  * Fixed a charset issue in the french translation.
-  * Updated config.guess and config.sub from GNU's latest versions.
-  * Added vlc.pot skeleton for translators.
-  * Removed unused code (intf_channels.c, keystrokes.h).
-  * Put common_win32.h back into common.h -- it wasn't that big and we
-    should not multiply header files.
-  * Added gettext support by Thomas Graf <reeler@reeler.org>, may be
-    broken on other platforms but we'll only see it when I'm finished
-    with vout 4 :-)
-  * New video output version 4, featuring direct to YUV buffer decoding,
-    non-ugly subtitle blending, XVideo and SDL video output.
-  * Renamed spu_dec to spudec and mad_adec to mad to stay coherent with
-    other plugins. Also, renamed mpeg to mpeg_system.
-  * Added jobi to the AUTHORS file.
-  * Factored code common to vout_x11.c and vout_xvideo.c.
+  * ./plugins/x11/xcommon.c: added missing XSync() in the XVideo plugin.
+  * ./plugins/filter/deinterlace.c: pathetic attempt at a 4:2:2 renderer and
+    deinterlacer, combining the most awful line dropping techniques of both BOB
+    and 422 to 420 downscaling. Don't worry, it should only survive for a
+    couple of days.
+  * ./plugins/filter/wall.c: new stupid plugin: "--filter wall" for split-image
+    playback :-) (will evolve into a real image wall plugin when I have time)
+  * ./plugins/filter/bob.c, ./plugins/filter/invert.c: filter plugins. Not very
+    polished (please don't look at how the dates are calculated!), but worth a
+    try. Use the following flags: "--filter invert" for inverse video,
+    "--filter bob" for BOB deinterlacing
+  * ./src/video_output/vout_pictures.c: buffer choice optimizations - vout4
+    should eat even less CPU now.
+  * ./src/video_output/video_output.c: fixed aspect ratio handling.
+  * ./src/interface/main.c: additional fixes for OSes with no gettext (thanks
+    to ej0).
+  * ./configure.in: don't try to use gettext if we don't have GNU gettext. This
+    may change in the future though (most GNU software seems to include a local
+    copy of gettext in case the operating system doesn't provide it).
+  * ./debian/rules, ./debian/control: added vlc-arts to the debian package
+    generation.
+  * ./po/ru.po: (very old) russian translation courtesy of Valek Filippov
+    <frob@df.ru>.
+  * ./po/fr.po: fixed a charset issue in the french translation.
+  * ./config.guess, ./config.sub: updated these files from GNU's latest
+    versions.
+  * ./po/vlc.pot: added vlc.pot skeleton for translators.
+  * ./src/interface/intf_channels.c, ./include/keystrokes.h: removed unused
+    files.
+  * ./include/common.h: put common_win32.h back into common.h -- it wasn't that
+    big and we should not multiply header files.
+  * ./src/interface/main.c: added gettext support by Thomas Graf
+    <reeler@reeler.org>, may be broken on other platforms but we'll only see
+    it when I'm finished with vout 4 :-)
+  * ./src/video_output/*: new video output version 4, featuring direct to YUV
+    buffer decoding, non-ugly subtitle blending, XVideo and SDL video output.
+  * ./plugins/spudec/*: renamed spu_dec to spudec and mad_adec to mad to stay
+    coherent with other plugins. Also, renamed mpeg to mpeg_system.
+  * ./AUTHORS: added jobi.
+  * ./plugins/x11/vout_common.c: voutFactored code common to vout_x11.c and
+    vout_xvideo.c.
 
 0.2.92
 Mon, 31 Dec 2001 19:50:40 +0100
@@ -311,11 +1082,11 @@ Mon, 12 Nov 2001 17:14:29 +0100
     very nice.
   * Fixed compilation errors in src/interface/main.c when the compiler did
     not support SSE or 3DNow! inline assembly.
-  * Qt fix in vlc.spec courtesy of Christopher Johnson <cjohnson@mint.net>.  
+  * Qt fix in vlc.spec courtesy of Christopher Johnson <cjohnson@mint.net>.
   * Fixed error reporting on an unknown argument parsing.
   * Fixed a deadlock in the TS input.
-  * Resizing the video out window in BeOS now retains the scaling.  
-  * Tidied up the BeOS code to remove interface messages not required.  
+  * Resizing the video out window in BeOS now retains the scaling.
+  * Tidied up the BeOS code to remove interface messages not required.
   * Fixed an error in the ts://server[:port][/broadcast] input parsing.
   * Minor video parser optimization.
   * SDL now displays an error message on 422 streams.
@@ -382,8 +1153,8 @@ Wed, 10 Oct 2001 15:00:29 +0200
   * Fixed bugs in the MacOS X port.
   * Faster configure script and as-yet untested Darwin patches.
   * Test for Altivec C extensions.
-  * If memalign isn't available, fall back on valloc.   
-  * Fixed a stupid mistake in NormScan().   
+  * If memalign isn't available, fall back on valloc.
+  * Fixed a stupid mistake in NormScan().
   * By default, use the real size of the stream for the video output size.
   * Altivec IDCT and motion compensation, courtesy of Michel Lespinasse for
     mpeg2dec (untested).
