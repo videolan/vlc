@@ -108,6 +108,7 @@ static inline int es_out_Control( es_out_t *out, int i_query, ... )
 enum access_query_e
 {
     /* capabilities */
+    ACCESS_CAN_SEEK,        /* arg1= vlc_bool_t*    cannot fail */
     ACCESS_CAN_FASTSEEK,    /* arg1= vlc_bool_t*    cannot fail */
     ACCESS_CAN_PAUSE,       /* arg1= vlc_bool_t*    cannot fail */
     ACCESS_CAN_CONTROL_PACE,/* arg1= vlc_bool_t*    cannot fail */
@@ -116,6 +117,8 @@ enum access_query_e
     ACCESS_GET_MTU,         /* arg1= int*           cannot fail (0 if no sense) */
     ACCESS_GET_SIZE,        /* arg1= int64_t*       cannot fail (0 if unknown) */
     ACCESS_GET_POS,         /* arg1= int64_t*       cannot fail */
+    ACCESS_GET_EOF,         /* arg1= vlc_bool_t*    cannot fail */
+    ACCESS_GET_PTS_DELAY,   /* arg1= int64_t*       cannot fail */
 
     /* */
     ACCESS_SET_PAUSE_STATE  /* arg1= vlc_bool_t     can fail if unsuported */
@@ -131,15 +134,15 @@ struct access_t
     /* Access name (empty if non forced) */
     char        *psz_access;
     char        *psz_path;
-    /* Access can fill this entry to force a deluxer */
+    /* Access can fill this entry to force a demuxer */
     char        *psz_demux;
 
     /* set by access (only one of pf_read/pf_block may be filled) */
     int         (*pf_read) ( access_t *, uint8_t *, int );  /* Return -1 if no data yet, 0 if no more data, else real data read */
     block_t    *(*pf_block)( access_t * );                  /* return a block of data in his 'natural' size */
-    int         (*pf_seek) ( access_t *, int64_t );
+    int         (*pf_seek) ( access_t *, int64_t );         /* can be null if can't seek */
 
-    int         (*pf_control)( access_t *, int i_query, va_list args);
+    int         (*pf_control)( access_t *, int i_query, va_list args);  /* mandatory */
     access_sys_t *p_sys;
 };
 
