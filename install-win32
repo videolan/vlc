@@ -59,7 +59,6 @@ Section "Install"
 
 	File  vlc.exe
 	File  *.txt
-	File  *.htm
 
 	File  /r share
 	File  /r plugins
@@ -73,7 +72,6 @@ Section "Install"
                        "$INSTDIR\vlc.exe" "--intf skins"
 	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc (custom).lnk" \
                        "$INSTDIR\vlc.exe" 
-	CreateShortCut "$SMPROGRAMS\VideoLAN\FAQ.lnk" "$INSTDIR\FAQ.htm"
 
         WriteRegStr HKLM \
             SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN \
