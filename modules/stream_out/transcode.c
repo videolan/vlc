@@ -459,7 +459,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->id = NULL;
     id->p_encoder = NULL;
 
-    if( p_fmt->i_cat == AUDIO_ES && p_sys->i_acodec != 0 )
+    if( p_fmt->i_cat == AUDIO_ES && (p_sys->i_acodec || p_sys->psz_aenc) )
     {
         msg_Dbg( p_stream,
                  "creating audio transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
@@ -502,7 +502,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             return NULL;
         }
     }
-    else if( p_fmt->i_cat == VIDEO_ES && p_sys->i_vcodec != 0 )
+    else if( p_fmt->i_cat == VIDEO_ES &&
+             (p_sys->i_vcodec != 0 || p_sys->psz_venc) )
     {
         msg_Dbg( p_stream,
                  "creating video transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
