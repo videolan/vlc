@@ -759,6 +759,7 @@ live.$(LIVEDOTCOM_VERSION).tar.gz:
 live: live.$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/live.patch
+	patch -p 0 < Patches/kasenna.patch
 
 .live: live
 	(cd $<; ./genmakefiles macosx && make )
@@ -986,6 +987,24 @@ libpng: libpng-$(PNG_VERSION).tar.bz2
 CLEAN_FILE += .png
 CLEAN_PKG += libpng
 DISCLEAN_PKG += libpng-$(PNG_VERSION).tar.bz2
+
+# ***************************************************************************
+# libzvbi
+# ***************************************************************************
+
+zvbi-$(ZVBI_VERSION).tar.bz2:
+	$(WGET) $(ZVBI_URL)
+
+zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.zvbi: zvbi
+	(cd $<; ./configure --prefix=$(PREFIX) && make )
+	touch $@
+
+CLEAN_FILE += .zvbi
+CLEAN_PKG += zvbi
+DISCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 
 # ***************************************************************************
 # Some cleansing
