@@ -2,7 +2,7 @@
  * var_bool.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_bool.hpp,v 1.3 2004/01/18 19:54:46 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -60,7 +60,7 @@ class VarBoolImpl: public VarBool
         virtual bool get() const { return m_value; }
 
         /// Set the internal value
-        virtual void set( bool value );
+        virtual void set( bool value, bool doNotify = true );
 
     private:
         /// Boolean value

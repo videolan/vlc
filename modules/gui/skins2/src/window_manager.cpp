@@ -147,19 +147,14 @@ void WindowManager::move( TopWindow &rWindow, int left, int top ) const
 }
 
 
-void WindowManager::raiseAll( TopWindow &rWindow ) const
+void WindowManager::raiseAll() const
 {
     // Raise all the windows
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        if( *it !=  &rWindow )
-        {
-            (*it)->raise();
-        }
+        (*it)->raise();
     }
-    // Make sure to raise the given window at the end, so that it is above
-    rWindow.raise();
 }
 
 

@@ -68,10 +68,10 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         virtual void refresh( int left, int top, int width, int height ) {}
 
         /// Get the coordinates of the window
-        virtual int getLeft() const { return m_left; }
-        virtual int getTop() const { return m_top; }
-        virtual int getWidth() const { return m_width; }
-        virtual int getHeight() const { return m_height; }
+        int getLeft() const { return m_left; }
+        int getTop() const { return m_top; }
+        int getWidth() const { return m_width; }
+        int getHeight() const { return m_height; }
 
         /// Give access to the visibility variable
         VarBool &getVisibleVar() { return m_varVisible; }

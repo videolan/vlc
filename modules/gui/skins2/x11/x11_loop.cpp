@@ -2,7 +2,7 @@
  * x11_loop.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_loop.cpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -31,6 +31,8 @@
 #include "x11_factory.hpp"
 #include "x11_timer.hpp"
 #include "../src/generic_window.hpp"
+#include "../src/theme.hpp"
+#include "../src/window_manager.hpp"
 #include "../events/evt_focus.hpp"
 #include "../events/evt_key.hpp"
 #include "../events/evt_mouse.hpp"
@@ -39,6 +41,7 @@
 #include "../events/evt_refresh.hpp"
 #include "../events/evt_scroll.hpp"
 #include "../commands/async_queue.hpp"
+#include "../utils/var_bool.hpp"
 #include "vlc_keys.h"
 
 
@@ -151,6 +154,13 @@ void X11Loop::handleX11Event()
 
     // Look for the next event in the queue
     XNextEvent( XDISPLAY, &event );
+
+    // If the "parent" window is mapped, show all the windows
+    if( event.xany.window == m_rDisplay.getMainWindow()
+        && event.type == MapNotify )
+    {
+        getIntf()->p_sys->p_theme->getWindowManager().showAll();
+    }
 
     // Find the window to which the event is sent
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );
@@ -375,9 +385,10 @@ void X11Loop::handleX11Event()
             break;
         }
 
-        default:
-            // XXX
-            fprintf(stderr, "unknown event: %d\n", event.type );
+        case UnmapNotify:
+            // Hack to update the visibility variable if the window
+            // is unmapped by the window manager
+            ((VarBoolImpl&)pWin->getVisibleVar()).set( false, false );
             break;
     }
 }

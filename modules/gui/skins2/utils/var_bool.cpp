@@ -2,7 +2,7 @@
  * var_bool.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: var_bool.cpp,v 1.3 2004/01/18 19:54:46 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -34,13 +34,15 @@ VarBoolImpl::VarBoolImpl( intf_thread_t *pIntf ):
 }
 
 
-void VarBoolImpl::set( bool value )
+void VarBoolImpl::set( bool value, bool doNotify )
 {
     if( value != m_value )
     {
         m_value = value;
-
-        notify();
+        if( doNotify )
+        {
+            notify();
+        }
     }
 }
 
