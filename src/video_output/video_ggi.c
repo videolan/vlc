@@ -34,7 +34,7 @@ typedef struct vout_sys_s
 
     /* Buffers informations */
     int                 i_buffer_index;                        /* buffer index */
-    ggi_directbuffer *  pp_buffer[2];                               /* buffers */
+    ggi_directbuffer *  p_buffer[2];                                /* buffers */
     boolean_t           b_must_acquire;     /* must be acquired before writing */    
 
     /* Characters size */
@@ -87,7 +87,7 @@ int vout_SysInit( vout_thread_t *p_vout )
     p_vout->p_sys->i_buffer_index = 0;
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceAcquire( p_vout->p_sys->pp_buffer[ 0 ]->resource, GGI_ACTYPE_WRITE );        
+        ggiResourceAcquire( p_vout->p_sys->p_buffer[ 0 ]->resource, GGI_ACTYPE_WRITE );        
     }    
 
     return( 0 );
@@ -103,7 +103,7 @@ void vout_SysEnd( vout_thread_t *p_vout )
     /* Release buffer */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceRelease( p_vout->p_sys->pp_buffer[ p_vout->p_sys->i_buffer_index ]->resource );
+        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->resource );
     }
 }
 
@@ -144,21 +144,21 @@ void vout_SysDisplay( vout_thread_t *p_vout )
     /* Change display frame */
     if( p_vout->p_sys->b_must_acquire )
     {            
-        ggiResourceRelease( p_vout->p_sys->pp_buffer[ p_vout->p_sys->i_buffer_index ]->resource );
+        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->resource );
     }    
     ggiFlush( p_vout->p_sys->p_display ); // ??    
     ggiSetDisplayFrame( p_vout->p_sys->p_display, 
-                        p_vout->p_sys->pp_buffer[ p_vout->p_sys->i_buffer_index ]->frame );      
+                        p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->frame );      
         
     /* Swap buffers and change write frame */
     p_vout->p_sys->i_buffer_index = ++p_vout->p_sys->i_buffer_index & 1;
     if( p_vout->p_sys->b_must_acquire )
     {            
-        ggiResourceAcquire( p_vout->p_sys->pp_buffer[ p_vout->p_sys->i_buffer_index ]->resource, 
+        ggiResourceAcquire( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->resource, 
                             GGI_ACTYPE_WRITE );
     } 
     ggiSetWriteFrame( p_vout->p_sys->p_display,
-                      p_vout->p_sys->pp_buffer[ p_vout->p_sys->i_buffer_index ]->frame );    
+                      p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->frame );    
  }
 
 /*******************************************************************************
@@ -168,7 +168,7 @@ void vout_SysDisplay( vout_thread_t *p_vout )
  *******************************************************************************/
 byte_t * vout_SysGetPicture( vout_thread_t *p_vout )
 {    
-    return( p_vout->p_sys->pp_buffer[ p_vout->p_sys->i_buffer_index ]->write );        
+    return( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->write );        
 }
 
 /*******************************************************************************
@@ -265,9 +265,9 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
     for( i_index = 0; i_index < 2; i_index++ )
     {
         /* Get buffer address */
-        p_vout->p_sys->pp_buffer[ i_index ] = 
+        p_vout->p_sys->p_buffer[ i_index ] = 
             ggiDBGetBuffer( p_vout->p_sys->p_display, i_index );
-        if( p_vout->p_sys->pp_buffer[ i_index ] == NULL )
+        if( p_vout->p_sys->p_buffer[ i_index ] == NULL )
         {
             intf_ErrMsg("error: double buffering is not possible\n");
             ggiClose( p_vout->p_sys->p_display );        
@@ -276,11 +276,11 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
         }        
         
         /* Check buffer properties */
-        if( ! (p_vout->p_sys->pp_buffer[ i_index ]->type & GGI_DB_SIMPLE_PLB) ||
-            (p_vout->p_sys->pp_buffer[ i_index ]->page_size != 0) ||
-            (p_vout->p_sys->pp_buffer[ i_index ]->write == NULL ) ||
-            (p_vout->p_sys->pp_buffer[ i_index ]->noaccess != 0) ||
-            (p_vout->p_sys->pp_buffer[ i_index ]->align != 0) )
+        if( ! (p_vout->p_sys->p_buffer[ i_index ]->type & GGI_DB_SIMPLE_PLB) ||
+            (p_vout->p_sys->p_buffer[ i_index ]->page_size != 0) ||
+            (p_vout->p_sys->p_buffer[ i_index ]->write == NULL ) ||
+            (p_vout->p_sys->p_buffer[ i_index ]->noaccess != 0) ||
+            (p_vout->p_sys->p_buffer[ i_index ]->align != 0) )
         {
             intf_ErrMsg("error: incorrect video memory type\n");
             ggiClose( p_vout->p_sys->p_display );        
@@ -289,7 +289,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
         } 
 
         /* Check if buffer needs to be acquired before write */
-        if( ggiResourceMustAcquire( p_vout->p_sys->pp_buffer[ i_index ]->resource ) )
+        if( ggiResourceMustAcquire( p_vout->p_sys->p_buffer[ i_index ]->resource ) )
         {
             p_vout->p_sys->b_must_acquire = 1;            
         }            
@@ -328,7 +328,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
     /* Set thread information */
     p_vout->i_width =           mode.visible.x;    
     p_vout->i_height =          mode.visible.y;
-    p_vout->i_bytes_per_line =  p_vout->p_sys->pp_buffer[ 0 ]->buffer.plb.stride;    
+    p_vout->i_bytes_per_line =  p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.stride;    
     switch( mode.graphtype )
     {
     case GT_15BIT:

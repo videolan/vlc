@@ -49,7 +49,6 @@
 #include "vlc_thread.h"
 #include "netutils.h"
 #include "debug.h"
-#include "xutils.h"
 #include "intf_msg.h"
 
 /* Input */

@@ -16,7 +16,7 @@
 #include <string.h>
 
 #ifdef VIDEO_X11
-#include <X11/Xlib.h>
+#include <X11/Xlib.h>                           /* for video_sys.h in X11 mode */
 #endif
 
 #include "common.h"
@@ -34,7 +34,7 @@
  *******************************************************************************/
 
 /* CLIP_BYTE: return value if between 0 and 255, else return nearest boundary 
- * (0 or 255) */
+ * (0 or 255), used to build translations tables */
 #define CLIP_BYTE( i_val ) ( (i_val < 0) ? 0 : ((i_val > 255) ? 255 : i_val) )
 
 /* YUV_GRAYSCALE: parametric macro for YUV grayscale transformation.
@@ -148,6 +148,7 @@ static void     RenderYUVGrayPicture    ( vout_thread_t *p_vout, picture_t *p_pi
 static void     RenderYUV16Picture      ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderYUV32Picture      ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderInfo              ( vout_thread_t *p_vout );
+static int      RenderIdle              ( vout_thread_t *p_vout, int i_level );
 
 /*******************************************************************************
  * vout_CreateThread: creates a new video output thread
@@ -221,7 +222,7 @@ vout_thread_t * vout_CreateThread               (
 #ifdef STATS
     p_vout->c_loops             = 0;
     p_vout->c_idle_loops        = 0;
-    p_vout->c_pictures          = 0;
+    p_vout->c_fps_samples       = 0;
 #endif      
 
     /* Create thread and set locks */
@@ -297,22 +298,16 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     char        psz_date[MSTRTIME_MAX_SIZE];         /* buffer for date string */
 #endif
 
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG
     /* Check if picture status is valid */
     if( p_pic->i_status != RESERVED_PICTURE )
     {
-        intf_DbgMsg("error: picture %d has invalid status %d\n", 
-                    p_pic, p_pic->i_status );       
+        intf_DbgMsg("error: picture %d has invalid status %d\n", p_pic, p_pic->i_status );       
     }   
 #endif
 
     /* Remove reservation flag */
     p_pic->i_status = READY_PICTURE;
-
-#ifdef STATS
-    /* Update stats */
-    p_vout->c_pictures++;
-#endif
 
 #ifdef DEBUG_VIDEO
     /* Send picture informations */
@@ -457,12 +452,11 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
  *******************************************************************************/
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifdef DEBUG_VIDEO
+#ifdef DEBUG
    /* Check if picture status is valid */
    if( p_pic->i_status != RESERVED_PICTURE )
    {
-       intf_DbgMsg("error: picture %d has invalid status %d\n", 
-                   p_pic, p_pic->i_status );       
+       intf_DbgMsg("error: picture %d has invalid status %d\n", p_pic, p_pic->i_status );       
    }   
 #endif
 
@@ -483,12 +477,11 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->lock );
     p_pic->i_refcount++;
+    vlc_mutex_unlock( &p_vout->lock );
 
 #ifdef DEBUG_VIDEO
     intf_DbgMsg("picture %p\n", p_pic);    
 #endif
-
-    vlc_mutex_unlock( &p_vout->lock );
 }
 
 /*******************************************************************************
@@ -504,12 +497,11 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
 	p_pic->i_status = DESTROYED_PICTURE;
     }
+    vlc_mutex_unlock( &p_vout->lock );
 
 #ifdef DEBUG_VIDEO
     intf_DbgMsg("picture %p\n", p_pic);    
 #endif
-
-    vlc_mutex_unlock( &p_vout->lock );    
 }
 
 /* following functions are local */
@@ -530,18 +522,11 @@ static int InitThread( vout_thread_t *p_vout )
     *p_vout->pi_status = THREAD_START;    
     
     /* Initialize pictures */    
-    p_vout->i_pictures = 0;
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
         p_vout->p_picture[i_index].i_type  = EMPTY_PICTURE;
         p_vout->p_picture[i_index].i_status= FREE_PICTURE;
     }
-
-#ifdef STATS
-    /* Initialize FPS index - since samples won't be used until a minimum of
-     * pictures, they don't need to be initialized */
-    p_vout->i_fps_index = 0;    
-#endif
 
     /* Initialize output method - this function issues its own error messages */
     if( vout_SysInit( p_vout ) )
@@ -644,7 +629,7 @@ static int InitThread( vout_thread_t *p_vout )
     p_vout->b_active =          1;    
     *p_vout->pi_status =        THREAD_READY;    
     intf_DbgMsg("thread ready\n");    
-    return(0);    
+    return( 0 );    
 }
 
 /*******************************************************************************
@@ -658,10 +643,13 @@ static void RunThread( vout_thread_t *p_vout)
 {
     int             i_picture;                                /* picture index */
     int             i_err;                                       /* error code */
+    int             i_idle_level = 0;                            /* idle level */
     mtime_t         current_date;                              /* current date */
-    picture_t *     p_pic;                                  /* picture pointer */    
     mtime_t         pic_date = 0;                              /* picture date */    
-
+    mtime_t         last_date = 0;                        /* last picture date */    
+    boolean_t       b_display;                                 /* display flag */    
+    picture_t *     p_pic;                                  /* picture pointer */
+     
     /* 
      * Initialize thread and free configuration 
      */
@@ -693,6 +681,7 @@ static void RunThread( vout_thread_t *p_vout)
                 pic_date = p_pic->date;                
 	    }
 	}
+        current_date = mdate();
 
         /* 
 	 * Render picture if any
@@ -701,57 +690,38 @@ static void RunThread( vout_thread_t *p_vout)
         {
 #ifdef STATS
             /* Computes FPS rate */
-            p_vout->fps_sample[ p_vout->i_fps_index++ ] = pic_date;
-            if( p_vout->i_fps_index == VOUT_FPS_SAMPLES )
-            {
-                p_vout->i_fps_index = 0;                
-            }                            
-#endif
-	    current_date = mdate();
+            p_vout->fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = pic_date;
+#endif	    
 	    if( pic_date < current_date )
 	    {
-		/* Picture is late: it will be destroyed and the thread will go
-		 * immediately to next picture */
-		if( p_pic->i_refcount )
-		{
-		    p_pic->i_status = DISPLAYED_PICTURE;
-		}
-		else
-		{
-		    p_pic->i_status = DESTROYED_PICTURE;
-		}
-
+		/* Picture is late: it will be destroyed and the thread will sleep and
+                 * go to next picture */
+                vlc_mutex_lock( &p_vout->lock );
+                p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
+                vlc_mutex_unlock( &p_vout->lock );
 #ifdef DEBUG_VIDEO
 		intf_DbgMsg( "warning: late picture %p skipped\n", p_pic );
 #endif
-                p_pic = NULL;
+                p_pic =         NULL;                
 	    }
 	    else if( pic_date > current_date + VOUT_DISPLAY_DELAY )
 	    {
 		/* A picture is ready to be rendered, but its rendering date is
 		 * far from the current one so the thread will perform an empty loop
 		 * as if no picture were found. The picture state is unchanged */
-		p_pic = NULL;
+                p_pic =         NULL;                
 	    }
 	    else
 	    {
 		/* Picture has not yet been displayed, and has a valid display
-		 * date : render it, then forget it */
-		RenderPicture( p_vout, p_pic );
-                if( p_pic->i_refcount )
-		{
-		    p_pic->i_status = DISPLAYED_PICTURE;
-		}
-		else
-		{
-		    p_pic->i_status = DESTROYED_PICTURE;
-		}
-
-                /* Print additional informations */
-                if( p_vout->b_info )
+		 * date : render it, then mark it as displayed */
+                if( p_vout->b_active )
                 {                    
-                    RenderInfo( p_vout );
+                    RenderPicture( p_vout, p_pic );
                 }                
+                vlc_mutex_lock( &p_vout->lock );
+                p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
+                vlc_mutex_unlock( &p_vout->lock );
 	    }
         }
 
@@ -767,26 +737,51 @@ static void RunThread( vout_thread_t *p_vout)
 	    p_vout->b_error = 1;
 	}
 	else 
-	{
+	{            
 	    if( p_pic )
 	    {
-		/* A picture is ready to be displayed : sleep until its display date */
+		/* A picture is ready to be displayed : remove blank screen flag */
+                last_date =     pic_date;
+                i_idle_level =  0;
+                b_display =     1;                
+                
+                /* Render additionnal informations */
+                if( p_vout->b_active && p_vout->b_info )
+                {
+                    RenderInfo( p_vout );    
+                }                
+                
+                /* Sleep until its display date */
 		mwait( pic_date );
-
-		if( !i_err )
-		{
-		    vout_SysDisplay( p_vout );
-		}
 	    }
 	    else
 	    {
-		/* Sleep to wait for new pictures */
-		msleep( VOUT_IDLE_SLEEP );
+                /* If last picture was a long time ago, increase idle level, reset
+                 * date and render idle screen */
+                if( !i_err && (current_date - last_date > VOUT_IDLE_DELAY) )
+                {       
+                    last_date = current_date;                    
+                    b_display = p_vout->b_active && RenderIdle( p_vout, i_idle_level++ );
+                }
+                else
+                {
+                    b_display = 0;                    
+                }
+                
 #ifdef STATS
 		/* Update counters */
 		p_vout->c_idle_loops++;
 #endif
+
+		/* Sleep to wait for new pictures */
+		msleep( VOUT_IDLE_SLEEP );
 	    }
+
+            /* On awakening, send immediately picture to display */
+            if( b_display && p_vout->b_active )
+            {
+                vout_SysDisplay( p_vout );
+            }
 	}
 
 #ifdef STATS
@@ -1135,37 +1130,91 @@ static void RenderYUV32Picture( vout_thread_t *p_vout, picture_t *p_pic )
 static void RenderInfo( vout_thread_t *p_vout )
 {
     char        psz_buffer[256];                              /* string buffer */
+#ifdef DEBUG
+    int         i_ready_pic = 0;                             /* ready pictures */
+    int         i_reserved_pic = 0;                       /* reserved pictures */
+    int         i_picture;                                    /* picture index */
+#endif
 
 #ifdef STATS
-    /* Print FPS rate */
-    if( p_vout->c_pictures > VOUT_FPS_SAMPLES )
+    /* Print FPS rate in upper right corner */
+    if( p_vout->c_fps_samples > VOUT_FPS_SAMPLES )
     {        
         sprintf( psz_buffer, "%.2f fps", (double) VOUT_FPS_SAMPLES * 1000000 /
-                 ( p_vout->fps_sample[ (p_vout->i_fps_index + (VOUT_FPS_SAMPLES - 1)) % 
-                                     VOUT_FPS_SAMPLES ] -
-                   p_vout->fps_sample[ p_vout->i_fps_index ] ) );        
+                 ( p_vout->fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
+                   p_vout->fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );        
         vout_SysPrint( p_vout, p_vout->i_width, 0, 1, -1, psz_buffer );
     }
 
-    /* Print statistics */
-    sprintf( psz_buffer, "%ld pictures, %.1f %% idle loops", p_vout->c_pictures,
-             (double) p_vout->c_idle_loops * 100 / p_vout->c_loops );    
+    /* Print statistics in upper left corner */
+    sprintf( psz_buffer, "%ld frames (%.1f %% idle)", p_vout->c_fps_samples,
+             p_vout->c_loops ? 
+             (double ) p_vout->c_idle_loops * 100 / p_vout->c_loops : 100. );    
     vout_SysPrint( p_vout, 0, 0, -1, -1, psz_buffer );    
 #endif
     
 #ifdef DEBUG
-    /* Print heap size  */
-    sprintf( psz_buffer, "video heap size: %d (%.1f %%)", p_vout->i_pictures,
-             (double) p_vout->i_pictures * 100 / VOUT_MAX_PICTURES );
+    /* Print heap state in lower left corner  */
+    for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
+    {
+        switch( p_vout->p_picture[i_picture].i_status )
+        {
+        case RESERVED_PICTURE:
+            i_reserved_pic++;            
+            break;            
+        case READY_PICTURE:
+            i_ready_pic++;            
+            break;            
+        }        
+    }
+    sprintf( psz_buffer, "video heap: %d/%d/%d", i_reserved_pic, i_ready_pic, 
+             VOUT_MAX_PICTURES );
     vout_SysPrint( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
 #endif
 
 #ifdef DEBUG_VIDEO
-    /* Print rendering statistics */
+    /* Print rendering statistics in lower right corner */
     sprintf( psz_buffer, "picture rendering time: %lu us", 
              (unsigned long) p_vout->picture_render_time );    
     vout_SysPrint( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );    
 #endif
 }
 
+/*******************************************************************************
+ * RenderIdle: render idle picture
+ *******************************************************************************
+ * This function will clear the display or print a logo. Level will vary from 0
+ * to a very high value that noone should never reach. It returns non 0 if 
+ * something needs to be displayed and 0 if the previous picture can be kept.
+ *******************************************************************************/
+static int RenderIdle( vout_thread_t *p_vout, int i_level )
+{
+    byte_t      *pi_pic;                            /* pointer to picture data */
+    
+    /* Get frame pointer and clear display */
+    pi_pic = vout_SysGetPicture( p_vout );    
+     
+    
+    switch( i_level )
+    {
+    case 0:                                           /* level 0: clear screen */
+        memset( pi_pic, 0, p_vout->i_bytes_per_line * p_vout->i_height );
+        break;                
+    case 1:                                            /* level 1: "no stream" */        
+        memset( pi_pic, 0, p_vout->i_bytes_per_line * p_vout->i_height );
+        vout_SysPrint( p_vout, p_vout->i_width / 2, p_vout->i_height / 2,
+                       0, 0, "no stream" );     
+        break;
+    case 50:                                    /* level 50: copyright message */
+        memset( pi_pic, 0, p_vout->i_bytes_per_line * p_vout->i_height );
+        vout_SysPrint( p_vout, p_vout->i_width / 2, p_vout->i_height / 2,
+                       0, 0, COPYRIGHT_MESSAGE );        
+        break; 
+    default:                            /* other levels: keep previous picture */
+        return( 0 );
+        break;        
+    }
+
+    return( 1 );    
+}
 

@@ -41,10 +41,6 @@ char *mstrtime( char *psz_buffer, mtime_t date )
  ******************************************************************************
  * Uses the gettimeofday() function when possible (1 MHz resolution) or the
  * ftime() function (1 kHz resolution).
- ******************************************************************************
- * to-do list: ??
- *  implement the function when gettimeofday is not available
- *  this function should be decalred as inline
  ******************************************************************************/
 mtime_t mdate( void )
 {
@@ -63,11 +59,6 @@ mtime_t mdate( void )
  * This function uses select() and an system date function to wake up at a
  * precise date. It should be used for process synchronization. If current date
  * is posterior to wished date, the function returns immediately.
- ******************************************************************************
- * to-do list:
- *  implement the function when gettimeofday is not available
- *  optimize delay calculation
- *  ?? declare as inline
  ******************************************************************************/
 void mwait( mtime_t date )
 {

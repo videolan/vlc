@@ -35,15 +35,17 @@ typedef struct vout_thread_s
     float               f_x_ratio;                 /* horizontal display ratio */
     float               f_y_ratio;                   /* vertical display ratio */
 
+    /* New size for resizeable windows - they may be ignored or handled by
+     * vout_SysManage */
+    int                 i_new_width;                              /* new width */    
+    int                 i_new_height;                            /* new height */    
+
 #ifdef STATS    
-    /* Statistics */
+    /* Statistics - these numbers are not supposed to be accurate */
     count_t             c_loops;                            /* number of loops */
     count_t             c_idle_loops;                  /* number of idle loops */
-    count_t             c_pictures;        /* number of pictures added to heap */
-
-    /* FPS */
-    mtime_t             fps_sample[ VOUT_FPS_SAMPLES ];       /* samples dates */
-    int                 i_fps_index;                       /* index in samples */
+    count_t             c_fps_samples;                       /* picture counts */    
+    mtime_t             fps_sample[ VOUT_FPS_SAMPLES ];   /* FPS samples dates */
 #endif
 
 #ifdef DEBUG_VIDEO
@@ -55,7 +57,6 @@ typedef struct vout_thread_s
     p_vout_sys_t        p_sys;                         /* system output method */
 
     /* Video heap */
-    int                 i_pictures;                       /* current heap size */
     picture_t           p_picture[VOUT_MAX_PICTURES];              /* pictures */
 
     /* YUV translation tables, for 15,16 and 24/32 bpp displays. 16 bits and 32

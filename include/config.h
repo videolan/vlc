@@ -16,7 +16,6 @@
  *   + variable names should end with '_VAR'
  *   + environment variable default value should end with '_DEFAULT'
  *   + values having a special meaning with '_VAL' 
- *   + complete environment strings with '_ENV'
  *   
  */
 
@@ -24,26 +23,29 @@
  * Program information
  *******************************************************************************/
 
-/* Program options */
+/* Program options - this part will produce a copyright message with compilation
+ * options informations, based on some definines set in the Makefile - do not
+ * edit */
 #if defined(VIDEO_X11)
-#define VIDEO_OPTIONS           "X11"
+#define VIDEO_OPTIONS                   "X11"
 #elif defined(VIDEO_FB)
-#define VIDEO_OPTIONS           "Framebuffer"
+#define VIDEO_OPTIONS                   "Framebuffer"
 #elif defined(VIDEO_GGI)
-#define VIDEO_OPTIONS           "GGI"
+#define VIDEO_OPTIONS                   "GGI"
 #else
-#define VIDEO_OPTIONS           ""
+#define VIDEO_OPTIONS                   ""
 #endif
 #if defined(HAVE_MMX)
-#define ARCH_OPTIONS            "MMX"
+#define ARCH_OPTIONS                    "MMX"
 #else
-#define ARCH_OPTIONS            ""
+#define ARCH_OPTIONS                    ""
 #endif
-#define PROGRAM_OPTIONS         VIDEO_OPTIONS " " ARCH_OPTIONS
+#define PROGRAM_OPTIONS                 VIDEO_OPTIONS " " ARCH_OPTIONS
 
 /* Program version and copyright message */
-#define PROGRAM_VERSION		"1.0-dev"
-#define COPYRIGHT_MESSAGE	"VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - " PROGRAM_OPTIONS " - (c)1999-2000 VideoLAN\n"
+#define PROGRAM_VERSION		        "DR 2.1"
+#define COPYRIGHT_MESSAGE	        "VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - " \
+                                        PROGRAM_OPTIONS " - (c)1999 VideoLAN"
 
 /*******************************************************************************
  * General compilation options
@@ -59,7 +61,8 @@
  * and might cause problems with some very weird streams. */
 //#define MPEG2_COMPLIANT
 
-/* Define for profiling support */
+/* Define for profiling and statistics support - such informations, like FPS
+ * or pictures count won't be available if it not set */
 #define STATS
 
 /* Define for unthreaded version of the program - ?? not yet implemented */
@@ -72,11 +75,8 @@
 /* General debugging support */
 #define DEBUG
 
-/* Extended debugging support - in this mode, debugging messages will have their
- * date and context printed */
-#define DEBUG_CONTEXT
-
-/* Modules specific debugging */
+/* Modules specific debugging - this will produce a lot of output, but can be
+ * usefull to track a bug */
 #define DEBUG_INTF
 #define DEBUG_INPUT
 #define DEBUG_AUDIO
@@ -85,32 +85,20 @@
 /* Debugging log file - if defined, a file can be used to store all messages. If
  * DEBUG_LOG_ONLY is defined, debug messages will only be printed to the log and
  * will not appear on the screen */
-#define DEBUG_LOG       "vlc-debug.log"
-#define DEBUG_LOG_ONLY  
-
+#define DEBUG_LOG                       "vlc-debug.log"
+#define DEBUG_LOG_ONLY
 
 /*******************************************************************************
- * Common settings
+ * General configuration
  *******************************************************************************/
 
 /* Automagically spawn input, audio and video threads ? */
+// ?? used ?
 #define AUTO_SPAWN
 
-/* Startup script */
-#define INTF_INIT_SCRIPT_VAR	  "vlc_init"
-#define INTF_INIT_SCRIPT_DEFAULT  "vlc.init"
-
-/* ?? */
-#define THREAD_SLEEP    100000
-
-/*
- * X11/XLib settings
- */
-
-/* Default font used when a wished font could not be loaded - note that this
- * font should be universal, else the program will exit when it can't find
- * a font */
-#define X11_DEFAULT_FONT                "fixed"
+/* When creating or destroying threads in blocking mode, delay to poll thread
+ * status */
+#define THREAD_SLEEP                    10000
 
 /*
  * Decoders FIFO configuration
@@ -118,6 +106,28 @@
 
 /* Size of the FIFO. FIFO_SIZE+1 must be a multiple of 2 */
 #define FIFO_SIZE                       1023
+
+
+/*******************************************************************************
+ * Interface configuration
+ *******************************************************************************/
+
+/* Environment variable used to store startup script name and default value */
+#define INTF_INIT_SCRIPT_VAR	        "vlc_init"
+#define INTF_INIT_SCRIPT_DEFAULT        "vlc.init"
+
+/* Base delay in micro second for interface sleeps */
+#define INTF_IDLE_SLEEP                 100000
+
+/*
+ * X11 settings
+ */
+
+/* Title of the X11 window */
+#define VOUT_TITLE                      "VideoLAN Client"
+
+/* Environment variable used in place of DISPLAY if available */
+#define ENV_VLC_DISPLAY                 "vlc_DISPLAY"
 
 /*******************************************************************************
  * Input thread configuration
@@ -218,9 +228,6 @@
  * Default settings for video output threads
  */
 
-/* Title of the window */
-#define VOUT_TITLE                      "VideoLAN Client"
-
 /* Default dimensions for display window - these dimensions are the standard 
  * width and height for broadcasted MPEG-2 */
 #define VOUT_WIDTH                      544
@@ -233,9 +240,6 @@
 /* Environment variable for grayscale output mode, and default value */
 #define VOUT_GRAYSCALE_VAR              "vlc_grayscale"
 #define VOUT_GRAYSCALE_DEFAULT          0
-
-/* Number of pictures required to computes the FPS rate */
-#define VOUT_FPS_SAMPLES                5
 
 /*
  * Time settings
@@ -254,6 +258,12 @@
 /* ?? this constant will probably evolve to a calculated value */
 #define VOUT_DISPLAY_DELAY              100000
 
+/* Delay (in microseconds) between increments in idle levels */
+#define VOUT_IDLE_DELAY                 5000000
+
+/* Number of pictures required to computes the FPS rate */
+#define VOUT_FPS_SAMPLES                5
+
 /*
  * Framebuffer settings
  */
@@ -271,8 +281,8 @@
 
 /* Font maximum and minimum characters - characters outside this range are not
  * printed - maximum range is 1-256 */
-#define VOUT_MIN_CHAR 1
-#define VOUT_MAX_CHAR 128
+#define VOUT_MIN_CHAR                   1
+#define VOUT_MAX_CHAR                   128
 
 /*******************************************************************************
  * Video parser configuration
@@ -310,66 +320,7 @@
 #define GDEC_IDLE_SLEEP                 100000
 
 /*******************************************************************************
- * Interface (main) thread configuration
- *******************************************************************************/
-
-/*
- * Interface configuration
- */
-
-/* Base delay in micro second for interface sleeps ?? */
-#define INTF_IDLE_SLEEP                 100000
-
-/* Maximal number of arguments on a command line, including the function name */
-#define INTF_MAX_ARGS                   20
-
-/* Maximal size of a command line in a script */
-#define INTF_MAX_CMD_SIZE               240
-/*
- * X11 interface properties
- */
-#define INTF_APP_CLASS                  "vlc"
-#define INTF_APP_NAME                   "vlc"
-
-/*
- * X11 console properties
- */
-
-/* Title of the X11 console interface window */
-#define INTF_XCONSOLE_TITLE             "VideoLAN Client: console"
-
-/* Welcome message: this message is always displayed when a new console is
- * openned */
-#define INTF_XCONSOLE_WELCOME_MSG       COPYRIGHT_MESSAGE "try `help' to have a list of available commands"
-
-/* Background pixmap - if not defined, no pixmap is used */
-#define INTF_XCONSOLE_BACKGROUND_PIXMAP "Resources/background.xpm"
-
-/* Default X11 console interface window geometry. It should at least give a
- * default size */
-#define INTF_XCONSOLE_GEOMETRY          "400x100"
-
-/* Font used in console. If first font is not found, the fallback font is
- * used. Therefore, the fallback font should be a universal one. */
-#define INTF_XCONSOLE_FONT              "-*-helvetica-medium-r-normal-*-18-*-*-*-*-*-iso8859-1"
-
-/* Number of memorized lines in X11 console window text zone */
-#define INTF_CONSOLE_MAX_TEXT         100
-
-/* Maximal number of commands which can be saved in history list */
-#define INTF_CONSOLE_MAX_HISTORY      20
-
-/* Maximum width of a line in an X11 console window. If a larger line is
- * printed, it will be wrapped. */
-#define INTF_XCONSOLE_MAX_LINE_WIDTH    120
-
-#define ENV_VLC_DISPLAY "vlc_DISPLAY"
-
-#define INTF_MAIN_WIDTH  600
-#define INTF_MAIN_HEIGHT 600
-
-/*******************************************************************************
- * Interface messages functions
+ * Messages and console interfaces configuration
  *******************************************************************************/
 
 /* Maximal size of the message queue - in case of overflow, all messages in the
@@ -384,7 +335,19 @@
 /* Format of the header for debug messages. The arguments following this header
  * are the file (char *), the function (char *) and the line (int) in which the
  * message function was called */
-#define INTF_MSG_DBG_FORMAT "## %s:%s(),%i: "
+#define INTF_MSG_DBG_FORMAT             "## %s:%s(),%i: "
+
+/* Maximal number of arguments on a command line, including the function name */
+#define INTF_MAX_ARGS                   20
+
+/* Maximal size of a command line in a script */
+#define INTF_MAX_CMD_SIZE               240
+
+/* Number of memorized lines in console window text zone */
+#define INTF_CONSOLE_MAX_TEXT           100
+
+/* Maximal number of commands which can be saved in history list */
+#define INTF_CONSOLE_MAX_HISTORY        20
 
 /*******************************************************************************
  * Network and VLAN management

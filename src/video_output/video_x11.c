@@ -109,7 +109,8 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, Window root_window
 /*******************************************************************************
  * vout_SysInit: initialize X11 video thread output method
  *******************************************************************************
- * This function create the XImages needed by the output thread.
+ * This function create the XImages needed by the output thread. It is called
+ * at the beginning of the thread, but also each time the window is resized.
  *******************************************************************************/
 int vout_SysInit( vout_thread_t *p_vout )
 { 
@@ -160,6 +161,9 @@ int vout_SysInit( vout_thread_t *p_vout )
         }
     }
 
+    /* Set bytes per line */
+    p_vout->i_bytes_per_line = p_vout->p_sys->p_ximage[0]->bytes_per_line;    
+
     /* Set buffer index to 0 */
     p_vout->p_sys->i_buffer_index = 0;
     return( 0 );
@@ -168,7 +172,8 @@ int vout_SysInit( vout_thread_t *p_vout )
 /*******************************************************************************
  * vout_SysEnd: terminate X11 video thread output method
  *******************************************************************************
- * Destroy the X11 XImages created by vout_SysInit.
+ * Destroy the X11 XImages created by vout_SysInit. It is called at the end of 
+ * the thread, but also each time the window is resized.
  *******************************************************************************/
 void vout_SysEnd( vout_thread_t *p_vout )
 {
@@ -208,10 +213,25 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  *******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
-    //??
-    return 0;
+    if( (p_vout->i_width != p_vout->i_new_width) || 
+        (p_vout->i_height != p_vout->i_new_height) )
+    {
+        /* Resize window */
+        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 
+                       p_vout->i_new_width, p_vout->i_new_height );
 
-    // ?? if resized: end/init again, return >0
+        /* Destroy then recreate XImages to change their size */
+        vout_SysEnd( p_vout );
+        p_vout->i_width = p_vout->i_new_width;
+        p_vout->i_height = p_vout->i_new_height;
+        // ?? bpl
+        vout_SysInit( p_vout );        
+
+        /* Cancel current display */
+        return( 1 );        
+    }
+    
+    return 0;
 }
 
 /*******************************************************************************
@@ -379,14 +399,17 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
         break;
     }    
 
-    /* Create a window and set line length */
+    /* Create a window */
     if( X11CreateWindow( p_vout ) )
     {
         intf_ErrMsg("error: can't open a window\n");        
         XCloseDisplay( p_vout->p_sys->p_display );        
         return( 1 );
     }
-    p_vout->i_bytes_per_line = p_vout->i_width * p_vout->i_bytes_per_pixel;    
+
+    /* Store additionnal vout informations */
+    p_vout->i_new_width =       p_vout->i_width;
+    p_vout->i_new_height =      p_vout->i_height;    
 
     /* Get font information */
     if( X11GetFont( p_vout ) )
@@ -581,6 +604,8 @@ static void X11DestroyWindow( vout_thread_t *p_vout )
 
 /*******************************************************************************
  * X11CreateImage: create an XImage                                      
+ *******************************************************************************
+ * Create a simple XImage used as a buffer.
  *******************************************************************************/
 static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
 {
@@ -588,6 +613,7 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
     int         i_quantum;                       /* XImage quantum (see below) */
   
     /* Allocate memory for image */
+    p_vout->i_bytes_per_line = p_vout->i_width * p_vout->i_bytes_per_pixel;    
     pb_data = (byte_t *) malloc( p_vout->i_bytes_per_line * p_vout->i_height );
     if( !pb_data )                                                    /* error */
     {

@@ -116,7 +116,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         intf_MsgDestroy();
         return(errno);
     }
-    intf_MsgImm( COPYRIGHT_MESSAGE );                 /* print welcome message */
+    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );            /* print welcome message */
 
     /*
      * Initialize shared resources and libraries
