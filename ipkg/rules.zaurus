@@ -28,11 +28,11 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-xvideo \
 	--enable-dummy \
 	--enable-v4l \
+	--enable-sout \
 	--enable-fb \
 	--enable-sdl \
 	--enable-oss \
 	--disable-alsa \
-	--disable-xvideo \
 	--disable-dvd \
 	--disable-dvdread \
 	--disable-vcd \
@@ -46,7 +46,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-mkv \
 	--enable-mad \
 	--enable-ffmpeg \
-	--disable-familiar \
+	--disable-pda \
 	--with-tuning=strongarm1100 \
 	--with-libiconv-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-mad-tree=/home/jpsaman/iPaq/src/libmad-0.15.0b \
@@ -64,7 +64,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-0.6.0
+export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-0.6.1
 export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
 
 build: build-stamp

@@ -25,18 +25,18 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-tremor \
 	--disable-theorea \
 	--enable-v4l \
+	--enable-sout \
 	--enable-dummy \
 	--enable-fb \
 	--enable-sdl \
 	--enable-oss \
 	--disable-alsa \
 	--enable-x11 \
-	--enable-xvideo \
+	--disable-xvideo \
 	--disable-dvd \
 	--disable-dvdread \
 	--disable-vcd \
 	--disable-maxosx \
-	--disable-xosd \
 	--disable-freetype \
 	--enable-a52 \
 	--enable-faad2 \
@@ -46,7 +46,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-mkv \
 	--enable-mad \
 	--enable-ffmpeg \
-	--enable-familiar \
+	--enable-pda \
 	--with-tuning=strongarm1100 \
 	--x-includes=/skiff/local/arm-linux/include \
 	--x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
@@ -57,8 +57,6 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-flac-tree=/home/jpsaman/iPaq/src/flac-1.1.0 \
 	--with-libmpeg2-tree=/home/jpsaman/iPaq/src/mpeg2dec-20030612 \
 	--with-libdvbpsi-tree=/home/jpsaman/iPaq/src/libdvbpsi-0.1.2 \
-	--with-gtk-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
-	--with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg-20030622"
@@ -66,7 +64,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.6.0
+export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.6.1
 
 config:
 	./configure --mandir=$${prefix}/share/man \

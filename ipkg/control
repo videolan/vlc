@@ -1,8 +1,8 @@
 Package: vlc
 Section: graphics
 Priority: optional
-Version: 0.6.0
-Release: 3
+Version: 0.6.1
+Release: 1
 Architecture: arm
 Source: http://www.videolan.org/vlc/download-sources.html
 Conflicts: gpe-vlc, opie-vlc, opie-libsdl, opie-base
