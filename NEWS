@@ -45,6 +45,11 @@ Stream Output:
  * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
  * Experimental WAV muxer
  * SDP generation outputs more compliant SDPs and can create SDP files now
+ * Frame rate selection in the transcoder
+ * Improved ASF muxer
+ * DVB subtitles encoder
+ * Subtitles overlaying in transcoder
+ * MPEG 1 layer 2 audio encoder using libtoolame
 
 Audio Output:
  * New audio equalizer filter
@@ -71,6 +76,7 @@ Linux port:
 
 Windows port:
  * DirectX Media Object decoder (allows playing some media types, like WMV3)
+ * DirectX Media Object audio and video encoder
  * Fixed long standing win32 thread handles leak
  * Fixed problem with CPU usage with subtitles rendering
  * Wallpaper mode for the DirectX video output (only in overlay mode)
