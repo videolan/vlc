@@ -474,6 +474,8 @@ VLC.app: vlc
 	    output.m \
 	    playlist.h \
 	    playlist.m \
+	    playlistinfo.h \
+	    playlistinfo.m \
 	    prefs_widgets.h \
 	    prefs_widgets.m \
 	    prefs.h \

@@ -673,6 +673,8 @@
 				8E9390CB0565D6D300C7661C,
 				8E9390CC0565D6D300C7661C,
 				8E9390CD0565D6D300C7661C,
+				8E49720206417F6800370C9F,
+				8E49720306417F6800370C9F,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -742,6 +744,8 @@
 				8ED6C28203E2EB1C0059A3A7,
 				8ED6C28303E2EB1C0059A3A7,
 				8ED6C28403E2EB1C0059A3A7,
+				8E49720006417F6800370C9F,
+				8E49720106417F6800370C9F,
 				8ED6C28503E2EB1C0059A3A7,
 				8ED6C28603E2EB1C0059A3A7,
 				8E55FB7F0459B0FD00FB3317,
@@ -1169,6 +1173,36 @@
 		};
 		8E445FB204728A700059A3A7 = {
 			fileRef = 8E445F9C04728A700059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E49720006417F6800370C9F = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = playlistinfo.h;
+			path = ../../modules/gui/macosx/playlistinfo.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		8E49720106417F6800370C9F = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.objc;
+			name = playlistinfo.m;
+			path = ../../modules/gui/macosx/playlistinfo.m;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		8E49720206417F6800370C9F = {
+			fileRef = 8E49720006417F6800370C9F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8E49720306417F6800370C9F = {
+			fileRef = 8E49720106417F6800370C9F;
 			isa = PBXBuildFile;
 			settings = {
 			};
