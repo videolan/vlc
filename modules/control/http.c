@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.29 2003/11/06 01:49:18 garf Exp $
+ * $Id: http.c,v 1.30 2003/11/09 03:41:50 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1511,15 +1511,183 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                 case MVLC_SEEK:
                 {
                     vlc_value_t val;
-                    char percent[4];
-
+                    char value[30];
+                    char * p_value;
+                    int i_stock = 0;
+                    uint64_t i_length;
+                    int i_value = 0;
+                    int i_relative = 0;
+#define POSITION_ABSOLUTE 12
+#define POSITION_REL_FOR 13
+#define POSITION_REL_BACK 11
+#define TIME_ABSOLUTE 0
+#define TIME_REL_FOR 1
+#define TIME_REL_BACK -1
                     if( p_sys->p_input )
                     {
-                        uri_extract_value( p_request, "percent", percent, 4 );
-                        val.f_float = ((float)atoi( percent )) / 100.0;
-                        var_Set( p_sys->p_input, "position", val );
-                        msg_Dbg( p_intf, "requested seek percent: %i", atoi( percent ) );
+                        uri_extract_value( p_request, "seek_value", value, 20 );
+                        uri_decode_url_encoded( value );
+                        p_value = value;
+                        var_Get( p_sys->p_input, "length", &val);
+                        i_length = val.i_time;
+
+                        while( p_value[0] != '\0' )
+                        {
+                            switch(p_value[0])
+                            {
+                                case '+':
+                                {
+                                    i_relative = TIME_REL_FOR;
+                                    p_value++;
+                                    break;
+                                }
+                                case '-':
+                                {
+                                    i_relative = TIME_REL_BACK;
+                                    p_value++;
+                                    break;
+                                }
+                                case '0': case '1': case '2': case '3': case '4':
+                                case '5': case '6': case '7': case '8': case '9':
+                                {
+                                    i_stock = strtol( p_value , &p_value , 10 );
+                                    break;
+                                }
+                                case '%': /* for percentage ie position */
+                                {
+                                    i_relative += POSITION_ABSOLUTE;
+                                    i_value = i_stock;
+                                    i_stock = 0;
+                                    p_value[0] = '\0';
+                                    break;
+                                }
+                                case ':':
+                                {
+                                    i_value = 60 * (i_value + i_stock) ;
+                                    i_stock = 0;
+                                    p_value++;
+                                    break;
+                                }
+                                case 'h': case 'H': /* hours */
+                                {
+                                    i_value += 3600 * i_stock;
+                                    i_stock = 0;
+                                    /* other characters which are not numbers are not important */
+                                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                                    {
+                                        p_value++;
+                                    }
+                                    break;
+                                }
+                                case 'm': case 'M': case '\'': /* minutes */
+                                {
+                                    i_value += 60 * i_stock;
+                                    i_stock = 0;
+                                    p_value++;
+                                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                                    {
+                                        p_value++;
+                                    }
+                                    break;
+                                }
+                                case 's': case 'S': case '"':  /* seconds */
+                                {
+                                    i_value += i_stock;
+                                    i_stock = 0;
+                                    while( ((p_value[0] < '0') || (p_value[0] > '9')) && (p_value[0] != '\0') )
+                                    {
+                                        p_value++;
+                                    }
+                                    break;
+                                }
+                                default:
+                                {
+                                    p_value++;
+                                    break;
+                                }
+                            }
+                        }
+
+                        /* if there is no known symbol, I consider it as seconds. Otherwise, i_stock = 0 */
+                        i_value += i_stock;
+
+                        switch(i_relative)
+                        {
+                            case TIME_ABSOLUTE:
+                            {
+                                if( (uint64_t)( i_value ) * 1000000 <= i_length )
+                                    val.i_time = (uint64_t)( i_value ) * 1000000;
+                                else
+                                    val.i_time = i_length;
+
+                                var_Set( p_sys->p_input, "time", val );
+                                msg_Dbg( p_intf, "requested seek position: %dsec", i_value );
+                                break;
+                            }
+                            case TIME_REL_FOR:
+                            {
+                                var_Get( p_sys->p_input, "time", &val );
+                                if( (uint64_t)( i_value ) * 1000 + val.i_time <= i_length )
+                                {
+                                    val.i_time = ((uint64_t)( i_value ) * 1000000) + val.i_time;
+                                } else
+                                {
+                                    val.i_time = i_length;
+                                }
+                                var_Set( p_sys->p_input, "time", val );
+                                msg_Dbg( p_intf, "requested seek position forward: %dsec", i_value );
+                                break;
+                            }
+                            case TIME_REL_BACK:
+                            {
+                                var_Get( p_sys->p_input, "time", &val );
+                                if( (int64_t)( i_value ) * 1000000 > val.i_time )
+                                {
+                                    val.i_time = 0;
+                                } else
+                                {
+                                    val.i_time = val.i_time - ((uint64_t)( i_value ) * 1000000);
+                                }
+                                var_Set( p_sys->p_input, "time", val );
+                                msg_Dbg( p_intf, "requested seek position backward: %dsec", i_value );
+                                break;
+                            }
+                            case POSITION_ABSOLUTE:
+                            {
+                                val.f_float = __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                                var_Set( p_sys->p_input, "position", val );
+                                msg_Dbg( p_intf, "requested seek percent: %d", i_value );
+                                break;
+                            }
+                            case POSITION_REL_FOR:
+                            {
+                                var_Get( p_sys->p_input, "position", &val );
+                                val.f_float += __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                                var_Set( p_sys->p_input, "position", val );
+                                msg_Dbg( p_intf, "requested seek percent forward: %d", i_value );
+                                break;
+                            }
+                            case POSITION_REL_BACK:
+                            {
+                                var_Get( p_sys->p_input, "position", &val );
+                                val.f_float -= __MIN( __MAX( ((float) i_value ) / 100.0 , 0.0 ) , 100.0 );
+                                var_Set( p_sys->p_input, "position", val );
+                                msg_Dbg( p_intf, "requested seek percent backward: %d", i_value );
+                                break;
+                            }
+                            default:
+                            {
+                                msg_Dbg( p_intf, "requested seek: what the f*** is going on here ?" );
+                                break;
+                            }
+                        }
                     }
+#undef POSITION_ABSOLUTE
+#undef POSITION_REL_FOR
+#undef POSITION_REL_BACK
+#undef TIME_ABSOLUTE
+#undef TIME_REL_FOR
+#undef TIME_REL_BACK
                     break;
                 }
                 case MVLC_VOLUME:
@@ -1558,7 +1726,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                             {
                                 aout_VolumeSet( p_intf , (i_volume - i_value) );
                                 msg_Dbg( p_intf, "requested volume set: -%i", (i_volume - i_value) );
-                            } 
+                            }
                         } else
                         {
                             i_value = atoi( vol );
@@ -1571,7 +1739,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     }
                     break;
                 }
-              
+
 
                 /* playlist management */
                 case MVLC_ADD:
@@ -1661,7 +1829,7 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
 
                     p_items[0] = p_sys->p_playlist->i_size;
                     p_items[ i_nb_items + 1 ] = -1;
-                    
+
                     /* The items need to be deleted from in reversed order */
                         for( i=0 ; i <= i_nb_items ; i++ )
                         {
@@ -2125,6 +2293,7 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         char length[12]; /* in seconds */
         audio_volume_t i_volume;
         char volume[5];
+        char state[8];
  
 #define p_sys p_args->p_intf->p_sys
         if( p_sys->p_input )
@@ -2135,11 +2304,24 @@ static int  http_get( httpd_file_callback_args_t *p_args,
             sprintf( time, "%d" , (int)(val.i_time / 1000) );
             var_Get( p_sys->p_input, "length", &val);
             sprintf( length, "%d" , (int)(val.i_time / 1000) );
+
+            var_Get( p_sys->p_input, "state", &val );
+            if( val.i_int == PLAYING_S )
+            {
+                sprintf( state, "playing" );
+            } else if( val.i_int == PAUSE_S )
+            {
+                sprintf( state, "paused" );
+            } else
+            {
+                sprintf( state, "stop" );
+            }
         } else
         {
             sprintf( position, "%d", 0 );
             sprintf( time, "%d", 0 );
             sprintf( length, "%d", 0 );
+            sprintf( state, "stop" );
         }
 #undef p_sys
 
@@ -2155,6 +2337,7 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         mvar_AppendNewVar( p_args->vars, "stream_time", time );
         mvar_AppendNewVar( p_args->vars, "stream_length", length );
         mvar_AppendNewVar( p_args->vars, "volume", volume );
+        mvar_AppendNewVar( p_args->vars, "stream_state", state );
 
         SSInit( &p_args->stack );
 
