@@ -34,11 +34,6 @@
 
 #include "../mux/mpeg/csa.h"
 
-#define TS_USE_DVB_SI 0
-
-/* Undef it to disable sdt/eit parsing */
-#define TS_USE_DVB_SI 0
-
 /* Include dvbpsi headers */
 #ifdef HAVE_DVBPSI_DR_H
 #   include <dvbpsi/dvbpsi.h>
@@ -47,9 +42,6 @@
 #   include <dvbpsi/pat.h>
 #   include <dvbpsi/pmt.h>
 #   include <dvbpsi/sdt.h>
-#   if TS_USE_DVB_SI
-#       include <dvbpsi/eit.h>
-#   endif
 #   include <dvbpsi/dr.h>
 #   include <dvbpsi/psi.h>
 #else
@@ -59,13 +51,19 @@
 #   include "tables/pat.h"
 #   include "tables/pmt.h"
 #   include "tables/sdt.h"
-#   if TS_USE_DVB_SI
-#       include "tables/eit.h"
-#   endif
 #   include "descriptors/dr.h"
 #   include "psi.h"
 #endif
 
+/* EIT support */
+#ifdef _DVBPSI_DR_4D_H_
+#   define TS_USE_DVB_SI 1
+#   ifdef HAVE_DVBPSI_DR_H
+#       include <dvbpsi/eit.h>
+#   else
+#       include "tables/eit.h"
+#   endif
+#endif
 
 /* TODO:
  *  - XXX: do not mark options message to be translated, they are too osbcure for now ...
@@ -324,7 +322,7 @@ static int  PIDFillFormat( ts_pid_t *pid, int i_stream_type );
 
 static void PATCallBack( demux_t *, dvbpsi_pat_t * );
 static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
-#if TS_USE_DVB_SI
+#ifdef TS_USE_DVB_SI
 static void PSINewTableCallBack( demux_t *, dvbpsi_handle,
                                  uint8_t  i_table_id, uint16_t i_extension );
 #endif
@@ -419,11 +417,7 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
     /* Init p_sys field */
-#if TS_USE_DVB_SI
     p_sys->b_meta = VLC_TRUE;
-#else
-    p_sys->b_meta = VLC_TRUE;
-#endif
     p_sys->b_dvb_control = VLC_TRUE;
     p_sys->i_dvb_program = 0;
     for( i = 0; i < 8192; i++ )
@@ -444,7 +438,7 @@ static int Open( vlc_object_t *p_this )
     PIDInit( pat, VLC_TRUE, NULL );
     pat->psi->handle = dvbpsi_AttachPAT( (dvbpsi_pat_callback)PATCallBack,
                                          p_demux );
-#if TS_USE_DVB_SI
+#ifdef TS_USE_DVB_SI
     if( p_sys->b_meta )
     {
         ts_pid_t *sdt = &p_sys->pid[0x11];
@@ -2030,7 +2024,7 @@ static vlc_bool_t DVBProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
     return VLC_FALSE;
 }
 
-#if TS_USE_DVB_SI
+#ifdef TS_USE_DVB_SI
 static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 {
     demux_sys_t          *p_sys = p_demux->p_sys;
