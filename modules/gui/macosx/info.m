@@ -2,7 +2,7 @@
  * info.m: MacOS X info panel
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: info.m,v 1.3 2003/02/23 05:53:53 jlj Exp $
+ * $Id: info.m,v 1.4 2003/03/14 01:23:06 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
@@ -135,8 +135,8 @@
 
     while( p_info )
     {
-        [o_content appendFormat: @"%s: %s\n\n", p_info->psz_name,
-                                                p_info->psz_value]; 
+        [o_content appendFormat: @"%@: %@\n\n", [NSApp localizedString: p_info->psz_name],
+                                                [NSApp localizedString: p_info->psz_value]]; 
         p_info = p_info->p_next;
     }
 
