@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.243 2003/09/22 03:40:06 hartman Exp $
+ * $Id: input.c,v 1.244 2003/09/30 15:36:39 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -748,6 +748,7 @@ static int InitThread( input_thread_t * p_input )
             if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe ) ) )
             {
                 TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+		subtitle_Select( p_sub );
             }
             free( val.psz_string );
         }
