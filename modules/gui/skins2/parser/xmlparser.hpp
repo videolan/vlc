@@ -2,7 +2,7 @@
  * xmlparser.hpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.hpp,v 1.4 2004/02/27 13:24:12 gbazin Exp $
+ * $Id: xmlparser.hpp,v 1.5 2004/02/27 15:07:04 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -51,8 +51,8 @@ class XMLParser: public SkinObject
         typedef map<const char*, const char*, ltstr> AttrList_t;
 
         /// Callbacks
-        virtual void handleBeginElement( const string &rName, AttrList_t &attr ) {;}
-        virtual void handleEndElement( const string &rName ) {;}
+        virtual void handleBeginElement( const string &rName, AttrList_t &attr ) {}
+        virtual void handleEndElement( const string &rName ) {}
 
     private:
         /// Reader context
