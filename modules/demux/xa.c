@@ -63,18 +63,18 @@ struct demux_sys_t
     date_t          pts;
 };
 
-typedef struct xa_header
+typedef struct xa_header_y
 {
-	uint8_t    	xa_id[4];
-	uint32_t	iSize;
+    uint8_t  xa_id[4];
+    uint32_t iSize;
 
-	uint16_t	wFormatTag;
-	uint16_t	nChannels;
-	uint32_t	nSamplesPerSec;
-	uint32_t	nAvgBytesPerSec;
-	uint16_t	nBlockAlign;
-	uint16_t	wBitsPerSample;
-} xa_header;
+    uint16_t wFormatTag;
+    uint16_t nChannels;
+    uint32_t nSamplesPerSec;
+    uint32_t nAvgBytesPerSec;
+    uint16_t nBlockAlign;
+    uint16_t wBitsPerSample;
+} xa_header_t;
 
 
 /*****************************************************************************
@@ -84,7 +84,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    xa_header   p_xa;
+    xa_header_t p_xa;
     uint8_t     *p_buf;
 
     /* XA file heuristic */
