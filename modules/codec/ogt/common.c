@@ -2,9 +2,9 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.8 2004/01/16 13:32:37 rocky Exp $
+ * $Id: common.c,v 1.9 2004/01/23 10:19:37 rocky Exp $
  *
- * Author: Rocky Bernstein
+ * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from:
  *       Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
  *       Samuel Hocevar <sam@zoy.org>
@@ -379,14 +379,17 @@ VCDSubHandleScaling( subpicture_t *p_spu, decoder_t *p_dec )
         */
         switch( p_vout->output.i_chroma )
           {
-            /* chromas which are not scaled: */
+            /* chromas in which scaling is done outside of our
+               blending routine, so we need to compensate for those
+               effects before blending gets called: */
           case VLC_FOURCC('I','4','2','0'):
           case VLC_FOURCC('I','Y','U','V'):
           case VLC_FOURCC('Y','V','1','2'):
           case VLC_FOURCC('Y','U','Y','2'):
             break;
             
-            /* chromas which are scaled: */
+            /* chromas in which scaling is done in our blending 
+               routine and thus we don't do it here: */
           case VLC_FOURCC('R','V','1','6'):
           case VLC_FOURCC('R','V','2','4'):
           case VLC_FOURCC('R','V','3','2'):
