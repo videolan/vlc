@@ -1238,12 +1238,12 @@ then
     test_LDFLAGS="-L${with_qte}/lib"
     test_CFLAGS="-I${with_qte}/include"
   fi
-
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
-  AC_CHECK_HEADERS(qte.h, [
+  AC_CHECK_HEADERS(qt.h, [
     qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -ljpeg -lqte"
     PLUGINS="${PLUGINS} qte"
+#    BUILTINS="${BUILTINS} qte"
   ],
   [ AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."]) ] )
   CPPFLAGS="${save_CPPFLAGS}"
