@@ -27,6 +27,7 @@
 #include "../src/var_manager.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
+#include "../vars/stream.hpp"
 
 
 const string VarText::m_type = "text";
@@ -85,6 +86,16 @@ const UString VarText::get() const
         temp.replace( pos, 2,
                       pVlcProc->getVolumeVar().getAsStringPercent().c_str() );
     }
+    while( (pos = temp.find( "$N" )) != UString::npos )
+    {
+        temp.replace( pos, 2,
+                      pVlcProc->getStreamVar().getAsStringName().c_str() );
+    }
+    while( (pos = temp.find( "$F" )) != UString::npos )
+    {
+        temp.replace( pos, 2,
+                      pVlcProc->getStreamVar().getAsStringFullName().c_str() );
+    }
 
     return temp;
 }
@@ -102,6 +113,7 @@ void VarText::set( const UString &rText )
     VlcProc *pVlcProc = VlcProc::instance( getIntf() );
     pVlcProc->getTimeVar().delObserver( this );
     pVlcProc->getVolumeVar().delObserver( this );
+    pVlcProc->getStreamVar().delObserver( this );
     VarManager *pVarManager = VarManager::instance( getIntf() );
     pVarManager->getHelpText().delObserver( this );
 
@@ -127,6 +139,14 @@ void VarText::set( const UString &rText )
     if( m_text.find( "$V" ) != UString::npos )
     {
         pVlcProc->getVolumeVar().addObserver( this );
+    }
+    if( m_text.find( "$N" ) != UString::npos )
+    {
+        pVlcProc->getStreamVar().addObserver( this );
+    }
+    if( m_text.find( "$F" ) != UString::npos )
+    {
+        pVlcProc->getStreamVar().addObserver( this );
     }
 
     notify();

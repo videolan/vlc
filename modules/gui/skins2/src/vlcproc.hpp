@@ -2,7 +2,7 @@
  * vlcproc.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.hpp,v 1.4 2004/01/18 19:54:46 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,6 +28,7 @@
 #include "../vars/playlist.hpp"
 #include "../vars/time.hpp"
 #include "../vars/volume.hpp"
+#include "../vars/stream.hpp"
 
 class OSTimer;
 class VarBool;
@@ -52,6 +53,9 @@ class VlcProc: public SkinObject
 
         /// Getter for the volume variable
         Volume &getVolumeVar() { return *((Volume*)(m_cVarVolume.get())); }
+
+        /// Getter for the stream variable
+        Stream &getStreamVar() { return *((Stream*)(m_cVarStream.get())); }
 
         /// Getter for the mute variable
         VarBool &getIsMuteVar() { return *((VarBool*)(m_cVarMute.get())); }
@@ -82,6 +86,8 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarTime;
         /// Variable for audio volume
         VariablePtr m_cVarVolume;
+        /// Variable for current stream properties (only name, currently)
+        VariablePtr m_cVarStream;
         /// Variable for the "mute" state
         VariablePtr m_cVarMute;
         /// Variables related to the input

@@ -2,7 +2,7 @@
  * vlcproc.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.4 2004/01/18 19:54:46 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -64,29 +64,31 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf )
 
     // Create and register VLC variables
     VarManager *pVarManager = VarManager::instance( getIntf() );
+
 #define REGISTER_VAR( var, type, name ) \
     var = VariablePtr( new type( getIntf() ) ); \
     pVarManager->registerVar( var, name );
-
     REGISTER_VAR( m_cPlaylist, Playlist, "playlist" )
     pVarManager->registerVar( getPlaylistVar().getPositionVarPtr(),
                               "playlist.slider" );
     REGISTER_VAR( m_cVarTime, Time, "time" )
     REGISTER_VAR( m_cVarVolume, Volume, "volume" )
+    REGISTER_VAR( m_cVarStream, Stream, "stream" )
     REGISTER_VAR( m_cVarMute, VarBoolImpl, "vlc.isMute" ) // XXX broken
     REGISTER_VAR( m_cVarPlaying, VarBoolImpl, "vlc.isPlaying" )
     REGISTER_VAR( m_cVarStopped, VarBoolImpl, "vlc.isStopped" )
     REGISTER_VAR( m_cVarPaused, VarBoolImpl, "vlc.isPaused" )
     REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
+#undef REGISTER_VAR
 
     // Called when the playlist changes
-    var_AddCallback( pIntf->p_sys-> p_playlist, "intf-change",
+    var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     // Called when the current played item changes
-    var_AddCallback( pIntf->p_sys-> p_playlist, "playlist-current",
+    var_AddCallback( pIntf->p_sys->p_playlist, "playlist-current",
                      onPlaylistChange, this );
-    // Called when a playlist items changed
-    var_AddCallback( pIntf->p_sys-> p_playlist, "item-change",
+    // Called when a playlist item changed
+    var_AddCallback( pIntf->p_sys->p_playlist, "item-change",
                      onItemChange, this );
 
     getIntf()->p_sys->p_input = NULL;
@@ -229,6 +231,18 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
 {
     VlcProc *pThis = ( VlcProc* )pParam;
 
+    // Update the stream variable
+    // XXX: we should not need to access p_inpu->psz_source directly, a
+    // getter should be provided by VLC core
+    playlist_t *p_playlist = (playlist_t*)pObj;
+    if( p_playlist->p_input )
+    {
+        Stream *pStream = (Stream*)pThis->m_cVarStream.get();
+        UString srcName( pThis->getIntf(),
+                         p_playlist->p_input->psz_source );
+        pStream->set( srcName, false );
+    }
+
     // Create a playlist notify command
     // TODO: selective update
     CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
@@ -237,9 +251,9 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->remove( "notify playlist" );
     pQueue->push( CmdGenericPtr( pCmd ) );
-/*
-    p_playlist_dialog->UpdateItem( old_val.i_int );
-    p_playlist_dialog->UpdateItem( new_val.i_int );*/
+
+//     p_playlist_dialog->UpdateItem( old_val.i_int );
+//     p_playlist_dialog->UpdateItem( new_val.i_int );
     return VLC_SUCCESS;
 }
 
