@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.27 2004/03/02 16:44:21 hartman Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -463,6 +463,26 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 
     if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
     {
+#define TITLE_MAX 30
+        input_info_category_t *p_cat;
+	char psz_streamid[TITLE_MAX];
+	int i_es_id = p_dec->fmt_out.i_id;
+	input_thread_t * p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, 
+						    FIND_PARENT );
+
+	snprintf(psz_streamid, TITLE_MAX, "%s%04x", _("Stream "), i_es_id);
+	p_cat = input_InfoCategory( p_input, psz_streamid );
+
+#if 1
+	/* We should be finding this stream, but we aren't. */
+	input_AddInfo( p_cat, _("Type"), "%s", _("audio") );
+	input_AddInfo( p_cat, _("Description"), "%s", _("MPEG audio") );
+#endif
+
+	input_AddInfo( p_cat, _("Sample Rate"), "%d", p_sys->i_rate );
+	input_AddInfo( p_cat, _("Bit Rate"), "%d", p_sys->i_bit_rate );
+	input_AddInfo( p_cat, _("Channel(s)"), "%d", p_sys->i_channels );
+
         msg_Info( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
                   p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
 
