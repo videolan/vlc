@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.17 2002/07/31 20:56:50 sam Exp $
+ * $Id: configuration.h,v 1.18 2002/07/31 22:54:21 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -115,42 +115,42 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
  *****************************************************************************/
 
 #define add_category_hint( text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_HINT_CATEGORY, NULL, NULL, '\0', text, longtext }; i_config++
+    { module_config_t tmp = { CONFIG_HINT_CATEGORY, NULL, NULL, '\0', text, longtext }; p_config[ i_config ] = tmp; } i_config++
 #define add_subcategory_hint( text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_HINT_SUBCATEGORY, NULL, NULL, '\0', text, longtext }; i_config++
+    { module_config_t tmp = { CONFIG_HINT_SUBCATEGORY, NULL, NULL, '\0', text, longtext }; p_config[ i_config ] = tmp; } i_config++
 #define end_subcategory_hint \
-    p_config[ i_config ] = (module_config_t){ CONFIG_HINT_SUBCATEGORY_END, NULL, NULL, '\0' }; i_config++
+    { module_config_t tmp = { CONFIG_HINT_SUBCATEGORY_END, NULL, NULL, '\0' }; p_config[ i_config ] = tmp; } i_config++
 #define add_usage_hint( text ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_HINT_USAGE, NULL, NULL, '\0', text }; i_config++
+    { module_config_t tmp = { CONFIG_HINT_USAGE, NULL, NULL, '\0', text }; p_config[ i_config ] = tmp; } i_config++
 
 #define add_string( name, psz_value, p_callback, text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_string_from_list( name, psz_value, ppsz_list, p_callback, text, \
       longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, p_callback, ppsz_list }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, p_callback, ppsz_list }; p_config[ i_config ] = tmp; } i_config++
 #define add_file( name, psz_value, p_callback, text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_FILE, NULL, name, '\0', text, longtext, psz_value, 0, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, '\0', text, longtext, psz_value, 0, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_module( name, psz_caps, psz_value, p_callback, text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_MODULE, psz_caps, name, '\0', text, longtext, psz_value, 0, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, '\0', text, longtext, psz_value, 0, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_integer( name, i_value, p_callback, text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, '\0', text, longtext, NULL, i_value, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_float( name, f_value, p_callback, text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, '\0', text, longtext, NULL, 0, f_value, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_bool( name, b_value, p_callback, text, longtext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_BOOL, NULL, name, '\0', text, longtext, NULL, b_value, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, '\0', text, longtext, NULL, b_value, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 
 /* These should be seldom used. They were added just to provide easy shortcuts
  * for the command line interface */
 #define add_string_with_short( name, ch, psz_value, p_callback, text, ltext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_STRING, NULL, name, ch, text, ltext, psz_value, 0, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, ch, text, ltext, psz_value, 0, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_file_with_short( name, ch, psz_value, p_callback, text, ltext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_FILE, NULL, name, ch, text, ltext, psz_value, 0, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, ch, text, ltext, psz_value, 0, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_module_with_short( name, ch, psz_caps, psz_value, p_callback, \
     text, ltext) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_MODULE, psz_caps, name, ch, text, ltext, psz_value, 0, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, ch, text, ltext, psz_value, 0, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_integer_with_short( name, ch, i_value, p_callback, text, ltext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_INTEGER, NULL, name, ch, text, ltext, NULL, i_value, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_INTEGER, NULL, name, ch, text, ltext, NULL, i_value, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_float_with_short( name, ch, f_value, p_callback, text, ltext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_FLOAT, NULL, name, ch, text, ltext, NULL, 0, f_value, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_FLOAT, NULL, name, ch, text, ltext, NULL, 0, f_value, p_callback }; p_config[ i_config ] = tmp; } i_config++
 #define add_bool_with_short( name, ch, b_value, p_callback, text, ltext ) \
-    p_config[ i_config ] = (module_config_t){ CONFIG_ITEM_BOOL, NULL, name, ch, text, ltext, NULL, b_value, 0, p_callback }; i_config++
+    { module_config_t tmp = { CONFIG_ITEM_BOOL, NULL, name, ch, text, ltext, NULL, b_value, 0, p_callback }; p_config[ i_config ] = tmp; } i_config++
