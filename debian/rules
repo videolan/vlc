@@ -9,7 +9,8 @@
 export DH_COMPAT=3
 
 # Compilation options
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde"
+export FFMPEG_VERSION=20020707
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION)"
 # Remove --without-dvdcss here in non-totalitarian countries
 export DVDCSS_FLAGS="--enable-dvd --without-dvdcss"
 
@@ -20,6 +21,10 @@ export GNOMEDIR="usr/share/gnome/apps/Multimedia"
 build: build-stamp
 build-stamp:
 	dh_testdir
+
+	# Check that we have an ffmpeg tree in here (can be a symlink)
+	test -d ffmpeg-$(FFMPEG_VERSION)
+	(cd ffmpeg-$(FFMPEG_VERSION) ; ./configure ; make)
 
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
@@ -40,6 +45,9 @@ clean:
 	dh_testroot
 	rm -f build-stamp
 
+	# Check that we have an ffmpeg tree in here (can be a symlink)
+	test -d ffmpeg-$(FFMPEG_VERSION)
+	-(cd ffmpeg-$(FFMPEG_VERSION) ; make distclean)
 	-$(MAKE) distclean
 
 	dh_clean
