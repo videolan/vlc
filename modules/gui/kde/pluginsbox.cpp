@@ -2,7 +2,7 @@
  * pluginbox.cpp: the pluginbox class
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: pluginsbox.cpp,v 1.2 2002/08/12 17:38:10 sigmunau Exp $
+ * $Id: pluginsbox.cpp,v 1.3 2003/03/29 14:30:55 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -45,15 +45,12 @@ KPluginsBox::KPluginsBox(intf_thread_t *p_intf,
     listView->addColumn(_("Name"));
     listView->addColumn(_("Description"));
     KButtonBox *item_bbox = new KButtonBox(item_vbox);
-    configure = item_bbox->addButton( _("Configure") );
-    configure->setEnabled(false);
     selectButton = item_bbox->addButton( _("Select") );
     QHBox *item_hbox = new QHBox(item_vbox);
     item_hbox->setSpacing(spacing);
     new QLabel( _("Selected:"), item_hbox );
     line = new KLineEdit( value, item_hbox );
     connect(selectButton, SIGNAL(clicked()), this, SLOT(selectClicked()));
-    connect(configure, SIGNAL(clicked()), this, SLOT(configureClicked()));
     connect(listView, SIGNAL(selectionChanged( QListViewItem *)),
             this, SLOT( selectionChanged( QListViewItem *)));
 }
@@ -76,15 +73,7 @@ void KPluginsBox::selectClicked()
     }
 }
 
-void KPluginsBox::configureClicked()
-{
-    if (listView->selectedItem()) {
-        new KPreferences(p_intf, listView->selectedItem()->text(0), this);
-    }
-}
 void KPluginsBox::selectionChanged( QListViewItem *item )
 {
     selectButton->setEnabled(true);
-    /* look for module 'psz_name' */
-    configure->setEnabled(owner->isConfigureable(item->text(0)));
 }

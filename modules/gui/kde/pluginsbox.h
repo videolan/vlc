@@ -2,7 +2,7 @@
  * pluginbox.h: includes for the pluginbox class
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: pluginsbox.h,v 1.2 2002/08/12 17:38:10 sigmunau Exp $
+ * $Id: pluginsbox.h,v 1.3 2003/03/29 14:30:55 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -39,7 +39,6 @@ class KPluginsBox : public QGroupBox
 
  private slots:
     void selectClicked(void);
-    void configureClicked(void);
     void selectionChanged( QListViewItem * );
 
  signals:
@@ -48,7 +47,6 @@ class KPluginsBox : public QGroupBox
  private:
     intf_thread_t *p_intf;
     KListView *listView;
-    QPushButton *configure;
     QPushButton *selectButton;
     KLineEdit *line;
     KPreferences *owner;
