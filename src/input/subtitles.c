@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: subtitles.c,v 1.2 2003/10/01 22:44:58 hartman Exp $
+ * $Id: subtitles.c,v 1.3 2003/10/02 00:16:05 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -159,13 +159,12 @@ static int compare_sub_priority( const void *a, const void *b )
  * in which the file resides and tries to find possible matches of
  * subtitles files. 
  *
- * \brief Use a filename to find subtitle files.
  * \ingroup Demux
  * \param p_this the calling \ref input_thread_t
  * \param psz_path a subdirectory to look into. This is not used atm.
  * \param psz_fname the complete filename to base the search on.
- * \return an array of filenames with detected possbile subtitles. You
- *         need to free this after use.
+ * \return a NULL terminated array of filenames with detected possible subtitles.
+ * The array contains max MAX_SUBTITLE_FILES items and you need to free it after use.
  */
 char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname )
 {
