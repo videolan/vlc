@@ -1,11 +1,10 @@
 /*****************************************************************************
  * prefs.h: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
- * $Id: prefs.h,v 1.14 2004/01/30 12:44:21 hartman Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: prefs.h,v 1.15 2004/02/19 19:38:58 hartman Exp $
  *
- * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Derk-Jan Hartman <hartman at videolan dot org>
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,26 +21,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define PREFS_WRAP 300
+
 @interface VLCTreeItem : NSObject
 {
-    int i_object_id;
-    char *psz_help;
-    char *psz_section;
     NSString *o_name;
-    
-    NSMutableArray *o_config_controls;
-
+    int i_object_id;
     VLCTreeItem *o_parent;
     NSMutableArray *o_children;
 }
 
 + (VLCTreeItem *)rootItem;
-- (id)initWithID: (int)i_id parent: (VLCTreeItem *)o_parent_item;
 - (int)numberOfChildren;
 - (VLCTreeItem *)childAtIndex:(int)i_index;
-- (int)objectID;
-- (NSString *)name;
-- (void)setName:(NSString *)a_name;
+- (int)getObjectID;
+- (NSString *)getName;
+- (BOOL)hasPrefs:(NSString *)o_module_name;
 
 @end
 
@@ -52,7 +47,9 @@
 {
     intf_thread_t *p_intf;
     vlc_bool_t b_advanced;
+    VLCTreeItem *o_config_tree;
     NSView *o_empty_view;
+    NSMutableDictionary *o_save_prefs;
     
     IBOutlet id o_prefs_window;
     IBOutlet id o_tree;
@@ -70,6 +67,105 @@
 - (IBAction)resetAll: (id)sender;
 - (void)sheetDidEnd:(NSWindow *)o_sheet returnCode:(int)i_return contextInfo:(void *)o_context;
 - (IBAction)advancedToggle: (id)sender;
-- (void)showViewForID: (int)i_id;
+- (IBAction)openFileDialog: (id)sender;
+- (void)pathChosenInPanel:(NSOpenPanel *)o_sheet withReturn:(int)i_return_code contextInfo:(void  *)o_context_info;
+- (void)showViewForID: (int) i_id andName:(NSString *)o_item_name;
+- (void)configChanged:(id)o_unknown;
 
 @end
+
+@interface VLCFlippedView : NSView
+{
+
+}
+
+@end
+
+#define INTF_CONTROL_CONFIG(x) \
+@interface VLC##x : NS##x \
+{ \
+    NSString *o_module_name; \
+    NSString *o_config_name; \
+    int i_config_type; \
+} \
+- (void)setModuleName:(NSString *)_o_module_name; \
+- (void)setConfigName:(NSString *)_o_config_name; \
+- (void)setConfigType:(int)_i_config_type; \
+- (NSString *)moduleName; \
+- (NSString *)configName; \
+- (int)configType; \
+@end
+
+#define IMPL_CONTROL_CONFIG(x) \
+@implementation VLC##x \
+- (id)init \
+{ \
+    self = [super init]; \
+    if( self != nil ) \
+    { \
+        o_module_name = nil; \
+        o_config_name = nil; \
+        i_config_type = 0; \
+    } \
+    return( self ); \
+} \
+- (void)dealloc \
+{ \
+    if( o_module_name != nil ) \
+    { \
+        [o_module_name release]; \
+    } \
+    if( o_config_name != nil ) \
+    { \
+        [o_config_name release]; \
+    } \
+    [super dealloc]; \
+} \
+- (void)setModuleName:(NSString *)_o_module_name \
+{ \
+    if( o_module_name != nil ) \
+    { \
+        [o_module_name release]; \
+    } \
+    o_module_name = [_o_module_name retain]; \
+} \
+- (void)setConfigName:(NSString *)_o_config_name \
+{ \
+    if( o_config_name != nil ) \
+    { \
+        [o_config_name release]; \
+    } \
+    o_config_name = [_o_config_name retain]; \
+} \
+- (void)setConfigType:(int)_i_config_type \
+{ \
+    i_config_type = _i_config_type; \
+} \
+- (NSString *)moduleName \
+{ \
+    return( o_module_name ); \
+} \
+- (NSString *)configName \
+{ \
+    return( o_config_name ); \
+} \
+- (int)configType \
+{ \
+    return( i_config_type ); \
+} \
+@end
+
+INTF_CONTROL_CONFIG(Button);
+INTF_CONTROL_CONFIG(PopUpButton);
+INTF_CONTROL_CONFIG(ComboBox);
+INTF_CONTROL_CONFIG(TextField);
+INTF_CONTROL_CONFIG(Slider);
+INTF_CONTROL_CONFIG(Matrix);
+
+#define CONTROL_CONFIG( obj, mname, ctype, cname ) \
+    { \
+        [obj setModuleName: mname]; \
+        [obj setConfigType: ctype]; \
+        [obj setConfigName: [NSString stringWithUTF8String: cname]]; \
+    }
+
