@@ -295,8 +295,8 @@ static int Demux ( demux_t *p_demux )
     {
         char *temp;
 
-        temp = (char *)malloc( sizeof("udp/ts2://@000.000.000.000:123456789" ) );
-        sprintf( temp, "udp/ts2://@" "%s:%i", p_sys->psz_mcast_ip, p_sys->i_mcast_port );
+        temp = (char *)malloc( sizeof("udp://@000.000.000.000:123456789" ) );
+        sprintf( temp, "udp://@" "%s:%i", p_sys->psz_mcast_ip, p_sys->i_mcast_port );
         if( p_sys->psz_uri ) free( p_sys->psz_uri );
         p_sys->psz_uri = strdup( temp );
         free( temp );
