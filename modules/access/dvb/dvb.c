@@ -446,6 +446,7 @@ int ioctl_SetFrontend (input_thread_t * p_input, struct dvb_frontend_parameters 
             msg_Dbg(p_input, "ioctl_SetFrontend: tuning status == 0x%02x!!! ..."
                              "tuning succeeded", s);
             ret = 0;
+            break;
         }
         else
         {
