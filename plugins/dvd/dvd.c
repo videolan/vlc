@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.29 2002/04/04 05:08:05 sam Exp $
+ * $Id: dvd.c,v 1.30 2002/04/06 04:22:27 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -105,13 +105,13 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void ProbeLibDVDCSS( void )
 {
-    static char *pp_filelist[4] = { "libdvdcss.so.2",
-                                    "./libdvdcss.so.2",
-                                    "./lib/libdvdcss.so.2",
-                                    "libdvdcss.so.1",
-                                    "./libdvdcss.so.1",
-                                    "./lib/libdvdcss.so.1",
-                                    NULL };
+    static char *pp_filelist[] = { "libdvdcss.so.2",
+                                   "./libdvdcss.so.2",
+                                   "./lib/libdvdcss.so.2",
+                                   "libdvdcss.so.1",
+                                   "./libdvdcss.so.1",
+                                   "./lib/libdvdcss.so.1",
+                                   NULL };
     char **pp_file = pp_filelist;
 
     /* Try to open the dynamic object */

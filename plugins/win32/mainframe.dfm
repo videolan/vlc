@@ -200,7 +200,7 @@ object MainFrameDlg: TMainFrameDlg
     object ToolButtonEject: TToolButton
       Left = 203
       Top = 2
-      Hint = 'Play stream'
+      Hint = 'Eject disc'
       Caption = 'Eject'
       ImageIndex = 5
       OnClick = ToolButtonEjectClick
@@ -208,7 +208,7 @@ object MainFrameDlg: TMainFrameDlg
     object ToolButtonPlay: TToolButton
       Left = 242
       Top = 2
-      Hint = 'Eject disc'
+      Hint = 'Play stream'
       Caption = 'Play'
       ImageIndex = 6
       OnClick = ToolButtonPlayClick

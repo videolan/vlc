@@ -10,8 +10,8 @@ export DH_COMPAT=3
 
 # Compilation options
 export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa"
-# Change this to --without-dvdcss in totalitarian countries
-export DVDCSS_FLAGS="--enable-dvd"
+# Remove --without-dvdcss here in non-totalitarian countries
+export DVDCSS_FLAGS="--enable-dvd --without-dvdcss"
 
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"

@@ -135,6 +135,7 @@ If you are going to watch DVD with the ALSA plugin, you should install vlc-alsa
 # Dadou - 0.1.99h-mdk - Don't use configure here. It breaks build at present
 #                       time.
 ./configure --enable-release \
+	    --enable-dvd --without-dvdcss \
 	    --prefix=%_prefix \
 	    --enable-gnome --enable-x11 --enable-gtk --enable-qt \
 	    --enable-esd \
@@ -146,6 +147,7 @@ perl -pi -e "s|#CFLAGS \+= -mcpu=750|CFLAGS \+= -mcpu=750 -mtune=750|" Makefile
 %else
 #export CC="gcc-3.0.1" CXX="g++-3.0.1"
 %configure --enable-release \
+           --enable-dvd --without-dvdcss \
            --enable-gnome --enable-gtk \
 	   --enable-x11 --disable-qt --enable-ncurses \
 	   --enable-esd --enable-alsa \
@@ -154,8 +156,6 @@ perl -pi -e "s|#CFLAGS \+= -mcpu=750|CFLAGS \+= -mcpu=750 -mtune=750|" Makefile
 	   --enable-ggi \
 	   --enable-sdl 
 %endif
-# thier configure check if /dev/dsp exists...
-perl -pi -e 's#(PLUGINS :=\s)#$1dsp #' Makefile.opts
 export QTDIR=%{_libdir}/qt2 
 %make
 
@@ -298,9 +298,10 @@ rm -fr %buildroot
 %endif
 
 %changelog
-* Thu Apr 04 2002 Samuel Hocevar <sam@zoy.org> 0.3.0
+* Thu Apr 06 2002 Samuel Hocevar <sam@zoy.org> 0.3.0
 - version 0.3.0.
 - removed libdvdcss from the whole tarball.
+- removed the workaround for vlc's bad /dev/dsp detection.
 
 * Thu Jan 17 2002 Yves Duret <yduret@mandrakesoft.com> 0.2.92-2mdk
 - readded libdvdcss rpm in specfile. use %%define css 1 with correct sources

@@ -4,6 +4,17 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.3.0
+Sat,  6 Apr 2002 04:27:50 +0200
+
+  * ./plugins/win32/mainframe.dfm: swapped two mixed up tooltips.
+  * ./Makefile: fixed make dist and make distclean.
+  * ./plugins/dvd/dvd.c: compilation fix.
+  * ./plugins/gtk/gtk_callbacks.c: fixed ejection code.
+  * ./plugins/text/ncurses.c: fixed compilation of the ncurses plugin.
+  * ./vlc.spec: updated specfile.
   * ./Makefile, ./configure.in: misc BeOS build fixes.
   * ./plugins/win32/win32.cpp: fixed `--intf intfwin' which wasn't working.
   * ./Makefile: we don't include the Gtk+ and SDL DLLs in the win32 package

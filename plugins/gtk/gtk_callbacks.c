@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.36 2002/04/03 06:19:43 gbazin Exp $
+ * $Id: gtk_callbacks.c,v 1.37 2002/04/06 04:22:27 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -481,6 +481,7 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
                         gpointer user_data )
 {
     char *psz_device = NULL;
+    char *psz_parser;
 
     /*
      * Get the active input
@@ -531,6 +532,17 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
     if( psz_device == NULL )
     {
         return TRUE;
+    }
+
+    /* Remove what we have after @ */
+    psz_parser = psz_device;
+    for( psz_parser = psz_device ; *psz_parser ; psz_parser++ )
+    {
+        if( *psz_parser == '@' )
+        {
+            *psz_parser = '\0';
+            break;
+        }
     }
 
     /* If there's a stream playing, we aren't allowed to eject ! */

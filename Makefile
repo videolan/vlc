@@ -274,7 +274,7 @@ distclean: clean
 	rm -f Makefile.opts
 	rm -f include/defs.h include/modules_builtin.h
 	rm -f src/misc/modules_builtin.h
-	rm -f config*status config*cache config*log
+	rm -f config*status config*cache config*log conftest*
 	rm -f gmon.out core build-stamp
 	rm -Rf .dep
 	rm -f .gdb_history
@@ -339,8 +339,11 @@ dist:
 	find debian -mindepth 1 -maxdepth 1 -type d | \
 		while read i ; do rm -Rf tmp/vlc/$$i ; done
 	# Copy .c .h .in .cpp and .glade files
-	find include src plugins -type f -name '*.[chig]*' | while read i ; \
+	find include src plugins -type f -name '*.[bcdhigrst]*' | while read i ; \
 		do cp $$i tmp/vlc/$$i ; done
+	# Grmbl... special case...
+	for i in API BUGS DESIGN TODO ; \
+		do cp plugins/mad/$$i tmp/vlc/plugins/mad ; done
 	# Copy plugin Makefiles
 	find plugins -type f -name Makefile | while read i ; \
 		do cp $$i tmp/vlc/$$i ; done
@@ -351,12 +354,13 @@ dist:
 		-type d -name CVS -o -name '.*' -o -name '*.[o]' | \
 			while read i ; do rm -Rf $$i ; done
 	# Copy gettext stuff
-	cp po/*.po tmp/vlc/po
+	cp po/ChangeLog po/vlc.pot po/*.po tmp/vlc/po
 	for i in Makefile.in.in POTFILES.in ; do cp po/$$i tmp/vlc/po ; done
 	# Copy misc files
 	cp FAQ AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
+		ABOUT-NLS BUGS MODULES vlc.spec \
 		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
-		configure configure.in install-sh install-win32 vlc.spec \
+		configure configure.in install-sh install-win32 macosx-dmg \
 		config.sub config.guess aclocal.m4 mkinstalldirs \
 			tmp/vlc/
 	# Copy Debian control files
@@ -365,18 +369,14 @@ dist:
 	for file in control changelog rules ; do \
 		cp debian/$$file tmp/vlc/debian/ ; done
 	# Copy ipkg control files
-	for file in control rules ; do \
+	for file in control rules patch ; do \
 		cp ipkg/$$file tmp/vlc/ipkg/ ; done
 	# Copy fonts and icons
-	for file in share/*png share/*xpm share/*psf ; do \
+	for file in share/*vlc* share/*psf; do \
 		cp $$file tmp/vlc/share ; done
-	for file in vlc_beos.rsrc vlc.icns gvlc_win32.ico vlc_win32_rc.rc ; do \
-			cp share/$$file tmp/vlc/share/ ; done
 	# Build archives
 	F=vlc-${VERSION}; \
-	mv tmp/vlc tmp/$$F; (cd tmp ; tar cf $$F.tar $$F); \
-	bzip2 -f -9 < tmp/$$F.tar > $$F.tar.bz2; \
-	gzip -f -9 tmp/$$F.tar ; mv tmp/$$F.tar.gz .
+	mv tmp/vlc tmp/$$F; (cd tmp ; tar czf ../$$F.tar.gz $$F); \
 	# Clean up
 	rm -Rf tmp
 
