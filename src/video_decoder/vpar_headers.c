@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.10 2001/10/01 16:18:49 massiot Exp $
+ * $Id: vpar_headers.c,v 1.11 2001/10/01 16:44:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -794,7 +794,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     }
     else
     {
-#if (VPAR_OPTIM_LEVEL > 0)
+#if (VPAR_OPTIM_LEVEL > 1)
         static f_picture_data_t pf_picture_data[5] =
         { NULL, vpar_PictureData1I, vpar_PictureData1P, vpar_PictureData1B,
           vpar_PictureData1D };

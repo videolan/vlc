@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.11 2001/10/01 10:27:17 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.12 2001/10/01 16:44:07 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -2176,10 +2176,6 @@ void FUNCNAME( vpar_thread_t * p_vpar )                                     \
 DECLARE_PICD( vpar_PictureDataGENERIC, p_vpar->sequence.b_mpeg2,
               p_vpar->picture.i_coding_type, p_vpar->picture.i_structure );
 #if (VPAR_OPTIM_LEVEL > 0)
-DECLARE_PICD( vpar_PictureData1I, 0, I_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData1P, 0, P_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData1B, 0, B_CODING_TYPE, FRAME_STRUCTURE );
-DECLARE_PICD( vpar_PictureData1D, 0, D_CODING_TYPE, FRAME_STRUCTURE );
 DECLARE_PICD( vpar_PictureData2IF, 1, I_CODING_TYPE, FRAME_STRUCTURE );
 DECLARE_PICD( vpar_PictureData2PF, 1, P_CODING_TYPE, FRAME_STRUCTURE );
 DECLARE_PICD( vpar_PictureData2BF, 1, B_CODING_TYPE, FRAME_STRUCTURE );
@@ -2191,6 +2187,10 @@ DECLARE_PICD( vpar_PictureData2BT, 1, B_CODING_TYPE, TOP_FIELD );
 DECLARE_PICD( vpar_PictureData2IB, 1, I_CODING_TYPE, BOTTOM_FIELD );
 DECLARE_PICD( vpar_PictureData2PB, 1, P_CODING_TYPE, BOTTOM_FIELD );
 DECLARE_PICD( vpar_PictureData2BB, 1, B_CODING_TYPE, BOTTOM_FIELD );
+DECLARE_PICD( vpar_PictureData1I, 0, I_CODING_TYPE, FRAME_STRUCTURE );
+DECLARE_PICD( vpar_PictureData1P, 0, P_CODING_TYPE, FRAME_STRUCTURE );
+DECLARE_PICD( vpar_PictureData1B, 0, B_CODING_TYPE, FRAME_STRUCTURE );
+DECLARE_PICD( vpar_PictureData1D, 0, D_CODING_TYPE, FRAME_STRUCTURE );
 #endif
 
 #undef DECLARE_PICD

@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.14 2001/10/01 16:18:49 massiot Exp $
+ * $Id: video_parser.h,v 1.15 2001/10/01 16:44:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -68,10 +68,6 @@ void FUNCNAME( struct vpar_thread_s * p_vpar );
 
 PROTO_PICD( vpar_PictureDataGENERIC )
 #if (VPAR_OPTIM_LEVEL > 0)
-PROTO_PICD( vpar_PictureData1I )
-PROTO_PICD( vpar_PictureData1P )
-PROTO_PICD( vpar_PictureData1B )
-PROTO_PICD( vpar_PictureData1D )
 PROTO_PICD( vpar_PictureData2IF )
 PROTO_PICD( vpar_PictureData2PF )
 PROTO_PICD( vpar_PictureData2BF )
@@ -83,6 +79,10 @@ PROTO_PICD( vpar_PictureData2BT )
 PROTO_PICD( vpar_PictureData2IB )
 PROTO_PICD( vpar_PictureData2PB )
 PROTO_PICD( vpar_PictureData2BB )
+PROTO_PICD( vpar_PictureData1I )
+PROTO_PICD( vpar_PictureData1P )
+PROTO_PICD( vpar_PictureData1B )
+PROTO_PICD( vpar_PictureData1D )
 #endif
 
 

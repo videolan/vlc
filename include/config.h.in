@@ -421,7 +421,7 @@
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */
-#define VPAR_OPTIM_LEVEL                2
+#define VPAR_OPTIM_LEVEL                1
 
 /* Maximum number of macroblocks in a picture. */
 #define MAX_MB                          2048
