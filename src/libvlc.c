@@ -1950,12 +1950,9 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             case CONFIG_ITEM_MODULE_CAT:
             case CONFIG_ITEM_MODULE_LIST:
             case CONFIG_ITEM_MODULE_LIST_CAT:
-                if( !p_item->ppsz_list )
-                {
-                    psz_bra = " <"; psz_type = _("string"); psz_ket = ">";
-                    break;
-                }
-                else
+                psz_bra = " <"; psz_type = _("string"); psz_ket = ">";
+
+                if( p_item->ppsz_list )
                 {
                     psz_bra = " {";
                     psz_type = psz_buffer;
@@ -1966,11 +1963,26 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                         strcat( psz_type, p_item->ppsz_list[i] );
                     }
                     psz_ket = "}";
-                    break;
                 }
+                break;
             case CONFIG_ITEM_INTEGER:
             case CONFIG_ITEM_KEY: /* FIXME: do something a bit more clever */
                 psz_bra = " <"; psz_type = _("integer"); psz_ket = ">";
+
+                if( p_item->i_list )
+                {
+                    psz_bra = " {";
+                    psz_type = psz_buffer;
+                    psz_type[0] = '\0';
+                    for( i = 0; p_item->ppsz_list_text[i]; i++ )
+                    {
+                        if( i ) strcat( psz_type, ", " );
+                        sprintf( psz_type + strlen(psz_type), "%i (%s)",
+                                 p_item->pi_list[i],
+                                 p_item->ppsz_list_text[i] );
+                    }
+                    psz_ket = "}";
+                }
                 break;
             case CONFIG_ITEM_FLOAT:
                 psz_bra = " <"; psz_type = _("float"); psz_ket = ">";
