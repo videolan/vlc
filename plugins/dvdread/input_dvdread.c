@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.6 2001/12/27 01:49:34 massiot Exp $
+ * $Id: input_dvdread.c,v 1.7 2001/12/29 00:39:49 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -210,8 +210,6 @@ static void DvdReadInit( input_thread_t * p_input )
     /* We read DVD_BLOCK_READ_ONCE in each loop, so the input will receive
      * DVD_DATA_READ_ONCE at most */
     p_dvd->i_block_once = DVD_BLOCK_READ_ONCE;
-    /* this value mustn't be modifed */
-    p_input->i_read_once = DVD_DATA_READ_ONCE;
 
     /* Ifo allocation & initialisation */
     if( ! ( p_dvd->p_vmg_file = ifoOpen( p_dvd->p_dvdread, 0 ) ) )
@@ -782,7 +780,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
  * EOF.
  *****************************************************************************/
 static int DvdReadRead( input_thread_t * p_input,
-                        data_packet_t ** pp_packets )
+                        data_packet_t ** pp_data )
 {
     thread_dvd_data_t *     p_dvd;
     u8                      p_data[DVD_VIDEO_LB_LEN];
@@ -797,6 +795,8 @@ static int DvdReadRead( input_thread_t * p_input,
     data_packet_t *         p_data_p;
 
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
+
+    *pp_data = NULL;
 
     /*
      * Playback by cell in this pgc, starting at the cell for our chapter.
@@ -848,8 +848,8 @@ static int DvdReadRead( input_thread_t * p_input,
     p_dvd->i_pack_len -= i_blocks;
 
     /* Get iovecs */
-    p_data_p = input_BuffersToIO( p_input->p_method_data, p_vec,
-                                DVD_DATA_READ_ONCE );
+    *pp_data = p_data_p = input_BuffersToIO( p_input->p_method_data, p_vec,
+                                             DVD_DATA_READ_ONCE );
 
     if ( p_data_p == NULL )
     {
@@ -895,34 +895,33 @@ static int DvdReadRead( input_thread_t * p_input,
             }
             if( i_pos != 0 )
             {
-                pp_packets[i_packet] = input_ShareBuffer(
-                        p_input->p_method_data, p_current );
+                *pp_data = input_ShareBuffer( p_input->p_method_data,
+                                              p_current );
             }
             else
             {
-                pp_packets[i_packet] = p_data_p;
+                *pp_data = p_data_p;
                 p_data_p = p_data_p->p_next;
             }
 
-            pp_packets[i_packet]->p_payload_start =
-                pp_packets[i_packet]->p_demux_start =
-                pp_packets[i_packet]->p_demux_start + i_pos;
+            (*pp_data)->p_payload_start = (*pp_data)->p_demux_start =
+                    (*pp_data)->p_demux_start + i_pos;
             
 
-            pp_packets[i_packet]->p_payload_end =
-                    pp_packets[i_packet]->p_payload_start + i_packet_size + 6;
-
-            pp_packets[i_packet]->p_next = NULL;
-            pp_packets[i_packet]->b_discard_payload = 0;
+            (*pp_data)->p_payload_end =
+                    (*pp_data)->p_payload_start + i_packet_size + 6;
 
             i_packet++;
             i_pos += i_packet_size + 6;
+            pp_data = &(*pp_data)->p_next;
         }
     }
 
-    pp_packets[i_packet] = NULL;
-
     p_input->pf_delete_packet( p_input->p_method_data, p_data_p );
+    if( i_packet != 0 )
+    {
+        *pp_data = NULL;
+    }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 

@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.111 2001/12/27 03:47:08 massiot Exp $
+ * $Id: input_dvd.c,v 1.112 2001/12/29 00:39:49 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -979,7 +979,7 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
     p_input->pf_delete_packet( p_input->p_method_data, p_data );
     if( i_packet != 0 )
     {
-        (*pp_data)->p_next = NULL;
+        *pp_data = NULL;
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );

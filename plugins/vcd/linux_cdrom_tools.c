@@ -134,7 +134,6 @@ int VCDReadSector( struct thread_vcd_data_s * p_vcd, byte_t * p_buffer )
     p_msf->minute =   i_dummy / (CD_FRAMES * CD_SECS);
     p_msf->second = ( i_dummy % (CD_FRAMES * CD_SECS) ) / CD_FRAMES;
     p_msf->frame =  ( i_dummy % (CD_FRAMES * CD_SECS) ) % CD_FRAMES;
-#undef p_msf
 
 #ifdef DEBUG
     intf_DbgMsg( "vcd debug: playing frame %d:%d-%d",
@@ -158,5 +157,7 @@ int VCDReadSector( struct thread_vcd_data_s * p_vcd, byte_t * p_buffer )
     }
 
     return 1;
+
+#undef p_msf
 }
 

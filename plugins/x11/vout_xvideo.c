@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.42 2001/12/19 18:14:23 sam Exp $
+ * $Id: vout_xvideo.c,v 1.43 2001/12/29 00:39:49 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -208,7 +208,7 @@ static int vout_Create( vout_thread_t *p_vout )
         free( p_vout->p_sys );
         return 1;
     }
-    intf_DbgMsg( "Using xv port %d" , p_vout->p_sys->xv_port );
+    intf_DbgMsg( "Using xv port %d" , p_vout->p_sys->i_xvport );
 
     /* Create blank cursor (for mouse cursor autohiding) */
     p_vout->p_sys->b_mouse_pointer_visible = 1;
