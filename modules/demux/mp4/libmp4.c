@@ -1085,6 +1085,7 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     unsigned int i;
 
     MP4_READBOX_ENTER( MP4_Box_data_sample_soun_t );
+    p_box->data.p_sample_soun->p_qt_description = NULL;
 
     /* Sanity check needed because the "wave" box does also contain an
      * "mp4a" box that we don't understand. */
@@ -1138,11 +1139,15 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #ifdef MP4_VERBOSE
         msg_Dbg( p_stream->s,
-                 "read box: \"soun\" qt3+ sample/packet=%d bytes/packet=%d bytes/frame=%d bytes/sample=%d",
-                 p_box->data.p_sample_soun->i_sample_per_packet, p_box->data.p_sample_soun->i_bytes_per_packet,
-                 p_box->data.p_sample_soun->i_bytes_per_frame, p_box->data.p_sample_soun->i_bytes_per_sample );
+                 "read box: \"soun\" qt3+ sample/packet=%d bytes/packet=%d "
+                 "bytes/frame=%d bytes/sample=%d",
+                 p_box->data.p_sample_soun->i_sample_per_packet,
+                 p_box->data.p_sample_soun->i_bytes_per_packet,
+                 p_box->data.p_sample_soun->i_bytes_per_frame,
+                 p_box->data.p_sample_soun->i_bytes_per_sample );
 #endif
-        MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 44 );
+        MP4_SeekStream( p_stream, p_box->i_pos +
+                        MP4_BOX_HEADERSIZE( p_box ) + 44 );
     }
     else
     {
@@ -1151,8 +1156,10 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_bytes_per_frame = 0;
         p_box->data.p_sample_soun->i_bytes_per_sample = 0;
 
-        msg_Dbg( p_stream->s, "read box: \"soun\" mp4 or qt1/2 (rest="I64Fd")", i_read );
-        MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 28 );
+        msg_Dbg( p_stream->s, "read box: \"soun\" mp4 or qt1/2 (rest="I64Fd")",
+                 i_read );
+        MP4_SeekStream( p_stream, p_box->i_pos +
+                        MP4_BOX_HEADERSIZE( p_box ) + 28 );
     }
 
     if( p_box->i_type == FOURCC_drms )
@@ -1169,11 +1176,12 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream->s, "read box: \"soun\" in stsd channel %d sample size %d sampl rate %f",
-                      p_box->data.p_sample_soun->i_channelcount,
-                      p_box->data.p_sample_soun->i_samplesize,
-                      (float)p_box->data.p_sample_soun->i_sampleratehi +
-                    (float)p_box->data.p_sample_soun->i_sampleratelo / 65536 );
+    msg_Dbg( p_stream->s, "read box: \"soun\" in stsd channel %d "
+             "sample size %d sampl rate %f",
+             p_box->data.p_sample_soun->i_channelcount,
+             p_box->data.p_sample_soun->i_samplesize,
+             (float)p_box->data.p_sample_soun->i_sampleratehi +
+             (float)p_box->data.p_sample_soun->i_sampleratelo / 65536 );
 
 #endif
     MP4_READBOX_EXIT( 1 );

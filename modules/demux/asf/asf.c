@@ -668,6 +668,7 @@ static int DemuxInit( demux_t *p_demux )
 
             tk->i_cat = AUDIO_ES;
             tk->p_es = es_out_Add( p_demux->out, &fmt );
+            es_format_Clean( &fmt );
 
             msg_Dbg( p_demux, "added new audio stream(codec:0x%x,ID:%d)",
                     GetWLE( p_data ), p_sp->i_stream_number );
@@ -693,6 +694,7 @@ static int DemuxInit( demux_t *p_demux )
 
             tk->i_cat = VIDEO_ES;
             tk->p_es = es_out_Add( p_demux->out, &fmt );
+            es_format_Clean( &fmt );
 
             msg_Dbg( p_demux, "added new video stream(ID:%d)",
                      p_sp->i_stream_number );
