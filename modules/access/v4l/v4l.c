@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.34 2003/11/24 19:27:46 gbazin Exp $
+ * $Id: v4l.c,v 1.35 2003/11/26 22:00:56 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -665,6 +665,7 @@ static void ParseMRL( input_thread_t *p_input )
     {
         p_sys->psz_device = strdup( psz_dup );
     }
+    if( psz_dup ) free( psz_dup );
 }
 
 /*****************************************************************************
