@@ -2,6 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: input_programs.c,v 1.4 2000/12/19 19:08:51 massiot Exp $
  *
  * Authors:
  *
@@ -389,11 +390,6 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     switch( p_es->i_type )
     {
-        /* FIXME ! */
-    case AC3_AUDIO_ES:
-        p_es->thread_id = ac3dec_CreateThread( GetAdecConfig( p_input, p_es ) );
-        break;
-
     case MPEG1_AUDIO_ES:
     case MPEG2_AUDIO_ES:
         p_es->thread_id = adec_CreateThread( GetAdecConfig( p_input, p_es ) );
@@ -402,6 +398,14 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case MPEG1_VIDEO_ES:
     case MPEG2_VIDEO_ES:
         p_es->thread_id = vpar_CreateThread( GetVdecConfig( p_input, p_es ) );
+        break;
+
+    case AC3_AUDIO_ES:
+        p_es->thread_id = ac3dec_CreateThread( GetAdecConfig( p_input, p_es ) );
+        break;
+
+    case DVD_SPU_ES:
+        p_es->thread_id = spudec_CreateThread( GetVdecConfig( p_input, p_es ) );
         break;
 
     default:

@@ -2,6 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: mpeg_system.c,v 1.9 2000/12/19 19:08:51 massiot Exp $
  *
  * Authors: 
  *
@@ -60,10 +61,6 @@
 void input_DecodePES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
 #define p_pes (p_es->p_pes)
-
-    /* FIXME: since we don't check the type of the stream anymore, we don't
-     * do the following : p_data->p_payload_start++; for DVD_SPU_ES, and
-     * DVD SPU support is BROKEN ! */
 
     if( p_es->p_decoder_fifo != NULL )
     {
@@ -342,6 +339,13 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 }
             }
             break;
+        }
+
+        if( p_es->i_stream_id == 0xBC )
+        {
+            /* With private stream 1, the first byte of the payload
+             * is a stream_private_id, so skip it. */
+            i_pes_header_size++;
         }
 
         /* Now we've parsed the header, we just have to indicate in some
@@ -644,6 +648,22 @@ static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
  */
 
 /*****************************************************************************
+ * GetID: Get the ID of a stream
+ *****************************************************************************/
+static u16 GetID( data_packet_t * p_data )
+{
+    u16         i_id;
+
+    i_id = p_data->p_buffer[3];                                 /* stream_id */
+    if( i_id == 0xBD )
+    {
+        /* stream_private_id */
+        i_id |= p_data->p_buffer[ 9 + p_data->p_buffer[8] ] << 8;
+    }
+    return( i_id );
+}
+
+/*****************************************************************************
  * DecodePSM: Decode the Program Stream Map information
  *****************************************************************************/
 static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
@@ -803,9 +823,20 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         int                 i_dummy;
 
         /* This is a PES packet. Find out if we want it or not. */
-        i_id = p_data->p_buffer[3];                     /* ID of the stream. */
+        i_id = GetID( p_data );
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
+#if 1
+        for( i_dummy = 0; i_dummy < INPUT_MAX_ES; i_dummy++ )
+        {
+            if( p_input->p_es[i_dummy].i_id != EMPTY_ID 
+                && p_input->p_es[i_dummy].i_id == i_id )
+            {
+                p_es = &p_input->p_es[i_dummy];
+                break;
+            }
+        }
+#else
         for( i_dummy = 0; i_dummy < INPUT_MAX_SELECTED_ES; i_dummy++ )
         {
             if( p_input->pp_selected_es[i_dummy] != NULL
@@ -815,20 +846,19 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 break;
             }
         }
+#endif
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         if( p_es == NULL )
         {
 #if 1
-            /* FIXME ! */
-            if( (i_id & 0xC0L) == 0xC0L )
-            {
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-                /* MPEG video and audio */
-                p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                    i_id, 0 );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                i_id, 0 );
 
-                if( p_es != NULL && (i_id & 0xF0L) == 0xE0L )
+            if( p_es != NULL )
+            {
+                if( (i_id & 0xF0) == 0xE0 )
                 {
                     /* MPEG video */
                     p_es->i_stream_id = i_id;
@@ -838,11 +868,31 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     input_SelectES( p_input, p_es );
 #endif
                 }
-                else if( p_es != NULL && (i_id & 0xE0) == 0xC0 )
+                else if( (i_id & 0xE0) == 0xC0 )
                 {
                     /* MPEG audio */
                     p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_AUDIO_ES;
+
+#ifdef AUTO_SPAWN
+                    input_SelectES( p_input, p_es );
+#endif
+                }
+                else if( (i_id & 0xF0FF) == 0x80BD )
+                {
+                    /* AC3 audio */
+                    p_es->i_stream_id = 0xBD;
+                    p_es->i_type = AC3_AUDIO_ES;
+
+#ifdef AUTO_SPAWN
+                    input_SelectES( p_input, p_es );
+#endif
+                }
+                else if( (i_id & 0xF0FF) == 0x20BD )
+                {
+                    /* Subtitles video */
+                    p_es->i_stream_id = 0xBD;
+                    p_es->i_type = DVD_SPU_ES;
 
 #ifdef AUTO_SPAWN
                     input_SelectES( p_input, p_es );
@@ -861,7 +911,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 #endif
         }
 
-        if( p_es != NULL )
+        if( p_es->p_decoder_fifo != NULL && !b_trash )
         {
 #ifdef STATS
             p_es->c_packets++;

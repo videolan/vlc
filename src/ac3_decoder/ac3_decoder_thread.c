@@ -367,11 +367,11 @@ void ac3_byte_stream_next (ac3_byte_stream_t * p_byte_stream)
             p_ac3dec->p_data = DECODER_FIFO_START(*p_ac3dec->p_fifo)->p_first;
 
             /* parse ac3 magic header */
-            ptr = *(p_ac3dec->p_data->p_payload_start + 2);
+            ptr = *(p_ac3dec->p_data->p_payload_start + 1);
             ptr <<= 8;
-            ptr |= *(p_ac3dec->p_data->p_payload_start + 3);
+            ptr |= *(p_ac3dec->p_data->p_payload_start + 2);
             p_ac3dec->sync_ptr = ptr;
-            p_ac3dec->p_data->p_payload_start += 4;
+            p_ac3dec->p_data->p_payload_start += 3;
 
             /* We can release the fifo's data lock */
             vlc_mutex_unlock (&p_ac3dec->p_fifo->data_lock);
