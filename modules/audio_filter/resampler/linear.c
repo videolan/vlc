@@ -2,7 +2,7 @@
  * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.8 2003/02/16 01:29:40 massiot Exp $
+ * $Id: linear.c,v 1.9 2003/02/17 09:47:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -57,7 +57,7 @@ struct aout_filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("audio filter for linear interpolation resampling") );
-    set_capability( "audio filter", 10 );
+    set_capability( "audio filter", 2 );
     set_callbacks( Create, Close );
 vlc_module_end();
 
