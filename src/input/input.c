@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.135 2001/10/02 17:09:44 sam Exp $
+ * $Id: input.c,v 1.136 2001/10/03 02:19:21 tcastley Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -413,6 +413,7 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_seek          = f.pf_seek;
 #undef f
 
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* FIXME : this is waaaay too kludgy */
     if( (strlen( p_input->p_source ) > 3) && !strncasecmp( p_input->p_source, "ts:", 3 ) )
     {
@@ -426,7 +427,9 @@ static int InitThread( input_thread_t * p_input )
         HTTPOpen( p_input );
         p_input->stream.i_method = INPUT_METHOD_NETWORK;
     }
-    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    else 
+#endif
+        if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
         /* DVD - this is THE kludge */
         p_input->p_input_module->p_functions->input.functions.input.pf_open( p_input );
@@ -505,6 +508,7 @@ static void EndThread( input_thread_t * p_input )
     /* Free demultiplexer's data */
     p_input->pf_end( p_input );
 
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* Close stream */
     if( (strlen( p_input->p_source ) > 3) && !strncasecmp( p_input->p_source, "ts:", 3 ) )
     {
@@ -514,7 +518,9 @@ static void EndThread( input_thread_t * p_input )
     {
         NetworkClose( p_input );
     }
-    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    else 
+#endif
+    if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
         p_input->p_input_module->p_functions->input.functions.input.pf_close( p_input );
     }
