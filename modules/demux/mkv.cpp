@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.22 2003/08/18 00:17:44 fenrir Exp $
+ * $Id: mkv.cpp,v 1.23 2003/08/25 20:47:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -35,6 +35,7 @@
 #include <vlc/input.h>
 
 #include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
+#include "iso_lang.h"
 
 #include <iostream>
 #include <cassert>
@@ -275,6 +276,8 @@ static void IndexAppendCluster  ( input_thread_t *p_input, KaxCluster *cluster )
 static char *UTF8ToStr          ( const UTFstring &u );
 static void LoadCues            ( input_thread_t *);
 static void InformationsCreate  ( input_thread_t *p_input );
+
+static char *LanguageGetName    ( const char *psz_code );
 
 /*****************************************************************************
  * Activate: initializes matroska demux structures
@@ -552,7 +555,8 @@ static int Activate( vlc_object_t * p_this )
                                     break;
                             }
 
-                            msg_Dbg( p_input, "|   |   |   + Track Type=%s", psz_type );
+                            msg_Dbg( p_input, "|   |   |   + Track Type=%s",
+                                     psz_type );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackFlagEnabled::ClassInfos.GlobalId )
                         {
@@ -560,7 +564,8 @@ static int Activate( vlc_object_t * p_this )
                             fenb.ReadData( p_sys->es->I_O() );
 
                             tk.b_enabled = uint32( fenb );
-                            msg_Dbg( p_input, "|   |   |   + Track Enabled=%u", uint32( fenb )  );
+                            msg_Dbg( p_input, "|   |   |   + Track Enabled=%u",
+                                     uint32( fenb )  );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackFlagDefault::ClassInfos.GlobalId )
                         {
@@ -568,28 +573,32 @@ static int Activate( vlc_object_t * p_this )
                             fdef.ReadData( p_sys->es->I_O() );
 
                             tk.b_default = uint32( fdef );
-                            msg_Dbg( p_input, "|   |   |   + Track Default=%u", uint32( fdef )  );
+                            msg_Dbg( p_input, "|   |   |   + Track Default=%u",
+                                     uint32( fdef )  );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackFlagLacing::ClassInfos.GlobalId )
                         {
                             KaxTrackFlagLacing &lac = *(KaxTrackFlagLacing*)el3;
                             lac.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track Lacing=%d", uint32( lac ) );
+                            msg_Dbg( p_input, "|   |   |   + Track Lacing=%d",
+                                     uint32( lac ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackMinCache::ClassInfos.GlobalId )
                         {
                             KaxTrackMinCache &cmin = *(KaxTrackMinCache*)el3;
                             cmin.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track MinCache=%d", uint32( cmin ) );
+                            msg_Dbg( p_input, "|   |   |   + Track MinCache=%d",
+                                     uint32( cmin ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackMaxCache::ClassInfos.GlobalId )
                         {
                             KaxTrackMaxCache &cmax = *(KaxTrackMaxCache*)el3;
                             cmax.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track MaxCache=%d", uint32( cmax ) );
+                            msg_Dbg( p_input, "|   |   |   + Track MaxCache=%d",
+                                     uint32( cmax ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackDefaultDuration::ClassInfos.GlobalId )
                         {
@@ -613,16 +622,19 @@ static int Activate( vlc_object_t * p_this )
                             tname.ReadData( p_sys->es->I_O() );
 
                             tk.psz_name = UTF8ToStr( UTFstring( tname ) );
-                            msg_Dbg( p_input, "|   |   |   + Track Name=%s", tk.psz_name );
+                            msg_Dbg( p_input, "|   |   |   + Track Name=%s",
+                                     tk.psz_name );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackLanguage::ClassInfos.GlobalId )
                         {
                             KaxTrackLanguage &lang = *(KaxTrackLanguage*)el3;
-
                             lang.ReadData( p_sys->es->I_O() );
 
-                            tk.psz_language = strdup( string( lang ).c_str() );
-                            msg_Dbg( p_input, "|   |   |   + Track Language=`%s'", string( lang ).c_str() );
+                            tk.psz_language =
+                                LanguageGetName( string( lang ).c_str() );
+                            msg_Dbg( p_input,
+                                     "|   |   |   + Track Language=`%s'(%s) ",
+                                     tk.psz_language, string( lang ).c_str() );
                         }
                         else  if( EbmlId( *el3 ) == KaxCodecID::ClassInfos.GlobalId )
                         {
@@ -630,7 +642,8 @@ static int Activate( vlc_object_t * p_this )
                             codecid.ReadData( p_sys->es->I_O() );
 
                             tk.psz_codec = strdup( string( codecid ).c_str() );
-                            msg_Dbg( p_input, "|   |   |   + Track CodecId=%s", string( codecid ).c_str() );
+                            msg_Dbg( p_input, "|   |   |   + Track CodecId=%s",
+                                     string( codecid ).c_str() );
                         }
                         else  if( EbmlId( *el3 ) == KaxCodecPrivate::ClassInfos.GlobalId )
                         {
@@ -1209,12 +1222,10 @@ static int Activate( vlc_object_t * p_this )
         {
             tk.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
         }
-#if 0
         else if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) )
         {
             tk.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
         }
-#endif
         else
         {
             msg_Err( p_input, "unknow codec id=`%s'", tk.psz_codec );
@@ -1594,9 +1605,26 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             {
                 p_pes->i_dts = 0;
             }
+
             if( p_pes->p_first && p_pes->i_pes_size > 0 )
             {
                 p_pes->p_first->p_payload_end[-1] = '\0';
+            }
+            if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) )
+            {
+                /* remove all fields before text for now */
+                char *start = (char*)p_pes->p_first->p_payload_start;
+                int  i_comma = 0;
+
+                while( *start && i_comma < 8 )
+                {
+                    if( *start++ == ',' )
+                    {
+                        i_comma++;
+                    }
+                }
+                memmove( p_pes->p_first->p_payload_start, start,
+                         strlen( start) + 1 );
             }
         }
 
@@ -2502,5 +2530,40 @@ static char * UTF8ToStr( const UTFstring &u )
     *p++= '\0';
 
     return dst;
+}
+
+static char *LanguageGetName    ( const char *psz_code )
+{
+    const iso639_lang_t *pl;
+
+    if( strlen( psz_code ) == 2 )
+    {
+        pl = GetLang_1( psz_code );
+    }
+    else if( strlen( psz_code ) == 3 )
+    {
+        pl = GetLang_2B( psz_code );
+        if( !strcmp( pl->psz_iso639_1, "??" ) )
+        {
+            pl = GetLang_2T( psz_code );
+        }
+    }
+    else
+    {
+        return strdup( psz_code );
+    }
+
+    if( !strcmp( pl->psz_iso639_1, "??" ) )
+    {
+       return strdup( psz_code );
+    }
+    else
+    {
+        if( *pl->psz_native_name )
+        {
+            return strdup( pl->psz_native_name );
+        }
+        return strdup( pl->psz_eng_name );
+    }
 }
 
