@@ -500,8 +500,10 @@ static struct
     { VLC_FOURCC('F','L','V','1'), CODEC_ID_FLV1,
       VIDEO_ES, "Flash Video" },
 
+#if LIBAVCODEC_BUILD > 4716
     { VLC_FOURCC('H','2','6','1'), CODEC_ID_H261,
       VIDEO_ES, "H.261" },
+#endif
 
 #if LIBAVCODEC_BUILD > 4680
     { VLC_FOURCC('F','L','I','C'), CODEC_ID_FLIC,
