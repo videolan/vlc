@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.36 2002/10/23 23:17:44 gbazin Exp $
+ * $Id: input_ext-dec.c,v 1.37 2002/10/24 09:37:47 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -131,7 +131,7 @@ static inline pes_packet_t *_GetPES( decoder_fifo_t * p_fifo )
         }
 
         /* Signal the input thread we're waiting. This is only
-         * needed in case of slave clock (ES plug-in)  but it won't
+         * needed in case of slave clock (ES plug-in) but it won't
          * harm. */
         vlc_cond_signal( &p_fifo->data_wait );
 
@@ -166,6 +166,12 @@ static inline pes_packet_t * _NextPES( decoder_fifo_t * p_fifo )
     input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
     p_fifo->p_first = p_next;
     p_fifo->i_depth--;
+
+    if( p_fifo->p_first == NULL )
+    {
+        /* No PES in the FIFO. p_last is no longer valid. */
+        p_fifo->pp_last = &p_fifo->p_first;
+    }
 
     vlc_mutex_unlock( &p_fifo->data_lock );
 
@@ -512,37 +518,19 @@ void NextPTS( bit_stream_t * p_bit_stream, mtime_t * pi_pts,
 }
 
 /****************************************************************************
- * input_NextPES : extract a PES from the fifo. If pp_pes is NULL then this 
+ * input_ExtractPES : extract a PES from the fifo. If pp_pes is NULL then this
  * PES is deleted, else pp_pes will be set to this PES
  ****************************************************************************/
-int input_NextPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
+int input_ExtractPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
 {
-    pes_packet_t *p_pes, *p_next;
+    pes_packet_t *p_pes;
+
+    p_pes = _GetPES( p_fifo );
 
     vlc_mutex_lock( &p_fifo->data_lock );
 
-    /* if fifo is emty wait */
-    while( !p_fifo->p_first )
-    {
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            if( pp_pes )
-            {
-                *pp_pes = NULL;
-            }
-            return( -1 );
-        }
-        vlc_cond_signal( &p_fifo->data_wait );
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    p_pes = p_fifo->p_first;
-
-    p_next = p_pes->p_next;
+    p_fifo->p_first = p_pes->p_next;
     p_pes->p_next = NULL;
-
-
-    p_fifo->p_first = p_next;
     p_fifo->i_depth--;
 
     if( !p_fifo->p_first )
@@ -551,6 +539,7 @@ int input_NextPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
         /* pp_last no longer valid */
         p_fifo->pp_last = &p_fifo->p_first;
     }
+
     vlc_mutex_unlock( &p_fifo->data_lock );
 
     if( pp_pes )
@@ -563,4 +552,3 @@ int input_NextPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
     }
     return( 0 );
 }
-

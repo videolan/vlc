@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.73 2002/10/23 23:17:45 gbazin Exp $
+ * $Id: input_ext-dec.h,v 1.74 2002/10/24 09:37:48 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -218,7 +218,7 @@ VLC_EXPORT( u32,  UnalignedGetBits,        ( bit_stream_t *, unsigned int ) );
 VLC_EXPORT( void, CurrentPTS,              ( bit_stream_t *, mtime_t *, mtime_t * ) );
 VLC_EXPORT( void, NextPTS,                 ( bit_stream_t *, mtime_t *, mtime_t * ) );
 
-VLC_EXPORT( int,  input_NextPES,           ( decoder_fifo_t *, pes_packet_t ** ) );
+VLC_EXPORT( int,  input_ExtractPES,        ( decoder_fifo_t *, pes_packet_t ** ) );
 
 /*****************************************************************************
  * AlignWord : fill in the bit buffer so that the byte pointer be aligned

@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.4 2002/10/15 01:50:24 fenrir Exp $
+ * $Id: cinepak.c,v 1.5 2002/10/24 09:37:48 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -155,56 +155,6 @@ static inline u32 GetDWBE( u8 *p_buff )
 #define FREE( p ) \
     if( p ) free( p )
 
-/* get the first pes from fifo */
-static pes_packet_t *__PES_GET( decoder_fifo_t *p_fifo )
-{
-    pes_packet_t *p_pes;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    /* if fifo is emty wait */
-    while( !p_fifo->p_first )
-    {
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return( NULL );
-        }
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    p_pes = p_fifo->p_first;
-
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    return( p_pes );
-}
-
-/* free the first pes and go to next */
-static void __PES_NEXT( decoder_fifo_t *p_fifo )
-{
-    pes_packet_t *p_next;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-    
-    p_next = p_fifo->p_first->p_next;
-    p_fifo->p_first->p_next = NULL;
-    input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
-    p_fifo->p_first = p_next;
-    p_fifo->i_depth--;
-
-    if( !p_fifo->p_first )
-    {
-        /* No PES in the fifo */
-        /* pp_last no longer valid */
-        p_fifo->pp_last = &p_fifo->p_first;
-        while( !p_fifo->p_first )
-        {
-            vlc_cond_signal( &p_fifo->data_wait );
-            vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-        }
-    }
-    vlc_mutex_unlock( &p_fifo->data_lock );
-}
 
 static inline void __GetFrame( videodec_thread_t *p_vdec )
 {
@@ -212,13 +162,12 @@ static inline void __GetFrame( videodec_thread_t *p_vdec )
     data_packet_t *p_data;
     byte_t        *p_buffer;
 
-    p_pes = __PES_GET( p_vdec->p_fifo );
+    p_pes = GetPES( p_vdec->p_fifo );
     p_vdec->i_pts = p_pes->i_pts;
 
     while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
     {
-        __PES_NEXT( p_vdec->p_fifo );
-        p_pes = __PES_GET( p_vdec->p_fifo );
+        p_pes = NextPES( p_vdec->p_fifo );
     }
     p_vdec->i_framesize = p_pes->i_pes_size;
     if( p_pes->i_nb_data == 1 )
@@ -242,12 +191,12 @@ static inline void __NextFrame( videodec_thread_t *p_vdec )
 {
     pes_packet_t  *p_pes;
 
-    p_pes = __PES_GET( p_vdec->p_fifo );
+    p_pes = GetPES( p_vdec->p_fifo );
     if( p_pes->i_nb_data != 1 )
     {
         free( p_vdec->p_framedata ); /* FIXME keep this buffer */
     }
-    __PES_NEXT( p_vdec->p_fifo );
+    NextPES( p_vdec->p_fifo );
 }
 
 static int cinepak_CheckVout( vout_thread_t *p_vout,

@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.6 2002/10/20 17:44:17 fenrir Exp $
+ * $Id: decoder.c,v 1.7 2002/10/24 09:37:47 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -148,64 +148,13 @@ static void faac_GetWaveFormatEx( waveformatex_t *p_wh,
     }
 }
 
-/* get the first pes from fifo */
-static pes_packet_t *__PES_GET( decoder_fifo_t *p_fifo )
-{
-    pes_packet_t *p_pes;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    /* if fifo is emty wait */
-    while( !p_fifo->p_first )
-    {
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return( NULL );
-        }
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    p_pes = p_fifo->p_first;
-
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    return( p_pes );
-}
-
-/* free the first pes and go to next */
-static void __PES_NEXT( decoder_fifo_t *p_fifo )
-{
-    pes_packet_t *p_next;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-    
-    p_next = p_fifo->p_first->p_next;
-    p_fifo->p_first->p_next = NULL;
-    input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
-    p_fifo->p_first = p_next;
-    p_fifo->i_depth--;
-
-    if( !p_fifo->p_first )
-    {
-        /* No PES in the fifo */
-        /* pp_last no longer valid */
-        p_fifo->pp_last = &p_fifo->p_first;
-        while( !p_fifo->p_first )
-        {
-            vlc_cond_signal( &p_fifo->data_wait );
-            vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-        }
-    }
-    vlc_mutex_unlock( &p_fifo->data_lock );
-}
-
 static inline void __GetFrame( adec_thread_t *p_adec )
 {
     pes_packet_t  *p_pes;
     data_packet_t *p_data;
     byte_t        *p_buffer;
 
-    p_pes = __PES_GET( p_adec->p_fifo );
+    p_pes = GetPES( p_adec->p_fifo );
     if( p_pes->i_pts )
     {
         p_adec->pts = p_pes->i_pts;
@@ -213,8 +162,7 @@ static inline void __GetFrame( adec_thread_t *p_adec )
 
     while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
     {
-        __PES_NEXT( p_adec->p_fifo );
-        p_pes = __PES_GET( p_adec->p_fifo );
+        p_pes = NextPES( p_adec->p_fifo );
     }
     p_adec->i_framesize = p_pes->i_pes_size;
     if( p_pes->i_nb_data == 1 )
@@ -250,7 +198,7 @@ static inline void __GetFrame( adec_thread_t *p_adec )
 
 static inline void __NextFrame( adec_thread_t *p_adec )
 {
-    __PES_NEXT( p_adec->p_fifo );
+    NextPES( p_adec->p_fifo );
 }
 
 
