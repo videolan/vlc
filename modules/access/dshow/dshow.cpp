@@ -2,7 +2,7 @@
  * dshow.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.5 2003/08/27 07:31:26 gbazin Exp $
+ * $Id: dshow.cpp,v 1.6 2003/08/27 12:59:11 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -305,13 +305,14 @@ static int AccessOpen( vlc_object_t *p_this )
     if( !p_sys->i_streams )
     {
         /* Release directshow objects */
-        p_sys->p_control->Release();
+        if( p_sys->p_control ) p_sys->p_control->Release();
         p_sys->p_graph->Release();
 
         /* Uninitialize OLE/COM */
         CoUninitialize();   
 
         free( p_sys->p_header );
+        free( p_sys->pp_streams );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -388,8 +389,11 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
     access_sys_t *p_sys = p_input->p_access_data;
     list<string> list_devices;
 
-    /* Enumerate audio devices and display their names */
+    /* Enumerate devices and display their names */
     FindCaptureDevice( (vlc_object_t *)p_input, NULL, &list_devices, b_audio );
+
+    if( !list_devices.size() )
+        return VLC_EGENERIC;
 
     list<string>::iterator iter;
     for( iter = list_devices.begin(); iter != list_devices.end(); iter++ )
