@@ -689,7 +689,7 @@ dnl
 dnl DVDREAD module: check for libdvdread plugin
 dnl
 AC_ARG_ENABLE(dvdread,
-[  --enable-dvdread          Enable dvdread support (default enabled)],
+[  --enable-dvdread          Enable dvdread support (default disabled)],
 [ if test x$enableval = xyes
   then
     NEED_LIBDVDCSS=1
@@ -697,12 +697,7 @@ AC_ARG_ENABLE(dvdread,
     BUILTINS="${BUILTINS} dvdread" 
     CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I../../extras/libdvdread"
     LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a lib/libdvdcss.a"
-  fi ],
-[ NEED_LIBDVDCSS=1
-  STATIC_LIBDVDCSS=1
-  BUILTINS="${BUILTINS} dvdread"
-  CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I../../extras/libdvdread"
-  LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a lib/libdvdcss.a" ])
+  fi ])
 
 dnl
 dnl  VCD module
