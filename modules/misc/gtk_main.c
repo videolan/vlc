@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.3 2002/08/21 15:55:15 sam Exp $
+ * $Id: gtk_main.c,v 1.4 2002/08/21 17:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,15 +51,11 @@ typedef struct gtk_main_t
 {
     VLC_COMMON_MEMBERS
 
-    /* XXX: Ugly kludge, see g_atexit */
-    void ( *pf_callback[MAX_ATEXIT] ) ( void );
-
 } gtk_main_t;
 
 /*****************************************************************************
  * Local variables (mutex-protected).
  *****************************************************************************/
-static void **       pp_global_data = NULL;
 static int           i_refcount = 0;
 static gtk_main_t *  p_gtk_main = NULL;
 
@@ -67,7 +63,6 @@ static gtk_main_t *  p_gtk_main = NULL;
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    pp_global_data = p_module->p_vlc->pp_global_data;
     set_description( _("Gtk+ helper module") );
     set_capability( "gtk_main", 100 );
     add_shortcut( "gtk" );
@@ -75,59 +70,14 @@ vlc_module_begin();
     add_shortcut( "gnome" );
 #endif
     set_callbacks( Open, Close );
+    linked_with_a_crap_library_which_uses_atexit();
 vlc_module_end();
-
-/*****************************************************************************
- * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
- *****************************************************************************
- * gtk_init() makes several calls to g_atexit() which calls atexit() to
- * register tidying callbacks to be called at program exit. Since the Gtk+
- * plugin is likely to be unloaded at program exit, we have to export this
- * symbol to intercept the g_atexit() calls. Talk about crude hack.
- *****************************************************************************/
-void g_atexit( GVoidFunc func )
-{
-    gtk_main_t *p_this;
-
-    int i_dummy;
-
-    if( pp_global_data == NULL )
-    {
-        atexit( func );
-        return;
-    }
-
-    p_this = (gtk_main_t *)*pp_global_data;
-    if( p_this == NULL )
-    {
-        /* Looks like this atexit() call wasn't for us. */
-        return;
-    }
-
-    for( i_dummy = 0;
-         i_dummy < MAX_ATEXIT && p_this->pf_callback[i_dummy] != NULL;
-         i_dummy++ )
-    {
-        ;
-    }
-
-    if( i_dummy >= MAX_ATEXIT - 1 )
-    {
-        msg_Err( p_this, "too many atexit() callbacks to register" );
-        return;
-    }
-
-    p_this->pf_callback[i_dummy]     = func;
-    p_this->pf_callback[i_dummy + 1] = NULL;
-}
 
 /*****************************************************************************
  * Open: initialize and create window
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    /* Initialize Gtk+ */
-
     vlc_mutex_lock( p_this->p_vlc->p_global_lock );
 
     if( i_refcount > 0 )
@@ -139,7 +89,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_gtk_main = vlc_object_create( p_this, sizeof(gtk_main_t) );
-    p_gtk_main->pf_callback[0] = NULL;
 
     /* Only initialize gthreads if it's the first time we do it */
     if( !g_thread_supported() )
@@ -168,8 +117,6 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    int i_dummy;
-
     vlc_mutex_lock( p_this->p_vlc->p_global_lock );
 
     i_refcount--;
@@ -182,14 +129,6 @@ static void Close( vlc_object_t *p_this )
 
     gtk_main_quit();
     vlc_thread_join( p_gtk_main );
-
-    /* Launch stored callbacks */
-    for( i_dummy = 0;
-         i_dummy < MAX_ATEXIT && p_gtk_main->pf_callback[i_dummy] != NULL;
-         i_dummy++ )
-    {
-        p_gtk_main->pf_callback[i_dummy]();
-    }
 
     vlc_object_destroy( p_gtk_main );
     p_gtk_main = NULL;
@@ -217,10 +156,6 @@ static void GtkMain( vlc_object_t *p_this )
     static char **pp_args  = p_args;
 #endif
     static int    i_args   = 1;
-
-    /* gtk_init will register stuff with g_atexit, so we need to have
-     * the global lock if we want to be able to intercept the calls */
-    *p_this->p_vlc->pp_global_data = p_gtk_main;
 
     /* FIXME: deprecated ? */
     /* gdk_threads_init(); */

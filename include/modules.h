@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.60 2002/08/15 12:11:15 sam Exp $
+ * $Id: modules.h,v 1.61 2002/08/21 17:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -71,6 +71,8 @@ struct module_t
     int   i_score;                              /* Score for each capability */
     u32   i_cpu;                                /* Required CPU capabilities */
 
+    vlc_bool_t b_unloadable;                          /* Can we be dlclosed? */
+    vlc_bool_t b_reentrant;                             /* Are we reentrant? */
     vlc_bool_t b_submodule;                          /* Is this a submodule? */
 
     /* Callbacks */

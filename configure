@@ -8153,7 +8153,7 @@ fi
 
 if test "x${enable_svgalib}" = "xyes"
 then
-  BUILTINS="${BUILTINS} video_output/svgalib"
+  PLUGINS="${PLUGINS} video_output/svgalib"
   svgalib_LDFLAGS="${svgalib_LDFLAGS} -lvgagl -lvga"
 fi
 

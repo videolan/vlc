@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.91 2002/08/21 11:07:42 xav Exp $
+ * $Id: modules.c,v 1.92 2002/08/21 17:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -823,7 +823,10 @@ static int DeleteModule( module_t * p_module )
 #ifdef HAVE_DYNAMIC_PLUGINS
     if( !p_module->b_builtin )
     {
-        module_unload( p_module->handle );
+        if( p_module->b_unloadable )
+        {
+            module_unload( p_module->handle );
+        }
         UndupModule( p_module );
         free( p_module->psz_filename );
         free( p_module->psz_longname );

@@ -2,7 +2,7 @@
  * svgalib.c : SVGAlib plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: svgalib.c,v 1.1 2002/08/21 15:10:33 sam Exp $
+ * $Id: svgalib.c,v 1.2 2002/08/21 17:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -53,6 +53,7 @@ vlc_module_begin();
     set_description( _("SVGAlib module") );
     set_capability( "video output", 0 );
     set_callbacks( Create, Destroy );
+    linked_with_a_crap_library_which_uses_atexit();
 vlc_module_end();
 
 /*****************************************************************************

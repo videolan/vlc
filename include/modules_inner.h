@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.30 2002/08/14 17:06:53 sam Exp $
+ * $Id: modules_inner.h,v 1.31 2002/08/21 17:31:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -87,6 +87,8 @@
         module_config_t p_config[ 100 ];                                      \
         STORE_SYMBOLS;                                                        \
         p_module->b_submodule = VLC_FALSE;                                    \
+        p_module->b_unloadable = VLC_TRUE;                                    \
+        p_module->b_reentrant = VLC_TRUE;                                     \
         p_module->psz_object_name = MODULE_STRING;                            \
         p_module->psz_longname = MODULE_STRING;                               \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
@@ -145,7 +147,7 @@
     i_shortcut++
 
 #define set_description( desc )                                               \
-    p_module->psz_longname = desc
+    p_submodule->psz_longname = desc
 
 #define set_capability( cap, score )                                          \
     p_submodule->psz_capability = cap;                                        \
@@ -157,6 +159,9 @@
 #define set_callbacks( activate, deactivate )                                 \
     p_submodule->pf_activate = activate;                                      \
     p_submodule->pf_deactivate = deactivate
+
+#define linked_with_a_crap_library_which_uses_atexit( )                       \
+    p_module->b_unloadable = VLC_FALSE
 
 /*
  * module_activate: this function is called before functions can be accessed,
