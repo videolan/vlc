@@ -352,7 +352,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
                           p_sys->p_context->sub_id );
             }
         }
-        else if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'a', 'v', 'c', '1' ) )
+        else
         {
             p_sys->p_context->extradata_size = i_size;
             p_sys->p_context->extradata =
