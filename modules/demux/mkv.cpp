@@ -385,6 +385,7 @@ public:
         ,es(estream)
         ,i_timescale(MKVD_TIMECODESCALE)
         ,f_duration(-1.0)
+		,f_start_time(0.0)
         ,i_cues_position(-1)
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
@@ -462,6 +463,7 @@ public:
 
     /* duration of the segment */
     float                   f_duration;
+	float                   f_start_time;
 
     /* all tracks */
     std::vector<mkv_track_t*> tracks;
@@ -514,6 +516,7 @@ public:
     void ParseTracks( EbmlElement *tracks );
     void ParseChapterAtom( int i_level, EbmlMaster *ca, chapter_item_t & chapters );
     void ParseTrackEntry( EbmlMaster *m );
+    void ParseCluster( );
     void IndexAppendCluster( KaxCluster *cluster );
     void LoadCues( );
     void LoadTags( );
@@ -3150,6 +3153,33 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
     }
 }
 
+void matroska_segment_t::ParseCluster( )
+{
+	EbmlElement *el;
+    EbmlMaster  *m;
+    unsigned int i;
+    int i_upper_level = 0;
+
+    /* Master elements */
+    m = static_cast<EbmlMaster *>( cluster );
+    m->Read( es, cluster->Generic().Context, i_upper_level, el, true );
+
+    for( i = 0; i < m->ListSize(); i++ )
+    {
+        EbmlElement *l = (*m)[i];
+
+        if( MKV_IS_ID( l, KaxClusterTimecode ) )
+        {
+            KaxClusterTimecode &ctc = *(KaxClusterTimecode*)l;
+
+            cluster->InitTimecode( uint64( ctc ), i_timescale );
+			break;
+        }
+    }
+
+	f_start_time = cluster->GlobalTimecode() / 1000000.0;
+}
+
 /*****************************************************************************
  * InformationCreate:
  *****************************************************************************/
@@ -3594,11 +3624,15 @@ void virtual_segment_t::PreloadLinked( )
 
 float virtual_segment_t::Duration() const
 {
-    float f_duration = 0.0;
-    for ( size_t i=0; i<linked_segments.size(); i++ )
-    {
-        f_duration += linked_segments[i]->f_duration;
-    }
+    float f_duration;
+	if ( linked_segments.size() == 0 )
+		f_duration = 0.0;
+	else {
+		matroska_segment_t *p_last_segment = linked_segments[linked_segments.size()-1];
+		p_last_segment->ParseCluster( );
+
+		f_duration = p_last_segment->f_start_time + p_last_segment->f_duration;
+	}
     return f_duration;
 }
 
