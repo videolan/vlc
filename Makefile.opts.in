@@ -98,6 +98,7 @@ beos_LDFLAGS = @beos_LDFLAGS@
 i420_rgb_LDFLAGS = @i420_rgb_LDFLAGS@
 directx_LDFLAGS = @directx_LDFLAGS@
 dsp_LDFLAGS = @dsp_LDFLAGS@
+dv_LDFLAGS = @dv_LDFLAGS@
 dvd_LDFLAGS = @dvd_LDFLAGS@
 dvdread_LDFLAGS = @dvdread_LDFLAGS@
 dvdplay_LDFLAGS = @dvdplay_LDFLAGS@

@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define if using alloca.c.  */
 #undef C_ALLOCA
@@ -234,6 +234,9 @@
 
 /* Define if you have the <kernel/scheduler.h> header file.  */
 #undef HAVE_KERNEL_SCHEDULER_H
+
+/* Define if you have the <libdv/dv.h> header file.  */
+#undef HAVE_LIBDV_DV_H
 
 /* Define if you have the <limits.h> header file.  */
 #undef HAVE_LIMITS_H
