@@ -1,4 +1,3 @@
-
 /*****************************************************************************
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
@@ -58,7 +57,7 @@ static int Control( demux_t *, int, va_list );
 
 struct demux_sys_t
 {
-    mtime_t         i_time;
+    date_t          pts;
     mtime_t         i_time_offset;
 
     int             i_bitrate_avg;  /* extracted from Xing header */
@@ -171,8 +170,7 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_time = 1;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_time_offset = 0;
     p_sys->i_bitrate_avg = 0;
     p_sys->meta = NULL;
@@ -307,6 +305,9 @@ static int Open( vlc_object_t * p_this )
         sprintf( psz_description, "MPEG Audio Layer %d, version %d",
                  MPGA_LAYER ( header ) + 1, MPGA_VERSION ( header ) + 1 );
         fmt.psz_description = strdup( psz_description );
+
+        date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
+        date_Set( &p_sys->pts, 1 );
     }
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
@@ -373,17 +374,16 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "cannot read data" );
         return 0;
     }
-    p_frame->i_dts = p_frame->i_pts = p_sys->i_time;
+
+    p_frame->i_dts = p_frame->i_pts =
+        date_Increment( &p_sys->pts, mpga_frame_samples( header ) );
 
     /* set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_frame->i_pts );
 
     es_out_Send( p_demux->out, p_sys->p_es, p_frame );
 
-    p_sys->i_time += (mtime_t)1000000 *
-                     (mtime_t)mpga_frame_samples( header ) /
-                     (mtime_t)MPGA_SAMPLE_RATE( header );
-    return( 1 );
+    return 1;
 }
 
 /*****************************************************************************
@@ -427,27 +427,26 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = p_sys->i_time + p_sys->i_time_offset;
+            *pi64 = date_Get( &p_sys->pts ) + p_sys->i_time_offset;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
         default:
-            i_ret = demux2_vaControlHelper( p_demux->s,
-                                            0, -1,
+            i_ret = demux2_vaControlHelper( p_demux->s, 0, -1,
                                             p_sys->i_bitrate_avg, 1, i_query,
                                             args );
             if( !i_ret && p_sys->i_bitrate_avg > 0 &&
-                ( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) )
+                (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
             {
-                int64_t i_time = I64C(8000000) * stream_Tell(p_demux->s) / p_sys->i_bitrate_avg;
+                int64_t i_time = I64C(8000000) * stream_Tell(p_demux->s) /
+                    p_sys->i_bitrate_avg;
 
                 /* fix time_offset */
                 if( i_time >= 0 )
-                    p_sys->i_time_offset = i_time - p_sys->i_time;
+                    p_sys->i_time_offset = i_time - date_Get( &p_sys->pts );
             }
             return i_ret;
     }
 }
-
