@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.11 2003/11/05 02:43:55 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.12 2003/11/05 17:46:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -111,14 +111,11 @@ ConfigControl::ConfigControl( vlc_object_t *_p_this,
     i_type( p_item->i_type ), b_advanced( p_item->b_advanced )
 {
     sizer = new wxBoxSizer( wxHORIZONTAL );
-    i_counter++;
 }
 
 ConfigControl::~ConfigControl()
 {
 }
-
-int ConfigControl::i_counter = 0;
 
 wxSizer *ConfigControl::Sizer()
 {
@@ -422,7 +419,7 @@ void StringListConfigControl::UpdateCombo( module_config_t *p_item )
 
 BEGIN_EVENT_TABLE(StringListConfigControl, wxPanel)
     /* Button events */
-    EVT_BUTTON(wxID_HIGHEST+i_counter%100, StringListConfigControl::OnRefresh)
+    EVT_BUTTON(wxID_HIGHEST, StringListConfigControl::OnRefresh)
 END_EVENT_TABLE()
 
 void StringListConfigControl::OnRefresh( wxCommandEvent& event )
@@ -476,7 +473,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *p_this,
 
 BEGIN_EVENT_TABLE(FileConfigControl, wxPanel)
     /* Button events */
-    EVT_BUTTON(wxID_HIGHEST+i_counter%100, FileConfigControl::OnBrowse)
+    EVT_BUTTON(wxID_HIGHEST, FileConfigControl::OnBrowse)
 END_EVENT_TABLE()
 
 void FileConfigControl::OnBrowse( wxCommandEvent& event )
@@ -551,7 +548,7 @@ int IntegerConfigControl::GetIntValue()
 IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *p_this,
                                                     module_config_t *p_item,
                                                     wxWindow *parent )
-  : ConfigControl( p_this, p_item, parent )
+  : ConfigControl( p_this, p_item, parent ), psz_name( NULL )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -608,7 +605,7 @@ void IntegerListConfigControl::UpdateCombo( module_config_t *p_item )
 
 BEGIN_EVENT_TABLE(IntegerListConfigControl, wxPanel)
     /* Button events */
-    EVT_BUTTON(wxID_HIGHEST+i_counter%100, IntegerListConfigControl::OnRefresh)
+    EVT_BUTTON(wxID_HIGHEST, IntegerListConfigControl::OnRefresh)
 END_EVENT_TABLE()
 
 void IntegerListConfigControl::OnRefresh( wxCommandEvent& event )

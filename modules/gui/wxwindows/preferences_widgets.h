@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.5 2003/11/05 02:43:55 gbazin Exp $
+ * $Id: preferences_widgets.h,v 1.6 2003/11/05 17:46:21 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -40,7 +40,6 @@ protected:
     wxBoxSizer *sizer;
     wxStaticText *label;
     vlc_object_t *p_this;
-    static int i_counter;
 
 private:
     wxString name;
@@ -95,7 +94,6 @@ private:
 
     void OnRefresh( wxCommandEvent& );
     char *psz_name;
-    vlc_object_t *p_this;
     vlc_callback_t pf_list_update;
 
     void UpdateCombo( module_config_t *p_item );
@@ -138,7 +136,6 @@ private:
 
     void OnRefresh( wxCommandEvent& );
     char *psz_name;
-    vlc_object_t *p_this;
     vlc_callback_t pf_list_update;
 
     void UpdateCombo( module_config_t *p_item );

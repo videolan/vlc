@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.3 2003/10/27 19:48:16 gbazin Exp $
+ * $Id: encoder.c,v 1.4 2003/11/05 17:46:21 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -70,12 +70,6 @@ struct encoder_sys_t
      */
     AVCodec         *p_codec;
     AVCodecContext  *p_context;
-
-    /*
-     * Packetizer output properties
-     */
-    sout_packetizer_input_t *p_sout_input;
-    sout_format_t           sout_format;
 
     /*
      * Common properties
@@ -424,7 +418,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
         if( i_samples_delay )
         {
             /* Take care of the left-over from last time */
-            int i_delay_size = i_samples_delay  * 2 *
+            int i_delay_size = i_samples_delay * 2 *
                                  p_sys->p_context->channels;
             int i_size = p_sys->i_frame_size - i_delay_size;
 
@@ -471,7 +465,8 @@ static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     /* Backup the remaining raw samples */
     if( i_samples )
     {
-        memcpy( p_sys->p_buffer, p_buffer + i_samples_delay,
+        memcpy( p_sys->p_buffer, p_buffer + i_samples_delay * 2 *
+                p_sys->p_context->channels,
                 i_samples * 2 * p_sys->p_context->channels );
     }
 
