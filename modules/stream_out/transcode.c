@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.82 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1076,9 +1076,54 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         id->ff_dec_c = avcodec_alloc_context();
         id->ff_dec_c->width         = id->f_src.video.i_width;
         id->ff_dec_c->height        = id->f_src.video.i_height;
+        id->ff_dec_c->bits_per_sample=id->f_src.video.i_bits_per_pixel;
         /* id->ff_dec_c->bit_rate      = id->f_src.i_bitrate; */
-        id->ff_dec_c->extradata_size= id->f_src.i_extra;
-        id->ff_dec_c->extradata     = id->f_src.p_extra;
+
+        if( id->f_src.i_extra > 0 )
+        {
+            if( i_ff_codec == CODEC_ID_SVQ3 )
+            {
+                int i_size = id->f_src.i_extra;
+                uint8_t *p;
+
+                id->ff_dec_c->extradata_size = i_size + 12;
+                p = id->ff_dec_c->extradata  = malloc( i_size + 12 );
+
+                memcpy( &p[0],  "SVQ3", 4 );
+                memset( &p[4], 0, 8 );
+                memcpy( &p[12], id->f_src.p_extra, i_size );
+
+                /* Now remove all atoms before the SMI one */
+                if( id->ff_dec_c->extradata_size > 0x5a && strncmp( &p[0x56], "SMI ", 4 ) )
+                {
+                    uint8_t *psz = &p[0x52];
+
+                    while( psz < &p[id->ff_dec_c->extradata_size - 8] )
+                    {
+                        int i_size = GetDWBE( psz );
+                        if( i_size <= 1 )
+                        {
+                            /* FIXME handle 1 as long size */
+                            break;
+                        }
+                        if( !strncmp( &psz[4], "SMI ", 4 ) )
+                        {
+                            memmove( &p[0x52], psz, &p[id->ff_dec_c->extradata_size] - psz );
+                            break;
+                        }
+                        psz += i_size;
+                    }
+                }
+            }
+            else
+            {
+                id->ff_dec_c->extradata_size= id->f_src.i_extra;
+                id->ff_dec_c->extradata = malloc( id->f_src.i_extra + FF_INPUT_BUFFER_PADDING_SIZE );
+
+                memcpy( id->ff_dec_c->extradata, id->f_src.p_extra, id->f_src.i_extra );
+                memset( (uint8_t*)id->ff_dec_c->extradata + id->f_src.i_extra, 0, FF_INPUT_BUFFER_PADDING_SIZE );
+            }
+        }
         id->ff_dec_c->workaround_bugs = FF_BUG_AUTODETECT;
         id->ff_dec_c->error_resilience= -1;
         id->ff_dec_c->get_buffer    = transcode_video_ffmpeg_getframebuf;
@@ -1089,7 +1134,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
             msg_Err( p_stream, "cannot open decoder" );
             return VLC_EGENERIC;
         }
-
+#if 0
         if( i_ff_codec == CODEC_ID_MPEG4 && id->ff_dec_c->extradata_size > 0 )
         {
             int b_gotpicture;
@@ -1107,6 +1152,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
                                   id->ff_dec_c->extradata_size );
             free( p_vol );
         }
+#endif
     }
 
     /* Open encoder */
