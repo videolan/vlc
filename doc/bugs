@@ -1,33 +1,25 @@
 * interface :
-  Il semble que si l'on envoie 2 messages de logs l'un immediatement apres
-  l'autre, le 2e ne soit jamais affiche (cf debut du DemuxPES)
+  + il semble que si l'on envoie 2 messages de logs l'un immediatement
+    apres l'autre, le 2e ne soit jamais affiche (cf debut du DemuxPES)
+  + l'envoi repeté de commandes dans la console provoque un segfault
+    - ce bug est du à la xconsole, qu'il faudra de toute manière
+      reprogrammer avec un widget quelconque (je recommande wx, qui est
+      portable, mais moche il est vrai), donc je vais pas me casser à le
+      corriger (Ptyx)
+    - vérifier qu'il est bien du à xconsole et non à intf_ExecCommand :-\
+      (Ptyx)
 
-* video output/X11 :
-  quand une XShmImage n'a jamais été affichée, la fermer provoque une erreur
-  (fatale ?) du serveur -> plantage de vout_thread.
-
-* video output/X11 :
-  erreur lors de la fermeture 'brutale' de la fenêtre
-    Ptyx: en cours de correction - j'ai trouvé comment signaler au WM qu'une
-    fenêtre est capable de se fermer propremenet sur un ClientMessage, mais
-    pas encore comment intercepter ce ClientMessage :-\
-
-* interface :
-  l'envoi repeté de commandes dans la console provoque un
-  segfault
-    Ptyx: ce bug est du à la xconsole, qu'il faudra de toute manière
-    reprogrammer avec un widget quelconque (je recommande wx, qui est portable,
-    mais moche il est vrai), donc je vais pas me casser à le corriger.
-    Ptyx: vérifier qu'il est bien du à xconsole et non à intf_ExecCommand :-\
+* video_output/X11 :
+  + quand une XShmImage n'a jamais été affichée, la fermer provoque une
+    erreur (fatale ?) du serveur -> plantage de vout_thread
+  + erreur lors de la fermeture 'brutale' de la fenêtre
+    - en cours de correction - j'ai trouvé comment signaler au WM qu'une
+      fenêtre est capable de se fermer propremenet sur un ClientMessage,
+      mais pas encore comment intercepter ce ClientMessage :-\ (Ptyx)
 
 * input :
-  = segfault au `quit' lorsqu'un thread input et un thread décodeur sont
-    spawnés (MaXX)
-    - Meuuh et MaXX: le thread input demande à ses décodeurs de se tuer
-      et se tue immédiatement, sans attendre leur mort effective, alors
-      que ces décodeurs accèdent encore à sa structure
-  = le flag b_random_access est activé dans tous les paquets PES (MaXX)
-  = le flag b_data_alignment n'est activé dans aucun paquet PES (MaXX)
-
-* input :
-  = lorsque le pid 120 est sélectionné le vlc segfaulte (MaXX)
+  + lorsque le vlc est appelé avec --novideo, le son n'est pas joué, bien
+    que décodé... parce que la synchro ou l'input n'envoie pas de date à
+    l'audio decoder... parce que les PCRs sont contenus dans la partie
+    video... solution : traiter TOUS les TS, afin de pouvoir récupérer les
+    PCRs (MaXX)
