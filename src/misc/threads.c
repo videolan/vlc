@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.28 2002/12/08 00:41:06 massiot Exp $
+ * $Id: threads.c,v 1.29 2002/12/14 19:19:08 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -679,7 +679,11 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
                                int i_line, int i_priority )
 {
 #if defined( WIN32 ) || defined( UNDER_CE )
-    /* FIXME: implement it under Win32 ! */
+    if ( !SetThreadPriority(GetCurrentThread(), i_priority) )
+    {
+        msg_Warn( p_this, "couldn't set a faster priority" );
+        return 1;
+    }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     if ( i_priority )
@@ -691,10 +695,15 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
         {
             msg_Warn( p_this, "couldn't go to real-time priority (%s:%d)",
                       psz_file, i_line );
-            i_priority = 0;
+            return 1;
         }
     }
+
+#else
+    return 1;
 #endif
+
+    return 0;
 }
 
 /*****************************************************************************
