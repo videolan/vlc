@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.5 2003/01/21 17:34:03 lool Exp $
+ * $Id: slp.c,v 1.6 2003/01/21 21:19:36 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -46,33 +46,36 @@ static int  Demux ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 
-#define SRVTYPE_TEXT "SLP service type"
+#define SRVTYPE_TEXT     "SLP service type"
 #define SRVTYPE_LONGTEXT "The service type string for SLP queries, " \
                          "including the authority string (if any) for the " \
                          "request. May not be empty"
-#define SCOPELIST_TEXT "SLP scopes list"
+#define ATTRIDS_TEXT     "SLP attribute identifiers"
+#define ATTRIDS_LONGTEXT "This string is a comma separated list of " \
+                         "attribute identifiers to search for a playlist "\
+                         "title or empty to use all attributes"
+#define SCOPELIST_TEXT     "SLP scopes list"
 #define SCOPELIST_LONGTEXT "This string is a comma separated list of scope " \
                            "names or empty if you want to use the default "  \
                            "scopes; it is used in all SLP queries"
-#define NAMINGAUTHORITY_TEXT "SLP naming authority"
+#define NAMINGAUTHORITY_TEXT     "SLP naming authority"
 #define NAMINGAUTHORITY_LONGTEXT "This string is a list of naming " \
                                  "authorities to search. Use \"*\" for all " \
                                  "and the empty string for the default of " \
                                  "IANA"
-#define FILTER_TEXT "SLP LDAP filter"
+#define FILTER_TEXT     "SLP LDAP filter"
 #define FILTER_LONGTEXT "This is a query formulated of attribute pattern " \
                         "matching expressions in the form of an LDAPv3 "   \
                         "search filter or empty for all answers"
-#define LANG_TEXT "language asked in SLP requests"
+#define LANG_TEXT     "language requested in SLP requests"
 #define LANG_LONGTEXT "RFC 1766 Language Tag for the natural language " \
                       "locale of requests, leave empty to use the "     \
-                      "default locale"
+                      "default locale; it is used in all SLP queries"
 
 vlc_module_begin();
     set_description( _("SLP access module") );
     add_category_hint( N_("slp"), NULL );
-/*    add_string( "slp-srvtype", "service:vls.services.videolan.org:udpm",
-                NULL, SRVTYPE_TEXT, SRVTYPE_LONGTEXT ); */
+    add_string( "slp-attrids", "", NULL, ATTRIDS_TEXT, ATTRIDS_LONGTEXT );
     add_string( "slp-scopelist", "", NULL, SCOPELIST_TEXT,
                 SCOPELIST_LONGTEXT );
     add_string( "slp-namingauthority", "*", NULL, NAMINGAUTHORITY_TEXT,
@@ -89,6 +92,36 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
+ * AttrCallback: updates the description of a playlist item
+ *****************************************************************************/
+static SLPBoolean AttrCallback( SLPHandle slph_slp,
+                           const char * psz_attrlist,
+                           SLPError slpe_errcode,
+                           void * p_cookie )
+{
+    playlist_item_t * p_playlist_item = (playlist_item_t *)p_cookie;
+
+    /* our callback was only called to tell us there's nothing more to read */
+    if( slpe_errcode == SLP_LAST_CALL )
+    {
+        return SLP_TRUE;
+    }
+
+    /* or there was a problem with getting the data we requested */
+    if( (slpe_errcode != SLP_OK) )
+    {
+/*        msg_Err( (vlc_object_t*)NULL,
+                 "AttrCallback got an error %i with attribute %s",
+                 slpe_errcode,
+                 psz_attrlist ); */
+        return SLP_TRUE;
+    }
+
+    p_playlist_item->psz_name = strdup(psz_attrlist);     /* NULL is checked */
+    return SLP_TRUE;
+}
+
+/*****************************************************************************
  * SrvUrlCallback: adds an entry to the playlist
  *****************************************************************************/
 static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
@@ -100,7 +133,10 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     input_thread_t * p_input = (input_thread_t  *)p_cookie;
     playlist_t * p_playlist;
     char psz_item[42] = "udp:@";
-    char * psz_s;
+    char * psz_s;                           /* to hold the uri of the stream */
+    SLPHandle slph_slp3;
+    SLPError slpe_result;
+    playlist_item_t * p_playlist_item;
 
     /* our callback was only called to tell us there's nothing more to read */
     if( slpe_errcode == SLP_LAST_CALL )
@@ -120,18 +156,56 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
 
     /* search the returned address after a double-slash */
     psz_s = strstr( psz_srvurl, "//" );
-    /* skip the slashes */
-    psz_s = &psz_s[2];
     if( psz_s == NULL )
     {
         msg_Err( (input_thread_t *)p_input,
-                 "SrvUrlCallback got a NULL string if your libslp" );
+                 "SrvUrlCallback got a strange string of your libslp" );
         return SLP_TRUE;
     }
+    /* skip the slashes */
+    psz_s = &psz_s[2];
     /* add udp:@ in front of the address */
     psz_s = strncat( psz_item,
                      psz_s,
                      sizeof(psz_item) - strlen(psz_item) - 1 );
+
+    /* create a playlist  item */
+    p_playlist_item = malloc( sizeof( playlist_item_t ) );
+    if( p_playlist_item == NULL )
+    {
+        msg_Err( p_input, "out of memory" );
+        return SLP_TRUE;
+    }
+
+    p_playlist_item->psz_name = NULL;
+    p_playlist_item->psz_uri  = strdup( psz_s );
+    p_playlist_item->i_type = 0;
+    p_playlist_item->i_status = 0;
+    p_playlist_item->b_autodeletion = VLC_FALSE;
+
+    /* search the description of the stream */
+    if( SLPOpen( config_GetPsz( p_input, "slp-lang" ),
+                 SLP_FALSE,                              /* synchronous ops */
+                 &slph_slp3 ) == SLP_OK )
+    {
+        /* search all attributes */
+        slpe_result = SLPFindAttrs( slph_slp3,
+                                    psz_srvurl,
+                                    config_GetPsz( p_input, "slp-scopelist" ),
+                                    config_GetPsz( p_input, "slp-attrids" ),
+                                    AttrCallback,
+                                    p_playlist_item
+                                  );
+
+        /* we're done, clean up */
+        SLPClose( slph_slp3 );
+    }
+
+    /* add a default name if we found no attribute */
+    if( p_playlist_item->psz_name == NULL )
+    {
+        p_playlist_item->psz_name = strdup( psz_s );
+    }
 
     /* search the main playlist object */
     p_playlist = vlc_object_find( (input_thread_t *)p_input,
@@ -144,9 +218,10 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
         return SLP_TRUE;
     }
 
-    playlist_Add( p_playlist, psz_s,
-                  PLAYLIST_APPEND,
-                  PLAYLIST_END );
+    playlist_AddItem( p_playlist,
+                      p_playlist_item,
+                      PLAYLIST_APPEND,
+                      PLAYLIST_END );
     vlc_object_release( (vlc_object_t *)p_playlist );
 
     msg_Info( (input_thread_t *)p_input,
