@@ -940,7 +940,7 @@ msgstr "Processeur"
 #: modules/gui/macosx/intf.m:351 modules/gui/win32/strings.cpp:120
 #: modules/gui/win32/strings.cpp:180 src/libvlc.h:544
 msgid "Playlist"
-msgstr "Playlist"
+msgstr "Liste de lecture"
 
 #. Misc options
 #: modules/audio_filter/converter/a52tofloat32.c:85
@@ -1757,7 +1757,7 @@ msgstr "Pauser le flux"
 #: modules/gui/macosx/playlist.m:122 modules/gui/win32/strings.cpp:100
 #: modules/gui/win32/strings.cpp:204
 msgid "Play"
-msgstr "Joue"
+msgstr "Lire"
 
 #: modules/gui/familiar/interface.c:145 modules/gui/win32/strings.cpp:101
 msgid "Play stream"
@@ -2033,13 +2033,13 @@ msgstr "Sélectionner la piste audio"
 #: modules/gui/gtk/gtk_interface.c:457 modules/gui/gtk/gtk_interface.c:1294
 #: modules/gui/macosx/intf.m:333
 msgid "Volume Up"
-msgstr "Monter le son"
+msgstr "Augmenter le volume"
 
 #: modules/gui/gtk/gnome_interface.c:133 modules/gui/gtk/gnome_interface.c:957
 #: modules/gui/gtk/gtk_interface.c:464 modules/gui/gtk/gtk_interface.c:1301
 #: modules/gui/macosx/intf.m:334
 msgid "Volume Down"
-msgstr "Baisser le son"
+msgstr "Baisser le volume"
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:964
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
@@ -2921,7 +2921,7 @@ msgstr "Contrôles"
 
 #: modules/gui/macosx/controls.m:721 modules/gui/macosx/intf.m:323
 msgid "Loop"
-msgstr "Boucle"
+msgstr "Tout répéter"
 
 #: modules/gui/macosx/controls.m:728 modules/gui/macosx/intf.m:324
 msgid "Step Forward"

@@ -1,5 +1,5 @@
 %define name 		vlc
-%define version 	0.5.0
+%define version 	0.5.1
 %define rel		1
 
 %define	libmajor	0
