@@ -947,7 +947,10 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
     }
 
     p_subpic = spu_CreateSubpicture( p_vout->p_spu );
-    p_subpic->i_channel = p_sys->i_spu_channel;
+    if( p_subpic )
+    {
+        p_subpic->i_channel = p_sys->i_spu_channel;
+    }
 
     vlc_object_release( p_vout );
 
