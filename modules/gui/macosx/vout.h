@@ -2,11 +2,12 @@
  * vout.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.21 2004/02/02 08:50:41 titer Exp $
+ * $Id: vout.h,v 1.22 2004/02/03 13:00:27 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Eric Petit <titer@m0k.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,14 +61,14 @@
 {
     vout_thread_t * p_vout;
     int             b_init_done;
-    unsigned long   i_cur_texture;
+    unsigned long   i_texture;
     float           f_x;
     float           f_y;
 }
 
 - (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) p_vout;
 - (void) initTextures;
-- (void) reloadTexture: (picture_t *) p_pic;
+- (void) reloadTexture;
 
 @end
 

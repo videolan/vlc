@@ -2,12 +2,13 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.76 2004/02/02 08:50:41 titer Exp $
+ * $Id: vout.m,v 1.77 2004/02/03 13:00:27 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Eric Petit <titer@m0k.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -291,7 +292,8 @@ static int vout_Init( vout_thread_t *p_vout )
     }
 
     /* Try to initialize up to QT_MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES < QT_MAX_DIRECTBUFFERS )
+    while( I_OUTPUTPICTURES <
+           p_vout->p_sys->i_opengl ? 1 : QT_MAX_DIRECTBUFFERS )
     {
         p_pic = NULL;
 
@@ -478,9 +480,11 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     {
         if( [p_vout->p_sys->o_glview lockFocusIfCanDraw] )
         {
-            [p_vout->p_sys->o_glview reloadTexture: p_pic];
+            /* Texture gotta be reload before the buffer is filled
+               (thanks to gcc from arstechnica forums) */
             [p_vout->p_sys->o_glview drawRect:
                 [p_vout->p_sys->o_glview bounds]];
+            [p_vout->p_sys->o_glview reloadTexture];
             [p_vout->p_sys->o_glview unlockFocus];
         }
     }
@@ -1330,70 +1334,51 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void) initTextures
 {
-    int    i;
-    GLuint pi_textures[QT_MAX_DIRECTBUFFERS];
-
     [[self openGLContext] makeCurrentContext];
 
     /* Create textures */
-    glGenTextures( QT_MAX_DIRECTBUFFERS, pi_textures );
+    glGenTextures( 1, &i_texture );
 
-    for( i = 0; i < I_OUTPUTPICTURES; i++ )
-    {
-        glEnable( GL_TEXTURE_RECTANGLE_EXT );
-        glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
-        glEnable( GL_APPLE_texture_range );
+    glEnable( GL_TEXTURE_RECTANGLE_EXT );
+    glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
 
-        glBindTexture( GL_TEXTURE_RECTANGLE_EXT, pi_textures[i] );
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
 
-#if 0
-        FIXME: the lines below are supposed to avoid a memcpy and get
-        a noticeable performance boost, but they are annoying side
-        effects at the moment -- titer
+    /* Use VRAM texturing */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
 
-        /* Use AGP texturing */
-        glTextureRangeAPPLE( GL_TEXTURE_RECTANGLE_EXT, 0, NULL );
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_SHARED_APPLE );
-#endif
+    /* Tell the driver not to make a copy of the texture but to use
+       our buffer */
+    glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
 
-        /* Tell the driver not to make a copy of the texture but to use
-           our buffer */
-        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+    /* Linear interpolation */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
-        /* Linear interpolation */
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    /* I have no idea what this exactly does, but it seems to be
+       necessary for scaling */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
 
-        /* I have no idea what this exactly does, but it seems to be
-           necessary for scaling */
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE );
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
-
-        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
-                p_vout->output.i_width, p_vout->output.i_height, 0,
-                GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-                PP_OUTPUTPICTURE[i]->p_data );
-
-        PP_OUTPUTPICTURE[i]->p_sys = malloc( sizeof( GLuint ) );
-        *((GLuint*) PP_OUTPUTPICTURE[i]->p_sys) = pi_textures[i];
-    }
+    glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
+            p_vout->output.i_width, p_vout->output.i_height, 0,
+            GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+            PP_OUTPUTPICTURE[0]->p_data );
 
     b_init_done = 1;
 }
 
-- (void) reloadTexture: (picture_t *) p_pic
+- (void) reloadTexture
 {
-    i_cur_texture = *((GLuint*) p_pic->p_sys);
-    
     [[self openGLContext] makeCurrentContext];
 
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_cur_texture );
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
 
     /* glTexSubImage2D is faster than glTexImage2D
        http://developer.apple.com/samplecode/Sample_Code/Graphics_3D/
@@ -1401,7 +1386,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     glTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0,
             p_vout->output.i_width, p_vout->output.i_height,
             GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-            p_pic->p_data );
+            PP_OUTPUTPICTURE[0]->p_data );
 }
 
 - (void) drawRect: (NSRect) rect
@@ -1425,7 +1410,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Draw a quad with our texture on it */
-    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_cur_texture );
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
     glBegin( GL_QUADS );
         /* Top left */
         glTexCoord2f( 0.0, 0.0 );
