@@ -2,7 +2,7 @@
  * tcp.c: TCP access plug-in
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: tcp.c,v 1.2 2003/12/04 16:49:43 sam Exp $
+ * $Id: tcp.c,v 1.3 2004/01/05 15:07:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -29,28 +29,6 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <sys/stat.h>
-#include <errno.h>
-#include <fcntl.h>
-
-#ifdef HAVE_SYS_TIME_H
-#    include <sys/time.h>
-#endif
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
-#ifdef WIN32
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
-#else
-#   include <sys/socket.h>
-#endif
-
 #include "network.h"
 
 /*****************************************************************************
@@ -70,8 +48,6 @@ vlc_module_begin();
     add_integer( "tcp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access", 0 );
     add_shortcut( "tcp" );
-    add_shortcut( "tcp4" );
-    add_shortcut( "tcp6" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -94,37 +70,10 @@ static int Open( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys;
 
-    char           *psz_network;
     char           *psz_dup = strdup(p_input->psz_name);
     char           *psz_parser = psz_dup;
 
-    network_socket_t sock;
-    module_t         *p_network;
-
-    vlc_value_t     val;
-
-    /* Select ip version */
-    psz_network = "";
-    if( config_GetInt( p_input, "ipv4" ) )
-    {
-        psz_network = "ipv4";
-    }
-    if( config_GetInt( p_input, "ipv6" ) )
-    {
-        psz_network = "ipv6";
-    }
-    if( *p_input->psz_access )
-    {
-        /* Find out which shortcut was used */
-        if( !strncmp( p_input->psz_access, "tcp6", 5 ) )
-        {
-            psz_network = "ipv6";
-        }
-        else if( !strncmp( p_input->psz_access, "tcp4", 5 ) )
-        {
-            psz_network = "ipv4";
-        }
-    }
+    vlc_value_t    val;
 
     /* Parse server:port */
     while( *psz_parser && *psz_parser != ':' )
@@ -139,45 +88,31 @@ static int Open( vlc_object_t *p_this )
         }
         psz_parser++;
     }
-
     if( *psz_parser != ':' || psz_parser == psz_dup )
     {
         msg_Err( p_input, "you have to provide server:port addresse" );
         free( psz_dup );
         return VLC_EGENERIC;
     }
-
     *psz_parser++ = '\0';
 
-    /* Prepare the network_socket_t structure */
-    sock.i_type = NETWORK_TCP;
-    sock.psz_bind_addr = "";
-    sock.i_bind_port = 0;
-    sock.psz_server_addr = psz_dup;
-    sock.i_server_port = atoi( psz_parser );
-    sock.i_ttl           = 0;
-
-    if( sock.i_server_port <= 0 )
+    if( atoi( psz_parser ) <= 0 )
     {
-        msg_Err( p_input, "invalid port number (%d)", sock.i_server_port );
+        msg_Err( p_input, "invalid port number (%d)", atoi( psz_parser ) );
         free( psz_dup );
         return VLC_EGENERIC;
     }
 
-    /* connecting */
-    msg_Dbg( p_input, "opening server=%s:%d",
-             sock.psz_server_addr, sock.i_server_port );
-    p_input->p_private = (void*)&sock;
-    p_network = module_Need( p_input, "network", psz_network );
+    /* Connect */
+    p_input->p_access_data = p_sys = malloc( sizeof( access_sys_t ) );
+    p_sys->fd = net_OpenTCP( p_input, psz_dup, atoi( psz_parser ) );
     free( psz_dup );
-    if( p_network == NULL )
+
+    if( p_sys->fd < 0 )
     {
+        free( p_sys );
         return VLC_EGENERIC;
     }
-    module_Unneed( p_input, p_network );
-
-    p_input->p_access_data = p_sys = malloc( sizeof( access_sys_t ) );
-    p_sys->fd = sock.i_handle;
 
     p_input->pf_read = Read;
     p_input->pf_set_program = input_SetProgram;
@@ -210,14 +145,7 @@ static void Close( vlc_object_t *p_this )
 
     msg_Info( p_input, "closing TCP target `%s'", p_input->psz_source );
 
-#ifdef UNDER_CE
-    CloseHandle( (HANDLE)p_sys->fd );
-#elif defined( WIN32 )
-    closesocket( p_sys->fd );
-#else
-    close( p_sys->fd );
-#endif
-
+    net_Close( p_sys->fd );
     free( p_sys );
 }
 
@@ -226,43 +154,8 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 {
-#ifdef UNDER_CE
-    return -1;
-#else
     access_sys_t   *p_sys = p_input->p_access_data;
-    struct timeval  timeout;
-    fd_set          fds;
-    ssize_t         i_recv;
-    int             i_ret;
 
-    do
-    {
-        if( p_input->b_die || p_input->b_error )
-        {
-            return 0;
-        }
-
-        /* Initialize file descriptor set */
-        FD_ZERO( &fds );
-        FD_SET( p_sys->fd, &fds );
-
-        /* We'll wait 0.5 second if nothing happens */
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500000;
-    } while( ( i_ret = select( p_sys->fd + 1, &fds, NULL, NULL, &timeout )) == 0 ||
-             ( i_ret < 0 && errno == EINTR ) );
-
-    if( i_ret < 0 )
-    {
-        msg_Err( p_input, "network select error (%s)", strerror(errno) );
-        return -1;
-    }
-
-    if( ( i_recv = recv( p_sys->fd, p_buffer, i_len, 0 ) ) < 0 )
-    {
-        msg_Err( p_input, "recv failed (%s)", strerror(errno) );
-    }
-    return i_recv;
-#endif
+    return net_Read( p_input, p_sys->fd, p_buffer, i_len, VLC_FALSE );
 }
 
