@@ -1,8 +1,8 @@
 /*****************************************************************************
- * image.cpp: Image control
+ * rectangle.cpp: Rectanglee control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rectangle.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: rectangle.cpp,v 1.2 2003/03/18 04:08:45 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -42,7 +42,7 @@
 
 
 //---------------------------------------------------------------------------
-// Control Image
+// Control Rectangle
 //---------------------------------------------------------------------------
 ControlRectangle::ControlRectangle( string id, bool visible, int x, int y,
     int w, int h, int color, string event, string help, Window *Parent )
@@ -74,6 +74,8 @@ bool ControlRectangle::ProcessEvent( Event *evt  )
     {
         case CTRL_ENABLED:
             Enable( (Event*)evt->GetParam1(), (bool)evt->GetParam2() );
+            break;
+        default:
             break;
     }
     return false;
@@ -117,7 +119,6 @@ void ControlRectangle::Enable( Event *event, bool enabled )
         Enabled = enabled;
         ParentWindow->Refresh( Left, Top, Width, Height );
     }
-
 }
 //---------------------------------------------------------------------------
 
