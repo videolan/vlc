@@ -68,7 +68,8 @@ struct decoder_sys_t
      * Output properties
      */
     vout_synchro_t *p_synchro;
-    int i_aspect;
+    int            i_aspect;
+    mtime_t        i_last_frame_pts;
 
 };
 
@@ -479,7 +480,18 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                                           p_sys->p_info->discard_fbuf->id );
             }
 
-            if( p_pic ) return p_pic;
+            /* For still frames */
+            if( state == STATE_END && p_pic ) p_pic->b_force = VLC_TRUE;
+
+            if( p_pic )
+            {
+                /* Avoid frames with identical timestamps.
+                 * Especially needed for still frames in DVD menus. */
+                if( p_sys->i_last_frame_pts == p_pic->date ) p_pic->date++;
+                p_sys->i_last_frame_pts = p_pic->date;
+
+                return p_pic;
+            }
 
             break;
 
