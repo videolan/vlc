@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.5 2002/10/07 21:58:40 massiot Exp $
+ * $Id: http.c,v 1.6 2002/11/07 16:54:39 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -96,7 +96,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     module_t *          p_network;
     char                psz_buffer[256];
     byte_t *            psz_parser;
-    int                 i_returncode, i;
+    int                 i_returncode, i, i_size;
     char *              psz_return_alpha;
 
     /* Find an appropriate network module */
@@ -160,24 +160,33 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 #define MAX_LINE 1024
 
     /* get the returncode */
-    if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
+    if( (i_size = input_Peek( p_input, &psz_parser, MAX_LINE )) <= 0 )
     {
         msg_Err( p_input, "not enough data" );
         input_FDNetworkClose( p_input );
         return( -1 );
     }
 
-    if( !strncmp( psz_parser, "HTTP/1.",
-                  strlen("HTTP/1.") ) )
+    if( (i_size >= sizeof("HTTP/1.") + 1 ) &&
+	!strncmp( psz_parser, "HTTP/1.", sizeof("HTTP/1.") - 1 ) )
     {
-        psz_parser += strlen("HTTP 1.") + 2;
+        psz_parser += sizeof("HTTP/1.") + 1;
         i_returncode = atoi( (char*)psz_parser );
         msg_Dbg( p_input, "HTTP server replied: %i", i_returncode );
         psz_parser += 4;
-        for ( i = 0; psz_parser[i] != '\r' || psz_parser[i+1] != '\n'; i++ )
+	i_size -= (sizeof("HTTP/1.") + 5);
+        for ( i = 0; (i < i_size -1) && ((psz_parser[i] != '\r') ||
+	      (psz_parser[i+1] != '\n')); i++ )
         {
             ;
         }
+	 /* check we actually parsed something */
+        if ( (i == i_size - 1) && (psz_parser[i+1] != '\n') )
+        {
+            msg_Err( p_input, "stream not compliant with HTTP/1.x" );
+            return -1;
+        }
+
         psz_return_alpha = malloc( i + 1 );
         memcpy( psz_return_alpha, psz_parser, i );
         psz_return_alpha[i] = '\0';
@@ -187,7 +196,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         msg_Err( p_input, "invalid http reply" );
         return -1;
     }
-    
+
     if ( i_returncode >= 400 ) /* something is wrong */
     {
         msg_Err( p_input, "%i %s", i_returncode,
