@@ -2,7 +2,7 @@
  * win32_factory.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_factory.hpp,v 1.3 2004/02/27 13:24:12 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -25,7 +25,9 @@
 #ifndef WIN32_FACTORY_HPP
 #define WIN32_FACTORY_HPP
 
-#define _WIN32_WINNT 0x0500
+#ifndef _WIN32_WINNT
+#   define _WIN32_WINNT 0x0500
+#endif
 
 #include <windows.h>
 #include "../src/os_factory.hpp"
@@ -74,6 +76,9 @@ class Win32Factory: public OSFactory
         /// Get the position of the mouse
         virtual void getMousePos( int &rXPos, int &rYPos ) const;
 
+        /// Change the cursor
+        virtual void changeCursor( CursorType_t type ) const;
+
         /// Delete a directory recursively
         virtual void rmDir( const string &rPath );
 
@@ -86,8 +91,8 @@ class Win32Factory: public OSFactory
         // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
         BOOL (WINAPI *TransparentBlt)( HDC, int, int, int, int,
                                        HDC, int, int, int, int, UINT );
-        BOOL (WINAPI *AlphaBlend)( HDC, int, int, int, int, HDC, int, int,
-                                   int, int, BLENDFUNCTION );
+        BOOL (WINAPI *AlphaBlend)( HDC, int, int, int, int,
+                                   HDC, int, int, int, int, BLENDFUNCTION );
 
         // Idem for user32.dll and SetLayeredWindowAttributes()
         BOOL (WINAPI *SetLayeredWindowAttributes)( HWND, COLORREF,

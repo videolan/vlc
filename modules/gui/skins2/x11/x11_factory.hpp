@@ -2,7 +2,7 @@
  * x11_factory.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_factory.hpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -81,6 +81,9 @@ class X11Factory: public OSFactory
 
         /// Get the position of the mouse
         virtual void getMousePos( int &rXPos, int &rYPos ) const;
+
+        /// Change the cursor
+        virtual void changeCursor( CursorType_t type ) const { /*TODO*/ }
 
         /// Delete a directory recursively
         virtual void rmDir( const string &rPath );

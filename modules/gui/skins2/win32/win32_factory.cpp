@@ -2,7 +2,7 @@
  * win32_factory.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_factory.cpp,v 1.2 2004/01/27 17:01:51 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -268,6 +268,36 @@ void Win32Factory::getMousePos( int &rXPos, int &rYPos ) const
     GetCursorPos( &mousePos );
     rXPos = mousePos.x;
     rYPos = mousePos.y;
+}
+
+
+void Win32Factory::changeCursor( CursorType_t type ) const
+{
+    LPCTSTR id;
+    switch( type )
+    {
+        case kDefaultArrow:
+            id = IDC_ARROW;
+            break;
+        case kResizeNWSE:
+            id = IDC_SIZENWSE;
+            break;
+        case kResizeNS:
+            id = IDC_SIZENS;
+            break;
+        case kResizeWE:
+            id = IDC_SIZEWE;
+            break;
+        case kResizeNESW:
+            id = IDC_SIZENESW;
+            break;
+        default:
+            id = IDC_ARROW;
+            break;
+    }
+
+    HCURSOR hCurs = LoadCursor( NULL, id );
+    SetCursor( hCurs );
 }
 
 

@@ -2,7 +2,7 @@
  * ctrl_resize.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_resize.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,6 +27,7 @@
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_motion.hpp"
 #include "../src/generic_layout.hpp"
+#include "../src/os_factory.hpp"
 #include "../utils/position.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_resize.hpp"
@@ -36,19 +37,26 @@ CtrlResize::CtrlResize( intf_thread_t *pIntf, CtrlFlat &rCtrl,
                         GenericLayout &rLayout, const UString &rHelp,
                         VarBool *pVisible ):
     CtrlFlat( pIntf, rHelp, pVisible ), m_fsm( pIntf ), m_rCtrl( rCtrl ),
-    m_rLayout( rLayout ), m_cmdResizeResize( this, &transResizeResize ),
+    m_rLayout( rLayout ), m_cmdOutStill( this, &transOutStill ),
+    m_cmdStillOut( this, &transStillOut ),
+    m_cmdStillStill( this, &transStillStill ),
     m_cmdStillResize( this, &transStillResize ),
-    m_cmdResizeStill( this, &transResizeStill )
+    m_cmdResizeStill( this, &transResizeStill ),
+    m_cmdResizeResize( this, &transResizeResize )
 {
     m_pEvt = NULL;
     m_xPos = 0;
     m_yPos = 0;
 
     // States
-    m_fsm.addState( "resize" );
+    m_fsm.addState( "out" );
     m_fsm.addState( "still" );
+    m_fsm.addState( "resize" );
 
     // Transitions
+    m_fsm.addTransition( "out", "enter", "still", &m_cmdOutStill );
+    m_fsm.addTransition( "still", "leave", "out", &m_cmdStillOut );
+    m_fsm.addTransition( "still", "motion", "still", &m_cmdStillStill );
     m_fsm.addTransition( "resize", "mouse:left:up:none", "still",
                          &m_cmdResizeStill );
     m_fsm.addTransition( "still", "mouse:left:down:none", "resize",
@@ -95,10 +103,38 @@ void CtrlResize::handleEvent( EvtGeneric &rEvent )
 }
 
 
+void CtrlResize::transOutStill( SkinObject *pCtrl )
+{
+    CtrlResize *pThis = (CtrlResize*)pCtrl;
+    OSFactory *pOsFactory = OSFactory::instance( pThis->getIntf() );
+    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+}
+
+
+void CtrlResize::transStillOut( SkinObject *pCtrl )
+{
+    CtrlResize *pThis = (CtrlResize*)pCtrl;
+    OSFactory *pOsFactory = OSFactory::instance( pThis->getIntf() );
+    pOsFactory->changeCursor( OSFactory::kDefaultArrow );
+}
+
+
+void CtrlResize::transStillStill( SkinObject *pCtrl )
+{
+    CtrlResize *pThis = (CtrlResize*)pCtrl;
+    OSFactory *pOsFactory = OSFactory::instance( pThis->getIntf() );
+    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+}
+
+
 void CtrlResize::transStillResize( SkinObject *pCtrl )
 {
     CtrlResize *pThis = (CtrlResize*)pCtrl;
     EvtMouse *pEvtMouse = (EvtMouse*)pThis->m_pEvt;
+
+    // Set the cursor
+    OSFactory *pOsFactory = OSFactory::instance( pThis->getIntf() );
+    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
 
     pThis->m_xPos = pEvtMouse->getXPos();
     pThis->m_yPos = pEvtMouse->getYPos();
@@ -110,10 +146,26 @@ void CtrlResize::transStillResize( SkinObject *pCtrl )
 }
 
 
+void CtrlResize::transResizeStill( SkinObject *pCtrl )
+{
+    CtrlResize *pThis = (CtrlResize*)pCtrl;
+
+    // Set the cursor
+    OSFactory *pOsFactory = OSFactory::instance( pThis->getIntf() );
+    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
+
+    pThis->releaseMouse();
+}
+
+
 void CtrlResize::transResizeResize( SkinObject *pCtrl )
 {
     CtrlResize *pThis = (CtrlResize*)pCtrl;
     EvtMotion *pEvtMotion = (EvtMotion*)pThis->m_pEvt;
+
+    // Set the cursor
+    OSFactory *pOsFactory = OSFactory::instance( pThis->getIntf() );
+    pOsFactory->changeCursor( OSFactory::kResizeNWSE );
 
     int newWidth = pEvtMotion->getXPos() - pThis->m_xPos + pThis->m_width;
     int newHeight = pEvtMotion->getYPos() - pThis->m_yPos + pThis->m_height;
@@ -144,12 +196,3 @@ void CtrlResize::transResizeResize( SkinObject *pCtrl )
     pQueue->remove( "resize" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 }
-
-
-void CtrlResize::transResizeStill( SkinObject *pCtrl )
-{
-    CtrlResize *pThis = (CtrlResize*)pCtrl;
-
-    pThis->releaseMouse();
-}
-

@@ -2,7 +2,7 @@
  * os_factory.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_factory.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -42,6 +42,15 @@ class OSTimer;
 class OSFactory: public SkinObject
 {
     public:
+        typedef enum
+        {
+            kDefaultArrow,
+            kResizeNS,
+            kResizeWE,
+            kResizeNWSE,
+            kResizeNESW
+        } CursorType_t;
+
         /// Initialization method overloaded in derived classes.
         /// It must return false if the init failed.
         virtual bool init() { return true; }
@@ -84,6 +93,9 @@ class OSFactory: public SkinObject
 
         /// Get the position of the mouse
         virtual void getMousePos( int &rXPos, int &rYPos ) const = 0;
+
+        /// Change the cursor
+        virtual void changeCursor( CursorType_t type ) const = 0;
 
         /// Delete a directory recursively
         virtual void rmDir( const string &rPath ) = 0;
