@@ -2,7 +2,7 @@
  * block.c: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: block.c,v 1.4 2003/11/22 04:02:10 titer Exp $
+ * $Id: block.c,v 1.5 2003/11/22 14:42:47 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -74,6 +74,7 @@ static block_t *__BlockDupContent( block_t *p_block )
     p_dup->b_frame_start   = p_block->b_frame_start;
     p_dup->i_pts           = p_block->i_pts;
     p_dup->i_dts           = p_block->i_dts;
+    p_dup->b_discontinuity = p_block->b_discontinuity;
 
     return p_dup;
 }
@@ -188,11 +189,16 @@ block_t *block_NewEmpty( void )
     block_t *p_block;
 
     p_block = malloc( sizeof( block_t ) );
+    memset( p_block, 0, sizeof( block_t ) );
+
     p_block->p_next         = NULL;
     p_block->b_frame_display= VLC_TRUE;
     p_block->b_frame_start  = VLC_FALSE;
     p_block->i_pts          = 0;
     p_block->i_dts          = 0;
+    p_block->i_length       = 0;
+
+    p_block->b_discontinuity= VLC_FALSE;
 
     p_block->i_buffer       = 0;
     p_block->p_buffer       = NULL;
@@ -202,6 +208,7 @@ block_t *block_NewEmpty( void )
     p_block->pf_modify      = NULL;
     p_block->pf_realloc     = NULL;
 
+    p_block->p_manager      = NULL;
     p_block->p_sys = NULL;
     return p_block;
 }
