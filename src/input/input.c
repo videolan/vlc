@@ -906,6 +906,14 @@ static int Init( input_thread_t * p_input, vlc_bool_t b_quick )
             {
                 p_input->b_out_pace_control = VLC_TRUE;
             }
+
+            if( p_input->b_can_pace_control && p_input->b_out_pace_control )
+            {
+                /* We don't want a high input priority here or we'll
+                 * end-up sucking up all the CPU time */
+                vlc_thread_set_priority( p_input, VLC_THREAD_PRIORITY_LOW );
+            }
+
             msg_Dbg( p_input, "starting in %s mode",
                      p_input->b_out_pace_control ? "asynch" : "synch" );
         }
