@@ -158,6 +158,7 @@ struct aout_sys_t
     UInt32                      i_stream_index;
     AudioStreamBasicDescription stream_format;
     UInt32                      b_dev_alive;
+    pid_t                       i_hog_pid;
 
     vlc_bool_t                  b_revert_sfmt;
     AudioStreamBasicDescription sfmt_revert;
@@ -361,6 +362,56 @@ static int Open( vlc_object_t * p_this )
 
         msg_Dbg( p_aout, "device bufframe size set to: [%ld]", 
                  p_sys->i_bufframe_size );
+        
+        if( err != noErr )
+        {
+            msg_Err( p_aout, "failed to set bufframe size (%ld): [%4.4s]", 
+                     p_sys->i_bufframe_size, (char *)&err );
+            FreeDevice( p_aout );
+            FreeHardwareInfo( p_aout );
+            vlc_mutex_destroy( &p_sys->lock );
+            free( (void *)p_sys );
+            return( VLC_EGENERIC );
+        }
+        
+        i_param_size = sizeof( p_sys->i_hog_pid );
+
+        err = AudioDeviceGetProperty( p_sys->devid, 0, FALSE, kAudioDevicePropertyHogMode,
+                                        &i_param_size, &p_sys->i_hog_pid );
+
+        if( !err )
+        {
+           msg_Dbg( p_aout, "Current status of hog mode: pid=%d  vlc pid=%d\n", (int)p_sys->i_hog_pid, (int)getpid() );
+
+           if( p_sys->i_hog_pid != getpid() ) {
+               p_sys->i_hog_pid = getpid() ;
+               err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
+                                             kAudioDevicePropertyHogMode, sizeof(i_param_size), &p_sys->i_hog_pid );
+               if( !err )
+               {
+                   msg_Dbg( p_aout, "Successfully set hog mode - new pid=%d!\n", (int)p_sys->i_hog_pid );
+       
+                   err = AudioDeviceGetProperty( p_sys->devid, 0, FALSE,
+                                                kAudioDevicePropertyHogMode, &i_param_size, &p_sys->i_hog_pid );
+                   if( !err )
+                   {
+                       msg_Dbg( p_aout, "Checking new status of hog mode: pid=%d vlc pid=%d\n",
+                             (int)p_sys->i_hog_pid, (int)getpid() );
+
+                   }
+               }
+           }
+        }
+
+        if( err != noErr )
+        {
+            msg_Err( p_aout, "failed to set hogmode: : [%4.4s]", (char *)&err );
+            FreeDevice( p_aout );
+            FreeHardwareInfo( p_aout );
+            vlc_mutex_destroy( &p_sys->lock );
+            free( (void *)p_sys );
+            return( VLC_EGENERIC );
+        }
     }
 
     switch( p_sys->stream_format.mFormatID )
@@ -1322,6 +1373,19 @@ static void FreeDevice( aout_instance_t * p_aout )
                 msg_Err( p_aout, "AudioStreamSetProperty revert format failed: [%4.4s]",
                          (char *)&err );
             }
+        }
+        
+        if( (int)p_sys->i_hog_pid != -1 )
+        {
+            p_sys->i_hog_pid = (pid_t) -1;
+            err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
+                                             kAudioDevicePropertyHogMode, sizeof(p_sys->i_hog_pid), &p_sys->i_hog_pid );
+            
+            if( err != noErr )
+            {
+                msg_Err( p_aout, "Releasing hog mode failed: [%4.4s]",
+                         (char *)&err );
+            } 
         }
     }
 
