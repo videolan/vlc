@@ -259,9 +259,10 @@ static int OpenVideo( vlc_object_t *p_this )
         goto error;
     }
 
-    /* Add a variable to indicate if the window should be on top of others */
+    /* Variable to indicate if the window should be on top of others */
+    /* Trigger a callback right now */
     var_Get( p_vout, "video-on-top", &val );
-    p_vout->p_sys->b_on_top_change = val.b_bool;
+    var_Set( p_vout, "video-on-top", val );
 
     return VLC_SUCCESS;
 
