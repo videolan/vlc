@@ -520,6 +520,7 @@ package-win32:
 	for i in dummy tmp/plugins/*$(LIBEXT) ; \
 		do if test $$i != tmp/plugins/libwin32_plugin$(LIBEXT) \
 		-a $$i != dummy ; then $(STRIP) $$i ; fi ; done
+
 	mkdir tmp/share
 	cp share/*.rle tmp/share/ ;
 
@@ -527,6 +528,14 @@ package-win32:
 	for i in $(ALL_LINGUAS); do \
 		mkdir -p tmp/locale/$${i}/LC_MESSAGES ; \
 		cp po/$${i}.gmo tmp/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	done
+
+	mkdir -p tmp/skins/default
+	for i in share/skins/default/*.*; do \
+		cp $$i tmp/skins/default/ || true ; \
+	done
+	for i in doc/skins/*.txt; do \
+		cp $$i tmp/skins/ || true ; \
 	done
 
 	cd doc/faq ; $(MAKE) html ; cd ../.. ;
