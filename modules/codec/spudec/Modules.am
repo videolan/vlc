@@ -3,7 +3,6 @@ SOURCES_spudec = \
 	modules/codec/spudec/parse.c \
 	modules/codec/spudec/render.c \
 	modules/codec/spudec/text.c \
-	modules/codec/spudec/subtitler.c
-
-noinst_HEADERS += \
-	modules/codec/spudec/spudec.h
+	modules/codec/spudec/subtitler.c \
+	modules/codec/spudec/spudec.h \
+	$(NULL)

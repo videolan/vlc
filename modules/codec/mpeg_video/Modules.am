@@ -1,15 +1,14 @@
 SOURCES_mpeg_video = \
 	modules/codec/mpeg_video/parser.c \
+	modules/codec/mpeg_video/parser.h \
 	modules/codec/mpeg_video/headers.c \
 	modules/codec/mpeg_video/blocks.c \
+	modules/codec/mpeg_video/blocks.h \
 	modules/codec/mpeg_video/synchro.c \
 	modules/codec/mpeg_video/pool.c \
-	modules/codec/mpeg_video/decoder.c
-
-noinst_HEADERS += \
-	modules/codec/mpeg_video/decoder.h \
-	modules/codec/mpeg_video/parser.h \
-	modules/codec/mpeg_video/blocks.h \
 	modules/codec/mpeg_video/pool.h \
-	modules/codec/mpeg_video/plugins.h
+	modules/codec/mpeg_video/decoder.c \
+	modules/codec/mpeg_video/decoder.h \
+	modules/codec/mpeg_video/plugins.h \
+	$(NULL)
 

@@ -1,10 +1,9 @@
 SOURCES_wxwindows = \
 	modules/gui/wxwindows/wxwindows.cpp \
+	modules/gui/wxwindows/wxwindows.h \
 	modules/gui/wxwindows/interface.cpp \
-	modules/gui/wxwindows/timer.cpp
-
-noinst_HEADERS += \
-	modules/gui/wxwindows/wxwindows.h
+	modules/gui/wxwindows/timer.cpp \
+	$(NULL)
 
 EXTRA_DIST += \
 	modules/gui/wxwindows/bitmaps/file.xpm \

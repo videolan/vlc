@@ -1,7 +1,6 @@
 SOURCES_mad = \
 	modules/codec/mad/decoder.c \
-	modules/codec/mad/libmad.c
-
-noinst_HEADERS += \
+	modules/codec/mad/decoder.h \
+	modules/codec/mad/libmad.c \
 	modules/codec/mad/libmad.h \
-	modules/codec/mad/decoder.h
+	$(NULL)

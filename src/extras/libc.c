@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.3 2002/11/13 20:51:04 sam Exp $
+ * $Id: libc.c,v 1.4 2002/11/20 08:58:24 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -30,7 +30,7 @@
  * getenv: just in case, but it should never be called
  *****************************************************************************/
 #ifndef HAVE_GETENV
-char *getenv( const char *name )
+char *vlc_getenv( const char *name )
 {
     return NULL;
 }
@@ -40,7 +40,7 @@ char *getenv( const char *name )
  * strdup: returns a malloc'd copy of a string 
  *****************************************************************************/
 #ifndef HAVE_STRDUP
-char *strdup( const char *string )
+char *vlc_strdup( const char *string )
 {
     return strndup( string, strlen( string ) );
 }
@@ -51,7 +51,7 @@ char *strdup( const char *string )
  * Does anyone know whether or not it will be present in Jaguar?
  *****************************************************************************/
 #ifndef HAVE_STRNDUP
-char *strndup( const char *string, size_t n )
+char *vlc_strndup( const char *string, size_t n )
 {
     char *psz;
     size_t len = strlen( string );
@@ -65,7 +65,7 @@ char *strndup( const char *string, size_t n )
         psz[ len ] = 0;
     }
 
-    return( psz );
+    return psz;
 }
 #endif
 
@@ -73,7 +73,7 @@ char *strndup( const char *string, size_t n )
  * strcasecmp: compare two strings ignoring case
  *****************************************************************************/
 #if !defined( HAVE_STRCASECMP ) && !defined( HAVE_STRICMP )
-int strcasecmp( const char *s1, const char *s2 )
+int vlc_strcasecmp( const char *s1, const char *s2 )
 {
     int i_delta = 0;
 
@@ -100,7 +100,7 @@ int strcasecmp( const char *s1, const char *s2 )
  * strncasecmp: compare n chars from two strings ignoring case
  *****************************************************************************/
 #if !defined( HAVE_STRNCASECMP ) && !defined( HAVE_STRNICMP )
-int strncasecmp( const char *s1, const char *s2, size_t n )
+int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
 {
     int i_delta = 0;
 
@@ -127,7 +127,7 @@ int strncasecmp( const char *s1, const char *s2, size_t n )
  * atof: convert a string to a double.
  *****************************************************************************/
 #ifndef HAVE_ATOF
-double atof( const char *nptr )
+double vlc_atof( const char *nptr )
 { 
     double f_result;
     wchar_t *psz_tmp;
@@ -148,7 +148,7 @@ double atof( const char *nptr )
  * FIXME: this cast sucks!
  *****************************************************************************/
 #if !defined( HAVE_LSEEK )
-off_t lseek( int fildes, off_t offset, int whence )
+off_t vlc_lseek( int fildes, off_t offset, int whence )
 {
     return SetFilePointer( (HANDLE)fildes, (long)offset, NULL, whence );
 }

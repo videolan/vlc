@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.38 2002/11/13 15:28:24 sam Exp $
+ * $Id: vlc_common.h,v 1.39 2002/11/20 08:58:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -469,39 +469,57 @@ static inline uint64_t U64_AT( void * _p )
 
 #endif
 
-/* strdup/strndup (defined in src/extras/libc.c) */
+/* Stuff defined in src/extras/libc.c */
 #ifndef HAVE_STRDUP
-    char * strdup( const char *s );
+#   define strdup vlc_strdup
+    VLC_EXPORT( char *, vlc_strdup, ( const char *s ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_strdup NULL
 #endif
+
 #ifndef HAVE_STRNDUP
-    char * strndup( const char *s, size_t n );
+#   define strndup vlc_strndup
+    VLC_EXPORT( char *, vlc_strndup, ( const char *s, size_t n ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_strndup NULL
 #endif
 
-/* atof (defined in src/extras/libc.c) */
 #ifndef HAVE_ATOF
-    double atof( const char *nptr );
+#   define atof vlc_atof
+    VLC_EXPORT( double, vlc_atof, ( const char *nptr ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_atof NULL
 #endif
 
-/* getenv - always returns NULL */
 #ifndef HAVE_GETENV
-    char *getenv( const char *name );
+#   define getenv vlc_getenv
+    VLC_EXPORT( char *, vlc_getenv, ( const char *name ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_getenv NULL
 #endif
 
-/* strncasecmp/strcasecmp (defined in src/extras/libc.c) */
 #ifndef HAVE_STRCASECMP
 #   ifdef HAVE_STRICMP
 #       define strcasecmp stricmp
-#   else
-        int strcasecmp( const char *s1, const char *s2 );
+#       define vlc_strcasecmp NULL
+#   elif !defined(__PLUGIN__)
+#       define strcasecmp vlc_strcasecmp
+        VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
 #   endif
+#elif !defined(__PLUGIN__)
+#   define vlc_strcasecmp NULL
 #endif
 
 #ifndef HAVE_STRNCASECMP
 #   ifdef HAVE_STRNICMP
 #       define strncasecmp strnicmp
-#   else
-        int strncasecmp( const char *s1, const char *s2, size_t n );
+#       define vlc_strncasecmp NULL
+#   elif !defined(__PLUGIN__)
+#       define strncasecmp vlc_strncasecmp
+        VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
 #   endif
+#elif !defined(__PLUGIN__)
+#   define vlc_strncasecmp NULL
 #endif
 
 /* Format type specifiers for 64 bits numbers */
@@ -581,7 +599,10 @@ typedef __int64 off_t;
 
 /* lseek (defined in src/extras/libc.c) */
 #ifndef HAVE_LSEEK
-    off_t lseek( int fildes, off_t offset, int whence );
+#   define lseek vlc_lseek
+    VLC_EXPORT( off_t, vlc_lseek, ( int fildes, off_t offset, int whence ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_lseek NULL
 #endif
 
 /*****************************************************************************

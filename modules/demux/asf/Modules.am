@@ -1,8 +1,6 @@
 SOURCES_asf = \
 	modules/demux/asf/asf.c \
-	modules/demux/asf/libasf.c
-
-
-noinst_HEADERS += \
 	modules/demux/asf/asf.h \
-    modules/demux/asf/libasf.h
+	modules/demux/asf/libasf.c \
+	modules/demux/asf/libasf.h \
+	$(NULL)

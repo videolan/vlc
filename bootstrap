@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.29 2002/11/19 17:38:06 sam Exp $
+##  $Id: bootstrap,v 1.30 2002/11/20 08:58:20 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -84,11 +84,13 @@ then
   LIBVLC_HEADERS=`make show-libvlc-headers | grep '^X: ' | cut -b3-`
   LIBVLC_PKG_HEADERS=`make show-libvlc-pkg-headers | grep '^X: ' | cut -b3-`
 
+  # Clean up
+  rm -f evc/*.vcp msvc/*.dsp
+
   # libvlc files
   for target in evc/libvlc.vcp msvc/libvlc.dsp
   do
     echo "${target}"
-    rm -f ${target}
     #  Top of the project file
     perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
     #  The source files
@@ -195,35 +197,42 @@ EOF
   done
 
   # plugins files
-  for dir in evc msvc
+  grep '^L_[^ ]*_pic =' Modules.am | while read a b c
   do
-    test "${dir}" = "evc" && suf="vcp" || suf="dsp"
-    for plugin in dummy
+    makefile="`echo $c | sed -e 's@/[^/]*$@/Modules.am@'`"
+    plugin="`echo $a | sed 's/L_\(.*\)_pic/\1/'`"
+    # this is an attempt at getting a list of plugin sources... we take the
+    # production and remove everything that does not contain "module", which
+    # means you miss $(NULL), but other variables too.
+    cfiles=`awk 'BEGIN{a=0}{if(!a&&/^SOURCES_'${plugin}'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < ${makefile} | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p'`
+    hfiles=`for i in ${cfiles} ; do echo $i ; done | grep '\.h$'`
+    cfiles=`for i in ${cfiles} ; do echo $i ; done | grep -v '\.h$'`
+    for dir in evc msvc
     do
-      makefile="`grep '^L_'${plugin}'_pic =' Modules.am | sed -e 's@.* modules@modules@' -e 's@/[^/]*$@/Modules.am@'`"
+      test "${dir}" = "evc" && suf="vcp" || suf="dsp"
       source="${dir}/plugins.${suf}.in"
       target="${dir}/plugin_${plugin}.${suf}"
       echo "${target}"
-      rm -f ${target}
       perl -pe 'if(/§SOURCES§/){last;} s/§PLUGIN§/'${plugin}'/g' < ${source} > ${target}
-      # this is an attempt at getting a list of plugin sources
-      sed -ne 's/^SOURCES_'${plugin}'.*=//; t foo; /^[a-zA-Z]/q; :foo p' < ${makefile} | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p' | while read source
+      for cfile in ${cfiles}
       do
         cat >> ${target} << EOF
 # Begin Source File${M}
-SOURCE="..\\${source}"${M}
+SOURCE="..\\${cfile}"${M}
 # End Source File${M}
 EOF
       done
       # sed is really nicer for this... unfortunately it's broken under cygwin
       # sed -ne '1,/§SOURCES§/d; /§HEADERS§/,$d; p' < ${source} >> ${target}
       perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${source} >> ${target}
-### header generation disabled
-##      cat >> ${target} << EOF
-### Begin Source File${M}
-##SOURCE="..\\test.h"${M}
-### End Source File${M}
-##EOF
+      for hfile in ${hfiles}
+      do
+        cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\${hfile}"${M}
+# End Source File${M}
+EOF
+      done
       # sed -ne '1,/§HEADERS§/d; p' < ${source} >> ${target}
       perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${source} >> ${target}
     done
@@ -233,7 +242,6 @@ EOF
   for target in evc/vlc.vcp msvc/vlc.dsp
   do
     echo "${target}"
-    rm -f ${target}
     #  Top of the project file
     perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
     #  The source files

@@ -1,16 +1,20 @@
 SOURCES_postprocessing_c = \
 	modules/codec/ffmpeg/postprocessing/postprocessing.c \
-	modules/codec/ffmpeg/postprocessing/postprocessing_c.c
+	modules/codec/ffmpeg/postprocessing/postprocessing_c.c \
+	$(NULL)
 
 SOURCES_postprocessing_mmx = \
 	modules/codec/ffmpeg/postprocessing/postprocessing.c \
-	modules/codec/ffmpeg/postprocessing/postprocessing_mmx.c
+	modules/codec/ffmpeg/postprocessing/postprocessing_mmx.c \
+	$(NULL)
 
 SOURCES_postprocessing_mmxext = \
 	modules/codec/ffmpeg/postprocessing/postprocessing.c \
-	modules/codec/ffmpeg/postprocessing/postprocessing_mmxext.c
+	modules/codec/ffmpeg/postprocessing/postprocessing_mmxext.c \
+	$(NULL)
 
 noinst_HEADERS += \
 	modules/codec/ffmpeg/postprocessing/postprocessing.h \
-	modules/codec/ffmpeg/postprocessing/postprocessing_common.h
+	modules/codec/ffmpeg/postprocessing/postprocessing_common.h \
+	$(NULL)
 

@@ -1,8 +1,6 @@
 SOURCES_avi = \
 	modules/demux/avi/avi.c \
-    modules/demux/avi/libavi.c
-
-
-noinst_HEADERS += \
 	modules/demux/avi/avi.h \
-    modules/demux/avi/libavi.h
+	modules/demux/avi/libavi.c \
+	modules/demux/avi/libavi.h \
+	$(NULL)
