@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.8 2003/01/02 23:09:30 massiot Exp $
+ * $Id: intf.h,v 1.9 2003/01/04 04:11:08 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -87,6 +87,21 @@ struct intf_sys_t
     id o_prefs;                 /* VLCPrefs       */
 
     IBOutlet id o_window;       /* main window    */
+    IBOutlet id o_timefield;    /* time field     */
+    IBOutlet id o_timeslider;   /* time slider    */
+    NSLock * o_slider_lock;     /* slider lock    */
+    float f_slider;             /* slider value   */
+    float f_slider_old;         /* old slider val */ 
+
+    IBOutlet id o_btn_playlist; /* btn playlist   */
+    IBOutlet id o_btn_prev;     /* btn previous   */
+    IBOutlet id o_btn_slower;   /* btn slower     */
+    IBOutlet id o_btn_play;     /* btn play       */
+    IBOutlet id o_btn_pause;    /* btn pause      */
+    IBOutlet id o_btn_stop;     /* btn stop       */
+    IBOutlet id o_btn_faster;   /* btn faster     */
+    IBOutlet id o_btn_next;     /* btn next       */
+    IBOutlet id o_btn_prefs;    /* btn prefs      */
 
     IBOutlet id o_controls;     /* VLCControls    */
     IBOutlet id o_playlist;     /* VLCPlaylist    */
@@ -174,9 +189,10 @@ struct intf_sys_t
 - (IBAction)clearRecentItems:(id)sender;
 - (void)openRecentItem:(id)sender;
 
-//- (void)selectAction:(id)sender;
-
 - (IBAction)viewPreferences:(id)sender;
+
+- (IBAction)timesliderUpdate:(id)sender;
+- (void)displayTime;
 
 @end
 

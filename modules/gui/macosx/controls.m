@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.4 2002/12/29 01:16:28 massiot Exp $
+ * $Id: controls.m,v 1.5 2003/01/04 04:11:08 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -236,7 +236,6 @@
 
 - (IBAction)mute:(id)sender
 {
-#if 0
     intf_thread_t * p_intf = [NSApp getIntf];
     aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
@@ -250,37 +249,6 @@
     NSMenuItem * o_mi = (NSMenuItem *)sender;
     p_intf->p_sys->b_mute = !p_intf->p_sys->b_mute;
     [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
-#else
-    int err;
-    AudioDeviceID device;
-    UInt32 ui_param_size;
-
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
-    intf_thread_t * p_intf = [NSApp getIntf];
-    UInt32 b_mute = !p_intf->p_sys->b_mute;
-
-    [o_mi setState: b_mute ? NSOnState : NSOffState];
-    p_intf->p_sys->b_mute = !p_intf->p_sys->b_mute;
-
-    ui_param_size = sizeof( device );
-    err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,
-                                    &ui_param_size, (void *)&device );
-    if( err != noErr )
-    {
-        msg_Err( p_intf, "AudioHardwareGetProperty failed (%d)", err );
-        return;
-    }
-
-    ui_param_size = sizeof( b_mute );
-    err = AudioDeviceSetProperty( device, 0, 0, false,
-                                  kAudioDevicePropertyMute,
-                                  ui_param_size, (void *)&b_mute );
-    if( err != noErr )
-    {
-        msg_Err( p_intf, "AudioDeviceSetProperty failed (%d)", err );
-        return;
-    }
-#endif
 }
 
 - (IBAction)fullscreen:(id)sender
@@ -458,7 +426,7 @@
     {
         bEnabled = p_intf->p_sys->p_input != NULL;
     }
-    else if( [[o_mi title] isEqualToString: _NS("Prev")] ||
+    else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
     {
         playlist_t * p_playlist = vlc_object_find( p_intf, 
@@ -477,40 +445,19 @@
         }
     }
     else if( [[o_mi title] isEqualToString: _NS("Volume Up")] ||
-             [[o_mi title] isEqualToString: _NS("Volume Down")] )
+             [[o_mi title] isEqualToString: _NS("Volume Down")] ||
+             [[o_mi title] isEqualToString: _NS("Mute")] )
     {
-        bEnabled = FALSE; /* not implemented yet */
-    }
-    else if( [[o_mi title] isEqualToString: _NS("Mute")] )
-    {
-        int err;
-        UInt32 b_mute;
-        AudioDeviceID device;
-        UInt32 ui_param_size;
-
-        ui_param_size = sizeof( device );
-        err = AudioHardwareGetProperty( 
-                            kAudioHardwarePropertyDefaultOutputDevice,
-                            &ui_param_size, (void *)&device );
-        if( err != noErr )
-        {
-            msg_Err( p_intf, "AudioHardwareGetProperty failed (%d)", err );
+        aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                    FIND_ANYWHERE );
+ 
+        if ( p_aout != NULL )
+        { 
+            vlc_object_release( (vlc_object_t *)p_aout );
         }
         else
         {
-            ui_param_size = sizeof( b_mute );
-            err = AudioDeviceGetProperty( device, 0, 0,
-                                          kAudioDevicePropertyMute,
-                                          &ui_param_size, (void *)&b_mute );
-            if( err != noErr )
-            {
-                msg_Err( p_intf, "AudioDeviceGetProperty failed (%d)", err );
-            }
-            else
-            {
-                [o_mi setState: b_mute ? NSOnState : NSOffState];
-                p_intf->p_sys->b_mute = (vlc_bool_t)b_mute ? 1 : 0;
-            }
+            bEnabled = FALSE;
         }
     }
     else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )    

@@ -30,11 +30,24 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {clearRecentItems = id; openRecentItem = id; viewPreferences = id; }; 
+            ACTIONS = {
+                clearRecentItems = id; 
+                openRecentItem = id; 
+                timesliderUpdate = id; 
+                viewPreferences = id; 
+            }; 
             CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                asystm = id; 
+                "o_btn_faster" = id; 
+                "o_btn_next" = id; 
+                "o_btn_pause" = id; 
+                "o_btn_play" = id; 
+                "o_btn_playlist" = id; 
+                "o_btn_prefs" = id; 
+                "o_btn_prev" = id; 
+                "o_btn_slower" = id; 
+                "o_btn_stop" = id; 
                 "o_controls" = id; 
                 "o_dmi_pause" = id; 
                 "o_dmi_play" = id; 
@@ -90,7 +103,8 @@
                 "o_mu_view" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
-                "o_prefs" = id; 
+                "o_timefield" = id; 
+                "o_timeslider" = id; 
                 "o_window" = id; 
             }; 
             SUPERCLASS = NSObject; 
