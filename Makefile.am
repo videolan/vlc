@@ -513,55 +513,75 @@ remove_distdir_woody = \
 # the same setup as me. Contact sam@zoy.org if you need to use it.
 #
 # Check that tmp isn't in the way
-package-win32:
-	@if test -e "$(srcdir)/tmp"; then \
-	  echo "Error: please remove $(srcdir)/tmp, it is in the way"; \
+package-win32-base:
+	@if test -e "$(srcdir)/vlc-${VERSION}"; then \
+	  echo "Error: please remove $(srcdir)/vlc-${VERSION}, it is in the way"; \
 	  false; \
 	else \
-	  echo "OK."; mkdir -p "$(srcdir)/tmp"; \
+	  echo "OK."; mkdir -p "$(srcdir)/vlc-${VERSION}"; \
 	fi
 # Create installation script
-	cp "$(srcdir)/install-win32" "$(srcdir)/tmp/nsi"
+	cp "$(srcdir)/install-win32" "$(srcdir)/vlc-${VERSION}/nsi"
 # Copy relevant files
-	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/tmp/"
-	$(STRIP) "$(srcdir)/tmp/vlc$(EXEEXT)"
+	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/vlc-${VERSION}/"
+	$(STRIP) "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
-	  do cp "$(srcdir)/$$file" "$(srcdir)/tmp/$${file}.txt" ; \
-	  unix2dos "$(srcdir)/tmp/$${file}.txt" ; done
+	  do cp "$(srcdir)/$$file" "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; \
+	  unix2dos "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; done
 
-	mkdir -p "$(srcdir)/tmp/plugins"
+	mkdir -p "$(srcdir)/vlc-${VERSION}/plugins"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
-	    $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" "$(srcdir)/tmp/plugins/" ; \
+	    $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" "\
+            $(srcdir)/vlc-${VERSION}/plugins/" ; \
 	  fi ; done
 
-	for i in "" $(srcdir)/tmp/plugins/*$(LIBEXT) ; \
+	for i in "" $(srcdir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
 
-	mkdir $(srcdir)/tmp/locale
+	mkdir $(srcdir)/vlc-${VERSION}/locale
 	for i in $(ALL_LINGUAS); do \
-	  mkdir -p "$(srcdir)/tmp/locale/$${i}/LC_MESSAGES" ; \
+	  mkdir -p "$(srcdir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES" ; \
 	  cp "$(srcdir)/po/$${i}.gmo" \
-	    "$(srcdir)/tmp/locale/$${i}/LC_MESSAGES/vlc.mo" || true ; \
+	    "$(srcdir)/vlc-${VERSION}/locale/$${i}/LC_MESSAGES/vlc.mo" \
+            || true ; \
 	done
 
-	mkdir -p $(srcdir)/tmp/skins/default
+	mkdir -p $(srcdir)/vlc-${VERSION}/skins/default
 	for i in $(srcdir)/share/skins/default/*.*; do \
-	  cp $$i $(srcdir)/tmp/skins/default/ || true ; \
+	  cp $$i $(srcdir)/vlc-${VERSION}/skins/default/ || true ; \
 	done
 	for i in $(srcdir)/doc/skins/*.txt; do \
-	  cp $$i $(srcdir)/tmp/skins/ || true ; \
+	  cp $$i $(srcdir)/vlc-${VERSION}/skins/ || true ; \
 	done
 
 	mkdir -p "$(srcdir)/tmp/http/admin"
-	cp $(srcdir)/share/http/*.html $(srcdir)/tmp/http/ ;
-	cp $(srcdir)/share/http/admin/*.html $(srcdir)/tmp/http/admin/ ;
-	cp $(srcdir)/share/http/admin/.access $(srcdir)/tmp/http/admin/ ;
+	cp $(srcdir)/share/http/*.html $(srcdir)/vlc-${VERSION}/http/ ;
+	cp $(srcdir)/share/http/admin/*.html \
+           $(srcdir)/vlc-${VERSION}/http/admin/ ;
+	cp $(srcdir)/share/http/admin/.access \
+           $(srcdir)/vlc-${VERSION}/http/admin/ ;
 
+package-win32-base-exe:
 # Create package 
-	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} $(srcdir)/tmp/nsi
+	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe \
+             -- /DVERSION=${VERSION} $(srcdir)/vlc-${VERSION}/nsi
+
+package-win32-base-zip:
+# Create package 
+	zip -r vlc-${VERSION}-win32 vlc-${VERSION}
+
+package-win32-exe: package-win32-base package-win32-base-exe
 # Clean up
-	rm -Rf $(srcdir)/tmp
+	rm -Rf $(srcdir)/vlc-${VERSION}
+
+package-win32-zip: package-win32-base package-win32-base-zip
+# Clean up
+	rm -Rf $(srcdir)/vlc-${VERSION}
+
+package-win32: package-win32-base package-win32-base-exe package-win32-base-zip
+# Clean up
+	rm -Rf $(srcdir)/vlc-${VERSION}
 
 package-beos:
 # Check that tmp isn't in the way
