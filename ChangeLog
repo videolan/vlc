@@ -1,3 +1,41 @@
+2003-04-08 Tuesday 21:26  gbazin
+
+ * modules/audio_output/waveout.c: compilation fix for builtins only build.
+
+2003-04-08 Tuesday 13:22  sam
+
+   * ./debian/changelog: ready for releasable .deb packages.
+
+2003-04-08 Tuesday 08:59  sam
+
+   * ./configure.ac.in: if CoreAudio is too old, disable the coreaudio_resampler
+     module for the moment.
+
+2003-04-08 Tuesday 08:35  massiot
+
+ * Fixed the translation option with Mac OS X.
+
+2003-04-08 Tuesday 07:22  sigmunau
+
+ modules/video_filter/Modules.am: forgot to add the osdtest module
+ modules/video_filter/osd_text.c: fixed a bug in size/place calculations.
+ Support gamma correction of the text.
+
+2003-04-08 Tuesday 07:19  alexis
+
+ Update spec file for the 0.5.3 release, courtesy of Jason Luka.
+
+2003-04-08 Tuesday 02:06  gbazin
+
+ *  modules/gui/skins/src/event.cpp, modules/gui/skins/src/event.h:
+     fixed 2 nasty buffer overflows. This fixes the last crashes I've got
+     with the skins interface.
+
+2003-04-07 Monday 21:51  massiot
+
+ * Updated ChangeLog
+ * src/libvlc.c: Darwin doesn't have a "translation" config variable
+
 2003-04-07 Monday 17:35  gbazin
 
  * po/fr.po: small update.
