@@ -42,19 +42,6 @@
 
 using namespace std;
 
-
-# ifdef __cplusplus
-extern "C" {
-#endif
-
-stream_t *__stream_DemuxNew( vlc_object_t *p_obj, char *psz_demux, es_out_t *out );
-void     stream_DemuxSend( stream_t *s, block_t *p_block );
-void     stream_DemuxDelete( stream_t *s );
-
-# ifdef __cplusplus
-}
-# endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
