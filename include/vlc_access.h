@@ -111,6 +111,7 @@ VLC_EXPORT( void,      access2_Delete, ( access_t * ) );
 
 static inline int access2_vaControl( access_t *p_access, int i_query, va_list args )
 {
+    if( !p_access ) return VLC_EGENERIC;
     return p_access->pf_control( p_access, i_query, args );
 }
 static inline int access2_Control( access_t *p_access, int i_query, ... )

@@ -159,10 +159,10 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     p_sys->i_sub   = 0;
 
     /* */
-    var_Get( p_input, "audio-channel", &val );
+    var_Get( p_input, "audio-track", &val );
     p_sys->i_audio_last = val.i_int;
 
-    var_Get( p_input, "spu-channel", &val );
+    var_Get( p_input, "spu-track", &val );
     p_sys->i_sub_last = val.i_int;
 
     var_Get( p_input, "audio-language", &val );

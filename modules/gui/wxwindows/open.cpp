@@ -674,7 +674,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
     sizer->Add( disc_sub_label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_sub, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     disc_sub->SetRange( -1, 255 );
-    i_disc_sub = config_GetInt( p_intf, "spu-channel" );
+    i_disc_sub = config_GetInt( p_intf, "spu-track" );
     disc_sub->SetValue( i_disc_sub );
 
     sizer_row->Add( sizer, 0, wxEXPAND | wxALL, 5 );
@@ -831,7 +831,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
             }
 
             if( i_disc_sub >= 0 )
-                mrltemp += wxString::Format( wxT("  :spu-channel=%d"),
+                mrltemp += wxString::Format( wxT("  :spu-track=%d"),
                                              i_disc_sub );
             break;
 
@@ -849,7 +849,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
 #endif
 
             if( i_disc_sub >= 0 )
-                mrltemp += wxString::Format( wxT("  :spu-channel=%d"),
+                mrltemp += wxString::Format( wxT("  :spu-track=%d"),
                                              i_disc_sub );
 
             caching_name = wxT("vcd-caching");

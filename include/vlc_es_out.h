@@ -33,7 +33,7 @@ enum es_out_mode_e
 {
     ES_OUT_MODE_NONE,   /* don't select anything */
     ES_OUT_MODE_ALL,    /* eg for stream output */
-    ES_OUT_MODE_AUTO,   /* best audio/video or for input follow audio-channel, spu-channel */
+    ES_OUT_MODE_AUTO,   /* best audio/video or for input follow audio-track, spu-track */
     ES_OUT_MODE_PARTIAL /* select programs given after --programs */
 };
 

@@ -249,7 +249,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
 
         if( !p_input ) return NULL;
 
-        if( var_Get( p_input, "spu-channel", &val ) )
+        if( var_Get( p_input, "spu-track", &val ) )
         {
             vlc_object_release( p_input );
             return NULL;

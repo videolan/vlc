@@ -329,25 +329,25 @@ static char *ppsz_clock_descriptions[] =
     "Only use this option if you want to read a multi-program stream " \
     "(like DVB streams for example )" )
 
-#define INPUT_CHAN_TEXT N_("Choose audio channel")
-#define INPUT_CHAN_LONGTEXT N_( \
-    "Give the stream number of the audio channel you want to use" \
+#define INPUT_AUDIOTRACK_TEXT N_("Choose audio track")
+#define INPUT_AUDIOTRACK_LONGTEXT N_( \
+    "Give the stream number of the audio track you want to use" \
     "(from 0 to n).")
 
-#define INPUT_SUB_TEXT N_("Choose subtitles track")
-#define INPUT_CHAN_LANG_TEXT N_("Choose audio language")
-#define INPUT_CHAN_LANG_LONGTEXT N_( \
-    "Give the language of the audio channel you want to use " \
-    "(comma separted, two or tree letter country code).")
-#define INPUT_SUB_LANG_TEXT N_("Choose subtitle track")
-#define INPUT_SUB_LANG_LONGTEXT N_( \
-    "Give the language of the subtitle channel you want to use " \
-    "(comma separted, two or tree letter country code).")
-
-
-#define INPUT_SUB_LONGTEXT N_( \
-    "Give the stream number of the subtitle channel you want to use " \
+#define INPUT_SUBTRACK_TEXT N_("Choose subtitles track")
+#define INPUT_SUBTRACK_LONGTEXT N_( \
+    "Give the stream number of the subtitle track you want to use " \
     "(from 0 to n).")
+
+#define INPUT_AUDIOTRACK_LANG_TEXT N_("Choose audio language")
+#define INPUT_AUDIOTRACK_LANG_LONGTEXT N_( \
+    "Give the language of the audio track you want to use " \
+    "(comma separted, two or tree letter country code).")
+
+#define INPUT_SUBTRACK_LANG_TEXT N_("Choose subtitle track")
+#define INPUT_SUBTRACK_LANG_LONGTEXT N_( \
+    "Give the language of the subtitle track you want to use " \
+    "(comma separted, two or tree letter country code).")
 
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
 #define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be " \
@@ -988,19 +988,19 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INPUT_SCODEC );
     set_subcategory( SUBCAT_INPUT_ADVANCED );
 
-    set_section( N_( "Tracks settings" ), NULL );
+    set_section( N_( "Track settings" ), NULL );
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT, VLC_TRUE );
     add_string( "programs", "", NULL,
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, VLC_FALSE );
-    add_integer( "audio-channel", -1, NULL,
-                 INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_FALSE );
-    add_integer( "spu-channel", -1, NULL,
-                 INPUT_SUB_TEXT, INPUT_SUB_LONGTEXT, VLC_FALSE );
+    add_integer( "audio-track", -1, NULL,
+                 INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, VLC_FALSE );
+    add_integer( "spu-track", -1, NULL,
+                 INPUT_SUBTRACK_TEXT, INPUT_SUBTRACK_LONGTEXT, VLC_FALSE );
     add_string( "audio-language", "", NULL,
-                 INPUT_CHAN_LANG_TEXT, INPUT_CHAN_LANG_LONGTEXT, VLC_FALSE );
+                 INPUT_AUDIOTRACK_LANG_TEXT, INPUT_AUDIOTRACK_LANG_LONGTEXT, VLC_FALSE );
     add_string( "spu-language", "", NULL,
-                 INPUT_SUB_LANG_TEXT, INPUT_SUB_LANG_LONGTEXT, VLC_FALSE );
+                 INPUT_SUBTRACK_LANG_TEXT, INPUT_SUBTRACK_LANG_LONGTEXT, VLC_FALSE );
 
 
     set_section( N_( "Playback control" ) , NULL);
