@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.18 2002/12/20 21:33:40 jpsaman Exp $
+ * $Id: callbacks.c,v 1.19 2002/12/22 21:46:50 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -388,9 +388,7 @@ void
 on_comboURL_entry_changed              (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-#if 0
     intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET(editable) );
-#endif
     gchar *       psz_url;
     struct stat st;
 
@@ -411,22 +409,13 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
     }
     else if (lstat((char*)psz_url, &st)==0)
     {
-#if 0
-// This piece of code crashes in ReadDirectory at gtk_clist_insert()
-// I cannot figure out why. So for now it is mandatory to use the
-// file://  syntax for opening a file on a known location.
-// The strange thing is it only crashes for names beginning with "/" or "."
-// The combobox is means as a URL box, so having "file://" in front
-// is not that strange ;-)
         if (S_ISDIR(st.st_mode))
         {
 		    if (!p_intf->p_sys->p_clist)
 			    msg_Err(p_intf, "p_clist pointer invalid!!" );
             ReadDirectory(p_intf->p_sys->p_clist, psz_url);
         }
-        else
-#endif
-        if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
+        else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
             (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
             (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
         {

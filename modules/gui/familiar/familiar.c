@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.19 2002/12/22 21:08:36 jpsaman Exp $
+ * $Id: familiar.c,v 1.20 2002/12/22 21:46:50 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -197,6 +197,7 @@ static void Run( intf_thread_t *p_intf )
     ReadDirectory(p_intf->p_sys->p_clist, "/mnt");
 
 #ifdef NEED_GTK_MAIN
+    msg_Dbg( p_intf, "Manage GTK keyboard events using threads" );
     while( !p_intf->b_die )
     {
         Manage( p_intf );
@@ -208,6 +209,7 @@ static void Run( intf_thread_t *p_intf )
         gdk_threads_enter();
     }
 #else
+    msg_Dbg( p_intf, "Manage GTK keyboard events using timeouts" );
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 100ms delay is a good compromise */
     i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, (GtkFunction)Manage,
