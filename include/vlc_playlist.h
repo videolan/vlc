@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.4 2002/07/31 20:56:50 sam Exp $
+ * $Id: vlc_playlist.h,v 1.5 2002/11/12 21:20:36 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,9 +26,10 @@
  *****************************************************************************/
 struct playlist_item_t
 {
-    char *  psz_name;
-    int     i_type;   /* unused yet */
-    int     i_status; /* unused yet */
+    char *     psz_name;
+    int        i_type;   /* unused yet */
+    int        i_status; /* unused yet */
+    vlc_bool_t b_autodeletion;
 };
 
 /*****************************************************************************

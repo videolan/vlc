@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.17 2002/11/10 18:04:24 sam Exp $
+ * $Id: playlist.c,v 1.18 2002/11/12 21:20:36 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -117,6 +117,7 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     p_item->psz_name = strdup( psz_target );
     p_item->i_type = 0;
     p_item->i_status = 0;
+    p_item->b_autodeletion = VLC_FALSE;
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -303,6 +304,10 @@ static void RunThread ( playlist_t *p_playlist )
                 /* Release the playlist lock, because we may get stuck
                  * in input_DestroyThread() for some time. */
                 vlc_mutex_unlock( &p_playlist->object_lock );
+
+                /* Check for autodeletion */
+                if( p_playlist->pp_items[p_playlist->i_index]->b_autodeletion )
+                    playlist_Delete( p_playlist, p_playlist->i_index );
 
                 /* Destroy input */
                 input_DestroyThread( p_input );
