@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.142 2001/10/10 14:25:15 sam Exp $
+ * $Id: input.c,v 1.143 2001/10/15 14:59:56 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -716,18 +716,24 @@ static void NetworkOpen( input_thread_t * p_input )
             char *psz_port = psz_server;
 
             /* Skip the hostname part */
-            while( *psz_port && *psz_port != ':' )
+            while( *psz_port && *psz_port != ':' && *psz_port != '/' )
             {
                 psz_port++;
             }
 
-            /* Found a port name */
+            /* Found a port name or a broadcast addres */
             if( *psz_port )
             {
-                /* Replace ':' with '\0' */
-                *psz_port = '\0';
-                psz_port++;
+		/* That's a port name */
+		if( *psz_port == ':' )
+		{
+                    *psz_port = '\0';
+                    psz_port++;
+                    i_port = atoi( psz_port );
+		}
 
+		/* Search for '/' just after the port in case
+		 * we also have a broadcast address */
                 psz_broadcast = psz_port;
                 while( *psz_broadcast && *psz_broadcast != '/' )
                 {
@@ -746,12 +752,6 @@ static void NetworkOpen( input_thread_t * p_input )
                 else
                 {
                     psz_broadcast = NULL;
-                }
-
-                /* port before broadcast address */
-                if( *psz_port != '\0' )
-                {
-                    i_port = atoi( psz_port );
                 }
             }
         }
