@@ -150,7 +150,6 @@ vcdplayer_play_return( input_thread_t * p_input );
 
 vcdplayer_read_status_t vcdplayer_pbc_nav ( input_thread_t * p_input );
 vcdplayer_read_status_t vcdplayer_non_pbc_nav ( input_thread_t * p_input );
-lid_t vcdplayer_selection2lid ( input_thread_t *p_input, int entry_num ) ;
 
 #endif /* _VCDPLAYER_H_ */
 /* 
