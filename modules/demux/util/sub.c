@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.25 2003/08/26 19:43:51 hartman Exp $
+ * $Id: sub.c,v 1.26 2003/09/22 03:40:06 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -64,18 +64,11 @@ static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", "vplaye
 #define SUB_TYPE_LONGTEXT \
     "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\", \"vplayer\" " \
     "\"sami\" (nothing for autodetection, it should always work)."
-#define SUB_AUTO_LONGTEXT \
-    "Automatically detect a subtitle file, if no subtitle filename is" \
-    "is specified"
 
 vlc_module_begin();
     set_description( _("Text subtitles demux") );
     set_capability( "subtitle demux", 12 );
     add_category_hint( "Subtitles", NULL, VLC_TRUE );
-        add_file( "sub-file", NULL, NULL,
-                  "Subtitles file name", "Subtitles file name", VLC_TRUE );
-        add_bool( "sub-autodetect-file", VLC_TRUE, NULL, "Autodetect subtitle filename",
-                  SUB_AUTO_LONGTEXT, VLC_FALSE );
         add_float( "sub-fps", 0.0, NULL,
                    "Frames per second",
                    SUB_FPS_LONGTEXT, VLC_TRUE );
@@ -101,8 +94,6 @@ static int Open ( vlc_object_t *p_this )
     p_sub->pf_close = sub_close;
 
     /* Initialize the variables */
-    var_Create( p_this, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "sub-autodetect-file", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_this, "sub-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_this, "sub-delay", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_this, "sub-type", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -235,104 +226,6 @@ static struct
 };
 
 /*****************************************************************************
- * sub_detect: Use the original filename to find a subtitle file
- *****************************************************************************/
-char* sub_detect( subtitle_demux_t *p_sub, char *psz_filename)
-{
-    DIR *p_dir_handle;
-    struct dirent *p_dir_afile;
-    char * ppsz_sub_exts[] = { "sub", "srt", "smi", "ssa", NULL};
-    char *psz_result, *psz_basename, *psz_dir = NULL;
-    char *psz_file_noext, *psz_extension;
-    int i;
-    size_t i_dirlen, i_baselen = 0;
-
-    if( psz_filename && *psz_filename )
-    {
-#ifdef WIN32
-        psz_basename = strrchr( psz_filename , '\\' );
-#else
-        psz_basename = strrchr( psz_filename , '/' );
-#endif
-        if( psz_basename )
-        {
-            i_dirlen = ( 1 + psz_basename ) - psz_filename;
-            psz_dir = (char*)malloc( i_dirlen + 1 );
-
-            if( !psz_dir )
-            {
-                return "";
-            }
-            strncpy( psz_dir, psz_filename, i_dirlen );
-            psz_dir[i_dirlen] = '\0';
-            ++psz_basename;
-        }
-        else
-        {
-            psz_basename = psz_filename;
-        }
-
-        psz_extension = strrchr( psz_basename , '.' );
-
-        if( psz_extension )
-        {
-            i_baselen = ( 1 + psz_extension ) - psz_basename;
-
-            psz_file_noext = (char*)malloc( i_baselen + 1 );
-            if( !psz_file_noext )
-            {
-                return "";
-            }
-            strncpy( psz_file_noext, psz_basename, i_baselen );
-            psz_file_noext[i_baselen] = '\0';
-            ++psz_extension;
-        }
-        else return "";
-
-        p_dir_handle = opendir( psz_dir ? psz_dir : "" );
-        if( p_dir_handle ) {
-            while(( p_dir_afile = readdir( p_dir_handle ))) {
-                char* psz_afile_ext = strrchr( p_dir_afile->d_name, '.' );
-
-                if( psz_afile_ext )
-                {
-                    int i_found = 0;
-
-                    ++psz_afile_ext;
-                    for (i = 0; ppsz_sub_exts[i]; i++) {
-                        if( strcmp( ppsz_sub_exts[i], psz_afile_ext ) == 0 ) {
-                            i_found = 1;
-                            break;
-                        }
-                    }
-                    if( i_found ) /* found a file with a subtitle extension */
-                    {
-                        if( strncmp( p_dir_afile->d_name, psz_file_noext, (strlen( p_dir_afile->d_name ) - strlen( psz_afile_ext) ) ) == 0 )
-                        {
-                            /* perfect match */
-                            msg_Dbg( p_sub, "autodetected subtitlefile: %s", strdup( p_dir_afile->d_name ) );
-                            if( psz_dir )
-                            {
-                                char *psz_append;
-                                psz_result = (char*)malloc( i_dirlen + strlen( p_dir_afile->d_name ) +1 );
-                                strncpy( psz_result, psz_dir, i_dirlen );
-                                psz_append = psz_result + i_dirlen;
-                                strncpy( psz_append, p_dir_afile->d_name, strlen( p_dir_afile->d_name ) );
-                                psz_result[i_dirlen + strlen( p_dir_afile->d_name )] = '\0';
-                                return psz_result;
-                            }
-                            else return strdup( p_dir_afile->d_name );
-                        }
-                    }
-                }
-            }
-            closedir( p_dir_handle );
-        }
-    }
-    return "";
-}
-
-/*****************************************************************************
  * sub_open: Open a subtitle file and add subtitle ES
  *****************************************************************************/
 static int  sub_open ( subtitle_demux_t *p_sub,
@@ -354,28 +247,11 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     p_sub->subtitle = NULL;
     p_sub->p_input = p_input;
 
-    if( !psz_name || !*psz_name)
+    if( !psz_name )
     {
-        var_Get( p_sub, "sub-file", &val );
-        if( !val.psz_string || !*val.psz_string )
-        {
-            var_Get( p_sub, "sub-autodetect-file", &val );
-            if( val.b_bool )
-            {
-                psz_name = strdup( sub_detect( p_sub, p_input->psz_source));
-                if( !psz_name || !*psz_name ) return VLC_EGENERIC;
-            }
-            else
-            {
-                if( val.psz_string ) free( val.psz_string );
-                return VLC_EGENERIC;
-            }
-        }
-        else
-        {
-            psz_name = strdup( val.psz_string );
-            if( val.psz_string ) free( val.psz_string );
-        }
+        msg_Err( p_sub, "no subtitle file specified", psz_name );
+        free( psz_name );
+        return VLC_EGENERIC;
     }
     
     /* *** load the file *** */

@@ -293,7 +293,8 @@ SOURCES_libvlc_common = \
 	src/input/input.c \
 	src/input/stream.c \
 	src/input/demux.c \
-	src/input/input_ext-plugins.c \
+	src/input/subtitles.c \
+        src/input/input_ext-plugins.c \
 	src/input/input_ext-dec.c \
 	src/input/input_ext-intf.c \
 	src/input/input_dec.c \

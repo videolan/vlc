@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.h,v 1.10 2003/07/27 23:05:41 hartman Exp $
+ * $Id: playlist.h,v 1.11 2003/09/22 03:40:05 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -43,6 +43,7 @@
 
     IBOutlet id o_ctx_menu;
 
+    IBOutlet id o_mi_save_playlist;
     IBOutlet id o_mi_play;
     IBOutlet id o_mi_delete;
     IBOutlet id o_mi_selectall;
@@ -53,6 +54,7 @@
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
+- (IBAction)savePlaylist:(id)sender;
 - (IBAction)playItem:(id)sender;
 - (IBAction)deleteItems:(id)sender;
 - (IBAction)selectAll:(id)sender;

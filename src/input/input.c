@@ -1,10 +1,10 @@
 /*****************************************************************************
  * input.c: input thread
- * Read an MPEG2 stream, demultiplex and parse it before sending it to
+ * Read a stream, demultiplex and parse it before sending it to
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.242 2003/09/20 13:50:14 fenrir Exp $
+ * $Id: input.c,v 1.243 2003/09/22 03:40:06 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -110,6 +110,8 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     var_Create( p_input, "audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "audio-channel", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Create( p_input, "spu-channel", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-file", VLC_VAR_FILE | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sub-autodetect-file", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -723,16 +725,31 @@ static int InitThread( input_thread_t * p_input )
         i_microsecondperframe = (int64_t)( (double)1000000.0 / (double)f_fps );
     }
 
-    /* Now add subtitles (for now only one) */
-    if( ( p_sub = subtitle_New( p_input, NULL, i_microsecondperframe ) ) )
+    /* Look for and add subtitle files */
+    var_Get( p_input, "sub-autodetect-file", &val );
+    if( val.b_bool )
     {
-        TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
-
-        /* see if it should be selected */
-        var_Get( p_sub, "sub-file", &val );
-        if( val.psz_string && *val.psz_string )
+        char **tmp = subtitles_Detect( p_input, "", p_input->psz_source );
+        char **tmp2 = tmp;
+        while (*tmp2)
         {
-            subtitle_Select( p_sub );
+            if( ( p_sub = subtitle_New( p_input, strdup(*tmp2++), i_microsecondperframe ) ) )
+            {
+                TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+            }
+	}
+        free(tmp);
+    }
+    else
+    {
+        var_Get( p_input, "sub-file", &val );
+        if( val.psz_string )
+        {
+            if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe ) ) )
+            {
+                TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+            }
+            free( val.psz_string );
         }
     }
 
@@ -1293,4 +1310,3 @@ static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
     }
     return VLC_SUCCESS;
 }
-

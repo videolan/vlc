@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.11 2003/09/13 17:42:15 fenrir Exp $
+ * $Id: ninput.h,v 1.12 2003/09/22 03:40:06 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -229,5 +229,19 @@ VLC_EXPORT( int,            demux_vaControlDefault, ( input_thread_t *, int i_qu
 /**
  * @}
  */
+
+
+/**
+ * \defgroup subtitles Subtitles
+ * @{
+ */
+
+/* Subtitles */
+VLC_EXPORT( char **,        subtitles_Detect,       ( input_thread_t *, char* path, char *fname ) );
+
+/**
+ * @}
+ */
+
 #endif
 

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.86 2003/09/20 19:37:54 hartman Exp $
+ * $Id: libvlc.h,v 1.87 2003/09/22 03:40:06 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -259,10 +259,20 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "es", "de", "fr", "it", 
     "Give the stream number of the audio channel you want to use in a DVD " \
     "(from 1 to n).")
 
-#define INPUT_SUBT_TEXT N_("Choose subtitles")
+#define INPUT_SUBT_TEXT N_("Choose subtitles track")
 #define INPUT_SUBT_LONGTEXT N_( \
-    "Give the stream number of the subtitle channel you want to use in a " \
-    "DVD (from 1 to n).")
+    "Give the stream number of the subtitle channel you want to use " \
+    "(from 1 to n).")
+
+#define SUB_AUTO_TEXT N_("Autodetect subtitle files")
+#define SUB_AUTO_LONGTEXT \
+    "Automatically detect a subtitle file, if no subtitle filename is" \
+    "is specified."
+
+#define SUB_FILE_TEXT N_("Use subtitle file")
+#define SUB_FILE_LONGTEXT \
+    "Load this subtitle file. To be used when autodetect cannot detect " \
+    "your subtitlefile."
 
 #define DVD_DEV_TEXT N_("DVD device")
 #ifdef WIN32
@@ -562,6 +572,11 @@ vlc_module_begin();
                  INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_TRUE );
     add_integer( "spu-channel", -1, NULL,
                  INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT, VLC_TRUE );
+    add_bool( "sub-autodetect-file", VLC_TRUE, NULL,
+                 SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, VLC_FALSE );
+    add_file( "sub-file", NULL, NULL,
+                 SUB_FILE_TEXT, SUB_FILE_LONGTEXT, VLC_TRUE );
+
 
     add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
     add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );

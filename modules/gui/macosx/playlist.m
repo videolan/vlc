@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.32 2003/09/20 13:46:00 hartman Exp $
+ * $Id: playlist.m,v 1.33 2003/09/22 03:40:05 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -187,6 +187,7 @@ int MacVersion102 = -1;
     [o_table_view registerForDraggedTypes: 
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
+    [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
@@ -219,6 +220,25 @@ int MacVersion102 = -1;
     [o_mi_selectall setEnabled: b_rows];
 
     return( o_ctx_menu );
+}
+
+- (IBAction)savePlaylist:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    
+    NSSavePanel *o_save_panel = [NSSavePanel savePanel];
+    NSString * o_name = [NSString stringWithFormat: @"%@.m3u", _NS("Untitled")];
+    [o_save_panel setTitle: _NS("Save Playlist")];
+    [o_save_panel setPrompt: _NS("Save")];
+
+    if( [o_save_panel runModalForDirectory: nil
+            file: o_name] == NSOKButton )
+    {
+        playlist_SaveFile( p_playlist, [[o_save_panel filename] fileSystemRepresentation] );
+    }
+
 }
 
 - (IBAction)playItem:(id)sender
