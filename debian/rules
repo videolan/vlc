@@ -87,7 +87,7 @@ configure-stamp:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	if test ! '(' -d CVS -o .svn ')'; then \
+	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg \
 	  && CC=$(CC) ./configure --enable-pp --enable-gpl --enable-zlib --disable-debug \
 	  && cd libavcodec \
@@ -96,7 +96,7 @@ configure-stamp:
 
 	# Check that we have an faad2 tree in here (can be a symlink)
 	test -d extras/faad2
-	if test ! '(' -d CVS -o .svn ')'; then \
+	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/faad2 \
 	  && touch `find . -name configure.in` \
 	  && touch `find . -name aclocal.m4` \
@@ -125,7 +125,7 @@ build-stamp:
 
 ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	# Hackety hackety hack
-	if test ! '(' -d CVS -o .svn ')'; then \
+	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg/libavcodec \
 	  && $(MAKE) clean \
 	  && rm -f Makefile.pic \
@@ -135,7 +135,7 @@ ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	fi
 
 	# HACKETY HACKETY HACK
-	if test ! '(' -d CVS -o .svn ')'; then \
+	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/faad2/libfaad \
 	  && $(MAKE) clean \
 	  && $(MAKE) AM_CFLAGS=-fPIC; \
@@ -154,12 +154,12 @@ clean:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	-if test ! '(' -d CVS -o .svn ')'; then \
+	-if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg && $(MAKE) distclean; \
 	fi
 	# Check that we have an faad2 tree in here (can be a symlink)
 	test -d extras/faad2
-	-if test ! '(' -d CVS -o .svn ')'; then \
+	-if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/faad2 && $(MAKE) distclean; \
 	fi
 
