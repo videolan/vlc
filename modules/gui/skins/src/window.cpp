@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: window.cpp,v 1.2 2003/03/19 02:09:56 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -372,6 +372,9 @@ void Window::Init()
 
     // Refresh Image buffer
     RefreshImage( 0, 0, Width, Height );
+
+    // Move window as it hasn't been moved yet
+    Move( Left, Top );
 }
 //---------------------------------------------------------------------------
 void Window::ReSize()

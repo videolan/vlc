@@ -2,7 +2,7 @@
  * button.h: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: button.h,v 1.2 2003/03/19 02:09:56 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -48,19 +48,28 @@ class ControlButton : public GenericControl
         // Control behaviour
         bool        Selected;
         bool        Enabled;
+        bool        CursorIn;
 
-        // List of actions to execute when clicking
+        // List of actions to execute
         Action     *ClickAction;
         string      ClickActionName;
+        Action     *MouseOverAction;
+        string      MouseOverActionName;
+        Action     *MouseOutAction;
+        string      MouseOutActionName;
 
         // ToolTip text
         string      ToolTipText;
 
     public:
         // Constructor
-        ControlButton( string id, bool visible, int x, int y, string Up,
-                       string Down, string Disabled, string click,
-                       string tooltiptext, string help, Window *Parent );
+        ControlButton( string id,
+                       bool visible,
+                       int x, int y,
+                       string Up, string Down, string Disabled,
+                       string onclick, string onmousevoer, string onmouseout,
+                       string tooltiptext, string help,
+                       Window *Parent );
 
         // Destructor
         virtual ~ControlButton();

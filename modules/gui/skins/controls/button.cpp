@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: button.cpp,v 1.2 2003/03/19 02:09:56 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -42,20 +42,32 @@
 //---------------------------------------------------------------------------
 // Control Button
 //---------------------------------------------------------------------------
-ControlButton::ControlButton( string id, bool visible, int x, int y, string Up,
-    string Down, string Disabled, string click, string tooltiptext, string help,
+ControlButton::ControlButton(
+    string id,
+    bool visible,
+    int x, int y,
+    string Up, string Down, string Disabled,
+    string onclick, string onmouseover, string onmouseout,
+    string tooltiptext, string help,
     Window *Parent ) : GenericControl( id, visible, help, Parent )
 {
+    // General
     Left            = x;
     Top             = y;
     State           = 1;                   // 1 = up - 0 = down
     Selected        = false;
     Enabled         = true;
-    ClickActionName = click;
+    CursorIn        = false;
     this->Up        = Up;
     this->Down      = Down;
     this->Disabled  = Disabled;
 
+    // Actions
+    ClickActionName     = onclick;
+    MouseOverActionName = onmouseover;
+    MouseOutActionName  = onmouseout;
+
+    // Texts
     ToolTipText = tooltiptext;
 }
 //---------------------------------------------------------------------------
@@ -78,7 +90,9 @@ void ControlButton::Init()
     Img[0]->GetSize( Width, Height );
 
     // Create script
-    ClickAction = new Action( p_intf, ClickActionName );
+    ClickAction     = new Action( p_intf, ClickActionName );
+    MouseOverAction = new Action( p_intf, MouseOverActionName );
+    MouseOutAction  = new Action( p_intf, MouseOutActionName );
 }
 //---------------------------------------------------------------------------
 bool ControlButton::ProcessEvent( Event *evt )
@@ -157,26 +171,41 @@ bool ControlButton::MouseDown( int x, int y, int button )
 //---------------------------------------------------------------------------
 bool ControlButton::MouseMove( int x, int y, int button )
 {
-    if( !Enabled || !Selected || !button )
+    if( !Enabled )
         return false;
 
-    if( MouseOver( x, y ) )
+
+    if( MouseOver( x, y ) && !CursorIn )
     {
-        if( State == 1 )
+        if( button == 1 && Selected )
         {
             State = 0;
             ParentWindow->Refresh( Left, Top, Width, Height );
         }
+
+        if( MouseOverActionName != "none" )
+            MouseOverAction->SendEvent();
+
+        CursorIn = true;
+        return true;
     }
-    else
+    else if( !MouseOver( x, y ) & CursorIn )
     {
-        if( State == 0 )
+
+        if( button == 1 && Selected )
         {
             State = 1;
             ParentWindow->Refresh( Left, Top, Width, Height );
         }
+
+        if( MouseOutActionName != "none" )
+            MouseOutAction->SendEvent();
+
+        CursorIn = false;
+        return true;
     }
-    return true;
+
+    return false;
 }
 //---------------------------------------------------------------------------
 bool ControlButton::MouseOver( int x, int y )

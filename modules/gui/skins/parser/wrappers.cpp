@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.2 2003/03/18 04:08:45 ipkiss Exp $
+ * $Id: wrappers.cpp,v 1.3 2003/03/19 02:09:56 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -157,17 +157,27 @@ void AddRectangle( char *id, char *visible, char *x, char *y, char *w, char *h,
         atoi( w ), atoi( h ), ConvertColor( color ), event, help, vlcWin ) );
 }
 //---------------------------------------------------------------------------
-void AddButton( char *id, char *visible, char *x, char *y, char *up, char *down,
-    char *disabled, char *click, char *tooltiptext, char *help )
+void AddButton(
+    char *id,
+    char *visible,
+    char *x, char *y,
+    char *up, char *down, char *disabled,
+    char *onclick, char *onmouseover, char *onmouseout,
+    char *tooltiptext, char *help )
 {
     int XOff, YOff;
     Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
 
-    vlcWin->ControlList.push_back( new ControlButton( id,
-        ConvertBoolean( visible ), atoi( x ) + XOff, atoi( y ) + YOff,
-        up, down, disabled, click, tooltiptext, help, vlcWin ) );
+    vlcWin->ControlList.push_back( new ControlButton(
+        id,
+        ConvertBoolean( visible ),
+        atoi( x ) + XOff, atoi( y ) + YOff,
+        up, down, disabled,
+        onclick, onmouseover, onmouseout,
+        tooltiptext, help,
+        vlcWin ) );
 }
 //---------------------------------------------------------------------------
 void AddCheckBox( char *id, char *visible, char *x, char *y, char *img1,

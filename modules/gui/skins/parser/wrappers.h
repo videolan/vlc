@@ -2,7 +2,7 @@
  * wrappers.h: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: wrappers.h,v 1.2 2003/03/19 02:09:56 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -66,13 +66,19 @@ extern "C" {
     void AddRectangle( char *id, char *visible, char *x, char *y, char *w,
                        char *h, char *color, char *event, char *help );
 
-    void AddButton( char *id, char *visible, char *x, char *y, char *up,
-                    char *down, char *disabled, char *click,
+    void AddButton( char *id,
+                    char *visible,
+                    char *x, char *y,
+                    char *up, char *down, char *disabled,
+                    char *onclick, char *onmouseover, char *onmouseout,
                     char *tooltiptext, char *help );
 
-    void AddCheckBox( char *id, char *visible, char *x, char *y, char *img1,
-                      char *img2, char *click1, char *click2, char *disabled1,
-                      char *disabled2, char *action1, char *action2,
+    void AddCheckBox( char *id,
+                      char *visible,
+                      char *x, char *y,
+                      char *img1, char *img2, char *click1, char *click2,
+                      char *disabled1, char *disabled2,
+                      char *action1, char *action2,
                       char *tooltiptext1, char *tooltiptext2, char *help );
 
     void AddSlider( char *id, char *visible, char *x, char *y, char *type,

@@ -1,5 +1,5 @@
 /* XML processor/application API for skin.dtd (Id: skin.dtd,v 1.8 2003/03/17 22:14:47 karibu Exp).
- * Generated 2003/03/18 03:18:31.
+ * Generated 2003/03/19 02:59:06.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -80,6 +80,8 @@ typedef char* AT_CheckBoxControl_disabled2;
 #define AU_CheckBoxControl_disabled2 NULL
 typedef char* AT_Font_underline;
 #define AU_Font_underline NULL
+typedef char* AT_ButtonControl_onmouseover;
+#define AU_ButtonControl_onmouseover NULL
 typedef char* AT_ButtonControl_visible;
 #define AU_ButtonControl_visible NULL
 typedef char* AT_TextControl_scroll;
@@ -228,6 +230,8 @@ typedef char* AT_RectangleControl_h;
 #define AU_RectangleControl_h NULL
 typedef char* AT_ThemeInfo_webpage;
 #define AU_ThemeInfo_webpage NULL
+typedef char* AT_ButtonControl_onmouseout;
+#define AU_ButtonControl_onmouseout NULL
 typedef char* AT_CheckBoxControl_tooltiptext1;
 #define AU_CheckBoxControl_tooltiptext1 NULL
 typedef char* AT_CheckBoxControl_tooltiptext2;
@@ -291,6 +295,7 @@ extern AT_ButtonControl_down A_ButtonControl_down;
 extern AT_CheckBoxControl_disabled1 A_CheckBoxControl_disabled1;
 extern AT_CheckBoxControl_disabled2 A_CheckBoxControl_disabled2;
 extern AT_Font_underline A_Font_underline;
+extern AT_ButtonControl_onmouseover A_ButtonControl_onmouseover;
 extern AT_ButtonControl_visible A_ButtonControl_visible;
 extern AT_TextControl_scroll A_TextControl_scroll;
 extern AT_SliderControl_id A_SliderControl_id;
@@ -365,6 +370,7 @@ extern AT_ButtonControl_tooltiptext A_ButtonControl_tooltiptext;
 extern AT_Event_event A_Event_event;
 extern AT_RectangleControl_h A_RectangleControl_h;
 extern AT_ThemeInfo_webpage A_ThemeInfo_webpage;
+extern AT_ButtonControl_onmouseout A_ButtonControl_onmouseout;
 extern AT_CheckBoxControl_tooltiptext1 A_CheckBoxControl_tooltiptext1;
 extern AT_CheckBoxControl_tooltiptext2 A_CheckBoxControl_tooltiptext2;
 extern AT_ImageControl_id A_ImageControl_id;

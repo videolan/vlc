@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: win32_window.cpp,v 1.2 2003/03/19 02:09:56 videolan Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -144,7 +144,6 @@ void Win32Window::OSShow( bool show )
 //---------------------------------------------------------------------------
 bool Win32Window::ProcessOSEvent( Event *evt )
 {
-    HDC DC;
     unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
@@ -152,6 +151,7 @@ bool Win32Window::ProcessOSEvent( Event *evt )
     switch( msg )
     {
         case WM_PAINT:
+            HDC DC;
             PAINTSTRUCT Infos;
             DC = BeginPaint( hWnd , &Infos );
             EndPaint( hWnd , &Infos );
@@ -159,6 +159,12 @@ bool Win32Window::ProcessOSEvent( Event *evt )
             return true;
 
         case WM_MOUSEMOVE:
+            TRACKMOUSEEVENT TrackEvent;
+            TrackEvent.cbSize      = sizeof( TRACKMOUSEEVENT );
+            TrackEvent.dwFlags     = TME_LEAVE;
+            TrackEvent.hwndTrack   = hWnd;
+            TrackEvent.dwHoverTime = 1;
+            TrackMouseEvent( &TrackEvent );
             if( p1 == MK_LBUTTON )
                 MouseMove( LOWORD( p2 ), HIWORD( p2 ), 1 );
             else if( p1 == MK_RBUTTON )
@@ -188,6 +194,10 @@ bool Win32Window::ProcessOSEvent( Event *evt )
 
         case WM_LBUTTONDBLCLK:
             MouseDblClick( LOWORD( p2 ), HIWORD( p2 ), 1 );
+            return true;
+
+        case WM_MOUSELEAVE:
+            MouseMove( -1, -1, 0 );
             return true;
 
         default:
