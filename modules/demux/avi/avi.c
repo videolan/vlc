@@ -615,7 +615,7 @@ static int Demux_Seekable( demux_t *p_demux )
     }
 
     /* wait for the good time */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time + 1 );
     p_sys->i_time += 25*1000;  /* read 25ms */
 
     /* init toread */
@@ -836,7 +836,7 @@ static int Demux_Seekable( demux_t *p_demux )
             p_frame->p_buffer += 8;
             p_frame->i_buffer -= 8;
         }
-        p_frame->i_pts = AVI_GetPTS( tk );
+        p_frame->i_pts = AVI_GetPTS( tk ) + 1;
         if( tk->p_index[tk->i_idxposc].i_flags&AVIIF_KEYFRAME )
         {
             p_frame->i_flags = BLOCK_FLAG_TYPE_I;
@@ -917,7 +917,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
     unsigned int i_stream;
     unsigned int i_packet;
 
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time + 1 );
 
     /* *** find master stream for data packet skipping algo *** */
     /* *** -> first video, if any, or first audio ES *** */
@@ -998,7 +998,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 {
                     return( -1 );
                 }
-                p_frame->i_pts = AVI_GetPTS( p_stream );
+                p_frame->i_pts = AVI_GetPTS( p_stream ) + 1;
 
                 if( avi_pk.i_cat != VIDEO_ES )
                     p_frame->i_dts = p_frame->i_pts;
