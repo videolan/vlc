@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.12 2003/06/22 12:46:49 asmax Exp $
+ * $Id: event.h,v 1.13 2003/07/20 20:42:23 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -61,7 +61,6 @@ using namespace std;
 #define VLC_DROP            (VLC_MESSAGE + 7)
 
 #define VLC_LOG_SHOW        (VLC_MESSAGE + 20)
-#define VLC_LOG_CLEAR       (VLC_MESSAGE + 22)
 #define VLC_PREFS_SHOW      (VLC_MESSAGE + 23)
 #define VLC_INFO_SHOW       (VLC_MESSAGE + 24)
 
@@ -94,9 +93,6 @@ using namespace std;
 // Playlist events
 #define VLC_PLAYLIST_ADD_FILE (VLC_MESSAGE + 301)
 #define VLC_TEST_ALL_CLOSED (VLC_MESSAGE + 600)
-
-// Network events
-#define VLC_NET_ADDUDP      (VLC_MESSAGE + 701)
 
 // Window event
 #define WINDOW_MOVE         (VLC_WINDOW + 1)

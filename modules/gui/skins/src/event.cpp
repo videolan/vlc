@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.19 2003/06/22 12:46:49 asmax Exp $
+ * $Id: event.cpp,v 1.20 2003/07/20 20:42:23 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -79,7 +79,6 @@ void Event::DestructParameters( bool force )
             delete[] (char *)Param2;
             break;
     }
-
 }
 //---------------------------------------------------------------------------
 bool Event::IsEqual( Event *evt )
@@ -159,8 +158,6 @@ unsigned int Event::GetMessageType( string Desc )
     // Dialogs
     else if( Desc == "VLC_LOG_SHOW" )
         return VLC_LOG_SHOW;
-    else if( Desc == "VLC_LOG_CLEAR" )
-        return VLC_LOG_CLEAR;
     else if( Desc == "VLC_PREFS_SHOW" )
         return VLC_PREFS_SHOW;
     else if( Desc == "VLC_INFO_SHOW" )
@@ -173,10 +170,6 @@ unsigned int Event::GetMessageType( string Desc )
     // Video output events
     else if( Desc == "VLC_FULLSCREEN" )
         return VLC_FULLSCREEN;
-
-    // Network events
-    else if( Desc == "VLC_NET_ADDUDP" )
-        return VLC_NET_ADDUDP;
 
     // Window events
     else if( Desc == "WINDOW_MOVE" )
@@ -284,10 +277,6 @@ void Event::CreateEvent()
             Param2 = GetBool( para1 );
             break;
 
-        case VLC_NET_ADDUDP:
-            Param2 = atoi( para1 );
-            break;
-
         case CTRL_ID_VISIBLE:
             Param1 = (unsigned int)FindControl( para1 );
             Param2 = GetBool( para2 );
@@ -336,7 +325,6 @@ void Event::CreateEvent()
 
     // Create shortcut
     CreateShortcut();
-
 }
 //---------------------------------------------------------------------------
 GenericControl * Event::FindControl( string id )
@@ -354,7 +342,6 @@ GenericControl * Event::FindControl( string id )
         }
     }
     return NULL;
-
 }
 //---------------------------------------------------------------------------
 int Event::GetBool( string expr )
@@ -451,12 +438,10 @@ Action::Action( intf_thread_t *_p_intf, string code )
     // Free memory
     delete[] evt;
     delete[] next;
-
 }
 //---------------------------------------------------------------------------
 Action::~Action()
 {
-
 }
 //---------------------------------------------------------------------------
 bool Action::SendEvent()

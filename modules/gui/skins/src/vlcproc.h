@@ -2,7 +2,7 @@
  * vlcproc.h: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.h,v 1.9 2003/06/24 22:26:01 asmax Exp $
+ * $Id: vlcproc.h,v 1.10 2003/07/20 20:42:23 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -50,15 +50,14 @@ class VlcProc
         void MoveStream( long Pos );
         void FullScreen();
         void ChangeVolume( unsigned int msg, long param );
-        void AddNetworkUDP( int port );
 
-        static int RefreshCallback( vlc_object_t *p_this, 
-            const char *psz_variable, vlc_value_t old_val, vlc_value_t new_val, 
+        static int RefreshCallback( vlc_object_t *p_this,
+            const char *psz_variable, vlc_value_t old_val, vlc_value_t new_val,
             void *param );
-        static int IntfShowCallback( vlc_object_t *p_this, 
-            const char *psz_variable, vlc_value_t old_val, vlc_value_t new_val, 
+        static int IntfShowCallback( vlc_object_t *p_this,
+            const char *psz_variable, vlc_value_t old_val, vlc_value_t new_val,
             void *param );
-            
+
         void InterfaceRefresh();
         void EnabledEvent( string type, bool state );
 

@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.41 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.42 2003/07/20 20:42:23 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -46,26 +46,26 @@
 //---------------------------------------------------------------------------
 VlcProc::VlcProc( intf_thread_t *_p_intf )
 {
-    p_intf = _p_intf; 
-    
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, 
+    p_intf = _p_intf;
+
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
         // We want to be noticed of playlit changes
         var_AddCallback( p_playlist, "intf-change", RefreshCallback, this );
-        
+
         // Raise/lower interface with middle click on vout
         var_AddCallback( p_playlist, "intf-show", IntfShowCallback, this );
-        
-        vlc_object_release( p_playlist );   
+
+        vlc_object_release( p_playlist );
     }
 }
 //---------------------------------------------------------------------------
 VlcProc::~VlcProc()
 {
     // Remove the refresh callback
-    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf, 
+    playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
@@ -154,9 +154,6 @@ bool VlcProc::EventProc( Event *evt )
             p_intf->p_sys->p_dialogs->ShowMessages();
             return true;
 
-        case VLC_LOG_CLEAR:
-            return true;
-
         case VLC_PREFS_SHOW:
             p_intf->p_sys->p_dialogs->ShowPrefs();
             return true;
@@ -181,10 +178,6 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_CHANGE_TASKBAR:
             p_intf->p_sys->p_theme->ChangeTaskbar();
-            return true;
-
-        case VLC_NET_ADDUDP:
-            AddNetworkUDP( (int)evt->GetParam2() );
             return true;
 
         default:
@@ -571,27 +564,5 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
     }
     aout_VolumeGet( p_intf, &volume );
 
-}
-//---------------------------------------------------------------------------
-
-
-//---------------------------------------------------------------------------
-// Network
-//---------------------------------------------------------------------------
-void VlcProc::AddNetworkUDP( int port )
-{
-    // Build source name
-    char *s_port = new char[5];
-    sprintf( s_port, "%i", port );
-    string source = "udp:@:" + (string)s_port;
-    delete[] s_port;
-
-    playlist_Add( p_intf->p_sys->p_playlist, (char *)source.c_str(),
-        PLAYLIST_APPEND, PLAYLIST_END );
-
-    // Refresh interface !
-    p_intf->p_sys->p_theme->EvtBank->Get( "playlist_refresh" )
-        ->PostSynchroMessage();
-    InterfaceRefresh();
 }
 //---------------------------------------------------------------------------
