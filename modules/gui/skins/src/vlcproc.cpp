@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.4 2003/04/11 22:08:06 videolan Exp $
+ * $Id: vlcproc.cpp,v 1.5 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -581,10 +581,15 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
     }
     aout_VolumeGet( p_intf, &volume );
 
+/* FIXME: kludge */
+#ifdef WIN32
     PostMessage( NULL, CTRL_SET_SLIDER,
         (unsigned int)
             p_intf->p_sys->p_theme->EvtBank->Get( "volume_refresh" ),
         (int)( volume * SLIDER_RANGE / AOUT_VOLUME_MAX ) );
+#else
+  fprintf(stderr, "WARNING: FIXME in vlcproc.cpp !!!");
+#endif
 }
 //---------------------------------------------------------------------------
 
@@ -594,7 +599,7 @@ void VlcProc::ChangeVolume( unsigned int msg, long param )
 //---------------------------------------------------------------------------
 void VlcProc::AddNetworkUDP( int port )
 {
-    config_PutInt( p_intf, "network-channel", FALSE );
+    config_PutInt( p_intf, "network-channel", VLC_FALSE );
 
     // Build source name
     char *s_port = new char[5];

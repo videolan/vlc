@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_event.h: Win32 implementation of the Event class
+ * gtk2_event.h: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_event.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,35 +22,37 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_EVENT
-#define VLC_SKIN_WIN32_EVENT
+#ifndef VLC_SKIN_GTK2_EVENT
+#define VLC_SKIN_GTK2_EVENT
 
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
 using namespace std;
+
+//--- GTK2 ------------------------------------------------------------------
+#include <gdk/gdk.h>
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
 class Window;
 
 //---------------------------------------------------------------------------
-class Win32Event : Event
+class GTK2Event : Event
 {
     private:
-        HWND GetWindowFromName( string name );
-        HWND hWnd;
+        GdkWindow *GetWindowFromName( string name );
+        GdkWindow *gWnd;
     public:
         // Constructor
-        Win32Event( intf_thread_t *p_intf, string Desc, string shortcut );
-        Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
+        GTK2Event( intf_thread_t *p_intf, string Desc, string shortcut );
+        GTK2Event( intf_thread_t *p_intf, GdkWindow *gwnd, unsigned int msg,
                     unsigned int par1, long par2 );
-        Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
+        GTK2Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
                     unsigned int par1, long par2 );
 
         // Destructor
-        virtual ~Win32Event();
+        virtual ~GTK2Event();
 
         // Event sending
         virtual bool SendEvent();
@@ -61,10 +62,8 @@ class Win32Event : Event
         virtual bool IsEqual( Event *evt );
 
         // Getters
-        HWND GetWindow()    { return hWnd; }
+        GdkWindow *GetWindow()    { return gWnd; }
 };
 //---------------------------------------------------------------------------
-
-#endif
 
 #endif

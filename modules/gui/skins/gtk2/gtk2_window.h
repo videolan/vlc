@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_window.h: Win32 implementation of the Window class
+ * gtk2_window.h: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_window.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,25 +22,24 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_WIN
-#define VLC_SKIN_WIN32_WIN
+#ifndef VLC_SKIN_GTK2_WIN
+#define VLC_SKIN_GTK2_WIN
 
-//--- WIN32 -----------------------------------------------------------------
-#include <commctrl.h>
+//--- GTK2 -----------------------------------------------------------------
+#include <gdk/gdk.h>
 
 //---------------------------------------------------------------------------
 class Graphics;
 class Event;
 
 //---------------------------------------------------------------------------
-class Win32Window : public Window
+class GTK2Window : public Window
 {
     private:
         // General parameters
-        HWND hWnd;
-        LPPOINT CursorPos;
+        GdkWindow *gWnd;
+/*        LPPOINT CursorPos;
         LPPOINT WindowPos;
 
         // Tooltip texts
@@ -49,16 +47,16 @@ class Win32Window : public Window
         TOOLINFO ToolTipInfo;
 
         // Drag & drop
-        LPDROPTARGET DropTarget;
+        LPDROPTARGET DropTarget;*/
 
     public:
         // Cosntructors
-        Win32Window( intf_thread_t *_p_intf, HWND hwnd, int x, int y,
+        GTK2Window( intf_thread_t *_p_intf, GdkWindow *gwnd, int x, int y,
             bool visible, int transition, int normalalpha, int movealpha,
             bool dragdrop );
 
         // Destructors
-        virtual ~Win32Window();
+        virtual ~GTK2Window();
 
         // Event processing
         virtual bool ProcessOSEvent( Event *evt );
@@ -74,14 +72,12 @@ class Win32Window : public Window
         virtual void Move( int left, int top );
         virtual void Size( int width, int height );
 
-        // Specific win32 methods
-        HWND GetHandle() {return hWnd; };
+        // Specific gtk2 methods
+        GdkWindow *GetHandle() {return gWnd; };
 
         // Tooltip texts
         virtual void ChangeToolTipText( string text );
 };
 //---------------------------------------------------------------------------
-
-#endif
 
 #endif

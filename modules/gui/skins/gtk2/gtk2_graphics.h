@@ -1,8 +1,8 @@
 /*****************************************************************************
- * win32_graphics.h: Win32 implementation of the Graphics and Region classes
+ * gtk2_graphics.h: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_graphics.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,27 +23,26 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_GRAPHICS
-#define VLC_SKIN_WIN32_GRAPHICS
+#ifndef VLC_SKIN_GTK2_GRAPHICS
+#define VLC_SKIN_GTK2_GRAPHICS
 
 //---------------------------------------------------------------------------
 class Region;
 class Window;
 
 //---------------------------------------------------------------------------
-class Win32Graphics : public Graphics
+class GTK2Graphics : public Graphics
 {
     private:
         int Width;
         int Height;
-        HDC Image;
+  //      HDC Image;
     public:
         // Constructor
-        Win32Graphics( int w, int h, Window *from = NULL );
+        GTK2Graphics( int w, int h, Window *from = NULL );
         // Destructor
-        virtual ~Win32Graphics();
+        virtual ~GTK2Graphics();
         // Drawing methods
         virtual void CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
                               int sx, int sy, int Flag );
@@ -54,20 +53,20 @@ class Win32Graphics : public Graphics
         // Clipping methods
         virtual void SetClipRegion( Region *rgn );
 
-        // Specific win32 methods
-        HDC GetImageHandle()    { return Image; };
+        // Specific GTK2 methods
+//        HDC GetImageHandle()    { return Image; };
 };
 //---------------------------------------------------------------------------
-class Win32Region : public Region
+class GTK2Region : public Region
 {
     private:
-        HRGN Rgn;
+//        HRGN Rgn;
     public:
         // Constructor
-        Win32Region();
-        Win32Region( int x, int y, int w, int h );
+        GTK2Region();
+        GTK2Region( int x, int y, int w, int h );
         // Destructor
-        ~Win32Region();
+        ~GTK2Region();
         // Modify region
         virtual void AddPoint( int x, int y );
         virtual void AddRectangle( int x, int y, int w, int h );
@@ -76,11 +75,9 @@ class Win32Region : public Region
 
         virtual bool Hit( int x, int y );
 
-        // Specific win32 methods
-        HRGN GetHandle() { return Rgn; };
+        // Specific GTK2 methods
+//        HRGN GetHandle() { return Rgn; };
 };
 //---------------------------------------------------------------------------
-
-#endif
 
 #endif

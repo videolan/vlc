@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_event.h: Win32 implementation of the Event class
+ * gtk2_dialog.h: GTK2 implementation of some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_dialog.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,48 +22,61 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_EVENT
-#define VLC_SKIN_WIN32_EVENT
+#ifndef VLC_SKIN_GTK2_DIALOG
+#define VLC_SKIN_GTK2_DIALOG
 
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
 using namespace std;
 
-//---------------------------------------------------------------------------
-struct intf_thread_t;
-class Window;
+
 
 //---------------------------------------------------------------------------
-class Win32Event : Event
+class GTK2OpenFileDialog : OpenFileDialog
 {
     private:
-        HWND GetWindowFromName( string name );
-        HWND hWnd;
+
+    protected:
+
     public:
-        // Constructor
-        Win32Event( intf_thread_t *p_intf, string Desc, string shortcut );
-        Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
-                    unsigned int par1, long par2 );
-        Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
-                    unsigned int par1, long par2 );
+        // Constructors
+        GTK2OpenFileDialog( intf_thread_t *_p_intf, string title,
+                             bool multiselect );
 
-        // Destructor
-        virtual ~Win32Event();
+        // Destructors
+        virtual ~GTK2OpenFileDialog();
 
-        // Event sending
-        virtual bool SendEvent();
+        virtual void AddFilter( string name, string type );
+        virtual bool Open();
+};
+//---------------------------------------------------------------------------
+class GTK2LogWindow : LogWindow
+{
+    private:
+/*        HWND hWindow;
+        HWND hRichCtrl;
+        string RtfHeader;*/
 
-        // General operations on events
-        virtual void CreateOSEvent( string para1, string para2, string para3 );
-        virtual bool IsEqual( Event *evt );
+    public:
+        // Constructors
+        GTK2LogWindow( intf_thread_t *_p_intf );
 
-        // Getters
-        HWND GetWindow()    { return hWnd; }
+        // Destructors
+        virtual ~GTK2LogWindow();
+
+        virtual void Clear();
+        virtual void AddLine( string line );
+        virtual void ChangeColor( int color, bool bold = false );
+        virtual void Show();
+        virtual void Hide();
+/*
+        // Specific methods
+        HWND GetRichCtrl() { return hRichCtrl; };
+        HWND GetWindow()   { return hWindow; };*/
+
 };
 //---------------------------------------------------------------------------
 
 #endif
 
-#endif

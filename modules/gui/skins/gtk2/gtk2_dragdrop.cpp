@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_dragdrop.cpp: Win32 implementation of the drag & drop
+ * gtk2_dragdrop.cpp: GTK2 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_dragdrop.cpp,v 1.3 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_dragdrop.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,28 +22,27 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 -----------------------------------------------------------------
+//#include <windows.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "event.h"
-#include "win32_dragdrop.h"
+#include "gtk2_dragdrop.h"
 
 
-
+/*
 //---------------------------------------------------------------------------
-Win32DropObject::Win32DropObject() : IDropTarget()
+GTK2DropObject::GTK2DropObject() : IDropTarget()
 {
     References = 1;
 }
 //---------------------------------------------------------------------------
-Win32DropObject::~Win32DropObject()
+GTK2DropObject::~GTK2DropObject()
 {
 }
 //---------------------------------------------------------------------------
-void Win32DropObject::HandleDrop( HDROP HDrop )
+void GTK2DropObject::HandleDrop( HDROP HDrop )
 {
     // Get number of files that are dropped into vlc
     int NbFiles = DragQueryFile( (HDROP)HDrop, 0xFFFFFFFF, NULL, 0 );
@@ -66,7 +64,7 @@ void Win32DropObject::HandleDrop( HDROP HDrop )
 
 }
 //---------------------------------------------------------------------------
-STDMETHODIMP Win32DropObject::QueryInterface( REFIID iid, void FAR* FAR* ppv )
+STDMETHODIMP GTK2DropObject::QueryInterface( REFIID iid, void FAR* FAR* ppv )
 {
     // Tell other objects about our capabilities
     if( iid == IID_IUnknown || iid == IID_IDropTarget )
@@ -79,12 +77,12 @@ STDMETHODIMP Win32DropObject::QueryInterface( REFIID iid, void FAR* FAR* ppv )
     return ResultFromScode( E_NOINTERFACE );
 }
 //---------------------------------------------------------------------------
-STDMETHODIMP_(ULONG) Win32DropObject::AddRef()
+STDMETHODIMP_(ULONG) GTK2DropObject::AddRef()
 {
     return ++References;
 }
 //---------------------------------------------------------------------------
-STDMETHODIMP_(ULONG) Win32DropObject::Release()
+STDMETHODIMP_(ULONG) GTK2DropObject::Release()
 {
     if( --References == 0 )
     {
@@ -94,7 +92,7 @@ STDMETHODIMP_(ULONG) Win32DropObject::Release()
     return References;
 }
 //---------------------------------------------------------------------------
-STDMETHODIMP Win32DropObject::DragEnter( LPDATAOBJECT pDataObj,
+STDMETHODIMP GTK2DropObject::DragEnter( LPDATAOBJECT pDataObj,
     DWORD grfKeyState, POINTL pt, DWORD *pdwEffect )
 {
     FORMATETC fmtetc;
@@ -115,7 +113,7 @@ STDMETHODIMP Win32DropObject::DragEnter( LPDATAOBJECT pDataObj,
     return S_OK;
 }
 //---------------------------------------------------------------------------
-STDMETHODIMP Win32DropObject::DragOver( DWORD grfKeyState, POINTL pt,
+STDMETHODIMP GTK2DropObject::DragOver( DWORD grfKeyState, POINTL pt,
    DWORD *pdwEffect )
 {
     // For visual feedback
@@ -123,14 +121,14 @@ STDMETHODIMP Win32DropObject::DragOver( DWORD grfKeyState, POINTL pt,
     return S_OK;
 }
 //---------------------------------------------------------------------------
-STDMETHODIMP Win32DropObject::DragLeave()
+STDMETHODIMP GTK2DropObject::DragLeave()
 {
     // Remove visual feedback
     // TODO
     return S_OK;
 }
 //---------------------------------------------------------------------------
-STDMETHODIMP Win32DropObject::Drop( LPDATAOBJECT pDataObj, DWORD grfKeyState,
+STDMETHODIMP GTK2DropObject::Drop( LPDATAOBJECT pDataObj, DWORD grfKeyState,
    POINTL pt, DWORD *pdwEffect )
 {
     // User has dropped on us -- get the CF_HDROP data from drag source
@@ -164,5 +162,4 @@ STDMETHODIMP Win32DropObject::Drop( LPDATAOBJECT pDataObj, DWORD grfKeyState,
     }
     return S_OK;
 }
-
-#endif
+*/

@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_bitmap.cpp: Win32 implementation of the Bitmap class
+ * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_bitmap.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +22,10 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#define WINVER  0x0500
-#include <windows.h>
+//--- GTK2 -----------------------------------------------------------------
+//#define WINVER  0x0500
+//#include <windows.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -35,20 +33,19 @@
 //--- SKIN ------------------------------------------------------------------
 #include "os_api.h"
 #include "graphics.h"
-#include "win32_graphics.h"
+#include "gtk2_graphics.h"
 #include "bitmap.h"
-#include "win32_bitmap.h"
+#include "gtk2_bitmap.h"
 #include "skin_common.h"
 
 
-
 //---------------------------------------------------------------------------
-//   Win32Bitmap
+//   GTK2Bitmap
 //---------------------------------------------------------------------------
-Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
+GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     : Bitmap( p_intf, FileName, AColor )
 {
-    HBITMAP HBitmap;
+/*    HBITMAP HBitmap;
     HBITMAP HBuf;
     BITMAP  Bmp;
     HDC     bufDC;
@@ -99,30 +96,30 @@ Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     }
 
     // Delete objects
-    DeleteObject( HBitmap );
+    DeleteObject( HBitmap );*/
 }
 //---------------------------------------------------------------------------
-Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
+GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
     int w, int h, int AColor ) : Bitmap( p_intf, from, x, y, w, h, AColor )
 {
-    Width  = w;
+/*    Width  = w;
     Height = h;
     AlphaColor = AColor;
     HBITMAP HBmp;
-    HDC fromDC = ( (Win32Graphics *)from )->GetImageHandle();
+    HDC fromDC = ( (GTK2Graphics *)from )->GetImageHandle();
 
     // Create image
     bmpDC = CreateCompatibleDC( fromDC );
     HBmp  = CreateCompatibleBitmap( fromDC, Width, Height );
     SelectObject( bmpDC, HBmp );
     DeleteObject( HBmp );
-    BitBlt( bmpDC, 0, 0, Width, Height, fromDC, x, y, SRCCOPY );
+    BitBlt( bmpDC, 0, 0, Width, Height, fromDC, x, y, SRCCOPY );*/
 }
 //---------------------------------------------------------------------------
-Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, Bitmap *c )
+GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, Bitmap *c )
     : Bitmap( p_intf, c )
 {
-    HBITMAP HBuf;
+/*    HBITMAP HBuf;
 
     // Copy attibutes
     c->GetSize( Width, Height );
@@ -133,45 +130,44 @@ Win32Bitmap::Win32Bitmap( intf_thread_t *p_intf, Bitmap *c )
     HBuf  = CreateCompatibleBitmap( bmpDC, Width, Height );
     SelectObject( bmpDC, HBuf );
 
-    BitBlt( bmpDC, 0, 0, Width, Height, ( (Win32Bitmap *)c )->GetBmpDC(),
+    BitBlt( bmpDC, 0, 0, Width, Height, ( (GTK2Bitmap *)c )->GetBmpDC(),
             0, 0, SRCCOPY );
-    DeleteObject( HBuf );
+    DeleteObject( HBuf );*/
 }
 //---------------------------------------------------------------------------
-Win32Bitmap::~Win32Bitmap()
+GTK2Bitmap::~GTK2Bitmap()
 {
-    DeleteDC( bmpDC );
+/*    DeleteDC( bmpDC );*/
 }
 //---------------------------------------------------------------------------
-void Win32Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
+void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
                               Graphics *dest )
 {
-    HDC destDC = ( (Win32Graphics *)dest )->GetImageHandle();
+/*    HDC destDC = ( (GTK2Graphics *)dest )->GetImageHandle();
 
     // New method, not available in win95
     TransparentBlt( destDC, xRef, yRef, w, h, bmpDC, x, y, w, h, AlphaColor );
-
+*/
 }
 //---------------------------------------------------------------------------
-bool Win32Bitmap::Hit( int x, int y)
+bool GTK2Bitmap::Hit( int x, int y)
 {
-    unsigned int c = GetPixel( bmpDC, x, y );
+/*    unsigned int c = GetPixel( bmpDC, x, y );
     if( c == AlphaColor || c == CLR_INVALID )
         return false;
     else
         return true;
-
+*/
 }
 //---------------------------------------------------------------------------
-int Win32Bitmap::GetBmpPixel( int x, int y )
+int GTK2Bitmap::GetBmpPixel( int x, int y )
 {
-    return GetPixel( bmpDC, x, y );
+//    return GetPixel( bmpDC, x, y );
 }
 //---------------------------------------------------------------------------
-void Win32Bitmap::SetBmpPixel( int x, int y, int color )
+void GTK2Bitmap::SetBmpPixel( int x, int y, int color )
 {
-    SetPixelV( bmpDC, x, y, color );
+//    SetPixelV( bmpDC, x, y, color );
 }
 //---------------------------------------------------------------------------
 
-#endif

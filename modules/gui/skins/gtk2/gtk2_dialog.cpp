@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_dialog.cpp: Win32 implementation of some dialog boxes
+ * gtk2_dialog.cpp: GTK2 implementation of some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_dialog.cpp,v 1.3 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_dialog.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +22,17 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
 extern intf_thread_t *g_pIntf;
 
-//--- WIN32 -----------------------------------------------------------------
-#define _WIN32_IE 0x0400    // Yes, i think it's a fucking kludge !
-#include <windows.h>
-#include <commdlg.h>
-#include <commctrl.h>
-#include <richedit.h>
+//--- GTK2 -----------------------------------------------------------------
+#define _GTK2_IE 0x0400    // Yes, i think it's a fucking kludge !
+//#include <windows.h>
+//#include <commdlg.h>
+//#include <commctrl.h>
+//#include <richedit.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "banks.h"
@@ -48,20 +46,20 @@ extern intf_thread_t *g_pIntf;
 #include "event.h"
 #include "os_api.h"
 
-
+/*
 //---------------------------------------------------------------------------
 // Open file dialog box
 //---------------------------------------------------------------------------
-Win32OpenFileDialog::Win32OpenFileDialog( intf_thread_t *_p_intf, string title,
+GTK2OpenFileDialog::GTK2OpenFileDialog( intf_thread_t *_p_intf, string title,
     bool multiselect ) : OpenFileDialog( _p_intf, title, multiselect )
 {
 }
 //---------------------------------------------------------------------------
-Win32OpenFileDialog::~Win32OpenFileDialog()
+GTK2OpenFileDialog::~GTK2OpenFileDialog()
 {
 }
 //---------------------------------------------------------------------------
-void Win32OpenFileDialog::AddFilter( string name, string type )
+void GTK2OpenFileDialog::AddFilter( string name, string type )
 {
     unsigned int i;
 
@@ -86,7 +84,7 @@ void Win32OpenFileDialog::AddFilter( string name, string type )
     Filter[FilterLength] = '\0';
 }
 //---------------------------------------------------------------------------
-bool Win32OpenFileDialog::Open()
+bool GTK2OpenFileDialog::Open()
 {
     // Initailize dialog box
     OPENFILENAME OpenFile;
@@ -119,7 +117,7 @@ bool Win32OpenFileDialog::Open()
         for( win = g_pIntf->p_sys->p_theme->WindowList.begin();
             win != g_pIntf->p_sys->p_theme->WindowList.end(); win++ )
         {
-            TrackEvent.hwndTrack   = ( (Win32Window *)(*win) )->GetHandle();
+            TrackEvent.hwndTrack   = ( (GTK2Window *)(*win) )->GetHandle();
             TrackMouseEvent( &TrackEvent );
         }
     }
@@ -208,10 +206,10 @@ LRESULT CALLBACK LogWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam,
             return 0;
 
         case WM_SIZE:
-            if( ( (Win32Theme *)p_intf->p_sys->p_theme )
+            if( ( (GTK2Theme *)p_intf->p_sys->p_theme )
                 ->GetLogHandle() == hwnd )
             {
-                SetWindowPos( ( (Win32LogWindow *)
+                SetWindowPos( ( (GTK2LogWindow *)
                     p_intf->p_sys->p_theme->GetLogWindow() )->GetRichCtrl(),
                     0, 0, 0, LOWORD( lParam ), HIWORD( lParam ),
                     SWP_NOREDRAW|SWP_NOZORDER|SWP_NOMOVE );
@@ -254,9 +252,9 @@ DWORD CALLBACK LogWindowStream( DWORD_PTR dwCookie, LPBYTE pbBuff,
 
 
 //---------------------------------------------------------------------------
-// Win32 Log Window class
+// GTK2 Log Window class
 //---------------------------------------------------------------------------
-Win32LogWindow::Win32LogWindow( intf_thread_t *_p_intf ) : LogWindow( _p_intf )
+GTK2LogWindow::GTK2LogWindow( intf_thread_t *_p_intf ) : LogWindow( _p_intf )
 {
     hWindow   = NULL;
     hRichCtrl = NULL;
@@ -304,13 +302,13 @@ Win32LogWindow::Win32LogWindow( intf_thread_t *_p_intf ) : LogWindow( _p_intf )
     Clear();
 }
 //---------------------------------------------------------------------------
-Win32LogWindow::~Win32LogWindow()
+GTK2LogWindow::~GTK2LogWindow()
 {
     DestroyWindow( hRichCtrl );
     DestroyWindow( hWindow );
 }
 //---------------------------------------------------------------------------
-void Win32LogWindow::Clear()
+void GTK2LogWindow::Clear()
 {
     EDITSTREAM *Stream;
     Stream = new EDITSTREAM;
@@ -321,7 +319,7 @@ void Win32LogWindow::Clear()
     SendMessage( hRichCtrl, EM_STREAMIN, SF_RTF, (LPARAM)Stream );
 }
 //---------------------------------------------------------------------------
-void Win32LogWindow::AddLine( string line )
+void GTK2LogWindow::AddLine( string line )
 {
     // Initialize stream
         EDITSTREAM *Stream;
@@ -336,7 +334,7 @@ void Win32LogWindow::AddLine( string line )
     SendMessage( hRichCtrl, WM_VSCROLL, SB_BOTTOM, 0 );
 }
 //---------------------------------------------------------------------------
-void Win32LogWindow::ChangeColor( int color, bool bold )
+void GTK2LogWindow::ChangeColor( int color, bool bold )
 {
     CHARFORMAT format;
     memset(&format, 0, sizeof(CHARFORMAT));
@@ -347,17 +345,16 @@ void Win32LogWindow::ChangeColor( int color, bool bold )
     SendMessage( hRichCtrl, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&format );
 }
 //---------------------------------------------------------------------------
-void Win32LogWindow::Show()
+void GTK2LogWindow::Show()
 {
     ShowWindow( hWindow, SW_SHOW );
     Visible = true;
 }
 //---------------------------------------------------------------------------
-void Win32LogWindow::Hide()
+void GTK2LogWindow::Hide()
 {
     ShowWindow( hWindow, SW_HIDE );
     Visible = false;
 }
 //---------------------------------------------------------------------------
-
-#endif
+*/

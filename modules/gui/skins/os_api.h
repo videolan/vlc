@@ -2,7 +2,7 @@
  * os_api.h: Wrapper for some os-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_api.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: os_api.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,6 +29,8 @@
 
 #if defined( WIN32 )
     #define DIRECTORY_SEPARATOR '\\'
+#else
+    #define DIRECTORY_SEPARATOR '/'
 #endif
 
 

@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_event.cpp: Win32 implementation of the Event class
+ * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.cpp,v 1.3 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_event.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +22,9 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 -----------------------------------------------------------------
+//#include <windows.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -41,33 +39,33 @@
 #include "skin_common.h"
 
 
-
+/*
 //---------------------------------------------------------------------------
 //   VLC Event
 //---------------------------------------------------------------------------
-Win32Event::Win32Event( intf_thread_t *p_intf, string Desc, string shortcut )
+GTK2Event::GTK2Event( intf_thread_t *p_intf, string Desc, string shortcut )
     : Event( p_intf, Desc, shortcut )
 {
     hWnd = NULL;
 }
 //---------------------------------------------------------------------------
-Win32Event::Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
+GTK2Event::GTK2Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
     hWnd = hwnd;
 }
 //---------------------------------------------------------------------------
-Win32Event::Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
+GTK2Event::GTK2Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
     unsigned int par1, long par2 ) : Event( p_intf, msg, par1, par2 )
 {
-    hWnd = ( (Win32Window *)win )->GetHandle();
+    hWnd = ( (GTK2Window *)win )->GetHandle();
 }
 //---------------------------------------------------------------------------
-Win32Event::~Win32Event()
+GTK2Event::~GTK2Event()
 {
 }
 //---------------------------------------------------------------------------
-bool Win32Event::SendEvent()
+bool GTK2Event::SendEvent()
 {
     if( Message != VLC_NOTHING )
     {
@@ -80,14 +78,14 @@ bool Win32Event::SendEvent()
 
 }
 //---------------------------------------------------------------------------
-bool Win32Event::IsEqual( Event *evt )
+bool GTK2Event::IsEqual( Event *evt )
 {
-    Win32Event *WinEvt = (Win32Event *)evt;
+    GTK2Event *WinEvt = (GTK2Event *)evt;
     return( WinEvt->GetWindow() == hWnd   && WinEvt->GetMessage() == Message &&
             WinEvt->GetParam1() == Param1 && WinEvt->GetParam2()  == Param2 );
 }
 //---------------------------------------------------------------------------
-void Win32Event::CreateOSEvent( string para1, string para2, string para3 )
+void GTK2Event::CreateOSEvent( string para1, string para2, string para3 )
 {
 
     // Find Parameters
@@ -109,9 +107,9 @@ void Win32Event::CreateOSEvent( string para1, string para2, string para3 )
 
 }
 //---------------------------------------------------------------------------
-HWND Win32Event::GetWindowFromName( string name )
+HWND GTK2Event::GetWindowFromName( string name )
 {
-    Win32Window *win = (Win32Window *)
+    GTK2Window *win = (GTK2Window *)
         p_intf->p_sys->p_theme->GetWindow( name );
     if( win == NULL )
         return NULL;
@@ -119,5 +117,4 @@ HWND Win32Event::GetWindowFromName( string name )
         return win->GetHandle();
 }
 //---------------------------------------------------------------------------
-
-#endif
+*/

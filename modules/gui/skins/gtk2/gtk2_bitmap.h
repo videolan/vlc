@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_event.h: Win32 implementation of the Event class
+ * gtk2_bitmap.h: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_bitmap.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +22,12 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_EVENT
-#define VLC_SKIN_WIN32_EVENT
+#ifndef VLC_GTK2_BITMAP
+#define VLC_GTK2_BITMAP
+
+//--- GTK2 -----------------------------------------------------------------
+//#include <windows.h>
 
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
@@ -34,37 +35,34 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class Bitmap;
+class Graphics;
 
 //---------------------------------------------------------------------------
-class Win32Event : Event
+class GTK2Bitmap : public Bitmap
 {
     private:
-        HWND GetWindowFromName( string name );
-        HWND hWnd;
+//        HDC bmpDC;
+
     public:
-        // Constructor
-        Win32Event( intf_thread_t *p_intf, string Desc, string shortcut );
-        Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
-                    unsigned int par1, long par2 );
-        Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
-                    unsigned int par1, long par2 );
+        // Constructors
+        GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor );
+        GTK2Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,
+                     int w, int h, int AColor );
+        GTK2Bitmap( intf_thread_t *p_intf, Bitmap *c );
 
         // Destructor
-        virtual ~Win32Event();
+        virtual ~GTK2Bitmap();
 
-        // Event sending
-        virtual bool SendEvent();
+        virtual void DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
+                                 Graphics *dest );
+        virtual bool Hit( int x, int y );
 
-        // General operations on events
-        virtual void CreateOSEvent( string para1, string para2, string para3 );
-        virtual bool IsEqual( Event *evt );
+        virtual int  GetBmpPixel( int x, int y );
+        virtual void SetBmpPixel( int x, int y, int color );
 
-        // Getters
-        HWND GetWindow()    { return hWnd; }
+//        HDC GetBmpDC() { return bmpDC; }
 };
 //---------------------------------------------------------------------------
-
-#endif
 
 #endif

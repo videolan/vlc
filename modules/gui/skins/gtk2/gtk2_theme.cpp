@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_theme.cpp: Win32 implementation of the Theme class
+ * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +22,9 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 -----------------------------------------------------------------
+#include <gtk/gtk.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -49,12 +47,12 @@
 //---------------------------------------------------------------------------
 void SkinManage( intf_thread_t *p_intf );
 
-
+/*
 
 //---------------------------------------------------------------------------
-// Win32 interface
+// GTK2 interface
 //---------------------------------------------------------------------------
-LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK GTK2Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
     // Get pointer to thread info
     intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
@@ -74,7 +72,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
          win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
     {
         // If it is the correct window
-        if( hwnd == ( (Win32Window *)(*win) )->GetHandle() )
+        if( hwnd == ( (GTK2Window *)(*win) )->GetHandle() )
         {
             // Send event and check if processed
             if( (*win)->ProcessEvent( evt ) )
@@ -92,7 +90,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 
     // If Window is parent window
-    if( hwnd == ( (Win32Theme *)p_intf->p_sys->p_theme )->GetParentWindow() )
+    if( hwnd == ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetParentWindow() )
     {
         if( uMsg == WM_SYSCOMMAND )
         {
@@ -106,7 +104,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             int x, y;
             OSAPI_GetMousePos( x, y );
             TrackPopupMenu(
-                ( (Win32Theme *)p_intf->p_sys->p_theme )->GetSysMenu(),
+                ( (GTK2Theme *)p_intf->p_sys->p_theme )->GetSysMenu(),
                 0, x, y, 0, hwnd, NULL );
         }
     }
@@ -125,13 +123,14 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 //---------------------------------------------------------------------------
 
 
-
+*/
 
 //---------------------------------------------------------------------------
 // THEME
 //---------------------------------------------------------------------------
-Win32Theme::Win32Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
+GTK2Theme::GTK2Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
 {
+/*
     // Get instance handle
     hinst = GetModuleHandle( NULL );
 
@@ -139,7 +138,7 @@ Win32Theme::Win32Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
     WNDCLASS SkinWindow;
 
     SkinWindow.style = CS_VREDRAW | CS_HREDRAW | CS_DBLCLKS;
-    SkinWindow.lpfnWndProc = (WNDPROC) Win32Proc;
+    SkinWindow.lpfnWndProc = (WNDPROC) GTK2Proc;
     SkinWindow.lpszClassName = "SkinWindow";
     SkinWindow.lpszMenuName = NULL;
     SkinWindow.cbClsExtra = 0;
@@ -164,11 +163,12 @@ Win32Theme::Win32Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
 
     //Initialize value
     ParentWindow = NULL;
-
+*/
 }
+
 //---------------------------------------------------------------------------
-Win32Theme::~Win32Theme()
-{
+GTK2Theme::~GTK2Theme()
+{/*
     // Unregister the window class if needed
     WNDCLASS wndclass;
     if( GetClassInfo( hinst, "SkinWindow", &wndclass ) )
@@ -194,15 +194,15 @@ Win32Theme::~Win32Theme()
     if( ParentWindow )
     {
         DestroyWindow( ParentWindow );
-    }
+    }*/
 }
 //---------------------------------------------------------------------------
-void Win32Theme::OnLoadTheme()
-{
+void GTK2Theme::OnLoadTheme()
+{/*
     // Create window class
     WNDCLASS ParentClass;
     ParentClass.style = CS_VREDRAW|CS_HREDRAW|CS_DBLCLKS;
-    ParentClass.lpfnWndProc = (WNDPROC) Win32Proc;
+    ParentClass.lpfnWndProc = (WNDPROC) GTK2Proc;
     ParentClass.lpszClassName = "ParentWindow";
     ParentClass.lpszMenuName = NULL;
     ParentClass.cbClsExtra = 0;
@@ -257,11 +257,11 @@ void Win32Theme::OnLoadTheme()
 
     // The create menu
     CreateSystemMenu();
-
+*/
 }
 //---------------------------------------------------------------------------
-void Win32Theme::AddSystemMenu( string name, Event *event )
-{
+void GTK2Theme::AddSystemMenu( string name, Event *event )
+{/*
     if( name == "SEPARATOR" )
     {
         AppendMenu( SysMenu, MF_SEPARATOR, 0, NULL );
@@ -270,17 +270,17 @@ void Win32Theme::AddSystemMenu( string name, Event *event )
     {
         AppendMenu( SysMenu, MF_STRING, (unsigned int)event,
                     (char *)name.c_str() );
-    }
+    }*/
 }
 //---------------------------------------------------------------------------
-void Win32Theme::ChangeClientWindowName( string name )
-{
-    SetWindowText( ParentWindow, name.c_str() );
+void GTK2Theme::ChangeClientWindowName( string name )
+{/*
+    SetWindowText( ParentWindow, name.c_str() );*/
 }
 //---------------------------------------------------------------------------
-void Win32Theme::AddWindow( string name, int x, int y, bool visible,
+void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
     int fadetime, int alpha, int movealpha, bool dragdrop )
-{
+{/*
     HWND hwnd;
 
     hwnd = CreateWindowEx( WS_EX_LAYERED|WS_EX_TOOLWINDOW,
@@ -296,19 +296,19 @@ void Win32Theme::AddWindow( string name, int x, int y, bool visible,
     SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_intf );
 
     WindowList.push_back( (Window *)new OSWindow( p_intf, hwnd, x, y, visible,
-        fadetime, alpha, movealpha, dragdrop ) ) ;
+        fadetime, alpha, movealpha, dragdrop ) ) ;*/
 }
 //---------------------------------------------------------------------------
-HWND Win32Theme::GetLogHandle()
+/*HWND GTK2Theme::GetLogHandle()
 {
     if( Log != NULL )
-        return ( (Win32LogWindow *)Log )->GetWindow();
+        return ( (GTK2LogWindow *)Log )->GetWindow();
     else
         return NULL;
-}
+}*/
 //---------------------------------------------------------------------------
-void Win32Theme::ChangeTray()
-{
+void GTK2Theme::ChangeTray()
+{/*
     if( ShowInTray )
     {
         Shell_NotifyIcon( NIM_DELETE, &TrayIcon );
@@ -318,11 +318,11 @@ void Win32Theme::ChangeTray()
     {
         Shell_NotifyIcon( NIM_ADD, &TrayIcon );
         ShowInTray = true;
-    }
+    }*/
 }
 //---------------------------------------------------------------------------
-void Win32Theme::ChangeTaskbar()
-{
+void GTK2Theme::ChangeTaskbar()
+{/*
     if( ShowInTaskbar )
     {
         ShowWindow( ParentWindow, SW_HIDE );
@@ -338,8 +338,7 @@ void Win32Theme::ChangeTaskbar()
                           WS_EX_LAYERED|WS_EX_APPWINDOW );
         ShowWindow( ParentWindow, SW_SHOW );
         ShowInTaskbar = true;
-    }
+    }*/
 }
 //---------------------------------------------------------------------------
 
-#endif

@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_api.cpp: Various win32-specific functions
+ * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_api.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet  <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +22,9 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 ------------------------------------------------------------------
+#include <gtk/gtk.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "window.h"
@@ -34,7 +32,7 @@
 #include "os_api.h"
 #include "event.h"         // for MAX_PARAM_SIZE
 
-
+/*
 
 //---------------------------------------------------------------------------
 // Event API
@@ -159,5 +157,4 @@ bool OSAPI_RmDir( string path )
     return true;
 }
 //---------------------------------------------------------------------------
-
-#endif
+*/

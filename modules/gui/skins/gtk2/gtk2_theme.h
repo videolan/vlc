@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_event.h: Win32 implementation of the Event class
+ * gtk2_theme.h: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_theme.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,48 +22,63 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_EVENT
-#define VLC_SKIN_WIN32_EVENT
+#ifndef VLC_SKIN_GTK2_THEME
+#define VLC_SKIN_GTK2_THEME
 
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
 using namespace std;
 
+//--- GTK2 -----------------------------------------------------------------
+//#include <shellapi.h>
+
 //---------------------------------------------------------------------------
 struct intf_thread_t;
 class Window;
+class EventBank;
+class BitmapBank;
+class FontBank;
+class LogWindow;
 
 //---------------------------------------------------------------------------
-class Win32Event : Event
+class GTK2Theme : public Theme
 {
-    private:
-        HWND GetWindowFromName( string name );
-        HWND hWnd;
+    protected:
+        // Handles
+/*        HINSTANCE hinst;
+        HWND ParentWindow;
+
+        // System tray icon
+        NOTIFYICONDATA TrayIcon;
+        HMENU SysMenu;
+*/
     public:
         // Constructor
-        Win32Event( intf_thread_t *p_intf, string Desc, string shortcut );
-        Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
-                    unsigned int par1, long par2 );
-        Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
-                    unsigned int par1, long par2 );
+        GTK2Theme( intf_thread_t *_p_intf );
+        virtual void OnLoadTheme();
 
         // Destructor
-        virtual ~Win32Event();
+        virtual ~GTK2Theme();
+/*
+        // Specific windows methods
+        HINSTANCE getInstance()       { return hinst; }
+        HWND      GetLogHandle();
+        HWND      GetParentWindow()   { return ParentWindow; }
+*/
+        // !!!
+        virtual void AddWindow( string name, int x, int y, bool visible,
+            int fadetime, int alpha, int movealpha, bool dragdrop );
+        virtual void ChangeClientWindowName( string name );
 
-        // Event sending
-        virtual bool SendEvent();
-
-        // General operations on events
-        virtual void CreateOSEvent( string para1, string para2, string para3 );
-        virtual bool IsEqual( Event *evt );
-
-        // Getters
-        HWND GetWindow()    { return hWnd; }
+        // Taskbar && system tray
+        virtual void AddSystemMenu( string name, Event *event );
+        virtual void ChangeTray();
+        virtual void ChangeTaskbar();
+//        HMENU GetSysMenu() { return SysMenu; }
 };
 //---------------------------------------------------------------------------
 
-#endif
 
 #endif
+

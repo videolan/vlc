@@ -2,7 +2,7 @@
  * slider.cpp: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.cpp,v 1.2 2003/03/21 00:17:00 karibu Exp $
+ * $Id: slider.cpp,v 1.3 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -78,7 +78,12 @@ ControlSlider::~ControlSlider()
 {
     delete[] CursorX;
     delete[] CursorY;
+/* FIXME: kludge */
+#ifdef WIN32    
     DeleteObject( HitRgn );
+#else
+  fprintf(stderr, "WARNING: fixme in slider.cpp!!!!!");
+#endif
 }
 //---------------------------------------------------------------------------
 void ControlSlider::Init()

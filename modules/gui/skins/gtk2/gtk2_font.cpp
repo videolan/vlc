@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_font.cpp: Win32 implementation of the Font class
+ * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_font.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,36 +22,35 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 -----------------------------------------------------------------
+//#include <windows.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "graphics.h"
-#include "win32_graphics.h"
+#include "gtk2_graphics.h"
 #include "font.h"
-#include "win32_font.h"
+#include "gtk2_font.h"
 
 
-
+/*
 //---------------------------------------------------------------------------
 // Font object
 //---------------------------------------------------------------------------
-Win32Font::Win32Font( intf_thread_t *_p_intf, string fontname, int size,
+GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
     int color, int weight, bool italic, bool underline )
     : Font( _p_intf, fontname, size, color, weight, italic, underline )
 {
 }
 //---------------------------------------------------------------------------
-Win32Font::~Win32Font()
+GTK2Font::~GTK2Font()
 {
 }
 //---------------------------------------------------------------------------
-void Win32Font::AssignWin32Font( HDC DC )
+void GTK2Font::AssignGTK2Font( HDC DC )
 {
     // Create font
     HGDIOBJ fontObj = CreateFont(
@@ -79,13 +77,13 @@ void Win32Font::AssignWin32Font( HDC DC )
     DeleteObject( fontObj );
 }
 //---------------------------------------------------------------------------
-void Win32Font::AssignFont( Graphics *dest )
+void GTK2Font::AssignFont( Graphics *dest )
 {
-    HDC DC = ( (Win32Graphics *)dest )->GetImageHandle();
-    AssignWin32Font( DC );
+    HDC DC = ( (GTK2Graphics *)dest )->GetImageHandle();
+    AssignGTK2Font( DC );
 }
 //---------------------------------------------------------------------------
-void Win32Font::GetSize( string text, int &w, int &h )
+void GTK2Font::GetSize( string text, int &w, int &h )
 {
     // Get device context of screen
     HDC DeskDC = GetWindowDC( GetDesktopWindow() );
@@ -94,7 +92,7 @@ void Win32Font::GetSize( string text, int &w, int &h )
     LPRECT rect = new RECT;;
     rect->left   = 0;
     rect->top    = 0;
-    AssignWin32Font( DeskDC );
+    AssignGTK2Font( DeskDC );
     DrawText( DeskDC, text.c_str(), text.length(), rect, DT_CALCRECT);
     w = rect->right - rect->left;
     h = rect->bottom - rect->top;
@@ -103,10 +101,10 @@ void Win32Font::GetSize( string text, int &w, int &h )
     ReleaseDC( GetDesktopWindow(), DeskDC );
 }
 //---------------------------------------------------------------------------
-void Win32Font::GenericPrint( Graphics *dest, string text, int x, int y,
+void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
                                  int w, int h, int align, int color )
 {
-    HDC DC = ( (Win32Graphics *)dest )->GetImageHandle();
+    HDC DC = ( (GTK2Graphics *)dest )->GetImageHandle();
     // Set boundaries
     LPRECT r = new RECT;
     r->left   = x;
@@ -134,18 +132,17 @@ void Win32Font::GenericPrint( Graphics *dest, string text, int x, int y,
 }
 
 //---------------------------------------------------------------------------
-void Win32Font::Print( Graphics *dest, string text, int x, int y, int w,
+void GTK2Font::Print( Graphics *dest, string text, int x, int y, int w,
                        int h, int align )
 {
     GenericPrint( dest, text, x, y, w, h, align, Color );
 }
 //---------------------------------------------------------------------------
-void Win32Font::PrintColor( Graphics *dest, string text, int x, int y, int w,
+void GTK2Font::PrintColor( Graphics *dest, string text, int x, int y, int w,
                             int h, int align, int color )
 {
     GenericPrint( dest, text, x, y, w, h, align, color );
 }
 //---------------------------------------------------------------------------
 
-
-#endif
+*/

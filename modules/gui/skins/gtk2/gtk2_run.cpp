@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_run.cpp:
+ * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.4 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +22,9 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 ------------------------------------------------------------------
+//#include <windows.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -44,6 +42,7 @@
 #include "vlcproc.h"
 
 
+#if 0
 
 //---------------------------------------------------------------------------
 // Specific method
@@ -67,7 +66,7 @@ void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
 
 
 //---------------------------------------------------------------------------
-// Win32 interface
+// GTK2 interface
 //---------------------------------------------------------------------------
 void OSRun( intf_thread_t *p_intf )
 {
@@ -179,5 +178,6 @@ bool IsVLCEvent( unsigned int msg )
     return( msg > VLC_MESSAGE && msg < VLC_WINDOW );
 }
 //---------------------------------------------------------------------------
+
 
 #endif

@@ -2,7 +2,7 @@
  * os_window.h: Wrapper for the OSWindow class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_window.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: os_window.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,4 +28,8 @@
     #include "win32_dragdrop.h"
     #include "win32_window.h"
     #define OSWindow Win32Window
+#else    
+    #include "gtk2_dragdrop.h"
+    #include "gtk2_window.h"
+    #define OSWindow GTK2Window
 #endif

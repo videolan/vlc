@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_dragdrop.h: Win32 implementation of the drag & drop
+ * gtk2_dragdrop.h: GTK2 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_dragdrop.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_dragdrop.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,21 +22,21 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_DRAGDROP
-#define VLC_SKIN_WIN32_DRAGDROP
+#ifndef VLC_SKIN_GTK2_DRAGDROP
+#define VLC_SKIN_GTK2_DRAGDROP
 
-//--- WIN32 -----------------------------------------------------------------
-#include <shellapi.h>
-#include <ole2.h>
+//--- GTK2 -----------------------------------------------------------------
+//#include <shellapi.h>
+//#include <ole2.h>
 
 //---------------------------------------------------------------------------
-class Win32DropObject : public IDropTarget
+/*
+class GTK2DropObject : public IDropTarget
 {
     public:
-       Win32DropObject();
-       virtual ~Win32DropObject();
+       GTK2DropObject();
+       virtual ~GTK2DropObject();
 
     protected:
         // IUnknown methods
@@ -58,8 +57,6 @@ class Win32DropObject : public IDropTarget
 
         // Helper function
         void HandleDrop( HDROP HDrop );
-};
+};*/
 //---------------------------------------------------------------------------
-#endif
-
 #endif

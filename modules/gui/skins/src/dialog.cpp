@@ -2,7 +2,7 @@
  * dialog.cpp: Classes for some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialog.cpp,v 1.2 2003/03/20 09:29:07 karibu Exp $
+ * $Id: dialog.cpp,v 1.3 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -87,6 +87,8 @@ void LogWindow::Update( msg_subscription_t *Sub )
         {
 
 
+/* FIXME: kludge */
+#ifdef WIN32
             // Append all messages to log window
             switch( Sub->p_msg[i_start].i_type )
             {
@@ -99,6 +101,21 @@ void LogWindow::Update( msg_subscription_t *Sub )
                 default:
                     ChangeColor( RGB( 128, 128, 128 ) );
                     break;
+#else
+  fprintf(stderr, "WARNING: FIXME in dialog.cpp");
+            // Append all messages to log window
+            switch( Sub->p_msg[i_start].i_type )
+            {
+                case VLC_MSG_ERR:
+ //                   ChangeColor( RGB( 255, 0, 0 ), true );
+                    break;
+                case VLC_MSG_WARN:
+//                    ChangeColor( RGB( 255, 128, 0 ), true );
+                    break;
+                default:
+//                    ChangeColor( RGB( 128, 128, 128 ) );
+                    break;
+#endif
             }
 
             // Add message

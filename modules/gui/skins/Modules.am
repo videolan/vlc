@@ -77,6 +77,25 @@ SOURCES_skins = \
 	modules/gui/skins/win32/win32_theme.h \
 	modules/gui/skins/win32/win32_window.cpp \
 	modules/gui/skins/win32/win32_window.h \
+	\
+	modules/gui/skins/gtk2/gtk2_api.cpp \
+	modules/gui/skins/gtk2/gtk2_bitmap.cpp \
+	modules/gui/skins/gtk2/gtk2_bitmap.h \
+	modules/gui/skins/gtk2/gtk2_dialog.cpp \
+	modules/gui/skins/gtk2/gtk2_dialog.h \
+	modules/gui/skins/gtk2/gtk2_dragdrop.cpp \
+	modules/gui/skins/gtk2/gtk2_dragdrop.h \
+	modules/gui/skins/gtk2/gtk2_event.cpp \
+	modules/gui/skins/gtk2/gtk2_event.h \
+	modules/gui/skins/gtk2/gtk2_font.cpp \
+	modules/gui/skins/gtk2/gtk2_font.h \
+	modules/gui/skins/gtk2/gtk2_graphics.cpp \
+	modules/gui/skins/gtk2/gtk2_graphics.h \
+	modules/gui/skins/gtk2/gtk2_run.cpp \
+	modules/gui/skins/gtk2/gtk2_theme.cpp \
+	modules/gui/skins/gtk2/gtk2_theme.h \
+	modules/gui/skins/gtk2/gtk2_window.cpp \
+	modules/gui/skins/gtk2/gtk2_window.h \
 	$(NULL)
 
 EXTRA_DIST += \

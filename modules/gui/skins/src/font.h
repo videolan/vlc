@@ -2,7 +2,7 @@
  * font.h: Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: font.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: font.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,6 +30,12 @@
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
 using namespace std;
+
+/* FIXME :kludge */
+#define DT_TOP               0  //  0x0000
+#define DT_LEFT              0  //  0x0000
+#define DT_CENTER            1  //  0x0001
+#define DT_RIGHT             2  //  0x0002
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;

@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.3 2003/03/19 03:11:14 karibu Exp $
+ * $Id: themeloader.cpp,v 1.4 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -27,6 +27,9 @@
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
 #include <fcntl.h>
+#if !defined WIN32
+#include <unistd.h>
+#endif
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/vlc.h>
@@ -180,8 +183,13 @@ bool ThemeLoader::Parse( const string XmlFile )
     msg_Dbg( p_intf, "Using skin file: %s", XmlFile.c_str() );
 
     // Save current working directory
+#ifdef WIN32    
     char *cwd = new char[MAX_PATH];
     getcwd( cwd, MAX_PATH );
+#else
+    char *cwd = new char[PATH_MAX];
+    getcwd( cwd, PATH_MAX );
+#endif
 
     // Directory separator is different in each OS !
     int p = XmlFile.rfind( DIRECTORY_SEPARATOR, XmlFile.size() );

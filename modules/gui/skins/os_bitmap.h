@@ -2,7 +2,7 @@
  * os_bitmap.h: Wrapper for the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_bitmap.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: os_bitmap.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -27,6 +27,9 @@
 #if defined( WIN32 )
     #include "win32_bitmap.h"
     #define OSBitmap Win32Bitmap
+#else    
+    #include "gtk2_bitmap.h"
+    #define OSBitmap GTK2Bitmap
 #endif
 
 

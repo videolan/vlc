@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.5 2003/04/06 17:57:11 ipkiss Exp $
+ * $Id: skin_main.cpp,v 1.6 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -53,8 +53,10 @@ intf_thread_t *g_pIntf;
 //---------------------------------------------------------------------------
 // Exported interface functions.
 //---------------------------------------------------------------------------
+#ifdef WIN32
 extern "C" __declspec( dllexport )
     int __VLC_SYMBOL( vlc_entry ) ( module_t *p_module );
+#endif
 
 //---------------------------------------------------------------------------
 // Local prototypes.
@@ -155,10 +157,18 @@ static void Run( intf_thread_t *p_intf )
 #if 0
         if( ! Loader->Load( DEFAULT_SKIN_FILE ) )
 #else
+#ifdef WIN32
         string default_dir = (string)p_intf->p_libvlc->psz_vlcpath +
                              DIRECTORY_SEPARATOR + "skins" +
                              DIRECTORY_SEPARATOR + "default" +
                              DIRECTORY_SEPARATOR + "theme.xml";
+#else
+/* FIXME: find VLC directory */
+        string default_dir = (string)"." +
+                             DIRECTORY_SEPARATOR + "skins" +
+                             DIRECTORY_SEPARATOR + "default" +
+                             DIRECTORY_SEPARATOR + "theme.xml";
+#endif
         if( ! Loader->Load( default_dir ) )
 #endif
         {
@@ -326,6 +336,6 @@ int SkinManage( intf_thread_t *p_intf )
     //-------------------------------------------------------------------------
     vlc_mutex_unlock( &p_intf->change_lock );
 
-    return( TRUE );
+    return( VLC_TRUE );
 }
 //---------------------------------------------------------------------------

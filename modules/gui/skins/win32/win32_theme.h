@@ -2,7 +2,7 @@
  * win32_theme.h: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: win32_theme.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,6 +23,7 @@
  * USA.
  *****************************************************************************/
 
+#ifdef WIN32
 
 #ifndef VLC_SKIN_WIN32_THEME
 #define VLC_SKIN_WIN32_THEME
@@ -83,3 +84,4 @@ class Win32Theme : public Theme
 
 #endif
 
+#endif

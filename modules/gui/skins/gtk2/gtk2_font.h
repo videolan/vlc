@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_event.h: Win32 implementation of the Event class
+ * gtk2_font.h: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_font.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +22,9 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-#ifndef VLC_SKIN_WIN32_EVENT
-#define VLC_SKIN_WIN32_EVENT
+#ifndef VLC_SKIN_GTK2_FONT
+#define VLC_SKIN_GTK2_FONT
 
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
@@ -34,37 +32,39 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-class Window;
+class Graphics;
 
 //---------------------------------------------------------------------------
-class Win32Event : Event
+class GTK2Font : Font
 {
     private:
-        HWND GetWindowFromName( string name );
-        HWND hWnd;
+        // Assign font to Device Context
+        virtual void AssignFont( Graphics *dest );
+//        void AssignGTK2Font( HDC DC );
+
+        // Helper function
+        virtual void GenericPrint( Graphics *dest, string text, int x, int y,
+                                   int w, int h, int align, int color );
+
     public:
         // Constructor
-        Win32Event( intf_thread_t *p_intf, string Desc, string shortcut );
-        Win32Event( intf_thread_t *p_intf, HWND hwnd, unsigned int msg,
-                    unsigned int par1, long par2 );
-        Win32Event( intf_thread_t *p_intf, Window *win, unsigned int msg,
-                    unsigned int par1, long par2 );
+        GTK2Font( intf_thread_t *_p_intf, string fontname, int size, int color,
+                   int weight, bool italic, bool underline );
 
         // Destructor
-        virtual ~Win32Event();
+        virtual ~GTK2Font();
 
-        // Event sending
-        virtual bool SendEvent();
+        // Get size of text
+        virtual void GetSize( string text, int &w, int &h );
 
-        // General operations on events
-        virtual void CreateOSEvent( string para1, string para2, string para3 );
-        virtual bool IsEqual( Event *evt );
+        // Draw text with boundaries
+        virtual void Print( Graphics *dest, string text, int x, int y, int w,
+                            int h, int align );
 
-        // Getters
-        HWND GetWindow()    { return hWnd; }
+        virtual void PrintColor( Graphics *dest, string text, int x, int y,
+                                 int w, int h, int align, int color );
+
 };
 //---------------------------------------------------------------------------
-
-#endif
 
 #endif

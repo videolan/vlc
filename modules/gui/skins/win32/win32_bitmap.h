@@ -2,7 +2,7 @@
  * win32_bitmap.h: Win32 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_bitmap.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: win32_bitmap.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,6 +23,7 @@
  * USA.
  *****************************************************************************/
 
+#ifdef WIN32
 
 #ifndef VLC_WIN32_BITMAP
 #define VLC_WIN32_BITMAP
@@ -65,5 +66,7 @@ class Win32Bitmap : public Bitmap
         HDC GetBmpDC() { return bmpDC; }
 };
 //---------------------------------------------------------------------------
+
+#endif
 
 #endif

@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.4 2003/03/19 17:14:50 karibu Exp $
+ * $Id: wrappers.cpp,v 1.5 2003/04/12 21:43:27 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -37,6 +37,7 @@ extern intf_thread_t *g_pIntf;
 #include "anchor.h"
 #include "banks.h"
 #include "controls.h"
+#include "font.h"
 #include "window.h"
 #include "theme.h"
 #include "skin_common.h"

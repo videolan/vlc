@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_graphics.cpp: Win32 implementation of the Graphics and Region classes
+ * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,31 +22,30 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 -----------------------------------------------------------------
+//#include <windows.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "graphics.h"
 #include "window.h"
 #include "os_window.h"
-#include "win32_graphics.h"
+#include "gtk2_graphics.h"
 
 
-
+/*
 //---------------------------------------------------------------------------
-// WIN32 GRAPHICS
+// GTK2 GRAPHICS
 //---------------------------------------------------------------------------
-Win32Graphics::Win32Graphics( int w, int h, Window *from ) : Graphics( w, h )
+GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
 {
     HBITMAP HImage ;
     Image          = CreateCompatibleDC( NULL );
     if( from != NULL )
     {
-        HDC DC = GetWindowDC( ( (Win32Window *)from )->GetHandle() );
+        HDC DC = GetWindowDC( ( (GTK2Window *)from )->GetHandle() );
         HImage = CreateCompatibleBitmap( DC, w, h );
-        ReleaseDC( ( (Win32Window *)from )->GetHandle(), DC );
+        ReleaseDC( ( (GTK2Window *)from )->GetHandle(), DC );
     }
     else
     {
@@ -57,26 +55,27 @@ Win32Graphics::Win32Graphics( int w, int h, Window *from ) : Graphics( w, h )
     DeleteObject( HImage );
 }
 //---------------------------------------------------------------------------
-Win32Graphics::~Win32Graphics()
+GTK2Graphics::~GTK2Graphics()
 {
     DeleteDC( Image );
 }
 //---------------------------------------------------------------------------
-void Win32Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
+void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
                               int sx, int sy, int Flag )
 {
-    BitBlt( Image, dx, dy, dw, dh, ( (Win32Graphics *)Src )->GetImageHandle(),
+    BitBlt( Image, dx, dy, dw, dh, ( (GTK2Graphics *)Src )->GetImageHandle(),
         sx, sy, Flag );
 }
+*/
 //---------------------------------------------------------------------------
-/*void Win32Graphics::CopyTo( Graphics *Dest, int dx, int dy, int dw, int dh,
+/*void GTK2Graphics::CopyTo( Graphics *Dest, int dx, int dy, int dw, int dh,
                             int sx, int sy, int Flag )
 {
-    BitBlt( ( (Win32Graphics *)Dest )->GetImageHandle(), dx, dy, dw, dh, Image,
+    BitBlt( ( (GTK2Graphics *)Dest )->GetImageHandle(), dx, dy, dw, dh, Image,
         sx, sy, Flag );
-}*/
+}*//*
 //---------------------------------------------------------------------------
-void Win32Graphics::DrawRect( int x, int y, int w, int h, int color )
+void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
 {
     LPRECT r = new RECT;
     HBRUSH  Brush = CreateSolidBrush( color );
@@ -89,9 +88,9 @@ void Win32Graphics::DrawRect( int x, int y, int w, int h, int color )
     delete r;
 }
 //---------------------------------------------------------------------------
-void Win32Graphics::SetClipRegion( Region *rgn )
+void GTK2Graphics::SetClipRegion( Region *rgn )
 {
-    SelectClipRgn( Image, ( (Win32Region *)rgn )->GetHandle() );
+    SelectClipRgn( Image, ( (GTK2Region *)rgn )->GetHandle() );
 }
 //---------------------------------------------------------------------------
 
@@ -99,29 +98,29 @@ void Win32Graphics::SetClipRegion( Region *rgn )
 
 
 //---------------------------------------------------------------------------
-// WIN32 REGION
+// GTK2 REGION
 //---------------------------------------------------------------------------
-Win32Region::Win32Region()
+GTK2Region::GTK2Region()
 {
     Rgn = CreateRectRgn( 0, 0, 0, 0 );
 }
 //---------------------------------------------------------------------------
-Win32Region::Win32Region( int x, int y, int w, int h )
+GTK2Region::GTK2Region( int x, int y, int w, int h )
 {
     Rgn = CreateRectRgn( x, y, x + w, y + h );
 }
 //---------------------------------------------------------------------------
-Win32Region::~Win32Region()
+GTK2Region::~GTK2Region()
 {
     DeleteObject( Rgn );
 }
 //---------------------------------------------------------------------------
-void Win32Region::AddPoint( int x, int y )
+void GTK2Region::AddPoint( int x, int y )
 {
     AddRectangle( x, y, x + 1, y + 1 );
 }
 //---------------------------------------------------------------------------
-void Win32Region::AddRectangle( int x, int y, int w, int h )
+void GTK2Region::AddRectangle( int x, int y, int w, int h )
 {
     HRGN Buffer;
     Buffer = CreateRectRgn( x, y, x + w, y + h );
@@ -129,7 +128,7 @@ void Win32Region::AddRectangle( int x, int y, int w, int h )
     DeleteObject( Buffer );
 }
 //---------------------------------------------------------------------------
-void Win32Region::AddElipse( int x, int y, int w, int h )
+void GTK2Region::AddElipse( int x, int y, int w, int h )
 {
     HRGN Buffer;
     Buffer = CreateEllipticRgn( x, y, x + w, y + h );
@@ -137,15 +136,14 @@ void Win32Region::AddElipse( int x, int y, int w, int h )
     DeleteObject( Buffer );
 }
 //---------------------------------------------------------------------------
-void Win32Region::Move( int x, int y )
+void GTK2Region::Move( int x, int y )
 {
     OffsetRgn( Rgn, x, y );
 }
 //---------------------------------------------------------------------------
-bool Win32Region::Hit( int x, int y )
+bool GTK2Region::Hit( int x, int y )
 {
     return PtInRegion( Rgn, x, y );
 }
 //---------------------------------------------------------------------------
-
-#endif
+*/

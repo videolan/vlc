@@ -1,11 +1,10 @@
 /*****************************************************************************
- * win32_window.cpp: Win32 implementation of the Window class
+ * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.4 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
  *
- * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
- *          Emmanuel Puig    <karibu@via.ecp.fr>
+ * Authors: Cyril Deguet     <asmax@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +22,6 @@
  * USA.
  *****************************************************************************/
 
-#ifdef WIN32
 
 //--- GENERAL ---------------------------------------------------------------
 //#include <math.h>
@@ -31,8 +29,8 @@
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
 
-//--- WIN32 -----------------------------------------------------------------
-#include <windows.h>
+//--- GTK2 ------------------------------------------------------------------
+//#include <windows.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "os_api.h"
@@ -48,7 +46,7 @@
 #include "theme.h"
 
 
-
+/*
 //---------------------------------------------------------------------------
 // Fading API
 //---------------------------------------------------------------------------
@@ -63,7 +61,7 @@ SLWA SetLayeredWindowAttributes =
 //---------------------------------------------------------------------------
 // Skinable Window
 //---------------------------------------------------------------------------
-Win32Window::Win32Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
+GTK2Window::GTK2Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
     bool visible, int transition, int normalalpha, int movealpha,
     bool dragdrop )
     : Window( p_intf, x, y, visible, transition, normalalpha, movealpha,
@@ -100,14 +98,14 @@ Win32Window::Win32Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
     {
         // Initialize the OLE library
         OleInitialize( NULL );
-        DropTarget = (LPDROPTARGET) new Win32DropObject();
+        DropTarget = (LPDROPTARGET) new GTK2DropObject();
         // register the listview as a drop target
         RegisterDragDrop( hWnd, DropTarget );
     }
 
 }
 //---------------------------------------------------------------------------
-Win32Window::~Win32Window()
+GTK2Window::~GTK2Window()
 {
     delete CursorPos;
     delete WindowPos;
@@ -131,7 +129,7 @@ Win32Window::~Win32Window()
 
 }
 //---------------------------------------------------------------------------
-void Win32Window::OSShow( bool show )
+void GTK2Window::OSShow( bool show )
 {
     if( show )
     {
@@ -143,7 +141,7 @@ void Win32Window::OSShow( bool show )
     }
 }
 //---------------------------------------------------------------------------
-bool Win32Window::ProcessOSEvent( Event *evt )
+bool GTK2Window::ProcessOSEvent( Event *evt )
 {
     unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
@@ -206,7 +204,7 @@ bool Win32Window::ProcessOSEvent( Event *evt )
     }
 }
 //---------------------------------------------------------------------------
-void Win32Window::SetTransparency( int Value )
+void GTK2Window::SetTransparency( int Value )
 {
     if( Value > -1 )
         Alpha = Value;
@@ -214,13 +212,13 @@ void Win32Window::SetTransparency( int Value )
     UpdateWindow( hWnd );
 }
 //---------------------------------------------------------------------------
-void Win32Window::RefreshFromImage( int x, int y, int w, int h )
+void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
 {
     // Initialize painting
     HDC DC = GetWindowDC( hWnd );
 
     // Draw image on window
-    BitBlt( DC, x, y, w, h, ( (Win32Graphics *)Image )->GetImageHandle(),
+    BitBlt( DC, x, y, w, h, ( (GTK2Graphics *)Image )->GetImageHandle(),
             x, y, SRCCOPY );
 
     // Release window device context
@@ -228,7 +226,7 @@ void Win32Window::RefreshFromImage( int x, int y, int w, int h )
 
 }
 //---------------------------------------------------------------------------
-void Win32Window::WindowManualMove()
+void GTK2Window::WindowManualMove()
 {
     // Get mouse cursor position
     LPPOINT NewPos = new POINT;
@@ -244,14 +242,14 @@ void Win32Window::WindowManualMove()
 
 }
 //---------------------------------------------------------------------------
-void Win32Window::WindowManualMoveInit()
+void GTK2Window::WindowManualMoveInit()
 {
     GetCursorPos( CursorPos );
     WindowPos->x = Left;
     WindowPos->y = Top;
 }
 //---------------------------------------------------------------------------
-void Win32Window::Move( int left, int top )
+void GTK2Window::Move( int left, int top )
 {
     Left = left;
     Top  = top;
@@ -260,7 +258,7 @@ void Win32Window::Move( int left, int top )
     MoveWindow( hWnd, Left, Top, Width, Height, false );
 }
 //---------------------------------------------------------------------------
-void Win32Window::Size( int width, int height )
+void GTK2Window::Size( int width, int height )
 {
     Width  = width;
     Height = height;
@@ -268,7 +266,7 @@ void Win32Window::Size( int width, int height )
                   SWP_NOMOVE|SWP_NOREDRAW|SWP_NOZORDER );
 }
 //---------------------------------------------------------------------------
-void Win32Window::ChangeToolTipText( string text )
+void GTK2Window::ChangeToolTipText( string text )
 {
     if( text == "none" )
     {
@@ -293,5 +291,4 @@ void Win32Window::ChangeToolTipText( string text )
 
 }
 //---------------------------------------------------------------------------
-
-#endif
+*/
