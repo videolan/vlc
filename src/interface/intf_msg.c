@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.32 2001/04/28 03:36:25 sam Exp $
+ * $Id: intf_msg.c,v 1.33 2001/04/30 15:01:00 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -43,7 +43,6 @@
 
 #include "intf_msg.h"
 #include "interface.h"
-#include "intf_console.h"
 
 #include "main.h"
 
@@ -76,7 +75,6 @@ typedef struct
 /* Message types */
 #define INTF_MSG_STD    0                                /* standard message */
 #define INTF_MSG_ERR    1                                   /* error message */
-#define INTF_MSG_INTF   2                               /* interface message */
 #define INTF_MSG_DBG    3                                   /* debug message */
 #define INTF_MSG_WARN   4                                  /* warning message*/
 
@@ -237,26 +235,6 @@ void intf_WarnMsg( int i_level, char *psz_format, ... )
     }
 }
 
-
-/*****************************************************************************
- * intf_IntfMsg : print an interface message                             (ok ?)
- *****************************************************************************
- * In opposition to all other intf_*Msg function, this function does not print
- * it's message on default terminal (stdout or stderr), but send it to
- * interface (in fact to the X11 console). This means that the interface MUST
- * be initialized and a X11 console openned before this function is used, and
- * that once the console is closed, this call is vorbidden.
- * Practically, only the interface thread itself should call this function, and
- * flush all messages before intf_CloseX11Console() is called.
- *****************************************************************************/
-void intf_IntfMsg(char *psz_format, ...)
-{
-    va_list ap;
-
-    va_start( ap, psz_format );
-    QueueMsg( p_main->p_msg, INTF_MSG_INTF, psz_format, ap );
-    va_end( ap );
-}
 
 /*****************************************************************************
  * _intf_DbgMsg: print a debugging message                               (ok ?)
@@ -608,10 +586,6 @@ static void PrintMsg( intf_msg_item_t *p_msg )
 
         break;
         
-    case INTF_MSG_INTF:                                /* interface messages */
-        snprintf( psz_msg, i_msg_len, "%s", p_msg->psz_msg );
-        break;
-
     case INTF_MSG_DBG:                                     /* debug messages */
         mstrtime( psz_date, p_msg->date );
         snprintf( psz_msg, i_msg_len, "(%s) " INTF_MSG_DBG_FORMAT "%s",
@@ -634,9 +608,6 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     case INTF_MSG_DBG:                                 /* debugging messages */
 #endif
         fprintf( stderr, "%s\n", psz_msg );
-        break;
-    case INTF_MSG_INTF:                                /* interface messages */
-        intf_ConsolePrint( p_main->p_intf->p_console, psz_msg );
         break;
     }
 
@@ -669,9 +640,6 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     case INTF_MSG_ERR:                                     /* error messages */
     case INTF_MSG_WARN:
         fprintf( stderr, "%s\n", p_msg->psz_msg );        /* warning message */
-        break;
-    case INTF_MSG_INTF:                                /* interface messages */
-        intf_ConsolePrint( p_main->p_intf->p_console, p_msg->psz_msg );
         break;
     }
 }

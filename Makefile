@@ -36,11 +36,8 @@ PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
 INTERFACE =	src/interface/main.o \
 		src/interface/interface.o \
 		src/interface/intf_msg.o \
-		src/interface/intf_cmd.o \
-		src/interface/intf_ctrl.o \
 		src/interface/intf_playlist.o \
 		src/interface/intf_channels.o \
-		src/interface/intf_console.o \
 		src/interface/intf_urldecode.o \
 
 INPUT =		src/input/input_ext-dec.o \
@@ -102,7 +99,6 @@ VIDEO_DECODER =	src/video_decoder/video_decoder.o
 
 MISC =		src/misc/mtime.o \
 		src/misc/tests.o \
-		src/misc/rsc_files.o \
 		src/misc/modules.o \
 		src/misc/netutils.o
 

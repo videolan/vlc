@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.73 2001/04/28 03:36:25 sam Exp $
+ * $Id: interface.c,v 1.74 2001/04/30 15:00:59 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -47,7 +47,6 @@
 
 #include "intf_msg.h"
 #include "interface.h"
-#include "intf_cmd.h"
 #include "intf_playlist.h"
 #include "intf_channels.h"
 #include "keystrokes.h"
