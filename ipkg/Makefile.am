@@ -1,1 +1,18 @@
-EXTRA_DIST = control patch rules control.gpe control.opie rules.gpe rules.opie postinst.gpe postinst.opie postrm.gpe postrm.opie vlc.desktop vlc.gpe vlc.opie
+EXTRA_DIST = \
+	patch \
+	control \
+	control.gpe \
+	control.opie \
+	rules \
+	rules.gpe \
+	rules.opie \
+	postinst \
+	postinst.gpe \
+	postinst.opie \
+	postrm \
+	postrm.gpe \
+	postrm.opie \
+	vlc.desktop \
+	vlc.gpe \
+	vlc.opie \
+	$(NULL)
