@@ -101,10 +101,9 @@ AC_TYPE_SIZE_T
 AC_HEADER_TIME
 
 dnl Checks for DVD ioctls
-AC_CHECK_HEADERS(sys/ioctl.h)
-AC_CHECK_HEADERS(sys/dvdio.h)
-AC_CHECK_HEADERS(linux/cdrom.h)
-AC_EGREP_HEADER(dvd,linux/cdrom.h,AC_DEFINE(LINUX_DVD,1,DVD support for linux))
+AC_CHECK_HEADERS(sys/ioctl.h,
+  [AC_CHECK_HEADERS(linux/cdrom.h)
+   AC_EGREP_HEADER(dvd,linux/cdrom.h,AC_DEFINE(LINUX_DVD,1,DVD support for linux))])
 
 dnl default plugins 
 PLUGINS=${PLUGINS}"ps ts dvd yuv idct idctclassic motion ";

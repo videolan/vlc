@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.3 2001/02/08 17:44:12 massiot Exp $
+ * $Id: dvd_ifo.c,v 1.4 2001/02/09 03:51:42 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -34,6 +34,8 @@
 #include "intf_msg.h"
 #include "dvd_ifo.h"
 #include "input_dvd.h"
+
+void CommandRead( ifo_command_t );
 
 /*
  * IFO Management.
@@ -244,9 +246,10 @@ void IfoEnd( ifo_t* p_ifo )
                                 (int)((p_com)->i_dir_cmp),                  \
                                 (int)((p_com)->i_cmp),                      \
                                 (int)((p_com)->i_sub_cmd),                  \
-                                (int)((p_com)->i_v0),                       \
-                                (int)((p_com)->i_v2),                       \
-                                (int)((p_com)->i_v4) );           */          \
+                                (int)((p_com)->data.pi_16[0]),              \
+                                (int)((p_com)->data.pi_16[1]),              \
+                                (int)((p_com)->data.pi_16[2]));*/             \
+/*        CommandRead( *(p_com) );*/                                            \
         p_ifo->i_pos += 8;                                                  \
     }
 
@@ -1115,9 +1118,435 @@ void IfoRead( ifo_t* p_ifo )
 }
 
 /*
- * IFO virtual machine : a set of commands that give the behaviour of the dvd
+ * IFO virtual machine : a set of commands that give the
+ * interactive behaviour of the dvd
  */
+#if 1
+
+#define OP_VAL_16(i) (ntoh16( com.data.pi_16[i]))
+#define OP_VAL_8(i) ((com.data.pi_8[i]))
+
+static char ifo_reg[][80]=
+{
+    "Menu_Language_Code",
+    "Audio_Stream_#",
+    "SubPicture_Stream_#",
+    "Angle_#",
+    "VTS_#",
+    "VTS_Title_#",
+    "PGC_#",
+    "PTT_#",
+    "Highlighted_Button_#",
+    "Nav_Timer",
+    "TimedPGC",
+    "Karaoke_audio_mixing_mode",
+    "Parental_mgmt_country_code",
+    "Parental_Level",
+    "Player_Video_Cfg",
+    "Player_Audio_Cfg",
+    "Audio_language_code_setting",
+    "Audio_language_extension_code",
+    "SPU_language_code_setting",
+    "SPU_language_extension_code",
+    "?Player_Regional_Code",
+    "Reserved_21",
+    "Reserved_22",
+    "Reserved_23"
+};
+
+static char * IfoMath( char val )
+{
+    static char math_op[][10] =
+    {
+        "none",
+        "=", 
+        "<->",    // swap
+        "+=",
+        "-=",
+        "*=",
+        "/=",
+        "%=",
+        "rnd",    // rnd
+        "&=",
+        "|=",
+        "^=",
+        "??",    // invalid
+        "??",    // invalid
+        "??",    // invalid
+        "??"    // invalid
+    };
+
+    return (char *) math_op[val & 0x0f];
+}
+
+
+char ifo_cmp[][10] =
+{
+    "none",
+    "&&",
+    "==",
+    "!=",
+    ">=",
+    ">",
+    "<",
+    "<="
+};
+
+char ifo_parental[][10] =
+{
+    "0",
+    "G",
+    "2",
+    "PG",
+    "PG-13",
+    "5",
+    "R",
+    "NC-17"
+};
+
+char ifo_menu_id[][80] =
+{
+    "-0-",
+    "-1-",
+    "Title (VTS menu)",
+    "Root",
+    "Sub-Picture",
+    "Audio",
+    "Angle",
+    "Part of Title",
+};
+
+char * IfoMenuName( char index )
+{
+    return ifo_menu_id[index&0x07];
+}
+
+static void IfoRegister( u16 i_data, u8 i_direct)
+{
+    if( i_direct )
+    {
+        if( 0/*isalpha( i_data >> 8 & 0xff )*/ )
+        {
+            printf("'%c%c'", i_data>>8&0xff, i_data&0xff);
+        }
+        else
+        {
+            printf("0x%02x", i_data);
+        }
+    }
+    else
+    {
+        if( i_data & 0x80 )
+        {
+            i_data &= 0x1f;
+
+            if( i_data > 0x17 )
+            {
+                printf("s[ILL]");
+            }
+            else
+            {
+                printf("s[%s]", ifo_reg[i_data]);
+            }
+        }
+        else
+        {
+            i_data &= 0x1f;
+
+            if( i_data > 0xf )
+            {
+                printf("r[ILL]");
+            }
+            else
+            {
+                printf("r[0x%02x]", i_data);
+            }
+        }
+    }
+}
+
+static void IfoAdvanced( u8 *pi_code )
+{
+    u8      i_cmd = pi_code[0];
+
+    printf(" { ");
+
+    if( pi_code[1]>>2 )
+    {
+        printf( " Highlight button %d; ", pi_code[1]>>2 );
+    }
+
+    if( i_cmd == 0xff )
+    {
+        printf( " Illegal " );
+    }
+
+    if( i_cmd == 0x00 )
+    {
+        printf( "ReSuME %d", pi_code[7] );
+    }
+    else if( ( i_cmd & 0x06) == 0x02 )
+    {    // XX01Y
+        printf ("Link to %s cell ", ( i_cmd & 0x01 ) ? "prev" : "next");
+    }
+    else
+    {
+        printf( "advanced (0x%02x) ", i_cmd );
+    }
+    printf(" } ");
+}
+
+static void IfoJmp( ifo_command_t com )
+{
+
+    printf ("jmp ");
+
+    switch( com.i_sub_cmd )
+    {
+    case 0x01:
+        printf( "Exit" );
+        break;
+    case 0x02:
+        printf( "VTS 0x%02x", OP_VAL_8(3) );
+        break;
+    case 0x03:
+        printf( "This VTS Title 0x%02x", OP_VAL_8(3) );
+        break;
+    case 0x05:
+        printf( "This VTS Title 0x%02x Part 0x%04x",
+                            OP_VAL_8(3),
+                            OP_VAL_8(0)<<8|OP_VAL_8(1));
+        break;
+    case 0x06:
 #if 0
+            printf ("in SystemSpace ");
+            switch (OP_VAL_8(3)>>4) {
+                case 0x00:
+                    printf ("to play first PGC");
+                    break;
+                case 0x01: {
+                    printf ("to menu \"%s\"", decode_menuname (OP_VAL_8(3)));
+                }
+                    break;
+                case 0x02:
+                    printf ("to VTS 0x%02x and TTN 0x%02x", OP_VAL_8(1), OP_VAL_8(2));
+                    break;
+                case 0x03:
+                    printf ("to VMGM PGC number 0x%02x", OP_VAL_8(0)<<8 | OP_VAL_8(1));
+                    break;
+                case 0x08:
+                    printf ("vts 0x%02x lu 0x%02x menu \"%s\"", OP_VAL_8(2), OP_VAL_8(1), decode_menuname (OP_VAL_8(3)));
+                    break;
+#else
+        switch( OP_VAL_8(3)>>6 )
+        {
+        case 0x00:
+            printf( "to play first PGC" );
+            break;                
+        case 0x01:
+            printf( "to VMG title menu (?)" );
+            break;
+        case 0x02:
+            printf( "vts 0x%02x lu 0x%02x menu \"%s\"",
+                            OP_VAL_8(2),
+                            OP_VAL_8(1),
+                            IfoMenuName( OP_VAL_8(3)&0xF ) );
+            break;                
+        case 0x03:
+            printf( "vmg pgc 0x%04x (?)", ( OP_VAL_8(0)<<8) | OP_VAL_8(1) );
+            break;
+#endif
+        }
+        break;
+    case 0x08:
+#if 0
+            switch(OP_VAL_8(3)>>4) {
+                case 0x00:
+                    printf ("system first pgc");
+                    break;
+                case 0x01:
+                    printf ("system title menu");
+                    break;
+                case 0x02:
+                    printf ("system menu \"%s\"", decode_menuname (OP_VAL_8(3)));
+                    break;
+                case 0x03:
+                    printf ("system vmg pgc %02x ????", OP_VAL_8(0)<<8|OP_VAL_8(1));
+                    break;
+                case 0x08:
+                    printf ("system lu 0x%02x menu \"%s\"", OP_VAL_8(2), decode_menuname (OP_VAL_8(3)));
+                    break;
+                case 0x0c:
+                    printf ("system vmg pgc 0x%02x", OP_VAL_8(0)<<8|OP_VAL_8(1));
+                    break;
+            }
+#else
+        // OP_VAL_8(2) is number of cell
+        // it is processed BEFORE switch
+        // under some conditions, it is ignored
+        // I don't understand exactly what it means
+        printf( " ( spec cell 0x%02X ) ", OP_VAL_8(2) ); 
+
+        switch( OP_VAL_8(3)>>6 )
+        {
+        case 0:
+            printf( "to FP PGC" );
+            break;
+        case 1:
+            printf( "to VMG root menu (?)" );
+            break;
+        case 2:
+            printf( "to VTS menu \"%s\" (?)",
+                    IfoMenuName(OP_VAL_8(3)&0xF) );
+            break; 
+        case 3:
+            printf( "vmg pgc 0x%02x (?)", (OP_VAL_8(0)<<8)|OP_VAL_8(1) );
+            break;
+        }    
+#endif
+        break;
+    }
+}
+
+static void IfoLnk( ifo_command_t com )
+{
+    u16     i_button=OP_VAL_8(4)>>2;
+
+    printf ("lnk to ");
+
+    switch( com.i_sub_cmd )
+    {
+    case 0x01:
+        IfoAdvanced( &OP_VAL_8(4) );
+        break;
+
+    case 0x04:
+        printf( "PGC 0x%02x", OP_VAL_16(2) );
+        break; 
+
+    case 0x05:
+        printf( "PTT 0x%02x", OP_VAL_16(2) );
+        break; 
+
+    case 0x06:
+        printf( "Program 0x%02x this PGC", OP_VAL_8(5) );
+        break;
+
+    case 0x07:
+        printf( "Cell 0x%02x this PGC", OP_VAL_8(5) );
+        break;
+    default:
+        return;
+    }
+
+    if( i_button )
+    {
+        printf( ", Highlight 0x%02x", OP_VAL_8(4)>>2 );
+    }
+            
+}
+
+void IfoSetSystem( ifo_command_t com )
+{
+    switch( com.i_cmd )
+    {
+    case 1: {
+        int i;
+
+        for( i=1; i<=3; i++ )
+        {
+            if( OP_VAL_8(i)&0x80 )
+            {
+                if( com.i_direct )
+                {
+                    printf ("s[%s] = 0x%02x;", ifo_reg[i], OP_VAL_8(i)&0xf);
+                }
+                else
+                {
+                    printf ("s[%s] = r[0x%02x];", ifo_reg[i], OP_VAL_8(i)&0xf);
+                }
+            }
+        }
+#if 0
+                if(op->direct) {
+                        if(OP_VAL_8(1]&0x80)
+                                printf ("s[%s] = 0x%02x;", reg_name[1], OP_VAL_8(1]&0xf);
+                        if(OP_VAL_8(2)&0x80)
+//DENT: lwhat about 0x7f here ???
+                                printf ("s[%s] = 0x%02x;", reg_name[2], OP_VAL_8(2)&0x7f);
+                        if(OP_VAL_8(3)&0x80)
+                                printf ("s[%s] = 0x%02x;", reg_name[3], OP_VAL_8(3)&0xf);
+                } else {
+                        if(OP_VAL_8(1)&0x80)
+                                printf ("s[%s] = r[0x%02x];", reg_name[1], OP_VAL_8(1)&0xf);
+                        if(OP_VAL_8(2)&0x80)
+                                printf ("s[%s] = r[0x%02x];", reg_name[2], OP_VAL_8(2)&0xf);
+                        if(OP_VAL_8(3)&0x80)
+                                printf ("s[%s] = r[0x%02x];", reg_name[3], OP_VAL_8(3)&0xf);
+                }
+#endif
+        }
+        break;
+    case 2:
+        if( com.i_direct )
+        {
+            printf( "s[%s] = 0x%02x", ifo_reg[9], OP_VAL_16(0) );
+        }
+        else
+        {
+            printf( "s[%s] = r[0x%02x]", ifo_reg[9], OP_VAL_8(1)&0x0f );
+        }
+
+        printf( "s[%s] = (s[%s]&0x7FFF)|0x%02x", 
+                        ifo_reg[10], ifo_reg[10], OP_VAL_16(1)&0x8000);
+        break;
+    case 3:
+        if( com.i_direct )
+        {
+            printf( "r[0x%02x] = 0x%02x", OP_VAL_8(3)&0x0f, OP_VAL_16(0) );
+        }
+        else
+        {
+            printf ("r[r[0x%02x]] = r[0x%02x]",
+                                    OP_VAL_8(3)&0x0f, OP_VAL_8(1)&0x0f);
+        }
+        break;
+    case 4:
+        //actually only bits 00011100 00011100 are set
+        if( com.i_direct )
+        {
+            printf ("s[%s] = 0x%02x", ifo_reg[11], OP_VAL_16(1));
+        }
+        else
+        {
+            printf ("s[%s] = r[0x%02x]", ifo_reg[11], OP_VAL_8(3)&0x0f );
+        }
+        break;
+    case 6:
+        //actually,
+        //s[%s]=(r[%s]&0x3FF) | (0x%02x << 0xA);
+        //but it is way too ugly
+        if( com.i_direct )
+        {
+            printf( "s[%s] = 0x%02x", ifo_reg[8], OP_VAL_8(2)>>2 );
+        }
+        else
+        {
+            printf( "s[%s] = r[0x%02x]", ifo_reg[8], OP_VAL_8(3)&0x0f );
+        }
+        break;
+    default:
+        printf ("unknown");
+    }
+}
+
+static void IfoSet( ifo_command_t com )
+{
+    IfoRegister( OP_VAL_16(0), 0 );
+    printf( " %s ", IfoMath( com.i_cmd ) );
+    IfoRegister( OP_VAL_16(1), com.i_direct );
+}
+
 /*****************************************************************************
  * CommandRead : translates the command strings in ifo into command
  * structures.
@@ -1128,59 +1557,242 @@ void CommandRead( ifo_command_t com )
 
     switch( com.i_type )
     {
-        case 0:                                     /* Goto */
-            if( !pi_code[1] )
+    /* Goto */
+    case 0:
+        /* Main command */
+        if( !pi_code[1] )
+        {
+            printf( "NOP\n" );
+        }
+        else
+        {
+            if( com.i_cmp )
             {
-                fprintf( stderr, "NOP\n" );
+                printf ("if (r[0x%02x] %s ", OP_VAL_8(1)&0x0f,
+                                             ifo_cmp[com.i_cmp]);
+                IfoRegister (OP_VAL_16(1), com.i_dir_cmp);
+                printf (") ");
             }
-            else if( cmd.i_cmp )
+        
+            /* Sub command */
+            switch( com.i_sub_cmd )
             {
-                
+            case 1:
+                printf( "goto Line 0x%02x", OP_VAL_16(2) );
+                break;
+        
+            case 2:
+                printf( "stop VM" );
+                break;
+        
+            case 3:
+                printf( "Set Parental Level To %s and goto Line 0x%02x",
+                                     ifo_parental[OP_VAL_8(4)&0x7],
+                                     OP_VAL_8(5) );
+                break;
+        
+            default:
+                printf( "Illegal" );
+                break;
             }
-            break;
-        case 1:                                     /* Lnk */
-            break;
-        case 2:                                     /* SetSystem */
-            break;
-        case 3:                                     /* Set */
-            break;
-        case 4:                                     /* */
-            break;
-        case 5:                                     /* */
-            break;
-        case 6:                                     /* */
-            break;
-        default:
-            fprintf( stderr, "Unknown Command\n" );
-            break;
+        }
+        break;
+
+    /* Lnk */
+    case 1:
+        /* Main command */
+        if( !pi_code[1] )
+        {
+            printf( "NOP\n" );
+        }
+        else
+        {
+            if( com.i_direct )
+            {
+                if( com.i_cmp )
+                {
+                    printf( "if (r[0x%02x] %s ", OP_VAL_8(4)&0x0f,
+                                                 ifo_cmp[com.i_cmp] );
+                    IfoRegister( OP_VAL_8(5), 0 );
+                    printf( ") " );
+                }
+
+                /* Sub command */
+                IfoJmp( com );
+            }
+            else
+            {    
+                if( com.i_cmp )
+                {
+                    printf( "if (r[0x%02x] %s ", OP_VAL_8(1)&0x0f,
+                                                 ifo_cmp[com.i_cmp] );
+                    IfoRegister( OP_VAL_16(1), com.i_dir_cmp );
+                    printf( ") " );
+                }
+
+                /* Sub command */
+                IfoLnk( com );
+            }
+        }
+        break;
+
+    /* SetSystem */
+    case 2:
+        if( !pi_code[1] )
+        {
+            IfoSetSystem( com );
+        }
+        else if( com.i_cmp && !com.i_sub_cmd )
+        {
+            printf ("if (r[0x%02x] %s ", OP_VAL_8(4)&0x0f, ifo_cmp[com.i_cmp]);
+            IfoRegister( OP_VAL_8(5), 0 );
+            printf (") ");
+            IfoSetSystem( com );
+        }
+        else if( !com.i_cmp && com.i_sub_cmd )
+        {
+            printf( "if (" );
+            IfoSetSystem( com );
+            printf( ") " );
+            IfoLnk( com );
+        }
+        else
+        {
+            printf("nop");
+        }
+        break;
+
+    /* Set */
+    case 3:
+          if( ! pi_code[1] )
+        {
+            IfoSet( com );
+        }
+        else if( com.i_cmp && !com.i_sub_cmd )
+        {
+            printf ("if (r[0x%02x] %s ", OP_VAL_8(0)&0x0f, ifo_cmp[com.i_cmp]);
+            IfoRegister( OP_VAL_16(2), com.i_dir_cmp );
+            printf (") ");
+            IfoSet( com );
+        }
+        else if( !com.i_cmp && com.i_sub_cmd )
+        {
+            printf ("if (");
+            IfoSet( com );
+            printf (") ");
+            IfoLnk( com );
+        }
+        else
+        {
+            printf( "nop" );
+        }
+        break;
+
+    /* 
+     * math command on r[opcode[1]] and
+     * direct?be2me_16(OP_VAL_8(0)):reg[OP_VAL_8(1)] is executed
+     * ( unless command is swap; then r[opcode[1]] and r[OP_VAL_8(1)]
+     * are swapped )
+     * boolean operation cmp on r[opcode[1]] and
+     * dir_cmp?be2me_16(OP_VAL_8(1)[1]):reg[OP_VAL_8(3)] is executed
+     * on true result, buttons(c[6], c[7]) is called
+     * problem is 'what is buttons()'
+     */
+    case 4:
+        printf( "r[0x%X] ", pi_code[1] );
+        printf( " %s ", IfoMath( com.i_cmd ) );
+        if( com.i_cmd == 2 )
+        {
+            printf( "r[0x%X] ", OP_VAL_8(1) );
+        }
+        else
+        {
+            IfoRegister( OP_VAL_16(0), com.i_direct );
+        }
+        printf("; ");
+
+        printf( "if ( r[%d] %s ", pi_code[1], ifo_cmp[com.i_cmp] );
+        IfoRegister( OP_VAL_8(1), com.i_dir_cmp );
+        printf( " )  then {" );
+        IfoAdvanced( &OP_VAL_8(4) );
+        printf( "}" );
+        break;
+
+    /*
+     * opposite to case 4: boolean, math and buttons.
+     */
+    case 5:
+    case 6:
+        printf("if (");
+
+        if( !com.i_direct && com.i_dir_cmp )
+        {
+            printf( "0x%X", OP_VAL_16(1) );
+        }
+        else
+        {
+            IfoRegister( OP_VAL_8(3), 0 );
+            if( OP_VAL_8(3)&0x80 )
+            {
+                printf( "s[%s]", ifo_reg[OP_VAL_8(3)&0x1F] );
+            }
+            else
+            {
+                printf( "r[0x%X]", OP_VAL_8(3)&0x1F);
+                    // 0x1F is either not a mistake,
+                    // or Microsoft programmer's mistake!!!
+            }
+        }
+
+        printf( " %s r[0x%X] ", ifo_cmp[com.i_cmp],
+                                com.i_direct ? OP_VAL_8(2) : OP_VAL_8(1) );
+           printf( " )  then {" );
+        printf( "r[0x%X] ", pi_code[1] & 0xF );
+        printf( " %s ", IfoMath( com.i_cmd ) );
+
+        if( com.i_cmd == 0x02 )    // swap
+        {
+            printf("r[0x%X] ", OP_VAL_8(0)&0x1F);
+        }
+        else
+        {
+            if( com.i_direct )
+            {
+                printf( "0x%X", OP_VAL_16(0) );
+            }
+            else
+            {
+                if( OP_VAL_8(0) & 0x80 )
+                {
+                    printf("s[%s]", ifo_reg[OP_VAL_8(0) & 0x1F] );
+                }
+                else
+                {
+                    printf("r[0x%X]", OP_VAL_8(0) & 0x1F );
+                }
+            }
+        }
+
+        printf("; ");
+        IfoAdvanced( &OP_VAL_8(4) );
+        printf("}");
+
+        break;
+
+    default:
+        printf( "Unknown Command\n" );
+        break;
     }
 
     return;
 }
 
 /*****************************************************************************
- * IfoGoto
+ * CommandPrint : print in clear text (I hope so !) what a command does
  *****************************************************************************/
-static void IfoGoto( ifo_command_t cmd )
-{
-    
-
-    return;
-}
-
-/*****************************************************************************
- * IfoLnk
- *****************************************************************************/
-static void IfoLnk( ifo_t* p_ifo )
+void CommandPrint( ifo_t ifo )
 {
     return;
 }
 
-/*****************************************************************************
- * IfoJmp
- *****************************************************************************/
-static void IfoJmp( ifo_t* p_ifo )
-{
-    return;
-}
 #endif

@@ -97,9 +97,6 @@
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
 
-/* Define if you have the <sys/dvdio.h> header file.  */
-#undef HAVE_SYS_DVDIO_H
-
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
 

@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.2 2001/02/08 17:44:12 massiot Exp $
+ * $Id: dvd_ifo.h,v 1.3 2001/02/09 03:51:42 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -38,9 +38,11 @@ typedef struct ifo_command_s
     u8              i_dir_cmp   :1;
     u8              i_cmp       :3;
     u8              i_sub_cmd   :4;
-    u16             i_v0        :16;
-    u16             i_v2        :16;
-    u16             i_v4        :16;
+    union
+    {
+		u8          pi_8[6];
+		u16         pi_16[3];
+    } data;
 } ifo_command_t;
 
 /* Program Chain Command Table

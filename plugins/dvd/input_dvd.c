@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.5 2001/02/08 17:44:12 massiot Exp $
+ * $Id: input_dvd.c,v 1.6 2001/02/09 03:51:42 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -176,10 +176,10 @@ static void DVDInit( input_thread_t * p_input )
     IfoRead( &(p_method->ifo) );
     intf_Msg( "Ifo: Initialized" );
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
     /* CSS authentication and keys */
     if( ( p_method->b_encrypted = DVDCheckCSS( p_input ) ) )
     {
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
         int   i;
 
         p_method->css = CSSInit( p_input->i_handle );
@@ -199,8 +199,10 @@ static void DVDInit( input_thread_t * p_input )
         }
         CSSGetKeys( &(p_method->css) );
         intf_Msg( "CSS: Initialized" );
-    }
+#else
+        intf_ErrMsg( "Unscrambling not supported" );
 #endif
+    }
 
     /* FIXME: Kludge beginning of vts_01_1.vob */
     i_start = p_method->ifo.p_vts[0].i_pos +
