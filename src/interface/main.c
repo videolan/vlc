@@ -265,7 +265,7 @@ static void SetDefaultConfiguration( program_data_t *p_data )
     p_data->vout_cfg.i_properties =         0;
 
     /* VLAN management */
-    p_data->cfg.b_vlans =                   1;    
+    p_data->cfg.b_vlans =                   0;    
     p_data->cfg.psz_input_vlan_server =     VLAN_DEFAULT_SERVER;
     p_data->cfg.i_input_vlan_server_port =  VLAN_DEFAULT_SERVER_PORT;    
 }

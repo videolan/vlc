@@ -80,8 +80,10 @@ int intf_Run( intf_thread_t *p_intf )
         /* Flush waiting messages */
         intf_FlushMsg();
 
+#ifndef FRAMEBUFFER
         /* Manage specific interfaces */
         intf_ManageXConsole( &p_intf->xconsole );               /* X11 console */
+#endif
 
         /* Sleep to avoid using all CPU - since some interfaces needs to access 
          * keyboard events, a 100ms delay is a good compromise */
@@ -119,12 +121,16 @@ static int StartInterface( intf_thread_t *p_intf )
         p_intf->pp_input[i_thread] = NULL;        
     }    
 
+#ifdef FRAMEBUFFER
+    intf_DbgMsg("intf debug: not opening X11 console\n");
+#else
     /* Start X11 Console*/
     if( intf_OpenXConsole( &p_intf->xconsole ) )
     {
         intf_ErrMsg("intf error: can't open X11 console\n");
         return( 1 );
     }
+#endif
 
 #ifdef INIT_SCRIPT
     /* Execute the initialization script (typically spawn an input thread) */
@@ -151,9 +157,10 @@ static void EndInterface( intf_thread_t *p_intf )
     int         pi_vout_status[VOUT_MAX_THREADS];       /* vout threads status */
     
     
-    
+#ifndef FRAMEBUFFER    
     /* Close X11 console */
     intf_CloseXConsole( &p_intf->xconsole );        
+#endif
 
     /* Destroy all remaining input threads */
     for( i_thread = 0; i_thread < INPUT_MAX_THREADS; i_thread++ )
