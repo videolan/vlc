@@ -555,9 +555,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
 
         id = malloc( sizeof( sout_stream_id_t ) );
+        memset( id, 0, sizeof( sout_stream_id_t ) );
         id->p_access    = NULL;
         id->p_input     = p_input;
         id->pf_packetize= NULL;
+        id->p_rtsp_url  = NULL;
 
         return id;
     }
@@ -588,6 +590,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     /* not create the rtp specific stuff */
     id = malloc( sizeof( sout_stream_id_t ) );
+    memset( id, 0, sizeof( sout_stream_id_t ) );
     id->p_stream   = p_stream;
     id->p_access   = p_access;
     id->p_input    = NULL;
@@ -842,7 +845,7 @@ static int AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
             /* allocate a new packet */
             p_sys->packet = block_New( p_stream, p_sys->i_mtu );
             p_sys->packet->p_buffer[ 0] = 0x80;
-            p_sys->packet->p_buffer[ 1] = p_sys->i_payload_type;
+            p_sys->packet->p_buffer[ 1] = 0x80|p_sys->i_payload_type;
             p_sys->packet->p_buffer[ 2] = ( p_sys->i_sequence >> 8)&0xff;
             p_sys->packet->p_buffer[ 3] = ( p_sys->i_sequence     )&0xff;
             p_sys->packet->p_buffer[ 4] = ( i_timestamp >> 24 )&0xff;
