@@ -675,8 +675,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     /* Nothing requested */
     if( !p_playlist->request.b_request && p_playlist->status.p_item == NULL )
     {
-        msg_Warn( p_playlist,"nothing requested" );
-        return NULL;
+        msg_Dbg( p_playlist,"nothing requested, starting" );
     }
 
     /* Repeat and play/stop */
@@ -692,7 +691,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         return NULL;
     }
 
-    if( !p_playlist->request.b_request &&
+    if( !p_playlist->request.b_request && p_playlist->status.p_item && 
         !(p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG) )
     {
         msg_Dbg( p_playlist, "no-skip mode, stopping") ;
@@ -817,7 +816,6 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
     else
     {
         p_playlist->request_date = 0;
-
 
         if( p_playlist->status.i_view == -1 )
         {

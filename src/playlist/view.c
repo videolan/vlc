@@ -340,7 +340,7 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
  * \return VLC_SUCCESS or an error
  */
 int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
-                        vlc_bool_t b_delete_items )
+                         vlc_bool_t b_delete_items )
 {
     int i;
     if( p_root->i_children == -1 )
