@@ -29,6 +29,7 @@ Input:
 Demux:
  * Annodex (http://www.annodex.net) support.
  * mmsh streaming fixes.
+ * Fixed infinite loop in the AVI demux on broken/incomplete files.
 
 Subtitles:
  * Subviewer and subviewer v2 subtitles support.

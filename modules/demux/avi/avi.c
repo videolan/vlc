@@ -693,6 +693,8 @@ static int Demux_Seekable( demux_t *p_demux )
 
         if( i_pos == -1 )
         {
+            int i_loop_count = 0;
+
             /* no valid index, we will parse directly the stream
              * in case we fail we will disable all finished stream */
             if( p_sys->i_movi_lastchunk_pos >= p_sys->i_movi_begin + 12 )
@@ -726,6 +728,19 @@ static int Demux_Seekable( demux_t *p_demux )
                         msg_Warn( p_demux,
                                   "cannot skip packet, track disabled" );
                         return( AVI_TrackStopFinishedStreams( p_demux ) ? 0 : 1 );
+                    }
+
+                    /* Prevents from eating all the CPU with broken files.
+                     * This value should be low enough so that it doesn't
+                     * affect the reading speed too much. */
+                    if( !(++i_loop_count % 1024) )
+                    {
+                        if( p_demux->b_die ) return -1;
+                        msleep( 10000 );
+
+                        if( !(i_loop_count % (1024 * 10)) )
+                            msg_Warn( p_demux,
+                                      "doesn't seem to find any data..." );
                     }
                     continue;
                 }
