@@ -50,9 +50,11 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "plugins.h"
 #include "netutils.h"
 #include "input_vlan.h"
 #include "intf_msg.h"
+
 #include "main.h"
 
 /*****************************************************************************

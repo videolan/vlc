@@ -112,7 +112,7 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
  *****************************************************************************/
 int vout_SysInit( vout_thread_t *p_vout )
 {
-    int i_err, i_dummy;
+    int i_err;
 
     /* create the MGA output */
     p_vout->p_sys->p_mga->src_width = p_vout->i_width;
@@ -180,7 +180,7 @@ int vout_SysInit( vout_thread_t *p_vout )
         }
         if( i_err )                                      /* an error occured */
         {
-            intf_Msg("XShm video sextension desactivated\n" );
+            intf_Msg("XShm video sextension deactivated\n" );
             p_vout->p_sys->b_shm = 0;
         }
     }

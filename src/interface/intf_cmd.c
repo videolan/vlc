@@ -165,7 +165,7 @@ int intf_ExecScript( char *psz_filename )
     p_file = fopen( psz_filename, "r" );
     if( p_file == NULL )
     {
-        intf_ErrMsg("warning: %s: %s\n", psz_filename, strerror(errno));
+        intf_DbgMsg("intf warning: %s: %s\n", psz_filename, strerror(errno));
         return( -1 );
     }
 

@@ -2,7 +2,7 @@ vlc (0.1.99d) unstable; urgency=low
 
   * .deb is now more lintian-friendly
 
- -- Samuel Hocevar <sam@via.ecp.fr>  Tue, 20 Jun 2000 14:17:33 +0200
+ -- Samuel Hocevar <sam@via.ecp.fr>  [Insert date here]
 
 vlc (0.1.99c) unstable; urgency=low
 

@@ -6,7 +6,7 @@ Building VideoLAN
 
 A typical way to configure the vlc is :
 
-   ./configure --prefix=/usr --enable-ppro --enable-mmx --enable-gnome
+   ./configure --prefix=/usr --enable-mmx --enable-gnome
 
 See `./configure --help' for more information.
 

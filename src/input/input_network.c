@@ -51,6 +51,7 @@
 #include "input_vlan.h"
 
 #include "intf_msg.h"
+#include "plugins.h"
 #include "main.h"
 
 /*****************************************************************************

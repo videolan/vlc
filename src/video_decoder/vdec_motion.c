@@ -121,6 +121,7 @@ __MotionComponents (8,16)	/* 422 */
 	    }								     \
 	}								     \
     }
+
 /*****************************************************************************
  * vdec_MotionComponent : last stage of motion compensation
  *****************************************************************************/
@@ -425,7 +426,7 @@ void vdec_MotionFieldField444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionField16x8XXX?? : motion compensation for 16x8 motion type (field)
+ * vdec_MotionField16x8XXX: motion compensation for 16x8 motion type (field)
  *****************************************************************************/
 #define FIELD16X8( MOTION )                                             \
 {                                                                       \

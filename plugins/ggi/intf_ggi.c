@@ -100,8 +100,6 @@ int intf_SysCreate( intf_thread_t *p_intf )
                                         NULL, 0,
                                         (void *)&p_intf->p_sys->p_display );
 
-    fprintf(stderr, "display is %i\n", p_intf->p_sys->p_display);
-    
     if( p_intf->p_vout == NULL )                                  /* error */
     {
         intf_ErrMsg("error: can't create video output thread\n" );

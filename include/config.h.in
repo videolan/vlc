@@ -27,8 +27,8 @@
  * - Symbols should begin with a prefix indicating in which module they are
  *   used, such as INTF_, VOUT_ or ADEC_.
  *
- * - Regarding environment variables, which are used as initialization parameters
- *   for threads :
+ * - Regarding environment variables, which are used as initialization
+ *  parameters for threads :
  *   + variable names should end with '_VAR'
  *   + environment variable default value should end with '_DEFAULT'
  *   + values having a special meaning with '_VAL'
@@ -41,7 +41,7 @@
 
 /* Program version and copyright message */
 #define VERSION_MESSAGE     "vlc @VLC_VERSION@ @VLC_CODENAME@ " \
-                            /* "(" PROGRAM_BUILD ") (" PROGRAM_OPTIONS ")\n" */ \
+                          /* "(" PROGRAM_BUILD ") (" PROGRAM_OPTIONS ")\n" */ \
                             "Copyright 1996-2000 VideoLAN\n"
 #define COPYRIGHT_MESSAGE   "VideoLAN Client - version @VLC_VERSION@" \
                             " @VLC_CODENAME@ - (c)1996-2000 VideoLAN"
@@ -113,6 +113,14 @@
 /* Size of the FIFO. FIFO_SIZE+1 must be a power of 2 */
 #define FIFO_SIZE                       1023
 
+/*
+ * Paths
+ */
+
+#define DATA_PATH                       "@prefix@/share/videolan"
+#define PLUGIN_PATH                     "@prefix@/lib/videolan/vlc"
+
+#define MAX_PLUGIN_COUNT                32
 
 /*****************************************************************************
  * Interface configuration
@@ -271,11 +279,11 @@
 #define VOUT_DISPLAY_VAR                "vlc_display"
 
 /* Default dimensions for display window - these dimensions are enough for the
- * standard width and height broadcasted MPEG-2 streams */
+ * standard width and height broadcasted MPEG-2 streams or DVDs */
 #define VOUT_WIDTH_VAR                  "vlc_width"
 #define VOUT_HEIGHT_VAR                 "vlc_height"
-#define VOUT_WIDTH_DEFAULT              720
-#define VOUT_HEIGHT_DEFAULT             576
+#define VOUT_WIDTH_DEFAULT              360
+#define VOUT_HEIGHT_DEFAULT             288
 
 /* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */
@@ -349,7 +357,7 @@
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */
-#define VPAR_OPTIM_LEVEL                1
+#define VPAR_OPTIM_LEVEL                2
 
 /* The following directives only apply if you define VDEC_SMP below. */
 

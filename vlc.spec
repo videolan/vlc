@@ -4,14 +4,17 @@ Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/0.1.99c/vlc-0.1.99c.tar.gz
-Packager: Eric Doutreleau <Eric.doutreleau@int-evry.fr>
+Source0: http://www.videolan.org/packages/0.1.99d/vlc-0.1.99d.tar.gz
+Packager: Samuel Hocevar <sam@via.ecp.fr>
 
 Buildroot: /tmp/vlc-build
 Summary: VideoLAN Client.
 
 %changelog
-* Thu Jun 15 2000 Eric Doutreleau < Eric.Doutreleau@int-evry.fr>
+* Sun Jun 18 2000 Samuel Hocevar <sam@via.ecp.fr>
+Took over the package
+
+* Thu Jun 15 2000 Eric Doutreleau <Eric.Doutreleau@int-evry.fr>
 Initial package
 
 %description
@@ -25,7 +28,7 @@ a free network-aware MPEG and DVD player
 %setup 
 
 %build
-./configure --prefix=/usr --enable-ppro --enable-mmx --enable-gnome
+./configure --prefix=/usr --enable-mmx --enable-gnome
 make
 %install
 mkdir -p $RPM_BUILD_ROOT/usr/lib

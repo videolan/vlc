@@ -463,8 +463,6 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
     int                 i_port = 0;                        /* port parameter */
     int                 i_vlan = 0;                        /* vlan parameter */
 
-    fprintf( stderr, "spawn input\n" );
-
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
     {
@@ -535,10 +533,10 @@ static int Vlan( int i_argc, intf_arg_t *p_argv  )
 {
     int i_command;                                /* command argument number */
 
-    /* Do not try anything if vlans are desactivated */
+    /* Do not try anything if vlans are deactivated */
     if( !p_main->b_vlans )
     {
-        intf_IntfMsg("vlans are desactivated");
+        intf_IntfMsg("vlans are deactivated");
         return( INTF_OTHER_ERROR );
     }
 

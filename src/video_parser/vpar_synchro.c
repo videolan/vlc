@@ -58,225 +58,141 @@
  */
 
 #ifdef SAM_SYNCHRO
-/*****************************************************************************
- * vpar_SynchroUpdateTab : Update a mean table in the synchro structure
- *****************************************************************************/
-float vpar_SynchroUpdateTab( video_synchro_tab_t * tab, int count )
-{
-
-    tab->mean = ( tab->mean + MAX_COUNT * count ) / ( MAX_COUNT + 1 );
-    tab->deviation = ( tab->deviation + MAX_COUNT * abs (tab->mean - count) )
-                        / ( MAX_COUNT + 1 );
-
-    return tab->deviation;
-}
 
 /*****************************************************************************
  * vpar_SynchroUpdateStructures : Update the synchro structures
  *****************************************************************************/
 void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
-                                   int i_coding_type, int dropped )
+                                   int i_coding_type, boolean_t b_kept )
 {
-    float candidate_deviation;
-    float optimal_deviation;
-    float predict;
-    mtime_t i_current_pts;
-    mtime_t i_delay;
-    mtime_t i_displaydate;
-    decoder_fifo_t * decoder_fifo = p_vpar->bit_stream.p_decoder_fifo;
+    mtime_t         i_delay;
+    mtime_t         i_pts;
+    pes_packet_t *  p_pes = p_vpar->bit_stream.p_decoder_fifo->buffer[ 
+                               p_vpar->bit_stream.p_decoder_fifo->i_start ];
 
-    /* interpolate the current _decode_ PTS */
-    i_current_pts = decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts ?
-                    decoder_fifo->buffer[decoder_fifo->i_start]->i_pts :
-                    0;
-    if( !i_current_pts )
+    /* try to guess the current DTS and PTS */
+    if( p_pes->b_has_pts )
     {
-        i_current_pts = p_vpar->synchro.i_last_decode_pts
-                       + 1000000.0 / (1 + p_vpar->synchro.actual_fps);
+        i_pts = p_pes->i_pts;
+
+        /* if the image is I type, then the presentation timestamp is
+         * the PTS of the PES. Otherwise, we calculate it with the
+         * theorical framerate value */
+        if( i_coding_type == I_CODING_TYPE )
+        {
+            p_vpar->synchro.i_last_pts = p_pes->i_pts;
+        }
+        else
+        {
+            p_vpar->synchro.i_last_pts += p_vpar->synchro.i_theorical_delay;
+        }
+
+        p_pes->b_has_pts = 0;
     }
-    p_vpar->synchro.i_last_decode_pts = i_current_pts;
-
-    /* see if the current image has a pts - if not, set to 0 */
-    p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_stop].i_pts
-            = i_current_pts;
-
-    /* update display time */
-    i_displaydate = decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts ?
-                    decoder_fifo->buffer[decoder_fifo->i_start]->i_pts :
-                    0;
-    if( !i_displaydate || i_coding_type != I_CODING_TYPE )
+    else
     {
-        if (!p_vpar->synchro.i_images_since_pts )
-            p_vpar->synchro.i_images_since_pts = 10;
-
-        i_displaydate = p_vpar->synchro.i_last_display_pts
-                       + 1000000.0 / (p_vpar->synchro.theorical_fps);
+        p_vpar->synchro.i_last_pts += p_vpar->synchro.i_theorical_delay;
+        i_pts = p_vpar->synchro.i_last_pts;
     }
-
-    decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts = 0;
-
-    p_vpar->synchro.i_images_since_pts--;
-    p_vpar->synchro.i_last_display_pts = i_displaydate;
-
-
 
     /* update structures */
     switch(i_coding_type)
     {
         case P_CODING_TYPE:
 
-            p_vpar->synchro.current_p_count++;
-            if( !dropped ) p_vpar->synchro.nondropped_p_count++;
+            p_vpar->synchro.i_P_seen++;
+            if( b_kept ) p_vpar->synchro.i_P_kept++;
             break;
 
         case B_CODING_TYPE:
-            p_vpar->synchro.current_b_count++;
-            if( !dropped ) p_vpar->synchro.nondropped_b_count++;
+            p_vpar->synchro.i_B_seen++;
+            if( b_kept ) p_vpar->synchro.i_B_kept++;
             break;
 
         case I_CODING_TYPE:
 
-            /* update information about images we can decode */
-            if (i_current_pts != p_vpar->synchro.i_last_i_pts)
+            /* update the last I PTS we have, we need it to
+             * calculate the theorical framerate */
+            if (i_pts != p_vpar->synchro.i_last_seen_I_pts)
             {
-                if ( p_vpar->synchro.i_last_i_pts && i_current_pts != p_vpar->synchro.i_last_i_pts)
+                if ( p_vpar->synchro.i_last_seen_I_pts )
                 {
-                    p_vpar->synchro.theorical_fps = (p_vpar->synchro.theorical_fps + 1000000.0 * (1 + p_vpar->synchro.current_b_count + p_vpar->synchro.current_p_count) / (i_current_pts - p_vpar->synchro.i_last_i_pts)) / 2;
+                    p_vpar->synchro.i_theorical_delay =
+                            ( i_pts - p_vpar->synchro.i_last_seen_I_pts )
+                          / ( 1 + p_vpar->synchro.i_B_seen
+                                + p_vpar->synchro.i_P_seen);
                 }
-                p_vpar->synchro.i_last_i_pts = i_current_pts;
+                p_vpar->synchro.i_last_seen_I_pts = i_pts;
             }
-
-            if( !dropped )
-            {
-                if ( p_vpar->synchro.i_last_nondropped_i_pts && i_current_pts != p_vpar->synchro.i_last_nondropped_i_pts)
-                {
-                    p_vpar->synchro.actual_fps = (p_vpar->synchro.actual_fps + 1000000.0 * (1 + p_vpar->synchro.nondropped_b_count + p_vpar->synchro.nondropped_p_count) / (i_current_pts - p_vpar->synchro.i_last_nondropped_i_pts)) / 2;
-                }
-
-            }
-
-
-            /* update all the structures for P images */
-
-            /* period == 1 */
-            optimal_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_p[0],
-                            p_vpar->synchro.current_p_count);
-            predict = p_vpar->synchro.tab_p[0].mean;
-
-            /* period == 2 */
-            candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_p[1 + (p_vpar->synchro.modulo & 0x1)],
-                            p_vpar->synchro.current_p_count);
-            if (candidate_deviation < optimal_deviation)
-            {
-                optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_p[1 + (p_vpar->synchro.modulo & 0x1)].mean;
-            }
-
-            /* period == 3 */
-            candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_p[3 + (p_vpar->synchro.modulo % 3)],
-                            p_vpar->synchro.current_p_count);
-            if (candidate_deviation < optimal_deviation)
-            {
-                optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_p[1 + (p_vpar->synchro.modulo % 3)].mean;
-            }
-
-            p_vpar->synchro.p_count_predict = predict;
-            p_vpar->synchro.current_p_count = 0;
-
-
-            /* update all the structures for B images */
-
-            /* period == 1 */
-            optimal_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_b[0],
-                            p_vpar->synchro.current_b_count);
-            predict = p_vpar->synchro.tab_b[0].mean;
-
-            /* period == 2 */
-            candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_b[1 + (p_vpar->synchro.modulo & 0x1)],
-                            p_vpar->synchro.current_b_count);
-            if (candidate_deviation < optimal_deviation)
-            {
-                optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_b[1 + (p_vpar->synchro.modulo & 0x1)].mean;
-            }
-
-            /* period == 3 */
-            candidate_deviation = vpar_SynchroUpdateTab(
-                            &p_vpar->synchro.tab_b[3 + (p_vpar->synchro.modulo % 3)],
-                            p_vpar->synchro.current_b_count);
-            if (candidate_deviation < optimal_deviation)
-            {
-                optimal_deviation = candidate_deviation;
-                predict = p_vpar->synchro.tab_b[1 + (p_vpar->synchro.modulo % 3)].mean;
-            }
-
-            p_vpar->synchro.b_count_predict = predict;
-            p_vpar->synchro.current_b_count = 0;
 
             /* now we calculated all statistics, it's time to
              * decide what we have the time to display
              */
-            i_delay = i_current_pts - p_vpar->synchro.i_last_nondropped_i_pts;
+            i_delay = i_pts - p_vpar->synchro.i_last_kept_I_pts;
 
-            p_vpar->synchro.can_display_i
-                = ( p_vpar->synchro.i_mean_decode_time < i_delay );
+            p_vpar->synchro.b_all_I
+                = ( p_vpar->synchro.i_delay < i_delay );
 
-            p_vpar->synchro.can_display_p
-                    = ( p_vpar->synchro.i_mean_decode_time
-                    * (1 + p_vpar->synchro.p_count_predict) < i_delay );
+            p_vpar->synchro.b_all_P
+                    = ( p_vpar->synchro.i_delay
+                    * (1 + p_vpar->synchro.i_P_seen) < i_delay );
 
-            if( !p_vpar->synchro.can_display_p )
+            if( !p_vpar->synchro.b_all_P )
             {
                 p_vpar->synchro.displayable_p
-                    = -1 + i_delay / p_vpar->synchro.i_mean_decode_time;
+                    //= -1.0 + (float)i_delay / (float)p_vpar->synchro.i_delay;
+                    = (-1.0 + (float)p_vpar->synchro.displayable_p + (float)i_delay / (float)p_vpar->synchro.i_delay) / 2.0;
                 if( p_vpar->synchro.displayable_p < 0 )
                     p_vpar->synchro.displayable_p = 0;
-            }
-            else
-                p_vpar->synchro.displayable_p = 0;
 
-            if( p_vpar->synchro.can_display_p
-                && !(p_vpar->synchro.can_display_b
-                    = ( p_vpar->synchro.i_mean_decode_time
-                    * (1 + p_vpar->synchro.b_count_predict
-                        + p_vpar->synchro.p_count_predict)) < i_delay) )
-            {
-                p_vpar->synchro.displayable_b
-                    = -2.0 + i_delay / p_vpar->synchro.i_mean_decode_time
-                        - p_vpar->synchro.can_display_p;
-            }
-            else
+                p_vpar->synchro.b_all_B = 0;
                 p_vpar->synchro.displayable_b = 0;
+            }
+            else
+            {
+                p_vpar->synchro.displayable_p = p_vpar->synchro.i_P_seen;
 
-#if 0
-            intf_DbgMsg( "I %i  P %i (%f)  B %i (%f)\n",
-                p_vpar->synchro.can_display_i,
-                p_vpar->synchro.can_display_p,
-                p_vpar->synchro.displayable_p,
-                p_vpar->synchro.can_display_b,
-                p_vpar->synchro.displayable_b );
+                if( !(p_vpar->synchro.b_all_B
+                        = ( p_vpar->synchro.i_delay
+                        * (1 + p_vpar->synchro.i_B_seen
+                            + p_vpar->synchro.i_P_seen)) < i_delay) )
+                {
+                    p_vpar->synchro.displayable_b
+                        //= -2.0 + i_delay / p_vpar->synchro.i_delay - p_vpar->synchro.b_all_P;
+                        = ( -2.0 + (float)p_vpar->synchro.displayable_b + (float)i_delay / (float)p_vpar->synchro.i_delay - (float)p_vpar->synchro.b_all_P) / 2.0;
+                }
+                else
+                {
+                    p_vpar->synchro.displayable_b = p_vpar->synchro.i_B_seen;
+                }
+            }
+
+#if 1
+            if( p_vpar->synchro.b_all_I )
+                intf_ErrMsg( "I: all  " );
+            if( p_vpar->synchro.b_all_P )
+                intf_ErrMsg( "P: all  " );
+            else if( p_vpar->synchro.displayable_p > 0 )
+                intf_ErrMsg( "P: %f  ", p_vpar->synchro.displayable_p );
+            if( p_vpar->synchro.b_all_B )
+                intf_ErrMsg( "B: all" );
+            else if( p_vpar->synchro.displayable_b > 0 )
+                intf_ErrMsg( "B: %f", p_vpar->synchro.displayable_b );
+            intf_ErrMsg( "\n" );
 #endif
+            p_vpar->synchro.i_P_seen = 0;
+            p_vpar->synchro.i_B_seen = 0;
 
             /* update some values */
-            if( !dropped )
+            if( b_kept )
             {
-                p_vpar->synchro.i_last_nondropped_i_pts = i_current_pts;
-                p_vpar->synchro.nondropped_p_count = 0;
-                p_vpar->synchro.nondropped_b_count = 0;
+                p_vpar->synchro.i_last_kept_I_pts = i_pts;
+                p_vpar->synchro.i_P_kept = 0;
+                p_vpar->synchro.i_B_kept = 0;
             }
 
             break;
-
     }
-
-    p_vpar->synchro.modulo++;
-
 }
 
 /*****************************************************************************
@@ -285,45 +201,56 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-    mtime_t i_delay = p_vpar->synchro.i_last_decode_pts - mdate();
+    mtime_t i_delay = p_vpar->synchro.i_last_pts - mdate();
 
     switch( i_coding_type )
     {
         case I_CODING_TYPE:
 
-            return( p_vpar->synchro.can_display_i );
+            //intf_ErrMsg( " I	%f	%f\nI ", 1000000.0 / p_vpar->synchro.i_theorical_delay, 1000000.0 / p_vpar->synchro.i_delay );
+            return( p_vpar->synchro.b_all_I );
 
         case P_CODING_TYPE:
 
-            if( p_vpar->synchro.can_display_p )
+            if( p_vpar->synchro.b_all_P )
+            {
+                //intf_ErrMsg( " p  " );
                 return( 1 );
+            }
 
             if( p_vpar->synchro.displayable_p * i_delay
-                < p_vpar->synchro.i_mean_decode_time )
+                < p_vpar->synchro.i_delay )
             {
-                //intf_ErrMsg( "trashed a P\n" );
+                //intf_ErrMsg( " -  " );
                 return( 0 );
             }
 
             p_vpar->synchro.displayable_p--;
+            //intf_ErrMsg( " p> " );
             return( 1 );
 
         case B_CODING_TYPE:
 
-            if( p_vpar->synchro.can_display_b )
-                return( 1 );
-
-            /* modulo & 0x3 is here to add some randomness */
-            if( i_delay < (1 + (p_vpar->synchro.modulo & 0x3))
-                * p_vpar->synchro.i_mean_decode_time )
+            if( p_vpar->synchro.b_all_B )
             {
-                //intf_ErrMsg( "trashed a B\n" );
-                return( 0 );
+                //intf_ErrMsg( "b " );
+                return( 1 );
             }
 
             if( p_vpar->synchro.displayable_b <= 0 )
+            {
+                //intf_ErrMsg( "  " );
                 return( 0 );
+            }
 
+            if( i_delay < 0 )
+            {
+                //intf_ErrMsg( "· " );
+                p_vpar->synchro.displayable_b -= 0.5;
+                return( 0 );
+            }
+
+            //intf_ErrMsg( "b " );
             p_vpar->synchro.displayable_b--;
             return( 1 );
     }
@@ -338,7 +265,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
                         int i_structure )
 {
-    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, 1);
+    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, 0);
 
 }
 
@@ -348,13 +275,11 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                             int i_structure )
 {
-    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, 0);
+    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, 1);
 
-    p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_stop].i_decode_date = mdate();
-    p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_stop].i_image_type
-        = i_coding_type;
+    p_vpar->synchro.i_date_fifo[p_vpar->synchro.i_stop] = mdate();
 
-    p_vpar->synchro.i_fifo_stop = (p_vpar->synchro.i_fifo_stop + 1) & 0xf;
+    FIFO_INCREMENT( i_stop );
 
 }
 
@@ -363,20 +288,29 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
  *****************************************************************************/
 void vpar_SynchroEnd( vpar_thread_t * p_vpar )
 {
-    mtime_t i_decode_time;
+    if( p_vpar->synchro.i_stop != p_vpar->synchro.i_start )
+    {
+        mtime_t i_delay;
 
-    i_decode_time = (mdate() -
-            p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_decode_date)
-        / ( (p_vpar->synchro.i_fifo_stop - p_vpar->synchro.i_fifo_start) & 0x0f);
+        i_delay = ( mdate() -
+            p_vpar->synchro.i_date_fifo[p_vpar->synchro.i_start] )
+              / ( (p_vpar->synchro.i_stop - p_vpar->synchro.i_start) & 0x0f );
 
-    p_vpar->synchro.i_mean_decode_time =
-        ( 7 * p_vpar->synchro.i_mean_decode_time + i_decode_time ) / 8;
+        p_vpar->synchro.i_delay =
+            ( 7 * p_vpar->synchro.i_delay + i_delay ) >> 3;
 
-    /* intf_ErrMsg( "decoding time was %lli\n",
-        p_vpar->synchro.i_mean_decode_time ); */
+#if 0
+        intf_ErrMsg( "decode %lli (mean %lli, theorical %lli)\n",
+                     i_delay, p_vpar->synchro.i_delay,
+                     p_vpar->synchro.i_theorical_delay );
+#endif
+    }
+    else
+    {
+        intf_ErrMsg( "vpar error: critical ! fifo full\n" );
+    }
 
-    p_vpar->synchro.i_fifo_start = (p_vpar->synchro.i_fifo_start + 1) & 0xf;
-
+    FIFO_INCREMENT( i_start );
 }
 
 /*****************************************************************************
@@ -384,23 +318,27 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar )
  *****************************************************************************/
 mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 {
-    mtime_t i_displaydate = p_vpar->synchro.i_last_display_pts;
-
 #if 0
+
+    mtime_t i_displaydate = p_vpar->synchro.i_last_pts;
+
     static mtime_t i_delta = 0;
 
-    intf_ErrMsg( "displaying type %i with delay %lli and delta %lli\n",
-        p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_image_type,
+    intf_ErrMsg( "displaying image with delay %lli and delta %lli\n",
         i_displaydate - mdate(),
         i_displaydate - i_delta );
 
     intf_ErrMsg ( "theorical fps: %f - actual fps: %f \n",
-        p_vpar->synchro.theorical_fps, p_vpar->synchro.actual_fps );
+        1000000.0 / p_vpar->synchro.i_theorical_delay, 1000000.0 / p_vpar->synchro.i_delay );
 
     i_delta = i_displaydate;
-#endif
 
     return i_displaydate;
+#else
+
+    return p_vpar->synchro.i_last_pts;
+
+#endif
 }
 
 #endif

@@ -4,7 +4,9 @@ README for vlc, the VideoLAN Client
 Introduction
 ============
 
-[ nothing appropriate yet ]
+The vlc is part of the VideoLAN project, a full MPEG2 client/server
+solution. The VideoLAN Client can also be used as a standalone program
+to play MPEG2 streams from a hard disk or a DVD.
 
 
 Building, Installing and Running VideoLAN
@@ -38,7 +40,13 @@ distribution, what plugins you were trying, and so on).
 Resources
 =========
 
-[ nothing appropriate yet ]
+The VideoLAN web site at http://www.videolan.org/ is a good start for
+information about MPEG and DVD playing. Have a look at the documentation
+section, as well as the bookmarks.
+
+You can also try the OpenDVD site at http://www.opendvd.org/ or the
+the LiVid project at http://www.linuxvideo.org/. They have lots of
+information, too.
 
 
 The team

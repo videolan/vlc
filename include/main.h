@@ -31,6 +31,7 @@
  * it when you can access the members you need in an other way. In fact, it
  * should only be used by interface thread.
  *****************************************************************************/
+
 typedef struct
 {
     /* Global properties */
@@ -49,6 +50,8 @@ typedef struct
 
     /* Shared data - these structures are accessed directly from p_main by
      * several modules */
+    p_plugin_bank_t        p_bank;                            /* plugin bank */
+    p_playlist_t           p_playlist;                        /* plugin bank */
     p_intf_msg_t           p_msg;                 /* messages interface data */
     p_input_vlan_t         p_vlan;                      /* vlan library data */
 } main_t;
@@ -63,3 +66,4 @@ int    main_GetIntVariable( char *psz_name, int i_default );
 char * main_GetPszVariable( char *psz_name, char *psz_default );
 void   main_PutIntVariable( char *psz_name, int i_value );
 void   main_PutPszVariable( char *psz_name, char *psz_value );
+

@@ -40,8 +40,8 @@
 
 #include "intf_msg.h"
 
-#define WIDTH 128
-#define HEIGHT 64
+#define WIDTH 16
+#define HEIGHT 16
 #define BITS_PER_PLANE 16
 #define BYTES_PER_PIXEL 2
 

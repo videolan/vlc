@@ -23,10 +23,13 @@
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 
-#include "int_types.h"
+#include "common.h"
+
 #include "ac3_decoder.h"
 #include "ac3_internal.h"
 #include "ac3_bit_stream.h"
+
+#include "intf_msg.h"
 
 #define Q0 ((-2 << 15) / 3.0)
 #define Q1 (0)

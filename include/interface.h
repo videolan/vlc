@@ -57,16 +57,12 @@ typedef struct intf_thread_s
     p_intf_sys_t        p_sys;                           /* system interface */
 
     /* Plugin */
-    plugin_id_t             intf_plugin;                 /* interface plugin */
     intf_sys_create_t *     p_sys_create;         /* create interface thread */
     intf_sys_manage_t *     p_sys_manage;                       /* main loop */
     intf_sys_destroy_t *    p_sys_destroy;              /* destroy interface */
 
     /* XXX: Channels array - new API */
-    //p_intf_channel_t *  p_channel[INTF_MAX_CHANNELS];/* channel descriptions */
-    /* file list - quick hack */
-    char **p_playlist;
-    int i_list_index;
+  //p_intf_channel_t *  p_channel[INTF_MAX_CHANNELS];/* channel descriptions */
 
     /* Channels array - NULL if not used */
     p_intf_channel_t    p_channel;                /* description of channels */

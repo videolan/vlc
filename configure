@@ -12,9 +12,13 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
-  --enable-dsp            Linux /dev/dsp support (default enabled)"
+  --enable-ppro           Enable PentiumPro optimizations (default is no)"
+ac_help="$ac_help
+  --enable-mmx            Enable MMX optimizations (default is no)"
 ac_help="$ac_help
   --enable-dummy          dummy audio and video support (default enabled)"
+ac_help="$ac_help
+  --enable-dsp            Linux /dev/dsp support (default enabled)"
 ac_help="$ac_help
   --enable-esd            Esound library support (default disabled)"
 ac_help="$ac_help
@@ -27,10 +31,6 @@ ac_help="$ac_help
   --enable-gnome          Gnome support (default disabled)"
 ac_help="$ac_help
   --enable-x11            X11 support (default enabled)"
-ac_help="$ac_help
-  --enable-ppro           Enable PentiumPro optimizations (default is no)"
-ac_help="$ac_help
-  --enable-mmx            Enable MMX optimizations (default is no)"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -3041,57 +3041,7 @@ EOF
 fi
 
 
-# Check whether --enable-dsp or --disable-dsp was given.
-if test "${enable_dsp+set}" = set; then
-  enableval="$enable_dsp"
-  :
-fi
-
-if test x$enable_dsp != xno; then PLUGINS=${PLUGINS}"dsp "; fi
-# Check whether --enable-dummy or --disable-dummy was given.
-if test "${enable_dummy+set}" = set; then
-  enableval="$enable_dummy"
-  :
-fi
-
-if test x$enable_dummy != xno; then PLUGINS=${PLUGINS}"dummy "; fi
-# Check whether --enable-esd or --disable-esd was given.
-if test "${enable_esd+set}" = set; then
-  enableval="$enable_esd"
-  if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"esd "; fi
-fi
-
-# Check whether --enable-fb or --disable-fb was given.
-if test "${enable_fb+set}" = set; then
-  enableval="$enable_fb"
-  if test x$enable_fb = xyes; then PLUGINS=${PLUGINS}"fb "; fi
-fi
-
-# Check whether --enable-ggi or --disable-ggi was given.
-if test "${enable_ggi+set}" = set; then
-  enableval="$enable_ggi"
-  if test x$enable_ggi = xyes; then PLUGINS=${PLUGINS}"ggi "; fi
-fi
-
-# Check whether --enable-glide or --disable-glide was given.
-if test "${enable_glide+set}" = set; then
-  enableval="$enable_glide"
-  if test x$enable_glide = xyes; then PLUGINS=${PLUGINS}"glide "; fi
-fi
-
-# Check whether --enable-gnome or --disable-gnome was given.
-if test "${enable_gnome+set}" = set; then
-  enableval="$enable_gnome"
-  if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"gnome "; fi
-fi
-
-# Check whether --enable-x11 or --disable-x11 was given.
-if test "${enable_x11+set}" = set; then
-  enableval="$enable_x11"
-  :
-fi
-
-if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; fi
+PLUGINS=${PLUGINS}"yuv ";
 
 ARCH=${host_cpu}
 # Check whether --enable-ppro or --disable-ppro was given.
@@ -3103,7 +3053,7 @@ fi
 # Check whether --enable-mmx or --disable-mmx was given.
 if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
-   if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; fi 
+   if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi 
 fi
 
 
@@ -3111,8 +3061,64 @@ SYS=${host_os}
 
 # special cases
 if test x$host_os = xbeos; then
-    PLUGINS="dummy beos"
+    PLUGINS=${PLUGINS}"dummy beos "
+
+else
+
+# Check whether --enable-dummy or --disable-dummy was given.
+if test "${enable_dummy+set}" = set; then
+  enableval="$enable_dummy"
+  :
 fi
+
+if test x$enable_dummy != xno; then PLUGINS=${PLUGINS}"dummy "; fi
+# Check whether --enable-dsp or --disable-dsp was given.
+if test "${enable_dsp+set}" = set; then
+  enableval="$enable_dsp"
+  :
+fi
+
+if test x$enable_dsp != xno; then PLUGINS=${PLUGINS}"dsp "; fi
+# Check whether --enable-esd or --disable-esd was given.
+if test "${enable_esd+set}" = set; then
+  enableval="$enable_esd"
+  if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"esd "; fi
+fi
+
+# Check whether --enable-fb or --disable-fb was given.
+if test "${enable_fb+set}" = set; then
+  enableval="$enable_fb"
+  if test x$enable_fb = xyes; then PLUGINS=${PLUGINS}"fb "; ALIASES=${ALIASES}"fbvlc "; fi
+fi
+
+# Check whether --enable-ggi or --disable-ggi was given.
+if test "${enable_ggi+set}" = set; then
+  enableval="$enable_ggi"
+  if test x$enable_ggi = xyes; then PLUGINS=${PLUGINS}"ggi "; ALIASES=${ALIASES}"ggivlc "; fi
+fi
+
+# Check whether --enable-glide or --disable-glide was given.
+if test "${enable_glide+set}" = set; then
+  enableval="$enable_glide"
+  if test x$enable_glide = xyes; then PLUGINS=${PLUGINS}"glide "; ALIASES=${ALIASES}"glidevlc "; fi
+fi
+
+# Check whether --enable-gnome or --disable-gnome was given.
+if test "${enable_gnome+set}" = set; then
+  enableval="$enable_gnome"
+  if test x$enable_gnome = xyes; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi
+fi
+
+# Check whether --enable-x11 or --disable-x11 was given.
+if test "${enable_x11+set}" = set; then
+  enableval="$enable_x11"
+  :
+fi
+
+if test x$enable_x11 != xno; then PLUGINS=${PLUGINS}"x11 "; ALIASES=${ALIASES}"xvlc "; fi
+
+fi
+
 
 
 
@@ -3268,6 +3274,7 @@ s%@LIBOBJS@%$LIBOBJS%g
 s%@SYS@%$SYS%g
 s%@ARCH@%$ARCH%g
 s%@PLUGINS@%$PLUGINS%g
+s%@ALIASES@%$ALIASES%g
 
 CEOF
 EOF
@@ -3495,4 +3502,5 @@ vlc version           : ${VLC_VERSION}
 system                : ${SYS}
 architecture          : ${ARCH}
 plugins               : ${PLUGINS}
+vlc aliases           : ${ALIASES}
 "

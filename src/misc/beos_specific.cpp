@@ -55,7 +55,7 @@ void beos_AppThread( void * args )
     delete BeApp;
 }
 
-void beos_Init( void )
+void beos_Create( void )
 {
     int i_lenght;
     BPath path;
@@ -78,7 +78,7 @@ void beos_Init( void )
     strcpy( psz_beos_program_path, path.Path() );
 }
 
-void beos_Clean( void )
+void beos_Destroy( void )
 {
     free( psz_beos_program_path ); /* XXX */
     be_app->PostMessage( B_QUIT_REQUESTED );

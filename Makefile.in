@@ -41,8 +41,6 @@ PROGRAM_BUILD = `date` $(USER)
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
 DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr a-z A-Z)
-DEFINE += -DPLUGIN_PATH="\"$(prefix)/lib/videolan/vlc\""
-DEFINE += -DDATA_PATH="\"$(prefix)/share/videolan/vlc\""
 
 ################################################################################
 # Tuning and other variables - do not change anything except if you know
@@ -211,6 +209,7 @@ video_decoder_obj =		video_decoder/video_decoder.o \
 misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \
 						misc/netutils.o \
+						misc/playlist.o \
 						misc/plugins.o \
 						misc/decoder_fifo.o
 
@@ -248,42 +247,68 @@ endif
 #
 PLUGINS := $(PLUGINS:%=lib/%.so)
 
-PLUGIN_BEOS   = plugins/beos/aout_beos.o \
+PLUGIN_BEOS   = plugins/beos/beos.o \
+		plugins/beos/aout_beos.o \
 		plugins/beos/intf_beos.o \
 		plugins/beos/vout_beos.o
 
-PLUGIN_DSP    = plugins/dsp/aout_dsp.o
+PLUGIN_DSP    = plugins/dsp/dsp.o \
+		plugins/dsp/aout_dsp.o \
 
-PLUGIN_DUMMY  = plugins/dummy/aout_dummy.o \
+PLUGIN_DUMMY  = plugins/dummy/dummy.o \
+		plugins/dummy/aout_dummy.o \
 		plugins/dummy/intf_dummy.o \
 		plugins/dummy/vout_dummy.o
 
-PLUGIN_ESD    = plugins/esd/aout_esd.o
+PLUGIN_ESD    = plugins/esd/esd.o \
+		plugins/esd/aout_esd.o
 
-PLUGIN_FB     = plugins/fb/intf_fb.o \
+PLUGIN_FB     = plugins/fb/fb.o \
+		plugins/fb/intf_fb.o \
 		plugins/fb/vout_fb.o
 
-PLUGIN_GGI    = plugins/ggi/intf_ggi.o \
+PLUGIN_GGI    = plugins/ggi/ggi.o \
+		plugins/ggi/intf_ggi.o \
 		plugins/ggi/vout_ggi.o
 
-PLUGIN_GLIDE  = plugins/glide/intf_glide.o \
+PLUGIN_GLIDE  = plugins/glide/glide.o \
+		plugins/glide/intf_glide.o \
 		plugins/glide/vout_glide.o
 
-PLUGIN_GNOME  = plugins/gnome/intf_gnome.o \
+PLUGIN_GNOME  = plugins/gnome/gnome.o \
+		plugins/gnome/intf_gnome.o \
 		plugins/gnome/intf_gnome_callbacks.o \
 		plugins/gnome/intf_gnome_interface.o \
 		plugins/gnome/intf_gnome_support.o \
 		plugins/gnome/vout_gnome.o
 
-PLUGIN_MGA    = plugins/mga/intf_mga.o \
-		plugins/fb/vout_mga.o
+PLUGIN_MGA    = plugins/mga/mga.o \
+		plugins/mga/intf_mga.o \
+		plugins/mga/vout_mga.o
 
-PLUGIN_X11    = plugins/x11/intf_x11.o \
+PLUGIN_X11    = plugins/x11/x11.o \
+		plugins/x11/intf_x11.o \
 		plugins/x11/vout_x11.o
+
+PLUGIN_YUV    = plugins/yuv/yuv.o \
+		plugins/yuv/video_yuv.o \
+		plugins/yuv/video_yuv8.o \
+		plugins/yuv/video_yuv15.o \
+		plugins/yuv/video_yuv16.o \
+		plugins/yuv/video_yuv24.o \
+		plugins/yuv/video_yuv32.o
+
+PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
+		plugins/yuvmmx/video_yuv.o \
+		plugins/yuvmmx/video_yuv8.o \
+		plugins/yuvmmx/video_yuv15.o \
+		plugins/yuvmmx/video_yuv16.o \
+		plugins/yuvmmx/video_yuv24.o \
+		plugins/yuvmmx/video_yuv32.o
 
 PLUGIN_OBJ = $(PLUGIN_BEOS) $(PLUGIN_DSP) $(PLUGIN_DUMMY) $(PLUGIN_ESD) \
 		$(PLUGIN_FB) $(PLUGIN_GGI) $(PLUGIN_GLIDE) $(PLUGIN_GNOME) \
-		$(PLUGIN_MGA) $(PLUGIN_X11)
+		$(PLUGIN_MGA) $(PLUGIN_X11) $(PLUGIN_YUV) $(PLUGIN_YUVMMX)
 #
 # Other lists of files
 #
@@ -303,32 +328,32 @@ export
 #
 # Virtual targets
 #
-all: vlc plugins
+all: vlc @ALIASES@ plugins
 
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
+	rm -f vlc @ALIASES@ lib/*.so
 
 distclean: clean
-	rm -f src/*/*.o plugins/*/*.o lib/*.so **/*~ *.log
+	rm -f src/*/*.o plugins/*/*.o **/*~ *.log
 	rm -f Makefile include/defs.h include/config.h
 	rm -f config.status config.cache config.log
-	rm -f vlc gmon.out core build-stamp
+	rm -f gmon.out core build-stamp
 	rm -rf .dep
 
 install:
 	$(INSTALL) vlc $(prefix)/bin
 	mkdir -p $(prefix)/lib/videolan/vlc
-	mkdir -p $(prefix)/share/videolan/vlc
+	mkdir -p $(prefix)/share/videolan
 	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
-	$(INSTALL) -m 644 share/*.psf $(prefix)/share/videolan/vlc
-	$(INSTALL) -m 644 share/*.png $(prefix)/share/videolan/vlc
+	$(INSTALL) -m 644 share/*.psf $(prefix)/share/videolan
+	$(INSTALL) -m 644 share/*.png $(prefix)/share/videolan
 
 show:
-	@echo "Command line for C objects:"
-	@echo $(CC) $(CCFLAGS) $(CFLAGS) -c -o "<dest.o>" "<src.c>"
-	@echo
-	@echo "Command line for assembler objects:"
-	@echo $(CC) $(CFLAGS) -c -o "<dest.o>" "<src.S>"
+	@echo CC: $(CC)
+	@echo CCFLAGS: $(CCFLAGS)
+	@echo DCFLAGS: $(DCFLAGS)
+	@echo LCFLAGS: $(CCFLAGS)
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
@@ -359,6 +384,9 @@ else
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
+gvlc xvlc fbvlc ggivlc glidevlc: vlc
+	rm -f $@ && ln -s vlc $@
+
 plugins: $(PLUGINS)
 
 #
@@ -382,11 +410,9 @@ $(ASM_OBJ): %.o: %.S
 #$(PLUGIN_OBJ): %.so: Makefile.dep
 #$(PLUGIN_OBJ): %.so: .dep/%.d
 
-#$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
-		
 lib/beos.so: $(PLUGIN_BEOS)
-	ld -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
-$(PLUGIN_BEOS): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+$(PLUGIN_BEOS): %.o: %.cpp
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 lib/esd.so: $(PLUGIN_ESD)
@@ -396,6 +422,11 @@ else
 	ld -shared -laudiofile -lesd -o $@ $^
 endif
 $(PLUGIN_ESD): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+
+lib/dsp.so: $(PLUGIN_DSP)
+	ld -shared -o $@ $^
+$(PLUGIN_DSP): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 lib/dummy.so: $(PLUGIN_DUMMY)
@@ -421,7 +452,7 @@ $(PLUGIN_MGA): %.o: %.c
 lib/gnome.so: $(PLUGIN_GNOME)
 	ld -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
 $(PLUGIN_GNOME): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) `gnome-config --cflags gnomeui`-c -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
 
 lib/glide.so: $(PLUGIN_GLIDE)
 	ld -shared -lglide2x -o $@ $^
@@ -431,6 +462,16 @@ $(PLUGIN_GLIDE): %.o: %.c
 lib/ggi.so: $(PLUGIN_GGI)
 	ld -shared -lggi -o $@ $^
 $(PLUGIN_GGI): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+
+lib/yuv.so: $(PLUGIN_YUV)
+	ld -shared -o $@ $^
+$(PLUGIN_YUV): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+
+lib/yuvmmx.so: $(PLUGIN_YUVMMX)
+	ld -shared -o $@ $^
+$(PLUGIN_YUVMMX): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 ################################################################################

@@ -91,9 +91,9 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
                           int i_method, void *p_data )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
+    typedef void    ( vout_getplugin_t ) ( vout_thread_t * p_vout );
     int             i_status;                               /* thread status */
     int             i_index;               /* index for array initialization */
-    char *          psz_method;
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");
@@ -104,29 +104,23 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         return( NULL );
     }
 
-    /* Request an interface plugin */
-    psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
+    p_vout->p_set_palette       = SetPalette;
 
-    if( RequestPlugin( &p_vout->vout_plugin, psz_method ) < 0 )
+    /* Get a suitable video plugin */
+    for( i_index = 0 ; i_index < p_main->p_bank->i_plugin_count ; i_index++ )
     {
-        intf_ErrMsg( "error: could not open video plugin %s.so\n", psz_method );
-        free( p_vout );
-        return( NULL );
+        /* If there's a plugin in p_info ... */
+        if( p_main->p_bank->p_info[ i_index ] != NULL )
+        {
+            /* ... and if this plugin provides the functions we want ... */
+            if( p_main->p_bank->p_info[ i_index ]->vout_GetPlugin != NULL )
+            {
+                /* ... then get these functions */
+                ( (vout_getplugin_t *)
+                  p_main->p_bank->p_info[ i_index ]->vout_GetPlugin )( p_vout );
+            }
+        }
     }
-
-    /* Get plugins */
-    p_vout->p_sys_create = 
-        GetPluginFunction( p_vout->vout_plugin, "vout_SysCreate" );
-    p_vout->p_sys_init =
-        GetPluginFunction( p_vout->vout_plugin, "vout_SysInit" );
-    p_vout->p_sys_end =
-        GetPluginFunction( p_vout->vout_plugin, "vout_SysEnd" );
-    p_vout->p_sys_destroy =
-        GetPluginFunction( p_vout->vout_plugin, "vout_SysDestroy" );
-    p_vout->p_sys_manage =
-        GetPluginFunction( p_vout->vout_plugin, "vout_SysManage" );
-    p_vout->p_sys_display =
-        GetPluginFunction( p_vout->vout_plugin, "vout_SysDisplay" );
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */
@@ -136,8 +130,9 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout->pi_status           = (pi_status != NULL) ? pi_status : &i_status;
     *p_vout->pi_status          = THREAD_CREATE;
 
-    /* Initialize some fields used by the system-dependant method - these fields will
-     * probably be modified by the method, and are only preferences */
+    /* Initialize some fields used by the system-dependant method - these
+     * fields will probably be modified by the method, and are only
+     * preferences */
     p_vout->i_changes           = 0;
     p_vout->i_width             = i_width;
     p_vout->i_height            = i_height;
@@ -151,8 +146,6 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout->b_info              = 0;
     p_vout->b_interface         = 0;
     p_vout->b_scale             = 0;
-
-    p_vout->p_set_palette       = SetPalette;
 
     intf_DbgMsg( "wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
@@ -193,19 +186,23 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
      * own error messages */
     if( p_vout->p_sys_create( p_vout, psz_display, i_root_window, p_data ) )
     {
-        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
-    intf_DbgMsg("actual configuration: %dx%d, %d/%d bpp (%d Bpl), masks: 0x%x/0x%x/0x%x\n",
-                p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
-                p_vout->i_red_mask, p_vout->i_green_mask, p_vout->i_blue_mask );
+    intf_DbgMsg( "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
+                 "masks: 0x%x/0x%x/0x%x\n",
+                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+                 p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
+                 p_vout->i_red_mask, p_vout->i_green_mask,
+                 p_vout->i_blue_mask );
 
     /* Calculate shifts from system-updated masks */
-    MaskToShift( &p_vout->i_red_lshift,   &p_vout->i_red_rshift,   p_vout->i_red_mask );
-    MaskToShift( &p_vout->i_green_lshift, &p_vout->i_green_rshift, p_vout->i_green_mask );
-    MaskToShift( &p_vout->i_blue_lshift,  &p_vout->i_blue_rshift,  p_vout->i_blue_mask );
+    MaskToShift( &p_vout->i_red_lshift, &p_vout->i_red_rshift,
+                 p_vout->i_red_mask );
+    MaskToShift( &p_vout->i_green_lshift, &p_vout->i_green_rshift,
+                 p_vout->i_green_mask );
+    MaskToShift( &p_vout->i_blue_lshift, &p_vout->i_blue_rshift,
+                 p_vout->i_blue_mask );
 
     /* Set some useful colors */
     p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
@@ -215,28 +212,28 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
 
     /* Load fonts - fonts must be initialized after the system method since
      * they may be dependant on screen depth and other thread properties */
-    p_vout->p_default_font      = vout_LoadFont( DATA_PATH "/" VOUT_DEFAULT_FONT );
+    p_vout->p_default_font = vout_LoadFont( DATA_PATH "/" VOUT_DEFAULT_FONT );
     if( p_vout->p_default_font == NULL )
     {
-        p_vout->p_default_font  = vout_LoadFont( "share/" VOUT_DEFAULT_FONT );
+        p_vout->p_default_font = vout_LoadFont( "share/" VOUT_DEFAULT_FONT );
     }
     if( p_vout->p_default_font == NULL )
     {
+        intf_ErrMsg( "vout error: could not load default font\n" );
         p_vout->p_sys_destroy( p_vout );
-        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
-    p_vout->p_large_font        = vout_LoadFont( DATA_PATH "/" VOUT_LARGE_FONT );
+    p_vout->p_large_font = vout_LoadFont( DATA_PATH "/" VOUT_LARGE_FONT );
     if( p_vout->p_large_font == NULL )
     {
-        p_vout->p_large_font    = vout_LoadFont( "share/" VOUT_LARGE_FONT );
+        p_vout->p_large_font = vout_LoadFont( "share/" VOUT_LARGE_FONT );
     }
     if( p_vout->p_large_font == NULL )
     {
+        intf_ErrMsg( "vout error: could not load large font\n" );
         vout_UnloadFont( p_vout->p_default_font );
         p_vout->p_sys_destroy( p_vout );
-        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -246,19 +243,20 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     vlc_mutex_init( &p_vout->subpicture_lock );
     vlc_mutex_init( &p_vout->change_lock );
     vlc_mutex_lock( &p_vout->change_lock );
-    if( vlc_thread_create( &p_vout->thread_id, "video output", (void *) RunThread, (void *) p_vout) )
+    if( vlc_thread_create( &p_vout->thread_id, "video output",
+                           (void *) RunThread, (void *) p_vout) )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
         p_vout->p_sys_destroy( p_vout );
-        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
 
-    intf_Msg("Video display initialized (%dx%d, %d/%d bpp)\n", p_vout->i_width,
-             p_vout->i_height, p_vout->i_screen_depth, p_vout->i_bytes_per_pixel * 8 );
+    intf_Msg( "Video display initialized (%dx%d, %d/%d bpp)\n", p_vout->i_width,
+              p_vout->i_height, p_vout->i_screen_depth,
+              p_vout->i_bytes_per_pixel * 8 );
 
     /* If status is NULL, wait until the thread is created */
     if( pi_status == NULL )
@@ -859,7 +857,7 @@ static int BinaryLog(u32 i)
     }
     if (i != ((u32)1 << i_log))
     {
-        intf_ErrMsg("internal error: binary log overflow\n");
+        intf_DbgMsg("internal error: binary log overflow\n");
     }
 
     return( i_log );
@@ -1256,9 +1254,6 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     vout_UnloadFont( p_vout->p_default_font );
     vout_UnloadFont( p_vout->p_large_font );
     p_vout->p_sys_destroy( p_vout );
-
-    /* Close plugin */
-    TrashPlugin( p_vout->vout_plugin );
 
     /* Free structure */
     free( p_vout );

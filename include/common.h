@@ -47,6 +47,18 @@ typedef unsigned long       count_t;
  * Classes declaration
  *****************************************************************************/
 
+/* Plugins */
+struct plugin_bank_s;
+struct plugin_info_s;
+
+typedef struct plugin_bank_s *          p_plugin_bank_t;
+typedef struct plugin_info_s *          p_plugin_info_t;
+
+/* Playlist */
+struct playlist_s;
+
+typedef struct playlist_s *             p_playlist_t;
+
 /* Interface */
 struct intf_thread_s;
 struct intf_sys_s;

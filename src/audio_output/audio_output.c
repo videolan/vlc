@@ -80,7 +80,8 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
 aout_thread_t *aout_CreateThread( int *pi_status )
 {
     aout_thread_t * p_aout;                             /* thread descriptor */
-    char * psz_method;
+    typedef void    ( aout_getplugin_t ) ( aout_thread_t * p_aout );
+    int             i_index;
 #if 0
     int             i_status;                                 /* thread status */
 #endif
@@ -92,32 +93,27 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
-    /* Request an interface plugin */
-    psz_method = main_GetPszVariable( AOUT_METHOD_VAR, AOUT_DEFAULT_METHOD );
-    
-    if( RequestPlugin( &p_aout->aout_plugin, psz_method ) )
+    /* Get a suitable audio plugin */
+    for( i_index = 0 ; i_index < p_main->p_bank->i_plugin_count ; i_index++ )
     {
-        intf_ErrMsg( "error: could not open audio plugin %s.so\n", psz_method );
-        free( p_aout );
-        return( NULL );
+        /* If there's a plugin in p_info ... */
+        if( p_main->p_bank->p_info[ i_index ] != NULL )
+        {
+            /* ... and if this plugin provides the functions we want ... */
+            if( p_main->p_bank->p_info[ i_index ]->aout_GetPlugin != NULL )
+            {
+                /* ... then get these functions */
+                ( (aout_getplugin_t *)
+                  p_main->p_bank->p_info[ i_index ]->aout_GetPlugin )( p_aout );
+            }
+        }
     }
-
-    /* Get plugins */
-    p_aout->p_sys_open =         GetPluginFunction( p_aout->aout_plugin, "aout_SysOpen" );
-    p_aout->p_sys_reset =        GetPluginFunction( p_aout->aout_plugin, "aout_SysReset" );
-    p_aout->p_sys_setformat =    GetPluginFunction( p_aout->aout_plugin, "aout_SysSetFormat" );
-    p_aout->p_sys_setchannels =  GetPluginFunction( p_aout->aout_plugin, "aout_SysSetChannels" );
-    p_aout->p_sys_setrate =      GetPluginFunction( p_aout->aout_plugin, "aout_SysSetRate" );
-    p_aout->p_sys_getbufinfo =   GetPluginFunction( p_aout->aout_plugin, "aout_SysGetBufInfo" );
-    p_aout->p_sys_playsamples =  GetPluginFunction( p_aout->aout_plugin, "aout_SysPlaySamples" );
-    p_aout->p_sys_close =        GetPluginFunction( p_aout->aout_plugin, "aout_SysClose" );
 
     /*
      * Initialize audio device
      */
     if ( p_aout->p_sys_open( p_aout ) )
     {
-        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
@@ -128,28 +124,24 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if ( p_aout->p_sys_reset( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
     if ( p_aout->p_sys_setformat( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
     if ( p_aout->p_sys_setchannels( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
     if ( p_aout->p_sys_setrate( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
@@ -163,7 +155,6 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if( aout_SpawnThread( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
@@ -329,9 +320,6 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     /* Free the structure */
     p_aout->p_sys_close( p_aout );
     intf_DbgMsg("aout debug: audio device (%s) closed\n", p_aout->psz_device);
-
-    /* Close plugin */
-    TrashPlugin( p_aout->aout_plugin );
 
     /* Free structure */
     free( p_aout );
@@ -746,7 +734,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                             }
                         }
 #define SOUND 1
-#define DEBUG 0
+#define ADEBUG 0
 #define COEFF 2
                         if ( p_aout->fifo[i_fifo].l_units > l_units )
                         {
@@ -771,7 +759,7 @@ l_buffer++;
 */
 #endif
 
-#if DEBUG 
+#if ADEBUG 
 //intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 11 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
 intf_DbgMsg( "p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit );
 intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );
@@ -822,7 +810,7 @@ if( COEFF*p_aout->fifo[i_fifo].l_unit < 60000 )
 */
 #endif
 
-#if DEBUG
+#if ADEBUG
 //intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 21 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
 intf_DbgMsg( "p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit );
 intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );

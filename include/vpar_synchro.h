@@ -33,71 +33,49 @@
  *  "video_fifo.h"
  *****************************************************************************/
 
-#define POLUX_SYNCHRO
+#define SAM_SYNCHRO
+//#define POLUX_SYNCHRO
+//#define MEUUH_SYNCHRO
 
 /*****************************************************************************
  * video_synchro_t and video_synchro_tab_s : timers for the video synchro
  *****************************************************************************/
 #ifdef SAM_SYNCHRO
-typedef struct video_synchro_tab_s
-{
-    double mean;
-    double deviation;
-
-} video_synchro_tab_t;
-
-typedef struct video_synchro_fifo_s
-{
-    /* type of image to be decoded, and decoding date */
-    int i_image_type;
-    mtime_t i_decode_date;
-    mtime_t i_pts;
-
-} video_synchro_fifo_t;
-
 typedef struct video_synchro_s
 {
     /* fifo containing decoding dates */
-    video_synchro_fifo_t fifo[16];
-    unsigned int i_fifo_start;
-    unsigned int i_fifo_stop;
+    mtime_t      i_date_fifo[16];
+    unsigned int i_start;
+    unsigned int i_stop;
 
     /* mean decoding time */
-    mtime_t i_mean_decode_time;
-    /* dates */
-    mtime_t i_last_display_pts;           /* pts of the last displayed image */
-    mtime_t i_last_decode_pts;              /* pts of the last decoded image */
-    mtime_t i_last_i_pts;                         /* pts of the last I image */
-    mtime_t i_last_nondropped_i_pts;      /* pts of last non-dropped I image */
-    unsigned int i_images_since_pts;
+    mtime_t i_delay;
+    mtime_t i_theorical_delay;
 
-    /* il manquait un compteur */
-    unsigned int modulo;
+    /* dates */
+    mtime_t i_last_pts;                   /* pts of the last displayed image */
+    mtime_t i_last_seen_I_pts;              /* date of the last I we decoded */
+    mtime_t i_last_kept_I_pts;            /* pts of last non-dropped I image */
 
     /* P images since the last I */
-    unsigned int current_p_count;
-    unsigned int nondropped_p_count;
-    double p_count_predict;
+    unsigned int i_P_seen;
+    unsigned int i_P_kept;
     /* B images since the last I */
-    unsigned int current_b_count;
-    unsigned int nondropped_b_count;
-    double b_count_predict;
+    unsigned int i_B_seen;
+    unsigned int i_B_kept;
 
     /* can we display pictures ? */
-    unsigned int    can_display_i;
-    unsigned int    can_display_p;
-    double          displayable_p;
-    unsigned int    can_display_b;
-    double          displayable_b;
-
-    /* 1 for linear count, 2 for binary count, 3 for ternary count */
-    video_synchro_tab_t tab_p[6];
-    video_synchro_tab_t tab_b[6];
-
-    double theorical_fps;
-    double actual_fps;
+    boolean_t     b_all_I;
+    boolean_t     b_all_P;
+    double        displayable_p;
+    boolean_t     b_all_B;
+    double        displayable_b;
 
 } video_synchro_t;
+
+#define FIFO_INCREMENT( i_counter ) \
+    p_vpar->synchro.i_counter = (p_vpar->synchro.i_counter + 1) & 0xf;
+
 #endif
 
 #ifdef MEUUH_SYNCHRO
@@ -140,15 +118,15 @@ typedef struct video_synchro_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-boolean_t vpar_SynchroChoose( struct vpar_thread_s * p_vpar, int i_coding_type,
-                         int i_structure );
-void vpar_SynchroTrash( struct vpar_thread_s * p_vpar, int i_coding_type,
-                        int i_structure );
-void vpar_SynchroDecode( struct vpar_thread_s * p_vpar, int i_coding_type,
-                            int i_structure );
-void vpar_SynchroEnd( struct vpar_thread_s * p_vpar );
-mtime_t vpar_SynchroDate( struct vpar_thread_s * p_vpar );
+boolean_t vpar_SynchroChoose    ( struct vpar_thread_s * p_vpar,
+                                  int i_coding_type, int i_structure );
+void vpar_SynchroTrash          ( struct vpar_thread_s * p_vpar,
+                                  int i_coding_type, int i_structure );
+void vpar_SynchroDecode         ( struct vpar_thread_s * p_vpar,
+                                  int i_coding_type, int i_structure );
+void vpar_SynchroEnd            ( struct vpar_thread_s * p_vpar );
+mtime_t vpar_SynchroDate        ( struct vpar_thread_s * p_vpar );
 
 #ifndef SAM_SYNCHRO
-void vpar_SynchroKludge( struct vpar_thread_s *, mtime_t );
+void vpar_SynchroKludge         ( struct vpar_thread_s *, mtime_t );
 #endif

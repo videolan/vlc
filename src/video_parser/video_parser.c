@@ -82,12 +82,13 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
 {
     vpar_thread_t *     p_vpar;
 
-    intf_DbgMsg("vpar debug: creating video parser thread\n");
+    intf_DbgMsg( "vpar debug: creating video parser thread\n" );
 
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_vpar = (vpar_thread_t *)malloc( sizeof(vpar_thread_t) )) == NULL )
     {
-        intf_ErrMsg("vpar error: not enough memory for vpar_CreateThread() to create the new thread\n");
+        intf_ErrMsg( "vpar error: not enough memory "
+                     "for vpar_CreateThread() to create the new thread\n");
         return( NULL );
     }
 
@@ -100,8 +101,8 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     /*
      * Initialize the input properties
      */
-    /* Initialize the decoder fifo's data lock and conditional variable and set
-     * its buffer as empty */
+    /* Initialize the decoder fifo's data lock and conditional variable
+     * and set its buffer as empty */
     vlc_mutex_init( &p_vpar->fifo.data_lock );
     vlc_cond_init( &p_vpar->fifo.data_wait );
     p_vpar->fifo.i_start = 0;
@@ -112,11 +113,12 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vpar->bit_stream.fifo.buffer = 0;
     p_vpar->bit_stream.fifo.i_available = 0;
 
-/* FIXME !!!!?? */
-p_vpar->p_vout = p_main->p_intf->p_vout;
+    /* FIXME !!!!?? */
+    p_vpar->p_vout = p_main->p_intf->p_vout;
 
     /* Spawn the video parser thread */
-    if ( vlc_thread_create(&p_vpar->thread_id, "video parser", (vlc_thread_func_t)RunThread, (void *)p_vpar) )
+    if ( vlc_thread_create( &p_vpar->thread_id, "video parser",
+                            (vlc_thread_func_t)RunThread, (void *)p_vpar ) )
     {
         intf_ErrMsg("vpar error: can't spawn video parser thread\n");
         free( p_vpar );
@@ -136,7 +138,8 @@ p_vpar->p_vout = p_main->p_intf->p_vout;
  *****************************************************************************/
 void vpar_DestroyThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 {
-    intf_DbgMsg("vpar debug: requesting termination of video parser thread %p\n", p_vpar);
+    intf_DbgMsg( "vpar debug: requesting termination of "
+                 "video parser thread %p\n", p_vpar);
 
     /* Ask thread to kill itself */
     p_vpar->b_die = 1;
@@ -180,10 +183,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     int i_dummy;
 #endif
 
-#ifdef SAM_SYNCHRO
-    int i_dummy;
-#endif
-
     intf_DbgMsg("vpar debug: initializing video parser thread %p\n", p_vpar);
 
     /* Our first job is to initialize the bit stream structure with the
@@ -199,8 +198,10 @@ static int InitThread( vpar_thread_t *p_vpar )
         vlc_cond_wait( &p_vpar->fifo.data_wait, &p_vpar->fifo.data_lock );
     }
     p_vpar->bit_stream.p_ts = DECODER_FIFO_START( p_vpar->fifo )->p_first_ts;
-    p_vpar->bit_stream.p_byte = p_vpar->bit_stream.p_ts->buffer + p_vpar->bit_stream.p_ts->i_payload_start;
-    p_vpar->bit_stream.p_end = p_vpar->bit_stream.p_ts->buffer + p_vpar->bit_stream.p_ts->i_payload_end;
+    p_vpar->bit_stream.p_byte = p_vpar->bit_stream.p_ts->buffer
+                                + p_vpar->bit_stream.p_ts->i_payload_start;
+    p_vpar->bit_stream.p_end = p_vpar->bit_stream.p_ts->buffer
+                               + p_vpar->bit_stream.p_ts->i_payload_end;
     vlc_mutex_unlock( &p_vpar->fifo.data_lock );
 
     /* Initialize parsing data */
@@ -251,8 +252,8 @@ static int InitThread( vpar_thread_t *p_vpar )
     }
 #else
     /* Fake a video_decoder thread */
-    if( (p_vpar->pp_vdec[0] = (vdec_thread_t *)malloc(sizeof( vdec_thread_t ))) == NULL
-        || vdec_InitThread( p_vpar->pp_vdec[0] ) )
+    if( (p_vpar->pp_vdec[0] = (vdec_thread_t *)malloc(sizeof( vdec_thread_t )))
+         == NULL || vdec_InitThread( p_vpar->pp_vdec[0] ) )
     {
         return( 1 );
     }
@@ -276,41 +277,28 @@ static int InitThread( vpar_thread_t *p_vpar )
      * Initialize the synchro properties
      */
 #ifdef SAM_SYNCHRO
-    p_vpar->synchro.i_last_decode_pts = 0;
-    p_vpar->synchro.i_last_display_pts = 0;
-    p_vpar->synchro.i_images_since_pts = 0;
+    p_vpar->synchro.i_last_pts = 0;
+
     /* for i frames */
-    p_vpar->synchro.i_last_i_pts = 0;
-    p_vpar->synchro.theorical_fps = 25;
-    p_vpar->synchro.i_last_nondropped_i_pts = 0;
-    p_vpar->synchro.actual_fps = 20;
+    p_vpar->synchro.i_last_seen_I_pts = 0;
+    p_vpar->synchro.i_last_kept_I_pts = 0;
+
     /* the fifo */
-    p_vpar->synchro.i_fifo_start = 0;
-    p_vpar->synchro.i_fifo_stop = 0;
-    /* the counter */
-    p_vpar->synchro.modulo = 0;
+    p_vpar->synchro.i_start  = 0;
+    p_vpar->synchro.i_stop   = 0;
+
     /* mean decoding time - at least 200 ms for a slow machine */
-    p_vpar->synchro.i_mean_decode_time = 200000;
+    p_vpar->synchro.i_delay            = 200000;
+    p_vpar->synchro.i_theorical_delay  = 40000; /* 25 fps */
     /* assume we can display all Is and 2 Ps */
-    p_vpar->synchro.can_display_i = 1;
-    p_vpar->synchro.can_display_p = 0;
+    p_vpar->synchro.b_all_I = 1;
+    p_vpar->synchro.b_all_P = 0;
     p_vpar->synchro.displayable_p = 2;
-    p_vpar->synchro.can_display_b = 0;
+    p_vpar->synchro.b_all_B = 0;
     p_vpar->synchro.displayable_b = 0;
     /* assume there were about 3 P and 6 B images between I's */
-    p_vpar->synchro.current_p_count = 1;
-    p_vpar->synchro.nondropped_p_count = 1;
-    p_vpar->synchro.p_count_predict = 3;
-    p_vpar->synchro.current_b_count = 1;
-    p_vpar->synchro.nondropped_b_count = 1;
-    p_vpar->synchro.b_count_predict = 6;
-    for( i_dummy = 0; i_dummy < 6; i_dummy++)
-    {
-        p_vpar->synchro.tab_p[i_dummy].mean = 3;
-        p_vpar->synchro.tab_p[i_dummy].deviation = .5;
-        p_vpar->synchro.tab_b[i_dummy].mean = 6;
-        p_vpar->synchro.tab_b[i_dummy].deviation = .5;
-    }
+    p_vpar->synchro.i_P_seen = p_vpar->synchro.i_P_kept = 1;
+    p_vpar->synchro.i_B_seen = p_vpar->synchro.i_B_kept = 1;
 #endif
 
 #ifdef MEUUH_SYNCHRO
@@ -411,7 +399,8 @@ static void ErrorThread( vpar_thread_t *p_vpar )
         /* Trash all received PES packets */
         while( !DECODER_FIFO_ISEMPTY(p_vpar->fifo) )
         {
-            input_NetlistFreePES( p_vpar->bit_stream.p_input, DECODER_FIFO_START(p_vpar->fifo) );
+            input_NetlistFreePES( p_vpar->bit_stream.p_input,
+                                  DECODER_FIFO_START(p_vpar->fifo) );
             DECODER_FIFO_INCSTART( p_vpar->fifo );
         }
 

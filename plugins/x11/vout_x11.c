@@ -89,8 +89,6 @@ static int  X11CreateShmImage   ( vout_thread_t *p_vout, XImage **pp_ximage,
                                   XShmSegmentInfo *p_shm_info );
 static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage,
                                   XShmSegmentInfo *p_shm_info );
-static void X11SetPalette       ( p_vout_thread_t p_vout,
-                                  u16 *red, u16 *green, u16 *blue, u16 *transp );
 
 /*****************************************************************************
  * vout_SysCreate: allocate X11 video thread output method
@@ -134,9 +132,6 @@ int vout_SysInit( vout_thread_t *p_vout )
 {
     int i_err;
 
-    /* Initialize palette changing procedure */
-    p_vout->p_set_palette       = X11SetPalette;
-
     /* Create XImages using XShm extension - on failure, fall back to regular
      * way (and destroy the first image if it was created successfully) */
     if( p_vout->p_sys->b_shm )
@@ -157,7 +152,7 @@ int vout_SysInit( vout_thread_t *p_vout )
         }
         if( i_err )                                      /* an error occured */
         {
-            intf_Msg("XShm video sextension desactivated\n" );
+            intf_Msg("XShm video sextension deactivated\n" );
             p_vout->p_sys->b_shm = 0;
         }
     }
@@ -234,7 +229,8 @@ int vout_SysManage( vout_thread_t *p_vout )
     /*
      * Color/Grayscale or gamma change: in 8bpp, just change the colormap
      */
-    if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE) && (p_vout->i_screen_depth == 8) )
+    if( (p_vout->i_changes & VOUT_GRAYSCALE_CHANGE)
+        && (p_vout->i_screen_depth == 8) )
     {
         /* FIXME: clear flags ?? */
     }
@@ -262,7 +258,8 @@ int vout_SysManage( vout_thread_t *p_vout )
         }
 
         /* Tell the video output thread that it will need to rebuild YUV
-         * tables. This is needed since conversion buffer size may have changed */
+         * tables. This is needed since conversion buffer size may have
+	 * changed */
         p_vout->i_changes |= VOUT_YUV_CHANGE;
         intf_Msg("Video display resized (%dx%d)\n", p_vout->i_width, p_vout->i_height);
     }
@@ -301,6 +298,37 @@ void vout_SysDisplay( vout_thread_t *p_vout )
         /* Send the order to the X server */
         XFlush(p_vout->p_sys->p_display);
     }
+}
+
+/*****************************************************************************
+ * vout_SetPalette: sets an 8 bpp palette
+ *****************************************************************************
+ * This function sets the palette given as an argument. It does not return
+ * anything, but could later send information on which colors it was unable
+ * to set.
+ *****************************************************************************/
+void vout_SetPalette( p_vout_thread_t p_vout,
+                      u16 *red, u16 *green, u16 *blue, u16 *transp )
+{
+    int i;
+    XColor color[255];
+
+    intf_DbgMsg( "Palette change called\n" );
+
+    /* allocate palette */
+    for( i = 0; i < 255; i++ )
+    {
+        /* kludge: colors are indexed reversely because color 255 seems
+         * to be reserved for black even if we try to set it to white */
+        color[i].pixel = 255-i;
+        color[i].pad = 0;
+        color[i].flags = DoRed|DoGreen|DoBlue;
+        color[i].red = red[255-i];
+        color[i].blue = blue[255-i];
+        color[i].green = green[255-i];
+    }
+
+    XStoreColors( p_vout->p_sys->p_display, p_vout->p_sys->colormap, color, 256 );
 }
 
 /* following functions are local */
@@ -661,34 +689,4 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
     }
 }
 
-/*****************************************************************************
- * X11SetPalette: sets an 8 bpp palette
- *****************************************************************************
- * This function sets the palette given as an argument. It does not return
- * anything, but could later send information on which colors it was unable
- * to set.
- *****************************************************************************/
-static void X11SetPalette       ( p_vout_thread_t p_vout,
-                                  u16 *red, u16 *green, u16 *blue, u16 *transp )
-{
-    int i;
-    XColor color[255];
-
-    intf_DbgMsg( "Palette change called\n" );
-
-    /* allocate palette */
-    for( i = 0; i < 255; i++ )
-    {
-        /* kludge: colors are indexed reversely because color 255 seems
-         * to be reserved for black even if we try to set it to white */
-        color[i].pixel = 255-i;
-        color[i].pad = 0;
-        color[i].flags = DoRed|DoGreen|DoBlue;
-        color[i].red = red[255-i];
-        color[i].blue = blue[255-i];
-        color[i].green = green[255-i];
-    }
-
-    XStoreColors( p_vout->p_sys->p_display, p_vout->p_sys->colormap, color, 256 );
-}
 

@@ -104,9 +104,14 @@ int intf_SysCreate( intf_thread_t *p_intf )
 
     /* set keyboard settings */
     if (tcgetattr(0, &p_intf->p_sys->old_termios) == -1)
+    {
         intf_ErrMsg( "intf error: tcgetattr" );
+    }
+
     if (tcgetattr(0, &p_intf->p_sys->new_termios) == -1)
+    {
         intf_ErrMsg( "intf error: tcgetattr" );
+    }
 
     p_intf->p_sys->new_termios.c_lflag &= ~ (ICANON | ISIG);
     p_intf->p_sys->new_termios.c_lflag |= (ECHO | ECHOCTL);
@@ -115,7 +120,9 @@ int intf_SysCreate( intf_thread_t *p_intf )
     p_intf->p_sys->new_termios.c_cc[VTIME] = 0;
 
     if (tcsetattr(0, TCSAFLUSH, &p_intf->p_sys->new_termios) == -1)
+    {
         intf_ErrMsg( "intf error: tcsetattr" );
+    }
 
     ioctl(p_intf->p_sys->i_tty_dev, VT_RELDISP, VT_ACKACQ);
 
@@ -126,17 +133,22 @@ int intf_SysCreate( intf_thread_t *p_intf )
     if( sigaction( SIGUSR1, &sig_tty, &p_intf->p_sys->sig_usr1 ) ||
         sigaction( SIGUSR2, &sig_tty, &p_intf->p_sys->sig_usr2 ) )
     {
-        intf_ErrMsg("intf error: can't set up signal handler (%s)\n", strerror(errno) );
+        intf_ErrMsg( "intf error: can't set up signal handler (%s)\n",
+                     strerror(errno) );
+        tcsetattr(0, 0, &p_intf->p_sys->old_termios);
         FBTextMode( p_intf->p_sys->i_tty_dev );
         return( 1 );
     }
 
     /* Set-up tty according to new signal handler */
-    if( ioctl(p_intf->p_sys->i_tty_dev, VT_GETMODE, &p_intf->p_sys->vt_mode) == -1 )
+    if( ioctl(p_intf->p_sys->i_tty_dev, VT_GETMODE, &p_intf->p_sys->vt_mode)
+        == -1 )
     {
-        intf_ErrMsg("intf error: cant get terminal mode (%s)\n", strerror(errno) );
+        intf_ErrMsg( "intf error: cant get terminal mode (%s)\n",
+                     strerror(errno) );
         sigaction( SIGUSR1, &p_intf->p_sys->sig_usr1, NULL );
         sigaction( SIGUSR2, &p_intf->p_sys->sig_usr2, NULL );
+        tcsetattr(0, 0, &p_intf->p_sys->old_termios);
         FBTextMode( p_intf->p_sys->i_tty_dev );
         return( 1 );
     }
@@ -148,9 +160,11 @@ int intf_SysCreate( intf_thread_t *p_intf )
 
     if( ioctl(p_intf->p_sys->i_tty_dev, VT_SETMODE, &vt_mode) == -1 )
     {
-        intf_ErrMsg("intf error: can't set terminal mode (%s)\n", strerror(errno) );
+        intf_ErrMsg( "intf error: can't set terminal mode (%s)\n",
+                     strerror(errno) );
         sigaction( SIGUSR1, &p_intf->p_sys->sig_usr1, NULL );
         sigaction( SIGUSR2, &p_intf->p_sys->sig_usr2, NULL );
+        tcsetattr(0, 0, &p_intf->p_sys->old_termios);
         FBTextMode( p_intf->p_sys->i_tty_dev );
         return( 1 );
     }
@@ -160,14 +174,17 @@ int intf_SysCreate( intf_thread_t *p_intf )
     {
         p_intf->p_vout = vout_CreateThread( NULL, 0,
                                             p_intf->p_sys->i_width,
-                                            p_intf->p_sys->i_height, NULL, 0, NULL );
+                                            p_intf->p_sys->i_height,
+                                            NULL, 0, NULL );
         if( p_intf->p_vout == NULL )                          /* XXX?? error */
         {
             intf_ErrMsg("intf error: can't create output thread\n" );
-            ioctl(p_intf->p_sys->i_tty_dev, VT_SETMODE, &p_intf->p_sys->vt_mode);
+            ioctl( p_intf->p_sys->i_tty_dev, VT_SETMODE,
+                   &p_intf->p_sys->vt_mode );
             sigaction( SIGUSR1, &p_intf->p_sys->sig_usr1, NULL );
             sigaction( SIGUSR2, &p_intf->p_sys->sig_usr2, NULL );
             free( p_intf->p_sys );
+            tcsetattr(0, 0, &p_intf->p_sys->old_termios);
             FBTextMode( p_intf->p_sys->i_tty_dev );
             return( 1 );
         }
@@ -224,8 +241,8 @@ void intf_SysManage( intf_thread_t *p_intf )
 /*****************************************************************************
  * FBSwitchDisplay: VT change signal handler
  *****************************************************************************
- * This function activate or desactivate the output of the thread. It is called
- * by the VT driver, on terminal change.
+ * This function activates or deactivates the output of the thread. It is
+ * called by the VT driver, on terminal change.
  *****************************************************************************/
 static void FBSwitchDisplay(int i_signal)
 {

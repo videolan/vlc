@@ -51,6 +51,18 @@ typedef struct spudec_thread_s
 } spudec_thread_t;
 
 /*****************************************************************************
+ * SPU commands
+ *****************************************************************************/
+#define SPU_CMD_FORCE_DISPLAY       0x00
+#define SPU_CMD_START_DISPLAY       0x01
+#define SPU_CMD_STOP_DISPLAY        0x02
+#define SPU_CMD_SET_PALETTE         0x03
+#define SPU_CMD_SET_ALPHACHANNEL    0x04
+#define SPU_CMD_SET_COORDINATES     0x05
+#define SPU_CMD_SET_OFFSETS         0x06
+#define SPU_CMD_END                 0xff
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 spudec_thread_t *       spudec_CreateThread( input_thread_t * p_input );

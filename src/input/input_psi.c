@@ -38,6 +38,7 @@
 #include "threads.h"
 #include "mtime.h"
 #include "intf_msg.h"
+#include "plugins.h"
 #include "debug.h"
 
 #include "input.h"

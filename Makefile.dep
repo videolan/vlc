@@ -14,8 +14,8 @@
 ################################################################################
 
 default:
-	@echo "This Makefile should not be called directly - see notes at end of"
-	@echo "main Makefile."
+	@echo "This Makefile should not be called directly,"
+	@echo "see notes at end of main Makefile."
 
 ################################################################################
 # Dependancies creation
@@ -30,6 +30,7 @@ $(dependancies): .dep/%.d: %.c
 	@test -d .dep/$(dir $*) || mkdir -p .dep/$(dir $*)
 	#@echo "generating dependancies for $*.c"
 	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) $< \
-		| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
-		.dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
-		[ -s $@ ] || rm -f $@'
+	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
+	.dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
+	[ -s $@ ] || rm -f $@'
+

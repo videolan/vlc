@@ -433,11 +433,7 @@ static void EndThread( input_thread_t * p_input )
         {
         case MPEG1_VIDEO_ES:
         case MPEG2_VIDEO_ES:
-#ifdef OLD_DECODER
-            vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
-#else
             vpar_DestroyThread( (vpar_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
-#endif
             break;
         case MPEG1_AUDIO_ES:
         case MPEG2_AUDIO_ES:
@@ -1212,11 +1208,7 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
         {
             case MPEG1_VIDEO_ES:
             case MPEG2_VIDEO_ES:
-#ifdef OLD_DECODER
-                p_fifo = &(((vdec_thread_t*)(p_es_descriptor->p_dec))->fifo);
-#else
                 p_fifo = &(((vpar_thread_t*)(p_es_descriptor->p_dec))->fifo);
-#endif
                 break;
 
             case MPEG1_AUDIO_ES:
@@ -1225,8 +1217,6 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
                 break;
 
             case AC3_AUDIO_ES:
-                /* we skip 4 bytes at the beginning of the AC3 payload */
-                //p_ts->i_payload_start += 4;
                 p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
                 break;
 
@@ -1293,8 +1283,9 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
 /*****************************************************************************
  * input_DemuxPSI:
  *****************************************************************************
- * Notice that current ES state has been locked by input_SortPacket. (No more true,
- * changed by benny - FIXME: See if it's ok, and definitely change the code ?? )
+ * Notice that current ES state has been locked by input_SortPacket.
+ * (No more true, changed by benny - FIXME: See if it's ok, and definitely
+ * change the code ?? )
  *****************************************************************************/
 static __inline__ void input_DemuxPSI( input_thread_t *p_input,
                                        ts_packet_t *p_ts_packet,
@@ -1303,7 +1294,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
 {
     int i_data_offset;    /* Offset of the interesting data in the TS packet */
     u16 i_data_length;                               /* Length of those data */
-    //boolean_t b_first_section; /* Was there another section in the TS packet ? */
+  //boolean_t b_first_section;         /* another section in the TS packet ? */
 
     ASSERT(p_input);
     ASSERT(p_ts_packet);
@@ -1322,13 +1313,14 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
        It will be set to a correct value if the data are not corrupted */
     i_data_offset = TS_PACKET_SIZE;
 
-    /* Has the reassembly of a section already began in a previous packet ? */
+    /* Has the reassembly of a section already begun in a previous packet ? */
     if( p_psi->b_running_section )
     {
         /* Was data lost since the last TS packet ? */
         if( b_packet_lost )
         {
-            /* Discard the packet and wait for the begining of a new one to resynch */
+            /* Discard the packet and wait for the begining of a new one
+             * to resynch */
             p_psi->b_running_section = 0;
             p_psi->i_current_position = 0;
             intf_DbgMsg( "PSI section(s) discarded due to packet loss\n" );
@@ -1350,35 +1342,36 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
         if( b_unit_start )
         {
             /* Get the offset at which the data for that section can be found
-               The offset is stored in the pointer_field since we are interested in
-               the first section of the TS packet. Note that the +1 is to bypass
-               the pointer field */
+               The offset is stored in the pointer_field since we are
+               interested in the first section of the TS packet. Note that
+               the +1 is to bypass the pointer field */
             i_data_offset = p_ts_packet->i_payload_start +
                             p_ts_packet->buffer[p_ts_packet->i_payload_start] + 1;
             //intf_DbgMsg( "New section beginning at offset %d in TS packet\n", i_data_offset );
         }
         else
         {
-            /* This may either mean that the TS is bad or that the packet contains
-               the end of a section that had been discarded in a previous loop:
-               trash the TS packet since we cannot do anything with those data: */
+            /* This may either mean that the TS is bad or that the packet
+             * contains the end of a section that had been discarded in a
+             * previous loop: trash the TS packet since we cannot do
+             * anything with those data: */
             p_psi->b_running_section = 0;
             p_psi->i_current_position = 0;
             intf_DbgMsg( "PSI packet discarded due to lack of synchronisation\n" );
         }
     }
 
-    /* The section we will deal with during the first iteration of the following
-       loop is the first one contained in the TS packet */
+    /* The section we will deal with during the first iteration of the
+     * following loop is the first one contained in the TS packet */
     //    b_first_section = 1;
 
-    /* Reassemble the pieces of sections contained in the TS packet and decode
-       the sections that could have been completed.
-       Stop when we reach the end of the packet or stuffing bytes */
+    /* Reassemble the pieces of sections contained in the TS packet and
+     * decode the sections that could have been completed.
+     * Stop when we reach the end of the packet or stuffing bytes */
     while( i_data_offset < TS_PACKET_SIZE && p_ts_packet->buffer[i_data_offset] != 0xFF )
     {
-        /* If the current section is a new one, reinit the data fields of the p_psi
-           struct to start its decoding */
+        /* If the current section is a new one, reinit the data fields of
+         * the p_psi struct to start its decoding */
         if( !p_psi->b_running_section )
         {
             /* Read the length of the new section */
@@ -1386,7 +1379,8 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
             //intf_DbgMsg( "Section length %d\n", p_psi->i_length );
             if( p_psi->i_length > PSI_SECTION_SIZE )
             {
-                /* The TS packet is corrupted, stop here to avoid possible a seg fault */
+                /* The TS packet is corrupted, stop here to avoid possible
+                 * a seg fault */
                 intf_DbgMsg( "PSI Section size is too big, aborting its reception\n" );
                 break;
             }

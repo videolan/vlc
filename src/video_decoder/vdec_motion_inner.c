@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vdec_motion.c : motion compensation routines
+ * vdec_motion_inner.c : motion compensation inner routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *

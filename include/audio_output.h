@@ -4,6 +4,7 @@
  * Copyright (C) 1999, 2000 VideoLAN
  *
  * Authors:
+ * Michel Kaempf <maxx@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -191,7 +192,6 @@ typedef struct aout_thread_s
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
 
     /* Plugins */
-    plugin_id_t                 aout_plugin;          /* video output plugin */
     aout_sys_open_t *           p_sys_open;
     aout_sys_reset_t *          p_sys_reset;
     aout_sys_setformat_t *      p_sys_setformat;

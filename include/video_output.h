@@ -109,8 +109,13 @@ typedef void (vout_sys_end_t)       ( p_vout_thread_t p_vout );
 typedef void (vout_sys_destroy_t)   ( p_vout_thread_t p_vout );
 typedef int  (vout_sys_manage_t)    ( p_vout_thread_t p_vout );
 typedef void (vout_sys_display_t)   ( p_vout_thread_t p_vout );
+
 typedef void (vout_set_palette_t)   ( p_vout_thread_t p_vout, u16 *red,
                                       u16 *green, u16 *blue, u16 *transp );
+
+typedef int  (yuv_sys_init_t)       ( p_vout_thread_t p_vout );
+typedef int  (yuv_sys_reset_t)      ( p_vout_thread_t p_vout );
+typedef void (yuv_sys_end_t)        ( p_vout_thread_t p_vout );
 
 typedef struct vout_thread_s
 {
@@ -152,14 +157,18 @@ typedef struct vout_thread_s
     u32                 i_blue_pixel;                                /* blue */
 
     /* Plugins */
-    plugin_id_t             vout_plugin;              /* video output plugin */
     vout_sys_create_t *     p_sys_create;          /* allocate output method */
     vout_sys_init_t *       p_sys_init;          /* initialize output method */
     vout_sys_end_t *        p_sys_end;            /* terminate output method */
     vout_sys_destroy_t *    p_sys_destroy;          /* destroy output method */
     vout_sys_manage_t *     p_sys_manage;                   /* handle events */
     vout_sys_display_t *    p_sys_display;         /* display rendered image */
-    vout_set_palette_t *    p_set_palette;              /* sets 8bpp palette */
+
+    vout_set_palette_t *    p_set_palette;               /* set 8bpp palette */
+
+    yuv_sys_init_t *        p_yuv_init;             /* initialize YUV tables */
+    yuv_sys_reset_t *       p_yuv_reset;                 /* reset YUV tables */
+    yuv_sys_end_t *         p_yuv_end;                    /* free YUV tables */
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;           /* color or grayscale display */

@@ -1,15 +1,30 @@
-Tue Jun 20 14:17:56 CEST 2000
+[insert date here]
 0.1.99d :
 
   * fixed RPM build
   * .deb is now more lintian-friendly
+  * fixed vlc.spec to install nicely
+  * PLUGIN_PATH and DATA_PATH now in include/*.h
+  * removed a few useless warning messages
+  * removed remaining header stuff related to the old non-free decoder
+  * fixed the MGA build (doesn't work yet, though)
+  * new plugin API
+  * updated the INSTALL document
+  * plugin auto-detection
+  * fixed a few misspellings in the code
+  * removed the default --enable-ppro option because it didn't work on K6-2
+  * the framebuffer client now leaves the console in a working state
+  * the dithered 8 bpp YUV transformation works again (blame bbp !)
+  * the YUV transformations are now plugins as well
+  * alternative symlinks like gvlc, fbvlc are now created at compile time
+  * borrowed libmpeg2's GPLed MMX YUV transformations (16 and 32 bits)
 
 Sun Jun 18 18:54:48 CEST 2000
 0.1.99c :
 
   * fixed Makefile.in for debug version
   * caught Delete Window event in Gnome and X11 modes
-  * fixed manpage
+  * fixed man page
   * GGI output now works
   * fixed a segfault on exit for the Gnome plugin
   * fixed compile problems for BeOS
@@ -23,4 +38,9 @@ Sat Jun 17 03:35:02 CEST 2000
   * fixed a bug preventing to quit when run with no arguments
   * new VLAN changing code
   * created the ChangeLog file :)
+
+Thu Jun 15 20:48:54 CEST 2000
+0.1.99a :
+
+  * first public release
 

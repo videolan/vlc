@@ -40,6 +40,7 @@
 #include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
+#include "playlist.h"
 #include "input_vlan.h"
 #include "input_ps.h"
 
@@ -132,7 +133,8 @@ main_t *p_main;
  * Local prototypes
  *****************************************************************************/
 static void SetDefaultConfiguration ( void );
-static int  GetConfiguration        ( int i_argc, char *ppsz_argv[], char *ppsz_env[] );
+static int  GetConfiguration        ( int i_argc, char *ppsz_argv[],
+                                      char *ppsz_env[] );
 static void Usage                   ( int i_fashion );
 static void Version                 ( void );
 
@@ -147,131 +149,152 @@ static int  TestMMX                 ( void );
  *****************************************************************************
  * Steps during program execution are:
  *      -configuration parsing and messages interface initialization
- *      -openning of audio output device and some global modules
+ *      -opening of audio output device and some global modules
  *      -execution of interface, which exit on error or on user request
  *      -closing of audio output device and some global modules
- * On error, the spawned threads are cancelled, and the open devices closed.
+ * On error, the spawned threads are canceled, and the open devices closed.
  *****************************************************************************/
 int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     main_t  main_data;                      /* root of all data - see main.h */
-    char **p_playlist;
-    int i_list_index;
 
     p_main = &main_data;                       /* set up the global variable */
 
+#ifdef SYS_BEOS
     /*
      * System specific initialization code
      */
-#ifdef SYS_BEOS
-    beos_Init();
+    beos_Create();
 #endif
 
-    /*
-     * Read configuration, initialize messages interface and set up program
-     */
 #ifdef HAVE_MMX
+    /*
+     * Test if our code is likely to run on this CPU 
+     */
     if( !TestMMX() )
     {
-        fprintf( stderr, "Sorry, this program needs an MMX processor. Please run the non-MMX version.\n" );
+        fprintf( stderr, "Sorry, this program needs an MMX processor. "
+                         "Please run the non-MMX version.\n" );
         return( 1 );
     }
 #endif
+
+    /*
+     * Initialize messages interface
+     */
     p_main->p_msg = intf_MsgCreate();
     if( !p_main->p_msg )                         /* start messages interface */
     {
-        fprintf( stderr, "critical error: can't initialize messages interface (%s)\n",
+        fprintf( stderr, "error: can't initialize messages interface (%s)\n",
                 strerror(errno) );
         return( errno );
     }
+
+    /*
+     * Read configuration
+     */
     if( GetConfiguration( i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
     {
         intf_MsgDestroy();
+        fprintf( stderr, "error: can't read configuration (%s)\n",
+                strerror(errno) );
         return( errno );
     }
 
-    /* get command line files */
-    i_list_index = 0;
-
-    if( optind < i_argc )
+    /*
+     * Initialize playlist and get commandline files
+     */
+    p_main->p_playlist = playlist_Create( );
+    if( !p_main->p_playlist )
     {
-        int i_index = 0;
-        p_playlist = malloc( (i_list_index = i_argc - optind)
-                                        * sizeof(int) );
-
-        while( i_argc - i_index > optind )
-        {
-            p_playlist[ i_index ] = ppsz_argv[ i_argc - i_index - 1];
-            i_index++;
-        }
+        intf_Msg( "Playlist initialization failed\n" );
+        intf_MsgDestroy();
+        return( errno );
     }
-    else
+    playlist_Init( p_main->p_playlist, optind );
+
+    /*
+     * Initialize plugin bank
+     */
+    p_main->p_bank = bank_Create( );
+    if( !p_main->p_bank )
     {
-        p_playlist = NULL;
+        intf_Msg( "Plugin bank initialization failed\n" );
+        playlist_Destroy( p_main->p_playlist );
+        intf_MsgDestroy();
+        return( errno );
     }
-
-    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );          /* print welcome message */
+    bank_Init( p_main->p_bank );
 
     /*
      * Initialize shared resources and libraries
      */
-    if( main_data.b_vlans && input_VlanCreate() )
+    if( p_main->b_vlans && input_VlanCreate() )
     {
-        /* On error during vlans initialization, switch of vlans */
-        intf_Msg( "Virtual LANs initialization failed : vlans management is deactivated\n" );
-        main_data.b_vlans = 0;
+        /* On error during vlans initialization, switch off vlans */
+        intf_Msg( "Virtual LANs initialization failed : "
+                  "vlans management is deactivated\n" );
+        p_main->b_vlans = 0;
     }
 
     /*
      * Open audio device and start aout thread
      */
-    if( main_data.b_audio )
+    if( p_main->b_audio )
     {
-        main_data.p_aout = aout_CreateThread( NULL );
-        if( main_data.p_aout == NULL )
+        p_main->p_aout = aout_CreateThread( NULL );
+        if( p_main->p_aout == NULL )
         {
-            /* On error during audio initialization, switch of audio */
+            /* On error during audio initialization, switch off audio */
             intf_Msg( "Audio initialization failed : audio is deactivated\n" );
-            main_data.b_audio = 0;
+            p_main->b_audio = 0;
         }
     }
 
     /*
      * Run interface
      */
-    main_data.p_intf = intf_Create();
-    if( main_data.p_intf != NULL )
+    p_main->p_intf = intf_Create();
+    if( p_main->p_intf != NULL )
     {
-        main_data.p_intf->p_playlist = p_playlist;
-        main_data.p_intf->i_list_index = i_list_index;
-
         InitSignalHandler();             /* prepare signals for interception */
 
-        intf_Run( main_data.p_intf );
-        intf_Destroy( main_data.p_intf );
+        intf_Run( p_main->p_intf );
+
+        intf_Destroy( p_main->p_intf );
     }
 
     /*
      * Close audio device
      */
-    if( main_data.b_audio )
+    if( p_main->b_audio )
     {
-        aout_DestroyThread( main_data.p_aout, NULL );
+        aout_DestroyThread( p_main->p_aout, NULL );
     }
 
     /*
      * Free shared resources and libraries
      */
-    if( main_data.b_vlans )
+    if( p_main->b_vlans )
     {
         input_VlanDestroy();
     }
 
     /*
+     * Free plugin bank
+     */
+    bank_Destroy( p_main->p_bank );
+
+    /*
+     * Free playlist
+     */
+    playlist_Destroy( p_main->p_playlist );
+
+#ifdef SYS_BEOS
+    /*
      * System specific cleaning code
      */
-#ifdef SYS_BEOS
-    beos_Clean();
+    beos_Destroy();
 #endif
 
     /*
@@ -279,6 +302,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      */
     intf_Msg( "Program terminated.\n" );
     intf_MsgDestroy();
+
     return( 0 );
 }
 
@@ -515,7 +539,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 static void Usage( int i_fashion )
 {
     /* Usage */
-    intf_Msg( "Usage: vlc [options] [parameters]\n" );
+    intf_Msg( "Usage: vlc [options] [parameters] [file]...\n" );
 
     if( i_fashion == USAGE )
     {
@@ -653,18 +677,18 @@ static void SignalHandler( int i_signal )
  * TestMMX: tests if the processor has MMX support.
  *****************************************************************************
  * This function is called if HAVE_MMX is enabled, to check whether the
- * cpu really supports MMX.
+ * CPU really supports MMX.
  *****************************************************************************/
 static int TestMMX( void )
 {
-/* FIXME: under beos, gcc does not support the foolowing inline assembly */ 
+/* FIXME: under beos, gcc does not support the following inline assembly */ 
 #ifdef SYS_BEOS
     return( 1 );
 #else
 
     int i_reg, i_dummy = 0;
 
-    /* test for a 386 cpu */
+    /* test for a 386 CPU */
     asm volatile ( "pushfl
                     popl %%eax
                     movl %%eax, %%ecx
@@ -680,7 +704,7 @@ static int TestMMX( void )
     if( !i_reg )
         return( 0 );
 
-    /* test for a 486 cpu */
+    /* test for a 486 CPU */
     asm volatile ( "movl %%ecx, %%eax
                     xorl $0x200000, %%eax
                     pushl %%eax
@@ -696,7 +720,7 @@ static int TestMMX( void )
     if( !i_reg )
         return( 0 );
 
-    /* the cpu supports the CPUID instruction - get its level */
+    /* the CPU supports the CPUID instruction - get its level */
     asm volatile ( "cpuid"
                  : "=a" ( i_reg ),
                    "=b" ( i_dummy ),
@@ -705,7 +729,7 @@ static int TestMMX( void )
                  : "a"  ( 0 ),       /* level 0 */
                    "b"  ( i_dummy ) ); /* buggy compiler shouldn't complain */
 
-    /* this shouldn't happen on a normal cpu */
+    /* this shouldn't happen on a normal CPU */
     if( !i_reg )
         return( 0 );
 

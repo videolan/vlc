@@ -212,14 +212,14 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     i_file = open( psz_name, O_RDONLY );
     if( i_file == -1 )
     {
-        intf_ErrMsg("error: can't open file '%s' (%s)\n", psz_name, strerror(errno));
+        intf_DbgMsg("vout: can't open file '%s' (%s)\n", psz_name, strerror(errno));
         return( NULL );
     }
 
     /* Read magick number */
     if( read( i_file, pi_buffer, 2 ) != 2 )
     {
-        intf_ErrMsg("error: unexpected end of file '%s'\n", psz_name );
+        intf_ErrMsg("vout error: unexpected end of file '%s'\n", psz_name );
         close( i_file );
         return( NULL );
     }
@@ -228,7 +228,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     p_font = malloc( sizeof( vout_font_t ) );
     if( p_font == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
         close( i_file );
         return( NULL );
     }
@@ -239,7 +239,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     case 0x3604:                                              /* .psf file */
         /*
          * PSF font: simple fixed font. Only the first 256 characters are read.
-         * Those fonts are always 1 byte width, and 256 or 512 characters long.
+         * Those fonts are always 1 byte wide, and 256 or 512 characters long.
          */
 
         /* Read font header - two bytes indicate the font properties */
@@ -320,7 +320,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
  *****************************************************************************/
 void vout_UnloadFont( vout_font_t *p_font )
 {
-    intf_DbgMsg( "font %p\n", p_font );
+    intf_DbgMsg( "vout: unloading font %p\n", p_font );
     free( p_font->p_data );
     free( p_font );
 }

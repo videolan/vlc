@@ -126,7 +126,8 @@ spudec_thread_t * spudec_CreateThread( input_thread_t * p_input )
  *****************************************************************************/
 void spudec_DestroyThread( spudec_thread_t *p_spudec )
 {
-    intf_DbgMsg("spudec debug: requesting termination of spu decoder thread %p\n", p_spudec);
+    intf_DbgMsg( "spudec debug: requesting termination of "
+                 "spu decoder thread %p\n", p_spudec);
 
     /* Ask thread to kill itself */
     p_spudec->b_die = 1;
@@ -180,7 +181,7 @@ static int InitThread( spudec_thread_t *p_spudec )
 /*****************************************************************************
  * RunThread: spu decoder thread
  *****************************************************************************
- * spu decoder thread. This function does only return when the thread is
+ * spu decoder thread. This function only returns when the thread is
  * terminated.
  *****************************************************************************/
 static void RunThread( spudec_thread_t *p_spudec )
@@ -213,7 +214,7 @@ static void RunThread( spudec_thread_t *p_spudec )
         while( !DECODER_FIFO_ISEMPTY(p_spudec->fifo) )
         {
             /* wait for the next SPU ID.
-             * XXX: We trash 0xff bytes since they come from
+             * XXX: We trash 0xff bytes since they probably come from
              * an incomplete previous packet */
             do
             {
@@ -284,30 +285,30 @@ static void RunThread( spudec_thread_t *p_spudec )
 
                         switch( i_cmd )
                         {
-                            case 0x00:
+                            case SPU_CMD_FORCE_DISPLAY:
                                 /* 00 (force displaying) */
                                 break;
                             /* FIXME: here we have to calculate dates. It's
                              * around i_date * 12000 but I don't know
                              * how much exactly.
                              */
-                            case 0x01:
+                            case SPU_CMD_START_DISPLAY:
                                 /* 01 (start displaying) */
                                 p_spu->begin_date += ( i_date * 12000 );
                                 break;
-                            case 0x02:
+                            case SPU_CMD_STOP_DISPLAY:
                                 /* 02 (stop displaying) */
                                 p_spu->end_date += ( i_date * 12000 );
                                 break;
-                            case 0x03:
+                            case SPU_CMD_SET_PALETTE:
                                 /* 03xxxx (palette) */
                                 GetWord( i_word );
                                 break;
-                            case 0x04:
+                            case SPU_CMD_SET_ALPHACHANNEL:
                                 /* 04xxxx (alpha channel) */
                                 GetWord( i_word );
                                 break;
-                            case 0x05:
+                            case SPU_CMD_SET_COORDINATES:
                                 /* 05xxxyyyxxxyyy (coordinates) */
                                 i_word = GetByte( &p_spudec->bit_stream );
                                 p_spu->i_x = (i_word << 4)
@@ -327,26 +328,29 @@ static void RunThread( spudec_thread_t *p_spudec )
 
 				i_index += 6;
                                 break;
-                            case 0x06:
+                            case SPU_CMD_SET_OFFSETS:
                                 /* 06xxxxyyyy (byte offsets) */
                                 GetWord( i_word );
                                 p_spu->type.spu.i_offset[0] = i_word - 4;
                                 GetWord( i_word );
                                 p_spu->type.spu.i_offset[1] = i_word - 4;
                                 break;
-                            case 0xff:
+                            case SPU_CMD_END:
                                 /* ff (end) */
                                 break;
                             default:
                                 /* ?? (unknown command) */
+                                intf_ErrMsg( "spudec: unknown command 0x%.2x\n",
+                                             i_cmd );
                                 break;
                         }
                     }
-                    while( i_cmd != 0xff );
+                    while( i_cmd != SPU_CMD_END );
                 }
                 while( !b_finished );
 
-                /* SPU is finished - we can display it */
+                /* SPU is finished - we can tell the video output
+                 * to display it */
                 vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
             }
             else 

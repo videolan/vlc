@@ -126,7 +126,6 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                 {
                     
                     case AC3_AUDIO_ES:
-                        intf_Msg( "Start an AC3 decoder\n" );
                         /* Spawn ac3 thread */
                         if ( ((ac3dec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
                             ac3dec_CreateThread(p_input)) == NULL )
@@ -139,11 +138,12 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 
 		             case LPCM_AUDIO_ES:
                         /* Spawn lpcm thread */
-                        intf_Msg ( "Start a LPCM decoder\n" );
-                        if ( ((lpcmdec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
-                            lpcmdec_CreateThread(p_input)) == NULL )
+                        if ( ((lpcmdec_thread_t *)
+                              (p_input->p_es[i_es_loop].p_dec) =
+                              lpcmdec_CreateThread(p_input)) == NULL )
                         {
-                            intf_ErrMsg( "LPCM Debug: Could not start lpcm decoder\n" );
+                            intf_ErrMsg( "LPCM Debug: Could not start "
+                                         "lpcm decoder\n" );
                             vlc_mutex_unlock( &p_input->es_lock );
                             return( -1 );
                         }
@@ -152,8 +152,9 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 
                     case DVD_SPU_ES:
                         /* Spawn spu thread */
-                        if ( ((spudec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
-                            spudec_CreateThread(p_input)) == NULL )
+                        if ( ((spudec_thread_t *)
+                              (p_input->p_es[i_es_loop].p_dec) =
+                              spudec_CreateThread(p_input)) == NULL )
                         {
                             intf_ErrMsg( "Could not start spu decoder\n" );
                             vlc_mutex_unlock( &p_input->es_lock );
@@ -176,19 +177,10 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                     case MPEG1_VIDEO_ES:
                     case MPEG2_VIDEO_ES:
                         /* Spawn video thread. */
-#ifdef OLD_DECODER
-                        if( ((vdec_thread_t*)(p_input->p_es[i_es_loop].p_dec) =
-                            vdec_CreateThread( p_input )) == NULL )
-#else
                         if( ((vpar_thread_t*)(p_input->p_es[i_es_loop].p_dec) =
                             vpar_CreateThread( p_input )) == NULL )
-#endif
                         {
-#ifdef OLD_DECODER
-                            intf_ErrMsg("Could not start video decoder\n");
-#else
                             intf_ErrMsg("Could not start video parser\n");
-#endif
                             vlc_mutex_unlock( &p_input->es_lock );
                             return( -1 );
                         }
@@ -196,7 +188,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 
                     default:
                         /* That should never happen. */
-                        intf_DbgMsg("input error: unknown stream type (0x%.2x)\n",
+                        intf_DbgMsg( "input error: unknown stream (0x%.2x)\n",
                                     p_input->p_es[i_es_loop].i_type);
                         vlc_mutex_unlock( &p_input->es_lock );
                         return( -1 );
@@ -209,8 +201,10 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                 p_input->p_es[i_es_loop].b_random = 0;
 
                 /* Mark stream to be demultiplexed. */
-                intf_DbgMsg("Stream %d added in %d\n", i_current_id, i_selected_es_loop);
-                p_input->pp_selected_es[i_selected_es_loop] = &p_input->p_es[i_es_loop];
+                intf_DbgMsg( "Stream %d added in %d\n",
+                             i_current_id, i_selected_es_loop);
+                p_input->pp_selected_es[i_selected_es_loop] =
+                                                 &p_input->p_es[i_es_loop];
                 vlc_mutex_unlock( &p_input->es_lock );
                 return( 0 );
             }
@@ -281,11 +275,7 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
 
                     case MPEG1_VIDEO_ES:
                     case MPEG2_VIDEO_ES:
-#ifdef OLD_DECODER
-                        vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) /*, NULL */ );
-#else
                         vpar_DestroyThread( (vpar_thread_t*)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) /*, NULL */ );
-#endif
                         break;
                 }
 

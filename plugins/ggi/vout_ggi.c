@@ -203,7 +203,6 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     }
 
     /* give the data back to the interface */
-    fprintf(stderr, "display is %i\n", p_vout->p_sys->p_display);
     *(ggi_visual_t *)p_data = p_vout->p_sys->p_display;
 
     /* Find most appropriate mode */
@@ -237,7 +236,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     {
         /* Get buffer address */
         p_vout->p_sys->p_buffer[ i_index ] =
-            ggiDBGetBuffer( p_vout->p_sys->p_display, i_index );
+            (ggi_directbuffer *)ggiDBGetBuffer( p_vout->p_sys->p_display, i_index );
         if( p_vout->p_sys->p_buffer[ i_index ] == NULL )
         {
             intf_ErrMsg("error: double buffering is not possible\n");

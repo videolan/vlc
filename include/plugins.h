@@ -22,11 +22,36 @@
 
 #ifdef SYS_BEOS
 typedef int plugin_id_t;
+#define GET_PLUGIN( p_func, plugin_id, psz_name ) \
+    get_image_symbol( plugin_id, psz_name, B_SYMBOL_TYPE_TEXT, &p_func );
 #else
-typedef void* plugin_id_t;
+typedef void *plugin_id_t;
+#define GET_PLUGIN( p_func, plugin_id, psz_name ) \
+    p_func = dlsym( plugin_id, psz_name );
 #endif
 
-int    RequestPlugin     ( plugin_id_t * p_plugin, char * psz_name );
-void   TrashPlugin       ( plugin_id_t p_plugin );
-void * GetPluginFunction ( plugin_id_t plugin, char *name );
+typedef struct plugin_info_s
+{
+    plugin_id_t plugin_id;
+
+    char *      psz_filename;
+    char *      psz_name;
+    char *      psz_version;
+    char *      psz_author;
+
+    void *      aout_GetPlugin;
+    void *      vout_GetPlugin;
+    void *      intf_GetPlugin;
+    void *      yuv_GetPlugin;
+} plugin_info_t;
+
+typedef struct plugin_bank_s
+{
+    int               i_plugin_count;
+    plugin_info_t *   p_info[ MAX_PLUGIN_COUNT ];
+} plugin_bank_t;
+
+plugin_bank_t *  bank_Create       ( void );
+void             bank_Init         ( plugin_bank_t * p_bank );
+void             bank_Destroy      ( plugin_bank_t * p_bank );
 

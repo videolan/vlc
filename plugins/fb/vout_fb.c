@@ -73,8 +73,6 @@ typedef struct vout_sys_s
  *****************************************************************************/
 static int     FBOpenDisplay   ( vout_thread_t *p_vout );
 static void    FBCloseDisplay  ( vout_thread_t *p_vout );
-static void    FBSetPalette    ( p_vout_thread_t p_vout,
-                                 u16 *red, u16 *green, u16 *blue, u16 *transp );
 
 /*****************************************************************************
  * vout_SysCreate: allocates FB video thread output method
@@ -108,7 +106,6 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display,
  *****************************************************************************/
 int vout_SysInit( vout_thread_t *p_vout )
 {
-    p_vout->p_set_palette       = FBSetPalette;
     return( 0 );
 }
 
@@ -184,6 +181,20 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 
     //ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
+}
+
+/*****************************************************************************
+ * vout_SetPalette: sets an 8 bpp palette
+ *****************************************************************************
+ * This function sets the palette given as an argument. It does not return
+ * anything, but could later send information on which colors it was unable
+ * to set.
+ *****************************************************************************/
+void vout_SetPalette( p_vout_thread_t p_vout,
+                      u16 *red, u16 *green, u16 *blue, u16 *transp )
+{
+    struct fb_cmap cmap = { 0, 256, red, green, blue, transp };
+    ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
 }
 
 /* following functions are local */
@@ -349,17 +360,4 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
     close( p_vout->p_sys->i_fb_dev );
 }
 
-/*****************************************************************************
- * FBSetPalette: sets an 8 bpp palette
- *****************************************************************************
- * This function sets the palette given as an argument. It does not return
- * anything, but could later send information on which colors it was unable
- * to set.
- *****************************************************************************/
-static void    FBSetPalette   ( p_vout_thread_t p_vout,
-                                u16 *red, u16 *green, u16 *blue, u16 *transp )
-{
-    struct fb_cmap cmap = { 0, 256, red, green, blue, transp };
-    ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
-}
 

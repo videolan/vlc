@@ -29,8 +29,8 @@
 extern "C" {
 #endif
 
-void       beos_Init( void );
-void       beos_Clean( void );
+void       beos_Create( void );
+void       beos_Destroy( void );
 char *     beos_GetProgramPath( void );
 
 #ifdef __cplusplus

@@ -39,6 +39,8 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+#include "plugins.h"
+#include "playlist.h"
 #include "intf_msg.h"
 
 #include "main.h"
@@ -60,14 +62,15 @@
 #define NO_SUBTITLES 255
 
 #define PS_BUFFER_SIZE 16384
-#define NO_PES 0
-#define AUDIO_PES 1
-#define VIDEO_PES 2
-#define AC3_PES 3
-#define SUBTITLE_PES 4
-#define LPCM_PES 5
-#define PRIVATE_PES 6
-#define UNKNOWN_PES 12
+
+#define NO_PES          0x00
+#define AUDIO_PES       0x01
+#define VIDEO_PES       0x02
+#define AC3_PES         0x03
+#define SUBTITLE_PES    0x04
+#define LPCM_PES        0x05
+#define PRIVATE_PES     0x06
+#define UNKNOWN_PES     0x12
 
 #define PCR_PID 0x20 /* 0x20 == first video stream
                       * 0x40 == first audio stream */
@@ -105,8 +108,6 @@ typedef struct options_s
     unsigned int pcr_pid;
     u8 i_file_type;
     int in; 
-    char **playlist;
-    int i_list_index;
 } options_t;
 
 typedef struct s_ps
@@ -279,15 +280,17 @@ static void adjust( input_file_t * p_if, file_ts_packet *ts )
 
 int file_next( options_t *options )
 {
-    /* the check for index == 0 should be done _before_ */
-    options->i_list_index--;
-    
+    p_playlist_t p_playlist = p_main->p_playlist;
+
+    /* the check for index == 0 has to be done _before_ */
+    p_playlist->i_index--;
+
     if( options->in != -1 )
     {
-            close( options->in );
+        close( options->in );
     }
 
-    if( !strcmp( options->playlist[options->i_list_index], "-" ) )
+    if( !strcmp( p_playlist->p_list[ p_playlist->i_index ], "-" ) )
     {
         /* read stdin */
         return ( options->in = 0 );
@@ -295,10 +298,14 @@ int file_next( options_t *options )
     else
     {
         /* read the actual file */
-        fprintf( stderr, "Playing file %s\n",
-                 options->playlist[options->i_list_index] );
-        return ( options->in = open( options->playlist[options->i_list_index],
-                                     O_RDONLY | O_NONBLOCK ) );
+        intf_Msg( "Playing file %s\n",
+                  p_playlist->p_list[ p_playlist->i_index ] );
+
+        options->in =
+            open( p_playlist->p_list[ p_playlist->i_index ],
+                  O_RDONLY | O_NONBLOCK );
+
+        return ( options->in );
     }
 }
 
@@ -320,7 +327,7 @@ ssize_t safe_read( options_t *options, unsigned char *buf, int count )
         if( ret == 0 )
         {
             /* zero means end of file */
-            if( options->i_list_index )
+            if( p_main->p_playlist->i_index )
             {
                 file_next( options );
             }
@@ -917,23 +924,24 @@ void ps_fill( input_file_t * p_if, boolean_t wait )
         
         /* read a whole UDP packet from the file */
         p_ps->ts_to_write = how_many;
-        if(ps_read(&p_if->options, p_ps, ts = (file_ts_packet *)(p_in_data->buf + p_in_data->end)) != how_many)
+        if( ps_read( &p_if->options, p_ps, ts = (file_ts_packet *)(p_in_data->buf + p_in_data->end) ) != how_many )
         {
             msleep( 50000 ); /* XXX we need an INPUT_IDLE */
             intf_ErrMsg( "input error: read() error\n" );
+            return;
         }
         
         /* Scan to mark TS packets containing a PCR */
-        for(i=0; i<how_many; i++, ts++)
+        for( i = 0 ; i < how_many ; i++ , ts++ )
         {
-            pcr_flag |= keep_pcr(p_ps->pcr_pid, ts);
+            pcr_flag |= keep_pcr( p_ps->pcr_pid, ts );
         }
         
-        vlc_mutex_lock(&p_in_data->lock);
+        vlc_mutex_lock( &p_in_data->lock );
         p_in_data->end++;
-        p_in_data->end %= BUF_SIZE+1;
-        vlc_cond_signal(&p_in_data->notempty);
-        vlc_mutex_unlock(&p_in_data->lock);
+        p_in_data->end %= BUF_SIZE + 1;
+        vlc_cond_signal( &p_in_data->notempty );
+        vlc_mutex_unlock( &p_in_data->lock );
     }
 }
 
@@ -962,19 +970,13 @@ int init_synchro( input_file_t * p_if )
         {
             vlc_cond_wait(&p_in_data->notempty, &p_in_data->lock);
         }
-        /*
-        if( p_in_data->end == p_in_data->start )
-        {
-            intf_ErrMsg( "input error: init_synchro error, not enough PCR found\n" );
-            return( -1 );
-        }
-        */
+
         vlc_mutex_unlock( &p_in_data->lock );
         
         ts = (file_ts_packet*)(p_in_data->buf + p_in_data->start);
         for( i=0 ; i < howmany ; i++, ts++ )
         {
-            if( ts  == p_own_pcr->buf[p_own_pcr->start] && !(((u8*)ts)[5] & 0x80) )
+            if( ts == p_own_pcr->buf[p_own_pcr->start] && !(((u8*)ts)[5] & 0x80) )
             {
                 p_synchro->last_pcr = ts;
                 p_synchro->last_pcr_time = ConvertPCRTime( ts );
@@ -1014,9 +1016,6 @@ int input_FileOpen( input_thread_t *p_input )
     options_t * p_options = &input_file.options;
 
     p_options->in = -1;
-
-    p_options->playlist = (char **)p_input->p_source;
-    p_options->i_list_index = p_input->i_port;
 
     if( file_next( p_options ) < 0 )
     {

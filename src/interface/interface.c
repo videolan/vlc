@@ -39,6 +39,7 @@
 #include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
+#include "playlist.h"
 #include "input.h"
 
 #include "audio_output.h"
@@ -89,8 +90,9 @@ static int      ParseChannel    ( intf_channel_t *p_channel, char *psz_str );
  *****************************************************************************/
 intf_thread_t* intf_Create( void )
 {
-    intf_thread_t *p_intf;
-    char * psz_method;
+    intf_thread_t * p_intf;
+    typedef void    ( intf_getplugin_t ) ( intf_thread_t * p_intf );
+    int             i_index;
 
     /* Allocate structure */
     p_intf = malloc( sizeof( intf_thread_t ) );
@@ -100,23 +102,21 @@ intf_thread_t* intf_Create( void )
         return( NULL );
     }
 
-    /* Request an interface plugin */
-    psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
-
-    if( RequestPlugin( &p_intf->intf_plugin, psz_method ) < 0 )
+    /* Get a suitable interface plugin */
+    for( i_index = 0 ; i_index < p_main->p_bank->i_plugin_count ; i_index++ )
     {
-        intf_ErrMsg( "error: could not open interface plugin %s.so\n", psz_method );
-        free( p_intf );
-        return( NULL );
+        /* If there's a plugin in p_info ... */
+        if( p_main->p_bank->p_info[ i_index ] != NULL )
+        {
+            /* ... and if this plugin provides the functions we want ... */
+            if( p_main->p_bank->p_info[ i_index ]->intf_GetPlugin != NULL )
+            {
+                /* ... then get these functions */
+                ( (intf_getplugin_t *)
+                  p_main->p_bank->p_info[ i_index ]->intf_GetPlugin )( p_intf );
+            }
+        }
     }
-
-    /* Get plugins */
-    p_intf->p_sys_create
-            = GetPluginFunction( p_intf->intf_plugin, "intf_SysCreate" );
-    p_intf->p_sys_manage
-            = GetPluginFunction( p_intf->intf_plugin, "intf_SysManage" );
-    p_intf->p_sys_destroy
-            = GetPluginFunction( p_intf->intf_plugin, "intf_SysDestroy" );
 
     /* Initialize structure */
     p_intf->b_die =     0;
@@ -133,7 +133,6 @@ intf_thread_t* intf_Create( void )
     if( p_intf->p_console == NULL )
     {
         intf_ErrMsg("error: can't create control console\n");
-        TrashPlugin( p_intf->intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -141,7 +140,6 @@ intf_thread_t* intf_Create( void )
     {
         intf_ErrMsg("error: can't create interface\n");
         intf_ConsoleDestroy( p_intf->p_console );
-        TrashPlugin( p_intf->intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -157,9 +155,9 @@ intf_thread_t* intf_Create( void )
  *****************************************************************************/
 void intf_Run( intf_thread_t *p_intf )
 {
-    if( p_intf->p_playlist )
+    if( p_main->p_playlist->p_list )
     {
-        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, (void *)p_intf->p_playlist, p_intf->i_list_index, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
+        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, NULL, 0, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
     }
     /* Execute the initialization script - if a positive number is returned,
      * the script could be executed but failed */
@@ -209,13 +207,6 @@ void intf_Destroy( intf_thread_t *p_intf )
 
     /* Unload channels */
     UnloadChannels( p_intf );
-
-    /* XXX: Close plugin - we don't do it because it makes the Gnome
-     * plugin segfaulting */
-    /*TrashPlugin( p_intf->intf_plugin );*/
-
-    /* Close plugin */
-    TrashPlugin( p_intf->intf_plugin );
 
     /* Free structure */
     free( p_intf );
