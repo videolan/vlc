@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.76 2003/12/09 00:46:03 yoann Exp $
+ * $Id: wxwindows.h,v 1.77 2003/12/10 21:54:17 courmisch Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -40,6 +40,7 @@
 #include <wx/treectrl.h>
 #include <wx/gauge.h>
 #include <wx/accel.h>
+#include <wx/checkbox.h>
 #include "vlc_keys.h"
 
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
@@ -387,6 +388,7 @@ private:
     wxSpinCtrl *net_ports[4];
     int        i_net_ports[4];
     wxTextCtrl *net_addrs[4];
+    wxCheckBox *net_ipv6;
 
     /* Controls for the v4l panel */
     wxRadioBox *video_type;
