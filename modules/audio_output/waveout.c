@@ -34,11 +34,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#ifdef UNDER_CE
-#   define FRAME_SIZE 4096           /* The size is in samples, not in bytes */
-#else
-#   define FRAME_SIZE 1024           /* The size is in samples, not in bytes */
-#endif
+#define FRAME_SIZE 4096              /* The size is in samples, not in bytes */
 #define FRAMES_NUM 8
 
 /*****************************************************************************
@@ -126,6 +122,10 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
 
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void WaveOutThread( notification_thread_t * );
+
+static int VolumeInfos( aout_instance_t *, audio_volume_t * );
+static int VolumeGet( aout_instance_t *, audio_volume_t * );
+static int VolumeSet( aout_instance_t *, audio_volume_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -291,6 +291,10 @@ static int Open( vlc_object_t *p_this )
             p_aout->output.output.i_bytes_per_frame;
 
         aout_VolumeSoftInit( p_aout );
+
+        p_aout->output.pf_volume_infos = VolumeInfos;
+        p_aout->output.pf_volume_get = VolumeGet;
+        p_aout->output.pf_volume_set = VolumeSet;
     }
 
 
@@ -777,4 +781,33 @@ static void WaveOutThread( notification_thread_t *p_notif )
             }
         }
     }
+}
+
+static int VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
+{
+    *pi_soft = AOUT_VOLUME_MAX / 2;
+    return 0;
+}
+
+static int VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
+{
+    aout_sys_t *p_sys = p_aout->output.p_sys;
+    DWORD i_waveout_vol;
+
+    waveOutGetVolume( p_sys->h_waveout, &i_waveout_vol );
+    i_waveout_vol &= 0xFFFF;
+    *pi_volume = p_aout->output.i_volume =
+        i_waveout_vol * AOUT_VOLUME_MAX / 2 / 0xFFFF;
+    return 0;
+}
+
+static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
+{
+    aout_sys_t *p_sys = p_aout->output.p_sys;
+    unsigned long i_waveout_vol = i_volume * 0xFFFF * 2 / AOUT_VOLUME_MAX;
+    i_waveout_vol |= (i_waveout_vol << 16);
+
+    waveOutSetVolume( p_sys->h_waveout, i_waveout_vol );
+    p_aout->output.i_volume = i_volume;
+    return 0;
 }
