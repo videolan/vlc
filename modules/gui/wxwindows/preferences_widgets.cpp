@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.15 2003/11/10 00:14:05 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.16 2003/12/05 14:48:46 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -611,20 +611,28 @@ void IntegerListConfigControl::UpdateCombo( module_config_t *p_item )
     /* build a list of available options */
     for( int i_index = 0; i_index < p_item->i_list; i_index++ )
     {
-        combo->Append( ( p_item->ppsz_list_text &&
-                         p_item->ppsz_list_text[i_index] ) ?
-                       wxU(p_item->ppsz_list_text[i_index]) :
-                       wxString::Format(wxT("%i"),
-                                        p_item->pi_list[i_index]) );
+        if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
+        {
+            combo->Append( wxU(p_item->ppsz_list_text[i_index]) );
+        }
+        else
+        {
+            combo->Append( wxString::Format(wxT("%i"),
+                                            p_item->pi_list[i_index]) );
+        }
         combo->SetClientData( i_index, (void *)p_item->pi_list[i_index] );
         if( p_item->i_value == p_item->pi_list[i_index] )
         {
             combo->SetSelection( i_index );
-            combo->SetValue( ( p_item->ppsz_list_text &&
-                               p_item->ppsz_list_text[i_index] ) ?
-                             wxU(p_item->ppsz_list_text[i_index]) :
-                             wxString::Format(wxT("%i"),
-                                              p_item->pi_list[i_index]) );
+            if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
+            {
+                combo->SetValue( wxU(p_item->ppsz_list_text[i_index]) );
+            }
+            else
+            {
+                combo->SetValue( wxString::Format(wxT("%i"),
+                                                  p_item->pi_list[i_index]) );
+            }
         }
     }
 }
