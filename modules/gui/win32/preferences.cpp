@@ -426,7 +426,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             ADD_PANEL;
 
             /* Look for valid modules */
-            p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+            p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
             pp_parser = (module_t **)p_list->pp_objects;
 
             for( ; *pp_parser ; pp_parser++ )
@@ -438,7 +438,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                 }
             }
 
-            vlc_list_release( p_intf, p_list );
+            vlc_list_release( p_intfGlobal, p_list );
 
             break;
 
