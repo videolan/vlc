@@ -114,9 +114,9 @@
             [NSString stringWithCString:p_item->input.psz_name] :
             [NSString stringWithUTF8String:p_item->input.psz_name]];
     }
-
-    psz_temp = vlc_input_item_GetInfo( &p_item->input, _("General"), _("Author") );
     vlc_mutex_unlock( &p_item->input.lock );
+    
+    psz_temp = vlc_input_item_GetInfo( &p_item->input, _("General"), _("Author") );
 
     if( psz_temp )
     {
