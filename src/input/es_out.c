@@ -360,6 +360,10 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
                 p_sys->i_mode != ES_OUT_MODE_ALL )
                 EsUnselect( out, p_sys->es[i], VLC_TRUE );
         }
+
+        p_sys->p_es_audio = NULL;
+        p_sys->p_es_sub = NULL;
+        p_sys->p_es_video = NULL;
     }
 
     msg_Dbg( p_input, "Selecting program id=%d", p_pgrm->i_id );
@@ -385,7 +389,8 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     var_Change( p_input, "spu-es",   VLC_VAR_CLEARCHOICES, NULL, NULL );
     for( i = 0; i < p_sys->i_es; i++ )
     {
-        EsOutESVarUpdate( out, p_sys->es[i], VLC_FALSE );
+        if( p_sys->es[i]->p_pgrm == p_sys->p_pgrm )
+            EsOutESVarUpdate( out, p_sys->es[i], VLC_FALSE );
         EsOutSelect( out, p_sys->es[i], VLC_FALSE );
     }
 
