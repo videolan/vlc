@@ -2,7 +2,7 @@
  * spdif.c : dummy mixer for S/PDIF output (1 input only)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: spdif.c,v 1.1 2002/08/11 22:36:35 massiot Exp $
+ * $Id: spdif.c,v 1.2 2002/08/12 07:40:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -64,7 +64,7 @@ static int Create( vlc_object_t *p_this )
     p_aout->mixer.pf_do_work = DoWork;
     /* This is a bit kludgy - do not ask for a new buffer, since the one
      * provided by the first input will be good enough. */
-    p_aout->mixer.output_alloc.i_alloc = AOUT_ALLOC_NONE;
+    p_aout->mixer.output_alloc.i_alloc_type = AOUT_ALLOC_NONE;
 
     return 0;
 }
@@ -74,5 +74,7 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
+    aout_input_t * p_input = p_aout->pp_inputs[0];
+    aout_FifoPop( p_aout, &p_input->fifo );
 }
 
