@@ -501,6 +501,8 @@
 				8ED6C27B03E2EB1C0059A3A7,
 				8ED6C27C03E2EB1C0059A3A7,
 				8ED6C27D03E2EB1C0059A3A7,
+				8EF1600B03FC62560059A3A7,
+				8EF1600C03FC62560059A3A7,
 				8ED6C27E03E2EB1C0059A3A7,
 				8ED6C27F03E2EB1C0059A3A7,
 				8ED6C28003E2EB1C0059A3A7,
@@ -770,6 +772,20 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
+		};
+		8EF1600B03FC62560059A3A7 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			name = info.h;
+			path = ../../modules/gui/macosx/info.h;
+			refType = 2;
+		};
+		8EF1600C03FC62560059A3A7 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			name = info.m;
+			path = ../../modules/gui/macosx/info.m;
+			refType = 2;
 		};
 //8E0
 //8E1

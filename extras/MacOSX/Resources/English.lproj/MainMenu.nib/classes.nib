@@ -36,6 +36,13 @@
             SUPERCLASS = NSObject; 
         }, 
         {
+            ACTIONS = {showCategory = id; toggleInfoPanel = id; }; 
+            CLASS = VLCInfo; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {"o_info_selector" = id; "o_info_view" = id; "o_info_window" = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
             ACTIONS = {
                 clearRecentItems = id; 
                 closeError = id; 
@@ -70,6 +77,8 @@
                 "o_err_lbl" = id; 
                 "o_err_msg" = id; 
                 "o_error" = id; 
+                "o_info" = id; 
+                "o_info_window" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 
                 "o_mi_bring_atf" = id; 
@@ -90,6 +99,7 @@
                 "o_mi_half_window" = id; 
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
+                "o_mi_info" = id; 
                 "o_mi_language" = id; 
                 "o_mi_license" = id; 
                 "o_mi_loop" = id; 
@@ -190,11 +200,6 @@
                 "o_file_sub_path" = id; 
                 "o_mrl" = id; 
                 "o_mrl_lbl" = id; 
-                "o_net_cs_addr" = id; 
-                "o_net_cs_addr_lbl" = id; 
-                "o_net_cs_port" = id; 
-                "o_net_cs_port_lbl" = id; 
-                "o_net_cs_port_stp" = id; 
                 "o_net_http_url" = id; 
                 "o_net_http_url_lbl" = id; 
                 "o_net_mode" = id; 

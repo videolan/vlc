@@ -6,6 +6,8 @@ SOURCES_macosx = \
 	modules/gui/macosx/intf.m \
 	modules/gui/macosx/intf.h \
 	modules/gui/macosx/open.m \
+	modules/gui/macosx/info.h \
+        modules/gui/macosx/info.m \
 	modules/gui/macosx/open.h \
 	modules/gui/macosx/prefs.m \
 	modules/gui/macosx/prefs.h \

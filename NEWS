@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.19 2003/02/16 01:38:36 titer Exp $
+$Id: NEWS,v 1.20 2003/02/16 23:32:05 hartman Exp $
 
 Changes between 0.5.0 and 0.5.1:
 --------------------------------
@@ -33,14 +33,15 @@ UNIX ports:
 
 Mac OS X port:
  * fixed a crash on start-up on some localized systems
- * lower real-time priorities to avoid lock-up on slow machines
- * VLC can now be made handler of ftp http mms and udp URLs
+ * lowered real-time priorities to avoid lock-up on slow machines
+ * VLC can now be made the handler of ftp http mms and udp URLs
  * playlist enhancements
  * added half, normal and double video window menu items
  * new step forward/step backward commands
  * the dock should no longer be visible in fullscreen mode
  * the Mac OS X binary is now compiled with Ogg/theora support
  * vlc.app is now VLC.app
+ * added an info panel
 
 Win32 port:
  * fixed the "RichEdit line insertion error" bug

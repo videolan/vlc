@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.57 2003/02/13 14:16:41 hartman Exp $
+ * $Id: intf.m,v 1.58 2003/02/16 23:32:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -34,6 +34,7 @@
 #include "vout.h"
 #include "prefs.h"
 #include "playlist.h"
+#include "info.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -349,6 +350,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_close_window setTitle: _NS("Close Window")];
     [o_mi_controller setTitle: _NS("Controller")];
     [o_mi_playlist setTitle: _NS("Playlist")];
+    [o_mi_info setTitle: _NS("Info")];
     [o_mi_messages setTitle: _NS("Messages")];
 
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
@@ -371,6 +373,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_err_bug_lbl setStringValue: _NS("If you believe that it is a bug, please follow the instructions at:")]; 
     [o_err_btn_msgs setTitle: _NS("Open Messages Window")];
     [o_err_btn_dismiss setTitle: _NS("Dismiss")];
+
+    [o_info_window setTitle: _NS("Info")];
 
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
@@ -638,6 +642,12 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         vlc_mutex_unlock( &p_playlist->object_lock );
         [o_playlist updateState];
         vlc_mutex_lock( &p_playlist->object_lock );
+        if( p_input != NULL )
+        {
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            [o_info updateInfo];
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+        }
         p_intf->p_sys->b_current_title_update = FALSE;
     }
 

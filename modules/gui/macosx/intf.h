@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.27 2003/02/13 14:16:41 hartman Exp $
+ * $Id: intf.h,v 1.28 2003/02/16 23:32:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -114,6 +114,7 @@ struct intf_sys_t
 
     IBOutlet id o_controls;     /* VLCControls    */
     IBOutlet id o_playlist;     /* VLCPlaylist    */
+    IBOutlet id o_info;		/* VLCInfo        */
 
     IBOutlet id o_messages;     /* messages tv    */
     IBOutlet id o_msgs_panel;   /* messages panel */
@@ -128,6 +129,8 @@ struct intf_sys_t
     IBOutlet id o_err_bug_lbl;
     IBOutlet id o_err_btn_msgs; /* Open Messages  */
     IBOutlet id o_err_btn_dismiss;
+    
+    IBOutlet id o_info_window;	/* Info panel     */
 
     /* main menu */
 
@@ -189,6 +192,7 @@ struct intf_sys_t
     IBOutlet id o_mi_close_window;
     IBOutlet id o_mi_controller;
     IBOutlet id o_mi_playlist;
+    IBOutlet id o_mi_info;
     IBOutlet id o_mi_messages;
     IBOutlet id o_mi_bring_atf;
     
