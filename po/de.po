@@ -5192,11 +5192,11 @@ msgid "OK"
 msgstr "OK"
 
 #: modules/gui/beos/InterfaceWindow.cpp:372
-msgid "VLC Media Player: Open Media Files"
+msgid "VLC media player: Open Media Files"
 msgstr "VideoLAN Client: Medien-Dateien öffnen"
 
 #: modules/gui/beos/InterfaceWindow.cpp:376
-msgid "VLC Media Player: Open Subtitle File"
+msgid "VLC media player: Open Subtitle File"
 msgstr "VideoLAN Client: Untertitel-Datei öffnen"
 
 #: modules/gui/beos/MediaControlView.cpp:68
@@ -5501,7 +5501,7 @@ msgstr "_Video"
 #: modules/gui/gtk/gtk_interface.c:1595 modules/gui/macosx/intf.m:441
 #: modules/gui/pda/pda_interface.c:205 modules/gui/pda/pda_interface.c:1302
 msgid "VLC media player"
-msgstr "VLC media Player"
+msgstr "VLC media player"
 
 #: modules/gui/gtk/gnome_interface.c:516
 msgid "Open disc"
@@ -5676,7 +5676,7 @@ msgid ""
 "Alternatively, you can build an MRL using one of the following predefined "
 "targets:"
 msgstr ""
-"Sonst können Sie ein Medien-Finder (MRL) mit einer dieser vordefinierten "
+"Sonst können Sie eine MRL mit einer dieser vordefinierten "
 "Ziele erzeugen:"
 
 #: modules/gui/gtk/gnome_interface.c:1563
@@ -6621,7 +6621,7 @@ msgstr "Quelle öffnen"
 
 #: modules/gui/macosx/open.m:136 modules/gui/wxwindows/open.cpp:242
 msgid "Media Resource Locator (MRL)"
-msgstr "Medien-Finder (MRL)"
+msgstr "Media Resource Locator (MRL)"
 
 #: modules/gui/macosx/open.m:146
 msgid "Treat as a pipe rather than as a file"
@@ -7222,11 +7222,11 @@ msgstr "Einstellung"
 
 #: modules/gui/pda/pda_interface.c:1281
 msgid ""
-"VLC Media Player is an MPEG, MPEG 2, MP3 and DivX player that accepts input "
+"VLC media player is an MPEG, MPEG 2, MP3 and DivX player that accepts input "
 "from local or network sources and is licensed under the GPL (http://www.gnu."
 "org/copyleft/gpl.html)."
 msgstr ""
-"VLC Media Player ist ein MPEG, MPEG 2, MP3 und DivX - Player, der Input von "
+"VLC media player ist ein MPEG, MPEG 2, MP3 und DivX - Player, der Input von "
 "lokalen oder Netzwerkquellen unterstützt und unter der GPL-Lizenz (http://"
 "www.gnu.org/copyleft/gpl.html) steht."
 
@@ -9141,8 +9141,8 @@ msgstr "XOSD Oberfläche"
 #~ msgid "Repeat Playlist"
 #~ msgstr "Wiedergabeliste wiederholen"
 
-#~ msgid "VLC Media Player"
-#~ msgstr "VLC Media Player"
+#~ msgid "VLC media player"
+#~ msgstr "VLC media player"
 
 #~ msgid "TTL"
 #~ msgstr "TTL"
