@@ -69,6 +69,9 @@ struct filter_sys_t
     int i_vborder, i_hborder; /* border width/height between miniatures */
     int i_alpha; /* subfilter alpha blending */
 
+    char **ppsz_order; /* list of picture-id */
+    int i_order_length;
+
 };
 
 /*****************************************************************************
@@ -90,6 +93,8 @@ struct filter_sys_t
 #define ROWS_TEXT N_("Mosaic number of rows")
 #define COLS_TEXT N_("Mosaic number of columns")
 #define AR_TEXT N_("Keep aspect ratio when resizing")
+
+#define ORDER_TEXT N_("Order as a comma separated list of picture-id(s)")
 
 static int pi_pos_values[] = { 0, 1 };
 static char * ppsz_pos_descriptions[] =
@@ -117,6 +122,7 @@ vlc_module_begin();
     add_integer( "mosaic-rows", 2, NULL, ROWS_TEXT, ROWS_TEXT, VLC_FALSE );
     add_integer( "mosaic-cols", 2, NULL, COLS_TEXT, COLS_TEXT, VLC_FALSE );
     add_bool( "mosaic-keep-aspect-ratio", 0, NULL, AR_TEXT, AR_TEXT, VLC_FALSE );
+    add_string( "mosaic-order", "", NULL, ORDER_TEXT, ORDER_TEXT, VLC_FALSE );
 vlc_module_end();
 
 
@@ -128,6 +134,8 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
+    char *psz_order;
+    int i_index;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -161,6 +169,33 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys->i_pos > 1 || p_sys->i_pos < 0 ) p_sys->i_pos = 0;
 
     p_sys->i_ar = var_CreateGetInteger( p_filter->p_libvlc, "mosaic-keep-aspect-ratio" );
+
+    p_sys->i_order_length = 0;
+    p_sys->ppsz_order = NULL;
+    psz_order = var_CreateGetString( p_filter->p_libvlc, "mosaic-order" );
+
+    fprintf( stderr, "psz_order : %s (%p)\n", psz_order, psz_order );
+    if( psz_order[0] != 0 )
+    {
+        i_index = 0;
+        char* psz_end=NULL;
+        do
+        { 
+            psz_end = strchr( psz_order, ',' );
+            i_index++;
+            p_sys->ppsz_order = realloc( p_sys->ppsz_order,
+                                         i_index * sizeof(char *) );
+            p_sys->ppsz_order[i_index - 1] = strndup( psz_order,
+                                           psz_end - psz_order );
+            psz_order = psz_end+1;
+        } while( NULL !=  psz_end );
+        p_sys->i_order_length = i_index;
+    }
+
+    for( i_index = 0; i_index < p_sys->i_order_length; i_index ++ )
+    {
+        fprintf( stderr, "%d/%d : %s\n", i_index, p_sys->i_order_length, p_sys->ppsz_order[i_index] );
+    }
 
     var_AddCallback( p_filter->p_libvlc, "mosaic-alpha",
                      MosaicCallback, p_sys );
@@ -228,6 +263,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     libvlc_t *p_libvlc = p_filter->p_libvlc;
     vlc_value_t val;
     int i_index, i_real_index, i_row, i_col;
+    int i_greatest_real_index_used = p_sys->i_order_length - 1;
 
     subpicture_region_t *p_region;
     subpicture_region_t *p_region_prev = NULL;
@@ -295,7 +331,24 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             msg_Dbg( p_filter, "Picture Vout Element is empty");
             break;
         }
-        i_real_index ++;
+        if( p_sys->i_order_length == 0 )
+            i_real_index ++;
+        else
+        {
+            int i;
+            for( i =0; i <= p_sys->i_order_length; i++ )
+            {
+                if( i == p_sys->i_order_length ) break;
+                if( strcmp( p_picture_vout->p_pic[i_index].psz_id,
+                    p_sys->ppsz_order[ i ] ) == 0 )
+                {
+                    i_real_index = i;
+                    break;
+                }
+            }
+            if( i == p_sys->i_order_length )
+                i_real_index = ++i_greatest_real_index_used;
+        }
         i_row = ( i_real_index / p_sys->i_cols ) % p_sys->i_rows ;
         i_col = i_real_index % p_sys->i_cols ;
 

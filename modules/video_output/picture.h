@@ -29,6 +29,7 @@
 struct picture_vout_e_t {
     picture_t *p_picture;
     int i_status;
+    char *psz_id;
 };
 struct picture_vout_t
 {

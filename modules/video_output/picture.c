@@ -48,6 +48,8 @@ struct vout_sys_t
 
 #include "picture.h"
 
+#define ID_TEXT N_("ID")
+
 /***********************************************************************
 * Local prototypes
 ***********************************************************************/
@@ -66,6 +68,7 @@ vlc_module_begin();
     set_description(_("VLC Internal Picture video output") );
     set_capability( "video output", 70 );
     set_callbacks( Open, Close );
+    add_string( "picture-id", "Id", NULL, ID_TEXT, ID_TEXT, VLC_FALSE );
 vlc_module_end();
 
 /***********************************************************************
@@ -119,6 +122,14 @@ static int Open ( vlc_object_t *p_this )
     p_picture_vout->p_pic[p_picture_vout->i_picture_num].p_picture = NULL;
     p_picture_vout->p_pic[p_picture_vout->i_picture_num].i_status
       = PICTURE_VOUT_E_OCCUPIED;
+
+    var_Create( p_vout, "picture-id", VLC_VAR_STRING );
+    var_Change( p_vout, "picture-id", VLC_VAR_INHERITVALUE, &val, NULL);
+    p_picture_vout->p_pic[p_picture_vout->i_picture_num].psz_id
+      = (char *)malloc( sizeof(char) * ( strlen( val.psz_string) + 1 ) );
+    strcpy( p_picture_vout->p_pic[p_picture_vout->i_picture_num].psz_id,
+            val.psz_string );
+
     p_picture_vout->i_picture_num++;
 
     vlc_mutex_unlock( &p_picture_vout->lock );
