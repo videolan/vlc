@@ -113,6 +113,7 @@ struct access_sys_t
     char       *psz_pragma;
     char       *psz_location;
     vlc_bool_t b_mms;
+    vlc_bool_t b_icecast;
 
     vlc_bool_t b_chunked;
     int64_t    i_chunk;
@@ -186,6 +187,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_mime = NULL;
     p_sys->psz_pragma = NULL;
     p_sys->b_mms = VLC_FALSE;
+    p_sys->b_icecast = VLC_FALSE;
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
     p_sys->b_pace_control = VLC_TRUE;
@@ -299,6 +301,12 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Dbg( p_access, "This is actually a live mms server, BAIL" );
         goto error;
+    }
+
+    if( p_sys->b_icecast )
+    {
+        if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "audio/mpeg" ) )
+            p_access->psz_demux = strdup( "mp3" );
     }
 
     if( !strcmp( p_sys->psz_protocol, "ICY" ) )
@@ -794,12 +802,15 @@ static int Connect( access_t *p_access, int64_t i_tell )
             p_sys->psz_pragma = strdup( p );
             msg_Dbg( p_access, "Pragma: %s", p_sys->psz_pragma );
         }
-        else if( !strcasecmp( psz, "Server" ) &&
-                 !strncasecmp( p, "Icecast", 7 ) )
+        else if( !strcasecmp( psz, "Server" ) )
         {
-            p_sys->b_reconnect = VLC_TRUE;
-            p_sys->b_pace_control = VLC_FALSE;
             msg_Dbg( p_access, "Server: %s", p );
+            if( !strncasecmp( p, "Icecast", 7 ) )
+            {
+                p_sys->b_reconnect = VLC_TRUE;
+                p_sys->b_pace_control = VLC_FALSE;
+                p_sys->b_icecast = VLC_TRUE;
+            }
         }
         else if( !strcasecmp( psz, "Transfer-Encoding" ) )
         {
