@@ -221,7 +221,7 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
             SDL_Flip( p_vout->p_sys->p_display );
             
             /* Swap buffers and change write frame */
-            SDL_LockSurface ( p_vout->p_sys->p_display );
+            //SDL_LockSurface ( p_vout->p_sys->p_display );
         }
      }
      else
@@ -396,19 +396,21 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void SDLCloseDisplay( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->p_display )
+    /*
+    if( p_vout->p_sys->p_display != NULL )
     {
         p_vout->p_sys->b_must_acquire = 0;
-        if( p_vout->p_sys->p_overlay )
-        {
+        if( p_vout->p_sys->p_overlay != NULL )
+        {            
             SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
             p_vout->p_sys->p_overlay = NULL;
         }
-        SDL_UnlockSurface(p_vout->p_sys->p_display);
         SDL_FreeSurface( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
-
+    */
     SDL_Quit();
+    
+    /* Prevents from cleaning, but prevents from SEGfaulting */
 }
 
