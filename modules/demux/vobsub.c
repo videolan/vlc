@@ -46,7 +46,7 @@ static void Close( vlc_object_t *p_this );
 
 vlc_module_begin();
     set_description( _("Vobsub subtitles demux") );
-    set_capability( "demux2", 1 );
+    set_capability( "demux2", 0 );
     
     set_callbacks( Open, Close );
 
@@ -93,8 +93,8 @@ struct demux_sys_t
     FILE        *p_vobsub_file;
     
     /* all tracks */
-    int                     i_tracks;
-    vobsub_track_t          *track;
+    int            i_tracks;
+    vobsub_track_t *track;
     
     int         i_original_frame_width;
     int         i_original_frame_height;
@@ -113,30 +113,18 @@ static int Open ( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
+    char *psz_vobname, *s;
     int i_len;
-    char *psz_vobname;
 
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_length = 0;
-    p_sys->p_vobsub_file = NULL;
-    p_sys->i_tracks = 0;
-    p_sys->track = (vobsub_track_t*)malloc( sizeof( vobsub_track_t ) );
-    p_sys->i_original_frame_width = -1;
-    p_sys->i_original_frame_height = -1;
-
-    char *s = NULL;
     if( ( s = stream_ReadLine( p_demux->s ) ) != NULL )
     {
         if( !strcasestr( s, "# VobSub index file" ) )
         {
-            msg_Err( p_demux, "this doesn't seem to be a vobsub file, bailing" );
+            msg_Dbg( p_demux, "this doesn't seem to be a vobsub file" );
             free( s );
             return VLC_EGENERIC;
         }
         free( s );
-        s = NULL;
 
         if( stream_Seek( p_demux->s, 0 ) )
         {
@@ -145,9 +133,19 @@ static int Open ( vlc_object_t *p_this )
     }
     else
     {
-        msg_Err( p_demux, "could not read vobsub IDX file" );
+        msg_Dbg( p_demux, "could not read vobsub IDX file" );
         return VLC_EGENERIC;
     }
+
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->i_length = 0;
+    p_sys->p_vobsub_file = NULL;
+    p_sys->i_tracks = 0;
+    p_sys->track = (vobsub_track_t *)malloc( sizeof( vobsub_track_t ) );
+    p_sys->i_original_frame_width = -1;
+    p_sys->i_original_frame_height = -1;
 
     /* Load the whole file */
     TextLoad( &p_sys->txt, p_demux->s );
