@@ -2,7 +2,7 @@
  * ustring.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ustring.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -204,7 +204,7 @@ void UString::operator =( const UString &rOther )
     m_length = rOther.m_length;
     delete[] m_pString;
     m_pString = new uint32_t[size() + 1];
-    for( uint32_t i = 0; i < size(); i++ )
+    for( uint32_t i = 0; i <= size(); i++ )
     {
         m_pString[i] = rOther.m_pString[i];
     }
