@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.6 2003/12/02 04:22:10 rocky Exp $
+ * $Id: access.c,v 1.7 2003/12/03 21:55:33 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -106,7 +106,7 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
     break;
   default:
     msg_Warn( p_vcd_input, message,
-            _("The above message had unknown vcdimager log level"), 
+            _("The above message had unknown log level"), 
             level);
   }
   return;
