@@ -7,9 +7,13 @@ Core support:
  * Include TLS/SSL API
  * SSL support in the HTTP daemon
 
+Demuxers:
+ * Fixed a VLC crash with OpenDML avi files
+
 Windows port:
  * Fixed multichannel audio support (which was broken in 0.8.0)
  * Fixed DV and MPEG (WinTV PVR 250/350) support in the dshow input
+ * Spurious taskbar item after switching to fullscreen fixed
 
 Stream Output:
  Encoders:
