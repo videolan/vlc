@@ -55,7 +55,7 @@ static void Close( vlc_object_t * );
     "Always select the stream with the maximum bitrate." )
 
 vlc_module_begin();
-    set_name( _("MMS") );
+    set_shortname( _("MMS") );
     set_description( _("Microsoft Media Server (MMS) input") );
     set_capability( "access2", -1 );
     set_category( CAT_INPUT );

@@ -51,7 +51,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_name( _("UDP/RTP" ) );
+    set_shortname( _("UDP/RTP" ) );
     set_description( _("UDP/RTP input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

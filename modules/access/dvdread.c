@@ -87,7 +87,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_name( _("DVD without menus") );
+    set_shortname( _("DVD without menus") );
     set_description( _("DVDRead Input (DVD without menu support)") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

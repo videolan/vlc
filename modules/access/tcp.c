@@ -43,7 +43,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_name( _("TCP") );
+    set_shortname( _("TCP") );
     set_description( _("TCP input") );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );

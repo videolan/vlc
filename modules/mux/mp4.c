@@ -56,7 +56,7 @@ vlc_module_begin();
     set_description( _("MP4/MOV muxer") );
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_MUX );
-    set_name( "MP4" );
+    set_shortname( "MP4" );
 
     add_bool( SOUT_CFG_PREFIX "faststart", 1, NULL, FASTSTART_TEXT, FASTSTART_LONGTEXT,
               VLC_TRUE );

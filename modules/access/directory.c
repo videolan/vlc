@@ -76,7 +76,7 @@ static char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),
 
 vlc_module_begin();
     set_category( CAT_INPUT );
-    set_name( _("Directory" ) );
+    set_shortname( _("Directory" ) );
     set_subcategory( SUBCAT_INPUT_ACCESS );
     set_description( _("Standard filesystem directory input") );
     set_capability( "access2", 55 );

@@ -74,7 +74,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("HTTP input") );
     set_capability( "access2", 0 );
-    set_name( _( "HTTP/HTTPS" ) );
+    set_shortname( _( "HTTP/HTTPS" ) );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 

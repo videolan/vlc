@@ -52,7 +52,7 @@ static void    Close( vlc_object_t * );
     "used for the connection.")
 
 vlc_module_begin();
-    set_name( "FTP" );
+    set_shortname( "FTP" );
     set_description( _("FTP input") );
     set_capability( "access2", 0 );
     set_category( CAT_INPUT );
