@@ -65,6 +65,7 @@ access_t *__access2_New( vlc_object_t *p_obj, char *psz_mrl )
 
     if( p_access == NULL )
     {
+        msg_Err( p_obj, "vlc_object_create( p_obj, VLC_OBJECT_ACCESS ) had failed" );
         free( psz_dup );
         return NULL;
     }
@@ -87,8 +88,8 @@ access_t *__access2_New( vlc_object_t *p_obj, char *psz_mrl )
         if( psz )
         {
             *psz++ = '\0';
-            p_access->psz_access = strdup( psz_dup );
         }
+        p_access->psz_access = strdup( psz_dup );
     }
     else
     {

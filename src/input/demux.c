@@ -202,9 +202,9 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
         if( psz )
         {
             *psz++ = '\0';
-            p_demux->psz_access = strdup( psz_dup );
             p_demux->psz_demux  = strdup( psz );
         }
+        p_demux->psz_access = strdup( psz_dup );
     }
     else
     {
