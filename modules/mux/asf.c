@@ -40,6 +40,22 @@ static void Close  ( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-asf-"
 
+#define TITLE_TEXT N_("Title")
+#define TITLE_LONGTEXT N_("Allows you to define the title that will be put " \
+                          "in ASF comments.")
+#define AUTHOR_TEXT N_("Author")
+#define AUTHOR_LONGTEXT N_("Allows you to define the author that will be put " \
+                          "in ASF comments.")
+#define COPYRIGHT_TEXT N_("Copyright")
+#define COPYRIGHT_LONGTEXT N_("Allows you to define the copyright string that "\
+                          "will be put in ASF comments.")
+#define COMMENT_TEXT N_("Comment")
+#define COMMENT_LONGTEXT N_("Allows you to define the comment that will be " \
+                            "put in ASF comments.")
+#define RATING_TEXT N_("Rating")
+#define RATING_LONGTEXT N_("Allows you to define the \"rating\" that will " \
+                           "be put in ASF comments.")
+
 vlc_module_begin();
     set_description( _("ASF muxer") );
     set_capability( "sout mux", 5 );
@@ -47,11 +63,16 @@ vlc_module_begin();
     add_shortcut( "asfh" );
     set_callbacks( Open, Close );
 
-    add_string( SOUT_CFG_PREFIX "title",    "", NULL, "title",     "title", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "author",   "", NULL, "author",    "author", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "copyright","", NULL, "copyright", "copyright", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "comment",  "", NULL, "comment",   "comment", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "rating",  "", NULL, "rating",   "rating", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "title", "", NULL, TITLE_TEXT, TITLE_LONGTEXT,
+                                 VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "author",   "", NULL, AUTHOR_TEXT,
+                                 AUTHOR_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "copyright","", NULL, COPYRIGHT_TEXT,
+                                 COPYRIGHT_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "comment",  "", NULL, COMMENT_TEXT,
+                                 COMMENT_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "rating",  "", NULL, RATING_TEXT,
+                                 RATING_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /*****************************************************************************
