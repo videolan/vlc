@@ -950,7 +950,12 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','1') )
     {
         H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->rtpSource;
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1081468800
         uint32_t header = h261Source->lastSpecialHeader();
+#else
+        uint32_t header = 0;
+        msg_Warn( p_demux, "need livemedia library >= \"2004.04.09\"" );
+#endif
         memcpy( p_block->p_buffer, &header, 4 );
         memcpy( p_block->p_buffer + 4, tk->buffer, i_size );        
     }
