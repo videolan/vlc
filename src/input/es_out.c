@@ -754,16 +754,18 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         p_block->i_pts =
             input_ClockGetTS( p_input, &p_pgrm->clock,
                               ( p_block->i_pts + 11 ) * 9 / 100 ) + i_delay;
-        if ( es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
+    }
+    if ( es->fmt.i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' ) )
+    {
+        mtime_t current_date = mdate();
+        if( !p_block->i_pts
+               || p_block->i_pts > current_date + 10000000
+               || current_date > p_block->i_pts )
         {
-            mtime_t current_date = mdate();
-            if( p_block->i_pts > current_date + 10000000
-                   || current_date > p_block->i_pts )
-            {
-                /* ETSI EN 300 472 Annex A : do not take into account the PTS
-                 * for teletext streams. */
-                p_block->i_pts = current_date + p_input->i_pts_delay + i_delay;
-            }
+            /* ETSI EN 300 472 Annex A : do not take into account the PTS
+             * for teletext streams. */
+            p_block->i_pts = current_date + 400000
+                               + p_input->i_pts_delay + i_delay;
         }
     }
 
