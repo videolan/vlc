@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.75 2003/09/20 13:52:23 gbazin Exp $
+dnl $Id: configure.ac,v 1.76 2003/09/20 15:52:19 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -3085,8 +3085,9 @@ then
     if test -f "${real_mozilla_sdk}/mozilla-config.h"; then
       AC_MSG_RESULT(${real_mozilla_sdk}/mozilla-config.h)
       mozilla=:
-      AX_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I{real_mozilla_sdk}/plugin/include -I{real_mozilla_sdk}/java/include])
+      AX_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
       AX_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -lnspr4 -lplds4 -lplc4 -lembedstring -lxpcomglue])
+      XPIDL_INCL="-I${real_mozilla_sdk}/xpcom/idl"
     else
       dnl  The given path is incorrect
       AC_MSG_RESULT(no)
@@ -3260,6 +3261,7 @@ AC_SUBST(ASM)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
 AC_SUBST(XPIDL)
+AC_SUBST(XPIDL_INCL)
 AC_SUBST(LIBEXT)
 AC_SUBST(INCLUDES)
 AC_SUBST(ALL_LINGUAS)
