@@ -105,6 +105,7 @@ modules/codec/xvid.c
 
 # control modules
 modules/control/gestures.c
+modules/control/http.c
 modules/control/lirc/lirc.c
 modules/control/rc/rc.c
 
@@ -168,7 +169,7 @@ modules/gui/win32/strings.cpp
 modules/gui/wxwindows/wxwindows.cpp
 modules/gui/wxwindows/interface.cpp
 modules/gui/wxwindows/open.cpp
-modules/gui/wxwindows/popup.cpp
+modules/gui/wxwindows/menus.cpp
 modules/gui/wxwindows/fileinfo.cpp
 modules/gui/wxwindows/messages.cpp
 modules/gui/wxwindows/playlist.cpp
@@ -198,6 +199,7 @@ modules/misc/testsuite/test4.c
 # mux plugins
 modules/mux/avi.c
 modules/mux/dummy.c
+modules/mux/mp4.c
 modules/mux/mpeg/ps.c
 modules/mux/mpeg/ts.c
 modules/mux/ogg.c
@@ -209,6 +211,14 @@ modules/packetizer/mpeg4audio.c
 modules/packetizer/mpeg4video.c
 modules/packetizer/mpegaudio.c
 modules/packetizer/mpegvideo.c
+
+# stream_output plugins
+modules/stream_output/display.c
+modules/stream_output/dummy.c
+modules/stream_output/duplicate.c
+modules/stream_output/es.c
+modules/stream_output/standard.c
+modules/stream_output/transcode.c
 
 # video_chroma modules
 modules/video_chroma/i420_rgb.c
