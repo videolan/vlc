@@ -1,6 +1,0 @@
-.dep
-*.lo
-*.o.*
-*.lo.*
-intfwin.mak
-*MAKE*

@@ -1,6 +1,0 @@
-*.moc
-*.lmoc
-.dep
-*.lo
-*.o.*
-*.lo.*
