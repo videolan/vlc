@@ -31,8 +31,13 @@
 #define OSD_ALIGN_TOP 0x4
 #define OSD_ALIGN_BOTTOM 0x8
 
+#define OSD_HOR_SLIDER 1
+#define OSD_VERT_SLIDER 2
+
 #define OSD_PLAY_ICON 1
 #define OSD_PAUSE_ICON 2
+#define OSD_SPEAKER_ICON 3
+#define OSD_MUTE_ICON 4
 
 /**
  * Text style information.

@@ -244,7 +244,7 @@ static void Run( intf_thread_t *p_intf )
                 if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                 {
                     vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                    i_newvol*100/AOUT_VOLUME_MAX, 1 );
+                        i_newvol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
                 }
                 else
                 {
@@ -262,7 +262,7 @@ static void Run( intf_thread_t *p_intf )
                 if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                 {
                     vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                    i_newvol*100/AOUT_VOLUME_MAX, 1 );
+                        i_newvol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
                 }
                 else
                 {
@@ -272,6 +272,33 @@ static void Run( intf_thread_t *p_intf )
             }
 
         }
+        else if( i_action == ACTIONID_VOL_MUTE )
+        {
+            audio_volume_t i_newvol = -1;
+            aout_VolumeMute( p_intf, &i_newvol );
+            if( p_vout )
+            {
+                if( i_newvol == 0 )
+                {
+                    vout_OSDMessage( p_intf, _( "Mute" ) );
+                    vout_OSDIcon( VLC_OBJECT( p_intf ), OSD_MUTE_ICON );
+                }
+                else
+                {
+                    if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
+                    {
+                        vout_OSDSlider( VLC_OBJECT( p_intf ),
+                            i_newvol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );
+                    }
+                    else
+                    {
+                        vout_OSDMessage( p_intf, "Vol %d%%",
+                                         i_newvol * 100 / AOUT_VOLUME_MAX );
+                    }
+                }
+            }
+        }
+
         else if( i_action == ACTIONID_SUBDELAY_DOWN )
         {
             int i_delay;
@@ -292,20 +319,6 @@ static void Run( intf_thread_t *p_intf )
                 i_delay++;
                 input_Control( p_input, INPUT_SET_SUBDELAY, i_delay );
                 vout_OSDMessage( p_intf, "Subtitle delay %i ms", i_delay*100);
-            }
-        }
-        else if( i_action == ACTIONID_VOL_MUTE )
-        {
-            audio_volume_t i_newvol = -1;
-            aout_VolumeMute( p_intf, &i_newvol );
-            if( i_newvol == 0 )
-            {
-                vout_OSDMessage( p_intf, _( "Mute" ) );
-            }
-            else
-            {
-                vout_OSDMessage( p_intf, "Vol %d%%",
-                                 i_newvol * 100 / AOUT_VOLUME_MAX );
             }
         }
         else if( i_action == ACTIONID_FULLSCREEN && p_vout )
@@ -365,7 +378,7 @@ static void Run( intf_thread_t *p_intf )
                 if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                 {
                     vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                    GetPosition( p_intf ), 0 );
+                                    GetPosition( p_intf ), OSD_HOR_SLIDER );
                 }
                 else
                 {
@@ -381,7 +394,7 @@ static void Run( intf_thread_t *p_intf )
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
                         vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                        GetPosition( p_intf ), 0 );
+                                        GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
@@ -398,7 +411,7 @@ static void Run( intf_thread_t *p_intf )
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
                         vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                        GetPosition( p_intf ), 0 );
+                                        GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
@@ -415,7 +428,7 @@ static void Run( intf_thread_t *p_intf )
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
                         vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                        GetPosition( p_intf ), 0 );
+                                        GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
@@ -425,7 +438,6 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN && b_seekable )
             {
-                vout_OSDMessage( p_intf, _( "Jump -5 minutes" ) );
                 val.i_time = -300000000;
                 var_Set( p_input, "time-offset", val );
                 if( p_vout )
@@ -433,7 +445,7 @@ static void Run( intf_thread_t *p_intf )
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
                         vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                        GetPosition( p_intf ), 0 );
+                                        GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
@@ -450,7 +462,7 @@ static void Run( intf_thread_t *p_intf )
                     if( !p_vout->p_parent_intf || p_vout->b_fullscreen )
                     {
                         vout_OSDSlider( VLC_OBJECT( p_intf ),
-                                        GetPosition( p_intf ), 0 );
+                                        GetPosition( p_intf ), OSD_HOR_SLIDER );
                     }
                     else
                     {
