@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.218 2002/12/06 16:34:08 sam Exp $
+ * $Id: input.c,v 1.219 2002/12/12 15:23:43 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -90,6 +90,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     p_input->i_bufsize = 0;
     p_input->i_mtu = 0;
+    p_input->i_pts_delay = DEFAULT_PTS_DELAY;
 
     /* Initialize statistics */
     p_input->c_loops                    = 0;
