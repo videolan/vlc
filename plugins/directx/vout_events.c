@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.17 2002/05/18 15:34:04 gbazin Exp $
+ * $Id: vout_events.c,v 1.18 2002/05/18 22:41:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -142,7 +142,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
             case VK_ESCAPE:
             case VK_F12:
                 /* exit application */
-                p_main->p_intf->b_die = p_vout->p_sys->b_event_thread_die = 1;
+                p_main->p_intf->b_die = 1;
                 break;
             }
             TranslateMessage(&msg);
@@ -154,7 +154,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
             case 'q':
             case 'Q':
                 /* exit application */
-                p_main->p_intf->b_die = p_vout->p_sys->b_event_thread_die = 1;
+                p_main->p_intf->b_die = 1;
                 break;
 
             case 'f':                            /* switch to fullscreen */
@@ -379,11 +379,18 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 static void DirectXCloseWindow( vout_thread_t *p_vout )
 {
     intf_WarnMsg( 3, "vout: DirectXCloseWindow" );
+
+    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
+
     if( p_vout->p_sys->hwnd != NULL )
     {
         DestroyWindow( p_vout->p_sys->hwnd );
         p_vout->p_sys->hwnd = NULL;
     }
+
+    p_vout->p_sys->i_event_thread_status = THREAD_OVER;
+
+    vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
 
     /* We don't unregister the Window Class because it could lead to race
      * conditions and it will be done anyway by the system when the app will
@@ -527,8 +534,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_CLOSE:
         intf_WarnMsg( 4, "vout: WinProc WM_CLOSE" );
         /* exit application */
-        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
-        p_main->p_intf->b_die = p_vout->p_sys->b_event_thread_die = 1;
+        p_main->p_intf->b_die = 1;
         return 0;
         break;
 

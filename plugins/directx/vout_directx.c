@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.34 2002/05/18 15:34:04 gbazin Exp $
+ * $Id: vout_directx.c,v 1.35 2002/05/18 22:41:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -179,19 +179,11 @@ static int vout_Create( vout_thread_t *p_vout )
 
     intf_WarnMsg( 3, "vout: vout_Create DirectXEventThread running" );
 
-
     /* Initialise DirectDraw */
     if( DirectXInitDDraw( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't initialise DirectDraw" );
-
-        /* Kill DirectXEventThread */
-        p_vout->p_sys->b_event_thread_die = 1;
-        /* we need to be sure DirectXEventThread won't stay stuck in
-         * GetMessage, so we send a fake message */
-        PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
-        vlc_thread_join( p_vout->p_sys->event_thread_id );
-
+        vout_Destroy( p_vout );
         return ( 1 );
     }
 
@@ -200,14 +192,7 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         intf_ErrMsg( "vout error: can't initialise DirectDraw" );
         DirectXCloseDDraw( p_vout );
-
-        /* Kill DirectXEventThread */
-        p_vout->p_sys->b_event_thread_die = 1;
-        /* we need to be sure DirectXEventThread won't stay stuck in
-         * GetMessage, so we send a fake message */
-        PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
-        vlc_thread_join( p_vout->p_sys->event_thread_id );
-
+        vout_Destroy( p_vout );
         return ( 1 );
     }
 
@@ -272,15 +257,16 @@ static void vout_Destroy( vout_thread_t *p_vout )
     DirectXCloseDDraw( p_vout );
 
     /* Kill DirectXEventThread */
+    vlc_mutex_lock( &p_vout->p_sys->event_thread_lock );
     p_vout->p_sys->b_event_thread_die = 1;
+
     /* we need to be sure DirectXEventThread won't stay stuck in GetMessage,
      * so we send a fake message */
-    if( p_vout->p_sys->i_event_thread_status == THREAD_READY &&
-        p_vout->p_sys->hwnd )
-    {
+    if( p_vout->p_sys->hwnd )
         PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
-        vlc_thread_join( p_vout->p_sys->event_thread_id );
-    }
+
+    vlc_mutex_unlock( &p_vout->p_sys->event_thread_lock );
+    vlc_thread_join( p_vout->p_sys->event_thread_id );
 
     if( p_vout->p_sys != NULL )
     {

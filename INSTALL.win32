@@ -53,7 +53,7 @@ to remove the make utility included with MINGW as it conflicts with the one
 from MSYS (just rename or remove c:\msys\1.0\mingw\bin\make.exe).
 
 http://www.mingw.org/download.shtml
-http://prdownloads.sourceforge.net/mingw/MSYS-1.0.7-i686-2002.04.24-1.exe
+http://prdownloads.sourceforge.net/mingw/MSYS-1.0.7-i686-2.exe
 http://prdownloads.sourceforge.net/mingw/MinGW-1.1.tar.gz
 
 You must also not forget to install the extra development packages if you want
@@ -81,8 +81,8 @@ If you are cross-compiling from Debian, you can use something
 along those lines:
 
   make distclean ; \
-  ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
-  --build=i386-linux \
+  CC=i586-mingw32msvc-gcc \
+  ./configure --host=i586-mingw32msvc --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
   --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
   --with-directx=/usr/local/dxheaders \
@@ -91,10 +91,9 @@ along those lines:
 If you are cross-compiling using the mingw32 package provided by
 www.videolan.org, you have to use something along those lines:
 
-  CC=/usr/local/cross-tools/bin/i586-mingw32msvc-gcc \
+  CC=i586-mingw32msvc-gcc \
   PATH=/usr/local/cross-tools/bin:$PATH \
-  ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
-  --build=i386-linux \
+  ./configure --host=i586-mingw32msvc --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
   --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
   --with-directx=/usr/local/dxheaders \
