@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.55 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: oss.c,v 1.56 2003/04/02 21:21:57 sigmunau Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -320,7 +320,7 @@ static int Open( vlc_object_t *p_this )
         p_aout->output.output.i_format = AOUT_FMT_S16_NE;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT;
+               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
     }
     else if ( !strcmp( val.psz_string, N_("Stereo") ) )
     {
