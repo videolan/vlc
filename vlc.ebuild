@@ -33,7 +33,7 @@ inherit libtool gcc eutils
 
 IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi speex
       oggvorbis gnome xv oss sdl aalib slp bidi truetype v4l lirc 
-	  wxwindows imlib matroska dvb pvr satellite mozilla debug faad
+	  wxwindows imlib matroska dvb mozilla debug faad
 	  xosd altivec png dts"
 
 S=${WORKDIR}/${P}
@@ -58,7 +58,7 @@ RDEPEND="X? ( virtual/x11 )
 		>=media-libs/libdvdnav-0.1.9
 		>=media-libs/libdvdplay-1.0.1 )
 	esd? ( >=media-sound/esound-0.2.22 )
-	faad? ( >=media-libs/faad2-2.0_rc3 )
+	faad? ( >=media-libs/faad2-2.0 )
 	ggi? ( >=media-libs/libggi-2.0_beta3 )
 	gnome? ( >=gnome-base/gnome-libs-1.4.1.2-r1 )
 	gtk? ( =x11-libs/gtk+-1.2* )
@@ -66,22 +66,23 @@ RDEPEND="X? ( virtual/x11 )
 	lirc? ( app-misc/lirc )
 	mad? ( media-libs/libmad
 		media-libs/libid3tag )
-	matroska? ( >=media-libs/libmatroska-0.6.3 )
-	mozilla? ( >=net-www/mozilla-1.4 )
+	matroska? ( >=media-libs/libmatroska-0.7.0 )
+	mozilla? ( >=net-www/mozilla-1.5 )
 	ncurses? ( sys-libs/ncurses )
 	nls? ( >=sys-devel/gettext-0.12.1 )
-	oggvorbis? ( >=media-libs/libvorbis-1.0
-		>=media-libs/libogg-1.0 )
+	oggvorbis? ( >=media-libs/libvorbis-1.0.1
+		>=media-libs/libogg-1.1 )
 	sdl? ( >=media-libs/libsdl-1.2.5 )
 	slp? ( >=net-libs/openslp-1.0.10 )
 	bidi? ( >=dev-libs/fribidi-0.10.4 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
-	wxwindows? ( >=x11-libs/wxGTK-2.4.1 )
+	wxwindows? ( >=x11-libs/wxGTK-2.4.2 )
 	xosd? ( >=x11-libs/xosd-2.0 )
 	3dfx? ( media-libs/glide-v3 )
 	png? ( >=media-libs/libpng-1.2.5 )
-	speex? ( >=media-libs/speex-1.0.3 )
+	speex? ( >=media-libs/speex-1.1.5 )
 	dts? ( >=media-libs/libdts-0.0.2 )
+	svga? ( media-libs/svgalib )
 	>=media-sound/lame-3.93.1
 	>=media-libs/libdvbpsi-0.1.3
 	>=media-libs/a52dec-0.7.4
@@ -115,12 +116,16 @@ src_compile(){
 	local myconf
 	myconf="--disable-mga --enable-flac --with-gnu-ld \
 			--enable-a52 --enable-dvbpsi --enable-libmpeg2 \
-			--disable-qt --disable-kde --disable-libcdio --disable-libcddb \
-			--disable-vcdx --enable-ffmpeg --with-ffmpeg-mp3lame \
-			--enable-livedotcom --with-livedotcom-tree=/usr/lib/live \
-			--disable-skins2" #keep the new skins disabled for now
+			--disable-qt --disable-kde --disable-gnome --disable-gtk \
+			--disable-libcdio --disable-libcddb --disable-vcdx \
+			--enable-ffmpeg --with-ffmpeg-mp3lame \
+			--enable-livedotcom --with-livedotcom-tree=/usr/lib/live"
+        
+	# qt, kde, gnome and gtk interfaces are deprecated and in a bad condition
+        # the same for mga video, libdv and xvid decoders 
+	# cddax and vcdx (which depend on libcdio and libcddb) are not ready yet
 
-    #--enable-pth				GNU Pth support (default disabled)
+	#--enable-pth				GNU Pth support (default disabled)
 	#--enable-st				State Threads (default disabled)
 	#--enable-gprof				gprof profiling (default disabled)
 	#--enable-cprof				cprof profiling (default disabled)
@@ -132,7 +137,7 @@ src_compile(){
 	use debug && myconf="${myconf} --enable-debug" \
 		|| myconf="${myconf} --enable-release"
 	
-	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins"
+	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins --enable-skins2"
 
 	use mozilla \
 		&& myconf="${myconf} --enable-mozilla \
@@ -172,11 +177,9 @@ src_compile(){
 		$(use_enable dvd dvdplay) \
 		$(use_enable dvd dvdnav) \
 		$(use_enable dvb) \
-		$(use_enable pvr) \
-		$(use_enable satellite) \
+		$(use_enable dvb pvr) \
 		$(use_enable joystick) $(use_enable lirc) \
 		$(use_enable arts) \
-		$(use_enable gtk) $(use_enable gnome) \
 		$(use_enable oggvorbis ogg) $(use_enable oggvorbis vorbis) \
 		$(use_enable speex) \
 		$(use_enable matroska mkv) \
