@@ -48,10 +48,10 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 SHELL = @SHELL@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 MOC = @MOC@
 WINDRES = @WINDRES@
 BCBUILDER = @BCBUILDER@
-DLL_PATH = @DLL_PATH@
 
 # 
 # Installation environment
@@ -64,77 +64,75 @@ libdir = @libdir@
 includedir = @includedir@
 
 #
-# Libraries for special cases
-#
-LIB_COMMON = @LIB_COMMON@
-LIB_VLC = @LIB_VLC@
-
-LIB_A52 = @LIB_A52@
-LIB_AA = @LIB_AA@
-LIB_ALSA = @LIB_ALSA@
-LIB_ARTS = @LIB_ARTS@
-LIB_BEOS = @LIB_BEOS@
-LIB_CHROMA_I420_RGB = @LIB_CHROMA_I420_RGB@
-LIB_DARWIN = @LIB_DARWIN@
-LIB_DIRECTX = @LIB_DIRECTX@
-LIB_DSP = @LIB_DSP@
-LIB_DVD = @LIB_DVD@
-LIB_DVDREAD = @LIB_DVDREAD@
-LIB_ESD = @LIB_ESD@
-LIB_FILTER_DISTORT = @LIB_FILTER_DISTORT@
-LIB_GGI = @LIB_GGI@
-LIB_GLIDE = @LIB_GLIDE@
-LIB_GNOME = @LIB_GNOME@
-LIB_GTK = @LIB_GTK@
-LIB_IDCTALTIVEC = @LIB_IDCTALTIVEC@
-LIB_IMDCT = @LIB_IMDCT@
-LIB_IMDCT3DN = @LIB_IMDCT3DN@
-LIB_IMDCTSSE = @LIB_IMDCTSSE@
-LIB_IPV4 = @LIB_IPV4@
-LIB_IPV6 = @LIB_IPV6@
-LIB_KDE = @LIB_KDE@
-LIB_LIRC = @LIB_LIRC@
-LIB_MACOSX = @LIB_MACOSX@
-LIB_MAD = @LIB_MAD@
-LIB_MEMCPYALTIVEC = @LIB_MEMCPYALTIVEC@
-LIB_MOTIONALTIVEC = @LIB_MOTIONALTIVEC@
-LIB_MPEG_TS = @LIB_MPEG_TS@
-LIB_NCURSES = @LIB_NCURSES@
-LIB_QNX = @LIB_QNX@
-LIB_QT = @LIB_QT@
-LIB_RC = @LIB_RC@
-LIB_SDL = @LIB_SDL@
-LIB_VCD = @LIB_VCD@
-LIB_VORBIS = @LIB_VORBIS@
-LIB_WAVEOUT = @LIB_WAVEOUT@
-LIB_WIN32 = @LIB_WIN32@
-LIB_X11 = @LIB_X11@
-LIB_XVIDEO = @LIB_XVIDEO@
-
-#
 # CFLAGS for special cases
 #
-CFLAGS_COMMON = @CFLAGS_COMMON@
-CFLAGS_VLC = @CFLAGS_VLC@
+vlc_CFLAGS = @vlc_CFLAGS@
+plugins_CFLAGS := @plugins_CFLAGS@
+builtins_CFLAGS := @builtins_CFLAGS@
 
-CFLAGS_ARTS = @CFLAGS_ARTS@
-CFLAGS_DVD = @CFLAGS_DVD@
-CFLAGS_DVDREAD = @CFLAGS_DVDREAD@
-CFLAGS_ESD = @CFLAGS_ESD@
-CFLAGS_GLIDE = @CFLAGS_GLIDE@
-CFLAGS_GNOME = @CFLAGS_GNOME@
-CFLAGS_GTK = @CFLAGS_GTK@
-CFLAGS_KDE = @CFLAGS_KDE@
-CFLAGS_IDCTALTIVEC = @CFLAGS_IDCTALTIVEC@
-CFLAGS_MACOSX = @CFLAGS_MACOSX@
-CFLAGS_MAD = @CFLAGS_MAD@
-CFLAGS_MEMCPYALTIVEC = @CFLAGS_MEMCPYALTIVEC@
-CFLAGS_MOTIONALTIVEC = @CFLAGS_MOTIONALTIVEC@
-CFLAGS_QT = @CFLAGS_QT@
-CFLAGS_SDL = @CFLAGS_SDL@
-CFLAGS_WIN32 = @CFLAGS_WIN32@
-CFLAGS_X11 = @CFLAGS_X11@
-CFLAGS_XVIDEO = @CFLAGS_XVIDEO@
+arts_CFLAGS = @arts_CFLAGS@
+dvd_CFLAGS = @dvd_CFLAGS@
+dvdread_CFLAGS = @dvdread_CFLAGS@
+directx_CFLAGS = @directx_CFLAGS@
+esd_CFLAGS = @esd_CFLAGS@
+glide_CFLAGS = @glide_CFLAGS@
+gnome_CFLAGS = @gnome_CFLAGS@
+gtk_CFLAGS = @gtk_CFLAGS@
+kde_CFLAGS = @kde_CFLAGS@
+idctaltivec_CFLAGS = @idctaltivec_CFLAGS@
+macosx_CFLAGS = @macosx_CFLAGS@
+mad_CFLAGS = @mad_CFLAGS@
+memcpyaltivec_CFLAGS = @memcpyaltivec_CFLAGS@
+motionaltivec_CFLAGS = @motionaltivec_CFLAGS@
+qt_CFLAGS = @qt_CFLAGS@
+sdl_CFLAGS = @sdl_CFLAGS@
+x11_CFLAGS = @x11_CFLAGS@
+xvideo_CFLAGS = @xvideo_CFLAGS@
+
+#
+# Libraries for special cases
+#
+vlc_LDFLAGS = @vlc_LDFLAGS@
+plugins_LDFLAGS += @plugins_LDFLAGS@
+builtins_LDFLAGS += @builtins_LDFLAGS@
+
+a52_LDFLAGS = @a52_LDFLAGS@
+aa_LDFLAGS = @aa_LDFLAGS@
+alsa_LDFLAGS = @alsa_LDFLAGS@
+arts_LDFLAGS = @arts_LDFLAGS@
+beos_LDFLAGS = @beos_LDFLAGS@
+chroma_i420_rgb_LDFLAGS = @chroma_i420_rgb_LDFLAGS@
+directx_LDFLAGS = @directx_LDFLAGS@
+dsp_LDFLAGS = @dsp_LDFLAGS@
+dvd_LDFLAGS = @dvd_LDFLAGS@
+dvdread_LDFLAGS = @dvdread_LDFLAGS@
+esd_LDFLAGS = @esd_LDFLAGS@
+filter_distort_LDFLAGS = @filter_distort_LDFLAGS@
+ggi_LDFLAGS = @ggi_LDFLAGS@
+glide_LDFLAGS = @glide_LDFLAGS@
+gnome_LDFLAGS = @gnome_LDFLAGS@
+gtk_LDFLAGS = @gtk_LDFLAGS@
+idctaltivec_LDFLAGS = @idctaltivec_LDFLAGS@
+imdct_LDFLAGS = @imdct_LDFLAGS@
+imdct3dn_LDFLAGS = @imdct3dn_LDFLAGS@
+imdctsse_LDFLAGS = @imdctsse_LDFLAGS@
+ipv4_LDFLAGS = @ipv4_LDFLAGS@
+kde_LDFLAGS = @kde_LDFLAGS@
+lirc_LDFLAGS = @lirc_LDFLAGS@
+macosx_LDFLAGS = @macosx_LDFLAGS@
+mad_LDFLAGS = @mad_LDFLAGS@
+memcpyaltivec_LDFLAGS = @memcpyaltivec_LDFLAGS@
+motionaltivec_LDFLAGS = @motionaltivec_LDFLAGS@
+ncurses_LDFLAGS = @ncurses_LDFLAGS@
+qnx_LDFLAGS = @qnx_LDFLAGS@
+qt_LDFLAGS = @qt_LDFLAGS@
+rc_LDFLAGS = @rc_LDFLAGS@
+sdl_LDFLAGS = @sdl_LDFLAGS@
+vcd_LDFLAGS = @vcd_LDFLAGS@
+vorbis_LDFLAGS = @vorbis_LDFLAGS@
+waveout_LDFLAGS = @waveout_LDFLAGS@
+x11_LDFLAGS = @x11_LDFLAGS@
+xvideo_LDFLAGS = @xvideo_LDFLAGS@
 
 #
 # Other special cases
@@ -149,15 +147,15 @@ NEED_GETOPT = @NEED_GETOPT@
 PROGRAM_OPTIONS = $(SYS) $(ARCH)
 ifeq ($(DEBUG),1)
 PROGRAM_OPTIONS += DEBUG
-DEFINE += -DDEBUG
+CFLAGS += -DDEBUG
 endif
 ifeq ($(CPROF),1)
 PROGRAM_OPTIONS += CPROF
-DEFINE += -DCPROF
+CFLAGS += -DCPROF
 endif
 ifeq ($(GPROF),1)
 PROGRAM_OPTIONS += GPROF
-DEFINE += -DGPROF
+CFLAGS += -DGPROF
 endif
 
 # PROGRAM_BUILD is a complete identification of the build
@@ -170,20 +168,15 @@ else
 PROGRAM_BUILD = `date` $(USER)@`hostname`
 endif
 
-# DEFINE will contain some of the constants definitions decided in Makefile, 
-# including SYS_xx. It will be passed to C compiler.
-DEFINE_SYS := -DSYS_$(shell echo $(SYS) | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_')
-DEFINE += $(DEFINE_SYS)
-
 # On Linux and Solaris, activate 64-bit off_t (by default under BSD)
-DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE
+CFLAGS += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURCE
 
 # Gettext support
-DEFINE += -DLOCALEDIR=\"$(datadir)/locale\"
+CFLAGS += -DLOCALEDIR=\"$(datadir)/locale\"
 
 # Data and plugin location
-DEFINE += -DDATA_PATH=\"@prefix@/share/videolan\"
-DEFINE += -DPLUGIN_PATH=\"@prefix@/lib/videolan/vlc\"
+CFLAGS += -DDATA_PATH=\"@prefix@/share/videolan\"
+CFLAGS += -DPLUGIN_PATH=\"@prefix@/lib/videolan/vlc\"
 
 ###############################################################################
 # Tuning and other variables - do not change anything except if you know
@@ -193,47 +186,16 @@ DEFINE += -DPLUGIN_PATH=\"@prefix@/lib/videolan/vlc\"
 #
 # C headers directories
 #
-INCLUDE += @INCLUDE@
-INCLUDE += -Iinclude -Iextras
-
-#
-# Libraries needed by built-in modules
-#
-LIB_BUILTINS := $(patsubst %,$$LIB_%,$(shell echo $(BUILTINS) | tr '[a-z]' '[A-Z]'))
-
-#
-# Libraries needed by the vlc executable
-#
-ifneq (,$(findstring mingw32,$(SYS)))
-LIB_VLC += -lws2_32 -lnetapi32
-endif
+CFLAGS += -Iinclude -Iextras
 
 #
 # C compiler flags: mainstream compilation
 #
-CFLAGS += $(DEFINE) $(INCLUDE)
 CFLAGS += -D_REENTRANT
 CFLAGS += -D_GNU_SOURCE
 
 ifeq ($(RELEASE),1)
 CFLAGS += -DHAVE_RELEASE
-endif
-
-# flags needed for clean beos compilation
-ifeq ($(SYS),beos)
-CFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
-endif
-
-ifneq (,$(findstring darwin,$(SYS)))
-CFLAGS += -no-cpp-precomp
-endif
-
-ifneq (,$(findstring mingw32,$(SYS)))
-CFLAGS += -fnative-struct -D_OFF_T_ -D_off_t=long
-endif
-
-ifneq (,$(findstring bsd,$(SYS)))
-CFLAGS += -pthread
 endif
 
 # Optimizations : don't compile debug versions with them
@@ -272,16 +234,9 @@ endif
 endif
 
 #
-# C compiler flags: dependancies
-#
-DCFLAGS += $(INCLUDE)
-DCFLAGS += -M
-
-#
 # C compiler flags: linking
 #
 LDFLAGS += @LDFLAGS@
-LDFLAGS += $(LIB)
 LDFLAGS += -Wall
 ifneq ($(DEBUG),1)
 ifneq ($(GPROF),1)
@@ -290,23 +245,17 @@ ifneq ($(CPROF),1)
 endif
 endif
 endif
-ifneq (,$(findstring mingw32,$(SYS)))
-LDFLAGS += -mwindows -Xlinker --force-exe-suffix
-endif
 
 #
-# C compiler flags: plugin compilation
+# C compiler flags: plugins and builtins compilation
 #
-ifneq (,$(findstring mingw32,$(SYS)))
-PCFLAGS += -fnative-struct
-else
-PCFLAGS += -fPIC
-endif
+plugins_CFLAGS += -DPLUGIN -I../../include -I../../extras
+builtins_CFLAGS += -DBUILTIN -I../../include -I../../extras
 
 #
-# C compiler flags: plugin linking
+# Linker flags: plugins and builtins linking
 #
-PLDFLAGS += @PLDFLAGS@
+builtins_LDFLAGS += $(patsubst %,$$%_LDFLAGS,$(BUILTINS))
 
 #
 # Debugging and profiling support

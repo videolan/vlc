@@ -211,7 +211,7 @@ endif
 #
 # Misc variables
 #
-VLC_QUICKVERSION := $(shell grep '^ *VERSION=' configure.in | head -1 | sed 's/"//g' | cut -f2 -d=)
+VERSION := $(shell grep '^ *VERSION=' configure.in | head -1 | sed 's/"//g' | cut -f2 -d=)
 
 # All symbols must be exported
 export
@@ -235,10 +235,11 @@ Makefile.opts:
 show:
 	@echo CC: $(CC)
 	@echo CFLAGS: $(CFLAGS)
-	@echo DCFLAGS: $(DCFLAGS)
 	@echo LDFLAGS: $(LDFLAGS)
-	@echo PCFLAGS: $(PCFLAGS)
-	@echo PLDFLAGS: $(PLDFLAGS)
+	@echo plugins_CFLAGS: $(plugins_CFLAGS)
+	@echo plugins_LDFLAGS: $(plugins_LDFLAGS)
+	@echo builtins_CFLAGS: $(builtins_CFLAGS)
+	@echo builtins_LDFLAGS: $(builtins_LDFLAGS)
 	@echo C_OBJ: $(C_OBJ)
 	@echo CPP_OBJ: $(CPP_OBJ)
 	@echo PLUGIN_OBJ: $(PLUGIN_OBJ)
@@ -250,7 +251,7 @@ show:
 clean: plugins-clean po-clean vlc-clean
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so* lib/*.a
-	rm -f plugins/*.so plugins/*.a
+	rm -f plugins/*.so plugins/*.a plugins/*.lib plugins/*.tds
 	rm -rf extras/MacOSX/build
 
 po-clean:
@@ -372,7 +373,7 @@ dist:
 	for file in vlc_beos.rsrc vlc.icns gvlc_win32.ico vlc_win32_rc.rc ; do \
 			cp share/$$file tmp/vlc/share/ ; done
 	# Build archives
-	F=vlc-${VLC_QUICKVERSION}; \
+	F=vlc-${VERSION}; \
 	mv tmp/vlc tmp/$$F; (cd tmp ; tar cf $$F.tar $$F); \
 	bzip2 -f -9 < tmp/$$F.tar > $$F.tar.bz2; \
 	gzip -f -9 tmp/$$F.tar ; mv tmp/$$F.tar.gz .
@@ -390,24 +391,22 @@ package-win32:
 		echo "OK."; mkdir tmp; \
 	fi
 	# Create installation script
-	sed -e 's#@VERSION@#'${VLC_QUICKVERSION}'#' < install-win32 > tmp/nsi
+	cp install-win32 tmp/nsi
 	# Copy relevant files
-	cp vlc.exe $(PLUGINS:%=plugins/%.so) tmp/ 
+	cp vlc.exe tmp/ 
+	$(STRIP) tmp/vlc.exe
 	cp INSTALL.win32 tmp/INSTALL.txt ; unix2dos tmp/INSTALL.txt
 	for file in AUTHORS COPYING ChangeLog README FAQ TODO ; \
 			do cp $$file tmp/$${file}.txt ; \
 			unix2dos tmp/$${file}.txt ; done
-	for file in iconv.dll libgmodule-1.3-12.dll libgtk-0.dll libgdk-0.dll \
-		libgobject-1.3-12.dll libintl-1.dll libglib-1.3-12.dll \
-		libgthread-1.3-12.dll SDL.dll README-SDL.txt ; \
-			do cp ${DLL_PATH}/$$file tmp/ ; done
+	mkdir tmp/plugins
+	cp $(PLUGINS:%=plugins/%.so) tmp/plugins/ 
+	$(STRIP) tmp/$(PLUGINS:%=plugins/%.so)
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/share/ ; done
 	# Create package 
-	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe /CD tmp/nsi
-	mv tmp/vlc-${VLC_QUICKVERSION}.exe \
-		vlc-${VLC_QUICKVERSION}-win32-installer.exe
+	wine ~/.wine/fake_windows/Program\ Files/NSIS/makensis.exe -- /DVERSION=${VERSION} /CD tmp/nsi
 	# Clean up
 	rm -Rf tmp
 
@@ -427,10 +426,10 @@ package-beos:
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/vlc/share/ ; done
 	# Create package 
-	mv tmp/vlc tmp/vlc-${VLC_QUICKVERSION}
-	(cd tmp ; find vlc-${VLC_QUICKVERSION} | \
-	zip -9 -@ vlc-${VLC_QUICKVERSION}-beos.zip )
-	mv tmp/vlc-${VLC_QUICKVERSION}-BeOS-x86.zip .
+	mv tmp/vlc tmp/vlc-${VERSION}
+	(cd tmp ; find vlc-${VERSION} | \
+	zip -9 -@ vlc-${VERSION}-beos.zip )
+	mv tmp/vlc-${VERSION}-BeOS-x86.zip .
 	# Clean up
 	rm -Rf tmp
 
@@ -447,7 +446,7 @@ package-macosx:
 	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/
 
 	# Create disk image 
-	./macosx-dmg 0 "vlc-${VLC_QUICKVERSION}" tmp/* 
+	./macosx-dmg 0 "vlc-${VERSION}" tmp/* 
 
 	# Clean up
 	rm -Rf tmp
@@ -528,7 +527,7 @@ endif
 # Main application target
 #
 vlc: Makefile.opts Makefile.dep Makefile $(VLC_OBJ) $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS) $(LIB_VLC) $(LIB_BUILTINS) $(LIB_COMMON)
+	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) $(builtins_LDFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@

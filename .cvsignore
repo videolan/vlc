@@ -1,6 +1,8 @@
 .*
 core
 core.*
+conftest
+conftest.*
 .dep
 gmon.out
 vlc-debug.log

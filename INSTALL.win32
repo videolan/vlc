@@ -123,10 +123,7 @@ Building Win32 interface with bcc32 (Borland's compiler)
 (This stage is only necessary if you want to use the Win32 native interface.
  If you are happy with the GTK interface, then you can skip this section)
 
-[Steps 2 and 3 are temporary]
-
 1) Compile vlc as usual.
-include\defs.h should be generated.
 
 2) From the plugin\win32 directory, use Borland C++ command-line tools
 as follows:

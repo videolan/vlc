@@ -4,6 +4,13 @@
 
 HEAD
 
+  * ./plugins/win32/win32.cpp: fixed `--intf intfwin' which wasn't working.
+  * ./Makefile: we don't include the Gtk+ and SDL DLLs in the win32 package
+    anymore, the package is now 700k instead of 4MB.
+  * ./configure.in, ./Makefile, ./Makefile.opts.in: replaced LIB_FOO with
+    foo_LDFLAGS and CFLAGS_BAR with bar_CFLAGS for faster builds, and moved a
+    lot of stuff from Makefile.opts.in back to configure.in.
+  * ./install-win32: updated script for NSIS 1.96.
   * ./configure.in: added --enable-intfwin to enable the win32 interface and
     --with-bcbuilder to tell make where to find Borland C++ Builder.
   * ./plugins/win32/intfwin.bpr: we now build intfwin.so at the right place.

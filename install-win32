@@ -1,13 +1,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NSIS installer script for vlc ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; written by Pierre Baillet <oct@zoy.org> 29/7/01 v0.2
-; modifications by Samuel Hocevar <sam@zoy.org> 12/11/01
 
 ;;;;;;;;;;;;;
 ; CHANGELOG ;
 ;;;;;;;;;;;;;
+; modifications by Samuel Hocevar <sam@zoy.org> 05 Apr 2002
+; . no need for @VERSION@ anymore
+; . updated script for NSIS 1.96.
+; modifications by Samuel Hocevar <sam@zoy.org> 12 Nov 2001
 ; . removed version information.
+; written by Pierre Baillet <oct@zoy.org> 29 Jul 2001 v0.2
 ; . lists all installed files so as to prevent installer.nsi to be included
 ;   in the release.
 ; . really remove the shortcuts.
@@ -17,14 +20,15 @@
 ; General configuration ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 
-OutFile vlc-@VERSION@.exe
+OutFile ..\vlc-${VERSION}-win32.exe
+
 Name "the VideoLAN Client"
-Caption "vlc @VERSION@ for Win32 Setup"
-;Icon ../share/gvlc_win32.ico
+Caption "VideoLAN Client '${VERSION}' for Win32 Setup"
+;Icon ../share/gvlc32x32.ico
 
 CRCCheck on
 
-InstallDir $PROGRAMFILES\vlc
+InstallDir "$PROGRAMFILES\VideoLAN\VideoLAN Client"
 ; check if the program has already been installed, if so, take this dir
 ; as install dir
 InstallDirRegKey HKLM SOFTWARE\VideoLAN\VLC "Install_Dir"
@@ -33,14 +37,12 @@ DirText "Choose a directory to install in to:"
 AutoCloseWindow false
 ShowInstDetails show
 
-; uninstall stuff
-UninstallText "This will uninstall the VideoLAN Client. Hit next to continue."
-UninstallExeName "vlc-uninst.exe"
-
 SetOverwrite ifnewer
 SetDatablockOptimize on
 SetDateSave off
 SetCompress auto
+
+UninstallText "This will uninstall the VideoLAN Client. Hit next to continue."
 
 ;;;;;;;;;;;;;;;;;;;;
 ; Install settings ;
@@ -50,17 +52,19 @@ Section "Install"
 	SetOutPath $INSTDIR
 
 	File  vlc.exe
-	File  *.so
-	File  *.dll
 	File  *.txt
 
 	File  /r share
+	File  /r plugins
 
 	CreateDirectory "$SMPROGRAMS\VideoLAN"
-	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc_@VERSION@.lnk" "$INSTDIR\vlc.exe" 
-	CreateShortCut "$SMPROGRAMS\VideoLAN\Uninstall VLC.lnk" "$INSTDIR\vlc-uninst.exe"
+	CreateShortCut "$SMPROGRAMS\VideoLAN\vlc.lnk" "$INSTDIR\vlc.exe" 
+	CreateShortCut "$SMPROGRAMS\VideoLAN\Uninstall VLC.lnk" "$INSTDIR\uninstall.exe"
+	WriteUninstaller "uninstall.exe"
+
 	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "Install_Dir" $INSTDIR
-	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "version" "@VERSION@"
+	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "version" "${VERSION}"
+
 	Exec "explorer $SMPROGRAMS\VideoLAN\"
 SectionEnd
 
@@ -73,6 +77,8 @@ Section "Uninstall"
 	RMDir $SMPROGRAMS\VideoLAN
 	Delete $INSTDIR\share\*
 	RMDir $INSTDIR\share
+	Delete $INSTDIR\plugins\*
+	RMDir $INSTDIR\plugins
 	Delete $INSTDIR\*
 	RMDir $INSTDIR
 	DeleteRegKey HKLM SOFTWARE\VideoLAN

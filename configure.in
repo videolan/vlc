@@ -9,6 +9,7 @@ CODENAME=Ourumov
 
 dnl Save CFLAGS and LDFLAGS
 save_CFLAGS="${CFLAGS}"
+save_CPPFLAGS="${CPPFLAGS}"
 save_LDFLAGS="${LDFLAGS}"
 
 dnl Check for tools
@@ -18,6 +19,7 @@ AC_PROG_CPP
 
 dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
+AC_CHECK_TOOL(STRIP, strip, :)
 
 dnl Check for GNU make
 AC_PATH_PROG(GMAKE, gmake, no)
@@ -58,59 +60,85 @@ case x"${target_os}" in
     ;;
   xbsdi*)
     SYS=bsdi
-    LIB_DVD="${LIB_DVD} -ldvd"
-    LIB_VCD="${LIB_VCD} -ldvd"
+    save_CFLAGS="${save_CFLAGS} -pthread"
+    dvd_LDFLAGS="${dvd_LDFLAGS} -ldvd"
+    vcd_LDFLAGS="${vcd_LDFLAGS} -ldvd"
+    ;;
+  x*bsd*)
+    SYS="${target_os}"
+    save_CFLAGS="${save_CFLAGS} -pthread"
     ;;
   xdarwin*)
     SYS=darwin
+    save_CFLAGS="${save_CFLAGS} -no-cpp-precomp"
     ;;
   x*mingw32*)
     SYS=mingw32
     AC_CHECK_TOOL(WINDRES, windres, :)
-    LIB_IPV4="${LIB_IPV4} -lws2_32"
-    LIB_RC="${LIB_RC} -lws2_32"
+    save_CFLAGS="${save_CFLAGS} -fnative-struct -D_OFF_T_ -D_off_t=long"
+    save_LDFLAGS="${save_LDFLAGS} -mwindows -Xlinker --force-exe-suffix"
+    vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
+    ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
+    rc_LDFLAGS="${rc_LDFLAGS} -lws2_32"
     ;;
   x*nto*)
     SYS=nto
-    LIB_X11="${LIB_X11} -lsocket"
-    LIB_XVIDEO="${LIB_XVIDEO} -lsocket"
+    x11_LDFLAGS="${x11_LDFLAGS} -lsocket"
+    xvideo_LDFLAGS="${xvideo_LDFLAGS} -lsocket"
     ;;
   xbeos)
     SYS=beos
-    LIB_VLC="${LIB_VLC} -lbe"
-    LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
-    LIB_IPV4="${LIB_IPV4} -lbind"
-    PLDFLAGS="${PLDFLAGS} -nostart"
+    vlc_LDFLAGS="${vlc_LDFLAGS} -lbe"
+    plugins_LDFLAGS="${plugins_LDFLAGS} -nostart"
+    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker"
+    ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind"
     ;;
   x*)
     SYS="${target_os}"
     ;;
 esac
 
+dnl Flags needed for clean BeOS compilation
+if test x"${SYS}" != xbeos
+then
+  save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"
+fi
+
+dnl Flags for plugin compilation
+if test x"${SYS}" = xmingw32
+then
+  plugins_CFLAGS="${plugins_CFLAGS} -fnative-struct"
+else
+  plugins_CFLAGS="${plugins_CFLAGS} -fPIC"
+fi
+
+dnl The -DSYS_FOO flag
+save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr '[a-z].' '[A-Z]_'`"
+
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign)
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,
-    LIB_IPV4="${LIB_IPV4} -lsocket"
-    LIB_VLC="${LIB_VLC} -lsocket"
+    ipv4_LDFLAGS="${ipv4_LDFLAGS} -lsocket"
+    vlc_LDFLAGS="${vlc_LDFLAGS} -lsocket"
 )])
 AC_CHECK_FUNC(gethostbyname,,[
-  AC_CHECK_LIB(nsl,gethostbyname,LIB_IPV4="${LIB_IPV4} -lnsl")
+  AC_CHECK_LIB(nsl,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lnsl")
 ])
 AC_CHECK_FUNC(gethostbyname,,[
-  AC_CHECK_LIB(bind,gethostbyname,LIB_IPV4="${LIB_IPV4} -lbind")
+  AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")
 ])
 AC_CHECK_FUNC(nanosleep,,[
-  AC_CHECK_LIB(rt,nanosleep,LIB_VLC="${LIB_VLC} -lrt",[
-    AC_CHECK_LIB(posix4,nanosleep,LIB_VLC="${LIB_VLC} -lposix4")
+  AC_CHECK_LIB(rt,nanosleep,vlc_LDFLAGS="${vlc_LDFLAGS} -lrt",[
+    AC_CHECK_LIB(posix4,nanosleep,vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4")
   ])
 ])
 AC_CHECK_FUNC(inet_aton,,[
-  AC_CHECK_LIB(resolv,inet_aton,LIB_IPV4="${LIB_IPV4} -lresolv")
+  AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
 ])
 AC_CHECK_FUNC(textdomain,,[
-  AC_CHECK_LIB(intl,textdomain,LIB_VLC="${LIB_VLC} -lintl")
+  AC_CHECK_LIB(intl,textdomain,vlc_LDFLAGS="${vlc_LDFLAGS} -lintl")
 ])
 
 dnl Check for getopt
@@ -118,19 +146,19 @@ NEED_GETOPT=0
 AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
   AC_CHECK_LIB([gnugetopt],[getopt_long],
-    [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) LIB_VLC="${LIB_VLC} -lgnugetopt"],
+    [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) vlc_LDFLAGS="${vlc_LDFLAGS} -lgnugetopt"],
     [NEED_GETOPT=1])])
 
 AC_TYPE_SIGNAL
-AC_CHECK_LIB(dl,dlopen,LIB_VLC="${LIB_VLC} -ldl")
+AC_CHECK_LIB(dl,dlopen,vlc_LDFLAGS="${vlc_LDFLAGS} -ldl")
 AC_CHECK_LIB(m,cos,
-  LIB_IMDCT="${LIB_IMDCT} -lm"
-  LIB_FILTER_DISTORT="${LIB_FILTER_DISTORT} -lm")
+  imdct_LDFLAGS="${imdct_LDFLAGS} -lm"
+  filter_distort_LDFLAGS="${filter_distort_LDFLAGS} -lm")
 AC_CHECK_LIB(m,pow,
-  LIB_IMDCT="${LIB_IMDCT} -lm"
-  LIB_IMDCT3DN="${LIB_IMDCT3DN} -lm"
-  LIB_IMDCTSSE="${LIB_IMDCTSSE} -lm"
-  LIB_CHROMA_I420_RGB="${LIB_CHROMA_I420_RGB} -lm"
+  imdct_LDFLAGS="${imdct_LDFLAGS} -lm"
+  imdct3dn_LDFLAGS="${imdct3dn_LDFLAGS} -lm"
+  imdctsse_LDFLAGS="${imdctsse_LDFLAGS} -lm"
+  chroma_i420_rgb_LDFLAGS="${chroma_i420_rgb_LDFLAGS} -lm"
 )
 
 dnl Check for pthreads - borrowed from XMMS
@@ -182,15 +210,14 @@ then
   if test x$x_libraries = xNONE; then
     x_libraries=/usr/X11R6/lib
   fi
-  saved_CPPFLAGS=$CPPFLAGS
-  CPPFLAGS="$CPPFLAGS -I$x_includes"
+  CPPFLAGS="$save_CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/extensions/dpms.h, [
     AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
       AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
                 Define if <X11/extensions/dpms.h> defines DPMSInfo.)
     ])
   ])
-  CPPFLAGS=$saved_CPPFLAGS
+  CPPFLAGS="$save_CPPFLAGS"
 fi
 
 dnl Check for ntohl, etc.
@@ -297,7 +324,7 @@ AC_CACHE_CHECK([if \$CC accepts -bundle -undefined error -lcc_dynamic],
     [CFLAGS="${save_CFLAGS} -bundle -undefined error -lcc_dynamic"
      AC_TRY_COMPILE([],,ac_cv_ld_darwin=yes, ac_cv_ld_darwin=no)])
 if test x"$ac_cv_ld_darwin" != x"no"; then
-    PLDFLAGS="${PLDFLAGS} -bundle -undefined error -lcc_dynamic"
+    plugins_LDFLAGS="${plugins_LDFLAGS} -bundle -undefined error -lcc_dynamic"
 fi
 
 dnl Check for standard plugin linking flags
@@ -306,7 +333,7 @@ AC_CACHE_CHECK([if \$CC accepts -shared],
     [CFLAGS="${save_CFLAGS} -shared"
      AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
 if test x"$ac_cv_ld_plugins" != x"no"; then
-    PLDFLAGS="${PLDFLAGS} -shared"
+    plugins_LDFLAGS="${plugins_LDFLAGS} -shared"
 fi
         
 dnl Checks for __attribute__(aligned()) directive
@@ -326,6 +353,7 @@ fi
 
 dnl End of the bizarre compilation tests
 CFLAGS="${save_CFLAGS}"
+CPPFLAGS="${save_CPPFLAGS}"
 LDFLAGS="${save_LDFLAGS}"
 
 dnl Check for boolean_t
@@ -431,10 +459,10 @@ AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
 if test x"$ac_cv_altivec_inline" != x"no"; then
   AC_DEFINE(CAN_COMPILE_ALTIVEC, 1, Define if \$CC groks ALTIVEC inline assembly.)
   if test x"$ac_cv_altivec_inline" != x"yes"; then
-    CFLAGS_IDCTALTIVEC="$CFLAGS_IDCTALTIVEC $ac_cv_altivec_inline"
-    CFLAGS_MOTIONALTIVEC="$CFLAGS_MOTIONALTIVEC $ac_cv_altivec_inline"
-    CFLAGS_MEMCPYALTIVEC="$CFLAGS_MEMCPYALTIVEC $ac_cv_altivec_inline"
-    CFLAGS_VLC="$CFLAGS_VLC $ac_cv_altivec_inline"
+    idctaltivec_CFLAGS="$idctaltivec_CFLAGS $ac_cv_altivec_inline"
+    motionaltivec_CFLAGS="$motionaltivec_CFLAGS $ac_cv_altivec_inline"
+    memcpyaltivec_CFLAGS="$memcpyaltivec_CFLAGS $ac_cv_altivec_inline"
+    vlc_CFLAGS="$vlc_CFLAGS $ac_cv_altivec_inline"
   fi
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
@@ -447,7 +475,7 @@ AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
      AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
         ac_cv_c_altivec=-faltivec, [
         # Linux/PPC test
-        CFLAGS="$save_CFLAGS $CFLAGS_IDCTALTIVEC -fvec"
+        CFLAGS="$save_CFLAGS $idctaltivec_CFLAGS -fvec"
         AC_TRY_COMPILE(,[vec_mtvscr((vector unsigned int)(0));],
             [ac_cv_c_altivec="-fvec"], ac_cv_c_altivec=no)
         ])
@@ -455,10 +483,10 @@ AC_CACHE_CHECK([if \$CC groks Altivec C extensions],
     ])
 if test x"$ac_cv_c_altivec" != x"no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C altivec extensions.)
-  CFLAGS_IDCTALTIVEC="$CFLAGS_IDCTALTIVEC $ac_cv_c_altivec"
-  CFLAGS_MOTIONALTIVEC="$CFLAGS_MOTIONALTIVEC $ac_cv_c_altivec"
-  CFLAGS_MEMCPYALTIVEC="$CFLAGS_MEMCPYALTIVEC $ac_cv_c_altivec"
-  CFLAGS_VLC="$CFLAGS_VLC $ac_cv_c_altivec"
+  idctaltivec_CFLAGS="$idctaltivec_CFLAGS $ac_cv_c_altivec"
+  motionaltivec_CFLAGS="$motionaltivec_CFLAGS $ac_cv_c_altivec"
+  memcpyaltivec_CFLAGS="$memcpyaltivec_CFLAGS $ac_cv_c_altivec"
+  vlc_CFLAGS="$vlc_CFLAGS $ac_cv_c_altivec"
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 
@@ -470,10 +498,10 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
      LDFLAGS=$save_LDFLAGS
     ])
 if test x"$ac_cv_ld_altivec" != x"no"; then
-  LIB_IDCTALTIVEC="${LIB_IDCTALTIVEC} -framework vecLib"
-  LIB_MOTIONALTIVEC="${LIB_MOTIONALTIVEC} -framework vecLib"
-  LIB_MEMCPYALTIVEC="${LIB_MEMCPYALTIVEC} -framework vecLib"
-  LIB_VLC="${LIB_VLC} -framework vecLib"
+  idctaltivec_LDFLAGS="${idctaltivec_LDFLAGS} -framework vecLib"
+  motionaltivec_LDFLAGS="${motionaltivec_LDFLAGS} -framework vecLib"
+  memcpyaltivec_LDFLAGS="${memcpyaltivec_LDFLAGS} -framework vecLib"
+  vlc_LDFLAGS="${vlc_LDFLAGS} -framework vecLib"
 fi
 fi # end if mingw32
 
@@ -534,6 +562,7 @@ AC_ARG_ENABLE(debug,
 dnl
 dnl  Enable release-specific flags
 dnl
+RELEASE=0
 AC_ARG_ENABLE(release,
 [  --enable-release        activate extra optimizations (default disabled)],
 [ if test x$enableval = xyes; then RELEASE=1; fi ],
@@ -562,7 +591,7 @@ then
     then
       AC_CHECK_HEADERS(dvdcss/dvdcss.h,
         [ PLUGINS="${PLUGINS} dvd"
-          LIB_DVD="${LIB_DVD} -ldvdcss" ],
+          dvd_LDFLAGS="${dvd_LDFLAGS} -ldvdcss" ],
         [ AC_MSG_WARN([libdvdcss is no longer provided with vlc; please get libdvdcss from http://www.videolan.org/libdvdcss/ and build it. Then either use --with-dvdcss=<path/where/libdvdcss/was/installed> for dynamic linking (recommended under Unix) or --with-dvdcss-tree=<path/where/libdvdcss/was/built> for static linking (recommended under BeOS, Windows, MacOS X). Alternatively you can use --disable-dvd to disable the DVD plugin.])
           AC_MSG_ERROR([cannot find libdvdcss headers]) ])
     else
@@ -579,8 +608,8 @@ then
         dnl  Use a custom libdvdcss
         AC_MSG_RESULT(${real_dvdcss_tree}/src/.libs/libdvdcss.a)
         BUILTINS="${BUILTINS} dvd"
-        LIB_DVD="${LIB_DVD} ${real_dvdcss_tree}/src/.libs/libdvdcss.a"
-        CFLAGS_DVD="${CFLAGS_DVD} -I${real_dvdcss_tree}/src"
+        dvd_LDFLAGS="${dvd_LDFLAGS} ${real_dvdcss_tree}/src/.libs/libdvdcss.a"
+        dvd_CFLAGS="${dvd_CFLAGS} -I${real_dvdcss_tree}/src"
       else
         dnl  The given libdvdcss wasn't built
         AC_MSG_RESULT(no)
@@ -591,8 +620,8 @@ then
   xno)
     dnl  Compile without dvdcss (dlopen version, works only under Linux)
     PLUGINS="${PLUGINS} dvd"
-    CFLAGS_DVD="${CFLAGS_DVD} -DGOD_DAMN_DMCA"
-    LIB_DVD="${LIB_DVD} -ldl"
+    dvd_CFLAGS="${dvd_CFLAGS} -DGOD_DAMN_DMCA"
+    dvd_LDFLAGS="${dvd_LDFLAGS} -ldl"
   ;;
   *)
     AC_MSG_CHECKING(for dvdcss headers in ${with_dvdcss})
@@ -601,8 +630,8 @@ then
       dnl  Use ${with_dvdcss}/include/dvdcss/dvdcss.h
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvd"
-      LIB_DVD="${LIB_DVD} -L${with_dvdcss}/lib -ldvdcss"
-      CFLAGS_DVD="${CFLAGS_DVD} -I${with_dvdcss}/include"
+      dvd_LDFLAGS="${dvd_LDFLAGS} -L${with_dvdcss}/lib -ldvdcss"
+      dvd_CFLAGS="${dvd_CFLAGS} -I${with_dvdcss}/include"
     else
       dnl  No libdvdcss could be found, sorry
       AC_MSG_RESULT(no)
@@ -625,7 +654,7 @@ then
   x)
     AC_CHECK_HEADERS(dvdread/dvd_reader.h,
       [ PLUGINS="${PLUGINS} dvdread"
-        LIB_DVDREAD="${LIB_DVDREAD} -ldvdread" ])
+        dvdread_LDFLAGS="${dvdread_LDFLAGS} -ldvdread" ])
   ;;
   *)
     AC_MSG_CHECKING(for dvdread headers in ${withval})
@@ -633,8 +662,8 @@ then
     then
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvdread"
-      LIB_DVDREAD="${LIB_DVDREAD} -L${withval}/lib -ldvdread"
-      CFLAGS_DVDREAD="${CFLAGS_DVDREAD} -I${withval}/include"
+      dvdread_LDFLAGS="${dvdread_LDFLAGS} -L${withval}/lib -ldvdread"
+      dvdread_CFLAGS="${dvdread_CFLAGS} -I${withval}/include"
     else
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([Cannot find ${withval}/dvdread/dvd_reader.h])
@@ -663,7 +692,7 @@ then
   if test "x${SYS}" = "xdarwin"
   then
     PLUGINS="${PLUGINS} vcd"
-    LIB_VCD="${LIB_VCD} -framework IOKit -framework CoreFoundation" 
+    vcd_LDFLAGS="${vcd_LDFLAGS} -framework IOKit -framework CoreFoundation" 
   fi
 fi
 
@@ -697,18 +726,18 @@ AC_ARG_ENABLE(mad,
 if test x$enable_mad = xyes
 then
   PLUGINS="${PLUGINS} mad"
-  LIB_MAD="${LIB_MAD} -lmad"
+  mad_LDFLAGS="${mad_LDFLAGS} -lmad"
   AC_ARG_WITH(mad,
     [    --with-mad=PATH       path to libmad],
     [ if test "x$with_val" != "xno" -a "x$with_val" != "x"
       then
-        CFLAGS_MAD="${CFLAGS_MAD} -I$with_val/include"
-        LIB_MAD="${LIB_MAD} -L$with_val/lib"
+        mad_CFLAGS="${mad_CFLAGS} -I$with_val/include"
+        mad_LDFLAGS="${mad_LDFLAGS} -L$with_val/lib"
       fi ])
   save_CFLAGS=$CFLAGS
   save_LDFLAGS=$LDFLAGS
-  CFLAGS="$CFLAGS $CFLAGS_MAD"
-  LDFLAGS="$LDFLAGS $LIB_MAD"
+  CFLAGS="$CFLAGS $mad_CFLAGS"
+  LDFLAGS="$LDFLAGS $mad_LDFLAGS"
   AC_CHECK_HEADERS(mad.h, ,
   [ echo "Cannot find development headers for libmad..."
     exit 1
@@ -725,9 +754,7 @@ dnl special case for BeOS
 if test x$SYS = xbeos
 then
     PLUGINS="${PLUGINS} beos"
-
-dnl default case
-else
+fi
 
 dnl
 dnl  a52 AC3 decoder plugin
@@ -738,7 +765,7 @@ if test "x$enableval" != "xno" -a x$SYS != xmingw32
   then
     AC_CHECK_HEADERS(a52dec/a52.h, [
       BUILTINS="${BUILTINS} a52"
-      LIB_A52="${LIB_A52} -la52 -lm"
+      a52_LDFLAGS="${a52_LDFLAGS} -la52 -lm"
      ],[])
 fi
 
@@ -751,7 +778,7 @@ if test "x$enableval" != "xno"
 then
   AC_CHECK_HEADERS(ogg/ogg.h, [
     PLUGINS="${PLUGINS} vorbis"
-    LIB_VORBIS="${LIB_VORBIS} -lvorbis"
+    vorbis_LDFLAGS="${vorbis_LDFLAGS} -lvorbis"
    ],[])
 fi
 
@@ -775,14 +802,13 @@ if test x$enable_x11 != xno &&
   if test x$x_libraries = xNONE; then
     x_libraries=/usr/X11R6/lib
   fi
-  saved_CPPFLAGS=$CPPFLAGS
-  CPPFLAGS="$CPPFLAGS -I$x_includes"
+  CPPFLAGS="$save_CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/Xlib.h, [
     PLUGINS="${PLUGINS} x11"
-    LIB_X11="${LIB_X11} -L$x_libraries -lX11 -lXext"
-    CFLAGS_X11="${CFLAGS_X11} -I$x_includes"
+    x11_LDFLAGS="${x11_LDFLAGS} -L$x_libraries -lX11 -lXext"
+    x11_CFLAGS="${x11_CFLAGS} -I$x_includes"
   ])
-  CPPFLAGS=$saved_CPPFLAGS
+  CPPFLAGS="$save_CPPFLAGS"
 fi
 
 dnl
@@ -799,23 +825,23 @@ if test x$enable_xvideo != xno &&
   if test x$x_libraries = xNONE; then
     x_libraries=/usr/X11R6/lib
   fi
-  saved_CPPFLAGS=$CPPFLAGS
-  CPPFLAGS="$CPPFLAGS -I$x_includes"
+  save_CPPFLAGS=$CPPFLAGS
+  CPPFLAGS="$save_CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
-    saved_CFLAGS=$CFLAGS
+    save_CFLAGS=$CFLAGS
     CFLAGS="$CFLAGS -L$x_libraries -lX11 -lXext"
     AC_CHECK_LIB(Xv_pic,XvSetPortAttribute,
       # We have Xv_pic, that's good, we can build an xvideo.so plugin !
       PLUGINS="${PLUGINS} xvideo"
-      LIB_XVIDEO="${LIB_XVIDEO} -L$x_libraries -lX11 -lXext -lXv_pic"
-      CFLAGS_XVIDEO="${CFLAGS_XVIDEO} -I$x_includes",
+      xvideo_LDFLAGS="${xvideo_LDFLAGS} -L$x_libraries -lX11 -lXext -lXv_pic"
+      xvideo_CFLAGS="${xvideo_CFLAGS} -I$x_includes",
       # We don't have Xv_pic, let's make xvideo.a as builtin
       BUILTINS="${BUILTINS} xvideo"
-      LIB_XVIDEO="${LIB_XVIDEO} -L$x_libraries -lX11 -lXext -lXv"
-      CFLAGS_XVIDEO="${CFLAGS_XVIDEO} -I$x_includes")
-    CFLAGS=$saved_CFLAGS
+      xvideo_LDFLAGS="${xvideo_LDFLAGS} -L$x_libraries -lX11 -lXext -lXv"
+      xvideo_CFLAGS="${xvideo_CFLAGS} -I$x_includes")
+    CFLAGS="$save_CFLAGS"
   ]
-  CPPFLAGS=$saved_CPPFLAGS)
+  CPPFLAGS="$save_CPPFLAGS")
 fi
 
 dnl
@@ -849,17 +875,16 @@ then
   if test x${SDL_CONFIG} != xno
   then
     PLUGINS="${PLUGINS} sdl"
-    CFLAGS_SDL="${CFLAGS_SDL} `${SDL_CONFIG} --cflags`"
-    LIB_SDL="${LIB_SDL} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
-    save_CPPFLAGS=$CPPFLAGS
-    CPPFLAGS="$CPPFLAGS $CFLAGS_SDL"
+    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} --cflags`"
+    sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
+    CPPFLAGS="$save_CPPFLAGS $sdl_CFLAGS"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
       [ AC_MSG_ERROR([The development package for SDL is not installed. 
 Please install it and try again. Alternatively you can also configure with 
 --disable-sdl.])
       ])
-    CPPFLAGS=$save_CPPFLAGS
+    CPPFLAGS="$save_CPPFLAGS"
     if expr 1.1.5 \> `$SDL_CONFIG --version` >/dev/null
     then
       AC_MSG_ERROR([The development package for SDL is not installed.
@@ -889,14 +914,14 @@ then
     then
       AC_CHECK_HEADERS(ddraw.h,
       [ PLUGINS="${PLUGINS} directx"
-        LIB_DIRECTX="${LIB_DIRECTX} -lgdi32" ])
+        directx_LDFLAGS="${directx_LDFLAGS} -lgdi32" ])
     else
       AC_MSG_CHECKING(for directX headers in ${withval})
       if test -f ${withval}/ddraw.h
       then
         PLUGINS="${PLUGINS} directx"
-        LIB_DIRECTX="${LIB_DIRECTX} -L${withval}/lib -lgdi32"
-        INCLUDE="${INCLUDE} -I${withval}"
+        directx_LDFLAGS="${directx_LDFLAGS} -L${withval}/lib -lgdi32"
+        directx_CFLAGS="${directx_CFLAGS} -I${withval}"
         AC_MSG_RESULT(yes)
       else
         AC_MSG_RESULT(no)
@@ -936,13 +961,13 @@ AC_ARG_ENABLE(ggi,
 if test x$enable_ggi = xyes
 then
   PLUGINS="${PLUGINS} ggi"
-  LIB_GGI="${LIB_GGI} -lggi"
+  ggi_LDFLAGS="${ggi_LDFLAGS} -lggi"
   AC_ARG_WITH(ggi,
     [    --with-ggi=PATH       path to libggi],
     [ if test "x$with_val" != "xno" -a "x$with_val" != "x"
       then
         CFLAGS_GGI="${CFLAGS_GGI} -I$with_val/include"
-        LIB_GGI="${LIB_GGI} -L$with_val/lib"
+        ggi_LDFLAGS="${ggi_LDFLAGS} -L$with_val/lib"
       fi ])
 fi
 
@@ -954,14 +979,14 @@ AC_ARG_ENABLE(glide,
 if test x$enable_glide = xyes
 then
   PLUGINS="${PLUGINS} glide"
-  LIB_GLIDE="${LIB_GLIDE} -lglide2x -lm"
-  CFLAGS_GLIDE="${CFLAGS_GLIDE} -I/usr/include/glide"
+  glide_LDFLAGS="${glide_LDFLAGS} -lglide2x -lm"
+  glide_CFLAGS="${glide_CFLAGS} -I/usr/include/glide"
   AC_ARG_WITH(glide,
     [    --with-glide=PATH     path to libglide],
     [ if test "x$with_val" != "xno" -a "x$with_val" != "x"
       then
-        CFLAGS_GLIDE="${CFLAGS_GLIDE} -I$with_val/include"
-        LIB_GLIDE="${LIB_GLIDE} -L$with_val/lib"
+        glide_CFLAGS="${glide_CFLAGS} -I$with_val/include"
+        glide_LDFLAGS="${glide_LDFLAGS} -L$with_val/lib"
       fi ])
 fi
 
@@ -976,7 +1001,7 @@ then
   if test x$have_aa = xtrue
   then
     PLUGINS="${PLUGINS} aa"
-    LIB_AA="${LIB_AA} -laa"
+    aa_LDFLAGS="${aa_LDFLAGS} -laa"
   fi
 fi
 
@@ -997,7 +1022,7 @@ if test x$enable_dsp != xno &&
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
     PLUGINS="${PLUGINS} dsp"
-    AC_CHECK_LIB(ossaudio,main,LIB_DSP="${LIB_DSP} -lossaudio")
+    AC_CHECK_LIB(ossaudio,main,dsp_LDFLAGS="${dsp_LDFLAGS} -lossaudio")
   ])
 fi
 
@@ -1012,8 +1037,8 @@ AC_ARG_ENABLE(esd,
      if test x${ESD_CONFIG} != xno
      then
        PLUGINS="${PLUGINS} esd"
-       CFLAGS_ESD="${CFLAGS_ESD} `${ESD_CONFIG} --cflags`"
-       LIB_ESD="${LIB_ESD} `${ESD_CONFIG} --libs`"
+       esd_CFLAGS="${esd_CFLAGS} `${ESD_CONFIG} --cflags`"
+       esd_LDFLAGS="${esd_LDFLAGS} `${ESD_CONFIG} --libs`"
      fi
    fi])
 
@@ -1028,8 +1053,8 @@ AC_ARG_ENABLE(arts,
      if test x${ARTS_CONFIG} != xno
      then
        PLUGINS="${PLUGINS} arts"
-       CFLAGS_ARTS="${CFLAGS_ARTS} `${ARTS_CONFIG} --cflags`"
-       LIB_ARTS="${LIB_ARTS} `${ARTS_CONFIG} --libs `"
+       arts_CFLAGS="${arts_CFLAGS} `${ARTS_CONFIG} --cflags`"
+       arts_LDFLAGS="${arts_LDFLAGS} `${ARTS_CONFIG} --libs `"
      fi
    fi])
 
@@ -1044,7 +1069,7 @@ AC_ARG_ENABLE(alsa,
      if test x$have_alsa = xtrue
      then
        PLUGINS="${PLUGINS} alsa"
-       LIB_ALSA="${LIB_ALSA} -lasound -lm -ldl"
+       alsa_LDFLAGS="${alsa_LDFLAGS} -lasound -lm -ldl"
      fi
    fi])
 
@@ -1056,7 +1081,7 @@ AC_ARG_ENABLE(waveout,
 if test "x$enableval" != "xno" -a x$SYS = xmingw32
   then
     PLUGINS="${PLUGINS} waveout"
-    LIB_WAVEOUT="-lwinmm"
+    waveout_LDFLAGS="-lwinmm"
 fi
 
 dnl
@@ -1092,11 +1117,10 @@ then
     then
       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
     fi
-    CFLAGS_GTK="${CFLAGS_GTK} `${GTK_CONFIG} --cflags gtk`"
-    LIB_GTK="${LIB_GTK} `${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
+    gtk_CFLAGS="${gtk_CFLAGS} `${GTK_CONFIG} --cflags gtk`"
+    gtk_LDFLAGS="${gtk_LDFLAGS} `${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
     # now look for the gtk.h header
-    saved_CPPFLAGS=$CPPFLAGS
-    CPPFLAGS="$CPPFLAGS $CFLAGS_GTK"
+    CPPFLAGS="$save_CPPFLAGS $gtk_CFLAGS"
     ac_cv_gtk_headers=yes
     AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
       ac_cv_gtk_headers=no
@@ -1107,7 +1131,7 @@ then
       PLUGINS="${PLUGINS} gtk"
       ALIASES="${ALIASES} gvlc"
     fi
-    CPPFLAGS=$saved_CPPFLAGS
+    CPPFLAGS="$save_CPPFLAGS"
   fi
 fi
 
@@ -1121,12 +1145,11 @@ AC_ARG_ENABLE(gnome,
     AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
     if test -x ${GNOME_CONFIG}
     then
-       CFLAGS_GNOME="${CFLAGS_GNOME} `${GNOME_CONFIG} --cflags gtk gnomeui`"
-       LIB_GNOME="${LIB_GNOME} `${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`"
+       gnome_CFLAGS="${gnome_CFLAGS} `${GNOME_CONFIG} --cflags gtk gnomeui`"
+       gnome_LDFLAGS="${gnome_LDFLAGS} `${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`"
     fi
     # now look for the gnome.h header
-    saved_CPPFLAGS=$CPPFLAGS
-    CPPFLAGS="$CPPFLAGS $CFLAGS_GNOME"
+    CPPFLAGS="$save_CPPFLAGS $gnome_CFLAGS"
     AC_CHECK_HEADERS(gnome.h, [
       PLUGINS="${PLUGINS} gnome"
       ALIASES="${ALIASES} gnome-vlc"
@@ -1134,8 +1157,7 @@ AC_ARG_ENABLE(gnome,
       AC_MSG_ERROR([Can't find gnome headers. Please install the gnome
 developement tools or remove the --enable-gnome option])
      ])
-  
-    CPPFLAGS=$saved_CPPFLAGS
+    CPPFLAGS="$save_CPPFLAGS"
   fi])
 
 dnl
@@ -1146,8 +1168,8 @@ AC_ARG_ENABLE(qt,
   [if test x$enable_qt = xyes; then
      PLUGINS="${PLUGINS} qt"
      ALIASES="${ALIASES} qvlc"
-     LIB_QT="${LIB_QT} -lqt -L${QTDIR}/lib"
-     CFLAGS_QT="${CFLAGS_QT} -I/usr/include/qt -I${QTDIR}/include"
+     qt_LDFLAGS="${qt_LDFLAGS} -lqt -L${QTDIR}/lib"
+     qt_CFLAGS="${qt_CFLAGS} -I/usr/include/qt -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -1164,9 +1186,9 @@ AC_ARG_ENABLE(kde,
   [if test x$enable_kde = xyes; then
      PLUGINS="${PLUGINS} kde"
      ALIASES="${ALIASES} kvlc"
-     LIB_KDE="${LIB_KDE} -L${KDEDIR}/lib -lkfile"
-     CFLAGS_KDE="${CFLAGS_KDE} -I/usr/include/kde -I/usr/include/qt"
-     CFLAGS_KDE="${CFLAGS_KDE} -I${KDEDIR}/include -I${QTDIR}/include"
+     kde_LDFLAGS="${kde_LDFLAGS} -L${KDEDIR}/lib -lkfile"
+     kde_CFLAGS="${kde_CFLAGS} -I/usr/include/kde -I/usr/include/qt"
+     kde_CFLAGS="${kde_CFLAGS} -I${KDEDIR}/include -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -1183,15 +1205,15 @@ AC_ARG_ENABLE(macosx,
   [if test x$enable_macosx = xyes
    then
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
-     CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
-     LIB_COMMON="${LIB_COMMON} -ObjC"
+     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     macosx_CFLAGS="${macosx_CFLAGS} -ObjC"
+     LDFLAGS="${LDFLAGS} -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
-     LIB_MACOSX="${LIB_MACOSX} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
-     CFLAGS_MACOSX="${CFLAGS_MACOSX} -ObjC"
-     LIB_COMMON="${LIB_COMMON} -ObjC"
+     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework Cocoa -framework AGL -framework QuickTime -lobjc"
+     macosx_CFLAGS="${macosx_CFLAGS} -ObjC"
+     LDFLAGS="${LDFLAGS} -ObjC"
    )])
 
 dnl
@@ -1203,7 +1225,7 @@ AC_ARG_ENABLE(qnx,
     then
       AC_CHECK_HEADERS(Ph.h, [
         PLUGINS="${PLUGINS} qnx"
-        LIB_QNX="${LIB_QNX} -lasound -lph"
+        qnx_LDFLAGS="${qnx_LDFLAGS} -lasound -lph"
       ])
     fi
 
@@ -1230,7 +1252,7 @@ AC_ARG_ENABLE(ncurses,
   [  --enable-ncurses        ncurses interface support (default disabled)],
   [if test x$enable_ncurses = xyes; then
      PLUGINS="${PLUGINS} ncurses"
-     LIB_NCURSES="${LIB_NCURSES} -lncurses"
+     ncurses_LDFLAGS="${ncurses_LDFLAGS} -lncurses"
    fi])
 
 dnl
@@ -1244,11 +1266,8 @@ then
   if test x$have_lirc = xtrue
   then
     PLUGINS="${PLUGINS} lirc"
-    LIB_LIRC="${LIB_LIRC} -llirc_client"
+    lirc_LDFLAGS="${lirc_LDFLAGS} -llirc_client"
   fi
-fi
-
-dnl  end of non-BeOS stuff
 fi
 
 AC_ARG_WITH(,[Misc options:])
@@ -1313,17 +1332,6 @@ then
 fi
 
 dnl
-dnl  DLLs - used for Win32 package build
-dnl
-DLL_PATH=.
-AC_ARG_WITH(dll-path,
-  [  --with-dll-path=PATH    path to Win32 DLLs (default search in \$PWD)],
-  [ if test "x$withval" != "xno"
-    then
-      DLL_PATH=$withval
-    fi ])
-
-dnl
 dnl  Profiling
 dnl
 GPROF=0
@@ -1336,7 +1344,7 @@ AC_ARG_ENABLE(cprof,
 [  --enable-cprof          cprof profiling (default disabled)],
 [ if test x$enableval = xyes;
   then
-    LIB_COMMON="${LIB_COMMON} -lcprof"
+    LDFLAGS="${LDFLAGS} -lcprof"
     CPROF=1
   fi
 ])
@@ -1369,7 +1377,7 @@ AC_ARG_ENABLE(st,
     fi])
 ])
 
-LIB_COMMON="${LIB_COMMON} ${THREAD_LIB}"
+LDFLAGS="${LDFLAGS} ${THREAD_LIB}"
 
 dnl
 dnl  Plug-ins - this must be AT THE END
@@ -1415,7 +1423,6 @@ AC_SUBST(ARCH)
 AC_SUBST(PLUGINS)
 AC_SUBST(BUILTINS)
 AC_SUBST(ALIASES)
-AC_SUBST(INCLUDE)
 AC_SUBST(DEBUG)
 AC_SUBST(ASM)
 AC_SUBST(CPROF)
@@ -1426,83 +1433,78 @@ AC_SUBST(RELEASE)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
 AC_SUBST(BCBUILDER)
-AC_SUBST(DLL_PATH)
 AC_SUBST(VLC_PACKAGE)
 AC_SUBST(VLC_VERSION)
+AC_SUBST(NEED_GETOPT)
 
-AC_SUBST(LDFLAGS)
-AC_SUBST(PLDFLAGS)
-
-AC_SUBST(LIB_COMMON)
-AC_SUBST(LIB_VLC)
-
-AC_SUBST(LIB_A52)
-AC_SUBST(LIB_AA)
-AC_SUBST(LIB_ALSA)
-AC_SUBST(LIB_ARTS)
-AC_SUBST(LIB_BEOS)
-AC_SUBST(LIB_CHROMA_I420_RGB)
-AC_SUBST(LIB_DARWIN)
-AC_SUBST(LIB_DIRECTX)
-AC_SUBST(LIB_DSP)
-AC_SUBST(LIB_DVD)
-AC_SUBST(LIB_DVDREAD)
-AC_SUBST(LIB_ESD)
-AC_SUBST(LIB_FILTER_DISTORT)
-AC_SUBST(LIB_GGI)
-AC_SUBST(LIB_GLIDE)
-AC_SUBST(LIB_GNOME)
-AC_SUBST(LIB_GTK)
-AC_SUBST(LIB_IDCTALTIVEC)
-AC_SUBST(LIB_IMDCT)
-AC_SUBST(LIB_IMDCT3DN)
-AC_SUBST(LIB_IMDCTSSE)
-AC_SUBST(LIB_IPV4)
-AC_SUBST(LIB_IPV6)
-AC_SUBST(LIB_KDE)
-AC_SUBST(LIB_LIRC)
-AC_SUBST(LIB_MACOSX)
-AC_SUBST(LIB_MAD)
-AC_SUBST(LIB_MEMCPYALTIVEC)
-AC_SUBST(LIB_MOTIONALTIVEC)
-AC_SUBST(LIB_MPEG_TS)
-AC_SUBST(LIB_NCURSES)
-AC_SUBST(LIB_QNX)
-AC_SUBST(LIB_QT)
-AC_SUBST(LIB_RC)
-AC_SUBST(LIB_SDL)
-AC_SUBST(LIB_VCD)
-AC_SUBST(LIB_VORBIS)
-AC_SUBST(LIB_WAVEOUT)
-AC_SUBST(LIB_WIN32)
-AC_SUBST(LIB_X11)
-AC_SUBST(LIB_XVIDEO)
-
-AC_SUBST(CFLAGS_COMMON)
-AC_SUBST(CFLAGS_VLC)
-
-AC_SUBST(CFLAGS_ARTS)
-AC_SUBST(CFLAGS_DVD)
-AC_SUBST(CFLAGS_DVDREAD)
-AC_SUBST(CFLAGS_ESD)
-AC_SUBST(CFLAGS_GLIDE)
-AC_SUBST(CFLAGS_GNOME)
-AC_SUBST(CFLAGS_GTK)
-AC_SUBST(CFLAGS_KDE)
-AC_SUBST(CFLAGS_IDCTALTIVEC)
-AC_SUBST(CFLAGS_MACOSX)
-AC_SUBST(CFLAGS_MAD)
-AC_SUBST(CFLAGS_MEMCPYALTIVEC)
-AC_SUBST(CFLAGS_MOTIONALTIVEC)
 AC_SUBST(CFLAGS_OPTIM)
 AC_SUBST(CFLAGS_OPTIM_NODEBUG)
-AC_SUBST(CFLAGS_QT)
-AC_SUBST(CFLAGS_SDL)
-AC_SUBST(CFLAGS_WIN32)
-AC_SUBST(CFLAGS_X11)
-AC_SUBST(CFLAGS_XVIDEO)
+AC_SUBST(LDFLAGS)
 
-AC_SUBST(NEED_GETOPT)
+AC_SUBST(vlc_CFLAGS)
+AC_SUBST(plugins_CFLAGS)
+AC_SUBST(builtins_CFLAGS)
+
+AC_SUBST(arts_CFLAGS)
+AC_SUBST(dvd_CFLAGS)
+AC_SUBST(dvdread_CFLAGS)
+AC_SUBST(directx_CFLAGS)
+AC_SUBST(esd_CFLAGS)
+AC_SUBST(glide_CFLAGS)
+AC_SUBST(gnome_CFLAGS)
+AC_SUBST(gtk_CFLAGS)
+AC_SUBST(kde_CFLAGS)
+AC_SUBST(idctaltivec_CFLAGS)
+AC_SUBST(macosx_CFLAGS)
+AC_SUBST(mad_CFLAGS)
+AC_SUBST(memcpyaltivec_CFLAGS)
+AC_SUBST(motionaltivec_CFLAGS)
+AC_SUBST(qt_CFLAGS)
+AC_SUBST(sdl_CFLAGS)
+AC_SUBST(x11_CFLAGS)
+AC_SUBST(xvideo_CFLAGS)
+
+AC_SUBST(vlc_LDFLAGS)
+AC_SUBST(plugins_LDFLAGS)
+AC_SUBST(builtins_LDFLAGS)
+
+AC_SUBST(a52_LDFLAGS)
+AC_SUBST(aa_LDFLAGS)
+AC_SUBST(alsa_LDFLAGS)
+AC_SUBST(arts_LDFLAGS)
+AC_SUBST(beos_LDFLAGS)
+AC_SUBST(chroma_i420_rgb_LDFLAGS)
+AC_SUBST(directx_LDFLAGS)
+AC_SUBST(dsp_LDFLAGS)
+AC_SUBST(dvd_LDFLAGS)
+AC_SUBST(dvdread_LDFLAGS)
+AC_SUBST(esd_LDFLAGS)
+AC_SUBST(filter_distort_LDFLAGS)
+AC_SUBST(ggi_LDFLAGS)
+AC_SUBST(glide_LDFLAGS)
+AC_SUBST(gnome_LDFLAGS)
+AC_SUBST(gtk_LDFLAGS)
+AC_SUBST(idctaltivec_LDFLAGS)
+AC_SUBST(imdct_LDFLAGS)
+AC_SUBST(imdct3dn_LDFLAGS)
+AC_SUBST(imdctsse_LDFLAGS)
+AC_SUBST(ipv4_LDFLAGS)
+AC_SUBST(kde_LDFLAGS)
+AC_SUBST(lirc_LDFLAGS)
+AC_SUBST(macosx_LDFLAGS)
+AC_SUBST(mad_LDFLAGS)
+AC_SUBST(memcpyaltivec_LDFLAGS)
+AC_SUBST(motionaltivec_LDFLAGS)
+AC_SUBST(ncurses_LDFLAGS)
+AC_SUBST(qnx_LDFLAGS)
+AC_SUBST(qt_LDFLAGS)
+AC_SUBST(rc_LDFLAGS)
+AC_SUBST(sdl_LDFLAGS)
+AC_SUBST(vcd_LDFLAGS)
+AC_SUBST(vorbis_LDFLAGS)
+AC_SUBST(waveout_LDFLAGS)
+AC_SUBST(x11_LDFLAGS)
+AC_SUBST(xvideo_LDFLAGS)
 
 AC_OUTPUT([Makefile.opts po/Makefile.in])
 

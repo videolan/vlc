@@ -14,8 +14,6 @@ include Makefile
 # Analyze the target we are asked to build
 #
 module_name := $(shell echo $(MAKECMDGOALS) | sed 's@.*/\(.*\)\..*@\1@')
-MODULE_NAME := $(shell echo $(module_name) | tr '[a-z]' '[A-Z]')
-
 suff := $(shell echo $(MAKECMDGOALS) | sed 's@.*\.@@' | tr so/a lo/o)
 
 #
@@ -25,14 +23,14 @@ SRC_C := $(filter %.c,$($(module_name)_SOURCES))
 SRC_CPP := $(filter %.cpp,$($(module_name)_SOURCES))
 
 ifeq (lo,$(suff))
-CFLAGS_EXTRA := -I../../include -I../../extras $(CFLAGS_$(MODULE_NAME)) \
+extra_CFLAGS := $(plugins_CFLAGS) $($(module_name)_CFLAGS) \
                 -DMODULE_NAME=$(module_name) -DMODULE_NAME_IS_$(module_name) \
-                -DPLUGIN $(CFLAGS_$(MODULE_NAME)_PLUGIN) $(PCFLAGS)
+                $($(module_name)_so_CFLAGS)
 OBJ_ALL := $(SRC_C:%.c=%.lo.$(module_name)) $(SRC_CPP:%.cpp=%.lo.$(module_name))
 else
-CFLAGS_EXTRA := -I../../include -I../../extras $(CFLAGS_$(MODULE_NAME)) \
+extra_CFLAGS := $(builtins_CFLAGS) $($(module_name)_CFLAGS) \
                 -DMODULE_NAME=$(module_name) -DMODULE_NAME_IS_$(module_name) \
-                -DBUILTIN $(CFLAGS_$(MODULE_NAME)_BUILTIN)
+                $($(module_name)_a_CFLAGS)
 OBJ_ALL := $(SRC_C:%.c=%.o.$(module_name)) $(SRC_CPP:%.cpp=%.o.$(module_name))
 endif
 
@@ -51,7 +49,7 @@ all:
 
 clean:
 #	rm -f $(PLUGIN_ALL) $(BUILTIN_ALL)
-	rm -f *.o *.o.* *.lo *.lo.* *.moc *.moc.* *.bak
+	rm -f *.o *.o.* *.lo *.lo.* *.obj *.moc *.moc.* *.bak
 	rm -rf .dep
 
 FORCE:
@@ -60,23 +58,23 @@ $(OBJ_ALL): ../../Makefile.modules ../../Makefile.dep ../../Makefile ../../Makef
 $(OBJ_ALL): $(H_DEP:%=../../include/%)
 
 $(C_DEP): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(CFLAGS_EXTRA)"
+	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
 
 $(CPP_DEP): %.dpp: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(CFLAGS_EXTRA)"
+	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
 
 $(SRC_C:%.c=%.$(suff).$(module_name)): %.$(suff).$(module_name): .dep/%.d
 $(SRC_C:%.c=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.c
-	$(CC) $(CFLAGS) $(CFLAGS_EXTRA) -c $< -o $@
+	$(CC) $(CFLAGS) $(extra_CFLAGS) -c $< -o $@
 
 $(SRC_CPP:%.cpp=%.$(suff).$(module_name)): %.$(suff).$(module_name): .dep/%.dpp
 $(SRC_CPP:%.cpp=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.cpp
-	$(CC) $(CFLAGS) $(CFLAGS_EXTRA) -c $< -o $@
+	$(CC) $(CFLAGS) $(extra_CFLAGS) -c $< -o $@
 
 # foo_CUSTOM lets us override all target rules for foo.so and foo.a
 ifeq (,$($(module_name)_CUSTOM))
 ../$(module_name).so: $(EXTRA_DEP) $(OBJ_ALL)
-	$(CC) $(OBJ_ALL) $(PLDFLAGS) $(LIB_$(MODULE_NAME)) $(LIB_COMMON) -o $@
+	$(CC) $(OBJ_ALL) $(LDFLAGS) $(plugins_LDFLAGS) $($(module_name)_LDFLAGS) -o $@
 	chmod a-x $@
 
 ../$(module_name).a: $(EXTRA_DEP) $(OBJ_ALL)

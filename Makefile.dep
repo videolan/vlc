@@ -50,7 +50,7 @@ CFLAGS += -DMAKE_DEP
 $(C_DEP): .dep/%.d: %.c
 	@test -d .dep/$(dir $*) || mkdir -p $(shell dirname .dep/$*)
 	#@echo "regenerating dependencies for $*.c"
-	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
+	@$(SHELL) -ec '$(CC) -M $(CFLAGS) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
 	.dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
 	[ -s $@ ] || rm -f $@'
@@ -58,7 +58,7 @@ $(C_DEP): .dep/%.d: %.c
 $(CPP_DEP): .dep/%.dpp: %.cpp
 	@test -d .dep/$(dir $*) || mkdir -p $(shell dirname .dep/$*)
 	#@echo "regenerating dependencies for $*.c"
-	@$(SHELL) -ec '$(CC) $(DCFLAGS) $(CFLAGS) $(DEFINE) 2>/dev/null $< \
+	@$(SHELL) -ec '$(CC) -M $(CFLAGS) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
 	.dep\/$(subst /,\/,$*).dpp : /g'\'' > $@; \
 	[ -s $@ ] || rm -f $@'
