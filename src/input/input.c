@@ -2547,8 +2547,9 @@ char *vlc_input_item_GetInfo( input_item_t *p_i,
         {
             if( !strcmp( p_cat->pp_infos[j]->psz_name, psz_name ) )
             {
+                char *psz_ret = strdup( p_cat->pp_infos[j]->psz_value );
                 vlc_mutex_unlock( &p_i->lock );
-                return strdup( p_cat->pp_infos[j]->psz_value );
+                return psz_ret;
             }
         }
     }
