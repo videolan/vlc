@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.16 2001/02/20 07:49:12 sam Exp $
+ * $Id: input_dvd.c,v 1.17 2001/02/20 08:47:25 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -354,7 +354,7 @@ static int DVDSetArea( input_thread_t * p_input,
                        int i_audio, int i_spu )
 {
     thread_dvd_data_t *  p_method;
-    es_descriptor_t *    p_es;
+//    es_descriptor_t *    p_es;
     off_t                i_start;
     off_t                i_size;
     pgc_t *              p_pgc;
@@ -362,9 +362,9 @@ static int DVDSetArea( input_thread_t * p_input,
     int                  i_end_cell;
     int                  i_index;
     int                  i_cell;
-    int                  i_nb;
-    int                  i_id;
-    int                  i;
+//    int                  i_nb;
+//    int                  i_id;
+//    int                  i;
     
     p_method = (thread_dvd_data_t*)p_input->p_plugin_data;
 
@@ -467,7 +467,7 @@ static int DVDSetArea( input_thread_t * p_input,
         p_es->i_stream_id = 0xbd;
         p_es->i_type = DVD_SPU_ES;
 //        p_es->psz_desc = p_method->ifo.vts.mat.pi_subpic_attr[i];
-        if( i == 0 )
+        if( i == 12 )
         {
             input_SelectES( p_input, p_es );
         }
@@ -475,15 +475,19 @@ static int DVDSetArea( input_thread_t * p_input,
     }
 
     /* area definition */
-    p_input->stream.pp_areas[0]->i_start = i_start;
-    p_input->stream.pp_areas[0]->i_size = i_size;
+    p_input->stream.pp_areas[i_title]->i_start = i_start;
+    p_input->stream.pp_areas[i_title]->i_size = i_size;
 
     /* No PSM to read in DVD mode */
     p_input->stream.pp_programs[0]->b_is_ok = 1;
 
+    /* Init has been successfull ; change the default area */
+    p_input->stream.p_selected_area = p_input->stream.pp_areas[i_title];
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
 #else
+    p_input->stream.p_selected_area = p_input->stream.pp_areas[0]; 
 
     if( p_input->stream.b_seekable )
     {
@@ -524,7 +528,8 @@ static int DVDSetArea( input_thread_t * p_input,
             }
 
             /* File too big. */
-            if( p_input->stream.pp_areas[0]->i_tell > INPUT_PREPARSE_LENGTH )
+            if( p_input->stream.p_selected_area->i_tell >
+                                                    INPUT_PREPARSE_LENGTH )
             {
                 break;
             }
@@ -534,7 +539,7 @@ static int DVDSetArea( input_thread_t * p_input,
 
         /* i_tell is an indicator from the beginning of the stream,
          * not of the DVD */
-        p_input->stream.pp_areas[0]->i_tell = 0;
+        p_input->stream.p_selected_area->i_tell = 0;
 
         if( p_demux_data->b_has_PSM )
         {
@@ -609,7 +614,7 @@ static int DVDSetArea( input_thread_t * p_input,
 #endif
 
         /* FIXME : ugly kludge */
-        p_input->stream.pp_areas[0]->i_size = i_size;
+        p_input->stream.p_selected_area->i_size = i_size;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -620,7 +625,7 @@ static int DVDSetArea( input_thread_t * p_input,
         p_input->stream.pp_programs[0]->b_is_ok = 0;
 
         /* FIXME : ugly kludge */
-        p_input->stream.pp_areas[0]->i_size = i_size;
+        p_input->stream.p_selected_area->i_size = i_size;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -845,7 +850,8 @@ static int DVDRead( input_thread_t * p_input,
     pp_packets[i_packet] = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.pp_areas[0]->i_tell += p_method->i_read_once *DVD_LB_SIZE;
+    p_input->stream.p_selected_area->i_tell +=
+                                        p_method->i_read_once *DVD_LB_SIZE;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );
@@ -873,14 +879,15 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_method = ( thread_dvd_data_t * )p_input->p_plugin_data;
 
     /* We have to take care of offset of beginning of title */
-    i_pos = i_off + p_input->stream.pp_areas[0]->i_start;
+    i_pos = i_off + p_input->stream.p_selected_area->i_start;
 
     /* With DVD, we have to be on a sector boundary */
     i_pos = i_pos & (~0x7ff);
 
     i_pos = lseek( p_input->i_handle, i_pos, SEEK_SET );
 
-    p_input->stream.pp_areas[0]->i_tell = i_pos - p_input->stream.pp_areas[0]->i_start;
+    p_input->stream.p_selected_area->i_tell = i_pos -
+                                    p_input->stream.p_selected_area->i_start;
 
     return;
 }

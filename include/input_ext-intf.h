@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.23 2001/02/20 02:53:13 stef Exp $
+ * $Id: input_ext-intf.h,v 1.24 2001/02/20 08:47:24 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -181,6 +181,7 @@ typedef struct stream_descriptor_s
     int                     i_area_nb;
     input_area_t **         pp_areas;      /* list of areas in stream == offset
                                             * interval with own properties */
+    input_area_t *          p_selected_area;
     u32                     i_mux_rate; /* the rate we read the stream (in
                                          * units of 50 bytes/s) ; 0 if undef */
 

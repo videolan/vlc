@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.85 2001/02/20 02:53:13 stef Exp $
+ * $Id: input.c,v 1.86 2001/02/20 08:47:25 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -112,7 +112,8 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.pp_areas = NULL;
     /* By default there is one areas in a stream */
     input_AddArea( p_input );
-    p_input->stream.pp_areas[0]->i_seek = NO_SEEK;
+    p_input->stream.p_selected_area = p_input->stream.pp_areas[0];
+    p_input->stream.p_selected_area->i_seek = NO_SEEK;
 
     /* Initialize stream control properties. */
     p_input->stream.control.i_status = PLAYING_S;
@@ -214,11 +215,12 @@ static void RunThread( input_thread_t *p_input )
 #endif
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( p_input->stream.pp_areas[0]->i_seek != NO_SEEK )
+        if( p_input->stream.p_selected_area->i_seek != NO_SEEK )
         {
             if( p_input->stream.b_seekable && p_input->pf_seek != NULL )
             {
-                p_input->pf_seek( p_input, p_input->stream.pp_areas[0]->i_seek );
+                p_input->pf_seek( p_input,
+                                  p_input->stream.p_selected_area->i_seek );
 
                 for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
                 {
@@ -232,7 +234,7 @@ static void RunThread( input_thread_t *p_input )
                     p_pgrm->i_synchro_state = SYNCHRO_REINIT;
                 }
             }
-            p_input->stream.pp_areas[0]->i_seek = NO_SEEK;
+            p_input->stream.p_selected_area->i_seek = NO_SEEK;
         }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -449,7 +451,7 @@ void input_FileOpen( input_thread_t * p_input )
          || S_ISBLK(stat_info.st_mode) )
     {
         p_input->stream.b_seekable = 1;
-        p_input->stream.pp_areas[0]->i_size = stat_info.st_size;
+        p_input->stream.p_selected_area->i_size = stat_info.st_size;
     }
     else if( S_ISFIFO(stat_info.st_mode)
 #ifndef SYS_BEOS
@@ -458,7 +460,7 @@ void input_FileOpen( input_thread_t * p_input )
              )
     {
         p_input->stream.b_seekable = 0;
-        p_input->stream.pp_areas[0]->i_size = 0;
+        p_input->stream.p_selected_area->i_size = 0;
     }
     else
     {
@@ -469,7 +471,7 @@ void input_FileOpen( input_thread_t * p_input )
         return;
     }
 
-    p_input->stream.pp_areas[0]->i_tell = 0;
+    p_input->stream.p_selected_area->i_tell = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     intf_Msg( "input: opening %s", p_input->p_source );

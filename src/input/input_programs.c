@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.32 2001/02/20 02:53:13 stef Exp $
+ * $Id: input_programs.c,v 1.33 2001/02/20 08:47:25 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -484,7 +484,7 @@ void input_DumpStream( input_thread_t * p_input )
     intf_Msg( "input info: Dumping stream ID 0x%x", S.i_stream_id );
     if( S.b_seekable )
         intf_Msg( "input info: seekable stream, position: %lld/%lld",
-                  S.pp_areas[0].i_tell, S.pp_areas[0].i_size );
+                  S.p_selected_area->i_tell, S.p_selected_area->i_size );
     else
         intf_Msg( "input info: %s", S.b_pace_control ? "pace controlled" :
                   "pace un-controlled" );

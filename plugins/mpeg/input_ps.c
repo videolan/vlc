@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.8 2001/02/20 07:49:13 sam Exp $
+ * $Id: input_ps.c,v 1.9 2001/02/20 08:47:25 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -205,14 +205,15 @@ static void PSInit( input_thread_t * p_input )
             }
 
             /* File too big. */
-            if( p_input->stream.pp_areas[0]->i_tell > INPUT_PREPARSE_LENGTH )
+            if( p_input->stream.p_selected_area->i_tell >
+                                                    INPUT_PREPARSE_LENGTH )
             {
                 break;
             }
         }
         rewind( p_method->stream );
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.pp_areas[0]->i_tell = 0;
+        p_input->stream.p_selected_area->i_tell = 0;
         if( p_demux_data->b_has_PSM )
         {
             /* (The PSM decoder will care about spawning the decoders) */
@@ -328,7 +329,7 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
         }
     }
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.pp_areas[0]->i_tell += i_len;
+    p_input->stream.p_selected_area->i_tell += i_len;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     return( 0 );
 }
@@ -470,7 +471,7 @@ static void PSSeek( input_thread_t * p_input, off_t i_position )
     /* A little bourrin but should work for a while --Meuuh */
     fseeko( p_method->stream, i_position, SEEK_SET );
 
-    p_input->stream.pp_areas[0]->i_tell = i_position;
+    p_input->stream.p_selected_area->i_tell = i_position;
 }
 
 /*

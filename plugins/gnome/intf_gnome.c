@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.15 2001/02/20 07:49:13 sam Exp $
+ * $Id: intf_gnome.c,v 1.16 2001/02/20 08:47:25 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -256,8 +256,9 @@ static gint GnomeManage( gpointer p_data )
         p_adj = gtk_range_get_adjustment ( GTK_RANGE( p_scale ) );
 
         /* Update the value */
-        p_adj->value = ( 100. * p_intf->p_input->stream.pp_areas[0]->i_tell )
-                           / p_intf->p_input->stream.pp_areas[0]->i_size;
+        p_adj->value = ( 100. *
+                         p_intf->p_input->stream.p_selected_area->i_tell ) /
+                         p_intf->p_input->stream.p_selected_area->i_size;
 
         /* Gtv does it this way. Why not. */
         gtk_range_set_adjustment ( GTK_RANGE( p_scale ), p_adj );
