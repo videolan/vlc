@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.18 2002/06/01 18:04:48 sam Exp $
+ * $Id: a52.c,v 1.19 2002/06/02 10:28:48 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -32,7 +32,9 @@
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
-#ifdef HAVE_INTTYPES_H
+#ifdef HAVE_STDINT_H
+#   include <stdint.h>                                         /* int16_t .. */
+#elif HAVE_INTTYPES_H
 #   include <inttypes.h>                                       /* int16_t .. */
 #endif
 
