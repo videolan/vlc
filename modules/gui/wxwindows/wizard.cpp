@@ -424,7 +424,7 @@ END_EVENT_TABLE()
 
 
 /* Local functions */
-static int ismult( char *psz_uri );
+static int ismult( const char *psz_uri );
 
 static void pageHeader( wxWindow *window, wxBoxSizer *sizer,
                        char *psz_title, char *psz_text);
@@ -1062,7 +1062,7 @@ void wizStreamingMethodPage::OnWizardPageChanging(wxWizardEvent& event)
     if( !event.GetDirection() ) return;
 
     /* Check valid address */
-    if( i_method == 1 && !ismult((char *) address_txtctrl->GetValue().c_str()) )
+    if( i_method == 1 && !ismult( address_txtctrl->GetValue().mb_str()) )
     {
         wxMessageBox( wxU( INVALID_MCAST_ADDRESS ) , wxU( ERROR_MSG ),
                       wxICON_WARNING | wxOK, this->p_parent );
@@ -1643,23 +1643,19 @@ void WizardDialog::Run()
 /****************************************************************
  * Local helper functions
  ****************************************************************/
-static int ismult( char *psz_uri )
+static int ismult( const char *psz_uri )
 {
     char *psz_end;
-    int  i_value;
+    unsigned long i_value;
 
-    i_value = strtol( psz_uri, &psz_end, 0 );
     /* IPv6 */
     if( psz_uri[0] == '[')
-    {
-            if( strncasecmp( &psz_uri[1], "FF0" , 3) ||
-                            strncasecmp( &psz_uri[2], "FF0" , 3))
-                    return( VLC_TRUE );
-            else
-                    return( VLC_FALSE );
-    }
+            return strncasecmp( &psz_uri[1], "FF" , 2) ? VLC_FALSE : VLC_TRUE;
+
+    /* IPv4 */
+    i_value = strtoul( psz_uri, &psz_end, 10 );
     if( *psz_end != '.' ) { return( VLC_FALSE ); }
 
-    return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
+    return( ( i_value >= 224 && i_value < 240 ) ? VLC_TRUE : VLC_FALSE );
 
 }
