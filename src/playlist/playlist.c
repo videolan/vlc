@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.68 2003/12/04 16:02:54 sam Exp $
+ * $Id: playlist.c,v 1.69 2003/12/07 19:06:21 jpsaman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,7 +44,9 @@ static void RunThread ( playlist_t * );
 static void SkipItem  ( playlist_t *, int );
 static void PlayItem  ( playlist_t * );
 
+#if 0
 static void Poubellize ( playlist_t *, input_thread_t * );
+#endif
 
 /**
  * Create playlist

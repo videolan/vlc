@@ -2,7 +2,7 @@
  * mpeg4video.c: mpeg 4 video packetizer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.20 2003/11/30 22:59:10 gbazin Exp $
+ * $Id: mpeg4video.c,v 1.21 2003/12/07 19:06:21 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -395,14 +395,19 @@ static int m4v_VOLParse( es_format_t *fmt, uint8_t *p_vol, int i_vol )
     i_ar = bs_read( &s, 4 );
     if( i_ar == 0xf )
     {
-        int i_ar_width = bs_read( &s, 8 );
-        int i_ar_height= bs_read( &s, 8 );
+        int i_ar_width, i_ar_height;
+
+        i_ar_width = bs_read( &s, 8 );
+        i_ar_height= bs_read( &s, 8 );
     }
     if( bs_read1( &s ) )
     {
+        int i_chroma_format;
+        int i_low_delay;
+
         /* vol control parameter */
-        int i_chroma_format = bs_read( &s, 2 );
-        int i_low_delay = bs_read1( &s );
+        i_chroma_format = bs_read( &s, 2 );
+        i_low_delay = bs_read1( &s );
 
         if( bs_read1( &s ) )
         {

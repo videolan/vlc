@@ -2,7 +2,7 @@
  * dummy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: dummy.c,v 1.2 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: dummy.c,v 1.3 2003/12/07 19:06:21 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -72,8 +72,9 @@ static int Open( vlc_object_t *p_this )
 
 static void Close( vlc_object_t * p_this )
 {
+#if 0
     sout_stream_t   *p_stream = (sout_stream_t*)p_this;
-
+#endif
 }
 
 struct sout_stream_id_t
