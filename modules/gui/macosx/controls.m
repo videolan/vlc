@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.9 2003/01/17 21:46:04 hartman Exp $
+ * $Id: controls.m,v 1.10 2003/01/22 01:48:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -46,6 +46,7 @@
 @interface VLCControls : NSObject
 {
     IBOutlet id o_open;
+    IBOutlet id o_main;
     IBOutlet id o_mi_mute;
     IBOutlet id o_volumeslider;
     int i_ff;
@@ -96,6 +97,7 @@
     if ( p_intf->p_sys->p_input != NULL && p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+        vlc_object_release( p_playlist );
     }
     else
     {
@@ -168,7 +170,7 @@
          * Therefore we need to count. I know, it is ugly. We could have used
          * a bool as well, but now we can also accellerate after a certain period.
          * Currently this method is called every second if the button is pressed.
-         * You can set this value in intf.m
+         * You can set this value in intf.m (hartman)
          */
         case NSPeriodic:
             if (i_ff == 1)
@@ -192,13 +194,13 @@
             {
                 vlc_mutex_unlock( &p_playlist->object_lock );
                 playlist_Play( p_playlist );
-                vlc_object_release( p_playlist );
             }
             break;
 
         default:
             break;
     }
+    vlc_object_release( p_playlist );
 }
 
 - (IBAction)prev:(id)sender
@@ -261,7 +263,6 @@
     intf_thread_t * p_intf = [NSApp getIntf];
     aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
-
     if ( p_aout != NULL )
     {
         if (p_intf->p_sys->b_mute)
@@ -279,7 +280,6 @@
     intf_thread_t * p_intf = [NSApp getIntf];
     aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
-
     if ( p_aout != NULL )
     {
         if (p_intf->p_sys->b_mute)
@@ -307,6 +307,7 @@
 
     p_intf->p_sys->b_mute = (i_volume == 0);
     [o_mi_mute setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
+    [o_volumeslider setEnabled: p_intf->p_sys->b_mute ? FALSE : TRUE];
     [self setVolumeSlider];
 }
 
@@ -325,13 +326,11 @@
                 i_volume = (int) [sender floatValue];
                 aout_VolumeSet( p_aout, i_volume * AOUT_VOLUME_STEP);
                 vlc_object_release( (vlc_object_t *)p_aout );
-                
-                p_intf->p_sys->b_mute = (i_volume == 0);
-                [o_mi_mute setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
             }
             break;
 
         default:
+            if ( p_aout != NULL ) vlc_object_release( (vlc_object_t *)p_aout );
             break;
     }
 }

@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.14 2003/01/20 00:23:45 hartman Exp $
+ * $Id: vout.m,v 1.15 2003/01/22 01:48:06 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1030,7 +1030,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         unsigned int i_stylemask = NSTitledWindowMask |
                                    NSMiniaturizableWindowMask |
                                    NSClosableWindowMask |
-                                   NSResizableWindowMask;
+                                   NSResizableWindowMask |
+                                   NSTexturedBackgroundWindowMask;
 
         [p_vout->p_sys->o_window 
             initWithContentRect: p_vout->p_sys->s_rect

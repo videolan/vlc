@@ -28,7 +28,7 @@
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_mi_mute" = id; "o_open" = id; "o_volumeslider" = id; }; 
+            OUTLETS = {"o_main" = id; "o_mi_mute" = id; "o_open" = id; "o_volumeslider" = id; }; 
             SUPERCLASS = NSObject; 
         }, 
         {

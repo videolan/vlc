@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.28 2003/01/21 17:08:16 hartman Exp $
+ * $Id: intf.m,v 1.29 2003/01/22 01:48:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -195,7 +195,7 @@ static void Run( intf_thread_t *p_intf )
     /* button controls */
     [o_btn_playlist setToolTip: _NS("Playlist")];
     [o_btn_prev setToolTip: _NS("Previous")];
-    [o_btn_slower setToolTip: _NS("Slower")];
+    [o_btn_slower setToolTip: _NS("Slowmotion")];
     [o_btn_play setToolTip: _NS("Play")];
     [o_btn_stop setToolTip: _NS("Stop")];
     [o_btn_fastforward setToolTip: _NS("Fast Forward")];
@@ -233,7 +233,7 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_select_all setTitle: _NS("Select All")];
 
     [o_mu_controls setTitle: _NS("Controls")];
-    [o_mi_play setTitle: _NS("Play/Pause")];
+    [o_mi_play setTitle: _NS("Play")];
     [o_mi_stop setTitle: _NS("Stop")];
     [o_mi_faster setTitle: _NS("Faster")];
     [o_mi_slower setTitle: _NS("Slower")];
@@ -268,7 +268,7 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
 
     /* dock menu */
-    [o_dmi_play setTitle: _NS("Play/Pause")];
+    [o_dmi_play setTitle: _NS("Play")];
     [o_dmi_stop setTitle: _NS("Stop")];
 
     /* error panel */
@@ -321,11 +321,7 @@ static void Run( intf_thread_t *p_intf )
         {
             p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                               FIND_ANYWHERE );
-            [o_btn_play setState: NSOffState];
-            [o_btn_stop setEnabled: NO];
-            [o_btn_slower setEnabled: NO];
-            [o_btn_fastforward setEnabled: NO];
-            [o_timeslider setEnabled: NO];
+            [self setControlItems];
         }
         else if( p_intf->p_sys->p_input->b_dead )
         {
@@ -344,13 +340,9 @@ static void Run( intf_thread_t *p_intf )
                     vlc_object_release( p_vout );
                     vout_Destroy( p_vout );
                 }
-
+                
                 p_intf->p_sys->b_stopping = 0;
-                [o_btn_play setState: NSOffState];
-                [o_btn_stop setEnabled: NO];
-                [o_btn_fastforward setEnabled: NO];
-                [o_btn_slower setEnabled: NO];
-                [o_timeslider setEnabled: NO];
+                [self setControlItems];
             }
 
             [self displayTime];
@@ -414,23 +406,15 @@ static void Run( intf_thread_t *p_intf )
 
             if ( b_need_menus )
                 [self setupMenus];
-
-            if ( p_intf->p_sys->p_input != NULL && p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
-            {
-                [o_btn_play setState: NSOnState];
-            }
-            else
-            {
-                [o_btn_play setState: NSOffState];
-            }
             
+            [self setControlItems];
+                        
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
         else if( p_intf->p_sys->b_playing && !p_intf->b_die )
         {
             [self displayTime];
             [self manageMode];
-            [o_btn_play setState: NSOffState];
             p_intf->p_sys->b_playing = 0;
         }
 
@@ -587,9 +571,7 @@ static void Run( intf_thread_t *p_intf )
 - (void)manageMode
 {
     vlc_bool_t b_input;
-    vlc_bool_t b_plmul = 0;
     vlc_bool_t b_control = 0;
-    playlist_t * p_playlist = NULL;
     intf_thread_t * p_intf = [NSApp getIntf];
 
     if( ( b_input = ( p_intf->p_sys->p_input != NULL ) ) )
@@ -621,7 +603,18 @@ static void Run( intf_thread_t *p_intf )
         [o_mi_screen setEnabled: FALSE];
         [o_mi_close_window setEnabled: FALSE];
     }
+    [self setControlItems];
+}
 
+- (void)setControlItems {
+    intf_thread_t * p_intf = [NSApp getIntf];
+    vlc_bool_t b_input;
+    vlc_bool_t b_plmul = 0;
+    vlc_bool_t b_control = 0;
+    playlist_t * p_playlist = NULL;
+    NSImage *playImage = [NSImage imageNamed:@"play"];
+    NSImage *pauseImage = [NSImage imageNamed:@"pause"];
+    
     p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, 
                                               FIND_ANYWHERE ); 
     if( p_playlist != NULL )
@@ -631,7 +624,13 @@ static void Run( intf_thread_t *p_intf )
         vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
     }
-
+    
+    if( ( b_input = ( p_intf->p_sys->p_input != NULL ) ) )
+    {
+        /* control buttons for free pace streams */
+        b_control = p_intf->p_sys->p_input->stream.b_pace_control;
+    }
+    
     /* set control items */
     [o_btn_stop setEnabled: b_input];
     [o_btn_fastforward setEnabled: b_control];
@@ -639,7 +638,8 @@ static void Run( intf_thread_t *p_intf )
     [o_btn_prev setEnabled: b_plmul];
     [o_btn_next setEnabled: b_plmul];
     [o_controls setVolumeSlider];
-
+    [o_timeslider setEnabled: b_input];
+    
     if ( (p_intf->p_sys->b_loop = config_GetInt( p_intf, "loop" )) )
     {
         [o_mi_loop setState: NSOnState];
@@ -647,6 +647,22 @@ static void Run( intf_thread_t *p_intf )
     else
     {
         [o_mi_loop setState: NSOffState];
+    }
+
+    if ( p_intf->p_sys->p_input != NULL &&
+                p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
+    {
+        [o_btn_play setImage: pauseImage];
+        [o_btn_play setToolTip: _NS("Pause")];
+        [o_mi_play setTitle: _NS("Pause")];
+        [o_dmi_play setTitle: _NS("Pause")];
+    }
+    else
+    {
+        [o_btn_play setImage: playImage];
+        [o_btn_play setToolTip: _NS("Play")];
+        [o_mi_play setTitle: _NS("Play")];
+        [o_dmi_play setTitle: _NS("Play")];
     }
 }
 
@@ -1051,6 +1067,7 @@ static void Run( intf_thread_t *p_intf )
             intf_thread_t * p_intf = [NSApp getIntf];
             input_thread_t * p_input = p_intf->p_sys->p_input;
             vlc_mutex_unlock( &p_input->stream.stream_lock );
+            vlc_object_release( p_input );
             break;
 
         default:

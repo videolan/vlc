@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.14 2003/01/21 17:08:16 hartman Exp $
+ * $Id: intf.h,v 1.15 2003/01/22 01:48:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -185,6 +185,7 @@ struct intf_sys_t
 
 - (void)manage;
 - (void)manageMode;
+- (void)setControlItems;
 
 - (void)setupMenus;
 - (void)setupLangMenu:(NSMenuItem *)o_mi
