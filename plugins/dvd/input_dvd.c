@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.47 2001/04/15 21:17:50 stef Exp $
+ * $Id: input_dvd.c,v 1.48 2001/04/20 05:40:03 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -394,6 +394,20 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
     if( p_dvd->i_sector > title.p_cell_play[p_dvd->i_prg_cell].i_end_sector )
     {
         p_dvd->i_prg_cell++;
+
+        /* basic handling of angles */
+        switch( ( ( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
+                    >> 12 ) )
+        {
+        case 0x5:
+            p_dvd->i_prg_cell += p_dvd->i_angle - 1;
+            intf_WarnMsg( 1, "dvd info: choosing angle %d", p_dvd->i_angle );
+            break;
+        case 0x9:
+        case 0xd:
+            p_dvd->i_prg_cell += p_dvd->i_angle_nb - p_dvd->i_angle;
+            break;
+        }
     }
 
     if( DVDFindCell( p_dvd ) < 0 )
@@ -411,13 +425,17 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
          title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
 
     intf_WarnMsg( 1, "cell: %d sector1: 0x%x end1: 0x%x\n"
-                   "index: %d sector2: 0x%x end2: 0x%x", 
+                   "index: %d sector2: 0x%x end2: 0x%x\n"
+                   "category: 0x%x ilvu end: 0x%x vobu start 0x%x", 
         p_dvd->i_cell,
         p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_start_sector,
         p_dvd->p_ifo->vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector,
         p_dvd->i_prg_cell,
         title.p_cell_play[p_dvd->i_prg_cell].i_start_sector,
-        title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
+        title.p_cell_play[p_dvd->i_prg_cell].i_end_sector,
+        title.p_cell_play[p_dvd->i_prg_cell].i_category, 
+        title.p_cell_play[p_dvd->i_prg_cell].i_first_ilvu_vobu_esector,
+        title.p_cell_play[p_dvd->i_prg_cell].i_last_vobu_start_sector );
 
 #undef title
 
@@ -493,10 +511,16 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_input->stream.p_selected_area =
                     p_input->stream.pp_areas[p_area->i_id];
 
+//        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
         /* title number: it is not vts nb!,
          * it is what appears in the interface list */
         p_dvd->i_title = p_area->i_id;
         p_dvd->p_ifo->i_title = p_dvd->i_title;
+
+        /* uodate title environnement variable so that we don't
+         * loop on the same title forever */
+        main_PutIntVariable( INPUT_TITLE_VAR, p_dvd->i_title + 1 );
 
         /* ifo vts */
         if( IfoTitleSet( p_dvd->p_ifo ) < 0 )
@@ -515,11 +539,11 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_program_chain =
           vts.title_inf.p_title_start[p_dvd->i_vts_title-1].i_program_chain_num;
 
-/*        intf_WarnMsg( 1, "dvd: title %d vts_title %d pgc %d",
+        intf_WarnMsg( 1, "dvd: title %d vts_title %d pgc %d",
                         p_dvd->i_title,
                         p_dvd->i_vts_title,
                         p_dvd->i_program_chain );
-*/
+
         /* css title key for current vts */
         if( p_dvd->b_encrypted )
         {
@@ -545,6 +569,16 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 p_input->b_error = 1;
                 return -1;
             }
+        }
+
+        /*
+         * Angle management
+         */
+        p_dvd->i_angle_nb = vmg.title_inf.p_attr[p_dvd->i_title-1].i_angle_nb;
+        p_dvd->i_angle = main_GetIntVariable( INPUT_ANGLE_VAR, 1 );
+        if( ( p_dvd->i_angle <= 0 ) || p_dvd->i_angle > p_dvd->i_angle_nb )
+        {
+            p_dvd->i_angle = 1;
         }
     
         /*
@@ -577,7 +611,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_sector = 0;
         p_dvd->i_size = DVD_LB_SIZE *
           (off_t)( vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
-        intf_WarnMsg( 2, "dvd info: stream size 1: %lld @ %d", p_dvd->i_size,vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
+        intf_WarnMsg( 2, "dvd info: stream size 1: %lld @ %d", p_dvd->i_size,
+                      vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
 	
         if( DVDChapterSelect( p_dvd, 1 ) < 0 )
         {
@@ -593,10 +628,15 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         intf_WarnMsg( 2, "dvd info: stream size: %lld", p_dvd->i_size );
         intf_WarnMsg( 2, "dvd info: number of chapters: %d",
                    vmg.title_inf.p_attr[p_dvd->i_title-1].i_chapter_nb );
+        intf_WarnMsg( 2, "dvd info: number of angles: %d", p_dvd->i_angle_nb );
+
+//        vlc_mutex_lock( &p_input->stream.stream_lock );
 
         /* Area definition */
         p_input->stream.p_selected_area->i_start = p_dvd->i_start;
         p_input->stream.p_selected_area->i_size = p_dvd->i_size;
+        p_input->stream.p_selected_area->i_angle_nb = p_dvd->i_angle_nb;
+        p_input->stream.p_selected_area->i_angle = p_dvd->i_angle;
 
         /*
          * Destroy obsolete ES by reinitializing program 0
@@ -645,7 +685,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         for( i = 1 ; i <= vts.manager_inf.i_audio_nb ; i++ )
         {
 
-#ifdef DEBUG
+//#ifdef DEBUG
         intf_WarnMsg( 1, "Audio %d: %x %x %x %x %x %x %x %x %x %x %x %x", i,
             vts.manager_inf.p_audio_attr[i-1].i_num_channels,
             vts.manager_inf.p_audio_attr[i-1].i_coding_mode,
@@ -659,7 +699,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             vts.manager_inf.p_audio_attr[i-1].i_sample_freq,
             vts.manager_inf.p_audio_attr[i-1].i_lang_code,
             vts.manager_inf.p_audio_attr[i-1].i_caption );
-#endif
+//#endif
 
             switch( vts.manager_inf.p_audio_attr[i-1].i_coding_mode )
             {
@@ -928,6 +968,10 @@ static void DVDInit( input_thread_t * p_input )
         area[i]->i_part_nb = title_inf.p_attr[i-1].i_chapter_nb;
         area[i]->i_part = 1;
 
+        /* Number of angles */
+        area[i]->i_angle_nb = 0;
+        area[i]->i_angle = 1;
+
         /* Offset to vts_i_0.ifo */
         area[i]->i_plugin_data = p_dvd->p_ifo->i_off +
                        ( title_inf.p_attr[i-1].i_start_sector * DVD_LB_SIZE );
@@ -940,7 +984,9 @@ static void DVDInit( input_thread_t * p_input )
     {
         i_title = 1;
     }
+
 #undef title_inf
+
     /* Get requested chapter - if none defaults to first one */
     i_chapter = main_GetIntVariable( INPUT_CHAPTER_VAR, 1 );
     if( i_chapter <= 0 )
@@ -1088,7 +1134,6 @@ static int DVDRead( input_thread_t * p_input,
         {
             CSSDescrambleSector( p_dvd->p_css->pi_title_key, 
                                  p_vec[i_iovec].iov_base );
-            ((u8*)(p_vec[i_iovec].iov_base))[0x14] &= 0x8F;
         }
 
         i_pos = 0;

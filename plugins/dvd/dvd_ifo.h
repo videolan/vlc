@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.12 2001/04/12 02:40:09 stef Exp $
+ * $Id: dvd_ifo.h,v 1.13 2001/04/20 05:40:03 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -182,7 +182,7 @@ typedef struct title_s
 /* Menu PGCI Language unit Descriptor */
 typedef struct unit_s
 {
-    char            ps_lang_code[2];            // 2 bytes (ISO-xx)
+    u16             i_lang_code;            // 2 bytes (ISO-xx)
 //    char            ???
     u8              i_existence_mask;           // 1 byte
     u32             i_unit_inf_start_byte;                 // 4 bytes

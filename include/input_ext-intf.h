@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.33 2001/04/13 05:36:12 stef Exp $
+ * $Id: input_ext-intf.h,v 1.34 2001/04/20 05:40:03 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -167,6 +167,9 @@ typedef struct input_area_s
     /* area subdivision */
     int                     i_part_nb;   /* number of parts (chapter for DVD)*/
     int                     i_part;      /* currently selected part */
+
+    int                     i_angle_nb;  /* number of angles/title units */
+    int                     i_angle;
 
     /* offset to plugin related data */
     off_t                   i_plugin_data;

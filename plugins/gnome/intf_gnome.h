@@ -2,7 +2,7 @@
  * intf_gnome.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.h,v 1.6 2001/04/08 07:24:47 stef Exp $
+ * $Id: intf_gnome.h,v 1.7 2001/04/20 05:40:03 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,11 @@ typedef struct intf_sys_s
     boolean_t           b_window_changed;        /* window display toggled ? */
     boolean_t           b_playlist_changed;    /* playlist display toggled ? */
     boolean_t           b_slider_free;                      /* slider status */
-    boolean_t           b_menus_update;        /* do we need to update menus */
+    boolean_t           b_title_update;  /* do we need to update title menus */
+    boolean_t           b_chapter_update;            /* do we need to update
+                                                               chapter menus */
+    boolean_t           b_audio_update;  /* do we need to update audio menus */
+    boolean_t           b_spu_update;      /* do we need to update spu menus */
 
     /* Windows and widgets */
     GtkWidget *         p_window;                             /* main window */

@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.30 2001/04/13 05:36:12 stef Exp $
+ * $Id: intf_gnome.c,v 1.31 2001/04/20 05:40:03 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -153,7 +153,10 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
-    p_intf->p_sys->b_menus_update = 1;
+    p_intf->p_sys->b_title_update = 1;
+    p_intf->p_sys->b_chapter_update = 1;
+    p_intf->p_sys->b_audio_update = 1;
+    p_intf->p_sys->b_spu_update = 1;
 
     p_intf->p_sys->b_slider_free = 1;
 
@@ -314,110 +317,67 @@ static gint GnomeManage( gpointer p_data )
     if( p_intf->p_input != NULL )
     {
         float           newvalue;
-        char            psz_title[3];
-        char            psz_chapter[3];
 
         /* New input or stream map change */
-        if( p_intf->p_input->stream.b_changed )
+        if( p_intf->p_input->stream.b_changed || p_intf->p_sys->b_mode_changed )
         {
-            /* input method */
-            if( p_intf->p_sys->b_mode_changed )
+            switch( p_intf->p_input->stream.i_method & 0xf0 )
             {
-#if 0
-                /* Sets the interface mode according to playlist item */
-                if( p_main->p_playlist->p_item != NULL )
-                {
-                    if( !strncmp( p_main->p_playlist->p_item->psz_name, "dvd:", 4 ) )
-                    {
-                        p_intf->p_sys->i_intf_mode = DVD_MODE;
-                    }
-                    else if( !strncmp(
-                                p_main->p_playlist->p_item->psz_name, "ts:", 4 ) )
-                    {
-                        p_intf->p_sys->i_intf_mode = NET_MODE;
-                    }
-                }
-        
-                switch( p_intf->p_sys->i_intf_mode )
-                {
-                    case DVD_MODE:
-                        GnomeDVDModeManage( p_intf );
-                        break;
-                    case NET_MODE:
-                        GnomeNetworkModeManage( p_intf );
-                        break;
-                    case FILE_MODE:
-                    default:
-                        GnomeFileModeManage( p_intf );
-                        break;
-                }
-#else
-                switch( p_intf->p_input->stream.i_method & 0xf0 )
-                {
-                    case INPUT_METHOD_FILE:
-                        GnomeFileModeManage( p_intf );
-                        break;
-                    case INPUT_METHOD_DISC:
-                        GnomeDiscModeManage( p_intf );
-                        break;
-                    case INPUT_METHOD_NETWORK:
-                        GnomeNetworkModeManage( p_intf );
-                        break;
-                    default:
-                        intf_ErrMsg( "intf error: can't determine input method" );
-                        break;
-                }
-#endif
-                p_intf->p_sys->b_mode_changed = 0;
+                case INPUT_METHOD_FILE:
+                    GnomeFileModeManage( p_intf );
+                    break;
+                case INPUT_METHOD_DISC:
+                    GnomeDiscModeManage( p_intf );
+                    break;
+                case INPUT_METHOD_NETWORK:
+                    GnomeNetworkModeManage( p_intf );
+                    break;
+                default:
+                    intf_ErrMsg( "intf error: can't determine input method" );
+                    break;
             }
 
-            p_intf->p_sys->b_menus_update = 1;
             p_intf->p_input->stream.b_changed = 0;
+            p_intf->p_sys->b_mode_changed = 0;
             intf_WarnMsg( 2, 
                           "Interface menus refreshed as stream has changed" );
         }
 
-#define p_area p_intf->p_input->stream.p_selected_area
         /* Update language/chapter menus after user request */
-        if( ( p_intf->p_sys->b_menus_update ) ||
-            ( p_intf->p_sys->i_part != p_area->i_part ) )
+        GnomeSetupMenu( p_intf );
+
+#define p_area p_intf->p_input->stream.p_selected_area
+        /* Update menus when chapter changes */
+        p_intf->p_sys->b_chapter_update =
+                    ( p_intf->p_sys->i_part != p_area->i_part );
+
+        if( p_intf->p_input->stream.b_seekable )
         {
-            p_intf->p_sys->b_menus_update = 1;
-            GnomeSetupMenu( p_intf );
-            p_intf->p_sys->b_menus_update = 0;
-
-            snprintf( psz_title, 3, "%02d", p_area->i_id );
-            gtk_label_set_text( p_intf->p_sys->p_label_title, psz_title );
-
-            p_intf->p_sys->i_part = p_area->i_part;
-            snprintf( psz_chapter, 3, "%02d", p_area->i_part );
-            gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );
-        }
-
-        /* Manage the slider */
-        newvalue = p_intf->p_sys->p_adj->value;
-
-        /* If the user hasn't touched the slider since the last time,
-         * then the input can safely change it */
-        if( newvalue == p_intf->p_sys->f_adj_oldvalue )
-        {
-            /* Update the value */
-            p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
-                ( 100. * p_area->i_tell ) / p_area->i_size;
-
-            gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
-                                     "value_changed" );
-        }
-        /* Otherwise, send message to the input if the user has
-         * finished dragging the slider */
-        else if( p_intf->p_sys->b_slider_free )
-        {
-            off_t i_seek = ( newvalue * p_area->i_size ) / 100;
-
-            input_Seek( p_intf->p_input, i_seek );
-
-            /* Update the old value */
-            p_intf->p_sys->f_adj_oldvalue = newvalue;
+            /* Manage the slider */
+            newvalue = p_intf->p_sys->p_adj->value;
+    
+            /* If the user hasn't touched the slider since the last time,
+             * then the input can safely change it */
+            if( newvalue == p_intf->p_sys->f_adj_oldvalue )
+            {
+                /* Update the value */
+                p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
+                    ( 100. * p_area->i_tell ) / p_area->i_size;
+    
+                gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                         "value_changed" );
+            }
+            /* Otherwise, send message to the input if the user has
+             * finished dragging the slider */
+            else if( p_intf->p_sys->b_slider_free )
+            {
+                off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+    
+                input_Seek( p_intf->p_input, i_seek );
+    
+                /* Update the old value */
+                p_intf->p_sys->f_adj_oldvalue = newvalue;
+            }
         }
 #undef p_area
     }
@@ -731,7 +691,7 @@ static gint GnomeTitleMenu( gpointer       p_data,
             p_title_submenu = gtk_menu_new();
         }
 
-        sprintf( psz_name, "Title %d", i_title );
+        sprintf( psz_name, "Title %d (%d)", i_title, p_intf->p_input->stream.pp_areas[i_title]->i_part_nb );
 
         if( pf_toggle == on_menubar_title_toggle )
         {
@@ -885,21 +845,47 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
     GtkWidget *         p_popup_menu;
     gint                i;
 
-    if( p_intf->p_input->stream.i_area_nb > 1 )
-    {
+    p_intf->p_sys->b_title_update &= ( p_intf->p_input->stream.i_area_nb > 1 );
+    p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
+    p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
+    p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update;
+
+    if( p_intf->p_sys->b_title_update )
+    { 
+        char            psz_title[3];
+
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                             p_intf->p_sys->p_window ), "menubar_title" ) );
         GnomeTitleMenu( p_intf, p_menubar_menu, on_menubar_title_toggle );
 
+        snprintf( psz_title, 3, "%02d",
+                  p_intf->p_input->stream.p_selected_area->i_id );
+        gtk_label_set_text( p_intf->p_sys->p_label_title, psz_title );
+
+        p_intf->p_sys->b_title_update = 0;
+    }
+
+    if( p_intf->p_sys->b_chapter_update )
+    {
+        char            psz_chapter[3];
+
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                              p_intf->p_sys->p_popup ), "popup_navigation" ) );
         GnomeTitleMenu( p_intf, p_popup_menu, on_popup_navigation_toggle );
-    
+     
         p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
                              p_intf->p_sys->p_window ), "menubar_chapter" ) );
         GnomeChapterMenu( p_intf, p_menubar_menu, on_menubar_chapter_toggle );
-    }
 
+        snprintf( psz_chapter, 3, "%02d", 
+                  p_intf->p_input->stream.p_selected_area->i_part );
+        gtk_label_set_text( p_intf->p_sys->p_label_chapter, psz_chapter );
+
+        p_intf->p_sys->i_part =
+                p_intf->p_input->stream.p_selected_area->i_part;
+        p_intf->p_sys->b_chapter_update = 0;
+    }
+    
     /* look for selected ES */
     p_audio_es = NULL;
     p_spu_es = NULL;
@@ -918,32 +904,40 @@ static gint GnomeSetupMenu( intf_thread_t * p_intf )
     }
 
     /* audio menus */
+    if( p_intf->p_sys->b_audio_update )
+    {
+        /* find audio root menu */
+        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                             p_intf->p_sys->p_window ), "menubar_audio" ) );
+    
+        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                     p_intf->p_sys->p_popup ), "popup_audio" ) );
+    
+        GnomeLanguageMenus( p_intf, p_menubar_menu, p_audio_es, AUDIO_ES,
+                            on_menubar_audio_toggle );
+        GnomeLanguageMenus( p_intf, p_popup_menu, p_audio_es, AUDIO_ES,
+                            on_popup_audio_toggle );
 
-    /* find audio root menu */
-    p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                         p_intf->p_sys->p_window ), "menubar_audio" ) );
-
-    p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                 p_intf->p_sys->p_popup ), "popup_audio" ) );
-
-    GnomeLanguageMenus( p_intf, p_menubar_menu, p_audio_es, AUDIO_ES,
-                        on_menubar_audio_toggle );
-    GnomeLanguageMenus( p_intf, p_popup_menu, p_audio_es, AUDIO_ES,
-                        on_popup_audio_toggle );
-
+        p_intf->p_sys->b_audio_update = 0;
+    }
+    
     /* sub picture menus */
+    if( p_intf->p_sys->b_spu_update )
+    {
+        /* find spu root menu */
+        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                          p_intf->p_sys->p_window ), "menubar_subtitle" ) );
+    
+        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                     p_intf->p_sys->p_popup ), "popup_subtitle" ) );
+    
+        GnomeLanguageMenus( p_intf, p_menubar_menu, p_spu_es, SPU_ES,
+                            on_menubar_subtitle_toggle  );
+        GnomeLanguageMenus( p_intf, p_popup_menu, p_spu_es, SPU_ES,
+                            on_popup_subtitle_toggle );
 
-    /* find spu root menu */
-    p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                      p_intf->p_sys->p_window ), "menubar_subtitle" ) );
-
-    p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                 p_intf->p_sys->p_popup ), "popup_subtitle" ) );
-
-    GnomeLanguageMenus( p_intf, p_menubar_menu, p_spu_es, SPU_ES,
-                        on_menubar_subtitle_toggle  );
-    GnomeLanguageMenus( p_intf, p_popup_menu, p_spu_es, SPU_ES,
-                        on_popup_subtitle_toggle );
+        p_intf->p_sys->b_spu_update = 0;
+    }
 
     return TRUE;
 }
@@ -1036,6 +1030,7 @@ static gint GnomeFileModeManage( intf_thread_t * p_intf )
     gtk_label_set_text( p_intf->p_sys->p_label_status,
                         "Status: foo" );
 #endif
+
     return TRUE;
 }
 

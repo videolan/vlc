@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.24 2001/04/11 04:31:59 sam Exp $
+ * $Id: dvd_css.c,v 1.25 2001/04/20 05:40:03 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -520,6 +520,9 @@ int CSSDescrambleSector( dvd_key_t pi_key, u8* pi_sec )
             pi_sec++;
             i_t5 >>= 8;
         }
+
+    pi_sec[0x14] &= 0x8F;
+
     }
 
     return 0;

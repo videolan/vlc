@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.86 2001/04/14 07:41:20 sam Exp $
+ * $Id: main.c,v 1.87 2001/04/20 05:40:03 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -159,6 +159,7 @@ static const struct option longopts[] =
     /* DVD options */
     {   "dvdtitle",         1,          0,      't' },
     {   "dvdchapter",       1,          0,      'T' },
+    {   "dvdangle",         1,          0,      'u' },
     {   "dvdaudio",         1,          0,      'a' },
     {   "dvdchannel",       1,          0,      'c' },
     {   "dvdsubtitle",      1,          0,      's' },
@@ -176,7 +177,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "hHvgt:T:a:s:c:I:A:V:";
+static const char *psz_shortopts = "hHvgt:T:u:a:s:c:I:A:V:";
 
 /*****************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -650,6 +651,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case 'T':
             main_PutIntVariable( INPUT_CHAPTER_VAR, atoi(optarg) );
             break;
+        case 'u':
+            main_PutIntVariable( INPUT_ANGLE_VAR, atoi(optarg) );
+            break;
         case 'a':
             if ( ! strcmp(optarg, "ac3") )
                 main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_AC3 );
@@ -769,12 +773,13 @@ static void Usage( int i_fashion )
           "\n"
           "\n  -t, --dvdtitle <num>           \tchoose DVD title"
           "\n  -T, --dvdchapter <num>         \tchoose DVD chapter"
+          "\n  -u, --dvdangle <num>           \tchoose DVD angle"
           "\n  -a, --dvdaudio <type>          \tchoose DVD audio type"
           "\n  -c, --dvdchannel <channel>     \tchoose DVD audio channel"
           "\n  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel"
           "\n"
           "\n      --input                    \tinput method"
-          "\n      --channels                    \tenable channels"
+          "\n      --channels                 \tenable channels"
           "\n      --server <host>            \tvideo server address"
           "\n      --port <port>              \tvideo server port"
           "\n      --broadcast                \tlisten to a broadcast"
@@ -819,6 +824,7 @@ static void Usage( int i_fashion )
         "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
         "\n  " INPUT_TITLE_VAR "=<title>             \ttitle number"
         "\n  " INPUT_CHAPTER_VAR "=<chapter>         \tchapter number"
+        "\n  " INPUT_ANGLE_VAR "=<angle>             \tangle number"
         "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
         "\n  " INPUT_CHANNEL_VAR "=[0-15]            \taudio channel"
         "\n  " INPUT_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );

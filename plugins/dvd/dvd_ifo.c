@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.22 2001/04/15 21:17:50 stef Exp $
+ * $Id: dvd_ifo.c,v 1.23 2001/04/20 05:40:03 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1186,6 +1186,7 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf, off_t i_pos )
 //fprintf( stderr, "Unit\n" );
 
     p_unit_inf->i_title_nb = ReadWord( p_ifo, pi_buffer, &p_current );
+//fprintf( stderr, "Unit nb: %d\n", p_unit_inf->i_title_nb );
     DumpBits( p_ifo, pi_buffer, &p_current, 2 );
     p_unit_inf->i_end_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
 
@@ -1201,6 +1202,7 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf, off_t i_pos )
     {
         p_unit_inf->p_title[i].i_category_mask = ReadByte( p_ifo, pi_buffer, &p_current );
         p_unit_inf->p_title[i].i_category = ReadByte( p_ifo, pi_buffer, &p_current );
+//fprintf( stderr, "cat mask %d: %x cat %x\n", i, p_unit_inf->p_title[i].i_category_mask, p_unit_inf->p_title[i].i_category );
         p_unit_inf->p_title[i].i_parental_mask = ReadWord( p_ifo, pi_buffer, &p_current );
         p_unit_inf->p_title[i].i_title_start_byte = ReadDouble( p_ifo, pi_buffer, &p_current );
     }
@@ -1259,7 +1261,9 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
 
     for( i = 0 ; i < p_title_unit->i_unit_nb ; i++ )
     {
-        ReadBits( p_ifo, pi_buffer, &p_current, p_title_unit->p_unit[i].ps_lang_code, 2 );
+        //ReadBits( p_ifo, pi_buffer, &p_current, p_title_unit->p_unit[i].ps_lang_code, 2 );
+        p_title_unit->p_unit[i].i_lang_code = ReadWord( p_ifo, pi_buffer, &p_current );
+//fprintf( stderr, "lang %d %x\n", i,p_title_unit->p_unit[i].i_lang_code );
         DumpBits( p_ifo, pi_buffer, &p_current, 1 );
         p_title_unit->p_unit[i].i_existence_mask = ReadByte( p_ifo, pi_buffer, &p_current );
         p_title_unit->p_unit[i].i_unit_inf_start_byte =

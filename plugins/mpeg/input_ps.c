@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.15 2001/04/16 12:34:28 asmax Exp $
+ * $Id: input_ps.c,v 1.16 2001/04/20 05:40:03 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -267,7 +267,10 @@ static void PSInit( input_thread_t * p_input )
         }
         rewind( p_method->stream );
         vlc_mutex_lock( &p_input->stream.stream_lock );
+
+        p_input->stream.i_method = INPUT_METHOD_FILE;
         p_input->stream.p_selected_area->i_tell = 0;
+
         if( p_demux_data->b_has_PSM )
         {
             /* (The PSM decoder will care about spawning the decoders) */

@@ -209,6 +209,7 @@
 
 #define INPUT_TITLE_VAR                 "vlc_input_title"
 #define INPUT_CHAPTER_VAR               "vlc_input_chapter"
+#define INPUT_ANGLE_VAR                 "vlc_input_angle"
 #define INPUT_AUDIO_VAR                 "vlc_input_audio"
 #define INPUT_CHANNEL_VAR               "vlc_input_channel"
 #define INPUT_SUBTITLE_VAR              "vlc_input_subtitle"
