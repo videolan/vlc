@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.30 2003/07/14 21:32:58 sigmunau Exp $
+dnl $Id: configure.ac,v 1.31 2003/07/16 16:06:56 sam Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -3035,8 +3035,10 @@ AC_ARG_ENABLE(mozilla,
 if test "${enable_mozilla}" = "yes"
 then
   AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
-  if test "${MOZILLA_CONFIG}" != "no"
+  if test "${MOZILLA_CONFIG}" = "no"
   then
+    AC_MSG_ERROR([Please install the Mozilla development tools, mozilla-config was not found.])
+  else
     if test "${SYS}" != "mingw32"; then
       LDFLAGS="${LDFLAGS_save} -L${x_libraries}"
       AC_CHECK_LIB(Xt,XtStrings,[
