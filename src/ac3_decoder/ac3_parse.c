@@ -1,9 +1,10 @@
 /*****************************************************************************
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
+ * Copyright (C) 1999, 2000, 2001 VideoLAN
  *
- * Authors:
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Renaud Dartus <reno@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
 #include "defs.h"
 
-#include "int_types.h"
+#include "common.h"
+#include "intf_msg.h"
+
 #include "ac3_decoder.h"
 #include "ac3_internal.h"
 #include "ac3_bit_stream.h"
@@ -78,31 +82,30 @@ static struct frmsize_s frmsizecod_tbl[] =
 
 static int fscod_tbl[] = {48000, 44100, 32000};
 
+/* Some internal functions */
+void parse_bsi_stats (ac3dec_t * p_ac3dec);
+void parse_audblk_stats (ac3dec_t * p_ac3dec);
+
 /* Parse a syncinfo structure */
 int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info) 
 {
     int buf;
-
+    
     p_ac3dec->bit_stream.total_bits_read = 0;
     p_ac3dec->bit_stream.i_available = 0;
 
     /* sync word - should be 0x0b77 */
-    NeedBits (&(p_ac3dec->bit_stream), 16);
-    buf =  p_ac3dec->bit_stream.buffer >> (32 - 16);
-    DumpBits (&(p_ac3dec->bit_stream), 16);
+    buf =  bitstream_get(&(p_ac3dec->bit_stream),16);
     if (buf != 0x0b77)
     {
         return 1;
     }
 
     /* Get crc1 - we don't actually use this data though */
-    NeedBits (&(p_ac3dec->bit_stream), 16);
-    DumpBits (&(p_ac3dec->bit_stream), 16);
+    bitstream_get(&(p_ac3dec->bit_stream),16);
 
     /* Get the sampling rate */
-    NeedBits (&(p_ac3dec->bit_stream), 2);
-    p_ac3dec->syncinfo.fscod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-    DumpBits (&(p_ac3dec->bit_stream), 2);
+    p_ac3dec->syncinfo.fscod = bitstream_get(&(p_ac3dec->bit_stream),2);
 
     if (p_ac3dec->syncinfo.fscod >= 3)
     {
@@ -110,10 +113,7 @@ int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info)
     }
 
     /* Get the frame size code */
-    NeedBits (&(p_ac3dec->bit_stream), 6);
-    p_ac3dec->syncinfo.frmsizecod =
-        (u16)(p_ac3dec->bit_stream.buffer >> (32 - 6));
-    DumpBits (&(p_ac3dec->bit_stream), 6);
+    p_ac3dec->syncinfo.frmsizecod = bitstream_get(&(p_ac3dec->bit_stream),6);
 
     if (p_ac3dec->syncinfo.frmsizecod >= 38)
     {
@@ -135,27 +135,19 @@ int ac3_sync_frame (ac3dec_t * p_ac3dec, ac3_sync_info_t * p_sync_info)
  */
 int parse_bsi (ac3dec_t * p_ac3dec)
 {
-    u32 i;
-
     /* Check the AC-3 version number */
-    NeedBits (&(p_ac3dec->bit_stream), 5);
-    p_ac3dec->bsi.bsid = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 5));
-    DumpBits (&(p_ac3dec->bit_stream), 5);
+    p_ac3dec->bsi.bsid = bitstream_get(&(p_ac3dec->bit_stream),5);
 
     if (p_ac3dec->bsi.bsid > 8)
     {
         return 1;
     }
 
-    /* Get the audio service provided by the steram */
-    NeedBits (&(p_ac3dec->bit_stream), 3);
-    p_ac3dec->bsi.bsmod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-    DumpBits (&(p_ac3dec->bit_stream), 3);
+    /* Get the audio service provided by the stream */
+    p_ac3dec->bsi.bsmod = bitstream_get(&(p_ac3dec->bit_stream),3);
 
     /* Get the audio coding mode (ie how many channels)*/
-    NeedBits (&(p_ac3dec->bit_stream), 3);
-    p_ac3dec->bsi.acmod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-    DumpBits (&(p_ac3dec->bit_stream), 3);
+    p_ac3dec->bsi.acmod = bitstream_get(&(p_ac3dec->bit_stream),3);
     /* Predecode the number of full bandwidth channels as we use this
      * number a lot */
     p_ac3dec->bsi.nfchans = nfchans[p_ac3dec->bsi.acmod];
@@ -163,180 +155,112 @@ int parse_bsi (ac3dec_t * p_ac3dec)
     /* If it is in use, get the centre channel mix level */
     if ((p_ac3dec->bsi.acmod & 0x1) && (p_ac3dec->bsi.acmod != 0x1))
     {
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->bsi.cmixlev = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
+        p_ac3dec->bsi.cmixlev = bitstream_get(&(p_ac3dec->bit_stream),2);
     }
 
     /* If it is in use, get the surround channel mix level */
     if (p_ac3dec->bsi.acmod & 0x4)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->bsi.surmixlev = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
+        p_ac3dec->bsi.surmixlev = bitstream_get(&(p_ac3dec->bit_stream),2);
     }
 
     /* Get the dolby surround mode if in 2/0 mode */
     if (p_ac3dec->bsi.acmod == 0x2)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->bsi.dsurmod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
+        p_ac3dec->bsi.dsurmod = bitstream_get(&(p_ac3dec->bit_stream),2);
     }
 
     /* Is the low frequency effects channel on? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.lfeon = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->bsi.lfeon = bitstream_get(&(p_ac3dec->bit_stream),1);
 
     /* Get the dialogue normalization level */
-    NeedBits (&(p_ac3dec->bit_stream), 5);
-    p_ac3dec->bsi.dialnorm = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 5));
-    DumpBits (&(p_ac3dec->bit_stream), 5);
+    p_ac3dec->bsi.dialnorm = bitstream_get(&(p_ac3dec->bit_stream),5);
 
     /* Does compression gain exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.compre = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-    if (p_ac3dec->bsi.compre)
+    if ((p_ac3dec->bsi.compre = bitstream_get(&(p_ac3dec->bit_stream),1)))
     {
         /* Get compression gain */
-        NeedBits (&(p_ac3dec->bit_stream), 8);
-        p_ac3dec->bsi.compr = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 8));
-        DumpBits (&(p_ac3dec->bit_stream), 8);
+        p_ac3dec->bsi.compr = bitstream_get(&(p_ac3dec->bit_stream),8);
     }
 
     /* Does language code exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.langcode = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-    if (p_ac3dec->bsi.langcode)
+    if ((p_ac3dec->bsi.langcode = bitstream_get(&(p_ac3dec->bit_stream),1)))
     {
         /* Get langauge code */
-        NeedBits (&(p_ac3dec->bit_stream), 8);
-        p_ac3dec->bsi.langcod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 8));
-        DumpBits (&(p_ac3dec->bit_stream), 8);
+        p_ac3dec->bsi.langcod = bitstream_get(&(p_ac3dec->bit_stream),8);
     }
 
     /* Does audio production info exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.audprodie = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-    if (p_ac3dec->bsi.audprodie)
+    if ((p_ac3dec->bsi.audprodie = bitstream_get(&(p_ac3dec->bit_stream),1)))
     {
         /* Get mix level */
-        NeedBits (&(p_ac3dec->bit_stream), 5);
-        p_ac3dec->bsi.mixlevel = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 5));
-        DumpBits (&(p_ac3dec->bit_stream), 5);
+        p_ac3dec->bsi.mixlevel = bitstream_get(&(p_ac3dec->bit_stream),5);
 
         /* Get room type */
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->bsi.roomtyp = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
+        p_ac3dec->bsi.roomtyp = bitstream_get(&(p_ac3dec->bit_stream),2);
     }
 
     /* If we're in dual mono mode then get some extra info */
-    if (p_ac3dec->bsi.acmod ==0)
+    if (p_ac3dec->bsi.acmod == 0)
     {
         /* Get the dialogue normalization level two */
-        NeedBits (&(p_ac3dec->bit_stream), 5);
-        p_ac3dec->bsi.dialnorm2 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 5));
-        DumpBits (&(p_ac3dec->bit_stream), 5);
+        p_ac3dec->bsi.dialnorm2 = bitstream_get(&(p_ac3dec->bit_stream),5);
 
         /* Does compression gain two exist? */
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->bsi.compr2e = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
-        if (p_ac3dec->bsi.compr2e)
+        if ((p_ac3dec->bsi.compr2e = bitstream_get(&(p_ac3dec->bit_stream),1)))
         {
             /* Get compression gain two */
-            NeedBits (&(p_ac3dec->bit_stream), 8);
-            p_ac3dec->bsi.compr2 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 8));
-            DumpBits (&(p_ac3dec->bit_stream), 8);
+            p_ac3dec->bsi.compr2 = bitstream_get(&(p_ac3dec->bit_stream),8);
         }
 
         /* Does language code two exist? */
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->bsi.langcod2e = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
-        if (p_ac3dec->bsi.langcod2e)
+        if ((p_ac3dec->bsi.langcod2e = bitstream_get(&(p_ac3dec->bit_stream),1)))
         {
             /* Get langauge code two */
-            NeedBits (&(p_ac3dec->bit_stream), 8);
-            p_ac3dec->bsi.langcod2 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 8));
-            DumpBits (&(p_ac3dec->bit_stream), 8);
+            p_ac3dec->bsi.langcod2 = bitstream_get(&(p_ac3dec->bit_stream),8);
         }
 
         /* Does audio production info two exist? */
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->bsi.audprodi2e = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
-        if (p_ac3dec->bsi.audprodi2e)
+        if ((p_ac3dec->bsi.audprodi2e = bitstream_get(&(p_ac3dec->bit_stream),1)))
         {
             /* Get mix level two */
-            NeedBits (&(p_ac3dec->bit_stream), 5);
-            p_ac3dec->bsi.mixlevel2 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 5));
-            DumpBits (&(p_ac3dec->bit_stream), 5);
+            p_ac3dec->bsi.mixlevel2 = bitstream_get(&(p_ac3dec->bit_stream),5);
 
             /* Get room type two */
-            NeedBits (&(p_ac3dec->bit_stream), 2);
-            p_ac3dec->bsi.roomtyp2 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-            DumpBits (&(p_ac3dec->bit_stream), 2);
+            p_ac3dec->bsi.roomtyp2 = bitstream_get(&(p_ac3dec->bit_stream),2);
         }
     }
 
     /* Get the copyright bit */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.copyrightb = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->bsi.copyrightb = bitstream_get(&(p_ac3dec->bit_stream),1);
 
     /* Get the original bit */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.origbs = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->bsi.origbs = bitstream_get(&(p_ac3dec->bit_stream),1);
 
     /* Does timecode one exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.timecod1e = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-
-    if (p_ac3dec->bsi.timecod1e)
+    if ((p_ac3dec->bsi.timecod1e = bitstream_get(&(p_ac3dec->bit_stream),1)))
     {
-        NeedBits (&(p_ac3dec->bit_stream), 14);
-        p_ac3dec->bsi.timecod1 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 14));
-        DumpBits (&(p_ac3dec->bit_stream), 14);
+        p_ac3dec->bsi.timecod1 = bitstream_get(&(p_ac3dec->bit_stream),14);
     }
 
     /* Does timecode two exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.timecod2e = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-
-    if (p_ac3dec->bsi.timecod2e)
+    if ((p_ac3dec->bsi.timecod2e = bitstream_get(&(p_ac3dec->bit_stream),1)))
     {
-        NeedBits (&(p_ac3dec->bit_stream), 14);
-        p_ac3dec->bsi.timecod2 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 14));
-        DumpBits (&(p_ac3dec->bit_stream), 14);
+        p_ac3dec->bsi.timecod2 = bitstream_get(&(p_ac3dec->bit_stream),14);
     }
 
     /* Does addition info exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->bsi.addbsie = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-
-    if (p_ac3dec->bsi.addbsie)
+    if ((p_ac3dec->bsi.addbsie = bitstream_get(&(p_ac3dec->bit_stream),1)))
     {
+        u32 i;
+
         /* Get how much info is there */
-        NeedBits (&(p_ac3dec->bit_stream), 6);
-        p_ac3dec->bsi.addbsil = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 6));
-        DumpBits (&(p_ac3dec->bit_stream), 6);
+        p_ac3dec->bsi.addbsil = bitstream_get(&(p_ac3dec->bit_stream),6);
 
         /* Get the additional info */
         for (i=0;i<(p_ac3dec->bsi.addbsil + 1);i++)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 8);
-            p_ac3dec->bsi.addbsi[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 8));
-            DumpBits (&(p_ac3dec->bit_stream), 8);
+            p_ac3dec->bsi.addbsi[i] = bitstream_get(&(p_ac3dec->bit_stream),8);
         }
     }
 
@@ -351,51 +275,35 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     for (i=0; i < p_ac3dec->bsi.nfchans; i++)
     {
         /* Is this channel an interleaved 256 + 256 block ? */
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->audblk.blksw[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
+        p_ac3dec->audblk.blksw[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
     }
 
     for (i=0; i < p_ac3dec->bsi.nfchans; i++)
     {
         /* Should we dither this channel? */
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->audblk.dithflag[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
+        p_ac3dec->audblk.dithflag[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
     }
 
     /* Does dynamic range control exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->audblk.dynrnge = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-    if (p_ac3dec->audblk.dynrnge)
+    if ((p_ac3dec->audblk.dynrnge = bitstream_get(&(p_ac3dec->bit_stream),1)))
     {
         /* Get dynamic range info */
-        NeedBits (&(p_ac3dec->bit_stream), 8);
-        p_ac3dec->audblk.dynrng = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 8));
-        DumpBits (&(p_ac3dec->bit_stream), 8);
+        p_ac3dec->audblk.dynrng = bitstream_get(&(p_ac3dec->bit_stream),8);
     }
 
     /* If we're in dual mono mode then get the second channel DR info */
     if (p_ac3dec->bsi.acmod == 0)
     {
         /* Does dynamic range control two exist? */
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->audblk.dynrng2e = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
-        if (p_ac3dec->audblk.dynrng2e)
+        if ((p_ac3dec->audblk.dynrng2e = bitstream_get(&(p_ac3dec->bit_stream),1)))
         {
             /* Get dynamic range info */
-            NeedBits (&(p_ac3dec->bit_stream), 8);
-            p_ac3dec->audblk.dynrng2 = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 8));
-            DumpBits (&(p_ac3dec->bit_stream), 8);
+            p_ac3dec->audblk.dynrng2 = bitstream_get(&(p_ac3dec->bit_stream),8);
         }
     }
 
     /* Does coupling strategy exist? */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->audblk.cplstre = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->audblk.cplstre = bitstream_get(&(p_ac3dec->bit_stream),1);
 
     if ((!blknum) && (!p_ac3dec->audblk.cplstre))
     {
@@ -405,19 +313,14 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     if (p_ac3dec->audblk.cplstre)
     {
         /* Is coupling turned on? */
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->audblk.cplinu = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
-        if (p_ac3dec->audblk.cplinu)
+        if ((p_ac3dec->audblk.cplinu = bitstream_get(&(p_ac3dec->bit_stream),1)))
         {
             int nb_coupled_channels;
 
             nb_coupled_channels = 0;
             for (i=0; i < p_ac3dec->bsi.nfchans; i++)
             {
-                NeedBits (&(p_ac3dec->bit_stream), 1);
-                p_ac3dec->audblk.chincpl[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                DumpBits (&(p_ac3dec->bit_stream), 1);
+                p_ac3dec->audblk.chincpl[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
                 if (p_ac3dec->audblk.chincpl[i])
                 {
                     nb_coupled_channels++;
@@ -430,16 +333,10 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
             if (p_ac3dec->bsi.acmod == 0x2)
             {
-                NeedBits (&(p_ac3dec->bit_stream), 1);
-                p_ac3dec->audblk.phsflginu = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                DumpBits (&(p_ac3dec->bit_stream), 1);
+                p_ac3dec->audblk.phsflginu = bitstream_get(&(p_ac3dec->bit_stream),1);
             }
-            NeedBits (&(p_ac3dec->bit_stream), 4);
-            p_ac3dec->audblk.cplbegf = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-            DumpBits (&(p_ac3dec->bit_stream), 4);
-            NeedBits (&(p_ac3dec->bit_stream), 4);
-            p_ac3dec->audblk.cplendf = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-            DumpBits (&(p_ac3dec->bit_stream), 4);
+            p_ac3dec->audblk.cplbegf = bitstream_get(&(p_ac3dec->bit_stream),4);
+            p_ac3dec->audblk.cplendf = bitstream_get(&(p_ac3dec->bit_stream),4);
 
             if (p_ac3dec->audblk.cplbegf > p_ac3dec->audblk.cplendf + 2)
             {
@@ -458,9 +355,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
             for (i=1; i< p_ac3dec->audblk.ncplsubnd; i++)
             {
-                NeedBits (&(p_ac3dec->bit_stream), 1);
-                p_ac3dec->audblk.cplbndstrc[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                DumpBits (&(p_ac3dec->bit_stream), 1);
+                p_ac3dec->audblk.cplbndstrc[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
                 p_ac3dec->audblk.ncplbnd -= p_ac3dec->audblk.cplbndstrc[i];
             }
         }
@@ -477,9 +372,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
             }
 
             /* Is there new coupling co-ordinate info? */
-            NeedBits (&(p_ac3dec->bit_stream), 1);
-            p_ac3dec->audblk.cplcoe[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-            DumpBits (&(p_ac3dec->bit_stream), 1);
+            p_ac3dec->audblk.cplcoe[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
 
             if ((!blknum) && (!p_ac3dec->audblk.cplcoe[i]))
             {
@@ -488,17 +381,11 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
             if (p_ac3dec->audblk.cplcoe[i])
             {
-                NeedBits (&(p_ac3dec->bit_stream), 2);
-                p_ac3dec->audblk.mstrcplco[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-                DumpBits (&(p_ac3dec->bit_stream), 2);
+                p_ac3dec->audblk.mstrcplco[i] = bitstream_get(&(p_ac3dec->bit_stream),2);
                 for (j=0;j < p_ac3dec->audblk.ncplbnd; j++)
                 {
-                    NeedBits (&(p_ac3dec->bit_stream), 4);
-                    p_ac3dec->audblk.cplcoexp[i][j] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-                    DumpBits (&(p_ac3dec->bit_stream), 4);
-                    NeedBits (&(p_ac3dec->bit_stream), 4);
-                    p_ac3dec->audblk.cplcomant[i][j] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-                    DumpBits (&(p_ac3dec->bit_stream), 4);
+                    p_ac3dec->audblk.cplcoexp[i][j] = bitstream_get(&(p_ac3dec->bit_stream),4);
+                    p_ac3dec->audblk.cplcomant[i][j] = bitstream_get(&(p_ac3dec->bit_stream),4);
                 }
             }
         }
@@ -509,9 +396,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
         {
             for (j=0; j < p_ac3dec->audblk.ncplbnd; j++)
             {
-                NeedBits (&(p_ac3dec->bit_stream), 1);
-                p_ac3dec->audblk.phsflg[j] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                DumpBits (&(p_ac3dec->bit_stream), 1);
+                p_ac3dec->audblk.phsflg[j] = bitstream_get(&(p_ac3dec->bit_stream),1);
             }
 
         }
@@ -520,9 +405,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     /* If we're in dual mono mode, there may be a rematrix strategy */
     if (p_ac3dec->bsi.acmod == 0x2)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->audblk.rematstr = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
+        p_ac3dec->audblk.rematstr = bitstream_get(&(p_ac3dec->bit_stream),1);
 
         if ((!blknum) && (!p_ac3dec->audblk.rematstr))
         {
@@ -535,36 +418,28 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
             {
                 for (i = 0; i < 4; i++)
                 {
-                    NeedBits (&(p_ac3dec->bit_stream), 1);
-                    p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                    DumpBits (&(p_ac3dec->bit_stream), 1);
+                    p_ac3dec->audblk.rematflg[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
                 }
             }
             if ((p_ac3dec->audblk.cplbegf > 2) && p_ac3dec->audblk.cplinu)
             {
                 for (i = 0; i < 4; i++)
                 {
-                    NeedBits (&(p_ac3dec->bit_stream), 1);
-                    p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                    DumpBits (&(p_ac3dec->bit_stream), 1);
+                    p_ac3dec->audblk.rematflg[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
                 }
             }
             if ((p_ac3dec->audblk.cplbegf <= 2) && p_ac3dec->audblk.cplinu)
             {
                 for (i = 0; i < 3; i++)
                 {
-                    NeedBits (&(p_ac3dec->bit_stream), 1);
-                    p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                    DumpBits (&(p_ac3dec->bit_stream), 1);
+                    p_ac3dec->audblk.rematflg[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
                 }
             }
             if ((p_ac3dec->audblk.cplbegf == 0) && p_ac3dec->audblk.cplinu)
             {
                 for (i = 0; i < 2; i++)
                 {
-                    NeedBits (&(p_ac3dec->bit_stream), 1);
-                    p_ac3dec->audblk.rematflg[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-                    DumpBits (&(p_ac3dec->bit_stream), 1);
+                    p_ac3dec->audblk.rematflg[i] = bitstream_get(&(p_ac3dec->bit_stream),1);
                 }
             }
         }
@@ -573,9 +448,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     if (p_ac3dec->audblk.cplinu)
     {
         /* Get the coupling channel exponent strategy */
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->audblk.cplexpstr = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
+        p_ac3dec->audblk.cplexpstr = bitstream_get(&(p_ac3dec->bit_stream),2);
 
         if ((!blknum) && (p_ac3dec->audblk.cplexpstr == EXP_REUSE))
         {
@@ -596,9 +469,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
     for (i = 0; i < p_ac3dec->bsi.nfchans; i++)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->audblk.chexpstr[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
+        p_ac3dec->audblk.chexpstr[i] = bitstream_get(&(p_ac3dec->bit_stream),2);
 
         if ((!blknum) && (p_ac3dec->audblk.chexpstr[i] == EXP_REUSE))
         {
@@ -609,9 +480,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     /* Get the exponent strategy for lfe channel */
     if (p_ac3dec->bsi.lfeon)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->audblk.lfeexpstr = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
+        p_ac3dec->audblk.lfeexpstr = bitstream_get(&(p_ac3dec->bit_stream),1);
 
         if ((!blknum) && (p_ac3dec->audblk.lfeexpstr == EXP_REUSE))
         {
@@ -632,9 +501,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
             }
             else
             {
-                NeedBits (&(p_ac3dec->bit_stream), 6);
-                p_ac3dec->audblk.chbwcod[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 6));
-                DumpBits (&(p_ac3dec->bit_stream), 6);
+                p_ac3dec->audblk.chbwcod[i] = bitstream_get(&(p_ac3dec->bit_stream),6);
 
                 if (p_ac3dec->audblk.chbwcod[i] > 60)
                 {
@@ -653,14 +520,10 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     /* Get the coupling exponents if they exist */
     if (p_ac3dec->audblk.cplinu && (p_ac3dec->audblk.cplexpstr != EXP_REUSE))
     {
-        NeedBits (&(p_ac3dec->bit_stream), 4);
-        p_ac3dec->audblk.cplabsexp = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-        DumpBits (&(p_ac3dec->bit_stream), 4);
+        p_ac3dec->audblk.cplabsexp = bitstream_get(&(p_ac3dec->bit_stream),4);
         for (i=0; i< p_ac3dec->audblk.ncplgrps;i++)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 7);
-            p_ac3dec->audblk.cplexps[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 7));
-            DumpBits (&(p_ac3dec->bit_stream), 7);
+            p_ac3dec->audblk.cplexps[i] = bitstream_get(&(p_ac3dec->bit_stream),7);
 
             if (p_ac3dec->audblk.cplexps[i] >= 125)
             {
@@ -674,41 +537,29 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     {
         if (p_ac3dec->audblk.chexpstr[i] != EXP_REUSE)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 4);
-            p_ac3dec->audblk.exps[i][0] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-            DumpBits (&(p_ac3dec->bit_stream), 4);
+            p_ac3dec->audblk.exps[i][0] = bitstream_get(&(p_ac3dec->bit_stream),4);
             for (j=1; j<=p_ac3dec->audblk.nchgrps[i];j++)
             {
-                NeedBits (&(p_ac3dec->bit_stream), 7);
-                p_ac3dec->audblk.exps[i][j] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 7));
-                DumpBits (&(p_ac3dec->bit_stream), 7);
+                p_ac3dec->audblk.exps[i][j] = bitstream_get(&(p_ac3dec->bit_stream),7);
                 if (p_ac3dec->audblk.exps[i][j] >= 125)
                 {
                     return 1;
                 }
             }
-            NeedBits (&(p_ac3dec->bit_stream), 2);
-            p_ac3dec->audblk.gainrng[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-            DumpBits (&(p_ac3dec->bit_stream), 2);
+            p_ac3dec->audblk.gainrng[i] = bitstream_get(&(p_ac3dec->bit_stream),2);
         }
     }
 
     /* Get the lfe channel exponents */
     if (p_ac3dec->bsi.lfeon && (p_ac3dec->audblk.lfeexpstr != EXP_REUSE))
     {
-        NeedBits (&(p_ac3dec->bit_stream), 4);
-        p_ac3dec->audblk.lfeexps[0] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-        DumpBits (&(p_ac3dec->bit_stream), 4);
-        NeedBits (&(p_ac3dec->bit_stream), 7);
-        p_ac3dec->audblk.lfeexps[1] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 7));
-        DumpBits (&(p_ac3dec->bit_stream), 7);
+        p_ac3dec->audblk.lfeexps[0] = bitstream_get(&(p_ac3dec->bit_stream),4);
+        p_ac3dec->audblk.lfeexps[1] = bitstream_get(&(p_ac3dec->bit_stream),7);
         if (p_ac3dec->audblk.lfeexps[1] >= 125)
         {
             return 1;
         }
-        NeedBits (&(p_ac3dec->bit_stream), 7);
-        p_ac3dec->audblk.lfeexps[2] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 7));
-        DumpBits (&(p_ac3dec->bit_stream), 7);
+        p_ac3dec->audblk.lfeexps[2] = bitstream_get(&(p_ac3dec->bit_stream),7);
         if (p_ac3dec->audblk.lfeexps[2] >= 125)
         {
             return 1;
@@ -716,9 +567,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
     }
 
     /* Get the parametric bit allocation parameters */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->audblk.baie = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->audblk.baie = bitstream_get(&(p_ac3dec->bit_stream),1);
 
     if ((!blknum) && (!p_ac3dec->audblk.baie))
     {
@@ -727,27 +576,15 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
     if (p_ac3dec->audblk.baie)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->audblk.sdcycod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->audblk.fdcycod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->audblk.sgaincod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
-        NeedBits (&(p_ac3dec->bit_stream), 2);
-        p_ac3dec->audblk.dbpbcod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-        DumpBits (&(p_ac3dec->bit_stream), 2);
-        NeedBits (&(p_ac3dec->bit_stream), 3);
-        p_ac3dec->audblk.floorcod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-        DumpBits (&(p_ac3dec->bit_stream), 3);
+        p_ac3dec->audblk.sdcycod = bitstream_get(&(p_ac3dec->bit_stream),2);
+        p_ac3dec->audblk.fdcycod = bitstream_get(&(p_ac3dec->bit_stream),2);
+        p_ac3dec->audblk.sgaincod = bitstream_get(&(p_ac3dec->bit_stream),2);
+        p_ac3dec->audblk.dbpbcod = bitstream_get(&(p_ac3dec->bit_stream),2);
+        p_ac3dec->audblk.floorcod = bitstream_get(&(p_ac3dec->bit_stream),3);
     }
 
     /* Get the SNR off set info if it exists */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->audblk.snroffste = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->audblk.snroffste = bitstream_get(&(p_ac3dec->bit_stream),1);
     if ((!blknum) && (!p_ac3dec->audblk.snroffste))
     {
         return 1;
@@ -755,46 +592,30 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
     if (p_ac3dec->audblk.snroffste)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 6);
-        p_ac3dec->audblk.csnroffst = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 6));
-        DumpBits (&(p_ac3dec->bit_stream), 6);
+        p_ac3dec->audblk.csnroffst = bitstream_get(&(p_ac3dec->bit_stream),6);
 
         if (p_ac3dec->audblk.cplinu)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 4);
-            p_ac3dec->audblk.cplfsnroffst = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-            DumpBits (&(p_ac3dec->bit_stream), 4);
-            NeedBits (&(p_ac3dec->bit_stream), 3);
-            p_ac3dec->audblk.cplfgaincod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-            DumpBits (&(p_ac3dec->bit_stream), 3);
+            p_ac3dec->audblk.cplfsnroffst = bitstream_get(&(p_ac3dec->bit_stream),4);
+            p_ac3dec->audblk.cplfgaincod = bitstream_get(&(p_ac3dec->bit_stream),3);
         }
 
         for (i = 0;i < p_ac3dec->bsi.nfchans; i++)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 4);
-            p_ac3dec->audblk.fsnroffst[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-            DumpBits (&(p_ac3dec->bit_stream), 4);
-            NeedBits (&(p_ac3dec->bit_stream), 3);
-            p_ac3dec->audblk.fgaincod[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-            DumpBits (&(p_ac3dec->bit_stream), 3);
+            p_ac3dec->audblk.fsnroffst[i] = bitstream_get(&(p_ac3dec->bit_stream),4);
+            p_ac3dec->audblk.fgaincod[i] = bitstream_get(&(p_ac3dec->bit_stream),3);
         }
         if (p_ac3dec->bsi.lfeon)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 4);
-            p_ac3dec->audblk.lfefsnroffst = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-            DumpBits (&(p_ac3dec->bit_stream), 4);
-            NeedBits (&(p_ac3dec->bit_stream), 3);
-            p_ac3dec->audblk.lfefgaincod = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-            DumpBits (&(p_ac3dec->bit_stream), 3);
+            p_ac3dec->audblk.lfefsnroffst = bitstream_get(&(p_ac3dec->bit_stream),4);
+            p_ac3dec->audblk.lfefgaincod = bitstream_get(&(p_ac3dec->bit_stream),3);
         }
     }
 
     /* Get coupling leakage info if it exists */
     if (p_ac3dec->audblk.cplinu)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        p_ac3dec->audblk.cplleake = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-        DumpBits (&(p_ac3dec->bit_stream), 1);
+        p_ac3dec->audblk.cplleake = bitstream_get(&(p_ac3dec->bit_stream),1);
         if ((!blknum) && (!p_ac3dec->audblk.cplleake))
         {
             return 1;
@@ -802,27 +623,19 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
         if (p_ac3dec->audblk.cplleake)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 3);
-            p_ac3dec->audblk.cplfleak = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-            DumpBits (&(p_ac3dec->bit_stream), 3);
-            NeedBits (&(p_ac3dec->bit_stream), 3);
-            p_ac3dec->audblk.cplsleak = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-            DumpBits (&(p_ac3dec->bit_stream), 3);
+            p_ac3dec->audblk.cplfleak = bitstream_get(&(p_ac3dec->bit_stream),3);
+            p_ac3dec->audblk.cplsleak = bitstream_get(&(p_ac3dec->bit_stream),3);
         }
     }
 
     /* Get the delta bit alloaction info */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->audblk.deltbaie = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->audblk.deltbaie = bitstream_get(&(p_ac3dec->bit_stream),1);
 
     if (p_ac3dec->audblk.deltbaie)
     {
         if (p_ac3dec->audblk.cplinu)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 2);
-            p_ac3dec->audblk.cpldeltbae = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-            DumpBits (&(p_ac3dec->bit_stream), 2);
+            p_ac3dec->audblk.cpldeltbae = bitstream_get(&(p_ac3dec->bit_stream),2);
             if (p_ac3dec->audblk.cpldeltbae == 3)
             {
                 return 1;
@@ -831,9 +644,7 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
         for (i = 0;i < p_ac3dec->bsi.nfchans; i++)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 2);
-            p_ac3dec->audblk.deltbae[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 2));
-            DumpBits (&(p_ac3dec->bit_stream), 2);
+            p_ac3dec->audblk.deltbae[i] = bitstream_get(&(p_ac3dec->bit_stream),2);
             if (p_ac3dec->audblk.deltbae[i] == 3)
             {
                 return 1;
@@ -842,20 +653,12 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
 
         if (p_ac3dec->audblk.cplinu && (p_ac3dec->audblk.cpldeltbae == DELTA_BIT_NEW))
         {
-            NeedBits (&(p_ac3dec->bit_stream), 3);
-            p_ac3dec->audblk.cpldeltnseg = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-            DumpBits (&(p_ac3dec->bit_stream), 3);
+            p_ac3dec->audblk.cpldeltnseg = bitstream_get(&(p_ac3dec->bit_stream),3);
             for (i = 0;i < p_ac3dec->audblk.cpldeltnseg + 1; i++)
             {
-                NeedBits (&(p_ac3dec->bit_stream), 5);
-                p_ac3dec->audblk.cpldeltoffst[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 5));
-                DumpBits (&(p_ac3dec->bit_stream), 5);
-                NeedBits (&(p_ac3dec->bit_stream), 4);
-                p_ac3dec->audblk.cpldeltlen[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-                DumpBits (&(p_ac3dec->bit_stream), 4);
-                NeedBits (&(p_ac3dec->bit_stream), 3);
-                p_ac3dec->audblk.cpldeltba[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-                DumpBits (&(p_ac3dec->bit_stream), 3);
+                p_ac3dec->audblk.cpldeltoffst[i] = bitstream_get(&(p_ac3dec->bit_stream),5);
+                p_ac3dec->audblk.cpldeltlen[i] = bitstream_get(&(p_ac3dec->bit_stream),4);
+                p_ac3dec->audblk.cpldeltba[i] = bitstream_get(&(p_ac3dec->bit_stream),3);
             }
         }
 
@@ -863,42 +666,29 @@ int parse_audblk (ac3dec_t * p_ac3dec, int blknum)
         {
             if (p_ac3dec->audblk.deltbae[i] == DELTA_BIT_NEW)
             {
-                NeedBits (&(p_ac3dec->bit_stream), 3);
-                p_ac3dec->audblk.deltnseg[i] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-                DumpBits (&(p_ac3dec->bit_stream), 3);
+                p_ac3dec->audblk.deltnseg[i] = bitstream_get(&(p_ac3dec->bit_stream),3);
 //                if (p_ac3dec->audblk.deltnseg[i] >= 8)
 //                    fprintf (stderr, "parse debug: p_ac3dec->audblk.deltnseg[%i] == %i\n", i, p_ac3dec->audblk.deltnseg[i]);
                 for (j = 0; j < p_ac3dec->audblk.deltnseg[i] + 1; j++)
                 {
-                    NeedBits (&(p_ac3dec->bit_stream), 5);
-                    p_ac3dec->audblk.deltoffst[i][j] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 5));
-                    DumpBits (&(p_ac3dec->bit_stream), 5);
-                    NeedBits (&(p_ac3dec->bit_stream), 4);
-                    p_ac3dec->audblk.deltlen[i][j] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 4));
-                    DumpBits (&(p_ac3dec->bit_stream), 4);
-                    NeedBits (&(p_ac3dec->bit_stream), 3);
-                    p_ac3dec->audblk.deltba[i][j] = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 3));
-                    DumpBits (&(p_ac3dec->bit_stream), 3);
+                    p_ac3dec->audblk.deltoffst[i][j] = bitstream_get(&(p_ac3dec->bit_stream),5);
+                    p_ac3dec->audblk.deltlen[i][j] = bitstream_get(&(p_ac3dec->bit_stream),4);
+                    p_ac3dec->audblk.deltba[i][j] = bitstream_get(&(p_ac3dec->bit_stream),3);
                 }
             }
         }
     }
 
     /* Check to see if there's any dummy info to get */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    p_ac3dec->audblk.skiple = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 1));
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    p_ac3dec->audblk.skiple = bitstream_get(&(p_ac3dec->bit_stream),1);
 
     if (p_ac3dec->audblk.skiple)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 9);
-        p_ac3dec->audblk.skipl = (u16)(p_ac3dec->bit_stream.buffer >> (32 - 9));
-        DumpBits (&(p_ac3dec->bit_stream), 9);
+        p_ac3dec->audblk.skipl = bitstream_get(&(p_ac3dec->bit_stream),9);
 
         for (i = 0; i < p_ac3dec->audblk.skipl ; i++)
         {
-            NeedBits (&(p_ac3dec->bit_stream), 8);
-            DumpBits (&(p_ac3dec->bit_stream), 8);
+            bitstream_get(&(p_ac3dec->bit_stream),8);
         }
     }
 
@@ -911,24 +701,18 @@ void parse_auxdata (ac3dec_t * p_ac3dec)
     int skip_length;
 
     skip_length = (p_ac3dec->syncinfo.frame_size * 16) - p_ac3dec->bit_stream.total_bits_read - 17 - 1;
-//    fprintf (stderr, "parse debug: skip_length == %i\n", skip_length);
 
     for (i = 0; i < skip_length; i++)
     {
-        NeedBits (&(p_ac3dec->bit_stream), 1);
-        DumpBits (&(p_ac3dec->bit_stream), 1);
+        bitstream_get(&(p_ac3dec->bit_stream),1);
     }
 
     /* get the auxdata exists bit */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    DumpBits (&(p_ac3dec->bit_stream), 1);
-
+    bitstream_get(&(p_ac3dec->bit_stream),1);
+    
     /* Skip the CRC reserved bit */
-    NeedBits (&(p_ac3dec->bit_stream), 1);
-    DumpBits (&(p_ac3dec->bit_stream), 1);
+    bitstream_get(&(p_ac3dec->bit_stream),1);
 
     /* Get the crc */
-    NeedBits (&(p_ac3dec->bit_stream), 16);
-    DumpBits (&(p_ac3dec->bit_stream), 16);
+    bitstream_get(&(p_ac3dec->bit_stream),16);
 }
-

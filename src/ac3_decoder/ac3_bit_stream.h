@@ -1,9 +1,10 @@
 /*****************************************************************************
  * ac3_bit_stream.h: getbits functions for the ac3 decoder
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN
  *
- * Authors:
+ * Authors: Renaud Dartus <reno@videolan.org>
+ *
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,31 +21,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-static __inline__ u8 GetByte (ac3_byte_stream_t * p_byte_stream)
+static __inline__ u32 bitstream_get (ac3_bit_stream_t * p_bit_stream, 
+                                     u32 num_bits)
 {
-    /* Are there some bytes left in the current buffer ? */
-    if (p_byte_stream->p_byte >= p_byte_stream->p_end)
+    u32 result=0;
+    while (p_bit_stream->i_available < num_bits)
     {
-        /* no, switch to next buffer */
-        ac3_byte_stream_next (p_byte_stream);
-    }
-
-    return *(p_byte_stream->p_byte++);
-}
-
-static __inline__ void NeedBits (ac3_bit_stream_t * p_bit_stream, int i_bits)
-{
-    while (p_bit_stream->i_available < i_bits)
-    {
-        p_bit_stream->buffer |=
-            ((u32)GetByte (&p_bit_stream->byte_stream)) << (24 - p_bit_stream->i_available);
+        if (p_bit_stream->byte_stream.p_byte >= p_bit_stream->byte_stream.p_end)
+        {
+            /* no, switch to next buffer */
+            ac3_byte_stream_next (&p_bit_stream->byte_stream);
+        }
+        p_bit_stream->buffer |=((u32) *(p_bit_stream->byte_stream.p_byte++)) 
+            << (24 - p_bit_stream->i_available);
         p_bit_stream->i_available += 8;
     }
-}
-
-static __inline__ void DumpBits (ac3_bit_stream_t * p_bit_stream, int i_bits)
-{
-    p_bit_stream->buffer <<= i_bits;
-    p_bit_stream->i_available -= i_bits;
-    p_bit_stream->total_bits_read += i_bits;
+    result = p_bit_stream->buffer >> (32 - num_bits);
+    p_bit_stream->buffer <<= num_bits;
+    p_bit_stream->i_available -= num_bits;
+    p_bit_stream->total_bits_read += num_bits;
+    
+    return result;
 }
