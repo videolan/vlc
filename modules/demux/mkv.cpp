@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.35 2003/11/02 18:03:45 sigmunau Exp $
+ * $Id: mkv.cpp,v 1.36 2003/11/05 00:17:50 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1248,7 +1248,9 @@ static int Open( vlc_object_t * p_this )
                  !strcmp( tk.psz_codec, "S_SSA" ) ||
                  !strcmp( tk.psz_codec, "S_ASS" ))
         {
-            tk.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+            tk.i_codec = VLC_FOURCC( 's', 's', 'a', ' ' );
+            tk.p_es->p_demux_data = malloc( sizeof( subtitle_data_t ) );
+            tk.p_es->p_demux_data->psz_header = strdup( (char *)tk.p_extra_data );
         }
         else if( !strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
@@ -1627,8 +1629,7 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
         {
             if( i_duration > 0 )
             {
-                /* FIXME not sure about that */
-                p_pes->i_dts += i_duration * 1000;// * (mtime_t) 1000 / p_sys->i_timescale;
+                p_pes->i_dts += i_duration * 1000;
             }
             else
             {
@@ -1638,49 +1639,6 @@ static void BlockDecode( input_thread_t *p_input, KaxBlock *block, mtime_t i_pts
             if( p_pes->p_first && p_pes->i_pes_size > 0 )
             {
                 p_pes->p_first->p_payload_end[0] = '\0';
-            }
-            if( !strcmp( tk.psz_codec, "S_TEXT/SSA" ) ||
-                !strcmp( tk.psz_codec, "S_SSA" ) ||
-                !strcmp( tk.psz_codec, "S_ASS" ))
-            {
-                /* remove all fields before text for now */
-                char *start = (char*)p_pes->p_first->p_payload_start;
-                char *src, *dst;
-                int  i_comma = 0;
-
-                while( *start && i_comma < 8 )
-                {
-                    if( *start++ == ',' )
-                    {
-                        i_comma++;
-                    }
-                }
-                memmove( p_pes->p_first->p_payload_start, start,
-                         strlen( start) + 1 );
-                
-		/* Fix the SSA string */
-                src = dst = (char*)p_pes->p_first->p_payload_start;
-                while( *src )
-                {
-                    if( src[0] == '\\' && ( src[1] == 'n' || src[1] == 'N' ) )
-                    {
-                        dst[0] = '\n'; dst++; src += 2;
-                    }
-                    else if( src[0] == '{' && src[1] == '\\' )
-                    {
-                        while( *src && src[0] != '}' )
-                        {
-                            src++;
-                        }
-                        src++;
-                    }
-                    else
-                    {
-                        dst[0] = src[0]; dst++; src++;
-                    }
-                }
-                dst++;
-                dst[0] = '\0';
             }
         }
 

@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: sub.h,v 1.9 2003/10/31 22:46:19 hartman Exp $
+ * $Id: sub.h,v 1.10 2003/11/05 00:17:50 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -43,6 +43,7 @@ typedef struct subtitle_s
 typedef struct subtitle_track_s
 {
     int             i_track_id;
+    char            *psz_header;
     int             i_subtitle;
     int             i_subtitles;
     subtitle_t      *subtitle;
@@ -73,12 +74,13 @@ typedef struct subtitle_demux_s
     input_thread_t      *p_input;
     int                 i_sub_type;
 
-    int                 i_previously_selected; /* to make pf_seek */
+    char                *psz_header;
     int                 i_subtitle;
     int                 i_subtitles;
     subtitle_t          *subtitle;
     es_descriptor_t     *p_es;
-    
+    int                 i_previously_selected; /* to make pf_seek */
+
     /*unsigned int	i_tracks;
     subtitle_track_t	*p_tracks
     */

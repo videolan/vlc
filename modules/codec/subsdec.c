@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.3 2003/10/11 14:08:58 hartman Exp $
+ * $Id: subsdec.c,v 1.4 2003/11/05 00:17:50 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -32,6 +32,7 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 #include <osd.h>
+#include <codecs.h>
 
 #if defined(HAVE_ICONV)
 #include <iconv.h>
@@ -118,7 +119,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','u','b','t') )
+    if( p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','u','b','t') && 
+        p_dec->p_fifo->i_fourcc != VLC_FOURCC('s','s','a',' ') )
     {
         return VLC_EGENERIC;
     }
@@ -144,6 +146,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int InitDecoder( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    subtitle_data_t *p_demux_data = (subtitle_data_t *)p_dec->p_fifo->p_demux_data;
     vlc_value_t val;
 
     var_Create( p_dec, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -174,6 +177,11 @@ static int InitDecoder( decoder_t *p_dec )
     if( val.psz_string ) free( val.psz_string );
 #else
     msg_Dbg( p_dec, "No iconv support available" );
+#endif
+
+#if 1
+    if( p_demux_data )
+        msg_Dbg( p_dec, p_demux_data->psz_header );
 #endif
 
     return VLC_SUCCESS;
@@ -250,6 +258,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     char *psz_subtitle;
+    int i_align_h, i_align_v;
 
     /* We cannot display a subpicture with no date */
     if( p_block->i_pts == 0 )
@@ -267,6 +276,9 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
 
     /* Should be resiliant against bad subtitles */
     psz_subtitle = strndup( p_block->p_buffer, p_block->i_buffer );
+    
+    i_align_h = p_sys->i_align ? 20 : 0;
+    i_align_v = 10;
 
 #if defined(HAVE_ICONV)
     if( p_sys->iconv_handle != (iconv_t)-1 )
@@ -297,9 +309,64 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
     }
 #endif
 
+    if( p_dec->p_fifo->i_fourcc == VLC_FOURCC('s','s','a',' ') )
+    {
+        /* Decode SSA strings */
+        /* We expect: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text */
+        char *psz_new_subtitle;
+        char *psz_buffer_sub;
+        int         i_comma;
+        int         i_text;
+
+        psz_buffer_sub = psz_subtitle;
+        for( ;; )
+        {
+            i_comma = 0;
+            while( i_comma < 8 &&
+                *psz_buffer_sub != '\0' )
+            {
+                if( *psz_buffer_sub == ',' )
+                {
+                    i_comma++;
+                }
+                psz_buffer_sub++;
+            }
+            psz_new_subtitle = malloc( strlen( psz_buffer_sub ) + 1);
+            i_text = 0;
+            while( psz_buffer_sub[0] != '\0' )
+            {
+                if( psz_buffer_sub[0] == '\\' && ( psz_buffer_sub[1] =='n' || psz_buffer_sub[1] =='N' ) )
+                {
+                    psz_new_subtitle[i_text] = '\n';
+                    i_text++;
+                    psz_buffer_sub += 2;
+                }
+                else if( psz_buffer_sub[0] == '{' && psz_buffer_sub[1] == '\\' )
+                {
+                    /* SSA control code */
+                    while( psz_buffer_sub[0] != '\0' && psz_buffer_sub[0] != '}' )
+                    {
+                        psz_buffer_sub++;
+                    }
+                    psz_buffer_sub++;
+                }
+                else
+                {
+                    psz_new_subtitle[i_text] = psz_buffer_sub[0];
+                    i_text++;
+                    psz_buffer_sub++;
+                }
+            }
+            psz_new_subtitle[i_text] = '\0';
+            free( psz_subtitle );
+            psz_subtitle = psz_new_subtitle;
+            break;
+        }
+    }
+
     vout_ShowTextAbsolute( p_vout, psz_subtitle, NULL, 
                            OSD_ALIGN_BOTTOM | p_sys->i_align,
-                           p_sys->i_align ? 20 : 0, 10, 
+                           i_align_h, i_align_v, 
                            p_block->i_pts, p_block->i_dts );
 
     free( psz_subtitle );

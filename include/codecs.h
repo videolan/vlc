@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.6 2003/10/19 23:12:16 hartman Exp $
+ * $Id: codecs.h,v 1.7 2003/11/05 00:17:50 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -142,6 +142,31 @@ static inline void wf_tag_to_fourcc( uint16_t i_tag,
     }
 }
 
+/**
+ * Structure to hold information concerning subtitles.
+ * Used between demuxers and decoders of subtitles.
+ */
+typedef struct es_sys_t
+{
+    char        *psz_header; /* for 'ssa ' and 'subt' */
+    
+    /* for spudec */
+    unsigned int        i_orig_height;
+    unsigned int        i_orig_width;
+    unsigned int        i_origin_x;
+    unsigned int        i_origin_y;
+    unsigned int        i_scale_h;
+    unsigned int        i_scale_v;
+    unsigned int        i_alpha;
+    vlc_bool_t          b_smooth;
+    mtime_t             i_fade_in;
+    mtime_t             i_fade_out;
+    unsigned int        i_align;
+    mtime_t             i_time_offset;
+    vlc_bool_t          b_forced_subs;
+    unsigned int        palette[16];
+    unsigned int        colors[4];
+} subtitle_data_t;
 
 #endif /* "codecs.h" */
 
