@@ -860,6 +860,8 @@ private:
 
     char **pp_sds;
 
+    wxStatusBar *statusbar;
+
     ItemInfoDialog *iteminfo_dialog;
 
     intf_thread_t *p_intf;

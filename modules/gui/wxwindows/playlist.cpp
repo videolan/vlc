@@ -367,6 +367,10 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     playlist_panel->SetSizerAndFit( panel_sizer );
 
+    int pi_widths[1] =  { -1 };
+    statusbar = CreateStatusBar( 1 );
+    statusbar->SetStatusWidths( 1, pi_widths );
+
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the playlist */
     SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
@@ -622,6 +626,11 @@ void Playlist::AppendItem( wxCommandEvent& event )
     {
         UpdateTreeItem( p_playlist, item );
     }
+
+    statusbar->SetStatusText( wxString::Format( wxT(_(
+                              "%i items in playlist")),
+                              p_playlist->i_size ), 0 );
+
     vlc_object_release( p_playlist );
 }
 
@@ -747,6 +756,25 @@ void Playlist::Rebuild()
     }
 
     SetCurrentItem( item );
+
+/*  GetChildrenCount does count internal nodes :(
+    if( treectrl->GetChildrenCount( root, true ) !=
+        p_playlist->i_size )
+    {
+        statusbar->SetStatusText( wxString::Format( wxT(_(
+                                  "%i items in playlist (%i not shown)")),
+                                  p_playlist->i_size,
+                                  p_playlist->i_size -
+                                  treectrl->GetChildrenCount( root, true ) ) );
+    }
+    else
+    {
+*/
+        statusbar->SetStatusText( wxString::Format( wxT(_(
+                                  "%i items in playlist")),
+                                  p_playlist->i_size ), 0 );
+//    }
+
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
