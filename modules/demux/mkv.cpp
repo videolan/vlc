@@ -1833,6 +1833,9 @@ static int Demux( demux_t *p_demux)
 
         if( p_segmet->BlockGet( &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
+            if ( p_sys->demuxer.b_die )
+                return 0;
+
             if ( p_vsegment->EditionIsOrdered() )
             {
                 // check if there are more chapters to read
@@ -3442,6 +3445,8 @@ bool demux_sys_t::PreparePlayback( )
 
     /* add information */
     p_current_segment->Segment()->InformationCreate( );
+
+    p_current_segment->Segment()->Select( 0 );
 
     return p_current_segment->Select( *title );
 }
