@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.1 2002/12/15 23:39:41 fenrir Exp $
+ * $Id: ftp.c,v 1.2 2002/12/16 15:17:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -470,7 +470,7 @@ static int  ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
     vasprintf( &psz_buffer, psz_fmt, args );
 #else
     i_size = strlen( psz_fmt ) + 2048;
-    psz_path = calloc( i_size, sizeof( char ) );
+    psz_buffer = calloc( i_size, sizeof( char ) );
     vsnprintf( psz_buffer, i_size, psz_fmt, args );
     psz_buffer[i_size - 1] = 0;
 #endif
