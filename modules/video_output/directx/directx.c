@@ -599,6 +599,14 @@ static int Manage( vout_thread_t *p_vout )
         SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0, 0, 0,
                       SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
 
+	if( p_vout->p_sys->hparent )
+	{
+	    ShowWindow( p_vout->p_sys->hwnd, SW_HIDE );
+	    SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE,
+			   p_vout->b_fullscreen ? 0 : WS_EX_TOOLWINDOW );
+	    ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
+	}
+
         /* Update the object variable and trigger callback */
         val.b_bool = p_vout->b_fullscreen;
         var_Set( p_vout, "fullscreen", val );

@@ -361,7 +361,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     WNDCLASSEX wc;                            /* window class components */
     HICON      vlc_icon = NULL;
     char       vlc_path[MAX_PATH+1];
-    int        i_style;
+    int        i_style, i_stylex;
 
     msg_Dbg( p_vout, "DirectXCreateWindow" );
 
@@ -440,14 +440,18 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     rect_window.bottom = rect_window.top + p_vout->p_sys->i_window_height;
     AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
 
+    i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
+    i_stylex = 0;
+
     if( p_vout->p_sys->hparent )
+    {
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
-    else
-        i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
+        i_stylex = WS_EX_TOOLWINDOW;
+    }
 
     /* Create the window */
     p_vout->p_sys->hwnd =
-        CreateWindowEx( WS_EX_NOPARENTNOTIFY,
+        CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
                     "VLC DirectX",                   /* name of window class */
                     VOUT_TITLE " (DirectX Output)", /* window title bar text */
                     i_style,                                 /* window style */
