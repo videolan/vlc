@@ -228,7 +228,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     {
         input_item_t *p_current = ( (input_thread_t*)p_access->p_parent)->
                                                         input.p_item;
-        p_item = playlist_ItemGetByInput( p_playlist, p_current );
+        p_item = playlist_LockItemGetByInput( p_playlist, p_current );
         msg_Dbg( p_access, "not starting directory playback");
         if( !p_item )
         {

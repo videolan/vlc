@@ -127,7 +127,7 @@ vlc_bool_t FindItem( demux_t *p_demux, playlist_t *p_playlist,
      {
          input_item_t *p_current = ( (input_thread_t*)p_demux->p_parent)->
                                                         input.p_item;
-         *pp_item = playlist_ItemGetByInput( p_playlist, p_current );
+         *pp_item = playlist_LockItemGetByInput( p_playlist, p_current );
          if( !*pp_item )
          {
              msg_Dbg( p_playlist, "unable to find item in playlist");

@@ -1890,7 +1890,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                                     i_index = j;
                             }
 
-                            playlist_Delete( p_sys->p_playlist,
+                            playlist_LockDelete( p_sys->p_playlist,
                                              p_items[i_index] );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      p_items[i_index] );
@@ -1930,7 +1930,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         }
                         if( j == i_nb_items )
                         {
-                            playlist_Delete( p_sys->p_playlist, i );
+                            playlist_LockDelete( p_sys->p_playlist, i );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                      i );
                         }
@@ -1941,10 +1941,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 }
                 case MVLC_EMPTY:
                 {
-                    while( p_sys->p_playlist->i_size > 0 )
-                    {
-                        playlist_Delete( p_sys->p_playlist, 0 );
-                    }
+                    playlist_LockClear( p_sys->p_playlist );
                     msg_Dbg( p_intf, "requested playlist empty" );
                     break;
                 }

@@ -338,7 +338,7 @@ static int Open( vlc_object_t * p_this )
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
-            p_item = playlist_ItemGetByInput( p_playlist,
+            p_item = playlist_LockItemGetByInput( p_playlist,
                       ((input_thread_t *)p_demux->p_parent)->input.p_item );
             playlist_ItemToNode( p_playlist, p_item );
 

@@ -79,10 +79,11 @@ struct playlist_item_t
     /* END LEGACY FIELDS */
 };
 
-#define PLAYLIST_SAVE_FLAG      0x1     /**< Must it be saved */
-#define PLAYLIST_SKIP_FLAG      0x2     /**< Must playlist skip after it ? */
-#define PLAYLIST_ENA_FLAG       0x4     /**< Is it enabled ? */
-#define PLAYLIST_DEL_FLAG       0x8     /**< Autodelete ? */
+#define PLAYLIST_SAVE_FLAG      0x01     /**< Must it be saved */
+#define PLAYLIST_SKIP_FLAG      0x02     /**< Must playlist skip after it ? */
+#define PLAYLIST_ENA_FLAG       0x04     /**< Is it enabled ? */
+#define PLAYLIST_DEL_FLAG       0x08     /**< Autodelete ? */
+#define PLAYLIST_RO_FLAG        0x10    /**< Write-enabled ? */
 
 /**
  * playlist view
@@ -247,6 +248,7 @@ int            playlist_Destroy  ( playlist_t * );
 VLC_EXPORT( int, playlist_Control, ( playlist_t *, int, ...  ) );
 
 VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
+VLC_EXPORT( int,  playlist_LockClear, ( playlist_t * ) );
 
 VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *) );
 
@@ -311,17 +313,23 @@ VLC_EXPORT(int, playlist_NodeAddItem, ( playlist_t *, playlist_item_t *,int,play
 
 /* Misc item operations (act on item+playlist) */
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
+VLC_EXPORT( int,  playlist_LockDelete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Disable, ( playlist_t *, playlist_item_t * ) );
 VLC_EXPORT( int,  playlist_Enable, ( playlist_t *, playlist_item_t * ) );
 VLC_EXPORT( int, playlist_ItemToNode, (playlist_t *,playlist_item_t *) );
+VLC_EXPORT( int, playlist_LockItemToNode, (playlist_t *,playlist_item_t *) );
 VLC_EXPORT( int, playlist_Replace, (playlist_t *,playlist_item_t *, input_item_t*) );
+VLC_EXPORT( int, playlist_LockReplace, (playlist_t *,playlist_item_t *, input_item_t*) );
 
 
 /* Item search functions */
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int) );
+VLC_EXPORT( playlist_item_t *, playlist_LockItemGetById, (playlist_t *, int) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetByPos, (playlist_t *, int) );
-VLC_EXPORT( int, playlist_GetPositionById, (playlist_t *,int ) );
+VLC_EXPORT( playlist_item_t *, playlist_LockItemGetByPos, (playlist_t *, int) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInput, (playlist_t *,input_item_t * ) );
+VLC_EXPORT( playlist_item_t *, playlist_LockItemGetByInput, (playlist_t *,input_item_t * ) );
+VLC_EXPORT( int, playlist_GetPositionById, (playlist_t *,int ) );
 
 /* Info functions */
 VLC_EXPORT( char * , playlist_GetInfo, ( playlist_t * , int, const char *, const char *) );

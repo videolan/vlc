@@ -619,7 +619,7 @@ void Playlist::UpdateItem( int i )
         return;
     }
 
-    p_item = playlist_ItemGetById( p_playlist, i );
+    p_item = playlist_LockItemGetById( p_playlist, i );
 
     wxTreeItemId item = FindItem( treectrl->GetRootItem(), p_item);
 
@@ -923,7 +923,7 @@ void Playlist::DeleteItem( int item_id )
         return;
     }
 
-    playlist_Delete( p_playlist, item_id );
+    playlist_LockDelete( p_playlist, item_id );
 
     vlc_object_release( p_playlist );
 }
@@ -1480,7 +1480,9 @@ void Playlist::OnPopupPreparse( wxMenuEvent& event )
     {
         if( p_popup_item->i_children == -1 )
         {
+            wxMutexGuiLeave();
             playlist_PreparseEnqueue( p_playlist, &p_popup_item->input );
+            wxMutexGuiEnter();
         }
         else
         {

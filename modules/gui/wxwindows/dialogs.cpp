@@ -390,7 +390,7 @@ void DialogsProvider::OnOpenDirectory( wxCommandEvent& event )
         int i_id = playlist_Add( p_playlist, (const char *)path.mb_str(),
                                              (const char *)path.mb_str(),
                                              PLAYLIST_APPEND, PLAYLIST_END );
-        p_item = playlist_ItemGetById( p_playlist, i_id );
+        p_item = playlist_LockItemGetById( p_playlist, i_id );
         if( p_item )
         {
             input_CreateThread( p_intf, &p_item->input );

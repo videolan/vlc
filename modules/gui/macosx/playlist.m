@@ -314,7 +314,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             {
                 playlist_Stop( p_playlist );
             }
-            playlist_Delete( p_playlist, p_item->input.i_id );
+            playlist_LockDelete( p_playlist, p_item->input.i_id );
         }
         [self playlistUpdated];
     }

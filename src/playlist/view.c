@@ -86,6 +86,8 @@ playlist_view_t * playlist_ViewCreate( playlist_t *p_playlist, int i_id,
 /**
  * Creates a new view and add it to the list
  *
+ * This function must be entered without the playlist lock
+ *
  * \param p_playlist a playlist object
  * \param i_id the view identifier
  * \return VLC_SUCCESS or an error
@@ -113,6 +115,8 @@ int playlist_ViewInsert( playlist_t *p_playlist, int i_id, char *psz_name )
 /**
  * Deletes a view
  *
+ * This function must be entered wit the playlist lock
+ *
  * \param p_view the view to delete
  * \return nothing
  */
@@ -121,7 +125,6 @@ int playlist_ViewDelete( playlist_t *p_playlist,playlist_view_t *p_view )
     REMOVE_ELEM( p_playlist->pp_views, p_playlist->i_views, 0 );
     return VLC_SUCCESS;
 }
-
 
 /**
  * Dumps the content of a view
@@ -366,15 +369,22 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
             playlist_Delete( p_playlist, p_root->pp_children[i]->input.i_id );
         }
     }
-    var_SetInteger( p_playlist, "item-deleted", p_root->input.i_id );    
     /* Delete the node */
-    for( i = 0 ; i< p_root->i_parents; i++ )
+    if( p_root->i_flags & PLAYLIST_RO_FLAG )
     {
-        playlist_NodeRemoveItem( p_playlist, p_root,
-                                 p_root->pp_parents[i]->p_parent );
+        msg_Dbg( p_playlist, "unable to remove node, write-protected" );
     }
-    playlist_ItemDelete( p_root );
-   return VLC_SUCCESS;
+    else
+    {
+        for( i = 0 ; i< p_root->i_parents; i++ )
+        {
+            playlist_NodeRemoveItem( p_playlist, p_root,
+                                     p_root->pp_parents[i]->p_parent );
+        }
+        var_SetInteger( p_playlist, "item-deleted", p_root->input.i_id );
+        playlist_ItemDelete( p_root );
+    }
+    return VLC_SUCCESS;
 }
 
 

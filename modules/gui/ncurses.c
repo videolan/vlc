@@ -419,8 +419,9 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             {
                 int i_item = p_sys->p_playlist->i_index;
 
-                playlist_Delete( p_sys->p_playlist, p_sys->i_box_plidx );
-                if( i_item < p_sys->p_playlist->i_size && i_item != p_sys->p_playlist->i_index )
+                playlist_LockDelete( p_sys->p_playlist, p_sys->i_box_plidx );
+                if( i_item < p_sys->p_playlist->i_size &&
+                    i_item != p_sys->p_playlist->i_index )
                 {
                     playlist_Goto( p_sys->p_playlist, i_item );
                 }

@@ -506,7 +506,7 @@ void GtkDeleteGListItem( gpointer data, gpointer param )
     int i_cur_row = (long)data;
     playlist_t * p_playlist = param;
 
-    playlist_Delete( p_playlist, i_cur_row );
+    playlist_LockDelete( p_playlist, i_cur_row );
 }
 
 

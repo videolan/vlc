@@ -920,7 +920,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         CDDAMetaInfo( p_access, CDIO_INVALID_TRACK, psz_mrl );
     }
 
-    p_item = playlist_ItemGetByInput( p_playlist,
+    p_item = playlist_LockItemGetByInput( p_playlist,
                         ((input_thread_t *)p_access->p_parent)->input.p_item );
 
     if( p_item == p_playlist->status.p_item && !b_single_track )

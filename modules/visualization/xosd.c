@@ -240,8 +240,7 @@ static void Run( intf_thread_t *p_intf )
             else
             {
     //           vlc_mutex_lock(&p_playlist->object_lock );
-                 p_item = playlist_ItemGetByPos( p_playlist,
-                                 p_playlist->i_index );
+                 p_item = p_playlist->status.p_item;
                 item = p_item->input;
                 if( !p_item )
                 {

@@ -1364,13 +1364,13 @@ VCDFixupPlayList( input_thread_t *p_input, thread_vcd_data_t *p_vcd,
                           psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE,
                           p_playlist->i_index);
 
-    } 
-  else 
+    }
+  else
     {
     vcdinfo_itemid_t list_itemid;
     list_itemid.type=VCDINFO_ITEM_TYPE_ENTRY;
 
-    playlist_Delete( p_playlist, p_playlist->i_index);
+    playlist_LockDelete( p_playlist, p_playlist->i_index);
 
     for( i = 0 ; i < p_vcd->num_entries ; i++ )
       {

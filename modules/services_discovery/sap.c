@@ -1375,7 +1375,7 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
 
     if( p_announce->p_item )
     {
-        playlist_Delete( p_playlist, p_announce->p_item->input.i_id );
+        playlist_LockDelete( p_playlist, p_announce->p_item->input.i_id );
     }
 
     for( i = 0; i< p_sd->p_sys->i_announces; i++)

@@ -436,6 +436,15 @@ playlist_item_t * playlist_ItemGetByPos( playlist_t * p_playlist , int i_pos )
     }
 }
 
+playlist_item_t *playlist_LockItemGetByPos( playlist_t *p_playlist, int i_pos )
+{
+    playlist_item_t *p_ret;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    p_ret = playlist_ItemGetByPos( p_playlist, i_pos );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return p_ret;
+}
+
 /**
  * Search an item by its id
  *
@@ -454,6 +463,15 @@ playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id )
         }
     }
     return NULL;
+}
+
+playlist_item_t *playlist_LockItemGetById( playlist_t *p_playlist, int i_id)
+{
+    playlist_item_t *p_ret;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    p_ret = playlist_ItemGetById( p_playlist, i_id );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return p_ret;
 }
 
 /**
@@ -482,6 +500,15 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
     return NULL;
 }
 
+playlist_item_t *playlist_LockItemGetByInput( playlist_t *p_playlist,
+                                               input_item_t *p_item )
+{
+    playlist_item_t *p_ret;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    p_ret = playlist_ItemGetByInput( p_playlist, p_item );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return p_ret;
+}
 
 
 /***********************************************************************
@@ -505,8 +532,6 @@ int playlist_ItemToNode( playlist_t *p_playlist,playlist_item_t *p_item )
         p_item->i_children = 0;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-
     /* Remove it from the array of available items */
     for( i = 0 ; i < p_playlist->i_size ; i++ )
     {
@@ -515,10 +540,18 @@ int playlist_ItemToNode( playlist_t *p_playlist,playlist_item_t *p_item )
             REMOVE_ELEM( p_playlist->pp_items, p_playlist->i_size, i );
         }
     }
-    vlc_mutex_unlock( &p_playlist->object_lock );
     var_SetInteger( p_playlist, "item-change", p_item->input.i_id );
 
     return VLC_SUCCESS;
+}
+
+int playlist_LockItemToNode( playlist_t *p_playlist, playlist_item_t *p_item )
+{
+    int i_ret;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    i_ret = playlist_ItemToNode( p_playlist, p_item );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return i_ret;
 }
 
 /**
@@ -527,7 +560,7 @@ int playlist_ItemToNode( playlist_t *p_playlist,playlist_item_t *p_item )
  *
  * \see playlist_Replace
  */
-int playlist_LockAndReplace( playlist_t *p_playlist,
+int playlist_LockReplace( playlist_t *p_playlist,
                              playlist_item_t *p_olditem,
                              input_item_t *p_new )
 {
@@ -604,11 +637,11 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
     /* Check if it is the current item */
     if( p_playlist->status.p_item == p_item )
     {
-        playlist_Control( p_playlist, PLAYLIST_STOP );
+        /* Hack we don't call playlist_Control for lock reasons */
+        p_playlist->status.i_status = PLAYLIST_STOPPED;
+        p_playlist->request.b_request = VLC_TRUE;
         p_playlist->status.p_item = NULL;
     }
-
-    vlc_mutex_lock( &p_playlist->object_lock );
 
     msg_Dbg( p_playlist, "deleting playlist item `%s'",
                           p_item->input.psz_name );
@@ -628,9 +661,16 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
 
     playlist_ItemDelete( p_item );
 
-    vlc_mutex_unlock( &p_playlist->object_lock );
-
     return VLC_SUCCESS;
+}
+
+int playlist_LockDelete( playlist_t * p_playlist, int i_id )
+{
+    int i_ret;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    i_ret = playlist_Delete( p_playlist, i_id );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return i_ret;
 }
 
 /**
@@ -652,6 +692,15 @@ int playlist_Clear( playlist_t * p_playlist )
         playlist_ViewEmpty( p_playlist, i, VLC_TRUE );
     }
     return VLC_SUCCESS;
+}
+
+int playlist_LockClear( playlist_t *p_playlist )
+{
+    int i_ret;
+    vlc_mutex_lock( &p_playlist->object_lock );
+    playlist_Clear( p_playlist );
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    return i_ret;
 }
 
 

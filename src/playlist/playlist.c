@@ -127,6 +127,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 
     p_playlist->p_general = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                         _( "General" ), p_view->p_root );
+    p_playlist->p_general->i_flags |= PLAYLIST_RO_FLAG;
 
     /* Set startup status
      * We set to simple view on startup for interfaces that don't do
@@ -572,10 +573,8 @@ static void RunThread ( playlist_t *p_playlist )
             {
                 if( p_autodelete_item )
                 {
-                    vlc_mutex_unlock( &p_playlist->object_lock );
                     playlist_Delete( p_playlist,
                                      p_autodelete_item->input.i_id );
-                    vlc_mutex_lock( &p_playlist->object_lock );
                     p_autodelete_item = NULL;
                 }
                 p_playlist->status.i_status = PLAYLIST_STOPPED;
@@ -587,9 +586,7 @@ static void RunThread ( playlist_t *p_playlist )
 
             if( p_autodelete_item )
             {
-                vlc_mutex_unlock( &p_playlist->object_lock );
                 playlist_Delete( p_playlist, p_autodelete_item->input.i_id );
-                vlc_mutex_lock( &p_playlist->object_lock );
                 p_autodelete_item = NULL;
             }
         }
@@ -770,7 +767,7 @@ static playlist_item_t * NextItem( playlist_t *p_playlist )
         return NULL;
     }
 
-    if( !p_playlist->request.b_request && p_playlist->status.p_item && 
+    if( !p_playlist->request.b_request && p_playlist->status.p_item &&
         !(p_playlist->status.p_item->i_flags & PLAYLIST_SKIP_FLAG) )
     {
         msg_Dbg( p_playlist, "no-skip mode, stopping") ;
