@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.6 2002/06/07 14:30:41 sam Exp $
+ * $Id: playlist.c,v 1.7 2002/06/07 16:06:09 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -179,7 +179,16 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     }
 
     p_playlist->pp_items[i_pos] = p_item;
-    p_playlist->i_status = PLAYLIST_RUNNING;
+
+    if( i_mode & PLAYLIST_GO )
+    {
+        p_playlist->i_index = i_pos;
+        if( p_playlist->p_input )
+        {
+            input_StopThread( p_playlist->p_input );
+        }
+        p_playlist->i_status = PLAYLIST_RUNNING;
+    }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 

@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_dummy.c,v 1.18 2002/06/01 12:31:58 sam Exp $
+ * $Id: input_dummy.c,v 1.19 2002/06/07 16:06:09 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -94,7 +94,7 @@ static int DummyOpen( input_thread_t * p_input )
 
     /* Force dummy demux plug-in */
     p_input->psz_demux = "vlc";
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -120,7 +120,7 @@ static int DummyInit( input_thread_t *p_input )
     if( p_method == NULL )
     {
         msg_Err( p_input, "out of memory" );
-        return( -1 );
+        return -1;
     }
 
     p_input->p_demux_data = p_method;
@@ -131,7 +131,7 @@ static int DummyInit( input_thread_t *p_input )
     {
         msg_Info( p_input, "command `nop'" );
         p_method->i_command = COMMAND_NOP;
-        return( 0 );
+        return 0;
     }
 
     /* Check for a "vlc:quit" command */
@@ -139,7 +139,7 @@ static int DummyInit( input_thread_t *p_input )
     {
         msg_Info( p_input, "command `quit'" );
         p_method->i_command = COMMAND_QUIT;
-        return( 0 );
+        return 0;
     }
 
     /* Check for a "vlc:loop" command */
@@ -147,7 +147,7 @@ static int DummyInit( input_thread_t *p_input )
     {
         msg_Info( p_input, "command `loop'" );
         p_method->i_command = COMMAND_LOOP;
-        return( 0 );
+        return 0;
     }
 
     /* Check for a "vlc:pause:***" command */
@@ -157,14 +157,14 @@ static int DummyInit( input_thread_t *p_input )
         msg_Info( p_input, "command `pause %i'", i_arg );
         p_method->i_command = COMMAND_PAUSE;
         p_method->expiration = mdate() + (mtime_t)i_arg * (mtime_t)1000000;
-        return( 0 );
+        return 0;
     }
 
     msg_Err( p_input, "unknown command `%s'", psz_name );
     free( p_input->p_demux_data );
     p_input->b_error = 1;
 
-    return( -1 );
+    return -1;
 }
 
 /*****************************************************************************
@@ -181,17 +181,25 @@ static void DummyEnd( input_thread_t *p_input )
 static int DummyDemux( input_thread_t *p_input )
 {
     struct demux_sys_s * p_method = p_input->p_demux_data;
+    playlist_t *p_playlist;
+
+    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
+
+    if( p_playlist == NULL )
+    {
+        msg_Err( p_input, "we are not attached to a playlist" );
+        p_input->b_error = 1;
+        return 1;
+    }
 
     switch( p_method->i_command )
     {
         case COMMAND_QUIT:
             p_input->p_vlc->b_die = 1;
-            p_input->b_die = 1;
             break;
 
         case COMMAND_LOOP:
-            //playlist_Jumpto( p_input->p_vlc->p_playlist, -1 );
-            p_input->b_eof = 1;
+            playlist_Goto( p_playlist, 0 );
             break;
 
         case COMMAND_PAUSE:
@@ -210,6 +218,8 @@ static int DummyDemux( input_thread_t *p_input )
             p_input->b_eof = 1;
             break;
     }
+
+    vlc_object_release( p_playlist );
 
     return 1;
 }

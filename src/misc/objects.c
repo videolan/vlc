@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.8 2002/06/07 14:30:41 sam Exp $
+ * $Id: objects.c,v 1.9 2002/06/07 16:06:09 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -181,7 +181,10 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     while( p_this->i_refcount )
     {
-        if( i_delay == 0 )
+        i_delay++;
+
+        /* Don't warn immediately ... 100ms seems OK */
+        if( i_delay == 2 )
         {
             msg_Warn( p_this, "refcount is %i, delaying before deletion",
                               p_this->i_refcount );
@@ -197,7 +200,6 @@ void __vlc_object_destroy( vlc_object_t *p_this )
             return;
         }
 
-        i_delay++;
         msleep( 100000 );
     }
 

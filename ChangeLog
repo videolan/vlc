@@ -5,6 +5,10 @@
 0.5.0
 Not released yet
 
+  * ./plugins/dummy/input_dummy.c: dummy targets such as vlc:nop, vlc:loop
+    and vlc:quit work again.
+  * ./src/playlist/playlist.c: when a new target is added, for instance through
+    the "File" menu, it is automatically played.
   * ./include/vlc_objects.h: pointers are set to NULL after a call to
     vlc_object_destroy.
   * ./po/pl.po: updated polish translation, thanks to Arkadiusz Lipiec

@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.33 2002/06/07 14:30:41 sam Exp $
+ * $Id: gtk_playlist.c,v 1.34 2002/06/07 16:06:09 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -64,10 +64,9 @@ static void UrlDecode( char *encoded_path );
 gboolean GtkPlaylistShow( GtkWidget       *widget,
                           gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-    playlist_t *p_playlist;
-
-    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
         return FALSE;
@@ -110,16 +109,16 @@ void GtkPlaylistCancel( GtkButton * button, gpointer user_data )
 gboolean GtkPlaylistPrev( GtkWidget       *widget,
                           gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-    playlist_t *p_playlist;
-
-    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist )
+    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
     {
-        playlist_Prev( p_playlist );
-        vlc_object_release( p_playlist );
+        return FALSE;
     }
+
+    playlist_Prev( p_playlist );
+    vlc_object_release( p_playlist );
 
     return TRUE;
 }
@@ -128,16 +127,16 @@ gboolean GtkPlaylistPrev( GtkWidget       *widget,
 gboolean GtkPlaylistNext( GtkWidget       *widget,
                           gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-    playlist_t *p_playlist;
-
-    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist )
+    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
     {
-        playlist_Next( p_playlist );
-        vlc_object_release( p_playlist );
+        return FALSE;
     }
+
+    playlist_Next( p_playlist );
+    vlc_object_release( p_playlist );
 
     return TRUE;
 }
