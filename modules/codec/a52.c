@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.1 2002/08/11 01:27:01 massiot Exp $
+ * $Id: a52.c,v 1.2 2002/08/11 22:46:34 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -81,7 +81,7 @@ typedef struct a52_thread_s
  *****************************************************************************/
 static int  OpenDecoder    ( vlc_object_t * );
 static int  RunDecoder     ( decoder_fifo_t * );
-static int  DecodeFrame    ( a52_thread_t *, const byte_t * );
+static int  DecodeFrame    ( a52_thread_t *, byte_t * );
 static int  InitThread     ( a52_thread_t *, decoder_fifo_t * );
 static void EndThread      ( a52_thread_t * );
 
@@ -282,7 +282,7 @@ static void Interleave( float * p_out, const float * p_in, int i_channels )
 /*****************************************************************************
  * DecodeFrame: decode an ATSC A/52 frame.
  *****************************************************************************/
-static int DecodeFrame( a52_thread_t * p_dec, const byte_t * p_frame_buffer )
+static int DecodeFrame( a52_thread_t * p_dec, byte_t * p_frame_buffer )
 {
     sample_t        i_sample_level = 1;
     aout_buffer_t * p_buffer;
