@@ -174,7 +174,7 @@ if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
   INCLUDES="${INCLUDES} -I\\\$(top_srcdir)/intl"
 else
-  AC_CHECK_FUNC(textdomain,,[
+  AC_CHECK_FUNCS(textdomain,,[
     AC_CHECK_LIB(intl,textdomain,
       LDFLAGS_vlc="${LDFLAGS_vlc} -lintl"
       LDFLAGS_plugins="${LDFLAGS_plugins} -lintl"
@@ -264,16 +264,16 @@ AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab 
 
 dnl Check for usual libc functions
 AC_CHECK_FUNCS(strdup strndup atof lseek)
-AC_CHECK_FUNC(strcasecmp,,[AC_CHECK_FUNC(stricmp)])
-AC_CHECK_FUNC(strncasecmp,,[AC_CHECK_FUNC(strnicmp)])
+AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
+AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
 
-AC_CHECK_FUNC(connect,,[
+AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,
     LDFLAGS_ipv4="${LDFLAGS_ipv4} -lsocket"
     LDFLAGS_vlc="${LDFLAGS_vlc} -lsocket"
 )])
 
-AC_CHECK_FUNC(send,,[
+AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,
     LDFLAGS_access_http="${LDFLAGS_access_http} -lsocket"
     LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket"
@@ -283,13 +283,13 @@ AC_CHECK_FUNC(send,,[
     LDFLAGS_access_output_udp="${LDFLAGS_access_output_udp} -lsocket"
 )])
 
-AC_CHECK_FUNC(gethostbyname,,[
+AC_CHECK_FUNCS(gethostbyname,,[
   AC_CHECK_LIB(nsl,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lnsl",[
     AC_CHECK_LIB(bind,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind")])
 ])
 
 have_nanosleep=false
-AC_CHECK_FUNC(nanosleep,have_nanosleep=:,[
+AC_CHECK_FUNCS(nanosleep,have_nanosleep=:,[
   AC_CHECK_LIB(rt,nanosleep,
     [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"; have_nanosleep=:],
     [AC_CHECK_LIB(posix4,nanosleep,
@@ -317,13 +317,13 @@ fi
 dnl HP/UX port
 AC_CHECK_LIB(rt,sem_init, [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"])
 
-AC_CHECK_FUNC(inet_aton,,[
+AC_CHECK_FUNCS(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lresolv")
 ])
 
 dnl Check for getopt
 need_getopt=false
-AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
+AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
   AC_CHECK_LIB([gnugetopt],[getopt_long],
     [AC_DEFINE(HAVE_GETOPT_LONG,1,getopt support) LDFLAGS_vlc="${LDFLAGS_vlc} -lgnugetopt"],
@@ -357,7 +357,7 @@ if test "x${THREAD_LIB}" = "xerror"; then
   AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_FUNC(pthread_mutex_lock)
+  AC_CHECK_FUNCS(pthread_mutex_lock)
   THREAD_LIB=""
 fi
 
@@ -1270,7 +1270,7 @@ dnl
 if test "x${SYS}" != "xnto" && test "x${SYS}" != "xmingw32"
 then
   have_ipv6=false
-  AC_CHECK_FUNC(inet_pton,[have_ipv6=:],[
+  AC_CHECK_FUNCS(inet_pton,[have_ipv6=:],[
     AC_CHECK_LIB(resolv,inet_pton,
       [have_ipv6=:
        LDFLAGS_ipv6="${LDFLAGS_ipv6} -lresolv"])

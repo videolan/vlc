@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.5 2002/12/27 15:31:56 sam Exp $
+ * $Id: libc.c,v 1.6 2002/12/30 13:34:03 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -90,6 +90,8 @@ int vlc_strcasecmp( const char *s1, const char *s2 )
         {
             i_delta += 'A' - 'a';
         }
+
+        s1++; s2++;
     }
 
     return i_delta;
@@ -117,6 +119,8 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
         {
             i_delta += 'A' - 'a';
         }
+
+        s1++; s2++;
     }
 
     return i_delta;
