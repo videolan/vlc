@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: wxwindows.h,v 1.92 2004/02/24 22:15:41 gbazin Exp $
+ * $Id: wxwindows.h,v 1.93 2004/02/25 18:42:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -42,6 +42,12 @@
 #include <wx/accel.h>
 #include <wx/checkbox.h>
 #include "vlc_keys.h"
+
+/* Hmmm, work-around for newest wxWin */
+#ifdef wxStaticCastEvent
+#   undef wxStaticCastEvent
+#   define wxStaticCastEvent(type, val) ((type)(val))
+#endif
 
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
 
