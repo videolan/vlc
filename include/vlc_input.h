@@ -281,9 +281,6 @@ struct input_thread_t
         int         i_type;
         vlc_value_t val;
     } control[INPUT_CONTROL_FIFO_SIZE];
-
-    /* Will be removed quickly (once input_thread_t is opaque)*/
-    input_thread_sys_t *p_sys;
 };
 
 /*****************************************************************************
