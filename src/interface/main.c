@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.99 2001/05/31 01:37:08 sam Exp $
+ * $Id: main.c,v 1.100 2001/06/12 00:30:41 reno Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -31,6 +31,7 @@
 
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
 #include <stdio.h>                                              /* sprintf() */
+#include <setjmp.h>                                       /* longjmp, setjmp */
 
 #ifdef HAVE_GETOPT_LONG
 #   ifdef HAVE_GETOPT_H
@@ -213,8 +214,10 @@ static void Version                 ( void );
 static void InitSignalHandler       ( void );
 static void SimpleSignalHandler     ( int i_signal );
 static void FatalSignalHandler      ( int i_signal );
-
+static void InstructionSignalHandler( int i_signal );
 static int  CPUCapabilities         ( void );
+static jmp_buf env;
+static int  i_illegal;
 
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads
@@ -896,6 +899,31 @@ static void FatalSignalHandler( int i_signal )
 }
 
 /*****************************************************************************
+ * InstructionSignalHandler: system signal handler
+ *****************************************************************************
+ * This function is called when a illegal instruction signal is received by
+ * the program.
+ * We use this function to test OS and CPU_Capabilities
+ *****************************************************************************/
+static void InstructionSignalHandler( int i_signal )
+{
+    /* Once a signal has been trapped, the termination sequence will be
+     * armed and following signals will be ignored to avoid sending messages
+     * to an interface having been destroyed */
+
+    /* Acknowledge the signal received */
+    fprintf(stderr,"illegal instruction : optimization disable\n");
+
+    i_illegal = 1;
+    
+    sigrelse( i_signal );
+    longjmp( env, 1 );
+}
+
+
+
+
+/*****************************************************************************
  * CPUCapabilities: list the processors MMX support and other capabilities
  *****************************************************************************
  * This function is called to list extensions the CPU may have.
@@ -942,6 +970,8 @@ static int CPUCapabilities( void )
     unsigned int  i_eax, i_ebx, i_ecx, i_edx;
     boolean_t     b_amd;
 
+    signal( SIGILL,  InstructionSignalHandler );
+    
 #   define cpuid( a )              \
     asm volatile ( "cpuid"         \
                  : "=a" ( i_eax ), \
@@ -967,6 +997,7 @@ static int CPUCapabilities( void )
 
     if( i_eax == i_ebx )
     {
+        signal( SIGILL, NULL );     
         return( i_capabilities );
     }
 
@@ -977,6 +1008,7 @@ static int CPUCapabilities( void )
 
     if( !i_eax )
     {
+        signal( SIGILL, NULL );     
         return( i_capabilities );
     }
 
@@ -992,6 +1024,7 @@ static int CPUCapabilities( void )
 
     if( ! (i_edx & 0x00800000) )
     {
+        signal( SIGILL, NULL );     
         return( i_capabilities );
     }
 
@@ -999,8 +1032,19 @@ static int CPUCapabilities( void )
 
     if( i_edx & 0x02000000 )
     {
+        
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
-        i_capabilities |= CPU_CAPABILITY_SSE;
+
+        /* We test if OS support the SSE instructions */
+        i_illegal = 0;
+        if(setjmp(env)==0) { /* Test a SSE instruction */
+            __asm__ __volatile__ (
+            "xorps %%xmm0,%%xmm0\n"
+            ::);
+        }
+        
+        if( i_illegal != 1 )
+            i_capabilities |= CPU_CAPABILITY_SSE;
     }
     
     /* test for additional capabilities */
@@ -1008,6 +1052,7 @@ static int CPUCapabilities( void )
 
     if( i_eax < 0x80000001 )
     {
+        signal( SIGILL, NULL );     
         return( i_capabilities );
     }
 
@@ -1016,7 +1061,16 @@ static int CPUCapabilities( void )
 
     if( i_edx & 0x80000000 )
     {
-        i_capabilities |= CPU_CAPABILITY_3DNOW;
+        i_illegal = 0;
+        if(setjmp(env)==0) { /* Test a 3D Now! instruction */
+            __asm__ __volatile__ (
+            "pfadd %%mm0,%%mm0\n"
+            "femms\n"
+            ::);
+        }
+        
+        if( i_illegal != 1 ) 
+            i_capabilities |= CPU_CAPABILITY_3DNOW;
     }
 
     if( b_amd && ( i_edx & 0x00400000 ) )
@@ -1027,6 +1081,7 @@ static int CPUCapabilities( void )
     /* default behaviour */
 
 #endif
+    signal( SIGILL, NULL );     
     return( i_capabilities );
 }
 

@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.9 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_decoder.h,v 1.10 2001/06/12 00:30:41 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -370,7 +370,7 @@ struct ac3dec_s
     bsi_t               bsi;
     audblk_t            audblk;
 
-    float               samples[6][256];
+    float               samples[6][256] __attribute__ ((aligned(16)));
     dm_par_t            dm_par;
 
     bit_allocate_t      bit_allocate;
