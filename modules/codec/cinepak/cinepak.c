@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.5 2002/10/24 09:37:48 gbazin Exp $
+ * $Id: cinepak.c,v 1.6 2002/10/27 16:58:14 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -162,12 +162,24 @@ static inline void __GetFrame( videodec_thread_t *p_vdec )
     data_packet_t *p_data;
     byte_t        *p_buffer;
 
-    p_pes = GetPES( p_vdec->p_fifo );
+    input_ExtractPES( p_vdec->p_fifo, &p_pes );
+    if( !p_pes )
+    {
+        p_vdec->p_framedata = NULL;
+        return;
+    }
+
     p_vdec->i_pts = p_pes->i_pts;
 
     while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
     {
-        p_pes = NextPES( p_vdec->p_fifo );
+        input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
+        input_ExtractPES( p_vdec->p_fifo, &p_pes );
+        if( !p_pes )
+        {
+            p_vdec->p_framedata = NULL;
+            return;
+        }
     }
     p_vdec->i_framesize = p_pes->i_pes_size;
     if( p_pes->i_nb_data == 1 )
@@ -185,18 +197,19 @@ static inline void __GetFrame( videodec_thread_t *p_vdec )
         p_buffer += p_data->p_payload_end - p_data->p_payload_start;
         p_data = p_data->p_next;
     } while( p_data );
+    input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
 }
 
 static inline void __NextFrame( videodec_thread_t *p_vdec )
 {
     pes_packet_t  *p_pes;
 
-    p_pes = GetPES( p_vdec->p_fifo );
-    if( p_pes->i_nb_data != 1 )
+    input_ExtractPES( p_vdec->p_fifo, &p_pes );
+    if( p_pes && (p_pes->i_nb_data != 1) )
     {
         free( p_vdec->p_framedata ); /* FIXME keep this buffer */
     }
-    NextPES( p_vdec->p_fifo );
+    input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
 }
 
 static int cinepak_CheckVout( vout_thread_t *p_vout,

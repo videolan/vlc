@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.15 2002/10/24 09:37:48 gbazin Exp $
+ * $Id: a52.c,v 1.16 2002/10/27 16:58:14 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -120,7 +120,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         DecoderError( p_fifo );
         return -1;
     }
-  
+
     /* Initialize the thread properties */
     p_dec->p_aout = NULL;
     p_dec->p_aout_input = NULL;
@@ -130,8 +130,14 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     aout_DateSet( &end_date, 0 );
 
     /* Init the bitstream */
-    InitBitstream( &p_dec->bit_stream, p_dec->p_fifo,
-                   NULL, NULL );
+    if( InitBitstream( &p_dec->bit_stream, p_dec->p_fifo,
+                       NULL, NULL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_fifo, "cannot initialize bitstream" );
+        DecoderError( p_fifo );
+        free( p_dec );
+        return -1;
+    }
 
     /* decoder thread's main loop */
     while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
@@ -252,6 +258,7 @@ static void EndThread( dec_thread_t * p_dec )
         aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
     }
 
+    CloseBitstream( &p_dec->bit_stream );
     free( p_dec );
 }
 

@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.5 2002/10/15 23:10:54 massiot Exp $
+ * $Id: lpcm.c,v 1.6 2002/10/27 16:58:14 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -121,8 +121,14 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     p_dec->p_fifo = p_fifo;
 
     /* Init the bitstream */
-    InitBitstream( &p_dec->bit_stream, p_dec->p_fifo,
-                   NULL, NULL );
+    if( InitBitstream( &p_dec->bit_stream, p_dec->p_fifo,
+                       NULL, NULL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_fifo, "cannot initialize bitstream" );
+        DecoderError( p_fifo );
+        EndThread( p_dec );
+        return -1;
+    }
    
     /* FIXME : I suppose the number of channel and sampling rate 
      * are somewhere in the headers */
@@ -140,6 +146,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     {
         msg_Err( p_dec->p_fifo, "failed to create aout fifo" );
         p_dec->p_fifo->b_error = 1;
+        EndThread( p_dec );
         return( -1 );
     }
 
@@ -220,5 +227,6 @@ static void EndThread( dec_thread_t * p_dec )
         aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
     }
 
+    CloseBitstream( &p_dec->bit_stream );
     free( p_dec );
 }

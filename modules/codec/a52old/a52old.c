@@ -2,7 +2,7 @@
  * a52old.c: A52 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: a52old.c,v 1.7 2002/09/26 22:40:20 massiot Exp $
+ * $Id: a52old.c,v 1.8 2002/10/27 16:58:14 gbazin Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -76,10 +76,10 @@ vlc_module_end();
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
-    
+
     if( p_fifo->i_fourcc != VLC_FOURCC('a','5','2',' ')
          && p_fifo->i_fourcc != VLC_FOURCC('a','5','2','b') )
-    {   
+    {
         return VLC_EGENERIC;
     }
 
@@ -330,10 +330,8 @@ static int InitThread( a52dec_t * p_a52dec )
     /*
      * Bit stream
      */
-    InitBitstream( &p_a52dec->bit_stream, p_a52dec->p_fifo,
-                   BitstreamCallback, (void *) p_a52dec );
-    
-    return( 0 );
+    return( InitBitstream( &p_a52dec->bit_stream, p_a52dec->p_fifo,
+                           BitstreamCallback, (void *) p_a52dec ) );
 }
 
 /*****************************************************************************
@@ -377,6 +375,7 @@ static void EndThread (a52dec_t * p_a52dec)
 
     /* Free what's left of the decoder */
     free( p_a52dec->imdct_orig );
+    CloseBitstream( p_a52dec->bit_stream );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.7 2002/10/24 09:37:47 gbazin Exp $
+ * $Id: decoder.c,v 1.8 2002/10/27 16:58:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -154,7 +154,13 @@ static inline void __GetFrame( adec_thread_t *p_adec )
     data_packet_t *p_data;
     byte_t        *p_buffer;
 
-    p_pes = GetPES( p_adec->p_fifo );
+    input_ExtractPES( p_adec->p_fifo, &p_pes );
+    if( !p_pes )
+    {
+        p_adec->p_framedata = NULL;
+        return;
+    }
+
     if( p_pes->i_pts )
     {
         p_adec->pts = p_pes->i_pts;
@@ -162,7 +168,13 @@ static inline void __GetFrame( adec_thread_t *p_adec )
 
     while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
     {
-        p_pes = NextPES( p_adec->p_fifo );
+        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+        input_ExtractPES( p_adec->p_fifo, &p_pes );
+        if( !p_pes )
+        {
+            p_vdec->p_framedata = NULL;
+            return;
+        }
     }
     p_adec->i_framesize = p_pes->i_pes_size;
     if( p_pes->i_nb_data == 1 )
@@ -194,11 +206,13 @@ static inline void __GetFrame( adec_thread_t *p_adec )
         p_buffer += p_data->p_payload_end - p_data->p_payload_start;
         p_data = p_data->p_next;
     } while( p_data );
+
+    input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
 }
 
 static inline void __NextFrame( adec_thread_t *p_adec )
 {
-    NextPES( p_adec->p_fifo );
+    input_ExtractPES( p_vdec->p_fifo, NULL );
 }
 
 

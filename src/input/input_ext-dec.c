@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.38 2002/10/24 10:33:09 fenrir Exp $
+ * $Id: input_ext-dec.c,v 1.39 2002/10/27 16:58:12 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,36 +35,30 @@
 #include "input_ext-plugins.h"
 
 /*****************************************************************************
- * InitBitstream: initialize a bit_stream_t structure
+ * InitBitstream: initialize a bit_stream_t structure and returns VLC_SUCCESS
+ *                on success.
  *****************************************************************************/
-void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
+int InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
                 void (* pf_bitstream_callback)( bit_stream_t *, vlc_bool_t ),
                 void * p_callback_arg )
 {
+    /* Get the first pes packet */
+    input_ExtractPES( p_fifo, &p_bit_stream->p_pes );
+    if( !p_bit_stream->p_pes )
+	return VLC_EGENERIC;
+
     p_bit_stream->p_decoder_fifo = p_fifo;
     p_bit_stream->pf_bitstream_callback = pf_bitstream_callback;
     p_bit_stream->p_callback_arg = p_callback_arg;
 
-    /* Get the first data packet. */
-    vlc_mutex_lock( &p_fifo->data_lock );
-    while ( p_fifo->p_first == NULL )
-    {
-        if ( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return;
-        }
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    p_bit_stream->p_data = p_fifo->p_first->p_first;
+    p_bit_stream->p_data = p_bit_stream->p_pes->p_first;
     p_bit_stream->p_byte = p_bit_stream->p_data->p_payload_start;
     p_bit_stream->p_end  = p_bit_stream->p_data->p_payload_end;
     p_bit_stream->fifo.buffer = 0;
     p_bit_stream->fifo.i_available = 0;
-    p_bit_stream->i_pts = p_fifo->p_first->i_pts;
-    p_bit_stream->i_dts = p_fifo->p_first->i_dts;
+    p_bit_stream->i_pts = p_bit_stream->p_pes->i_pts;
+    p_bit_stream->i_dts = p_bit_stream->p_pes->i_dts;
     p_bit_stream->p_pts_validity = p_bit_stream->p_byte;
-    vlc_mutex_unlock( &p_fifo->data_lock );
 
     /* Call back the decoder. */
     if( p_bit_stream->pf_bitstream_callback != NULL )
@@ -80,6 +74,18 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
          * sizeof(WORD_TYPE) - 1 empty bytes in the bit buffer. */
         AlignWord( p_bit_stream );
     }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CloseBitstream: free the bitstream structure.
+ *****************************************************************************/
+void CloseBitstream( bit_stream_t * p_bit_stream )
+{
+    if( p_bit_stream->p_pes )
+        input_DeletePES( p_bit_stream->p_decoder_fifo->p_packets_mgt,
+                         p_bit_stream->p_pes );
 }
 
 /*****************************************************************************
@@ -87,116 +93,25 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
  *****************************************************************************/
 void DecoderError( decoder_fifo_t * p_fifo )
 {
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock (&p_fifo->data_lock);
+    /* No need to take the lock, because input_ExtractPES already takes it
+     * and also check for p_fifo->b_die */
 
     /* Wait until a `die' order is sent */
-    while (!p_fifo->b_die)
+    while( !p_fifo->b_die )
     {
         /* Trash all received PES packets */
-        input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
-        p_fifo->p_first = NULL;
-        p_fifo->pp_last = &p_fifo->p_first;
-
-        /* If the input is waiting for us, tell him to stop */
-        vlc_cond_signal( &p_fifo->data_wait );
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait (&p_fifo->data_wait, &p_fifo->data_lock);
+        input_ExtractPES( p_fifo, NULL );
     }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock (&p_fifo->data_lock);
-}
-
-/*****************************************************************************
- * GetPES: return the first PES from the fifo
- *****************************************************************************/
-static inline pes_packet_t *_GetPES( decoder_fifo_t * p_fifo )
-{
-    pes_packet_t * p_pes;
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    if( p_fifo->p_first == NULL )
-    {
-        /* No PES in the FIFO. p_last is no longer valid. */
-        p_fifo->pp_last = &p_fifo->p_first;
-
-        if( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return NULL;
-        }
-
-        /* Signal the input thread we're waiting. This is only
-         * needed in case of slave clock (ES plug-in) but it won't
-         * harm. */
-        vlc_cond_signal( &p_fifo->data_wait );
-
-        /* Wait for the input to tell us when we receive a packet. */
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-
-    p_pes = p_fifo->p_first;
-
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    return p_pes;
-}
-
-pes_packet_t * GetPES( decoder_fifo_t * p_fifo )
-{
-    return( _GetPES( p_fifo ) );
-}
-
-/*****************************************************************************
- * NextPES: free the current PES and return the next one
- *****************************************************************************/
-static inline pes_packet_t * _NextPES( decoder_fifo_t * p_fifo )
-{
-    pes_packet_t * p_next;
-
-    if( p_fifo->p_first == NULL )
-    {
-        if( GetPES( p_fifo ) == NULL )
-        {
-            return( NULL );
-        }
-    }
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    /* Free the previous PES packet. */
-    p_next = p_fifo->p_first->p_next;
-    p_fifo->p_first->p_next = NULL;
-    input_DeletePES( p_fifo->p_packets_mgt, p_fifo->p_first );
-    p_fifo->p_first = p_next;
-    p_fifo->i_depth--;
-
-    if( p_fifo->p_first == NULL )
-    {
-        /* No PES in the FIFO. p_last is no longer valid. */
-        p_fifo->pp_last = &p_fifo->p_first;
-    }
-
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    return _GetPES( p_fifo );
-}
-
-pes_packet_t * NextPES( decoder_fifo_t * p_fifo )
-{
-    return( _NextPES( p_fifo ) );
 }
 
 /*****************************************************************************
  * NextDataPacket: go to the data packet after *pp_data, return 1 if we
- * changed PES
+ * changed PES. This function can fail in case of end of stream, you can
+ * check p_bit_stream->p_data or p_bit_stream->p_pes to know wether we did get
+ * the next data packet.
  *****************************************************************************/
 static inline vlc_bool_t _NextDataPacket( decoder_fifo_t * p_fifo,
-                                          data_packet_t ** pp_data )
+                                          bit_stream_t * p_bit_stream )
 {
     vlc_bool_t b_new_pes;
 
@@ -206,41 +121,51 @@ static inline vlc_bool_t _NextDataPacket( decoder_fifo_t * p_fifo,
     {
         /* We were reading the last data packet of this PES packet... It's
          * time to jump to the next PES packet */
-        if( (*pp_data)->p_next == NULL )
+        if( p_bit_stream->p_data->p_next == NULL )
         {
             /* The next packet could be found in the next PES packet */
-            *pp_data = (_NextPES( p_fifo ))->p_first;
-
+	    input_DeletePES( p_fifo->p_packets_mgt, p_bit_stream->p_pes );
+            input_ExtractPES( p_fifo, &p_bit_stream->p_pes );
+	    if( !p_bit_stream->p_pes )
+            {
+	        /* Couldn't get the next PES, might be an eos */
+	        p_bit_stream->p_data = NULL;
+	        return 0;
+	    }
+            p_bit_stream->p_data = p_bit_stream->p_pes->p_first;
             b_new_pes = 1;
         }
         else
         {
             /* Perhaps the next data packet of the current PES packet contains
              * real data (ie its payload's size is greater than 0). */
-            *pp_data = (*pp_data)->p_next;
+            p_bit_stream->p_data = p_bit_stream->p_data->p_next;
 
             b_new_pes = 0;
         }
-    } while ( (*pp_data)->p_payload_start == (*pp_data)->p_payload_end );
+    } while ( p_bit_stream->p_data->p_payload_start ==
+	      p_bit_stream->p_data->p_payload_end );
 
     return( b_new_pes );
 }
 
-vlc_bool_t NextDataPacket( decoder_fifo_t * p_fifo, data_packet_t ** pp_data )
+vlc_bool_t NextDataPacket( decoder_fifo_t * p_fifo,
+			   bit_stream_t * p_bit_stream )
 {
-    return( _NextDataPacket( p_fifo, pp_data ) );
+    return( _NextDataPacket( p_fifo, p_bit_stream ) );
 }
 
 /*****************************************************************************
  * BitstreamNextDataPacket: go to the next data packet, and update bitstream
- * context
+ * context. This function can fail in case of eos!
  *****************************************************************************/
 static inline void _BitstreamNextDataPacket( bit_stream_t * p_bit_stream )
 {
     decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
     vlc_bool_t          b_new_pes;
 
-    b_new_pes = _NextDataPacket( p_fifo, &p_bit_stream->p_data );
+    b_new_pes = _NextDataPacket( p_fifo, p_bit_stream );
+    if( !p_bit_stream->p_pes ) return;
 
     /* We've found a data packet which contains interesting data... */
     p_bit_stream->p_byte = p_bit_stream->p_data->p_payload_start;
@@ -259,10 +184,10 @@ static inline void _BitstreamNextDataPacket( bit_stream_t * p_bit_stream )
     }
 
     /* Retrieve the PTS. */
-    if( b_new_pes && p_fifo->p_first->i_pts )
+    if( b_new_pes && p_bit_stream->p_pes->i_pts )
     {
-        p_bit_stream->i_pts = p_fifo->p_first->i_pts;
-        p_bit_stream->i_dts = p_fifo->p_first->i_dts;
+        p_bit_stream->i_pts = p_bit_stream->p_pes->i_pts;
+        p_bit_stream->i_dts = p_bit_stream->p_pes->i_dts;
         p_bit_stream->p_pts_validity = p_bit_stream->p_byte;
     }
 }
@@ -523,40 +448,4 @@ void NextPTS( bit_stream_t * p_bit_stream, mtime_t * pi_pts,
         *pi_pts = 0;
         if( pi_dts != NULL) *pi_dts = 0;
     }
-}
-
-/****************************************************************************
- * input_ExtractPES : extract a PES from the fifo. If pp_pes is NULL then this
- * PES is deleted, else pp_pes will be set to this PES
- ****************************************************************************/
-int input_ExtractPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
-{
-    pes_packet_t *p_pes;
-
-    p_pes = _GetPES( p_fifo );
-
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    p_fifo->p_first = p_pes->p_next;
-    p_pes->p_next = NULL;
-    p_fifo->i_depth--;
-
-    if( !p_fifo->p_first )
-    {
-        /* No PES in the fifo */
-        /* pp_last no longer valid */
-        p_fifo->pp_last = &p_fifo->p_first;
-    }
-
-    vlc_mutex_unlock( &p_fifo->data_lock );
-
-    if( pp_pes )
-    {
-        *pp_pes = p_pes;
-    }
-    else
-    {
-        input_DeletePES( p_fifo->p_packets_mgt, p_pes );
-    }
-    return( 0 );
 }

@@ -81,7 +81,7 @@ enum mad_flow libmad_input( void *p_data, struct mad_stream *p_stream )
             i_wanted = MAD_BUFFER_MDLEN - i_left;
 
             /* Store timestamp for next frame */
-            p_dec->i_next_pts = p_dec->p_fifo->p_first->i_pts;
+            p_dec->i_next_pts = p_dec->bit_stream.p_pes->i_pts;
         }
         else
         {
@@ -89,27 +89,28 @@ enum mad_flow libmad_input( void *p_data, struct mad_stream *p_stream )
             i_left = 0;
 
             /* Store timestamp for this frame */
-            p_dec->i_current_pts = p_dec->p_fifo->p_first->i_pts;
+            p_dec->i_current_pts = p_dec->bit_stream.p_pes->i_pts;
         }
-        p_dec->p_fifo->p_first->i_pts = 0;
 
         /* Fill-in the buffer. If an error occurs print a message and leave
          * the decoding loop. If the end of stream is reached we also leave
          * the loop but the return status is left untouched. */
-        if( i_wanted > p_dec->p_data->p_payload_end
-                        - p_dec->p_data->p_payload_start )
+        if( i_wanted > p_dec->bit_stream.p_data->p_payload_end
+                        - p_dec->bit_stream.p_data->p_payload_start )
         {
-            i_wanted = p_dec->p_data->p_payload_end
-                        - p_dec->p_data->p_payload_start;
+            i_wanted = p_dec->bit_stream.p_data->p_payload_end
+                        - p_dec->bit_stream.p_data->p_payload_start;
             memcpy( p_dec->buffer + i_left,
-                    p_dec->p_data->p_payload_start, i_wanted );
-            NextDataPacket( p_dec->p_fifo, &p_dec->p_data );
+                    p_dec->bit_stream.p_data->p_payload_start, i_wanted );
+            NextDataPacket( p_dec->p_fifo, &p_dec->bit_stream );
+            /* No need to check that p_dec->bit_stream->p_data is valid
+             * since we check later on for b_die and b_error */
         }
         else
         {
             memcpy( p_dec->buffer + i_left,
-                    p_dec->p_data->p_payload_start, i_wanted );
-            p_dec->p_data->p_payload_start += i_wanted;
+                    p_dec->bit_stream.p_data->p_payload_start, i_wanted );
+            p_dec->bit_stream.p_data->p_payload_start += i_wanted;
         }
 
         if ( p_dec->p_fifo->b_die )
@@ -354,7 +355,7 @@ enum mad_flow libmad_error( void *data, struct mad_stream *p_libmad_stream,
 
 
 /****************************************************************************
- * Print human readable informations about an audio MPEG frame.				*
+ * Print human readable informations about an audio MPEG frame.
  ****************************************************************************/
 static void PrintFrameInfo(struct mad_header *Header)
 {

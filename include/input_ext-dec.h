@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.74 2002/10/24 09:37:48 gbazin Exp $
+ * $Id: input_ext-dec.h,v 1.75 2002/10/27 16:58:14 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -167,7 +167,9 @@ struct bit_stream_t
     /*
      * Byte structures
      */
-    /* Current data packet (in the current PES packet of the PES stream) */
+    /* Current PES packet (extracted from the PES stream) */
+    pes_packet_t *          p_pes;
+    /* Current data packet (in the current PES packet) */
     data_packet_t *         p_data;
     /* Pointer to the next byte that is to be read (in the current packet) */
     byte_t *                p_byte;
@@ -207,18 +209,15 @@ struct bit_stream_t
 /*****************************************************************************
  * Prototypes from input_ext-dec.c
  *****************************************************************************/
-VLC_EXPORT( void, InitBitstream,  ( bit_stream_t *, decoder_fifo_t *, void ( * )( bit_stream_t *, vlc_bool_t ), void * p_callback_arg ) );
-VLC_EXPORT( vlc_bool_t, NextDataPacket,    ( decoder_fifo_t *, data_packet_t ** ) );
-VLC_EXPORT( pes_packet_t *, GetPES,        ( decoder_fifo_t * ) );
-VLC_EXPORT( pes_packet_t *, NextPES,       ( decoder_fifo_t * ) );
+VLC_EXPORT( int, InitBitstream, ( bit_stream_t *, decoder_fifo_t *, void ( * )( bit_stream_t *, vlc_bool_t ), void * p_callback_arg ) );
+VLC_EXPORT( vlc_bool_t, NextDataPacket,    ( decoder_fifo_t *, bit_stream_t * ) );
 VLC_EXPORT( void, BitstreamNextDataPacket, ( bit_stream_t * ) );
 VLC_EXPORT( u32,  UnalignedShowBits,       ( bit_stream_t *, unsigned int ) );
 VLC_EXPORT( void, UnalignedRemoveBits,     ( bit_stream_t * ) );
 VLC_EXPORT( u32,  UnalignedGetBits,        ( bit_stream_t *, unsigned int ) );
+VLC_EXPORT( void, CloseBitstream,          ( bit_stream_t * ) );
 VLC_EXPORT( void, CurrentPTS,              ( bit_stream_t *, mtime_t *, mtime_t * ) );
 VLC_EXPORT( void, NextPTS,                 ( bit_stream_t *, mtime_t *, mtime_t * ) );
-
-VLC_EXPORT( int,  input_ExtractPES,        ( decoder_fifo_t *, pes_packet_t ** ) );
 
 /*****************************************************************************
  * AlignWord : fill in the bit buffer so that the byte pointer be aligned

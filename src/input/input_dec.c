@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.47 2002/09/01 21:20:29 massiot Exp $
+ * $Id: input_dec.c,v 1.48 2002/10/27 16:58:12 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -153,6 +153,76 @@ void input_DecodePES( decoder_fifo_t * p_decoder_fifo, pes_packet_t * p_pes )
     /* Warn the decoder that it's got work to do. */
     vlc_cond_signal( &p_decoder_fifo->data_wait );
     vlc_mutex_unlock( &p_decoder_fifo->data_lock );
+}
+
+/****************************************************************************
+ * input_ExtractPES
+ *****************************************************************************
+ * Extract a PES from the fifo. If pp_pes is NULL then the PES is just
+ * deleted, otherwise *pp_pes will point to this PES.
+ ****************************************************************************/
+void input_ExtractPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
+{
+    pes_packet_t *p_pes;
+
+    vlc_mutex_lock( &p_fifo->data_lock );
+
+    if( p_fifo->p_first == NULL )
+    {
+        if( p_fifo->b_die )
+        {
+            vlc_mutex_unlock( &p_fifo->data_lock );
+            if( pp_pes ) *pp_pes = NULL;
+            return;
+        }
+
+        /* Signal the input thread we're waiting. This is only
+         * needed in case of slave clock (ES plug-in) but it won't
+         * harm. */
+        vlc_cond_signal( &p_fifo->data_wait );
+
+        /* Wait for the input to tell us when we received a packet. */
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+
+    p_pes = p_fifo->p_first;
+    p_fifo->p_first = p_pes->p_next;
+    p_pes->p_next = NULL;
+    p_fifo->i_depth--;
+
+    if( !p_fifo->p_first )
+    {
+        /* No PES in the FIFO. p_last is no longer valid. */
+        p_fifo->pp_last = &p_fifo->p_first;
+    }
+
+    vlc_mutex_unlock( &p_fifo->data_lock );
+
+    if( pp_pes )
+        *pp_pes = p_pes;
+    else
+        input_DeletePES( p_fifo->p_packets_mgt, p_pes );
+}
+
+/****************************************************************************
+ * input_FlushPESFifo
+ *****************************************************************************
+ * Empties the PES fifo of the decoder.
+ ****************************************************************************/
+void input_FlushPESFifo( decoder_fifo_t *p_fifo )
+{
+    pes_packet_t * p_pes;
+
+    vlc_mutex_lock( &p_fifo->data_lock );
+    while( p_fifo->p_first )
+    {
+        p_pes = p_fifo->p_first;
+        p_fifo->p_first = p_fifo->p_first->p_next;
+        input_DeletePES( p_fifo->p_packets_mgt, p_pes );
+    }
+    /* No PES in the FIFO. p_last is no longer valid. */
+    p_fifo->pp_last = &p_fifo->p_first;
+    vlc_mutex_unlock( &p_fifo->data_lock );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.1 2002/10/24 09:30:47 gbazin Exp $
+ * $Id: vorbis.c,v 1.2 2002/10/27 16:58:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -61,7 +61,8 @@ typedef struct dec_thread_t
     /*
      * Input properties
      */
-    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
+    decoder_fifo_t         *p_fifo;            /* stores the PES stream data */
+    pes_packet_t           *p_pes;            /* current PES we are decoding */
 
     /*
      * Output properties
@@ -81,7 +82,7 @@ static int  RunDecoder   ( decoder_fifo_t * );
 static void CloseDecoder ( dec_thread_t * );
 
 static void DecodePacket ( dec_thread_t * );
-static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t *, int );
+static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t * );
 
 static void Interleave   ( float *, const float **, int, int );
 
@@ -129,12 +130,13 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 
     /* Initialize the thread properties */
     p_dec->p_fifo = p_fifo;
+    p_dec->p_pes  = NULL;
 
     /* Take care of the initial Vorbis header */
     vorbis_info_init( &p_dec->vi );
     vorbis_comment_init( &p_dec->vc );
 
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts, 0 ) != VLC_SUCCESS )
+    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
         goto error;
 
     oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
@@ -148,7 +150,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     /* The next two packets in order are the comment and codebook headers.
        We need to watch out that these packets are not missing as a
        missing or corrupted header is fatal. */
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts, 1 ) != VLC_SUCCESS )
+    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
         goto error;
 
     if( vorbis_synthesis_headerin( &p_dec->vi, &p_dec->vc, &oggpacket ) < 0 )
@@ -157,7 +159,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         goto error;
     }
 
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts, 1 ) != VLC_SUCCESS )
+    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
         goto error;
 
     if( vorbis_synthesis_headerin( &p_dec->vi, &p_dec->vc, &oggpacket ) < 0 )
@@ -235,7 +237,7 @@ static void DecodePacket( dec_thread_t *p_dec )
     int           i_samples;
     mtime_t       i_pts;
 
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts, 1 ) != VLC_SUCCESS )
+    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
     {
         /* This should mean an eos */
         return;
@@ -297,23 +299,24 @@ static void DecodePacket( dec_thread_t *p_dec )
  * Returns VLC_EGENERIC in case of eof.
  *****************************************************************************/
 static int GetOggPacket( dec_thread_t *p_dec, ogg_packet *p_oggpacket,
-                         mtime_t *p_pts, int b_next )
+                         mtime_t *p_pts )
 {
-    pes_packet_t *p_pes;
+    if( p_dec->p_pes ) input_DeletePES( p_dec->p_fifo->p_packets_mgt,
+                                        p_dec->p_pes );
 
-    if( b_next ) NextPES( p_dec->p_fifo );
-    p_pes = GetPES( p_dec->p_fifo );
+    input_ExtractPES( p_dec->p_fifo, &p_dec->p_pes );
+    if( !p_dec->p_pes ) return VLC_EGENERIC;
 
-    p_oggpacket->packet = p_pes->p_first->p_payload_start;
-    p_oggpacket->bytes = p_pes->i_pes_size;
-    p_oggpacket->granulepos = p_pes->i_dts;
+    p_oggpacket->packet = p_dec->p_pes->p_first->p_payload_start;
+    p_oggpacket->bytes = p_dec->p_pes->i_pes_size;
+    p_oggpacket->granulepos = p_dec->p_pes->i_dts;
     p_oggpacket->b_o_s = 0;
     p_oggpacket->e_o_s = 0;
     p_oggpacket->packetno = 0;
 
-    *p_pts = p_pes->i_pts;
+    *p_pts = p_dec->p_pes->i_pts;
 
-    return p_pes ? VLC_SUCCESS : VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -345,6 +348,8 @@ static void CloseDecoder( dec_thread_t * p_dec )
 
     if( p_dec )
     {
+        if( p_dec->p_pes )
+            input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_dec->p_pes );
         vorbis_block_clear( &p_dec->vb );
         vorbis_dsp_clear( &p_dec->vd );
         vorbis_comment_clear( &p_dec->vc );

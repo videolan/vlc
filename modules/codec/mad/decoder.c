@@ -136,8 +136,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 static int InitThread( mad_adec_thread_t * p_dec )
 {
-    decoder_fifo_t * p_fifo = p_dec->p_fifo;
-
     /* Initialize the thread properties */
     p_dec->p_aout = NULL;
     p_dec->p_aout_input = NULL;
@@ -165,21 +163,7 @@ static int InitThread( mad_adec_thread_t * p_dec )
      * Initialize the input properties
      */
 
-    /* Get the first data packet. */
-    vlc_mutex_lock( &p_fifo->data_lock );
-    while ( p_fifo->p_first == NULL )
-    {
-        if ( p_fifo->b_die )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return VLC_EGENERIC;
-        }
-        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-    }
-    vlc_mutex_unlock( &p_fifo->data_lock );
-    p_dec->p_data = p_fifo->p_first->p_first;
-
-    return VLC_SUCCESS;
+    return InitBitstream( &p_dec->bit_stream, p_dec->p_fifo, NULL, NULL );
 }
 
 /*****************************************************************************
@@ -196,6 +180,6 @@ static void EndThread (mad_adec_thread_t * p_dec)
     /* mad_decoder_finish releases the memory allocated inside the struct */
     mad_decoder_finish( &p_dec->libmad_decoder );
 
+    CloseBitstream( &p_dec->bit_stream );
     free( p_dec );
 }
-

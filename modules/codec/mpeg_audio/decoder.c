@@ -2,7 +2,7 @@
  * decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: decoder.c,v 1.6 2002/10/15 23:10:54 massiot Exp $
+ * $Id: decoder.c,v 1.7 2002/10/27 16:58:13 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -109,7 +109,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     /*
      * Initialize bit stream 
      */
-    InitBitstream( &p_dec->bit_stream, p_dec->p_fifo, NULL, NULL );
+    if( InitBitstream( &p_dec->bit_stream, p_dec->p_fifo, NULL, NULL )
+        != VLC_SUCCESS )
+    {
+        msg_Err( p_fifo, "cannot initialize bitstream" );
+        DecoderError( p_fifo );
+        return 0;
+    }
 
     /* We do not create the audio output fifo now, but
        it will be created when the first frame is received */
@@ -241,6 +247,8 @@ static void EndThread ( adec_thread_t *p_dec )
         aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
         
     }
+
+    CloseBitstream( &p_dec->bit_stream );
 
     /* Destroy descriptor */
     free( p_dec );

@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.4 2002/09/14 20:50:24 stef Exp $
+ * $Id: spudec.c,v 1.5 2002/10/27 16:58:13 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -166,10 +166,8 @@ static int InitThread( spudec_thread_t *p_spudec )
     }
     while( 1 );
 
-    InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo, NULL, NULL );
-
-    /* Mark thread as running and return */
-    return 0;
+    return InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
+                          NULL, NULL );
 }
 
 /*****************************************************************************
@@ -201,6 +199,7 @@ static void EndThread( spudec_thread_t *p_spudec )
         vlc_object_release( p_spudec->p_vout );
     }
     
+    CloseBitstream( &p_spudec->bit_stream );
     free( p_spudec );
 }
 

@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.2 2002/08/12 09:34:15 sam Exp $
+ * $Id: dv.c,v 1.3 2002/10/27 16:58:13 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -99,7 +99,14 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
         return -1;
     }
 
-    InitBitstream( &bit_stream, p_fifo, NULL, NULL );
+    if( InitBitstream( &bit_stream, p_fifo, NULL, NULL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_fifo, "cannot initialise bitstream" );
+        free( p_buffer );
+        p_fifo->b_error = 1;
+        DecoderError( p_fifo );
+        return -1;
+    }
 
     /* Fill the buffer */
     GetChunk( &bit_stream, p_buffer, i_data );
@@ -260,6 +267,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
     }
 
     free( p_buffer );
+    CloseBitstream( bit_stream );
 
     if( p_fifo->b_error )
     {
@@ -303,4 +311,3 @@ static pes_packet_t *GetFirstPES( decoder_fifo_t *p_fifo )
     
     return p_pes;
 }
-

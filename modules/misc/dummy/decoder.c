@@ -2,7 +2,7 @@
  * dec_dummy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.2 2002/08/04 17:40:49 sam Exp $
+ * $Id: decoder.c,v 1.3 2002/10/27 16:58:13 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -81,7 +81,14 @@ static int Run ( decoder_fifo_t *p_fifo )
 
     msg_Dbg( p_fifo, "dumping stream to file `%s'", psz_file );
 
-    InitBitstream( &bit_stream, p_fifo, NULL, NULL );
+    if( InitBitstream( &bit_stream, p_fifo, NULL, NULL ) != VLC_SUCCESS )
+    {
+        msg_Err( p_fifo, "cannot initialize bitstream" );
+        p_fifo->b_error = 1;
+        DecoderError( p_fifo );
+        close( i_fd );
+        return -1;
+    }
 
     while( !p_fifo->b_die && !p_fifo->b_error )
     {
@@ -107,6 +114,7 @@ static int Run ( decoder_fifo_t *p_fifo )
     }
 
     close( i_fd );
+    CloseBitstream( &bit_stream );
 
     if( p_fifo->b_error )
     {
@@ -116,4 +124,3 @@ static int Run ( decoder_fifo_t *p_fifo )
 
     return 0;
 }
-

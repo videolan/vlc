@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.4 2002/08/12 09:34:15 sam Exp $
+ * $Id: parser.c,v 1.5 2002/10/27 16:58:13 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -231,8 +231,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->pf_idct_copy        = ((void**)p_vpar->p_fifo->p_private)[5];
 
     /* Initialize input bitstream */
-    InitBitstream( &p_vpar->bit_stream, p_vpar->p_fifo,
-                   BitstreamCallback, (void *)p_vpar );
+    if( InitBitstream( &p_vpar->bit_stream, p_vpar->p_fifo,
+                       BitstreamCallback, (void *)p_vpar ) != VLC_SUCCESS )
+    {
+        msg_Err( p_vpar->p_fifo, "cannot initialize bitstream" );
+        module_Unneed( p_vpar->p_fifo, p_vpar->p_motion );
+        free( p_vpar );
+        return( -1 );
+    }
 
     /* Initialize parsing data */
     p_vpar->sequence.p_forward = NULL;
@@ -383,6 +389,7 @@ static void EndThread( vpar_thread_t *p_vpar )
     module_Unneed( p_vpar->p_fifo, p_vpar->p_idct );
     module_Unneed( p_vpar->p_fifo, p_vpar->p_motion );
 
+    CloseBitstream( &p_vpar->bit_stream );
     free( p_vpar );
 }
 
@@ -399,9 +406,9 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
     if( b_new_pes )
     {
         p_vpar->sequence.i_current_rate =
-            p_bit_stream->p_decoder_fifo->p_first->i_rate;
+            p_bit_stream->p_pes->i_rate;
 
-        if( p_bit_stream->p_decoder_fifo->p_first->b_discontinuity )
+        if( p_bit_stream->p_pes->b_discontinuity )
         {
             /* Escape the current picture and reset the picture predictors. */
             p_vpar->sequence.b_expect_discontinuity = 1;

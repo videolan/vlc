@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.10 2002/10/24 10:33:09 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.11 2002/10/27 16:58:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -795,7 +795,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
             /* too much late picture, won't decode 
                but break picture until a new I, and for mpeg4 ...*/
             p_vdec->i_frame_late--; /* needed else it will never be decrease */
-            NextPES( p_vdec->p_fifo );
+            input_ExtractPES( p_vdec->p_fifo, NULL );
             return;
         }
 #else
@@ -808,7 +808,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
             /* too much late picture, won't decode 
                but break picture until a new I, and for mpeg4 ...*/
             p_vdec->i_frame_late--; /* needed else it will never be decrease */
-            NextPES( p_vdec->p_fifo );
+            input_ExtractPES( p_vdec->p_fifo, NULL );
             return;
         }
 #endif
@@ -823,7 +823,8 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
 
     do
     {
-        if( !( p_pes = GetPES( p_vdec->p_fifo ) ) )
+        input_ExtractPES( p_vdec->p_fifo, &p_pes );
+        if( !p_pes )
         {
             p_vdec->p_fifo->b_error = 1;
             return;
@@ -842,7 +843,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
             
             GetPESData( p_vdec->p_buffer, p_vdec->i_buffer, p_pes );
         }
-        NextPES( p_vdec->p_fifo );
+        input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
     } while( i_frame_size <= 0 );
 
 

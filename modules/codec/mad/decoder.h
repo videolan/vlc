@@ -42,7 +42,7 @@ typedef struct mad_adec_thread_s
      * Input properties
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-    data_packet_t *     p_data;
+    bit_stream_t        bit_stream;    /* handle PES stream at the bit level */
 
     /* Store i_pts for syncing audio frames */
     mtime_t             i_current_pts, i_next_pts;
