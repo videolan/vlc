@@ -199,8 +199,6 @@ struct picture_heap_t
  */
 struct subpicture_region_t
 {
-    /** \name Region properties */
-    /**@{*/
     video_format_t  fmt;                          /**< format of the picture */
     picture_t       picture;             /**< picture comprising this region */
 
@@ -211,10 +209,10 @@ struct subpicture_region_t
     int             i_text_color;     /**< text color (RGB native endianess) */
     int             i_text_alpha;                     /**< text transparency */
     int             i_text_size;                              /**< text size */
+    int             i_text_align;         /**< horizontal alignment hint for */
 
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_t *p_cache;       /**< modified version of this region */
-    /**@}*/
 };
 
 /**

@@ -358,20 +358,32 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     for( ; p_line != NULL; p_line = p_line->p_next )
     {
         int i_glyph_tmax = 0;
-        int i_bitmap_offset, i_offset;
+        int i_bitmap_offset, i_offset, i_align_offset = 0;
         for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
         {
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
             i_glyph_tmax = __MAX( i_glyph_tmax, p_glyph->top );
         }
 
+        if( p_line->i_width < i_width )
+        {
+            if( p_region->i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            {
+                i_align_offset = i_width - p_line->i_width;
+            }
+            else if( p_region->i_text_align != SUBPICTURE_ALIGN_LEFT )
+            {
+                i_align_offset = ( i_width - p_line->i_width ) / 2;
+            }
+        }
         for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
         {
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 
             i_offset = ( p_line->p_glyph_pos[ i ].y +
                 i_glyph_tmax - p_glyph->top + 1 ) *
-                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 1;
+                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 1 +
+                i_align_offset;
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {
@@ -399,7 +411,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
             i_offset = ( p_line->p_glyph_pos[ i ].y +
                 i_glyph_tmax - p_glyph->top + 1 ) *
-                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 1;
+                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 1 +
+                i_align_offset;
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {

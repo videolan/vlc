@@ -589,6 +589,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 if( p_spu->p_text && p_spu->p_text->p_module &&
                     p_spu->p_text->pf_render_text )
                 {
+                    p_region->i_text_align = p_subpic->i_flags & 0x3;
                     p_spu->p_text->pf_render_text( p_spu->p_text,
                                                    p_region, p_region ); 
                 }
