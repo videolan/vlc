@@ -1266,9 +1266,13 @@ int ftime(struct timeb *tp)
 
 static int64_t vlm_Date()
 {
+#ifdef WIN32
     struct timeb tm;
     ftime( &tm );
     return ((int64_t)tm.time) * 1000000 + ((int64_t)tm.millitm) * 1000;
+#else
+    return mdate();
+#endif
 }
 
 vlm_schedule_t *vlm_ScheduleNew( vlm_t *vlm, char *psz_name )
