@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.20 2003/02/05 14:58:15 hartman Exp $
+ * $Id: open.m,v 1.21 2003/02/05 22:48:13 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -286,9 +286,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     int i_result;
 
     [o_tabview selectTabViewItemAtIndex: i_type];
-    [o_ckbox_enqueue setState: NSOffState];
+    [o_ckbox_enqueue setState: NSOnState];
     [o_file_sub_path setStringValue: @""];
-    [o_file_sub_ckbox setState: NSOnState];
+    [o_file_sub_ckbox setState: NSOffState];
     [o_file_sub_path setEnabled: NO];
     [o_file_sub_btn_browse setEnabled: NO];
     
