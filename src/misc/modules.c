@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.112 2003/02/17 05:50:31 sam Exp $
+ * $Id: modules.c,v 1.113 2003/02/17 06:00:24 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -589,8 +589,13 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
             {
                 continue;
             }
+#ifdef WIN32
+            sprintf( psz_fullpath, "%s\\%s",
+                     p_this->p_libvlc->psz_vlcpath, *ppsz_path );
+#else
             sprintf( psz_fullpath, "%s/%s",
                      p_this->p_libvlc->psz_vlcpath, *ppsz_path );
+#endif
         }
         else
 #endif
@@ -705,7 +710,11 @@ static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
 
         i_len = strlen( file->d_name );
         psz_file = malloc( i_dirlen + 1 + i_len + 1 );
+#ifdef WIN32
+        sprintf( psz_file, "%s\\%s", psz_dir, file->d_name );
+#else
         sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
+#endif
 
         if( !stat( psz_file, &statbuf ) && statbuf.st_mode & S_IFDIR )
         {
