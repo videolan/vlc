@@ -38,6 +38,8 @@
 #include "mad_adec.h"
 #include "mad_libmad.h"
 
+static void PrintFrameInfo(struct mad_header *Header);
+
 /*****************************************************************************
  * libmad_input: this function is called by libmad when the input buffer needs
  * to be filled.
@@ -153,9 +155,7 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  *
  *   intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
  *
- *   p_mad_adec->p_aout_fifo->i_rate = p_libmad_header->samplerate;
- * //  mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
- *
+ *   PrintFrameInfo(p_limad_mad_header)
  *   return MAD_FLOW_CONTINUE;
  *}
  */
@@ -169,8 +169,6 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  * }
  */
 
-//#define MPG321_ROUTINES     1
-#ifdef MPG321_ROUTINES
 /*****************************************************************************
  * support routines borrowed from mpg321 (file: mad.c), which is distributed
  * under GPL license
@@ -201,10 +199,10 @@ static __inline__ unsigned long prng(unsigned long state)
 }
 
 /*
-* NAME:                audio_linear_dither()
+* NAME:        mpg321_s24_to_s16_pcm()
 * DESCRIPTION: generic linear sample quantize and dither routine
 */
-static __inline__ signed int audio_linear_dither(unsigned int bits, mad_fixed_t sample,
+static __inline__ signed int mpg321_s24_to_s16_pcm(unsigned int bits, mad_fixed_t sample,
                                     struct audio_dither *dither)
 {
     unsigned int scalebits;
@@ -256,7 +254,6 @@ static __inline__ signed int audio_linear_dither(unsigned int bits, mad_fixed_t 
     /* scale */
     return output >> scalebits;
 }
-#else
 
 /*****************************************************************************
  * s24_to_s16_pcm: Scale a 24 bit pcm sample to a 16 bit pcm sample.
@@ -275,7 +272,6 @@ static __inline__ mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
   /* quantize */
   return sample >> (MAD_F_FRACBITS + 1 - 16);
 }
-#endif
 
 /*****************************************************************************
  * libmad_ouput: this function is called just after the frame is decoded
@@ -284,13 +280,10 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 {
     mad_adec_thread_t *p_mad_adec= (mad_adec_thread_t *) data;
     byte_t *buffer=NULL;
-
     mad_fixed_t const *left_ch = p_libmad_pcm->samples[0], *right_ch = p_libmad_pcm->samples[1];
     register int nsamples = p_libmad_pcm->length;
     mad_fixed_t sample;
-#ifdef MPG321_ROUTINES
     static struct audio_dither dither;
-#endif
 
     /* Creating the audio output fifo.
      * Assume the samplerate and nr of channels from the first decoded frame is right for the entire audio track.
@@ -336,12 +329,18 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 
     while (nsamples--)
     {
-#ifdef MPG321_ROUTINES
-        sample = audio_linear_dither(16, *left_ch++, &dither);
-#else
-     	  sample = s24_to_s16_pcm(*left_ch++);
-#endif
+        switch (p_mad_adec->audio_scaling)
+        {
+          case MPG321_SCALING:
+               sample = mpg321_s24_to_s16_pcm(16, *left_ch++, &dither);
+          break;
+          case FAST_SCALING: /* intended fall through */
+          default:
+               sample = s24_to_s16_pcm(*left_ch++);
+          break;
+			  }
 
+        /* left audio channel */
 #ifndef WORDS_BIGENDIAN
         *buffer++ = (byte_t) (sample >> 0);
         *buffer++ = (byte_t) (sample >> 8);
@@ -352,29 +351,27 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
       	if (p_libmad_pcm->channels == 2)
         {
        	    /* right audio channel */
-#ifdef MPG321_ROUTINES
-            sample = audio_linear_dither(16, *right_ch++, &dither);
-#else
-            sample = s24_to_s16_pcm(*right_ch++);
-#endif
-
-#ifndef WORDS_BIGENDIAN
-            *buffer++ = (byte_t) (sample >> 0);
-            *buffer++ = (byte_t) (sample >> 8);
-#else
-            *buffer++ = (byte_t) (sample >> 8);
-            *buffer++ = (byte_t) (sample >> 0);
-#endif						
+            switch (p_mad_adec->audio_scaling)
+            {
+              case MPG321_SCALING:
+                   sample = mpg321_s24_to_s16_pcm(16, *right_ch++, &dither);
+              break;
+              case FAST_SCALING: /* intended fall through */
+              default:
+                   sample = s24_to_s16_pcm(*right_ch++);
+              break;
+    			  }
         }
-      	else {
-      	    /* Somethimes a single channel frame is found, while the rest of the movie are
-             * stereo channel frames. How to deal with this ??
-             * One solution is to silence the second channel.
-             */
-            *buffer++ = (byte_t) (0);
-            *buffer++ = (byte_t) (0);
-      	}
+        /* else reuse left_ch */
+#ifndef WORDS_BIGENDIAN
+        *buffer++ = (byte_t) (sample >> 0);
+        *buffer++ = (byte_t) (sample >> 8);
+#else
+        *buffer++ = (byte_t) (sample >> 8);
+        *buffer++ = (byte_t) (sample >> 0);
+#endif						
     }
+
     /* DEBUG */
     if (p_libmad_pcm->channels == 1) {
        intf_ErrMsg( "mad debug: libmad_output channels [%d]", p_libmad_pcm->channels);
@@ -498,3 +495,73 @@ enum mad_flow libmad_error(void *data, struct mad_stream *p_libmad_stream, struc
  */
 
 
+
+/****************************************************************************
+ * Print human readable informations about an audio MPEG frame.				*
+ ****************************************************************************/
+static void PrintFrameInfo(struct mad_header *Header)
+{
+	const char	*Layer,
+			*Mode,
+			*Emphasis;
+
+	/* Convert the layer number to it's printed representation. */
+	switch(Header->layer)
+	{
+		case MAD_LAYER_I:
+			Layer="I";
+			break;
+		case MAD_LAYER_II:
+			Layer="II";
+			break;
+		case MAD_LAYER_III:
+			Layer="III";
+			break;
+		default:
+			Layer="(unexpected layer value)";
+			break;
+	}
+
+	/* Convert the audio mode to it's printed representation. */
+	switch(Header->mode)
+	{
+		case MAD_MODE_SINGLE_CHANNEL:
+			Mode="single channel";
+			break;
+		case MAD_MODE_DUAL_CHANNEL:
+			Mode="dual channel";
+			break;
+		case MAD_MODE_JOINT_STEREO:
+			Mode="joint (MS/intensity) stereo";
+			break;
+		case MAD_MODE_STEREO:
+			Mode="normal LR stereo";
+			break;
+		default:
+			Mode="(unexpected mode value)";
+			break;
+	}
+
+	/* Convert the emphasis to it's printed representation. */
+	switch(Header->emphasis)
+	{
+		case MAD_EMPHASIS_NONE:
+			Emphasis="no";
+			break;
+		case MAD_EMPHASIS_50_15_US:
+			Emphasis="50/15 us";
+			break;
+		case MAD_EMPHASIS_CCITT_J_17:
+			Emphasis="CCITT J.17";
+			break;
+		default:
+			Emphasis="(unexpected emphasis value)";
+			break;
+	}
+
+	intf_ErrMsg("statistics: %lu kb/s audio mpeg layer %s stream %s crc, "
+			"%s with %s emphasis at %d Hz sample rate\n",
+			Header->bitrate,Layer,
+			Header->flags&MAD_FLAG_PROTECTION?"with":"without",
+			Mode,Emphasis,Header->samplerate);
+}

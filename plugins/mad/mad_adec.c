@@ -60,7 +60,14 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define DOWNSCALE_TEXT N_("Mad audio downscale routine (fast,mp321)")
+#define DOWNSCALE_LONGTEXT N_( \
+    "Specify the mad audio downscale routine you want to use.\nBy default mad plugins will " \
+    "use the fastest routine.")
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_STRING  ( "downscale", "fast", NULL, DOWNSCALE_TEXT, DOWNSCALE_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -156,11 +163,33 @@ static int decoder_Run ( decoder_config_t * p_config )
 static int InitThread( mad_adec_thread_t * p_mad_adec )
 {
     decoder_fifo_t * p_fifo = p_mad_adec->p_fifo;
+    char *psz_downscale = NULL;
 
     /*
      * Properties of audio for libmad
      */
-        
+		
+		/* Look what scaling method was requested by the user */
+    psz_downscale = config_GetPszVariable( "downscale" );
+
+    if ( strncmp(psz_downscale,"fast",4)==0 )
+    {
+        p_mad_adec->audio_scaling = FAST_SCALING;
+        intf_ErrMsg( "mad_adec debug: downscale fast selected" );
+    }
+    else if ( strncmp(psz_downscale,"mpg321",7)==0 )
+    {
+        p_mad_adec->audio_scaling = MPG321_SCALING;
+        intf_ErrMsg( "mad_adec debug: downscale mpg321 selected" );
+    }
+    else
+    {
+        p_mad_adec->audio_scaling = FAST_SCALING;
+        intf_ErrMsg( "mad_adec debug: downscale default fast selected" );
+    }
+
+		if (psz_downscale) free(psz_downscale);
+
     /* Initialize the libmad decoder structures */
     p_mad_adec->libmad_decoder = (struct mad_decoder*) malloc(sizeof(struct mad_decoder));
     if (p_mad_adec->libmad_decoder == NULL)
@@ -172,7 +201,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     p_mad_adec->i_current_pts = p_mad_adec->i_next_pts = 0;
 
     mad_decoder_init( p_mad_adec->libmad_decoder,
-                          p_mad_adec,         /* vlc's thread structure and p_fifo playbuffer */
+                      p_mad_adec,         /* vlc's thread structure and p_fifo playbuffer */
                       libmad_input,          /* input_func */
                       0,                /* header_func */
                       0,                /* filter */

@@ -22,6 +22,8 @@
  * mad_adec_thread_t : mad decoder thread descriptor
  *****************************************************************************/
 
+enum mad_scaling { FAST_SCALING, MPG321_SCALING };
+
 typedef struct mad_adec_thread_s
 {
     /*
@@ -50,6 +52,7 @@ typedef struct mad_adec_thread_s
      * Output properties
      */
     aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
+    enum mad_scaling	  audio_scaling;
 
 } mad_adec_thread_t;
 
