@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.25 2003/05/20 23:17:59 gbazin Exp $
+ * $Id: open.cpp,v 1.26 2003/05/24 17:52:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -270,7 +270,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                                             wxU(_("Cancel")) );
 
     /* Create notebook */
-    wxNotebook *notebook = new wxNotebook( panel, Notebook_Event );
+    notebook = new wxNotebook( panel, Notebook_Event );
     wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
 
     notebook->AddPage( FilePanel( notebook ), wxU(_("File")),
@@ -325,6 +325,17 @@ OpenDialog::~OpenDialog()
     if( sout_dialog ) delete sout_dialog;
     if( subsfile_dialog ) delete subsfile_dialog;
     if( demuxdump_dialog ) delete demuxdump_dialog;
+}
+
+int OpenDialog::ShowModal( int i_access_method )
+{
+    notebook->SetSelection( i_access_method );
+    return wxDialog::ShowModal();
+}
+
+int OpenDialog::ShowModal()
+{
+    return wxDialog::ShowModal();
 }
 
 /*****************************************************************************

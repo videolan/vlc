@@ -2,7 +2,7 @@
  * gtk2_font.h: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.h,v 1.6 2003/04/21 22:12:37 asmax Exp $
+ * $Id: gtk2_font.h,v 1.7 2003/05/24 17:52:48 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -44,6 +44,9 @@ class GTK2Font : SkinFont
         PangoContext  *Context;
         PangoLayout   *Layout;
         PangoFontDescription *FontDesc;
+
+        // pointer to thread info
+        intf_thread_t *p_intf;
 
         // Assign font to Device Context
         virtual void AssignFont( Graphics *dest );

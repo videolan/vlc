@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.24 2003/05/21 13:27:25 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.25 2003/05/24 17:52:48 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -335,9 +335,10 @@ void VlcProc::LoadSkin()
 #ifndef BASIC_SKINS
     if( p_intf->p_sys->p_new_theme_file == NULL )
     {
-        wxFileDialog dialog( NULL, _("Open a skin file"), "", "",
-            "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|All files|*.*",
-            wxOPEN );
+        wxFileDialog dialog( NULL,
+            wxU(_("Open a skin file")), wxT(""), wxT(""),
+            wxT("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
+                "All files|*.*"), wxOPEN );
 
         if( dialog.ShowModal() == wxID_OK )
         {

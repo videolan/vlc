@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.32 2003/05/22 12:00:56 gbazin Exp $
+ * $Id: interface.cpp,v 1.33 2003/05/24 17:52:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -412,7 +412,8 @@ void Interface::Open( int i_access_method )
     if( p_open_dialog == NULL )
         p_open_dialog = new OpenDialog( p_intf, this, i_access_method );
 
-    if( p_open_dialog && p_open_dialog->ShowModal() == wxID_OK )
+    if( p_open_dialog &&
+        p_open_dialog->ShowModal( i_access_method ) == wxID_OK )
     {
         /* Update the playlist */
         playlist_t *p_playlist =

@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.14 2003/04/28 12:00:13 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.15 2003/05/24 17:52:48 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -48,6 +48,7 @@ GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
 {
     Context = gdk_pango_context_get();
     Layout = pango_layout_new( Context );
+    p_intf = _p_intf;
 
     // Text properties setting
     FontDesc    = pango_font_description_new();
@@ -106,7 +107,7 @@ void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
     int real_w, real_h;
 
     // Create buffer image
-    Graphics* cov = (Graphics *)new OSGraphics( w, h );
+    Graphics* cov = (Graphics *)new OSGraphics( p_intf, w, h );
     cov->CopyFrom( 0, 0, w, h, dest, x, y, SRC_COPY );
 
     // Get handles

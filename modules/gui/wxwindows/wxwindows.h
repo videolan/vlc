@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.30 2003/05/20 23:17:59 gbazin Exp $
+ * $Id: wxwindows.h,v 1.31 2003/05/24 17:52:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -206,6 +206,9 @@ public:
                 int i_access_method );
     virtual ~OpenDialog();
 
+    int ShowModal();
+    int ShowModal( int i_access_method );
+
     wxArrayString mrl;
 
 private:
@@ -256,6 +259,7 @@ private:
     int i_current_access_method;
 
     wxComboBox *mrl_combo;
+    wxNotebook *notebook;
 
     /* Controls for the file panel */
     wxComboBox *file_combo;
