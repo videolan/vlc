@@ -497,13 +497,11 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
 {
     if( ! item.IsOk() ) return;
 
-    playlist_item_t *p_item  =
-            ((PlaylistItem *)treectrl->GetItemData( item ))->p_item;
+    wxTreeItemData *p_data = treectrl->GetItemData( item );
+    if( !p_data ) return;
 
-    if( !p_item )
-    {
-        return;
-    }
+    playlist_item_t *p_item = ((PlaylistItem *)p_data)->p_item;
+    if( !p_item ) return;
 
     wxString msg;
     wxString duration = wxU( "" );
