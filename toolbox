@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.30 2003/06/28 13:04:52 sam Exp $
+##  $Id: toolbox,v 1.31 2003/06/28 21:03:26 hartman Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -116,7 +116,7 @@ if test "${action}" = "vc"
 then
   echo "generating Visual Studio files..."
 
-  srcdir="`sed -ne 's/^srcdir *= *//p;T;q' < Makefile`"
+  srcdir="`sed -ne 's/^srcdir *= *//p;D;q' < Makefile`"
 
   #  The evil ^M
   M="`printf '\r'`"
@@ -367,7 +367,7 @@ if test "${action}" = "includes"
 then
   #set -x
 
-  srcdir="`sed -ne 's/^srcdir *= *//p;T;q' < Makefile`"
+  srcdir="`sed -ne 's/^srcdir *= *//p;D;q' < Makefile`"
   LIBVLC_HEADERS=`getfiles HEADERS_include`
   BUILTINS=`sed -ne 's/.*builtins *= *" *\([^"]*\)".*/\1/p' vlc-config`
 
