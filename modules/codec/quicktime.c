@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.5 2003/05/24 02:48:55 hartman Exp $
+ * $Id: quicktime.c,v 1.6 2003/05/26 14:59:37 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -63,7 +63,7 @@ static int  RunDecoderVideo( decoder_fifo_t * );
 
 vlc_module_begin();
     set_description( _("QuickTime library decoder") );
-    set_capability( "decoder", 100 );
+    set_capability( "decoder", 10 );
     set_callbacks( OpenDecoder, NULL );
 
     /* create a mutex */

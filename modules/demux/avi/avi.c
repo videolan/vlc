@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.48 2003/05/22 21:42:44 gbazin Exp $
+ * $Id: avi.c,v 1.49 2003/05/26 14:59:37 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -960,7 +960,7 @@ static int AVIInit( vlc_object_t * p_this )
     p_input->pf_demux = AVIDemux_Seekable;
     if( AVI_TestFile( p_input ) )
     {
-        msg_Warn( p_input, "avi module discarded (invalid headr)" );
+        msg_Warn( p_input, "avi module discarded (invalid header)" );
         return VLC_EGENERIC;
     }
 

@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.29 2003/05/26 02:03:10 hartman Exp $
+ * $Id: prefs.m,v 1.30 2003/05/26 14:59:37 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -254,7 +254,7 @@
     { \
         char * psz_duptip = NULL; \
         if ( p_item->psz_longtext != NULL ) \
-            psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP ); \
+            psz_duptip = strdup( p_item->psz_longtext ); \
         s_rc.size.height = 25; \
         s_rc.size.width = w; \
         s_rc.origin.y += 10; \
@@ -265,8 +265,8 @@
         [o_text_field msg: param]; \
         if ( psz_duptip != NULL ) \
         { \
-            [o_text_field setToolTip: [NSApp localizedString: \
-                                       psz_duptip]]; \
+            [o_text_field setToolTip: [NSApp wrapString: [NSApp localizedString: \
+                                       psz_duptip] toWidth: PREFS_WRAP ]]; \
             free(psz_duptip);\
         } \
         [o_view addSubview: [o_text_field autorelease]]; \
@@ -323,7 +323,7 @@
                 char * psz_duptip = NULL;
 
                 if ( p_item->psz_longtext != NULL )
-                    psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+                    psz_duptip = strdup( p_item->psz_longtext );
 
                 s_rc.size.height = 30;
                 s_rc.size.width = 200;
@@ -340,7 +340,7 @@
                 
                 if ( psz_duptip != NULL )
                 {
-                    [o_modules setToolTip: [NSApp localizedString: psz_duptip]];
+                    [o_modules setToolTip: [NSApp wrapString: [NSApp localizedString: psz_duptip] toWidth: PREFS_WRAP]];
                     free( psz_duptip );
                 }
                 [o_view addSubview: [o_modules autorelease]];
@@ -398,7 +398,7 @@
                     VLCComboBox *o_combo_box;
                     char * psz_duptip = NULL;
                     if ( p_item->psz_longtext != NULL )
-                        psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+                        psz_duptip = strdup( p_item->psz_longtext );
     
                     s_rc.size.height = 27;
                     s_rc.size.width = 200;
@@ -415,7 +415,7 @@
 
                     if ( psz_duptip != NULL )
                     {
-                        [o_combo_box setToolTip: [NSApp localizedString: psz_duptip]];
+                        [o_combo_box setToolTip: [NSApp wrapString: [NSApp localizedString: psz_duptip] toWidth: PREFS_WRAP]];
                         free( psz_duptip );
                     }
                     [o_view addSubview: [o_combo_box autorelease]];
@@ -450,7 +450,7 @@
                     VLCSlider *o_slider;
                     char * psz_duptip = NULL;
                     if ( p_item->psz_longtext != NULL )
-                        psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+                        psz_duptip = strdup( p_item->psz_longtext );
         
                     s_rc.size.height = 27;
                     s_rc.size.width = 200;
@@ -465,7 +465,7 @@
 
                     if ( psz_duptip != NULL )
                     {
-                        [o_slider setToolTip: [NSApp localizedString: psz_duptip]];
+                        [o_slider setToolTip: [NSApp wrapString: [NSApp localizedString: psz_duptip] toWidth: PREFS_WRAP]];
                         free( psz_duptip );
                     }
                     [o_slider setTarget: self];
@@ -495,7 +495,7 @@
                     VLCSlider *o_slider;
                     char * psz_duptip = NULL;
                     if ( p_item->psz_longtext != NULL )
-                        psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+                        psz_duptip = strdup( p_item->psz_longtext );
         
                     s_rc.size.height = 27;
                     s_rc.size.width = 200;
@@ -510,7 +510,7 @@
 
                     if ( psz_duptip != NULL )
                     {
-                        [o_slider setToolTip: [NSApp localizedString: psz_duptip]];
+                        [o_slider setToolTip: [NSApp wrapString: [NSApp localizedString: psz_duptip] toWidth: PREFS_WRAP]];
                         free( psz_duptip );
                     }
                     [o_slider setTarget: self];
@@ -533,7 +533,7 @@
                 char * psz_duptip = NULL;
 
                 if ( p_item->psz_longtext != NULL )
-                    psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+                    psz_duptip = strdup( p_item->psz_longtext );
     
                 s_rc.size.height = 27;
                 s_rc.size.width = s_vrc.size.width - X_ORIGIN * 2 - 20;
@@ -547,7 +547,7 @@
                 [o_btn_bool setTitle: [NSApp localizedString: p_item->psz_text]];
                 if ( psz_duptip != NULL )
                 {
-                    [o_btn_bool setToolTip: [NSApp localizedString: psz_duptip]];
+                    [o_btn_bool setToolTip: [NSApp wrapString: [NSApp localizedString: psz_duptip] toWidth: PREFS_WRAP]];
                     free( psz_duptip );
                 }
                 [o_btn_bool setTarget: self];

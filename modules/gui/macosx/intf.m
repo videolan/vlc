@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.86 2003/05/25 17:27:13 massiot Exp $
+ * $Id: intf.m,v 1.87 2003/05/26 14:59:37 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -167,6 +167,49 @@ static void Run( intf_thread_t *p_intf )
 - (NSStringEncoding)getEncoding
 {
     return i_encoding;
+}
+
+/* i_width is in pixels */
+- (NSString *)wrapString: (NSString *)o_in_string toWidth: (int) i_width
+{
+    NSMutableString *o_wrapped;
+    NSString *o_out_string;
+    NSRange glyphRange, effectiveRange, charRange;
+    NSRect lineFragmentRect;
+    unsigned glyphIndex, breaksInserted = 0;
+
+    NSTextStorage *o_storage = [[NSTextStorage alloc] initWithString: o_in_string
+        attributes: [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSFont labelFontOfSize: 0.0], NSFontAttributeName, nil]];
+    NSLayoutManager *o_layout_manager = [[NSLayoutManager alloc] init];
+    NSTextContainer *o_container = [[NSTextContainer alloc]
+        initWithContainerSize: NSMakeSize(i_width, 2000)];
+    
+    [o_layout_manager addTextContainer: o_container];
+    [o_container release];
+    [o_storage addLayoutManager: o_layout_manager];
+    [o_layout_manager release];
+        
+    o_wrapped = [o_in_string mutableCopy];
+    glyphRange = [o_layout_manager glyphRangeForTextContainer: o_container];
+    
+    for( glyphIndex = glyphRange.location ; glyphIndex < NSMaxRange(glyphRange) ;
+            glyphIndex += effectiveRange.length) {
+        lineFragmentRect = [o_layout_manager lineFragmentRectForGlyphAtIndex: glyphIndex
+                                            effectiveRange: &effectiveRange];
+        charRange = [o_layout_manager characterRangeForGlyphRange: effectiveRange
+                                    actualGlyphRange: &effectiveRange];
+        if ([o_wrapped lineRangeForRange:
+                NSMakeRange(charRange.location + breaksInserted, charRange.length)].length > charRange.length) {
+            [o_wrapped insertString: @"\n" atIndex: NSMaxRange(charRange) + breaksInserted];
+            breaksInserted++;
+        }
+    }
+    o_out_string = [NSString stringWithString: o_wrapped];
+    [o_wrapped release];
+    [o_storage release];
+    
+    return o_out_string;
 }
 
 - (void)setIntf:(intf_thread_t *)_p_intf

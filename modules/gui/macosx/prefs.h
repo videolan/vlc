@@ -2,7 +2,7 @@
  * prefs.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.h,v 1.8 2003/05/26 01:25:12 hartman Exp $
+ * $Id: prefs.h,v 1.9 2003/05/26 14:59:37 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define PREFS_WRAP 60
+#define PREFS_WRAP 300
 
 @interface VLCTreeItem : NSObject
 {
