@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.39 2003/11/27 04:11:40 fenrir Exp $
+ * $Id: sub.c,v 1.40 2004/01/06 14:35:16 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -72,7 +72,7 @@ vlc_module_begin();
     set_description( _("Text subtitles demux") );
     set_capability( "subtitle demux", 12 );
     add_category_hint( "Subtitles", NULL, VLC_TRUE );
-        add_float( "sub-fps", 0.0, NULL,
+        add_float( "sub-fps", 25.0, NULL,
                    "Frames per second",
                    SUB_FPS_LONGTEXT, VLC_TRUE );
         add_integer( "sub-delay", 0, NULL,
@@ -297,10 +297,9 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     var_Get( p_sub, "sub-fps", &val );
     if( val.i_int >= 1.0 )
     {
-        var_Get( p_sub, "sub-fps", &val );
         i_microsecperframe = (mtime_t)( (float)1000000 / val.f_float );
     }
-    else if( i_microsecperframe <= 0 )
+    else if( val.f_float <= 0 )
     {
         i_microsecperframe = 40000; /* default: 25fps */
     }
