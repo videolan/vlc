@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.6 2003/01/23 15:52:04 sam Exp $
+ * $Id: mpeg_audio.c,v 1.7 2003/01/28 21:17:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -286,10 +286,18 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if ( !aout_DateGet( &end_date ) )
         {
             byte_t p_junk[MAX_FRAME_SIZE];
+            int    i_skip = i_current_frame_size - MAD_BUFFER_GUARD;
 
             /* We've just started the stream, wait for the first PTS. */
-            GetChunk( &p_dec->bit_stream, p_junk, i_current_frame_size
-                        - MAD_BUFFER_GUARD );
+            while( i_skip > 0 )
+            {
+                int i_read;
+
+                i_read = __MIN( i_current_frame_size  - MAD_BUFFER_GUARD, MAX_FRAME_SIZE );
+                GetChunk( &p_dec->bit_stream, p_junk, i_read );
+
+                i_skip -= i_read;
+            }
             NextPTS( &p_dec->bit_stream, &pts, NULL );
             GetChunk( &p_dec->bit_stream, p_sync, MAD_BUFFER_GUARD );
             continue;
