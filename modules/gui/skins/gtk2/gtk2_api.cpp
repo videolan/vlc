@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.14 2003/04/22 19:26:02 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.15 2003/04/24 14:38:06 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -53,7 +53,7 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int para
                         long param2 )
 {
     GdkEventClient *event = (GdkEventClient *) new GdkEvent;
-    
+
     event->type = GDK_CLIENT_EVENT;
     if( win == NULL )
     {
@@ -117,8 +117,8 @@ int OSAPI_GetTime()
 //---------------------------------------------------------------------------
 void OSAPI_GetScreenSize( int &w, int &h )
 {
-/*    w = GetSystemMetrics(SM_CXSCREEN);
-    h = GetSystemMetrics(SM_CYSCREEN);*/
+    w = gdk_screen_width();
+    h = gdk_screen_height();
 }
 //---------------------------------------------------------------------------
 void OSAPI_GetMousePos( int &x, int &y )
