@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.2 2003/03/20 09:29:07 karibu Exp $
+ * $Id: event.h,v 1.3 2003/04/08 02:06:13 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -38,7 +38,7 @@ using namespace std;
 // VLC specific messages
 //---------------------------------------------------------------------------
 
-#define MAX_EVENT_SIZE 20
+#define MAX_EVENT_SIZE 30
 #define MAX_PARAM_SIZE 20
 
 #define VLC_MESSAGE         (WM_APP)
