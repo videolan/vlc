@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.4 2001/12/19 10:00:00 massiot Exp $
+ * $Id: input_dvdread.c,v 1.5 2001/12/20 23:53:49 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -794,7 +794,7 @@ static int DvdReadRead( input_thread_t * p_input,
     int                     i_packet_size;
     int                     i_packet;
     int                     i_pos;
-    data_packet_t *         p_data;
+    data_packet_t *         p_data_p;
 
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
 
@@ -848,10 +848,10 @@ static int DvdReadRead( input_thread_t * p_input,
     p_dvd->i_pack_len -= i_blocks;
 
     /* Get iovecs */
-    p_data = input_BuffersToIO( p_input->p_method_data, p_vec,
+    p_data_p = input_BuffersToIO( p_input->p_method_data, p_vec,
                                 DVD_DATA_READ_ONCE );
 
-    if ( p_data == NULL )
+    if ( p_data_p == NULL )
     {
         return( -1 );
     }
@@ -875,7 +875,7 @@ static int DvdReadRead( input_thread_t * p_input,
     /* Read headers to compute payload length */
     for( i_iovec = 0 ; i_iovec < i_read ; i_iovec++ )
     {
-        data_packet_t * p_current = p_data;
+        data_packet_t * p_current = p_data_p;
         i_pos = 0;
 
         while( i_pos < DVD_LB_SIZE )
@@ -900,8 +900,8 @@ static int DvdReadRead( input_thread_t * p_input,
             }
             else
             {
-                pp_packets[i_packet] = p_data;
-                p_data = p_data->p_next;
+                pp_packets[i_packet] = p_data_p;
+                p_data_p = p_data_p->p_next;
             }
 
             pp_packets[i_packet]->p_payload_start =
@@ -922,11 +922,11 @@ static int DvdReadRead( input_thread_t * p_input,
 
     pp_packets[i_packet] = NULL;
 
-    while( p_data != NULL )
+    while( p_data_p != NULL )
     {
-        data_packet_t * p_next = p_data->p_next;
-        p_input->pf_delete_packet( p_input->p_method_data, p_data );
-        p_data = p_next;
+        data_packet_t * p_next = p_data_p->p_next;
+        p_input->pf_delete_packet( p_input->p_method_data, p_data_p );
+        p_data_p = p_next;
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
