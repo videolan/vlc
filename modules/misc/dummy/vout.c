@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout.c,v 1.4 2003/03/28 11:34:52 sigmunau Exp $
+ * $Id: vout.c,v 1.5 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -133,9 +133,9 @@ static int Init( vout_thread_t *p_vout )
             break;
         }
 
-        vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_width,
-                              p_vout->output.i_height,
-                              p_vout->output.i_chroma );
+        vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,
+                              p_vout->output.i_width, p_vout->output.i_height,
+                              p_vout->output.i_aspect );
 
         if( p_pic->i_planes == 0 )
         {

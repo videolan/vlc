@@ -2,7 +2,7 @@
  * filter_common.h: Common filter functions
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: filter_common.h,v 1.3 2003/10/15 22:49:48 gbazin Exp $
+ * $Id: filter_common.h,v 1.4 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,10 +43,10 @@
         }                                                                     \
                                                                               \
         /* Allocate the picture */                                            \
-        vout_AllocatePicture( p_vout, p_pic,                                  \
+        vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,         \
                               p_vout->output.i_width,                         \
                               p_vout->output.i_height,                        \
-                              p_vout->output.i_chroma );                      \
+                              p_vout->output.i_aspect );                      \
                                                                               \
         if( !p_pic->i_planes )                                                \
         {                                                                     \

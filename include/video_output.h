@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.99 2003/10/04 15:51:22 sigmunau Exp $
+ * $Id: video_output.h,v 1.100 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -200,8 +200,9 @@ VLC_EXPORT( int, vout_VarCallback, ( vlc_object_t *, const char *, vlc_value_t, 
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
 
 VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, vlc_bool_t, vlc_bool_t, unsigned int ) );
-VLC_EXPORT( void,            vout_InitPicture,    ( vlc_object_t *, picture_t *, int, int, uint32_t ) );
-VLC_EXPORT( void,            vout_AllocatePicture,( vout_thread_t *, picture_t *, int, int, uint32_t ) );
+VLC_EXPORT( void,            vout_InitFormat,     ( video_frame_format_t *, uint32_t, int, int, int ) );
+VLC_EXPORT( void,            vout_InitPicture,    ( vlc_object_t *, picture_t *, uint32_t, int, int, int ) );
+VLC_EXPORT( void,            vout_AllocatePicture,( vout_thread_t *, picture_t *, uint32_t, int, int, int ) );
 VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DatePicture,    ( vout_thread_t *, picture_t *, mtime_t ) );

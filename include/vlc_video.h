@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.4 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: vlc_video.h,v 1.5 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -28,14 +28,21 @@
 /**
  * Description of a video frame
  */
-typedef struct video_frame_format_t
+struct video_frame_format_t
 {
-    unsigned int i_width;                                 /**< picture width */
-    unsigned int i_height;                               /**< picture height */
     vlc_fourcc_t i_chroma;                               /**< picture chroma */
     unsigned int i_aspect;                                 /**< aspect ratio */
 
-} video_frame_format_t;
+    unsigned int i_width;                                 /**< picture width */
+    unsigned int i_height;                               /**< picture height */
+    unsigned int i_x_offset;               /**< start offset of visible area */
+    unsigned int i_y_offset;               /**< start offset of visible area */
+    unsigned int i_visible_width;                 /**< width of visible area */
+    unsigned int i_visible_height;               /**< height of visible area */
+
+    unsigned int i_bits_per_pixel;             /**< number of bits per pixel */
+
+};
 
 /**
  * Description of a planar graphic field
@@ -66,6 +73,12 @@ typedef struct plane_t
  */
 struct picture_t
 {
+    /** \name Picture format
+     * Describes the properties of the picture
+     * @{*/
+    video_frame_format_t format;
+    /**@}*/
+
     /** Picture data - data can always be freely modified, but p_data may
      * NEVER be modified. A direct buffer can be handled as the plugin
      * wishes, it can even swap p_pixels buffers. */
@@ -224,22 +237,6 @@ struct subpicture_t
     int             i_width;                              /**< picture width */
     int             i_height;                            /**< picture height */
     /**@}*/
-#if 0
-    /* Additionnal properties depending of the subpicture type */
-    union
-    {
-        /* Text subpictures properties - text is stored in data area, in ASCIIZ
-         * format */
-        struct
-        {
-            vout_font_t *       p_font;            /* font, NULL for default */
-            int                 i_style;                       /* text style */
-            uint32_t            i_char_color;             /* character color */
-            uint32_t            i_border_color;              /* border color */
-            uint32_t            i_bg_color;              /* background color */
-        } text;
-    } type;
-#endif
 
     /** Pointer to function that renders this subtitle in a picture */
     void ( *pf_render )  ( vout_thread_t *, picture_t *, const subpicture_t * );

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * rawvideo.c: Pseudo audio decoder; for raw video data
+ * rawvideo.c: Pseudo video decoder/packetizer for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.6 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: rawvideo.c,v 1.7 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -24,49 +24,74 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                              /* strdup() */
+
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 #include <vlc/input.h>
+#include <vlc/sout.h>
 
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
 #include "codecs.h"
+
 /*****************************************************************************
- * Local prototypes
+ * decoder_sys_t : raw video decoder descriptor
  *****************************************************************************/
-
-typedef struct
+struct decoder_sys_t
 {
-    /* Input properties */
-    decoder_fifo_t *p_fifo;
-    int            i_raw_size;
+    /* Module mode */
+    vlc_bool_t b_packetizer;
 
-    /* Output properties */
+    /*
+     * Input properties
+     */
+    int i_raw_size;
 
-    mtime_t             pts;
+    /*
+     * Output properties
+     */
+    vout_thread_t *p_vout;
 
-    vout_thread_t       *p_vout;
+    /*
+     * Packetizer output properties
+     */
+    sout_packetizer_input_t *p_sout_input;
+    sout_format_t           sout_format;
 
-} vdec_thread_t;
+    /*
+     * Common properties
+     */
+    mtime_t i_pts;
 
-static int  OpenDecoder    ( vlc_object_t * );
+};
 
-static int  RunDecoder     ( decoder_fifo_t * );
-static int  InitThread     ( vdec_thread_t * );
-static void DecodeThread   ( vdec_thread_t * );
-static void EndThread      ( vdec_thread_t * );
+/****************************************************************************
+ * Local prototypes
+ ****************************************************************************/
+static int OpenDecoder   ( vlc_object_t * );
+static int OpenPacketizer( vlc_object_t * );
+
+static int InitDecoder   ( decoder_t * );
+static int RunDecoder    ( decoder_t *, block_t * );
+static int EndDecoder    ( decoder_t * );
+
+static int DecodeFrame   ( decoder_t *, block_t * );
+static int SendFrame     ( decoder_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
 vlc_module_begin();
     set_description( _("Pseudo Raw Video decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
-vlc_module_end();
 
+    add_submodule();
+    set_description( _("Pseudo Raw Video packetizer") );
+    set_capability( "packetizer", 100 );
+    set_callbacks( OpenPacketizer, NULL );
+vlc_module_end();
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -89,233 +114,262 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('I','4','1','1'):
         case VLC_FOURCC('I','4','1','0'):
 
-	/* Packed YUV */
+        /* Packed YUV */
         case VLC_FOURCC('Y','U','Y','2'):
         case VLC_FOURCC('U','Y','V','Y'):
 
-	/* RGB */
+        /* RGB */
         case VLC_FOURCC('R','V','3','2'):
         case VLC_FOURCC('R','V','2','4'):
         case VLC_FOURCC('R','V','1','6'):
         case VLC_FOURCC('R','V','1','5'):
-
-            p_dec->pf_run = RunDecoder;
-            return VLC_SUCCESS;
+            break;
 
         default:
             return VLC_EGENERIC;
     }
+
+    p_dec->pf_init = InitDecoder;
+    p_dec->pf_decode = RunDecoder;
+    p_dec->pf_end = EndDecoder;
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_dec->p_sys =
+          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_dec, "out of memory" );
+        return VLC_EGENERIC;
+    }
+    p_dec->p_sys->b_packetizer = VLC_FALSE;
+
+    return VLC_SUCCESS;
+}
+
+static int OpenPacketizer( vlc_object_t *p_this )
+{
+    decoder_t *p_dec = (decoder_t*)p_this;
+
+    int i_ret = OpenDecoder( p_this );
+
+    if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = VLC_TRUE;
+
+    return i_ret;
 }
 
 /*****************************************************************************
- * RunDecoder: this function is called just after the thread is created
+ * InitDecoder: Initalize the decoder
  *****************************************************************************/
-static int RunDecoder( decoder_fifo_t *p_fifo )
+static int InitDecoder( decoder_t *p_dec )
 {
-    vdec_thread_t *p_vdec;
-    int b_error;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    video_frame_format_t format;
 
-    if( !( p_vdec = malloc( sizeof( vdec_thread_t ) ) ) )
-    {
-        msg_Err( p_fifo, "out of memory" );
-        DecoderError( p_fifo );
-        return( -1 );
-    }
-    memset( p_vdec, 0, sizeof( vdec_thread_t ) );
+    p_sys->i_pts = 0;
 
-    p_vdec->p_fifo = p_fifo;
+    p_sys->p_sout_input = NULL;
+    p_sys->sout_format.i_cat = VIDEO_ES;
+    p_sys->sout_format.i_block_align = 0;
+    p_sys->sout_format.i_bitrate     = 0;
+    p_sys->sout_format.i_extra_data  = 0;
+    p_sys->sout_format.p_extra_data  = NULL;
 
-    if( InitThread( p_vdec ) != 0 )
-    {
-        DecoderError( p_fifo );
-        return( -1 );
-    }
-
-    while( ( !p_vdec->p_fifo->b_die )&&( !p_vdec->p_fifo->b_error ) )
-    {
-        DecodeThread( p_vdec );
-    }
-
-
-    if( ( b_error = p_vdec->p_fifo->b_error ) )
-    {
-        DecoderError( p_vdec->p_fifo );
-    }
-
-    EndThread( p_vdec );
-    if( b_error )
-    {
-        return( -1 );
-    }
-
-    return( 0 );
-}
-
-
-#define FREE( p ) if( p ) { free( p ); p = NULL; }
-
-
-/*****************************************************************************
- * InitThread: initialize data before entering main loop
- *****************************************************************************/
-static int InitThread( vdec_thread_t * p_vdec )
-{
-    picture_t pic;
-    int i;
-
-#define bih ((BITMAPINFOHEADER*)p_vdec->p_fifo->p_bitmapinfoheader)
+#define bih ((BITMAPINFOHEADER*)p_dec->p_fifo->p_bitmapinfoheader)
     if( bih == NULL )
     {
-        msg_Err( p_vdec->p_fifo,
-                 "info missing, fatal" );
-        return( VLC_EGENERIC );
+        msg_Err( p_dec, "info missing, fatal" );
+        return VLC_EGENERIC;
     }
     if( bih->biWidth <= 0 || bih->biHeight <= 0 )
     {
-        msg_Err( p_vdec->p_fifo,
-                 "invalid display size %dx%d",
+        msg_Err( p_dec, "invalid display size %dx%d",
                  bih->biWidth, bih->biHeight );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
-    p_vdec->p_vout = vout_Request( p_vdec->p_fifo, NULL,
-                                   bih->biWidth, bih->biHeight,
-                                   p_vdec->p_fifo->i_fourcc,
-                                   VOUT_ASPECT_FACTOR * bih->biWidth /
-                                   bih->biHeight );
-
-    if( p_vdec->p_vout == NULL )
+    if( p_sys->b_packetizer )
     {
-        msg_Err( p_vdec->p_fifo, "failed created vout" );
-        return( VLC_EGENERIC );
+        /* add an input for the stream ouput */
+        p_sys->sout_format.i_width  = bih->biWidth;
+        p_sys->sout_format.i_height = bih->biHeight;
+        p_sys->sout_format.i_fourcc = p_dec->p_fifo->i_fourcc;
+
+        p_sys->p_sout_input =
+            sout_InputNew( p_dec, &p_sys->sout_format );
+
+        if( !p_sys->p_sout_input )
+        {
+            msg_Err( p_dec, "cannot add a new stream" );
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        /* Initialize video output */
+        p_sys->p_vout = vout_Request( p_dec, NULL,
+                                      bih->biWidth, bih->biHeight,
+                                      p_dec->p_fifo->i_fourcc,
+                                      VOUT_ASPECT_FACTOR * bih->biWidth /
+                                      bih->biHeight );
+        if( p_sys->p_vout == NULL )
+        {
+            msg_Err( p_dec, "failed to create vout" );
+            return VLC_EGENERIC;
+        }
     }
 
     /* Find out p_vdec->i_raw_size */
-    vout_InitPicture( VLC_OBJECT(p_vdec->p_fifo), &pic,
-                      bih->biWidth, bih->biHeight, p_vdec->p_fifo->i_fourcc );
-    p_vdec->i_raw_size = 0;
-    for( i = 0; i < pic.i_planes; i++ )
-    {
-        p_vdec->i_raw_size += pic.p[i].i_lines * pic.p[i].i_visible_pitch;
-    }
-
-    return( VLC_SUCCESS );
+    vout_InitFormat( &format, p_dec->p_fifo->i_fourcc,
+                     bih->biWidth, bih->biHeight,
+                     bih->biWidth * VOUT_ASPECT_FACTOR / bih->biHeight );
+    p_sys->i_raw_size = format.i_bits_per_pixel *
+        format.i_width * format.i_height / 8;
 #undef bih
+
+    return VLC_SUCCESS;
 }
 
-
-static void FillPicture( pes_packet_t *p_pes, picture_t *p_pic )
+/****************************************************************************
+ * RunDecoder: the whole thing
+ ****************************************************************************
+ * This function must be fed with ogg packets.
+ ****************************************************************************/
+static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 {
-    int i_plane;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int i_ret;
 
-    data_packet_t   *p_data;
-    uint8_t *p_src;
-    int     i_src;
+#if 0
+    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
+    {
+        /* We've just started the stream, wait for the first PTS. */
+        block_Release( p_block );
+        return VLC_SUCCESS;
+    }
+#endif
 
-    p_data = p_pes->p_first;
-    p_src  = p_data->p_payload_start;
-    i_src = p_data->p_payload_end - p_data->p_payload_start;
+    /* Date management */
+    if( p_block->i_pts > 0 && p_block->i_pts != p_sys->i_pts )
+    {
+        p_sys->i_pts = p_block->i_pts;
+    }
+
+    if( p_block->i_buffer < p_sys->i_raw_size )
+    {
+        msg_Warn( p_dec, "invalid frame size (%d < %d)",
+                  p_block->i_buffer, p_sys->i_raw_size );
+
+        block_Release( p_block );
+        return VLC_EGENERIC;
+    }
+
+    if( p_sys->b_packetizer )
+    {
+        i_ret = SendFrame( p_dec, p_block );
+    }
+    else
+    {
+        i_ret = DecodeFrame( p_dec, p_block );
+    }
+
+    /* Date management: 1 frame per packet */
+    p_sys->i_pts += ( I64C(1000000) * 1.0 / 25 /*FIXME*/ );
+
+    block_Release( p_block );
+    return i_ret;
+}
+
+/*****************************************************************************
+ * FillPicture:
+ *****************************************************************************/
+static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
+{
+    uint8_t *p_src, *p_dst;
+    int i_src, i_plane, i_line, i_width;
+
+    p_src  = p_block->p_buffer;
+    i_src = p_block->i_buffer;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
-
-        uint8_t *p_dst;
-        int     i_dst;
-
         p_dst = p_pic->p[i_plane].p_pixels;
-        i_dst = p_pic->p[i_plane].i_pitch * p_pic->p[i_plane].i_lines;
+        i_width = p_pic->p[i_plane].i_visible_pitch;
 
-        while( i_dst > 0 )
+        for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
-            int i_copy;
-
-            i_copy = __MIN( i_src, i_dst );
-            if( i_copy > 0 )
-            {
-                memcpy( p_dst, p_src, i_copy );
-            }
-            i_dst -= i_copy;
-            p_dst += i_copy;
-
-            i_src -= i_copy;
-            p_src += i_copy;
-            if( i_src <= 0 )
-            {
-                do
-                {
-                    p_data = p_data->p_next;
-                    if( p_data == NULL )
-                    {
-                        return;
-                    }
-                    p_src  = p_data->p_payload_start;
-                    i_src = p_data->p_payload_end - p_data->p_payload_start;
-                } while( i_src <= 0 );
-            }
+            p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_width );
+            p_src += i_width;
+            p_dst += p_pic->p[i_plane].i_pitch;
         }
     }
 }
 
 /*****************************************************************************
- * DecodeThread: decodes a frame
+ * DecodeFrame: decodes a video frame.
  *****************************************************************************/
-static void DecodeThread( vdec_thread_t *p_vdec )
+static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
 {
-    int             i_size;
-    pes_packet_t    *p_pes;
-    picture_t       *p_pic;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    picture_t *p_pic;
 
-    /* **** get frame **** */
-    input_ExtractPES( p_vdec->p_fifo, &p_pes );
-    if( !p_pes )
+    /* Get a new picture */
+    while( !(p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) ) )
     {
-        p_vdec->p_fifo->b_error = 1;
-        return;
-    }
-    i_size = p_pes->i_pes_size;
-
-    if( i_size < p_vdec->i_raw_size )
-    {
-        msg_Warn( p_vdec->p_fifo, "invalid frame size (%d < %d)",
-                  i_size, p_vdec->i_raw_size );
-        //input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
-        return;
-    }
-
-    /* **** get video picture **** */
-    while( !(p_pic = vout_CreatePicture( p_vdec->p_vout, 0, 0, 0 ) ) )
-    {
-        if( p_vdec->p_fifo->b_die || p_vdec->p_fifo->b_error )
+        if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
         {
-            return;
+            return VLC_EGENERIC;
         }
         msleep( VOUT_OUTMEM_SLEEP );
     }
+    if( !p_pic ) return VLC_EGENERIC;
 
+    FillPicture( p_dec, p_block, p_pic );
 
-    /* **** fill p_pic **** */
-    FillPicture( p_pes, p_pic );
+    vout_DatePicture( p_sys->p_vout, p_pic, p_sys->i_pts );
+    vout_DisplayPicture( p_sys->p_vout, p_pic );
 
-    /* **** display p_pic **** */
-    vout_DatePicture( p_vdec->p_vout, p_pic, p_pes->i_pts);
-    vout_DisplayPicture( p_vdec->p_vout, p_pic );
-
-
-    input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
+    return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * SendFrame: send a video frame to the stream output.
+ *****************************************************************************/
+static int SendFrame( decoder_t *p_dec, block_t *p_block )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    sout_buffer_t *p_sout_buffer =
+        sout_BufferNew( p_sys->p_sout_input->p_sout, p_block->i_buffer );
+
+    if( !p_sout_buffer ) return VLC_EGENERIC;
+
+    p_dec->p_vlc->pf_memcpy( p_sout_buffer->p_buffer,
+                             p_block->p_buffer, p_block->i_buffer );
+
+    p_sout_buffer->i_dts = p_sout_buffer->i_pts = p_sys->i_pts;
+
+    sout_InputSendBuffer( p_sys->p_sout_input, p_sout_buffer );
+
+    return VLC_SUCCESS;
+}
 
 /*****************************************************************************
- * EndThread : faad decoder thread destruction
+ * EndDecoder: decoder destruction
  *****************************************************************************/
-static void EndThread (vdec_thread_t *p_vdec)
+static int EndDecoder( decoder_t *p_dec )
 {
-    if( p_vdec->p_vout )
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( !p_sys->b_packetizer )
     {
-        vout_Request( p_vdec->p_fifo, p_vdec->p_vout, 0, 0, 0, 0 );
+        vout_Request( p_dec, p_sys->p_vout, 0, 0, 0, 0 );
     }
 
-    msg_Dbg( p_vdec->p_fifo, "raw video decoder closed" );
+    if( p_sys->p_sout_input != NULL )
+    {
+        sout_InputDelete( p_sys->p_sout_input );
+    }
 
-    free( p_vdec );
+    free( p_sys );
+
+    return VLC_SUCCESS;
 }

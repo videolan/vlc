@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.81 2003/10/08 19:40:42 gbazin Exp $
+ * $Id: vlc_common.h,v 1.82 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -250,9 +250,9 @@ typedef struct audio_date_t audio_date_t;
 
 /* Video */
 typedef struct vout_thread_t vout_thread_t;
-typedef struct vout_font_t vout_font_t;
 typedef struct vout_sys_t vout_sys_t;
 typedef struct chroma_sys_t chroma_sys_t;
+typedef struct video_frame_format_t video_frame_format_t;
 typedef struct picture_t picture_t;
 typedef struct picture_sys_t picture_sys_t;
 typedef struct picture_heap_t picture_heap_t;

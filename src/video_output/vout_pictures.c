@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.42 2003/08/28 21:11:54 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.43 2003/10/24 21:27:07 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -44,8 +44,8 @@ static void CopyPicture( vout_thread_t *, picture_t *, picture_t * );
 /*****************************************************************************
  * vout_DisplayPicture: display a picture
  *****************************************************************************
- * Remove the reservation flag of a picture, which will cause it to be ready for
- * display. The picture won't be displayed until vout_DatePicture has been
+ * Remove the reservation flag of a picture, which will cause it to be ready
+ * for display. The picture won't be displayed until vout_DatePicture has been
  * called.
  *****************************************************************************/
 void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
@@ -102,8 +102,9 @@ void vout_DatePicture( vout_thread_t *p_vout,
  *****************************************************************************
  * This function creates a reserved image in the video output heap.
  * A null pointer is returned if the function fails. This method provides an
- * already allocated zone of memory in the picture data fields. It needs locking
- * since several pictures can be created by several producers threads.
+ * already allocated zone of memory in the picture data fields.
+ * It needs locking since several pictures can be created by several producers
+ * threads.
  *****************************************************************************/
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                                vlc_bool_t b_progressive,
@@ -164,9 +165,9 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
      */
     if( p_freepic != NULL )
     {
-        vout_AllocatePicture( p_vout, p_freepic,
+        vout_AllocatePicture( p_vout, p_freepic, p_vout->render.i_chroma,
                               p_vout->render.i_width, p_vout->render.i_height,
-                              p_vout->render.i_chroma );
+                              p_vout->render.i_aspect );
 
         if( p_freepic->i_planes )
         {
@@ -250,7 +251,7 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * vout_UnlinkPicture: decrement reference counter of a picture
  *****************************************************************************
- * This function decrement the reference counter of a picture in the video heap.
+ * This function decrement the reference counter of a picture in the video heap
  *****************************************************************************/
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -455,17 +456,17 @@ void vout_PlacePicture( vout_thread_t *p_vout,
  * how it gets displayed.
  *****************************************************************************/
 void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
-                           int i_width, int i_height, vlc_fourcc_t i_chroma )
+                           vlc_fourcc_t i_chroma,
+                           int i_width, int i_height, int i_aspect )
 {
     int i_bytes, i_index;
 
-    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, i_width, i_height, i_chroma );
+    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, i_chroma,
+                      i_width, i_height, i_aspect );
 
     /* Calculate how big the new image should be */
-    for( i_bytes = 0, i_index = 0; i_index < p_pic->i_planes; i_index++ )
-    {
-        i_bytes += p_pic->p[ i_index ].i_lines * p_pic->p[ i_index ].i_pitch;
-    }
+    i_bytes = p_pic->format.i_bits_per_pixel *
+        p_pic->format.i_width * p_pic->format.i_height / 8;
 
     p_pic->p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
 
@@ -487,13 +488,84 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
 }
 
 /*****************************************************************************
+ * vout_InitFormat: initialise the video format fields given chroma/size.
+ *****************************************************************************
+ * This function initializes all the video_frame_format_t fields given the
+ * static properties of a picture (chroma and size).
+ *****************************************************************************/
+void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
+                      int i_width, int i_height, int i_aspect )
+{
+    p_format->i_chroma   = i_chroma;
+    p_format->i_width    = p_format->i_visible_width  = i_width;
+    p_format->i_height   = p_format->i_visible_height = i_height;
+    p_format->i_x_offset = p_format->i_y_offset = 0;
+    p_format->i_aspect   = i_aspect;
+
+#if 0
+    /* Assume we have square pixels */
+    if( i_width && i_height )
+        p_format->i_aspect = i_width * VOUT_ASPECT_FACTOR / i_height;
+    else
+        p_format->i_aspect = 0;
+#endif
+
+    switch( i_chroma )
+    {
+        case FOURCC_I444:
+            p_format->i_bits_per_pixel = 24;
+            break;
+        case FOURCC_I422:
+        case FOURCC_YUY2:
+            p_format->i_bits_per_pixel = 16;
+            p_format->i_bits_per_pixel = 16;
+            break;
+        case FOURCC_I411:
+        case FOURCC_YV12:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+            p_format->i_bits_per_pixel = 12;
+            break;
+        case FOURCC_I410:
+            p_format->i_bits_per_pixel = 9;
+            break;
+        case FOURCC_Y211:
+            p_format->i_bits_per_pixel = 8;
+            break;
+        case FOURCC_RV32:
+            p_format->i_bits_per_pixel = 32;
+            break;
+        case FOURCC_RV24:
+            /* FIXME: Should be 24 here but x11 and our chroma conversion
+             * routines assume 32. */
+#ifdef WIN32
+            p_format->i_bits_per_pixel = 24;
+#else
+            p_format->i_bits_per_pixel = 32;
+#endif
+            break;
+        case FOURCC_RV15:
+        case FOURCC_RV16:
+            p_format->i_bits_per_pixel = 16;
+            break;
+        case FOURCC_RGB2:
+            p_format->i_bits_per_pixel = 8;
+            break;
+        default:
+            p_format->i_bits_per_pixel = 0;
+            break;
+    }
+}
+
+/*****************************************************************************
  * vout_InitPicture: initialise the picture_t fields given chroma/size.
  *****************************************************************************
  * This function initializes most of the picture_t fields given a chroma and
  * size. It makes the assumption that stride == width.
  *****************************************************************************/
 void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
-                       int i_width, int i_height, vlc_fourcc_t i_chroma )
+                       vlc_fourcc_t i_chroma,
+                       int i_width, int i_height, int i_aspect )
 {
     int i_index;
 
@@ -503,6 +575,8 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
         p_pic->p[i_index].p_pixels = NULL;
         p_pic->p[i_index].i_pixel_pitch = 1;
     }
+
+    vout_InitFormat( &p_pic->format, i_chroma, i_width, i_height, i_aspect );
 
     /* Calculate coordinates */
     switch( i_chroma )
@@ -624,9 +698,17 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
 
         case FOURCC_RV24:
             p_pic->p->i_lines = i_height;
+
+            /* FIXME: Should be 3 here but x11 and our chroma conversion
+             * routines assume 4. */
+#ifdef WIN32
             p_pic->p->i_pitch = i_width * 3;
-            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
             p_pic->p->i_pixel_pitch = 3;
+#else
+            p_pic->p->i_pitch = i_width * 4;
+            p_pic->p->i_pixel_pitch = 4;
+#endif
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
 /* FIXME: p_heap isn't always reachable
             p_pic->p_heap->i_rmask = 0xff0000;
             p_pic->p_heap->i_gmask = 0x00ff00;
@@ -652,14 +734,13 @@ void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 0;
             return;
     }
-
 }
 
 /*****************************************************************************
  * vout_ChromaCmp: compare two chroma values
  *****************************************************************************
  * This function returns 1 if the two fourcc values given as argument are
- * the same format (eg. UYVY / UYNV) or almost the same format (eg. I420/YV12)
+ * the same format (eg. UYVY/UYNV) or almost the same format (eg. I420/YV12)
  *****************************************************************************/
 int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
 {

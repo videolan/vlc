@@ -2,7 +2,7 @@
  * xcommon.h: Defines common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.8 2003/08/03 23:11:21 gbazin Exp $
+ * $Id: xcommon.h,v 1.9 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -29,7 +29,7 @@
  *****************************************************************************/
 #ifdef MODULE_NAME_IS_xvideo
 #   define IMAGE_TYPE     XvImage
-#   define EXTRA_ARGS     int i_xvport, int i_chroma
+#   define EXTRA_ARGS     int i_xvport, int i_chroma, int i_bits_per_pixel
 #   define EXTRA_ARGS_SHM int i_xvport, int i_chroma, XShmSegmentInfo *p_shm
 #   define DATA_SIZE(p)   (p)->data_size
 #   define IMAGE_FREE     XFree      /* There is nothing like XvDestroyImage */

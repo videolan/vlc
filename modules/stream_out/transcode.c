@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.42 2003/10/09 19:40:29 gbazin Exp $
+ * $Id: transcode.c,v 1.43 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1661,8 +1661,10 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             int i_plane;
 
             vout_InitPicture( VLC_OBJECT(p_stream), &pic,
+                              id->p_encoder->format.video.i_chroma,
                               id->f_dst.i_width, id->f_dst.i_height,
-                              id->p_encoder->format.video.i_chroma );
+                              id->f_dst.i_width * VOUT_ASPECT_FACTOR /
+                              id->f_dst.i_height );
 
             for( i_plane = 0; i_plane < pic.i_planes; i_plane++ )
             {

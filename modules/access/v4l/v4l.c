@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.24 2003/09/07 22:49:05 fenrir Exp $
+ * $Id: v4l.c,v 1.25 2003/10/24 21:27:06 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -858,8 +858,9 @@ static int AccessOpen( vlc_object_t *p_this )
     else
     {
         /* Fill in picture_t fields */
-        vout_InitPicture( VLC_OBJECT(p_input), &p_sys->pic,
-                          p_sys->i_width, p_sys->i_height, p_sys->i_fourcc );
+        vout_InitPicture( VLC_OBJECT(p_input), &p_sys->pic, p_sys->i_fourcc,
+                          p_sys->i_width, p_sys->i_height, p_sys->i_width *
+                          VOUT_ASPECT_FACTOR / p_sys->i_height );
         if( !p_sys->pic.i_planes )
         {
             msg_Err( p_input, "unsupported chroma" );

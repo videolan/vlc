@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.32 2003/10/08 21:03:35 gbazin Exp $
+ * $Id: xcommon.c,v 1.33 2003/10/24 21:27:06 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1146,6 +1146,10 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
  *****************************************************************************/
 static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+#ifdef MODULE_NAME_IS_xvideo
+    int i_plane;
+#endif
+
     /* We know the chroma, allocate a buffer which will be used
      * directly by the decoder */
     p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
@@ -1154,6 +1158,11 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
         return -1;
     }
+
+    /* Fill in picture_t fields */
+    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
+		      p_vout->output.i_width, p_vout->output.i_height,
+		      p_vout->output.i_aspect );
 
 #ifdef HAVE_SYS_SHM_H
     if( p_vout->p_sys->b_shm )
@@ -1178,6 +1187,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             CreateImage( p_vout, p_vout->p_sys->p_display,
 #ifdef MODULE_NAME_IS_xvideo
                          p_vout->p_sys->i_xvport, p_vout->output.i_chroma,
+                         p_pic->format.i_bits_per_pixel,
 #else
                          p_vout->p_sys->p_visual,
                          p_vout->p_sys->i_screen_depth,
@@ -1196,148 +1206,50 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
 #ifdef MODULE_NAME_IS_xvideo
         case VLC_FOURCC('I','4','2','0'):
-
-            p_pic->Y_PIXELS = p_pic->p_sys->p_image->data
-                               + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
-            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width;
-
-            p_pic->U_PIXELS = p_pic->p_sys->p_image->data
-                               + p_pic->p_sys->p_image->offsets[1];
-            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
-            p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
-
-            p_pic->V_PIXELS = p_pic->p_sys->p_image->data
-                               + p_pic->p_sys->p_image->offsets[2];
-            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
-            p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
-
-            p_pic->i_planes = 3;
-            break;
-
         case VLC_FOURCC('Y','V','1','2'):
-
-            p_pic->Y_PIXELS = p_pic->p_sys->p_image->data
-                               + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
-            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width;
-
-            p_pic->U_PIXELS = p_pic->p_sys->p_image->data
-                               + p_pic->p_sys->p_image->offsets[2];
-            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[2];
-            p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
-
-            p_pic->V_PIXELS = p_pic->p_sys->p_image->data
-                               + p_pic->p_sys->p_image->offsets[1];
-            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_image->pitches[1];
-            p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2;
-
-            p_pic->i_planes = 3;
-            break;
-
         case VLC_FOURCC('Y','2','1','1'):
-
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p->i_lines = p_vout->output.i_height;
-            /* XXX: this just looks so plain wrong... check it out ! */
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0] / 4;
-            p_pic->p->i_pixel_pitch = 4;
-            p_pic->p->i_visible_pitch = p_vout->output.i_width * 4;
-
-            p_pic->i_planes = 1;
-            break;
-
         case VLC_FOURCC('Y','U','Y','2'):
         case VLC_FOURCC('U','Y','V','Y'):
-
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p->i_pixel_pitch = 2;
-            p_pic->p->i_visible_pitch = p_vout->output.i_width * 2;
-
-            p_pic->i_planes = 1;
-            break;
-
         case VLC_FOURCC('R','V','1','5'):
-
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p->i_pixel_pitch = 2;
-            p_pic->p->i_visible_pitch = p_vout->output.i_width * 2;
-
-            p_pic->i_planes = 1;
-            break;
-
         case VLC_FOURCC('R','V','1','6'):
+        case VLC_FOURCC('R','V','2','4'): /* Fixme: pixel pitch == 4 ? */
+        case VLC_FOURCC('R','V','3','2'):
 
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->offsets[0];
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p->i_pixel_pitch = 2;
-            p_pic->p->i_visible_pitch = p_vout->output.i_width * 2;
-
-            p_pic->i_planes = 1;
+            for( i_plane = 0; i_plane < p_pic->p_sys->p_image->num_planes;
+                 i_plane++ )
+            {
+                p_pic->p[i_plane].p_pixels = p_pic->p_sys->p_image->data
+                    + p_pic->p_sys->p_image->offsets[i_plane];
+                p_pic->p[i_plane].i_pitch =
+                    p_pic->p_sys->p_image->pitches[i_plane];
+            }
+            if( p_vout->output.i_chroma == VLC_FOURCC('Y','V','1','2') )
+            {
+                /* U and V inverted compared to I420
+                 * Fixme: this should be handled by the vout core */
+                p_pic->U_PIXELS = p_pic->p_sys->p_image->data
+                    + p_pic->p_sys->p_image->offsets[2];
+                p_pic->V_PIXELS = p_pic->p_sys->p_image->data
+                    + p_pic->p_sys->p_image->offsets[1];
+            }
             break;
 
 #else
         case VLC_FOURCC('R','G','B','2'):
-
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->xoffset;
-            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
-            p_pic->p->i_pixel_pitch = p_pic->p_sys->p_image->depth;
-            p_pic->p->i_visible_pitch = p_pic->p_sys->p_image->width;
-
-            p_pic->i_planes = 1;
-
-            break;
-
         case VLC_FOURCC('R','V','1','6'):
         case VLC_FOURCC('R','V','1','5'):
-
-            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->xoffset;
-            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
-            p_pic->p->i_pixel_pitch = p_pic->p_sys->p_image->depth;
-            p_pic->p->i_visible_pitch = 2 * p_pic->p_sys->p_image->width;
-
-            p_pic->i_planes = 1;
-
-            break;
-
-        case VLC_FOURCC('R','V','3','2'):
         case VLC_FOURCC('R','V','2','4'):
+        case VLC_FOURCC('R','V','3','2'):
 
+            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->xoffset;
-            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
             p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
-            p_pic->p->i_pixel_pitch = p_pic->p_sys->p_image->depth;
-            p_pic->p->i_visible_pitch = 4 * p_pic->p_sys->p_image->width;
 
-            p_pic->i_planes = 1;
-
+            /* p_pic->p->i_pixel_pitch = 4 for RV24 but this should be set
+             * properly by vout_InitPicture() */
+            p_pic->p->i_visible_pitch = p_pic->p->i_pixel_pitch
+                                         * p_pic->p_sys->p_image->width;
             break;
 #endif
 
@@ -2148,7 +2060,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
 
     /* Allocate memory for image */
 #ifdef MODULE_NAME_IS_xvideo
-    p_data = (byte_t *) malloc( i_width * i_height * 2 ); /* XXX */
+    p_data = (byte_t *) malloc( i_width * i_height * i_bits_per_pixel / 8 );
 #else
     i_bytes_per_line = i_width * i_bytes_per_pixel;
     p_data = (byte_t *) malloc( i_bytes_per_line * i_height );

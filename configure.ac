@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.93 2003/10/24 16:34:30 sam Exp $
+dnl $Id: configure.ac,v 1.94 2003/10/24 21:27:06 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2779,6 +2779,7 @@ then
     then
       AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwindows.])
     fi
+    AC_LANG_PUSH(C++)
     AX_ADD_CXXFLAGS([wxwindows],[`${WX_CONFIG} --cxxflags`])
     AX_ADD_LDFLAGS([wxwindows],[`${WX_CONFIG} --libs`])
     # now look for the wxprec.h header
@@ -2794,6 +2795,7 @@ then
       ALIASES="${ALIASES} wxvlc"
     fi
     CPPFLAGS="${CPPFLAGS_save}"
+    AC_LANG_POP(C++)
   fi
 fi
 
