@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.21 2002/05/18 14:03:13 gbazin Exp $
+ * $Id: spu_decoder.c,v 1.22 2002/05/19 01:07:13 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -211,6 +211,25 @@ static int InitThread( spudec_thread_t *p_spudec )
  *****************************************************************************/
 static void EndThread( spudec_thread_t *p_spudec )
 {
+    if( p_spudec->p_vout != NULL 
+     && p_spudec->p_vout->p_subpicture != NULL )
+    {
+        subpicture_t *  p_subpic;
+        int             i_subpic;
+    
+        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
+        {
+            p_subpic = &p_spudec->p_vout->p_subpicture[i_subpic];
+
+            if( p_subpic != NULL &&
+              ( ( p_subpic->i_status == RESERVED_SUBPICTURE )
+             || ( p_subpic->i_status == READY_SUBPICTURE ) ) )
+            {
+                vout_DestroySubPicture( p_spudec->p_vout, p_subpic );
+            }
+        }
+    }
+    
     free( p_spudec );
 }
 
