@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: wall.c,v 1.13 2004/01/25 20:05:28 hartman Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -95,6 +95,25 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
+ * Control: control facility for the vout (forwards to child vout)
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    int i_row, i_col, i_vout = 0;
+
+    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
+    {
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        {
+            vout_vaControl( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
+                            i_query, args );
+            i_vout++;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * Create: allocates Wall video thread output method
  *****************************************************************************
  * This function allocates and initializes a Wall vout method.
@@ -118,6 +137,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_manage = NULL;
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
+    p_vout->pf_control = Control;
 
     /* Look what method was requested */
     p_vout->p_sys->i_col = config_GetInt( p_vout, "wall-cols" );

@@ -2,7 +2,7 @@
  * invert.c : Invert video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: invert.c,v 1.9 2004/01/25 03:28:41 hartman Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,6 +67,14 @@ struct vout_sys_t
 };
 
 /*****************************************************************************
+ * Control: control facility for the vout (forwards to child vout)
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
+}
+
+/*****************************************************************************
  * Create: allocates Invert video thread output method
  *****************************************************************************
  * This function allocates and initializes a Invert vout method.
@@ -88,6 +96,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_manage = NULL;
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
+    p_vout->pf_control = Control;
 
     return VLC_SUCCESS;
 }

@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: adjust.c,v 1.17 2004/01/25 20:05:28 hartman Exp $
+ * $Id$
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>
  *
@@ -100,6 +100,14 @@ inline static int32_t clip( int32_t a )
 }
 
 /*****************************************************************************
+ * Control: control facility for the vout (forwards to child vout)
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
+}
+
+/*****************************************************************************
  * Create: allocates adjust video thread output method
  *****************************************************************************
  * This function allocates and initializes a adjust vout method.
@@ -121,6 +129,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_manage = NULL;
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
+    p_vout->pf_control = Control;
     
     var_Create( p_vout, "contrast", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "brightness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
