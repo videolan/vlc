@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.9 2003/01/18 04:10:58 hartman Exp $
+ * $Id: open.m,v 1.10 2003/01/18 04:57:08 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -348,11 +348,22 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 {
     NSString *o_mrl_string;
     NSString *o_filename = [o_file_path stringValue];
+    NSString *o_ext = [o_filename pathExtension];
     vlc_bool_t b_stream = [o_file_stream state];
 
-    o_mrl_string = [NSString stringWithFormat: @"%s://%@",
-                    b_stream ? "stream" : "file",
-                    o_filename];
+    if ([o_ext isEqualToString: @"bin"] ||
+        [o_ext isEqualToString: @"cue"] ||
+        [o_ext isEqualToString: @"vob"] ||
+        [o_ext isEqualToString: @"iso"])
+    {
+        o_mrl_string = o_filename;
+    }
+    else
+    {
+        o_mrl_string = [NSString stringWithFormat: @"%s://%@",
+                        b_stream ? "stream" : "file",
+                        o_filename];
+    }
     [o_mrl setStringValue: o_mrl_string]; 
 }
 
