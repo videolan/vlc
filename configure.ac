@@ -1466,7 +1466,10 @@ then
     if test -z "${with_dvbpsi_tree}"
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
-        [ VLC_ADD_PLUGINS([mux_ts ts])
+        [ VLC_ADD_PLUGINS([ts])
+          if test "${enable_sout}" != "no"; then
+            VLC_ADD_BUILTINS([mux_ts])
+          fi
           VLC_ADD_LDFLAGS([mux_ts ts dvb],[-ldvbpsi]) ],
         [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
         [#if defined( HAVE_STDINT_H )
@@ -1491,7 +1494,10 @@ then
       then
         dnl  Use a custom libdvbpsi
         AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
-        VLC_ADD_BUILTINS([mux_ts ts])
+        VLC_ADD_BUILTINS([ts])
+        if test "${enable_sout}" != "no"; then
+          VLC_ADD_BUILTINS([mux_ts])
+        fi
         VLC_ADD_CPPFLAGS([mux_ts ts dvb],[-I${real_dvbpsi_tree}/src])
         VLC_ADD_LDFLAGS([mux_ts ts dvb],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
       else
@@ -1516,7 +1522,10 @@ then
     fi
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
-      VLC_ADD_PLUGINS([mux_ts ts])
+      VLC_ADD_PLUGINS([ts])
+      if test "${enable_sout}" != "no"; then
+        VLC_ADD_BUILTINS([mux_ts])
+      fi
       VLC_ADD_CPPFLAGS([mux_ts ts dvb],[${CPPFLAGS_test}])
       VLC_ADD_LDFLAGS([mux_ts ts dvb],[${LDFLAGS_test} -ldvbpsi])
 
