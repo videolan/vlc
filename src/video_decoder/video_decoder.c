@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.59 2001/10/11 13:19:27 massiot Exp $
+ * $Id: video_decoder.c,v 1.60 2001/10/11 16:12:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -249,7 +249,7 @@ static __inline__ void MotionBlock( vdec_pool_t * p_pool,
                      p_vdec->p_idct_data, p_idct->i_sparse_pos ); 
 
 #define DECODE_NONINTRA_BLOCK( i_b, p_dest, I_CHROMA )                      \
-    if( p_mb->i_coded_block_pattern & (1 << (3 + p_vpar->sequence.i_chroma_nb_blocks - i_b)) )                    \
+    if( p_mb->i_coded_block_pattern & (1 << (11 - (i_b))) )                 \
     {                                                                       \
         DECODE_INTRA_BLOCK( i_b, p_dest, I_CHROMA );                        \
     }

@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.6 2001/10/11 13:19:27 massiot Exp $
+ * $Id: vdec_ext-plugins.h,v 1.7 2001/10/11 16:12:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -52,7 +52,7 @@ typedef struct macroblock_s
 
     /* IDCT information */
     idct_inner_t            p_idcts[12];
-    int                     i_coded_block_pattern;
+    u16                     i_coded_block_pattern;
                                                  /* which blocks are coded ? */
     yuv_data_t *            p_y_data;
     yuv_data_t *            p_u_data;

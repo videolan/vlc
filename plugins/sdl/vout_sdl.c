@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.63 2001/09/26 12:32:25 massiot Exp $
+ * $Id: vout_sdl.c,v 1.64 2001/10/11 16:12:43 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -559,6 +559,11 @@ static void vout_Display( vout_thread_t *p_vout )
              * render 
              */
             /* TODO: support for streams other than 4:2:0 */
+            if( p_vout->p_rendered_pic->i_type != YUV_420_PICTURE )
+            {
+                intf_ErrMsg("sdl vout error: no support for that kind of pictures");
+                return;
+            }
             /* create the overlay if necessary */
             if( p_vout->p_sys->p_overlay == NULL )
             {

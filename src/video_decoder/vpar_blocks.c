@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.13 2001/10/11 13:19:27 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.14 2001/10/11 16:12:43 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -1000,7 +1000,7 @@ DECLARE_INTRAMB( MPEG2IntraB15MB, MPEG2IntraB15 );
 #undef DECODE_CHROMABLOCK
 
 #define DECODE_LUMABLOCK( I_B, PF_MBFUNC )                                  \
-    if( p_mb->i_coded_block_pattern & (1 << (3 + p_vpar->sequence.i_chroma_nb_blocks - (I_B))) )                    \
+    if( p_mb->i_coded_block_pattern & (1 << (11 - (I_B))) )                 \
     {                                                                       \
         p_idct = &p_mb->p_idcts[I_B];                                       \
         memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                \
@@ -1009,7 +1009,7 @@ DECLARE_INTRAMB( MPEG2IntraB15MB, MPEG2IntraB15 );
     }
 
 #define DECODE_CHROMABLOCK( I_B, PF_MBFUNC )                                \
-    if( p_mb->i_coded_block_pattern & (1 << (3 + p_vpar->sequence.i_chroma_nb_blocks - (I_B))) )                    \
+    if( p_mb->i_coded_block_pattern & (1 << (11 - (I_B))) )                 \
     {                                                                       \
         p_idct = &p_mb->p_idcts[I_B];                                       \
         memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                \
@@ -1589,46 +1589,23 @@ static __inline__ int CodedPattern( vpar_thread_t * p_vpar )
     {
         p_tab = CBP_7 - 16 + i_code;
         RemoveBits( &p_vpar->bit_stream, p_tab->i_length );
-        if( p_vpar->sequence.i_chroma_format != CHROMA_420 )
-        {
-            int i_value = p_tab->i_value;
-
-            if( p_vpar->sequence.i_chroma_format != CHROMA_444 )
-            {
-                i_value <<= 2;
-                i_value |= GetBits( &p_vpar->bit_stream, 2 );
-            }
-            else
-            {
-                i_value <<= 6;
-                i_value |= GetBits( &p_vpar->bit_stream, 6 );
-            }
-            return( i_value );
-        }
-        return( p_tab->i_value );
     }
     else
     {
         p_tab = CBP_9 + ShowBits( &p_vpar->bit_stream, 9 );
         RemoveBits( &p_vpar->bit_stream, p_tab->i_length );
-        if( p_vpar->sequence.i_chroma_format != CHROMA_420 )
-        {
-            int i_value = p_tab->i_value;
-
-            if( p_vpar->sequence.i_chroma_format != CHROMA_444 )
-            {
-                i_value <<= 2;
-                i_value |= GetBits( &p_vpar->bit_stream, 2 );
-            }
-            else
-            {
-                i_value <<= 6;
-                i_value |= GetBits( &p_vpar->bit_stream, 6 );
-            }
-            return( i_value );
-        }
-        return( p_tab->i_value );
     }
+    if( p_vpar->sequence.i_chroma_format == CHROMA_420 )
+    {
+        return( p_tab->i_value << 6 );
+    }
+    if( p_vpar->sequence.i_chroma_format == CHROMA_422 )
+    {
+        return( (p_tab->i_value << 6)
+                 | (GetBits( &p_vpar->bit_stream, 2 ) << 4) );
+    }
+    return( (p_tab->i_value << 6)
+             | GetBits( &p_vpar->bit_stream, 6 ) );
 }
 
 /*****************************************************************************
