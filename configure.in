@@ -932,6 +932,16 @@ then
 fi
 
 dnl
+dnl  AAC demux plugin
+dnl
+AC_ARG_ENABLE(aac,
+  [  --enable-aac            AAC demux module (default enabled)])
+if test "x${enable_aac}" != "xno"
+then
+  PLUGINS="${PLUGINS} demux/aac/aac"
+fi
+
+dnl
 dnl  Codec plugins
 dnl
 
