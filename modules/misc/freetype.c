@@ -1,7 +1,7 @@
 /*****************************************************************************
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
- * Copyright (C) 2002, 2003 VideoLAN
+ * Copyright (C) 2002 - 2005 VideoLAN
  * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -72,6 +72,10 @@ static void Destroy( vlc_object_t * );
 
 static subpicture_t *RenderText( filter_t *, block_t * );
 static line_desc_t *NewLine( byte_t * );
+static int FreetypeCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data );
+
 
 /*****************************************************************************
  * Module descriptor
@@ -84,8 +88,8 @@ static line_desc_t *NewLine( byte_t * );
     "relative font size " )
 #define OPACITY_TEXT N_("Opacity, 0..255")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of overlay text. " \
-    "0 = totally transparent, 255 = totally opaque. " )
-#define COLOR_TEXT N_("Color, RGB, 0x000000 - 0xFFFFFF")
+    "1 = transparent, 255 = totally opaque. " )
+#define COLOR_TEXT N_("Text Default Color")
 #define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal." \
     "#000000 = all colors off, 0xFF0000 = just Red, 0xFFFFFF = all color on [White]" )
 #define FONTSIZER_TEXT N_("Font size")
@@ -94,6 +98,13 @@ static line_desc_t *NewLine( byte_t * );
 static int   pi_sizes[] = { 20, 18, 16, 12, 6 };
 static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
                                    N_("Large"), N_("Larger") };
+static int pi_color_values[] = { 0x00000000, 0x00808080, 0x00C0C0C0, 0x00FFFFFF, 0x00800000,
+                               0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00808000, 0x00008000, 0x00008080, 
+                               0x0000FF00, 0x00800080, 0x00000080, 0x000000FF, 0x0000FFFF}; 
+static char *ppsz_color_descriptions[] = { N_("Black"), N_("Gray"), N_("Silver"), N_("White"), 
+                                 N_("Maroon"), N_("Red"), N_("Fuchsia"), N_("Yellow"), 
+                                 N_("Olive"), N_("Green"), N_("Teal"), N_("Lime"), N_("Purple"), 
+                                 N_("Navy"), N_("Blue"), N_("Aqua") };
 
 vlc_module_begin();
     set_description( _("freetype2 font renderer") );
@@ -104,10 +115,11 @@ vlc_module_begin();
               VLC_FALSE );
     add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, VLC_TRUE );
-    add_integer( "freetype-opacity", 255, NULL, OPACITY_TEXT,
-                 OPACITY_LONGTEXT, VLC_TRUE );
-    add_integer( "freetype-color", 0xFFFFFF, NULL, COLOR_TEXT,
-                 COLOR_LONGTEXT, VLC_TRUE );
+    add_integer_with_range( "freetype-opacity", 255, 0, 255, NULL,
+        OPACITY_TEXT, OPACITY_LONGTEXT, VLC_FALSE );
+    add_integer( "freetype-color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
+        change_integer_list( pi_color_values, ppsz_color_descriptions, 0 );
+
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
@@ -142,7 +154,7 @@ struct line_desc_t
 };
 
 static void Render    ( filter_t *, subpicture_t *, subpicture_data_t *, uint8_t,
-                        uint8_t, uint8_t, uint8_t );
+                        int, int, int );
 static void FreeString( subpicture_data_t * );
 static void FreeLine( line_desc_t * );
 
@@ -158,8 +170,14 @@ struct filter_sys_t
     FT_Face        p_face;      /* handle to face object */
     vlc_bool_t     i_use_kerning;
     uint8_t        i_opacity;   
-    uint8_t        i_red, i_green, i_blue; /* color components */
+    uint8_t        i_defaultopacity; /* freetype-opacity */
+    uint8_t        i_tempopacity; /* font-opacity dynamic changes */
+    int            i_tempcolor;   /* font-color dynamic changes */
+    int            i_defaultcolor;  /* freetype-color */
+    int            i_red, i_green, i_blue; /* color components */
     uint8_t        pi_gamma[256];
+    vlc_bool_t     b_need_color;  /* flag for font color changes */
+    vlc_bool_t     b_need_opacity;  /* flag for font opacity changes */
 };
 
 /*****************************************************************************
@@ -175,6 +193,7 @@ static int Create( vlc_object_t *p_this )
     int i, i_error;
     int i_fontsize = 0;
     vlc_value_t val;
+    vlc_object_t *p_input;
 
     /* Allocate structure */
     p_sys = malloc( sizeof( filter_sys_t ) );
@@ -185,11 +204,32 @@ static int Create( vlc_object_t *p_this )
     }
     p_sys->p_face = 0;
     p_sys->p_library = 0;
+    
+    /* Hook used for callback variables */
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return VLC_ENOOBJ;
+    }
+   
+    /* accessible variables, to allow individual text subfilters to set their own values */
+    p_sys->i_tempcolor = var_CreateGetInteger( p_input->p_libvlc , "font-color" );
+    p_sys->i_tempopacity = var_CreateGetInteger( p_input->p_libvlc , "font-opacity" );
+    var_AddCallback( p_input->p_libvlc, "font-color", FreetypeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "font-opacity", FreetypeCallback, p_sys );
+    vlc_object_release( p_input ); /* free the hook */
+
     /* default to opaque letters, white (all colors set to 255): */
     p_sys->i_opacity = 255;
+    p_sys->i_defaultopacity = 255;
     p_sys->i_red = 255;
     p_sys->i_green = 255;
     p_sys->i_blue = 255;
+    p_sys->i_defaultcolor = 0x00FFFFFF;
+    
+    /* miscellaneous initialization */
+    p_sys->b_need_color = VLC_FALSE; /* inversion of true/false */
+    p_sys->b_need_opacity = VLC_FALSE;   
 
     for( i = 0; i < 256; i++ )
     {
@@ -202,10 +242,20 @@ static int Create( vlc_object_t *p_this )
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "freetype-rel-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-opacity",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-color",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "freetype-opacity", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Get( p_filter, "freetype-opacity", &val );
+    p_sys->i_opacity = __MAX( __MIN( val.i_int, 255 ), 0 );
+    p_sys->i_defaultopacity = p_sys->i_opacity;
+    var_Create( p_filter, "freetype-color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_filter, "freetype-color", &val );
+    if ( ( val.i_int > -1 ) && ( val.i_int < 0x00FFFFFF ) )  /* valid range */
+    {
+	    p_sys->i_defaultcolor = val.i_int;
+        p_sys->i_blue = val.i_int & 0x000000FF;
+        p_sys->i_green = (val.i_int & 0x0000FF00)/256;
+        p_sys->i_red = (val.i_int & 0x00FF0000)/(256*256);
+    }
+    else msg_Warn(p_filter, "Invalid freetype color specified, using white [0xFFFFFF]");        
 
     /* Look what method was requested */
     var_Get( p_filter, "freetype-font", &val );
@@ -254,26 +304,6 @@ static int Create( vlc_object_t *p_this )
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
 
-    var_Get( p_filter, "freetype-opacity", &val );
-    if( val.i_int )
-    {
-	    if ( ( val.i_int > -1 ) && ( val.i_int < 256 ) )  /* valid range 0 to 255 */
-	    {
-           p_sys->i_opacity = val.i_int;
-        }
-        else msg_Warn(p_filter, "Invalid freetype opacity specified, using 255");        
-    }
-    var_Get( p_filter, "freetype-color", &val );
-    if( val.i_int )
-    {
-	    if ( ( val.i_int > -1 ) && ( val.i_int < 0xFFFFFF ) )  /* valid range */
-	    {
-           p_sys->i_blue = val.i_int & 0x000000FF;
-           p_sys->i_green = (val.i_int & 0x0000FF00)/256;
-           p_sys->i_red = (val.i_int & 0x00FF0000)/(256*256);
-        }
-        else msg_Warn(p_filter, "Invalid freetype color specified, using white [0xFFFFFF]");        
-    }
     
     var_Get( p_filter, "freetype-fontsize", &val );
     if( val.i_int )
@@ -319,8 +349,20 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
+    vlc_object_t *p_input;
+
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    if( !p_input )
+    {
+        return;
+    }
+    var_Destroy( p_input->p_libvlc , "font-color" );
+    var_Destroy( p_input->p_libvlc , "font-opacity" );
+    vlc_object_release( p_input );
+
     FT_Done_Face( p_sys->p_face );
     FT_Done_FreeType( p_sys->p_library );
     free( p_sys );
@@ -333,7 +375,7 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static void Render( filter_t *p_filter, subpicture_t *p_spu,
                     subpicture_data_t *p_string, uint8_t opacity, 
-                    uint8_t red, uint8_t green, uint8_t blue )
+                    int red, int green, int blue )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     line_desc_t *p_line;
@@ -343,9 +385,9 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
     uint8_t i_y, i_u, i_v;  /* YUV values, derived from incoming RGB */
     
     /* calculate text color components: */
-    i_y = (uint8_t) (0.257 * red) + (0.504 * green) + (0.098 * blue) + 16;
-    i_u = (uint8_t) -(0.148 * red) - (0.291 * green) + (0.439 * blue) + 128;
-    i_v = (uint8_t) (0.439 * red) - (0.368 * green) - (0.071 * blue) + 128;
+    i_y = (uint8_t) ( (  66 * red + 129 * green +  25 * blue + 128) >> 8) +  16;
+    i_u = (uint8_t) ( ( -38 * red -  74 * green + 112 * blue + 128) >> 8) + 128;
+    i_v = (uint8_t) ( ( 112 * red -  94 * green -  18 * blue + 128) >> 8) + 128;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -368,14 +410,13 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
     p_a = p_spu->p_region->picture.A_PIXELS;
     i_pitch = p_spu->p_region->picture.Y_PITCH;
 
-    /* Initialize the region pixels (only the alpha will be changed later) */
+    /* Initialize the region pixels */
     memset( p_y, 0x00, i_pitch * p_spu->p_region->fmt.i_height );
     memset( p_u, 0x80, i_pitch * p_spu->p_region->fmt.i_height );
     memset( p_v, 0x80, i_pitch * p_spu->p_region->fmt.i_height );
     memset( p_a, 0x00, i_pitch * p_spu->p_region->fmt.i_height );
 
 #define pi_gamma p_sys->pi_gamma
-/* #define opacity  p_sys->i_opacity */
 
     for( p_line = p_string->p_lines; p_line != NULL; p_line = p_line->p_next )
     {
@@ -427,9 +468,9 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
             {
                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                {
-                   p_y[i_offset + x] =
-                       pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]]*opacity/256;
-                   p_u[i_offset + x] = i_u; p_v[i_offset + x] = i_v;
+                   p_y[i_offset + x] = i_y;
+                   p_u[i_offset + x] = i_u; 
+                   p_v[i_offset + x] = i_v;
                }
                i_offset += i_pitch;
             }
@@ -692,6 +733,30 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 #undef face
 #undef glyph
 
+/* check to see whether to use the default color/opacity, or another one: */
+    if( !p_sys->b_need_color ) 
+    {
+	    p_sys->i_blue = p_sys->i_tempcolor & 0x000000FF;
+        p_sys->i_green = (p_sys->i_tempcolor & 0x0000FF00)/256;
+        p_sys->i_red = (p_sys->i_tempcolor & 0x00FF0000)/(256*256);
+    }
+    else
+    {
+        p_sys->i_blue = p_sys->i_defaultcolor & 0x000000FF;
+        p_sys->i_green = (p_sys->i_defaultcolor & 0x0000FF00)/256;
+        p_sys->i_red = (p_sys->i_defaultcolor & 0x00FF0000)/(256*256);
+        p_sys->b_need_color = VLC_FALSE;
+    }
+    if( !p_sys->b_need_opacity )
+    {
+       p_sys->i_opacity = p_sys->i_tempopacity;
+    }
+    else
+    {
+       p_sys->i_opacity = p_sys->i_defaultopacity;
+       p_sys->b_need_opacity = VLC_FALSE;
+    }
+   
     Render( p_filter, p_subpic, p_string, p_sys->i_opacity, 
                  p_sys->i_red, p_sys->i_green, p_sys->i_blue );
     FreeString( p_string );
@@ -770,4 +835,25 @@ static line_desc_t *NewLine( byte_t *psz_string )
     }
 
     return p_line;
+}
+/**********************************************************************
+ * Callback to update params on the fly
+ **********************************************************************/
+static int FreetypeCallback( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    filter_sys_t *p_sys = (filter_sys_t *) p_data;
+
+    if ( !strncmp( psz_var, "font-color", 8 ) )
+    {
+        p_sys->i_tempcolor = newval.i_int;
+        p_sys->b_need_color = VLC_TRUE;
+    }
+    else if ( !strncmp( psz_var, "font-opacity", 8 ) )
+    {
+        p_sys->i_tempopacity = newval.i_int;
+        p_sys->b_need_opacity = VLC_TRUE;
+    }
+    return VLC_SUCCESS;
 }
