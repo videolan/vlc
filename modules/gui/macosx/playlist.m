@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.10 2003/02/13 01:14:55 hartman Exp $
+ * $Id: playlist.m,v 1.11 2003/02/13 14:16:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -298,6 +298,40 @@
 - (void)playlistUpdated
 {
     [o_table_view reloadData];
+}
+
+- (void)updateState
+{
+    int i_row;
+
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+    
+    i_row = p_playlist->i_index;
+    vlc_object_release( p_playlist );
+    
+    [o_table_view selectRow: i_row byExtendingSelection: NO];
+    [o_table_view scrollRowToVisible: i_row];
+    
+    vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                          FIND_ANYWHERE );
+
+    if ( p_vout == NULL )
+    {
+        [[NSApp keyWindow] makeFirstResponder:o_table_view];
+        return;
+    }
+    else if ( !p_vout->b_fullscreen )
+    {
+        [[NSApp keyWindow] makeFirstResponder:o_table_view];
+    }
+    vlc_object_release( (vlc_object_t *)p_vout );
 }
 
 @end
