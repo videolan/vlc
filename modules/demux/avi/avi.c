@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.31 2003/01/25 16:58:34 fenrir Exp $
+ * $Id: avi.c,v 1.32 2003/01/25 17:57:36 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -144,15 +144,6 @@ static int input_ReadInPES( input_thread_t *p_input,
         {
             /* should occur only with EOF and max allocation reached 
              * it safer to  return an error */
-            /* free all data packet */
-            for( p_data = p_pes->p_first; p_data != NULL; )
-            {
-                data_packet_t *p_next;
-
-                p_next = p_data->p_next;
-                input_DeletePacket( p_input->p_method_data, p_data );
-                p_data = p_next;
-            }
             /* free pes */
             input_DeletePES( p_input->p_method_data, p_pes );
             return -1;
