@@ -28,14 +28,14 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
 static GnomeUIInfo menubar_view_menu_uiinfo[] =
 {
   {
-    GNOME_APP_UI_ITEM, N_("P_laylist"),
+    GNOME_APP_UI_ITEM, N_("_Playlist..."),
     N_("Open the playlist window"),
     (gpointer) on_menubar_playlist_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_INDEX,
     0, (GdkModifierType) 0, NULL
   },
   {
-    GNOME_APP_UI_ITEM, N_("_Modules"),
+    GNOME_APP_UI_ITEM, N_("_Modules..."),
     N_("Open the plugin manager"),
     (gpointer) on_menubar_modules_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH,

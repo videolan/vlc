@@ -317,6 +317,12 @@ PLUGIN_GGI =	plugins/ggi/ggi.o \
 PLUGIN_GLIDE =	plugins/glide/glide.o \
 		plugins/glide/vout_glide.o
 
+PLUGIN_GTK =	plugins/gtk/gtk.o \
+		plugins/gtk/intf_gtk.o \
+		plugins/gtk/gtk_callbacks.o \
+		plugins/gtk/gtk_interface.o \
+		plugins/gtk/gtk_support.o
+
 PLUGIN_GNOME =	plugins/gnome/gnome.o \
 		plugins/gnome/intf_gnome.o \
 		plugins/gnome/gnome_callbacks.o \
@@ -415,6 +421,7 @@ STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON), \
 
 NONSTD_PLUGIN_OBJ = \
 		$(PLUGIN_GLIDE) \
+		$(PLUGIN_GTK) \
 		$(PLUGIN_GNOME)
 
 NONSTD_CPP_PLUGIN_OBJ = \
@@ -542,10 +549,10 @@ plugins: $(PLUGINS:%=lib/%.so)
 FORCE:
 
 #
-# Gnome and Framebuffer aliases - don't add new aliases which could bloat
+# GTK/Gnome and Framebuffer aliases - don't add new aliases which could bloat
 # the namespace
 #
-gvlc fbvlc: vlc
+gvlc kvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
 
@@ -576,6 +583,11 @@ $(STD_PLUGIN_OBJ): %.o: Makefile.dep
 $(STD_PLUGIN_OBJ): %.o: .dep/%.d
 $(STD_PLUGIN_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+
+$(PLUGIN_GTK): %.o: Makefile.dep
+$(PLUGIN_GTK): %.o: .dep/%.d
+$(PLUGIN_GTK): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) `gtk-config --cflags gtk` -c -o $@ $<
 
 $(PLUGIN_GNOME): %.o: Makefile.dep
 $(PLUGIN_GNOME): %.o: .dep/%.d
@@ -642,6 +654,9 @@ lib/x11.so: $(PLUGIN_X11)
 lib/mga.so: $(PLUGIN_MGA)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
 
+lib/gtk.so: $(PLUGIN_GTK)
+	$(CC) $(PCFLAGS) -shared -o $@ $^ `gtk-config --libs gtk | sed 's,-rdynamic,,'`
+
 lib/gnome.so: $(PLUGIN_GNOME)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
 
@@ -655,7 +670,7 @@ lib/sdl.so: $(PLUGIN_SDL)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_SDL)
 
 lib/ncurses.so: $(PLUGIN_NCURSES)
-	$(CC) $(PCFLAGS) -shared -o $@ $^ -lcurses
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -lncurses
 
 ifeq ($(SYS),beos)
 lib/null.so: $(PLUGIN_NULL)

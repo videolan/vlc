@@ -1,0 +1,159 @@
+#include <gtk/gtk.h>
+
+
+void
+on_intf_window_destroy                 (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_intf_window_drag_data_received      (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        GtkSelectionData *data,
+                                        guint            info,
+                                        guint            time,
+                                        gpointer         user_data);
+
+void
+on_toolbar_open_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_back_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_stop_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_play_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_pause_clicked               (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_slow_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_fast_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_playlist_clicked            (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_prev_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_next_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+gboolean
+on_hscale_button_release_event         (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+gboolean
+on_hscale_button_press_event           (GtkWidget       *widget,
+                                        GdkEventButton  *event,
+                                        gpointer         user_data);
+
+void
+on_intf_fileopen_destroy               (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_fileopen_ok_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_fileopen_cancel_clicked             (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_intf_modules_destroy                (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_modules_ok_clicked                  (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_modules_apply_clicked               (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_modules_cancel_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_intf_playlist_destroy               (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_playlist_ok_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_popup_fast_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_open_activate               (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_exit_activate               (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_play_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_exit_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_modules_activate            (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_preferences_activate        (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_menubar_about_activate              (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_pause_activate                (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_slow_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_open_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_about_activate                (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_about_ok_clicked                    (GtkButton       *button,
+                                        gpointer         user_data);
+

@@ -131,7 +131,7 @@
 		<handler>on_menubar_playlist_activate</handler>
 		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
 	      </signal>
-	      <label>P_laylist</label>
+	      <label>_Playlist...</label>
 	      <right_justify>False</right_justify>
 	      <stock_icon>GNOME_STOCK_MENU_INDEX</stock_icon>
 	    </widget>
@@ -146,7 +146,7 @@
 		<handler>on_menubar_modules_activate</handler>
 		<last_modification_time>Tue, 13 Feb 2001 17:19:41 GMT</last_modification_time>
 	      </signal>
-	      <label>_Modules</label>
+	      <label>_Modules...</label>
 	      <right_justify>False</right_justify>
 	      <stock_icon>GNOME_STOCK_MENU_ATTACH</stock_icon>
 	    </widget>
@@ -596,6 +596,7 @@ Andres Krapf &lt;dae@via.ecp.fr&gt;
 Christophe Massiot &lt;massiot@via.ecp.fr&gt;
 Vincent Seguin &lt;seguin@via.ecp.fr&gt;
 Benoit Steiner &lt;benny@via.ecp.fr&gt;
+Arnaud de Bossoreille de Ribou &lt;bozo@via.ecp.fr&gt;
 Jean-Marc Dressler &lt;polux@via.ecp.fr&gt;
 Gaël Hendryckx &lt;jimmy@via.ecp.fr&gt;
 Samuel Hocevar &lt;sam@zoy.org&gt;

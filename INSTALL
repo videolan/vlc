@@ -32,7 +32,7 @@ Here's a shortcut to copy-paste to do a clean build :
 
    make distclean 2>/dev/null ; ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
-      --enable-alsa --enable-mga && make
+      --enable-alsa --enable-mga --enable-gtk && make
 
 
 Installing and running VideoLAN
