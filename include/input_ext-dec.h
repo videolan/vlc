@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.78 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: input_ext-dec.h,v 1.79 2003/03/04 13:21:19 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -211,6 +211,8 @@ struct bit_stream_t
 /*****************************************************************************
  * Prototypes from input_ext-dec.c
  *****************************************************************************/
+VLC_EXPORT( void, input_ExtractPES,        ( decoder_fifo_t *, pes_packet_t ** ) );
+VLC_EXPORT( void, input_DeletePES,         ( input_buffers_t *, pes_packet_t * ) );
 VLC_EXPORT( int, InitBitstream, ( bit_stream_t *, decoder_fifo_t *, void ( * )( bit_stream_t *, vlc_bool_t ), void * p_callback_arg ) );
 VLC_EXPORT( vlc_bool_t, NextDataPacket,    ( decoder_fifo_t *, bit_stream_t * ) );
 VLC_EXPORT( void, BitstreamNextDataPacket, ( bit_stream_t * ) );

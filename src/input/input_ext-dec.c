@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.44 2003/02/26 13:51:36 gbazin Exp $
+ * $Id: input_ext-dec.c,v 1.45 2003/03/04 13:21:19 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,6 +32,55 @@
 #include "input_ext-dec.h"
 #include "input_ext-intf.h"
 #include "input_ext-plugins.h"
+
+/****************************************************************************
+ * input_ExtractPES
+ *****************************************************************************
+ * Extract a PES from the fifo. If pp_pes is NULL then the PES is just
+ * deleted, otherwise *pp_pes will point to this PES.
+ ****************************************************************************/
+void input_ExtractPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )
+{
+    pes_packet_t *p_pes;
+
+    vlc_mutex_lock( &p_fifo->data_lock );
+
+    if( p_fifo->p_first == NULL )
+    {
+        if( p_fifo->b_die )
+        {
+            vlc_mutex_unlock( &p_fifo->data_lock );
+            if( pp_pes ) *pp_pes = NULL;
+            return;
+        }
+
+        /* Signal the input thread we're waiting. This is only
+         * needed in case of slave clock (ES plug-in) but it won't
+         * harm. */
+        vlc_cond_signal( &p_fifo->data_wait );
+
+        /* Wait for the input to tell us when we received a packet. */
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+
+    p_pes = p_fifo->p_first;
+    p_fifo->p_first = p_pes->p_next;
+    p_pes->p_next = NULL;
+    p_fifo->i_depth--;
+
+    if( !p_fifo->p_first )
+    {
+        /* No PES in the FIFO. p_last is no longer valid. */
+        p_fifo->pp_last = &p_fifo->p_first;
+    }
+
+    vlc_mutex_unlock( &p_fifo->data_lock );
+
+    if( pp_pes )
+        *pp_pes = p_pes;
+    else
+        input_DeletePES( p_fifo->p_packets_mgt, p_pes );
+}
 
 /*****************************************************************************
  * InitBitstream: initialize a bit_stream_t structure and returns VLC_SUCCESS

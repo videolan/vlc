@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.39 2003/01/25 03:12:20 fenrir Exp $
+ * $Id: input_ext-plugins.h,v 1.40 2003/03/04 13:21:19 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,8 +58,6 @@ VLC_EXPORT( int,  input_UnselectES,( input_thread_t *, es_descriptor_t * ) );
 decoder_fifo_t * input_RunDecoder( input_thread_t *, es_descriptor_t * );
 void input_EndDecoder( input_thread_t *, es_descriptor_t * );
 VLC_EXPORT( void, input_DecodePES, ( decoder_fifo_t *, pes_packet_t * ) );
-VLC_EXPORT( void, input_ExtractPES, ( decoder_fifo_t *, pes_packet_t ** ) );
-VLC_EXPORT( void, input_FlushPESFifo, ( decoder_fifo_t * ) );
 void input_EscapeDiscontinuity( input_thread_t * );
 void input_EscapeAudioDiscontinuity( input_thread_t * );
 VLC_EXPORT( void, input_NullPacket, ( input_thread_t *, es_descriptor_t * ) );
@@ -91,7 +89,6 @@ VLC_EXPORT( data_packet_t *, input_ShareBuffer, ( input_buffers_t *, data_buffer
 VLC_EXPORT( data_packet_t *, input_NewPacket,   ( input_buffers_t *, size_t ) );
 VLC_EXPORT( void, input_DeletePacket,           ( input_buffers_t *, data_packet_t * ) );
 VLC_EXPORT( pes_packet_t *, input_NewPES, ( input_buffers_t * ) );
-VLC_EXPORT( void, input_DeletePES,        ( input_buffers_t *, pes_packet_t * ) );
 VLC_EXPORT( ssize_t, input_FillBuffer,  ( input_thread_t * ) );
 VLC_EXPORT( ssize_t, input_Peek,        ( input_thread_t *, byte_t **, size_t ) );
 VLC_EXPORT( ssize_t, input_SplitBuffer, ( input_thread_t *, data_packet_t **, size_t ) );
