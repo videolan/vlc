@@ -49,10 +49,17 @@ dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(STRIP, strip, :)
 
+dnl
 dnl Gettext stuff
+dnl
 ALL_LINGUAS="de en_GB fr ja no ru nl pl se"
 AM_GNU_GETTEXT_VERSION(0.10.40)
 AM_GNU_GETTEXT
+if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
+  AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
+  INCLUDES="${INCLUDES} -I\\\$(top_srcdir)/intl"
+fi
+AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
 
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
@@ -2262,6 +2269,7 @@ AC_SUBST(WINDRES)
 AC_SUBST(BCBUILDER)
 AC_SUBST(XPIDL)
 AC_SUBST(LIBEXT)
+AC_SUBST(INCLUDES)
 
 AC_SUBST(CFLAGS_TUNING)
 AC_SUBST(CFLAGS_OPTIM)

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.18 2002/10/04 13:13:54 sam Exp $
+##  $Id: bootstrap,v 1.19 2002/10/16 15:10:38 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -169,26 +169,21 @@ echo "done."
 ###
 set -x
 rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh
+rm -Rf intl
 
 # Check for gettext
 if gettextize --version >/dev/null 2>&1
 then
 if expr `gettextize --version | sed -e '1s/[^0-9]*//' -e q` \
-        '>' 0.11.3 >/dev/null 2>&1
+        '>' 0.11.2 >/dev/null 2>&1
 then
   # We have gettext, and a recent version! Everything is cool.
-  autopoint --force || exit 1
+  autopoint || exit 1
   GETTEXT=yes
 else
-  # What?! User is not using a recent version of gettext? We'll have to
-  # cheat a bit, then.
-  rm -f po/ChangeLog~
-  gettextize --copy --force | grep '^from the' | cut -f3 -d' '
-  test -f po/ChangeLog~ && mv -f po/ChangeLog~ po/ChangeLog
-  # Yuck!
+  # User's gettext is too old. try to continue anyway.
   mkdir -p intl
-  test -f intl/Makefile.am || echo > intl/Makefile.am
-  # Yuck!
+  echo > intl/Makefile.am
   echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' > m4/oldgettext.m4
   GETTEXT=old
 fi;else

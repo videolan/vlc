@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.41 2002/10/15 12:30:00 sam Exp $
+ * $Id: libvlc.c,v 1.42 2002/10/16 15:10:39 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -912,22 +912,36 @@ int VLC_FullScreen( int i_object )
  *****************************************************************************/
 static void SetLanguage ( char const *psz_lang )
 {
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
-#   if defined( HAVE_LOCALE_H ) && defined( HAVE_LC_MESSAGES )
-    if( !setlocale( LC_MESSAGES, psz_lang ) )
-    {
-        fprintf( stderr, "warning: unsupported locale settings\n" );
-    }
+#if defined( ENABLE_NLS ) \
+     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 
-    setlocale( LC_CTYPE, psz_lang );
+#   if defined( HAVE_INCLUDED_GETTEXT ) && !defined( HAVE_LC_MESSAGES )
+    if( *psz_lang )
+    {
+        /* We set LC_ALL manually because it is the only way to set
+         * the language at runtime under eg. Windows. Beware that this
+         * makes the environment unconsistent when libvlc is unloaded and
+         * should probably be moved to a safer place like vlc.c. */
+        static char psz_lcall[20];
+        snprintf( psz_lcall, 19, "LC_ALL=%s", psz_lang );
+        psz_lcall[19] = '\0';
+        putenv( psz_lcall );
+    }
 #   endif
 
+#   if defined( HAVE_LC_MESSAGES )
+    setlocale( LC_MESSAGES, psz_lang );
+#   endif
+    setlocale( LC_CTYPE, psz_lang );
+
+    /* Specify where to find the locales for current domain */
     if( !bindtextdomain( PACKAGE, LOCALEDIR ) )
     {
         fprintf( stderr, "warning: no domain %s in directory %s\n",
                  PACKAGE, LOCALEDIR );
     }
 
+    /* Set the default domain */
     textdomain( PACKAGE );
 #endif
 }

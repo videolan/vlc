@@ -225,7 +225,7 @@ endif
 
 # These dependencies are mandatory
 $(SOURCES): include/vlc_symbols.h
-$(SOURCES_libvlc): src/misc/modules_plugin.h src/misc/modules_builtin.h
+$(SOURCES_libvlc): src/misc/modules_plugin.h src/misc/modules_builtin.h $(LIB_intl)
 
 ###############################################################################
 # Optional getopt
@@ -239,6 +239,17 @@ EXTRA_DIST += \
 
 if BUILD_GETOPT
 SOURCES_libgetopt = extras/GNUgetopt/getopt.c extras/GNUgetopt/getopt1.c
+endif
+
+###############################################################################
+# Optional libintl - FIXME, bad dependencies
+###############################################################################
+
+intl/libintl.a: FORCE
+	cd intl && $(MAKE)
+
+if BUILD_INTL
+LIB_intl = intl/libintl.a
 endif
 
 ###############################################################################
@@ -354,12 +365,13 @@ vlc_SOURCES = src/vlc.c $(SOURCES_libgetopt)
 # @AUTOMAKE_SUCKS@ gets expanded to $(L_builtin) $(LDFLAGS_builtin)
 # but we don't write it directly, otherwise automake will go amok and eat all
 # the memory because of its 2^N crap algorithm. So we fool him. Nuahaha.
-vlc_LDADD = lib/libvlc.a $(LDFLAGS_vlc) $(DATA_win32_rc) @AUTOMAKE_SUCKS@
+vlc_LDADD = lib/libvlc.a $(LDFLAGS_vlc) \
+            $(DATA_win32_rc) $(LIB_intl) @AUTOMAKE_SUCKS@
 vlc_CFLAGS = $(CPPFLAGS_default) $(CFLAGS_default)
 
 # We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
 # old automake-1.5 bug (automake/279).
-DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin) $(DATA_win32_rc)
+DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin) $(DATA_win32_rc) $(LIB_intl)
 
 vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
@@ -459,3 +471,7 @@ libvlcdir = $(libdir)/vlc
 
 include Modules.am
 
+###############################################################################
+# Force rule
+###############################################################################
+FORCE:
