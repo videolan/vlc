@@ -1032,8 +1032,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 
             if( pid->es->p_pes )
             {
-                block_ChainRelease( pid->es->p_pes );
-                pid->es->p_pes = NULL;
+                pid->es->p_pes->i_flags |= BLOCK_FLAG_DISCONTINUITY;
             }
         }
     }
