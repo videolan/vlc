@@ -129,7 +129,7 @@ static int Demux( demux_t *p_demux )
         return -1;
     }
 
-    b_play = FindItem( p_demux, p_playlist, p_parent );
+    b_play = FindItem( p_demux, p_playlist, &p_parent );
     p_parent->input.i_type = ITEM_TYPE_PLAYLIST;
 
     /* Change the item to a node */
