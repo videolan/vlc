@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.63 2003/01/19 03:16:24 sam Exp $
+ * $Id: modules.h,v 1.64 2003/10/04 11:17:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,10 +30,16 @@
 #define MODULE_SHORTCUT_MAX 10
 
 /* The module handle type. */
-#ifdef SYS_BEOS
-typedef int     module_handle_t;
-#else
-typedef void *  module_handle_t;
+#if defined(HAVE_DL_DYLD)
+typedef NSModule module_handle_t;
+#elif defined(HAVE_IMAGE_H)
+typedef int module_handle_t;
+#elif defined(WIN32) || defined(UNDER_CE)
+typedef void * module_handle_t;
+#elif defined(HAVE_DL_DLOPEN)
+typedef void * module_handle_t;
+#elif defined(HAVE_DL_SHL_LOAD)
+typedef shl_t module_handle_t;
 #endif
 
 /*****************************************************************************

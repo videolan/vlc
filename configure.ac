@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.81 2003/10/04 10:54:45 gbazin Exp $
+dnl $Id: configure.ac,v 1.82 2003/10/04 11:17:04 sam Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -348,9 +348,6 @@ AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 
 if test "${SYS}" != "mingw32"; then
 AC_TYPE_SIGNAL
-AC_CHECK_LIB(dl,dlopen,[
-  AX_ADD_LDFLAGS([vlc],[-ldl])
-])
 AC_CHECK_LIB(m,cos,[
   AX_ADD_LDFLAGS([imdct adjust distort a52tofloat32],[-lm])
 ])
@@ -361,6 +358,69 @@ AC_CHECK_LIB(m,sqrt,[
   AX_ADD_LDFLAGS([headphone_channel_mixer],[-lm])
 ])
 fi # end "${SYS}" != "mingw32"
+
+dnl Check for dynamic plugins
+ac_cv_have_plugins=no
+
+# OS X style
+AC_CHECK_HEADERS(mach-o/dyld.h,
+  [AC_CHECK_FUNCS(NSLinkModule,
+    [AC_DEFINE(HAVE_DL_DYLD, 1, [Define if you have the Darwin dyld API])
+     ac_cv_have_plugins=yes])])
+
+# HP-UX style
+if test "${ac_cv_have_plugins}" = "no"; then
+  AC_CHECK_HEADERS(dl.h)
+  ac_cv_my_have_shl_load=no
+  AC_CHECK_FUNC(shl_load,
+   [ac_cv_my_have_shl_load=yes,
+    AC_CHECK_LIB(dld, shl_load,
+     [ac_cv_my_have_shl_load=yes
+      AX_ADD_LDFLAGS([vlc],[-ldld])])])
+  if test "${ac_cv_my_have_shl_load}" = "yes"; then
+    AC_DEFINE(HAVE_DL_SHL_LOAD, 1, [Define if you have the shl_load API])
+    ac_cv_have_plugins=yes
+  fi
+fi
+
+# Whatever style
+if test "${ac_cv_have_plugins}" = "no"; then
+  AC_CHECK_LIB(dld, dld_link,
+   [AX_ADD_LDFLAGS([vlc],[-ldld])
+    AC_DEFINE(HAVE_DL_DLD_LINK, 1, [Define if you have the GNU dld library])
+    ac_cv_have_plugins=yes])
+fi
+
+# Win32 style
+if test "${ac_cv_have_plugins}" = "no"; then
+  AC_CHECK_LIB(kernel32, main,
+   [AX_ADD_LDFLAGS([vlc],[-lkernel32])
+    ac_cv_have_plugins=yes])
+fi
+
+# BeOS style
+if test "${ac_cv_have_plugins}" = "no"; then
+  AC_CHECK_HEADERS(image.h,
+   [ac_cv_have_plugins=yes])
+fi
+
+# Only test for dlopen() if the others didn't work
+if test "${ac_cv_have_plugins}" = "no"; then
+  AC_CHECK_HEADERS(dlfcn.h sys/dl.h)
+  ac_cv_my_have_dlopen=no
+  AC_CHECK_FUNC(dlopen,
+    ac_cv_my_have_dlopen=yes,
+    AC_CHECK_LIB(dl, dlopen,
+      ac_cv_my_have_dlopen=yes
+      AX_ADD_LDFLAGS([vlc],[-ldl]),
+      AC_CHECK_LIB(svld, dlopen,
+        ac_cv_my_have_dlopen=yes
+        AX_ADD_LDFLAGS([vlc],[-lsvld]))))
+  if test "${ac_cv_my_have_dlopen}" = "yes"; then
+    AC_DEFINE(HAVE_DL_DLOPEN, 1, [Define if you have the dlopen API])
+    ac_cv_have_plugins=yes
+  fi
+fi
 
 if test "${SYS}" != "mingw32"; then
 dnl Check for pthreads - borrowed from XMMS
@@ -467,7 +527,6 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
 dnl Check for headers
 AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h getopt.h strings.h inttypes.h sys/int_types.h wchar.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
-AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
 if test "${SYS}" != "mingw32"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
@@ -3191,7 +3250,7 @@ AC_ARG_ENABLE(plugins,
 dnl Automagically disable plugins if there is no system support for
 dnl dynamically loadable files (.so, .dll, .dylib).
 dnl don't forget vlc-win32 still can load .dll as plugins
-if test "${ac_cv_header_dlfcn_h}" = "no" -a "${ac_cv_header_image_h}" = "no" -a "${SYS}" != "mingw32"
+if test "${ac_cv_have_plugins}" = "no"
 then
   echo "*** Your system doesn't have plugin support. All plugins will be built"
   echo "statically."

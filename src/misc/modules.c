@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.133 2003/09/26 11:30:06 gbazin Exp $
+ * $Id: modules.c,v 1.134 2003/10/04 11:17:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -53,16 +53,26 @@
 #   include <unistd.h>
 #endif
 
-#if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
-#   include <dlfcn.h>                        /* dlopen(), dlsym(), dlclose() */
-#   define HAVE_DYNAMIC_PLUGINS
-#elif defined(HAVE_IMAGE_H)                                          /* BeOS */
+#define HAVE_DYNAMIC_PLUGINS
+#if defined (HAVE_MACH_O_DYLD_H)
+#   include <mach-o/dyld.h>
+#elif defined (HAVE_IMAGE_H)                                         /* BeOS */
 #   include <image.h>
-#   define HAVE_DYNAMIC_PLUGINS
-#elif defined(UNDER_CE)
-#   define HAVE_DYNAMIC_PLUGINS
-#elif defined(WIN32)
-#   define HAVE_DYNAMIC_PLUGINS
+#elif defined (UNDER_CE)
+#   include <windows.h>
+#elif defined (WIN32)
+#   include <windows.h>
+#elif defined (HAVE_DL_DLOPEN)
+#   if defined (HAVE_DLFCN_H)                            /* Linux, BSD, Hurd */
+#       include <dlfcn.h>
+#   endif
+#   if defined (HAVE_SYS_DL_H)
+#       include <sys/dl.h>
+#   endif
+#elif defined (HAVE_DL_SHL_LOAD)
+#   if defined (HAVE_DL_H)
+#       include <dl.h>
+#   endif
 #else
 #   undef HAVE_DYNAMIC_PLUGINS
 #endif
