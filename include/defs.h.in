@@ -181,6 +181,9 @@
 /* Define if <pthread.h> defines boolean_t. */
 #undef BOOLEAN_T_IN_PTHREAD_H
 
+/* Define if <cthreads.h> defines boolean_t. */
+#undef BOOLEAN_T_IN_CTHREADS_H
+
 /* Define if <sys/dvdio.h> defines dvd_struct. */
 #undef DVD_STRUCT_IN_SYS_DVDIO_H
 

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.37 2001/07/30 00:53:04 sam Exp $
+ * $Id: common.h,v 1.38 2001/08/14 04:52:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -41,6 +41,8 @@ typedef u8                  byte_t;
 #   include <sys/types.h>
 #elif defined(BOOLEAN_T_IN_PTHREAD_H)
 #   include <pthread.h>
+#elif defined(BOOLEAN_T_IN_CTHREADS_H)
+#   include <cthreads.h>
 #else
 typedef int                 boolean_t;
 #endif

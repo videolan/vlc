@@ -78,18 +78,24 @@ CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
 CFLAGS="${CFLAGS} -I/usr/local/include"
 
 dnl Check for pthreads - borrowed from XMMS
-PTHREAD_LIBS=error
-AC_CHECK_LIB(pthread,pthread_attr_init,THREAD_LIB="-lpthread")
-if test "x${THREAD_LIB}" = xerror; then
-  AC_CHECK_LIB(pthreads,pthread_attr_init,THREAD_LIB="-lpthreads")
-fi
-if test "x${THREAD_LIB}" = xerror; then
-  AC_CHECK_LIB(c_r,pthread_attr_init,THREAD_LIB="-lc_r")
-fi
-if test "x${THREAD_LIB}" = xerror; then
-  THREAD_LIBS=""
-  AC_CHECK_FUNC(pthread_attr_init)
-fi
+AC_CHECK_FUNC(pthread_attr_init,,[
+  THREAD_LIB=error
+  if test "x${THREAD_LIB}" = xerror; then
+    AC_CHECK_LIB(pthread,pthread_attr_init,THREAD_LIB="-lpthread")
+  fi
+  if test "x${THREAD_LIB}" = xerror; then
+    AC_CHECK_LIB(pthreads,pthread_attr_init,THREAD_LIB="-lpthreads")
+  fi
+  if test "x${THREAD_LIB}" = xerror; then
+    AC_CHECK_LIB(c_r,pthread_attr_init,THREAD_LIB="-lc_r")
+  fi
+  if test "x${THREAD_LIB}" = xerror; then
+    THREAD_LIB=""
+  fi
+])
+
+dnl Check for cthreads under GNU/Hurd for instance
+AC_CHECK_LIB(threads,cthread_fork,THREAD_LIB="-lthreads")
 
 dnl Check for misc headers
 AC_EGREP_HEADER(pthread_cond_t,pthread.h,[
@@ -173,6 +179,11 @@ AC_MSG_CHECKING([for boolean_t in pthread.h])
 AC_TRY_COMPILE([#include <pthread.h>
 void quux() { boolean_t foo; }],,
  AC_DEFINE(BOOLEAN_T_IN_PTHREAD_H, 1, Define if <pthread.h> defines boolean_t.)
+ AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+AC_MSG_CHECKING([for boolean_t in cthreads.h])
+AC_TRY_COMPILE([#include <cthreads.h>
+void quux() { boolean_t foo; }],,
+ AC_DEFINE(BOOLEAN_T_IN_CTHREADS_H, 1, Define if <cthreads.h> defines boolean_t.)
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Checks for typedefs, structures, and compiler characteristics.

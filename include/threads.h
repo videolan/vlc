@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.22 2001/07/31 21:13:30 gbazin Exp $
+ * $Id: threads.h,v 1.23 2001/08/14 04:52:39 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -387,6 +387,9 @@ static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )    
     return pthread_mutex_destroy( p_mutex );
 
+#elif defined( HAVE_CTHREADS_H )
+    return 0;
+
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex->init == 9999 )
     {
@@ -680,6 +683,9 @@ static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_destroy( p_condvar );
+
+#elif defined( HAVE_CTHREADS_H )
+    return 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_condvar->init = 0;

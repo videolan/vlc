@@ -4,6 +4,7 @@
 
 HEAD
 
+  * GNU/Hurd configuration and compilation fixes.
   * Fixed a crash in subtitle rendering.
   * Activated old crappy subtitle rendering in overlay mode (ugly but
     probably better than having no subtitles at all).
