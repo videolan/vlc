@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.2 2002/08/17 08:46:46 tcastley Exp $
+ * $Id: AudioOutput.cpp,v 1.3 2002/08/19 11:51:03 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -82,7 +82,9 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
         msg_Err( p_aout, "out of memory" );
         return( 1 );
     }
-
+    p_aout->output.pf_setformat = SetFormat;
+    p_sys->p_format = (gs_audio_format *)malloc( sizeof( struct gs_audio_format));
+    SetFormat(p_aout);
     /* Allocate BPushGameSound */
     p_sys->p_sound = new BPushGameSound( 8192,
                                          p_sys->p_format,
