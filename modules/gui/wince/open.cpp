@@ -114,10 +114,8 @@ LRESULT OpenDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         memset( &mbi, 0, sizeof(SHMENUBARINFO) );
         mbi.cbSize     = sizeof(SHMENUBARINFO);
         mbi.hwndParent = hwnd;
-        mbi.nToolBarId = IDR_DUMMYMENU;
+        mbi.dwFlags    = SHCMBF_EMPTYBAR;
         mbi.hInstRes   = hInst;
-        mbi.nBmpId     = 0;
-        mbi.cBmpImages = 0;  
 
         if( !SHCreateMenuBar( &mbi ) )
         {
@@ -599,8 +597,11 @@ void OpenDialog::OnOk()
 {
     TCHAR psz_text[2048];
 
-    GetWindowText( mrl_combo, psz_text, 2048 ); // replace by ComboBox_GetText( mrl_combo, wUnicode, size )
-    mrl = SeparateEntries( psz_text );
+    GetWindowText( mrl_combo, psz_text, 2048 );
+
+    int i_args;
+    char **pp_args = vlc_parse_cmdline( _TOMB(psz_text), &i_args );
+
     ComboBox_AddString( mrl_combo, psz_text );
     if( ComboBox_GetCount( mrl_combo ) > 10 ) 
         ComboBox_DeleteString( mrl_combo, 0 );
@@ -612,18 +613,16 @@ void OpenDialog::OnOk()
                                        FIND_ANYWHERE );
     if( p_playlist == NULL ) return;
 
-    for( int i = 0; i < (int)mrl.size(); i++ )
+    for( int i = 0; i < i_args; i++ )
     {
         vlc_bool_t b_start = !i && i_open_arg;
         playlist_item_t *p_item =
-            playlist_ItemNew( p_intf, (const char*)mrl[i].c_str(),
-                              (const char *)mrl[i].c_str() );
+            playlist_ItemNew( p_intf, pp_args[i], pp_args[i] );
 
         /* Insert options */
-        while( i + 1 < (int)mrl.size() &&
-               ((const char *)mrl[i + 1].c_str())[0] == ':' )
+        while( i + 1 < i_args && pp_args[i + 1][0] == ':' )
         {
-            playlist_ItemAddOption( p_item, mrl[i + 1].c_str() );
+            playlist_ItemAddOption( p_item, pp_args[i + 1] );
             i++;
         }
 
@@ -648,6 +647,11 @@ void OpenDialog::OnOk()
 
     //TogglePlayButton( PLAYING_S );
 
+    while( i_args-- )
+    {
+        free( pp_args[i_args] );
+        if( !i_args ) free( pp_args );
+    }
     vlc_object_release( p_playlist );
 }
 
@@ -811,70 +815,4 @@ void OpenDialog::OnSubsFileSettings( HWND hwnd )
         subsfile_mrl.push_back( subsfile_dialog->subsfile_mrl[i] );
 
     delete subsfile_dialog;
-}
-
-/*****************************************************************************
- * Utility functions.
- *****************************************************************************/
-vector<string> SeparateEntries( TCHAR *entries )
-{
-    vlc_bool_t b_quotes_mode = VLC_FALSE;
-    vector<string> entries_array;
-    TCHAR *entry = new TCHAR[ _tcslen(entries) + 1 ];
-    TCHAR *strToken = entries;
-    int length = _tcscspn( strToken, _T(" \t\r\n\"") );
-    *entry = 0;
-
-    while( strToken - entries < _tcslen(entries) )
-    { 
-        _tcsncat( entry, strToken, length );
-
-        _tcsncat( entry, strToken + length, 1 );
-
-        if( !b_quotes_mode && strToken[length] == _T('\"') )
-        {
-            /* Enters quotes mode */
-            entry[ _tcslen(entry) - 1 ] = 0;
-            b_quotes_mode = VLC_TRUE;
-        }
-        else if( b_quotes_mode && strToken[length] == _T('\"') )
-        {
-            /* Finished the quotes mode */
-            entry[ _tcslen(entry) - 1 ] = 0;
-            if( _tcscmp( entry, _T("") ) != 0 )
-            {
-                entries_array.push_back( _TOMB(entry) );
-            }
-            *entry = 0;
-            b_quotes_mode = VLC_FALSE;
-        }
-        else if( !b_quotes_mode && strToken[length] != _T('\"') )
-        {
-            /* we found a non-quoted standalone string */
-            if( strToken + length - entries < _tcslen(entries) ||/*token.HasMoreTokens() ||*/ //FIX ME IF YOU CAN
-                strToken[length] == _T(' ') ||
-                strToken[length] == _T('\t') ||
-                strToken[length] == _T('\r') ||
-                strToken[length] == _T('\n') )
-              entry[ _tcslen(entry) - 1 ]/*strToken[length]*/ = 0;
-            if( _tcscmp( entry, _T("") ) != 0 )
-            {
-                entries_array.push_back( _TOMB(entry) );
-            }
-            *entry = 0;
-        }
-        else
-        {;}
-
-        strToken += length + 1;
-        length = _tcscspn( strToken, _T(" \t\r\n\"") );
-    }
-
-    if( _tcscmp( entry, _T("") ) != 0 )
-    {
-        entries_array.push_back( _TOMB(entry) );
-    }
-
-    delete [] entry;
-    return entries_array;
 }

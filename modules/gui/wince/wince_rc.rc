@@ -24,15 +24,6 @@
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#if defined(_WIN32) && !defined(_WIN32_WCE)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
 //
 // Menubar
 //
@@ -69,31 +60,15 @@ IDR_MENUBAR2 MENU DISCARDABLE
 BEGIN
     POPUP "Manage"
     BEGIN
-        MENUITEM "&Simple Add...",              ID_MANAGE_SIMPLEADD
-        MENUITEM "&Add MRL...",                 40106
-        MENUITEM SEPARATOR
-        MENUITEM "&Open Playlist...",           ID_MANAGE_OPENPL
-        MENUITEM "&Save Playlist...",           ID_MANAGE_SAVEPL
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
     POPUP "Sort"
     BEGIN
-        MENUITEM "Sort by &title",              ID_SORT_TITLE
-        MENUITEM "&Reverse sort by title",      ID_SORT_RTITLE
-        MENUITEM SEPARATOR
-        MENUITEM "Sort by &author",             ID_SORT_AUTHOR
-        MENUITEM "Reverse sort by author",      ID_SORT_RAUTHOR
-        MENUITEM SEPARATOR
-        MENUITEM "&Shuffle Playlist",           ID_SORT_SHUFFLE
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
     POPUP "Selection"
     BEGIN
-        MENUITEM "&Enable",                     ID_SEL_ENABLE
-        MENUITEM "&Disable",                    ID_SEL_DISABLE
-        MENUITEM SEPARATOR
-        MENUITEM "&Invert",                     ID_SEL_INVERT
-        MENUITEM "D&elete",                     ID_SEL_DELETE
-        MENUITEM SEPARATOR
-        MENUITEM "&Select All",                 ID_SEL_SELECTALL
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
 END
 
@@ -122,7 +97,7 @@ END
 
 IDR_MENUBAR2 RCDATA DISCARDABLE 
 BEGIN
-    IDR_MENUBAR2, 4,
+    IDR_MENUBAR2, 3,
     I_IMAGENONE, IDM_MANAGE, TBSTATE_ENABLED, 
     TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE, IDM_MANAGE, IDM_MANAGE, 0,
     I_IMAGENONE, IDM_SORT, TBSTATE_ENABLED, 
@@ -136,77 +111,21 @@ END
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE DISCARDABLE
 BEGIN
     IDM_FILE                "File"
     IDM_VIEW                "View"
     IDM_SETTINGS            "Settings"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
     IDM_AUDIO               "Audio"
     IDM_VIDEO               "Video"
     IDM_NAVIGATION          "Navigation"
 END
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE DISCARDABLE
 BEGIN
     IDM_MANAGE              "Manage"
     IDM_SORT                "Sort"
     IDM_SEL                 "Selection"
-    ID_SORT_AUTHOR          "A"
-    ID_SORT_SHUFFLE         "S"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    ID_SEL_INVERT           "I"
-    ID_SEL_DELETE           "E"
-    ID_SEL_SELECTALL        "S"
-    ID_SEL_ENABLE           "E"
-    ID_SEL_DISABLE          "D"
-    ID_SORT_TITLE           "T"
-    ID_SORT_RTITLE          "R"
-    ID_MANAGE_SIMPLEADD     "S"
-    ID_MANAGE_OPENPL        "O"
-    ID_MANAGE_ADDMRL        "A"
-    ID_MANAGE_SAVEPL        "S"
-END
-
-#endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// French (France) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
-#if defined(_WIN32) && !defined(_WIN32_WCE)
-LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
-#pragma code_page(1252)
-#endif //_WIN32
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menubar
-//
-
-IDR_DUMMYMENU MENU DISCARDABLE 
-BEGIN
-    MENUITEM "",                            ID_MENUITEM40108
-END
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Data
-//
-
-IDR_DUMMYMENU RCDATA DISCARDABLE 
-BEGIN
-    IDR_DUMMYMENU, 1,
-    I_IMAGENONE, ID_MENUITEM40108, TBSTATE_ENABLED, TBSTYLE_AUTOSIZE, 
-    IDS_CAP_MENUITEM40109, 0, 0
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -236,68 +155,3 @@ IDB_BITMAP1             BITMAP  DISCARDABLE     "bitmaps\\toolbar1.bmp"
 IDB_BITMAP2             BITMAP  DISCARDABLE     "bitmaps\\toolbar2.bmp"
 IDB_BITMAP3             BITMAP  DISCARDABLE     "bitmaps\\toolbar3.bmp"
 #endif
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_TITLE               "VLC Media PLayer"
-    IDS_CLASSNAME           "wince"
-    IDS_CAP_VIEW            "View"
-    IDS_CAP_SETTINGS        "Settings"
-    IDS_CAP_AUDIO           "Audio"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_CAP_VIDEO           "Video"
-    IDS_CAP_Navigation      "Navigation"
-    IDS_CAP_FILE            "File"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDM_AUDIO               "Audio"
-    IDM_VIDEO               "Video"
-    IDM_NAVIGATION          "Navigation"
-    ID_FILE_QUICK_OPEN      "O"
-    ID_FILE_OPENFILE        "F"
-    ID_FILE_QUICKOPEN       "O"
-    ID_FILE_OPENNETWORKSTREAM "N"
-    ID_FILE_OPENNET         "N"
-    ID_FILE_EXIT            "X"
-    ID_VIEW_PLAYLIST        "P"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    StopStream_Event        "StopStream_Event"
-    PlayStream_Event        "PlayStream_Event"
-    PrevStream_Event        "SlowStream_Event"
-    NextStream_Event        "NextStream_Event"
-    SlowStream_Event        "SlowStream_Event"
-    FastStream_Event        "FastStream_Event"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    ID_VIEW_MESSAGES        "M"
-    ID_VIEW_MEDIAINFO       "S"
-    ID_VIEW_STREAMINFO      "S"
-    IDS_CAP_NAV             "Navigation"
-    ID_SETTINGS_PREF        "P"
-    ID_SETTINGS_EXTEND      "E"
-END
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDM_FILE                "File"
-    IDM_VIEW                "View"
-    IDM_SETTINGS            "Settings"
-END
-
-#endif    // French (France) resources
-/////////////////////////////////////////////////////////////////////////////

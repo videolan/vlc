@@ -46,8 +46,6 @@
 #include <vector>
 using namespace std; 
 
-vector<string> SeparateEntries( TCHAR *entries );
-
 class MenuItemExt;
 class VideoWindow;
 
@@ -107,7 +105,7 @@ protected:
    HWND            hwndCB;              // The command bar handle
 
    HINSTANCE       GetInstance () const { return hInst; }
-   virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM ) = 0;
+   virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM ) {};
 };
 
 class FileInfo;
@@ -385,7 +383,7 @@ protected:
 
     void OnOpen();
     void OnSave();
-    void OnAddFile();
+    void OnAddFile( vlc_bool_t );
     void OnAddMRL();
 
     void OnDeleteSelection();
@@ -676,11 +674,12 @@ extern "C" {
 #define ID_SEL_DISABLE                  40101
 #define ID_SORT_TITLE                   40102
 #define ID_SORT_RTITLE                  40103
-#define ID_MANAGE_SIMPLEADD             40104
-#define ID_MANAGE_OPENPL                40105
+#define ID_MANAGE_ADDFILE               40104
+#define ID_MANAGE_ADDDIRECTORY          40105
 #define ID_MANAGE_ADDMRL                40106
-#define ID_MANAGE_SAVEPL                40107
-#define ID_MENUITEM40108                40108
+#define ID_MANAGE_OPENPL                40107
+#define ID_MANAGE_SAVEPL                40108
+#define ID_MENUITEM40108                40109
 #define IDS_CAP_MENUITEM40109           40110
 #define IDS_STOP                        57601
 #define StopStream_Event                57601

@@ -52,7 +52,6 @@
 #define BUTTONWIDTH   0    // Width of the button images in the toolbar
 #define BUTTONHEIGHT  0    // Height of the button images in the toolbar
 #define ID_TOOLBAR    2000 // Identifier of the main tool bar
-#define dwTBFontStyle TBSTYLE_BUTTON | TBSTYLE_CHECK | TBSTYLE_GROUP // style for toolbar buttons
 
 enum      
 {
@@ -71,7 +70,7 @@ enum
 // Help strings
 #define HELP_OPENPL _T("Open playlist")
 #define HELP_SAVEPL _T("Save playlist")
-#define HELP_SIMPLEADD _T("Simple Add")
+#define HELP_ADDFILE _T("Add File")
 #define HELP_ADDMRL _T("Add MRL")
 #define HELP_DELETE _T("Delete selection")
 #define HELP_INFOS _T("Item info")
@@ -82,12 +81,12 @@ enum
 #define HELP_REPEAT _T("Repeat one")
 
 // The TBBUTTON structure contains information the toolbar buttons.
-static TBBUTTON tbButton2[] =      
+static TBBUTTON tbButton2[] =
 {
   {0, ID_MANAGE_OPENPL,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
   {1, ID_MANAGE_SAVEPL,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
   {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
-  {2, ID_MANAGE_SIMPLEADD,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
+  {2, ID_MANAGE_ADDFILE,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
   {3, ID_MANAGE_ADDMRL,        TBSTATE_ENABLED, TBSTYLE_BUTTON},
   {4, ID_SEL_DELETE,       TBSTATE_ENABLED, TBSTYLE_BUTTON},
   {0, 0,              TBSTATE_ENABLED, TBSTYLE_SEP},
@@ -106,7 +105,7 @@ TCHAR * szToolTips2[] =
 {
     HELP_OPENPL,
     HELP_SAVEPL,
-    HELP_SIMPLEADD,
+    HELP_ADDFILE,
     HELP_ADDMRL,
     HELP_DELETE,
     HELP_INFOS,
@@ -139,6 +138,104 @@ Playlist::Playlist( intf_thread_t *_p_intf, HINSTANCE _hInst )
 
 /***********************************************************************
 FUNCTION: 
+  CreateMenuBar
+
+PURPOSE: 
+  Creates a menu bar.
+***********************************************************************/
+static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
+{
+#ifdef UNDER_CE
+    SHMENUBARINFO mbi;
+    memset( &mbi, 0, sizeof(SHMENUBARINFO) );
+    mbi.cbSize     = sizeof(SHMENUBARINFO);
+    mbi.hwndParent = hwnd;
+    mbi.hInstRes   = hInst;
+    mbi.nToolBarId = IDR_MENUBAR2;
+
+    if( !SHCreateMenuBar( &mbi ) )
+    {
+        MessageBox(hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK);
+        return 0;
+    }
+
+    TBBUTTONINFO tbbi;
+    tbbi.cbSize = sizeof(tbbi);
+    tbbi.dwMask = TBIF_LPARAM;
+
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_MANAGE, (LPARAM)&tbbi );
+    HMENU hmenu_file = (HMENU)tbbi.lParam;
+    RemoveMenu( hmenu_file, 0, MF_BYPOSITION );
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_SORT, (LPARAM)&tbbi );
+    HMENU hmenu_sort = (HMENU)tbbi.lParam;
+    RemoveMenu( hmenu_sort, 0, MF_BYPOSITION );
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_SEL, (LPARAM)&tbbi );
+    HMENU hmenu_sel = (HMENU)tbbi.lParam;
+    RemoveMenu( hmenu_sel, 0, MF_BYPOSITION );
+
+#else
+    HMENU hmenu_file = CreatePopupMenu();
+    HMENU hmenu_sort = CreatePopupMenu();
+    HMENU hmenu_sel = CreatePopupMenu();
+#endif
+
+    AppendMenu( hmenu_file, MF_STRING, ID_MANAGE_ADDFILE,
+                _T("&Add File...") );
+    AppendMenu( hmenu_file, MF_STRING, ID_MANAGE_ADDDIRECTORY,
+                _T("Add Directory...") );
+    AppendMenu( hmenu_file, MF_STRING, ID_MANAGE_ADDMRL,
+                _T("Add MRL...") );
+    AppendMenu( hmenu_file, MF_SEPARATOR, 0, 0 );
+    AppendMenu( hmenu_file, MF_STRING, ID_MANAGE_OPENPL,
+                _T("Open &Playlist") );
+    AppendMenu( hmenu_file, MF_STRING, ID_MANAGE_SAVEPL,
+                _T("Save Playlist") );
+
+    AppendMenu( hmenu_sort, MF_STRING, ID_SORT_TITLE,
+                _T("Sort by &title") );
+    AppendMenu( hmenu_sort, MF_STRING, ID_SORT_RTITLE,
+                _T("&Reverse sort by title") );
+    AppendMenu( hmenu_sort, MF_SEPARATOR, 0, 0 );
+    AppendMenu( hmenu_sort, MF_STRING, ID_SORT_AUTHOR,
+                _T("Sort by &author") );
+    AppendMenu( hmenu_sort, MF_STRING, ID_SORT_RAUTHOR,
+                _T("Reverse sort by &author") );
+    AppendMenu( hmenu_sort, MF_SEPARATOR, 0, 0 );
+    AppendMenu( hmenu_sort, MF_STRING, ID_SORT_SHUFFLE,
+                _T("&Shuffle Playlist") );
+
+    AppendMenu( hmenu_sel, MF_STRING, ID_SEL_ENABLE,
+                _T("&Enable") );
+    AppendMenu( hmenu_sel, MF_STRING, ID_SEL_DISABLE,
+                _T("&Disable") );
+    AppendMenu( hmenu_sel, MF_SEPARATOR, 0, 0 );
+    AppendMenu( hmenu_sel, MF_STRING, ID_SEL_INVERT,
+                _T("&Invert") );
+    AppendMenu( hmenu_sel, MF_STRING, ID_SEL_DELETE,
+                _T("D&elete") );
+    AppendMenu( hmenu_sel, MF_SEPARATOR, 0, 0 );
+    AppendMenu( hmenu_sel, MF_STRING, ID_SEL_SELECTALL,
+                _T("&Select All") );
+
+
+#ifdef UNDER_CE
+    return mbi.hwndMB;
+
+#else
+    HMENU hmenu = CreateMenu();
+
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_file, _T("Manage") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_sort, _T("Sort") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_sel, _T("Selection") );
+
+    SetMenu( hwnd, hmenu );
+    return hwnd;
+
+#endif
+}
+
+/***********************************************************************
+FUNCTION: 
   WndProc
 
 PURPOSE: 
@@ -164,23 +261,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         shidi.hDlg = hwnd;
         SHInitDialog( &shidi );
 
-        //Create the menubar.
-        memset( &mbi, 0, sizeof (SHMENUBARINFO) );
-        mbi.cbSize     = sizeof (SHMENUBARINFO);
-        mbi.hwndParent = hwnd;
-        mbi.dwFlags    = SHCMBF_HMENU;
-        mbi.nToolBarId = IDR_MENUBAR2;
-        mbi.hInstRes   = hInst;
-        mbi.nBmpId     = 0;
-        mbi.cBmpImages = 0;  
-
-        if( !SHCreateMenuBar(&mbi) )
-        {
-            MessageBox(hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK);
-            //return -1;
-        }
-
-        hwndCB = mbi.hwndMB;
+        hwndCB = CreateMenuBar( hwnd, hInst );
 
         iccex.dwSize = sizeof (INITCOMMONCONTROLSEX);
         iccex.dwICC = ICC_BAR_CLASSES;
@@ -285,9 +366,16 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             break;
 
-        case ID_MANAGE_SIMPLEADD:
+        case ID_MANAGE_ADDFILE:
             SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
-            OnAddFile();
+            OnAddFile( VLC_FALSE );
+            SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
+            b_need_update = VLC_TRUE;
+            break;
+
+        case ID_MANAGE_ADDDIRECTORY:
+            SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
+            OnAddFile( VLC_TRUE );
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
             break;
@@ -393,6 +481,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         default:
             break;
         }
+        break;
 
     case WM_NOTIFY:
         if( ( ((LPNMHDR)lp)->hwndFrom == hListView ) &&
@@ -708,16 +797,12 @@ void Playlist::OnSave()
     }
 }
 
-void Playlist::OnAddFile()
+void Playlist::OnAddFile( vlc_bool_t b_directory )
 {
     // Same code as in Interface
     OPENFILENAME ofn;
     TCHAR DateiName[80+1] = _T("\0");
     static TCHAR szFilter[] = _T("All (*.*)\0*.*\0");
-
-    playlist_t *p_playlist = (playlist_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-    if( p_playlist == NULL ) return;
 
     memset( &ofn, 0, sizeof(OPENFILENAME) );
     ofn.lStructSize = sizeof(OPENFILENAME);
@@ -732,7 +817,7 @@ void Playlist::OnAddFile()
     ofn.lpstrFileTitle = NULL; 
     ofn.nMaxFileTitle = 40;
     ofn.lpstrInitialDir = NULL;
-    ofn.lpstrTitle = _T("Quick Open File");
+    ofn.lpstrTitle = _T("Add File");
     ofn.Flags = 0; 
     ofn.nFileOffset = 0;
     ofn.nFileExtension = 0;
@@ -741,16 +826,23 @@ void Playlist::OnAddFile()
     ofn.lpfnHook = NULL;
     ofn.lpTemplateName = NULL;
 
+#if 0//def UNDER_CE
+    if( b_directory ) ofn.Flags |= OFN_PROJECT;
+#endif
+
     SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
 
     if( GetOpenFileName( (LPOPENFILENAME)&ofn ) )
     {
+        playlist_t *p_playlist = (playlist_t *)
+	    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+	if( p_playlist == NULL ) return;
+
         char *psz_filename = _TOMB(ofn.lpstrFile);
         playlist_Add( p_playlist, psz_filename, psz_filename,
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+	vlc_object_release( p_playlist );
     }
-
-    vlc_object_release( p_playlist );
 }
 
 void Playlist::OnAddMRL()

@@ -128,14 +128,15 @@ BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
     wc.lpszClassName = _T("VLC WinCE");
     if( !RegisterClass( &wc ) ) return FALSE;
 
-#ifndef WS_OVERLAPPEDWINDOW
-#   define WS_OVERLAPPEDWINDOW 0xcf0000
+    int i_style = WS_VISIBLE;
+
+#ifndef UNDER_CE
+    i_style |= WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
 #endif
 
     // Create main window
     hwndMain =
-        CreateWindow( _T("VLC WinCE"), _T("VLC media player"),
-                      WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE,
+        CreateWindow( _T("VLC WinCE"), _T("VLC media player"), i_style,
                       0, MENU_HEIGHT, CW_USEDEFAULT, CW_USEDEFAULT,
                       NULL, NULL, hInstance, (void *)this );
 
@@ -154,7 +155,7 @@ FUNCTION:
 PURPOSE: 
   Creates a menu bar.
 ***********************************************************************/
-HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
+static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
 {
 #ifdef UNDER_CE
     SHMENUBARINFO mbi;
@@ -454,8 +455,8 @@ int CBaseWindow::CreateDialogBox( HWND hwnd, CBaseWindow *p_obj )
     memset( p_dlg_template, 0, sizeof(DLGTEMPLATE) + sizeof(WORD) * 4 );
 
     // these values are arbitrary, they won't be used normally anyhow
-    p_dlg_template->x  = 34; p_dlg_template->y  = 22;
-    p_dlg_template->cx = 144; p_dlg_template->cy = 75;
+    p_dlg_template->x  = 0; p_dlg_template->y  = 0;
+    p_dlg_template->cx = 300; p_dlg_template->cy = 300;
     p_dlg_template->style =
         DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX;
 

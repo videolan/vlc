@@ -51,7 +51,7 @@ static void Run    ( intf_thread_t * );
 
 vlc_module_begin();
     set_description( (char *) _("WinCE interface module") );
-    set_capability( "interface", 200 );
+    set_capability( "interface", 100 );
     set_callbacks( Open, Close );
     add_shortcut( "wince" );
     set_program( "wcevlc" );

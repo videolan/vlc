@@ -242,11 +242,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
 
-    if( p_intf->p_sys->pf_show_dialog )
-    {
-        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU,
-                                       new_val.b_bool, 0 );
-    }
+    /* Nothing for now */
 
     return VLC_SUCCESS;
 }

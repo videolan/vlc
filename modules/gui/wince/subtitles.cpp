@@ -88,10 +88,8 @@ LRESULT SubsFileDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         memset (&mbi, 0, sizeof (SHMENUBARINFO));
         mbi.cbSize     = sizeof (SHMENUBARINFO);
         mbi.hwndParent = hwnd;
-        mbi.nToolBarId = IDR_DUMMYMENU;
+        mbi.dwFlags    = SHCMBF_EMPTYBAR;
         mbi.hInstRes   = hInst;
-        mbi.nBmpId     = 0;
-        mbi.cBmpImages = 0;
 
         if (!SHCreateMenuBar(&mbi))
         {
