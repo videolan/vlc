@@ -176,8 +176,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
             *pb_bool = !p_sys->b_broadcast;
             break;
+
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_FALSE;
+            break;
+
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
 
