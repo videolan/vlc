@@ -511,6 +511,15 @@ else
 fi
 
 dnl
+dnl  Enable release-specific flags
+dnl
+AC_ARG_ENABLE(release,
+[  --enable-release        Activate extra optimizations (default disabled)],
+[ if test x$enableval = xyes; then RELEASE=1; fi ],
+[ VLC_VERSION="${VLC_VERSION}_`date +%Y-%m-%d`";
+  LIBDVDCSS_VERSION="${LIBDVDCSS_VERSION}_`date +%Y-%m-%d`"; ])
+
+dnl
 dnl  MMX acceleration
 dnl
 AC_ARG_ENABLE(mmx,
@@ -1100,6 +1109,7 @@ AC_SUBST(CPROF)
 AC_SUBST(GPROF)
 AC_SUBST(OPTIMS)
 AC_SUBST(TUNING)
+AC_SUBST(RELEASE)
 AC_SUBST(NEED_GETOPT)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
@@ -1154,7 +1164,8 @@ global configuration
 system                : ${SYS}
 architecture          : ${ARCH}
 optimizations         : ${OPTIMS}
-tuning:               : ${TUNING}"
+tuning:               : ${TUNING}
+release:              : ${RELEASE}"
 
 if test x${HAVE_VLC} = x1
 then

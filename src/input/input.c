@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.149 2001/11/02 13:30:38 massiot Exp $
+ * $Id: input.c,v 1.150 2001/11/06 17:12:02 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -779,16 +779,16 @@ static void NetworkOpen( input_thread_t * p_input )
             /* Found a port name or a broadcast addres */
             if( *psz_port )
             {
-		/* That's a port name */
-		if( *psz_port == ':' )
-		{
+                /* That's a port name */
+                if( *psz_port == ':' )
+                {
                     *psz_port = '\0';
                     psz_port++;
                     i_port = atoi( psz_port );
-		}
+                }
 
-		/* Search for '/' just after the port in case
-		 * we also have a broadcast address */
+                /* Search for '/' just after the port in case
+                 * we also have a broadcast address */
                 psz_broadcast = psz_port;
                 while( *psz_broadcast && *psz_broadcast != '/' )
                 {
