@@ -1,174 +1,88 @@
-/* make VERSION visible to all Gnome components */
+/*****************************************************************************
+ * gnome_callbacks.h : Callbacks for the Gnome plugin.
+ *****************************************************************************
+ * Copyright (C) 2000, 2001 VideoLAN
+ *
+ * Authors: Samuel Hocevar <sam@zoy.org>
+ *      
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include "config.h"
 #include <gnome.h>
 
-
+/*****************************************************************************
+ * Callback prototypes
+ *****************************************************************************/
 void
-on_open_activate                       (GtkMenuItem     *menuitem,
+on_menubar_open_activate               (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_preferences_activate                (GtkMenuItem     *menuitem,
+on_menubar_exit_activate               (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_modules_activate                    (GtkMenuItem     *menuitem,
+on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_about_activate                      (GtkMenuItem     *menuitem,
+on_menubar_plugins_activate            (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_exit_activate                       (GtkMenuItem     *menuitem,
+on_menubar_preferences_activate        (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_open_activate                       (GtkMenuItem     *menuitem,
+on_menubar_about_activate              (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_hide_activate                       (GtkMenuItem     *menuitem,
+on_toolbar_open_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_exit_activate                       (GtkMenuItem     *menuitem,
+on_toolbar_back_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_preferences_activate                (GtkMenuItem     *menuitem,
+on_toolbar_stop_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_plugins_activate                    (GtkMenuItem     *menuitem,
+on_toolbar_play_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_about_activate                      (GtkMenuItem     *menuitem,
+on_toolbar_pause_clicked               (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_show_activate                       (GtkMenuItem     *menuitem,
+on_toolbar_playlist_clicked            (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_stop_clicked                        (GtkButton       *button,
+on_toolbar_prev_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_popup_control_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_playlist_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_control_activate                    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_playlist_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_exit_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_about_activate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_intf_window_destroy                 (GtkObject       *object,
-                                        gpointer         user_data);
-
-void
-on_intf_playlist_destroy               (GtkObject       *object,
-                                        gpointer         user_data);
-
-void
-on_control_activate                    (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_playlist_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel1_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel2_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel3_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel4_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel5_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_channel1_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_channel2_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_channel3_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_channel4_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_channel5_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_config_channels_activate      (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel1_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel2_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel3_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel4_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_channel5_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_config_channels_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_user_guide_activate                 (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_stop_activate                 (GtkMenuItem     *menuitem,
+on_toolbar_next_clicked                (GtkButton       *button,
                                         gpointer         user_data);
 
 void
@@ -176,41 +90,33 @@ on_popup_play_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_playlist_close_clicked              (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-on_play_clicked                        (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-on_channel0_activate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_popup_channel0_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
-void
-on_open_clicked                        (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-on_pause_clicked                       (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
 on_popup_pause_activate                (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_stop_clicked                        (GtkButton       *button,
+on_popup_exit_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_mute_clicked                        (GtkButton       *button,
+on_intf_window_destroy                 (GtkObject       *object,
                                         gpointer         user_data);
 
 void
-on_popup_mute_activate                 (GtkMenuItem     *menuitem,
+on_fileopen_ok_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_fileopen_cancel_clicked             (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_intf_fileopen_destroy               (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_popup_open_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_about_activate                (GtkMenuItem     *menuitem,
                                         gpointer         user_data);

@@ -100,11 +100,11 @@ intf_thread_t* intf_Create( void )
     p_intf->pf_manage     = intf_Manage;
 
     /* Initialize structure */
-    p_intf->b_die =     0;
+    p_intf->b_die         = 0;
 
-    p_intf->p_input =       NULL;
-    p_intf->p_keys =        NULL;
-    p_intf->b_menu =        0;
+    p_intf->p_input       = NULL;
+    p_intf->p_keys        = NULL;
+    p_intf->b_menu        = 0;
     p_intf->b_menu_change = 0;
 
     if( p_intf->pf_open( p_intf ) )

@@ -320,46 +320,61 @@ int vout_Manage( vout_thread_t *p_vout )
 
             /* FIXME : this is temporary */
             case SDLK_p:
-                if( p_input->stream.control.i_status == PLAYING_S )
+                if( p_input != NULL )
                 {
-                    input_Pause( p_input );
-                }
-                else
-                {
-                    input_Play( p_input );
+                    if( p_input->stream.control.i_status == PLAYING_S )
+                    {
+                        input_Pause( p_input );
+                    }
+                    else
+                    {
+                        input_Play( p_input );
+                    }
                 }
                 break;
 
             case SDLK_a:
-                i_rate = p_input->stream.control.i_rate/2;
-                if ( i_rate >= MINIMAL_RATE )
+                if( p_input != NULL )
                 {
-                    input_Forward( p_input, i_rate );
+                    i_rate = p_input->stream.control.i_rate/2;
+                    if ( i_rate >= MINIMAL_RATE )
+                    {
+                        input_Forward( p_input, i_rate );
+                    }
                 }
                 break;
 
             case SDLK_z:
-                i_rate = p_input->stream.control.i_rate*2;
-                if ( i_rate <= MAXIMAL_RATE )
+                if( p_input != NULL )
                 {
-                    /* Compensation of int truncature */
-                    if ( i_rate > 500 && i_rate < 1000 )
-                        i_rate = 1000;
-                    input_Forward( p_input, i_rate );
+                    i_rate = p_input->stream.control.i_rate*2;
+                    if ( i_rate <= MAXIMAL_RATE )
+                    {
+                        /* Compensation of int truncature */
+                        if ( i_rate > 500 && i_rate < 1000 )
+                            i_rate = 1000;
+                        input_Forward( p_input, i_rate );
+                    }
                 }
                 break;
 
             case SDLK_j:
-                /* Jump forwards */
-                input_Seek( p_input, p_input->stream.i_tell
-                             + p_input->stream.i_size / 20 );
-                                                           /* gabuzomeu */
+                if( p_input != NULL )
+                {
+                    /* Jump forwards */
+                    input_Seek( p_input, p_input->stream.i_tell
+                                 + p_input->stream.i_size / 20 );
+                                                               /* gabuzomeu */
+                }
                 break;
 
             case SDLK_b:
-                /* Jump backwards */
-                input_Seek( p_input, p_input->stream.i_tell
-                             - p_input->stream.i_size / 20 );
+                if( p_input != NULL )
+                {
+                    /* Jump backwards */
+                    input_Seek( p_input, p_input->stream.i_tell
+                                 - p_input->stream.i_size / 20 );
+                }
                 break;
 
             default:

@@ -1,0 +1,527 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>VideoLAN Client</name>
+  <program_name>vlc</program_name>
+  <directory></directory>
+  <source_directory></source_directory>
+  <pixmaps_directory>pixmaps</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>True</gnome_support>
+  <gettext_support>True</gettext_support>
+  <output_main_file>False</output_main_file>
+  <output_build_files>False</output_build_files>
+  <main_source_file>gnome_interface.c</main_source_file>
+  <main_header_file>gnome_interface.h</main_header_file>
+  <handler_source_file>gnome_callbacks.c</handler_source_file>
+  <handler_header_file>gnome_callbacks.h</handler_header_file>
+  <support_source_file>gnome_support.c</support_source_file>
+  <support_header_file>gnome_support.h</support_header_file>
+</project>
+
+<widget>
+  <class>GnomeApp</class>
+  <name>intf_window</name>
+  <signal>
+    <name>destroy</name>
+    <handler>on_intf_window_destroy</handler>
+    <last_modification_time>Sun, 11 Feb 2001 17:41:57 GMT</last_modification_time>
+  </signal>
+  <title>VideoLAN Client</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+  <enable_layout_config>True</enable_layout_config>
+
+  <widget>
+    <class>GnomeDock</class>
+    <child_name>GnomeApp:dock</child_name>
+    <name>dock1</name>
+    <allow_floating>True</allow_floating>
+    <child>
+      <padding>0</padding>
+      <expand>True</expand>
+      <fill>True</fill>
+    </child>
+
+    <widget>
+      <class>GnomeDockItem</class>
+      <name>dockitem_menubar</name>
+      <border_width>2</border_width>
+      <placement>GNOME_DOCK_TOP</placement>
+      <band>0</band>
+      <position>0</position>
+      <offset>0</offset>
+      <locked>False</locked>
+      <exclusive>True</exclusive>
+      <never_floating>False</never_floating>
+      <never_vertical>True</never_vertical>
+      <never_horizontal>False</never_horizontal>
+      <shadow_type>GTK_SHADOW_OUT</shadow_type>
+
+      <widget>
+	<class>GtkMenuBar</class>
+	<name>menubar</name>
+	<shadow_type>GTK_SHADOW_NONE</shadow_type>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menubar_file</name>
+	  <stock_item>GNOMEUIINFO_MENU_FILE_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menubar_file_menu</name>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_open</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_open_activate</handler>
+		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+	      </signal>
+	      <stock_item>GNOMEUIINFO_MENU_OPEN_ITEM</stock_item>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
+	      <name>separator1</name>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_exit</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_exit_activate</handler>
+		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+	      </signal>
+	      <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menubar_view</name>
+	  <stock_item>GNOMEUIINFO_MENU_VIEW_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menubar_view_menu</name>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_playlist</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_playlist_activate</handler>
+		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+	      </signal>
+	      <label>P_laylist</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_INDEX</stock_icon>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_plugins</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_plugins_activate</handler>
+		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+	      </signal>
+	      <label>_Plugins</label>
+	      <right_justify>False</right_justify>
+	      <stock_icon>GNOME_STOCK_MENU_ATTACH</stock_icon>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menubar_settings</name>
+	  <stock_item>GNOMEUIINFO_MENU_SETTINGS_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menubar_settings_menu</name>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_preferences</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_preferences_activate</handler>
+		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+	      </signal>
+	      <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkMenuItem</class>
+	  <name>menubar_help</name>
+	  <stock_item>GNOMEUIINFO_MENU_HELP_TREE</stock_item>
+
+	  <widget>
+	    <class>GtkMenu</class>
+	    <name>menubar_help_menu</name>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_about</name>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_about_activate</handler>
+		<last_modification_time>Sun, 11 Feb 2001 16:55:04 GMT</last_modification_time>
+	      </signal>
+	      <stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
+	    </widget>
+	  </widget>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GnomeDockItem</class>
+      <name>dockitem_toolbar</name>
+      <border_width>1</border_width>
+      <placement>GNOME_DOCK_TOP</placement>
+      <band>1</band>
+      <position>0</position>
+      <offset>2</offset>
+      <locked>False</locked>
+      <exclusive>True</exclusive>
+      <never_floating>False</never_floating>
+      <never_vertical>False</never_vertical>
+      <never_horizontal>False</never_horizontal>
+      <shadow_type>GTK_SHADOW_OUT</shadow_type>
+
+      <widget>
+	<class>GtkToolbar</class>
+	<name>toolbar</name>
+	<border_width>1</border_width>
+	<orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+	<type>GTK_TOOLBAR_BOTH</type>
+	<space_size>16</space_size>
+	<space_style>GTK_TOOLBAR_SPACE_LINE</space_style>
+	<relief>GTK_RELIEF_NONE</relief>
+	<tooltips>True</tooltips>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_open</name>
+	  <tooltip>Open File</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_open_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:24 GMT</last_modification_time>
+	  </signal>
+	  <label>Open</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_OPEN</stock_pixmap>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_back</name>
+	  <tooltip>Go Backwards</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_back_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:28 GMT</last_modification_time>
+	  </signal>
+	  <label>Back</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_BACK</stock_pixmap>
+	  <child>
+	    <new_group>True</new_group>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_stop</name>
+	  <tooltip>Stop Stream</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_stop_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:33 GMT</last_modification_time>
+	  </signal>
+	  <label>Stop</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_STOP</stock_pixmap>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_play</name>
+	  <tooltip>Play Stream</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_play_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:39 GMT</last_modification_time>
+	  </signal>
+	  <label>Play</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_pause</name>
+	  <tooltip>Pause Stream</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_pause_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:43 GMT</last_modification_time>
+	  </signal>
+	  <label>Pause</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_TIMER_STOP</stock_pixmap>
+	</widget>
+
+	<widget>
+	  <class>GtkVSeparator</class>
+	  <name>vseparator2</name>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_playlist</name>
+	  <tooltip>Open Playlist</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_playlist_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:48 GMT</last_modification_time>
+	  </signal>
+	  <label>Playlist</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_INDEX</stock_pixmap>
+	  <child>
+	    <new_group>True</new_group>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_prev</name>
+	  <tooltip>Previous File</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_prev_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:52 GMT</last_modification_time>
+	  </signal>
+	  <label>Prev</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_FIRST</stock_pixmap>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_next</name>
+	  <tooltip>Next File</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_next_clicked</handler>
+	    <last_modification_time>Sun, 11 Feb 2001 17:06:56 GMT</last_modification_time>
+	  </signal>
+	  <label>Next</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_LAST</stock_pixmap>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <child_name>GnomeDock:contents</child_name>
+      <name>scrolledwindow1</name>
+      <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+
+      <widget>
+	<class>GtkText</class>
+	<name>text1</name>
+	<can_focus>True</can_focus>
+	<editable>False</editable>
+	<text>This is some random text. Nah.</text>
+      </widget>
+    </widget>
+  </widget>
+
+  <widget>
+    <class>GnomeAppBar</class>
+    <child_name>GnomeApp:appbar</child_name>
+    <name>appbar</name>
+    <has_progress>True</has_progress>
+    <has_status>True</has_status>
+    <child>
+      <padding>0</padding>
+      <expand>True</expand>
+      <fill>True</fill>
+    </child>
+  </widget>
+</widget>
+
+<widget>
+  <class>GtkMenu</class>
+  <name>intf_popup</name>
+
+  <widget>
+    <class>GtkPixmapMenuItem</class>
+    <name>popup_play</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_play_activate</handler>
+      <last_modification_time>Sun, 11 Feb 2001 16:52:11 GMT</last_modification_time>
+    </signal>
+    <label>_Play</label>
+    <right_justify>False</right_justify>
+    <stock_icon>GNOME_STOCK_MENU_FORWARD</stock_icon>
+  </widget>
+
+  <widget>
+    <class>GtkPixmapMenuItem</class>
+    <name>popup_pause</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_pause_activate</handler>
+      <last_modification_time>Sun, 11 Feb 2001 16:52:11 GMT</last_modification_time>
+    </signal>
+    <label>Pause</label>
+    <right_justify>False</right_justify>
+    <stock_icon>GNOME_STOCK_MENU_TIMER_STOP</stock_icon>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>separator2</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkPixmapMenuItem</class>
+    <name>popup_open</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_open_activate</handler>
+      <last_modification_time>Sun, 11 Feb 2001 23:49:08 GMT</last_modification_time>
+    </signal>
+    <stock_item>GNOMEUIINFO_MENU_OPEN_ITEM</stock_item>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
+    <name>separator3</name>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkPixmapMenuItem</class>
+    <name>popup_about</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_about_activate</handler>
+      <last_modification_time>Mon, 12 Feb 2001 00:00:08 GMT</last_modification_time>
+    </signal>
+    <stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
+  </widget>
+
+  <widget>
+    <class>GtkPixmapMenuItem</class>
+    <name>popup_exit</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_exit_activate</handler>
+      <last_modification_time>Sun, 11 Feb 2001 16:49:30 GMT</last_modification_time>
+    </signal>
+    <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
+  </widget>
+</widget>
+
+<widget>
+  <class>GnomeAbout</class>
+  <name>intf_about</name>
+  <modal>False</modal>
+  <copyright>(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team</copyright>
+  <authors>Régis Duchesne &lt;regis@via.ecp.fr&gt;
+Michel Lespinasse &lt;walken@zoy.org&gt;
+Olivier Pomel &lt;pomel@via.ecp.fr&gt;
+Jean-Philippe Grimaldi &lt;jeanphi@via.ecp.fr&gt;
+Andres Krapf &lt;dae@via.ecp.fr&gt;
+Christophe Massiot &lt;massiot@via.ecp.fr&gt;
+Vincent Seguin &lt;seguin@via.ecp.fr&gt;
+Benoit Steiner &lt;benny@via.ecp.fr&gt;
+Jean-Marc Dressler &lt;polux@via.ecp.fr&gt;
+Gaël Hendryckx &lt;jimmy@via.ecp.fr&gt;
+Samuel Hocevar &lt;sam@zoy.org&gt;
+Brieuc Jeunhomme &lt;bbp@via.ecp.fr&gt;
+Michel Kaempf &lt;maxx@via.ecp.fr&gt;
+Stéphane Borel &lt;stef@via.ecp.fr&gt;
+Renaud Dartus &lt;reno@via.ecp.fr&gt;
+Henri Fallon &lt;henri@via.ecp.fr&gt;
+</authors>
+  <comments>This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source.</comments>
+</widget>
+
+<widget>
+  <class>GtkFileSelection</class>
+  <name>intf_fileopen</name>
+  <border_width>10</border_width>
+  <signal>
+    <name>destroy</name>
+    <handler>on_intf_fileopen_destroy</handler>
+    <last_modification_time>Sun, 11 Feb 2001 18:36:13 GMT</last_modification_time>
+  </signal>
+  <title>Open File</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+  <show_file_op_buttons>True</show_file_op_buttons>
+
+  <widget>
+    <class>GtkButton</class>
+    <child_name>FileSel:ok_button</child_name>
+    <name>fileopen_ok</name>
+    <can_default>True</can_default>
+    <can_focus>True</can_focus>
+    <signal>
+      <name>clicked</name>
+      <handler>on_fileopen_ok_clicked</handler>
+      <last_modification_time>Sun, 11 Feb 2001 18:22:44 GMT</last_modification_time>
+    </signal>
+    <label>OK</label>
+    <relief>GTK_RELIEF_NORMAL</relief>
+  </widget>
+
+  <widget>
+    <class>GtkButton</class>
+    <child_name>FileSel:cancel_button</child_name>
+    <name>fileopen_cancel</name>
+    <can_default>True</can_default>
+    <can_focus>True</can_focus>
+    <signal>
+      <name>clicked</name>
+      <handler>on_fileopen_cancel_clicked</handler>
+      <last_modification_time>Sun, 11 Feb 2001 18:22:50 GMT</last_modification_time>
+    </signal>
+    <label>Cancel</label>
+    <relief>GTK_RELIEF_NORMAL</relief>
+  </widget>
+</widget>
+
+</GTK-Interface>

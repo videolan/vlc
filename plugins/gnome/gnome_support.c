@@ -91,6 +91,9 @@ create_pixmap                          (GtkWidget       *widget,
   GdkBitmap *mask;
   gchar *pathname;
 
+  if (!filename || !filename[0])
+      return create_dummy_pixmap (widget, gnome_pixmap);
+
   pathname = gnome_pixmap_file (filename);
   if (!pathname)
     {

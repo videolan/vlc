@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.8 2001/02/11 01:15:10 sam Exp $
+ * $Id: intf_gnome.c,v 1.9 2001/02/12 00:20:37 sam Exp $
  *
  * Authors:
  *
@@ -180,6 +180,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* we don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
     p_intf->p_sys->p_playlist = NULL;
+    p_intf->p_sys->p_fileopen = NULL;
 
     /* store p_sys to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),

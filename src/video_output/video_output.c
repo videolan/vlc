@@ -1833,12 +1833,14 @@ int RenderSplash( vout_thread_t *p_vout )
  *****************************************************************************/
 int RenderIdle( vout_thread_t *p_vout )
 {
+#if 0
     int         i_x = 0, i_y = 0;                           /* text position */
     int         i_width, i_height;                              /* text size */
-    mtime_t     current_date;                                /* current date */
     int         i_amount = 0;                             /*  amount to draw */
     char *psz_text =    "Waiting for stream";            /* text to display */
     char *psz_wtext =   "[................]";
+#endif
+    mtime_t     current_date;                                /* current date */
 
 
     memset( p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
@@ -1850,6 +1852,8 @@ int RenderIdle( vout_thread_t *p_vout )
 //            && (current_date - p_vout->last_idle_date) > VOUT_IDLE_DELAY 
     )
     {
+        /* FIXME: idle screen disabled */
+#if 0
         SetBufferPicture( p_vout, NULL );
         vout_TextSize( p_vout->p_large_font, WIDE_TEXT | OUTLINED_TEXT, psz_text,
                        &i_width, &i_height );
@@ -1873,6 +1877,7 @@ int RenderIdle( vout_thread_t *p_vout )
 
             SetBufferArea( p_vout, i_x, i_y, i_width, i_height * 2 );
         }
+#endif
         return( 1 );
     }
     return( 0 );
