@@ -45,6 +45,10 @@
 /* Version checking */
 #if (LIBAVFORMAT_BUILD >= 4611) && defined(HAVE_LIBAVFORMAT)
 
+#if LIBAVFORMAT_BUILD >= 4619
+#   define av_seek_frame(a,b,c) av_seek_frame(a,b,c,AVSEEK_FLAG_BYTE)
+#endif
+
 /*****************************************************************************
  * demux_sys_t: demux descriptor
  *****************************************************************************/
