@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.52 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: sap.c,v 1.53 2004/02/23 21:00:37 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -362,6 +362,7 @@ static void Close( vlc_object_t *p_this )
            free( p_sys->pp_announces[i]->psz_uri );
         free( p_sys->pp_announces[i] );
     }
+    free( p_sys->pp_announces );
 
     free( p_sys );
 }
@@ -805,12 +806,16 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             {
                 psz_http_path = strdup( "/" );
             }
-
-            psz_item_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
-                                   strlen( psz_port ) + strlen(psz_http_path) +
-                                    5 );
-            sprintf( psz_item_uri, "%s://%s:%s%s", psz_proto,
-                            psz_uri, psz_port,psz_http_path );
+            if( *psz_http_path == '/' )
+            {
+                asprintf( &psz_item_uri, "%s://%s:%s%s", psz_proto,
+                         psz_uri, psz_port,psz_http_path );
+            }
+            else
+            {
+                asprintf( &psz_item_uri, "%s://%s:%s/%s", psz_proto, psz_uri,
+                          psz_port, psz_http_path );
+            }
 
             if( psz_http_path )
             {
@@ -855,6 +860,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
                     vlc_object_release( p_playlist );
                 }
+                free( psz_item_uri );
                 return;
             }
         }
