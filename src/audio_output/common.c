@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.11 2002/12/07 23:50:30 massiot Exp $
+ * $Id: common.c,v 1.12 2002/12/25 02:23:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -168,6 +168,8 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
             return "Dolby";
         else if ( p_format->i_original_channels & AOUT_CHAN_DUALMONO )
             return "Dual-mono";
+        else if ( p_format->i_original_channels == AOUT_CHAN_CENTER )
+            return "Mono";
         else if ( !(p_format->i_original_channels & AOUT_CHAN_RIGHT) )
             return "Stereo/Left";
         else if ( !(p_format->i_original_channels & AOUT_CHAN_LEFT) )
@@ -200,6 +202,8 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
             return "Dolby/LFE";
         else if ( p_format->i_original_channels & AOUT_CHAN_DUALMONO )
             return "Dual-mono/LFE";
+        else if ( p_format->i_original_channels == AOUT_CHAN_CENTER )
+            return "Mono/LFE";
         else if ( !(p_format->i_original_channels & AOUT_CHAN_RIGHT) )
             return "Stereo/Left/LFE";
         else if ( !(p_format->i_original_channels & AOUT_CHAN_LEFT) )

@@ -104,8 +104,11 @@ modules/gui/kde/interface.cpp
 modules/gui/kde/kde.cpp
 modules/gui/kde/messages.cpp
 modules/gui/kde/pluginsbox.cpp
-modules/gui/macosx/intf.h
-modules/gui/macosx/macosx.m
+modules/gui/macosx/intf.m
+modules/gui/macosx/prefs.m
+modules/gui/macosx/open.m
+modules/gui/macosx/playlist.m
+modules/gui/macosx/controls.m
 modules/gui/ncurses/ncurses.c
 modules/gui/qnx/qnx.c
 modules/gui/qt/qt.cpp

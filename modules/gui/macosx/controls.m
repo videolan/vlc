@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.2 2002/12/07 23:50:30 massiot Exp $
+ * $Id: controls.m,v 1.3 2002/12/25 02:23:36 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -31,6 +31,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc/aout.h>
 
 #include <Cocoa/Cocoa.h> 
 #include <CoreAudio/AudioHardware.h>
@@ -251,7 +252,7 @@
     p_intf->p_sys->b_mute = !p_intf->p_sys->b_mute;
     [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
 #else
-    OSStatus err;
+    int err;
     AudioDeviceID device;
     UInt32 ui_param_size;
 
@@ -376,7 +377,7 @@
         }
         else
         {
-            int i;
+            unsigned int i;
             int i_cat = [o_mi tag];
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -409,16 +410,16 @@
 - (IBAction)toggleVar:(id)sender
 {
     NSMenuItem * o_mi = (NSMenuItem *)sender;
-    intf_thread_t * p_intf = [NSApp getIntf];
 
     if( [o_mi state] == NSOffState )
     {
         const char * psz_variable = (const char *)[o_mi tag];
-        char * psz_value = [[o_mi title] cString];
+        const char * psz_value = [[o_mi title] cString];
         vlc_object_t * p_object = (vlc_object_t *)
             [[o_mi representedObject] pointerValue];
         vlc_value_t val;
-        val.psz_string = psz_value;
+        /* psz_string sucks */
+        val.psz_string = (char *)psz_value;
 
         if ( var_Set( p_object, psz_variable, val ) < 0 )
         {
@@ -483,7 +484,7 @@
     }
     else if( [[o_mi title] isEqualToString: _NS("Mute")] )
     {
-        OSStatus err;
+        int err;
         UInt32 b_mute;
         AudioDeviceID device;
         UInt32 ui_param_size;

@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.28 2002/12/22 17:08:42 sam Exp $
+ * $Id: input.c,v 1.29 2002/12/25 02:23:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -127,7 +127,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     else
     {
         /* Create resamplers. */
-        intermediate_format.i_rate = (p_input->input.i_rate
+        intermediate_format.i_rate = (__MAX(p_input->input.i_rate,
+                                            p_aout->mixer.mixer.i_rate)
                                  * (100 + AOUT_MAX_RESAMPLING)) / 100;
         if ( intermediate_format.i_rate == p_aout->mixer.mixer.i_rate )
         {

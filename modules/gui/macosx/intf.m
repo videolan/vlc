@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.11 2002/12/24 23:00:51 massiot Exp $
+ * $Id: intf.m,v 1.12 2002/12/25 02:23:36 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -533,7 +533,7 @@ static void Run( intf_thread_t *p_intf )
 
 - (void)setupMenus
 {
-    int i, i_nb_items;
+    unsigned int i, i_nb_items;
     NSMenuItem * o_item;
     NSString * o_menu_title;
     char psz_title[ 256 ];
@@ -772,7 +772,7 @@ static void Run( intf_thread_t *p_intf )
                       category:(int)i_cat
                       selector:(SEL)pf_callback
 {
-    int i, i_nb_items;
+    unsigned int i, i_nb_items;
     NSMenu * o_menu = [o_mi submenu];
     intf_thread_t * p_intf = [NSApp getIntf];
 

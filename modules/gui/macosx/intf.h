@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.5 2002/12/08 23:38:02 massiot Exp $
+ * $Id: intf.h,v 1.6 2002/12/25 02:23:36 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -76,7 +76,7 @@ struct intf_sys_t
     msg_subscription_t * p_sub;
 
     /* DVD mode */
-    int i_part;
+    unsigned int i_part;
 };
 
 /*****************************************************************************

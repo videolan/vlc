@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.8 2002/12/24 23:00:51 massiot Exp $
+ * $Id: vout.m,v 1.9 2002/12/25 02:23:36 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -130,7 +130,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->h_img_descr = 
         (ImageDescriptionHandle)NewHandleClear( sizeof(ImageDescription) );
     p_vout->p_sys->p_matrix = (MatrixRecordPtr)malloc( sizeof(MatrixRecord) );
-    p_vout->p_sys->p_fullscreen_state;
+    p_vout->p_sys->p_fullscreen_state = NULL;
 
     p_vout->p_sys->b_mouse_pointer_visible = 1;
 
@@ -569,10 +569,10 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 static void QTScaleMatrix( vout_thread_t *p_vout )
 {
     Rect s_rect;
-    int i_width, i_height;
+    unsigned int i_width, i_height;
     Fixed factor_x, factor_y;
-    int i_offset_x = 0;
-    int i_offset_y = 0;
+    unsigned int i_offset_x = 0;
+    unsigned int i_offset_y = 0;
 
     GetPortBounds( p_vout->p_sys->p_qdport, &s_rect );
 
@@ -983,7 +983,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else
     {
-        int i_index = 0;
+        unsigned int i_index = 0;
         NSArray *o_screens = [NSScreen screens];
 
         if( !sscanf( val.psz_string, "Screen %d", &i_index ) ||
@@ -1001,8 +1001,11 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( p_vout->b_fullscreen )
     {
+        NSRect screen_rect = [o_screen frame];
+        screen_rect.origin.x = screen_rect.origin.y = 0;
+
         [p_vout->p_sys->o_window 
-            initWithContentRect: [o_screen frame]
+            initWithContentRect: screen_rect
             styleMask: NSBorderlessWindowMask
             backing: NSBackingStoreBuffered
             defer: NO screen: o_screen];

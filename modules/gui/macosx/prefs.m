@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.2 2002/12/13 01:56:30 gbazin Exp $
+ * $Id: prefs.m,v 1.3 2002/12/25 02:23:36 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -132,7 +132,7 @@
     int i_pos;
     int i_module_tag;
 
-    module_t *p_parser;
+    module_t *p_parser = NULL;
     vlc_list_t list;
     module_config_t *p_item;
     char *psz_module_name;

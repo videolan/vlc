@@ -54,7 +54,7 @@ AC_CHECK_TOOL(LD, ld, :)
 dnl
 dnl Gettext stuff
 dnl
-ALL_LINGUAS="de en_GB fr ja no ru nl pl se"
+ALL_LINGUAS="de en_GB fr it ja no ru nl pl se"
 AM_GNU_GETTEXT_VERSION(0.10.40)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then

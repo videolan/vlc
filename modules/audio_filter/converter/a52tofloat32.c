@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.9 2002/11/28 23:24:14 massiot Exp $
+ * $Id: a52tofloat32.c,v 1.10 2002/12/25 02:23:36 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -143,6 +143,10 @@ static int Create( vlc_object_t * _p_filter )
         if ( p_filter->output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
         {
             p_sys->i_flags = A52_DOLBY;
+        }
+        else if ( p_filter->input.i_original_channels == AOUT_CHAN_CENTER )
+        {
+            p_sys->i_flags = A52_MONO;
         }
         else if ( p_filter->input.i_original_channels & AOUT_CHAN_DUALMONO )
         {
