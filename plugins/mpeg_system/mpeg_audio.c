@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.4 2002/05/13 23:12:10 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.5 2002/05/14 14:10:17 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -80,6 +80,13 @@ static void input_getfunctions( function_list_t * p_function_list )
 /*****************************************************************************
  * Definitions of structures  and functions used by this plugins 
  *****************************************************************************/
+
+/* XXX set this to 0 to avoid problem with PS XXX */
+/* but with some file or web radio will failed to detect */
+/* it's you to choose */
+#define MPEGAUDIO_MAXTESTPOS    0
+
+#define MPEGAUDIO_MAXFRAMESIZE  1500 /* no exactly */
 
 typedef struct mpegaudio_format_s
 {
@@ -163,7 +170,7 @@ static __inline__ u32 __GetDWBE( byte_t *p_buff )
 static int __CheckPS( input_thread_t *p_input )
 {
     byte_t *p_buff;
-    int i_size = input_Peek( p_input, &p_buff, 8192 );
+    int i_size = input_Peek( p_input, &p_buff, 8196 );
 
     while( i_size > 0 )
     {
@@ -268,16 +275,17 @@ static int MPEGAudio_DecodedFrameSize( mpegaudio_format_t *p_mpeg )
  *****************************************************************************/
 static int MPEGAudio_FindFrame( input_thread_t *p_input, 
                                  int *pi_pos, 
-                                 mpegaudio_format_t *p_mpeg )
+                                 mpegaudio_format_t *p_mpeg,
+                                 int i_posmax )
 {
     byte_t *p_buff;
     u32 i_header;
     int i_framesize;
 
     int i_pos = 0;
-    int i_size = input_Peek( p_input, &p_buff, 8192 );
+    int i_size = input_Peek( p_input, &p_buff, i_posmax+MPEGAUDIO_MAXFRAMESIZE);
 
-    while( i_pos + 4 <= i_size ) /* need at least 4 bytes */
+    while( i_pos + 4 <= __MIN( i_posmax, i_size ) )
     {
         i_header = __GetDWBE( p_buff );
         if( MPEGAudio_CheckHeader( i_header ) )
@@ -321,13 +329,13 @@ static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
     byte_t  *p_buff;
     
     p_xh->i_flags = 0;  /* nothing present */
-    if( !(MPEGAudio_FindFrame( p_input, &i_pos, &mpeg )) )
+    if( !(MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, 2024 )) )
     {
         return; /* failed , can't */
     }
     p_xh->i_avgbitrate = mpeg.i_bitrate * 1000; /* default */
 
-    /* 1024 is very very enougth */
+    /* 1024 is enougth */
     if( ( i_size = input_Peek( p_input, &p_buff, 1024 + i_pos ) ) < 8 )
     {
         return;
@@ -406,7 +414,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
         return( -1 );
     }
     /* must be sure that is mpeg audio stream */
-    if( MPEGAudio_FindFrame( p_input, &i_pos, &mpeg ) != 2 )
+    if( MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, MPEGAUDIO_MAXTESTPOS)!= 2 )
     {
         intf_WarnMsg( 2,"input: MPEGAudio plug-in discarded" );
         return( -1 );
@@ -518,9 +526,9 @@ static int MPEGAudioDemux( input_thread_t * p_input )
                         (demux_data_mpegaudio_t*) p_input->p_demux_data;
 
     /*  look for a frame */
-    if( !MPEGAudio_FindFrame( p_input, &i_pos, &mpeg ) )
+    if( !MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, 4096 ) )
     {
-        intf_WarnMsg( 1, "input error: cannot found next frame");
+        intf_WarnMsg( 1, "input error: cannot find next frame");
         return( 0 );
     }
     
