@@ -2,7 +2,7 @@
  * x11_timer.cpp: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.cpp,v 1.3 2003/06/08 11:33:14 asmax Exp $
+ * $Id: x11_timer.cpp,v 1.4 2003/06/09 12:33:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -123,7 +123,7 @@ void X11TimerManager::Destroy()
 
  
 // Main timer loop
-void *X11TimerManager::Thread( void *p_timer )
+void X11TimerManager::Thread( void *p_timer )
 {
     vlc_thread_ready( (vlc_object_t*) p_timer );
 

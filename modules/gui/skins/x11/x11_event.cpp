@@ -2,7 +2,7 @@
  * x11_event.cpp: x11 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_event.cpp,v 1.2 2003/05/19 21:39:34 asmax Exp $
+ * $Id: x11_event.cpp,v 1.3 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -49,7 +49,7 @@
 X11Event::X11Event( intf_thread_t *p_intf, string Desc, string shortcut )
     : Event( p_intf, Desc, shortcut )
 {
-    Wnd = NULL;
+    Wnd = None;
 }
 //---------------------------------------------------------------------------
 X11Event::X11Event( intf_thread_t *p_intf, Window wnd, unsigned int msg,
@@ -126,7 +126,7 @@ Window X11Event::GetWindowFromName( string name )
 
     if( win == NULL )
     {
-        return NULL;
+        return None;
     }
     else
     {

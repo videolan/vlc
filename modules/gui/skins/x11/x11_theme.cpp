@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.10 2003/06/07 10:18:15 gbazin Exp $
+ * $Id: x11_theme.cpp,v 1.11 2003/06/09 12:33:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -59,29 +59,10 @@ X11Theme::X11Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
 
 //---------------------------------------------------------------------------
 X11Theme::~X11Theme()
-{/*
-    // Unregister the window class if needed
-    WNDCLASS wndclass;
-    if( GetClassInfo( hinst, "SkinWindow", &wndclass ) )
-    {
-        UnregisterClass( "SkinWindow", hinst );
-    }
-    if( GetClassInfo( hinst, "ParentWindow", &wndclass ) )
-    {
-        UnregisterClass( "ParentWindow", hinst );
-    }
-
-    // Delete tray icon if exists
-    if( ShowInTray )
-    {
-        Shell_NotifyIcon( NIM_DELETE, &TrayIcon );
-    }
-*/
-    // Destroy parent window
-/*    if( ParentWindow )
-    {
-        gdk_window_destroy( ParentWindow );
-    }*/
+{
+    XLOCK;
+    XDestroyWindow( display, p_intf->p_sys->mainWin );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Theme::OnLoadTheme()

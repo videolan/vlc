@@ -2,7 +2,7 @@
  * x11_dragdrop.h: X11 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_dragdrop.h,v 1.3 2003/06/09 00:07:09 asmax Exp $
+ * $Id: x11_dragdrop.h,v 1.4 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -28,6 +28,8 @@
 
 //--- X11 -----------------------------------------------------------------
 #include <X11/Xlib.h>
+
+#include "../src/skin_common.h"
 
 //---------------------------------------------------------------------------
 

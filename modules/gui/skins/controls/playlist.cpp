@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.12 2003/06/08 15:22:03 asmax Exp $
+ * $Id: playlist.cpp,v 1.13 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -83,6 +83,26 @@ ControlPlayList::ControlPlayList( string id, bool visible, int width,
 //---------------------------------------------------------------------------
 ControlPlayList::~ControlPlayList()
 {
+    if( CaseLeft )
+    {
+        delete[] CaseLeft;
+    }
+    if( CaseRight )
+    {
+        delete[] CaseRight;
+    }
+    if( CaseTextLeft )
+    {
+        delete[] CaseTextLeft;
+    }
+    if( Slider )
+    {
+        delete Slider;
+    }
+    if( TextClipRgn )
+    {
+        delete TextClipRgn;
+    }
     if( PlayList != NULL )
     {
         vlc_object_release( PlayList );

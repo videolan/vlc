@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.18 2003/06/09 00:07:09 asmax Exp $
+ * $Id: x11_window.cpp,v 1.19 2003/06/09 12:33:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -136,26 +136,17 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
 //---------------------------------------------------------------------------
 X11Window::~X11Window()
 {
-/*    delete CursorPos;
-    delete WindowPos;
-
-    if( hWnd != NULL )
-    {
-        DestroyWindow( hWnd );
-    }*/
-
-    XFreeGC( display, Gc );
-    XDestroyWindow( display, ToolTip.window );
-
-    /*
     if( DragDrop )
     {
-        // Remove the listview from the list of drop targets
-        RevokeDragDrop( hWnd );
-        DropTarget->Release();
-        // Uninitialize the OLE library
-        OleUninitialize();
-    }*/
+        delete DropObject;
+    }
+    delete ToolTip.timer;
+    XLOCK;
+    XFreeGC( display, ToolTip.gc );
+    XFreeGC( display, Gc );
+    XDestroyWindow( display, ToolTip.window );
+    XDestroyWindow( display, Wnd );
+    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Window::OSShow( bool show )
@@ -177,7 +168,6 @@ void X11Window::OSShow( bool show )
         {
             // Mask for transparency
             Region region = XCreateRegion();
-            region = XCreateRegion();
             for( int line = 0; line < Height; line++ )
             {
                 int start = 0, end = 0;
@@ -205,6 +195,7 @@ void X11Window::OSShow( bool show )
                     start = end + 1;
                 }
             }
+            XDestroyImage( image );
 
             XShapeCombineRegion( display, Wnd, ShapeBounding, 0, 0, region,
                                  ShapeSet );
@@ -231,7 +222,7 @@ void X11Window::OSShow( bool show )
 bool X11Window::ProcessOSEvent( Event *evt )
 {
     unsigned int msg = evt->GetMessage();
-    unsigned int p1  = evt->GetParam1();
+    //unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
     int          time;
     int          posX, posY;

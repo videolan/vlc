@@ -2,7 +2,7 @@
  * x11_timer.h: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.h,v 1.4 2003/06/08 12:45:13 gbazin Exp $
+ * $Id: x11_timer.h,v 1.5 2003/06/09 12:33:17 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -75,7 +75,7 @@ class X11TimerManager
         X11TimerManager( intf_thread_t *p_intf );
         ~X11TimerManager();
 
-        static void *Thread( void *p_timer );
+        static void Thread( void *p_timer );
         void WaitNextTimer();
 
     public:

@@ -2,7 +2,7 @@
  * vlcproc.h: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.h,v 1.6 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: vlcproc.h,v 1.7 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -27,12 +27,11 @@
 #ifndef VLC_SKIN_PROC
 #define VLC_SKIN_PROC
 
+#include "skin_common.h"
+
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
 using namespace std;
-
-//---------------------------------------------------------------------------
-struct intf_thread_t;
 
 //---------------------------------------------------------------------------
 class VlcProc

@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.14 2003/05/31 23:23:59 ipkiss Exp $
+ * $Id: button.cpp,v 1.15 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -71,6 +71,18 @@ ControlButton::ControlButton(
 //---------------------------------------------------------------------------
 ControlButton::~ControlButton()
 {
+    if( ClickAction )
+    {
+        delete ClickAction;
+    }
+    if( MouseOverAction )
+    {
+        delete MouseOverAction;
+    }
+    if( MouseOutAction )
+    {
+        delete MouseOutAction;
+    }
 }
 //---------------------------------------------------------------------------
 void ControlButton::Init()

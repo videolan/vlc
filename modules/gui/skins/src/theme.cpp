@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.13 2003/04/29 20:36:56 ipkiss Exp $
+ * $Id: theme.cpp,v 1.14 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -232,7 +232,7 @@ SkinWindow * Theme::GetWindow( string name )
 //---------------------------------------------------------------------------
 void Theme::MoveSkin( SkinWindow *wnd, int left, int top )
 {
-    int x, y, oldx, oldy;
+    int oldx, oldy;
     SkinWindow *win;
     list<Anchor *>::const_iterator anc;
     list<Anchor *>::const_iterator hang;

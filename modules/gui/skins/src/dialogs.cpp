@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.4 2003/06/08 16:56:48 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.5 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -422,9 +422,9 @@ void Dialogs::OnExitThread( wxCommandEvent& event )
 int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                  vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
+#ifndef BASIC_SKINS
     Dialogs *p_dialogs = (Dialogs *)param;
 
-#ifndef BASIC_SKINS
     p_dialogs->ShowPopup();
 #endif // BASIC_SKINS
 

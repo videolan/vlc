@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.13 2003/06/08 16:56:48 gbazin Exp $
+ * $Id: themeloader.cpp,v 1.14 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -133,7 +133,7 @@ bool ThemeLoader::ExtractTarGz( const string tarfile, const string rootdir )
     }
 
     if( tar_extract_all( t, (char *)rootdir.c_str() ) != 0 )
-    {
+    {   tar_close( t );
         return false;
     }
 

@@ -2,7 +2,7 @@
  * image.cpp: Image control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: image.cpp,v 1.7 2003/05/02 15:53:32 gbazin Exp $
+ * $Id: image.cpp,v 1.8 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -56,6 +56,10 @@ ControlImage::ControlImage( string id, bool visible, int x, int y, string img,
 //---------------------------------------------------------------------------
 ControlImage::~ControlImage()
 {
+    if( MouseDownAction )
+    {
+        delete MouseDownAction;
+    }
 }
 //---------------------------------------------------------------------------
 void ControlImage::Init()

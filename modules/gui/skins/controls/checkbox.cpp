@@ -2,7 +2,7 @@
  * checkbox.cpp: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.cpp,v 1.6 2003/05/02 15:53:32 gbazin Exp $
+ * $Id: checkbox.cpp,v 1.7 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -95,6 +95,30 @@ ControlCheckBox::ControlCheckBox(
 //---------------------------------------------------------------------------
 ControlCheckBox::~ControlCheckBox()
 {
+    if( ClickAction1 )
+    {
+        delete ClickAction1;
+    }
+    if( ClickAction2 )
+    {
+        delete ClickAction2;
+    }
+    if( MouseOverAction1 )
+    {
+        delete MouseOverAction1;
+    }
+    if( MouseOverAction2 )
+    {
+        delete MouseOverAction2;
+    }
+    if( MouseOutAction1 )
+    {
+        delete MouseOutAction1;
+    }
+    if( MouseOutAction2 )
+    {
+        delete MouseOutAction2;
+    }
 }
 //---------------------------------------------------------------------------
 void ControlCheckBox::Init()

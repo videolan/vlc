@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.20 2003/06/08 18:17:50 asmax Exp $
+ * $Id: x11_run.cpp,v 1.21 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -106,6 +106,7 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     {
         if( !proc->EventProc( evt ) )
         {
+            delete (OSEvent *)evt;
             return 1;      // Exit VLC !
         }
     }
@@ -198,7 +199,7 @@ void OSRun( intf_thread_t *p_intf )
 
     timerManager->Destroy();
     delete refreshTimer;
-    
+    delete proc;
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

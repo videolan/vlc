@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.10 2003/06/08 12:45:13 gbazin Exp $
+ * $Id: x11_bitmap.cpp,v 1.11 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -59,7 +59,6 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
     // Find the display
     display = p_intf->p_sys->display;
     int screen = DefaultScreen( display );
-    int depth = DefaultDepth( display, screen );
     Screen *screenptr = DefaultScreenOfDisplay( display );
     Visual *visual = DefaultVisualOfScreen( screenptr );
     Img = NULL;
@@ -176,9 +175,9 @@ void X11Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 //---------------------------------------------------------------------------
 bool X11Bitmap::Hit( int x, int y)
 {
-    unsigned int c = (unsigned int)GetBmpPixel( x, y );
+    int c = GetBmpPixel( x, y );
 
-    if( c == -1 || c == AlphaColor )
+    if( c == -1 || (unsigned int)c == AlphaColor )
         return false;
     else
         return true;

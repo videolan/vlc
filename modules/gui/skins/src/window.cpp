@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.26 2003/06/08 16:56:48 gbazin Exp $
+ * $Id: window.cpp,v 1.27 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -87,6 +87,10 @@ SkinWindow::SkinWindow( intf_thread_t *_p_intf, int x, int y, bool visible,
 //---------------------------------------------------------------------------
 SkinWindow::~SkinWindow()
 {
+    if( Image )
+    {
+        delete Image;
+    }
     // Destroy the controls
     for( unsigned int i = 0; i < ControlList.size(); i++ )
         delete ControlList[i];
@@ -420,10 +424,12 @@ void SkinWindow::MouseUp( int x, int y, int button )
         }
     }
 
+#ifndef BASIC_SKINS
     if( i < 0  && button == 2 )
     {
         p_intf->p_sys->p_dialogs->ShowPopup();
     }
+#endif
 }
 //---------------------------------------------------------------------------
 void SkinWindow::MouseDblClick( int x, int y, int button )
@@ -512,7 +518,6 @@ void SkinWindow::ReSize()
         if( Image != NULL )
             delete (OSGraphics *)Image;
         Image = (Graphics *)new OSGraphics( p_intf, w, h, this );
-//        Image = (Graphics *)new OSGraphics( w, h, this );
 
         Size( w, h );
     }

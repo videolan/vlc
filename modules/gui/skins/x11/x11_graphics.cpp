@@ -2,7 +2,7 @@
  * x11_graphics.cpp: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.7 2003/06/08 15:22:03 asmax Exp $
+ * $Id: x11_graphics.cpp,v 1.8 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -170,7 +170,7 @@ void X11Region::Move( int x, int y )
 //---------------------------------------------------------------------------
 bool X11Region::Hit( int x, int y )
 {
-    int i;
+    unsigned int i;
 
     x -= RefPoint.x;
     y -= RefPoint.y;

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.34 2003/06/08 16:56:48 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.35 2003/06/09 12:33:16 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -187,6 +187,10 @@ static void Close ( vlc_object_t *p_this )
 
     // Delete theme, it's important to do it correctly
     delete (OSTheme *)p_intf->p_sys->p_theme;
+
+#if defined X11_SKINS
+    XCloseDisplay( p_intf->p_sys->display );
+#endif
 
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
