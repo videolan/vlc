@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.180 2002/05/29 18:39:14 sam Exp $
+ * $Id: video_output.c,v 1.180.2.1 2002/06/02 02:23:34 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -575,6 +575,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_last_picture->i_status = DESTROYED_PICTURE;
                     p_vout->i_heap_size--;
                 }
+                p_last_picture = NULL;
                 vlc_mutex_unlock( &p_vout->picture_lock );
             }
 
