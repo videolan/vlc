@@ -3,7 +3,7 @@
  *            encoding.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: charset.c,v 1.3 2003/09/29 17:36:35 gbazin Exp $
+ * $Id: charset.c,v 1.4 2003/10/11 21:08:40 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <thedj at users.sf.net>
  *
@@ -214,7 +214,7 @@ static char *vlc_encoding_from_locale( char *psz_locale )
         
         if( psz_modifier == NULL )
             return psz_dot;
-        if( psz_modifier - psz_dot < sizeof( buf ))
+        if( 0 < ( psz_modifier - psz_dot ) < sizeof( buf ))
         {
             memcpy( buf, psz_dot, psz_modifier - psz_dot );
             buf[ psz_modifier - psz_dot ] = '\0';
@@ -222,7 +222,7 @@ static char *vlc_encoding_from_locale( char *psz_locale )
         }
     }
     /* try language mapping */
-    return vlc_encoding_from_language( psz_locale );
+    return (char *)vlc_encoding_from_language( psz_locale );
 }
 
 vlc_bool_t vlc_current_charset( char **psz_charset )
@@ -260,7 +260,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     /* On some old systems, one used to set locale = "iso8859_1". On others,
      * you set it to "language_COUNTRY.charset". Darwin only has LANG :(
      */
-    psz_codeset = vlc_encoding_from_locale( psz_locale );
+    psz_codeset = vlc_encoding_from_locale( (char *)psz_locale );
 # endif /* HAVE_LANGINFO_CODESET */
 
 #elif defined WIN32
@@ -322,7 +322,7 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
     }
     
     if( psz_charset )
-        *psz_charset = (char *)psz_codeset;
+        *psz_charset = strdup((char *)psz_codeset);
 
     if (strcasecmp(psz_codeset, "UTF8")==0 || strcasecmp(psz_codeset, "UTF-8")==0)
         return VLC_TRUE;
