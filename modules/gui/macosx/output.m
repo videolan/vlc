@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.11 2003/07/27 23:05:41 hartman Exp $
+ * $Id: output.m,v 1.12 2003/07/28 21:41:20 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -260,8 +260,8 @@
         else if( [o_mode isEqualToString: _NS("RTP")] )
         {
             [o_stream_address setEnabled: YES];
-            [o_stream_ttl setEnabled: NO];
-            [o_stream_ttl_stp setEnabled: NO];
+            [o_stream_ttl setEnabled: YES];
+            [o_stream_ttl_stp setEnabled: YES];
             [[o_mux_selector itemAtIndex: 1] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];

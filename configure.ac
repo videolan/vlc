@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.44 2003/07/27 21:35:50 jpsaman Exp $
+dnl $Id: configure.ac,v 1.45 2003/07/28 21:41:20 massiot Exp $
 
 AC_INIT(vlc,0.6.1-test1)
 
@@ -1506,7 +1506,10 @@ if test "${enable_ffmpeg}" != "no"
 then
   AC_ARG_WITH(ffmpeg-mp3lame,
     [    --with-ffmpeg-mp3lame   if ffmpeg has been compiled with mp3lame support],
-    [ AX_ADD_LDFLAGS([stream_out_transcode],[-lmp3lame])
+    [
+      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+      dnl       linker would miserably barf on multiple definitions.
+      AX_ADD_LDFLAGS([stream_out_transcode],[])
       AX_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
 
   AC_ARG_WITH(ffmpeg-tree,

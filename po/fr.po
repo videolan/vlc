@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: vlc\n"
 "POT-Creation-Date: 2003-07-24 00:53+0200\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
-"Last-Translator: Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be>\n"
+"Last-Translator: Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be> 2003-07-27\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -279,7 +279,8 @@ msgid ""
 msgstr ""
 "Cette option permet de choisir des interfaces supplémentaires à utiliser. "
 "Elles seront lancées en tâche de fond en plus de l'interface prédéfini. "
-"Utilisez une liste de modules séparés par des virgules."
+"Utilisez une liste de modules séparés par des virgules. "
+"(Les valeurs courantes sont logger, gestures, sap, rc, http, screensaver.)"
 
 #: src/libvlc.h:55
 msgid "Verbosity (0,1,2)"
@@ -453,17 +454,17 @@ msgstr ""
 #: src/libvlc.h:130
 #, fuzzy
 msgid "Choose prefered audio output channels mode"
-msgstr "Liste d'encodeurs audio préférés"
+msgstr "Sélectionnez le mode des canaux de sortie audio préféré"
 
 #: src/libvlc.h:132
-#, fuzzy
 msgid ""
 "This option allows you to set the audio output channels mode that will be "
 "used by default when possible (ie. if your hardware supports it as well as "
 "the audio stream being played)"
 msgstr ""
-"Cette option permet d'utiliser a priori la sortie audio S/PDIF lorsque le "
-"matériel la reconnaît de même que le flux audio en train d'être joué."
+"Cette option permet de fixer le mode des canaux de sortie audio à utiliser "
+"a priori si possible (i.e. si le matériel en est capable, de même que le flux "
+"audio à jouer)."
 
 #: src/libvlc.h:136
 msgid "Use the S/PDIF audio output when available"
@@ -1045,7 +1046,7 @@ msgstr ""
 
 #: src/libvlc.h:402
 msgid "Increase the priority of the process"
-msgstr ""
+msgstr "Augmente la priorité du processus"
 
 #: src/libvlc.h:404
 msgid ""
@@ -2022,8 +2023,8 @@ msgid ""
 "This video decoder can benefit from a multiprocessor computer. If you have "
 "one, you can specify the number of processors here."
 msgstr ""
-"iCe décodeur vidéo peut tirer partie d'un ordinateur multi-processeurs. Si "
-"vous en avez un, vous pouvez indiquer le nombre de procésseurs ici."
+"Ce décodeur vidéo peut tirer partie d'un ordinateur multi-processeurs. Si "
+"vous en avez un, vous pouvez indiquer le nombre de processeurs ici."
 
 #: modules/codec/mpeg_video/parser.c:76
 msgid "Force synchro algorithm {I|I+|IP|IP+|IPB}"
@@ -2129,9 +2130,8 @@ msgid "mouse gestures control interface"
 msgstr "Interface de contrôle de mouvements de souris"
 
 #: modules/control/http.c:131
-#, fuzzy
 msgid "Host address"
-msgstr "Adresse"
+msgstr "Adresse l'hôte"
 
 #: modules/control/http.c:133
 #, fuzzy
@@ -2139,9 +2139,8 @@ msgid "You can set the address and port on which the http interface will bind"
 msgstr "Indiquez l'adresse à laquelle l'interface HTPP est reliée"
 
 #: modules/control/http.c:134 modules/control/http.c:135
-#, fuzzy
 msgid "Source directory"
-msgstr "Choisir un fichier ou un répertoire"
+msgstr "Répertoire source"
 
 #: modules/control/http.c:138
 msgid "HTTP remote control interface"
@@ -2152,9 +2151,8 @@ msgid "HTTP remote control"
 msgstr "Commande HTTP à distance"
 
 #: modules/control/joystick.c:134
-#, fuzzy
 msgid "the amount of joystick movement required for a movement to berecorded"
-msgstr "La quantité requise pour enregistrer un mouvement de souris"
+msgstr "La quantité requise pour enregistrer un mouvement de joystick"
 
 #: modules/control/joystick.c:137
 msgid "Joystick device"
@@ -2433,9 +2431,8 @@ msgid "FOURCC"
 msgstr ""
 
 #: modules/demux/avi/avi.c:1187
-#, fuzzy
 msgid "Audio Bitrate"
-msgstr "Audio"
+msgstr "Débit audio"
 
 #: modules/demux/avi/avi.c:1225 modules/demux/ogg.c:631
 #: modules/demux/ogg.c:737 modules/demux/ogg.c:912
@@ -3150,7 +3147,7 @@ msgstr "Tout sélectionner"
 
 #: modules/gui/beos/PlayListWindow.cpp:103
 msgid "Select None"
-msgstr ""
+msgstr "Ne rien sélectionner"
 
 #: modules/gui/beos/PlayListWindow.cpp:108
 msgid "Sort Reverse"
@@ -4447,7 +4444,7 @@ msgstr "Lisez-moi..."
 
 #: modules/gui/macosx/intf.m:417
 msgid "Online Documentation"
-msgstr ""
+msgstr "Documentation en ligne"
 
 #: modules/gui/macosx/intf.m:418
 msgid "Report a Bug"
@@ -4470,7 +4467,7 @@ msgid ""
 "An error has occurred which probably prevented the execution of your request:"
 msgstr ""
 "Une erreur est survenue, qui a probablement empêché le déroulement normal du "
-"programme:"
+"programme :"
 
 #: modules/gui/macosx/intf.m:431
 msgid "If you believe that it is a bug, please follow the instructions at:"
@@ -4545,7 +4542,7 @@ msgstr "Dossier VIDEO_TS"
 #: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:389
 #: modules/gui/macosx/open.m:480
 msgid "Audio CD"
-msgstr ""
+msgstr "CD audio"
 
 #: modules/gui/macosx/open.m:171
 msgid "Load subtitles file:"
@@ -4553,7 +4550,7 @@ msgstr "Fichier de sous-titres :"
 
 #: modules/gui/macosx/open.m:174
 msgid "Override"
-msgstr "Ecraser"
+msgstr "Remplacer"
 
 #: modules/gui/macosx/open.m:333 modules/gui/macosx/open.m:527
 #: modules/gui/macosx/open.m:631 modules/gui/macosx/open.m:678
@@ -4571,7 +4568,7 @@ msgstr "Ouvrir un dossier VIDEO_TS"
 
 #: modules/gui/macosx/output.m:132
 msgid "Advanced output:"
-msgstr ""
+msgstr "Options de sortie avancées :"
 
 #: modules/gui/macosx/output.m:136
 msgid "Output Options"
@@ -4611,22 +4608,21 @@ msgstr ""
 
 #: modules/gui/macosx/output.m:157
 msgid "Transcode options"
-msgstr ""
+msgstr "Options de transcodage"
 
 #: modules/gui/macosx/output.m:161 modules/gui/macosx/output.m:167
 #: modules/gui/wxwindows/streamout.cpp:609
 #: modules/gui/wxwindows/streamout.cpp:661
 msgid "Bitrate (kb/s)"
-msgstr ""
+msgstr "Débit (kbps)"
 
 #: modules/gui/macosx/output.m:174 modules/gui/wxwindows/streamout.cpp:483
-#, fuzzy
 msgid "Miscellaneous Options"
-msgstr "Divers"
+msgstr "Options diverses"
 
 #: modules/gui/macosx/output.m:175
 msgid "Announce streams via SAP Channel:"
-msgstr ""
+msgstr "Annoncer le flux via un canal SAP :"
 
 #: modules/gui/macosx/output.m:306 modules/gui/macosx/output.m:366
 msgid "mp4"
@@ -4650,11 +4646,11 @@ msgid ""
 "Are you sure you want to continue?"
 msgstr ""
 "Attention, ceci va réinitialiser le fichier de configuration du VLC.\n"
-"Voulez-vous vraiment continuer ?"
+"Désirez-vous vraiment continuer ?"
 
 #: modules/gui/macosx/prefs.m:198
 msgid "Select file or directory"
-msgstr "Choisir un fichier ou un répertoire"
+msgstr "Sélectionnez un fichier ou un répertoire"
 
 #: modules/gui/macosx/prefs.m:408 modules/gui/wxwindows/preferences.cpp:767
 msgid "Default"
@@ -4665,14 +4661,12 @@ msgid "ncurses interface"
 msgstr "Interface ncurses"
 
 #: modules/gui/pda/interface.c:396
-#, fuzzy
 msgid "UDP/RTP (Adress when Multicast)"
 msgstr "Multidiffusion UDP/RTP"
 
 #: modules/gui/pda/pda.c:72
-#, fuzzy
 msgid "PDA Linux Gtk2+ interface"
-msgstr "Interface Gtk+ Familiar Linux"
+msgstr "Interface Gtk2+ Linux pour PDA"
 
 #: modules/gui/qnx/qnx.c:44
 msgid "QNX RTOS video and audio output"
@@ -4925,16 +4919,15 @@ msgstr "Entrée"
 
 #: modules/gui/wxwindows/menus.cpp:197
 msgid "Close Menu"
-msgstr ""
+msgstr "Fermer"
 
 #: modules/gui/wxwindows/menus.cpp:358
 msgid "Empty"
 msgstr "Vide"
 
 #: modules/gui/wxwindows/messages.cpp:116
-#, fuzzy
 msgid "Save As..."
-msgstr "&Sauver la liste de lecture..."
+msgstr "Enregistrer sous..."
 
 #: modules/gui/wxwindows/messages.cpp:121
 msgid "Verbose"
@@ -4942,7 +4935,7 @@ msgstr "Verbeux"
 
 #: modules/gui/wxwindows/messages.cpp:222
 msgid "Save Messages As a file..."
-msgstr ""
+msgstr "Enregistrer les messages dans un document..."
 
 #: modules/gui/wxwindows/open.cpp:181
 msgid ""
@@ -4953,7 +4946,7 @@ msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:198 modules/gui/wxwindows/subtitles.cpp:98
 msgid "Subtitles file"
-msgstr ""
+msgstr "Fichier de sous-titres"
 
 #: modules/gui/wxwindows/open.cpp:199
 msgid "Load an additional subtitles file. Currently only works with AVI files."
@@ -4977,7 +4970,7 @@ msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:386
 msgid "CD Audio"
-msgstr ""
+msgstr "CD audio"
 
 #: modules/gui/wxwindows/open.cpp:886 modules/gui/wxwindows/streamout.cpp:785
 msgid "Save file"
@@ -4994,11 +4987,11 @@ msgstr ""
 
 #: modules/gui/wxwindows/playlist.cpp:118
 msgid "&Open Playlist..."
-msgstr "&Ouvre la liste de lecture"
+msgstr "&Ouvrir la liste de lecture"
 
 #: modules/gui/wxwindows/playlist.cpp:119
 msgid "&Save Playlist..."
-msgstr "&Sauver la liste de lecture..."
+msgstr "&Enregistrer la liste de lecture..."
 
 #: modules/gui/wxwindows/playlist.cpp:121
 msgid "&Close"
@@ -5030,7 +5023,7 @@ msgstr "Pas d'info"
 
 #: modules/gui/wxwindows/playlist.cpp:332
 msgid "Save playlist"
-msgstr "Sauver la liste de lecture"
+msgstr "Enregistrer la liste de lecture"
 
 #: modules/gui/wxwindows/preferences.cpp:318
 msgid "Reset config file"
@@ -5073,20 +5066,19 @@ msgstr "Nom de fichier"
 
 #: modules/gui/wxwindows/streamout.cpp:495
 msgid "SAP Announce"
-msgstr ""
+msgstr "Annonce SAP"
 
 #: modules/gui/wxwindows/streamout.cpp:497
-#, fuzzy
 msgid "Channel Name "
-msgstr "Serveur de chaînes"
+msgstr "Nom du canal"
 
 #: modules/gui/wxwindows/streamout.cpp:569
 msgid "Transcoding options"
-msgstr ""
+msgstr "Options de transcodage"
 
 #: modules/gui/wxwindows/streamout.cpp:602
 msgid "Video codec"
-msgstr "Codec video"
+msgstr "Codec vidéo"
 
 #: modules/gui/wxwindows/streamout.cpp:649
 msgid "Audio codec"
@@ -5098,7 +5090,7 @@ msgstr "Ouvrir un fichier de sous-titres"
 
 #: modules/gui/wxwindows/subtitles.cpp:115
 msgid "Subtitles options"
-msgstr "Sous-titres"
+msgstr "Options de sous-titres"
 
 #: modules/gui/wxwindows/subtitles.cpp:119
 msgid "Delay subtitles (in 1/10s)"
@@ -5149,7 +5141,7 @@ msgstr ""
 
 #: modules/misc/dummy/dummy.c:53
 msgid "dummy interface function"
-msgstr "fonctions d'interface qui ne fint rien"
+msgstr "fonctions d'interface qui ne font rien"
 
 #: modules/misc/dummy/dummy.c:62
 msgid "dummy access function"
@@ -5174,7 +5166,7 @@ msgstr "fonctions de sortie vidéo qui ne font rien"
 #: modules/misc/dummy/dummy.c:84
 #, fuzzy
 msgid "dummy font renderer function"
-msgstr "fonctions d'interface qui ne fint rien"
+msgstr "fonctions d'interface qui ne font rien"
 
 #: modules/misc/dummy/interface.c:52
 msgid "Using the dummy interface plugin..."
@@ -5197,9 +5189,8 @@ msgid "The size of the fonts used by the osd module"
 msgstr "Taille de caractères utilisée par le module osd"
 
 #: modules/misc/freetype.c:71
-#, fuzzy
 msgid "Fonts"
-msgstr "Police"
+msgstr "Polices"
 
 #: modules/misc/freetype.c:74
 msgid "freetype2 font renderer"
@@ -5283,7 +5274,7 @@ msgstr ""
 
 #: modules/misc/sap.c:144 modules/misc/sap.c:145
 msgid "SAP multicast address"
-msgstr ""
+msgstr "Adresse de multidiffusion SAP"
 
 #: modules/misc/sap.c:146
 msgid "No IPv4-SAP listening"
