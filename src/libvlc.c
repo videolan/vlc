@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.72 2003/03/29 12:22:15 gbazin Exp $
+ * $Id: libvlc.c,v 1.73 2003/04/06 14:12:46 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -322,6 +322,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /* Check for translation config option */
+#ifndef SYS_DARWIN
     if( !config_GetInt( p_vlc, "translation" ) )
     {
         /* Reset the default domain */
@@ -332,6 +333,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         textdomain( "dummy" );
 #endif
     }
+#endif
 
     /*
      * Load the builtins and plugins into the module_bank.
