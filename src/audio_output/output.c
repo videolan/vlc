@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.36 2003/02/08 17:26:00 massiot Exp $
+ * $Id: output.c,v 1.37 2003/04/22 19:26:02 asmax Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,6 +44,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
     char * psz_name = config_GetPsz( p_aout, "aout" );
     int i_rate = config_GetInt( p_aout, "aout-rate" );
     vlc_value_t val;
+    /* kludge to avoid a fpu error when rate is 0... */
+    if( i_rate == 0 ) i_rate = -1;
 
     memcpy( &p_aout->output.output, p_format, sizeof(audio_sample_format_t) );
     if ( i_rate != -1 )

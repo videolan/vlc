@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.13 2003/04/21 21:51:16 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.14 2003/04/22 19:26:02 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -52,19 +52,25 @@ void OSAPI_SendMessage( SkinWindow *win, unsigned int message, unsigned int para
 void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int param1,
                         long param2 )
 {
-    GdkEventClient *event = new GdkEventClient;
+    GdkEventClient *event = (GdkEventClient *) new GdkEvent;
     
     event->type = GDK_CLIENT_EVENT;
     if( win == NULL )
+    {
         event->window = NULL;
+    }
     else
+    {
         event->window = ((GTK2Window *)win)->GetHandle();
+    }
     event->send_event = 0;
     event->message_type = NULL;
     event->data_format = 32;
     event->data.l[0] = message;
     event->data.l[1] = param1;
     event->data.l[2] = param2;
+    event->data.l[3] = 0;
+    event->data.l[4] = 0;
 
     gdk_event_put( (GdkEvent *)event );
 

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.16 2003/04/21 18:39:39 asmax Exp $
+ * $Id: skin_main.cpp,v 1.17 2003/04/22 19:26:02 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -107,8 +107,8 @@ static int Open ( vlc_object_t *p_this )
 
 #if !defined WIN32
     // Initialize GDK
-    int    i_args   = 1;
-    char  *p_args[] = { "", NULL };
+    int    i_args   = 3;
+    char  *p_args[] = { "", "", "--sync", NULL };
     char **pp_args  = p_args;
 
     gdk_init( &i_args, &pp_args );
