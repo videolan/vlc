@@ -29,6 +29,9 @@
 
 AsyncQueue::AsyncQueue( intf_thread_t *pIntf ): SkinObject( pIntf )
 {
+    // Initialize the mutex
+    vlc_mutex_init( pIntf, &m_lock );
+
     // Create a timer
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
     m_pTimer = pOsFactory->createOSTimer( Callback( this, &doFlush ) );
@@ -41,6 +44,7 @@ AsyncQueue::AsyncQueue( intf_thread_t *pIntf ): SkinObject( pIntf )
 AsyncQueue::~AsyncQueue()
 {
     delete( m_pTimer );
+    vlc_mutex_destroy( &m_lock );
 }
 
 
@@ -78,6 +82,8 @@ void AsyncQueue::push( const CmdGenericPtr &rcCommand )
 
 void AsyncQueue::remove( const string &rType )
 {
+    vlc_mutex_lock( &m_lock );
+
     list<CmdGenericPtr>::iterator it;
     for( it = m_cmdList.begin(); it != m_cmdList.end(); it++ )
     {
@@ -90,19 +96,25 @@ void AsyncQueue::remove( const string &rType )
             it = itNew;
         }
     }
+
+    vlc_mutex_unlock( &m_lock );
 }
 
 
 void AsyncQueue::flush()
 {
+    vlc_mutex_lock( &m_lock );
+
     while( m_cmdList.size() > 0 )
     {
-        // Execute the first command in the queue
-        CmdGenericPtr &rcCommand = m_cmdList.front();
-        rcCommand.get()->execute();
-        // And remove it
+        // Pop the first command from the queue
+        CmdGenericPtr cCommand = m_cmdList.front();
         m_cmdList.pop_front();
+        // And execute it
+        cCommand.get()->execute();
     }
+
+    vlc_mutex_unlock( &m_lock );
 }
 
 
