@@ -1,8 +1,8 @@
 /*****************************************************************************
- * m3u.c : M3U playlist format import
+ * pls.c : PLS playlist format import
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: m3u.c,v 1.2 2004/01/11 17:46:58 sigmunau Exp $
+ * $Id: pls.c,v 1.1 2004/01/11 17:46:58 sigmunau Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -45,9 +45,9 @@ static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 /*****************************************************************************
- * Import_M3U: main import function
+ * Import_PLS: main import function
  *****************************************************************************/
-int Import_M3U( vlc_object_t *p_this )
+int Import_PLS( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
 
@@ -61,22 +61,22 @@ int Import_M3U( vlc_object_t *p_this )
     }
     psz_ext = strrchr ( p_demux->psz_path, '.' );
 
-    if( !strncmp( p_peek, "#EXTM3U", 7 ) )
+    if( !strncasecmp( p_peek, "[playlist]", 10 ) )
     {
         ;
     }
-    else if( ( psz_ext && !strcasecmp( psz_ext, ".m3u") ) ||
-             ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "m3u") ) )
+    else if( ( psz_ext && !strcasecmp( psz_ext, ".pls") ) ||
+             ( p_demux->psz_demux && !strcmp(p_demux->psz_demux, "pls") ) )
     {
         ;
     }
     else
     {
-        msg_Warn(p_demux, "m3u import module discarded");
+        msg_Warn(p_demux, "pls import module discarded");
         return VLC_EGENERIC;
         
     }
-    msg_Info( p_demux, "Found valid M3U playlist file");
+    msg_Info( p_demux, "Found valid PLS playlist file");
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
@@ -94,7 +94,7 @@ int Import_M3U( vlc_object_t *p_this )
 /*****************************************************************************
  * Deactivate: frees unused data
  *****************************************************************************/
-void Close_M3U( vlc_object_t *p_this )
+void Close_PLS( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     if( p_demux->p_sys->psz_prefix )
@@ -104,17 +104,19 @@ void Close_M3U( vlc_object_t *p_this )
     free( p_demux->p_sys );
 }
 
-
 static int Demux( demux_t *p_demux )
 {
     mtime_t        i_duration = -1;
     char          *psz_name = NULL;    
     char          *psz_line;
-    char          *psz_parse;
-    char          *psz_duration;
-    char          *psz_mrl;
+    char          *psz_mrl = NULL;
+    char          *psz_key;
+    char          *psz_value;
     playlist_t    *p_playlist;
     int            i_position;
+    int            i_item = -1;
+    int            i_new_item = 0;
+    int            i_key_length;
 
     p_playlist = (playlist_t *) vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                  FIND_PARENT );
@@ -128,50 +130,127 @@ static int Demux( demux_t *p_demux )
     i_position = p_playlist->i_index + 1;
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
-        if( *psz_line == '#' )
+        if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) )
         {
-            /* parse extra info */
-            psz_parse = psz_line;
-            while( *psz_parse &&
-                   strncasecmp( psz_parse, "EXTINF:", sizeof("EXTINF:") - 1 ) )
-               psz_parse++;
-            if( *psz_parse )
-            {
-                psz_parse += sizeof("EXTINF:") - 1;
-                while( *psz_parse == '\t' || *psz_parse == ' ' )
-                    psz_parse++;
-                psz_duration = psz_parse;
-                psz_parse = strchr( psz_parse, ',' );
-                if ( psz_parse )
-                {
-                    *psz_parse = '\0';
-                    psz_parse++;
-                    psz_name = strdup( psz_parse );
-                    i_duration = atoi( psz_duration );
-                    if( i_duration != -1 )
-                    {
-                        i_duration *= 1000000;
-                    }
-                }
-            }
+            free( psz_line );
+            continue;
+        }
+        psz_key = psz_line;
+        psz_value = strchr( psz_line, '=' );
+        if( psz_value )
+        {
+            *psz_value='\0';
+            psz_value++;
         }
         else
         {
-            psz_mrl = ProcessMRL( psz_line, p_demux->p_sys->psz_prefix );
-            playlist_Add( p_playlist, psz_mrl, psz_name,
-                          PLAYLIST_INSERT, i_position );
-            playlist_SetDuration( p_playlist, i_position, i_duration );
-            free( psz_mrl );
-            i_position++;
-            i_duration = -1;
+            msg_Warn( p_demux, "invalid line in pls file" );
+            free( psz_line );
+            continue;
+        }
+        if( !strcasecmp( psz_key, "version" ) )
+        {
+            msg_Dbg( p_demux, "pls file version: %s", psz_value );
+            free( psz_line );
+            continue;
+        }
+        /* find the number part of of file1, title1 or length1 etc */
+        i_key_length = strlen( psz_key );
+        if( i_key_length >= 5 ) /* file1 type case */
+        {
+            i_new_item = atoi( psz_key + 4 );
+            if( i_new_item == 0 && i_key_length >= 6 ) /* title1 type case */
+            {
+                i_new_item = atoi( psz_key + 5 );
+                if( i_new_item == 0 && i_key_length >= 7 ) /* length1 type case */
+                {
+                    i_new_item = atoi( psz_key + 6 );
+                }
+            }
+        }
+        if( i_new_item == 0 )
+        {
+            msg_Warn( p_demux, "couldn't find number of item" );
+            free( psz_line );
+            continue;
+        }
+        if( i_item == -1 )
+        {
+            i_item = i_new_item;
+        }
+        /* we found a new item, insert the previous */
+        if( i_item != i_new_item )
+        {
+            if( psz_mrl )
+            {
+                playlist_Add( p_playlist, psz_mrl, psz_name,
+                              PLAYLIST_INSERT, i_position );
+                if( i_duration != -1 )
+                {
+                    playlist_SetDuration( p_playlist, i_position, i_duration );
+                }
+                i_position++;
+                free( psz_mrl );
+                psz_mrl = NULL;
+            }
+            else
+            {
+                msg_Warn( p_demux, "no file= part found for item %d", i_item );
+            }
             if( psz_name )
             {
                 free( psz_name );
                 psz_name = NULL;
             }
+            i_duration = -1;
+            i_item = i_new_item;
+            i_new_item = 0;
         }
-        free( psz_line);
+        if( !strncasecmp( psz_key, "file", sizeof("file") -1 ) )
+        {
+            psz_mrl = ProcessMRL( psz_value, p_demux->p_sys->psz_prefix );
+        }
+        else if( !strncasecmp( psz_key, "title", sizeof("title") -1 ) )
+        {
+            psz_name = strdup( psz_value );
+        }
+        else if( !strncasecmp( psz_key, "length", sizeof("length") -1 ) )
+        {
+            i_duration = atoi( psz_value );
+            if( i_duration != -1 )
+            {
+                i_duration *= 1000000;
+            }
+        }
+        else
+        {
+            msg_Warn( p_demux, "unknown key found in pls file: %s", psz_key );
+        }
+        free( psz_line );
     }
+    /* Add last object */
+    if( psz_mrl )
+    {
+        playlist_Add( p_playlist, psz_mrl, psz_name,
+                      PLAYLIST_INSERT, i_position );
+        if( i_duration != -1 )
+        {
+                    playlist_SetDuration( p_playlist, i_position, i_duration );
+        }
+        i_position++;
+        free( psz_mrl );
+        psz_mrl = NULL;
+    }
+    else
+    {
+        msg_Warn( p_demux, "no file= part found for item %d", i_item );
+    }
+    if( psz_name )
+    {
+        free( psz_name );
+        psz_name = NULL;
+    }
+
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
 }
