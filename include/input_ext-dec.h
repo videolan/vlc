@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.7 2000/12/27 18:35:45 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.8 2001/01/09 21:03:47 sam Exp $
  *
  * Authors:
  *
@@ -244,10 +244,10 @@ static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
 #if defined(SYS_BEOS)
 #   define swab32(x) B_BENDIAN_TO_HOST_INT32(x)
 #else
-#   if __BYTE_ORDER == __BIG_ENDIAN
+#   ifdef WORDS_BIG_ENDIAN
 #       define swab32(x) (x)
 #   else
-#       if defined (__i386__)
+#       if defined (HAVE_X86_BSWAP)
 static __inline__ const u32 __i386_swab32( u32 x )
 {
     __asm__("bswap %0" : "=r" (x) : "0" (x));

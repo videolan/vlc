@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.21 2001/01/06 07:23:32 sam Exp $
+ * $Id: common.h,v 1.22 2001/01/09 21:03:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -150,16 +150,9 @@ typedef struct video_parser_s *         p_video_parser_t;
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties - note that these 'functions'
  * needs <netinet/in.h> or the local equivalent. */
-/* FIXME??: hton64 should be declared as an extern inline function to avoid border
- * effects (see byteorder.h) */
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-#define hton16      htons
-#define hton32      htonl
-#define hton64(i)   ( ((u64)(htonl((i) & 0xffffffff)) << 32) | htonl(((i) >> 32) & 0xffffffff ) )
-#define ntoh16      ntohs
-#define ntoh32      ntohl
-#define ntoh64      hton64
-#elif __BYTE_ORDER == __BIG_ENDIAN
+/* FIXME: hton64 should be declared as an extern inline function to avoid
+ * border effects (see byteorder.h) */
+#if WORDS_BIGENDIAN
 #define hton16      htons
 #define hton32      htonl
 #define hton64(i)   ( i )
@@ -167,7 +160,12 @@ typedef struct video_parser_s *         p_video_parser_t;
 #define ntoh32      ntohl
 #define ntoh64(i)   ( i )
 #else
-/* XXX??: cause a compilation error */
+#define hton16      htons
+#define hton32      htonl
+#define hton64(i)   ( ((u64)(htonl((i) & 0xffffffff)) << 32) | htonl(((i) >> 32) & 0xffffffff ) )
+#define ntoh16      ntohs
+#define ntoh32      ntohl
+#define ntoh64      hton64
 #endif
 
 /* Macros with automatic casts */

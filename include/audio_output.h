@@ -192,10 +192,10 @@ typedef struct aout_thread_s
 #define AOUT_FMT_U16_LE      0x00000080                 /* Little endian U16 */
 #define AOUT_FMT_U16_BE      0x00000100                    /* Big endian U16 */
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-#define AOUT_FMT_S16_NE      AOUT_FMT_S16_LE
-#elif __BYTE_ORDER == __BIG_ENDIAN
+#ifdef WORDS_BIGENDIAN
 #define AOUT_FMT_S16_NE      AOUT_FMT_S16_BE
+#else
+#define AOUT_FMT_S16_NE      AOUT_FMT_S16_LE
 #endif
 
 /*****************************************************************************

@@ -148,6 +148,9 @@
 /* Define if you have the threads library (-lthreads).  */
 #undef HAVE_LIBTHREADS
 
+/* Define if compiler accepts bswap x86 instruction. */
+#undef HAVE_X86_BSWAP
+
 /* Define if ntohl is in <sys/param.h>. */
 #undef NTOHL_IN_SYS_PARAM_H
 

@@ -25,6 +25,11 @@ dnl Check for compiler environment
 AC_C_CONST
 AC_C_BIGENDIAN
 
+AC_MSG_CHECKING([whether compiler accepts bswap x86 instruction])
+AC_TRY_COMPILE([unsigned int foo( unsigned int x )
+   { __asm__("bswap %0" : "=r" (x) : "0" (x)); return x; }],,
+ AC_DEFINE(HAVE_X86_BSWAP, 1, Define if compiler accepts bswap x86 instruction.) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol)
 AC_CHECK_FUNCS(setenv putenv)
