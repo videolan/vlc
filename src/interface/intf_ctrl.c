@@ -465,7 +465,7 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
     int                 i_method = 0;                    /* method parameter */
     char *              p_source = NULL;                 /* source parameter */
     int                 i_port = 0;                        /* port parameter */
-    int                 i_vlan = 0;                        /* vlan parameter */
+    int                 i_vlan_id = 0;                  /* vlan id parameter */
 
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
@@ -483,8 +483,8 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
         case 4:                                                      /* port */
             i_port = p_argv[i_arg].i_num;
             break;
-        case 5:                                                      /* VLAN */
-            i_vlan = p_argv[i_arg].i_num;
+        case 5:                                                   /* VLAN id */
+            i_vlan_id = p_argv[i_arg].i_num;
             break;
         }
     }
@@ -495,7 +495,7 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
         input_DestroyThread( p_main->p_intf->p_input, NULL );
     }
 
-    p_main->p_intf->p_input = input_CreateThread( i_method, p_source, i_port, i_vlan,
+    p_main->p_intf->p_input = input_CreateThread( i_method, p_source, i_port, i_vlan_id,
                                                   p_main->p_intf->p_vout, p_main->p_aout,
                                                   NULL );
     return( INTF_NO_ERROR );

@@ -73,7 +73,7 @@ typedef struct intf_channel_s
     int         i_input_method;                   /* input method descriptor */
     char *      psz_input_source;                   /* source string (owned) */
     int         i_input_port;                                        /* port */
-    int         i_input_vlan;                                        /* vlan */
+    int         i_input_vlan_id;                                  /* vlan id */
 } intf_channel_t;
 
 /*****************************************************************************
@@ -313,7 +313,7 @@ int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
 
             /* Open a new input */
             p_intf->p_input = input_CreateThread( p_channel->i_input_method, p_channel->psz_input_source,
-                                  p_channel->i_input_port, p_channel->i_input_vlan,
+                                  p_channel->i_input_port, p_channel->i_input_vlan_id,
                                   p_intf->p_vout, p_main->p_aout, NULL );
             return( p_intf->p_input == NULL );
             }
@@ -537,7 +537,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
  *      integer         input method (see input.h)
  *      string          input source
  *      integer         input port
- *      integer         input vlan
+ *      integer         input vlan id
  * The last field must end with a semicolon.
  * Comments and empty lines are not explicitely allowed, but lines with parsing
  * errors are ignored without warning.
@@ -589,11 +589,11 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
         {
             if( !ParseChannel( p_channel, psz_line ) )
             {
-                intf_DbgMsg( "channel [%d] %s : method %d (%s:%d vlan %d)\n",
+                intf_DbgMsg( "channel [%d] %s : method %d (%s:%d vlan id %d)\n",
                          p_channel->i_channel, p_channel->psz_description,
                          p_channel->i_input_method,
                          p_channel->psz_input_source,
-                         p_channel->i_input_port, p_channel->i_input_vlan );
+                         p_channel->i_input_port, p_channel->i_input_vlan_id );
                 p_channel++;
             }
         }
@@ -658,7 +658,7 @@ static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
     p_channel->i_input_method =         0;
     p_channel->psz_input_source =       NULL;
     p_channel->i_input_port =           0;
-    p_channel->i_input_vlan =           0;
+    p_channel->i_input_vlan_id =        0;
 
     /* Parse string */
     i_field = 0;
@@ -725,8 +725,8 @@ static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
                     i_field = -1;
                 }
                 break;
-            case 5:                                            /* input vlan */
-                p_channel->i_channel = strtol( psz_str, &psz_end, 0);
+            case 5:                                          /* input vlan id */
+                p_channel->i_input_vlan_id = strtol( psz_str, &psz_end, 0);
                 if( (*psz_str == '\0') || (*psz_end != '\0') )
                 {
                     i_field = -1;

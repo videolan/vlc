@@ -180,7 +180,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
-    /* Initialize the vomue level */
+    /* Initialize the volume level */
     p_aout->vol = VOLUME_DEFAULT;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype
@@ -546,7 +546,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
     l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> (p_fifo->b_stereo));
 
     l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 256);
-//    intf_DbgMsg( "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
+    intf_DbgMsg( "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->l_rate );
 
@@ -569,13 +569,11 @@ void aout_Thread_S8_Stereo( aout_thread_t * p_aout )
 
 void aout_Thread_U8_Mono( aout_thread_t * p_aout )
 {
-# if 0
     int i_fifo;
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
 
-    intf_DbgMsg("adec debug: ********aout_Thread_U8_Mono********\n");
-    intf_DbgMsg("adec debug: running audio output thread (%p) (pid == %i)\n", p_aout, getpid());
+    intf_DbgMsg("adec debug: running audio output U8_M_thread (%p) (pid == %i)\n", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */
@@ -586,14 +584,14 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
         {
             switch ( p_aout->fifo[i_fifo].i_type )
             {
-	        case AOUT_EMPTY_FIFO:
+                case AOUT_EMPTY_FIFO:
                     break;
 
-	        case AOUT_INTF_MONO_FIFO:
+                case AOUT_INTF_MONO_FIFO:
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
                     {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
+                        while ( l_buffer < (p_aout->l_units) ) /* p_aout->b_stereo == 0 */
                         {
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
@@ -606,10 +604,8 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                     else
                     {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
+                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units) ) /* p_aout->b_stereo == 0 */
                         {
-                            p_aout->s32_buffer[l_buffer++] +=
-                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
                             UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
@@ -624,12 +620,12 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
                     {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
+                        while ( l_buffer < (p_aout->l_units) ) /* p_aout->b_stereo == 0 */
                         {
+                            /* I mix half left - half right */
                             p_aout->s32_buffer[l_buffer++] +=
-                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
-                            p_aout->s32_buffer[l_buffer++] +=
-                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] );
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] ) / 2 +
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
                             UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
                         }
                         p_aout->fifo[i_fifo].l_units -= p_aout->l_units;
@@ -637,12 +633,12 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                     else
                     {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
+                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units) ) /* p_aout->b_stereo == 0 */
                         {
+                            /* I mix half left - half right */
                             p_aout->s32_buffer[l_buffer++] +=
-                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
-                            p_aout->s32_buffer[l_buffer++] +=
-                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] );
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] ) / 2 +
+                                (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
                             UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
                         }
                         free( p_aout->fifo[i_fifo].buffer ); /* !! */
@@ -675,11 +671,9 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
 
                         if ( p_aout->fifo[i_fifo].l_units > l_units )
                         {
-                            l_buffer_limit = p_aout->l_units /*<< 1*/; /* p_aout->b_stereo == 1 */
+                            l_buffer_limit = p_aout->l_units; /* p_aout->b_stereo == 0 */
                             while ( l_buffer < l_buffer_limit )
                             {
-                                p_aout->s32_buffer[l_buffer++] +=
-                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
                                 p_aout->s32_buffer[l_buffer++] +=
                                     (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
 
@@ -696,12 +690,10 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         }
                         else
                         {
-                            l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units << 1);
-                            /* p_aout->b_stereo == 1 */
+                            l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units);
+                            /* p_aout->b_stereo == 0 */
                             while ( l_buffer < l_buffer_limit )
                             {
-                                p_aout->s32_buffer[l_buffer++] +=
-                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
                                 p_aout->s32_buffer[l_buffer++] +=
                                     (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
 
@@ -749,45 +741,23 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                                 break;
                             }
                         }
-#define SOUND 1
-#define ADEBUG 0
-#define COEFF 2
+
                         if ( p_aout->fifo[i_fifo].l_units > l_units )
                         {
-                            l_buffer_limit = p_aout->l_units /*<< 1*/; /* p_aout->b_stereo == 1 */
-//intf_DbgMsg( "l_buffer_limit:%d\n",l_buffer_limit );
+                            l_buffer_limit = p_aout->l_units; /* p_aout->b_stereo == 0 */
                             while ( l_buffer < l_buffer_limit )
                             {
-#if SOUND
-
+                                /* I mix half left - half right */
                                 p_aout->s32_buffer[l_buffer++] +=
-                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] );
-                                p_aout->s32_buffer[l_buffer++] +=
-                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] );
-
-/*
-//intf_DbgMsg( "1deb " );
-l_buffer++;
-p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) / 2;
-p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
-l_buffer++;
-//intf_DbgMsg( "1fin" );
-*/
-#endif
-
-#if ADEBUG 
-//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 11 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
-intf_DbgMsg( "p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit );
-intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );
-//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 12 : %x (%d)\n",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
-#endif
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] ) / 2 +
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
                                 if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 2/*1*/)) )
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1)) )
                                 {
                                     p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 2/*1*/));
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1));
                                 }
                             }
                             p_aout->fifo[i_fifo].l_units -= l_units;
@@ -795,106 +765,56 @@ intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i
                         }
                         else
                         {
-//#if 0
-                            l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units /*<< 1*/);
-//intf_DbgMsg( "l_buffer_limit:%d\n",l_buffer_limit );
-                           /* p_aout->b_stereo == 1 */
+                            l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units);
+                            /* p_aout->b_stereo == 0 */
                             while ( l_buffer < l_buffer_limit )
                             {
-#if SOUND
- 
+                                /* I mix half left - half right */
                                 p_aout->s32_buffer[l_buffer++] +=
-                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] );
-                                p_aout->s32_buffer[l_buffer++] +=
-                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] );
-
-/*
-//intf_DbgMsg( "2deb " );
-l_buffer++;
-//intf_DbgMsg( "793 ");
-// !!!!!! Seg Fault !!!!!!! 
-//intf_DbgMsg( "\n p->aout_buffer : %d\t%d\n",p_aout->s32_buffer[l_buffer],COEFF*p_aout->fifo[i_fifo].l_unit );
-if( COEFF*p_aout->fifo[i_fifo].l_unit < 60000 )
-{
-    p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) / 2;
-//    intf_DbgMsg( "795 ");
-    p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
-//intf_DbgMsg( "797 ");
-    l_buffer++;
-}
-//intf_DbgMsg( "2fin " );
-*/
-#endif
-
-#if ADEBUG
-//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 21 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
-intf_DbgMsg( "p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit );
-intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );
-//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 22 : %x (%d)\n",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
-#endif
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] ) / 2 +
+                                    (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
-//intf_DbgMsg( "807 ");
                                 if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 2/*1*/)) )
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1)) )
                                 {
-//intf_DbgMsg( "811 ");
                                     p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 2/*1*/));
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1));
                                 }
                             }
-//intf_DbgMsg( "816 ");
                             l_units -= p_aout->fifo[i_fifo].l_units;
-//intf_DbgMsg( "818 ");
+
                             vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
-//intf_DbgMsg( "820 ");
                             p_aout->fifo[i_fifo].l_start_frame = p_aout->fifo[i_fifo].l_next_frame;
-//intf_DbgMsg( "822 ");
                             vlc_cond_signal( &p_aout->fifo[i_fifo].data_wait );
-//intf_DbgMsg( "824 ");
                             vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
-//intf_DbgMsg( "826 ");
+
                             /* p_aout->fifo[i_fifo].b_start_frame = 1; */
                             p_aout->fifo[i_fifo].l_next_frame += 1;
-//intf_DbgMsg( "829 ");
                             p_aout->fifo[i_fifo].l_next_frame &= AOUT_FIFO_SIZE;
-//intf_DbgMsg( "831 ");
                             p_aout->fifo[i_fifo].b_next_frame = 0;
-//#endif
-//intf_DbgMsg( "837 ");
                         }
-//intf_DbgMsg( "838 ");
-/* !!!!!!!!!!!!! Seg Fault !!!!!!!!!!!!!!!!! */
                     }
-//intf_DbgMsg( "839 ");
                     break;
 
-	        default:
-//intf_DbgMsg( "841 ");
+            default:
                     intf_DbgMsg("aout debug: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
-//intf_DbgMsg( "842 ");
                     break;
             }
         }
-//intf_DbgMsg( "843 ");
         vlc_mutex_unlock( &p_aout->fifos_lock );
-//intf_DbgMsg( "845 ");
-        l_buffer_limit = p_aout->l_units  /*<< 1*/ ; /* p_aout->b_stereo == 1 */
-//intf_DbgMsg( "\nici commence l'envoi sur sb\n" );
+
+        l_buffer_limit = p_aout->l_units; /* p_aout->b_stereo == 0 */
+
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
-    	{
-//intf_DbgMsg( "3deb ");
-//intf_DbgMsg( "p_aout->s_32_buffer[l_buffer] : %x (%d)\n",p_aout->s32_buffer[l_buffer],p_aout->s32_buffer[l_buffer] );
-            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( (p_aout->s32_buffer[/*2 **/ l_buffer] / 256) + 128 );
-//intf_DbgMsg( "p_aout->buffer[l_buffer] : %x (%d)\n", ((u8 *)p_aout->buffer)[l_buffer], ((u8 *)p_aout->buffer)[l_buffer] );
-            p_aout->s32_buffer[/*2 **/ l_buffer] = 0;
-//            p_aout->s32_buffer[2 * l_buffer + 1] = 0;
-//intf_DbgMsg( "3fin ");
+        {
+            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256 ) + 128 ) * p_aout->vol / 256 );
+            p_aout->s32_buffer[l_buffer] = 0;
         }
         l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
-        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 2 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 2 */
+        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 1 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 1 */
         p_aout->p_sys_playsamples( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
-        if ( l_bytes > (l_buffer_limit * sizeof(u8)) )
+        if ( l_bytes > (l_buffer_limit * sizeof(u8) * 2) ) /* There are 2 channels (left & right) */
         {
             msleep( p_aout->l_msleep );
         }
@@ -928,7 +848,8 @@ intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i
         }
     }
     vlc_mutex_unlock( &p_aout->fifos_lock );
-#endif
+
+
 }
 
 void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
@@ -937,8 +858,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
 
-    intf_DbgMsg("adec debug: ********aout_Thread_U8_Stereo********\n");
-    intf_DbgMsg("adec debug: running audio output thread (%p) (pid == %i)\n", p_aout, getpid());
+    intf_DbgMsg("adec debug: running audio output U8_S_thread (%p) (pid == %i)\n", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */
@@ -1179,7 +1099,7 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
         {
-            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / 256) + 128 ) * p_aout->vol / 256 );
+            ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256) + 128 ) * p_aout->vol / 256 );
             p_aout->s32_buffer[l_buffer] = 0;
         }
         l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
@@ -1232,8 +1152,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
     long l_buffer, l_buffer_limit;
     long l_units, l_bytes;
 
-    intf_DbgMsg("adec debug: ********aout_Thread_S16_Stereo********\n");
-    intf_DbgMsg("adec debug: running audio output thread (%p) (pid == %i)\n", p_aout, getpid());
+    intf_DbgMsg("adec debug: running audio output S16_S_thread (%p) (pid == %i)\n", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */

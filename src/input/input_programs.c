@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.6 2000/12/20 17:49:40 massiot Exp $
+ * $Id: input_programs.c,v 1.7 2000/12/20 22:23:23 reno Exp $
  *
  * Authors:
  *
@@ -197,6 +197,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     {
         /* No slot is empty */
         intf_ErrMsg("Stream carries too many ES for our decoder");
+        input_DumpStream( p_input );
     }
     else
     {
