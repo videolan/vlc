@@ -1,14 +1,10 @@
-Index: common/mp4v2/mp4.h
-===================================================================
-RCS file: /cvsroot/faac/faad2/common/mp4v2/mp4.h,v
-retrieving revision 1.14
-diff -u -r1.14 mp4.h
---- common/mp4v2/mp4.h	7 Aug 2003 18:58:43 -0000	1.14
-+++ common/mp4v2/mp4.h	2 Nov 2003 00:14:11 -0000
+diff -ru faad2.old/common/mp4v2/mp4.h faad2/common/mp4v2/mp4.h
+--- faad2.old/common/mp4v2/mp4.h	Sun Feb 22 14:04:55 2004
++++ faad2/common/mp4v2/mp4.h	Sun Feb 22 14:18:41 2004
 @@ -27,6 +27,8 @@
- #include "mpeg4ip.h"
+ #include <mpeg4ip.h>
  
- #include <math.h>	/* to define float HUGE_VAL and/or NAN */
+ #include <math.h>   /* to define float HUGE_VAL and/or NAN */
 +/* Meuuh power */
 +#undef NAN
  #ifndef NAN

@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: Makefile,v 1.15 2004/02/09 12:54:47 hartman Exp $
+# $Id: Makefile,v 1.16 2004/02/22 15:41:27 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -261,6 +261,9 @@ DISTCLEAN_PKG += a52dec-$(A52DEC_VERSION).tar.gz
 #	cvs -d $(MPEG2DEC_CVSROOT) co mpeg2dec
 #	(cd $@; ./bootstrap)
 
+#mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
+#	$(WGET) $(MPEG2DEC_URL)
+
 # It is easier to use bootstrapped versions...
 mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
 	$(WGET) $(MPEG2DEC_SNAPSHOT)
@@ -275,6 +278,7 @@ mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 
 CLEAN_FILE += .mpeg2
 CLEAN_PKG += mpeg2dec
+#DISTCLEAN_PKG += mpeg2dec-$(MPEG2DEC_VERSION)-cvs.tar.gz
 DISTCLEAN_PKG += mpeg2dec-$(MPEG2_DEC_VERSION).tar.gz
 
 # ***************************************************************************
@@ -308,7 +312,6 @@ libmad: libmad-$(LIBMAD_VERSION).tar.gz
 
 .mad: libmad
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .mad
@@ -438,12 +441,12 @@ DISTCLEAN_PKG += speex-$(SPEEX_VERSION).tar.gz
 #	(cd $@; patch -p 0 < ../Patches/faad2.patch)
 #	(cd $@; sh ./bootstrap)
 
-faad2-$(FAAD2_VERSION).tar.gz:
+faad2-$(FAAD2_VERSION).tar.bz2:
 	$(WGET) $(FAAD2_URL)
 
-faad2: faad2-$(FAAD2_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	(cd $@; patch -p 0 < ../Patches/faad2.patch)
+faad2: faad2-$(FAAD2_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+	patch -p 0 < Patches/faad2.patch
 
 .faad: faad2
 	(cd $<; ./configure --prefix=$(PREFIX) && make -C libfaad && make -C libfaad install)

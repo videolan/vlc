@@ -1,33 +1,3 @@
-diff -ru ffmpeg.old/configure ffmpeg/configure
---- ffmpeg.old/configure	Sat Nov  1 15:29:32 2003
-+++ ffmpeg/configure	Sun Nov  2 02:04:09 2003
-@@ -426,21 +426,21 @@
- #Darwin CC versions
- if test $targetos = Darwin; then
-     if test -n "`$cc -v 2>&1 | grep xlc`"; then
--	CFLAGS="-qpdf2 -qlanglvl=extc99 -qmaxmem=-1 -qarch=auto -qtune=auto"
-+	CFLAGS="$CFLAGS -qpdf2 -qlanglvl=extc99 -qmaxmem=-1 -qarch=auto -qtune=auto"
-     else
- 	gcc_version="`$cc -v 2>&1 | grep version | cut -d ' ' -f3-`"
- 	case "$gcc_version" in
- 	    *2.95*) 
--		CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer"
-+		CFLAGS="$CFLAGS -no-cpp-precomp -pipe -fomit-frame-pointer"
- 		;;
- 	    *3.1*)
--		CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer -force_cpusubtype_ALL -Wno-sign-compare"
-+		CFLAGS="$CFLAGS -no-cpp-precomp -pipe -fomit-frame-pointer -force_cpusubtype_ALL -Wno-sign-compare"
- 		;;
- 	    *3.3*)
--		CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer -mdynamic-no-pic -force_cpusubtype_ALL -Wno-sign-compare"
-+		CFLAGS="$CFLAGS -no-cpp-precomp -pipe -fomit-frame-pointer -mdynamic-no-pic -force_cpusubtype_ALL -Wno-sign-compare"
- 		;;
- 	    *)
--		CFLAGS="-no-cpp-precomp -pipe -fomit-frame-pointer -mdynamic-no-pic"
-+		CFLAGS="$CFLAGS -no-cpp-precomp -pipe -fomit-frame-pointer -mdynamic-no-pic"
- 		;;
- 	esac
-     fi
 diff -ru ffmpeg.old/libavcodec/dsputil.h ffmpeg/libavcodec/dsputil.h
 --- ffmpeg.old/libavcodec/dsputil.h	Sat Oct 25 02:32:54 2003
 +++ ffmpeg/libavcodec/dsputil.h	Sun Nov  2 02:04:09 2003
@@ -60,8 +30,8 @@ diff -ru ffmpeg.old/libavcodec/libpostproc/Makefile ffmpeg/libavcodec/libpostpro
  	mkdir -p $(prefix)/include/postproc
  	install -m 644 postprocess.h $(prefix)/include/postproc/postprocess.h
 +else
-+	mkdir -p $(prefix)/include/libpostproc
-+	install -m 644 postprocess.h $(prefix)/include/libpostproc/postprocess.h
++	mkdir -p $(prefix)/include/postproc
++	install -m 644 postprocess.h $(prefix)/include/postproc/postprocess.h
  endif
  
  

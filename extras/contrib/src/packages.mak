@@ -2,7 +2,7 @@
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: packages.mak,v 1.13 2004/02/09 12:54:47 hartman Exp $
+# $Id: packages.mak,v 1.14 2004/02/22 15:41:27 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -61,14 +61,14 @@ FLAC_VERSION=1.1.0
 FLAC_URL=$(SF)/flac/flac-$(FLAC_VERSION).tar.gz
 SPEEX_VERSION=1.0.2
 SPEEX_URL=http://www.speex.org/download/speex-$(SPEEX_VERSION).tar.gz
-FAAD2_VERSION=2.0rc2
-FAAD2_URL=$(VIDEOLAN)/faad2-$(FAAD2_VERSION).tar.gz
+FAAD2_VERSION=2.0
+FAAD2_URL=$(VIDEOLAN)/faad2-$(FAAD2_VERSION).tar.bz2
 FAAD2_CVSROOT=:pserver:anonymous@cvs.audiocoding.com:/cvsroot/faac
 LAME_VERSION=3.93.1
 LAME_URL=$(SF)/lame/lame-$(LAME_VERSION).tar.gz
-LIBEBML_VERSION=0.6.3
+LIBEBML_VERSION=0.6.4
 LIBEBML_URL=http://matroska.free.fr/downloads/libebml/libebml-$(LIBEBML_VERSION).tar.gz
-LIBMATROSKA_VERSION=0.6.2
+LIBMATROSKA_VERSION=0.6.3
 LIBMATROSKA_URL=http://matroska.free.fr/downloads/libmatroska/libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 FFMPEG_VERSION=0.4.8
 FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
@@ -92,4 +92,3 @@ LIBCACA_VERSION=0.8
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
 DTSDEC_VERSION=0.0.1
 DTSDEC_URL=http://download.videolan.org/pub/videolan/dtsdec/$(DTSDEC_VERSION)/dtsdec-$(DTSDEC_VERSION).tar.gz
-

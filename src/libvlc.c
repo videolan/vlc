@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.116 2004/02/22 15:03:33 gbazin Exp $
+ * $Id: libvlc.c,v 1.117 2004/02/22 15:41:27 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -204,6 +204,7 @@ int VLC_Create( void )
     {
         return VLC_EGENERIC;
     }
+    p_vlc->thread_id = 0;
     vlc_thread_set_priority( p_vlc, VLC_THREAD_PRIORITY_LOW );
 
     p_vlc->psz_object_name = "root";

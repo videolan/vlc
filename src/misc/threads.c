@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: threads.c,v 1.46 2004/02/20 17:20:01 massiot Exp $
+ * $Id: threads.c,v 1.47 2004/02/22 15:41:27 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -668,6 +668,8 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, char * psz_file,
             param.sched_priority = i_priority;
             i_policy = SCHED_RR;
         }
+        if ( !p_this->thread_id )
+            p_this->thread_id = pthread_self();
         if ( (i_error = pthread_setschedparam( p_this->thread_id,
                                                i_policy, &param )) )
         {
