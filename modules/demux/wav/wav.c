@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.1 2002/10/14 21:59:44 fenrir Exp $
+ * $Id: wav.c,v 1.2 2002/10/26 19:14:46 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -84,8 +84,8 @@ static off_t TellAbsolute( input_thread_t *p_input )
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
-    i_pos= p_input->stream.p_selected_area->i_tell -
-            ( p_input->p_last_data - p_input->p_current_data  );
+    i_pos= p_input->stream.p_selected_area->i_tell;
+//          - ( p_input->p_last_data - p_input->p_current_data  );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 

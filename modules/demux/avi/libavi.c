@@ -2,7 +2,7 @@
  * libavi.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.1 2002/10/15 00:56:43 fenrir Exp $
+ * $Id: libavi.c,v 1.2 2002/10/26 19:14:45 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -75,8 +75,8 @@ off_t AVI_TellAbsolute( input_thread_t *p_input )
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
-    i_pos= p_input->stream.p_selected_area->i_tell -
-            ( p_input->p_last_data - p_input->p_current_data  );
+    i_pos= p_input->stream.p_selected_area->i_tell;
+//            - ( p_input->p_last_data - p_input->p_current_data  );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -169,6 +169,8 @@ int AVI_ReadData( input_thread_t *p_input, u8 *p_buff, int i_size )
 
 int  AVI_SkipBytes( input_thread_t *p_input, int i_count )
 {
+    /* broken with new use of i_tell */
+#if 0
     int i_buff_size;
     vlc_mutex_lock( &p_input->stream.stream_lock );
     i_buff_size = p_input->p_last_data - p_input->p_current_data;
@@ -186,6 +188,7 @@ int  AVI_SkipBytes( input_thread_t *p_input, int i_count )
         return( 1 );
     }
     else
+#endif
     {
         return( AVI_SeekAbsolute( p_input, 
                               AVI_TellAbsolute( p_input ) + i_count ) );

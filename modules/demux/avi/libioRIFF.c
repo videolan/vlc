@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.3 2002/10/15 00:55:07 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.4 2002/10/26 19:14:45 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -50,8 +50,8 @@ static inline u32 __EVEN( u32 i )
 int __RIFF_TellPos( input_thread_t *p_input, u32 *pos )
 { 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    *pos= p_input->stream.p_selected_area->i_tell - 
-            ( p_input->p_last_data - p_input->p_current_data  );
+    *pos= p_input->stream.p_selected_area->i_tell;
+//            - ( p_input->p_last_data - p_input->p_current_data  );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     return 0;
 }
