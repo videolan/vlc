@@ -85,6 +85,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     /* Sets method-specific functions */
     switch( i_method )
     {
+#ifdef VIDEO_DUMMY
         case VOUT_DUMMY_METHOD:
             p_vout->p_sys_create =    vout_DummySysCreate;
             p_vout->p_sys_init =      vout_DummySysInit;
@@ -93,6 +94,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
             p_vout->p_sys_manage =    vout_DummySysManage;
             p_vout->p_sys_display =   vout_DummySysDisplay;
             break;
+#endif
 #ifdef VIDEO_X11
         case VOUT_X11_METHOD:
             p_vout->p_sys_create =    vout_X11SysCreate;
@@ -1915,7 +1917,7 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
 {
     int i_synchro_inc = 0;
     //???? gore following
-    static int i_panic_count = 0;
+    //static int i_panic_count = 0;
     static int i_last_synchro_inc = 0;
     static float r_synchro_level = VOUT_SYNCHRO_LEVEL_START;
     static int i_truc = 1;

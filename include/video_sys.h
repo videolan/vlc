@@ -6,12 +6,14 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifdef VIDEO_DUMMY
 int     vout_DummySysCreate   ( p_vout_thread_t p_vout, char *psz_display, int i_root_window );
 int     vout_DummySysInit     ( p_vout_thread_t p_vout );
 void    vout_DummySysEnd      ( p_vout_thread_t p_vout );
 void    vout_DummySysDestroy  ( p_vout_thread_t p_vout );
 int     vout_DummySysManage   ( p_vout_thread_t p_vout );
 void    vout_DummySysDisplay  ( p_vout_thread_t p_vout );
+#endif
 #ifdef VIDEO_X11
 int     vout_X11SysCreate     ( p_vout_thread_t p_vout, char *psz_display, int i_root_window );
 int     vout_X11SysInit       ( p_vout_thread_t p_vout );

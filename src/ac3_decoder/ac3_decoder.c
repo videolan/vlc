@@ -182,6 +182,7 @@ static int InitThread( ac3dec_thread_t * p_ac3dec )
 
     aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
     aout_fifo.i_channels = 2;
+    aout_fifo.b_stereo = 1;
 
     aout_fifo.l_frame_size = AC3DEC_FRAME_SIZE;
 

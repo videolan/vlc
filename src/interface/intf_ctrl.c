@@ -275,7 +275,7 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     }
 
     /* Set default configuration */
-    fifo.i_channels = 1 + AOUT_DEFAULT_STEREO;
+    fifo.i_channels = 1 + ( fifo.b_stereo = AOUT_DEFAULT_STEREO );
     fifo.l_rate = AOUT_DEFAULT_RATE;
 
     /* The channels and rate parameters are essential ! */
@@ -322,17 +322,17 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
 
     /* Get file size to calculate number of audio units */
     fstat( i_fd, &stat_buffer );
-    fifo.l_units = ( long )( stat_buffer.st_size / (sizeof(s16) << (fifo.i_channels - 1)) );
+    fifo.l_units = ( long )( stat_buffer.st_size / (sizeof(s16) << fifo.b_stereo) );
 
     /* Allocate memory, read file and close it */
-    if ( (fifo.buffer = malloc(sizeof(s16)*(fifo.l_units << (fifo.i_channels - 1)))) == NULL ) /* !! */
+    if ( (fifo.buffer = malloc(sizeof(s16)*(fifo.l_units << fifo.b_stereo))) == NULL ) /* !! */
     {
         intf_IntfMsg("play-audio error: not enough memory to read `%s'", psz_file );
         close( i_fd );                                         /* close file */
         return( INTF_OTHER_ERROR );
     }
-    if ( read(i_fd, fifo.buffer, sizeof(s16)*(fifo.l_units << (fifo.i_channels - 1)))
-        != sizeof(s16)*(fifo.l_units << (fifo.i_channels - 1)) )
+    if ( read(i_fd, fifo.buffer, sizeof(s16)*(fifo.l_units << fifo.b_stereo))
+        != sizeof(s16)*(fifo.l_units << fifo.b_stereo) )
     {
         intf_IntfMsg("play-audio error: can't read %s", psz_file);
         free( fifo.buffer );

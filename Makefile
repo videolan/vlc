@@ -14,17 +14,21 @@
 #SHELL=/bin/sh
 
 # Audio output settings
-AUDIO_DSP=YES
+AUDIO = dsp
+# Not yet supported
+#AUDIO += esd
+# Fallback method that should always work
+AUDIO += dummy
 
 # Video output settings
-VIDEO_X11=YES
-VIDEO_FB=YES
-#VIDEO_GGI=YES
-# You probably won't need this one
-#VIDEO_GLIDE=YES
+VIDEO = x11 fb
+#VIDEO += ggi
+#VIDEO += glide
 # Not yet supported
-#VIDEO_BEOS=YES
-#VIDEO_DGA=YES
+#VIDEO += beos
+#VIDEO += dga
+# Fallback method that should always work
+VIDEO += dummy
 
 # Target architecture
 ARCH=X86
@@ -45,7 +49,7 @@ MMX=YES
 DECODER=new
 
 # Debugging mode on or off (set to 1 to activate)
-DEBUG=1
+DEBUG=0
 
 #----------------- do not change anything below this line ----------------------
 
@@ -54,57 +58,17 @@ DEBUG=1
 ################################################################################
 
 # Program version - may only be changed by the project leader
-PROGRAM_VERSION = 1.0-dev
+PROGRAM_VERSION = 0.95.0
 
-# AUDIO_OPTIONS describes all used audio options
-AUDIO_OPTIONS = dummy
-aout_method = audio_output/aout_dummy.o
-ifeq ($(AUDIO_DSP), YES)
-AUDIO_OPTIONS += dsp
-DEFINE += -DAUDIO_DSP
-aout_method += audio_output/aout_dsp.o
-endif
+# audio options
+audio := $(shell echo $(AUDIO) | tr 'A-Z' 'a-z')
+AUDIO := $(shell echo $(AUDIO) | tr 'a-z' 'A-Z')
+DEFINE += $(AUDIO:%=-DAUDIO_%)
 
-# VIDEO_OPTIONS describes all used video options
-VIDEO_OPTIONS = dummy
-intf_method = interface/intf_dummy.o
-vout_method = video_output/vout_dummy.o
-ifeq ($(VIDEO_GLIDE), YES)
-VIDEO_OPTIONS += glide
-DEFINE += -DVIDEO_GLIDE
-intf_method += interface/intf_glide.o
-vout_method += video_output/vout_glide.o
-endif
-ifeq ($(VIDEO_X11), YES)
-VIDEO_OPTIONS += x11
-DEFINE += -DVIDEO_X11
-intf_method += interface/intf_x11.o
-vout_method += video_output/vout_x11.o
-endif
-ifeq ($(VIDEO_GGI), YES)
-VIDEO_OPTIONS += ggi
-DEFINE += -DVIDEO_GGI
-intf_method += interface/intf_ggi.o
-vout_method += video_output/vout_ggi.o
-endif
-ifeq ($(VIDEO_FB), YES)
-VIDEO_OPTIONS += fb
-DEFINE += -DVIDEO_FB
-intf_method += interface/intf_fb.o
-vout_method += video_output/vout_fb.o
-endif
-ifeq ($(VIDEO_BEOS), YES)
-VIDEO_OPTIONS += beos
-DEFINE += -DVIDEO_BEOS
-intf_method += interface/intf_beos.o
-vout_method += video_output/vout_beos.o
-endif
-ifeq ($(VIDEO_DGA), YES)
-VIDEO_OPTIONS += dga
-DEFINE += -DVIDEO_DGA
-intf_method += interface/intf_dga.o
-vout_method += video_output/vout_dga.o
-endif
+# video options
+video := $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
+VIDEO := $(shell echo $(VIDEO) | tr 'a-z' 'A-Z')
+DEFINE += $(VIDEO:%=-DVIDEO_%)
 
 # PROGRAM_OPTIONS is an identification string of the compilation options
 PROGRAM_OPTIONS = $(ARCH) $(SYS)
@@ -119,8 +83,8 @@ PROGRAM_BUILD = `date -R` $(USER)@`hostname`
 # including ARCH_xx and SYS_xx. It will be passed to C compiler.
 DEFINE += -DARCH_$(ARCH)
 DEFINE += -DSYS_$(SYS)
-DEFINE += -DAUDIO_OPTIONS="\"$(shell echo $(AUDIO_OPTIONS) | tr 'A-Z' 'a-z')\""
-DEFINE += -DVIDEO_OPTIONS="\"$(shell echo $(VIDEO_OPTIONS) | tr 'A-Z' 'a-z')\""
+DEFINE += -DAUDIO_OPTIONS="\"$(audio)\""
+DEFINE += -DVIDEO_OPTIONS="\"$(video)\""
 DEFINE += -DPROGRAM_VERSION="\"$(PROGRAM_VERSION)\""
 DEFINE += -DPROGRAM_OPTIONS="\"$(PROGRAM_OPTIONS)\""
 DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
@@ -138,11 +102,11 @@ endif
 #
 INCLUDE += -Iinclude
 
-ifeq ($(VIDEO_X11),YES)
+ifneq (,$(findstring x11,$(video)))
 INCLUDE += -I/usr/X11R6/include
 endif
 
-ifeq ($(VIDEO_GLIDE),YES)
+ifneq (,$(findstring glide,$(video)))
 INCLUDE += -I/usr/include/glide
 endif
 
@@ -150,17 +114,17 @@ endif
 # Libraries
 #
 LIB += -lpthread
-LIN += -lm
+LIB += -lm
 
-ifeq ($(VIDEO_X11),YES)
+ifneq (,$(findstring x11,$(video)))
 LIB += -L/usr/X11R6/lib
 LIB += -lX11
 LIB += -lXext 
 endif
-ifeq ($(VIDEO_GGI),YES)
+ifneq (,$(findstring ggi,$(video)))
 LIB += -lggi
 endif
-ifeq ($(VIDEO_GLIDE),YES)
+ifneq (,$(findstring glide,$(video)))
 LIB += -lglide2x
 endif
 
@@ -242,7 +206,7 @@ interface_obj =  		interface/main.o \
 						interface/intf_ctrl.o \
 						interface/control.o \
 						interface/intf_console.o \
-						$(intf_method)
+						$(video:%=interface/intf_%.o)
 
 input_obj =         		input/input_vlan.o \
 						input/input_file.o \
@@ -254,12 +218,12 @@ input_obj =         		input/input_vlan.o \
 						input/input.o
 
 audio_output_obj = 		audio_output/audio_output.o \
-						$(aout_method)
+						$(audio:%=audio_output/aout_%.o)
 
 video_output_obj = 		video_output/video_output.o \
 						video_output/video_text.o \
 						video_output/video_yuv.o \
-						$(vout_method)
+						$(video:%=video_output/vout_%.o)
 
 ac3_decoder_obj =		ac3_decoder/ac3_decoder.o \
 						ac3_decoder/ac3_parse.o \

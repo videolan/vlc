@@ -62,7 +62,7 @@ static const struct option longopts[] =
 
     /* General/common options */
     {   "help",             0,          0,      'h' },
-    {   "long-help",        0,          0,      'H' },
+    {   "longhelp",         0,          0,      'H' },
     {   "version",          0,          0,      'v' },
 
     /* Audio options */
@@ -337,7 +337,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             Usage( SHORT_HELP );
             return( -1 );
             break;
-        case 'H':                                         /* -H, --long-help */
+        case 'H':                                          /* -H, --longhelp */
             Usage( LONG_HELP );
             return( -1 );
             break;
@@ -426,7 +426,7 @@ static void Usage( int i_fashion )
 
     /* Options */
     intf_Msg("Options:\n" \
-             "  -h, --help, -H, --long-help       \tprint short/long usage\n" \
+             "  -h, --help, -H, --longhelp        \tprint short/long usage\n" \
              "  -v, --version                     \tprint version information\n" \
              "  --noaudio, --novideo              \tdisable audio/video\n" \
              "  --aout {" AUDIO_OPTIONS "}            \taudio output method\n" \

@@ -97,6 +97,7 @@ typedef struct
     boolean_t           b_die;
 
     int                 i_channels;
+    boolean_t           b_stereo;
     long                l_rate;
 
     vlc_mutex_t         data_lock;
@@ -141,7 +142,8 @@ typedef int  (aout_sys_reset_t)          ( p_aout_thread_t p_aout );
 typedef int  (aout_sys_setformat_t)      ( p_aout_thread_t p_aout );
 typedef int  (aout_sys_setchannels_t)    ( p_aout_thread_t p_aout );
 typedef int  (aout_sys_setrate_t)        ( p_aout_thread_t p_aout );
-typedef long (aout_sys_getbufinfo_t)     ( p_aout_thread_t p_aout );
+typedef long (aout_sys_getbufinfo_t)     ( p_aout_thread_t p_aout,
+                                           long l_buffer_limit );
 typedef void (aout_sys_playsamples_t)    ( p_aout_thread_t p_aout,
                                            byte_t *buffer, int i_size );
 typedef void (aout_sys_close_t)          ( p_aout_thread_t p_aout );
@@ -186,6 +188,8 @@ typedef struct aout_thread_s
     int                 i_format;
     /* Number of channels */
     int                 i_channels;
+    /* Mono or Stereo sound */
+    boolean_t           b_stereo;
     /* Rate and gain of the audio output sound (in Hz) */
     long                l_rate;
     long                l_gain;
@@ -203,6 +207,8 @@ typedef struct aout_thread_s
 /* Get the fallback method */
 #ifdef AUDIO_DSP
 #define AOUT_DEFAULT_METHOD "dsp"
+#else
+#define AOUT_DEFAULT_METHOD "dummy"
 #endif
 
 /* Those are from <linux/soundcard.h> but are needed because of formats

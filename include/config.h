@@ -53,7 +53,7 @@
 /*****************************************************************************
  * Debugging options - define or undefine symbols
  *****************************************************************************/
-#ifdef DEBUG
+#if DEBUG == 1
 /* General debugging support, which depends of the DEBUG define, is determined
  * in the Makefile */
 
