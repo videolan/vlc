@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.25 2003/05/24 23:40:11 gbazin Exp $
+ * $Id: variables.c,v 1.26 2003/05/25 11:31:54 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -566,6 +566,12 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                     p_var->val = val;
                     /* Free data if needed */
                     p_var->pf_free( &oldval );
+                }
+
+                if( p_val )
+                {
+                    *p_val = p_var->val;
+                    p_var->pf_dup( p_val );
                 }
             }
             break;

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.224 2003/05/24 23:40:11 gbazin Exp $
+ * $Id: video_output.c,v 1.225 2003/05/25 11:31:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -354,12 +354,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
     var_Create( p_vout, "key-pressed", VLC_VAR_STRING );
 
-    /* user requested fullscreen? */
-    if( config_GetInt( p_vout, "fullscreen" ) )
-    {
-        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-    }
-
     /* Initialize the dimensions of the video window */
     InitWindowSize( p_vout, &p_vout->i_window_width,
                     &p_vout->i_window_height );
@@ -389,6 +383,12 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "fullscreen", VLC_VAR_BOOL );
     text.psz_string = _("Fullscreen");
     var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "fullscreen", VLC_VAR_INHERITVALUE, &val, NULL );
+    if( val.b_bool )
+    {
+        /* user requested fullscreen */
+        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    }
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
 
     var_Create( p_vout, "deinterlace", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
@@ -1191,8 +1191,22 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    input_thread_t *p_input;
     vlc_value_t val;
+
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+    p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+                                                 FIND_PARENT );
+    if( p_input )
+    {
+        /* Modify input as well because the vout might have to be restarted */
+        var_Create( p_input, "fullscreen", VLC_VAR_BOOL );
+        var_Set( p_input, "fullscreen", newval );
+
+        vlc_object_release( p_input );
+    }
+
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;

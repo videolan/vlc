@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.20 2003/05/21 13:27:25 gbazin Exp $
+ * $Id: directx.c,v 1.21 2003/05/25 11:31:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -458,12 +458,12 @@ static int Manage( vout_thread_t *p_vout )
 
         SetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
 
+        /* Update the object variable and trigger callback */
+        val.b_bool = p_vout->b_fullscreen;
+        var_Set( p_vout, "fullscreen", val );
+
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
         p_vout->p_sys->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-
-        /* Update the object variable without triggering a callback */
-        val.b_bool = p_vout->b_fullscreen;
-        var_Change( p_vout, "fullscreen", VLC_VAR_SETVALUE, &val, NULL );
     }
 
     /*

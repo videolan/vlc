@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.15 2003/05/05 16:09:38 gbazin Exp $
+ * $Id: xcommon.c,v 1.16 2003/05/25 11:31:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -774,6 +774,12 @@ static int ManageVideo( vout_thread_t *p_vout )
      */
     if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
+        vlc_value_t val;
+
+        /* Update the object variable and trigger callback */
+        val.b_bool = !p_vout->b_fullscreen;
+        var_Set( p_vout, "fullscreen", val );
+
         ToggleFullScreen( p_vout );
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }

@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.13 2003/05/24 23:40:11 gbazin Exp $
+ * $Id: deinterlace.c,v 1.14 2003/05/25 11:31:54 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -137,8 +137,7 @@ static int Create( vlc_object_t *p_this )
 
     /* Look what method was requested */
     var_Create( p_vout, "deinterlace-mode", VLC_VAR_STRING );
-    var_Change( p_vout, "deinterlace-mode", VLC_VAR_INHERITVALUE, NULL, NULL );
-    var_Get( p_vout, "deinterlace-mode", &val );
+    var_Change( p_vout, "deinterlace-mode", VLC_VAR_INHERITVALUE, &val, NULL );
 
     if( val.psz_string == NULL )
     {
