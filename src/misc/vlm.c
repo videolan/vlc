@@ -527,6 +527,8 @@ static int ExecuteCommand( vlm_t *vlm, char *command , vlm_message_t **p_message
                 {
                     vlm_MediaDelete( vlm, vlm->media[i], NULL );
                 }
+                message = vlm_MessageNew( "del", NULL );
+                goto end_seq;
             }
             else if( strcmp(p_command[1] , "schedule") == 0 )
             {
@@ -534,6 +536,8 @@ static int ExecuteCommand( vlm_t *vlm, char *command , vlm_message_t **p_message
                 {
                     vlm_ScheduleDelete( vlm, vlm->schedule[i], NULL );
                 }
+                message = vlm_MessageNew( "del", NULL );
+                goto end_seq;
             }
             else if( strcmp(p_command[1] , "all") == 0 )
             {
@@ -547,6 +551,7 @@ static int ExecuteCommand( vlm_t *vlm, char *command , vlm_message_t **p_message
                     vlm_ScheduleDelete( vlm, vlm->schedule[i], NULL );
                 }
                 i_return = 0;
+                message = vlm_MessageNew( "del", NULL );
                 goto end_seq;
             }
             else
