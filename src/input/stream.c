@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.4 2003/08/20 01:18:50 fenrir Exp $
+ * $Id: stream.c,v 1.5 2003/09/08 00:36:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -120,7 +120,7 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
                   s->p_input->stream.p_selected_area->i_size < i64 ) )
             {
                 vlc_mutex_unlock( &s->p_input->stream.stream_lock );
-                msg_Err( s, "seek out of bound" );
+                msg_Warn( s, "seek out of bound" );
                 return VLC_EGENERIC;
             }
             vlc_mutex_unlock( &s->p_input->stream.stream_lock );
