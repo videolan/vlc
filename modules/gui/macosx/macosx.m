@@ -68,12 +68,13 @@ void E_(CloseVideoGL) ( vlc_object_t * );
         "borders (OpenGL only)." )
 
 vlc_module_begin();
-    set_description( _("Mac OS X interface, sound and video") );
+    set_description( _("Mac OS X interface") );
     set_capability( "interface", 100 );
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );
     set_category( CAT_INTERFACE );
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_submodule();
+        set_description( _("Quartz video") );
         set_capability( "video output", 100 );
         set_callbacks( E_(OpenVideoQT), E_(CloseVideoQT) );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
@@ -85,6 +86,7 @@ vlc_module_begin();
         add_bool( "macosx-fill", 0, NULL, FILL_TEXT, FILL_LONGTEXT,
                   VLC_TRUE );
     add_submodule();
+        set_description( _("Mac OS X OpenGL") );
         set_capability( "opengl provider", 100 );
         set_callbacks( E_(OpenVideoGL), E_(CloseVideoGL) );
 vlc_module_end();

@@ -518,6 +518,29 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         o_name = (NSString *)[o_one_item objectForKey: @"ITEM_NAME"];
         o_options = (NSArray *)[o_one_item objectForKey: @"ITEM_OPTIONS"];
 
+        /* Find the name for a disc entry ( i know, can you believe the trouble?) */
+        if( ( !o_name || [o_name isEqualToString:@""] ) && [o_uri rangeOfString: @"/dev/"].location != NSNotFound )
+        {
+            int i_count, i_index;
+            struct statfs *mounts = NULL;
+            
+            i_count = getmntinfo (&mounts, MNT_NOWAIT);
+            /* getmntinfo returns a pointer to static data. Do not free. */
+            for( i_index = 0 ; i_index < i_count; i_index++ )
+            {
+                NSMutableString *o_temp, *o_temp2;
+                o_temp = [NSMutableString stringWithString: o_uri];
+                o_temp2 = [NSMutableString stringWithCString: mounts[i_index].f_mntfromname];
+                [o_temp replaceOccurrencesOfString: @"/dev/rdisk" withString: @"/dev/disk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+                [o_temp2 replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
+                [o_temp2 replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp2 length]) ];
+
+                if( strstr( [o_temp fileSystemRepresentation], [o_temp2 fileSystemRepresentation] ) != NULL )
+                {
+                    o_name = [[NSFileManager defaultManager] displayNameAtPath: [NSString stringWithCString:mounts[i_index].f_mntonname]];
+                }
+            }
+        }
         /* If no name, then make a guess */
         if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_uri];
 
@@ -529,10 +552,16 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             /* Converts mountpoint to a /dev file */
             struct statfs *buf;
             char *psz_dev;
+            NSMutableString *o_temp;
+
             buf = (struct statfs *) malloc (sizeof(struct statfs));
             statfs( [o_uri fileSystemRepresentation], buf );
             psz_dev = strdup(buf->f_mntfromname);
-            o_uri = [NSString stringWithCString: psz_dev ];
+            o_temp = [NSMutableString stringWithCString: psz_dev ];
+            [o_temp replaceOccurrencesOfString: @"/dev/disk" withString: @"/dev/rdisk" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+            [o_temp replaceOccurrencesOfString: @"s0" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+            [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
+            o_uri = o_temp;
         }
 
         if( o_options && [o_options count] > 0 )
