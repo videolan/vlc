@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.38 2001/05/31 01:37:08 sam Exp $
+ * $Id: input_netlist.c,v 1.39 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -31,14 +31,14 @@
 #include <sys/types.h>
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
 #endif
 
 #if !defined( WIN32 )
-#include <sys/uio.h>                                         /* struct iovec */
+#   include <sys/uio.h>                                      /* struct iovec */
 #else
-#include <io.h>
-#include "iovec.h"
+#   include <io.h>
+#   include "input_iovec.h"
 #endif
 
 #include "config.h"

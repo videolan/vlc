@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.116 2001/05/31 03:12:49 sam Exp $
+ * $Id: input.c,v 1.117 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,8 +91,10 @@ static void EndThread       ( input_thread_t *p_input );
 
 static void FileOpen        ( input_thread_t *p_input );
 static void FileClose       ( input_thread_t *p_input );
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 static void NetworkOpen     ( input_thread_t *p_input );
 static void NetworkClose    ( input_thread_t *p_input );
+#endif
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
@@ -613,7 +615,6 @@ static void FileClose( input_thread_t * p_input )
 
     return;
 }
-
 
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 /*****************************************************************************

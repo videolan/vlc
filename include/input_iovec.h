@@ -1,5 +1,5 @@
 /*****************************************************************************
- * iovec.h: iovec structure and readv() replacement
+ * input_iovec.h: iovec structure and readv() replacement
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *

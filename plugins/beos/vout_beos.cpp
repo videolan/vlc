@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.26 2001/05/30 17:03:11 sam Exp $
+ * $Id: vout_beos.cpp,v 1.27 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -52,7 +52,6 @@ extern "C"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -61,6 +60,9 @@ extern "C"
 #include "intf_msg.h"
 
 #include "main.h"
+
+#include "modules.h"
+#include "modules_export.h"
 }
 
 #include "VideoWindow.h"

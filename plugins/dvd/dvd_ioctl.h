@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.9 2001/05/31 03:12:49 sam Exp $
+ * $Id: dvd_ioctl.h,v 1.10 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -63,16 +63,22 @@ int ioctl_SendKey2          ( int, int *, u8 * );
  *****************************************************************************/
 
 #if defined( SYS_BEOS ) || defined( WIN32 )
-
-/* The generic packet command opcodes for CD/DVD Logical Units,
- * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
-#define GPCMD_READ_DVD_STRUCTURE 0xad
-#define GPCMD_REPORT_KEY         0xa4
-#define GPCMD_SEND_KEY           0xa3
-
-/* DVD struct types */
-#define DVD_STRUCT_COPYRIGHT     0x01
-#define DVD_STRUCT_DISCKEY       0x02
+    /* The generic packet command opcodes for CD/DVD Logical Units,
+     * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
+#   define GPCMD_READ_DVD_STRUCTURE 0xad
+#   define GPCMD_REPORT_KEY         0xa4
+#   define GPCMD_SEND_KEY           0xa3
+    /* DVD struct types */
+#   define DVD_STRUCT_COPYRIGHT     0x01
+#   define DVD_STRUCT_DISCKEY       0x02
+    /* Key formats */
+#   define DVD_REPORT_AGID          0x00
+#   define DVD_REPORT_CHALLENGE     0x01
+#   define DVD_SEND_CHALLENGE       0x01
+#   define DVD_REPORT_KEY1          0x02
+#   define DVD_SEND_KEY2            0x03
+#   define DVD_REPORT_ASF           0x05
+#   define DVD_INVALIDATE_AGID      0x3f
 #endif
 
 #if defined( WIN32 )
@@ -148,15 +154,6 @@ typedef struct _SCSI_PASS_THROUGH_DIRECT
 
 #define SCSI_IOCTL_DATA_OUT         0
 #define SCSI_IOCTL_DATA_IN          1
-
-/* Key formats */
-#define DVD_REPORT_AGID          0x00
-#define DVD_REPORT_CHALLENGE     0x01
-#define DVD_SEND_CHALLENGE       0x01
-#define DVD_REPORT_KEY1          0x02
-#define DVD_SEND_KEY2            0x03
-#define DVD_REPORT_ASF           0x05
-#define DVD_INVALIDATE_AGID      0x3f
 
 #endif
 

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: dvd.c,v 1.9 2001/05/30 17:03:12 sam Exp $
+ * $Id: dvd.c,v 1.10 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,6 +42,7 @@
 #include "mtime.h"
 
 #include "modules.h"
+#include "modules_export.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.

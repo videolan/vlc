@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.23 2001/05/31 03:12:49 sam Exp $
+ * $Id: input_ts.c,v 1.24 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -57,7 +57,7 @@
 
 #if defined( WIN32 )
 #   include <io.h>
-#   include "iovec.h"
+#   include "input_iovec.h"
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif

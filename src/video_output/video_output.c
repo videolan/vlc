@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.130 2001/05/31 03:23:24 sam Exp $
+ * $Id: video_output.c,v 1.131 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -882,7 +882,7 @@ static int InitThread( vout_thread_t *p_vout )
     {
         module_Unneed( p_vout->p_module );
         free( p_vout );
-        return( NULL );
+        return( 1 );
     }
 
     intf_WarnMsg( 3, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "

@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.13 2001/02/20 07:49:12 sam Exp $
+ * $Id: aout_beos.cpp,v 1.14 2001/05/31 03:57:54 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -55,6 +55,7 @@ extern "C"
 #include "main.h"
 
 #include "modules.h"
+#include "modules_export.h"
 }
 
 /*****************************************************************************
