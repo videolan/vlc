@@ -226,7 +226,7 @@ int     VLC_Set          ( int, char const *, vlc_value_t );
  */
 int     VLC_Get          ( int, char const *, vlc_value_t * );
 
-int     VLC_AddIntf      ( int, char const *, vlc_bool_t );
+int     VLC_AddIntf      ( int, char const *, vlc_bool_t, vlc_bool_t );
 int     VLC_AddTarget    ( int, char const *, const char **, int, int, int );
 
 int     VLC_Play         ( int );

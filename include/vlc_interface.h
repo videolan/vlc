@@ -50,6 +50,7 @@ struct intf_thread_t
 
     /* Thread properties and locks */
     vlc_bool_t          b_block;
+    vlc_bool_t          b_play;
 
     /* Specific interfaces */
     intf_console_t *    p_console;                               /** console */

@@ -278,6 +278,9 @@ static void RunInterface( intf_thread_t *p_intf )
     /* Give control to the interface */
     p_intf->pf_run( p_intf );
 
+    /* Reset play on start status */
+    p_intf->b_play = VLC_FALSE;
+
     /* Provide ability to switch the main interface on the fly */
     while( p_intf->psz_switch_intf )
     {

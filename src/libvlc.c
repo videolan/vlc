@@ -616,7 +616,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         if( psz_temp )
         {
             sprintf( psz_temp, "%s,none", psz_module );
-            VLC_AddIntf( 0, psz_temp, VLC_FALSE );
+            VLC_AddIntf( 0, psz_temp, VLC_FALSE, VLC_FALSE );
             free( psz_temp );
         }
     }
@@ -628,7 +628,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /*
      * Allways load the hotkeys interface if it exists
      */
-    VLC_AddIntf( 0, "hotkeys,none", VLC_FALSE );
+    VLC_AddIntf( 0, "hotkeys,none", VLC_FALSE, VLC_FALSE );
 
     /*
      * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin
@@ -661,9 +661,11 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
  * This function opens an interface plugin and runs it. If b_block is set
  * to 0, VLC_AddIntf will return immediately and let the interface run in a
  * separate thread. If b_block is set to 1, VLC_AddIntf will continue until
- * user requests to quit.
+ * user requests to quit. If b_play is set to 1, VLC_AddIntf will start playing
+ * the playlist when it is completely initialised.
  *****************************************************************************/
-int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
+int VLC_AddIntf( int i_object, char const *psz_module,
+                 vlc_bool_t b_block, vlc_bool_t b_play )
 {
     int i_err;
     intf_thread_t *p_intf;
@@ -684,7 +686,11 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
         return VLC_EGENERIC;
     }
 
+    /* Interface doesn't handle play on start so do it ourselves */
+    if( !p_intf->b_play && b_play ) VLC_Play( i_object );
+
     /* Try to run the interface */
+    p_intf->b_play = b_play;
     p_intf->b_block = b_block;
     i_err = intf_RunThread( p_intf );
     if( i_err )

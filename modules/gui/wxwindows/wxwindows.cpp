@@ -148,6 +148,9 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_show_dialog = NULL;
 
+    /* We support play on start */
+    p_intf->b_play = VLC_TRUE;
+
     return VLC_SUCCESS;
 }
 
@@ -305,6 +308,19 @@ bool Instance::OnInit()
 
     /* OK, initialization is over */
     vlc_thread_ready( p_intf );
+
+    /* Check if we need to start playing */
+    if( p_intf->b_play )
+    {
+        playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
+        }
+    }
 
     /* Return TRUE to tell program to continue (FALSE would terminate) */
     return TRUE;
