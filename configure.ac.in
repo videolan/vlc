@@ -735,7 +735,8 @@ PLUGINS="${PLUGINS} aout_file"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm"
-PLUGINS="${PLUGINS} access_udp access_http ipv4 access_mms access_ftp sap"
+PLUGINS="${PLUGINS} access_udp access_http ipv4 access_mms access_ftp"
+PLUGINS="${PLUGINS} sap"
 
 dnl
 dnl  Accelerated modules
@@ -2491,6 +2492,21 @@ then
   then
     PLUGINS="${PLUGINS} xosd"
     LDFLAGS_xosd="${LDFLAGS_xosd} -lxosd"
+  fi
+fi
+
+dnl
+dnl  SLP access plugin
+dnl
+AC_ARG_ENABLE(slp,
+  [  --enable-slp            SLP service discovery support (default disabled)])
+if test "x${enable_slp}" = "xyes"
+then
+  AC_CHECK_HEADER(slp.h, have_slp="true", have_slp="false")
+  if test "x${have_slp}" = "xtrue"
+  then
+    PLUGINS="${PLUGINS} access_slp"
+    LDFLAGS_access_slp="${LDFLAGS_access_slp} -lslp"
   fi
 fi
 
