@@ -12291,7 +12291,7 @@ fi;
   if test x${SDL_CONFIG} != xno
   then
     PLUGINS="${PLUGINS} sdl"
-    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --cflags`"
+    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`"
     sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="$save_CPPFLAGS $sdl_CFLAGS"
 
@@ -14413,23 +14413,25 @@ if test "${enable_opie+set}" = set; then
   enableval="$enable_opie"
   if test "x${enable_opie}" = "xyes"; then
 
+
 # Check whether --with-qte or --without-qte was given.
 if test "${with_qte+set}" = set; then
   withval="$with_qte"
 
 fi;
-     if test "x${with_qte}" != "xno"
+     if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
      then
-       test_LDFLAGS="-L${with_qte}/lib"
-       test_CFLAGS="-I${with_qte}/include"
+       test_LDFLAGS="-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'`"
+       test_CFLAGS="-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'`"
      else
-       test_LDFLAGS="-L${QTDIR}/lib"
-       test_CFLAGS="-I${QTDIR}/include"
+       test_LDFLAGS="-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`"
+       test_CFLAGS="-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`"
      fi
-     ac_cv_qte_headers=yes
      CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+     ac_cv_qte_headers=yes
 
-for ac_header in qte.h
+
+for ac_header in qt.h jpeglib.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -14538,21 +14540,24 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
 
-       test_CFLAGS="${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-       test_LDFLAGS="${test_LDFLAGS} -lqpe -lqte"
-
 else
-   ac_cv_qte_headers=no
-         { { echo "$as_me:$LINENO: error: echo \"Cannot find QT Embedded development headers.\"" >&5
+
+       ac_cv_qte_headers=no
+       { { echo "$as_me:$LINENO: error: echo \"Cannot find QT Embedded development headers.\"" >&5
 echo "$as_me: error: echo \"Cannot find QT Embedded development headers.\"" >&2;}
    { (exit 1); exit 1; }; }
-
 
 fi
 
 done
 
+     if test "x${ac_cv_qte_headers}" = "xyes"
+     then
+       qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+       qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -ljpeg -lqte"
+     fi
      CPPFLAGS="${save_CPPFLAGS}"
+
      if test x${ac_cv_qte_headers} = "xyes"
      then
        PLUGINS="${PLUGINS} opie"

@@ -1196,7 +1196,7 @@ then
   if test x${SDL_CONFIG} != xno
   then
     PLUGINS="${PLUGINS} sdl"
-    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --cflags`"
+    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`"
     sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="$save_CPPFLAGS $sdl_CFLAGS"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
@@ -1640,28 +1640,31 @@ dnl
 AC_ARG_ENABLE(opie,
   [  --enable-opie           Qt embedded interface support (default disabled)],
   [if test "x${enable_opie}" = "xyes"; then
+
      AC_ARG_WITH(qte,
-  [    --with-qte=PATH       Qt Embedded headers and libraries])
-     if test "x${with_qte}" != "xno"
+     [    --with-qte=PATH       Qt Embedded headers and libraries])
+     if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
      then
-       test_LDFLAGS="-L${with_qte}/lib"
-       test_CFLAGS="-I${with_qte}/include"
+       test_LDFLAGS="-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'`"
+       test_CFLAGS="-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'`"
      else
-       test_LDFLAGS="-L${QTDIR}/lib"
-       test_CFLAGS="-I${QTDIR}/include"
+       test_LDFLAGS="-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`"
+       test_CFLAGS="-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`"
      fi
-     ac_cv_qte_headers=yes
      CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
-     AC_CHECK_HEADERS(qte.h, [
-       test_CFLAGS="${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-       test_LDFLAGS="${test_LDFLAGS} -lqpe -lqte"
-       ],
-       [ ac_cv_qte_headers=no
-         AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."]) 
-       ] 
-     )
+     ac_cv_qte_headers=yes
+     AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
+       ac_cv_qte_headers=no
+       AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
+     ] )
+     if test "x${ac_cv_qte_headers}" = "xyes"
+     then
+       qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+       qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -ljpeg -lqte"
+     fi
      CPPFLAGS="${save_CPPFLAGS}"
-     if test x${ac_cv_qte_headers} = "xyes" 
+
+     if test x${ac_cv_qte_headers} = "xyes"
      then
        PLUGINS="${PLUGINS} opie"
        opie_LDFLAGS="${opie_LDFLAGS} ${test_LDFLAGS}"
