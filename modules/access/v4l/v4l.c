@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.5 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: v4l.c,v 1.6 2003/03/31 04:26:17 fenrir Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -829,6 +829,16 @@ static void AccessClose( vlc_object_t *p_this )
 
     free( p_sys->psz_video_device );
     close( p_sys->fd );
+    if( p_sys->p_video_mmap )
+    {
+        munmap( p_sys->p_video_mmap, p_sys->vid_mbuf.size )
+    }
+#ifdef _V4L_AUDIO_
+    if( p_sys->fd_audio >= 0 )
+    {
+        close( p_sys->fd_audio );
+    }
+#endif
 
     if( p_sys->p_encoder )
     {
