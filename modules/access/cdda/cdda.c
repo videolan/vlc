@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cddax.c,v 1.9 2003/11/25 03:54:33 rocky Exp $
+ * $Id: cdda.c,v 1.1 2003/11/26 01:32:52 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -45,9 +45,9 @@
 
 #include <string.h>
 
-#include "vcdx/cdrom.h"
+#include "../vcdx/cdrom.h"
 
-/* how many blocks CDDAOpen will read in each loop */
+/* how many blocks E_(Open) will read in each loop */
 #define CDDA_BLOCKS_ONCE 1
 #define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDIO_CD_FRAMESIZE_RAW)
 
@@ -119,17 +119,16 @@ static input_thread_t *p_cdda_input = NULL;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  CDDAOpen         ( vlc_object_t * );
-static void CDDAClose        ( vlc_object_t * );
+static int  E_(Open)         ( vlc_object_t * );
+static void E_(Close)        ( vlc_object_t * );
+static int  E_(OpenIntf)     ( vlc_object_t * );
+static void E_(CloseIntf)    ( vlc_object_t * );
+
 static int  CDDARead         ( input_thread_t *, byte_t *, size_t );
 static void CDDASeek         ( input_thread_t *, off_t );
 static int  CDDASetArea      ( input_thread_t *, input_area_t * );
 static int  CDDAPlay         ( input_thread_t *, int );
 static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
-
-static int  CDDAOpenIntf     ( vlc_object_t * );
-static void CDDACloseIntf    ( vlc_object_t * );
-
 
 static int  InitThread     ( intf_thread_t *p_intf );
 static int  KeyEvent       ( vlc_object_t *, char const *,
@@ -137,9 +136,9 @@ static int  KeyEvent       ( vlc_object_t *, char const *,
 
 static void RunIntf          ( intf_thread_t *p_intf );
 
-static int debug_callback   ( vlc_object_t *p_this, const char *psz_name,
-			      vlc_value_t oldval, vlc_value_t val, 
-			      void *p_data );
+static int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
+				vlc_value_t oldval, vlc_value_t val, 
+				void *p_data );
 
 /*****************************************************************************
  * Module descriptor
@@ -154,15 +153,17 @@ static void DemuxClose ( vlc_object_t * );
     "value should be set in miliseconds units." )
 
 vlc_module_begin();
-    set_description( _("CD Audio input") );
+    add_usage_hint( N_("cddax://[device-or-file][@num]") );
+    set_description( _("Compact Disc Digital Audio (CD-DA) input") );
     set_capability( "access", 75 /* slightly higher than cdda */ );
     add_integer( "cddax-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    set_callbacks( CDDAOpen, CDDAClose );
+    set_callbacks( E_(Open), E_(Close) );
     add_shortcut( "cdda" );
+    add_shortcut( "cddax" );
 
     /* Configuration options */
     add_category_hint( N_("CDX"), NULL, VLC_TRUE );
-    add_integer ( MODULE_STRING "-debug", 0, debug_callback, DEBUG_TEXT, 
+    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback), DEBUG_TEXT, 
                   DEBUG_LONGTEXT, VLC_TRUE );
     add_string( MODULE_STRING "-device", "", NULL, DEV_TEXT, 
                 DEV_LONGTEXT, VLC_TRUE );
@@ -175,7 +176,7 @@ vlc_module_begin();
 
     add_submodule();
         set_capability( "interface", 0 );
-        set_callbacks( E_(CDDAOpenIntf), E_(CDDACloseIntf) );
+        set_callbacks( E_(OpenIntf), E_(CloseIntf) );
 
 vlc_module_end();
 
@@ -184,8 +185,8 @@ vlc_module_end();
  ****************************************************************************/
 
 static int
-debug_callback   ( vlc_object_t *p_this, const char *psz_name,
-                   vlc_value_t oldval, vlc_value_t val, void *p_data )
+E_(DebugCallback)   ( vlc_object_t *p_this, const char *psz_name,
+		      vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
   cdda_data_t *p_cdda;
 
@@ -229,9 +230,9 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
 
 
 /*****************************************************************************
- * CDDAOpen: open cdda
+ * E_(Open): open cdda
  *****************************************************************************/
-static int CDDAOpen( vlc_object_t *p_this )
+static int E_(Open)( vlc_object_t *p_this )
 {
     input_thread_t *        p_input = (input_thread_t *)p_this;
     char *                  psz_orig;
@@ -405,10 +406,10 @@ CDDAPlay( input_thread_t *p_input, int i_track )
 }
 
 /*****************************************************************************
- * CDDAClose: closes cdda
+ * E_(Close): closes cdda
  *****************************************************************************/
 static void 
-CDDAClose( vlc_object_t *p_this )
+E_(Close)( vlc_object_t *p_this )
 {
     input_thread_t *   p_input = (input_thread_t *)p_this;
     cdda_data_t *p_cdda = (cdda_data_t *)p_input->p_access_data;
@@ -659,7 +660,7 @@ static int  Demux( input_thread_t * p_input )
 /*****************************************************************************
  * OpenIntf: initialize dummy interface
  *****************************************************************************/
-int CDDAOpenIntf ( vlc_object_t *p_this )
+int E_(OpenIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -680,7 +681,7 @@ int CDDAOpenIntf ( vlc_object_t *p_this )
 /*****************************************************************************
  * CloseIntf: destroy dummy interface
  *****************************************************************************/
-void CDDACloseIntf ( vlc_object_t *p_this )
+void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 

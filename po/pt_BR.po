@@ -6,7 +6,6 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2003-11-23 19:29+0100\n"
 "PO-Revision-Date: 2003-08-16 18:31+0200\n"
 "Last-Translator: André de Barros Martins Ribeiro  <andrerib@ajato.com.br>\n"
@@ -14,6 +13,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Report-Msgid-Bugs-To: \n"
 
 #: include/vlc_help.h:32
 msgid "VLC Preferences"

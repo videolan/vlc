@@ -1,0 +1,3 @@
+SOURCES_cddax = \
+	cdda.c \
+	$(NULL)
