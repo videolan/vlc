@@ -321,18 +321,12 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             /* PTS management */
             if( p_pes->b_has_pts )
             {
+                //intf_Msg("%lld\n", p_pes->i_pts);
                 switch( p_es->p_pgrm->i_synchro_state )
                 {
                 case SYNCHRO_NOT_STARTED:
-                    p_pes->b_has_pts = 0;
-                    break;
-
                 case SYNCHRO_START:
-                    p_pes->i_pts += p_es->p_pgrm->delta_cr;
-                    p_es->p_pgrm->delta_absolute = mdate()
-                                     - p_pes->i_pts + DEFAULT_PTS_DELAY;
-                    p_pes->i_pts += p_es->p_pgrm->delta_absolute;
-                    p_es->p_pgrm->i_synchro_state = SYNCHRO_OK;
+                    p_pes->b_has_pts = 0;
                     break;
 
                 case SYNCHRO_REINIT: /* We skip a PES | Why ?? --Meuuh */
@@ -342,7 +336,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 
                 case SYNCHRO_OK:
                     p_pes->i_pts += p_es->p_pgrm->delta_cr
-                                         + p_es->p_pgrm->delta_absolute;
+                                         + p_es->p_pgrm->delta_absolute
+                                         + DEFAULT_PTS_DELAY;
                     break;
                 }
             }
@@ -567,7 +562,20 @@ static void CRDecode( input_thread_t * p_input, es_descriptor_t * p_es,
         p_pgrm = p_input->stream.pp_programs[0];
     }
 
-    if( p_input->stream.b_pace_control )
+    if( p_pgrm->i_synchro_state != SYNCHRO_OK )
+    {
+        switch( p_pgrm->i_synchro_state )
+        {
+        case SYNCHRO_START:
+            p_pgrm->delta_absolute = mdate() - cr_time;
+            p_pgrm->i_synchro_state = SYNCHRO_OK;
+            break;
+
+        default:
+            break;
+        }
+    }
+    else if( p_input->stream.b_pace_control )
     {
         /* Wait a while before delivering the packets to the decoder. */
         mwait( cr_time + p_pgrm->delta_absolute );
@@ -721,7 +729,6 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         switch( i_code )
         {
         case 0x1BA: /* PACK_START_CODE */
-            if( p_input->stream.pp_programs[0]->i_synchro_state == SYNCHRO_OK )
             {
                 /* Convert the SCR in microseconds. */
                 mtime_t         scr_time;
@@ -750,9 +757,10 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                       ) * 300) / 27;
                 }
                 /* Call the pace control. */
-                CRDecode( p_input, NULL, scr_time );
+                //intf_Msg("+%lld\n", scr_time);
+                CRDecode( p_input, NULL, scr_time - 200000 );
+                b_trash = 1;
             }
-            b_trash = 1;
             break;
 
         case 0x1BB: /* SYSTEM_START_CODE */
