@@ -56,6 +56,13 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     return _o_sharedMainInstance;
 }
 
+- (void)dealloc
+{
+    [o_empty_view release];
+    [o_save_prefs release];
+    [super dealloc];
+}
+
 - (void)showPrefs
 {
     /* load our nib */
