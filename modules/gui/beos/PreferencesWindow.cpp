@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.8 2003/01/17 18:19:43 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.9 2003/01/25 20:15:41 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -37,12 +37,12 @@
 /*****************************************************************************
  * Preferences::PreferencesWindow
  *****************************************************************************/
-PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
-								intf_thread_t *p_interface )
-	:	BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-				 B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE )
+PreferencesWindow::PreferencesWindow( intf_thread_t * p_intf,
+                                      BRect frame, const char * name )
+    : BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+               B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE )
 {
-	p_intf = p_interface;
+    this->p_intf = p_intf;
     BRect rect;
 
     /* "background" view */
@@ -132,8 +132,6 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
     rect.top = rect.bottom - 10;
     fRestartString = new BStringView( rect, NULL,
         "Warning: changing settings after starting playback may have no effect." );
-    /*rgb_color redColor = {255, 0, 0, 255};
-    fRestartString->SetHighColor(redColor);*/
     fRestartString->SetAlignment( B_ALIGN_CENTER );
     fPrefsView->AddChild( fRestartString );
 
@@ -154,9 +152,9 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
     button = new BButton( rect, NULL, "Defaults", new BMessage( PREFS_DEFAULTS ) );
     fPrefsView->AddChild( button );
     
-	// start window thread in hidden state
-	Hide();
-	Show();
+    // start window thread in hidden state
+    Hide();
+    Show();
 }
 
 /*****************************************************************************
@@ -171,36 +169,36 @@ PreferencesWindow::~PreferencesWindow()
  *****************************************************************************/
 void PreferencesWindow::MessageReceived( BMessage * p_message )
 {
-	switch ( p_message->what )
-	{
-	    case DVDOLD_CHECK:
-	    case SLIDER_UPDATE:
-	    {
-	        ApplyChanges();
-	        break;
-	    }
-	    case PREFS_DEFAULTS:
-	    {
-	        SetDefaults();
+    switch ( p_message->what )
+    {
+        case DVDOLD_CHECK:
+        case SLIDER_UPDATE:
+        {
             ApplyChanges();
-	        break;
-	    }
-	    case PREFS_SAVE:
-	    {
-	        config_SaveConfigFile( p_intf, "main" );
-	        config_SaveConfigFile( p_intf, "adjust" );
-	        config_SaveConfigFile( p_intf, "ffmpeg" );
-	        break;
-	    }
-	    case PREFS_OK:
-	    {
+            break;
+        }
+        case PREFS_DEFAULTS:
+        {
+            SetDefaults();
+            ApplyChanges();
+            break;
+        }
+        case PREFS_SAVE:
+        {
+            config_SaveConfigFile( p_intf, "main" );
+            config_SaveConfigFile( p_intf, "adjust" );
+            config_SaveConfigFile( p_intf, "ffmpeg" );
+            break;
+        }
+        case PREFS_OK:
+        {
             Hide();
             break;
-	    }
-		default:
-			BWindow::MessageReceived( p_message );
-			break;
-	}
+        }
+        default:
+            BWindow::MessageReceived( p_message );
+            break;
+    }
 }
 
 /*****************************************************************************

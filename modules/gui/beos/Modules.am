@@ -15,6 +15,8 @@ SOURCES_beos = \
 	modules/gui/beos/PlayListWindow.h \
 	modules/gui/beos/PreferencesWindow.cpp \
 	modules/gui/beos/PreferencesWindow.h \
+	modules/gui/beos/MessagesWindow.cpp \
+	modules/gui/beos/MessagesWindow.h \
 	modules/gui/beos/MediaControlView.cpp \
 	modules/gui/beos/MediaControlView.h \
 	modules/gui/beos/VlcWrapper.cpp \

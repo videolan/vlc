@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.9 2003/01/22 01:13:22 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.10 2003/01/25 20:15:41 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -35,115 +35,116 @@ class MediaControlView;
 class PlayListWindow;
 class BFilePanel;
 class PreferencesWindow;
+class MessagesWindow;
 
 class CDMenu : public BMenu
 {
  public:
-							CDMenu( const char* name );
-	virtual					~CDMenu();
+                            CDMenu( const char* name );
+    virtual                 ~CDMenu();
 
-	virtual	void			AttachedToWindow();
+    virtual void            AttachedToWindow();
 
  private:
-	int						GetCD( const char* directory );
+    int                     GetCD( const char* directory );
 };
 
 class LanguageMenu : public BMenu
 {
  public:
-							LanguageMenu( const char* name,
-										  int menu_kind,
-										  VlcWrapper *p_wrapper );
-	virtual					~LanguageMenu();
+                            LanguageMenu( const char* name,
+                                          int menu_kind,
+                                          VlcWrapper *p_wrapper );
+    virtual                 ~LanguageMenu();
 
-	virtual	void			AttachedToWindow();
+    virtual void            AttachedToWindow();
 
  private:
-			void			_GetChannels();
+            void            _GetChannels();
 
-	VlcWrapper *            p_wrapper;
-	int						kind;
+    VlcWrapper *            p_wrapper;
+    int                     kind;
 };
 
 class TitleMenu : public BMenu
 {
  public:
-							TitleMenu( const char* name, intf_thread_t  *p_interface );
-	virtual					~TitleMenu();
+                            TitleMenu( const char* name, intf_thread_t  *p_interface );
+    virtual                 ~TitleMenu();
 
-	virtual	void			AttachedToWindow();
-	
-	intf_thread_t  *p_intf;
+    virtual void            AttachedToWindow();
+    
+    intf_thread_t  *p_intf;
 };
 
 class ChapterMenu : public BMenu
 {
  public:
-							ChapterMenu( const char* name, intf_thread_t  *p_interface );
-	virtual					~ChapterMenu();
+                            ChapterMenu( const char* name, intf_thread_t  *p_interface );
+    virtual                 ~ChapterMenu();
 
-	virtual	void			AttachedToWindow();
+    virtual void            AttachedToWindow();
 
-	intf_thread_t  *p_intf;
+    intf_thread_t  *p_intf;
 };
 
 
 class InterfaceWindow : public BWindow
 {
  public:
-							InterfaceWindow( BRect frame,
-											 const char* name,
-											 intf_thread_t* p_interface );
-	virtual					~InterfaceWindow();
+                            InterfaceWindow( BRect frame,
+                                             const char* name,
+                                             intf_thread_t* p_interface );
+    virtual                 ~InterfaceWindow();
 
-							// BWindow
-	virtual	void			FrameResized( float width, float height );
-	virtual	void			MessageReceived( BMessage* message );
-	virtual	bool			QuitRequested();
+                            // BWindow
+    virtual void            FrameResized( float width, float height );
+    virtual void            MessageReceived( BMessage* message );
+    virtual bool            QuitRequested();
 
-							// InterfaceWindow
-			void 			updateInterface();
-			bool			IsStopped() const;
-	    
-	MediaControlView*		p_mediaControl;
+                            // InterfaceWindow
+            void            UpdateInterface();
+            bool            IsStopped() const;
+        
+    MediaControlView*        p_mediaControl;
 
- private:	
-			void			_UpdatePlaylist();
-			void			_SetMenusEnabled( bool hasFile,
-											  bool hasChapters = false,
-											  bool hasTitles = false );
-			void			_UpdateSpeedMenu( int rate );
-			void			_InputStreamChanged();
+ private:    
+            void            _UpdatePlaylist();
+            void            _SetMenusEnabled( bool hasFile,
+                                              bool hasChapters = false,
+                                              bool hasTitles = false );
+            void            _UpdateSpeedMenu( int rate );
+            void            _InputStreamChanged();
 
-	intf_thread_t*			p_intf;
-	es_descriptor_t*		p_spu_es;
+    intf_thread_t*          p_intf;
+    es_descriptor_t*        p_spu_es;
 
-	bool					fPlaylistIsEmpty;
-	BFilePanel*				fFilePanel;
-	BFilePanel*				fSubtitlesPanel;
-	PlayListWindow*			fPlaylistWindow;
-	PreferencesWindow*		fPreferencesWindow;
-	BMenuBar*				fMenuBar;
-	BMenuItem*				fNextTitleMI;
-	BMenuItem*				fPrevTitleMI;
-	BMenuItem*				fNextChapterMI;
-	BMenuItem*				fPrevChapterMI;
-	BMenuItem*				fOnTopMI;
-	BMenuItem*				fSlowerMI;
-	BMenuItem*				fNormalMI;
-	BMenuItem*				fFasterMI;
-	BMenuItem*				fPreferencesMI;
-	BMenu*					fAudioMenu;
-	BMenu*					fNavigationMenu;
-	BMenu*					fTitleMenu;
-	BMenu*					fChapterMenu;
-	BMenu*					fLanguageMenu;
-	BMenu*					fSubtitlesMenu;
-	BMenu*					fSpeedMenu;
-	BMenu*					fSettingsMenu;
-	bigtime_t				fLastUpdateTime;
-	
-	VlcWrapper * p_wrapper;
+    bool                    fPlaylistIsEmpty;
+    BFilePanel*             fFilePanel;
+    BFilePanel*             fSubtitlesPanel;
+    PlayListWindow*         fPlaylistWindow;
+    PreferencesWindow*      fPreferencesWindow;
+    MessagesWindow*         fMessagesWindow;
+    BMenuBar*               fMenuBar;
+    BMenuItem*              fNextTitleMI;
+    BMenuItem*              fPrevTitleMI;
+    BMenuItem*              fNextChapterMI;
+    BMenuItem*              fPrevChapterMI;
+    BMenuItem*              fOnTopMI;
+    BMenuItem*              fSlowerMI;
+    BMenuItem*              fNormalMI;
+    BMenuItem*              fFasterMI;
+    BMenu*                  fAudioMenu;
+    BMenu*                  fNavigationMenu;
+    BMenu*                  fTitleMenu;
+    BMenu*                  fChapterMenu;
+    BMenu*                  fLanguageMenu;
+    BMenu*                  fSubtitlesMenu;
+    BMenu*                  fSpeedMenu;
+    BMenu*                  fShowMenu;
+    bigtime_t               fLastUpdateTime;
+    
+    VlcWrapper * p_wrapper;
 };
 
-#endif	// BEOS_INTERFACE_WINDOW_H
+#endif    // BEOS_INTERFACE_WINDOW_H

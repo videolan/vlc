@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.6 2003/01/17 18:19:43 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.7 2003/01/25 20:15:41 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -38,9 +38,9 @@
 class PreferencesWindow : public BWindow
 {
     public:
-                         PreferencesWindow( BRect frame,
-                                            const char* name,
-                                            intf_thread_t *p_interface );
+                         PreferencesWindow( intf_thread_t * p_intf,
+                                            BRect frame,
+                                            const char * name );
         virtual          ~PreferencesWindow();
         virtual void     MessageReceived(BMessage *message);
         void             ReallyQuit();
@@ -65,5 +65,5 @@ class PreferencesWindow : public BWindow
         intf_thread_t *  p_intf;
 };
 
-#endif	// BEOS_PREFERENCES_WINDOW_H
+#endif    // BEOS_PREFERENCES_WINDOW_H
 

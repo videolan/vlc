@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.15 2003/01/22 01:13:22 titer Exp $
+ * $Id: VlcWrapper.h,v 1.16 2003/01/25 20:15:41 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -35,16 +35,18 @@ class VlcWrapper;
  *****************************************************************************/
 struct intf_sys_t
 {
-    InterfaceWindow * p_window;
+    msg_subscription_t * p_sub;
+
+    InterfaceWindow *    p_window;
     
-    vlc_bool_t        b_loop;
-    vlc_bool_t        b_mute;
-    int	              i_part;
-    audio_volume_t    i_saved_volume;
-    int               i_channel;
-    bool              b_dvdold;
+    vlc_bool_t           b_loop;
+    vlc_bool_t           b_mute;
+    int                  i_part;
+    audio_volume_t       i_saved_volume;
+    int                  i_channel;
+    bool                 b_dvdold;
     
-    VlcWrapper * p_wrapper;
+    VlcWrapper *         p_wrapper;
 };
 
 /*****************************************************************************
@@ -94,8 +96,8 @@ public:
     void    PlaylistJumpTo( int );
     void    GetNavCapabilities( bool * canSkipPrev,
                                 bool * canSkipNext );
-	void    NavigatePrev();
-	void    NavigateNext();
+    void    NavigatePrev();
+    void    NavigateNext();
 
     /* Audio */
     bool           HasAudio();
@@ -124,8 +126,8 @@ public:
     void         LoadSubFile( char * psz_file );
     
 private:
-    intf_thread_t * p_intf;
-    input_thread_t * p_input;
-    playlist_t * p_playlist;
+    intf_thread_t *   p_intf;
+    input_thread_t *  p_input;
+    playlist_t *      p_playlist;
     aout_instance_t * p_aout;
 };
