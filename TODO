@@ -7,6 +7,92 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 
+Difficulty: Medium
+Urgency: Critical
+Description: Fix audio synchro
+ With some audio plugins, the audio stream is late because of buffer
+ sizes. See what's wrong and fix it.
+Status: Todo
+
+# input-II tasks, from the least important to the most important
+# (backwards order) :
+
+Task: 0x47
+Difficulty: Hard
+Urgency: Normal
+Description: Make decoders dynamically loadable
+Status: Todo
+
+Task: 0x46
+Difficulty: Hard
+Urgency: Normal
+Description: Make input plugins dynamically loadable
+ With a probe() function, and stuff...
+Status: Todo
+
+Task: 0x45
+Difficulty: Guru
+Urgency: Normal
+Description: Write DVD plugin
+ We need a DVD plugin which read the device directly, calls DeCSS
+ (optional) and parse .ifo files.
+Status: Todo
+
+Task: 0x44
+Difficulty: Guru
+Urgency: Important
+Description: Write input_ext-intf.c
+ This file will provide functions which allow the interface to change
+ the pace of reading and change the position in the file.
+Status: Todo
+
+Task: 0x43
+Difficulty: Medium
+Urgency: Important
+Description: Write TS support
+ The parser has already been back-ported, but it still lacks the
+ PSI parser, and currently the functions to read from the network
+ are yet to be written.
+Status: Todo
+
+Task: 0x42
+Difficulty: Medium
+Urgency: Important
+Description: Write input_netlist.c
+ We need an interface to create fixed-size packets (for instance
+ 188 bytes or 2 kB) and avoid using the system malloc().
+Status: Todo
+
+Task: 0x41
+Difficulty: Easy
+Urgency: Important
+Description: Write input_programs.c
+ We need a centralized manner of creating new programs, es, and
+ spawning new decoders.
+Status: Todo
+
+Task: 0x40
+Difficulty: Medium
+Urgency: Important
+Description: Fix the PS plugin
+ The PS plugin should be able to recover from packet loss, to
+ read MPEG-1 .mpg files, and to pre-parse the stream (if possible)
+ to build the ES table. Check what's wrong and fix it. Now.
+Status: Todo
+
+Task: 0x3f
+Difficulty: Easy
+Urgency: Critical
+Description: Enhance intf_*Msg
+ The intf_*Msg functions could be more clever : add "mymodule
+ warning/error:" and \n automatically. The new input already
+ uses such a behaviour, so we must hurry. It might be necessary
+ to modify all messages in all modules...
+Status: Todo
+
+# end of input-II tasks, thanks for being with us
+
 Task: 0x3e
 Difficulty: Guru
 Urgency: Critical
@@ -548,5 +634,6 @@ Description: Splash screen
  The vlc needs a splash screen with a vlc logo, instead of
  the "waiting for stream" message.
 Status: Todo
+
 
 
