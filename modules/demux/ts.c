@@ -175,7 +175,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t                i_iod_label;
+    uint8_t                i_iod_label, i_iod_label_scope;
 
     /* IOD */
     uint16_t                i_od_id;
@@ -410,7 +410,7 @@ static int Open( vlc_object_t *p_this )
     /* Read config */
     var_Create( p_demux, "ts-es-id-pid", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-es-id-pid", &val );
-    p_sys->b_es_id_pid = val.b_bool,
+    p_sys->b_es_id_pid = val.b_bool;
 
     var_Create( p_demux, "ts-out", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-out", &val );
@@ -1626,7 +1626,7 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
     iod_descriptor_t *p_iod;
     int i;
     int i_es_index;
-    uint8_t     i_flags;
+    uint8_t     i_flags, i_iod_tag, byte1, byte2, byte3;
     vlc_bool_t  b_url;
     int         i_iod_length;
 
@@ -1645,14 +1645,28 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
         return p_iod;
     }
 
-    p_iod->i_iod_label = IODGetByte( &i_data, &p_data );
+    byte1 = IODGetByte( &i_data, &p_data );
+    byte2 = IODGetByte( &i_data, &p_data );
+    byte3 = IODGetByte( &i_data, &p_data );
+    if( byte2 == 0x02 )	//old vlc's buggy implementation of the IOD_descriptor
+    {
+        p_iod->i_iod_label_scope = 0x11;
+        p_iod->i_iod_label = byte1;
+        i_iod_tag = byte2;
+    }
+    else		//correct implementation of the IOD_descriptor
+    {
+        p_iod->i_iod_label_scope = byte1;
+        p_iod->i_iod_label = byte2;
+        i_iod_tag = byte3;
+    }
     fprintf( stderr, "\n* iod_label:%d", p_iod->i_iod_label );
     fprintf( stderr, "\n* ===========" );
-    fprintf( stderr, "\n* tag:0x%x", p_data[0] );
+    fprintf( stderr, "\n* tag:0x%x", i_iod_tag );
 
-    if( IODGetByte( &i_data, &p_data ) != 0x02 )
+    if( i_iod_tag != 0x02 )
     {
-        fprintf( stderr, "\n ERR: tag != 0x02" );
+        fprintf( stderr, "\n ERR: tag %02x != 0x02", i_iod_tag );
         return p_iod;
     }
 
@@ -2111,6 +2125,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                     case 0x20: /* mpeg4 */
                         pid->es->fmt.i_codec = VLC_FOURCC('m','p','4','v');
+                        break;
+                    case 0x21: /* h264 */
+                        pid->es->fmt.i_codec = VLC_FOURCC('h','2','6','4');
                         break;
                     case 0x60:
                     case 0x61:

@@ -1790,6 +1790,8 @@ static void GetPMT( sout_mux_t *p_mux,
         memset( iod, 0, 4096 );
 
         bits_initwrite( &bits, 4096, iod );
+	// IOD_label_scope
+        bits_write( &bits, 8,   0x11 );
         // IOD_label
         bits_write( &bits, 8,   0x01 );
         // InitialObjectDescriptor
@@ -1839,7 +1841,12 @@ static void GetPMT( sout_mux_t *p_mux,
                     bits_write( &bits, 8, 0x20 );   // Visual 14496-2
                     bits_write( &bits, 6, 0x04 );   // VisualStream
                 }
-                else if( p_stream->i_stream_type == 0x11 )
+                else if( p_stream->i_stream_type == 0x1b )
+                {
+                    bits_write( &bits, 8, 0x21 );   // Visual 14496-2
+                    bits_write( &bits, 6, 0x04 );   // VisualStream
+                }
+                else if( p_stream->i_stream_type == 0x11  || p_stream->i_stream_type == 0x0f )
                 {
                     bits_write( &bits, 8, 0x40 );   // Audio 14496-3
                     bits_write( &bits, 6, 0x05 );   // AudioStream
