@@ -56,6 +56,8 @@ static vlc_bool_t Control( input_thread_t *, int, vlc_value_t );
 static void UpdateFromAccess( input_thread_t * );
 static void UpdateFromDemux( input_thread_t * );
 
+static void UpdateItemLength( input_thread_t *, int64_t i_length );
+
 static void ParseOption( input_thread_t *p_input, const char *psz_option );
 
 static void DecodeUrl  ( char * );
@@ -450,15 +452,7 @@ static int Run( input_thread_t *p_input )
 
                 if( old_val.i_time != val.i_time )
                 {
-                    char psz_buffer[MSTRTIME_MAX_SIZE];
-
-                    vlc_mutex_lock( &p_input->input.p_item->lock );
-                    p_input->input.p_item->i_duration = i_length;
-                    vlc_mutex_unlock( &p_input->input.p_item->lock );
-
-                    input_Control( p_input, INPUT_ADD_INFO,
-                                   _("General"), _("Duration"),
-                    msecstotimestr( psz_buffer, i_length / 1000 ) );
+                    UpdateItemLength( p_input, i_length );
                 }
             }
 
@@ -563,7 +557,8 @@ static int Init( input_thread_t * p_input )
                          &val.i_time ) && val.i_time > 0 )
     {
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
-        /* TODO update playlist meta data */
+
+        UpdateItemLength( p_input, val.i_time );
     }
     /* Start time*/
     /* Set start time */
@@ -1399,6 +1394,21 @@ static void UpdateFromAccess( input_thread_t *p_input )
         p_access->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
     p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
+}
+
+/*****************************************************************************
+ * UpdateItemLength:
+ *****************************************************************************/
+static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
+{
+    char psz_buffer[MSTRTIME_MAX_SIZE];
+
+    vlc_mutex_lock( &p_input->input.p_item->lock );
+    p_input->input.p_item->i_duration = i_length;
+    vlc_mutex_unlock( &p_input->input.p_item->lock );
+
+    input_Control( p_input, INPUT_ADD_INFO, _("General"), _("Duration"),
+                   msecstotimestr( psz_buffer, i_length / 1000 ) );
 }
 
 /*****************************************************************************
