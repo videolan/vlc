@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.44 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: vlc_common.h,v 1.45 2002/12/18 11:47:35 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -438,6 +438,13 @@ static inline uint64_t U64_AT( void * _p )
 #   define ntoh16(i)   U16_AT(&i)
 #   define ntoh32(i)   U32_AT(&i)
 #   define ntoh64(i)   U64_AT(&i)
+#endif
+
+/* Format string sanity checks */
+#ifdef HAVE_ATTRIBUTE_FORMAT
+#   define ATTRIBUTE_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
+#else
+#   define ATTRIBUTE_FORMAT(x,y)
 #endif
 
 /* Alignment of critical static data structures */

@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.7 2002/11/13 15:28:24 sam Exp $
+ * $Id: vlc_messages.h,v 1.8 2002/12/18 11:47:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -97,11 +97,11 @@ struct msg_subscription_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) );
-VLC_EXPORT( void, __msg_Info,    ( void *, const char *, ... ) );
-VLC_EXPORT( void, __msg_Err,     ( void *, const char *, ... ) );
-VLC_EXPORT( void, __msg_Warn,    ( void *, const char *, ... ) );
-VLC_EXPORT( void, __msg_Dbg,    ( void *, const char *, ... ) );
+VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) ATTRIBUTE_FORMAT( 4, 5 ) );
+VLC_EXPORT( void, __msg_Info,    ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( void, __msg_Err,     ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( void, __msg_Warn,    ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
+VLC_EXPORT( void, __msg_Dbg,    ( void *, const char *, ... ) ATTRIBUTE_FORMAT( 2, 3 ) );
 
 #ifdef HAVE_VARIADIC_MACROS
 

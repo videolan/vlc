@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.10 2002/12/08 00:41:06 massiot Exp $
+ * $Id: vlc_threads_funcs.h,v 1.11 2002/12/18 11:47:35 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -618,7 +618,7 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
         {
             msg_Warn( p_condvar->p_this,
                       "thread %d: possible deadlock detected "
-                      "in cond_wait at %s:%d (%s)", pthread_self(),
+                      "in cond_wait at %s:%d (%s)", (int)pthread_self(),
                       psz_file, i_line, strerror(i_result) );
         }
         else break;
@@ -702,4 +702,4 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
  * vlc_thread_join: wait until a thread exits
  *****************************************************************************/
 #define vlc_thread_join( P_THIS )                                           \
-    __vlc_thread_join( VLC_OBJECT(P_THIS), __FILE__, __LINE__ ) 
+    __vlc_thread_join( VLC_OBJECT(P_THIS), __FILE__, __LINE__ )
