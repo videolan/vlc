@@ -2,7 +2,7 @@
  * decoder.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.10 2004/01/25 22:16:26 rocky Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -68,7 +68,7 @@ int E_(OpenDecoder) ( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    char psz_file[ PATH_MAX ];
+    char psz_file[ MAX_PATH ];
     vlc_value_t val;
 
     /* Allocate the memory needed to store the decoder's structure */
