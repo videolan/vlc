@@ -2,7 +2,7 @@
  * ac3_srfft_3dn.c: accelerated 3D Now! ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_srfft_3dn.c,v 1.1 2001/05/16 14:51:29 reno Exp $
+ * $Id: ac3_srfft_3dn.c,v 1.2 2001/07/08 23:15:11 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -126,6 +126,7 @@ void C_1_3dn (void)
 static void fft_4_3dn (complex_t *x)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
 	"movq    (%%eax), %%mm0\n"      /* x[0] */
 	"movq   8(%%eax), %%mm1\n"      /* x[1] */
 	"movq  16(%%eax), %%mm2\n"      /* x[2] */

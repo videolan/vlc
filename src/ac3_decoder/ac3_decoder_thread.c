@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.34 2001/05/31 01:37:08 sam Exp $
+ * $Id: ac3_decoder_thread.c,v 1.35 2001/07/08 23:15:11 reno Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -82,7 +82,13 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
     intf_DbgMsg( "ac3dec debug: creating ac3 decoder thread" );
 
     /* Allocate the memory needed to store the thread's structure */
-    if((p_ac3thread = (ac3dec_thread_t *)malloc(sizeof(ac3dec_thread_t)))==NULL)
+    p_ac3thread = (ac3dec_thread_t *)malloc(sizeof(ac3dec_thread_t));
+
+    /* We need to be 16 bytes aligned */
+    p_ac3thread->ac3thread = (int)p_ac3thread & (-15);
+    p_ac3thread = (ac3dec_thread_t *)p_ac3thread->ac3thread;
+    
+    if(p_ac3thread == NULL)
     {
         intf_ErrMsg ( "ac3dec error: not enough memory "
                       "for ac3dec_CreateThread() to create the new thread");
@@ -335,6 +341,7 @@ static void EndThread (ac3dec_thread_t * p_ac3thread)
 
     /* Destroy descriptor */
     free( p_ac3thread->p_config );
+    p_ac3thread = (ac3dec_thread_t *)p_ac3thread->ac3thread;
     free( p_ac3thread );
 
     intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p destroyed", p_ac3thread);

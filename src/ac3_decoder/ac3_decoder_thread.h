@@ -2,7 +2,7 @@
  * ac3_decoder_thread.h : ac3 decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.h,v 1.7 2001/05/14 15:58:03 reno Exp $
+ * $Id: ac3_decoder_thread.h,v 1.8 2001/07/08 23:15:11 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -24,8 +24,16 @@
 /*****************************************************************************
  * ac3dec_thread_t : ac3 decoder thread descriptor
  *****************************************************************************/
+
 typedef struct ac3dec_thread_s
 {
+    /*
+     * Decoder properties
+     */
+    float used_for_alignement1;
+    float used_for_alignement2;
+    ac3dec_t            ac3_decoder __attribute__ ((aligned(16)));
+    
     /*
      * Thread properties
      */
@@ -39,15 +47,11 @@ typedef struct ac3dec_thread_s
     adec_config_t *     p_config;
 
     /*
-     * Decoder properties
-     */
-    ac3dec_t            ac3_decoder;
-
-    /*
      * Output properties
      */
     aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-
+    int                 ac3thread;      /* save the old pointer */
+    
 } ac3dec_thread_t;
 
 /*****************************************************************************

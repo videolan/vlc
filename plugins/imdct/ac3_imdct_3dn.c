@@ -2,7 +2,7 @@
  * ac3_imdct_3dn.c: accelerated 3D Now! ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_3dn.c,v 1.4 2001/06/03 12:47:21 sam Exp $
+ * $Id: ac3_imdct_3dn.c,v 1.5 2001/07/08 23:15:11 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -89,6 +89,7 @@ void _M( imdct_do_512_nol ) (imdct_t * p_imdct, float data[], float delay[])
 static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float *data, float *xcos_sin_sse)
 {
     __asm__ __volatile__ (	
+    ".align 16\n"
 	"pushl %%ebp\n"
 	"movl  %%esp, %%ebp\n"
 	"addl  $-4, %%esp\n" /* local variable, loop counter */
@@ -106,6 +107,7 @@ static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float
 	"movl 20(%%ebp), %%edx\n" 	/* xcos_sin_sse */
 	"movl $128, -4(%%ebp)\n"
 	
+    ".align 16\n"
 ".loop:\n"
 	"movl  (%%eax), %%esi\n"
 	"movd (%%ecx, %%esi, 8), %%mm1\n"   /* 2j */
@@ -147,9 +149,11 @@ static void imdct512_pre_ifft_twiddle_3dn (const int *pmt, complex_t *buf, float
 static void imdct512_post_ifft_twiddle_3dn (complex_t *buf, float *xcos_sin_sse)
 {
     __asm__ __volatile__ ( 
+    ".align 16\n"
 	"pushl %%ebx\n"
 	"movl $64, %%ebx\n"         /* loop counter */
 
+    ".align 16\n"
 ".loop1:\n"
 	"movq	(%%eax), %%mm0\n"   /* im0 | re0 */
 	"movq	  %%mm0, %%mm1\n"   /* im0 | re0 */
@@ -200,6 +204,7 @@ static void imdct512_post_ifft_twiddle_3dn (complex_t *buf, float *xcos_sin_sse)
 static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
 	"pushl %%ebp\n"
 	"movl  %%esp, %%ebp\n"
 
@@ -219,6 +224,7 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 	"leal 504(%%eax), %%edi\n"  /* buf[63].re */
 	"movl  12(%%ebp), %%eax\n"  /* data */
 
+    ".align 16\n"
 ".first_128_samples:\n"
 	"movd   (%%esi), %%mm0\n" /* im0 */
 	"movd  8(%%esi), %%mm2\n" /* im1 */
@@ -258,6 +264,7 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 	"leal 1020(%%esi), %%edi\n" /* buf[127].im */
 	"movl $32, %%ecx\n"         /* loop count */
     
+    ".align 16\n"
 ".second_128_samples:\n"
 	"movd   (%%esi), %%mm0\n" /* buf[i].re */
 	"movd  8(%%esi), %%mm2\n" /* re1 */
@@ -302,6 +309,7 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 	"movl $32, %%ecx\n"         /* loop count */
 	"movl  20(%%ebp), %%eax\n"  /* delay */
 
+    ".align 16\n"
 ".first_128_delay:\n"
 	"movd   (%%esi), %%mm0\n" /* re0 */
 	"movd  8(%%esi), %%mm2\n" /* re1 */
@@ -339,6 +347,7 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 	"leal 1016(%%ebx), %%edi\n" /* buf[127].re */
 	"movl $32, %%ecx\n"         /* loop count */
     
+    ".align 16\n"
 ".second_128_delay:\n"
 	"movd   (%%esi), %%mm0\n" /* im0 */
 	"movd  8(%%esi), %%mm2\n" /* im1 */
@@ -386,6 +395,7 @@ static void imdct512_window_delay_3dn (complex_t *buf, float *data_ptr, float *w
 static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, float *window_prt, float *delay_prt)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
 	"pushl %%ebp\n"
 	"movl  %%esp, %%ebp\n"
 	
@@ -405,6 +415,7 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
 	"leal 504(%%eax), %%edi\n"  /* buf[63].re */
 	"movl  12(%%ebp), %%eax\n"  /* data */
 
+    ".align 16\n"
 ".first_128_samples2:\n"
 	"movd   (%%esi), %%mm0\n" /* im0 */
 	"movd  8(%%esi), %%mm2\n" /* im1 */
@@ -439,6 +450,7 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
 	"leal 1020(%%esi), %%edi\n" /* buf[127].im */
 	"movl $32, %%ecx\n"         /* loop count */
     
+    ".align 16\n"
 ".second_128_samples2:\n"
 	"movd   (%%esi), %%mm0\n" /* buf[i].re */
 	"movd  8(%%esi), %%mm2\n" /* re1 */
@@ -478,6 +490,7 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
 	"movl $32, %%ecx\n"         /* loop count */
 	"movl  20(%%ebp), %%eax\n"  /* delay */
 
+    ".align 16\n"
 ".first_128_delays:\n"
 	"movd   (%%esi), %%mm0\n" /* re0 */
 	"movd  8(%%esi), %%mm2\n" /* re1 */
@@ -515,6 +528,7 @@ static void imdct512_window_delay_nol_3dn (complex_t *buf, float *data_ptr, floa
 	"leal 1016(%%ebx), %%edi\n" /* buf[127].re */
 	"movl $32, %%ecx\n"         /* loop count */
     
+    ".align 16\n"
 ".second_128_delays:\n"
 	"movd   (%%esi), %%mm0\n" /* im0 */
 	"movd  8(%%esi), %%mm2\n" /* im1 */

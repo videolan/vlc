@@ -2,7 +2,7 @@
  * ac3_imdct.h : AC3 IMDCT types
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.h,v 1.4 2001/06/12 00:30:41 reno Exp $
+ * $Id: ac3_imdct.h,v 1.5 2001/07/08 23:15:11 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -42,18 +42,19 @@ typedef struct imdct_s
     float xsin1[N/4] __attribute__ ((aligned(16)));
     float xcos2[N/8] __attribute__ ((aligned(16)));
     float xsin2[N/8] __attribute__ ((aligned(16)));
+    float xcos_sin_sse[128 * 4] __attribute__ ((aligned(16)));
    
     /* Twiddle factor LUT */
-    complex_t *w[7] __attribute__ ((aligned(16)));
     complex_t w_1[1] __attribute__ ((aligned(16)));
+    float used_for_alignement1;
+    float used_for_alignement2;
     complex_t w_2[2] __attribute__ ((aligned(16)));
     complex_t w_4[4] __attribute__ ((aligned(16)));
     complex_t w_8[8] __attribute__ ((aligned(16)));
     complex_t w_16[16] __attribute__ ((aligned(16)));
     complex_t w_32[32] __attribute__ ((aligned(16)));
     complex_t w_64[64] __attribute__ ((aligned(16)));
-
-    float xcos_sin_sse[128 * 4] __attribute__ ((aligned(16)));
+    complex_t *w[7] __attribute__ ((aligned(16)));
     
     /* Module used and shortcuts */
     struct module_s * p_module;

@@ -2,7 +2,7 @@
  * ac3_downmix_3dn.c: accelerated 3D Now! ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_3dn.c,v 1.3 2001/07/01 08:49:09 gbazin Exp $
+ * $Id: ac3_downmix_3dn.c,v 1.4 2001/07/08 23:15:11 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *
@@ -46,6 +46,7 @@ void sqrt2_3dn (void)
 void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
     "pushl %%ebx\n"
     "movl  $128,  %%ebx\n"            /* loop counter */
 
@@ -58,6 +59,7 @@ void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
     "movd    8(%%ecx), %%mm7\n"        /* slev */
     "punpckldq %%mm7, %%mm7\n"        /* slev | slev */
 
+    ".align 16\n"
 ".loop:\n"
     "movq    (%%eax),     %%mm0\n"   /* left */
     "movq    2048(%%eax), %%mm1\n"   /* right */
@@ -90,6 +92,7 @@ void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
 void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
     "pushl %%ebx\n"
     "movl  $128, %%ebx\n"       /* loop counter */
 
@@ -99,6 +102,7 @@ void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movd    8(%%ecx), %%mm7\n"    /* slev */
     "punpckldq %%mm7, %%mm7\n"    /* slev | slev */
 
+    ".align 16\n"
 ".loop3:\n"
     "movq   (%%eax), %%mm0\n"       /* left */
     "movq   1024(%%eax), %%mm1\n"   /* right */
@@ -127,7 +131,7 @@ void _M( downmix_2f_2r_to_2ch ) (float *samples, dm_par_t * dm_par)
 void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
-
+    ".align 16\n"
     "pushl    %%ebx\n"
     "movl    $128, %%ebx\n"            /* loop counter */
 
@@ -140,6 +144,7 @@ void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movd    8(%%ecx), %%mm7\n"        /* slev */
     "punpckldq %%mm7, %%mm7\n"      /* slev | slev */
 
+    ".align 16\n"
 ".loop4:\n"
     "movq    (%%eax), %%mm0\n"       /* left */
     "movq    2048(%%eax), %%mm1\n"   /* right */
@@ -170,6 +175,7 @@ void _M( downmix_3f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
     "pushl    %%ebx\n"
     "movl    $128, %%ebx\n"            /* loop counter */
 
@@ -179,6 +185,7 @@ void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movd    8(%%ecx), %%mm7\n"        /* slev */
     "punpckldq %%mm7, %%mm7\n"      /* slev | slev */
 
+    ".align 16\n"
 ".loop5:\n"
     "movq    (%%eax), %%mm0\n"       /* left */
     "movq    1024(%%eax), %%mm1\n"   /* right */
@@ -205,6 +212,7 @@ void _M( downmix_2f_1r_to_2ch ) (float *samples, dm_par_t * dm_par)
 void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
     "pushl    %%ebx\n"
     "movl    $128, %%ebx\n"            /* loop counter */
 
@@ -214,6 +222,7 @@ void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
     "movd    4(%%ecx), %%mm6\n"        /* clev */
     "punpckldq %%mm6, %%mm6\n"      /* clev | clev */
 
+    ".align 16\n"
 ".loop6:\n"
     "movq    (%%eax), %%mm0\n"       /*left */
     "movq    2048(%%eax), %%mm1\n"   /* right */
@@ -240,6 +249,7 @@ void _M( downmix_3f_0r_to_2ch ) (float *samples, dm_par_t * dm_par)
 void _M( stream_sample_1ch_to_s16 ) (s16 *s16_samples, float *left)
 {
     __asm__ __volatile__ (
+    ".align 16\n"
     "pushl %%ebx\n"
     "pushl %%edx\n"
 
@@ -248,6 +258,7 @@ void _M( stream_sample_1ch_to_s16 ) (s16 *s16_samples, float *left)
     "punpckldq %%mm7, %%mm7\n"   /* sqrt2 | sqrt2 */
     "movl $128, %%ebx\n"
 
+    ".align 16\n"
 ".loop2:\n"
     "movq (%%ecx), %%mm0\n"        /* c1 | c0 */
     "pfmul   %%mm7, %%mm0\n"
@@ -274,9 +285,11 @@ void _M( stream_sample_2ch_to_s16 ) (s16 *s16_samples, float *left, float *right
 {
 
     __asm__ __volatile__ (
+    ".align 16\n"
     "pushl %%ebx\n"
     "movl $128, %%ebx\n"
 
+    ".align 16\n"
 ".loop1:\n"
     "movq  (%%ecx), %%mm0\n"    /* l1 | l0 */
     "movq  (%%edx), %%mm1\n"    /* r1 | r0 */
