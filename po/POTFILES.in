@@ -137,6 +137,7 @@ modules/encoder/ffmpeg/encoder.c
 modules/encoder/xvid.c
 
 # gui modules
+modules/gui/beos/BeOS.cpp
 modules/gui/beos/InterfaceWindow.cpp
 modules/gui/beos/MediaControlView.cpp
 modules/gui/beos/PlayListWindow.cpp
