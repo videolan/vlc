@@ -76,6 +76,9 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         /// Give access to the visibility variable
         VarBool &getVisibleVar() { return m_varVisible; }
 
+        /// Window type, mainly useful when overloaded (for VoutWindow)
+        virtual string getType() const { return "Generic"; }
+
     protected:
         /// Get the OS window
         OSWindow *getOSWindow() const { return m_pOsWindow; }
