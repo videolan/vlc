@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.5 2003/01/03 00:03:13 jlj Exp $
+ * $Id: darwin_specific.m,v 1.6 2003/01/16 14:40:04 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -76,9 +76,9 @@ static int FindLanguage( const char * psz_lang )
     {
         psz_short = "ru";
     }
-    else if ( !strcmp(psz_lang, "se") )
+    else if ( !strcmp(psz_lang, "sv") )
     {
-        psz_short = "se";
+        psz_short = "sv";
     }
     else if ( !strcmp(psz_lang, "English") )
     {
