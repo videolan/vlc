@@ -1655,7 +1655,7 @@ static int WriteUserKey( void *_p_drms, uint32_t *p_user_key )
         snprintf( psz_path, PATH_MAX - 1, "%s/" DRMS_DIRNAME "/%08X.%03d",
                   p_drms->psz_homedir, p_drms->i_user, p_drms->i_key );
 
-        file = fopen( psz_path, "w" );
+        file = fopen( psz_path, "wb" );
         if( file != NULL )
         {
             i_ret = fwrite( p_user_key, sizeof(uint32_t),
@@ -1683,7 +1683,7 @@ static int ReadUserKey( void *_p_drms, uint32_t *p_user_key )
               "%s/" DRMS_DIRNAME "/%08X.%03d", p_drms->psz_homedir,
               p_drms->i_user, p_drms->i_key );
 
-    file = fopen( psz_path, "r" );
+    file = fopen( psz_path, "rb" );
     if( file != NULL )
     {
         i_ret = fread( p_user_key, sizeof(uint32_t),
@@ -1902,7 +1902,7 @@ static int GetSCIData( char *psz_ipod, uint32_t **pp_sci,
         return -1;
     }
 
-    file = fopen( psz_path, "r" );
+    file = fopen( psz_path, "rb" );
     if( file != NULL )
     {
         struct stat st;
