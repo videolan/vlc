@@ -2,7 +2,7 @@
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: qte_main.cpp,v 1.6 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: qte_main.cpp,v 1.7 2003/06/09 19:56:26 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -42,6 +42,7 @@ typedef struct qte_thread_t
 
     QApplication*       p_qte_application;
     QWidget*            p_qte_widget;
+    bool		b_gui_server;
 
 } qte_thread_t;
 
@@ -62,9 +63,14 @@ static qte_thread_t * p_qte_main = NULL;
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define STANDALONE_TEXT N_("Run as standalone Qt/Embedded Gui Server")
+#define STANDALONE_LONGTEXT N_("Use this option to run as standalone Qt/Embedded Gui Server. " \
+	"This option is equivalent to the -qws option from normal Qt.")
+
 vlc_module_begin();
     set_description( _("Qt Embedded GUI helper") );
     set_capability( "gui-helper", 90 );
+    add_bool( "qte-guiserver", 0, NULL, STANDALONE_TEXT, STANDALONE_LONGTEXT, VLC_FALSE );
     add_shortcut( "qte" );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -151,9 +157,20 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void QteMain( qte_thread_t *p_this )
 {
-    int argc = 0;
+    int i_argc = 1;
+    char *p_args[] = {"-qws", NULL};
+    char **pp_args = p_args;
 
-    QApplication* pApp = new QApplication(argc, NULL);
+    p_this->b_gui_server = VLC_FALSE;
+    if( config_GetInt( p_this, "qte-guiserver" ) )
+    {
+	msg_Dbg( p_this, "Running as Qt Embedded standalone GuiServer" );
+        p_this->b_gui_server = VLC_TRUE;
+    }
+
+    /* Run as standalone GuiServer or as GuiClient. */
+    QApplication* pApp = new QApplication(i_argc, NULL,
+        (p_this->b_gui_server ? (QApplication::GuiServer):(QApplication::GuiClient)) );
     if(pApp)
     {
         p_this->p_qte_application = pApp;
@@ -165,6 +182,9 @@ static void QteMain( qte_thread_t *p_this )
         p_this->p_qte_widget = pWidget;
     }
 
+    if (p_this->b_gui_server) {
+        p_this->p_qte_application->desktop()->setFixedSize(240, 320);
+    }
     /* signal the creation of the window */
     p_this->p_qte_application->setMainWidget(p_this->p_qte_widget);
     p_this->p_qte_widget->show();
