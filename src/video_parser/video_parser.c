@@ -301,7 +301,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->synchro.displayable_p = 2 << 10;
     p_vpar->synchro.b_all_B = 0;
     p_vpar->synchro.displayable_b = 0;
-    p_vpar->synchro.b_dropped_last_B = 0;
+    p_vpar->synchro.b_dropped_last = 0;
     /* assume there were about 3 P and 6 B images between I's */
     p_vpar->synchro.i_P_seen = p_vpar->synchro.i_P_kept = 1 << 10;
     p_vpar->synchro.i_B_seen = p_vpar->synchro.i_B_kept = 1 << 10;
@@ -499,6 +499,10 @@ static int SynchroType( )
         {
           case '\0':
             return VPAR_SYNCHRO_I;
+
+          case '+':
+            if( *psz_synchro ) return 0;
+            return VPAR_SYNCHRO_Iplus;
 
           case 'p':
           case 'P':

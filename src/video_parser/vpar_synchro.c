@@ -215,6 +215,10 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             if( p_vpar->synchro.i_type != VPAR_SYNCHRO_DEFAULT )
             {
                 /* I, IP, IP+, IPB */
+                if( p_vpar->synchro.i_type == VPAR_SYNCHRO_Iplus )
+                {
+                    p_vpar->synchro.b_dropped_last = 1;
+                }
                 return( 1 );
             }
 
@@ -225,6 +229,19 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             if( p_vpar->synchro.i_type == VPAR_SYNCHRO_I ) /* I */
             {
                 return( 0 );
+            }
+
+            if( p_vpar->synchro.i_type == VPAR_SYNCHRO_Iplus ) /* I+ */
+            {
+                if( p_vpar->synchro.b_dropped_last )
+                {
+                    p_vpar->synchro.b_dropped_last = 0;
+                    return( 1 );
+                }
+                else
+                {
+                    return( 0 );
+                }
             }
 
             if( p_vpar->synchro.i_type >= VPAR_SYNCHRO_IP ) /* IP, IP+, IPB */
@@ -260,13 +277,13 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                     return( 1 );
                 }
 
-                if( p_vpar->synchro.b_dropped_last_B ) /* IP+ */
+                if( p_vpar->synchro.b_dropped_last ) /* IP+ */
                 {
-                    p_vpar->synchro.b_dropped_last_B = 0;
+                    p_vpar->synchro.b_dropped_last = 0;
                     return( 1 );
                 }
 
-                p_vpar->synchro.b_dropped_last_B = 1;
+                p_vpar->synchro.b_dropped_last = 1;
                 return( 0 );
             }
 

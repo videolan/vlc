@@ -657,7 +657,7 @@ static void Usage( int i_fashion )
     /* Synchro parameters */
     intf_Msg( "\n"
               "Synchro parameters:\n"
-              "  " VPAR_SYNCHRO_VAR "={I|IP|IP+|IPB}      \tsynchro algorithm\n");
+              "  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm\n");
 }
 
 /*****************************************************************************

@@ -75,7 +75,7 @@ typedef struct video_synchro_s
     int           displayable_p;
     boolean_t     b_all_B;
     int           displayable_b;
-    boolean_t     b_dropped_last_B;
+    boolean_t     b_dropped_last;
 
 } video_synchro_t;
 
@@ -84,9 +84,10 @@ typedef struct video_synchro_s
 
 #define VPAR_SYNCHRO_DEFAULT   0
 #define VPAR_SYNCHRO_I         1
-#define VPAR_SYNCHRO_IP        2
-#define VPAR_SYNCHRO_IPplus    3
-#define VPAR_SYNCHRO_IPB       4
+#define VPAR_SYNCHRO_Iplus     2
+#define VPAR_SYNCHRO_IP        3
+#define VPAR_SYNCHRO_IPplus    4
+#define VPAR_SYNCHRO_IPB       5
 
 #endif
 

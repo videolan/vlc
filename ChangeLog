@@ -1,12 +1,13 @@
 O.1.99i :
 
-  * fixed the support for the field pictures, which involved a few dozens
+  * fixed the support for field pictures, which involved a few dozens
     bugs in the video parser and video decoder.
   * put names of authors under a lot of source files, for historical
     purposes.
   * fixed another input_file exit bug for the beos version.
   * fixed the aliases install.
   * renamed an inconsistent varaible in src/input/input_file.c.
+  * added support for I+ synchro (all Is and the first P).
 
 Tue, 22 Aug 2000 01:31:58 +0200
 0.1.99h :
