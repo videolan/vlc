@@ -1,5 +1,8 @@
 Makefile
 Makefile.in
+changelog.woody
+control.woody
+rules.woody
 tmp
 vlc
 mozilla-plugin-vlc
