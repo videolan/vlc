@@ -20,9 +20,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* repompé sur video_decoder.c
- * FIXME: passer en terminate/destroy avec les signaux supplémentaires ?? */
-
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -364,6 +361,7 @@ static void ErrorThread( spudec_thread_t *p_spudec )
 static void EndThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg( "spudec debug: destroying spu decoder thread %p\n", p_spudec );
+    free( p_spudec->p_config );
     free( p_spudec );
     intf_DbgMsg( "spudec debug: spu decoder thread %p destroyed\n", p_spudec);
 }

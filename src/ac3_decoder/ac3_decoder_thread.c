@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.19 2000/12/21 13:25:50 massiot Exp $
+ * $Id: ac3_decoder_thread.c,v 1.20 2000/12/21 14:18:15 massiot Exp $
  *
  * Authors:
  *
@@ -321,7 +321,8 @@ static void EndThread (ac3dec_thread_t * p_ac3dec)
     }
 
     /* Destroy descriptor */
-    free (p_ac3dec);
+    free( p_ac3dec->p_config );
+    free( p_ac3dec );
 
     intf_DbgMsg ("ac3dec debug: ac3 decoder thread %p destroyed\n", p_ac3dec);
 }

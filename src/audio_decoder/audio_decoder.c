@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.40 2000/12/21 13:25:50 massiot Exp $
+ * $Id: audio_decoder.c,v 1.41 2000/12/21 14:18:15 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -320,7 +320,8 @@ static void EndThread ( adec_thread_t *p_adec )
         vlc_mutex_unlock (&(p_adec->p_aout_fifo->data_lock));
     }
     /* Destroy descriptor */
-    free (p_adec);
+    free( p_adec->p_config );
+    free( p_adec );
 
     intf_DbgMsg ("adec debug: audio decoder thread %p destroyed\n", p_adec);
 }

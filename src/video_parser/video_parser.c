@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.55 2000/12/21 13:25:51 massiot Exp $
+ * $Id: video_parser.c,v 1.56 2000/12/21 14:18:15 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -313,11 +313,6 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     intf_DbgMsg("vpar debug: destroying video parser thread %p\n", p_vpar);
 
-#ifdef DEBUG
-    /* Check for remaining PES packets */
-    /* XXX?? */
-#endif
-
 #ifdef STATS
     intf_Msg("vpar stats: %d loops among %d sequence(s)\n",
              p_vpar->c_loops, p_vpar->c_sequences);
@@ -361,10 +356,6 @@ static void EndThread( vpar_thread_t *p_vpar )
              S.i_matrix_coefficients);
 #endif
 
-    /* Destroy thread structures allocated by InitThread */
-//    vout_DestroyStream( p_vpar->p_vout, p_vpar->i_stream );
-    /* XXX?? */
-
     /* Dispose of matrices if they have been allocated. */
     if( p_vpar->sequence.intra_quant.b_allocated )
     {
@@ -396,6 +387,7 @@ static void EndThread( vpar_thread_t *p_vpar )
     free( p_vpar->pp_vdec[0] );
 #endif
 
+    free( p_vpar->p_config );
     free( p_vpar );
 
     intf_DbgMsg("vpar debug: EndThread(%p)\n", p_vpar);

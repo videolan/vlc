@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.61 2000/12/21 13:54:15 massiot Exp $
+ * $Id: input.c,v 1.62 2000/12/21 14:18:15 massiot Exp $
  *
  * Authors: 
  *
@@ -316,18 +316,38 @@ static void EndThread( input_thread_t * p_input )
     for( i_es_loop = 0; i_es_loop < p_input->i_selected_es_number;
          i_es_loop++ )
     {
-        p_input->pp_selected_es[i_es_loop]->p_decoder_fifo->b_die = 1;
-        /* Make sure the thread leaves the GetByte() function */
-        vlc_mutex_lock( &p_input->pp_selected_es[i_es_loop]->p_decoder_fifo->data_lock);
-        vlc_cond_signal( &p_input->pp_selected_es[i_es_loop]->p_decoder_fifo->data_wait );
-        vlc_mutex_unlock( &p_input->pp_selected_es[i_es_loop]->p_decoder_fifo->data_lock );
+        decoder_fifo_t *    p_decoder_fifo;
+
+        p_decoder_fifo = p_input->pp_selected_es[i_es_loop]->p_decoder_fifo;
+        p_decoder_fifo->b_die = 1;
+
+        /* Make sure the thread leaves the NextDataPacket() function */
+        vlc_mutex_lock( &p_decoder_fifo->data_lock);
+        vlc_cond_signal( &p_decoder_fifo->data_wait );
+        vlc_mutex_unlock( &p_decoder_fifo->data_lock );
 
         /* Waiting for the thread to exit */
         vlc_thread_join( p_input->pp_selected_es[i_es_loop]->thread_id );
+
+        /* Freeing all packets still in the decoder fifo. */
+        while( !DECODER_FIFO_ISEMPTY( *p_decoder_fifo ) )
+        {
+            p_decoder_fifo->pf_delete_pes( p_decoder_fifo->p_packets_mgt,
+                                     DECODER_FIFO_START( *p_decoder_fifo ) );
+            DECODER_FIFO_INCSTART( *p_decoder_fifo );
+        }
         free( p_input->pp_selected_es[i_es_loop]->p_decoder_fifo );
     }
 
     /* Free demultiplexer's data */
+    p_input->p_plugin->pf_end( p_input );
+    free( p_input->p_plugin );
+
+    /* Free input structures */
+    input_EndStream( p_input );
+    free( p_input->pp_es );
+    free( p_input->pp_selected_es );
+    free( p_input );
 
     /* Update status */
     *pi_status = THREAD_OVER;

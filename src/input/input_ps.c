@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.8 2000/12/20 18:45:43 massiot Exp $
+ * $Id: input_ps.c,v 1.9 2000/12/21 14:18:15 massiot Exp $
  *
  * Authors: 
  *
@@ -417,6 +417,7 @@ input_capabilities_t * PSKludge( void )
 
     p_plugin = (input_capabilities_t *)malloc( sizeof(input_capabilities_t) );
     p_plugin->pf_init = PSInit;
+    p_plugin->pf_end = PSEnd;
     p_plugin->pf_read = PSRead;
     p_plugin->pf_demux = input_DemuxPS; /* FIXME: use i_p_config_t ! */
     p_plugin->pf_new_packet = NewPacket;

@@ -3,7 +3,7 @@
  * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.11 2000/12/21 13:54:15 massiot Exp $
+ * $Id: input_programs.c,v 1.12 2000/12/21 14:18:15 massiot Exp $
  *
  * Authors:
  *
@@ -62,6 +62,32 @@ void input_InitStream( input_thread_t * p_input, size_t i_data_len )
     {
         p_input->stream.p_demux_data = malloc( i_data_len );
         memset( p_input->stream.p_demux_data, 0, i_data_len );
+    }
+}
+
+/*****************************************************************************
+ * input_EndStream: free all stream descriptors
+ *****************************************************************************/
+void input_EndStream( input_thread_t * p_input )
+{
+    int i, j;
+
+    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+    {
+        for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
+        {
+            if( p_input->stream.pp_programs[i]->pp_es[j]->p_demux_data != NULL )
+            {
+                free( p_input->stream.pp_programs[i]->pp_es[j]->p_demux_data );
+            }
+            free( p_input->stream.pp_programs[i]->pp_es[j] );
+        }
+
+        if( p_input->stream.pp_programs[i]->p_demux_data != NULL )
+        {
+            free( p_input->stream.pp_programs[i]->p_demux_data );
+        }
+        free( p_input->stream.pp_programs[i] );
     }
 }
 
