@@ -716,6 +716,7 @@ static int Demux( demux_t *p_demux )
             }
             else
             {
+                PCRHandle( p_demux, p_pid, p_pkt );
                 block_Release( p_pkt );
             }
         }
