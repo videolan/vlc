@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.19 2003/05/08 10:40:31 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.20 2003/06/03 12:06:29 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -383,12 +383,23 @@ VideoWindow::MessageReceived( BMessage *p_message )
 						dst += dstBpr;
 						src += srcBpr;
 					}
-					char* path = config_GetPsz( p_vout, "beos-screenshotpath" );
+					char * path = config_GetPsz( p_vout, "beos-screenshotpath" );
 					if ( !path )
 						path = strdup( DEFAULT_SCREEN_SHOT_PATH );
-					/* TODO: handle the format */
-					/* config_GetPsz( p_vout, "beos-screenshotformat" ); */
+					
+					/* FIXME - we should check which translators are
+					   actually available */
+					char * psz_format = config_GetPsz( p_vout, "beos-screenshotformat" );
 					int32 format = DEFAULT_SCREEN_SHOT_FORMAT;
+					if( !strcmp( psz_format, "TGA" ) )
+						format = 'TGA ';
+					else if( !strcmp( psz_format, "PPM" ) )
+						format = 'PPM ';
+					else if( !strcmp( psz_format, "JPEG" ) )
+						format = 'JPEG';
+					else if( !strcmp( psz_format, "BMP" ) )
+						format = 'BMP ';
+
 					_SaveScreenShot( temp, path, format );
 				}
 				else
