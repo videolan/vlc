@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.69 2003/08/27 08:27:52 gbazin Exp $
+dnl $Id: configure.ac,v 1.70 2003/08/29 19:50:12 fenrir Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1621,11 +1621,6 @@ then
     fi
   fi
 
-  dnl Duplicate the ffmpeg CPPFLAGS and LDFLAGS for the encoder
-  AX_ADD_CPPFLAGS([encoder_ffmpeg],[${CPPFLAGS_ffmpeg}])
-  dnl XXX: we don't link with -lavcodec blah blah blah
-  dnl AX_ADD_LDFLAGS([encoder_ffmpeg],[${LDFLAGS_ffmpeg}])
-
   ac_have_vorbis_headers=yes
   AC_CHECK_HEADERS(vorbis/vorbisenc.h vorbis/codec.h,,
       ac_have_vorbis_headers=no)
@@ -1743,10 +1738,6 @@ then
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
   fi
-
-  dnl Duplicate the xvid CPPFLAGS and LDFLAGS for the encoder
-  AX_ADD_LDFLAGS([encoder_xvid],[${LDFLAGS_xvid}])
-  AX_ADD_CPPFLAGS([encoder_xvid],[${CPPFLAGS_xvid}])
 fi
 
 dnl
@@ -3318,8 +3309,6 @@ AC_OUTPUT([
   modules/demux/mp4/Makefile
   modules/demux/mpeg/Makefile
   modules/demux/util/Makefile
-  modules/encoder/Makefile
-  modules/encoder/ffmpeg/Makefile
   modules/gui/Makefile
   modules/gui/beos/Makefile
   modules/gui/pda/Makefile

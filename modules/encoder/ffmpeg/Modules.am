@@ -1,6 +1,0 @@
-SOURCES_encoder_ffmpeg = \
-	encoder.c \
-	video.c \
-	audio.c \
-	$(NULL)
-

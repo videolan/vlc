@@ -71,7 +71,6 @@ HEADERS_include = \
 	include/darwin_specific.h \
 	include/charset.h \
 	include/codecs.h \
-	include/encoder.h \
 	include/ninput.h \
 	include/input_ext-dec.h \
 	include/input_ext-intf.h \
