@@ -978,22 +978,23 @@ VLC_ADD_PLUGINS([dummy logger memcpy])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak])
 VLC_ADD_PLUGINS([deinterlace invert adjust transform distort clone crop motionblur])
-VLC_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32 audio_format])
+VLC_ADD_PLUGINS([fixed32tofloat32 fixed32tos16 s16tofixed32 u8tofixed32])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
-VLC_ADD_PLUGINS([trivial_channel_mixer simple_channel_mixer])
-VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
+VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
 VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
 VLC_ADD_PLUGINS([i420_rgb rawvideo blend scale image logo])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au])
-VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp access_http access_mms])
-VLC_ADD_PLUGINS([access_ftp ipv4])
+VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
+VLC_ADD_PLUGINS([access_http access_mms access_ftp ipv4])
 
 if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap])
   VLC_ADD_PLUGINS([picture mosaic wall motiondetect])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
+  VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])
   VLC_ADD_PLUGINS([headphone_channel_mixer normvol equalizer])
+  VLC_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif s16tofloat32 s16tofloat32swab s8tofloat32 u8tofloat32 audio_format])
 fi
 
 dnl
