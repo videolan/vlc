@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.15 2002/12/07 15:25:26 gbazin Exp $
+ * $Id: rc.c,v 1.16 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -737,7 +737,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         vlc_value_t val;
         int i, i_vals;
         vlc_value_t * p_vals;
-        char * psz_value;
+        const char * psz_value;
 
         if ( var_Get( (vlc_object_t *)p_aout, psz_variable, &val ) < 0 )
         {

@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: controls.m,v 1.2 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -66,6 +66,7 @@
 - (IBAction)toggleTitle:(id)sender;
 - (IBAction)toggleChapter:(id)sender;
 - (IBAction)toggleLanguage:(id)sender;
+- (IBAction)toggleVar:(id)sender;
 
 @end
 
@@ -209,24 +210,47 @@
 
 - (IBAction)volumeUp:(id)sender
 {
-    /*
     intf_thread_t * p_intf = [NSApp getIntf];
-    */
+    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
 
-    /* TODO, kAudioDevicePropertyVolumeScalar */
+    if ( p_aout != NULL )
+    {
+        aout_VolumeUp( p_aout, 1, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
 }
 
 - (IBAction)volumeDown:(id)sender
 {
-    /*
     intf_thread_t * p_intf = [NSApp getIntf];
-    */
+    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
 
-    /* TODO, kAudioDevicePropertyVolumeScalar */
+    if ( p_aout != NULL )
+    {
+        aout_VolumeDown( p_aout, 1, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
 }
 
 - (IBAction)mute:(id)sender
 {
+#if 0
+    intf_thread_t * p_intf = [NSApp getIntf];
+    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+
+    if ( p_aout != NULL )
+    {
+        aout_VolumeMute( p_aout, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
+
+    NSMenuItem * o_mi = (NSMenuItem *)sender;
+    p_intf->p_sys->b_mute = !p_intf->p_sys->b_mute;
+    [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
+#else
     OSStatus err;
     AudioDeviceID device;
     UInt32 ui_param_size;
@@ -256,6 +280,7 @@
         msg_Err( p_intf, "AudioDeviceSetProperty failed (%d)", err );
         return;
     }
+#endif
 }
 
 - (IBAction)fullscreen:(id)sender
@@ -379,6 +404,27 @@
     }
 
 #undef p_input
+}
+
+- (IBAction)toggleVar:(id)sender
+{
+    NSMenuItem * o_mi = (NSMenuItem *)sender;
+    intf_thread_t * p_intf = [NSApp getIntf];
+
+    if( [o_mi state] == NSOffState )
+    {
+        const char * psz_variable = (const char *)[o_mi tag];
+        char * psz_value = [[o_mi title] cString];
+        vlc_object_t * p_object = (vlc_object_t *)
+            [[o_mi representedObject] pointerValue];
+        vlc_value_t val;
+        val.psz_string = psz_value;
+
+        if ( var_Set( p_object, psz_variable, val ) < 0 )
+        {
+            msg_Warn( p_object, "cannot set variable (%s)", psz_value );
+        }
+    }
 }
 
 @end

@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.5 2002/12/04 20:51:23 jlj Exp $
+ * $Id: vout.m,v 1.6 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -171,6 +171,33 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         vlc_object_release( p_vout->p_sys->p_intf );
         free( p_vout->p_sys );
         return( 1 );        
+    }
+
+    NSArray * p_screens = [NSScreen screens];
+    if ( [p_screens count] > 0 )
+    {
+        vlc_value_t val;
+        var_Destroy( p_vout, "video-device" );
+        var_Create( p_vout, "video-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+        NSEnumerator * p_enumerator = [p_screens objectEnumerator];
+        NSScreen * p_screen;
+        int i = 1;
+        while ( (p_screen = [p_enumerator nextObject]) != NULL )
+        {
+            NSRect p_rect = [p_screen frame];
+            char psz_temp[255];
+            snprintf(psz_temp, sizeof(psz_temp), "%s %d (%dx%d)",
+                     _("Screen"), i, (int)p_rect.size.width,
+                     (int)p_rect.size.height);
+            val.psz_string = psz_temp;
+            var_Change( p_vout, "video-device", VLC_VAR_ADDCHOICE, &val );
+            i++;
+        }
+        var_AddCallback( p_vout, "video-device", vout_VarCallback,
+                         NULL );
+
+        val.b_bool = VLC_TRUE;
+        var_Set( p_vout, "intf-change", val );
     }
 
     if( CoCreateWindow( p_vout ) )
@@ -736,39 +763,29 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( key )
     {
-#if 0
         case (unichar)0xf700: /* up-arrow */
         { 
-            aout_thread_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
-                                                      FIND_ANYWHERE );
-            if( p_aout != NULL )
+            aout_instance_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
+                                                        FIND_ANYWHERE );
+            if ( p_aout != NULL ) 
             {
-                if( p_aout->i_volume + VOLUME_STEP <= VOLUME_MAX )
-                {
-                    p_aout->i_volume += VOLUME_STEP;
-                }
- 
-                vlc_object_release( p_aout ); 
-            } 
+                aout_VolumeUp( p_aout, 1, NULL );
+                vlc_object_release( (vlc_object_t *)p_aout );
+            }
         } 
         break;
 
         case (unichar)0xf701: /* down-arrow */
         {
-            aout_thread_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
-                                                      FIND_ANYWHERE );
-            if( p_aout != NULL )
+            aout_instance_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
+                                                        FIND_ANYWHERE );
+            if ( p_aout != NULL ) 
             {
-                if( p_aout->i_volume - VOLUME_STEP >= VOLUME_MIN )
-                {
-                    p_aout->i_volume -= VOLUME_STEP;
-                }
-
-                vlc_object_release( p_aout );
+                aout_VolumeDown( p_aout, 1, NULL );
+                vlc_object_release( (vlc_object_t *)p_aout );
             }
         }
         break;
-#endif
 
         case 'f': case 'F':
             [self toggleFullscreen];

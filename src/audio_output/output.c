@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.26 2002/12/07 15:25:27 gbazin Exp $
+ * $Id: output.c,v 1.27 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,6 +43,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     /* Retrieve user defaults. */
     char * psz_name = config_GetPsz( p_aout, "aout" );
     int i_rate = config_GetInt( p_aout, "aout-rate" );
+    vlc_value_t val;
 
     memcpy( &p_aout->output.output, p_format, sizeof(audio_sample_format_t) );
     if ( i_rate != -1 )
@@ -66,7 +67,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
              (VLC_VAR_STRING | VLC_VAR_HASCHOICE) )
     {
         /* The user may have selected a different channels configuration. */
-        vlc_value_t val;
         var_Get( p_aout, "audio-channels", &val );
 
         if ( !strcmp( val.psz_string, N_("Both") ) )
@@ -92,7 +92,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
     else if ( p_aout->output.output.i_physical_channels == AOUT_CHAN_CENTER )
     {
         /* Mono - create the audio-channels variable. */
-        vlc_value_t val;
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
         {
@@ -117,7 +116,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
                  (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
         /* Stereo - create the audio-channels variable. */
-        vlc_value_t val;
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         val.psz_string = N_("Both");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
@@ -134,6 +132,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
+    val.b_bool = VLC_TRUE;
+    var_Set( p_aout, "intf-change", val );
 
     aout_FormatPrepare( &p_aout->output.output );
 

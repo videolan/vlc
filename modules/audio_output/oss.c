@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.36 2002/12/07 15:25:26 gbazin Exp $
+ * $Id: oss.c,v 1.37 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -205,6 +205,9 @@ static void Probe( aout_instance_t * p_aout )
         val.psz_string = N_("Mono");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );        
     }
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_aout, "intf-change", val );
 }
 
 /*****************************************************************************

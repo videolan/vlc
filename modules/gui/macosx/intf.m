@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.6 2002/12/04 20:51:23 jlj Exp $
+ * $Id: intf.m,v 1.7 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -221,10 +221,12 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_previous setTitle: _NS("Prev")];
     [o_mi_next setTitle: _NS("Next")];
     [o_mi_loop setTitle: _NS("Loop")];
-    [o_mi_vol_up setTitle: _NS("Volume Up")];
-    [o_mi_vol_down setTitle: _NS("Volume Down")];
+    [o_mi_vol_up setTitle: _NS("Louder")];
+    [o_mi_vol_down setTitle: _NS("Softer")];
     [o_mi_mute setTitle: _NS("Mute")];
+    [o_mi_channels setTitle: _NS("Channels")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
+    [o_mi_screen setTitle: _NS("Screen")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mi_program setTitle: _NS("Program")];
     [o_mi_title setTitle: _NS("Title")];
@@ -298,9 +300,14 @@ static void Run( intf_thread_t *p_intf )
             p_intf->p_sys->p_input = NULL;
         }
 
-        if( p_intf->p_sys->p_input )
+        if( p_intf->p_sys->p_input != NULL )
         {
-            input_thread_t *p_input = p_intf->p_sys->p_input;
+            vlc_bool_t b_need_menus = 0;
+            input_thread_t * p_input = p_intf->p_sys->p_input;
+            aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                        FIND_ANYWHERE );
+            vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                      FIND_ANYWHERE );
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -310,7 +317,7 @@ static void Run( intf_thread_t *p_intf )
                 if( p_input->stream.b_changed )
                 {
                     [self manageMode];
-                    [self setupMenus];
+                    b_need_menus = 1;
                     p_intf->p_sys->b_playing = 1;
                 }
 
@@ -318,9 +325,36 @@ static void Run( intf_thread_t *p_intf )
                     p_input->stream.p_selected_area->i_part )
                 {
                     p_intf->p_sys->b_chapter_update = 1;
-                    [self setupMenus];
+                    b_need_menus = 1;
                 }
             }
+
+            if ( p_aout != NULL )
+            {
+                vlc_value_t val;
+                if ( var_Get( (vlc_object_t *)p_aout, "intf-change", &val )
+                      >= 0 && val.b_bool )
+                {
+                    p_intf->p_sys->b_aout_update = 1;
+                    b_need_menus = 1;
+                }
+                vlc_object_release( (vlc_object_t *)p_aout );
+            }
+
+            if ( p_vout != NULL )
+            {
+                vlc_value_t val;
+                if ( var_Get( (vlc_object_t *)p_vout, "intf-change", &val )
+                      >= 0 && val.b_bool )
+                {
+                    p_intf->p_sys->b_vout_update = 1;
+                    b_need_menus = 1;
+                }
+                vlc_object_release( (vlc_object_t *)p_vout );
+            }
+
+            if ( b_need_menus )
+                [self setupMenus];
 
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
@@ -464,7 +498,7 @@ static void Run( intf_thread_t *p_intf )
     vlc_bool_t b_control = 0;
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    if( p_intf->p_sys->p_input )
+    if( p_intf->p_sys->p_input != NULL )
     {
         /* control buttons for free pace streams */
         b_control = p_intf->p_sys->p_input->stream.b_pace_control;
@@ -488,6 +522,8 @@ static void Run( intf_thread_t *p_intf )
         [o_mi_chapter setEnabled: FALSE];
         [o_mi_language setEnabled: FALSE];
         [o_mi_subtitle setEnabled: FALSE];
+        [o_mi_channels setEnabled: FALSE];
+        [o_mi_screen setEnabled: FALSE];
     }
 }
 
@@ -680,6 +716,48 @@ static void Run( intf_thread_t *p_intf )
         p_intf->p_sys->b_spu_update = 0;
     }
 
+    if ( p_intf->p_sys->b_aout_update )
+    {
+        aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                    FIND_ANYWHERE );
+
+        if ( p_aout != NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = 0;
+
+            var_Set( (vlc_object_t *)p_aout, "intf-change", val );
+
+            [self setupVarMenu: o_mi_channels target: (vlc_object_t *)p_aout
+                var: "audio-channels" selector: @selector(toggleVar:)];
+
+            vlc_object_release( (vlc_object_t *)p_aout );
+        }
+
+        p_intf->p_sys->b_aout_update = 0;
+    }
+
+    if ( p_intf->p_sys->b_vout_update )
+    {
+        vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                  FIND_ANYWHERE );
+
+        if ( p_vout != NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = 0;
+
+            var_Set( (vlc_object_t *)p_vout, "intf-change", val );
+
+            [self setupVarMenu: o_mi_screen target: (vlc_object_t *)p_vout
+                var: "video-device" selector: @selector(toggleVar:)];
+
+            vlc_object_release( (vlc_object_t *)p_vout );
+        }
+
+        p_intf->p_sys->b_vout_update = 0;
+    }
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
 #undef p_input
@@ -700,6 +778,11 @@ static void Run( intf_thread_t *p_intf )
     {
         [o_menu removeItemAtIndex: 0];
     }
+
+    /* make sensitive : we can't change it after we build the menu, and
+     * before, we don't yet how many items we will have. So make it
+     * always sensitive. --Meuuh */
+    [o_mi setEnabled: TRUE];
 
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 
@@ -745,10 +828,68 @@ static void Run( intf_thread_t *p_intf )
 #undef ES
 
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+}
+
+- (void)setupVarMenu:(NSMenuItem *)o_mi
+                     target:(vlc_object_t *)p_object
+                     var:(const char *)psz_variable
+                     selector:(SEL)pf_callback
+{
+    int i, i_nb_items;
+    NSMenu * o_menu = [o_mi submenu];
+    vlc_value_t val;
+    int i_vals;
+    vlc_value_t * p_vals;
+    char * psz_value;
+
+    /* remove previous items */
+    i_nb_items = [o_menu numberOfItems];
+    for( i = 0; i < i_nb_items; i++ )
+    {
+        [o_menu removeItemAtIndex: 0];
+    }
+
+    if ( var_Get( p_object, psz_variable, &val ) < 0 )
+    {
+        return;
+    }
+    psz_value = val.psz_string;
+
+    if ( var_Change( p_object, psz_variable,
+                     VLC_VAR_GETLIST, &val ) < 0 )
+    {
+        free( psz_value );
+        return;
+    }
+
+    i_vals = ((vlc_value_t *)val.p_address)[0].i_int;
+    p_vals = &((vlc_value_t *)val.p_address)[1]; /* Starts at index 1 */
 
     /* make (un)sensitive */
-    [o_mi setEnabled: 
-        [o_menu numberOfItems] ? TRUE : FALSE];
+    [o_mi setEnabled: (i_vals > 0)];
+
+    for ( i = 0; i < i_vals; i++ )
+    {
+        NSMenuItem * o_lmi;
+        NSString * o_title;
+
+        o_title = [NSString stringWithCString: p_vals[i].psz_string];
+        o_lmi = [o_menu addItemWithTitle: o_title
+                 action: pf_callback keyEquivalent: @""];
+        /* FIXME: this isn't 64-bit clean ! */
+        [o_lmi setTag: (int)psz_variable];
+        [o_lmi setRepresentedObject:
+            [NSValue valueWithPointer: p_object]];
+        [o_lmi setTarget: o_controls];
+
+        if ( !strcmp( psz_value, p_vals[i].psz_string ) )
+            [o_lmi setState: NSOnState];
+    }
+
+    var_Change( p_object, psz_variable, VLC_VAR_FREELIST,
+                &val );
+
+    free( psz_value );
 }
 
 - (IBAction)clearRecentItems:(id)sender
@@ -856,6 +997,26 @@ static void Run( intf_thread_t *p_intf )
     if( p_req->i_type == VOUT_REQ_CREATE_WINDOW )
     {
         VLCView * o_view;
+        NSScreen * p_screen;
+
+        NSMenu * o_menu = [o_mi_screen submenu];
+
+        int i, i_nb_items = [o_menu numberOfItems];
+        for( i = 0; i < i_nb_items; i++ )
+        {
+             if ( [[o_menu itemAtIndex:i] state] ) break;
+        }
+
+        NSArray * p_screens = [NSScreen screens];
+        if ( i == i_nb_items || [p_screens count] < i )
+        {
+            /* This shouldn't happen. */
+            p_screen = [NSScreen mainScreen];
+        }
+        else
+        {
+            p_screen = [p_screens objectAtIndex: i];
+        }
 
         p_req->p_vout->p_sys->o_window = [VLCWindow alloc];
         [p_req->p_vout->p_sys->o_window setVout: p_req->p_vout];
@@ -864,10 +1025,10 @@ static void Run( intf_thread_t *p_intf )
         if( p_req->p_vout->b_fullscreen )
         {
             [p_req->p_vout->p_sys->o_window 
-                initWithContentRect: [[NSScreen mainScreen] frame] 
+                initWithContentRect: [p_screen frame] 
                 styleMask: NSBorderlessWindowMask 
                 backing: NSBackingStoreBuffered
-                defer: NO screen: [NSScreen mainScreen]];
+                defer: NO screen: p_screen];
 
             [p_req->p_vout->p_sys->o_window 
                 setLevel: NSModalPanelWindowLevel];
@@ -882,7 +1043,7 @@ static void Run( intf_thread_t *p_intf )
                 initWithContentRect: p_req->p_vout->p_sys->s_rect 
                 styleMask: i_stylemask
                 backing: NSBackingStoreBuffered
-                defer: NO screen: [NSScreen mainScreen]];
+                defer: NO screen: p_screen];
 
             if( !p_req->p_vout->p_sys->b_pos_saved )
             {

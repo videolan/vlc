@@ -467,11 +467,6 @@ AC_CACHE_CHECK([if \$CC accepts -Wall],
     [CFLAGS="-Wall ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wall=yes, ac_cv_c_Wall=no)])
 
-AC_CACHE_CHECK([if \$CC accepts -Wtraditional],
-    [ac_cv_c_Wtraditional],
-    [CFLAGS="-Wtraditional ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wtraditional=yes, ac_cv_c_Wtraditional=no)])
-
 AC_CACHE_CHECK([if \$CC accepts -Wconversion],
     [ac_cv_c_Wconversion],
     [CFLAGS="-Wconversion ${CFLAGS_save}"
@@ -501,12 +496,6 @@ if test "x${ac_cv_c_Wall}" != "xno"; then
     CFLAGS_save="-Wall ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wall ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wall ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
-
-if test "x${ac_cv_c_Wtraditional}" != "xno"; then
-    CFLAGS_save="-Wtraditional ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wtraditional ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="-Wtraditional ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
 if test "x${ac_cv_c_Wunreachable_code}" != "xno"; then

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.202 2002/11/28 17:35:00 sam Exp $
+ * $Id: video_output.c,v 1.203 2002/12/07 23:50:31 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -138,6 +138,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_index;                                /* loop variable */
     char          * psz_plugin;
+    vlc_value_t     val;
 
     /* Allocate descriptor */
     p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
@@ -146,6 +147,10 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         msg_Err( p_parent, "out of memory" );
         return NULL;
     }
+
+    var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
 
     /* If the parent is not a VOUT object, that means we are at the start of
      * the video output pipe */
@@ -332,6 +337,8 @@ void vout_Destroy( vout_thread_t *p_vout )
     /* Request thread destruction */
     p_vout->b_die = VLC_TRUE;
     vlc_thread_join( p_vout );
+
+    var_Destroy( p_vout, "intf-change" );
 
     /* Free structure */
     vlc_object_destroy( p_vout );
@@ -1039,4 +1046,18 @@ static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
     }
 
 #undef FP_FACTOR
+}
+
+/*****************************************************************************
+ * vout_VarCallback: generic callback for intf variables
+ *****************************************************************************/
+int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
+                      vlc_value_t old_value, vlc_value_t new_value,
+                      void * unused )
+{
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    vlc_value_t val;
+    val.b_bool = 1;
+    var_Set( p_vout, "intf-change", val );
+    return 0;
 }

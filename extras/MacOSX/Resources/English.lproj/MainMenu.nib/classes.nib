@@ -1,6 +1,7 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = VLCApplication; LANGUAGE = ObjC; SUPERCLASS = NSApplication; }, 
         {
             ACTIONS = {
                 deinterlace = id; 
@@ -19,6 +20,7 @@
                 toggleProgram = id; 
                 toggleSubtitle = id; 
                 toggleTitle = id; 
+                toggleVar = id; 
                 volumeDown = id; 
                 volumeUp = id; 
             }; 
@@ -28,10 +30,11 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {clearRecentItems = id; viewPreferences = id; }; 
+            ACTIONS = {clearRecentItems = id; openRecentItem = id; viewPreferences = id; }; 
             CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                asystm = id; 
                 "o_controls" = id; 
                 "o_dmi_pause" = id; 
                 "o_dmi_play" = id; 
@@ -39,6 +42,7 @@
                 "o_messages" = id; 
                 "o_mi_about" = id; 
                 "o_mi_bring_atf" = id; 
+                "o_mi_channels" = id; 
                 "o_mi_chapter" = id; 
                 "o_mi_clear" = id; 
                 "o_mi_copy" = id; 
@@ -67,6 +71,7 @@
                 "o_mi_previous" = id; 
                 "o_mi_program" = id; 
                 "o_mi_quit" = id; 
+                "o_mi_screen" = id; 
                 "o_mi_select_all" = id; 
                 "o_mi_show_all" = id; 
                 "o_mi_slower" = id; 
@@ -83,6 +88,7 @@
                 "o_mu_view" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
+                "o_prefs" = id; 
                 "o_window" = id; 
             }; 
             SUPERCLASS = NSObject; 

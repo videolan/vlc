@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.10 2002/12/06 10:10:39 sam Exp $
+ * $Id: common.c,v 1.11 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,6 +43,7 @@
 aout_instance_t * __aout_New( vlc_object_t * p_parent )
 {
     aout_instance_t * p_aout;
+    vlc_value_t val;
 
     /* Allocate descriptor. */
     p_aout = vlc_object_create( p_parent, VLC_OBJECT_AOUT );
@@ -60,14 +61,11 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     p_aout->mixer.b_error = 1;
     p_aout->output.b_starving = 1;
 
-    vlc_object_attach( p_aout, p_parent->p_vlc );
+    var_Create( p_aout, "intf-change", VLC_VAR_BOOL );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_aout, "intf-change", val );
 
-    var_Create( p_aout, "physical-channels", VLC_VAR_INTEGER );
-    var_AddCallback( p_aout, "physical-channels", aout_ChannelsRestart,
-                     NULL );
-    var_Create( p_aout, "original-channels", VLC_VAR_INTEGER );
-    var_AddCallback( p_aout, "original-channels", aout_ChannelsRestart,
-                     NULL );
+    vlc_object_attach( p_aout, p_parent->p_vlc );
 
     return p_aout;
 }
@@ -77,7 +75,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
  *****************************************************************************/
 void aout_Delete( aout_instance_t * p_aout )
 {
-    var_Destroy( p_aout, "channels" );
+    var_Destroy( p_aout, "intf-change" );
 
     vlc_mutex_destroy( &p_aout->input_fifos_lock );
     vlc_mutex_destroy( &p_aout->mixer_lock );

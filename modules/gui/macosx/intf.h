@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.3 2002/11/05 03:57:16 jlj Exp $
+ * $Id: intf.h,v 1.4 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -66,6 +66,8 @@ struct intf_sys_t
     vlc_bool_t b_title_update;
     vlc_bool_t b_audio_update;
     vlc_bool_t b_spu_update;
+    vlc_bool_t b_aout_update;
+    vlc_bool_t b_vout_update;
 
     /* The input thread */
     input_thread_t * p_input;
@@ -132,7 +134,9 @@ struct intf_sys_t
     IBOutlet id o_mi_vol_up;
     IBOutlet id o_mi_vol_down;
     IBOutlet id o_mi_mute;
+    IBOutlet id o_mi_channels;
     IBOutlet id o_mi_fullscreen;
+    IBOutlet id o_mi_screen;
     IBOutlet id o_mi_deinterlace;
     IBOutlet id o_mi_program;
     IBOutlet id o_mi_title;
@@ -162,6 +166,10 @@ struct intf_sys_t
                       es:(es_descriptor_t *)p_es
                       category:(int)i_cat
                       selector:(SEL)pf_callback;
+- (void)setupVarMenu:(NSMenuItem *)o_mi
+                     target:(vlc_object_t *)p_object
+                     var:(const char *)psz_var
+                     selector:(SEL)pf_callback;
 
 - (IBAction)clearRecentItems:(id)sender;
 - (void)openRecentItem:(id)sender;

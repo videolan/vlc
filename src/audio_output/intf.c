@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.9 2002/12/06 10:10:39 sam Exp $
+ * $Id: intf.c,v 1.10 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -196,6 +196,51 @@ int aout_VolumeDown( aout_instance_t * p_aout, int i_nb_steps,
         i_volume = 0;
     else
         i_volume -= AOUT_VOLUME_STEP * i_nb_steps;
+
+    i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
+
+    vlc_mutex_unlock( &p_aout->mixer_lock );
+
+    if ( pi_volume != NULL ) *pi_volume = i_volume;
+    return i_result;
+}
+
+/*****************************************************************************
+ * aout_VolumeMute : Mute/un-mute the output volume
+ *****************************************************************************
+ * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
+ * function (muted => 0).
+ *****************************************************************************/
+int aout_VolumeMute( aout_instance_t * p_aout, audio_volume_t * pi_volume )
+{
+    int i_result;
+    audio_volume_t i_volume;
+
+    vlc_mutex_lock( &p_aout->mixer_lock );
+
+    if ( p_aout->mixer.b_error )
+    {
+        /* The output module is destroyed. */
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+        msg_Err( p_aout, "VolumeUp called without output module" );
+        return -1;
+    }
+
+    if ( p_aout->output.pf_volume_get( p_aout, &i_volume ) )
+    {
+        vlc_mutex_unlock( &p_aout->mixer_lock );
+        return -1;
+    }
+
+    if ( i_volume == 0 )
+    {
+        i_volume = p_aout->output.i_saved_volume;
+    }
+    else
+    {
+        p_aout->output.i_saved_volume = i_volume;
+        i_volume = 0;
+    }
 
     i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
 

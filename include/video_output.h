@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.88 2002/11/28 17:34:59 sam Exp $
+ * $Id: video_output.h,v 1.89 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -146,6 +146,7 @@ VLC_EXPORT( vout_thread_t *, __vout_Request,      ( vlc_object_t *, vout_thread_
 #define vout_Create(a,b,c,d,e) __vout_Create(VLC_OBJECT(a),b,c,d,e)
 VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *, unsigned int, unsigned int, uint32_t, unsigned int ) );
 VLC_EXPORT( void,            vout_Destroy,        ( vout_thread_t * ) );
+VLC_EXPORT( int, vout_VarCallback, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
 

@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.16 2002/12/07 15:25:26 gbazin Exp $
+ * $Id: sdl.c,v 1.17 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -202,6 +202,9 @@ static int Open ( vlc_object_t *p_this )
 
         var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
                          NULL );
+
+        val.b_bool = VLC_TRUE;
+        var_Set( p_aout, "intf-change", val );
     }
 
     p_aout->output.output.i_rate = obtained.freq;

@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.35 2002/12/06 10:10:40 sam Exp $
+ * $Id: aout_internal.h,v 1.36 2002/12/07 23:50:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -200,6 +200,8 @@ typedef struct aout_output_t
     /* Current volume for the output - it's just a placeholder, the plug-in
      * may or may not use it. */
     audio_volume_t          i_volume;
+    /* Saved volume for aout_VolumeMute(). */
+    audio_volume_t          i_saved_volume;
 } aout_output_t;
 
 /*****************************************************************************
