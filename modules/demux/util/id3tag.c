@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.8 2003/06/15 15:16:14 sigmunau Exp $
+ * $Id: id3tag.c,v 1.9 2003/06/23 16:09:13 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -109,7 +109,6 @@ static int ParseID3Tags( vlc_object_t *p_this )
     u8  *p_peek;
     int i_size;
     int i_size2;
-    stream_position_t * p_pos;
 
     if ( p_this->i_object_type != VLC_OBJECT_INPUT )
     {
@@ -122,17 +121,14 @@ static int ParseID3Tags( vlc_object_t *p_this )
     if ( p_input->stream.b_seekable &&
          p_input->stream.i_method != INPUT_METHOD_NETWORK )
     {        
+        stream_position_t pos;
+
         /*look for a id3v1 tag at the end of the file*/
-        p_pos = malloc( sizeof( stream_position_t ) );
-        if ( p_pos == 0 )
-        {
-            msg_Err( p_input, "no mem" );
-        }
-        input_Tell( p_input, p_pos );
-        if ( p_pos->i_size >128 )
+        input_Tell( p_input, &pos );
+        if ( pos.i_size >128 )
         {
             input_AccessReinit( p_input );
-            p_input->pf_seek( p_input, p_pos->i_size - 128 );
+            p_input->pf_seek( p_input, pos.i_size - 128 );
             
             /* get 10 byte id3 header */    
             if( input_Peek( p_input, &p_peek, 10 ) < 10 )
@@ -160,10 +156,10 @@ static int ParseID3Tags( vlc_object_t *p_this )
                 return( VLC_EGENERIC );
             }
             i_size2 = id3_tag_query( p_peek + 118, 10 );
-            if ( i_size2 < 0  && p_pos->i_size > -i_size2 )
-            {                                          /* id3v2.4 footer found */
+            if ( i_size2 < 0  && pos.i_size > -i_size2 )
+            {                                        /* id3v2.4 footer found */
                 input_AccessReinit( p_input );
-                p_input->pf_seek( p_input, p_pos->i_size + i_size2 );
+                p_input->pf_seek( p_input, pos.i_size + i_size2 );
                 /* peek the entire tag */
                 if ( input_Peek( p_input, &p_peek, i_size2 ) < i_size2 )
                 {
@@ -173,7 +169,6 @@ static int ParseID3Tags( vlc_object_t *p_this )
                 ParseID3Tag( p_input, p_peek, i_size2 );
             }
         }
-        free( p_pos );
         input_AccessReinit( p_input );    
         p_input->pf_seek( p_input, 0 );
     }

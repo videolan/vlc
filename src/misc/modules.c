@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.120 2003/05/20 16:20:33 zorglub Exp $
+ * $Id: modules.c,v 1.121 2003/06/23 16:09:13 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -650,7 +650,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     }
 
     /* Free plugin-path */
-    free( path[ sizeof(path)/sizeof(char*) - 2 ] );
+    if( path[ sizeof(path)/sizeof(char*) - 2 ] )
+        free( path[ sizeof(path)/sizeof(char*) - 2 ] );
     path[ sizeof(path)/sizeof(char*) - 2 ] = NULL;
 }
 

@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.24 2003/06/13 15:54:42 gbazin Exp $
+ * $Id: timer.cpp,v 1.25 2003/06/23 16:09:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -154,11 +154,9 @@ void Timer::Notify()
                 wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
                 i_volume * 200 / AOUT_VOLUME_MAX ) );
 
+            /* control buttons for free pace streams */
+            b_pace_control = p_intf->p_sys->p_input->stream.b_pace_control;
         }
-
-        /* control buttons for free pace streams */
-        b_pace_control = p_intf->p_sys->p_input->stream.b_pace_control;
-
     }
     else if( p_intf->p_sys->p_input->b_dead )
     {
