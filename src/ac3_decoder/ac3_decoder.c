@@ -202,7 +202,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 {
     intf_DbgMsg( "ac3dec debug: running ac3 decoder thread (%p) (pid == %i)\n", p_ac3dec, getpid() );
 
-    msleep( (3 * INPUT_PTS_DELAY) / 4 );
+    msleep( INPUT_PTS_DELAY );
 
     /* Initializing the ac3 decoder thread */
     if ( InitThread(p_ac3dec) ) /* XXX */

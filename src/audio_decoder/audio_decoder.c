@@ -800,7 +800,7 @@ static void RunThread( adec_thread_t * p_adec )
 
     intf_DbgMsg("adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid());
 
-    msleep( (3 * INPUT_PTS_DELAY) / 4 );
+    msleep( INPUT_PTS_DELAY );
 
     /* Initializing the audio decoder thread */
     if ( InitThread(p_adec) )
