@@ -44,7 +44,7 @@ static void PrintFrameInfo(struct mad_header *Header);
 enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
 {
     mad_adec_thread_t *p_mad_adec = (mad_adec_thread_t *) data;
-    size_t 	       ReadSize, Remaining;
+    size_t             ReadSize, Remaining;
     unsigned char     *ReadStart;
 
     if ( p_mad_adec->p_fifo->b_die == 1 ) {
@@ -164,110 +164,110 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  * }
  */
 
-/*****************************************************************************
- * support routines borrowed from mpg321 (file: mad.c), which is distributed
- * under GPL license
- *
- * mpg321 was written by Joe Drew <drew@debian.org>, and based upon 'plaympeg'
- * from the smpeg sources, which was written by various people from Loki Software
- * (http://www.lokigames.com).
- *
- * It also incorporates some source from mad, written by Robert Leslie
- *****************************************************************************/
-
-/* The following two routines and data structure are from the ever-brilliant
-     Rob Leslie.
-*/
-
-struct audio_dither {
-    mad_fixed_t error[3];
-    mad_fixed_t random;
-};
-
-/*
-* NAME:                prng()
-* DESCRIPTION: 32-bit pseudo-random number generator
-*/
-static inline unsigned long prng(unsigned long state)
-{
-    return (state * 0x0019660dL + 0x3c6ef35fL) & 0xffffffffL;
-}
-
-/*
-* NAME:        mpg321_s24_to_s16_pcm()
-* DESCRIPTION: generic linear sample quantize and dither routine
-*/
-static inline signed int mpg321_s24_to_s16_pcm(unsigned int bits, mad_fixed_t sample,
-                                    struct audio_dither *dither)
-{
-    unsigned int scalebits;
-    mad_fixed_t output, mask, random;
-
-    enum {
-        MIN = -MAD_F_ONE,
-        MAX = MAD_F_ONE - 1
-    };
-
-    /* noise shape */
-    sample += dither->error[0] - dither->error[1] + dither->error[2];
-
-    dither->error[2] = dither->error[1];
-    dither->error[1] = dither->error[0] / 2;
-
-    /* bias */
-    output = sample + (1L << (MAD_F_FRACBITS + 1 - bits - 1));
-
-    scalebits = MAD_F_FRACBITS + 1 - bits;
-    mask = (1L << scalebits) - 1;
-
-    /* dither */
-    random    = prng(dither->random);
-    output += (random & mask) - (dither->random & mask);
-
-    dither->random = random;
-
-    /* clip */
-    if (output > MAX) {
-        output = MAX;
-
-        if (sample > MAX)
-            sample = MAX;
-    }
-    else if (output < MIN) {
-        output = MIN;
-
-        if (sample < MIN)
-            sample = MIN;
-    }
-
-    /* quantize */
-    output &= ~mask;
-
-    /* error feedback */
-    dither->error[0] = sample - output;
-
-    /* scale */
-    return output >> scalebits;
-}
-
-/*****************************************************************************
- * s24_to_s16_pcm: Scale a 24 bit pcm sample to a 16 bit pcm sample.
- *****************************************************************************/
-static inline mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
-{
-  /* round */
-  sample += (1L << (MAD_F_FRACBITS - 16));
-
-  /* clip */
-  if (sample >= MAD_F_ONE)
-    sample = MAD_F_ONE - 1;
-  else if (sample < -MAD_F_ONE)
-    sample = -MAD_F_ONE;
-
-  /* quantize */
-  return sample >> (MAD_F_FRACBITS + 1 - 16);
-}
-
+///*****************************************************************************
+// * support routines borrowed from mpg321 (file: mad.c), which is distributed
+// * under GPL license
+// *
+// * mpg321 was written by Joe Drew <drew@debian.org>, and based upon 'plaympeg'
+// * from the smpeg sources, which was written by various people from Loki Software
+// * (http://www.lokigames.com).
+// *
+// * It also incorporates some source from mad, written by Robert Leslie
+// *****************************************************************************/
+//
+///* The following two routines and data structure are from the ever-brilliant
+//     Rob Leslie.
+//*/
+//
+//struct audio_dither {
+//    mad_fixed_t error[3];
+//    mad_fixed_t random;
+//};
+//
+///*
+//* NAME:                prng()
+//* DESCRIPTION: 32-bit pseudo-random number generator
+//*/
+//static inline unsigned long prng(unsigned long state)
+//{
+//    return (state * 0x0019660dL + 0x3c6ef35fL) & 0xffffffffL;
+//}
+//
+///*
+//* NAME:        mpg321_s24_to_s16_pcm()
+//* DESCRIPTION: generic linear sample quantize and dither routine
+//*/
+//static inline signed int mpg321_s24_to_s16_pcm(unsigned int bits, mad_fixed_t sample,
+//                                    struct audio_dither *dither)
+//{
+//    unsigned int scalebits;
+//    mad_fixed_t output, mask, random;
+//
+//    enum {
+//        MIN = -MAD_F_ONE,
+//        MAX = MAD_F_ONE - 1
+//    };
+//
+//    /* noise shape */
+//    sample += dither->error[0] - dither->error[1] + dither->error[2];
+//
+//    dither->error[2] = dither->error[1];
+//    dither->error[1] = dither->error[0] / 2;
+//
+//    /* bias */
+//    output = sample + (1L << (MAD_F_FRACBITS + 1 - bits - 1));
+//
+//    scalebits = MAD_F_FRACBITS + 1 - bits;
+//    mask = (1L << scalebits) - 1;
+//
+//    /* dither */
+//    random    = prng(dither->random);
+//    output += (random & mask) - (dither->random & mask);
+//
+//    dither->random = random;
+//
+//    /* clip */
+//    if (output > MAX) {
+//        output = MAX;
+//
+//        if (sample > MAX)
+//            sample = MAX;
+//    }
+//    else if (output < MIN) {
+//        output = MIN;
+//
+//        if (sample < MIN)
+//            sample = MIN;
+//    }
+//
+//    /* quantize */
+//    output &= ~mask;
+//
+//    /* error feedback */
+//    dither->error[0] = sample - output;
+//
+//    /* scale */
+//    return output >> scalebits;
+//}
+//
+///*****************************************************************************
+// * s24_to_s16_pcm: Scale a 24 bit pcm sample to a 16 bit pcm sample.
+// *****************************************************************************/
+//static inline mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
+//{
+//  /* round */
+//  sample += (1L << (MAD_F_FRACBITS - 16));
+//
+//  /* clip */
+//  if (sample >= MAD_F_ONE)
+//    sample = MAD_F_ONE - 1;
+//  else if (sample < -MAD_F_ONE)
+//    sample = -MAD_F_ONE;
+//
+//  /* quantize */
+//  return sample >> (MAD_F_FRACBITS + 1 - 16);
+//}
+//
 /*****************************************************************************
  * libmad_ouput: this function is called just after the frame is decoded
  *****************************************************************************/
@@ -456,7 +456,7 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
     }
     p_mad_adec->last_date += (mtime_t)(p_libmad_pcm->length*2)
                              / p_mad_adec->output_format.i_rate;
-    p_buffer->end_date = p_mad_adec->i_next_pts; // last_date;
+    p_buffer->end_date = p_mad_adec->last_date;
 
     /* Interleave and keep buffers in mad_fixed_t format */
     while (nsamples--)
@@ -464,11 +464,12 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
         /* left audio channel */
         sample = *left_ch++;
 #ifndef WORDS_BIGENDIAN
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
 #else
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
 #endif
         /* right audio channel */
         if (p_libmad_pcm->channels == 2)
@@ -476,11 +477,12 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
            sample = *right_ch++;
         } /* else reuse left audio channel */
 #ifndef WORDS_BIGENDIAN
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
 #else
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
-        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
+//        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
 #endif
     }
 
