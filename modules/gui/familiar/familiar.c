@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.23 2003/01/04 00:21:00 jpsaman Exp $
+ * $Id: familiar.c,v 1.24 2003/01/04 13:30:02 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -197,6 +197,7 @@ static void Run( intf_thread_t *p_intf )
     gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
                          GTK_SIGNAL_FUNC( E_(GtkDisplayDate) ), NULL );
     p_intf->p_sys->f_adj_oldvalue = 0;
+    p_intf->p_sys->i_adj_oldvalue = 0;
 #undef P_SLIDER
 
     p_intf->p_sys->p_clist = GTK_CLIST( gtk_object_get_data(
@@ -323,45 +324,77 @@ static int Manage( intf_thread_t *p_intf )
             }
 
             /* Manage the slider */
-            if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
-            {
-#ifndef HAVE_STRONGARM
-                float newvalue = p_intf->p_sys->p_adj->value;
-#else
-                off_t newvalue = p_intf->p_sys->p_adj->value;
-#endif
+            if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+			{	
+                /* Manage the slider for CPU_CAPABILITY_FPU hardware */				
+                if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+                {
+                    float newvalue = p_intf->p_sys->p_adj->value;
 
 #define p_area p_input->stream.p_selected_area
-                /* If the user hasn't touched the slider since the last time,
-                 * then the input can safely change it */
-                if( newvalue == p_intf->p_sys->f_adj_oldvalue )
-                {
-                    /* Update the value */
-                    p_intf->p_sys->p_adj->value =
-                    p_intf->p_sys->f_adj_oldvalue =
-#ifndef HAVE_STRONGARM
-                        ( 100. * p_area->i_tell ) / p_area->i_size;
-#else
-						( 100 * p_area->i_tell ) / p_area->i_size;						
-#endif
-                    gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
-                                             "value_changed" );
-                }
-                /* Otherwise, send message to the input if the user has
-                 * finished dragging the slider */
-                else if( p_intf->p_sys->b_slider_free )
-                {
-                    off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+                    /* If the user hasn't touched the slider since the last time,
+                     * then the input can safely change it */
+                    if( newvalue == p_intf->p_sys->f_adj_oldvalue )
+                    {
+                        /* Update the value */
+                        p_intf->p_sys->p_adj->value =
+                        p_intf->p_sys->f_adj_oldvalue =
+                            ( 100. * p_area->i_tell ) / p_area->i_size;
+                        gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                                 "value_changed" );
+                    }
+                    /* Otherwise, send message to the input if the user has
+                     * finished dragging the slider */
+                    else if( p_intf->p_sys->b_slider_free )
+                    {
+                        off_t i_seek = ( newvalue * p_area->i_size ) / 100;
 
-                    /* release the lock to be able to seek */
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                    input_Seek( p_input, i_seek, INPUT_SEEK_SET );
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
+                        /* release the lock to be able to seek */
+                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                        vlc_mutex_lock( &p_input->stream.stream_lock );
 
-                    /* Update the old value */
-                    p_intf->p_sys->f_adj_oldvalue = newvalue;
-                }
+                        /* Update the old value */
+                        p_intf->p_sys->f_adj_oldvalue = newvalue;
+                    }
 #undef p_area
+                }
+			}
+			else
+			{
+                /* Manage the slider without CPU_CAPABILITY_FPU hardware */				
+                if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+                {
+                    off_t newvalue = p_intf->p_sys->p_adj->value;
+
+#define p_area p_input->stream.p_selected_area
+                    /* If the user hasn't touched the slider since the last time,
+                     * then the input can safely change it */
+                    if( newvalue == p_intf->p_sys->i_adj_oldvalue )
+                    {
+                        /* Update the value */
+                        p_intf->p_sys->p_adj->value =
+                        p_intf->p_sys->i_adj_oldvalue =
+                            ( 100 * p_area->i_tell ) / p_area->i_size;
+                        gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                                                 "value_changed" );
+                    }
+                    /* Otherwise, send message to the input if the user has
+                     * finished dragging the slider */
+                    else if( p_intf->p_sys->b_slider_free )
+                    {
+                        off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+
+                        /* release the lock to be able to seek */
+                        vlc_mutex_unlock( &p_input->stream.stream_lock );
+                        input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                        vlc_mutex_lock( &p_input->stream.stream_lock );
+
+                        /* Update the old value */
+                        p_intf->p_sys->i_adj_oldvalue = newvalue;
+                    }
+#undef p_area
+                }
             }
         }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -441,7 +474,10 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
         /* initialize and show slider for seekable streams */
         if( p_intf->p_sys->p_input->stream.b_seekable )
         {
-            p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
+			if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+                p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
+            else
+				p_intf->p_sys->p_adj->value = p_intf->p_sys->i_adj_oldvalue = 0;
             gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
                                      "value_changed" );
             gtk_widget_show( GTK_WIDGET( p_slider ) );

@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.11 2003/01/04 00:21:00 jpsaman Exp $
+ * $Id: familiar.h,v 1.12 2003/01/04 13:30:02 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -40,11 +40,9 @@ struct intf_sys_t
     /* slider */
     GtkLabel *          p_slider_label;
     GtkAdjustment *     p_adj;                   /* slider adjustment object */
-#ifdef HAVE_STRONGARM
-    off_t               f_adj_oldvalue;
-#else
-    float               f_adj_oldvalue;                    /* previous value */
-#endif
+    off_t               i_adj_oldvalue;  /* previous value -no FPU hardware  */
+    float               f_adj_oldvalue;  /* previous value -with FPU hardware*/
+
     /* special actions */
     vlc_bool_t          b_playing;
     vlc_bool_t          b_window_changed;        /* window display toggled ? */

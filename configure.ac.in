@@ -855,10 +855,6 @@ AC_ARG_WITH(tuning,
 if test "x${with_tuning}" != "x"; then
     if test "x${target_cpu}" = "xpowerpc"; then
         CFLAGS_TUNING="-mtune=${with_tuning}"
-    elif test "x${target_cpu}" = "xstrongarm1100"; then
-        CFLAGS_TUNING="-mtune=${with_tuning}"
-	    AC_DEFINE(HAVE_STRONGARM, 1, Define if have a strongarm cpu, because then we should not do FPU calculations
- due to lack of FPU hardware support. Otherwise it would be *slow*)
     else
         CFLAGS_TUNING="-mcpu=${with_tuning}"
     fi
