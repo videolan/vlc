@@ -2,12 +2,62 @@
 # ChangeLog for vlc #
 #===================#
 
-HEAD
-  * Nothing yet
-
 0.2.92
 Fri,  7 Dec 2001 20:18:56 +0100
 
+  * Added a missing call to DecoderError() in mpeg_adec.c.
+  * Fixed a segfault in the aRts plugin.
+  * Fixed a bug in DecoderError.
+  * Next Generation Buffer Manager.
+  * All decoders enter DecoderError() in case of error, even if they
+    haven't allocated all their data. This prevents the input from getting
+    stuck if a decoder has failed its initialization.
+  * Backported lool's fix for the Gtk+ playlist crash.
+  * If $DISPLAY isn't set, don't try to run the Gtk+ interface.
+  * Fixed a segfault in input_dvd.c:DVDInit.
+  * Fixed a PPC compilation issue.
+  * Mouse wheel seek patch for XVideo courtesy of Peter Surda.
+  * Ported to SDL.
+  * Backported a VCD crash fix from the main branch.
+  * Fixed compilation with dvdcss disabled.
+  * Bug fixes in the VCD input.
+  * The SDL plugin now says whether we are using software or hardware YUV
+    in its window title.
+  * Added --with-dll-path option for my automated Win32 package builds.
+  * Initialize SDL before opening the SDL audio output.
+  * Prevent two SDL video outputs or audio outputs to be spawned at the
+    same time to avoid ugly crashes.
+  * TS input: bugfix in DecodePAT and minor optimizations elsewhere.
+  * TS input: we now check that the contents of the PAT has changed
+    before updating it, instead of just relying on its version number.
+  * Disabled broken ALSA audio output. Closes Debian bugs #110869 and #119846.
+  * Fixed build dependencies on libasound2-dev. Closes Debian bug #121057.
+  * Changed configure.in so that libXv_pic is used instead of libXv.a when
+    available. Closes Debian bug #111790.
+  * CPU detection under BeOS.
+  * Fixed XVideo port selection.
+  * Fixed 4:2:2 software rendering.
+  * Removed cruft I forgot in aout_alsa.c.
+  * Minor compile fix under Hurd.
+  * Fixed a potential segfault if the subtitle stream was encountered
+    before the video stream.
+  * Fixed potential compilation issues under eg. BSD/OS.
+  * Fixed unnecessary target remake (recursive make is harmful !).
+  * Fixed a potential BeOS linking issue.
+  * Fixed a minor bug in input.c.
+  * Fixed an issue in Makefile.dep causing to rebuild unnecessary files
+    in the gtk/gnome plugins.
+  * Removed cruft from configure.in.
+  * Fixed major bugs in the PSI decoder.
+  * Fixed possible segfault with --input.
+  * Fix for EOF of ES-only streams.
+  * MPEG-1 aspect ratio patch, courtesy of Vladimir Chernyshov
+    <greengrass@writeme.com>.
+  * Seeking patch for X11, courtesy of Peter Surda
+    <shurdeek@panorama.sth.ac.at>.
+  * Fixed a segfault on exit when no fast_memcpy module was found.
+  * Workaround for a bug in the GLIBC dlopen() code.
+  * Fixed win32 compilation.
   * New libmad plug-in, courtesy of Jean-Paul Saman. We now have sound on
     iPAQ Familiar Linux.
   * Borrowed MPlayer's fast memcpy() routines. Best is autodetected, choose
