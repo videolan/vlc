@@ -207,6 +207,10 @@ OK, let's go for an enumeration of the different tags and theor attributes :
        of the button.
      - onclick: event executed when clicking on the button.
        Default is "none".
+     - onmouseover: event executed when the mouse cursor enter the button.
+       Default is "none".
+     - onmouseout: event executed when the mouse cursor leaves the button.
+       Default is "none".
      - tooltiptext : used to display a tooltip.
        Default is "none". (no tooltip).
 
@@ -233,6 +237,18 @@ OK, let's go for an enumeration of the different tags and theor attributes :
      - onclick1: event executed when clicking on the control in state 1.
        Default is "none".
      - onclick2: event executed when clicking on the control in state 2.
+       Default is "none".
+     - onmouseover1: event executed when the mouse cursor enter the button in
+       state 1.
+       Default is "none".
+     - onmouseout1: event executed when the mouse cursor leaves the button in
+       state 1.
+       Default is "none".
+     - onmouseover2: event executed when the mouse cursor enter the button in
+       state 2.
+       Default is "none".
+     - onmouseout2: event executed when the mouse cursor leaves the button in
+       state 2.
        Default is "none".
 
  - TextControl: Creates a text.

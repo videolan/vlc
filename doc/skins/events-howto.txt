@@ -119,11 +119,17 @@ EVENT is the action to execute, it can be one of the followings
 
  - VLC_WINDOW_OPEN:
    Action    : open a window with a fading effect if selected.
-   Parameters: only one which must match the ID of a window.
+   Parameters:
+     1: ID of the window to open.
+     2: Describe what to do. Nothing is opening. 'TRUE' is the same. 'FALSE' is
+        closing window. 'CHANGE' is switching between this to state.
 
  - VLC_WINDOW_CLOSE:
    Action    : close a window with a fading effect if selected.
-   Parameters: only one who must match the ID of a window.
+   Parameters:
+     1: ID of the window to close.
+     2: Describe what to do. Nothing is closing. 'TRUE' is the same. 'FALSE' is
+        opening window. 'CHANGE' is switching between this to state.
 
  - CTRL_SET_SLIDER:
    Not supported yet.
