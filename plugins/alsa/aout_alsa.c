@@ -205,39 +205,6 @@ int aout_AlsaSetFormat ( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_AlsaReset: resets the dsp
- *****************************************************************************/
-int aout_AlsaReset ( aout_thread_t *p_aout )
-{
-    /* TODO : put something in here, such as close and open again 
-     * or check status, drain, flush, .... */ 
-    return ( 0 );
-}
-
-/*****************************************************************************
- * aout_AlsaSetChannels: sets mono, stereo and other modes
- *****************************************************************************/
-int aout_AlsaSetChannels ( aout_thread_t *p_aout )
-{
-    /* TODO : normally, nothing
-     * everything should be done in the AlsaSetFormat, as far a I understand
-     * the alsa documentation
-     */
-    return ( 0 );
-}
-
-/*****************************************************************************
- * aout_AlsaSetRate: sets the audio output rate
- *****************************************************************************
- * As in the previous function, the rate is supposed to be set in the
- * AlsaSetFormat function
- *****************************************************************************/
-int aout_AlsaSetRate ( aout_thread_t *p_aout )
-{
-    return ( 0 );
-}
-
-/*****************************************************************************
  * aout_AlsaGetBufInfo: buffer status query
  *****************************************************************************/
 long aout_AlsaGetBufInfo ( aout_thread_t *p_aout, long l_buffer_limit )
@@ -286,9 +253,9 @@ long aout_AlsaGetBufInfo ( aout_thread_t *p_aout, long l_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_AlsaPlaySamples
+ * aout_AlsaPlay
  *****************************************************************************/
-void aout_AlsaPlaySamples ( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_AlsaPlay ( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_write_returns;
 

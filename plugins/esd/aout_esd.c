@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,8 @@
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "main.h"
 
+#include "modules.h"
+
 /*****************************************************************************
  * aout_sys_t: esd audio output method descriptor
  *****************************************************************************
@@ -64,9 +66,47 @@ typedef struct aout_sys_s
 } aout_sys_t;
 
 /*****************************************************************************
- * aout_EsdOpen: opens an esd socket
+ * Local prototypes.
  *****************************************************************************/
-int aout_EsdOpen( aout_thread_t *p_aout )
+static int     aout_Probe       ( probedata_t *p_data );
+static int     aout_Open        ( aout_thread_t *p_aout );
+static int     aout_SetFormat   ( aout_thread_t *p_aout );
+static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static void    aout_Play        ( aout_thread_t *p_aout,
+                                  byte_t *buffer, int i_size );
+static void    aout_Close       ( aout_thread_t *p_aout );
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void esd_aout_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->p_probe = aout_Probe;
+    p_function_list->functions.aout.p_open = aout_Open;
+    p_function_list->functions.aout.p_setformat = aout_SetFormat;
+    p_function_list->functions.aout.p_getbufinfo = aout_GetBufInfo;
+    p_function_list->functions.aout.p_play = aout_Play;
+    p_function_list->functions.aout.p_close = aout_Close;
+}
+
+/*****************************************************************************
+ * aout_Probe: probes the audio device and return a score
+ *****************************************************************************
+ * This function tries to open the dps and returns a score to the plugin
+ * manager so that it can 
+ *****************************************************************************/
+static int aout_Probe( probedata_t *p_data )
+{
+    /* We don't have to test anything -- if we managed to open this plugin,
+     * it means we have the appropriate libs. */
+    return( 50 );
+}
+
+/*****************************************************************************
+ * aout_Open: open an esd socket
+ *****************************************************************************/
+static int aout_Open( aout_thread_t *p_aout )
 {
     /* mpg123 does it this way */
     int i_bits = ESD_BITS16;
@@ -112,52 +152,28 @@ int aout_EsdOpen( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_EsdReset: resets the dsp
+ * aout_SetFormat: set the output format
  *****************************************************************************/
-int aout_EsdReset( aout_thread_t *p_aout )
+static int aout_SetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_EsdSetFormat: sets the dsp output format
+ * aout_GetBufInfo: buffer status query
  *****************************************************************************/
-int aout_EsdSetFormat( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_EsdSetChannels: sets the dsp's stereo or mono mode
- *****************************************************************************/
-int aout_EsdSetChannels( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_EsdSetRate: sets the dsp's audio output rate
- *****************************************************************************/
-int aout_EsdSetRate( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_EsdGetBufInfo: buffer status query
- *****************************************************************************/
-long aout_EsdGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     /* arbitrary value that should be changed */
     return( l_buffer_limit );
 }
 
 /*****************************************************************************
- * aout_EsdPlaySamples: plays a sound samples buffer
+ * aout_Play: play a sound samples buffer
  *****************************************************************************
- * This function writes a buffer of i_length bytes in the dsp
+ * This function writes a buffer of i_length bytes in the socket
  *****************************************************************************/
-void aout_EsdPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int amount;
 
@@ -182,9 +198,9 @@ void aout_EsdPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_EsdClose: closes the dsp audio device
+ * aout_Close: close the Esound socket
  *****************************************************************************/
-void aout_EsdClose( aout_thread_t *p_aout )
+void aout_Close( aout_thread_t *p_aout )
 {
     close( p_aout->i_fd );
 }

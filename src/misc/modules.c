@@ -55,6 +55,8 @@
 static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename );
 static int HideModule( module_t * p_module );
 static int FreeModule( module_bank_t * p_bank, module_t * p_module );
+static int LockModule( module_t * p_module );
+static int UnlockModule( module_t * p_module );
 static int CallSymbol( module_t * p_module, char * psz_name );
 
 /*****************************************************************************
@@ -109,12 +111,12 @@ void module_InitBank( module_bank_t * p_bank )
 
                 /* We only load files ending with ".so" */
                 if( i_filelen > 3
-                        && !strcmp( file->d_name + i_filelen - 3, ".so" ) )
+                        && !strncmp( file->d_name + i_filelen - 3, ".so", 3 ) )
                 {
 #ifdef SYS_BEOS
                     /* Under BeOS, we need to add beos_GetProgramPath() to
                      * access files under the current directory */
-                    if( memcmp( file->d_name, "/", 1 ) )
+                    if( strncmp( file->d_name, "/", 1 ) )
                     {
                         psz_file = malloc( i_programlen + i_dirlen
                                                + i_filelen + 3 );
@@ -236,87 +238,99 @@ void module_ManageBank( module_bank_t * p_bank )
 }
 
 /*****************************************************************************
- * module_Need: increase the usage count of a module and load it if needed.
+ * module_Need: return the best module function, given a capability list.
  *****************************************************************************
- * This function has to be called before a thread starts using a module. If
- * the module is already loaded, we just increase its usage count. If it isn't
- * loaded, we have to dynamically open it and initialize it.
- * If you successfully call module_Need() at any moment, be careful to call
- * module_Unneed() when you don't need it anymore.
+ * This function returns the module that best fits the asked capabilities.
  *****************************************************************************/
-int module_Need( module_t * p_module )
+module_t * module_Need( module_bank_t *p_bank,
+                        int i_capabilities, void *p_data )
 {
-    if( p_module->i_usage >= 0 )
+    module_t * p_module;
+    module_t * p_bestmodule = NULL;
+    int i_score, i_totalscore, i_bestscore = 0;
+    int i_index;
+
+    /* We take the global lock */
+    vlc_mutex_lock( &p_bank->lock );
+
+    /* Parse the module list for capabilities and probe each of them */
+    for( p_module = p_bank->first ;
+         p_module != NULL ;
+         p_module = p_module->next )
     {
-        /* This module is already loaded and activated, we can return */
-        p_module->i_usage++;
-        return( 0 );
+        /* Test that this module can do everything we need */
+        if( ( p_module->i_capabilities & i_capabilities ) == i_capabilities )
+        {
+            i_totalscore = 0;
+
+            LockModule( p_module );
+
+            /* Parse all the requested capabilities and test them */
+            for( i_index = 0 ; (1 << i_index) <= i_capabilities ; i_index++ )
+            {
+                if( ( (1 << i_index) & i_capabilities ) )
+                {
+                    i_score = ( (function_list_t *)p_module->p_functions)
+                                                  [i_index].p_probe( p_data );
+
+                    if( i_score )
+                    {
+                        i_totalscore += i_score;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            /* If the high score was broken, we have a new champion */
+            if( i_totalscore > i_bestscore )
+            {
+                /* Keep the current module locked, but release the previous */
+                if( p_bestmodule != NULL )
+                {
+                    UnlockModule( p_bestmodule );
+                }
+
+                /* This is the new best module */
+                i_bestscore = i_totalscore;
+                p_bestmodule = p_module;
+            }
+            else
+            {
+                /* This module wasn't interesting, unlock it and forget it */
+                UnlockModule( p_module );
+            }
+        }
     }
 
-    if( p_module->b_builtin )
-    {
-        /* A built-in module should always have a refcount >= 0 ! */
-        intf_ErrMsg( "module error: built-in module `%s' has refcount %i",
-                     p_module->psz_name, p_module->i_usage );
-        return( -1 );
-    }
+    /* We release the global lock */
+    vlc_mutex_unlock( &p_bank->lock );
 
-    if( p_module->i_usage != -1 )
-    {
-        /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: dynamic module `%s' has refcount %i",
-                     p_module->psz_name, p_module->i_usage );
-        return( -1 );
-    }
-
-    /* i_usage == -1, which means that the module isn't in memory */
-    if( ! module_load( p_module->psz_filename, &p_module->handle ) )
-    {
-        /* The dynamic module couldn't be opened */
-        intf_ErrMsg( "module error: cannot open %s (%s)",
-                     p_module->psz_filename, module_error() );
-        return( -1 );
-    }
-
-    if( CallSymbol( p_module, "ActivateModule" ) != 0 )
-    {
-        /* We couldn't call ActivateModule() -- looks nasty, but
-         * we can't do much about it. Just try to unload module. */
-        module_unload( p_module->handle );
-        p_module->i_usage = -1;
-        return( -1 );
-    }
-
-    /* Everything worked fine ! The module is ready to be used */
-    p_module->i_usage = 1;
-
-    return( 0 );
+    /* Don't forget that the module is still locked if bestmodule != NULL */
+    return( p_bestmodule );
 }
 
 /*****************************************************************************
  * module_Unneed: decrease the usage count of a module.
  *****************************************************************************
- * This function has to be called before a thread starts using a module. If
- * the module is already loaded, we just increase its usage count. If it isn't
- * loaded, we have to dynamically open it and initialize it.
- * If you successfully call module_Need() at any moment, be careful to call
- * module_Unneed() when you don't need it anymore.
+ * This function must be called by the thread that called module_Need, to
+ * decrease the reference count and allow for hiding of modules.
  *****************************************************************************/
-int module_Unneed( module_t * p_module )
+void module_Unneed( module_bank_t * p_bank, module_t * p_module )
 {
-    if( p_module->i_usage <= 0 )
-    {
-        /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: trying to call module_Unneed() on `%s'"
-                     " which isn't even in use", p_module->psz_name );
-        return( -1 );
-    }
+    /* We take the global lock */
+    vlc_mutex_lock( &p_bank->lock );
 
-    /* This module is still in use, we can return */
-    p_module->i_usage--;
-    p_module->i_unused_delay = 0;
+    /* Just unlock the module - we can't do anything if it fails,
+     * so there is no need to check the return value. */
+    UnlockModule( p_module );
 
-    return( 0 );
+    /* We release the global lock */
+    vlc_mutex_unlock( &p_bank->lock );
+
+    return;
 }
 
 /*****************************************************************************
@@ -332,7 +346,7 @@ int module_Unneed( module_t * p_module )
  *****************************************************************************/
 static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
 {
-    module_t * p_module;
+    module_t * p_module, * p_othermodule;
     module_handle_t handle;
 
     /* Try to dynamically load the module. */
@@ -358,6 +372,7 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     p_module->psz_filename = psz_filename;
     p_module->handle = handle;
 
+    /* Initialize the module : fill p_module->psz_name, etc. */
     if( CallSymbol( p_module, "InitModule" ) != 0 )
     {
         /* We couldn't call InitModule() */
@@ -366,6 +381,28 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
         return( -1 );
     }
 
+    /* Check that version numbers match */
+    if( strcmp( VERSION, p_module->psz_version ) )
+    {
+        free( p_module );
+        module_unload( handle );
+        return( -1 );
+    }
+
+    /* Check that we don't already have a module with this name */
+    for( p_othermodule = p_bank->first ;
+         p_othermodule != NULL ;
+         p_othermodule = p_othermodule->next )
+    {
+        if( !strcmp( p_othermodule->psz_name, p_module->psz_name ) )
+        {
+            free( p_module );
+            module_unload( handle );
+            return( -1 );
+        }
+    }
+
+    /* Activate the module : fill the capability structure, etc. */
     if( CallSymbol( p_module, "ActivateModule" ) != 0 )
     {
         /* We couldn't call ActivateModule() */
@@ -447,6 +484,7 @@ static int HideModule( module_t * p_module )
         return( -1 );
     }
 
+    /* Deactivate the module : free the capability structure, etc. */
     if( CallSymbol( p_module, "DeactivateModule" ) != 0 )
     {
         /* We couldn't call DeactivateModule() -- looks nasty, but
@@ -526,6 +564,92 @@ static int FreeModule( module_bank_t * p_bank, module_t * p_module )
     free( p_module->psz_version );
 
     free( p_module );
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * LockModule: increase the usage count of a module and load it if needed.
+ *****************************************************************************
+ * This function has to be called before a thread starts using a module. If
+ * the module is already loaded, we just increase its usage count. If it isn't
+ * loaded, we have to dynamically open it and initialize it.
+ * If you successfully call LockModule() at any moment, be careful to call
+ * UnlockModule() when you don't need it anymore.
+ *****************************************************************************/
+static int LockModule( module_t * p_module )
+{
+    if( p_module->i_usage >= 0 )
+    {
+        /* This module is already loaded and activated, we can return */
+        p_module->i_usage++;
+        return( 0 );
+    }
+
+    if( p_module->b_builtin )
+    {
+        /* A built-in module should always have a refcount >= 0 ! */
+        intf_ErrMsg( "module error: built-in module `%s' has refcount %i",
+                     p_module->psz_name, p_module->i_usage );
+        return( -1 );
+    }
+
+    if( p_module->i_usage != -1 )
+    {
+        /* This shouldn't happen. Ever. We have serious problems here. */
+        intf_ErrMsg( "module error: dynamic module `%s' has refcount %i",
+                     p_module->psz_name, p_module->i_usage );
+        return( -1 );
+    }
+
+    /* i_usage == -1, which means that the module isn't in memory */
+    if( ! module_load( p_module->psz_filename, &p_module->handle ) )
+    {
+        /* The dynamic module couldn't be opened */
+        intf_ErrMsg( "module error: cannot open %s (%s)",
+                     p_module->psz_filename, module_error() );
+        return( -1 );
+    }
+
+    /* FIXME: what to do if the guy modified the plugin while it was
+     * unloaded ? It makes XMMS crash nastily, perhaps we should try
+     * to be a bit more clever here. */
+
+    /* Activate the module : fill the capability structure, etc. */
+    if( CallSymbol( p_module, "ActivateModule" ) != 0 )
+    {
+        /* We couldn't call ActivateModule() -- looks nasty, but
+         * we can't do much about it. Just try to unload module. */
+        module_unload( p_module->handle );
+        p_module->i_usage = -1;
+        return( -1 );
+    }
+
+    /* Everything worked fine ! The module is ready to be used */
+    p_module->i_usage = 1;
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * UnlockModule: decrease the usage count of a module.
+ *****************************************************************************
+ * We decrease the usage count of a module so that we know when a module
+ * becomes unused and can be hidden.
+ *****************************************************************************/
+static int UnlockModule( module_t * p_module )
+{
+    if( p_module->i_usage <= 0 )
+    {
+        /* This shouldn't happen. Ever. We have serious problems here. */
+        intf_ErrMsg( "module error: trying to call module_Unneed() on `%s'"
+                     " which isn't even in use", p_module->psz_name );
+        return( -1 );
+    }
+
+    /* This module is still in use, we can return */
+    p_module->i_usage--;
+    p_module->i_unused_delay = 0;
 
     return( 0 );
 }

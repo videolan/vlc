@@ -54,7 +54,7 @@ int     aout_BeSetFormat    ( aout_thread_t *p_aout );
 int     aout_BeSetChannels  ( aout_thread_t *p_aout );
 int     aout_BeSetRate      ( aout_thread_t *p_aout );
 long    aout_BeGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
-void    aout_BePlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
+void    aout_BePlay         ( aout_thread_t *p_aout, byte_t *buffer,
                               int i_size );
 void    aout_BeClose        ( aout_thread_t *p_aout );
 
@@ -102,14 +102,11 @@ plugin_info_t * GetConfig( void )
 
 static void aout_GetPlugin( p_aout_thread_t p_aout )
 {
-    p_aout->p_sys_open        = aout_BeOpen;
-    p_aout->p_sys_reset       = aout_BeReset;
-    p_aout->p_sys_setformat   = aout_BeSetFormat;
-    p_aout->p_sys_setchannels = aout_BeSetChannels;
-    p_aout->p_sys_setrate     = aout_BeSetRate;
-    p_aout->p_sys_getbufinfo  = aout_BeGetBufInfo;
-    p_aout->p_sys_playsamples = aout_BePlaySamples;
-    p_aout->p_sys_close       = aout_BeClose;
+    p_aout->p_open        = aout_BeOpen;
+    p_aout->p_setformat   = aout_BeSetFormat;
+    p_aout->p_getbufinfo  = aout_BeGetBufInfo;
+    p_aout->p_play        = aout_BePlay;
+    p_aout->p_close       = aout_BeClose;
 }
 
 static void vout_GetPlugin( p_vout_thread_t p_vout )

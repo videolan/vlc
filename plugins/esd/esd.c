@@ -1,9 +1,9 @@
 /*****************************************************************************
- * esd.c : Esound plugin for vlc
+ * esd.c : EsounD module
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,82 +20,92 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME esd
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>                                              /* strdup() */
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "plugins.h"
 
-#include "interface.h"
-#include "audio_output.h"
-#include "video.h"
-#include "video_output.h"
+#include "modules.h"
+#include "modules_inner.h"
 
 /*****************************************************************************
- * Exported prototypes
+ * Build configuration tree.
  *****************************************************************************/
-static void aout_GetPlugin( p_aout_thread_t p_aout );
-
-/* Audio output */
-int     aout_EsdOpen         ( aout_thread_t *p_aout );
-int     aout_EsdReset        ( aout_thread_t *p_aout );
-int     aout_EsdSetFormat    ( aout_thread_t *p_aout );
-int     aout_EsdSetChannels  ( aout_thread_t *p_aout );
-int     aout_EsdSetRate      ( aout_thread_t *p_aout );
-long    aout_EsdGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
-void    aout_EsdPlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
-                               int i_size );
-void    aout_EsdClose        ( aout_thread_t *p_aout );
+MODULE_CONFIG_START( "Configuration for esd module" )
+    ADD_FRAME( "EsounD" )
+        ADD_COMMENT( "This module does not need configuration" )
+MODULE_CONFIG_END
 
 /*****************************************************************************
- * GetConfig: get the plugin structure and configuration
+ * Capabilities defined in the other files.
  *****************************************************************************/
-plugin_info_t * GetConfig( void )
+void esd_aout_getfunctions( function_list_t * p_function_list );
+
+/*****************************************************************************
+ * InitModule: get the module structure and configuration.
+ *****************************************************************************
+ * We have to fill psz_name, psz_longname and psz_version. These variables
+ * will be strdup()ed later by the main application because the module can
+ * be unloaded later to save memory, and we want to be able to access this
+ * data even after the module has been unloaded.
+ *****************************************************************************/
+int InitModule( module_t * p_module )
 {
-    plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
+    p_module->psz_name = MODULE_STRING;
+    p_module->psz_longname = "EsounD audio module";
+    p_module->psz_version = VERSION;
 
-    p_info->psz_name    = "Esound";
-    p_info->psz_version = VERSION;
-    p_info->psz_author  = "the VideoLAN team <vlc@videolan.org>";
+    p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_AOUT;
 
-    p_info->aout_GetPlugin = aout_GetPlugin;
-    p_info->vout_GetPlugin = NULL;
-    p_info->intf_GetPlugin = NULL;
-    p_info->yuv_GetPlugin  = NULL;
-
-    /* esound should always work, but score it lower than DSP */
-    p_info->i_score = 0x100;
-
-    /* If this plugin was requested, score it higher */
-    if( TestMethod( AOUT_METHOD_VAR, "esd" ) )
-    {
-        p_info->i_score += 0x200;
-    }
-
-    return( p_info );
+    return( 0 );
 }
 
 /*****************************************************************************
- * Following functions are only called through the p_info structure
+ * ActivateModule: set the module to an usable state.
+ *****************************************************************************
+ * This function fills the capability functions and the configuration
+ * structure. Once ActivateModule() has been called, the i_usage can
+ * be set to 0 and calls to NeedModule() be made to increment it. To unload
+ * the module, one has to wait until i_usage == 0 and call DeactivateModule().
  *****************************************************************************/
-
-static void aout_GetPlugin( p_aout_thread_t p_aout )
+int ActivateModule( module_t * p_module )
 {
-    p_aout->p_sys_open        = aout_EsdOpen;
-    p_aout->p_sys_reset       = aout_EsdReset;
-    p_aout->p_sys_setformat   = aout_EsdSetFormat;
-    p_aout->p_sys_setchannels = aout_EsdSetChannels;
-    p_aout->p_sys_setrate     = aout_EsdSetRate;
-    p_aout->p_sys_getbufinfo  = aout_EsdGetBufInfo;
-    p_aout->p_sys_playsamples = aout_EsdPlaySamples;
-    p_aout->p_sys_close       = aout_EsdClose;
+    p_module->p_functions = malloc( sizeof( module_functions_t ) );
+    if( p_module->p_functions == NULL )
+    {
+        return( -1 );
+    }
+
+    esd_aout_getfunctions( &p_module->p_functions->aout );
+
+    p_module->p_config = p_config;
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * DeactivateModule: make sure the module can be unloaded.
+ *****************************************************************************
+ * This function must only be called when i_usage == 0. If it successfully
+ * returns, i_usage can be set to -1 and the module unloaded. Be careful to
+ * lock usage_lock during the whole process.
+ *****************************************************************************/
+int DeactivateModule( module_t * p_module )
+{
+    free( p_module->p_functions );
+
+    return( 0 );
 }
 

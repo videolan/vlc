@@ -61,33 +61,9 @@ int aout_DummyOpen( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_DummyReset: fake reset
- *****************************************************************************/
-int aout_DummyReset( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
  * aout_DummySetFormat: pretends to set the dsp output format
  *****************************************************************************/
 int aout_DummySetFormat( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_DummySetChannels: pretends to set stereo or mono mode
- *****************************************************************************/
-int aout_DummySetChannels( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_DummySetRate: pretends to set audio output rate
- *****************************************************************************/
-int aout_DummySetRate( aout_thread_t *p_aout )
 {
     return( 0 );
 }
@@ -101,10 +77,11 @@ long aout_DummyGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_DummyPlaySamples: pretends to play a sound
+ * aout_DummyPlay: pretends to play a sound
  *****************************************************************************/
-void aout_DummyPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_DummyPlay( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
+    ;
 }
 
 /*****************************************************************************

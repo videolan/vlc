@@ -120,16 +120,13 @@ typedef struct
 /*****************************************************************************
  * aout_thread_t : audio output thread descriptor
  *****************************************************************************/
-typedef int  (aout_sys_open_t)           ( p_aout_thread_t p_aout );
-typedef int  (aout_sys_reset_t)          ( p_aout_thread_t p_aout );
-typedef int  (aout_sys_setformat_t)      ( p_aout_thread_t p_aout );
-typedef int  (aout_sys_setchannels_t)    ( p_aout_thread_t p_aout );
-typedef int  (aout_sys_setrate_t)        ( p_aout_thread_t p_aout );
-typedef long (aout_sys_getbufinfo_t)     ( p_aout_thread_t p_aout,
-                                           long l_buffer_limit );
-typedef void (aout_sys_playsamples_t)    ( p_aout_thread_t p_aout,
-                                           byte_t *buffer, int i_size );
-typedef void (aout_sys_close_t)          ( p_aout_thread_t p_aout );
+typedef int  (aout_open_t)       ( p_aout_thread_t p_aout );
+typedef int  (aout_setformat_t)  ( p_aout_thread_t p_aout );
+typedef long (aout_getbufinfo_t) ( p_aout_thread_t p_aout,
+                                   long l_buffer_limit );
+typedef void (aout_play_t)       ( p_aout_thread_t p_aout,
+                                   byte_t *buffer, int i_size );
+typedef void (aout_close_t)      ( p_aout_thread_t p_aout );
 
 typedef struct aout_thread_s
 {
@@ -140,15 +137,13 @@ typedef struct aout_thread_s
     vlc_mutex_t         fifos_lock;
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
 
-    /* Plugins */
-    aout_sys_open_t *           p_sys_open;
-    aout_sys_reset_t *          p_sys_reset;
-    aout_sys_setformat_t *      p_sys_setformat;
-    aout_sys_setchannels_t *    p_sys_setchannels;
-    aout_sys_setrate_t *        p_sys_setrate;
-    aout_sys_getbufinfo_t *     p_sys_getbufinfo;
-    aout_sys_playsamples_t *    p_sys_playsamples;
-    aout_sys_close_t *          p_sys_close;
+    /* Plugin used and shortcuts to access its capabilities */
+    struct module_s *   p_module;
+    aout_open_t *       p_open;
+    aout_setformat_t *  p_setformat;
+    aout_getbufinfo_t * p_getbufinfo;
+    aout_play_t *       p_play;
+    aout_close_t *      p_close;
 
     void *              buffer;
     /* The s32 buffer is used to mix all the audio fifos together before

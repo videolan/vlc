@@ -1,9 +1,10 @@
 /*****************************************************************************
- * dsp.c : OSS /dev/dsp plugin for vlc
+ * dsp.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
  *
- * Authors:
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,98 +21,92 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME dsp
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <unistd.h>                                               /* close() */
+#include <string.h>                                              /* strdup() */
 
 #include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "plugins.h"
 
-#include "interface.h"
-#include "audio_output.h"
-#include "video.h"
-#include "video_output.h"
-
-#include "main.h"
+#include "modules.h"
+#include "modules_inner.h"
 
 /*****************************************************************************
- * Exported prototypes
+ * Build configuration tree.
  *****************************************************************************/
-static void aout_GetPlugin( p_aout_thread_t p_aout );
-
-/* Audio output */
-int     aout_DspOpen         ( aout_thread_t *p_aout );
-int     aout_DspReset        ( aout_thread_t *p_aout );
-int     aout_DspSetFormat    ( aout_thread_t *p_aout );
-int     aout_DspSetChannels  ( aout_thread_t *p_aout );
-int     aout_DspSetRate      ( aout_thread_t *p_aout );
-long    aout_DspGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
-void    aout_DspPlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
-                               int i_size );
-void    aout_DspClose        ( aout_thread_t *p_aout );
+MODULE_CONFIG_START( "Configuration for dsp module" )
+    ADD_FRAME( "OSS Device" )
+        ADD_FILE( "Device name: ", MODULE_VAR(device), NULL )
+MODULE_CONFIG_END
 
 /*****************************************************************************
- * GetConfig: get the plugin structure and configuration
+ * Capabilities defined in the other files.
  *****************************************************************************/
-plugin_info_t * GetConfig( void )
+void dsp_aout_getfunctions( function_list_t * p_function_list );
+
+/*****************************************************************************
+ * InitModule: get the module structure and configuration.
+ *****************************************************************************
+ * We have to fill psz_name, psz_longname and psz_version. These variables
+ * will be strdup()ed later by the main application because the module can
+ * be unloaded later to save memory, and we want to be able to access this
+ * data even after the module has been unloaded.
+ *****************************************************************************/
+int InitModule( module_t * p_module )
 {
-    int i_fd;
-    plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
+    p_module->psz_name = MODULE_STRING;
+    p_module->psz_longname = "Linux OSS /dev/dsp module";
+    p_module->psz_version = VERSION;
 
-    p_info->psz_name    = "OSS /dev/dsp";
-    p_info->psz_version = VERSION;
-    p_info->psz_author  = "the VideoLAN team <vlc@videolan.org>";
+    p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_AOUT;
 
-    p_info->aout_GetPlugin = aout_GetPlugin;
-    p_info->vout_GetPlugin = NULL;
-    p_info->intf_GetPlugin = NULL;
-    p_info->yuv_GetPlugin  = NULL;
-
-    /* Test if the device can be opened */
-    if ( (i_fd = open( main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT ),
-                       O_WRONLY|O_NONBLOCK )) < 0 )
-    {
-        p_info->i_score = 0;
-    }
-    else
-    {
-        close( i_fd );
-        p_info->i_score = 0x100;
-    }
-
-    /* If this plugin was requested, score it higher */
-    if( TestMethod( AOUT_METHOD_VAR, "dsp" ) )
-    {
-        p_info->i_score += 0x200;
-    }
-
-    return( p_info );
+    return( 0 );
 }
 
 /*****************************************************************************
- * Following functions are only called through the p_info structure
+ * ActivateModule: set the module to an usable state.
+ *****************************************************************************
+ * This function fills the capability functions and the configuration
+ * structure. Once ActivateModule() has been called, the i_usage can
+ * be set to 0 and calls to NeedModule() be made to increment it. To unload
+ * the module, one has to wait until i_usage == 0 and call DeactivateModule().
  *****************************************************************************/
-
-static void aout_GetPlugin( p_aout_thread_t p_aout )
+int ActivateModule( module_t * p_module )
 {
-    p_aout->p_sys_open        = aout_DspOpen;
-    p_aout->p_sys_reset       = aout_DspReset;
-    p_aout->p_sys_setformat   = aout_DspSetFormat;
-    p_aout->p_sys_setchannels = aout_DspSetChannels;
-    p_aout->p_sys_setrate     = aout_DspSetRate;
-    p_aout->p_sys_getbufinfo  = aout_DspGetBufInfo;
-    p_aout->p_sys_playsamples = aout_DspPlaySamples;
-    p_aout->p_sys_close       = aout_DspClose;
+    p_module->p_functions = malloc( sizeof( module_functions_t ) );
+    if( p_module->p_functions == NULL )
+    {
+        return( -1 );
+    }
+
+    dsp_aout_getfunctions( &p_module->p_functions->aout );
+
+    p_module->p_config = p_config;
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * DeactivateModule: make sure the module can be unloaded.
+ *****************************************************************************
+ * This function must only be called when i_usage == 0. If it successfully
+ * returns, i_usage can be set to -1 and the module unloaded. Be careful to
+ * lock usage_lock during the whole process.
+ *****************************************************************************/
+int DeactivateModule( module_t * p_module )
+{
+    free( p_module->p_functions );
+
+    return( 0 );
 }
 

@@ -150,9 +150,7 @@ endif
 #
 # C compiler flags: plugin compilation
 #
-ifneq (,$(findstring solaris,$(SYS)))
 PCFLAGS += -fPIC
-endif
 
 #
 # C compiler flags: dependancies
@@ -407,9 +405,9 @@ install:
 	mkdir -p $(prefix)/bin
 	$(INSTALL) vlc $(prefix)/bin
 # ugly
-	for alias in "" @ALIASES@ ; do if test $$alias ; then ln -s vlc $(prefix)/bin/$$alias ; fi ; done
+	for alias in "" @ALIASES@ ; do if test $$alias ; then rm -f $(prefix)/bin/$$alias && ln -s vlc $(prefix)/bin/$$alias ; fi ; done
 	mkdir -p $(prefix)/lib/videolan/vlc
-	$(INSTALL) -m 644 $(PLUGINS) $(prefix)/lib/videolan/vlc
+	$(INSTALL) -m 644 $(PLUGINS:%=lib/%.so) $(prefix)/lib/videolan/vlc
 	mkdir -p $(prefix)/share/videolan
 	$(INSTALL) -m 644 share/*.psf $(prefix)/share/videolan
 	$(INSTALL) -m 644 share/*.png $(prefix)/share/videolan
@@ -478,11 +476,11 @@ $(STD_PLUGIN_OBJ): %.o: %.c
 
 $(PLUGIN_GNOME): %.o: Makefile.dep
 $(PLUGIN_GNOME): %.o: %.c
-	$(CC) $(CFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
 
 $(PLUGIN_GLIDE): %.o: Makefile.dep
 $(PLUGIN_GLIDE): %.o: %.c
-	$(CC) $(CFLAGS) -I/usr/include/glide -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
 
 #
 # Real targets
@@ -501,56 +499,56 @@ lib/beos.so: $(PLUGIN_BEOS)
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
-	$(CC) $(LCFLAGS) -shared -lesd -o $@ $^
+	$(CC) -shared -lesd -o $@ $^ $(LCFLAGS) -lesd
 else
-	$(CC) $(LCFLAGS) -shared -laudiofile -lesd -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS) -laudiofile -lesd
 endif
 
 lib/dsp.so: $(PLUGIN_DSP)
-	$(CC) $(LCFLAGS) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS)
 
 lib/alsa.so: $(PLUGIN_ALSA)
-	$(CC) $(LCFLAGS) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS)
 
 lib/null.so: $(PLUGIN_NULL)
-	$(CC) $(LCFLAGS) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS)
 
 lib/dummy.so: $(PLUGIN_DUMMY)
-	$(CC) $(LCFLAGS) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS)
 
 lib/fb.so: $(PLUGIN_FB)
-	$(CC) $(LCFLAGS) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS)
 
 lib/x11.so: $(PLUGIN_X11)
-	$(CC) $(LCFLAGS) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+	$(CC) -shared -L/usr/X11R6/lib -o $@ $^ $(LCFLAGS) -lX11 -lXext
 
 lib/mga.so: $(PLUGIN_MGA)
-	$(CC) $(LCFLAGS) -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
+	$(CC) -shared -L/usr/X11R6/lib -o $@ $^ $(LCFLAGS) -lX11 -lXext
 
 lib/gnome.so: $(PLUGIN_GNOME)
-	$(CC) $(LCFLAGS) -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS) `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
 
 lib/glide.so: $(PLUGIN_GLIDE)
-	$(CC) $(LCFLAGS) -shared $(LIB_GLIDE) -o $@ $^
+	$(CC) -shared $(LIB_GLIDE) -o $@ $^ $(LCFLAGS)
 
 lib/ggi.so: $(PLUGIN_GGI)
-	$(CC) $(LCFLAGS) -shared $(LIB_GGI) -o $@ $^
+	$(CC) -shared $(LIB_GGI) -o $@ $^ $(LCFLAGS)
 
 lib/sdl.so: $(PLUGIN_SDL)
-	$(CC) $(LCFLAGS) -shared $(LIB_SDL) -o $@ $^
+	$(CC) -shared $(LIB_SDL) -o $@ $^ $(LCFLAGS)
 
 lib/yuv.so: $(PLUGIN_YUV)
 ifeq ($(SYS),beos)
 	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
-	$(CC) $(LCFLAGS) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS)
 endif
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
 ifeq ($(SYS),beos)
 	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
-	$(CC) $(LCFLAGS) -shared -o $@ $^
+	$(CC) -shared -o $@ $^ $(LCFLAGS)
 endif
 
 ################################################################################

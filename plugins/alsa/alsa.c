@@ -52,12 +52,9 @@ static void aout_GetPlugin( p_aout_thread_t p_aout );
 
 /* Audio output */
 int     aout_AlsaOpen         ( aout_thread_t *p_aout );
-int     aout_AlsaReset        ( aout_thread_t *p_aout );
 int     aout_AlsaSetFormat    ( aout_thread_t *p_aout );
-int     aout_AlsaSetChannels  ( aout_thread_t *p_aout );
-int     aout_AlsaSetRate      ( aout_thread_t *p_aout );
 long    aout_AlsaGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
-void    aout_AlsaPlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
+void    aout_AlsaPlay         ( aout_thread_t *p_aout, byte_t *buffer,
                                int i_size );
 void    aout_AlsaClose        ( aout_thread_t *p_aout );
 
@@ -96,12 +93,9 @@ plugin_info_t * GetConfig( void )
 
 static void aout_GetPlugin( p_aout_thread_t p_aout )
 {
-    p_aout->p_sys_open        = aout_AlsaOpen;
-    p_aout->p_sys_reset       = aout_AlsaReset;
-    p_aout->p_sys_setformat   = aout_AlsaSetFormat;
-    p_aout->p_sys_setchannels = aout_AlsaSetChannels;
-    p_aout->p_sys_setrate     = aout_AlsaSetRate;
-    p_aout->p_sys_getbufinfo  = aout_AlsaGetBufInfo;
-    p_aout->p_sys_playsamples = aout_AlsaPlaySamples;
-    p_aout->p_sys_close       = aout_AlsaClose;
+    p_aout->p_open        = aout_AlsaOpen;
+    p_aout->p_setformat   = aout_AlsaSetFormat;
+    p_aout->p_getbufinfo  = aout_AlsaGetBufInfo;
+    p_aout->p_play        = aout_AlsaPlay;
+    p_aout->p_close       = aout_AlsaClose;
 }

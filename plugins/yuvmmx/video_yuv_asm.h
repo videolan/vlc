@@ -27,20 +27,23 @@
  *****************************************************************************/
 
 /* hope these constant values are cache line aligned */
-static unsigned long long mmx_80w     = 0x0080008000800080;
-static unsigned long long mmx_10w     = 0x1010101010101010;
-static unsigned long long mmx_00ffw   = 0x00ff00ff00ff00ff;
-static unsigned long long mmx_Y_coeff = 0x253f253f253f253f;
+#define UNUSED_LONGLONG(foo) \
+    static unsigned long long foo __attribute__((unused))
+UNUSED_LONGLONG(mmx_80w)     = 0x0080008000800080;
+UNUSED_LONGLONG(mmx_10w)     = 0x1010101010101010;
+UNUSED_LONGLONG(mmx_00ffw)   = 0x00ff00ff00ff00ff;
+UNUSED_LONGLONG(mmx_Y_coeff) = 0x253f253f253f253f;
 
-static unsigned long long mmx_U_green = 0xf37df37df37df37d;
-static unsigned long long mmx_U_blue  = 0x4093409340934093;
-static unsigned long long mmx_V_red   = 0x3312331233123312;
-static unsigned long long mmx_V_green = 0xe5fce5fce5fce5fc;
+UNUSED_LONGLONG(mmx_U_green) = 0xf37df37df37df37d;
+UNUSED_LONGLONG(mmx_U_blue)  = 0x4093409340934093;
+UNUSED_LONGLONG(mmx_V_red)   = 0x3312331233123312;
+UNUSED_LONGLONG(mmx_V_green) = 0xe5fce5fce5fce5fc;
 
-static unsigned long long mmx_redmask = 0xf8f8f8f8f8f8f8f8;
-static unsigned long long mmx_grnmask = 0xfcfcfcfcfcfcfcfc;
-static unsigned long long mmx_grnshift   = 0x03;
-static unsigned long long mmx_blueshift  = 0x03;
+UNUSED_LONGLONG(mmx_redmask) = 0xf8f8f8f8f8f8f8f8;
+UNUSED_LONGLONG(mmx_grnmask) = 0xfcfcfcfcfcfcfcfc;
+UNUSED_LONGLONG(mmx_grnshift)   = 0x03;
+UNUSED_LONGLONG(mmx_blueshift)  = 0x03;
+#undef UNUSED_LONGLONG
 
 #define MMX_INIT_16 "                                                       \n\
                                                                             \n\

@@ -6,7 +6,7 @@
 #export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
-export DH_COMPAT=1
+export DH_COMPAT=3
 
 build: build-stamp
 build-stamp:
@@ -15,9 +15,9 @@ build-stamp:
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
-		--enable-mmx --enable-gnome --enable-fb \
-		--enable-ggi --enable-esd --enable-glide \
-		--enable-sdl
+		--enable-gnome --enable-fb \
+		--with-ggi --enable-esd --with-glide \
+		--with-sdl
 	$(MAKE)
 
 	touch build-stamp

@@ -48,12 +48,9 @@ static void intf_GetPlugin( p_intf_thread_t p_intf );
 
 /* Audio output */
 int     aout_DummyOpen         ( aout_thread_t *p_aout );
-int     aout_DummyReset        ( aout_thread_t *p_aout );
 int     aout_DummySetFormat    ( aout_thread_t *p_aout );
-int     aout_DummySetChannels  ( aout_thread_t *p_aout );
-int     aout_DummySetRate      ( aout_thread_t *p_aout );
 long    aout_DummyGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
-void    aout_DummyPlaySamples  ( aout_thread_t *p_aout, byte_t *buffer,
+void    aout_DummyPlay         ( aout_thread_t *p_aout, byte_t *buffer,
                                  int i_size );
 void    aout_DummyClose        ( aout_thread_t *p_aout );
 
@@ -114,14 +111,11 @@ plugin_info_t * GetConfig( void )
 
 static void aout_GetPlugin( p_aout_thread_t p_aout )
 {
-    p_aout->p_sys_open        = aout_DummyOpen;
-    p_aout->p_sys_reset       = aout_DummyReset;
-    p_aout->p_sys_setformat   = aout_DummySetFormat;
-    p_aout->p_sys_setchannels = aout_DummySetChannels;
-    p_aout->p_sys_setrate     = aout_DummySetRate;
-    p_aout->p_sys_getbufinfo  = aout_DummyGetBufInfo;
-    p_aout->p_sys_playsamples = aout_DummyPlaySamples;
-    p_aout->p_sys_close       = aout_DummyClose;
+    p_aout->p_open        = aout_DummyOpen;
+    p_aout->p_setformat   = aout_DummySetFormat;
+    p_aout->p_getbufinfo  = aout_DummyGetBufInfo;
+    p_aout->p_play        = aout_DummyPlay;
+    p_aout->p_close       = aout_DummyClose;
 }
 
 static void vout_GetPlugin( p_vout_thread_t p_vout )

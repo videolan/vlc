@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.20 2001/01/07 04:31:18 henri Exp $
+ * $Id: input_programs.c,v 1.21 2001/01/07 16:17:58 sam Exp $
  *
  * Authors:
  *
@@ -84,15 +84,12 @@ void input_EndStream( input_thread_t * p_input )
         /* Don't put i instead of 0 !! */
         input_DelProgram( p_input, p_input->stream.pp_programs[0] );
     }
-    free( p_input->stream.pp_programs );
 
     /* Free standalone ES */
     for( i = 0; i < p_input->stream.i_es_number; i++ )
     {
         input_DelES( p_input, p_input->stream.pp_es[0] );
     }
-    free( p_input->stream.pp_es );
-    free( p_input->stream.pp_selected_es );
 }
 
 /*****************************************************************************
@@ -202,9 +199,6 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
         input_DelES( p_input, p_pgrm->pp_es[i_index] );
     }
 
-    /* Free the table of es descriptors */
-    free( p_pgrm->pp_es );
-
     /* Free the demux data */
     if( p_pgrm->p_demux_data != NULL )
     {
@@ -221,16 +215,19 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 
     /* Remove this program from the stream's list of programs */
     p_input->stream.i_pgrm_number--;
+
     p_input->stream.pp_programs[i_pgrm_index] =
         p_input->stream.pp_programs[p_input->stream.i_pgrm_number];
     p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
                                            p_input->stream.i_pgrm_number
                                             * sizeof(pgrm_descriptor_t *) );
 
-    if( p_input->stream.pp_programs == NULL)
+    if( p_input->stream.i_pgrm_number && p_input->stream.pp_programs == NULL)
     {
-        intf_ErrMsg( "Unable to realloc memory in input_DelProgram" );
+        intf_ErrMsg( "input error: unable to realloc program list"
+                     " in input_DelProgram" );
     }
+
     /* Free the description of this program */
     free( p_pgrm );
 }
@@ -360,7 +357,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
                 p_pgrm->pp_es = realloc( p_pgrm->pp_es,
                                          p_pgrm->i_es_number
                                           * sizeof(es_descriptor_t *));
-                if( p_pgrm->pp_es == NULL )
+                if( p_pgrm->i_es_number && p_pgrm->pp_es == NULL )
                 {
                     intf_ErrMsg( "Unable to realloc memory in input_DelES" );
                 }
@@ -391,7 +388,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     p_input->stream.pp_es = realloc( p_input->stream.pp_es,
                                      p_input->stream.i_es_number
                                       * sizeof(es_descriptor_t *));
-    if( p_input->stream.pp_es == NULL )
+    if( p_input->stream.i_es_number && p_input->stream.pp_es == NULL )
     {
         intf_ErrMsg( "Unable to realloc memory in input_DelES" );
     }

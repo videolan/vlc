@@ -35,25 +35,25 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
+
 #include "modules.h"
 #include "modules_inner.h"
-#include "modules_config.h"
 
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START( "Configuration for null module" )
-    ADD_PANE( "First" )
-        ADD_FRAME( "First test" )
+    ADD_PANE( "First pane" )
+        ADD_FRAME( "First frame" )
             ADD_COMMENT( "You can put whatever you want here." )
             ADD_STRING( "Random text: ", MODULE_VAR(text), NULL )
-        ADD_FRAME( "Second test" )
+        ADD_FRAME( "Second frame" )
             ADD_COMMENT( "The file below is not used." )
             ADD_FILE( "Select file: ", MODULE_VAR(file), NULL )
-        ADD_FRAME( "Third test" )
+        ADD_FRAME( "Third frame" )
             ADD_COMMENT( "This space intentionally left blank." )
-    ADD_PANE( "Second" )
-        ADD_FRAME( "NULL Frame" )
+    ADD_PANE( "Second pane" )
+        ADD_FRAME( "Frame" )
             ADD_COMMENT( "There is nothing in this frame." )
 MODULE_CONFIG_END
 
@@ -68,7 +68,7 @@ MODULE_CONFIG_END
 int InitModule( module_t * p_module )
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "the Null Module that does nothing";
+    p_module->psz_longname = "the Null module that does nothing";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL;
@@ -86,7 +86,11 @@ int InitModule( module_t * p_module )
  *****************************************************************************/
 int ActivateModule( module_t * p_module )
 {
+    /* Since the Null module can't do anything, there is no need to
+     * fill the p_functions structure. */
+    p_module->p_functions = NULL;
     p_module->p_config = p_config;
+
     return( 0 );
 }
 
@@ -99,6 +103,7 @@ int ActivateModule( module_t * p_module )
  *****************************************************************************/
 int DeactivateModule( module_t * p_module )
 {
+    /* We didn't allocate p_functions - so we don't have to free it */
     return( 0 );
 }
 

@@ -47,6 +47,7 @@
 #include "threads.h"
 #include "mtime.h"                             /* mtime_t, mdate(), msleep() */
 #include "plugins.h"
+#include "modules.h"
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
@@ -99,9 +100,6 @@ static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long
 aout_thread_t *aout_CreateThread( int *pi_status )
 {
     aout_thread_t * p_aout;                             /* thread descriptor */
-    typedef void    ( aout_getplugin_t ) ( aout_thread_t * p_aout );
-    int             i_index;
-    int             i_best_index = 0, i_best_score = 0;
 #if 0
     int             i_status;                               /* thread status */
 #endif
@@ -113,41 +111,31 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
-    /* Get a suitable audio plugin */
-    for( i_index = 0 ; i_index < p_main->p_bank->i_plugin_count ; i_index++ )
-    {
-        /* If there's a plugin in p_info ... */
-        if( p_main->p_bank->p_info[ i_index ] != NULL )
-        {
-            /* ... and if this plugin provides the functions we want ... */
-            if( p_main->p_bank->p_info[ i_index ]->aout_GetPlugin != NULL )
-            {
-                /* ... and if this plugin has a good score ... */
-                if( p_main->p_bank->p_info[ i_index ]->i_score > i_best_score )
-                {
-                    /* ... then take it */
-                    i_best_score = p_main->p_bank->p_info[ i_index ]->i_score;
-                    i_best_index = i_index;
-                }
-            }
-        }
-    }
+    /* Choose the best module */
+    p_aout->p_module = module_Need( p_main->p_module_bank,
+                                    MODULE_CAPABILITY_AOUT, NULL );
 
-    if( i_best_score == 0 )
+    if( p_aout->p_module == NULL )
     {
+        intf_ErrMsg( "aout error: no suitable aout module" );
         free( p_aout );
         return( NULL );
     }
 
-    /* Get the plugin functions */
-    ( (aout_getplugin_t *)
-      p_main->p_bank->p_info[ i_best_index ]->aout_GetPlugin )( p_aout );
+#define aout_functions p_aout->p_module->p_functions->aout.functions.aout
+    p_aout->p_open       = aout_functions.p_open;
+    p_aout->p_setformat  = aout_functions.p_setformat;
+    p_aout->p_getbufinfo = aout_functions.p_getbufinfo;
+    p_aout->p_play       = aout_functions.p_play;
+    p_aout->p_close      = aout_functions.p_close;
+#undef aout_functions
 
     /*
      * Initialize audio device
      */
-    if ( p_aout->p_sys_open( p_aout ) )
+    if ( p_aout->p_open( p_aout ) )
     {
+        module_Unneed( p_main->p_module_bank, p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -155,27 +143,10 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0; /* FIXME: only works
                                                    for i_channels == 1 or 2 ??*/
 
-    if ( p_aout->p_sys_reset( p_aout ) )
+    if ( p_aout->p_setformat( p_aout ) )
     {
-        p_aout->p_sys_close( p_aout );
-        free( p_aout );
-        return( NULL );
-    }
-    if ( p_aout->p_sys_setformat( p_aout ) )
-    {
-        p_aout->p_sys_close( p_aout );
-        free( p_aout );
-        return( NULL );
-    }
-    if ( p_aout->p_sys_setchannels( p_aout ) )
-    {
-        p_aout->p_sys_close( p_aout );
-        free( p_aout );
-        return( NULL );
-    }
-    if ( p_aout->p_sys_setrate( p_aout ) )
-    {
-        p_aout->p_sys_close( p_aout );
+        p_aout->p_close( p_aout );
+        module_Unneed( p_main->p_module_bank, p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -188,7 +159,8 @@ aout_thread_t *aout_CreateThread( int *pi_status )
      * this thread is only called in main and all calls are blocking */
     if( aout_SpawnThread( p_aout ) )
     {
-        p_aout->p_sys_close( p_aout );
+        p_aout->p_close( p_aout );
+        module_Unneed( p_main->p_module_bank, p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -362,8 +334,11 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     }
     vlc_mutex_destroy( &p_aout->fifos_lock );
     
+    /* Release the aout module */
+    module_Unneed( p_main->p_module_bank, p_aout->p_module );
+
     /* Free the structure */
-    p_aout->p_sys_close( p_aout );
+    p_aout->p_close( p_aout );
     intf_DbgMsg("aout debug: audio device (%s) closed", p_aout->psz_device);
 
     /* Free structure */
@@ -822,9 +797,9 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
             ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256 ) + 128 ) * p_aout->vol / 256 );
             p_aout->s32_buffer[l_buffer] = 0;
         }
-        l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
+        l_bytes = p_aout->p_getbufinfo( p_aout, l_buffer_limit );
         p_aout->date = mdate() + ((((mtime_t)(l_bytes / 1 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 1 */
-        p_aout->p_sys_playsamples( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
+        p_aout->p_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
         if ( l_bytes > (l_buffer_limit * sizeof(u8) * 2) ) /* There are 2 channels (left & right) */
         {
             msleep( p_aout->l_msleep );
@@ -1113,9 +1088,9 @@ void aout_Thread_U8_Stereo( aout_thread_t * p_aout )
             ((u8 *)p_aout->buffer)[l_buffer] = (u8)( ( (p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS / 256) + 128 ) * p_aout->vol / 256 );
             p_aout->s32_buffer[l_buffer] = 0;
         }
-        l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
+        l_bytes = p_aout->p_getbufinfo( p_aout, l_buffer_limit );
         p_aout->date = mdate() + ((((mtime_t)(l_bytes / 2 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 2 */
-        p_aout->p_sys_playsamples( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
+        p_aout->p_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
         if ( l_bytes > (l_buffer_limit * sizeof(u8)) )
         {
             msleep( p_aout->l_msleep );
@@ -1408,9 +1383,9 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
             p_aout->s32_buffer[l_buffer] = 0;
         }
 
-        l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
+        l_bytes = p_aout->p_getbufinfo( p_aout, l_buffer_limit );
         p_aout->date = mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(s16) << (p_aout->b_stereo) == 4 */
-        p_aout->p_sys_playsamples( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(s16) );
+        p_aout->p_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(s16) );
         if ( l_bytes > (l_buffer_limit * sizeof(s16)) )
         {
             msleep( p_aout->l_msleep );

@@ -2,7 +2,7 @@
  * aout_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_beos.cpp,v 1.7 2001/01/05 18:46:43 massiot Exp $
+ * $Id: aout_beos.cpp,v 1.8 2001/01/07 16:17:58 sam Exp $
  *
  * Authors:
  * Samuel Hocevar <sam@via.ecp.fr>
@@ -135,34 +135,11 @@ int aout_BeOpen( aout_thread_t *p_aout )
 
     return( 0 );
 }
-/*****************************************************************************
- * aout_BeReset: resets the dsp
- *****************************************************************************/
-int aout_BeReset( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
 
 /*****************************************************************************
  * aout_BeSetFormat: sets the dsp output format
  *****************************************************************************/
 int aout_BeSetFormat( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_BeSetChannels: sets the dsp's stereo or mono mode
- *****************************************************************************/
-int aout_BeSetChannels( aout_thread_t *p_aout )
-{
-    return( 0 );
-}
-
-/*****************************************************************************
- * aout_BeSetRate: sets the dsp's audio output rate
- *****************************************************************************/
-int aout_BeSetRate( aout_thread_t *p_aout )
 {
     return( 0 );
 }
@@ -185,11 +162,11 @@ long aout_BeGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_BePlaySamples: plays a sound samples buffer
+ * aout_BePlay: plays a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-void aout_BePlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_BePlay( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     long i_newbuf_pos;
 
