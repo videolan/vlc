@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.7 2002/05/20 19:49:18 gbazin Exp $
+ * $Id: ipv6.c,v 1.8 2002/05/21 06:55:48 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -120,14 +120,14 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
     if( wship6_dll )
     {
         _getaddrinfo = (GETADDRINFO) GetProcAddress( wship6_dll,
-                                                      "getaddrinfo" );
+                                                     "getaddrinfo" );
         _freeaddrinfo = (FREEADDRINFO) GetProcAddress( wship6_dll,
                                                        "freeaddrinfo" );
     }
     if( !_getaddrinfo || !_freeaddrinfo )
     {
         intf_ErrMsg( "ipv6 error: no IPv6 stack installed" );
-        FreeLibrary( wship6_dll );
+        if( wship6_dll ) FreeLibrary( wship6_dll );
         return( -1 );
     }
 #endif
