@@ -426,7 +426,7 @@ static int Quit( int i_argc, intf_arg_t *p_argv )
  ******************************************************************************/
 static int SelectPID( int i_argc, intf_arg_t *p_argv )
 {
-    int i_input, i_pid;
+    int i_input = -1, i_pid = -1;
     int i_arg;
   
     /* Parse parameters - see command list above */

@@ -94,7 +94,7 @@ typedef struct video_synchro_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-boolean_t vpar_SynchroChoose( struct vpar_thread_s * p_vpar, int i_coding_type, 
+boolean_t vpar_SynchroChoose( struct vpar_thread_s * p_vpar, int i_coding_type,
                          int i_structure );
 void vpar_SynchroTrash( struct vpar_thread_s * p_vpar, int i_coding_type,
                         int i_structure );
@@ -102,3 +102,7 @@ void vpar_SynchroDecode( struct vpar_thread_s * p_vpar, int i_coding_type,
                             int i_structure );
 void vpar_SynchroEnd( struct vpar_thread_s * p_vpar );
 mtime_t vpar_SynchroDate( struct vpar_thread_s * p_vpar );
+
+#ifndef SAM_SYNCHRO
+void vpar_SynchroKludge( struct vpar_thread_s *, mtime_t );
+#endif

@@ -1270,6 +1270,7 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
  * calculated to minimize the cache interactions of the 3 tables.
  */
 
+#if 0
 static void yuvToRgb24 (unsigned char * Y,
 			unsigned char * U, unsigned char * V,
 			char * dest, int table[1935], int width)
@@ -1426,4 +1427,4 @@ static void yuvToRgb24 (unsigned char * Y,
 	*(dest++) = tmp24 >> 16;
     }
 }
-
+#endif

@@ -158,7 +158,13 @@ static int CheckConfiguration( video_cfg_t *p_cfg )
  *******************************************************************************/
 static int InitThread( vpar_thread_t *p_vpar )
 {
-    int     i_dummy;
+#ifdef VDEC_SMP
+    int i_dummy;
+#endif
+
+#ifdef SAM_SYNCHRO
+    int i_dummy;
+#endif
 
     intf_DbgMsg("vpar debug: initializing video parser thread %p\n", p_vpar);
 
@@ -167,6 +173,11 @@ static int InitThread( vpar_thread_t *p_vpar )
     vlc_mutex_lock( &p_vpar->fifo.data_lock );
     while ( DECODER_FIFO_ISEMPTY(p_vpar->fifo) )
     {
+        if ( p_vpar->b_die )
+        {
+            vlc_mutex_unlock( &p_vpar->fifo.data_lock );
+            return( 1 );
+        }
         vlc_cond_wait( &p_vpar->fifo.data_wait, &p_vpar->fifo.data_lock );
     }
     p_vpar->bit_stream.p_ts = DECODER_FIFO_START( p_vpar->fifo )->p_first_ts;
@@ -308,10 +319,7 @@ static void RunThread( vpar_thread_t *p_vpar )
      * Initialize thread 
      */
     p_vpar->b_error = InitThread( p_vpar );
-    if( p_vpar->b_error )
-    {
-        return;
-    }
+
     p_vpar->b_run = 1;
 
     /*
@@ -346,9 +354,10 @@ static void RunThread( vpar_thread_t *p_vpar )
         ErrorThread( p_vpar );
     }
 
+    p_vpar->b_run = 0;
+
     /* End of thread */
     EndThread( p_vpar );
-    p_vpar->b_run = 0;
 }
 
 /*******************************************************************************
@@ -360,25 +369,26 @@ static void RunThread( vpar_thread_t *p_vpar )
  *******************************************************************************/
 static void ErrorThread( vpar_thread_t *p_vpar )
 {
-    /* Wait until a `die' order */
+    /* We take the lock, because we are going to read/write the start/end
+     * indexes of the decoder fifo */
+    vlc_mutex_lock( &p_vpar->fifo.data_lock );
+
+    /* Wait until a `die' order is sent */
     while( !p_vpar->b_die )
     {
-        /* We take the lock, because we are going to read/write the start/end
-         * indexes of the parser fifo */
-        vlc_mutex_lock( &p_vpar->fifo.data_lock );
-
-        /* ?? trash all trashable PES packets */
+        /* Trash all received PES packets */
         while( !DECODER_FIFO_ISEMPTY(p_vpar->fifo) )
         {
-            input_NetlistFreePES( p_vpar->bit_stream.p_input,
-                                  DECODER_FIFO_START(p_vpar->fifo) );
+            input_NetlistFreePES( p_vpar->bit_stream.p_input, DECODER_FIFO_START(p_vpar->fifo) );
             DECODER_FIFO_INCSTART( p_vpar->fifo );
         }
 
-        vlc_mutex_unlock( &p_vpar->fifo.data_lock );
-        /* Sleep a while */
-        msleep( VPAR_IDLE_SLEEP );
+        /* Waiting for the input thread to put new PES packets in the fifo */
+        vlc_cond_wait( &p_vpar->fifo.data_wait, &p_vpar->fifo.data_lock );
     }
+
+    /* We can release the lock before leaving */
+    vlc_mutex_unlock( &p_vpar->fifo.data_lock );
 }
 
 /*******************************************************************************
@@ -434,6 +444,8 @@ static void EndThread( vpar_thread_t *p_vpar )
 #else
     free( p_vpar->pp_vdec[0] );
 #endif
+
+    free( p_vpar );
 
     intf_DbgMsg("vpar debug: EndThread(%p)\n", p_vpar);
 }

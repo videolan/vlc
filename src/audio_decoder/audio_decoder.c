@@ -713,12 +713,12 @@ static int InitThread( adec_thread_t * p_adec )
     vlc_mutex_lock( &p_adec->fifo.data_lock );
     while ( DECODER_FIFO_ISEMPTY(p_adec->fifo) )
     {
-        vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
-        if ( p_adec->bit_stream.p_input->b_die )
+        if ( p_adec->b_die )
         {
             vlc_mutex_unlock( &p_adec->fifo.data_lock );
             return( -1 );
         }
+        vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
     }
     p_adec->bit_stream.p_ts = DECODER_FIFO_START( p_adec->fifo )->p_first_ts;
     p_adec->bit_stream.i_byte = p_adec->bit_stream.p_ts->i_payload_start;
@@ -842,7 +842,7 @@ static void RunThread( adec_thread_t * p_adec )
                      * l_end_frame index would be incremented 6 times. But, if after
                      * this operation the audio output fifo contains less than 6 frames,
                      * it would mean that we had not enough room to store the 6 frames :-P */
-                    while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* !! */
+                    while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* XXX */
                     {
                         vlc_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
                     }

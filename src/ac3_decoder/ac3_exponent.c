@@ -29,19 +29,10 @@ static const s16 exps_2[128] = { -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, 0, 0, 0
 
 static const s16 exps_3[128] = { -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0, 1, 2, -2, -1, 0 };
 
-/*
-static const s16 exps_1[128] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5 };
-static const s16 exps_2[128] = { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 0, 0, 0 };
-static const s16 exps_3[128] = { 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2 };
-*/
-
-static __inline__ void exp_unpack_ch( u16 type, u16 expstr, u16 ngrps, u16 initial_exp, u16 exps[], u16 * dest )
+static __inline__ void exp_unpack_ch( ac3dec_thread_t * p_ac3dec, u16 type, u16 expstr, u16 ngrps, u16 initial_exp, u16 exps[], u16 * dest )
 {
 	u16 i,j;
 	s16 exp_acc;
-	/*
-	s16 exp_1,exp_2,exp_3;
-	*/
 
 	if ( expstr == EXP_REUSE )
 	{
@@ -65,12 +56,11 @@ static __inline__ void exp_unpack_ch( u16 type, u16 expstr, u16 ngrps, u16 initi
 		case EXP_D45:
 			for ( i = 0; i < ngrps; i++ )
 			{
-#ifdef AC3_SIGSEGV
-				if ( exps[i] > 127 )
+				if ( exps[i] > 124 )
 				{
 					fprintf( stderr, "ac3dec debug: invalid exponent\n" );
+					p_ac3dec->b_invalid = 1;
 				}
-#endif
 				exp_acc += (exps_1[exps[i]] /*- 2*/);
 				dest[j++] = exp_acc;
 				dest[j++] = exp_acc;
@@ -92,12 +82,11 @@ static __inline__ void exp_unpack_ch( u16 type, u16 expstr, u16 ngrps, u16 initi
 		case EXP_D25:
 			for ( i = 0; i < ngrps; i++ )
 			{
-#ifdef AC3_SIGSEGV
-				if ( exps[i] > 127 )
+				if ( exps[i] > 124 )
 				{
 					fprintf( stderr, "ac3dec debug: invalid exponent\n" );
+					p_ac3dec->b_invalid = 1;
 				}
-#endif
 				exp_acc += (exps_1[exps[i]] /*- 2*/);
 				dest[j++] = exp_acc;
 				dest[j++] = exp_acc;
@@ -113,12 +102,11 @@ static __inline__ void exp_unpack_ch( u16 type, u16 expstr, u16 ngrps, u16 initi
 		case EXP_D15:
 			for ( i = 0; i < ngrps; i++ )
 			{
-#ifdef AC3_SIGSEGV
-				if ( exps[i] > 127 )
+				if ( exps[i] > 124 )
 				{
 					fprintf( stderr, "ac3dec debug: invalid exponent\n" );
+					p_ac3dec->b_invalid = 1;
 				}
-#endif
 				exp_acc += (exps_1[exps[i]] /*- 2*/);
 				dest[j++] = exp_acc;
 				exp_acc += (exps_2[exps[i]] /*- 2*/);
@@ -127,72 +115,7 @@ static __inline__ void exp_unpack_ch( u16 type, u16 expstr, u16 ngrps, u16 initi
 				dest[j++] = exp_acc;
 			}
 			break;
-
-		default:
-			fprintf( stderr, "ac3dec debug: expstr == %i <maxx@via.ecp.fr>\n", expstr );
-			break;
 	}
-#if 0
-	for ( i = 0; i < ngrps; i++ )
-	{
-		/*
-		if ( exps[i] > 124 )
-		{
-			//FIXME set an error flag and mute the frame
-			fprintf( stderr, "!! Invalid exponent !!\n" );
-//			exit( 1 );
-		}
-		*/
-
-		/*
-		exp_1 = exps[i] / 25;
-		exp_2 = (exps[i] - (exp_1 * 25)) / 5;
-		exp_3 = exps[i] - (exp_1 * 25) - (exp_2 * 5) ;
-		*/
-
-		switch ( expstr )
-		{
-			case EXP_D45:
-				exp_acc += (exps_1[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				exp_acc += (exps_2[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				exp_acc += (exps_3[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-			break;
-
-			case EXP_D25:
-				exp_acc += (exps_1[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				exp_acc += (exps_2[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-				exp_acc += (exps_3[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				dest[j++] = exp_acc;
-			break;
-
-			case EXP_D15:
-				exp_acc += (exps_1[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				exp_acc += (exps_2[exps[i]] - 2);
-				dest[j++] = exp_acc;
-				exp_acc += (exps_3[exps[i]] - 2);
-				dest[j++] = exp_acc;
-			break;
-		}
-	}
-#endif
 }
 
 void exponent_unpack( ac3dec_thread_t * p_ac3dec )
@@ -201,16 +124,16 @@ void exponent_unpack( ac3dec_thread_t * p_ac3dec )
 
 	for ( i = 0; i < p_ac3dec->bsi.nfchans; i++ )
 	{
-		exp_unpack_ch( UNPACK_FBW, p_ac3dec->audblk.chexpstr[i], p_ac3dec->audblk.nchgrps[i], p_ac3dec->audblk.exps[i][0], &p_ac3dec->audblk.exps[i][1], p_ac3dec->audblk.fbw_exp[i] );
+		exp_unpack_ch( p_ac3dec, UNPACK_FBW, p_ac3dec->audblk.chexpstr[i], p_ac3dec->audblk.nchgrps[i], p_ac3dec->audblk.exps[i][0], &p_ac3dec->audblk.exps[i][1], p_ac3dec->audblk.fbw_exp[i] );
 	}
 
 	if ( p_ac3dec->audblk.cplinu )
 	{
-		exp_unpack_ch( UNPACK_CPL, p_ac3dec->audblk.cplexpstr, p_ac3dec->audblk.ncplgrps, p_ac3dec->audblk.cplabsexp << 1, p_ac3dec->audblk.cplexps, &p_ac3dec->audblk.cpl_exp[p_ac3dec->audblk.cplstrtmant] );
+		exp_unpack_ch( p_ac3dec, UNPACK_CPL, p_ac3dec->audblk.cplexpstr, p_ac3dec->audblk.ncplgrps, p_ac3dec->audblk.cplabsexp << 1, p_ac3dec->audblk.cplexps, &p_ac3dec->audblk.cpl_exp[p_ac3dec->audblk.cplstrtmant] );
 	}
 
 	if ( p_ac3dec->bsi.lfeon )
 	{
-		exp_unpack_ch( UNPACK_LFE, p_ac3dec->audblk.lfeexpstr, 2, p_ac3dec->audblk.lfeexps[0], &p_ac3dec->audblk.lfeexps[1], p_ac3dec->audblk.lfe_exp );
+		exp_unpack_ch( p_ac3dec, UNPACK_LFE, p_ac3dec->audblk.lfeexpstr, 2, p_ac3dec->audblk.lfeexps[0], &p_ac3dec->audblk.lfeexps[1], p_ac3dec->audblk.lfe_exp );
 	}
 }

@@ -100,91 +100,8 @@ static float exp_lut[ 25 ] =
 	3.63797880709171295166015625e-12,
 };
 
-#ifdef DITHER
-#if 0
-static u32 lfsr_state = 1;
-
-static __inline__ float dither_gen( u16 exp )
-{
-        int i;
-        u32 state;
-	s16 mantissa;
-
-        //explicitly bring the state into a local var as gcc > 3.0?
-        //doesn't know how to optimize out the stores
-        state = lfsr_state;
-
-        //Generate eight pseudo random bits
-        for(i=0;i<8;i++)
-        {
-                state <<= 1;
-
-                if(state & 0x10000)
-                        state ^= 0xa011;
-        }
-
-        lfsr_state = state;
-
-        mantissa = ((((s32)state<<8)>>8) * (s32) (0.707106f * 256.0f))>>16;
-	return( mantissa * exp_lut[exp] );
-}
-#else
-static int fuck[31] =
-{
-    0x00000001,
-    0x00000002,
-    0x00000004,
-    0x00000008,
-    0x00000010,
-    0x00000020,
-    0x00000040,
-    0x00000080,
-    0x00000100,
-    0x80000200,
-    0x00000400,
-    0x00000800,
-    0x00001000,
-    0x00002000,
-    0x00004000,
-    0x00008000,
-    0x80010000,
-    0x00020000,
-    0x00040000,
-    0x00080000,
-    0x00100000,
-    0x80200000,
-    0x00400000,
-    0x00800000,
-    0x01000000,
-    0x02000000,
-    0x04000000,
-    0x08000000,
-    0x10000000,
-    0x20000000,
-    0x40000000
-};
-
-static int index = 0;
-
-static __inline__ float dither_gen( u16 exp )
-{
-	int tmp;
-	fprintf( stderr, "dither suxx\n" );
-	tmp = fuck[(index+3)%31];
-	tmp ^= fuck[index];
-	fuck[index] = tmp;
-	index = (index+1)%31;
-        return( tmp * 1.52587890625e-5f * 0.707106f * exp_lut[exp] );
-}
-#endif
-#endif
-
 /* Fetch an unpacked, left justified, and properly biased/dithered mantissa value */
-#ifdef DITHER
-static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 dithflag, u16 exp )
-#else
 static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp )
-#endif
 {
 	u32 group_code;
 
@@ -192,12 +109,7 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 	switch ( bap )
 	{
 		case 0:
-#ifdef DITHER
-			if(dithflag)
-				return( dither_gen(exp) );
-			else
-#endif
-				return( 0 );
+			return( 0 );
 
 		case 1:
 			if ( q_1_pointer >= 0 )
@@ -209,16 +121,12 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 5 );
 			p_ac3dec->total_bits_read += 5;
 
-#ifdef AC3_SIGSEGV
 			if ( group_code > 26 )
 			{
-				//FIXME do proper block error handling
 				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
 				p_ac3dec->b_invalid = 1;
 			}
-#endif
 
-			//q_1[ 0 ] = q_1_0[ group_code ];
 			q_1[ 1 ] = q_1_1[ group_code ];
 			q_1[ 0 ] = q_1_2[ group_code ];
 
@@ -236,16 +144,12 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 7 );
 			p_ac3dec->total_bits_read += 7;
 
-#ifdef AC3_SIGSEGV
 			if ( group_code > 124 )
 			{
-				//FIXME do proper block error handling
 				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
 				p_ac3dec->b_invalid = 1;
 			}
-#endif
 
-			//q_2[ 0 ] = q_2_0[ group_code ];
 			q_2[ 1 ] = q_2_1[ group_code ];
 			q_2[ 0 ] = q_2_2[ group_code ];
 
@@ -259,14 +163,11 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 3 );
 			p_ac3dec->total_bits_read += 3;
 
-#ifdef AC3_SIGSEGV
 			if ( group_code > 6 )
 			{
-				//FIXME do proper block error handling
 				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
 				p_ac3dec->b_invalid = 1;
 			}
-#endif
 
 			return( q_3[group_code] * exp_lut[exp] );
 
@@ -280,16 +181,12 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 7 );
 			p_ac3dec->total_bits_read += 7;
 
-#ifdef AC3_SIGSEGV
 			if ( group_code > 120 )
 			{
-				//FIXME do proper block error handling
 				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
 				p_ac3dec->b_invalid = 1;
 			}
-#endif
 
-			//q_4[ 0 ] = q_4_0[ group_code ];
 			q_4[ 0 ] = q_4_1[ group_code ];
 
 			q_4_pointer = 0;
@@ -302,14 +199,11 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			DumpBits( &(p_ac3dec->bit_stream), 4 );
 			p_ac3dec->total_bits_read += 4;
 
-#ifdef AC3_SIGSEGV
 			if ( group_code > 14 )
 			{
-				//FIXME do proper block error handling
 				fprintf( stderr, "ac3dec debug: invalid mantissa\n" );
 				p_ac3dec->b_invalid = 1;
 			}
-#endif
 
 			return( q_5[group_code] * exp_lut[exp] );
 
@@ -328,7 +222,6 @@ static __inline__ void uncouple_channel( ac3dec_thread_t * p_ac3dec, u32 ch )
 	u32 bnd = 0;
 	u32 i,j;
 	float cpl_coord = 0;
-	//float coeff;
 	u32 cpl_exp_tmp;
 	u32 cpl_mant_tmp;
 
@@ -348,59 +241,12 @@ static __inline__ void uncouple_channel( ac3dec_thread_t * p_ac3dec, u32 ch )
 
 		for(j=0;j < 12; j++)
 		{
-			//Get new dither values for each channel if necessary, so
-			//the channels are uncorrelated
-#ifdef DITHER
-			if ( p_ac3dec->audblk.dithflag[ch] && p_ac3dec->audblk.cpl_bap[i] == 0 )
-				p_ac3dec->coeffs.fbw[ch][i] = cpl_coord * dither_gen( p_ac3dec->audblk.cpl_exp[i] );
-			else
-#endif
-				p_ac3dec->coeffs.fbw[ch][i]  = cpl_coord * p_ac3dec->audblk.cplfbw[i];
+			p_ac3dec->coeffs.fbw[ch][i]  = cpl_coord * p_ac3dec->audblk.cplfbw[i];
 			i++;
 		}
 	}
 }
 
-#if 0
-void
-uncouple(bsi_t *bsi,audblk_t *audblk,stream_coeffs_t *coeffs)
-{
-	int i,j;
-
-	for(i=0; i< bsi->nfchans; i++)
-	{
-		for(j=0; j < audblk->endmant[i]; j++)
-			 convert_to_float(audblk->fbw_exp[i][j],audblk->chmant[i][j],
-					 (u32*) &coeffs->fbw[i][j]);
-	}
-
-	if(audblk->cplinu)
-	{
-		for(i=0; i< bsi->nfchans; i++)
-		{
-			if(audblk->chincpl[i])
-			{
-				uncouple_channel(coeffs,audblk,i);
-			}
-		}
-
-	}
-
-	if(bsi->lfeon)
-	{
-		/* There are always 7 mantissas for lfe */
-		for(j=0; j < 7 ; j++)
-			 convert_to_float(audblk->lfe_exp[j],audblk->lfemant[j],
-					 (u32*) &coeffs->lfe[j]);
-
-	}
-
-}
-#endif
-
-/*
-void mantissa_unpack( bsi_t * bsi, audblk_t * audblk, bitstream_t * bs )
-*/
 void mantissa_unpack( ac3dec_thread_t * p_ac3dec )
 {
 	int i, j;
@@ -416,52 +262,28 @@ void mantissa_unpack( ac3dec_thread_t * p_ac3dec )
 		{
 			for ( j = 0; j < p_ac3dec->audblk.endmant[i]; j++ )
 			{
-#ifdef DITHER
-				p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j] );
-#else
 				p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.fbw_exp[i][j] );
-#endif
 			}
 		}
 
 		/* 2 */
 		for ( j = 0; j < p_ac3dec->audblk.endmant[i]; j++ )
 		{
-#ifdef DITHER
-			p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j] );
-#else
 			p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.fbw_exp[i][j] );
-#endif
 		}
 		for ( j = p_ac3dec->audblk.cplstrtmant; j < p_ac3dec->audblk.cplendmant; j++ )
 		{
-#ifdef DITHER
-			p_ac3dec->audblk.cplfbw[j] = float_get( p_ac3dec, p_ac3dec->audblk.cpl_bap[j], 0, p_ac3dec->audblk.cpl_exp[j] );
-#else
 			p_ac3dec->audblk.cplfbw[j] = float_get( p_ac3dec, p_ac3dec->audblk.cpl_bap[j], p_ac3dec->audblk.cpl_exp[j] );
-#endif
 		}
-//		uncouple_channel( coeffs, audblk, i );
+		uncouple_channel( p_ac3dec, i );
 
 		/* 3 */
 		for ( i++; i < p_ac3dec->bsi.nfchans; i++ )
 		{
 			for ( j = 0; j < p_ac3dec->audblk.endmant[i]; j++ )
 			{
-#ifdef DITHER
-				p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j] );
-#else
 				p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.fbw_exp[i][j] );
-#endif
 			}
-			if ( p_ac3dec->audblk.chincpl[i] )
-			{
-//				uncouple_channel( coeffs, audblk, i );
-			}
-		}
-
-		for ( i = 0; i < p_ac3dec->bsi.nfchans; i++ )
-		{
 			if ( p_ac3dec->audblk.chincpl[i] )
 			{
 				uncouple_channel( p_ac3dec, i );
@@ -474,11 +296,7 @@ void mantissa_unpack( ac3dec_thread_t * p_ac3dec )
 		{
 			for ( j = 0; j < p_ac3dec->audblk.endmant[i]; j++ )
 			{
-#ifdef DITHER
-				p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.dithflag[i], p_ac3dec->audblk.fbw_exp[i][j] );
-#else
 				p_ac3dec->coeffs.fbw[i][j] = float_get( p_ac3dec, p_ac3dec->audblk.fbw_bap[i][j], p_ac3dec->audblk.fbw_exp[i][j] );
-#endif
 			}
 		}
 	}
@@ -488,11 +306,7 @@ void mantissa_unpack( ac3dec_thread_t * p_ac3dec )
 		/* There are always 7 mantissas for lfe, no dither for lfe */
 		for ( j = 0; j < 7; j++ )
 		{
-#ifdef DITHER
-			p_ac3dec->coeffs.lfe[j] = float_get( p_ac3dec, p_ac3dec->audblk.lfe_bap[j], 0, p_ac3dec->audblk.lfe_exp[j] );
-#else
 			p_ac3dec->coeffs.lfe[j] = float_get( p_ac3dec, p_ac3dec->audblk.lfe_bap[j], p_ac3dec->audblk.lfe_exp[j] );
-#endif
 		}
 	}
 }

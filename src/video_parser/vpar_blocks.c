@@ -631,7 +631,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
     
     i_nc = 0;
     i_coef = 0;
-    for( i_parse = 0; ; i_parse++ )
+    for( i_parse = 0; !p_vpar->b_die; i_parse++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         if( i_code >= 16384 )
@@ -832,7 +832,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     
     i_coef = 0;
     b_vlc_intra = p_vpar->picture.b_intra_vlc_format;
-    for( i_parse = 1; /*i_parse < 64*/; i_parse++ )
+    for( i_parse = 1; !p_vpar->b_die/*i_parse < 64*/; i_parse++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         if( i_code >= 16384 )

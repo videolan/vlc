@@ -141,10 +141,6 @@ void ac3dec_DestroyThread( ac3dec_thread_t * p_ac3dec )
  *****************************************************************************/
 static __inline__ int decode_find_sync( ac3dec_thread_t * p_ac3dec )
 {
-#ifdef AC3_SIGSEGV
-    int i = 0;
-#endif
-
     while ( (!p_ac3dec->b_die) && (!p_ac3dec->b_error) )
     {
         NeedBits( &(p_ac3dec->bit_stream), 16 );
@@ -152,20 +148,9 @@ static __inline__ int decode_find_sync( ac3dec_thread_t * p_ac3dec )
         {
             DumpBits( &(p_ac3dec->bit_stream), 16 );
             p_ac3dec->total_bits_read = 16;
-#ifdef AC3_SIGSEGV
-	    if ( i )
-	    {
-		fprintf( stderr, "ac3dec debug: %i bit(s) skipped to synkronize\n", i );
-	    }
-#endif
             return( 0 );
         }
-#ifdef AC3_SIGSEGV
-        DumpBits( &(p_ac3dec->bit_stream), 1 );
-	i += 1;
-#else
-        DumpBits( &(p_ac3dec->bit_stream), 8 );
-#endif
+        DumpBits( &(p_ac3dec->bit_stream), 1 ); /* XXX */
     }
     return( -1 );
 }
@@ -184,12 +169,12 @@ static int InitThread( ac3dec_thread_t * p_ac3dec )
     vlc_mutex_lock( &p_ac3dec->fifo.data_lock );
     while ( DECODER_FIFO_ISEMPTY(p_ac3dec->fifo) )
     {
-        vlc_cond_wait( &p_ac3dec->fifo.data_wait, &p_ac3dec->fifo.data_lock );
-        if ( p_ac3dec->bit_stream.p_input->b_die )
+        if ( p_ac3dec->b_die )
         {
             vlc_mutex_unlock( &p_ac3dec->fifo.data_lock );
             return( -1 );
         }
+        vlc_cond_wait( &p_ac3dec->fifo.data_wait, &p_ac3dec->fifo.data_lock );
     }
     p_ac3dec->bit_stream.p_ts = DECODER_FIFO_START( p_ac3dec->fifo )->p_first_ts;
     p_ac3dec->bit_stream.i_byte = p_ac3dec->bit_stream.p_ts->i_payload_start;
@@ -220,7 +205,7 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
     msleep( (3 * INPUT_PTS_DELAY) / 4 );
 
     /* Initializing the ac3 decoder thread */
-    if ( InitThread(p_ac3dec) )
+    if ( InitThread(p_ac3dec) ) /* XXX */
     {
         p_ac3dec->b_error = 1;
     }
@@ -258,9 +243,14 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 			p_ac3dec->p_aout_fifo->l_rate = 32000;
 			break;
 
-		default:
+		default: /* XXX */
 			fprintf( stderr, "ac3dec debug: invalid fscod\n" );
+			p_ac3dec->b_invalid = 1;
 			break;
+	}
+	if ( p_ac3dec->b_invalid ) /* XXX */
+	{
+		continue;
 	}
 
 	parse_bsi( p_ac3dec );
@@ -268,6 +258,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	/* frame 1 */
 	parse_audblk( p_ac3dec );
 	exponent_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
 	if ( p_ac3dec->b_invalid )
@@ -288,6 +282,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	/* frame 2 */
 	parse_audblk( p_ac3dec );
 	exponent_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
 	if ( p_ac3dec->b_invalid )
@@ -309,6 +307,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	/* frame 3 */
 	parse_audblk( p_ac3dec );
 	exponent_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
 	if ( p_ac3dec->b_invalid )
@@ -330,6 +332,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	/* frame 4 */
 	parse_audblk( p_ac3dec );
 	exponent_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
 	if ( p_ac3dec->b_invalid )
@@ -351,6 +357,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	/* frame 5 */
 	parse_audblk( p_ac3dec );
 	exponent_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
 	if ( p_ac3dec->b_invalid )
@@ -372,6 +382,10 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
 	/* frame 6 */
 	parse_audblk( p_ac3dec );
 	exponent_unpack( p_ac3dec );
+	if ( p_ac3dec->b_invalid )
+	{
+		continue;
+	}
 	bit_allocate( p_ac3dec );
 	mantissa_unpack( p_ac3dec );
 	if ( p_ac3dec->b_invalid )

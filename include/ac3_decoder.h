@@ -3,8 +3,6 @@
  * (c)1999 VideoLAN
  *****************************************************************************/
 
-#define AC3_SIGSEGV
-
 /* Exponent strategy constants */
 #define EXP_REUSE       (0)
 #define EXP_D15         (1)
