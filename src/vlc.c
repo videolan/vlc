@@ -157,6 +157,7 @@ static void SigHandler( int i_signal )
 #endif
 
 #if defined(UNDER_CE)
+#include "vlc_common.h"
 /*****************************************************************************
  * WinMain: parse command line, start interface and spawn threads. (WinCE only)
  *****************************************************************************/
@@ -166,17 +167,17 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     char **argv, psz_cmdline[MAX_PATH];
     int argc, i_ret;
 
-    WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, lpCmdLine, -1,
+    WideCharToMultiByte( CP_ACP, 0, lpCmdLine, -1,
                          psz_cmdline, MAX_PATH, NULL, NULL );
 
     argv = vlc_parse_cmdline( psz_cmdline, &argc );
     argv = realloc( argv, (argc + 1) * sizeof(char *) );
     if( !argv ) return -1;
 
-    if( argc ) memmove( argv + 1, argv, argc );
-    argv[0] = strdup(""); /* Fake program path */
+    if( argc ) memmove( argv + 1, argv, argc * sizeof(char *) );
+    argv[0] = ""; /* Fake program path */
 
-    i_ret = main( argc, argv );
+    i_ret = main( argc + 1, argv );
 
     /* No need to free the argv memory */
     return i_ret;
