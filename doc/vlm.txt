@@ -1,0 +1,158 @@
+VLM: VideoLAN (Media) Manager
+
+VLM is a little media manager originally designed to launch multiple
+streams with only one VLC.
+
+I - Interfaces
+ 1) Telnet interface
+    You can launch it as a common interface.
+    Default port is 4212, default password is "admin". These are common
+    options of the interface, so you can modify them as you wish.
+    Once you are connected on telnet interface, just type a command
+    line.
+
+ 2) HTTP interface
+    Not finished yet. Please be a little more patient !
+
+II - VLM Elements
+ 1) Medias
+    A media is composed with a list of inputs (the videos and audios you
+    want to stream), an output (where you want to stream them), and some
+    options.
+    There are two types of medias: vod and broadcast.
+    A vod media is commonly used for Video on Demand. It can be launched
+    only if a vod client asks for it.
+    A broadcast media is very close to a TV program, or channel: it is
+    launched, stopped, paused by the administrator (or a schedule), may
+    be repeated several times etc.
+
+ 2) Schedules
+    A Schedule is a script with a date. When the current date is the
+    schedule date, the script is launched. There are of course other
+    options, like a period, a number of repetitions, etc. for the
+    schedule to be launched several times (or endlessly) automatically.
+
+III - Command line syntax:
+Note: an element is a media or a schedule.
+ 1) Command lines:
+    help
+        Displays an exhaustive commmand lines list.
+
+    new (name) vod|broadcast|schedule [properties]
+        Creates a new element. You must specify if it as a vod media, a
+        broadcast media, or a schedule (there is no default type).
+        "media" and "schedule" are reserved names, and element names
+        must be unique.
+        Properties are optional: you can use the "setup" command to set
+        it.
+    setup (name) (properties)
+        Set the property of the (name) element.
+        See Properties section for more information.
+    show [(name)|media|schedule]
+        Displays current element states and configurations.
+        "show (name)" displays all information about the (name) element.
+        "show media" displays a summary of medias states.
+        "show schedule" displays a summary of schedules states.
+        "show" is a the same as "show media show schedule".
+    del (name)|all|media|schedule
+        Destroys an element, or a group of elements. If the element is
+        at a non-stop state, it stops it (media or schedule).
+        "del (name)" destroys the (name) element.
+        "del all" destroys all elements.
+        "del media" destroys all medias.
+        "del schedule" destroys all schedules.
+    control (name) (command)
+        Changes the state of the (name) media.
+        See Commands section for more information.
+    save (config_file)
+        Saves all media and schedule configurations in the (config_file)
+        configuration file. the "save" command overwrites the file if it
+        already exists. States (playing, paused, stop) are not saved.
+        See Configuration File section for more information.
+    load (config_file)
+        Loads the (config_file) configuration file.
+        See Configuration File section for more information.
+
+ 2) Properties:
+ Note: except the "append" property, all property can be followed by
+ another one, recursively.For example:
+ "setup pouet input file://arf.avi output udp:127.0.0.1 enabled loop"
+ is a valid command line.
+    Media Properties Syntax:
+        input (input_name)
+            Adds (input_name) at the end of the media input list.
+        output (output_name)
+            Defines the output of the media.
+            The syntax is equivalent to the ":sout=..." option , but you
+            do not have to put the ":sout=" string.
+        option (option_name)[=value]
+            Adds the (option_name) to the media option list.
+            The syntax is equivalent to the ":(option)=..." option , but you
+            do not have to put the ":" string.
+            Options are global: they are applied to all inputs of the
+            media.
+        enabled|disabled
+            Enable or Disable the media.
+            If a media is disabled, it can not be streamed, paused,
+            launched by a schedule, or played as a VoD.
+        loop|unloop
+            Used for broadcast only.
+            If a media with "loop" option receives the "play" command
+            and finally finishes to play the last input of the list, it
+            will automatically restart to play the input list.
+
+    Schedule Properties Syntax:
+        enabled|disabled
+            A disabled schedule will never be launched.
+        append (command)
+            Adds a command to the command line list.
+            The command line can be every command the VLM can understand.
+            Note: the rest of the line will be considered as part of the
+            command line. You cannot put another option after the
+            "append" one.
+        date (year)/(month)/(day)-(hour):(minutes):(seconds)|now
+            Specifies the first date the schedule should be launched.
+            the date must have the explicit form:
+            (year)/(month)/(day)-(hour):(minutes):(seconds)
+            For example: 2004/03/07-12:42:30
+            If you write "now" instead of a date, the schedule will be
+            launch as soon as possible (as soon as it is enabled), and
+            the current date will be used as the first date of the
+            schedule (for repeating).
+        period (years)/(months)/(days)-(hours):(minutes):(seconds)
+            Specifies the period of time a schedule must wait for
+            launching itself another time.
+            For now, the period has a very close syntax to a date:
+            months are considered as 30 days
+            years are considered as 12 months.
+            If a period is specified without a "repeat", it will be
+            launched endlessly.
+        repeat (number_of_repetitions)
+            Specifies the number of times the schedule has to be launch
+            again. For example, if a schedule has "repeat 3", it will be
+            launched 4 times.
+
+ 3) Control Commands Syntax:
+    play
+        Starts a broadcast media. The media begins to launch the first
+        item of the input list, then launches the next one, and so on
+        (like a playlist).
+    pause
+        Puts the broadcast media in paused status.
+    stop
+        Stops the broadcast media.
+    seek (percentage)
+        Seeks in the current playing item of input list.
+
+IV - The configuration file
+  A VLM configuration file is very simple: it is only a list of command
+  lines: one line corresponds to one command line.
+  If you want to create a configuration file, just edit a text file and
+  type a list of VLM command lines. But beware of recursive calls: you
+  can put a "load (file)" command in a configuration file, so for
+  example, if you put a "load pouet" in a pouet file, and you launch the
+  "load pouet" command, then pouet will be loaded endlessly, and VLC
+  will crash (at least).
+  The load command converts the medias and schedules configurations into
+  command lines, and writes them into a file.
+  Note: commentary system has not been implement yet.
