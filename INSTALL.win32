@@ -1,4 +1,4 @@
-$Id: INSTALL.win32,v 1.22 2004/01/24 21:06:51 hartman Exp $
+$Id: INSTALL.win32,v 1.23 2004/02/29 14:35:10 gbazin Exp $
 
 INSTALL file for the Windows9x/Me/NT4/2k/XP version of the VLC media player
 
@@ -28,6 +28,8 @@ If you want to build VLC from sources, you can do it in several ways:
 - natively on Windows, using cygwin (www.cygwin.com) with or without the
   unix emulation layer. This is the prefered way to compile vlc if you want
   to do it on Windows.
+  NOTE: This is the PREFERED way of building VLC natively (the others
+  are not as much tested so expect more difficulties with them).
 
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
   (MSYS is a minimal build environnement to compile unixish projects under
@@ -92,10 +94,10 @@ http://download.videolan.org/pub/testing/contrib/
 We also provide a package with all the libraries already compiled so it is
 actually really easy to compile a full-featured version of vlc (these compiled
 libraries will only work with mingw or cygwin):
-http://download.videolan.org/pub/testing/win32/contrib-20040106-win32-bin-gcc3.3.1-only.tar.bz2
+http://download.videolan.org/pub/testing/win32/contrib-20040229-win32-bin-gcc3.3.1-only.tar.bz2
 All you need to do is extract it in your root directory (the include files
 and libraries will be put in /usr/win32). You can do this with the following
-command: "tar xjvf contrib-20040106-win32-bin-gcc3.3.1-only.tar.bz2 -C /"
+command: "tar xjvf contrib-20040229-win32-bin-gcc3.3.1-only.tar.bz2 -C /"
 
 A complete list of the libraries on which we depend can be found here:
 http://developers.videolan.org/vlc/
@@ -119,13 +121,18 @@ along those lines:
   ./configure --host=i586-mingw32msvc --build=i386-linux \
       --disable-sdl --disable-gtk \
       --enable-nls \
-      --enable-ffmpeg --with-ffmpeg-mp3lame \
+      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --enable-faad \
       --enable-flac \
       --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
-      --disable-fribidi --disable-vcdx \
+      --with-fribidi-config-path=/usr/win32/bin \
+      --enable-livedotcom --with-livedotcom-tree=/usr/win32/live.com \
+      --enable-caca --with-caca-config-path=/usr/win32/bin \
+      --with-xml2-config-path=/usr/win32/bin \
+      --with-dvdnav-config-path=/usr/win32/bin \
+      --disable-cddax --disable-vcdx \
       --enable-debug
 
 If you are cross-compiling with our gcc-3.3.1 package, you can use something
@@ -139,14 +146,19 @@ along those lines:
   ./configure --host=i586-mingw32msvc --build=i386-linux \
       --disable-sdl --disable-gtk \
       --enable-nls \
-      --enable-ffmpeg --with-ffmpeg-mp3lame \
+      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --enable-faad \
       --enable-flac \
       --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
-      --disable-vcdx --enable-debug
+      --enable-livedotcom --with-livedotcom-tree=/usr/win32/live.com \
+      --enable-caca --with-caca-config-path=/usr/win32/bin \
+      --with-xml2-config-path=/usr/win32/bin \
+      --with-dvdnav-config-path=/usr/win32/bin \
+      --disable-cddax --disable-vcdx \
+      --enable-debug
 
 If you are using cygwin, you can build VLC with or without the unix emulation
 layer (without is usually better). To build without the emulaion layer, use
@@ -158,13 +170,18 @@ something like this:
   ./configure \
       --disable-sdl --disable-gtk \
       --enable-nls \
-      --enable-ffmpeg --with-ffmpeg-mp3lame \
+      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --enable-faad \
       --enable-flac \
       --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
+      --enable-livedotcom --with-livedotcom-tree=/usr/win32/live.com \
+      --enable-caca --with-caca-config-path=/usr/win32/bin \
+      --with-xml2-config-path=/usr/win32/bin \
+      --with-dvdnav-config-path=/usr/win32/bin \
+      --disable-cddax --disable-vcdx \
       --enable-debug
 
 If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
@@ -177,15 +194,19 @@ lines:
   LDFLAGS=-L/usr/win32/lib \
   ./configure \
       --disable-sdl --disable-gtk \
-      --disable-mkv \
       --enable-nls \
-      --enable-ffmpeg --with-ffmpeg-mp3lame \
+      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
       --enable-faad \
       --enable-flac \
       --enable-theora \
       --with-wx-config-path=/usr/win32/bin \
       --with-freetype-config-path=/usr/win32/bin \
       --with-fribidi-config-path=/usr/win32/bin \
+      --enable-caca --with-caca-config-path=/usr/win32/bin \
+      --with-xml2-config-path=/usr/win32/bin \
+      --with-dvdnav-config-path=/usr/win32/bin \
+      --disable-cddax --disable-vcdx \
+      --disable-mkv \
       --enable-debug
 
 See `./configure --help' for more information.
