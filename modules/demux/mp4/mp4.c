@@ -1652,7 +1652,7 @@ static void MP4_TrackDestroy( demux_t *p_demux,
     p_track->b_enable   = VLC_FALSE;
     p_track->b_selected = VLC_FALSE;
 
-    es_format_Init( &p_track->fmt, UNKNOWN_ES, 0 );
+    es_format_Clean( &p_track->fmt );
 
     for( i_chunk = 0; i_chunk < p_track->i_chunk_count; i_chunk++ )
     {
