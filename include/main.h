@@ -45,4 +45,5 @@ extern main_t *p_main;
  *******************************************************************************/
 int    main_GetIntVariable( char *psz_name, int i_default );
 char * main_GetPszVariable( char *psz_name, char *psz_default );
-
+void   main_PutIntVariable( char *psz_name, int i_value );
+void   main_PutPszVariable( char *psz_name, char *psz_value );

@@ -137,13 +137,10 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 /*******************************************************************************
  * vout_SysGetPicture: get current display buffer informations
  *******************************************************************************
- * This function returns the address of the current display buffer, and the
- * number of samples per line. For 15, 16 and 32 bits displays, this value is 
- * the number of pixels in a line.
+ * This function returns the address of the current display buffer.
  *******************************************************************************/
-byte_t * vout_SysGetPicture( vout_thread_t *p_vout, int *pi_eol_offset )
+byte_t * vout_SysGetPicture( vout_thread_t *p_vout )
 {
-    *pi_eol_offset = p_vout->i_width;
 //????
 //    return( p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ].data );        
 }

@@ -68,15 +68,12 @@
 
 /* Video */
 #include "video.h"
-#include "video_sys.h"
 #include "video_output.h"
 #include "video_decoder.h"
 
 /* Interface */
 #include "intf_cmd.h"
 #include "intf_ctrl.h"
-#include "intf_sys.h"
-#include "intf_console.h"
 #include "interface.h"
 
 #include "main.h"

@@ -119,8 +119,8 @@ p_intf_msg_t intf_MsgCreate( void )
     {
 #ifdef INTF_MSG_QUEUE
     /* Message queue initialization */
-    vlc_mutex_init( &p_intf_msg->lock );                     /* intialize lock */
-    p_intf_msg->i_count = 0;                                 /* queue is empty */
+    vlc_mutex_init( &p_msg->lock );                          /* intialize lock */
+    p_msg->i_count = 0;                                      /* queue is empty */
 #endif
 
 #ifdef DEBUG_LOG
@@ -293,9 +293,9 @@ void _intf_DbgMsgImm( char *psz_file, char *psz_function, int i_line,
 #ifdef INTF_MSG_QUEUE
 void intf_FlushMsg( void )
 {
-    vlc_mutex_lock( &p_program_data->intf_msg.lock );              /* get lock */
-    FlushLockedMsg( &p_program_data->intf_msg );             /* flush messages */
-    vlc_mutex_unlock( &p_program_data->intf_msg.lock );      /* give lock back */
+    vlc_mutex_lock( &p_main->p_msg->lock );                        /* get lock */
+    FlushLockedMsg( p_main->p_msg );                         /* flush messages */
+    vlc_mutex_unlock( &p_main->p_msg->lock );                /* give lock back */
 }
 #endif
 
@@ -325,7 +325,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     vasprintf( &psz_str, psz_format, ap );
     if( psz_str == NULL )
     {
-        fprintf(stderr, "Warning: can't store following message (%s): ", 
+        fprintf(stderr, "warning: can't store following message (%s): ", 
                 strerror(errno) );
         vfprintf(stderr, psz_format, ap );
         exit( errno );
@@ -336,7 +336,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     if( p_msg->i_count == INTF_MSG_QSIZE )            /* flush queue if needed */
     {  
 #ifdef DEBUG                 /* in debug mode, queue overflow causes a warning */
-        fprintf(stderr, "Warning: message queue overflow\n" );
+        fprintf(stderr, "warning: message queue overflow\n" );
 #endif
         FlushLockedMsg( p_msg );
     }
@@ -381,7 +381,7 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     vasprintf( &psz_str, psz_format, ap );
     if( psz_str == NULL )
     {
-        fprintf(stderr, "Warning: can't store following message (%s): ", 
+        fprintf(stderr, "warning: can't store following message (%s): ", 
                 strerror(errno) );
         fprintf(stderr, INTF_MSG_DBG_FORMAT, psz_file, psz_function, i_line );
 	vfprintf(stderr, psz_format, ap );
@@ -393,7 +393,7 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     if( p_msg->i_count == INTF_MSG_QSIZE )            /* flush queue if needed */
     {  
 #ifdef DEBUG                 /* in debug mode, queue overflow causes a warning */
-        fprintf(stderr, "Warning: message queue overflow\n" );
+        fprintf(stderr, "warning: message queue overflow\n" );
 #endif
         FlushLockedMsg( p_msg );
     }
@@ -481,7 +481,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
     /* Check if formatting function suceeded */
     if( psz_msg == NULL )
     {
-        fprintf( stderr, "intf error: *** can not format message (%s): %s ***\n", 
+        fprintf( stderr, "error: can not format message (%s): %s\n", 
                  strerror( errno ), p_msg->psz_msg );        
         return;        
     }
@@ -519,7 +519,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
 
 #else
 
-static void PrintMsg( interface_msg_message_t *p_msg )
+static void PrintMsg( intf_msg_item_t *p_msg )
 {
     /*
      * Print messages on screen 
@@ -534,8 +534,7 @@ static void PrintMsg( interface_msg_message_t *p_msg )
         fprintf( stderr, p_msg->psz_msg );
         break;
     case INTF_MSG_INTF:                                  /* interface messages */
-        intf_PrintXConsole( &p_main->intf_thread.xconsole, 
-                            p_msg->psz_msg );
+        intf_ConsolePrint( p_main->p_intf->p_console, p_msg->psz_msg );
         break;
     } 
 }

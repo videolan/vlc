@@ -215,7 +215,7 @@ endif
 
 ifeq ($(ARCH),MMX)
 ASM_OBJ = 			video_decoder_ref/idctmmx.o \
-						video_decoder_ref/yuv12-rgb16.o
+						video_output/yuv-mmx.o
 endif
 
 C_OBJ = $(interface_obj) \

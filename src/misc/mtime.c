@@ -12,6 +12,7 @@
  * Preamble
  ******************************************************************************/
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/time.h>
 
 #include "common.h"
@@ -82,24 +83,25 @@ void mwait( mtime_t date )
     {
         return;
     }
+#ifndef usleep
     tv_delay.tv_sec = delay / 1000000;
     tv_delay.tv_usec = delay % 1000000;
 
     /* see msleep() about select() errors */
     select( 0, NULL, NULL, NULL, &tv_delay );
+#else
+    usleep( delay );    
+#endif
 }
 
 /******************************************************************************
  * msleep: more precise sleep() (inline function)                        (ok ?)
  ******************************************************************************
- * This function uses select() in a classical way to implement a sleep() call
- * with a microsecond precision.
- * For synchronization purposes, mwait() should be prefered.
- ******************************************************************************
- * ?? decalre as inline
+ * Portable usleep() function.
  ******************************************************************************/
 void msleep( mtime_t delay )
 {
+#ifndef usleep
     struct timeval tv_delay;
 
     tv_delay.tv_sec = delay / 1000000;
@@ -109,4 +111,7 @@ void msleep( mtime_t delay )
      * (i.e. when a signal is sent to the thread, or when memory is full), and
      * can be ingnored. */
     select( 0, NULL, NULL, NULL, &tv_delay );
+#else
+    usleep( delay );
+#endif
 }

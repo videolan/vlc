@@ -25,8 +25,11 @@ typedef struct vout_thread_s
     int *               pi_status;                    /* temporary status flag */
 
     /* Common display properties */
+    boolean_t           b_info;              /* print additionnal informations */    
+    boolean_t           b_grayscale;             /* color or grayscale display */    
     int                 i_width;                /* current output method width */
     int                 i_height;              /* current output method height */
+    int                 i_bytes_per_line;/* bytes per line (including virtual) */    
     int                 i_screen_depth;                      /* bits per pixel */
     int                 i_bytes_per_pixel;                /* real screen depth */
     float               f_x_ratio;                 /* horizontal display ratio */
@@ -34,9 +37,18 @@ typedef struct vout_thread_s
 
 #ifdef STATS    
     /* Statistics */
-    count_t         c_loops;                               /* number of loops */
-    count_t         c_idle_loops;                     /* number of idle loops */
-    count_t         c_pictures;           /* number of pictures added to heap */
+    count_t             c_loops;                            /* number of loops */
+    count_t             c_idle_loops;                  /* number of idle loops */
+    count_t             c_pictures;        /* number of pictures added to heap */
+
+    /* FPS */
+    mtime_t             fps_sample[ VOUT_FPS_SAMPLES ];       /* samples dates */
+    int                 i_fps_index;                       /* index in samples */
+#endif
+
+#ifdef DEBUG_VIDEO
+    /* Video debugging informations */
+    mtime_t             picture_render_time;    /* last picture rendering time */
 #endif
 
     /* Output method */
@@ -49,12 +61,12 @@ typedef struct vout_thread_s
     /* YUV translation tables, for 15,16 and 24/32 bpp displays. 16 bits and 32
      * bits pointers points on the same data.
      * CAUTION: these tables are translated: their origin is -384 */
-    u16 *           pi_trans16_red;
-    u16 *           pi_trans16_green;
-    u16 *           pi_trans16_blue;
-    u32 *           pi_trans32_red;
-    u32 *           pi_trans32_green;
-    u32 *           pi_trans32_blue;          
+    u16 *               pi_trans16_red;
+    u16 *               pi_trans16_green;
+    u16 *               pi_trans16_blue;
+    u32 *               pi_trans32_red;
+    u32 *               pi_trans32_green;
+    u32 *               pi_trans32_blue;          
 } vout_thread_t;
 
 /*******************************************************************************

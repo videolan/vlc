@@ -60,7 +60,7 @@
 //#define MPEG2_COMPLIANT
 
 /* Define for profiling support */
-//#define STATS
+#define STATS
 
 /* Define for unthreaded version of the program - ?? not yet implemented */
 //#define NO_THREAD
@@ -230,6 +230,13 @@
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES               10
 
+/* Environment variable for grayscale output mode, and default value */
+#define VOUT_GRAYSCALE_VAR              "vlc_grayscale"
+#define VOUT_GRAYSCALE_DEFAULT          0
+
+/* Number of pictures required to computes the FPS rate */
+#define VOUT_FPS_SAMPLES                5
+
 /*
  * Time settings
  */
@@ -237,7 +244,7 @@
 /* Time during which the thread will sleep if it has nothing to 
  * display (in micro-seconds) */
 /* ?? this constant will probably evolve to a calculated value */
-#define VOUT_IDLE_SLEEP                 50000
+#define VOUT_IDLE_SLEEP                 20000
 
 /* Maximum lap of time allowed between the beginning of rendering and
  * display. If, compared to the current date, the next image is too
@@ -245,7 +252,7 @@
  * at least VOUT_IDLE_SLEEP plus the time required to render a few
  * images, to avoid trashing of decoded images */
 /* ?? this constant will probably evolve to a calculated value */
-#define VOUT_DISPLAY_DELAY              150000
+#define VOUT_DISPLAY_DELAY              100000
 
 /*
  * Framebuffer settings
@@ -261,6 +268,11 @@
 
 /* Allow use of X11 XShm (shared memory) extension if possible */
 #define VOUT_XSHM                       1
+
+/* Font maximum and minimum characters - characters outside this range are not
+ * printed - maximum range is 0-256 */
+#define VOUT_MIN_CHAR 1
+#define VOUT_MAX_CHAR 128
 
 /*******************************************************************************
  * Video parser configuration
@@ -363,12 +375,12 @@
 
 /* Maximal size of the message queue - in case of overflow, all messages in the
  * queue are printed by the calling thread */
-#define INTF_MSG_QSIZE                  32
+#define INTF_MSG_QSIZE                  64
 
 /* Define to enable messages queues - disabling messages queue can be usefull
  * when debugging, since it allows messages which would not otherwise be printed,
  * due to a crash, to be printed anyway */
-//#define INTF_MSG_QUEUE
+#define INTF_MSG_QUEUE
 
 /* Format of the header for debug messages. The arguments following this header
  * are the file (char *), the function (char *) and the line (int) in which the

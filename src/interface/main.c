@@ -38,16 +38,11 @@
 #define OPT_NOAUDIO             150
 #define OPT_STEREO              151
 #define OPT_MONO                152
-#define OPT_RATE                153
 
 #define OPT_NOVIDEO             160
-#define OPT_XDGA                161
-#define OPT_XSHM                162
-#define OPT_XNOSHM              163
-#define OPT_XNODGA              164
+#define OPT_COLOR               161
 
 #define OPT_NOVLANS             170
-#define OPT_VLAN_SERVER         171
  
 /* Long options */
 static const struct option longopts[] =
@@ -64,6 +59,8 @@ static const struct option longopts[] =
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },           
+    {   "grayscale",        0,          0,      'g' },    
+    {   "color",            0,          0,      OPT_COLOR },                
 
     /* VLAN management options */
     {   "novlans",          0,          0,      OPT_NOVLANS },
@@ -72,7 +69,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "h";
+static const char *psz_shortopts = "hg";
 
 /*******************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -187,18 +184,19 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
  *******************************************************************************/
 int main_GetIntVariable( char *psz_name, int i_default )
 {
-    char *psz_env;
+    char *      psz_env;                                  /* environment value */
+    char *      psz_end;                               /* end of parsing index */
+    long int    i_value;                                              /* value */
 
     psz_env = getenv( psz_name );
     if( psz_env )
-    {
-	psz_env = strchr( psz_env, '=' );
-	if( psz_env )
-	{
-	    return( atoi( psz_env + 1) );
-	}
+    {        
+        i_value = strtol( psz_env, &psz_end, 0 );
+        if( (*psz_env != '\0') && (*psz_end == '\0') )
+        {
+            return( i_value );
+        }        
     }	
-    
     return( i_default );
 }
 
@@ -214,14 +212,50 @@ char * main_GetPszVariable( char *psz_name, char *psz_default )
     psz_env = getenv( psz_name );
     if( psz_env )
     {
-	psz_env = strchr( psz_env, '=' );
-	if( psz_env )
-	{
-	    return( psz_env + 1 );
-	}
+        return( psz_env );
     }
-
     return( psz_default );    
+}
+
+/*******************************************************************************
+ * main_PutPszVariable: set the string value of an environment variable
+ *******************************************************************************
+ * This function is used to set some default parameters in modules. The use of
+ * this function will cause some memory leak: since some systems use the pointer
+ * passed to putenv to store the environment string, it can't be freed.
+ *******************************************************************************/
+void main_PutPszVariable( char *psz_name, char *psz_value )
+{
+    char *psz_env;
+
+    psz_env = malloc( strlen(psz_name) + strlen(psz_value) + 2 );
+    if( psz_env == NULL )
+    {
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM));        
+    }
+    else
+    {
+        sprintf( psz_env, "%s=%s", psz_name, psz_value );
+        if( putenv( psz_env ) )
+        {
+            intf_ErrMsg("error: %s\n", strerror(errno));
+        }        
+    }
+}
+
+/*******************************************************************************
+ * main_PutIntVariable: set the integer value of an environment variable
+ *******************************************************************************
+ * This function is used to set some default parameters in modules. The use of
+ * this function will cause some memory leak: since some systems use the pointer
+ * passed to putenv to store the environment string, it can't be freed.
+ *******************************************************************************/
+void main_PutIntVariable( char *psz_name, int i_value )
+{
+    char psz_value[ 256 ];                                 /* buffer for value */    
+
+    sprintf(psz_value, "%d", i_value );        
+    main_PutPszVariable( psz_name, psz_value );    
 }
 
 /* following functions are local */
@@ -299,19 +333,23 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_NOAUDIO:                                        /* --noaudio */
 	    p_main->b_audio = 0;
             break;
-        case OPT_STEREO:                                          /* --stereo */	    
-	    // ?? should be replaced by a putenv
-	    //p_main->p_aout->dsp.b_stereo = 1;
+        case OPT_STEREO:                                          /* --stereo */
+            main_PutIntVariable( AOUT_STEREO_VAR, 1 );
             break;
         case OPT_MONO:                                              /* --mono */
-	    // ?? should be replaced by a putenv
-	    //p_main->p_aout->dsp.b_stereo = 0;
+            main_PutIntVariable( AOUT_STEREO_VAR, 0 );
             break;
 
         /* Video options */
         case OPT_NOVIDEO:                                         /* --novideo */
             p_main->b_video = 0;
             break;       
+        case 'g':                                           /* -g, --grayscale */
+            main_PutIntVariable( VOUT_GRAYSCALE_VAR, 1 );
+            break;            
+        case OPT_COLOR:                                             /* --color */
+            main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
+            break;            
 
         /* VLAN management options */
         case OPT_NOVLANS:                                         /* --novlans */
@@ -352,10 +390,12 @@ static void Usage( void )
     /* Options */
     intf_Msg("Options:" \
              "  -h, --help                      print usage\n" \
+             "  -g, --grayscale                 grayscale video\n" \
              "  --noaudio                       disable audio\n" \
              "  --stereo                        enable stereo\n" \
              "  --mono                          disable stereo\n"
              "  --novideo                       disable video\n" \
+             "  --color                         color video\n" \
              "  --novlans      	                disable vlans\n" \
              );
 
@@ -374,6 +414,7 @@ static void Usage( void )
     /* Video parameters */
     intf_Msg("Video parameters:\n" \
              "  " VOUT_FB_DEV_VAR "=<filename>           framebuffer device path\n" \
+             "  " VOUT_GRAYSCALE_VAR "={1|0}             grayscale or color output\n" \
 	     ); 
 
     /* Vlan parameters */
