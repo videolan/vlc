@@ -3628,7 +3628,6 @@ fi
 
 
 
-
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -3783,7 +3782,6 @@ s%@ALIASES@%$ALIASES%g
 s%@DEBUG@%$DEBUG%g
 s%@STATS@%$STATS%g
 s%@OPTIMS@%$OPTIMS%g
-s%@BIZARRE_OPTIMS@%$BIZARRE_OPTIMS%g
 s%@DYNAMIC_FLAG@%$DYNAMIC_FLAG%g
 s%@LIB_SDL@%$LIB_SDL%g
 s%@LIB_GLIDE@%$LIB_GLIDE%g
