@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.15 2003/06/08 12:45:13 gbazin Exp $
+ * $Id: x11_window.cpp,v 1.16 2003/06/08 18:17:50 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -32,6 +32,7 @@
 
 //--- X11 -------------------------------------------------------------------
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <X11/extensions/shape.h>
 
 //--- SKIN ------------------------------------------------------------------
@@ -85,7 +86,13 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     {
         // register the listview as a drop target
         DropObject = new X11DropObject( p_intf );
-    //    gdk_window_register_dnd( gwnd );
+
+        Atom xdndAtom = XInternAtom( display, "XdndAware", False );
+        char xdndVersion = 4;
+        XLOCK;
+        XChangeProperty( display, wnd, xdndAtom, XA_ATOM, 32, 
+                         PropModeReplace, (unsigned char *)&xdndVersion, 1);
+        XUNLOCK;
     }
 
     // Create Tool Tip window
@@ -332,10 +339,33 @@ bool X11Window::ProcessOSEvent( Event *evt )
             OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
             return true;
 
-/*        case GDK_DROP_START:
-            DropObject->HandleDropStart( ( (GdkEventDND *)p2 )->context );
-            return true;
-*/
+        case ClientMessage:
+            {
+            string type = XGetAtomName( display, ( (XClientMessageEvent*)
+                                                    p2 )->message_type );
+            if( type == "XdndEnter" )
+            {
+                DropObject->DndEnter( ((XClientMessageEvent*)p2)->data.l );
+                return true;
+            }
+            else if( type == "XdndPosition" )
+            {
+                DropObject->DndPosition( ((XClientMessageEvent*)p2)->data.l );
+                return true;
+            }
+            else if( type == "XdndLeave" )
+            {
+                DropObject->DndLeave( ((XClientMessageEvent*)p2)->data.l );
+                return true;
+            }
+            else if( type == "XdndDrop" )
+            {
+                DropObject->DndDrop( ((XClientMessageEvent*)p2)->data.l );
+                return true;
+            }
+            }
+            return false;
+            
         default:
             return false;
     }

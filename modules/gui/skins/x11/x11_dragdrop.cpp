@@ -2,7 +2,7 @@
  * x11_dragdrop.cpp: X11 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_dragdrop.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_dragdrop.cpp,v 1.2 2003/06/08 18:17:50 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -46,6 +46,25 @@ X11DropObject::~X11DropObject()
 {
 }
 //---------------------------------------------------------------------------
+void X11DropObject::DndEnter( ldata_t data )
+{
+    fprintf(stderr,"dnd enter\n");
+}
+//---------------------------------------------------------------------------
+void X11DropObject::DndPosition( ldata_t data )
+{
+    fprintf(stderr,"dnd position\n");
+}
+//---------------------------------------------------------------------------
+void X11DropObject::DndLeave( ldata_t data )
+{
+    fprintf(stderr,"dnd leave\n");
+}
+//---------------------------------------------------------------------------
+void X11DropObject::DndDrop( ldata_t data )
+{
+    fprintf(stderr,"dnd drop\n");
+}
 #if 0
 void X11DropObject::HandleDropStart( GdkDragContext *context )
 {

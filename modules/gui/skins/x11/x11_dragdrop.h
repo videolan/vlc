@@ -2,7 +2,7 @@
  * x11_dragdrop.h: X11 implementation of the drag & drop
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_dragdrop.h,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_dragdrop.h,v 1.2 2003/06/08 18:17:50 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -30,6 +30,9 @@
 #include <X11/Xlib.h>
 
 //---------------------------------------------------------------------------
+
+typedef long ldata_t[5];
+
 class X11DropObject
 {
     private:
@@ -39,7 +42,10 @@ class X11DropObject
        X11DropObject( intf_thread_t *_p_intf );
        virtual ~X11DropObject();
 
- //      void HandleDropStart( GdkDragContext *context );
+       void DndEnter( ldata_t data );
+       void DndPosition( ldata_t data );
+       void DndLeave( ldata_t data );
+       void DndDrop( ldata_t data );
 };
 //---------------------------------------------------------------------------
 #endif
