@@ -354,6 +354,9 @@ AC_CHECK_LIB(m,pow,
   LDFLAGS_i420_rgb="${LDFLAGS_i420_rgb} -lm"
   LDFLAGS_faad="${LDFLAGS_faad} -lm"
 )
+AC_CHECK_LIB(m,sqrt,
+  LDFLAGS_headphone_channel_mixer="${LDFLAGS_headphone_channel_mixer} -lm"
+)
 
 dnl Check for pthreads - borrowed from XMMS
 THREAD_LIB=error
