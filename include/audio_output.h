@@ -98,6 +98,7 @@ typedef int32_t vlc_fixed_t;
 #define AOUT_CHAN_REVERSESTEREO     0x40000
 
 #define AOUT_CHAN_PHYSMASK          0xFFFF
+#define AOUT_CHAN_MAX               9
 
 /* Values used for the audio-device and audio-channels object variables */
 #define AOUT_VAR_MONO               1
@@ -166,6 +167,9 @@ VLC_EXPORT( void, aout_DateSet, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( void, aout_DateMove, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) );
 VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, uint32_t ) );
+
+VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *, const uint32_t *, uint32_t, int, int * ) );
+VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int ) );
 
 /* From dec.c : */
 #define aout_DecNew(a, b, c) __aout_DecNew(VLC_OBJECT(a), b, c)

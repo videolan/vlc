@@ -464,3 +464,105 @@ mtime_t aout_DateIncrement( audio_date_t * p_date, uint32_t i_nb_samples )
     return p_date->date;
 }
 
+/*****************************************************************************
+ * aout_CheckChannelReorder : Check if we need to do some channel re-ordering
+ *****************************************************************************/
+int aout_CheckChannelReorder( const uint32_t *pi_chan_order_in,
+                              const uint32_t *pi_chan_order_out,
+                              uint32_t i_channel_mask,
+                              int i_channels, int *pi_chan_table )
+{
+    vlc_bool_t b_chan_reorder = VLC_FALSE;
+    int i, j, k, l;
+
+    if( i_channels > AOUT_CHAN_MAX ) return VLC_FALSE;
+
+    for( i = 0, j = 0; pi_chan_order_in[i]; i++ )
+    {
+        if( !(i_channel_mask & pi_chan_order_in[i]) ) continue;
+
+        for( k = 0, l = 0; pi_chan_order_in[i] != pi_chan_order_out[k]; k++ )
+        {
+            if( i_channel_mask & pi_chan_order_out[k] ) l++;
+        }
+
+        pi_chan_table[j++] = l;
+    }
+
+    for( i = 0; i < i_channels; i++ )
+    {
+        if( pi_chan_table[i] != i ) b_chan_reorder = VLC_TRUE;
+    }
+
+    return b_chan_reorder;
+}
+
+/*****************************************************************************
+ * aout_ChannelReorder :
+ *****************************************************************************/
+void aout_ChannelReorder( uint8_t *p_buf, int i_buffer,
+                          int i_channels, const int *pi_chan_table,
+                          int i_bits_per_sample )
+{
+    uint8_t p_tmp[AOUT_CHAN_MAX * 4];
+    int i, j;
+
+    if( i_bits_per_sample == 8 )
+    {
+        for( i = 0; i < i_buffer / i_channels; i++ )
+        {
+            for( j = 0; j < i_channels; j++ )
+            {
+                p_tmp[pi_chan_table[j]] = p_buf[j];
+            }
+
+            memcpy( p_buf, p_tmp, i_channels );
+            p_buf += i_channels;
+        }
+    }
+    else if( i_bits_per_sample == 16 )
+    {
+        for( i = 0; i < i_buffer / i_channels / 2; i++ )
+        {
+            for( j = 0; j < i_channels; j++ )
+            {
+                p_tmp[2 * pi_chan_table[j]]     = p_buf[2 * j];
+                p_tmp[2 * pi_chan_table[j] + 1] = p_buf[2 * j + 1];
+            }
+
+            memcpy( p_buf, p_tmp, 2 * i_channels );
+            p_buf += 2 * i_channels;
+        }
+    }
+    else if( i_bits_per_sample == 24 )
+    {
+        for( i = 0; i < i_buffer / i_channels / 3; i++ )
+        {
+            for( j = 0; j < i_channels; j++ )
+            {
+                p_tmp[3 * pi_chan_table[j]]     = p_buf[3 * j];
+                p_tmp[3 * pi_chan_table[j] + 1] = p_buf[3 * j + 1];
+                p_tmp[3 * pi_chan_table[j] + 2] = p_buf[3 * j + 2];
+            }
+
+            memcpy( p_buf, p_tmp, 3 * i_channels );
+            p_buf += 3 * i_channels;
+        }
+    }
+    else if( i_bits_per_sample == 32 )
+    {
+        for( i = 0; i < i_buffer / i_channels / 4; i++ )
+        {
+            for( j = 0; j < i_channels; j++ )
+            {
+                p_tmp[4 * pi_chan_table[j]]     = p_buf[4 * j];
+                p_tmp[4 * pi_chan_table[j] + 1] = p_buf[4 * j + 1];
+                p_tmp[4 * pi_chan_table[j] + 2] = p_buf[4 * j + 2];
+                p_tmp[4 * pi_chan_table[j] + 3] = p_buf[4 * j + 3];
+            }
+
+            memcpy( p_buf, p_tmp, 4 * i_channels );
+            p_buf += 4 * i_channels;
+        }
+    }
+}
