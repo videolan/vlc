@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.12 2003/01/11 18:10:49 fenrir Exp $
+ * $Id: audio.c,v 1.13 2003/01/25 16:59:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -71,7 +71,7 @@ static unsigned int pi_channels_maps[6] =
 /*****************************************************************************
  * locales Functions
  *****************************************************************************/
-
+#if 0
 static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
                                     u8 *p_data )
 {
@@ -93,7 +93,7 @@ static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
                 p_wh->i_size );
     }
 }
-
+#endif
 
 /*****************************************************************************
  *
@@ -116,37 +116,34 @@ static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
  *****************************************************************************/
 int E_( InitThread_Audio )( adec_thread_t *p_adec )
 {
-    WAVEFORMATEX *p_wf;
+    WAVEFORMATEX wf, *p_wf;
 
-    if( ( p_wf = p_adec->p_fifo->p_waveformatex ) != NULL )
-    {
-        ffmpeg_GetWaveFormatEx( &p_adec->format,
-                                (uint8_t*)p_wf );
-    }
-    else
+    if( ( p_wf = p_adec->p_fifo->p_waveformatex ) == NULL )
     {
         msg_Warn( p_adec->p_fifo, "audio informations missing" );
+        p_wf = &wf;
+        memset( p_wf, 0, sizeof( WAVEFORMATEX ) );
     }
 
     /* ***** Fill p_context with init values ***** */
-    p_adec->p_context->sample_rate = p_adec->format.i_samplespersec;
-    p_adec->p_context->channels = p_adec->format.i_nb_channels;
+    p_adec->p_context->sample_rate = p_wf->nSamplesPerSec;
+    p_adec->p_context->channels = p_wf->nChannels;
 #if LIBAVCODEC_BUILD >= 4618
-    p_adec->p_context->block_align = p_adec->format.i_blockalign;
+    p_adec->p_context->block_align = p_wf->nBlockAlign;
 #endif
-    p_adec->p_context->bit_rate = p_adec->format.i_avgbytespersec * 8;
+    p_adec->p_context->bit_rate = p_wf->nAvgBytesPerSec * 8;
 
-    if( ( p_adec->p_context->extradata_size = p_adec->format.i_size ) > 0 )
+    if( ( p_adec->p_context->extradata_size = p_wf->cbSize ) > 0 )
     {
-        p_adec->p_context->extradata = 
-            malloc( p_adec->format.i_size );
+        p_adec->p_context->extradata =
+            malloc( p_wf->cbSize );
 
         memcpy( p_adec->p_context->extradata,
-                p_adec->format.p_data,
-                p_adec->format.i_size );
+                &p_wf[1],
+                p_wf->cbSize);
     }
 
-    /* ***** Open the codec ***** */ 
+    /* ***** Open the codec ***** */
     if (avcodec_open(p_adec->p_context, p_adec->p_codec) < 0)
     {
         msg_Err( p_adec->p_fifo,
@@ -165,10 +162,10 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
 
 
     p_adec->output_format.i_format = AOUT_FMT_S16_NE;
-    p_adec->output_format.i_rate = p_adec->format.i_samplespersec;
+    p_adec->output_format.i_rate = p_wf->nSamplesPerSec;
     p_adec->output_format.i_physical_channels
         = p_adec->output_format.i_original_channels
-        = p_adec->format.i_nb_channels;
+        = p_wf->nChannels;
 
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
@@ -355,12 +352,13 @@ usenextdata:
  *****************************************************************************/
 void E_( EndThread_Audio )( adec_thread_t *p_adec )
 {
-    FREE( p_adec->format.p_data );
+//    FREE( p_adec->format.p_data );
+    FREE( p_adec->p_output );
 
     if( p_adec->p_aout_input )
     {
         aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
     }
-    
+
 }
 

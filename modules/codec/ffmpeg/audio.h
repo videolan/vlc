@@ -2,7 +2,7 @@
  * audio.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.h,v 1.2 2002/11/14 22:38:47 massiot Exp $
+ * $Id: audio.h,v 1.3 2003/01/25 16:59:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,19 +40,19 @@ typedef struct adec_thread_s
 {
     DECODER_THREAD_COMMON
 
-    waveformatex_t  format;
+//    waveformatex_t  format;
 
     /*
      * Output properties
      */
 
-    u8 *                p_output;
-    
-    aout_instance_t *   p_aout;       /* opaque */
-    aout_input_t *      p_aout_input; /* opaque */
+    uint8_t *             p_output;
+
+    aout_instance_t *     p_aout;       /* opaque */
+    aout_input_t *        p_aout_input; /* opaque */
     audio_sample_format_t output_format;
 
-    audio_date_t        date;
+    audio_date_t          date;
 
 } adec_thread_t;
 

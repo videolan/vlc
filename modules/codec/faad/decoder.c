@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.18 2003/01/08 10:43:27 fenrir Exp $
+ * $Id: decoder.c,v 1.19 2003/01/25 16:59:49 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -120,7 +120,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     return( 0 );
 }
 
-static int pi_channels_maps[6] =
+static unsigned int pi_channels_maps[6] =
 {
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
@@ -209,6 +209,7 @@ static int InitThread( adec_thread_t * p_adec )
     {
         msg_Warn( p_adec->p_fifo,
                   "cannot load stream informations" );
+        memset( &p_adec->format, 0, sizeof( waveformatex_t ) );
     }
     else
     {
@@ -253,7 +254,7 @@ static int InitThread( adec_thread_t * p_adec )
                     p_adec->p_buffer = malloc( i_frame_size + 16 );
                     p_adec->i_buffer = i_frame_size + 16;
                 }
-                
+
                 GetPESData( p_adec->p_buffer, p_adec->i_buffer, p_pes );
             }
             else
@@ -295,7 +296,7 @@ static int InitThread( adec_thread_t * p_adec )
     p_faad_config = faacDecGetCurrentConfiguration( p_adec->p_handle );
     p_faad_config->outputFormat = FAAD_FMT_FLOAT;
     faacDecSetConfiguration( p_adec->p_handle, p_faad_config );
-        
+
 
     /* Initialize the thread properties */
     p_adec->output_format.i_format = VLC_FOURCC('f','l','3','2');
@@ -307,7 +308,7 @@ static int InitThread( adec_thread_t * p_adec )
     p_adec->p_aout_input = NULL;
 
     p_adec->pts = 0;
-  
+
     return( 0 );
 }
 
@@ -350,12 +351,12 @@ static void DecodeThread( adec_thread_t *p_adec )
                 p_adec->p_buffer = malloc( i_frame_size + 16 );
                 p_adec->i_buffer = i_frame_size + 16;
             }
-            
+
             GetPESData( p_adec->p_buffer, p_adec->i_buffer, p_pes );
         }
         input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
     } while( i_frame_size <= 0 );
-    
+
     /* **** decode this frame **** */
     p_faad_buffer = faacDecDecode( p_adec->p_handle,
                                    &faad_frame,
@@ -392,7 +393,7 @@ static void DecodeThread( adec_thread_t *p_adec )
 #endif
 
     /* **** Now we can output these samples **** */
-    
+
     /* **** First check if we have a valid output **** */
     if( ( !p_adec->p_aout_input )||
         ( p_adec->output_format.i_original_channels !=
@@ -470,7 +471,7 @@ static void EndThread (adec_thread_t *p_adec)
     FREE( p_adec->p_buffer );
 
     msg_Dbg( p_adec->p_fifo, "faad decoder closed" );
-        
+
     free( p_adec );
 }
 
