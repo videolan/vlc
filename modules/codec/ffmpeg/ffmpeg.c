@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.36 2003/05/09 23:23:45 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.37 2003/05/10 11:05:52 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -616,7 +616,8 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             break;
 
 #if LIBAVCODEC_BUILD >= 4663
-        case FOURCC_IV31:
+        /* Quality of both decoders is not good enough yet
+	case FOURCC_IV31:
         case FOURCC_iv31:
         case FOURCC_IV32:
         case FOURCC_iv32:
@@ -624,6 +625,12 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec  = CODEC_ID_INDEO3;
             psz_name = "Indeo v3";
             break;
+	case FOURCC_vp31:
+	case FOURCC_VP31:
+	    i_cat    = VIDEO_ES;
+	    i_codec  = CODEC_ID_VP3;
+	    psz_name = "On2's VP3 Video";
+	    break; */
 #endif
         default:
             i_cat = UNKNOWN_ES;
