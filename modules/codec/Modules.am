@@ -22,3 +22,4 @@ SOURCES_faad = faad.c
 SOURCES_dvbsub = dvbsub.c
 SOURCES_mash = mash.cpp
 SOURCES_x264 = x264.c
+SOURCES_toolame = toolame.c

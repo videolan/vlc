@@ -441,7 +441,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad equalizer vlc],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol],[-lm])
@@ -1959,6 +1959,50 @@ then
   fi
 fi
 
+dnl
+dnl toolame encoder plugin
+dnl
+AC_ARG_ENABLE(toolame,
+[  --enable-toolame         toolame codec (default disabled)])
+if test "${enable_toolame}" = "yes"
+then
+  AC_ARG_WITH(toolame-tree,
+  [    --with-toolame-tree=PATH toolame tree for static linking])
+  if test -n "${with_toolame_tree}"
+  then
+    AC_MSG_CHECKING(for libtoolame.a in ${with_toolame_tree})
+    real_toolame_tree="`cd ${with_toolame_tree} 2>/dev/null && pwd`"
+    if test -z "${real_toolame_tree}"
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_toolame_tree}])
+    fi
+    if test -f "${real_toolame_tree}/libtoolame/libtoolame.a"
+    then
+      dnl  Use a custom toolame
+      AC_MSG_RESULT(${real_toolame_tree}/libtoolame/libtoolame.a)
+      VLC_ADD_BUILTINS([toolame])
+      VLC_ADD_LDFLAGS([toolame],[${real_faad_tree}/libtoolame/libtoolame.a])
+      VLC_ADD_CPPFLAGS([toolame],[-I${real_toolame_tree}/libtoolame])
+    else
+      dnl  The given libtoolame wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_toolame_tree}/libtoolame/libtoolame.a, make sure you compiled libtoolame in ${with_toolame_tree}])
+    fi
+  else
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_toolame}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_toolame}"
+    AC_CHECK_HEADERS(toolame.h, ,
+      [ AC_MSG_ERROR([Cannot find development header for libtoolame...]) ])
+    AC_CHECK_LIB(toolame, toolame_init, [
+      VLC_ADD_PLUGINS([toolame])
+      VLC_ADD_LDFLAGS([toolame],[-ltoolame]) ],
+        [ AC_MSG_ERROR([Cannot find libtoolame library...]) ])
+    LDFLAGS="${LDFLAGS_save}"
+    CPPFLAGS="${CPPFLAGS_save}"
+  fi
+fi
 
 dnl dnl
 dnl dnl  xvid decoder plugin
