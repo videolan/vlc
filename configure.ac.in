@@ -88,6 +88,7 @@ case "x${target_os}" in
     SYS=bsdi
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
     LDFLAGS_dvd="${LDFLAGS_dvd} -ldvd"
+    LDFLAGS_dvdcss="${LDFLAGS_dvdcss} -ldvd"
     LDFLAGS_vcd="${LDFLAGS_vcd} -ldvd"
     ;;
   x*bsd*)
@@ -955,7 +956,7 @@ then
     then
       AC_CHECK_HEADERS(dvdread/dvd_reader.h,
         [ PLUGINS="${PLUGINS} dvdread"
-          LDFLAGS_dvdread="${LDFLAGS_dvdread} -ldvdread" ],
+          LDFLAGS_dvdread="${LDFLAGS_dvdread} -ldvdread ${LDFLAGS_dvdcss}" ],
         [ if test "x${enable_dvdread}" != "x"
           then
             AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
@@ -975,7 +976,7 @@ then
         dnl  Use a custom libdvdread
         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
         BUILTINS="${BUILTINS} dvdread"
-        LDFLAGS_dvdread="${LDFLAGS_dvdread} ${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
+        LDFLAGS_dvdread="${LDFLAGS_dvdread} ${real_dvdread_tree}/dvdread/.libs/libdvdread.a ${LDFLAGS_dvdcss}"
         CPPFLAGS_dvdread="${CPPFLAGS_dvdread} -I${real_dvdread_tree}"
       else
         dnl  The given libdvdread wasn't built
@@ -990,7 +991,7 @@ then
       dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvdread"
-      LDFLAGS_dvdread="${LDFLAGS_dvdread} -L${with_dvdread}/lib -ldvdread"
+      LDFLAGS_dvdread="${LDFLAGS_dvdread} -L${with_dvdread}/lib -ldvdread ${LDFLAGS_dvdcss}"
       CPPFLAGS_dvdread="${CPPFLAGS_dvdread} -I${with_dvdread}/include"
     else
       dnl  No libdvdread could be found, sorry
@@ -1017,7 +1018,7 @@ then
     then
       AC_CHECK_HEADERS(dvdplay/dvdplay.h,
         [ PLUGINS="${PLUGINS} dvdplay"
-          LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_dvd} ${LDFLAGS_dvdread} -ldvdplay"
+          LDFLAGS_dvdplay="${LDFLAGS_dvdplay} -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}"
           CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread}" ],
         [ if test "x${enable_dvdplay}" != "x"
           then
@@ -1038,7 +1039,7 @@ then
         dnl  Use a custom libdvdplay
         AC_MSG_RESULT(${real_dvdplay_tree}/src/.libs/libdvdplay.a)
         BUILTINS="${BUILTINS} dvdplay"
-        LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_dvd} ${LDFLAGS_dvdread} ${real_dvdplay_tree}/src/.libs/libdvdplay.a"
+        LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${real_dvdplay_tree}/src/.libs/libdvdplay.a ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}"
         CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread} -I${real_dvdplay_tree}/src"
       else
         dnl  The given libdvdplay wasn't built
@@ -1053,7 +1054,7 @@ then
       dnl  Use ${with_dvdplay}/include/dvdplay/dvdplay.h
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvdplay"
-      LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_dvd} ${LDFLAGS_dvdread} -L${with_dvdplay}/lib -ldvdplay"
+      LDFLAGS_dvdplay="${LDFLAGS_dvdplay} -L${with_dvdplay}/lib -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}"
       CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread} -I${with_dvdplay}/include"
     else
       dnl  No libdvdplay could be found, sorry
