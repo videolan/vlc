@@ -20,6 +20,7 @@ SOURCES_aiff = aiff.c
 SOURCES_sgimb = sgimb.c
 SOURCES_mjpeg = mjpeg.c
 SOURCES_subtitle = subtitle.c
+SOURCES_ty = ty.c
 SOURCES_vobsub = vobsub.c
 SOURCES_voc = voc.c
 SOURCES_xa = xa.c
