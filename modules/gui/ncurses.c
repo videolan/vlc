@@ -40,6 +40,14 @@
 #include <vlc/vout.h>
 #include <vlc/aout.h>
 
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#if (!defined( WIN32 ) || defined(__MINGW32__))
+/* Mingw has its own version of dirent */
+#   include <dirent.h>
+#endif
+
 #ifdef HAVE_CDDAX
 #define CDDA_MRL "cddax://"
 #else
@@ -69,15 +77,23 @@ static int  HandleKey      ( intf_thread_t *, int );
 static void Redraw         ( intf_thread_t *, time_t * );
 static void SearchPlaylist ( intf_thread_t *, char * );
 static void ManageSlider   ( intf_thread_t * );
+static void ReadDir        ( intf_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+#define BROWSE_TEXT N_("Filebrowser starting point")
+#define BROWSE_LONGTEXT N_( \
+    "This option allows you to specify directory the ncurses filebrowser" \
+    "will show you initially.")
+
 vlc_module_begin();
     set_description( _("ncurses interface") );
     set_capability( "interface", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "curses" );
+    add_directory( "browse-dir", NULL, NULL, BROWSE_TEXT, BROWSE_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
 /*****************************************************************************
@@ -91,7 +107,13 @@ enum
     BOX_LOG,
     BOX_PLAYLIST,
     BOX_SEARCH,
-    BOX_OPEN
+    BOX_OPEN,
+    BOX_BROWSE
+};
+struct dir_entry_t
+{
+    vlc_bool_t  b_file;
+    char        *psz_path;
 };
 struct intf_sys_t
 {
@@ -121,6 +143,10 @@ struct intf_sys_t
     int             i_before_search;
 
     char            *psz_open_chain;
+    
+    char            *psz_current_dir;
+    int             i_dir_entries;
+    struct dir_entry_t  **pp_dir_entries;
 };
 
 static void DrawBox( WINDOW *win, int y, int x, int h, int w, char *title );
@@ -180,6 +206,24 @@ static int Open( vlc_object_t *p_this )
 
     /* Initialize open chain */
     p_sys->psz_open_chain = (char *)malloc( OPEN_CHAIN_SIZE + 1 );
+    
+    /* Initialize browser options */
+    var_Create( p_intf, "browse-dir", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_intf, "browse-dir", &val);
+    
+    if( val.psz_string && *val.psz_string )
+    {
+        p_sys->psz_current_dir = strdup( val.psz_string);
+        free( val.psz_string );
+    }
+    else
+    {
+        p_sys->psz_current_dir = strdup( p_intf->p_vlc->psz_homedir );
+    }
+    
+    p_sys->i_dir_entries = 0;
+    p_sys->pp_dir_entries  = NULL;
+    ReadDir( p_intf );
 
     return VLC_SUCCESS;
 }
@@ -191,7 +235,18 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t    *p_sys = p_intf->p_sys;
+    int i;
 
+    for( i = 0; i < p_sys->i_dir_entries; i++ )
+    {
+        struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[i];
+        if( p_dir_entry->psz_path ) free( p_dir_entry->psz_path );
+        REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, i );
+        if( p_dir_entry ) free( p_dir_entry );
+    }
+    p_sys->pp_dir_entries = NULL;
+    
+    if( p_sys->psz_current_dir ) free( p_sys->psz_current_dir );
     if( p_sys->psz_search_chain ) free( p_sys->psz_search_chain );
     if( p_sys->psz_old_search ) free( p_sys->psz_old_search );
     if( p_sys->psz_open_chain ) free( p_sys->psz_open_chain );
@@ -389,6 +444,70 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             return 1;
         }
     }
+    if( p_sys->i_box_type == BOX_BROWSE )
+    {
+        /* Browser navigation */
+        switch( i_key )
+        {
+            case KEY_HOME:
+                p_sys->i_box_plidx = 0;
+                break;
+            case KEY_END:
+                p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
+                break;
+            case KEY_UP:
+                p_sys->i_box_plidx--;
+                break;
+            case KEY_DOWN:
+                p_sys->i_box_plidx++;
+                break;
+            case KEY_PPAGE:
+                p_sys->i_box_plidx -= p_sys->i_box_lines;
+                break;
+            case KEY_NPAGE:
+                p_sys->i_box_plidx += p_sys->i_box_lines;
+                break;
+
+            case KEY_ENTER:
+            case 0x0d:
+                if( p_sys->pp_dir_entries[p_sys->i_box_plidx]->b_file )
+                {
+                    int i_size_entry = strlen( p_sys->psz_current_dir ) +
+                                       strlen( p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path ) + 2;
+                    char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
+
+                    sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path );
+                    playlist_Add( p_sys->p_playlist, psz_uri,
+                                  psz_uri,
+                                  PLAYLIST_APPEND, PLAYLIST_END );
+                    p_sys->i_box_type = BOX_PLAYLIST;
+                    free( psz_uri );
+                }
+                else
+                {
+                    int i_size_entry = strlen( p_sys->psz_current_dir ) +
+                                       strlen( p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path ) + 2;
+                    char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
+
+                    sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_plidx]->psz_path );
+                    
+                    p_sys->psz_current_dir = strdup( psz_uri );
+                    ReadDir( p_intf );
+                    free( psz_uri );
+                }
+                break;
+            default:
+                break;
+
+            if( p_sys->i_box_plidx >= p_sys->i_dir_entries ) p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
+            if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
+            if( p_sys->i_box_plidx == p_sys->i_dir_entries )
+                p_sys->b_box_plidx_follow = VLC_TRUE;
+            else
+                p_sys->b_box_plidx_follow = VLC_FALSE;
+            return 1;
+        }
+    }
     else if( p_sys->i_box_type == BOX_HELP || p_sys->i_box_type == BOX_INFO )
     {
         switch( i_key )
@@ -557,7 +676,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_INFO;
             p_sys->i_box_lines_total = 0;
             return 1;
-        case 'l':
+        case 'L':
             if( p_sys->i_box_type == BOX_LOG )
                 p_sys->i_box_type = BOX_NONE;
             else
@@ -568,6 +687,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 p_sys->i_box_type = BOX_NONE;
             else
                 p_sys->i_box_type = BOX_PLAYLIST;
+            return 1;
+        case 'B':
+            if( p_sys->i_box_type == BOX_BROWSE )
+                p_sys->i_box_type = BOX_NONE;
+            else
+                p_sys->i_box_type = BOX_BROWSE;
             return 1;
         case 'h':
         case 'H':
@@ -980,8 +1105,9 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, "[Display]" );
         MainBoxWrite( p_intf, l++, 1, "     h,H         Show/Hide help box" );
         MainBoxWrite( p_intf, l++, 1, "     i           Show/Hide info box" );
-        MainBoxWrite( p_intf, l++, 1, "     l           Show/Hide messages box" );
+        MainBoxWrite( p_intf, l++, 1, "     L           Show/Hide messages box" );
         MainBoxWrite( p_intf, l++, 1, "     P           Show/Hide playlist box" );
+        MainBoxWrite( p_intf, l++, 1, "     B           Show/Hide filebrowser" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Global]" );
@@ -1117,6 +1243,58 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         p_intf->p_sys->p_sub->i_start = i_stop;
         vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
         y = y_end;
+    }
+    else if( p_sys->i_box_type == BOX_BROWSE )
+    {
+        /* Playlist box */
+        int        i_start, i_stop;
+        int        i_item;
+        DrawBox( p_sys->w, y++, 0, h, COLS, " Browse " );
+
+        if( p_sys->i_box_plidx >= p_sys->i_dir_entries ) p_sys->i_box_plidx = p_sys->i_dir_entries - 1;
+        if( p_sys->i_box_plidx < 0 ) p_sys->i_box_plidx = 0;
+
+        if( p_sys->i_box_plidx < (h - 2)/2 )
+        {
+            i_start = 0;
+            i_stop = h - 2;
+        }
+        else if( p_sys->i_dir_entries - p_sys->i_box_plidx > (h - 2)/2 )
+        {
+            i_start = p_sys->i_box_plidx - (h - 2)/2;
+            i_stop = i_start + h - 2;
+        }
+        else
+        {
+            i_stop = p_sys->i_dir_entries;
+            i_start = p_sys->i_dir_entries - (h - 2);
+        }
+        if( i_start < 0 )
+        {
+            i_start = 0;
+        }
+        if( i_stop > p_sys->i_dir_entries )
+        {
+            i_stop = p_sys->i_dir_entries;
+        }
+
+        for( i_item = i_start; i_item < i_stop; i_item++ )
+        {
+            vlc_bool_t b_selected = ( p_sys->i_box_plidx == i_item );
+
+            if( y >= y_end ) break;
+            if( b_selected )
+            {
+                attrset( A_REVERSE );
+            }
+            mvnprintw( y++, 1, COLS - 2, "%c %s", p_sys->pp_dir_entries[i_item]->b_file == VLC_TRUE ? '-' : '+',
+                            p_sys->pp_dir_entries[i_item]->psz_path );
+            if( b_selected )
+            {
+                attroff ( A_REVERSE );
+            }
+        }
+
     }
     else if( ( p_sys->i_box_type == BOX_PLAYLIST ||
                p_sys->i_box_type == BOX_SEARCH ||
@@ -1337,7 +1515,97 @@ static void Eject ( intf_thread_t *p_intf )
     return;
 }
 
-static void PlayPause ( intf_thread_t *p_intf )
+static void ReadDir( intf_thread_t *p_intf )
+{
+    intf_sys_t     *p_sys = p_intf->p_sys;
+    DIR *                       p_current_dir;
+    struct dirent *             p_dir_content;
+    int i;
+
+    if( p_sys->psz_current_dir && *p_sys->psz_current_dir )
+    {
+        /* Open the dir */
+        p_current_dir = opendir( p_sys->psz_current_dir );
+
+        if( p_current_dir == NULL )
+        {
+            /* something went bad, get out of here ! */
+#ifdef HAVE_ERRNO_H
+            msg_Warn( p_intf, "cannot open directory `%s' (%s)",
+                      p_sys->psz_current_dir, strerror(errno));
+#else
+            msg_Warn( p_intf, "cannot open directory `%s'", p_sys->psz_current_dir );
+#endif
+            return;
+        }
+        
+        /* Clean the old shit */
+        for( i = 0; i < p_sys->i_dir_entries; i++ )
+        {
+            struct dir_entry_t *p_dir_entry = p_sys->pp_dir_entries[i];
+            free( p_dir_entry->psz_path );
+            REMOVE_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries, i );
+            free( p_dir_entry );
+        }
+        p_sys->pp_dir_entries = NULL;
+        p_sys->i_dir_entries = 0;
+
+        /* get the first directory entry */
+        p_dir_content = readdir( p_current_dir );
+
+        /* while we still have entries in the directory */
+        while( p_dir_content != NULL )
+        {
+            struct dir_entry_t *p_dir_entry;
+            int i_size_entry = strlen( p_sys->psz_current_dir ) +
+                               strlen( p_dir_content->d_name ) + 2;
+            char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
+
+            sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_dir_content->d_name );
+
+            if( ( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) == NULL )
+            {
+                free( psz_uri);
+                return;
+            }
+
+#if defined( S_ISDIR )
+            struct stat stat_data;
+            stat( psz_uri, &stat_data );
+            if( S_ISDIR(stat_data.st_mode) )
+#elif defined( DT_DIR )
+            if( p_dir_content->d_type & DT_DIR )
+#else
+            if( 0 )
+#endif
+            {
+                p_dir_entry->psz_path = strdup( p_dir_content->d_name );
+                p_dir_entry->b_file = VLC_FALSE;
+                INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
+                     p_sys->i_dir_entries, p_dir_entry );
+            }
+            else
+            {
+                p_dir_entry->psz_path = strdup( p_dir_content->d_name );
+                p_dir_entry->b_file = VLC_TRUE;
+                INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
+                     p_sys->i_dir_entries, p_dir_entry );
+            }
+            free( psz_uri );
+            /* Read next entry */
+            p_dir_content = readdir( p_current_dir );
+        }
+        closedir( p_current_dir );
+        return;
+    }
+    else
+    {
+        msg_Dbg( p_intf, "no current dir set" );
+        return;
+    }
+}
+
+static void PlayPause( intf_thread_t *p_intf )
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
     vlc_value_t val;
