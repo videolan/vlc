@@ -3,7 +3,7 @@
  *               using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: chroma.c 7834 2004-05-30 16:57:55Z sigmunau $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -39,6 +39,7 @@
 #include "ffmpeg.h"
 
 void E_(InitLibavcodec) ( vlc_object_t *p_object );
+static int CheckInit( filter_t *p_filter );
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic );
 static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic );
 
@@ -67,7 +68,6 @@ int E_(OpenFilter)( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys;
     vlc_bool_t b_convert, b_resize;
-    ImgReSampleContext *p_rsc;
 
     /* Check if we can handle that formats */
     if( E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma ) < 0 ||
@@ -88,16 +88,6 @@ int E_(OpenFilter)( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_rsc = img_resample_init( p_filter->fmt_out.video.i_width,
-                               p_filter->fmt_out.video.i_height,
-                               p_filter->fmt_in.video.i_width,
-                               p_filter->fmt_in.video.i_height );
-    if( !p_rsc )
-    {
-        msg_Err( p_filter, "img_resample_init failed" );
-        return VLC_EGENERIC;
-    }
-
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_filter->p_sys = p_sys =
           (filter_sys_t *)malloc(sizeof(filter_sys_t)) ) == NULL )
@@ -107,16 +97,21 @@ int E_(OpenFilter)( vlc_object_t *p_this )
     }
 
     /* Misc init */
-    p_sys->b_resize = b_resize;
+    p_sys->p_rsc = NULL;
     p_sys->b_convert = b_convert;
-    p_sys->p_rsc = p_rsc;
     p_sys->i_src_ffmpeg_chroma =
         E_(GetFfmpegChroma)( p_filter->fmt_in.video.i_chroma );
     p_sys->i_dst_ffmpeg_chroma =
         E_(GetFfmpegChroma)( p_filter->fmt_out.video.i_chroma );
-    p_sys->fmt_in = p_filter->fmt_in;
-    p_sys->fmt_out = p_filter->fmt_out;
     p_filter->pf_video_filter = Process;
+    es_format_Init( &p_sys->fmt_in, 0, 0 );
+    es_format_Init( &p_sys->fmt_out, 0, 0 );
+
+    if( CheckInit( p_filter ) != VLC_SUCCESS )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     avpicture_alloc( &p_sys->tmp_pic, p_sys->i_dst_ffmpeg_chroma,
                      p_filter->fmt_in.video.i_width,
@@ -150,6 +145,46 @@ void E_(CloseFilter)( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
+ * CheckInit: Initialise filter when necessary
+ *****************************************************************************/
+static int CheckInit( filter_t *p_filter )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( p_filter->fmt_in.video.i_width != p_sys->fmt_in.video.i_width ||
+        p_filter->fmt_in.video.i_height != p_sys->fmt_in.video.i_height ||
+        p_filter->fmt_out.video.i_width != p_sys->fmt_out.video.i_width ||
+        p_filter->fmt_out.video.i_height != p_sys->fmt_out.video.i_height )
+    {
+        if( p_sys->p_rsc ) img_resample_close( p_sys->p_rsc );
+        p_sys->p_rsc = 0;
+
+        p_sys->b_resize =
+          p_filter->fmt_in.video.i_width != p_filter->fmt_out.video.i_width ||
+          p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height;
+
+        if( p_sys->b_resize )
+        {
+            p_sys->p_rsc = img_resample_init( p_filter->fmt_out.video.i_width,
+                               p_filter->fmt_out.video.i_height,
+                               p_filter->fmt_in.video.i_width,
+                               p_filter->fmt_in.video.i_height );
+
+            if( !p_sys->p_rsc )
+            {
+                msg_Err( p_filter, "img_resample_init failed" );
+                return VLC_EGENERIC;
+            }
+        }
+
+        p_sys->fmt_in = p_filter->fmt_in;
+        p_sys->fmt_out = p_filter->fmt_out;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * Do the processing here
  *****************************************************************************/
 static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
@@ -159,6 +194,9 @@ static picture_t *Process( filter_t *p_filter, picture_t *p_pic )
     picture_t *p_pic_dst;
     vlc_bool_t b_resize = p_sys->b_resize;
     int i;
+
+    /* Check if format properties changed */
+    if( CheckInit( p_filter ) != VLC_SUCCESS ) return 0;
 
     /* Request output picture */
     p_pic_dst = p_filter->pf_vout_buffer_new( p_filter );
@@ -314,8 +352,8 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     }
 
     avpicture_deinterlace( &dest_pic, &src_pic, p_sys->i_src_ffmpeg_chroma,
-			   p_filter->fmt_in.video.i_width,
-			   p_filter->fmt_in.video.i_height );
+                           p_filter->fmt_in.video.i_width,
+                           p_filter->fmt_in.video.i_height );
 
     p_pic_dst->date = p_pic->date;
     p_pic_dst->b_force = p_pic->b_force;
