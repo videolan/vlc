@@ -2,7 +2,7 @@
  * trivial.c : trivial resampler (skips samples or pads with zeroes)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.4 2002/08/21 22:41:59 massiot Exp $
+ * $Id: trivial.c,v 1.5 2002/08/24 16:07:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -80,22 +80,24 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_out_nb = i_in_nb * p_filter->output.i_rate
                     / p_filter->input.i_rate;
+    int i_frame_bytes = p_filter->input.i_channels * sizeof(s32);
 
     if ( p_out_buf != p_in_buf )
     {
         /* For whatever reason the buffer allocator decided to allocate
          * a new buffer. Currently, this never happens. */
         p_aout->p_vlc->pf_memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer,
-                                  __MIN(i_out_nb, i_in_nb) );
+                                  __MIN(i_out_nb, i_in_nb) * i_frame_bytes );
     }
 
     if ( i_out_nb > i_in_nb )
     {
         /* Pad with zeroes. */
-        memset( p_out_buf->p_buffer + i_in_nb, 0, i_out_nb - i_in_nb );
+        memset( p_out_buf->p_buffer + i_in_nb * i_frame_bytes,
+                0, (i_out_nb - i_in_nb) * i_frame_bytes );
     }
 
     p_out_buf->i_nb_samples = i_out_nb;
-    p_out_buf->i_nb_bytes = i_out_nb * sizeof(s32);
+    p_out_buf->i_nb_bytes = i_out_nb * i_frame_bytes;
 }
 
