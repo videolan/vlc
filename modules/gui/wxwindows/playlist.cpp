@@ -343,12 +343,15 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create image list */
     wxImageList *p_images = new wxImageList( 16 , 16, TRUE );
+
+    /* FIXME: absolutely needs to be in the right order FIXME */
     p_images->Add( wxIcon( type_unknown_xpm ) );
-    p_images->Add( wxIcon( type_disc_xpm ) );
+    p_images->Add( wxIcon( type_unknown_xpm ) );
     p_images->Add( wxIcon( type_directory_xpm ) );
-    p_images->Add( wxIcon( type_playlist_xpm ) );
-    p_images->Add( wxIcon( type_net_xpm ) );
+    p_images->Add( wxIcon( type_disc_xpm ) );
     p_images->Add( wxIcon( type_card_xpm ) );
+    p_images->Add( wxIcon( type_net_xpm ) );
+    p_images->Add( wxIcon( type_playlist_xpm ) );
     treectrl->AssignImageList( p_images );
 
     treectrl->AddRoot( wxU(_("root" )), -1, -1, NULL );
