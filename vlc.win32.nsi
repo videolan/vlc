@@ -188,14 +188,21 @@ SectionEnd
 
 Section /o "Mozilla plugin" SEC03
   SectionIn 2 3
-  File  /r mozilla
+  File /r mozilla
 
   WriteRegStr HKLM \
     SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION} \
     "Path" '"$INSTDIR\mozilla\npvlc.dll"'
 SectionEnd
 
-SubSection "File type associations" SEC04
+Section /o "ActiveX plugin" SEC04
+  SectionIn 2 3
+  SetOutPath $SYSDIR
+  File activex\axvlc.dll
+  RegDLL $SYSDIR\axvlc.dll
+SectionEnd
+
+SubSection "File type associations" SEC05
   ; Make sure we have the same list in uninstall
   !insertmacro RegisterExtensionSection ".a52"
   !insertmacro RegisterExtensionSection ".aac"
@@ -264,6 +271,8 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} \
     "The VLC mozilla plugin"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} \
+    "The VLC ActiveX plugin"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} \
     "Sets VLC media player as the default application for the specified file type"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
