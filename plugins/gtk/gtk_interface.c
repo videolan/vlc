@@ -788,7 +788,7 @@ create_intf_window (void)
 
   channel_label = gtk_label_new (_("Channel:"));
   gtk_widget_ref (channel_label);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "channel-label", channel_label,
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "channel_label", channel_label,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (channel_label);
   gtk_box_pack_start (GTK_BOX (network_channel_box), channel_label, FALSE, FALSE, 5);
@@ -815,7 +815,6 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (intf_statusbar);
   gtk_box_pack_start (GTK_BOX (window_vbox), intf_statusbar, FALSE, FALSE, 0);
-  gtk_widget_set_usize (intf_statusbar, 500, -2);
 
   gtk_signal_connect (GTK_OBJECT (intf_window), "drag_data_received",
                       GTK_SIGNAL_FUNC (GtkWindowDrag),

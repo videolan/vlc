@@ -1006,7 +1006,6 @@
     <widget>
       <class>GtkStatusbar</class>
       <name>intf_statusbar</name>
-      <width>500</width>
       <child>
 	<padding>0</padding>
 	<expand>False</expand>

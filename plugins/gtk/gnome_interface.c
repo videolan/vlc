@@ -714,7 +714,6 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (appbar);
   gnome_app_set_statusbar (GNOME_APP (intf_window), appbar);
-  gtk_widget_set_usize (appbar, 500, -2);
 
   gtk_signal_connect (GTK_OBJECT (intf_window), "delete_event",
                       GTK_SIGNAL_FUNC (GtkWindowDelete),

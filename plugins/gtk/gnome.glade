@@ -1002,7 +1002,6 @@
     <class>GnomeAppBar</class>
     <child_name>GnomeApp:appbar</child_name>
     <name>appbar</name>
-    <width>500</width>
     <has_progress>False</has_progress>
     <has_status>True</has_status>
     <child>
