@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.63 2003/10/08 10:07:22 zorglub Exp $
+ * $Id: interface.cpp,v 1.64 2003/10/08 12:18:50 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -605,10 +605,10 @@ void Interface::CreateOurExtraPanel()
 
     float f_value;
     f_value = config_GetFloat( p_intf, "saturation" );
-    if( f_value > 0 && f_value < 3 )
+    if( f_value > 0 && f_value < 5 )
         saturation_slider->SetValue( (int)(100 * f_value) );
     f_value = config_GetFloat( p_intf, "contrast" );
-    if( f_value > 0 && f_value < 2 )
+    if( f_value > 0 && f_value < 4 )
         contrast_slider->SetValue( (int)(100 * f_value) );
     f_value = config_GetFloat( p_intf, "brightness" );
     if( f_value > 0 && f_value < 2 )
@@ -944,17 +944,17 @@ void Interface::OnHueUpdate( wxScrollEvent& event)
 
 void Interface::OnSaturationUpdate( wxScrollEvent& event)
 {
-   config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/300 );
+   config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/100 );
 }
 
 void Interface::OnBrightnessUpdate( wxScrollEvent& event)
 {
-   config_PutFloat( p_intf , "brightness", (float)event.GetPosition()/200 );
+   config_PutFloat( p_intf , "brightness", (float)event.GetPosition()/100 );
 }
 
 void Interface::OnContrastUpdate(wxScrollEvent& event)
 {
-   config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/200 );
+   config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/100 );
 
 }
 
