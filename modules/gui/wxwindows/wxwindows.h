@@ -67,7 +67,7 @@ DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
 #else // ENABLE_NLS && ENABLE_UTF8
 #if wxUSE_UNICODE
-#   define wxU(ansi) wxString(ansi, *wxConvCurrent)
+#   define wxU(ansi) wxString(ansi, wxConvLocal)
 #else
 #   define wxU(ansi) ansi
 #endif
