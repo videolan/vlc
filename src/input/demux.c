@@ -456,7 +456,24 @@ static int      DStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_SET_POSITION:
-            return VLC_EGENERIC;
+        {
+            int64_t i64 = (int64_t)va_arg( args, int64_t );
+            int i_skip;
+            if( i64 < p_sys->i_pos )
+                return VLC_EGENERIC;
+            i_skip = i64 - p_sys->i_pos;
+
+            while( i_skip > 0 )
+            {
+                int i_read = DStreamRead( s, NULL, i_skip );
+
+                if( i_read <= 0 )
+                    return VLC_EGENERIC;
+
+                i_skip -= i_read;
+            }
+            return VLC_SUCCESS;
+        }
 
         case STREAM_GET_MTU:
             p_int = (int*) va_arg( args, int * );
