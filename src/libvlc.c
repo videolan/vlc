@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.99 2003/10/26 12:46:55 sigmunau Exp $
+ * $Id: libvlc.c,v 1.100 2003/10/27 21:54:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -512,7 +512,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     msg_Flush( p_vlc );
 
     /* p_vlc initialization. FIXME ? */
-    p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
 
 #if defined( __i386__ )
     if( !config_GetInt( p_vlc, "mmx" ) )

@@ -2,7 +2,7 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec.c,v 1.11 2003/07/31 23:14:32 massiot Exp $
+ * $Id: dec.c,v 1.12 2003/10/27 21:54:10 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,6 +49,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
 {
     aout_input_t * p_input;
     input_thread_t * p_input_thread;
+    vlc_value_t val;
 
     /* We can only be called by the decoder, so no need to lock
      * p_input->lock. */
@@ -82,14 +83,8 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
     {
         int i;
 
-        if ( var_Type( p_aout, "audio-device" ) != 0 )
-        {
-            var_Destroy( p_aout, "audio-device" );
-        }
-        if ( var_Type( p_aout, "audio-channels" ) != 0 )
-        {
-            var_Destroy( p_aout, "audio-channels" );
-        }
+        var_Destroy( p_aout, "audio-device" );
+        var_Destroy( p_aout, "audio-channels" );
 
         /* Recreate the output using the new format. */
         if ( aout_OutputNew( p_aout, p_format ) < 0 )
@@ -129,18 +124,22 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
 
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
+    var_Create( p_this, "audio-desync", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_this, "audio-desync", &val );
+    p_input->i_desync = val.i_int * 1000;
+
     p_input_thread = (input_thread_t *)vlc_object_find( p_this,
                                            VLC_OBJECT_INPUT, FIND_PARENT );
     if( p_input_thread )
     {
-        p_aout->i_pts_delay = p_input_thread->i_pts_delay;
-        p_aout->i_pts_delay += p_aout->p_vlc->i_desync;
+        p_input->i_pts_delay = p_input_thread->i_pts_delay;
+        p_input->i_pts_delay += p_input->i_desync;
         vlc_object_release( p_input_thread );
     }
     else
     {
-        p_aout->i_pts_delay = DEFAULT_PTS_DELAY;
-        p_aout->i_pts_delay += p_aout->p_vlc->i_desync;
+        p_input->i_pts_delay = DEFAULT_PTS_DELAY;
+        p_input->i_pts_delay += p_input->i_desync;
     }
 
     return p_input;
@@ -300,10 +299,10 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     }
 
     /* Apply the desynchronisation requested by the user */
-    p_buffer->start_date += p_aout->p_vlc->i_desync;
-    p_buffer->end_date += p_aout->p_vlc->i_desync;
+    p_buffer->start_date += p_input->i_desync;
+    p_buffer->end_date += p_input->i_desync;
 
-    if ( p_buffer->start_date > mdate() + p_aout->i_pts_delay +
+    if ( p_buffer->start_date > mdate() + p_input->i_pts_delay +
          AOUT_MAX_ADVANCE_TIME )
     {
         msg_Warn( p_aout, "received buffer in the future ("I64Fd")",

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.96 2003/10/12 23:28:36 hartman Exp $
+ * $Id: libvlc.h,v 1.97 2003/10/27 21:54:10 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -596,12 +596,12 @@ vlc_module_begin();
 #if !defined( SYS_DARWIN )
     add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT, AOUT_RESAMP_LONGTEXT, VLC_TRUE );
 #endif
-    add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
 #if 0
     add_bool( "headphone-opt", 0, NULL, HEADPHONE_TEXT, 
                         HEADPHONE_LONGTEXT, VLC_FALSE );
 #endif
+    add_integer( "audio-desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
     add_string("audio-filter",0,NULL,AUDIO_FILTER_TEXT,
                     AUDIO_FILTER_LONGTEXT,VLC_FALSE);
     

@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.40 2003/03/06 23:10:11 gbazin Exp $
+ * $Id: aout_internal.h,v 1.41 2003/10/27 21:54:10 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -169,8 +169,15 @@ struct aout_input_t
 
     /* If b_error == 1, there is no input pipeline. */
     vlc_bool_t              b_error;
-    /* Did we just change the output format ? (expect buffer inconsistencies) */
+
+    /* Did we just change the output format? (expect buffer inconsistencies) */
     vlc_bool_t              b_changed;
+
+    /* internal caching delay from input */
+    int                     i_pts_delay;
+    /* desynchronisation delay request by the user */
+    int                     i_desync;
+
 };
 
 /*****************************************************************************
@@ -236,8 +243,6 @@ struct aout_instance_t
 
     /* Output plug-in */
     aout_output_t           output;
-
-    int                     i_pts_delay;                 /* internal caching */
 };
 
 /*****************************************************************************
