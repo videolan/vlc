@@ -1,20 +1,19 @@
-$Id: README,v 1.13 2002/11/26 15:03:28 sam Exp $
+$Id: README,v 1.14 2003/02/01 23:08:48 sam Exp $
 
 README for vlc, the VideoLAN Client
 ===================================
 
 ABOUT-NLS          - Notes on the Free Translation Project.
-AUTHORS            - All the people who worked on vlc.
+AUTHORS            - Main VLC authors.
 COPYING            - The GPL license.
 ChangeLog          - The vlc ChangeLog.
 FAQ                - Commonly asked questions.
 HACKING            - Hacking vlc.
 INSTALL            - Installation instructions.
-INSTALL.libmad     - Installation instructions for the libmad library.
 INSTALL.win32      - Installation instructions for the Win32 version of vlc.
-MODULES            - Short description of all the available modules.
 README             - This file.
 README.MacOSX.rtf  - Information specific to the MacOS X port.
+THANKS             - All VLC contributors.
 doc/               - miscellaneous documentation.
 
 Resources
