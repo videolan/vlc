@@ -34,7 +34,11 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#define FRAME_SIZE 1024              /* The size is in samples, not in bytes */
+#ifdef UNDER_CE
+#   define FRAME_SIZE 4096           /* The size is in samples, not in bytes */
+#else
+#   define FRAME_SIZE 1024           /* The size is in samples, not in bytes */
+#endif
 #define FRAMES_NUM 8
 
 /*****************************************************************************
