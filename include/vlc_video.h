@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.2 2003/07/15 18:12:05 sigmunau Exp $
+ * $Id: vlc_video.h,v 1.3 2003/10/04 15:51:22 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -23,90 +23,102 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * plane_t: description of a planar graphic field
- *****************************************************************************/
+/**
+ * Description of a planar graphic field
+ */
 typedef struct plane_t
 {
-    uint8_t *p_pixels;                          /* Start of the plane's data */
+    uint8_t *p_pixels;                        /**< Start of the plane's data */
 
     /* Variables used for fast memcpy operations */
-    int i_lines;                                          /* Number of lines */
-    int i_pitch;             /* Number of bytes in a line, including margins */
+    int i_lines;                                        /**< Number of lines */
+    int i_pitch;           /**< Number of bytes in a line, including margins */
 
-    /* Size of a macropixel, defaults to 1 */
+    /** Size of a macropixel, defaults to 1 */
     int i_pixel_pitch;
 
     /* Variables used for pictures with margins */
-    int i_visible_pitch;              /* How many visible pixels are there ? */
+    int i_visible_pitch;            /**< How many visible pixels are there ? */
 
 } plane_t;
 
-/*****************************************************************************
- * picture_t: video picture
- *****************************************************************************
+/**
+ * Video picture
+ *
  * Any picture destined to be displayed by a video output thread should be
  * stored in this structure from it's creation to it's effective display.
  * Picture type and flags should only be modified by the output thread. Note
  * that an empty picture MUST have its flags set to 0.
- *****************************************************************************/
+ */
 struct picture_t
 {
-    /* Picture data - data can always be freely modified, but p_data may
+    /** Picture data - data can always be freely modified, but p_data may
      * NEVER be modified. A direct buffer can be handled as the plugin
      * wishes, it can even swap p_pixels buffers. */
     uint8_t        *p_data;
-    void           *p_data_orig;                  /* pointer before memalign */
-    plane_t         p[ VOUT_MAX_PLANES ];       /* description of the planes */
-    int             i_planes;                  /* number of allocated planes */
+    void           *p_data_orig;                /**< pointer before memalign */
+    plane_t         p[ VOUT_MAX_PLANES ];     /**< description of the planes */
+    int             i_planes;                /**< number of allocated planes */
 
-    /* Type and flags - should NOT be modified except by the vout thread */
-    int             i_status;                               /* picture flags */
-    int             i_type;                  /* is picture a direct buffer ? */
-    int             i_matrix_coefficients;     /* in YUV type, encoding type */
+    /** \name Type and flags
+     * Should NOT be modified except by the vout thread
+     * @{*/
+    int             i_status;                             /**< picture flags */
+    int             i_type;                /**< is picture a direct buffer ? */
+    int             i_matrix_coefficients;   /**< in YUV type, encoding type */
+    /**@}*/
 
-    /* Picture management properties - these properties can be modified using
-     * the video output thread API, but should never be written directly */
-    int             i_refcount;                    /* link reference counter */
-    mtime_t         date;                                    /* display date */
+    /** \name Picture management properties
+     * These properties can be modified using the video output thread API,
+     * but should never be written directly */
+    /**@{*/
+    int             i_refcount;                  /**< link reference counter */
+    mtime_t         date;                                  /**< display date */
     vlc_bool_t      b_force;
+    /**@}*/
 
-    /* Picture dynamic properties - those properties can be changed by the
-     * decoder */
-    vlc_bool_t      b_progressive;            /* is it a progressive frame ? */
-    unsigned int    i_nb_fields;                    /* # of displayed fields */
-    vlc_bool_t      b_top_field_first;               /* which field is first */
-
-    /* The picture heap we are attached to */
+    /** \name Picture dynamic properties
+     * Those properties can be changed by the decoder
+     * @{
+     */
+    vlc_bool_t      b_progressive;          /**< is it a progressive frame ? */
+    unsigned int    i_nb_fields;                  /**< # of displayed fields */
+    vlc_bool_t      b_top_field_first;             /**< which field is first */
+    /**@}*/
+    
+    /** The picture heap we are attached to */
     picture_heap_t* p_heap;
 
     /* Some vouts require the picture to be locked before it can be modified */
     int (* pf_lock) ( vout_thread_t *, picture_t * );
     int (* pf_unlock) ( vout_thread_t *, picture_t * );
 
-    /* Private data - the video output plugin might want to put stuff here to
+    /** Private data - the video output plugin might want to put stuff here to
      * keep track of the picture */
     picture_sys_t * p_sys;
 };
 
-/*****************************************************************************
- * picture_heap_t: video picture heap, either render (to store pictures used
+/**
+ * Video picture heap, either render (to store pictures used
  * by the decoder) or output (to store pictures displayed by the vout plugin)
- *****************************************************************************/
+ */
 struct picture_heap_t
 {
-    int i_pictures;                                     /* current heap size */
+    int i_pictures;                                   /**< current heap size */
 
-    /* Picture static properties - those properties are fixed at initialization
-     * and should NOT be modified */
-    unsigned int i_width;                                   /* picture width */
-    unsigned int i_height;                                 /* picture height */
-    vlc_fourcc_t i_chroma;                                 /* picture chroma */
-    unsigned int i_aspect;                                   /* aspect ratio */
+    /* \name Picture static properties
+     * Those properties are fixed at initialization and should NOT be modified
+     * @{
+     */
+    unsigned int i_width;                                 /**< picture width */
+    unsigned int i_height;                               /**< picture height */
+    vlc_fourcc_t i_chroma;                               /**< picture chroma */
+    unsigned int i_aspect;                                 /**< aspect ratio */
+    /**@}*/
 
     /* Real pictures */
-    picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
-    int             i_last_used_pic;                /* last used pic in heap */
+    picture_t*      pp_picture[VOUT_MAX_PICTURES];             /**< pictures */
+    int             i_last_used_pic;              /**< last used pic in heap */
     vlc_bool_t      b_allow_modify_pics;
 
     /* Stuff used for truecolor RGB planes */
@@ -114,7 +126,7 @@ struct picture_heap_t
     int i_gmask, i_rgshift, i_lgshift;
     int i_bmask, i_rbshift, i_lbshift;
 
-    /* Stuff used for palettized RGB planes */
+    /** Stuff used for palettized RGB planes */
     void (* pf_setpalette) ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 };
 
@@ -152,6 +164,14 @@ struct picture_heap_t
 #define U_PITCH      p[U_PLANE].i_pitch
 #define V_PIXELS     p[V_PLANE].p_pixels
 #define V_PITCH      p[V_PLANE].i_pitch
+
+/**
+ * \defgroup subpicture Video Subpictures
+ * Subpictures are pictures that should be displayed on top of the video, like
+ * subtitles and OSD
+ * \ingroup video_output
+ * @{
+ */
 
 /**
  * Video subtitle
@@ -226,3 +246,4 @@ struct subpicture_t
 #define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
 #define READY_SUBPICTURE       2                        /* ready for display */
 
+/**@}*/

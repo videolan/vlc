@@ -1,11 +1,8 @@
 /*****************************************************************************
  * video_output.h : video output thread
- * This module describes the programming interface for video output threads.
- * It includes functions allowing to open a new thread, send pictures to a
- * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.98 2003/08/28 21:11:54 gbazin Exp $
+ * $Id: video_output.h,v 1.99 2003/10/04 15:51:22 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -25,33 +22,41 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * vout_chroma_t: Chroma conversion function
- *****************************************************************************
+/**
+ * \defgroup video_output Video Output
+ * This module describes the programming interface for video output threads.
+ * It includes functions allowing to open a new thread, send pictures to a
+ * thread, and destroy a previously opened video output thread.
+ * @{
+ */
+
+/**
+ * Chroma conversion function
+ *
  * This is the prototype common to all conversion functions.
- * Parameters:
- *      p_source                        source picture
- *      p_dest                          destination picture
+ * \param p_vout video output thread
+ * \param p_source source picture
+ * \param p_dest destination picture
  * Picture width and source dimensions must be multiples of 16.
- *****************************************************************************/
+ */
 typedef void (vout_chroma_convert_t)( vout_thread_t *,
                                       picture_t *, picture_t * );
 
 typedef struct vout_chroma_t
 {
-    /* conversion functions */
+    /** conversion functions */
     vout_chroma_convert_t *pf_convert;
 
-    /* Private module-dependant data */
+    /** Private module-dependant data */
     chroma_sys_t *      p_sys;                               /* private data */
 
-    /* Plugin used and shortcuts to access its capabilities */
+    /** Plugin used and shortcuts to access its capabilities */
     module_t * p_module;
 
 } vout_chroma_t;
 
 /**
- * \brief video output thread descriptor
+ * Video output thread descriptor
  *
  * Any independant video output device, such as an X11 window or a GGI device,
  * is represented by a video output thread, and described using the following
@@ -71,7 +76,8 @@ struct vout_thread_t
     
     /** \name Current display properties */
     /**@{*/
-    uint16_t            i_changes;           /**< changes made to the thread */
+    uint16_t            i_changes;          /**< changes made to the thread.
+                                                      \see \ref vout_changes */
     float               f_gamma;                                  /**< gamma */
     vlc_bool_t          b_grayscale;         /**< color or grayscale display */
     vlc_bool_t          b_info;            /**< print additional information */
@@ -144,18 +150,32 @@ struct vout_thread_t
 #define I_RENDERPICTURES p_vout->render.i_pictures
 #define PP_RENDERPICTURE p_vout->render.pp_picture
 
-/* Flags for changes - these flags are set in the i_changes field when another
- * thread changed a variable */
-#define VOUT_INFO_CHANGE        0x0001                     /* b_info changed */
-#define VOUT_GRAYSCALE_CHANGE   0x0002                /* b_grayscale changed */
-#define VOUT_INTF_CHANGE        0x0004                /* b_interface changed */
-#define VOUT_SCALE_CHANGE       0x0008                    /* b_scale changed */
-#define VOUT_GAMMA_CHANGE       0x0010                      /* gamma changed */
-#define VOUT_CURSOR_CHANGE      0x0020                   /* b_cursor changed */
-#define VOUT_FULLSCREEN_CHANGE  0x0040               /* b_fullscreen changed */
-#define VOUT_SIZE_CHANGE        0x0200                       /* size changed */
-#define VOUT_DEPTH_CHANGE       0x0400                      /* depth changed */
-#define VOUT_CHROMA_CHANGE      0x0800               /* change chroma tables */
+/** \defgroup vout_changes Flags for changes
+ * These flags are set in the vout_thread_t::i_changes field when another
+ * thread changed a variable
+ * @{
+ */
+/** b_info changed */
+#define VOUT_INFO_CHANGE        0x0001                   
+/** b_grayscale changed */
+#define VOUT_GRAYSCALE_CHANGE   0x0002              
+/** b_interface changed */
+#define VOUT_INTF_CHANGE        0x0004              
+/** b_scale changed */
+#define VOUT_SCALE_CHANGE       0x0008                  
+/** gamma changed */
+#define VOUT_GAMMA_CHANGE       0x0010
+/** b_cursor changed */
+#define VOUT_CURSOR_CHANGE      0x0020
+/** b_fullscreen changed */
+#define VOUT_FULLSCREEN_CHANGE  0x0040
+/** size changed */
+#define VOUT_SIZE_CHANGE        0x0200
+/** depth changed */
+#define VOUT_DEPTH_CHANGE       0x0400
+/** change chroma tables */
+#define VOUT_CHROMA_CHANGE      0x0800
+/**@}*/
 
 /* Alignment flags */
 #define VOUT_ALIGN_LEFT         0x0001
@@ -190,7 +210,10 @@ VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
-
+/**
+ * \addtogroup subpicture
+ * @{
+ */
 VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int ) );
 VLC_EXPORT( void,            vout_DestroySubPicture,  ( vout_thread_t *, subpicture_t * ) );
 VLC_EXPORT( void,            vout_DisplaySubPicture,  ( vout_thread_t *, subpicture_t * ) );
@@ -198,3 +221,7 @@ VLC_EXPORT( void,            vout_DisplaySubPicture,  ( vout_thread_t *, subpict
 subpicture_t *  vout_SortSubPictures    ( vout_thread_t *, mtime_t );
 void            vout_RenderSubPictures  ( vout_thread_t *, picture_t *,
                                                            subpicture_t * );
+/** @}*/
+/**
+ * @}
+ */

@@ -2,7 +2,7 @@
  * osd.h : Constants for use with osd modules
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: osd.h,v 1.3 2003/08/10 10:22:52 gbazin Exp $
+ * $Id: osd.h,v 1.4 2003/10/04 15:51:22 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -21,10 +21,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/**
+ * \file
+ * Stucts and function prototypes to place text on the video
+ */
+
 #define OSD_ALIGN_LEFT 0x1
 #define OSD_ALIGN_RIGHT 0x2
 #define OSD_ALIGN_TOP 0x4
 #define OSD_ALIGN_BOTTOM 0x8
+
+/**
+ * Text style information.
+ * This struct is currently ignored
+ */
 struct text_style_t
 {
     int i_size;
