@@ -402,9 +402,8 @@ vlc_appdir = $(bindir)
 VLC.app: vlc
 	cd $(top_builddir)
 	rm -Rf VLC.app
-	rm -Rf extras
-	mkdir extras
-	cp -r $(srcdir)/extras/MacOSX extras
+	mkdir extras || true
+	cp -r $(srcdir)/extras/MacOSX extras || true
 	cd extras/MacOSX && pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
 	cd $(top_builddir)
 	cp -r extras/MacOSX/build/vlc.bundle VLC.app
