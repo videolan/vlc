@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap.sh,v 1.10 2002/08/07 21:36:55 massiot Exp $
+##  $Id: bootstrap.sh,v 1.11 2002/08/24 11:57:07 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -82,9 +82,6 @@ then
 #include <vlc/vlc.h>
 EOF
     tail +8 modules/gui/gtk/$file \
-        | sed 's#DISABLED!!!_("/dev/dvd")#config_GetPsz( "dvd" )#' \
-        | sed 's#DISABLED!!!11954#config_GetInt( "frequency" )#' \
-        | sed 's#DISABLED!!!27500#config_GetInt( "symbol-rate" )#' \
         | sed 's#_("-:--:--")#"-:--:--"#' \
         | sed 's#_("---")#"---"#' \
         | sed 's#_("--")#"--"#' \

@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: open.c,v 1.2 2002/08/24 11:57:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -437,6 +437,16 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
         free( psz_var );
     }
 
+    /* Disc stuff */
+    psz_var = config_GetPsz( p_intf, "dvd" );
+    if( psz_var )
+    {
+        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_open ), "disc_name" ) ),
+            psz_var );
+        free( psz_var );
+    }
+
     /* Network stuff */
     gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_open ), "network_udp_port" ) ),
@@ -458,6 +468,25 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
     gtk_toggle_button_set_active( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_open ), "network_channel" ),
         config_GetInt( p_intf, "network-channel" ) );
+
+    /* Satellite stuff */
+    psz_var = config_GetPsz( p_intf, "frequency" );
+    if( psz_var )
+    {
+        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_open ), "sat_freq" ) ),
+            psz_var );
+        free( psz_var );
+    }
+
+    psz_var = config_GetPsz( p_intf, "symbol-rate" );
+    if( psz_var )
+    {
+        gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data(
+            GTK_OBJECT( p_intf->p_sys->p_open ), "sat_srate" ) ),
+            psz_var );
+        free( psz_var );
+    }
 
     /* Set the right page */
 setpage:
