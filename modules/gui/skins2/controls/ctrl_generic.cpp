@@ -2,7 +2,7 @@
  * ctrl_generic.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_generic.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -24,7 +24,7 @@
 
 #include "ctrl_generic.hpp"
 #include "../src/generic_layout.hpp"
-#include "../src/generic_window.hpp"
+#include "../src/top_window.hpp"
 #include "../src/os_graphics.hpp"
 #include "../utils/position.hpp"
 #include "../utils/var_bool.hpp"
@@ -101,7 +101,7 @@ void CtrlGeneric::releaseMouse() const
 
 void CtrlGeneric::notifyTooltipChange() const
 {
-    GenericWindow *pWin = getWindow();
+    TopWindow *pWin = getWindow();
     if( pWin )
     {
         // Notify the window
@@ -110,7 +110,7 @@ void CtrlGeneric::notifyTooltipChange() const
 }
 
 
-GenericWindow *CtrlGeneric::getWindow() const
+TopWindow *CtrlGeneric::getWindow() const
 {
     if( m_pLayout )
     {

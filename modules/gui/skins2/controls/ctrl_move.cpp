@@ -26,13 +26,13 @@
 #include "../events/evt_generic.hpp"
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_motion.hpp"
-#include "../src/generic_window.hpp"
+#include "../src/top_window.hpp"
 #include "../src/window_manager.hpp"
 #include "../utils/position.hpp"
 
 
 CtrlMove::CtrlMove( intf_thread_t *pIntf, WindowManager &rWindowManager,
-                    CtrlFlat &rCtrl, GenericWindow &rWindow,
+                    CtrlFlat &rCtrl, TopWindow &rWindow,
                     const UString &rHelp, VarBool *pVisible ):
     CtrlFlat( pIntf, rHelp, pVisible ), m_fsm( pIntf ),
     m_rWindowManager( rWindowManager ),

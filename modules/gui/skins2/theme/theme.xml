@@ -61,7 +61,6 @@
   <Bitmap id="stop_disabled" file="stop_disabled.png" alphacolor="#FF0000"/>
   <Bitmap id="stop_onclick" file="stop_onclick.png" alphacolor="#FF0000"/>
   <Bitmap id="volume_radial" file="volume.png" alphacolor="#FF0000"/>
-  <Bitmap id="vout" file="vout.png" alphacolor="#FF0000"/>
 
   <Font id="default_font" font="FreeSansBold.ttf" size="15"/> 
   <Font id="playlist_font" font="FreeSansBold.ttf" size="12"/> 

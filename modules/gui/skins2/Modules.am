@@ -112,6 +112,8 @@ SOURCES_skins2 = \
 	src/theme_loader.hpp \
 	src/tooltip.cpp \
 	src/tooltip.hpp \
+	src/top_window.cpp \
+	src/top_window.hpp \
 	src/var_manager.cpp \
 	src/var_manager.hpp \
 	src/vlcproc.cpp \

@@ -27,10 +27,9 @@
 #include "../src/os_graphics.hpp"
 
 
-CtrlVideo::CtrlVideo( intf_thread_t *pIntf, WindowManager &rWindowManager,
-                      const UString &rHelp, VarBool *pVisible ):
-    CtrlGeneric( pIntf, rHelp, pVisible ), m_rWindowManager( rWindowManager ),
-    m_pVout( NULL )
+CtrlVideo::CtrlVideo( intf_thread_t *pIntf, const UString &rHelp,
+                      VarBool *pVisible ):
+    CtrlGeneric( pIntf, rHelp, pVisible ), m_pVout( NULL )
 {
 }
 
@@ -80,8 +79,7 @@ void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
         if (!m_pVout)
         {
             m_pVout = new VoutWindow( getIntf(), pPos->getLeft(),
-                                      pPos->getTop(), m_rWindowManager, false,
-                                      false, *pParent );
+                                      pPos->getTop(), false, false, *pParent );
             m_pVout->resize( pPos->getWidth(), pPos->getHeight() );
             m_pVout->show();
         }

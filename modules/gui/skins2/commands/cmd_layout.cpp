@@ -2,7 +2,7 @@
  * cmd_layout.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_layout.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include "cmd_layout.hpp"
-#include "../src/generic_window.hpp"
+#include "../src/top_window.hpp"
 #include "../src/generic_layout.hpp"
 #include "../src/theme.hpp"
 
@@ -42,7 +42,7 @@ void CmdLayout::execute()
     {
         return;
     }
-    GenericWindow *pWindow =
+    TopWindow *pWindow =
         getIntf()->p_sys->p_theme->getWindowById( m_windowId );
     GenericLayout *pLayout =
         getIntf()->p_sys->p_theme->getLayoutById( m_layoutId );

@@ -27,9 +27,8 @@
 
 
 VoutWindow::VoutWindow( intf_thread_t *pIntf, int left, int top,
-                        WindowManager &rWindowManager,
                         bool dragDrop, bool playOnDrop, GenericWindow &rParent ):
-    GenericWindow( pIntf, left, top, rWindowManager, dragDrop, playOnDrop,
+    GenericWindow( pIntf, left, top, dragDrop, playOnDrop,
                    &rParent )
 {
 }

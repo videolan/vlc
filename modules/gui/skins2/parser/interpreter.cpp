@@ -118,7 +118,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
     {
         int leftPos = rAction.find( ".show()" );
         string windowId = rAction.substr( 0, leftPos );
-        GenericWindow *pWin = pTheme->getWindowById( windowId );
+        TopWindow *pWin = pTheme->getWindowById( windowId );
         if( pWin )
         {
             pCommand = new CmdShowWindow( getIntf(), pTheme->getWindowManager(),
@@ -133,7 +133,7 @@ CmdGeneric *Interpreter::parseAction( const string &rAction, Theme *pTheme )
     {
         int leftPos = rAction.find( ".hide()" );
         string windowId = rAction.substr( 0, leftPos );
-        GenericWindow *pWin = pTheme->getWindowById( windowId );
+        TopWindow *pWin = pTheme->getWindowById( windowId );
         if( pWin )
         {
             pCommand = new CmdHideWindow( getIntf(), pTheme->getWindowManager(),
@@ -210,7 +210,7 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
     {
         int leftPos = rName.find( ".isVisible" );
         string windowId = rName.substr( 0, leftPos );
-        GenericWindow *pWin = pTheme->getWindowById( windowId );
+        TopWindow *pWin = pTheme->getWindowById( windowId );
         if( pWin )
         {
             return &pWin->getVisibleVar();

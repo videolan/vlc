@@ -42,14 +42,14 @@ WindowManager::~WindowManager()
 }
 
 
-void WindowManager::registerWindow( GenericWindow &rWindow )
+void WindowManager::registerWindow( TopWindow &rWindow )
 {
     // Add the window to the set
     m_allWindows.insert( &rWindow );
 }
 
 
-void WindowManager::unregisterWindow( GenericWindow &rWindow )
+void WindowManager::unregisterWindow( TopWindow &rWindow )
 {
     // Erase every possible reference to the window
     m_allWindows.erase( &rWindow );
@@ -58,7 +58,7 @@ void WindowManager::unregisterWindow( GenericWindow &rWindow )
 }
 
 
-void WindowManager::startMove( GenericWindow &rWindow )
+void WindowManager::startMove( TopWindow &rWindow )
 {
     // Rebuild the set of moving windows
     m_movingWindows.clear();
@@ -126,7 +126,7 @@ void WindowManager::stopMove()
 }
 
 
-void WindowManager::move( GenericWindow &rWindow, int left, int top ) const
+void WindowManager::move( TopWindow &rWindow, int left, int top ) const
 {
     // Compute the real move offset
     int xOffset = left - rWindow.getLeft();
@@ -144,7 +144,7 @@ void WindowManager::move( GenericWindow &rWindow, int left, int top ) const
 }
 
 
-void WindowManager::raiseAll( GenericWindow &rWindow ) const
+void WindowManager::raiseAll( TopWindow &rWindow ) const
 {
     // Raise all the windows
     WinSet_t::const_iterator it;
@@ -194,7 +194,7 @@ void WindowManager::toggleOnTop()
 
 
 void WindowManager::buildDependSet( WinSet_t &rWinSet,
-                                    GenericWindow *pWindow )
+                                    TopWindow *pWindow )
 {
     // pWindow is in the set
     rWinSet.insert( pWindow );
@@ -213,7 +213,7 @@ void WindowManager::buildDependSet( WinSet_t &rWinSet,
 }
 
 
-void WindowManager::checkAnchors( GenericWindow *pWindow,
+void WindowManager::checkAnchors( TopWindow *pWindow,
                                   int &xOffset, int &yOffset ) const
 {
     WinSet_t::const_iterator itMov, itSta;

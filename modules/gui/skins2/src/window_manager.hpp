@@ -26,7 +26,7 @@
 #define WINDOW_MANAGER_HPP
 
 #include "skin_common.hpp"
-#include "generic_window.hpp"
+#include "top_window.hpp"
 #include <list>
 #include <map>
 #include <set>
@@ -50,13 +50,13 @@ class WindowManager: public SkinObject
 
         /// Add a window to the list of known windows. Necessary if you want
         /// your window to be movable...
-        void registerWindow( GenericWindow &rWindow );
+        void registerWindow( TopWindow &rWindow );
 
         /// Remove a previously registered window
-        void unregisterWindow( GenericWindow &rWindow );
+        void unregisterWindow( TopWindow &rWindow );
 
         /// Tell the window manager that a move is initiated for pWindow.
-        void startMove( GenericWindow &rWindow );
+        void startMove( TopWindow &rWindow );
 
         /// Tell the window manager that the current move ended.
         void stopMove();
@@ -64,10 +64,10 @@ class WindowManager: public SkinObject
         /// Move the pWindow window to (left, top), and move all its
         /// anchored windows.
         /// If a new anchoring is detected, the windows will move accordingly.
-        void move( GenericWindow &rWindow, int left, int top ) const;
+        void move( TopWindow &rWindow, int left, int top ) const;
 
         /// Raise all the windows, rWindow being above the others
-        void raiseAll( GenericWindow &rWindow ) const;
+        void raiseAll( TopWindow &rWindow ) const;
 
         /// Show all the registered windows
         void showAll() const;
@@ -76,10 +76,10 @@ class WindowManager: public SkinObject
         void hideAll() const;
 
         /// Show the given window
-        void show( GenericWindow &rWindow ) { rWindow.show(); }
+        void show( TopWindow &rWindow ) { rWindow.show(); }
 
         /// Hide the given window
-        void hide( GenericWindow &rWindow ) { rWindow.hide(); }
+        void hide( TopWindow &rWindow ) { rWindow.hide(); }
 
         /// Toggle all the windows on top
         void toggleOnTop();
@@ -104,7 +104,7 @@ class WindowManager: public SkinObject
 
     private:
         /// Some useful typedefs for lazy people like me
-        typedef set<GenericWindow*> WinSet_t;
+        typedef set<TopWindow*> WinSet_t;
         typedef list<Anchor*> AncList_t;
 
         /// This map represents the graph of anchored windows: it associates
@@ -112,7 +112,7 @@ class WindowManager: public SkinObject
         /// This is not transitive, i.e. if a is in m_dep[b] and if b is in
         /// m_dep[c], it doesn't mean that a is in m_dep[c] (in fact, it
         /// would be extremely rare...)
-        map<GenericWindow*, WinSet_t> m_dependencies;
+        map<TopWindow*, WinSet_t> m_dependencies;
         /// Store all the windows
         WinSet_t m_allWindows;
         /// Store the moving windows; this set is updated at every start of
@@ -130,11 +130,11 @@ class WindowManager: public SkinObject
         Tooltip *m_pTooltip;
 
         /// Recursively build a set of windows anchored to the one given.
-        void buildDependSet( WinSet_t &rWinSet, GenericWindow *pWindow );
+        void buildDependSet( WinSet_t &rWinSet, TopWindow *pWindow );
 
         /// Check anchoring: this function updates xOffset and yOffset,
         /// to take care of a new anchoring (if any)
-        void checkAnchors( GenericWindow *pWindow,
+        void checkAnchors( TopWindow *pWindow,
                            int &xOffset, int &yOffset ) const;
 };
 

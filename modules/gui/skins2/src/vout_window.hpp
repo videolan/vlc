@@ -32,7 +32,6 @@ class VoutWindow: public GenericWindow
 {
     public:
         VoutWindow( intf_thread_t *pIntf, int xPos, int yPos,
-                    WindowManager &rWindowManager,
                     bool dragDrop, bool playOnDrop, GenericWindow &rParent );
         virtual ~VoutWindow();
 };

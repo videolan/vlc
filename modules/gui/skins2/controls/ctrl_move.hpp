@@ -2,7 +2,7 @@
  * ctrl_move.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_move.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -29,7 +29,7 @@
 #include "../utils/fsm.hpp"
 #include "ctrl_flat.hpp"
 
-class GenericWindow;
+class TopWindow;
 class WindowManager;
 
 
@@ -38,7 +38,7 @@ class CtrlMove: public CtrlFlat
 {
     public:
         CtrlMove( intf_thread_t *pIntf, WindowManager &rWindowManager,
-                  CtrlFlat &rCtrl, GenericWindow &rWindow,
+                  CtrlFlat &rCtrl, TopWindow &rWindow,
                   const UString &rHelp, VarBool *pVisible );
         virtual ~CtrlMove() {}
 
@@ -69,7 +69,7 @@ class CtrlMove: public CtrlFlat
         /// Decorated CtrlFlat
         CtrlFlat &m_rCtrl;
         /// The window moved by this control
-        GenericWindow &m_rWindow;
+        TopWindow &m_rWindow;
         /// The last received event
         EvtGeneric *m_pEvt;
         /// Position of the click that started the move

@@ -51,14 +51,14 @@ void Theme::loadConfig()
         return;
 
     // Initialization
-    map<string, GenericWindowPtr>::const_iterator it;
+    map<string, TopWindowPtr>::const_iterator it;
     int i = 0;
     int x, y, v, scan;
 
     // Get config for each window
     for( it = m_windows.begin(); it != m_windows.end(); it++ )
     {
-        GenericWindow *pWin = (*it).second.get();
+        TopWindow *pWin = (*it).second.get();
         // Get config
         scan = sscanf( &save[i * 13], "(%4d,%4d,%1d)", &x, &y, &v );
 
@@ -81,14 +81,14 @@ void Theme::saveConfig()
 
     // Initialize char where config is stored
     char *save  = new char[400];
-    map<string, GenericWindowPtr>::const_iterator it;
+    map<string, TopWindowPtr>::const_iterator it;
     int i = 0;
     int x, y;
 
     // Save config of every window
     for( it = m_windows.begin(); it != m_windows.end(); it++ )
     {
-        GenericWindow *pWin = (*it).second.get();
+        TopWindow *pWin = (*it).second.get();
         // Print config
         x = pWin->getLeft();
         y = pWin->getTop();
@@ -126,9 +126,9 @@ GenericFont *Theme::getFontById( const string &id )
     FIND_OBJECT( GenericFontPtr, m_fonts );
 }
 
-GenericWindow *Theme::getWindowById( const string &id )
+TopWindow *Theme::getWindowById( const string &id )
 {
-    FIND_OBJECT( GenericWindowPtr, m_windows );
+    FIND_OBJECT( TopWindowPtr, m_windows );
 }
 
 GenericLayout *Theme::getLayoutById( const string &id )

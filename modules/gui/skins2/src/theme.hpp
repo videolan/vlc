@@ -51,7 +51,7 @@ class Theme: public SkinObject
 
         GenericBitmap *getBitmapById( const string &id );
         GenericFont *getFontById( const string &id );
-        GenericWindow *getWindowById( const string &id );
+        TopWindow *getWindowById( const string &id );
         GenericLayout *getLayoutById( const string &id );
         CtrlGeneric *getControlById( const string &id );
 
@@ -65,7 +65,7 @@ class Theme: public SkinObject
         /// Store the fonts by ID
         map<string, GenericFontPtr> m_fonts;
         /// Store the windows by ID
-        map<string, GenericWindowPtr> m_windows;
+        map<string, TopWindowPtr> m_windows;
         /// Store the layouts by ID
         map<string, GenericLayoutPtr> m_layouts;
         /// Store the controls by ID

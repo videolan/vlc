@@ -26,7 +26,7 @@
 #define CMD_SHOW_WINDOW_HPP
 
 #include "cmd_generic.hpp"
-#include "../src/generic_window.hpp"
+#include "../src/top_window.hpp"
 #include "../src/window_manager.hpp"
 
 
@@ -35,7 +35,7 @@ class CmdShowWindow: public CmdGeneric
 {
     public:
         CmdShowWindow( intf_thread_t *pIntf, WindowManager &rWinManager,
-                       GenericWindow &rWin ):
+                       TopWindow &rWin ):
             CmdGeneric( pIntf ), m_rWinManager( rWinManager ), m_rWin( rWin ) {}
         virtual ~CmdShowWindow() {}
 
@@ -49,7 +49,7 @@ class CmdShowWindow: public CmdGeneric
         /// Reference to the window manager
         WindowManager &m_rWinManager;
         /// Reference to the window
-        GenericWindow &m_rWin;
+        TopWindow &m_rWin;
 };
 
 
@@ -58,7 +58,7 @@ class CmdHideWindow: public CmdGeneric
 {
     public:
         CmdHideWindow( intf_thread_t *pIntf, WindowManager &rWinManager,
-                       GenericWindow &rWin ):
+                       TopWindow &rWin ):
             CmdGeneric( pIntf ), m_rWinManager( rWinManager ), m_rWin( rWin ) {}
         virtual ~CmdHideWindow() {}
 
@@ -72,7 +72,7 @@ class CmdHideWindow: public CmdGeneric
         /// Reference to the window manager
         WindowManager &m_rWinManager;
         /// Reference to the window
-        GenericWindow &m_rWin;
+        TopWindow &m_rWin;
 };
 
 

@@ -2,7 +2,7 @@
  * generic_layout.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_layout.cpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include "generic_layout.hpp"
-#include "generic_window.hpp"
+#include "top_window.hpp"
 #include "os_factory.hpp"
 #include "os_graphics.hpp"
 #include "../controls/ctrl_generic.hpp"
@@ -52,7 +52,7 @@ GenericLayout::~GenericLayout()
 }
 
 
-void GenericLayout::setWindow( GenericWindow *pWindow )
+void GenericLayout::setWindow( TopWindow *pWindow )
 {
     m_pWindow = pWindow;
 }
@@ -61,7 +61,7 @@ void GenericLayout::setWindow( GenericWindow *pWindow )
 void GenericLayout::onControlCapture( const CtrlGeneric &rCtrl )
 {
     // Just forward the request to the window
-    GenericWindow *pWindow = getWindow();
+    TopWindow *pWindow = getWindow();
     if( pWindow )
     {
         pWindow->onControlCapture( rCtrl );
@@ -72,7 +72,7 @@ void GenericLayout::onControlCapture( const CtrlGeneric &rCtrl )
 void GenericLayout::onControlRelease( const CtrlGeneric &rCtrl )
 {
     // Just forward the request to the window
-    GenericWindow *pWindow = getWindow();
+    TopWindow *pWindow = getWindow();
     if( pWindow )
     {
         pWindow->onControlRelease( rCtrl );
@@ -161,7 +161,7 @@ void GenericLayout::resize( int width, int height )
     }
 
     // Resize and refresh the associated window
-    GenericWindow *pWindow = getWindow();
+    TopWindow *pWindow = getWindow();
     if( pWindow )
     {
         // Resize the window
@@ -191,7 +191,7 @@ void GenericLayout::refreshAll()
     }
 
     // Refresh the associated window
-    GenericWindow *pWindow = getWindow();
+    TopWindow *pWindow = getWindow();
     if( pWindow )
     {
         pWindow->refresh( 0, 0, m_width, m_height );

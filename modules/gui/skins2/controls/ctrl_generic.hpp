@@ -2,7 +2,7 @@
  * ctrl_generic.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_generic.hpp,v 1.2 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -35,7 +35,7 @@ class EvtGeneric;
 class OSGraphics;
 class GenericLayout;
 class Position;
-class GenericWindow;
+class TopWindow;
 class VarBool;
 
 
@@ -96,7 +96,7 @@ class CtrlGeneric: public SkinObject, public Observer<VarBool>
         virtual void notifyTooltipChange() const;
 
         /// Get the associated window, if any
-        virtual GenericWindow *getWindow() const;
+        virtual TopWindow *getWindow() const;
 
         /// Overload this method if you want to do something special when
         /// the Position object is set

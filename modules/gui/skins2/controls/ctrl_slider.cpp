@@ -2,7 +2,7 @@
  * ctrl_slider.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_slider.cpp,v 1.5 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -27,7 +27,7 @@
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_scroll.hpp"
 #include "../src/generic_bitmap.hpp"
-#include "../src/generic_window.hpp"
+#include "../src/top_window.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/os_graphics.hpp"
 #include "../utils/position.hpp"
@@ -342,7 +342,7 @@ void CtrlSliderBg::handleEvent( EvtGeneric &rEvent )
 
         // Forward the clic to the cursor
         EvtMouse evt( getIntf(), x, y, EvtMouse::kLeft, EvtMouse::kDown );
-        GenericWindow *pWin = getWindow();
+        TopWindow *pWin = getWindow();
         if( pWin )
         {
             EvtEnter evtEnter( getIntf() );

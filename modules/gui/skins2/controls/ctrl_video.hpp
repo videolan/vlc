@@ -27,14 +27,13 @@
 #include "ctrl_generic.hpp"
 
 class VoutWindow;
-class WindowManager;
 
 /// Control video
 class CtrlVideo: public CtrlGeneric
 {
     public:
-        CtrlVideo( intf_thread_t *pIntf, WindowManager &rWindowManager,
-                   const UString &rHelp, VarBool *pVisible );
+        CtrlVideo( intf_thread_t *pIntf, const UString &rHelp,
+                   VarBool *pVisible );
         virtual ~CtrlVideo();
 
         /// Handle an event on the control
@@ -50,8 +49,6 @@ class CtrlVideo: public CtrlGeneric
         virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
     private:
-        /// Window manager
-        WindowManager &m_rWindowManager;
         /// Vout window
         VoutWindow *m_pVout;
 };

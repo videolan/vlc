@@ -2,7 +2,7 @@
  * generic_layout.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_layout.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -31,7 +31,7 @@
 
 #include <list>
 
-class GenericWindow;
+class TopWindow;
 class OSGraphics;
 class CtrlGeneric;
 
@@ -60,10 +60,10 @@ class GenericLayout: public SkinObject, public Box
         virtual ~GenericLayout();
 
         /// Attach the layout to a window
-        virtual void setWindow( GenericWindow *pWindow );
+        virtual void setWindow( TopWindow *pWindow );
 
         /// Get the associated window, if any
-        virtual GenericWindow *getWindow() const { return m_pWindow; }
+        virtual TopWindow *getWindow() const { return m_pWindow; }
 
         /// Called by a control which wants to capture the mouse
         virtual void onControlCapture( const CtrlGeneric &rCtrl );
@@ -104,7 +104,7 @@ class GenericLayout: public SkinObject, public Box
 
     private:
         /// Parent window of the layout
-        GenericWindow *m_pWindow;
+        TopWindow *m_pWindow;
         /// Layout size
         int m_width, m_height;
         int m_minWidth, m_maxWidth;

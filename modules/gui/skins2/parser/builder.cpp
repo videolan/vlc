@@ -29,8 +29,7 @@
 #include "../src/png_bitmap.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/generic_bitmap.hpp"
-#include "../src/generic_window.hpp"
-#include "../src/vout_window.hpp"
+#include "../src/top_window.hpp"
 #include "../src/anchor.hpp"
 #include "../src/ft2_font.hpp"
 #include "../src/theme.hpp"
@@ -149,18 +148,18 @@ void Builder::addFont( const BuilderData::Font &rData )
 
 void Builder::addWindow( const BuilderData::Window &rData )
 {
-    GenericWindow *pWin =
-        new GenericWindow( getIntf(), rData.m_xPos, rData.m_yPos,
+    TopWindow *pWin =
+        new TopWindow( getIntf(), rData.m_xPos, rData.m_yPos,
                            m_pTheme->getWindowManager(),
                            rData.m_dragDrop, rData.m_playOnDrop );
 
-    m_pTheme->m_windows[rData.m_id] = GenericWindowPtr( pWin );
+    m_pTheme->m_windows[rData.m_id] = TopWindowPtr( pWin );
 }
 
 
 void Builder::addLayout( const BuilderData::Layout &rData )
 {
-    GenericWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
+    TopWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
     if( pWin == NULL )
     {
         msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
@@ -186,7 +185,7 @@ void Builder::addLayout( const BuilderData::Layout &rData )
 
 void Builder::addAnchor( const BuilderData::Anchor &rData )
 {
-    GenericWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
+    TopWindow *pWin = m_pTheme->m_windows[rData.m_windowId].get();
     if( pWin == NULL )
     {
         msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
@@ -335,7 +334,7 @@ void Builder::addImage( const BuilderData::Image &rData )
         return;
     }
 
-    GenericWindow *pWindow = m_pTheme->m_windows[rData.m_windowId].get();
+    TopWindow *pWindow = m_pTheme->m_windows[rData.m_windowId].get();
     if( pWindow == NULL )
     {
         msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
@@ -570,9 +569,8 @@ void Builder::addVideo( const BuilderData::Video &rData )
         return;
     }
 
-    CtrlVideo *pVideo =
-        new CtrlVideo( getIntf(), m_pTheme->getWindowManager(),
-                       UString( getIntf(), rData.m_help.c_str() ), NULL);
+    CtrlVideo *pVideo = new CtrlVideo( getIntf(),
+        UString( getIntf(), rData.m_help.c_str() ), NULL);
 
     // Compute the position of the control
     const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
