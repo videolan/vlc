@@ -986,6 +986,8 @@ VLC_ADD_PLUGINS([i420_rgb rawvideo blend scale image logo])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au xa])
 VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
 VLC_ADD_PLUGINS([access_http access_mms access_ftp ipv4])
+VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
+VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 
 if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap])
@@ -1223,8 +1225,6 @@ if test "${enable_sout}" != "no"
 then
   VLC_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
   VLC_ADD_PLUGINS([mux_ps mux_avi mux_mp4 mux_asf mux_dummy mux_wav mux_mpjpeg])
-  VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
-  VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   VLC_ADD_PLUGINS([packetizer_copy])
 
   VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp stream_out_description vod_rtsp])
