@@ -47,6 +47,14 @@ void Theme::loadConfig()
     char *save = config_GetPsz( getIntf(), "skins2-config" );
     if( !save ) return;
 
+    // Is there an existing config?
+    if( !strcmp( save, "" ) )
+    {
+        // Show the windows
+        m_windowManager.showAll();
+        return;
+    }
+
     // Initialization
     map<string, TopWindowPtr>::const_iterator it;
     int i = 0;
