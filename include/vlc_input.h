@@ -169,6 +169,7 @@ struct seekpoint_t
     int64_t i_byte_offset;
     int64_t i_time_offset;
     char    *psz_name;
+    int     i_level;
 };
 
 static inline seekpoint_t *vlc_seekpoint_New( void )
@@ -176,6 +177,7 @@ static inline seekpoint_t *vlc_seekpoint_New( void )
     seekpoint_t *point = (seekpoint_t*)malloc( sizeof( seekpoint_t ) );
     point->i_byte_offset =
     point->i_time_offset = 0;
+    point->i_level = 0;
     point->psz_name = NULL;
     return point;
 }

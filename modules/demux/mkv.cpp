@@ -56,7 +56,6 @@
 #include "ebml/EbmlSubHead.h"
 #include "ebml/EbmlStream.h"
 #include "ebml/EbmlContexts.h"
-#include "ebml/EbmlVersion.h"
 #include "ebml/EbmlVoid.h"
 #include "ebml/StdIOCallback.h"
 
@@ -333,6 +332,7 @@ public:
         ,segment(NULL)
         ,cluster(NULL)
         ,i_pts(0)
+        ,i_start_pts(0)
         ,b_cues(false)
         ,i_index(0)
         ,i_index_max(0)
@@ -371,6 +371,7 @@ public:
     KaxSegmentUID           segment_uid;
 
     mtime_t                 i_pts;
+    mtime_t                 i_start_pts;
 
     vlc_bool_t              b_cues;
     int                     i_index;
@@ -390,6 +391,9 @@ public:
 
     std::vector<KaxSegmentFamily> families;
     std::vector<KaxSegment*> family_members;
+
+    int64_t                  edition_uid;
+    bool                     edition_ordered;
 };
 
 #define MKVD_TIMECODESCALE 1000000
@@ -757,6 +761,10 @@ static int Open( vlc_object_t * p_this )
             else if( !strcmp( tk.psz_codec, "V_MPEG4/ISO/AVC" ) )
             {
                 tk.fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
+                tk.fmt.b_packetized = VLC_FALSE;
+                tk.fmt.i_extra = tk.i_extra_data;
+                tk.fmt.p_extra = malloc( tk.i_extra_data );
+                memcpy( tk.fmt.p_extra,tk.p_extra_data, tk.i_extra_data );
             }
             else
             {
@@ -1057,6 +1065,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t     *pi64;
     double      *pf, f;
+    int         i_skp;
 
     vlc_meta_t **pp_meta;
 
@@ -1125,11 +1134,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_SEEKPOINT:
             /* FIXME do a better implementation */
-            if( p_sys->title && p_sys->title->i_seekpoint > 0 )
-            {
-                int i_skp = (int)va_arg( args, int );
+            i_skp = (int)va_arg( args, int );
 
+            if( p_sys->title && i_skp < p_sys->title->i_seekpoint)
+            {
                 Seek( p_demux, (int64_t)p_sys->title->seekpoint[i_skp]->i_time_offset, -1);
+                p_demux->info.i_seekpoint |= INPUT_UPDATE_SEEKPOINT;
+                p_demux->info.i_seekpoint = i_skp;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1344,8 +1355,16 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
-        if( tk.fmt.i_cat != VIDEO_ES )
+        if (i_pts < p_sys->i_start_pts)
+        {
+            p_block->i_pts = -1;
+            p_block->i_dts = -1;
+/*            p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;*/
+        }
+        else if( tk.fmt.i_cat != VIDEO_ES )
+        {
             p_block->i_dts = p_block->i_pts = i_pts;
+        }
         else
         {
             p_block->i_dts = i_pts;
@@ -1390,7 +1409,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
     p_sys->cluster = NULL;
 
     /* seek without index or without date */
-    if( config_GetInt( p_demux, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 )
+    if( i_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 ))
     {
         int64_t i_pos = i_percent * stream_Size( p_demux->s ) / 100;
 
@@ -1472,6 +1491,8 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
         }
     }
 
+    p_sys->i_start_pts = i_date;
+
     while( i_track_skipping > 0 )
     {
         if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
@@ -1481,7 +1502,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
             return;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000 + 1;
+        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000;
 
         for( i_track = 0; i_track < p_sys->i_track; i_track++ )
         {
@@ -1536,7 +1557,7 @@ static int Demux( demux_t *p_demux)
             return 0;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000 + 1;
+        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000;
 
         if( p_sys->i_pts > 0 )
         {
@@ -2616,12 +2637,15 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca )
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i;
     seekpoint_t *sk;
+    bool b_display_seekpoint = true;
 
     if( p_sys->title == NULL )
     {
         p_sys->title = vlc_input_title_New();
     }
     sk = vlc_seekpoint_New();
+
+    sk->i_level = i_level;
 
     msg_Dbg( p_demux, "|   |   |   + ChapterAtom (level=%d)", i_level );
     for( i = 0; i < ca->ListSize(); i++ )
@@ -2633,6 +2657,13 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca )
             KaxChapterUID &uid = *(KaxChapterUID*)l;
             uint32_t i_uid = uint32( uid );
             msg_Dbg( p_demux, "|   |   |   |   + ChapterUID: 0x%x", i_uid );
+        }
+        else if( MKV_IS_ID( l, KaxChapterFlagHidden ) )
+        {
+            KaxChapterFlagHidden &flag =*(KaxChapterFlagHidden*)l;
+            b_display_seekpoint = uint8( flag ) == 0;
+
+            msg_Dbg( p_demux, "|   |   |   |   + ChapterFlagHidden: %s", b_display_seekpoint ? "no":"yes" );
         }
         else if( MKV_IS_ID( l, KaxChapterTimeStart ) )
         {
@@ -2660,10 +2691,16 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca )
 
                 if( MKV_IS_ID( l, KaxChapterString ) )
                 {
+                    std::string psz;
+                    int k;
+
                     KaxChapterString &name =*(KaxChapterString*)l;
-                    char *psz = UTF8ToStr( UTFstring( name ) );
-                    sk->psz_name = strdup( psz );
-                    msg_Dbg( p_demux, "|   |   |   |   |    + ChapterString '%s'", psz );
+                    for (k = 0; k < i_level; k++)
+                        psz += '+';
+                    psz += ' ';
+                    psz += UTF8ToStr( UTFstring( name ) );
+                    sk->psz_name = strdup( psz.c_str() );
+                    msg_Dbg( p_demux, "|   |   |   |   |    + ChapterString '%s'", UTF8ToStr(UTFstring(name)) );
                 }
                 else if( MKV_IS_ID( l, KaxChapterLanguage ) )
                 {
@@ -2686,10 +2723,18 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca )
             ParseChapterAtom( p_demux, i_level+1, static_cast<EbmlMaster *>(l) );
         }
     }
-    // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
-    p_sys->title->i_seekpoint++;
-    p_sys->title->seekpoint = (seekpoint_t**)realloc( p_sys->title->seekpoint, p_sys->title->i_seekpoint * sizeof( seekpoint_t* ) );
-    p_sys->title->seekpoint[p_sys->title->i_seekpoint-1] = sk;
+
+    if (b_display_seekpoint)
+    {
+        // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
+        p_sys->title->i_seekpoint++;
+        p_sys->title->seekpoint = (seekpoint_t**)realloc( p_sys->title->seekpoint, p_sys->title->i_seekpoint * sizeof( seekpoint_t* ) );
+        p_sys->title->seekpoint[p_sys->title->i_seekpoint-1] = sk;
+    }
+    else
+    {
+        vlc_seekpoint_Delete(sk);
+    }
 }
 
 /*****************************************************************************
@@ -2717,6 +2762,7 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
             EbmlMaster *E = static_cast<EbmlMaster *>(l );
             unsigned int j;
             msg_Dbg( p_demux, "|   |   + EditionEntry" );
+            p_sys->edition_ordered = false;
             for( j = 0; j < E->ListSize(); j++ )
             {
                 EbmlElement *l = (*E)[j];
@@ -2724,6 +2770,14 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
                 if( MKV_IS_ID( l, KaxChapterAtom ) )
                 {
                     ParseChapterAtom( p_demux, 0, static_cast<EbmlMaster *>(l) );
+                }
+                else if( MKV_IS_ID( l, KaxEditionUID ) )
+                {
+                    p_sys->edition_uid = uint64(*static_cast<KaxEditionUID *>(l));
+                }
+                else if( MKV_IS_ID( l, KaxEditionFlagOrdered ) )
+                {
+                    p_sys->edition_ordered = uint8(*static_cast<KaxEditionFlagOrdered *>(l)) != 0;
                 }
                 else
                 {
