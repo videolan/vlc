@@ -215,8 +215,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     char           * psz_plugin;
     vlc_value_t      val, text;
 
-    unsigned int i_width = p_fmt->i_visible_width;
-    unsigned int i_height = p_fmt->i_visible_height;
+    unsigned int i_width = p_fmt->i_width;
+    unsigned int i_height = p_fmt->i_height;
     vlc_fourcc_t i_chroma = p_fmt->i_chroma;
     unsigned int i_aspect = p_fmt->i_aspect;
 
