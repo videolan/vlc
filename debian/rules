@@ -94,10 +94,10 @@ build-stamp:
 	test -d extras/faad
 	if test ! -d CVS; then \
 		cd extras/faad \
-		&& touch configure.in \
-		&& touch aclocal.m4 \
-		&& touch configure \
-		&& touch config.h.in \
+		&& touch `find . -name configure.in` \
+		&& touch `find . -name aclocal.m4` \
+		&& touch `find . -name configure` \
+		&& touch `find . -name config.h.in` \
 		&& touch `find . -name Makefile.in` \
 		&& ./configure --disable-shared \
 		&& cd libfaad \
