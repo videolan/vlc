@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.37 2003/12/07 12:11:13 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.38 2003/12/10 23:27:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -320,6 +320,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_PICTURE:
         {
             uint8_t *buf[3];
+            mtime_t i_pts;
             buf[0] = buf[1] = buf[2] = NULL;
 
             if ( p_sys->b_after_sequence_header &&
@@ -336,13 +337,27 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
             p_sys->b_after_sequence_header = 0;
 
+            i_pts = p_sys->p_info->current_picture->flags & PIC_FLAG_PTS ?
+                ( ( p_sys->p_info->current_picture->pts ==
+                    (uint32_t)p_sys->i_current_pts ) ?
+                  p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
+
+            /* Hack to handle demuxers which only have DTS timestamps */
+            if( !i_pts && !p_block->i_pts && p_block->i_dts > 0 )
+            {
+                if( p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY ||
+                    (p_sys->p_info->current_picture->flags &
+                      PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B )
+                {
+                    i_pts = p_block->i_dts;
+                }
+            }
+            p_block->i_pts = p_block->i_dts = 0;
+            /* End hack */
+
             vout_SynchroNewPicture( p_sys->p_synchro,
                 p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
-                p_sys->p_info->current_picture->nb_fields,
-                (p_sys->p_info->current_picture->flags & PIC_FLAG_PTS) ?
-                    ( ( p_sys->p_info->current_picture->pts ==
-                        (uint32_t)p_sys->i_current_pts ) ?
-                      p_sys->i_current_pts : p_sys->i_previous_pts ) : 0,
+ 	        p_sys->p_info->current_picture->nb_fields, i_pts,
                 0, p_sys->i_current_rate );
 
             if ( !(p_sys->b_slice_i
