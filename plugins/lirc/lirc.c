@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.11 2002/06/01 12:31:59 sam Exp $
+ * $Id: lirc.c,v 1.12 2002/07/01 17:40:27 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -42,6 +42,8 @@ struct intf_sys_s
 {
     struct lirc_config *config;
     vlc_mutex_t         change_lock;
+
+    input_thread_t *    p_input;
 };
 
 /*****************************************************************************
@@ -117,6 +119,8 @@ static int intf_Open( intf_thread_t *p_intf )
         return 1;
     }
 
+    p_intf->p_sys->p_input = NULL;
+
     return 0;
 }
 
@@ -125,6 +129,11 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+
     /* Destroy structure */
     lirc_freeconfig( p_intf->p_sys->config );
     lirc_deinit();
@@ -136,17 +145,26 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    char *code;
-    char *c;
-
-    /* Manage core vlc functions through the callback */
-    p_intf->pf_manage( p_intf );
+    char *code, *c;
+    playlist_t *p_playlist;
+    input_thread_t *p_input;
 
     while( !p_intf->p_vlc->b_die )
     {
-        /* Manage core vlc functions through the callback */
-        p_intf->pf_manage( p_intf );
+        /* Sleep a bit */
         msleep( INTF_IDLE_SLEEP );
+
+        /* Update the input */
+        if( p_intf->p_sys->p_input == NULL )
+        {
+            p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                              FIND_ANYWHERE );
+        }
+        else if( p_intf->p_sys->p_input->b_dead )
+        {
+            vlc_object_release( p_intf->p_sys->p_input );
+            p_intf->p_sys->p_input = NULL;
+        }
 
         /* We poll the lircsocket */
         if( lirc_nextcode(&code) != 0 )
@@ -171,100 +189,79 @@ static void intf_Run( intf_thread_t *p_intf )
 
             if( !strcmp( c, "FULLSCREEN" ) )
             {
-                vlc_mutex_lock( &p_intf->p_vlc->p_vout_bank->lock );
-                /* XXX: only fullscreen the first video output */
-                if( p_intf->p_vlc->p_vout_bank->i_count )
+                vout_thread_t *p_vout;
+                p_vout = vlc_object_find( p_intf->p_sys->p_input,
+                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                if( p_vout )
                 {
-                    p_intf->p_vlc->p_vout_bank->pp_vout[0]->i_changes
-                        |= VOUT_FULLSCREEN_CHANGE;
+                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    vlc_object_release( p_vout );
                 }
-                vlc_mutex_unlock( &p_intf->p_vlc->p_vout_bank->lock );
                 continue;
             }
 
-            vlc_mutex_lock( &p_intf->p_vlc->p_input_bank->lock );
-
             if( !strcmp( c, "PLAY" ) )
             {
-                if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                      FIND_ANYWHERE );
+                if( p_playlist )
                 {
-                    input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0],
-                                     INPUT_STATUS_PLAY );
-                    p_intf->p_vlc->p_playlist->b_stopped = 0;
-                }
-                else
-                {
-                    vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-
-                    if( p_intf->p_vlc->p_playlist->b_stopped 
-                         && p_intf->p_vlc->p_playlist->i_size )
+                    vlc_mutex_lock( &p_playlist->object_lock );
+                    if( p_playlist->i_size )
                     {
-                        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
-                        intf_PlaylistJumpto( p_intf->p_vlc->p_playlist,
-                                             p_intf->p_vlc->p_playlist->i_index );
-                    }
-                    else
-                    {
-                        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+                        vlc_mutex_unlock( &p_playlist->object_lock );
+                        playlist_Play( p_playlist );
+                        vlc_object_release( p_playlist );
                     }
                 }
             }
-            else if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
+            else if( p_intf->p_sys->p_input )
             {
+                p_input = p_intf->p_sys->p_input;
+
                 if( !strcmp( c, "PAUSE" ) )
                 {
-                    input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0],
-                                     INPUT_STATUS_PAUSE );
-
-                    vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-                    p_intf->p_vlc->p_playlist->b_stopped = 0;
-                    vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
                 }
                 else if( !strcmp( c, "NEXT" ) )
                 {
-                    p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                          FIND_ANYWHERE );
+                    if( p_playlist )
+                    {
+                        playlist_Next( p_playlist );
+                        vlc_object_release( p_playlist );
+                    }
                 }
-                else if( !strcmp( c, "LAST" ) )
+                else if( !strcmp( c, "PREV" ) )
                 {
-                    /* FIXME: temporary hack */
-                    intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-                    intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-                    p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                          FIND_ANYWHERE );
+                    if( p_playlist )
+                    {
+                        playlist_Prev( p_playlist );
+                        vlc_object_release( p_playlist );
+                    }
                 }
                 else if( !strcmp( c, "STOP" ) )
                 {
-                    /* end playing item */
-                    p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-    
-                    /* update playlist */
-                    vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-    
-                    p_intf->p_vlc->p_playlist->i_index--;
-                    p_intf->p_vlc->p_playlist->b_stopped = 1;
-    
-                    vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                          FIND_ANYWHERE );
+                    if( p_playlist )
+                    {
+                        playlist_Stop( p_playlist );
+                        vlc_object_release( p_playlist );
+                    }
                 }
                 else if( !strcmp( c, "FAST" ) )
                 {
-                    input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0],
-                                     INPUT_STATUS_FASTER );
-    
-                    vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-                    p_intf->p_vlc->p_playlist->b_stopped = 0;
-                    vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+                    input_SetStatus( p_input, INPUT_STATUS_FASTER );
                 }
                 else if( !strcmp( c, "SLOW" ) )
                 {
-                    input_SetStatus( p_intf->p_vlc->p_input_bank->pp_input[0],
-                                     INPUT_STATUS_SLOWER );
-    
-                    vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-                    p_intf->p_vlc->p_playlist->b_stopped = 0;
-                    vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
+                    input_SetStatus( p_input, INPUT_STATUS_SLOWER );
                 }
             }
-
-            vlc_mutex_unlock( &p_intf->p_vlc->p_input_bank->lock );
         }
 
         free( code );
