@@ -820,7 +820,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     char psz_path[MAX_PATH + 256];
     WIN32_FIND_DATA finddata;
     HANDLE handle;
-    unsigned int rc;
+    int rc;
 #else
     int    i_dirlen;
     DIR *  dir;
@@ -838,13 +838,13 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     MultiByteToWideChar( CP_ACP, 0, psz_dir, -1, psz_wdir, MAX_PATH );
 
     rc = GetFileAttributes( psz_wdir );
-    if( !(rc & FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
+    if( rc<0 || !(rc&FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
 
     /* Parse all files in the directory */
     swprintf( psz_wpath, L"%ls\\*", psz_wdir );
 #else
     rc = GetFileAttributes( psz_dir );
-    if( !(rc & FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
+    if( rc<0 || !(rc&FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
 #endif
 
     /* Parse all files in the directory */
