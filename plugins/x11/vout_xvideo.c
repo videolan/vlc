@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.36.2.3 2001/12/20 16:46:40 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.36.2.4 2002/01/23 01:59:16 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -349,9 +349,11 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Init( vout_thread_t *p_vout )
 {
+#if 0
 #ifdef SYS_DARWIN
     /* FIXME : As of 2001-03-16, XFree4 for MacOS X does not support Xshm. */
     p_vout->p_sys->b_shm = 0;
+#endif
 #endif
     p_vout->b_need_render = 0;
     p_vout->p_sys->i_image_width = p_vout->p_sys->i_image_height = 0;
