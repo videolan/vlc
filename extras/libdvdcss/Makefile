@@ -41,3 +41,10 @@ install:
 	rm -f $(DESTDIR)$(libdir)/libdvdcss.so && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) $(DESTDIR)$(libdir)/libdvdcss.so
 	rm -f $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_MAJOR) && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_MAJOR)
 
+uninstall:
+	rm -f $(DESTDIR)$(includedir)/videolan/dvdcss.h
+	rm -f $(DESTDIR)$(libdir)/libdvdcss.a
+	rm -f $(DESTDIR)$(libdir)/libdvdcss.so
+	rm -f $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_MAJOR)
+	rm -f $(DESTDIR)$(libdir)/libdvdcss.so.$(LIBDVDCSS_VERSION)
+

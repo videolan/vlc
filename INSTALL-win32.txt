@@ -50,7 +50,7 @@ See `./configure --help' for more information.
 
 To cross-compile for the Win32 platform using mingw32:
 
-   make distclean && CC=i586-mingw32msvc-gcc CFLAGS=-I/usr/i586-mingw32msvc \
+   make distclean ; CC=i586-mingw32msvc-gcc CFLAGS=-I/usr/i586-mingw32msvc \
      RANLIB=i586-mingw32msvc-ranlib WINDRES=i586-mingw32msvc-windres \
      ./configure --host=i386-mingw32msvc \
      --target=i386-mingw32msvc --build=i386-linux --disable-dsp \

@@ -2,7 +2,7 @@
 # vlc (VideoLAN Client) main Makefile - (c)1998 VideoLAN
 ###############################################################################
 
--include Makefile.opts
+include Makefile.opts
 
 ###############################################################################
 # Objects and files
@@ -112,7 +112,7 @@ plugins-clean:
 
 vlc-clean:
 	rm -f $(C_OBJ) $(CPP_OBJ)
-	rm -f vlc gnome-vlc gvlc kvlc qvlc
+	rm -f vlc gnome-vlc gvlc kvlc qvlc vlc.exe
 	rm -Rf vlc.app
 
 distclean: clean
@@ -127,6 +127,8 @@ distclean: clean
 
 install: libdvdcss-install vlc-install plugins-install
 
+uninstall: libdvdcss-uninstall vlc-uninstall plugins-uninstall
+
 vlc-install:
 	mkdir -p $(DESTDIR)$(bindir)
 	$(INSTALL) vlc $(DESTDIR)$(bindir)
@@ -138,14 +140,31 @@ endif
 	$(INSTALL) -m 644 share/*.png $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.xpm $(DESTDIR)$(datadir)/videolan
 
+vlc-uninstall:
+	rm vlc $(DESTDIR)$(bindir)/vlc
+ifneq (,$(ALIASES))
+	for alias in $(ALIASES) ; do if test $$alias ; then rm -f $(DESTDIR)$(bindir)/$$alias ; fi ; done
+endif
+	rm -f $(DESTDIR)$(datadir)/videolan/*.psf
+	rm -f $(DESTDIR)$(datadir)/videolan/*.png
+	rm -f $(DESTDIR)$(datadir)/videolan/*.xpm
+
 plugins-install:
 	mkdir -p $(DESTDIR)$(libdir)/videolan/vlc
 ifneq (,$(PLUGINS))
 	$(INSTALL) -m 644 $(PLUGINS:%=plugins/%.so) $(DESTDIR)$(libdir)/videolan/vlc
 endif
 
+plugins-uninstall:
+ifneq (,$(PLUGINS))
+	rm -f $(DESTDIR)$(libdir)/videolan/vlc/*.so
+endif
+
 libdvdcss-install:
 	cd extras/libdvdcss && $(MAKE) install
+
+libdvdcss-uninstall:
+	cd extras/libdvdcss && $(MAKE) uninstall
 
 show:
 	@echo CC: $(CC)
@@ -185,7 +204,7 @@ snapshot: clean Makefile.opts
 		done
 	# copy misc files
 	cp vlc.spec AUTHORS COPYING ChangeLog INSTALL INSTALL.libdvdcss \
-		README TODO todo.pl \
+		INSTALL-win32.txt README TODO todo.pl \
 		Makefile.opts.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh config.sub config.guess \
 			/tmp/vlc-${PROGRAM_VERSION}/
@@ -194,8 +213,10 @@ snapshot: clean Makefile.opts
 		gvlc.desktop gnome-vlc.desktop vlc.menu ; do \
 			cp debian/$$file /tmp/vlc-${PROGRAM_VERSION}/debian/ ; \
 		done
-	for file in default8x16.psf default8x9.psf vlc_beos.rsrc vlc.icns ; do \
-		cp share/$$file /tmp/vlc-${PROGRAM_VERSION}/share/ ; done
+	for file in default8x16.psf default8x9.psf vlc_beos.rsrc vlc.icns \
+		gvlc_win32.ico vlc_win32_rc.rc ; do \
+			cp share/$$file /tmp/vlc-${PROGRAM_VERSION}/share/ ; \
+		done
 	for icon in vlc gvlc qvlc gnome-vlc kvlc ; do \
 		cp share/$$icon.xpm share/$$icon.png \
 			/tmp/vlc-${PROGRAM_VERSION}/share/ ; done
@@ -224,9 +245,11 @@ libdvdcss-snapshot: clean Makefile.opts
 		do cp $$i /tmp/libdvdcss-${LIBDVDCSS_VERSION}/$$i ; done
 	# Makefiles
 	sed -e 's#^install:#install-unused:#' \
+		-e 's#^uninstall:#uninstall-unused:#' \
 		-e 's#^clean:#clean-unused:#' \
 		-e 's#^all:.*#all: libdvdcss#' \
 		-e 's#^libdvdcss-install:#install:#' \
+		-e 's#^libdvdcss-uninstall:#uninstall:#' \
 		-e 's#^libdvdcss-clean:#clean:#' \
 		< Makefile > /tmp/libdvdcss-${LIBDVDCSS_VERSION}/Makefile
 	# extra files
