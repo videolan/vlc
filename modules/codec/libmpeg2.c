@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.35 2003/11/24 23:22:01 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.36 2003/12/05 14:58:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -178,8 +178,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
-            if( p_block->b_discontinuity && p_sys->p_synchro
-                && p_sys->p_info->sequence->width != (unsigned)-1 )
+            if( p_block->b_discontinuity && p_sys->p_synchro &&
+                p_sys->p_info->sequence &&
+                p_sys->p_info->sequence->width != (unsigned)-1 )
             {
                 vout_SynchroReset( p_sys->p_synchro );
                 if( p_sys->p_info->current_fbuf != NULL
@@ -420,7 +421,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                ( ( p_sys->p_info->current_picture->flags &
 		   PIC_MASK_CODING_TYPE) != B_CODING_TYPE ) )
             {
-                vout_SynchroReset( p_sys->p_synchro );
+                if( p_sys->p_synchro ) vout_SynchroReset( p_sys->p_synchro );
             }
             mpeg2_skip( p_sys->p_mpeg2dec, 1 );
             p_sys->b_skip = 1;
@@ -430,6 +431,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 p_sys->b_garbage_pic = 1;
                 p_pic = p_sys->p_info->current_fbuf->id;
+            }
+            else if( !p_sys->p_info->sequence )
+            {
+                break;
             }
             else
             {
