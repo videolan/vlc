@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.12 2003/09/28 21:54:21 gbazin Exp $
+ * $Id: ogg.c,v 1.13 2003/09/28 22:18:57 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -335,10 +335,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             SetDWLE( &p_stream->header.i_size,
                      sizeof( ogg_stream_header_t ) - 1);
-            /* XXX this won't make mplayer happy,
-             * but vlc can read that without any problem so...*/
-            SetQWLE( &p_stream->header.i_time_unit, 10*1000 );
-            //(int64_t)10*1000*1000/(int64_t)25 );  // FIXME (25fps)
+            SetQWLE( &p_stream->header.i_time_unit,
+                     I64C(10000000)/(int64_t)25 );  // FIXME (25fps)
             SetQWLE( &p_stream->header.i_samples_per_unit, 1 );
             SetDWLE( &p_stream->header.i_default_len, 0 );      /* ??? */
             SetDWLE( &p_stream->header.i_buffer_size, 1024*1024 );
@@ -827,7 +825,8 @@ static int Mux( sout_mux_t *p_mux )
                 op.granulepos = op.packetno; /* FIXME */
             }
             else
-                op.granulepos = ( i_dts - p_sys->i_start_dts ) / 1000;
+                op.granulepos = ( i_dts - p_sys->i_start_dts )
+                                * I64C(10) / p_stream->header.i_time_unit;
         }
         else if( p_stream->i_cat == SPU_ES )
         {
