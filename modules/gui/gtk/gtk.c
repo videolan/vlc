@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.9 2002/12/06 16:34:07 sam Exp $
+ * $Id: gtk.c,v 1.10 2003/01/03 14:44:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -194,13 +194,13 @@ static void Run( intf_thread_t *p_intf )
     /* Accept file drops on the main window */
     gtk_drag_dest_set( GTK_WIDGET( p_intf->p_sys->p_window ),
                        GTK_DEST_DEFAULT_ALL, target_table,
-                       1, GDK_ACTION_COPY );
+                       DROP_ACCEPT_END, GDK_ACTION_COPY );
 
     /* Accept file drops on the playlist window */
     gtk_drag_dest_set( GTK_WIDGET( lookup_widget( p_intf->p_sys->p_playwin,
                                    "playlist_clist") ),
                        GTK_DEST_DEFAULT_ALL, target_table,
-                       1, GDK_ACTION_COPY );
+                       DROP_ACCEPT_END, GDK_ACTION_COPY );
 
     /* Get the slider object */
     p_intf->p_sys->p_slider_frame = GTK_FRAME( gtk_object_get_data(

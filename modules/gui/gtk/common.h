@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.h,v 1.4 2002/12/06 16:34:07 sam Exp $
+ * $Id: common.h,v 1.5 2003/01/03 14:44:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -28,7 +28,7 @@
 #define DROP_ACCEPT_TEXT_PLAIN     1
 #define DROP_ACCEPT_STRING         2
 
-#define MAX_ATEXIT                 10
+#define DROP_ACCEPT_END            3
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface

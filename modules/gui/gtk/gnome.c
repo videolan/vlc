@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.4 2002/10/14 16:46:55 sam Exp $
+ * $Id: gnome.c,v 1.5 2003/01/03 14:44:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -76,7 +76,7 @@ vlc_module_begin();
               TOOLBAR_LONGTEXT );
     add_integer( "gnome-prefs-maxh", 480, NULL,
                  PREFS_MAXH_TEXT, PREFS_MAXH_LONGTEXT );
-    
+
     set_description( _("GNOME interface module") );
     set_capability( "interface", i );
     set_callbacks( Open, Close );
@@ -178,12 +178,12 @@ static void Run( intf_thread_t *p_intf )
     /* Accept file drops on the main window */
     gtk_drag_dest_set( GTK_WIDGET( p_intf->p_sys->p_window ),
                        GTK_DEST_DEFAULT_ALL, target_table,
-                       1, GDK_ACTION_COPY );
+                       DROP_ACCEPT_END, GDK_ACTION_COPY );
     /* Accept file drops on the playlist window */
     gtk_drag_dest_set( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                             p_intf->p_sys->p_playwin ), "playlist_clist") ),
                        GTK_DEST_DEFAULT_ALL, target_table,
-                       1, GDK_ACTION_COPY );
+                       DROP_ACCEPT_END, GDK_ACTION_COPY );
 
     /* Get the slider object */
     p_intf->p_sys->p_slider_frame = gtk_object_get_data(
@@ -357,7 +357,7 @@ static void Manage( intf_thread_t *p_intf )
             p_intf->p_sys->p_input = NULL;
         }
     }
-    
+
     if( p_intf->p_sys->p_input == NULL )
     {
         p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
