@@ -1,8 +1,9 @@
 /*****************************************************************************
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
+ * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.10 2000/12/21 13:25:51 massiot Exp $
+ * $Id: input_programs.c,v 1.11 2000/12/21 13:54:15 massiot Exp $
  *
  * Authors:
  *
@@ -184,53 +185,41 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
                                pgrm_descriptor_t * p_pgrm, u16 i_es_id,
                                size_t i_data_len )
 {
-    int i_index;
-    es_descriptor_t * p_es = NULL;
+    es_descriptor_t * p_es;
 
     intf_DbgMsg("Adding description for ES %d", i_es_id);
 
-    /* Find an empty slot to store the description of that es */
-    for( i_index = 0; i_index < INPUT_MAX_ES &&
-         p_input->p_es[i_index].i_id != EMPTY_ID; i_index++ );
+    p_es = (es_descriptor_t *)malloc( sizeof(es_descriptor_t) );
+    p_input->i_es_number++;
+    p_input->pp_es = realloc( p_input->pp_es, p_input->i_es_number
+                                               * sizeof(es_descriptor_t *) );
+    p_input->pp_es[p_input->i_es_number - 1] = p_es;
+    p_es->i_id = i_es_id;
 
-    if( i_index >= INPUT_MAX_ES )
+    /* Init its values */
+    p_es->b_discontinuity = 0;
+    p_es->p_pes = NULL;
+    p_es->p_decoder_fifo = NULL;
+
+    if( i_data_len )
     {
-        /* No slot is empty */
-        intf_ErrMsg("Stream carries too many ES for our decoder");
+        p_es->p_demux_data = malloc( i_data_len );
+        memset( p_es->p_demux_data, 0, i_data_len );
+    }
+
+    /* Add this ES to the program definition if one is given */
+    if( p_pgrm )
+    {
+        p_pgrm->i_es_number++;
+        p_pgrm->pp_es = realloc( p_pgrm->pp_es,
+                                 p_pgrm->i_es_number
+                                  * sizeof(es_descriptor_t *) );
+        p_pgrm->pp_es[p_pgrm->i_es_number - 1] = p_es;
+        p_es->p_pgrm = p_pgrm;
     }
     else
     {
-        /* Reserve the slot for that ES */
-        p_es = &p_input->p_es[i_index];
-        p_es->i_id = i_es_id;
-        intf_DbgMsg("Slot %d in p_es table assigned to ES %d",
-                    i_index, i_es_id);
-
-        /* Init its values */
-        p_es->b_discontinuity = 0;
-        p_es->p_pes = NULL;
-        p_es->p_decoder_fifo = NULL;
-
-        if( i_data_len )
-        {
-            p_es->p_demux_data = malloc( i_data_len );
-            memset( p_es->p_demux_data, 0, i_data_len );
-        }
-
-        /* Add this ES to the program definition if one is given */
-        if( p_pgrm )
-        {
-            p_pgrm->i_es_number++;
-            p_pgrm->pp_es = realloc( p_pgrm->pp_es,
-                                     p_pgrm->i_es_number
-                                      * sizeof(es_descriptor_t *) );
-            p_pgrm->pp_es[p_pgrm->i_es_number - 1] = p_es;
-            p_es->p_pgrm = p_pgrm;
-        }
-        else
-        {
-            p_es->p_pgrm = NULL;
-        }
+        p_es->p_pgrm = NULL;
     }
 
     return p_es;
@@ -241,17 +230,17 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
  *****************************************************************************/
 void input_DelES( input_thread_t * p_input, u16 i_id )
 {
-    int                     i_index;
+    int                     i_index, i_es;
     pgrm_descriptor_t *     p_pgrm = NULL;
     es_descriptor_t *       p_es = NULL;
 
     /* Look for the description of the ES */
-    for( i_index = 0; i_index < INPUT_MAX_ES; i_index++ )
+    for( i_es = 0; i_es < p_input->i_es_number; i_es++ )
     {
-        if( p_input->p_es[i_index].i_id == i_id )
+        if( p_input->pp_es[i_es]->i_id == i_id )
         {
-            p_es = &p_input->p_es[i_index];
-            p_pgrm = p_input->p_es[i_index].p_pgrm;
+            p_es = p_input->pp_es[i_es];
+            p_pgrm = p_input->pp_es[i_es]->p_pgrm;
             break;
         }
     }
@@ -276,15 +265,18 @@ void input_DelES( input_thread_t * p_input, u16 i_id )
         }
     }
 
-    /* The table of stream descriptors is static, so don't free memory
-     * but just mark the slot as unused */
-    p_es->i_id = EMPTY_ID;
-
     /* Free the demux data */
     if( p_es->p_demux_data != NULL )
     {
         free( p_es->p_demux_data );
     }
+
+    /* Free the ES */
+    free( p_es );
+    p_input->i_es_number--;
+    p_input->pp_es[i_es] = p_input->pp_es[p_input->i_es_number];
+    p_input->pp_es = realloc( p_input->pp_es, p_input->i_es_number
+                                               * sizeof(es_descriptor_t *));
 }
 
 #ifdef STATS
@@ -402,7 +394,6 @@ static adec_config_t * GetAdecConfig( input_thread_t * p_input,
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     int                 i;
-    es_descriptor_t **  p_spot = NULL;
 
 #ifdef DEBUG_INPUT
     intf_DbgMsg( "Selecting ES %d", p_es->i_id );
@@ -411,22 +402,6 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_es->p_decoder_fifo != NULL )
     {
         intf_ErrMsg( "ES %d is already selected", p_es->i_id );
-        return( -1 );
-    }
-
-    /* Find a free spot in pp_selected_es. */
-    for( i = 0; i < INPUT_MAX_SELECTED_ES; i++ )
-    {
-        if( p_input->pp_selected_es[i] == NULL )
-        {
-            p_spot = &p_input->pp_selected_es[i];
-            break;
-        }
-    }
-
-    if( p_spot == NULL )
-    {
-        intf_ErrMsg( "Too many ES selected" );
         return( -1 );
     }
 
@@ -474,7 +449,11 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     if( p_es->p_decoder_fifo != NULL )
     {
-        *p_spot = p_es;
+        p_input->i_selected_es_number++;
+        p_input->pp_selected_es = realloc( p_input->pp_selected_es,
+                                           p_input->i_selected_es_number
+                                            * sizeof(es_descriptor_t *) );
+        p_input->pp_selected_es[p_input->i_selected_es_number - 1] = p_es;
     }
     return( 0 );
 }

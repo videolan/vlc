@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.5 2000/12/20 17:49:40 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.6 2000/12/21 13:54:15 massiot Exp $
  *
  * Authors:
  *
@@ -210,11 +210,12 @@ typedef struct input_thread_s
 
     /* General stream description */
     stream_descriptor_t     stream;                            /* PAT tables */
-    es_descriptor_t         p_es[INPUT_MAX_ES];
-                                               /* carried elementary streams */
+    es_descriptor_t **      pp_es;             /* carried elementary streams */
+    int                     i_es_number;
 
     /* List of streams to demux */
-    es_descriptor_t *       pp_selected_es[INPUT_MAX_SELECTED_ES];
+    es_descriptor_t **      pp_selected_es;
+    int                     i_selected_es_number;
 
     /* For auto-launch of decoders */
     struct aout_thread_s *  p_default_aout;

@@ -168,12 +168,6 @@
  * interface, and is in fact an interface limitation */
 #define INPUT_MAX_THREADS               10
 
-/* Maximum number of ES definitions in a TS stream */
-#define INPUT_MAX_ES                    42
-
-/* Maximum number of selected ES in an input thread */
-#define INPUT_MAX_SELECTED_ES           42
-
 /* Maximum size of a data packet (128 kB) */
 #define INPUT_MAX_PACKET_SIZE			131072
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.60 2000/12/20 16:04:31 massiot Exp $
+ * $Id: input.c,v 1.61 2000/12/21 13:54:15 massiot Exp $
  *
  * Authors: 
  *
@@ -75,7 +75,6 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     int                 i_status;                           /* thread status */
-    int                 i;
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");
@@ -96,14 +95,10 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     p_input->p_config = p_config;
 
     /* Initialize stream description */
-    for( i = 0; i < INPUT_MAX_SELECTED_ES; i++ )
-    {
-        p_input->pp_selected_es[i] = NULL;
-    }
-    for( i= 0; i < INPUT_MAX_ES; i++ )
-    {
-        p_input->p_es[i].i_id = EMPTY_ID;
-    }
+    p_input->pp_es = NULL;
+    p_input->pp_selected_es = NULL;
+    p_input->i_es_number = 0;
+    p_input->i_selected_es_number = 0;
     p_input->stream.i_pgrm_number = 0;
 
     /* Initialize stream control properties. */
@@ -318,9 +313,7 @@ static void EndThread( input_thread_t * p_input )
 #endif
 
     /* Destroy all decoder threads */
-    for( i_es_loop = 0;
-         (i_es_loop < INPUT_MAX_ES)
-            && (p_input->pp_selected_es[i_es_loop] != NULL) ;
+    for( i_es_loop = 0; i_es_loop < p_input->i_selected_es_number;
          i_es_loop++ )
     {
         p_input->pp_selected_es[i_es_loop]->p_decoder_fifo->b_die = 1;

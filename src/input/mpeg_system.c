@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.12 2000/12/20 20:09:19 sam Exp $
+ * $Id: mpeg_system.c,v 1.13 2000/12/21 13:54:15 massiot Exp $
  *
  * Authors: 
  *
@@ -667,6 +667,7 @@ static u16 GetID( data_packet_t * p_data )
 /*****************************************************************************
  * DecodePSM: Decode the Program Stream Map information
  *****************************************************************************/
+/* FIXME : deprecated code ! */
 static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 {
     stream_ps_data_t *  p_demux =
@@ -709,6 +710,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
         /* 4 == minimum useful size of a section */
         while( p_byte + 4 <= p_end )
         {
+#if 0
             p_input->p_es[i_es].i_id
                 = p_input->p_es[i_es].i_stream_id
                 = p_byte[1];
@@ -735,6 +737,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 #endif
 
             i_es++;
+#endif
         }
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -771,7 +774,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
         if( p_input->stream.pp_programs[0]->b_is_ok )
         {
             /* Look only at the selected ES. */
-            for( i_dummy = 0; i_dummy < INPUT_MAX_SELECTED_ES; i_dummy++ )
+            for( i_dummy = 0; i_dummy < p_input->i_selected_es_number;
+                 i_dummy++ )
             {
                 if( p_input->pp_selected_es[i_dummy] != NULL
                     && p_input->pp_selected_es[i_dummy]->i_id == i_id )
@@ -784,12 +788,12 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
         else
         {
             /* Search all ES ; if not found -> AddES */
-            for( i_dummy = 0; i_dummy < INPUT_MAX_ES; i_dummy++ )
+            for( i_dummy = 0; i_dummy < p_input->i_es_number; i_dummy++ )
             {
-                if( p_input->p_es[i_dummy].i_id != EMPTY_ID 
-                    && p_input->p_es[i_dummy].i_id == i_id )
+                if( p_input->pp_es[i_dummy] != NULL
+                    && p_input->pp_es[i_dummy]->i_id == i_id )
                 {
-                    p_es = &p_input->p_es[i_dummy];
+                    p_es = p_input->pp_es[i_dummy];
                     break;
                 }
             }
@@ -995,13 +999,13 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    for( i_dummy = 0; i_dummy < INPUT_MAX_ES; i_dummy++ )
+    for( i_dummy = 0; i_dummy < p_input->i_es_number; i_dummy++ )
     {
-        if( p_input->p_es[i_dummy].i_id != EMPTY_ID )
+        if( p_input->pp_es[i_dummy] != NULL )
         {
-            if( p_input->p_es[i_dummy].i_id == i_pid )
+            if( p_input->pp_es[i_dummy]->i_id == i_pid )
             {
-                p_es = &p_input->p_es[i_dummy];
+                p_es = p_input->pp_es[i_dummy];
                 p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
                 p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
                 break;
