@@ -245,8 +245,13 @@ static void RunThread (adec_thread_t * p_adec)
             do 
             {
                 adec_byte_stream_next ( p_byte_stream );
-            } while ( 0 && (!p_adec->align) && (!p_adec->b_die)
+            } while ( (!p_adec->align) && (!p_adec->b_die)
                         && (!p_adec->b_error) );
+
+            if( p_adec->b_die || p_adec->b_error )
+            {
+                goto bad_frame;
+            }
 
             sync = 1;
         }

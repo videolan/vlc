@@ -1,3 +1,18 @@
+vlc (0.1.99h) unstable; urgency=low
+
+  * added support for the SDL vout : the --display fullscreen allows
+    fullscreen when possible. Disabled by default.
+  * updated debian directory to build vlc-sdl.
+  * removed CCFLAGS flags which were improperly used.
+  * added hints for powerpc build.
+  * fixed the input_file exit bug.
+  * removed the frame statistics output.
+  * removed a verbose message in intf_sdl.c.
+  * added a few sanity checks in the audio mpeg and ac3 decoders.
+  * temporarily got rid of vlc.channels.
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Tue, 22 Aug 2000 01:31:58 +0200
+
 vlc (0.1.99g) unstable; urgency=low
 
   * removed all "*vlc" aliases except "gvlc" and "fbvlc". The other sucked.

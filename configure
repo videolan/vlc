@@ -3055,7 +3055,7 @@ fi
 # Check whether --enable-mmx or --disable-mmx was given.
 if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
-   if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi 
+   if test x`echo $ARCH | cut -b3-4` = x86 ; then if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}"yuvmmx "; fi; fi 
 fi
 
 

@@ -509,6 +509,9 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
     /* Set default value */
     p_intf->p_channel = NULL;
 
+    /* FIXME: channels are disabled */
+    return( 0 );
+
     /* Open file */
     p_file = fopen( psz_filename, "r" );
     if( p_file == NULL )

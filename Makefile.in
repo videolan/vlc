@@ -369,7 +369,7 @@ distclean: clean
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp
 	rm -rf .dep
-	rm -rf debian/tmp debian/*.debhelper debian/*.substvars
+	rm -rf debian/tmp debian/files debian/*.debhelper debian/*.substvars
 	find debian/* -type d -maxdepth 0 -name 'vlc-*' | xargs rm -rf
 
 install:
@@ -392,7 +392,7 @@ show:
 snapshot:
 	rm -rf /tmp/${SNAPSHOTDIR}
 	mkdir /tmp/${SNAPSHOTDIR}
-	cp -r * /tmp/${SNAPSHOTDIR}
+	cp -a * /tmp/${SNAPSHOTDIR}
 		(cd /tmp/${SNAPSHOTDIR} ; \
 		make distclean ; \
 		find . -type d -name CVS | xargs rm -rf ; \

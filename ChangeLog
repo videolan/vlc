@@ -1,3 +1,4 @@
+Tue, 22 Aug 2000 01:31:58 +0200
 0.1.99h :
 
   * fixed the sound issue under beos
@@ -15,8 +16,12 @@
   * fixed a Makefile bug which removed the CVS directory.
   * removed the frame statistics output.
   * removed a verbose message in intf_sdl.c.
+  * added a few sanity checks in the audio mpeg and ac3 decoders.
+  * temporarily got rid of vlc.channels.
+  * added notice in debian/control about unencrypted DVDs.
+  * fixed PowerPC .deb build.
  
-Wed Aug 16 01:07:14 CEST 2000
+Wed, 16 Aug 2000 01:07:14 +0200
 0.1.99g :
 
   * removed all "*vlc" aliases except "gvlc" and "fbvlc". The other sucked.
@@ -35,7 +40,7 @@ Wed Aug 16 01:07:14 CEST 2000
   * added request for ALSA support in the TODO list.
   * changed "pentiumpro" to "ppro" in the ./configure, it was misleading.
 
-Tue Aug  8 11:24:01 CEST 2000
+Tue,  8 Aug 2000 11:24:01 +0200
 0.1.99f :
 
   * plugin detection now works
@@ -47,14 +52,14 @@ Tue Aug  8 11:24:01 CEST 2000
   * borrowed linuxvideo's MMX motion compensation
   * fixed an undefined symbol in the MMX YUV plugin
 
-Thu Jul 20 15:14:06 CEST 2000
+Thu, 20 Jul 2000 15:14:06 +0200
 0.1.99e :
 
   * new bitstream syntax and slight performance increase
   * BeOS build fix
   * removed the sample code from the reference decoder
 
-Wed Jul 12 01:24:40 CEST 2000
+Wed, 12 Jul 2000 01:24:40 +0200
 0.1.99d :
 
   * fixed RPM build
@@ -77,7 +82,7 @@ Wed Jul 12 01:24:40 CEST 2000
   * fixed an endianness problem which occured on iMacs
   * fixed the build for the Mandrake distribution
 
-Sun Jun 18 18:54:48 CEST 2000
+Sun, 18 Jun 2000 18:54:48 +0200
 0.1.99c :
 
   * fixed Makefile.in for debug version
@@ -90,14 +95,14 @@ Sun Jun 18 18:54:48 CEST 2000
   * fixed a warning in ac3_exponent.c
   * automatic support for .rpm and .deb building
 
-Sat Jun 17 03:35:02 CEST 2000
+Sat, 17 Jun 2000 03:35:02 +0200
 0.1.99b :
 
   * fixed a bug preventing to quit when run with no arguments
   * new VLAN changing code
   * created the ChangeLog file :)
 
-Thu Jun 15 20:48:54 CEST 2000
+Thu, 15 Jun 2000 20:48:54 +0200
 0.1.99a :
 
   * first public release

@@ -10,8 +10,8 @@ Depends: ${shlibs:Depends}
 Description: VideoLAN Client - a free MPEG2 and DVD player
  VideoLAN is a free MPEG2 software solution.
  .
- This is the VideoLAN Client. It plays MPEG2 files, DVDs, or MPEG2
- streams from a network source.
+ This is the VideoLAN Client. It plays MPEG2 files, unencrypted DVDs,
+ or MPEG2 streams from a network source.
 
 Package: vlc-gnome
 Architecture: any
@@ -20,7 +20,7 @@ Description: Gnome VideoLAN Client - a free MPEG2 and DVD player for Gnome
  VideoLAN is a free MPEG2 software solution.
  .
  This is the Gnome version of the VideoLAN Client. It plays MPEG2 files,
- DVDs, or MPEG2 streams from a network source.
+ unencrypted DVDs, or MPEG2 streams from a network source.
 
 Package: vlc-fb
 Architecture: any
@@ -29,7 +29,7 @@ Description: Framebuffer VideoLAN Client - a free MPEG2 and DVD player
  VideoLAN is a free MPEG2 software solution.
  .
  This is the Linux framebuffer version of the VideoLAN Client. It plays
- MPEG2 files, DVDs, or MPEG2 streams from a network source.
+ MPEG2 files, unencrypted DVDs, or MPEG2 streams from a network source.
 
 Package: vlc-ggi
 Architecture: any
