@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.17 2003/07/01 08:30:49 adn Exp $
+ * $Id: httpd.c,v 1.18 2003/07/01 08:55:57 adn Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -465,7 +465,8 @@ static httpd_host_t *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_addr, i
     for( i = 0; i < p_httpt->i_host_count; i++ )
     {
         if( p_httpt->host[i]->sock.sin_port == sock.sin_port &&
-            p_httpt->host[i]->sock.sin_addr.s_addr == sock.sin_addr.s_addr )
+            ( p_httpt->host[i]->sock.sin_addr.s_addr == INADDR_ANY ||
+            p_httpt->host[i]->sock.sin_addr.s_addr == sock.sin_addr.s_addr ) )
         {
             break;
         }
@@ -1829,14 +1830,15 @@ search_file:
 
     p_con->i_state = HTTPD_CONNECTION_SENDING_HEADER;
 
+    p_con->i_buffer_size = 4096;  
+    p_con->i_buffer = 0;
+    
     /* we send stream header with this one */
     if( p_con->i_http_error == 200 && p_con->p_file->b_stream )
     {
-        p_con->i_buffer_size = 4096 + p_con->p_file->i_header_size;
+        p_con->i_buffer_size += p_con->p_file->i_header_size;
     }
 
-    p_con->i_buffer_size = 4096;
-    p_con->i_buffer = 0;  
     p = p_con->p_buffer = malloc( p_con->i_buffer_size );
 
     p += sprintf( p, "HTTP/1.0 %d %s\r\n", p_con->i_http_error, psz_status );
