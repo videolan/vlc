@@ -62,19 +62,33 @@ AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LIB="${LIB} -ldl")
 AC_CHECK_LIB(m,pow,LIB_YUV="${LIB_YUV} -lm")
 
-AC_CHECK_LIB(pthread,pthread_create,
-  LIB="${LIB} -lpthread",
-  AC_MSG_CHECKING(for old style FreeBSD -pthread flag)
-  AC_EGREP_CPP(yes,
-    [#if defined(__FreeBSD_cc_version) && __FreeBSD_cc_version <= 500001
-      yes
-     #endif],
-    AC_MSG_RESULT(yes)
-    DEFINE="${DEFINE} -D_THREAD_SAFE" LIB="${LIB} -pthread",
-    AC_MSG_RESULT(no)))
-AC_CHECK_LIB(threads,thread_create,LIB="${LIB} -lthreads")
-
 CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+CFLAGS="${CFLAGS} -I/usr/local/include"
+
+dnl Check for pthreads - borrowed from XMMS
+PTHREAD_LIBS=error
+AC_CHECK_LIB(pthread,pthread_attr_init,PTHREAD_LIBS="-lpthread")
+if test "x$PTHREAD_LIBS" = xerror; then
+  AC_CHECK_LIB(pthreads,pthread_attr_init,PTHREAD_LIBS="-lpthreads")
+fi
+if test "x$PTHREAD_LIBS" = xerror; then
+  AC_CHECK_LIB(c_r,pthread_attr_init,PTHREAD_LIBS="-lc_r")
+fi
+if test "x$PTHREAD_LIBS" = xerror; then
+  PTHREAD_LIBS=""
+  AC_CHECK_FUNC(pthread_attr_init)
+fi
+LIB="${LIB} ${PTHREAD_LIBS}"
+
+dnl Check for misc headers
+AC_EGREP_HEADER(pthread_cond_t,pthread.h,[
+  AC_DEFINE(PTHREAD_COND_T_IN_PTHREAD_H, 1,
+            Define if <pthread.h> defines pthread_cond_t.)
+])
+AC_EGREP_HEADER(strncasecmp,strings.h,[
+  AC_DEFINE(STRNCASECMP_IN_STRINGS_H, 1,
+            Define if <strings.h> defines strncasecmp.)
+])
 
 dnl Check for headers
 AC_CHECK_HEADERS(stddef.h getopt.h strings.h)
@@ -86,16 +100,6 @@ AC_CHECK_HEADERS(machine/param.h)
 
 dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
-
-dnl Check for misc headers
-AC_EGREP_HEADER(pthread_cond_t,pthread.h,[
-  AC_DEFINE(PTHREAD_COND_T_IN_PTHREAD_H, 1,
-            Define if <pthread.h> defines pthread_cond_t.)
-])
-AC_EGREP_HEADER(strncasecmp,strings.h,[
-  AC_DEFINE(STRNCASECMP_IN_STRINGS_H, 1,
-            Define if <strings.h> defines strncasecmp.)
-])
 
 dnl Check for ntohl, etc.
 CFLAGS="${CFLAGS} -Wall -Werror"
