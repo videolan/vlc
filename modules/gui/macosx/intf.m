@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.111 2004/01/04 21:44:44 kuehne Exp $
+ * $Id: intf.m,v 1.112 2004/01/05 18:43:17 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -634,6 +634,8 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         if( p_playlist != NULL )
         {
             var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
+            var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
+
 #define p_input p_playlist->p_input
         
             if( p_input )
