@@ -6,15 +6,19 @@ src/audio_output/output.c
 include/interface.h
 
 # access modules
+modules/access/directory.c
 modules/access/dvd/dvd.c
 modules/access/dvdread/dvdread.c
 modules/access/dvdplay/dvd.c
+modules/access/mms/mms.c
 modules/access/vcd/vcd.c
 modules/access/v4l/v4l.c
 modules/access/file.c
+modules/access/ftp.c
 modules/access/http.c
 modules/access/udp.c
 modules/access/satellite/satellite.c
+modules/access/slp.c
 
 # access_output modules
 modules/access_output/file.c
@@ -23,8 +27,11 @@ modules/access_output/http.c
 modules/access_output/udp.c
 
 # audio_filter modules
+modules/audio_filter/channel_mixer/headphone.c
 modules/audio_filter/channel_mixer/trivial.c
+modules/audio_filter/converter/a52tofloat32.c
 modules/audio_filter/converter/a52tospdif.c
+modules/audio_filter/converter/dtstospdif.c
 modules/audio_filter/converter/fixed32tofloat32.c
 modules/audio_filter/converter/fixed32tos16.c
 modules/audio_filter/converter/float32tos16.c
@@ -32,12 +39,18 @@ modules/audio_filter/converter/float32tos8.c
 modules/audio_filter/converter/float32tou16.c
 modules/audio_filter/converter/float32tou8.c
 modules/audio_filter/converter/s16tofloat32.c
-modules/audio_filter/converter/a52tofloat32.c
 modules/audio_filter/converter/mpgatofixed32.c
+modules/audio_filter/converter/s16tofixed32.c
+modules/audio_filter/converter/s16tofloat32.c
 modules/audio_filter/converter/s16tofloat32swab.c
+modules/audio_filter/converter/s8tofloat32.c
+modules/audio_filter/converter/u8tofixed32.c
+modules/audio_filter/converter/u8tofloat32.c
+modules/audio_filter/resampler/bandlimited.c
+modules/audio_filter/resampler/coreaudio.c
+modules/audio_filter/resampler/linear.c
 modules/audio_filter/resampler/trivial.c
 modules/audio_filter/resampler/ugly.c
-modules/audio_filter/resampler/linear.c
 
 # audio_mixer modules
 modules/audio_mixer/float32.c
@@ -47,6 +60,7 @@ modules/audio_mixer/trivial.c
 # audio_output modules
 modules/audio_output/alsa.c
 modules/audio_output/arts.c
+modules/audio_output/coreaudio.c
 modules/audio_output/directx.c
 modules/audio_output/esd.c
 modules/audio_output/file.c
@@ -63,10 +77,11 @@ modules/codec/adpcm.c
 modules/codec/araw.c
 modules/codec/cinepak/cinepak.c
 modules/codec/dv.c
+modules/codec/dts.c
 modules/codec/faad/decoder.c
-modules/codec/flacdec.c
 modules/codec/ffmpeg/ffmpeg.c
 modules/codec/ffmpeg/postprocessing/postprocessing.c
+modules/codec/flacdec.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mpeg_audio.c
@@ -81,6 +96,7 @@ modules/codec/mpeg_video/motion/motionaltivec.c
 modules/codec/mpeg_video/motion/motionmmx.c
 modules/codec/mpeg_video/motion/motionmmxext.c
 modules/codec/mpeg_video/parser.c
+modules/codec/rawvideo.c
 modules/codec/spudec/spudec.c
 modules/codec/tarkin.c
 modules/codec/theora.c
@@ -96,6 +112,7 @@ modules/control/rc/rc.c
 modules/demux/a52sys.c
 modules/demux/aac/demux.c
 modules/demux/asf/asf.c
+modules/demux/au.c
 modules/demux/avi/avi.c
 modules/demux/demuxdump.c
 modules/demux/flac.c
@@ -110,6 +127,7 @@ modules/demux/ogg.c
 modules/demux/rawdv.c
 modules/demux/util/id3.c
 modules/demux/util/id3tag.c
+modules/demux/util/sub.c
 modules/demux/wav/wav.c
 
 # encoder modules
@@ -154,6 +172,10 @@ modules/gui/wxwindows/popup.cpp
 modules/gui/wxwindows/fileinfo.cpp
 modules/gui/wxwindows/messages.cpp
 modules/gui/wxwindows/playlist.cpp
+modules/gui/wxwindows/preferences.cpp
+modules/gui/wxwindows/streamout.cpp
+modules/gui/skins/src/skin_main.cpp
+modules/gui/skins/src/vlcproc.cpp
 
 # misc plugins
 modules/misc/dummy/dummy.c
@@ -195,12 +217,14 @@ modules/video_chroma/i420_yuy2.c
 modules/video_chroma/i422_yuy2.c
 
 # video_filter modules
+modules/video_filter/adjust.c
 modules/video_filter/clone.c
 modules/video_filter/crop.c
 modules/video_filter/deinterlace/deinterlace.c
 modules/video_filter/distort.c
 modules/video_filter/invert.c
 modules/video_filter/motionblur.c
+modules/video_filter/osd_text.c
 modules/video_filter/transform.c
 modules/video_filter/wall.c
 
