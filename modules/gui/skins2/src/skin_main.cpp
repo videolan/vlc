@@ -260,5 +260,5 @@ vlc_module_begin();
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
-    set_program( "s2vlc" );
+    set_program( "svlc" );
 vlc_module_end();
