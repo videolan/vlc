@@ -1420,9 +1420,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         {
             PlaylistRebuild( p_intf );
         }
-        if( p_sys->b_box_plidx_follow &&
-            ( p_sys->pp_plist[p_sys->i_box_plidx]->p_item !=
-              p_sys->p_playlist->status.p_item ) )
+        if( p_sys->b_box_plidx_follow )
         {
             FindIndex( p_intf );
         }
@@ -1645,7 +1643,9 @@ static void FindIndex( intf_thread_t *p_intf )
     {
          p_sys->i_box_plidx = p_sys->p_playlist->i_index;
     }
-    else
+    else if( ( p_sys->i_box_plidx < p_sys->i_plist_entries &&
+               p_sys->pp_plist[p_sys->i_box_plidx]->p_item !=
+               p_sys->p_playlist->status.p_item ) )
     {
         for( i = 0; i < p_sys->i_plist_entries; i++ )
         {

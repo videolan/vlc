@@ -411,6 +411,11 @@ static int ReadDir( playlist_t *p_playlist,
         msg_Warn( p_playlist, "Failed to read directory" );
         return VLC_EGENERIC;
     }
+    else if( i_dir_content <= 0 )
+    {
+        /* directory is empty */
+        return VLC_SUCCESS;
+    }
     p_dir_content = pp_dir_content[0];
 
     /* while we still have entries in the directory */
