@@ -125,8 +125,10 @@ static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
     VIDEO_FIFO_INCEND( *p_fifo );
 
     vlc_mutex_unlock( &p_fifo->lock );
+#else
+    p_fifo->p_vpar->p_vout->vdec_DecodeMacroblock(
+            p_fifo->p_vpar->pp_vdec[0], p_mb );
 #endif
-    /* Shouldn't normally be used without SMP. */
 }
 
 /*****************************************************************************

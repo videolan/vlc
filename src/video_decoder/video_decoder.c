@@ -59,10 +59,6 @@
  */
 #ifdef VDEC_SMP
 static int      vdec_InitThread     ( vdec_thread_t *p_vdec );
-static void     vdec_DecodeMacroblockC  ( vdec_thread_t *p_vdec,
-                                          macroblock_t * p_mb );
-static void     vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec,
-                                          macroblock_t * p_mb );
 #endif
 static void     RunThread           ( vdec_thread_t *p_vdec );
 static void     ErrorThread         ( vdec_thread_t *p_vdec );
@@ -154,7 +150,9 @@ static int vdec_InitThread( vdec_thread_t *p_vdec )
 int vdec_InitThread( vdec_thread_t *p_vdec )
 #endif
 {
+#ifndef HAVE_MMX
     int i_dummy;
+#endif
 
     intf_DbgMsg("vdec debug: initializing video decoder thread %p\n", p_vdec);
 
@@ -168,6 +166,7 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
     p_vdec->c_decoded_b_pictures = 0;
 #endif
 
+#ifndef HAVE_MMX
     /* Init crop table */
     p_vdec->pi_crop = p_vdec->pi_crop_buf + (VDEC_CROPRANGE >> 1);
     for( i_dummy = -(VDEC_CROPRANGE >> 1); i_dummy < 0; i_dummy++ )
@@ -182,6 +181,7 @@ int vdec_InitThread( vdec_thread_t *p_vdec )
     {
         p_vdec->pi_crop[i_dummy] = 255;
     }
+#endif
 
     /* Mark thread as running and return */
     intf_DbgMsg("vdec debug: InitThread(%p) succeeded\n", p_vdec);
@@ -474,11 +474,7 @@ static  __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
     }                                                                   \
 }
 
-#ifdef VDEC_SMP
-static __inline__ void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-#else
 void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-#endif
 {
     if( !(p_mb->i_mb_type & MB_INTRA) )
     {
@@ -508,11 +504,7 @@ void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
     vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
 }
 
-#ifdef VDEC_SMP
-static __inline__ void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-#else
 void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
-#endif
 {
     if( !(p_mb->i_mb_type & MB_INTRA) )
     {

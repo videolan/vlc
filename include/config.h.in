@@ -65,7 +65,7 @@
 
 /* Define for profiling and statistics support - such informations, like FPS
  * or pictures count won't be available if it not set */
-//#define STATS
+#define STATS
 
 /* Define for unthreaded version of the program FIXME: not yet implemented ??*/
 //#define NO_THREAD

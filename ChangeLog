@@ -15,6 +15,8 @@
     necessary.
   * Fixed the DEBUG mode in the Makefile.
   * Fixed a bug in mwait() which made us wait too long.
+  * The video_decoder can now be split into several threads to take
+    advantage of the SMP machines.
 
 Mon, 28 Aug 2000 02:34:18 +0200
 0.1.99i :

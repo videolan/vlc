@@ -54,13 +54,13 @@ typedef struct vdec_thread_s
     dctelem_t              p_pre_idct[64*64];
 
     /* Input properties */
-    struct vpar_thread_s *    p_vpar;                 /* video_parser thread */
+    struct vpar_thread_s * p_vpar;                    /* video_parser thread */
 
+#ifndef HAVE_MMX
     /* Lookup tables */
-//#ifdef MPEG2_COMPLIANT
     u8              pi_crop_buf[VDEC_CROPRANGE];
     u8 *            pi_crop;
-//#endif
+#endif
 
 #ifdef STATS
     /* Statistics */
@@ -70,9 +70,6 @@ typedef struct vdec_thread_s
     count_t         c_decoded_i_pictures;    /* number of I pictures decoded */
     count_t         c_decoded_p_pictures;    /* number of P pictures decoded */
     count_t         c_decoded_b_pictures;    /* number of B pictures decoded */
-
-/*    void            (*vdec_DecodeMacroblock)  ( struct vdec_thread_s *p_vdec,
-                                                struct macroblock_s *p_mb );*/
 #endif
 } vdec_thread_t;
 
@@ -85,13 +82,13 @@ struct macroblock_s;
 /* Thread management functions */
 #ifndef VDEC_SMP
 int             vdec_InitThread         ( struct vdec_thread_s *p_vdec );
+#endif
 void            vdec_DecodeMacroblock   ( struct vdec_thread_s *p_vdec,
                                           struct macroblock_s *p_mb );
 void            vdec_DecodeMacroblockC  ( struct vdec_thread_s *p_vdec,
                                           struct macroblock_s *p_mb );
 void            vdec_DecodeMacroblockBW ( struct vdec_thread_s *p_vdec,
                                           struct macroblock_s *p_mb );
-#endif
 vdec_thread_t * vdec_CreateThread       ( struct vpar_thread_s *p_vpar /*,
                                           int *pi_status */ );
 void            vdec_DestroyThread      ( vdec_thread_t *p_vdec /*,
