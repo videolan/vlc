@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.16 2002/05/18 13:30:28 gbazin Exp $
+ * $Id: vout_events.c,v 1.17 2002/05/18 15:34:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -287,12 +287,11 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     ReleaseDC( p_vout->p_sys->hwnd, hdc );
 
     /* Get the Icon from the main app */
+    vlc_icon = NULL;
     if( GetModuleFileName( NULL, vlc_path, _MAX_PATH ) )
     {
         vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
     }
-    if( !vlc_icon )
-        vlc_icon = LoadIcon( NULL, IDI_APPLICATION );
 
 
     /* fill in the window class structure */
@@ -302,18 +301,29 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     wc.cbClsExtra    = 0;                             /* no extra class data */
     wc.cbWndExtra    = 0;                            /* no extra window data */
     wc.hInstance     = hInstance;                                /* instance */
-    wc.hIcon         = CopyIcon( vlc_icon );            /* load the vlc icon */
+    wc.hIcon         = vlc_icon;                        /* load the vlc icon */
     wc.hCursor       = LoadCursor(NULL, IDC_ARROW); /* load a default cursor */
     wc.hbrBackground = p_vout->p_sys->hbrush;            /* background color */
     wc.lpszMenuName  = NULL;                                      /* no menu */
     wc.lpszClassName = "VLC DirectX";                 /* use a special class */
-    wc.hIconSm       = CopyIcon( vlc_icon );            /* load the vlc icon */
+    wc.hIconSm       = vlc_icon;                        /* load the vlc icon */
 
     /* register the window class */
     if (!RegisterClassEx(&wc))
     {
-        /* Check why it failed. If it's because one already exists then fine */
         WNDCLASS wndclass;
+
+        /* free window background brush */
+        if( p_vout->p_sys->hbrush )
+        {
+            DeleteObject( p_vout->p_sys->hbrush );
+            p_vout->p_sys->hbrush = NULL;
+        }
+
+        if( vlc_icon )
+            DestroyIcon( vlc_icon );
+
+        /* Check why it failed. If it's because one already exists then fine */
         if( !GetClassInfo( hInstance, "VLC DirectX", &wndclass ) )
         {
             intf_ErrMsg( "vout: DirectXCreateWindow RegisterClass FAILED" );
@@ -371,20 +381,13 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
     intf_WarnMsg( 3, "vout: DirectXCloseWindow" );
     if( p_vout->p_sys->hwnd != NULL )
     {
-        DestroyWindow( p_vout->p_sys->hwnd);
+        DestroyWindow( p_vout->p_sys->hwnd );
         p_vout->p_sys->hwnd = NULL;
     }
 
     /* We don't unregister the Window Class because it could lead to race
      * conditions and it will be done anyway by the system when the app will
      * exit */
-
-    /* free window background brush */
-    if( p_vout->p_sys->hbrush != NULL )
-    {
-        DeleteObject( p_vout->p_sys->hbrush );
-        p_vout->p_sys->hbrush = NULL;
-    }
 }
 
 /*****************************************************************************
@@ -526,14 +529,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         /* exit application */
         p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
         p_main->p_intf->b_die = p_vout->p_sys->b_event_thread_die = 1;
-        return 0;
-        break;
-
-    /* the window has been closed so shut down everything now */
-    case WM_DESTROY:
-        intf_WarnMsg( 4, "vout: WinProc WM_DESTROY" );
-        /* just destroy the window */
-        PostQuitMessage( 0 );
         return 0;
         break;
 

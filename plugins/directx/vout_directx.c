@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.33 2002/05/18 13:30:28 gbazin Exp $
+ * $Id: vout_directx.c,v 1.34 2002/05/18 15:34:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1026,7 +1026,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         }
         else
         {
-            intf_ErrMsg( "vout error: can't create YUV overlay surface." );
+            intf_WarnMsg( 3, "vout: can't create an YUV overlay surface." );
             p_vout->p_sys->b_using_overlay = 0;
         }
     }
