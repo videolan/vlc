@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.35 2003/01/25 21:34:45 hartman Exp $
+ * $Id: intf.m,v 1.36 2003/01/27 00:08:31 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -187,10 +187,7 @@ static void Run( intf_thread_t *p_intf )
 
 - (void)awakeFromNib
 {
-    NSString * pTitle;
-    pTitle = _NS("VLC - Controller");
-
-    [o_window setTitle: pTitle];
+    [o_window setTitle: _NS("VLC - Controller")];
     [o_window setExcludedFromWindowsMenu: TRUE];
 
     /* button controls */
@@ -207,6 +204,7 @@ static void Run( intf_thread_t *p_intf )
     [o_timeslider setToolTip: _NS("Position")];
     
     /* messages panel */ 
+    [o_msgs_panel setDelegate: self];
     [o_msgs_panel setTitle: _NS("Messages")];
     [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
     [o_msgs_btn_ok setTitle: _NS("Close")];
@@ -294,6 +292,9 @@ static void Run( intf_thread_t *p_intf )
     intf_thread_t * p_intf = [NSApp getIntf];
 
     f_slider_old = f_slider = 0.0;
+
+    o_msg_lock = [[NSLock alloc] init];
+    o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
 
     [NSThread detachNewThreadSelector: @selector(manage)
         toTarget: self withObject: nil];
@@ -433,35 +434,34 @@ static void Run( intf_thread_t *p_intf )
 
         if( p_intf->p_sys->p_sub->i_start != i_stop )
         {
-#if 0
             NSColor *o_white = [NSColor whiteColor];
             NSColor *o_red = [NSColor redColor];
             NSColor *o_yellow = [NSColor yellowColor];
             NSColor *o_gray = [NSColor grayColor];
 
-            unsigned int ui_length = [[o_messages string] length];
-
             NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
             static const char * ppsz_type[4] = { ": ", " error: ", 
                                                  " warning: ", " debug: " }; 
-        
-            [o_messages setEditable: YES];
-            [o_messages setSelectedRange: NSMakeRange( ui_length, 0 )];
-            [o_messages scrollRangeToVisible: NSMakeRange( ui_length, 0 )];
-#endif
 
             for( i_start = p_intf->p_sys->p_sub->i_start;
                  i_start != i_stop;
                  i_start = (i_start+1) % VLC_MSG_QSIZE )
             {
-#if 0
                 NSString *o_msg;
                 NSDictionary *o_attr;
                 NSAttributedString *o_msg_color;
-#endif
+
                 int i_type = p_intf->p_sys->p_sub->p_msg[i_start].i_type;
 
-#if 0
+                [o_msg_lock lock];
+
+                if( [o_msg_arr count] + 2 > 200 )
+                {
+                    unsigned rid[] = { 0, 1 };
+                    [o_msg_arr removeObjectsFromIndices: (unsigned *)&rid
+                               numIndices: sizeof(rid)/sizeof(rid[0])];
+                }
+
                 o_attr = [NSDictionary dictionaryWithObject: o_gray
                     forKey: NSForegroundColorAttributeName];
                 o_msg = [NSString stringWithFormat: @"%s%s",
@@ -469,18 +469,17 @@ static void Run( intf_thread_t *p_intf )
                     ppsz_type[i_type]];
                 o_msg_color = [[NSAttributedString alloc]
                     initWithString: o_msg attributes: o_attr];
-                [o_messages insertText: o_msg_color];
+                [o_msg_arr addObject: [o_msg_color autorelease]];
 
                 o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]
                     forKey: NSForegroundColorAttributeName];
-                o_msg = [NSString stringWithCString:
+                o_msg = [NSString stringWithFormat: @"%s\n",
                     p_intf->p_sys->p_sub->p_msg[i_start].psz_msg];
                 o_msg_color = [[NSAttributedString alloc]
                     initWithString: o_msg attributes: o_attr];
-                [o_messages insertText: o_msg_color];
+                [o_msg_arr addObject: [o_msg_color autorelease]];
 
-                [o_messages insertText: @"\n"];
-#endif
+                [o_msg_lock unlock];
 
                 if ( i_type == 1 )
                 {
@@ -499,10 +498,6 @@ static void Run( intf_thread_t *p_intf )
                     [o_err_msg setEditable: NO];
                 }
             }
-
-#if 0
-            [o_messages setEditable: NO];
-#endif
 
             vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
             p_intf->p_sys->p_sub->i_start = i_start;
@@ -534,12 +529,6 @@ static void Run( intf_thread_t *p_intf )
         p_intf->p_sys->p_input = NULL;
     }
 
-    if( o_prefs != nil )
-    {
-        [o_prefs release];
-        o_prefs = nil;
-    }
-
     /*
      * Free playlists
      */
@@ -562,6 +551,19 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         vout_Destroy( p_vout );
+    }
+
+    if( o_msg_arr != nil )
+    {
+        [o_msg_arr removeAllObjects];
+        [o_msg_arr release];
+        o_msg_arr = nil;
+    }
+
+    if( o_msg_lock != nil )
+    {
+        [o_msg_lock release];
+        o_msg_lock = nil;
     }
 
     if( o_prefs != nil )
@@ -1173,44 +1175,63 @@ static void Run( intf_thread_t *p_intf )
 - (IBAction)closeError:(id)sender
 {
     /* Error panel */
-    [o_err_msg setEditable: YES];
-    [o_err_msg setSelectedRange:
-                NSMakeRange( 0, [[o_err_msg string] length] )];
-    [o_err_msg insertText: @""];
-    [o_err_msg setEditable: NO];
+    [o_err_msg setString: @""];
     [o_error performClose: self];
 }
 
 - (IBAction)openReadMe:(id)sender
 {
-    NSString *readmeFile = [[NSBundle mainBundle] pathForResource:@"README.MacOSX"
-       ofType:@"rtf"];
+    NSString * o_path = [[NSBundle mainBundle] 
+        pathForResource: @"README.MacOSX" ofType: @"rtf"]; 
        
-    [[NSWorkspace sharedWorkspace] openFile: readmeFile 
-        withApplication:@"TextEdit"];
+    [[NSWorkspace sharedWorkspace] openFile: o_path 
+                                   withApplication: @"TextEdit"];
 }
 
 - (IBAction)reportABug:(id)sender
 {
-    NSURL *bugURL = [NSURL URLWithString:@"http://www.videolan.org/support/bug-reporting.html"];
+    NSURL * o_url = [NSURL URLWithString: 
+        @"http://www.videolan.org/support/bug-reporting.html"];
     
-    [[NSWorkspace sharedWorkspace] openURL: bugURL];
+    [[NSWorkspace sharedWorkspace] openURL: o_url];
 }
 
 - (IBAction)openWebsite:(id)sender
 {
-    NSURL *websiteURL = [NSURL URLWithString:@"http://www.videolan.org/"];
+    NSURL * o_url = [NSURL URLWithString: @"http://www.videolan.org"];
     
-    [[NSWorkspace sharedWorkspace] openURL: websiteURL];
+    [[NSWorkspace sharedWorkspace] openURL: o_url];
 }
 
 - (IBAction)openLicense:(id)sender
 {
-    NSString *licenseFile = [[NSBundle mainBundle] pathForResource:@"COPYING"
-       ofType:nil];
+    NSString * o_path = [[NSBundle mainBundle] 
+        pathForResource: @"COPYING" ofType: nil];
        
-    [[NSWorkspace sharedWorkspace] openFile: licenseFile 
-        withApplication:@"TextEdit"];
+    [[NSWorkspace sharedWorkspace] openFile: o_path 
+                                   withApplication: @"TextEdit"];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)o_notification
+{
+    if( [o_notification object] == o_msgs_panel )
+    {
+        id o_msg;
+        NSEnumerator * o_enum;
+
+        [o_messages setString: @""]; 
+
+        [o_msg_lock lock];
+
+        o_enum = [o_msg_arr objectEnumerator];
+
+        while( ( o_msg = [o_enum nextObject] ) != nil )
+        {
+            [o_messages insertText: o_msg];
+        }
+
+        [o_msg_lock unlock];
+    }
 }
 
 @end
