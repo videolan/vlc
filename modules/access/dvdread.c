@@ -1194,13 +1194,15 @@ static void DvdReadFindCell( demux_t *p_demux )
 
 #undef cell
 
+    if( p_sys->i_chapter + 1 >= p_sys->i_chapters ) return;
+
     pgc_id = p_sys->p_vts_file->vts_ptt_srpt->title[
-                p_sys->i_ttn - 1].ptt[p_sys->i_chapter].pgcn;
+                p_sys->i_ttn - 1].ptt[p_sys->i_chapter + 1].pgcn;
     pgn = p_sys->p_vts_file->vts_ptt_srpt->title[
-              p_sys->i_ttn - 1].ptt[p_sys->i_chapter].pgn;
+              p_sys->i_ttn - 1].ptt[p_sys->i_chapter + 1].pgn;
     p_pgc = p_sys->p_vts_file->vts_pgcit->pgci_srp[pgc_id - 1].pgc;
 
-    if( p_pgc->program_map[pgn - 1] <= p_sys->i_cur_cell )
+    if( p_sys->i_cur_cell >= p_pgc->program_map[pgn - 1] - 1 )
     {
         p_sys->i_chapter++;
 
