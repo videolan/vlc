@@ -78,7 +78,7 @@ struct filter_sys_t
 vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
-    add_string( "marquee", "Marquee", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
+    add_string( "marq-marquee", "Marquee", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
     add_integer( "marq-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "marq-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     add_integer( "marq-timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
@@ -110,16 +110,16 @@ static int CreateFilter( vlc_object_t *p_this )
     {
         return VLC_ENOOBJ;
     }
-
+/* p_access->p_libvlc p_demux->p_libvlc */
 
     p_sys->i_xoff = var_CreateGetInteger( p_pl , "marq-x" );
     p_sys->i_yoff = var_CreateGetInteger( p_pl , "marq-y" );
     p_sys->i_timeout = var_CreateGetInteger( p_pl , "marq-timeout" );
-    p_sys->psz_marquee =  var_CreateGetString( p_pl, "marquee" );
+    p_sys->psz_marquee =  var_CreateGetString( p_pl, "marq-marquee" );
 
     var_AddCallback( p_pl, "marq-x", MarqueeCallback, p_sys );
     var_AddCallback( p_pl, "marq-y", MarqueeCallback, p_sys );
-    var_AddCallback( p_pl, "marquee", MarqueeCallback, p_sys );
+    var_AddCallback( p_pl, "marq-marquee", MarqueeCallback, p_sys );
     var_AddCallback( p_pl, "marq-timeout", MarqueeCallback, p_sys );
 
     vlc_object_release( p_pl );
@@ -149,9 +149,10 @@ static void DestroyFilter( vlc_object_t *p_this )
     {
         return;
     }
-    var_Destroy( p_pl , "marquee" );
+    var_Destroy( p_pl , "marq-marquee" );
     var_Destroy( p_pl , "marq-x" );
-    var_Destroy( p_pl , "marq_y" );
+    var_Destroy( p_pl , "marq-y" );
+    var_Destroy( p_pl , "marq-timeout" );
     vlc_object_release( p_pl );
 }
 
@@ -219,7 +220,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
 {
     filter_sys_t *p_sys = (filter_sys_t *) p_data;
 
-    if( !strncmp( psz_var, "marquee", 7 ) )
+    if( !strncmp( psz_var, "marq-marquee", 7 ) )
     {
         if( p_sys->psz_marquee ) free( p_sys->psz_marquee );
         p_sys->psz_marquee = strdup( newval.psz_string );
