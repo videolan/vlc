@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.4 2003/01/17 14:51:09 lool Exp $
+ * $Id: slp.c,v 1.5 2003/01/21 17:34:03 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -53,7 +53,12 @@ static int  Demux ( input_thread_t * );
 #define SCOPELIST_TEXT "SLP scopes list"
 #define SCOPELIST_LONGTEXT "This string is a comma separated list of scope " \
                            "names or empty if you want to use the default "  \
-                           "scopes"
+                           "scopes; it is used in all SLP queries"
+#define NAMINGAUTHORITY_TEXT "SLP naming authority"
+#define NAMINGAUTHORITY_LONGTEXT "This string is a list of naming " \
+                                 "authorities to search. Use \"*\" for all " \
+                                 "and the empty string for the default of " \
+                                 "IANA"
 #define FILTER_TEXT "SLP LDAP filter"
 #define FILTER_LONGTEXT "This is a query formulated of attribute pattern " \
                         "matching expressions in the form of an LDAPv3 "   \
@@ -66,10 +71,12 @@ static int  Demux ( input_thread_t * );
 vlc_module_begin();
     set_description( _("SLP access module") );
     add_category_hint( N_("slp"), NULL );
-    add_string( "slp-srvtype", "service:vls.services.videolan.org:udpm",
-                NULL, SRVTYPE_TEXT, SRVTYPE_LONGTEXT );
+/*    add_string( "slp-srvtype", "service:vls.services.videolan.org:udpm",
+                NULL, SRVTYPE_TEXT, SRVTYPE_LONGTEXT ); */
     add_string( "slp-scopelist", "", NULL, SCOPELIST_TEXT,
                 SCOPELIST_LONGTEXT );
+    add_string( "slp-namingauthority", "*", NULL, NAMINGAUTHORITY_TEXT,
+                NAMINGAUTHORITY_LONGTEXT );
     add_string( "slp-filter", "", NULL, FILTER_TEXT, FILTER_LONGTEXT );
     add_string( "slp-lang", "", NULL, LANG_TEXT, LANG_LONGTEXT );
     add_submodule();
@@ -84,50 +91,122 @@ vlc_module_end();
 /*****************************************************************************
  * SrvUrlCallback: adds an entry to the playlist
  *****************************************************************************/
-static SLPBoolean SrvUrlCallback( SLPHandle hslp,
+static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
                            const char * psz_srvurl,
                            uint16_t i_lifetime,
                            SLPError slpe_errcode,
-                           void * p_input )
+                           void * p_cookie )
 {
+    input_thread_t * p_input = (input_thread_t  *)p_cookie;
     playlist_t * p_playlist;
     char psz_item[42] = "udp:@";
     char * psz_s;
 
-    if( slpe_errcode == SLP_OK )
+    /* our callback was only called to tell us there's nothing more to read */
+    if( slpe_errcode == SLP_LAST_CALL )
     {
-        p_playlist = vlc_object_find( (input_thread_t *)p_input,
-                                      VLC_OBJECT_PLAYLIST,
-                                      FIND_ANYWHERE );
-        if( p_playlist == NULL )
-        {
-            msg_Dbg( (input_thread_t *)p_input, "could not find playlist" );
-            return SLP_FALSE;
-        }
+        return SLP_TRUE;
+    }
 
-        /* search the returned address after a double-slash */
-        psz_s = strstr( psz_srvurl, "//" );
-        /* skip the slashes */
-        psz_s = &psz_s[2];
-        if( psz_s == NULL )
-        {
-            msg_Dbg( (input_thread_t *)p_input,
-                     "something went wrong with your libslp" );
-            return SLP_FALSE;
-        }
-        /* add udp:@ in front of the address */
-        psz_s = strncat( psz_item,
-                         psz_s,
-                         sizeof(psz_item) - strlen(psz_item) - 1 );
-        playlist_Add( p_playlist, psz_s,
-                      PLAYLIST_APPEND,
-                      PLAYLIST_END );
-        vlc_object_release( (vlc_object_t *)p_playlist );
+    /* or there was a problem with getting the data we requested */
+    if( (slpe_errcode != SLP_OK) )
+    {
+        msg_Err( p_input,
+                 "SrvUrlCallback got an error %i with URL %s",
+                 slpe_errcode,
+                 psz_srvurl );
+        return SLP_TRUE;
+    }
 
-        msg_Dbg( (input_thread_t *)p_input,
-                 "added « %s » (lifetime %i) to playlist",
-                 psz_srvurl,
-                 i_lifetime );
+    /* search the returned address after a double-slash */
+    psz_s = strstr( psz_srvurl, "//" );
+    /* skip the slashes */
+    psz_s = &psz_s[2];
+    if( psz_s == NULL )
+    {
+        msg_Err( (input_thread_t *)p_input,
+                 "SrvUrlCallback got a NULL string if your libslp" );
+        return SLP_TRUE;
+    }
+    /* add udp:@ in front of the address */
+    psz_s = strncat( psz_item,
+                     psz_s,
+                     sizeof(psz_item) - strlen(psz_item) - 1 );
+
+    /* search the main playlist object */
+    p_playlist = vlc_object_find( (input_thread_t *)p_input,
+                                  VLC_OBJECT_PLAYLIST,
+                                  FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        msg_Warn( (input_thread_t *)p_input,
+                  "could not find playlist, not adding entries" );
+        return SLP_TRUE;
+    }
+
+    playlist_Add( p_playlist, psz_s,
+                  PLAYLIST_APPEND,
+                  PLAYLIST_END );
+    vlc_object_release( (vlc_object_t *)p_playlist );
+
+    msg_Info( (input_thread_t *)p_input,
+             "added « %s » (lifetime %i) to playlist",
+             psz_srvurl,
+             i_lifetime );
+
+    return SLP_TRUE;
+}
+
+/*****************************************************************************
+ * SrvTypeCallback: searchs all servers of a certain type
+ *****************************************************************************/
+static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
+                           const char * psz_srvurl,
+                           SLPError slpe_errcode,
+                           void * p_cookie )
+{
+    input_thread_t * p_input = (input_thread_t  *)p_cookie;
+    SLPError slpe_result;
+    SLPHandle slph_slp2;
+
+    /* our callback was only called to tell us there's nothing more to read */
+    if( slpe_errcode == SLP_LAST_CALL )
+    {
+        return SLP_TRUE;
+    }
+
+    /* or there was a problem with getting the data we requested */
+    if( slpe_errcode != SLP_OK )
+    {
+        msg_Err( p_input,
+                 "SrvTypeCallback got an error %i with URL %s",
+                 slpe_errcode,
+                 psz_srvurl );
+        return SLP_TRUE;
+    }
+
+    /* get a new handle to the library */
+    if( SLPOpen( config_GetPsz( p_input, "slp-lang" ),
+                 SLP_FALSE,                              /* synchronous ops */
+                 &slph_slp2 ) == SLP_OK )
+    {
+        /* search for services */
+        slpe_result = SLPFindSrvs( slph_slp2,
+                                   psz_srvurl,
+                                   config_GetPsz( p_input, "slp-scopelist" ),
+                                   config_GetPsz( p_input, "slp-filter" ),
+                                   SrvUrlCallback,
+                                   p_input );
+
+        SLPClose( slph_slp2 );
+
+        if( slpe_result != SLP_OK )
+        {
+            msg_Err( p_input,
+                     "SLPFindSrvs error %i finding servers of type %s",
+                     slpe_result,
+                     psz_srvurl );
+        }
     }
 
     return SLP_TRUE;
@@ -139,7 +218,6 @@ static SLPBoolean SrvUrlCallback( SLPHandle hslp,
 static int Open( vlc_object_t * p_this )
 {
     input_thread_t * p_input = (input_thread_t *)p_this;
-    char *           psz_name = strdup(p_input->psz_name);
     SLPError         slpe_result;
     SLPHandle        slph_slp;
     playlist_t *     p_playlist;
@@ -149,8 +227,8 @@ static int Open( vlc_object_t * p_this )
                                                  FIND_ANYWHERE );
     if( !p_playlist )
     {
-        msg_Err( p_input, "can't find playlist" );
-        return -1;
+        msg_Warn( p_input, "hey I can't find the main playlist, I need it" );
+        return VLC_FALSE;
     }
 
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
@@ -161,20 +239,13 @@ static int Open( vlc_object_t * p_this )
                  SLP_FALSE,                              /* synchronous ops */
                  &slph_slp ) == SLP_OK )
     {
-        /* search for services */
-        slpe_result = SLPFindSrvs( slph_slp,
-                                   config_GetPsz( p_input, "slp-srvtype" ),
-                                   config_GetPsz( p_input, "slp-scopelist" ),
-                                   config_GetPsz( p_input, "slp-filter" ),
-                                   SrvUrlCallback,
-                                   p_input );
-        if( slpe_result != SLP_OK )
-        {
-            msg_Dbg( p_input,
-                     "slp error opening %s: %i",
-                     psz_name,
-                     slpe_result );
-        }
+        /* search all service types */
+        slpe_result =
+            SLPFindSrvTypes( slph_slp,
+                             config_GetPsz( p_input, "slp-namingauthority" ),
+                             config_GetPsz( p_input, "slp-scopelist" ),
+                             SrvTypeCallback,
+                             p_input );
         /* we're done, clean up */
         SLPClose( slph_slp );
     }
@@ -199,7 +270,7 @@ static int Open( vlc_object_t * p_this )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     p_input->i_mtu = 0;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -228,13 +299,13 @@ static int Init ( vlc_object_t *p_this )
 
     if( p_input->stream.i_method != INPUT_METHOD_SLP )
     {
-        return -1;
+        return VLC_FALSE;
     }
 
     p_input->pf_demux  = Demux;
     p_input->pf_rewind = NULL;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
