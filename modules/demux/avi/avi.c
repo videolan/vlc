@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.25 2003/01/13 04:46:49 fenrir Exp $
+ * $Id: avi.c,v 1.26 2003/01/19 16:57:32 massiot Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1892,8 +1892,8 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                         default:
                             if( AVI_PacketNext( p_input ) )
                             {
-                                msg_Err( p_input,
-                                         "cannot skip packet, track disabled" );
+                                msg_Warn( p_input,
+                                          "cannot skip packet, track disabled" );
                                 return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                             }
                             break;
@@ -1924,8 +1924,8 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                     {
                         if( AVI_PacketNext( p_input ) )
                         {
-                            msg_Err( p_input,
-                                     "cannot skip packet, track disabled" );
+                            msg_Warn( p_input,
+                                      "cannot skip packet, track disabled" );
                             return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                         }
                     }
