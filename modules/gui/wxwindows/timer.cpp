@@ -33,6 +33,8 @@
 #include <vlc/aout.h>
 #include <vlc/intf.h>
 
+#include "vlc_meta.h"
+
 #include "wxwindows.h"
 #include <wx/timer.h>
 
@@ -133,8 +135,21 @@ void Timer::Notify()
             b_old_seekable = VLC_FALSE;
             b_disc_shown = VLC_FALSE;
 
-            p_main_interface->statusbar->SetStatusText(
-                wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
+            char *psz_now_playing = vlc_input_item_GetInfo(
+                p_intf->p_sys->p_input->input.p_item,
+                _("Meta-information"), _( "Now Playing" ) );
+            if( psz_now_playing && *psz_now_playing )
+            {
+                p_main_interface->statusbar->SetStatusText(
+                    wxU(psz_now_playing) + wxT( " - " ) +
+                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
+            }
+            else
+            {
+                p_main_interface->statusbar->SetStatusText(
+                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
+            }
+            free( psz_now_playing );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
 #ifdef wxHAS_TASK_BAR_ICON
@@ -190,8 +205,21 @@ void Timer::Notify()
             p_intf->p_sys->b_playing = 1;
 
             /* Update the item name */
-            p_main_interface->statusbar->SetStatusText(
-                wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
+            char *psz_now_playing = vlc_input_item_GetInfo(
+                p_intf->p_sys->p_input->input.p_item,
+                _("Meta-information"), _( "Now Playing" ) );
+            if( psz_now_playing && *psz_now_playing )
+            {
+                p_main_interface->statusbar->SetStatusText(
+                    wxU(psz_now_playing) + wxT( " - " ) +
+                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
+            }
+            else
+            {
+                p_main_interface->statusbar->SetStatusText(
+                    wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
+            }
+            free( psz_now_playing );
 
             /* Manage the slider */
             /* FIXME --fenrir */

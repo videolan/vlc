@@ -2518,6 +2518,16 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
 /***********************************************************************
  * Info management functions
  ***********************************************************************/
+/**
+ * Get a info item from a given category in a given input item.
+ *
+ * \param p_i The input item to get info from
+ * \param psz_cat String representing the category for the info
+ * \param psz_name String representing the name of the desired info
+ * \return A pointer to the string with the given info if found, or an
+ *         empty string otherwise. The caller should free the returned
+ *         pointer.
+ */
 char *vlc_input_item_GetInfo( input_item_t *p_i,
                               const char *psz_cat,
                               const char *psz_name )
