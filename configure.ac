@@ -893,7 +893,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
-AX_ADD_PLUGINS([mpgv mpga m4v h264 mpeg_system ps ps2 pva ts_old avi asf aac mp4 rawdv demux2 nsv real aiff mjpeg])
+AX_ADD_PLUGINS([mpgv mpga m4v h264 mpeg_system ps ps2 pva avi asf aac mp4 rawdv demux2 nsv real aiff mjpeg])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -1213,201 +1213,201 @@ fi
 
 
 
-dnl
-dnl  DVD module: optionally check for installed libdvdcss
-dnl
-AC_ARG_ENABLE(dvd,
-[  --enable-dvd            DVD input module (default enabled)])
-if test "${enable_dvd}" != "no"
-then
-  AC_ARG_WITH(dvdcss,
-  [    --with-dvdcss=PATH    libdvdcss headers and libraries])
-  AC_ARG_WITH(dvdcss-tree,
-  [    --with-dvdcss-tree=PATH libdvdcss tree for static linking])
-  case "${with_dvdcss}" in
-  ""|yes)
-    if test -z "${with_dvdcss_tree}"
-    then
-      AC_CHECK_HEADERS(dvdcss/dvdcss.h,
-        [ AX_ADD_PLUGINS([dvd])
-          AX_ADD_LDFLAGS([dvd dvdcss],[-ldvdcss])],
-        [ AC_MSG_WARN([libdvdcss is no longer provided with vlc; please get libdvdcss from http://www.videolan.org/libdvdcss/ and build it. Then either use --with-dvdcss=<path/where/libdvdcss/was/installed> for dynamic linking (recommended under Unix) or --with-dvdcss-tree=<path/where/libdvdcss/was/built> for static linking (recommended under BeOS, Windows, MacOS X). Alternatively you can use --disable-dvd to disable the DVD plugin.])
-          AC_MSG_ERROR([cannot find libdvdcss headers]) ])
-    else
-      AC_MSG_CHECKING(for libdvdcss.a in ${with_dvdcss_tree})
-      real_dvdcss_tree="`cd ${with_dvdcss_tree} 2>/dev/null && pwd`"
-      if test -z "${real_dvdcss_tree}"
-      then
-        dnl  The given directory can't be found
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot cd to ${with_dvdcss_tree}])
-      fi
-      if test -f "${real_dvdcss_tree}/src/.libs/libdvdcss.a"
-      then
-        dnl  Use a custom libdvdcss
-        AC_MSG_RESULT(${real_dvdcss_tree}/src/.libs/libdvdcss.a)
-        AX_ADD_BUILTINS([dvd])
-        AX_ADD_LDFLAGS([dvd dvdcss],[-L${real_dvdcss_tree}/src/.libs -ldvdcss])
-        AX_ADD_CPPFLAGS([dvd],[-I${real_dvdcss_tree}/src])
-      else
-        dnl  The given libdvdcss wasn't built
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find ${real_dvdcss_tree}/src/.libs/libdvdcss.a, make sure you compiled libdvdcss in ${with_dvdcss_tree}])
-      fi
-    fi
-  ;;
-  no)
-    dnl  Compile without dvdcss (dlopen version, works only under Linux)
-    AX_ADD_PLUGINS([dvd])
-    AX_ADD_CPPFLAGS([dvd],[-DGOD_DAMN_DMCA])
-    AX_ADD_LDFLAGS([dvd],[-ldl])
-  ;;
-  *)
-    AC_MSG_CHECKING(for dvdcss headers in ${with_dvdcss})
-    if test -f ${with_dvdcss}/include/dvdcss/dvdcss.h
-    then
-      dnl  Use ${with_dvdcss}/include/dvdcss/dvdcss.h
-      AC_MSG_RESULT(yes)
-      AX_ADD_PLUGINS([dvd])
-      AX_ADD_LDFLAGS([dvd dvdcss],[-L${with_dvdcss}/lib -ldvdcss])
-      AX_ADD_CPPFLAGS([dvd],[-I${with_dvdcss}/include])
-    else
-      dnl  No libdvdcss could be found, sorry
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${with_dvdcss}/include/dvdcss/dvdcss.h])
-    fi
-  ;;
-  esac
-fi
-
-dnl
-dnl dvdread module: check for libdvdread
-dnl
-AC_ARG_ENABLE(dvdread,
-[  --enable-dvdread        dvdread input module (default disabled)])
-if test "${enable_dvdread}" != "no"
-then
-  AC_ARG_WITH(dvdread,
-  [    --with-dvdread=PATH    libdvdread headers and libraries])
-  AC_ARG_WITH(dvdread-tree,
-  [    --with-dvdread-tree=PATH libdvdread tree for static linking])
-  if test -z "${with_dvdread}"
-  then
-    if test -z "${with_dvdread_tree}"
-    then
-      AC_CHECK_HEADERS(dvdread/dvd_reader.h,
-        [ AX_ADD_PLUGINS([dvdread])
-          AX_ADD_LDFLAGS([dvdread],[-ldvdread ${LDFLAGS_dvdcss}])
-        ],[
-          if test -n "${enable_dvdread}"
-          then
-            AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
-            AC_MSG_ERROR([cannot find libdvdread headers])
-          fi
-        ])
-    else
-      AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
-      real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
-      if test -z "${real_dvdread_tree}"
-      then
-        dnl  The given directory can't be found
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
-      fi
-      if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
-      then
-        dnl  Use a custom libdvdread
-        AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
-        AX_ADD_BUILTINS([dvdread])
-        AX_ADD_LDFLAGS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LDFLAGS_dvdcss}])
-        AX_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
-      else
-        dnl  The given libdvdread wasn't built
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find ${real_dvdread_tree}/dvdread/.libs/libdvdread.a, make sure you compiled libdvdread in ${with_dvdread_tree}])
-      fi
-    fi
-  else
-    AC_MSG_CHECKING(for dvdread headers in ${with_dvdread})
-    if test -f ${with_dvdread}/include/dvdread/dvd_reader.h
-    then
-      dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
-      AC_MSG_RESULT(yes)
-      AX_ADD_PLUGINS([dvdread])
-      AX_ADD_LDFLAGS([dvdread],[-L${with_dvdread}/lib -ldvdread ${LDFLAGS_dvdcss}])
-      AX_ADD_CPPFLAGS([dvdread],[-I${with_dvdread}/include])
-    else
-      dnl  No libdvdread could be found, sorry
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
-    fi
-  fi
-fi
-
-dnl
-dnl dvdplay module: check for libdvdplay
-dnl
-AC_ARG_ENABLE(dvdplay,
-[  --enable-dvdplay        dvdplay input module (default enabled)])
-if test "${enable_dvdplay}" != "no"
-then
-  AC_ARG_WITH(dvdplay,
-  [    --with-dvdplay=PATH    libdvdplay headers and libraries])
-  AC_ARG_WITH(dvdplay-tree,
-  [    --with-dvdplay-tree=PATH libdvdplay tree for static linking])
-  if test -z "${with_dvdplay}"
-  then
-    if test -z "${with_dvdplay_tree}"
-    then
-      AC_CHECK_HEADERS(dvdplay/dvdplay.h,[
-          AX_ADD_PLUGINS([dvdplay])
-          AX_ADD_LDFLAGS([dvdplay],[-ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
-          AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread}])
-        ],[
-          if test -n "${enable_dvdplay}"
-          then
-            AC_MSG_WARN([Please get libdvdplay from http://www.videolan.org/.])
-            AC_MSG_ERROR([cannot find libdvdplay headers])
-          fi
-        ])
-    else
-      AC_MSG_CHECKING(for libdvdplay.a in ${with_dvdplay_tree})
-      real_dvdplay_tree="`cd ${with_dvdplay_tree} 2>/dev/null && pwd`"
-      if test -z "${real_dvdplay_tree}"
-      then
-        dnl  The given directory can't be found
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot cd to ${with_dvdplay_tree}])
-      fi
-      if test -f "${real_dvdplay_tree}/src/.libs/libdvdplay.a"
-      then
-        dnl  Use a custom libdvdplay
-        AC_MSG_RESULT(${real_dvdplay_tree}/src/.libs/libdvdplay.a)
-        AX_ADD_BUILTINS([dvdplay])
-        AX_ADD_LDFLAGS([dvdplay],[-L${real_dvdplay_tree}/src/.libs -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
-        AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread} -I${real_dvdplay_tree}/src])
-      else
-        dnl  The given libdvdplay wasn't built
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find ${real_dvdplay_tree}/src/.libs/libdvdplay.a, make sure you compiled libdvdplay in ${with_dvdplay_tree}])
-      fi
-    fi
-  else
-    AC_MSG_CHECKING(for dvdplay headers in ${with_dvdplay})
-    if test -f "${with_dvdplay}/include/dvdplay/dvdplay.h"
-    then
-      dnl  Use ${with_dvdplay}/include/dvdplay/dvdplay.h
-      AC_MSG_RESULT(yes)
-      AX_ADD_PLUGINS([dvdplay])
-      AX_ADD_LDFLAGS([dvdplay],[-L${with_dvdplay}/lib -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
-      AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread} -I${with_dvdplay}/include])
-    else
-      dnl  No libdvdplay could be found, sorry
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${with_dvdplay}/include/dvdplay/dvdplay.h])
-    fi
-  fi
-fi
+dnl dnl
+dnl dnl  DVD module: optionally check for installed libdvdcss
+dnl dnl
+dnl AC_ARG_ENABLE(dvd,
+dnl [  --enable-dvd            DVD input module (default enabled)])
+dnl if test "${enable_dvd}" != "no"
+dnl then
+dnl   AC_ARG_WITH(dvdcss,
+dnl   [    --with-dvdcss=PATH    libdvdcss headers and libraries])
+dnl   AC_ARG_WITH(dvdcss-tree,
+dnl   [    --with-dvdcss-tree=PATH libdvdcss tree for static linking])
+dnl   case "${with_dvdcss}" in
+dnl   ""|yes)
+dnl     if test -z "${with_dvdcss_tree}"
+dnl     then
+dnl       AC_CHECK_HEADERS(dvdcss/dvdcss.h,
+dnl         [ AX_ADD_PLUGINS([dvd])
+dnl           AX_ADD_LDFLAGS([dvd dvdcss],[-ldvdcss])],
+dnl         [ AC_MSG_WARN([libdvdcss is no longer provided with vlc; please get libdvdcss from http://www.videolan.org/libdvdcss/ and build it. Then either use --with-dvdcss=<path/where/libdvdcss/was/installed> for dynamic linking (recommended under Unix) or --with-dvdcss-tree=<path/where/libdvdcss/was/built> for static linking (recommended under BeOS, Windows, MacOS X). Alternatively you can use --disable-dvd to disable the DVD plugin.])
+dnl           AC_MSG_ERROR([cannot find libdvdcss headers]) ])
+dnl     else
+dnl       AC_MSG_CHECKING(for libdvdcss.a in ${with_dvdcss_tree})
+dnl       real_dvdcss_tree="`cd ${with_dvdcss_tree} 2>/dev/null && pwd`"
+dnl       if test -z "${real_dvdcss_tree}"
+dnl       then
+dnl         dnl  The given directory can't be found
+dnl         AC_MSG_RESULT(no)
+dnl         AC_MSG_ERROR([cannot cd to ${with_dvdcss_tree}])
+dnl       fi
+dnl       if test -f "${real_dvdcss_tree}/src/.libs/libdvdcss.a"
+dnl       then
+dnl         dnl  Use a custom libdvdcss
+dnl         AC_MSG_RESULT(${real_dvdcss_tree}/src/.libs/libdvdcss.a)
+dnl         AX_ADD_BUILTINS([dvd])
+dnl         AX_ADD_LDFLAGS([dvd dvdcss],[-L${real_dvdcss_tree}/src/.libs -ldvdcss])
+dnl         AX_ADD_CPPFLAGS([dvd],[-I${real_dvdcss_tree}/src])
+dnl       else
+dnl         dnl  The given libdvdcss wasn't built
+dnl         AC_MSG_RESULT(no)
+dnl         AC_MSG_ERROR([cannot find ${real_dvdcss_tree}/src/.libs/libdvdcss.a, make sure you compiled libdvdcss in ${with_dvdcss_tree}])
+dnl       fi
+dnl     fi
+dnl   ;;
+dnl   no)
+dnl     dnl  Compile without dvdcss (dlopen version, works only under Linux)
+dnl     AX_ADD_PLUGINS([dvd])
+dnl     AX_ADD_CPPFLAGS([dvd],[-DGOD_DAMN_DMCA])
+dnl     AX_ADD_LDFLAGS([dvd],[-ldl])
+dnl   ;;
+dnl   *)
+dnl     AC_MSG_CHECKING(for dvdcss headers in ${with_dvdcss})
+dnl     if test -f ${with_dvdcss}/include/dvdcss/dvdcss.h
+dnl     then
+dnl       dnl  Use ${with_dvdcss}/include/dvdcss/dvdcss.h
+dnl       AC_MSG_RESULT(yes)
+dnl       AX_ADD_PLUGINS([dvd])
+dnl       AX_ADD_LDFLAGS([dvd dvdcss],[-L${with_dvdcss}/lib -ldvdcss])
+dnl       AX_ADD_CPPFLAGS([dvd],[-I${with_dvdcss}/include])
+dnl     else
+dnl       dnl  No libdvdcss could be found, sorry
+dnl       AC_MSG_RESULT(no)
+dnl       AC_MSG_ERROR([cannot find ${with_dvdcss}/include/dvdcss/dvdcss.h])
+dnl     fi
+dnl   ;;
+dnl   esac
+dnl fi
+dnl 
+dnl dnl
+dnl dnl dvdread module: check for libdvdread
+dnl dnl
+dnl AC_ARG_ENABLE(dvdread,
+dnl [  --enable-dvdread        dvdread input module (default disabled)])
+dnl if test "${enable_dvdread}" != "no"
+dnl then
+dnl   AC_ARG_WITH(dvdread,
+dnl   [    --with-dvdread=PATH    libdvdread headers and libraries])
+dnl   AC_ARG_WITH(dvdread-tree,
+dnl   [    --with-dvdread-tree=PATH libdvdread tree for static linking])
+dnl   if test -z "${with_dvdread}"
+dnl   then
+dnl     if test -z "${with_dvdread_tree}"
+dnl     then
+dnl       AC_CHECK_HEADERS(dvdread/dvd_reader.h,
+dnl         [ AX_ADD_PLUGINS([dvdread])
+dnl           AX_ADD_LDFLAGS([dvdread],[-ldvdread ${LDFLAGS_dvdcss}])
+dnl         ],[
+dnl           if test -n "${enable_dvdread}"
+dnl           then
+dnl             AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
+dnl             AC_MSG_ERROR([cannot find libdvdread headers])
+dnl           fi
+dnl         ])
+dnl     else
+dnl       AC_MSG_CHECKING(for libdvdread.a in ${with_dvdread_tree})
+dnl       real_dvdread_tree="`cd ${with_dvdread_tree} 2>/dev/null && pwd`"
+dnl       if test -z "${real_dvdread_tree}"
+dnl       then
+dnl         dnl  The given directory can't be found
+dnl         AC_MSG_RESULT(no)
+dnl         AC_MSG_ERROR([cannot cd to ${with_dvdread_tree}])
+dnl       fi
+dnl       if test -f "${real_dvdread_tree}/dvdread/.libs/libdvdread.a"
+dnl       then
+dnl         dnl  Use a custom libdvdread
+dnl         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
+dnl         AX_ADD_BUILTINS([dvdread])
+dnl         AX_ADD_LDFLAGS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LDFLAGS_dvdcss}])
+dnl         AX_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
+dnl       else
+dnl         dnl  The given libdvdread wasn't built
+dnl         AC_MSG_RESULT(no)
+dnl         AC_MSG_ERROR([cannot find ${real_dvdread_tree}/dvdread/.libs/libdvdread.a, make sure you compiled libdvdread in ${with_dvdread_tree}])
+dnl       fi
+dnl     fi
+dnl   else
+dnl     AC_MSG_CHECKING(for dvdread headers in ${with_dvdread})
+dnl     if test -f ${with_dvdread}/include/dvdread/dvd_reader.h
+dnl     then
+dnl       dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
+dnl       AC_MSG_RESULT(yes)
+dnl       AX_ADD_PLUGINS([dvdread])
+dnl       AX_ADD_LDFLAGS([dvdread],[-L${with_dvdread}/lib -ldvdread ${LDFLAGS_dvdcss}])
+dnl       AX_ADD_CPPFLAGS([dvdread],[-I${with_dvdread}/include])
+dnl     else
+dnl       dnl  No libdvdread could be found, sorry
+dnl       AC_MSG_RESULT(no)
+dnl       AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
+dnl     fi
+dnl   fi
+dnl fi
+dnl 
+dnl dnl
+dnl dnl dvdplay module: check for libdvdplay
+dnl dnl
+dnl AC_ARG_ENABLE(dvdplay,
+dnl [  --enable-dvdplay        dvdplay input module (default enabled)])
+dnl if test "${enable_dvdplay}" != "no"
+dnl then
+dnl   AC_ARG_WITH(dvdplay,
+dnl   [    --with-dvdplay=PATH    libdvdplay headers and libraries])
+dnl   AC_ARG_WITH(dvdplay-tree,
+dnl   [    --with-dvdplay-tree=PATH libdvdplay tree for static linking])
+dnl   if test -z "${with_dvdplay}"
+dnl   then
+dnl     if test -z "${with_dvdplay_tree}"
+dnl     then
+dnl       AC_CHECK_HEADERS(dvdplay/dvdplay.h,[
+dnl           AX_ADD_PLUGINS([dvdplay])
+dnl           AX_ADD_LDFLAGS([dvdplay],[-ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
+dnl           AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread}])
+dnl         ],[
+dnl           if test -n "${enable_dvdplay}"
+dnl           then
+dnl             AC_MSG_WARN([Please get libdvdplay from http://www.videolan.org/.])
+dnl             AC_MSG_ERROR([cannot find libdvdplay headers])
+dnl           fi
+dnl         ])
+dnl     else
+dnl       AC_MSG_CHECKING(for libdvdplay.a in ${with_dvdplay_tree})
+dnl       real_dvdplay_tree="`cd ${with_dvdplay_tree} 2>/dev/null && pwd`"
+dnl       if test -z "${real_dvdplay_tree}"
+dnl       then
+dnl         dnl  The given directory can't be found
+dnl         AC_MSG_RESULT(no)
+dnl         AC_MSG_ERROR([cannot cd to ${with_dvdplay_tree}])
+dnl       fi
+dnl       if test -f "${real_dvdplay_tree}/src/.libs/libdvdplay.a"
+dnl       then
+dnl         dnl  Use a custom libdvdplay
+dnl         AC_MSG_RESULT(${real_dvdplay_tree}/src/.libs/libdvdplay.a)
+dnl         AX_ADD_BUILTINS([dvdplay])
+dnl         AX_ADD_LDFLAGS([dvdplay],[-L${real_dvdplay_tree}/src/.libs -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
+dnl         AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread} -I${real_dvdplay_tree}/src])
+dnl       else
+dnl         dnl  The given libdvdplay wasn't built
+dnl         AC_MSG_RESULT(no)
+dnl         AC_MSG_ERROR([cannot find ${real_dvdplay_tree}/src/.libs/libdvdplay.a, make sure you compiled libdvdplay in ${with_dvdplay_tree}])
+dnl       fi
+dnl     fi
+dnl   else
+dnl     AC_MSG_CHECKING(for dvdplay headers in ${with_dvdplay})
+dnl     if test -f "${with_dvdplay}/include/dvdplay/dvdplay.h"
+dnl     then
+dnl       dnl  Use ${with_dvdplay}/include/dvdplay/dvdplay.h
+dnl       AC_MSG_RESULT(yes)
+dnl       AX_ADD_PLUGINS([dvdplay])
+dnl       AX_ADD_LDFLAGS([dvdplay],[-L${with_dvdplay}/lib -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
+dnl       AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread} -I${with_dvdplay}/include])
+dnl     else
+dnl       dnl  No libdvdplay could be found, sorry
+dnl       AC_MSG_RESULT(no)
+dnl       AC_MSG_ERROR([cannot find ${with_dvdplay}/include/dvdplay/dvdplay.h])
+dnl     fi
+dnl   fi
+dnl fi
 
 dnl
 dnl  libdvdnav plugin
@@ -1464,8 +1464,8 @@ then
     if test -z "${with_dvbpsi_tree}"
     then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
-        [ AX_ADD_PLUGINS([ts_old_dvbpsi mux_ts ts])
-          AX_ADD_LDFLAGS([ts_old_dvbpsi mux_ts ts],[-ldvbpsi]) ],
+        [ AX_ADD_PLUGINS([mux_ts ts])
+          AX_ADD_LDFLAGS([mux_ts ts],[-ldvbpsi]) ],
         [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
         [#if defined( HAVE_STDINT_H )
 #   include <stdint.h>
@@ -1489,9 +1489,9 @@ then
       then
         dnl  Use a custom libdvbpsi
         AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
-        AX_ADD_BUILTINS([ts_old_dvbpsi mux_ts ts])
-        AX_ADD_CPPFLAGS([ts_old_dvbpsi mux_ts ts],[-I${real_dvbpsi_tree}/src])
-        AX_ADD_LDFLAGS([ts_old_dvbpsi mux_ts ts],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
+        AX_ADD_BUILTINS([mux_ts ts])
+        AX_ADD_CPPFLAGS([mux_ts ts],[-I${real_dvbpsi_tree}/src])
+        AX_ADD_LDFLAGS([mux_ts ts],[-L${real_dvbpsi_tree}/src/.libs -ldvbpsi])
       else
         dnl  The given libdvbpsi wasn't built
         AC_MSG_RESULT(no)
@@ -1514,9 +1514,9 @@ then
     fi
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
-      AX_ADD_PLUGINS([ts_old_dvbpsi mux_ts ts])
-      AX_ADD_CPPFLAGS([ts_old_dvbpsi mux_ts ts],[${CPPFLAGS_test}])
-      AX_ADD_LDFLAGS([ts_old_dvbpsi mux_ts ts],[${LDFLAGS_test} -ldvbpsi])
+      AX_ADD_PLUGINS([mux_ts ts])
+      AX_ADD_CPPFLAGS([mux_ts ts],[${CPPFLAGS_test}])
+      AX_ADD_LDFLAGS([mux_ts ts],[${LDFLAGS_test} -ldvbpsi])
 
     ],[
       if test -n "${enable_dvbpsi}"
@@ -1560,59 +1560,59 @@ then
   AX_ADD_PLUGINS([pvr])
 fi
 
-dnl
-dnl  VCDX and CDDAX modules
-dnl
-AC_ARG_ENABLE(libcdio,
-  [  --enable-libcdio        CDDA support via libcdio (default enabled)])
-
-AC_ARG_ENABLE(libcddb,
-  [  --enable-libcddb        CDDB support for CDDAX (default enabled)])
-
-AC_ARG_ENABLE(vcdx,
-  [  --enable-vcdx           VCD support with Navigation (default enabled)])
-
-AC_ARG_ENABLE(cdda,           
-  [  --enable-cdda           CDDA plugin support (default enabled)])
-
-AC_ARG_ENABLE(cddax,
-  [  --enable-cddax          CDDAX plugin support (default enabled)])
-
-if test "${enable_cddax}" != "no"
-then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
-   [enable_cddax="no"
-    AC_DEFINE(HAVE_CDDAX, [], [Define for the CD-DA plugin using libcdio])
-    AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
-    AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
-    AX_ADD_PLUGINS([cddax])], 
-   [AC_MSG_WARN(libcdio library not found)
-   HAVE_CDDAX=no])
-
-  if test x$enable_libcddb != no; then
-    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
-      HAVE_LIBCDDB=yes 
-      AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
-      AX_ADD_LDFLAGS([cddax],[$LIBCDDB_LIBS])
-      AX_ADD_CFLAGS([cddax],[$LIBCDDB_CFLAGS])
-      ],
-      [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled) 
-      HAVE_LIBCDDB=no])
-  fi
-
-  if test "${enable_vcdx}" != "no"
-  then
-    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20,
-     [enable_vcd="no"
-      AC_DEFINE(HAVE_VCDX, [], 
-      [Define for the VCD plugin using libcdio/libvcdinfo])
-      AX_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
-      AX_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
-      AX_ADD_PLUGINS([vcdx])], 
-     [AC_MSG_WARN(vcdinfo library not found)
-     HAVE_VCDX=no])
-  fi
-fi
+dnl dnl
+dnl dnl  VCDX and CDDAX modules
+dnl dnl
+dnl AC_ARG_ENABLE(libcdio,
+dnl   [  --enable-libcdio        CDDA support via libcdio (default enabled)])
+dnl 
+dnl AC_ARG_ENABLE(libcddb,
+dnl   [  --enable-libcddb        CDDB support for CDDAX (default enabled)])
+dnl 
+dnl AC_ARG_ENABLE(vcdx,
+dnl   [  --enable-vcdx           VCD support with Navigation (default enabled)])
+dnl 
+dnl AC_ARG_ENABLE(cdda,           
+dnl   [  --enable-cdda           CDDA plugin support (default enabled)])
+dnl 
+dnl AC_ARG_ENABLE(cddax,
+dnl   [  --enable-cddax          CDDAX plugin support (default enabled)])
+dnl 
+dnl if test "${enable_cddax}" != "no"
+dnl then
+dnl   PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.65,
+dnl    [enable_cddax="no"
+dnl     AC_DEFINE(HAVE_CDDAX, [], [Define for the CD-DA plugin using libcdio])
+dnl     AX_ADD_LDFLAGS([cddax],[$LIBCDIO_LIBS])
+dnl     AX_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
+dnl     AX_ADD_PLUGINS([cddax])], 
+dnl    [AC_MSG_WARN(libcdio library not found)
+dnl    HAVE_CDDAX=no])
+dnl 
+dnl   if test x$enable_libcddb != no; then
+dnl     PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.4, [
+dnl       HAVE_LIBCDDB=yes 
+dnl       AC_DEFINE(HAVE_LIBCDDB, [], [Define this if you have libcddb installed])
+dnl       AX_ADD_LDFLAGS([cddax],[$LIBCDDB_LIBS])
+dnl       AX_ADD_CFLAGS([cddax],[$LIBCDDB_CFLAGS])
+dnl       ],
+dnl       [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled) 
+dnl       HAVE_LIBCDDB=no])
+dnl   fi
+dnl 
+dnl   if test "${enable_vcdx}" != "no"
+dnl   then
+dnl     PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.20,
+dnl      [enable_vcd="no"
+dnl       AC_DEFINE(HAVE_VCDX, [], 
+dnl       [Define for the VCD plugin using libcdio/libvcdinfo])
+dnl       AX_ADD_LDFLAGS([vcdx],[$VCDINFO_LIBS])
+dnl       AX_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
+dnl       AX_ADD_PLUGINS([vcdx])], 
+dnl      [AC_MSG_WARN(vcdinfo library not found)
+dnl      HAVE_VCDX=no])
+dnl   fi
+dnl fi
 
 dnl
 dnl  VCD module
@@ -3112,59 +3112,59 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
 fi
 
 
-dnl
-dnl  Gtk+ module
-dnl
-AC_ARG_ENABLE(gtk,
-  [  --enable-gtk            Gtk+ support (default enabled)])
-if test "${enable_gtk}" != "no"
-then
-  GTK_PATH="${PATH}"
-  AC_ARG_WITH(gtk-config-path,
-    [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
-    [ if test "${with_gtk_config_path}" != "no"
-      then
-        GTK_PATH="${with_gtk_config_path}:${PATH}"
-      fi ])
-  # look for gtk-config
-  AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
-  GTK_CONFIG=${GTK12_CONFIG}
-  if test "${GTK_CONFIG}" = "no"
-  then
-    AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
-  fi
-  if test "${GTK_CONFIG}" != "no"
-  then
-    if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
-    then
-      AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
-    fi
-    if test "${SYS}" != "mingw32"; then
-      AX_ADD_CFLAGS([gtk],[`${GTK_CONFIG} --cflags gtk gthread`])
-      AX_ADD_LDFLAGS([gtk],[`${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`])
-    else
-      AX_ADD_CFLAGS([gtk],[`${GTK_CONFIG} --cflags gtk`])
-      AX_ADD_LDFLAGS([gtk],[`${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`])
-    fi
-    # now look for the gtk.h header
-    CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_gtk}"
-    ac_cv_gtk_headers=yes
-    AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
-      ac_cv_gtk_headers=no
-      echo "Cannot find gtk development headers."
-    ])
-    if test "${ac_cv_gtk_headers}" = "yes"
-    then
-      AX_ADD_PLUGINS([gtk])
-      if test "${SYS}" != "mingw32"; then
-        NEED_GTK_MAIN=yes
-      fi
-      ALIASES="${ALIASES} gvlc"
-    fi
-    CPPFLAGS="${CPPFLAGS_save}"
-  fi
-fi
-
+dnl dnl
+dnl dnl  Gtk+ module
+dnl dnl
+dnl AC_ARG_ENABLE(gtk,
+dnl   [  --enable-gtk            Gtk+ support (default enabled)])
+dnl if test "${enable_gtk}" != "no"
+dnl then
+dnl   GTK_PATH="${PATH}"
+dnl   AC_ARG_WITH(gtk-config-path,
+dnl     [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
+dnl     [ if test "${with_gtk_config_path}" != "no"
+dnl       then
+dnl         GTK_PATH="${with_gtk_config_path}:${PATH}"
+dnl       fi ])
+dnl   # look for gtk-config
+dnl   AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
+dnl   GTK_CONFIG=${GTK12_CONFIG}
+dnl   if test "${GTK_CONFIG}" = "no"
+dnl   then
+dnl     AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
+dnl   fi
+dnl   if test "${GTK_CONFIG}" != "no"
+dnl   then
+dnl     if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
+dnl     then
+dnl       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-gtk.])
+dnl     fi
+dnl     if test "${SYS}" != "mingw32"; then
+dnl       AX_ADD_CFLAGS([gtk],[`${GTK_CONFIG} --cflags gtk gthread`])
+dnl       AX_ADD_LDFLAGS([gtk],[`${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`])
+dnl     else
+dnl       AX_ADD_CFLAGS([gtk],[`${GTK_CONFIG} --cflags gtk`])
+dnl       AX_ADD_LDFLAGS([gtk],[`${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`])
+dnl     fi
+dnl     # now look for the gtk.h header
+dnl     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_gtk}"
+dnl     ac_cv_gtk_headers=yes
+dnl     AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
+dnl       ac_cv_gtk_headers=no
+dnl       echo "Cannot find gtk development headers."
+dnl     ])
+dnl     if test "${ac_cv_gtk_headers}" = "yes"
+dnl     then
+dnl       AX_ADD_PLUGINS([gtk])
+dnl       if test "${SYS}" != "mingw32"; then
+dnl         NEED_GTK_MAIN=yes
+dnl       fi
+dnl       ALIASES="${ALIASES} gvlc"
+dnl     fi
+dnl     CPPFLAGS="${CPPFLAGS_save}"
+dnl   fi
+dnl fi
+dnl 
 dnl
 dnl  Gtk+2 module ! Disabled for now as it is unusable and confuses users
 dnl
@@ -3199,39 +3199,39 @@ then
   fi
 fi
 
-dnl
-dnl  Gnome module
-dnl
-AC_ARG_ENABLE(gnome,
-  [  --enable-gnome          Gnome interface support (default disabled)],
-  [if test "${enable_gnome}" = "yes"; then
-    # look for gnome-config
-    AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
-    if test -x ${GNOME_CONFIG}
-    then
-       AX_ADD_CFLAGS([gnome],[`${GNOME_CONFIG} --cflags gtk gnomeui`])
-       AX_ADD_LDFLAGS([gnome],[`${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`])
-    fi
-    # now look for the gnome.h header
-    CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_gnome}"
-    AC_CHECK_HEADERS(gnome.h, [
-      AX_ADD_PLUGINS([gnome])
-      NEED_GTK_MAIN=yes
-      NEED_GNOME_MAIN=yes
-      ALIASES="${ALIASES} gnome-vlc"
-      dnl We need this because of some moronic gnomesupport.h flavours
-      AC_MSG_CHECKING(for strndup in gnome.h)
-      AC_EGREP_HEADER(strndup,gnome.h,[
-        AC_MSG_RESULT(yes)
-        AC_DEFINE(STRNDUP_IN_GNOME_H, 1,
-                  Define if <gnome.h> defines strndup.)],[
-        AC_MSG_RESULT(no)])
-     ],[
-      AC_MSG_ERROR([Can't find gnome headers. Please install the gnome
-developement tools or remove the --enable-gnome option])
-     ])
-    CPPFLAGS="${CPPFLAGS_save}"
-  fi])
+dnl dnl
+dnl dnl  Gnome module
+dnl dnl
+dnl AC_ARG_ENABLE(gnome,
+dnl   [  --enable-gnome          Gnome interface support (default disabled)],
+dnl   [if test "${enable_gnome}" = "yes"; then
+dnl     # look for gnome-config
+dnl     AC_PATH_PROG(GNOME_CONFIG, gnome-config, no)
+dnl     if test -x ${GNOME_CONFIG}
+dnl     then
+dnl        AX_ADD_CFLAGS([gnome],[`${GNOME_CONFIG} --cflags gtk gnomeui`])
+dnl        AX_ADD_LDFLAGS([gnome],[`${GNOME_CONFIG} --libs gnomeui | sed 's,-rdynamic,,'`])
+dnl     fi
+dnl     # now look for the gnome.h header
+dnl     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_gnome}"
+dnl     AC_CHECK_HEADERS(gnome.h, [
+dnl       AX_ADD_PLUGINS([gnome])
+dnl       NEED_GTK_MAIN=yes
+dnl       NEED_GNOME_MAIN=yes
+dnl       ALIASES="${ALIASES} gnome-vlc"
+dnl       dnl We need this because of some moronic gnomesupport.h flavours
+dnl       AC_MSG_CHECKING(for strndup in gnome.h)
+dnl       AC_EGREP_HEADER(strndup,gnome.h,[
+dnl         AC_MSG_RESULT(yes)
+dnl         AC_DEFINE(STRNDUP_IN_GNOME_H, 1,
+dnl                   Define if <gnome.h> defines strndup.)],[
+dnl         AC_MSG_RESULT(no)])
+dnl      ],[
+dnl       AC_MSG_ERROR([Can't find gnome headers. Please install the gnome
+dnl developement tools or remove the --enable-gnome option])
+dnl      ])
+dnl     CPPFLAGS="${CPPFLAGS_save}"
+dnl   fi])
 
 dnl
 dnl  Gnome2 module ! Disabled for know as it is unuseable and confuses users
@@ -3291,65 +3291,65 @@ then
   fi
 fi
 
-dnl
-dnl  Qt module
-dnl
-AC_ARG_ENABLE(qt,
-  [  --enable-qt             Qt interface support (default disabled)],
-  [if test "${enable_qt}" = "yes"; then
-     AX_ADD_PLUGINS([qt])
-     ALIASES="${ALIASES} qvlc"
-     AX_ADD_LDFLAGS([qt],[-L${QTDIR}/lib])
-     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_qt}"
-     AC_CHECK_LIB(qt-mt,main,[
-       AX_ADD_LDFLAGS([qt],[-lqt-mt])
-     ],[
-       AC_CHECK_LIB(qt,main,[
-         AX_ADD_LDFLAGS([qt],[-lqt])
-       ])
-     ])
-     LDFLAGS="${LDFLAGS_save}"
-     AX_ADD_CXXFLAGS([qt],[-I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}/include])
-     if test -x ${QTDIR}/bin/moc
-     then
-       MOC=${QTDIR}/bin/moc
-     else
-       MOC=moc
-     fi
-   fi])
-
-dnl
-dnl  KDE module
-dnl
-AC_ARG_ENABLE(kde,
-  [  --enable-kde            KDE interface support (default disabled)],
-  [if test "${enable_kde}" = "yes"; then
-     AX_ADD_PLUGINS([kde])
-     ALIASES="${ALIASES} kvlc"
-     AX_ADD_LDFLAGS([kde],[-L${KDEDIR}/lib])
-     dnl Check for -lkfile (only in KDE 2) or -lkdeui -lkio (KDE 3)
-     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
-     AC_CHECK_LIB(kfile,main,[
-       AX_ADD_LDFLAGS([kde],[-lkfile])
-     ])
-     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
-     AC_CHECK_LIB(kdeui,main,[
-       AX_ADD_LDFLAGS([kde],[-lkdeui])
-     ])
-     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
-     AC_CHECK_LIB(kio,main,[
-       AX_ADD_LDFLAGS([kde],[-lkio])
-     ])
-     LDFLAGS="${LDFLAGS_save}"
-     AX_ADD_CXXFLAGS([kde],[-I/usr/include/kde -I/usr/include/qt3 -I/usr/include/qt])
-     AX_ADD_CXXFLAGS([kde],[-I${KDEDIR}/include -I${QTDIR}/include])
-     if test -x ${QTDIR}/bin/moc
-     then
-       MOC=${QTDIR}/bin/moc
-     else
-       MOC=moc
-     fi
-   fi])
+dnl dnl
+dnl dnl  Qt module
+dnl dnl
+dnl AC_ARG_ENABLE(qt,
+dnl   [  --enable-qt             Qt interface support (default disabled)],
+dnl   [if test "${enable_qt}" = "yes"; then
+dnl      AX_ADD_PLUGINS([qt])
+dnl      ALIASES="${ALIASES} qvlc"
+dnl      AX_ADD_LDFLAGS([qt],[-L${QTDIR}/lib])
+dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_qt}"
+dnl      AC_CHECK_LIB(qt-mt,main,[
+dnl        AX_ADD_LDFLAGS([qt],[-lqt-mt])
+dnl      ],[
+dnl        AC_CHECK_LIB(qt,main,[
+dnl          AX_ADD_LDFLAGS([qt],[-lqt])
+dnl        ])
+dnl      ])
+dnl      LDFLAGS="${LDFLAGS_save}"
+dnl      AX_ADD_CXXFLAGS([qt],[-I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}/include])
+dnl      if test -x ${QTDIR}/bin/moc
+dnl      then
+dnl        MOC=${QTDIR}/bin/moc
+dnl      else
+dnl        MOC=moc
+dnl      fi
+dnl    fi])
+dnl 
+dnl dnl
+dnl dnl  KDE module
+dnl dnl
+dnl AC_ARG_ENABLE(kde,
+dnl   [  --enable-kde            KDE interface support (default disabled)],
+dnl   [if test "${enable_kde}" = "yes"; then
+dnl      AX_ADD_PLUGINS([kde])
+dnl      ALIASES="${ALIASES} kvlc"
+dnl      AX_ADD_LDFLAGS([kde],[-L${KDEDIR}/lib])
+dnl      dnl Check for -lkfile (only in KDE 2) or -lkdeui -lkio (KDE 3)
+dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
+dnl      AC_CHECK_LIB(kfile,main,[
+dnl        AX_ADD_LDFLAGS([kde],[-lkfile])
+dnl      ])
+dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
+dnl      AC_CHECK_LIB(kdeui,main,[
+dnl        AX_ADD_LDFLAGS([kde],[-lkdeui])
+dnl      ])
+dnl      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_kde}"
+dnl      AC_CHECK_LIB(kio,main,[
+dnl        AX_ADD_LDFLAGS([kde],[-lkio])
+dnl      ])
+dnl      LDFLAGS="${LDFLAGS_save}"
+dnl      AX_ADD_CXXFLAGS([kde],[-I/usr/include/kde -I/usr/include/qt3 -I/usr/include/qt])
+dnl      AX_ADD_CXXFLAGS([kde],[-I${KDEDIR}/include -I${QTDIR}/include])
+dnl      if test -x ${QTDIR}/bin/moc
+dnl      then
+dnl        MOC=${QTDIR}/bin/moc
+dnl      else
+dnl        MOC=moc
+dnl      fi
+dnl    fi])
 
 dnl
 dnl  Opie QT embedded module
