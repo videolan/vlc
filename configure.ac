@@ -3426,6 +3426,7 @@ then
       AC_MSG_CHECKING(for libgoom.a in ${with_goom_tree})
       if test -f "${real_goom_tree}/libgoom.a"; then
         AC_MSG_RESULT(${real_goom_tree}/libgoom.a)
+        AX_ADD_BUILTINS([goom])
         AX_ADD_LDFLAGS([goom],[-L${real_goom_tree} -lgoom])
         AX_ADD_CPPFLAGS([goom],[-I${real_goom_tree} -DUSE_GOOM_TREE -DOLD_GOOM])
       else
