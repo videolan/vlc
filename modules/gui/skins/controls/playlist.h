@@ -2,7 +2,7 @@
  * playlist.h: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.h,v 1.4 2003/04/21 22:12:37 asmax Exp $
+ * $Id: playlist.h,v 1.5 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -37,7 +37,7 @@ class Graphics;
 class SkinWindow;
 class SkinFont;
 class Bezier;
-class Region;
+class SkinRegion;
 
 //---------------------------------------------------------------------------
 #define MAX_PLAYLIST_SIZE 7
@@ -78,7 +78,7 @@ class ControlPlayList : public GenericControl
         int TextHeight;
         int TextWidth;
         Bezier *TextCurve;
-        Region *TextClipRgn;
+        SkinRegion *TextClipRgn;
 
         int  NumOfItems;
         int  SelectColor;

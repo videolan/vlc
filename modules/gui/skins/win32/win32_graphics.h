@@ -2,7 +2,7 @@
  * win32_graphics.h: Win32 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.h,v 1.4 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_graphics.h,v 1.5 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,7 +29,7 @@
 #define VLC_SKIN_WIN32_GRAPHICS
 
 //---------------------------------------------------------------------------
-class Region;
+class SkinRegion;
 class SkinWindow;
 
 //---------------------------------------------------------------------------
@@ -51,14 +51,14 @@ class Win32Graphics : public Graphics
         virtual void DrawRect( int x, int y, int w, int h, int color );
 
         // Clipping methods
-        virtual void SetClipRegion( Region *rgn );
+        virtual void SetClipRegion( SkinRegion *rgn );
         virtual void ResetClipRegion();
 
         // Specific win32 methods
         HDC GetImageHandle()    { return Image; };
 };
 //---------------------------------------------------------------------------
-class Win32Region : public Region
+class Win32Region : public SkinRegion
 {
     private:
         HRGN Rgn;

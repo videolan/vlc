@@ -2,7 +2,7 @@
  * win32_graphics.cpp: Win32 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.cpp,v 1.5 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_graphics.cpp,v 1.6 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -82,7 +82,7 @@ void Win32Graphics::DrawRect( int x, int y, int w, int h, int color )
     delete r;
 }
 //---------------------------------------------------------------------------
-void Win32Graphics::SetClipRegion( Region *rgn )
+void Win32Graphics::SetClipRegion( SkinRegion *rgn )
 {
     SelectClipRgn( Image, ( (Win32Region *)rgn )->GetHandle() );
 }

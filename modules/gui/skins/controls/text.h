@@ -2,7 +2,7 @@
  * text.h: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.h,v 1.4 2003/04/21 22:12:37 asmax Exp $
+ * $Id: text.h,v 1.5 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,7 +36,7 @@ class Event;
 class BitmapBank;
 class Graphics;
 class SkinWindow;
-class Region;
+class SkinRegion;
 class SkinFont;
 
 //---------------------------------------------------------------------------
@@ -66,7 +66,7 @@ class ControlText : public GenericControl
         string   FontName;
         list<string> DisplayList;
         list<string>::const_iterator Display;
-        Region   *TextClipRgn;
+        SkinRegion   *TextClipRgn;
 
         // Internal methods
         void SetSize();

@@ -2,7 +2,7 @@
  * generic.h: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
+ * $Id: generic.h,v 1.4 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,7 +36,7 @@ struct intf_thread_t;
 class SkinWindow;
 class Bitmap;
 class Graphics;
-class Region;
+class SkinRegion;
 class Event;
 
 //---------------------------------------------------------------------------
@@ -86,7 +86,7 @@ class GenericControl               // This is the generic control class
             int y2, int w2, int h2, int &x, int &y, int &w, int &h );
 
         // Create a region from a bitmap with transcolor as empty region
-        Region *CreateRegionFromBmp( Bitmap *bmp, int MoveX, int MoveY );
+        SkinRegion *CreateRegionFromBmp( Bitmap *bmp, int MoveX, int MoveY );
         int Left;               // Left offset of the control
         int Top;                // Top offset of the control
         int Width;              // Width of the control

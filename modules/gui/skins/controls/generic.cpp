@@ -2,7 +2,7 @@
  * generic.cpp: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.cpp,v 1.5 2003/04/23 10:29:52 asmax Exp $
+ * $Id: generic.cpp,v 1.6 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -196,15 +196,15 @@ void GenericControl::MoveRelative( int xOff, int yOff )
     Top  += yOff;
 }
 //---------------------------------------------------------------------------
-Region *GenericControl::CreateRegionFromBmp( Bitmap *bmp, int MoveX, int MoveY )
+SkinRegion *GenericControl::CreateRegionFromBmp( Bitmap *bmp, int MoveX, int MoveY )
 {
     // Initialization
-        Region *Buffer;
+        SkinRegion *Buffer;
         int w, h;
         int x = 0, y = 0, x_first = 0;
         bmp->GetSize( w, h );
 
-        Buffer = (Region *)new OSRegion;
+        Buffer = (SkinRegion *)new OSRegion;
 
     // Parse bitmap
         for( y = 0; y < h; y++ )

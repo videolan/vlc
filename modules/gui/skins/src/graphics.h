@@ -2,7 +2,7 @@
  * graphics.h: Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: graphics.h,v 1.2 2003/04/19 02:34:47 karibu Exp $
+ * $Id: graphics.h,v 1.3 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,7 +28,7 @@
 #define VLC_SKIN_GRAPHICS
 
 //---------------------------------------------------------------------------
-class Region;
+class SkinRegion;
 
 //---------------------------------------------------------------------------
 class Graphics
@@ -50,20 +50,20 @@ class Graphics
         virtual void DrawRect( int x, int y, int w, int h, int color ) = 0;
 
         // Clipping methods
-        virtual void SetClipRegion( Region *rgn ) = 0;
+        virtual void SetClipRegion( SkinRegion *rgn ) = 0;
         virtual void ResetClipRegion() = 0;
 
 };
 //---------------------------------------------------------------------------
-class Region
+class SkinRegion
 {
     private:
     public:
         // Constructor
-        Region();
-        Region( int x, int y, int w, int h );
+        SkinRegion();
+        SkinRegion( int x, int y, int w, int h );
         // Destructor
-        virtual ~Region();
+        virtual ~SkinRegion();
         // Modify region
         virtual void Move( int x, int y ) = 0;
         virtual void AddPoint( int x, int y ) = 0;

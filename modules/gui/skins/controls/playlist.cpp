@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.9 2003/04/21 22:12:37 asmax Exp $
+ * $Id: playlist.cpp,v 1.10 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -154,7 +154,7 @@ void ControlPlayList::Init()
     TextWidth -= TextLeft;
 
     // Set Text Clipping Region
-    TextClipRgn = (Region *)new OSRegion;
+    TextClipRgn = (SkinRegion *)new OSRegion;
     for( i = 0; i < Line; i++ )
     {
         for( j = 0; j < CaseHeight; j++ )
@@ -279,7 +279,7 @@ void ControlPlayList::Draw( int x, int y, int w, int h, Graphics *dest )
                          xI, yI, wI, hI) )
     {
         // Change clipping region
-        Region *destClipRgn = (Region *)new OSRegion( 0, 0, w, h );
+        SkinRegion *destClipRgn = (SkinRegion *)new OSRegion( 0, 0, w, h );
         TextClipRgn->Move( TextLeft - x, TextTop - y );
         dest->SetClipRegion( TextClipRgn );
 

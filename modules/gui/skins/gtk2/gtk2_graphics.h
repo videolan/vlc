@@ -2,7 +2,7 @@
  * gtk2_graphics.h: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.h,v 1.5 2003/04/21 21:51:16 asmax Exp $
+ * $Id: gtk2_graphics.h,v 1.6 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -31,7 +31,7 @@
 #include <gdk/gdk.h>
 
 //---------------------------------------------------------------------------
-class Region;
+class SkinRegion;
 class SkinWindow;
 
 //---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ class GTK2Graphics : public Graphics
         virtual void DrawRect( int x, int y, int w, int h, int color );
 
         // Clipping methods
-        virtual void SetClipRegion( Region *rgn );
+        virtual void SetClipRegion( SkinRegion *rgn );
         virtual void ResetClipRegion();
 
         // Specific GTK2 methods
@@ -62,7 +62,7 @@ class GTK2Graphics : public Graphics
         GdkGC *GetGC()    { return Gc; };
 };
 //---------------------------------------------------------------------------
-class GTK2Region : public Region
+class GTK2Region : public SkinRegion
 {
     private:
         GdkRegion *Rgn;

@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.7 2003/04/21 21:51:16 asmax Exp $
+ * $Id: text.cpp,v 1.8 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -231,7 +231,7 @@ void ControlText::SetSize()
     if( TextClipRgn != NULL )
         delete TextClipRgn;
 
-    TextClipRgn = (Region *)new OSRegion( Left, Top, Width, Height );
+    TextClipRgn = (SkinRegion *)new OSRegion( Left, Top, Width, Height );
 
 }
 //---------------------------------------------------------------------------
@@ -300,7 +300,7 @@ void ControlText::Draw( int x, int y, int w, int h, Graphics *dest )
     }
 
     // Reset clipping region to old region
-    Region *destClipRgn = (Region *)new OSRegion( 0, 0, w, h );
+    SkinRegion *destClipRgn = (SkinRegion *)new OSRegion( 0, 0, w, h );
     dest->SetClipRegion( destClipRgn );
     delete destClipRgn;
     TextClipRgn->Move( x, y );

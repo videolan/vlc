@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.16 2003/04/28 12:00:13 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.17 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -79,7 +79,7 @@ void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
     gdk_draw_rectangle( Image, Gc, TRUE, x, y, w, h);
 }
 //---------------------------------------------------------------------------
-void GTK2Graphics::SetClipRegion( Region *rgn )
+void GTK2Graphics::SetClipRegion( SkinRegion *rgn )
 {
     gdk_gc_set_clip_region( Gc, ( (GTK2Region *)rgn )->GetHandle() );
 }

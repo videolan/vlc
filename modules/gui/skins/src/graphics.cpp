@@ -2,7 +2,7 @@
  * graphics.cpp: Graphics class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: graphics.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: graphics.cpp,v 1.2 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -47,15 +47,15 @@ Graphics::~Graphics()
 //---------------------------------------------------------------------------
 // REGION
 //---------------------------------------------------------------------------
-Region::Region()
+SkinRegion::SkinRegion()
 {
 }
 //---------------------------------------------------------------------------
-Region::Region( int x, int y, int w, int h )
+SkinRegion::SkinRegion( int x, int y, int w, int h )
 {
 }
 //---------------------------------------------------------------------------
-Region::~Region()
+SkinRegion::~SkinRegion()
 {
 }
 //---------------------------------------------------------------------------

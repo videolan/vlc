@@ -2,7 +2,7 @@
  * slider.h: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.h,v 1.4 2003/04/21 21:51:16 asmax Exp $
+ * $Id: slider.h,v 1.5 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,7 +36,7 @@ class Event;
 class Graphics;
 class SkinWindow;
 class Bezier;
-class Region;
+class SkinRegion;
 
 //---------------------------------------------------------------------------
 class ControlSlider : public GenericControl
@@ -55,7 +55,7 @@ class ControlSlider : public GenericControl
         int CHeight;        // Height of cursor
         int * CursorX;      // Array of x coordinates of slider points
         int * CursorY;      // Array of y coordinates of slider points
-        Region *HitRgn;     // Active region for mouse events
+        SkinRegion *HitRgn;     // Active region for mouse events
         int LastRefreshTime;
 
         // Slider properties

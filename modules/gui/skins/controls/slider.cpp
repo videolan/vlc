@@ -2,7 +2,7 @@
  * slider.cpp: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.cpp,v 1.8 2003/04/22 17:56:44 asmax Exp $
+ * $Id: slider.cpp,v 1.9 2003/04/28 12:25:34 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -121,7 +121,7 @@ void ControlSlider::Init()
         delete Curve;
 
     // Create Hit Region
-    HitRgn = (Region *)new OSRegion;
+    HitRgn = (SkinRegion *)new OSRegion;
 
     // Create slider hit region and move cursor inside control
     for( i = 0; i <= MaxValue; i++ )
