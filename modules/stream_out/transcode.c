@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.27 2003/07/28 20:25:30 jpsaman Exp $
+ * $Id: transcode.c,v 1.28 2003/07/30 02:00:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -91,7 +91,7 @@ struct sout_stream_sys_t
     int             i_key_int;
     int             i_qmin;
     int             i_qmax;
-    vlc_bool_t      b_hq;
+    vlc_bool_t      i_hq;
     vlc_bool_t      b_deinterlace;
 
     int             i_crop_top;
@@ -125,7 +125,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_key_int    = -1;
     p_sys->i_qmin       = 2;
     p_sys->i_qmax       = 31;
-    p_sys->b_hq         = VLC_FALSE;
+#if LIBAVCODEC_BUILD >= 4673
+    p_sys->i_hq         = FF_MB_DECISION_SIMPLE;
+#else
+    p_sys->i_hq         = VLC_FALSE;
+#endif
     p_sys->b_deinterlace= VLC_FALSE;
 
     p_sys->i_crop_top   = 0;
@@ -218,10 +222,32 @@ static int Open( vlc_object_t *p_this )
         {
             p_sys->i_key_int    = atoi( val );
         }
+#if LIBAVCODEC_BUILD >= 4673
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "hq" ) ) )
+        {
+            if( !strcmp( val, "rd" ) )
+            {
+                p_sys->i_hq = FF_MB_DECISION_RD;
+            }
+            else if( !strcmp( val, "bits" ) )
+            {
+                p_sys->i_hq = FF_MB_DECISION_BITS;
+            }
+            else if( !strcmp( val, "simple" ) )
+            {
+                p_sys->i_hq = FF_MB_DECISION_SIMPLE;
+            }
+            else
+            {
+                p_sys->i_hq = FF_MB_DECISION_RD;
+            }
+        }
+#else
         if( sout_cfg_find( p_stream->p_cfg, "hq" ) )
         {
-            p_sys->b_hq = VLC_TRUE;
+            p_sys->i_hq = VLC_TRUE;
         }
+#endif
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "qmin" ) ) )
         {
             p_sys->i_qmin   = atoi( val );
@@ -590,14 +616,14 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
         i_ff_codec = get_ff_codec( id->f_src.i_fourcc );
         if( i_ff_codec == 0 )
         {
-            msg_Err( p_stream, "cannot find decoder" );
+            msg_Err( p_stream, "cannot find decoder id" );
             return VLC_EGENERIC;
         }
 
         id->ff_dec = avcodec_find_decoder( i_ff_codec );
         if( !id->ff_dec )
         {
-            msg_Err( p_stream, "cannot find decoder" );
+            msg_Err( p_stream, "cannot find decoder (avcodec)" );
             return VLC_EGENERIC;
         }
 
@@ -666,20 +692,22 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     i_ff_codec = get_ff_codec( id->f_dst.i_fourcc );
     if( i_ff_codec == 0 )
     {
-        msg_Err( p_stream, "cannot find encoder" );
+        msg_Err( p_stream, "cannot find encoder id" );
         return VLC_EGENERIC;
     }
 
     id->ff_enc = avcodec_find_encoder( i_ff_codec );
     if( !id->ff_enc )
     {
-        msg_Err( p_stream, "cannot find encoder" );
+        msg_Err( p_stream, "cannot find encoder (avcodec)" );
         return VLC_EGENERIC;
     }
 
     /* Hack for mp3 transcoding support */
     if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','3',' ' ) )
+    {
         id->f_dst.i_fourcc = VLC_FOURCC( 'm','p','g','a' );
+    }
 
     id->ff_enc_c = avcodec_alloc_context();
     id->ff_enc_c->bit_rate    = id->f_dst.i_bitrate;
@@ -688,8 +716,22 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
 
     if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
     {
-        msg_Err( p_stream, "cannot open encoder" );
-        return VLC_EGENERIC;
+        if( id->ff_enc_c->channels > 2 )
+        {
+            id->ff_enc_c->channels = 2;
+            id->f_dst.i_channels   = 2;
+            if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
+            {
+                msg_Err( p_stream, "cannot open encoder" );
+                return VLC_EGENERIC;
+            }
+            msg_Warn( p_stream, "stereo mode selected (codec limitation)" );
+        }
+        else
+        {
+            msg_Err( p_stream, "cannot open encoder" );
+            return VLC_EGENERIC;
+        }
     }
 
     return VLC_SUCCESS;
@@ -1004,17 +1046,16 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
             }
 
             if( id->ff_dec_c->channels != id->ff_enc_c->channels )
-	    {
+            {
                 /* dumb downmixing */
                 for( i = 0; i < id->ff_enc_c->frame_size; i++ )
                 {
                     for( j = 0 ; j < id->f_dst.i_channels; j++ )
                     {
-                        p_buffer[i*id->f_dst.i_channels+j] =
-                            p_buffer[i*id->f_src.i_channels+j];
+                        p_buffer[i*id->f_dst.i_channels+j] = p_buffer[i*id->f_src.i_channels+j];
                     }
                 }
-	    }
+            }
 
             /* msg_Warn( p_stream, "avcodec_encode_audio: frame size%d",
                          i_frame_size); */
@@ -1169,10 +1210,15 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     }
     id->ff_enc_c->qmin           = p_sys->i_qmin;
     id->ff_enc_c->qmax           = p_sys->i_qmax;
-    if( p_sys->b_hq )
+
+#if LIBAVCODEC_BUILD >= 4673
+    id->ff_enc_c->mb_decision = p_sys->i_hq;
+#else
+    if( p_sys->i_hq )
     {
         id->ff_enc_c->flags      |= CODEC_FLAG_HQ;
     }
+#endif
 
     if( i_ff_codec == CODEC_ID_RAWVIDEO )
     {
