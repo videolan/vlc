@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.226 2003/03/24 17:15:30 gbazin Exp $
+ * $Id: input.c,v 1.227 2003/03/25 17:07:45 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -552,6 +552,8 @@ static void ErrorThread( input_thread_t *p_input )
  *****************************************************************************/
 static void EndThread( input_thread_t * p_input )
 {
+    vlc_object_t *p_object;
+
 #ifdef HAVE_SYS_TIMES_H
     /* Display statistics */
     struct tms  cpu_usage;
@@ -585,6 +587,16 @@ static void EndThread( input_thread_t * p_input )
     module_Unneed( p_input, p_input->p_access );
 
     input_AccessEnd( p_input );
+
+    /* Close the video output that should have been re-attached
+     * to our object */
+    p_object = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_object )
+    {
+        vlc_object_detach( p_object );
+        vlc_object_release( p_object );
+        vout_Destroy( p_object );
+    }
 
     free( p_input->psz_source );
     if ( p_input->psz_dupsource != NULL ) free( p_input->psz_dupsource );

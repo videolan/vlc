@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.215 2003/03/25 00:43:26 gbazin Exp $
+ * $Id: video_output.c,v 1.216 2003/03/25 17:07:45 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -69,15 +69,18 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
 {
     if( !i_width || !i_height || !i_chroma )
     {
-        /* Reattach video output to p_vlc before bailing out */
+        /* Reattach video output to input before bailing out */
         if( p_vout )
         {
+            vlc_object_t *p_input;
             char *psz_sout = config_GetPsz( p_this, "sout" );
 
-            if( !psz_sout || !*psz_sout )
+            p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+
+            if( p_input && (!psz_sout || !*psz_sout) )
             {
                 vlc_object_detach( p_vout );
-                vlc_object_attach( p_vout, p_this->p_vlc );
+                vlc_object_attach( p_vout, p_input );
             }
             else
             {
@@ -86,6 +89,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
                 vout_Destroy( p_vout );
             }
             if( psz_sout ) free( psz_sout );
+            if( p_input ) vlc_object_release( p_input );
         }
 
         return NULL;
@@ -102,7 +106,15 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
 
         if( !p_vout )
         {
-            p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+            vlc_object_t *p_input;
+
+            p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+            if( p_input )
+            {
+                p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT,
+                                          FIND_CHILD );
+                vlc_object_release( p_input );
+            }
         }
     }
 
