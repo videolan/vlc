@@ -211,6 +211,7 @@ snapshot-common:
 	find -type d | grep -v '\(\.dep\|snapshot\|CVS\)' | while read i ; \
 		do mkdir -p tmp/vlc/$$i ; \
 	done
+	rm -Rf tmp/vlc/tmp
 	find debian -mindepth 1 -maxdepth 1 -type d | \
 		while read i ; do rm -Rf tmp/vlc/$$i ; done
 	# Copy .c .h .in .cpp and .glade files

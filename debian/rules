@@ -9,7 +9,7 @@
 export DH_COMPAT=3
 
 # Compilation options
-export CONFIG_FLAGS="--prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --with-sdl --enable-esd --enable-alsa --enable-qt"
+export CONFIG_FLAGS="--prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --with-sdl --enable-esd --enable-qt"
 export LIBDVDCSS_FLAGS="--with-dvdcss=local-shared"
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
@@ -23,18 +23,17 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 
-	if [ $(DEB_BUILD_ARCH) = i386 ]; then \
-		./configure --mandir=$${prefix}/share/man \
-			--infodir=$${prefix}/share/info \
-			$(shell echo $(CONFIG_FLAGS)) \
-			$(shell echo $(LIBDVDCSS_FLAGS)) \
-			--with-glide --disable-ppro ; \
-	else \
-		./configure --mandir=$${prefix}/share/man \
-			--infodir=$${prefix}/share/info \
-			$(shell echo $(CONFIG_FLAGS)) \
-			$(shell echo $(LIBDVDCSS_FLAGS)) ; \
-	fi
+	case $(DEB_BUILD_ARCH) in \
+	i386) \
+		ARCH_FLAGS="--enable-alsa --with-glide --disable-ppro" ;; \
+	alpha|ia64|m68k|powerpc) \
+		ARCH_FLAGS="--enable-alsa" ;; \
+	*) \
+		ARCH_FLAGS="" ;; \
+	esac ;\
+	./configure $$ARCH_FLAGS --mandir=$${prefix}/share/man \
+		--infodir=$${prefix}/share/info \
+		$(shell echo $(CONFIG_FLAGS)) $(shell echo $(LIBDVDCSS_FLAGS))
 
 	$(MAKE)
 
@@ -58,7 +57,15 @@ install: build
 	DESTDIR=`pwd`/debian/vlc/ $(MAKE) install prefix=/usr
 
 	# make symlinks for packages and install plugins
-	for alias in ggi gtk gnome esd sdl qt alsa `if [ $(DEB_BUILD_ARCH) = i386 ]; then echo glide ; fi` ; do \
+	case $(DEB_BUILD_ARCH) in \
+	i386) \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt alsa glide" ;; \
+	alpha|ia64|m68k|powerpc) \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt alsa" ;; \
+	*) \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt" ;; \
+	esac ;\
+	for alias in $$ARCH_ALIASES ; do \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
 		mv debian/vlc/usr/lib/videolan/vlc/$$alias.so \
 			debian/vlc-$$alias/usr/lib/videolan/vlc/ ; done
@@ -112,7 +119,6 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installinit
 #	dh_installcron
-#	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt doc/vlc.1
 	dh_installman doc/vlc.1
 #	dh_installinfo
 #	dh_undocumented
@@ -127,16 +133,19 @@ binary-arch: build install
 	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
-	dh_shlibdeps -Nvlc-glide
-	if [ $(DEB_BUILD_ARCH) = i386 ]; then \
-		dh_gencontrol ;\
-		dh_md5sums ;\
-		dh_builddeb ;\
-	else \
-		dh_gencontrol -Nvlc-glide ;\
-		dh_md5sums -Nvlc-glide ;\
-		dh_builddeb -Nvlc-glide ;\
-	fi
+
+	case $(DEB_BUILD_ARCH) in \
+	i386) \
+		ARCH_EXCLUDE="" ;; \
+	alpha|ia64|m68k|powerpc) \
+		ARCH_EXCLUDE="-Nvlc-glide" ;; \
+	*) \
+		ARCH_EXCLUDE="-Nvlc-glide -Nvlc-alsa" ;; \
+	esac ;\
+	dh_shlibdeps $$ARCH_EXCLUDE ;\
+	dh_gencontrol $$ARCH_EXCLUDE ;\
+	dh_md5sums $$ARCH_EXCLUDE ;\
+	dh_builddeb $$ARCH_EXCLUDE
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

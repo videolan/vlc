@@ -1,3 +1,10 @@
+vlc (0.2.83-2) unstable; urgency=low
+
+  * Fixed build dependencies for architectures not supporting libasound2
+    (Closes: #109722).
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri, 24 Aug 2001 12:47:45 +0200
+
 vlc (0.2.83-1) unstable; urgency=low
 
   * New upstream release.
