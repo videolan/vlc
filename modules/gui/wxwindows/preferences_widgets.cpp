@@ -533,6 +533,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
     sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Layout();
     this->SetSizerAndFit( sizer );
+    i_value = p_item->i_value;
 }
 
 IntegerConfigControl::~IntegerConfigControl()
@@ -542,7 +543,15 @@ IntegerConfigControl::~IntegerConfigControl()
 
 int IntegerConfigControl::GetIntValue()
 {
-    return spin->GetValue();
+    /* We avoid using GetValue because of a recursion bug with wxSpinCtrl with
+     * wxGTK. */
+    return i_value; //spin->GetValue();
+}
+
+void IntegerConfigControl::OnUpdate( wxCommandEvent &event )
+{
+    i_value = event.GetInt();
+    ConfigControl::OnUpdate( event );
 }
 
 /*****************************************************************************

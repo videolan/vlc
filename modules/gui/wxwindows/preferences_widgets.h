@@ -133,6 +133,9 @@ public:
     virtual int GetIntValue();
 private:
     wxSpinCtrl *spin;
+    int i_value;
+
+    void OnUpdate( wxCommandEvent& );
 
     DECLARE_EVENT_TABLE()
 };
