@@ -135,22 +135,25 @@ static int Open( vlc_object_t *p_this )
 
     char                *psz_mux_byext = NULL;
 
-    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                   p_stream->p_cfg );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "access", &val );
     psz_access = *val.psz_string ? val.psz_string : NULL;
+    if( val.psz_string && !*val.psz_string ) free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "mux", &val );
     psz_mux = *val.psz_string ? val.psz_string : NULL;
+    if( val.psz_string && !*val.psz_string ) free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "url", &val );
     psz_url = *val.psz_string ? val.psz_string : NULL;
+    if( val.psz_string && !*val.psz_string ) free( val.psz_string );
 
-    p_stream->p_sys        = malloc( sizeof( sout_stream_sys_t) );
+    p_stream->p_sys = malloc( sizeof( sout_stream_sys_t) );
     p_stream->p_sys->p_session = NULL;
 
-    msg_Dbg( p_this, "creating `%s/%s://%s'",
-             psz_access, psz_mux, psz_url );
+    msg_Dbg( p_this, "creating `%s/%s://%s'", psz_access, psz_mux, psz_url );
 
     /* ext -> muxer name */
     if( psz_url && strrchr( psz_url, '.' ) )
@@ -192,15 +195,15 @@ static int Open( vlc_object_t *p_this )
 
     /* We fix access/mux to valid couple */
 
-    if( psz_access == NULL && psz_mux == NULL )
+    if( !psz_access && !psz_mux )
     {
         if( psz_mux_byext )
         {
             msg_Warn( p_stream,
                       "no access _and_ no muxer, extention gives file/%s",
                       psz_mux_byext );
-            psz_access = "file";
-            psz_mux    = psz_mux_byext;
+            psz_access = strdup("file");
+            psz_mux    = strdup(psz_mux_byext);
         }
         else
         {
@@ -209,40 +212,41 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if( psz_access && psz_mux == NULL )
+    if( psz_access && !psz_mux )
     {
         /* access given, no mux */
         if( !strncmp( psz_access, "mmsh", 4 ) )
         {
-            psz_mux = "asfh";
+            psz_mux = strdup("asfh");
         }
         else if( !strncmp( psz_access, "udp", 3 ) )
         {
-            psz_mux = "ts";
+            psz_mux = strdup("ts");
         }
         else
         {
-            psz_mux = psz_mux_byext;
+            psz_mux = strdup(psz_mux_byext);
         }
     }
-    else if( psz_mux && psz_access == NULL )
+    else if( psz_mux && !psz_access )
     {
         /* mux given, no access */
         if( !strncmp( psz_mux, "asfh", 4 ) )
         {
-            psz_access = "mmsh";
+            psz_access = strdup("mmsh");
         }
         else
         {
             /* default file */
-            psz_access = "file";
+            psz_access = strdup("file");
         }
     }
 
     /* fix or warm of incompatible couple */
     if( psz_mux && psz_access )
     {
-        if( !strncmp( psz_access, "mmsh", 4 ) && strncmp( psz_mux, "asfh", 4 ) )
+        if( !strncmp( psz_access, "mmsh", 4 ) &&
+            strncmp( psz_mux, "asfh", 4 ) )
         {
             char *p = strchr( psz_mux,'{' );
 
@@ -255,7 +259,7 @@ static int Open( vlc_object_t *p_this )
             }
             else
             {
-                psz_mux = "asfh";
+                psz_mux = strdup("asfh");
             }
         }
         else if( ( !strncmp( psz_access, "rtp", 3 ) ||
@@ -280,7 +284,9 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_stream, "no suitable sout access module for `%s/%s://%s'",
                  psz_access, psz_mux, psz_url );
-        return( VLC_EGENERIC );
+        if( psz_access ) free( psz_access );
+        if( psz_mux ) free( psz_mux );
+        return VLC_EGENERIC;
     }
     msg_Dbg( p_stream, "access opened" );
 
@@ -292,14 +298,16 @@ static int Open( vlc_object_t *p_this )
                  psz_access, psz_mux, psz_url );
 
         sout_AccessOutDelete( p_access );
-        return( VLC_EGENERIC );
+        if( psz_access ) free( psz_access );
+        if( psz_mux ) free( psz_mux );
+        return VLC_EGENERIC;
     }
     msg_Dbg( p_stream, "mux opened" );
 
     /*  *** Create the SAP Session structure *** */
     var_Get( p_stream, SOUT_CFG_PREFIX "sap", &val );
     if( val.b_bool &&
-        ( strstr( psz_access, "udp" ) || strstr( psz_access ,  "rtp" ) ) )
+        ( strstr( psz_access, "udp" ) || strstr( psz_access , "rtp" ) ) )
     {
         session_descriptor_t *p_session = sout_AnnounceSessionCreate();
         announce_method_t *p_method =
@@ -324,10 +332,7 @@ static int Open( vlc_object_t *p_this )
 
         if( url.psz_host )
         {
-            if( url.i_port == 0 )
-            {
-                url.i_port = DEFAULT_PORT;
-            }
+            if( url.i_port == 0 ) url.i_port = DEFAULT_PORT;
 
             p_session->psz_uri = url.psz_host;
             p_session->i_port = url.i_port;
@@ -373,9 +378,9 @@ static int Open( vlc_object_t *p_this )
         else
         {
             p_slp = malloc(sizeof(slp_session_t));
-            p_slp->psz_url= strdup(psz_url);
-            p_slp->psz_name = strdup( *val.psz_string ? val.psz_string :
-                                    psz_url );
+            p_slp->psz_url = strdup( psz_url );
+            p_slp->psz_name =
+                strdup( *val.psz_string ? val.psz_string : psz_url );
         }
         free( val.psz_string );
     }
@@ -387,6 +392,10 @@ static int Open( vlc_object_t *p_this )
 
     p_stream->p_sys->p_mux = p_mux;
     p_stream->p_sys->p_slp = p_slp;
+
+    if( psz_access ) free( psz_access );
+    if( psz_mux ) free( psz_mux );
+    if( psz_url ) free( psz_url );
 
     return VLC_SUCCESS;
 }
