@@ -2,7 +2,7 @@
  * window_manager.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window_manager.cpp,v 1.2 2004/01/11 00:21:22 asmax Exp $
+ * $Id: window_manager.cpp,v 1.3 2004/01/18 00:50:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -192,8 +192,11 @@ void WindowManager::buildDependSet( WinSet_t &rWinSet,
     WinSet_t::const_iterator iter;
     for( iter = anchored.begin(); iter != anchored.end(); iter++ )
     {
+        // Check that the window is visible
+        bool visible = (*iter)->getVisibleVar().get();
+
         // Check that the window isn't already in the set before adding it
-        if( rWinSet.find( *iter ) == rWinSet.end() )
+        if( visible && rWinSet.find( *iter ) == rWinSet.end() )
         {
             buildDependSet( rWinSet, *iter );
         }
