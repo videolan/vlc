@@ -1034,7 +1034,7 @@ libgcrypt: libgcrypt-$(GCRYPT_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .gcrypt: libgcrypt
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install )
 	touch $@
 
 CLEAN_FILE += .gcrypt
