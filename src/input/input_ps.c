@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.21 2001/01/30 05:48:23 sam Exp $
+ * $Id: input_ps.c,v 1.22 2001/02/07 15:32:26 massiot Exp $
  *
  * Authors: 
  *
@@ -103,6 +103,7 @@ static void PSInit( input_thread_t * p_input )
     }
     fseek( p_method->stream, 0, SEEK_SET );
 
+    /* FIXME : detect if InitStream failed */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 

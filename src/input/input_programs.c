@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.27 2001/01/24 19:05:55 massiot Exp $
+ * $Id: input_programs.c,v 1.28 2001/02/07 15:32:26 massiot Exp $
  *
  * Authors:
  *
@@ -51,7 +51,7 @@
 /*****************************************************************************
  * input_InitStream: init the stream descriptor of the given input
  *****************************************************************************/
-void input_InitStream( input_thread_t * p_input, size_t i_data_len )
+int input_InitStream( input_thread_t * p_input, size_t i_data_len )
 {
     p_input->stream.i_stream_id = 0;
     p_input->stream.pp_es = NULL;
@@ -63,11 +63,12 @@ void input_InitStream( input_thread_t * p_input, size_t i_data_len )
         if ( (p_input->stream.p_demux_data = malloc( i_data_len )) == NULL )
         {
             intf_ErrMsg( "Unable to allocate memory in input_InitStream");
-            /* FIXME : find a way to tell if failed */
-            return;
+            return 1;
         }
         memset( p_input->stream.p_demux_data, 0, i_data_len );
     }
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -147,11 +148,8 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     p_input->stream.pp_programs[i_pgrm_index]->i_es_number = 0;
     p_input->stream.pp_programs[i_pgrm_index]->pp_es = NULL;
 
-    p_input->stream.pp_programs[i_pgrm_index]->delta_cr = 0;
-    p_input->stream.pp_programs[i_pgrm_index]->cr_ref = 0;
-    p_input->stream.pp_programs[i_pgrm_index]->sysdate_ref = 0;
-    p_input->stream.pp_programs[i_pgrm_index]->last_cr = 0;
-    p_input->stream.pp_programs[i_pgrm_index]->c_average_count = 0;
+    input_ClockInit( p_input->stream.pp_programs[i_pgrm_index] );
+
     p_input->stream.pp_programs[i_pgrm_index]->i_synchro_state
                                                 = SYNCHRO_START;
     p_input->stream.pp_programs[i_pgrm_index]->b_discontinuity = 0;

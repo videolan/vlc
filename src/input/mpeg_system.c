@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.28 2001/01/30 05:48:23 sam Exp $
+ * $Id: mpeg_system.c,v 1.29 2001/02/07 15:32:26 massiot Exp $
  *
  * Authors: 
  *
@@ -217,11 +217,10 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         p_pes = NULL;
                         return;
                     }
-                    p_pes->i_pts = input_ClockToSysdate( p_input, p_es->p_pgrm,
+                    p_pes->i_pts = input_ClockGetTS( p_input, p_es->p_pgrm,
                     ( ((mtime_t)(p_full_header[2] & 0x0E) << 29) |
                       (((mtime_t)U16_AT(p_full_header + 3) << 14) - (1 << 14)) |
-                      ((mtime_t)U16_AT(p_full_header + 5) >> 1) ) )
-                        + DEFAULT_PTS_DELAY;
+                      ((mtime_t)U16_AT(p_full_header + 5) >> 1) ) );
 
                     if( b_has_dts )
                     {
@@ -235,13 +234,11 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                             p_pes = NULL;
                             return;
                         }
-                        p_pes->i_dts = input_ClockToSysdate( p_input,
-                                                             p_es->p_pgrm,
+                        p_pes->i_dts = input_ClockGetTS( p_input, p_es->p_pgrm,
                         ( ((mtime_t)(p_full_header[7] & 0x0E) << 29) |
                           (((mtime_t)U16_AT(p_full_header + 8) << 14)
                                 - (1 << 14)) |
-                          ((mtime_t)U16_AT(p_full_header + 10) >> 1) ) )
-                            + DEFAULT_PTS_DELAY;
+                          ((mtime_t)U16_AT(p_full_header + 10) >> 1) ) );
                     }
                 }
             }
@@ -313,11 +310,10 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         return;
                     }
 
-                    p_pes->i_pts = input_ClockToSysdate( p_input, p_es->p_pgrm,
+                    p_pes->i_pts = input_ClockGetTS( p_input, p_es->p_pgrm,
                       ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
                         (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
-                        ((mtime_t)U16_AT(p_ts + 3) >> 1) ) )
-                      + DEFAULT_PTS_DELAY;
+                        ((mtime_t)U16_AT(p_ts + 3) >> 1) ) );
 
                     if( b_has_dts )
                     {
@@ -332,12 +328,11 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                             return;
                         }
 
-                        p_pes->i_dts = input_ClockToSysdate( p_input,
-                                                             p_es->p_pgrm,
+                        p_pes->i_dts = input_ClockGetTS( p_input,
+                                                         p_es->p_pgrm,
                             ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
                               (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
-                              ((mtime_t)U16_AT(p_ts + 3) >> 1) ) )
-                            + DEFAULT_PTS_DELAY;
+                              ((mtime_t)U16_AT(p_ts + 3) >> 1) ) );
                     }
                 }
             }
@@ -488,132 +483,6 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
         }
     }
 #undef p_pes
-}
-
-
-/*
- * Pace control
- */
-
-/*
- *   DISCUSSION : SYNCHRONIZATION METHOD
- *
- *   In some cases we can impose the pace of reading (when reading from a
- *   file or a pipe), and for the synchronization we simply sleep() until
- *   it is time to deliver the packet to the decoders. When reading from
- *   the network, we must be read at the same pace as the server writes,
- *   otherwise the kernel's buffer will trash packets. The risk is now to
- *   overflow the input buffers in case the server goes too fast, that is
- *   why we do these calculations :
- *
- *   We compute an average for the pcr because we want to eliminate the
- *   network jitter and keep the low frequency variations. The average is
- *   in fact a low pass filter and the jitter is a high frequency signal
- *   that is why it is eliminated by the filter/average.
- *
- *   The low frequency variations enable us to synchronize the client clock
- *   with the server clock because they represent the time variation between
- *   the 2 clocks. Those variations (ie the filtered pcr) are used to compute
- *   the presentation dates for the audio and video frames. With those dates
- *   we can decode (or trash) the MPEG2 stream at "exactly" the same rate
- *   as it is sent by the server and so we keep the synchronization between
- *   the server and the client.
- *
- *   It is a very important matter if you want to avoid underflow or overflow
- *   in all the FIFOs, but it may be not enough.
- */
-
-/*****************************************************************************
- * Constants
- *****************************************************************************/
-
-/* Maximum number of samples used to compute the dynamic average value,
- * it is also the maximum of c_average_count in pgrm_ts_data_t.
- * We use the following formula :
- * new_average = (old_average * c_average + new_sample_value) / (c_average +1) */
-#define CR_MAX_AVERAGE_COUNTER 40
-
-/* Maximum gap allowed between two CRs. */
-#define CR_MAX_GAP 1000000
-
-/*****************************************************************************
- * CRReInit : Reinitialize the clock reference
- *****************************************************************************/
-static void CRReInit( pgrm_descriptor_t * p_pgrm )
-{
-    p_pgrm->delta_cr        = 0;
-    p_pgrm->last_cr         = 0;
-    p_pgrm->c_average_count = 0;
-}
-
-/* FIXME: find a better name */
-/*****************************************************************************
- * CRDecode : Decode a clock reference
- *****************************************************************************/
-static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
-                      mtime_t cr_time )
-{
-    if( p_pgrm->i_synchro_state != SYNCHRO_OK )
-    {
-        input_ClockNewRef( p_input, p_pgrm, cr_time );
-        p_pgrm->i_synchro_state = SYNCHRO_OK;
-    }
-    else
-    {
-        if( p_pgrm->b_discontinuity ||
-            ( p_pgrm->last_cr != 0 &&
-                  (    (p_pgrm->last_cr - cr_time) > CR_MAX_GAP
-                    || (p_pgrm->last_cr - cr_time) < - CR_MAX_GAP ) ) )
-        {
-#if 0
-            /* This code is deprecated */
-            int i_es;
-
-            /* Stream discontinuity. */
-            intf_WarnMsg( 3, "CR re-initialiazed" );
-            CRReInit( p_pgrm );
-            p_pgrm->i_synchro_state = SYNCHRO_REINIT;
-            p_pgrm->b_discontinuity = 0;
-
-            /* Warn all the elementary streams */
-            for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
-            {
-                p_pgrm->pp_es[i_es]->b_discontinuity = 1;
-            }
-#endif
-        }
-        p_pgrm->last_cr = cr_time;
-
-        if( p_input->stream.b_pace_control )
-        {
-            /* Wait a while before delivering the packets to the decoder. */
-            mwait( input_ClockToSysdate( p_input, p_pgrm, cr_time ) );
-        }
-        else
-        {
-#if 0
-            /* This code is deprecated, too */
-            mtime_t                 sys_time, delta_cr;
-
-            sys_time = mdate();
-            delta_cr = sys_time - cr_time;
-
-            if( p_pgrm->c_average_count == CR_MAX_AVERAGE_COUNTER )
-            {
-                p_pgrm->delta_cr = ( delta_cr + (p_pgrm->delta_cr
-                                              * (CR_MAX_AVERAGE_COUNTER - 1)) )
-                                     / CR_MAX_AVERAGE_COUNTER;
-            }
-            else
-            {
-                p_pgrm->delta_cr = ( delta_cr + (p_pgrm->delta_cr
-                                              * p_pgrm->c_average_count) )
-                                     / ( p_pgrm->c_average_count + 1 );
-                p_pgrm->c_average_count++;
-            }
-#endif
-        }
-    }
 }
 
 
@@ -939,8 +808,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 }
                 /* Call the pace control. */
                 //intf_Msg("+%lld", scr_time);
-                CRDecode( p_input, p_input->stream.pp_programs[0],
-                          scr_time );
+                input_ClockManageRef( p_input, p_input->stream.pp_programs[0],
+                                      scr_time );
                 b_trash = 1;
             }
             break;
@@ -1111,7 +980,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                                     ( (mtime_t)U32_AT((u32*)&p[6]) << 1 )
                                       | ( p[10] >> 7 );
                             /* Call the pace control. */
-                            CRDecode( p_input, p_es->p_pgrm, pcr_time );
+                            input_ClockManageRef( p_input, p_es->p_pgrm,
+                                                  pcr_time );
                         }
                     } /* PCR ? */
                 } /* valid TS adaptation field ? */
@@ -1184,6 +1054,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         {
             /* The payload contains PSI tables */
 #if 0
+            /* FIXME ! write the PSI decoder :p */
             input_DemuxPSI( p_input, p_data, p_es,
                             b_unit_start, b_lost );
 #endif

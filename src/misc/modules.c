@@ -224,8 +224,8 @@ void module_ManageBank( module_bank_t * p_bank )
             }
             else
             {
-                intf_DbgMsg( "module: hiding unused module `%s'",
-                             p_module->psz_name );
+                intf_WarnMsg( 1, "module: hiding unused module `%s'",
+                              p_module->psz_name );
                 HideModule( p_module );
             }
         }

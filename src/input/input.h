@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.12 2001/01/24 19:05:55 massiot Exp $
+ * $Id: input.h,v 1.13 2001/02/07 15:32:25 massiot Exp $
  *
  * Authors:
  *
@@ -30,7 +30,7 @@
                                  * Ethernet MTU is 1500 bytes, so in a UDP   *
                                  * packet we can put : 1500/188 = 7 TS       *
                                  * packets. Have a nice day and merry Xmas.  */
-#define PADDING_PACKET_SIZE 100 /* Size of the NULL packet inserted in case
+#define PADDING_PACKET_SIZE 188 /* Size of the NULL packet inserted in case
                                  * of data loss (this should be < 188).      */
 
 /*****************************************************************************
@@ -78,7 +78,7 @@ void NextDataPacket ( struct bit_stream_s * );
 /*****************************************************************************
  * Prototypes from input_programs.c
  *****************************************************************************/
-void input_InitStream( struct input_thread_s *, size_t );
+int input_InitStream( struct input_thread_s *, size_t );
 void input_EndStream( struct input_thread_s * );
 struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
 struct pgrm_descriptor_s * input_AddProgram( struct input_thread_s *,
@@ -103,10 +103,15 @@ void input_DecodePES( struct decoder_fifo_s *, struct pes_packet_s * );
 /*****************************************************************************
  * Prototypes from input_clock.c
  *****************************************************************************/
-mtime_t input_ClockToSysdate( struct input_thread_s *,
-                           struct pgrm_descriptor_s *, mtime_t );
 void input_ClockNewRef( struct input_thread_s *,
                         struct pgrm_descriptor_s *, mtime_t );
+void input_EscapeDiscontinuity( struct input_thread_s *,
+                                struct pgrm_descriptor_s * );
+void input_ClockInit( struct pgrm_descriptor_s * );
+void input_ClockManageRef( struct input_thread_s *,
+                           struct pgrm_descriptor_s *, mtime_t );
+mtime_t input_ClockGetTS( struct input_thread_s *,
+                          struct pgrm_descriptor_s *, mtime_t );
 
 /*****************************************************************************
  * Create a NULL packet for padding in case of a data loss
