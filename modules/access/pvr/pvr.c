@@ -509,6 +509,7 @@ static int Open( vlc_object_t * p_this )
     /* set the picture size */
     if ( p_sys->i_width != -1 || p_sys->i_height != -1 )
     {
+        vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if ( ioctl( p_sys->i_fd, VIDIOC_G_FMT, &vfmt ) < 0 )
         {
             msg_Warn( p_access, "VIDIOC_G_FMT failed" );
