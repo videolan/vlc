@@ -202,12 +202,11 @@ static void RunThread (adec_thread_t * p_adec)
             
             intf_DbgMsg ( "adec: sync\n" );
             
-            p_adec->align = 0;
             p_byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
             do 
             {
                 adec_byte_stream_next ( p_byte_stream );
-            } while ( (!p_adec->align) && (!p_adec->b_die)
+            } while ( !((*((u32 *)p_adec->p_data->p_payload_start) & 0xFFFFFF00) == 0x100) && (!p_adec->b_die)
                         && (!p_adec->b_error) );
 
             if( p_adec->b_die || p_adec->b_error )
@@ -370,10 +369,6 @@ void adec_byte_stream_next ( adec_byte_stream_t * p_byte_stream )
 
             /* The next byte could be found in the next PES packet */
             p_adec->p_data = DECODER_FIFO_START (*p_adec->p_fifo)->p_first;
-            if (DECODER_FIFO_START (*p_adec->p_fifo)->b_data_alignment)
-            {
-                p_adec->align = 1;
-            }
 
             /* We can release the fifo's data lock */
             vlc_mutex_unlock (&p_adec->p_fifo->data_lock);

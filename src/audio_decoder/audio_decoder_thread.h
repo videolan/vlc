@@ -38,7 +38,6 @@ typedef struct adec_thread_s
      */
     decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
     data_packet_t *     p_data;
-    int                 align;
     adec_config_t *     p_config;
 
 
