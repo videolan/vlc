@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.14 2003/05/03 18:11:42 fenrir Exp $
+ * $Id: transcode.c,v 1.15 2003/05/04 18:51:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -145,6 +145,10 @@ static int Open( vlc_object_t *p_this )
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "ab" ) ) )
         {
             p_sys->i_abitrate = atoi( val );
+            if( p_sys->i_abitrate < 4000 )
+            {
+                p_sys->i_abitrate *= 1000;
+            }
         }
 
         msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
