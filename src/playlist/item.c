@@ -47,8 +47,9 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
     if( p_item == NULL ) return NULL;
     if( psz_uri == NULL) return NULL;
 
-    memset( p_item, 0, sizeof( playlist_item_t ) );
+    vlc_input_item_Init( p_obj, p_item );
 
+    p_item->input.i_duration = -1;
     p_item->input.psz_uri = strdup( psz_uri );
 
     if( psz_name != NULL ) p_item->input.psz_name = strdup( psz_name );
@@ -57,12 +58,6 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
     p_item->b_enabled = VLC_TRUE;
     p_item->i_group = PLAYLIST_TYPE_MANUAL;
     p_item->i_nb_played = 0;
-
-    p_item->input.i_duration = -1;
-    p_item->input.ppsz_options = NULL;
-    p_item->input.i_options = 0;
-
-    vlc_mutex_init( p_obj, &p_item->input.lock );
 
     playlist_ItemCreateCategory( p_item, _("General") );
     return p_item;
@@ -76,50 +71,7 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
  */
 void playlist_ItemDelete( playlist_item_t *p_item )
 {
-    vlc_mutex_lock( &p_item->input.lock );
-
-    if( p_item->input.psz_name ) free( p_item->input.psz_name );
-    if( p_item->input.psz_uri ) free( p_item->input.psz_uri );
-
-    /* Free the info categories */
-    if( p_item->input.i_categories > 0 )
-    {
-        int i, j;
-
-        for( i = 0; i < p_item->input.i_categories; i++ )
-        {
-            info_category_t *p_category = p_item->input.pp_categories[i];
-
-            for( j = 0; j < p_category->i_infos; j++)
-            {
-                if( p_category->pp_infos[j]->psz_name )
-                {
-                    free( p_category->pp_infos[j]->psz_name);
-                }
-                if( p_category->pp_infos[j]->psz_value )
-                {
-                    free( p_category->pp_infos[j]->psz_value );
-                }
-                free( p_category->pp_infos[j] );
-            }
-
-            if( p_category->i_infos ) free( p_category->pp_infos );
-            if( p_category->psz_name ) free( p_category->psz_name );
-            free( p_category );
-        }
-
-        free( p_item->input.pp_categories );
-    }
-
-    for( ; p_item->input.i_options > 0; p_item->input.i_options-- )
-    {
-        free( p_item->input.ppsz_options[p_item->input.i_options - 1] );
-        if( p_item->input.i_options == 1 ) free( p_item->input.ppsz_options );
-    }
-
-    vlc_mutex_unlock( &p_item->input.lock );
-    vlc_mutex_destroy( &p_item->input.lock );
-
+    vlc_input_item_Clean( p_item );
     free( p_item );
 }
 

@@ -62,6 +62,65 @@ struct input_item_t
     vlc_mutex_t lock;                /**< Item cannot be changed without this lock */
 };
 
+static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
+{
+    memset( p_i, 0, sizeof(input_item_t) );
+    p_i->psz_name = 0;
+    p_i->psz_uri = 0;
+    p_i->ppsz_options = 0;
+    p_i->pp_categories = 0;
+    p_i->es = 0;
+    vlc_mutex_init( p_o, &p_i->lock );
+}
+
+static inline void vlc_input_item_Clean( input_item_t *p_i )
+{
+    if( p_i->psz_name ) free( p_i->psz_name );
+    if( p_i->psz_uri ) free( p_i->psz_uri );
+    p_i->psz_name = 0;
+    p_i->psz_uri = 0;
+
+    while( p_i->i_options )
+    {
+        p_i->i_options--;
+        if( p_i->ppsz_options[p_i->i_options] )
+            free( p_i->ppsz_options[p_i->i_options] );
+        if( !p_i->i_options ) free( p_i->ppsz_options );
+    }
+
+    while( p_i->i_es )
+    {
+        p_i->i_es--;
+        es_format_Clean( p_i->es[p_i->i_es] );
+        if( !p_i->i_es ) free( p_i->es );
+    }
+
+    while( p_i->i_categories )
+    {
+        info_category_t *p_category =
+            p_i->pp_categories[--(p_i->i_categories)];
+
+        while( p_category->i_infos )
+        {
+            p_category->i_infos--;
+
+            if( p_category->pp_infos[p_category->i_infos]->psz_name )
+                free( p_category->pp_infos[p_category->i_infos]->psz_name);
+            if( p_category->pp_infos[p_category->i_infos]->psz_value )
+                free( p_category->pp_infos[p_category->i_infos]->psz_value );
+            free( p_category->pp_infos[p_category->i_infos] );
+
+            if( !p_category->i_infos ) free( p_category->pp_infos );
+        }
+
+        if( p_category->psz_name ) free( p_category->psz_name );
+        free( p_category );
+
+        if( !p_i->i_categories ) free( p_i->pp_categories );
+    }
+
+    vlc_mutex_destroy( &p_i->lock );
+}
 
 /*****************************************************************************
  * Seek point: (generalisation of chapters)
@@ -129,6 +188,7 @@ static inline input_title_t *vlc_input_title_New( )
 
     return t;
 }
+
 static inline void vlc_input_title_Delete( input_title_t *t )
 {
     int i;
@@ -168,7 +228,6 @@ static inline input_title_t *vlc_input_title_Duplicate( input_title_t *t )
 
     return dup;
 }
-
 
 /*****************************************************************************
  * input defines/constants.
@@ -357,10 +416,8 @@ enum input_query_e
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
 VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
 
-
 VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, vlc_bool_t b_force_decoder ) );
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
 
 #endif
-
