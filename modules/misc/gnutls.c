@@ -451,7 +451,6 @@ Open( vlc_object_t *p_this )
     var_Create( p_this->p_libvlc, "gnutls_count", VLC_VAR_INTEGER );
     var_Get( p_this->p_libvlc, "gnutls_count", &count);
 
-    /* FIXME: should check version number */
     if( count.i_int == 0)
     {
         __p_gcry_data = p_this;
@@ -461,6 +460,13 @@ Open( vlc_object_t *p_this )
         {
             msg_Warn( p_this, "cannot initialize GNUTLS" );
             vlc_mutex_unlock( lock.p_address);
+            return VLC_EGENERIC;
+        }
+        if( gnutls_check_version( "1.0.0" ) == NULL )
+        {
+            gnutls_global_deinit( );
+            vlc_mutex_unlock( lock.p_address);
+            msg_Err( p_this, "unsupported GNUTLS version" );
             return VLC_EGENERIC;
         }
         msg_Dbg( p_this, "GNUTLS initialized" );
