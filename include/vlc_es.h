@@ -2,7 +2,7 @@
  * vlc_es.h: Elementary stream formats descriptions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.9 2004/02/07 00:16:34 gbazin Exp $
+ * $Id: vlc_es.h,v 1.10 2004/02/07 00:33:08 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -196,12 +196,16 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
     }
 }
 
-static inline void es_format_Free( es_format_t *fmt )
+static inline void es_format_Clean( es_format_t *fmt )
 {
     if( fmt->psz_language ) free( fmt->psz_language );
+    fmt->psz_language = 0;
     if( fmt->psz_description ) free( fmt->psz_description );
+    fmt->psz_description = 0;
     if( fmt->i_extra > 0 ) free( fmt->p_extra );
+    fmt->i_extra = 0; fmt->p_extra = 0;
     if( fmt->video.p_palette ) free( fmt->video.p_palette );
+    fmt->video.p_palette = 0;
 }
 
 #endif
