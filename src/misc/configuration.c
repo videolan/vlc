@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.22 2002/05/03 20:49:30 sam Exp $
+ * $Id: configuration.c,v 1.23 2002/05/15 01:29:07 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -782,7 +782,7 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     module_config_t *pp_shortopts[256];
     char *psz_shortopts;
 
-    /* reset warning level */
+    /* Reset warning level */
     p_main->i_warning_level = 0;
 
     /* Set default configuration and copy arguments */
@@ -812,7 +812,7 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
 #endif
 
     /*
-     * Generate the longopts and shortopts structure used by getopt_long
+     * Generate the longopts and shortopts structures used by getopt_long
      */
 
     i_opts = 0;
@@ -840,6 +840,22 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
         return( -1 );
     }
 
+    /* If we are requested to ignore errors, then we must work on a copy
+     * of the ppsz_argv array, otherwise getopt_long will reorder it for
+     * us, ignoring the arity of the options */
+    if( b_ignore_errors )
+    {
+        ppsz_argv = (char**)malloc( *pi_argc * sizeof(char *) );
+        if( ppsz_argv == NULL )
+        {
+            intf_ErrMsg( "config error: couldn't duplicate ppsz_argv" );
+            free( psz_shortopts );
+            free( p_longopts );
+            return -1;
+        }
+        memcpy( ppsz_argv, p_main->ppsz_argv, *pi_argc * sizeof(char *) );
+    }
+
     psz_shortopts[0] = 'v';
     i_shortopts = 1;
     for( i_index = 0; i_index < 256; i_index++ )
@@ -847,7 +863,7 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
         pp_shortopts[i_index] = NULL;
     }
 
-    /* Fill the longopts structure */
+    /* Fill the p_longopts and psz_shortopts structures */
     i_index = 0;
     for( p_module = p_module_bank->first ;
          p_module != NULL ;
@@ -857,15 +873,20 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
              p_item->i_type != MODULE_CONFIG_HINT_END;
              p_item++ )
         {
+            /* Ignore hints */
             if( p_item->i_type & MODULE_CONFIG_HINT )
-                /* ignore hints */
                 continue;
+
+            /* Add item to long options */
             p_longopts[i_index].name = p_item->psz_name;
             p_longopts[i_index].has_arg =
                 (p_item->i_type == MODULE_CONFIG_ITEM_BOOL)?
                                                no_argument : required_argument;
             p_longopts[i_index].flag = 0;
             p_longopts[i_index].val = 0;
+            i_index++;
+
+            /* If item also has a short option, add it */
             if( p_item->i_short )
             {
                 pp_shortopts[(int)p_item->i_short] = p_item;
@@ -877,7 +898,6 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                     i_shortopts++;
                 }
             }
-            i_index++;
         }
     }
 
@@ -962,12 +982,14 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
 
             free( p_longopts );
             free( psz_shortopts );
+            if( b_ignore_errors ) free( ppsz_argv );
             return( -1 );
         }
     }
 
     free( p_longopts );
     free( psz_shortopts );
+    if( b_ignore_errors ) free( ppsz_argv );
 
     /* Update the warning level */
     p_main->i_warning_level += config_GetIntVariable( "warning" );
