@@ -50,6 +50,10 @@
 #include "playlist.h"
 #include "controls.h"
 #include "osd.h"
+#include "misc.h"
+
+#define REF_HEIGHT 500
+#define REF_WIDTH 500
 
 /*****************************************************************************
  * VLCPlaylistView implementation 
@@ -167,6 +171,64 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [[o_loop_popup itemAtIndex:2] setTitle: _NS("Repeat All")];
 }
 
+- (IBAction)toggleWindow:(id)sender
+{
+    NSRect o_rect;
+    /*First, check if the playlist is visible*/
+    if ( [o_controller frame].size.height == [o_controller minSize].height )
+    {
+        /*Check if the stored heigth of the controller is usable (!= minSize)*/
+        if ([o_controller getSizeWithPlaylist].height !=
+                                        [o_controller minSize].height)
+        {
+            o_rect.size.height = [o_controller getSizeWithPlaylist].height;
+        }
+        else
+        {
+            /*If the stored height is not usable, use a reference one*/
+            o_rect.size.height = REF_HEIGHT;
+        }
+
+        /*Check if the controller width is the minimum one*/
+        if ( [o_controller frame].size.width == [o_controller minSize].width)
+        {
+            /*If the controller width is minimum, check if the stored height
+              of the playlist makes it visible*/
+            if ([o_controller getSizeWithPlaylist].height !=
+                                               [o_controller minSize].height)
+            {
+                o_rect.size.width = [o_controller getSizeWithPlaylist].width;
+            }
+            else
+            {
+                /*If not, use a reference width*/
+                o_rect.size.width = REF_WIDTH;
+            }
+        }
+        else
+        {
+            o_rect.size.width = [o_controller frame].size.width;
+        }
+        o_rect.origin.x = [o_controller frame].origin.x;
+        o_rect.origin.y = [o_controller frame].origin.y - o_rect.size.height +
+                                                [o_controller minSize].height;
+
+        [o_btn_playlist setState: YES];
+    }
+    else
+    {
+        o_rect.size = [o_controller minSize];
+        o_rect.origin.x = [o_controller frame].origin.x;
+        /*Calculate the position of the lower right corner after resize*/
+        o_rect.origin.y = [o_controller frame].origin.y +
+            [o_controller frame].size.height - [o_controller minSize].height;
+
+        [o_btn_playlist setState: NO];
+    }
+
+    [o_controller setFrame: o_rect display:YES animate: YES];
+}
+
 - (void)playlistUpdated
 {
     unsigned int i;
@@ -182,6 +244,19 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     o_tc_sortColumn = nil;
     [o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
+}
+
+- (void)updateTogglePlaylistState
+{
+    if ([o_controller getSizeWithPlaylist].height ==
+                                    [o_controller minSize].height)
+    {
+        [o_btn_playlist setState: NO];
+    }
+    else
+    {
+        [o_btn_playlist setState: YES];
+    }
 }
 
 - (bool)isItem:(playlist_item_t *)p_item inNode:(playlist_item_t *)p_node
@@ -917,11 +992,11 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 }
 
 /* Delegate method of NSWindow */
-- (void)windowWillClose:(NSNotification *)aNotification
+/*- (void)windowWillClose:(NSNotification *)aNotification
 {
     [o_btn_playlist setState: NSOffState];
 }
-
+*/
 @end
 
 

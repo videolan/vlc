@@ -39,12 +39,34 @@
     self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
     backing:backingType defer:flag];
 
+    o_size_with_playlist = [self frame].size;
+
+    [[[VLCMain sharedInstance] getPlaylist] updateTogglePlaylistState];
+
     return( self );
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
     return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
+}
+
+/*Stores the size the controller one resize, to be able to restore it when
+  toggling the playlist*/
+
+- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize
+{
+    o_size_with_playlist = proposedFrameSize;
+
+    /*Callback to update the state of Playlist Toggle Button*/
+    [[[VLCMain sharedInstance] getPlaylist] updateTogglePlaylistState];
+
+    return proposedFrameSize;
+}
+
+- (NSSize)getSizeWithPlaylist
+{
+    return o_size_with_playlist;
 }
 
 @end

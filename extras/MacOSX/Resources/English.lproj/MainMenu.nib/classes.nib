@@ -397,11 +397,13 @@
                 selectAll = id; 
                 sortNodeByAuthor = id; 
                 sortNodeByName = id; 
+                toggleWindow = id; 
             }; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 "o_btn_playlist" = id; 
+                "o_controller" = id; 
                 "o_ctx_menu" = id; 
                 "o_loop_popup" = id; 
                 "o_mi_delete" = id; 

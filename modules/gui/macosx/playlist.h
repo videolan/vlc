@@ -36,6 +36,8 @@
  *****************************************************************************/
 @interface VLCPlaylist : NSObject
 {
+    IBOutlet id o_controller;
+
     IBOutlet id o_btn_playlist;
     IBOutlet id o_outline_view;
     IBOutlet id o_tc_name;
@@ -71,6 +73,7 @@
 - (void)initStrings;
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
+- (void)updateTogglePlaylistState;
 - (void)playlistUpdated;
 - (void)sortNode:(int)i_mode;
 
