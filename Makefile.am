@@ -106,13 +106,13 @@ HEADERS_include_built = \
 	$(NULL)
 
 include/vlc_symbols.h: Makefile $(HEADERS_include)
-	$(srcdir)/toolbox --update-includes
+	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 
 src/misc/modules_plugin.h: Makefile src/misc/modules_plugin.h.in $(HEADERS_include)
-	$(srcdir)/toolbox --update-includes
+	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in
-	$(srcdir)/toolbox --update-includes
+	srcdir=$(srcdir) $(srcdir)/toolbox --update-includes
 
 # These dependencies are mandatory
 $(SOURCES): include/vlc_symbols.h
@@ -208,7 +208,7 @@ EXTRA_DIST += \
 
 dist-hook:
 	mv $(distdir)/vlc.ebuild $(distdir)/vlc-${VERSION}.ebuild
-	cd $(distdir) && $(srcdir)/toolbox --update-vc
+	cd $(distdir) && srcdir=$(srcdir) $(srcdir)/toolbox --update-vc
 
 ###############################################################################
 # Building libvlc
