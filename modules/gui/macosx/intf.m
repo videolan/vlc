@@ -687,6 +687,15 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
+- (id)getInfo
+{
+    if ( o_info )
+    {
+        return o_info;
+    }
+    return  nil;
+}
+
 - (void)manage
 {
     NSDate * o_sleep_date;
@@ -811,7 +820,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
             vlc_object_release( (vlc_object_t *)p_vout );
         }
         [o_playlist updateRowSelection];
-        [o_info updateInfo];
+//        [o_info updateInfo];
 
         p_intf->p_sys->b_current_title_update = FALSE;
     }

@@ -52,10 +52,34 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {showCategory = id; toggleInfoPanel = id; }; 
+            ACTIONS = {
+                createOutlineGroup = id; 
+                deleteOutlineGroup = id; 
+                handleGroup = id; 
+                infoCancel = id; 
+                infoOk = id; 
+                toggleInfoPanel = id; 
+                togglePlaylistInfoPanel = id; 
+            }; 
             CLASS = VLCInfo; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_selector" = id; "o_view" = id; "o_window" = id; }; 
+            OUTLETS = {
+                "o_author_lbl" = id; 
+                "o_author_txt" = id; 
+                "o_btn_add_group" = id; 
+                "o_btn_cancel" = id; 
+                "o_btn_delete_group" = id; 
+                "o_btn_ok" = id; 
+                "o_group_cbx" = id; 
+                "o_group_color" = id; 
+                "o_group_lbl" = id; 
+                "o_info_window" = id; 
+                "o_outline_view" = id; 
+                "o_title_lbl" = id; 
+                "o_title_txt" = id; 
+                "o_uri_lbl" = id; 
+                "o_uri_txt" = id; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {
@@ -96,15 +120,12 @@
                 "o_err_msg" = id; 
                 "o_error" = id; 
                 "o_info" = id; 
-                "o_info_window" = id; 
                 "o_messages" = id; 
                 "o_mi_about" = id; 
                 "o_mi_add_intf" = id; 
                 "o_mi_audiotrack" = id; 
                 "o_mi_bring_atf" = id; 
                 "o_mi_bwd" = id; 
-                "o_mi_bwd1m" = id; 
-                "o_mi_bwd5m" = id; 
                 "o_mi_channels" = id; 
                 "o_mi_chapter" = id; 
                 "o_mi_clear" = id; 
@@ -121,8 +142,6 @@
                 "o_mi_floatontop" = id; 
                 "o_mi_fullscreen" = id; 
                 "o_mi_fwd" = id; 
-                "o_mi_fwd1m" = id; 
-                "o_mi_fwd5m" = id; 
                 "o_mi_half_window" = id; 
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
@@ -368,37 +387,6 @@
                 "o_tc_id" = id; 
                 "o_tc_name" = id; 
                 "o_window" = id; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                createOutlineGroup = id; 
-                deleteOutlineGroup = id; 
-                handleGroup = id; 
-                infoCancel = id; 
-                infoOk = id; 
-                togglePlaylistInfoPanel = id; 
-            }; 
-            CLASS = VLCPlaylistInfo; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_author_lbl" = id; 
-                "o_author_txt" = id; 
-                "o_btn_add_group" = id; 
-                "o_btn_cancel" = id; 
-                "o_btn_delete_group" = id; 
-                "o_btn_ok" = id; 
-                "o_group_cbx" = id; 
-                "o_group_color" = id; 
-                "o_group_lbl" = id; 
-                "o_info_window" = id; 
-                "o_outline_view" = id; 
-                "o_title_lbl" = id; 
-                "o_title_txt" = id; 
-                "o_uri_lbl" = id; 
-                "o_uri_txt" = id; 
-                "o_vlc_playlist" = id; 
             }; 
             SUPERCLASS = NSObject; 
         }, 

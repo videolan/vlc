@@ -2,15 +2,15 @@
  r playlistinfo.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlistinfo.m 7015 2004-03-08 15:22:58Z bigben $
+ * $Id$
  *
- * Authors: Benjmaib Pracht <bigben at videolan dot org>
+ * Authors: Benjamin Pracht <bigben at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -33,7 +33,25 @@
  * VLCPlaylistInfo Implementation
  *****************************************************************************/
 
-@implementation VLCPlaylistInfo
+@implementation VLCInfo
+
+- (id)init
+{
+    self = [super init];
+
+    if( self != nil )
+    {
+        i_item = -1;
+        o_selected = NULL;
+    }
+    return( self );
+}
+
+- (void)dealloc
+{
+    [o_selected release];
+    [super dealloc];
+}
 
 - (void)awakeFromNib
 {
@@ -52,69 +70,99 @@
 
 - (IBAction)togglePlaylistInfoPanel:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist;
-
     if( [o_info_window isVisible] )
     {
         [o_info_window orderOut: sender];
     }
     else
     {
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+        i_item = [[[NSApp delegate] getPlaylist] selectedPlaylistItem];
+        o_selected = [[[NSApp delegate] getPlaylist] selectedPlaylistItemsList];
+        [o_selected retain];
+        [self initPanel:sender];
+    }
+}
+
+- (IBAction)toggleInfoPanel:(id)sender
+{
+    if( [o_info_window isVisible] )
+    {
+        [o_info_window orderOut: sender];
+    }
+    else
+    {
+        intf_thread_t * p_intf = [NSApp getIntf];
+        playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
 
         if (p_playlist)
         {
-            /*fill uri / title / author info */
-            int i_item = [o_vlc_playlist selectedPlaylistItem];
-            [o_uri_txt setStringValue:
-                ([NSString stringWithUTF8String:p_playlist->
-                    pp_items[i_item]->input.psz_uri] == nil ) ?
-                [NSString stringWithCString:p_playlist->
-                    pp_items[i_item]->input.psz_uri] :
-                [NSString stringWithUTF8String:p_playlist->
-                    pp_items[i_item]->input.psz_uri]];
-
-            [o_title_txt setStringValue:
-                ([NSString stringWithUTF8String:p_playlist->
-                    pp_items[i_item]->input.psz_name] == nil ) ?
-                [NSString stringWithCString:p_playlist->
-                    pp_items[i_item]->input.psz_name] :
-                [NSString stringWithUTF8String:p_playlist->
-                    pp_items[i_item]->input.psz_name]];
-
-            [o_author_txt setStringValue:
-                [NSString stringWithUTF8String:playlist_GetInfo
-                (p_playlist, i_item ,_("General"),_("Author") )]];
-
-            [[VLCInfoTreeItem rootItem] refresh];
-            [o_outline_view reloadData];
-
-            [self createComboBox];
-            [self handleGroup:self];
-
-            vlc_object_release( p_playlist );
+            i_item = p_playlist->i_index;
+            o_selected = [NSMutableArray arrayWithObject:
+                            [NSNumber numberWithInt:i_item]];
+            [o_selected retain];
+            vlc_object_release(p_playlist);
         }
-        [o_info_window makeKeyAndOrderFront: sender];
+        [self initPanel:sender];
     }
+}
+
+- (void)initPanel:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist;
+
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+
+
+    if (p_playlist)
+    {
+        /*fill uri / title / author info */
+        [o_uri_txt setStringValue:
+            ([NSString stringWithUTF8String:p_playlist->
+               pp_items[i_item]->input.psz_uri] == nil ) ?
+            [NSString stringWithCString:p_playlist->
+                pp_items[i_item]->input.psz_uri] :
+            [NSString stringWithUTF8String:p_playlist->
+                pp_items[i_item]->input.psz_uri]];
+
+        [o_title_txt setStringValue:
+            ([NSString stringWithUTF8String:p_playlist->
+                pp_items[i_item]->input.psz_name] == nil ) ?
+            [NSString stringWithCString:p_playlist->
+                pp_items[i_item]->input.psz_name] :
+            [NSString stringWithUTF8String:p_playlist->
+                pp_items[i_item]->input.psz_name]];
+
+        [o_author_txt setStringValue:
+            [NSString stringWithUTF8String:playlist_GetInfo
+            (p_playlist, i_item ,_("General"),_("Author") )]];
+
+        [[VLCInfoTreeItem rootItem] refresh];
+        [o_outline_view reloadData];
+
+        [self createComboBox];
+        [self handleGroup:self];
+
+        vlc_object_release( p_playlist );
+    }
+    [o_info_window makeKeyAndOrderFront: sender];
 }
 
 - (IBAction)infoCancel:(id)sender
 {
-    [self togglePlaylistInfoPanel:self];
+    [o_info_window orderOut: self];
 }
 
 
 - (IBAction)infoOk:(id)sender
 {
     int i,i_row,c;
-    int i_item = [o_vlc_playlist selectedPlaylistItem];
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
     vlc_value_t val;
-    NSMutableArray * o_selected = [o_vlc_playlist selectedPlaylistItemsList];
     NSNumber * o_number;
 
 
@@ -164,7 +212,7 @@
         var_Set( p_playlist,"intf-change",val );
         vlc_object_release ( p_playlist );
     }
-    [self togglePlaylistInfoPanel:self];
+    [o_info_window orderOut: self];
 }
 
 - (IBAction)handleGroup:(id)sender
@@ -175,16 +223,16 @@
 
     if (p_playlist)
     {
-        if ([[o_group_cbx stringValue] isEqual: 
+        if ([[o_group_cbx stringValue] isEqual:
                     [o_group_cbx objectValueOfSelectedItem]])
         {
-            [o_group_color setBackgroundColor:[o_vlc_playlist 
+            [o_group_color setBackgroundColor:[[[NSApp delegate] getPlaylist]
                 getColor: p_playlist->pp_groups[
                 [o_group_cbx indexOfSelectedItem]]->i_id]];
         }
         else
         {
-            [o_group_color setBackgroundColor:[o_vlc_playlist 
+            [o_group_color setBackgroundColor:[[[NSApp delegate] getPlaylist]
                 getColor:p_playlist->pp_groups[
                 [o_group_cbx numberOfItems] - 1]->i_id + 1]];
         }
@@ -203,7 +251,7 @@
         if ([[o_group_cbx stringValue] isEqual:
                     [o_group_cbx objectValueOfSelectedItem]])
         {
-            [o_vlc_playlist deleteGroup:p_playlist->pp_groups[
+            [[[NSApp delegate] getPlaylist] deleteGroup:p_playlist->pp_groups[
                     [o_group_cbx indexOfSelectedItem]]->i_id];
             [self createComboBox];
             [self handleGroup:self];
@@ -212,12 +260,12 @@
         else
         {
             msg_Warn(p_playlist,"Group doesn't exist, cannot delete");
-        } 
+        }
     vlc_object_release(p_playlist);
     }
 }
 
-- (IBAction)createOutlineGroup:(id)sender; 
+- (IBAction)createOutlineGroup:(id)sender;
 {
     intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -228,7 +276,7 @@
                     strdup([[o_group_cbx stringValue] cString]));
         [self createComboBox];
         [o_group_cbx reloadData];
-        [o_vlc_playlist playlistUpdated];
+        [[[NSApp delegate] getPlaylist] playlistUpdated];
         vlc_object_release(p_playlist);
     }
 }
@@ -239,7 +287,6 @@
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
     int i;
-    int i_item = [o_vlc_playlist selectedPlaylistItem];
 
     [o_group_cbx removeAllItems];
 
@@ -258,14 +305,42 @@
         }
     vlc_object_release(p_playlist);
     }
-}      
+}
+
+- (int)getItem
+{
+    return i_item;
+}
 
 @end
 
+@implementation VLCInfo (NSMenuValidation)
 
-@implementation VLCPlaylistInfo (NSTableDataSource)
+- (BOOL)validateMenuItem:(NSMenuItem *)o_mi
+{
+    BOOL bEnabled = TRUE;
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item  
+    intf_thread_t * p_intf = [NSApp getIntf];
+    input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                       FIND_ANYWHERE );
+
+    if( [[o_mi title] isEqualToString: _NS("Info")] )
+    {
+        if( p_input == NULL )
+        {
+            bEnabled = FALSE;
+        }
+    }
+    if( p_input ) vlc_object_release( p_input );
+
+    return( bEnabled );
+}
+
+@end
+
+@implementation VLCInfo (NSTableDataSource)
+
+- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     return (item == nil) ? [[VLCInfoTreeItem rootItem] numberOfChildren] : [item numberOfChildren];
 }
@@ -274,7 +349,7 @@
     return ([item numberOfChildren] > 0);
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item  
+- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
     return (item == nil) ? [[VLCInfoTreeItem rootItem] childAtIndex:index] : [item childAtIndex:index];
 }
@@ -291,6 +366,7 @@
     }
 }
 
+
 @end
 
 @implementation VLCInfoTreeItem
@@ -302,15 +378,14 @@ static VLCInfoTreeItem *o_root_item = nil;
 - (id)initWithName: (NSString *)o_item_name value: (NSString *)o_item_value ID: (int)i_id parent:(VLCInfoTreeItem *)o_parent_item
 {
     self = [super init];
- 
+
     if( self != nil )
     {
-
-        i_item = [[[NSApp delegate] getPlaylist] selectedPlaylistItem];
         o_name = [o_item_name copy];
         o_value = [o_item_value copy];
         i_object_id = i_id;
         o_parent = o_parent_item;
+        i_item = [[[NSApp delegate] getInfo] getItem];
     }
     return( self );
 }
@@ -347,12 +422,12 @@ static VLCInfoTreeItem *o_root_item = nil;
                     o_children = [[NSMutableArray alloc] initWithCapacity:p_playlist->pp_items[i_item]->input.i_categories];
                     for (i = 0 ; i<p_playlist->pp_items[i_item]->input.i_categories ; i++)
                     {
-                        [o_children addObject:[[VLCInfoTreeItem alloc] 
+                        [o_children addObject:[[VLCInfoTreeItem alloc]
                             initWithName: [NSString stringWithUTF8String:
                                 p_playlist->pp_items[i_item]->input.
                                 pp_categories[i]->psz_name]
                             value: @""
-                            ID: i 
+                            ID: i
                             parent: self]];
                     }
                 }
@@ -407,19 +482,19 @@ static VLCInfoTreeItem *o_root_item = nil;
     return (i_tmp == IsALeafNode) ? (-1) : (int)[i_tmp count];
 }
 
-- (int)selectedPlaylistItem
+/*- (int)selectedPlaylistItem
 {
-    return i_item; 
+    return i_item;
 }
-
+*/
 - (void)refresh
 {
+    i_item = [[[NSApp delegate] getInfo] getItem];
     if (o_children != NULL)
     {
         [o_children release];
         o_children = NULL;
     }
-    i_item = [[[NSApp delegate] getPlaylist] selectedPlaylistItem];
 }
 
 @end

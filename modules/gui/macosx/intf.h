@@ -239,6 +239,7 @@ struct intf_sys_t
 
 - (id)getControls;
 - (id)getPlaylist;
+- (id)getInfo;
 - (void)terminate;
 
 - (void)initStrings;

@@ -7,8 +7,6 @@ SOURCES_macosx = \
 	controls.m \
 	intf.m \
 	intf.h \
-	info.h \
-	info.m \
 	macosx.m \
 	misc.m \
 	misc.h \
