@@ -2,7 +2,7 @@
  * postprocessing.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: postprocessing.h,v 1.1 2002/08/04 22:13:06 fenrir Exp $
+ * $Id: postprocessing.h,v 1.2 2002/11/10 02:47:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define QT_STORE_T int
+#define QT_STORE_T int8_t
 
 /* postprocessing available using to create i_mode */
 #define PP_DEBLOCK_Y_H 0x00000001

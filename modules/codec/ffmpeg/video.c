@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.3 2002/11/06 21:48:24 gbazin Exp $
+ * $Id: video.c,v 1.4 2002/11/10 02:47:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -354,7 +354,8 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     p_vdec->b_direct_rendering = 0;
 #if LIBAVCODEC_BUILD > 4615
     if( (p_vdec->p_codec->capabilities & CODEC_CAP_DR1)
-        && (p_vdec->p_context->pix_fmt != PIX_FMT_YUV410P) )
+        && (p_vdec->p_context->pix_fmt != PIX_FMT_YUV410P) && 
+        config_GetInt( p_vdec->p_fifo, "ffmpeg-dr" ) )
     {
         msg_Dbg( p_vdec->p_fifo, "using direct rendering" );
         p_vdec->b_direct_rendering = 1;
@@ -448,7 +449,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
             case( CODEC_ID_H263I ):
                 /* Ok we can make postprocessing :)) */
                 /* first try to get a postprocess module */
-#if LIBAVCODEC_BUILD > 4613
+#if LIBAVCODEC_BUILD >= 4633
                 p_vdec->p_pp = vlc_object_create( p_vdec->p_fifo,
                                                   sizeof( postprocessing_t ) );
                 p_vdec->p_pp->psz_object_name = "postprocessing";
@@ -473,9 +474,9 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
                                                 );
 
                     /* allocate table for postprocess */
-                    p_vdec->p_context->quant_store = 
-                        malloc( sizeof( int ) * ( MBR + 1 ) * ( MBC + 1 ) );
-                    p_vdec->p_context->qstride = MBC + 1;
+//                    p_vdec->p_context->quant_store = 
+//                        malloc( sizeof( int ) * ( MBR + 1 ) * ( MBC + 1 ) );
+//                    p_vdec->p_context->qstride = MBC + 1;
                 }
 #else
                 p_vdec->i_pp_mode = 0;
@@ -756,7 +757,8 @@ static void ffmpeg_PostProcPicture( vdec_thread_t *p_vdec, picture_t *p_pic )
     {
         /* Make postproc */
         p_vdec->p_pp->pf_postprocess( p_pic,
-                                      p_vdec->p_context->quant_store, 
+                                      p_vdec->p_context->display_qscale_table,
+//                                      p_vdec->p_context->current_qscale_table,
                                       p_vdec->p_context->qstride,
                                       p_vdec->i_pp_mode );
     }
