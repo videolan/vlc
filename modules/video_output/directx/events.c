@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.3 2002/10/06 19:28:28 gbazin Exp $
+ * $Id: events.c,v 1.4 2002/10/17 16:56:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -65,6 +65,8 @@ void DirectXEventThread( event_thread_t *p_event )
 {
     MSG msg;
     POINT old_mouse_pos;
+    vlc_value_t val;
+    int i_width, i_height, i_x, i_y;
 
     /* Initialisation */
 
@@ -94,6 +96,21 @@ void DirectXEventThread( event_thread_t *p_event )
 
         case WM_NCMOUSEMOVE:
         case WM_MOUSEMOVE:
+            vout_PlacePicture( p_event->p_vout,
+                               p_event->p_vout->p_sys->i_window_width,
+                               p_event->p_vout->p_sys->i_window_height,
+                               &i_x, &i_y, &i_width, &i_height );
+
+            val.i_int = ( GET_X_LPARAM(msg.lParam) - i_x )
+                         * p_event->p_vout->render.i_width / i_width;
+            var_Set( p_event->p_vout, "mouse-x", val );
+            val.i_int = ( GET_Y_LPARAM(msg.lParam) - i_y )
+                         * p_event->p_vout->render.i_height / i_height;
+            var_Set( p_event->p_vout, "mouse-y", val );
+
+            val.b_bool = VLC_TRUE;
+            var_Set( p_event->p_vout, "mouse-moved", val );
+
             if( (abs(GET_X_LPARAM(msg.lParam) - old_mouse_pos.x) > 2 ||
                 (abs(GET_Y_LPARAM(msg.lParam) - old_mouse_pos.y)) > 2 ) )
             {
@@ -124,6 +141,11 @@ void DirectXEventThread( event_thread_t *p_event )
                     vlc_object_release( p_intf );
                 }
             }
+            break;
+
+        case WM_LBUTTONUP:
+            var.b_bool = VLC_TRUE;
+            var_Set( p_event->p_vout, "mouse-clicked", val );
             break;
 
         case WM_LBUTTONDOWN:
