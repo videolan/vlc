@@ -404,7 +404,6 @@ VLC.app: vlc
 	    "$(srcdir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share
-	$(INSTALL) -m 644 $(srcdir)/share/*.rle $(srcdir)/VLC.app/Contents/MacOS/share
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share/http
 	$(INSTALL) -m 644 $(srcdir)/share/http/*.html $(srcdir)/VLC.app/Contents/MacOS/share/http
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/share/http/admin
@@ -528,7 +527,6 @@ package-beos:
 	  cp $(srcdir)/po/$${i}.gmo $(srcdir)/tmp/vlc/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
 	done
 	mkdir -p $(srcdir)/tmp/vlc/share
-	cp $(srcdir)/share/*.rle $(srcdir)/tmp/vlc/share/
 
 # Create package with debug symbols
 	mimeset -f $(srcdir)/tmp/vlc/* $(srcdir)/tmp/vlc/*/*

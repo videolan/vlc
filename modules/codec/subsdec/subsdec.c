@@ -2,7 +2,7 @@
  * subsdec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.1 2003/07/22 20:49:10 hartman Exp $
+ * $Id: subsdec.c,v 1.2 2003/07/22 22:02:44 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -72,6 +72,7 @@ vlc_module_begin();
     set_description( _("file subtitles decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
+    add_category_hint( N_("Subtitles"), NULL, VLC_FALSE );
 
 #if defined(HAVE_ICONV)
     add_string_from_list( "subsdec-encoding", "ISO-8859-1", ppsz_encodings, NULL,
@@ -105,7 +106,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     subsdec_thread_t *    p_subsdec;
-    vout_thread_t *       p_vout_backup = NULL;
 
     /* Allocate the memory needed to store the thread's structure */
     p_subsdec = (subsdec_thread_t *)malloc( sizeof(subsdec_thread_t) );
