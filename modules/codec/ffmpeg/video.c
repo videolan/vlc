@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.56 2003/12/01 09:39:04 fenrir Exp $
+ * $Id: video.c,v 1.57 2003/12/02 10:55:21 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -146,18 +146,26 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
     }
 
-#if LIBAVCODEC_BUILD >= 4687
-    p_dec->fmt_out.video.i_aspect =
-        VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
-            p_context->width / p_context->height );
-#else
-    p_dec->fmt_out.video.i_aspect =
-        VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
-#endif
-    if( p_dec->fmt_out.video.i_aspect == 0 )
+    /* If an aspect-ratio was specified in the input format then force it */
+    if( p_dec->fmt_in.video.i_aspect )
     {
+        p_dec->fmt_out.video.i_aspect = p_dec->fmt_in.video.i_aspect;
+    }
+    else
+    {
+#if LIBAVCODEC_BUILD >= 4687
         p_dec->fmt_out.video.i_aspect =
-            VOUT_ASPECT_FACTOR * p_context->width / p_context->height;
+            VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
+                p_context->width / p_context->height );
+#else
+        p_dec->fmt_out.video.i_aspect =
+            VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
+#endif
+        if( p_dec->fmt_out.video.i_aspect == 0 )
+        {
+            p_dec->fmt_out.video.i_aspect =
+                VOUT_ASPECT_FACTOR * p_context->width / p_context->height;
+        }
     }
 
     p_pic = p_dec->pf_vout_buffer_new( p_dec );

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.44 2003/11/29 17:14:39 fenrir Exp $
+ * $Id: mp4.c,v 1.45 2003/12/02 10:55:21 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1003,49 +1003,41 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
 #undef p_decconfig
 
     /* some last initialisation */
-    /* XXX I create a bitmapinfoheader_t or
-       waveformatex_t for each stream, up to now it's the best thing
-       I've found but it could exist a better solution :) as something
-       like adding some new fields in p_es ...
-
-       XXX I don't set all values, only thoses that are interesting or known
-        --> bitmapinfoheader_t : width and height
-        --> waveformatex_t : channels, samplerate, bitspersample
-        and at the end I add p_decoder_specific_info
-
-        TODO set more values
-
-     */
-
     switch( p_track->fmt.i_cat )
     {
-        case( VIDEO_ES ):
-            p_track->fmt.video.i_width = p_sample->data.p_sample_vide->i_width;
-            p_track->fmt.video.i_height= p_sample->data.p_sample_vide->i_height;
+    case( VIDEO_ES ):
+        p_track->fmt.video.i_width = p_sample->data.p_sample_vide->i_width;
+        p_track->fmt.video.i_height = p_sample->data.p_sample_vide->i_height;
 
-            /* fall on display size */
-            if( p_track->fmt.video.i_width <= 0 )
-            {
-                p_track->fmt.video.i_width = p_track->i_width;
-            }
-            if( p_track->fmt.video.i_height <= 0 )
-            {
-                p_track->fmt.video.i_height = p_track->i_height;
-            }
-            break;
+        /* fall on display size */
+        if( p_track->fmt.video.i_width <= 0 )
+            p_track->fmt.video.i_width = p_track->i_width;
+        if( p_track->fmt.video.i_height <= 0 )
+            p_track->fmt.video.i_height = p_track->i_height;
 
-        case( AUDIO_ES ):
-            p_track->fmt.audio.i_channels = p_sample->data.p_sample_soun->i_channelcount;
-            p_track->fmt.audio.i_rate = p_sample->data.p_sample_soun->i_sampleratehi;
-            p_track->fmt.i_bitrate =p_sample->data.p_sample_soun->i_channelcount *
-                                    p_sample->data.p_sample_soun->i_sampleratehi *
-                                    p_sample->data.p_sample_soun->i_samplesize;
-            p_track->fmt.audio.i_bitspersample = p_sample->data.p_sample_soun->i_samplesize;
-            break;
+        /* Find out apect ratio from display size */
+        if( p_track->i_width > 0 && p_track->i_height > 0 )
+            p_track->fmt.video.i_aspect =
+                VOUT_ASPECT_FACTOR * p_track->i_width / p_track->i_height;
 
-        default:
-            break;
+        break;
+
+    case( AUDIO_ES ):
+        p_track->fmt.audio.i_channels =
+            p_sample->data.p_sample_soun->i_channelcount;
+        p_track->fmt.audio.i_rate =
+            p_sample->data.p_sample_soun->i_sampleratehi;
+        p_track->fmt.i_bitrate = p_sample->data.p_sample_soun->i_channelcount *
+            p_sample->data.p_sample_soun->i_sampleratehi *
+                p_sample->data.p_sample_soun->i_samplesize;
+        p_track->fmt.audio.i_bitspersample =
+            p_sample->data.p_sample_soun->i_samplesize;
+        break;
+
+    default:
+        break;
     }
+
     *pp_es = es_out_Add( p_input->p_es_out, &p_track->fmt );
 
     return VLC_SUCCESS;
