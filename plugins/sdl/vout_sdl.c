@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.91 2002/05/18 17:47:47 sam Exp $
+ * $Id: vout_sdl.c,v 1.91.2.1 2002/06/03 00:28:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -466,16 +466,18 @@ static int vout_Manage( vout_thread_t *p_vout )
                 vout_Seek( -60 );
                 break;
 
-            case SDLK_F10: network_ChannelJoin( 0 ); break;
-            case SDLK_F1:  network_ChannelJoin( 1 ); break;
-            case SDLK_F2:  network_ChannelJoin( 2 ); break;
-            case SDLK_F3:  network_ChannelJoin( 3 ); break;
-            case SDLK_F4:  network_ChannelJoin( 4 ); break;
-            case SDLK_F5:  network_ChannelJoin( 5 ); break;
-            case SDLK_F6:  network_ChannelJoin( 6 ); break;
-            case SDLK_F7:  network_ChannelJoin( 7 ); break;
-            case SDLK_F8:  network_ChannelJoin( 8 ); break;
-            case SDLK_F9:  network_ChannelJoin( 9 ); break;
+            case SDLK_F1: network_ChannelJoin( 1 ); break;
+            case SDLK_F2: network_ChannelJoin( 2 ); break;
+            case SDLK_F3: network_ChannelJoin( 3 ); break;
+            case SDLK_F4: network_ChannelJoin( 4 ); break;
+            case SDLK_F5: network_ChannelJoin( 5 ); break;
+            case SDLK_F6: network_ChannelJoin( 6 ); break;
+            case SDLK_F7: network_ChannelJoin( 7 ); break;
+            case SDLK_F8: network_ChannelJoin( 8 ); break;
+            case SDLK_F9: network_ChannelJoin( 9 ); break;
+            case SDLK_F10: network_ChannelJoin( 10 ); break;
+            case SDLK_F11: network_ChannelJoin( 11 ); break;
+            case SDLK_F12: network_ChannelJoin( 12 ); break;
 
             default:
                 break;

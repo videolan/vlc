@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.66.2.1 2002/06/02 01:22:04 massiot Exp $
+ * $Id: netutils.c,v 1.66.2.2 2002/06/03 00:28:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -75,6 +75,9 @@
 #endif
 
 #include "netutils.h"
+
+#include "stream_control.h"
+#include "input_ext-intf.h"
 
 #include "intf_playlist.h"
 #include "network.h"
@@ -157,6 +160,26 @@ int network_ChannelJoin( int i_channel )
     struct timeval delay;
     fd_set fds;
 
+    if( p_main->p_channel->i_channel == i_channel )
+    {
+        return 0;
+    }
+
+    /* FIXME: ugly hack to close input and outputs */
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        /* end playing item */
+        p_input_bank->pp_input[0]->b_eof = 1;
+
+        /* update playlist */
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+
+        p_main->p_playlist->i_index--;
+        p_main->p_playlist->b_stopped = 1;
+
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    }
+
     if( !config_GetIntVariable( "network-channel" ) )
     {
         intf_ErrMsg( "network: channels disabled, to enable them, use the "
@@ -182,8 +205,7 @@ int network_ChannelJoin( int i_channel )
 
     i_port = config_GetIntVariable( "channel-port" );
 
-    intf_WarnMsg( 5, "channel: connecting to %s:%d",
-                     psz_vlcs, i_port );
+    intf_WarnMsg( 5, "channel: connecting to %s:%d", psz_vlcs, i_port );
 
     /* Prepare the network_socket_t structure */
     socket_desc.i_type = NETWORK_UDP;
@@ -267,6 +289,8 @@ int network_ChannelJoin( int i_channel )
 #   define p_item \
         (&p_main->p_playlist->p_item[ p_main->p_playlist->i_index + 1])
         vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        /* FIXME 2 */
+        p_main->p_playlist->b_stopped = 0;
         if( p_item )
         {
             free( p_item->psz_name );

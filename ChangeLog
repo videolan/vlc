@@ -4,6 +4,11 @@
 
 HEAD
 
+  * ./src/misc/netutils.c: factored code common to the interfaces into the
+    network_ChannelJoin function.
+  * ./plugins/mga/xmga.c, ./plugins/x11/xcommon.c, ./plugins/sdl/vout_sdl.c,
+    ./plugins/directx/vout_events.c: we can now use keys F1 to F12 to switch
+    channels from the video output window.
   * ./plugins/motion/motionmmx.c: MMX motion optimizations courtesy of
     Vladimir Chernyshov <greengrass@writeme.com>.
   * ./plugins/dvdread/dvdread.c: disabled the dvdread plugin because it

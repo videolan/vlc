@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.6.2.5 2002/06/02 22:32:46 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.6.2.6 2002/06/03 00:28:07 sam Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -211,27 +211,8 @@ static Intf_VLCWrapper *o_intf = nil;
     intf_WarnMsg( 3, "intf info: joining channel %d", p_intf->p_sys->i_channel );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        /* end playing item */
-        p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
-        p_main->p_playlist->i_index--;
-        p_main->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-
-        /* FIXME: ugly hack to close input and outputs */
-        p_intf->pf_manage( p_intf );
-    }
 
     network_ChannelJoin( p_intf->p_sys->i_channel );
-
-    /* FIXME 2 */
-    p_main->p_playlist->b_stopped = 0;
     p_intf->pf_manage( p_intf );
 
     vlc_mutex_unlock( &p_intf->change_lock );
@@ -249,27 +230,8 @@ static Intf_VLCWrapper *o_intf = nil;
     intf_WarnMsg( 3, "intf info: joining channel %d", p_intf->p_sys->i_channel );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        /* end playing item */
-        p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
-        p_main->p_playlist->i_index--;
-        p_main->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-
-        /* FIXME: ugly hack to close input and outputs */
-        p_intf->pf_manage( p_intf );
-    }
 
     network_ChannelJoin( p_intf->p_sys->i_channel );
-
-    /* FIXME 2 */
-    p_main->p_playlist->b_stopped = 0;
     p_intf->pf_manage( p_intf );
 
     vlc_mutex_unlock( &p_intf->change_lock );

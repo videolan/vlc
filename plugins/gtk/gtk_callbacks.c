@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.39 2002/05/18 02:12:20 ipkiss Exp $
+ * $Id: gtk_callbacks.c,v 1.39.2.1 2002/06/03 00:28:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -307,27 +307,8 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
     intf_WarnMsg( 3, "intf info: joining channel %d", i_channel );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        /* end playing item */
-        p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
-        p_main->p_playlist->i_index--;
-        p_main->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-
-        /* FIXME: ugly hack to close input and outputs */
-        p_intf->pf_manage( p_intf );
-    }
 
     network_ChannelJoin( i_channel );
-
-    /* FIXME 2 */
-    p_main->p_playlist->b_stopped = 0;
     p_intf->pf_manage( p_intf );
 
     vlc_mutex_unlock( &p_intf->change_lock );
