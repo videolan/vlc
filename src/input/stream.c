@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c,v 1.9 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: stream.c,v 1.10 2004/01/06 21:42:43 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -27,6 +27,7 @@
 
 #include "ninput.h"
 
+#define MAX_LINE 1024
 /****************************************************************************
  * stream_* :
  * XXX for now it's just a wrapper
@@ -256,17 +257,17 @@ int stream_Read( stream_t *s, void *p_data, int i_data )
 
 /**
  * Store in pp_peek a pointer to the next "i_peek" bytes in the stream
- * The return value is the real numbers of valid bytes, if it's less
- * or equal to 0, *pp_peek is invalid.  XXX: it's a pointer to
- * internal buffer and it will be invalid as soons as other stream_*
- * functions are called.  be 0 (then *pp_peek isn't valid).  XXX: due
- * to input limitation, it could be less than i_peek without meaning
+ * \return The real numbers of valid bytes, if it's less
+ * or equal to 0, *pp_peek is invalid.
+ * \note pp_peek is a pointer to internal buffer and it will be invalid as
+ * soons as other stream_* functions are called.
+ * \note Due to input limitation, it could be less than i_peek without meaning
  * the end of the stream (but only when you have i_peek >=
  * p_input->i_bufsize)
  */
-int stream_Peek( stream_t *s, uint8_t **pp_peek, int i_data )
+int stream_Peek( stream_t *s, uint8_t **pp_peek, int i_peek )
 {
-    return input_Peek( s->p_input, pp_peek, i_data );
+    return input_Peek( s->p_input, pp_peek, i_peek );
 }
 
 /**
@@ -289,6 +290,42 @@ block_t *stream_Block( stream_t *s, int i_size )
     }
 
     return p_block;
+}
+
+/**
+ * Read from the stream untill first newline.
+ * \param s Stream handle to read from
+ * \return A null-terminated string. This must be freed,
+ */
+char *stream_ReadLine( stream_t *s )
+{
+    uint8_t *p_data;
+    char    *p_line;
+    int      i_data;
+    int      i = 0;
+    i_data = stream_Peek( s, &p_data, MAX_LINE );
+    msg_Dbg( s->p_input, "i_data %d", i_data );
+    while( i < i_data && p_data[i] != '\n' )
+    {
+        i++;
+    }
+    if( i_data <= 0 )
+    {
+        return NULL;
+    }
+    else
+    {
+        p_line = malloc( i + 1 );
+        if( p_line == NULL )
+        {
+            msg_Err( s->p_input, "Out of memory" );
+            return NULL;
+        }
+        i = stream_Read( s, p_line, i + 1 );
+        p_line[ i - 1 ] = '\0';
+        msg_Dbg( s->p_input, "found %d chars long line", i );
+        return p_line;
+    }
 }
 
 /**

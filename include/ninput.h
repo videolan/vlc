@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.21 2003/11/30 17:29:03 fenrir Exp $
+ * $Id: ninput.h,v 1.22 2004/01/06 21:42:43 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -125,6 +125,7 @@ VLC_EXPORT( int,            stream_vaControl,       ( stream_t *, int i_query, v
 VLC_EXPORT( int,            stream_Control,         ( stream_t *, int i_query, ... ) );
 VLC_EXPORT( int,            stream_Read,            ( stream_t *, void *p_read, int i_read ) );
 VLC_EXPORT( int,            stream_Peek,            ( stream_t *, uint8_t **pp_peek, int i_peek ) );
+VLC_EXPORT( char *,         stream_ReadLine,        ( stream_t * ) );
 VLC_EXPORT( data_packet_t *,stream_DataPacket,      ( stream_t *, int i_size, vlc_bool_t b_force ) );
 VLC_EXPORT( pes_packet_t *, stream_PesPacket,       ( stream_t *, int i_size ) );
 VLC_EXPORT( block_t *,      stream_Block,           ( stream_t *, int i_size ) );
