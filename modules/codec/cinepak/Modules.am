@@ -1,4 +1,0 @@
-SOURCES_cinepak = \
-	cinepak.c \
-	cinepak.h \
-	$(NULL)

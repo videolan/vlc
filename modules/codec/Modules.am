@@ -1,4 +1,5 @@
 SOURCES_a52 = a52.c
+SOURCES_cinepak = cinepak.c
 SOURCES_dts = dts.c
 SOURCES_flacdec = flacdec.c
 SOURCES_lpcm = lpcm.c

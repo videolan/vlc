@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.79 2003/10/01 22:19:57 gbazin Exp $
+dnl $Id: configure.ac,v 1.80 2003/10/02 21:12:45 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -3311,7 +3311,6 @@ AC_OUTPUT([
   modules/codec/a52old/Makefile
   modules/codec/a52old/downmix/Makefile
   modules/codec/a52old/imdct/Makefile
-  modules/codec/cinepak/Makefile
   modules/codec/faad/Makefile
   modules/codec/ffmpeg/Makefile
   modules/codec/ffmpeg/postprocessing/Makefile
