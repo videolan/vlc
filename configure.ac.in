@@ -335,7 +335,8 @@ AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LDFLAGS_vlc="${LDFLAGS_vlc} -ldl")
 AC_CHECK_LIB(m,cos,
   LDFLAGS_imdct="${LDFLAGS_imdct} -lm"
-  LDFLAGS_filter_distort="${LDFLAGS_filter_distort} -lm"
+  LDFLAGS_adjust="${LDFLAGS_adjust} -lm"
+  LDFLAGS_distort="${LDFLAGS_distort} -lm"
   LDFLAGS_a52tofloat32="${LDFLAGS_a52tofloat32} -lm")
 AC_CHECK_LIB(m,pow,
   LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lm"
