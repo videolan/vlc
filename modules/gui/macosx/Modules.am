@@ -1,4 +1,6 @@
 SOURCES_macosx = \
+	modules/gui/macosx/about.h \
+	modules/gui/macosx/about.m \
 	modules/gui/macosx/applescript.h \
 	modules/gui/macosx/applescript.m \
 	modules/gui/macosx/controls.h \

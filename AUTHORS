@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.92 2003/02/27 12:44:01 marcari Exp $
+# $Id: AUTHORS,v 1.93 2003/04/09 20:53:28 hartman Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -148,9 +148,11 @@ D: Gnome and Gtk+ interface enhancements
 S: United Kingdom
 
 N: Derk-Jan Hartman
-E: pjotr@sidekick.student.utwente.nl
+E: thedj@users.sourceforge.net
 C: hartman
 D: Mac OS X interface
+D: Dutch translation
+D: Directory input
 S: Netherlands
 
 N: Gaël Hendryckx

@@ -1,6 +1,19 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {showPanel = id; }; 
+            CLASS = VLAboutBox; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                "o_about_window" = id; 
+                "o_copyright_field" = id; 
+                "o_credits_scrollview" = id; 
+                "o_credits_textview" = id; 
+                "o_name_version_field" = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
         {CLASS = VLBrushedMetalImageView; LANGUAGE = ObjC; SUPERCLASS = NSImageView; }, 
         {CLASS = VLCApplication; LANGUAGE = ObjC; SUPERCLASS = NSApplication; }, 
         {

@@ -466,6 +466,7 @@
 				8EBF3FA803F140A80059A3A7,
 				A0E6B59904407FBD0080DD97,
 				8EDAC3440440F72D0059A3A7,
+				8EE1AFA40444660F0059A3A7,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -506,6 +507,7 @@
 				A064F9E803CB9EE000B21232,
 				A064F9E903CB9EE000B21232,
 				8E88833C03DD6E870059A3A7,
+				8EE1AFA30444660F0059A3A7,
 				F69B0CA602E24F6401A80112,
 				8ED6C29D03E2F32E0059A3A7,
 				8ED6C29E03E2F32E0059A3A7,
@@ -526,6 +528,8 @@
 		};
 		08FB77AFFE84173DC02AAC07 = {
 			children = (
+				8EE1AF9F044465080059A3A7,
+				8EE1AFA0044465080059A3A7,
 				8E6BC6F6041643860059A3A7,
 				8E6BC6F7041643860059A3A7,
 				8ED6C27A03E2EB1C0059A3A7,
@@ -822,6 +826,32 @@
 		};
 		8EDAC3440440F72D0059A3A7 = {
 			fileRef = 8EDAC3430440F72D0059A3A7;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		8EE1AF9F044465080059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = about.h;
+			path = ../../modules/gui/macosx/about.h;
+			refType = 2;
+		};
+		8EE1AFA0044465080059A3A7 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = about.m;
+			path = ../../modules/gui/macosx/about.m;
+			refType = 2;
+		};
+		8EE1AFA30444660F0059A3A7 = {
+			isa = PBXFileReference;
+			name = about_bg.png;
+			path = Resources/about_bg.png;
+			refType = 2;
+		};
+		8EE1AFA40444660F0059A3A7 = {
+			fileRef = 8EE1AFA30444660F0059A3A7;
 			isa = PBXBuildFile;
 			settings = {
 			};

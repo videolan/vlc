@@ -263,6 +263,7 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/slow.png \
 	extras/MacOSX/Resources/stop.png \
 	extras/MacOSX/Resources/vlc_hg.png \
+	extras/MacOSX/Resources/about_bg.png \
 	extras/MacOSX/Resources/vlc.scriptSuite \
 	extras/MacOSX/Resources/README \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
