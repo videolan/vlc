@@ -56,6 +56,7 @@ struct demux_sys_t
 
     /* Packetizer */
     decoder_t *p_packetizer;
+    vlc_meta_t *p_meta;
 };
 
 #define STREAMINFO_SIZE 38
@@ -67,18 +68,33 @@ struct demux_sys_t
 static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
+    module_t    *p_id3;
     demux_sys_t *p_sys;
     int          i_peek;
     byte_t      *p_peek;
     es_format_t  fmt;
+    vlc_meta_t  *p_meta = NULL;
 
+    /* Skip/parse possible id3 header */
+    if( ( p_id3 = module_Need( p_demux, "id3", NULL, 0 ) ) )
+    {
+        p_meta = (vlc_meta_t *)p_demux->p_private;
+        p_demux->p_private = NULL;
+        module_Unneed( p_demux, p_id3 );
+    }
+    
     /* Have a peep at the show. */
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+    {
+        if( p_meta ) vlc_meta_Delete( p_meta );
+        return VLC_EGENERIC;
+    }
 
     if( p_peek[0]!='f' || p_peek[1]!='L' || p_peek[2]!='a' || p_peek[3]!='C' )
     {
         if( strncmp( p_demux->psz_demux, "flac", 4 ) )
         {
+            if( p_meta ) vlc_meta_Delete( p_meta );
             return VLC_EGENERIC;
         }
         /* User forced */
@@ -91,18 +107,21 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
     p_sys->b_start = VLC_TRUE;
+    p_sys->p_meta = p_meta;
 
     /* We need to read and store the STREAMINFO metadata */
     i_peek = stream_Peek( p_demux->s, &p_peek, 8 );
     if( p_peek[4] & 0x7F )
     {
         msg_Err( p_demux, "this isn't a STREAMINFO metadata block" );
+        if( p_meta ) vlc_meta_Delete( p_meta );
         return VLC_EGENERIC;
     }
 
     if( ((p_peek[5]<<16)+(p_peek[6]<<8)+p_peek[7]) != (STREAMINFO_SIZE - 4) )
     {
         msg_Err( p_demux, "invalid size for a STREAMINFO metadata block" );
+        if( p_meta ) vlc_meta_Delete( p_meta );
         return VLC_EGENERIC;
     }
 
@@ -140,6 +159,7 @@ static int Open( vlc_object_t * p_this )
 
         vlc_object_destroy( p_sys->p_packetizer );
         msg_Err( p_demux, "cannot find flac packetizer" );
+        if( p_meta ) vlc_meta_Delete( p_meta );
         return VLC_EGENERIC;
     }
 
@@ -164,7 +184,7 @@ static void Close( vlc_object_t * p_this )
 
     /* Delete the decoder */
     vlc_object_destroy( p_sys->p_packetizer );
-
+    if( p_sys->p_meta ) vlc_meta_Delete( p_sys->p_meta );
     free( p_sys );
 }
 
@@ -221,6 +241,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     /* FIXME bitrate */
     if( i_query == DEMUX_SET_TIME )
         return VLC_EGENERIC;
+    else if( i_query == DEMUX_GET_META )
+    {        
+        vlc_meta_t **pp_meta = (vlc_meta_t **)va_arg( args, vlc_meta_t** );
+        if( p_demux->p_sys->p_meta ) *pp_meta = vlc_meta_Duplicate( p_demux->p_sys->p_meta );
+        else *pp_meta = NULL;
+        return VLC_SUCCESS;
+    }
     else
         return demux2_vaControlHelper( p_demux->s,
                                        0, -1,
