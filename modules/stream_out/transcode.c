@@ -321,7 +321,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->p_out )
     {
         msg_Err( p_stream, "cannot create chain" );
-        free( p_sys );
+        vlc_object_destroy( p_sys );
         return VLC_EGENERIC;
     }
 
