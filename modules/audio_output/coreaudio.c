@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout.m: CoreAudio output plugin
+ * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.29 2003/03/16 20:06:34 jlj Exp $
+ * $Id: coreaudio.c,v 1.1 2003/03/30 23:35:06 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -35,9 +35,7 @@
 
 #include "aout_internal.h"
 
-#include <Carbon/Carbon.h>
-#include <CoreAudio/HostTime.h>
-#include <CoreAudio/AudioHardware.h>
+#include <CoreAudio/CoreAudio.h>
 
 #define A52_FRAME_NB 1536
 
@@ -187,6 +185,9 @@ static void     FreeStreamInfo   ( UInt32 i_dev, aout_instance_t * p_aout,
 static void     InitDeviceVar    ( aout_instance_t * p_aout, int i_option,
                                    vlc_bool_t b_change );
 
+static int      Open             ( vlc_object_t * );
+static void     Close            ( vlc_object_t * );
+
 static void     Play             ( aout_instance_t * p_aout );
 
 static OSStatus IOCallback       ( AudioDeviceID inDevice,
@@ -212,9 +213,22 @@ static OSStatus StreamListener   ( AudioStreamID inStream,
                                    void * inClientData );
 
 /*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+#define ADEV_TEXT N_("audio device")
+
+vlc_module_begin();
+    set_description( _("CoreAudio output") );
+    set_capability( "audio output", 100 );
+    set_callbacks( Open, Close );
+    add_category_hint( N_("Audio"), NULL, VLC_FALSE );
+    add_integer( "coreaudio-dev", -1, NULL, ADEV_TEXT, ADEV_TEXT, VLC_FALSE ); 
+vlc_module_end();
+
+/*****************************************************************************
  * Open: open a CoreAudio HAL device
  *****************************************************************************/
-int E_(OpenAudio)( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     OSStatus err;
     UInt32 i_param_size;
@@ -246,7 +260,7 @@ int E_(OpenAudio)( vlc_object_t * p_this )
 
     if( var_Type( p_aout, "audio-device" ) == 0 )
     {
-        InitDeviceVar( p_aout, config_GetInt( p_aout, "macosx-adev" ),
+        InitDeviceVar( p_aout, config_GetInt( p_aout, "coreaudio-dev" ),
                        VLC_FALSE );
     }
 
@@ -501,9 +515,10 @@ int E_(OpenAudio)( vlc_object_t * p_this )
 /*****************************************************************************
  * Close: close the CoreAudio HAL device
  *****************************************************************************/
-void E_(CloseAudio)( aout_instance_t * p_aout )
+static void Close( vlc_object_t * p_this )
 {
     OSStatus err; 
+    aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     if( p_sys->b_dev_alive )
@@ -581,9 +596,9 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
     if( p_buffer != NULL )
     {
         /* move data into output data buffer */
-        BlockMoveData( p_buffer->p_buffer, 
-                       outOutputData->mBuffers[ 0 ].mData, 
-                       p_sys->i_buffer_size );
+        p_aout->p_vlc->pf_memcpy( outOutputData->mBuffers[ 0 ].mData, 
+                                  p_buffer->p_buffer, 
+                                  p_sys->i_buffer_size );
 
         aout_BufferFree( p_buffer );
     }
@@ -1250,7 +1265,7 @@ static int InitDevice( aout_instance_t * p_aout )
         return( VLC_EGENERIC );
     } 
 
-    config_PutInt( p_aout, "macosx-adev", i_option );
+    config_PutInt( p_aout, "coreaudio-dev", i_option );
 
     p_sys->i_sel_opt = i_option;
     p_sys->devid = p_dev->devid;
@@ -1463,7 +1478,7 @@ static void InitDeviceVar( aout_instance_t * p_aout, int i_option,
         {
             p_sys->i_sel_opt = i;
             var_Set( p_aout, "audio-device", val );
-            config_PutInt( p_aout, "macosx-adev", i_option );
+            config_PutInt( p_aout, "coreaudio-dev", i_option );
         }
     }
 

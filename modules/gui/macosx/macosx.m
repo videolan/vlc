@@ -2,7 +2,7 @@
  * macosx.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.5 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: macosx.m,v 1.6 2003/03/30 23:35:06 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -38,16 +38,12 @@
 int  E_(OpenIntf)     ( vlc_object_t * );
 void E_(CloseIntf)    ( vlc_object_t * );
 
-int  E_(OpenAudio)    ( vlc_object_t * );
-void E_(CloseAudio)   ( vlc_object_t * );
-
 int  E_(OpenVideo)    ( vlc_object_t * );
 void E_(CloseVideo)   ( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADEV_TEXT N_("audio device")
 #define VDEV_TEXT N_("video device")
 
 vlc_module_begin();
@@ -60,10 +56,5 @@ vlc_module_begin();
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
         add_category_hint( N_("Video"), NULL, VLC_FALSE );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_TEXT, VLC_FALSE );
-    add_submodule();
-        set_capability( "audio output", 100 );
-        set_callbacks( E_(OpenAudio), E_(CloseAudio) );
-        add_category_hint( N_("Audio"), NULL, VLC_FALSE );
-        add_integer( "macosx-adev", -1, NULL, ADEV_TEXT, ADEV_TEXT, VLC_FALSE );
 vlc_module_end();
 

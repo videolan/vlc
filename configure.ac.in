@@ -1992,7 +1992,7 @@ dnl
 dnl  freetype module
 dnl
 AC_ARG_ENABLE(freetype,
-  [  --enable-freetype            freetype support (default enabled)])
+  [  --enable-freetype       freetype support (default enabled)])
 if test "x${enable_freetype}" != "xno"
 then
   FREETYPE_PATH="${PATH}"
@@ -2263,6 +2263,22 @@ if test "x${enable_waveout}" != "xno"; then
 fi
 
 dnl
+dnl  CoreAudio plugin
+dnl
+AC_ARG_ENABLE(coreaudio,
+  [  --enable-coreaudio      CoreAudio module (default enabled on MacOS X)])
+if test "x${enable_coreaudio}" != "xno" &&
+  (test "x${SYS}" = "xdarwin" || test "x${enable_coreaudio}" = "xyes")
+then
+  AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
+    [ BUILTINS="${BUILTINS} coreaudio"
+      PLUGINS="${PLUGINS} coreaudio_resampler"
+      LDFLAGS_coreaudio="${LDFLAGS_coreaudio} -framework CoreAudio"
+      LDFLAGS_coreaudio_resampler="${LDFLAGS_coreaudio_resampler} -framework AudioToolbox" ], 
+    [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
+fi
+
+dnl
 dnl  Interface plugins
 dnl
 
@@ -2278,7 +2294,7 @@ dnl
 dnl Skins module
 dnl
 AC_ARG_ENABLE(skins,
-  [  --enable-skins         Win32 skins module (default enabled on Win32)])
+  [  --enable-skins          Win32 skins module (default enabled on Win32)])
 if test "x${enable_skins}" != "xno"; then
   if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
     PLUGINS="${PLUGINS} skins"
@@ -2630,15 +2646,11 @@ AC_ARG_ENABLE(macosx,
   [if test "x${enable_macosx}" = "xyes"
    then
      BUILTINS="${BUILTINS} macosx"
-     PLUGINS="${PLUGINS} coreaudio_resampler"
-     LDFLAGS_macosx="${LDFLAGS_macosx} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC"
-     LDFLAGS_coreaudio_resampler="${LDFLAGS_coreaudio_resampler} -framework AudioToolbox"
+     LDFLAGS_macosx="${LDFLAGS_macosx} -framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
-     PLUGINS="${PLUGINS} coreaudio_resampler"
-     LDFLAGS_macosx="${LDFLAGS_macosx} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC"
-     LDFLAGS_coreaudio_resampler="${LDFLAGS_coreaudio_resampler} -framework AudioToolbox"
+     LDFLAGS_macosx="${LDFLAGS_macosx} -framework IOKit -framework Cocoa -framework Carbon -framework QuickTime -lobjc -ObjC"
    )])
 
 dnl
