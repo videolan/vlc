@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.13 2002/08/29 23:53:22 massiot Exp $
+ * $Id: playlist.c,v 1.14 2002/09/29 18:19:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -62,7 +62,7 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     }
 
     p_playlist->p_input = NULL;
-    p_playlist->i_status = PLAYLIST_RUNNING;
+    p_playlist->i_status = PLAYLIST_STOPPED;
     p_playlist->i_index = -1;
     p_playlist->i_size = 0;
     p_playlist->pp_items = NULL;

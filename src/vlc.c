@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.10 2002/08/20 18:08:51 sam Exp $
+ * $Id: vlc.c,v 1.11 2002/09/29 18:19:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -28,8 +28,11 @@
 #include <stdio.h>                                              /* fprintf() */
 #include <stdlib.h>                                  /* putenv(), strtol(),  */
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
+#include <time.h>                                                  /* time() */
 
 #include <vlc/vlc.h>
+
+#include "config.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -87,7 +90,7 @@ int main( int i_argc, char *ppsz_argv[] )
     }
 
     /* Run libvlc, in non-blocking mode */
-    err = vlc_run();
+    err = vlc_play();
 
     /* Add background interfaces */
 #if 0
@@ -103,7 +106,10 @@ int main( int i_argc, char *ppsz_argv[] )
     /* Add a blocking interface and keep the return value */
     err = vlc_add_intf( NULL, VLC_TRUE );
 
-    /* Finish the threads and destroy the libvlc structure */
+    /* Finish the threads */
+    vlc_stop();
+
+    /* Destroy the libvlc structure */
     vlc_destroy();
 
     return err;
@@ -118,7 +124,7 @@ int main( int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void SigHandler( int i_signal )
 {
-    static mtime_t abort_time = 0;
+    static time_t abort_time = 0;
     static volatile vlc_bool_t b_die = VLC_FALSE;
 
     /* Once a signal has been trapped, the termination sequence will be
@@ -128,7 +134,7 @@ static void SigHandler( int i_signal )
     if( !b_die )
     {
         b_die = VLC_TRUE;
-        abort_time = mdate();
+        abort_time = time( NULL );
 
         fprintf( stderr, "signal %d received, terminating vlc - do it "
                          "again in case it gets stuck\n", i_signal );
@@ -136,9 +142,9 @@ static void SigHandler( int i_signal )
         /* Acknowledge the signal received */
         vlc_die();
     }
-    else if( mdate() > abort_time + 1000000 )
+    else if( time( NULL ) > abort_time + 2 )
     {
-        /* If user asks again 1 second later, die badly */
+        /* If user asks again 1 or 2 seconds later, die badly */
         signal( SIGINT,  SIG_DFL );
         signal( SIGHUP,  SIG_DFL );
         signal( SIGQUIT, SIG_DFL );
@@ -147,7 +153,7 @@ static void SigHandler( int i_signal )
 
         fprintf( stderr, "user insisted too much, dying badly\n" );
 
-        exit( 1 );
+        abort();
     }
 }
 #endif

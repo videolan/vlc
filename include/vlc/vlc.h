@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.13 2002/08/26 23:36:20 sam Exp $
+ * $Id: vlc.h,v 1.14 2002/09/29 18:19:53 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ typedef int        vlc_status_t;
 #define VLC_EMODULE         -2                           /* Module not found */
 #define VLC_ESTATUS         -3                             /* Invalid status */
 #define VLC_ETHREAD         -4                     /* Could not spawn thread */
+#define VLC_EOBJECT         -5                           /* Object not found */
 #define VLC_EEXIT         -255                             /* Program exited */
 #define VLC_EGENERIC      -666                              /* Generic error */
 
@@ -105,13 +106,17 @@ vlc_status_t    vlc_status       ( void );
 
 vlc_error_t     vlc_create       ( void );
 vlc_error_t     vlc_init         ( int, char *[] );
-vlc_error_t     vlc_run          ( void );
 vlc_error_t     vlc_die          ( void );
 vlc_error_t     vlc_destroy      ( void );
 
 vlc_error_t     vlc_set          ( const char *, const char * );
 vlc_error_t     vlc_add_intf     ( const char *, vlc_bool_t );
 vlc_error_t     vlc_add_target   ( const char *, int, int );
+
+vlc_error_t     vlc_play         ( );
+vlc_error_t     vlc_pause        ( );
+vlc_error_t     vlc_stop         ( void );
+vlc_error_t     vlc_fullscreen   ( );
 
 /*****************************************************************************
  * Exported libvlc reentrant API
@@ -120,13 +125,17 @@ vlc_status_t    vlc_status_r     ( vlc_t * );
 
 vlc_t *         vlc_create_r     ( void );
 vlc_error_t     vlc_init_r       ( vlc_t *, int, char *[] );
-vlc_error_t     vlc_run_r        ( vlc_t * );
 vlc_error_t     vlc_die_r        ( vlc_t * );
 vlc_error_t     vlc_destroy_r    ( vlc_t * );
 
 vlc_error_t     vlc_set_r        ( vlc_t *, const char *, const char * );
 vlc_error_t     vlc_add_intf_r   ( vlc_t *, const char *, vlc_bool_t );
 vlc_error_t     vlc_add_target_r ( vlc_t *, const char *, int, int );
+
+vlc_error_t     vlc_play_r       ( vlc_t * );
+vlc_error_t     vlc_pause_r      ( vlc_t * );
+vlc_error_t     vlc_stop_r       ( vlc_t * );
+vlc_error_t     vlc_fullscreen_r ( vlc_t * );
 
 # ifdef __cplusplus
 }

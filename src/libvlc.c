@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.32 2002/09/26 22:40:24 massiot Exp $
+ * $Id: libvlc.c,v 1.33 2002/09/29 18:19:53 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,7 +51,7 @@
 #endif
 
 #ifdef WIN32                       /* optind, getopt(), included in unistd.h */
-#   include "GNUgetopt/getopt.h"
+#   include "extras/GNUgetopt/getopt.h"
 #endif
 
 #ifdef HAVE_LOCALE_H
@@ -306,7 +306,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* Check for short help option */
     if( config_GetInt( p_vlc, "help" ) )
     {
-        fprintf( stderr, _("Usage: %s [options] [parameters] [files]...\n\n"),
+        fprintf( stderr, _("Usage: %s [options] [items]...\n\n"),
                          p_vlc->psz_object_name );
         Usage( p_vlc, "main" );
         Usage( p_vlc, "help" );
@@ -508,34 +508,6 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 }
 
 /*****************************************************************************
- * vlc_run: run vlc
- *****************************************************************************
- * XXX: This function opens an interface plugin and runs it. If b_block is set
- * to 0, vlc_add_intf will return immediately and let the interface run in a
- * separate thread. If b_block is set to 1, vlc_add_intf will continue until
- * user requests to quit.
- *****************************************************************************/
-vlc_error_t vlc_run( void )
-{
-    return vlc_run_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
-}
-
-vlc_error_t vlc_run_r( vlc_t *p_vlc )
-{
-    /* Check that the handle is valid */
-    if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
-    {
-        fprintf( stderr, "error: invalid status (!STOPPED)\n" );
-        return VLC_ESTATUS;
-    }
-
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_RUNNING;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * vlc_add_intf: add an interface
  *****************************************************************************
  * This function opens an interface plugin and runs it. If b_block is set
@@ -614,74 +586,14 @@ vlc_error_t vlc_destroy( void )
 vlc_error_t vlc_destroy_r( vlc_t *p_vlc )
 {
     int               i_index;
-    intf_thread_t *   p_intf;
-    playlist_t    *   p_playlist;
-    vout_thread_t *   p_vout;
-    aout_instance_t * p_aout;
 
     /* Check that the handle is valid */
-    if( !p_vlc || (p_vlc->i_status != VLC_STATUS_RUNNING
-                    && p_vlc->i_status != VLC_STATUS_STOPPED
+    if( !p_vlc || (p_vlc->i_status != VLC_STATUS_STOPPED
                     && p_vlc->i_status != VLC_STATUS_CREATED) )
     {
         fprintf( stderr, "error: invalid status "
-                         "(!RUNNING&&!STOPPED&&!CREATED)\n" );
+                         "(!STOPPED&&!CREATED)\n" );
         return VLC_ESTATUS;
-    }
-
-    if( p_vlc->i_status == VLC_STATUS_RUNNING )
-    {
-        /*
-         * Ask the interfaces to stop and destroy them
-         */
-        msg_Dbg( p_vlc, "removing all interfaces" );
-        while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF,
-                                                 FIND_CHILD )) )
-        {
-            intf_StopThread( p_intf );
-            vlc_object_detach( p_intf );
-            vlc_object_release( p_intf );
-            intf_Destroy( p_intf );
-        }
-
-        /*
-         * Free playlists
-         */
-        msg_Dbg( p_vlc, "removing all playlists" );
-        while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
-                                              FIND_CHILD )) )
-        {
-            vlc_object_detach( p_playlist );
-            vlc_object_release( p_playlist );
-            playlist_Destroy( p_playlist );
-        }
-
-        /*
-         * Free video outputs
-         */
-        msg_Dbg( p_vlc, "removing all video outputs" );
-        while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT,
-                                                 FIND_CHILD )) )
-        {
-            vlc_object_detach( p_vout );
-            vlc_object_release( p_vout );
-            vout_DestroyThread( p_vout );
-        }
-
-        /*
-         * Free audio outputs
-         */
-        msg_Dbg( p_vlc, "removing all audio outputs" );
-        while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT,
-                                                 FIND_CHILD )) )
-        {
-            vlc_object_detach( (vlc_object_t *)p_aout );
-            vlc_object_release( (vlc_object_t *)p_aout );
-            aout_Delete( p_aout );
-        }
-
-        /* Update the handle status */
-        p_vlc->i_status = VLC_STATUS_STOPPED;
     }
 
     if( p_vlc->i_status == VLC_STATUS_STOPPED )
@@ -967,6 +879,178 @@ vlc_error_t vlc_set_r( vlc_t *p_vlc, const char *psz_var, const char *psz_val )
     return VLC_SUCCESS;
 }
 
+/* XXX: temporary hacks */
+
+/*****************************************************************************
+ * vlc_play: play
+ *****************************************************************************/
+vlc_error_t vlc_play( )
+{
+    return vlc_play_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+}
+
+vlc_error_t vlc_play_r( vlc_t *p_vlc )
+{
+    playlist_t * p_playlist;
+
+    /* Check that the handle is valid */
+    if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
+    {
+        fprintf( stderr, "error: invalid status (!STOPPED)\n" );
+        return VLC_ESTATUS;
+    }
+
+    /* Update the handle status */
+    p_vlc->i_status = VLC_STATUS_RUNNING;
+
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
+
+    if( !p_playlist )
+    {
+        return VLC_EOBJECT;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    if( p_playlist->i_size )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        playlist_Play( p_playlist );
+    }
+    else
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+    }
+
+    vlc_object_release( p_playlist );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * vlc_stop: stop
+ *****************************************************************************/
+vlc_error_t vlc_stop( )
+{
+    return vlc_stop_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+}
+
+vlc_error_t vlc_stop_r( vlc_t *p_vlc )
+{
+    intf_thread_t *   p_intf;
+    playlist_t    *   p_playlist;
+    vout_thread_t *   p_vout;
+    aout_instance_t * p_aout;
+
+    /* Check that the handle is valid */
+    if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
+                     && p_vlc->i_status != VLC_STATUS_RUNNING ) )
+    {
+        fprintf( stderr, "error: invalid status (!STOPPED&&!RUNNING)\n" );
+        return VLC_ESTATUS;
+    }
+
+    /*
+     * Ask the interfaces to stop and destroy them
+     */
+    msg_Dbg( p_vlc, "removing all interfaces" );
+    while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_CHILD )) )
+    {
+        intf_StopThread( p_intf );
+        vlc_object_detach( p_intf );
+        vlc_object_release( p_intf );
+        intf_Destroy( p_intf );
+    }
+
+    /*
+     * Free playlists
+     */
+    msg_Dbg( p_vlc, "removing all playlists" );
+    while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
+                                          FIND_CHILD )) )
+    {
+        vlc_object_detach( p_playlist );
+        vlc_object_release( p_playlist );
+        playlist_Destroy( p_playlist );
+    }
+
+    /*
+     * Free video outputs
+     */
+    msg_Dbg( p_vlc, "removing all video outputs" );
+    while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
+    {
+        vlc_object_detach( p_vout );
+        vlc_object_release( p_vout );
+        vout_DestroyThread( p_vout );
+    }
+
+    /*
+     * Free audio outputs
+     */
+    msg_Dbg( p_vlc, "removing all audio outputs" );
+    while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
+    {
+        vlc_object_detach( (vlc_object_t *)p_aout );
+        vlc_object_release( (vlc_object_t *)p_aout );
+        aout_Delete( p_aout );
+    }
+
+    /* Update the handle status */
+    p_vlc->i_status = VLC_STATUS_STOPPED;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * vlc_pause: toggle pause
+ *****************************************************************************/
+vlc_error_t vlc_pause( )
+{
+    return vlc_pause_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+}
+
+vlc_error_t vlc_pause_r( vlc_t *p_vlc )
+{
+    input_thread_t *p_input;
+
+    p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
+
+    if( !p_input )
+    {
+        return VLC_EOBJECT;
+    }
+
+    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+    vlc_object_release( p_input );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * vlc_fullscreen: toggle fullscreen mode
+ *****************************************************************************/
+vlc_error_t vlc_fullscreen( )
+{
+    return vlc_fullscreen_r( ( i_vlc == 1 ) ? pp_vlc[0] : NULL );
+}
+
+vlc_error_t vlc_fullscreen_r( vlc_t *p_vlc )
+{
+    vout_thread_t *p_vout;
+
+    p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD );
+
+    if( !p_vout )
+    {
+        return VLC_EOBJECT;
+    }
+
+    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    vlc_object_release( p_vout );
+
+    return VLC_SUCCESS;
+}
+
 /* following functions are local */
 
 /*****************************************************************************
@@ -982,7 +1066,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
         vlc_add_target_r( p_vlc, ppsz_argv[ i_opt ],
-                          PLAYLIST_APPEND, PLAYLIST_END );
+                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
     }
 
     return VLC_SUCCESS;
@@ -1210,7 +1294,7 @@ static void ListModules( vlc_t *p_this )
 #endif
 
     /* Usage */
-    fprintf( stderr, _("Usage: %s [options] [parameters] [files]...\n\n"),
+    fprintf( stderr, _("Usage: %s [options] [items]...\n\n"),
                      p_this->p_vlc->psz_object_name );
 
     fprintf( stderr, _("[module]              [description]\n") );

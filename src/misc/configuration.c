@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.38 2002/08/20 18:25:42 sam Exp $
+ * $Id: configuration.c,v 1.39 2002/09/29 18:19:53 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -37,7 +37,7 @@
 #       include <getopt.h>                                       /* getopt() */
 #   endif
 #else
-#   include "GNUgetopt/getopt.h"
+#   include "extras/GNUgetopt/getopt.h"
 #endif
 
 #if defined(HAVE_GETPWUID)
