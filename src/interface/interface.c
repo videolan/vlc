@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 #include <sys/uio.h>                                        /* for input.h */
 
 #include "config.h"
@@ -42,32 +44,32 @@ intf_thread_t* intf_Create( void )
     p_intf = malloc( sizeof( intf_thread_t ) );
     if( !p_intf )
     {
-	errno = ENOMEM;
+        intf_ErrMsg("error: %s\n", strerror( ENOMEM ) );        
 	return( NULL );
     }
-    p_intf->b_die = 0;
-    intf_DbgMsg( "0x%x\n", p_intf );
 
     /* Initialize structure */
-    p_intf->p_vout = NULL;
-    p_intf->p_input = NULL;   
+    p_intf->b_die =     0;    
+    p_intf->p_vout =    NULL;
+    p_intf->p_input =   NULL;   
 
     /* Start interfaces */
     p_intf->p_console = intf_ConsoleCreate();
     if( p_intf->p_console == NULL )
     {
-        intf_ErrMsg("intf error: can't create control console\n");
+        intf_ErrMsg("error: can't create control console\n");
 	free( p_intf );
         return( NULL );
     }
     if( intf_SysCreate( p_intf ) )
     {
-	intf_ErrMsg("intf error: can't create interface\n");
+	intf_ErrMsg("error: can't create interface\n");
 	intf_ConsoleDestroy( p_intf->p_console );
 	free( p_intf );
 	return( NULL );
     }   
 
+    intf_Msg("Interface initialized\n");    
     return( p_intf );
 }
 
@@ -78,13 +80,11 @@ intf_thread_t* intf_Create( void )
  *******************************************************************************/
 void intf_Run( intf_thread_t *p_intf )
 { 
-    intf_DbgMsg("0x%x begin\n", p_intf );
-
     /* Execute the initialization script - if a positive number is returned, 
      * the script could be executed but failed */
     if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
     {
-	intf_ErrMsg("intf error: error during initialization script\n");
+	intf_ErrMsg("warning: error(s) during startup script\n");
     }
 
     /* Main loop */
@@ -100,8 +100,6 @@ void intf_Run( intf_thread_t *p_intf )
          * keyboard events, a 100ms delay is a good compromise */
         msleep( INTF_IDLE_SLEEP );
     }
-
-    intf_DbgMsg("0x%x end\n", p_intf );
 }
 
 /*******************************************************************************
@@ -111,8 +109,6 @@ void intf_Run( intf_thread_t *p_intf )
  *******************************************************************************/
 void intf_Destroy( intf_thread_t *p_intf )
 {
-    intf_DbgMsg("0x%x\n", p_intf );
-
     /* Destroy interfaces */
     intf_SysDestroy( p_intf );
     intf_ConsoleDestroy( p_intf->p_console );

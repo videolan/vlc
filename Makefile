@@ -17,7 +17,7 @@
 VIDEO=X11
 #VIDEO=DGA (not yet supported)
 #VIDEO=FB
-#VIDEO=GGI (not yet supported)
+#VIDEO=GGI
 #VIDEO=BEOS (not yet supported)
 
 # Target architecture and optimization
@@ -69,7 +69,9 @@ ifeq ($(VIDEO),X11)
 LIB += -L/usr/X11R6/lib
 LIB += -lX11
 LIB += -lXext 
-LIB += -lXpm
+endif
+ifeq ($(VIDEO),GGI)
+LIB += -lggi
 endif
 
 # System dependant libraries
@@ -265,7 +267,7 @@ vlc: $(C_OBJ) $(ASM_OBJ)
 # Generic rules (see below)
 #
 $(dependancies): %.d: FORCE
-	@make -s --no-print-directory -f Makefile.dep $@
+	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
 $(C_OBJ): %.o: dep/%.d
 

@@ -9,8 +9,10 @@
  * Preamble
  *******************************************************************************/
 #include <stdio.h>
+#include <sys/types.h>
 #include <sys/uio.h>                                                 /* iovec */
 #include <stdlib.h>                               /* atoi(), malloc(), free() */
+#include <sys/socket.h>
 #include <netinet/in.h>
 
 #include "config.h"

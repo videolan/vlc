@@ -25,6 +25,7 @@
  * Preamble
  *******************************************************************************/
 #include "vlc.h"
+#include <sys/stat.h>
 /*??#include <errno.h>
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -33,7 +34,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/soundcard.h>
-#include <sys/stat.h>
 #include <sys/uio.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>

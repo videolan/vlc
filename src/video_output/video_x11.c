@@ -1,10 +1,6 @@
 /*******************************************************************************
  * vout_x11.c: X11 video output display method
  * (c)1998 VideoLAN
- *******************************************************************************
- * The X11 method for video output thread. It's properties (and the vout_x11_t
- * type) are defined in vout.h. The functions declared here should not be
- * needed by any other module than vout.c.
  *******************************************************************************/
 
 /*******************************************************************************
@@ -14,6 +10,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -23,6 +21,7 @@
 #include "common.h"
 #include "mtime.h"
 #include "vlc_thread.h"
+
 #include "video.h"
 #include "video_output.h"
 #include "video_sys.h"
@@ -48,12 +47,6 @@ typedef struct vout_sys_s
     Window              window;                     /* window instance handler */
     GC                  gc;                /* graphic context instance handler */    
 
-    /* Color maps and translation tables - some of those tables are shifted,
-     * see x11.c for more informations. */
-    u8 *                trans_16bpp_red;           /* red (16 bpp) (SHIFTED !) */
-    u8 *                trans_16bpp_green;       /* green (16 bpp) (SHIFTED !) */
-    u8 *                trans_16bpp_blue;         /* blue (16 bpp) (SHIFTED !) */
-
     /* Display buffers and shared memory information */
     int                 i_buffer_index;                        /* buffer index */
     XImage *            p_ximage[2];                         /* XImage pointer */   
@@ -63,83 +56,127 @@ typedef struct vout_sys_s
 /*******************************************************************************
  * Local prototypes
  *******************************************************************************/
-static int  X11GetProperties        ( vout_thread_t *p_vout );
-static int  X11CreateWindow         ( vout_thread_t *p_vout );
-static int  X11CreateImages         ( vout_thread_t *p_vout );
-static void X11DestroyImages        ( vout_thread_t *p_vout );
-static void X11DestroyWindow        ( vout_thread_t *p_vout );
-static int  X11CreateImage          ( vout_thread_t *p_vout, XImage **pp_ximage );
-static void X11DestroyImage         ( XImage *p_ximage );
-static int  X11CreateShmImage       ( vout_thread_t *p_vout, XImage **pp_ximage, 
-                                      XShmSegmentInfo *p_shm_info );
-static void X11DestroyShmImage      ( vout_thread_t *p_vout, XImage *p_ximage, 
-                                      XShmSegmentInfo *p_shm_info );
+static int  X11OpenDisplay      ( vout_thread_t *p_vout, char *psz_display, Window root_window );
+static void X11CloseDisplay     ( vout_thread_t *p_vout );
 
+static int  X11CreateWindow     ( vout_thread_t *p_vout );
+static void X11DestroyWindow    ( vout_thread_t *p_vout );
+static int  X11CreateImage      ( vout_thread_t *p_vout, XImage **pp_ximage );
+static void X11DestroyImage     ( XImage *p_ximage );
+static int  X11CreateShmImage   ( vout_thread_t *p_vout, XImage **pp_ximage, 
+                                  XShmSegmentInfo *p_shm_info );
+static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage, 
+                                  XShmSegmentInfo *p_shm_info );
 
 /*******************************************************************************
  * vout_SysCreate: allocate X11 video thread output method
  *******************************************************************************
- * This function allocate and initialize a X11 vout method.
+ * This function allocate and initialize a X11 vout method. It uses some of the
+ * vout properties to choose the window size, and change them according to the
+ * actual properties of the display.
  *******************************************************************************/
 int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, Window root_window )
 {
+    /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );    
     if( p_vout->p_sys == NULL )
     {   
-        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM) );        
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );        
         return( 1 );        
     }    
 
-    /* Since XLib is usually not thread-safe, we can't use the same display
-     * pointer than the interface or another thread. However, the window
-     * id is still valid */
-    p_vout->p_sys->p_display = XOpenDisplay( psz_display );
-    if( !p_vout->p_sys->p_display )                               /* error */
+    /* Open and initialize device. This function issues its own error messages.
+     * Since XLib is usually not thread-safe, we can't use the same display
+     * pointer than the interface or another thread. However, the root window
+     * id is still valid. */
+    if( X11OpenDisplay( p_vout, psz_display, root_window ) )
     {
-        intf_ErrMsg("vout error: can't open display %s\n", psz_display );
+        intf_ErrMsg("error: can't initialize X11 display\n" );
         free( p_vout->p_sys );
         return( 1 );               
     }
-        
-    p_vout->p_sys->root_window = root_window;
+
     return( 0 );
 }
 
 /*******************************************************************************
  * vout_SysInit: initialize X11 video thread output method
  *******************************************************************************
- * This function create a X11 window according to the user configuration.
+ * This function create the XImages needed by the output thread.
  *******************************************************************************/
 int vout_SysInit( vout_thread_t *p_vout )
-{
-    if( X11GetProperties( p_vout ) )                      /* get display properties */
+{ 
+    int i_err;
+
+    /* Create XImages using XShm extension - on failure, fall back to regular 
+     * way (and destroy the first image if it was created successfully) */
+    if( p_vout->p_sys->b_shm )
     {
-	return( 1 );
+        /* Create first image */
+        i_err = X11CreateShmImage( p_vout, &p_vout->p_sys->p_ximage[0], 
+                                   &p_vout->p_sys->shm_info[0] );
+        if( !i_err )                           /* first image has been created */
+        {
+            /* Create second image */
+            if( X11CreateShmImage( p_vout, &p_vout->p_sys->p_ximage[1], 
+                                   &p_vout->p_sys->shm_info[1] ) )
+            {                               /* error creating the second image */
+                X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[0], 
+                                    &p_vout->p_sys->shm_info[0] );
+                i_err = 1;
+            }
+        }
+        if( i_err )                                        /* an error occured */
+        {                        
+            intf_Msg("warning: XShm video extension desactivated\n" );
+            p_vout->p_sys->b_shm = 0;
+        }
     }
-    if( X11CreateWindow( p_vout ) )                           /* create window */
+
+    /* Create XImages without XShm extension */
+    if( !p_vout->p_sys->b_shm )
     {
-        return( 1 );
+        if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[0] ) )
+        {
+            intf_Msg("error: can't create images\n");
+            p_vout->p_sys->p_ximage[0] = NULL;
+            p_vout->p_sys->p_ximage[1] = NULL;
+            return( 1 );
+        }
+        if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[1] ) )
+        {
+            intf_Msg("error: can't create images\n");
+            X11DestroyImage( p_vout->p_sys->p_ximage[0] );
+            p_vout->p_sys->p_ximage[0] = NULL;
+            p_vout->p_sys->p_ximage[1] = NULL;
+            return( 1 );
+        }
     }
-    if( X11CreateImages( p_vout ) )                           /* create images */
-    {
-        X11DestroyWindow( p_vout );
-        return( 1 );        
-    }
-    intf_Msg("vout: X11 display initialized, depth=%d bpp, Shm=%d\n", 
-             p_vout->i_screen_depth, p_vout->p_sys->b_shm );
+
+    /* Set buffer index to 0 */
+    p_vout->p_sys->i_buffer_index = 0;
     return( 0 );
 }
 
 /*******************************************************************************
  * vout_SysEnd: terminate X11 video thread output method
  *******************************************************************************
- * Terminate an output method created by vout_X11CreateOutputMethod
+ * Destroy the X11 XImages created by vout_SysInit.
  *******************************************************************************/
 void vout_SysEnd( vout_thread_t *p_vout )
 {
-    X11DestroyImages( p_vout );
-    X11DestroyWindow( p_vout );
-    intf_DbgMsg("%p\n", p_vout );
+    if( p_vout->p_sys->b_shm )                              /* Shm XImages... */
+    {
+        X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[0], 
+                            &p_vout->p_sys->shm_info[0] );
+        X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[1], 
+                            &p_vout->p_sys->shm_info[1] );
+    }
+    else                                          /* ...or regular XImages */
+    {
+        X11DestroyImage( p_vout->p_sys->p_ximage[0] );
+        X11DestroyImage( p_vout->p_sys->p_ximage[1] );
+    }
 }
 
 /*******************************************************************************
@@ -149,7 +186,7 @@ void vout_SysEnd( vout_thread_t *p_vout )
  *******************************************************************************/
 void vout_SysDestroy( vout_thread_t *p_vout )
 {
-    XCloseDisplay( p_vout->p_sys->p_display );    
+    X11CloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
@@ -161,8 +198,6 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  * something happened which does not allow the thread to continue, and a 
  * positive one if the thread can go on, but the images have been modified and
  * therefore it is useless to display them.
- *******************************************************************************
- * Messages type: vout, major code: 103
  *******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
@@ -175,19 +210,19 @@ int vout_SysManage( vout_thread_t *p_vout )
 
 
     /* If window has been resized, re-create images */
-    if( b_resized )
+/* ??    if( b_resized )
     {
         intf_DbgMsg("%p -> resizing window\n", p_vout);
         X11DestroyImages( p_vout );
         if( X11CreateImages( p_vout ) )
-        {
+        { */
             /* A fatal error occured: images could not be re-created. Note
              * that in this case, the images pointers will be NULL, so the
              * image destructor will know it does not need to destroy them. */
-            return( -1 );
+/*            return( -1 );
         }
         return( 1 );        
-    }
+    }*/
 
     return( 0 );
 }
@@ -200,7 +235,7 @@ int vout_SysManage( vout_thread_t *p_vout )
  *******************************************************************************/
 void vout_SysDisplay( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->b_shm)                                     /* XShm is used */
+    if( p_vout->p_sys->b_shm)                                  /* XShm is used */
     {
         /* Display rendered image using shared memory extension */
         XShmPutImage(p_vout->p_sys->p_display, p_vout->p_sys->window, p_vout->p_sys->gc, 
@@ -249,20 +284,28 @@ byte_t * vout_SysGetPicture( vout_thread_t *p_vout, int *pi_eol_offset )
 /* following functions are local */
 
 /*******************************************************************************
- * X11GetProperties: get properties of a given display
+ * X11OpenDisplay: open and initialize X11 device 
  *******************************************************************************
- * Opens an X11 display and try to detect usable X extensions.
+ * Create a window according to video output given size, and set other 
+ * properties according to the display properties.
  *******************************************************************************/
-static int X11GetProperties( vout_thread_t *p_vout )
+static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root_window )
 {
-    /* Check if extensions are supported */
-    p_vout->p_sys->b_shm = VOUT_XSHM && (XShmQueryExtension(p_vout->p_sys->p_display) == True);
+    /* Open display */
+    p_vout->p_sys->p_display = XOpenDisplay( psz_display );
+    if( p_vout->p_sys->p_display == NULL )
+    {
+        intf_ErrMsg("error: can't open display %s\n", psz_display );        
+        return( 1 );        
+    }
 
-    /* Get the screen number and depth (bpp) - select functions depending 
-     * of this value. i_bytes_per_pixel is required since on some hardware,
-     * depth as 15bpp are used, which can cause problems with later memory
-     * allocation. */
-    p_vout->p_sys->i_screen =   DefaultScreen( p_vout->p_sys->p_display );
+    /* Initialize structure */
+    p_vout->p_sys->root_window  = root_window;
+    p_vout->p_sys->b_shm        = VOUT_XSHM && 
+        (XShmQueryExtension(p_vout->p_sys->p_display) == True);
+    p_vout->p_sys->i_screen     = DefaultScreen( p_vout->p_sys->p_display );
+
+    /* Get the screen depth */
     p_vout->i_screen_depth = DefaultDepth( p_vout->p_sys->p_display, 
                                            p_vout->p_sys->i_screen );
     switch( p_vout->i_screen_depth )
@@ -271,22 +314,41 @@ static int X11GetProperties( vout_thread_t *p_vout )
     case 16:                                          /* 16 bpp (65536 colors) */
         p_vout->i_bytes_per_pixel = 2;
         break;
-
     case 24:                                    /* 24 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 3;
         break;
-
     case 32:                                    /* 32 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 4;
         break;
-
     default:                                       /* unsupported screen depth */
-        intf_ErrMsg("vout error: screen depth %i is not supported\n", 
-                     p_vout->i_screen_depth);
+        intf_ErrMsg("error: screen depth %d is not supported\n", 
+                    p_vout->i_screen_depth);    
+        XCloseDisplay( p_vout->p_sys->p_display );        
         return( 1  );
         break;
     }
-    return( 0 ); 
+
+    /* Create a window */
+    if( X11CreateWindow( p_vout ) )                           /* create window */
+    {
+        intf_ErrMsg("error: can't open a window\n");        
+        XCloseDisplay( p_vout->p_sys->p_display );        
+        return( 1 );
+    }
+
+    return( 0 );    
+}
+
+/*******************************************************************************
+ * X11CloseDisplay: close X11 device 
+ *******************************************************************************
+ * Returns all resources allocated by X11OpenDisplay and restore the original
+ * state of the display.
+ *******************************************************************************/
+static void X11CloseDisplay( vout_thread_t *p_vout )
+{
+    X11DestroyWindow( p_vout );
+    XCloseDisplay( p_vout->p_sys->p_display );    
 }
 
 /*******************************************************************************
@@ -306,10 +368,9 @@ static int X11CreateWindow( vout_thread_t *p_vout )
     boolean_t               b_map_notify;    
 
     /* Prepare window attributes */
-    xwindow_attributes.backing_store = Always;         /* save the hidden part */  
+    xwindow_attributes.backing_store = Always;         /* save the hidden part */
  
-    /* Create the window and set hints - the window must receive ConfigureNotify
-     * events, and, until it is displayed, Expose and MapNotify events. */
+    /* Create the window and set hints */
     p_vout->p_sys->window = XCreateSimpleWindow( p_vout->p_sys->p_display,
 						 p_vout->p_sys->root_window,
 						 0, 0, 
@@ -349,92 +410,9 @@ static int X11CreateWindow( vout_thread_t *p_vout )
     while( !( b_expose && b_map_notify ) );
     XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->window, 0 );
 
-    /* At this stage, the window is openned, displayed, and ready to receive data */
-    p_vout->b_active = 1;    
+    /* At this stage, the window is openned, displayed, and ready to receive 
+     * data */
     return( 0 );
-}
-
-/*******************************************************************************
- * X11CreateImages: create X11 rendering buffers
- *******************************************************************************
- * Create two XImages which will be used as rendering buffers. On error, non 0
- * will be returned and the images pointer will be set to NULL (see 
- * vout_X11ManageOutputMethod()).
- *******************************************************************************/
-static int X11CreateImages( vout_thread_t *p_vout )
-{
-    int i_err;
-
-    /* Create XImages using XShm extension - on failure, fall back to regular 
-     * way (and destroy the first image if it was created successfully) */
-    if( p_vout->p_sys->b_shm )
-    {
-        /* Create first image */
-        i_err = X11CreateShmImage( p_vout, &p_vout->p_sys->p_ximage[0], 
-                                   &p_vout->p_sys->shm_info[0] );
-        if( !i_err )                           /* first image has been created */
-        {
-            /* Create second image */
-            if( X11CreateShmImage( p_vout, &p_vout->p_sys->p_ximage[1], 
-                                   &p_vout->p_sys->shm_info[1] ) )
-            {                               /* error creating the second image */
-                X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[0], 
-                                    &p_vout->p_sys->shm_info[0] );
-                i_err = 1;
-            }
-        }
-        if( i_err )                                        /* an error occured */
-        {                        
-            intf_Msg("vout: XShm extension desactivated\n" );
-            p_vout->p_sys->b_shm = 0;
-        }
-    }
-
-    /* Create XImages without XShm extension */
-    if( !p_vout->p_sys->b_shm )
-    {
-        if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[0] ) )
-        {
-            intf_Msg("vout error: can't create images\n");
-            p_vout->p_sys->p_ximage[0] = NULL;
-            p_vout->p_sys->p_ximage[1] = NULL;
-            return( -1 );
-        }
-        if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[1] ) )
-        {
-            intf_Msg("vout error: can't create images\n");
-            X11DestroyImage( p_vout->p_sys->p_ximage[0] );
-            p_vout->p_sys->p_ximage[0] = NULL;
-            p_vout->p_sys->p_ximage[1] = NULL;
-            return( -1 );
-        }
-    }
-
-    /* Set buffer index to 0 */
-    p_vout->p_sys->i_buffer_index = 0;
-
-    return( 0 );
-}
-
-/*******************************************************************************
- * X11DestroyImages: destroy X11 rendering buffers
- *******************************************************************************
- * Destroy buffers created by vout_X11CreateImages().
- *******************************************************************************/
-static void X11DestroyImages( vout_thread_t *p_vout )
-{
-    if( p_vout->p_sys->b_shm )                              /* Shm XImages... */
-    {
-        X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[0], 
-                            &p_vout->p_sys->shm_info[0] );
-		X11DestroyShmImage( p_vout, p_vout->p_sys->p_ximage[1], 
-                            &p_vout->p_sys->shm_info[1] );
-	}
-	else                                              /* ...or regular XImages */
-	{
-		X11DestroyImage( p_vout->p_sys->p_ximage[0] );
-		X11DestroyImage( p_vout->p_sys->p_ximage[1] );
-	}
 }
 
 /*******************************************************************************
@@ -444,7 +422,6 @@ static void X11DestroyImages( vout_thread_t *p_vout )
  *******************************************************************************/
 static void X11DestroyWindow( vout_thread_t *p_vout )
 {
-    intf_DbgMsg("vout window: 0x%x\n", p_vout->p_sys->window );
     XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
     XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->gc );
     XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
@@ -464,8 +441,8 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
                                  * p_vout->i_height );
     if( !pb_data )                                                    /* error */
     {
-        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
-        return( -1 );   
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        return( 1 );   
     }
 
     /* Optimize the quantum of a scanline regarding its size - the quantum is
@@ -493,9 +470,9 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
                                p_vout->i_width, p_vout->i_height, i_quantum, 0);
     if(! *pp_ximage )                                                 /* error */
     {
-        intf_ErrMsg( "vout error: can't create XImages\n" );
+        intf_ErrMsg( "error: XCreateImage() failed\n" );
         free( pb_data );
-        return( -1 );
+        return( 1 );
     }
 
     return 0;
@@ -525,8 +502,8 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
                                   p_shm_info, p_vout->i_width, p_vout->i_height );
     if(! *pp_ximage )                                                 /* error */
     {
-        intf_ErrMsg("vout error: can't create XImages with shared memory\n");
-        return( -1 );
+        intf_ErrMsg("error: XShmCreateImage() failed\n");
+        return( 1 );
     }
 
     /* Allocate shared memory segment - 0777 set the access permission
@@ -536,21 +513,21 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
                                 IPC_CREAT | 0777);
     if( p_shm_info->shmid < 0)                                        /* error */
     {
-        intf_ErrMsg("vout error: can't allocate shared image data (%s)\n",
+        intf_ErrMsg("error: can't allocate shared image data (%s)\n",
                     strerror(errno));
         XDestroyImage( *pp_ximage );
-        return( -1 );
+        return( 1 );
     }
 
     /* Attach shared memory segment to process (read/write) */
     p_shm_info->shmaddr = (*pp_ximage)->data = shmat(p_shm_info->shmid, 0, 0);
     if(! p_shm_info->shmaddr )
     {                                                                 /* error */
-        intf_ErrMsg("vout error: can't attach shared memory (%s)\n",
+        intf_ErrMsg("error: can't attach shared memory (%s)\n",
                     strerror(errno));
         shmctl( p_shm_info->shmid, IPC_RMID, 0 );        /* free shared memory */
         XDestroyImage( *pp_ximage );
-        return( -1 );
+        return( 1 );
     }
 
     /* Mark the shm segment to be removed when there will be no more
@@ -561,11 +538,11 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
     p_shm_info->readOnly = True;
     if( XShmAttach( p_vout->p_sys->p_display, p_shm_info ) == False )    /* error */
     {
-        intf_ErrMsg("vout error: can't attach shared memory to X11 server\n");
+        intf_ErrMsg("error: can't attach shared memory to X11 server\n");
         shmdt( p_shm_info->shmaddr );     /* detach shared memory from process
                                            * and automatic free                */
         XDestroyImage( *pp_ximage );
-        return( -1 );
+        return( 1 );
     }
     return( 0 );
 }
@@ -575,8 +552,6 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
  *******************************************************************************
  * Destroy XImage AND associated data. If pointer is NULL, the image won't be
  * destroyed (see vout_X11ManageOutputMethod())
- *******************************************************************************
- * Messages type: vout, major code 114
  *******************************************************************************/
 static void X11DestroyImage( XImage *p_ximage )
 {
@@ -592,8 +567,6 @@ static void X11DestroyImage( XImage *p_ximage )
  * Destroy XImage AND associated data. Detach shared memory segment from
  * server and process, then free it. If pointer is NULL, the image won't be
  * destroyed (see vout_X11ManageOutputMethod()) 
- *******************************************************************************
- * Messages type: vout, major code 115
  *******************************************************************************/
 static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage, 
                                 XShmSegmentInfo *p_shm_info )
@@ -608,10 +581,8 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
     XDestroyImage( p_ximage );
     if( shmdt( p_shm_info->shmaddr ) )    /* detach shared memory from process */
     {                                     /* also automatic freeing...         */
-        intf_ErrMsg("vout error: can't detach shared memory (%s)\n", 
+        intf_ErrMsg("error: can't detach shared memory (%s)\n", 
                     strerror(errno));
     }
 }
-
-/* following functions are local rendering functions */
 

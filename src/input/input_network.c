@@ -8,6 +8,7 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
+#include <sys/types.h>
 #include <sys/uio.h>
 #include <string.h>
 #include <stdio.h>
@@ -17,7 +18,6 @@
 #include <netinet/in.h>                      /* sockaddr_in, htons(), htonl() */
 #include <errno.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include "common.h"

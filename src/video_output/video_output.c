@@ -36,12 +36,12 @@
  * (0 or 255) */
 #define CLIP_BYTE( i_val ) ( (i_val < 0) ? 0 : ((i_val > 255) ? 255 : i_val) )
 
-/* YUV_TRANSFORM_16: parametric macro. Due to the high performance need of this
- * loop, all possible conditions evaluations are made outside the transformation
- * loop. However, the code does not change much for two different loops. This 
- * macro allows to change slightly the content of the loop without having to
- * copy and paste code. It is used in RenderYUVPicture function.
- */
+/* YUV_TRANSFORM: parametric macro for YUV transformation.
+ * Due to the high performance need of this loop, all possible conditions 
+ * evaluations are made outside the transformation loop. However, the code does 
+ * not change much for two different loops. This macro allows to change slightly
+ * the content of the loop without having to copy and paste code. It is used in 
+ * RenderYUVPicture function. */
 #define YUV_TRANSFORM( CHROMA, TRANS_RED, TRANS_GREEN, TRANS_BLUE, P_PIC ) \
 /* Main loop */                                                         \
 for (i_pic_y=0; i_pic_y < p_pic->i_height ; i_pic_y++)                  \
@@ -97,11 +97,10 @@ int matrix_coefficients_table[8][4] =
 /*******************************************************************************
  * Local prototypes
  *******************************************************************************/
-static int      InitThread          ( vout_thread_t *p_vout );
-static void     RunThread           ( vout_thread_t *p_vout );
-static void     ErrorThread         ( vout_thread_t *p_vout );
-static void     EndThread           ( vout_thread_t *p_vout );
-
+static int      InitThread      ( vout_thread_t *p_vout );
+static void     RunThread       ( vout_thread_t *p_vout );
+static void     ErrorThread     ( vout_thread_t *p_vout );
+static void     EndThread       ( vout_thread_t *p_vout );
 static void     RenderPicture   ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderYUVPicture( vout_thread_t *p_vout, picture_t *p_pic );
 
@@ -110,22 +109,12 @@ static void     RenderYUVPicture( vout_thread_t *p_vout, picture_t *p_pic );
  *******************************************************************************
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
- * Following configuration properties are used:
- *  VIDEO_CFG_SIZE      video heap maximal size
- *  VIDEO_CFG_WIDTH     window width
- *  VIDEO_CFG_HEIGHT    window height 
- * Using X11 display method (the only one supported yet):
- *  VIDEO_CFG_DISPLAY   display used
- *  VIDEO_CFG_TITLE     window title
- *  VIDEO_CFG_SHM_EXT   try to use XShm extension
  * If pi_status is NULL, then the function will block until the thread is ready.
- * If not, pi_error will be updated using one of the THREAD_* constants.
+ * If not, it will be updated using one of the THREAD_* constants.
  *******************************************************************************/
 vout_thread_t * vout_CreateThread               ( 
-#if defined(VIDEO_X11)
+#ifdef VIDEO_X11
                                                   char *psz_display, Window root_window, 
-#elif defined(VIDEO_FB)
-                                                  //??
 #endif
                                                   int i_width, int i_height, int *pi_status 
                                                 )
@@ -133,44 +122,66 @@ vout_thread_t * vout_CreateThread               (
     vout_thread_t * p_vout;                               /* thread descriptor */
     int             i_status;                                 /* thread status */
 
-    /* Allocate descriptor and create method */
+    /* Allocate descriptor */
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
-    if( p_vout == NULL )                                              /* error */
+    if( p_vout == NULL )
     {
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM));        
         return( NULL );
     }
-    intf_DbgMsg( "%p\n", p_vout );
+
+    /* Initialize some fields used by the system-dependant method - these fields will
+     * probably be modified by the method */
+    p_vout->i_width             = i_width;
+    p_vout->i_height            = i_height;
+    p_vout->i_screen_depth      = 15;
+    p_vout->i_bytes_per_pixel   = 2;
+    p_vout->f_x_ratio           = 1;
+    p_vout->f_y_ratio           = 1;
+    intf_DbgMsg("wished configuration: %dx%dx%d (%d bytes per pixel), ratio %f:%f\n",
+                p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+                p_vout->i_bytes_per_pixel, p_vout->f_x_ratio, p_vout->f_y_ratio );    
+   
+    /* Create and initialize system-dependant method - this function issues its
+     * own error messages */
     if( vout_SysCreate( p_vout
 #if defined(VIDEO_X11)
                         , psz_display, root_window 
-#elif defined(VIDEO_FB)
-                        //??
 #endif
         ) )
     {
       free( p_vout );
       return( NULL );
     }
+    intf_DbgMsg("actual configuration: %dx%dx%d (%d bytes per pixel), ratio %f:%f\n",
+                p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+                p_vout->i_bytes_per_pixel, p_vout->f_x_ratio, p_vout->f_y_ratio );    
   
-    /* Initialize */
-    p_vout->i_width            = i_width;
-    p_vout->i_height           = i_height;
-    p_vout->pi_status          = (pi_status != NULL) ? pi_status : &i_status;
-    *p_vout->pi_status         = THREAD_CREATE;
-    p_vout->b_die              = 0;
-    p_vout->b_error            = 0;    
-    p_vout->b_active           = 0;
+    /* Terminate the initialization */
+    p_vout->b_die               = 0;
+    p_vout->b_error             = 0;    
+    p_vout->b_active            = 0;
+    p_vout->pi_status           = (pi_status != NULL) ? pi_status : &i_status;
+    *p_vout->pi_status          = THREAD_CREATE;    
+#ifdef STATS
+    p_vout->c_loops             = 0;
+    p_vout->c_idle_loops        = 0;
+    p_vout->c_pictures          = 0;    
+#endif      
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->lock );
     if( vlc_thread_create( &p_vout->thread_id, "video output", 
 			   (void *) RunThread, (void *) p_vout) )
     {
-        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
 	vout_SysDestroy( p_vout );
         free( p_vout );
         return( NULL );
     }   
+
+    intf_Msg("Video: display initialized (%dx%d, %d bpp)\n", 
+             p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth );    
 
     /* If status is NULL, wait until the thread is created */
     if( pi_status == NULL )
@@ -185,7 +196,6 @@ vout_thread_t * vout_CreateThread               (
             return( NULL );            
         }        
     }
-
     return( p_vout );
 }
 
@@ -200,8 +210,6 @@ vout_thread_t * vout_CreateThread               (
 void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 {  
     int     i_status;                                         /* thread status */
-
-    intf_DbgMsg( "%p\n", p_vout );
 
     /* Set status */
     p_vout->pi_status = (pi_status != NULL) ? pi_status : &i_status;
@@ -313,7 +321,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         /* Allocate memory */
         switch( i_type )
         {
-        case YUV_420_PICTURE:           /* YUV picture: 3*16 ?? bits per pixel */
+        case YUV_420_PICTURE:                   /* YUV picture: bits per pixel */
         case YUV_422_PICTURE:
         case YUV_444_PICTURE:
             p_free_picture->p_data = malloc( 3 * i_height * i_bytes_per_line );                
@@ -323,8 +331,9 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
             break;                
 #ifdef DEBUG
         default:
-            intf_DbgMsg("%p error: unknown picture type %d\n", p_vout, i_type );
-            p_free_picture->p_data = NULL;            
+            intf_DbgMsg("unknown picture type %d\n", i_type );
+            p_free_picture->p_data   =  NULL;            
+            break;            
 #endif    
         }
 
@@ -342,10 +351,10 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         else
         {
             /* Memory allocation failed : set picture as empty */
-            p_free_picture->i_type   = EMPTY_PICTURE;            
-            p_free_picture->i_status = FREE_PICTURE;            
-            p_free_picture = NULL;            
-            intf_DbgMsg("%p malloc for new picture failed\n", p_vout );            
+            p_free_picture->i_type   =  EMPTY_PICTURE;            
+            p_free_picture->i_status =  FREE_PICTURE;            
+            p_free_picture =            NULL;            
+            intf_ErrMsg("warning: %s\n", strerror( ENOMEM ) );            
         }
         
         vlc_mutex_unlock( &p_vout->lock );
@@ -353,7 +362,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
     }
     
     // No free or destroyed picture could be found
-    intf_DbgMsg("%p no picture available\n", p_vout );
+    intf_DbgMsg( "heap is full\n" );
     vlc_mutex_unlock( &p_vout->lock );
     return( NULL );
 }
@@ -368,11 +377,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->lock );
-
-    /* Mark picture for destruction */
     p_pic->i_status = DESTROYED_PICTURE;
-    intf_DbgMsg("%p picture %p destroyed\n", p_vout, p_pic );
-
     vlc_mutex_unlock( &p_vout->lock );
 }
 
@@ -423,24 +428,15 @@ static int InitThread( vout_thread_t *p_vout )
     *p_vout->pi_status = THREAD_START;    
     
     /* Initialize pictures */    
+    p_vout->i_pictures = 0;
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
         p_vout->p_picture[i_index].i_type  = EMPTY_PICTURE;
         p_vout->p_picture[i_index].i_status= FREE_PICTURE;
     }
 
-    /* Initialize other properties */
-    p_vout->i_pictures = 0;
-#ifdef STATS
-    p_vout->c_loops = 0;
-    p_vout->c_idle_loops = 0;
-    p_vout->c_pictures = 0;
-    p_vout->c_rendered_pictures = 0;
-#endif
-
-    /* Initialize output method - width, height, screen depth and bytes per 
-     * pixel are initialized by this call. */
-    if( vout_SysInit( p_vout ) )                        /* error */
+    /* Initialize output method - this function issues its own error messages */
+    if( vout_SysInit( p_vout ) )
     {
         *p_vout->pi_status = THREAD_ERROR;        
         return( 1 );
@@ -454,9 +450,17 @@ static int InitThread( vout_thread_t *p_vout )
         break;                
     case 3:                   /* 24 or 32 bpp, use 32 bits translations tables */        
     case 4:
+#ifndef DEBUG
     default:        
+#endif
         i_pixel_size = sizeof( u32 );
-        break;        
+        break;
+#ifdef DEBUG
+    default:
+        intf_DbgMsg("invalid bytes_per_pixel %d\n", p_vout->i_bytes_per_pixel );
+        i_pixel_size = sizeof( u32 );        
+        break;              
+#endif
     }
     p_vout->pi_trans32_red =   (u32 *)p_vout->pi_trans16_red =   
         (u16 *)malloc( 1024 * i_pixel_size );
@@ -468,7 +472,7 @@ static int InitThread( vout_thread_t *p_vout )
         (p_vout->pi_trans16_green == NULL ) ||
         (p_vout->pi_trans16_blue == NULL ) )
     {
-        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
         *p_vout->pi_status = THREAD_ERROR;   
         if( p_vout->pi_trans16_red != NULL )
         {
@@ -521,11 +525,17 @@ static int InitThread( vout_thread_t *p_vout )
             p_vout->pi_trans32_blue[i_index]    =  CLIP_BYTE( i_index ) ;
         }
         break;        
+#ifdef DEBUG
+    default:
+        intf_DbgMsg("invalid screen depth %d\n", p_vout->i_screen_depth );
+        break;      
+#endif
     }
     
     /* Mark thread as running and return */
-    *p_vout->pi_status = THREAD_READY;    
-    intf_DbgMsg("%p -> succeeded\n", p_vout);    
+    p_vout->b_active =          1;    
+    *p_vout->pi_status =        THREAD_READY;    
+    intf_DbgMsg("thread ready");    
     return(0);    
 }
 
@@ -541,15 +551,11 @@ static void RunThread( vout_thread_t *p_vout)
     int             i_picture;                                /* picture index */
     int             i_err;                                       /* error code */
     mtime_t         current_date;                              /* current date */
-    picture_t *     p_pic = NULL;
-#ifdef VOUT_DEBUG
-    char            sz_date[MSTRTIME_MAX_SIZE];                 /* date buffer */
-#endif
+    picture_t *     p_pic = NULL;                           /* picture pointer */    
 
     /* 
      * Initialize thread and free configuration 
      */
-    intf_DbgMsg( "%p begin\n", p_vout );
     p_vout->b_error = InitThread( p_vout );
     if( p_vout->b_error )
     {
@@ -603,7 +609,7 @@ static void RunThread( vout_thread_t *p_vout)
 		    p_pic->i_status = DESTROYED_PICTURE;
 		}
 		vlc_mutex_unlock( &p_vout->lock );
-		intf_ErrMsg( "vout error: picture %p was late - skipped\n", p_pic );
+		intf_ErrMsg( "warning: late picture skipped\n" );
 		p_pic = NULL;
 	    }
 	    else if( p_pic->date > current_date + VOUT_DISPLAY_DELAY )
@@ -683,7 +689,7 @@ static void RunThread( vout_thread_t *p_vout)
 
     /* End of thread */
     EndThread( p_vout );
-    intf_DbgMsg( "%p end\n", p_vout );
+    intf_DbgMsg( "thread end\n" );
 }
 
 /*******************************************************************************
@@ -734,12 +740,11 @@ static void EndThread( vout_thread_t *p_vout )
     
     /* Destroy thread structures allocated by InitThread */
     vout_SysEnd( p_vout );
-    vout_SysDestroy( p_vout );            /* destroy output method */
+    vout_SysDestroy( p_vout );
     free( p_vout );
 
     /* Update status */
     *pi_status = THREAD_OVER;    
-    intf_DbgMsg("%p\n", p_vout);
 }
 
 /*******************************************************************************
@@ -759,18 +764,19 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
     case YUV_444_PICTURE:
         RenderYUVPicture( p_vout, p_pic );        
         break;        
-    }    
-        
-    intf_DbgMsg("%p Picture %p type=%d, %dx%d\n", 
-                p_vout, p_pic, p_pic->i_type, p_pic->i_width, p_pic->i_height );
-    
-    /*???*/
+#ifdef DEBUG
+    default:        
+        intf_DbgMsg("unknown picture type %d\n", p_pic->i_type );
+        break;        
+#endif
+    }
 }
 
 /*******************************************************************************
  * RenderYUVPicture: render a YUV picture
  *******************************************************************************
- * Performs the YUV convertion.
+ * Performs the YUV convertion. The picture sent to this function should only
+ * have YUV_420, YUV_422 or YUV_444 types.
  *******************************************************************************/
 static void RenderYUVPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
@@ -893,6 +899,11 @@ static void RenderYUVPicture( vout_thread_t *p_vout, picture_t *p_pic )
            break;                
         }
         break;
+#ifdef DEBUG
+    default:        
+        intf_DbgMsg("invalid screen depth %d\n", p_vout->i_screen_depth );
+        break;        
+#endif
     }                
 }
 
