@@ -27,7 +27,6 @@
 
 #include "../src/generic_bitmap.hpp"
 #include "../src/generic_font.hpp"
-#include "../src/vout_window.hpp"
 #include "../src/generic_layout.hpp"
 #include "../src/window_manager.hpp"
 #include "../commands/cmd_generic.hpp"
@@ -77,8 +76,6 @@ class Theme: public SkinObject
         list<BezierPtr> m_curves;
         /// Store the variables
         list<VariablePtr> m_vars;
-        /// Store the vout windows
-        list<VoutWindowPtr> m_vouts;
 
     private:
         WindowManager m_windowManager;

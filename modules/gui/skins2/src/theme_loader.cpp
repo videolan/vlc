@@ -28,7 +28,6 @@
 #include "../parser/skin_parser.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/window_manager.hpp"
-#include "../src/vout_window.hpp"
 
 #include <fcntl.h>
 #if !defined( WIN32 )
@@ -89,15 +88,6 @@ bool ThemeLoader::load( const string &fileName )
         pNewTheme->getWindowManager().showAll();
     }
 
-    // XXX show the vout window
-    list<VoutWindowPtr> &vouts = getIntf()->p_sys->p_theme->m_vouts;
-    if (vouts.size() > 0)
-    {
-        VoutWindow *pVout = (vouts.back()).get();
-        // XXX hardcoded
-        pVout->resize(350,220);
-        pVout->show();
-    }
     return true;
 }
 

@@ -43,6 +43,7 @@
 #include "../controls/ctrl_slider.hpp"
 #include "../controls/ctrl_radialslider.hpp"
 #include "../controls/ctrl_text.hpp"
+#include "../controls/ctrl_video.hpp"
 #include "../utils/position.hpp"
 #include "../utils/var_bool.hpp"
 #include "../utils/var_text.hpp"
@@ -562,17 +563,26 @@ void Builder::addList( const BuilderData::List &rData )
 
 void Builder::addVideo( const BuilderData::Video &rData )
 {
-    GenericWindow *pWindow = m_pTheme->m_windows[rData.m_windowId].get();
-    if( pWindow == NULL )
+    GenericLayout *pLayout = m_pTheme->m_layouts[rData.m_layoutId].get();
+    if( pLayout == NULL )
     {
-        msg_Err( getIntf(), "unknown window id: %s", rData.m_windowId.c_str() );
+        msg_Err( getIntf(), "unknown layout id: %s", rData.m_layoutId.c_str() );
         return;
     }
 
-    VoutWindow *pVout = new VoutWindow( getIntf(), rData.m_xPos,
-            rData.m_yPos, m_pTheme->getWindowManager(), false, false,
-            *pWindow );
-    m_pTheme->m_vouts.push_back( VoutWindowPtr( pVout ) );
+    CtrlVideo *pVideo =
+        new CtrlVideo( getIntf(), m_pTheme->getWindowManager(),
+                       UString( getIntf(), rData.m_help.c_str() ), NULL);
+
+    // Compute the position of the control
+    const Position pos = makePosition( rData.m_leftTop, rData.m_rightBottom,
+                                       rData.m_xPos, rData.m_yPos,
+                                       rData.m_width, rData.m_height,
+                                       *pLayout );
+
+    pLayout->addControl( pVideo, pos, rData.m_layer );
+
+    m_pTheme->m_controls[rData.m_id] = CtrlGenericPtr( pVideo );
 }
 
 

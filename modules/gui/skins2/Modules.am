@@ -47,6 +47,8 @@ SOURCES_skins2 = \
 	controls/ctrl_radialslider.hpp \
 	controls/ctrl_text.hpp \
 	controls/ctrl_text.cpp \
+	controls/ctrl_video.cpp \
+	controls/ctrl_video.hpp \
 	\
 	events/evt_enter.hpp \
 	events/evt_generic.hpp \

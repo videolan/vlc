@@ -30,7 +30,6 @@ Theme::~Theme()
     saveConfig();
 
     // Be sure things are destroyed in the right order (XXX check)
-    m_vouts.clear();
     m_layouts.clear();
     m_controls.clear();
     m_windows.clear();

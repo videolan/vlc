@@ -119,14 +119,23 @@
    </Layout>
   </Window>
 
-  <Window x="10" y="10" dragdrop="false">
-    <Layout width="410" height="250">
-      <Group x="0" y="0">
-        <Image x="0" y="0" image="vout" action="move"/>
-        <Video x="15" y="13" width="350" height="220"/>
-      </Group>
+  <Window x="10" y="10" visible="false">
+   <Layout width="410" height="250" minwidth="200" minheight="150" maxwidth="1000" maxheight="800">
+    <Group x="0" y="0">
+      <Image image="playlist1" x="0" y="0" lefttop="lefttop" rightbottom="lefttop" action="move"/>
+      <Image image="playlist2" x="17" y="0" lefttop="lefttop" rightbottom="righttop" action="move"/>
+      <Image image="playlist3" x="350" y="0" lefttop="righttop" rightbottom="righttop" action="move"/>
+      <Image image="playlist4" x="0" y="70" lefttop="lefttop" rightbottom="leftbottom" action="move"/>
+      <Image image="playlist6" x="350" y="70" lefttop="righttop" rightbottom="rightbottom" action="move"/>
+      <Image image="playlist7" x="0" y="200" lefttop="leftbottom" rightbottom="leftbottom" action="move"/>
+      <Image image="playlist8" x="17" y="200" lefttop="leftbottom" rightbottom="rightbottom" action="move"/>
+      <Image image="playlist9" x="350" y="200" lefttop="rightbottom" rightbottom="rightbottom" action="move"/> 
+      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" action="resize"/>
+      <Video x="15" y="13" width="350" height="220" lefttop="lefttop" rightbottom="rightbottom"/>
+    </Group>
    </Layout>
   </Window>
+
 
 </Theme>
 
