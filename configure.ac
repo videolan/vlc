@@ -440,7 +440,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32 x264],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transcode stream_out_transcodealtivec stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol],[-lm])
@@ -1175,7 +1175,7 @@ then
   VLC_ADD_PLUGINS([packetizer_copy])
 
   VLC_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp])
-  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display])
+  VLC_ADD_PLUGINS([stream_out_duplicate stream_out_gather stream_out_display stream_out_transcode])
 #  VLC_ADD_PLUGINS([stream_out_transrate])
 
   dnl Ogg and vorbis are handled in their respective section
@@ -1818,25 +1818,18 @@ then
   then
     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
     AC_CHECK_HEADERS(postproc/postprocess.h)
-    VLC_ADD_PLUGINS([ffmpeg stream_out_transcode])
-    VLC_ADD_CFLAGS([ffmpeg stream_out_transcode],[`${FFMPEG_CONFIG} --cflags`])
+    VLC_ADD_PLUGINS([ffmpeg])
+    VLC_ADD_CFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --cflags`])
     VLC_ADD_LDFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
-    VLC_ADD_LDFLAGS([stream_out_transcode],[`${FFMPEG_CONFIG} --libs avcodec`])
   else
     AC_ARG_WITH(ffmpeg-mp3lame,
       [    --with-ffmpeg-mp3lame   if ffmpeg has been compiled with mp3lame support],
       [
-        dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-        dnl       linker would miserably barf on multiple definitions.
-        VLC_ADD_LDFLAGS([stream_out_transcode],[])
         VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
 
     AC_ARG_WITH(ffmpeg-faac,
       [    --with-ffmpeg-faac      if ffmpeg has been compiled with faac support],
       [
-        dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-        dnl       linker would miserably barf on multiple definitions.
-        VLC_ADD_LDFLAGS([stream_out_transcode],[])
         VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
 
     AC_ARG_WITH(ffmpeg-tree,
@@ -1851,11 +1844,8 @@ then
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
       AC_CHECK_LIB(avcodec, avcodec_init, [
-        VLC_ADD_BUILTINS([ffmpeg stream_out_transcode])
+        VLC_ADD_BUILTINS([ffmpeg])
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
-        dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-        dnl       linker would miserably barf on multiple definitions.
-        VLC_ADD_LDFLAGS([stream_out_transcode],[]) ],
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         AC_DEFINE(HAVE_LIBAVFORMAT, 1,
@@ -1888,7 +1878,7 @@ then
       fi
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-      VLC_ADD_BUILTINS([ffmpeg stream_out_transcode])
+      VLC_ADD_BUILTINS([ffmpeg])
       VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
       VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
 
@@ -1897,11 +1887,6 @@ then
         VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
         VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
       fi
-
-      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-      dnl       linker would miserably barf on multiple definitions.
-      VLC_ADD_LDFLAGS([stream_out_transcode],[-L${real_ffmpeg_tree}/libavcodec])
-      VLC_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
     fi
   fi
 fi
@@ -1933,7 +1918,7 @@ then
     fi
     dnl  Use a custom libffmpeg
     AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a)
-    VLC_ADD_BUILTINS([ffmpegaltivec stream_out_transcodealtivec])
+    VLC_ADD_BUILTINS([ffmpegaltivec])
     VLC_ADD_LDFLAGS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavcodec -lavcodecaltivec])
     VLC_ADD_CPPFLAGS([ffmpeg],[-DNO_ALTIVEC_IN_FFMPEG])
     VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
@@ -1943,12 +1928,6 @@ then
       VLC_ADD_LDFLAGS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavformat -lavformataltivec -lz])
       VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavformat])
     fi
-
-    dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-    dnl       linker would miserably barf on multiple definitions.
-    VLC_ADD_LDFLAGS([stream_out_transcodealtivec],[-L${real_ffmpeg_tree}/libavcodec])
-    VLC_ADD_CPPFLAGS([stream_out_transcode],[-DNO_ALTIVEC_IN_FFMPEG])
-    VLC_ADD_CPPFLAGS([stream_out_transcodealtivec],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
   fi
 fi
 

@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.86 2003/11/20 22:10:55 fenrir Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -129,6 +129,13 @@ struct aout_buffer_t
     mtime_t                 start_date, end_date;
 
     struct aout_buffer_t *  p_next;
+
+    /** Private data (aout_buffer_t will disappear soon so no need for an
+     * aout_buffer_sys_t type) */
+    void * p_sys;
+
+    /** This way the release can be overloaded */
+    void (*pf_release)( aout_buffer_t * );
 };
 
 /* Size of a frame for S/PDIF output. */

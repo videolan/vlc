@@ -51,10 +51,11 @@ struct filter_t
     /* Output format of filter */
     es_format_t         fmt_out;
 
+    picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
+    block_t *           ( * pf_audio_filter ) ( filter_t *, block_t * );
     void                ( * pf_video_blend )  ( filter_t *, picture_t *,
                                                 picture_t *, picture_t *,
                                                 int, int );
-    picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
 
     subpicture_t *      ( *pf_render_string ) ( filter_t *, block_t * );
 
@@ -63,8 +64,7 @@ struct filter_t
      */
 
     /* Audio output callbacks */
-    aout_buffer_t * ( * pf_aout_buffer_new) ( filter_t *, int );
-    void            ( * pf_aout_buffer_del) ( filter_t *, aout_buffer_t * );
+    block_t *       ( * pf_audio_buffer_new) ( filter_t *, int );
 
     /* Video output callbacks */
     picture_t     * ( * pf_vout_buffer_new) ( filter_t * );

@@ -74,6 +74,7 @@ struct block_t
     mtime_t     i_dts;
     mtime_t     i_length;
 
+    int         i_samples; /* Used for audio */
     int         i_rate;
 
     int         i_buffer;

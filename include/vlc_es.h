@@ -74,6 +74,14 @@ struct audio_format_t
     int i_bitspersample;
 };
 
+#ifdef WORDS_BIGENDIAN
+#   define AUDIO_FMT_S16_NE VLC_FOURCC('s','1','6','b')
+#   define AUDIO_FMT_U16_NE VLC_FOURCC('u','1','6','b')
+#else
+#   define AUDIO_FMT_S16_NE VLC_FOURCC('s','1','6','l')
+#   define AUDIO_FMT_U16_NE VLC_FOURCC('u','1','6','l')
+#endif
+
 /**
  * video format description
  */
@@ -202,8 +210,10 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
 
     if( src->video.p_palette )
     {
-        dst->video.p_palette = (video_palette_t*)malloc( sizeof( video_palette_t ) );
-        memcpy( dst->video.p_palette, src->video.p_palette, sizeof( video_palette_t ) );
+        dst->video.p_palette =
+            (video_palette_t*)malloc( sizeof( video_palette_t ) );
+        memcpy( dst->video.p_palette, src->video.p_palette,
+                sizeof( video_palette_t ) );
     }
 }
 
