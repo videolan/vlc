@@ -156,6 +156,7 @@ vlc_module_begin();
     set_capability( "encoder", 100 );
     set_callbacks( OpenEncoder, CloseEncoder );
 
+    add_shortcut( "flac" );
 vlc_module_end();
 
 /*****************************************************************************

@@ -809,6 +809,7 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
         if( avcodec_open( id->ff_dec_c, id->ff_dec ) )
         {
             msg_Err( p_stream, "cannot open decoder" );
+            av_free( id->ff_dec_c );
             return VLC_EGENERIC;
         }
     }
@@ -852,6 +853,7 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
         vlc_object_detach( id->p_encoder );
         vlc_object_destroy( id->p_encoder );
         msg_Err( p_stream, "cannot open encoder" );
+        av_free( id->ff_dec_c );
         return VLC_EGENERIC;
     }
 
@@ -1000,21 +1002,16 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         /* Encode as much data as possible */
         if( !id->b_enc_inited && id->p_encoder->pf_header )
         {
+            block_t *p_block_tmp;
+
             p_block = id->p_encoder->pf_header( id->p_encoder );
-            while( p_block )
+            p_block_tmp = p_block;
+            while( p_block_tmp )
             {
-                block_t *p_out;
-                block_t *p_prev_block = p_block;
-
-                p_out = block_New( p_stream, p_block->i_buffer );
-                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-                p_out->i_dts = p_out->i_pts = in->i_dts;
-                p_out->i_length = 0;
-                block_ChainAppend( out, p_out );
-
-                p_block = p_block->p_next;
-                block_Release( p_prev_block );
+                p_block_tmp->i_dts = p_block_tmp->i_pts = in->i_dts;
+                p_block_tmp = p_block_tmp->p_next;
             }
+            block_ChainAppend( out, p_block );
 
             id->b_enc_inited = VLC_TRUE;
         }
@@ -1118,21 +1115,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, &aout_buf );
-        while( p_block )
-        {
-            block_t *p_out;
-            block_t *p_prev_block = p_block;
-
-            p_out = block_New( p_stream, p_block->i_buffer );
-            memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-            p_out->i_dts = p_block->i_dts;
-            p_out->i_pts = p_block->i_pts;
-            p_out->i_length = p_block->i_length;
-            block_ChainAppend( out, p_out );
-
-            p_block = p_block->p_next;
-            block_Release( p_prev_block );
-        }
+        block_ChainAppend( out, p_block );
     }
 
     return VLC_SUCCESS;
@@ -1253,6 +1236,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         if( avcodec_open( id->ff_dec_c, id->ff_dec ) < 0 )
         {
             msg_Err( p_stream, "cannot open decoder" );
+            av_free( id->ff_dec_c );
             return VLC_EGENERIC;
         }
     }
@@ -1325,6 +1309,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     {
         vlc_object_detach( id->p_encoder );
         vlc_object_destroy( id->p_encoder );
+        av_free( id->ff_dec_c );
         msg_Err( p_stream, "cannot find encoder" );
         return VLC_EGENERIC;
     }
@@ -1349,7 +1334,9 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         if( vlc_thread_create( p_sys, "encoder", EncoderThread,
                                VLC_THREAD_PRIORITY_VIDEO, VLC_FALSE ) )
         {
+            vlc_object_detach( id->p_encoder );
             vlc_object_destroy( id->p_encoder );
+            av_free( id->ff_dec_c );
             msg_Err( p_stream, "cannot spawn encoder thread" );
             return VLC_EGENERIC;
         }
@@ -1557,23 +1544,16 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
             if( id->p_encoder->pf_header )
             {
+                block_t *p_block_tmp;
+
                 p_block = id->p_encoder->pf_header( id->p_encoder );
-                while( p_block )
+                p_block_tmp = p_block;
+                while( p_block_tmp )
                 {
-                    block_t *p_out;
-                    block_t *p_prev_block = p_block;
-
-                    p_out = block_New( p_stream,
-                                            p_block->i_buffer );
-                    memcpy( p_out->p_buffer, p_block->p_buffer,
-                            p_block->i_buffer);
-                    p_out->i_dts = p_out->i_pts = in->i_dts;
-                    p_out->i_length = 0;
-                    block_ChainAppend( out, p_out );
-
-                    p_block = p_block->p_next;
-                    block_Release( p_prev_block );
+                    p_block_tmp->i_dts = p_block_tmp->i_pts = in->i_dts;
+                    p_block_tmp = p_block_tmp->p_next;
                 }
+                block_ChainAppend( out, p_block );
             }
 
             id->i_inter_pixfmt =
@@ -1591,7 +1571,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 uint8_t *buf;
                 id->p_ff_pic_tmp0 = avcodec_alloc_frame();
                 i_size = avpicture_get_size( id->ff_dec_c->pix_fmt,
-                                             id->ff_dec_c->width, id->ff_dec_c->height );
+                                             id->ff_dec_c->width,
+                                             id->ff_dec_c->height );
 
                 buf = malloc( i_size );
 
@@ -1600,8 +1581,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                                 id->ff_dec_c->width, id->ff_dec_c->height );
             }
 
-            avpicture_deinterlace( (AVPicture*)id->p_ff_pic_tmp0, (AVPicture*)frame,
-                                   id->ff_dec_c->pix_fmt,
+            avpicture_deinterlace( (AVPicture*)id->p_ff_pic_tmp0,
+                                   (AVPicture*)frame, id->ff_dec_c->pix_fmt,
                                    id->ff_dec_c->width, id->ff_dec_c->height );
 
 #if LIBAVCODEC_BUILD >= 4685
@@ -1747,10 +1728,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         {
             block_t *p_block;
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
-            if( p_block )
-            {
-                block_ChainAppend( out, p_block );
-            }
+            block_ChainAppend( out, p_block );
             free( p_pic );
         }
 
@@ -1792,10 +1770,7 @@ static int EncoderThread( sout_stream_sys_t * p_sys )
 
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
         vlc_mutex_lock( &p_sys->lock_out );
-        if( p_block )
-        {
-            block_ChainAppend( &p_sys->p_buffers, p_block );
-        }
+        block_ChainAppend( &p_sys->p_buffers, p_block );
         vlc_mutex_unlock( &p_sys->lock_out );
 
         for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
