@@ -989,6 +989,17 @@ then
     ffmpeg_LDFLAGS="${ffmpeg_LDFLAGS} -L${with_ffmpeg}/lib"
   fi
 
+  dnl Add postprocessing modules
+  PLUGINS="${PLUGINS} codec/ffmpeg/postprocessing/postprocessing_c"
+  if test "x${ac_cv_mmx_inline}" != "xno"; then
+    PLUGINS="${PLUGINS} codec/ffmpeg/postprocessing/postprocessing_mmx"
+  fi
+
+  if test "x${ac_cv_mmxext_inline}" != "xno"; then
+    PLUGINS="${PLUGINS} codec/ffmpeg/postprocessing/postprocessing_mmxext"
+  fi
+
+
   AC_ARG_WITH(ffmpeg-tree, 
   [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
   if test "x${with_ffmpeg_tree}" != "x"
