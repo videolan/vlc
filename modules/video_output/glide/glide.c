@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: glide.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -266,7 +266,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     /* disable dithering */
-    //grDitherMode( GR_DITHER_DISABLE );
+    /*grDitherMode( GR_DITHER_DISABLE );*/
 
     /* clear both buffers */
     grRenderBuffer( GR_BUFFER_BACKBUFFER );

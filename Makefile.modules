@@ -29,12 +29,12 @@ builtins_CFLAGS += -D__BUILTIN__ -I$(PARENT)/include -I$(PARENT)/extras
 ifeq (lo,$(suff))
 extra_CFLAGS := $(plugins_CFLAGS) $($(module_name)_CFLAGS) \
                 -DMODULE_NAME=$(module_name) -DMODULE_NAME_IS_$(module_name) \
-                $($(module_name)_so_CFLAGS)
+		-DMODULE_PATH=$(MODULE_PATH) $($(module_name)_so_CFLAGS)
 OBJ_ALL := $(SRC_C:%.c=%.lo.$(module_name)) $(SRC_CPP:%.cpp=%.lo.$(module_name))
 else
 extra_CFLAGS := $(builtins_CFLAGS) $($(module_name)_CFLAGS) \
                 -DMODULE_NAME=$(module_name) -DMODULE_NAME_IS_$(module_name) \
-                $($(module_name)_a_CFLAGS)
+		-DMODULE_PATH=$(MODULE_PATH) $($(module_name)_a_CFLAGS)
 OBJ_ALL := $(SRC_C:%.c=%.o.$(module_name)) $(SRC_CPP:%.cpp=%.o.$(module_name)) \
 		$(SRC_M:%.m=%.o.$(module_name))
 endif

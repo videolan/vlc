@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -305,9 +305,11 @@ void GtkNetworkJoin( GtkEditable * editable, gpointer user_data )
     int     i_channel;
 
     i_channel = gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( editable ) );
-//    msg_Dbg( "intf info: joining channel %d", i_channel );
+#if 0
+    msg_Dbg( "intf info: joining channel %d", i_channel );
 
-//    network_ChannelJoin( i_channel );
+    network_ChannelJoin( i_channel );
+#endif
 }
 
 void GtkChannelGo( GtkButton * button, gpointer user_data )
@@ -329,7 +331,7 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
     network_ChannelJoin( p_intf, i_channel );
     vlc_mutex_unlock( &p_intf->change_lock );
 
-//    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+/*    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY ); */
 }
 
 

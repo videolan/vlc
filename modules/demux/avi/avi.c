@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: avi.c,v 1.3 2002/08/08 22:28:22 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -372,7 +372,7 @@ static int AVI_SeekAbsolute( input_thread_t *p_input,
     i_filepos = AVI_TellAbsolute( p_input );
     if( i_pos != i_filepos )
     {
-//        msg_Err( p_input, "Seek --> delta %d", i_pos - i_filepos );
+/*        msg_Err( p_input, "Seek --> delta %d", i_pos - i_filepos );*/
         p_input->pf_seek( p_input, i_pos );
         input_AccessReinit( p_input );
     }
@@ -1207,7 +1207,7 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
         * because invalid index
         * or will find ck_other before ck_info 
     */
-//    msg_Warn( p_input, "method %d", i_method ); 
+/*    msg_Warn( p_input, "method %d", i_method ); */
     /* we will calculate the better position we have to reach */
     if( i_method == 1 )
     {
@@ -1273,7 +1273,7 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
         {
             return( 0 );
         }
-//        msg_Dbg( p_input, "ck: %4.4s len %d", &p_ck->i_id, p_ck->i_size );
+/*        msg_Dbg( p_input, "ck: %4.4s len %d", &p_ck->i_id, p_ck->i_size ); */
         /* special case for LIST-rec chunk */
         if( ( p_ck->i_id == FOURCC_LIST )&&( p_ck->i_type == FOURCC_rec ) )
         {
@@ -2007,7 +2007,7 @@ static int AVIDemux_NotSeekable( input_thread_t *p_input,
                 msg_Err( p_input, "Badd" );
                 return( 0 ); /* assume EOF */
             }
-            //msg_Err( p_input,"Looking ck: %4.4s %d",&p_ck->i_id, p_ck->i_size );
+            /*msg_Err( p_input,"Looking ck: %4.4s %d",&p_ck->i_id, p_ck->i_size );*/
 
             switch( __AVIDemux_ChunkAction( p_avi->i_streams, p_ck ) )
             {

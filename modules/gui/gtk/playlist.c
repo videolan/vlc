@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: playlist.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: playlist.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -392,7 +392,7 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
     gchar *     p_protocol;
     gchar *     p_temp;
     gchar *     p_next;
-    gchar *     p_string = p_data->data ;
+    gchar *     p_string = (gchar *)p_data->data;
     GList *     p_files = NULL;
     GtkCList *  p_clist;
 
@@ -512,7 +512,7 @@ void GtkDeleteGListItem( gpointer data, gpointer param )
 
 gint GtkCompareItems( gconstpointer a, gconstpointer b )
 {
-    return b - a;
+    return (ptrdiff_t) ( (int *)b - (int *)a );
 }
 
 

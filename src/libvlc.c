@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.22 2002/08/08 00:35:11 sam Exp $
+ * $Id: libvlc.c,v 1.23 2002/08/08 22:28:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -27,6 +27,7 @@
  * Pretend we are a builtin module
  *****************************************************************************/
 #define MODULE_NAME main
+#define MODULE_PATH main
 #define __BUILTIN__
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
+ * $Id: file.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>

@@ -2,7 +2,7 @@
  * vlcplugin.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.c,v 1.3 2002/07/20 18:01:42 sam Exp $
+ * $Id: vlcplugin.c,v 1.4 2002/08/08 22:28:23 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -95,12 +95,12 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 
     char *ppsz_foo[] =
     {
-        "vlc",
-        //"--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins",
-        "--vout", "xvideo,x11,dummy",
-        "--intf", "dummy",
-        "--noaudio",
-        //"-v"
+        "vlc"
+        /*, "--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins"*/
+        , "--vout", "xvideo,x11,dummy"
+        , "--intf", "dummy"
+        , "--noaudio"
+        /*, "-v"*/
     };
 
     fprintf(stderr, "NPP_New\n");
@@ -159,7 +159,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         }
         else
         {
-            //__config_PutPsz( This->psz_target, argn[i], argv[i] );
+            /*__config_PutPsz( This->psz_target, argn[i], argv[i] );*/
         }
     }
 
@@ -310,12 +310,12 @@ int32 NPP_WriteReady( NPP instance, NPStream *stream )
         This = (PluginInstance*) instance->pdata;
         /* Muahahahahahahaha */
         return STREAMBUFSIZE;
-        //return SARASS_SIZE;
+        /*return SARASS_SIZE;*/
     }
 
     /* Number of bytes ready to accept in NPP_Write() */
     return STREAMBUFSIZE;
-    //return 0;
+    /*return 0;*/
 }
 
 
@@ -326,7 +326,7 @@ int32 NPP_Write( NPP instance, NPStream *stream, int32 offset,
 
     if (instance != NULL)
     {
-        //PluginInstance* This = (PluginInstance*) instance->pdata;
+        /*PluginInstance* This = (PluginInstance*) instance->pdata;*/
     }
 
     return len;		/* The number of bytes accepted */

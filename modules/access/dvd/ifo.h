@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ifo.h,v 1.2 2002/08/08 00:35:10 sam Exp $
+ * $Id: ifo.h,v 1.3 2002/08/08 22:28:22 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -276,7 +276,7 @@ typedef struct vobu_map_s
  */ 
 typedef struct manager_inf_s
 {
-    char            psz_id[13];                 /* 12 bytes (DVDVIDEO-VMG) */
+    byte_t          psz_id[13];                 /* 12 bytes (DVDVIDEO-VMG) */
     u32             i_vmg_end_sector;                  /* 4 bytes */
 /*    char[12]        ??? */
     u32             i_vmg_inf_end_sector;                /* 4 bytes */
@@ -288,7 +288,7 @@ typedef struct manager_inf_s
     u8              i_disc_side;                /* 1 bytes */
 /*    char[20]        ??? */
     u16             i_title_set_nb;                   /* 2 bytes */
-    char            ps_provider_id[32];         /* 32 bytes */
+    byte_t          ps_provider_id[32];         /* 32 bytes */
     u64             i_pos_code;                 /* 8 bytes */
 /*    char[24]        ??? */
     u32             i_vmg_inf_end_byte;              /* 4 bytes */
@@ -345,7 +345,7 @@ typedef struct title_inf_s
  */
 typedef struct parental_desc_s
 {
-    char            ps_country_code[2];         /* 2 bytes */
+    byte_t          ps_country_code[2];         /* 2 bytes */
 /*    char[2]         ??? */
     u16             i_parental_mask_start_byte;            /* 2 bytes */
 /*    char[2]         ??? */
@@ -429,7 +429,7 @@ typedef struct vmg_s
  */ 
 typedef struct vts_manager_s
 {
-    char            psz_id[13];                 /* 12 bytes (DVDVIDEO-VTS) */
+    byte_t          psz_id[13];                 /* 12 bytes (DVDVIDEO-VTS) */
     u32             i_last_sector;              /* 4 bytes */
 /*    char[12]        ??? */
     u32             i_inf_last_sector;          /* 4 bytes */

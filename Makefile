@@ -187,11 +187,16 @@ endif
 plugins-install:
 	mkdir -p $(DESTDIR)$(libdir)/vlc
 ifneq (,$(PLUGINS))
-	$(INSTALL) $(PLUGINS:%=modules/%.so) $(DESTDIR)$(libdir)/vlc
+	for plugin in $(PLUGINS) ; \
+		do dir=`echo $$plugin | sed -e 's@/[^ ]*@@g'` ; \
+		mkdir -p $(DESTDIR)$(libdir)/vlc/$$dir ; \
+		cp modules/$${plugin}.so $(DESTDIR)$(libdir)/vlc/$$dir ; \
+	done
 endif
 
 plugins-uninstall:
-	rm -f $(DESTDIR)$(libdir)/vlc/*.so
+	rm -f $(DESTDIR)$(libdir)/vlc/*/*.so
+	-rmdir $(DESTDIR)$(libdir)/vlc/*
 	-rmdir $(DESTDIR)$(libdir)/vlc
 
 builtins-install:
@@ -405,7 +410,7 @@ src/misc/modules_builtin.h: Makefile.opts Makefile Makefile.config
 	@rm -f $@ && cp $@.in $@
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
-		echo "int vlc_entry__"`basename $$i`"( module_t* );" >>$@; \
+		echo "int vlc_entry__modules_"`echo $$i | sed -e 'y@/@_@ ; s@\..*@@'`"( module_t* );" >>$@; \
 	done
 	@echo "" >> $@ ;
 endif
@@ -414,7 +419,7 @@ endif
 	@echo "    { \\" >> $@ ;
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
-		echo "        ALLOCATE_BUILTIN("`basename $$i`"); \\" >> $@ ; \
+		echo "        ALLOCATE_BUILTIN(modules_"`echo $$i | sed -e 'y@/@_@ ; s@\..*@@'`"); \\" >> $@ ; \
 	done
 endif
 	@echo "    } while( 0 );" >> $@ ;
@@ -479,7 +484,7 @@ builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
 
 modules/%.a modules/%.so: $(H_OBJ) FORCE
-	@cd $(shell echo $@ | sed -e 's@\(.*\)/.*@\1@') && $(MAKE) -f $(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@')/Makefile.modules $(shell echo $@ | sed -e 's@.*/@@') PARENT=$(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@')
+	cd $(shell echo $@ | sed -e 's@\(.*\)/.*@\1@') && $(MAKE) -f $(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@')/Makefile.modules $(shell echo $@ | sed -e 's@.*/@@') PARENT=$(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@') MODULE_PATH=$(shell echo $@ | sed -e 'y@/@_@ ; s@\..*@@')
 
 #
 # Mozilla plugin target

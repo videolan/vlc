@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: idctmmx.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: idctmmx.c,v 1.3 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -209,10 +209,10 @@ static inline void Col( dctelem_t * col, int offset )
 #define T3 43790
 #define C4 23170
 
-    static short _T1[] ATTR_ALIGN(8) = {T1,T1,T1,T1};
-    static short _T2[] ATTR_ALIGN(8) = {T2,T2,T2,T2};
-    static short _T3[] ATTR_ALIGN(8) = {T3,T3,T3,T3};
-    static short _C4[] ATTR_ALIGN(8) = {C4,C4,C4,C4};
+    static unsigned short _T1[] ATTR_ALIGN(8) = {T1,T1,T1,T1};
+    static unsigned short _T2[] ATTR_ALIGN(8) = {T2,T2,T2,T2};
+    static unsigned short _T3[] ATTR_ALIGN(8) = {T3,T3,T3,T3};
+    static unsigned short _C4[] ATTR_ALIGN(8) = {C4,C4,C4,C4};
     static mmx_t scratch0, scratch1;
 
     /* column code adapted from peter gubanov */

@@ -2,7 +2,7 @@
  * postprocessing_common.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: postprocessing_common.h,v 1.1 2002/08/04 22:13:06 fenrir Exp $
+ * $Id: postprocessing_common.h,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -21,9 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-//#define PP_USE_3DNOW /* Nothing done yet */
-//#define PP_USE_MMX   /* when only MMX is supported */
-//#define PP_USE_MMXEXT  /* when MMXEXT is also supported, imply MMX */
+#if 0
+#define PP_USE_3DNOW /* Nothing done yet */
+#define PP_USE_MMX   /* when only MMX is supported */
+#define PP_USE_MMXEXT  /* when MMXEXT is also supported, imply MMX */
+#endif
 
 
 /* thresholds for deblocking, I've taken value given by ISO  */

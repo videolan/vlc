@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.3 2002/08/08 00:35:10 sam Exp $
+ * $Id: vcd.c,v 1.4 2002/08/08 22:28:22 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -193,8 +193,8 @@ static int VCDOpen( vlc_object_t *p_this )
     }
 
     /* We read the Table Of Content information */
-    p_vcd->nb_tracks = ioctl_GetTrackCount( p_vcd->i_handle,
-                                            psz_source );
+    p_vcd->nb_tracks = ioctl_GetTrackCount( VLC_OBJECT( p_input),
+                                            p_vcd->i_handle, psz_source );
     if( p_vcd->nb_tracks < 0 )
     {
         msg_Err( p_input, "unable to count tracks" );
@@ -210,8 +210,8 @@ static int VCDOpen( vlc_object_t *p_this )
         return -1;
     }
 
-    p_vcd->p_sectors = ioctl_GetSectors( p_vcd->i_handle,
-                                         psz_source );
+    p_vcd->p_sectors = ioctl_GetSectors( VLC_OBJECT( p_input),
+                                         p_vcd->i_handle, psz_source );
     if( p_vcd->p_sectors == NULL )
     {
         input_BuffersEnd( p_input, p_input->p_method_data );
@@ -298,8 +298,8 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
 
     for ( i_index = 0 ; i_index < i_blocks ; i_index++ ) 
     {
-        if ( ioctl_ReadSector( p_vcd->i_handle, p_vcd->i_sector, 
-                    p_buffer + i_index * VCD_DATA_SIZE ) < 0 )
+        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->i_handle,
+                    p_vcd->i_sector, p_buffer + i_index * VCD_DATA_SIZE ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;
@@ -327,8 +327,8 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
     
     if ( i_len % VCD_DATA_SIZE ) /* this should not happen */
     { 
-        if ( ioctl_ReadSector( p_vcd->i_handle, p_vcd->i_sector, 
-                    p_last_sector ) < 0 )
+        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->i_handle,
+                               p_vcd->i_sector, p_last_sector ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;

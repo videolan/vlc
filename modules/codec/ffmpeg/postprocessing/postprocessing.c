@@ -2,7 +2,7 @@
  * postprocessing.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocessing.c,v 1.1 2002/08/04 22:13:06 fenrir Exp $
+ * $Id: postprocessing.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -134,7 +134,7 @@ static int pp_postprocess( picture_t *p_pic,
                            unsigned int i_mode )
 {
     /* Some sanity checks */
-//    if( ( p_pic->i_height&0x0f )||( p_pic->i_width&0x0f )||
+/*    if( ( p_pic->i_height&0x0f )||( p_pic->i_width&0x0f )||*/
     if( ( p_pic->p_heap->i_chroma != VLC_FOURCC( 'I', '4', '2', '0' ) )&&
         ( p_pic->p_heap->i_chroma != VLC_FOURCC( 'Y', 'V', '1', '2' ) ) )
     {

@@ -2,7 +2,7 @@
  * postprocessing_mmxext.c: Post Processing plugin MMXEXT
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: postprocessing_mmxext.c,v 1.1 2002/08/04 22:13:06 fenrir Exp $
+ * $Id: postprocessing_mmxext.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -620,9 +620,9 @@ static inline void pp_dering_BinIndex( u8  *p_block, int i_stride, int i_thr,
     {
         __asm__ __volatile__( 
        "movq        (%1),       %%mm0   \n"
-       "psubusb     %%mm7,      %%mm0   \n" // sat makes that x <= thr --> 0
-       "pcmpeqb     %%mm6,      %%mm0   \n" // p_block <= i_thr ? -1 : 0
-       "pmovmskb    %%mm0,      %0      \n" // i_bin msb of each bytes 
+       "psubusb     %%mm7,      %%mm0   \n" /* sat makes that x <= thr --> 0 */
+       "pcmpeqb     %%mm6,      %%mm0   \n" /* p_block <= i_thr ? -1 : 0 */
+       "pmovmskb    %%mm0,      %0      \n" /* i_bin msb of each bytes */
          : "=r"(i_bin) :"r"(p_block) );
         /* Now last 2 tests */
         if( p_block[8] <= i_thr ) i_bin |= 1 << 8;
@@ -712,7 +712,7 @@ static inline void pp_dering_Filter( u8  *p_block, int i_stride,
     /* Create mm7 with all bytes  set to QP/2 */
     __asm__ __volatile__(
    "movl        %0,     %%eax   \n"
-   "shrl        $1,     %%eax   \n" // i_QP/2
+   "shrl        $1,     %%eax   \n" /* i_QP/2 */
    "movb        %%al,   %%ah    \n"
    "movd        %%eax,  %%mm7   \n"
    "pshufw      $0x00,  %%mm7,  %%mm7   \n"
@@ -722,13 +722,13 @@ static inline void pp_dering_Filter( u8  *p_block, int i_stride,
     {
         /* clamp those values and copy them */
         __asm__ __volatile__( 
-       "movq    (%0),   %%mm0   \n" // mm0 = i_ftl[y][0] ... i_ftl[y][7]
-       "movq    (%1),   %%mm1   \n" // mm1 = p_sav[0] ... p_sav[7]
+       "movq    (%0),   %%mm0   \n" /* mm0 = i_ftl[y][0] ... i_ftl[y][7] */
+       "movq    (%1),   %%mm1   \n" /* mm1 = p_sav[0] ... p_sav[7] */
        "movq    %%mm1,  %%mm2   \n"
-       "psubusb %%mm7,  %%mm1   \n" // mm1 = psav - i_QP/2 ( >= 0 )
-       "paddusb %%mm7,  %%mm2   \n" // mm2 = psav + i_QP/2 ( <= 255 )
-       "pmaxub  %%mm1,  %%mm0   \n" // psav - i_QP/2 <= mm0
-       "pminub  %%mm2,  %%mm0   \n" //                  mm0 <= psav + i_QP/2
+       "psubusb %%mm7,  %%mm1   \n" /* mm1 = psav - i_QP/2 ( >= 0 ) */
+       "paddusb %%mm7,  %%mm2   \n" /* mm2 = psav + i_QP/2 ( <= 255 ) */
+       "pmaxub  %%mm1,  %%mm0   \n" /* psav - i_QP/2 <= mm0 */
+       "pminub  %%mm2,  %%mm0   \n" /*                  mm0 <= psav + i_QP/2 */
        "movq    %%mm0,  (%1)    \n"
         : :"r"(i_flt[y]), "r"(p_sav) : "memory" );
 

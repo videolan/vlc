@@ -1,2 +1,3 @@
-usr/lib/vlc
+usr/lib/vlc/audio_output
+usr/lib/vlc/video_output
 usr/share/doc

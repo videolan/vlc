@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: udf.c,v 1.2 2002/08/08 00:35:10 sam Exp $
+ * $Id: udf.c,v 1.3 2002/08/08 22:28:22 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -233,7 +233,7 @@ static int UDFICB( u8 * pi_data, u8 * pi_file_type, u16 * pi_flags)
  * UDFPartition: gets partition descriptor
  *****************************************************************************/
 static int UDFPartition( u8 * pi_data, u16 * pi_flags, u16 * pi_nb,
-                         char * ps_contents, u32 * pi_start, u32 * pi_length )
+                         byte_t * ps_contents, u32 * pi_start, u32 * pi_length )
 {
     pi_flags[0] = GETN2( 20 );
     pi_nb[0] = GETN2( 22 );
@@ -250,13 +250,13 @@ static int UDFPartition( u8 * pi_data, u16 * pi_flags, u16 * pi_nb,
  *****************************************************************************
  * Returns 0 on OK, 1 on error
  *****************************************************************************/
-static int UDFLogVolume(u8 * pi_data, char * p_volume_descriptor )
+static int UDFLogVolume(u8 * pi_data, byte_t * p_volume_descriptor )
 {
     u32 i_lb_size;
     u32 i_MT_L;
     u32 i_N_PM;
 
-    UDFDecode( &pi_data[84], 128, p_volume_descriptor );
+    UDFDecode( &pi_data[84], 128, (char *)p_volume_descriptor );
 
     i_lb_size = GETN4( 212 );        /* should be 2048 */
     i_MT_L = GETN4( 264 );        /* should be 6 */

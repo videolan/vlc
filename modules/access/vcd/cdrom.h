@@ -2,7 +2,7 @@
  * cdrom.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: cdrom.h,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -31,7 +31,7 @@
 /******************************************************************************
 * Prototypes                                                                  *
 ******************************************************************************/
-int ioctl_GetTrackCount ( int, const char *psz_dev );
-int * ioctl_GetSectors  ( int, const char *psz_dev );
-int ioctl_ReadSector    ( int, int, byte_t * );
+int   ioctl_GetTrackCount ( vlc_object_t *, int, const char *psz_dev );
+int * ioctl_GetSectors    ( vlc_object_t *, int, const char *psz_dev );
+int   ioctl_ReadSector    ( vlc_object_t *, int, int, byte_t * );
 

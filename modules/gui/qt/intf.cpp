@@ -2,7 +2,7 @@
  * intf.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf.cpp,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: intf.cpp,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -250,27 +250,27 @@ IntfWindow::IntfWindow( intf_thread_t *p_intf )
 
     QPopupMenu * p_tmpmenu = new QPopupMenu( this );
 
-#define instmp( x, y... ) p_tmpmenu->insertItem( x, this, ## y )
+#define instmp0( x, y )    p_tmpmenu->insertItem( x, this, y )
+#define instmp1( x, y, a ) p_tmpmenu->insertItem( x, this, y, a )
     menuBar()->insertItem( "&File", p_tmpmenu );
-    instmp( "&Open File...", SLOT(FileOpen()), Key_F3 );
-    instmp( "Open &Disc...", SLOT(Unimplemented()), Key_F4 );
-    instmp( "&Network Stream...", SLOT(Unimplemented()), Key_F5 );
+    instmp1( "&Open File...", SLOT(FileOpen()), Key_F3 );
+    instmp1( "Open &Disc...", SLOT(Unimplemented()), Key_F4 );
+    instmp1( "&Network Stream...", SLOT(Unimplemented()), Key_F5 );
     p_tmpmenu->insertSeparator();
-    instmp( "&Exit", SLOT(FileQuit()), CTRL+Key_Q );
+    instmp1( "&Exit", SLOT(FileQuit()), CTRL+Key_Q );
 
     p_tmpmenu = new QPopupMenu( this );
     menuBar()->insertItem( "&View", p_tmpmenu );
-    instmp( "&Playlist...", SLOT(Unimplemented()) );
-    instmp( "&Modules...", SLOT(Unimplemented()) );
+    instmp0( "&Playlist...", SLOT(Unimplemented()) );
+    instmp0( "&Modules...", SLOT(Unimplemented()) );
 
     p_tmpmenu = new QPopupMenu( this );
     menuBar()->insertItem( "&Settings", p_tmpmenu );
-    instmp( "&Preferences...", SLOT(Unimplemented()) );
+    instmp0( "&Preferences...", SLOT(Unimplemented()) );
 
     p_tmpmenu = new QPopupMenu( this );
     menuBar()->insertItem( "&Help", p_tmpmenu );
-    instmp( "&About...", SLOT(About()) );
-#undef instmp
+    instmp0( "&About...", SLOT(About()) );
 
     /*
      * Create the popup menu
@@ -278,19 +278,19 @@ IntfWindow::IntfWindow( intf_thread_t *p_intf )
 
     p_popup = new QPopupMenu( /* floating menu */ );
 
-#define inspop( x, y... ) p_popup->insertItem( x, this, ## y )
-    inspop( "&Play", SLOT(PlaybackPlay()) );
-    inspop( "Pause", SLOT(PlaybackPause()) );
-    inspop( "&Slow", SLOT(PlaybackSlow()) );
-    inspop( "&Fast", SLOT(PlaybackFast()) );
+#define inspop0( x, y )    p_popup->insertItem( x, this, y )
+#define inspop1( x, y, a ) p_popup->insertItem( x, this, y, a )
+    inspop0( "&Play", SLOT(PlaybackPlay()) );
+    inspop0( "Pause", SLOT(PlaybackPause()) );
+    inspop0( "&Slow", SLOT(PlaybackSlow()) );
+    inspop0( "&Fast", SLOT(PlaybackFast()) );
     p_popup->insertSeparator();
-    inspop( "&Open File...", SLOT(FileOpen()), Key_F3 );
-    inspop( "Open &Disc...", SLOT(Unimplemented()), Key_F4 );
-    inspop( "&Network Stream...", SLOT(Unimplemented()), Key_F5 );
+    inspop1( "&Open File...", SLOT(FileOpen()), Key_F3 );
+    inspop1( "Open &Disc...", SLOT(Unimplemented()), Key_F4 );
+    inspop1( "&Network Stream...", SLOT(Unimplemented()), Key_F5 );
     p_popup->insertSeparator();
-    inspop( "&About...", SLOT(About()) );
-    inspop( "&Exit", SLOT(FileQuit()) );
-#undef inspop
+    inspop0( "&About...", SLOT(About()) );
+    inspop0( "&Exit", SLOT(FileQuit()) );
 
     /* Activate the statusbar */
     statusBar();

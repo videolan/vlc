@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: libmp4.h,v 1.2 2002/08/08 22:28:22 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -521,6 +521,8 @@ typedef struct MP4_descriptor_decoder_config_s
 
 typedef struct MP4_descriptor_SL_config_s
 {
+
+    int i_dummy; /* ANSI C forbids empty structures */
     
 } MP4_descriptor_SL_config_t;
 

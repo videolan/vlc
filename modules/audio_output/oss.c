@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: oss.c,v 1.3 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -287,7 +287,7 @@ static int OSSThread( aout_instance_t * p_aout )
         aout_buffer_t * p_buffer;
         mtime_t next_date;
         int i_tmp;
-        char * p_bytes;
+        byte_t * p_bytes;
 
         /* Get the presentation date of the next write() operation. It
          * is equal to the current date + duration of buffered samples.

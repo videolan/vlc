@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: preferences.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: preferences.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -303,7 +303,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
             /* create a new clist widget */
             {
-                gchar * titles[] = { _("Name"), _("Description") };
+                gchar * titles[] = { N_("Name"), N_("Description") };
+                titles[0] = _(titles[0]);
+                titles[1] = _(titles[1]);
 
                 module_clist = gtk_clist_new_with_titles( 2, titles );
             }

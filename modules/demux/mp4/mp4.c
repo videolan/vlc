@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: mp4.c,v 1.3 2002/08/08 22:28:22 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -451,12 +451,12 @@ static void MP4_ParseTrack( input_thread_t *p_input,
     
     if( !p_edts )
     {
-//        msg_Warn( p_input, "Unhandled box: edts --> FIXME" );
+/*        msg_Warn( p_input, "Unhandled box: edts --> FIXME" ); */
     }
 
     if( !p_tref )
     {
-//        msg_Warn( p_input, "Unhandled box: tref --> FIXME" );
+/*        msg_Warn( p_input, "Unhandled box: tref --> FIXME" ); */
     } 
 
     p_mdhd = MP4_FindBox( p_mdia, FOURCC_mdhd );
@@ -1014,7 +1014,7 @@ static int  MP4_ReadSample( input_thread_t *p_input,
         return( 1 );
     }
     
-//    msg_Dbg( p_input, "will read %d bytes", i_size );
+/*    msg_Dbg( p_input, "will read %d bytes", i_size ); */
     if( !MP4_ReadData( p_input, p_data->p_payload_start, i_size ) )
     {
         input_DeletePES( p_input->p_method_data, *pp_pes );

@@ -2,7 +2,7 @@
  * gtk_modules.c : functions to build modules configuration boxes.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: modules.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: modules.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -53,7 +53,7 @@ gboolean GtkModulesShow( GtkWidget       *widget,
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_modules ) )
     {
-//        p_intf->p_sys->p_modules = create_intf_modules();
+/*        p_intf->p_sys->p_modules = create_intf_modules(); */
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_modules ),
                              "p_intf", p_intf );
     }

@@ -56,6 +56,10 @@ AM_GNU_GETTEXT
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
+dnl Check for compiler properties
+AC_C_CONST
+AC_C_INLINE
+
 dnl
 dnl  Set default LDFLAGS
 dnl

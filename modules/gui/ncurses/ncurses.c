@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: ncurses.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -273,7 +273,6 @@ static int PrintFullLine ( const char *p_fmt, ... )
 
     if ( p_buf == NULL )
     {
-//X        msg_Err( p_input, "intf error: %s", strerror ( ENOMEM ) );
         return ( -1 );
     }
 
@@ -446,7 +445,7 @@ static void Eject ( intf_thread_t *p_intf )
     /* If there's a stream playing, we aren't allowed to eject ! */
     if( p_intf->p_sys->p_input == NULL )
     {
-//X        msg_Dbg( p_input, "ejecting %s", psz_device );
+        msg_Dbg( p_intf, "ejecting %s", psz_device );
 
         intf_Eject( p_intf, psz_device );
     }

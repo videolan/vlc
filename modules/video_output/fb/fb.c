@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: fb.c,v 1.2 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -425,7 +425,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     if( p_vout->p_sys->b_pan )
     {
         p_vout->p_sys->var_info.yoffset = 0;
-        //p_vout->p_sys->var_info.yoffset = p_vout->p_sys->var_info.yres;
+        /*p_vout->p_sys->var_info.yoffset = p_vout->p_sys->var_info.yres; */
    
         /* the X offset should be 0, but who knows ...
          * some other app might have played with the framebuffer */
@@ -680,7 +680,7 @@ static void TextMode( int i_tty )
     /* return to text mode */
     if( -1 == ioctl(i_tty, KDSETMODE, KD_TEXT) )
     {
-//X        msg_Err( p_vout, "failed ioctl KDSETMODE KD_TEXT" );
+        /*msg_Err( p_vout, "failed ioctl KDSETMODE KD_TEXT" );*/
     }
 }
 
@@ -689,7 +689,7 @@ static void GfxMode( int i_tty )
     /* switch to graphic mode */
     if( -1 == ioctl(i_tty, KDSETMODE, KD_GRAPHICS) )
     {
-//X        msg_Err( p_vout, "failed ioctl KDSETMODE KD_GRAPHICS" );
+        /*msg_Err( p_vout, "failed ioctl KDSETMODE KD_GRAPHICS" );*/
     }
 }
 

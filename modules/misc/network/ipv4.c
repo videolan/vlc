@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.2 2002/08/08 00:35:11 sam Exp $
+ * $Id: ipv4.c,v 1.3 2002/08/08 22:28:22 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -134,7 +134,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     char * psz_bind_win32;        /* WIN32 multicast kludge */
 #endif
 
-    int i_handle, i_opt, i_opt_size;
+    int i_handle, i_opt;
+    unsigned int i_opt_size;
     struct sockaddr_in sock;
 
     if( i_bind_port == 0 )
