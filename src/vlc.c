@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.18 2002/11/13 15:28:24 sam Exp $
+ * $Id: vlc.c,v 1.19 2002/12/25 23:39:01 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -103,7 +103,7 @@ int main( int i_argc, char *ppsz_argv[] )
 
     /* Add a blocking interface and keep the return value */
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE );
- 
+
     /* Finish the threads */
     VLC_Stop( 0 );
 

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.53 2002/12/14 19:43:25 gbazin Exp $
+ * $Id: libvlc.c,v 1.54 2002/12/25 23:39:01 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -229,6 +229,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * Support for gettext
      */
     SetLanguage( "" );
+    msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
 
     /*
      * System specific initialization code

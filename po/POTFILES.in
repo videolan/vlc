@@ -1,8 +1,8 @@
 # libvlc
-include/interface.h
 src/libvlc.c
 src/libvlc.h
 src/misc/configuration.c
+include/interface.h
 
 # access modules
 modules/access/dvd/dvd.c

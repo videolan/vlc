@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.45 2002/12/18 14:17:11 sam Exp $
+ * $Id: input_ext-intf.c,v 1.46 2002/12/25 23:39:01 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -355,10 +355,10 @@ int input_ChangeArea( input_thread_t * p_input, input_area_t * p_area )
 /****************************************************************************
  * input_ChangeProgram: interface request a program change
  ****************************************************************************/
-int input_ChangeProgram( input_thread_t * p_input, u16 i_program_number )
+int input_ChangeProgram( input_thread_t * p_input, uint16_t i_program_number )
 {
     pgrm_descriptor_t *       p_program;
-    
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_program = input_FindProgram( p_input, i_program_number );
@@ -370,7 +370,7 @@ int input_ChangeProgram( input_thread_t * p_input, u16 i_program_number )
     }
 
     p_input->stream.p_new_program = p_program;
-    
+
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return 0;

@@ -393,3 +393,9 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<bbp> et de toute façon ca sert a rien de coder sur vlc, ils changent tout a
+      chaque fois entre le moment ou on commence a écrire sa première ligne
+      de code et celui où on écrit la deuxième
+
+  -- #c00lz
+%
