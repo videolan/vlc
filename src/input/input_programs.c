@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_programs.c,v 1.131 2004/01/29 15:10:17 fenrir Exp $
+ * $Id: input_programs.c,v 1.132 2004/02/22 16:40:25 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -50,8 +50,6 @@ static int NavigationCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static int ESCallback( vlc_object_t *, char const *,
                        vlc_value_t, vlc_value_t, void * );
-
-static es_format_t null_es_format = {0};
 
 /*****************************************************************************
  * input_InitStream: init the stream descriptor of the given input
@@ -625,7 +623,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->c_packets = 0;
     p_es->c_invalid_packets = 0;
     p_es->b_force_decoder = VLC_FALSE;
-    p_es->fmt = null_es_format;
+    es_format_Init( &p_es->fmt, UNKNOWN_ES, 0 );
 
     if( i_data_len )
     {
@@ -806,6 +804,9 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     {
         free( p_es->psz_desc );
     }
+
+    /* Clean the es format */
+    es_format_Clean( &p_es->fmt );
 
     /* Find the ES in the ES table */
     for( i_es_index = 0; i_es_index < p_input->stream.i_es_number;
