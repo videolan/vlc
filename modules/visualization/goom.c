@@ -35,8 +35,10 @@
 #include <vlc/vout.h>
 #include "aout_internal.h"
 
-#ifndef WIN32
-#include "goom_core.h"
+#ifdef USE_GOOM_TREE
+#   include "goom.h"
+#else
+#   include <goom/goom.h>
 #endif
 
 /*****************************************************************************
@@ -299,6 +301,7 @@ static void Thread( vlc_object_t *p_this )
     audio_date_t i_pts;
     int16_t p_data[2][512];
     int i_data = 0, i_count = 0;
+    PluginInfo *p_plugin_info;
 
     var_Get( p_this, "goom-width", &width );
     var_Get( p_this, "goom-height", &height );
@@ -308,8 +311,7 @@ static void Thread( vlc_object_t *p_this )
     speed.i_int = MAX_SPEED - speed.i_int;
     if( speed.i_int < 0 ) speed.i_int = 0;
 
-    goom_init( width.i_int, height.i_int, 0 );
-    goom_set_font( NULL, NULL, NULL );
+    p_plugin_info = goom_init( width.i_int, height.i_int );
 
     while( !p_thread->b_die )
     {
@@ -329,7 +331,8 @@ static void Thread( vlc_object_t *p_this )
         /* Frame dropping if necessary */
         if( aout_DateGet( &i_pts ) + GOOM_DELAY <= mdate() ) continue;
 
-        plane = goom_update( p_data, 0, 0.0, p_thread->psz_title, NULL );
+        plane = goom_update( p_plugin_info, p_data, 0, 0.0,
+                             p_thread->psz_title, NULL );
 
         if( p_thread->psz_title )
         {
@@ -351,7 +354,7 @@ static void Thread( vlc_object_t *p_this )
         vout_DisplayPicture( p_thread->p_vout, p_pic );
     }
 
-    goom_close();
+    goom_close( p_plugin_info );
 }
 
 /*****************************************************************************

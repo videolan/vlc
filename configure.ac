@@ -3408,27 +3408,32 @@ then
   dnl test for --with-goom-tree
   dnl
   if test "${with_goom_tree}" != "no" -a -n "${with_goom_tree}"; then
-    AC_MSG_CHECKING(for libgoom.a in ${with_goom_tree})
+    AC_MSG_CHECKING(for libgoom2.a in ${with_goom_tree})
     real_goom_tree="`cd ${with_goom_tree} 2>/dev/null && pwd`"
     if test -z "${real_goom_tree}"; then
       dnl  The given directory can't be found
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_goom_tree}])
     fi
-    if test -f "${real_goom_tree}/libgoom.a"; then
-      AC_MSG_RESULT(${real_goom_tree}/libgoom.a)
+    if test -f "${real_goom_tree}/src/.libs/libgoom2.a"; then
+      AC_MSG_RESULT(${real_goom_tree}/src/.libs/libgoom2.a)
       AX_ADD_BUILTINS([goom])
-      AX_ADD_LDFLAGS([goom],[-L${real_goom_tree} -lgoom])
-      AX_ADD_CPPFLAGS([goom],[-I${real_goom_tree}])
+      AX_ADD_LDFLAGS([goom],[-L${real_goom_tree}/src/.libs -lgoom2])
+      AX_ADD_CPPFLAGS([goom],[-I${real_goom_tree}/src -DUSE_GOOM_TREE])
     else
       dnl  The given libgoom wasn't built
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_goom_tree}/libgoom.a, make sure you compiled goom in ${with_goom_tree}])
+      AC_MSG_ERROR([cannot find ${real_goom_tree}/src/.libs/libgoom2.a, make sure you compiled goom in ${with_goom_tree}])
     fi
   else
-    dnl  The --with-goom-tree isn't specified wasn't built
-    AC_MSG_RESULT(no)
-    AC_MSG_ERROR([You have to specify a tree with --with-goom-tree])
+    AC_CHECK_HEADERS(goom/goom.h, [
+      AC_CHECK_LIB(goom2, goom_init, [
+        AX_ADD_PLUGINS([goom])
+        AX_ADD_LDFLAGS([goom],[-lgoom2])
+      ],[
+        AC_MSG_ERROR([Could not find goom on your system: you may get it from http://www.ios-software.com/.])
+      ])
+    ])
   fi
 fi
 
