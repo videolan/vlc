@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.29 2001/11/06 16:59:06 stef Exp $
+ * $Id: vout_xvideo.c,v 1.30 2001/11/07 02:10:14 stef Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -1291,14 +1291,21 @@ static int XVideoGetPort( Display *dpy )
 static void XVideoDisplay( vout_thread_t *p_vout )
 {
     int         i_dest_width, i_dest_height;
+    int         i_dest_x, i_dest_y;
 
     if( !p_vout->p_sys->p_xvimage )
     {
         return;
     }
 
-        i_dest_height = p_vout->p_sys->i_window_height > p_vout->p_rendered_pic->i_height ? p_vout->p_sys->i_window_height : p_vout->p_rendered_pic->i_height;
-        i_dest_width = p_vout->p_sys->i_window_width > p_vout->p_rendered_pic->i_width ? p_vout->p_sys->i_window_width : p_vout->p_rendered_pic->i_width;
+    i_dest_height = p_vout->p_sys->i_window_height >
+                        p_vout->p_rendered_pic->i_height
+                  ? p_vout->p_sys->i_window_height
+                  : p_vout->p_rendered_pic->i_height;
+    i_dest_width = p_vout->p_sys->i_window_width >
+                        p_vout->p_rendered_pic->i_width
+                 ? p_vout->p_sys->i_window_width
+                 : p_vout->p_rendered_pic->i_width;
         
     if( p_vout->b_scale )
     {
@@ -1315,6 +1322,7 @@ static void XVideoDisplay( vout_thread_t *p_vout )
                 {
                     i_dest_height = i_dest_width * 3 / 4;
                 }
+                i_ratio = 1200;
                 break;
 
             case AR_16_9_PICTURE:
@@ -1326,7 +1334,7 @@ static void XVideoDisplay( vout_thread_t *p_vout )
                 {
                     i_dest_height = i_dest_width * 9 / 16;
                 }
-
+                i_ratio = 1600;
                 break;
 
             case AR_221_1_PICTURE:
@@ -1338,7 +1346,7 @@ static void XVideoDisplay( vout_thread_t *p_vout )
                 {
                     i_dest_height = i_dest_width * 100 / 221;
                 }
-
+                i_ratio = 1989;
                 break;
 
             case AR_SQUARE_PICTURE:
@@ -1351,7 +1359,23 @@ static void XVideoDisplay( vout_thread_t *p_vout )
                 {
                     i_dest_height = i_dest_width * p_vout->p_rendered_pic->i_height / p_vout->p_rendered_pic->i_width;
                 }
+                i_ratio = 900;
                 break;
+        }
+
+        if( i_dest_width >
+            DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen ) )
+        {
+            i_dest_width = DisplayWidth( p_vout->p_sys->p_display,
+                                         p_vout->p_sys->i_screen );
+            i_dest_height = 900 * i_dest_width / i_ratio;
+        }
+        else if( i_dest_height >
+            DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen ) )
+        {
+            i_dest_height = DisplayHeight( p_vout->p_sys->p_display,
+                                           p_vout->p_sys->i_screen );
+            i_dest_width = i_ratio * i_dest_height / 900;
         }
     }
 
@@ -1379,14 +1403,14 @@ static void XVideoDisplay( vout_thread_t *p_vout )
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
                        i_dest_width, i_dest_height );
     }
-#if 0 
+    
     /* Set picture position */
     i_dest_x = (p_vout->p_sys->i_window_width - i_dest_width) / 2;
     i_dest_y = (p_vout->p_sys->i_window_height - i_dest_height) / 2;
     
     XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
                  i_dest_x, i_dest_y );
-#endif
+    
     /* Send the order to the X server */
     XSync( p_vout->p_sys->p_display, False );
 }
