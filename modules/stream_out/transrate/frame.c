@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- * $Id: frame.c,v 1.1 2004/03/03 11:20:52 massiot Exp $
+ * $Id: frame.c,v 1.2 2004/03/03 11:39:06 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -42,19 +42,6 @@
 #include <vlc/input.h>
 
 #include "transrate.h"
-
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int      Open    ( vlc_object_t * );
-static void     Close   ( vlc_object_t * );
-
-static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
-static int               Del ( sout_stream_t *, sout_stream_id_t * );
-static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
-
-static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, sout_buffer_t *, sout_buffer_t ** );
-
 
 /****************************************************************************
  * transrater, code from M2VRequantizer http://www.metakine.com/
