@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.121 2003/06/23 16:09:13 gbazin Exp $
+ * $Id: modules.c,v 1.122 2003/06/24 13:33:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -69,7 +69,7 @@
 
 #include "error.h"
 
-#include "interface.h"
+#include "vlc_interface.h"
 #include "vlc_playlist.h"
 #include "intf_eject.h"
 

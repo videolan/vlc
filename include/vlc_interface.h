@@ -1,10 +1,10 @@
 /*****************************************************************************
- * interface.h: interface access for other threads
+ * vlc_interface.h: interface access for other threads
  * This library provides basic functions for threads to interact with user
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.41 2003/06/22 15:43:54 gbazin Exp $
+ * $Id: vlc_interface.h,v 1.1 2003/06/24 13:33:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

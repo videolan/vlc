@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.230 2003/05/22 16:01:02 gbazin Exp $
+ * $Id: input.c,v 1.231 2003/06/24 13:33:48 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -46,7 +46,7 @@
 #include "stream_output.h"
 #include <vlc/vout.h>
 
-#include "interface.h"
+#include "vlc_interface.h"
 
 /*****************************************************************************
  * Local prototypes

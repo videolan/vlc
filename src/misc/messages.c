@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.33 2003/06/13 03:21:40 sam Exp $
+ * $Id: messages.c,v 1.34 2003/06/24 13:33:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -46,7 +46,7 @@
 #   include <unistd.h>                                   /* close(), write() */
 #endif
 
-#include "interface.h"
+#include "vlc_interface.h"
 
 /*****************************************************************************
  * Local macros

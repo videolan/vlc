@@ -2,7 +2,7 @@
  * intf.h: interface header for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.2 2002/06/07 23:53:44 sam Exp $
+ * $Id: intf.h,v 1.3 2003/06/24 13:33:49 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ extern "C" {
 /*****************************************************************************
  * Required internal headers
  *****************************************************************************/
-#include "interface.h"
+#include "vlc_interface.h"
 #include "intf_eject.h"
 #include "vlc_playlist.h"
 #include "stream_control.h"
