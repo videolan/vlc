@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.18 2004/01/26 18:30:37 titer Exp $
+ * $Id: vout.h,v 1.19 2004/01/28 21:31:15 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -62,7 +62,7 @@
     int           i_init_done;
     int           i_textures_loaded;
     int           i_index;
-    unsigned long pi_textures[3];
+    unsigned long i_texture;
 }
 
 @end
