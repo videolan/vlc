@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.3 2003/02/18 00:51:40 fenrir Exp $
+ * $Id: mpegaudio.c,v 1.4 2003/03/11 19:02:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -44,7 +44,7 @@ typedef struct packetizer_s
     bit_stream_t            bit_stream;
 
     /* Output properties */
-    sout_input_t            *p_sout_input;
+    sout_packetizer_input_t *p_sout_input;
     sout_packet_format_t    output_format;
 
     uint64_t                i_samplescount;

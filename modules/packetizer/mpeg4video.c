@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.7 2003/01/23 15:52:04 sam Exp $
+ * $Id: mpeg4video.c,v 1.8 2003/03/11 19:02:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -45,7 +45,7 @@ typedef struct packetizer_thread_s
     decoder_fifo_t          *p_fifo;
 
     /* Output properties */
-    sout_input_t            *p_sout_input;
+    sout_packetizer_input_t *p_sout_input;
     sout_packet_format_t    output_format;
 
     mtime_t i_pts_start;

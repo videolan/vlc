@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.57 2003/03/04 21:12:04 gbazin Exp $
+ * $Id: vlc_common.h,v 1.58 2003/03/11 19:02:30 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -247,9 +247,11 @@ typedef struct subpicture_sys_t subpicture_sys_t;
 typedef struct sout_instance_t sout_instance_t;
 typedef struct sout_fifo_t sout_fifo_t;
 typedef struct sout_input_t sout_input_t;
+typedef struct sout_packetizer_input_t sout_packetizer_input_t;
 typedef struct sout_buffer_t sout_buffer_t;
 typedef struct sout_packet_format_t sout_packet_format_t;
 typedef struct sout_access_out_t sout_access_out_t;
+typedef struct sout_mux_t sout_mux_t;
 typedef struct sout_access_out_sys_t sout_access_out_sys_t;
 
 /* Decoders */

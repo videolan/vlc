@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.9 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: avi.c,v 1.10 2003/03/11 19:02:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -63,13 +63,13 @@
 static int     Open   ( vlc_object_t * );
 static void    Close  ( vlc_object_t * );
 
-static int Capability(sout_instance_t *, int , void *, void * );
-static int AddStream( sout_instance_t *, sout_input_t * );
-static int DelStream( sout_instance_t *, sout_input_t * );
-static int Mux      ( sout_instance_t * );
+static int Capability(sout_mux_t *, int , void *, void * );
+static int AddStream( sout_mux_t *, sout_input_t * );
+static int DelStream( sout_mux_t *, sout_input_t * );
+static int Mux      ( sout_mux_t * );
 
-static sout_buffer_t *avi_HeaderCreateRIFF( sout_instance_t *p_sout );
-static sout_buffer_t *avi_HeaderCreateidx1( sout_instance_t *p_sout );
+static sout_buffer_t *avi_HeaderCreateRIFF( sout_mux_t * );
+static sout_buffer_t *avi_HeaderCreateidx1( sout_mux_t * );
 
 static void SetFCC( uint8_t *p, char *fcc )
 {
@@ -136,7 +136,7 @@ typedef struct avi_idx1_s
     avi_idx1_entry_t *entry;
 } avi_idx1_t;
 
-typedef struct sout_mux_s
+struct sout_mux_sys_t
 {
     int i_streams;
     int i_stream_video;
@@ -147,39 +147,39 @@ typedef struct sout_mux_s
     avi_idx1_t idx1;
     off_t i_idx1_size;
 
-} sout_mux_t;
+};
 
 /*****************************************************************************
  * Open:
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
-    sout_mux_t          *p_mux;
-    sout_buffer_t       *p_hdr;
+    sout_mux_t      *p_mux = (sout_mux_t*)p_this;
+    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    sout_buffer_t   *p_hdr;
 
-    p_mux = malloc( sizeof( sout_mux_t ) );
-    p_mux->i_streams = 0;
-    p_mux->i_stream_video = -1;
-    p_mux->i_movi_size = 0;
+    p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    p_sys->i_streams = 0;
+    p_sys->i_stream_video = -1;
+    p_sys->i_movi_size = 0;
 
-    p_mux->idx1.i_entry_count = 0;
-    p_mux->idx1.i_entry_max = 10000;
-    p_mux->idx1.entry = calloc( p_mux->idx1.i_entry_max, sizeof( avi_idx1_entry_t ) );
+    p_sys->idx1.i_entry_count = 0;
+    p_sys->idx1.i_entry_max = 10000;
+    p_sys->idx1.entry = calloc( p_sys->idx1.i_entry_max, sizeof( avi_idx1_entry_t ) );
 
-    msg_Info( p_sout, "Open" );
+    msg_Info( p_mux, "Open" );
 
-    p_sout->pf_mux_capacity  = Capability;
-    p_sout->pf_mux_addstream = AddStream;
-    p_sout->pf_mux_delstream = DelStream;
-    p_sout->pf_mux           = Mux;
-    p_sout->p_mux_data = (void*)p_mux;
-    p_sout->i_mux_preheader  = 8; // (fourcc,length) header
+    p_mux->pf_capacity  = Capability;
+    p_mux->pf_addstream = AddStream;
+    p_mux->pf_delstream = DelStream;
+    p_mux->pf_mux       = Mux;
+    p_mux->p_sys        = p_sys;
+    p_mux->i_preheader  = 8; // (fourcc,length) header
 
     /* room to add header at the end */
-    p_hdr = sout_BufferNew( p_sout, HDR_SIZE );
+    p_hdr = sout_BufferNew( p_mux->p_sout, HDR_SIZE );
     memset( p_hdr->p_buffer, 0, HDR_SIZE );
-    sout_AccessOutWrite( p_sout->p_access, p_hdr );
+    sout_AccessOutWrite( p_mux->p_access, p_hdr );
 
     return VLC_SUCCESS;
 }
@@ -190,24 +190,25 @@ static int Open( vlc_object_t *p_this )
 
 static void Close( vlc_object_t * p_this )
 {
-    sout_instance_t     *p_sout = (sout_instance_t*)p_this;
-    sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
+    sout_mux_t      *p_mux = (sout_mux_t*)p_this;
+    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+
     sout_buffer_t       *p_hdr, *p_idx1;
     int                 i_stream;
 
-    msg_Info( p_sout, "Close" );
+    msg_Info( p_mux, "Close" );
 
     /* first create idx1 chunk (write at the end of the stream */
-    p_idx1 = avi_HeaderCreateidx1( p_sout );
-    p_mux->i_idx1_size = p_idx1->i_size;
-    sout_AccessOutWrite( p_sout->p_access, p_idx1 );
+    p_idx1 = avi_HeaderCreateidx1( p_mux );
+    p_sys->i_idx1_size = p_idx1->i_size;
+    sout_AccessOutWrite( p_mux->p_access, p_idx1 );
 
     /* calculate some value for headers creations */
-    for( i_stream = 0; i_stream < p_mux->i_streams; i_stream++ )
+    for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         avi_stream_t *p_stream;
 
-        p_stream = &p_mux->stream[i_stream];
+        p_stream = &p_sys->stream[i_stream];
 
         p_stream->f_fps = 25;
         if( p_stream->i_duration > 0 )
@@ -224,19 +225,19 @@ static void Close( vlc_object_t * p_this )
                     (uint64_t)p_stream->i_totalsize /
                     (uint64_t)p_stream->i_duration;
         }
-        msg_Err( p_sout,"stream[%d] duration:%lld totalsize:%lld frames:%d fps:%f kb/s:%d",
-                i_stream,
-                p_stream->i_duration/1000000, p_stream->i_totalsize,
-                p_stream->i_frames,
-                p_stream->f_fps, p_stream->i_bitrate/1024 );
+        msg_Err( p_mux, "stream[%d] duration:%lld totalsize:%lld frames:%d fps:%f kb/s:%d",
+                 i_stream,
+                 p_stream->i_duration/1000000, p_stream->i_totalsize,
+                 p_stream->i_frames,
+                 p_stream->f_fps, p_stream->i_bitrate/1024 );
     }
 
-    p_hdr = avi_HeaderCreateRIFF( p_sout );
-    sout_AccessOutSeek( p_sout->p_access, 0 );
-    sout_AccessOutWrite( p_sout->p_access, p_hdr );
+    p_hdr = avi_HeaderCreateRIFF( p_mux );
+    sout_AccessOutSeek( p_mux->p_access, 0 );
+    sout_AccessOutWrite( p_mux->p_access, p_hdr );
 }
 
-static int Capability( sout_instance_t *p_sout, int i_query, void *p_args, void *p_answer )
+static int Capability( sout_mux_t *p_mux, int i_query, void *p_args, void *p_answer )
 {
    switch( i_query )
    {
@@ -248,27 +249,27 @@ static int Capability( sout_instance_t *p_sout, int i_query, void *p_args, void 
    }
 }
 
-static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
+static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-    sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
-    avi_stream_t        *p_stream;
+    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    avi_stream_t    *p_stream;
 
-    if( p_mux->i_streams >= 100 )
+    if( p_sys->i_streams >= 100 )
     {
-        msg_Err( p_sout, "too many streams" );
+        msg_Err( p_mux, "too many streams" );
         return( -1 );
     }
     if( p_input->input_format.p_format == NULL )
     {
-        msg_Err( p_sout, "stream descriptor missing" );
+        msg_Err( p_mux, "stream descriptor missing" );
         return( -1 );
     }
 
-    msg_Dbg( p_sout, "adding input" );
-    p_input->p_mux_data = malloc( sizeof( int ) );
+    msg_Dbg( p_mux, "adding input" );
+    p_input->p_sys = malloc( sizeof( int ) );
 
-    *((int*)p_input->p_mux_data) = p_mux->i_streams;
-    p_stream = &p_mux->stream[p_mux->i_streams];
+    *((int*)p_input->p_sys) = p_sys->i_streams;
+    p_stream = &p_sys->stream[p_sys->i_streams];
 
     switch( p_input->input_format.i_cat )
     {
@@ -278,8 +279,8 @@ static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
                     (WAVEFORMATEX*)p_input->input_format.p_format;
 
                 p_stream->i_cat = AUDIO_ES;
-                p_stream->fcc[0] = '0' + p_mux->i_streams / 10;
-                p_stream->fcc[1] = '0' + p_mux->i_streams % 10;
+                p_stream->fcc[0] = '0' + p_sys->i_streams / 10;
+                p_stream->fcc[1] = '0' + p_sys->i_streams % 10;
                 p_stream->fcc[2] = 'w';
                 p_stream->fcc[3] = 'b';
 
@@ -296,13 +297,13 @@ static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
                     (BITMAPINFOHEADER*)p_input->input_format.p_format;;
 
                 p_stream->i_cat = VIDEO_ES;
-                p_stream->fcc[0] = '0' + p_mux->i_streams / 10;
-                p_stream->fcc[1] = '0' + p_mux->i_streams % 10;
+                p_stream->fcc[0] = '0' + p_sys->i_streams / 10;
+                p_stream->fcc[1] = '0' + p_sys->i_streams % 10;
                 p_stream->fcc[2] = 'd';
                 p_stream->fcc[3] = 'c';
-                if( p_mux->i_stream_video < 0 )
+                if( p_sys->i_stream_video < 0 )
                 {
-                    p_mux->i_stream_video = p_mux->i_streams;
+                    p_sys->i_stream_video = p_sys->i_streams;
                 }
                 p_stream->p_wf  = NULL;
                 p_stream->p_bih = malloc( p_bih->biSize );
@@ -318,37 +319,36 @@ static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
     p_stream->i_frames     = 0;
     p_stream->i_duration  = 0;
 
-    p_mux->i_streams++;
+    p_sys->i_streams++;
     return( 0 );
 }
 
-static int DelStream( sout_instance_t *p_sout, sout_input_t *p_input )
+static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-//    sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
 
-    msg_Dbg( p_sout, "removing input" );
+    msg_Dbg( p_mux, "removing input" );
 
-    free( p_input->p_mux_data ); p_input->p_mux_data = NULL;
+    free( p_input->p_sys ); p_input->p_sys = NULL;
 
     return( 0 );
 }
 
-static int Mux      ( sout_instance_t *p_sout )
+static int Mux      ( sout_mux_t *p_mux )
 {
-    sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
-    avi_stream_t        *p_stream;
+    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    avi_stream_t    *p_stream;
     int i_stream;
     int i;
 
-    for( i = 0; i < p_sout->i_nb_inputs; i++ )
+    for( i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         int i_count;
         sout_fifo_t *p_fifo;
 
-        i_stream = *((int*)p_sout->pp_inputs[i]->p_mux_data );
-        p_stream = &p_mux->stream[i_stream];
+        i_stream = *((int*)p_mux->pp_inputs[i]->p_sys );
+        p_stream = &p_sys->stream[i_stream];
 
-        p_fifo = p_sout->pp_inputs[i]->p_fifo;
+        p_fifo = p_mux->pp_inputs[i]->p_fifo;
         i_count = p_fifo->i_depth;
         while( i_count > 0 )
         {
@@ -362,31 +362,31 @@ static int Mux      ( sout_instance_t *p_sout )
             p_stream->i_totalsize += p_data->i_size;
 
             /* add idx1 entry for this frame */
-            p_idx = &p_mux->idx1.entry[p_mux->idx1.i_entry_count];
+            p_idx = &p_sys->idx1.entry[p_sys->idx1.i_entry_count];
             memcpy( p_idx->fcc, p_stream->fcc, 4 );
             p_idx->i_flags = AVIIF_KEYFRAME;
-            p_idx->i_pos   = p_mux->i_movi_size + 4;
+            p_idx->i_pos   = p_sys->i_movi_size + 4;
             p_idx->i_length= p_data->i_size;
-            p_mux->idx1.i_entry_count++;
-            if( p_mux->idx1.i_entry_count >= p_mux->idx1.i_entry_max )
+            p_sys->idx1.i_entry_count++;
+            if( p_sys->idx1.i_entry_count >= p_sys->idx1.i_entry_max )
             {
-                p_mux->idx1.i_entry_max += 10000;
-                p_mux->idx1.entry = realloc( p_mux->idx1.entry,
-                                             p_mux->idx1.i_entry_max * sizeof( avi_idx1_entry_t ) );
+                p_sys->idx1.i_entry_max += 10000;
+                p_sys->idx1.entry = realloc( p_sys->idx1.entry,
+                                             p_sys->idx1.i_entry_max * sizeof( avi_idx1_entry_t ) );
             }
 
 
-            if( sout_BufferReallocFromPreHeader( p_sout, p_data, 8 ) )
+            if( sout_BufferReallocFromPreHeader( p_mux->p_sout, p_data, 8 ) )
             {
                 /* there isn't enough data in preheader */
                 sout_buffer_t *p_hdr;
 
-                p_hdr = sout_BufferNew( p_sout, 8 );
+                p_hdr = sout_BufferNew( p_mux->p_sout, 8 );
                 SetFCC( p_hdr->p_buffer, p_stream->fcc );
                 SetDWLE( p_hdr->p_buffer + 4, p_data->i_size );
 
-                sout_AccessOutWrite( p_sout->p_access, p_hdr );
-                p_mux->i_movi_size += p_hdr->i_size;
+                sout_AccessOutWrite( p_mux->p_access, p_hdr );
+                p_sys->i_movi_size += p_hdr->i_size;
 
             }
             else
@@ -397,12 +397,12 @@ static int Mux      ( sout_instance_t *p_sout )
 
             if( p_data->i_size & 0x01 )
             {
-                sout_BufferRealloc( p_sout, p_data, p_data->i_size + 1 );
+                sout_BufferRealloc( p_mux->p_sout, p_data, p_data->i_size + 1 );
                 p_data->i_size += 1;
             }
 
-            sout_AccessOutWrite( p_sout->p_access, p_data );
-            p_mux->i_movi_size += p_data->i_size;
+            sout_AccessOutWrite( p_mux->p_access, p_data );
+            p_sys->i_movi_size += p_data->i_size;
 
             i_count--;
         }
@@ -511,20 +511,20 @@ static void bo_AddMem( buffer_out_t *p_bo, int i_size, uint8_t *p_mem )
     bo_AddDWordLE( &_bo_sav_, p_bo->i_buffer - _bo_sav_.i_buffer - 4 ); \
     return( i_err );
 
-static int avi_HeaderAdd_avih( sout_instance_t *p_sout,
+static int avi_HeaderAdd_avih( sout_mux_t *p_mux,
                                buffer_out_t *p_bo )
 {
-    sout_mux_t *p_mux = (sout_mux_t*)p_sout->p_mux_data;
-    avi_stream_t *p_video = NULL;
+    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    avi_stream_t    *p_video = NULL;
     int         i_stream;
     uint32_t    i_microsecperframe;
     int         i_maxbytespersec;
     int         i_totalframes;
     AVI_BOX_ENTER( "avih" );
 
-    if( p_mux->i_stream_video >= 0 )
+    if( p_sys->i_stream_video >= 0 )
     {
-        p_video = &p_mux->stream[p_mux->i_stream_video];
+        p_video = &p_sys->stream[p_sys->i_stream_video];
         if( p_video->i_frames <= 0 )
         {
             p_video = NULL;
@@ -535,23 +535,23 @@ static int avi_HeaderAdd_avih( sout_instance_t *p_sout,
     {
         i_microsecperframe =
             (uint32_t)( (float)1000000 /
-                        (float)p_mux->stream[p_mux->i_stream_video].f_fps );
-        i_totalframes = p_mux->stream[p_mux->i_stream_video].i_frames;
+                        (float)p_sys->stream[p_sys->i_stream_video].f_fps );
+        i_totalframes = p_sys->stream[p_sys->i_stream_video].i_frames;
     }
     else
     {
-        msg_Warn( p_sout, "avi file without audio video track isn't a good idea..." );
+        msg_Warn( p_mux, "avi file without audio video track isn't a good idea..." );
         i_microsecperframe = 0;
         i_totalframes = 0;
     }
 
-    for( i_stream = 0,i_maxbytespersec = 0; i_stream < p_mux->i_streams; i_stream++ )
+    for( i_stream = 0,i_maxbytespersec = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
-        if( p_mux->stream[p_mux->i_stream_video].i_duration > 0 )
+        if( p_sys->stream[p_sys->i_stream_video].i_duration > 0 )
         {
             i_maxbytespersec +=
-                p_mux->stream[p_mux->i_stream_video].i_totalsize /
-                p_mux->stream[p_mux->i_stream_video].i_duration;
+                p_sys->stream[p_sys->i_stream_video].i_totalsize /
+                p_sys->stream[p_sys->i_stream_video].i_duration;
         }
     }
 
@@ -563,7 +563,7 @@ static int avi_HeaderAdd_avih( sout_instance_t *p_sout,
                          AVIF_ISINTERLEAVED );  /* flags */
     bo_AddDWordLE( p_bo, i_totalframes );
     bo_AddDWordLE( p_bo, 0 );                   /* initial frame */
-    bo_AddDWordLE( p_bo, p_mux->i_streams );    /* streams count */
+    bo_AddDWordLE( p_bo, p_sys->i_streams );    /* streams count */
     bo_AddDWordLE( p_bo, 1024 * 1024 );         /* suggested buffer size */
     if( p_video )
     {
@@ -582,11 +582,10 @@ static int avi_HeaderAdd_avih( sout_instance_t *p_sout,
 
     AVI_BOX_EXIT( 0 );
 }
-static int avi_HeaderAdd_strh( sout_instance_t *p_sout,
+static int avi_HeaderAdd_strh( sout_mux_t   *p_mux,
                                buffer_out_t *p_bo,
                                avi_stream_t *p_stream )
 {
-//    sout_mux_t *p_mux = (sout_mux_t*)p_sout->p_mux_data;
     AVI_BOX_ENTER( "strh" );
 
     switch( p_stream->i_cat )
@@ -652,11 +651,10 @@ static int avi_HeaderAdd_strh( sout_instance_t *p_sout,
     AVI_BOX_EXIT( 0 );
 }
 
-static int avi_HeaderAdd_strf( sout_instance_t *p_sout,
+static int avi_HeaderAdd_strf( sout_mux_t *p_mux,
                                buffer_out_t *p_bo,
                                avi_stream_t *p_stream )
 {
-//    sout_mux_t *p_mux = (sout_mux_t*)p_sout->p_mux_data;
     AVI_BOX_ENTER( "strf" );
 
     switch( p_stream->i_cat )
@@ -699,45 +697,44 @@ static int avi_HeaderAdd_strf( sout_instance_t *p_sout,
     AVI_BOX_EXIT( 0 );
 }
 
-static int avi_HeaderAdd_strl( sout_instance_t *p_sout,
+static int avi_HeaderAdd_strl( sout_mux_t *p_mux,
                                buffer_out_t *p_bo,
                                avi_stream_t *p_stream )
 {
-//    sout_mux_t *p_mux = (sout_mux_t*)p_sout->p_mux_data;
     AVI_BOX_ENTER_LIST( "strl" );
 
-    avi_HeaderAdd_strh( p_sout, p_bo, p_stream );
-    avi_HeaderAdd_strf( p_sout, p_bo, p_stream );
+    avi_HeaderAdd_strh( p_mux, p_bo, p_stream );
+    avi_HeaderAdd_strf( p_mux, p_bo, p_stream );
 
     AVI_BOX_EXIT( 0 );
 }
 
-static sout_buffer_t *avi_HeaderCreateRIFF( sout_instance_t *p_sout )
+static sout_buffer_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
 {
-    sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
+    sout_mux_sys_t      *p_sys = p_mux->p_sys;
     sout_buffer_t       *p_hdr;
     int                 i_stream;
     int                 i_maxbytespersec;
     int                 i_junk;
     buffer_out_t        bo;
 
-    p_hdr = sout_BufferNew( p_sout, HDR_SIZE );
+    p_hdr = sout_BufferNew( p_mux->p_sout, HDR_SIZE );
     memset( p_hdr->p_buffer, 0, HDR_SIZE );
 
     bo_Init( &bo, HDR_SIZE, p_hdr->p_buffer );
 
     bo_AddFCC( &bo, "RIFF" );
-    bo_AddDWordLE( &bo, p_mux->i_movi_size + HDR_SIZE - 8 + p_mux->i_idx1_size );
+    bo_AddDWordLE( &bo, p_sys->i_movi_size + HDR_SIZE - 8 + p_sys->i_idx1_size );
     bo_AddFCC( &bo, "AVI " );
 
     bo_AddFCC( &bo, "LIST" );
     bo_AddDWordLE( &bo, HDR_SIZE - 8);
     bo_AddFCC( &bo, "hdrl" );
 
-    avi_HeaderAdd_avih( p_sout, &bo );
-    for( i_stream = 0,i_maxbytespersec = 0; i_stream < p_mux->i_streams; i_stream++ )
+    avi_HeaderAdd_avih( p_mux, &bo );
+    for( i_stream = 0,i_maxbytespersec = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
-        avi_HeaderAdd_strl( p_sout, &bo, &p_mux->stream[i_stream] );
+        avi_HeaderAdd_strl( p_mux, &bo, &p_sys->stream[i_stream] );
     }
 
     i_junk = HDR_SIZE - bo.i_buffer - 8 - 12;
@@ -746,35 +743,35 @@ static sout_buffer_t *avi_HeaderCreateRIFF( sout_instance_t *p_sout )
 
     bo.i_buffer += i_junk;
     bo_AddFCC( &bo, "LIST" );
-    bo_AddDWordLE( &bo, p_mux->i_movi_size + 4 );
+    bo_AddDWordLE( &bo, p_sys->i_movi_size + 4 );
     bo_AddFCC( &bo, "movi" );
 
     return( p_hdr );
 }
 
-static sout_buffer_t * avi_HeaderCreateidx1( sout_instance_t *p_sout )
+static sout_buffer_t * avi_HeaderCreateidx1( sout_mux_t *p_mux )
 {
-    sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
+    sout_mux_sys_t      *p_sys = p_mux->p_sys;
     sout_buffer_t       *p_idx1;
     uint32_t            i_idx1_size;
     unsigned int        i;
     buffer_out_t        bo;
 
-    i_idx1_size = 16 * p_mux->idx1.i_entry_count;
+    i_idx1_size = 16 * p_sys->idx1.i_entry_count;
 
-    p_idx1 = sout_BufferNew( p_sout, i_idx1_size + 8 );
+    p_idx1 = sout_BufferNew( p_mux->p_sout, i_idx1_size + 8 );
     memset( p_idx1->p_buffer, 0, i_idx1_size );
 
     bo_Init( &bo, i_idx1_size, p_idx1->p_buffer );
     bo_AddFCC( &bo, "idx1" );
     bo_AddDWordLE( &bo, i_idx1_size );
 
-    for( i = 0; i < p_mux->idx1.i_entry_count; i++ )
+    for( i = 0; i < p_sys->idx1.i_entry_count; i++ )
     {
-        bo_AddFCC( &bo, p_mux->idx1.entry[i].fcc );
-        bo_AddDWordLE( &bo, p_mux->idx1.entry[i].i_flags );
-        bo_AddDWordLE( &bo, p_mux->idx1.entry[i].i_pos );
-        bo_AddDWordLE( &bo, p_mux->idx1.entry[i].i_length );
+        bo_AddFCC( &bo, p_sys->idx1.entry[i].fcc );
+        bo_AddDWordLE( &bo, p_sys->idx1.entry[i].i_flags );
+        bo_AddDWordLE( &bo, p_sys->idx1.entry[i].i_pos );
+        bo_AddDWordLE( &bo, p_sys->idx1.entry[i].i_length );
     }
 
     return( p_idx1 );

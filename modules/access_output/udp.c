@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.5 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: udp.c,v 1.6 2003/03/11 19:02:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -125,18 +125,11 @@ static int Open( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
+
     if( p_access->psz_access != NULL &&
         !strcmp( p_access->psz_access, "rtp" ) )
     {
-         if( p_access->p_sout->psz_mux != NULL && 
-             *p_access->p_sout->psz_mux &&
-             strcmp( p_access->p_sout->psz_mux, "ts" ) &&
-             strcmp( p_access->p_sout->psz_mux, "ts_dvbpsi" ) )
-        {
-            msg_Err( p_access, "rtp ouput work only with ts payload" );
-            free( p_sys );
-            return( VLC_EGENERIC );
-        }
+        msg_Warn( p_access, "becarefull that rtp ouput work only with ts payload(not an error)" );
         p_sys->b_rtpts = 1;
     }
     else
@@ -203,9 +196,10 @@ static int Open( vlc_object_t *p_this )
         return( VLC_EGENERIC );
     }
 
+    srand( (uint32_t)mdate());
     p_sys->p_buffer          = NULL;
-    p_sys->i_sequence_number = 12;   // FIXME should be random, used by rtp
-    p_sys->i_ssrc            = 4212; // FIXME   "    "    "       "  "   "
+    p_sys->i_sequence_number = rand()&0xffff;
+    p_sys->i_ssrc            = rand()&0xffffffff;
 
     p_access->pf_write       = Write;
     p_access->pf_seek        = Seek;
@@ -300,10 +294,12 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
                 /* add rtp/ts header */
                 p_sys->p_buffer->p_buffer[0] = 0x80;
                 p_sys->p_buffer->p_buffer[1] = 0x21; // mpeg2-ts
+
                 p_sys->p_buffer->p_buffer[2] =
                     ( p_sys->i_sequence_number >> 8 )&0xff;
                 p_sys->p_buffer->p_buffer[3] =
                     p_sys->i_sequence_number&0xff;
+                p_sys->i_sequence_number++;
 
                 p_sys->p_buffer->p_buffer[4] = ( i_timestamp >> 24 )&0xff;
                 p_sys->p_buffer->p_buffer[5] = ( i_timestamp >> 16 )&0xff;
