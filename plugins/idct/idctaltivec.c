@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.15 2001/09/25 11:46:14 massiot Exp $
+ * $Id: idctaltivec.c,v 1.16 2001/09/28 09:55:20 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -103,10 +103,10 @@ static void NormScan( u8 ppi_scan[2][64] )
     for( i = 0; i < 64; i++ )
     {
         j = ppi_scan[0][i];
-        ppi_scan[0][i] = (j & 0x38) | ((j & 6) >> 1) | ((j & 1) << 2);
+        ppi_scan[0][i] = (j >> 3) | ((j & 7) << 3);
 
         j = ppi_scan[1][i];
-        ppi_scan[1][i] = (j & 0x38) | ((j & 6) >> 1) | ((j & 1) << 2);
+        ppi_scan[1][i] = (j >> 3) | ((j & 7) << 3);
     }
 }
 
