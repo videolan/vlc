@@ -44,6 +44,8 @@
  * Local prototypes
  */
 
+//extern IDCT_mmx(elem_t*);
+
 /* Our current implementation is a fast DCT, we might move to a fast DFT or
  * an MMX DCT in the future. */
 
@@ -85,7 +87,6 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, elem_t * p_block,
     int coeff, rr;
 
     /* If DC Coefficient. */
-
     if ( i_sparse_pos == 0 ) 
     {
 	    dp=(int *)p_block;
@@ -136,6 +137,8 @@ void vdec_SparseIDCT (vdec_thread_t * p_vdec, elem_t * p_block,
  *****************************************************************************/
 void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
 {
+//IDCT_mmx(p_block);
+#if 1
     s32 tmp0, tmp1, tmp2, tmp3;
     s32 tmp10, tmp11, tmp12, tmp13;
     s32 z1, z2, z3, z4, z5;
@@ -1310,4 +1313,5 @@ void vdec_IDCT( vdec_thread_t * p_vdec, elem_t * p_block, int i_idontcare )
     
     dataptr++;			/* advance pointer to next column */
     }
+#endif
 }

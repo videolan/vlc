@@ -102,7 +102,9 @@ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
     if( P_buffer.i_index == -1 )
     {
         /* No more structures available. This should not happen ! */
-        return NULL;
+msleep(VPAR_IDLE_SLEEP);
+return vpar_NewMacroblock( p_fifo );
+//        return NULL;
     }
 
     p_mb = P_buffer.pp_mb_free[ P_buffer.i_index-- ];
@@ -136,10 +138,11 @@ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
     /* Unlink picture buffer */
     vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
     p_mb->p_picture->i_deccount--;
-
+//fprintf(stderr, "%d ", p_mb->p_picture->i_deccount);
     /* Test if it was the last block of the picture */
-    if( p_mb->p_picture->i_deccount == 0 )
+    if( p_mb->p_picture->i_deccount == 1 )
     {
+fprintf(stderr, "Image decodee\n");
         /* Mark the picture to be displayed */
         vout_DisplayPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
@@ -147,16 +150,16 @@ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
         vpar_SynchroEnd( p_fifo->p_vpar );
      
         /* Unlink referenced pictures */
-        if( p_mb->p_forward != NULL )
+/*        if( p_mb->p_forward != NULL )
         {
 	        vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_forward );
         }
         if( p_mb->p_backward != NULL )
         {
             vout_UnlinkPicture( p_fifo->p_vpar->p_vout, p_mb->p_backward );
-        }
-   }
-    vlc_mutex_unlock( & p_mb->p_picture->lock_deccount );
+        }*/
+    }
+    vlc_mutex_unlock( &p_mb->p_picture->lock_deccount );
 
     /* Release the macroblock_t structure */
 #define P_buffer p_fifo->p_vpar->vbuffer

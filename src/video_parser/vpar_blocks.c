@@ -574,6 +574,7 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
  * Macroblock parsing functions
  */
 
+     
 /*****************************************************************************
  * vpar_ParseMacroblock : Parse the next macroblock
  *****************************************************************************/
@@ -587,8 +588,6 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
     static int      pi_x[12] = {0,8,0,8,0,0,0,0,8,8,8,8};
     static int      pi_y[2][12] = { {0,0,8,8,0,0,8,8,0,0,8,8},
                                     {0,0,1,1,0,0,1,1,0,0,1,1} };
-    static int      pi_chroma_hor[4] = { 0, 1, 1, 0 };
-    static int      pi_chroma_ver[4] = { 0, 1, 0, 0 };
 
     int             i_mb, i_b, i_mask;
     macroblock_t *  p_mb;
@@ -631,13 +630,14 @@ if( 0 )
      exit(0);
 }
 
-    for( i_mb = i_mb_previous; i_mb < *pi_mb_address; i_mb++ )
+    for( i_mb = i_mb_previous + 1; i_mb < *pi_mb_address; i_mb++ )
     {
         /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
         static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
         static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionField,
                                 vdec_MotionField, vdec_MotionFrame};
 
+fprintf(stderr, "Skipped macroblock !\n");
         /* Reset DC predictors (7.2.1). */
         p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
             = p_vpar->slice.pi_dc_dct_pred[2]
@@ -749,7 +749,8 @@ fprintf( stderr, "motion2 !\n" );
             /* Calculate block coordinates. */
             p_mb->p_data[i_b] = p_data1
                                 + pi_y[p_vpar->mb.b_dct_type][i_b]
-                                * p_vpar->sequence.i_width;
+                                * p_vpar->sequence.i_width
+                                + pi_x[i_b];
         }
         else
         {
@@ -757,44 +758,20 @@ fprintf( stderr, "motion2 !\n" );
             p_mb->pf_addb[i_b] = vdec_DummyBlock;
             p_mb->pf_idct[i_b] = vdec_DummyIDCT;
         }
- if( 0 )    
-    //i_count == 482 && i_b == 2 )
-    // i_count != *pi_mb_address)
-    //b_stop )
-{
-    fprintf( stderr, "i_count = %d (%d)\n", i_count, i_inc );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x ", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x", GetBits( &p_vpar->bit_stream, 16 ) );
-     fprintf( stderr, "%4x\n", GetBits( &p_vpar->bit_stream, 16 ) );
-     exit(0);
-}
     }
 
     /* chrominance */
+//fprintf(stderr, "%d ", p_mb->i_c_x
+//                      + p_mb->i_c_y
+//                                      * (p_vpar->sequence.i_chroma_width));
+
     p_data1 = p_mb->p_picture->p_u
-              + (p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format])
-              + (p_mb->i_c_y >> pi_chroma_ver[p_vpar->sequence.i_chroma_format])
+              + p_mb->i_c_x
+              + p_mb->i_c_y
                 * (p_vpar->sequence.i_chroma_width);
     p_data2 = p_mb->p_picture->p_v
-              + (p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format])
-              + (p_mb->i_c_y >> pi_chroma_ver[p_vpar->sequence.i_chroma_format])
+               + p_mb->i_c_x
+               + p_mb->i_c_y
                 * (p_vpar->sequence.i_chroma_width);
     
     for( i_b = 4; i_b < 4 + p_vpar->sequence.i_chroma_nb_blocks;
@@ -815,7 +792,8 @@ fprintf( stderr, "motion2 !\n" );
             /* Calculate block coordinates. */
             p_mb->p_data[i_b] = pp_data[i_b & 1]
                                  + pi_y[p_vpar->mb.b_dct_type][i_b]
-                                   * p_vpar->sequence.i_chroma_width;
+                                   * p_vpar->sequence.i_chroma_width
+                                 + pi_x[i_b];
         }
         else
         {
@@ -1260,7 +1238,7 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     int         i_nc;
     int         i_cc;
     int         i_coef;
-    int         i_type;
+    int         i_type, i_quant_type;
     int         i_code;
     int         i_length;
     int         i_pos;
@@ -1274,11 +1252,12 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
     
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
-    
+
     i_cc = pi_cc_index[i_b];
 
     /* Determine whether it is luminance or not (chrominance) */
     i_type = ( i_cc + 1 ) >> 1;
+    i_quant_type = i_type | (p_vpar->sequence.i_chroma_format == CHROMA_420);
 
     /* Give a pointer to the quantization matrices for intra blocks */
     ppi_quant[0] = p_vpar->sequence.intra_quant.pi_matrix;
@@ -1451,7 +1430,7 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
                                                         : i_level;
                 break;
             case DCT_EOB:
-                if( i_nc <= 1 )
+                if( i_nc <= 0 )
                 {
                     p_mb->pf_idct[i_b] = vdec_SparseIDCT;
                     p_mb->pi_sparse_pos[i_b] = i_coef;
@@ -1479,8 +1458,8 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
         i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( i_level *
                     p_vpar->slice.i_quantizer_scale *
-                    ppi_quant[i_type][i_pos] ) >> 4;
-        p_mb->ppi_blocks[i_b][i_parse] = b_sign ? -i_level : i_level;
+                    ppi_quant[i_quant_type][i_pos] ) >> 4;
+        p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
     
 fprintf( stderr, "MPEG2 end (%d)\n", i_b );

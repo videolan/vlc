@@ -267,7 +267,7 @@
 #define VOUT_DISPLAY_DELAY              100000
 
 /* Delay (in microseconds) between increments in idle levels */
-#define VOUT_IDLE_DELAY                 5000000
+#define VOUT_IDLE_DELAY                 5000000000
 
 /* Number of pictures required to computes the FPS rate */
 #define VOUT_FPS_SAMPLES                5

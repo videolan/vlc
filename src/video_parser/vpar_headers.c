@@ -443,7 +443,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     {
     case CHROMA_420:
         p_vpar->sequence.i_chroma_nb_blocks = 2;
-        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 2;
+        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 1;
         p_vpar->sequence.i_chroma_mb_width = 8;
         p_vpar->sequence.i_chroma_mb_height = 8;
         break;
@@ -679,16 +679,15 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             p_vpar->b_error = 1;
             return;
         }
-
+bzero( P_picture->p_data, 940032 );
         /* Initialize values. */
         P_picture->date = vpar_SynchroDecode( p_vpar,
                                               p_vpar->picture.i_coding_type,
                                               i_structure );
         p_vpar->picture.i_l_stride = - 8 + ( p_vpar->sequence.i_width
                     << ( 1 - p_vpar->picture.b_frame_structure ) );
-        p_vpar->picture.i_c_stride = -8 + ( p_vpar->sequence.i_width
-                    << (( 1 - p_vpar->picture.b_frame_structure ) +
-                        ( 3 - p_vpar->sequence.i_chroma_format )) );
+        p_vpar->picture.i_c_stride = - 8 + ( p_vpar->sequence.i_chroma_width
+                    << ( 1 - p_vpar->picture.b_frame_structure ));
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
@@ -701,8 +700,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( i_structure == BOTTOM_FIELD )
     {
         i_mb_base = p_vpar->sequence.i_mb_size >> 1;
-        p_vpar->mb.i_l_y = 16;
-        p_vpar->mb.i_c_y = p_vpar->sequence.i_chroma_mb_height;
+        p_vpar->mb.i_l_y = 1;
+        p_vpar->mb.i_c_y = 1;
     }
     else
     {

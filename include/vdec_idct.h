@@ -86,7 +86,7 @@ struct vdec_thread_s;
  * shows that the values given below are the most effective.
  */
 
-#define CONST_BITS 13       /* Jimmy chose this constant :) */
+#define CONST_BITS 8       /* Jimmy chose this constant :) */
  
 #ifdef EIGHT_BIT_SAMPLES
 #define PASS1_BITS  2
