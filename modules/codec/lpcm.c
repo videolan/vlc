@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.8 2002/12/28 02:02:18 massiot Exp $
+ * $Id: lpcm.c,v 1.9 2002/12/30 17:28:31 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -176,7 +176,7 @@ static void DecodeFrame( dec_thread_t * p_dec )
     aout_buffer_t *    p_buffer;
     mtime_t            i_pts;
     uint8_t            i_header;
-    unsigned int       i_rate, i_original_channels;
+    unsigned int       i_rate, i_original_channels, i_nb_channels;
 
     /* Look for sync word - should be 0xXX80 */
     RealignBits( &p_dec->bit_stream );
@@ -214,18 +214,22 @@ static void DecodeFrame( dec_thread_t * p_dec )
     {
     case 0:
         i_original_channels = AOUT_CHAN_CENTER;
+        i_nb_channels = 1;
         break;
     case 1:
         i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        i_nb_channels = 2;
         break;
     case 3:
         i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        i_nb_channels = 4;
         break;
     case 5:
         i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                                | AOUT_CHAN_CENTER | AOUT_CHAN_LFE;
+        i_nb_channels = 6;
         break;
     case 2:
     case 4:
@@ -255,6 +259,8 @@ static void DecodeFrame( dec_thread_t * p_dec )
         p_dec->output_format.i_original_channels = i_original_channels;
         p_dec->output_format.i_physical_channels
                    = i_original_channels & AOUT_CHAN_PHYSMASK;
+        p_dec->output_format.i_bytes_per_frame = i_nb_channels * 2;
+        p_dec->output_format.i_frame_length = 1;
         aout_DateInit( &p_dec->end_date, i_rate );
         p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                            &p_dec->p_aout,
