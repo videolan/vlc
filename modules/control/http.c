@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.17 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: http.c,v 1.18 2003/07/29 18:51:16 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -60,16 +60,58 @@
 #   include <dirent.h>
 #endif
 
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Activate     ( vlc_object_t * );
+static void Close        ( vlc_object_t * );
+
+#define HOST_TEXT N_( "Host address" )
+#define HOST_LONGTEXT N_( \
+    "You can set the address and port on which the http interface will bind" )
+#define SRC_TEXT N_( "Source directory" )
+#define SRC_LONGTEXT N_( "Source directory" )
+
+vlc_module_begin();
+    set_description( _("HTTP remote control interface") );
+    add_category_hint( N_("HTTP remote control"), NULL, VLC_TRUE );
+        add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
+        add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
+    set_capability( "interface", 0 );
+    set_callbacks( Activate, Close );
+vlc_module_end();
+
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Activate     ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
 
 static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                            char *psz_dir );
+
+static int DirectoryCheck( char *psz_dir )
+{
+    DIR           *p_dir;
+
+#ifdef HAVE_SYS_STAT_H
+    struct stat   stat_info;
+
+    if( stat( psz_dir, &stat_info ) == -1 || !S_ISDIR( stat_info.st_mode ) )
+    {
+        return VLC_EGENERIC;
+    }
+#endif
+
+    if( ( p_dir = opendir( psz_dir ) ) == NULL )
+    {
+        return VLC_EGENERIC;
+    }
+    closedir( p_dir );
+
+    return VLC_SUCCESS;
+}
+
 
 static int  http_get( httpd_file_callback_args_t *p_args,
                       uint8_t *p_request, int i_request,
@@ -125,28 +167,6 @@ struct intf_sys_t
 };
 
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define HOST_TEXT N_( "Host address" )
-#define HOST_LONGTEXT N_( \
-    "You can set the address and port on which the http interface will bind" )
-#define SRC_TEXT N_( "Source directory" )
-#define SRC_LONGTEXT N_( "Source directory" )
-
-vlc_module_begin();
-    set_description( _("HTTP remote control interface") );
-    add_category_hint( N_("HTTP remote control"), NULL, VLC_TRUE );
-        add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
-#if defined(SYS_DARWIN) || defined(SYS_BEOS) \
-             || (defined(WIN32) && !defined(UNDER_CE))
-        add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
-#else
-        add_string ( "http-src",  "share/http", NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
-#endif
-    set_capability( "interface", 0 );
-    set_callbacks( Activate, Close );
-vlc_module_end();
 
 /*****************************************************************************
  * Activate: initialize and create stuff
@@ -218,7 +238,20 @@ static int Activate( vlc_object_t *p_this )
     }
 #else
     psz_src = config_GetPsz( p_intf, "http-src" );
+
+    if( !psz_src || *psz_src == '\0' )
+    {
+        if( !DirectoryCheck( "share/http" ) )
+        {
+            psz_src = strdup( "share/http" );
+        }
+        else if( !DirectoryCheck( DATA_PATH "/http" ) )
+        {
+            psz_src = strdup( DATA_PATH "/http" );
+        }
+    }
 #endif
+
     if( !psz_src || *psz_src == '\0' )
     {
         msg_Err( p_intf, "invalid src dir" );
@@ -237,7 +270,7 @@ static int Activate( vlc_object_t *p_this )
 
     if( p_sys->i_files <= 0 )
     {
-        msg_Err( p_intf, "cannot find any files" );
+        msg_Err( p_intf, "cannot find any files (%s)", psz_src );
         goto failed;
     }
     p_intf->pf_run = Run;
