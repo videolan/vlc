@@ -31,7 +31,7 @@
 
 /**
  * video palette data
- * \see viedo_format_t
+ * \see video_format_t
  * \see subs_format_t
  */
 struct video_palette_t
