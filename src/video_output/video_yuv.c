@@ -15,10 +15,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef VIDEO_X11
-#include <X11/Xlib.h>                           /* for video_sys.h in X11 mode */
-#endif
-
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
@@ -319,9 +315,8 @@ int vout_InitTables( vout_thread_t *p_vout )
  *******************************************************************************/
 int vout_ResetTables( vout_thread_t *p_vout )
 {
-    // ?? realloc if b_grayscale or i_screen_depth changed
-    SetTables( p_vout );
-    return( 0 );    
+    vout_EndTables( p_vout );    
+    return( vout_InitTables( p_vout ) );    
 }
 
 /*******************************************************************************
@@ -413,7 +408,7 @@ static void SetTables( vout_thread_t *p_vout )
      */     
     for( i_index = 0; i_index < 256; i_index++ )
     {
-        i_gamma[i_index] = 255. * exp( (double)i_index * p_vout->f_gamma / 255. );        
+        i_gamma[i_index] = 255. * pow( (double)i_index / 255., exp(p_vout->f_gamma) );        
     }
 
     /*          

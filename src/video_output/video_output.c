@@ -15,10 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef VIDEO_X11
-#include <X11/Xlib.h>                           /* for video_sys.h in X11 mode */
-#endif
-
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
@@ -37,10 +33,11 @@ static int      InitThread              ( vout_thread_t *p_vout );
 static void     RunThread               ( vout_thread_t *p_vout );
 static void     ErrorThread             ( vout_thread_t *p_vout );
 static void     EndThread               ( vout_thread_t *p_vout );
-static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
-static int      RenderIdle              ( vout_thread_t *p_vout );
-static int      RenderInfo              ( vout_thread_t *p_vout );
+static void     RenderBlank             ( vout_thread_t *p_vout );
+static int      RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank );
+static int      RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank );
+static int      RenderIdle              ( vout_thread_t *p_vout, boolean_t b_blank );
+static int      RenderInfo              ( vout_thread_t *p_vout, boolean_t b_balnk );
 static int      Manage                  ( vout_thread_t *p_vout );
 
 /*******************************************************************************
@@ -51,12 +48,8 @@ static int      Manage                  ( vout_thread_t *p_vout );
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *******************************************************************************/
-vout_thread_t * vout_CreateThread               ( 
-#ifdef VIDEO_X11
-                                                  char *psz_display, Window root_window, 
-#endif
-                                                  int i_width, int i_height, int *pi_status 
-                                                )
+vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_window, 
+                                                  int i_width, int i_height, int *pi_status )
 {
     vout_thread_t * p_vout;                               /* thread descriptor */
     int             i_status;                                 /* thread status */
@@ -100,11 +93,7 @@ vout_thread_t * vout_CreateThread               (
    
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
-    if( vout_SysCreate( p_vout
-#if defined(VIDEO_X11)
-                        , psz_display, root_window 
-#endif
-        ) )
+    if( vout_SysCreate( p_vout, psz_display, i_root_window ) )
     {
       free( p_vout );
       return( NULL );
@@ -116,15 +105,21 @@ vout_thread_t * vout_CreateThread               (
 
 #ifdef STATS
     /* Initialize statistics fields */
-    p_vout->loop_time           = 0;    
+    p_vout->render_time           = 0;    
     p_vout->c_fps_samples       = 0;    
 #endif      
+
+    /* Initialize running properties */
+    p_vout->i_changes           = 0;
+    p_vout->last_picture_date   = 0;
+    p_vout->last_display_date   = 0;
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );
     vlc_mutex_init( &p_vout->subtitle_lock );    
-    if( vlc_thread_create( &p_vout->thread_id, "video output", 
-			   (void *) RunThread, (void *) p_vout) )
+    vlc_mutex_init( &p_vout->change_lock );    
+    vlc_mutex_lock( &p_vout->change_lock );    
+    if( vlc_thread_create( &p_vout->thread_id, "video output", (void *) RunThread, (void *) p_vout) )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
 	vout_SysDestroy( p_vout );
@@ -615,7 +610,6 @@ static void RunThread( vout_thread_t *p_vout)
                 p_pic =         NULL;                
 	    }
         }
-
               
         /*
          * Perform rendering, sleep and display rendered picture
@@ -625,13 +619,12 @@ static void RunThread( vout_thread_t *p_vout)
             /* A picture is ready to be displayed : render it */
             if( p_vout->b_active )
             {                    
-                RenderPicture( p_vout, p_pic );
+                b_display = RenderPicture( p_vout, p_pic, 1 );
                 if( p_vout->b_info )
                 {
-                    RenderPictureInfo( p_vout, p_pic );
-                    RenderInfo( p_vout );                    
+                    b_display |= RenderPictureInfo( p_vout, p_pic, b_display );
+                    b_display |= RenderInfo( p_vout, b_display );                    
                 }                    
-                b_display = 1;                    
             }
             else
             {
@@ -646,17 +639,26 @@ static void RunThread( vout_thread_t *p_vout)
         else
         {
             /* No picture. However, an idle screen may be ready to display */
-            b_display = p_vout->b_active && (                   RenderIdle( p_vout ) | 
-                                            ( p_vout->b_info && RenderInfo( p_vout ) ));
+            if( p_vout->b_active )
+            {                
+                b_display = RenderIdle( p_vout, 1 );
+                if( p_vout->b_info )
+                {                    
+                    b_display |= RenderInfo( p_vout, b_display );
+                }        
+            }
+            else
+            {
+                b_display = 0;                
+            }            
         }
+
+        /* Give back change lock */
+        vlc_mutex_unlock( &p_vout->change_lock );        
 
         /* Sleep a while or until a given date */
         if( p_pic )
         {
-#ifdef STATS
-            /* Computes loop time */
-            p_vout->loop_time = mdate() - current_date;            
-#endif
             mwait( pic_date );
         }
         else
@@ -664,8 +666,10 @@ static void RunThread( vout_thread_t *p_vout)
             msleep( VOUT_IDLE_SLEEP );                
         }            
 
-        /* On awakening, send immediately picture to display */
-        if( b_display && p_vout->b_active )
+        /* On awakening, take back lock and send immediately picture to display */
+        vlc_mutex_lock( &p_vout->change_lock );        
+        if( b_display && p_vout->b_active && 
+            !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
         {
             vout_SysDisplay( p_vout );
         }
@@ -749,6 +753,48 @@ static void EndThread( vout_thread_t *p_vout )
 }
 
 /*******************************************************************************
+ * RenderBlank: render a blank screen
+ *******************************************************************************
+ * This function is called by all other rendering functions when they arrive on
+ * a non blanked screen.
+ *******************************************************************************/
+static void RenderBlank( vout_thread_t *p_vout )
+{
+    int  i_index;                                    /* current 32 bits sample */    
+    int  i_width;                                 /* number of 32 bits samples */    
+    u32 *p_pic;                                  /* pointer to 32 bits samples */
+    
+    /* Initialize variables */
+    p_pic =     vout_SysGetPicture( p_vout );
+    i_width =   p_vout->i_bytes_per_line * p_vout->i_height / 128;
+
+    /* Clear beginning of screen by 128 bytes blocks */
+    for( i_index = 0; i_index < i_width; i_index++ )
+    {
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+        *p_pic++ = 0;   *p_pic++ = 0;
+    }
+
+    /* Clear last pixels */
+    //??
+}
+
+
+/*******************************************************************************
  * RenderPicture: render a picture
  *******************************************************************************
  * This function convert a picture from a video heap to a pixel-encoded image
@@ -756,8 +802,17 @@ static void EndThread( vout_thread_t *p_vout )
  * rendered picture has been determined as existant, and will only be destroyed
  * by the vout thread later.
  *******************************************************************************/
-static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
+static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
 {
+    /* Mark last picture date */
+    p_vout->last_picture_date = p_pic->date;    
+
+    /* Blank screen if required */
+    if( b_blank )
+    {
+        RenderBlank( p_vout );
+    }
+
     /* 
      * Prepare scaling 
      */
@@ -769,7 +824,6 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
          * XImages */
 /*        p_vout->i_new_width =   p_pic->i_width;
         p_vout->i_new_height =  p_pic->i_height;*/
-        return;        
 #else
         /* Other drivers: the video output thread can't change its size, so
          * we need to change the aspect ratio */
@@ -815,6 +869,8 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
      * Terminate scaling 
      */
     //??
+
+    return( 1 );    
 }
 
 
@@ -822,16 +878,12 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 /*******************************************************************************
  * RenderPictureInfo: print additionnal informations on a picture
  *******************************************************************************
- * This function will add informations such as fps and buffer size on a picture
+ * This function will print informations such as fps and other picture
+ * dependant informations.
  *******************************************************************************/
-static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
+static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
 {
     char        psz_buffer[256];                              /* string buffer */
-#ifdef DEBUG
-    int         i_ready_pic = 0;                             /* ready pictures */
-    int         i_reserved_pic = 0;                       /* reserved pictures */
-    int         i_picture;                                    /* picture index */
-#endif
 
 #ifdef STATS
     /* 
@@ -846,16 +898,74 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* 
-     * Print statistics in upper left corner 
+     * Print frames count and loop time in upper left corner 
      */
-    sprintf( psz_buffer, "gamma=%.2f   %ld frames", 
-             p_vout->f_gamma, p_vout->c_fps_samples );
+    sprintf( psz_buffer, "%ld frames   render time: %lu us", 
+             p_vout->c_fps_samples, (long unsigned) p_vout->render_time );
     vout_SysPrint( p_vout, 0, 0, -1, -1, psz_buffer );    
 #endif
+
+#ifdef DEBUG
+    /*
+     * Print picture information in lower right corner
+     */
+    sprintf( psz_buffer, "%s picture (mc=%d) %dx%d (%dx%d%+d%+d ar=%s)",
+             (p_pic->i_type == YUV_420_PICTURE) ? "4:2:0" :
+             ((p_pic->i_type == YUV_422_PICTURE) ? "4:2:2" :
+              ((p_pic->i_type == YUV_444_PICTURE) ? "4:4:4" : "?")),
+             p_pic->i_matrix_coefficients, p_pic->i_width, p_pic->i_height,
+             p_pic->i_display_width, p_pic->i_display_height,
+             p_pic->i_display_horizontal_offset, p_pic->i_display_vertical_offset,
+             (p_pic->i_aspect_ratio == AR_SQUARE_PICTURE) ? "square" :
+             ((p_pic->i_aspect_ratio == AR_3_4_PICTURE) ? "4:3" :
+              ((p_pic->i_aspect_ratio == AR_16_9_PICTURE) ? "16:9" :
+               ((p_pic->i_aspect_ratio == AR_221_1_PICTURE) ? "2.21:1" : "?" ))));    
+    vout_SysPrint( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );
+#endif
     
+    return( 0 );    
+}
+
+/*******************************************************************************
+ * RenderIdle: render idle picture
+ *******************************************************************************
+ * This function will clear the display or print a logo.
+ *******************************************************************************/
+static int RenderIdle( vout_thread_t *p_vout, boolean_t b_blank )
+{
+    /* Blank screen if required */
+    if( (mdate() - p_vout->last_picture_date > VOUT_IDLE_DELAY) &&
+        (p_vout->last_picture_date > p_vout->last_display_date) &&
+        b_blank )
+    {        
+        RenderBlank( p_vout );
+        p_vout->last_display_date = mdate();        
+        vout_SysPrint( p_vout, p_vout->i_width / 2, p_vout->i_height / 2, 0, 0,
+                       "no stream" );        
+        return( 1 );        
+    }
+
+    return( 0 );    
+}
+
+/*******************************************************************************
+ * RenderInfo: render additionnal informations
+ *******************************************************************************
+ * This function render informations which do not depend of the current picture
+ * rendered.
+ *******************************************************************************/
+static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
+{
+    char        psz_buffer[256];                              /* string buffer */
+#ifdef DEBUG
+    int         i_ready_pic = 0;                             /* ready pictures */
+    int         i_reserved_pic = 0;                       /* reserved pictures */
+    int         i_picture;                                    /* picture index */
+#endif
+
 #ifdef DEBUG
     /* 
-     * Print heap state in lower left corner  
+     * Print thread state in lower left corner  
      */
     for( i_picture = 0; i_picture < VOUT_MAX_PICTURES; i_picture++ )
     {
@@ -869,46 +979,32 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
             break;            
         }        
     }
-    sprintf( psz_buffer, "video heap: %d/%d/%d", i_reserved_pic, i_ready_pic, 
+    sprintf( psz_buffer, "%s %dx%d:%d %.2f:%.2f g%+.2f   pic: %d/%d/%d", 
+             p_vout->b_grayscale ? "gray" : "rgb", 
+             p_vout->i_width, p_vout->i_height,
+             p_vout->i_screen_depth, p_vout->f_x_ratio, p_vout->f_y_ratio, p_vout->f_gamma,
+             i_reserved_pic, i_ready_pic,
              VOUT_MAX_PICTURES );
     vout_SysPrint( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
 #endif
-
-#ifdef DEBUG_VIDEO
-    //??
-#endif
-}
-
-/*******************************************************************************
- * RenderIdle: render idle picture
- *******************************************************************************
- * This function will clear the display or print a logo.
- *******************************************************************************/
-static int RenderIdle( vout_thread_t *p_vout )
-{
-    //??
-    return( 0 );    
-}
-
-/*******************************************************************************
- * RenderInfo: render additionnal informations
- *******************************************************************************
- * ??
- *******************************************************************************/
-static int RenderInfo( vout_thread_t *p_vout )
-{
-    //??
     return( 0 );    
 }
 
 /*******************************************************************************
  * Manage: manage thread
  *******************************************************************************
- * ??
+ * This function will handle changes in thread configuration.
  *******************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
-    //??
+    /* On gamma or grayscale change, rebuild tables */
+    if( p_vout->i_changes & (VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE) )
+    {
+        vout_ResetTables( p_vout );        
+    }    
+
+    /* Clear changes flags which does not need management or have been handled */
+    p_vout->i_changes &= ~(VOUT_INFO_CHANGE | VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE);
 
     /* Detect unauthorized changes */
     if( p_vout->i_changes )

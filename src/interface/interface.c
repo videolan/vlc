@@ -26,6 +26,8 @@
 #include "intf_cmd.h"
 #include "intf_console.h"
 #include "main.h"
+#include "video.h"
+#include "video_output.h"
 
 #include "intf_sys.h"
 
@@ -96,6 +98,19 @@ void intf_Run( intf_thread_t *p_intf )
         /* Manage specific interface */
         intf_SysManage( p_intf );
 
+        /* Check attached threads status */
+        if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
+        {
+            //?? add aout error detection
+            p_intf->b_die = 1;            
+        }    
+        if( (p_intf->p_input != NULL) && p_intf->p_input->b_error )
+        {
+            input_DestroyThread( p_intf->p_input /*, NULL */ );            
+            p_intf->p_input = NULL;            
+            intf_DbgMsg("Input thread destroyed\n");            
+        }
+
         /* Sleep to avoid using all CPU - since some interfaces needs to access 
          * keyboard events, a 100ms delay is a good compromise */
         msleep( INTF_IDLE_SLEEP );
@@ -143,4 +158,124 @@ int intf_SelectInput( intf_thread_t * p_intf, input_cfg_t *p_cfg )
     return( (p_cfg != NULL) && (p_intf->p_input == NULL) );    
 }
 
+/*******************************************************************************
+ * intf_ProcessKey: process standard keys
+ *******************************************************************************
+ * This function will process standard keys and return non 0 if the key was
+ * unknown.
+ *******************************************************************************/
+int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
+{
+    switch( i_key )
+    {
+    case 'Q':                                                    /* quit order */
+    case 'q':
+    case 27:
+        p_intf->b_die = 1;
+        break;  
+    case '0':                                                 /* source change */
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':                    
+        // ??
+        break;
+    case '+':                                                      /* volume + */
+        // ??
+        break;
+    case '-':                                                      /* volume - */
+        // ??
+        break;
+    case 'M':                                                   /* toggle mute */
+    case 'm':                    
+        // ??
+        break;	    
+    case 'g':                                                       /* gamma - */
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_MAX) )
+        {
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );
+            p_intf->p_vout->f_gamma   -= INTF_GAMMA_STEP;                        
+            p_intf->p_vout->i_changes |= VOUT_GAMMA_CHANGE;
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+        }                    
+        break;                                        
+    case 'G':                                                       /* gamma + */
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma < INTF_GAMMA_MAX) )
+        {       
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );
+            p_intf->p_vout->f_gamma   += INTF_GAMMA_STEP;
+            p_intf->p_vout->i_changes |= VOUT_GAMMA_CHANGE;
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+        }                    
+        break;  
+    case 'c':                                              /* toggle grayscale */
+        if( p_intf->p_vout != NULL )
+        {
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );                        
+            p_intf->p_vout->b_grayscale = !p_intf->p_vout->b_grayscale;                    
+            p_intf->p_vout->i_changes  |= VOUT_GRAYSCALE_CHANGE;                        
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
+        }
+        break;  
+    case 'x':                                     /* horizontal aspect ratio - */
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_x_ratio > INTF_RATIO_MIN) )
+        {
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );
+            p_intf->p_vout->f_x_ratio /= INTF_RATIO_FACTOR;                        
+            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+        }                    
+        break;                                        
+    case 'X':                                     /* horizontal aspect ratio + */
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_x_ratio < INTF_RATIO_MAX) )
+        {       
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );
+            p_intf->p_vout->f_x_ratio *= INTF_RATIO_FACTOR;
+            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+        }                    
+        break;  
+    case 'y':                                       /* vertical aspect ratio - */
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_y_ratio > INTF_RATIO_MIN) )
+        {
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );
+            p_intf->p_vout->f_y_ratio /= INTF_RATIO_FACTOR;                        
+            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+        }                    
+        break;                                        
+    case 'Y':                                     /* horizontal aspect ratio + */
+        if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_y_ratio < INTF_RATIO_MAX) )
+        {       
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );
+            p_intf->p_vout->f_y_ratio *= INTF_RATIO_FACTOR;
+            p_intf->p_vout->i_changes |= VOUT_RATIO_CHANGE;
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );
+        }
+        break;        
+    case 'f':                                             /* toggle fullscreen */
+        //??
+        break;                                        
+    case ' ':                                                   /* toggle info */
+        if( p_intf->p_vout != NULL )
+        {
+            vlc_mutex_lock( &p_intf->p_vout->change_lock );                        
+            p_intf->p_vout->b_info     = !p_intf->p_vout->b_info;                    
+            p_intf->p_vout->i_changes |= VOUT_INFO_CHANGE;                        
+            vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
+        }
+        break;                                
+    default:                                                    /* unknown key */
+        return( 1 );        
+    }
 
+    return( 0 );    
+}
+
+    
+                

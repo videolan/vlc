@@ -87,6 +87,7 @@ typedef struct vout_thread_s
     vlc_thread_t        thread_id;                 /* id for pthread functions */
     vlc_mutex_t         picture_lock;                     /* picture heap lock */
     vlc_mutex_t         subtitle_lock;                   /* subtitle heap lock */   
+    vlc_mutex_t         change_lock;                     /* thread change lock */    
     int *               pi_status;                    /* temporary status flag */
     p_vout_sys_t        p_sys;                         /* system output method */
 
@@ -105,15 +106,15 @@ typedef struct vout_thread_s
 #ifdef STATS    
     /* Statistics - these numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
-    mtime_t             loop_time;                   /* last picture loop time */
-    count_t             c_fps_samples;               /* picture counts */    
+    mtime_t             render_time;               /* last picture render time */
+    count_t             c_fps_samples;                       /* picture counts */    
     mtime_t             fps_sample[ VOUT_FPS_SAMPLES ];   /* FPS samples dates */
 #endif
 
     /* Running properties */
     u16                 i_changes;               /* changes made to the thread */    
     mtime_t             last_picture_date;        /* last picture display date */
-    mtime_t             last_idle_date;        /* last idle screen displaydate */    
+    mtime_t             last_display_date;         /* last screen display date */    
 
     /* Videos heap and translation tables */
     picture_t           p_picture[VOUT_MAX_PICTURES];              /* pictures */
@@ -133,16 +134,13 @@ typedef struct vout_thread_s
 #define VOUT_DEPTH_CHANGE       0x0008                        /* depth changed */
 #define VOUT_RATIO_CHANGE       0x0010                /* display ratio changed */
 #define VOUT_GAMMA_CHANGE       0x0020                        /* gamma changed */
+#define VOUT_NODISPLAY_CHANGE   0xffdc   /* changes which forbiden the display */
 
 /*******************************************************************************
  * Prototypes
  *******************************************************************************/
-vout_thread_t * vout_CreateThread       ( 
-#ifdef VIDEO_X11
-                                          char *psz_display, Window root_window, 
-#endif
-                                          int i_width, int i_height, int *pi_status
-                                        );
+vout_thread_t * vout_CreateThread       ( char *psz_display, int i_root_window, 
+                                          int i_width, int i_height, int *pi_status );
 void            vout_DestroyThread      ( vout_thread_t *p_vout, int *pi_status );
 picture_t *     vout_CreatePicture      ( vout_thread_t *p_vout, int i_type, 
                                           int i_width, int i_height );

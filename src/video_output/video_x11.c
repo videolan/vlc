@@ -82,7 +82,7 @@ static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage,
  * vout properties to choose the window size, and change them according to the
  * actual properties of the display.
  *******************************************************************************/
-int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, Window root_window )
+int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window )
 {
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );    
@@ -96,7 +96,7 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, Window root_window
      * Since XLib is usually not thread-safe, we can't use the same display
      * pointer than the interface or another thread. However, the root window
      * id is still valid. */
-    if( X11OpenDisplay( p_vout, psz_display, root_window ) )
+    if( X11OpenDisplay( p_vout, psz_display, i_root_window ) )
     {
         intf_ErrMsg("error: can't initialize X11 display\n" );
         free( p_vout->p_sys );
@@ -259,7 +259,7 @@ void vout_SysDisplay( vout_thread_t *p_vout )
                   p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->height);
 
         /* Send the order to the X server */
-        XFlush(p_vout->p_sys->p_display);       /* ?? not needed ? */
+        XFlush(p_vout->p_sys->p_display);
     }
 
     /* Swap buffers */
@@ -291,17 +291,19 @@ void vout_SysPrint( vout_thread_t *p_vout, int i_x, int i_y, int i_halign,
     int                 i_byte;               /* byte offset in character line */    
     int                 i_height;                          /* character height */    
     int                 i_char_bytes_per_line;         /* total bytes per line */
+    int                 i_text_width;                      /* total text width */
     byte_t *            pi_pic;                                /* picture data */
     byte_t *            pi_char;                             /* character data */
 
     /* Update upper left coordinates according to alignment */
+    i_text_width = p_vout->p_sys->i_char_interspacing * strlen( psz_text );    
     switch( i_halign )
     {
     case 0:                                                        /* centered */
-        i_x -= p_vout->p_sys->i_char_interspacing * strlen( psz_text ) / 2;
+        i_x -= i_text_width / 2;
         break;        
     case 1:                                                   /* right aligned */
-        i_x -= p_vout->p_sys->i_char_interspacing * strlen( psz_text );
+        i_x -= i_text_width;
         break;                
     }
     switch( i_valign )
@@ -318,11 +320,20 @@ void vout_SysPrint( vout_thread_t *p_vout, int i_x, int i_y, int i_halign,
     i_height =                  p_vout->p_sys->i_char_height;
     i_char_bytes_per_line =     p_vout->p_sys->i_char_bytes_per_line;    
 
+    /* Check that the text is in the screen vertically and horizontally */
+    if( (i_y < 0) || (i_y + i_height > p_vout->i_height) || (i_x < 0) ||
+        (i_x + i_text_width > p_vout->i_width) )
+    {
+        intf_DbgMsg("text '%s' would print outside the screen\n", psz_text);        
+        return;        
+    }    
+
     /* Print text */
     for( ; *psz_text != '\0'; psz_text++ )
     {
+        /* Check that the character is valid and in the screen horizontally */
         if( (*psz_text >= VOUT_MIN_CHAR) && (*psz_text < VOUT_MAX_CHAR) )
-        {            
+        {       
             /* Select character */
             pi_char =   p_vout->p_sys->pi_font + (*psz_text - VOUT_MIN_CHAR) * 
                 i_height * i_char_bytes_per_line;

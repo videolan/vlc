@@ -6,11 +6,7 @@
 /*******************************************************************************
  * Prototypes
  *******************************************************************************/
-int          vout_SysCreate     ( p_vout_thread_t p_vout
-#ifdef VIDEO_X11
-                                  , char *psz_display, Window root_window
-#endif
-                                );
+int          vout_SysCreate     ( p_vout_thread_t p_vout, char *psz_display, int i_root_window );
 int          vout_SysInit       ( p_vout_thread_t p_vout );
 void         vout_SysEnd        ( p_vout_thread_t p_vout );
 void         vout_SysDestroy    ( p_vout_thread_t p_vout );

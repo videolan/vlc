@@ -380,7 +380,8 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
  *******************************************************************************/
 static void Usage( void )
 {
-    intf_Msg(COPYRIGHT_MESSAGE);
+    intf_Msg(COPYRIGHT_MESSAGE "\n");
+
     /* Usage */
     intf_Msg("usage: vlc [options...] [parameters]\n" \
 	     "  parameters can be passed using environment variables\n" \
@@ -425,12 +426,11 @@ static void Usage( void )
     /* Interfaces keys */
     intf_Msg("Interface keys: most interface accept the following commands:\n" \
              "  [esc], q                        quit\n" \
-             "  +, -                            change volume\n" \
-             "  m                               mute\n" \
-             "  f                               fullscreen\n" \
+             "  +, -, m                         change volume, mute\n" \
+             "  g, G, c                         change gamma, toggle grayscale\n" \
+             "  x, X, y, Y, f                   change aspect ratio, toggle fullscreen\n"  \
              "  0 - 9                           select channel\n" \
              "  [space]                         toggle info printing\n" \
-             "  g, G                            change gamma\n" \
              );    
 }
 

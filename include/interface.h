@@ -47,4 +47,5 @@ void            intf_Run                ( intf_thread_t * p_intf );
 void            intf_Destroy            ( intf_thread_t * p_intf );
 
 int             intf_SelectInput        ( intf_thread_t * p_intf, p_input_cfg_t p_cfg );
+int             intf_ProcessKey         ( intf_thread_t * p_intf, int i_key );
 
