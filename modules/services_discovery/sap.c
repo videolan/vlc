@@ -103,7 +103,7 @@
     static void CloseDemux ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("SAP interface") );
+    set_description( _("SAP announces") );
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
 
@@ -607,7 +607,7 @@ static int Demux( demux_t *p_demux )
                  PLAYLIST_APPEND, PLAYLIST_END );
 
    vlc_object_release( p_playlist );
-    if( p_sdp ) FreeSDP( p_sdp );
+   if( p_sdp ) FreeSDP( p_sdp );
 
    return VLC_SUCCESS;
 }
@@ -638,7 +638,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
 
     /* First, check the sap announce is correct */
     i_version = p_buffer[0] >> 5;
-
+msg_Dbg( p_sd, "." );
     if( i_version != 1 )
     {
        msg_Dbg( p_sd, "strange sap version %d found", i_version );
@@ -983,7 +983,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         }
         else
         {
-            msg_Dbg( p_obj, "incorrect c field");
+            msg_Dbg( p_obj, "incorrect c field, %s", p_sdp->psz_connection );
         }
         psz_uri = strdup( psz_parse );
 
@@ -1053,7 +1053,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         }
         else
         {
-            msg_Dbg( p_obj, "incorrect m field");
+            msg_Dbg( p_obj, "incorrect m field, %s", p_sdp->psz_media );
             p_sdp->i_media_type = 33;
             psz_proto = strdup( psz_parse );
         }
@@ -1100,7 +1100,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     sdp_t *p_sdp;
     vlc_bool_t b_invalid = VLC_FALSE;
     vlc_bool_t b_end = VLC_FALSE;
-
+msg_Dbg( p_obj, "%s", psz_sdp );
     if( psz_sdp == NULL )
     {
         return NULL;
