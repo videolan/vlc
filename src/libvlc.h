@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.15 2002/09/16 20:46:38 massiot Exp $
+ * $Id: libvlc.h,v 1.16 2002/10/01 22:29:09 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -188,6 +188,12 @@
 #define IFACE_LONGTEXT N_( \
     "If you have several interfaces on your Linux machine and use the " \
     "VLAN solution, you may indicate here which interface to use.")
+
+#define IFACE_ADDR_TEXT N_("network interface address")
+#define IFACE_ADDR_LONGTEXT N_( \
+    "If you have several interfaces on your machine and use the " \
+    "multicast solution, you will probably have to indicate the IP address " \
+    "of your multicasting interface here.")    
 
 #define INPUT_PROGRAM_TEXT N_("choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
@@ -392,6 +398,7 @@ vlc_module_begin();
                  CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT );
     add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT );
     add_string( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT );
+    add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT );
 
     add_integer( "program", 0, NULL,
                  INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT );

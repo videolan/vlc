@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.3 2002/08/08 22:28:22 sam Exp $
+ * $Id: ipv4.c,v 1.4 2002/10/01 22:29:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -240,15 +240,25 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         struct ip_mreq imr;
-        imr.imr_interface.s_addr = INADDR_ANY;
+        char * psz_if_addr = config_GetPsz( p_this, "iface-addr" );
         imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
 #else
     if( IN_MULTICAST( ntohl(inet_addr(psz_bind_addr) ) ) )
     {
         struct ip_mreq imr;
-        imr.imr_interface.s_addr = INADDR_ANY;
+        char * psz_if_addr = config_GetPsz( p_this, "iface-addr" );
         imr.imr_multiaddr.s_addr = inet_addr(psz_bind_addr);
-#endif                
+#endif
+        if ( *psz_if_addr && inet_addr(psz_if_addr) != -1 )
+        {
+            imr.imr_interface.s_addr = inet_addr(psz_if_addr);
+        }
+        else
+        {
+            imr.imr_interface.s_addr = INADDR_ANY;
+        }
+        free( psz_if_addr );
+
         if( setsockopt( i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
