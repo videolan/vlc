@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.52 2004/01/09 12:23:47 gbazin Exp $
+ * $Id: http.c,v 1.53 2004/01/09 15:26:58 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -486,7 +486,7 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable, off_t *pi_
         char *buf;
         char *b64;
 
-        vasprintf( &buf, "%s:%s", p_sys->psz_user,
+        asprintf( &buf, "%s:%s", p_sys->psz_user,
                    p_sys->psz_passwd ? p_sys->psz_passwd : "" );
 
         b64 = b64_encode( buf );
