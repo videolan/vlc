@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ogg.c
+ * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.8 2003/07/01 17:14:58 sam Exp $
+ * $Id: ogg.c,v 1.9 2003/09/25 23:09:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -262,11 +262,16 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                      p_input->p_fmt->i_height );
             break;
 
+        case VLC_FOURCC( 't', 'h', 'e', 'o' ):
+          msg_Dbg( p_mux, "theora stream" );
+          break;
+
         default:
             FREE( p_input->p_sys );
             return( VLC_EGENERIC );
         }
         break;
+
     case AUDIO_ES:
         switch( p_input->p_fmt->i_fourcc )
         {
@@ -300,6 +305,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'v', 'o', 'r', 'b' ):
           msg_Dbg( p_mux, "vorbis stream" );
           break;
+
         default:
             FREE( p_input->p_sys );
             return( VLC_EGENERIC );
@@ -466,7 +472,8 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
 
         p_stream = (ogg_stream_t*)p_mux->pp_inputs[i]->p_sys;
 
-        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
+            p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
             /* Special case, headers are already there in the
              * incoming stream */
@@ -504,7 +511,8 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
 
         p_stream = (ogg_stream_t*)p_mux->pp_inputs[i]->p_sys;
 
-        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
+            p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
             /* Special case, headers are already there in the incoming stream.
              * We need to gather them an mark them as headers. */
@@ -644,7 +652,12 @@ static int Mux( sout_mux_t *p_mux )
         }
         else if( p_stream->i_cat == VIDEO_ES )
         {
-            op.granulepos = ( i_dts - p_sys->i_start_dts ) / 1000;
+            if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+            {
+                op.granulepos = op.packetno; /* FIXME */
+            }
+            else
+                op.granulepos = ( i_dts - p_sys->i_start_dts ) / 1000;
         }
 
         ogg_stream_packetin( &p_stream->os, &op );
