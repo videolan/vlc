@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.152 2004/01/22 01:20:39 jlj Exp $
+dnl $Id: configure.ac,v 1.153 2004/01/23 15:36:23 titer Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -995,7 +995,7 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
      CFLAGS="${CFLAGS_save}"])
 if test "${ac_cv_c_altivec}" != "no"; then
   AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1, Define if your compiler groks C AltiVec extensions.)
-  AX_ADD_CFLAGS([vlc idctaltivec motionaltivec memcpyaltivec],[${ac_cv_c_altivec}])
+  AX_ADD_CFLAGS([vlc idctaltivec motionaltivec memcpyaltivec deinterlace],[${ac_cv_c_altivec}])
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
 fi
 

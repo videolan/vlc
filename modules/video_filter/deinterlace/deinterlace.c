@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.18 2003/12/22 14:32:56 sam Exp $
+ * $Id: deinterlace.c,v 1.19 2004/01/23 15:36:23 titer Exp $
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *
@@ -55,7 +55,8 @@ static void RenderMean   ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderBlend  ( vout_thread_t *, picture_t *, picture_t * );
 static void RenderLinear ( vout_thread_t *, picture_t *, picture_t *, int );
 
-static void Merge        ( void *, const void *, const void *, size_t );
+static void MergeGeneric ( void *, const void *, const void *, size_t );
+static void MergeAltivec ( void *, const void *, const void *, size_t );
 
 static int  SendEvents   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -107,6 +108,8 @@ struct vout_sys_t
     vout_thread_t *p_vout;
 
     vlc_mutex_t filter_lock;
+
+    void (*pf_merge) ( void *, const void *, const void *, size_t );
 };
 
 /*****************************************************************************
@@ -137,6 +140,15 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->b_double_rate = 0;
     p_vout->p_sys->last_date = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
+
+    if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_ALTIVEC )
+    {
+        p_vout->p_sys->pf_merge = MergeAltivec;
+    }
+    else
+    {
+        p_vout->p_sys->pf_merge = MergeGeneric;
+    }
 
     /* Look what method was requested */
     var_Create( p_vout, "deinterlace-mode", VLC_VAR_STRING );
@@ -617,6 +629,8 @@ static void RenderBob( vout_thread_t *p_vout,
     }
 }
 
+#define Merge p_vout->p_sys->pf_merge
+
 /*****************************************************************************
  * RenderLinear: BOB with linear interpolation
  *****************************************************************************/
@@ -774,8 +788,10 @@ static void RenderBlend( vout_thread_t *p_vout,
     }
 }
 
-static void Merge( void *_p_dest, const void *_p_s1,
-                   const void *_p_s2, size_t i_bytes )
+#undef Merge
+
+static void MergeGeneric( void *_p_dest, const void *_p_s1,
+                          const void *_p_s2, size_t i_bytes )
 {
     uint8_t* p_dest = (uint8_t*)_p_dest;
     const uint8_t *p_s1 = (const uint8_t *)_p_s1;
@@ -800,6 +816,41 @@ static void Merge( void *_p_dest, const void *_p_s1,
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
+}
+
+static void MergeAltivec( void *_p_dest, const void *_p_s1,
+                          const void *_p_s2, size_t i_bytes )
+{
+#ifdef CAN_COMPILE_C_ALTIVEC
+    uint8_t *p_dest = (uint8_t*)_p_dest;
+    const uint8_t *p_s1 = (const uint8_t *)_p_s1;
+    const uint8_t *p_s2 = (const uint8_t *)_p_s2;
+    uint8_t *p_end = p_dest + i_bytes - 16;
+
+    if( ( (int)p_s1 & 0xF ) | ( (int)p_s2 & 0xF ) |
+        ( (int)p_dest & 0xF ) )
+    {
+        /* TODO Handle non 16-bytes aligned planes */
+        MergeGeneric( _p_dest, _p_s1, _p_s2, i_bytes );
+        return;
+    }
+
+    while( p_dest < p_end )
+    {
+        vec_st( vec_avg( vec_ld( 0, p_s1 ), vec_ld( 0, p_s2 ) ),
+                0, p_dest );
+        p_s1   += 16;
+        p_s2   += 16;
+        p_dest += 16;
+    }
+
+    p_end += 16;
+
+    while( p_dest < p_end )
+    {
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+    }
+#endif
 }
 
 /*****************************************************************************
