@@ -39,7 +39,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for DVDnav streams. This "\
     "value should be set in millisecond units." )
@@ -90,6 +90,7 @@ struct demux_sys_t
 
     /* track */
     ps_track_t  tk[PS_TK_COUNT];
+    int         i_mux_rate;
 
     /* for spu variables */
     input_thread_t *p_input;
@@ -165,6 +166,7 @@ static int Open( vlc_object_t *p_this )
     ps_track_init( p_sys->tk );
     p_sys->i_aspect = -1;
     p_sys->b_es_out_ok = VLC_FALSE;
+    p_sys->i_mux_rate = 0;
 
     if( 1 )
     {
@@ -320,32 +322,51 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
-        case DEMUX_GET_POSITION:
-        {
-            uint32_t pos, len;
-            pf = (double*) va_arg( args, double* );
-            if( dvdnav_get_position( p_sys->dvdnav, &pos, &len ) ==
-                  DVDNAV_STATUS_OK && len > 0 )
-            {
-                *pf = (double)pos / (double)len;
-            }
-            else
-            {
-                *pf = 0.0;
-            }
-            return VLC_SUCCESS;
-        }
         case DEMUX_SET_POSITION:
+        case DEMUX_GET_POSITION:
+        case DEMUX_GET_TIME:
+        case DEMUX_GET_LENGTH:
         {
             uint32_t pos, len;
-            f = (double)va_arg( args, double );
-            if( dvdnav_get_position( p_sys->dvdnav, &pos, &len ) ==
-                  DVDNAV_STATUS_OK && len > 0 )
+            if( dvdnav_get_position( p_sys->dvdnav, &pos, &len ) !=
+                  DVDNAV_STATUS_OK || len == 0 )
             {
+                return VLC_EGENERIC;
+            }
+
+            if( i_query == DEMUX_GET_POSITION )
+            {
+                pf = (double*)va_arg( args, double* );
+                *pf = (double)pos / (double)len;
+                return VLC_SUCCESS;
+            }
+            else if( i_query == DEMUX_SET_POSITION )
+            {
+                f = (double)va_arg( args, double );
                 pos = f * len;
                 if( dvdnav_sector_search( p_sys->dvdnav, pos, SEEK_SET ) ==
                       DVDNAV_STATUS_OK )
                 {
+                    return VLC_SUCCESS;
+                }
+            }
+            else if( i_query == DEMUX_GET_TIME )
+            {
+                pi64 = (int64_t*)va_arg( args, int64_t * );
+                if( p_sys->i_mux_rate > 0 )
+                {
+                    *pi64 = (int64_t)1000000 * 2048 * pos / 50 /
+                        p_sys->i_mux_rate;
+                    return VLC_SUCCESS;
+                }
+            }
+            else if( i_query == DEMUX_GET_LENGTH )
+            {
+                pi64 = (int64_t*)va_arg( args, int64_t * );
+                if( p_sys->i_mux_rate > 0 )
+                {
+                    *pi64 = (int64_t)1000000 * len * 2048 / 50 /
+                        p_sys->i_mux_rate;
                     return VLC_SUCCESS;
                 }
             }
@@ -986,6 +1007,7 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
             if( !ps_pkt_parse_pack( p_pkt, &i_scr, &i_mux_rate ) )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_scr );
+                if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
             }
             block_Release( p_pkt );
             break;
@@ -1142,7 +1164,6 @@ static int EventThread( vlc_object_t *p_this )
     p_ev->b_moved   = VLC_FALSE;
     p_ev->b_clicked = VLC_FALSE;
     p_ev->b_key     = VLC_FALSE;
-
     p_ev->b_still   = VLC_FALSE;
 
     /* catch all key event */
@@ -1200,7 +1221,7 @@ static int EventThread( vlc_object_t *p_this )
         /* VOUT part */
         if( p_vout && ( p_ev->b_moved || p_ev->b_clicked ) )
         {
-            pci_t       *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
             vlc_value_t valx, valy;
 
             vlc_mutex_lock( &p_ev->lock );

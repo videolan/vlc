@@ -54,7 +54,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for DVDread streams. " \
     "This value should be set in millisecond units." )
@@ -138,6 +138,7 @@ struct demux_sys_t
 
     /* Track */
     ps_track_t    tk[PS_TK_COUNT];
+    int           i_mux_rate;
 
     int           i_titles;
     input_title_t **titles;
@@ -230,6 +231,7 @@ static int Open( vlc_object_t *p_this )
 
     ps_track_init( p_sys->tk );
     p_sys->i_aspect = -1;
+    p_sys->i_mux_rate = 0;
 
     p_sys->p_dvdread = p_dvdread;
     p_sys->p_vmg_file = p_vmg_file;
@@ -312,6 +314,27 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             return VLC_SUCCESS;
         }
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_mux_rate > 0 )
+            {
+                *pi64 = (int64_t)1000000 * DVD_VIDEO_LB_LEN *
+                        p_sys->i_title_offset / 50 / p_sys->i_mux_rate;
+                return VLC_SUCCESS;
+            }
+            *pi64 = 0;
+            return VLC_EGENERIC;
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            if( p_sys->i_mux_rate > 0 )
+            {
+                *pi64 = (int64_t)1000000 * DVD_VIDEO_LB_LEN *
+                        p_sys->i_title_blocks / 50 / p_sys->i_mux_rate;
+                return VLC_SUCCESS;
+            }
+            *pi64 = 0;
+            return VLC_EGENERIC;
 
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
@@ -519,6 +542,7 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
             if( !ps_pkt_parse_pack( p_pkt, &i_scr, &i_mux_rate ) )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_scr );
+                if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
             }
             block_Release( p_pkt );
             break;
@@ -1126,10 +1150,6 @@ static void DvdReadFindCell( demux_t *p_demux )
 
     if( cell[p_sys->i_cur_cell].block_type == BLOCK_TYPE_ANGLE_BLOCK )
     {
-#if 0
-        p_sys->i_next_cell = p_sys->i_cur_cell + p_sys->i_angle_nb;
-        p_sys->i_cur_cell += p_sys->i_angle - 1;
-#else
         p_sys->i_cur_cell += p_sys->i_angle - 1;
 
         while( cell[p_sys->i_cur_cell+i].block_mode != BLOCK_MODE_LAST_CELL )
@@ -1137,7 +1157,6 @@ static void DvdReadFindCell( demux_t *p_demux )
             i++;
         }
         p_sys->i_next_cell = p_sys->i_cur_cell + i + 1;
-#endif
     }
     else
     {
