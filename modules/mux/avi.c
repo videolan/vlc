@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.1 2003/01/12 04:30:14 fenrir Exp $
+ * $Id: avi.c,v 1.2 2003/01/13 02:33:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -140,8 +140,8 @@ static int Open( vlc_object_t *p_this )
     p_sout->pf_mux_addstream = AddStream;
     p_sout->pf_mux_delstream = DelStream;
     p_sout->pf_mux           = Mux;
-
     p_sout->p_mux_data = (void*)p_mux;
+    p_sout->i_mux_preheader  = 8; // (fourcc,length) header
 
     /* room to add header at the end */
     p_hdr = sout_BufferNew( p_sout, HDR_SIZE );
@@ -303,7 +303,6 @@ static int Mux      ( sout_instance_t *p_sout )
         while( i_count > 0 )
         {
             sout_buffer_t *p_data;
-            sout_buffer_t *p_hdr;
 
             p_data = sout_FifoGet( p_fifo );
 
@@ -311,9 +310,24 @@ static int Mux      ( sout_instance_t *p_sout )
             p_stream->i_duration  += p_data->i_length;
             p_stream->i_totalsize += p_data->i_size;
 
-            p_hdr = sout_BufferNew( p_sout, 8 );
-            SetFCC( p_hdr->p_buffer, p_stream->fcc );
-            SetDWLE( p_hdr->p_buffer + 4, p_data->i_size );
+            if( sout_BufferReallocFromPreHeader( p_sout, p_data, 8 ) )
+            {
+                /* there isn't enough data in preheader */
+                sout_buffer_t *p_hdr;
+
+                p_hdr = sout_BufferNew( p_sout, 8 );
+                SetFCC( p_hdr->p_buffer, p_stream->fcc );
+                SetDWLE( p_hdr->p_buffer + 4, p_data->i_size );
+
+                p_sout->pf_write( p_sout, p_hdr );
+                p_mux->i_movi_size += p_hdr->i_size;
+
+            }
+            else
+            {
+                SetFCC( p_data->p_buffer, p_stream->fcc );
+                SetDWLE( p_data->p_buffer + 4, p_data->i_size - 8 );
+            }
 
             if( p_data->i_size & 0x01 )
             {
@@ -321,8 +335,6 @@ static int Mux      ( sout_instance_t *p_sout )
                 p_data->i_size += 1;
             }
 
-            p_sout->pf_write( p_sout, p_hdr );
-            p_mux->i_movi_size += p_hdr->i_size;
             p_sout->pf_write( p_sout, p_data );
             p_mux->i_movi_size += p_data->i_size;
 

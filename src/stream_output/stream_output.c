@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.8 2003/01/08 14:59:23 sam Exp $
+ * $Id: stream_output.c,v 1.9 2003/01/13 02:33:13 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -82,6 +82,8 @@ static int InitInstance( sout_instance_t * p_sout )
     p_sout->psz_name = "";
     p_sout->p_access = NULL;
     p_sout->p_mux = NULL;
+    p_sout->i_access_preheader = 0;
+    p_sout->i_mux_preheader = 0;
     p_sout->i_nb_inputs = 0;
     p_sout->pp_inputs = NULL;
     vlc_mutex_init( p_sout, &p_sout->lock );
@@ -478,45 +480,81 @@ sout_buffer_t *sout_FifoShow( sout_fifo_t *p_fifo )
 sout_buffer_t *sout_BufferNew( sout_instance_t *p_sout, size_t i_size )
 {
     sout_buffer_t *p_buffer;
+    size_t        i_prehader;
 
 #ifdef DEBUG_BUFFER
     msg_Dbg( p_sout, "allocating an new buffer, size:%d", (uint32_t)i_size );
 #endif
 
     p_buffer = malloc( sizeof( sout_buffer_t ) );
+    i_prehader = p_sout->i_access_preheader + p_sout->i_mux_preheader;
+
     if( i_size > 0 )
     {
-        p_buffer->p_buffer = malloc( i_size );
+        p_buffer->p_allocated_buffer = malloc( i_size + i_prehader );
+        p_buffer->p_buffer = p_buffer->p_allocated_buffer + i_prehader;
     }
     else
     {
+        p_buffer->p_allocated_buffer = NULL;
         p_buffer->p_buffer = NULL;
     }
-    p_buffer->i_allocated_size = i_size;
+    p_buffer->i_allocated_size = i_size + i_prehader;
+    p_buffer->i_buffer_size = i_size;
+
     p_buffer->i_size = i_size;
+    p_buffer->i_length = 0;
+    p_buffer->i_dts = 0;
+    p_buffer->i_pts = 0;
+    p_buffer->i_bitrate = 0;
     p_buffer->p_next = NULL;
 
     return( p_buffer );
 }
 int sout_BufferRealloc( sout_instance_t *p_sout, sout_buffer_t *p_buffer, size_t i_size )
 {
+    size_t          i_prehader;
+
 #ifdef DEBUG_BUFFER
     msg_Dbg( p_sout,
              "realloc buffer old size:%d new size:%d",
              (uint32_t)p_buffer->i_allocated_size,
              (uint32_t)i_size );
 #endif
-    if( !( p_buffer->p_buffer = realloc( p_buffer->p_buffer, i_size ) ) )
+
+    i_prehader = p_buffer->p_buffer - p_buffer->p_allocated_buffer;
+
+    if( !( p_buffer->p_allocated_buffer = realloc( p_buffer->p_allocated_buffer, i_size + i_prehader ) ) )
     {
         msg_Err( p_sout, "realloc failed" );
         p_buffer->i_allocated_size = 0;
+        p_buffer->i_buffer_size = 0;
         p_buffer->i_size = 0;
+        p_buffer->p_buffer = NULL;
+        return( -1 );
+    }
+    p_buffer->p_buffer = p_buffer->p_allocated_buffer + i_prehader;
 
+    p_buffer->i_allocated_size = i_size + i_prehader;
+    p_buffer->i_buffer_size = i_size;
+
+    return( 0 );
+}
+
+int sout_BufferReallocFromPreHeader( sout_instance_t *p_sout, sout_buffer_t *p_buffer, size_t i_size )
+{
+    size_t  i_preheader;
+
+    i_preheader = p_buffer->p_buffer - p_buffer->p_allocated_buffer;
+
+    if( i_preheader < i_size )
+    {
         return( -1 );
     }
 
-    p_buffer->i_allocated_size = i_size;
-    return( 0 );
+    p_buffer->p_buffer -= i_size;
+    p_buffer->i_size += i_size;
+    p_buffer->i_buffer_size += i_size;
 }
 
 int sout_BufferDelete( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
@@ -524,9 +562,9 @@ int sout_BufferDelete( sout_instance_t *p_sout, sout_buffer_t *p_buffer )
 #ifdef DEBUG_BUFFER
     msg_Dbg( p_sout, "freeing buffer, size:%d", p_buffer->i_size );
 #endif
-    if( p_buffer->p_buffer )
+    if( p_buffer->p_allocated_buffer )
     {
-        free( p_buffer->p_buffer );
+        free( p_buffer->p_allocated_buffer );
     }
     free( p_buffer );
     return( 0 );

@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.3 2003/01/08 10:38:32 fenrir Exp $
+ * $Id: stream_output.h,v 1.4 2003/01/13 02:33:13 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -27,13 +27,24 @@
  * sout_instance_t: stream output thread descriptor
  *****************************************************************************/
 
+/*
+ * i_allocated_size: size of allocated buffer
+ * p_allocated_buffer: where data has been allocated
+ *
+ * i_buffer_size: sizeof buffer from p_buffer
+ * p_buffer: where data begins
+ * i_size: size of valid data
+ *
+ */
 struct sout_buffer_t
 {
     size_t                  i_allocated_size;
+    byte_t                  *p_allocated_buffer;
+
+    size_t                  i_buffer_size;
     byte_t                  *p_buffer;
 
     size_t                  i_size;
-//    mtime_t                 i_date;
     mtime_t                 i_length;
 
     mtime_t                 i_dts;
@@ -91,11 +102,13 @@ struct sout_instance_t
     module_t                *p_access;
     int                     i_method;
     void                    *p_access_data;
+    int                     i_access_preheader;
     int                     (* pf_write )( sout_instance_t *, sout_buffer_t * );
     int                     (* pf_seek  )( sout_instance_t *, off_t );
 
     module_t                *p_mux;
     void                    *p_mux_data;
+    int                     i_mux_preheader;
     int                     (* pf_mux_addstream )( sout_instance_t *,
                                                    sout_input_t * );
     int                     (* pf_mux_delstream )( sout_instance_t *,
@@ -135,6 +148,7 @@ VLC_EXPORT( int,            sout_InputSendBuffer,  ( sout_input_t *, sout_buffer
 
 VLC_EXPORT( sout_buffer_t*, sout_BufferNew,    ( sout_instance_t *, size_t ) );
 VLC_EXPORT( int,            sout_BufferRealloc,( sout_instance_t *, sout_buffer_t*, size_t ) );
+VLC_EXPORT( int,            sout_BufferReallocFromPreHeader,( sout_instance_t *, sout_buffer_t*, size_t ) );
 VLC_EXPORT( int,            sout_BufferDelete, ( sout_instance_t *, sout_buffer_t* ) );
 VLC_EXPORT( sout_buffer_t*, sout_BufferDuplicate,(sout_instance_t *, sout_buffer_t * ) );
 VLC_EXPORT( void,           sout_BufferChain,  ( sout_buffer_t **, sout_buffer_t * ) );

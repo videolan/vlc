@@ -2,7 +2,7 @@
  * ps.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.4 2003/01/08 10:34:58 fenrir Exp $
+ * $Id: ps.c,v 1.5 2003/01/13 02:33:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -120,6 +120,7 @@ static int Open( vlc_object_t *p_this )
     p_sout->pf_mux_delstream = DelStream;
     p_sout->pf_mux           = Mux;
     p_sout->p_mux_data       = (void*)p_mux;
+    p_sout->i_mux_preheader  = 30; // really enough for a pes header
 
     p_mux->i_stream_id_mpga = 0xc0;
     p_mux->i_stream_id_a52  = 0x80;

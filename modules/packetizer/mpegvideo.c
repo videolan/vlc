@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.2 2003/01/08 10:26:49 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.3 2003/01/13 02:33:13 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -188,11 +188,11 @@ static int CopyUntilNextStartCode( packetizer_t   *p_pack,
                 GetBits( &p_pack->bit_stream, 8 );
         i_copy++;
 
-        if( *pi_pos + 2048 > p_sout_buffer->i_allocated_size )
+        if( *pi_pos + 2048 > p_sout_buffer->i_buffer_size )
         {
             sout_BufferRealloc( p_pack->p_sout_input->p_sout,
                                 p_sout_buffer,
-                                p_sout_buffer->i_allocated_size + 50 * 1024);
+                                p_sout_buffer->i_buffer_size + 50 * 1024);
         }
 
     } while( ShowBits( &p_pack->bit_stream, 24 ) != 0x01 &&
