@@ -172,6 +172,13 @@ AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then
   AC_DEFINE(HAVE_INCLUDED_GETTEXT, 1, Define if we use the local libintl)
   INCLUDES="${INCLUDES} -I\\\$(top_srcdir)/intl"
+else
+  AC_CHECK_FUNC(textdomain,,[
+    AC_CHECK_LIB(intl,textdomain,
+      LDFLAGS_vlc="${LDFLAGS_vlc} -lintl"
+      LDFLAGS_plugins="${LDFLAGS_plugins} -lintl"
+    )
+  ])
 fi
 AM_CONDITIONAL(BUILD_INTL, test "${nls_cv_force_use_gnu_gettext}" = "yes")
 XGETTEXT="${XGETTEXT} --keyword=_NS"
@@ -312,12 +319,6 @@ AC_CHECK_LIB(rt,sem_init, [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"])
 
 AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lresolv")
-])
-AC_CHECK_FUNC(textdomain,,[
-  AC_CHECK_LIB(intl,textdomain,
-    LDFLAGS_vlc="${LDFLAGS_vlc} -lintl"
-    LDFLAGS_plugins="${LDFLAGS_plugins} -lintl"
-  )
 ])
 
 dnl Check for getopt
