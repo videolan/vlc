@@ -425,6 +425,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
+        case DEMUX_SET_TIME:
+            return VLC_EGENERIC;
+
         case DEMUX_GET_LENGTH:
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = p_sys->i_length;
@@ -436,7 +439,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-        case DEMUX_SET_TIME:
             p_sys->i_time = -1;
             for( i = 0; i < 128 ; i++ )
             {
