@@ -53,9 +53,14 @@ int Export_M3U( vlc_object_t *p_this )
     /* Go through the playlist and add items */
     for( i = 0; i< p_playlist->i_size ; i++)
     {
+        if( p_playlist->pp_items[i]->i_flags & ~PLAYLIST_SAVE_FLAG )
+        {
+            continue;
+        }
+
         /* General info */
         if( p_playlist->pp_items[i]->input.psz_name &&
-	    strcmp( p_playlist->pp_items[i]->input.psz_name,
+             strcmp( p_playlist->pp_items[i]->input.psz_name,
                     p_playlist->pp_items[i]->input.psz_uri ) )
         {
             char *psz_author =

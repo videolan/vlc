@@ -326,7 +326,7 @@ SOURCES_libvlc_common = \
 	src/playlist/playlist.c \
 	src/playlist/sort.c \
 	src/playlist/loadsave.c \
-	src/playlist/group.c \
+	src/playlist/view.c \
 	src/playlist/item.c \
 	src/playlist/item-ext.c \
 	src/playlist/info.c \

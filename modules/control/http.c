@@ -941,9 +941,6 @@ static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
 
         mvar_AppendNewVar( itm, "uri", p_pl->pp_items[i]->input.psz_uri );
 
-        sprintf( value, "%d", p_pl->pp_items[i]->i_group );
-        mvar_AppendNewVar( itm, "group", value );
-
         mvar_AppendVar( s, itm );
     }
     vlc_mutex_unlock( &p_pl->object_lock );
@@ -1585,26 +1582,25 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                     uri_extract_value( p_request, "item", item, 512 );
                     i_item = atoi( item );
-                    playlist_Command( p_sys->p_playlist, PLAYLIST_GOTO, i_item );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_GOTO,
+                                                         i_item );
                     msg_Dbg( p_intf, "requested playlist item: %i", i_item );
                     break;
                 }
                 case MVLC_STOP:
-                    playlist_Command( p_sys->p_playlist, PLAYLIST_STOP, 0 );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_STOP);
                     msg_Dbg( p_intf, "requested playlist stop" );
                     break;
                 case MVLC_PAUSE:
-                    playlist_Command( p_sys->p_playlist, PLAYLIST_PAUSE, 0 );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE );
                     msg_Dbg( p_intf, "requested playlist pause" );
                     break;
                 case MVLC_NEXT:
-                    playlist_Command( p_sys->p_playlist, PLAYLIST_GOTO,
-                                      p_sys->p_playlist->i_index + 1 );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, 1 );
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
                 case MVLC_PREVIOUS:
-                    playlist_Command( p_sys->p_playlist, PLAYLIST_GOTO,
-                                      p_sys->p_playlist->i_index - 1 );
+                    playlist_Control( p_sys->p_playlist, PLAYLIST_SKIP, -1);
                     msg_Dbg( p_intf, "requested playlist next" );
                     break;
                 case MVLC_FULLSCREEN:
@@ -1989,10 +1985,6 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         playlist_SortTitle( p_sys->p_playlist , i_order );
                         msg_Dbg( p_intf, "requested playlist sort by title (%d)" , i_order );
-                    } else if( !strcmp( type , "group" ) )
-                    {
-                        playlist_SortGroup( p_sys->p_playlist , i_order );
-                        msg_Dbg( p_intf, "requested playlist sort by group (%d)" , i_order );
                     } else if( !strcmp( type , "author" ) )
                     {
                         playlist_SortAuthor( p_sys->p_playlist , i_order );
@@ -2001,7 +1993,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         playlist_Sort( p_sys->p_playlist , SORT_RANDOM, ORDER_NORMAL );
                         msg_Dbg( p_intf, "requested playlist shuffle");
-                    } 
+                    }
 
                     break;
                 }

@@ -109,10 +109,34 @@ Task
 Difficulty: Medium
 Urgency: Normal
 Platform: any
-Description: Tree playlist
+Description: Playlist II
  A hierarchized playlist structure, eventually using a media library.
 Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas (not up-to-date)</a><br />
-Mostly finished. will be done after 0.8.0
+50% done.<br />
+Todo:<br />
+- Core support<br />
+   - **  input options inheritance (down nodes)<br />
+   - *** Improve random mode and fix loop<br />
+   - *   "Name finder"<br />
+   - *   "Protocol rollover" node<br />
+   - *** Fix autodeletion<br />
+   - *** Item moving/copying facilities<br />
+- Helper modules<br />
+   - **  ASX and B4S parsers (see below)<br />
+   - *   Rewrite SLP announce discovery<br />
+   - *** Finish new SAP parser (see above)<br />
+   - **  Adapt CDDAX<br />
+   - **  Fix MP4, LIVE.COM<br />
+- *** Implement in MacOS X and Skins 2 interfaces<br />
+- wx implementation :<br />
+   - **  Support item move/copy<br />
+   - *   Explorer view<br />
+   - *** Fix search<br />
+   - *** Play Node vs Play all<br />
+   - **  Clever update using i_serial<br />
+   - *   Playlist preferences panel<br />
+   - **  Improve iteminfo dialog<br />
+   - **  Support item types<br />
 Status: Assigned to zorglub
 
 Task
@@ -515,7 +539,7 @@ Status: Todo
 Task
 Difficulty: Medium
 Platform: any
-Urgency: Normal
+Urgency: Important
 Description: Update matroska demux
  Better Seeking
 Status: Todo
