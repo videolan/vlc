@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.51 2003/12/11 12:52:39 rocky Exp $
+ * $Id: open.cpp,v 1.52 2003/12/13 00:45:00 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -486,15 +486,16 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_device, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
-    label = new wxStaticText( panel, -1, wxU(_("Title")) );
+    disc_title_label = new wxStaticText( panel, -1, wxU(_("Title")) );
     disc_title = new wxSpinCtrl( panel, DiscTitle_Event );
 
-    sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+    sizer->Add( disc_title_label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_title, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
-    label = new wxStaticText( panel, -1, wxU(_("Chapter")) );
+    disc_chapter_label = new wxStaticText( panel, -1, wxU(_("Chapter")) );
     disc_chapter = new wxSpinCtrl( panel, DiscChapter_Event );
-    sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+    sizer->Add( disc_chapter_label, 0, 
+		wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_chapter, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer_row->Add( sizer, 0, wxEXPAND | wxALL, 5 );
 
@@ -680,6 +681,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
       switch ( disc_type->GetSelection() ) 
 	{
 	case 0:
+	  disc_chapter->Enable();
+	  disc_chapter_label->Enable();
 	  mrltemp = wxT("dvd://") 
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d:%d"),
@@ -687,6 +690,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                       disc_chapter->GetValue() );
 	  break;
 	case 1:
+	  disc_chapter->Enable();
+	  disc_chapter_label->Enable();
 	  mrltemp = wxT("dvdsimple://") 
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d:%d"),
@@ -694,6 +699,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                       disc_chapter->GetValue() );
 	  break;
 	case 2:
+	  disc_chapter->Disable();
+	  disc_chapter_label->Disable();
 #ifdef HAVE_VCDX
 	  if ( disc_title->GetValue() )
 	    mrltemp = wxT("vcdx://") 
@@ -714,6 +721,8 @@ void OpenDialog::UpdateMRL( int i_access_method )
 #endif
 	  break;
 	case 3:
+	  disc_chapter->Disable();
+	  disc_chapter_label->Disable();
 #ifdef HAVE_CDDAX
 	  if ( disc_title->GetValue() )
 	    mrltemp =  wxT("cddax://") 
@@ -1039,6 +1048,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         if( !b_disc_device_changed )
         {
             disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
+	    disc_title_label->SetLabel ( wxT("Track") );
         }
         break;
 
@@ -1047,6 +1057,8 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         if( !b_disc_device_changed )
         {
             disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
+	    disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
+					 ? wxT("PBC LID") : wxT("Entry") );
         }
         break;
 
@@ -1055,6 +1067,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         if( !b_disc_device_changed )
         {
             disc_device->SetValue( psz_device ? wxU(psz_device) : wxT("") );
+	    disc_title_label->SetLabel ( wxT("Title") );
         }
         break;
     }
