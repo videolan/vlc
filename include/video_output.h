@@ -102,7 +102,8 @@ typedef struct vout_buffer_s
  * structure.
  *****************************************************************************/
 typedef int  (vout_sys_create_t)    ( p_vout_thread_t p_vout,
-                                      char *psz_display, int i_root_window );
+                                      char *psz_display,
+                                      int i_root_window, void *p_data );
 typedef int  (vout_sys_init_t)      ( p_vout_thread_t p_vout );
 typedef void (vout_sys_end_t)       ( p_vout_thread_t p_vout );
 typedef void (vout_sys_destroy_t)   ( p_vout_thread_t p_vout );
@@ -224,7 +225,8 @@ typedef struct vout_thread_s
  * Prototypes
  *****************************************************************************/
 vout_thread_t * vout_CreateThread       ( char *psz_display, int i_root_window,
-                                          int i_width, int i_height, int *pi_status, int i_method );
+                                          int i_width, int i_height, int *pi_status,
+                                          int i_method, void *p_data );
 void            vout_DestroyThread      ( vout_thread_t *p_vout, int *pi_status );
 picture_t *     vout_CreatePicture      ( vout_thread_t *p_vout, int i_type,
                                           int i_width, int i_height );

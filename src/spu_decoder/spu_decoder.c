@@ -288,16 +288,16 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 /* 00 (force displaying) */
                                 break;
                             /* FIXME: here we have to calculate dates. It's
-                             * around i_date * 10000 but I don't know
+                             * around i_date * 12000 but I don't know
                              * how much exactly.
                              */
                             case 0x01:
                                 /* 01 (start displaying) */
-                                p_spu->begin_date += ( i_date * 10000 );
+                                p_spu->begin_date += ( i_date * 12000 );
                                 break;
                             case 0x02:
                                 /* 02 (stop displaying) */
-                                p_spu->end_date += ( i_date * 10000 );
+                                p_spu->end_date += ( i_date * 12000 );
                                 break;
                             case 0x03:
                                 /* 03xxxx (palette) */

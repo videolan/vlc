@@ -135,9 +135,9 @@ void vout_RenderSPU( byte_t *p_data, int p_offset[2],
             {
                 if( (i_color = i_code & 0x3) )
                 {
-                    u8 *p_target = &vspu.p_data[ 2 * 
+                    u8 *p_target = &vspu.p_data[ i_bytes_per_pixel *
                                     ( vspu.x + vspu.y * vspu.width ) ];
-                    memset( p_target, p_palette[i_color], 2 * (i_code >> 2) );
+                    memset( p_target, p_palette[i_color], i_bytes_per_pixel * (i_code >> 2) );
                 }
                 vspu.x += i_code >> 2;
             }

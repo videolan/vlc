@@ -87,7 +87,8 @@ static void     SetPalette        ( p_vout_thread_t p_vout, u16 *red,
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
 vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
-                          int i_width, int i_height, int *pi_status, int i_method )
+                          int i_width, int i_height, int *pi_status,
+                          int i_method, void *p_data )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_status;                               /* thread status */
@@ -190,7 +191,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
 
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
-    if( p_vout->p_sys_create( p_vout, psz_display, i_root_window ) )
+    if( p_vout->p_sys_create( p_vout, psz_display, i_root_window, p_data ) )
     {
         TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
@@ -1856,7 +1857,6 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
             {
                 /* too late, destroying the subpic */
                 vout_DestroySubPicture( p_vout, p_subpic );
-                printf( "destroying subpicture\n" );
                 break;
             }
             vout_RenderSPU( p_subpic->p_data, p_subpic->type.spu.i_offset,
