@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.10 2004/01/21 04:45:47 rocky Exp $
+ * $Id: subtitle.h,v 1.11 2004/01/22 04:46:19 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -185,6 +185,7 @@ struct subpicture_sys_t
 
   uint8_t *p_data;             /* Image data one byte T, Y, U, V */
 
+
   /* Link to our input */
   vlc_object_t * p_input;
   
@@ -192,4 +193,9 @@ struct subpicture_sys_t
   vlc_mutex_t  lock;
   vlc_bool_t   b_crop;
   unsigned int i_x_start, i_y_start, i_x_end, i_y_end;
+
+  /* This is only used for color palette Chromas like RGB2. */
+  ogt_yuvt_t p_palette[NUM_SUBTITLE_COLORS];  /* Palette of colors used
+						  in subtitle */
+
 };

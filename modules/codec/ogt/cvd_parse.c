@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd_parse.c,v 1.13 2004/01/21 04:45:47 rocky Exp $
+ * $Id: cvd_parse.c,v 1.14 2004/01/22 04:46:19 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -317,6 +317,11 @@ E_(ParsePacket)( decoder_t *p_dec)
 
     p_spu->i_x        = p_sys->i_x_start 
       + config_GetInt( p_dec, MODULE_STRING "-horizontal-correct" );
+
+    p_spu->p_sys->p_palette[0] = p_sys->p_palette[0];
+    p_spu->p_sys->p_palette[1] = p_sys->p_palette[1];
+    p_spu->p_sys->p_palette[2] = p_sys->p_palette[2];
+    p_spu->p_sys->p_palette[3] = p_sys->p_palette[3];
 
     /* FIXME: use aspect ratio for x? */
     p_spu->i_x        = (p_spu->i_x * 3) / 4; 

@@ -2,7 +2,7 @@
  * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.18 2004/01/21 07:38:29 rocky Exp $
+ * $Id: render.c,v 1.19 2004/01/22 04:46:19 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -61,7 +61,8 @@ static void BlendI420( vout_thread_t *, picture_t *, const subpicture_t *,
 static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
 static void BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
-                        const subpicture_t *p_spu, vlc_bool_t b_crop );
+                       const subpicture_t *p_spu, vlc_bool_t b_crop,
+                       vlc_bool_t b_15bpp );
 static void BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
 static void BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
@@ -95,8 +96,14 @@ void VCDSubBlend( vout_thread_t *p_vout, picture_t *p_pic,
             break;
 
         /* RGB 555 - scaled */
+        case VLC_FOURCC('R','V','1','5'):
+            BlendRV16( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop, 
+                       VLC_TRUE );
+            break;
+          
         case VLC_FOURCC('R','V','1','6'):
-            BlendRV16( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+            BlendRV16( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop,
+                       VLC_FALSE );
 	    break;
 
         /* RV32 target, scaling */
@@ -218,7 +225,7 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
 	  
 	  switch( p_source->s.t )
 	    {
-	    case 0x00: 
+	    case 0: 
 	      /* Completely transparent. Don't change pixel. */
 	      break;
 	      
@@ -414,7 +421,7 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 
 	  switch( i_avg_tr )
 	    {
-	    case 0x00: 
+	    case 0: 
 	      /* Completely transparent. Don't change pixel. */
 	      break;
 	      
@@ -563,12 +570,49 @@ yuv2rgb555(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
 
 }
 
+/**
+   Convert a YUV pixel into a 16-bit RGB 5-6-5 pixel.
+
+   A RGB 5-6-5 pixel looks like this:
+   RGB 5-6-5   bit  (MSB) 7  6   5  4  3  2  1  0 (LSB)
+                 p 	 B4 B3 	B2 B1 B0 R5 R4 	R3
+                 q 	 R2 R1  R0 G4 G3 G2 G1 	G0
+
+**/
+
+static inline void
+yuv2rgb565(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
+{
+
+  uint8_t rgb[3];
+
+  yuv2rgb(p_yuv, rgb);
+  
+  /* Scale RGB from 8 bits down to 5 or 6 bits. */
+  rgb[RED_PIXEL]   >>= (8-6);
+  rgb[GREEN_PIXEL] >>= (8-5);
+  rgb[BLUE_PIXEL]  >>= (8-5);
+  
+  *p_rgb1 = ( (rgb[BLUE_PIXEL] << 3)&0xF8 ) | ( (rgb[RED_PIXEL]>>3) & 0x07 );
+  *p_rgb2 = ( (rgb[RED_PIXEL]  << 5)&0xe0 ) | ( rgb[GREEN_PIXEL]&0x1f );
+
+#if 0
+  printf("Y,Cb,Cr,T=(%02x,%02x,%02x,%02x), r,g,b=(%d,%d,%d), "
+         "rgb1: %02x, rgb2 %02x\n",
+         p_yuv->s.y, p_yuv->s.u, p_yuv->s.v, p_yuv->s.t,
+         rgb[RED_PIXEL], rgb[GREEN_PIXEL], rgb[BLUE_PIXEL],
+         *p_rgb1, *p_rgb2);
+#endif
+
+}
+
 #undef BYTES_PER_PIXEL
 #define BYTES_PER_PIXEL 2
 
 static void 
 BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
-            const subpicture_t *p_spu, vlc_bool_t b_crop )
+           const subpicture_t *p_spu, vlc_bool_t b_crop,
+           vlc_bool_t b_15bpp )
 {
     /* Common variables */
     uint8_t *p_pixel_base;
@@ -668,7 +712,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 	      
 	      switch( p_source->s.t )
                 {
-                case 0x00:
+                case 0:
 		  /* Completely transparent. Don't change pixel. */
 		  break;
 		  
@@ -683,7 +727,10 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		    uint8_t *p_dest = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
                     uint8_t i_rgb1;
                     uint8_t i_rgb2;
-                    yuv2rgb555(p_source, &i_rgb1, &i_rgb2);
+                    if (b_15bpp) 
+                      yuv2rgb555(p_source, &i_rgb1, &i_rgb2);
+                    else 
+                      yuv2rgb565(p_source, &i_rgb1, &i_rgb2);
                     *p_dest++ = i_rgb1;
                     *p_dest++ = i_rgb2;
 		    break;
@@ -703,7 +750,10 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		    uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
                     uint8_t rgb[3];
 
-                    yuv2rgb(p_source, rgb);
+                    if (b_15bpp) 
+                      yuv2rgb555(p_source, &i_rgb1, &i_rgb2);
+                    else 
+                      yuv2rgb565(p_source, &i_rgb1, &i_rgb2);
                     rv16_pack_blend(p_dest, rgb, dest_alpha, ALPHA_SCALEDOWN);
 		    break;
 		  }
@@ -741,7 +791,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 	      
 	      switch( p_source->s.t )
                 {
-                case 0x00:
+                case 0:
 		    /* Completely transparent. Don't change pixel. */
                     break;
 
@@ -762,7 +812,10 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		      uint8_t *p_dest = p_pixel_base_x + i_ytmp;
                       uint8_t i_rgb1;
                       uint8_t i_rgb2;
-                      yuv2rgb555(p_source, &i_rgb1, &i_rgb2);
+                      if (b_15bpp) 
+                        yuv2rgb555(p_source, &i_rgb1, &i_rgb2);
+                      else 
+                        yuv2rgb565(p_source, &i_rgb1, &i_rgb2);
                       *p_dest++ = i_rgb1;
                       *p_dest++ = i_rgb2;
                     }
@@ -783,7 +836,10 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
                       uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
                       uint8_t rgb[3];
 
-                      yuv2rgb(p_source, rgb);
+                      if (b_15bpp) 
+                        yuv2rgb555(p_source, &i_rgb1, &i_rgb2);
+                      else 
+                        yuv2rgb565(p_source, &i_rgb1, &i_rgb2);
                       rv16_pack_blend(p_dest, rgb, dest_alpha,ALPHA_SCALEDOWN);
                     }
                     break;
@@ -909,7 +965,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 	      
 	      switch( p_source->s.t )
                 {
-                case 0x00:
+                case 0:
 		  /* Completely transparent. Don't change pixel. */
 		  break;
 		  
@@ -924,18 +980,26 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                     uint16_t i_dest_x = 
                       ((i_x * i_xscale ) >> ASCALE)  * BYTES_PER_PIXEL;
 		    uint8_t *p_dest = p_pixel_base_y + i_dest_x;
-                    uint8_t rgb[4];
+                    uint8_t rgb[3];
 
                     yuv2rgb(p_source, rgb);
                     switch (i_dest_x % 4) {
                     case 3:
-                      p_dest++;
+                      p_dest-=3;
+                      *p_dest++ = rgb[BLUE_PIXEL];
+                      *p_dest++ = rgb[GREEN_PIXEL];
+                      *p_dest++ = rgb[RED_PIXEL];
+                      *p_dest++;
                       *p_dest++ = rgb[BLUE_PIXEL];
                       *p_dest++ = rgb[GREEN_PIXEL];
                       *p_dest++ = rgb[RED_PIXEL];
                       break;
                     case 2:
-                      p_dest+=2;
+                      p_dest-=2;
+                      *p_dest++ = rgb[BLUE_PIXEL];
+                      *p_dest++ = rgb[GREEN_PIXEL];
+                      *p_dest++ = rgb[RED_PIXEL];
+                      *p_dest++;
                       *p_dest++ = rgb[BLUE_PIXEL];
                       *p_dest++ = rgb[GREEN_PIXEL];
                       *p_dest++ = rgb[RED_PIXEL];
@@ -949,27 +1013,30 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                       break;
                     default:  /* Can't happen */;
 		    break;
-		  }
+                    }
 
 #ifdef TRANSPARENCY_FINISHED
-                default:
-		  {
-		    /* Blend in underlying pixel subtitle pixel. */
-		    
-		    /* To be able to scale correctly for full opaqueness, we
-		       add 1 to the alpha.  This means alpha value 0 won't
-		       be completely transparent and is not correct, but
-		       that's handled in a special case above anyway. */
-		
-		    uint8_t *p_dest = p_pixel_base_y 
-                      + ((i_x * i_xscale ) >> ASCALE) * BYTES_PER_PIXEL;
-		    uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
-                    uint8_t rgb[3];
-
-                    yuv2rgb(p_source, rgb);
-                    rv32_pack_blend(p_dest, rgb, dest_alpha, ALPHA_SCALEDOWN);
-		    break;
-		  }
+                  default:
+                    {
+                      /* Blend in underlying pixel subtitle pixel. */
+                      
+                      /* To be able to scale correctly for full opaqueness, we
+                         add 1 to the alpha.  This means alpha value 0 won't
+                         be completely transparent and is not correct, but
+                         that's handled in a special case above anyway. */
+                      
+		     */
+                      uint16_t i_dest_x = 
+                        ((i_x * i_xscale ) >> ASCALE)  * BYTES_PER_PIXEL;
+                      uint8_t *p_dest = p_pixel_base_y + i_dest_x;
+                      uint8_t rgb[3];
+                      uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
+                      uint8_t rgb[3];
+                      
+                      yuv2rgb(p_source, rgb);
+                      rv32_pack_blend(p_dest, rgb, dest_alpha, ALPHA_SCALEDOWN);
+                      break;
+                    }
 #endif /*TRANSPARENCY_FINISHED*/
                   }
                 }
@@ -1005,7 +1072,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 	      
 	      switch( p_source->s.t )
                 {
-                case 0x00:
+                case 0:
 		    /* Completely transparent. Don't change pixel. */
                     break;
 
@@ -1019,7 +1086,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 		     */
 		    uint8_t i_dest_x = ((i_x * i_xscale ) >> ASCALE) 
                       * BYTES_PER_PIXEL;
-                    uint8_t rgb[4];
+                    uint8_t rgb[3];
 
                     yuv2rgb(p_source, rgb); 
 
@@ -1031,17 +1098,25 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                       /* This is the location that's going to get changed.
                        */
                       uint8_t *p_dest = p_pixel_base + i_ytmp + i_dest_x;
-                      uint8_t rgb[4];
+                      uint8_t rgb[3];
                       
                       switch (i_dest_x % 4) {
                       case 3:
-                        p_dest++;
+                        p_dest-=3;
+                        *p_dest++ = rgb[BLUE_PIXEL];
+                        *p_dest++ = rgb[GREEN_PIXEL];
+                        *p_dest++ = rgb[RED_PIXEL];
+                        *p_dest++;
                         *p_dest++ = rgb[BLUE_PIXEL];
                         *p_dest++ = rgb[GREEN_PIXEL];
                         *p_dest++ = rgb[RED_PIXEL];
                         break;
                       case 2:
-                        p_dest+=2;
+                        p_dest-=2;
+                        *p_dest++ = rgb[BLUE_PIXEL];
+                        *p_dest++ = rgb[GREEN_PIXEL];
+                        *p_dest++ = rgb[RED_PIXEL];
+                        *p_dest++;
                         *p_dest++ = rgb[BLUE_PIXEL];
                         *p_dest++ = rgb[GREEN_PIXEL];
                         *p_dest++ = rgb[RED_PIXEL];
@@ -1063,7 +1138,10 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
                 default: 
                   {
                     
-                    uint8_t rgb[4];
+		    uint8_t i_dest_x = ((i_x * i_xscale ) >> ASCALE) 
+                      * BYTES_PER_PIXEL;
+                    uint8_t rgb[3];
+
                     yuv2rgb(p_source, rgb);
 
                     for(  ; i_ytmp < i_ynext ; y_ytmp += p_pic->p->i_pitch )
@@ -1074,7 +1152,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 			 add 1 to the alpha.  This means alpha value 0 won't
 			 be completely transparent and is not correct, but
 			 that's handled in a special case above anyway. */
-		      uint8_t *p_dest = p_pixel_base + i_ytmp;
+                      uint8_t *p_dest = p_pixel_base + i_ytmp + i_dest_x;
                       uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
                       rv32_pack_blend(p_dest, rgb, dest_alpha,ALPHA_SCALEDOWN);
                     }
@@ -1149,26 +1227,6 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
 	p_pixel_base_y = p_pixel_base + (i_ytmp * p_pic->p->i_pitch);
 	i_x = 0;
 
-#if 0
-        /* Remove this */        
-        *p_pixel_base_y = 0xff;         /*+++++*/
-        *(p_pixel_base_y+1) = 0x0;
-        *(p_pixel_base_y+2) = 0x0;
-        *(p_pixel_base_y+3) = 0x0;
-        *(p_pixel_base_y+4) = 0x0;
-        *(p_pixel_base_y+5) = 0x0;
-        *(p_pixel_base_y+6) = 0x0;
-        *(p_pixel_base_y+7) = 0x0;
-        *(p_pixel_base_y+8) = 0xFF;
-        *(p_pixel_base_y+9) = 0xFF;
-        *(p_pixel_base_y+10) = 0xFF;
-        *(p_pixel_base_y+11) = 0xFF;
-        *(p_pixel_base_y+12) = 0xFF;
-        *(p_pixel_base_y+13) = 0xFF;
-        *(p_pixel_base_y+14) = 0xFF;
-        *(p_pixel_base_y+15) = 0xFF;
-#endif
-
         if ( b_crop ) {
           if ( i_y > i_y_end ) break;
           if (i_x_start) {
@@ -1184,6 +1242,8 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
           /* Draw until we reach the end of the line */
           for( ; i_x < p_spu->i_width; i_x ++, p_source++ )
             {
+              ogt_yuvt_t p_yuvt = p_sys->p_palette[*p_source & 0x3];
+
               if( b_crop ) {
                 
                 /* FIXME: y cropping should be dealt with outside of this 
@@ -1203,13 +1263,19 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                 return;
               }
               
-              if (*p_source == 0) {
+              if ( (p_yuvt.s.t) == 0 ) {
+                /* Completely transparent. Don't change pixel. */
+
 #if 0
                 printf(" "); /*++++*/
 #endif
               } else {
                 uint8_t *p_dest = p_pixel_base_y + ((i_x*i_xscale) >> 7);
-                *p_dest++ = 0xff;
+                /* We don't have a way to find the closest color in the
+                   colormap. So for now use the greyscale Y component as a 
+                   index. 
+                 */
+                *p_dest++ = p_yuvt.s.y;
 #if 0
                 printf("%1d", *p_source); /*++++*/
 #endif
