@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.m,v 1.3 2002/05/19 23:51:37 massiot Exp $
+ * $Id: intf_controller.m,v 1.4 2002/05/20 05:20:12 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -42,18 +42,6 @@
         stringWithCString: VOUT_TITLE " (Cocoa)"];
 
     [o_window setTitle: pTitle];
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)o_notification
-{
-    o_intf = [[Intf_VLCWrapper instance] retain];
-    o_vout = [[Vout_VLCWrapper instance] retain];
-
-    f_slider = f_slider_old = 0.0;
-    o_slider_lock = [[NSLock alloc] init];
-
-    [NSThread detachNewThreadSelector: @selector(manage)
-        toTarget: self withObject: nil];
 }
 
 - (void)manage
@@ -116,6 +104,30 @@
                 context: [NSGraphicsContext currentContext] eventNumber: 1
                 clickCount: 1 pressure: 0.0];
     [NSApp postEvent: pEvent atStart: YES];
+}
+
+/* NSApplication messages */
+
+- (void)applicationWillFinishLaunching:(NSNotification *)o_notification
+{
+    o_intf = [[Intf_VLCWrapper instance] retain];
+    o_vout = [[Vout_VLCWrapper instance] retain];
+
+    f_slider = f_slider_old = 0.0;
+    o_slider_lock = [[NSLock alloc] init];
+
+    [NSThread detachNewThreadSelector: @selector(manage)
+        toTarget: self withObject: nil];
+}
+
+- (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
+{
+    NSArray *o_array;
+
+    o_array = [NSArray arrayWithObject: o_filename];
+    [o_intf openFiles: o_array];
+
+    return( TRUE );
 }
 
 /* Functions attached to user interface */

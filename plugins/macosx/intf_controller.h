@@ -2,7 +2,7 @@
  * intf_controller.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.h,v 1.7 2002/05/18 13:33:44 massiot Exp $
+ * $Id: intf_controller.h,v 1.8 2002/05/20 05:20:12 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -61,9 +61,12 @@
 
 /* Initialization & Event-Management */
 - (void)awakeFromNib;
-- (void)applicationDidFinishLaunching:(NSNotification *)o_notification;
 - (void)manage;
 - (void)terminate;
+
+/* NSApplication messages */
+- (void)applicationWillFinishLaunching:(NSNotification *)o_notification;
+- (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename;
 
 /* Functions atteched to user interface */
 - (IBAction)pause:(id)sender;
