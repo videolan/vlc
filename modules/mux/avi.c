@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.12 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: avi.c,v 1.13 2003/05/02 00:33:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -316,6 +316,27 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_FOURCC( 'w', 'm', 'a', '3' ):
                     p_wf->wFormatTag = WAVE_FORMAT_WMA3;
                     break;
+                    /* raw codec */
+                case VLC_FOURCC( 'u', '8', ' ', ' ' ):
+                    p_wf->wFormatTag = WAVE_FORMAT_PCM;
+                    p_wf->nBlockAlign= p_wf->nChannels;
+                    p_wf->wBitsPerSample = 8;
+                    break;
+                case VLC_FOURCC( 's', '1', '6', 'l' ):
+                    p_wf->wFormatTag = WAVE_FORMAT_PCM;
+                    p_wf->nBlockAlign= 2 * p_wf->nChannels;
+                    p_wf->wBitsPerSample = 16;
+                    break;
+                case VLC_FOURCC( 's', '2', '4', 'l' ):
+                    p_wf->wFormatTag = WAVE_FORMAT_PCM;
+                    p_wf->nBlockAlign= 3 * p_wf->nChannels;
+                    p_wf->wBitsPerSample = 24;
+                    break;
+                case VLC_FOURCC( 's', '3', '2', 'l' ):
+                    p_wf->wFormatTag = WAVE_FORMAT_PCM;
+                    p_wf->nBlockAlign= 4 * p_wf->nChannels;
+                    p_wf->wBitsPerSample = 32;
+                    break;
                 default:
                     return VLC_EGENERIC;
             }
@@ -428,7 +449,9 @@ static int Mux      ( sout_mux_t *p_mux )
             if( p_data->i_length < 0 )
             {
                 msg_Warn( p_mux, "argg length < 0 l" );
-                p_data->i_length = 0;
+                sout_BufferDelete( p_mux->p_sout, p_data );
+                i_count--;
+                continue;
             }
             p_stream->i_duration  += p_data->i_length;
             p_stream->i_totalsize += p_data->i_size;

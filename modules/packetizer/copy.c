@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.7 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: copy.c,v 1.8 2003/05/02 00:33:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -144,6 +144,7 @@ static int InitThread( packetizer_thread_t *p_pack )
 
     switch( p_pack->p_fifo->i_fourcc )
     {
+        /* video */
         case VLC_FOURCC( 'm', '4', 's', '2'):
         case VLC_FOURCC( 'M', '4', 'S', '2'):
         case VLC_FOURCC( 'm', 'p', '4', 's'):
@@ -167,10 +168,6 @@ static int InitThread( packetizer_thread_t *p_pack )
         case VLC_FOURCC( 'm', 'p', '2', 'v' ):
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'v' );
             p_pack->output_format.i_cat = VIDEO_ES;
-            break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
-            p_pack->output_format.i_cat = AUDIO_ES;
             break;
 
         case VLC_FOURCC( 'd', 'i', 'v', '1' ):
@@ -248,6 +245,20 @@ static int InitThread( packetizer_thread_t *p_pack )
             p_pack->output_format.i_cat = VIDEO_ES;
             break;
 
+        case VLC_FOURCC( 'I', '4', '2', '0' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'I', '4', '2', '0' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+        case VLC_FOURCC( 'I', '4', '2', '2' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'I', '4', '2', '2' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+
+        /* audio */
+        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+            p_pack->output_format.i_cat = AUDIO_ES;
+            break;
         case VLC_FOURCC( 'w', 'm', 'a', '1' ):
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'w', 'm', 'a', '1' );
             p_pack->output_format.i_cat = AUDIO_ES;
@@ -256,6 +267,102 @@ static int InitThread( packetizer_thread_t *p_pack )
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'w', 'm', 'a', '2' );
             p_pack->output_format.i_cat = AUDIO_ES;
             break;
+        case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
+        {
+            WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
+            if( p_wf )
+            {
+                switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
+                {
+                    case 1:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('u','8',' ',' ');
+                        break;
+                    case 2:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','1','6','l');
+                        break;
+                    case 3:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','2','4','l');
+                        break;
+                    case 4:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','3','2','l');
+                        break;
+                    default:
+                        msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
+                        return VLC_EGENERIC;
+                }
+            }
+            else
+            {
+                msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
+                return VLC_EGENERIC;
+            }
+            p_pack->output_format.i_cat = AUDIO_ES;
+            break;
+        }
+        case VLC_FOURCC( 't', 'w', 'o', 's' ):
+        {
+            WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
+            if( p_wf )
+            {
+                switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
+                {
+                    case 1:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','8',' ',' ');
+                        break;
+                    case 2:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','1','6','b');
+                        break;
+                    case 3:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','2','4','b');
+                        break;
+                    case 4:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','3','2','b');
+                        break;
+                    default:
+                        msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
+                        return VLC_EGENERIC;
+                }
+            }
+            else
+            {
+                msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
+                return VLC_EGENERIC;
+            }
+            p_pack->output_format.i_cat = AUDIO_ES;
+            break;
+        }
+        case VLC_FOURCC( 's', 'o', 'w', 't' ):
+        {
+            WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
+            if( p_wf )
+            {
+                switch( ( p_wf->wBitsPerSample + 7 ) / 8 )
+                {
+                    case 1:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','8',' ',' ');
+                        break;
+                    case 2:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','1','6','l');
+                        break;
+                    case 3:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','2','4','l');
+                        break;
+                    case 4:
+                        p_pack->output_format.i_fourcc = VLC_FOURCC('s','3','2','l');
+                        break;
+                    default:
+                        msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
+                        return VLC_EGENERIC;
+                }
+            }
+            else
+            {
+                msg_Err( p_pack->p_fifo, "unknown raw audio sample size !!" );
+                return VLC_EGENERIC;
+            }
+            p_pack->output_format.i_cat = AUDIO_ES;
+            break;
+        }
 
         default:
             msg_Err( p_pack->p_fifo, "unknown es type !!" );
