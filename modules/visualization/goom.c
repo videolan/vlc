@@ -2,7 +2,7 @@
  * goom.c: based on libgoom (see http://ios.free.fr/?page=projet&quoi=1)
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: goom.c,v 1.1 2003/08/23 17:23:45 fenrir Exp $
+ * $Id: goom.c,v 1.2 2003/08/23 22:49:50 fenrir Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -34,7 +34,7 @@
 #include <vlc/vout.h>
 #include "aout_internal.h"
 
-#include "goom/goom_core.h"
+#include "goom_core.h"
 
 #define GOOM_WIDTH 160
 #define GOOM_HEIGHT 120

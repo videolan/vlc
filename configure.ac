@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.66 2003/08/23 12:59:31 hartman Exp $
+dnl $Id: configure.ac,v 1.67 2003/08/23 22:49:50 fenrir Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2844,6 +2844,44 @@ AC_ARG_ENABLE(visual,
 if test "${enable_visual}" != "no"
 then
     AX_ADD_PLUGINS([visual])
+fi
+
+dnl
+dnl  goom visualization plugin
+dnl
+AC_ARG_ENABLE(goom,
+[  --enable-goom         goom visualisation plugin (default disabled)])
+if test "${enable_goom}" = "yes"
+then
+  AC_ARG_WITH(goom-tree,
+    [    --with-goom-tree=PATH goom tree for static linking (required)])
+
+  dnl
+  dnl test for --with-goom-tree
+  dnl
+  if test "${with_goom_tree}" != "no" -a -n "${with_goom_tree}";then
+    AC_MSG_CHECKING(for libgoom.a in ${with_goom_tree})
+    real_goom_tree="`cd ${with_goom_tree} 2>/dev/null && pwd`"
+    if test -z "${real_goom_tree}"; then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_goom_tree}])
+    fi
+    if test -f "${real_goom_tree}/libgoom.a"; then
+      AC_MSG_RESULT(${real_goom_tree}/libgoom.a)
+      AX_ADD_BUILTINS([goom])
+      AX_ADD_LDFLAGS([goom],[-L${real_goom_tree} -lgoom])
+      AX_ADD_CPPFLAGS([goom],[-I${real_goom_tree}])
+    else
+      dnl  The given libgoom wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_goom_tree}/libgoom.a, make sure you compiled goom in ${with_goom_tree}])
+    fi
+  else
+    dnl  The --with-goom-tree isn't specified wasn't built
+    AC_MSG_RESULT(no)
+    AC_MSG_ERROR([You have to specify a tree with --with-goom-tree])
+  fi
 fi
 
 dnl

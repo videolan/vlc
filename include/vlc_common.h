@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.74 2003/08/17 23:02:51 fenrir Exp $
+ * $Id: vlc_common.h,v 1.75 2003/08/23 22:49:50 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -278,6 +278,10 @@ typedef struct pes_packet_t pes_packet_t;
 typedef struct bit_stream_t bit_stream_t;
 typedef struct network_socket_t network_socket_t;
 typedef struct iso639_lang_t iso639_lang_t;
+
+/* block */
+typedef struct block_t      block_t;
+typedef struct block_fifo_t block_fifo_t;
 
 /*****************************************************************************
  * Variable callbacks

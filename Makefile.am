@@ -90,6 +90,7 @@ HEADERS_include = \
 	include/stream_output.h \
 	include/variables.h \
 	include/video_output.h \
+	include/vlc_block.h \
 	include/vlc_common.h \
 	include/vlc_config.h \
 	include/vlc_cpu.h \
@@ -317,6 +318,7 @@ SOURCES_libvlc_common = \
 	src/stream_output/stream_output.c \
 	src/misc/charset.c \
 	src/misc/mtime.c \
+	src/misc/block.c \
 	src/misc/modules.c \
 	src/misc/threads.c \
 	src/misc/cpu.c \
