@@ -2,12 +2,13 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.16.2.2 2002/07/13 11:33:11 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.16.2.3 2002/09/03 12:00:24 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Tony Castley <tony@castley.net>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,6 +59,8 @@ extern "C"
 #include "intf_vlc_wrapper.h"
 #include "InterfaceWindow.h"
 
+#define INTERFACE_UPDATE_TIMEOUT 80000 // 2 frames if at 25 fps
+
 
 /*****************************************************************************
  * InterfaceWindow
@@ -65,95 +68,131 @@ extern "C"
 
 InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
                                   intf_thread_t  *p_interface )
-    : BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-               B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK
-                | B_ASYNCHRONOUS_CONTROLS )
+	: BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+               B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
+	  p_intf(p_interface),
+	  b_empty_playlist(p_main->p_playlist->i_size < 0),
+	  file_panel(NULL),
+	  playlist_window(NULL),
+	  fLastUpdateTime(system_time())
 {
-    file_panel = NULL;
-    playlist_window = NULL;
-    p_intf = p_interface;
-    BRect controlRect(0,0,0,0);
-    b_empty_playlist = (p_main->p_playlist->i_size < 0);
+	// set the title bar
+	SetName( "interface" );
+	SetTitle(VOUT_TITLE);
 
-    /* set the title bar */
-    SetName( "interface" );
-    SetTitle(VOUT_TITLE);
+	// the media control view
+	p_mediaControl = new MediaControlView( BRect(0.0, 0.0, 250.0, 50.0) );
+	p_mediaControl->SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
+	b_empty_playlist = true;
+	p_mediaControl->SetEnabled( !b_empty_playlist );
 
-    /* set up the main menu */
-    BMenuBar *menu_bar;
-    menu_bar = new BMenuBar(controlRect, "main menu");
-    AddChild( menu_bar );
+    float width, height;
+    p_mediaControl->GetPreferredSize(&width, &height);
 
-    BMenu *mFile;
-    BMenu *mAudio;
-    CDMenu *cd_menu;
-    BMenu *mNavigation;
-    BMenu *mConfig;
+	// set up the main menu
+	fMenuBar = new BMenuBar( BRect(0.0, 0.0, width, 15.0), "main menu",
+							 B_FOLLOW_NONE, B_ITEMS_IN_ROW, false );
+
+	// make menu bar resize to correct height
+	float menuWidth, menuHeight;
+	fMenuBar->GetPreferredSize(&menuWidth, &menuHeight);
+	fMenuBar->ResizeTo(width, menuHeight);	// don't change! it's a workarround!
+	// take care of proper size for ourself
+    height += fMenuBar->Bounds().Height();
+    ResizeTo(width, height);
+
+	p_mediaControl->MoveTo( fMenuBar->Bounds().LeftBottom() + BPoint(0.0, 1.0) );
+	AddChild( fMenuBar );
+	AddChild( p_mediaControl );
+
+    BMenu *fileMenu;
+//	BMenu *configMenu;
     
-    /* Add the file Menu */
-    BMenuItem *mItem;
-    menu_bar->AddItem( mFile = new BMenu( "File" ) );
-    menu_bar->ResizeToPreferred();
-    mFile->AddItem( mItem = new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
+	// Add the file Menu
+	BMenuItem *mItem;
+	fMenuBar->AddItem( fileMenu = new BMenu( "File" ) );
+	fileMenu->AddItem( mItem = new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
                                            new BMessage(OPEN_FILE), 'O') );
     
-    cd_menu = new CDMenu( "Open Disc" );
-    mFile->AddItem( cd_menu );
+    fileMenu->AddItem( new CDMenu( "Open Disc" ) );
     
-    mFile->AddSeparatorItem();
-    mFile->AddItem( mItem = new BMenuItem( "Play List" B_UTF8_ELLIPSIS,
+    fileMenu->AddSeparatorItem();
+    fileMenu->AddItem( mItem = new BMenuItem( "Play List" B_UTF8_ELLIPSIS,
                                            new BMessage(OPEN_PLAYLIST), 'P') );
     
-    mFile->AddSeparatorItem();
-    mFile->AddItem( mItem = new BMenuItem( "About" B_UTF8_ELLIPSIS,
+    fileMenu->AddSeparatorItem();
+    fileMenu->AddItem( mItem = new BMenuItem( "About" B_UTF8_ELLIPSIS,
                                        new BMessage(B_ABOUT_REQUESTED), 'A') );
     mItem->SetTarget( be_app );
-    mFile->AddItem(mItem = new BMenuItem( "Quit",
+    fileMenu->AddItem(mItem = new BMenuItem( "Quit",
                                         new BMessage(B_QUIT_REQUESTED), 'Q') );
 
+	fLanguageMenu = new LanguageMenu("Language", AUDIO_ES, p_intf);
+	fSubtitlesMenu = new LanguageMenu("Subtitles", SPU_ES, p_intf);
+
     /* Add the Audio menu */
-    menu_bar->AddItem ( mAudio = new BMenu( "Audio" ) );
-    menu_bar->ResizeToPreferred();
-    mAudio->AddItem( new LanguageMenu( "Language", AUDIO_ES, p_intf ) );
-    mAudio->AddItem( new LanguageMenu( "Subtitles", SPU_ES, p_intf ) );
+    fAudioMenu = new BMenu( "Audio" );
+    fMenuBar->AddItem ( fAudioMenu );
+    fAudioMenu->AddItem( fLanguageMenu );
+    fAudioMenu->AddItem( fSubtitlesMenu );
+
+	fPrevTitleMI = new BMenuItem("Prev Title", new BMessage(PREV_TITLE));
+	fNextTitleMI = new BMenuItem("Next Title", new BMessage(NEXT_TITLE));
+	fPrevChapterMI = new BMenuItem("Prev Chapter", new BMessage(PREV_CHAPTER));
+	fNextChapterMI = new BMenuItem("Next Chapter", new BMessage(NEXT_CHAPTER));
 
     /* Add the Navigation menu */
-    menu_bar->AddItem( mNavigation = new BMenu( "Navigation" ) );
-    menu_bar->ResizeToPreferred();
-    mNavigation->AddItem( new BMenuItem( "Prev Title",
-                                        new BMessage(PREV_TITLE)) );
-    mNavigation->AddItem( new BMenuItem( "Next Title",
-                                        new BMessage(NEXT_TITLE)) );
-    mNavigation->AddItem( new BMenuItem( "Prev Chapter",
-                                        new BMessage(PREV_CHAPTER)) );
-    mNavigation->AddItem( new BMenuItem( "Next Chapter",
-                                        new BMessage(NEXT_CHAPTER)) );
+    fNavigationMenu = new BMenu( "Navigation" );
+    fMenuBar->AddItem( fNavigationMenu );
+    fNavigationMenu->AddItem(fPrevTitleMI);
+    fNavigationMenu->AddItem(fNextTitleMI);
+    fNavigationMenu->AddItem(fPrevChapterMI);
+    fNavigationMenu->AddItem(fNextChapterMI);
+
+	/* Add the Speed menu */
+	fSpeedMenu = new BMenu("Speed");
+	fSpeedMenu->SetRadioMode(true);
+    fSpeedMenu->AddItem( new BMenuItem( "Slow",
+                                       new BMessage(SLOWER_PLAY)) );
+	BMenuItem* normalSpeedItem = new BMenuItem( "Normal",
+                                               new BMessage(NORMAL_PLAY));
+	normalSpeedItem->SetMarked(true); // default to normal speed
+    fSpeedMenu->AddItem( normalSpeedItem );
+    fSpeedMenu->AddItem( new BMenuItem( "Fast",
+                                       new BMessage(FASTER_PLAY)) );
+	fSpeedMenu->SetTargetForItems(this);
+	fMenuBar->AddItem(fSpeedMenu);
+
                                         
     /* Add the Config menu */
-//    menu_bar->AddItem( mConfig = new BMenu( "Config" ) );
+//    menu_bar->AddItem( configMenu = new BMenu( "Config" ) );
 //    menu_bar->ResizeToPreferred();
-//    mConfig->AddItem( miOnTop = new BMenuItem( "Always on Top",
+//    configMenu->AddItem( miOnTop = new BMenuItem( "Always on Top",
 //                                        new BMessage(TOGGLE_ON_TOP)) );
 //    miOnTop->SetMarked(false);                                    
 
-    ResizeTo(260,50 + menu_bar->Bounds().IntegerHeight()+1);
-    controlRect = Bounds();
-    controlRect.top += menu_bar->Bounds().IntegerHeight() + 1;
-
-    p_mediaControl = new MediaControlView( controlRect );
-    p_mediaControl->SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
-    b_empty_playlist = true;
-    p_mediaControl->SetEnabled( !b_empty_playlist );
-
     /* Show */
-    AddChild( p_mediaControl );
+    _SetMenusEnabled(false);
     Show();
-    
 }
 
 InterfaceWindow::~InterfaceWindow()
 {
     if (playlist_window) playlist_window->ReallyQuit();
+}
+
+/*****************************************************************************
+ * InterfaceWindow::FrameResized
+ *****************************************************************************/
+void
+InterfaceWindow::FrameResized(float width, float height)
+{
+	BRect r(Bounds());
+	fMenuBar->MoveTo(r.LeftTop());
+	fMenuBar->ResizeTo(r.Width(), fMenuBar->Bounds().Height());
+	r.top += fMenuBar->Bounds().Height() + 1.0;
+	p_mediaControl->MoveTo(r.LeftTop());
+	p_mediaControl->ResizeTo(r.Width(), r.Height());
 }
 
 /*****************************************************************************
@@ -166,7 +205,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     int     i_index;
     BAlert *alert;
 
-    Activate();
+//    Activate(); // why ?!?
     if (p_input_bank->pp_input[0])
     {
 	    playback_status = p_input_bank->pp_input[0]->stream.control.i_status;
@@ -211,7 +250,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         {
             const char *psz_device;
             BString type("dvd");
-            if( p_message->FindString("device", &psz_device) != B_ERROR )
+            if( p_message->FindString("device", &psz_device) == B_OK )
             {
                 BString device(psz_device);
                 Intf_VLCWrapper::openDisc(type, device, 0,0);
@@ -223,10 +262,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case STOP_PLAYBACK:
         // this currently stops playback not nicely
-        Intf_VLCWrapper::volume_mute();
-        snooze( 400000 );
-        Intf_VLCWrapper::playlistStop();
-        p_mediaControl->SetStatus(NOT_STARTED_S,DEFAULT_RATE);
+        if (playback_status > UNDEF_S)
+        {
+	        Intf_VLCWrapper::volume_mute();
+	        snooze( 400000 );
+	        Intf_VLCWrapper::playlistStop();
+	        p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
+        }
         break;
 
     case START_PLAYBACK:
@@ -234,7 +276,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case PAUSE_PLAYBACK:
         /* toggle between pause and play */
-        if( p_input_bank->pp_input[0] != NULL )
+        if (playback_status > UNDEF_S)
         {
             /* pause if currently playing */
             if ( playback_status == PLAYING_S )
@@ -258,16 +300,31 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case FASTER_PLAY:
         /* cycle the fast playback modes */
-        Intf_VLCWrapper::volume_mute();
-        snooze( 400000 );
-        Intf_VLCWrapper::playFaster();
+    	if (playback_status > UNDEF_S)
+    	{
+	        Intf_VLCWrapper::volume_mute();
+	        snooze( 400000 );
+	        Intf_VLCWrapper::playFaster();
+    	}
         break;
 
     case SLOWER_PLAY:
         /*  cycle the slow playback modes */
-        Intf_VLCWrapper::volume_mute();
-        snooze( 400000 );
-        Intf_VLCWrapper::playSlower();
+    	if (playback_status > UNDEF_S)
+    	{
+	        Intf_VLCWrapper::volume_mute();
+	        snooze( 400000 );
+	        Intf_VLCWrapper::playSlower();
+    	}
+        break;
+
+    case NORMAL_PLAY:
+        /*  restore speed to normal if already playing */
+    	if (playback_status > UNDEF_S)
+    	{
+            Intf_VLCWrapper::volume_restore();
+            Intf_VLCWrapper::playlistPlay();
+    	}
         break;
 
     case SEEK_PLAYBACK:
@@ -276,27 +333,34 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case VOLUME_CHG:
         /* adjust the volume */
-        vlc_mutex_lock( &p_aout_bank->lock );
-        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+        if (playback_status > UNDEF_S)
         {
-            if( p_aout_bank->pp_aout[i_index]->i_savedvolume )
-            {
-                p_aout_bank->pp_aout[i_index]->i_savedvolume = vol_val;
-            }
-            else
-            {
-                p_aout_bank->pp_aout[i_index]->i_volume = vol_val;
-            }
+/*	        vlc_mutex_lock( &p_aout_bank->lock );
+	        for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
+	        {
+	            if( p_aout_bank->pp_aout[i_index]->i_savedvolume )
+	            {
+	                p_aout_bank->pp_aout[i_index]->i_savedvolume = vol_val;
+	            }
+	            else
+	            {
+	                p_aout_bank->pp_aout[i_index]->i_volume = vol_val;
+	            }
+	        }
+	        vlc_mutex_unlock( &p_aout_bank->lock );*/
+	        Intf_VLCWrapper::set_volume( vol_val );
+	        p_mediaControl->SetMuted( Intf_VLCWrapper::is_muted() );
         }
-        vlc_mutex_unlock( &p_aout_bank->lock );
         break;
 
     case VOLUME_MUTE:
         /* toggle muting */
         Intf_VLCWrapper::toggle_mute();
+        p_mediaControl->SetMuted( Intf_VLCWrapper::is_muted() );
         break;
 
     case SELECT_CHANNEL:
+        if (playback_status > UNDEF_S)
         {
             int32 i = p_message->FindInt32( "channel" );
             if ( i == -1 )
@@ -312,6 +376,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         break;
 
     case SELECT_SUBTITLE:
+        if (playback_status > UNDEF_S)
         {
             int32 i = p_message->FindInt32( "subtitle" );
             if ( i == -1 )
@@ -326,6 +391,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         }
         break;
     case PREV_TITLE:
+        if (playback_status > UNDEF_S)
         {
             int             i_id;
             i_id = p_input_bank->pp_input[0]->stream.p_selected_area->i_id - 1;
@@ -338,6 +404,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
         }
     case NEXT_TITLE:
+        if (playback_status > UNDEF_S)
         {
             int             i_id;
 
@@ -350,6 +417,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         }
         break;
     case PREV_CHAPTER:
+        if (playback_status > UNDEF_S)
         {
             int             i_id;
 
@@ -362,6 +430,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         }
         break;
     case NEXT_CHAPTER:
+        if (playback_status > UNDEF_S)
         {
             int             i_id;
 
@@ -398,6 +467,24 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 }
 
 /*****************************************************************************
+ * InterfaceWindow::QuitRequested
+ *****************************************************************************/
+bool InterfaceWindow::QuitRequested()
+{
+	if (p_input_bank->pp_input[0])
+	{
+		Intf_VLCWrapper::volume_mute();
+		snooze( 400000 );
+		Intf_VLCWrapper::playlistStop();
+		p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
+	}
+	
+    p_intf->b_die = 1;
+
+    return( true );
+}
+
+/*****************************************************************************
  * InterfaceWindow::updateInterface
  *****************************************************************************/
 void InterfaceWindow::updateInterface()
@@ -407,18 +494,34 @@ void InterfaceWindow::updateInterface()
         if ( acquire_sem(p_mediaControl->fScrubSem) == B_OK )
         {
             uint64 seekTo = (p_mediaControl->GetSeekTo() *
-                        p_input_bank->pp_input[0]->stream.p_selected_area->i_size) / 100;
+                        p_input_bank->pp_input[0]->stream.p_selected_area->i_size) / 2048;
             input_Seek( p_input_bank->pp_input[0], seekTo);
         }
         else if( Lock() )
         {
+	        bool hasTitles = p_input_bank->pp_input[0]->stream.i_area_nb > 1;
+	        bool hasChapters = p_input_bank->pp_input[0]->stream.p_selected_area->i_part_nb > 1;
             p_mediaControl->SetStatus(p_input_bank->pp_input[0]->stream.control.i_status, 
                                       p_input_bank->pp_input[0]->stream.control.i_rate);
             p_mediaControl->SetProgress(p_input_bank->pp_input[0]->stream.p_selected_area->i_tell,
                                         p_input_bank->pp_input[0]->stream.p_selected_area->i_size);
+	        _SetMenusEnabled(true, hasChapters, hasTitles);
+	        bool canSkipBack = false;
+	        bool canSkipForward = false;
+	        if (hasChapters)
+	        {
+				canSkipBack = p_input_bank->pp_input[0]->stream.p_selected_area->i_part > 0;
+				canSkipForward = p_input_bank->pp_input[0]->stream.p_selected_area->i_part <
+								 p_input_bank->pp_input[0]->stream.p_selected_area->i_part_nb - 1;
+	        }
+	        p_mediaControl->SetSkippable(canSkipBack, canSkipForward);
+	        p_mediaControl->SetMuted(Intf_VLCWrapper::is_muted());
             Unlock();
         }
     }
+    else
+		_SetMenusEnabled(false);
+
     if ( b_empty_playlist != (p_main->p_playlist->i_size < 1) )
     {
         if (Lock())
@@ -428,16 +531,51 @@ void InterfaceWindow::updateInterface()
             Unlock();
         }
     }
+    fLastUpdateTime = system_time();
 }
 
 /*****************************************************************************
- * InterfaceWindow::QuitRequested
+ * InterfaceWindow::IsStopped
  *****************************************************************************/
-bool InterfaceWindow::QuitRequested()
+bool
+InterfaceWindow::IsStopped() const
 {
-    p_intf->b_die = 1;
+	return (system_time() - fLastUpdateTime > INTERFACE_UPDATE_TIMEOUT);
+}
 
-    return( true );
+/*****************************************************************************
+ * InterfaceWindow::_SetMenusEnabled
+ *****************************************************************************/
+void
+InterfaceWindow::_SetMenusEnabled(bool hasFile, bool hasChapters, bool hasTitles)
+{
+	if (!hasFile)
+	{
+		hasChapters = false;
+		hasTitles = false;
+	}
+	if (Lock())
+	{
+		if (fNextChapterMI->IsEnabled() != hasChapters)
+			fNextChapterMI->SetEnabled(hasChapters);
+		if (fPrevChapterMI->IsEnabled() != hasChapters)
+			fPrevChapterMI->SetEnabled(hasChapters);
+		if (fNextTitleMI->IsEnabled() != hasTitles)
+			fNextTitleMI->SetEnabled(hasTitles);
+		if (fPrevTitleMI->IsEnabled() != hasTitles)
+			fPrevTitleMI->SetEnabled(hasTitles);
+		if (fAudioMenu->IsEnabled() != hasFile)
+			fAudioMenu->SetEnabled(hasFile);
+		if (fNavigationMenu->IsEnabled() != hasFile)
+			fNavigationMenu->SetEnabled(hasFile);
+		if (fLanguageMenu->IsEnabled() != hasFile)
+			fLanguageMenu->SetEnabled(hasFile);
+		if (fSubtitlesMenu->IsEnabled() != hasFile)
+			fSubtitlesMenu->SetEnabled(hasFile);
+		if (fSpeedMenu->IsEnabled() != hasFile)
+			fSpeedMenu->SetEnabled(hasFile);
+		Unlock();
+	}
 }
 
 /*****************************************************************************
@@ -460,7 +598,9 @@ CDMenu::~CDMenu()
  *****************************************************************************/
 void CDMenu::AttachedToWindow(void)
 {
-    while (RemoveItem((long int)0) != NULL);  // remove all items
+	// remove all items
+    while (BMenuItem* item = RemoveItem(0L))
+    	delete item;
     GetCD("/dev/disk");
     BMenu::AttachedToWindow();
 }
@@ -542,10 +682,9 @@ LanguageMenu::~LanguageMenu()
  *****************************************************************************/
 void LanguageMenu::AttachedToWindow(void)
 {
-    while( RemoveItem((long int)0) != NULL )
-    {
-        ; // remove all items
-    }
+	// remove all items
+    while (BMenuItem* item = RemoveItem(0L))
+    	delete item;
 
     SetRadioMode(true);
     GetChannels();
@@ -560,30 +699,26 @@ int LanguageMenu::GetChannels()
     char  *psz_name;
     bool   b_active;
     BMessage *msg;
+    BMenuItem *menu_item;
     int    i;
     es_descriptor_t *p_es  = NULL;
 
     /* Insert the null */
-    if( kind == AUDIO_ES ) //audio
-    {
-        msg = new BMessage(SELECT_CHANNEL);
-        msg->AddInt32("channel", -1);
-    }
-    else
+    if( kind != AUDIO_ES ) //subtitle
     {
         msg = new BMessage(SELECT_SUBTITLE);
         msg->AddInt32("subtitle", -1);
+	    menu_item = new BMenuItem("None", msg);
+	    AddItem(menu_item);
+	    menu_item->SetMarked(true);
     }
-    BMenuItem *menu_item;
-    menu_item = new BMenuItem("None", msg);
-    AddItem(menu_item);
-    menu_item->SetMarked(TRUE);
 
     if( p_input_bank->pp_input[0] == NULL )
     {
         return 1;
     }
 
+	int32 addedItems = 0;
 
     vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
     for( i = 0; i < p_input_bank->pp_input[0]->stream.i_selected_es_number; i++ )
@@ -598,6 +733,7 @@ int LanguageMenu::GetChannels()
     {
         if( kind == p_input_bank->pp_input[0]->stream.pp_es[i]->i_cat )
         {
+        	addedItems++;
             psz_name = p_input_bank->pp_input[0]->stream.pp_es[i]->psz_desc;
             if( kind == AUDIO_ES ) //audio
             {
@@ -610,6 +746,9 @@ int LanguageMenu::GetChannels()
                 msg->AddInt32("subtitle", i);
             }
             BMenuItem *menu_item;
+            // workarround for irritating empty strings
+            if (strcmp(psz_name, "") == 0)
+            	psz_name = "Default";
             menu_item = new BMenuItem(psz_name, msg);
             AddItem(menu_item);
             b_active = (p_es == p_input_bank->pp_input[0]->stream.pp_es[i]);
@@ -618,6 +757,9 @@ int LanguageMenu::GetChannels()
     }
     vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
 
+	// enhance readability and separate first item from rest
+	if (addedItems > 1)
+		 AddItem(new BSeparatorItem(), 1);
 }
 
 

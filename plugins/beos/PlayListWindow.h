@@ -2,7 +2,7 @@
  * PlayListWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.h,v 1.1.4.1 2002/06/01 10:12:10 tcastley Exp $
+ * $Id: PlayListWindow.h,v 1.1.4.2 2002/09/03 12:00:25 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -22,7 +22,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#ifndef BEOS_PLAY_LIST_WINDOW_H
+#define BEOS_PLAY_LIST_WINDOW_H
+
+#include <Window.h>
+
+class BFilePanel;
+class BListView;
 class CDMenu;
+
 class PlayListWindow : public BWindow
 {
 public:
@@ -42,4 +51,5 @@ private:
     BFilePanel *file_panel;
 };
 
+#endif	// BEOS_PLAY_LIST_WINDOW_H
 

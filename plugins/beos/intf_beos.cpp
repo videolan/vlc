@@ -2,12 +2,13 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.38.2.1 2002/07/13 11:33:11 tcastley Exp $
+ * $Id: intf_beos.cpp,v 1.38.2.2 2002/09/03 12:00:24 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Tony Castley <tony@castley.net>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +31,8 @@
 #include <stdio.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <InterfaceKit.h>
+#include <Application.h>
+#include <Message.h>
 #include <string.h>
 
 extern "C"
@@ -44,6 +47,7 @@ extern "C"
 
 #include "InterfaceWindow.h"
 #include "intf_vlc_wrapper.h"
+#include "MsgVals.h"
 
 extern "C"
 {
@@ -98,6 +102,10 @@ static int intf_Open( intf_thread_t *p_intf )
         free( p_intf->p_sys );
         intf_ErrMsg( "error: cannot allocate memory for InterfaceWindow" );
         return( 1 );
+    } else {
+    	BMessage message(INTERFACE_CREATED);
+    	message.AddPointer("window", p_intf->p_sys->p_window);
+    	be_app->PostMessage(&message);
     }
     p_intf->p_sys->b_disabled_menus = 0;
     p_intf->p_sys->i_saved_volume = VOLUME_DEFAULT;

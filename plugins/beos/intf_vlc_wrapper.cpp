@@ -2,11 +2,12 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.cpp,v 1.1.2.1 2002/07/13 11:33:11 tcastley Exp $
+ * $Id: intf_vlc_wrapper.cpp,v 1.1.2.2 2002/09/03 12:00:24 tcastley Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Tony Casltey <tony@castley.net>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software{} you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -263,7 +264,36 @@ void Intf_VLCWrapper::volume_restore()
 
     p_aout_bank->pp_aout[0]->i_volume = 
                       p_main->p_intf->p_sys->i_saved_volume;
+	p_main->p_intf->p_sys->i_saved_volume = 0;
     p_main->p_intf->p_sys->b_mute = 0;
+}
+
+void Intf_VLCWrapper::set_volume(int value)
+{
+    if( p_aout_bank->pp_aout[0] == NULL ) return;
+//printf("Intf_VLCWrapper::set_volume(%ld)\n", value);
+	// make sure value is within bounds
+	if (value < 0)
+		value = 0;
+	if (value > VOLUME_MAX)
+		value = VOLUME_MAX;
+	vlc_mutex_lock( &p_aout_bank->lock );
+		// unmute volume if muted
+		if (p_main->p_intf->p_sys->b_mute)
+		{
+			p_main->p_intf->p_sys->b_mute = 0;
+//			p_main->p_intf->p_sys->i_saved_volume = 0;
+		}
+		// set every stream to the given value
+		for(int i = 0 ; i < p_aout_bank->i_count ; i++ )
+		{
+			if (p_aout_bank->pp_aout[i])
+			{
+//				p_aout_bank->pp_aout[i]->i_savedvolume = 0;
+				p_aout_bank->pp_aout[i]->i_volume = value;
+			}
+		}
+	vlc_mutex_unlock( &p_aout_bank->lock );
 }
 
 void Intf_VLCWrapper::toggle_mute()
@@ -277,7 +307,13 @@ void Intf_VLCWrapper::toggle_mute()
     {
         Intf_VLCWrapper::volume_mute();
     }
-    p_main->p_intf->p_sys->b_mute = !p_main->p_intf->p_sys->b_mute;
+//    p_main->p_intf->p_sys->b_mute = !p_main->p_intf->p_sys->b_mute;
+}
+
+bool Intf_VLCWrapper::is_muted()
+{
+    if( p_aout_bank->pp_aout[0] == NULL ) return false;
+    return p_main->p_intf->p_sys->b_mute;
 }
 
 void Intf_VLCWrapper::maxvolume()

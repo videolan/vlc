@@ -2,11 +2,12 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.h,v 1.1.2.1 2002/07/13 11:33:11 tcastley Exp $
+ * $Id: intf_vlc_wrapper.h,v 1.1.2.2 2002/09/03 12:00:25 tcastley Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Tony Casltey <tony@castley.net>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +62,9 @@ public:
     static void playFaster();
     static void volume_mute();
     static void volume_restore();
+    static void set_volume(int value);
     static void toggle_mute();
+    static bool is_muted();
     static void maxvolume();
 //    static void fullscreen();
     static void eject();

@@ -2,11 +2,12 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.19.2.4 2002/07/11 12:24:45 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.19.2.5 2002/09/03 12:00:25 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +23,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#ifndef BEOS_VIDEO_WINDOW_H
+#define BEOS_VIDEO_WINDOW_H
+
+#include <View.h>
+#include <Window.h>
+
 #define BITMAP  0
 #define OVERLAY 1
 #define OPENGL  2
@@ -50,35 +58,58 @@ colorcombo colspace[]=
 
 class VLCView : public BView
 {
-public:
-	VLCView( BRect bounds);
-	~VLCView();
-	
-	void MouseDown(BPoint point);
-	void Draw(BRect updateRect);
-	
+ public:
+							VLCView( BRect bounds);
+	virtual					~VLCView();
+
+	virtual	void			AttachedToWindow();
+	virtual	void			MouseDown(BPoint where);
+	virtual	void			MouseMoved(BPoint where, uint32 transit,
+									   const BMessage* dragMessage);
+	virtual	void			Pulse();
+	virtual	void			Draw(BRect updateRect);
+	virtual	void			KeyDown(const char* bytes, int32 numBytes);
+
+ private:
+			bigtime_t		fLastMouseMovedTime;
+			bool			fCursorHidden;
+			bool			fCursorInside;
 };
 
 
 class VideoWindow : public BWindow
 {
 public:
-    // standard constructor and destructor
-    VideoWindow( int v_width, int v_height,
-                 BRect frame); 
-    ~VideoWindow();
-    
-    void	        Zoom(BPoint origin, float width, float height);
-    void            FrameResized(float width, float height);
-    void            FrameMoved(BPoint origin);
-    void            ScreenChanged(BRect frame, color_space mode);
-    void            drawBuffer(int bufferIndex);
-    void            WindowActivated(bool active);
-    int             SelectDrawingMode(int width, int height);
-    virtual void    MessageReceived(BMessage *message);
+							VideoWindow(int v_width, 
+										int v_height,
+										BRect frame); 
+	virtual					~VideoWindow();
+
+							// BWindow    
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			Zoom(BPoint origin,
+								 float width, float height);
+	virtual	void			FrameResized(float width, float height);
+	virtual	void			FrameMoved(BPoint origin);
+	virtual	void			ScreenChanged(BRect frame,
+										  color_space mode);
+	virtual	void			WindowActivated(bool active);
+
+							// VideoWindow
+			void			drawBuffer(int bufferIndex);
+
+			void			ToggleInterfaceShowing();
+			void			SetInterfaceShowing(bool showIt);
+
+			void			SetCorrectAspectRatio(bool doIt);
+	inline	bool			CorrectAspectRatio() const
+								{ return fCorrectAspect; }
+	inline	status_t		InitCheck() const
+								{ return fInitStatus; }
+
 
     // this is the hook controling direct screen connection
-    int32           i_width;     // incomming bitmap size 
+    int32           i_width;     // aspect corrected bitmap size 
     int32           i_height;
     BRect           winSize;     // current window size
     bool            is_zoomed, vsync;
@@ -86,14 +117,28 @@ public:
     BBitmap         *overlaybitmap;
     VLCView	        *view;
     int             i_buffer;
-    bool			teardownwindow;
+	volatile bool	teardownwindow;
     thread_id       fDrawThreadID;
     int             mode;
     int             colspace_index;
 
 private:
+			status_t		_AllocateBuffers(int width,
+											 int height,
+											 int* mode);
+			void			_FreeBuffers();
+			void			_BlankBitmap(BBitmap* bitmap) const;
+			void			_SetVideoSize(uint32 mode);
+
     struct vout_thread_s   *p_vout;
 
+			int32			fTrueWidth;     // incomming bitmap size 
+			int32			fTrueHeight;
+			bool			fCorrectAspect;
+			window_feel		fCachedFeel;
+			bool			fInterfaceShowing;
+			status_t		fInitStatus;
 };
 
+#endif	// BEOS_VIDEO_WINDOW_H
  

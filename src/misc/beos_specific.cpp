@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.18 2002/04/26 05:43:37 sam Exp $
+ * $Id: beos_specific.cpp,v 1.18.2.1 2002/09/03 12:00:24 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -24,6 +24,8 @@
 #include <Roster.h>
 #include <Path.h>
 #include <Alert.h>
+#include <Message.h>
+#include <Window.h>
 #include <stdio.h>
 #include <string.h> /* strdup() */
 #include <malloc.h>   /* free() */
@@ -44,6 +46,12 @@ public:
 
     virtual void ReadyToRun();
     virtual void AboutRequested();
+    virtual void RefsReceived(BMessage* message);
+    virtual void MessageReceived(BMessage* message);
+
+private:
+    BWindow*     fInterfaceWindow;
+    BMessage*    fRefsMessage;
 };
 
 /*****************************************************************************
@@ -53,6 +61,9 @@ static vlc_thread_t app_thread;
 static vlc_mutex_t  app_lock;
 static vlc_cond_t   app_wait;
 static char        *psz_program_path;
+
+//const uint32 INTERFACE_CREATED = 'ifcr';  /* message sent from interface */
+#include "../../plugins/beos/MsgVals.h"
 
 extern "C"
 {
@@ -131,7 +142,9 @@ static void system_AppThread( void * args )
  * VlcApplication: application constructor
  *****************************************************************************/
 VlcApplication::VlcApplication( char * psz_mimetype )
-               :BApplication( psz_mimetype )
+               :BApplication( psz_mimetype ),
+                fInterfaceWindow( NULL ),
+                fRefsMessage( NULL )
 {
     /* Nothing to do, we use the default constructor */
 }
@@ -142,6 +155,7 @@ VlcApplication::VlcApplication( char * psz_mimetype )
 VlcApplication::~VlcApplication( )
 {
     /* Nothing to do, we use the default destructor */
+    delete fRefsMessage;
 }
 
 /*****************************************************************************
@@ -177,3 +191,47 @@ void VlcApplication::ReadyToRun( )
     vlc_mutex_unlock( &app_lock );
 }
 
+/*****************************************************************************
+ * RefsReceived: called when files are sent to our application
+ *               (for example when the user drops fils onto our icon)
+ *****************************************************************************/
+void VlcApplication::RefsReceived(BMessage* message)
+{
+	if (fInterfaceWindow)
+		fInterfaceWindow->PostMessage(message);
+	else {
+		delete fRefsMessage;
+		fRefsMessage = new BMessage(*message);
+	}
+}
+
+/*****************************************************************************
+ * MessageReceived: a BeOS applications main message loop
+ *                  Since VlcApplication and interface are separated
+ *                  in the vlc binary and the interface plugin,
+ *                  we use this method to "stick" them together.
+ *                  The interface will post a message to the global
+ *                  "be_app" pointer when the interface is created
+ *                  containing a pointer to the interface window.
+ *                  In this way, we can keep a B_REFS_RECEIVED message
+ *                  in store for the interface window to handle later.
+ *****************************************************************************/
+void VlcApplication::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case INTERFACE_CREATED: {
+			BWindow* interfaceWindow;
+			if (message->FindPointer("window", (void**)&interfaceWindow) == B_OK) {
+				fInterfaceWindow = interfaceWindow;
+				if (fRefsMessage) {
+					fInterfaceWindow->PostMessage(fRefsMessage);
+					delete fRefsMessage;
+					fRefsMessage = NULL;
+				}
+			}
+			break;
+		}
+		default:
+			BApplication::MessageReceived(message);
+	}
+}
