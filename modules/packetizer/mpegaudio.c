@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.6 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: mpegaudio.c,v 1.7 2003/08/26 23:12:37 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -309,7 +309,7 @@ static void PacketizeThread( packetizer_t *p_pack )
         p_pack->output_format.i_sample_rate = i_samplerate;
         p_pack->output_format.i_channels    = i_channels;
         p_pack->output_format.i_block_align = 1;
-        p_pack->output_format.i_bitrate     = 0;
+        p_pack->output_format.i_bitrate     = i_bitrate*1000;
 
         p_pack->p_sout_input =
             sout_InputNew( p_pack->p_fifo,
