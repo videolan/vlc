@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.6 2003/08/22 20:29:58 fenrir Exp $
+ * $Id: ninput.h,v 1.7 2003/08/23 14:15:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -47,6 +47,16 @@ enum stream_query_e
     STREAM_GET_SIZE,            /**< arg1= int64_t *      res=cannot fail (0 if no sense)*/
 };
 
+/* Stream */
+VLC_EXPORT( stream_t *,     stream_OpenInput,       ( input_thread_t * ) );
+VLC_EXPORT( void,           stream_Release,         ( stream_t * ) );
+VLC_EXPORT( int,            stream_vaControl,       ( stream_t *, int i_query, va_list ) );
+VLC_EXPORT( int,            stream_Control,         ( stream_t *, int i_query, ... ) );
+VLC_EXPORT( int,            stream_Read,            ( stream_t *, void *p_read, int i_read ) );
+VLC_EXPORT( int,            stream_Peek,            ( stream_t *, uint8_t **pp_peek, int i_peek ) );
+VLC_EXPORT( data_packet_t *,stream_DataPacket,      ( stream_t *, int i_size, vlc_bool_t b_force ) );
+VLC_EXPORT( pes_packet_t *, stream_PesPacket,       ( stream_t *, int i_size ) );
+
 static int64_t inline stream_Tell( stream_t *s )
 {
     int64_t i_pos;
@@ -67,15 +77,6 @@ static int inline stream_Seek( stream_t *s, int64_t i_pos )
 }
 
 
-/* Stream */
-VLC_EXPORT( stream_t *,     stream_OpenInput,       ( input_thread_t * ) );
-VLC_EXPORT( void,           stream_Release,         ( stream_t * ) );
-VLC_EXPORT( int,            stream_vaControl,       ( stream_t *, int i_query, va_list ) );
-VLC_EXPORT( int,            stream_Control,         ( stream_t *, int i_query, ... ) );
-VLC_EXPORT( int,            stream_Read,            ( stream_t *, void *p_read, int i_read ) );
-VLC_EXPORT( int,            stream_Peek,            ( stream_t *, uint8_t **pp_peek, int i_peek ) );
-VLC_EXPORT( data_packet_t *,stream_DataPacket,      ( stream_t *, int i_size, vlc_bool_t b_force ) );
-VLC_EXPORT( pes_packet_t *, stream_PesPacket,       ( stream_t *, int i_size ) );
 /**
  * @}
  */
