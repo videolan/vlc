@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.8 2003/06/21 14:24:30 gbazin Exp $
+ * $Id: file.c,v 1.9 2003/09/07 20:08:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -81,6 +81,7 @@ struct sout_access_out_sys_t
 static int Open( vlc_object_t *p_this )
 {
     sout_access_out_t   *p_access = (sout_access_out_t*)p_this;
+    int                 i_flags;
 
     if( !( p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
@@ -93,13 +94,22 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_access, "no file name specified" );
         return VLC_EGENERIC;
     }
+    i_flags = O_WRONLY|O_CREAT;
+    if( sout_cfg_find_value( p_access->p_cfg, "append" ) )
+    {
+        i_flags |= O_APPEND;
+    }
+    else
+    {
+        i_flags |= O_TRUNC;
+    }
     if( !strcmp( p_access->psz_name, "-" ) )
     {
         p_access->p_sys->i_handle = STDOUT_FILENO;
         msg_Dbg( p_access, "using stdout" );
     }
     else if( ( p_access->p_sys->i_handle =
-               open( p_access->psz_name, O_WRONLY|O_CREAT|O_TRUNC,
+               open( p_access->psz_name, i_flags,
                      S_IWRITE | S_IREAD | S_IRGRP | S_IROTH ) ) == -1 )
     {
         msg_Err( p_access, "cannot open `%s'", p_access->psz_name );
