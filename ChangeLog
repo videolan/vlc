@@ -5,11 +5,154 @@
 0.5.0
 Not released yet
 
+  * ./plugins/dvdplay/access.c: use dvdplay after it has completed
+    initialization.
+  * ./configure.in: better detection of IPv6, fixed solaris handling.
+  * ./plugins/familiar/*: used buttons instead of pixmaps.
+  * ./share/vlc16x16.xpm: XPM version of the logo.
+  * ./plugins/mpeg_system/mpeg_es.c: fixed a segfault when no decoder was
+    found (p_fifo might be NULL).                                        
   * ./po/se.po : Swedish translation, courtesy of Joel Arvidsson
-    <dogai@privat.utfors.se> ;
+    <dogai@privat.utfors.se>.
+  * ./plugins/ffmpeg/ffmpeg.h: added a new fourcc (3IV2, you shoudln't be able
+    to decode it but sometimes it's in fact MPEG-4, thx titer).
+  * ./plugins/mp4/*: added capability to read mov with mp3 tracks. But it seems
+    that mad doesn't like too much fragmented data packets, and thus breaks the
+    audio.
+  * ./mozilla/Makefile: fixed dependencies on .h files.
+  * ./plugins/filter/distort.c: fixed a typo in option names.
+  * ./plugins/dummy/dec_dummy.c: new dummy decoder, for testing purposes.
+  * ./configure.in: workaround Debian bug #150490 (bad mozilla-config output).
+  * ./mozilla/vlcplugin.h: added .mov and .mp4 files to the plugin.
+  * ./Makefile: we no longer try to merge .a files into libvlc.a, but rather
+    add them to the vlc-config output.
+  * ./plugins/dvdplay/*: first version of plugin for libdvdplay; supports DVD
+    reading with title and menus, pause, seeking, interactive menus with
+    mouse control.
+  * ./plugins/gtk/*: allowed 0 for title selection as it is the area for first
+    play pgc in DVDs.
+  * ./plugins/familiar/*: interface neatly exits now.
+  * ./plugins/cinepak/cinepak.c: added a new fourcc.
+  * ./plugins/mp4/*, ./plugins/ffmpeg/*: some clean up and changed the way
+    ffmpeg is initialized.
+  * ./plugins/beos/InterfaceWindow.cpp: implemented muting.
+  * ./plugins/beos/InterfaceWindow.cpp: fixed code for subtitle and audio
+    selection, still probs but working.
+  * ./plugins/beos/*: changes to ensure BeOS plugins compile and function,
+    implemented a intf_vlc_wrapper to "shield" the BeOS code from the
+    underlying vlc structurs, yet to be completed.
+  * ALL: decoders now use a fourcc as a probe value.
+  * include/input_ext-intf.h: killed p_es->b_audio, since i_cat already fills
+    its purpose.
+  * include/input_ext-intf.h: killed p_es->i_type in favour of p_es->i_fourcc.
+  * include/video.h: killed p_pic->p_plane->b_margin; now i_visible_pitch is
+    always valid.                                                           
+  * ./src/libvlc.h: replaced --mpeg-adec and --ac3-adec with --codec; see
+    vlc --help for more information.
+  * include/video.h: removed fourcc values which should _not_ be global
+    (thanks fenrir for convincing me).
+  * ALL: video output plugins use the VLC_FOURCC macro to build their fourccs.
+  * ./plugins/beos/InterfaceWindow.cpp: removed the last remaining call to
+    input_ChangeES.
+  * ./src/input/input_info.c, ./src/misc/messages.c: initialized the first 
+    vasprintf arguments to NULL for extra safety.
+  * ./src/misc/modules.c: added the "any" and "none" keywords to the module
+    selection string. "any" matches any module, and "none" always fails.   
+  * ./src/input/input_info.c: win32 compilation fixes.
+  * ./plugins/familiar/familiar.c: fixed gtk core-dump on exit. Used code from
+    gtk plugin for this.
+  * ./share/*: VCR icon buttons for Familiar Linux interface.
+  * ./plugins/familiar/*: Familiar Linux interface (non functional yet).
+  * ./plugins/memcpy/fastmemcpy.h: commented out suspicious code.
+  * ./plugins/mp4/mp4.c: improved mp4a detection/handling.
+  * ./plugins/mp4/mp4.c: can now read mp4 files with mp3 audio declared in
+    mp4a box.
+  * ./src/libvlc.c: updated usage info to include STRING_FROM_LIST
+    configuration items.                                          
+  * ./src/input/input_info.c: new input info subsystem.
+  * ./plugins/mp4/*: same endianness for fourcc as the ones in video.h.
+  * ./plugins/cinepak/*: take care of grayscale option.
+  * ./debian/control: changed "interface plugin" occurences to "frontend" to
+    make package descriptions less misleading.                              
+  * ./bootstrap.sh: use C locale for generating vlc_symbols.h.
+  * ./bootstrap.sh: don't generate pofiles by default.
+  * ./plugins/cinepak/*: a cinepak (cvid) video decoder (codec found in old
+    .mov files).
+  * ./plugins/ffmpeg/ffmpeg.c: tried to add an option to allow frame droppping
+    (--enable-hurry-up). Begin to work.
+  * ./configure.in: added -lrt for HP/UX port.
+  * ./plugins/ffmpeg/ffmpeg.c: added a new option, to set the level of error
+    resilience. It allows to play badly encoded mpeg4 files (illegal VLC code).
+  * ALL: changed "struct foo_s" into "struct foo_t" to make greppers happy.
+  * ./src/libvlc.c, ./include/vlc/vlc.h: created reentrant versions of the
+    libvlc API.                                                           
+  * ./src/vlc.c: vlc uses the non-reentrant libvlc functions.
+  * ./mozilla/vlcplugin.c: the mozilla plugin uses the reentrant functions.
+  * ./debian/*: created packages for libvlc0-dev.
+  * ./plugins/a52/a52.c: added a global lock to prevent two VLC threads to
+    call a liba52 function simultaneously (liba52 isn't reentrant).
+  * ./plugins/a52/a52.c: made liba52 the default AC3 decoder.
+  * ./configure.in: we no longer check for a specific function in -lphtread
+    because some systems (such as HP-UX...) have them inlined.
+  * ./Makefile.modules: we don't chmod -x the compiled plugins because of
+    HP-UX's dynamic linker which would otherwise be unable to open them. 
+  * ./configure: rebuilt using the newest autotools.
+  * ./src/vlc.c, ./src/libvlc.c: added more robust consistency checks.
+  * ./configure.in: fixed description of MP4 module.
+  * ./doc/fortunes.txt: added a selection of Lool's fortune cookies.
+  * ./configure.in: added mp4 module, default disabled.
+  * ./src/misc/darwin_specific.c: s/vlc_object_t/vlc_t.
+  * ./configure.in: fixed Mac OS X compilation which was broken on some
+    machines.
+  * ./include/vlc/vlc.h: included os_specific.h.
+  * ./include/interface.h: interface creation and destruction functions are
+    now exported to plugins so that any plugin can spawn a new interface.
+  * ./plugins/mp4/*: preliminary mp4 (and some mov) demux plugin. I've not
+    enabled it (add by hand to Makefile... and link it with zlib -lz) as I
+    will probably break it too many times. It work for some mp4 (but without
+    audio, need aac decoder) and mov with sorenson v1(ffmpeg :).
+  * ./plugins/x11/xcommon.c: fixed a bug in the computation of the mouse
+    coordinates sent to interface.
+  * ./plugins/dvd/dvd.c: added a 'dvdold' shortcut to force the use of the
+    dvd plugin in case another plugin with higher priority wants to use 'dvd'
+    as shortcut.
+  * ./plugins/lpcm_adec/lpcm_adec.c: the loop in lpcm decoder DecodeFrame()
+    could not exit after b_die in some cases.
+  * ./configure.in: plugin compilation fix for HP-UX.
+  * ./configure.in: better protection of CFLAGS and LDFLAGS. Should also fix
+    remaining issues with XvPutImage detection, please confirm!
+  * ./plugins/alsa/alsa.c: ALSA device selection patch, courtesy of John
+    Paul Lorenti <jpl31@columbia.edu>.
+  * ./Makefile: src/misc/modules_builtin.h now depends on Makefile.config.
+  * ./src/misc/threads.c: improved lazy initialization of the global lock.
+  * ./doc/fortunes.txt: a few IRC fortune cookies for those with too much
+    time on their hands.
+  * ./plugins/mpeg_vdec/video_parser.c, ./src/input/input_programs.c: fixed
+    a few uninitialized variables.                                         
+  * MacOS X: added deinterlace submenu.
   * ./plugins/access/http.c: fixed a double free bug and a memory leak.
+  * ./plugins/*: interface plugins set p_vlc->b_die to quit vlc, but check
+    for p_intf->b_die to know when they are supposed to terminate p_intf. This
+    will allow to spawn interface plugins on the fly.
+  * ./plugins/avi/avi.c: quick hack to read file created by ffmpeg. I think
+    it should work.
+  * ./plugins/ffmpeg/ffmpeg.c: added support for some others codecs provided
+    by ffmpeg, but some of them aren't tested.
+  * ./src/misc/messages.c: debug messages that were issued before the -v
+    flag was tested for are no longer lost.
+  * ./configure.in: we now look for XvPutImage instead of XvSetPortAttribute
+    because XvSetPortAttribute isn't always available.                      
+  * ./plugins/macosx/vout_macosx.m: added missing arrow up/down handling.   
   * MacOS X: added messages and playlist panel, dock menu, context menu 
     in video view and localization support.
+  * ./ipkg/control: add package sdl to package dependency list.
+  * ./doc/vlc-howto.sgml: fixed typos.
+  * ./include/vlc_common.h: greatly simplified ntoh*, and U??_AT macros are
+    now alignment-safe.
+  * ./STATUS: new file indicating who's working on what. Please keep it
+    up-to-date.
+  * ./MAINTAINERS: new file indicating who has knowledge on which parts.
+  * ./po/*: polish translation, courtesy of Arkadiusz Lipiec.
   * ./README: removed much outdated data.
   * ./debian/*: great package renaming - names should make more sense now.
   * ./plugins/mad/mad_libmad.c: prevent the MAD decoder from looping endlessly
@@ -183,6 +326,24 @@ Not released yet
   * ./include/vdec_ext-plugins.h: removed the vdec_thread_t declaration, which
     belongs to plugins/mpeg_vdec.
   * ALL: the first libvlc commit.
+
+0.4.3
+Not released yet.
+
+  * ./plugins/access/http.c: we are now parsing the http return code and
+    failing cleanly if it is >= 400.
+  * ./plugins/mpeg_system/mpeg_es.c, ./src/input/input_ext-dec.c: fixed 
+    a deadlock issue with demuxers waiting on p_fifo->data_lock.
+  * ./src/input/input_ext-plugins.c: fixed a memory leak.
+  * ./plugins/access/http.c: fixed a bug with HTTP/1.0 servers.
+  * ./src/interface/main.c: new --mtu option.
+  * ./configure.in: fixed nanosleep detection on some platforms.
+  * ./plugins/beos/*: created a wrapper class for VLC functions and
+    interaction, improved file and disk opening, fixed drag and drop, added
+    right click menu and always on top mode.
+  * ./plugins/beos/VideoWindow.h: fixed pop-up menu's radio mode.
+  * ./plugins/beos/VideoWindow.h: fixed changing workspaces problem.
+  * ./plugins/beos/VideoWindow.h: added a popup menu to enable changing.
 
 0.4.2
 Sun,  7 Jul 2002 22:15:33 +0200
