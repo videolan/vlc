@@ -270,6 +270,9 @@
     vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
 
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+
     if( p_vout != NULL )
     {
         while ((o_window = [o_enumerator nextObject]))
@@ -299,7 +302,24 @@
             }
         }
         vlc_object_release( (vlc_object_t *)p_vout );
+        if (p_playlist) vlc_object_release(p_playlist);
     }
+
+    else if ( p_playlist != NULL )
+    {
+        if (! ([o_title isEqualToString: _NS("Half Size") ] ||
+               [o_title isEqualToString: _NS("Normal Size") ] ||
+               [o_title isEqualToString: _NS("Double Size") ] ||
+               [o_title isEqualToString: _NS("Float on Top") ] ||
+               [o_title isEqualToString: _NS("Fit to Screen") ] ))
+        {
+            vlc_value_t val;
+            var_Get( p_playlist, "fullscreen", &val );
+            var_Set( p_playlist, "fullscreen", (vlc_value_t)!val.b_bool );
+        }
+    vlc_object_release( (vlc_object_t *)p_playlist );
+    }
+
 }
 
 - (void)setupVarMenuItem:(NSMenuItem *)o_mi
@@ -610,8 +630,7 @@
     {
         [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
     }
-    else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] ||
-                [[o_mi title] isEqualToString: _NS("Half Size")] ||
+    else if( [[o_mi title] isEqualToString: _NS("Half Size")] ||
                 [[o_mi title] isEqualToString: _NS("Normal Size")] ||
                 [[o_mi title] isEqualToString: _NS("Double Size")] ||
                 [[o_mi title] isEqualToString: _NS("Fit to Screen")] ||
@@ -643,6 +662,20 @@
             vlc_object_release( (vlc_object_t *)p_vout );
         }
     }
+    else if( [[o_mi title] isEqualToString: _NS("Fullscreen")])
+    {
+        if (p_playlist)
+        {
+            var_Get(p_playlist, "fullscreen", &val );
+            [o_mi setState: val.b_bool];
+            bEnabled = TRUE;
+        }
+        else
+        {
+            bEnabled = FALSE;
+        }
+    }
+
 
     if( p_playlist != NULL )
     {

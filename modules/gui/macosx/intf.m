@@ -180,6 +180,19 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * FullscreenChanged: Callback triggered by the fullscreen-change playlist
+ * variable, to let the intf update the controller.
+ *****************************************************************************/
+int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    intf_thread_t * p_intf = VLCIntf;
+    p_intf->p_sys->b_fullscreen_update = TRUE;
+    return VLC_SUCCESS;
+}
+
+
 static struct
 {
     unichar i_nskey;
@@ -365,6 +378,11 @@ static VLCMain *_o_sharedMainInstance = nil;
         {
             playlist_Play( p_playlist );
         }
+        var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+        val.b_bool = VLC_FALSE;
+
+        var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
+
         [o_btn_fullscreen setState: ( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool )];
         vlc_object_release( p_playlist );
     }
@@ -700,6 +718,7 @@ static VLCMain *_o_sharedMainInstance = nil;
 {
     NSDate * o_sleep_date;
     playlist_t * p_playlist;
+    vlc_value_t val;
 
     /* new thread requires a new pool */
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
@@ -714,6 +733,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
         var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
         var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
+
         vlc_object_release( p_playlist );
     }
 
@@ -816,14 +836,12 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     if ( p_intf->p_sys->b_playlist_update )
     {
-        [o_playlist playlistUpdated];
+       [o_playlist playlistUpdated];
         p_intf->p_sys->b_playlist_update = VLC_FALSE;
     }
 
     if( p_intf->p_sys->b_fullscreen_update )
     {
-        vout_thread_t * p_vout;
-
         playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                    FIND_ANYWHERE );
 
@@ -831,16 +849,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
         vlc_object_release( p_playlist );
 
-        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-        if( p_vout != NULL )
-        {
-            [o_btn_fullscreen setEnabled: VLC_TRUE];
-            vlc_object_release( p_vout );
-        }
-        else
-        {
-            [o_btn_fullscreen setEnabled: VLC_FALSE];
-        }
         p_intf->p_sys->b_fullscreen_update = VLC_FALSE;
     }
 
