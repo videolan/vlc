@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.2 2002/05/13 16:28:44 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.3 2002/05/13 21:55:30 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -378,7 +378,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
     
     if( !(MPEGAudio_FindFrame( p_input, &i_pos, &mpeg )) )
     {
-        intf_ErrMsg( "input: MPEGAudio plug-in discarded (no MPEG header)" );
+        intf_WarnMsg( 2,"input: MPEGAudio plug-in discarded (no MPEG header)" );
         return( -1 );
     }
     

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.8 2002/05/12 06:51:08 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.9 2002/05/13 21:55:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -61,7 +61,7 @@ static int      InitThread      ( videodec_thread_t * );
 static void     EndThread       ( videodec_thread_t * );
 static void     DecodeThread    ( videodec_thread_t * );
 
-/* FIXME make this variable global */
+
 static int      b_ffmpeginit = 0;
 
 /*****************************************************************************
@@ -81,7 +81,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "ffmpeg video decoder (MSMPEG4v3,MPEG4)" )
+    SET_DESCRIPTION( "ffmpeg video decoder (MSMPEG4v123,MPEG4)" )
     ADD_CAPABILITY( DECODER, 70 )
     ADD_SHORTCUT( "ffmpeg" )
 MODULE_INIT_STOP
@@ -119,7 +119,11 @@ static int decoder_Probe( u8 *pi_type )
 {
     switch( *pi_type )
     {
-        case( MSMPEG4_VIDEO_ES ):
+#if LIBAVCODEC_BUILD >= 4608
+        case( MSMPEG4v1_VIDEO_ES):
+        case( MSMPEG4v2_VIDEO_ES):
+#endif
+        case( MSMPEG4v3_VIDEO_ES):
         case( MPEG4_VIDEO_ES ):
             return( 0 );
         default:
@@ -326,13 +330,29 @@ static int InitThread( videodec_thread_t *p_vdec )
 
     switch( p_vdec->p_config->i_type)
     {
-        case( MSMPEG4_VIDEO_ES):
-            p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MSMPEG4 );
-            p_vdec->psz_namecodec = "MS MPEG-4/divx";
+#if LIBAVCODEC_BUILD >= 4608 /* what is the true version */
+        case( MSMPEG4v1_VIDEO_ES):
+            p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MSMPEG4V1 );
+            p_vdec->psz_namecodec = "MS MPEG-4 v1";
             break;
+        case( MSMPEG4v2_VIDEO_ES):
+            p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MSMPEG4V2 );
+            p_vdec->psz_namecodec = "MS MPEG-4 v2";
+            break;
+        case( MSMPEG4v3_VIDEO_ES):
+            p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MSMPEG4V3 );
+            p_vdec->psz_namecodec = "MS MPEG-4 v3";
+            break;
+#else            
+            /* fallback on this */
+            case( MSMPEG4v3_VIDEO_ES):
+            p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MSMPEG4 );
+            p_vdec->psz_namecodec = "MS MPEG-4";
+            break;
+#endif
         case( MPEG4_VIDEO_ES):
             p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MPEG4 );
-            p_vdec->psz_namecodec = "MPEG-4/opendivx";
+            p_vdec->psz_namecodec = "MPEG-4";
             break;
         default:
             p_vdec->p_codec = NULL;

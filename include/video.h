@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.50 2002/04/25 21:52:42 sam Exp $
+ * $Id: video.h,v 1.51 2002/05/13 21:55:30 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -176,28 +176,51 @@ typedef struct picture_heap_s
 #define TWOCC_dc            MAKETWOCC('d','c')
 #define TWOCC_pc            MAKETWOCC('p','c')
 
-/* MPEG4 (opendivx) codec */
+/* MPEG4 codec */
 #define FOURCC_DIVX         MAKEFOURCC('D','I','V','X')
 #define FOURCC_divx         MAKEFOURCC('d','i','v','x')
-#define FOURCC_DX50         MAKEFOURCC('D','X','5','0')
+#define FOURCC_DIV1         MAKEFOURCC('D','I','V','1')
+#define FOURCC_div1         MAKEFOURCC('d','i','v','1')
 #define FOURCC_MP4S         MAKEFOURCC('M','P','4','S')
+#define FOURCC_mp4s         MAKEFOURCC('m','p','4','s')
+#define FOURCC_M4S2         MAKEFOURCC('M','4','S','2')
+#define FOURCC_m4s2         MAKEFOURCC('m','4','s','2')
+#define FOURCC_xvid         MAKEFOURCC('x','v','i','d')
+#define FOURCC_XVID         MAKEFOURCC('X','V','I','D')
+#define FOURCC_XviD         MAKEFOURCC('X','v','i','D')
+#define FOURCC_DX50         MAKEFOURCC('D','X','5','0')
+#define FOURCC_mp4v         MAKEFOURCC('m','p','4','v')
+#define FOURCC_4            MAKEFOURCC( 4,  0,  0,  0 )
+        
+/* MSMPEG4 v2 */
 #define FOURCC_MPG4         MAKEFOURCC('M','P','G','4')
 #define FOURCC_mpg4         MAKEFOURCC('m','p','g','4')
-#define FOURCC_mp4v         MAKEFOURCC('m','p','4','v')
+#define FOURCC_DIV2         MAKEFOURCC('D','I','V','2')
+#define FOURCC_div2         MAKEFOURCC('d','i','v','2')
+#define FOURCC_MP42         MAKEFOURCC('M','P','4','2')
+#define FOURCC_mp42         MAKEFOURCC('m','p','4','2')
 
-/* msmepg (divx v3) codec */
-#define FOURCC_DIV3         MAKEFOURCC('D','I','V','3')
+/* MSMPEG4 v3 */
+/* M$ mpeg4 v3 */
+#define FOURCC_MPG3         MAKEFOURCC('M','P','G','3')
+#define FOURCC_mpg3         MAKEFOURCC('m','p','g','3')
 #define FOURCC_div3         MAKEFOURCC('d','i','v','3')
+#define FOURCC_MP43         MAKEFOURCC('M','P','4','3')
+#define FOURCC_mp43         MAKEFOURCC('m','p','4','3')
+/* DivX 3.20 */
+#define FOURCC_DIV3         MAKEFOURCC('D','I','V','3')
 #define FOURCC_DIV4         MAKEFOURCC('D','I','V','4')
 #define FOURCC_div4         MAKEFOURCC('d','i','v','4')
 #define FOURCC_DIV5         MAKEFOURCC('D','I','V','5')
 #define FOURCC_div5         MAKEFOURCC('d','i','v','5')
 #define FOURCC_DIV6         MAKEFOURCC('D','I','V','6')
 #define FOURCC_div6         MAKEFOURCC('d','i','v','6')
-#define FOURCC_3IV1         MAKEFOURCC('3','I','V','1')
+/* AngelPotion stuff */
 #define FOURCC_AP41         MAKEFOURCC('A','P','4','1')
-#define FOURCC_MP43         MAKEFOURCC('M','P','4','3')
-#define FOURCC_mp43         MAKEFOURCC('m','p','4','3')
+/* ?? */
+#define FOURCC_3IV1         MAKEFOURCC('3','I','V','1')
+
+
 
 /* Packed RGB for 8bpp */
 #define FOURCC_BI_RGB       MAKEFOURCC( 0 , 0 , 0 , 0 )
