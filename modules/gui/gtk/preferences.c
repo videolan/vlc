@@ -1,8 +1,8 @@
 /*****************************************************************************
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: preferences.c,v 1.10 2003/06/20 23:13:37 hartman Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: preferences.c,v 1.11 2004/01/25 18:34:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -123,6 +123,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     module_t *p_parser = NULL;
     vlc_list_t *p_list;
     module_config_t *p_item;
+    vlc_bool_t b_advanced = config_GetInt( p_intf, "advanced" );
     int i_index;
 
     guint rows = 0;
@@ -233,16 +234,12 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
     if( p_item ) do
     {
-        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ))
-        {
-            continue;
-        }
-        switch( p_item->i_type )
-        {
+        if( p_item->b_advanced && !b_advanced ) continue;
 
-        case CONFIG_HINT_CATEGORY:
-        case CONFIG_HINT_END:
-
+        if( p_item->i_type == CONFIG_HINT_CATEGORY ||
+            p_item->i_type == CONFIG_HINT_END ||
+            !category_table )
+        {
             /*
              * Before we start building the interface for the new category, we
              * must close/finish the previous one we were generating.
@@ -296,7 +293,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
              * Now we can start taking care of the new category
              */
 
-            if( p_item->i_type == CONFIG_HINT_CATEGORY )
+            if( p_item->i_type != CONFIG_HINT_END )
             {
                 /* create a new table for right-left alignment of children */
                 category_table = gtk_table_new( 0, 0, FALSE );
@@ -304,10 +301,15 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                 rows = 0;
 
                 /* create a new category label */
-                category_label = gtk_label_new( p_item->psz_text );
+                if( p_item->i_type == CONFIG_HINT_CATEGORY )
+                    category_label = gtk_label_new( p_item->psz_text );
+                else
+                    category_label = gtk_label_new( p_parser->psz_longname );
             }
+        }
 
-            break;
+        switch( p_item->i_type )
+        {
 
         case CONFIG_ITEM_MODULE:
 
