@@ -770,7 +770,7 @@ package-translations:
 ###############################################################################
 # Stamp rules
 ###############################################################################
-clean: clean-stamp
+clean: clean-stamp clean-recursive
 clean-stamp:
 	rm -f stamp-builtin
 
