@@ -73,7 +73,7 @@ Task
 Difficulty: Guru
 Urgency: Normal
 Platform: any
-Description: External audio file playin
+Description: External audio file playing
  Allow several access from an input thread to allow for multi-input (30% done)
 Status: Assigned to fenrir
 
@@ -110,6 +110,14 @@ Description: Tree playlist
  A hierarchized playlist structure, eventually using a media library.
 Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas (not up-to-date)</a>
 Status: Assigned to zorglub
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: fix ASX playlist parser
+Basically our asx parser is broken. It doesn't handle relative links. It should also URL encode the hrefs (spaces in the url need to be converted to %20 etc). protocol rollover, authors, title's etc etc aren't handled. See <a href="http://www.meetnewplayers.com/bend/Windows%20Media%20-%20Fun%20with%20asx%20files2.htm">this</a> for asx examples. It is still located in the old demux/m3u.c module instead of modules/demux/playlist/
+Status: Todo
 
 Task
 Difficulty: Easy
@@ -238,7 +246,7 @@ Urgency: Normal
 Platform: any
 Description: RTSP server
 Full implementation of a RTSP server.
-Status: 80%
+Status: 90%
 
 Task
 Difficulty: Medium
@@ -248,7 +256,7 @@ Description: Add VoD module for VLM
 Add a VoD module for VLM, so that we can create a RTSP server that can
 provide unicast RTSP sessions upon contacting the VoD module. See the following
 <a href="http://via.ecp.fr/via/ml/streaming/200408/msg00082.html">mail</a>.
-Status: Todo
+Status: 85% done
 
 Task
 Difficulty: Easy
