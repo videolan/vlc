@@ -747,8 +747,8 @@ package-beos:
 	mv $(srcdir)/tmp/vlc-${VERSION} $(srcdir)/tmp/vlc ;
 
 # Create normal package
-	strip --strip-debug --strip-unneeded $(srcdir)/tmp/vlc/vlc ;
-	find $(srcdir)/tmp/vlc -name 'lib*.so' -exec strip \
+	$(STRIP) --strip-debug --strip-unneeded $(srcdir)/tmp/vlc/vlc ;
+	find $(srcdir)/tmp/vlc -name 'lib*.so' -exec $(STRIP) \
 	  --strip-debug --strip-unneeded "{}" \; ;
 	xres -o $(srcdir)/tmp/vlc/vlc $(srcdir)/share/vlc_beos.rsrc ;
 	find $(srcdir)/tmp/vlc -exec mimeset -f {} \; ;
