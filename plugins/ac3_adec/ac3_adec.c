@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.13 2002/01/09 00:33:37 asmax Exp $
+ * $Id: ac3_adec.c,v 1.14 2002/01/14 23:46:35 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -316,14 +316,12 @@ static int decoder_Run ( decoder_config_t * p_config )
                 return( -1 );
             }
         }
-        
-        if (p_ac3thread->p_fifo->p_first->i_pts)
+
+        CurrentPTS( &p_ac3thread->ac3_decoder->bit_stream,
+            &p_ac3thread->p_aout_fifo->date[p_ac3thread->p_aout_fifo->l_end_frame],
+            NULL );
+        if( !p_ac3thread->p_aout_fifo->date[p_ac3thread->p_aout_fifo->l_end_frame] )
         {
-            p_ac3thread->p_aout_fifo->date[
-                p_ac3thread->p_aout_fifo->l_end_frame] =
-                p_ac3thread->p_fifo->p_first->i_pts;
-            p_ac3thread->p_fifo->p_first->i_pts = 0;
-        } else {
             p_ac3thread->p_aout_fifo->date[
                 p_ac3thread->p_aout_fifo->l_end_frame] =
                 LAST_MDATE;

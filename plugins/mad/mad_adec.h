@@ -50,7 +50,7 @@ typedef struct mad_adec_thread_s
     decoder_config_t *  p_config;
 
     /* Store i_pts for syncing audio frames */
-    mtime_t		i_pts_save;
+    mtime_t         	i_current_pts, i_next_pts;
 
     /*
      * Output properties

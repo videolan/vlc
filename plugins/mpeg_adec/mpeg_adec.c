@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.13 2002/01/10 23:41:08 asmax Exp $
+ * $Id: mpeg_adec.c,v 1.14 2002/01/14 23:46:35 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -153,7 +153,7 @@ static int decoder_Run ( decoder_config_t * p_config )
 }
 
 /*
- * Following finctions are local to this module
+ * Following functions are local to this module
  */
 
 /*****************************************************************************
@@ -203,13 +203,10 @@ static void DecodeThread( adec_thread_t * p_adec )
         buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
                     + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
 
-        if( p_adec->p_fifo->p_first->i_pts )
-        {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
-                p_adec->p_fifo->p_first->i_pts;
-            p_adec->p_fifo->p_first->i_pts = 0;
-        }
-        else
+        CurrentPTS( &p_adec->bit_stream,
+            &p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame],
+            NULL );
+        if( !p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] )
         {
             p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
                 LAST_MDATE;

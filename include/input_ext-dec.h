@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.50 2001/12/30 07:09:54 sam Exp $
+ * $Id: input_ext-dec.h,v 1.51 2002/01/14 23:46:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -169,6 +169,12 @@ typedef struct bit_stream_s
     void *                  p_callback_arg;
 
     /*
+     * PTS retrieval
+     */
+    mtime_t                 i_pts, i_dts;
+    byte_t *                p_pts_validity;
+
+    /*
      * Byte structures
      */
     /* Current data packet (in the current PES packet of the PES stream) */
@@ -215,10 +221,12 @@ typedef struct bit_stream_s
 u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
 void UnalignedRemoveBits( struct bit_stream_s * );
 u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
+void CurrentPTS( struct bit_stream_s *, mtime_t *, mtime_t * );
 #else
 #   define UnalignedShowBits p_symbols->UnalignedShowBits
 #   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits
 #   define UnalignedGetBits p_symbols->UnalignedGetBits
+#   define CurrentPTS p_symbols->CurrentPTS
 #endif
 
 /*****************************************************************************

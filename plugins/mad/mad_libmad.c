@@ -50,13 +50,14 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
     size_t ReadSize, Remaining;
     unsigned char      *ReadStart;
 
-    /* Store time stamp of current frame */
-    if ( p_mad_adec->p_fifo->p_first->i_pts ) {
-         p_mad_adec->i_pts_save = p_mad_adec->p_fifo->p_first->i_pts;
-         p_mad_adec->p_fifo->p_first->i_pts = 0;
+    if ( p_mad_adec->p_fifo->b_die == 1 ) {
+        intf_ErrMsg( "mad_adec error: libmad_input stopping libmad decoder" );
+        return MAD_FLOW_STOP;
     }
-    else {
-         p_mad_adec->i_pts_save = LAST_MDATE;
+
+    if ( p_mad_adec->p_fifo->b_error == 1 ) {
+        intf_ErrMsg( "mad_adec error: libmad_input ignoring current audio frame" );	
+        return MAD_FLOW_IGNORE;
     }
 
     /* libmad_stream_buffer does not consume the total buffer, it consumes only data
@@ -64,56 +65,80 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
      */
     if ((p_libmad_stream->buffer==NULL) || (p_libmad_stream->error==MAD_ERROR_BUFLEN))
     {
+        /* libmad does not consume all the buffer it's given. Some
+         * datas, part of a truncated frame, is left unused at the
+         * end of the buffer. Those datas must be put back at the
+         * beginning of the buffer and taken in account for
+         * refilling the buffer. This means that the input buffer
+         * must be large enough to hold a complete frame at the
+         * highest observable bit-rate (currently 448 kb/s). XXX=XXX
+         * Is 2016 bytes the size of the largest frame?
+         * (448000*(1152/32000))/8
+         */
+        if(p_libmad_stream->next_frame!=NULL)
+        {
+            Remaining=p_libmad_stream->bufend-p_libmad_stream->next_frame;
+            memmove(p_mad_adec->buffer,p_libmad_stream->next_frame,Remaining);
+            ReadStart=p_mad_adec->buffer+Remaining;
+            ReadSize=(MAD_BUFFER_SIZE)-Remaining;
 
-	/* libmad does not consume all the buffer it's given. Some
-     	 * datas, part of a truncated frame, is left unused at the
-     	 * end of the buffer. Those datas must be put back at the
-     	 * beginning of the buffer and taken in account for
-     	 * refilling the buffer. This means that the input buffer
-     	 * must be large enough to hold a complete frame at the
-     	 * highest observable bit-rate (currently 448 kb/s). XXX=XXX
-     	 * Is 2016 bytes the size of the largest frame?
-     	 * (448000*(1152/32000))/8
-     	 */
-     	if(p_libmad_stream->next_frame!=NULL)
-     	{
-     		Remaining=p_libmad_stream->bufend-p_libmad_stream->next_frame;
-     		memmove(p_mad_adec->buffer,p_libmad_stream->next_frame,Remaining);
-     		ReadStart=p_mad_adec->buffer+Remaining;
-     		ReadSize=(MAD_BUFFER_SIZE)-Remaining;
-     	}
-     	else
-	{
-     		ReadSize=(MAD_BUFFER_SIZE);
-     		ReadStart=p_mad_adec->buffer;
-     		Remaining=0;
-	}
-	//intf_ErrMsg( "mad_adec debug: buffer size remaining [%d] and readsize [%d] total [%d]", 
-	//		Remaining, ReadSize, ReadSize+Remaining);
+            /* Store time stamp of next frame */
+            p_mad_adec->i_current_pts = p_mad_adec->i_next_pts;
+            CurrentPTS( &p_mad_adec->bit_stream, &p_mad_adec->i_next_pts, NULL );
+        }
+        else
+        {
+            ReadSize=(MAD_BUFFER_SIZE);
+            ReadStart=p_mad_adec->buffer;
+            Remaining=0;
+            p_mad_adec->i_next_pts = 0;
+            CurrentPTS( &p_mad_adec->bit_stream, &p_mad_adec->i_current_pts, NULL );
+        }
 
-     	/* Fill-in the buffer. If an error occurs print a message
-   	 * and leave the decoding loop. If the end of stream is
-     	 * reached we also leave the loop but the return status is
-     	 * left untouched.
-     	 */
-     	GetChunk( &p_mad_adec->bit_stream, ReadStart, ReadSize );
+        /* Fill-in the buffer. If an error occurs print a message
+         * and leave the decoding loop. If the end of stream is
+         * reached we also leave the loop but the return status is
+         * left untouched.
+         */
+#if 0
+        /* This is currently buggy --Meuuh */
+        if( ReadSize > p_mad_adec->bit_stream.p_end
+                        - p_mad_adec->bit_stream.p_byte )
+        {
+            FAST_MEMCPY( ReadStart, p_mad_adec->bit_stream.p_byte,
+               p_mad_adec->bit_stream.p_end - p_mad_adec->bit_stream.p_byte );
+            p_mad_adec->bit_stream.pf_next_data_packet( &p_mad_adec->bit_stream );
+        }
+        else
+        {
+            FAST_MEMCPY( ReadStart, p_mad_adec->bit_stream.p_byte,
+                         ReadSize );
+            p_mad_adec->bit_stream.p_byte += ReadSize;
+        }
+#else
+        /* This is PTS-inaccurate --Meuuh */
+        GetChunk( &p_mad_adec->bit_stream, ReadStart, ReadSize );
+#endif
 
-        if ( p_mad_adec->p_fifo->b_die == 1 ) {
+        if ( p_mad_adec->p_fifo->b_die == 1 )
+        {
             intf_ErrMsg( "mad_adec error: libmad_input stopping libmad decoder" );
             return MAD_FLOW_STOP;
         }
 
-        if ( p_mad_adec->p_fifo->b_error == 1 ) {
-            intf_ErrMsg( "mad_adec error: libmad_input ignoring current audio frame" );	
+        if ( p_mad_adec->p_fifo->b_error == 1 )
+        {
+            intf_ErrMsg( "mad_adec error: libmad_input ignoring current audio frame" );    
             return MAD_FLOW_IGNORE;
         }
 
-     	/* Pipe the new buffer content to libmad's stream decoder facility.
-         * Libmad never copies the buffer, but just references it. So keep it in 
-	 * mad_adec_thread_t structure.
-     	 */
-     	mad_stream_buffer(p_libmad_stream,(unsigned char*) &p_mad_adec->buffer,ReadSize+Remaining);
-     	p_libmad_stream->error=0;
+        /* Pipe the new buffer content to libmad's stream decoder facility.
+         * Libmad never copies the buffer, but just references it. So keep it in
+         * mad_adec_thread_t structure.
+         */
+        mad_stream_buffer(p_libmad_stream,(unsigned char*) &p_mad_adec->buffer,
+                          MAD_BUFFER_SIZE);
+        p_libmad_stream->error=0;
     }
 
     return MAD_FLOW_CONTINUE;
@@ -270,7 +295,8 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 #endif
 
     /* Creating the audio output fifo */
-    if (p_mad_adec->p_aout_fifo==NULL) {
+    if (p_mad_adec->p_aout_fifo==NULL)
+    {
     	p_mad_adec->p_aout_fifo = aout_CreateFifo(  
 		AOUT_ADEC_STEREO_FIFO,  	/* fifo type */
 		p_libmad_pcm->channels,         /* nr. of channels */
@@ -284,10 +310,11 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
         	return( -1 );
     	}
 
-	intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
+        intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
     }
-    else {
-	p_mad_adec->p_aout_fifo->l_rate = p_libmad_pcm->samplerate;
+    else
+    {
+        p_mad_adec->p_aout_fifo->l_rate = p_libmad_pcm->samplerate;
     }
 
 /* Some frames are nog quite right. Why ??? I do not know. Probably syncing and CRC errors ??
@@ -306,7 +333,17 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     }
 
     /* Set timestamp to synchronize audio and video decoder fifo's */
-    p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->l_end_frame] = p_mad_adec->i_pts_save;
+    p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
+    if( p_mad_adec->i_current_pts )
+    {
+        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->l_end_frame]
+                = p_mad_adec->i_current_pts;
+    }
+    else
+    {
+        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->l_end_frame]
+                = LAST_MDATE;
+    }
     mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
 
     buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->l_end_frame * MAD_OUTPUT_SIZE);

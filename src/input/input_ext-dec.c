@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.27 2001/12/31 03:26:27 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.28 2002/01/14 23:46:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -63,6 +63,9 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
     p_bit_stream->p_end  = p_bit_stream->p_data->p_payload_end;
     p_bit_stream->fifo.buffer = 0;
     p_bit_stream->fifo.i_available = 0;
+    p_bit_stream->i_pts = p_fifo->p_first->i_pts;
+    p_bit_stream->i_dts = p_fifo->p_first->i_dts;
+    p_bit_stream->p_pts_validity = p_bit_stream->p_byte;
     vlc_mutex_unlock( &p_fifo->data_lock );
 
     /* Call back the decoder. */
@@ -169,6 +172,20 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     if( p_bit_stream->pf_bitstream_callback != NULL )
     {
         p_bit_stream->pf_bitstream_callback( p_bit_stream, b_new_pes );
+    }
+
+    /* Discontinuity management. */
+    if( p_bit_stream->p_data->b_discard_payload )
+    {
+        p_bit_stream->i_pts = p_bit_stream->i_dts = 0;
+    }
+
+    /* Retrieve the PTS. */
+    if( b_new_pes && p_fifo->p_first->i_pts )
+    {
+        p_bit_stream->i_pts = p_fifo->p_first->i_pts;
+        p_bit_stream->i_dts = p_fifo->p_first->i_dts;
+        p_bit_stream->p_pts_validity = p_bit_stream->p_byte;
     }
 }
 
@@ -372,6 +389,31 @@ void UnalignedRemoveBits( bit_stream_t * p_bit_stream )
          * sizeof(WORD_TYPE) - 1 bytes to store, and at least
          * sizeof(WORD_TYPE) - 1 empty bytes in the bit buffer. */
         AlignWord( p_bit_stream );
+    }
+}
+
+/*****************************************************************************
+ * CurrentPTS: returns the current PTS and DTS
+ *****************************************************************************/
+void CurrentPTS( bit_stream_t * p_bit_stream, mtime_t * pi_pts,
+                 mtime_t * pi_dts )
+{
+    /* Check if the current PTS is already valid (ie. if the first byte
+     * of the packet has already been used in the decoder). */
+    ptrdiff_t p_diff = p_bit_stream->p_byte - p_bit_stream->p_pts_validity;
+    if( p_diff < 0 || p_diff > 4 /* We are far away so it is valid */
+         || (p_diff * 8) >= p_bit_stream->fifo.i_available
+            /* We have buffered less bytes than actually read */ )
+    {
+        *pi_pts = p_bit_stream->i_pts;
+        if( pi_dts != NULL ) *pi_dts = p_bit_stream->i_dts;
+        p_bit_stream->i_pts = 0;
+        p_bit_stream->i_dts = 0;
+    }
+    else
+    {
+        *pi_pts = 0;
+        if( pi_dts != NULL) *pi_dts = 0;
     }
 }
 

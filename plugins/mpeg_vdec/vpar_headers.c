@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.11 2002/01/14 22:26:05 massiot Exp $
+ * $Id: vpar_headers.c,v 1.12 2002/01/14 23:46:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -263,7 +263,6 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
     {
     case SEQUENCE_HEADER_CODE:
         p_vpar->c_sequences++;
-
         SequenceHeader( p_vpar );
         return 0;
         break;
@@ -539,6 +538,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 {
     int                 i_structure, i_previous_coding_type;
     boolean_t           b_parsable = 0;
+
+    /* Retrieve the PTS. */
+    CurrentPTS( &p_vpar->bit_stream, &p_vpar->sequence.next_pts,
+                &p_vpar->sequence.next_dts );
 
     /* Recover in case of stream discontinuity. */
     if( p_vpar->sequence.b_expect_discontinuity )

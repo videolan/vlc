@@ -170,6 +170,8 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
                       "for decoder_InitThread() to allocate p_mad_adec->libmad_decder" );
     	return -1;
     }
+    p_mad_adec->i_current_pts = p_mad_adec->i_next_pts = 0;
+
     /*
      * Initialize bit stream
      */
@@ -177,8 +179,6 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
 					      p_mad_adec->p_config->p_decoder_fifo,
 					      NULL,    /* pf_bitstream_callback */
 					      NULL );  /* void **/
-
-    RealignBits( &p_mad_adec->bit_stream );
 
     mad_decoder_init( p_mad_adec->libmad_decoder,
     		      p_mad_adec, 	/* vlc's thread structure and p_fifo playbuffer */

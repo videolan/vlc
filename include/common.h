@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.68 2002/01/13 18:13:07 gbazin Exp $
+ * $Id: common.h,v 1.69 2002/01/14 23:46:35 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -571,6 +571,8 @@ typedef struct module_symbols_s
     u32  ( * UnalignedShowBits )    ( struct bit_stream_s *, unsigned int );
     void ( * UnalignedRemoveBits )  ( struct bit_stream_s * );
     u32  ( * UnalignedGetBits )     ( struct bit_stream_s *, unsigned int );
+    void ( * CurrentPTS )           ( struct bit_stream_s *, mtime_t *,
+                                      mtime_t * );
 
     char * ( * DecodeLanguage ) ( u16 );
 
