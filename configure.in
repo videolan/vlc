@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(include/defs.h)
 AC_CANONICAL_SYSTEM
 
 PACKAGE="vlc"
-VERSION="0.4.1"
+VERSION="0.4.0"
 CODENAME=Ourumov
 
 dnl Save CFLAGS and LDFLAGS
@@ -188,7 +188,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
             Define if <strings.h> defines strncasecmp.)])
 
 dnl Check for headers
-AC_CHECK_HEADERS(stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
+AC_CHECK_HEADERS(getopt.h strings.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
@@ -422,7 +422,7 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga mpeg_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope"
+PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone fx_scope"
 
 dnl
 dnl  Accelerated modules
@@ -719,28 +719,68 @@ if test "x$enable_dvbpsi" != "xno"
 then
   AC_ARG_WITH(dvbpsi, 
   [    --with-dvbpsi=PATH    libdvbpsi headers and libraries])
-  if test "x$with_dvbpsi" = x
-  then
-    test_LDFLAGS=""
-    test_CFLAGS=""
-  else
-    test_LDFLAGS="-L${with_dvbpsi}/lib"
-    test_CFLAGS="-I${with_dvbpsi}/include"
-  fi
-  CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
-  AC_CHECK_HEADER([dvbpsi/dr.h],[
-    PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
-    mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${test_LDFLAGS} -ldvbpsi"
-    mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} ${test_CFLAGS}"
-    ],[
-    if test "x$enable_dvbpsi" != x
+  AC_ARG_WITH(dvbpsi,
+  [    --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
+  case "x$with_dvbpsi" in
+  x|xyes)
+    if test "x$with_dvbpsi_tree" = x
     then
-      AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
+      AC_CHECK_HEADERS(src/descriptors/dr.h,
+        [ PLUGINS="${PLUGINS} dvbpsi"
+          mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} -ldvbpsi" ], [],
+        [  AC_MSG_ERROR([cannot find libdvbpsi headers]) ])
+    else
+      AC_MSG_CHECKING(for libdvbpsi.a in ${with_dvbpsi_tree})
+      real_dvbpsi_tree="`cd ${with_dvbpsi_tree} 2>/dev/null && pwd`"
+      if test "x$real_dvbpsi_tree" = x
+      then
+        dnl  The given directory can't be found
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot cd to ${with_dvbpsi_tree}])
+      fi
+      if test -f "${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
+      then
+        dnl  Use a custom libdvbpsi
+        AC_MSG_RESULT(${real_dvbpsi_tree}/src/.libs/libdvbpsi.a)
+        BUILTINS="${BUILTINS} mpeg_ts_dvbpsi"
+        mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a"
+        mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} -I${real_dvbpsi_tree}/src"
+      else
+        dnl  The given libdvbpsi wasn't built
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot find ${real_dvbpsi_tree}/src/.libs/libdvbpsi.a, make sure you compiled libdvbpsi in ${with_dvbpsi_tree}])
+      fi
     fi
-  ])
-  CPPFLAGS="$save_CPPFLAGS"
+  ;;
+  xno)
+    dnl  Compile without dvbpsi (dlopen version, works only under Linux)
+  ;;
+  *)
+    AC_MSG_CHECKING(for dvbpsi headers in ${with_dvbpsi})
+    if test "x$with_dvbpsi" = x
+    then
+      test_LDFLAGS=""
+      test_CFLAGS=""
+    else
+      test_LDFLAGS="-L${with_dvbpsi}/lib"
+      test_CFLAGS="-I${with_dvbpsi}/include"
+    fi
+    CPPFLAGS="$save_CPPFLAGS $test_CFLAGS"
+    AC_CHECK_HEADER([dvbpsi/dr.h],[
+      PLUGINS="${PLUGINS} mpeg_ts_dvbpsi"
+      mpeg_ts_dvbpsi_LDFLAGS="${mpeg_ts_dvbpsi_LDFLAGS} ${test_LDFLAGS} -ldvbpsi"
+      mpeg_ts_dvbpsi_CFLAGS="${mpeg_ts_dvbpsi_CFLAGS} ${test_CFLAGS}"
+      ],[
+      if test "x$enable_dvbpsi" != x
+      then
+        AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
+      fi
+    ])
+    CPPFLAGS="$save_CPPFLAGS"
+  ;;
+  esac
 fi
- 
+
 dnl
 dnl  VCD module
 dnl
