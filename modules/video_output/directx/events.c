@@ -287,7 +287,8 @@ void DirectXEventThread( event_thread_t *p_event )
 
     } /* End Main loop */
 
-    if( msg.message == WM_QUIT )
+    /* Check for WM_QUIT if we created the window */
+    if( !p_event->p_vout->p_sys->hparent && msg.message == WM_QUIT )
     {
         msg_Warn( p_event, "WM_QUIT... should not happen!!" );
         p_event->p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
@@ -357,6 +358,9 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         WNDCLASSEX wc;                            /* window class components */
         HICON      vlc_icon = NULL;
         char       vlc_path[MAX_PATH+1];
+
+        /* We create the window ourself, there is no previous window proc. */
+        p_vout->p_sys->pf_wndproc = NULL;
 
         /* Get the Icon from the main app */
         vlc_icon = NULL;
@@ -739,6 +743,11 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
             msg_Dbg( p_vout, "Created video sub-window" );
             SetWindowLong( p_vout->p_sys->hvideownd,
                            GWL_WNDPROC, (LONG)DirectXVideoEventProc );
+            /* Store the previous window proc of _this_ window with the video
+             * window so we can use it in DirectXVideoEventProc to pass
+             * messages to the creator of _this_ window */
+            SetWindowLong( p_vout->p_sys->hvideownd,
+                           GWL_USERDATA, (LONG)p_vout->p_sys->pf_wndproc );
         }
         break;
 
@@ -747,16 +756,75 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         break;
     }
 
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    if( p_vout->p_sys->pf_wndproc )
+    {
+        LRESULT i_ret;
+
+        /* Hmmm mozilla does manage somehow to save the pointer to our
+         * windowproc and will call us again whereby creating an
+         * infinite loop.
+         * We can detect this by resetting GWL_USERDATA before calling
+         * the parent's windowproc. */
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)NULL );
+
+        /* Call next window proc in chain */
+        i_ret = CallWindowProc( p_vout->p_sys->pf_wndproc, hwnd, message,
+                                wParam, lParam );
+
+        SetWindowLong( p_vout->p_sys->hwnd, GWL_USERDATA, (LONG)p_vout );
+        return i_ret;
+    }
+    else
+    {
+        /* Let windows handle the message */
+        return DefWindowProc(hwnd, message, wParam, lParam);
+    }
+
 }
+
 static long FAR PASCAL DirectXVideoEventProc( HWND hwnd, UINT message,
                                               WPARAM wParam, LPARAM lParam )
 {
+    WNDPROC pf_parentwndproc;
+    POINT pt;
+
     switch( message )
     {
     case WM_VLC_DESTROY_VIDEO_WIN:
         /* Destroy video sub-window */
         DestroyWindow( hwnd );
+        break;
+    case WM_MOUSEMOVE:
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+    case WM_LBUTTONDBLCLK:
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONUP:
+        /* Translate mouse cursor position to parent window coordinates. */
+        pt.x = LOWORD( lParam );
+        pt.y = HIWORD( lParam );
+        MapWindowPoints( hwnd, GetParent( hwnd ), &pt, 1 );
+        lParam = MAKELPARAM( pt.x, pt.y );
+        /* Fall through. */
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
+        /* Foward these to the original window proc of the parent so the
+         * creator of the window gets a chance to process them. If we created
+         * the parent window ourself DirectXEventThread will process these
+         * and they will never make it here.
+         * Note that we fake the hwnd to be our parent in order to prevent
+         * confusion in the creator's window proc. */   
+        pf_parentwndproc = (WNDPROC)GetWindowLong( hwnd, GWL_USERDATA );
+
+        if( pf_parentwndproc )
+        {
+            return CallWindowProc( pf_parentwndproc, GetParent( hwnd ),
+                                   message, wParam, lParam );
+        }
         break;
     }
 
