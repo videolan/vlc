@@ -1423,8 +1423,6 @@ void wxVolCtrl::UpdateVolume()
     int i_gauge_volume = i_volume * 200 * 2 / AOUT_VOLUME_MAX;
     if( i_gauge_volume == GetValue() ) return;
 
-    msg_Err( p_intf, "volume: %i", i_gauge_volume / 2 );
-
     SetValue( i_gauge_volume );
     SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
                 i_gauge_volume / 2 ) );
