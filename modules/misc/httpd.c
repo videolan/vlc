@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.24 2003/07/10 22:37:02 fenrir Exp $
+ * $Id: httpd.c,v 1.25 2003/08/11 20:18:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -23,6 +23,9 @@
 
 /*****************************************************************************
  * Preamble
+ *
+ * TODO:
+ *  - make that two distinct host:port use different daemon
  *****************************************************************************/
 #include <stdlib.h>
 #include <vlc/vlc.h>
@@ -134,8 +137,11 @@ struct httpd_host_t
 
 };
 
-#define HTTPD_AUTHENTICATE_NONE     0
-#define HTTPD_AUTHENTICATE_BASIC    1
+enum httpd_authenticate_e
+{
+    HTTPD_AUTHENTICATE_NONE = 0,
+    HTTPD_AUTHENTICATE_BASIC = 1
+};
 
 //typedef httpd_file_t httpd_stream_t;
 
@@ -171,14 +177,22 @@ struct httpd_file_t
 };
 
 
-#define HTTPD_CONNECTION_RECEIVING_REQUEST      1
-#define HTTPD_CONNECTION_SENDING_HEADER         2
-#define HTTPD_CONNECTION_SENDING_FILE           3
-#define HTTPD_CONNECTION_SENDING_STREAM         4
-#define HTTPD_CONNECTION_TO_BE_CLOSED           5
+enum httpd_connection_state_e
+{
+    HTTPD_CONNECTION_RECEIVING_REQUEST = 1,
+    HTTPD_CONNECTION_SENDING_HEADER = 2,
+    HTTPD_CONNECTION_SENDING_FILE = 3,
+    HTTPD_CONNECTION_SENDING_STREAM = 4,
+    HTTPD_CONNECTION_TO_BE_CLOSED = 5
+};
 
-#define HTTPD_CONNECTION_METHOD_GET             1
-#define HTTPD_CONNECTION_METHOD_POST            2
+enum httpd_connection_method_e
+{
+    HTTPD_CONNECTION_METHOD_GET = 1,
+    HTTPD_CONNECTION_METHOD_POST = 2,
+    HTTPD_CONNECTION_METHOD_HEAD =3
+};
+
 typedef struct httpd_connection_s
 {
     struct httpd_connection_s *p_next;
@@ -247,7 +261,9 @@ static void httpd_Thread( httpd_sys_t *p_httpt );
 static void httpd_ConnnectionNew( httpd_sys_t *, int , struct sockaddr_in * );
 static void httpd_ConnnectionClose( httpd_sys_t *, httpd_connection_t * );
 static int httpd_UnbanIP( httpd_sys_t *, httpd_banned_ip_t *);
+#if 0
 static int httpd_BanIP( httpd_sys_t *, char *);
+#endif
 static httpd_banned_ip_t *httpd_GetbannedIP( httpd_sys_t *, char * );
 
 /*****************************************************************************
@@ -1123,7 +1139,7 @@ static int  httpd_page_404_get( httpd_file_callback_args_t *p_args,
     return VLC_SUCCESS;
 }
 
-
+#if 0
 static int httpd_BanIP( httpd_sys_t *p_httpt, char * psz_new_banned_ip)
 {
     httpd_banned_ip_t *p_new_banned_ip ;
@@ -1167,7 +1183,7 @@ static int httpd_BanIP( httpd_sys_t *p_httpt, char * psz_new_banned_ip)
     p_httpt->i_banned_ip_count++;
     return 0;
 }
-
+#endif
 static httpd_banned_ip_t *httpd_GetbannedIP( httpd_sys_t *p_httpt, char *psz_ip )
 {
     httpd_banned_ip_t *p_ip;
@@ -1444,6 +1460,10 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
     {
         p_con->i_method = HTTPD_CONNECTION_METHOD_POST;
     }
+    else if( !strcmp( command, "HEAD" ))
+    {
+        p_con->i_method = HTTPD_CONNECTION_METHOD_HEAD;
+    }
     else
     {
         /* unimplemented */
@@ -1563,6 +1583,7 @@ search_file:
         if( !strcmp( p_httpt->file[i]->psz_file, p_con->psz_file ) )
         {
             if( p_httpt->file[i]->b_stream ||
+                p_con->i_method == HTTPD_CONNECTION_METHOD_HEAD ||
                 ( p_con->i_method == HTTPD_CONNECTION_METHOD_GET  && p_httpt->file[i]->pf_get ) ||
                 ( p_con->i_method == HTTPD_CONNECTION_METHOD_POST && p_httpt->file[i]->pf_post ) )
             {
@@ -1871,7 +1892,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                             p_con->i_buffer = 0;
                             FREE( p_con->p_buffer );
 
-                            if( !p_con->p_file->b_stream )
+                            if( !p_con->p_file->b_stream || p_con->i_method == HTTPD_CONNECTION_METHOD_HEAD )
                             {
                                 p_con->i_state = HTTPD_CONNECTION_SENDING_FILE; // be sure to out from HTTPD_CONNECTION_SENDING_HEADER
                                 if( p_con->i_method == HTTPD_CONNECTION_METHOD_GET )
@@ -1888,6 +1909,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                                 }
                                 else
                                 {
+                                    /* HTTPD_CONNECTION_METHOD_HEAD for example */
                                     p_con->p_buffer = NULL;
                                     p_con->i_buffer_size = 0;
                                 }
