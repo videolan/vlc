@@ -2,7 +2,7 @@
  * cmd_playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cmd_playlist.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: cmd_playlist.cpp,v 1.2 2004/01/10 03:36:03 hartman Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -37,7 +37,7 @@ void CmdPlaylistSort::execute()
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
     {
-        playlist_Sort( pPlaylist, SORT_TITLE, SORT_NORMAL );
+        playlist_Sort( pPlaylist, SORT_TITLE, ORDER_NORMAL );
     }
 
 }

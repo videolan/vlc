@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.5 2004/01/07 19:20:30 gbazin Exp $
+ * $Id: item-ext.c,v 1.6 2004/01/10 03:36:03 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -233,7 +233,7 @@ int playlist_SetName( playlist_t *p_playlist, int i_item, char *psz_name )
  * \param i_duration the duration to set
  * \return VLC_SUCCESS on success, VLC_EGENERIC on failure
  */
-int playlist_SetDuration( playlist_t *p_playlist, int i_item, int i_duration )
+int playlist_SetDuration( playlist_t *p_playlist, int i_item, mtime_t i_duration )
 {
     char psz_buffer[MSTRTIME_MAX_SIZE];
     vlc_value_t val;

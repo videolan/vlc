@@ -1,8 +1,8 @@
 /*****************************************************************************
  * http.c :  http mini-server ;)
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.42 2004/01/05 13:07:02 zorglub Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: http.c,v 1.43 2004/01/10 03:36:03 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1864,8 +1864,8 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     uri_extract_value( p_request, "type", type, 12 );
                     uri_extract_value( p_request, "order", order, 2 );
 
-                    if( order[0] == '0' ) i_order = SORT_NORMAL;
-                    else i_order = SORT_REVERSE;
+                    if( order[0] == '0' ) i_order = ORDER_NORMAL;
+                    else i_order = ORDER_REVERSE;
 
                     if( !strcmp( type , "title" ) )
                     {

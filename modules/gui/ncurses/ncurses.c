@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
- * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: ncurses.c,v 1.7 2004/01/08 16:28:37 fenrir Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: ncurses.c,v 1.8 2004/01/10 03:36:03 hartman Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -265,13 +265,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         {
             /* Playlist sort */
             case 'r':
-                playlist_Sort( p_sys->p_playlist, SORT_RANDOM, SORT_NORMAL );
+                playlist_Sort( p_sys->p_playlist, SORT_RANDOM, ORDER_NORMAL );
                 return 1;
             case 'o':
-                playlist_Sort( p_sys->p_playlist, SORT_TITLE, SORT_NORMAL );
+                playlist_Sort( p_sys->p_playlist, SORT_TITLE, ORDER_NORMAL );
                 return 1;
             case 'O':
-                playlist_Sort( p_sys->p_playlist, SORT_TITLE, SORT_REVERSE );
+                playlist_Sort( p_sys->p_playlist, SORT_TITLE, ORDER_REVERSE );
                 return 1;
 
             /* Playlist navigation */

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: playlist.cpp,v 1.34 2004/01/08 00:52:08 sigmunau Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: playlist.cpp,v 1.35 2004/01/10 03:36:03 hartman Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -722,7 +722,7 @@ void Playlist::OnSort( wxCommandEvent& event )
            playlist_SortGroup( p_playlist , 1 );
            break;
         case Randomize_Event:
-           playlist_Sort( p_playlist , SORT_RANDOM, SORT_NORMAL );
+           playlist_Sort( p_playlist , SORT_RANDOM, ORDER_NORMAL );
            break;
     }
     vlc_object_release( p_playlist );

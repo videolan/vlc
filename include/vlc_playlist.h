@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.21 2004/01/06 08:50:20 zorglub Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: vlc_playlist.h,v 1.22 2004/01/10 03:36:03 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -127,9 +127,10 @@ struct playlist_t
 #define SORT_AUTHOR 1
 #define SORT_GROUP 2
 #define SORT_RANDOM 3
+#define SORT_ID 4
 
-#define SORT_NORMAL 0
-#define SORT_REVERSE 1
+#define ORDER_NORMAL 0
+#define ORDER_REVERSE 1
 
 #define PLAYLIST_TYPE_MANUAL 1
 #define PLAYLIST_TYPE_SAP 2
@@ -167,7 +168,7 @@ VLC_EXPORT( int,  playlist_EnableGroup, ( playlist_t *, int ) );
 /* Basic item informations accessors */
 VLC_EXPORT( int, playlist_SetGroup, (playlist_t *, int, int ) );
 VLC_EXPORT( int, playlist_SetName, (playlist_t *, int, char * ) );
-VLC_EXPORT( int, playlist_SetDuration, (playlist_t *, int, int ) );
+VLC_EXPORT( int, playlist_SetDuration, (playlist_t *, int, mtime_t ) );
 
 /* Item search functions */
 VLC_EXPORT( int, playlist_GetPositionById, (playlist_t *, int) );

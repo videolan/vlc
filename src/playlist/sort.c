@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sort.c,v 1.5 2004/01/06 08:50:20 zorglub Exp $
+ * $Id: sort.c,v 1.6 2004/01/10 03:36:03 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -33,8 +33,8 @@
 /**
  * Sort the playlist
  * \param p_playlist the playlist
- * \param i_mode: SORT_TITLE, SORT_GROUP, SORT_AUTHOR, SORT_RANDOM
- * \param i_type: SORT_NORMAL or SORT_REVERSE (reversed order)
+ * \param i_mode: SORT_TITLE, SORT_GROUP, SORT_AUTHOR, SORT_RANDOM SORT_ID
+ * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
  * \return 0 on success
  */
 int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
@@ -96,8 +96,8 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
                                             _("General") , _("Author") ) );
             }
 
-            if( ( i_type == SORT_NORMAL  && i_test < 0 ) ||
-                ( i_type == SORT_REVERSE && i_test > 0 ) )
+            if( ( i_type == ORDER_NORMAL  && i_test < 0 ) ||
+                ( i_type == ORDER_REVERSE && i_test > 0 ) )
             {
                 i_small = i;
             }
