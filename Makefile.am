@@ -584,7 +584,7 @@ package-win32-base:
            $(UPX) -9 "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"; fi ;
 
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
-	  do cp "$(srcdir)/$$file" "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; \
+	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; \
 	  unix2dos "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; done
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/plugins"
