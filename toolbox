@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.12 2003/03/10 19:30:35 sam Exp $
+##  $Id: toolbox,v 1.13 2003/03/12 04:16:02 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -81,9 +81,10 @@ fi
 if test "$do_changelog" = "yes"
 then
   cvs2cl --help >/dev/null 2>&1 || exit 1
+  rm -f ChangeLog
   cvs2cl --hide-filenames --no-wrap -w --stdout | \
     sed -e 's/^[^0-9]/ /' -e 's/^  *$//' | \
-    uniq >| ChangeLog
+    uniq > ChangeLog
 fi
 
 ##
@@ -91,12 +92,6 @@ fi
 ##
 if test "$do_vc" = "yes"
 then
-  if test ! -f Makefile
-  then
-    echo "no Makefile found, did you run ./configure?"
-    exit 1
-  fi
-
   echo "generating Visual Studio files..."
 
   #  The evil ^M
