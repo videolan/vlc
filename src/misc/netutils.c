@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.31 2001/05/28 02:38:48 sam Exp $
+ * $Id: netutils.c,v 1.32 2001/05/28 02:44:39 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -199,7 +199,7 @@ int network_ChannelCreate( void )
     intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
     return( 1 );
 
-#elif defined( SYS_LINUX )
+#elif defined( SYS_LINUX ) || defined( WIN32 )
 /* FIXME : channels handling only work for linux */
     /* Allocate structure */
     p_main->p_channel = malloc( sizeof( input_channel_t ) );
@@ -241,7 +241,7 @@ int network_ChannelJoin( int i_channel )
     intf_ErrMsg( "network error: channels are not yet supported under BeOS" );
     return( -1 );
 
-#elif defined( WIN32 ) || defined( SYS_LINUX )
+#elif defined( SYS_LINUX ) || defined( WIN32 )
     int                 i_socket;
     int                 i_fromlen;
     struct sockaddr_in  sa_server;
