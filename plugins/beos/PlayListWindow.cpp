@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.5 2001/12/30 07:09:54 sam Exp $
+ * $Id: PlayListWindow.cpp,v 1.6 2002/06/01 08:54:08 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,12 +43,22 @@ extern "C"
 
 /* BeOS interface headers */
 #include "InterfaceWindow.h"
-#include "PlayListWindow.h"
 #include "MsgVals.h"
+#include "PlayListWindow.h"
 
 /*****************************************************************************
  * PlayListWindow
  *****************************************************************************/
+PlayListWindow *PlayListWindow::getPlayList( BRect frame, const char *name,
+                                  playlist_t *p_pl)
+{
+    static PlayListWindow *one_playlist;
+    if (one_playlist == NULL)
+    {
+       one_playlist = new PlayListWindow(frame, name, p_pl);
+    }
+    return one_playlist;
+}
 
 PlayListWindow::PlayListWindow( BRect frame, const char *name,
                                   playlist_t *p_pl)
@@ -143,4 +153,17 @@ void PlayListWindow::MessageReceived( BMessage * p_message )
         BWindow::MessageReceived( p_message );
         break;
     }
+}
+
+bool PlayListWindow::QuitRequested()
+{
+    Hide(); 
+    return false;
+}
+
+void PlayListWindow::ReallyQuit()
+{
+    Hide(); 
+    Lock();
+    Quit();
 }
