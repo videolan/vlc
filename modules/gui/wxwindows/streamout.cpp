@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.14 2003/05/22 12:00:56 gbazin Exp $
+ * $Id: streamout.cpp,v 1.15 2003/05/22 22:24:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -299,7 +299,7 @@ void SoutDialog::UpdateMRL()
         dup_opts += wxString::Format( wxT(":%d"), net_port->GetValue() );
         dup_opts += wxT("}");
     }
-    if( access_checkboxes[UDP_ACCESS_OUT]->IsChecked() )
+    if( access_checkboxes[RTP_ACCESS_OUT]->IsChecked() )
     {
         if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
         dup_opts += wxT("dst=std{access=rtp,mux=");
