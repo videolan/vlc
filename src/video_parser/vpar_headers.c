@@ -669,6 +669,7 @@ fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
     /* OK, now we are sure we will decode the picture. */
 #define P_picture p_vpar->picture.p_picture
     p_vpar->picture.b_error = 0;
+    p_vpar->picture.b_frame_structure = (i_structure == FRAME_STRUCTURE);
 
     if( !p_vpar->picture.i_current_structure )
     {
@@ -713,7 +714,6 @@ memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
     }
     p_vpar->picture.i_current_structure |= i_structure;
     p_vpar->picture.i_structure = i_structure;
-    p_vpar->picture.b_frame_structure = (i_structure == FRAME_STRUCTURE);
 
     /* Initialize picture data for decoding. */
     if( p_vpar->picture.b_motion_field = (i_structure == BOTTOM_FIELD) )
