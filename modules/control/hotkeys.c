@@ -311,10 +311,24 @@ static void Run( intf_thread_t *p_intf )
             vout_OSDMessage( p_intf, DEFAULT_CHAN, "Subtitle delay %i ms",
                                  (int)(i_delay/1000) );
         }
-        else if( i_action == ACTIONID_FULLSCREEN && p_vout )
+        else if( i_action == ACTIONID_FULLSCREEN )
         {
-            var_Get( p_vout, "fullscreen", &val ); val.b_bool = !val.b_bool;
-            var_Set( p_vout, "fullscreen", val );
+            if( p_vout )
+            {
+                var_Get( p_vout, "fullscreen", &val ); val.b_bool = !val.b_bool;
+                var_Set( p_vout, "fullscreen", val );
+            }
+            else
+            {
+                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                          FIND_ANYWHERE );
+                if( p_playlist )
+                {
+                    var_Get( p_playlist, "fullscreen", &val ); val.b_bool = !val.b_bool;
+                    var_Set( p_playlist, "fullscreen", val );
+                    vlc_object_release( p_playlist );
+                }
+            }
         }
         else if( i_action == ACTIONID_PLAY )
         {
