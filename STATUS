@@ -1,0 +1,58 @@
+# $Id: STATUS,v 1.1 2002/07/12 21:57:25 massiot Exp $
+#
+#                              VLC STATUS
+#
+# This file gathers all current contributors of VLC, and what they're
+# currently working on. PLEASE KEEP THIS FILE UP-TO-DATE. If you don't
+# have a CVS account and want to contribute, ask a committer to update
+# this file.
+
+Laurent Aimar <fenrir@via.ecp.fr> :
+    - MPEG-4 HTTP streaming
+      ETA : very soon
+
+Sigmund Augdal <sigmunau@idi.ntnu.no> :
+    - Id3 tags for MP3 files, creation of an attributes list in the input
+      ETA : soon
+    - RTP & RTSP support
+      ETA : long-term
+
+Gildas Bazin <gbazin@netcourrier.com> :
+    - wxWindows interface plug-in
+      ETA : starting in september
+
+Stéphane Borel <stef@via.ecp.fr> :
+    - DVD menus
+      ETA : soon
+    - Better deinterlacing support
+      ETA : summer
+
+Henri Fallon <henri@via.ecp.fr> :
+    - DXR2 & DXR3 support
+      ETA : soon
+    - Better deinterlacing support
+      ETA : summer
+
+Samuel Hocevar <sam@via.ecp.fr> :
+    - VLC objects, reentrancy, navigator plug-ins
+      ETA : soon
+    - Audio output 3
+      ETA : late summer
+
+Jon Lech Johansen <jon-vl@nanocrew.net> :
+    - Mac OS X interface : contextual menu, playlist, general enhancements
+      ETA : very soon
+
+Xavier Maillard <zedek@fxgsproject.org> :
+    - Xinerama fullscreen support
+      ETA : completed
+    - Ogg/Vorbis decoder plug-in
+      ETA : soon
+
+Christophe Massiot <massiot@via.ecp.fr> :
+    - Audio output 3
+      ETA : late summer
+    - Input 3 (multiple-file input, DivX subtitles, frame by frame,
+      rewind, better time handling)
+      ETA : end of 2002
+

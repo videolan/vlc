@@ -23,6 +23,7 @@ E: sigmunau@idi.ntnu.no
 D: lirc plugin
 D: norwegian translation
 D: aalib plugin
+D: KDE plug-in
 S: Norway
 
 N: Pierre Baillet
@@ -312,6 +313,13 @@ D: decoder and input core functions
 D: MPEG video decoder
 D: Many ports (Mac OS X, iPAQ, *BSD, Solaris...)
 D: documentation
+S: France
+
+N: Loïc Minier
+E: lool@via.ecp.fr
+C: lool
+D: Gtk/gnome enhancements
+D: xosd interface plug-in
 S: France
 
 N: Benjamin Mironer

@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.32 2002/06/01 12:32:01 sam Exp $
+ * $Id: mtime.c,v 1.33 2002/07/12 21:57:25 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -83,7 +83,7 @@ char *mstrtime( char *psz_buffer, mtime_t date )
 }
 
 /*****************************************************************************
- * mdate: return high precision date (inline function)
+ * mdate: return high precision date
  *****************************************************************************
  * Uses the gettimeofday() function when possible (1 MHz resolution) or the
  * ftime() function (1 kHz resolution).
@@ -122,7 +122,7 @@ mtime_t mdate( void )
 }
 
 /*****************************************************************************
- * mwait: wait for a date (inline function)
+ * mwait: wait for a date
  *****************************************************************************
  * This function uses select() and an system date function to wake up at a
  * precise date. It should be used for process synchronization. If current date
@@ -201,7 +201,7 @@ void mwait( mtime_t date )
 }
 
 /*****************************************************************************
- * msleep: more precise sleep() (inline function)                        (ok ?)
+ * msleep: more precise sleep()
  *****************************************************************************
  * Portable usleep() function.
  *****************************************************************************/

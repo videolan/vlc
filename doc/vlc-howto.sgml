@@ -116,7 +116,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <itemize>
     <item> Linux (all distributions, including iPAQ Familiar Linux)
     <item> Windows (all 32bit versions)
-    <item> Mas OS X
+    <item> Mac OS X
     <item> FreeBSD, NetBSD, OpenBSD, BSD/OS
     <item> BeOS
     <item> QNX RTOS
@@ -124,8 +124,8 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    </itemize>
    </p>
    <p>
-    Please note that the Linux, Windows and MacOS X are generally the most
-    up-to-date versions.
+    Please note that the Linux, Windows and MacOS X versions are generally the most
+    up-to-date ones.
   </p>
    </sect2>
    <sect2>

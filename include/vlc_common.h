@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.8 2002/07/05 11:18:56 sam Exp $
+ * $Id: vlc_common.h,v 1.9 2002/07/12 21:57:25 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -258,98 +258,7 @@ struct vlc_object_s
 #ifdef NTOHL_IN_SYS_PARAM_H
 #   include <sys/param.h>
 
-#elif defined(WIN32)
-/* Swap bytes in 16 bit value.  */
-#   define __bswap_constant_16(x) \
-     ((((x) >> 8) & 0xff) | (((x) & 0xff) << 8))
-
-#   if defined __GNUC__ && __GNUC__ >= 2
-#       define __bswap_16(x) \
-            (__extension__                                                    \
-             ({ register unsigned short int __v;                              \
-                if (__builtin_constant_p (x))                                 \
-                  __v = __bswap_constant_16 (x);                              \
-                else                                                          \
-                  __asm__ __volatile__ ("rorw $8, %w0"                        \
-                                        : "=r" (__v)                          \
-                                        : "0" ((unsigned short int) (x))      \
-                                        : "cc");                              \
-                __v; }))
-#   else
-/* This is better than nothing.  */
-#       define __bswap_16(x) __bswap_constant_16 (x)
-#   endif
-
-/* Swap bytes in 32 bit value.  */
-#   define __bswap_constant_32(x) \
-        ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >>  8) |            \
-         (((x) & 0x0000ff00) <<  8) | (((x) & 0x000000ff) << 24))
-
-#   if defined __GNUC__ && __GNUC__ >= 2
-/* To swap the bytes in a word the i486 processors and up provide the
-   `bswap' opcode.  On i386 we have to use three instructions.  */
-#       if !defined __i486__ && !defined __pentium__ && !defined __pentiumpro__
-#           define __bswap_32(x) \
-                (__extension__                                                \
-                 ({ register unsigned int __v;                                \
-                    if (__builtin_constant_p (x))                             \
-                      __v = __bswap_constant_32 (x);                          \
-                    else                                                      \
-                      __asm__ __volatile__ ("rorw $8, %w0;"                   \
-                                            "rorl $16, %0;"                   \
-                                            "rorw $8, %w0"                    \
-                                            : "=r" (__v)                      \
-                                            : "0" ((unsigned int) (x))        \
-                                            : "cc");                          \
-                    __v; }))
-#       else
-#           define __bswap_32(x) \
-                (__extension__                                                \
-                 ({ register unsigned int __v;                                \
-                    if (__builtin_constant_p (x))                             \
-                      __v = __bswap_constant_32 (x);                          \
-                    else                                                      \
-                      __asm__ __volatile__ ("bswap %0"                        \
-                                            : "=r" (__v)                      \
-                                            : "0" ((unsigned int) (x)));      \
-                    __v; }))
-#       endif
-#   else
-#       define __bswap_32(x) __bswap_constant_32 (x)
-#   endif
-
-#   if defined __GNUC__ && __GNUC__ >= 2
-/* Swap bytes in 64 bit value.  */
-#       define __bswap_constant_64(x) \
-            ((((x) & 0xff00000000000000ull) >> 56)                            \
-             | (((x) & 0x00ff000000000000ull) >> 40)                          \
-             | (((x) & 0x0000ff0000000000ull) >> 24)                          \
-             | (((x) & 0x000000ff00000000ull) >> 8)                           \
-             | (((x) & 0x00000000ff000000ull) << 8)                           \
-             | (((x) & 0x0000000000ff0000ull) << 24)                          \
-             | (((x) & 0x000000000000ff00ull) << 40)                          \
-             | (((x) & 0x00000000000000ffull) << 56))
-
-#       define __bswap_64(x) \
-            (__extension__                                                    \
-             ({ union { __extension__ unsigned long long int __ll;            \
-                        unsigned long int __l[2]; } __w, __r;                 \
-                if (__builtin_constant_p (x))                                 \
-                  __r.__ll = __bswap_constant_64 (x);                         \
-                else                                                          \
-                  {                                                           \
-                    __w.__ll = (x);                                           \
-                    __r.__l[0] = __bswap_32 (__w.__l[1]);                     \
-                    __r.__l[1] = __bswap_32 (__w.__l[0]);                     \
-                  }                                                           \
-                __r.__ll; }))
-#   else
-#       define __bswap_64(i) \
-            (u64)((__bswap_32((i) & 0xffffffff) << 32) |                      \
-            __bswap_32(((i) >> 32) & 0xffffffff ))
-#   endif
-
-#else /* NTOHL_IN_SYS_PARAM_H || WIN32 */
+#elif !defined(WIN32) /* NTOHL_IN_SYS_PARAM_H || WIN32 */
 #   include <netinet/in.h>
 
 #endif /* NTOHL_IN_SYS_PARAM_H || WIN32 */
@@ -371,35 +280,39 @@ struct vlc_object_s
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. Note that
  * byte orders other than little and big endians are not supported, but only
- * the VAX seems to have such exotic properties - note that these 'functions'
- * needs <netinet/in.h> or the local equivalent. */
-#if !defined( WIN32 )
+ * the VAX seems to have such exotic properties. */
+static inline u16 U16_AT( void * _p )
+{
+    u8 * p = (u8 *)_p;
+    return ( ((u16)p[0] << 8) | p[1] );
+}
+static inline u32 U32_AT( void * _p )
+{
+    u8 * p = (u8 *)_p;
+    return ( ((u32)p[0] << 24) | ((u32)p[1] << 16) | ((u32)p[2] << 8) | p[3] );
+}
+static inline u64 U64_AT( void * _p )
+{
+    u8 * p = (u8 *)_p;
+    return ( ((u64)p[0] << 56) | ((u64)p[1] << 48) | ((u64)p[2] << 40) 
+              | ((u64)p[3] << 32) | ((u64)p[4] << 24) | ((u64)p[5] << 16)
+              | ((u64)p[6] << 8) | p[7] );
+}
 #if WORDS_BIGENDIAN
-#   define hton16      htons
-#   define hton32      htonl
+#   define hton16(i)   ( i )
+#   define hton32(i)   ( i )
 #   define hton64(i)   ( i )
-#   define ntoh16      ntohs
-#   define ntoh32      ntohl
+#   define ntoh16(i)   ( i )
+#   define ntoh32(i)   ( i )
 #   define ntoh64(i)   ( i )
 #else
-#   define hton16      htons
-#   define hton32      htonl
-    static inline u64 __hton64( u64 i )
-    {
-        return ((u64)(htonl((i) & 0xffffffff)) << 32)
-                | htonl(((i) >> 32) & 0xffffffff );
-    }
-#   define hton64(i)   __hton64( i )
-#   define ntoh16      ntohs
-#   define ntoh32      ntohl
-#   define ntoh64      hton64
+#   define hton16(i)   U16_AT(&i)
+#   define hton32(i)   U32_AT(&i)
+#   define hton64(i)   U64_AT(&i)
+#   define ntoh16(i)   U16_AT(&i)
+#   define ntoh32(i)   U32_AT(&i)
+#   define ntoh64(i)   U64_AT(&i)
 #endif
-#endif /* !defined( WIN32 ) */
-
-/* Macros with automatic casts */
-#define U64_AT(p)   ( ntoh64 ( *( (u64 *)(p) ) ) )
-#define U32_AT(p)   ( ntoh32 ( *( (u32 *)(p) ) ) )
-#define U16_AT(p)   ( ntoh16 ( *( (u16 *)(p) ) ) )
 
 /* Alignment of critical static data structures */
 #ifdef ATTRIBUTE_ALIGNED_MAX
@@ -444,29 +357,7 @@ char * strndup( const char *s, size_t n );
 
 #define I64C(x)         x##LL
 
-
-#if defined( WIN32 )
-/* The ntoh* and hton* bytes swapping functions are provided by winsock
- * but for conveniency and speed reasons it is better to implement them
- * ourselves. ( several plugins use them and it is too much hassle to link
- * winsock with each of them ;-)
- */
-#   ifdef WORDS_BIGENDIAN
-#       define ntoh32(x)       (x)
-#       define ntoh16(x)       (x)
-#       define ntoh64(x)       (x)
-#       define hton32(x)       (x)
-#       define hton16(x)       (x)
-#       define hton64(x)       (x)
-#   else
-#       define ntoh32(x)     __bswap_32 (x)
-#       define ntoh16(x)     __bswap_16 (x)
-#       define ntoh64(x)     __bswap_32 (x)
-#       define hton32(x)     __bswap_32 (x)
-#       define hton16(x)     __bswap_16 (x)
-#       define hton64(x)     __bswap_64 (x)
-#   endif
-
+#ifdef WIN32
 /* win32, cl and icl support */
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )
 #       define __attribute__(x)

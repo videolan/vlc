@@ -1,0 +1,101 @@
+# $Id: MAINTAINERS,v 1.1 2002/07/12 21:57:25 massiot Exp $
+#
+#                            VLC MAINTAINERS
+#
+# This file lists all modules of VLC, and presents who's responsible for
+# what. "Responsible" doesn't mean this person will be alone to improve
+# the code, it just means that she's probably the contributor with the
+# best knowledge of the code, so that questions and propositions of
+# contributions should be directed to her.
+
+* MISC VLC ARCHITECTURE
+
+  - Makefiles & autoconf : [sam] & [meuuh]
+  - configuration & command-line options : [gibalou]
+  - modules, detection, dynamic loading : [sam]
+  - objects support, libvlc : [sam]
+  - messages (errors, debug) : [sam]
+  - internationalization : [sam]
+  - MMX optimizations : [sam]
+  - Altivec optimizations : [meuuh] ([jlj])
+
+* PORTS
+
+  - Debian GNU/Linux : [sam]
+  - Mandrake Linux : Yves Duret
+  - BeOS : Tony Castley (Eric Petit)
+  - Windows : [gibalou]
+  - Mac OS X : [jlj] ([meuuh])
+  - QNX RTOS : [jlj]
+  - Solaris : [meuuh]
+  - *BSD : [meuuh]
+  - GNU/Hurd : [sam]
+  - iPAQ Familiar Linux : [saman] ([meuuh])
+  - BSD/OS : Steven M. Schultz
+
+* INTERFACE
+
+  - interface architecture : [sam]
+  - modules gtk, gnome : [sam] ([stef])
+  - modules lirc, dummy, rc, ncurses : [sam]
+  - modules qt, kde : [sigmund]
+  - module xosd : [lool]
+
+* VIDEO OUTPUT
+
+  - video output architecture : [sam]
+  - modules dummy, fb, ggi, glide, mga, sdl : [sam]
+  - output filters & chroma : [sam]
+  - modules x11, xvideo : [gibalou]
+  - module aa : [sigmund]
+
+* AUDIO OUTPUT
+
+  - audio output architecture : [sam] ([meuuh])
+  - module ALSA : [henri]
+  - module aRts : Emmanuel Blindauer
+  - modules dsp, dummy, esd : [sam] ([meuuh])
+  - output filters : [sam] ([meuuh])
+
+* INPUT
+
+  - input architecture : [meuuh]
+  - demux modules PS, ES, a52_system : [meuuh]
+  - access modules file, udp, http : [meuuh]
+  - demux modules TS, satellite : [jobi]
+  - network modules ipv4, ipv6 : [meuuh]
+  - demux module mpeg_audio (mp3), avi : [fenrir]
+  - DVD module : [stef]
+  - VCD module : [jobi] ([jlj])
+
+* DECODERS
+
+  - decoders architecture : [meuuh] ([henri])
+  - built-in MPEG audio : unmaintained (FIXME)
+  - built-in MPEG video & associated idct+motion : [meuuh]
+  - built-in AC3 & associated plug-ins : Renaud Dartus (soon-to-be scrapped)
+  - mad : [saman] ([meuuh])
+  - ffmpeg : [fenrir]
+  - AC3 SPDIF : [stef]
+  - A/52 : [gibalou] ([meuuh])
+  - SPU : [sam]
+  - Ogg/Vorbis : Xavier Maillard
+
+* DOCUMENTATION
+
+  - VLC HOWTO : [jobi]
+  - Developer documentation : [sam] ([meuuh])
+  - FAQ : [lool]
+
+
+[fenrir] = Laurent Aimar
+[gibalou] = Gildas Bazin
+[henri] = Henri Fallon
+[jlj] = Jon Lech Johansen
+[jobi] = Johan Bilien
+[lool] = Loïc Minier
+[meuuh] = Christophe Massiot
+[sam] = Samuel Hocevar
+[saman] = Jean-Paul Saman
+[sigmund] = Sigmund Augdal
+[stef] = Stéphane Borel
