@@ -71,7 +71,6 @@ src/audio_output/intf.c
 src/audio_output/mixer.c
 src/audio_output/output.c
 src/extras/dirent.c
-src/extras/dirent.h
 src/extras/getopt.c
 src/extras/getopt.h
 src/extras/getopt1.c
@@ -156,6 +155,7 @@ modules/access/dvb/en50221.c
 modules/access/dvb/linux_dvb.c
 modules/access/dvdnav.c
 modules/access/dvdread.c
+modules/access/fake.c
 modules/access/file.c
 modules/access/ftp.c
 modules/access/http.c
@@ -317,7 +317,6 @@ modules/control/lirc.c
 modules/control/netsync.c
 modules/control/ntservice.c
 modules/control/rc.c
-modules/control/rtci.c
 modules/control/showintf.c
 modules/control/telnet.c
 modules/demux/a52.c
@@ -364,11 +363,14 @@ modules/demux/real.c
 modules/demux/sgimb.c
 modules/demux/subtitle.c
 modules/demux/ts.c
+modules/demux/ty.c
 modules/demux/util/id3.c
 modules/demux/util/id3genres.h
 modules/demux/util/id3tag.c
 modules/demux/vobsub.c
+modules/demux/voc.c
 modules/demux/wav.c
+modules/demux/xa.c
 modules/gui/beos/AudioOutput.cpp
 modules/gui/beos/BeOS.cpp
 modules/gui/beos/Bitmaps.h
@@ -787,6 +789,7 @@ modules/stream_out/es.c
 modules/stream_out/gather.c
 modules/stream_out/rtp.c
 modules/stream_out/standard.c
+modules/stream_out/switcher.c
 modules/stream_out/transcode.c
 modules/stream_out/transrate/block.c
 modules/stream_out/transrate/frame.c
@@ -815,6 +818,7 @@ modules/video_filter/filter_common.h
 modules/video_filter/invert.c
 modules/video_filter/logo.c
 modules/video_filter/marq.c
+modules/video_filter/mosaic.c
 modules/video_filter/motionblur.c
 modules/video_filter/motiondetect.c
 modules/video_filter/scale.c
@@ -848,6 +852,8 @@ modules/video_output/hd1000v.cpp
 modules/video_output/image.c
 modules/video_output/mga.c
 modules/video_output/opengl.c
+modules/video_output/picture.c
+modules/video_output/picture.h
 modules/video_output/qte/qte.cpp
 modules/video_output/qte/qte.h
 modules/video_output/sdl.c
