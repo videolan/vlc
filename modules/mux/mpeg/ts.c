@@ -79,6 +79,8 @@ static void    Close  ( vlc_object_t * );
   "PID will automatically be the video.")
 #define APID_TEXT N_("Audio PID")
 #define APID_LONGTEXT N_("Assigns a fixed PID to the audio stream.")
+#define PMTPID_TEXT N_("PMT PID")
+#define PMTPID_LONGTEXT N_("Assings a fixed PID to the PMT")
 
 #define SHAPING_TEXT N_("Shaping delay (ms)")
 #define SHAPING_LONGTEXT N_("If enabled, the TS muxer will cut the " \
@@ -122,6 +124,8 @@ vlc_module_begin();
                                   VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT,
                  APID_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pid-pmt", 0, NULL, PMTPID_TEXT,
+                 PMTPID_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
                  SHAPING_LONGTEXT, VLC_TRUE );
@@ -146,7 +150,7 @@ vlc_module_end();
  * Local data structures
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "pid-video", "pid-audio", "shaping", "pcr",
+    "pid-video", "pid-audio", "pid-pmt", "shaping", "pcr",
     "use-key-frames", "dts-delay", "csa-ck", "crypt-audio", NULL
 };
 
@@ -354,10 +358,19 @@ static int Open( vlc_object_t *p_this )
     p_sys->pat.i_continuity_counter = 0;
 
     p_sys->i_pmt_version_number = rand() % 32;
-    p_sys->pmt.i_pid = 0x42;
     p_sys->pmt.i_continuity_counter = 0;
 
-    p_sys->i_pid_free = 0x43;
+    var_Get( p_mux, SOUT_CFG_PREFIX "pid-pmt", &val );
+    if (val.i_int )
+    {
+        p_sys->pmt.i_pid = val.i_int;
+    }
+    else
+    {
+       p_sys->pmt.i_pid = 0x42;
+    }
+
+    p_sys->i_pid_free = p_sys->pmt.i_pid + 1;
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pid-video", &val );
     p_sys->i_pid_video = val.i_int;
