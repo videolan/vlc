@@ -2129,12 +2129,14 @@ AC_ARG_ENABLE(testsuite,
   [  --enable-testsuite      build test modules (default disabled)])
 if test "x${enable_testsuite}" = "xyes"
 then
-  TESTS="test1 test2 test3"
+  TESTS="test1 test2 test3 test4"
+
   dnl  we define those so that bootstrap sets the right linker
   CXXFLAGS_test2="${CXXFLAGS_test2}"
   OBJCFLAGS_test3="${OBJCFLAGS_test3}"
   dnl  this one is needed until automake knows what to do
   LDFLAGS_test3="${LDFLAGS_test3} -lobjc"
+
   PLUGINS="${PLUGINS} ${TESTS}"
   #BUILTINS="${BUILTINS} ${TESTS}"
 fi

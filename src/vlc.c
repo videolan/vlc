@@ -2,7 +2,7 @@
  * vlc.c: the vlc player
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.14 2002/10/11 22:32:56 sam Exp $
+ * $Id: vlc.c,v 1.15 2002/10/14 16:46:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -95,17 +95,6 @@ int main( int i_argc, char *ppsz_argv[] )
 
     /* Run libvlc, in non-blocking mode */
     i_ret = VLC_Play( 0 );
-
-    /* Add background interfaces */
-#if 0
-    { int i; for( i=10; i--; ) VLC_AddIntf( 0, "dummy", 0 ); }
-    VLC_AddIntf( 0, "dummy", VLC_FALSE );
-    VLC_AddIntf( 0, "logger", VLC_FALSE );
-    VLC_AddIntf( 0, "xosd", VLC_FALSE );
-    VLC_AddIntf( 0, "gtk", VLC_FALSE );
-    VLC_AddIntf( 0, "kde", VLC_FALSE );
-    VLC_AddIntf( 0, "rc", VLC_FALSE );
-#endif
 
     /* Add a blocking interface and keep the return value */
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE );

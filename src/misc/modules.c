@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.97 2002/10/11 10:08:06 gbazin Exp $
+ * $Id: modules.c,v 1.98 2002/10/14 16:46:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -54,7 +54,7 @@
 #   undef HAVE_DYNAMIC_PLUGINS
 #endif
 
-
+#include "error.h"
 #include "netutils.h"
 
 #include "interface.h"

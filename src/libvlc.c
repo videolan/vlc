@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.38 2002/10/11 22:32:56 sam Exp $
+ * $Id: libvlc.c,v 1.39 2002/10/14 16:46:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -61,6 +61,7 @@
 #include "vlc_cpu.h"                                        /* CPU detection */
 #include "os_specific.h"
 
+#include "error.h"
 #include "netutils.h"                                 /* network_ChannelJoin */
 
 #include "stream_control.h"
@@ -86,7 +87,7 @@ static vlc_t *  p_static_vlc;
  * Local prototypes
  *****************************************************************************/
 static int  GetFilenames  ( vlc_t *, int, char *[] );
-static void Usage         ( vlc_t *, const char *psz_module_name );
+static void Usage         ( vlc_t *, char const *psz_module_name );
 static void ListModules   ( vlc_t * );
 static void Version       ( void );
 
@@ -99,9 +100,19 @@ static void ShowConsole   ( void );
  *****************************************************************************
  * This function returns full version string (numeric version and codename).
  *****************************************************************************/
-char * VLC_Version( void )
+char const * VLC_Version( void )
 {
     return VERSION_MESSAGE;
+}
+
+/*****************************************************************************
+ * VLC_Error: strerror() equivalent
+ *****************************************************************************
+ * This function returns full version string (numeric version and codename).
+ *****************************************************************************/
+char const * VLC_Error( int i_err )
+{
+    return vlc_error( i_err );
 }
 
 /*****************************************************************************
@@ -182,9 +193,6 @@ int VLC_Create( void )
     /* Store data for the non-reentrant API */
     p_static_vlc = p_vlc;
 
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_CREATED;
-
     return p_vlc->i_object_id;
 }
 
@@ -208,11 +216,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
-    /* Check that the handle is valid */
-    if( !p_vlc || p_vlc->i_status != VLC_STATUS_CREATED )
+    if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status (!CREATED)\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     /* Support for gettext */
@@ -482,9 +488,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         return VLC_EGENERIC;
     }
 
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_STOPPED;
-
     /*
      * Get input filenames given as commandline arguments
      */
@@ -501,7 +504,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
  * separate thread. If b_block is set to 1, VLC_AddIntf will continue until
  * user requests to quit.
  *****************************************************************************/
-int VLC_AddIntf( int i_object, const char *psz_module, vlc_bool_t b_block )
+int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
 {
     int i_err;
     intf_thread_t *p_intf;
@@ -510,11 +513,9 @@ int VLC_AddIntf( int i_object, const char *psz_module, vlc_bool_t b_block )
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
-    /* Check that the handle is valid */
-    if( !p_vlc || p_vlc->i_status != VLC_STATUS_RUNNING )
+    if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status (!RUNNING)\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     if( psz_module )
@@ -566,52 +567,44 @@ int VLC_Destroy( int i_object )
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
-    /* Check that the handle is valid */
-    if( !p_vlc || (p_vlc->i_status != VLC_STATUS_STOPPED
-                    && p_vlc->i_status != VLC_STATUS_CREATED) )
+    if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status "
-                         "(!STOPPED&&!CREATED)\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
-    if( p_vlc->i_status == VLC_STATUS_STOPPED )
+    /*
+     * Go back into channel 0 which is the network
+     */
+    if( config_GetInt( p_vlc, "network-channel" ) && p_vlc->p_channel )
     {
-        /*
-         * Go back into channel 0 which is the network
-         */
-        if( config_GetInt( p_vlc, "network-channel" ) && p_vlc->p_channel )
-        {
-            network_ChannelJoin( p_vlc, COMMON_CHANNEL );
-        }
+        network_ChannelJoin( p_vlc, COMMON_CHANNEL );
+    }
     
-        /*
-         * Free allocated memory
-         */
-        if( p_vlc->p_memcpy_module != NULL )
-        {
-            module_Unneed( p_vlc, p_vlc->p_memcpy_module );
-        }
-    
+    /*
+     * Free allocated memory
+     */
+    if( p_vlc->p_memcpy_module )
+    {
+        module_Unneed( p_vlc, p_vlc->p_memcpy_module );
+        p_vlc->p_memcpy_module = NULL;
+    }
+
+    if( p_vlc->psz_homedir )
+    {
         free( p_vlc->psz_homedir );
-    
-        /*
-         * XXX: Free module bank !
-         */
-        //module_EndBank( p_vlc );
-    
-        /*
-         * System specific cleaning code
-         */
-        system_End( p_vlc );
-    
-        /* Update the handle status */
-        p_vlc->i_status = VLC_STATUS_CREATED;
+        p_vlc->psz_homedir = NULL;
     }
 
-    /* Update the handle status, just in case */
-    p_vlc->i_status = VLC_STATUS_NONE;
-
+    /*
+     * XXX: Free module bank !
+     */
+    //module_EndBank( p_vlc );
+    
+    /*
+     * System specific cleaning code
+     */
+    system_End( p_vlc );
+    
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_vlc->config_lock );
 
@@ -639,8 +632,7 @@ int VLC_Die( int i_object )
 
     if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status (!EXIST)\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     p_vlc->b_die = VLC_TRUE;
@@ -654,7 +646,7 @@ int VLC_Die( int i_object )
  * This function adds psz_target to the current playlist. If a playlist does
  * not exist, it will create one.
  *****************************************************************************/
-int VLC_AddTarget( int i_object, const char *psz_target, int i_mode, int i_pos )
+int VLC_AddTarget( int i_object, char const *psz_target, int i_mode, int i_pos )
 {
     int i_err;
     playlist_t *p_playlist;
@@ -662,11 +654,9 @@ int VLC_AddTarget( int i_object, const char *psz_target, int i_mode, int i_pos )
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
-    if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
-                     && p_vlc->i_status != VLC_STATUS_RUNNING ) )
+    if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status (!STOPPED&&!RUNNING)\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -696,7 +686,7 @@ int VLC_AddTarget( int i_object, const char *psz_target, int i_mode, int i_pos )
  *****************************************************************************
  *
  *****************************************************************************/
-int VLC_Set( int i_object, const char *psz_var, vlc_value_t value )
+int VLC_Set( int i_object, char const *psz_var, vlc_value_t value )
 {
     vlc_t *p_vlc;
 
@@ -704,8 +694,7 @@ int VLC_Set( int i_object, const char *psz_var, vlc_value_t value )
 
     if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     /* FIXME: Temporary hack for Mozilla, if variable starts with conf:: then
@@ -713,7 +702,7 @@ int VLC_Set( int i_object, const char *psz_var, vlc_value_t value )
     if( !strncmp( psz_var, "conf::", 6 ) )
     {
         module_config_t *p_item;
-        const char *psz_newvar = psz_var + 6;
+        char const *psz_newvar = psz_var + 6;
 
         p_item = config_FindConfig( VLC_OBJECT(p_vlc), psz_newvar );
 
@@ -746,7 +735,7 @@ int VLC_Set( int i_object, const char *psz_var, vlc_value_t value )
  *****************************************************************************
  *
  *****************************************************************************/
-int VLC_Get( int i_object, const char *psz_var, vlc_value_t *p_value )
+int VLC_Get( int i_object, char const *psz_var, vlc_value_t *p_value )
 {
     vlc_t *p_vlc;
 
@@ -754,8 +743,7 @@ int VLC_Get( int i_object, const char *psz_var, vlc_value_t *p_value )
 
     if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     return var_Get( p_vlc, psz_var, p_value );
@@ -774,20 +762,16 @@ int VLC_Play( int i_object )
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
-    if( !p_vlc || p_vlc->i_status != VLC_STATUS_STOPPED )
+    if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status (!STOPPED)\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
-
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_RUNNING;
 
     p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
 
     if( !p_playlist )
     {
-        return VLC_EOBJECT;
+        return VLC_ENOOBJ;
     }
 
     vlc_mutex_lock( &p_playlist->object_lock );
@@ -820,11 +804,9 @@ int VLC_Stop( int i_object )
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
     /* Check that the handle is valid */
-    if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
-                     && p_vlc->i_status != VLC_STATUS_RUNNING ) )
+    if( !p_vlc )
     {
-        fprintf( stderr, "error: invalid status (!STOPPED&&!RUNNING)\n" );
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     /*
@@ -873,9 +855,6 @@ int VLC_Stop( int i_object )
         aout_Delete( p_aout );
     }
 
-    /* Update the handle status */
-    p_vlc->i_status = VLC_STATUS_STOPPED;
-
     return VLC_SUCCESS;
 }
 
@@ -891,14 +870,14 @@ int VLC_Pause( int i_object )
 
     if( !p_vlc )
     {
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     p_input = vlc_object_find( p_vlc, VLC_OBJECT_INPUT, FIND_CHILD );
 
     if( !p_input )
     {
-        return VLC_EOBJECT;
+        return VLC_ENOOBJ;
     }
 
     input_SetStatus( p_input, INPUT_STATUS_PAUSE );
@@ -919,14 +898,14 @@ int VLC_FullScreen( int i_object )
 
     if( !p_vlc )
     {
-        return VLC_ESTATUS;
+        return VLC_ENOOBJ;
     }
 
     p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD );
 
     if( !p_vout )
     {
-        return VLC_EOBJECT;
+        return VLC_ENOOBJ;
     }
 
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
@@ -963,7 +942,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
  *****************************************************************************
  * Print a short inline help. Message interface is initialized at this stage.
  *****************************************************************************/
-static void Usage( vlc_t *p_this, const char *psz_module_name )
+static void Usage( vlc_t *p_this, char const *psz_module_name )
 {
 #define FORMAT_STRING "      --%s%s%s%s%s%s%s %s%s\n"
     /* option name -------------'     | | | |  | |

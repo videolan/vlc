@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.8 2002/10/11 22:32:56 sam Exp $
+ * $Id: rc.c,v 1.9 2002/10/14 16:46:55 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -57,6 +57,10 @@
 static int  Activate     ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
 
+static int  Playlist     ( vlc_object_t *, char *, char * );
+static int  Quit         ( vlc_object_t *, char *, char * );
+static int  Intf         ( vlc_object_t *, char *, char * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -89,7 +93,7 @@ static int Activate( vlc_object_t *p_this )
     if( !config_GetInt( p_intf, "fake-tty" ) && !isatty( 0 ) )
     {
         msg_Warn( p_intf, "fd 0 is not a TTY" );
-        return 1;
+        return VLC_EGENERIC;
     }
 #endif
 
@@ -101,7 +105,7 @@ static int Activate( vlc_object_t *p_this )
     CONSOLE_INTRO_MSG;
 
     printf( "remote control interface initialized, `h' for help\n" );
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -116,7 +120,6 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *     p_playlist;
 
     char       p_buffer[ MAX_LINE_LENGTH + 1 ];
-    vlc_bool_t b_complete = 0;
     vlc_bool_t b_showpos = config_GetInt( p_intf, "rc-show-pos" );
     input_info_category_t * p_category;
     input_info_t * p_info;
@@ -124,20 +127,34 @@ static void Run( intf_thread_t *p_intf )
     int        i_dummy;
     off_t      i_oldpos = 0;
     off_t      i_newpos;
-    fd_set     fds;                                        /* stdin changed? */
-    struct timeval tv;                                   /* how long to wait */
 
-    double     f_ratio = 1;
+    double     f_ratio = 1.0;
 
     p_input = NULL;
     p_playlist = NULL;
 
-    var_Create( p_intf, "foo", VLC_VAR_STRING );
-    var_Set( p_intf, "foo", (vlc_value_t)"test" );
+    /* Register commands that will be cleaned up upon object destruction */
+    var_Create( p_intf, "quit", VLC_VAR_COMMAND );
+    var_Set( p_intf, "quit", (vlc_value_t)(void*)Quit );
+    var_Create( p_intf, "intf", VLC_VAR_COMMAND );
+    var_Set( p_intf, "intf", (vlc_value_t)(void*)Intf );
+
+    var_Create( p_intf, "play", VLC_VAR_COMMAND );
+    var_Set( p_intf, "play", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "stop", VLC_VAR_COMMAND );
+    var_Set( p_intf, "stop", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "pause", VLC_VAR_COMMAND );
+    var_Set( p_intf, "pause", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "prev", VLC_VAR_COMMAND );
+    var_Set( p_intf, "prev", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "next", VLC_VAR_COMMAND );
+    var_Set( p_intf, "next", (vlc_value_t)(void*)Playlist );
 
     while( !p_intf->b_die )
     {
-        b_complete = 0;
+        fd_set         fds;
+        struct timeval tv;
+        vlc_bool_t     b_complete = VLC_FALSE;
 
         /* Check stdin */
         tv.tv_sec = 0;
@@ -164,7 +181,7 @@ static void Run( intf_thread_t *p_intf )
                  || p_buffer[ i_size ] == '\n' )
             {
                 p_buffer[ i_size ] = 0;
-                b_complete = 1;
+                b_complete = VLC_TRUE;
             }
         }
 
@@ -215,83 +232,58 @@ static void Run( intf_thread_t *p_intf )
         }
 
         /* Is there something to do? */
-        if( b_complete == 1 )
+        if( b_complete )
         {
-            char *p_cmd = p_buffer;
+            char *psz_cmd, *psz_arg;
 
-            if( !strcmp( p_cmd, "quit" ) )
+            /* Skip heading spaces */
+            psz_cmd = p_buffer;
+            while( *psz_cmd == ' ' )
             {
-                p_intf->p_vlc->b_die = VLC_TRUE;
+                psz_cmd++;
             }
-            else if( !strcmp( p_cmd, "segfault" ) )
-            {
-                raise( SIGSEGV );
-            }
-            else if( !strcmp( p_cmd, "prev" ) )
-            {
-                if( p_playlist ) playlist_Prev( p_playlist );
-            }
-            else if( !strcmp( p_cmd, "next" ) )
-            {
-                if( p_playlist ) playlist_Next( p_playlist );
-            }
-            else if( !strcmp( p_cmd, "play" ) )
-            {
-                if( p_playlist ) playlist_Play( p_playlist );
-            }
-            else if( !strcmp( p_cmd, "stop" ) )
-            {
-                if( p_playlist ) playlist_Stop( p_playlist );
-            }
-            else if( !strcmp( p_cmd, "pause" ) )
-            {
-                if( p_input ) input_SetStatus( p_input, INPUT_STATUS_PAUSE );
-            }
-            else if( !strcmp( p_cmd, "tree" ) )
-            {
-                vlc_dumpstructure( p_intf->p_vlc );
-            }
-            else if( !strcmp( p_cmd, "list" ) )
-            {
-                vlc_liststructure( p_intf->p_vlc );
-            }
-            else if( !strncmp( p_cmd, "setfoo ", 7 ) )
-            {
-                vlc_value_t value;
-                value.psz_string = p_cmd + 7;
-                var_Set( p_intf, "foo", value );
-            }
-            else if( !strncmp( p_cmd, "getfoo", 6 ) )
-            {
-                vlc_value_t value;
-                var_Get( p_intf, "foo", &value );
-                printf( "current value is '%s'\n", value.psz_string );
-            }
-            else if( !strncmp( p_cmd, "intf ", 5 ) )
-            {
-                intf_thread_t *p_newintf;
-                char *psz_oldmodule = config_GetPsz( p_intf->p_vlc, "intf" );
 
-                config_PutPsz( p_intf->p_vlc, "intf", p_cmd + 5 );
-                p_newintf = intf_Create( p_intf->p_vlc );
-                config_PutPsz( p_intf->p_vlc, "intf", psz_oldmodule );
-
-                if( psz_oldmodule )
+            /* Split psz_cmd at the first space and make sure that
+             * psz_arg is valid */
+            psz_arg = strchr( psz_cmd, ' ' );
+            if( psz_arg )
+            {
+                *psz_arg++ = 0;
+                while( *psz_arg == ' ' )
                 {
-                    free( psz_oldmodule );
-                }
-
-                if( p_newintf )
-                {
-                    p_newintf->b_block = VLC_FALSE;
-                    if( intf_RunThread( p_newintf ) )
-                    {
-                        vlc_object_detach( p_newintf );
-                        intf_Destroy( p_newintf );
-                    }
+                    psz_arg++;
                 }
             }
-            else if( !strcmp( p_cmd, "info" ) )
+            else
+            {
+                psz_arg = "";
+            }
+
+            /* If the user typed a registered local command, try it */
+            if( var_Type( p_intf, psz_cmd ) == VLC_VAR_COMMAND )
+            {
+                vlc_value_t val;
+                int i_ret;
+
+                val.psz_string = psz_arg;
+                i_ret = var_Get( p_intf, psz_cmd, &val );
+                printf( "%s: returned %i (%s)\n",
+                        psz_cmd, i_ret, vlc_error( i_ret ) );
+            }
+            /* Or maybe it's a global command */
+            else if( var_Type( p_intf->p_libvlc, psz_cmd ) == VLC_VAR_COMMAND )
+            {
+                vlc_value_t val;
+                int i_ret;
+
+                val.psz_string = psz_arg;
+                /* FIXME: it's a global command, but we should pass the
+                 * local object as an argument, not p_intf->p_libvlc. */
+                i_ret = var_Get( p_intf->p_libvlc, psz_cmd, &val );
+                printf( "%s: returned %i (%s)\n",
+                        psz_cmd, i_ret, vlc_error( i_ret ) );
+            }
+            else if( !strcmp( psz_cmd, "info" ) )
             {
                 if ( p_input )
                 {
@@ -319,13 +311,13 @@ static void Run( intf_thread_t *p_intf )
                     printf( "no input\n" );
                 }
             }
-            else switch( p_cmd[0] )
+            else switch( psz_cmd[0] )
             {
             case 'a':
             case 'A':
-                if( p_cmd[1] == ' ' && p_playlist )
+                if( psz_cmd[1] == ' ' && p_playlist )
                 {
-                    playlist_Add( p_playlist, p_cmd + 2,
+                    playlist_Add( p_playlist, psz_cmd + 2,
                                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
                 }
                 break;
@@ -356,15 +348,15 @@ static void Run( intf_thread_t *p_intf )
                 if( p_input )
                 {
                     for( i_dummy = 1;
-                         i_dummy < MAX_LINE_LENGTH && p_cmd[ i_dummy ] >= '0'
-                                                   && p_cmd[ i_dummy ] <= '9';
+                         i_dummy < MAX_LINE_LENGTH && psz_cmd[ i_dummy ] >= '0'
+                                                   && psz_cmd[ i_dummy ] <= '9';
                          i_dummy++ )
                     {
                         ;
                     }
 
-                    p_cmd[ i_dummy ] = 0;
-                    input_Seek( p_input, (off_t)atoi( p_cmd + 1 ),
+                    psz_cmd[ i_dummy ] = 0;
+                    input_Seek( p_input, (off_t)atoi( psz_cmd + 1 ),
                                 INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
                     /* rcreseek(f_cpos); */
                 }
@@ -395,7 +387,7 @@ static void Run( intf_thread_t *p_intf )
                 /* Ignore empty lines */
                 break;
             default:
-                printf( "unknown command `%s', type `help' for help\n", p_cmd );
+                printf( "unknown command `%s', type `help' for help\n", psz_cmd );
                 break;
             }
         }
@@ -412,7 +404,95 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
         p_playlist = NULL;
     }
-
-    var_Destroy( p_intf, "foo" );
 }
+
+static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+{
+    input_thread_t * p_input;
+    playlist_t *     p_playlist;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+
+    if( !p_input )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    /* Parse commands that only require an input */
+    if( !strcmp( psz_cmd, "pause" ) )
+    {
+        input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
+    }
+
+    p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                           FIND_PARENT );
+    vlc_object_release( p_input );
+
+    if( !p_playlist )
+    {
+        return VLC_ENOOBJ;
+    }
+
+    /* Parse commands that require a playlist */
+    if( !strcmp( psz_cmd, "prev" ) )
+    {
+        playlist_Prev( p_playlist );
+    }
+    else if( !strcmp( psz_cmd, "next" ) )
+    {
+        playlist_Next( p_playlist );
+    }
+    else if( !strcmp( psz_cmd, "play" ) )
+    {
+        playlist_Play( p_playlist );
+    }
+    else if( !strcmp( psz_cmd, "stop" ) )
+    {
+        playlist_Stop( p_playlist );
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int Quit( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+{
+    p_this->p_vlc->b_die = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
+static int Intf( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+{
+    intf_thread_t *p_newintf;
+    char *psz_oldmodule = config_GetPsz( p_this->p_vlc, "intf" );
+
+    config_PutPsz( p_this->p_vlc, "intf", psz_arg );
+    p_newintf = intf_Create( p_this->p_vlc );
+    config_PutPsz( p_this->p_vlc, "intf", psz_oldmodule );
+
+    if( psz_oldmodule )
+    {
+        free( psz_oldmodule );
+    }
+
+    if( p_newintf )
+    {
+        p_newintf->b_block = VLC_FALSE;
+        if( intf_RunThread( p_newintf ) )
+        {
+            vlc_object_detach( p_newintf );
+            intf_Destroy( p_newintf );
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int Signal( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+{
+    raise( atoi(psz_arg) );
+    return VLC_SUCCESS;
+}
+
 

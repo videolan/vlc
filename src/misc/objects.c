@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.24 2002/10/11 22:32:56 sam Exp $
+ * $Id: objects.c,v 1.25 2002/10/14 16:46:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,6 +46,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static int  DumpCommand( vlc_object_t *, char *, char * );
+
 static vlc_object_t * FindObject    ( vlc_object_t *, int, int );
 static void           DetachObject  ( vlc_object_t * );
 static void           PrintObject   ( vlc_object_t *, const char * );
@@ -113,8 +115,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             psz_type = "audio output";
             break;
         default:
-            i_size = i_type > sizeof(vlc_object_t)
-                   ? i_type : sizeof(vlc_object_t);
+            i_size = i_type > 0
+                      ? i_type > sizeof(vlc_object_t)
+                         ? i_type : sizeof(vlc_object_t)
+                      : sizeof(vlc_object_t);
             i_type = VLC_OBJECT_GENERIC;
             psz_type = "generic";
             break;
@@ -206,6 +210,11 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     if( i_type == VLC_OBJECT_ROOT )
     {
         vlc_mutex_init( p_new, &structure_lock );
+
+        var_Create( p_new, "list", VLC_VAR_COMMAND );
+        var_Set( p_new, "list", (vlc_value_t)(void*)DumpCommand );
+        var_Create( p_new, "tree", VLC_VAR_COMMAND );
+        var_Set( p_new, "tree", (vlc_value_t)(void*)DumpCommand );
     }
 
     return p_new;
@@ -225,14 +234,12 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     if( p_this->i_children )
     {
         msg_Err( p_this, "cannot delete object with children" );
-        vlc_dumpstructure( p_this );
         return;
     }
 
     if( p_this->p_parent )
     {
         msg_Err( p_this, "cannot delete object with a parent" );
-        vlc_dumpstructure( p_this );
         return;
     }
 
@@ -517,51 +524,63 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 }
 
 /*****************************************************************************
- * vlc_liststructure: print the current vlc objects
+ * DumpCommand: print the current vlc structure
  *****************************************************************************
- * This function prints alist of vlc objects, and additional information such
- * as their refcount, thread ID, etc.
+ * This function prints either an ASCII tree showing the connections between
+ * vlc objects, and additional information such as their refcount, thread ID,
+ * etc. (command "tree"), or the same data as a simple list (command "list").
  *****************************************************************************/
-void __vlc_liststructure( vlc_object_t *p_this )
+static int DumpCommand( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
 {
-    vlc_object_t **pp_current, **pp_end;
-
     vlc_mutex_lock( &structure_lock );
 
-    pp_current = p_this->p_libvlc->pp_objects;
-    pp_end = pp_current + p_this->p_libvlc->i_objects;
-
-    for( ; pp_current < pp_end ; pp_current++ )
+    if( *psz_cmd == 't' )
     {
-        if( (*pp_current)->b_attached )
+        char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
+        vlc_object_t *p_object;
+
+        if( *psz_arg )
         {
-            PrintObject( *pp_current, "" );
+            p_object = vlc_object_get( p_this, atoi(psz_arg) );
+
+            if( !p_object )
+            {
+                return VLC_ENOOBJ;
+            }
         }
         else
         {
-            printf( " o %.6x %s (not attached)\n",
-                    (*pp_current)->i_object_id,
-                    (*pp_current)->psz_object_type );
+            p_object = p_this->p_vlc ? VLC_OBJECT(p_this->p_vlc) : p_this;
+        }
+
+        psz_foo[0] = '|';
+        DumpStructure( p_object, 0, psz_foo );
+    }
+    else if( *psz_cmd == 'l' )
+    {
+        vlc_object_t **pp_current, **pp_end;
+
+        pp_current = p_this->p_libvlc->pp_objects;
+        pp_end = pp_current + p_this->p_libvlc->i_objects;
+
+        for( ; pp_current < pp_end ; pp_current++ )
+        {
+            if( (*pp_current)->b_attached )
+            {
+                PrintObject( *pp_current, "" );
+            }
+            else
+            {
+                printf( " o %.8i %s (not attached)\n",
+                        (*pp_current)->i_object_id,
+                        (*pp_current)->psz_object_type );
+            }
         }
     }
 
     vlc_mutex_unlock( &structure_lock );
-}
 
-/*****************************************************************************
- * vlc_dumpstructure: print the current vlc structure
- *****************************************************************************
- * This function prints an ASCII tree showing the connections between vlc
- * objects, and additional information such as their refcount, thread ID, etc.
- *****************************************************************************/
-void __vlc_dumpstructure( vlc_object_t *p_this )
-{
-    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
-
-    vlc_mutex_lock( &structure_lock );
-    psz_foo[0] = '|';
-    DumpStructure( p_this, 0, psz_foo );
-    vlc_mutex_unlock( &structure_lock );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -775,7 +794,7 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
         psz_thread[19] = '\0';
     }
 
-    printf( " %so %.6x %s%s%s%s%s\n", psz_prefix,
+    printf( " %so %.8i %s%s%s%s%s\n", psz_prefix,
             p_this->i_object_id, p_this->psz_object_type,
             psz_name, psz_thread, psz_refcount, psz_children );
 }

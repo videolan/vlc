@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.3 2002/09/30 11:05:39 sam Exp $
+ * $Id: gnome.c,v 1.4 2002/10/14 16:46:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -102,7 +102,7 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
-        return VLC_EMODULE;
+        return VLC_ENOMOD;
     }
 
     p_intf->pf_run = Run;

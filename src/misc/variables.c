@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.1 2002/10/11 11:05:52 sam Exp $
+ * $Id: variables.c,v 1.2 2002/10/14 16:46:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,7 @@ static int LookupInner    ( variable_t *, int, u32 );
  * may require slow memory copies, but think about what we gain in the log(n)
  * lookup phase when setting/getting the variable value!
  *****************************************************************************/
-void __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
+int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
     int i_new;
 
@@ -76,6 +76,8 @@ void __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_this->i_vars++;
 
     vlc_mutex_unlock( &p_this->var_lock );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -84,7 +86,7 @@ void __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
  * Look for the variable and destroy it if it is found. As in var_Create we
  * do a call to memmove() but we have performance counterparts elsewhere.
  *****************************************************************************/
-void __var_Destroy( vlc_object_t *p_this, const char *psz_name )
+int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 {
     int i_del;
 
@@ -96,7 +98,7 @@ void __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     {
         msg_Err( p_this, "variable %s was not found", psz_name );
         vlc_mutex_unlock( &p_this->var_lock );
-        return;
+        return VLC_ENOVAR;
     }
 
     /* Free value if needed */
@@ -128,6 +130,34 @@ void __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     p_this->i_vars--;
 
     vlc_mutex_unlock( &p_this->var_lock );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * var_Type: request a variable's type, 0 if not found
+ *****************************************************************************
+ * 
+ *****************************************************************************/
+int __var_Type( vlc_object_t *p_this, const char *psz_name )
+{
+    int i_var, i_type;
+
+    vlc_mutex_lock( &p_this->var_lock );
+
+    i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
+
+    if( i_var < 0 )
+    {
+        vlc_mutex_unlock( &p_this->var_lock );
+        return 0;
+    }
+
+    i_type = p_this->p_vars[i_var].i_type;
+
+    vlc_mutex_unlock( &p_this->var_lock );
+
+    return i_type;
 }
 
 /*****************************************************************************
@@ -145,9 +175,8 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
 
     if( i_var < 0 )
     {
-        msg_Err( p_this, "variable %s was not found", psz_name );
         vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_EVAR;
+        return VLC_ENOVAR;
     }
 
     /* Duplicate value if needed */
@@ -183,8 +212,7 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
  *****************************************************************************
  *
  *****************************************************************************/
-int __var_Get( vlc_object_t *p_this, const char *psz_name,
-                                     vlc_value_t *p_value )
+int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 {
     int i_var;
 
@@ -194,19 +222,35 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name,
 
     if( i_var < 0 )
     {
-        msg_Err( p_this, "variable %s was not found", psz_name );
         vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_EVAR;
+        return VLC_ENOVAR;
     }
 
     if( !p_this->p_vars[i_var].b_set )
     {
-        msg_Err( p_this, "variable %s is not set", psz_name );
         vlc_mutex_unlock( &p_this->var_lock );
-        return VLC_EVAR;
+        return VLC_EBADVAR;
     }
 
-    *p_value = p_this->p_vars[i_var].val;
+    /* Some variables trigger special behaviour. */
+    switch( p_this->p_vars[i_var].i_type )
+    {
+        case VLC_VAR_COMMAND:
+            if( p_this->p_vars[i_var].b_set )
+            {
+                int i_ret = ((int (*) (vlc_object_t *, char *, char *))
+                                p_this->p_vars[i_var].val.p_address) (
+                                    p_this,
+                                    p_this->p_vars[i_var].psz_name,
+                                    p_val->psz_string );
+                vlc_mutex_unlock( &p_this->var_lock );
+                return i_ret;
+            }
+            break;
+    }
+
+    /* Really set the variable */
+    *p_val = p_this->p_vars[i_var].val;
 
     /* Duplicate value if needed */
     switch( p_this->p_vars[i_var].i_type )
@@ -214,9 +258,9 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name,
         case VLC_VAR_STRING:
         case VLC_VAR_MODULE:
         case VLC_VAR_FILE:
-            if( p_value->psz_string )
+            if( p_val->psz_string )
             {
-                p_value->psz_string = strdup( p_value->psz_string );
+                p_val->psz_string = strdup( p_val->psz_string );
             }
             break;
     }

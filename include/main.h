@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.48 2002/10/04 18:07:21 sam Exp $
+ * $Id: main.h,v 1.49 2002/10/14 16:46:55 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -72,9 +72,6 @@ struct libvlc_t
 struct vlc_t
 {
     VLC_COMMON_MEMBERS
-
-    /* The vlc structure status */
-    int                    i_status;
 
     /* Global properties */
     int                    i_argc;           /* command line arguments count */

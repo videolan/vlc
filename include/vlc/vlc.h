@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.15 2002/10/11 22:32:56 sam Exp $
+ * $Id: vlc.h,v 1.16 2002/10/14 16:46:55 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ typedef union
     char *      psz_string;
     void *      p_address;
 
-    /* Use this to make sure the structure is at least 64bits */
+    /* Make sure the structure is at least 64bits */
     struct { char a, b, c, d, e, f, g, h; } padding;
 
 } vlc_value_t;
@@ -49,11 +49,16 @@ typedef union
  *****************************************************************************/
 #define VLC_SUCCESS         -0                                   /* No error */
 #define VLC_ENOMEM          -1                          /* Not enough memory */
-#define VLC_EMODULE         -2                           /* Module not found */
-#define VLC_ESTATUS         -3                             /* Invalid status */
-#define VLC_ETHREAD         -4                     /* Could not spawn thread */
-#define VLC_EOBJECT         -5                           /* Object not found */
-#define VLC_EVAR            -6                         /* Variable not found */
+#define VLC_ETHREAD         -2                               /* Thread error */
+
+#define VLC_ENOMOD         -10                           /* Module not found */
+
+#define VLC_ENOOBJ         -20                           /* Object not found */
+#define VLC_EBADOBJ        -21                            /* Bad object type */
+
+#define VLC_ENOVAR         -30                         /* Variable not found */
+#define VLC_EBADVAR        -31                         /* Bad variable value */
+
 #define VLC_EEXIT         -255                             /* Program exited */
 #define VLC_EGENERIC      -666                              /* Generic error */
 
@@ -62,14 +67,6 @@ typedef union
  *****************************************************************************/
 #define VLC_FALSE 0
 #define VLC_TRUE  1
-
-/*****************************************************************************
- * Main structure status
- *****************************************************************************/
-#define VLC_STATUS_NONE     0x00000000
-#define VLC_STATUS_CREATED  0x02020202
-#define VLC_STATUS_STOPPED  0x12121212
-#define VLC_STATUS_RUNNING  0x42424242
 
 /*****************************************************************************
  * Playlist
@@ -110,22 +107,23 @@ typedef union
 /*****************************************************************************
  * Exported libvlc API
  *****************************************************************************/
-char *  VLC_Version     ( void );
+char const * VLC_Version ( void );
+char const * VLC_Error   ( int );
 
-int     VLC_Create      ( void );
-int     VLC_Init        ( int, int, char *[] );
-int     VLC_Die         ( int );
-int     VLC_Destroy     ( int );
+int     VLC_Create       ( void );
+int     VLC_Init         ( int, int, char *[] );
+int     VLC_Die          ( int );
+int     VLC_Destroy      ( int );
 
-int     VLC_Set         ( int, const char *, vlc_value_t );
-int     VLC_Get         ( int, const char *, vlc_value_t * );
-int     VLC_AddIntf     ( int, const char *, vlc_bool_t );
-int     VLC_AddTarget   ( int, const char *, int, int );
+int     VLC_Set          ( int, char const *, vlc_value_t );
+int     VLC_Get          ( int, char const *, vlc_value_t * );
+int     VLC_AddIntf      ( int, char const *, vlc_bool_t );
+int     VLC_AddTarget    ( int, char const *, int, int );
 
-int     VLC_Play        ( int );
-int     VLC_Pause       ( int );
-int     VLC_Stop        ( int );
-int     VLC_FullScreen  ( int );
+int     VLC_Play         ( int );
+int     VLC_Pause        ( int );
+int     VLC_Stop         ( int );
+int     VLC_FullScreen   ( int );
 
 # ifdef __cplusplus
 }

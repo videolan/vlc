@@ -155,6 +155,7 @@ HEADERS_include = \
 	include/beos_specific.h \
 	include/configuration.h \
 	include/darwin_specific.h \
+	include/error.h \
 	include/input_ext-dec.h \
 	include/input_ext-intf.h \
 	include/input_ext-plugins.h \
@@ -336,6 +337,7 @@ SOURCES_libvlc = \
 	src/misc/messages.c \
 	src/misc/objects.c \
 	src/misc/variables.c \
+	src/misc/error.c \
 	src/misc/extras.c \
 	$(SOURCES_libvlc_win32) \
 	$(SOURCES_libvlc_beos) \

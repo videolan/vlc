@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.5 2002/10/04 18:07:21 sam Exp $
+ * $Id: gtk.c,v 1.6 2002/10/14 16:46:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -100,7 +100,7 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
-        return VLC_EMODULE;
+        return VLC_ENOMOD;
     }
 #endif
 

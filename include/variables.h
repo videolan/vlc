@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.1 2002/10/11 11:05:52 sam Exp $
+ * $Id: variables.h,v 1.2 2002/10/14 16:46:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,6 +30,7 @@
 #define VLC_VAR_FLOAT     0x0400
 #define VLC_VAR_TIME      0x0500
 #define VLC_VAR_ADDRESS   0x0600
+#define VLC_VAR_COMMAND   0x0700
 
 /*****************************************************************************
  * vlc_value_t is the common union for variable values; variable_t is the
@@ -51,9 +52,10 @@ struct variable_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void, __var_Create, ( vlc_object_t *, const char *, int ) );
-VLC_EXPORT( void, __var_Destroy, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( int, __var_Create, ( vlc_object_t *, const char *, int ) );
+VLC_EXPORT( int, __var_Destroy, ( vlc_object_t *, const char * ) );
 
+VLC_EXPORT( int, __var_Type, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int, __var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
 VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 
@@ -62,6 +64,9 @@ VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 
 #define var_Destroy(a,b) \
     __var_Destroy( VLC_OBJECT(a), b )
+
+#define var_Type(a,b) \
+    __var_Type( VLC_OBJECT(a), b )
 
 #define var_Set(a,b,c) \
     __var_Set( VLC_OBJECT(a), b, c )
