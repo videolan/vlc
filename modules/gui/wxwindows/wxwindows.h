@@ -189,7 +189,6 @@ public:
     wxSlider    *slider;
     wxWindow    *slider_frame;
     wxWindow    *extra_frame;
-    wxStaticBox *slider_box;
 
     vlc_bool_t b_extra;
 
