@@ -378,51 +378,50 @@ static int DemuxOpen( vlc_object_t *p_this )
         msg_Warn( p_demux, "cannot set title/chapter" );
     }
 
-    if( !p_sys->b_simple )
-    {
-        /* Get p_input and create variable */
-        p_sys->p_input =
-            vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_ANYWHERE );
-        var_Create( p_sys->p_input, "x-start", VLC_VAR_INTEGER );
-        var_Create( p_sys->p_input, "y-start", VLC_VAR_INTEGER );
-        var_Create( p_sys->p_input, "x-end", VLC_VAR_INTEGER );
-        var_Create( p_sys->p_input, "y-end", VLC_VAR_INTEGER );
-        var_Create( p_sys->p_input, "color", VLC_VAR_ADDRESS );
-        var_Create( p_sys->p_input, "contrast", VLC_VAR_ADDRESS );
-        var_Create( p_sys->p_input, "highlight", VLC_VAR_BOOL );
-        var_Create( p_sys->p_input, "highlight-mutex", VLC_VAR_MUTEX );
-
-        /* Create a few object variables used for navigation in the interfaces */
-        var_Create( p_sys->p_input, "dvd_menus",
-                    VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
-        text.psz_string = _("DVD menus");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_SETTEXT, &text, NULL );
-        var_AddCallback( p_sys->p_input, "dvd_menus", MenusCallback, p_demux );
-        val.i_int = DVD_MENU_Escape; text.psz_string = _("Resume");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = DVD_MENU_Root; text.psz_string = _("Root");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = DVD_MENU_Title; text.psz_string = _("Title");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = DVD_MENU_Part; text.psz_string = _("Chapter");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = DVD_MENU_Subpicture; text.psz_string = _("Subtitle");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = DVD_MENU_Audio; text.psz_string = _("Audio");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
-        val.i_int = DVD_MENU_Angle; text.psz_string = _("Angle");
-        var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
-
-    /* Now create our event thread catcher */
-        p_sys->p_ev = vlc_object_create( p_demux, sizeof( event_thread_t ) );
-        p_sys->p_ev->p_demux = p_demux;
-        vlc_thread_create( p_sys->p_ev, "dvdnav event thread handler", EventThread,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
-    }
-
     /* fill p_demux field */
     p_demux->pf_control = DemuxControl;
     p_demux->pf_demux = DemuxDemux;
+
+    /* For simple mode (no menus), we're done */
+    if( p_sys->b_simple ) return VLC_SUCCESS;
+
+    /* Get p_input and create variable */
+    p_sys->p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+    var_Create( p_sys->p_input, "x-start", VLC_VAR_INTEGER );
+    var_Create( p_sys->p_input, "y-start", VLC_VAR_INTEGER );
+    var_Create( p_sys->p_input, "x-end", VLC_VAR_INTEGER );
+    var_Create( p_sys->p_input, "y-end", VLC_VAR_INTEGER );
+    var_Create( p_sys->p_input, "color", VLC_VAR_ADDRESS );
+    var_Create( p_sys->p_input, "contrast", VLC_VAR_ADDRESS );
+    var_Create( p_sys->p_input, "highlight", VLC_VAR_BOOL );
+    var_Create( p_sys->p_input, "highlight-mutex", VLC_VAR_MUTEX );
+
+    /* Create a few object variables used for navigation in the interfaces */
+    var_Create( p_sys->p_input, "dvd_menus",
+                VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("DVD menus");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_sys->p_input, "dvd_menus", MenusCallback, p_demux );
+    val.i_int = DVD_MENU_Escape; text.psz_string = _("Resume");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = DVD_MENU_Root; text.psz_string = _("Root");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = DVD_MENU_Title; text.psz_string = _("Title");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = DVD_MENU_Part; text.psz_string = _("Chapter");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = DVD_MENU_Subpicture; text.psz_string = _("Subtitle");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = DVD_MENU_Audio; text.psz_string = _("Audio");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = DVD_MENU_Angle; text.psz_string = _("Angle");
+    var_Change( p_sys->p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+
+    /* Now create our event thread catcher */
+    p_sys->p_ev = vlc_object_create( p_demux, sizeof( event_thread_t ) );
+    p_sys->p_ev->p_demux = p_demux;
+    vlc_thread_create( p_sys->p_ev, "dvdnav event thread handler", EventThread,
+                       VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
 
     return VLC_SUCCESS;
 }
@@ -734,7 +733,8 @@ static void ButtonUpdate( demux_t *p_demux )
         dvdnav_highlight_area_t hl;
         int32_t i_button;
 
-        if( dvdnav_get_current_highlight( p_sys->dvdnav, &i_button ) != DVDNAV_STATUS_OK )
+        if( dvdnav_get_current_highlight( p_sys->dvdnav, &i_button )
+            != DVDNAV_STATUS_OK )
         {
             msg_Err( p_demux, "dvdnav_get_current_highlight failed" );
             return;
@@ -769,11 +769,13 @@ static void ButtonUpdate( demux_t *p_demux )
         }
         else
         {
-            msg_Dbg( p_demux, "buttonUpdate not done b=%d t=%d", i_button, i_title );
+            msg_Dbg( p_demux, "buttonUpdate not done b=%d t=%d",
+                     i_button, i_title );
 
             /* Show all */
             vlc_mutex_lock( p_mutex );
-            val.b_bool = VLC_FALSE; var_Set( p_sys->p_input, "highlight", val );
+            val.b_bool = VLC_FALSE;
+            var_Set( p_sys->p_input, "highlight", val );
             vlc_mutex_unlock( p_mutex );
         }
     }
