@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.8 2002/12/15 22:45:35 jpsaman Exp $
+ * $Id: familiar.h,v 1.9 2002/12/16 22:06:59 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -41,7 +41,6 @@ struct intf_sys_t
     GtkCList    *       p_clist;
 
     vlc_bool_t          b_autoplayfile;
-    vlc_bool_t			b_filelist_update;
     /* The input thread */
     input_thread_t *    p_input;
 };

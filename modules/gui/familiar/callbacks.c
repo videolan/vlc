@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.15 2002/12/16 21:48:17 jpsaman Exp $
+ * $Id: callbacks.c,v 1.16 2002/12/16 22:06:59 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -282,12 +282,13 @@ void
 on_toolbar_rewind_clicked              (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *  p_intf = GtkGetIntf( GTK_WIDGET(button) );
+    intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf->p_sys->p_input )
+    if( p_intf->p_sys->p_input != NULL )
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
     }
+    else msg_Err(p_intf, "p_intf->p_sys->p_input is NULL" );
 }
 
 
@@ -295,12 +296,13 @@ void
 on_toolbar_pause_clicked               (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *  p_intf = GtkGetIntf( GTK_WIDGET( button ) );
+    intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf->p_sys->p_input )
+    if( p_intf->p_sys->p_input != NULL )
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
+    else msg_Err(p_intf, "p_intf->p_sys->p_input is NULL" );
 }
 
 
@@ -356,12 +358,13 @@ void
 on_toolbar_forward_clicked             (GtkButton       *button,
                                         gpointer         user_data)
 {
-    intf_thread_t *  p_intf = GtkGetIntf( GTK_WIDGET( button ));
+    intf_thread_t *  p_intf = GtkGetIntf( button );
 
-    if( p_intf->p_sys->p_input )
+    if( p_intf->p_sys->p_input != NULL )
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
     }
+    else msg_Err(p_intf, "p_intf->p_sys->p_input is NULL" );
 }
 
 
