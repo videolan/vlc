@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: objects.c,v 1.45 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: objects.c,v 1.46 2004/03/03 13:25:24 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,7 +51,7 @@
 #include "vlc_interface.h"
 #include "vlc_codec.h"
 
-#include "httpd.h"
+#include "vlc_httpd.h"
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
