@@ -37,9 +37,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>                                              /* ENOMEM */
-#endif
+#include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <stdlib.h>                                                /* free() */

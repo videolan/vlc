@@ -38,9 +38,7 @@
 #   include <fcntl.h>                  /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */
 #endif
 
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>                                               /* errno */
-#endif
+#include <errno.h>                                                  /* errno */
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                   /* close(), write() */
@@ -299,12 +297,8 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
     if( psz_str == NULL )
     {
-#ifdef HAVE_ERRNO_H
         fprintf( stderr, "main warning: can't store message (%s): ",
                  strerror(errno) );
-#else
-        fprintf( stderr, "main warning: can't store message: " );
-#endif
         vlc_va_copy( args, _args );
         vfprintf( stderr, psz_format, args );
         va_end( args );

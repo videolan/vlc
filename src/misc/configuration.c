@@ -27,9 +27,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <string.h>                                              /* strdup() */
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>                                               /* errno */
-#endif
+#include <errno.h>                                                  /* errno */
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>                                          /* getuid() */
@@ -926,7 +924,7 @@ int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
         }
     }
 
-#elif defined( HAVE_ERRNO_H )
+#else
 #   if defined( WIN32 )
     if( mkdir( psz_dirname ) && errno != EEXIST )
 #   else
@@ -935,12 +933,6 @@ int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
     {
         msg_Err( p_this, "could not create %s (%s)",
                  psz_dirname, strerror(errno) );
-    }
-
-#else
-    if( mkdir( psz_dirname ) )
-    {
-        msg_Err( p_this, "could not create %s", psz_dirname );
     }
 
 #endif

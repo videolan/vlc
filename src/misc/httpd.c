@@ -31,9 +31,8 @@
 #include "network.h"
 
 #include <string.h>
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#endif
+#include <errno.h>
+
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
@@ -2345,11 +2344,7 @@ static void httpd_HostThread( httpd_host_t *host )
         i_ret = select( i_handle_max + 1,
                         &fds_read, &fds_write, NULL, &timeout );
 
-#if defined( WIN32 ) || defined( UNDER_CE )
-        if( i_ret == -1 )
-#else
         if( i_ret == -1 && errno != EINTR )
-#endif
         {
             msg_Warn( host, "cannot select sockets" );
             msleep( 1000 );

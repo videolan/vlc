@@ -27,9 +27,7 @@
 #include <stdlib.h>
 #include <vlc/vlc.h>
 
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#endif
+#include <errno.h>
 
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
@@ -58,7 +56,6 @@
 #endif
 
 #include "network.h"
-
 
 /*****************************************************************************
  * __net_OpenTCP:
@@ -188,11 +185,7 @@ int __net_Accept( vlc_object_t *p_this, int fd, mtime_t i_wait )
         timeout.tv_usec = b_block ? 500000 : i_wait;
 
         i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
-#ifdef HAVE_ERRNO_H
         if( (i_ret < 0 && errno == EINTR) || i_ret == 0 )
-#else
-        if( i_ret == 0 )
-#endif
         {
             if( b_block ) continue;
             else return -1;
@@ -333,11 +326,7 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
             timeout.tv_usec = 500000;
 
         } while( (i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout)) == 0
-#ifdef HAVE_ERRNO_H
                  || ( i_ret < 0 && errno == EINTR ) );
-#else
-                 );
-#endif
 
         if( i_ret < 0 )
         {
@@ -410,11 +399,7 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
 
     i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
 
-#ifdef HAVE_ERRNO_H
     if( i_ret < 0 && errno == EINTR )
-#else
-    if( 0 )
-#endif
     {
         return 0;
     }
@@ -494,11 +479,7 @@ int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
             timeout.tv_usec = 500000;
 
         } while( (i_ret = select(fd + 1, NULL, &fds_w, &fds_e, &timeout)) == 0
-#ifdef HAVE_ERRNO_H
                  || ( i_ret < 0 && errno == EINTR ) );
-#else
-                 );
-#endif
 
         if( i_ret < 0 )
         {
