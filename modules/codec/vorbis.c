@@ -576,7 +576,19 @@ static void ParseVorbisComments( decoder_t *p_dec )
             psz_value++;
             input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
                            psz_name, psz_value );
+            /* HACK, we should use meta */
+            if( strstr( psz_name, "artist" ) )
+            {
+                input_Control( p_input, INPUT_ADD_INFO, _("Meta-information"),
+                               _("Artist"), psz_value );
+            }
+            else if( strstr( psz_name, "title" ) )
+            {
+                p_input->input.p_item->psz_name = strdup( psz_value );
+            }
         }
+        /* FIXME */
+        var_SetInteger( p_input, "item-change", p_input->input.p_item->i_id );
         free( psz_comment );
         i++;
     }

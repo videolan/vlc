@@ -526,7 +526,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
             msg_Dbg( p_intf, "calling browser_Open with \"%s\"", psz_url );
 #endif
             (void) browser_Open( psz_url );
-            playlist_Command( p_playlist, PLAYLIST_PAUSE, 0 );
+            playlist_Control( p_playlist, PLAYLIST_PAUSE, 0 );
         }
 
         free( psz_uri_to_load );

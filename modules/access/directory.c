@@ -108,7 +108,8 @@ static int Demux( demux_t *p_demux );
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args );
 
 
-static int ReadDir( playlist_t *, char *psz_name, int i_mode, int *pi_pos );
+static int ReadDir( playlist_t *, char *psz_name, int i_mode, int *pi_pos,
+                    playlist_item_t * );
 
 /*****************************************************************************
  * Open: open the directory
@@ -206,17 +207,24 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     free( psz );
 
     /* Make sure we are deleted when we are done */
-    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
+//    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
     /* The playlist position we will use for the add */
     i_pos = p_playlist->i_index + 1;
 
     msg_Dbg( p_access, "opening directory `%s'", psz_name );
-    if( ReadDir( p_playlist, psz_name , i_mode, &i_pos ) != VLC_SUCCESS )
+
+    p_playlist->status.p_item->input.i_type = ITEM_TYPE_DIRECTORY;
+    if( ReadDir( p_playlist, psz_name , i_mode, &i_pos,
+                            p_playlist->status.p_item
+               ) != VLC_SUCCESS )
     {
         goto end;
     }
 
 end:
+    /* Begin to read the directory */
+    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,p_playlist->status.i_view,
+                      p_playlist->status.p_item, NULL );
     if( psz_name ) free( psz_name );
     vlc_object_release( p_playlist );
 
@@ -307,11 +315,19 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
 static int ReadDir( playlist_t *p_playlist,
-                    char *psz_name , int i_mode, int *pi_position )
+                    char *psz_name , int i_mode, int *pi_position,
+                    playlist_item_t *p_parent )
 {
     DIR *                       p_current_dir;
     struct dirent *             p_dir_content;
+    playlist_item_t *p_node;
+    int i;
 
+   /* Change the item to a node */
+   if( p_parent->i_children == -1)
+   {
+        playlist_ItemToNode( p_playlist,p_parent );
+   }
     /* Open the dir */
     p_current_dir = opendir( psz_name );
 
@@ -361,8 +377,21 @@ static int ReadDir( playlist_t *p_playlist,
                 else if(i_mode == MODE_EXPAND )
                 {
                     msg_Dbg(p_playlist, "Reading subdirectory %s", psz_uri );
-                    if( ReadDir( p_playlist, psz_uri , MODE_EXPAND, pi_position )
-                                 != VLC_SUCCESS )
+                    p_node = playlist_NodeCreate( p_playlist,
+                                       p_parent->pp_parents[0]->i_view,
+                                       psz_uri, p_parent );
+
+                    p_node->input.i_type = ITEM_TYPE_DIRECTORY;
+                    /* We need to declare the parents of the node as the
+                     * same of the parent's ones */
+                    for( i= 1 ; i< p_parent->i_parents; i ++ )
+                    {
+                        playlist_ItemAddParent( p_node,
+                                                p_parent->pp_parents[i]->i_view,
+                                                p_parent );
+                    }
+                    if( ReadDir( p_playlist, psz_uri , MODE_EXPAND,
+                                 pi_position, p_node ) != VLC_SUCCESS )
                     {
                         return VLC_EGENERIC;
                     }
@@ -370,9 +399,22 @@ static int ReadDir( playlist_t *p_playlist,
             }
             else
             {
-                playlist_Add( p_playlist, psz_uri, p_dir_content->d_name,
-                          PLAYLIST_INSERT, *pi_position );
-                (*pi_position)++;
+                playlist_item_t *p_item = playlist_ItemNew( p_playlist,
+                                psz_uri, p_dir_content->d_name );
+                fprintf(stderr,"STARTTTTt\n");
+                playlist_NodeAddItem( p_playlist,p_item,
+                                      p_parent->pp_parents[0]->i_view,
+                                      p_parent,
+                                      PLAYLIST_APPEND, PLAYLIST_END );
+                fprintf(stderr,"DONE\n");
+                /* We need to declare the parents of the node as the
+                 * same of the parent's ones */
+                for( i= 1 ; i< p_parent->i_parents; i ++ )
+                {
+                    playlist_ItemAddParent( p_item,
+                                            p_parent->pp_parents[i]->i_view,
+                                            p_parent );
+                }
             }
         }
         free( psz_uri );
