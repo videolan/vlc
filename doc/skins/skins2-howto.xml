@@ -710,6 +710,12 @@ difficulty to understand how VLC skins work.</para>
     <emphasis>vlc.mute()</emphasis>: Toggle mute/un-mute.
   </para></listitem>
   <listitem><para>
+    <emphasis>vlc.volumeUp()</emphasis>: Increase the volume (since VLC 0.8.2).
+  </para></listitem>
+  <listitem><para>
+    <emphasis>vlc.volumeDown()</emphasis>: Reduce the volume (since VLC 0.8.2).
+  </para></listitem>
+  <listitem><para>
     <emphasis>vlc.fullscreen()</emphasis>: Toggle the fullscreen mode.
   </para></listitem>
   <listitem><para>

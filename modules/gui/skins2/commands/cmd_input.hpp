@@ -34,6 +34,8 @@ DEFINE_COMMAND( Stop, "stop" )
 DEFINE_COMMAND( Slower, "slower" )
 DEFINE_COMMAND( Faster, "faster" )
 DEFINE_COMMAND( Mute, "mute" )
+DEFINE_COMMAND( VolumeUp, "volume up" )
+DEFINE_COMMAND( VolumeDown, "volume down" )
 
 
 #endif

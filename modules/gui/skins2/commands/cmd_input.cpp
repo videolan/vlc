@@ -109,3 +109,15 @@ void CmdMute::execute()
     aout_VolumeMute( getIntf(), NULL );
 }
 
+
+void CmdVolumeUp::execute()
+{
+    aout_VolumeUp( getIntf(), 1, NULL );
+}
+
+
+void CmdVolumeDown::execute()
+{
+    aout_VolumeDown( getIntf(), 1, NULL );
+}
+
