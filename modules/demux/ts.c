@@ -164,11 +164,21 @@ typedef struct
     int             i_version;
     int             i_number;
     int             i_pid_pcr;
-    dvbpsi_handle   handle;
-
     /* IOD stuff (mpeg4) */
     iod_descriptor_t *iod;
+} ts_prg_psi_t;
 
+typedef struct
+{
+    /* Common PSI handle */
+    dvbpsi_handle   handle;
+
+    /* for special PAT case */
+    int             i_pat_version;
+
+    /* For PMT */
+    int             i_prg;
+    ts_prg_psi_t    **prg;
 } ts_psi_t;
 
 typedef struct
@@ -190,6 +200,7 @@ typedef struct
 
     /* PSI owner (ie PMT -> PAT, ES -> PMT */
     ts_psi_t   *p_owner;
+    int         i_owner_number;
 
     /* */
     ts_psi_t    *psi;
@@ -396,7 +407,7 @@ static int Open( vlc_object_t *p_this )
             pmt->psi->handle =
                 dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack,
                                   p_demux );
-            pmt->psi->i_number = 0; /* special one */
+            pmt->psi->prg[0]->i_number = 0; /* special one */
 
             psz = strchr( psz, '=' ) + 1;   /* can't failed */
             while( psz && *psz )
@@ -419,9 +430,9 @@ static int Open( vlc_object_t *p_this )
                         ts_pid_t *pid = &p_sys->pid[i_pid];
 
                         PIDInit( pid, VLC_FALSE, pmt->psi);
-                        if( pmt->psi->i_pid_pcr <= 0 )
+                        if( pmt->psi->prg[0]->i_pid_pcr <= 0 )
                         {
-                            pmt->psi->i_pid_pcr = i_pid;
+                            pmt->psi->prg[0]->i_pid_pcr = i_pid;
                         }
                         PIDFillFormat( pid, i_stream_type);
                         if( pid->es->fmt.i_cat != UNKNOWN_ES )
@@ -725,23 +736,39 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
 static void PIDInit( ts_pid_t *pid, vlc_bool_t b_psi, ts_psi_t *p_owner )
 {
+    vlc_bool_t b_old_valid = pid->b_valid;
+
     pid->b_valid    = VLC_TRUE;
     pid->i_cc       = 0xff;
     pid->p_owner    = p_owner;
+    pid->i_owner_number = 0;
 
     pid->extra_es   = NULL;
     pid->i_extra_es = 0;
 
     if( b_psi )
     {
-        pid->psi = malloc( sizeof( ts_psi_t ) );
         pid->es  = NULL;
 
-        pid->psi->i_version  = -1;
-        pid->psi->i_number   = -1;
-        pid->psi->i_pid_pcr  = -1;
-        pid->psi->handle     = NULL;
-        pid->psi->iod        = NULL;
+        if( !b_old_valid )
+        {
+            pid->psi = malloc( sizeof( ts_psi_t ) );
+            pid->psi->i_prg = 0;
+            pid->psi->prg   = NULL;
+            pid->psi->handle         = NULL;
+        }
+        pid->psi->i_pat_version  = -1;
+        if( p_owner )
+        {
+            ts_prg_psi_t *prg = malloc( sizeof( ts_prg_psi_t ) );
+            /* PMT */
+            prg->i_version  = -1;
+            prg->i_number   = -1;
+            prg->i_pid_pcr  = -1;
+            prg->iod        = NULL;
+
+            TAB_APPEND( pid->psi->i_prg, pid->psi->prg, prg );
+        }
     }
     else
     {
@@ -759,8 +786,15 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
 {
     if( pid->psi )
     {
+        int i;
+
         if( pid->psi->handle ) dvbpsi_DetachPMT( pid->psi->handle );
-        if( pid->psi->iod ) IODFree( pid->psi->iod );
+        for( i = 0; i < pid->psi->i_prg; i++ )
+        {
+            if( pid->psi->prg[i]->iod ) IODFree( pid->psi->prg[i]->iod );
+            free( pid->psi->prg[i] );
+        }
+        if( pid->psi->prg ) free( pid->psi->prg );
         free( pid->psi );
     }
     else
@@ -995,11 +1029,15 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         /* Search program and set the PCR */
         for( i = 0; i < p_sys->i_pmt; i++ )
         {
-            if( pid->i_pid == p_sys->pmt[i]->psi->i_pid_pcr )
+            int i_prg;
+            for( i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
             {
-                es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
-                                (int)p_sys->pmt[i]->psi->i_number,
-                                (int64_t)(i_pcr * 100 / 9) );
+                if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
+                {
+                    es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
+                                    (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
+                                    (int64_t)(i_pcr * 100 / 9) );
+                }
             }
         }
     }
@@ -1558,6 +1596,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     dvbpsi_pmt_es_t      *p_es;
 
     ts_pid_t             *pmt = NULL;
+    ts_prg_psi_t         *prg = NULL;
     int                  i;
 
     msg_Dbg( p_demux, "PMTCallBack called" );
@@ -1565,11 +1604,20 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     /* First find this PMT declared in PAT */
     for( i = 0; i < p_sys->i_pmt; i++ )
     {
-        if( p_sys->pmt[i]->psi->i_number == p_pmt->i_program_number )
+        int i_prg;
+        for( i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
-            pmt = p_sys->pmt[i];
+            if( p_sys->pmt[i]->psi->prg[i_prg]->i_number == p_pmt->i_program_number )
+            {
+                pmt = p_sys->pmt[i];
+                prg = p_sys->pmt[i]->psi->prg[i_prg];
+                break;
+            }
         }
+        if( pmt )
+            break;
     }
+
     if( pmt == NULL )
     {
         msg_Warn( p_demux, "unreferenced program (broken stream)" );
@@ -1577,8 +1625,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         return;
     }
 
-    if( pmt->psi->i_version != -1 &&
-        ( !p_pmt->b_current_next || pmt->psi->i_version == p_pmt->i_version ) )
+    if( prg->i_version != -1 &&
+        ( !p_pmt->b_current_next || prg->i_version == p_pmt->i_version ) )
     {
         dvbpsi_DeletePMT( p_pmt );
         return;
@@ -1589,21 +1637,21 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     {
         ts_pid_t *pid = &p_sys->pid[i];
 
-        if( pid->b_valid && pid->p_owner == pmt->psi && pid->psi == NULL )
+        if( pid->b_valid && pid->p_owner == pmt->psi && pid->i_owner_number == prg->i_number && pid->psi == NULL )
         {
             PIDClean( p_demux->out, pid );
         }
     }
-    if( pmt->psi->iod )
+    if( prg->iod )
     {
-        IODFree( pmt->psi->iod );
-        pmt->psi->iod = NULL;
+        IODFree( prg->iod );
+        prg->iod = NULL;
     }
 
     msg_Dbg( p_demux, "new PMT program number=%d version=%d pid_pcr=0x%x",
              p_pmt->i_program_number, p_pmt->i_version, p_pmt->i_pcr_pid );
-    pmt->psi->i_pid_pcr = p_pmt->i_pcr_pid;
-    pmt->psi->i_version = p_pmt->i_version;
+    prg->i_pid_pcr = p_pmt->i_pcr_pid;
+    prg->i_version = p_pmt->i_version;
 
     /* Parse descriptor */
     for( p_dr = p_pmt->p_first_descriptor; p_dr != NULL; p_dr = p_dr->p_next )
@@ -1613,7 +1661,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             /* We have found an IOD descriptor */
             msg_Warn( p_demux, " * descriptor : IOD (0x1d)" );
 
-            pmt->psi->iod = IODNew( p_dr->i_length, p_dr->p_data );
+            prg->iod = IODNew( p_dr->i_length, p_dr->p_data );
         }
         else
         {
@@ -1634,6 +1682,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
         PIDInit( pid, VLC_FALSE, pmt->psi );
         PIDFillFormat( pid, p_es->i_type );
+        pid->i_owner_number = prg->i_number;
 
         if( p_es->i_type == 0x10 || p_es->i_type == 0x11 )
         {
@@ -1653,7 +1702,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                 for( i = 0; i < 255; i++ )
                 {
-                    iod_descriptor_t *iod = pmt->psi->iod;
+                    iod_descriptor_t *iod = prg->iod;
 
                     if( iod->es_descr[i].b_ok &&
                         iod->es_descr[i].i_es_id == i_es_id )
@@ -1902,8 +1951,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
     msg_Dbg( p_demux, "PATCallBack called" );
 
-    if( pat->psi->i_version != -1 &&
-        ( !p_pat->b_current_next || p_pat->i_version == pat->psi->i_version ) )
+    if( pat->psi->i_pat_version != -1 &&
+        ( !p_pat->b_current_next || p_pat->i_version == pat->psi->i_pat_version ) )
     {
         dvbpsi_DeletePAT( p_pat );
         return;
@@ -1927,11 +1976,19 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             for( p_program = p_pat->p_first_program; p_program != NULL;
                  p_program = p_program->p_next )
             {
-                if( p_program->i_pid == pmt->i_pid &&
-                    p_program->i_number == pmt->psi->i_number )
+                if( p_program->i_pid == pmt->i_pid )
                 {
-                    b_keep = VLC_TRUE;
-                    break;
+                    int i_prg;
+                    for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                    {
+                        if( p_program->i_number == pmt->psi->prg[i_prg]->i_number )
+                        {
+                            b_keep = VLC_TRUE;
+                            break;
+                        }
+                    }
+                    if( b_keep )
+                        break;
                 }
             }
             if( !b_keep )
@@ -1949,13 +2006,19 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
 
             for( j = 0; j < i_pmt_rm; j++ )
             {
-                if( pid->p_owner->i_pid_pcr == pmt_rm[j]->i_pid &&
-                    pid->es->id )
+                int i_prg;
+                for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                 {
-                    /* We only remove es that aren't defined by extra pmt */
-                    PIDClean( p_demux->out, pid );
-                    break;
+                    if( pid->p_owner->prg[i_prg]->i_pid_pcr == pmt_rm[j]->i_pid &&
+                        pid->es->id )
+                    {
+                        /* We only remove es that aren't defined by extra pmt */
+                        PIDClean( p_demux->out, pid );
+                        break;
+                    }
                 }
+                if( !pid->b_valid )
+                    break;
             }
         }
 
@@ -1987,13 +2050,32 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                 pmt->psi->handle =
                     dvbpsi_AttachPMT( p_program->i_number,
                                       (dvbpsi_pmt_callback)PMTCallBack, p_demux );
-                pmt->psi->i_number = p_program->i_number;
+                pmt->psi->prg[0]->i_number = p_program->i_number;
 
                 TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
             }
+            else
+            {
+                vlc_bool_t b_add = VLC_TRUE;
+                int i_prg;
+                for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                {
+                    if( pmt->psi->prg[i_prg]->i_number == p_program->i_number )
+                    {
+                        b_add = VLC_FALSE;
+                        break;
+                    }
+                }
+                if( b_add )
+                {
+                    PIDInit( pmt, VLC_TRUE, pat->psi );
+                    pmt->psi->prg[pmt->psi->i_prg-1]->i_number = p_program->i_number;
+                }
+            }
         }
     }
-    pat->psi->i_version = p_pat->i_version;
+    pat->psi->i_pat_version = p_pat->i_version;
 
     dvbpsi_DeletePAT( p_pat );
 }
+

@@ -108,7 +108,7 @@ static int Demux2Open( vlc_object_t * p_this )
     }
     else
     {
-        sprintf( psz_uri, "%s", p_input->psz_name );
+        sprintf( psz_uri, "://%s", p_input->psz_name );
     }
 
     p_demux = demux2_New( p_input, psz_uri, p_input->s, p_input->p_es_out );
