@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.9 2002/07/10 07:32:43 lool Exp $
+$Id: FAQ,v 1.10 2002/07/25 22:34:37 lool Exp $
 
 1. Using VLC
 
@@ -170,12 +170,8 @@ in the videolan subfolder of your "Application Data" directory.
 Currently it doesn't. We'd be glad to support them, but we lack technical
 information on them.
 
-3.1.2 Video output is black since I installed QuickTime 6 preview
------------------------------------------------------------------
-We suspect this is a bug in QuickTime 6 preview. Either downgrade to
-QuickTime version 5, or wait for a bugfix in the final QuickTime 6. Some
-people also reported that switching the desktop to thousands of colours
-may solve the issue.
+3.1.2 [REMOVED]
+---------------
 
 3.2 Win32 port
 
