@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.67 2003/12/02 12:57:36 gbazin Exp $
+ * $Id: playlist.c,v 1.68 2003/12/04 16:02:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/sout.h>
+#include <vlc/input.h>
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

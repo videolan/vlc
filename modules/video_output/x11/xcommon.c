@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.38 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: xcommon.c,v 1.39 2003/12/04 16:02:54 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -2087,7 +2087,7 @@ static void TestNetWMSupport( vout_thread_t *p_vout )
                                 0, 16384, False, AnyPropertyType,
                                 &net_wm_supported,
                                 &i_format, &i_items, &i_bytesafter,
-                                (unsigned char **)&p_args );
+                                (unsigned char **)(intptr_t)&p_args );
 
     if( i_ret != Success || i_items == 0 ) return;
 

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.93 2003/12/03 21:50:49 sigmunau Exp $
+ * $Id: vlc_common.h,v 1.94 2003/12/04 16:02:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -93,6 +93,8 @@
     typedef unsigned long long  uint64_t;
     typedef signed long long    int64_t;
 #   endif
+    typedef uint32_t            uintptr_t;
+    typedef int32_t             intptr_t;
 #endif
 
 typedef uint8_t                 byte_t;

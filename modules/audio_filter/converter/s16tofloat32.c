@@ -2,7 +2,7 @@
  * s16tofloat32.c : converter from signed 16 bits integer to float32
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32.c,v 1.6 2003/10/25 00:49:13 sam Exp $
+ * $Id: s16tofloat32.c,v 1.7 2003/12/04 16:02:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -96,7 +96,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
          * this takes 16 seconds to perform one billion conversions, instead
          * of 19 seconds for the above division. */
         int32_t i_out = *p_in + 0x43c00000;
-        float f_out = *(float *)&i_out;
+        float f_out = *(float *)(intptr_t)&i_out;
         *p_out = f_out - 384.0;
 #endif
 

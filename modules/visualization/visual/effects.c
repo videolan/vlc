@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.9 2003/10/24 17:43:51 sam Exp $
+ * $Id: effects.c,v 1.10 2003/12/04 16:02:54 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -148,7 +148,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     {
         float f_in = *p_buffl + 384.0;
         int32_t i_in;
-        i_in = *(int32_t *)&f_in;
+        i_in = *(int32_t *)(intptr_t)&f_in;
         if(i_in >  0x43c07fff ) * p_buffs = 32767;
         else if ( i_in < 0x43bf8000 ) *p_buffs = -32768;
         else *p_buffs = i_in - 0x43c00000;
@@ -248,20 +248,20 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                             (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
                              p_picture->p[2].i_pitch +
                              ( ( i_band_width * i + j ) /2  ) )
-                                    = 0xff; 
+                                    = 0xff;
                    }
                    else
                    {
                         *(p_picture->p[2].p_pixels  +
                          (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
-                         p_picture->p[2].i_pitch + 
-                         ( ( i_band_width * i + j ) /2  ) ) 
+                         p_picture->p[2].i_pitch +
+                         ( ( i_band_width * i + j ) /2  ) )
                                = 0x10 ;
                    }
                }
-            } 
+            }
         }
-    
+
         if(height[i] * i_amp > p_effect->i_height)
             height[i] = floor(p_effect->i_height / i_amp );
 
@@ -278,50 +278,49 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                  p_picture->p[1].i_pitch +
                  ( ( i_band_width * i + j ) /2  ) ) = 0x00;
 
-               
                if( 0x04 * i_line - 0x0f > 0 )
                {
                     if( 0x04 * i_line - 0x0f < 0xff )
                          *(p_picture->p[2].p_pixels  +
                           (p_picture->p[2].i_lines - i_line /2 - 1) *
-                           p_picture->p[2].i_pitch + 
-                           ( ( i_band_width * i + j ) /2  ) ) = 
+                           p_picture->p[2].i_pitch +
+                           ( ( i_band_width * i + j ) /2  ) ) =
                                ( 0x04 * i_line) -0x0f ;
                     else
                          *(p_picture->p[2].p_pixels  +
                           (p_picture->p[2].i_lines - i_line /2 - 1) *
-                           p_picture->p[2].i_pitch + 
-                           ( ( i_band_width * i + j ) /2  ) ) = 
+                           p_picture->p[2].i_pitch +
+                           ( ( i_band_width * i + j ) /2  ) ) =
                                        0xff;
                }
                else
                {
                     *(p_picture->p[2].p_pixels  +
                      (p_picture->p[2].i_lines - i_line /2 - 1) *
-                     p_picture->p[2].i_pitch + 
-                     ( ( i_band_width * i + j ) /2  ) ) = 
+                     p_picture->p[2].i_pitch +
+                     ( ( i_band_width * i + j ) /2  ) ) =
                             0x10 ;
                }
             }
         }
     }
-       
+
     fft_close( p_state );
-   
-    if( p_s16_buff != NULL ) 
+
+    if( p_s16_buff != NULL )
     {
         free( p_s16_buff );
         p_s16_buff = NULL;
     }
-   
+
     if(height) free(height);
-   
+
     if(psz_parse) free(psz_parse);
-    
+
     return 0;
 }
 
- 
+
 /*****************************************************************************
  * scope_Run: scope effect
  *****************************************************************************/
@@ -415,23 +414,23 @@ int random_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 /*****************************************************************************
  * blur_Run:  blur effect
  *****************************************************************************/
-#if 0 
+#if 0
   /* This code is totally crappy */
 int blur_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
               aout_buffer_t * p_buffer , picture_t * p_picture)
 {
     uint8_t * p_pictures;
-    int i,j; 
+    int i,j;
     int i_size;   /* Total size of one image */
-    
+
     i_size = (p_picture->p[0].i_pitch * p_picture->p[0].i_lines +
               p_picture->p[1].i_pitch * p_picture->p[1].i_lines +
               p_picture->p[2].i_pitch * p_picture->p[2].i_lines );
-    
+
     if( !p_effect->p_data )
     {
         p_effect->p_data=(void *)malloc( 5 * i_size *sizeof(uint8_t));
-        
+
         if( !p_effect->p_data)
         {
             msg_Err(p_aout,"Out of memory");
@@ -447,17 +446,17 @@ int blur_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     for( i = 0 ; i < 5 ; i++)
     {
         for ( j = 0 ; j< p_picture->p[0].i_pitch * p_picture->p[0].i_lines; i++)
-            p_picture->p[0].p_pixels[j] = 
+            p_picture->p[0].p_pixels[j] =
                     p_pictures[i * i_size + j] * (100 - 20 * i) /100 ;
         for ( j = 0 ; j< p_picture->p[1].i_pitch * p_picture->p[1].i_lines; i++)
-            p_picture->p[1].p_pixels[j] = 
+            p_picture->p[1].p_pixels[j] =
                     p_pictures[i * i_size +
                     p_picture->p[0].i_pitch * p_picture->p[0].i_lines + j ];
         for ( j = 0 ; j< p_picture->p[2].i_pitch * p_picture->p[2].i_lines; i++)
-            p_picture->p[2].p_pixels[j] = 
+            p_picture->p[2].p_pixels[j] =
                     p_pictures[i * i_size +
                     p_picture->p[0].i_pitch * p_picture->p[0].i_lines +
-                    p_picture->p[1].i_pitch * p_picture->p[1].i_lines 
+                    p_picture->p[1].i_pitch * p_picture->p[1].i_lines
                     + j ];
     }
 

@@ -2,7 +2,7 @@
  * float32tos16.c : converter from float32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.13 2003/10/25 00:49:13 sam Exp $
+ * $Id: float32tos16.c,v 1.14 2003/12/04 16:02:54 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -94,7 +94,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         /* This is walken's trick based on IEEE float format. */
         float f_in = *p_in + 384.0;
         int32_t i_in;
-        i_in = *(int32_t *)&f_in;
+        i_in = *(int32_t *)(intptr_t)&f_in;
         if ( i_in > 0x43c07fff ) *p_out = 32767;
         else if ( i_in < 0x43bf8000 ) *p_out = -32768;
         else *p_out = i_in - 0x43c00000;

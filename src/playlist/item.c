@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: item.c,v 1.5 2003/11/27 21:24:57 fenrir Exp $
+ * $Id: item.c,v 1.6 2003/12/04 16:02:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/sout.h>
+#include <vlc/input.h>
 
 #include "vlc_playlist.h"
 
