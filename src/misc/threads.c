@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.35 2003/01/24 06:31:56 titer Exp $
+ * $Id: threads.c,v 1.36 2003/02/10 16:53:34 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -215,6 +215,8 @@ int __vlc_threads_end( vlc_object_t *p_this )
  * Prototype for GPROF wrapper
  *****************************************************************************/
 #ifdef GPROF
+typedef void *(*vlc_thread_func_t)(void *p_data);
+
 /* Wrapper function for profiling */
 static void *      vlc_thread_wrapper ( void *p_wrapper );
 
@@ -546,6 +548,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
                          int i_priority, vlc_bool_t b_wait )
 {
     int i_ret;
+    void *p_data;
 
     vlc_mutex_lock( &p_this->object_lock );
 
@@ -564,14 +567,16 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
      * of the real function */
     p_data = &wrapper;
     func = vlc_thread_wrapper;
+#else
+    p_data = (void *)p_this;
 #endif
 
 #if defined( PTH_INIT_IN_PTH_H )
-    p_this->thread_id = pth_spawn( PTH_ATTR_DEFAULT, func, (void *)p_this );
+    p_this->thread_id = pth_spawn( PTH_ATTR_DEFAULT, func, p_data );
     i_ret = 0;
 
 #elif defined( ST_INIT_IN_ST_H )
-    p_this->thread_id = st_thread_create( func, (void *)p_this, 1, 0 );
+    p_this->thread_id = st_thread_create( func, p_data, 1, 0 );
     i_ret = 0;
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
@@ -584,10 +589,10 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
         p_this->thread_id =
 #if defined( UNDER_CE )
                 (HANDLE)CreateThread( NULL, 0, (PTHREAD_START) func,
-                                      (void *)p_this, 0, &threadID );
+                                      p_data, 0, &threadID );
 #else
                 (HANDLE)_beginthreadex( NULL, 0, (PTHREAD_START) func,
-                                        (void *)p_this, 0, &threadID );
+                                        p_data, 0, &threadID );
 #endif
     }
 
@@ -603,7 +608,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     i_ret = ( p_this->thread_id ? 0 : 1 );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    i_ret = pthread_create( &p_this->thread_id, NULL, func, (void *)p_this );
+    i_ret = pthread_create( &p_this->thread_id, NULL, func, p_data );
 
     if ( i_priority )
     {
@@ -622,12 +627,12 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     }
 
 #elif defined( HAVE_CTHREADS_H )
-    p_this->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_this );
+    p_this->thread_id = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
     i_ret = 0;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_this->thread_id = spawn_thread( (thread_func)func, psz_name,
-                                      i_priority, (void *)p_this );
+                                      i_priority, p_data );
     i_ret = resume_thread( p_this->thread_id );
 
 #endif
