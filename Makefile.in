@@ -293,9 +293,9 @@ PLUGIN_GGI    = plugins/ggi/ggi.o \
 
 PLUGIN_SDL    = plugins/sdl/sdl.o \
 		plugins/sdl/intf_sdl.o \
-		plugins/sdl/vout_sdl.o \
-		plugins/sdl/video_yuv.o \
-		plugins/sdl/video_yuvall.o
+		plugins/sdl/vout_sdl.o 
+#		plugins/sdl/video_yuv.o \
+#		plugins/sdl/video_yuvall.o
 
 
 PLUGIN_GLIDE  = plugins/glide/glide.o \

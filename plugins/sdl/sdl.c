@@ -46,7 +46,10 @@
  *****************************************************************************/
 static void vout_GetPlugin( p_vout_thread_t p_vout );
 static void intf_GetPlugin( p_intf_thread_t p_intf );
+
+#if 0
 static void yuv_GetPlugin( p_vout_thread_t p_vout );
+#endif
 
 /* Video output */
 int     vout_SDLCreate       ( vout_thread_t *p_vout, char *psz_display,
@@ -59,12 +62,12 @@ void    vout_SDLDisplay      ( p_vout_thread_t p_vout );
 void    vout_SDLSetPalette   ( p_vout_thread_t p_vout,
                                u16 *red, u16 *green, u16 *blue, u16 *transp );
 
-
+#if 0
 /* YUV transformations */
 int     yuv_CInit          ( p_vout_thread_t p_vout );
 int     yuv_CReset         ( p_vout_thread_t p_vout );
 void    yuv_CEnd           ( p_vout_thread_t p_vout );
-
+#endif
 
 /* Interface */
 int     intf_SDLCreate       ( p_intf_thread_t p_intf );
@@ -78,7 +81,7 @@ plugin_info_t * GetConfig( void )
 {
     plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
 
-    p_info->psz_name    = "SDL (video yuv conversion?, audio?)";
+    p_info->psz_name    = "SDL (video)";
     p_info->psz_version = VERSION;
     p_info->psz_author  = "the VideoLAN team <vlc@videolan.org>";
 
@@ -91,13 +94,17 @@ plugin_info_t * GetConfig( void )
      * hardware YUV -> display acceleration....
      */
 
-    
+#if 0
     p_info->yuv_GetPlugin  = (void *) yuv_GetPlugin;
+#else
+    p_info->yuv_GetPlugin = NULL;
+#endif
+	    
     
     /* if the SDL libraries are there, assume we can enter the
      * initialization part at least, even if we fail afterwards */
     
-    p_info->i_score = 0x50;
+    p_info->i_score = 0x100;
     
     
     
@@ -131,11 +138,12 @@ static void intf_GetPlugin( p_intf_thread_t p_intf )
     p_intf->p_sys_manage  = intf_SDLManage;
 }
 
+#if 0
 static void yuv_GetPlugin( p_vout_thread_t p_vout )
 {
     p_vout->p_yuv_init   = yuv_CInit;
     p_vout->p_yuv_reset  = yuv_CReset;
     p_vout->p_yuv_end    = yuv_CEnd;
 }
-
+#endif
 
