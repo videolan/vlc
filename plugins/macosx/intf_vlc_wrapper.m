@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.6 2002/05/19 23:51:37 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.7 2002/06/01 11:11:51 sam Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -400,7 +400,7 @@ static Intf_VLCWrapper *o_intf = nil;
 - (void)playlistAdd:(NSString *)o_filename
 {
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
-                      [o_filename lossyCString] );
+                      [o_filename fileSystemRepresentation] );
 }
     
 - (void)clearPlaylist
@@ -429,7 +429,7 @@ static Intf_VLCWrapper *o_intf = nil;
     while( ( o_file = (NSString *)[o_enum nextObject] ) )
     {
         intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
-                          [o_file lossyCString] );
+                          [o_file fileSystemRepresentation] );
     }
 
     /* end current item, select first added item */
@@ -450,7 +450,7 @@ static Intf_VLCWrapper *o_intf = nil;
                     o_type, o_device, i_title, i_chapter];
 
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
-                      [o_source lossyCString] );
+                      [o_source fileSystemRepresentation] );
 
     /* stop current item, select added item */
     if( p_input_bank->pp_input[0] != NULL )
@@ -485,7 +485,7 @@ static Intf_VLCWrapper *o_intf = nil;
     }
 
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
-                      [o_source lossyCString] );
+                      [o_source fileSystemRepresentation] );
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
 }
