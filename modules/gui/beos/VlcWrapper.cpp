@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.5 2002/10/10 23:11:52 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.6 2002/10/14 20:09:17 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -658,7 +658,8 @@ void   Intf_VLCWrapper::setTimeAsFloat(float f_position)
     if( p_intf->p_sys->p_input != NULL )
     {
         input_Seek( p_intf->p_sys->p_input, 
-                   (long long int)(p_intf->p_sys->p_input->stream.p_selected_area->i_size * f_position / 100), 
+                   (long long int)(p_intf->p_sys->p_input->stream.p_selected_area->i_size
+                       * f_position / SEEKSLIDER_RANGE ), 
                    INPUT_SEEK_SET);
     }
 }

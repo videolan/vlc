@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.3 2002/09/30 18:30:27 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.4 2002/10/14 20:09:17 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -82,7 +82,8 @@ MediaControlView::MediaControlView(BRect frame)
 	BRect frame(0.0, 0.0, 10.0, 10.0);
 	
     // Seek Slider
-    fSeekSlider = new SeekSlider(frame, "seek slider", this, 0, 2047);
+    fSeekSlider = new SeekSlider(frame, "seek slider", this,
+                                 0, SEEKSLIDER_RANGE - 1);
     fSeekSlider->SetValue(0);
     fSeekSlider->ResizeToPreferred();
     AddChild( fSeekSlider );
