@@ -1332,6 +1332,16 @@ then
 fi
 
 dnl
+dnl  special access module for Hauppauge PVR cards
+dnl
+AC_ARG_ENABLE(pvr,
+  [  --enable-pvr            PVR cards access module (default disabled)])
+if test "x${enable_pvr}" = "xyes"
+then
+  PLUGINS="${PLUGINS} pvr"
+fi
+
+dnl
 dnl  VCD module
 dnl
 AC_ARG_ENABLE(vcd,

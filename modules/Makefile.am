@@ -7,6 +7,7 @@ EXTRA_DIST = \
 	access/dvdplay/Modules.am \
 	access/dvdread/Modules.am \
 	access/mms/Modules.am \
+	access/pvr/Modules.am \
 	access/satellite/Modules.am \
 	access/v4l/Modules.am \
 	access/vcd/Modules.am \
