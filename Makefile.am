@@ -247,6 +247,7 @@ EXTRA_DIST += \
 dist-hook:
 	cp $(distdir)/vlc.ebuild $(distdir)/vlc-${VERSION}.ebuild
 	cd $(distdir) && srcdir=$(srcdir) $(srcdir)/toolbox --update-vc
+	distdir=$(distdir) srcdir=$(srcdir) $(srcdir)/toolbox --dist-contrib
 
 ###############################################################################
 # Building libvlc

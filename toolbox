@@ -29,6 +29,7 @@ recognized flags are:
   --update-glade2         generate and fix Glade 2 code
   --update-flexml         generate and fix flexml and flex code
   --distclean             "make distclean" on steroids
+  --dist-contrib          add the contrib dir to MAKE_DIST
   --make-woody <dir>      change distdir <dir> to a woody distdir
 EOF
   exit 1
@@ -84,6 +85,9 @@ case "$1" in
     ;;
   --add-include)
     action=include
+    ;;
+  --dist-contrib)
+    action=contrib
     ;;
   --help)
     help
@@ -576,6 +580,37 @@ then
   rm -Rf autom4te.cache
   rm -f mozilla/vlcintf.h mozilla/vlcintf.xpt
   # FIXME: a lot of Makefiles are still there
+fi
+
+##
+## Add the extras/contrib dir to the distribution
+##
+if test "${action}" = "contrib"
+then
+  set -x
+  if test ! -d "${distdir}/extras"
+  then
+    mkdir "${distdir}/extras"
+  fi
+  if test ! -d "${distdir}/extras/contrib"
+  then
+    mkdir "${distdir}/extras/contrib"
+  fi
+  cp "${srcdir}/extras/contrib/Makefile" "${distdir}/extras/contrib/Makefile"
+  cp "${srcdir}/extras/contrib/README" "${distdir}/extras/contrib/README"
+  cp "${srcdir}/extras/contrib/bootstrap" "${distdir}/extras/contrib/bootstrap"
+  cp "${srcdir}/extras/contrib/change_prefix.sh" "${distdir}/extras/contrib/change_prefix.sh"
+  if test ! -d "${distdir}/extras/contrib/src"
+  then
+    mkdir "${distdir}/extras/contrib/src"
+  fi
+  cp "${srcdir}/extras/contrib/src/Makefile" "${distdir}/extras/contrib/src/Makefile"
+  cp "${srcdir}/extras/contrib/src/packages.mak" "${distdir}/extras/contrib/src/packages.mak"
+  if test ! -d "${distdir}/extras/contrib/src/Patches"
+  then
+    mkdir "${distdir}/extras/contrib/src/Patches"
+  fi
+  cp ${srcdir}/extras/contrib/src/Patches/* "${distdir}/extras/contrib/src/Patches/"
 fi
 
 ##

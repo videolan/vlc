@@ -1304,7 +1304,7 @@ AC_ARG_ENABLE(dvdread,
 if test "${enable_dvdread}" != "no"
 then
   AC_ARG_WITH(dvdread,
-  [    --with-dvdread=PATH    libdvdread headers and libraries])
+  [    --with-dvdread=PATH   libdvdread headers and libraries])
   AC_ARG_WITH(dvdread-tree,
   [    --with-dvdread-tree=PATH libdvdread tree for static linking])
 
@@ -1858,22 +1858,22 @@ then
     VLC_ADD_LDFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
   else
     AC_ARG_WITH(ffmpeg-mp3lame,
-      [    --with-ffmpeg-mp3lame   if ffmpeg has been compiled with mp3lame support],
+      [    --with-ffmpeg-mp3lame specify if ffmpeg has been compiled with mp3lame support],
       [
         VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
 
     AC_ARG_WITH(ffmpeg-faac,
-      [    --with-ffmpeg-faac      if ffmpeg has been compiled with faac support],
+      [    --with-ffmpeg-faac    specify if ffmpeg has been compiled with faac support],
       [
         VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
 
     AC_ARG_WITH(ffmpeg-dts,
-      [    --with-ffmpeg-dts   if ffmpeg has been compiled with dts support],
+      [    --with-ffmpeg-dts     specify if ffmpeg has been compiled with dts support],
       [
         VLC_ADD_LDFLAGS([ffmpeg],[-ldts]) ])
 
     AC_ARG_WITH(ffmpeg-zlib,
-      [    --with-ffmpeg-zlib   if ffmpeg has been compiled with zlib support],
+      [    --with-ffmpeg-zlib    specify if ffmpeg has been compiled with zlib support],
       [
         VLC_ADD_LDFLAGS([ffmpeg],[-lz]) ])
 
@@ -2442,7 +2442,7 @@ dnl
 dnl  dirac decoder plugin
 dnl
 AC_ARG_ENABLE(dirac,
-[  --enable-dirac         experimental dirac codec (default disabled)])
+[  --enable-dirac          experimental dirac codec (default disabled)])
 if test "${enable_dirac}" = "yes"; then
   AC_CHECK_HEADERS(libdirac_decoder/dirac_parser.h, [
     AC_CHECK_LIB(dirac_decoder, dirac_decoder_init, [
@@ -2477,7 +2477,7 @@ AC_ARG_ENABLE(x264,
   [  --enable-x264           H264 encoding support with libx264 (default enabled)])
 if test "${enable_x264}" != "no"; then
   AC_ARG_WITH(x264-tree,
-    [    --with-x264-tree=PATH  x264 tree for static linking ],[],[])
+    [    --with-x264-tree=PATH x264 tree for static linking ],[],[])
   if test "${with_x264_tree}" != "no" -a -n "${with_x264_tree}"
   then
     real_x264_tree="`cd ${with_x264_tree} 2>/dev/null && pwd`"
@@ -2804,7 +2804,7 @@ dnl
 dnl  libxml2 module
 dnl
 AC_ARG_ENABLE(libxml2,
-  [  --enable-libxml2       libxml2 support (default enabled)])
+  [  --enable-libxml2        libxml2 support (default enabled)])
 if test "${enable_libxml2}" != "no"
 then
   XML2_PATH="${PATH}"
@@ -3757,7 +3757,7 @@ dnl
 dnl DAAP access plugin and services discovery 
 dnl
 AC_ARG_ENABLE(daap,
-  [  --enable-daap	     DAAP shares services discovery support (default enabled)])
+  [  --enable-daap	          DAAP shares services discovery support (default enabled)])
 if test "$enable_daap" != "no"
 then
    PKG_CHECK_MODULES(DAAP, opendaap >= 0.3.0,
@@ -3821,7 +3821,7 @@ dnl
 dnl GnuTLS-based TLS/SSL support
 dnl
 AC_ARG_WITH(libgnutls-prefix,
-          [  --with-libgnutls-prefix=PREFIX set prefix where libgnutls is installed],
+          [    --with-libgnutls-prefix=PREFIX set prefix where libgnutls is installed],
           libgnutls_config_prefix="$withval", libgnutls_config_prefix="")
 
 AS_IF([test x$libgnutls_config_prefix != x],
@@ -3863,7 +3863,7 @@ dnl  We give the user the opportunity to specify
 dnl  --with-words=big or --with-words=little ; otherwise, try to guess
 dnl
 AC_ARG_WITH(words,
-  [  --with-words=endianness set endianness (big or little)])
+  [    --with-words=endianness set endianness (big or little)])
   case "${with_words}" in
     big)
       ac_cv_c_bigendian=yes
