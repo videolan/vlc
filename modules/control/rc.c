@@ -49,11 +49,15 @@
 #include "vlc_error.h"
 #include "network.h"
 
-#if defined(PF_UNIX) || defined(PF_LOCAL)
+#if defined(PF_UNIX) && !defined(PF_LOCAL)
+#    define PF_LOCAL PF_UNIX
+#endif
+#if defined(AF_UNIX) && !defined(AF_LOCAL)
+#    define AF_LOCAL AF_UNIX
+#endif
+
+#ifdef PF_LOCAL
 #    include <sys/un.h>
-#    if !defined(PF_UNIX)
-#        define PF_UNIX PF_LOCAL
-#    endif
 #endif
 
 #define MAX_LINE_LENGTH 256
@@ -86,6 +90,7 @@ struct intf_sys_t
 {
     int i_socket_listen;
     int i_socket;
+    char *psz_unix_path;
 
 #ifdef WIN32
     HANDLE hConsoleIn;
@@ -115,16 +120,20 @@ void Printf( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #define TTY_TEXT N_("Fake TTY")
 #define TTY_LONGTEXT N_("Force the rc module to use stdin as if it was a TTY.")
 
-#define HOST_TEXT N_("Command input")
+#define UNIX_TEXT N_("UNIX socket command input")
+#define UNIX_LONGTEXT N_("Accept commands over a Unix socket rather than stdin. " )    
+
+#define HOST_TEXT N_("IP command input")
 #define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
     "You can set the address and port the interface will bind to." )
-
+    
 vlc_module_begin();
     set_description( _("Remote control interface") );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
 #ifdef HAVE_ISATTY
     add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
 #endif
+    add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, VLC_TRUE );
     add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
     set_capability( "interface", 20 );
     set_callbacks( Activate, Deactivate );
@@ -136,7 +145,7 @@ vlc_module_end();
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    char *psz_host;
+    char *psz_host, *psz_unix_path;
     int i_socket = -1;
 
 #if defined(HAVE_ISATTY) && !defined(WIN32)
@@ -148,14 +157,13 @@ static int Activate( vlc_object_t *p_this )
     }
 #endif
 
-    psz_host = config_GetPsz( p_intf, "rc-host" );
-    if( psz_host && (psz_host[0] == '/' || psz_host[0] == '.' ) )
+    psz_unix_path = config_GetPsz( p_intf, "rc-unix" );
+    if( psz_unix_path )
     {
-#if !defined(PF_UNIX) && !defined(PF_LOCAL)
+#ifndef PF_LOCAL
         msg_Warn( p_intf, "your OS doesn't support filesystem sockets" );
-        free( psz_host );
+        free( psz_unix_path );
         return VLC_EGENERIC;
-
 #else
         struct sockaddr_un addr;
         int i_ret;
@@ -164,36 +172,39 @@ static int Activate( vlc_object_t *p_this )
 
         msg_Dbg( p_intf, "trying UNIX socket" );
 
-        if( (i_socket = socket( PF_UNIX, SOCK_STREAM, 0 ) ) < 0 )
+        if( (i_socket = socket( PF_LOCAL, SOCK_STREAM, 0 ) ) < 0 )
         {
             msg_Warn( p_intf, "can't open socket: %s", strerror(errno) );
-            free( psz_host );
+            free( psz_unix_path );
             return VLC_EGENERIC;
         }
 
-        addr.sun_family = AF_UNIX;
-        strcpy( addr.sun_path, psz_host );
+        addr.sun_family = AF_LOCAL;
+        strncpy( addr.sun_path, psz_unix_path, sizeof( addr.sun_path ) );
+        addr.sun_path[sizeof( addr.sun_path ) - 1] = '\0';
 
         if( (i_ret = bind( i_socket, (struct sockaddr*)&addr,
                            sizeof(struct sockaddr_un) ) ) < 0 )
         {
             msg_Warn( p_intf, "couldn't bind socket to address: %s",
                       strerror(errno) );
-            free( psz_host );
-            close( i_socket );
+            free( psz_unix_path );
+            net_Close( i_socket );
             return VLC_EGENERIC;
         }
 
         if( ( i_ret = listen( i_socket, 1 ) ) < 0 )
         {
             msg_Warn( p_intf, "can't listen on socket: %s", strerror(errno));
-            free( psz_host );
-            close( i_socket );
+            free( psz_unix_path );
+            net_Close( i_socket );
             return VLC_EGENERIC;
         }
 #endif
     }
-    else if( psz_host && *psz_host )
+
+    if( ( i_socket == -1) &&
+        ( psz_host = config_GetPsz( p_intf, "rc-host" ) ) != NULL )
     {
         char *psz_addr;
         vlc_url_t url;
@@ -206,20 +217,36 @@ static int Activate( vlc_object_t *p_this )
         /* By default, we listen on localhost only for security reasons.
          * If you need to listen on all IP addresses, specify 0.0.0.0
          */
-        psz_addr = url.psz_host ? url.psz_host : "127.0.0.1";
-        msg_Dbg( p_intf, "base %s:%d", psz_addr, url.i_port );
+        if( url.psz_host != NULL )
+        {
+            psz_addr = url.psz_host;
+        }
+        else
+        {
+            /* Default to IPv4 for now.
+             * FIXME: should try both IPv4 and IPv6.
+             */
+            vlc_value_t val;
+
+            var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+            var_Get( p_this, "ipv6", &val );
+            psz_addr = val.b_bool ? "::1" : "127.0.0.1";
+        }
+            
+        msg_Dbg( p_intf, "base %s port %d", psz_addr, url.i_port );
 
         if( (i_socket = net_ListenTCP( p_this, psz_addr, url.i_port )) == -1 )
         {
-            msg_Warn( p_intf, "can't listen to %s:%i", psz_addr, url.i_port );
+            msg_Warn( p_intf, "can't listen to %s port %i", psz_addr,
+                      url.i_port );
             vlc_UrlClean( &url );
             free( psz_host );
             return VLC_EGENERIC;
         }
 
         vlc_UrlClean( &url );
+        free( psz_host );
     }
-    if( psz_host ) free( psz_host );
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
@@ -230,6 +257,7 @@ static int Activate( vlc_object_t *p_this )
 
     p_intf->p_sys->i_socket_listen = i_socket;
     p_intf->p_sys->i_socket = -1;
+    p_intf->p_sys->psz_unix_path = psz_unix_path;
 
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
@@ -253,6 +281,13 @@ static void Deactivate( vlc_object_t *p_this )
         net_Close( p_intf->p_sys->i_socket_listen );
     if( p_intf->p_sys->i_socket != -1 )
         net_Close( p_intf->p_sys->i_socket );
+    if( p_intf->p_sys->psz_unix_path != NULL )
+    {
+#ifdef PF_LOCAL
+        unlink( p_intf->p_sys->psz_unix_path );
+#endif
+        free( p_intf->p_sys->psz_unix_path );
+    }
     free( p_intf->p_sys );
 }
 
