@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.7 2002/12/06 14:22:55 fenrir Exp $
+ * $Id: audio.c,v 1.8 2002/12/18 14:17:10 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -238,7 +238,7 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
         p_adec->p_context->channels > 5 )
     {
         msg_Warn( p_adec->p_fifo,
-                  "invalid channels count", 
+                  "invalid channels count %d",
                   p_adec->p_context->channels );
     }
 

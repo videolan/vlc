@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.8 2002/11/28 17:35:00 sam Exp $
+ * $Id: parser.c,v 1.9 2002/12/18 14:17:10 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -317,22 +317,22 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     vout_Request( p_vpar->p_fifo, p_vpar->p_vout, 0, 0, 0, 0 );
 
-    msg_Dbg( p_vpar->p_fifo, "%d loops among %d sequence(s)",
+    msg_Dbg( p_vpar->p_fifo, "%ld loops among %ld sequence(s)",
              p_vpar->c_loops, p_vpar->c_sequences );
 
 #ifdef HAVE_SYS_TIMES_H
-    msg_Dbg( p_vpar->p_fifo, "cpu usage (user: %d, system: %d)",
+    msg_Dbg( p_vpar->p_fifo, "cpu usage (user: %ld, system: %ld)",
              cpu_usage.tms_utime, cpu_usage.tms_stime );
 #endif
 
-    msg_Dbg( p_vpar->p_fifo, "read %d frames/fields (I %d/P %d/B %d)",
+    msg_Dbg( p_vpar->p_fifo, "read %ld frames/fields (I %ld/P %ld/B %ld)",
              p_vpar->pc_pictures[I_CODING_TYPE]
              + p_vpar->pc_pictures[P_CODING_TYPE]
              + p_vpar->pc_pictures[B_CODING_TYPE],
              p_vpar->pc_pictures[I_CODING_TYPE],
              p_vpar->pc_pictures[P_CODING_TYPE],
              p_vpar->pc_pictures[B_CODING_TYPE] );
-    msg_Dbg( p_vpar->p_fifo, "decoded %d frames/fields (I %d/P %d/B %d)",
+    msg_Dbg( p_vpar->p_fifo, "decoded %ld frames/fields (I %ld/P %ld/B %ld)",
              p_vpar->pc_decoded_pictures[I_CODING_TYPE]
              + p_vpar->pc_decoded_pictures[P_CODING_TYPE]
              + p_vpar->pc_decoded_pictures[B_CODING_TYPE],
@@ -340,7 +340,7 @@ static void EndThread( vpar_thread_t *p_vpar )
              p_vpar->pc_decoded_pictures[P_CODING_TYPE],
              p_vpar->pc_decoded_pictures[B_CODING_TYPE] );
     msg_Dbg( p_vpar->p_fifo,
-             "read %d malformed frames/fields (I %d/P %d/B %d)",
+             "read %ld malformed frames/fields (I %ld/P %ld/B %ld)",
              p_vpar->pc_malformed_pictures[I_CODING_TYPE]
              + p_vpar->pc_malformed_pictures[P_CODING_TYPE]
              + p_vpar->pc_malformed_pictures[B_CODING_TYPE],

@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.13 2002/12/12 15:10:58 gbazin Exp $
+ * $Id: mms.c,v 1.14 2002/12/18 14:17:09 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1559,11 +1559,15 @@ static int  mms_ParseCommand( input_thread_t *p_input,
              GET32( 0 ),
              GET32( 4 ),
              GET32( 8 ),
+             /* 12: protocol type "MMS " */
              GET32( 16 ),
              GET32( 20 ),
+             /* 24: unknown (0) */
+             /* 28: unknown (0) */
              GET32( 32 ),
-             GET32( 36 ),
-             GET32( 40 ) );
+             GET32( 36 )
+             /* 40: switches */
+             /* 44: extra */ );
 
     p_access->i_command = GET32( 36 ) & 0xffff;
 

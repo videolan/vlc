@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.10 2002/12/06 16:34:06 sam Exp $
+ * $Id: libmp4.c,v 1.11 2002/12/18 14:17:10 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -1557,7 +1557,7 @@ int MP4_ReadBox_stdp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     
     
 #ifdef MP4_VERBOSE 
-    msg_Dbg( p_stream->p_input, "Read Box: \"stdp\" entry-count %d",
+    msg_Dbg( p_stream->p_input, "Read Box: \"stdp\" entry-count "I64Fd,
                       i_read / 2 );
 
 #endif
@@ -1602,7 +1602,7 @@ int MP4_ReadBox_padb( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     
     
 #ifdef MP4_VERBOSE 
-    msg_Dbg( p_stream->p_input, "Read Box: \"stdp\" entry-count %d",
+    msg_Dbg( p_stream->p_input, "Read Box: \"stdp\" entry-count "I64Fd,
                       i_read / 2 );
 
 #endif
@@ -1661,7 +1661,7 @@ int MP4_ReadBox_elst( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     
     
 #ifdef MP4_VERBOSE 
-    msg_Dbg( p_stream->p_input, "Read Box: \"elst\" entry-count %d",
+    msg_Dbg( p_stream->p_input, "Read Box: \"elst\" entry-count "I64Fd,
                       i_read / 2 );
 
 #endif

@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.1 2002/12/03 17:00:16 fenrir Exp $
+ * $Id: adpcm.c,v 1.2 2002/12/18 14:17:10 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -378,6 +378,7 @@ static void DecodeThread( adec_thread_t *p_adec )
             DecodeAdpcmMs( p_adec, p_aout_buffer );
             break;
         default:
+            break;
     }
 
 

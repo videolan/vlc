@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.38 2002/12/10 18:22:01 gbazin Exp $
+ * $Id: oss.c,v 1.39 2002/12/18 14:17:09 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -376,7 +376,7 @@ static int Open( vlc_object_t *p_this )
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_CHANNELS, &i_nb_channels ) < 0 ||
             i_nb_channels != aout_FormatNbChannels( &p_aout->output.output ) )
         {
-            msg_Err( p_aout, "cannot set number of audio channels (%x)",
+            msg_Err( p_aout, "cannot set number of audio channels (%s)",
                      aout_FormatPrintChannels( &p_aout->output.output) );
             close( p_sys->i_fd );
             free( p_sys );

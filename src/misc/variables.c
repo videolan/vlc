@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.18 2002/12/14 19:34:06 gbazin Exp $
+ * $Id: variables.c,v 1.19 2002/12/18 14:17:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -497,7 +497,7 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
         i_var = Lookup( p_this->p_vars, p_this->i_vars, psz_name );
         if( i_var < 0 )
         {
-            msg_Err( p_this, "variable %s has disappeared" );
+            msg_Err( p_this, "variable %s has disappeared", psz_name );
             vlc_mutex_unlock( &p_this->var_lock );
             return VLC_ENOVAR;
         }

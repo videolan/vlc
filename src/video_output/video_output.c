@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.204 2002/12/18 08:08:29 gbazin Exp $
+ * $Id: video_output.c,v 1.205 2002/12/18 14:17:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -477,7 +477,8 @@ static int InitThread( vout_thread_t *p_vout )
         if( p_vout->chroma.p_module == NULL )
         {
             msg_Err( p_vout, "no chroma module for %4.4s to %4.4s",
-                     &p_vout->render.i_chroma, &p_vout->output.i_chroma );
+                     (char*)&p_vout->render.i_chroma,
+                     (char*)&p_vout->output.i_chroma );
             p_vout->pf_end( p_vout );
             vlc_mutex_unlock( &p_vout->change_lock );
             return VLC_EGENERIC;

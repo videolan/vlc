@@ -2,7 +2,7 @@
  * demuxdump.c : Pseudo demux module for vlc (dump raw stream)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demuxdump.c,v 1.1 2002/11/13 20:23:21 fenrir Exp $
+ * $Id: demuxdump.c,v 1.2 2002/12/18 14:17:10 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -157,7 +157,7 @@ static void Desactivate ( vlc_object_t *p_this )
     demux_sys_t         *p_demux = (demux_sys_t*)p_input->p_demux_data;
     
     msg_Info( p_input, 
-              "closing %s (%d Kbytes dumped)", 
+              "closing %s ("I64Fd" Kbytes dumped)", 
               p_demux->psz_name,
               p_demux->i_write / 1024 );
    

@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.5 2002/12/13 01:56:29 gbazin Exp $
+ * $Id: display.c,v 1.6 2002/12/18 14:17:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -288,7 +288,7 @@ void GtkHideToolbarText( vlc_object_t *p_this )
 
     for( i_index = 0; i_index < list.i_count; i_index++ )
     {
-        p_intf = (module_t *)list.p_values[i_index].p_object ;
+        p_intf = (intf_thread_t *)list.p_values[i_index].p_object ;
 
         if( strcmp( MODULE_STRING, p_intf->p_module->psz_object_name ) )
         {

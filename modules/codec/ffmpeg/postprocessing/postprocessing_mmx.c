@@ -2,15 +2,15 @@
  * postprocessing_mmx.c: Post Processing library in MMX
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: postprocessing_mmx.c,v 1.2 2002/12/06 16:34:05 sam Exp $
+ * $Id: postprocessing_mmx.c,v 1.3 2002/12/18 14:17:10 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <vlc/vlc.h> /* only use u8, u32 .... */
+#include <vlc/vlc.h> /* only use uint8_t, uint32_t .... */
 
 #include "postprocessing.h"
 #include "postprocessing_common.h"
@@ -42,8 +42,8 @@
 /* Use same things as in idct but how it work ? */
 #define UNUSED_LONGLONG( foo ) \
     static const unsigned long long foo __asm__ (#foo)  __attribute__((unused))
-   
-/* to calculate isDC_mode for mmx */   
+
+/* to calculate isDC_mode for mmx */
 UNUSED_LONGLONG( mmx_127_thr1 ) = ( ( 127ULL - PP_THR1 ) << 56 )|
                                   ( ( 127ULL - PP_THR1 ) << 48 )|
                                   ( ( 127ULL - PP_THR1 ) << 40 )|
@@ -67,38 +67,38 @@ UNUSED_LONGLONG( mmx_m2_5_m5_2 ) = 0xfffe0005fffb0002ULL;
 #if 0
 /* find min bytes from r ans set it in r, t is destroyed */
 #define MMXEXT_GET_PMIN( r, t ) \
-   "movq      " #r ",     " #t "                                \n\
-    psrlq       $8,       " #t "                                \n\
-    pminub    " #t ",     " #r "                                \n\
-    pshufw $0xf5, " #r ", " #t " #instead of shift with tmp reg \n\
-    pminub    " #t ",     " #r "                                \n\
-    pshufw $0xfe, " #r ", " #t "                                \n\
-    pminub    " #t ",     " #r "                                \n"
-    
+   "movq      " #r ",     " #t "                                \n" \
+   "psrlq       $8,       " #t "                                \n" \
+   "pminub    " #t ",     " #r "                                \n" \
+   "pshufw $0xf5, " #r ", " #t " #instead of shift with tmp reg \n" \
+   "pminub    " #t ",     " #r "                                \n" \
+   "pshufw $0xfe, " #r ", " #t "                                \n" \
+   "pminub    " #t ",     " #r "                                \n"
+
  /* find mzx bytes from r ans set it in r, t is destroyed */
 #define MMXEXT_GET_PMAX( r, t ) \
-   "movq      " #r ",     " #t "                                \n\
-    psrlq       $8,       " #t "                                \n\
-    pmaxub    " #t ",     " #r "                                \n\
-    pshufw $0xf5, " #r ", " #t "                                \n\
-    pmaxub    " #t ",     " #r "                                \n\
-    pshufw $0xfe, " #r ", " #t "                                \n\
-    pmaxub    " #t ",     " #r "                                \n"
-  
+   "movq      " #r ",     " #t "                                \n" \
+   "psrlq       $8,       " #t "                                \n" \
+   "pmaxub    " #t ",     " #r "                                \n" \
+   "pshufw $0xf5, " #r ", " #t "                                \n" \
+   "pmaxub    " #t ",     " #r "                                \n" \
+   "pshufw $0xfe, " #r ", " #t "                                \n" \
+   "pmaxub    " #t ",     " #r "                                \n"
+
 
 
 #define MMXEXT_GET_LMINMAX( s, m, M, t ) \
-    "movq   " #s ",        " #t "   \n\
-     pminub " #t ",        " #m "   \n\
-     pmaxub " #t ",        " #M "   \n"
+    "movq   " #s ",        " #t "   \n" \
+    "pminub " #t ",        " #m "   \n" \
+    "pmaxub " #t ",        " #M "   \n"
 
 
 /* Some tips for MMX
-  
+
     * |a-b| :
         d1 = a - b with unsigned saturate
-        d2 = b - a  with ... 
-        |a-b| = d1 | d2 
+        d2 = b - a  with ...
+        |a-b| = d1 | d2
 
 */
 
@@ -112,45 +112,45 @@ UNUSED_LONGLONG( mmx_m2_5_m5_2 ) = 0xfffe0005fffb0002ULL;
  *  so need to be fast ...
  *
  ****************************************************************************/
-static inline int pp_deblock_isDC_mode( u8 *p_v )
+static inline int pp_deblock_isDC_mode( uint8_t *p_v )
 {
     unsigned int i_eq_cnt;
 
     /* algo :
-       x = v[i] - v[i+1] without signed saturation 
-        ( XXX see if there is'nt problem, but can't be with signed 
-        sat because pixel will be saturate :( 
+       x = v[i] - v[i+1] without signed saturation
+        ( XXX see if there is'nt problem, but can't be with signed
+        sat because pixel will be saturate :(
        so x within [-128, 127] and we have to test if it fit in [-M, M]
        we add 127-M with wrap around -> good value fit in [ 127-2*M, 127]
        and if x >= 127 - 2 * M ie x > 127 -2*M - 1 value is good
     */
-    __asm__ __volatile__ ("                                             \n\
-                                    #* Do (v0-v1) to (v7-v8)            \n\
-    movq      (%1),         %%mm1   #  load v0->v7                      \n\
-    movq      1(%1),        %%mm2   #  load v1->v8                      \n\
-    psubb    %%mm2,         %%mm1   #  v[i]-v[i+1]                      \n\
-    paddb     mmx_127_thr1, %%mm1   #  + 127-THR1 with wrap             \n\
-    pcmpgtb   mmx_127_2xthr1_1, %%mm1 #  >  127 -2*thr1 - 1             \n"
-   "movq      %%mm1,        %%mm0   #                                   \n\
-    psrlw     $8,           %%mm1   #                                   \n\
-    paddb     %%mm1,        %%mm0   #                                   \n\
-                                    #                                   \n\
-    movq      %%mm0,        %%mm1   #  Now sum to create eq_cnt         \n\
-    psrld     $16,          %%mm0   #                                   \n\
-    paddb     %%mm0,        %%mm1   #                                   \n\
-                                    #                                   \n\
-    movq      %%mm1,        %%mm0   #                                   \n\
-    psrlq     $32,          %%mm1   #                                   \n\
-    paddb     %%mm1,        %%mm0                                       \n"  
-   "movd      %%mm0,        %0      #                                   \n\
-    negl      %0                                                        \n\
-    andl      $255,         %0"
+    __asm__ __volatile__ (
+   "                                #* Do (v0-v1) to (v7-v8)            \n"
+   "movq      (%1),         %%mm1   #  load v0->v7                      \n"
+   "movq      1(%1),        %%mm2   #  load v1->v8                      \n"
+   "psubb    %%mm2,         %%mm1   #  v[i]-v[i+1]                      \n"
+   "paddb     mmx_127_thr1, %%mm1   #  + 127-THR1 with wrap             \n"
+   "pcmpgtb   mmx_127_2xthr1_1, %%mm1 #  >  127 -2*thr1 - 1             \n"
+   "movq      %%mm1,        %%mm0   #                                   \n"
+   "psrlw     $8,           %%mm1   #                                   \n"
+   "paddb     %%mm1,        %%mm0   #                                   \n"
+   "                                #                                   \n"
+   "movq      %%mm0,        %%mm1   #  Now sum to create eq_cnt         \n"
+   "psrld     $16,          %%mm0   #                                   \n"
+   "paddb     %%mm0,        %%mm1   #                                   \n"
+   "                                #                                   \n"
+   "movq      %%mm1,        %%mm0   #                                   \n"
+   "psrlq     $32,          %%mm1   #                                   \n"
+   "paddb     %%mm1,        %%mm0                                       \n"
+   "movd      %%mm0,        %0      #                                   \n"
+   "negl      %0                                                        \n"
+   "andl      $255,         %0"
 
        : "=r"(i_eq_cnt) : "r" (p_v) );
 
     /* last test, hey, 9 don't fit in MMX */
-    if((  ( p_v[8] - p_v[9] + PP_THR1 )&0xffff )<= PP_2xTHR1 ) 
-    {   
+    if((  ( p_v[8] - p_v[9] + PP_THR1 )&0xffff )<= PP_2xTHR1 )
+    {
          i_eq_cnt++;
     }
 
@@ -160,8 +160,8 @@ static inline int pp_deblock_isDC_mode( u8 *p_v )
 
     for( i =0; i < 9; i++ )
     {
-        if((  ( p_v[i] - p_v[i+1] + PP_THR1 )&0xffff )<= PP_2xTHR1 ) 
-        {   
+        if((  ( p_v[i] - p_v[i+1] + PP_THR1 )&0xffff )<= PP_2xTHR1 )
+        {
             i_eq_cnt++;
         }
     }
@@ -170,25 +170,25 @@ static inline int pp_deblock_isDC_mode( u8 *p_v )
     return( (i_eq_cnt >= PP_THR2 ) ? 1 : 0 );
 }
 
-static inline int pp_deblock_isMinMaxOk( u8 *p_v, int i_QP )
+static inline int pp_deblock_isMinMaxOk( uint8_t *p_v, int i_QP )
 {
     int i_range;
 
 #if 0
-    __asm__ __volatile__ ( 
+    __asm__ __volatile__ (
    "movq        1(%1),      %%mm0   # 8 bytes                   \n"
    "movq        %%mm0,      %%mm1                               \n"
     MMXEXT_GET_PMIN( %%mm0, %%mm7 )
     MMXEXT_GET_PMAX( %%mm1, %%mm7 )
-   "psubd       %%mm0,      %%mm1   # max - min                 \n\
-    movd        %%mm1,      %0                                  \n\
-    andl        $255,       %0" : "=r"(i_range) : "r"(p_v) );
+   "psubd       %%mm0,      %%mm1   # max - min                 \n"
+   "movd        %%mm1,      %0                                  \n"
+   "andl        $255,       %0" : "=r"(i_range) : "r"(p_v) );
 
 #endif
     int i_max, i_min;
     int i;
 
-    i_min = i_max = p_v[1];  
+    i_min = i_max = p_v[1];
     for( i = 2; i < 9; i++ )
     {
         if( i_max < p_v[i] ) i_max = p_v[i];
@@ -200,7 +200,7 @@ static inline int pp_deblock_isMinMaxOk( u8 *p_v, int i_QP )
 }
 
 
-static inline void pp_deblock_DefaultMode( u8 i_v[10], int i_stride,
+static inline void pp_deblock_DefaultMode( uint8_t i_v[10], int i_stride,
                                       int i_QP )
 {
     int d, i_delta;
@@ -210,16 +210,16 @@ static inline void pp_deblock_DefaultMode( u8 i_v[10], int i_stride,
     /* d = CLIP( 5(a3x0' - a3x0)//8, 0, (v4-v5)/2 ).d( abs(a3x0) < QP ) */
 
     /* First calculate a3x0 */
-    __asm__ __volatile__ ( "                        \n\
-    pxor    %%mm7,  %%mm7           # mm7 = 0          \n\
-    movq    mmx_m2_5_m5_2, %%mm6    # mm6 =(2,-5,5,-2) \n\
-    movd    3(%1),  %%mm0           \n\
-    punpcklbw %%mm7,%%mm0           \n\
-    pmaddwd %%mm6,  %%mm0           \n"
-   "movq    %%mm0,  %%mm1           \n\
-    psrlq   $32,    %%mm1           \n"
-   "paddd   %%mm1,  %%mm0           \n\
-    movd    %%mm0,  %0" : "=r"(a3x0) :"r"(i_v) );
+    __asm__ __volatile__ (
+   "pxor    %%mm7,  %%mm7           # mm7 = 0          \n"
+   "movq    mmx_m2_5_m5_2, %%mm6    # mm6 =(2,-5,5,-2) \n"
+   "movd    3(%1),  %%mm0           \n"
+   "punpcklbw %%mm7,%%mm0           \n"
+   "pmaddwd %%mm6,  %%mm0           \n"
+   "movq    %%mm0,  %%mm1           \n"
+   "psrlq   $32,    %%mm1           \n"
+   "paddd   %%mm1,  %%mm0           \n"
+   "movd    %%mm0,  %0" : "=r"(a3x0) :"r"(i_v) );
 #if 0
     a3x0 = 2 * ( i_v[3] - i_v[6] ) + 5 *( i_v[5] - i_v[4] );
 #endif
@@ -228,7 +228,7 @@ static inline void pp_deblock_DefaultMode( u8 i_v[10], int i_stride,
     {
         b_neg = 1;
         a3x0  = -a3x0;
-    } 
+    }
     else
     {
         b_neg = 0;
@@ -237,24 +237,24 @@ static inline void pp_deblock_DefaultMode( u8 i_v[10], int i_stride,
     if( ( a3x0 < 8 * i_QP )&&( a3x0 != 0 ) ) /* |a3x0| < 8*i_QP */
     {
         /* calculate a3x1 et a3x2 */
-        __asm__ __volatile__ ( "        \n\
-                                        # mm7 = 0                   \n\
-                                        # mm6 = ( 2, -5, 5, -2 )    \n\
-        movd    1(%2),  %%mm0           \n\
-        movd    5(%2),  %%mm2           \n\
-        punpcklbw %%mm7,%%mm0           \n\
-        punpcklbw %%mm7,%%mm2           \n\
-        pmaddwd %%mm6,  %%mm0           \n\
-        pmaddwd %%mm6,  %%mm2           \n"
-       "movq    %%mm0,  %%mm1           \n\
-        psrlq   $32,    %%mm1           \n"
-       "paddd   %%mm1,  %%mm0           # mm0 = a3x1    \n\
-        movd    %%mm0,  %0              \n"
-       "movq    %%mm2,  %%mm1           \n\
-        psrlq   $32,    %%mm1           \n"
-       "paddd   %%mm1,  %%mm2           # mm2 = a3x2    \n\
-        movd    %%mm2,  %1              \n\
-        " : "=r"(a3x1), "=r"(a3x2) : "r"(i_v) );
+        __asm__ __volatile__ (
+       "                                # mm7 = 0                   \n"
+       "                                # mm6 = ( 2, -5, 5, -2 )    \n"
+       "movd    1(%2),  %%mm0           \n"
+       "movd    5(%2),  %%mm2           \n"
+       "punpcklbw %%mm7,%%mm0           \n"
+       "punpcklbw %%mm7,%%mm2           \n"
+       "pmaddwd %%mm6,  %%mm0           \n"
+       "pmaddwd %%mm6,  %%mm2           \n"
+       "movq    %%mm0,  %%mm1           \n"
+       "psrlq   $32,    %%mm1           \n"
+       "paddd   %%mm1,  %%mm0           # mm0 = a3x1    \n"
+       "movd    %%mm0,  %0              \n"
+       "movq    %%mm2,  %%mm1           \n"
+       "psrlq   $32,    %%mm1           \n"
+       "paddd   %%mm1,  %%mm2           # mm2 = a3x2    \n"
+       "movd    %%mm2,  %1              \n"
+        : "=r"(a3x1), "=r"(a3x2) : "r"(i_v) );
 #if 0
         a3x1 = 2 * ( i_v[1] - i_v[4] ) + 5 * ( i_v[3] - i_v[2] );
         a3x2 = 2 * ( i_v[5] - i_v[8] ) + 5 * ( i_v[7] - i_v[6] );
@@ -264,7 +264,7 @@ static inline void pp_deblock_DefaultMode( u8 i_v[10], int i_stride,
         if( a3x2 < 0) a3x2 = -a3x2; /* abs( a3x2 ) */
 
         a3x0_ = PP_MIN3( a3x0, a3x1, a3x2 );
-        
+
         d = 5 *( a3x0 - a3x0_ ) / 8; /* always > 0 */
 
         i_delta = ( i_v[4] - i_v[5] ) / 2;
@@ -293,7 +293,7 @@ static inline void pp_deblock_DefaultMode( u8 i_v[10], int i_stride,
 
 
 
-static inline void pp_deblock_DCMode( u8 *p_v, /*  = int i_v[10] */
+static inline void pp_deblock_DCMode( uint8_t *p_v, /*  = int i_v[10] */
                                  int i_QP )
 {
     int i_p0, i_p9;
@@ -302,20 +302,20 @@ static inline void pp_deblock_DCMode( u8 *p_v, /*  = int i_v[10] */
     i_p9 = PP_ABS( p_v[8] - p_v[9] ) < i_QP ? p_v[9] : p_v[8];
 
     /* mm0 = 8 pix unmodified
-     -We will process first 4 pixel 
+     -We will process first 4 pixel
        mm0 = 8 pix unmodified
        mm1 = for the first part of the 4 first pix
              (v1) -> (p0) -> ... ( word )
              (v2)    (v1)
              (v3)    (v2)
              (v4)    (v3)
-             
+
            = for the commoin part between first and last pix
              (v2) -> (v3) -> ... ( word )
              (v3)    (v4)
              (v4)    (v5)
              (v5)    (v6)
-             
+
            = for the last part of the 4 last pix
              (v5) -> (v6) -> ... ( word )
              (v6)    (v7)
@@ -323,110 +323,110 @@ static inline void pp_deblock_DCMode( u8 *p_v, /*  = int i_v[10] */
              (v8)    (p9)
 
        mm2 = acu for first new pix
-       mm3 = acu for last pix 
+       mm3 = acu for last pix
        mm4 = unused
-       mm5 = p0 
+       mm5 = p0
        mm6 = p9 << 48
        mm7 = 0 */
     __asm__ __volatile__ (
-   "pxor        %%mm7,      %%mm7   \n\
-    movq        1(%0),      %%mm0   # get 8 pix             \n\
-                                    # unpack into mm1       \n\
-    movq        %%mm0,      %%mm1   \n\
-    punpcklbw   %%mm7,      %%mm1   \n\
-                                    # get p_0 and i_p9      \n\
-    movd        %1,         %%mm5   \n\
-    movd        %2,         %%mm6   \n\
-    psllq       $48,        %%mm6   \n
-                                    \n\
-    movq        %%mm1,      %%mm3   # p_v[5-8] = v[1-4] !!  \n\
-    movq        %%mm1,      %%mm2   \n\
-    psllw       $2,         %%mm2   # p_v[1-4] = 4*v[1-4]   \n\
-                                    \n\
-    psllq       $16,        %%mm1   \n\
-    por         %%mm5,      %%mm1   # mm1 =( p0, v1, v2 ,v3)\n\
-                                    \n\
-    paddw       %%mm1,      %%mm2   \n\
-    paddw       %%mm1,      %%mm2   \n\
-                                    \n\
-    psllq       $16,        %%mm1   \n\
-    por         %%mm5,      %%mm1   # mm1 =( p0, p0, v1, v2)\n\
-                                    \n\
-    paddw       %%mm1,      %%mm2   \n\
-    paddw       %%mm1,      %%mm2   \n\
-                                    \n\
-    psllq       $16,        %%mm1   \n\
-    por         %%mm5,      %%mm1   # mm1 =( p0, p0, p0, v1)\n\
-                                    \n\
-    paddw       %%mm1,      %%mm2   \n\
-                                    \n\
-    psllq       $16,        %%mm1   \n\
-    por         %%mm5,      %%mm1   # mm1 =( p0, p0, p0, p0)\n\
-                                    \n\
-    paddw       %%mm1,      %%mm2   \n\
-                                    # Now last part a little borring\n\
-                                    # last part for mm2, beginig for mm3
-    movq        %%mm0,      %%mm1   \n\
-    psrlq       $8,         %%mm1   \n\
-    punpcklbw   %%mm7,      %%mm1   # mm1 =( v2, v3, v4, v5 )\n\
-    paddw       %%mm1,      %%mm2   \n\
-    paddw       %%mm1,      %%mm2   \n\
-    paddw       %%mm1,      %%mm3   \n\
+   "pxor        %%mm7,      %%mm7   \n"
+   "movq        1(%0),      %%mm0   # get 8 pix             \n"
+   "                                # unpack into mm1       \n"
+   "movq        %%mm0,      %%mm1   \n"
+   "punpcklbw   %%mm7,      %%mm1   \n"
+   "                                # get p_0 and i_p9      \n"
+   "movd        %1,         %%mm5   \n"
+   "movd        %2,         %%mm6   \n"
+   "psllq       $48,        %%mm6   \n"
+   "                                \n"
+   "movq        %%mm1,      %%mm3   # p_v[5-8] = v[1-4] !!  \n"
+   "movq        %%mm1,      %%mm2   \n"
+   "psllw       $2,         %%mm2   # p_v[1-4] = 4*v[1-4]   \n"
+   "                                \n"
+   "psllq       $16,        %%mm1   \n"
+   "por         %%mm5,      %%mm1   # mm1 =( p0, v1, v2 ,v3)\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "                                \n"
+   "psllq       $16,        %%mm1   \n"
+   "por         %%mm5,      %%mm1   # mm1 =( p0, p0, v1, v2)\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "                                \n"
+   "psllq       $16,        %%mm1   \n"
+   "por         %%mm5,      %%mm1   # mm1 =( p0, p0, p0, v1)\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "                                \n"
+   "psllq       $16,        %%mm1   \n"
+   "por         %%mm5,      %%mm1   # mm1 =( p0, p0, p0, p0)\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "                                # Now last part a little borring\n"
+   "                                # last part for mm2, beginig for mm3\n"
+   "movq        %%mm0,      %%mm1   \n"
+   "psrlq       $8,         %%mm1   \n"
+   "punpcklbw   %%mm7,      %%mm1   # mm1 =( v2, v3, v4, v5 )\n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "paddw       %%mm1,      %%mm3   \n"
 
-                                    \n\
-    movq        %%mm0,      %%mm1   \n\
-    psrlq       $16,        %%mm1   \n\
-    punpcklbw   %%mm7,      %%mm1   # mm1 =( v3, v4, v5, v6 )\n\
-    psllw       $1,         %%mm1   \n\
-    paddw       %%mm1,      %%mm2   \n\
-    paddw       %%mm1,      %%mm3   \n\
-                                    \n\
-    movq        %%mm0,      %%mm1   \n\
-    psrlq       $24,        %%mm1   \n\
-    punpcklbw   %%mm7,      %%mm1   # mm1 =( v4, v5, v6, v7)    \n\
-    paddw       %%mm1,      %%mm2   \n\
-    paddw       %%mm1,      %%mm3   \n\
-    paddw       %%mm1,      %%mm3   \n\
-                                    \n\
-    movq        %%mm0,      %%mm1   \n\
-    psrlq       $32,        %%mm1   \n\
-    punpcklbw   %%mm7,      %%mm1   # mm1 =( v5, v6, v7, v8)    \n\
-    paddw       %%mm1,      %%mm2   \n\
-    psllw       $2,         %%mm1
-    paddw       %%mm1,      %%mm3   \n\
-                                    # Now last part for last 4 pix \n\
-                                    # \n\
-    movq        %%mm0,      %%mm1   \n\
-    punpckhbw   %%mm7,      %%mm1   # mm1 = ( v5, v6, v7, v8)      \n\
-                                    \n\
-    psrlq       $16,        %%mm1   \n\
-    por         %%mm6,      %%mm1   # mm1 =( v6, v7, v8, p9 )\n\
-                                    \n\
-    paddw       %%mm1,      %%mm3   \n\
-    paddw       %%mm1,      %%mm3   \n\
-                                    \n\
-    psrlq       $16,        %%mm1   \n\
-    por         %%mm6,      %%mm1   # mm1 =( v7, v8, p9, p9)\n\
-                                    \n\
-    paddw       %%mm1,      %%mm3   \n\
-    paddw       %%mm1,      %%mm3   \n\
-                                    \n\
-    psrlq       $16,        %%mm1   \n\
-    por         %%mm6,      %%mm1   # mm1 =( v8, p9, p9, p9 )\n\
-                                    \n\
-    paddw       %%mm1,      %%mm3   \n\
-                                    \n\
-    psrlq       $16,        %%mm1   \n\
-    por         %%mm6,      %%mm1   # mm1 =( p9, p9, p9, p9 )\n\
-                                    \n\
-    paddw       %%mm1,      %%mm3   \n\
+   "                                \n"
+   "movq        %%mm0,      %%mm1   \n"
+   "psrlq       $16,        %%mm1   \n"
+   "punpcklbw   %%mm7,      %%mm1   # mm1 =( v3, v4, v5, v6 )\n"
+   "psllw       $1,         %%mm1   \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "                                \n"
+   "movq        %%mm0,      %%mm1   \n"
+   "psrlq       $24,        %%mm1   \n"
+   "punpcklbw   %%mm7,      %%mm1   # mm1 =( v4, v5, v6, v7)    \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "                                \n"
+   "movq        %%mm0,      %%mm1   \n"
+   "psrlq       $32,        %%mm1   \n"
+   "punpcklbw   %%mm7,      %%mm1   # mm1 =( v5, v6, v7, v8)    \n"
+   "paddw       %%mm1,      %%mm2   \n"
+   "psllw       $2,         %%mm1   \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "                                # Now last part for last 4 pix \n"
+   "                                # \n"
+   "movq        %%mm0,      %%mm1   \n"
+   "punpckhbw   %%mm7,      %%mm1   # mm1 = ( v5, v6, v7, v8)      \n"
+   "                                \n"
+   "psrlq       $16,        %%mm1   \n"
+   "por         %%mm6,      %%mm1   # mm1 =( v6, v7, v8, p9 )\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "                                \n"
+   "psrlq       $16,        %%mm1   \n"
+   "por         %%mm6,      %%mm1   # mm1 =( v7, v8, p9, p9)\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "                                \n"
+   "psrlq       $16,        %%mm1   \n"
+   "por         %%mm6,      %%mm1   # mm1 =( v8, p9, p9, p9 )\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm3   \n"
+   "                                \n"
+   "psrlq       $16,        %%mm1   \n"
+   "por         %%mm6,      %%mm1   # mm1 =( p9, p9, p9, p9 )\n"
+   "                                \n"
+   "paddw       %%mm1,      %%mm3   \n"
 
-    psrlw       $4,         %%mm2   \n\
-    psrlw       $4,         %%mm3   \n\
-    packuswb    %%mm3,      %%mm2   \n\
-    movq        %%mm2,      1(%0)   \n\
- 
-   ": : "r"(p_v), "r"(i_p0), "r"(i_p9) : "memory" );
+   "psrlw       $4,         %%mm2   \n"
+   "psrlw       $4,         %%mm3   \n"
+   "packuswb    %%mm3,      %%mm2   \n"
+   "movq        %%mm2,      1(%0)   \n"
+
+    : : "r"(p_v), "r"(i_p0), "r"(i_p9) : "memory" );
 
 #if 0
     for( i = 1; i < 9; i++ )
@@ -434,28 +434,28 @@ static inline void pp_deblock_DCMode( u8 *p_v, /*  = int i_v[10] */
         v[i] = p_v[i]; /* save 8 pix that will be modified */
     }
 
-    p_v[1] = ( 6 * i_p0                        + 4 * v[1] 
+    p_v[1] = ( 6 * i_p0                        + 4 * v[1]
                 + 2 *( v[2] + v[3]) + v[4] + v[5]) >> 4;
-    
-    p_v[2] = ( 4 * i_p0    + 2 * v[1]          + 4 * v[2] 
+
+    p_v[2] = ( 4 * i_p0    + 2 * v[1]          + 4 * v[2]
                 + 2 *( v[3] + v[4]) + v[5] + v[6]) >> 4;
 
-    p_v[3] = ( 2 * i_p0    + 2 * (v[1] + v[2]) + 4 * v[3] 
+    p_v[3] = ( 2 * i_p0    + 2 * (v[1] + v[2]) + 4 * v[3]
                 + 2 *( v[4] + v[5]) + v[6] + v[7]) >> 4;
 
-    p_v[4] = ( i_p0 + v[1] + 2 * (v[2] + v[3]) + 4 * v[4] 
+    p_v[4] = ( i_p0 + v[1] + 2 * (v[2] + v[3]) + 4 * v[4]
                 + 2 *( v[5] + v[6]) + v[7] + v[8]) >> 4;
 
-    p_v[5] = ( v[1] + v[2] + 2 * (v[3] + v[4]) + 4 * v[5] 
+    p_v[5] = ( v[1] + v[2] + 2 * (v[3] + v[4]) + 4 * v[5]
                 + 2 *( v[6] + v[7]) + v[8] + i_p9) >> 4;
 
-    p_v[6] = ( v[2] + v[3] + 2 * (v[4] + v[5]) + 4 * v[6] 
+    p_v[6] = ( v[2] + v[3] + 2 * (v[4] + v[5]) + 4 * v[6]
             + 2 *( v[7] + v[8]) + 2 * i_p9) >> 4;
 
-    p_v[7] = ( v[3] + v[4] + 2 * (v[5] + v[6]) + 4 * v[7] 
+    p_v[7] = ( v[3] + v[4] + 2 * (v[5] + v[6]) + 4 * v[7]
                 + 2 * v[8] + 4 * i_p9) >> 4;
 
-    p_v[8] = ( v[4] + v[5] + 2 * (v[6] + v[7]) + 4 * v[8] 
+    p_v[8] = ( v[4] + v[5] + 2 * (v[6] + v[7]) + 4 * v[8]
                                     + 6 * i_p9) >> 4;
 #endif
 
@@ -471,21 +471,21 @@ static inline void pp_deblock_DCMode( u8 *p_v, /*  = int i_v[10] */
 /*---------------------------------------------------------------------------*/
 /*****************************************************************************/
 
-void E_( pp_deblock_V )( u8 *p_plane, 
+void E_( pp_deblock_V )( uint8_t *p_plane,
                          int i_width, int i_height, int i_stride,
                          QT_STORE_T *p_QP_store, int i_QP_stride,
                          int b_chroma )
 {
     int x, y, i;
-    u8 *p_v;
+    uint8_t *p_v;
     int i_QP_scale; /* use to do ( ? >> i_QP_scale ) */
     int i_QP;
-    
-    u8 i_v[10];
-    
+
+    uint8_t i_v[10];
+
     i_QP_scale = b_chroma ? 5 : 4 ;
 
-    for( y = 8; y < i_height - 4; y += 8 ) 
+    for( y = 8; y < i_height - 4; y += 8 )
     {
         p_v = p_plane + ( y - 5 )* i_stride;
         for( x = 0; x < i_width; x++ )
@@ -530,22 +530,22 @@ void E_( pp_deblock_V )( u8 *p_plane,
 /*---------------------------------------------------------------------------*/
 /*****************************************************************************/
 
-void E_( pp_deblock_H )( u8 *p_plane, 
+void E_( pp_deblock_H )( uint8_t *p_plane,
                          int i_width, int i_height, int i_stride,
                          QT_STORE_T *p_QP_store, int i_QP_stride,
                          int b_chroma )
 {
     int x, y;
-    u8 *p_v;
+    uint8_t *p_v;
     int i_QP_scale;
     int i_QP;
-    
+
     i_QP_scale = b_chroma ? 5 : 4 ;
 
-    for( y = 0; y < i_height; y++ ) 
+    for( y = 0; y < i_height; y++ )
     {
         p_v = p_plane + y * i_stride - 5;
-        for( x = 8; x < i_width - 4; x += 8 ) 
+        for( x = 8; x < i_width - 4; x += 8 )
         {
             /* p_v point 5 pix before a block boundary */
             /* XXX QP is for v5 */
@@ -564,7 +564,7 @@ void E_( pp_deblock_H )( u8 *p_plane,
             }
         }
     }
-            
+
     return;
 }
 
@@ -575,7 +575,7 @@ void E_( pp_deblock_H )( u8 *p_plane,
  *
  *****************************************************************************/
 
-static inline void pp_dering_MinMax( u8 *p_block, int i_stride,
+static inline void pp_dering_MinMax( uint8_t *p_block, int i_stride,
                                      int *pi_min, int *pi_max )
 {
     int x, y;
@@ -583,13 +583,13 @@ static inline void pp_dering_MinMax( u8 *p_block, int i_stride,
 
 #if 0
 
-    /* First we will extract min/max for each pix on vertical line 
+    /* First we will extract min/max for each pix on vertical line
         and next extract global min/max */
-    __asm__ __volatile__( 
+    __asm__ __volatile__(
 
-    "leal   (%2,%3),        %%eax       \n\
-     movq   (%2),           %%mm0 #load line \n\
-     movq   %%mm0,          %%mm1       \n" 
+    "leal   (%2,%3),        %%eax       \n"
+    "movq   (%2),           %%mm0 #load line \n"
+    "movq   %%mm0,          %%mm1       \n"
 
     MMXEXT_GET_LMINMAX( (%%eax),        %%mm0, %%mm1, %%mm7 )
     MMXEXT_GET_LMINMAX( (%%eax, %3),    %%mm0, %%mm1, %%mm7 )
@@ -600,20 +600,20 @@ static inline void pp_dering_MinMax( u8 *p_block, int i_stride,
     MMXEXT_GET_LMINMAX( (%%eax),        %%mm0, %%mm1, %%mm7 )
     MMXEXT_GET_LMINMAX( (%%eax, %3),    %%mm0, %%mm1, %%mm7 )
     MMXEXT_GET_LMINMAX( (%%eax, %3,2), %%mm0, %%mm1, %%mm7 )
-    MMXEXT_GET_PMIN( %%mm0, %%mm7 )  
+    MMXEXT_GET_PMIN( %%mm0, %%mm7 )
     MMXEXT_GET_PMAX( %%mm1, %%mm7 )
-    "movd   %%mm0,  %%eax               \n\
-     andl   $255,   %%eax               \n\
-     movl   %%eax,  (%0)                \n\
-     movd   %%mm1,  %%eax               \n\
-     andl   $255,   %%eax               \n\
-     movl   %%eax,  (%1)                \n"
+    "movd   %%mm0,  %%eax               \n"
+    "andl   $255,   %%eax               \n"
+    "movl   %%eax,  (%0)                \n"
+    "movd   %%mm1,  %%eax               \n"
+    "andl   $255,   %%eax               \n"
+    "movl   %%eax,  (%1)                \n"
 
      : : "r"(pi_min), "r"(pi_max), "r"(p_block), "r"(i_stride) : "%eax", "memory" );
 #endif
-    
+
     i_min = 255; i_max = 0;
-    
+
     for( y = 0; y < 8; y++ )
     {
         for( x = 0; x < 8; x++ )
@@ -623,17 +623,17 @@ static inline void pp_dering_MinMax( u8 *p_block, int i_stride,
         }
         p_block += i_stride;
     }
-            
+
     *pi_min = i_min;
     *pi_max = i_max;
 }
 
 
-static inline void pp_dering_BinIndex( u8  *p_block, int i_stride, int i_thr,
-                                       u32 *p_bin )
+static inline void pp_dering_BinIndex( uint8_t  *p_block, int i_stride,
+                                       int i_thr, uint32_t *p_bin )
 {
     int x, y;
-    u32 i_bin;
+    uint32_t i_bin;
 
     for( y = 0; y < 10; y++ )
     {
@@ -653,27 +653,27 @@ static inline void pp_dering_BinIndex( u8  *p_block, int i_stride, int i_thr,
     }
 }
 
-static inline void pp_dering_Filter( u8  *p_block, int i_stride,
-                                     u32 *p_bin,
+static inline void pp_dering_Filter( uint8_t  *p_block, int i_stride,
+                                     uint32_t *p_bin,
                                      int i_QP )
 {
     int x, y;
-    u32 i_bin;
+    uint32_t i_bin;
     int i_flt[8][8];
     int i_f;
-    u8 *p_sav;
+    uint8_t *p_sav;
     int i_QP_2;
-    
+
     p_sav = p_block;
     i_QP_2 = i_QP >> 1;
-    
+
     for( y = 0; y < 8; y++ )
     {
         i_bin = p_bin[y] & p_bin[y+1] & p_bin[y+2]; /* To be optimised */
         i_bin |= i_bin >> 16; /* detect 0 or 1 */
 
         for( x = 0; x < 8; x++ )
-        {       
+        {
             if( i_bin&0x02 ) /* 0x02 since 10 index but want 1-9 */
             {
                 /* apply dering */
@@ -683,11 +683,11 @@ static inline void pp_dering_Filter( u8  *p_block, int i_stride,
                 i_f =   p_block[x - i_stride - 1] +
                       ( p_block[x - i_stride    ] << 1)+
                         p_block[x - i_stride + 1] +
-                      
+
                       ( p_block[x - 1] << 1 )+
                       ( p_block[x    ] << 2 )+
                       ( p_block[x + 1] << 1 )+
-                      
+
                         p_block[x + i_stride - 1] +
                       ( p_block[x + i_stride    ] << 1 ) +
                         p_block[x + i_stride + 1];
@@ -707,7 +707,7 @@ static inline void pp_dering_Filter( u8  *p_block, int i_stride,
                 }
                 else
                 {
-                    i_flt[y][x] = i_f ; 
+                    i_flt[y][x] = i_f ;
                 }
             }
             else
@@ -715,7 +715,7 @@ static inline void pp_dering_Filter( u8  *p_block, int i_stride,
                 i_flt[y][x] = p_block[x];
             }
             i_bin >>= 1;
- 
+
         }
         p_block += i_stride;
     }
@@ -738,7 +738,7 @@ static inline void pp_dering_Filter( u8  *p_block, int i_stride,
 /*---------------------------------------------------------------------------*/
 /*****************************************************************************/
 
-void E_( pp_dering_Y )( u8 *p_plane, 
+void E_( pp_dering_Y )( uint8_t *p_plane,
                         int i_width, int i_height, int i_stride,
                         QT_STORE_T *p_QP_store, int i_QP_stride )
 {
@@ -746,10 +746,10 @@ void E_( pp_dering_Y )( u8 *p_plane,
     int i_max[4], i_min[4], i_range[4];
     int i_thr[4];
     int i_max_range, i_kmax;
-    u32 i_bin[4][10];
-    u8  *p_block[4];
+    uint32_t i_bin[4][10];
+    uint8_t  *p_block[4];
     QT_STORE_T *p_QP;
-    
+
     /* We process 4 blocks/loop*/
     for( y = 8; y < i_height-8; y += 16 )
     {
@@ -819,8 +819,8 @@ void E_( pp_dering_Y )( u8 *p_plane,
                                 i_thr[2], i_bin[2] );
             pp_dering_BinIndex( p_block[3] - i_stride - 1, i_stride,
                                 i_thr[3], i_bin[3] );
-            
-            
+
+
             /* 3: adaptive smoothing */
             /* since we begin at (8,8) QP can be different for each block */
             p_QP = &( p_QP_store[( y >> 4) * i_QP_stride + (x >> 4)] );
@@ -836,27 +836,27 @@ void E_( pp_dering_Y )( u8 *p_plane,
 
             pp_dering_Filter( p_block[3], i_stride,
                               i_bin[3], p_QP[i_QP_stride+1] );
-                    
+
             p_block[0] += 8;
             p_block[1] += 8;
             p_block[2] += 8;
             p_block[3] += 8;
         }
     }
-    
+
 }
 
-void E_( pp_dering_C )( u8 *p_plane, 
+void E_( pp_dering_C )( uint8_t *p_plane,
                         int i_width, int i_height, int i_stride,
                         QT_STORE_T *p_QP_store, int i_QP_stride )
 {
     int x, y;
     int i_max, i_min;
     int i_thr;
-    u32 i_bin[10];
-   
-    u8 *p_block;
-    
+    uint32_t i_bin[10];
+
+    uint8_t *p_block;
+
 
     for( y = 8; y < i_height-8; y += 8 )
     {
@@ -877,13 +877,13 @@ void E_( pp_dering_C )( u8 *p_plane,
             pp_dering_BinIndex( p_block - i_stride -1, i_stride,
                                 i_thr,
                                 i_bin );
-            
+
             /* 3: adaptive smoothing */
             pp_dering_Filter( p_block, i_stride,
-                              i_bin, 
+                              i_bin,
                               p_QP_store[(y>>5)*i_QP_stride+ (x>>5)]);
             p_block += 8;
         }
     }
-    
+
 }

@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.44 2002/12/06 16:34:08 sam Exp $
+ * $Id: input_ext-intf.c,v 1.45 2002/12/18 14:17:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -277,7 +277,7 @@ void input_DumpStream( input_thread_t * p_input )
     unsigned int i, j;
 
 #define S   p_input->stream
-    msg_Dbg( p_input, "dumping stream ID 0x%x [OK:%d/D:%d]", S.i_stream_id,
+    msg_Dbg( p_input, "dumping stream ID 0x%x [OK:%ld/D:%ld]", S.i_stream_id,
              S.c_packets_read, S.c_packets_trashed );
     if( S.b_seekable )
         msg_Dbg( p_input, "seekable stream, position: "I64Fd"/"I64Fd" (%s/%s)",
@@ -299,8 +299,8 @@ void input_DumpStream( input_thread_t * p_input )
         for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
         {
 #define ES  p_input->stream.pp_programs[i]->pp_es[j]
-            msg_Dbg( p_input,
-                     "ES 0x%x, stream 0x%x, fourcc `%4.4s', %s [OK:%d/ERR:%d]",
+            msg_Dbg( p_input, "ES 0x%x, "
+                     "stream 0x%x, fourcc `%4.4s', %s [OK:%ld/ERR:%ld]",
                      ES->i_id, ES->i_stream_id, (char*)&ES->i_fourcc,
                      ES->p_decoder_fifo != NULL ? "selected" : "not selected",
                      ES->c_packets, ES->c_invalid_packets );

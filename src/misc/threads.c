@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.29 2002/12/14 19:19:08 gbazin Exp $
+ * $Id: threads.c,v 1.30 2002/12/18 14:17:11 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -651,7 +651,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
         p_this->b_thread = 1;
 
         msg_Dbg( p_this, "thread %d (%s) created at priority %d (%s:%d)",
-                 p_this->thread_id, psz_name, i_priority,
+                 (int)p_this->thread_id, psz_name, i_priority,
                  psz_file, i_line );
 
         vlc_mutex_unlock( &p_this->object_lock );
@@ -752,16 +752,17 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
     {
 #ifdef HAVE_STRERROR
         msg_Err( p_this, "thread_join(%d) failed at %s:%d (%s)",
-                         p_this->thread_id, psz_file, i_line, strerror(i_ret) );
+                         (int)p_this->thread_id, psz_file, i_line,
+                         strerror(i_ret) );
 #else
         msg_Err( p_this, "thread_join(%d) failed at %s:%d",
-                         p_this->thread_id, psz_file, i_line );
+                         (int)p_this->thread_id, psz_file, i_line );
 #endif
     }
     else
     {
         msg_Dbg( p_this, "thread %d joined (%s:%d)",
-                         p_this->thread_id, psz_file, i_line );
+                         (int)p_this->thread_id, psz_file, i_line );
     }
 
     p_this->b_thread = 0;

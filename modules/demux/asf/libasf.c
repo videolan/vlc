@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.8 2002/12/06 16:34:06 sam Exp $
+ * $Id: libasf.c,v 1.9 2002/12/18 14:17:10 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -353,10 +353,11 @@ int  ASF_ReadObject_Index( input_thread_t *p_input,
     msg_Dbg( p_input,
             "Read \"Index Object\" file_id:" GUID_FMT
             " index_entry_time_interval:"I64Fd" max_packet_count:%d "
-            "index_entry_count:%d",
+            "index_entry_count:%ld",
             GUID_PRINT( p_index->i_file_id ),
+            p_index->i_index_entry_time_interval,
             p_index->i_max_packet_count,
-            p_index->i_index_entry_count );
+            (long int)p_index->i_index_entry_count );
 #endif
     return( 1 );
 }

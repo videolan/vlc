@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.14 2002/12/16 18:30:12 gbazin Exp $
+ * $Id: ogg.c,v 1.15 2002/12/18 14:17:10 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -457,7 +457,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     if( p_stream->i_fourcc == VLC_FOURCC( 't','a','r','k' ) )
     {
         /* FIXME: the biggest hack I've ever done */
-        msg_Warn( p_input, "tark pts: %lli, granule: %i",
+        msg_Warn( p_input, "tark pts: "I64Fd", granule: "I64Fd,
                   p_pes->i_pts, p_pes->i_dts );
         msleep(10000);
     }

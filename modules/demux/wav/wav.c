@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.7 2002/12/10 23:34:19 gbazin Exp $
+ * $Id: wav.c,v 1.8 2002/12/18 14:17:10 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -210,7 +210,7 @@ static int FindTag( input_thread_t *p_input, u32 i_tag )
         i_id   = GetDWLE( p_peek );
         i_size = GetDWLE( p_peek + 4 );
 
-        msg_Dbg( p_input, "FindTag: tag:%4.4s size:%d", &i_id, i_size );
+        msg_Dbg( p_input, "FindTag: tag:%4.4s size:%d", (char*)&i_id, i_size );
         if( i_id == i_tag )
         {
             /* Yes, we have found the good tag */

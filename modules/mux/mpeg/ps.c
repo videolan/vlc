@@ -2,7 +2,7 @@
  * ps.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.2 2002/12/15 23:39:41 fenrir Exp $
+ * $Id: ps.c,v 1.3 2002/12/18 14:17:11 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -160,7 +160,7 @@ static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
     sout_mux_t          *p_mux = (sout_mux_t*)p_sout->p_mux_data;
     ps_stream_t         *p_stream;
 
-    msg_Dbg( p_sout, "adding input", p_sout );
+    msg_Dbg( p_sout, "adding input" );
     p_input->p_mux_data = (void*)p_stream = malloc( sizeof( ps_stream_t ) );
     p_stream->i_ok = 0;
     switch( p_input->input_format.i_cat )
@@ -188,7 +188,7 @@ static int AddStream( sout_instance_t *p_sout, sout_input_t *p_input )
     }
 
     p_stream->i_ok = 1;
-    msg_Dbg( p_sout, "adding input stream_id:0x%x [OK]", p_stream->i_stream_id, p_sout );
+    msg_Dbg( p_sout, "adding input stream_id:0x%x [OK]", p_stream->i_stream_id );
     return( 0 );
 }
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.219 2002/12/12 15:23:43 gbazin Exp $
+ * $Id: input.c,v 1.220 2002/12/18 14:17:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -541,10 +541,10 @@ static void EndThread( input_thread_t * p_input )
     struct tms  cpu_usage;
     times( &cpu_usage );
 
-    msg_Dbg( p_input, "%d loops consuming user: %d, system: %d",
+    msg_Dbg( p_input, "%ld loops consuming user: %ld, system: %ld",
              p_input->c_loops, cpu_usage.tms_utime, cpu_usage.tms_stime );
 #else
-    msg_Dbg( p_input, "%d loops", p_input->c_loops );
+    msg_Dbg( p_input, "%ld loops", p_input->c_loops );
 #endif
 
     /* Free info structures */
