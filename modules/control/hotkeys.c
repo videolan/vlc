@@ -414,7 +414,7 @@ static void Run( intf_thread_t *p_intf )
                 vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-faster", val );
             }
-            else if( i_action == ACTIONID_FASTER )
+            else if( i_action == ACTIONID_SLOWER )
             {
                 vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-slower", val );
