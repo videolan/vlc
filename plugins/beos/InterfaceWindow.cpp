@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.11 2001/12/30 07:09:54 sam Exp $
+ * $Id: InterfaceWindow.cpp,v 1.12 2002/02/08 15:57:29 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -153,9 +153,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     BAlert *alert;
 
     Activate();
-    if (p_intf->p_input)
+    if (p_input_bank->pp_input[0])
     {
-	    playback_status = p_intf->p_input->stream.control.i_status;
+	    playback_status = p_input_bank->pp_input[0]->stream.control.i_status;
 	}
 	else
 	{
@@ -197,9 +197,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                       "dvd:%s", psz_device );
             psz_source[ strlen(psz_source) ] = '\0';
             intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)psz_source );
-            if( p_intf->p_input != NULL )
+            if( p_input_bank->pp_input[0] != NULL )
             {
-                p_intf->p_input->b_eof = 1;
+                p_input_bank->pp_input[0]->b_eof = 1;
             }
             intf_PlaylistJumpto( p_main->p_playlist, 
                                  p_main->p_playlist->i_size - 1 );
@@ -208,7 +208,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case STOP_PLAYBACK:
         // this currently stops playback not nicely
-        if( p_intf->p_input != NULL )
+        if( p_input_bank->pp_input[0] != NULL )
         {
             // silence the sound, otherwise very horrible
             vlc_mutex_lock( &p_aout_bank->lock );
@@ -221,7 +221,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             snooze( 400000 );
 
             /* end playing item */
-            p_intf->p_input->b_eof = 1;
+            p_input_bank->pp_input[0]->b_eof = 1;
             
             /* update playlist */
             vlc_mutex_lock( &p_main->p_playlist->change_lock );
@@ -237,7 +237,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case PAUSE_PLAYBACK:
         /* toggle between pause and play */
-        if( p_intf->p_input != NULL )
+        if( p_input_bank->pp_input[0] != NULL )
         {
             /* pause if currently playing */
             if( playback_status == PLAYING_S )
@@ -254,7 +254,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 snooze( 400000 );
                 
                 /* pause the movie */
-                input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
+                input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
                 vlc_mutex_lock( &p_main->p_playlist->change_lock );
                 p_main->p_playlist->b_stopped = 0;
                 vlc_mutex_unlock( &p_main->p_playlist->change_lock );
@@ -274,7 +274,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 snooze( 400000 );
                 
                 /* Start playing */
-                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+                input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
                 p_main->p_playlist->b_stopped = 0;
             }
         }
@@ -301,7 +301,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case FASTER_PLAY:
         /* cycle the fast playback modes */
-        if( p_intf->p_input != NULL )
+        if( p_input_bank->pp_input[0] != NULL )
         {
             /* mute the sound */
             vlc_mutex_lock( &p_aout_bank->lock );
@@ -315,7 +315,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             snooze( 400000 );
 
             /* change the fast play mode */
-            input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
+            input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
             vlc_mutex_lock( &p_main->p_playlist->change_lock );
             p_main->p_playlist->b_stopped = 0;
             vlc_mutex_unlock( &p_main->p_playlist->change_lock );
@@ -324,7 +324,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case SLOWER_PLAY:
         /*  cycle the slow playback modes */
-        if (p_intf->p_input != NULL )
+        if (p_input_bank->pp_input[0] != NULL )
         {
             /* mute the sound */
             vlc_mutex_lock( &p_aout_bank->lock );
@@ -338,7 +338,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             snooze( 400000 );
 
             /* change the slower play */
-            input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
+            input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
             vlc_mutex_lock( &p_main->p_playlist->change_lock );
             p_main->p_playlist->b_stopped = 0;
             vlc_mutex_unlock( &p_main->p_playlist->change_lock );
@@ -392,12 +392,12 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             int32 i = p_message->FindInt32( "channel" );
             if ( i == -1 )
             {
-                input_ChangeES( p_intf->p_input, NULL, AUDIO_ES );
+                input_ChangeES( p_input_bank->pp_input[0], NULL, AUDIO_ES );
             }
             else
             {
-                input_ChangeES( p_intf->p_input,
-                        p_intf->p_input->stream.pp_es[i], AUDIO_ES );
+                input_ChangeES( p_input_bank->pp_input[0],
+                        p_input_bank->pp_input[0]->stream.pp_es[i], AUDIO_ES );
             }
         }
         break;
@@ -407,12 +407,12 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             int32 i = p_message->FindInt32( "subtitle" );
             if ( i == -1 )
             {
-                input_ChangeES( p_intf->p_input, NULL, SPU_ES);
+                input_ChangeES( p_input_bank->pp_input[0], NULL, SPU_ES);
             }
             else
             {
-                input_ChangeES( p_intf->p_input,
-                        p_intf->p_input->stream.pp_es[i], SPU_ES );
+                input_ChangeES( p_input_bank->pp_input[0],
+                        p_input_bank->pp_input[0]->stream.pp_es[i], SPU_ES );
             }
         }
         break;
@@ -421,14 +421,14 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             input_area_t *  p_area;
             int             i_id;
 
-            i_id = p_intf->p_input->stream.p_selected_area->i_id - 1;
+            i_id = p_input_bank->pp_input[0]->stream.p_selected_area->i_id - 1;
 
             /* Disallow area 0 since it is used for video_ts.vob */
             if( i_id > 0 )
             {
-                p_area = p_intf->p_input->stream.pp_areas[i_id];
-                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
-                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+                p_area = p_input_bank->pp_input[0]->stream.pp_areas[i_id];
+                input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+                input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
             }
             break;
         }
@@ -437,13 +437,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             input_area_t *  p_area;
             int             i_id;
 
-            i_id = p_intf->p_input->stream.p_selected_area->i_id + 1;
+            i_id = p_input_bank->pp_input[0]->stream.p_selected_area->i_id + 1;
 
-            if( i_id < p_intf->p_input->stream.i_area_nb )
+            if( i_id < p_input_bank->pp_input[0]->stream.i_area_nb )
             {
-                p_area = p_intf->p_input->stream.pp_areas[i_id];
-                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
-                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+                p_area = p_input_bank->pp_input[0]->stream.pp_areas[i_id];
+                input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+                input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
             }
         }
         break;
@@ -451,13 +451,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         {
             input_area_t *  p_area;
 
-            p_area = p_intf->p_input->stream.p_selected_area;
+            p_area = p_input_bank->pp_input[0]->stream.p_selected_area;
 
             if( p_area->i_part > 0 )
             {
                 p_area->i_part--;
-                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
-                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+                input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+                input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
             }
         }
         break;
@@ -465,13 +465,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         {
             input_area_t *  p_area;
 
-            p_area = p_intf->p_input->stream.p_selected_area;
+            p_area = p_input_bank->pp_input[0]->stream.p_selected_area;
 
             if( p_area->i_part > 0 )
             {
                 p_area->i_part++;
-                input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
-                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+                input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );
+                input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
             }
         }
         break;
@@ -484,9 +484,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 BPath path( &ref );
                 intf_PlaylistAdd( p_main->p_playlist,
                                   PLAYLIST_END, (char*)path.Path() );
-                if( p_intf->p_input != NULL )
+                if( p_input_bank->pp_input[0] != NULL )
                 {
-                    p_intf->p_input->b_eof = 1;
+                    p_input_bank->pp_input[0]->b_eof = 1;
                 }
                 intf_PlaylistJumpto( p_main->p_playlist, 
                                      p_main->p_playlist->i_size - 1 );
@@ -507,20 +507,20 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
  *****************************************************************************/
 void InterfaceWindow::updateInterface()
 {
-	if ( p_intf->p_input )
+	if ( p_input_bank->pp_input[0] )
 	{
         if ( acquire_sem(p_mediaControl->fScrubSem) == B_OK )
         {
             uint64 seekTo = (p_mediaControl->GetSeekTo() *
-                        p_intf->p_input->stream.p_selected_area->i_size) / 100;
-            input_Seek( p_intf->p_input, seekTo);
+                        p_input_bank->pp_input[0]->stream.p_selected_area->i_size) / 100;
+            input_Seek( p_input_bank->pp_input[0], seekTo);
         }
         else if( Lock() )
         {
-            p_mediaControl->SetStatus(p_intf->p_input->stream.control.i_status, 
-                                      p_intf->p_input->stream.control.i_rate);
-            p_mediaControl->SetProgress(p_intf->p_input->stream.p_selected_area->i_tell,
-                                        p_intf->p_input->stream.p_selected_area->i_size);
+            p_mediaControl->SetStatus(p_input_bank->pp_input[0]->stream.control.i_status, 
+                                      p_input_bank->pp_input[0]->stream.control.i_rate);
+            p_mediaControl->SetProgress(p_input_bank->pp_input[0]->stream.p_selected_area->i_tell,
+                                        p_input_bank->pp_input[0]->stream.p_selected_area->i_size);
             Unlock();
         }
     }
@@ -684,26 +684,26 @@ int LanguageMenu::GetChannels()
     AddItem(menu_item);
     menu_item->SetMarked(TRUE);
 
-    if( p_intf->p_input == NULL )
+    if( p_input_bank->pp_input[0] == NULL )
     {
         return 1;
     }
 
 
-    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
-    for( i = 0; i < p_intf->p_input->stream.i_selected_es_number; i++ )
+    vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+    for( i = 0; i < p_input_bank->pp_input[0]->stream.i_selected_es_number; i++ )
     {
-        if( kind == p_intf->p_input->stream.pp_selected_es[i]->i_cat )
+        if( kind == p_input_bank->pp_input[0]->stream.pp_selected_es[i]->i_cat )
         {
-            p_es = p_intf->p_input->stream.pp_selected_es[i];
+            p_es = p_input_bank->pp_input[0]->stream.pp_selected_es[i];
         }
     }
 
-    for( i = 0; i < p_intf->p_input->stream.i_es_number; i++ )
+    for( i = 0; i < p_input_bank->pp_input[0]->stream.i_es_number; i++ )
     {
-        if( kind == p_intf->p_input->stream.pp_es[i]->i_cat )
+        if( kind == p_input_bank->pp_input[0]->stream.pp_es[i]->i_cat )
         {
-            psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;
+            psz_name = p_input_bank->pp_input[0]->stream.pp_es[i]->psz_desc;
             if( kind == AUDIO_ES ) //audio
             {
                 msg = new BMessage(SELECT_CHANNEL);
@@ -717,11 +717,11 @@ int LanguageMenu::GetChannels()
             BMenuItem *menu_item;
             menu_item = new BMenuItem(psz_name, msg);
             AddItem(menu_item);
-            b_active = (p_es == p_intf->p_input->stream.pp_es[i]);
+            b_active = (p_es == p_input_bank->pp_input[0]->stream.pp_es[i]);
             menu_item->SetMarked(b_active);
         }
     }
-    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+    vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
 
 }
 

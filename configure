@@ -6654,7 +6654,7 @@ fi
 
 if test x$SYS = xbeos
 then
-    BUILTINS="${BUILTINS} beos"
+    PLUGINS="${PLUGINS} beos"
 
 else
 

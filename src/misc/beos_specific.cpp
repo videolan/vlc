@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.16 2002/01/26 01:18:27 tcastley Exp $
+ * $Id: beos_specific.cpp,v 1.17 2002/02/08 15:57:29 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -31,10 +31,6 @@
 extern "C"
 {
 #include <videolan/vlc.h>
-
-#include "intf_msg.h"
-/*#include "threads.h"*/
-#include "mtime.h"
 }
 
 /*****************************************************************************

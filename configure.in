@@ -976,7 +976,7 @@ AC_ARG_WITH(mad,
 dnl special case for BeOS
 if test x$SYS = xbeos
 then
-    BUILTINS="${BUILTINS} beos"
+    PLUGINS="${PLUGINS} beos"
 
 dnl default case
 else

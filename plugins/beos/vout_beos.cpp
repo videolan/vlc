@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.38 2002/01/19 19:54:01 gbazin Exp $
+ * $Id: vout_beos.cpp,v 1.39 2002/02/08 15:57:29 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,6 +63,10 @@ typedef struct vout_sys_s
 
     s32 i_width;
     s32 i_height;
+
+    u8 *pp_buffer[2];
+    int i_index;
+
 } vout_sys_t;
 
 
@@ -109,15 +113,15 @@ int32 Draw(void *data)
          (disp_mode.timing.v_total)); 
     if (!(refresh == oldrefresh)) 
     { 
-        printf("\nNew refreshrate is %d:Hz\n",refresh); 
+        intf_WarnMsg( 1, "vout info: new refreshrate is %ld:Hz", refresh ); 
         oldrefresh = refresh; 
-        if (refresh  < 61) 
+        if (refresh < 61 ) 
         { 
-            printf("Enabling retrace sync.\n"); 
+            intf_WarnMsg( 1, "vout info: enabling retrace sync" ); 
         } 
         else 
         { 
-            printf("Disabling retrace sync.\n"); 
+            intf_WarnMsg( 1, "vout info: disabling retrace sync" ); 
         } 
     } 
 
@@ -291,14 +295,10 @@ VideoWindow::VideoWindow( int width, int height,
     view = new VLCView( voutWindow->Bounds() );
     voutWindow->AddChild(view);
     
-    /* Bitmap mode overlay not available */
-#if BITS_PER_PLANE == 32
+    /* Bitmap mode overlay not available, set the system to 32bits
+     * and let BeOS do all the work */
     bitmap[0] = new BBitmap( voutWindow->Bounds(), B_RGB32);
     bitmap[1] = new BBitmap( voutWindow->Bounds(), B_RGB32);
-#else
-    bitmap[0] = new BBitmap( voutWindow->Bounds(), B_RGB32);
-    bitmap[1] = new BBitmap( voutWindow->Bounds(), B_RGB32);
-#endif
     memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
     memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
 
@@ -355,11 +355,7 @@ void VideoWindow::drawBuffer(int bufferIndex)
  *****************************************************************************/
 VLCView::VLCView(BRect bounds) : BView(bounds, "", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-#if BITS_PER_PLANE == 32
     SetViewColor(B_TRANSPARENT_32_BIT);
-#else
-    SetViewColor(B_TRANSPARENT_16_BIT);
-#endif
 }
 
 /*****************************************************************************
@@ -468,14 +464,57 @@ int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Init( vout_thread_t *p_vout )
 {
-    VideoWindow * p_win = p_vout->p_sys->p_window;
+    VideoWindow *p_win = p_vout->p_sys->p_window;
 
-    if((p_win->bitmap[0] != NULL) && (p_win->bitmap[1] != NULL))
+    int i_index;
+    picture_t *p_pic;
+
+    I_OUTPUTPICTURES = 0;
+
+    p_vout->output.i_width  = p_vout->p_sys->i_width;
+    p_vout->output.i_height = p_vout->p_sys->i_height;
+    p_vout->output.i_aspect = p_vout->p_sys->i_width
+                               * VOUT_ASPECT_FACTOR
+                               / p_vout->p_sys->i_height;
+    p_vout->output.i_chroma = FOURCC_RV32;
+
+    p_pic = NULL;
+
+    /* Find an empty picture slot */
+    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
     {
-        p_vout->pf_setbuffers( p_vout,
-               (byte_t *)p_win->bitmap[0]->Bits(),
-               (byte_t *)p_win->bitmap[1]->Bits());
+        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+        {
+            p_pic = p_vout->p_picture + i_index;
+            break;
+        }
     }
+
+    if( p_pic == NULL )
+    {
+        return 0;
+    }
+
+    p_vout->p_sys->i_index = 0;
+    p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[0];
+    p_pic->p->i_pixel_bytes = 4;
+    p_pic->p->i_lines = p_vout->p_sys->i_height;
+    p_pic->p->b_margin = 0;
+    p_pic->p->i_pitch = 4 * p_vout->p_sys->i_width;
+
+    p_pic->p->i_red_mask   = 0x00ff0000;
+    p_pic->p->i_green_mask = 0x0000ff00;
+    p_pic->p->i_blue_mask  = 0x000000ff;
+
+    p_pic->i_planes = 1;
+
+    p_pic->i_status = DESTROYED_PICTURE;
+    p_pic->i_type   = DIRECT_PICTURE;
+
+    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+    I_OUTPUTPICTURES++;
+
     return( 0 );
 }
 
@@ -508,8 +547,8 @@ int vout_Manage( vout_thread_t *p_vout )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
     
-    p_win->resizeIfRequired(p_vout->p_buffer[p_vout->i_buffer_index].i_pic_width,
-                            p_vout->p_buffer[p_vout->i_buffer_index].i_pic_height);
+//    p_win->resizeIfRequired(p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index].i_pic_width,
+//                            p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index].i_pic_height);
                             
     return( 0 );
 }
@@ -530,15 +569,16 @@ void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-
     VideoWindow * p_win = p_vout->p_sys->p_window;
+
     /* draw buffer if required */    
     if (!p_win->teardownwindow)
     {
-       p_win->drawBuffer(p_vout->i_buffer_index);
+       p_win->drawBuffer(p_vout->p_sys->i_index);
     }
     /* change buffer */
-    p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
+    p_vout->p_sys->i_index = ++p_vout->p_sys->i_index & 1;
+    p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index];
 }
 
 /* following functions are local */
@@ -548,32 +588,22 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
-    
-    VideoWindow * p_win = new VideoWindow( p_vout->i_width - 1, 
-                                           p_vout->i_height - 1, 
-                                           p_vout );
+    p_vout->p_sys->p_window = new VideoWindow(
+            main_GetIntVariable( VOUT_WIDTH_VAR, VOUT_WIDTH_DEFAULT ) + 1,
+            main_GetIntVariable( VOUT_HEIGHT_VAR, VOUT_HEIGHT_DEFAULT ) + 1,
+            p_vout );
 
-    if( p_win == 0 )
+    if( p_vout->p_sys->p_window == NULL )
     {
-        free( p_vout->p_sys );
         intf_ErrMsg( "error: cannot allocate memory for VideoWindow" );
         return( 1 );
     }   
     
-    p_vout->p_sys->p_window = p_win;
-    /* set the system to 32bits always
-       let BeOS do all the work */
-    p_vout->p_sys->i_width    = p_win->i_width + 1;
-    p_vout->p_sys->i_height   = p_win->i_height + 1;
-#if 0
-    p_vout->i_screen_depth    = BITS_PER_PLANE;
-    p_vout->i_bytes_per_pixel = BYTES_PER_PIXEL;
-    p_vout->i_bytes_per_line  = p_vout->p_sys->i_width * BYTES_PER_PIXEL;
+    p_vout->p_sys->i_width    = p_vout->p_sys->p_window->i_width + 1;
+    p_vout->p_sys->i_height   = p_vout->p_sys->p_window->i_height + 1;
 
-    p_vout->i_red_mask =        0xff0000;
-    p_vout->i_green_mask =      0x00ff00;
-    p_vout->i_blue_mask =       0x0000ff;
-#endif
+    p_vout->p_sys->pp_buffer[0] = (u8*)p_vout->p_sys->p_window->bitmap[0]->Bits();
+    p_vout->p_sys->pp_buffer[1] = (u8*)p_vout->p_sys->p_window->bitmap[1]->Bits();
 
     return( 0 );
 }

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.41 2002/01/07 02:12:29 sam Exp $
+ * $Id: video.h,v 1.42 2002/02/08 15:57:29 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -143,6 +143,7 @@ typedef struct picture_heap_s
 #define FOURCC_BI_BITFIELDS  0x00000003            /* RGB, for 16, 24, 32bpp */
 #define FOURCC_RV15          0x35315652    /* RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
 #define FOURCC_RV16          0x36315652    /* RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */
+#define FOURCC_RV32          0x32335652 /* RGB 32bpp, 0xff, 0xff00, 0xff0000 */
 
 /* Planar YUV formats */
 #define FOURCC_I420          0x30323449               /* Planar 4:2:0, Y:U:V */
