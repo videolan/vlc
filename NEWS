@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.41 2003/05/17 23:57:35 gbazin Exp $
+$Id: NEWS,v 1.42 2003/05/18 18:56:57 hartman Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -18,8 +18,9 @@ Input demux:
  * More complete .mp4/.mov support
 
 Codecs:
- * VLC's own MPEG1/2 decoder has been replace with libmpeg2
+ * VLC's own MPEG1/2 decoder has been replaced with libmpeg2
  * Support for Sorenson 3 (SVQ3 or Quicktime content) via ffmpeg
+   NOTE: QDM2 sound, often used in QT content, is not yet supported
  * Fixed a bug which was causing artefacts in DivX video (ffmpeg)
  * If ffmpeg cannot keep up, skip and try to recover instead of stopping altogether
 
@@ -35,6 +36,7 @@ Miscellaneous:
  * New reset option for the preferences
  * You can set your language in the prefences
  * New video chroma conversion module using ffmpeg
+ * Added a Gentoo ebuild file to the distribution
 
 UNIX ports:
  *
@@ -42,7 +44,6 @@ UNIX ports:
 Mac OS X port:
  * When you add several items to the playlist, they are sorted alphabetically.
  * New about panel
- * Subtitles are less permanent now.
  * Fixed the deinterlace menu.
  * Transparency option for video out.
  * Float on top option for video out.
