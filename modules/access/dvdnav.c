@@ -823,7 +823,6 @@ static void ButtonUpdate( demux_t *p_demux )
             dvdnav_get_highlight_area( pci, i_button, 1, &hl );
 
             /* I fear it is plain wrong */
-            //val.p_address = (void *)&hl.palette;
             p_sys->alpha[0] = hl.palette&0x0f;
             p_sys->alpha[1] = (hl.palette>>4)&0x0f;
             p_sys->alpha[2] = (hl.palette>>8)&0x0f;
@@ -993,7 +992,7 @@ static void ESNew( demux_t *p_demux, int i_id )
 
     if( tk->b_seen ) return;
 
-    if( ps_track_fill( tk, i_id ) )
+    if( ps_track_fill( tk, 0, i_id ) )
     {
         msg_Warn( p_demux, "unknown codec for id=0x%x", i_id );
         return;

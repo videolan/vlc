@@ -22,7 +22,11 @@
  *****************************************************************************/
 
 #define PS_TK_COUNT (512 - 0xc0)
-#define PS_ID_TO_TK( id ) ((id) <= 0xff ? (id) - 0xc0 : ((id)&0xff) + (256 - 0xc0))
+#define PS_ID_TO_TK( id ) ((id) <= 0xff ? (id) - 0xc0 : \
+                                          ((id)&0xff) + (256 - 0xc0))
+
+typedef struct ps_psm_t ps_psm_t;
+static inline int ps_id_to_type( ps_psm_t *, int );
 
 typedef struct
 {
@@ -30,6 +34,7 @@ typedef struct
     int         i_skip;
     es_out_id_t *es;
     es_format_t fmt;
+
 } ps_track_t;
 
 /* Init a set of track */
@@ -46,7 +51,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
 }
 
 /* From id fill i_skip and es_format_t */
-static inline int ps_track_fill( ps_track_t *tk, int i_id )
+static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
 {
     tk->i_skip = 0;
     if( ( i_id&0xff00 ) == 0xbd00 )
@@ -87,19 +92,32 @@ static inline int ps_track_fill( ps_track_t *tk, int i_id )
     }
     else
     {
-        if( ( i_id&0xf0 ) == 0xe0 )
+        int i_type = ps_id_to_type( p_psm , i_id );
+
+        es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
+
+        if( (i_id&0xf0) == 0xe0 && i_type == 0x10 )
+        {
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('m','p','4','v') );
+        }
+        else if( (i_id&0xf0) == 0xe0 && i_type == 0x02 )
         {
             es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('m','p','g','v') );
         }
-        else if( ( i_id&0xe0 ) == 0xc0 )
+        else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x03 )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
         }
-        else
+
+        if( tk->fmt.i_cat == UNKNOWN_ES && ( i_id&0xf0 ) == 0xe0 )
         {
-            es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
-            return VLC_EGENERIC;
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('m','p','g','v') );
         }
+        else if( tk->fmt.i_cat == UNKNOWN_ES && ( i_id&0xe0 ) == 0xc0 )
+        {
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
+        }
+        else return VLC_EGENERIC;
     }
 
     /* PES packets usually contain truncated frames */
@@ -183,7 +201,7 @@ static inline int ps_pkt_parse_pack( block_t *p_pkt, int64_t *pi_scr,
 }
 
 /* Parse a SYSTEM PES */
-static inline int ps_pkt_parse_system( block_t *p_pkt,
+static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
                                        ps_track_t tk[PS_TK_COUNT] )
 {
     uint8_t *p = &p_pkt->p_buffer[6 + 3 + 1 + 1 + 1];
@@ -204,7 +222,7 @@ static inline int ps_pkt_parse_system( block_t *p_pkt,
 
             if( !tk[i_tk].b_seen )
             {
-                if( !ps_track_fill( &tk[i_tk], i_id ) )
+                if( !ps_track_fill( &tk[i_tk], p_psm, i_id ) )
                 {
                     tk[i_tk].b_seen = VLC_TRUE;
                 }
@@ -317,6 +335,115 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
 
     p_pes->i_dts = 100 * p_pes->i_dts / 9;
     p_pes->i_pts = 100 * p_pes->i_pts / 9;
+
+    return VLC_SUCCESS;
+}
+
+/* Program stream map handling */
+typedef struct p_es_t
+{
+    int i_type;
+    int i_id;
+
+    int i_descriptor;
+    uint8_t *p_descriptor;
+
+    struct ps_es_t *p_next;
+
+} ps_es_t;
+
+struct ps_psm_t
+{
+    int i_version;
+
+    int     i_es;
+    ps_es_t **es;
+};
+
+static inline int ps_id_to_type( ps_psm_t *p_psm, int i_id )
+{
+    int i;
+    for( i = 0; p_psm && i < p_psm->i_es; i++ )
+    {
+        if( p_psm->es[i]->i_id == i_id ) return p_psm->es[i]->i_type;     
+    }
+    return 0;
+}
+
+static inline void ps_psm_init( ps_psm_t *p_psm )
+{
+    p_psm->i_version = 0xFFFF;
+    p_psm->i_es = 0;
+    p_psm->es = 0;
+}
+
+static inline void ps_psm_destroy( ps_psm_t *p_psm )
+{
+    while( p_psm->i_es-- )
+    {
+        if( p_psm->es[p_psm->i_es]->i_descriptor )
+            free( p_psm->es[p_psm->i_es]->p_descriptor );
+        free( p_psm->es[p_psm->i_es] );
+    }
+    if( p_psm->es ) free( p_psm->es );
+
+    p_psm->es = 0;
+    p_psm->i_es = 0;
+}
+
+static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt )
+{
+    int i_buffer = p_pkt->i_buffer;
+    uint8_t *p_buffer = p_pkt->p_buffer;
+    int i_length, i_version, i_info_length, i_esm_length, i_es_base;
+
+    if( !p_psm || p_buffer[3] != 0xbc ) return VLC_EGENERIC;
+
+    i_length = (uint16_t)(p_buffer[4] << 8) + p_buffer[5];
+    if( i_length > i_buffer ) return VLC_EGENERIC;
+
+    //i_current_next_indicator = (p_buffer[6] && 0x01);
+    i_version = (p_buffer[6] && 0xf8);
+
+    if( p_psm->i_version == i_version ) return VLC_EGENERIC;
+
+    ps_psm_destroy( p_psm );
+
+    i_info_length = (uint16_t)(p_buffer[8] << 8) + p_buffer[9];
+    if( i_info_length + 10 > i_length ) return VLC_EGENERIC;
+
+    /* Elementary stream map */
+    i_esm_length = (uint16_t)(p_buffer[ 10 + i_info_length ] << 8) +
+        p_buffer[ 11 + i_info_length];
+    i_es_base = 12 + i_info_length;
+
+    while( i_es_base + 4 < i_length )
+    {
+        ps_es_t es;
+
+        es.i_type = p_buffer[ i_es_base  ];
+        es.i_id = p_buffer[ i_es_base + 1 ];
+        i_info_length = (uint16_t)(p_buffer[ i_es_base + 2 ] << 8) +
+            p_buffer[ i_es_base + 3 ];
+
+        if( i_es_base + 4 + i_info_length > i_length ) break;
+
+        es.p_descriptor = 0;
+        es.i_descriptor = i_info_length;
+        if( i_info_length > 0 )
+        {
+            es.p_descriptor = malloc( i_info_length );
+            memcpy( es.p_descriptor, p_buffer + i_es_base + 4, i_info_length);
+        }
+
+        p_psm->es = realloc( &p_psm->es, sizeof(ps_es_t) * (p_psm->i_es+1) );
+        *p_psm->es[p_psm->i_es++] = es;
+        i_es_base += 4 + i_info_length; 
+    }
+
+    /* TODO: CRC */
+
+    p_psm->i_version = i_version;
 
     return VLC_SUCCESS;
 }

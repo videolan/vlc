@@ -55,6 +55,7 @@ vlc_module_end();
 
 struct demux_sys_t
 {
+    ps_psm_t    psm;
     ps_track_t  tk[PS_TK_COUNT];
 
     int64_t     i_scr;
@@ -99,6 +100,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mux_rate = 0;
     p_sys->i_scr      = -1;
 
+    ps_psm_init( &p_sys->psm );
     ps_track_init( p_sys->tk );
 
     /* TODO prescanning of ES */
@@ -124,6 +126,8 @@ static void Close( vlc_object_t *p_this )
             if( tk->es ) es_out_Del( p_demux->out, tk->es );
         }
     }
+
+    ps_psm_destroy( &p_sys->psm );
 
     free( p_sys );
 }
@@ -170,7 +174,7 @@ static int Demux( demux_t *p_demux )
         break;
 
     case 0x1bb:
-        if( !ps_pkt_parse_system( p_pkt, p_sys->tk ) )
+        if( !ps_pkt_parse_system( p_pkt, &p_sys->psm, p_sys->tk ) )
         {
             int i;
             for( i = 0; i < PS_TK_COUNT; i++ )
@@ -187,7 +191,8 @@ static int Demux( demux_t *p_demux )
         break;
 
     case 0x1bc:
-        /* TODO PSM */
+        msg_Dbg( p_demux, "received PSM");
+        ps_psm_fill( &p_sys->psm, p_pkt );
         block_Release( p_pkt );
         break;
 
@@ -198,7 +203,7 @@ static int Demux( demux_t *p_demux )
 
             if( !tk->b_seen )
             {
-                if( !ps_track_fill( tk, i_id ) )
+                if( !ps_track_fill( tk, &p_sys->psm, i_id ) )
                 {
                     tk->es = es_out_Add( p_demux->out, &tk->fmt );
                 }

@@ -619,7 +619,7 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
 
     if( tk->b_seen ) return;
 
-    if( ps_track_fill( tk, i_id ) )
+    if( ps_track_fill( tk, 0, i_id ) )
     {
         msg_Warn( p_demux, "unknown codec for id=0x%x", i_id );
         return;
