@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.22 2001/07/10 06:07:53 gbazin Exp $
+ * $Id: vout_xvideo.c,v 1.23 2001/07/30 18:56:36 gbazin Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -204,12 +204,42 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
+    Display *p_display;                                   /* display pointer */
+    char    *psz_display;
+
+    /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
+    psz_display = XDisplayName( main_GetPszVariable(VOUT_DISPLAY_VAR, NULL) );
+    p_display = XOpenDisplay( psz_display );
+    if( p_display == NULL )                                         /* error */
+    {
+        intf_WarnMsg( 3, "vout: Xvideo cannot open display %s", psz_display );
+        intf_WarnMsg( 3, "vout: Xvideo not supported" );
+        return( 0 );
+    }
+    
+    if( !XVideoCheckForXv( p_display ) )
+    {
+        intf_WarnMsg( 3, "vout: Xvideo not supported" );
+        XCloseDisplay( p_display );
+        return( 0 );
+    }
+
+    if( XVideoGetPort( p_display ) < 0 )
+    {
+        intf_WarnMsg( 3, "vout: Xvideo not supported" );
+        XCloseDisplay( p_display );
+        return( 0 );
+    }
+
+    /* Clean-up everyting */
+    XCloseDisplay( p_display );
+
     if( TestMethod( VOUT_METHOD_VAR, "xvideo" ) )
     {
         return( 999 );
     }
 
-    return( 60 );
+    return( 150 );
 }
 
 /*****************************************************************************
@@ -266,6 +296,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( (p_vout->p_sys->xv_port = XVideoGetPort( p_vout->p_sys->p_display ))<0 )
     {
+        intf_ErrMsg( "vout error: cannot get XVideo port" );
         XVideoDestroyWindow( p_vout );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
@@ -696,15 +727,15 @@ static int XVideoCheckForXv( Display *dpy )
             return( 1 );
 
         case XvBadExtension:
-            intf_ErrMsg( "vout error: XvBadExtension" );
+            intf_WarnMsg( 3, "vout error: XvBadExtension" );
             return( 0 );
 
         case XvBadAlloc:
-            intf_ErrMsg( "vout error: XvBadAlloc" );
+            intf_WarnMsg( 3, "vout error: XvBadAlloc" );
             return( 0 );
 
         default:
-            intf_ErrMsg( "vout error: XvQueryExtension failed" );
+            intf_WarnMsg( 3, "vout error: XvQueryExtension failed" );
             return( 0 );
     }
 }
@@ -1136,15 +1167,15 @@ static int XVideoGetPort( Display *dpy )
             break;
 
         case XvBadExtension:
-            intf_ErrMsg( "vout error: XvBadExtension for XvQueryAdaptors" );
+            intf_WarnMsg( 3, "vout error: XvBadExtension for XvQueryAdaptors" );
             return( -1 );
 
         case XvBadAlloc:
-            intf_ErrMsg( "vout error: XvBadAlloc for XvQueryAdaptors" );
+            intf_WarnMsg( 3, "vout error: XvBadAlloc for XvQueryAdaptors" );
             return( -1 );
 
         default:
-            intf_ErrMsg( "vout error: XvQueryAdaptors failed" );
+            intf_WarnMsg( 3, "vout error: XvQueryAdaptors failed" );
             return( -1 );
     }
 
@@ -1190,7 +1221,7 @@ static int XVideoGetPort( Display *dpy )
 
     if( xv_port == -1 )
     {
-        intf_ErrMsg( "vout error: no suitable Xvideo image input port" );
+        intf_WarnMsg( 3, "vout: no suitable Xvideo image input port" );
     }
 
     return( xv_port );

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.82 2001/07/30 00:53:05 sam Exp $
+ * $Id: input_dvd.c,v 1.83 2001/07/30 18:56:35 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -389,6 +389,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     if( p_area != p_input->stream.p_selected_area )
     {
+        /* Reset the Chapter position of the old title */
+        p_input->stream.p_selected_area->i_part = 0;
 
         /*
          *  We have to load all title information
@@ -486,11 +488,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_input->stream.p_selected_area->i_angle_nb = p_dvd->i_angle_nb;
         p_input->stream.p_selected_area->i_angle = p_dvd->i_angle;
 
+#if 0
         /* start at the beginning of the title */
         /* FIXME: create a conf option to select whether to restart
          * title or not */
         p_input->stream.p_selected_area->i_tell = 0;
         p_input->stream.p_selected_area->i_part = 1;
+#endif
 
         /*
          * Destroy obsolete ES by reinitializing program 0
