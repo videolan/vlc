@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.10 2003/12/20 15:25:32 rocky Exp $
+ * $Id$
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,10 +61,10 @@ vcdplayer_update_entry( input_thread_t * p_input, uint16_t ofs,
   if ( ofs == VCDINFO_INVALID_OFFSET ) {
     *entry = VCDINFO_INVALID_ENTRY;
   } else {
-    vcdinfo_offset_t *off_t = vcdinfo_get_offset_t(p_vcd->vcd, ofs);
-    if (off_t != NULL) {
-      *entry = off_t->lid;
-      dbg_print(INPUT_DBG_PBC, "%s: LID %d\n", label, off_t->lid);
+    vcdinfo_offset_t *off = vcdinfo_get_offset_t(p_vcd->vcd, ofs);
+    if (off != NULL) {
+      *entry = off->lid;
+      dbg_print(INPUT_DBG_PBC, "%s: LID %d\n", label, off->lid);
     } else
       *entry = VCDINFO_INVALID_ENTRY;
   }
