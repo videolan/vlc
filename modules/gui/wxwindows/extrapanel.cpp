@@ -2,7 +2,7 @@
  * extrapanel.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2003 VideoLAN
- * $Id: interface.cpp 8152 2004-07-08 10:52:23Z gbazin $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -43,15 +43,13 @@
                 "together when you move one. The higher the value is, the " \
                 "more correlated their movement will be." )
 
-static int IntfBandsCallback( vlc_object_t *p_this, char const *psz_cmd,
-                          vlc_value_t oldval, vlc_value_t newval, void *param );
-static int IntfPreampCallback( vlc_object_t *p_this, char const *psz_cmd,
-                          vlc_value_t oldval, vlc_value_t newval, void *param );
-static void ChangeFiltersString( intf_thread_t *p_intf,
-                                 aout_instance_t * p_aout,
-                                 char *psz_name, vlc_bool_t b_add );
-static void ChangeVFiltersString( intf_thread_t *p_intf,
-                                 char *psz_name, vlc_bool_t b_add );
+static int IntfBandsCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+static int IntfPreampCallback( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
+static void ChangeFiltersString( intf_thread_t *, aout_instance_t *,
+                                 char *, vlc_bool_t );
+static void ChangeVFiltersString( intf_thread_t *, char *, vlc_bool_t );
 
 
 /* IDs for the controls and the menu commands */
@@ -149,13 +147,13 @@ struct filter {
 
 static const struct filter vfilters[] =
 {
-    { "clone", "Image clone","Creates several clones of the image" },
+    { "clone", "Image clone", "Creates several clones of the image" },
     { "distort", "Distortion", "Adds distorsion effects" },
     { "invert", "Image inversion" , "Inverts the image colors" },
-    { "crop","Image cropping", "Crops the image" },
+    { "crop", "Image cropping", "Crops the image" },
     { "motionblur", "Blurring", "Creates a motion blurring on the image" },
-    { "transform","Transformation","Rotates or flips the image" },
-    {NULL , NULL , NULL } /* Do not remove this line */
+    { "transform", "Transformation", "Rotates or flips the image" },
+    { NULL, NULL, NULL } /* Do not remove this line */
 };
 
 /*****************************************************************************
@@ -188,7 +186,6 @@ ExtraPanel::ExtraPanel( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 ExtraPanel::~ExtraPanel()
 {
 }
-
 
 /* Video Panel constructor */
 wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
@@ -244,22 +241,22 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     gamma_slider = new wxSlider ( panel, Gamma_Event, 0, 0,
                            100, wxDefaultPosition, wxDefaultSize );
 
-    adjust_gridsizer->Add(adjust_check, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(restoredefaults_button, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(hue_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(hue_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(contrast_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(contrast_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(brightness_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(brightness_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(saturation_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(saturation_slider, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(gamma_text, 1, wxEXPAND, 0);
-    adjust_gridsizer->Add(gamma_slider, 1, wxEXPAND, 0);
+    adjust_gridsizer->Add( adjust_check, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( restoredefaults_button, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( hue_text, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( hue_slider, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( contrast_text, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( contrast_slider, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( brightness_text, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( brightness_slider, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( saturation_text, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( saturation_slider, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( gamma_text, 1, wxEXPAND|wxALL, 2 );
+    adjust_gridsizer->Add( gamma_slider, 1, wxEXPAND|wxALL, 2 );
 
-    adjust_sizer->Add(adjust_gridsizer,1,wxEXPAND, 0);
+    adjust_sizer->Add( adjust_gridsizer, 1, wxEXPAND|wxALL, 2);
 
-    panel_sizer->Add( adjust_sizer , 1 );
+    panel_sizer->Add( adjust_sizer , 1, wxTOP, 2 );
 
 #if 0
     /* Create sizer to surround the other controls */
@@ -287,13 +284,14 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
                                   WXSIZEOF(ratio_array), ratio_array,
                                   0 );
 
-    ratio_sizer->Add( ratio_text, 0 );
-    ratio_sizer->Add( ratio_combo, 0 );
+    ratio_sizer->Add( ratio_text, 0, wxALL, 2 );
+    ratio_sizer->Add( ratio_combo, 0, wxALL, 2 );
     ratio_sizer->Layout();
 
-    video_sizer->Add( ratio_sizer  , 0 , wxALL , 0 );
+    video_sizer->Add( ratio_sizer  , 0 , wxALL , 2 );
     video_sizer->Layout();
 #endif
+
     wxStaticBox *filter_box =
                   new wxStaticBox( panel, -1, wxU(_("Video Filters")) );
     wxStaticBoxSizer *filter_sizer =
@@ -306,13 +304,13 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     {
         wxCheckBox *box = new wxCheckBox( panel, Filter0_Event + i,
                                           wxU( _( vfilters[i].psz_name ) ) );
-        t_col_sizer->Add( box );
+        t_col_sizer->Add( box, 0, wxALL, 4 );
         box->SetToolTip( wxU( _( vfilters[i].psz_help ) ) );
     }
 
     filter_sizer->Add( t_col_sizer );
     filter_sizer->Add( new wxButton( panel, FiltersInfo_Event,
-                            wxU(_("More info" ) ) ) );
+                            wxU(_("More info" ) ) ), 0, wxALL, 4 );
 #if 0
     other_sizer->Add( video_sizer, 0, wxALL | wxEXPAND , 0);
     other_sizer->Add( filter_sizer, 0, wxALL | wxEXPAND , 0);
@@ -320,7 +318,7 @@ wxPanel *ExtraPanel::VideoPanel( wxWindow *parent )
     panel_sizer->Add(other_sizer , 1 );
 #endif
 
-    panel_sizer->Add( filter_sizer, 1 );
+    panel_sizer->Add( filter_sizer, 1, wxTOP|wxLEFT, 2 );
 
     panel->SetSizerAndFit( panel_sizer );
 
@@ -404,12 +402,12 @@ wxPanel *ExtraPanel::AudioPanel( wxWindow *parent )
     wxSlider *normvol_slider = new wxSlider ( panel, NVSlider_Event, 20, 5,
                            100, wxDefaultPosition, wxSize( 100, -1 ) );
 
-    filter_sizer->Add( headphone_check );
-    filter_sizer->Add( normvol_check );
-    filter_sizer->Add( normvol_label, 0, wxLEFT, 10 );
-    filter_sizer->Add( normvol_slider, 0, wxLEFT, 10 );
+    filter_sizer->Add( headphone_check, 0, wxALL, 4 );
+    filter_sizer->Add( normvol_check, 0, wxALL, 4 );
+    filter_sizer->Add( normvol_label, 0, wxALL, 4 );
+    filter_sizer->Add( normvol_slider, 0, wxALL, 4 );
 
-    panel_sizer->Add( filter_sizer, 1 );
+    panel_sizer->Add( filter_sizer, 1, wxTOP, 2 );
     panel->SetSizerAndFit( panel_sizer );
     panel_sizer->Layout();
     panel_sizer->SetSizeHints( panel );
@@ -461,7 +459,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
                             wxU(_("Enable") ) );
     eq_chkbox->SetToolTip( wxU(_("Enable the equalizer. You can either "
     "manually change the bands or use a preset (Audio Menu->Equalizer)." ) ) );
-    top_sizer->Add( eq_chkbox );
+    top_sizer->Add( eq_chkbox, 0, wxALL, 2 );
 
     eq_2p_chkbox =  new wxCheckBox( panel, Eq2Pass_Event,
                             wxU(_("2 Pass") ) );
@@ -469,22 +467,23 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
     eq_2p_chkbox->SetToolTip( wxU(_("If you enable this settting, the "
      "equalizer filter will be applied twice. The effect will be sharper") ) );
 
-    top_sizer->Add( eq_2p_chkbox );
+    top_sizer->Add( eq_2p_chkbox, 0, wxALL, 2 );
 
-    top_sizer->Add( 0, 0, 1 );
+    top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
     top_sizer->Add( new wxButton( panel, EqRestore_Event,
-                                  wxU( _("Restore defaults") ) ) );
-    top_sizer->Add( 0, 0, 1 );
+                                  wxU( _("Restore defaults") ) ),
+		    0, wxALL, 2 );
+    top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
     wxStaticText *smooth_text = new wxStaticText( panel, -1, wxU( "Smooth :" ));
     smooth_text->SetToolTip( wxU( SMOOTH_TIP ) );
-    top_sizer->Add( smooth_text );
+    top_sizer->Add( smooth_text, 0, wxALL, 2 );
 
     smooth_slider =new wxSlider( panel, Smooth_Event, 0, 0, 10 ,
                     wxDefaultPosition, wxSize( 100, -1 ) );
     smooth_slider->SetToolTip( wxU( SMOOTH_TIP ) );
-    top_sizer->Add( smooth_slider );
+    top_sizer->Add( smooth_slider, 0, wxALL, 2 );
 
     /* Create flex grid */
     wxFlexGridSizer *eq_gridsizer =
@@ -494,9 +493,9 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
 
     preamp_slider = new wxSlider( panel, Preamp_Event, 200, 0, 400,
                     wxDefaultPosition, wxSize( -1 , 90 ) , wxSL_VERTICAL );
-    eq_gridsizer->Add( preamp_slider, 1, wxEXPAND, 0 );
+    eq_gridsizer->Add( preamp_slider, 1, wxEXPAND|wxALL, 2 );
 
-    eq_gridsizer->Add( 0,0,1 );
+    eq_gridsizer->Add( 0, 0, 1, wxALL, 2 );
 
     for( int i = 0 ; i < 10 ; i++ )
     {
@@ -504,29 +503,29 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
                     wxDefaultPosition, wxSize( -1 , 90 ) , wxSL_VERTICAL );
 
         i_values[i] = 200;
-        eq_gridsizer->Add( band_sliders[i], 1, wxEXPAND, 0 );
+        eq_gridsizer->Add( band_sliders[i], 1, wxEXPAND|wxALL, 2 );
     }
 
     preamp_text = new wxStaticText( panel, -1, wxT( "Preamp\n0.0dB" ) );
     wxFont font= preamp_text->GetFont();
     font.SetPointSize(7);
     preamp_text->SetFont( font );
-    eq_gridsizer->Add( preamp_text );
+    eq_gridsizer->Add( preamp_text, wxALL, 2 );
 
-    eq_gridsizer->Add( 0,0,1 );
+    eq_gridsizer->Add( 0, 0, 1 );
 
     for( int i = 0 ; i < 10 ; i++ )
     {
         band_texts[i] = new wxStaticText( panel, -1,
                                 band_frequencies[i] + wxU("\n0.0dB" ) ) ;
-        eq_gridsizer->Add( band_texts[i], 1, wxEXPAND, 0 );
+        eq_gridsizer->Add( band_texts[i], 1, wxEXPAND|wxALL, 2 );
         wxFont font= band_texts[i]->GetFont();
         font.SetPointSize(7);
         band_texts[i]->SetFont( font );
     }
 
-    panel_sizer->Add( top_sizer , 0 , wxTOP | wxEXPAND , 5 );
-    panel_sizer->Add( eq_gridsizer , 0 , wxEXPAND , 0 );
+    panel_sizer->Add( top_sizer , 0 , wxTOP | wxEXPAND, 5 );
+    panel_sizer->Add( eq_gridsizer , 0 , wxEXPAND, 0 );
 
     panel->SetSizer( panel_sizer );
 
