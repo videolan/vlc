@@ -78,7 +78,6 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		kde/kde \
 		lpcm_adec/lpcm_adec \
 		macosx/macosx \
-		macosx/macosx_qt \
 		mga/mga \
 		motion/motion \
 		motion/motionmmx \
@@ -454,8 +453,8 @@ ifneq (,$(findstring darwin,$(SYS)))
 	rm -Rf vlc.app
 	cd extras/MacOSX ; pbxbuild | grep -v '^ ' | grep -v '^\t'
 	cp -r extras/MacOSX/build/vlc.bundle ./vlc.app
-	$(INSTALL) -d vlc vlc.app/Contents/MacOS/share
-	$(INSTALL) -d vlc vlc.app/Contents/MacOS/plugins
+	$(INSTALL) -d vlc.app/Contents/MacOS/share
+	$(INSTALL) -d vlc.app/Contents/MacOS/plugins
 	$(INSTALL) vlc vlc.app/Contents/MacOS/
 ifneq (,$(PLUGINS))
 	$(INSTALL) $(PLUGINS:%=plugins/%.so) vlc.app/Contents/MacOS/plugins
