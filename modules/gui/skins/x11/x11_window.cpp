@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.9 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_window.cpp,v 1.10 2003/06/06 23:34:35 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -97,6 +97,8 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     SendMessage( ToolTipWindow, TTM_ADDTOOL, 0,
                     (LPARAM)(LPTOOLINFO) &ToolTipInfo );
 */
+
+
     if( DragDrop )
     {
         // register the listview as a drop target
@@ -105,14 +107,7 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     }
 
     // Create Tool Tip window
-/*    GdkWindowAttr attr;
-    attr.event_mask = GDK_ALL_EVENTS_MASK;
-    attr.width = 100;
-    attr.height = 100;
-    attr.window_type = GDK_WINDOW_CHILD;
-    attr.wclass = GDK_INPUT_OUTPUT;
-    gint mask = 0;
-    ToolTipWindow = gdk_window_new( gwnd, &attr, mask);*/
+    ToolTipWindow = XCreateSimpleWindow( display, wnd, 0, 0, 1, 1, 0, 0, 0 );
 }
 //---------------------------------------------------------------------------
 X11Window::~X11Window()
@@ -123,11 +118,11 @@ X11Window::~X11Window()
     if( hWnd != NULL )
     {
         DestroyWindow( hWnd );
-    }
+    }*/
     if( ToolTipWindow != NULL )
     {
-        DestroyWindow( ToolTipWindow );
-    }
+        XDestroyWindow( display, ToolTipWindow );
+    }/*
     if( DragDrop )
     {
         // Remove the listview from the list of drop targets
@@ -358,13 +353,13 @@ void X11Window::Size( int width, int height )
 //---------------------------------------------------------------------------
 void X11Window::ChangeToolTipText( string text )
 {
-/*    if( text == "none" )
+    if( text == "none" )
     {
         if( ToolTipText != "none" )
         {
             ToolTipText = "none";
-            ToolTipInfo.lpszText = NULL;
-            SendMessage( ToolTipWindow, TTM_ACTIVATE, 0 , 0 );
+//            ToolTipInfo.lpszText = NULL;
+ //           SendMessage( ToolTipWindow, TTM_ACTIVATE, 0 , 0 );
         }
     }
     else
@@ -372,13 +367,12 @@ void X11Window::ChangeToolTipText( string text )
         if( text != ToolTipText )
         {
             ToolTipText = text;
-            ToolTipInfo.lpszText = (char *)ToolTipText.c_str();
-            SendMessage( ToolTipWindow, TTM_ACTIVATE, 1 , 0 );
+  //          ToolTipInfo.lpszText = (char *)ToolTipText.c_str();
+  /*          SendMessage( ToolTipWindow, TTM_ACTIVATE, 1 , 0 );
             SendMessage( ToolTipWindow, TTM_UPDATETIPTEXT, 0,
-                             (LPARAM)(LPTOOLINFO)&ToolTipInfo );
+                             (LPARAM)(LPTOOLINFO)&ToolTipInfo );*/
         }
     }
-*/
 }
 //---------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.32 2003/06/04 16:03:33 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.33 2003/06/06 23:34:35 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -278,7 +278,7 @@ static void Run( intf_thread_t *p_intf )
 
     delete Loader;
 
-    msg_Err( p_intf, "Load theme time : %i ms", OSAPI_GetTime() - a );
+    msg_Dbg( p_intf, "Load theme time : %i ms", OSAPI_GetTime() - a );
 
     // Refresh the whole interface
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (int)true );

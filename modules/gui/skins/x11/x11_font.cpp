@@ -2,7 +2,7 @@
  * x11_font.cpp: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.cpp,v 1.6 2003/06/06 21:47:18 asmax Exp $
+ * $Id: x11_font.cpp,v 1.7 2003/06/06 23:34:35 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -55,7 +55,7 @@ X11Font::X11Font( intf_thread_t *_p_intf, string fontname, int size,
     size = ( size < 10 ? 8 : 12 );
     snprintf( name, 256, "-*-helvetica-bold-%c-*-*-*-%i-*-*-*-*-*-*", 
               slant, 10 * size );
-    msg_Warn( _p_intf, "loading font %s", name );
+    msg_Dbg( _p_intf, "loading font %s", name );
 
     XLOCK;
     font = XLoadFont( display, name );
