@@ -759,7 +759,6 @@ live.$(LIVEDOTCOM_VERSION).tar.gz:
 live: live.$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/live.patch
-	patch -p 0 < Patches/kasenna.patch
 
 .live: live
 	(cd $<; ./genmakefiles macosx && make )
