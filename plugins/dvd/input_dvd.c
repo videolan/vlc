@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.31 2001/03/07 10:31:10 stef Exp $
+ * $Id: input_dvd.c,v 1.32 2001/03/15 00:37:04 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -393,7 +393,7 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
             p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_esector,
             p_pgc->p_cell_play_inf[i_index].i_lsector );
 
-//intf_WarnMsg( 3, "cell: %d index: %d sector1: %x sector2: %x end1: %x end2: %x", i_cell, i_index, p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_ssector, p_pgc->p_cell_play_inf[i_index].i_entry_sector, p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_esector,p_pgc->p_cell_play_inf[i_index].i_lsector  );
+intf_WarnMsg( 3, "cell: %d index: %d sector1: %x sector2: %x end1: %x end2: %x", i_cell, i_index, p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_ssector, p_pgc->p_cell_play_inf[i_index].i_entry_sector, p_dvd->ifo.vts.c_adt.p_cell_inf[i_cell].i_esector,p_pgc->p_cell_play_inf[i_index].i_lsector  );
 
     return 0;
 }
@@ -464,7 +464,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
          *  We have to load all title information
          */
         /* Change the default area */
-        p_input->stream.p_selected_area = p_input->stream.pp_areas[p_area->i_id];
+        p_input->stream.p_selected_area =
+                    p_input->stream.pp_areas[p_area->i_id];
 
         /* title number: it is not vts nb! */
         p_dvd->i_title = p_area->i_id;
@@ -897,6 +898,7 @@ static int DVDRead( input_thread_t * p_input,
         if( DVDFindSector( p_dvd ) < 0 )
         {
             pp_packets[0] = NULL;
+            intf_ErrMsg( "dvd error: can't find next cell" );
             return 1;
         }
 

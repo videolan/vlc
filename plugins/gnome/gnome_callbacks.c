@@ -723,98 +723,127 @@ on_popup_disc_activate                 (GtkMenuItem     *menuitem,
 
 
 void
-on_popup_audio_activate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_popup_audio_toggle                  (GtkCheckMenuItem    *menuitem,
+                                        gpointer            user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    es_descriptor_t *       p_es;
-
-    p_es = (es_descriptor_t*)user_data;
-
-    input_ChangeES( p_intf->p_input, p_es, 1 );
+    if( menuitem->active )
+    {
+        intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+        es_descriptor_t *       p_es;
+    
+        p_es = (es_descriptor_t*)user_data;
+    
+        input_ChangeES( p_intf->p_input, p_es, 1 );
+    }
 }
 
 
 void
-on_popup_subtitle_activate          (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_popup_subtitle_toggle               (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    es_descriptor_t *       p_es;
-
-    p_es = (es_descriptor_t*)user_data;
-
-    input_ChangeES( p_intf->p_input, p_es, 2 );
+    if( menuitem->active )
+    {
+        intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+        es_descriptor_t *       p_es;
+    
+        p_es = (es_descriptor_t*)user_data;
+    
+        input_ChangeES( p_intf->p_input, p_es, 2 );
+    }
 }
 
 
 void
-on_menubar_audio_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_menubar_audio_toggle                (GtkCheckMenuItem    *menuitem,
+                                        gpointer            user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-    es_descriptor_t *       p_es;
+    if( menuitem->active )
+    {
+        intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+        es_descriptor_t *       p_es;
 
-    p_es = (es_descriptor_t*)user_data;
+        p_es = (es_descriptor_t*)user_data;
 
-    input_ChangeES( p_intf->p_input, p_es, 1 );
+        input_ChangeES( p_intf->p_input, p_es, 1 );
+    }
 }
 
 
 void
-on_menubar_subtitle_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_menubar_subtitle_toggle             (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-    es_descriptor_t *       p_es;
-
-    p_es = (es_descriptor_t*)user_data;
-
-    input_ChangeES( p_intf->p_input, p_es, 2 );
+    if( menuitem->active )
+    {
+        intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+        es_descriptor_t *       p_es;
+    
+        p_es = (es_descriptor_t*)user_data;
+    
+        input_ChangeES( p_intf->p_input, p_es, 2 );
+    }
 }
 
 
 void
-on_popup_navigation_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data)
 {
-    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
-    input_area_t *  p_area;
-    gint            i_title;
-    gint            i_chapter;
+    if( menuitem->active )
+    {
+        intf_thread_t * p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+        input_area_t *  p_area;
+        gint            i_title;
+        gint            i_chapter;
+    
+        i_title   = (gint)(user_data) / 100 ;
+        i_chapter = (gint)(user_data) - ( 100 * i_title );
 
-    i_title   = (gint)(user_data) / 100 ;
-    i_chapter = (gint)(user_data) - ( 100 * i_title );
-    p_area    = p_intf->p_input->stream.pp_areas[i_title];
-    p_area->i_part = i_chapter;
+        if( i_title != p_intf->p_input->stream.p_selected_area->i_id )
+        {
+            p_intf->p_sys->b_menus_update = 1;
+        }
 
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+        p_area = p_intf->p_input->stream.pp_areas[i_title];
+        p_area->i_part = i_chapter;
+    
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+                input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    }
 }
 
 
 void
-on_menubar_title_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_menubar_title_toggle                (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)user_data );
-    p_intf->p_sys->b_menus_update = 1;
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    if( menuitem->active )
+    {
+        intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+    
+        p_intf->p_input->pf_set_area( p_intf->p_input,
+                                      (input_area_t*)user_data );
+        p_intf->p_sys->b_menus_update = 1;
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    }
 }
 
 
 void
-on_menubar_chapter_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data)
+on_menubar_chapter_toggle              (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data)
 {
-    intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
-    input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
-    gint            i_chapter = (gint)user_data;
-
-    p_area->i_part = i_chapter;
-
-    p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
-    input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    if( menuitem->active )
+    {
+        intf_thread_t * p_intf    = GetIntf( GTK_WIDGET(menuitem),
+                                             "intf_window" );
+        input_area_t *  p_area    = p_intf->p_input->stream.p_selected_area;
+        gint            i_chapter = (gint)user_data;
+    
+        p_area->i_part = i_chapter;
+    
+        p_intf->p_input->pf_set_area( p_intf->p_input, (input_area_t*)p_area );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+    }
 }

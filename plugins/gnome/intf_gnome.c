@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.20 2001/03/07 11:56:33 stef Exp $
+ * $Id: intf_gnome.c,v 1.21 2001/03/15 00:37:04 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -66,11 +66,12 @@ static void intf_Run       ( intf_thread_t *p_intf );
 
 static gint GnomeManage    ( gpointer p_data );
 static gint GnomeLanguageMenus( gpointer, GtkWidget *, es_descriptor_t *, gint,
-                              void (*pf_activate)(GtkMenuItem *, gpointer) );
+                              void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
 static gint GnomeChapterMenu  ( gpointer, GtkWidget *,
-                              void (*pf_activate)(GtkMenuItem *, gpointer) );
+                              void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
 static gint GnomeTitleMenu    ( gpointer, GtkWidget *, 
-                              void (*pf_activate)(GtkMenuItem *, gpointer) );
+                              void (*pf_toggle)(GtkCheckMenuItem *, gpointer) );
+static gint GnomeSetupMenu    ( intf_thread_t * p_intf );
 
 /*****************************************************************************
  * g_atexit: kludge to avoid the Gnome thread to segfault at exit
@@ -141,6 +142,7 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->b_popup_changed = 0;
     p_intf->p_sys->b_window_changed = 0;
     p_intf->p_sys->b_playlist_changed = 0;
+    p_intf->p_sys->b_menus_update = 1;
 
     p_intf->p_sys->b_scale_isfree = 1;
 
@@ -266,74 +268,7 @@ static gint GnomeManage( gpointer p_data )
     if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL &&
         p_intf->p_sys->b_menus_update )
     {
-        es_descriptor_t *   p_audio_es;
-        es_descriptor_t *   p_spu_es;
-        GtkWidget *         p_menubar_menu;
-        GtkWidget *         p_popup_menu;
-        gint                i;
-
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_window ), "menubar_title" ) );
-
-        GnomeTitleMenu( p_intf, p_menubar_menu, on_menubar_title_activate );
-
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_window ), "menubar_chapter" ) );
-
-        GnomeChapterMenu( p_intf, p_menubar_menu, on_menubar_chapter_activate );
-
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_popup ), "popup_navigation" ) );
-
-        GnomeTitleMenu( p_intf, p_popup_menu, on_popup_navigation_activate );
-    
-        /* look for selected ES */
-        p_audio_es = NULL;
-        p_spu_es = NULL;
-
-        for( i = 0 ; i < p_intf->p_input->stream.i_selected_es_number ; i++ )
-        {
-            if( p_intf->p_input->stream.pp_es[i]->b_audio )
-            {
-                p_audio_es = p_intf->p_input->stream.pp_es[i];
-            }
-    
-            if( p_intf->p_input->stream.pp_es[i]->b_spu )
-            {
-                p_spu_es = p_intf->p_input->stream.pp_es[i];
-            }
-        }
-
-        /* audio menus */
-
-        /* find audio root menu */
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                             p_intf->p_sys->p_window ), "menubar_audio" ) );
-
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_popup ), "popup_audio" ) );
-
-        GnomeLanguageMenus( p_intf, p_menubar_menu, p_audio_es, 1,
-                          on_menubar_audio_activate );
-        GnomeLanguageMenus( p_intf, p_popup_menu, p_audio_es, 1,
-                          on_popup_audio_activate );
-
-        /* sub picture menus */
-
-        /* find spu root menu */
-        p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                          p_intf->p_sys->p_window ), "menubar_subtitle" ) );
-
-        p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
-                     p_intf->p_sys->p_popup ), "popup_subtitle" ) );
-
-        GnomeLanguageMenus( p_intf, p_menubar_menu, p_spu_es, 2,
-                          on_menubar_subtitle_activate  );
-        GnomeLanguageMenus( p_intf, p_popup_menu, p_spu_es, 2,
-                          on_popup_subtitle_activate );
-
-        /* everything is ready */
-        p_intf->p_sys->b_menus_update = 0;
+        GnomeSetupMenu( p_intf );
     }
 
     /* Manage the slider */
@@ -380,62 +315,6 @@ static gint GnomeManage( gpointer p_data )
 }
 
 /*****************************************************************************
- * GnomeMenuRadioItem: give a menu item adapted to language/title selection,
- * ie the menu item is a radio button.
- *****************************************************************************/
-static GtkWidget * GnomeMenuRadioItem( GtkWidget * p_menu,
-                                       GSList **   p_button_group,
-                                       gint        b_active,
-                                       char *      psz_name )
-{
-    GtkWidget *     p_item;
-
-#if 0
-    GtkWidget *     p_button;
-
-    /* create button */
-    p_button =
-        gtk_radio_button_new_with_label( *p_button_group, psz_name );
-
-    /* add button to group */
-    *p_button_group =
-        gtk_radio_button_group( GTK_RADIO_BUTTON( p_button ) );
-
-    /* prepare button for display */
-    gtk_widget_show( p_button );
-
-    /* create menu item to store button */
-    p_item = gtk_menu_item_new();
-
-    /* put button inside item */
-    gtk_container_add( GTK_CONTAINER( p_item ), p_button );
-
-    /* add item to menu */
-    gtk_menu_append( GTK_MENU( p_menu ), p_item );
-
-          gtk_signal_connect( GTK_OBJECT( p_item ), "activate",
-               GTK_SIGNAL_FUNC( on_audio_toggle ),
-               NULL );
-
-
-    /* prepare item for display */
-    gtk_widget_show( p_item );
-
-    /* is it the selected item ? */
-    if( b_active )
-    {
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( p_button ), TRUE );
-    }
-#else
-    p_item = gtk_menu_item_new_with_label( psz_name );
-    gtk_menu_append( GTK_MENU( p_menu ), p_item );
-    gtk_widget_show( p_item );
-
-#endif
-    return p_item;
-}
-
-/*****************************************************************************
  * GnomeLanguageMenus: update interactive menus of the interface
  *****************************************************************************
  * Sets up menus with information from input:
@@ -448,13 +327,14 @@ static gint GnomeLanguageMenus( gpointer          p_data,
                                 GtkWidget *       p_root,
                                 es_descriptor_t * p_es,
                                 gint              i_type,
-                          void(*pf_activate )( GtkMenuItem *, gpointer ) )
+                          void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
     GtkWidget *         p_menu;
     GtkWidget *         p_separator;
     GtkWidget *         p_item;
-    GSList *            p_button_group;
+    GtkWidget *         p_item_off;
+    GSList *            p_group;
     char *              psz_name;
     gint                b_active;
     gint                b_audio;
@@ -468,27 +348,32 @@ static gint GnomeLanguageMenus( gpointer          p_data,
 
     vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
 
-    b_audio = ( i_type == 1 );
-    p_button_group = NULL;
+    /* removes previous menu */
+    gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_root ) );
 
-    /* menu container for audio */
+    b_audio = ( i_type == 1 );
+    p_group = NULL;
+
+    /* menu container */
     p_menu = gtk_menu_new();
 
-    /* create a set of language buttons and append them to the container */
-    b_active = ( p_es == NULL ) ? 1 : 0;
+    /* special case for "off" item */
+    b_active = ( p_es == NULL ) ? TRUE : FALSE;
     psz_name = "Off";
 
-    p_item = GnomeMenuRadioItem( p_menu, &p_button_group, b_active, psz_name );
-
-    /* setup signal hanling */
-    gtk_signal_connect( GTK_OBJECT( p_item ), "activate",
-            GTK_SIGNAL_FUNC ( pf_activate ), NULL );
+    p_item_off = gtk_radio_menu_item_new_with_label( p_group, psz_name );
+    p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item_off ) );
+    gtk_widget_show( p_item_off );
+    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item_off ),
+                                    b_active );
+    gtk_menu_append( GTK_MENU( p_menu ), p_item_off );
 
     p_separator = gtk_menu_item_new();
     gtk_widget_show( p_separator );
     gtk_menu_append( GTK_MENU( p_menu ), p_separator );
     gtk_widget_set_sensitive( p_separator, FALSE );
 
+    /* create a set of language buttons and append them to the container */
     for( i = 0 ; i < p_intf->p_input->stream.i_es_number ; i++ )
     {
 
@@ -497,19 +382,30 @@ static gint GnomeLanguageMenus( gpointer          p_data,
 
         if( b_audio || b_spu )
         {
-            b_active = ( p_es == p_intf->p_input->stream.pp_es[i] ) ? 1 : 0;
+            b_active = ( p_es == p_intf->p_input->stream.pp_es[i] ) ? TRUE :
+                                                                      FALSE;
             psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;
 
-            p_item = GnomeMenuRadioItem( p_menu, &p_button_group,
-                                         b_active, psz_name );
+            p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
+            p_group =
+                gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
+            gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item ),
+                                            b_active );
+            gtk_menu_append( GTK_MENU( p_menu ), p_item );
+            gtk_widget_show( p_item );
 
             /* setup signal hanling */
-            gtk_signal_connect( GTK_OBJECT( p_item ), "activate",
-               GTK_SIGNAL_FUNC( pf_activate ),
-                 (gpointer)( p_intf->p_input->stream.pp_es[i] ) );
+            gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
+                            GTK_SIGNAL_FUNC( pf_toggle ),
+                            (gpointer)( p_intf->p_input->stream.pp_es[i] ) );
 
         }
     }
+
+    /* signal hanling for off - dunno why this does not work
+     * if it is before the loop */
+    gtk_signal_connect( GTK_OBJECT( p_item_off ), "toggled",
+                        GTK_SIGNAL_FUNC ( pf_toggle ), NULL );
 
     /* link the new menu to the menubar item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_root ), p_menu );
@@ -523,22 +419,27 @@ static gint GnomeLanguageMenus( gpointer          p_data,
 }
 
 /*****************************************************************************
- * GnomeChapterMenu: generate chapter menu foir current title
+ * GnomeChapterMenu: generate chapter menu for current title
  *****************************************************************************/
 static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
-                        void(*pf_activate )( GtkMenuItem *, gpointer ) )
+                        void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
     char                psz_name[10];
     GtkWidget *         p_chapter_menu;
     GtkWidget *         p_item;
-    GSList *            p_chapter_button_group;
+    GSList *            p_chapter_group;
     gint                i_title;
     gint                i_chapter;
     gint                b_active;
 
     /* cast */
     p_intf = (intf_thread_t*)p_data;
+
+    /* removes previous menu */
+    gtk_menu_item_remove_submenu( GTK_MENU_ITEM( p_chapter ) );
+
+    p_chapter_group = NULL;
 
     i_title = p_intf->p_input->stream.p_selected_area->i_id;
     p_chapter_menu = gtk_menu_new();
@@ -552,12 +453,19 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
         
         sprintf( psz_name, "Chapter %d", i_chapter + 1 );
 
-        p_item = GnomeMenuRadioItem( p_chapter_menu, &p_chapter_button_group,
-                                     b_active, psz_name );
+        p_item = gtk_radio_menu_item_new_with_label( p_chapter_group,
+                                                     psz_name );
+        p_chapter_group =
+            gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
+        gtk_menu_append( GTK_MENU( p_chapter_menu ), p_item );
+        gtk_widget_show( p_item );
+        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_item ),
+                                        b_active );
+
         /* setup signal hanling */
         gtk_signal_connect( GTK_OBJECT( p_item ),
-                        "activate",
-                        GTK_SIGNAL_FUNC( pf_activate ),
+                        "toggled",
+                        GTK_SIGNAL_FUNC( pf_toggle ),
                         (gpointer)(i_chapter + 1) );
     }
 
@@ -574,13 +482,13 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
 /*****************************************************************************
  * GnomeTitleMenu: sets menus for titles and chapters selection
  *****************************************************************************
- * Generates two type of menus:
+ * Generates two types of menus:
  *  -simple list of titles
  *  -cascaded lists of chapters for each title
  *****************************************************************************/
 static gint GnomeTitleMenu( gpointer       p_data,
                             GtkWidget *    p_navigation, 
-                            void(*pf_activate )( GtkMenuItem *, gpointer ) )
+                            void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
     char                psz_name[10];
@@ -588,8 +496,8 @@ static gint GnomeTitleMenu( gpointer       p_data,
     GtkWidget *         p_title_item;
     GtkWidget *         p_chapter_menu;
     GtkWidget *         p_item;
-    GSList *            p_title_button_group;
-    GSList *            p_chapter_button_group;
+    GSList *            p_title_group;
+    GSList *            p_chapter_group;
     gint                i_title;
     gint                i_chapter;
     gint                b_active;
@@ -598,8 +506,8 @@ static gint GnomeTitleMenu( gpointer       p_data,
     p_intf = (intf_thread_t*)p_data;
 
     p_title_menu = gtk_menu_new();
-    p_title_button_group = NULL;
-    p_chapter_button_group = NULL;
+    p_title_group = NULL;
+    p_chapter_group = NULL;
 
     /* loop on titles */
     for( i_title = 1 ;
@@ -610,15 +518,24 @@ static gint GnomeTitleMenu( gpointer       p_data,
                      p_intf->p_input->stream.p_selected_area ) ? 1 : 0;
         sprintf( psz_name, "Title %d", i_title );
 
-        p_title_item = GnomeMenuRadioItem( p_title_menu, &p_title_button_group,
-                                           b_active, psz_name );
+        p_title_item = gtk_radio_menu_item_new_with_label( p_title_group,
+                                                           psz_name );
+        p_title_group =
+            gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_title_item ) );
+        gtk_menu_append( GTK_MENU( p_title_menu ), p_title_item );
+        gtk_widget_show( p_title_item );
 
-        if( pf_activate == on_menubar_title_activate )
+                                           
+
+        if( pf_toggle == on_menubar_title_toggle )
         {
+
+            gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM( p_title_item ),
+                                        b_active );
             /* setup signal hanling */
             gtk_signal_connect( GTK_OBJECT( p_title_item ),
-                     "activate",
-                     GTK_SIGNAL_FUNC( pf_activate ),
+                     "toggled",
+                     GTK_SIGNAL_FUNC( pf_toggle ),
                      (gpointer)(p_intf->p_input->stream.pp_areas[i_title]) );
         }
         else
@@ -635,14 +552,19 @@ static gint GnomeTitleMenu( gpointer       p_data,
                 
                 sprintf( psz_name, "Chapter %d", i_chapter + 1 );
     
-                p_item = GnomeMenuRadioItem( p_chapter_menu,
-                                             &p_chapter_button_group,
-                                             b_active, psz_name );
-    
+                p_item = gtk_radio_menu_item_new_with_label(
+                                                p_chapter_group, psz_name );
+                p_chapter_group = gtk_radio_menu_item_group(
+                                                GTK_RADIO_MENU_ITEM( p_item ) );
+                gtk_menu_append( GTK_MENU( p_chapter_menu ), p_item );
+                gtk_widget_show( p_item );
+                gtk_check_menu_item_set_active(
+                                    GTK_CHECK_MENU_ITEM( p_item ), b_active );
+
                 /* setup signal hanling */
                 gtk_signal_connect( GTK_OBJECT( p_item ),
-                           "activate",
-                           GTK_SIGNAL_FUNC( pf_activate ),
+                           "toggled",
+                           GTK_SIGNAL_FUNC( pf_toggle ),
                            (gpointer)( ( i_title * 100 ) + ( i_chapter + 1) ) );
         }
 
@@ -656,12 +578,90 @@ static gint GnomeTitleMenu( gpointer       p_data,
 
     }
 
-    /* link the new menu to the menubar audio item */
+    /* link the new menu to the menubar item */
     gtk_menu_item_set_submenu( GTK_MENU_ITEM( p_navigation ), p_title_menu );
 
-    /* be sure that audio menu is sensitive */
+    /* be sure that menu is sensitive */
     gtk_widget_set_sensitive( p_navigation, TRUE );
 
+
+    return TRUE;
+}
+
+/*****************************************************************************
+ * GnomeSetupMenu: function that generates title/chapter/audio/subpic
+ * menus with help from preceding functions
+ *****************************************************************************/
+static gint GnomeSetupMenu( intf_thread_t * p_intf )
+{
+    es_descriptor_t *   p_audio_es;
+    es_descriptor_t *   p_spu_es;
+    GtkWidget *         p_menubar_menu;
+    GtkWidget *         p_popup_menu;
+    gint                i;
+
+    p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                 p_intf->p_sys->p_window ), "menubar_title" ) );
+
+    GnomeTitleMenu( p_intf, p_menubar_menu, on_menubar_title_toggle );
+
+    p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                 p_intf->p_sys->p_window ), "menubar_chapter" ) );
+
+    GnomeChapterMenu( p_intf, p_menubar_menu, on_menubar_chapter_toggle );
+
+    p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                 p_intf->p_sys->p_popup ), "popup_navigation" ) );
+
+    GnomeTitleMenu( p_intf, p_popup_menu, on_popup_navigation_toggle );
+
+    /* look for selected ES */
+    p_audio_es = NULL;
+    p_spu_es = NULL;
+
+    for( i = 0 ; i < p_intf->p_input->stream.i_selected_es_number ; i++ )
+    {
+        if( p_intf->p_input->stream.pp_es[i]->b_audio )
+        {
+            p_audio_es = p_intf->p_input->stream.pp_es[i];
+        }
+
+        if( p_intf->p_input->stream.pp_es[i]->b_spu )
+        {
+            p_spu_es = p_intf->p_input->stream.pp_es[i];
+        }
+    }
+
+    /* audio menus */
+
+    /* find audio root menu */
+    p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                         p_intf->p_sys->p_window ), "menubar_audio" ) );
+
+    p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                 p_intf->p_sys->p_popup ), "popup_audio" ) );
+
+    GnomeLanguageMenus( p_intf, p_menubar_menu, p_audio_es, 1,
+                      on_menubar_audio_toggle );
+    GnomeLanguageMenus( p_intf, p_popup_menu, p_audio_es, 1,
+                      on_popup_audio_toggle );
+
+    /* sub picture menus */
+
+    /* find spu root menu */
+    p_menubar_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
+                      p_intf->p_sys->p_window ), "menubar_subtitle" ) );
+
+    p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( 
+                 p_intf->p_sys->p_popup ), "popup_subtitle" ) );
+
+    GnomeLanguageMenus( p_intf, p_menubar_menu, p_spu_es, 2,
+                      on_menubar_subtitle_toggle  );
+    GnomeLanguageMenus( p_intf, p_popup_menu, p_spu_es, 2,
+                      on_popup_subtitle_toggle );
+
+    /* everything is ready */
+    p_intf->p_sys->b_menus_update = 0;
 
     return TRUE;
 }

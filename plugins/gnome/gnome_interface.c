@@ -540,7 +540,7 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   GNOMEUIINFO_SEPARATOR,
   {
     GNOME_APP_UI_ITEM, N_("_Navigation"),
-    NULL,
+    N_("Navigate through titles and chapters"),
     (gpointer) NULL, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
@@ -549,14 +549,14 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Audio"),
     N_("Select audio channel"),
-    (gpointer) on_popup_audio_activate, NULL, NULL,
+    (gpointer) NULL, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Subtitle"),
-    NULL,
-    (gpointer) on_popup_subtitle_activate, NULL, NULL,
+    N_("Select subtitle channel"),
+    (gpointer) NULL, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },

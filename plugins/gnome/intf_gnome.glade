@@ -657,6 +657,7 @@
     <class>GtkMenuItem</class>
     <name>popup_navigation</name>
     <sensitive>False</sensitive>
+    <tooltip>Navigate through titles and chapters</tooltip>
     <label>_Navigation</label>
     <right_justify>False</right_justify>
   </widget>
@@ -672,11 +673,6 @@
     <name>popup_audio</name>
     <sensitive>False</sensitive>
     <tooltip>Select audio channel</tooltip>
-    <signal>
-      <name>activate</name>
-      <handler>on_popup_audio_activate</handler>
-      <last_modification_time>Thu, 22 Feb 2001 05:35:57 GMT</last_modification_time>
-    </signal>
     <label>Audio</label>
     <right_justify>False</right_justify>
   </widget>
@@ -685,11 +681,7 @@
     <class>GtkMenuItem</class>
     <name>popup_subtitle</name>
     <sensitive>False</sensitive>
-    <signal>
-      <name>activate</name>
-      <handler>on_popup_subtitle_activate</handler>
-      <last_modification_time>Thu, 22 Feb 2001 05:35:57 GMT</last_modification_time>
-    </signal>
+    <tooltip>Select subtitle channel</tooltip>
     <label>_Subtitle</label>
     <right_justify>False</right_justify>
   </widget>

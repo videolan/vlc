@@ -267,14 +267,14 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
                 input_UnselectES( p_input,
                                   p_input->stream.pp_selected_es[i_index] );
                 input_SelectES( p_input, p_es );
-                intf_WarnMsg( 1, "dvd info: ES selected -> %s (0x%x)",
+                intf_WarnMsg( 1, "input info: es selected -> %s (0x%x)",
                                                 p_es->psz_desc, p_es->i_id );
             }
         }
         else
         {
             input_SelectES( p_input, p_es );
-            intf_WarnMsg( 1, "dvd info: selected -> %s (0x%x)",
+            intf_WarnMsg( 1, "input info: es selected -> %s (0x%x)",
                           p_es->psz_desc, p_es->i_id );
         }
     }
@@ -282,6 +282,10 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
     {
         if( i_index != -1 )
         {
+            intf_WarnMsg( 1, "input info: es unselected -> %s (0x%x)",
+                          p_input->stream.pp_selected_es[i_index]->psz_desc,
+                          p_input->stream.pp_selected_es[i_index]->i_id );
+
             input_UnselectES( p_input,
                               p_input->stream.pp_selected_es[i_index] );
         }

@@ -231,29 +231,29 @@ on_popup_disc_activate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
-on_popup_audio_activate                (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
+on_menubar_audio_toggle                (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data);
 
 void
-on_popup_subtitle_activate             (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
+on_menubar_subtitle_toggle             (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data);
 
 void
-on_menubar_audio_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
+on_popup_audio_toggle                  (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data);
 
 void
-on_menubar_subtitle_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
+on_popup_subtitle_toggle               (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data);
 
 void
-on_popup_navigation_activate           (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
+on_popup_navigation_toggle             (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data);
 
 void
-on_menubar_title_activate              (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
+on_menubar_title_toggle                (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data);
 
 void
-on_menubar_chapter_activate            (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
+on_menubar_chapter_toggle              (GtkCheckMenuItem     *menuitem,
+                                        gpointer             user_data);
