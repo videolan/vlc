@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.26 2003/01/10 16:21:39 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.27 2003/01/14 15:31:12 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,8 +37,9 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
-extern "C" {
-#include <aout_internal.h>
+extern "C"
+{
+    #include <aout_internal.h>
 }
 
 /*****************************************************************************
@@ -48,6 +49,7 @@ extern "C" {
 typedef struct aout_sys_t
 {
     BSoundPlayer *p_player;
+    vlc_mutex_t   lock;
     mtime_t       latency;
     
 } aout_sys_t;
@@ -122,6 +124,7 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
      * to what I've seen, the latency is almost constant most of the
      * time anyway -- titer */
     p_sys->latency = 16209;
+    vlc_mutex_init( p_aout, &p_sys->lock );
     if( vlc_thread_create( p_aout, "latency", CheckLatency,
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
     {
@@ -145,6 +148,7 @@ void E_(CloseAudio) ( vlc_object_t *p_this )
     p_aout->b_die = VLC_TRUE;
     vlc_thread_join( p_aout );
     p_aout->b_die = VLC_FALSE;
+    vlc_mutex_destroy( &p_sys->lock );
     
     p_sys->p_player->Stop();
     delete p_sys->p_player;
@@ -163,7 +167,9 @@ static void Play( void *aout, void *p_buffer, size_t i_size,
     mtime_t play_time = 0;
     
     /* FIXME (see above) */
+    vlc_mutex_lock( &p_sys->lock );
     play_time = mdate() + p_sys->latency;
+    vlc_mutex_unlock( &p_sys->lock );
     
     p_aout_buffer = aout_OutputNextBuffer( p_aout, play_time, VLC_FALSE );
 
@@ -202,9 +208,11 @@ static int CheckLatency( aout_instance_t *p_aout )
         if( mdate() > last_check + 100000 )
         {
             latency = p_sys->p_player->Latency();
-            if( latency && latency != p_sys->latency )
+            if( latency > 0 )
             {
+                vlc_mutex_lock( &p_sys->lock );
                 p_sys->latency = latency;
+                vlc_mutex_unlock( &p_sys->lock );
             }
             last_check = mdate();
         }
