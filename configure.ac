@@ -53,6 +53,7 @@ AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(STRIP, strip, :)
 AC_CHECK_TOOL(AR, ar, :)
 AC_CHECK_TOOL(LD, ld, :)
+AC_CHECK_TOOL(UPX, upx, "")
 
 dnl Sam, if you think I didn't see that... --Meuuh
 dnl AM_PROG_LIBTOOL
@@ -3620,6 +3621,7 @@ then
 dnl special case for mingw32
 elif test "${enable_mozilla}" = "yes"
 then
+  AC_CHECK_TOOL(CYGPATH, cygpath, "")
   AC_ARG_WITH(mozilla-sdk-path,
     [    --with-mozilla-sdk-path=PATH path to win32 mozilla sdk], [
     real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
@@ -3628,7 +3630,12 @@ then
       mozilla=:
       AX_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk} -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
       AX_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -lnspr4 -lplds4 -lplc4 -lembedstring -lxpcomglue -Wl,--kill-at])
-      XPIDL_INCL="-I${real_mozilla_sdk}/xpcom/idl" ])
+      XPIDL_INCL="-I${real_mozilla_sdk}/xpcom/idl"
+      if test -n "${CYGPATH}"; then
+        XPIDL="${real_mozilla_sdk}/xpcom/bin/xpidl"
+        real_mozilla_sdk="`${CYGPATH} -w ${real_mozilla_sdk}`"
+        XPIDL_INCL="${XPIDL_INCL} -I${real_mozilla_sdk}/xpcom/idl"
+      fi ])
     CPPFLAGS="${CPPFLAGS_save}"
   ])
 fi

@@ -577,6 +577,9 @@ package-win32-base:
 	cp "$(top_builddir)/vlc$(EXEEXT)" "$(srcdir)/vlc-${VERSION}/"
 	cp "$(top_builddir)/vlc$(EXEEXT).manifest" "$(srcdir)/vlc-${VERSION}/"
 	$(STRIP) "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"
+	@if test -n "$(UPX)"; then \
+           $(UPX) -9 "$(srcdir)/vlc-${VERSION}/vlc$(EXEEXT)"; fi ;
+
 	for file in AUTHORS MAINTAINERS THANKS NEWS COPYING README ; \
 	  do cp "$(srcdir)/$$file" "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; \
 	  unix2dos "$(srcdir)/vlc-${VERSION}/$${file}.txt" ; done
@@ -589,7 +592,9 @@ package-win32-base:
 	  fi ; done
 
 	for i in "" $(srcdir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
-	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
+	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; \
+	     if test -n "$(UPX)" -a -n "$$i"; then $(UPX) -9 "$$i"; fi ; \
+	  done
 
 	mkdir $(srcdir)/vlc-${VERSION}/locale
 	for i in $(ALL_LINGUAS); do \
@@ -627,6 +632,8 @@ package-win32-base:
 if BUILD_MOZILLA
 	cp $(srcdir)/mozilla/*$(LIBEXT) $(srcdir)/vlc-${VERSION}/mozilla/ ;
 	$(STRIP) $(srcdir)/vlc-${VERSION}/mozilla/*$(LIBEXT);
+	@if test $(UPX); then \
+	  $(UPX) -9 $(srcdir)/vlc-${VERSION}/mozilla/npvlc$(LIBEXT); fi ; \
 	cp $(srcdir)/mozilla/vlcintf.xpt  $(srcdir)/vlc-${VERSION}/mozilla/ ;
 endif
 
