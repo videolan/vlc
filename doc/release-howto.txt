@@ -70,7 +70,7 @@
 
  * Update sur le web
 
-  - le web se trouve dans /opt/www/videolan/
+  - le web se trouve dans /var/www/www.videolan.org/
   - éditer vlc/download.html pour mettre à jour les tarballs
   - éditer news.msg pour mettre une petite bafouille sur la release, en
     s'inspirant des releases précédentes et du changelog quand on n'a pas
@@ -92,6 +92,10 @@
   - choisir "add release" dans le menu déroulant
   - remplir tout le bazar, et submit
   - l'update peut mettre plusieurs heures
+
+ * Annonce sur VersionTracker
+
+  - demander à Meuuh pour le moment
 
  * Mail d'annonce
 
