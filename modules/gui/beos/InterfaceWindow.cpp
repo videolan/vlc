@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.23 2003/01/27 10:29:21 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.24 2003/01/28 08:17:26 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -234,8 +234,10 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 
 InterfaceWindow::~InterfaceWindow()
 {
-    if (fPlaylistWindow)
+    if( fPlaylistWindow )
         fPlaylistWindow->ReallyQuit();
+    if( fMessagesWindow )
+        fMessagesWindow->ReallyQuit();
 }
 
 /*****************************************************************************
