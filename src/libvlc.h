@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.90 2003/09/29 17:36:35 gbazin Exp $
+ * $Id: libvlc.h,v 1.91 2003/10/01 22:44:58 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -286,8 +286,8 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it", "ja",
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT \
-    "Automatically detect a subtitle file, if no subtitle filename is" \
-    "is specified."
+    "Automatically detect a subtitle file, if no subtitle filename is " \
+    "specified."
 
 #define SUB_FILE_TEXT N_("Use subtitle file")
 #define SUB_FILE_LONGTEXT \

@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: subtitles.c,v 1.1 2003/09/22 03:40:06 hartman Exp $
+ * $Id: subtitles.c,v 1.2 2003/10/01 22:44:58 hartman Exp $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -22,6 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/**
+ *  \file
+ *  This file contains functions to dectect subtitle files.
+ */
+
 #include <stdlib.h>
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -30,14 +35,38 @@
 #include <dirent.h>
 #include <ctype.h>
 
+/**
+ * What's between a directory and a filename?
+ */
 #if defined( WIN32 )
     #define DIRECTORY_SEPARATOR '\\'
 #else
     #define DIRECTORY_SEPARATOR '/'
 #endif
 
+/**
+ * We are not going to autodetect more subtitle files than this.
+ */
 #define MAX_SUBTITLE_FILES 128
 
+/**
+ * This determines how fuzzy the returned results will be.
+ *
+ * Currently set to 3, other options are:
+ * 0 = nothing
+ * 1 = any subtitle file
+ * 2 = any sub file containing movie name
+ * 3 = sub file matching movie name exactly
+ * 4 = sub file matching movie name with additional chars 
+ */
+#define SUB_FUZZY 3
+
+/**
+ * The possible extentions for subtitle files we support
+ */
+static const char * sub_exts[] = {  "utf", "utf8", "utf-8", "sub", "srt", "smi", "txt", "ssa", NULL};
+/* extensions from unsupported types */
+/* rt, aqt, jss, js, ass */
 
 static void strcpy_trim( char *d, char *s )
 {
@@ -122,27 +151,36 @@ static int compare_sub_priority( const void *a, const void *b )
     }
 }
 
-/*****************************************************************************
- * subtitles_Detect: Use the original filename to find a subtitle files.
- *****************************************************************************/
-char** subtitles_Detect( input_thread_t *p_input, char *psz_path, char *psz_fname )
+/**
+ * Detect subtitle files.
+ * 
+ * When called this function will split up the psz_fname string into a
+ * directory, filename and extension. It then opens the directory
+ * in which the file resides and tries to find possible matches of
+ * subtitles files. 
+ *
+ * \brief Use a filename to find subtitle files.
+ * \ingroup Demux
+ * \param p_this the calling \ref input_thread_t
+ * \param psz_path a subdirectory to look into. This is not used atm.
+ * \param psz_fname the complete filename to base the search on.
+ * \return an array of filenames with detected possbile subtitles. You
+ *         need to free this after use.
+ */
+char** subtitles_Detect( input_thread_t *p_this, char *psz_path, char *psz_fname )
 {
     /* variables to be used for derivatives of psz_fname */
     char *f_dir, *f_fname, *f_fname_noext, *f_fname_trim, *tmp;
     /* variables to be used for derivatives FILE *f */
     char *tmp_fname_noext, *tmp_fname_trim, *tmp_fname_ext, *tmpresult;
  
-    int len, i, j, i_sub_count, i_sub_match_fuzziness;
+    int len, i, j, i_sub_count;
     subfn *result; /* unsorted results */
     char **result2; /* sorted results */
  
     FILE *f;
     DIR *d;
     struct dirent *de;
-
-    char * sub_exts[] = {  "utf", "utf8", "utf-8", "sub", "srt", "smi", "txt", "ssa", NULL};
-    /* extensions from unsupported types */
-    /* rt, aqt, jss, js, ass */
 
     i_sub_count = 0;
     len = ( strlen( psz_fname ) > 256 ? strlen( psz_fname ) : 256 ) +
@@ -181,20 +219,13 @@ char** subtitles_Detect( input_thread_t *p_input, char *psz_path, char *psz_fnam
     strcpy_strip_ext( f_fname_noext, f_fname );
     strcpy_trim( f_fname_trim, f_fname_noext );
 
-    i_sub_match_fuzziness = 3;
-    /* 0 = nothing
-     * 1 = any subtitle file
-     * 2 = any sub file containing movie name
-     * 3 = sub file matching movie name exactly
-     * 4 = sub file matching movie name with additional chars 
-     */
     for( j = 0; j <= 1; j++)
     {
 	d = opendir( j == 0 ? f_dir : psz_path );
 	if( d )
         {
             int b_found;
-	    while( de = readdir( d ) )
+	    while( ( de = readdir( d ) ) )
             {
 		/* retrieve various parts of the filename */
 		strcpy_strip_ext( tmp_fname_noext, de->d_name );
@@ -208,7 +239,7 @@ char** subtitles_Detect( input_thread_t *p_input, char *psz_path, char *psz_fnam
 		    if( strcmp(sub_exts[i], tmp_fname_ext ) == 0 )
                     {
 			b_found = 1;
-                        msg_Dbg( p_input, "found subtitle: %s", de->d_name );
+                        msg_Dbg( p_this, "found a possible subtitle: %s", de->d_name );
 			break;
 		    }
 		}
@@ -243,11 +274,11 @@ char** subtitles_Detect( input_thread_t *p_input, char *psz_path, char *psz_fnam
 			if( j == 0 ) i_prio = 1;
 		    }
 
-		    if( i_prio >= i_sub_match_fuzziness )
+		    if( i_prio >= SUB_FUZZY )
                     {
                         sprintf( tmpresult, "%s%s", j == 0 ? f_dir : psz_path, de->d_name );
-                        msg_Dbg( p_input, "autodetected subtitle: %s with priority %d", de->d_name, i_prio );
-			if( f = fopen( tmpresult, "rt" ) )
+                        msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", de->d_name, i_prio );
+			if( ( f = fopen( tmpresult, "rt" ) ) )
                         {
 			    fclose( f );
 			    result[i_sub_count].priority = i_prio;

@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.23 2003/09/30 16:41:13 hartman Exp $
+ * $Id: freetype.c,v 1.24 2003/10/01 22:44:58 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -90,7 +90,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /**
- * Private data in a aubpicture. Describes a string.
+ * Private data in a subpicture. Describes a string.
  */
 struct subpicture_sys_t
 {
@@ -116,7 +116,7 @@ struct line_desc_t
 };
 
 /*****************************************************************************
- * text_remderer_sys_t: freetype local data
+ * text_renderer_sys_t: freetype local data
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
  * It describes the freetype specific properties of an output thread.
