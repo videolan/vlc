@@ -180,7 +180,6 @@
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
         font        CDATA   #REQUIRED
-        var         CDATA   "playlist"
         fgcolor     CDATA   "#000000"
         playcolor   CDATA   "#FF0000"
         bgcolor1    CDATA   "#FFFFFF"
