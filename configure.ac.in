@@ -1,6 +1,6 @@
 dnl Autoconf settings for vlc
 
-AC_INIT(vlc,0.5.1-cvs)
+AC_INIT(vlc,0.5.1-test1)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Natalya"
@@ -11,7 +11,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.5.1-cvs)
+AM_INIT_AUTOMAKE(vlc,0.5.1-test1)
 AM_CONFIG_HEADER(config.h)
 
 dnl
@@ -738,7 +738,7 @@ esac
 dnl
 dnl  default modules
 dnl
-PLUGINS="${PLUGINS} dummy rc logger access_file memcpy"
+PLUGINS="${PLUGINS} dummy rc logger gestures access_file memcpy"
 PLUGINS="${PLUGINS} es audio m4v mpeg_system ps ts"
 PLUGINS="${PLUGINS} idct idctclassic motion mpeg_video spudec mpeg_audio"
 #PLUGINS="${PLUGINS} a52old imdct downmix imdct3dn downmix3dn imdctsse downmixsse"
