@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.31 2003/04/20 11:57:13 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.32 2003/04/20 14:11:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -53,7 +53,7 @@
 #include "ffmpeg.h"
 
 #ifdef LIBAVCODEC_PP
-#   ifndef HAVE_POSTPROC_POSTPROCESS_H
+#   ifdef HAVE_POSTPROC_POSTPROCESS_H
 #       include <postproc/postprocess.h>
 #   else
 #       include <libpostproc/postprocess.h>

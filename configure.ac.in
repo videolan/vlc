@@ -1534,7 +1534,7 @@ then
   dnl
   dnl test for !(--with-ffmpeg-tree)
   dnl
-  if test "x${with_ffmpeg}" == "xno" -o "x${with_ffmpeg}" == "x"; then
+  if test "x${with_ffmpeg_tree}" == "xno" -o "x${with_ffmpeg_tree}" == "x";then
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
     AC_CHECK_LIB(avcodec, avcodec_init, [
