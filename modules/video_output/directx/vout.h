@@ -72,6 +72,7 @@ struct vout_sys_t
     int          i_window_y;
     int          i_window_width;
     int          i_window_height;
+    int          i_window_style;
 
     /* Coordinates of src and dest images (used when blitting to display) */
     RECT         rect_src;

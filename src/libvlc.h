@@ -232,6 +232,11 @@ static char *ppsz_align_descriptions[] =
 #define VIDEO_ON_TOP_LONGTEXT N_("Always place the video window on top of " \
     "other windows." )
 
+#define VIDEO_DECO_TEXT N_("Window decorations")
+#define VIDEO_DECO_LONGTEXT N_( \
+    "If this option is disabled, VLC will avoid creating window caption, " \
+    "frames, etc... around the video. Currently only supported on Windows.")
+
 #define FILTER_TEXT N_("Video filter module")
 #define FILTER_LONGTEXT N_( \
     "This will allow you to add a post-processing filter to enhance the " \
@@ -880,6 +885,8 @@ vlc_module_begin();
 
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
+    add_bool( "video-deco", 0, NULL, VIDEO_DECO_TEXT,
+              VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_module( "filter", "video filter", NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
     add_string( "aspect-ratio", "", NULL,

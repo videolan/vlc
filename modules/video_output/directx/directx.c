@@ -600,9 +600,7 @@ static int Manage( vout_thread_t *p_vout )
         else
         {
             /* Change window style, no borders and no title bar */
-            int i_style = WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW |
-                WS_SIZEBOX | WS_VISIBLE;
-            SetWindowLong( hwnd, GWL_STYLE, i_style );
+            SetWindowLong( hwnd, GWL_STYLE, p_vout->p_sys->i_window_style );
 
             /* Normal window */
             window_placement.showCmd = SW_SHOWNORMAL;

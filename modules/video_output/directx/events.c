@@ -361,7 +361,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     WNDCLASS   wc;                            /* window class components */
     HICON      vlc_icon = NULL;
     char       vlc_path[MAX_PATH+1];
-    int        i_style;
+    int        i_style, i_stylex;
 
     msg_Dbg( p_vout, "DirectXCreateWindow" );
 
@@ -438,18 +438,34 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     rect_window.left   = 10;
     rect_window.right  = rect_window.left + p_vout->p_sys->i_window_width;
     rect_window.bottom = rect_window.top + p_vout->p_sys->i_window_height;
-    AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
 
-    i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
+    if( var_GetBool( p_vout, "video-deco" ) )
+    {
+        /* Open with window decoration */
+        AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
+        i_style = WS_OVERLAPPEDWINDOW|WS_SIZEBOX|WS_VISIBLE|WS_CLIPCHILDREN;
+        i_stylex = 0;
+    }
+    else
+    {
+        /* No window decoration */
+        AdjustWindowRect( &rect_window, WS_POPUP, 0 );
+        i_style = WS_POPUP|WS_VISIBLE|WS_CLIPCHILDREN;
+        i_stylex = 0; // WS_EX_TOOLWINDOW; Is TOOLWINDOW really needed ?
+                      // It messes up the fullscreen window.
+    }
 
     if( p_vout->p_sys->hparent )
     {
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
+        i_stylex = 0;
     }
+
+    p_vout->p_sys->i_window_style = i_style;
 
     /* Create the window */
     p_vout->p_sys->hwnd =
-        CreateWindowEx( WS_EX_NOPARENTNOTIFY,
+        CreateWindowEx( WS_EX_NOPARENTNOTIFY | i_stylex,
                     _T("VLC DirectX"),               /* name of window class */
                     _T(VOUT_TITLE) _T(" (DirectX Output)"),  /* window title */
                     i_style,                                 /* window style */
@@ -881,7 +897,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         rect_window.top = rect_window.left = 0;
         rect_window.right  = p_vout->i_window_width * f_arg;
         rect_window.bottom = p_vout->i_window_height * f_arg;
-        AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
+        AdjustWindowRect( &rect_window, p_vout->p_sys->i_window_style, 0 );
 
         SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
                       rect_window.right - rect_window.left,

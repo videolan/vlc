@@ -211,6 +211,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
 
+    /* Add a variable to indicate whether we want window decoration or not */
+    var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+
     /* Add a fullscreen variable */
     var_Create( p_vout, "fullscreen", VLC_VAR_BOOL );
     text.psz_string = _("Fullscreen");
