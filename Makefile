@@ -57,7 +57,8 @@ AUDIO_OUTPUT = 	src/audio_output/audio_output.o \
 		src/audio_output/aout_u8.o \
 		src/audio_output/aout_s8.o \
 		src/audio_output/aout_u16.o \
-		src/audio_output/aout_s16.o
+		src/audio_output/aout_s16.o \
+        src/audio_output/aout_spdif.o
 
 VIDEO_OUTPUT = 	src/video_output/video_output.o \
 		src/video_output/video_text.o \
@@ -74,6 +75,9 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 		src/ac3_decoder/ac3_imdct.o \
 		src/ac3_decoder/ac3_downmix.o \
 		src/ac3_decoder/ac3_downmix_c.o
+
+AC3_SPDIF = src/ac3_spdif/ac3_spdif.o \
+        src/ac3_spdif/ac3_iec958.o
 
 LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o \
 		src/lpcm_decoder/lpcm_decoder.o
@@ -107,6 +111,7 @@ C_OBJ =		$(INTERFACE) \
 		$(VIDEO_OUTPUT) \
 		$(AUDIO_OUTPUT) \
 		$(AC3_DECODER) \
+        $(AC3_SPDIF) \
 		$(LPCM_DECODER) \
 		$(AUDIO_DECODER) \
 		$(SPU_DECODER) \

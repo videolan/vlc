@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.52 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_programs.c,v 1.53 2001/04/29 02:48:51 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -599,6 +599,8 @@ static adec_config_t * GetAdecConfig( input_thread_t * p_input,
 /* FIXME */
 vlc_thread_t adec_CreateThread( void * );
 vlc_thread_t ac3dec_CreateThread( void * );
+vlc_thread_t ac3spdif_CreateThread( void * );
+vlc_thread_t spdif_CreateThread( void * );
 vlc_thread_t vpar_CreateThread( void * );
 vlc_thread_t spudec_CreateThread( void * );
 
@@ -659,7 +661,15 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case AC3_AUDIO_ES:
         if( p_main->b_audio )
         {
-            decoder.pf_create_thread = ac3dec_CreateThread;
+            if( !p_main->b_spdif )
+            {
+                decoder.pf_create_thread = ac3dec_CreateThread;
+            }
+            else
+            {
+                decoder.pf_create_thread = spdif_CreateThread;
+            }
+
             p_config = (void *)GetAdecConfig( p_input, p_es );
 
             /* Release the lock, not to block the input thread during
@@ -669,7 +679,30 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
+#if 0
+    case LPCM_AUDIO_ES:
+        if( p_main->b_audio )
+        {
+            if( p_main->b_spdif )
+            {
+                decoder.pf_create_thread = spdif_CreateThread;
+            }
+            else
+            {
+                intf_ErrMsg( "input error: LPCM audio not handled yet" );
+                break;
+            }
 
+            p_config = (void *)GetAdecConfig( p_input, p_es );
+
+            /* Release the lock, not to block the input thread during
+             * the creation of the thread. */
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            p_es->thread_id = input_RunDecoder( &decoder, p_config );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+        }
+        break;
+#endif
     case DVD_SPU_ES:
         if( p_main->b_video )
         {

@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.57 2001/04/28 03:36:25 sam Exp $
+ * $Id: audio_output.c,v 1.58 2001/04/29 02:48:51 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -119,6 +119,14 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
+    /* special setting for ac3 pass-through mode */
+    if( p_main->b_spdif )
+    {
+        p_aout->i_format   = AOUT_FMT_AC3;
+        p_aout->i_channels = 1;
+        p_aout->l_rate = 48000;
+    }
+
     /* FIXME: only works for i_channels == 1 or 2 ?? */
     p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0;
 
@@ -209,8 +217,13 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
             l_bytes = 1 * sizeof(s16) * p_aout->l_units;
             aout_thread = (void *)aout_S16MonoThread;
             break;
+        case AOUT_FMT_AC3:
+            intf_WarnMsg( 2, "aout info: ac3 pass-through thread" );
+            l_bytes = 0;
+            aout_thread = (void *)aout_SpdifThread;
+            break;
 
-                default:
+        default:
             intf_ErrMsg( "aout error: unknown audio output format (%i)",
                          p_aout->i_format );
             return( -1 );
@@ -246,7 +259,6 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
             l_bytes = 2 * sizeof(s16) * p_aout->l_units;
             aout_thread = (void *)aout_S16StereoThread;
             break;
-
         default:
             intf_ErrMsg( "aout error: unknown audio output format %i",
                          p_aout->i_format );

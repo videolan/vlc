@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.89 2001/04/28 03:36:25 sam Exp $
+ * $Id: main.c,v 1.90 2001/04/29 02:48:51 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -94,6 +94,7 @@
 #define OPT_NOAUDIO             150
 #define OPT_STEREO              151
 #define OPT_MONO                152
+#define OPT_SPDIF               153
 
 #define OPT_NOVIDEO             160
 #define OPT_DISPLAY             161
@@ -141,6 +142,7 @@ static const struct option longopts[] =
     {   "aout",             1,          0,      'A' },
     {   "stereo",           0,          0,      OPT_STEREO },
     {   "mono",             0,          0,      OPT_MONO },
+    {   "spdif",            0,          0,      OPT_SPDIF },
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },
@@ -522,6 +524,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->b_audio     = 1;
     p_main->b_video     = 1;
     p_main->b_channels  = 0;
+    p_main->b_spdif     = 0;
 
     p_main->i_warning_level = 4;
 
@@ -604,6 +607,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
         case OPT_MONO:                                             /* --mono */
             main_PutIntVariable( AOUT_STEREO_VAR, 0 );
+            break;
+        case OPT_SPDIF:                                           /* --spdif */
+            p_main->b_spdif = 1;
             break;
 
         /* Video options */
@@ -757,6 +763,7 @@ static void Usage( int i_fashion )
           "\n      --noaudio                  \tdisable audio"
           "\n  -A, --aout <module>            \taudio output method"
           "\n      --stereo, --mono           \tstereo/mono audio"
+          "\n      --spdif                    \tac3 pass-through mode"
           "\n"
           "\n      --novideo                  \tdisable video"
           "\n  -V, --vout <module>            \tvideo output method"

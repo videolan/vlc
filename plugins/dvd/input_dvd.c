@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.51 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_dvd.c,v 1.52 2001/04/29 02:48:51 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -380,8 +380,8 @@ static void DVDInit( input_thread_t * p_input )
     /* reading several block once seems to cause lock-up
      * when using input_ToggleES
      * who wrote thez damn buggy piece of shit ??? --stef */
-    p_dvd->i_block_once = 1;//32;
-    p_input->i_read_once = 8;//128;
+    p_dvd->i_block_once = 32;
+    p_input->i_read_once = 128;
 
     i = CSSTest( p_input->i_handle );
 
@@ -398,7 +398,7 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Reading structures initialisation */
     p_input->p_method_data =
-        DVDNetlistInit( 2048, 8192, 2048, DVD_LB_SIZE, p_dvd->i_block_once );
+        DVDNetlistInit( 8192, 16384, 2048, DVD_LB_SIZE, p_dvd->i_block_once );
     intf_WarnMsg( 2, "dvd info: netlist initialized" );
 
     /* Ifo allocation & initialisation */
@@ -552,6 +552,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     u16                  i_id;
     u8                   i_ac3;
     u8                   i_mpeg;
+    u8                   i_lpcm;
     u8                   i_sub_pic;
     u8                   i;
     int                  j;
@@ -741,6 +742,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             
         i_ac3 = 0x7f;
         i_mpeg = 0xc0;
+        i_lpcm = 0x9f;
 
         for( i = 1 ; i <= vts.manager_inf.i_audio_nb ; i++ )
         {
@@ -795,8 +797,24 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
                 break;
             case 0x04:              /* LPCM */
+#if 0
+                i_id = ( ( i_lpcm + i ) << 8 ) | 0xbd;
+                p_es = input_AddES( p_input,
+                                    p_input->stream.pp_programs[0], i_id, 0 );
+                p_es->i_stream_id = i_id;
+                p_es->i_type = LPCM_AUDIO_ES;
+                p_es->b_audio = 1;
+                p_es->i_cat = AUDIO_ES;
+                strcpy( p_es->psz_desc, Language( hton16(
+                    vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
+                strcat( p_es->psz_desc, " (lpcm)" );
+
+                intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
+                              i, p_es->psz_desc, i_id );
+#else
                 i_id = 0;
                 intf_ErrMsg( "dvd warning: LPCM audio not handled yet" );
+#endif
                 break;
             case 0x06:              /* DTS */
                 i_id = 0;
@@ -946,6 +964,7 @@ static int DVDRead( input_thread_t * p_input,
 {
     thread_dvd_data_t *     p_dvd;
     dvd_netlist_t *         p_netlist;
+    input_area_t *          p_area;
     struct iovec *          p_vec;
     struct data_packet_s *  pp_data[p_input->i_read_once];
     u8 *                    pi_cur;
@@ -958,6 +977,7 @@ static int DVDRead( input_thread_t * p_input,
     int                     i_read_blocks;
     off_t                   i_off;
     boolean_t               b_eof;
+    boolean_t               b_eot;
 
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
@@ -994,18 +1014,21 @@ static int DVDRead( input_thread_t * p_input,
 
         /* update chapter : it will be easier when we have navigation
          * ES support */
-        if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
+        if( p_dvd->i_chapter < ( p_dvd->i_chapter_nb - 1 ) )
         {
-            i_angle = p_dvd->i_angle - 1;
-        }
-        else
-        {
-            i_angle = 0;
-        }
-        if( title.chapter_map.pi_start_cell[p_dvd->i_chapter-1] <=
-            ( p_dvd->i_prg_cell - i_angle ) )
-        {
-            p_dvd->i_chapter++;
+            if( title.p_cell_play[p_dvd->i_prg_cell].i_category & 0xf000 )
+            {
+                i_angle = p_dvd->i_angle - 1;
+            }
+            else
+            {
+                i_angle = 0;
+            }
+            if( title.chapter_map.pi_start_cell[p_dvd->i_chapter] <=
+                ( p_dvd->i_prg_cell - i_angle + 1 ) )
+            {
+                p_dvd->i_chapter++;
+            }
         }
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -1015,7 +1038,7 @@ static int DVDRead( input_thread_t * p_input,
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
         /* the synchro has to be reinitialized when we change cell */
-        p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_START;
+        p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_REINIT;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -1115,18 +1138,30 @@ static int DVDRead( input_thread_t * p_input,
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_input->stream.p_selected_area->i_tell += i_read_bytes;
-    b_eof = !( p_input->stream.p_selected_area->i_tell < p_dvd->i_size );
+    b_eot = !( p_input->stream.p_selected_area->i_tell < p_dvd->i_size );
+    b_eof = b_eot && ( ( p_dvd->i_title + 1 ) < p_input->stream.i_area_nb );
+    p_area = p_input->stream.pp_areas[p_dvd->i_title + 1];
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    if( ( i_read_blocks == i_block_once ) && ( !b_eof ) )
-    {
-        return 0;
-    }
-    else
+    if( b_eof )
     {
         return 1;
     }
+
+    if( b_eot )
+    {
+        p_dvd->i_title++;
+        DVDSetArea( p_input, p_area );
+        return 0;
+    }
+
+    if( i_read_blocks == i_block_once )
+    {
+        return 0;
+    }
+
+    return -1;
 }
 
 /*****************************************************************************
@@ -1163,7 +1198,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_dvd->i_sector = i_pos >> 11;
 
     i_prg_cell = 0;
-    i_chapter = 1;
+    i_chapter = 0;
 
     /* parse vobu address map to find program cell */
     while( title.p_cell_play[i_prg_cell].i_end_sector < p_dvd->i_sector  )
@@ -1224,8 +1259,9 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     {
         i_angle = 0;
     }
-    while( title.chapter_map.pi_start_cell[i_chapter-1] <=
-           ( p_dvd->i_prg_cell - i_angle ) )
+    while( ( title.chapter_map.pi_start_cell[i_chapter] <=
+                ( p_dvd->i_prg_cell - i_angle + 1 ) ) &&
+           ( i_chapter < ( p_dvd->i_chapter_nb - 1 ) ) )
     {
         i_chapter++;
     }

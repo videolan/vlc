@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.31 2001/03/21 13:42:33 sam Exp $
+ * $Id: audio_output.h,v 1.32 2001/04/29 02:48:51 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -39,7 +39,7 @@
 /*
  * Macros
  */
-#define AOUT_FIFO_ISEMPTY( fifo )       ( (fifo).l_end_frame == (fifo).i_start_frame )
+#define AOUT_FIFO_ISEMPTY( fifo )       ( (fifo).l_end_frame == (fifo).l_start_frame )
 #define AOUT_FIFO_ISFULL( fifo )        ( ((((fifo).l_end_frame + 1) - (fifo).l_start_frame) & AOUT_FIFO_SIZE) == 0 )
 
 /*****************************************************************************
@@ -192,6 +192,8 @@ typedef struct aout_thread_s
 #define AOUT_FMT_S8          0x00000040
 #define AOUT_FMT_U16_LE      0x00000080                 /* Little endian U16 */
 #define AOUT_FMT_U16_BE      0x00000100                    /* Big endian U16 */
+#define AOUT_FMT_AC3         0x00000400                 /* Dolby Digital AC3 */
+
 
 #ifdef WORDS_BIGENDIAN
 #define AOUT_FMT_S16_NE      AOUT_FMT_S16_BE

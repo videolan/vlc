@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.32 2001/04/22 00:08:26 stef Exp $
+ * $Id: intf_gnome.c,v 1.33 2001/04/29 02:48:51 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -444,7 +444,7 @@ static gint GnomeLanguageMenus( gpointer          p_data,
     GtkWidget *         p_item;
     GtkWidget *         p_item_active;
     GSList *            p_group;
-    char *              psz_name;
+    char                psz_name[12];
     gint                i_item;
     gint                i;
 
@@ -463,7 +463,7 @@ static gint GnomeLanguageMenus( gpointer          p_data,
     p_menu = gtk_menu_new();
 
     /* special case for "off" item */
-    psz_name = "Off";
+    sprintf( psz_name, "Off" );
 
     p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );
     p_group = gtk_radio_menu_item_group( GTK_RADIO_MENU_ITEM( p_item ) );
@@ -491,7 +491,7 @@ static gint GnomeLanguageMenus( gpointer          p_data,
         if( p_intf->p_input->stream.pp_es[i]->i_cat == i_cat )
         {
             i_item++;
-            psz_name = p_intf->p_input->stream.pp_es[i]->psz_desc;
+            strcpy( psz_name, p_intf->p_input->stream.pp_es[i]->psz_desc );
             if( psz_name[0] == '\0' )
             {
                 sprintf( psz_name, "Language %d", i_item );
@@ -547,7 +547,7 @@ static gint GnomeAngleMenu( gpointer p_data, GtkWidget * p_angle,
                         void(*pf_toggle)( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
-    char                psz_name[10];
+    char                psz_name[12];
     GtkWidget *         p_angle_menu;
     GSList *            p_angle_group;
     GtkWidget *         p_item;
@@ -618,7 +618,7 @@ static gint GnomeChapterMenu( gpointer p_data, GtkWidget * p_chapter,
                         void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
-    char                psz_name[10];
+    char                psz_name[12];
     GtkWidget *         p_chapter_menu;
     GtkWidget *         p_chapter_submenu;
     GtkWidget *         p_menu_item;
@@ -733,7 +733,7 @@ static gint GnomeTitleMenu( gpointer       p_data,
                             void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
-    char                psz_name[10];
+    char                psz_name[12];
     GtkWidget *         p_title_menu;
     GtkWidget *         p_title_submenu;
     GtkWidget *         p_title_item;

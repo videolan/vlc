@@ -2,7 +2,7 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_common.h,v 1.2 2001/03/21 13:42:34 sam Exp $
+ * $Id: aout_common.h,v 1.3 2001/04/29 02:48:51 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -32,6 +32,7 @@ void aout_U16MonoThread       ( aout_thread_t * p_aout );
 void aout_U16StereoThread     ( aout_thread_t * p_aout );
 void aout_S16MonoThread       ( aout_thread_t * p_aout );
 void aout_S16StereoThread     ( aout_thread_t * p_aout );
+void aout_SpdifThread         ( aout_thread_t * p_aout );
 
 #define UPDATE_INCREMENT( increment, integer ) \
     if ( ((increment).l_remainder += (increment).l_euclidean_remainder) >= 0 )\
