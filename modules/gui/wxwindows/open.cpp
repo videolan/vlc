@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.50 2003/12/11 05:27:23 rocky Exp $
+ * $Id: open.cpp,v 1.51 2003/12/11 12:52:39 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -694,23 +694,38 @@ void OpenDialog::UpdateMRL( int i_access_method )
                                       disc_chapter->GetValue() );
 	  break;
 	case 2:
-	  mrltemp = 
 #ifdef HAVE_VCDX
-	    wxT("vcdx://");
+	  if ( disc_title->GetValue() )
+	    mrltemp = wxT("vcdx://") 
+	      + disc_device->GetValue()
+	      + wxString::Format( wxT("@%c%d"), 
+				  config_GetInt( p_intf, "vcdx-PBC"  )
+				  ? 'P' : 'E',
+				  disc_title->GetValue()
+				  );
+	  else 
+	    mrltemp = wxT("vcdx://")
+                  + disc_device->GetValue();
 #else
-	    wxT("vcd://") 
+	  mrltemp = wxT("vcd://") 
                   + disc_device->GetValue()
-                  + wxString::Format( wxT("@%d:%d"),
-                                      disc_title->GetValue(),
-                                      disc_chapter->GetValue() );
+                  + wxString::Format( wxT("@%d"),
+                                      disc_title->GetValue() );
 #endif
 	  break;
 	case 3:
-	  mrltemp = 
 #ifdef HAVE_CDDAX
-	    wxT("cddax://");
+	  if ( disc_title->GetValue() )
+	    mrltemp =  wxT("cddax://") 
+	          + disc_device->GetValue()
+                  + wxString::Format( wxT("@T%d"),
+                                      disc_title->GetValue() );
+	  else 
+	    mrltemp = wxT("cddax://")
+	          + disc_device->GetValue();
+	  
 #else
-	    wxT("cdda://") 
+	  mrltemp =  wxT("cdda://") 
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d"),
                                       disc_title->GetValue() );
@@ -1002,6 +1017,8 @@ void OpenDialog::OnDiscDeviceChange( wxCommandEvent& event )
             psz_device = config_GetPsz( p_intf, "dvd" );
             break;
     }
+    
+    if ( !psz_device ) psz_device = "";
 
     if( disc_device->GetValue().Cmp( wxU( psz_device ) ) )
     {
@@ -1050,7 +1067,26 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_title->SetRange( 0, 255 );
         disc_title->SetValue( 0 );
         break;
-
+    case 2:
+       /* There are at most 100 tracks in a VCD */
+        disc_title->SetRange( 0, 100 ); 
+#ifdef HAVE_VCDX
+        disc_title->SetValue( 0 );
+#else
+        disc_title->SetValue( 1 );
+#endif
+        break;
+    case 3:
+       /* There are at most 100 tracks in a CD */
+#ifdef HAVE_CDDAX
+        disc_title->SetRange( 0, 100 ); 
+        disc_title->SetValue( 0 );
+	break;
+#else
+        disc_title->SetRange( 1, 100 ); 
+        disc_title->SetValue( 1 );
+#endif
+        break;
     default:
         disc_title->SetRange( 1, 255 );
         disc_title->SetValue( 1 );
