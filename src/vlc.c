@@ -157,7 +157,9 @@ static void SigHandler( int i_signal )
 #endif
 
 #if defined(UNDER_CE)
-#include "vlc_common.h"
+#   if defined( _MSC_VER ) && defined( UNDER_CE )
+#       include "vlc_common.h"
+#   endif
 /*****************************************************************************
  * WinMain: parse command line, start interface and spawn threads. (WinCE only)
  *****************************************************************************/
