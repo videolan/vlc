@@ -84,6 +84,9 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 #define SIZES_TEXT N_("Sizes")
 #define SIZES_LONGTEXT N_( \
     "List of sizes separated by colons (720x576:480x576)." )
+#define RATIO_TEXT N_("Aspect ratio")
+#define RATIO_LONGTEXT N_( \
+    "Aspect ratio (4:3, 16:9)." )
 #define PORT_TEXT N_("Command UDP port")
 #define PORT_LONGTEXT N_( \
     "UDP port to listen to for commands." )
@@ -95,7 +98,7 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     "Number of P frames between two I frames." )
 #define QSCALE_TEXT N_("Quantizer scale")
 #define QSCALE_LONGTEXT N_( \
-    "Quantizer scale." )
+    "Fixed quantizer scale to use." )
 
 vlc_module_begin();
     set_description( _("MPEG2 video switcher stream output") );
@@ -107,6 +110,8 @@ vlc_module_begin();
                 FILES_LONGTEXT, VLC_FALSE );
     add_string( SOUT_CFG_PREFIX "sizes", "", NULL, SIZES_TEXT,
                 SIZES_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "aspect-ratio", "4:3", NULL, RATIO_TEXT,
+                RATIO_LONGTEXT, VLC_FALSE );
     add_integer( SOUT_CFG_PREFIX "port", 5001, NULL,
                  PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "command", 0, NULL,
@@ -118,7 +123,7 @@ vlc_module_begin();
 vlc_module_end();
 
 static const char *ppsz_sout_options[] = {
-    "files", "sizes", "port", "command", "gop", "qscale", NULL
+    "files", "sizes", "aspect-ratio", "port", "command", "gop", "qscale", NULL
 };
 
 struct sout_stream_sys_t
@@ -126,6 +131,7 @@ struct sout_stream_sys_t
     sout_stream_t   *p_out;
     int             i_gop;
     int             i_qscale;
+    AVRational      sample_aspect_ratio;
     sout_stream_id_t *pp_audio_ids[MAX_AUDIO];
 
     /* Pictures */
@@ -217,6 +223,32 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
         p_sys->i_nb_pictures++;
+    }
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "aspect-ratio", &val );
+    if ( val.psz_string )
+    {
+        char *psz_parser = strchr( val.psz_string, ':' );
+
+        if( psz_parser )
+        {
+            *psz_parser++ = '\0';
+            p_sys->sample_aspect_ratio.num = atoi( val.psz_string );
+            p_sys->sample_aspect_ratio.den = atoi( psz_parser );
+        }
+        else
+        {
+            msg_Warn( p_stream, "bad aspect ratio %s", val.psz_string );
+            p_sys->sample_aspect_ratio.num = 4;
+            p_sys->sample_aspect_ratio.den = 3;
+        }
+
+        free( val.psz_string );
+    }
+    else
+    {
+        p_sys->sample_aspect_ratio.num = 4;
+        p_sys->sample_aspect_ratio.den = 3;
     }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "port", &val );
@@ -703,6 +735,8 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         id->ff_enc_c->frame_rate    = 25; /* FIXME */
         id->ff_enc_c->frame_rate_base = 1;
+        memcpy( &id->ff_enc_c->sample_aspect_ratio, &p_sys->sample_aspect_ratio,
+                sizeof(AVRational) );
 
         id->ff_enc_c->gop_size = 200;
         id->ff_enc_c->max_b_frames = 0;
