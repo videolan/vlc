@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.11 2003/03/24 19:12:16 gbazin Exp $
+ * $Id: ftp.c,v 1.12 2003/03/24 20:00:51 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -832,6 +832,8 @@ static ssize_t NetRead( input_thread_t *p_input,
                             NULL, NULL, &timeout )) == 0
            || (i_ret < 0 && errno == EINTR) )
     {
+        FD_ZERO( &fds );
+        FD_SET( p_socket->i_handle, &fds );
         timeout.tv_sec  = 1;
         timeout.tv_usec = 0;
 

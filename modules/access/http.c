@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.29 2003/03/24 19:12:16 gbazin Exp $
+ * $Id: http.c,v 1.30 2003/03/24 20:00:51 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -718,6 +718,8 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 #endif
            )
     {
+        FD_ZERO( &fds );
+        FD_SET( p_access_data->i_handle, &fds );
         timeout.tv_sec = 0;
         timeout.tv_usec = 500000;
 
