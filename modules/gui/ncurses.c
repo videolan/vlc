@@ -82,6 +82,7 @@ static int  PlaylistChanged( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void * );
 static void FindIndex      ( intf_thread_t * );
 static void SearchPlaylist ( intf_thread_t *, char * );
+static int  SubSearchPlaylist( intf_thread_t *, char *, int, int );
 static void ManageSlider   ( intf_thread_t * );
 static void ReadDir        ( intf_thread_t * );
 
@@ -968,15 +969,16 @@ static void ManageSlider( intf_thread_t *p_intf )
 
 static void SearchPlaylist( intf_thread_t *p_intf, char *psz_searchstring )
 {
-    bool b_ok = false;
-    int i_current;
+    int i_max;
     int i_first = 0 ;
     int i_item = -1;
     intf_sys_t *p_sys = p_intf->p_sys;
     playlist_t *p_playlist = p_sys->p_playlist;
 
     if( p_sys->i_before_search >= 0 )
+    {
         i_first = p_sys->i_before_search;
+    }
 
     if( ( ! psz_searchstring ) ||  strlen( psz_searchstring ) <= 0 )
     {
@@ -984,38 +986,55 @@ static void SearchPlaylist( intf_thread_t *p_intf, char *psz_searchstring )
         return;
     }
 
-    for( i_current = i_first + 1; i_current < p_playlist->i_size;
-         i_current++ )
+    i_max = p_sys->i_current_view == VIEW_ALL ?
+                p_playlist->i_size : p_sys->i_plist_entries;
+
+    i_item = SubSearchPlaylist( p_intf, psz_searchstring, i_first + 1, i_max );
+    if( i_item < 0 )
     {
-        if( strcasestr( p_playlist->pp_items[i_current]->input.psz_name,
-                        psz_searchstring ) != NULL
-            || strcasestr( p_playlist->pp_items[i_current]->input.psz_uri,
-                           psz_searchstring ) != NULL )
-        {
-            i_item = i_current;
-            b_ok = true;
-            break;
-        }
+        i_item = SubSearchPlaylist( p_intf, psz_searchstring, 0, i_first );
     }
-    if( !b_ok )
+
+    if( i_item < 0 || i_item >= i_max ) return;
+
+    p_sys->i_box_plidx = i_item;
+}
+
+static int SubSearchPlaylist( intf_thread_t *p_intf, char *psz_searchstring,
+                              int i_start, int i_stop )
+{
+    intf_sys_t *p_sys = p_intf->p_sys;
+    playlist_t *p_playlist = p_sys->p_playlist;
+    int i, i_item = -1;
+
+    if( p_sys->i_current_view == VIEW_ALL )
     {
-        for( i_current = 0; i_current < i_first; i_current++ )
+        for( i = i_start + 1; i < i_stop; i++ )
         {
-            if( strcasestr( p_playlist->pp_items[i_current]->input.psz_name,
+            if( strcasestr( p_playlist->pp_items[i]->input.psz_name,
                             psz_searchstring ) != NULL
-                || strcasestr( p_playlist->pp_items[i_current]->input.psz_uri,
+                || strcasestr( p_playlist->pp_items[i]->input.psz_uri,
                                psz_searchstring ) != NULL )
             {
-                i_item = i_current;
-                b_ok = true;
+                i_item = i;
+                break;
+            }
+        }
+    }
+    else
+    {
+        for( i = i_start + 1; i < i_stop; i++ )
+        {
+            if( strcasestr( p_sys->pp_plist[i]->psz_display,
+                            psz_searchstring ) != NULL )
+            {
+                i_item = i;
                 break;
             }
         }
     }
 
-    if( i_item < 0 || i_item >= p_playlist->i_size ) return;
-
-    p_sys->i_box_plidx = i_item;
+    return i_item;
 }
 
 
