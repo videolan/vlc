@@ -268,7 +268,7 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     combo->Append( wxU(_("Default")), (void *)NULL );
     combo->SetSelection( 0 );
-    for( unsigned int i_index = 0; i_index < p_list->i_count; i_index++ )
+    for( int i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
@@ -327,7 +327,7 @@ ModuleListCatConfigControl::ModuleListCatConfigControl( vlc_object_t *p_this,
 
     /* build a list of available modules */
     p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
-    for( unsigned int i_index = 0; i_index < p_list->i_count; i_index++ )
+    for(  int i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
 
@@ -380,7 +380,7 @@ wxString ModuleListCatConfigControl::GetPszValue()
 void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
 {
     wxString newtext = wxU("");
-    for( int i = 0 ; i< pp_checkboxes.size() ; i++ )
+    for( unsigned int i = 0 ; i< pp_checkboxes.size() ; i++ )
     {
         if( pp_checkboxes[i]->checkbox->IsChecked() )
         {

@@ -449,7 +449,6 @@ void Playlist::UpdateNode( playlist_t *p_playlist, playlist_item_t *p_node,
 void Playlist::CreateNode( playlist_t *p_playlist, playlist_item_t *p_node,
                            wxTreeItemId parent )
 {
-    long cookie;
     wxTreeItemId node =
         treectrl->AppendItem( parent, wxL2U( p_node->input.psz_name ),
                               -1,-1, new PlaylistItem( p_node ) );
