@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.7 2003/05/02 14:51:57 fenrir Exp $
+ * $Id: transcode.c,v 1.8 2003/05/02 16:25:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -677,7 +677,6 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
         else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
         {
             int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
-            i_used = i_samples * 2;
 #ifdef WORDS_BIGENDIAN
             uint8_t *sin = (uint8_t*)id->p_buffer_in;
             while( i_samples > 0 )
@@ -694,11 +693,11 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             memcpy( sout, id->p_buffer_in, i_samples * 2 );
             sout += i_samples;
 #endif
+            i_used = i_samples * 2;
         }
         else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
         {
             int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
-            i_used = i_samples * 2;
 #ifdef WORDS_BIGENDIAN
             memcpy( sout, id->p_buffer_in, i_samples * 2 );
             sout += i_samples;
@@ -714,6 +713,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                 i_samples--;
             }
 #endif
+            i_used = i_samples * 2;
         }
 
         id->i_buffer_pos = (uint8_t*)sout - id->p_buffer;
