@@ -111,7 +111,7 @@ void DirectXEventThread( event_thread_t *p_event )
 
         if( OurSetThreadExecutionState )
             /* Prevent monitor from powering off */
-            OurSetThreadExecutionState( ES_DISPLAY_REQUIRED );
+            OurSetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
         else
             msg_Dbg( p_event, "no support for SetThreadExecutionState()" );
     }
