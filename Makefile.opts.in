@@ -225,20 +225,25 @@ endif
 endif
 endif
 
-# Optimizations for x86 familiy
-ifneq (,$(findstring 86,$(ARCH)))
-CFLAGS += -mcpu=$(TUNING)
-endif
-
-# Optimizations for PowerPC
 ifneq (,$(findstring powerpc,$(ARCH)))
+# Optimizations for PowerPC
 CFLAGS += -mmultiple -mhard-float -mstring -mcpu=powerpc
+ifneq (,$(TUNING))
 CFLAGS += -mtune=$(TUNING)
 endif
-
-# Optimizations for Sparc
+else
 ifneq (,$(findstring sparc,$(ARCH)))
+# Optimizations for Sparc
 CFLAGS += -mhard-float
+ifneq (,$(TUNING))
+CFLAGS += -mcpu=$(TUNING)
+endif
+else
+# Generic optimizations
+ifneq (,$(TUNING))
+CFLAGS += -mcpu=$(TUNING)
+endif
+endif
 endif
 
 #end of optimisations

@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.36 2001/10/02 16:46:59 massiot Exp $
+ * $Id: input_ps.c,v 1.37 2001/10/03 14:41:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -401,7 +401,6 @@ static void PSEnd( input_thread_t * p_input )
 #undef p_packet_cache
 
     free( p_input->p_method_data );
-    free( p_input->p_plugin_data );
 }
 
 /*****************************************************************************
