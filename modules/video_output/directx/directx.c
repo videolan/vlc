@@ -94,7 +94,7 @@ static void DirectXGetDDrawCaps   ( vout_thread_t *p_vout );
 static int  DirectXLockSurface    ( vout_thread_t *p_vout, picture_t *p_pic );
 static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
 
-static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color );
+static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t *i_color );
 
 void SwitchWallpaperMode( vout_thread_t *, vlc_bool_t );
 
@@ -218,7 +218,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->GetMonitorInfo = NULL;
     if( (huser32 = GetModuleHandle( _T("USER32") ) ) )
     {
-        p_vout->p_sys->MonitorFromWindow =
+        p_vout->p_sys->MonitorFromWindow = (HMONITOR (WINAPI *)( HWND, DWORD ))
             GetProcAddress( huser32, _T("MonitorFromWindow") );
         p_vout->p_sys->GetMonitorInfo =
 #ifndef UNICODE
@@ -1017,7 +1017,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     /* Make sure the colorkey will be painted */
     p_vout->p_sys->i_colorkey = 1;
     p_vout->p_sys->i_rgb_colorkey =
-        DirectXFindColorkey( p_vout, p_vout->p_sys->i_colorkey );
+        DirectXFindColorkey( p_vout, &p_vout->p_sys->i_colorkey );
 
     /* Create the actual brush */
     SetClassLong( p_vout->p_sys->hvideownd, GCL_HBRBACKGROUND,
@@ -1906,7 +1906,7 @@ static int DirectXUnlockSurface( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * DirectXFindColorkey: Finds out the 32bits RGB pixel value of the colorkey
  *****************************************************************************/
-static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color )
+static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t *pi_color )
 {
     DDSURFACEDESC ddsd;
     HRESULT dxresult;
@@ -1924,16 +1924,20 @@ static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color )
     switch( ddsd.ddpfPixelFormat.dwRGBBitCount )
     {
     case 4:
-        *(uint8_t *)ddsd.lpSurface = 0x11;
+        *(uint8_t *)ddsd.lpSurface = *pi_color | (*pi_color << 4);
         break;
     case 8:
-        *(uint8_t *)ddsd.lpSurface = 0x01;
+        *(uint8_t *)ddsd.lpSurface = *pi_color;
         break;
+    case 15:
     case 16:
-        *(uint16_t *)ddsd.lpSurface = 0x01;
+        *(uint16_t *)ddsd.lpSurface = *pi_color;
         break;
+    case 24:
+        /* Seems to be problematic so we'll just put black as the colorkey */
+        *pi_color = 0;
     default:
-        *(uint32_t *)ddsd.lpSurface = 0x01;
+        *(uint32_t *)ddsd.lpSurface = *pi_color;
         break;
     }
 
