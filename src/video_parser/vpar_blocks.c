@@ -1863,7 +1863,9 @@ static __inline__ void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
     u32         i_dummy;
 
     NextStartCode( p_vpar );
-    while( i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
+    while( (i_coding_type != I_CODING_TYPE || i_coding_type != D_CODING_TYPE
+             || !p_vpar->picture.b_error)
+           && i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
            && !p_vpar->b_die )
     {
         if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))
@@ -1885,7 +1887,8 @@ static __inline__ void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
     /* Try to recover from error. If we missed less than half the
      * number of macroblocks of the picture, mark the missed ones
      * as skipped. */
-    if( p_vpar->picture.b_error &&
+    if( (i_coding_type == P_CODING_TYPE || i_coding_type == B_CODING_TYPE)
+        && p_vpar->picture.b_error &&
         ( (i_mb_address-i_mb_base) > (p_vpar->sequence.i_mb_size >> 1)
            || (i_structure != FRAME_STRUCTURE
                && (i_mb_address-i_mb_base) > (p_vpar->sequence.i_mb_size >> 2) ) ) )
