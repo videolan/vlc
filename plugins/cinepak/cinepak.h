@@ -2,7 +2,7 @@
  * cinepak.h: Cinepak video decoder
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: cinepak.h,v 1.1 2002/07/21 15:11:55 fenrir Exp $
+ * $Id: cinepak.h,v 1.2 2002/07/21 18:47:22 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -33,6 +33,8 @@ typedef struct cinepak_codebook_s
 
 typedef struct cinepak_context_s
 {
+    int b_grayscale; /* force to grayscale */
+    
     int i_width;
     int i_height;
 

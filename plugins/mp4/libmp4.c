@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.2 2002/07/21 15:13:19 fenrir Exp $
+ * $Id: libmp4.c,v 1.3 2002/07/21 18:47:22 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -55,6 +55,9 @@
 
 #define MP4_GET4BYTES( dst ) \
     dst = GetDWBE( p_peek ); p_peek += 4; i_read -= 4
+    
+#define MP4_GETFOURCC( dst ) \
+    dst = GetDWLE( p_peek ); p_peek += 4; i_read -= 4
 
 #define MP4_GET8BYTES( dst ) \
     dst = GetQWBE( p_peek ); p_peek += 8; i_read -= 8
@@ -435,7 +438,7 @@ int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     p_box->p_next   = NULL;
     
     MP4_GET4BYTES( p_box->i_shortsize );
-    MP4_GET4BYTES( p_box->i_type );
+    MP4_GETFOURCC( p_box->i_type );
 
     /* Now special case */
 
@@ -465,8 +468,8 @@ int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     if( p_box->i_size )
     {
         msg_Dbg( p_stream->p_input, "Found Box: %c%c%c%c size %d",
-                 (p_box->i_type>>24)&0xff, (p_box->i_type>>16)&0xff, 
-                     (p_box->i_type>>8)&0xff, (p_box->i_type)&0xff,
+                 (p_box->i_type)&0xff, (p_box->i_type>>8)&0xff, 
+                     (p_box->i_type>>16)&0xff, (p_box->i_type>>24)&0xff,
                  (u32)p_box->i_size );
     }
 #endif
@@ -589,10 +592,10 @@ int MP4_ReadBoxSkip( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     /* Nothing to do */
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Skip box: \"%c%c%c%c\"", 
-            (p_box->i_type>>24)&0xff, 
-            (p_box->i_type>>16)&0xff,
-            (p_box->i_type>>8)&0xff, 
-            (p_box->i_type)&0xff );
+            (p_box->i_type)&0xff, 
+            (p_box->i_type>>8)&0xff,
+            (p_box->i_type>>16)&0xff, 
+            (p_box->i_type>>24)&0xff );
 #endif
     return( 1 );
 }
@@ -601,7 +604,7 @@ int MP4_ReadBox_ftyp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_ftyp_t );
     
-    MP4_GET4BYTES( p_box->data.p_ftyp->i_major_brand );
+    MP4_GETFOURCC( p_box->data.p_ftyp->i_major_brand );
     MP4_GET4BYTES( p_box->data.p_ftyp->i_minor_version );
     
     if( ( p_box->data.p_ftyp->i_compatible_brands_count = i_read / 4 ) )
@@ -612,7 +615,7 @@ int MP4_ReadBox_ftyp( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
         for( i =0; i < p_box->data.p_ftyp->i_compatible_brands_count; i++ )
         {
-            MP4_GET4BYTES( p_box->data.p_ftyp->i_compatible_brands[i] );
+            MP4_GETFOURCC( p_box->data.p_ftyp->i_compatible_brands[i] );
         }
     }
     else
@@ -849,17 +852,17 @@ int MP4_ReadBox_hdlr( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GETVERSIONFLAGS( p_box->data.p_hdlr );
  
     MP4_GET4BYTES( p_box->data.p_hdlr->i_predefined );
-    MP4_GET4BYTES( p_box->data.p_hdlr->i_handler_type );
+    MP4_GETFOURCC( p_box->data.p_hdlr->i_handler_type );
 
     p_box->data.p_hdlr->psz_name = calloc( sizeof( char ), i_read + 1 );
     memcpy( p_box->data.p_hdlr->psz_name, p_peek, i_read );
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"hdlr\" hanler type %c%c%c%c name %s",
-                       ( p_box->data.p_hdlr->i_handler_type >> 24 )&0xff,
-                       ( p_box->data.p_hdlr->i_handler_type >> 16 )&0xff,
-                       ( p_box->data.p_hdlr->i_handler_type >>  8 )&0xff,
                        ( p_box->data.p_hdlr->i_handler_type )&0xff,
+                       ( p_box->data.p_hdlr->i_handler_type >>  8 )&0xff,
+                       ( p_box->data.p_hdlr->i_handler_type >> 16 )&0xff,
+                       ( p_box->data.p_hdlr->i_handler_type >> 24 )&0xff,
                        p_box->data.p_hdlr->psz_name );
 
 #endif
@@ -1291,7 +1294,9 @@ int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_depth );
     MP4_GET2BYTES( p_box->data.p_sample_vide->i_predefined4 );
     
-    
+    MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 78);
+    MP4_ReadBoxContainerRaw( p_stream, p_box );
+   
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, "Read Box: \"vide\" in stsd %dx%d depth %d",
                       p_box->data.p_sample_vide->i_width,
@@ -1302,6 +1307,7 @@ int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+#if 0
 int MP4_ReadBox_sample_mp4v( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     int i;    
@@ -1353,7 +1359,7 @@ int MP4_ReadBox_sample_mp4v( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 #endif
     MP4_READBOX_EXIT( 1 );
 }
-
+#endif 
 
 
 int MP4_ReadBox_stsd( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
@@ -1745,14 +1751,14 @@ int MP4_ReadBox_dcom( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_dcom_t );
     
-    MP4_GET4BYTES( p_box->data.p_dcom->i_algorithm );
+    MP4_GETFOURCC( p_box->data.p_dcom->i_algorithm );
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream->p_input, 
              "Read Box: \"dcom\" compression algorithm : %c%c%c%c",
-                      ( p_box->data.p_dcom->i_algorithm >> 24 )&0xff,
+                      ( p_box->data.p_dcom->i_algorithm )&0xff,
+                      ( p_box->data.p_dcom->i_algorithm >> 8 )&0xff,
                       ( p_box->data.p_dcom->i_algorithm >> 16 )&0xff,
-                      ( p_box->data.p_dcom->i_algorithm >>  8 )&0xff,
-                      ( p_box->data.p_dcom->i_algorithm  )&0xff );
+                      ( p_box->data.p_dcom->i_algorithm >> 24 )&0xff );
 #endif 
     
     MP4_READBOX_EXIT( 1 );
@@ -1834,10 +1840,10 @@ int MP4_ReadBox_cmov( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     if( p_dcom->data.p_dcom->i_algorithm != FOURCC_zlib )
     {
         msg_Dbg( p_stream->p_input, "Read Box: \"cmov\" compression algorithm : %c%c%c%c not supported",
-                    ( p_dcom->data.p_dcom->i_algorithm >> 24 )&0xff,
+                    ( p_dcom->data.p_dcom->i_algorithm )&0xff,
+                    ( p_dcom->data.p_dcom->i_algorithm >> 8 )&0xff,
                     ( p_dcom->data.p_dcom->i_algorithm >> 16 )&0xff,
-                    ( p_dcom->data.p_dcom->i_algorithm >>  8 )&0xff,
-                    ( p_dcom->data.p_dcom->i_algorithm  )&0xff );
+                    ( p_dcom->data.p_dcom->i_algorithm >> 24 )&0xff );
         return( 1 );
     }
     
@@ -1988,12 +1994,18 @@ static struct
     { FOURCC_mp4a,  MP4_ReadBox_sample_mp4a,    MP4_FreeBox_Common },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_mp4v,  MP4_ReadBox_sample_mp4v,    MP4_FreeBox_Common },
+    { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_SVQ1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_DIVX,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_h263,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
     { FOURCC_cvid,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
-    { FOURCC_3IV1,  NULL,                       MP4_FreeBox_Common },
+    { FOURCC_3IV1,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_mjpa,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_mjpb,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
+    { FOURCC_mjqt,  NULL,                       NULL }, /* found in mjpa/b */
+    { FOURCC_mjht,  NULL,                       NULL },
+ 
+    { FOURCC_jpeg,  MP4_ReadBox_sample_vide,    MP4_FreeBox_Common },
 
     { FOURCC_mp4s,  NULL,                       MP4_FreeBox_Common },
 
@@ -2049,10 +2061,10 @@ int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father )
     {
         msg_Warn( p_stream->p_input,
                   "Unknown box type %c%c%c%c (uncompletetly loaded)",
-                  (p_box->i_type>>24)&0xff, 
-                  (p_box->i_type>>16)&0xff,
+                  (p_box->i_type)&0xff, 
                   (p_box->i_type>>8)&0xff,
-                  (p_box->i_type)&0xff );
+                  (p_box->i_type>>16)&0xff,
+                  (p_box->i_type>>24)&0xff );
         return( 1 );
     }
     else
@@ -2109,10 +2121,10 @@ void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box )
             /* Should not happen */
             msg_Warn( p_input, 
                       "cannot free box %c%c%c%c, type unknown",
-                      (p_box->i_type >> 24)&0xff,
+                      (p_box->i_type)&0xff,
+                      (p_box->i_type >> 8)&0xff, 
                       (p_box->i_type >> 16)&0xff, 
-                      (p_box->i_type >>  8)&0xff, 
-                      (p_box->i_type )&0xff );
+                      (p_box->i_type >> 24)&0xff );
         }
         else
         {
@@ -2197,10 +2209,10 @@ static void __MP4_DumpBoxStructure( input_thread_t *p_input,
     if( !i_level )
     {
         msg_Dbg( p_input, "Dumping root Box \"%c%c%c%c \"",
-                          (p_box->i_type>>24 ) &0xff,
-                          (p_box->i_type>>16 ) &0xff,
-                          (p_box->i_type>> 8 ) &0xff,
-                          (p_box->i_type ) &0xff );
+                          (p_box->i_type ) &0xff,
+                          (p_box->i_type >>8 ) &0xff,
+                          (p_box->i_type >>16 ) &0xff,
+                          (p_box->i_type >>24) &0xff );
     }
     else
     {
@@ -2212,10 +2224,10 @@ static void __MP4_DumpBoxStructure( input_thread_t *p_input,
             str[i*5] = '|';
         }
         sprintf( str + i_level * 5, "+ %c%c%c%c size %d",
-                      (p_box->i_type>>24 ) &0xff,
-                      (p_box->i_type>>16 ) &0xff,
-                      (p_box->i_type>> 8 ) &0xff,
                       (p_box->i_type ) &0xff,
+                      (p_box->i_type>>8 ) &0xff,
+                      (p_box->i_type>>16 ) &0xff,
+                      (p_box->i_type>>24 ) &0xff,
                       (u32)p_box->i_size );
         
         msg_Dbg( p_input, "%s", str );

@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.1 2002/07/21 15:11:55 fenrir Exp $
+ * $Id: cinepak.c,v 1.2 2002/07/21 18:47:22 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -342,7 +342,7 @@ static vout_thread_t *cinepak_CreateVout( videodec_thread_t *p_vdec,
 
 void cinepak_LoadCodebook( cinepak_codebook_t *p_codebook,
                            u8 *p_data,
-                           int b_12bits )
+                           int b_grayscale )
 {
     int i, i_y[4], i_u, i_v, i_Cb, i_Cr;
     int i_uv;
@@ -353,7 +353,7 @@ void cinepak_LoadCodebook( cinepak_codebook_t *p_codebook,
     {
         i_y[i] = (u8)( *(p_data++) );
     }
-    if( b_12bits )
+    if( b_grayscale )
     {
         i_u  = (s8)( *(p_data++) );
         i_v  = (s8)( *(p_data++) );
@@ -632,7 +632,8 @@ int cinepak_decode_frame( cinepak_context_t *p_context,
                     for( i = 0; i < i_count; i++ )
                     {
                         cinepak_LoadCodebook( &((*p_codebook)[i_strip][i]), 
-                                              p_data, i_mode );
+                                              p_data, 
+                                       i_mode&~p_context->b_grayscale );
                         p_data += i_mode ? 6 : 4;
                         i_chunk_size -= i_mode ? 6 : 4;
                     }
@@ -661,7 +662,9 @@ int cinepak_decode_frame( cinepak_context_t *p_context,
                             if( i_vector_flags&0x80000000UL )
                             {
                                 cinepak_LoadCodebook( &((*p_codebook)[i_strip][i_index]),
-                                                      p_data, i_mode );
+                                                      p_data, 
+                                            i_mode&~p_context->b_grayscale );
+
                                 p_data += i_mode ? 6 : 4;
                                 i_chunk_size -= i_mode ? 6 : 4;
                             }
@@ -843,6 +846,15 @@ static int InitThread( videodec_thread_t *p_vdec )
     }
     memset( p_vdec->p_context, 0, sizeof( cinepak_context_t ) );
 
+    if( config_GetInt( p_vdec->p_fifo, "grayscale" ) )
+    {
+        p_vdec->p_context->b_grayscale = 1;
+    }
+    else
+    {
+        p_vdec->p_context->b_grayscale = 0;
+    }
+    
     p_vdec->p_vout = NULL;
     msg_Dbg( p_vdec->p_fifo, "cinepak decoder started" );
     return( 0 );

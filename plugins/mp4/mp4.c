@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.1 2002/07/17 21:37:27 fenrir Exp $
+ * $Id: mp4.c,v 1.2 2002/07/21 18:47:22 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -137,8 +137,8 @@ static int MP4Init( input_thread_t *p_input )
         msg_Warn( p_input, "MP4 plugin discarded (cannot peek)" );
         return( -1 );
     }
-    i_type = ( p_peek[4] << 24 ) + ( p_peek[5] << 16 ) +
-                ( p_peek[6] << 8 ) + ( p_peek[7] );
+    i_type = ( p_peek[4] ) + ( p_peek[5] << 8 ) +
+                ( p_peek[6] << 16 ) + ( p_peek[7] << 24);
     switch( i_type )
     {
         case( FOURCC_ftyp ):
@@ -809,10 +809,10 @@ static void MP4_StartDecoder( input_thread_t *p_input,
     {
         msg_Warn( p_input, "%s (%c%c%c%c) unsupported", 
                   psz_name,
-                  (p_sample->i_type >> 24)&0xff,
-                  (p_sample->i_type >> 16)&0xff,
+                  (p_sample->i_type )&0xff,
                   (p_sample->i_type >> 8)&0xff,
-                  (p_sample->i_type )&0xff);
+                  (p_sample->i_type >> 16)&0xff,
+                  (p_sample->i_type >> 24)&0xff);
         p_demux_track->b_ok = 0;
         return;
     }

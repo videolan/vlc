@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.2 2002/07/21 15:13:19 fenrir Exp $
+ * $Id: libmp4.h,v 1.3 2002/07/21 18:47:22 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,10 +23,14 @@
 
 
 /* XXX It's not the same than VLC_FOURCC */
+#if 0
 #define MP4_FOURCC( a, b, c, d ) \
     ( ((u32)d) | ( ((u32)c) << 8 ) | ( ((u32)b) << 16 ) | ( ((u32)a) << 24 ) )
-        
+#endif         
 
+#define MP4_FOURCC( a, b, c, d ) \
+    ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
+    
 #define FOURCC_uuid MP4_FOURCC( 'u', 'u', 'i', 'd' )
 
 #define FOURCC_ftyp MP4_FOURCC( 'f', 't', 'y', 'p' )
@@ -106,8 +110,13 @@
 #define FOURCC_h263 MP4_FOURCC( 'h', '2', '6', '3' )
 #define FOURCC_DIVX MP4_FOURCC( 'D', 'I', 'V', 'X' )
 #define FOURCC_cvid MP4_FOURCC( 'c', 'v', 'i', 'd' )
-
-    
+#define FOURCC_mjpa MP4_FOURCC( 'm', 'j', 'p', 'a' )
+#define FOURCC_mjpb MP4_FOURCC( 'm', 'j', 'q', 't' )
+#define FOURCC_mjqt MP4_FOURCC( 'm', 'j', 'h', 't' )
+#define FOURCC_mjht MP4_FOURCC( 'm', 'j', 'p', 'b' )
+ 
+#define FOURCC_jpeg MP4_FOURCC( 'j', 'p', 'e', 'g' )
+   
 /*
 #define FOURCC_  MP4_FOURCC( '', '', '', '' )
 */    
@@ -367,6 +376,7 @@ typedef struct MP4_Box_data_sample_vide_s
     
 } MP4_Box_data_sample_vide_t;
 
+/*
 typedef struct MP4_Box_data_sample_mp4v_s
 {
     u8  i_reserved1[6];
@@ -392,7 +402,7 @@ typedef struct MP4_Box_data_sample_mp4v_s
     
 } MP4_Box_data_sample_mp4v_t;
 
-
+*/
 
 typedef struct MP4_Box_data_sample_hint_s
 {
