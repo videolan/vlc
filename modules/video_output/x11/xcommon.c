@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.24 2003/07/28 22:46:00 gbazin Exp $
+ * $Id: xcommon.c,v 1.25 2003/07/29 09:32:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -911,9 +911,9 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XGCValues               xgcvalues;
     XEvent                  xevent;
 
-    vlc_bool_t              b_expose;
-    vlc_bool_t              b_configure_notify;
-    vlc_bool_t              b_map_notify;
+    vlc_bool_t              b_expose = VLC_FALSE;
+    vlc_bool_t              b_configure_notify = VLC_FALSE;
+    vlc_bool_t              b_map_notify = VLC_FALSE;
 
     vlc_value_t             val;
     long long int           i_drawable;
@@ -939,8 +939,6 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     if( !i_drawable )
     {
-        p_win->b_owned = VLC_TRUE;
-
         /* Create the window and set hints - the window must receive
          * ConfigureNotify events, and until it is displayed, Expose and
          * MapNotify events. */
@@ -975,13 +973,29 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     }
     else
     {
-        p_win->b_owned = VLC_FALSE;
-        p_win->base_window = i_drawable;
+        /* Get the parent window's geometry information */
+        Window dummy1;
+        unsigned int dummy2, dummy3;
+        XGetGeometry( p_vout->p_sys->p_display, i_drawable,
+                      &dummy1, &dummy2, &dummy3,
+                      &p_win->i_width,
+                      &p_win->i_height,
+                      &dummy2, &dummy3 );
 
-        XChangeWindowAttributes( p_vout->p_sys->p_display,
-                                 p_win->base_window,
-                                 CWBackingStore | CWBackPixel | CWEventMask,
-                                 &xwindow_attributes );
+        /* We are already configured */
+        b_configure_notify = VLC_TRUE;
+
+        /* From man XSelectInput: only one client at a time can select a
+         * ButtonPress event, so we need to open a new window anyway. */
+        p_win->base_window =
+            XCreateWindow( p_vout->p_sys->p_display,
+                           i_drawable,
+                           0, 0,
+                           p_win->i_width, p_win->i_height,
+                           0,
+                           0, CopyFromParent, 0,
+                           CWBackingStore | CWBackPixel | CWEventMask,
+                           &xwindow_attributes );
     }
 
     if( (p_win->wm_protocols == None)        /* use WM_DELETE_WINDOW */
@@ -1000,67 +1014,41 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                            p_win->base_window,
                            GCGraphicsExposures, &xgcvalues );
 
-    if( p_win->b_owned )
+    /* Send orders to server, and wait until window is displayed - three
+     * events must be received: a MapNotify event, an Expose event allowing
+     * drawing in the window, and a ConfigureNotify to get the window
+     * dimensions. Once those events have been received, only
+     * ConfigureNotify events need to be received. */
+    XMapWindow( p_vout->p_sys->p_display, p_win->base_window );
+    do
     {
-        /* Send orders to server, and wait until window is displayed - three
-         * events must be received: a MapNotify event, an Expose event allowing
-         * drawing in the window, and a ConfigureNotify to get the window
-         * dimensions. Once those events have been received, only
-         * ConfigureNotify events need to be received. */
-        b_expose = 0;
-        b_configure_notify = 0;
-        b_map_notify = 0;
-        XMapWindow( p_vout->p_sys->p_display, p_win->base_window );
-        do
+        XNextEvent( p_vout->p_sys->p_display, &xevent);
+        if( (xevent.type == Expose)
+            && (xevent.xexpose.window == p_win->base_window) )
         {
-            XNextEvent( p_vout->p_sys->p_display, &xevent);
-            if( (xevent.type == Expose)
-                && (xevent.xexpose.window == p_win->base_window) )
-            {
-                b_expose = 1;
-            }
-            else if( (xevent.type == MapNotify)
-                     && (xevent.xmap.window == p_win->base_window) )
-            {
-                b_map_notify = 1;
-            }
-            else if( (xevent.type == ConfigureNotify)
-                     && (xevent.xconfigure.window == p_win->base_window) )
-            {
-                b_configure_notify = 1;
-                p_win->i_width = xevent.xconfigure.width;
-                p_win->i_height = xevent.xconfigure.height;
-            }
-        } while( !( b_expose && b_configure_notify && b_map_notify ) );
-    }
-    else
-    {
-        /* Get the window's geometry information */
-        Window dummy1;
-        unsigned int dummy2, dummy3;
-        XGetGeometry( p_vout->p_sys->p_display, p_win->base_window,
-                      &dummy1, &dummy2, &dummy3,
-                      &p_win->i_width,
-                      &p_win->i_height,
-                      &dummy2, &dummy3 );
-    }
+            b_expose = VLC_TRUE;
+        }
+        else if( (xevent.type == MapNotify)
+                 && (xevent.xmap.window == p_win->base_window) )
+        {
+            b_map_notify = VLC_TRUE;
+        }
+        else if( (xevent.type == ConfigureNotify)
+                 && (xevent.xconfigure.window == p_win->base_window) )
+        {
+            b_configure_notify = VLC_TRUE;
+            p_win->i_width = xevent.xconfigure.width;
+            p_win->i_height = xevent.xconfigure.height;
+        }
+    } while( !( b_expose && b_configure_notify && b_map_notify ) );
 
-    /* When we don't own the window we cannot put ButtonPressMask in the list,
-     * because according to the XSelectInput manpage, only one client at a
-     * time can select a ButtonPress event. Programs such as Mozilla may be
-     * already selecting this event. */
-    if( p_win->b_owned )
-        XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
-                      StructureNotifyMask | KeyPressMask |
-                      ButtonPressMask | ButtonReleaseMask |
-                      PointerMotionMask );
-    else
-        XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
-                      StructureNotifyMask );
+    XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
+                  StructureNotifyMask | KeyPressMask |
+                  ButtonPressMask | ButtonReleaseMask |
+                  PointerMotionMask );
 
 #ifdef MODULE_NAME_IS_x11
-    if( p_win->b_owned &&
-         XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
+    if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
     {
         /* Allocate a new palette */
         p_vout->p_sys->colormap =
@@ -1128,11 +1116,8 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XDestroyWindow( p_vout->p_sys->p_display, p_win->video_window );
     XFreeGC( p_vout->p_sys->p_display, p_win->gc );
 
-    if( p_win->b_owned )
-    {
-        XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
-        XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
-    }
+    XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
+    XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
 }
 
 /*****************************************************************************
@@ -1411,11 +1396,8 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         p_vout->p_sys->b_altfullscreen =
             config_GetInt( p_vout, MODULE_STRING "-altfullscreen" );
 
-        if( p_vout->p_sys->p_win->b_owned )
-        {
-            XUnmapWindow( p_vout->p_sys->p_display,
-                          p_vout->p_sys->p_win->base_window);
-        }
+        XUnmapWindow( p_vout->p_sys->p_display,
+                      p_vout->p_sys->p_win->base_window);
 
         p_vout->p_sys->p_win = &p_vout->p_sys->fullscreen_window;
 
@@ -1525,32 +1507,22 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         DestroyWindow( p_vout, &p_vout->p_sys->fullscreen_window );
         p_vout->p_sys->p_win = &p_vout->p_sys->original_window;
 
-        if( p_vout->p_sys->p_win->b_owned )
-        {
-            XMapWindow( p_vout->p_sys->p_display,
-                        p_vout->p_sys->p_win->base_window);
-        }
+        XMapWindow( p_vout->p_sys->p_display,
+                    p_vout->p_sys->p_win->base_window);
     }
 
     /* Unfortunately, using XSync() here is not enough to ensure the
      * window has already been mapped because the XMapWindow() request
      * has not necessarily been sent directly to our window (remember,
      * the call is first redirected to the window manager) */
-    if( p_vout->p_sys->p_win->b_owned )
+    do
     {
-        do
-        {
-            XWindowEvent( p_vout->p_sys->p_display,
-                          p_vout->p_sys->p_win->base_window,
-                          StructureNotifyMask, &xevent );
-        } while( xevent.type != MapNotify );
-    }
-    else
-    {
-        XSync( p_vout->p_sys->p_display, False );
-    }
+        XWindowEvent( p_vout->p_sys->p_display,
+                      p_vout->p_sys->p_win->base_window,
+                      StructureNotifyMask, &xevent );
+    } while( xevent.type != MapNotify );
 
-    /* Becareful, this can generate a BadMatch error if the window is not
+    /* Be careful, this can generate a BadMatch error if the window is not
      * already mapped by the server (see above) */
     XSetInputFocus(p_vout->p_sys->p_display,
                    p_vout->p_sys->p_win->base_window,

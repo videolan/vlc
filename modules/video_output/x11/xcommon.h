@@ -2,7 +2,7 @@
  * xcommon.h: Defines common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.6 2003/07/28 18:02:06 massiot Exp $
+ * $Id: xcommon.h,v 1.7 2003/07/29 09:32:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -69,8 +69,6 @@ typedef struct x11_window_t
 
     Atom                wm_protocols;
     Atom                wm_delete_window;
-
-    vlc_bool_t          b_owned;                   /* do we own this window? */
 
 #ifdef HAVE_XINERAMA
     int                 i_screen;
