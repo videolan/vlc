@@ -2,7 +2,7 @@
  * dtstospdif.c : encapsulates DTS frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dtstospdif.c,v 1.1 2003/03/09 20:07:47 jlj Exp $
+ * $Id: dtstospdif.c,v 1.2 2004/02/02 23:49:46 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -37,9 +37,25 @@
 #include "aout_internal.h"
 
 /*****************************************************************************
+ * Local structures
+ *****************************************************************************/
+struct aout_filter_sys_t
+{
+    /* 3 DTS frames have to be packed into an S/PDIF frame.
+     * We accumulate DTS frames from the decoder until we have enough to
+     * send. */
+
+    uint8_t *p_buf;
+
+    int i_frames;
+    unsigned int i_frame_size;
+};
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
+static void Close     ( vlc_object_t * );
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
 
@@ -49,7 +65,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 vlc_module_begin();
     set_description( _("audio filter for DTS->S/PDIF encapsulation") );
     set_capability( "audio filter", 10 );
-    set_callbacks( Create, NULL );
+    set_callbacks( Create, Close );
 vlc_module_end();
 
 /*****************************************************************************
@@ -65,10 +81,30 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
+    /* Allocate the memory needed to store the module's structure */
+    p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
+    if( p_filter->p_sys == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        return VLC_ENOMEM;
+    }
+    memset( p_filter->p_sys, 0, sizeof(struct aout_filter_sys_t) );
+    p_filter->p_sys->p_buf = 0;
+
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = 0;
+    p_filter->b_in_place = 1;
 
     return 0;
+}
+
+/*****************************************************************************
+ * Close: free our resources
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    if( p_filter->p_sys->i_frame_size ) free( p_filter->p_sys->p_buf );
+    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
@@ -77,9 +113,35 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    uint16_t i_fz = (p_in_buf->i_nb_samples / 3) * 4;
-    uint16_t i_frame, i_length = p_in_buf->i_nb_bytes / 3;
+    uint16_t i_fz = p_in_buf->i_nb_samples * 4;
+    uint16_t i_frame, i_length = p_in_buf->i_nb_bytes;
     static const uint8_t p_sync[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x00, 0x00 };
+
+    if( p_in_buf->i_nb_bytes != p_filter->p_sys->i_frame_size )
+    {
+        /* Frame size changed, reset everything */
+        p_filter->p_sys->i_frame_size = p_in_buf->i_nb_bytes;
+        p_filter->p_sys->p_buf = realloc( p_filter->p_sys->p_buf,
+                                          p_in_buf->i_nb_bytes * 3 );
+        p_filter->p_sys->i_frames = 0;
+    }
+
+    /* Backup frame */
+    p_filter->p_vlc->pf_memcpy( p_filter->p_sys->p_buf + p_in_buf->i_nb_bytes *
+                                p_filter->p_sys->i_frames, p_in_buf->p_buffer,
+                                p_in_buf->i_nb_bytes );
+
+    p_filter->p_sys->i_frames++;
+
+    if( p_filter->p_sys->i_frames < 3 )
+    {
+        /* Not enough data */
+        p_out_buf->i_nb_samples = 0;
+        p_out_buf->i_nb_bytes = 0;
+        return;
+    }
+
+    p_filter->p_sys->i_frames = 0;
 
     for( i_frame = 0; i_frame < 3; i_frame++ )
     {
@@ -88,7 +150,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         byte_t * p_tmp;
 #endif
         byte_t * p_out = p_out_buf->p_buffer + (i_frame * i_fz);
-        byte_t * p_in = p_in_buf->p_buffer + (i_frame * i_length);
+        byte_t * p_in = p_filter->p_sys->p_buf + (i_frame * i_length);
 
         /* Copy the S/PDIF headers. */
         memcpy( p_out, p_sync, 6 );
@@ -119,6 +181,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                     i_fz - i_length - 8 );
     }
 
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples * 3;
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples * 4;
 }

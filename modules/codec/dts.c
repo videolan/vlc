@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.12 2004/01/27 19:14:07 gbazin Exp $
+ * $Id: dts.c,v 1.13 2004/02/02 23:49:46 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -56,12 +56,6 @@ struct decoder_sys_t
 
     int i_frame_size, i_bit_rate;
     unsigned int i_frame_length, i_rate, i_channels, i_channels_conf;
-
-    /* This is very hacky. For DTS over S/PDIF we apparently need to send
-     * 3 frames at a time. This should likely be moved to the output stage. */
-    int i_frames_in_buf;
-    aout_buffer_t *p_aout_buffer;        /* current aout buffer being filled */
-
 };
 
 enum {
@@ -130,7 +124,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_packetizer = VLC_FALSE;
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
-    p_sys->i_frames_in_buf = 0;
 
     p_sys->bytestream = block_BytestreamInit( p_dec );
 
@@ -299,16 +292,6 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             p_sys->i_state = STATE_NOSYNC;
 
-            if( !p_sys->b_packetizer )
-            {
-                if( p_sys->i_frames_in_buf != 3 ) break;
-                else
-                {
-                    p_sys->i_frames_in_buf = 0;
-                    p_sys->p_aout_buffer = 0;
-                }
-            }
-
             /* So p_block doesn't get re-added several times */
             *pp_block = block_BytestreamPop( &p_sys->bytestream );
 
@@ -351,7 +334,8 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 
     p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
     p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
+    /* Hack for DTS S/PDIF filter which needs to send 3 frames at a time */
+    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size * 3;
     p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
 
     p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
@@ -368,16 +352,10 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
     }
     else
     {
-        if( !p_sys->i_frames_in_buf )
-        {
-            p_sys->p_aout_buffer = GetAoutBuffer( p_dec );
-        }
-        p_buf = p_sys->p_aout_buffer ? p_sys->p_aout_buffer->p_buffer +
-            p_sys->i_frames_in_buf * p_sys->i_frame_size : NULL;
-        *pp_out_buffer = p_sys->p_aout_buffer;
+        aout_buffer_t *p_aout_buffer = GetAoutBuffer( p_dec );
+        p_buf = p_aout_buffer ? p_aout_buffer->p_buffer : NULL;
+        *pp_out_buffer = p_aout_buffer;
     }
-
-    p_sys->i_frames_in_buf++;
 
     return p_buf;
 }
@@ -390,12 +368,12 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     aout_buffer_t *p_buf;
 
-    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length * 3 );
+    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length );
     if( p_buf == NULL ) return NULL;
 
     p_buf->start_date = aout_DateGet( &p_sys->end_date );
     p_buf->end_date =
-        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length * 3 );
+        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
 
     return p_buf;
 }
@@ -458,7 +436,18 @@ static int SyncInfo16be( const uint8_t *p_buf,
     return i_frame_size + 1;
 }
 
-static int Buf14leTO16be( uint8_t *p_out, const uint8_t *p_in, int i_in )
+static void BufLeToBe( uint8_t *p_out, const uint8_t *p_in, int i_in )
+{
+    int i;
+
+    for( i = 0; i < i_in/2; i++  )
+    {
+        p_out[i*2] = p_in[i*2+1];
+        p_out[i*2+1] = p_in[i*2];
+    }
+}
+
+static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le )
 {
     unsigned char tmp, cur = 0;
     int bits_in, bits_out = 0;
@@ -466,16 +455,16 @@ static int Buf14leTO16be( uint8_t *p_out, const uint8_t *p_in, int i_in )
 
     for( i = 0; i < i_in; i++  )
     {
-	if( i%2 )
-	{
-	    tmp = p_in[i-1];
-	    bits_in = 8;
-	}
-	else
-	{
-	    tmp = p_in[i+1] & 0x3F;
-	    bits_in = 8 - 2;
-	}
+        if( i%2 )
+        {
+            tmp = p_in[i-i_le];
+            bits_in = 8;
+        }
+        else
+        {
+            tmp = p_in[i+i_le] & 0x3F;
+            bits_in = 8 - 2;
+        }
 
         if( bits_out < 8 )
         {
@@ -513,9 +502,22 @@ static inline int SyncCode( const uint8_t *p_buf )
     {
         return VLC_SUCCESS;
     }
+    /* 14 bits, big endian version of the bitstream */
+    else if( p_buf[0] == 0x1f && p_buf[1] == 0xff &&
+             p_buf[2] == 0xe8 && p_buf[3] == 0x00 &&
+             p_buf[4] == 0x07 && (p_buf[5] & 0xf0) == 0xf0 )
+    {
+        return VLC_SUCCESS;
+    }
     /* 16 bits, big endian version of the bitstream */
     else if( p_buf[0] == 0x7f && p_buf[1] == 0xfe &&
              p_buf[2] == 0x80 && p_buf[3] == 0x01 )
+    {
+        return VLC_SUCCESS;
+    }
+    /* 16 bits, little endian version of the bitstream */
+    else if( p_buf[0] == 0xfe && p_buf[1] == 0x7f &&
+             p_buf[2] == 0x01 && p_buf[3] == 0x80 )
     {
         return VLC_SUCCESS;
     }
@@ -538,15 +540,35 @@ static int SyncInfo( const uint8_t *p_buf,
         (p_buf[4] & 0xf0) == 0xf0 && p_buf[5] == 0x07 )
     {
         uint8_t conv_buf[12];
-	Buf14leTO16be( conv_buf, p_buf, 12 );
+        Buf14To16( conv_buf, p_buf, 12, 1 );
         i_frame_size = SyncInfo16be( conv_buf, &i_audio_mode, pi_sample_rate,
                                      pi_bit_rate, pi_frame_length );
-	i_frame_size = i_frame_size * 8 / 14 * 2;
+        i_frame_size = i_frame_size * 8 / 14 * 2;
+    }
+    /* 14 bits, big endian version of the bitstream */
+    else if( p_buf[0] == 0x1f && p_buf[1] == 0xff &&
+             p_buf[2] == 0xe8 && p_buf[3] == 0x00 &&
+             p_buf[4] == 0x07 && (p_buf[5] & 0xf0) == 0xf0 )
+    {
+        uint8_t conv_buf[12];
+        Buf14To16( conv_buf, p_buf, 12, 0 );
+        i_frame_size = SyncInfo16be( conv_buf, &i_audio_mode, pi_sample_rate,
+                                     pi_bit_rate, pi_frame_length );
+        i_frame_size = i_frame_size * 8 / 14 * 2;
     }
     /* 16 bits, big endian version of the bitstream */
     else if( p_buf[0] == 0x7f && p_buf[1] == 0xfe &&
              p_buf[2] == 0x80 && p_buf[3] == 0x01 )
     {
+        i_frame_size = SyncInfo16be( p_buf, &i_audio_mode, pi_sample_rate,
+                                     pi_bit_rate, pi_frame_length );
+    }
+    /* 16 bits, little endian version of the bitstream */
+    else if( p_buf[0] == 0xfe && p_buf[1] == 0x7f &&
+             p_buf[2] == 0x01 && p_buf[3] == 0x80 )
+    {
+        uint8_t conv_buf[12];
+        BufLeToBe( conv_buf, p_buf, 12 );
         i_frame_size = SyncInfo16be( p_buf, &i_audio_mode, pi_sample_rate,
                                      pi_bit_rate, pi_frame_length );
     }
