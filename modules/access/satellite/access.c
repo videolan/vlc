@@ -111,22 +111,22 @@ int E_(Open) ( vlc_object_t *p_this )
 
     }
 
-    if( i_freq > 12999 || i_freq < 10000 )
+    if( i_freq > (12999*1000) || i_freq < (10000*1000) )
     {
         msg_Warn( p_input, "invalid frequency, using default one" );
         i_freq = config_GetInt( p_input, "frequency" );
-        if( i_freq > 12999 || i_freq < 10000 )
+        if( i_freq > (12999*1000) || i_freq < (10000*1000)a )
         {
             msg_Err( p_input, "invalid default frequency" );
             return -1;
         }
     }
 
-    if( i_srate > 30000 || i_srate < 1000 )
+    if( i_srate > (30000*1000) || i_srate < (1000*1000) )
     {
         msg_Warn( p_input, "invalid symbol rate, using default one" );
         i_srate = config_GetInt( p_input, "symbol-rate" );
-        if( i_srate > 30000 || i_srate < 1000 )
+        if( i_srate > (30000*1000) || i_srate < (1000*1000) )
         {
             msg_Err( p_input, "invalid default symbol rate" );
             return -1;
@@ -217,8 +217,7 @@ int E_(Open) ( vlc_object_t *p_this )
     msg_Dbg( p_input, "initializing Sat Card with Freq: %d, Pol: %d, "
                       "FEC: %03f, Srate: %d", i_freq, b_pol, f_fec, i_srate );
 
-    if ( ioctl_SECControl( i_freq * 1000, b_pol, i_lnb_slof * 1000,
-                b_diseqc ) < 0 )
+    if ( ioctl_SECControl( i_freq, b_pol, i_lnb_slof, b_diseqc ) < 0 )
     {
         msg_Err( p_input, "an error occured when controling SEC" );
         close( p_satellite->i_handle );
@@ -227,8 +226,8 @@ int E_(Open) ( vlc_object_t *p_this )
     }
 
     msg_Dbg( p_input, "initializing frontend device" );
-    switch (ioctl_SetQPSKFrontend ( i_freq * 1000, i_srate* 1000, f_fec,
-                i_lnb_lof1 * 1000, i_lnb_lof2 * 1000, i_lnb_slof * 1000))
+    switch (ioctl_SetQPSKFrontend ( i_freq, i_srate, f_fec,
+                i_lnb_lof1, i_lnb_lof2, i_lnb_slof))
     {
         case -2:
             msg_Err( p_input, "frontend returned an unexpected event" );

@@ -2727,9 +2727,9 @@
 	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
 	    <snap>False</snap>
 	    <wrap>False</wrap>
-	    <value>11954</value>
-	    <lower>10000</lower>
-	    <upper>12999</upper>
+	    <value>11954000</value>
+	    <lower>10000000</lower>
+	    <upper>12999000</upper>
 	    <step>1</step>
 	    <page>10</page>
 	    <page_size>10</page_size>
@@ -2851,9 +2851,9 @@
 	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
 	    <snap>False</snap>
 	    <wrap>False</wrap>
-	    <value>27500</value>
-	    <lower>1000</lower>
-	    <upper>30000</upper>
+	    <value>27500000</value>
+	    <lower>1000000</lower>
+	    <upper>30000000</upper>
 	    <step>1</step>
 	    <page>10</page>
 	    <page_size>10</page_size>

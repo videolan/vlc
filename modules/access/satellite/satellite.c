@@ -38,7 +38,7 @@ void E_(Close)   ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 
-#define FREQ_TEXT N_("Satellite default transponder frequency")
+#define FREQ_TEXT N_("Satellite default transponder frequency (KHz)")
 #define FREQ_LONGTEXT ""
 
 #define POL_TEXT N_("Satellite default transponder polarization")
@@ -47,36 +47,36 @@ void E_(Close)   ( vlc_object_t * );
 #define FEC_TEXT N_("Satellite default transponder FEC")
 #define FEC_LONGTEXT ""
 
-#define SRATE_TEXT N_("Satellite default transponder symbol rate")
+#define SRATE_TEXT N_("Satellite default transponder symbol rate (KHz)")
 #define SRATE_LONGTEXT ""
 
 #define DISEQC_TEXT N_("Use diseqc with antenna")
 #define DISEQC_LONGTEXT ""
 
-#define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (kHz)")
+#define LNB_LOF1_TEXT N_("Antenna lnb_lof1 (KHz)")
 #define LNB_LOF1_LONGTEXT ""
 
-#define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (kHz)")
+#define LNB_LOF2_TEXT N_("Antenna lnb_lof2 (KHz)")
 #define LNB_LOF2_LONGTEXT ""
 
-#define LNB_SLOF_TEXT N_("Antenna lnb_slof (kHz)")
+#define LNB_SLOF_TEXT N_("Antenna lnb_slof (KHz)")
 #define LNB_SLOF_LONGTEXT ""
 
 vlc_module_begin();
     add_category_hint( N_("Input"), NULL, VLC_FALSE );
-        add_integer( "frequency", 11954, NULL, FREQ_TEXT, FREQ_LONGTEXT,
+        add_integer( "frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                      VLC_FALSE );
         add_integer( "polarization", 0, NULL, POL_TEXT, POL_LONGTEXT,
                      VLC_FALSE );
         add_integer( "fec", 3, NULL, FEC_TEXT, FEC_LONGTEXT, VLC_FALSE );
-        add_integer( "symbol-rate", 27500, NULL, SRATE_TEXT, SRATE_LONGTEXT,
+        add_integer( "symbol-rate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
                      VLC_FALSE );
         add_bool( "diseqc", 0, NULL, DISEQC_TEXT, DISEQC_LONGTEXT, VLC_FALSE );
-        add_integer( "lnb-lof1", 10000, NULL,
+        add_integer( "lnb-lof1", 10000000, NULL,
                      LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT, VLC_FALSE );
-        add_integer( "lnb-lof2", 10000, NULL,
+        add_integer( "lnb-lof2", 10000000, NULL,
                      LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT, VLC_FALSE );
-        add_integer( "lnb-slof", 11700, NULL,
+        add_integer( "lnb-slof", 11700000, NULL,
                      LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT, VLC_FALSE );
     set_description( _("satellite input") );
     set_capability( "access", 0 );
