@@ -26,7 +26,7 @@
  * ----------------------------------------------------
  *
  * - Symbols should begin with a prefix indicating in which module they are
- *   used, such as INTF_, VOUT_ or ADEC_.
+ *   used, such as INTF_, VOUT_ or AOUT_.
  */
 
 /*****************************************************************************
@@ -35,9 +35,6 @@
 
 #define CLOCK_FREQ 1000000
 
-
-/* Automagically spawn audio and video decoder threads */
-#define AUTO_SPAWN
 
 /* When creating or destroying threads in blocking mode, delay to poll thread
  * status */
@@ -88,18 +85,6 @@
 /*
  * General limitations
  */
-
-/* Maximum size of a data packet (128 kB) */
-#define INPUT_MAX_PACKET_SIZE           131072
-
-/* Maximum length of a pre-parsed chunk (4 MB) */
-#define INPUT_PREPARSE_LENGTH           4194304
-
-/* Maximum length of a hostname or source name */
-#define INPUT_MAX_SOURCE_LENGTH         100
-
-/* Maximum memory the input is allowed to use (20 MB) */
-#define INPUT_MAX_ALLOCATION            20971520
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
@@ -171,7 +156,7 @@
 
 /* Video heap size - remember that a decompressed picture is big
  * (~1 Mbyte) before using huge values */
-#ifdef UNDER_CE
+#ifdef OPTIMIZE_MEMORY
 #   define VOUT_MAX_PICTURES               5
 #else
 #   define VOUT_MAX_PICTURES               8
@@ -183,13 +168,6 @@
 
 /* Number of simultaneous subpictures */
 #define VOUT_MAX_SUBPICTURES            8
-
-/* Maximum number of active areas in a rendering buffer. Active areas are areas
- * of the picture which need to be cleared before re-using the buffer. If a
- * picture, including its many additions such as subtitles, additionnal user
- * information and interface, has too many active areas, some of them are
- * joined. */
-#define VOUT_MAX_AREAS                  5
 
 /* Statistics are displayed every n loops (=~ pictures) */
 #define VOUT_STATS_NB_LOOPS             100
