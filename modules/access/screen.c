@@ -106,7 +106,6 @@ static int Open( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
-
     if( InitCapture( p_demux ) != VLC_SUCCESS )
     {
         free( p_sys );
@@ -178,7 +177,7 @@ static int Demux( demux_t *p_demux )
 static int InitCapture( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i_chroma;
+    int i_chroma, i_bits_per_pixel;
 
     BITMAPINFO bmi;
 
@@ -198,9 +197,8 @@ static int InitCapture( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    p_sys->fmt.video.i_bits_per_pixel =
-        GetDeviceCaps( p_sys->hdc_src, BITSPIXEL );
-    switch( p_sys->fmt.video.i_bits_per_pixel )
+    i_bits_per_pixel = GetDeviceCaps( p_sys->hdc_src, BITSPIXEL );
+    switch( i_bits_per_pixel )
     {
     case 8: /* FIXME: set the palette */
         i_chroma = VLC_FOURCC('R','G','B','2'); break;
@@ -220,11 +218,15 @@ static int InitCapture( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
+#if 1 /* For now we force RV24 because of chroma inversion in the other cases*/
+    i_chroma = VLC_FOURCC('R','V','2','4');
+    i_bits_per_pixel = 24;
+#endif
+
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
     p_sys->fmt.video.i_width  = GetDeviceCaps( p_sys->hdc_src, HORZRES );
     p_sys->fmt.video.i_height = GetDeviceCaps( p_sys->hdc_src, VERTRES );
-    p_sys->fmt.video.i_bits_per_pixel =
-        GetDeviceCaps( p_sys->hdc_src, BITSPIXEL );
+    p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
 
     /* Create the bitmap info header */
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
