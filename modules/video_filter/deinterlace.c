@@ -66,7 +66,7 @@ static void MergeAltivec ( void *, const void *, const void *, size_t );
 #if defined(CAN_COMPILE_MMX)
 static void MergeMMX     ( void *, const void *, const void *, size_t );
 #endif
-#if defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
 static void MergeSSE2    ( void *, const void *, const void *, size_t );
 #endif
 #if defined(CAN_COMPILE_MMX) || defined(CAN_COMPILE_SSE)
@@ -176,7 +176,7 @@ static int Create( vlc_object_t *p_this )
     }
     else
 #endif
-#if defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
     if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2 )
     {
         p_vout->p_sys->pf_merge = MergeSSE2;
@@ -900,18 +900,19 @@ static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
 }
 #endif
 
-#if defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
 static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
                        size_t i_bytes )
 {
     uint8_t* p_dest = (uint8_t*)_p_dest;
     const uint8_t *p_s1 = (const uint8_t *)_p_s1;
     const uint8_t *p_s2 = (const uint8_t *)_p_s2;
+    uint8_t* p_end;
     while( (int)p_s1 % 16 )
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }        
-    uint8_t* p_end = p_dest + i_bytes - 16;
+    p_end = p_dest + i_bytes - 16;
     while( p_dest < p_end )
     {
         __asm__  __volatile__( "movdqu %2,%%xmm1;"
