@@ -1381,6 +1381,34 @@ from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
 fi
 
 dnl
+dnl  QT Embedded module
+dnl  (disabled by default)
+dnl
+AC_ARG_ENABLE(qte,
+  [  --enable-qte            QT Embedded support (default disabled)])
+if test "x${enable_qte}" = "xyes"
+then
+  AC_ARG_WITH(qte,
+  [    --with-qte=PATH    Qt Embedded headers and libraries])
+  if test "x${with_qte}" = "x"
+  then
+    test_LDFLAGS="-L${QTDIR}/lib"
+    test_CFLAGS="-I$(QTDIR)/include/qte"
+  else
+    test_LDFLAGS="-L${with_qte}/lib"
+    test_CFLAGS="-I${with_qte}/include/qte"
+  fi
+
+  CPPFLAGS="${save_CPPFLAGS} -I${qte_includes}"
+  AC_CHECK_HEADERS(qte/qte.h, [
+    PLUGINS="${PLUGINS} video_output/qte/qte"
+    qte_CFLAGS ="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+    qte_LDFLAGS ="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+  ])
+  CPPFLAGS="${save_CPPFLAGS}"
+fi
+
+dnl
 dnl  Windows DirectX module
 dnl
 AC_ARG_ENABLE(directx,
@@ -1743,14 +1771,25 @@ AC_ARG_ENABLE(kde,
    fi])
 
 dnl
-dnl  Qt embedded module
+dnl  Opie QT embedded module
 dnl
-AC_ARG_ENABLE(qte,
-  [  --enable-qte            Qt embedded interface support (default disabled)],
-  [if test "x${enable_qte}" = "xyes"; then
-     PLUGINS="${PLUGINS} gui/qte/qte"
-     qte_LDFLAGS="${qte_LDFLAGS} -lqte -L${QTEDIR}/lib"
-     qte_CFLAGS="${qte_CFLAGS} -I/usr/include/qte -I${QTEDIR}/include"
+AC_ARG_ENABLE(opie,
+  [  --enable-opie           Qt embedded interface support (default disabled)],
+  [if test "x${enable_opie}" = "xyes"; then
+     AC_ARG_WITH(qte,
+     [    --with-qte=PATH    Qt Embedded headers and libraries])
+     if test "x${with_qte}" = "x"
+     then
+       test_LDFLAGS="-L$(QTDIR)/lib"
+       test_CFLAGS="-I${QTDIR}/include/qte"
+     else
+       test_LDFLAGS="-L${with_qte}/lib"
+       test_CFLAGS="-I${with_qte}/include/qte"
+     fi
+
+     PLUGINS="${PLUGINS} gui/opie/opie"
+     opie_LDFLAGS="${opie_LDFLAGS} ${test_LDFLAGS} -lqte"
+     opie_CFLAGS="${opie_CFLAGS} ${test_CFLAGS}"
      if test -x ${QTEDIR}/bin/moc
      then
        MOC=${QTEDIR}/bin/moc
@@ -2098,6 +2137,7 @@ AC_SUBST(gnome_CFLAGS)
 AC_SUBST(gtk_CFLAGS)
 AC_SUBST(gtk_main_CFLAGS)
 AC_SUBST(kde_CFLAGS)
+AC_SUBST(opie_CFLAGS)
 AC_SUBST(idctaltivec_CFLAGS)
 AC_SUBST(macosx_CFLAGS)
 AC_SUBST(mad_CFLAGS)
@@ -2153,6 +2193,7 @@ AC_SUBST(mad_LDFLAGS)
 AC_SUBST(memcpyaltivec_LDFLAGS)
 AC_SUBST(motionaltivec_LDFLAGS)
 AC_SUBST(ncurses_LDFLAGS)
+AC_SUBST(opie_LDFLAGS)
 AC_SUBST(oss_LDFLAGS)
 AC_SUBST(qnx_LDFLAGS)
 AC_SUBST(qt_LDFLAGS)
