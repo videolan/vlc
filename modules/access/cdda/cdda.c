@@ -40,15 +40,15 @@
 
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \
-    "meta info        1\n" \
-    "events           2\n" \
-    "MRL              4\n" \
-    "external call    8\n" \
-    "all calls (10)  16\n" \
-    "LSN       (20)  32\n" \
-    "seek      (40)  64\n" \
-    "libcdio   (80) 128\n" \
-    "libcddb  (100) 256\n" )
+    "meta info          1\n" \
+    "events             2\n" \
+    "MRL                4\n" \
+    "external call      8\n" \
+    "all calls (0x10)  16\n" \
+    "LSN       (0x20)  32\n" \
+    "seek      (0x40)  64\n" \
+    "libcdio   (0x80) 128\n" \
+    "libcddb  (0x100) 256\n" )
 
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for CDDA streams. This " \

@@ -434,8 +434,31 @@ static void CDDAMetaInfo( access_t *p_access  )
 
 #endif /*HAVE_LIBCDDB*/
 #define TITLE_MAX 30
+  
+/* Adds a string-valued entry to the stream and media information if
+   the string is not null or the null string.
+ */
+#define add_cddb_info_str(CATEGORY, TITLE, FIELD)		  \
+  if (FIELD && strlen(FIELD)) {					  \
+    input_Control( p_cdda->p_input, INPUT_ADD_INFO, CATEGORY,	  \
+		   _(TITLE), "%s", FIELD );			  \
+  }  
+  
+/* Adds a numeric-valued entry to the stream and media information */
+#define add_cddb_info_val(CATEGORY, TITLE, FMT, FIELD)		  \
+  if (FIELD) {							  \
+    input_Control( p_cdda->p_input, INPUT_ADD_INFO, CATEGORY,	  \
+		   _(TITLE), FMT, FIELD );			  \
+  }  
 
-#if UPDATE_TRACK_INFORMATION_FINISHED
+#define add_cddb_disc_info_str(TITLE, FIELD)			\
+  add_cddb_info_str("Disc", TITLE, p_cdda->cddb.disc->FIELD)
+
+#define add_cddb_disc_info_val(TITLE, FMT, FIELD)		    \
+  add_cddb_info_val("Disc", TITLE, FMT, p_cdda->cddb.disc->FIELD)
+
+/*#if UPDATE_TRACK_INFORMATION_FINISHED*/
+#if 1
   {
     track_t i_track = p_cdda->i_tracks;
     char psz_buffer[MSTRTIME_MAX_SIZE];
@@ -444,35 +467,41 @@ static void CDDAMetaInfo( access_t *p_access  )
       / CDIO_CD_FRAMES_PER_SEC;
 
     dbg_print( INPUT_DBG_META, "Duration %ld", (long int) i_duration );
-    input_Control( p_access, INPUT_ADD_INFO, _("General"), _("Duration"), "%s",
+    input_Control( p_cdda->p_input, INPUT_ADD_INFO, 
+		   _("Disc"), _("Duration"), "%s",
 		   secstotimestr( psz_buffer, i_duration ) );
 
+#ifdef HAVE_LIBCDDB
+      if (p_cdda->i_cddb_enabled && p_cdda->cddb.disc) {
+	add_cddb_disc_info_str("Artist (CDDB)", artist);
+	add_cddb_disc_info_str("Genre (CDDB)",  genre);
+	add_cddb_disc_info_str("Extended Data (CDDB)", ext_data);
+	add_cddb_disc_info_val("Year (CDDB)", "%d", year);
+	add_cddb_disc_info_val("Disc ID (CDDB)", "%x", discid);
+	add_cddb_disc_info_str("Title (CDDB)",  title);
+	add_cddb_info_str("Disc", "Category (CDDB)",  
+			  CDDB_CATEGORY[p_cdda->cddb.disc->category]);
+      }
+#endif /*HAVE_LIBCDDB*/
+
     for( i_track = 0 ; i_track < p_cdda->i_tracks ; i_track++ ) {
+
       char track_str[TITLE_MAX];
       mtime_t i_duration =
         (p_cdda->p_lsns[i_track+1] - p_cdda->p_lsns[i_track])
         / CDIO_CD_FRAMES_PER_SEC;
       snprintf(track_str, TITLE_MAX, "%s %02d", _("Track"), i_track+1);
-      input_Control( p_access, INPUT_ADD_INFO, track_str, _("Duration"), "%s",
-                     secstotimestr( psz_buffer, i_duration ) );
+      input_Control( p_cdda->p_input, INPUT_ADD_INFO, track_str, 
+		     _("Duration"), "%s", 
+		     secstotimestr( psz_buffer, i_duration ) );
 
 #ifdef HAVE_LIBCDDB
       if (p_cdda->i_cddb_enabled) {
-        cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
-                                            i_track);
+        cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i_track);
         if (t != NULL) {
-          if ( t->artist != NULL && strlen(t->artist) ) {
-            input_Control( p_access, INPUT_ADD_INFO, track_str,
-                           _("Artist"), "%s", t->artist );
-          }
-          if ( t->title != NULL && strlen(t->title) ) {
-            input_Control( p_access, INPUT_ADD_INFO, track_str,
-                           _("Title"), "%s",  t->title );
-          }
-          if ( t->ext_data != NULL && strlen(t->ext_data) ) {
-            input_Control( p_access, INPUT_ADD_INFO, track_str,
-                           _("Extended Data"), "%s",  t->ext_data );
-          }
+	  add_cddb_info_str(track_str, "Artist (CDDB)", t->artist);
+	  add_cddb_info_str(track_str, "Title (CDDB)",  t->title);
+	  add_cddb_info_str(track_str, "Extended Data (CDDB)", t->ext_data);
         }
       }
 #endif /*HAVE_LIBCDDB*/
@@ -651,6 +680,15 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
   return strdup(temp_str);
 }
 
+/* Adds a string-valued entry to the playlist information under "Disc"
+   if the string is not null or the null string.
+ */
+#define add_playlist_disc_info_str(TITLE, FIELD)		  \
+  if (FIELD && strlen(FIELD)) {					  \
+    playlist_ItemAddInfo( p_item, _("Disc"), _(TITLE),		  \
+			  "%s", FIELD);				  \
+  }  
+
 static void
 CDDACreatePlaylistItem(const access_t *p_access, cdda_data_t *p_cdda,
                        playlist_t *p_playlist, track_t i_track,
@@ -661,8 +699,8 @@ CDDACreatePlaylistItem(const access_t *p_access, cdda_data_t *p_cdda,
   mtime_t i_duration =
     (p_cdda->p_lsns[i_track] - p_cdda->p_lsns[i_track-1])
     * (1000000 / CDIO_CD_FRAMES_PER_SEC) ;
-  char *p_author;
-  char *p_title;
+  char *psz_disc_info;
+  char *psz_title;
   char *config_varname = MODULE_STRING "-title-format";
   playlist_item_t *p_item;
 
@@ -675,13 +713,13 @@ CDDACreatePlaylistItem(const access_t *p_access, cdda_data_t *p_cdda,
   snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u",
            CDDA_MRL_PREFIX, psz_source, i_track);
 
-  p_title = CDDAFormatStr(p_access, p_cdda,
-                          config_GetPsz( p_access, config_varname ),
-                          psz_mrl, i_track);
+  psz_title = CDDAFormatStr(p_access, p_cdda,
+			    config_GetPsz( p_access, config_varname ),
+			    psz_mrl, i_track);
 
   dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld, pos %d",
-             psz_mrl, p_title, (long int) i_duration / 1000000 , i_pos );
-  playlist_AddExt( p_playlist, psz_mrl, p_title, playlist_operation,
+             psz_mrl, psz_title, (long int) i_duration / 1000000 , i_pos );
+  playlist_AddExt( p_playlist, psz_mrl, psz_title, playlist_operation,
                          i_pos, i_duration , NULL, 0);
 
   if( i_pos == PLAYLIST_END ) i_pos = p_playlist->i_size - 1;
@@ -694,46 +732,43 @@ CDDACreatePlaylistItem(const access_t *p_access, cdda_data_t *p_cdda,
 
   vlc_mutex_lock( &p_item->input.lock );
 
-  p_author =
+  psz_disc_info =
     CDDAFormatStr( p_access, p_cdda,
-                   config_GetPsz( p_access, MODULE_STRING "-author-format" ),
+                   config_GetPsz( p_access, MODULE_STRING "-title-format" ),
                    psz_mrl, i_track );
 
-  playlist_ItemAddInfo( p_item ,  _("General"),_("Author"), p_author);
+  playlist_ItemAddInfo( p_item ,  _("Disc"),_("Title"), psz_disc_info);
 
 #ifdef HAVE_LIBCDDB
   if (p_cdda->i_cddb_enabled) {
-    const char *psz_general_cat = _("General");
+    const char *psz_general_cat = _("Disc");
+    cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i_track-1);
 
-    playlist_ItemAddInfo( p_item, psz_general_cat, _("Album"),
-                      "%s", p_cdda->cddb.disc->title);
-    playlist_ItemAddInfo( p_item, psz_general_cat, _("Disc Artist(s)"),
-                      "%s", p_cdda->cddb.disc->artist);
-    playlist_ItemAddInfo( p_item, psz_general_cat,
-                        _("CDDB Disc Category"),
-                      "%s", CDDB_CATEGORY[p_cdda->cddb.disc->category]);
-    playlist_ItemAddInfo( p_item, psz_general_cat, _("Genre"),
-                      "%s", p_cdda->cddb.disc->genre);
+    add_playlist_disc_info_str("Disc Album (CDDB)",
+			       p_cdda->cddb.disc->title);
+    add_playlist_disc_info_str("Disc Artist(s) (CDDB)", 
+			       p_cdda->cddb.disc->artist);
+    add_playlist_disc_info_str("Disc Category (CDDB)", 
+			       CDDB_CATEGORY[p_cdda->cddb.disc->category]);
+    add_playlist_disc_info_str("Disc Genre (CDDB)", 
+			       p_cdda->cddb.disc->genre);
     if ( p_cdda->cddb.disc->discid ) {
-      playlist_ItemAddInfo( p_item, psz_general_cat, _("CDDB Disc ID"),
-                        "%x", p_cdda->cddb.disc->discid );
+      playlist_ItemAddInfo( p_item, psz_general_cat, _("Disc ID (CDDB)"),
+			    "%x", p_cdda->cddb.disc->discid );
     }
     if (p_cdda->cddb.disc->year != 0) {
       playlist_ItemAddInfo( p_item, psz_general_cat,
-                        _("Year"), "%5d", p_cdda->cddb.disc->year );
+			    _("Year"), "%5d", p_cdda->cddb.disc->year );
     }
-
-    if (p_cdda->i_cddb_enabled) {
-      cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
-                                          i_track-1);
-      if (t != NULL && t->artist != NULL) {
-        playlist_ItemAddInfo( p_item, psz_general_cat,
-                          _("Track Artist"), "%s", t->artist );
-        playlist_ItemAddInfo( p_item , psz_general_cat,
-                          _("Track Title"), "%s",  t->title );
-      }
+    
+    if (t) {
+      if (t->artist)
+	add_playlist_disc_info_str("Track Artist (CDDB)", 
+				   t->artist);
+      if (t->title)
+	add_playlist_disc_info_str("Track Title (CDDB)", 
+				   t->title);
     }
-
   }
 #endif /*HAVE_LIBCDDB*/
 
@@ -753,7 +788,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 #ifdef HAVE_LIBCDDB
   p_cdda->i_cddb_enabled =
     config_GetInt( p_access, MODULE_STRING "-cddb-enabled" );
-  if( b_single_track && !p_cdda->i_cddb_enabled ) return 0;
+  if( b_single_track && !p_cdda->i_cddb_enabled ) return VLC_SUCCESS;
 #else
   if( b_single_track ) return VLC_SUCCESS;
 #endif
@@ -781,9 +816,22 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     /* May fill out more information when the playlist user interface becomes
        more mature.
      */
-    CDDACreatePlaylistItem(p_access, p_cdda, p_playlist, p_cdda->i_track,
+    track_t i_track = p_cdda->i_track;
+
+    input_title_t *t = p_cdda->p_title[i_track-1] = vlc_input_title_New();
+	
+    asprintf( &t->psz_name, _("Track %i"), i_track );
+    t->i_size = ( p_cdda->p_lsns[i_track] - p_cdda->p_lsns[i_track-1] ) *
+      (int64_t)CDIO_CD_FRAMESIZE_RAW;
+	
+    t->i_length = I64C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
+    CDDACreatePlaylistItem(p_access, p_cdda, p_playlist, i_track,
                            psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE,
                            p_playlist->i_index);
+    p_access->info.i_size = 
+      ( p_cdda->p_lsns[i_track] - p_cdda->p_lsns[i_track-1] ) *
+      (int64_t)CDIO_CD_FRAMESIZE_RAW;
+
   } else {
 
     for( i = 1 ; i <= p_cdda->i_tracks ; i++ )
@@ -799,6 +847,9 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 			       psz_mrl_max, psz_source, PLAYLIST_APPEND,
 			       PLAYLIST_END);
       }
+    p_access->info.i_size = 
+      (p_cdda->p_lsns[p_cdda->i_tracks] - p_cdda->p_lsns[0]) * 
+      (int64_t)CDIO_CD_FRAMESIZE_RAW;
   }
 
   return VLC_SUCCESS;
@@ -911,6 +962,9 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     p_cdda->i_blocks_per_read
                      = config_GetInt(p_this, MODULE_STRING "-blocks-per-read");
 
+    p_cdda->p_input  = vlc_object_find( p_access, VLC_OBJECT_INPUT, 
+					FIND_PARENT );
+
     if (0 == p_cdda->i_blocks_per_read)
       p_cdda->i_blocks_per_read = DEFAULT_BLOCKS_PER_READ;
     
@@ -934,9 +988,9 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     p_access->pf_control = CDDAControl;
     p_access->pf_seek    = CDDASeek;
 
-    p_access->info.i_update    = 0;
     p_access->info.i_size      = 0;
-    p_access->info.i_pos       = 0;
+
+    p_access->info.i_update    = 0;
     p_access->info.b_eof       = VLC_FALSE;
     p_access->info.i_title     = 0;
     p_access->info.i_seekpoint = 0;
@@ -1117,6 +1171,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
+
         default:
 	  msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;

@@ -91,6 +91,8 @@ typedef struct cdda_data_s
     WAVEHEADER   waveheader;           /* Wave header for the output data */
     vlc_bool_t   b_header;
 
+    input_thread_t *p_input;
+
 } cdda_data_t;
 
 /* FIXME: This variable is a hack. Would be nice to eliminate. */
