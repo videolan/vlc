@@ -32,13 +32,13 @@ CONFIG_FLAGS += \
 	--enable-mozilla \
 	--enable-kde \
 	--enable-mp4 \
-	--enable-dvb \
+	--disable-dvb \
 	--enable-dv \
 	--disable-satellite \
 	--enable-ogg \
 	--enable-vorbis \
 	--enable-wxwindows \
-	--enable-slp \
+	--disable-slp \
 	--enable-flac \
 	--disable-skins \
 	--disable-basic-skins \
@@ -56,11 +56,14 @@ CONFIG_FLAGS += \
 	--enable-cdio \
 	--enable-mod \
 	--enable-theora \
+	--enable-modplug \
 	$(NULL)
 
 # These ones are currently shipped with VLC
 CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
+#CONFIG_FLAGS += --enable-ffmpegaltivec
 CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad2
+CONFIG_FLAGS += --enable-x264 --with-x264-tree=extras/x264
 
 # Glide and svgalib are only for x86
 ifeq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
@@ -95,9 +98,16 @@ configure-stamp:
 	test -d extras/ffmpeg
 	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg \
-	  && CC=$(CC) ./configure --enable-pp --enable-gpl --enable-zlib --disable-debug \
+	  && CC=$(CC) ./configure --enable-pp --enable-gpl --enable-zlib --disable-debug --disable-mmx \
 	  && cd libavcodec \
 	  && $(MAKE); \
+	fi
+
+	# Check that we have an x264 tree in here (can be a symlink)
+	test -d extras/x264
+	if test ! '(' -d CVS -o -d .svn ')'; then \
+	  cd extras/x264 \
+	  && jam -dx libx264.a; \
 	fi
 
 	# Check that we have an faad2 tree in here (can be a symlink)
@@ -129,7 +139,6 @@ build-stamp: patch configure-stamp
 	cd modules && AM_MAKEFLAGS='plugin=no pic=no' $(MAKE)
 	$(MAKE) vlc
 
-ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	# Hackety hackety hack
 	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg/libavcodec \
@@ -140,13 +149,22 @@ ifneq ($(shell dpkg-architecture -qDEB_BUILD_GNU_CPU),i386)
 	  && rm -f Makefile.pic; \
 	fi
 
+	# Hackety hackety hack
+	if test ! '(' -d CVS -o -d .svn ')'; then \
+	  cd extras/x264 \
+	  && jam -dx clean \
+	  && rm -f Jamfile.pic \
+	  && sed 's/^CCFLAGS *=/& -fPIC -DPIC /' <Jamfile >Jamfile.pic \
+	  && jam -dx -sJAMFILE=Jamfile.pic libx264.a \
+	  && rm -f Jamfile.pic; \
+	fi
+
 	# HACKETY HACKETY HACK
 	if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/faad2/libfaad \
 	  && $(MAKE) clean \
 	  && $(MAKE) AM_CFLAGS=-fPIC; \
 	fi
-endif
 
 	# Build all the rest, with the PIC libs
 	AM_MAKEFLAGS='builtin=no' $(MAKE)
@@ -163,6 +181,11 @@ clean: unpatch
 	-if test ! '(' -d CVS -o -d .svn ')'; then \
 	  cd extras/ffmpeg && $(MAKE) distclean; \
 	fi
+	# Check that we have an x264 tree in here (can be a symlink)
+	test -d extras/x264
+	-if test ! '(' -d CVS -o -d .svn ')'; then \
+	  cd extras/x264 && jam -dx clean; \
+	fi
 	# Check that we have an faad2 tree in here (can be a symlink)
 	test -d extras/faad2
 	-if test ! '(' -d CVS -o -d .svn ')'; then \
@@ -176,11 +199,6 @@ clean: unpatch
 	# Remove spurious autotools stuff
 	rm -f config.log confdefs.h
 
-	touch configure.ac -d yesterday
-	touch aclocal.m4 -d yesterday
-	touch configure -d yesterday
-	touch config.h.in -d yesterday
-	touch `find . -name Makefile.in` -d yesterday
 	-$(MAKE) distclean
 
 	dh_clean

@@ -32,7 +32,6 @@ EXTRA_DIST = \
 	wxvlc.dirs \
 	wxvlc.menu \
 	patches/00list \
-	patches/20_faad2.dpatch \
 	patches/20_ffmpeg.dpatch \
 	patches/20_interfaces.dpatch \
 	$(NULL)
