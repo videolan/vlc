@@ -1,5 +1,6 @@
 Create translations for VLC media player
 ==============
+The translation files are located in the "po" directory of the vlc sources.
 Edit the appropriate file (for instance fr.po for French translation).
 Write the translation of "msgid" strings into the "msgstr" field.
 You can always ask vlc-devel@videolan.org for assistance.
@@ -65,4 +66,4 @@ VLC.app/Contents/MacOS/locale/it/LC_MESSAGES]
 -- 
 Christophe Massiot <massiot@via.ecp.fr>
 Derk-Jan Hartman <hartman at videolan dot org>
-$Id: translations.txt,v 1.1 2004/02/04 03:23:25 hartman Exp $
+$Id$
