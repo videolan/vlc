@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.13 2003/05/05 22:23:33 gbazin Exp $
+ * $Id: v4l.c,v 1.14 2003/05/08 19:21:39 fenrir Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,12 +44,7 @@
 #include <fcntl.h>
 #include <linux/videodev.h>
 
-/* enable audio grabbing */
-#define _V4L_AUDIO_
-
-#ifdef _V4L_AUDIO_
-    #include <sys/soundcard.h>
-#endif
+#include <sys/soundcard.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -121,7 +116,6 @@ struct access_sys_t
     int     i_video_frame_size;
     int     i_video_frame_size_allocated;
 
-#ifdef _V4L_AUDIO_
     char         *psz_adev;
     int          fd_audio;
     vlc_fourcc_t i_acodec_raw;
@@ -131,8 +125,6 @@ struct access_sys_t
     uint8_t *p_audio_frame;
     int     i_audio_frame_size;
     int     i_audio_frame_size_allocated;
-
-#endif
 
     /* header */
     int     i_header_size;
@@ -224,12 +216,10 @@ static int AccessOpen( vlc_object_t *p_this )
 
     p_sys->i_codec          = VLC_FOURCC( 0, 0, 0, 0 );
     p_sys->i_video_frame_size_allocated = 0;
-#ifdef _V4L_AUDIO_
     p_sys->psz_adev         = NULL;
     p_sys->fd_audio         = -1;
     p_sys->i_sample_rate    = 44100;
     p_sys->b_stereo         = VLC_TRUE;
-#endif
 
     p_sys->i_data_size = 0;
     p_sys->i_data_pos  = 0;
@@ -362,7 +352,6 @@ static int AccessOpen( vlc_object_t *p_this )
                     msg_Warn( p_input, "unknow codec" );
                 }
             }
-#ifdef _V4L_AUDIO_
             else if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) ) )
             {
                 int  i_len;
@@ -400,7 +389,6 @@ static int AccessOpen( vlc_object_t *p_this )
 
                 p_sys->b_stereo = VLC_FALSE;
             }
-#endif
             else
             {
                 msg_Warn( p_input, "unknow option" );
@@ -428,13 +416,11 @@ static int AccessOpen( vlc_object_t *p_this )
     }
     msg_Dbg( p_input, "video device=`%s'", p_sys->psz_video_device );
 
-#ifdef _V4L_AUDIO_
     if( p_sys->psz_adev && *p_sys->psz_adev == '\0' )
     {
         p_sys->psz_adev = strdup( "/dev/dsp" );
     }
     msg_Dbg( p_input, "audio device=`%s'", p_sys->psz_adev );
-#endif
 
 
 
@@ -582,7 +568,6 @@ static int AccessOpen( vlc_object_t *p_this )
                 goto failed;
             }
 
-#ifdef _V4L_AUDIO_
             if( p_sys->psz_adev )
             {
                 int    i_format;
@@ -626,7 +611,6 @@ static int AccessOpen( vlc_object_t *p_this )
                 p_sys->p_audio_frame =
                     malloc( p_sys->i_audio_frame_size_allocated );
             }
-#endif
         }
     }
 
@@ -864,7 +848,6 @@ static int AccessOpen( vlc_object_t *p_this )
     SetDWBE( &p_sys->p_header[20], p_sys->i_height );
     SetDWBE( &p_sys->p_header[24], 0 );
 
-#ifdef _V4L_AUDIO_
     if( p_sys->fd_audio > 0 )
     {
         p_sys->i_header_size += 20;
@@ -878,7 +861,6 @@ static int AccessOpen( vlc_object_t *p_this )
         SetDWBE( &p_sys->p_header[40], p_sys->i_sample_rate );
         SetDWBE( &p_sys->p_header[44], 16 );
     }
-#endif
     return VLC_SUCCESS;
 
 failed:
@@ -907,12 +889,10 @@ static void AccessClose( vlc_object_t *p_this )
     {
         munmap( p_sys->p_video_mmap, p_sys->vid_mbuf.size );
     }
-#ifdef _V4L_AUDIO_
     if( p_sys->fd_audio >= 0 )
     {
         close( p_sys->fd_audio );
     }
-#endif
 
     if( p_sys->p_encoder )
     {
@@ -927,7 +907,6 @@ static void AccessClose( vlc_object_t *p_this )
     free( p_sys );
 }
 
-#ifdef _V4L_AUDIO_
 static int GrabAudio( input_thread_t * p_input,
                       uint8_t **pp_data,
                       int      *pi_data,
@@ -962,7 +941,6 @@ static int GrabAudio( input_thread_t * p_input,
                          2 / ( p_sys->b_stereo ? 2 : 1) / p_sys->i_sample_rate;
     return VLC_SUCCESS;
 }
-#endif
 
 static int GrabVideo( input_thread_t * p_input,
                       uint8_t **pp_data,
@@ -1092,7 +1070,6 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         p_sys->i_data_pos = 0;
 
         /* try grabbing audio frames */
-#ifdef _V4L_AUDIO_
         i_stream = 1;
         if( p_sys->fd_audio < 0 ||
             GrabAudio( p_input, &p_sys->p_data, &p_sys->i_data_size, &i_pts ) )
@@ -1104,14 +1081,6 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
                 return -1;
             }
         }
-#else
-        /* and then get video frame if no audio */
-        i_stream = 0;
-        if( GrabVideo( p_input, &p_sys->p_data, &p_sys->i_data_size, &i_pts ) )
-        {
-            return -1;
-        }
-#endif
 
         /* create pseudo header */
         p_sys->i_header_size = 16;
