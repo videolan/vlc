@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.74 2003/11/27 06:37:11 adn Exp $
+ * $Id: wxwindows.h,v 1.75 2003/11/29 13:39:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -229,14 +229,14 @@ private:
     int i_old_playing_status;
 
     /* For auto-generated menus */
+    wxMenu *p_settings_menu;
+    vlc_bool_t b_settings_menu;
     wxMenu *p_audio_menu;
     vlc_bool_t b_audio_menu;
     wxMenu *p_video_menu;
     vlc_bool_t b_video_menu;
     wxMenu *p_navig_menu;
     vlc_bool_t b_navig_menu;
-    wxMenu *p_misc_menu;
-    vlc_bool_t b_misc_menu;
 };
 
 class StreamDialog;
@@ -893,10 +893,10 @@ private:
 /* Menus */
 void PopupMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
                 const wxPoint& pos );
+wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
-wxMenu *MiscMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 
 class MenuEvtHandler : public wxEvtHandler
 {

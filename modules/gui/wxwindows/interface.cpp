@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.71 2003/11/21 18:55:40 gbazin Exp $
+ * $Id: interface.cpp,v 1.72 2003/11/29 13:39:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -345,11 +345,8 @@ void Interface::CreateOurMenuBar()
                        wxU(_(HELP_FILEINFO)) );
 
     /* Create the "Settings" menu */
-    wxMenu *settings_menu = new wxMenu;
-    settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
-                           wxU(_(HELP_PREFS)) );
-    settings_menu->AppendCheckItem( Extra_Event, wxU(_("&Extended GUI") ),
-                                    wxU(_(EXTRA_PREFS)) );
+    p_settings_menu = new wxMenu;
+    b_settings_menu = 1;
 
     /* Create the "Audio" menu */
     p_audio_menu = new wxMenu;
@@ -363,10 +360,6 @@ void Interface::CreateOurMenuBar()
     p_navig_menu = new wxMenu;
     b_navig_menu = 1;
 
-    /* Create the "Miscellaneous" menu */
-    p_misc_menu = new wxMenu;
-    b_misc_menu = 1;
-
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
     help_menu->Append( About_Event, wxU(_("&About...")), wxU(_(HELP_ABOUT)) );
@@ -375,11 +368,10 @@ void Interface::CreateOurMenuBar()
     wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
     menubar->Append( file_menu, wxU(_("&File")) );
     menubar->Append( view_menu, wxU(_("&View")) );
-    menubar->Append( settings_menu, wxU(_("&Settings")) );
+    menubar->Append( p_settings_menu, wxU(_("&Settings")) );
     menubar->Append( p_audio_menu, wxU(_("&Audio")) );
     menubar->Append( p_video_menu, wxU(_("&Video")) );
     menubar->Append( p_navig_menu, wxU(_("&Navigation")) );
-    menubar->Append( p_misc_menu, wxU(_("&Miscellaneous")) );
     menubar->Append( help_menu, wxU(_("&Help")) );
 
     /* Attach the menu bar to the frame */
@@ -748,7 +740,32 @@ void RecursiveDestroy( wxMenu *menu )
 void Interface::OnMenuOpen(wxMenuEvent& event)
 {
 #if !defined( __WXMSW__ )
-    if( event.GetEventObject() == p_audio_menu )
+    if( event.GetEventObject() == p_settings_menu )
+    {
+        if( b_settings_menu )
+        {
+            p_settings_menu = SettingsMenu( p_intf, this );
+
+            /* Add static items */
+            p_settings_menu->AppendCheckItem( Extra_Event,
+                             wxU(_("&Extended GUI") ), wxU(_(EXTRA_PREFS)) );
+            p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
+                                     wxU(_(HELP_PREFS)) );
+
+            /* Work-around for buggy wxGTK */
+            wxMenu *menu = GetMenuBar()->GetMenu( 2 );
+            RecursiveDestroy( menu );
+            /* End work-around */
+
+            menu = GetMenuBar()->Replace( 2, p_settings_menu,
+                                          wxU(_("&Settings")));
+            if( menu ) delete menu;
+
+            b_settings_menu = 0;
+        }
+        else b_settings_menu = 1;
+    }
+    else if( event.GetEventObject() == p_audio_menu )
     {
         if( b_audio_menu )
         {
@@ -805,29 +822,20 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         }
         else b_navig_menu = 1;
     }
-    else if( event.GetEventObject() == p_misc_menu )
-    {
-        if( b_misc_menu )
-        {
-            p_misc_menu = MiscMenu( p_intf, this );
-
-            /* Work-around for buggy wxGTK */
-            wxMenu *menu = GetMenuBar()->GetMenu( 6 );
-            RecursiveDestroy( menu );
-            /* End work-around */
-
-            menu = GetMenuBar()->Replace( 6, p_misc_menu,
-					  wxU(_("&Miscellaneous")));
-            if( menu ) delete menu;
-
-            b_misc_menu = 0;
-        }
-        else b_misc_menu = 1;
-    }
 
 #else
+    p_settings_menu = SettingsMenu( p_intf, this );
+    /* Add static items */
+    p_settings_menu->AppendCheckItem( Extra_Event, wxU(_("&Extended GUI") ),
+                                      wxU(_(EXTRA_PREFS)) );
+    p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
+                             wxU(_(HELP_PREFS)) );
+    wxMenu *menu =
+        GetMenuBar()->Replace( 2, p_settings_menu, wxU(_("&Settings")) );
+    if( menu ) delete menu;
+
     p_audio_menu = AudioMenu( p_intf, this );
-    wxMenu *menu = GetMenuBar()->Replace( 3, p_audio_menu, wxU(_("&Audio")) );
+    menu = GetMenuBar()->Replace( 3, p_audio_menu, wxU(_("&Audio")) );
     if( menu ) delete menu;
 
     p_video_menu = VideoMenu( p_intf, this );
@@ -837,11 +845,8 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
     p_navig_menu = NavigMenu( p_intf, this );
     menu = GetMenuBar()->Replace( 5, p_navig_menu, wxU(_("&Navigation")) );
     if( menu ) delete menu;
-
-    p_misc_menu = MiscMenu( p_intf, this );
-    menu = GetMenuBar()->Replace( 6, p_misc_menu, wxU(_("&Miscellaneous")) );
-    if( menu ) delete menu;
 #endif
+
 }
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
