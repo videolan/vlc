@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.4 2003/01/28 10:05:15 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.5 2003/01/31 06:45:00 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -150,12 +150,8 @@ void MessagesWindow::UpdateMessages()
             fMessagesView->LockLooper();
             oldLength = fMessagesView->TextLength();
             BString string;
-            string.Append( p_sub->p_msg[i_start].psz_module );
-            string.Append( " " );
-            string.Append( psz_module_type );
-            string.Append( " : " );
-            string.Append( p_sub->p_msg[i_start].psz_msg );
-            string.Append( "\n" );
+            string << p_sub->p_msg[i_start].psz_module << " " << psz_module_type << " : " <<
+                p_sub->p_msg[i_start].psz_msg << "\n";
             fMessagesView->Insert( string.String() );
             fMessagesView->SetFontAndColor( oldLength,
                                             fMessagesView->TextLength(),

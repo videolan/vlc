@@ -2,7 +2,7 @@
  * beos.cpp : BeOS plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: BeOS.cpp,v 1.4 2003/01/25 20:15:41 titer Exp $
+ * $Id: BeOS.cpp,v 1.5 2003/01/31 06:45:00 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,6 +59,10 @@ vlc_module_begin();
         add_integer( "beos-playlist-xpos", 0, NULL, "", "" );
         add_integer( "beos-playlist-ypos", 0, NULL, "", "" );
         add_bool( "beos-playlist-show", 0, NULL, "", "" );
+        add_integer( "beos-messages-width", 0, NULL, "", "" );
+        add_integer( "beos-messages-height", 0, NULL, "", "" );
+        add_integer( "beos-messages-xpos", 0, NULL, "", "" );
+        add_integer( "beos-messages-ypos", 0, NULL, "", "" );
         add_bool( "beos-messages-show", 0, NULL, "", "" );
     add_submodule();                                     
         set_capability( "video output", 100 );

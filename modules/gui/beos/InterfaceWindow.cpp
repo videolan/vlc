@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.24 2003/01/28 08:17:26 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.25 2003/01/31 06:45:00 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -209,6 +209,16 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
         /* playlist window size and position */
         fPlaylistWindow->ResizeTo( i_width, i_height );
         fPlaylistWindow->MoveTo( i_xpos, i_ypos );
+    }
+    i_width = config_GetInt( p_intf, "beos-messages-width" ),
+    i_height = config_GetInt( p_intf, "beos-messages-height" ),
+    i_xpos = config_GetInt( p_intf, "beos-messages-xpos" ),
+    i_ypos = config_GetInt( p_intf, "beos-messages-ypos" );
+    if( i_width && i_height && i_xpos && i_ypos )
+    {
+        /* messages window size and position */
+        fMessagesWindow->ResizeTo( i_width, i_height );
+        fMessagesWindow->MoveTo( i_xpos, i_ypos );
     }
     if( config_GetInt( p_intf, "beos-playlist-show" ) )
     {
@@ -632,6 +642,11 @@ bool InterfaceWindow::QuitRequested()
     }
     if( fMessagesWindow->Lock() )
     {
+        frame = fMessagesWindow->Frame();
+        config_PutInt( p_intf, "beos-messages-width", (int)frame.Width() );
+        config_PutInt( p_intf, "beos-messages-height", (int)frame.Height() );
+        config_PutInt( p_intf, "beos-messages-xpos", (int)frame.left );
+        config_PutInt( p_intf, "beos-messages-ypos", (int)frame.top );
         config_PutInt( p_intf, "beos-messages-show", !fMessagesWindow->IsHidden() );
         fMessagesWindow->Unlock();
     }
