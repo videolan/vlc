@@ -230,6 +230,7 @@ static int Init( vout_thread_t *p_vout )
     unsigned int i_hstart, i_hend, i_vstart, i_vend;
     unsigned int w1,h1,w2,h2;
     int i_xpos, i_ypos;
+    int i_vstart_rounded = 0, i_hstart_rounded = 0;
 
     i_xpos = var_CreateGetInteger( p_vout, "video-x" );
     i_ypos = var_CreateGetInteger( p_vout, "video-y" );
@@ -257,7 +258,7 @@ static int Init( vout_thread_t *p_vout )
     
     if ( h1 * p_vout->p_sys->i_row < p_vout->output.i_height )
     {
-        int i_tmp;
+        unsigned int i_tmp;
         i_target_width = w2;        
         i_target_height = h2;
         i_vstart = 0;
@@ -265,11 +266,13 @@ static int Init( vout_thread_t *p_vout )
         i_tmp = i_target_width * p_vout->p_sys->i_col;
         while( i_tmp < p_vout->output.i_width ) i_tmp += p_vout->p_sys->i_col;
         i_hstart = (( i_tmp - p_vout->output.i_width ) / 2)&~1;
+        i_hstart_rounded  = ( ( i_tmp - p_vout->output.i_width ) % 2 ) ||
+            ( ( ( i_tmp - p_vout->output.i_width ) / 2 ) & 1 );
         i_hend = i_hstart + p_vout->output.i_width;
     }
     else
     {
-        int i_tmp;
+        unsigned int i_tmp;
         i_target_height = h1;
         i_target_width = w1;
         i_hstart = 0;
@@ -277,6 +280,8 @@ static int Init( vout_thread_t *p_vout )
         i_tmp = i_target_height * p_vout->p_sys->i_row;
         while( i_tmp < p_vout->output.i_height ) i_tmp += p_vout->p_sys->i_row;
         i_vstart = ( ( i_tmp - p_vout->output.i_height ) / 2 ) & ~1;
+        i_vstart_rounded  = ( ( i_tmp - p_vout->output.i_height ) % 2 ) ||
+            ( ( ( i_tmp - p_vout->output.i_height ) / 2 ) & 1 );
         i_vend = i_vstart + p_vout->output.i_height;
     }
     msg_Dbg( p_vout, "target resolution %dx%d", i_target_width, i_target_height );
@@ -310,9 +315,16 @@ static int Init( vout_thread_t *p_vout )
             }
             else
             {
-                i_width = i_target_width - i_hstart % i_target_width;
-                i_align |= i_col > ( p_vout->p_sys->i_col / 2 ) ?
-                    VOUT_ALIGN_LEFT : VOUT_ALIGN_RIGHT;
+                i_width = ( i_target_width - i_hstart % i_target_width );
+                if( i_col > ( p_vout->p_sys->i_col / 2 ) )
+                {
+                    i_align |= VOUT_ALIGN_LEFT;
+                    i_width -= i_hstart_rounded ? 2: 0;
+                }
+                else
+                {
+                    i_align |= VOUT_ALIGN_RIGHT;
+                }
             }
             
             if( i_row * i_target_height >= i_vstart &&
@@ -327,10 +339,17 @@ static int Init( vout_thread_t *p_vout )
             }
             else
             {
-                i_height = i_target_height -
-                             i_vstart%i_target_height;
-                i_align |= i_row > ( p_vout->p_sys->i_row / 2 ) ?
-                    VOUT_ALIGN_TOP : VOUT_ALIGN_BOTTOM;
+                i_height = ( i_target_height -
+                             i_vstart%i_target_height );
+                if(  i_row > ( p_vout->p_sys->i_row / 2 ) )
+                {
+                    i_align |= VOUT_ALIGN_TOP;
+                    i_height -= i_vstart_rounded ? 2: 0;
+                }
+                else
+                {
+                    i_align |= VOUT_ALIGN_BOTTOM;
+                }
             }
             if( i_height == 0 || i_width == 0 )
             {
