@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.23 2001/05/06 04:32:02 sam Exp $
+ * $Id: modules.h,v 1.24 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -65,16 +65,19 @@ typedef void *  module_handle_t;
 #define MODULE_CAPABILITY_DECAPS   1 <<  3  /* Decaps */
 #define MODULE_CAPABILITY_ADEC     1 <<  4  /* Audio decoder */
 #define MODULE_CAPABILITY_VDEC     1 <<  5  /* Video decoder */
-#define MODULE_CAPABILITY_MOTION   1 <<  6  /* Video decoder */
+#define MODULE_CAPABILITY_MOTION   1 <<  6  /* Motion compensation */
 #define MODULE_CAPABILITY_IDCT     1 <<  7  /* IDCT transformation */
 #define MODULE_CAPABILITY_AOUT     1 <<  8  /* Audio output */
 #define MODULE_CAPABILITY_VOUT     1 <<  9  /* Video output */
 #define MODULE_CAPABILITY_YUV      1 << 10  /* YUV colorspace conversion */
-#define MODULE_CAPABILITY_AFX      1 << 11  /* Audio effects */
-#define MODULE_CAPABILITY_VFX      1 << 12  /* Video effects */
+#define MODULE_CAPABILITY_IMDCT    1 << 11  /* IMDCT transformation */
+#define MODULE_CAPABILITY_DOWNMIX  1 << 12  /* AC3 downmix */
 
 /* FIXME: kludge */
 struct input_area_s;
+struct imdct_s;
+struct complex_s;
+struct dm_par_s;
 
 /* FIXME: not yet used */
 typedef struct probedata_s
@@ -190,6 +193,35 @@ typedef struct function_list_s
             void ( * pf_end )          ( struct vout_thread_s * );
         } yuv;
 
+        /* IMDCT plugin */
+        struct
+        {
+            void ( * pf_imdct_init )   ( struct imdct_s * );
+            void ( * pf_imdct_256 )    ( struct imdct_s *,
+                                         float data[], float delay[] );
+            void ( * pf_imdct_256_nol )( struct imdct_s *,
+                                         float data[], float delay[] );
+            void ( * pf_imdct_512 )    ( struct imdct_s *,
+                                         float data[], float delay[] );
+            void ( * pf_imdct_512_nol )( struct imdct_s *,
+                                         float data[], float delay[] );
+//            void ( * pf_fft_64p )      ( struct complex_s * );
+
+        } imdct;
+
+        /* AC3 downmix plugin */
+        struct
+        {
+            void ( * pf_downmix_3f_2r_to_2ch ) ( float *, struct dm_par_s * );
+            void ( * pf_downmix_3f_1r_to_2ch ) ( float *, struct dm_par_s * );
+            void ( * pf_downmix_2f_2r_to_2ch ) ( float *, struct dm_par_s * );
+            void ( * pf_downmix_2f_1r_to_2ch ) ( float *, struct dm_par_s * );
+            void ( * pf_downmix_3f_0r_to_2ch ) ( float *, struct dm_par_s * );
+            void ( * pf_stream_sample_2ch_to_s16 ) ( s16 *, float *, float * );
+            void ( * pf_stream_sample_1ch_to_s16 ) ( s16 *, float * );
+
+        } downmix;
+
     } functions;
 
 } function_list_t;
@@ -208,8 +240,8 @@ typedef struct module_functions_s
     function_list_t aout;
     function_list_t vout;
     function_list_t yuv;
-    function_list_t afx;
-    function_list_t vfx;
+    function_list_t imdct;
+    function_list_t downmix;
 
 } module_functions_t;
 

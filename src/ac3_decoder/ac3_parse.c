@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_parse.c,v 1.22 2001/05/14 15:58:04 reno Exp $
+ * $Id: ac3_parse.c,v 1.23 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -23,6 +23,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include "defs.h"
 
 #include <string.h>                                              /* memset() */
@@ -33,12 +36,15 @@
 #include "threads.h"
 #include "mtime.h"
 
+#include "intf_msg.h"
+
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
 #include "audio_output.h"
 
-#include "intf_msg.h"
+#include "ac3_imdct.h"
+#include "ac3_downmix.h"
 #include "ac3_decoder.h"
 #include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
 
@@ -871,7 +877,6 @@ static void parse_audblk_stats (ac3dec_t * p_ac3dec)
     for(i=0;i<p_ac3dec->bsi.nfchans;i++)
             intf_ErrMsg ("%1d",p_ac3dec->audblk.blksw[i]);
     intf_ErrMsg ("]");
-
-    intf_ErrMsg ("\n");
 }
 #endif
+

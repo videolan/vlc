@@ -52,6 +52,12 @@ Choose stereo or mono audio output.
 .B \-\-spdif
 Activate hardware AC3 pass-through mode.
 .TP
+.B \-\-downmix <module>
+Specify a module for AC3 downmix: "downmix", "downmixsse", for instance.
+.TP
+.B \-\-imdct <module>
+Specify a module for AC3 IMDCT: "imdct", "imdctsse", for instance.
+.TP
 .B \-\-novideo
 Disable video output.
 .TP
@@ -145,11 +151,13 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_channels=<filename>  channels list
 .TP
 .B Audio parameters:
- vlc_aout=<method name>   audio method
- vlc_dsp=<filename>       dsp device path
- vlc_stereo={1|0}         stereo or mono output
- vlc_spdif={1|0}          AC3 pass-through mode
- vlc_audio_rate=<rate>    output rate
+ vlc_aout=<method name>  	audio method
+ vlc_dsp=<filename>      	dsp device path
+ vlc_stereo={1|0}        	stereo or mono output
+ vlc_spdif={1|0}         	AC3 pass-through mode
+ vlc_downmix=<method name>      AC3 downmix method
+ vlc_imdct=<method name>        AC3 IMDCT method
+ vlc_audio_rate=<rate>    	output rate
 .TP
 .B Video parameters:
  vlc_vout=<method name>        display method
@@ -160,6 +168,7 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_grayscale={1|0}           grayscale or color
  vlc_fullscreen={1|0}          full screen
  vlc_overlay={1|0}             overlay
+ vlc_motion=<method name>      motion compensation method
  vlc_idct=<method name>        IDCT method
  vlc_yuv=<method name>         YUV method
  vlc_synchro={I|I+|IP|IP+|IPB} synchro algorithm

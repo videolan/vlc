@@ -1,10 +1,10 @@
 /*****************************************************************************
- * motionmmxext.c : MMX EXT motion compensation module for vlc
+ * imdctsse.c : accelerated SSE IMDCT module
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: motionmmxext.c,v 1.5 2001/05/15 16:19:42 sam Exp $
+ * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: imdctsse.c,v 1.1 2001/05/15 16:19:42 sam Exp $
  *
- * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MODULE_NAME motionmmxext
+#define MODULE_NAME imdctsse
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -29,28 +29,30 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <stdlib.h>                                      /* malloc(), free() */
+#include <stdlib.h>
 
 #include "config.h"
-#include "common.h"                                     /* boolean_t, byte_t */
+#include "common.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
-#include "video.h"
+#include "ac3_imdct.h"
+#include "ac3_imdct_common.h"
 
 #include "modules.h"
 
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-void motion_getfunctions( function_list_t * p_function_list );
+static void imdct_getfunctions( function_list_t * p_function_list );
+static int  imdct_Probe       ( probedata_t *p_data );
 
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for motion compensation module" )
+ADD_WINDOW( "Configuration for IMDCT module" )
     ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
 MODULE_CONFIG_END
 
@@ -65,11 +67,11 @@ MODULE_CONFIG_END
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "MMX EXT motion compensation module";
+    p_module->psz_longname = "AC3 IMDCT module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_MOTION;
+                                | MODULE_CAPABILITY_IMDCT;
 
     return( 0 );
 }
@@ -90,7 +92,7 @@ MODULE_ACTIVATE
         return( -1 );
     }
 
-    motion_getfunctions( &p_module->p_functions->motion );
+    imdct_getfunctions( &p_module->p_functions->imdct );
 
     p_module->p_config = p_config;
 
@@ -111,21 +113,40 @@ MODULE_DEACTIVATE
     return( 0 );
 }
 
+/* Following functions are local */
+
 /*****************************************************************************
- * motion_Probe: tests probe the CPU and return a score
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
  *****************************************************************************/
-int _M( motion_Probe )( probedata_t *p_data )
+static void imdct_getfunctions( function_list_t * p_function_list )
 {
-    if( !TestCPU( CPU_CAPABILITY_MMXEXT ) )
+    p_function_list->pf_probe = imdct_Probe;
+#define F p_function_list->functions.imdct
+    F.pf_imdct_init    = _M( imdct_init );
+    F.pf_imdct_256     = _M( imdct_do_256 );
+    F.pf_imdct_256_nol = _M( imdct_do_256_nol );
+    F.pf_imdct_512     = _M( imdct_do_512 );
+    F.pf_imdct_512_nol = _M( imdct_do_512_nol );
+#undef F
+}
+
+/*****************************************************************************
+ * imdct_Probe: returns a preference score
+ *****************************************************************************/
+static int imdct_Probe( probedata_t *p_data )
+{
+    if( !TestCPU( CPU_CAPABILITY_SSE ) )
     {
         return( 0 );
     }
 
-    if( TestMethod( MOTION_METHOD_VAR, "motionmmxext" ) )
+    if( TestMethod( IDCT_METHOD_VAR, "imdctsse" ) )
     {
         return( 999 );
     }
 
+    /* This plugin always works */
     return( 200 );
 }
 

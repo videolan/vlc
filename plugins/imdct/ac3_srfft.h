@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ac3_srfft.h: ac3 FFT
+ * ac3_srfft.h: ac3 FFT tables
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_srfft.h,v 1.3 2001/05/14 15:58:04 reno Exp $
+ * $Id: ac3_srfft.h,v 1.1 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -289,3 +289,4 @@ static const complex_t delta128_3[32] =
   a_i += v_i; \
   A13.imag = a_i; \
   }
+

@@ -3,7 +3,7 @@
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuvmmx.c,v 1.8 2001/04/15 04:19:58 sam Exp $
+ * $Id: video_yuvmmx.c,v 1.9 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -79,21 +79,17 @@ void _M( yuv_getfunctions )( function_list_t * p_function_list )
 static int yuv_Probe( probedata_t *p_data )
 {
     /* Test for MMX support in the CPU */
-    if( TestCPU( CPU_CAPABILITY_MMX ) )
-    {
-        if( TestMethod( YUV_METHOD_VAR, "yuvmmx" ) )
-        {
-            return( 999 );
-        }
-        else
-        {
-            return( 100 );
-        }
-    }
-    else
+    if( !TestCPU( CPU_CAPABILITY_MMX ) )
     {
         return( 0 );
     }
+
+    if( TestMethod( YUV_METHOD_VAR, "yuvmmx" ) )
+    {
+        return( 999 );
+    }
+
+    return( 100 );
 }
 
 /*****************************************************************************

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.94 2001/05/14 15:58:04 reno Exp $
+ * $Id: main.c,v 1.95 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -113,6 +113,8 @@
 #define OPT_MOTION              181
 #define OPT_IDCT                182
 #define OPT_YUV                 183
+#define OPT_DOWNMIX             184
+#define OPT_IMDCT               185
 
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
@@ -143,6 +145,8 @@ static const struct option longopts[] =
     {   "stereo",           0,          0,      OPT_STEREO },
     {   "mono",             0,          0,      OPT_MONO },
     {   "spdif",            0,          0,      OPT_SPDIF },
+    {   "downmix",          1,          0,      OPT_DOWNMIX },
+    {   "imdct",            1,          0,      OPT_IMDCT },
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },
@@ -559,6 +563,12 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_SPDIF:                                           /* --spdif */
             main_PutIntVariable( AOUT_SPDIF_VAR, 1 );
             break;
+	case OPT_DOWNMIX:                                       /* --downmix */
+            main_PutPszVariable( DOWNMIX_METHOD_VAR, optarg );
+            break;
+        case OPT_IMDCT:                                           /* --imdct */
+            main_PutPszVariable( IMDCT_METHOD_VAR, optarg );
+            break;
 
         /* Video options */
         case OPT_NOVIDEO:                                       /* --novideo */
@@ -712,6 +722,8 @@ static void Usage( int i_fashion )
           "\n  -A, --aout <module>            \taudio output method"
           "\n      --stereo, --mono           \tstereo/mono audio"
           "\n      --spdif                    \tAC3 pass-through mode"
+          "\n      --downmix <module>         \tAC3 downmix method"
+          "\n      --imdct <module>           \tAC3 IMDCT method"
           "\n"
           "\n      --novideo                  \tdisable video"
           "\n  -V, --vout <module>            \tvideo output method"
@@ -758,6 +770,8 @@ static void Usage( int i_fashion )
         "\n  " AOUT_DSP_VAR "=<filename>              \tdsp device path"
         "\n  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output"
         "\n  " AOUT_SPDIF_VAR "={1|0}                 \tAC3 pass-through mode"
+        "\n  " DOWNMIX_METHOD_VAR "=<method name>     \tAC3 downmix method"
+        "\n  " IMDCT_METHOD_VAR "=<method name>       \tAC3 IMDCT method"
         "\n  " AOUT_RATE_VAR "=<rate>             \toutput rate" );
 
     /* Video parameters */

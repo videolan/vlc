@@ -2,7 +2,7 @@
  * ac3_bit_allocate.c: ac3 allocation tables
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: ac3_bit_allocate.c,v 1.21 2001/05/14 15:58:03 reno Exp $
+ * $Id: ac3_bit_allocate.c,v 1.22 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -22,6 +22,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include "defs.h"
 
 #include <string.h>                                              /* memcpy() */
@@ -31,12 +35,13 @@
 #include "threads.h"
 #include "mtime.h"
 
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
+#include "ac3_imdct.h"
+#include "ac3_downmix.h"
 #include "ac3_decoder.h"
+
 #include "ac3_internal.h"                                 /* DELTA_BIT_REUSE */
 
 

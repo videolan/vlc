@@ -13,7 +13,7 @@
 #
 PLUGINS_DIR :=	alsa beos darwin dsp dummy \
 		dvd esd fb ggi glide gnome gtk \
-		idct \
+		downmix idct imdct \
 		macosx mga \
 		motion \
 		mpeg null qt sdl \
@@ -24,7 +24,9 @@ PLUGINS_DIR :=	alsa beos darwin dsp dummy \
 #
 PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
 		dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gnome/gnome gtk/gtk \
+		downmix/downmix downmix/downmixsse downmix/downmix3dn \
 		idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext \
+		imdct/imdct imdct/imdctsse \
 		macosx/macosx mga/mga \
 		motion/motion motion/motionmmx motion/motionmmxext \
 		mpeg/es mpeg/ps mpeg/ts null/null qt/qt sdl/sdl \
@@ -69,11 +71,7 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 		src/ac3_decoder/ac3_bit_allocate.o \
 		src/ac3_decoder/ac3_mantissa.o \
 		src/ac3_decoder/ac3_rematrix.o \
-		src/ac3_decoder/ac3_imdct.o \
-		src/ac3_decoder/ac3_imdct_c.o \
-		src/ac3_decoder/ac3_srfft.o \
-		src/ac3_decoder/ac3_downmix.o \
-		src/ac3_decoder/ac3_downmix_c.o
+		src/ac3_decoder/ac3_imdct.o
 
 AC3_SPDIF = src/ac3_spdif/ac3_spdif.o \
 	        src/ac3_spdif/ac3_iec958.o

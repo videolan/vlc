@@ -135,7 +135,7 @@ ARCH=${host_cpu}
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion"
+BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix"
 
 dnl
 dnl  Accelerated modules
@@ -154,9 +154,9 @@ AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
   ACCEL_PLUGINS="${ACCEL_PLUGINS} ${MMX_PLUGINS}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING([if \$CC groks MMX EXT (SSE) inline assembly])
+AC_MSG_CHECKING([if \$CC groks MMX EXT or SSE inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext"
+  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext imdctsse downmix3dn downmixsse"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl

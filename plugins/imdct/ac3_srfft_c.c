@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ac3_srfft.c: ac3 FFT
+ * ac3_srfft.c: ac3 FFT in C
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_srfft.c,v 1.4 2001/05/14 15:58:04 reno Exp $
+ * $Id: ac3_srfft_c.c,v 1.1 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -22,6 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME imdct
+#include "modules_inner.h"
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include "defs.h"
 
 #include <string.h>                                              /* memcpy() */
@@ -34,10 +40,7 @@
 #include "threads.h"
 #include "mtime.h"
 
-#include "stream_control.h"
-#include "input_ext-dec.h"
-
-#include "ac3_decoder.h"
+#include "ac3_imdct.h"
 #include "ac3_srfft.h"
 
 static void fft_8 (complex_t *x);
@@ -206,7 +209,7 @@ static void fft_8 (complex_t *x)
 
 
 static void fft_asmb(int k, complex_t *x, complex_t *wTB,
-	     const complex_t *d, const complex_t *d_3)
+                     const complex_t *d, const complex_t *d_3)
 {
   register complex_t  *x2k, *x3k, *x4k, *wB;
   register float a_r, a_i, a1_r, a1_i, u_r, u_i, v_r, v_i;
@@ -256,7 +259,7 @@ static void fft_asmb16(complex_t *x, complex_t *wTB)
 } 
 
 
-void fft_64p_c (complex_t *a)
+void _M( fft_64p ) ( complex_t *a )
 {
   fft_8(&a[0]); fft_4(&a[8]); fft_4(&a[12]);
   fft_asmb16(&a[0], &a[8]);
@@ -274,7 +277,7 @@ void fft_64p_c (complex_t *a)
 }
 
 
-void fft_128p_c (complex_t *a)
+void _M( fft_128p ) ( complex_t *a )
 {
   fft_8(&a[0]); fft_4(&a[8]); fft_4(&a[12]);
   fft_asmb16(&a[0], &a[8]);
@@ -310,3 +313,4 @@ void fft_128p_c (complex_t *a)
   /* fft_128(&a[0]); */
   fft_asmb(16, &a[0], &a[64], &delta128[0], &delta128_3[0]);
 }
+

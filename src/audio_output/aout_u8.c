@@ -2,7 +2,7 @@
  * aout_u8.c: 8 bit unsigned audio output functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_u8.c,v 1.4 2001/05/06 04:32:02 sam Exp $
+ * $Id: aout_u8.c,v 1.5 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -104,8 +104,6 @@ void aout_U8StereoThread( aout_thread_t * p_aout )
 {
     int i_fifo;
     long l_buffer, l_buffer_limit, l_bytes;
-
-    intf_DbgMsg("adec debug: running audio output U8_S_thread (%p) (pid == %i)", p_aout, getpid());
 
     /* As the s32_buffer was created with calloc(), we don't have to set this
      * memory to zero and we can immediately jump into the thread's loop */

@@ -264,6 +264,12 @@
 #define AOUT_SPDIF_VAR                  "vlc_spdif"
 #define AOUT_SPDIF_DEFAULT              0
 
+/* Environment variable containing the AC3 downmix method */
+#define DOWNMIX_METHOD_VAR              "vlc_downmix"
+
+/* Environment variable containing the AC3 IMDCT method */
+#define IMDCT_METHOD_VAR                "vlc_imdct"
+
 /* Volume */
 #define VOLUME_DEFAULT                  512
 #define VOLUME_STEP                     128

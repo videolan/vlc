@@ -2,7 +2,7 @@
  * ac3_decoder.h : ac3 decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.h,v 1.8 2001/05/14 15:58:03 reno Exp $
+ * $Id: ac3_decoder.h,v 1.9 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Renaud Dartus <reno@videolan.org>
@@ -352,63 +352,6 @@ typedef struct mantissa_s
     u16 lfsr_state;
 } mantissa_t;
 
-typedef struct complex_s {
-    float real;
-    float imag;
-} complex_t;
-
-#define N 512
-
-typedef struct imdct_s
-{
-    complex_t buf[N/4];
-
-    /* Delay buffer for time domain interleaving */
-    float delay[6][256];
-    float delay1[6][256];
-
-    /* Twiddle factors for IMDCT */
-    float xcos1[N/4];
-    float xsin1[N/4];
-    float xcos2[N/8];
-    float xsin2[N/8];
-   
-    /* Twiddle factor LUT */
-    complex_t *w[7];
-    complex_t w_1[1];
-    complex_t w_2[2];
-    complex_t w_4[4];
-    complex_t w_8[8];
-    complex_t w_16[16];
-    complex_t w_32[32];
-    complex_t w_64[64];
-
-    float xcos_sin_sse[128 * 4] __attribute__((aligned(16)));
-    
-    /* Functions */
-    void (*fft_64p) (complex_t *a);
-    
-    void (*imdct_do_512)(struct imdct_s * p_imdct, float data[], float delay[]);
-    void (*imdct_do_512_nol)(struct imdct_s * p_imdct, float data[], float delay[]);
-
-} imdct_t;
-
-typedef struct dm_par_s {
-    float unit;
-    float clev;
-    float slev;
-} dm_par_t;
-
-typedef struct downmix_s {
-    void (*downmix_3f_2r_to_2ch)(float *samples, dm_par_t * dm_par);
-    void (*downmix_3f_1r_to_2ch)(float *samples, dm_par_t * dm_par);
-    void (*downmix_2f_2r_to_2ch)(float *samples, dm_par_t * dm_par);
-    void (*downmix_2f_1r_to_2ch)(float *samples, dm_par_t * dm_par);
-    void (*downmix_3f_0r_to_2ch)(float *samples, dm_par_t * dm_par);
-    void (*stream_sample_2ch_to_s16)(s16 *s16_samples, float *left, float *right);
-    void (*stream_sample_1ch_to_s16)(s16 *s16_samples, float *center);
-} downmix_t;
-
 struct ac3dec_s
 {
     /*
@@ -436,3 +379,4 @@ struct ac3dec_s
     downmix_t           downmix;
 
 };
+

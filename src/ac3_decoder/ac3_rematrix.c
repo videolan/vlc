@@ -2,7 +2,7 @@
  * ac3_rematrix.c: ac3 audio rematrixing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_rematrix.c,v 1.17 2001/05/14 15:58:04 reno Exp $
+ * $Id: ac3_rematrix.c,v 1.18 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -21,6 +21,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include "defs.h"
 
 #include <string.h>                                              /* memcpy() */
@@ -33,6 +37,8 @@
 #include "stream_control.h"
 #include "input_ext-dec.h"
 
+#include "ac3_imdct.h"
+#include "ac3_downmix.h"
 #include "ac3_decoder.h"
 
 struct rematrix_band_s {
@@ -79,3 +85,4 @@ void rematrix (ac3dec_t * p_ac3dec)
         }
     }
 }
+

@@ -1,10 +1,11 @@
 /*****************************************************************************
- * ac3_internals.h: needed by the ac3 decoder
+ * ac3_downmix.h : AC3 downmix types
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: ac3_internal.h,v 1.10 2001/05/15 16:19:42 sam Exp $
+ * Copyright (C) 1999, 2000 VideoLAN
+ * $Id: ac3_downmix.h,v 1.3 2001/05/15 16:19:42 sam Exp $
  *
- * Authors: Michel Lespinasse <walken@zoy.org>
+ * Authors: Michel Kaempf <maxx@via.ecp.fr>
+ *          Renaud Dartus <reno@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,36 +22,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* Exponent strategy constants */
-#define EXP_REUSE       (0)
-#define EXP_D15         (1)
-#define EXP_D25         (2)
-#define EXP_D45         (3)
+typedef struct dm_par_s {
+    float unit;
+    float clev;
+    float slev;
+} dm_par_t;
 
-/* Delta bit allocation constants */
-#define DELTA_BIT_REUSE         (0)
-#define DELTA_BIT_NEW           (1)
-#define DELTA_BIT_NONE          (2)
-#define DELTA_BIT_RESERVED      (3)
-
-/* ac3_bit_allocate.c */
-void bit_allocate (ac3dec_t *);
-
-/* ac3_exponent.c */
-int exponent_unpack (ac3dec_t *);
-
-/* ac3_imdct.c */
-void imdct_init (imdct_t * p_imdct);
-void imdct (ac3dec_t * p_ac3dec, s16 * buffer);
-
-/* ac3_mantissa.c */
-void mantissa_unpack (ac3dec_t *);
-
-/* ac3_parse.c */
-int parse_bsi (ac3dec_t *);
-int parse_audblk (ac3dec_t *, int);
-void parse_auxdata (ac3dec_t *);
-
-/* ac3_rematrix.c */
-void rematrix (ac3dec_t *);
+typedef struct downmix_s {
+    /* Module used and shortcuts */
+    struct module_s * p_module;
+    void (*pf_downmix_3f_2r_to_2ch)(float *, dm_par_t * dm_par);
+    void (*pf_downmix_3f_1r_to_2ch)(float *, dm_par_t * dm_par);
+    void (*pf_downmix_2f_2r_to_2ch)(float *, dm_par_t * dm_par);
+    void (*pf_downmix_2f_1r_to_2ch)(float *, dm_par_t * dm_par);
+    void (*pf_downmix_3f_0r_to_2ch)(float *, dm_par_t * dm_par);
+    void (*pf_stream_sample_2ch_to_s16)(s16 *, float *left, float *right);
+    void (*pf_stream_sample_1ch_to_s16)(s16 *, float *center);
+} downmix_t;
 

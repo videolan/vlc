@@ -2,7 +2,7 @@
  * ac3_decoder.c: core ac3 decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.c,v 1.33 2001/05/14 15:58:03 reno Exp $
+ * $Id: ac3_decoder.c,v 1.34 2001/05/15 16:19:42 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -23,6 +23,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
 #include "defs.h"
 
 #include <string.h>                                              /* memcpy() */
@@ -39,8 +42,11 @@
 
 #include "audio_output.h"
 
+#include "ac3_imdct.h"
+#include "ac3_downmix.h"
 #include "ac3_decoder.h"
 #include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
+
 #include "ac3_internal.h"
 
 static const float cmixlev_lut[4] = { 0.707, 0.595, 0.500, 0.707 };
@@ -50,7 +56,6 @@ int ac3_init (ac3dec_t * p_ac3dec)
 {
     p_ac3dec->mantissa.lfsr_state = 1;          /* dither_gen initialization */
     imdct_init(&p_ac3dec->imdct);
-    downmix_init(&p_ac3dec->downmix);
     
     return 0;
 }
@@ -58,7 +63,7 @@ int ac3_init (ac3dec_t * p_ac3dec)
 int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
 {
     int i;
-    ac3dec_thread_t * p_ac3dec_t = (ac3dec_thread_t *) p_ac3dec->bit_stream.p_callback_arg;
+    ac3dec_thread_t * p_ac3thread = (ac3dec_thread_t *) p_ac3dec->bit_stream.p_callback_arg;
     
     if (parse_bsi (p_ac3dec))
     {
@@ -67,20 +72,20 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
         return 1;
     }
     
-	/* compute downmix parameters
-	 * downmix to tow channels for now */
-	p_ac3dec->dm_par.clev = 0.0;
+    /* compute downmix parameters
+     * downmix to tow channels for now */
+    p_ac3dec->dm_par.clev = 0.0;
     p_ac3dec->dm_par.slev = 0.0; 
     p_ac3dec->dm_par.unit = 1.0;
-	if (p_ac3dec->bsi.acmod & 0x1)	/* have center */
-	    p_ac3dec->dm_par.clev = cmixlev_lut[p_ac3dec->bsi.cmixlev];
+    if (p_ac3dec->bsi.acmod & 0x1)    /* have center */
+        p_ac3dec->dm_par.clev = cmixlev_lut[p_ac3dec->bsi.cmixlev];
 
-	if (p_ac3dec->bsi.acmod & 0x4)	/* have surround channels */
-		p_ac3dec->dm_par.slev = smixlev_lut[p_ac3dec->bsi.surmixlev];
+    if (p_ac3dec->bsi.acmod & 0x4)    /* have surround channels */
+        p_ac3dec->dm_par.slev = smixlev_lut[p_ac3dec->bsi.surmixlev];
 
     p_ac3dec->dm_par.unit /= 1.0 + p_ac3dec->dm_par.clev + p_ac3dec->dm_par.slev;
-	p_ac3dec->dm_par.clev *= p_ac3dec->dm_par.unit;
-	p_ac3dec->dm_par.slev *= p_ac3dec->dm_par.unit;
+    p_ac3dec->dm_par.clev *= p_ac3dec->dm_par.unit;
+    p_ac3dec->dm_par.slev *= p_ac3dec->dm_par.unit;
 
     for (i = 0; i < 6; i++) {
         /* Initialize freq/time sample storage */
@@ -88,45 +93,50 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
                 (p_ac3dec->bsi.nfchans + p_ac3dec->bsi.lfeon));
 
 
-        if ((p_ac3dec_t->p_fifo->b_die) && (p_ac3dec_t->p_fifo->b_error))
+        if( p_ac3thread->p_fifo->b_die || p_ac3thread->p_fifo->b_error )
         {        
             return 1;
         }
  
-        if (parse_audblk (p_ac3dec, i))
+        if( parse_audblk( p_ac3dec, i ) )
         {
-            intf_WarnMsg (3,"ac3dec warn: error during audioblock");
-            parse_auxdata (p_ac3dec);
+            intf_WarnMsg( 3, "ac3dec warning: error during audioblock" );
+            parse_auxdata( p_ac3dec );
             return 1;
         }
 
-        if ((p_ac3dec_t->p_fifo->b_die) && (p_ac3dec_t->p_fifo->b_error))
+        if( p_ac3thread->p_fifo->b_die || p_ac3thread->p_fifo->b_error )
         {        
             return 1;
         }
 
-        if (exponent_unpack (p_ac3dec))
+        if( exponent_unpack( p_ac3dec ) )
         {
-            intf_WarnMsg (3,"ac3dec warn: error during unpack");
-            parse_auxdata (p_ac3dec);
+            intf_WarnMsg( 3, "ac3dec warning: error during unpack" );
+            parse_auxdata( p_ac3dec );
             return 1;
         }
+
         bit_allocate (p_ac3dec);
         mantissa_unpack (p_ac3dec);
 
-        if ((p_ac3dec_t->p_fifo->b_die) && (p_ac3dec_t->p_fifo->b_error))
+        if( p_ac3thread->p_fifo->b_die || p_ac3thread->p_fifo->b_error )
         {        
             return 1;
         }
         
         if  (p_ac3dec->bsi.acmod == 0x2)
+        {
             rematrix (p_ac3dec);
+        }
+
         imdct (p_ac3dec, buffer);
 
-        buffer += 2*256;
+        buffer += 2 * 256;
     }
 
     parse_auxdata (p_ac3dec);
 
     return 0;
 }
+

@@ -3162,7 +3162,7 @@ fi
 
 ARCH=${host_cpu}
 
-BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion"
+BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix"
 
 case x$host_os in
   xmingw32msvc)
@@ -3195,8 +3195,8 @@ else
 fi
 rm -f conftest*
 
-echo $ac_n "checking if \$CC groks MMX EXT (SSE) inline assembly""... $ac_c" 1>&6
-echo "configure:3200: checking if \$CC groks MMX EXT (SSE) inline assembly" >&5
+echo $ac_n "checking if \$CC groks MMX EXT or SSE inline assembly""... $ac_c" 1>&6
+echo "configure:3200: checking if \$CC groks MMX EXT or SSE inline assembly" >&5
 cat > conftest.$ac_ext <<EOF
 #line 3202 "configure"
 #include "confdefs.h"
@@ -3207,7 +3207,7 @@ int main() {
 EOF
 if { (eval echo configure:3209: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext"
+  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext imdctsse downmix3dn downmixsse"
   echo "$ac_t""yes" 1>&6
 else
   echo "configure: failed program was:" >&5
