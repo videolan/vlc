@@ -357,7 +357,7 @@ RSC=rc.exe
 # ADD RSC /l 0x409 /d UNDER_CE=$(CEVersion) /d _WIN32_WCE=$(CEVersion) /d "UNICODE" /d "_UNICODE" /d "DEBUG" /d "$(CePlatform)" /d "_X86_" /d "x86" /d "i486" /r
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /Zi /Od /D "DEBUG" /D "i486" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /Yu"stdafx.h" /Gz /c
-# ADD CPP /nologo /W3 /Zi /Od /I "." /I "..\include" /D "DEBUG" /D "i486" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /Gz /c
+# ADD CPP /nologo /W3 /Zi /Od /I "." /I "..\include" /D "DEBUG" /D "i486" /D UNDER_CE=$(CEVersion) /D _WIN32_WCE=$(CEVersion) /D "WIN32" /D "STRICT" /D "_WIN32_WCE_EMULATION" /D "INTERNATIONAL" /D "USA" /D "INTLMSG_CODEPAGE" /D "$(CePlatform)" /D "UNICODE" /D "_UNICODE" /D "_X86_" /D "x86" /FR /Gz /c
 # SUBTRACT CPP /YX /Yc /Yu
 MTL=midl.exe
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o "NUL" /win32
@@ -383,14 +383,257 @@ LINK32=link.exe
 # Name "vlc - Win32 (WCE ARM) Debug"
 # Name "vlc - Win32 (WCE x86em) Release"
 # Name "vlc - Win32 (WCE x86em) Debug"
-
 # Begin Group "Source Files"
+
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
+
 SOURCE="..\evc\vlc.c"
+
+!IF  "$(CFG)" == "vlc - Win32 (WCE MIPS) Release"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH4) Release"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH4) Debug"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH3) Release"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH3) Debug"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE ARM) Release"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE ARM) Debug"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86em) Release"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86em) Debug"
+
+DEP_CPP_VLC_C=\
+	"..\include\beos_specific.h"\
+	"..\include\configuration.h"\
+	"..\include\darwin_specific.h"\
+	"..\include\main.h"\
+	"..\include\modules.h"\
+	"..\include\modules_inner.h"\
+	"..\include\mtime.h"\
+	"..\include\os_specific.h"\
+	"..\include\variables.h"\
+	"..\include\vlc\vlc.h"\
+	"..\include\vlc_common.h"\
+	"..\include\vlc_config.h"\
+	"..\include\vlc_messages.h"\
+	"..\include\vlc_objects.h"\
+	"..\include\vlc_symbols.h"\
+	"..\include\vlc_threads.h"\
+	"..\include\vlc_threads_funcs.h"\
+	"..\include\win32_specific.h"\
+	".\config.h"\
+	
+
+!ENDIF 
+
 # End Source File
 # End Group
-
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"

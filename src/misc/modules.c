@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.104 2002/11/13 15:28:24 sam Exp $
+ * $Id: modules.c,v 1.105 2002/11/18 18:05:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -37,6 +37,8 @@
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
+#elif defined( UNDER_CE )
+#   include <windows.h>                               /* GetFileAttributes() */
 #else
 #   include "../extras/dirent.h"
 #endif
@@ -87,6 +89,12 @@
 
 #include "iso_lang.h"
 
+#if defined( UNDER_CE )
+#   define MYCHAR wchar_t
+#else
+#   define MYCHAR char
+#endif
+
 #ifdef HAVE_DYNAMIC_PLUGINS
 #   include "modules_plugin.h"
 #endif
@@ -104,8 +112,8 @@
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins   ( vlc_object_t * );
-static void AllocatePluginDir    ( vlc_object_t *, const char *, int );
-static int  AllocatePluginFile   ( vlc_object_t *, char * );
+static void AllocatePluginDir    ( vlc_object_t *, const MYCHAR *, int );
+static int  AllocatePluginFile   ( vlc_object_t *, MYCHAR * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
 static int  DeleteModule ( module_t * );
@@ -550,6 +558,10 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     vlc_bool_t      b_notinroot;
 #endif
 
+#if defined( UNDER_CE )
+    wchar_t   psz_dir[MAX_PATH];
+#endif
+
     /* If the user provided a plugin path, we add it to the list */
     path[ sizeof(path)/sizeof(char*) - 2 ] = config_GetPsz( p_this,
                                                             "plugin-path" );
@@ -584,7 +596,12 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         msg_Dbg( p_this, "recursively browsing `%s'", psz_fullpath );
 
         /* Don't go deeper than 5 subdirectories */
+#if defined( UNDER_CE )
+        MultiByteToWideChar( CP_ACP, 0, psz_fullpath, -1, psz_dir, MAX_PATH );
+        AllocatePluginDir( p_this, psz_dir, 5 );
+#else
         AllocatePluginDir( p_this, psz_fullpath, 5 );
+#endif
 
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN )
         if( b_notinroot )
@@ -602,22 +619,66 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 /*****************************************************************************
  * AllocatePluginDir: recursively parse a directory to look for plugins
  *****************************************************************************/
-static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
+static void AllocatePluginDir( vlc_object_t *p_this, const MYCHAR *psz_dir,
                                int i_maxdepth )
 {
+#ifdef UNDER_CE
+    MYCHAR psz_path[MAX_PATH + 256];
+    WIN32_FIND_DATA finddata;
+    HANDLE handle;
+    unsigned int rc;
+#else
     int    i_dirlen;
     DIR *  dir;
     char * psz_file;
-
     struct dirent * file;
+#endif
 
     if( i_maxdepth < 0 )
     {
         return;
     }
 
-    dir = opendir( psz_dir );
+#ifdef UNDER_CE
+    rc = GetFileAttributes( psz_dir );
+    if( !(rc & FILE_ATTRIBUTE_DIRECTORY) )
+    {
+        /* Not a directory */
+        return;
+    }
 
+    /* Parse all files in the directory */
+    swprintf( psz_path, L"%s\\*.*", psz_dir );
+    handle = FindFirstFile( psz_path, &finddata );
+    if( handle == INVALID_HANDLE_VALUE )
+    {
+        /* Empty directory */
+        return;
+    }
+
+    /* Parse the directory and try to load all files it contains. */
+    do
+    {
+        unsigned int i_len = wcslen( finddata.cFileName );
+
+        swprintf( psz_path, L"%s\\%s", psz_dir, finddata.cFileName );
+
+        if( GetFileAttributes( psz_path ) & FILE_ATTRIBUTE_DIRECTORY )
+        {
+            AllocatePluginDir( p_this, psz_path, i_maxdepth - 1 );
+        }
+        else if( i_len > strlen( LIBEXT ) )
+        {
+            AllocatePluginFile( p_this, psz_path );
+        }
+    }
+    while( FindNextFile( handle, &finddata ) ); 
+
+    /* Close the directory */
+    FindClose( handle );
+
+#else
+    dir = opendir( psz_dir );
     if( !dir )
     {
         return;
@@ -628,9 +689,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
     /* Parse the directory and try to load all files it contains. */
     while( (file = readdir( dir )) )
     {
-#ifndef UNDER_CE
         struct stat statbuf;
-#endif
         unsigned int i_len;
 
         /* Skip ".", ".." and anything starting with "." */
@@ -640,15 +699,10 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
         }
 
         i_len = strlen( file->d_name );
-
-        psz_file = malloc( i_dirlen + 1 /* / */ + i_len + 1 /* \0 */ );
+        psz_file = malloc( i_dirlen + 1 + i_len + 1 );
         sprintf( psz_file, "%s/%s", psz_dir, file->d_name );
 
-#ifdef UNDER_CE
-        if( GetFileAttributes( psz_file ) & FILE_ATTRIBUTE_DIRECTORY )
-#else
         if( !stat( psz_file, &statbuf ) && statbuf.st_mode & S_IFDIR )
-#endif
         {
             AllocatePluginDir( p_this, psz_file, i_maxdepth - 1 );
         }
@@ -657,7 +711,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
                   && !strncasecmp( file->d_name + i_len - strlen( LIBEXT ),
                                    LIBEXT, strlen( LIBEXT ) ) )
         {
-            AllocatePluginFile( p_this, psz_file );
+            AllocatePluginFile( p_this, psz_file )
         }
 
         free( psz_file );
@@ -665,6 +719,8 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
 
     /* Close the directory */
     closedir( dir );
+
+#endif
 }
 
 /*****************************************************************************
@@ -674,7 +730,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
  * for its information data. The module can then be handled by module_Need
  * and module_Unneed. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
+static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
 {
     module_t * p_module;
     module_handle_t handle;
@@ -701,7 +757,8 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file )
     }
 
     /* We need to fill these since they may be needed by CallEntry() */
-    p_module->psz_filename = psz_file;
+    /* FIXME: this is not unicode-compliant */
+    p_module->psz_filename = (char *)psz_file;
     p_module->handle = handle;
     p_module->p_symbols = &p_this->p_libvlc->p_module_bank->symbols;
 

@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h.in,v 1.6 2002/11/11 14:39:12 sam Exp $
+ * $Id: modules_plugin.h.in,v 1.7 2002/11/18 18:05:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,7 +31,7 @@
  * This function loads a dynamically linked library using a system dependant
  * method, and returns a non-zero value on error, zero otherwise.
  *****************************************************************************/
-static int module_load( const char * psz_filename, module_handle_t * handle )
+static int module_load( const MYCHAR * psz_filename, module_handle_t * handle )
 {
 #ifdef SYS_BEOS
     *handle = load_add_on( psz_filename );
@@ -99,18 +99,24 @@ static void * _module_getsymbol( module_handle_t handle,
     if( B_OK == get_image_symbol( handle, psz_function,
                                   B_SYMBOL_TYPE_TEXT, &p_symbol ) )
     {
-        return( p_symbol );
+        return p_symbol;
     }
     else
     {
-        return( NULL );
+        return NULL;
     }
 
-#elif defined(WIN32) || defined(UNDER_CE)
-    return( (void *)GetProcAddress( handle, psz_function ) );
+#elif defined( UNDER_CE )
+    wchar_t psz_real[256];
+    MultiByteToWideChar( CP_ACP, 0, psz_function, -1, psz_real, 256 );
+
+    return (void *)GetProcAddress( handle, psz_real );
+
+#elif defined( WIN32 )
+    return (void *)GetProcAddress( handle, (MYCHAR*)psz_function );
 
 #else
-    return( dlsym( handle, psz_function ) );
+    return dlsym( handle, psz_function );
 
 #endif
 }
@@ -149,12 +155,37 @@ static const char * module_error( char *psz_buffer )
 #if defined(SYS_BEOS)
     return( "failed" );
 
-#elif defined(WIN32) || defined(UNDER_CE)
+#elif defined(UNDER_CE)
+    wchar_t psz_tmp[256];
+
     int i, i_error = GetLastError();
 
     FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                    NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   (LPTSTR) psz_buffer, 256, NULL);
+                   (LPTSTR) psz_tmp, 256, NULL );
+
+    /* Go to the end of the string */
+    for( i = 0;
+         psz_tmp[i] && psz_tmp[i] != L'\r' && psz_tmp[i] != L'\n';
+         i++ ) {};
+
+    if( psz_tmp[i] )
+    {
+        swprintf( psz_tmp + i, L" (error %i)", i_error );
+        psz_tmp[ 255 ] = L'\0';
+    }
+    
+    WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_tmp, -1,
+                         psz_buffer, 256, NULL, NULL );
+
+    return psz_buffer;
+
+#elif defined(WIN32)
+    int i, i_error = GetLastError();
+
+    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                   NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+                   (LPTSTR) psz_buffer, 256, NULL );
 
     /* Go to the end of the string */
     for( i = 0;
@@ -164,7 +195,7 @@ static const char * module_error( char *psz_buffer )
     if( psz_buffer[i] )
     {
         snprintf( psz_buffer + i, 256 - i, " (error %i)", i_error );
-	psz_buffer[ 255 ] = '\0';
+        psz_buffer[ 255 ] = '\0';
     }
     
     return psz_buffer;

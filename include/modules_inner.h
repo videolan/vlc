@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.32 2002/09/30 11:05:33 sam Exp $
+ * $Id: modules_inner.h,v 1.33 2002/11/18 18:05:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -64,6 +64,14 @@
 #   define STORE_SYMBOLS           p_symbols = p_module->p_symbols
 #endif
 
+#if defined( __PLUGIN__ ) && ( defined( WIN32 ) || defined( UNDER_CE ) )
+#   define DLL_SYMBOL              __declspec(dllexport)
+#   define CDECL_SYMBOL            __cdecl
+#else
+#   define DLL_SYMBOL
+#   define CDECL_SYMBOL
+#endif
+
 #if defined( __cplusplus )
 #   define EXTERN_SYMBOL           extern "C"
 #else
@@ -80,7 +88,8 @@
  */
 #define vlc_module_begin( )                                                   \
     DECLARE_SYMBOLS;                                                          \
-    EXTERN_SYMBOL int __VLC_SYMBOL(vlc_entry) ( module_t *p_module )          \
+    EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
+    __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
         int i_shortcut = 1, i_config = 0;                                     \
         module_config_t p_config[ 100 ];                                      \
@@ -114,7 +123,7 @@
         }                                                                     \
         return 0 && i_shortcut;                                               \
     }                                                                         \
-    int __VLC_SYMBOL(vlc_entry) ( module_t * ) /* the ; gets added */
+    struct _u_n_u_s_e_d_ /* the ; gets added */
 
 
 #define add_submodule( )                                                      \

@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout.c,v 1.2 2002/09/10 12:58:42 sam Exp $
+ * $Id: vout.c,v 1.3 2002/11/18 18:05:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,7 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 

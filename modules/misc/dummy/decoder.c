@@ -2,7 +2,7 @@
  * dec_dummy.c: dummy decoder plugin for vlc.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: decoder.c,v 1.3 2002/10/27 16:58:13 gbazin Exp $
+ * $Id: decoder.c,v 1.4 2002/11/18 18:05:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -30,10 +30,15 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h> /* write(), close() */
 #endif
-
-#include <sys/types.h> /* open() */
-#include <sys/stat.h>
-#include <fcntl.h>
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h> /* open() */
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
 
 #include <stdio.h> /* sprintf() */
 
@@ -66,9 +71,12 @@ static int Run ( decoder_fifo_t *p_fifo )
     size_t       i_bytes = 0;
 
     char         psz_file[100];
+#ifndef UNDER_CE
     int          i_fd;
+#endif
 
     sprintf( psz_file, "stream.%i", p_fifo->i_object_id );
+#ifndef UNDER_CE
     i_fd = open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
 
     if( i_fd == -1 )
@@ -78,6 +86,7 @@ static int Run ( decoder_fifo_t *p_fifo )
         DecoderError( p_fifo );
         return -1;
     }
+#endif
 
     msg_Dbg( p_fifo, "dumping stream to file `%s'", psz_file );
 
@@ -86,16 +95,20 @@ static int Run ( decoder_fifo_t *p_fifo )
         msg_Err( p_fifo, "cannot initialize bitstream" );
         p_fifo->b_error = 1;
         DecoderError( p_fifo );
+#ifndef UNDER_CE
         close( i_fd );
+#endif
         return -1;
     }
 
     while( !p_fifo->b_die && !p_fifo->b_error )
     {
         GetChunk( &bit_stream, p_buffer, 1024 );
+#ifndef UNDER_CE
         write( i_fd, p_buffer, 1024 );
 
         i_bytes += 1024;
+#endif
 
         if( mdate() < last_date + 2000000 )
         {
@@ -113,7 +126,9 @@ static int Run ( decoder_fifo_t *p_fifo )
         msg_Dbg( p_fifo, "dumped %i bytes", i_bytes );
     }
 
+#ifndef UNDER_CE
     close( i_fd );
+#endif
     CloseBitstream( &bit_stream );
 
     if( p_fifo->b_error )

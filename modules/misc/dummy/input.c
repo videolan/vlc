@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: input.c,v 1.2 2002/11/18 18:05:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -25,13 +25,15 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <sys/types.h>
 #include <string.h>
-#include <errno.h>
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/input.h>
+
+#ifndef HAVE_STRNCASECMP
+#   define strncasecmp(a,b,c) strcmp(a,b)
+#endif
 
 /*****************************************************************************
  * Local prototypes
