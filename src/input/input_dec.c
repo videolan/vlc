@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.80 2003/11/26 08:18:09 gbazin Exp $
+ * $Id: input_dec.c,v 1.81 2003/11/28 16:06:56 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -460,6 +460,11 @@ static int DecoderThread( decoder_t * p_dec )
         {
             p_dec->b_error = 1;
             break;
+        }
+        if( p_block->i_buffer <= 0 )
+        {
+            block_Release( p_block );
+            continue;
         }
 
         if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
