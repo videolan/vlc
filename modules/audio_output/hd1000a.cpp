@@ -66,6 +66,8 @@ static void    Close       ( vlc_object_t * );
 static void    Play        ( aout_instance_t * );
 static int     Thread      ( aout_instance_t * );
 
+static void    InterleaveS16( int16_t *, int16_t * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -235,9 +237,8 @@ static int Thread( aout_instance_t * p_aout )
         }
         else
         {
-            p_aout->p_vlc->pf_memcpy( p_sys->ppBuffers[ i ],
-                                      p_buffer->p_buffer,
-                                      p_sys->nBufferSize );
+            InterleaveS16( (int16_t *)p_buffer->p_buffer,
+                           (int16_t *)p_sys->ppBuffers[ i ] );
             aout_BufferFree( p_buffer );
         }
 
@@ -252,4 +253,16 @@ static int Thread( aout_instance_t * p_aout )
     }
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * InterleaveS16: interleave samples
+ *****************************************************************************/
+static void InterleaveS16( int16_t * p_in, int16_t * p_out )
+{
+    for( int i = 0; i < FRAME_SIZE; i++ )
+    {
+        p_out[ i * 2 + 0 ] = p_in[ i * 2 + 1 ];
+        p_out[ i * 2 + 1 ] = p_in[ i * 2 + 0 ];
+    }
 }
