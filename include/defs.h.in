@@ -130,6 +130,9 @@
 /* Define if you have the <machine/soundcard.h> header file.  */
 #undef HAVE_MACHINE_SOUNDCARD_H
 
+/* Define if you have the <mad.h> header file.  */
+#undef HAVE_MAD_H
+
 /* Define if you have the <net/if.h> header file.  */
 #undef HAVE_NET_IF_H
 
@@ -174,6 +177,9 @@
 
 /* Define if you have the <winioctl.h> header file.  */
 #undef HAVE_WINIOCTL_H
+
+/* Define if you have the mad library (-lmad).  */
+#undef HAVE_LIBMAD
 
 /* Define if you have the pth library (-lpth).  */
 #undef HAVE_LIBPTH

@@ -10,6 +10,8 @@
 PLUGIN_DVD = dvd.o input_dvd.o dvd_ifo.o dvd_udf.o dvd_summary.o $(OBJ_DVD)
 BUILTIN_DVD = $(PLUGIN_DVD:%.o=BUILTIN_%.o)
 
+LIBDVDCSS_OBJ = ../../lib/libdvdcss.a ../../lib/libdvdcss.so
+
 ALL_OBJ = $(PLUGIN_DVD) $(BUILTIN_DVD)
 
 #
@@ -30,22 +32,27 @@ $(BUILTIN_DVD): BUILTIN_%.o: %.c
 # Real targets
 #
 
+# If we build our own libdvdcss
 ifeq (1,$(NEED_LIBDVDCSS))
-../dvd.so: libdvdcss $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
+../dvd.so: $(LIBDVDCSS_OBJ) $(PLUGIN_DVD)
+	$(CC) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
-../dvd.a: libdvdcss $(BUILTIN_DVD)
+../dvd.a: $(LIBDVDCSS_OBJ) $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
+
+# If we rely on an existing libdvdcss
 else
 ../dvd.so: $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
+	$(CC) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
 ../dvd.a: $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
 endif
 
+$(LIBDVDCSS_OBJ): libdvdcss
+
 libdvdcss:
-	cd ../../ && $(MAKE) libdvdcss
+	@cd ../../ && $(MAKE) libdvdcss
 
