@@ -1,7 +1,7 @@
 /* es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: es.c,v 1.2 2002/08/30 22:22:24 massiot Exp $
+ * $Id: es.c,v 1.3 2002/11/05 18:25:43 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -254,13 +254,10 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
 
     /* Select Video stream (always 0) */
-    if( config_GetInt( p_input, "video" ) )
-    {
-        input_SelectES( p_input, p_input->stream.pp_es[0] );
-    }
+    input_SelectES( p_input, p_input->stream.pp_es[0] );
 
     /* Select audio stream */
-    if( p_dvd->i_audio_nb > 0 && config_GetInt( p_input, "audio" ) )
+    if( p_dvd->i_audio_nb > 0 )
     {
         /* For audio: first one if none or a not existing one specified */
         i_audio = config_GetInt( p_input, "audio-channel" );
@@ -295,7 +292,7 @@ void DVDLaunchDecoders( input_thread_t * p_input )
     }
 
     /* Select subtitle */
-    if( p_dvd->i_spu_nb > 0 && config_GetInt( p_input, "video" ) )
+    if( p_dvd->i_spu_nb )
     {
         /* for spu, default is none */
         i_spu = config_GetInt( p_input, "spu-channel" );

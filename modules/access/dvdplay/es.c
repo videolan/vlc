@@ -2,7 +2,7 @@
  * es.c: functions to handle elementary streams.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: es.c,v 1.3 2002/08/30 22:22:24 massiot Exp $
+ * $Id: es.c,v 1.4 2002/11/05 18:25:43 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -236,16 +236,12 @@ void dvdplay_LaunchDecoders( input_thread_t * p_input )
 
     dvdplay_audio_info( p_dvd->vmg, &i_audio_nr, &i_audio );
     dvdplay_subp_info( p_dvd->vmg, &i_subp_nr, &i_subp );
-            
-    if( config_GetInt( p_input, "video" ) )
-    {
-        input_SelectES( p_input, p_input->stream.pp_es[0] );
-    }
+
+    input_SelectES( p_input, p_input->stream.pp_es[0] );
 
 //    if( !i_audio ) i_audio = 1;
     if( i_audio > p_dvd->i_audio_nb ) i_audio = 1;
-    if( config_GetInt( p_input, "audio" )
-            &&( i_audio > 0 ) && ( p_dvd->i_audio_nb > 0 ) )
+    if( ( i_audio > 0 ) && ( p_dvd->i_audio_nb > 0 ) )
     {
         if( config_GetInt( p_input, "audio-type" ) == REQUESTED_A52 )
         {
@@ -279,8 +275,7 @@ void dvdplay_LaunchDecoders( input_thread_t * p_input )
         }
     }
 
-    if( config_GetInt( p_input, "video" )
-            && ( i_subp > 0 ) && ( p_dvd->i_spu_nb > 0 ) )
+    if( ( i_subp > 0 ) && ( p_dvd->i_spu_nb > 0 ) )
     {
         i_subp += p_dvd->i_audio_nb;
         input_SelectES( p_input, p_input->stream.pp_es[i_subp] );

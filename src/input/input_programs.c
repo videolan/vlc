@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.95 2002/10/29 13:22:48 sam Exp $
+ * $Id: input_programs.c,v 1.96 2002/11/05 18:25:43 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -560,6 +560,21 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_es == NULL )
     {
         msg_Err( p_input, "nothing to do in input_SelectES" );
+        return -1;
+    }
+
+    if( ((p_es->i_cat == VIDEO_ES) || (p_es->i_cat == SPU_ES))
+        && !config_GetInt( p_input, "video" ) )
+    {
+        msg_Dbg( p_input,
+                 "video is disabled, not selecting ES 0x%x", p_es->i_id );
+        return -1;
+    }
+
+    if( (p_es->i_cat == AUDIO_ES) && !config_GetInt( p_input, "audio" ) )
+    {
+        msg_Dbg( p_input,
+                 "audio is disabled, not selecting ES 0x%x", p_es->i_id );
         return -1;
     }
 

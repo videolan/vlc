@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.6 2002/10/26 15:24:19 gbazin Exp $
+ * $Id: input.c,v 1.7 2002/11/05 18:25:43 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -1198,64 +1198,51 @@ static void DvdReadFindCell( thread_dvd_data_t * p_dvd )
  *****************************************************************************/
 static void DvdReadLauchDecoders( input_thread_t * p_input )
 {
-    thread_dvd_data_t *  p_dvd;
-    
-    p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);            
-            
-    if( config_GetInt( p_input, "video" ) )
-    {
-        input_SelectES( p_input, p_input->stream.pp_es[0] );
-    }
+    thread_dvd_data_t * p_dvd = (thread_dvd_data_t*)(p_input->p_access_data);
+    int i_audio, i_spu;
 
-    if( config_GetInt( p_input, "audio" ) )
+    input_SelectES( p_input, p_input->stream.pp_es[0] );
+
+    /* For audio: first one if none or a not existing one specified */
+    i_audio = config_GetInt( p_input, "audio-channel" );
+    if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
     {
-        /* For audio: first one if none or a not existing one specified */
-        int i_audio = config_GetInt( p_input, "audio-channel" );
-        if( i_audio < 0 /*|| i_audio > i_audio_nb*/ )
+        config_PutInt( p_input, "audio-channel", 1 );
+        i_audio = 1;
+    }
+    if( i_audio > 0/* && i_audio_nb > 0*/ )
+    {
+        if( config_GetInt( p_input, "audio-type" ) == REQUESTED_A52 )
         {
-            config_PutInt( p_input, "audio-channel", 1 );
-            i_audio = 1;
+            int     i_a52 = i_audio;
+            while( ( p_input->stream.pp_es[i_a52]->i_fourcc !=
+                   VLC_FOURCC('a','5','2','b') ) && ( i_a52 <=
+                   p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams ) )
+            {
+                i_a52++;
+            }
+            if( p_input->stream.pp_es[i_a52]->i_fourcc
+                 == VLC_FOURCC('a','5','2','b') )
+            {
+                input_SelectES( p_input, p_input->stream.pp_es[i_a52] );
+            }
         }
-        if( i_audio > 0/* && i_audio_nb > 0*/ )
+        else
         {
-            if( config_GetInt( p_input, "audio-type" )
-                 == REQUESTED_A52 )
-            {
-                int     i_a52 = i_audio;
-                while( ( p_input->stream.pp_es[i_a52]->i_fourcc !=
-                       VLC_FOURCC('a','5','2','b') ) && ( i_a52 <=
-                       p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams ) )
-                {
-                    i_a52++;
-                }
-                if( p_input->stream.pp_es[i_a52]->i_fourcc
-                     == VLC_FOURCC('a','5','2','b') )
-                {
-                    input_SelectES( p_input,
-                                    p_input->stream.pp_es[i_a52] );
-                }
-            }
-            else
-            {
-                input_SelectES( p_input,
-                                p_input->stream.pp_es[i_audio] );
-            }
+            input_SelectES( p_input, p_input->stream.pp_es[i_audio] );
         }
     }
 
-    if( config_GetInt( p_input, "video" ) )
+    /* for spu, default is none */
+    i_spu = config_GetInt( p_input, "spu-channel" );
+    if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
     {
-        /* for spu, default is none */
-        int i_spu = config_GetInt( p_input, "spu-channel" );
-        if( i_spu < 0 /*|| i_spu > i_spu_nb*/ )
-        {
-            config_PutInt( p_input, "spu-channel", 0 );
-            i_spu = 0;
-        }
-        if( i_spu > 0 /*&& i_spu_nb > 0*/ )
-        {
-            i_spu += p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams;
-            input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
-        }
+        config_PutInt( p_input, "spu-channel", 0 );
+        i_spu = 0;
+    }
+    if( i_spu > 0 /*&& i_spu_nb > 0*/ )
+    {
+        i_spu += p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams;
+        input_SelectES( p_input, p_input->stream.pp_es[i_spu] );
     }
 }
