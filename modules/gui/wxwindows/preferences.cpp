@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.21 2003/06/17 16:09:16 gbazin Exp $
+ * $Id: preferences.cpp,v 1.22 2003/06/19 12:21:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -681,6 +681,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     wxButton *button;
     wxArrayString array;
 
+    vlc_bool_t b_has_advanced = VLC_FALSE;
+
     /* Initializations */
     p_intf = _p_intf;
     p_prefs_dialog =_p_prefs_dialog,
@@ -784,6 +786,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             config_data->control.combobox = combo;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
             panel_sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         case CONFIG_ITEM_STRING:
@@ -827,6 +830,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 panel_sizer->Add( button, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
                 button->SetClientData((void *)config_data);
             }
+            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         case CONFIG_ITEM_INTEGER:
@@ -842,19 +846,20 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
 
             spin->SetClientData((void *)config_data);
+            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         case CONFIG_ITEM_FLOAT:
             label = new wxStaticText(panel, -1, wxU(p_item->psz_text));
-            spin = new wxSpinCtrl( panel, -1,
-                                   wxString::Format(wxT("%f"),p_item->f_value),
-                                   wxDefaultPosition, wxDefaultSize,
-                                   wxSP_ARROW_KEYS,
-                                   -16000, 16000, (int)p_item->f_value);
-            spin->SetToolTip( wxU(p_item->psz_longtext) );
-            config_data->control.spinctrl = spin;
+            textctrl = new wxTextCtrl( panel, -1,
+                             wxString::Format(wxT("%f"),p_item->f_value),
+                             wxDefaultPosition, wxDefaultSize,
+                             wxTE_PROCESS_ENTER );
+            textctrl->SetToolTip( wxU(p_item->psz_longtext) );
+            config_data->control.textctrl = textctrl;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-            panel_sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+            panel_sizer->Add( textctrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         case CONFIG_ITEM_BOOL:
@@ -863,6 +868,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             checkbox->SetToolTip( wxU(p_item->psz_longtext) );
             config_data->control.checkbox = checkbox;
             panel_sizer->Add( checkbox, 0, wxALL, 5 );
+            if( p_item->b_advanced ) b_has_advanced = VLC_TRUE;
             break;
 
         default:
@@ -906,8 +912,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     b_advanced = !config_GetInt( p_intf, "advanced" );
     OnAdvanced( dummy_event );
 
-    /* Create advanced checkbox */
-    if( config_array.GetCount() )
+    /* Create advanced checkbox if needed */
+    if( config_array.GetCount() && b_has_advanced )
     {
         wxCheckBox *advanced_checkbox =
            new wxCheckBox( this, Advanced_Event, wxU(_("Advanced options")) );
@@ -952,8 +958,13 @@ void PrefsPanel::ApplyChanges()
                            config_data->control.spinctrl->GetValue() );
             break;
         case CONFIG_ITEM_FLOAT:
-            config_PutFloat( p_intf, config_data->option_name.mb_str(),
-                             config_data->control.spinctrl->GetValue() );
+            {
+                float f_value;
+                if( (wxSscanf(config_data->control.textctrl->GetValue(),
+                              wxT("%f"), &f_value) == 1) )
+                    config_PutFloat( p_intf, config_data->option_name.mb_str(),
+                                     f_value );
+            }
             break;
         }
     }

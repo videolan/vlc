@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.40 2003/06/13 15:54:42 gbazin Exp $
+ * $Id: interface.cpp,v 1.41 2003/06/19 12:21:53 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -840,12 +840,14 @@ void Interface::TogglePlayButton( int i_playing_status )
     if( i_playing_status == PLAYING_S )
     {
         GetToolBar()->InsertTool( 5, PlayStream_Event, wxU(_("Pause")),
-                                  wxBitmap( pause_xpm ) );
+                                  wxBitmap( pause_xpm ), wxNullBitmap,
+                                  wxITEM_NORMAL, wxU(_(HELP_PAUSE)) );
     }
     else
     {
         GetToolBar()->InsertTool( 5, PlayStream_Event, wxU(_("Play")),
-                                  wxBitmap( play_xpm ) );
+                                  wxBitmap( play_xpm ), wxNullBitmap,
+                                  wxITEM_NORMAL, wxU(_(HELP_PLAY)) );
     }
 
     GetToolBar()->Realize();
