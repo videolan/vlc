@@ -272,7 +272,9 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     s16 *                               p_s16;
 
     int                                 i_need = 0, i_dump = 0;
-//    static const int                    pi_framesize[512] = ADEC_FRAME_SIZE;
+#if 0
+    static const int                    pi_framesize[512] = ADEC_FRAME_SIZE;
+#endif
 
     /* Read the audio frame header and flush the bit buffer */
     i_header = p_adec->bit_stream.fifo.buffer;
@@ -679,18 +681,20 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     NEXT_BUF
     READ_SAMPLE_L2S( pf_scalefactor_0_2, pf_scalefactor_1_2, 12 )
 
-//    fprintf(stderr, "adec debug: layer == %i, padding_bit == %i, sampling_frequency == %i, bitrate_index == %i\n",
-//        (i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT,
-//        (i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT,
-//        (i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK) >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT,
-//        (i_header & ADEC_HEADER_BITRATE_INDEX_MASK) >> ADEC_HEADER_BITRATE_INDEX_SHIFT);
-//    fprintf(stderr, "adec debug: framesize == %i, i_need == %i, i_dump == %i\n",
-//        pi_framesize[ 128 * ((i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT) +
-//            64 * ((i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT) +
-//            16 * ((i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK) >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT) +
-//            1 * ((i_header & ADEC_HEADER_BITRATE_INDEX_MASK) >> ADEC_HEADER_BITRATE_INDEX_SHIFT) ],
-//        i_need,
-//        i_dump);
+#if 0
+    fprintf(stderr, "adec debug: layer == %i, padding_bit == %i, sampling_frequency == %i, bitrate_index == %i\n",
+        (i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT,
+        (i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT,
+        (i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK) >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT,
+        (i_header & ADEC_HEADER_BITRATE_INDEX_MASK) >> ADEC_HEADER_BITRATE_INDEX_SHIFT);
+    fprintf(stderr, "adec debug: framesize == %i, i_need == %i, i_dump == %i\n",
+        pi_framesize[ 128 * ((i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT) +
+            64 * ((i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT) +
+            16 * ((i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK) >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT) +
+            1 * ((i_header & ADEC_HEADER_BITRATE_INDEX_MASK) >> ADEC_HEADER_BITRATE_INDEX_SHIFT) ],
+        i_need,
+        i_dump);
+#endif
     p_adec->bit_stream.fifo.buffer = 0;
     p_adec->bit_stream.fifo.i_available = 0;
     return( 6 );
@@ -796,10 +800,12 @@ static int InitThread( adec_thread_t * p_adec )
  *****************************************************************************/
 static void RunThread( adec_thread_t * p_adec )
 {
-//    static const int    pi_framesize[512] = ADEC_FRAME_SIZE;
-//    int                 i_header;
-//    int                 i_framesize;
-//    int                 i_dummy;
+#if 0
+    static const int    pi_framesize[512] = ADEC_FRAME_SIZE;
+    int                 i_header;
+    int                 i_framesize;
+    int                 i_dummy;
+#endif
 
     intf_DbgMsg("adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid());
 
@@ -840,27 +846,27 @@ static void RunThread( adec_thread_t * p_adec )
                     /* Waiting until there is enough free space in the audio output fifo
                      * in order to store the new decoded frames */
                     vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
-		    /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384)...
+                    /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384)...
                      * If these 6 frames were recorded in the audio output fifo, the
                      * l_end_frame index would be incremented 6 times. But, if after
                      * this operation the audio output fifo contains less than 6 frames,
                      * it would mean that we had not enough room to store the 6 frames :-P */
-                    while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* XXX */
+                    while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* XXX?? */
                     {
                         vlc_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
                     }
-		    if ( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
-		    {
+                    if ( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
+                    {
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_adec->fifo)->i_pts;
                         DECODER_FIFO_START(p_adec->fifo)->b_has_pts = 0;
-		    }
-		    else
-		    {
+                    }
+                    else
+                    {
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-		    }
+                    }
                     vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
 
-		    /* Decoding the frames */
+                    /* Decoding the frames */
                     if ( adec_Layer2_Stereo(p_adec) )
                     {
                         vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
@@ -868,23 +874,23 @@ static void RunThread( adec_thread_t * p_adec )
                         /* Frame 1 */
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
 
-			/* Frame 2 */
+                        /* Frame 2 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
 
-			/* Frame 3 */
+                        /* Frame 3 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
 
-			/* Frame 4 */
+                        /* Frame 4 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
 
-			/* Frame 5 */
+                        /* Frame 5 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
 
-			/* Frame 6 */
+                        /* Frame 6 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
 
@@ -947,7 +953,7 @@ static void ErrorThread( adec_thread_t *p_adec )
         while( !DECODER_FIFO_ISEMPTY(p_adec->fifo) )
         {
             input_NetlistFreePES( p_adec->bit_stream.p_input, DECODER_FIFO_START(p_adec->fifo) );
-	    DECODER_FIFO_INCSTART( p_adec->fifo );
+            DECODER_FIFO_INCSTART( p_adec->fifo );
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */

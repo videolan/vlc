@@ -81,11 +81,11 @@ intf_thread_t* intf_Create( void )
 
     /* Initialize method-dependent functions */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
- 
+
     psz_plugin = malloc( sizeof("./interface/intf_.so") + strlen(psz_method) );
     sprintf( psz_plugin, "./interface/intf_%s.so", psz_method );
 
-    p_intf->p_intf_plugin = dlopen( psz_plugin, RTLD_LAZY );
+    p_intf->p_intf_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
 
     if( p_intf->p_intf_plugin == NULL )
     {
@@ -159,7 +159,7 @@ void intf_Run( intf_thread_t *p_intf )
         /* Check attached threads status */
         if( (p_intf->p_vout != NULL) && p_intf->p_vout->b_error )
         {
-            //?? add aout error detection
+            /* FIXME: add aout error detection ?? */
             p_intf->b_die = 1;
         }
         if( (p_intf->p_input != NULL) && p_intf->p_input->b_error )
@@ -191,7 +191,7 @@ void intf_Destroy( intf_thread_t *p_intf )
 
     /* Close plugin */
     dlclose( p_intf->p_intf_plugin );
-    
+
     /* Free structure */
     free( p_intf );
 }
@@ -270,14 +270,14 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
         intf_SelectChannel( p_intf, i_key - '0' );
         break;
     case '+':                                                    /* volume + */
-        // ??
+        /* XXX?? */
         break;
     case '-':                                                    /* volume - */
-        // ??
+        /* XXX?? */
         break;
     case 'M':                                                 /* toggle mute */
     case 'm':
-        // ??
+        /* XXX?? */
         break;
     case 'g':                                                     /* gamma - */
         if( (p_intf->p_vout != NULL) && (p_intf->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )

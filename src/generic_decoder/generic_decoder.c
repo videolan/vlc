@@ -65,7 +65,7 @@ static void     PrintPES            ( pes_packet_t *p_pes, int i_stream_id );
  * to its description. On error, it returns NULL.
  * Following configuration properties are used:
  *  GDEC_CFG_ACTIONS    (required)
- * ??
+ * XXX??
  *****************************************************************************/
 gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
                                    int *pi_status )
@@ -90,7 +90,7 @@ gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
 
     /* Copy configuration */
     p_gdec->i_actions = p_cfg->i_actions;
-    /* ?? */
+    /* XXX?? */
 
     /* Set status */
     p_gdec->pi_status = (pi_status != NULL) ? pi_status : &i_status;
@@ -194,7 +194,7 @@ static int CheckConfiguration( gdec_cfg_t *p_cfg )
  *****************************************************************************/
 static int InitThread( gdec_thread_t *p_gdec )
 {
-    /* ?? */
+    /* XXX?? */
 
     /* Update status */
     *p_gdec->pi_status = THREAD_START;
@@ -239,8 +239,8 @@ static void RunThread( gdec_thread_t *p_gdec )
      */
     while( (!p_gdec->b_die) && (!p_gdec->b_error) )
     {
-        /* ?? locks à rajouter ? - vérifier les macros (transformer en inline ?) */
-        /* ?? on idle loop, increment c_idle_loops */
+        /* FIXME: locks à rajouter ?? - vérifier les macros (transformer en inline ?) */
+        /* on idle loop, increment c_idle_loops */
         while( !DECODER_FIFO_ISEMPTY( p_gdec->fifo ) )
         {
             p_pes = DECODER_FIFO_START( p_gdec->fifo );
@@ -262,13 +262,13 @@ static void RunThread( gdec_thread_t *p_gdec )
             /* PES multiplexed stream saving */
             if( p_gdec->i_actions & GDEC_SAVE )
             {
-                /* ?? */
+                /* XXX?? */
             }
 
             /* PES demultiplexed stream saving */
             if( p_gdec->i_actions & GDEC_SAVE_DEMUX )
             {
-                /* ?? */
+                /* XXX?? */
             }
 
             /* PES information printing */
@@ -344,7 +344,7 @@ static void EndThread( gdec_thread_t *p_gdec )
 
 #ifdef DEBUG
     /* Check for remaining PES packets */
-    /* ?? */
+    /* XXX?? */
 #endif
 
     /* Destroy thread structures allocated by InitThread */
@@ -372,7 +372,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
     case INPUT_METHOD_TS_UCAST:
     case INPUT_METHOD_TS_BCAST:
     case INPUT_METHOD_TS_VLAN_BCAST:
-        /* ?? since PID is extracted by demux, it could be usefull to store it
+        /* XXX?? since PID is extracted by demux, it could be usefull to store it
          * in a readable place, i.e. the TS packet descriptor, rather than to
          * re-extract it now */
         i_id = U16_AT(&p_pes->p_first_ts->buffer[1]) & 0x1fff;
@@ -419,7 +419,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
     }
 
     /* Update ES table */
-    /* ?? */
+    /* XXX?? */
 }
 
 /*****************************************************************************

@@ -47,7 +47,7 @@
  * or pictures count won't be available if it not set */
 #define STATS
 
-/* Define for unthreaded version of the program - ?? not yet implemented */
+/* Define for unthreaded version of the program FIXME: not yet implemented ??*/
 //#define NO_THREAD
 
 /*****************************************************************************
@@ -80,7 +80,7 @@
 
 
 /* Automagically spawn input, audio and video threads ? */
-// ?? used ?
+/* XXX?? used ? */
 #define AUTO_SPAWN
 
 /* When creating or destroying threads in blocking mode, delay to poll thread
@@ -125,7 +125,7 @@
  * Input thread configuration
  *****************************************************************************/
 
-/* ?? */
+/* XXX?? */
 #define INPUT_IDLE_SLEEP                ((int)(0.100*CLOCK_FREQ))
 
 /*

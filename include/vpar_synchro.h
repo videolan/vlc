@@ -91,8 +91,8 @@ typedef struct video_synchro_s
     int         i_coding_type;
 } video_synchro_t;
 
-#define SYNC_TOLERATE   ((int)(0.010*CLOCK_FREQ))	/* 10 ms */
-#define SYNC_DELAY      ((int)(0.500*CLOCK_FREQ))      	/* 500 ms */
+#define SYNC_TOLERATE   ((int)(0.010*CLOCK_FREQ))                   /* 10 ms */
+#define SYNC_DELAY      ((int)(0.500*CLOCK_FREQ))                  /* 500 ms */
 #endif
 
 #ifdef POLUX_SYNCHRO
@@ -102,19 +102,19 @@ typedef struct video_synchro_s
 typedef struct video_synchro_s
 {
     /* Date Section */
-    
-    /* Dates needed to compute the date of the current frame 
+
+    /* Dates needed to compute the date of the current frame
      * We also use the stream frame rate (sequence.r_frame_rate) */
     mtime_t     i_current_frame_date;
     mtime_t     i_backward_frame_date;
 
     /* Frame Trashing Section */
-    
+
     int         i_b_nb, i_p_nb;   /* number of decoded P and B between two I */
     float       r_b_average, r_p_average;
     int         i_b_count, i_p_count, i_i_count;
     int         i_b_trasher;                /* used for brensenham algorithm */
-    
+
 } video_synchro_t;
 
 #endif

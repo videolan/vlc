@@ -175,7 +175,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     main_data.p_intf = intf_Create();
     if( main_data.p_intf != NULL )
     {
-        InitSignalHandler();               /* prepare signals for interception */
+        InitSignalHandler();             /* prepare signals for interception */
         intf_Run( main_data.p_intf );
         intf_Destroy( main_data.p_intf );
     }
@@ -425,11 +425,11 @@ static void Usage( int i_fashion )
     /* Options */
     intf_Msg("Options:\n" \
              "  -h, --help, -H, --longhelp        \tprint short/long usage\n" \
-             "  -v, --version                     \tprint version information\n" \
+             "  -v, --version                     \tprint version information\n"\
              "  --noaudio, --novideo              \tdisable audio/video\n" \
-             "  --aout {" AUDIO_OPTIONS "}            \taudio output method\n" \
+             "  --aout {" AUDIO_OPTIONS "}            \taudio output method\n"\
              "  --stereo, --mono                  \tstereo/mono audio\n" \
-             "  --vout {" VIDEO_OPTIONS "}            \tvideo output method\n" \
+             "  --vout {" VIDEO_OPTIONS "}            \tvideo output method\n"\
              "  --display <display>               \tdisplay string\n" \
              "  --width <w>, --height <h>         \tdisplay dimensions\n" \
              "  -g, --grayscale, --color          \tgrayscale/color video\n" \
@@ -468,7 +468,7 @@ static void Usage( int i_fashion )
     intf_Msg("Input parameters:\n" \
              "  " INPUT_SERVER_VAR "=<hostname>          \tvideo server\n" \
              "  " INPUT_PORT_VAR "=<port>            \tvideo server port\n" \
-             "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n" \
+             "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n"\
              "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n" \
              "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n"\
              );
@@ -552,7 +552,7 @@ static int TestMMX( void )
                     xorl %%ecx, %%eax
                     andl $0x40000, %%eax"
                  : "=a" ( i_reg ) );
-    
+
     if( !i_reg )
         return( 0 );
 
@@ -564,11 +564,11 @@ static int TestMMX( void )
                     pushfl
                     popl %%eax
                     xorl %%ecx, %%eax
-                    pushl %%ecx 
+                    pushl %%ecx
                     popfl
                     andl $0x200000, %%eax"
                  : "=a" ( i_reg ) );
-    
+
     if( !i_reg )
         return( 0 );
 

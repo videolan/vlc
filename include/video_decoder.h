@@ -17,7 +17,7 @@
 /*****************************************************************************
  * vdec_thread_t: video decoder thread descriptor
  *****************************************************************************
- * ??
+ * XXX??
  *****************************************************************************/
 typedef struct vdec_thread_s
 {
@@ -29,8 +29,7 @@ typedef struct vdec_thread_s
     vlc_thread_t        thread_id;                /* id for thread functions */
 
     /* Thread configuration */
-    /* ?? */
- /*??*/
+    /* XXX?? */
 //    int *pi_status;
 
 #ifdef OLD_DECODER

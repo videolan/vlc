@@ -16,15 +16,15 @@ SHELL=/bin/sh
 # Audio output settings
 AUDIO = dsp
 # Not yet supported
-#AUDIO += esd
+AUDIO += esd
 # Fallback method that should always work
 AUDIO += dummy
 
 # Video output settings
 VIDEO = x11
-#VIDEO += fb
+VIDEO += fb
 #VIDEO += ggi
-#VIDEO += glide
+VIDEO += glide
 # Not yet supported
 #VIDEO += beos
 #VIDEO += dga
@@ -59,7 +59,7 @@ DEBUG=0
 ################################################################################
 
 # Program version - may only be changed by the project leader
-PROGRAM_VERSION = 0.95.0
+PROGRAM_VERSION = 0.1.99
 
 # audio options
 audio := $(shell echo $(AUDIO) | tr 'A-Z' 'a-z')

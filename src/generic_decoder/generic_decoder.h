@@ -9,7 +9,7 @@
  *  "vlc_thread.h"
  *  "input.h"
  *  "decoder_fifo.h"
- * ??
+ * XXX??
  *****************************************************************************/
 
 /*****************************************************************************
@@ -50,13 +50,13 @@ typedef struct gdec_thread_s
     input_thread_t *    p_input;                             /* input thread */
     decoder_fifo_t      fifo;                              /* PES input fifo */
 
-    /* ?? status info */
+    /* XXX?? status info */
     int *               pi_status;
 
 
     /* Files array - these files are used to extract ES streams from a
      * demultiplexed stream */
-    /* ?? */
+    /* XXX?? */
 
 #ifdef STATS
     /* Statistics */
@@ -83,7 +83,7 @@ gdec_thread_t * gdec_CreateThread       ( gdec_cfg_t *p_cfg,
 void            gdec_DestroyThread      ( gdec_thread_t *p_gdec, int *pi_status );
 
 /* Time management functions */
-/* ?? */
+/* XXX?? */
 
 /* Dynamic thread settings */
-/* ?? */
+/* XXX?? */

@@ -3,7 +3,7 @@
  * (c)1999 VideoLAN
  *****************************************************************************/
 
-/* ?? passer en terminate/destroy avec les signaux supplémentaires */
+/* FIXME: passer en terminate/destroy avec les signaux supplémentaires ?? */
 
 /*****************************************************************************
  * Preamble
@@ -23,7 +23,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -59,7 +59,7 @@ static void     EndThread           ( vdec_thread_t *p_vdec );
  * This function creates a new video decoder thread, and returns a pointer
  * to its description. On error, it returns NULL.
  * Following configuration properties are used:
- * ??
+ * XXX??
  *****************************************************************************/
 vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 {

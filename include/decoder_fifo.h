@@ -13,7 +13,7 @@
  * Macros
  *****************************************************************************/
 
-/* ?? move to inline functions */
+/* FIXME: move to inline functions ??*/
 #define DECODER_FIFO_ISEMPTY( fifo )    ( (fifo).i_start == (fifo).i_end )
 #define DECODER_FIFO_ISFULL( fifo )     ( ( ( (fifo).i_end + 1 - (fifo).i_start ) \
                                           & FIFO_SIZE ) == 0 )
@@ -80,7 +80,7 @@ typedef struct bit_stream_s
      */
     /* Current TS packet (in the current PES packet of the PES stream) */
     ts_packet_t *       p_ts;
-    /* Pointer to the next byte that is to be read (in the current TS packet) */
+   /* Pointer to the next byte that is to be read (in the current TS packet) */
     byte_t *            p_byte;
     /* Pointer to the last byte that is to be read (in the current TS packet */
     byte_t *            p_end;
@@ -103,8 +103,8 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
     /* could change this test to have a if (! (bytes--)) instead */
     if ( p_bit_stream->p_byte >= p_bit_stream->p_end )
     {
-	/* no, switch to next TS packet */
-	decoder_fifo_next( p_bit_stream );
+        /* no, switch to next TS packet */
+        decoder_fifo_next( p_bit_stream );
     }
 
     return( *(p_bit_stream->p_byte++));

@@ -20,7 +20,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -646,7 +646,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z3 = d7 + d3;
                         z4 = d5 + d1;
                         z5 = MULTIPLY(z3 + z4, FIX(1.175875602));
-                
+
                         tmp0 = MULTIPLY(d7, FIX(0.298631336));
                         tmp1 = MULTIPLY(d5, FIX(2.053119869));
                         tmp2 = MULTIPLY(d3, FIX(3.072711026));
@@ -658,7 +658,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
 
                         z3 += z5;
                         z4 += z5;
-                
+
                         tmp0 += z1 + z3;
                         tmp1 += z2 + z4;
                         tmp2 += z2 + z3;
@@ -670,7 +670,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z2 = d5 + d3;
                         z3 = d7 + d3;
                         z5 = MULTIPLY(z3 + d5, FIX(1.175875602));
-                
+
                         tmp0 = MULTIPLY(d7, FIX(0.298631336));
                         tmp1 = MULTIPLY(d5, FIX(2.053119869));
                         tmp2 = MULTIPLY(d3, FIX(3.072711026));
@@ -678,10 +678,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z2 = MULTIPLY(z2, - FIX(2.562915447));
                         z3 = MULTIPLY(z3, - FIX(1.961570560));
                         z4 = MULTIPLY(d5, - FIX(0.390180644));
-                
+
                         z3 += z5;
                         z4 += z5;
-                
+
                         tmp0 += z1 + z3;
                         tmp1 += z2 + z4;
                         tmp2 += z2 + z3;
@@ -696,7 +696,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z1 = d7 + d1;
                         z4 = d5 + d1;
                         z5 = MULTIPLY(d7 + z4, FIX(1.175875602));
-                
+
                         tmp0 = MULTIPLY(d7, FIX(0.298631336));
                         tmp1 = MULTIPLY(d5, FIX(2.053119869));
                         tmp3 = MULTIPLY(d1, FIX(1.501321110));
@@ -704,10 +704,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z2 = MULTIPLY(d5, - FIX(2.562915447));
                         z3 = MULTIPLY(d7, - FIX(1.961570560));
                         z4 = MULTIPLY(z4, - FIX(0.390180644));
-                
+
                         z3 += z5;
                         z4 += z5;
-                
+
                         tmp0 += z1 + z3;
                         tmp1 += z2 + z4;
                         tmp2 = z2 + z3;
@@ -724,10 +724,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z3 = MULTIPLY(d7, - FIX(1.961570560));
                         z2 = MULTIPLY(d5, - FIX(2.562915447));
                         z4 = MULTIPLY(d5, - FIX(0.390180644));
-                
+
                         z3 += z5;
                         z4 += z5;
-                
+
                         tmp0 += z3;
                         tmp1 += z4;
                         tmp2 = z2 + z3;
@@ -745,7 +745,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z1 = d7 + d1;
                         z3 = d7 + d3;
                         z5 = MULTIPLY(z3 + d1, FIX(1.175875602));
-                
+
                         tmp0 = MULTIPLY(d7, FIX(0.298631336));
                         tmp2 = MULTIPLY(d3, FIX(3.072711026));
                         tmp3 = MULTIPLY(d1, FIX(1.501321110));
@@ -753,10 +753,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z2 = MULTIPLY(d3, - FIX(2.562915447));
                         z3 = MULTIPLY(z3, - FIX(1.961570560));
                         z4 = MULTIPLY(d1, - FIX(0.390180644));
-                
+
                         z3 += z5;
                         z4 += z5;
-                
+
                         tmp0 += z1 + z3;
                         tmp1 = z2 + z4;
                         tmp2 += z2 + z3;
@@ -767,7 +767,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
             /* d1 == 0, d3 != 0, d5 == 0, d7 != 0 */
                         z3 = d7 + d3;
                         z5 = MULTIPLY(z3, FIX(1.175875602));
-                
+
                         tmp0 = MULTIPLY(d7, - FIX2(0.601344887));
                         tmp2 = MULTIPLY(d3, FIX(0.509795579));
                         z1 = MULTIPLY(d7, - FIX(0.899976223));
@@ -822,7 +822,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z2 = d5 + d3;
                         z4 = d5 + d1;
                         z5 = MULTIPLY(d3 + z4, FIX(1.175875602));
-                
+
                         tmp1 = MULTIPLY(d5, FIX(2.053119869));
                         tmp2 = MULTIPLY(d3, FIX(3.072711026));
                         tmp3 = MULTIPLY(d1, FIX(1.501321110));
@@ -830,10 +830,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z2 = MULTIPLY(z2, - FIX(2.562915447));
                         z3 = MULTIPLY(d3, - FIX(1.961570560));
                         z4 = MULTIPLY(z4, - FIX(0.390180644));
-                
+
                         z3 += z5;
                         z4 += z5;
-                
+
                         tmp0 = z1 + z3;
                         tmp1 += z2 + z4;
                         tmp2 += z2 + z3;
@@ -844,13 +844,13 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
             /* d1 == 0, d3 != 0, d5 != 0, d7 == 0 */
                         z2 = d5 + d3;
                         z5 = MULTIPLY(z2, FIX(1.175875602));
-                
+
                         tmp1 = MULTIPLY(d5, FIX2(1.662939225));
                         tmp2 = MULTIPLY(d3, FIX2(1.111140466));
                         z2 = MULTIPLY(z2, - FIX2(1.387039845));
                         z3 = MULTIPLY(d3, - FIX(1.961570560));
                         z4 = MULTIPLY(d5, - FIX(0.390180644));
-                
+
                         tmp0 = z3 + z5;
                         tmp1 += z2;
                         tmp2 += z2;
@@ -864,13 +864,13 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
             /* d1 != 0, d3 == 0, d5 != 0, d7 == 0 */
                         z4 = d5 + d1;
                         z5 = MULTIPLY(z4, FIX(1.175875602));
-                
+
                         tmp1 = MULTIPLY(d5, - FIX2(0.509795578));
                         tmp3 = MULTIPLY(d1, FIX2(0.601344887));
                         z1 = MULTIPLY(d1, - FIX(0.899976223));
                         z2 = MULTIPLY(d5, - FIX(2.562915447));
                         z4 = MULTIPLY(z4, FIX2(0.785694958));
-                
+
                         tmp0 = z1 + z5;
                         tmp1 += z4;
                         tmp2 = z2 + z5;
@@ -901,7 +901,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                         z2 = MULTIPLY(d3, - FIX(2.172734803));
                         z4 = MULTIPLY(z5, FIX(0.785694958));
                         z5 = MULTIPLY(z5, FIX(1.175875602));
-                
+
                         tmp0 = z1 - z4;
                         tmp1 = z2 + z4;
                         tmp2 += z5;
@@ -1213,7 +1213,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z3 = d7 + d3;
                     z4 = d5 + d1;
                     z5 = MULTIPLY(z3 + z4, FIX(1.175875602));
-                
+
                     tmp0 = MULTIPLY(d7, FIX(0.298631336));
                     tmp1 = MULTIPLY(d5, FIX(2.053119869));
                     tmp2 = MULTIPLY(d3, FIX(3.072711026));
@@ -1222,10 +1222,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = MULTIPLY(z2, - FIX(2.562915447));
                     z3 = MULTIPLY(z3, - FIX(1.961570560));
                     z4 = MULTIPLY(z4, - FIX(0.390180644));
-                
+
                     z3 += z5;
                     z4 += z5;
-                
+
                     tmp0 += z1 + z3;
                     tmp1 += z2 + z4;
                     tmp2 += z2 + z3;
@@ -1237,7 +1237,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = d5 + d3;
                     z3 = d7 + d3;
                     z5 = MULTIPLY(z3 + d5, FIX(1.175875602));
-                
+
                     tmp0 = MULTIPLY(d7, FIX(0.298631336));
                     tmp1 = MULTIPLY(d5, FIX(2.053119869));
                     tmp2 = MULTIPLY(d3, FIX(3.072711026));
@@ -1245,10 +1245,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = MULTIPLY(z2, - FIX(2.562915447));
                     z3 = MULTIPLY(z3, - FIX(1.961570560));
                     z4 = MULTIPLY(d5, - FIX(0.390180644));
-                
+
                     z3 += z5;
                     z4 += z5;
-                
+
                     tmp0 += z1 + z3;
                     tmp1 += z2 + z4;
                     tmp2 += z2 + z3;
@@ -1263,7 +1263,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z1 = d7 + d1;
                     z4 = d5 + d1;
                     z5 = MULTIPLY(d7 + z4, FIX(1.175875602));
-                
+
                     tmp0 = MULTIPLY(d7, FIX(0.298631336));
                     tmp1 = MULTIPLY(d5, FIX(2.053119869));
                     tmp3 = MULTIPLY(d1, FIX(1.501321110));
@@ -1271,10 +1271,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = MULTIPLY(d5, - FIX(2.562915447));
                     z3 = MULTIPLY(d7, - FIX(1.961570560));
                     z4 = MULTIPLY(z4, - FIX(0.390180644));
-                
+
                     z3 += z5;
                     z4 += z5;
-                
+
                     tmp0 += z1 + z3;
                     tmp1 += z2 + z4;
                     tmp2 = z2 + z3;
@@ -1291,10 +1291,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z3 = MULTIPLY(d7, - FIX(1.961570560));
                     z2 = MULTIPLY(d5, - FIX(2.562915447));
                     z4 = MULTIPLY(d5, - FIX(0.390180644));
-                
+
                     z3 += z5;
                     z4 += z5;
-                
+
                     tmp0 += z3;
                     tmp1 += z4;
                     tmp2 = z2 + z3;
@@ -1312,7 +1312,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z1 = d7 + d1;
                     z3 = d7 + d3;
                     z5 = MULTIPLY(z3 + d1, FIX(1.175875602));
-                
+
                     tmp0 = MULTIPLY(d7, FIX(0.298631336));
                     tmp2 = MULTIPLY(d3, FIX(3.072711026));
                     tmp3 = MULTIPLY(d1, FIX(1.501321110));
@@ -1320,10 +1320,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = MULTIPLY(d3, - FIX(2.562915447));
                     z3 = MULTIPLY(z3, - FIX(1.961570560));
                     z4 = MULTIPLY(d1, - FIX(0.390180644));
-                
+
                     z3 += z5;
                     z4 += z5;
-                
+
                     tmp0 += z1 + z3;
                     tmp1 = z2 + z4;
                     tmp2 += z2 + z3;
@@ -1334,13 +1334,13 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
             /* d1 == 0, d3 != 0, d5 == 0, d7 != 0 */
                     z3 = d7 + d3;
                     z5 = MULTIPLY(z3, FIX(1.175875602));
-                
+
                     tmp0 = MULTIPLY(d7, - FIX2(0.601344887));
                     z1 = MULTIPLY(d7, - FIX(0.899976223));
                     tmp2 = MULTIPLY(d3, FIX(0.509795579));
                     z2 = MULTIPLY(d3, - FIX(2.562915447));
                     z3 = MULTIPLY(z3, - FIX2(0.785694958));
-                
+
                     tmp0 += z3;
                     tmp1 = z2 + z5;
                     tmp2 += z3;
@@ -1389,7 +1389,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = d5 + d3;
                     z4 = d5 + d1;
                     z5 = MULTIPLY(d3 + z4, FIX(1.175875602));
-                
+
                     tmp1 = MULTIPLY(d5, FIX(2.053119869));
                     tmp2 = MULTIPLY(d3, FIX(3.072711026));
                     tmp3 = MULTIPLY(d1, FIX(1.501321110));
@@ -1397,10 +1397,10 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = MULTIPLY(z2, - FIX(2.562915447));
                     z3 = MULTIPLY(d3, - FIX(1.961570560));
                     z4 = MULTIPLY(z4, - FIX(0.390180644));
-                
+
                     z3 += z5;
                     z4 += z5;
-                
+
                     tmp0 = z1 + z3;
                     tmp1 += z2 + z4;
                     tmp2 += z2 + z3;
@@ -1417,7 +1417,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = MULTIPLY(z2, - FIX2(1.387039845));
                     z3 = MULTIPLY(d3, - FIX(1.961570560));
                     z4 = MULTIPLY(d5, - FIX(0.390180644));
-                
+
                     tmp0 = z3 + z5;
                     tmp1 += z2;
                     tmp2 += z2;
@@ -1431,13 +1431,13 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
             /* d1 != 0, d3 == 0, d5 != 0, d7 == 0 */
                     z4 = d5 + d1;
                     z5 = MULTIPLY(z4, FIX(1.175875602));
-                
+
                     tmp1 = MULTIPLY(d5, - FIX2(0.509795578));
                     tmp3 = MULTIPLY(d1, FIX2(0.601344887));
                     z1 = MULTIPLY(d1, - FIX(0.899976223));
                     z2 = MULTIPLY(d5, - FIX(2.562915447));
                     z4 = MULTIPLY(z4, FIX2(0.785694958));
-                
+
                     tmp0 = z1 + z5;
                     tmp1 += z4;
                     tmp2 = z2 + z5;
@@ -1468,7 +1468,7 @@ void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block, int i_idontcare )
                     z2 = MULTIPLY(d3, - FIX(2.172734803));
                     z4 = MULTIPLY(z5, FIX(0.785694958));
                     z5 = MULTIPLY(z5, FIX(1.175875602));
-                
+
                     tmp0 = z1 - z4;
                     tmp1 = z2 + z4;
                     tmp2 += z5;

@@ -95,7 +95,7 @@ typedef struct es_descriptor_t
     u8                      i_type;                           /* stream type */
 
     boolean_t               b_pcr;        /* does the stream include a PCR ? */
-    /* ?? b_pcr will be replaced by something else: since a PCR can't be shared
+    /* XXX?? b_pcr will be replaced by something else: since a PCR can't be shared
      * between several ES, we will probably store the PCR fields directly here,
      * and one of those fields will probably (again) be used as a test of the
      * PCR presence */
@@ -119,12 +119,12 @@ typedef struct es_descriptor_t
                                         * vdec_thread_t. We will use explicit
                                         * casts. */
 
-    /* ?? video stream descriptor ? */
-    /* ?? audio stream descriptor ? */
-    /* ?? hierarchy descriptor ? */
-    /* ?? target background grid descriptor ? */
-    /* ?? video window descriptor ? */
-    /* ?? ISO 639 language descriptor ? */
+    /* XXX?? video stream descriptor ? */
+    /* XXX?? audio stream descriptor ? */
+    /* XXX?? hierarchy descriptor ? */
+    /* XXX?? target background grid descriptor ? */
+    /* XXX?? video window descriptor ? */
+    /* XXX?? ISO 639 language descriptor ? */
 
 #ifdef STATS
     /* Stats */
@@ -132,7 +132,7 @@ typedef struct es_descriptor_t
     count_t                 c_payload_bytes;/* total of payload usefull bytes */
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
-    /* ?? ... other stats */
+    /* XXX?? ... other stats */
 #endif
 } es_descriptor_t;
 
@@ -173,13 +173,13 @@ typedef struct
     char*                   psz_srv_name;
 #endif
 
-    /* ?? target background grid descriptor ? */
-    /* ?? video window descriptor ? */
-    /* ?? ISO 639 language descriptor ? */
+    /* XXX?? target background grid descriptor ? */
+    /* XXX?? video window descriptor ? */
+    /* XXX?? ISO 639 language descriptor ? */
 
 #ifdef STATS
     /* Stats */
-    /* ?? ...stats */
+    /* XXX?? ...stats */
 #endif
 } pgrm_descriptor_t;
 
@@ -241,7 +241,7 @@ typedef struct
 
 #ifdef STATS
     /* Stats */
-    /* ?? ...stats */
+    /* XXX?? ...stats */
 #endif
 } stream_descriptor_t;
 

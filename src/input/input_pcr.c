@@ -98,8 +98,8 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
 
     if( p_es->b_discontinuity ||
         ( p_pcr->last_pcr != 0 &&
-	      (    (p_pcr->last_pcr - pcr_time) > PCR_MAX_GAP
-	        || (p_pcr->last_pcr - pcr_time) < - PCR_MAX_GAP ) ) )
+              (    (p_pcr->last_pcr - pcr_time) > PCR_MAX_GAP
+                || (p_pcr->last_pcr - pcr_time) < - PCR_MAX_GAP ) ) )
     {
         intf_DbgMsg("input debug: input_PcrReInit()\n");
         input_PcrReInit(p_input);

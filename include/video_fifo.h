@@ -16,7 +16,7 @@
  *****************************************************************************/
 
 #ifdef VDEC_SMP
-/* ?? move to inline functions */
+/* FIXME: move to inline functions ??*/
 #define VIDEO_FIFO_ISEMPTY( fifo )    ( (fifo).i_start == (fifo).i_end )
 #define VIDEO_FIFO_ISFULL( fifo )     ( ( ( (fifo).i_end + 1 - (fifo).i_start )\
                                           & VFIFO_SIZE ) == 0 )

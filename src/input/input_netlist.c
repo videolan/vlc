@@ -130,9 +130,9 @@ void input_NetlistEnd( input_thread_t *p_input )
        been allocated */
     for( i = 0; i < INPUT_MAX_PES + 1; i++ )
     {
-      byte_t* p_buffer = p_input->netlist.p_pes_packets[i].p_pes_header_save;
-      if(p_buffer)
-	free(p_buffer);
+        byte_t* p_buffer = p_input->netlist.p_pes_packets[i].p_pes_header_save;
+        if(p_buffer)
+            free(p_buffer);
     }
 
     /* free PES netlist */

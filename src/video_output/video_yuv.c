@@ -991,7 +991,7 @@ static void ConvertY4Gray24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_
                              int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                              int i_matrix_coefficients )
 {
-    //??
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -1083,12 +1083,14 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
 
     /* other matrices that can be interesting, either for debugging or for effects */
-    //int dither[4][4] = { { 0, 8, 2, 10 }, { 12, 4, 14, 16 }, { 3, 11, 1, 9}, {15, 7, 13, 5} };
-    //int dither[4][4] = { { 7, 8, 0, 15 }, { 0, 15, 8, 7 }, { 7, 0, 15, 8 }, { 15, 7, 8, 0 } };
-    //int dither[4][4] = { { 0, 15, 0, 15 }, { 15, 0, 15, 0 }, { 0, 15, 0, 15 }, { 15, 0, 15, 0 } };
-    //int dither[4][4] = { { 15, 15, 0, 0 }, { 15, 15, 0, 0 }, { 0, 0, 15, 15 }, { 0, 0, 15, 15 } };
-    //int dither[4][4] = { { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 } };
-    //int dither[4][4] = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 } };
+#if 0
+    int dither[4][4] = { { 0, 8, 2, 10 }, { 12, 4, 14, 16 }, { 3, 11, 1, 9}, {15, 7, 13, 5} };
+    int dither[4][4] = { { 7, 8, 0, 15 }, { 0, 15, 8, 7 }, { 7, 0, 15, 8 }, { 15, 7, 8, 0 } };
+    int dither[4][4] = { { 0, 15, 0, 15 }, { 15, 0, 15, 0 }, { 0, 15, 0, 15 }, { 15, 0, 15, 0 } };
+    int dither[4][4] = { { 15, 15, 0, 0 }, { 15, 15, 0, 0 }, { 0, 0, 15, 15 }, { 0, 0, 15, 15 } };
+    int dither[4][4] = { { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 }, { 8, 8, 8, 8 } };
+    int dither[4][4] = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 }, { 12, 13, 14, 15 } };
+#endif
 
     /*
      * Initialize some values  - i_pic_line_width will store the line skip
@@ -1247,9 +1249,10 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-/* MMX version */
-  //  int                 i_chroma_width, i_chroma_skip;      /* width and eol for chroma */
-/*
+#if 0
+    /* MMX version */
+    int                 i_chroma_width, i_chroma_skip;      /* width and eol for chroma */
+
     i_chroma_width =    i_width / 2;
     i_chroma_skip =     i_skip / 2;
     ConvertYUV420RGB16MMX( p_y, p_u, p_v, i_width, i_height,
@@ -1257,7 +1260,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                            (i_chroma_width + i_chroma_skip) * sizeof( yuv_data_t),
                            i_scale, (u8 *)p_pic, 0, 0, (i_width + i_pic_eol) * sizeof( u16 ),
                            p_vout->i_screen_depth == 15 );
-*/
+#endif
     boolean_t   b_horizontal_scaling;             /* horizontal scaling type */
     int         i_vertical_scaling;                 /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
@@ -1449,7 +1452,7 @@ static void ConvertYUV420RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t 
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //???
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -1459,7 +1462,7 @@ static void ConvertYUV422RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t 
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //???
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -1469,7 +1472,7 @@ static void ConvertYUV444RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t 
                                 int i_width, int i_height, int i_pic_width, int i_pic_height, int i_pic_line_width,
                                 int i_matrix_coefficients )
 {
-    //???
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -1663,7 +1666,7 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
     }
 }
 
-//-------------------- walken code follows ------------------------------------
+/*-------------------- walken code follows ----------------------------------*/
 
 /*
  * YUV to RGB routines.
@@ -1689,7 +1692,7 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
  */
 
 #if 0
-//??
+/* XXX?? */
 static void yuvToRgb24 (unsigned char * Y,
                         unsigned char * U, unsigned char * V,
                         char * dest, int table[1935], int width)

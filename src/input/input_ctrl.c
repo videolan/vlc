@@ -173,7 +173,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                 p_input->p_es[i_es_loop].p_pes_packet = NULL;
                 p_input->p_es[i_es_loop].i_continuity_counter = 0xff;
                 p_input->p_es[i_es_loop].b_random = 0;
-		
+
                 /* Mark stream to be demultiplexed. */
                 intf_DbgMsg("Stream %d added in %d\n", i_current_id, i_selected_es_loop);
                 p_input->pp_selected_es[i_selected_es_loop] = &p_input->p_es[i_es_loop];

@@ -49,7 +49,7 @@ u32 i_crc_32_table[256];
  * the option (audio and video) passed to the VideoLAN client.
  */
 #ifdef AUTO_SPAWN
-//??extern program_data_t *p_main;
+//XXX?? extern program_data_t *p_main;
 #endif
 
 /*
@@ -107,8 +107,8 @@ int input_PsiInit( input_thread_t *p_input )
 {
   ASSERT(p_input);
 
-  /* Precalculate the 32-bit CRC table if not already done ???
-     TO DO -> Put a lock or do that at pgrm init */
+  /* Precalculate the 32-bit CRC table if not already done ?
+     FIXME: Put a lock or do that at pgrm init ?? */
   if( !b_crc_initialised )
   {
     BuildCrc32Table();
@@ -137,10 +137,10 @@ int input_PsiEnd( input_thread_t *p_input )
   ASSERT(p_input);
 
   /* Stop to receive all the PSI tables associated with that program */
-  /* TO DO ??? -> Not really usefull */
+  /* FIXME: Not really useful ??*/
 
   /* Clean also descriptors for programs associated with that stream */
-  /* TO DO ??? -> Not really usefull and maybe buggy */
+  /* FIXME: -> Not really useful and maybe buggy ??*/
 
   /* Destroy the stream description */
   DestroyStreamDescr( p_input, p_input->p_stream->i_stream_id );
@@ -151,9 +151,9 @@ int input_PsiEnd( input_thread_t *p_input )
 /*****************************************************************************
  * input_PsiRead: Read the table of programs
  *****************************************************************************
- * Ugly debugging function at that time ???????
+ * Ugly debugging function at that time ? XXX??
  *****************************************************************************/
-void input_PsiRead( input_thread_t *p_input /* ??? */ )
+void input_PsiRead( input_thread_t *p_input /* XXX?? */ )
 {
   int i_index;
   int i_index2;
@@ -679,7 +679,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
 /*****************************************************************************
  * DecodeSrvDescrSection
  *****************************************************************************
- * A finir et a refaire proprement ????
+ * FIXME: A finir et a refaire proprement ??
  *****************************************************************************/
 void DecodeSrvDescrSection( byte_t* p_sdt, input_thread_t *p_input )
 {
@@ -1183,7 +1183,7 @@ static pgrm_descriptor_t* AddPgrmDescr( stream_descriptor_t* p_stream,
   p_stream->ap_programs[i_pgrm_index]->i_es_number = 0;
   p_stream->ap_programs[i_pgrm_index]->ap_es = NULL;
 
-  /* descriptors ???? */
+  /* descriptors ? XXX?? */
 
   return p_stream->ap_programs[i_pgrm_index];
 }
@@ -1272,7 +1272,7 @@ static es_descriptor_t* AddESDescr(input_thread_t* p_input,
     intf_DbgMsg("Slot %d in p_es table assigned to ES %d\n", i_index, i_es_pid);
 
     /* Init its values */
-    p_es->i_type = 0;  /* ??? */
+    p_es->i_type = 0;  /* XXX?? */
     p_es->b_psi = 0;
     p_es->b_pcr = 0;
     p_es->i_continuity_counter = 0xFF;

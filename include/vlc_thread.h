@@ -59,8 +59,10 @@ static __inline__ int  vlc_cond_init    ( vlc_cond_t *p_condvar );
 static __inline__ int  vlc_cond_signal  ( vlc_cond_t *p_condvar );
 static __inline__ int  vlc_cond_wait    ( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex );
 
-//static _inline__ int    vlc_cond_timedwait   ( vlc_cond_t * condvar, vlc_mutex_t * mutex,
-//                              mtime_t absoute_timeout_time );
+#if 0
+static _inline__ int    vlc_cond_timedwait   ( vlc_cond_t * condvar, vlc_mutex_t * mutex,
+                              mtime_t absoute_timeout_time );
+#endif
 
 /*****************************************************************************
  * vlc_thread_create: create a thread

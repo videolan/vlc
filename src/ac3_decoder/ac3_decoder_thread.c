@@ -146,7 +146,7 @@ static __inline__ int decode_find_sync( ac3dec_thread_t * p_ac3dec )
             p_ac3dec->ac3_decoder.total_bits_read = 16;
             return( 0 );
         }
-        DumpBits( &(p_ac3dec->ac3_decoder.bit_stream), 1 ); /* XXX */
+        DumpBits( &(p_ac3dec->ac3_decoder.bit_stream), 1 ); /* XXX?? */
     }
     return( -1 );
 }
@@ -203,76 +203,76 @@ static void RunThread( ac3dec_thread_t * p_ac3dec )
     msleep( INPUT_PTS_DELAY );
 
     /* Initializing the ac3 decoder thread */
-    if ( InitThread(p_ac3dec) ) /* XXX */
+    if ( InitThread(p_ac3dec) ) /* XXX?? */
     {
         p_ac3dec->b_error = 1;
     }
 
     /* ac3 decoder thread's main loop */
-    /* FIXME : do we have enough room to store the decoded frames ? */
+    /* FIXME : do we have enough room to store the decoded frames ?? */
     while ( (!p_ac3dec->b_die) && (!p_ac3dec->b_error) )
     {
         int i;
 
         p_ac3dec->ac3_decoder.b_invalid = 0;
 
-	decode_find_sync( p_ac3dec );
+        decode_find_sync( p_ac3dec );
 
-	if ( DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts )
-	{
-		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_ac3dec->fifo)->i_pts;
-		DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts = 0;
-	}
-	else
-	{
-		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-	}
-
-	parse_syncinfo( &p_ac3dec->ac3_decoder );
-	switch ( p_ac3dec->ac3_decoder.syncinfo.fscod )
-	{
-		case 0:
-			p_ac3dec->p_aout_fifo->l_rate = 48000;
-			break;
-
-		case 1:
-			p_ac3dec->p_aout_fifo->l_rate = 44100;
-			break;
-
-		case 2:
-			p_ac3dec->p_aout_fifo->l_rate = 32000;
-			break;
-
-		default: /* XXX */
-			fprintf( stderr, "ac3dec debug: invalid fscod\n" );
-			p_ac3dec->ac3_decoder.b_invalid = 1;
-			break;
-	}
-	if ( p_ac3dec->ac3_decoder.b_invalid ) /* XXX */
-	{
-		continue;
-	}
-
-	parse_bsi( &p_ac3dec->ac3_decoder );
-
-	for (i = 0; i < 6; i++)
-	    {
-	    s16 * buffer;
-
-	    buffer = ((ac3dec_frame_t *)p_ac3dec->p_aout_fifo->buffer)[ p_ac3dec->p_aout_fifo->l_end_frame ];
-
-	    if (ac3_audio_block (&p_ac3dec->ac3_decoder, buffer))
-		goto bad_frame;
-
-	    if (i)
-		p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-	    vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
-	    p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-	    vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
-	    vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
+        if ( DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts )
+        {
+                p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_ac3dec->fifo)->i_pts;
+                DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts = 0;
+        }
+        else
+        {
+                p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
         }
 
-	parse_auxdata( &p_ac3dec->ac3_decoder );
+        parse_syncinfo( &p_ac3dec->ac3_decoder );
+        switch ( p_ac3dec->ac3_decoder.syncinfo.fscod )
+        {
+                case 0:
+                        p_ac3dec->p_aout_fifo->l_rate = 48000;
+                        break;
+
+                case 1:
+                        p_ac3dec->p_aout_fifo->l_rate = 44100;
+                        break;
+
+                case 2:
+                        p_ac3dec->p_aout_fifo->l_rate = 32000;
+                        break;
+
+                default: /* XXX?? */
+                        fprintf( stderr, "ac3dec debug: invalid fscod\n" );
+                        p_ac3dec->ac3_decoder.b_invalid = 1;
+                        break;
+        }
+        if ( p_ac3dec->ac3_decoder.b_invalid ) /* XXX?? */
+        {
+                continue;
+        }
+
+        parse_bsi( &p_ac3dec->ac3_decoder );
+
+        for (i = 0; i < 6; i++)
+            {
+            s16 * buffer;
+
+            buffer = ((ac3dec_frame_t *)p_ac3dec->p_aout_fifo->buffer)[ p_ac3dec->p_aout_fifo->l_end_frame ];
+
+            if (ac3_audio_block (&p_ac3dec->ac3_decoder, buffer))
+                goto bad_frame;
+
+            if (i)
+                p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = LAST_MDATE;
+            vlc_mutex_lock( &p_ac3dec->p_aout_fifo->data_lock );
+            p_ac3dec->p_aout_fifo->l_end_frame = (p_ac3dec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+            vlc_cond_signal( &p_ac3dec->p_aout_fifo->data_wait );
+            vlc_mutex_unlock( &p_ac3dec->p_aout_fifo->data_lock );
+        }
+
+        parse_auxdata( &p_ac3dec->ac3_decoder );
 bad_frame:
     }
 
@@ -302,7 +302,7 @@ static void ErrorThread( ac3dec_thread_t * p_ac3dec )
         while( !DECODER_FIFO_ISEMPTY(p_ac3dec->fifo) )
         {
             input_NetlistFreePES( p_ac3dec->ac3_decoder.bit_stream.p_input, DECODER_FIFO_START(p_ac3dec->fifo) );
-	    DECODER_FIFO_INCSTART( p_ac3dec->fifo );
+            DECODER_FIFO_INCSTART( p_ac3dec->fifo );
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */

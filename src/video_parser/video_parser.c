@@ -3,7 +3,7 @@
  * (c)1999 VideoLAN
  *****************************************************************************/
 
-/* ?? passer en terminate/destroy avec les signaux supplémentaires */
+/* FIXME: passer en terminate/destroy avec les signaux supplémentaires ?? */
 
 /*****************************************************************************
  * Preamble
@@ -21,7 +21,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -54,7 +54,7 @@ static void     EndThread           ( vpar_thread_t *p_vpar );
  * This function creates a new video parser thread, and returns a pointer
  * to its description. On error, it returns NULL.
  * Following configuration properties are used:
- * ??
+ * XXX??
  *****************************************************************************/
 #include "main.h"
 #include "interface.h"
@@ -94,7 +94,7 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vpar->bit_stream.fifo.buffer = 0;
     p_vpar->bit_stream.fifo.i_available = 0;
 
-/* FIXME !!!! */
+/* FIXME !!!!?? */
 p_vpar->p_vout = p_main->p_intf->p_vout;
 
     /* Spawn the video parser thread */
@@ -143,7 +143,7 @@ void vpar_DestroyThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 #if 0
 static int CheckConfiguration( video_cfg_t *p_cfg )
 {
-    /* ?? */
+    /* XXX?? */
 
     return( 0 );
 }
@@ -223,7 +223,7 @@ static int InitThread( vpar_thread_t *p_vpar )
 
 #ifdef VDEC_SMP
     /* Spawn video_decoder threads */
-    /* ??? modify the number of vdecs at runtime ? */
+    /* FIXME: modify the number of vdecs at runtime ?? */
     for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )
     {
         if( (p_vpar->pp_vdec[i_dummy] = vdec_CreateThread( p_vpar )) == NULL )
@@ -306,14 +306,14 @@ static int InitThread( vpar_thread_t *p_vpar )
 #ifdef POLUX_SYNCHRO
     p_vpar->synchro.i_current_frame_date = 0;
     p_vpar->synchro.i_backward_frame_date = 0;
-    
+
     p_vpar->synchro.r_p_average = p_vpar->synchro.i_p_nb = 6;
     p_vpar->synchro.r_b_average = p_vpar->synchro.i_b_nb = 6;
     p_vpar->synchro.i_p_count = 0;
     p_vpar->synchro.i_b_count = 0;
     p_vpar->synchro.i_i_count = 0;
 #endif
-    
+
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
     return( 0 );
@@ -421,12 +421,12 @@ static void EndThread( vpar_thread_t *p_vpar )
 
 #ifdef DEBUG
     /* Check for remaining PES packets */
-    /* ?? */
+    /* XXX?? */
 #endif
 
     /* Destroy thread structures allocated by InitThread */
 //    vout_DestroyStream( p_vpar->p_vout, p_vpar->i_stream );
-    /* ?? */
+    /* XXX?? */
 
     /* Dispose of matrices if they have been allocated. */
     if( p_vpar->sequence.intra_quant.b_allocated )

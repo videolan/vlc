@@ -264,7 +264,7 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
  *****************************************************************************/
 int input_OpenAudioStream( input_thread_t *p_input, int i_id )
 {
-    /* ?? */
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -274,7 +274,7 @@ int input_OpenAudioStream( input_thread_t *p_input, int i_id )
  *****************************************************************************/
 void input_CloseAudioStream( input_thread_t *p_input, int i_id )
 {
-    /* ?? */
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -285,7 +285,7 @@ void input_CloseAudioStream( input_thread_t *p_input, int i_id )
 int input_OpenVideoStream( input_thread_t *p_input,
                            struct vout_thread_s *p_vout, struct video_cfg_s * p_cfg )
 {
-    /* ?? */
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -295,7 +295,7 @@ int input_OpenVideoStream( input_thread_t *p_input,
  *****************************************************************************/
 void input_CloseVideoStream( input_thread_t *p_input, int i_id )
 {
-    /* ?? */
+    /* XXX?? */
 }
 #endif
 
@@ -343,7 +343,7 @@ static void RunThread( input_thread_t *p_input )
         /* Scatter read the UDP packet from the network or the file. */
         if( (input_ReadPacket( p_input )) == (-1) )
         {
-            /* ??? Normally, a thread can't kill itself, but we don't have
+            /* FIXME??: Normally, a thread can't kill itself, but we don't have
              * any method in case of an error condition ... */
             p_input->b_error = 1;
         }
@@ -489,7 +489,7 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
     if( ((p_input->netlist.i_ts_end -1 - p_input->netlist.i_ts_start) & INPUT_MAX_TS) <= INPUT_TS_READ_ONCE )
     {
         intf_ErrMsg("input error: TS netlist is empty !\n");
-	return( -1 );
+        return( -1 );
     }
 #endif /* FIFO netlist */
 
@@ -499,10 +499,12 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
                            INPUT_TS_READ_ONCE );
     if( i_packet_size == (-1) )
     {
-//	intf_DbgMsg("Read packet %d %p %d %d\n", i_base_index,
-//			&p_input->netlist.p_ts_free[i_base_index],
-//			p_input->netlist.i_ts_start,
-//			p_input->netlist.i_ts_end);
+#if 0
+        intf_DbgMsg("Read packet %d %p %d %d\n", i_base_index,
+                    &p_input->netlist.p_ts_free[i_base_index],
+                    p_input->netlist.i_ts_start,
+                    p_input->netlist.i_ts_end);
+#endif
         intf_ErrMsg("input error: readv() failed (%s)\n", strerror(errno));
         return( -1 );
     }
@@ -614,13 +616,13 @@ static __inline__ void input_SortPacket( input_thread_t *p_input,
            purposes (see man page). */
         i_current_pid = U16_AT(&p_ts_packet->buffer[1]) & 0x1fff;
 
-//	intf_DbgMsg("input debug: pid %d received (%p)\n",
-//                    i_current_pid, p_ts_packet);
+        //intf_DbgMsg("input debug: pid %d received (%p)\n",
+        //            i_current_pid, p_ts_packet);
 
         /* Lock current ES state. */
         vlc_mutex_lock( &p_input->es_lock );
 
-	/* Verify that we actually want this PID. */
+    /* Verify that we actually want this PID. */
         for( i_es_loop = 0; i_es_loop < INPUT_MAX_SELECTED_ES; i_es_loop++ )
         {
             if( p_input->pp_selected_es[i_es_loop] != NULL)
@@ -639,7 +641,7 @@ static __inline__ void input_SortPacket( input_thread_t *p_input,
                     input_DemuxTS( p_input, p_ts_packet,
                                    p_input->pp_selected_es[i_es_loop] );
                     return;
-		}
+                }
             }
             else
             {
@@ -652,8 +654,8 @@ static __inline__ void input_SortPacket( input_thread_t *p_input,
 
     /* We weren't interested in receiving this packet. Give it back to the
        netlist. */
-//    intf_DbgMsg("SortPacket: freeing unwanted TS %p (pid %d)\n", p_ts_packet,
-//                     U16_AT(&p_ts_packet->buffer[1]) & 0x1fff);
+    //intf_DbgMsg("SortPacket: freeing unwanted TS %p (pid %d)\n", p_ts_packet,
+    //                 U16_AT(&p_ts_packet->buffer[1]) & 0x1fff);
     input_NetlistFreeTS( p_input, p_ts_packet );
 #ifdef STATS
     p_input->c_packets_trashed++;
@@ -682,8 +684,8 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
 
 #define p (p_ts_packet->buffer)
 
-//    intf_DbgMsg("input debug: TS-demultiplexing packet %p, pid %d, number %d\n",
-//                p_ts_packet, U16_AT(&p[1]) & 0x1fff, p[3] & 0x0f);
+    //intf_DbgMsg("input debug: TS-demultiplexing packet %p, pid %d, number %d\n",
+    //            p_ts_packet, U16_AT(&p[1]) & 0x1fff, p[3] & 0x0f);
 
 #ifdef STATS
     p_es_descriptor->c_packets++;
@@ -713,7 +715,7 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
         {
             /* If the packet has both adaptation_field and payload, adaptation_field
                cannot be more than 182 bytes long; if there is only an
-	       adaptation_field, it must fill the next 183 bytes. */
+           adaptation_field, it must fill the next 183 bytes. */
             if( b_payload ? (p[4] > 182) : (p[4] != 183) )
             {
                 intf_DbgMsg("input debug: invalid TS adaptation field (%p)\n",
@@ -739,7 +741,7 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
                     p_es_descriptor->b_discontinuity = 1;
 
                     /* There also may be a continuity_counter discontinuity:
-		       resynchronise our counter with the one of the stream */
+               resynchronise our counter with the one of the stream */
                     p_es_descriptor->i_continuity_counter = (p[3] & 0x0f) - 1;
                 }
 
@@ -747,11 +749,11 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
                 p_es_descriptor->b_random |= p[5] & 0x40;
 
                 /* If this is a PCR_PID, and this TS packet contains a PCR,
-		   we pass it along to the PCR decoder. */
+           we pass it along to the PCR decoder. */
                 if( (p_es_descriptor->b_pcr) && (p[5] & 0x10) )
                 {
                     /* There should be a PCR field in the packet, check if the
-		       adaption field is long enough to carry it */
+               adaption field is long enough to carry it */
                     if( p[4] >= 7 )
                     {
                         /* Call the PCR decoder */
@@ -864,7 +866,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
     ASSERT(p_ts_packet);
     ASSERT(p_es_descriptor);
 
-//    intf_DbgMsg("PES-demultiplexing %p (%p)\n", p_ts_packet, p_pes);
+    //intf_DbgMsg("PES-demultiplexing %p (%p)\n", p_ts_packet, p_pes);
 
     /* If we lost data, discard the PES packet we are trying to reassemble
        if any and wait for the beginning of a new one in order to synchronise
@@ -881,7 +883,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
        so parse its header and give it to the decoders */
     if( b_unit_start && p_pes != NULL )
     {
-//        intf_DbgMsg("End of PES packet %p\n", p_pes);
+        //intf_DbgMsg("End of PES packet %p\n", p_pes);
 
         /* Parse the header. The header has a variable length, but in order
            to improve the algorithm, we will read the 14 bytes we may be
@@ -905,7 +907,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
             intf_DbgMsg("Code never tested encountered, WARNING ! (benny)\n");
             if( !p_pes->p_pes_header_save )
             {
-                p_pes->p_pes_header_save = malloc(PES_HEADER_SIZE); 
+                p_pes->p_pes_header_save = malloc(PES_HEADER_SIZE);
             }
 
             do
@@ -925,7 +927,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                   intf_DbgMsg("PES packet too short: trashed\n");
                   input_NetlistFreePES( p_input, p_pes );
                   p_pes = NULL;
-                  /* Stats ?? */
+                  /* Stats XXX?? */
                   return;
                 }
 
@@ -960,7 +962,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
           intf_DbgMsg("Corrupted PES packet received: trashed\n");
           input_NetlistFreePES( p_input, p_pes );
           p_pes = NULL;
-          /* Stats ?? */
+          /* Stats XXX?? */
         }
         else
         {
@@ -1052,7 +1054,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
             /* This last packet is partly header, partly payload. */
             p_ts->i_payload_start += i_pes_header_size;
 
-	
+
             /* Now we can eventually put the PES packet in the decoder's
                PES fifo */
             switch( p_es_descriptor->i_type )
@@ -1105,10 +1107,10 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     intf_DbgMsg("PES trashed - fifo full ! (%d, %d)\n",
                                p_es_descriptor->i_id, p_es_descriptor->i_type);
                 }
-		else
+        else
                 {
-//                    intf_DbgMsg("Putting %p into fifo %p/%d\n",
-//                                p_pes, p_fifo, p_fifo->i_end);
+                    //intf_DbgMsg("Putting %p into fifo %p/%d\n",
+                    //            p_pes, p_fifo, p_fifo->i_end);
                     p_fifo->buffer[p_fifo->i_end] = p_pes;
                     DECODER_FIFO_INCEND( *p_fifo );
 
@@ -1146,7 +1148,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
         }
         else
         {
-//           intf_DbgMsg("New PES packet %p (first TS: %p)\n", p_pes, p_ts_packet);
+            //intf_DbgMsg("New PES packet %p (first TS: %p)\n", p_pes, p_ts_packet);
 
             /* Init the PES fields so that the first TS packet could be correctly
                added to the PES packet (see below) */
@@ -1171,7 +1173,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
        packet */
     if( p_pes != NULL )
     {
-//      intf_DbgMsg("Adding TS %p to PES %p\n", p_ts_packet, p_pes);
+        //intf_DbgMsg("Adding TS %p to PES %p\n", p_ts_packet, p_pes);
 
         /* Size of the payload carried in the TS packet */
         i_ts_payload_size = p_ts_packet->i_payload_end -
@@ -1203,7 +1205,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
     {
         /* Since we don't use the TS packet to build a PES packet, we don't
            need it anymore, so give it back to the netlist */
-//        intf_DbgMsg("Trashing TS %p: no PES being build\n", p_ts_packet);
+        //intf_DbgMsg("Trashing TS %p: no PES being build\n", p_ts_packet);
         input_NetlistFreeTS( p_input, p_ts_packet );
     }
 
@@ -1217,7 +1219,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
  * input_DemuxPSI:
  *****************************************************************************
  * Notice that current ES state has been locked by input_SortPacket. (No more true,
- * changed by benny - See if it's ok, and definitely change the code ???????? )
+ * changed by benny - FIXME: See if it's ok, and definitely change the code ?? )
  *****************************************************************************/
 static __inline__ void input_DemuxPSI( input_thread_t *p_input,
                                        ts_packet_t *p_ts_packet,
@@ -1234,9 +1236,9 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
 
 #define p_psi (p_es_descriptor->p_psi_section)
 
-//    intf_DbgMsg( "input debug: PSI demultiplexing %p (%p)\n", p_ts_packet, p_input);
+    //intf_DbgMsg( "input debug: PSI demultiplexing %p (%p)\n", p_ts_packet, p_input);
 
-//    intf_DbgMsg( "Packet: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x (unit start: %d)\n", p_ts_packet->buffer[p_ts_packet->i_payload_start], p_ts_packet->buffer[p_ts_packet->i_payload_start+1], p_ts_packet->buffer[p_ts_packet->i_payload_start+2], p_ts_packet->buffer[p_ts_packet->i_payload_start+3], p_ts_packet->buffer[p_ts_packet->i_payload_start+4], p_ts_packet->buffer[p_ts_packet->i_payload_start+5], p_ts_packet->buffer[p_ts_packet->i_payload_start+6], p_ts_packet->buffer[p_ts_packet->i_payload_start+7], p_ts_packet->buffer[p_ts_packet->i_payload_start+8], p_ts_packet->buffer[p_ts_packet->i_payload_start+9], p_ts_packet->buffer[p_ts_packet->i_payload_start+10], p_ts_packet->buffer[p_ts_packet->i_payload_start+11], p_ts_packet->buffer[p_ts_packet->i_payload_start+12], p_ts_packet->buffer[p_ts_packet->i_payload_start+13], p_ts_packet->buffer[p_ts_packet->i_payload_start+14], p_ts_packet->buffer[p_ts_packet->i_payload_start+15], p_ts_packet->buffer[p_ts_packet->i_payload_start+16], p_ts_packet->buffer[p_ts_packet->i_payload_start+17], p_ts_packet->buffer[p_ts_packet->i_payload_start+18], p_ts_packet->buffer[p_ts_packet->i_payload_start+19], p_ts_packet->buffer[p_ts_packet->i_payload_start+20], b_unit_start);
+    //intf_DbgMsg( "Packet: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x (unit start: %d)\n", p_ts_packet->buffer[p_ts_packet->i_payload_start], p_ts_packet->buffer[p_ts_packet->i_payload_start+1], p_ts_packet->buffer[p_ts_packet->i_payload_start+2], p_ts_packet->buffer[p_ts_packet->i_payload_start+3], p_ts_packet->buffer[p_ts_packet->i_payload_start+4], p_ts_packet->buffer[p_ts_packet->i_payload_start+5], p_ts_packet->buffer[p_ts_packet->i_payload_start+6], p_ts_packet->buffer[p_ts_packet->i_payload_start+7], p_ts_packet->buffer[p_ts_packet->i_payload_start+8], p_ts_packet->buffer[p_ts_packet->i_payload_start+9], p_ts_packet->buffer[p_ts_packet->i_payload_start+10], p_ts_packet->buffer[p_ts_packet->i_payload_start+11], p_ts_packet->buffer[p_ts_packet->i_payload_start+12], p_ts_packet->buffer[p_ts_packet->i_payload_start+13], p_ts_packet->buffer[p_ts_packet->i_payload_start+14], p_ts_packet->buffer[p_ts_packet->i_payload_start+15], p_ts_packet->buffer[p_ts_packet->i_payload_start+16], p_ts_packet->buffer[p_ts_packet->i_payload_start+17], p_ts_packet->buffer[p_ts_packet->i_payload_start+18], p_ts_packet->buffer[p_ts_packet->i_payload_start+19], p_ts_packet->buffer[p_ts_packet->i_payload_start+20], b_unit_start);
 
 
     /* Try to find the beginning of the payload in the packet to initialise
@@ -1264,7 +1266,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
             /* ...Unless there is a pointer field, that we have to bypass */
             if( b_unit_start )
                 i_data_offset++;
-//            intf_DbgMsg( "New part of the section received at offset %d\n", i_data_offset );
+            //intf_DbgMsg( "New part of the section received at offset %d\n", i_data_offset );
         }
     }
     /* We are looking for the beginning of a new section */
@@ -1278,7 +1280,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
                the pointer field */
             i_data_offset = p_ts_packet->i_payload_start +
                             p_ts_packet->buffer[p_ts_packet->i_payload_start] + 1;
-//            intf_DbgMsg( "New section beginning at offset %d in TS packet\n", i_data_offset );
+            //intf_DbgMsg( "New section beginning at offset %d in TS packet\n", i_data_offset );
         }
         else
         {
@@ -1306,7 +1308,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
         {
             /* Read the length of the new section */
             p_psi->i_length = (U16_AT(&p_ts_packet->buffer[i_data_offset+1]) & 0xFFF) + 3;
-//            intf_DbgMsg( "Section length %d\n", p_psi->i_length );
+            //intf_DbgMsg( "Section length %d\n", p_psi->i_length );
             if( p_psi->i_length > PSI_SECTION_SIZE )
             {
                 /* The TS packet is corrupted, stop here to avoid possible a seg fault */
@@ -1337,7 +1339,7 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
         if (p_psi->i_length == p_psi->i_current_position + i_data_length)
         {
             /* Packet is complete, decode it */
-//            intf_DbgMsg( "SECTION COMPLETE: starting decoding of its data\n" );
+            //intf_DbgMsg( "SECTION COMPLETE: starting decoding of its data\n" );
             input_PsiDecode( p_input, p_psi );
 
             /* Prepare the buffer to receive a new section */
@@ -1351,11 +1353,11 @@ static __inline__ void input_DemuxPSI( input_thread_t *p_input,
         {
             /* Prepare the buffer to receive the next part of the section */
           p_psi->i_current_position += i_data_length;
-//          intf_DbgMsg( "Section not complete, waiting for the end\n" );
+          //intf_DbgMsg( "Section not complete, waiting for the end\n" );
         }
 
-//        intf_DbgMsg( "Must loop ? Next data offset: %d, stuffing: %d\n",
-//                     i_data_offset, p_ts_packet->buffer[i_data_offset] );
+        //intf_DbgMsg( "Must loop ? Next data offset: %d, stuffing: %d\n",
+        //             i_data_offset, p_ts_packet->buffer[i_data_offset] );
     }
 
     /* Relase the TS packet, we don't need it anymore */

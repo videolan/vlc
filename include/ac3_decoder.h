@@ -202,14 +202,14 @@ typedef struct audblk_s
                 u16 lfefsnroffst;
                 /* lfe fast gain code */
                 u16 lfefgaincod;
-        
+
         /* Coupling leak info */
         u16 cplleake;
                 /* coupling fast leak initialization */
                 u16 cplfleak;
                 /* coupling slow leak initialization */
                 u16 cplsleak;
-        
+
         /* delta bit allocation info */
         u16 deltbaie;
                 /* coupling delta bit allocation exists */
@@ -264,7 +264,7 @@ typedef struct audblk_s
         /* Number of coupling exponent groups
          * Derived from cplbegf, cplendf, cplexpstr */
         u16 ncplgrps;
-                        
+
         /* End mantissa numbers of fbw channels */
         u16 endmant[5];
 
@@ -279,7 +279,7 @@ typedef struct audblk_s
 
         /* Bit allocation pointer results */
         u16 fbw_bap[5][256];
-        //FIXME figure out exactly how many entries there should be (253-37?)
+        /* FIXME?? figure out exactly how many entries there should be (253-37?) */
         u16 cpl_bap[256];
         u16 lfe_bap[7];
 

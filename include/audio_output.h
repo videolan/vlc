@@ -40,7 +40,7 @@
 #define AOUT_DEFAULT_STEREO     1
 
 /* Audio output rate, in Hz */
-#define AOUT_MIN_RATE           22050 /* ?? */
+#define AOUT_MIN_RATE           22050 /* XXX?? */
 #define AOUT_DEFAULT_RATE       44100
 #define AOUT_MAX_RATE           48000
 

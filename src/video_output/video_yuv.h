@@ -24,8 +24,8 @@ void            vout_EndYUV       ( vout_thread_t *p_vout );
  *      i_ypitch, i_vpitch:     Y and V lines sizes (bytes)
  *      i_aspect:               vertical aspect factor
  *      p_pic:                  RGB frame
- *      i_dci_offset:           ?? x offset for left image border
- *      i_offset_to_line_0:     ?? x offset for left image border
+ *      i_dci_offset:           XXX?? x offset for left image border
+ *      i_offset_to_line_0:     XXX?? x offset for left image border
  *      i_pitch:                RGB line size (bytes)
  *      i_colortype:            0 for 565, 1 for 555 */
 void ConvertYUV420RGB16MMX( u8* p_y, u8* p_u, u8 *p_v,

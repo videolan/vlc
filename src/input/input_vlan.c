@@ -110,7 +110,7 @@ int input_VlanJoin( int i_vlan_id )
     p_main->p_vlan->i_vlan_id = i_vlan_id;
 
     intf_Msg("Joining VLAN %d (channel %d)\n", i_vlan_id + 2, i_vlan_id );
-    return( ZeTrucMucheFunction( i_vlan_id ) ); // ?? join vlan
+    return( ZeTrucMucheFunction( i_vlan_id ) ); /* FIXME: join vlan ?? */
 }
 
 /*****************************************************************************
@@ -121,92 +121,92 @@ int input_VlanJoin( int i_vlan_id )
  *****************************************************************************/
 void input_VlanLeave( int i_vlan_id )
 {
-    // ??
+    /* XXX?? */
 }
 
 /* following functions are local */
 
 static int ZeTrucMucheFunction( int Channel)
 {
-	int  			i_socket;
-	char	*		ipaddr;
-	struct ifreq		interface;
-	struct sockaddr_in	sa_server;
-	struct sockaddr_in	sa_client;
-        char mess[80];
+    int                         i_socket;
+    char   *                    ipaddr;
+    struct ifreq                interface;
+    struct sockaddr_in          sa_server;
+    struct sockaddr_in          sa_client;
+    char                        mess[80];
 
-  	/*
-	 *Looking for informations about the eth0 interface
-	 */
+    /*
+     *Looking for informations about the eth0 interface
+     */
 
-	interface.ifr_addr.sa_family = AF_INET;
-	strcpy( interface.ifr_name, main_GetPszVariable( INPUT_IFACE_VAR, INPUT_IFACE_DEFAULT ) );
+    interface.ifr_addr.sa_family = AF_INET;
+    strcpy( interface.ifr_name, main_GetPszVariable( INPUT_IFACE_VAR, INPUT_IFACE_DEFAULT ) );
 
-	i_socket = socket( AF_INET, SOCK_DGRAM, 0 );
+    i_socket = socket( AF_INET, SOCK_DGRAM, 0 );
 
-	/* Looking for the interface IP address */
-	ioctl( i_socket, SIOCGIFDSTADDR, &interface );
-	ipaddr = inet_ntoa((*(struct sockaddr_in *)(&(interface.ifr_addr))).sin_addr );
+    /* Looking for the interface IP address */
+    ioctl( i_socket, SIOCGIFDSTADDR, &interface );
+    ipaddr = inet_ntoa((*(struct sockaddr_in *)(&(interface.ifr_addr))).sin_addr );
 
-	/* Looking for the interface MAC address */
-	ioctl( i_socket, SIOCGIFHWADDR, &interface );
-	close( i_socket );
-	
-	/*
-	 * Getting address, port, ... of the server
-	 */
+    /* Looking for the interface MAC address */
+    ioctl( i_socket, SIOCGIFHWADDR, &interface );
+    close( i_socket );
 
-	/* Initialize */
-	bzero( &sa_server, sizeof(struct sockaddr_in) );
-	/* sin_family is ALWAYS set to AF_INET (see in man 7 ip)*/
-	sa_server.sin_family = AF_INET;
-	/* Giving port on to connect after having convert it*/
-	sa_server.sin_port = htons ( main_GetIntVariable( INPUT_VLAN_PORT_VAR, INPUT_VLAN_PORT_DEFAULT ));
-	/* Giving address after having convert it into binary data*/
-	inet_aton( main_GetPszVariable( INPUT_VLAN_SERVER_VAR, INPUT_VLAN_SERVER_DEFAULT ), &(sa_server.sin_addr) );
-	
-	/*
-	 * Getting address, port, ... of the client
-	 */
+    /*
+     * Getting address, port, ... of the server
+     */
 
-	/* Initialize */
-	bzero( &sa_client, sizeof(struct sockaddr_in) );
-	/* sin_family is ALWAYS set to AF_INET (see in man 7 ip)*/
-	sa_client.sin_family = AF_INET;
-	/* Giving port on to connect after having convert it*/
-	sa_client.sin_port = htons( 0 );
-	/* Giving address after having convert it into binary data*/
-	inet_aton( ipaddr, &(sa_client.sin_addr) );
-	
-	/* Initialization of the socket */
-	i_socket = socket(AF_INET, SOCK_DGRAM, 17 ); // ?? UDP
-	 /*  SOCK_DGRAM because here we use DATAGRAM
-	  * Sachant qu'il y a un #define AF_INET = PF_INET dans sys/socket.h et que PF_INET est le IP protocol family ...
-	  * Protocol is in #define, should be 17 for udp */
+    /* Initialize */
+    bzero( &sa_server, sizeof(struct sockaddr_in) );
+    /* sin_family is ALWAYS set to AF_INET (see in man 7 ip)*/
+    sa_server.sin_family = AF_INET;
+    /* Giving port on to connect after having convert it*/
+    sa_server.sin_port = htons ( main_GetIntVariable( INPUT_VLAN_PORT_VAR, INPUT_VLAN_PORT_DEFAULT ));
+    /* Giving address after having convert it into binary data*/
+    inet_aton( main_GetPszVariable( INPUT_VLAN_SERVER_VAR, INPUT_VLAN_SERVER_DEFAULT ), &(sa_server.sin_addr) );
 
-	/* Elaborate the message to send */
+    /*
+     * Getting address, port, ... of the client
+     */
+
+    /* Initialize */
+    bzero( &sa_client, sizeof(struct sockaddr_in) );
+    /* sin_family is ALWAYS set to AF_INET (see in man 7 ip)*/
+    sa_client.sin_family = AF_INET;
+    /* Giving port on to connect after having convert it*/
+    sa_client.sin_port = htons( 0 );
+    /* Giving address after having convert it into binary data*/
+    inet_aton( ipaddr, &(sa_client.sin_addr) );
+
+    /* Initialization of the socket */
+    i_socket = socket(AF_INET, SOCK_DGRAM, 17 ); /* XXX?? UDP */
+     /*  SOCK_DGRAM because here we use DATAGRAM
+      * Sachant qu'il y a un #define AF_INET = PF_INET dans sys/socket.h et que PF_INET est le IP protocol family ...
+      * Protocol is in #define, should be 17 for udp */
+
+    /* Elaborate the message to send */
         sprintf( mess , "%d %s %2.2x%2.2x%2.2x%2.2x%2.2x%2.2x %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x \n",
-		    Channel, ipaddr,
-		    interface.ifr_hwaddr.sa_data[0] & 0xff,
-		    interface.ifr_hwaddr.sa_data[1] & 0xff,
-		    interface.ifr_hwaddr.sa_data[2] & 0xff,
-		    interface.ifr_hwaddr.sa_data[3] & 0xff,
-		    interface.ifr_hwaddr.sa_data[4] & 0xff,
-		    interface.ifr_hwaddr.sa_data[5] & 0xff,
+            Channel, ipaddr,
+            interface.ifr_hwaddr.sa_data[0] & 0xff,
+            interface.ifr_hwaddr.sa_data[1] & 0xff,
+            interface.ifr_hwaddr.sa_data[2] & 0xff,
+            interface.ifr_hwaddr.sa_data[3] & 0xff,
+            interface.ifr_hwaddr.sa_data[4] & 0xff,
+            interface.ifr_hwaddr.sa_data[5] & 0xff,
                     interface.ifr_hwaddr.sa_data[0] & 0xff,
-		    interface.ifr_hwaddr.sa_data[1] & 0xff,
-		    interface.ifr_hwaddr.sa_data[2] & 0xff,
-		    interface.ifr_hwaddr.sa_data[3] & 0xff,
-		    interface.ifr_hwaddr.sa_data[4] & 0xff,
-		    interface.ifr_hwaddr.sa_data[5] & 0xff
-	    );
-	
-	/* Send the message */
-	intf_DbgMsg("%s\n", mess);
-        sendto(i_socket,mess,80,0,(struct sockaddr *)&sa_server,sizeof(struct sockaddr));
-	
-	/*Close the socket */
-	close( i_socket );
+            interface.ifr_hwaddr.sa_data[1] & 0xff,
+            interface.ifr_hwaddr.sa_data[2] & 0xff,
+            interface.ifr_hwaddr.sa_data[3] & 0xff,
+            interface.ifr_hwaddr.sa_data[4] & 0xff,
+            interface.ifr_hwaddr.sa_data[5] & 0xff
+        );
 
-	return 0;
+    /* Send the message */
+    intf_DbgMsg("%s\n", mess);
+        sendto(i_socket,mess,80,0,(struct sockaddr *)&sa_server,sizeof(struct sockaddr));
+
+    /*Close the socket */
+    close( i_socket );
+
+    return 0;
 }

@@ -350,7 +350,7 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
     int         i_font_bytes_per_line, i_font_height;     /* font properties */
     vout_put_byte_t *p_PutByte;                          /* PutByte function */
 
-    //?? background: can be something else that whole byte
+    /* FIXME: background: can be something else that whole byte ?? */
 
     /* Select output function */
     switch( i_bytes_per_pixel )
@@ -479,7 +479,7 @@ static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border,
 static void PutByte24( void *p_pic, int i_byte, byte_t i_char, byte_t i_border, byte_t i_bg,
                        u32 i_char_color, u32 i_border_color, u32 i_bg_color )
 {
-    //??
+    /* XXX?? */
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  * (c)1999 VideoLAN
  *****************************************************************************
- * ??
+ * XXX??
  *****************************************************************************
  * Required headers:
  * <netinet/in.h>
@@ -275,7 +275,7 @@ int ReadNetConf(int i_sockfd, net_descr_t* p_net_descr)
                 p_net_descr->i_if_number++;
                 p_net_descr->a_if = realloc(p_net_descr->a_if,
                                             p_net_descr->i_if_number*sizeof(if_descr_t));
-                /* Read the info ??? */
+                /* FIXME: Read the info ?? */
                 i_rc = ReadIfConf(i_sockfd, &p_net_descr->a_if[p_net_descr->i_if_number-1],
                                   p_ifr_current_if->ifr_name);
             }

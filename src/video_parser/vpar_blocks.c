@@ -19,7 +19,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -137,7 +137,7 @@ static lookup_t     pl_coded_pattern[512] =
      * Tables are cut in two parts to reduce memory occupation
      */
 
-    /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
+    /* Table B-12, dct_dc_size_luminance, codes 00XXX ... 11110 */
 static lookup_t     pl_dct_dc_lum_init_table_1[32] =
     { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
       {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
@@ -163,7 +163,7 @@ static lookup_t     pl_dct_dc_chrom_init_table_1[32] =
       {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
     };
 
-    /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
+   /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
 static lookup_t     pl_dct_dc_chrom_init_table_2[32] =
     { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
       {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
@@ -543,11 +543,11 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
     p_vpar->pppl_dct_dc_size[1][0] = pl_dct_dc_chrom_init_table_1;
     p_vpar->pppl_dct_dc_size[1][1] = pl_dct_dc_chrom_init_table_2;
 
-    /* ??? MB_ERROR is replaced by 0 because if we use -1 we 
+    /* XXX?? MB_ERROR is replaced by 0 because if we use -1 we
      * can block in DecodeMPEG2Intra and others */
     memset( p_vpar->ppl_dct_coef[0], 0, 16 );
     memset( p_vpar->ppl_dct_coef[1], 0, 16 );
-    
+
     /* For table B14 & B15, we have a pointer to tables */
     /* We fill the table thanks to the fonction defined above */
     FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab0, 256, 60,  4 );
@@ -1485,7 +1485,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
             p_vpar->mb.i_motion_type = MOTION_FRAME;
         }
 
-        /* ???? */
+        /* XXX?? */
         p_vpar->mb.i_mv_count = ppi_mv_count[i_structure == FRAME_STRUCTURE]
                                             [p_vpar->mb.i_motion_type];
         p_vpar->mb.i_mv_format = ppi_mv_format[i_structure == FRAME_STRUCTURE]
@@ -1646,7 +1646,7 @@ i_count++;
         p_vpar->picture.b_error = 1;
         return;
     }
-    
+
     if( *pi_mb_address - i_mb_previous - 1 )
     {
         /* Skipped macroblock (ISO/IEC 13818-2 7.6.6). */
@@ -1858,7 +1858,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
         {
             RemoveBits( &p_vpar->bit_stream, 8 );
         }
-    }    
+    }
     *pi_mb_address = (i_vert_code - 1)*p_vpar->sequence.i_mb_width;
 
     if( *pi_mb_address < i_mb_address_save )
@@ -1881,7 +1881,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
         if( i_mb_address_save >= p_vpar->sequence.i_mb_size )
         {
             p_vpar->picture.b_error = 1;
-            return;            
+            return;
         }
         ParseMacroblock( p_vpar, pi_mb_address, i_mb_address_save,
                          i_mb_base, b_mpeg2, i_coding_type,

@@ -97,7 +97,7 @@ typedef struct video_parser_s *         p_video_parser_t;
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties - note that these 'functions'
  * needs <netinet/in.h> or the local equivalent. */
-/* ?? hton64 should be declared as an extern inline function to avoid border
+/* FIXME??: hton64 should be declared as an extern inline function to avoid border
  * effects (see byteorder.h) */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #define hton16      htons
@@ -114,7 +114,7 @@ typedef struct video_parser_s *         p_video_parser_t;
 #define ntoh32      ntohl
 #define ntoh64(i)   ( i )
 #else
-/* ?? cause a compilation error */
+/* XXX??: cause a compilation error */
 #endif
 
 /* Macros used by input to access the TS buffer */

@@ -19,7 +19,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"

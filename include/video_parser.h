@@ -60,7 +60,7 @@ typedef struct video_buffer_s
 /*****************************************************************************
  * vpar_thread_t: video parser thread descriptor
  *****************************************************************************
- * ??
+ * XXX??
  *****************************************************************************/
 typedef struct vpar_thread_s
 {
@@ -72,8 +72,7 @@ typedef struct vpar_thread_s
     vlc_thread_t        thread_id;                /* id for thread functions */
 
     /* Thread configuration */
-    /* ?? */
- /*??*/
+    /* XXX?? */
 //    int *pi_status;
 
 
@@ -143,10 +142,10 @@ vpar_thread_t * vpar_CreateThread       ( /* video_cfg_t *p_cfg, */ input_thread
 void            vpar_DestroyThread      ( vpar_thread_t *p_vpar /*, int *pi_status */ );
 
 /* Time management functions */
-/* ?? */
+/* XXX?? */
 
 /* Dynamic thread settings */
-/* ?? */
+/* XXX?? */
 
 
 /*****************************************************************************

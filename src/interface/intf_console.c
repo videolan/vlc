@@ -58,7 +58,7 @@ void intf_ConsoleDestroy( intf_console_t *p_console )
  *****************************************************************************/
 void intf_ConsoleClear( intf_console_t *p_console )
 {
-    //??
+    /* XXX?? */
 }
 
 /*****************************************************************************
@@ -68,7 +68,7 @@ void intf_ConsoleClear( intf_console_t *p_console )
  *****************************************************************************/
 void intf_ConsolePrint( intf_console_t *p_console, char *psz_str )
 {
-    //??
+    /* XXX?? */
 }
 
 
@@ -79,7 +79,7 @@ void intf_ConsolePrint( intf_console_t *p_console, char *psz_str )
  *****************************************************************************/
 void intf_ConsoleExec( intf_console_t *p_console, char *psz_str )
 {
-    //??
+    /* XXX?? */
 }
 
 /* following functions are local */

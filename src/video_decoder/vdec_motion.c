@@ -19,7 +19,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -503,7 +503,7 @@ void vdec_MotionFieldField444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionField16x8XXX : motion compensation for 16x8 motion type (field)
+ * vdec_MotionField16x8XXX?? : motion compensation for 16x8 motion type (field)
  *****************************************************************************/
 #define FIELD16X8( MOTION )                                             \
 {                                                                       \
@@ -585,7 +585,7 @@ void vdec_MotionField16x8444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionFieldDMVXXX : motion compensation for dmv motion type (field)
+ * vdec_MotionFieldDMVXXX?? : motion compensation for dmv motion type (field)
  *****************************************************************************/
 #define FIELDDMV( MOTION )                                              \
 {                                                                       \
@@ -627,7 +627,7 @@ void vdec_MotionFieldDMV444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionFrameFrameXXX : motion compensation for frame motion type (frame)
+ * vdec_MotionFrameFrameXXX?? : motion compensation for frame motion type (frame)
  *****************************************************************************/
 #define FRAMEFRAME( MOTION )                                            \
 {                                                                       \
@@ -672,7 +672,7 @@ void vdec_MotionFrameFrame444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionFrameFieldXXX : motion compensation for field motion type (frame)
+ * vdec_MotionFrameFieldXXX?? : motion compensation for field motion type (frame)
  *****************************************************************************/
 #define FRAMEFIELD( MOTION )                                            \
 {                                                                       \
@@ -737,7 +737,7 @@ void vdec_MotionFrameField444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionFrameDMVXXX : motion compensation for dmv motion type (frame)
+ * vdec_MotionFrameDMVXXX?? : motion compensation for dmv motion type (frame)
  *****************************************************************************/
 #define FRAMEDMV( MOTION )                                              \
 {                                                                       \
@@ -748,7 +748,7 @@ void vdec_MotionFrameField444( macroblock_t * p_mb )
     MOTION( p_mb, p_mb->p_forward, 0, 0,                                \
             p_mb->pppi_motion_vectors[0][0][0],                         \
             p_mb->pppi_motion_vectors[0][0][1],                         \
-            /* ????? >> 1 ? */                                          \
+            /* XXX?? XXX?? >> 1 ? */                                        \
             p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 0 );    \
                                                                         \
     /* predict and add to top field from bottom field */                \
@@ -760,7 +760,7 @@ void vdec_MotionFrameField444( macroblock_t * p_mb )
     MOTION( p_mb, p_mb->p_forward, 1, 1,                                \
             p_mb->pppi_motion_vectors[0][0][0],                         \
             p_mb->pppi_motion_vectors[0][0][1],                         \
-            /* ????? >> 1 ? */                                          \
+            /* XXX?? XXX?? >> 1 ? */                                        \
             p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 0 );    \
                                                                         \
     /* predict and add to bottom field from top field */                \

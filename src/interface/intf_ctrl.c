@@ -220,7 +220,7 @@ static int Exec( int i_argc, intf_arg_t *p_argv )
  *****************************************************************************/
 static int DisplayImage( int i_argc, intf_arg_t *p_argv )
 {
-    /* ?? */
+    /* XXX?? */
     return( INTF_NO_ERROR );
 }
 
@@ -359,7 +359,7 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     }
     close( i_fd );
 
-    /* Now we can work out how many output units we can compute with the fifo */
+   /* Now we can work out how many output units we can compute with the fifo */
     fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_main->p_aout->l_rate)/(s64)fifo.l_rate);
 
     /* Create the fifo */
@@ -376,11 +376,11 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
 /*****************************************************************************
  * PlayVideo: play a video sequence from a file
  *****************************************************************************
- * ??
+ * XXX??
  *****************************************************************************/
 static int PlayVideo( int i_argc, intf_arg_t *p_argv )
 {
-    /* ?? */
+    /* XXX?? */
     return( INTF_NO_ERROR );
 }
 
@@ -412,7 +412,7 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
       switch( p_argv[i_arg].i_index )
       {
       case 0:
-          // ?? useless
+          /* FIXME: useless ?? */
           i_input = p_argv[i_arg].i_num;
           break;
       case 1:
@@ -424,8 +424,8 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
 
     /* Find to which input this command is destinated */
     intf_IntfMsg( "Adding PID %d to input %d\n", i_pid, i_input );
-//????    input_AddPgrmElem( p_main->p_intf->p_x11->p_input,
-//????                       i_pid );
+    //XXX?? input_AddPgrmElem( p_main->p_intf->p_x11->p_input,
+    //XXX??                    i_pid );
     return( INTF_NO_ERROR );
 }
 
@@ -489,7 +489,7 @@ static int Test( int i_argc, intf_arg_t *p_argv )
 {
     int i_thread;
 
-/*??    if( i_argc == 1 )
+/*XXX??    if( i_argc == 1 )
     {
         i_thread = intf_CreateVoutThread( &p_main->intf_thread, NULL, -1, -1);
         intf_IntfMsg("return value: %d", i_thread );
@@ -497,7 +497,7 @@ static int Test( int i_argc, intf_arg_t *p_argv )
     else*/
     {
         i_thread = p_argv[1].i_num;
-    //??    intf_DestroyVoutThread( &p_main->intf_thread, i_thread );
+    //XXX??    intf_DestroyVoutThread( &p_main->intf_thread, i_thread );
     }
 
     return( INTF_NO_ERROR );
@@ -530,12 +530,12 @@ static int Vlan( int i_argc, intf_arg_t *p_argv  )
     /* Command is 'join' */
     if( !strcmp(p_argv[i_command].psz_str, "join") )
     {
-        /* ?? */
+        /* XXX?? */
     }
     /* Command is 'leave' */
     else if( !strcmp(p_argv[i_command].psz_str, "leave") )
     {
-        /* ?? */
+        /* XXX?? */
     }
     /* Command is unknown */
     else
@@ -558,6 +558,6 @@ static int Psi( int i_argc, intf_arg_t *p_argv )
     int i_index = p_argv[1].i_num;
 
     intf_IntfMsg("Reading PSI table for input %d\n", i_index);
-//????    input_PsiRead(p_main->p_intf->p_x11->p_input );
+    //XXX?? input_PsiRead(p_main->p_intf->p_x11->p_input );
     return( INTF_NO_ERROR );
 }

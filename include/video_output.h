@@ -166,7 +166,7 @@ typedef struct vout_thread_s
     int                 i_buffer_index;                      /* buffer index */
     vout_buffer_t       p_buffer[2];                   /* buffers properties */
 
-    /* Videos heap and translation tables */    
+    /* Videos heap and translation tables */
     picture_t           p_picture[VOUT_MAX_PICTURES];            /* pictures */
     subpicture_t        p_subpicture[VOUT_MAX_PICTURES];      /* subpictures */
     int                 i_pictures;                     /* current heap size */
@@ -178,7 +178,7 @@ typedef struct vout_thread_s
 
     /* Synchronisation informations - synchro level is updated by the vout
      * thread and read by decoder threads */
-    int                 i_synchro_level;                   /* trashing level */    
+    int                 i_synchro_level;                   /* trashing level */
 } vout_thread_t;
 
 /* Flags for changes - these flags are set in the i_changes field when another

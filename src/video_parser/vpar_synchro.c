@@ -19,7 +19,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -49,7 +49,7 @@
  *****************************************************************************/
 float vpar_SynchroUpdateTab( video_synchro_tab_t * tab, int count )
 {
-        
+
     tab->mean = ( tab->mean + MAX_COUNT * count ) / ( MAX_COUNT + 1 );
     tab->deviation = ( tab->deviation + MAX_COUNT * abs (tab->mean - count) )
                         / ( MAX_COUNT + 1 );
@@ -210,7 +210,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 
             p_vpar->synchro.b_count_predict = predict;
             p_vpar->synchro.current_b_count = 0;
-        
+
             /* now we calculated all statistics, it's time to
              * decide what we have the time to display
              */
@@ -524,10 +524,10 @@ void vpar_SynchroKludge( vpar_thread_t * p_vpar, mtime_t date )
 
 void vpar_SynchroSetCurrentDate( vpar_thread_t * p_vpar, int i_coding_type )
 {
-    pes_packet_t * p_pes = 
-        p_vpar->bit_stream.p_decoder_fifo->buffer[p_vpar->bit_stream.p_decoder_fifo->i_start]; 
+    pes_packet_t * p_pes =
+        p_vpar->bit_stream.p_decoder_fifo->buffer[p_vpar->bit_stream.p_decoder_fifo->i_start];
 
-    
+
     switch( i_coding_type )
     {
     case B_CODING_TYPE:
@@ -545,7 +545,7 @@ void vpar_SynchroSetCurrentDate( vpar_thread_t * p_vpar, int i_coding_type )
             p_vpar->synchro.i_current_frame_date += 1000000/(p_vpar->sequence.r_frame_rate);
         }
         break;
-        
+
     default:
 
         if( p_vpar->synchro.i_backward_frame_date == 0 )
@@ -577,14 +577,14 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 {
     boolean_t b_result = 1;
     int i_synchro_level = p_vpar->p_vout->i_synchro_level;
-    
+
     vpar_SynchroSetCurrentDate( p_vpar, i_coding_type );
 
-    /* 
+    /*
      * The synchro level is updated by the video input (see SynchroLevelUpdate)
      * so we just use the synchro_level to decide which frame to trash
      */
-    
+
     switch( i_coding_type )
     {
     case I_CODING_TYPE:
@@ -596,7 +596,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             (p_vpar->synchro.r_p_average*(SYNC_AVERAGE_COUNT-1)+p_vpar->synchro.i_p_count)/SYNC_AVERAGE_COUNT;
         p_vpar->synchro.r_b_average =
             (p_vpar->synchro.r_b_average*(SYNC_AVERAGE_COUNT-1)+p_vpar->synchro.i_b_count)/SYNC_AVERAGE_COUNT;
-        
+
         p_vpar->synchro.i_p_nb = (int)(p_vpar->synchro.r_p_average+0.5);
         p_vpar->synchro.i_b_nb = (int)(p_vpar->synchro.r_b_average+0.5);
 
@@ -612,7 +612,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             b_result = 0;
         }
         break;
-        
+
     case B_CODING_TYPE:
         p_vpar->synchro.i_b_count++;
         if( p_vpar->synchro.i_p_nb >= i_synchro_level )
@@ -633,7 +633,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         }
         break;
     }
-   
+
     return( b_result );
 }
 

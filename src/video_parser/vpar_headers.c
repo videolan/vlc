@@ -19,7 +19,7 @@
 #include "vlc_thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                    /* ?? temporaire, requis par netlist.h */
+#include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
 #include "input.h"
 #include "input_netlist.h"
@@ -458,7 +458,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     if(    p_vpar->sequence.i_width != i_width_save
         || p_vpar->sequence.i_height != i_height_save )
     {
-         /* What do we do in case of a size change ??? */
+         /* FIXME: What do we do in case of a size change ?? */
     }
 #endif
 
@@ -529,7 +529,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
-    
+
     if( p_vpar->picture.i_coding_type == P_CODING_TYPE
         || p_vpar->picture.i_coding_type == B_CODING_TYPE )
     {
@@ -656,7 +656,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
     }
 #endif
-    
+
     if( !b_parsable )
     {
         /* Update the reference pointers. */
@@ -682,7 +682,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* This is a new frame. Get a structure from the video_output. */
         while( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
-                                        99+p_vpar->sequence.i_chroma_format, /*???*/
+                                        99+p_vpar->sequence.i_chroma_format, /*XXX??*/
                                         p_vpar->sequence.i_width,
                                         p_vpar->sequence.i_height ) )
              == NULL )
@@ -709,7 +709,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 #ifdef VDEC_SMP
         memset( p_vpar->picture.pp_mb, 0, MAX_MB*sizeof(macroblock_t *) );
 #endif
-/* FIXME ! remove asap */
+/* FIXME ! remove asap ?? */
 //memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
