@@ -2,7 +2,7 @@
  * vout_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vout_synchro.c,v 1.1 2003/04/14 22:22:32 massiot Exp $
+ * $Id: vout_synchro.c,v 1.2 2003/05/04 22:33:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -126,7 +126,7 @@ vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
         msg_Err( p_object, "out of memory" );
         return NULL;
     }
-    vlc_object_attach( p_synchro, p_vout );
+    vlc_object_attach( p_synchro, p_object );
 
     /* We use a fake stream pattern, which is often right. */
     p_synchro->i_n_p = p_synchro->i_eta_p = DEFAULT_NB_P;

@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.16 2003/05/04 01:36:20 massiot Exp $
+ * $Id: libmpeg2.c,v 1.17 2003/05/04 22:33:35 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -259,6 +259,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
             mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
 
+            if ( p_dec->p_synchro )
+            {
+                vout_SynchroRelease( p_dec->p_synchro );
+            }
             p_dec->p_synchro = vout_SynchroInit( p_dec->p_fifo, p_dec->p_vout,
                 (u32)((u64)1001000000 * 27 / p_dec->p_info->sequence->frame_period) );
         }
@@ -402,6 +406,9 @@ static void CloseDecoder( dec_thread_t * p_dec )
         if( p_dec->p_pes )
             input_DeletePES( p_dec->p_fifo->p_packets_mgt, p_dec->p_pes );
 
+        if( p_dec->p_synchro )
+            vout_SynchroRelease( p_dec->p_synchro );
+
         if( p_dec->p_vout )
         {
             /* Temporary hack to free the pictures in use by libmpeg2 */
@@ -418,9 +425,6 @@ static void CloseDecoder( dec_thread_t * p_dec )
 
             vout_Request( p_dec->p_fifo, p_dec->p_vout, 0, 0, 0, 0 );
         }
-
-        if( p_dec->p_synchro )
-            vout_SynchroRelease( p_dec->p_synchro );
 
         if( p_dec->p_mpeg2dec ) mpeg2_close( p_dec->p_mpeg2dec );
 
