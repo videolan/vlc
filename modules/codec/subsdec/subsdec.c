@@ -2,7 +2,7 @@
  * subsdec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.2 2003/07/22 22:02:44 hartman Exp $
+ * $Id: subsdec.c,v 1.3 2003/07/24 19:07:03 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -329,15 +329,14 @@ void E_(ParseText)( subsdec_thread_t *p_subsdec )
 	else
 	{
 	    msg_Dbg( p_subsdec->p_fifo, "reencoded \"%s\" into \"%s\"", psz_subtitle, psz_new_subtitle );
-	    vout_ShowTextAbsolute( p_subsdec->p_vout, psz_new_subtitle, NULL, 
-				   OSD_ALIGN_BOTTOM|OSD_ALIGN_LEFT, 20, 20, 
-				   i_pts, i_dts );
+            psz_subtitle = psz_new_subtitle;
 	}
-	free( psz_new_subtitle );
-#else
+#endif
 	vout_ShowTextAbsolute( p_subsdec->p_vout, psz_subtitle, NULL, 
 			       OSD_ALIGN_BOTTOM|OSD_ALIGN_LEFT, 20, 20, 
 			       i_pts, i_dts );
+#if defined(HAVE_ICONV)
+        free( psz_new_subtitle );
 #endif
     }
 
