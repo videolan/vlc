@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.26 2002/02/15 13:32:52 sam Exp $
+ * $Id: aout_alsa.c,v 1.27 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -90,7 +90,6 @@ static int aout_Open( aout_thread_t *p_aout )
         return( -1 );
     }
 
-    intf_DbgMsg( "aout info: ALSA device successfully opened" );
     return( 0 );
 }
 
@@ -339,8 +338,6 @@ static void aout_Close( aout_thread_t *p_aout )
     }
 
     free( p_aout->p_sys );
-
-    intf_DbgMsg( "aout: ALSA device closed" );
 }
 
 /*****************************************************************************

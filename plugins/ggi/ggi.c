@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.13 2002/02/15 13:32:53 sam Exp $
+ * $Id: ggi.c,v 1.14 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -467,11 +467,6 @@ static int OpenDisplay( vout_thread_t *p_vout )
         {
             p_vout->p_sys->b_must_acquire = 1;
         }
-    }
-
-    if( p_vout->p_sys->b_must_acquire )
-    {
-        intf_DbgMsg("buffers must be acquired");
     }
 
     /* Set graphic context colors */

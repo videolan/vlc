@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.88 2002/02/15 13:32:54 sam Exp $
+ * $Id: interface.c,v 1.89 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -112,9 +112,6 @@ intf_thread_t* intf_Create( void )
  *****************************************************************************/
 static void intf_Manage( intf_thread_t *p_intf )
 {
-    /* Flush waiting messages */
-    intf_FlushMsg();
-
     /* Manage module bank */
     module_ManageBank( );
 

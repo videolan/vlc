@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.70 2001/12/30 07:09:56 sam Exp $
+ * $Id: input_programs.c,v 1.71 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -142,8 +142,6 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     /* Where to add the pgrm */
     int i_pgrm_index = p_input->stream.i_pgrm_number;
 
-    intf_DbgMsg("Adding description for pgrm %d", i_pgrm_id);
-
     /* Add an entry to the list of program associated with the stream */
     p_input->stream.i_pgrm_number++;
     p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
@@ -208,8 +206,6 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 
     ASSERT( p_pgrm );
 
-    intf_DbgMsg("Deleting description for pgrm %d", p_pgrm->i_number);
-
     /* Free the structures that describe the es that belongs to that program */
     while( p_pgrm->i_es_number )
     {
@@ -258,8 +254,6 @@ input_area_t * input_AddArea( input_thread_t * p_input )
 {
     /* Where to add the pgrm */
     int i_area_index = p_input->stream.i_area_nb;
-
-    intf_DbgMsg("Adding description for area %d", i_area_index );
 
     /* Add an entry to the list of program associated with the stream */
     p_input->stream.i_area_nb++;
@@ -329,8 +323,6 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 
     ASSERT( p_area );
 
-    intf_DbgMsg("Deleting description for area %d", p_area->i_id );
-
     /* Find the area in the areas table */
     for( i_area_index = 0; i_area_index < p_input->stream.i_area_nb;
          i_area_index++ )
@@ -389,8 +381,6 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
                                size_t i_data_len )
 {
     es_descriptor_t * p_es;
-
-    intf_DbgMsg("Adding description for ES 0x%x", i_es_id);
 
     p_es = (es_descriptor_t *)malloc( sizeof(es_descriptor_t) );
     if( p_es == NULL )
@@ -533,13 +523,11 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     if( p_es == NULL )
     {
-        intf_ErrMsg( "Nothing to do in input_SelectES" );
+        intf_ErrMsg( "input error: nothing to do in input_SelectES" );
         return -1;
     }
 
-#ifdef TRACE_INPUT
-    intf_DbgMsg( "Selecting ES 0x%x", p_es->i_id );
-#endif
+    intf_WarnMsg( 4, "input: selecting ES 0x%x", p_es->i_id );
 
     if( p_es->p_decoder_fifo != NULL )
     {
@@ -607,9 +595,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         return -1;
     }
 
-#ifdef TRACE_INPUT
-    intf_DbgMsg( "Unselecting ES 0x%x", p_es->i_id );
-#endif
+    intf_WarnMsg( 4, "input: unselecting ES 0x%x", p_es->i_id );
 
     if( p_es->p_decoder_fifo == NULL )
     {
@@ -640,9 +626,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
         if( p_input->stream.pp_selected_es == NULL )
         {
-#ifdef TRACE_INPUT
-            intf_DbgMsg( "No more selected ES in input_UnselectES" );
-#endif
+            intf_WarnMsg( 4, "input: no more selected ES in input_UnselectES" );
             return( 1 );
         }
     }

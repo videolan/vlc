@@ -476,12 +476,6 @@ static int vout_Manage( vout_thread_t *p_vout )
                         {
                             network_ChannelJoin( i_key );
                         }
-                        else if( intf_ProcessKey( p_main->p_intf,
-                                                    (char) i_key ) )
-                        {
-                            intf_DbgMsg( "vout: unhandled key '%c' (%i)",
-                                         (char) i_key, i_key );
-                        }
                         break;
                     }
                 }
@@ -497,8 +491,6 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         PhDim_t dim;
-
-        intf_DbgMsg( "vout: changing full-screen status" );
 
         p_vout->b_fullscreen = !p_vout->b_fullscreen;
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
@@ -540,7 +532,6 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_DbgMsg( "vout: resizing window" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         if( p_vout->p_sys->i_mode != MODE_VIDEO_OVERLAY )
@@ -566,8 +557,6 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( b_repos && p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY )
     {
-        intf_DbgMsg( "vout: moving video channel" );
-
         vout_End( p_vout );
         if( vout_Init( p_vout ) )
         {
@@ -670,7 +659,6 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
         hwcaps.currently_available_video_ram >= 
         ( ( minfo.width * minfo.height * minfo.bits_per_pixel ) / 8 ) )
     {
-        intf_DbgMsg( "vout: using video ram" );
         p_vout->p_sys->i_mode = MODE_VIDEO_MEM;
     }
 

@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.42 2002/01/04 14:01:35 sam Exp $
+ * $Id: intf_msg.c,v 1.43 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -41,35 +41,6 @@
 
 #include "interface.h"
 
-/*****************************************************************************
- * intf_msg_item_t
- *****************************************************************************
- * Store a single message. Messages have a maximal size of INTF_MSG_MSGSIZE.
- * If TRACE is defined, messages have a date field and debug messages are
- * printed with a date to allow more precise profiling.
- *****************************************************************************/
-typedef struct
-{
-    int     i_type;                               /* message type, see below */
-    char *  psz_msg;                                   /* the message itself */
-
-#ifdef TRACE
-    /* Debugging informations - in TRACE mode, debug messages have calling
-     * location information printed */
-    mtime_t date;                                     /* date of the message */
-    char *  psz_file;               /* file in which the function was called */
-    char *  psz_function;     /* function from which the function was called */
-    int     i_line;                 /* line at which the function was called */
-#endif
-} intf_msg_item_t;
-
-/* Message types */
-#define INTF_MSG_STD    0                                /* standard message */
-#define INTF_MSG_ERR    1                                   /* error message */
-#define INTF_MSG_DBG    3                                   /* debug message */
-#define INTF_MSG_WARN   4                                 /* warning message */
-#define INTF_MSG_STAT   5                               /* statistic message */
-
 
 /*****************************************************************************
  * intf_msg_t
@@ -77,43 +48,29 @@ typedef struct
  * Store all data requiered by messages interfaces. It has a single reference
  * int p_main.
  *****************************************************************************/
-typedef struct intf_msg_s
+typedef struct msg_bank_s
 {
-#ifdef INTF_MSG_QUEUE
+    /* Message queue lock */
+    vlc_mutex_t             lock;
+
     /* Message queue */
-    vlc_mutex_t             lock;                      /* message queue lock */
-    int                     i_count;            /* number of messages stored */
-    intf_msg_item_t         msg[INTF_MSG_QSIZE];            /* message queue */
-#endif
+    msg_item_t              msg[INTF_MSG_QSIZE];            /* message queue */
+    int i_start;
+    int i_stop;
 
-#ifdef TRACE_LOG
-    /* Log file */
-    FILE *                  p_log_file;                          /* log file */
-#endif
+    /* Subscribers */
+    int i_sub;
+    intf_subscription_t **pp_sub;
 
-#if !defined(INTF_MSG_QUEUE) && !defined(TRACE_LOG)
-    /* If neither messages queue, neither log file is used, then the structure
-     * is empty. However, empty structures are not allowed in C. Therefore, a
-     * dummy integer is used to fill it. */
-    int                     i_dummy;                        /* unused filler */
-#endif
-} intf_msg_t;
+} msg_bank_t;
+
+msg_bank_t msg_bank;
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-
-static void QueueMsg        ( intf_msg_t *p_msg, int i_type,
-                              char *psz_format, va_list ap );
-static void PrintMsg        ( intf_msg_item_t *p_msg );
-#ifdef TRACE
-static void QueueDbgMsg     ( intf_msg_t *p_msg, char *psz_file,
-                              char *psz_function, int i_line,
-                              char *psz_format, va_list ap );
-#endif
-#ifdef INTF_MSG_QUEUE
-static void FlushLockedMsg  ( intf_msg_t *p_msg );
-#endif
+static void QueueMsg        ( int, char *, va_list );
+static void FlushLockedMsg  ( void );
 
 #if defined( WIN32 )
 static char *ConvertPrintfFormatString ( char *psz_format );
@@ -125,33 +82,15 @@ static char *ConvertPrintfFormatString ( char *psz_format );
  * This functions has to be called before any call to other intf_*Msg functions.
  * It set up the locks and the message queue if it is used.
  *****************************************************************************/
-p_intf_msg_t intf_MsgCreate( void )
+void intf_MsgCreate( void )
 {
-    p_intf_msg_t p_msg;
-
-    /* Allocate structure */
-    p_msg = malloc( sizeof( intf_msg_t ) );
-    if( p_msg == NULL )
-    {
-        errno = ENOMEM;
-    }
-    else
-    {
-#ifdef INTF_MSG_QUEUE
     /* Message queue initialization */
-    vlc_mutex_init( &p_msg->lock );                        /* intialize lock */
-    p_msg->i_count = 0;                                    /* queue is empty */
-#endif
+    vlc_mutex_init( &msg_bank.lock );
+    msg_bank.i_start = 0;
+    msg_bank.i_stop = 0;
 
-    
-#ifdef TRACE_LOG
-        /* Log file initialization - on failure, file pointer will be null,
-         * and no log will be issued, but this is not considered as an
-         * error */
-        p_msg->p_log_file = fopen( TRACE_LOG, "w" );
-#endif
-    }
-    return( p_msg );
+    msg_bank.i_sub = 0;
+    msg_bank.pp_sub = NULL;
 }
 
 /*****************************************************************************
@@ -163,23 +102,81 @@ p_intf_msg_t intf_MsgCreate( void )
  *****************************************************************************/
 void intf_MsgDestroy( void )
 {
-    intf_FlushMsg();                         /* print all remaining messages */
+    /* Destroy lock */
+    vlc_mutex_destroy( &msg_bank.lock );
 
-#ifdef TRACE_LOG
-    /* Close log file if any */
-    if( p_main->p_msg->p_log_file != NULL )
+    if( msg_bank.i_sub )
     {
-        fclose( p_main->p_msg->p_log_file );
+        fprintf( stderr, "intf error: stale interface subscribers\n" );
     }
-#endif
 
-#ifdef INTF_MSG_QUEUE
-    /* destroy lock */
-    vlc_mutex_destroy( &p_main->p_msg->lock );
-#endif
-    
-    /* Free structure */
-    free( p_main->p_msg );
+    /* Free remaining messages */
+    FlushLockedMsg( );
+}
+
+/*****************************************************************************
+ * intf_MsgSub: subscribe to the message queue.
+ *****************************************************************************/
+intf_subscription_t *intf_MsgSub( void )
+{
+    intf_subscription_t *p_sub = malloc( sizeof( intf_subscription_t ) );
+
+    vlc_mutex_lock( &msg_bank.lock );
+
+    /* Add subscription to the list */
+    msg_bank.i_sub++;
+    msg_bank.pp_sub = realloc( msg_bank.pp_sub,
+        msg_bank.i_sub * sizeof( intf_subscription_t* ) );
+
+    msg_bank.pp_sub[ msg_bank.i_sub - 1 ] = p_sub;
+
+    p_sub->i_start = msg_bank.i_start;
+    p_sub->pi_stop = &msg_bank.i_stop;
+
+    p_sub->p_msg   = msg_bank.msg;
+    p_sub->p_lock  = &msg_bank.lock;
+
+    vlc_mutex_unlock( &msg_bank.lock );
+
+    return p_sub;
+}
+
+/*****************************************************************************
+ * intf_MsgSub: unsubscribe from the message queue.
+ *****************************************************************************/
+void intf_MsgUnsub( intf_subscription_t *p_sub )
+{
+    int i_index;
+
+    vlc_mutex_lock( &msg_bank.lock );
+
+    /* Look for the appropriate subscription */
+    for( i_index = 0; i_index < msg_bank.i_sub; i_index++ )
+    {
+        if( msg_bank.pp_sub[ i_index ] == p_sub )
+        {
+            break;
+        }
+    }
+
+    if( msg_bank.pp_sub[ i_index ] != p_sub )
+    {
+        intf_ErrMsg( "intf error: subscriber not found" );
+        vlc_mutex_unlock( &msg_bank.lock );
+        return;
+    }
+
+    /* Remove this subscription */
+    for( ; i_index < msg_bank.i_sub; i_index++ )
+    {
+        msg_bank.pp_sub[ i_index ] = msg_bank.pp_sub[ i_index+1 ];
+    }
+
+    msg_bank.i_sub--;
+    msg_bank.pp_sub = realloc( msg_bank.pp_sub,
+        msg_bank.i_sub * sizeof( intf_subscription_t* ) );
+
+    vlc_mutex_unlock( &msg_bank.lock );
 }
 
 /*****************************************************************************
@@ -193,7 +190,7 @@ void intf_Msg( char *psz_format, ... )
     va_list ap;
 
     va_start( ap, psz_format );
-    QueueMsg( p_main->p_msg, INTF_MSG_STD, psz_format, ap );
+    QueueMsg( INTF_MSG_STD, psz_format, ap );
     va_end( ap );
 }
 
@@ -208,7 +205,7 @@ void intf_ErrMsg( char *psz_format, ... )
     va_list ap;
 
     va_start( ap, psz_format );
-    QueueMsg( p_main->p_msg, INTF_MSG_ERR, psz_format, ap );
+    QueueMsg( INTF_MSG_ERR, psz_format, ap );
     va_end( ap );
 }
 
@@ -225,7 +222,7 @@ void intf_WarnMsg( int i_level, char *psz_format, ... )
     if( i_level <= p_main->i_warning_level )
     {
         va_start( ap, psz_format );
-        QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );
+        QueueMsg( INTF_MSG_WARN, psz_format, ap );
         va_end( ap );
     }
 }
@@ -243,105 +240,10 @@ void intf_StatMsg( char *psz_format, ... )
     if( p_main->b_stats )
     {
         va_start( ap, psz_format );
-        QueueMsg( p_main->p_msg, INTF_MSG_STAT, psz_format, ap );
+        QueueMsg( INTF_MSG_STAT, psz_format, ap );
         va_end( ap );
     }
 }
-
-/*****************************************************************************
- * _intf_DbgMsg: print a debugging message                               (ok ?)
- *****************************************************************************
- * This function prints a debugging message. Compared to other intf_*Msg
- * functions, it is only defined if TRACE is defined and require a file name,
- * a function name and a line number as additionnal debugging informations. It
- * also prints a debugging header for each received line.
- *****************************************************************************/
-#ifdef TRACE
-void _intf_DbgMsg( char *psz_file, char *psz_function, int i_line,
-                   char *psz_format, ...)
-{
-    va_list ap;
-
-    va_start( ap, psz_format );
-    QueueDbgMsg( p_main->p_msg, psz_file, psz_function, i_line,
-                 psz_format, ap );
-    va_end( ap );
-}
-#endif
-
-/*****************************************************************************
- * intf_MsgImm: print a message                                          (ok ?)
- *****************************************************************************
- * This function prints a message immediately. If the queue is used, all
- * waiting messages are also printed.
- *****************************************************************************/
-void intf_MsgImm( char *psz_format, ... )
-{
-    va_list ap;
-
-    va_start( ap, psz_format );
-    QueueMsg( p_main->p_msg, INTF_MSG_STD, psz_format, ap );
-    va_end( ap );
-    intf_FlushMsg();
-}
-
-/*****************************************************************************
- * intf_ErrMsgImm: print an error message immediately                    (ok ?)
- *****************************************************************************
- * This function is the same as intf_MsgImm, except that it prints its message
- * on stderr.
- *****************************************************************************/
-void intf_ErrMsgImm(char *psz_format, ...)
-{
-    va_list ap;
-
-    va_start( ap, psz_format );
-    QueueMsg( p_main->p_msg, INTF_MSG_ERR, psz_format, ap );
-    va_end( ap );
-    intf_FlushMsg();
-}
-
-/*****************************************************************************
- * intf_WarnMsgImm : print a warning message
- *****************************************************************************
- * This function is the same as intf_MsgImm, except that it concerns warning
- * messages for testing purpose.
- *****************************************************************************/
-void intf_WarnMsgImm( int i_level, char *psz_format, ... )
-{
-    va_list ap;
-
-    if( i_level <= p_main->i_warning_level )
-    {
-        va_start( ap, psz_format );
-        QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );
-        va_end( ap );
-    }
-    intf_FlushMsg();
-}
-
-
-
-/*****************************************************************************
- * _intf_DbgMsgImm: print a debugging message immediately                (ok ?)
- *****************************************************************************
- * This function is the same as intf_DbgMsgImm, except that it prints its
- * message immediately. It should only be called through the macro
- * intf_DbgMsgImm().
- *****************************************************************************/
-#ifdef TRACE
-void _intf_DbgMsgImm( char *psz_file, char *psz_function, int i_line,
-                      char *psz_format, ...)
-{
-    va_list ap;
-
-    va_start( ap, psz_format );
-    QueueDbgMsg( p_main->p_msg, psz_file, psz_function, i_line,
-                 psz_format, ap );
-    va_end( ap );
-    intf_FlushMsg();
-}
-#endif
 
 /*****************************************************************************
  * intf_WarnHexDump : print a hexadecimal dump of a memory area
@@ -380,23 +282,6 @@ void intf_WarnHexDump( int i_level, void *p_data, int i_size )
     intf_WarnMsg( i_level, "hexdump: %i bytes dumped", i_size );
 }
 
-/*****************************************************************************
- * intf_FlushMsg                                                        (ok ?)
- *****************************************************************************
- * Print all messages remaining in queue: get lock and call FlushLockedMsg.
- * This function does nothing if the message queue isn't used.
- * This function is only implemented if message queue is used. If not, it is
- * an empty macro.
- *****************************************************************************/
-#ifdef INTF_MSG_QUEUE
-void intf_FlushMsg( void )
-{
-    vlc_mutex_lock( &p_main->p_msg->lock );                      /* get lock */
-    FlushLockedMsg( p_main->p_msg );                       /* flush messages */
-    vlc_mutex_unlock( &p_main->p_msg->lock );              /* give lock back */
-}
-#endif
-
 /* following functions are local */
 
 /*****************************************************************************
@@ -407,282 +292,123 @@ void intf_FlushMsg( void )
  * is full. If the message can't be converted to string in memory, it exit the
  * program. If the queue is not used, it prints the message immediately.
  *****************************************************************************/
-static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list ap )
+static void QueueMsg( int i_type, char *psz_format, va_list ap )
 {
     char *                  psz_str;             /* formatted message string */
-    intf_msg_item_t *       p_msg_item;                /* pointer to message */
+    msg_item_t *            p_item;                /* pointer to message */
 #ifdef WIN32
     char *                  psz_temp;
 #endif
 
-#ifndef INTF_MSG_QUEUE /*................................... instant mode ...*/
-    intf_msg_item_t         msg_item;                             /* message */
-    p_msg_item =           &msg_item;
-#endif /*....................................................................*/
-
     /*
      * Convert message to string
      */
-
 #ifdef HAVE_VASPRINTF
     vasprintf( &psz_str, psz_format, ap );
 #else
     psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
 #endif
+
     if( psz_str == NULL )
     {
-        fprintf(stderr, "warning: can't store following message (%s): ",
+        fprintf(stderr, "intf warning: can't store following message (%s): ",
                 strerror(errno) );
         vfprintf(stderr, psz_format, ap );
         fprintf(stderr, "\n" );
         exit( errno );
     }
+
 #ifndef HAVE_VASPRINTF
-#ifdef WIN32
+#   ifdef WIN32
     psz_temp = ConvertPrintfFormatString(psz_format);
     vsprintf( psz_str, psz_temp, ap );
     free( psz_temp );
-#else
+#   else
     vsprintf( psz_str, psz_format, ap );
-#endif /* WIN32 */
-#endif /* HAVE_VASPRINTF */
+#   endif
+#endif
 
-#ifdef INTF_MSG_QUEUE /*...................................... queue mode ...*/
-    vlc_mutex_lock( &p_msg->lock );                              /* get lock */
-    if( p_msg->i_count == INTF_MSG_QSIZE )          /* flush queue if needed */
+    /* Put message in queue */
+    vlc_mutex_lock( &msg_bank.lock );
+
+    /* Send the message to stderr */
+    fprintf( stderr, "%s\n", psz_str );
+
+    if( ((msg_bank.i_stop - msg_bank.i_start + 1) % INTF_MSG_QSIZE) == 0 )
     {
-#ifdef DEBUG               /* in debug mode, queue overflow causes a warning */
-        fprintf(stderr, "warning: message queue overflow\n" );
-#endif
-        FlushLockedMsg( p_msg );
+        FlushLockedMsg( );
+
+        if( ((msg_bank.i_stop - msg_bank.i_start + 1) % INTF_MSG_QSIZE) == 0 )
+        {
+            fprintf( stderr, "intf warning: message queue overflow\n" );
+            vlc_mutex_unlock( &msg_bank.lock );
+            return;
+        }
     }
-    p_msg_item = p_msg->msg + p_msg->i_count++;            /* select message */
-#endif /*.............................................. end of queue mode ...*/
 
-    /*
-     * Fill message information fields
-     */
-    p_msg_item->i_type =     i_type;
-    p_msg_item->psz_msg =    psz_str;
-#ifdef TRACE    
-    p_msg_item->date =       mdate();
-#endif
+    p_item = msg_bank.msg + msg_bank.i_stop;
+    msg_bank.i_stop = (msg_bank.i_stop + 1) % INTF_MSG_QSIZE;
 
-#ifdef INTF_MSG_QUEUE /*......................................... queue mode */
-    vlc_mutex_unlock( &p_msg->lock );                      /* give lock back */
-#else /*....................................................... instant mode */
-    PrintMsg( p_msg_item );                                 /* print message */
-    free( psz_str );                                    /* free message data */
-#endif /*....................................................................*/
+    /* Fill message information fields */
+    p_item->i_type =     i_type;
+    p_item->psz_msg =    psz_str;
+
+    vlc_mutex_unlock( &msg_bank.lock );
 }
-
-/*****************************************************************************
- * QueueDbgMsg: add a message to a queue with debugging informations
- *****************************************************************************
- * This function is the same as QueueMsg, except that it is only defined when
- * TRACE is define, and require additionnal debugging informations.
- *****************************************************************************/
-#ifdef TRACE
-static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
-                        int i_line, char *psz_format, va_list ap)
-{
-    char *                  psz_str;             /* formatted message string */
-    intf_msg_item_t *       p_msg_item;                /* pointer to message */
-#ifdef WIN32
-    char *                  psz_temp;
-#endif
-
-#ifndef INTF_MSG_QUEUE /*................................... instant mode ...*/
-    intf_msg_item_t         msg_item;                             /* message */
-    p_msg_item =           &msg_item;
-#endif /*....................................................................*/
-
-    /*
-     * Convert message to string
-     */
-#ifdef HAVE_VASPRINTF
-    vasprintf( &psz_str, psz_format, ap );
-#else
-    psz_str = (char*) malloc( INTF_MAX_MSG_SIZE );
-#endif
-    if( psz_str == NULL )
-    {
-        fprintf(stderr, "warning: can't store following message (%s): ",
-                strerror(errno) );
-        fprintf(stderr, INTF_MSG_DBG_FORMAT, psz_file, psz_function, i_line );
-        vfprintf(stderr, psz_format, ap );
-        fprintf(stderr, "\n" );
-        exit( errno );
-    }
-#ifndef HAVE_VASPRINTF
-#ifdef WIN32
-    psz_temp = ConvertPrintfFormatString(psz_format);
-    vsprintf( psz_str, psz_temp, ap );
-    free( psz_temp );
-#else
-    vsprintf( psz_str, psz_format, ap );
-#endif /* WIN32 */
-#endif /* HAVE_VASPRINTF */
-
-#ifdef INTF_MSG_QUEUE /*...................................... queue mode ...*/
-    vlc_mutex_lock( &p_msg->lock );                              /* get lock */
-    if( p_msg->i_count == INTF_MSG_QSIZE )          /* flush queue if needed */
-    {
-        fprintf(stderr, "warning: message queue overflow\n" );
-        FlushLockedMsg( p_msg );
-    }
-    p_msg_item = p_msg->msg + p_msg->i_count++;            /* select message */
-#endif /*.............................................. end of queue mode ...*/
-
-    /*
-     * Fill message information fields
-     */
-    p_msg_item->i_type =       INTF_MSG_DBG;
-    p_msg_item->psz_msg =      psz_str;
-    p_msg_item->psz_file =     psz_file;
-    p_msg_item->psz_function = psz_function;
-    p_msg_item->i_line =       i_line;
-    p_msg_item->date =         mdate();
-
-#ifdef INTF_MSG_QUEUE /*......................................... queue mode */
-    vlc_mutex_unlock( &p_msg->lock );                      /* give lock back */
-#else /*....................................................... instant mode */
-    PrintMsg( p_msg_item );                                 /* print message */
-    free( psz_str );                                    /* free message data */
-#endif /*....................................................................*/
-}
-#endif
 
 /*****************************************************************************
  * FlushLockedMsg                                                       (ok ?)
  *****************************************************************************
  * Print all messages remaining in queue. MESSAGE QUEUE MUST BE LOCKED, since
- * this function does not check the lock. This function is only defined if
- * INTF_MSG_QUEUE is defined.
+ * this function does not check the lock.
  *****************************************************************************/
-#ifdef INTF_MSG_QUEUE
-static void FlushLockedMsg ( intf_msg_t *p_msg )
+static void FlushLockedMsg ( void )
 {
-    int i_index;
+    int i_index, i_start, i_stop;
 
-    for( i_index = 0; i_index < p_msg->i_count; i_index++ )
+    /* Get the maximum message index that can be freed */
+    i_stop = msg_bank.i_stop;
+
+    /* Check until which value we can free messages */
+    for( i_index = 0; i_index < msg_bank.i_sub; i_index++ )
     {
-        /* Print message and free message data */
-        PrintMsg( &p_msg->msg[i_index] );
-        free( p_msg->msg[i_index].psz_msg );
+        i_start = msg_bank.pp_sub[ i_index ]->i_start;
+
+        /* If this subscriber is late, we don't free messages before
+         * his i_start value, otherwise he'll miss messages */
+        if(   ( i_start < i_stop
+               && (msg_bank.i_stop <= i_start || i_stop <= msg_bank.i_stop) )
+           || ( i_stop < i_start
+               && (i_stop <= msg_bank.i_stop && msg_bank.i_stop <= i_start) ) )
+        {
+            i_stop = i_start;
+        }
     }
 
-    p_msg->i_count = 0;
-}
-#endif
-
-/*****************************************************************************
- * PrintMsg: print a message                                             (ok ?)
- *****************************************************************************
- * Print a single message. The message data is not freed. This function exists
- * in two version. The TRACE version prints a date with each message, and is
- * able to log messages (if TRACE_LOG is defined).
- * The normal one just prints messages to the screen.
- *****************************************************************************/
-#ifdef TRACE
-
-static void PrintMsg( intf_msg_item_t *p_msg )
-{
-    char    psz_date[MSTRTIME_MAX_SIZE];            /* formatted time buffer */
-    int     i_msg_len = MSTRTIME_MAX_SIZE + strlen(p_msg->psz_msg) + 200;
-    char   *psz_msg;                                       /* message buffer */
-
-    psz_msg = malloc( sizeof( char ) * i_msg_len );
-
-    /* Check if allocation succeeded */
-    if( psz_msg == NULL )
+    /* Free message data */
+    if( msg_bank.i_start <= i_stop )
     {
-        fprintf( stderr, "error: not enough memory for message %s\n",
-                 p_msg->psz_msg );
-        return;
+        i_index = msg_bank.i_start;
+    }
+    else
+    {
+        for( i_index = msg_bank.i_start; i_index < INTF_MSG_QSIZE; i_index++ )
+        {
+            free( msg_bank.msg[i_index].psz_msg );
+        }
+
+        i_index = 0;
     }
 
-    /* Format message - the message is formatted here because in case the log
-     * file is used, it avoids another format string parsing */
-    switch( p_msg->i_type )
+    for( ; i_index < i_stop; i_index++ )
     {
-    case INTF_MSG_STD:                                   /* regular messages */
-    case INTF_MSG_STAT:
-    case INTF_MSG_ERR:
-        snprintf( psz_msg, i_msg_len, "%s", p_msg->psz_msg );
-        break;
-
-    case INTF_MSG_WARN:                                   /* Warning message */
-        mstrtime( psz_date, p_msg->date );
-        snprintf( psz_msg, i_msg_len, "(%s) %s",
-                  psz_date, p_msg->psz_msg );
-
-        break;
-        
-    case INTF_MSG_DBG:                                     /* debug messages */
-        mstrtime( psz_date, p_msg->date );
-        snprintf( psz_msg, i_msg_len, "(%s) " INTF_MSG_DBG_FORMAT "%s",
-                  psz_date, p_msg->psz_file, p_msg->psz_function, p_msg->i_line,
-                  p_msg->psz_msg );
-        break;
+        free( msg_bank.msg[i_index].psz_msg );
     }
 
-    /*
-     * Print messages
-     */
-    switch( p_msg->i_type )
-    {
-    case INTF_MSG_STD:                                  /* standard messages */
-    case INTF_MSG_STAT:
-        fprintf( stdout, "%s\n", psz_msg );
-        break;
-    case INTF_MSG_ERR:                                     /* error messages */
-    case INTF_MSG_WARN:
-#ifndef TRACE_LOG_ONLY
-    case INTF_MSG_DBG:                                 /* debugging messages */
-#endif
-        fprintf( stderr, "%s\n", psz_msg );
-        break;
-    }
-
-#ifdef TRACE_LOG
-    /* Append all messages to log file */
-    if( p_main->p_msg->p_log_file != NULL )
-    {
-        fwrite( psz_msg, strlen( psz_msg ), 1, p_main->p_msg->p_log_file );
-        fwrite( "\n", 1, 1, p_main->p_msg->p_log_file );
-    }
-#endif
-
-    /* Free the message */
-    free( psz_msg );
+    /* Update the new start value */
+    msg_bank.i_start = i_index;
 }
 
-#else
-
-static void PrintMsg( intf_msg_item_t *p_msg )
-{
-    /*
-     * Print messages on screen
-     */
-    switch( p_msg->i_type )
-    {
-    case INTF_MSG_STD:                                  /* standard messages */
-    case INTF_MSG_STAT:
-    case INTF_MSG_DBG:                                     /* debug messages */
-        fprintf( stdout, "%s\n", p_msg->psz_msg );
-        break;
-    case INTF_MSG_ERR:                                     /* error messages */
-    case INTF_MSG_WARN:
-        fprintf( stderr, "%s\n", p_msg->psz_msg );        /* warning message */
-        break;
-    }
-}
-
-#endif
-
-
-#if defined( WIN32 )
 /*****************************************************************************
  * ConvertPrintfFormatString: replace all occurrences of %ll with %I64 in the
  *                            printf format string.
@@ -694,6 +420,7 @@ static void PrintMsg( intf_msg_item_t *p_msg )
  * a "long long" type!!!
  * By the way, if we don't do this we can sometimes end up with segfaults.
  *****************************************************************************/
+#if defined( WIN32 )
 static char *ConvertPrintfFormatString( char *psz_format )
 {
   int i, i_counter=0, i_pos=0;
@@ -715,7 +442,7 @@ static char *ConvertPrintfFormatString( char *psz_format )
   psz_dest = malloc( strlen(psz_format) + i_counter + 1 );
   if( psz_dest == NULL )
   {
-      fprintf(stderr, "warning: malloc failed in ConvertPrintfFormatString\n");
+      fprintf( stderr, "intf warning: ConvertPrintfFormatString failed\n");
       exit (errno);
   }
 

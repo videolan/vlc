@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.33 2001/12/30 07:09:56 sam Exp $
+ * $Id: video_text.c,v 1.34 2002/02/19 00:50:20 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -262,7 +262,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
     if( i_file == -1 )
     {
-        intf_DbgMsg( "vout error: can't open file '%s' (%s)",
+        intf_ErrMsg( "vout error: can't open file '%s' (%s)",
                      psz_name, strerror(errno) );
         return( NULL );
     }
@@ -360,9 +360,9 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         break;
     }
 
-
-    intf_DbgMsg( "loaded %s: type %d, %d-%dx%d", psz_name, p_font->i_type,
+    intf_ErrMsg( "loaded %s: type %d, %d-%dx%d", psz_name, p_font->i_type,
                  p_font->i_width, p_font->i_interspacing, p_font->i_height );
+
     return( p_font );
 }
 
@@ -379,7 +379,6 @@ void vout_UnloadFont( vout_font_t *p_font )
         return;
     }
 
-    intf_DbgMsg( "vout: unloading font %p", p_font );
     free( p_font->p_data );
     free( p_font );
 }

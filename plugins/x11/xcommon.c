@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.16 2002/02/15 13:32:54 sam Exp $
+ * $Id: xcommon.c,v 1.17 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -669,8 +669,6 @@ static int vout_Manage( vout_thread_t *p_vout )
                         case '9': network_ChannelJoin( 9 ); break;
 
                         default:
-                            intf_DbgMsg( "vout: unhandled key '%c' (%i)", 
-                                         (char)i_key, i_key );
                             break;
                         }
                     }
@@ -767,10 +765,6 @@ static int vout_Manage( vout_thread_t *p_vout )
         {
             p_main->p_intf->b_die = 1;
         }
-        else
-        {
-            intf_DbgMsg( "vout: unhandled ClientMessage received" );
-        }
     }
 
     /*
@@ -792,7 +786,6 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( b_resized )
     {
         /* If interface window has been resized, change vout size */
-        intf_DbgMsg( "vout: resizing output window" );
         p_vout->i_width =  p_vout->p_sys->i_width;
         p_vout->i_height = p_vout->p_sys->i_height;
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
@@ -801,7 +794,6 @@ static int vout_Manage( vout_thread_t *p_vout )
              (p_vout->i_height != p_vout->p_sys->i_height) )
     {
         /* If video output size has changed, change interface window size */
-        intf_DbgMsg( "vout: resizing output window" );
         p_vout->p_sys->i_width =    p_vout->i_width;
         p_vout->p_sys->i_height =   p_vout->i_height;
         XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->window,
@@ -821,7 +813,6 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_DbgMsg( "vout info: resizing window" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Resize window */
@@ -1660,7 +1651,6 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
     int dummy;
 #endif
 
-    intf_DbgMsg( "vout: enabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
@@ -1696,7 +1686,6 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
                      &p_vout->p_sys->i_ss_exposure );
 
     /* Disable screen saver */
-    intf_DbgMsg( "vout: disabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, 0,
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
@@ -1710,7 +1699,6 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
         /* Save DPMS current state */
         DPMSInfo( p_vout->p_sys->p_display, &unused,
                   &p_vout->p_sys->b_ss_dpms );
-        intf_DbgMsg( "vout: disabling DPMS" );
         DPMSDisable( p_vout->p_sys->p_display );
    }
 #endif

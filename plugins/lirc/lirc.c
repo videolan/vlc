@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.2 2002/02/15 13:32:53 sam Exp $
+ * $Id: lirc.c,v 1.3 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -95,9 +95,6 @@ static void intf_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int intf_Open( intf_thread_t *p_intf )
 {
-    /* Non-buffered stdout */
-    setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
-
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )

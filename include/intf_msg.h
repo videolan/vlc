@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_msg.h,v 1.17 2001/12/30 07:09:54 sam Exp $
+ * $Id: intf_msg.h,v 1.18 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -24,91 +24,22 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * intf_DbgMsg macros and functions
- *****************************************************************************
- * The intf_DbgMsg* functions are defined as macro to be able to use the
- * compiler extensions and print the file, the function and the line number
- * from which they have been called. They call _intf_DbgMsg*() functions after
- * having added debugging informations.
- * Outside trace mode, intf_DbgMsg* functions do nothing.
- *****************************************************************************/
-#ifdef TRACE
-
-/* TRACE mode */
-void    _intf_DbgMsg        ( char *psz_file, char *psz_function, int i_line,
-                              char *psz_format, ... );
-void    _intf_DbgMsgImm     ( char *psz_file, char *psz_function, int i_line,
-                              char *psz_format, ... );
-
-#define intf_DbgMsg( format, args... ) \
-    _intf_DbgMsg( __FILE__, __FUNCTION__, __LINE__, format, ## args )
-#define intf_DbgMsgImm( format, args... ) \
-    _intf_DbgMsg( __FILE__, __FUNCTION__, __LINE__, format, ## args )
-
-#else
-
-/* Non-TRACE mode */
-#if defined( _MSC_VER )
-#   define intf_DbgMsg
-#   define intf_DbgMsgImm
-#else
-#   define intf_DbgMsg( format, args... )
-#   define intf_DbgMsgImm( format, args...)
-#endif
-
-#endif
-
-/*****************************************************************************
- * intf_FlushMsg macro and function
- *****************************************************************************
- * intf_FlushMsg is a function which flushs message queue and print all messages
- * remaining. It is only useful if INTF_MSG_QUEUE is defined. In this case, it
- * is really a function. In the other case, it is a macro doing nothing.
- *****************************************************************************/
-#ifdef INTF_MSG_QUEUE
-
-/* Message queue mode */
-void    intf_FlushMsg       ( void );
-
-#else
-
-/* Direct mode */
-#define intf_FlushMsg()     ;
-
-#endif
-
-/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 #ifndef PLUGIN
-p_intf_msg_t intf_MsgCreate      ( void );
-void         intf_MsgDestroy     ( void );
+void intf_Msg            ( char *psz_format, ... );
+void intf_ErrMsg         ( char *psz_format, ... );
+void intf_WarnMsg        ( int i_level, char *psz_format, ... );
+void intf_StatMsg        ( char *psz_format, ... );
 
-void         intf_Msg            ( char *psz_format, ... );
-void         intf_ErrMsg         ( char *psz_format, ... );
-void         intf_WarnMsg        ( int i_level, char *psz_format, ... );
-void         intf_StatMsg        ( char *psz_format, ... );
-
-void         intf_MsgImm         ( char *psz_format, ... );
-void         intf_ErrMsgImm      ( char *psz_format, ... );
-void         intf_WarnMsgImm     ( int i_level, char *psz_format, ... );
-void         intf_WarnHexDump    ( int i_level, void *p_data, int i_size );
+void intf_WarnHexDump    ( int i_level, void *p_data, int i_size );
 #else
+#   define intf_MsgSub p_symbols->intf_MsgSub
+#   define intf_MsgUnsub p_symbols->intf_MsgUnsub
+
 #   define intf_Msg p_symbols->intf_Msg
 #   define intf_ErrMsg p_symbols->intf_ErrMsg
 #   define intf_StatMsg p_symbols->intf_StatMsg
 #   define intf_WarnMsg p_symbols->intf_WarnMsg
-#   define intf_WarnMsgImm p_symbols->intf_WarnMsgImm
-#   ifdef TRACE
-#       undef  intf_DbgMsg
-#       undef  intf_DbgMsgImm
-#       define intf_DbgMsg( format, args... ) \
-        p_symbols->intf_DbgMsg( __FILE__, __FUNCTION__, \
-                                __LINE__, format, ## args )
-#       define intf_DbgMsgImm( format, args... ) \
-            p_symbols->intf_DbgMsgImm( __FILE__, __FUNCTION__, \
-                                       __LINE__, format, ## args )
-#   endif
-
 #endif
 

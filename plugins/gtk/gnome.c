@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.9 2002/02/15 13:32:53 sam Exp $
+ * $Id: gnome.c,v 1.10 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -76,7 +76,7 @@ MODULE_INIT_START
     {
         ADD_CAPABILITY( INTF, 100 )
     }
-    ADD_SHORTCUT( "gtk" )
+    ADD_SHORTCUT( "gnome" )
     ADD_PROGRAM( "gnome-vlc" )
 MODULE_INIT_STOP
 

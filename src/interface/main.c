@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.151 2002/02/15 13:32:54 sam Exp $
+ * $Id: main.c,v 1.152 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -128,8 +128,7 @@
 #define OPT_SYNCHRO             190
 #define OPT_WARNING             191
 #define OPT_VERSION             192
-#define OPT_STDOUT              193
-#define OPT_STATS               194
+#define OPT_STATS               193
 
 #define OPT_MPEG_ADEC           200
 #define OPT_AC3_ADEC            201
@@ -158,7 +157,6 @@ static const struct option longopts[] =
     /* Interface options */
     {   "intf",             1,          0,      'I' },
     {   "warning",          1,          0,      OPT_WARNING },
-    {   "stdout",           1,          0,      OPT_STDOUT },
     {   "stats",            0,          0,      OPT_STATS },
 
     /* Audio options */
@@ -250,7 +248,6 @@ static void FatalSignalHandler      ( int i_signal );
 static void IllegalSignalHandler    ( int i_signal );
 static u32  CPUCapabilities         ( void );
 
-static int  RedirectSTDOUT          ( void );
 static void ShowConsole             ( void );
 
 static jmp_buf env;
@@ -327,15 +324,9 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize messages interface
      */
-    p_main->p_msg = intf_MsgCreate();
-    if( !p_main->p_msg )                         /* start messages interface */
-    {
-        fprintf( stderr, "error: can't initialize messages interface (%s)\n",
-                 strerror(errno) );
-        return( errno );
-    }
+    intf_MsgCreate();
 
-    intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
+    intf_Msg( COPYRIGHT_MESSAGE "\n" );
 
     /*
      * Read configuration
@@ -350,8 +341,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
      * Redirect the standard output if required by the user, and on Win32 we
      * also open a console to display the debug messages.
      */
-    RedirectSTDOUT();
-
     if( p_main->b_stats )
     {
         char          p_capabilities[200];
@@ -670,46 +659,28 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* General/common options */
         case 'h':                                              /* -h, --help */
             ShowConsole();
-            RedirectSTDOUT();
             Usage( SHORT_HELP );
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
-                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
-            {
-                /* No stdout redirection has been asked for */
-                intf_MsgImm( "\nPress the RETURN key to continue..." );
-                getchar();
-            }
+            intf_Msg( "\nPress the RETURN key to continue..." );
+            getchar();
 #endif
             return( -1 );
             break;
         case 'H':                                          /* -H, --longhelp */
             ShowConsole();
-            RedirectSTDOUT();
             Usage( LONG_HELP );
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
-                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
-            {
-                /* No stdout redirection has been asked for */
-                intf_MsgImm( "\nPress the RETURN key to continue..." );
-                getchar();
-            }
+            intf_Msg( "\nPress the RETURN key to continue..." );
+            getchar();
 #endif
             return( -1 );
             break;
         case OPT_VERSION:                                       /* --version */
             ShowConsole();
-            RedirectSTDOUT();
             Version();
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
-                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
-            {
-                /* No stdout redirection has been asked for */
-                intf_MsgImm( "\nPress the RETURN key to continue..." );
-                getchar();
-            }
+            intf_Msg( "\nPress the RETURN key to continue..." );
+            getchar();
 #endif
             return( -1 );
             break;
@@ -724,10 +695,6 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_WARNING:                                       /* --warning */
             intf_ErrMsg( "intf error: `--warning' is deprecated, use `-v'" );
             p_main->i_warning_level = atoi(optarg);
-            break;
-
-        case OPT_STDOUT:                                         /* --stdout */
-            main_PutPszVariable( INTF_STDOUT_VAR, optarg );
             break;
 
         case OPT_STATS:
@@ -899,18 +866,12 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case '?':
         default:
             ShowConsole();
-            RedirectSTDOUT();
             intf_ErrMsg( "intf error: unknown option `%s'",
                          ppsz_argv[optind] );
             Usage( USAGE );
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
-            if( strcmp( "", main_GetPszVariable( INTF_STDOUT_VAR,
-                                                 INTF_STDOUT_DEFAULT ) ) == 0 )
-            {
-                /* No stdout redirection has been asked for */
-                intf_MsgImm( "\nPress the RETURN key to continue..." );
-                getchar();
-            }
+            intf_Msg( "\nPress the RETURN key to continue..." );
+            getchar();
 #endif
             return( EINVAL );
             break;
@@ -952,21 +913,20 @@ static int GetFilenames( int i_argc, char *ppsz_argv[] )
 static void Usage( int i_fashion )
 {
     /* Usage */
-    intf_MsgImm( "Usage: %s [options] [parameters] [file]...",
+    intf_Msg( "Usage: %s [options] [parameters] [file]...",
                  p_main->psz_arg0 );
 
     if( i_fashion == USAGE )
     {
-        intf_MsgImm( "Try `%s --help' for more information.",
+        intf_Msg( "Try `%s --help' for more information.",
                      p_main->psz_arg0 );
         return;
     }
 
     /* Options */
-    intf_MsgImm( "\nOptions:"
+    intf_Msg( "\nOptions:"
           "\n  -I, --intf <module>            \tinterface method"
           "\n  -v, --verbose                  \tverbose mode (cumulative)"
-          "\n      --stdout <filename>        \tredirect console stdout"
           "\n      --memcpy <module>          \tmemcpy method"
           "\n"
           "\n      --noaudio                  \tdisable audio"
@@ -1034,15 +994,14 @@ static void Usage( int i_fashion )
         return;
 
     /* Interface parameters */
-    intf_MsgImm( "\nInterface parameters:"
+    intf_Msg( "\nInterface parameters:"
         "\n  " INTF_METHOD_VAR "=<method name>        \tinterface method"
         "\n  " INTF_INIT_SCRIPT_VAR "=<filename>              \tinitialization script"
         "\n  " INTF_CHANNELS_VAR "=<filename>         \tchannels list"
-        "\n  " INTF_STDOUT_VAR "=<filename>           \tredirect console stdout"
         "\n  " MEMCPY_METHOD_VAR "=<method name>      \tmemcpy method" );
 
     /* Audio parameters */
-    intf_MsgImm( "\nAudio parameters:"
+    intf_Msg( "\nAudio parameters:"
         "\n  " AOUT_METHOD_VAR "=<method name>        \taudio method"
         "\n  " AOUT_DSP_VAR "=<filename>              \tdsp device path"
         "\n  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output"
@@ -1053,7 +1012,7 @@ static void Usage( int i_fashion )
         "\n  " AOUT_RATE_VAR "=<rate>                 \toutput rate" );
 
     /* Video parameters */
-    intf_MsgImm( "\nVideo parameters:"
+    intf_Msg( "\nVideo parameters:"
         "\n  " VOUT_METHOD_VAR "=<method name>        \tdisplay method"
         "\n  " VOUT_DISPLAY_VAR "=<display name>      \tdisplay used"
         "\n  " VOUT_WIDTH_VAR "=<width>               \tdisplay width"
@@ -1072,7 +1031,7 @@ static void Usage( int i_fashion )
         "\n  " VOUT_SPUMARGIN_VAR "=<margin>          \tforce SPU margin" );
 
     /* DVD parameters */
-    intf_MsgImm( "\nDVD parameters:"
+    intf_Msg( "\nDVD parameters:"
         "\n  " INPUT_DVD_DEVICE_VAR "=<device>        \tDVD device"
         "\n  " INPUT_TITLE_VAR "=<title>              \ttitle number"
         "\n  " INPUT_CHAPTER_VAR "=<chapter>          \tchapter number"
@@ -1082,13 +1041,13 @@ static void Usage( int i_fashion )
         "\n  " INPUT_SUBTITLE_VAR "=[0-31]            \tsubtitle channel" );
 
     /* Input parameters */
-    intf_MsgImm( "\nInput parameters:"
+    intf_Msg( "\nInput parameters:"
         "\n  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface"
         "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>  \tchannel server"
         "\n  " INPUT_CHANNEL_PORT_VAR "=<port>        \tchannel server port" );
 
     /* Decoder parameters */
-    intf_MsgImm( "\nDecoder parameters:"
+    intf_Msg( "\nDecoder parameters:"
         "\n  " ADEC_MPEG_VAR "=<builtin|mad>          \tMPEG audio decoder"
         "\n  " ADEC_AC3_VAR "=<builtin|a52>           \tAC3 audio decoder" );
 }
@@ -1100,7 +1059,7 @@ static void Usage( int i_fashion )
  *****************************************************************************/
 static void Version( void )
 {
-    intf_MsgImm( VERSION_MESSAGE
+    intf_Msg( VERSION_MESSAGE
         "This program comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute it under the terms of the GNU General Public License;\n"
         "see the file named COPYING for details.\n"
@@ -1157,7 +1116,7 @@ static void FatalSignalHandler( int i_signal )
 #endif
 
     /* Acknowledge the signal received */
-    intf_ErrMsgImm( "intf error: signal %d received, exiting", i_signal );
+    intf_ErrMsg( "intf error: signal %d received, exiting", i_signal );
 
     /* Try to terminate everything - this is done by requesting the end of the
      * interface thread */
@@ -1407,49 +1366,6 @@ static u32 CPUCapabilities( void )
     return( i_capabilities );
 
 #endif
-}
-
-/*****************************************************************************
- * RedirectSTDOUT: redirect stdout and stderr to a file
- *****************************************************************************
- * This function will redirect stdout and stderr to a file if the user has
- * specified so.
- *****************************************************************************/
-static int RedirectSTDOUT( void )
-{
-    int  i_fd;
-    char *psz_filename;
-
-    psz_filename = main_GetPszVariable( INTF_STDOUT_VAR, INTF_STDOUT_DEFAULT );
-
-    if( *psz_filename )
-    {
-        ShowConsole();
-        i_fd = open( psz_filename, O_CREAT | O_TRUNC | O_RDWR,
-                                   S_IREAD | S_IWRITE );
-        if( dup2( i_fd, fileno(stdout) ) == -1 )
-        {
-            intf_ErrMsg( "warning: unable to redirect stdout" );
-        }
-
-        if( dup2( i_fd, fileno(stderr) ) == -1 )
-        {
-            intf_ErrMsg( "warning: unable to redirect stderr" );
-        }
-
-        close( i_fd );
-    }
-    else
-    {
-        /* No stdout redirection has been asked so open a console */
-        if( p_main->i_warning_level )
-        {
-            ShowConsole();
-        }
-
-    }
-
-    return 0;
 }
 
 /*****************************************************************************

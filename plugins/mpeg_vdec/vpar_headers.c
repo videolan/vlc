@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.13 2002/02/13 22:10:40 sam Exp $
+ * $Id: vpar_headers.c,v 1.14 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -804,7 +804,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                  p_vpar->picture.b_repeat_first_field ) )
                  == NULL )
         {
-            intf_DbgMsg("vpar debug: vout_CreatePicture failed, delaying");
             if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
             {
                 return;

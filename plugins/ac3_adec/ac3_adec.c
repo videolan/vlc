@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.19 2002/02/15 13:32:52 sam Exp $
+ * $Id: ac3_adec.c,v 1.20 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -194,17 +194,12 @@ static int InitThread( ac3dec_thread_t * p_ac3thread )
      */
     p_ac3thread->p_aout_fifo = NULL;
 
-    intf_DbgMsg ( "ac3_adec debug: ac3_adec thread (%p) initialized", 
-                  p_ac3thread );
-
     /*
      * Bit stream
      */
     InitBitstream(&p_ac3thread->ac3_decoder->bit_stream,
             p_ac3thread->p_config->p_decoder_fifo,
             BitstreamCallback, (void *) p_ac3thread );
-    
-    intf_DbgMsg("ac3dec debug: ac3 decoder thread %p initialized", p_ac3thread);
     
     return( 0 );
 }
@@ -216,8 +211,6 @@ static int decoder_Run ( decoder_config_t * p_config )
 {
     ac3dec_thread_t *   p_ac3thread;
     boolean_t           b_sync = 0;
-
-    intf_DbgMsg( "ac3_adec debug: ac3_adec thread launched, initializing" );
 
     /* Allocate the memory needed to store the thread's structure */
     p_ac3thread = (ac3dec_thread_t *)memalign(16, sizeof(ac3dec_thread_t));
@@ -379,8 +372,6 @@ static int decoder_Run ( decoder_config_t * p_config )
  *****************************************************************************/
 static void EndThread (ac3dec_thread_t * p_ac3thread)
 {
-    intf_DbgMsg ("ac3dec debug: destroying ac3 decoder thread %p", p_ac3thread);
-
     /* If the audio output fifo was created, we destroy it */
     if (p_ac3thread->p_aout_fifo != NULL)
     {
@@ -424,8 +415,6 @@ static void EndThread (ac3dec_thread_t * p_ac3thread)
     /* Free what's left of the decoder */
     free( p_ac3thread->ac3_decoder->imdct );
     free( p_ac3thread->ac3_decoder );
-
-    intf_DbgMsg( "ac3dec debug: ac3 decoder thread %p destroyed", p_ac3thread );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.12 2002/02/15 13:32:53 sam Exp $
+ * $Id: aout_macosx.c,v 1.13 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -228,8 +228,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
         if( err == noErr )
         {
-            intf_DbgMsg( "audio output format is %i", p_aout->i_format );
-            
             /*
              * setting format.mFormatFlags to anything but the default value 
              * doesn't seem to work. Can anybody explain that ??
@@ -243,14 +241,12 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                     return( -1 );
                     
                 case AOUT_FMT_S16_LE:           /* Little endian signed 16 */
-                    intf_DbgMsg( "This means Little endian signed 16" );
                     // format.mFormatFlags &= ~kLinearPCMFormatFlagIsBigEndian;
                     intf_ErrMsg( "Audio format (LE Unsigned 16) not supported now,"
                                  "please report stream" );
                     return( -1 );
                     
                 case AOUT_FMT_S16_BE:              /* Big endian signed 16 */
-                    intf_DbgMsg( "This means big endian signed 16" );
                     // format.mFormatFlags |= kLinearPCMFormatFlagIsBigEndian;
                     break;
                     
@@ -261,7 +257,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                     
                 case AOUT_FMT_U16_LE:                 /* Little endian U16 */
                     // format.mFormatFlags &= ~kLinearPCMFormatFlagIsSignedInteger;
-                    intf_DbgMsg( "This means Little endian U16" );
                     intf_ErrMsg( "Audio format (LE Unsigned 8) not supported now,"
                                  "please report stream" );
                     return( -1 );
@@ -274,7 +269,6 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                     
                     break;
                 default:
-                    intf_DbgMsg( "This means Unknown aout format" );
                     return( -1 );
             }
 
@@ -363,7 +357,6 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
 #if WRITE_AUDIO_OUTPUT_TO_FILE
     write( p_aout->p_sys->fd, buffer, i_size );
-    intf_DbgMsg( "write() -> %d", write( p_aout->p_sys->fd, buffer, i_size ) );
 #else
     Convert16BitIntegerTo32Float( buffer, p_aout->p_sys->p_Data, i_size );
     

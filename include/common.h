@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.73 2002/02/15 13:32:52 sam Exp $
+ * $Id: common.h,v 1.74 2002/02/19 00:50:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -167,6 +167,7 @@ struct pgrm_descriptor_s;
 struct pes_packet_s;
 struct input_area_s;
 struct bit_stream_s;
+struct intf_subscription_s;
 
 /*****************************************************************************
  * Macros and inline functions
@@ -444,18 +445,13 @@ typedef struct module_symbols_s
     void   ( * main_PutIntVariable ) ( char *, int );
     void   ( * main_PutPszVariable ) ( char *, char * );
 
-    int  ( * intf_ProcessKey ) ( struct intf_thread_s *, int );
-    void ( * intf_AssignKey )  ( struct intf_thread_s *, int, int, int );
+    struct intf_subscription_s * ( * intf_MsgSub ) ( void );
+    void ( * intf_MsgUnsub )   ( struct intf_subscription_s * );
 
     void ( * intf_Msg )        ( char *, ... );
     void ( * intf_ErrMsg )     ( char *, ... );
     void ( * intf_StatMsg )    ( char *, ... );
     void ( * intf_WarnMsg )    ( int, char *, ... );
-    void ( * intf_WarnMsgImm ) ( int, char *, ... );
-#ifdef TRACE
-    void ( * intf_DbgMsg )     ( char *, char *, int, char *, ... );
-    void ( * intf_DbgMsgImm )  ( char *, char *, int, char *, ... );
-#endif
 
     int  ( * intf_PlaylistAdd )     ( struct playlist_s *, int, const char* );
     int  ( * intf_PlaylistDelete )  ( struct playlist_s *, int );

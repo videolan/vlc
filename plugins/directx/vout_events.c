@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.10 2002/01/27 22:14:52 gbazin Exp $
+ * $Id: vout_events.c,v 1.11 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -190,8 +190,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
             case '9': network_ChannelJoin( 9 ); break;
 
             default:
-                intf_DbgMsg( "unhandled key '%c' (%i)",
-                             (char)msg.wParam, msg.wParam );
                 break;
             }
 

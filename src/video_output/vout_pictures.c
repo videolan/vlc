@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.15 2002/02/15 13:32:54 sam Exp $
+ * $Id: vout_pictures.c,v 1.16 2002/02/19 00:50:20 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,17 +53,12 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     case RESERVED_DATED_PICTURE:
         p_pic->i_status = READY_PICTURE;
         break;
-#ifdef DEBUG
     default:
         intf_ErrMsg( "error: picture %p has invalid status %d",
                      p_pic, p_pic->i_status );
         break;
-#endif
     }
 
-#ifdef TRACE_VOUT
-    intf_DbgMsg("picture %p", p_pic);
-#endif
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -77,10 +72,6 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 void vout_DatePicture( vout_thread_t *p_vout,
                        picture_t *p_pic, mtime_t date )
 {
-#ifdef TRACE_VOUT
-    char        psz_date[ MSTRTIME_MAX_SIZE ];                       /* date */
-#endif
-
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->date = date;
     switch( p_pic->i_status )
@@ -91,18 +82,12 @@ void vout_DatePicture( vout_thread_t *p_vout,
     case RESERVED_DISP_PICTURE:
         p_pic->i_status = READY_PICTURE;
         break;
-#ifdef DEBUG
     default:
         intf_ErrMsg( "error: picture %p has invalid status %d",
                      p_pic, p_pic->i_status );
         break;
-#endif
     }
 
-#ifdef TRACE_VOUT
-    intf_DbgMsg( "picture %p, display date: %s",
-                 p_pic, mstrtime( psz_date, p_pic->date) );
-#endif
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -261,11 +246,6 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount++;
-
-#ifdef TRACE_VOUT
-    intf_DbgMsg( "picture %p refcount=%d", p_pic, p_pic->i_refcount );
-#endif
-
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -279,13 +259,11 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_lock( &p_vout->picture_lock );
     p_pic->i_refcount--;
 
-#ifdef TRACE_VOUT
     if( p_pic->i_refcount < 0 )
     {
-        intf_DbgMsg( "error: refcount < 0" );
+        intf_ErrMsg( "vout error: picture refcount is %i", p_pic->i_refcount );
         p_pic->i_refcount = 0;
     }
-#endif
 
     if( ( p_pic->i_refcount == 0 ) &&
         ( p_pic->i_status == DISPLAYED_PICTURE ) )
@@ -293,10 +271,6 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->i_status = DESTROYED_PICTURE;
         p_vout->i_heap_size--;
     }
-
-#ifdef TRACE_VOUT
-    intf_DbgMsg( "picture %p refcount=%d", p_pic, p_pic->i_refcount );
-#endif
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.159 2002/02/18 19:02:41 stef Exp $
+ * $Id: video_output.c,v 1.160 2002/02/19 00:50:20 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -377,7 +377,6 @@ static int InitThread( vout_thread_t *p_vout )
     p_vout->b_active = 1;
     *p_vout->pi_status = THREAD_READY;
 
-    intf_DbgMsg("thread ready");
     return( 0 );
 }
 
@@ -536,10 +535,6 @@ static void RunThread( vout_thread_t *p_vout)
          * to display. */
         vlc_mutex_lock( &p_vout->change_lock );
 
-#ifdef TRACE_VOUT
-        intf_DbgMsg( "picture %p, subpicture %p", p_picture, p_subpic );
-#endif
-
         /*
          * Display the previously rendered picture
          */
@@ -590,7 +585,6 @@ static void RunThread( vout_thread_t *p_vout)
 
     /* Destroy thread structures allocated by CreateThread */
     DestroyThread( p_vout, THREAD_OVER );
-    intf_DbgMsg( "thread end" );
 }
 
 /*****************************************************************************

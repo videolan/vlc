@@ -154,7 +154,6 @@ enum mad_flow libmad_input(void *data, struct mad_stream *p_libmad_stream)
  *   mad_adec_thread_t *p_mad_adec = (mad_adec_thread_t *) data;
  *
  *   intf_ErrMsg( "mad_adec: libmad_header samplerate %d", p_libmad_header->samplerate);
- *   intf_DbgMsg( "mad_adec: libmad_header bitrate %d", p_libmad_header->bitrate);	
  *
  *   p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
  *   mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);

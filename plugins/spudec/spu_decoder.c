@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.9 2002/02/15 13:32:53 sam Exp $
+ * $Id: spu_decoder.c,v 1.10 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -171,20 +171,15 @@ static int decoder_Run( decoder_config_t * p_config )
  *****************************************************************************/
 static int InitThread( spudec_thread_t *p_spudec )
 {
-    int i_retry = 0;
-
-    /* Spawn a video output if there is none */
+    /* Find an available video output */
     vlc_mutex_lock( &p_vout_bank->lock );
 
     while( p_vout_bank->i_count == 0 )
     {
         vlc_mutex_unlock( &p_vout_bank->lock );
 
-        if( i_retry++ > 10 )
+        if( p_spudec->p_fifo->b_die || p_spudec->p_fifo->b_error )
         {
-            intf_WarnMsg( 1, "spudec: waited too long for vout, aborting" );
-            free( p_spudec );
-
             return( -1 );
         }
 

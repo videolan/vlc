@@ -12,7 +12,7 @@
                  break;
              }
 +#else
-+            intf_ProcessKey( p_main->p_intf, SDLK_q );
++            //intf_ProcessKey( p_main->p_intf, SDLK_q );
 +#endif
              break;
  

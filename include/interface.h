@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.26 2002/01/07 02:12:29 sam Exp $
+ * $Id: interface.h,v 1.27 2002/02/19 00:50:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -54,8 +54,57 @@ typedef struct intf_thread_s
 } intf_thread_t;
 
 /*****************************************************************************
+ * msg_item_t
+ *****************************************************************************
+ * Store a single message. Messages have a maximal size of INTF_MSG_MSGSIZE.
+ *****************************************************************************/
+typedef struct
+{
+    int     i_type;                               /* message type, see below */
+    char *  psz_msg;                                   /* the message itself */
+
+#if 0
+    mtime_t date;                                     /* date of the message */
+    char *  psz_file;               /* file in which the function was called */
+    char *  psz_function;     /* function from which the function was called */
+    int     i_line;                 /* line at which the function was called */
+#endif
+} msg_item_t;
+
+/* Message types */
+#define INTF_MSG_STD    0                                /* standard message */
+#define INTF_MSG_ERR    1                                   /* error message */
+#define INTF_MSG_WARN   2                                 /* warning message */
+#define INTF_MSG_STAT   3                               /* statistic message */
+
+/*****************************************************************************
+ * intf_subscription_t
+ *****************************************************************************
+ * Used by interface plugins which subscribe to the message queue.
+ *****************************************************************************/
+typedef struct intf_subscription_s
+{
+    int   i_start;
+    int*  pi_stop;
+
+    msg_item_t*  p_msg;
+    vlc_mutex_t* p_lock;
+} intf_subscription_t;
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
-intf_thread_t * intf_Create             ( void );
-void            intf_Destroy            ( intf_thread_t * p_intf );
+intf_thread_t * intf_Create       ( void );
+void            intf_Destroy      ( intf_thread_t * p_intf );
+
+void            intf_MsgCreate    ( void );
+void            intf_MsgDestroy   ( void );
+
+#ifndef PLUGIN
+intf_subscription_t* intf_MsgSub    ( void );
+void                 intf_MsgUnsub  ( intf_subscription_t * );
+#else
+#   define intf_MsgSub p_symbols->intf_MsgSub
+#   define intf_MsgUnsub p_symbols->intf_MsgUnsub
+#endif
 

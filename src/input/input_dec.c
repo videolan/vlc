@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.26 2002/02/15 13:32:54 sam Exp $
+ * $Id: input_dec.c,v 1.27 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -90,9 +90,6 @@ vlc_thread_t input_RunDecoder( input_thread_t * p_input,
         return( 0 );
     }
 
-    intf_DbgMsg( "input debug: decoder \"%s\"thread created", 
-                 p_es->p_module->psz_name );
-    
     return thread_id;
 }
 

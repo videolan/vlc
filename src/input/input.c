@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.174 2002/02/15 13:32:54 sam Exp $
+ * $Id: input.c,v 1.175 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -441,8 +441,6 @@ static void RunThread( input_thread_t *p_input )
     EndThread( p_input );
 
     DestroyThread( p_input );
-
-    intf_DbgMsg("input: Thread end");
 }
 
 /*****************************************************************************

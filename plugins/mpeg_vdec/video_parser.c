@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.13 2002/02/15 13:32:53 sam Exp $
+ * $Id: video_parser.c,v 1.14 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -106,8 +106,6 @@ static int decoder_Run ( decoder_config_t * p_config )
 {
     vpar_thread_t *     p_vpar;
     boolean_t           b_error;
-
-    intf_DbgMsg( "vpar debug: video parser thread created. Initializing..." );
 
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_vpar = (vpar_thread_t *)malloc( sizeof(vpar_thread_t) )) == NULL )
@@ -265,7 +263,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_InitPool( p_vpar );
 
     /* Mark thread as running and return */
-    intf_DbgMsg("vpar debug: InitThread(%p) succeeded", p_vpar);
     return( 0 );
 }
 
@@ -277,8 +274,6 @@ static int InitThread( vpar_thread_t *p_vpar )
  *****************************************************************************/
 static void EndThread( vpar_thread_t *p_vpar )
 {
-    intf_DbgMsg("vpar debug: destroying video parser thread %p", p_vpar);
-
     /* Release used video buffers. */
     if( p_vpar->sequence.p_forward != NULL )
     {
@@ -367,8 +362,6 @@ static void EndThread( vpar_thread_t *p_vpar )
     module_Unneed( p_vpar->p_motion_module );
 
     free( p_vpar );
-
-    intf_DbgMsg("vpar debug: EndThread(%p)", p_vpar);
 }
 
 /*****************************************************************************
@@ -388,9 +381,6 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
 
         if( p_bit_stream->p_decoder_fifo->p_first->b_discontinuity )
         {
-#ifdef TRACE_VPAR
-            intf_DbgMsg( "Discontinuity in BitstreamCallback" );
-#endif
             /* Escape the current picture and reset the picture predictors. */
             p_vpar->sequence.b_expect_discontinuity = 1;
             p_vpar->picture.b_error = 1;
@@ -399,9 +389,6 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
 
     if( p_bit_stream->p_data->b_discard_payload )
     {
-#ifdef TRACE_VPAR
-        intf_DbgMsg( "Discard payload in BitstreamCallback" );
-#endif
         /* 1 packet messed up, trash the slice. */
         p_vpar->picture.b_error = 1;
     }

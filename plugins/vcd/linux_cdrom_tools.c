@@ -116,9 +116,6 @@ int ioctl_ReadSector( int i_fd, int i_sector, byte_t * p_buffer )
     p_msf->minute =   i_dummy / (CD_FRAMES * CD_SECS);
     p_msf->second = ( i_dummy % (CD_FRAMES * CD_SECS) ) / CD_FRAMES;
     p_msf->frame =  ( i_dummy % (CD_FRAMES * CD_SECS) ) % CD_FRAMES;
-
-    intf_DbgMsg( "vcd debug: playing frame %d:%d-%d",
-                 p_msf->minute, p_msf->second, p_msf->frame);
 #undef p_msf
 
     if( ioctl(i_fd, CDROMREADRAW, p_block) == -1 )

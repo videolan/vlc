@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.8 2002/01/29 20:11:18 gbazin Exp $
+ * $Id: modules_plugin.h,v 1.9 2002/02/19 00:50:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -144,16 +144,7 @@ module_error( void )
 /*****************************************************************************
  * STORE_SYMBOLS: store known symbols into p_symbols for plugin access.
  *****************************************************************************/
-#ifdef TRACE
-#   define STORE_TRACE_SYMBOLS( p_symbols ) \
-        (p_symbols)->intf_DbgMsg = _intf_DbgMsg; \
-        (p_symbols)->intf_DbgMsgImm = _intf_DbgMsgImm;
-#else
-#   define STORE_TRACE_SYMBOLS( p_symbols )
-#endif
-
 #define STORE_SYMBOLS( p_symbols ) \
-    STORE_TRACE_SYMBOLS( p_symbols ) \
     (p_symbols)->p_main = p_main; \
     (p_symbols)->p_input_bank = p_input_bank; \
     (p_symbols)->p_aout_bank = p_aout_bank; \
@@ -162,11 +153,12 @@ module_error( void )
     (p_symbols)->main_GetPszVariable = main_GetPszVariable; \
     (p_symbols)->main_PutIntVariable = main_PutIntVariable; \
     (p_symbols)->main_PutPszVariable = main_PutPszVariable; \
+    (p_symbols)->intf_MsgSub = intf_MsgSub; \
+    (p_symbols)->intf_MsgUnsub = intf_MsgUnsub; \
     (p_symbols)->intf_Msg = intf_Msg; \
     (p_symbols)->intf_ErrMsg = intf_ErrMsg; \
     (p_symbols)->intf_StatMsg = intf_StatMsg;\
     (p_symbols)->intf_WarnMsg = intf_WarnMsg; \
-    (p_symbols)->intf_WarnMsgImm = intf_WarnMsgImm; \
     (p_symbols)->intf_PlaylistAdd = intf_PlaylistAdd; \
     (p_symbols)->intf_PlaylistDelete = intf_PlaylistDelete; \
     (p_symbols)->intf_PlaylistNext = intf_PlaylistNext; \

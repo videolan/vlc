@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.4 2002/02/15 13:32:53 sam Exp $
+ * $Id: xmga.c,v 1.5 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -558,8 +558,6 @@ static int vout_Manage( vout_thread_t *p_vout )
                         case '9': network_ChannelJoin( 9 ); break;
 
                         default:
-                            intf_DbgMsg( "vout: unhandled key '%c' (%i)", 
-                                         (char)i_key, i_key );
                             break;
                         }
                     }
@@ -625,10 +623,6 @@ static int vout_Manage( vout_thread_t *p_vout )
             && (xevent.xclient.data.l[0] == p_vout->p_sys->wm_delete_window ) )
         {
             p_main->p_intf->b_die = 1;
-        }
-        else
-        {
-            intf_DbgMsg( "vout: unhandled ClientMessage received" );
         }
     }
 
@@ -1175,7 +1169,6 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
 {
     int dummy;
 
-    intf_DbgMsg( "vout: enabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
@@ -1207,7 +1200,6 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
                      &p_vout->p_sys->i_ss_exposure );
 
     /* Disable screen saver */
-    intf_DbgMsg( "vout: disabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, 0,
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
@@ -1220,7 +1212,6 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
         /* Save DPMS current state */
         DPMSInfo( p_vout->p_sys->p_display, &dummy,
                   &p_vout->p_sys->b_ss_dpms );
-        intf_DbgMsg( "vout: disabling DPMS" );
         DPMSDisable( p_vout->p_sys->p_display );
    }
 }

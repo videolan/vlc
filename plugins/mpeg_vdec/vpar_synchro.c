@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_synchro.c,v 1.5 2001/12/30 07:09:56 sam Exp $
+ * $Id: vpar_synchro.c,v 1.6 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -206,9 +206,6 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         mtime_t         now, period, tau_yuv;
         mtime_t         pts = 0;
         boolean_t       b_decode = 0;
-#ifdef TRACE_VPAR
-        char            p_date[MSTRTIME_MAX_SIZE];
-#endif
 
         now = mdate();
         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate
@@ -297,13 +294,6 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             }
         }
 
-#ifdef TRACE_VPAR
-        intf_DbgMsg("vpar synchro debug: %s picture scheduled for %s, %s (%lld)",
-                    i_coding_type == B_CODING_TYPE ? "B" :
-                    (i_coding_type == P_CODING_TYPE ? "P" : "I"),
-                    mstrtime(p_date, pts), b_decode ? "decoding" : "trashed",
-                    S.p_tau[i_coding_type]);
-#endif
         if( !b_decode )
         {
             S.i_not_chosen_pic++;
@@ -359,18 +349,6 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_coding_type,
                 p_vpar->synchro.pi_meaningful[i_coding_type]++;
             }
         }
-
-#ifdef TRACE_VPAR
-        intf_DbgMsg("vpar synchro debug: finished decoding %s (%lld)",
-                    i_coding_type == B_CODING_TYPE ? "B" :
-                    (i_coding_type == P_CODING_TYPE ? "P" : "I"), tau);
-#endif
-    }
-    else
-    {
-        intf_DbgMsg("vpar synchro debug: aborting %s",
-                    i_coding_type == B_CODING_TYPE ? "B" :
-                    (i_coding_type == P_CODING_TYPE ? "P" : "I"));
     }
 }
 

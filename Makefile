@@ -119,6 +119,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		qt/qt \
 		sdl/sdl \
 		spudec/spudec \
+		text/logger \
 		text/ncurses \
 		text/rc \
 		vcd/vcd \

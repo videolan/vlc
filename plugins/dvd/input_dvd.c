@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.119 2002/02/15 13:32:53 sam Exp $
+ * $Id: input_dvd.c,v 1.120 2002/02/19 00:50:19 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -445,9 +445,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_title_id =
             vts.title_inf.p_title_start[i_vts_title-1].i_title_id;
 
-        intf_WarnMsgImm( 3, "dvd: title %d vts_title %d pgc %d",
-                         p_dvd->i_title, i_vts_title, p_dvd->i_title_id );
-
+        intf_WarnMsg( 3, "dvd: title %d vts_title %d pgc %d",
+                      p_dvd->i_title, i_vts_title, p_dvd->i_title_id );
 
         /*
          * Angle management

@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_decoder.c,v 1.5 2001/12/30 07:09:56 sam Exp $
+ * $Id: video_decoder.c,v 1.6 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -61,8 +61,6 @@ vdec_thread_t * vdec_CreateThread( vdec_pool_t * p_pool )
 {
     vdec_thread_t *     p_vdec;
 
-    intf_DbgMsg("vdec debug: creating video decoder thread");
-
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_vdec = (vdec_thread_t *)malloc( sizeof(vdec_thread_t) )) == NULL )
     {
@@ -89,7 +87,6 @@ vdec_thread_t * vdec_CreateThread( vdec_pool_t * p_pool )
         return( NULL );
     }
 
-    intf_DbgMsg("vdec debug: video decoder thread (%p) created", p_vdec);
     return( p_vdec );
 }
 
@@ -98,8 +95,6 @@ vdec_thread_t * vdec_CreateThread( vdec_pool_t * p_pool )
  *****************************************************************************/
 void vdec_DestroyThread( vdec_thread_t *p_vdec )
 {
-    intf_DbgMsg("vdec debug: requesting termination of video decoder thread %p", p_vdec);
-
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
 
@@ -122,8 +117,6 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec )
  *****************************************************************************/
 void vdec_InitThread( vdec_thread_t * p_vdec )
 {
-    intf_DbgMsg("vdec debug: initializing video decoder thread %p", p_vdec);
-
 #if !defined(SYS_BEOS)
 #   if VDEC_NICE
     /* Re-nice ourself - otherwise we would steal CPU time from the video
@@ -146,7 +139,6 @@ void vdec_InitThread( vdec_thread_t * p_vdec )
     p_vdec->p_pool->pf_idct_init( &p_vdec->p_idct_data );
 
     /* Mark thread as running and return */
-    intf_DbgMsg("vdec debug: InitThread(%p) succeeded", p_vdec);
 }
 
 /*****************************************************************************
@@ -157,8 +149,6 @@ void vdec_InitThread( vdec_thread_t * p_vdec )
  *****************************************************************************/
 void vdec_EndThread( vdec_thread_t * p_vdec )
 {
-    intf_DbgMsg("vdec debug: EndThread(%p)", p_vdec);
-
     if( p_vdec->p_idct_data != NULL )
     {
         free( p_vdec->p_idct_data );
@@ -388,9 +378,6 @@ DECLARE_DECODEMB( vdec_DecodeMacroblock444, CHROMA_444 );
  *****************************************************************************/
 static void RunThread( vdec_thread_t *p_vdec )
 {
-    intf_DbgMsg("vdec debug: running video decoder thread (%p) (pid == %i)",
-                p_vdec, getpid());
-
     vdec_InitThread( p_vdec );
 
     /*

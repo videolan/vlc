@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.13 2002/02/15 13:32:52 sam Exp $
+ * $Id: ac3_spdif.c,v 1.14 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -109,8 +109,6 @@ static int decoder_Run( decoder_config_t * p_config )
     /* PTS of the current frame */
     mtime_t     i_current_pts = 0;
 
-    intf_DbgMsg( "spdif debug: ac3_spdif thread created, initializing." );
-
     /* Allocate the memory needed to store the thread's structure */
     p_spdif = malloc( sizeof(ac3_spdif_thread_t) );
 
@@ -136,8 +134,6 @@ static int decoder_Run( decoder_config_t * p_config )
     i_frame_time = 1000000 * AC3_FRAME_SIZE /
                              p_spdif->ac3_info.i_sample_rate;
     
-    intf_DbgMsg( "spdif debug: ac3_spdif thread (%p) initialized", p_spdif );
-
     while( !p_spdif->p_fifo->b_die && !p_spdif->p_fifo->b_error )
     {
         /* Handle the dates */
@@ -292,8 +288,6 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
  *****************************************************************************/
 static void EndThread( ac3_spdif_thread_t * p_spdif )
 {
-    intf_DbgMsg( "spdif debug: destroying thread %p", p_spdif );
-
     /* If the audio output fifo was created, we destroy it */
     if( p_spdif->p_aout_fifo != NULL )
     {
@@ -309,8 +303,6 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
     /* Destroy descriptor */
     free( p_spdif->p_ac3 );
     free( p_spdif );
-    
-    intf_DbgMsg ("spdif debug: thread %p destroyed", p_spdif );
 }
 
 /*****************************************************************************

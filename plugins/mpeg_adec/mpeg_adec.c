@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.18 2002/02/15 13:32:53 sam Exp $
+ * $Id: mpeg_adec.c,v 1.19 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -95,8 +95,6 @@ static int decoder_Run ( decoder_config_t * p_config )
 {
     adec_thread_t   * p_adec;
     
-    intf_DbgMsg("mpeg_adec debug: thread launched, initializing.");
-    
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_adec = (adec_thread_t *)malloc (sizeof(adec_thread_t))) == NULL ) 
     {
@@ -129,8 +127,6 @@ static int decoder_Run ( decoder_config_t * p_config )
     /* We do not create the audio output fifo now, but
        it will be created when the first frame is received */
     p_adec->p_aout_fifo = NULL;
-
-    intf_DbgMsg("mpeg_adec debug: thread initialized, decoding begins.");
 
     p_adec->i_sync = 0;
 
@@ -240,8 +236,6 @@ static void DecodeThread( adec_thread_t * p_adec )
  *****************************************************************************/
 static void EndThread ( adec_thread_t *p_adec )
 {
-    intf_DbgMsg ( "adec debug: destroying audio decoder thread %p", p_adec );
-
     /* If the audio output fifo was created, we destroy it */
     if ( p_adec->p_aout_fifo != NULL ) 
     {
@@ -254,7 +248,5 @@ static void EndThread ( adec_thread_t *p_adec )
     }
     /* Destroy descriptor */
     free( p_adec );
-
-    intf_DbgMsg ("adec debug: audio decoder thread %p destroyed", p_adec);
 }
 

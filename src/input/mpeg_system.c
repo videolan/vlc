@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.78 2002/01/04 14:01:34 sam Exp $
+ * $Id: mpeg_system.c,v 1.79 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -118,8 +118,6 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     int             i_done;
 
 #define p_pes (p_es->p_pes)
-
-    //intf_DbgMsg("End of PES packet %p", p_pes);
 
     /* Parse the header. The header has a variable length, but in order
      * to improve the algorithm, we will read the 14 bytes we may be
@@ -413,8 +411,6 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
 {
 #define p_pes (p_es->p_pes)
 
-    //intf_DbgMsg("PES-demultiplexing %p (%p)", p_ts_packet, p_pes);
-
     /* If we lost data, insert a NULL data packet (philosophy : 0 is quite
      * often an escape sequence in decoders, so that should make them wait
      * for the next start code). */
@@ -541,7 +537,6 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
         return;
     }
 
-    intf_DbgMsg( "input: building PSM" );
     p_demux->b_has_PSM = 1;
     p_demux->i_PSM_version = p_data->p_demux_start[6] & 0x1F;
 

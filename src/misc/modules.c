@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.52 2002/02/15 13:32:54 sam Exp $
+ * $Id: modules.c,v 1.53 2002/02/19 00:50:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -403,7 +403,8 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
                 break;
 
             default:
-                intf_ErrMsg( "module error: if you can read this, sam fucked up something very bad... fuck him with a chainsaw on vlc-devel" );
+                intf_ErrMsg( "module error: unknown module type %i",
+                             i_capability );
                 i_ret = -1;
                 break;
         }
@@ -449,7 +450,7 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
     }
     else if( psz_name != NULL && *psz_name )
     {
-        intf_ErrMsg( "module error: requested %s module `%s' not found",
+        intf_ErrMsg( "module error: requested %s module `%s' unavailable",
                      GetCapabilityName( i_capability ), psz_name );
     }
 
@@ -535,7 +536,7 @@ static void AllocateAllPlugins( void )
             psz_fullpath = *ppsz_path;
         }
 
-        intf_WarnMsgImm( 1, "module: browsing `%s'", psz_fullpath );
+        intf_WarnMsg( 1, "module: browsing `%s'", psz_fullpath );
 
         if( (dir = opendir( psz_fullpath )) )
         {
@@ -594,7 +595,7 @@ static int AllocatePluginModule( char * psz_filename )
     if( module_load( psz_filename, &handle ) )
     {
         /* The plugin module couldn't be opened */
-        intf_WarnMsgImm( 1, "module warning: cannot open %s (%s)",
+        intf_WarnMsg( 1, "module warning: cannot open %s (%s)",
                          psz_filename, module_error() );
         return( -1 );
     }
@@ -698,7 +699,7 @@ static int AllocatePluginModule( char * psz_filename )
     p_module_bank->i_count++;
 
     /* Immediate message so that a slow module doesn't make the user wait */
-    intf_WarnMsgImm( 2, "module: new plugin module `%s', %s",
+    intf_WarnMsg( 2, "module: new plugin module `%s', %s",
                      p_module->psz_name, p_module->psz_longname );
 
     return( 0 );
@@ -788,7 +789,7 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
     p_module_bank->i_count++;
 
     /* Immediate message so that a slow module doesn't make the user wait */
-    intf_WarnMsgImm( 2, "module: new builtin module `%s', %s",
+    intf_WarnMsg( 2, "module: new builtin module `%s', %s",
                      p_module->psz_name, p_module->psz_longname );
 
     return( 0 );

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.42 2002/02/08 15:57:29 sam Exp $
+ * $Id: video.h,v 1.43 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -318,8 +318,6 @@ typedef struct subpicture_s
     int             i_y;                   /* offset from alignment position */
     int             i_width;                                /* picture width */
     int             i_height;                              /* picture height */
-    int             i_horizontal_align;              /* horizontal alignment */
-    int             i_vertical_align;                  /* vertical alignment */
 
     /* Additionnal properties depending of the subpicture type */
     union
@@ -356,20 +354,4 @@ typedef struct subpicture_s
 #define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
 #define READY_SUBPICTURE       2                        /* ready for display */
 #define DESTROYED_SUBPICTURE   3           /* allocated but not used anymore */
-
-/* Alignment types */
-#define RIGHT_ALIGN            10                 /* x is absolute for right */
-#define LEFT_ALIGN             11                  /* x is absolute for left */
-#define RIGHT_RALIGN           12      /* x is relative for right from right */
-#define LEFT_RALIGN            13        /* x is relative for left from left */
-
-#define CENTER_ALIGN           20            /* x, y are absolute for center */
-#define CENTER_RALIGN          21 /* x,y are relative for center from center */
-
-#define BOTTOM_ALIGN           30                /* y is absolute for bottom */
-#define TOP_ALIGN              31                   /* y is absolute for top */
-#define BOTTOM_RALIGN          32    /* y is relative for bottom from bottom */
-#define TOP_RALIGN             33          /* y is relative for top from top */
-#define SUBTITLE_RALIGN        34  /* y is relative for center from subtitle */
-
 

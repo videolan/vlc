@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.10 2001/12/30 07:09:56 sam Exp $
+ * $Id: x11.c,v 1.11 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -67,8 +67,6 @@ static void vout_SetPalette( p_vout_thread_t p_vout,
 {
     int i, j;
     XColor p_colors[255];
-
-    intf_DbgMsg( "vout: Palette change called" );
 
     /* allocate palette */
     for( i = 0, j = 255; i < 255; i++, j-- )

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.81 2002/02/15 13:32:53 sam Exp $
+ * $Id: vout_sdl.c,v 1.82 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -473,7 +473,6 @@ static int vout_Manage( vout_thread_t *p_vout )
             case SDLK_F9:  network_ChannelJoin( 9 ); break;
 
             default:
-                intf_DbgMsg( "unhandled key %i", event.key.keysym.sym );
                 break;
             }
             break;

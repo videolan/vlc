@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.21 2001/12/30 07:09:56 sam Exp $
+ * $Id: aout_spdif.c,v 1.22 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -51,8 +51,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
   mtime_t     m_play;
   mtime_t     m_old = 0;
 
-
-  intf_DbgMsg( "aout debug: starting spdif output loop" );
 
   while( !p_aout->b_die )
   {
@@ -103,8 +101,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
             /* check continuity */
             if( (m_play - m_old) != m_frame_time )
             {
-              intf_DbgMsg( "aout debug: malformed frame ? (%lld)",
-                               m_play - m_old );
               mwait( m_play - m_frame_time );
             }
             else
@@ -117,10 +113,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                              (byte_t *)p_aout->buffer,
                              SPDIF_FRAME_SIZE );
           }
-          else
-          {
-            intf_DbgMsg( "aout debug: late spdif frame" );
-          }
         }
         else
         {
@@ -132,7 +124,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     }
   }
 
-  intf_DbgMsg( "aout debug: exiting spdif loop" );
   vlc_mutex_lock( &p_aout->fifos_lock );
 
   for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )

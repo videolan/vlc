@@ -37,29 +37,6 @@
  */
 
 /*****************************************************************************
- * Debugging options - define or undefine symbols
- *****************************************************************************/
-#ifdef TRACE
-/* General trace support, which depends of the TRACE define, is determined
- * in the Makefile */
-
-/* Modules specific debugging - this will produce a lot of output, but can be
- * useful to track a bug */
-//#define TRACE_INTF
-//#define TRACE_INPUT
-//#define TRACE_AUDIO
-#define TRACE_VOUT
-#define TRACE_VPAR
-
-/* Trace log file - if defined, a file can be used to store all messages. If
- * TRACE_LOG_ONLY is defined, debug messages will only be printed to the log and
- * will not appear on the screen */
-#define TRACE_LOG                       "vlc-trace.log"
-#define TRACE_LOG_ONLY
-
-#endif
-
-/*****************************************************************************
  * General configuration
  *****************************************************************************/
 
@@ -115,10 +92,6 @@
 /* Default search path for interface file browser */
 #define INTF_PATH_VAR                   "vlc_search_path"
 #define INTF_PATH_DEFAULT               ""
-
-/* Environment variable containing the standard output method */
-#define INTF_STDOUT_VAR                 "vlc_stdout"
-#define INTF_STDOUT_DEFAULT             ""
 
 /*****************************************************************************
  * Input thread configuration
@@ -457,39 +430,15 @@
 
 /* Maximal size of a message to be stored in the mesage queue,
  * it is needed when vasprintf is not avalaible */
-#define INTF_MAX_MSG_SIZE              512
+#define INTF_MAX_MSG_SIZE               512
 
 /* Maximal size of the message queue - in case of overflow, all messages in the
- * queue are printed by the calling thread */
-#define INTF_MSG_QSIZE                  64
+ * queue are printed, but not sent to the threads */
+#define INTF_MSG_QSIZE                  256
 
 /* Interface warnig message level */
 #define INTF_WARNING_VAR                "vlc_warning_level"
 #define INTF_WARNING_DEFAULT            0
-
-/* Define to enable messages queues - disabling messages queue can be useful
- * when debugging, since it allows messages which would not be printed
- * due to a crash to be printed anyway */
-#ifndef DEBUG
-#define INTF_MSG_QUEUE
-#endif
-
-/* Format of the header for debug messages. The arguments following this header
- * are the file (char *), the function (char *) and the line (int) in which the
- * message function was called */
-#define INTF_MSG_DBG_FORMAT             "## %s:%s(),%i: "
-
-/* Max number of arguments on a command line, including the function name */
-#define INTF_MAX_ARGS                   20
-
-/* Maximal size of a command line in a script */
-#define INTF_MAX_CMD_SIZE               240
-
-/* Number of memorized lines in console window text zone */
-#define INTF_CONSOLE_MAX_TEXT           100
-
-/* Maximal number of commands which can be saved in history list */
-#define INTF_CONSOLE_MAX_HISTORY        20
 
 /****************************************************************************
  * Playlist defaults

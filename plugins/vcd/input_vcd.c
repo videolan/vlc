@@ -464,8 +464,6 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_data )
                 break; /* go to the next sector */
             }
 
-            intf_DbgMsg( "packet start code : %X", i_header );
-
             switch( i_header )
             {
                 /* 0x1b9 == SYSTEM_END_CODE, it is only 4 bytes long. */
@@ -499,9 +497,6 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_data )
                     i_packet_size = U16_AT((p_buffer + ( i_index + 4 )));
                     break;
             }
-
-            intf_DbgMsg( "i_index : %d", i_index );
-            intf_DbgMsg( "i_packet_size : %d", i_packet_size );
 
             if ( i_index + i_packet_size > BUFFER_SIZE )
             {

@@ -2,7 +2,7 @@
  * aout_common.c: generic audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_common.c,v 1.2 2002/01/14 19:54:36 asmax Exp $
+ * $Id: aout_common.c,v 1.3 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -123,7 +123,7 @@ void aout_FillBuffer( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
 
     default:
 
-        intf_DbgMsg("aout debug: unknown fifo type (%i)", p_fifo->i_type);
+        intf_ErrMsg("aout error: unknown fifo type (%i)", p_fifo->i_type);
         break;
     }
 }
@@ -203,9 +203,6 @@ static int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
     {
         l_rate = p_fifo->l_rate;
     }
-
-    intf_DbgMsg( "aout debug: %lli (%li);", aout_date - 
-            p_fifo->date[p_fifo->l_start_frame], l_rate );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->l_rate );
 

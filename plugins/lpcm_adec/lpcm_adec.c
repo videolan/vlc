@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.11 2002/02/15 13:32:53 sam Exp $
+ * $Id: lpcm_adec.c,v 1.12 2002/02/19 00:50:19 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -94,8 +94,6 @@ static int decoder_Run( decoder_config_t * p_config )
 {
     lpcmdec_thread_t *   p_lpcmdec;
 
-    intf_DbgMsg("lpcm_adec debug: thread launched, initializing.");
-    
     /* Allocate the memory needed to store the thread's structure */
     if( (p_lpcmdec = (lpcmdec_thread_t *)malloc (sizeof(lpcmdec_thread_t)) )
             == NULL) 
@@ -118,9 +116,6 @@ static int decoder_Run( decoder_config_t * p_config )
         return( -1 );
     }
 
-    intf_DbgMsg( "LPCM Debug: lpcm decoder thread %p initialized\n", 
-                 p_lpcmdec );
-    
     /* lpcm decoder thread's main loop */
     while ((!p_lpcmdec->p_fifo->b_die) && (!p_lpcmdec->p_fifo->b_error))
     {
@@ -208,9 +203,6 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
         (p_lpcmdec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
     vlc_cond_signal (&p_lpcmdec->p_aout_fifo->data_wait);
     vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
-    
-    intf_DbgMsg( "LPCM Debug: %x", *buffer );
-
 }
 
 /*****************************************************************************
@@ -218,8 +210,6 @@ void DecodeFrame( lpcmdec_thread_t * p_lpcmdec )
  *****************************************************************************/
 static void EndThread( lpcmdec_thread_t * p_lpcmdec )
 {
-    intf_DbgMsg( "LPCM Debug: destroying lpcm decoder thread %p", p_lpcmdec );
-
     /* If the audio output fifo was created, we destroy it */
     if( p_lpcmdec->p_aout_fifo != NULL ) 
     {
@@ -233,6 +223,4 @@ static void EndThread( lpcmdec_thread_t * p_lpcmdec )
 
     /* Destroy descriptor */
     free( p_lpcmdec );
-
-    intf_DbgMsg( "LPCM Debug: lpcm decoder thread %p destroyed", p_lpcmdec );
 }
