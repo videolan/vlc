@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.4 2002/11/23 18:42:59 gbazin Exp $
+ * $Id: playlist.cpp,v 1.5 2002/12/08 19:56:04 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -155,8 +155,10 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
 
+#if !defined(__WXX11__)
     /* Associate drop targets with the playlist */
     SetDropTarget( new DragAndDrop( p_intf ) );
+#endif
 
     /* Update the playlist */
     Rebuild();

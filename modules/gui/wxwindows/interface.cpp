@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.9 2002/11/23 18:42:59 gbazin Exp $
+ * $Id: interface.cpp,v 1.10 2002/12/08 19:56:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -164,8 +164,10 @@ Interface::Interface( intf_thread_t *_p_intf ):
     frame_sizer->Layout();
     frame_sizer->Fit(this);
 
+#if !defined(__WXX11__)
     /* Associate drop targets with the main interface */
     SetDropTarget( new DragAndDrop( p_intf ) );
+#endif
 }
 
 Interface::~Interface()
@@ -232,8 +234,10 @@ void Interface::CreateOurMenuBar()
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
 
+#if !defined(__WXX11__)
     /* Associate drop targets with the menubar */
     menubar->SetDropTarget( new DragAndDrop( p_intf ) );
+#endif
 }
 
 void Interface::CreateOurToolBar()
@@ -285,8 +289,10 @@ void Interface::CreateOurToolBar()
     toolbar_sizer->Layout();
     frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth(), -1 );
 
+#if !defined(__WXX11__)
     /* Associate drop targets with the toolbar */
     toolbar->SetDropTarget( new DragAndDrop( p_intf ) );
+#endif
 }
 
 void Interface::CreateOurSlider()
@@ -451,6 +457,7 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
     vlc_object_release( p_playlist );
 }
 
+#if !defined(__WXX11__)
 /*****************************************************************************
  * Definition of DragAndDrop class.
  *****************************************************************************/
@@ -485,3 +492,4 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 
     return TRUE;
 }
+#endif

@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.15 2002/12/07 15:25:27 gbazin Exp $
+ * $Id: variables.c,v 1.16 2002/12/08 19:56:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,6 +56,7 @@ static void DupString( vlc_value_t *p_val ) { p_val->psz_string = strdup( p_val-
 
 static void FreeDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
 static void FreeString( vlc_value_t *p_val ) { free( p_val->psz_string ); }
+static void FreeMutex( vlc_value_t *p_val ) { vlc_mutex_destroy( (vlc_mutex_t*)p_val->p_address ); free( p_val->p_address ); }
 
 /*****************************************************************************
  * Local prototypes
@@ -172,6 +173,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             break;
         case VLC_VAR_MUTEX:
             p_var->pf_cmp = CmpAddress;
+            p_var->pf_free = FreeMutex;
             p_var->val.p_address = malloc( sizeof(vlc_mutex_t) );
             vlc_mutex_init( p_this, (vlc_mutex_t*)p_var->val.p_address );
             break;
@@ -216,15 +218,6 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 
     /* Free value if needed */
     p_var->pf_free( &p_var->val );
-
-    switch( p_var->i_type & VLC_VAR_TYPE )
-    {
-        /* XXX: find a way to put this in pf_free */
-        case VLC_VAR_MUTEX:
-            vlc_mutex_destroy( (vlc_mutex_t*)p_var->val.p_address );
-            free( p_var->val.p_address );
-            break;
-    }
 
     /* Free choice list if needed */
     if( p_var->pp_choices )

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.3 2002/11/23 14:28:51 gbazin Exp $
+ * $Id: wxwindows.h,v 1.4 2002/12/08 19:56:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -166,6 +166,7 @@ private:
     wxButton *ok_button;
 };
 
+#if !defined(__WXX11__)
 /* Drag and Drop class */
 class DragAndDrop: public wxFileDropTarget
 {
@@ -178,3 +179,4 @@ public:
 private:
     intf_thread_t *p_intf;
 };
+#endif
