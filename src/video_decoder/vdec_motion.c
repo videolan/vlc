@@ -37,6 +37,76 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
+#define __MotionComponents(width,height)		\
+void MotionComponent_x_y_copy_##width##_##height ();	\
+void MotionComponent_X_y_copy_##width##_##height ();	\
+void MotionComponent_x_Y_copy_##width##_##height ();	\
+void MotionComponent_X_Y_copy_##width##_##height ();	\
+void MotionComponent_x_y_avg_##width##_##height ();	\
+void MotionComponent_X_y_avg_##width##_##height ();	\
+void MotionComponent_x_Y_avg_##width##_##height ();	\
+void MotionComponent_X_Y_avg_##width##_##height ();
+
+__MotionComponents (16,16)	/* 444, 422, 420 */
+__MotionComponents (16,8)	/* 444, 422, 420 */
+__MotionComponents (8,8)	/* 422, 420 */
+__MotionComponents (8,4)	/* 420 */
+#if 0
+__MotionComponents (8,16)	/* 422 */
+#endif
+
+#define ___callTheRightOne(width,height)				     \
+    if ((i_width == width) && (i_height == height))			     \
+    {									     \
+	if (!b_average)							     \
+	{								     \
+	    switch (i_select)						     \
+	    {								     \
+	    case 0:							     \
+		MotionComponent_x_y_copy_##width##_##height (p_src, p_dest,  \
+							     i_stride);	     \
+		break;							     \
+	    case 1:							     \
+		MotionComponent_X_y_copy_##width##_##height (p_src, p_dest,  \
+							     i_stride);	     \
+		break;							     \
+	    case 2:							     \
+		MotionComponent_x_Y_copy_##width##_##height (p_src, p_dest,  \
+							     i_stride,	     \
+							     i_step);	     \
+		break;							     \
+	    case 3:							     \
+		MotionComponent_X_Y_copy_##width##_##height (p_src, p_dest,  \
+							     i_stride,	     \
+							     i_step);	     \
+		break;							     \
+	    }								     \
+	}								     \
+	else								     \
+	{								     \
+	    switch (i_select)						     \
+	    {								     \
+	    case 0:							     \
+		MotionComponent_x_y_avg_##width##_##height (p_src, p_dest,   \
+							    i_stride);	     \
+		break;							     \
+	    case 1:							     \
+		MotionComponent_X_y_avg_##width##_##height (p_src, p_dest,   \
+							    i_stride);	     \
+		break;							     \
+	    case 2:							     \
+		MotionComponent_x_Y_avg_##width##_##height (p_src, p_dest,   \
+							    i_stride,	     \
+							    i_step);	     \
+		break;							     \
+	    case 3:							     \
+		MotionComponent_X_Y_avg_##width##_##height (p_src, p_dest,   \
+							    i_stride,	     \
+							    i_step);	     \
+		break;							     \
+	    }								     \
+	}								     \
+    }
 /*****************************************************************************
  * vdec_MotionComponent : last stage of motion compensation
  *****************************************************************************/
@@ -54,175 +124,13 @@ static __inline__ void MotionComponent(
                     boolean_t b_average     /* (explicit) averaging of several
                                              * predictions */ )
 {
-    int i_x, i_y, i_x1;
-    unsigned int i_dummy;
-
-    if( !b_average )
-    {
-        /* Please note that b_average will be expanded at compile time */
-
-        switch( i_select )
-        {
-        case 0:
-            /* !xh, !yh, !average */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             p_dest[i_x+i_x1] = p_src[i_x+i_x1];
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-
-        case 1:
-            /* xh, !yh, !average */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1]
-                                                      + p_src[i_x+i_x1 + 1] + 1)
-                                                    >> 1;
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-
-        case 2:
-            /* !xh, yh, !average */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1] + 1
-                                                + p_src[i_x+i_x1 + i_step])
-                                              >> 1;
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-
-        case 3:
-            /* xh, yh, !average (3) */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             p_dest[i_x+i_x1]
-                                = ((unsigned int)(
-                                      p_src[i_x+i_x1]
-                                    + p_src[i_x+i_x1 + 1]
-                                    + p_src[i_x+i_x1 + i_step]
-                                    + p_src[i_x+i_x1 + i_step + 1]
-                                    + 2) >> 2);
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-        }
-
-    }
-    else
-    {
-        /* b_average */
-        switch( i_select )
-        {
-        case 0:
-            /* !xh, !yh, average */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             i_dummy = p_dest[i_x + i_x1] + p_src[i_x + i_x1];
-                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-
-        case 1:
-            /* xh, !yh, average */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             i_dummy = p_dest[i_x+i_x1]
-                                + ((unsigned int)(p_src[i_x+i_x1]
-                                                  + p_src[i_x+i_x1 + 1] + 1) >> 1);
-                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-
-        case 2:
-            /* !xh, yh, average */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             i_dummy = p_dest[i_x+i_x1]
-                                + ((unsigned int)(p_src[i_x+i_x1] + 1
-                                         + p_src[i_x+i_x1 + i_step]) >> 1);
-                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-
-        case 3:
-            /* xh, yh, average */
-            for( i_y = 0; i_y < i_height; i_y ++ )
-            {
-                    for( i_x = 0; i_x < i_width; i_x += 8 )
-                    {
-                         for( i_x1 = 0; i_x1 < 8; i_x1++ )
-                         {
-                             i_dummy = p_dest[i_x+i_x1]
-                                + ((unsigned int)(
-                                      p_src[i_x+i_x1]
-                                    + p_src[i_x+i_x1 + 1]
-                                    + p_src[i_x+i_x1 + i_step]
-                                    + p_src[i_x+i_x1 + i_step + 1]
-                                    + 2) >> 2);
-                             p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
-                         }
-                    }
-                    p_dest += i_stride;
-                    p_src += i_stride;
-            }
-            break;
-        }
-    }
+___callTheRightOne (16,16)
+___callTheRightOne (16,8)
+___callTheRightOne (8,8)
+___callTheRightOne (8,4)
+#if 0
+___callTheRightOne (8,16)
+#endif
 }
 
 /*****************************************************************************

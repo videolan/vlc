@@ -241,6 +241,7 @@ video_parser_obj = 		video_parser/video_parser.o \
 
 video_decoder_obj =		video_decoder/video_decoder.o \
 						video_decoder/vdec_motion.o \
+						video_decoder/vdec_motion_inner.o \
 			                        video_decoder/vdec_idct.o
 endif
 
