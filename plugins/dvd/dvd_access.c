@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.22 2002/07/31 20:56:51 sam Exp $
+ * $Id: dvd_access.c,v 1.23 2002/08/01 12:58:38 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -88,11 +88,12 @@ static char * DVDParse( input_thread_t * );
  *****************************************************************************/
 int E_(DVDOpen) ( vlc_object_t *p_this )
 {
-    input_thread_t *        p_input = (input_thread_t *)p_this;
+    input_thread_t *     p_input = (input_thread_t *)p_this;
     char *               psz_device;
     thread_dvd_data_t *  p_dvd;
     input_area_t *       p_area;
     int                  i;
+    char *               psz_dvdcss_env;
 
     p_dvd = malloc( sizeof(thread_dvd_data_t) );
     if( p_dvd == NULL )
@@ -118,6 +119,28 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
      * set up input
      */ 
     p_input->i_mtu = 0;
+
+    /* override environment variable DVDCSS_METHOD with config option
+     * (FIXME: this creates a small memory leak) */
+    psz_dvdcss_env = config_GetPsz( p_input, "dvd-css-method" );
+    if( psz_dvdcss_env && *psz_dvdcss_env )
+    {
+        char *psz_env;
+
+        psz_env = malloc( strlen("DVDCSS_METHOD=") +
+                          strlen( psz_dvdcss_env ) + 1 );
+
+        if( !psz_env )
+        {
+            free( p_dvd );
+            return -1;
+        }
+
+        sprintf( psz_env, "%s%s", "DVDCSS_METHOD=", psz_dvdcss_env );
+
+        putenv( psz_env );
+    }
+    if( psz_dvdcss_env ) free( psz_dvdcss_env );
 
     /*
      *  get plugin ready

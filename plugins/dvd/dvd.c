@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.34 2002/07/31 20:56:51 sam Exp $
+ * $Id: dvd.c,v 1.35 2002/08/01 12:58:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,9 +61,29 @@ static void UnprobeLibDVDCSS( void );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CSSMETHOD_TEXT N_("Method to use by libdvdcss for key decryption")
+#define CSSMETHOD_LONGTEXT N_( \
+    "title: decrypted title key is guessed from the encrypted sectors of " \
+           "the stream. Thus it should work with a file as well as the " \
+           "DVD device. But it sometimes takes much time to decrypt a title " \
+           "key and may even fail. With this method, the key is only checked "\
+           "at the beginning of each title, so it won't work if the key " \
+           "changes in the middle of a title.\n" \
+    "disc: the disc key is first cracked, then all title keys can be " \
+           "decrypted instantly, which allows us to check them often.\n" \
+    "key: the same as \"disc\" if you don't have a file with player keys " \
+           "at compilation time. If you do, the decryption of the disc key " \
+           "will be faster with this method. It is the one that was used by " \
+           "libcss.\n" \
+    "The default method is: key.")
+
+static char *cssmethod_list[] = { "title", "disc", "key", NULL };
+
 vlc_module_begin();
     int i;
     add_category_hint( N_("[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"), NULL );
+    add_string_from_list( "dvd-css-method", NULL, cssmethod_list, NULL,
+                          CSSMETHOD_TEXT, CSSMETHOD_LONGTEXT );
 #ifdef GOD_DAMN_DMCA
     set_description( _("DVD input module, uses libdvdcss if installed") );
     i = 90;
