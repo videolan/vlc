@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.125 2003/07/14 21:32:59 sigmunau Exp $
+ * $Id: modules.c,v 1.126 2003/07/24 22:58:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -400,7 +400,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
         }
 
         /* Special case: test if we requested a particular intf plugin */
-        if( p_module->psz_program
+        if( !i_shortcuts && p_module->psz_program
              && !strcmp( p_module->psz_program,
                          p_this->p_vlc->psz_object_name ) )
         {
