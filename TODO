@@ -103,7 +103,7 @@ Description: Rewrite the SAP parser
  The SAP parser is very dirty at the moment, and needs a complete rewrite.
  - caching support<br />
 Mostly finished. Closely tied to the new playlist system
-Status: Assigned to zorglub
+Status: Done
 
 Task
 Difficulty: Medium
@@ -121,6 +121,7 @@ Todo:<br />
    - *   "Protocol rollover" node<br />
    - *** Fix autodeletion<br />
    - *** Item moving/copying facilities<br />
+   - *** Live directory representation<br /> 
 - Helper modules<br />
    - **  ASX and B4S parsers (see below)<br />
    - *   Rewrite SLP announce discovery<br />
@@ -218,7 +219,9 @@ Difficulty: Medium
 Urgency: Wishlist
 Platform: any
 Description: Closed Captions/Teletext support
-In order to conform to international regulations, VLC needs to be able to decode the closed captions in TV, DVD, DVB and HDTV video. V4L has a CC api, DVD and HDTV usually have them in a seperate stream.
+In order to conform to international regulations, VLC needs to be able to decode the closed captions in TV, DVD, DVB and HDTV video. V4L has a CC api, DVD and HDTV usually have them in a seperate stream.<br />
+ - Use ZVBI library for VBI decoding and image generation<br />
+ - ESTI EN 300 472 for EBU teletext support in DVB<br />
 Perhaps look at Xawtv, dvbtext and other vbi, vtx systems.
 Status: Todo
 
@@ -290,8 +293,8 @@ Task
 Difficulty: Easy
 Urgency: Wishlist
 Platform: any
-Description: More Picture filters
-There are several picture filters (blend, scale), but we can use more (crop, move..)
+Description: More/Better Picture filters
+There are several picture filters (blend, scale), but we can use more (screenshot, crop, move..) We probably need on the fly picture filter insertion as well.
 Status: Todo
 
 Task
@@ -314,7 +317,6 @@ Urgency: Wishlist
 Platform: any
 Description: Subtitle work
 - better SSA support with postioning, colors etc.
-- Vobsub seeking
 - Fix subtitles dialogs (mac done)
 Status: Todo
 
@@ -424,7 +426,7 @@ Platform: any
 Description: SSL http
 SSL encrypted HTTP communication. To support protected VoD.<br />
 The question is how to neatly integrate it into our API. Support for all our http handling plugins means complicating the API. Perhaps we should store the SSL context in the p_sys of the vlc_object that is calling it? Tad dangerous, but would keep stuff simple.
-Status: Todo
+Status: Done
 
 Task
 Difficulty: Hard
@@ -438,7 +440,7 @@ Task
 Difficulty: Easy
 Urgency: Wishlist
 Platform: any
-Description: mime-type VLC launching
+Description: Progressive download playing
 Allow application/vlc mimetype to launch VLC instead of plugin for video file.
 Allows for Progressive download to TEMP folder from browsers. VLC would play the file in the TEMP.
 Status: Todo
@@ -550,6 +552,7 @@ Difficulty: Hard
 Platform: any
 Urgency: Wishlist
 Description: Matroska muxer
+ We need one :)
 Status: Todo
 
 Task
@@ -567,7 +570,7 @@ Platform: any
 Urgency: Wishlist
 Description: Option to automatically deinterlace when needed
   Mkv stores wether a video track is interlaced in the traxk descriptor
-  libmpeg2 etc output this information on a per-picture bases
+  libmpeg2 etc output this information in the header AND on a per-picture basis
 Status: Todo
 
 Task
@@ -592,12 +595,43 @@ Task
 Difficulty: Medium
 Platform: any
 Urgency: Wishlist
-Description: More service discovry modules
+Description: More service discovery modules
 - Port UPnP support from http://sourceforge.net/project/showfiles.php?group_id=89768 <br />
 - libhal based discovery (should be able to find cd,dvd,capture cards,etc etc <br />
 - Perhaps a generalized webpage parser (use user supplied templates to parse
    streams from popular websites )
 Status: Todo
+
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: Autoselect a track based on preferred language
+Problems might exist with formats that don't have headers?
+Most part easy to do, because the language info is stored in the ES format structs these days.
+Status: Todo
+
+Task
+Difficulty: Hard
+Platform: any
+Urgency: Immediate
+Description: Clock Synchro redesign
+We need to adapt the clock synchro to work better with BOTH files and streams.
+Status: Todo
+
+Task
+Difficulty: Easy
+Platform: win32
+Urgency: Wishlist
+Description: file filters in the open dialog
+Have default filters in the open dialog. like:
+All files<br />
+Sound Files( .mp3, .ogg, .wav, .m4a, .m4p)<br />
+Video Files( .avi, .mkv, .mov, .mpg, .m2v, etc)<br />
+Subtitle Files( .idx, .sub, .utf, .srt)<br />
+Status: Todo
+
+
 
 # Do not remove me
 Task
