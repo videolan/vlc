@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.13 2003/12/13 12:56:59 rocky Exp $
+ * $Id: cdda.c,v 1.14 2003/12/20 11:56:56 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -169,7 +169,7 @@ vlc_module_begin();
 
     add_bool( MODULE_STRING "-cddb-httpd", 0, NULL,
 	      N_("Contact CDDB via the HTTP protocol?"),
-	      N_("If set, the CDDB server get information via the CDDB HTTP "
+	      N_("If set, the CDDB server gets information via the CDDB HTTP "
 		 "protocol"),
 	      VLC_TRUE );
 
