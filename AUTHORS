@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.95 2003/07/07 17:01:16 sam Exp $
+# $Id: AUTHORS,v 1.96 2003/08/06 12:01:06 jpsaman Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -253,8 +253,9 @@ N: Jean-Paul Saman
 E: jpsaman@wxs.nl
 D: libmad plug-in
 D: iPAQ port
-D: Familiar Linux interface
+D: Familiar and PDA Linux interface
 D: Dutch Translation
+D: DVB-S/C/T on v4l2 API
 S: Netherlands
 
 N: Arnaud Schauly
