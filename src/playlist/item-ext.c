@@ -477,7 +477,10 @@ int playlist_Delete( playlist_t * p_playlist, int i_id )
 
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
 
-    if( p_item == NULL ) return VLC_EGENERIC;
+    if( p_item == NULL )
+    {
+        return VLC_EGENERIC;
+    }
 
     /* Check if it is the current item */
     if( p_playlist->status.p_item == p_item )

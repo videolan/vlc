@@ -91,6 +91,7 @@ enum
     Infos_Event,
 
     PopupPlay_Event,
+    PopupPlayThis_Event,
     PopupDel_Event,
     PopupEna_Event,
     PopupInfo_Event,
@@ -144,6 +145,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
 
     /* Popup events */
     EVT_MENU( PopupPlay_Event, Playlist::OnPopupPlay)
+    EVT_MENU( PopupPlayThis_Event, Playlist::OnPopupPlay)
     EVT_MENU( PopupDel_Event, Playlist::OnPopupDel)
     EVT_MENU( PopupEna_Event, Playlist::OnPopupEna)
     EVT_MENU( PopupInfo_Event, Playlist::OnPopupInfo)
@@ -260,6 +262,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Create the popup menu */
     popup_menu = new wxMenu;
     popup_menu->Append( PopupPlay_Event, wxU(_("Play")) );
+    popup_menu->Append( PopupPlayThis_Event, wxU(_("Play this branch")) );
     popup_menu->Append( PopupDel_Event, wxU(_("Delete")) );
     popup_menu->Append( PopupEna_Event, wxU(_("Enable/Disable")) );
     popup_menu->Append( PopupInfo_Event, wxU(_("Info")) );
@@ -330,9 +333,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     icons[ ITEM_TYPE_NET ] = wxIcon( type_net_xpm );
     icons[ ITEM_TYPE_CARD ] = wxIcon( type_card_xpm );
 
-    for( int i = 0; i< WXSIZEOF( icons ) ; i++ )
+    for( unsigned int i = 0; i< WXSIZEOF( icons ) ; i++ )
     {
-//       p_images->Add( wxBitmap( wxBitmap(icons[i]).ConvertToImage().Rescale(16,16) ) );
          p_images->Add( wxIcon( icons[i] ));
     }
 
@@ -1144,24 +1146,15 @@ void Playlist::OnRepeat( wxCommandEvent& event )
     vlc_object_release( p_playlist );
 }
 
-
-
 void Playlist::OnActivateItem( wxTreeEvent& event )
 {
     playlist_item_t *p_item,*p_node;
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
-		                 VLC_OBJECT_PLAYLIST,FIND_ANYWHERE );
-    PlaylistItem *p_wxitem = (PlaylistItem *)treectrl->GetItemData( 
-		                                   event.GetItem() );
+                                    VLC_OBJECT_PLAYLIST,FIND_ANYWHERE );
+    PlaylistItem *p_wxitem = (PlaylistItem *)treectrl->GetItemData(
+                                                        event.GetItem() );
     wxTreeItemId parent = treectrl->GetItemParent( event.GetItem() );
-    if( parent.IsOk() )
-    {
-        fprintf(stderr,"Ca gère\n" );
-    }
-    else
-    {
-        fprintf(stderr,"Ca craint\n" );
-    }
+
     PlaylistItem *p_wxparent = (PlaylistItem *)treectrl->GetItemData( parent );
 
     if( p_playlist == NULL )
@@ -1177,7 +1170,14 @@ void Playlist::OnActivateItem( wxTreeEvent& event )
     else
     {
         p_node = p_wxitem->p_item;
-        p_item = NULL;
+        if( p_wxitem->p_item->i_children > 0 )
+        {
+            p_item = p_wxitem->p_item->pp_children[0];
+        }
+        else
+        {
+            p_item = NULL;
+        }
     }
 
     playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, i_current_view,
@@ -1376,9 +1376,30 @@ void Playlist::OnPopupPlay( wxMenuEvent& event )
     }
     if( p_popup_item != NULL )
     {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
-                          VIEW_SIMPLE, p_popup_parent, p_popup_item );
-                                /*FIXME*/
+        if( p_popup_item->i_children > -1 )
+        {
+            if( event.GetId() == PopupPlay_Event &&
+                p_popup_item->i_children > 0 )
+            {
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                                  i_current_view, p_popup_item,
+                                  p_popup_item->pp_children[0] );
+            }
+            else
+            {
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                                  i_current_view, p_popup_item, NULL );
+            }
+        }
+        else
+        {
+            if( event.GetId() == PopupPlay_Event )
+            {
+                playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                                  i_current_view, p_popup_parent,
+                                  p_popup_item );
+            }
+        }
     }
     vlc_object_release( p_playlist );
 }
