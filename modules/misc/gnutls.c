@@ -546,6 +546,7 @@ static tls_session_t *
 gnutls_ServerSessionPrepare( tls_server_t *p_server )
 {
     tls_session_t *p_session;
+    tls_server_sys_t *p_server_sys;
     gnutls_session session;
     int i_val;
 
@@ -562,12 +563,12 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
 
     vlc_object_attach( p_session, p_server );
 
+    p_server_sys = (tls_server_sys_t *)p_server->p_sys;
     p_session->sock.p_sys = p_session;
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
     p_session->pf_handshake = gnutls_BeginHandshake;
-    p_session->pf_handshake2 = ((tls_server_sys_t *)
-                               (p_server->p_sys))->pf_handshake2;
+    p_session->pf_handshake2 = p_server_sys->pf_handshake2;
     p_session->pf_close = gnutls_SessionClose;
 
     ((tls_session_sys_t *)p_session->p_sys)->b_handshaked = VLC_FALSE;
@@ -592,8 +593,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     }
 
     i_val = gnutls_credentials_set( session, GNUTLS_CRD_CERTIFICATE,
-                                    ((tls_server_sys_t *)(p_server->p_sys))
-                                    ->x509_cred );
+                                    p_server_sys->x509_cred );
     if( i_val < 0 )
     {
         msg_Err( p_server, "Cannot set TLS session credentials : %s",
@@ -602,9 +602,8 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
         goto error;
     }
 
-    /* TODO: support for client authentication */
-    /*gnutls_certificate_server_set_request( p_session->session,
-                                           GNUTLS_CERT_REQUEST ); */
+    if( p_session->pf_handshake2 == gnutls_HandshakeAndValidate )
+        gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUIRE );
 
     gnutls_dh_set_prime_bits( session, get_Int( p_server, "dh-bits" ) );
 
