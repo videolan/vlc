@@ -1,5 +1,5 @@
 /*
- * This file was created automatically by glade and fixed by fixfiles.sh
+ * NE PAS ÉDITER CE FICHIER - il est généré par Glade.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -11,7 +11,7 @@
 /*
  * Standard gettext macros.
  */
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
+#ifdef ENABLE_NLS
 #  include <libintl.h>
 #  undef _
 #  define _(String) dgettext (PACKAGE, String)

@@ -163,3 +163,35 @@ GtkSatOpenOk                           (GtkButton       *button,
 void
 GtkSatOpenCancel                       (GtkButton       *button,
                                         gpointer         user_data);
+
+void
+GnomeNetworkOpenUDP                    (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GnomeNetworkOpenMulticast              (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GnomeNetworkOpenChannel                (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GnomeNetworkOpenHTTP                   (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenUDP                      (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenMulticast                (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenHTTP                     (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);

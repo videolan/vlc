@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.18 2002/03/25 02:06:24 jobi Exp $
+ * $Id: gtk_callbacks.h,v 1.19 2002/05/18 02:12:20 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -105,4 +105,28 @@ GtkSatOpenOk                           (GtkButton       *button,
 
 void
 GtkSatOpenCancel                       (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenUDP                      (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenMulticast                (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenCS                       (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenHTTP                     (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkNetworkOpenChannel                  (GtkToggleButton *togglebutton,
                                         gpointer         user_data);

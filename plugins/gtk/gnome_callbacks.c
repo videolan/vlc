@@ -273,3 +273,4 @@ GnomeMenubarMessagesActivate           (GtkMenuItem     *menuitem,
 {
     GtkMessagesShow( GTK_WIDGET( menuitem ), NULL, "intf_window" );
 }
+

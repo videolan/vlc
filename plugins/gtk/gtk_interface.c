@@ -1,6 +1,10 @@
-/* This file was created automatically by glade and fixed by fixfiles.sh */
+/*
+ * NE PAS ÉDITER CE FICHIER - il est généré par Glade.
+ */
 
-#include <videolan/vlc.h>
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1592,7 +1596,7 @@ create_intf_disc (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (disc_name);
   gtk_box_pack_start (GTK_BOX (hbox2), disc_name, TRUE, TRUE, 0);
-  gtk_entry_set_text (GTK_ENTRY (disc_name), config_GetPszVariable( "dvd" ));
+  gtk_entry_set_text (GTK_ENTRY (disc_name), _("/dev/dvd"));
 
   dialog_action_area1 = GTK_DIALOG (intf_disc)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_action_area1", dialog_action_area1);
@@ -1642,33 +1646,31 @@ create_intf_network (void)
   GtkWidget *intf_network;
   GtkWidget *vbox7;
   GtkWidget *vbox8;
-  GtkWidget *hbox6;
-  GtkWidget *frame4;
-  GtkWidget *vbox9;
-  GSList *network_group = NULL;
-  GtkWidget *network_ts;
-  GtkWidget *network_rtp;
-  GtkWidget *network_http;
-  GtkWidget *frame5;
-  GtkWidget *table2;
-  GtkObject *network_port_adj;
-  GtkWidget *network_port;
-  GtkWidget *network_port_label;
-  GtkWidget *network_server_label;
-  GtkWidget *network_broadcast_check;
-  GtkWidget *network_broadcast_combo;
-  GtkWidget *network_broadcast;
-  GtkWidget *network_server_combo;
-  GList *network_server_combo_items = NULL;
-  GtkWidget *network_server;
-  GtkWidget *frame6;
-  GtkWidget *hbox14;
-  GtkWidget *network_channel_check;
-  GtkWidget *network_channel_combo;
+  GtkWidget *frame9;
+  GtkWidget *table4;
+  GSList *table4_group = NULL;
+  GtkWidget *network_udp;
+  GtkWidget *network_multicast;
   GtkWidget *network_channel;
+  GtkWidget *network_http;
+  GtkWidget *network_udp_port_label;
+  GtkWidget *network_multicast_address_label;
+  GtkWidget *network_channel_address_label;
+  GtkWidget *network_http_url_label;
+  GtkWidget *combo1;
+  GtkWidget *network_multicast_address;
+  GtkObject *network_udp_port_adj;
+  GtkWidget *network_udp_port;
+  GtkWidget *combo2;
+  GtkWidget *network_channel_address;
+  GtkWidget *network_multicast_port_label;
   GtkWidget *network_channel_port_label;
+  GtkObject *network_multicast_port_adj;
+  GtkWidget *network_multicast_port;
   GtkObject *network_channel_port_adj;
   GtkWidget *network_channel_port;
+  GtkWidget *network_http_url;
+  GtkWidget *label28;
   GtkWidget *hbox4;
   GtkWidget *hbox5;
   GtkWidget *network_ok;
@@ -1693,196 +1695,214 @@ create_intf_network (void)
   gtk_box_pack_start (GTK_BOX (vbox7), vbox8, TRUE, TRUE, 0);
   gtk_container_set_border_width (GTK_CONTAINER (vbox8), 5);
 
-  hbox6 = gtk_hbox_new (FALSE, 5);
-  gtk_widget_ref (hbox6);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "hbox6", hbox6,
+  frame9 = gtk_frame_new (_("Network mode"));
+  gtk_widget_ref (frame9);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "frame9", frame9,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (hbox6);
-  gtk_box_pack_start (GTK_BOX (vbox8), hbox6, TRUE, TRUE, 0);
+  gtk_widget_show (frame9);
+  gtk_box_pack_start (GTK_BOX (vbox8), frame9, TRUE, TRUE, 0);
 
-  frame4 = gtk_frame_new (_("Protocol"));
-  gtk_widget_ref (frame4);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "frame4", frame4,
+  table4 = gtk_table_new (4, 6, FALSE);
+  gtk_widget_ref (table4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "table4", table4,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (frame4);
-  gtk_box_pack_start (GTK_BOX (hbox6), frame4, TRUE, TRUE, 0);
+  gtk_widget_show (table4);
+  gtk_container_add (GTK_CONTAINER (frame9), table4);
+  gtk_container_set_border_width (GTK_CONTAINER (table4), 9);
+  gtk_table_set_col_spacings (GTK_TABLE (table4), 6);
 
-  vbox9 = gtk_vbox_new (FALSE, 0);
-  gtk_widget_ref (vbox9);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "vbox9", vbox9,
+  network_udp = gtk_radio_button_new_with_label (table4_group, _("UDP"));
+  table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_udp));
+  gtk_widget_ref (network_udp);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_udp", network_udp,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (vbox9);
-  gtk_container_add (GTK_CONTAINER (frame4), vbox9);
-
-  network_ts = gtk_radio_button_new_with_label (network_group, _("TS"));
-  network_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_ts));
-  gtk_widget_ref (network_ts);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_ts", network_ts,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_ts);
-  gtk_box_pack_start (GTK_BOX (vbox9), network_ts, FALSE, FALSE, 0);
-
-  network_rtp = gtk_radio_button_new_with_label (network_group, _("RTP"));
-  network_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_rtp));
-  gtk_widget_ref (network_rtp);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_rtp", network_rtp,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_rtp);
-  gtk_box_pack_start (GTK_BOX (vbox9), network_rtp, FALSE, FALSE, 0);
-  gtk_widget_set_sensitive (network_rtp, FALSE);
-
-  network_http = gtk_radio_button_new_with_label (network_group, _("HTTP"));
-  network_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_http));
-  gtk_widget_ref (network_http);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_http", network_http,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_http);
-  gtk_box_pack_start (GTK_BOX (vbox9), network_http, FALSE, FALSE, 0);
-
-  frame5 = gtk_frame_new (_("Server"));
-  gtk_widget_ref (frame5);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "frame5", frame5,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (frame5);
-  gtk_box_pack_start (GTK_BOX (hbox6), frame5, TRUE, TRUE, 0);
-
-  table2 = gtk_table_new (3, 2, FALSE);
-  gtk_widget_ref (table2);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "table2", table2,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (table2);
-  gtk_container_add (GTK_CONTAINER (frame5), table2);
-  gtk_container_set_border_width (GTK_CONTAINER (table2), 5);
-  gtk_table_set_row_spacings (GTK_TABLE (table2), 5);
-  gtk_table_set_col_spacings (GTK_TABLE (table2), 5);
-
-  network_port_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
-  network_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_port_adj), 1, 0);
-  gtk_widget_ref (network_port);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_port", network_port,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_port);
-  gtk_table_attach (GTK_TABLE (table2), network_port, 1, 2, 1, 2,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-
-  network_port_label = gtk_label_new (_("Port"));
-  gtk_widget_ref (network_port_label);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_port_label", network_port_label,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_port_label);
-  gtk_table_attach (GTK_TABLE (table2), network_port_label, 0, 1, 1, 2,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (network_port_label), 0, 0.5);
-
-  network_server_label = gtk_label_new (_("Address"));
-  gtk_widget_ref (network_server_label);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server_label", network_server_label,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_server_label);
-  gtk_table_attach (GTK_TABLE (table2), network_server_label, 0, 1, 0, 1,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (network_server_label), 0, 0.5);
-
-  network_broadcast_check = gtk_check_button_new_with_label (_("Broadcast"));
-  gtk_widget_ref (network_broadcast_check);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_broadcast_check", network_broadcast_check,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_broadcast_check);
-  gtk_table_attach (GTK_TABLE (table2), network_broadcast_check, 0, 1, 2, 3,
+  gtk_widget_show (network_udp);
+  gtk_table_attach (GTK_TABLE (table4), network_udp, 0, 1, 0, 1,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  network_broadcast_combo = gtk_combo_new ();
-  gtk_widget_ref (network_broadcast_combo);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_broadcast_combo", network_broadcast_combo,
+  network_multicast = gtk_radio_button_new_with_label (table4_group, _("UDP Multicast"));
+  table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_multicast));
+  gtk_widget_ref (network_multicast);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_multicast", network_multicast,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_broadcast_combo);
-  gtk_table_attach (GTK_TABLE (table2), network_broadcast_combo, 1, 2, 2, 3,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+  gtk_widget_show (network_multicast);
+  gtk_table_attach (GTK_TABLE (table4), network_multicast, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  gtk_widget_set_sensitive (network_broadcast_combo, FALSE);
 
-  network_broadcast = GTK_COMBO (network_broadcast_combo)->entry;
-  gtk_widget_ref (network_broadcast);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_broadcast", network_broadcast,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_broadcast);
-  gtk_widget_set_sensitive (network_broadcast, FALSE);
-  gtk_entry_set_text (GTK_ENTRY (network_broadcast), _("138.195.143.255"));
-
-  network_server_combo = gtk_combo_new ();
-  gtk_widget_ref (network_server_combo);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server_combo", network_server_combo,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_server_combo);
-  gtk_table_attach (GTK_TABLE (table2), network_server_combo, 1, 2, 0, 1,
-                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  network_server_combo_items = g_list_append (network_server_combo_items, (gpointer) _("vls"));
-  gtk_combo_set_popdown_strings (GTK_COMBO (network_server_combo), network_server_combo_items);
-  g_list_free (network_server_combo_items);
-
-  network_server = GTK_COMBO (network_server_combo)->entry;
-  gtk_widget_ref (network_server);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server", network_server,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_server);
-  gtk_entry_set_text (GTK_ENTRY (network_server), _("vls"));
-
-  frame6 = gtk_frame_new (_("Channels"));
-  gtk_widget_ref (frame6);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "frame6", frame6,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (frame6);
-  gtk_box_pack_start (GTK_BOX (vbox8), frame6, TRUE, TRUE, 5);
-  gtk_frame_set_label_align (GTK_FRAME (frame6), 0.05, 0.5);
-
-  hbox14 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_ref (hbox14);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "hbox14", hbox14,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (hbox14);
-  gtk_container_add (GTK_CONTAINER (frame6), hbox14);
-
-  network_channel_check = gtk_check_button_new_with_label (_("Channel server:"));
-  gtk_widget_ref (network_channel_check);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_check", network_channel_check,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_channel_check);
-  gtk_box_pack_start (GTK_BOX (hbox14), network_channel_check, FALSE, FALSE, 0);
-
-  network_channel_combo = gtk_combo_new ();
-  gtk_widget_ref (network_channel_combo);
-  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_combo", network_channel_combo,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_channel_combo);
-  gtk_box_pack_start (GTK_BOX (hbox14), network_channel_combo, TRUE, TRUE, 0);
-
-  network_channel = GTK_COMBO (network_channel_combo)->entry;
+  network_channel = gtk_radio_button_new_with_label (table4_group, _("Channel server "));
+  table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_channel));
   gtk_widget_ref (network_channel);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel", network_channel,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_channel);
-  gtk_entry_set_text (GTK_ENTRY (network_channel), _("138.195.143.120"));
+  gtk_table_attach (GTK_TABLE (table4), network_channel, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
-  network_channel_port_label = gtk_label_new (_("port:"));
+  network_http = gtk_radio_button_new_with_label (table4_group, _("HTTP"));
+  table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_http));
+  gtk_widget_ref (network_http);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_http", network_http,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_http);
+  gtk_table_attach (GTK_TABLE (table4), network_http, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  network_udp_port_label = gtk_label_new (_("Port"));
+  gtk_widget_ref (network_udp_port_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_udp_port_label", network_udp_port_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_udp_port_label);
+  gtk_table_attach (GTK_TABLE (table4), network_udp_port_label, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (network_udp_port_label), 1, 0.5);
+
+  network_multicast_address_label = gtk_label_new (_("Address"));
+  gtk_widget_ref (network_multicast_address_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_multicast_address_label", network_multicast_address_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_multicast_address_label);
+  gtk_table_attach (GTK_TABLE (table4), network_multicast_address_label, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (network_multicast_address_label, FALSE);
+  gtk_label_set_justify (GTK_LABEL (network_multicast_address_label), GTK_JUSTIFY_RIGHT);
+  gtk_misc_set_alignment (GTK_MISC (network_multicast_address_label), 1, 0.5);
+
+  network_channel_address_label = gtk_label_new (_("Address"));
+  gtk_widget_ref (network_channel_address_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_address_label", network_channel_address_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_address_label);
+  gtk_table_attach (GTK_TABLE (table4), network_channel_address_label, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (network_channel_address_label, FALSE);
+
+  network_http_url_label = gtk_label_new (_("URL"));
+  gtk_widget_ref (network_http_url_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_http_url_label", network_http_url_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_http_url_label);
+  gtk_table_attach (GTK_TABLE (table4), network_http_url_label, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (network_http_url_label, FALSE);
+  gtk_misc_set_alignment (GTK_MISC (network_http_url_label), 1, 0.5);
+
+  combo1 = gtk_combo_new ();
+  gtk_widget_ref (combo1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "combo1", combo1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo1);
+  gtk_table_attach (GTK_TABLE (table4), combo1, 2, 4, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  network_multicast_address = GTK_COMBO (combo1)->entry;
+  gtk_widget_ref (network_multicast_address);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_multicast_address", network_multicast_address,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_multicast_address);
+  gtk_widget_set_sensitive (network_multicast_address, FALSE);
+
+  network_udp_port_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
+  network_udp_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_udp_port_adj), 1, 0);
+  gtk_widget_ref (network_udp_port);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_udp_port", network_udp_port,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_udp_port);
+  gtk_table_attach (GTK_TABLE (table4), network_udp_port, 2, 3, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_usize (network_udp_port, 1, -2);
+
+  combo2 = gtk_combo_new ();
+  gtk_widget_ref (combo2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "combo2", combo2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo2);
+  gtk_table_attach (GTK_TABLE (table4), combo2, 2, 4, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  network_channel_address = GTK_COMBO (combo2)->entry;
+  gtk_widget_ref (network_channel_address);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_address", network_channel_address,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_address);
+  gtk_widget_set_sensitive (network_channel_address, FALSE);
+
+  network_multicast_port_label = gtk_label_new (_("Port"));
+  gtk_widget_ref (network_multicast_port_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_multicast_port_label", network_multicast_port_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_multicast_port_label);
+  gtk_table_attach (GTK_TABLE (table4), network_multicast_port_label, 4, 5, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_usize (network_multicast_port_label, 51, -2);
+  gtk_widget_set_sensitive (network_multicast_port_label, FALSE);
+  gtk_misc_set_alignment (GTK_MISC (network_multicast_port_label), 1, 0.5);
+
+  network_channel_port_label = gtk_label_new (_("Port"));
   gtk_widget_ref (network_channel_port_label);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_port_label", network_channel_port_label,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_channel_port_label);
-  gtk_box_pack_start (GTK_BOX (hbox14), network_channel_port_label, FALSE, FALSE, 5);
+  gtk_table_attach (GTK_TABLE (table4), network_channel_port_label, 4, 5, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (network_channel_port_label, FALSE);
+  gtk_misc_set_alignment (GTK_MISC (network_channel_port_label), 1, 0.5);
 
-  network_channel_port_adj = gtk_adjustment_new (6010, 1024, 100, 1, 10, 10);
+  network_multicast_port_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
+  network_multicast_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_multicast_port_adj), 1, 0);
+  gtk_widget_ref (network_multicast_port);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_multicast_port", network_multicast_port,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_multicast_port);
+  gtk_table_attach (GTK_TABLE (table4), network_multicast_port, 5, 6, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_usize (network_multicast_port, 75, -2);
+  gtk_widget_set_sensitive (network_multicast_port, FALSE);
+
+  network_channel_port_adj = gtk_adjustment_new (6010, 0, 65535, 1, 10, 10);
   network_channel_port = gtk_spin_button_new (GTK_ADJUSTMENT (network_channel_port_adj), 1, 0);
   gtk_widget_ref (network_channel_port);
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_channel_port", network_channel_port,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_channel_port);
-  gtk_box_pack_start (GTK_BOX (hbox14), network_channel_port, TRUE, TRUE, 0);
-  gtk_widget_set_usize (network_channel_port, 62, -2);
+  gtk_table_attach (GTK_TABLE (table4), network_channel_port, 5, 6, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_usize (network_channel_port, 75, -2);
+  gtk_widget_set_sensitive (network_channel_port, FALSE);
+
+  network_http_url = gtk_entry_new ();
+  gtk_widget_ref (network_http_url);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_http_url", network_http_url,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_http_url);
+  gtk_table_attach (GTK_TABLE (table4), network_http_url, 2, 6, 3, 4,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_widget_set_sensitive (network_http_url, FALSE);
+
+  label28 = gtk_label_new ("");
+  gtk_widget_ref (label28);
+  gtk_object_set_data_full (GTK_OBJECT (intf_network), "label28", label28,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label28);
+  gtk_table_attach (GTK_TABLE (table4), label28, 3, 6, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label28), 0, 0.5);
 
   hbox4 = GTK_DIALOG (intf_network)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_network), "hbox4", hbox4);
@@ -1910,11 +1930,17 @@ create_intf_network (void)
   gtk_widget_show (network_cancel);
   gtk_box_pack_start (GTK_BOX (hbox5), network_cancel, FALSE, TRUE, 0);
 
-  gtk_signal_connect (GTK_OBJECT (network_broadcast_check), "toggled",
-                      GTK_SIGNAL_FUNC (GtkNetworkOpenBroadcast),
+  gtk_signal_connect (GTK_OBJECT (network_udp), "toggled",
+                      GTK_SIGNAL_FUNC (GtkNetworkOpenUDP),
                       "intf_network");
-  gtk_signal_connect (GTK_OBJECT (network_channel_check), "toggled",
+  gtk_signal_connect (GTK_OBJECT (network_multicast), "toggled",
+                      GTK_SIGNAL_FUNC (GtkNetworkOpenMulticast),
+                      "intf_network");
+  gtk_signal_connect (GTK_OBJECT (network_channel), "toggled",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenChannel),
+                      "intf_network");
+  gtk_signal_connect (GTK_OBJECT (network_http), "toggled",
+                      GTK_SIGNAL_FUNC (GtkNetworkOpenHTTP),
                       "intf_network");
   gtk_signal_connect (GTK_OBJECT (network_ok), "clicked",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenOk),

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.38 2002/04/23 14:16:20 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.39 2002/05/18 02:12:20 ipkiss Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -607,5 +607,4 @@ GtkMessagesDelete                      (GtkWidget       *widget,
     gtk_widget_hide( p_intf->p_sys->p_messages );
     return TRUE;
 }
-
 
