@@ -2,7 +2,7 @@
  * dummy_dvdcss.c: Dummy libdvdcss with minimal DVD access.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dummy_dvdcss.c,v 1.1 2001/08/06 13:28:00 sam Exp $
+ * $Id: dummy_dvdcss.c,v 1.2 2001/10/23 23:41:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -111,7 +111,8 @@ extern char * dummy_dvdcss_error ( dvdcss_handle dvdcss )
 /*****************************************************************************
  * dvdcss_seek: seek into the device
  *****************************************************************************/
-extern int dummy_dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
+extern int dummy_dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks,
+                                                     int i_flags )
 {
     off_t i_read;
 

@@ -2,7 +2,7 @@
  * dummy_dvdcss.h: Dummy libdvdcss header.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dummy_dvdcss.h,v 1.1 2001/08/06 13:28:00 sam Exp $
+ * $Id: dummy_dvdcss.h,v 1.2 2001/10/23 23:41:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,7 +36,17 @@ typedef struct dvdcss_s* dvdcss_handle;
 
 #define DVDCSS_READ_DECRYPT    (1 << 0)
 
+#define DVDCSS_SEEK_INI        (1 << 0)
+#define DVDCSS_SEEK_MPEG       (2 << 0)
+
 #define DVDCSS_BLOCK_SIZE      2048
+
+/*****************************************************************************
+ * libdvdcss method: used like init flags
+ *****************************************************************************/
+#define DVDCSS_KEY        0
+#define DVDCSS_DISC       1
+#define DVDCSS_TITLE      2
 
 /*****************************************************************************
  * Exported prototypes
@@ -44,7 +54,7 @@ typedef struct dvdcss_s* dvdcss_handle;
 dvdcss_handle dummy_dvdcss_open  ( char *, int i_flags );
 int           dummy_dvdcss_close ( dvdcss_handle );
 int           dummy_dvdcss_title ( dvdcss_handle, int );
-int           dummy_dvdcss_seek  ( dvdcss_handle, int );
+int           dummy_dvdcss_seek  ( dvdcss_handle, int, int );
 int           dummy_dvdcss_read  ( dvdcss_handle, void *, int, int );
 int           dummy_dvdcss_readv ( dvdcss_handle, void *, int, int );
 char *        dummy_dvdcss_error ( dvdcss_handle );
@@ -56,7 +66,7 @@ char *        dummy_dvdcss_error ( dvdcss_handle );
 dvdcss_handle (* dvdcss_open )   ( char *, int i_flags );
 int           (* dvdcss_close )  ( dvdcss_handle );
 int           (* dvdcss_title )  ( dvdcss_handle, int );
-int           (* dvdcss_seek )   ( dvdcss_handle, int );
+int           (* dvdcss_seek )   ( dvdcss_handle, int, int );
 int           (* dvdcss_read )   ( dvdcss_handle, void *, int, int );
 int           (* dvdcss_readv )  ( dvdcss_handle, void *, int, int );
 char *        (* dvdcss_error )  ( dvdcss_handle );

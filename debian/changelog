@@ -1,3 +1,10 @@
+vlc (0.2.90-2) unstable; urgency=low
+
+  * Various upstream bugfixes.
+  * Compiled against libsdl1.2-debian (Closes: #116709).
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue, 23 Oct 2001 02:09:39 +0200
+
 vlc (0.2.90-1) unstable; urgency=low
 
   * Fixed syntax error in build dependencies (Closes: #109722).

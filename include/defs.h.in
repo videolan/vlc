@@ -190,6 +190,9 @@
 /* Define if <sys/param.h> defines ntohl. */
 #undef NTOHL_IN_SYS_PARAM_H
 
+/* Maximum supported data alignment */
+#undef ATTRIBUTE_ALIGNED_MAX
+
 /* Define if <sys/types.h> defines boolean_t. */
 #undef BOOLEAN_T_IN_SYS_TYPES_H
 
@@ -198,9 +201,6 @@
 
 /* Define if <cthreads.h> defines boolean_t. */
 #undef BOOLEAN_T_IN_CTHREADS_H
-
-/* Maximum supported data alignment */
-#undef ATTRIBUTE_ALIGNED_MAX
 
 /* Define if $CC groks 3D Now! inline assembly. */
 #undef HAVE_3DNOW
