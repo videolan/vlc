@@ -1,6 +1,6 @@
-diff -ru ffmpeg.old/libavcodec/eval.c ffmpeg/libavcodec/eval.c
---- ffmpeg.old/libavcodec/eval.c	Thu Mar  6 12:32:01 2003
-+++ ffmpeg/libavcodec/eval.c	Sun Nov  2 02:04:09 2003
+diff -ru ffmpeg-original/libavcodec/eval.c ffmpeg/libavcodec/eval.c
+--- ffmpeg-original/libavcodec/eval.c	Wed Feb 18 12:49:30 2004
++++ ffmpeg/libavcodec/eval.c	Fri Jul 23 11:39:29 2004
 @@ -34,6 +34,8 @@
  #include <string.h>
  #include <math.h>
@@ -10,9 +10,38 @@ diff -ru ffmpeg.old/libavcodec/eval.c ffmpeg/libavcodec/eval.c
  #ifndef NAN
    #define NAN 0
  #endif
-diff -ru ffmpeg.old/libavformat/tcp.c ffmpeg/libavformat/tcp.c
---- ffmpeg.old/libavformat/tcp.c	Mon Sep 29 03:41:30 2003
-+++ ffmpeg/libavformat/tcp.c	Sun Nov  2 02:04:09 2003
+diff -ru ffmpeg-original/libavcodec/h261.c ffmpeg/libavcodec/h261.c
+--- ffmpeg-original/libavcodec/h261.c	Thu Jul 22 10:23:28 2004
++++ ffmpeg/libavcodec/h261.c	Fri Jul 23 11:47:30 2004
+@@ -524,11 +524,12 @@
+ 
+ static int h261_decode_gob(H261Context *h){
+     MpegEncContext * const s = &h->s;
++    int v;
+     
+     ff_set_qscale(s, s->qscale);
+ 
+     /* check for empty gob */
+-    int v= show_bits(&s->gb, 15);
++    v= show_bits(&s->gb, 15);
+ 
+     if(get_bits_count(&s->gb) + 15 > s->gb.size_in_bits){
+         v>>= get_bits_count(&s->gb) + 15 - s->gb.size_in_bits;
+diff -ru ffmpeg-original/libavcodec/msmpeg4.c ffmpeg/libavcodec/msmpeg4.c
+--- ffmpeg-original/libavcodec/msmpeg4.c	Tue May 25 18:07:24 2004
++++ ffmpeg/libavcodec/msmpeg4.c	Fri Jul 23 11:49:38 2004
+@@ -716,7 +716,7 @@
+        necessitate to modify mpegvideo.c. The problem comes from the
+        fact they decided to store the quantized DC (which would lead
+        to problems if Q could vary !) */
+-#if defined ARCH_X86 && !defined PIC
++#if defined ARCH_X86 && !defined PIC && !defined __PIC__
+     asm volatile(
+         "movl %3, %%eax		\n\t"
+ 	"shrl $1, %%eax		\n\t"
+diff -ru ffmpeg-original/libavformat/tcp.c ffmpeg/libavformat/tcp.c
+--- ffmpeg-original/libavformat/tcp.c	Sat Jun 19 03:59:34 2004
++++ ffmpeg/libavformat/tcp.c	Fri Jul 23 11:52:23 2004
 @@ -32,6 +32,7 @@
  #include <netdb.h>
  #include <sys/time.h>
@@ -21,3 +50,17 @@ diff -ru ffmpeg.old/libavformat/tcp.c ffmpeg/libavformat/tcp.c
  
  typedef struct TCPContext {
      int fd;
+@@ -120,11 +121,13 @@
+                 break;
+         }
+         
++#ifndef __BEOS__
+         /* test error */
+         optlen = sizeof(ret);
+         getsockopt (fd, SOL_SOCKET, SO_ERROR, &ret, &optlen);
+         if (ret != 0)
+             goto fail;
++#endif
+     }
+     s->fd = fd;
+     return 0;

@@ -58,7 +58,8 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
-	.a52 .mpeg2 .id3tag .mad
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+	.FLAC .speex .faad .faac .lame .ffmpeg .dvdcss .dvdread
 endif
 
 FORCE:
@@ -114,10 +115,14 @@ endef
 endif
 
 ifeq ($(SYS),BEOS)
+# We test if the file actually exists, as sometimes (but not always)
+# libtool won't accept to build the shared library
 define INSTALL_NAME
-	mkdir -p $(PREFIX)/vlc-lib ; \
-	cp $(PREFIX)/lib/lib$(patsubst .%,%,$@).so \
-		$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).so ;
+	if test -f $(PREFIX)/lib/lib$(patsubst .%,%,$@).so ; then \
+		mkdir -p $(PREFIX)/vlc-lib ; \
+		cp $(PREFIX)/lib/lib$(patsubst .%,%,$@).so \
+		  $(PREFIX)/vlc-lib/ ; \
+	fi
 endef
 endif
 
@@ -282,9 +287,7 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 
 .freetype: freetype2
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
-endif
 	touch $@
 
 CLEAN_FILE += .freetype
@@ -304,9 +307,7 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 
 .fribidi: fribidi
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
-endif
 	touch $@
 
 CLEAN_FILE += .fribidi
@@ -360,7 +361,7 @@ mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 CLEAN_FILE += .mpeg2
 CLEAN_PKG += mpeg2dec
 #DISTCLEAN_PKG += mpeg2dec-$(MPEG2DEC_VERSION)-cvs.tar.gz
-DISTCLEAN_PKG += mpeg2dec-$(MPEG2_DEC_VERSION).tar.gz
+DISTCLEAN_PKG += mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 
 # ***************************************************************************
 # libid3tag
@@ -374,9 +375,7 @@ libid3tag: libid3tag-$(LIBID3TAG_VERSION).tar.gz
 
 .id3tag: libid3tag
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
-endif
 	touch $@
 
 CLEAN_FILE += .id3tag
@@ -395,9 +394,7 @@ libmad: libmad-$(LIBMAD_VERSION).tar.gz
 
 .mad: libmad
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="-O3" && make && make install)
-ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
-endif
 	touch $@
 
 CLEAN_FILE += .mad
@@ -506,6 +503,7 @@ speex-$(SPEEX_VERSION).tar.gz:
 
 speex: speex-$(SPEEX_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/speex.patch
 
 .speex: speex
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
@@ -540,7 +538,7 @@ faad2: faad2-$(FAAD2_VERSION).tar.bz2
 
 CLEAN_FILE += .faad
 CLEAN_PKG += faad2
-DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.gz
+DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.bz2
 
 # ***************************************************************************
 # faac
@@ -625,7 +623,7 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 
 ffmpeg:
 	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
-	CVS_PASSFILE=./ffmpeg.cvs cvs -d $(FFMPEG_CVSROOT) co ffmpeg
+	CVS_PASSFILE=./ffmpeg.cvs cvs -z3 -d $(FFMPEG_CVSROOT) co ffmpeg
 	patch -p 0 < Patches/ffmpeg.patch.cvs
 #	(cd $@; ./bootstrap)
 
@@ -637,7 +635,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
-	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
+	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-audio-beos --disable-ffserver --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
@@ -691,6 +689,7 @@ libdvdread-$(LIBDVDREAD_VERSION).tar.gz:
 
 libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/libdvdread.patch
 
 .dvdread: libdvdread .dvdcss
 	(cd $<; ./configure --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
