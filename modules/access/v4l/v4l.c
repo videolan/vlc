@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: v4l.c,v 1.40 2004/02/04 20:13:55 fenrir Exp $
+ * $Id: v4l.c,v 1.41 2004/02/12 17:52:48 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -1416,10 +1416,10 @@ static int GrabVideo( input_thread_t * p_input,
     {
         mtime_t i_dur = (mtime_t)((double)1000000 / (double)p_sys->f_fps);
 
-        /* Dif we wait long enougth ? */
+        /* Did we wait long enougth ? */
         if( p_sys->i_video_pts + i_dur > mdate() )
         {
-            return VLC_EGENERIC;
+            return VLC_ETIMEOUT;
         }
     }
 
@@ -1510,16 +1510,28 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             GrabAudio( p_input, &p_sys->p_data,
                        &p_sys->i_data_size, &i_pts ) != VLC_SUCCESS )
         {
+            int i_ret = VLC_ETIMEOUT;
+
             /* Try grabbing video frame */
             i_stream = 0;
-            if( p_sys->fd_video < 0 ||
-                GrabVideo( p_input, &p_sys->p_data,
-                           &p_sys->i_data_size, &i_pts ) != VLC_SUCCESS )
+            if( p_sys->fd_video > 0 )
+            {
+                i_ret = GrabVideo( p_input, &p_sys->p_data,
+                                   &p_sys->i_data_size, &i_pts );
+            }
+
+            /* No video or timeout */
+            if( i_ret == VLC_ETIMEOUT )
             {
                 /* Sleep so we do not consume all the cpu, 10ms seems
                  * like a good value (100fps) */
                 msleep( 10000 );
                 continue;
+            }
+            else if( i_ret != VLC_SUCCESS )
+            {
+                msg_Err( p_input, "Error during capture!" );
+                return -1;
             }
         }
 
