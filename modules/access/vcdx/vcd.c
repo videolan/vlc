@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.9 2003/11/26 01:28:52 rocky Exp $
+ * $Id: vcd.c,v 1.10 2003/11/30 13:53:45 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -49,7 +49,6 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
  * Option help text
  *****************************************************************************/
 
-#define DEBUG_TEXT N_("set debug mask for additional debugging.")
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \
     "meta info         1\n" \
@@ -64,12 +63,6 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
     "seek-cur (200)  512\n" \
     "still    (400) 1024\n" \
     "vcdinfo  (800) 2048\n" )
-
-#define DEV_TEXT N_("Video device name")
-#define DEV_LONGTEXT N_( \
-    "Specify the name of the video device that will be used by default. " \
-    "If you don't specify anything, we'll scan for a suitable VCD device.")
-
 
 /*****************************************************************************
  * Module descriptor
@@ -86,16 +79,21 @@ vlc_module_begin();
     /* Configuration options */
     add_category_hint( N_("VCDX"), NULL, VLC_TRUE );
 
-    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback), DEBUG_TEXT, 
+    add_integer ( MODULE_STRING "-debug", 0, E_(DebugCallback), 
+		  N_("set debug mask for additional debugging."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
-    add_string( MODULE_STRING "-device", "", NULL, DEV_TEXT, 
-		DEV_LONGTEXT, VLC_TRUE );
+    add_string( MODULE_STRING "-device", "", NULL, 
+		N_("VCD device name"),
+		N_("Specify the name of the Video Compact Disc device that "
+                   "will be used by default. If you don't specify anything, "
+		   "we'll scan for a suitable VCD device."),
+		VLC_FALSE );
 
     add_bool( MODULE_STRING "-PBC", 0, NULL,
-	      "Use playback control?",
-	      "If VCD is authored with playback control, use it. "
-	      "Otherwise we play by tracks.", 
+	      N_("Use playback control?"),
+	      N_("If VCD is authored with playback control, use it. "
+		 "Otherwise we play by tracks."), 
 	      VLC_TRUE );
 
 #ifdef FIXED
