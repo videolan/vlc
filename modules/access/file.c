@@ -78,11 +78,11 @@ static int     _OpenFile( input_thread_t *, char * );
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for file streams. This " \
-    "value should be set in miliseconds units." )
+    "value should be set in millisecond units." )
 #define CAT_TEXT N_("Concatenate with additional files")
 #define CAT_LONGTEXT N_( \
-    "Allows you to play splitted files as they were part of a unique file. " \
-    "Specify a coma (',') separated list of files." )
+    "Allows you to play split files as if they were part of a unique file. " \
+    "Specify a comma-separated list of files." )
 
 vlc_module_begin();
     set_description( _("Standard filesystem file input") );

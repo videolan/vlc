@@ -83,7 +83,7 @@ vlc_module_begin();
     i_80w   = 0x0000000080808080ULL;
 #elif defined (MODULE_NAME_IS_i420_yuy2_altivec)
     set_description(
-            _("Altivec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
+            _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "chroma", 100 );
     add_requirement( ALTIVEC );
 #endif

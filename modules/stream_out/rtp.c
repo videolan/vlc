@@ -47,7 +47,7 @@
     "Allows you to specify the SDP used for the streaming output. " \
     "You must use an url: http://location to access the SDP via HTTP, " \
     "rtsp://location for RTSP access, and sap:// for the SDP to be " \
-    "annnounced via SAP" )
+    "announced via SAP" )
 #define MUX_TEXT N_("Muxer")
 #define MUX_LONGTEXT N_( \
     "Allows you to specify the muxer used for the streaming output." )

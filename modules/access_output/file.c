@@ -64,7 +64,7 @@ static void Close( vlc_object_t * );
                             "of replacing it.")
 
 vlc_module_begin();
-    set_description( _("File stream ouput") );
+    set_description( _("File stream output") );
     set_capability( "sout access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );

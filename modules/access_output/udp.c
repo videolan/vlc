@@ -62,7 +62,7 @@ static void Close( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for udp streams. This " \
+    "Allows you to modify the default caching value for UDP streams. This " \
     "value should be set in millisecond units." )
 
 #define TTL_TEXT N_("Time To Live")
@@ -86,7 +86,7 @@ static void Close( vlc_object_t * );
                        "in order to improve streaming)." )
 
 vlc_module_begin();
-    set_description( _("UDP stream ouput") );
+    set_description( _("UDP stream output") );
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL,TTL_TEXT, TTL_LONGTEXT,
                                  VLC_TRUE );

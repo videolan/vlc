@@ -2,7 +2,7 @@
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: caca.c,v 1.9 2004/01/26 16:45:02 zorglub Exp $
+ * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -51,7 +51,7 @@ static void Display   ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("colour ASCII art video output") );
+    set_description( _("color ASCII art video output") );
     set_capability( "video output", 12 );
     set_callbacks( Create, Destroy );
 vlc_module_end();

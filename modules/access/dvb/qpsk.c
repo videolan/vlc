@@ -76,7 +76,7 @@ void E_(Close)   ( vlc_object_t * );
 
 /* Cable */
 #define MODULATION_TEXT N_("Modulation type")
-#define MODULATION_LONGTEXT N_("Modulation type for frontend device.")
+#define MODULATION_LONGTEXT N_("Modulation type for front-end device.")
 
 /* Terrestrial */
 #define CODE_RATE_HP_TEXT N_("Terrestrial high priority stream code rate (FEC)")

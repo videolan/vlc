@@ -51,11 +51,11 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 #define COLS_TEXT N_("Number of columns")
-#define COLS_LONGTEXT N_("Select the number of horizontal videowindows in " \
+#define COLS_LONGTEXT N_("Select the number of horizontal video windows in " \
     "which to split the video")
 
 #define ROWS_TEXT N_("Number of rows")
-#define ROWS_LONGTEXT N_("Select the number of vertical videowindows in " \
+#define ROWS_LONGTEXT N_("Select the number of vertical video windows in " \
     "which to split the video")
 
 #define ACTIVE_TEXT N_("Active windows")

@@ -52,7 +52,7 @@ static void Close( vlc_object_t * );
 
 
 vlc_module_begin();
-    set_description( _("HTTP stream ouput") );
+    set_description( _("HTTP stream output") );
     set_capability( "sout access", 0 );
     add_shortcut( "http" );
     add_shortcut( "mmsh" );

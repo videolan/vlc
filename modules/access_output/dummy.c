@@ -37,7 +37,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("Dummy stream ouput") );
+    set_description( _("Dummy stream output") );
     set_capability( "sout access", 0 );
     add_shortcut( "dummy" );
     set_callbacks( Open, Close );

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * rawdv.c : raw dv input module for vlc
+ * rawdv.c : raw DV input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
  * $Id$
@@ -36,7 +36,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("raw dv demuxer") );
+    set_description( _("raw DV demuxer") );
     set_capability( "demux2", 2 );
     set_callbacks( Open, Close );
     add_shortcut( "rawdv" );
@@ -113,7 +113,7 @@ static block_t *dv_extract_audio( demux_t *p_demux,
                                   block_t* p_frame_block );
 
 /*****************************************************************************
- * Open: initializes raw dv demux structures
+ * Open: initializes raw DV demux structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
@@ -127,12 +127,12 @@ static int Open( vlc_object_t * p_this )
     dv_id_t     dv_id;
     char        *psz_ext;
 
-    /* It isn't easy to recognize a raw dv stream. The chances that we'll
-     * mistake a stream from another type for a raw dv stream are too high, so
+    /* It isn't easy to recognize a raw DV stream. The chances that we'll
+     * mistake a stream from another type for a raw DV stream are too high, so
      * we'll rely on the file extension to trigger this demux. Alternatively,
      * it is possible to force this demux. */
 
-    /* Check for dv file extension */
+    /* Check for DV file extension */
     psz_ext = strrchr( p_demux->psz_path, '.' );
     if( ( !psz_ext || strcasecmp( psz_ext, ".dv") ) &&
         strcmp(p_demux->psz_demux, "rawdv") )
@@ -162,7 +162,7 @@ static int Open( vlc_object_t * p_this )
 
     if( dv_id.sct != 0 )
     {
-        msg_Warn( p_demux, "not a raw dv stream header" );
+        msg_Warn( p_demux, "not a raw DV stream header" );
         return VLC_EGENERIC;
     }
 

@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.64 2004/01/25 18:53:07 gbazin Exp $
+ * $Id$
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Sam Hocevar <sam@zoy.org>
@@ -70,7 +70,7 @@
  * aout_sys_t: OSS audio output method descriptor
  *****************************************************************************
  * This structure is part of the audio output thread descriptor.
- * It describes the dsp specific properties of an audio device.
+ * It describes the DSP specific properties of an audio device.
  *****************************************************************************/
 struct aout_sys_t
 {
@@ -108,7 +108,7 @@ vlc_module_begin();
     set_description( _("Linux OSS audio output") );
 
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
-              N_("OSS dsp device"), NULL, VLC_FALSE );
+              N_("OSS DSP device"), NULL, VLC_FALSE );
     add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, VLC_TRUE );
 
     set_capability( "audio output", 100 );
@@ -262,7 +262,7 @@ static void Probe( aout_instance_t * p_aout )
 /*****************************************************************************
  * Open: open the audio device (the digital sound processor)
  *****************************************************************************
- * This function opens the dsp as a usual non-blocking write-only file, and
+ * This function opens the DSP as a usual non-blocking write-only file, and
  * modifies the p_aout->p_sys->i_fd with the file's descriptor.
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
@@ -283,7 +283,7 @@ static int Open( vlc_object_t *p_this )
     /* Get device name */
     if( (psz_device = config_GetPsz( p_aout, "dspdev" )) == NULL )
     {
-        msg_Err( p_aout, "no audio device given (maybe /dev/dsp ?)" );
+        msg_Err( p_aout, "no audio device specified (maybe /dev/dsp?)" );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -533,7 +533,7 @@ static void Play( aout_instance_t *p_aout )
 }
 
 /*****************************************************************************
- * Close: close the dsp audio device
+ * Close: close the DSP audio device
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {

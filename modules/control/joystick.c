@@ -2,7 +2,7 @@
  * joystick.c: control vlc with a joystick
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: joystick.c,v 1.4 2004/01/25 16:17:03 anil Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -155,7 +155,7 @@ static void Run       ( intf_thread_t *p_intf );
 
 #define SEEK_TEXT N_( "Max seek interval (seconds)")
 #define SEEK_LONGTEXT N_(\
-   "The maximum number of seconds that will be seeked at a time." )
+   "The maximum number of seconds that will be sought at a time." )
 
 #define MAP_TEXT N_( "Action mapping")
 #define MAP_LONGTEXT N_( "Allows you to remap the actions." )

@@ -2,7 +2,7 @@
  * postprocessing.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocessing.c,v 1.5 2003/12/22 02:24:51 sam Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -55,7 +55,7 @@ vlc_module_begin();
     add_requirement( MMX );
     add_shortcut( "mmx" );
 #elif defined( MODULE_NAME_IS_postprocessing_mmxext )
-    set_description( _("MMXEXT post processing") );
+    set_description( _("MMX EXT post processing") );
     set_capability( "postprocessing", 150 );
     add_requirement( MMXEXT );
     add_shortcut( "mmxext" );

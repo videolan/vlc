@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.17 2004/01/25 18:53:06 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -82,7 +82,7 @@ struct aout_filter_sys_t
     "listening room.")
 
 vlc_module_begin();
-    set_description( _("ATSC A/52 aka AC-3 audio decoder") );
+    set_description( _("ATSC A/52 (AC-3) audio decoder") );
     add_bool( "a52-dynrng", 1, NULL, DYNRNG_TEXT, DYNRNG_LONGTEXT, VLC_FALSE );
     set_capability( "audio filter", 100 );
     set_callbacks( Create, Destroy );

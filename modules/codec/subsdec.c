@@ -95,7 +95,7 @@ static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
 #define ENCODING_TEXT N_("Subtitles text encoding")
 #define ENCODING_LONGTEXT N_("Set the encoding used in text subtitles")
 #define ALIGN_TEXT N_("Subtitles justification")
-#define ALIGN_LONGTEXT N_("Set the justification of substitles")
+#define ALIGN_LONGTEXT N_("Set the justification of subtitles")
 
 vlc_module_begin();
     set_description( _("text subtitles decoder") );

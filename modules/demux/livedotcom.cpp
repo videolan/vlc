@@ -53,7 +53,7 @@ static void AccessClose( vlc_object_t * );
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for RTSP streams. This " \
-    "value should be set in miliseconds units." )
+    "value should be set in millisecond units." )
 
 vlc_module_begin();
     set_description( _("live.com (RTSP/RTP/SDP) demuxer" ) );

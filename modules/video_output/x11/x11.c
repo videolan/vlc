@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.9 2004/01/26 16:45:03 zorglub Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -46,7 +46,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
     "has its drawbacks.\n" \
     "1) Let the window manager handle your fullscreen window (default), but " \
     "things like taskbars will likely show on top of the video.\n" \
-    "2) Completly bypass the window manager, but then nothing will be able " \
+    "2) Completely bypass the window manager, but then nothing will be able " \
     "to show on top of the video.")
 
 #define DISPLAY_TEXT N_("X11 display name")

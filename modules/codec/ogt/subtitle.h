@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.15 2004/01/30 13:17:12 rocky Exp $
+ * $Id$
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -76,7 +76,7 @@
   N_("Add this to starting horizontal position of subtitle.")
 #define HORIZONTAL_CORRECT_LONGTEXT N_(			    \
   "If you need to adjust the subtitle starting position horizontally, " \
-  "set this. Negative values shift left and postive values right. 0 would " \
+  "set this. Negative values shift left and positive values right. 0 would " \
   "be no deviation from where the position specified in the subtitle."	\
   )
 

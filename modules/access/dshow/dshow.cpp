@@ -107,7 +107,7 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for directshow streams. " \
+    "Allows you to modify the default caching value for DirectShow streams. " \
     "This value should be set in milliseconds units." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \

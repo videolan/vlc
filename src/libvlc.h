@@ -59,7 +59,7 @@ static char *ppsz_language_text[] =
     "This option allows you to select additional interfaces used by VLC. " \
     "They will be launched in the background in addition to the default " \
     "interface. Use a comma separated list of interface modules. (common " \
-    "values are: logger,gestures,sap,rc,http,screensaver)")
+    "values are logger, gestures, sap, rc, http or screensaver)")
 
 #define VERBOSE_TEXT N_("Verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
@@ -97,9 +97,9 @@ static char *ppsz_language_text[] =
     "for its modules.")
 
 #define AOUT_CAT_LONGTEXT N_( \
-    "These options allow you to modify the behaviour of the audio " \
+    "These options allow you to modify the behavior of the audio " \
     "subsystem, and to add audio filters which can be used for " \
-    "postprocessing or visual effects (spectrum analyzer, ...).\n" \
+    "post processing or visual effects (spectrum analyzer, ...).\n" \
     "Enable these filters here, and configure them in the \"audio filters\" " \
     "modules section.")
 
@@ -158,7 +158,7 @@ static char *ppsz_language_text[] =
 
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
-    "This allows you to add audio postprocessing filters, to modify " \
+    "This allows you to add audio post processing filters, to modify " \
     "the sound, or audio visualization modules (spectrum analyzer, ...).")
 
 #define AUDIO_CHANNEL_MIXER N_("Channel mixer")
@@ -168,8 +168,8 @@ static char *ppsz_language_text[] =
      "with a headphone.")
 
 #define VOUT_CAT_LONGTEXT N_( \
-    "These options allow you to modify the behaviour of the video output " \
-    "subsytem. You can for example enable video filters (deinterlacing, " \
+    "These options allow you to modify the behavior of the video output " \
+    "subsystem. You can for example enable video filters (deinterlacing, " \
     "image adjusting, ...). Enable these filters here and configure " \
     "them in the \"video filters\" modules section. You can also set many " \
     "miscellaneous video options." )
@@ -211,7 +211,7 @@ static char *ppsz_language_text[] =
 
 #define ALIGN_TEXT N_("Video alignment")
 #define ALIGN_LONGTEXT N_( \
-    "You can enforce the video alignement in its window. By default (0) it " \
+    "You can enforce the video alignment in its window. By default (0) it " \
     "will be centered (0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
     "also use combinations of these values).")
 static int pi_align_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
@@ -268,7 +268,7 @@ static char *ppsz_align_descriptions[] =
     "squareness.")
 
 #define INPUT_CAT_LONGTEXT N_( \
-    "These options allow you to modify the behaviour of the input " \
+    "These options allow you to modify the behavior of the input " \
     "subsystem, such as the DVD or VCD device, the network interface " \
     "settings or the subtitle channel.")
 
@@ -337,7 +337,7 @@ static char *ppsz_align_descriptions[] =
 
 #define SUB_FUZZY_TEXT N_("Subtitle autodetection fuzziness")
 #define SUB_FUZZY_LONGTEXT \
-    N_("This determines how fuzzy subtitle and movie filenaming matching " \
+    N_("This determines how fuzzy subtitle and movie filename matching " \
     "will be. Options are:\n" \
     "0 = no subtitles autodetected\n" \
     "1 = any subtitle file\n" \
@@ -359,7 +359,7 @@ static char *ppsz_align_descriptions[] =
 #ifdef WIN32
 #define DVD_DEV_LONGTEXT N_( \
     "This is the default DVD drive (or file) to use. Don't forget the colon " \
-    "after the drive letter (eg D:)")
+    "after the drive letter (eg. D:)")
 #else
 #define DVD_DEV_LONGTEXT N_( \
     "This is the default DVD device to use.")
@@ -469,10 +469,10 @@ static char *ppsz_align_descriptions[] =
     "This allows you to choose if the video stream should be redirected to " \
     "the stream output facility when this last one is enabled.")
 
-#define SOUT_KEEP_TEXT N_("Keep sout open" )
+#define SOUT_KEEP_TEXT N_("Keep stream output open" )
 #define SOUT_KEEP_LONGTEXT N_( \
-    "This allows you to keep an unique sout instance across " \
-    "multiple playlist item (automatically insert gather stream_out " \
+    "This allows you to keep an unique stream output instance across " \
+    "multiple playlist item (automatically insert the gather stream output " \
     "if not specified)" )
 
 #define PACKETIZER_TEXT N_("Preferred packetizer list")
@@ -533,7 +533,7 @@ static char *ppsz_align_descriptions[] =
 
 #define PLAYLIST_CAT_LONGTEXT N_( \
      "These options define the behavior of the playlist. Some " \
-     "of them can be overriden in the playlist dialog box." )
+     "of them can be overridden in the playlist dialog box." )
 
 #define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
@@ -605,7 +605,7 @@ static char *ppsz_align_descriptions[] =
 #define FAST_MUTEX_TEXT N_("Fast mutex on NT/2K/XP (developers only)")
 #define FAST_MUTEX_LONGTEXT N_( \
     "On Windows NT/2K/XP we use a slow mutex implementation but which " \
-    "allows us to correctely implement condition variables. " \
+    "allows us to correctly implement condition variables. " \
     "You can also use the faster Win9x implementation but you might " \
     "experience problems with it.")
 
@@ -669,7 +669,7 @@ static char *ppsz_align_descriptions[] =
 #define NAV_LEFT_KEY_TEXT N_("Navigate left")
 #define NAV_LEFT_KEY_LONGTEXT N_("Select the key to move the selector left in DVD menus.")
 #define NAV_RIGHT_KEY_TEXT N_("Navigate right")
-#define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in dvd menus.")
+#define NAV_RIGHT_KEY_LONGTEXT N_("Select the key to move the selector right in DVD menus.")
 #define NAV_ACTIVATE_KEY_TEXT N_("Activate")
 #define NAV_ACTIVATE_KEY_LONGTEXT N_("Select the key to activate selected item in DVD menus.")
 #define VOL_UP_KEY_TEXT N_("Volume up")

@@ -2,7 +2,7 @@
  * id3genres.h: list of genres for id3 genre tags
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: id3genres.h,v 1.4 2004/01/25 20:05:29 hartman Exp $
+ * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *         list found at http://www.id3.org/id3v2.4.0-frames.txt
@@ -92,7 +92,7 @@ static char *ppsz_genres[] = {
     N_("Native American"),
     N_("Cabaret"),
     N_("New wave"),
-    N_("Psychadelic"),
+    N_("Psychedelic"),
     N_("Rave"),
     N_("Showtunes"),
     N_("Trailer"),

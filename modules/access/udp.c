@@ -40,8 +40,8 @@
  *****************************************************************************/
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for udp streams. This " \
-    "value should be set in miliseconds units." )
+    "Allows you to modify the default caching value for UDP streams. This " \
+    "value should be set in millisecond units." )
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );

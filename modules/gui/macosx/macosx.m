@@ -1,5 +1,5 @@
 /*****************************************************************************
- * macosx.m: MacOS X module for vlc
+ * macosx.m: Mac OS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
  * $Id$
@@ -71,7 +71,7 @@ void E_(CloseVideo)   ( vlc_object_t * );
 
 #define FILL_TEXT N_("Fill fullscreen")
 #define FILL_LONGTEXT N_("In fullscreen mode, crop the picture if " \
-        "necessary in order to fill the screen without black" \
+        "necessary in order to fill the screen without black " \
         "borders (OpenGL only)." )
 
 static char * effect_list[] = { "none", "cube", "transparent-cube" };
@@ -82,7 +82,7 @@ static char *ppsz_vout_list[] = { "auto", "quartz", "opengl" };
 static char *ppsz_vout_list_text[] = { N_("Auto"), "Quartz", "OpenGL" };
     
 vlc_module_begin();
-    set_description( _("MacOS X interface, sound and video") );
+    set_description( _("Mac OS X interface, sound and video") );
     set_capability( "interface", 100 );
     set_callbacks( E_(OpenIntf), E_(CloseIntf) );
     add_submodule();

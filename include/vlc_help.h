@@ -31,14 +31,14 @@
  */
 #define GENERAL_TITLE N_( "VLC preferences" )
 #define GENERAL_HELP N_( \
-    "Configure some global options in General Settings " \
+    "Configure the global options in General Settings " \
     "and configure each VLC module in the Modules section.\n" \
     "Click on \"Advanced Options\" to see all options." )
 
 #define PLUGIN_TITLE N_( "VLC modules preferences" )
 #define PLUGIN_HELP N_( \
     "In this tree, you can set options for every module used by VLC.\n" \
-    "Modules are sorted by type.\nHave fun tuning VLC!" )
+    "Modules are sorted by type." )
 
 /*
  *  Then, help for each module capabilities.
@@ -83,7 +83,7 @@
 
 #define SOUT_TITLE N_("Stream output access modules settings")
 #define SOUT_HELP N_( \
-    "In this section you can set the caching value for the UDP stream" \
+    "In this section you can set the caching value for the UDP stream " \
     "output access module.")
 
 #define SUBTITLE_DEMUX_TITLE N_("Subtitle demuxer settings")

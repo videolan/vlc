@@ -620,7 +620,7 @@ void Interface::CreateOurExtendedPanel()
     wxBoxSizer *visual_sizer = new wxBoxSizer( wxHORIZONTAL );
 
     wxCheckBox *visual_checkbox = new wxCheckBox( extra_frame, Visual_Event,
-                                            wxU(_("Visualisations")) );
+                                            wxU(_("Visualizations")) );
 
     visual_sizer->Add( visual_checkbox, 0, wxEXPAND, 0);
     visual_sizer->Layout();

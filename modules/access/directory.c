@@ -74,7 +74,7 @@ int ReadDir( playlist_t *p_playlist, char *psz_name , int i_mode, int *pi_pos );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define RECURSIVE_TEXT N_("Subdirectory behaviour")
+#define RECURSIVE_TEXT N_("Subdirectory behavior")
 #define RECURSIVE_LONGTEXT N_( \
         "Select whether subdirectories must be expanded.\n" \
         "none: subdirectories do not appear in the playlist.\n" \

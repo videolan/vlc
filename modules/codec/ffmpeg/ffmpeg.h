@@ -80,10 +80,10 @@ void E_(ClosePostproc)( decoder_t *, void * );
 
 #define ERROR_TEXT N_("Error resilience")
 #define ERROR_LONGTEXT N_( \
-    "ffmpeg can make error resiliences.          \n" \
-    "Nevertheless, with a buggy encoder (like ISO MPEG-4 encoder from M$) " \
-    "this will produce a lot of errors.\n" \
-    "Valid range is -1 to 99 (-1 disables all errors resiliences).")
+    "ffmpeg can do error resilience.\n" \
+    "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) " \
+    "this can produce a lot of errors.\n" \
+    "Valid values range from -1 to 99 (-1 disables all errors resilience).")
 
 #define BUGS_TEXT N_("Workaround bugs")
 #define BUGS_LONGTEXT N_( \
@@ -111,7 +111,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define DEBUG_TEXT N_( "Debug mask" )
 #define DEBUG_LONGTEXT N_( "Set ffmpeg debug mask" )
 
-#define LIBAVCODEC_PP_TEXT N_("ffmpeg postproc filter chains")
+#define LIBAVCODEC_PP_TEXT N_("ffmpeg post processing filter chains")
 /* FIXME (cut/past from ffmpeg */
 #define LIBAVCODEC_PP_LONGTEXT \
 "<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \
@@ -181,9 +181,9 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define ENC_RC_BUF_LONGTEXT N_( "Allows you to specify the rate control " \
   "buffer size." )
 
-#define ENC_RC_BUF_AGGR_TEXT N_( "Rate control buffer aggressivity" )
+#define ENC_RC_BUF_AGGR_TEXT N_( "Rate control buffer aggressiveness" )
 #define ENC_RC_BUF_AGGR_LONGTEXT N_( "Allows you to specify the rate control "\
-  "buffer aggressivity." )
+  "buffer aggressiveness." )
 
 #define ENC_IQUANT_FACTOR_TEXT N_( "I quantization factor" )
 #define ENC_IQUANT_FACTOR_LONGTEXT N_( "Allows you to specify the " \
@@ -195,8 +195,8 @@ void E_(ClosePostproc)( decoder_t *, void * );
   "reduction algorithm to lower the encoding length and bitrate, at the " \
   "expense of lower quality frames." )
 
-#define ENC_MPEG4_MATRIX_TEXT N_( "Enable mpeg4 quantization matrix" )
-#define ENC_MPEG4_MATRIX_LONGTEXT N_( "Allows you to use the mpeg4 " \
+#define ENC_MPEG4_MATRIX_TEXT N_( "Enable MPEG4 quantization matrix" )
+#define ENC_MPEG4_MATRIX_LONGTEXT N_( "Allows you to use the MPEG4 " \
   "quantization matrix for mpeg2 encoding. This generally yields a " \
   "better looking picture, while still retaining the compatibility with " \
   "standard MPEG-2 decoders.")
@@ -210,7 +210,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define ENC_HURRYUP_LONGTEXT N_( "Allows you to specify if the encoder " \
   "should make on-the-fly quality tradeoffs if your CPU can't keep up with " \
   "the encoding rate. It will disable trellis quantization, then the rate " \
-  "distorsion of motion vectors (hq), and raise the noise reduction " \
+  "distortion of motion vectors (hq), and raise the noise reduction " \
   "threshold to ease the encoder's task." )
 
 #define ENC_QMIN_TEXT N_( "Minimum video quantizer scale" )
@@ -223,4 +223,4 @@ void E_(ClosePostproc)( decoder_t *, void * );
 
 #define ENC_TRELLIS_TEXT N_( "Enable trellis quantization" )
 #define ENC_TRELLIS_LONGTEXT N_( "Allows you to enable trellis " \
-  "quantization (rate distorsion for block coefficients)." )
+  "quantization (rate distortion for block coefficients)." )

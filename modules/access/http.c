@@ -52,7 +52,7 @@ static void Close( vlc_object_t * );
 
 #define USER_TEXT N_("HTTP user name")
 #define USER_LONGTEXT N_("Allows you to modify the user name that will " \
-    "be used for the connection (Basic authentification only).")
+    "be used for the connection (Basic authentication only).")
 
 #define PASS_TEXT N_("HTTP password")
 #define PASS_LONGTEXT N_("Allows you to modify the password that will be " \

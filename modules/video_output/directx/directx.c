@@ -114,13 +114,14 @@ static int FindDevicesCallback( vlc_object_t *, char const *,
 
 #define TRIPLEBUF_TEXT N_("Use triple buffering for overlays")
 #define TRIPLEBUF_LONGTEXT N_( \
-    "Try to use triple bufferring when using YUV overlays. That results in " \
+    "Try to use triple buffering when using YUV overlays. That results in " \
     "much better video quality (no flickering)." )
 
 #define DEVICE_TEXT N_("Name of desired display device")
-#define DEVICE_LONGTEXT N_("In a multimonitor configuration, you can specify "\
-    "the Windows device name of the display that you want the video window " \
-    "to open on. For example, \"\\\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"." )
+#define DEVICE_LONGTEXT N_("In a multiple monitor configuration, you can " \
+    "specify the Windows device name of the display that you want the video " \
+    "window to open on. For example, \"\\\\.\\DISPLAY1\" or " \
+    "\"\\\\.\\DISPLAY2\"." )
 
 static char *ppsz_dev[] = { "" };
 static char *ppsz_dev_text[] = { N_("Default") };

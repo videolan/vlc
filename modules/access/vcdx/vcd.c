@@ -70,7 +70,7 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
 "   %A : The album information\n" \
 "   %C : The VCD volume count - the number of CDs in the collection\n" \
 "   %c : The VCD volume num - the number of the CD in the collection.\n" \
-"   %F : The VCD Format, e.g. VCD 1.0, VCD 1.1, VCD 2.0, or SVC\n" \
+"   %F : The VCD Format, e.g. VCD 1.0, VCD 1.1, VCD 2.0, or SVCD\n" \
 "   %I : The current entry/segment/playback type, e.g. ENTRY, TRACK, SEGMENT...\n" \
 "   %L : The playlist ID prefixed with \" LID\" if it exists\n" \
 "   %N : The current number of the %I - a decimal number\n" \

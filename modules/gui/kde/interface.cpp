@@ -149,7 +149,7 @@ void KInterface::initActions()
     fileOpenRecent->setStatusText(i18n(_("Opens a recently used file")));
     fileQuit->setStatusText(i18n(_("Quits the application")));
     viewToolBar->setStatusText(i18n(_("Enables/disables the toolbar")));
-    viewStatusBar->setStatusText(i18n(_("Enables/disables the statusbar")));
+    viewStatusBar->setStatusText(i18n(_("Enables/disables the status bar")));
 
     diskOpen->setStatusText( i18n( _("Opens a disk") ) );
     streamOpen->setStatusText( i18n( _("Opens a network stream") ) );
@@ -249,7 +249,7 @@ void KInterface::slotViewToolBar()
 
 void KInterface::slotViewStatusBar()
 {
-  slotStatusMsg(i18n(_("Toggle the statusbar...")));
+  slotStatusMsg(i18n(_("Toggle the status bar...")));
   ///////////////////////////////////////////////////////////////////
   //turn Statusbar on or off
   if(!viewStatusBar->isChecked())

@@ -2,7 +2,7 @@
  * iso_lang.c: function to decode language code (in dvd or a52 for instance).
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: iso_lang.c,v 1.11 2004/01/06 12:02:06 zorglub Exp $
+ * $Id$
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
@@ -56,16 +56,18 @@ const char * DecodeLanguage( uint16_t i_code )
     {
         if( !strncmp( p_lang->psz_iso639_1, psz_code, 2 ) )
         {
+# if 0
             if( *p_lang->psz_native_name )
             {
                 return p_lang->psz_native_name;
             }
+#endif
 
-            return p_lang->psz_eng_name;
+            return _( p_lang->psz_eng_name );
         }
     }
 
-    return "Unknown";
+    return _( "Unknown" );
 }
 
 const iso639_lang_t * GetLang_1( const char * psz_code )

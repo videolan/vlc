@@ -39,15 +39,15 @@
  *****************************************************************************/
 #define ACCESS_TEXT N_("Output access method")
 #define ACCESS_LONGTEXT N_( \
-    "Allows you to pecify the output access method used for the streaming " \
+    "Allows you to specify the output access method used for the streaming " \
     "output." )
 #define MUX_TEXT N_("Output muxer")
 #define MUX_LONGTEXT N_( \
-    "Allows you to pecify the output muxer method used for the streaming " \
+    "Allows you to specify the output muxer method used for the streaming " \
     "output." )
 #define URL_TEXT N_("Output URL")
 #define URL_LONGTEXT N_( \
-    "Allows you to pecify the output URL used for the streaming output." )
+    "Allows you to specify the output URL used for the streaming output." )
 
 #define NAME_TEXT N_("Session name")
 #define NAME_LONGTEXT N_( \

@@ -101,7 +101,7 @@
        "is received.")
 #define SAP_PARSE_TEXT N_("Try to parse the SAP")
 #define SAP_PARSE_LONGTEXT N_( \
-       "When SAP can it will try to parse the SAP. Normal behaviour is" \
+       "When SAP can it will try to parse the SAP. Normal behavior is " \
        "to have livedotcom parse the announce." )
 
 static int  Open ( vlc_object_t * );

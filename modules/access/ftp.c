@@ -2,7 +2,7 @@
  * ftp.c: FTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ftp.c,v 1.25 2004/01/25 17:31:22 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,7 +39,7 @@ static void    Close    ( vlc_object_t * );
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
-    "Allows you to modify the default caching value for ftp streams. This " \
+    "Allows you to modify the default caching value for FTP streams. This " \
     "value should be set in millisecond units." )
 #define USER_TEXT N_("FTP user name")
 #define USER_LONGTEXT N_("Allows you to modify the user name that will " \

@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.30 2004/02/14 17:03:33 gbazin Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -86,7 +86,7 @@ static void    Play        ( aout_instance_t * );
     "will be saved but you can restrict the number of channels here.")
 
 #define WAV_TEXT N_("Add wave header")
-#define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a wav " \
+#define WAV_LONGTEXT N_("Instead of writing a raw file, you can add a WAV " \
                         "header to the file")
 
 static char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le", "s16_le",

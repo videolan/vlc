@@ -48,7 +48,7 @@ static void Close        ( vlc_object_t * );
 #define WIDTH_TEXT N_("Goom display width")
 #define HEIGHT_TEXT N_("Goom display height")
 #define RES_LONGTEXT N_("Allows you to change the resolution of the " \
-  "goom display (bigger resolution will be prettier but more CPU intensive).")
+  "Goom display (bigger resolution will be prettier but more CPU intensive).")
 
 #define SPEED_TEXT N_("Goom animation speed")
 #define SPEED_LONGTEXT N_("Allows you to reduce the speed of the animation " \
