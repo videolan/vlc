@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.12 2004/01/12 20:54:24 hartman Exp $
+# $Id: Makefile,v 1.13 2004/01/19 01:11:47 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -679,7 +679,7 @@ libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .caca: libcaca
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-imlib2 && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --disable-imlib2 --disable-doc && make && make install)
 	touch $@
 
 CLEAN_FILE += .caca
