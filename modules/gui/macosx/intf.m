@@ -487,19 +487,18 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
     
-    /* Check if we need to start playing */
-    if( p_intf->b_play )
-    {
-        p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-        if( p_playlist )
+    if( p_playlist )
+    {
+        /* Check if we need to start playing */
+        if( p_intf->b_play )
         {
             playlist_Play( p_playlist );
-            vlc_object_release( p_playlist );
         }
+        [o_btn_fullscreen setState: ( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool )];
+        vlc_object_release( p_playlist );
     }
-    
-    [o_btn_fullscreen setState: ( var_Get( p_playlist, "fullscreen", &val )>=0 && val.b_bool )];
 }
 
 - (void)initStrings

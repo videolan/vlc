@@ -156,8 +156,9 @@ void playlist_Destroy( playlist_t * p_playlist )
 
 
 /**
- * Do a playlist action
+ * Do a playlist action.
  *
+ * If there is something in the playlist then you can do playlist actions.
  * \param p_playlist the playlist to do the command on
  * \param i_command the command to do
  * \param i_arg the argument to the command. See playlist_command_t for details
@@ -168,6 +169,12 @@ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
     vlc_value_t val;
 
     vlc_mutex_lock( &p_playlist->object_lock );
+
+    if( p_playlist->i_size <= 0 )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        return;
+    }
 
     switch( i_command )
     {
