@@ -115,8 +115,8 @@ void Printf( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #define TTY_TEXT N_("Fake TTY")
 #define TTY_LONGTEXT N_("Force the rc module to use stdin as if it was a TTY.")
 
-#define CF_TEXT N_("Command input")
-#define CF_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
+#define HOST_TEXT N_("Command input")
+#define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
     "You can set the address and port the interface will bind to." )
 
 vlc_module_begin();
@@ -125,7 +125,7 @@ vlc_module_begin();
 #ifdef HAVE_ISATTY
     add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, VLC_TRUE );
 #endif
-    add_string( "rc-host", 0, NULL, CF_TEXT, CF_LONGTEXT, VLC_TRUE );
+    add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
     set_capability( "interface", 20 );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();
@@ -907,7 +907,8 @@ vlc_bool_t ReadWin32( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
                                 INTF_IDLE_SLEEP/1000 ) == WAIT_OBJECT_0 )
     {
         while( !p_intf->b_die && *pi_size < MAX_LINE_LENGTH &&
-               ReadConsoleInput( p_sys->hConsoleIn, &input_record, 1, &i_dw ) )
+               ReadConsoleInput( p_intf->p_sys->hConsoleIn, &input_record,
+                                 1, &i_dw ) )
         {
             if( input_record.EventType != KEY_EVENT ||
                 !input_record.Event.KeyEvent.bKeyDown ||
@@ -967,7 +968,7 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
 
 #ifdef WIN32
     if( p_intf->p_sys->i_socket == -1 )
-        return ReadWin32( p_intf, p_buffer, pi_size, pb_complete );
+        return ReadWin32( p_intf, p_buffer, pi_size );
 #endif
 
     while( !p_intf->b_die && *pi_size < MAX_LINE_LENGTH &&

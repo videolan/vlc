@@ -194,7 +194,7 @@ int __net_Accept( vlc_object_t *p_this, int fd, mtime_t i_wait )
         else if( i_ret < 0 )
         {
 #ifdef WIN32
-            msg_Err( p_this, "network select error (%s)", WSAGetLastError() );
+            msg_Err( p_this, "network select error (%i)", WSAGetLastError() );
 #else
             msg_Err( p_this, "network select error (%s)", strerror(errno) );
 #endif
