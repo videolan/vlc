@@ -34,12 +34,9 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
-
-#ifdef STRNCASECMP_IN_STRINGS_H
-#   include <strings.h>
-#endif
 
 #if defined( WIN32 )
 #   include <io.h>                                                 /* read() */
