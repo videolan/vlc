@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.54 2003/08/20 16:22:27 garf Exp $
+ * $Id: vout.m,v 1.55 2003/08/25 14:51:47 garf Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -486,10 +486,13 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 	GetPortBounds( p_vout->p_sys->p_qdportold, &oldrect );
         GetClip( oldClip );
 
+	LockPortBits( p_vout->p_sys->p_qdport );
+
         SetPort( p_vout->p_sys->p_qdport );
         SetOrigin( p_vout->p_sys->portx , p_vout->p_sys->porty );
         ClipRect( &p_vout->p_sys->rect );
-   	
+   
+	
         if( ( err = DecompressSequenceFrameS( 
                         p_vout->p_sys->i_seq,
                         p_pic->p_sys->p_info,
@@ -503,9 +506,13 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
             QDFlushPortBuffer( p_vout->p_sys->p_qdport, p_vout->p_sys->mask );
         }
 
+
 	SetOrigin( oldrect.left , oldrect.top );
         SetClip( oldClip );
         SetPort( p_vout->p_sys->p_qdportold );
+
+	UnlockPortBits( p_vout->p_sys->p_qdport );
+
     }
     else
     { 

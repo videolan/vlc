@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.18 2003/08/19 14:07:51 garf Exp $
+ * $Id: vlcshell.cpp,v 1.19 2003/08/25 14:51:49 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,7 +47,7 @@
 
 #ifdef XP_MACOSX
     /* Mac OS X stuff */
-#   include <QuickDraw.h>
+#   include <Quickdraw.h>
 #endif
 
 #include "vlcpeer.h"
@@ -208,7 +208,6 @@ int16 NPP_HandleEvent( NPP instance, void * event )
     {
         value.i_int = 1;
         VLC_Set( p_plugin->i_vlc, "drawableredraw", value );
-
         return true;
     }
 
@@ -413,6 +412,8 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     vlc_value_t valuer;
     vlc_value_t valueportx;
     vlc_value_t valueporty;
+    Rect black_rect;
+    char * text;
 #endif
 
     if( instance == NULL )
@@ -453,6 +454,24 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     VLC_Set( p_plugin->i_vlc, "drawableh", valueh );
 
     p_plugin->window = window;
+
+    /* draw the beautiful "No Picture" */
+
+    black_rect.top = valuet.i_int - valuey.i_int;
+    black_rect.left = valuel.i_int - valuex.i_int;
+    black_rect.bottom = valueb.i_int - valuey.i_int;
+    black_rect.right = valuer.i_int - valuex.i_int;
+
+    SetPort( value.i_int );
+    SetOrigin( valueportx.i_int , valueporty.i_int );
+    ForeColor(blackColor);
+    PenMode( patCopy );
+    PaintRect( &black_rect );
+
+    ForeColor(whiteColor);
+    text = strdup( WINDOW_TEXT );
+    MoveTo( valuew.i_int / 2 - 40 , valueh.i_int / 2 );
+    DrawText( text , 0 , strlen(text) );
 
 #else
     /* FIXME: this cast sucks */
