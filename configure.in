@@ -240,6 +240,21 @@ have problems using libdvdcss.
     fi
 fi
 
+dnl Checks for __attribute__(aligned()) directive
+AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
+    [ac_cv_c_attribute_aligned],
+    [ac_cv_c_attribute_aligned=0
+	CFLAGS="${save_CFLAGS} -Werror"
+    for ac_cv_c_attr_align_try in 2 4 8 16 32 64; do
+        AC_TRY_COMPILE([],
+        [static char c __attribute__ ((aligned($ac_cv_c_attr_align_try))) = 0; return c;],
+        [ac_cv_c_attribute_aligned=$ac_cv_c_attr_align_try])
+    done])
+if test x"$ac_cv_c_attribute_aligned" != x"0"; then
+    AC_DEFINE_UNQUOTED([ATTRIBUTE_ALIGNED_MAX],
+        [$ac_cv_c_attribute_aligned],[Maximum supported data alignment])
+fi
+
 dnl End of the bizarre compilation tests
 CFLAGS="${save_CFLAGS}"
 LDFLAGS="${save_LDFLAGS}"
@@ -273,21 +288,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 AC_HEADER_TIME
-
-dnl Checks for __attribute__(aligned()) directive
-AC_CACHE_CHECK([__attribute__ ((aligned ())) support],
-    [ac_cv_c_attribute_aligned],
-    [ac_cv_c_attribute_aligned=0
-    for ac_cv_c_attr_align_try in 2 4 8 16 32 64; do
-        AC_TRY_COMPILE([],
-        [static char c __attribute__ ((aligned($ac_cv_c_attr_align_try))) = 0; return c;],
-        [ac_cv_c_attribute_aligned=$ac_cv_c_attr_align_try])
-    done])
-if test x"$ac_cv_c_attribute_aligned" != x"0"; then
-    AC_DEFINE_UNQUOTED([ATTRIBUTE_ALIGNED_MAX],
-        [$ac_cv_c_attribute_aligned],[Maximum supported data alignment])
-fi
-
 
 
 ARCH=${target_cpu}
