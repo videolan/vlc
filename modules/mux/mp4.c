@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.7 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: mp4.c,v 1.8 2004/01/12 20:19:55 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -280,6 +280,55 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     box_fix( esds );
 
     return esds;
+}
+
+static bo_t *GetWaveTag( mp4_stream_t *p_stream )
+{
+    bo_t *wave;
+    bo_t *box;
+
+    wave = box_new( "wave" );
+
+    box = box_new( "frma" );
+    bo_add_fourcc( box, "mp4a" );
+    box_fix( box );
+    box_gather( wave, box );
+
+    box = box_new( "mp4a" );
+    bo_add_32be( box, 0 );
+    box_fix( box );
+    box_gather( wave, box );
+
+    box = GetESDS( p_stream );
+    box_fix( box );
+    box_gather( wave, box );
+
+    box = box_new( "srcq" );
+    bo_add_32be( box, 0x40 );
+    box_fix( box );
+    box_gather( wave, box );
+
+    box = box_new( "    " );
+    box_fix( box );
+    box_gather( wave, box );
+
+    box_fix( wave );
+
+    return wave;
+}
+
+/* TODO: No idea about these values */
+static bo_t *GetSVQ3Tag( mp4_stream_t *p_stream )
+{
+    bo_t *smi = box_new( "SMI " );
+
+    bo_add_fourcc( smi, "SEQH" );
+    bo_add_32be( smi, 0x5 );
+    bo_add_32be( smi, 0xe2c0211d );
+    bo_add_8( smi, 0xc0 );
+    box_fix( smi );
+
+    return smi;
 }
 
 /*****************************************************************************
@@ -628,7 +677,15 @@ static void Close( vlc_object_t * p_this )
             bo_add_16be( soun, 1 );         // data-reference-index
 
             /* SoundDescription */
-            bo_add_16be( soun, 0 );         // version;
+            if( p_sys->b_mov &&
+                p_stream->p_fmt->i_codec == VLC_FOURCC( 'm', 'p', '4', 'a' ) )
+            {
+                bo_add_16be( soun, 1 );     // version 1;
+            }
+            else
+            {
+                bo_add_16be( soun, 0 );     // version 0;
+            }
             bo_add_16be( soun, 0 );         // revision level (0)
             bo_add_32be( soun, 0 );         // vendor
             bo_add_16be( soun, p_stream->p_fmt->audio.i_channels );   // channel-count
@@ -636,17 +693,35 @@ static void Close( vlc_object_t * p_this )
             bo_add_16be( soun, -2 );        // compression id
             bo_add_16be( soun, 0 );         // packet size (0)
             bo_add_16be( soun, p_stream->p_fmt->audio.i_rate ); // sampleratehi
-            bo_add_16be( soun, 0 );                              // sampleratelo
+            bo_add_16be( soun, 0 );                             // sampleratelo
+
+            /* Extended data for SoundDescription V1 */
+            if( p_sys->b_mov &&
+                p_stream->p_fmt->i_codec == VLC_FOURCC( 'm', 'p', '4', 'a' ) )
+            {
+                bo_add_32be( soun, p_stream->p_fmt->audio.i_frame_length );    /* samples per packet */
+                bo_add_32be( soun, 1536 ); /* bytes per packet */
+                bo_add_32be( soun, 2 );    /* bytes per frame */
+                /* bytes per sample */
+                bo_add_32be( soun, 2 /*p_stream->p_fmt->audio.i_bitspersample/8 */);
+            }
 
             /* add an ES Descriptor */
             if( b_mpeg4_hdr )
             {
-                bo_t *esds;
+                bo_t *box;
 
-                esds = GetESDS( p_stream );
-
-                box_fix( esds );
-                box_gather( soun, esds );
+                if( p_sys->b_mov &&
+                    p_stream->p_fmt->i_codec == VLC_FOURCC('m','p','4','a') )
+                {
+                    box = GetWaveTag( p_stream );
+                }
+                else
+                {
+                    box = GetESDS( p_stream );
+                }
+                box_fix( box );
+                box_gather( soun, box );
             }
 
             box_fix( soun );
@@ -657,24 +732,24 @@ static void Close( vlc_object_t * p_this )
             bo_t *vide;
             char fcc[4] = "    ";
             int  i;
-            vlc_bool_t b_mpeg4_hdr;
 
             switch( p_stream->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'm', 'p', '4', 'v' ):
                 case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
                     memcpy( fcc, "mp4v", 4 );
-                    b_mpeg4_hdr = VLC_TRUE;
                     break;
 
                 case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
                     memcpy( fcc, "mjpa", 4 );
-                    b_mpeg4_hdr = VLC_FALSE;
+                    break;
+
+                case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
+                    memcpy( fcc, "SVQ3", 4 );
                     break;
 
                 default:
                     memcpy( fcc, (char*)&p_stream->p_fmt->i_codec, 4 );
-                    b_mpeg4_hdr = VLC_FALSE;
                     break;
             }
 
@@ -711,14 +786,29 @@ static void Close( vlc_object_t * p_this )
             bo_add_16be( vide, 0xffff );    // predefined
 
             /* add an ES Descriptor */
-            if( b_mpeg4_hdr )
+            switch( p_stream->p_fmt->i_codec )
             {
-                bo_t *esds;
+            case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+            case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+                {
+                    bo_t *esds = GetESDS( p_stream );
 
-                esds = GetESDS( p_stream );
+                    box_fix( esds );
+                    box_gather( vide, esds );
+                }
+                break;
 
-                box_fix( esds );
-                box_gather( vide, esds );
+            case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
+                {
+                    bo_t *esds = GetSVQ3Tag( p_stream );
+
+                    box_fix( esds );
+                    box_gather( vide, esds );
+                }
+                break;
+
+            default:
+                break;
             }
 
             box_fix( vide );
@@ -953,6 +1043,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
         case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
         case VLC_FOURCC( 'm', 'j', 'p', 'b' ):
+        case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
             break;
         default:
             msg_Err( p_mux, "unsupported codec %4.4s in mp4",
