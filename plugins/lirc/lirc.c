@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.4 2002/02/19 03:54:55 sam Exp $
+ * $Id: lirc.c,v 1.5 2002/02/20 01:47:01 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -140,15 +140,20 @@ static void intf_Run( intf_thread_t *p_intf )
     char *code;
     char *c;
 
+    /* Manage core vlc functions through the callback */
+    p_intf->pf_manage( p_intf );
+
     while( !p_intf->b_die && lirc_nextcode(&code) == 0 )
     {
+printf("code\n");
         if( code == NULL )
         {
             continue;
         }
 
-        while( !p_intf->b_die && c != NULL
-                && lirc_code2char( p_intf->p_sys->config, code, &c ) == 0 )
+        while( !p_intf->b_die 
+                && lirc_code2char( p_intf->p_sys->config, code, &c ) == 0
+                && c != NULL )
         {
             if( !strcmp( c, "QUIT" ) )
             {
@@ -265,5 +270,6 @@ static void intf_Run( intf_thread_t *p_intf )
         /* Manage core vlc functions through the callback */
         p_intf->pf_manage( p_intf );
     }
+printf("end of intf\n");
 }
 
