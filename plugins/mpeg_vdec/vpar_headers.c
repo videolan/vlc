@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.4 2001/12/10 04:53:11 sam Exp $
+ * $Id: vpar_headers.c,v 1.5 2001/12/10 10:58:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -381,6 +381,43 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     else
     {
         /* It's an MPEG-1 stream. Put adequate parameters. */
+        int i_xyratio;
+        static int pi_mpeg1ratio[15] = {
+            10000,
+            10000,
+             6735,
+             7031,
+             7615,
+             8055,
+             8437,
+             8935,
+             9157,
+             9815,
+            10255,
+            10695,
+            10950,
+            11575,
+            12015
+        };
+
+        if( p_vpar->sequence.i_aspect_ratio > 1 )
+        {
+                i_xyratio = p_vpar->sequence.i_height *
+                        pi_mpeg1ratio[p_vpar->sequence.i_aspect_ratio] /
+                        p_vpar->sequence.i_width;
+                if( 7450 < i_xyratio && i_xyratio < 7550 )
+                {
+                        p_vpar->sequence.i_aspect_ratio = 2;
+                }
+                else if( 5575 < i_xyratio && i_xyratio < 5675 )
+                {
+                        p_vpar->sequence.i_aspect_ratio = 3;
+                }
+                else if( 4475 < i_xyratio && i_xyratio < 4575 )
+                {
+                        p_vpar->sequence.i_aspect_ratio = 4;
+                }
+        }
 
         p_vpar->sequence.b_mpeg2 = 0;
         p_vpar->sequence.b_progressive = 1;
