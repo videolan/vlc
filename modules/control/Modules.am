@@ -8,4 +8,3 @@ SOURCES_joystick = joystick.c
 SOURCES_hotkeys = hotkeys.c
 SOURCES_lirc = lirc.c
 SOURCES_rc = rc.c
-SOURCES_rtci = rtci.c
