@@ -602,7 +602,7 @@ CDDAFormatStr(const input_thread_t *p_input, cdda_data_t *p_cdda,
   bool saw_control_prefix = false;
   size_t format_len = strlen(format_str);
 
-  bzero(temp_str, TEMP_STR_SIZE);
+  memset(temp_str, 0, TEMP_STR_SIZE);
 
   for (i=0; i<format_len; i++) {
 
