@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.45 2001/03/15 01:42:20 sam Exp $
+ * $Id: mpeg_system.c,v 1.46 2001/04/05 14:00:28 asmax Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -657,6 +657,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
     es_descriptor_t *   p_es = NULL;
 
     i_code = p_data->p_payload_start[3];
+
     if( i_code > 0xBC ) /* ES start code */
     {
         u16                 i_id;

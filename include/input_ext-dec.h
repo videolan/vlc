@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.25 2001/03/06 19:33:58 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.26 2001/04/05 14:00:28 asmax Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -33,6 +33,7 @@ typedef struct data_packet_s
 {
     /* Nothing before this line, the code relies on that */
     byte_t *                p_buffer;                     /* raw data packet */
+    long    	    	    l_size;                         /* buffer length */
 
     /* Decoders information */
     byte_t *                p_payload_start;

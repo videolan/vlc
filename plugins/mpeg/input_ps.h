@@ -2,9 +2,10 @@
  * input_ps.h: thread structure of the PS plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ps.h,v 1.2 2001/03/21 13:42:34 sam Exp $
+ * $Id: input_ps.h,v 1.3 2001/04/05 14:00:28 asmax Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Cyril Deguet <asmax@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,3 +30,55 @@ typedef struct thread_ps_data_s
     /* We're necessarily reading a file. */
     FILE *                  stream;
 } thread_ps_data_t;
+
+
+#define DATA_CACHE_SIZE 150
+#define PES_CACHE_SIZE 150
+#define SMALL_CACHE_SIZE 150
+#define LARGE_CACHE_SIZE 300
+#define MAX_SMALL_SIZE 50     // frontier between small and large packets
+
+typedef struct
+{
+    data_packet_t **        p_stack;
+    long                    l_index;
+} data_packet_cache_t;
+
+
+typedef struct
+{
+    pes_packet_t **         p_stack;
+    long                    l_index;
+} pes_packet_cache_t;
+
+
+typedef struct
+{
+    byte_t *                p_data;
+    long                    l_size;
+} packet_buffer_t;
+
+
+typedef struct
+{
+    packet_buffer_t *       p_stack;
+    long                    l_index;
+} small_buffer_cache_t;
+
+
+typedef struct
+{
+    packet_buffer_t *       p_stack;
+    long                    l_index;
+} large_buffer_cache_t;
+
+
+typedef struct
+{
+    data_packet_cache_t     data;
+    pes_packet_cache_t      pes;
+    small_buffer_cache_t    small;
+    large_buffer_cache_t    large;
+} packet_cache_t;
+
+
