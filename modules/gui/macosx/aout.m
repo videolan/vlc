@@ -1,8 +1,8 @@
 /*****************************************************************************
  * aout.m: CoreAudio output plugin
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.19 2003/01/13 14:51:25 massiot Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: aout.m,v 1.20 2003/01/13 20:02:37 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -407,13 +407,6 @@ void E_(CloseAudio)( aout_instance_t * p_aout )
     if( err != noErr )
     {
         msg_Err( p_aout, "AudioDeviceRemoveIOProc failed: [%4.4s]",
-                 (char *)&err );
-    }
-
-    err = AudioHardwareUnload();
-    if( err != noErr )
-    {
-        msg_Err( p_aout, "AudioHardwareUnload failed: [%4.4s]", 
                  (char *)&err );
     }
 
