@@ -210,7 +210,8 @@ http://www.videolan.org/libdvdcss/ or http://plf.zarb.org/
 Summary: Development files for the VideoLAN Client
 Group: Development/C
 Requires: %name = %version-%release
-Provides: %{name}-devel = %version-%release
+Provides: %name-devel = %version-%release
+Provides: lib%name-devel = %version-%release
 %description -n %libname-devel
 Development files for the VideoLAN Client
 VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
@@ -636,10 +637,6 @@ install -m 644 %pngdir/qvlc48x48.png %buildroot/%_liconsdir/qvlc.png
 
 #rpm (>= 4.0.4-20mdk) now checks for installed (but unpackaged) files
 rm -f %pngdir/*
-#rm -f %buildroot/%_libdir/vlc/demux/libts_dvbpsi_plugin.so
-#FIXME: mandrake configure2_5x macro is broken (force cross compile mode)
-mv %buildroot/%_bindir/%_target_cpu-mandrake-linux-gnu-vlc %buildroot/%_bindir/vlc
-mv %buildroot/%_bindir/%_target_cpu-mandrake-linux-gnu-vlc-config %buildroot/%_bindir/vlc-config
 
 %post
 %update_menus
@@ -661,7 +658,6 @@ rm -fr %buildroot
 %_libdir/vlc/access/libaccess_ftp_plugin.so
 %_libdir/vlc/access/libaccess_http_plugin.so
 %_libdir/vlc/access/libaccess_mms_plugin.so
-%_libdir/vlc/access/libaccess_rtp_plugin.so
 %_libdir/vlc/access/libaccess_udp_plugin.so
 %if %with_dvdplay
 %_libdir/vlc/access/libdvdplay_plugin.so
@@ -707,24 +703,26 @@ rm -fr %buildroot
 %_libdir/vlc/codec/libadpcm_plugin.so
 %_libdir/vlc/codec/libaraw_plugin.so
 %_libdir/vlc/codec/libcinepak_plugin.so
-%_libdir/vlc/codec/libdownmix3dn_plugin.so
-%_libdir/vlc/codec/libdownmixsse_plugin.so
 %_libdir/vlc/codec/libidctclassic_plugin.so
+%ifarch %ix86
 %_libdir/vlc/codec/libidctmmxext_plugin.so
 %_libdir/vlc/codec/libidctmmx_plugin.so
+%endif
 %_libdir/vlc/codec/libidct_plugin.so
-%_libdir/vlc/codec/libimdct3dn_plugin.so
-%_libdir/vlc/codec/libimdctsse_plugin.so
 %_libdir/vlc/codec/liblpcm_plugin.so
+%ifarch %ix86
 %_libdir/vlc/codec/libmotionmmxext_plugin.so
 %_libdir/vlc/codec/libmotionmmx_plugin.so
+%endif
 %_libdir/vlc/codec/libmotion_plugin.so
 %_libdir/vlc/codec/libmpeg_audio_plugin.so
 %_libdir/vlc/codec/libmpeg_video_plugin.so
 %if %with_ffmpeg
 %_libdir/vlc/codec/libpostprocessing_c_plugin.so
-%_libdir/vlc/codec/libpostprocessing_mmx_plugin.so
-%_libdir/vlc/codec/libpostprocessing_mmxext_plugin.so
+	%ifarch %ix86
+	%_libdir/vlc/codec/libpostprocessing_mmx_plugin.so
+	%_libdir/vlc/codec/libpostprocessing_mmxext_plugin.so
+	%endif
 %endif
 %_libdir/vlc/codec/libspudec_plugin.so
 
@@ -753,9 +751,11 @@ rm -fr %buildroot
 %_libdir/vlc/misc/libipv4_plugin.so
 %_libdir/vlc/misc/libipv6_plugin.so
 %_libdir/vlc/misc/liblogger_plugin.so
+%ifarch %ix86
 %_libdir/vlc/misc/libmemcpy3dn_plugin.so
 %_libdir/vlc/misc/libmemcpymmxext_plugin.so
 %_libdir/vlc/misc/libmemcpymmx_plugin.so
+%endif
 %_libdir/vlc/misc/libmemcpy_plugin.so
 %_libdir/vlc/misc/libsap_plugin.so
 
@@ -772,14 +772,16 @@ rm -fr %buildroot
 %_libdir/vlc/packetizer/libpacketizer_mpegvideo_plugin.so
 
 %dir %_libdir/vlc/video_chroma
-%_libdir/vlc/video_chroma/libi420_rgb_mmx_plugin.so
 %_libdir/vlc/video_chroma/libi420_rgb_plugin.so
-%_libdir/vlc/video_chroma/libi420_ymga_mmx_plugin.so
 %_libdir/vlc/video_chroma/libi420_ymga_plugin.so
-%_libdir/vlc/video_chroma/libi420_yuy2_mmx_plugin.so
 %_libdir/vlc/video_chroma/libi420_yuy2_plugin.so
-%_libdir/vlc/video_chroma/libi422_yuy2_mmx_plugin.so
 %_libdir/vlc/video_chroma/libi422_yuy2_plugin.so
+%ifarch %ix86
+%_libdir/vlc/video_chroma/libi420_rgb_mmx_plugin.so
+%_libdir/vlc/video_chroma/libi420_ymga_mmx_plugin.so
+%_libdir/vlc/video_chroma/libi420_yuy2_mmx_plugin.so
+%_libdir/vlc/video_chroma/libi422_yuy2_mmx_plugin.so
+%endif
 
 %dir %_libdir/vlc/video_filter
 %_libdir/vlc/video_filter/libadjust_plugin.so
