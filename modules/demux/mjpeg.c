@@ -64,9 +64,6 @@ struct demux_sys_t
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
-    int64_t         i_data_pos;
-    unsigned int    i_data_size;
-
     mtime_t         i_time;
     mtime_t         i_frame_length;
     char            *psz_separator;
@@ -92,7 +89,8 @@ static vlc_bool_t Peek( demux_t *p_demux, vlc_bool_t b_first )
     {
         p_sys->i_frame_size_estimate += 5120;
     }
-    i_data = stream_Peek( p_demux->s, &p_sys->p_peek, p_sys->i_frame_size_estimate );
+    i_data = stream_Peek( p_demux->s, &p_sys->p_peek,
+                          p_sys->i_frame_size_estimate );
     if( i_data == p_sys->i_data_peeked )
     {
         msg_Warn( p_demux, "no more data" );
@@ -169,7 +167,7 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
     vlc_bool_t  b_jpeg = VLC_FALSE;
     int         i_pos;
     char        *psz_line;
-    char	*p_ch;
+    char        *p_ch;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     if( !Peek( p_demux, VLC_TRUE ) )
@@ -200,13 +198,15 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
     if( NULL == p_sys->psz_separator )
     {
         p_sys->psz_separator = psz_line;
-        msg_Dbg( p_demux, "Multipart MIME detected, using separator: %s", p_sys->psz_separator );
+        msg_Dbg( p_demux, "Multipart MIME detected, using separator: %s",
+                 p_sys->psz_separator );
     }
     else
     {
         if( strcmp( psz_line, p_sys->psz_separator ) )
         {
-            msg_Warn( p_demux, "separator %s does not match %s", psz_line, p_sys->psz_separator );
+            msg_Warn( p_demux, "separator %s does not match %s", psz_line,
+                      p_sys->psz_separator );
         }
         free( psz_line );
     }
@@ -357,7 +357,8 @@ static int MjpgDemux( demux_t *p_demux )
         i++;
         if( i >= p_sys->i_data_peeked )
         {
-            msg_Dbg( p_demux, "Did not find JPEG EOI in %d bytes", p_sys->i_data_peeked );
+            msg_Dbg( p_demux, "Did not find JPEG EOI in %d bytes",
+                     p_sys->i_data_peeked );
             if( !Peek( p_demux, VLC_FALSE ) )
             {
                 msg_Warn( p_demux, "No more data is available at the moment" );
@@ -413,15 +414,19 @@ static int MimeDemux( demux_t *p_demux )
             i_size++;
             if( i_size >= p_sys->i_data_peeked )
             {
-                msg_Dbg( p_demux, "MIME boundary not found in %d bytes of data", p_sys->i_data_peeked );
+                msg_Dbg( p_demux, "MIME boundary not found in %d bytes of "
+                         "data", p_sys->i_data_peeked );
+
                 if( !Peek( p_demux, VLC_FALSE ) )
                 {
-                    msg_Warn( p_demux, "No more data is available at the moment" );
+                    msg_Warn( p_demux, "No more data is available at the "
+                              "moment" );
                     return 0;
                 }
             }
         }
-        if( !strncmp( p_sys->psz_separator, p_sys->p_peek + i + 2, strlen( p_sys->psz_separator ) ) )
+        if( !strncmp( p_sys->psz_separator, p_sys->p_peek + i + 2,
+                      strlen( p_sys->psz_separator ) ) )
         {
             b_done = VLC_TRUE;
             msg_Dbg( p_demux, "MIME boundary detected at %d", i );
@@ -465,16 +470,7 @@ static void Close ( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys  = p_demux->p_sys;
-    int64_t i_end = -1;
-    if( p_sys->i_data_size > 0 )
-    {
-        i_end = p_sys->i_data_pos + p_sys->i_data_size;
-    }
-    return demux2_vaControlHelper( p_demux->s,
-                                   p_sys->i_data_pos, i_end,
-                                   p_sys->fmt.i_bitrate, p_sys->fmt.audio.i_blockalign,
-                                   i_query, args );
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    return demux2_vaControlHelper( p_demux->s, 0, 0, 0, 0, i_query, args );
 }
-
-
