@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.19 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: timer.cpp,v 1.20 2003/05/27 11:35:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -123,14 +123,10 @@ void Timer::Notify()
     {
         wxPoint mousepos = wxGetMousePosition();
 
-#if defined( __WXMSW__ ) || defined( __WXMAC__ )
-        wxContextMenuEvent event =
-            wxContextMenuEvent( wxEVT_NULL, 0, mousepos );
-#else
         wxMouseEvent event = wxMouseEvent( wxEVT_RIGHT_UP );
         event.m_x = p_main_interface->ScreenToClient(mousepos).x;
         event.m_y = p_main_interface->ScreenToClient(mousepos).y;
-#endif
+
         p_main_interface->AddPendingEvent(event);
 
         p_main_interface->b_popup_change = VLC_FALSE;

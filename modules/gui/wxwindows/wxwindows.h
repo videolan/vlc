@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.32 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: wxwindows.h,v 1.33 2003/05/27 11:35:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,10 +173,9 @@ private:
     void OnMenuOpen( wxMenuEvent& event );
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
-    void OnContextMenu(wxContextMenuEvent& event);
-#else
-    void OnContextMenu(wxMouseEvent& event);
+    void OnContextMenu2(wxContextMenuEvent& event);
 #endif
+    void OnContextMenu(wxMouseEvent& event);
 
     DECLARE_EVENT_TABLE();
 

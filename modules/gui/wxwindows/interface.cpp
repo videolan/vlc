@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.35 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: interface.cpp,v 1.36 2003/05/27 11:35:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -139,10 +139,9 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU_OPEN(Interface::OnMenuOpen)
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
-    EVT_CONTEXT_MENU(Interface::OnContextMenu)
-#else
-    EVT_RIGHT_UP(Interface::OnContextMenu)
+    EVT_CONTEXT_MENU(Interface::OnContextMenu2)
 #endif
+    EVT_RIGHT_UP(Interface::OnContextMenu)
 
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
@@ -539,16 +538,15 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
 }
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
-void Interface::OnContextMenu(wxContextMenuEvent& event)
+void Interface::OnContextMenu2(wxContextMenuEvent& event)
 {
     ::PopupMenu( p_intf, this, ScreenToClient(event.GetPosition()) );
 }
-#else
+#endif
 void Interface::OnContextMenu(wxMouseEvent& event)
 {
     ::PopupMenu( p_intf, this, event.GetPosition() );
 }
-#endif
 
 void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 {
