@@ -416,7 +416,7 @@ END_EVENT_TABLE()
 
 VLCVolCtrl::VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent,
                         wxGauge **pp_volctrl )
-  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, 16 ) )
+  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, 16 ), wxBORDER_NONE )
 {
     *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint(18,0),
                                   wxSize(44,16) );
@@ -471,7 +471,9 @@ void Interface::CreateOurToolBar()
                       wxU(_(HELP_PLO)) );
 
     wxControl *p_dummy_ctrl =
-        new wxControl( toolbar, -1, wxDefaultPosition, wxSize(64, 16 ) );
+        new wxControl( toolbar, -1, wxDefaultPosition,
+                       wxSize(64, 16 ), wxBORDER_NONE );
+
     toolbar->AddControl( p_dummy_ctrl );
 
     VLCVolCtrl *sound_control = new VLCVolCtrl( p_intf, toolbar, &volctrl );
