@@ -98,7 +98,7 @@
       <form method="get" action="">
       <table>
        <vlc id="foreach" param1="pl" param2="playlist" />
-        <tr class="<vlc id="if" param1="2 pl.index % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
+        <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
          <td>
           <input type=checkbox name="item" value="<vlc id="value" param1="pl.index" />">
           <vlc id="if" param1="pl.current" />
