@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.5 2003/05/19 21:39:34 asmax Exp $
+ * $Id: x11_window.cpp,v 1.6 2003/05/24 21:28:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -112,6 +112,9 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     attr.wclass = GDK_INPUT_OUTPUT;
     gint mask = 0;
     ToolTipWindow = gdk_window_new( gwnd, &attr, mask);*/
+
+    Open();
+    fprintf(stderr, "kludge in x11_window.cpp\n");
 
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.3 2003/05/19 21:39:34 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.4 2003/05/24 21:28:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -170,8 +170,7 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
     Window wnd = XCreateSimpleWindow( display, root, 0, 0, 1, 1, 0, 0, 0 );
     XSelectInput( display, wnd, ExposureMask|
             KeyPressMask|KeyReleaseMask|ButtonPressMask|ButtonReleaseMask|
-            PointerMotionMask|PointerMotionHintMask|EnterWindowMask|
-            LeaveWindowMask);
+            PointerMotionMask|EnterWindowMask|LeaveWindowMask);
 
     // Changing decorations
     struct {
@@ -193,7 +192,7 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
 
     // Display the window
     XMapRaised( display, wnd );
-    XFlush( display );
+    XSync( display, False );
 
     WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, 
         visible, fadetime, alpha, movealpha, dragdrop, name ) ) ;

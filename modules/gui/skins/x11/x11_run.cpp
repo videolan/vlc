@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.7 2003/05/24 20:54:27 gbazin Exp $
+ * $Id: x11_run.cpp,v 1.8 2003/05/24 21:28:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -242,10 +242,9 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
 
     Window wnd = ((XAnyEvent *)event)->window;
     
-//    fprintf(stderr,"event %d %x\n", event->type, wnd);
-
     // Create event to dispatch in windows
     // Skin event
+
     if( event->type == ClientMessage )
     {
         msg = ( (XClientMessageEvent *)event )->data.l[0];

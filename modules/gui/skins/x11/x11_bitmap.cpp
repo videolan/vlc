@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.5 2003/05/19 21:39:34 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.6 2003/05/24 21:28:29 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -135,13 +135,12 @@ void X11Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 //---------------------------------------------------------------------------
 bool X11Bitmap::Hit( int x, int y)
 {
-//    unsigned int c = (unsigned int)GetBmpPixel( x, y );
+    unsigned int c = (unsigned int)GetBmpPixel( x, y );
 
-/*    if( c == -1 || c == AlphaColor )
+    if( c == -1 || c == AlphaColor )
         return false;
     else
-        return true;*/
-    return true;
+        return true;
 }
 //---------------------------------------------------------------------------
 int X11Bitmap::GetBmpPixel( int x, int y )
@@ -149,6 +148,7 @@ int X11Bitmap::GetBmpPixel( int x, int y )
     if( !Bmp || x < 0 || x >= Width || y < 0 || y >= Height )
         return -1;
 
+    return 42;
 /*    guchar *pixels;
     int rowstride, offset;
     gboolean has_alpha;
