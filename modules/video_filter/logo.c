@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: logo.c,v 1.7 2004/01/25 03:28:41 hartman Exp $
+ * $Id: logo.c,v 1.8 2004/01/25 10:17:19 gbazin Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -69,7 +69,7 @@ vlc_module_begin();
     add_file( "logo_file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
     add_integer( "logo_x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "logo_y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_int_with_range( "logo_transparency", 255, 0, 255, NULL, TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( "logo_transparency", 255, 0, 255, NULL, TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
     set_description( _("Logo video filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "logo" );
@@ -390,7 +390,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             } else
             {
                 p_out  = p_outpic->p[i_index].p_pixels +
-                         ( p_vout->p_sys->posy  2 )* p_outpic->p[i_index].i_pitch +
+                            p_vout->p_sys->posy / 2 * p_outpic->p[i_index].i_pitch +
                          p_vout->p_sys->posx / 2;
                 i_max = p_vout->p_sys->height / 2;
                 j_max = p_vout->p_sys->width / 2;
