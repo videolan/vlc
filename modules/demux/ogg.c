@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.16 2002/12/19 23:23:24 sigmunau Exp $
+ * $Id: ogg.c,v 1.17 2002/12/20 15:18:56 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -443,8 +443,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 
     if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 't','a','r','k' ) &&
-        p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) &&
-        p_stream->i_fourcc != VLC_FOURCC( 'o','f','l','c') )
+        p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
     {
         /* Remove the header from the packet */
         i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
@@ -525,33 +524,8 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 /* FIXME: check return value */
                 ogg_stream_packetpeek( &p_stream->os, &oggpacket );
 
-                msg_Dbg( p_input, "found string: %s", strndup( &oggpacket.packet[0], 6 ) );
-                msg_Dbg( p_input, "oggpacket.bytes is %d", oggpacket.bytes );
-                if( oggpacket.bytes >= 4 &&
-                    ! strncmp( &oggpacket.packet[0], "fLaC", 4 ) )
-                {
-                    oggpack_buffer opb;
-
-                    msg_Dbg( p_input, "found flac header" );
-                    p_stream->i_cat = AUDIO_ES;
-                    p_stream->i_fourcc = VLC_FOURCC( 'o','f','l','c' );
-#if 0
-                    /* Signal that we want to keep a backup of the vorbis
-                     * stream headers. They will be used when switching between
-                     * audio streams. */
-                    p_stream->b_force_backup = 1;
-
-                    /* Cheat and get additionnal info ;) */
-                    oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
-                    oggpack_adv( &opb, 96 );
-                    p_stream->f_rate = oggpack_read( &opb, 32 );
-                    oggpack_adv( &opb, 32 );
-                    p_stream->i_bitrate = oggpack_read( &opb, 32 );
-#endif
-                }
-
                 /* Check for Vorbis header */
-                else if( oggpacket.bytes >= 7 &&
+                if( oggpacket.bytes >= 7 &&
                     ! strncmp( &oggpacket.packet[1], "vorbis", 6 ) )
                 {
                     oggpack_buffer opb;
