@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.21 2003/01/09 23:43:07 massiot Exp $
+ * $Id: intf.m,v 1.22 2003/01/12 18:25:05 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -315,6 +315,25 @@ static void Run( intf_thread_t *p_intf )
         {
             vlc_object_release( p_intf->p_sys->p_input );
             p_intf->p_sys->p_input = NULL;
+
+            if( p_intf->p_sys->b_stopping )
+            {
+                vout_thread_t * p_vout = vlc_object_find( p_intf, 
+                                                          VLC_OBJECT_VOUT,
+                                                          FIND_ANYWHERE );
+
+                if( p_vout != NULL )
+                {
+                    vlc_object_detach( p_vout );
+                    vlc_object_release( p_vout );
+                    vout_Destroy( p_vout );
+                }
+
+                p_intf->p_sys->b_stopping = 0;
+            }
+
+            [self displayTime];
+            [self manageMode];
         }
 
         if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )
@@ -382,20 +401,6 @@ static void Run( intf_thread_t *p_intf )
             [self displayTime];
             [self manageMode];
             p_intf->p_sys->b_playing = 0;
-
-            if ( p_intf->p_sys->b_stopping )
-            {
-                vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                          FIND_ANYWHERE );
-
-                if ( p_vout != NULL )
-                {
-                    vlc_object_detach( p_vout );
-                    vlc_object_release( p_vout );
-                    vout_Destroy( p_vout );
-                }
-                p_intf->p_sys->b_stopping = 0;
-            }
         }
 
         /* update the log window */
