@@ -165,8 +165,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 
     p_playlist->p_preparse->i_waiting = 0;
     p_playlist->p_preparse->pp_waiting = NULL;
-    vlc_mutex_init( p_playlist->p_preparse,
-                    &p_playlist->p_preparse->object_lock );
 
     vlc_object_attach( p_playlist->p_preparse, p_playlist );
     if( vlc_thread_create( p_playlist->p_preparse, "preparser",
@@ -206,8 +204,6 @@ int playlist_Destroy( playlist_t * p_playlist )
     vlc_thread_join( p_playlist );
 
     vlc_object_detach( p_playlist->p_preparse );
-
-    vlc_mutex_destroy( &p_playlist->p_preparse->object_lock );
 
     var_Destroy( p_playlist, "intf-change" );
     var_Destroy( p_playlist, "item-change" );
