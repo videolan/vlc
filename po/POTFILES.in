@@ -113,6 +113,7 @@ modules/gui/qnx/qnx.c
 modules/gui/qt/qt.cpp
 modules/gui/win32/misc.cpp
 modules/gui/win32/win32.cpp
+modules/gui/win32/strings.cpp
 
 # misc plugins
 modules/misc/dummy/dummy.c
