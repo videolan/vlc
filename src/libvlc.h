@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.5 2002/06/27 19:05:17 sam Exp $
+ * $Id: libvlc.h,v 1.6 2002/07/19 21:14:13 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -161,6 +161,11 @@
 #define SERVER_PORT_TEXT N_("server port")
 #define SERVER_PORT_LONGTEXT N_( \
     "This is the port used for UDP streams. By default, we chose 1234.")
+
+#define MTU_TEXT N_("MTU of the interface")
+#define MTU_LONGTEXT N_( \
+    "This is the typical size of UDP packets that we expect. On Ethernet " \
+    "it is usually 1500.")
 
 #define NETCHANNEL_TEXT N_("enable network channel mode")
 #define NETCHANNEL_LONGTEXT N_( \
@@ -354,6 +359,7 @@ ADD_INTEGER ( "server-port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT 
 ADD_BOOL    ( "network-channel", 0, NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
 ADD_STRING  ( "channel-server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
 ADD_INTEGER ( "channel-port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
+ADD_INTEGER ( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
 
 ADD_INTEGER ( "program", 0, NULL, INPUT_PROGRAM_TEXT, INPUT_PROGRAM_LONGTEXT )

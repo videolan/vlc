@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.12 2002/06/09 23:35:33 massiot Exp $
+ * $Id: ipv6.c,v 1.13 2002/07/19 21:14:13 massiot Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -54,10 +54,6 @@
 #endif
 
 #include "network.h"
-
-/* Default MTU used for UDP socket. FIXME: we should issue some ioctl()
- * call to get that value from the interface driver. */
-#define DEFAULT_MTU 1500
 
 #if defined(WIN32)
 static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
@@ -359,7 +355,8 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
 
     p_socket->i_handle = i_handle;
-    p_socket->i_mtu = DEFAULT_MTU;
+    p_socket->i_mtu = config_GetInt( p_this, "mtu" );
+
     return( 0 );
 }
 
