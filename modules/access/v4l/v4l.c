@@ -2,10 +2,11 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.27 2003/10/25 20:19:19 fenrir Exp $
+ * $Id: v4l.c,v 1.28 2003/11/06 00:12:17 gbazin Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
+ *         Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,10 +55,13 @@ static int  AccessOpen  ( vlc_object_t * );
 static void AccessClose ( vlc_object_t * );
 static int  Read        ( input_thread_t *, byte_t *, size_t );
 
+static void ParseMRL    ( input_thread_t * );
+static int  OpenVideoDev( input_thread_t *, char * );
+static int  OpenAudioDev( input_thread_t *, char * );
+
 static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
 static int  Demux      ( input_thread_t * );
-
 
 /*****************************************************************************
  * Module descriptior
@@ -66,6 +70,14 @@ static int  Demux      ( input_thread_t * );
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for v4l streams. This " \
     "value should be set in miliseconds units." )
+#define VDEV_TEXT N_("Video device name")
+#define VDEV_LONGTEXT N_( \
+    "Specify the name of the video device that will be used. " \
+    "If you don't specify anything, no video device will be used.")
+#define ADEV_TEXT N_("Audio device name")
+#define ADEV_LONGTEXT N_( \
+    "Specify the name of the audio device that will be used. " \
+    "If you don't specify anything, no video device will be used.")
 
 vlc_module_begin();
     set_description( _("Video4Linux input") );
@@ -75,6 +87,11 @@ vlc_module_begin();
     add_shortcut( "v4l" );
     set_capability( "access", 10 );
     set_callbacks( AccessOpen, AccessClose );
+
+    add_string( "v4l-vdev", "/dev/video", 0, VDEV_TEXT, VDEV_LONGTEXT,
+                VLC_FALSE );
+    add_string( "v4l-adev", "/dev/dsp", 0, ADEV_TEXT, ADEV_LONGTEXT,
+                VLC_FALSE );
 
     add_submodule();
         set_description( _("Video4Linux demuxer") );
@@ -105,10 +122,17 @@ struct quicktime_mjpeg_app1
 
 struct access_sys_t
 {
-    char    *psz_video_device;
-    int     fd;
+    /* Devices */
+    char *psz_device;         /* Main device from MRL, can be video or audio */
 
-    picture_t       pic;
+    char *psz_vdev;
+    int  fd_video;
+
+    char *psz_adev;
+    int  fd_audio;
+
+    /* Video properties */
+    picture_t pic;
 
     int i_fourcc;
     int i_channel;
@@ -140,8 +164,7 @@ struct access_sys_t
     int     i_video_frame_size;
     int     i_video_frame_size_allocated;
 
-    char         *psz_adev;
-    int          fd_audio;
+    /* Audio properties */
     vlc_fourcc_t i_acodec_raw;
     int          i_sample_rate;
     vlc_bool_t   b_stereo;
@@ -151,6 +174,7 @@ struct access_sys_t
     int     i_audio_frame_size_allocated;
 
     /* header */
+    int     i_streams;
     int     i_header_size;
     int     i_header_pos;
     uint8_t *p_header;      // at lest 8 bytes allocated
@@ -183,7 +207,7 @@ struct access_sys_t
  *  u8      data
  */
 
-static void    SetDWBE( uint8_t *p, uint32_t dw )
+static void SetDWBE( uint8_t *p, uint32_t dw )
 {
     p[0] = (dw >> 24)&0xff;
     p[1] = (dw >> 16)&0xff;
@@ -191,14 +215,14 @@ static void    SetDWBE( uint8_t *p, uint32_t dw )
     p[3] = (dw      )&0xff;
 }
 
-static void    SetQWBE( uint8_t *p, uint64_t qw )
+static void SetQWBE( uint8_t *p, uint64_t qw )
 {
     SetDWBE( p,     (qw >> 32)&0xffffffff );
     SetDWBE( &p[4], qw&0xffffffff);
 }
 
 /*****************************************************************************
- * Open: open device:
+ * AccessOpen: opens v4l device
  *****************************************************************************
  *
  * url: <video device>::::
@@ -208,25 +232,16 @@ static int AccessOpen( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys;
-    char           *psz_dup, *psz_parser;
-    struct mjpeg_params mjpeg;
-    int i;
-
-    struct video_channel    vid_channel;
+    vlc_value_t    val;
 
     /* create access private data */
-    p_sys = malloc( sizeof( access_sys_t ) );
+    p_input->p_access_data = p_sys = malloc( sizeof( access_sys_t ) );
     memset( p_sys, 0, sizeof( access_sys_t ) );
 
-    p_sys->psz_video_device = NULL;
-    p_sys->fd               = -1;
-    p_sys->i_channel        = -1;
     p_sys->i_audio          = -1;
     p_sys->i_norm           = VIDEO_MODE_AUTO;    // auto
     p_sys->i_tuner          = -1;
     p_sys->i_frequency      = -1;
-    p_sys->i_width          = 0;
-    p_sys->i_height         = 0;
 
     p_sys->f_fps            = -1.0;
     p_sys->i_video_pts      = -1;
@@ -235,21 +250,182 @@ static int AccessOpen( vlc_object_t *p_this )
     p_sys->i_decimation = 1;
     p_sys->i_quality = 100;
 
+    p_sys->i_video_frame_size_allocated = 0;
     p_sys->i_frame_pos = 0;
 
-    p_sys->i_video_frame_size_allocated = 0;
-    p_sys->psz_adev         = NULL;
-    p_sys->fd_audio         = -1;
-    p_sys->i_sample_rate    = 44100;
-    p_sys->b_stereo         = VLC_TRUE;
+    p_sys->p_audio_frame  = 0;
+    p_sys->i_sample_rate  = 44100;
+    p_sys->b_stereo       = VLC_TRUE;
 
+    p_sys->p_header    = NULL;
     p_sys->i_data_size = 0;
     p_sys->i_data_pos  = 0;
     p_sys->p_data      = NULL;
 
-    /* parse url and open device(s) */
-    psz_dup = strdup( p_input->psz_name );
-    psz_parser = psz_dup;
+    p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
+    p_sys->fd_video = -1;
+    p_sys->fd_audio = -1;
+
+    ParseMRL( p_input );
+
+    /* Find main device (video or audio) */
+    if( p_sys->psz_device && *p_sys->psz_device )
+    {
+        msg_Dbg( p_input, "main device=`%s'", p_sys->psz_device );
+
+        /* Try to open as video device */
+        p_sys->fd_video = OpenVideoDev( p_input, p_sys->psz_device );
+
+        if( p_sys->fd_video < 0 )
+        {
+            /* Try to open as audio device */
+            p_sys->fd_audio = OpenAudioDev( p_input, p_sys->psz_device );
+            if( p_sys->fd_audio >= 0 )
+            {
+                if( p_sys->psz_adev ) free( p_sys->psz_adev );
+                p_sys->psz_adev = p_sys->psz_device;
+                p_sys->psz_device = NULL;
+            }
+        }
+        else
+        {
+            if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+            p_sys->psz_vdev = p_sys->psz_device;
+            p_sys->psz_device = NULL;
+        }
+    }
+
+    /* If no device opened, only continue if the access was forced */
+    if( p_sys->fd_video < 0 && p_sys->fd_audio < 0 )
+    {
+        if( !p_input->psz_access ||
+            strcmp( p_input->psz_access, "v4l" ) )
+        {
+            AccessClose( p_this );
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* Find video device */
+    if( p_sys->fd_video < 0 )
+    {
+        if( !p_sys->psz_vdev || !*p_sys->psz_vdev )
+        {
+            var_Create( p_input, "v4l-vdev",
+                        VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+            var_Get( p_input, "v4l-vdev", &val );
+
+            if( p_sys->psz_vdev ) free( p_sys->psz_vdev );
+            p_sys->psz_vdev = val.psz_string;
+        }
+
+        if( p_sys->psz_vdev && *p_sys->psz_vdev )
+        {
+            p_sys->fd_video = OpenVideoDev( p_input, p_sys->psz_vdev );
+        }
+    }
+
+    /* Find audio device */
+    if( p_sys->fd_audio < 0 )
+    {
+        if( !p_sys->psz_adev || !*p_sys->psz_adev )
+        {
+            var_Create( p_input, "v4l-adev",
+                        VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+            var_Get( p_input, "v4l-adev", &val );
+
+            if( p_sys->psz_adev ) free( p_sys->psz_adev );
+            p_sys->psz_adev = val.psz_string;
+        }
+
+        if( p_sys->psz_adev && *p_sys->psz_adev )
+        {
+            p_sys->fd_audio = OpenAudioDev( p_input, p_sys->psz_adev );
+        }
+    }
+
+    if( p_sys->fd_video < 0 && p_sys->fd_audio < 0 )
+    {
+        AccessClose( p_this );
+        return VLC_EGENERIC;
+    }
+
+    p_input->pf_read        = Read;
+    p_input->pf_seek        = NULL;
+    p_input->pf_set_area    = NULL;
+    p_input->pf_set_program = NULL;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.b_pace_control = 0;
+    p_input->stream.b_seekable = 0;
+    p_input->stream.p_selected_area->i_size = 0;
+    p_input->stream.p_selected_area->i_tell = 0;
+    p_input->stream.i_method = INPUT_METHOD_FILE;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    /* Update default_pts to a suitable value for access */
+    var_Create( p_input, "v4l-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Get( p_input, "v4l-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
+
+    msg_Info( p_input, "v4l grabbing started" );
+
+    /* create header */
+    p_sys->i_streams     = 0;
+    p_sys->i_header_size = 8;
+    p_sys->i_header_pos  = 8;
+    p_sys->p_header      = malloc( p_sys->i_header_size );
+
+    memcpy( p_sys->p_header, ".v4l", 4 );
+
+    if( p_sys->fd_video >= 0 )
+    {
+        p_sys->i_header_size += 20;
+        p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_size );
+
+        SetDWBE( &p_sys->p_header[4], ++p_sys->i_streams );
+
+        memcpy(  &p_sys->p_header[p_sys->i_header_pos], "vids", 4 );
+        memcpy(  &p_sys->p_header[p_sys->i_header_pos+4],
+                 &p_sys->i_fourcc, 4 );
+        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+8], p_sys->i_width );
+        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+12], p_sys->i_height );
+        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+16], 0 );
+
+        p_sys->i_header_pos = p_sys->i_header_size;
+    }
+
+    if( p_sys->fd_audio >= 0 )
+    {
+        p_sys->i_header_size += 20;
+        p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_size );
+
+        SetDWBE( &p_sys->p_header[4], ++p_sys->i_streams );
+
+        memcpy(  &p_sys->p_header[p_sys->i_header_pos], "auds", 4 );
+        memcpy(  &p_sys->p_header[p_sys->i_header_pos+4], "araw", 4 );
+        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+8],
+                 p_sys->b_stereo ? 2 : 1 );
+        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+12],
+                 p_sys->i_sample_rate );
+        SetDWBE( &p_sys->p_header[p_sys->i_header_pos+16], 16 );
+
+        p_sys->i_header_pos = p_sys->i_header_size;
+    }
+    p_sys->i_header_pos = 0;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * ParseMRL: parse the options contained in the MRL
+ *****************************************************************************/
+static void ParseMRL( input_thread_t *p_input )
+{
+    access_sys_t *p_sys = p_input->p_access_data;
+
+    char *psz_dup = strdup( p_input->psz_name );
+    char *psz_parser = psz_dup;
 
     while( *psz_parser && *psz_parser != ':' )
     {
@@ -303,7 +479,8 @@ static int AccessOpen( vlc_object_t *p_this )
                             &psz_parser, 0 );
                 if( p_sys->i_frequency < 30000 )
                 {
-                msg_Warn( p_input, "v4l syntax has changed : 'frequency' is now channel frequency in kHz");
+                    msg_Warn( p_input, "v4l syntax has changed : "
+                              "'frequency' is now channel frequency in kHz");
                 }
             }
             else if( !strncmp( psz_parser, "audio=", strlen( "audio=" ) ) )
@@ -443,32 +620,32 @@ static int AccessOpen( vlc_object_t *p_this )
 
     if( *psz_dup )
     {
-        p_sys->psz_video_device = strdup( psz_dup );
+        p_sys->psz_device = strdup( psz_dup );
     }
-    else
-    {
-        p_sys->psz_video_device = strdup( "/dev/video" );
-    }
-    msg_Dbg( p_input, "video device=`%s'", p_sys->psz_video_device );
+}
 
-    if( p_sys->psz_adev && *p_sys->psz_adev == '\0' )
-    {
-        p_sys->psz_adev = strdup( "/dev/dsp" );
-    }
-    msg_Dbg( p_input, "audio device=`%s'", p_sys->psz_adev );
+/*****************************************************************************
+ * OpenVideoDev:
+ *****************************************************************************/
+int OpenVideoDev( input_thread_t *p_input, char *psz_device )
+{
+    access_sys_t *p_sys = p_input->p_access_data;
+    int i_fd;
 
+    struct video_channel vid_channel;
+    struct mjpeg_params mjpeg;
+    int i;
 
-
-    if( ( p_sys->fd = open( p_sys->psz_video_device, O_RDWR ) ) < 0 )
+    if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_input, "cannot open device (%s)", strerror( errno ) );
-        goto failed;
+        goto vdev_failed;
     }
 
-    if( ioctl( p_sys->fd, VIDIOCGCAP, &p_sys->vid_cap ) < 0 )
+    if( ioctl( i_fd, VIDIOCGCAP, &p_sys->vid_cap ) < 0 )
     {
         msg_Err( p_input, "cannot get capabilities (%s)", strerror( errno ) );
-        goto failed;
+        goto vdev_failed;
     }
 
     msg_Dbg( p_input,
@@ -506,15 +683,15 @@ static int AccessOpen( vlc_object_t *p_this )
     if( !( p_sys->vid_cap.type & VID_TYPE_CAPTURE ) )
     {
         msg_Err( p_input, "cannot grab" );
-        goto failed;
+        goto vdev_failed;
     }
 
     vid_channel.channel = p_sys->i_channel;
-    if( ioctl( p_sys->fd, VIDIOCGCHAN, &vid_channel ) < 0 )
+    if( ioctl( i_fd, VIDIOCGCHAN, &vid_channel ) < 0 )
     {
         msg_Err( p_input, "cannot get channel infos (%s)",
                           strerror( errno ) );
-        goto failed;
+        goto vdev_failed;
     }
     msg_Dbg( p_input,
              "setting channel %s(%d) %d tuners flags=0x%x type=0x%x norm=0x%x",
@@ -532,10 +709,10 @@ static int AccessOpen( vlc_object_t *p_this )
     }
 
     vid_channel.norm = p_sys->i_norm;
-    if( ioctl( p_sys->fd, VIDIOCSCHAN, &vid_channel ) < 0 )
+    if( ioctl( i_fd, VIDIOCSCHAN, &vid_channel ) < 0 )
     {
         msg_Err( p_input, "cannot set channel (%s)", strerror( errno ) );
-        goto failed;
+        goto vdev_failed;
     }
 
     if( vid_channel.flags & VIDEO_VC_TUNER )
@@ -547,10 +724,10 @@ static int AccessOpen( vlc_object_t *p_this )
         if( p_sys->i_tuner >= 0 )
         {
             vid_tuner.tuner = p_sys->i_tuner;
-            if( ioctl( p_sys->fd, VIDIOCGTUNER, &vid_tuner ) < 0 )
+            if( ioctl( i_fd, VIDIOCGTUNER, &vid_tuner ) < 0 )
             {
                 msg_Err( p_input, "cannot get tuner (%s)", strerror( errno ) );
-                goto failed;
+                goto vdev_failed;
             }
             msg_Dbg( p_input, "tuner %s low=%d high=%d, flags=0x%x "
                      "mode=0x%x signal=0x%x",
@@ -560,27 +737,29 @@ static int AccessOpen( vlc_object_t *p_this )
             msg_Dbg( p_input, "setting tuner %s (%d)",
                      vid_tuner.name, vid_tuner.tuner );
 
-            //vid_tuner.mode = p_sys->i_norm; /* FIXME FIXME to be checked FIXME FIXME */
-            if( ioctl( p_sys->fd, VIDIOCSTUNER, &vid_tuner ) < 0 )
+            /* FIXME FIXME to be checked FIXME FIXME */
+            //vid_tuner.mode = p_sys->i_norm;
+            if( ioctl( i_fd, VIDIOCSTUNER, &vid_tuner ) < 0 )
             {
                 msg_Err( p_input, "cannot set tuner (%s)", strerror( errno ) );
-                goto failed;
+                goto vdev_failed;
             }
         }
 #endif
 
-        // show a warning if frequency is < than 30000. User is certainly usint old syntax.
+        /* Show a warning if frequency is < than 30000.
+         * User is certainly usint old syntax. */
 
 
         /* set frequency */
         if( p_sys->i_frequency >= 0 )
         {
             int driver_frequency = p_sys->i_frequency * 16 /1000;
-            if( ioctl( p_sys->fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
+            if( ioctl( i_fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
             {
                 msg_Err( p_input, "cannot set frequency (%s)",
                                   strerror( errno ) );
-                goto failed;
+                goto vdev_failed;
             }
             msg_Dbg( p_input, "frequency %d (%d)", p_sys->i_frequency,
                                                    driver_frequency );
@@ -596,69 +775,22 @@ static int AccessOpen( vlc_object_t *p_this )
         if( p_sys->i_audio >= 0 )
         {
             vid_audio.audio = p_sys->i_audio;
-            if( ioctl( p_sys->fd, VIDIOCGAUDIO, &vid_audio ) < 0 )
+            if( ioctl( i_fd, VIDIOCGAUDIO, &vid_audio ) < 0 )
             {
                 msg_Err( p_input, "cannot get audio (%s)", strerror( errno ) );
-                goto failed;
+                goto vdev_failed;
             }
 
             /* unmute audio */
             vid_audio.flags &= ~VIDEO_AUDIO_MUTE;
 
-            if( ioctl( p_sys->fd, VIDIOCSAUDIO, &vid_audio ) < 0 )
+            if( ioctl( i_fd, VIDIOCSAUDIO, &vid_audio ) < 0 )
             {
                 msg_Err( p_input, "cannot set audio (%s)", strerror( errno ) );
-                goto failed;
+                goto vdev_failed;
             }
         }
 
-    }
-
-    if( p_sys->psz_adev )
-    {
-        int    i_format;
-        if( ( p_sys->fd_audio = open( p_sys->psz_adev, O_RDONLY|O_NONBLOCK ) ) < 0 )
-        {
-            msg_Err( p_input, "cannot open audio device (%s)",
-                              strerror( errno ) );
-            goto failed;
-        }
-
-        i_format = AFMT_S16_LE;
-        if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SETFMT, &i_format ) < 0
-            || i_format != AFMT_S16_LE )
-        {
-            msg_Err( p_input, "cannot set audio format (16b little endian) "
-                              "(%s)", strerror( errno ) );
-            goto failed;
-        }
-
-        if( ioctl( p_sys->fd_audio, SNDCTL_DSP_STEREO,
-                   &p_sys->b_stereo ) < 0 )
-        {
-            msg_Err( p_input, "cannot set audio channels count (%s)",
-                              strerror( errno ) );
-            goto failed;
-        }
-
-        if( ioctl( p_sys->fd_audio, SNDCTL_DSP_SPEED,
-                   &p_sys->i_sample_rate ) < 0 )
-        {
-            msg_Err( p_input, "cannot set audio sample rate (%s)",
-                              strerror( errno ) );
-            goto failed;
-        }
-
-        msg_Dbg( p_input,
-                 "adev=`%s' %s %dHz",
-                 p_sys->psz_adev,
-                 p_sys->b_stereo ? "stereo" : "mono",
-                 p_sys->i_sample_rate );
-
-        p_sys->i_audio_frame_size = 0;
-        p_sys->i_audio_frame_size_allocated = 6*1024;
-        p_sys->p_audio_frame =
-            malloc( p_sys->i_audio_frame_size_allocated );
     }
 
     /* establish basic params with input and norm before feeling width
@@ -668,11 +800,11 @@ static int AccessOpen( vlc_object_t *p_this )
         struct quicktime_mjpeg_app1 *p_app1;
         int32_t i_offset;
 
-        if( ioctl( p_sys->fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
+        if( ioctl( i_fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
         {
             msg_Err( p_input, "cannot get mjpeg params (%s)",
                               strerror( errno ) );
-            goto failed;
+            goto vdev_failed;
         }
         mjpeg.input = p_sys->i_channel;
         mjpeg.norm  = p_sys->i_norm;
@@ -719,11 +851,11 @@ static int AccessOpen( vlc_object_t *p_this )
          * optional.  They will be present in the output. */
         mjpeg.jpeg_markers = JPEG_MARKER_DHT | JPEG_MARKER_DQT;
 
-        if( ioctl( p_sys->fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
+        if( ioctl( i_fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
         {
             msg_Err( p_input, "cannot set mjpeg params (%s)",
                               strerror( errno ) );
-            goto failed;
+            goto vdev_failed;
         }
 
         p_sys->i_width = mjpeg.img_width * mjpeg.HorDcm;
@@ -736,10 +868,10 @@ static int AccessOpen( vlc_object_t *p_this )
     {
         struct video_window vid_win;
 
-        if( ioctl( p_sys->fd, VIDIOCGWIN, &vid_win ) < 0 )
+        if( ioctl( i_fd, VIDIOCGWIN, &vid_win ) < 0 )
         {
             msg_Err( p_input, "cannot get win (%s)", strerror( errno ) );
-            goto failed;
+            goto vdev_failed;
         }
         p_sys->i_width  = vid_win.width;
         p_sys->i_height = vid_win.height;
@@ -752,21 +884,21 @@ static int AccessOpen( vlc_object_t *p_this )
     if( !p_sys->b_mjpeg )
     {
         /* Find out video format used by device */
-        if( ioctl( p_sys->fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
+        if( ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
         {
             int i_chroma = VLC_FOURCC( ' ', ' ', ' ', ' ' );
             struct video_picture vid_picture = p_sys->vid_picture;
 
             /* Try to set the format to something easy to encode */
             vid_picture.palette = VIDEO_PALETTE_YUV420P;
-            if( ioctl( p_sys->fd, VIDIOCSPICT, &vid_picture ) == 0 )
+            if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
             {
                 p_sys->vid_picture = vid_picture;
             }
             else
             {
                 vid_picture.palette = VIDEO_PALETTE_YUV422P;
-                if( ioctl( p_sys->fd, VIDIOCSPICT, &vid_picture ) == 0 )
+                if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
                 {
                     p_sys->vid_picture = vid_picture;
                 }
@@ -826,10 +958,9 @@ static int AccessOpen( vlc_object_t *p_this )
         else
         {
             msg_Err( p_input, "ioctl VIDIOCGPICT failed" );
-            goto failed;
+            goto vdev_failed;
         }
     }
-
 
     if( p_sys->b_mjpeg )
     {
@@ -838,19 +969,19 @@ static int AccessOpen( vlc_object_t *p_this )
         p_sys->mjpeg_buffers.count = 8;
         p_sys->mjpeg_buffers.size = MJPEG_BUFFER_SIZE;
 
-        if( ioctl( p_sys->fd, MJPIOC_REQBUFS, &p_sys->mjpeg_buffers ) < 0 )
+        if( ioctl( i_fd, MJPIOC_REQBUFS, &p_sys->mjpeg_buffers ) < 0 )
         {
             msg_Err( p_input, "mmap unsupported" );
-            goto failed;
+            goto vdev_failed;
         }
 
         p_sys->p_video_mmap = mmap( 0,
                 p_sys->mjpeg_buffers.size * p_sys->mjpeg_buffers.count,
-                PROT_READ | PROT_WRITE, MAP_SHARED, p_sys->fd, 0 );
+                PROT_READ | PROT_WRITE, MAP_SHARED, i_fd, 0 );
         if( p_sys->p_video_mmap == MAP_FAILED )
         {
             msg_Err( p_input, "mmap failed" );
-            goto failed;
+            goto vdev_failed;
         }
 
         p_sys->i_fourcc  = VLC_FOURCC( 'm','j','p','g' );
@@ -859,10 +990,10 @@ static int AccessOpen( vlc_object_t *p_this )
         /* queue up all the frames */
         for( i = 0; i < (int)p_sys->mjpeg_buffers.count; i++ )
         {
-            if( ioctl( p_sys->fd, MJPIOC_QBUF_CAPT, &i ) < 0 )
+            if( ioctl( i_fd, MJPIOC_QBUF_CAPT, &i ) < 0 )
             {
                 msg_Err( p_input, "unable to queue frame" );
-                goto failed;
+                goto vdev_failed;
             }
         }
     }
@@ -875,7 +1006,7 @@ static int AccessOpen( vlc_object_t *p_this )
         if( !p_sys->pic.i_planes )
         {
             msg_Err( p_input, "unsupported chroma" );
-            goto failed;
+            goto vdev_failed;
         }
         p_sys->i_video_frame_size = 0;
         for( i = 0; i < p_sys->pic.i_planes; i++ )
@@ -890,20 +1021,20 @@ static int AccessOpen( vlc_object_t *p_this )
                 (char*)&p_sys->i_fourcc );
 
         /* Allocate mmap buffer */
-        if( ioctl( p_sys->fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
+        if( ioctl( i_fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
         {
             msg_Err( p_input, "mmap unsupported" );
-            goto failed;
+            goto vdev_failed;
         }
 
         p_sys->p_video_mmap = mmap( 0, p_sys->vid_mbuf.size,
                                     PROT_READ|PROT_WRITE, MAP_SHARED,
-                                    p_sys->fd, 0 );
+                                    i_fd, 0 );
         if( p_sys->p_video_mmap == MAP_FAILED )
         {
             /* FIXME -> normal read */
             msg_Err( p_input, "mmap failed" );
-            goto failed;
+            goto vdev_failed;
         }
 
         /* init grabbing */
@@ -911,91 +1042,99 @@ static int AccessOpen( vlc_object_t *p_this )
         p_sys->vid_mmap.width  = p_sys->i_width;
         p_sys->vid_mmap.height = p_sys->i_height;
         p_sys->vid_mmap.format = p_sys->vid_picture.palette;
-        if( ioctl( p_sys->fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
+        if( ioctl( i_fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
         {
             msg_Warn( p_input, "%4.4s refused", (char*)&p_sys->i_fourcc );
             msg_Err( p_input, "chroma selection failed" );
-            goto failed;
+            goto vdev_failed;
         }
     }
+    return i_fd;
 
-    p_input->pf_read        = Read;
-    p_input->pf_seek        = NULL;
-    p_input->pf_set_area    = NULL;
-    p_input->pf_set_program = NULL;
+vdev_failed:
 
-    p_input->p_access_data  = p_sys;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.b_pace_control = 0;
-    p_input->stream.b_seekable = 0;
-    p_input->stream.p_selected_area->i_size = 0;
-    p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.i_method = INPUT_METHOD_FILE;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    /* Update default_pts to a suitable value for access */
-    p_input->i_pts_delay = config_GetInt( p_input, "v4l-caching" ) * 1000;
-
-    msg_Info( p_input, "v4l grabbing started" );
-
-    /* create header */
-    p_sys->i_header_size = 8 + 20;
-    p_sys->i_header_pos  = 0;
-    p_sys->p_header      = malloc( p_sys->i_header_size );
-
-    memcpy(  &p_sys->p_header[0], ".v4l", 4 );
-    SetDWBE( &p_sys->p_header[4], 1 );
-
-    memcpy(  &p_sys->p_header[ 8], "vids", 4 );
-    memcpy(  &p_sys->p_header[12], &p_sys->i_fourcc, 4 );
-    SetDWBE( &p_sys->p_header[16], p_sys->i_width );
-    SetDWBE( &p_sys->p_header[20], p_sys->i_height );
-    SetDWBE( &p_sys->p_header[24], 0 );
-
-    if( p_sys->fd_audio > 0 )
-    {
-        p_sys->i_header_size += 20;
-        p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_size );
-
-        SetDWBE( &p_sys->p_header[4], 2 );
-
-        memcpy(  &p_sys->p_header[28], "auds", 4 );
-        memcpy(  &p_sys->p_header[32], "araw", 4 );
-        SetDWBE( &p_sys->p_header[36], p_sys->b_stereo ? 2 : 1 );
-        SetDWBE( &p_sys->p_header[40], p_sys->i_sample_rate );
-        SetDWBE( &p_sys->p_header[44], 16 );
-    }
-    return VLC_SUCCESS;
-
-failed:
-    free( p_sys->psz_video_device );
-    if( p_sys->fd >= 0 )
-    {
-        close( p_sys->fd );
-    }
-    free( p_sys );
-    return VLC_EGENERIC;
+    if( i_fd >= 0 ) close( i_fd );
+    return -1;
 }
 
 /*****************************************************************************
- * V4lClose: close device
+ * OpenAudioDev:
+ *****************************************************************************/
+int OpenAudioDev( input_thread_t *p_input, char *psz_device )
+{
+    access_sys_t *p_sys = p_input->p_access_data;
+    int i_fd, i_format;
+
+    if( (i_fd = open( psz_device, O_RDONLY | O_NONBLOCK )) < 0 )
+    {
+        msg_Err( p_input, "cannot open audio device (%s)", strerror( errno ) );
+        goto adev_fail;
+    }
+
+    i_format = AFMT_S16_LE;
+    if( ioctl( i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
+        || i_format != AFMT_S16_LE )
+    {
+        msg_Err( p_input, "cannot set audio format (16b little endian) "
+                 "(%s)", strerror( errno ) );
+        goto adev_fail;
+    }
+
+    if( ioctl( i_fd, SNDCTL_DSP_STEREO,
+               &p_sys->b_stereo ) < 0 )
+    {
+        msg_Err( p_input, "cannot set audio channels count (%s)",
+                 strerror( errno ) );
+        goto adev_fail;
+    }
+
+    if( ioctl( i_fd, SNDCTL_DSP_SPEED,
+               &p_sys->i_sample_rate ) < 0 )
+    {
+        msg_Err( p_input, "cannot set audio sample rate (%s)",
+                 strerror( errno ) );
+        goto adev_fail;
+    }
+
+    msg_Dbg( p_input, "openened adev=`%s' %s %dHz",
+             psz_device, p_sys->b_stereo ? "stereo" : "mono",
+             p_sys->i_sample_rate );
+
+    p_sys->i_audio_frame_size = 0;
+    p_sys->i_audio_frame_size_allocated = 6*1024;
+    p_sys->p_audio_frame = malloc( p_sys->i_audio_frame_size_allocated );
+
+    return i_fd;
+
+ adev_fail:
+
+    if( i_fd >= 0 ) close( i_fd );
+    return -1;
+}
+
+/*****************************************************************************
+ * AccessClose: close device, free resources
  *****************************************************************************/
 static void AccessClose( vlc_object_t *p_this )
 {
-    input_thread_t  *p_input = (input_thread_t *)p_this;
-    access_sys_t    *p_sys   = p_input->p_access_data;
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    access_sys_t   *p_sys   = p_input->p_access_data;
 
-    msg_Info( p_input, "v4l grabbing stoped" );
+    if( p_sys->psz_device ) free( p_sys->psz_device );
+    if( p_sys->psz_vdev )   free( p_sys->psz_vdev );
+    if( p_sys->psz_adev )   free( p_sys->psz_adev );
+    if( p_sys->fd_video >= 0 ) close( p_sys->fd_video );
+    if( p_sys->fd_audio >= 0 ) close( p_sys->fd_audio );
+
+    if( p_sys->p_header ) free( p_sys->p_header );
+    if( p_sys->p_audio_frame ) free( p_sys->p_audio_frame );
 
     if( p_sys->b_mjpeg )
     {
         int i_noframe = -1;
-        ioctl( p_sys->fd, MJPIOC_QBUF_CAPT, &i_noframe );
+        ioctl( p_sys->fd_video, MJPIOC_QBUF_CAPT, &i_noframe );
     }
 
-    free( p_sys->psz_video_device );
-    close( p_sys->fd );
     if( p_sys->p_video_mmap && p_sys->p_video_mmap != MAP_FAILED )
     {
         if( p_sys->b_mjpeg )
@@ -1004,14 +1143,13 @@ static void AccessClose( vlc_object_t *p_this )
         else
             munmap( p_sys->p_video_mmap, p_sys->vid_mbuf.size );
     }
-    if( p_sys->fd_audio >= 0 )
-    {
-        close( p_sys->fd_audio );
-    }
 
     free( p_sys );
 }
 
+/*****************************************************************************
+ * GrabAudio: grab audio
+ *****************************************************************************/
 static int GrabAudio( input_thread_t * p_input,
                       uint8_t **pp_data,
                       int      *pi_data,
@@ -1047,6 +1185,9 @@ static int GrabAudio( input_thread_t * p_input,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * GrabVideo:
+ *****************************************************************************/
 static uint8_t *GrabCapture( input_thread_t *p_input )
 {
     access_sys_t *p_sys = p_input->p_access_data;
@@ -1054,7 +1195,7 @@ static uint8_t *GrabCapture( input_thread_t *p_input )
                             p_sys->vid_mbuf.frames;
     for( ;; )
     {
-        if( ioctl( p_sys->fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) >= 0 )
+        if( ioctl( p_sys->fd_video, VIDIOCMCAPTURE, &p_sys->vid_mmap ) >= 0 )
         {
             break;
         }
@@ -1069,7 +1210,7 @@ static uint8_t *GrabCapture( input_thread_t *p_input )
 
     //msg_Warn( p_input, "grab a new frame" );
 
-    while( ioctl(p_sys->fd, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 &&
+    while( ioctl(p_sys->fd_video, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 &&
            ( errno == EAGAIN || errno == EINTR ) );
 
     p_sys->i_frame_pos = p_sys->vid_mmap.frame;
@@ -1088,11 +1229,11 @@ static uint8_t *GrabMJPEG( input_thread_t *p_input )
 
     /* re-queue the last frame we sync'd */
     if( p_sys->i_frame_pos != -1 )
-        while( ioctl( p_sys->fd, MJPIOC_QBUF_CAPT, &p_sys->i_frame_pos ) < 0 &&
+        while( ioctl( p_sys->fd_video, MJPIOC_QBUF_CAPT, &p_sys->i_frame_pos ) < 0 &&
                 ( errno == EAGAIN || errno == EINTR ) );
 
     /* sync on the next frame */
-    while( ioctl( p_sys->fd, MJPIOC_SYNC, &sync ) < 0 &&
+    while( ioctl( p_sys->fd_video, MJPIOC_SYNC, &sync ) < 0 &&
             ( errno == EAGAIN || errno == EINTR ) );
 
     p_sys->i_frame_pos = sync.frame;
@@ -1177,11 +1318,9 @@ static int GrabVideo( input_thread_t * p_input,
     {
         mtime_t i_dur = (mtime_t)((double)1000000 / (double)p_sys->f_fps);
 
-        /* have we wait enought ? */
+        /* Dif we wait long enougth ? */
         if( p_sys->i_video_pts + i_dur > mdate() )
         {
-            /* no, msleep needed to consume all the cpu, 10ms seem a good value (100fps)*/
-            msleep( 10000 );
             return VLC_EGENERIC;
         }
     }
@@ -1217,8 +1356,6 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     int          i_stream;
     mtime_t      i_pts;
 
-    //msg_Info( p_input, "access read data_size %i, data_pos %i",
-                //p_sys->i_data_size, p_sys->i_data_pos );
     while( i_len > 0 )
     {
         /* First copy header if any */
@@ -1266,19 +1403,24 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             return( i_data );
         }
 
-        /* re fill data by grabbing audio/video */
+        /* Re-fill data by grabbing audio/video */
         p_sys->i_data_pos = 0;
 
-        /* try grabbing audio frames */
-        i_stream = 1;
+        /* Try grabbing audio frames first */
+        i_stream = p_sys->i_streams - 1;
         if( p_sys->fd_audio < 0 ||
-            GrabAudio( p_input, &p_sys->p_data, &p_sys->i_data_size, &i_pts ) )
+            GrabAudio( p_input, &p_sys->p_data,
+                       &p_sys->i_data_size, &i_pts ) != VLC_SUCCESS )
         {
-            /* and then get video frame if no audio */
+            /* Try grabbing video frame */
             i_stream = 0;
-            if( GrabVideo( p_input, &p_sys->p_data, &p_sys->i_data_size, &i_pts ) )
+            if( p_sys->fd_video < 0 ||
+                GrabVideo( p_input, &p_sys->p_data,
+                           &p_sys->i_data_size, &i_pts ) != VLC_SUCCESS )
             {
-                return -1;
+                /* Sleep so we do not consume all the cpu, 10ms seems
+                 * like a good value (100fps) */
+                msleep( 10000 );
             }
         }
 
@@ -1296,12 +1438,9 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 /****************************************************************************
  * I. Demux Part
  ****************************************************************************/
-#define MAX_PACKETS_IN_FIFO 3
-
 static int DemuxOpen( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    //demux_sys_t    *p_sys;
 
     uint8_t        *p_peek;
     int            i_streams;
@@ -1320,7 +1459,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     if( input_Peek( p_input, &p_peek, 8 ) < 8 )
     {
         msg_Warn( p_input, "v4l plugin discarded (cannot peek)" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     if( strncmp( p_peek, ".v4l", 4 ) || GetDWBE( &p_peek[4] ) <= 0 )
@@ -1341,7 +1480,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot add program" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
@@ -1352,7 +1491,7 @@ static int DemuxOpen( vlc_object_t *p_this )
         < 8 + 20 * i_streams )
     {
         msg_Err( p_input, "v4l plugin discarded (cannot peek)" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
     p_peek += 8;
 
@@ -1436,6 +1575,8 @@ static void DemuxClose( vlc_object_t *p_this )
     return;
 }
 
+#define MAX_PACKETS_IN_FIFO 3
+
 static int Demux( input_thread_t *p_input )
 {
     es_descriptor_t *p_es;
@@ -1443,8 +1584,9 @@ static int Demux( input_thread_t *p_input )
 
     int i_stream;
     int i_size;
+
     uint8_t *p_peek;
-    mtime_t        i_pts;
+    mtime_t i_pts;
 
     if( input_Peek( p_input, &p_peek, 16 ) < 16 )
     {
@@ -1456,8 +1598,6 @@ static int Demux( input_thread_t *p_input )
     i_size   = GetDWBE( &p_peek[4] );
     i_pts    = GetQWBE( &p_peek[8] );
 
-    //msg_Dbg( p_input, "stream=%d size=%d", i_stream, i_size );
-//    p_es = input_FindES( p_input, i_stream );
     p_es = p_input->stream.p_selected_program->pp_es[i_stream];
     if( !p_es )
     {
@@ -1498,9 +1638,9 @@ static int Demux( input_thread_t *p_input )
         p_pes->p_last  = p_data;
         i_size -= i_read;
     }
-//    input_SplitBuffer( p_input, &p_pk, i_size + 8 );
     p_pes->p_first->p_payload_start += 16;
     p_pes->i_pes_size               -= 16;
+
     if( p_es && p_es->p_decoder_fifo )
     {
         vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
@@ -1511,8 +1651,8 @@ static int Demux( input_thread_t *p_input )
                            &p_es->p_decoder_fifo->data_lock );
         }
         vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
-        //p_pes->i_pts = mdate() + p_input->i_pts_delay;
         p_pes->i_pts = p_pes->i_dts = i_pts + p_input->i_pts_delay;
+
         input_DecodePES( p_es->p_decoder_fifo, p_pes );
     }
     else
