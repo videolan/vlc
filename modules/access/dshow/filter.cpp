@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.4 2003/08/27 07:31:26 gbazin Exp $
+ * $Id: filter.cpp,v 1.5 2003/08/31 22:06:17 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -31,21 +31,6 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/vout.h>
-
-#ifndef _MSC_VER
-#   include <wtypes.h>
-#   include <unknwn.h>
-#   include <ole2.h>
-#   include <limits.h>
-#   define _WINGDI_ 1
-#   define AM_NOVTABLE
-#   define _OBJBASE_H_
-#   undef _X86_
-#   define _I64_MAX LONG_LONG_MAX
-#   define LONGLONG long long
-#endif
-
-#include <dshow.h>
 
 #include "filter.h"
 
@@ -79,6 +64,9 @@ const GUID IID_IEnumMediaTypes = {0x89c31040, 0x846b, 0x11ce, {0x97,0xd3, 0x00,0
  */
 const GUID MEDIATYPE_Video = {0x73646976, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
+/* Packed RGB formats */
+const GUID MEDIASUBTYPE_RGB1 = {0xe436eb78, 0x524f, 0x11ce, {0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70}};
+const GUID MEDIASUBTYPE_RGB4 = {0xe436eb79, 0x524f, 0x11ce, {0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70}};
 const GUID MEDIASUBTYPE_RGB8 = {0xe436eb7a, 0x524f, 0x11ce, {0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70}};
 const GUID MEDIASUBTYPE_RGB565 = {0xe436eb7b, 0x524f, 0x11ce, {0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70}};
 const GUID MEDIASUBTYPE_RGB555 = {0xe436eb7c, 0x524f, 0x11ce, {0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70}};
@@ -86,18 +74,26 @@ const GUID MEDIASUBTYPE_RGB24 = {0xe436eb7d, 0x524f, 0x11ce, {0x9f, 0x53, 0x00, 
 const GUID MEDIASUBTYPE_RGB32 = {0xe436eb7e, 0x524f, 0x11ce, {0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70}};
 const GUID MEDIASUBTYPE_ARGB32 = {0x773c9ac0, 0x3274, 0x11d0, {0xb7, 0x24, 0x0, 0xaa, 0x0, 0x6c, 0x1a, 0x1}};
 
+/* Packed YUV formats */
 const GUID MEDIASUBTYPE_YUYV = {0x56595559, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID MEDIASUBTYPE_Y411 = {0x31313459, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
-const GUID MEDIASUBTYPE_Y41P = {0x50313459, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+const GUID MEDIASUBTYPE_Y211 = {0x31313259, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID MEDIASUBTYPE_YUY2 = {0x32595559, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID MEDIASUBTYPE_YVYU = {0x55595659, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID MEDIASUBTYPE_UYVY = {0x59565955, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
-const GUID MEDIASUBTYPE_Y211 = {0x31313259, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+
+/* Planar YUV formats */
+const GUID MEDIASUBTYPE_YVU9 = {0x39555659, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID MEDIASUBTYPE_YV12 = {0x32315659, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+const GUID MEDIASUBTYPE_IYUV = {0x56555949, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}}; /* identical to YV12 */
+const GUID MEDIASUBTYPE_Y41P = {0x50313459, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+const GUID MEDIASUBTYPE_I420 = {0x30323449, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 const GUID MEDIATYPE_Audio = {0x73647561, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID FORMAT_WaveFormatEx = {0x05589f81, 0xc356, 0x11ce, {0xbf, 0x01, 0x00, 0xaa, 0x00, 0x55, 0x59, 0x5a}};
 const GUID MEDIASUBTYPE_PCM = {0x00000001, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+
+const GUID GUID_NULL = {0x0000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
 void WINAPI FreeMediaType( AM_MEDIA_TYPE& mt )
 {
@@ -144,9 +140,10 @@ HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
  * Implementation of our dummy directshow filter pin class
  ****************************************************************************/
 
-CapturePin::CapturePin( input_thread_t * _p_input, CaptureFilter *_p_filter )
+CapturePin::CapturePin( input_thread_t * _p_input, CaptureFilter *_p_filter,
+                        AM_MEDIA_TYPE mt )
   : p_input( _p_input ), p_filter( _p_filter ), p_connected_pin( NULL ),
-    i_ref( 1 )
+    media_type( mt ), i_ref( 1 )
 {
 }
 
@@ -232,8 +229,29 @@ STDMETHODIMP CapturePin::ReceiveConnection( IPin * pConnector,
     msg_Dbg( p_input, "CapturePin::ReceiveConnection" );
 #endif
 
+    if( pmt->majortype == MEDIATYPE_Video )
+    {
+        if( media_type.subtype != GUID_NULL &&
+            media_type.subtype != pmt->subtype )
+            return VFW_E_TYPE_NOT_ACCEPTED;
+
+        if( media_type.pbFormat &&
+            ((VIDEOINFOHEADER *)media_type.pbFormat)->bmiHeader.biHeight &&
+            ((VIDEOINFOHEADER *)media_type.pbFormat)->bmiHeader.biHeight !=
+            ((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight )
+            return VFW_E_TYPE_NOT_ACCEPTED;
+
+        if( media_type.pbFormat &&
+            ((VIDEOINFOHEADER *)media_type.pbFormat)->bmiHeader.biWidth &&
+            ((VIDEOINFOHEADER *)media_type.pbFormat)->bmiHeader.biWidth !=
+            ((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth )
+            return VFW_E_TYPE_NOT_ACCEPTED;
+    }
+
     p_connected_pin = pConnector;
     p_connected_pin->AddRef();
+
+    FreeMediaType( media_type );
     return CopyMediaType( &media_type, pmt );
 }
 STDMETHODIMP CapturePin::Disconnect()
@@ -435,9 +453,9 @@ STDMETHODIMP CapturePin::ReceiveCanBlock( void )
  * Implementation of our dummy directshow filter class
  ****************************************************************************/
 
-CaptureFilter::CaptureFilter( input_thread_t * _p_input )
-  : p_input( _p_input ), p_pin( new CapturePin( _p_input, this ) ),
-    i_ref( 1 )
+CaptureFilter::CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE mt )
+  : p_input( _p_input ), p_pin( new CapturePin( _p_input, this, mt ) ),
+    media_type( mt ), i_ref( 1 )
 {
 }
 
@@ -751,7 +769,6 @@ CaptureEnumMediaTypes::CaptureEnumMediaTypes( input_thread_t * _p_input,
     p_pin->AddRef();
 
     /* Are we creating a new enumerator */
-
     if( pEnumMediaTypes == NULL )
     {
         i_position = 0;
@@ -816,20 +833,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Next( ULONG cMediaTypes,
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Next" );
 #endif
 
-    *pcFetched = 0;
-
-#if 0
-    if( i_position < 1 && cMediaTypes > 0 )
-    {
-        IPin *pPin = p_pin->CustomGetPin();
-        *ppMediaTypes = pPin;
-        pPin->AddRef();
-        *pcFetched = 1;
-        i_position++;
-        return NOERROR;
-    }
-#endif
-
+    if( pcFetched ) *pcFetched = 0;
     return S_FALSE;
 };
 STDMETHODIMP CaptureEnumMediaTypes::Skip( ULONG cMediaTypes )
@@ -838,13 +842,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Skip( ULONG cMediaTypes )
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Skip" );
 #endif
 
-    if( cMediaTypes > 0 )
-    {
-        return S_FALSE;
-    }
-
-    i_position += cMediaTypes;
-    return NOERROR;
+    return S_FALSE;
 };
 STDMETHODIMP CaptureEnumMediaTypes::Reset()
 {

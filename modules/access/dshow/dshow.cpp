@@ -2,7 +2,7 @@
  * dshow.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.6 2003/08/27 12:59:11 gbazin Exp $
+ * $Id: dshow.cpp,v 1.7 2003/08/31 22:06:17 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,21 +32,6 @@
 #include <vlc/input.h>
 #include <vlc/vout.h>
 
-#ifndef _MSC_VER
-#   include <wtypes.h>
-#   include <unknwn.h>
-#   include <ole2.h>
-#   include <limits.h>
-#   define _WINGDI_ 1
-#   define AM_NOVTABLE
-#   define _OBJBASE_H_
-#   undef _X86_
-#   define _I64_MAX LONG_LONG_MAX
-#   define LONGLONG long long
-#endif
-
-#include <dshow.h>
-
 #include "filter.h"
 
 /*****************************************************************************
@@ -63,8 +48,9 @@ static int  Demux      ( input_thread_t * );
 static int OpenDevice( input_thread_t *, string, vlc_bool_t );
 static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
                                        list<string> *, vlc_bool_t );
-static bool ConnectFilters( IFilterGraph *p_graph, IBaseFilter *p_filter,
-                            IPin *p_input_pin );
+static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
+                                     vlc_bool_t, int, int, int );
+static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
 
 /*****************************************************************************
  * Module descriptior
@@ -173,6 +159,11 @@ struct access_sys_t
     dshow_stream_t **pp_streams;
     int            i_streams;
     int            i_current_stream;
+
+    /* misc properties */
+    int            i_width;
+    int            i_height;
+    int            i_chroma;
 };
 
 /*****************************************************************************
@@ -188,6 +179,7 @@ static int AccessOpen( vlc_object_t *p_this )
     psz_dup = strdup( p_input->psz_name );
     psz_parser = psz_dup;
     string vdevname, adevname;
+    int i_width = 0, i_height = 0, i_chroma = VLC_FOURCC('I','4','2','0');
 
     while( *psz_parser && *psz_parser != ':' )
     {
@@ -234,6 +226,59 @@ static int AccessOpen( vlc_object_t *p_this )
 
                 psz_parser += i_len;
             }
+            else if( !strncmp( psz_parser, "size=", strlen( "size=" ) ) )
+            {
+                psz_parser += strlen( "size=" );
+                if( !strncmp( psz_parser, "subqcif", strlen( "subqcif" ) ) )
+                {
+                    i_width  = 128;
+                    i_height = 96;
+                }
+                else if( !strncmp( psz_parser, "qsif", strlen( "qsif" ) ) )
+                {
+                    i_width  = 160;
+                    i_height = 120;
+                }
+                else if( !strncmp( psz_parser, "qcif", strlen( "qcif" ) ) )
+                {
+                    i_width  = 176;
+                    i_height = 144;
+                }
+                else if( !strncmp( psz_parser, "sif", strlen( "sif" ) ) )
+                {
+                    i_width  = 320;
+                    i_height = 240;
+                }
+                else if( !strncmp( psz_parser, "cif", strlen( "cif" ) ) )
+                {
+                    i_width  = 352;
+                    i_height = 288;
+                }
+                else if( !strncmp( psz_parser, "vga", strlen( "vga" ) ) )
+                {
+                    i_width  = 640;
+                    i_height = 480;
+                }
+                else
+                {
+                    /* widthxheight */
+                    i_width = strtol( psz_parser, &psz_parser, 0 );
+                    if( *psz_parser == 'x' || *psz_parser == 'X')
+                    {
+                        i_height = strtol( psz_parser + 1, &psz_parser, 0 );
+                    }
+                    msg_Dbg( p_input, "WidthxHeight %dx%d", i_width, i_height );
+                }
+            }
+            else if( !strncmp( psz_parser, "chroma=", strlen( "chroma=" ) ) )
+            {
+                psz_parser += strlen( "chroma=" );
+                if( strlen( psz_parser ) >= 4 )
+                {
+                    i_chroma = VLC_FOURCC( psz_parser[0],psz_parser[1],
+                                           psz_parser[2],psz_parser[3] );
+                }
+            }
             else
             {
                 msg_Warn( p_input, "unknown option" );
@@ -277,6 +322,9 @@ static int AccessOpen( vlc_object_t *p_this )
     /* Initialize some data */
     p_sys->i_streams = 0;
     p_sys->pp_streams = (dshow_stream_t **)malloc( 1 );
+    p_sys->i_width = i_width;
+    p_sys->i_height = i_height;
+    p_sys->i_chroma = i_chroma;
 
     /* Create header */
     p_sys->i_header_size = 8;
@@ -418,8 +466,12 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
         return VLC_EGENERIC;
     }
 
+    AM_MEDIA_TYPE media_type =
+        EnumDeviceCaps( (vlc_object_t *)p_input, p_device_filter, b_audio,
+                        p_sys->i_chroma, p_sys->i_width, p_sys->i_height );
+
     /* Create and add our capture filter */
-    CaptureFilter *p_capture_filter = new CaptureFilter( p_input );
+    CaptureFilter *p_capture_filter = new CaptureFilter( p_input, media_type );
     p_sys->p_graph->AddFilter( p_capture_filter, 0 );
 
     /* Add the device filter to the graph (seems necessary with VfW before
@@ -441,8 +493,13 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
         {
             msg_Dbg( p_input, "MEDIATYPE_Video");
 
+            /* Packed RGB formats */
+            if( dshow_stream.mt.subtype == MEDIASUBTYPE_RGB1 )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
+            if( dshow_stream.mt.subtype == MEDIASUBTYPE_RGB4 )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
             if( dshow_stream.mt.subtype == MEDIASUBTYPE_RGB8 )
-                dshow_stream.i_fourcc = VLC_FOURCC( 'G', 'R', 'E', 'Y' );
+                dshow_stream.i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_RGB555 )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_RGB565 )
@@ -453,21 +510,31 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
                 dshow_stream.i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_ARGB32 )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
-            
+
+            /* Packed YUV formats */
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YVYU )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'V', 'Y', 'U' );
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YUYV )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', 'V' );
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_Y411 )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'I', '4', '1', 'N' );
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_Y211 )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'Y', '2', '1', '1' );
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YUY2 ||
+                     dshow_stream.mt.subtype == MEDIASUBTYPE_UYVY )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
+
+            /* Planar YUV formats */
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_I420 )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'I', '4', '2', '0' );
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_Y41P )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'I', '4', '1', '1' );
-            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YUY2 )
-                dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
-            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YVYU )
-                dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'V', 'Y', 'U' );
-            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_Y411 )
-                dshow_stream.i_fourcc = VLC_FOURCC( 'I', '4', '1', 'N' );
-            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YV12 )
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YV12 ||
+                     dshow_stream.mt.subtype == MEDIASUBTYPE_IYUV )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'V', '1', '2' );
+            else if( dshow_stream.mt.subtype == MEDIASUBTYPE_YVU9 )
+                dshow_stream.i_fourcc = VLC_FOURCC( 'Y', 'V', 'U', '9' );
+
             else goto fail;
 
             dshow_stream.header.video =
@@ -476,7 +543,10 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             int i_height = dshow_stream.header.video.bmiHeader.biHeight;
 
             /* Check if the image is inverted (bottom to top) */
-            if( dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '5' ) ||
+            if( dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'G', 'B', '1' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'G', 'B', '4' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'G', 'B', '8' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '5' ) ||
                 dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '6' ) ||
                 dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '2', '4' ) ||
                 dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '3', '2' ) ||
@@ -659,6 +729,90 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
 
     p_class_enum->Release();
     return NULL;
+}
+
+static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
+                                     IBaseFilter *p_filter, vlc_bool_t b_audio,
+                                     int i_chroma, int i_width, int i_height )
+{
+    IEnumPins *p_enumpins;
+    IPin *p_output_pin;
+    IEnumMediaTypes *p_enummt;
+
+    AM_MEDIA_TYPE media_type;
+    media_type.majortype = GUID_NULL;
+    media_type.subtype = GUID_NULL;
+    media_type.formattype = GUID_NULL;
+    media_type.pUnk = NULL;
+    media_type.cbFormat = 0;
+    media_type.pbFormat = NULL;
+
+    if( S_OK != p_filter->EnumPins( &p_enumpins ) ) return media_type;
+
+    /*while*/if( p_enumpins->Next( 1, &p_output_pin, NULL ) == S_OK )
+    {
+        /* Probe pin */
+        if( !b_audio &&
+            SUCCEEDED( p_output_pin->EnumMediaTypes( &p_enummt ) ) )
+        {
+            AM_MEDIA_TYPE *p_mt;
+            while( p_enummt->Next( 1, &p_mt, NULL ) == S_OK )
+            {
+                int i_fourcc = VLC_FOURCC(' ', ' ', ' ', ' ');
+
+                /* Packed RGB formats */
+                if( p_mt->subtype == MEDIASUBTYPE_RGB1 )
+                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
+                if( p_mt->subtype == MEDIASUBTYPE_RGB4 )
+                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
+                if( p_mt->subtype == MEDIASUBTYPE_RGB8 )
+                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
+                else if( p_mt->subtype == MEDIASUBTYPE_RGB555 )
+                    i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
+                else if( p_mt->subtype == MEDIASUBTYPE_RGB565 )
+                    i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
+                else if( p_mt->subtype == MEDIASUBTYPE_RGB24 )
+                    i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
+                else if( p_mt->subtype == MEDIASUBTYPE_RGB32 )
+                    i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
+                else if( p_mt->subtype == MEDIASUBTYPE_ARGB32 )
+                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
+                else i_fourcc = *((int *)&p_mt->subtype);
+
+                int i_current_width = p_mt->pbFormat ?
+                  ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth : 0;
+                int i_current_height = p_mt->pbFormat ?
+                  ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biHeight : 0;
+
+                msg_Dbg( p_this, "EnumDeviceCaps: input pin "
+                         "accepts chroma: %4.4s, width:%i, height:%i",
+                         (char *)&i_fourcc, i_current_width,
+                         i_current_height );
+
+                if( i_fourcc == i_chroma )
+                {
+                    media_type.subtype = p_mt->subtype;
+                }
+
+                if( i_fourcc == i_chroma && p_mt->pbFormat &&
+                    i_width && i_height && i_width == i_current_width &&
+                    i_height == i_current_height )
+                {
+                    media_type = *p_mt;
+                }
+                else
+                {
+                    FreeMediaType( *p_mt );
+                }
+                CoTaskMemFree( (PVOID)p_mt );
+            }
+            p_enummt->Release();
+        }
+        p_output_pin->Release();
+    }
+
+    p_enumpins->Release();
+    return media_type;
 }
 
 /*****************************************************************************
