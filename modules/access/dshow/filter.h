@@ -2,7 +2,7 @@
  * filter.h : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.h,v 1.2 2003/08/31 22:06:17 gbazin Exp $
+ * $Id: filter.h,v 1.3 2003/10/18 20:09:23 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -72,7 +72,7 @@ class CapturePin: public IPin, public IMemInputPin
 
     deque<VLCMediaSample> samples_queue;
 
-    int i_ref;
+    long i_ref;
 
   public:
     CapturePin( input_thread_t * _p_input, CaptureFilter *_p_filter,
@@ -128,7 +128,7 @@ class CaptureFilter : public IBaseFilter
     IFilterGraph   *p_graph;
     AM_MEDIA_TYPE  media_type;
 
-    int i_ref;
+    long i_ref;
 
   public:
     CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE mt );
@@ -170,7 +170,7 @@ class CaptureEnumPins : public IEnumPins
     CaptureFilter  *p_filter;
 
     int i_position;
-    int i_ref;
+    long i_ref;
 
 public:
     CaptureEnumPins( input_thread_t * _p_input, CaptureFilter *_p_filter,
@@ -198,7 +198,7 @@ class CaptureEnumMediaTypes : public IEnumMediaTypes
     CapturePin     *p_pin;
 
     int i_position;
-    int i_ref;
+    long i_ref;
 
 public:
     CaptureEnumMediaTypes( input_thread_t * _p_input, CapturePin *_p_pin,

@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.9 2003/09/21 10:23:59 gbazin Exp $
+ * $Id: dshow.cpp,v 1.10 2003/10/18 20:09:23 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,8 +49,15 @@ static int OpenDevice( input_thread_t *, string, vlc_bool_t );
 static IBaseFilter *FindCaptureDevice( vlc_object_t *, string *,
                                        list<string> *, vlc_bool_t );
 static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *, IBaseFilter *,
-                                     vlc_bool_t, int, int, int );
+                                     int, int, int, int, int, int );
 static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
+
+#if 0
+    /* Debug only, use this to find out GUIDs */
+    unsigned char p_st[];
+    UuidToString( (IID *)&IID_IAMBufferNegotiation, &p_st );
+    msg_Err( p_input, "BufferNegotiation: %s" , p_st );
+#endif
 
 /*****************************************************************************
  * Module descriptior
@@ -59,12 +66,36 @@ static bool ConnectFilters( IFilterGraph *, IBaseFilter *, IPin * );
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for directshow streams. " \
     "This value should be set in miliseconds units." )
+#define VDEV_TEXT N_("Video device name")
+#define VDEV_LONGTEXT N_( \
+    "You can specify the name of the video device that will be used by the " \
+    "DirectShow plugin. If you don't specify anything, the default device " \
+    "will be used.")
+#define ADEV_TEXT N_("Audio device name")
+#define ADEV_LONGTEXT N_( \
+    "You can specify the name of the audio device that will be used by the " \
+    "DirectShow plugin. If you don't specify anything, the default device " \
+    "will be used.")
+#define SIZE_TEXT N_("Video size")
+#define SIZE_LONGTEXT N_( \
+    "You can specify the size of the video that will be displayed by the " \
+    "DirectShow plugin. If you don't specify anything the default size for " \
+    "your device will be used.")
+#define CHROMA_TEXT N_("Video input chroma format")
+#define CHROMA_LONGTEXT N_( \
+    "Force the DirectShow video input to use a specific chroma format " \
+    "(eg. I420 (default), RV24, etc...)")
 
 vlc_module_begin();
     set_description( _("DirectShow input") );
     add_category_hint( N_("dshow"), NULL, VLC_TRUE );
-    add_integer( "dshow-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+    add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, VLC_FALSE);
+    add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE);
+    add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, VLC_FALSE);
+    add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+                VLC_TRUE );
     add_shortcut( "dshow" );
     set_capability( "access", 0 );
     set_callbacks( AccessOpen, AccessClose );
@@ -135,10 +166,7 @@ typedef struct dshow_stream_t
 
     } header;
 
-    VLCMediaSample  sample;
-    int             i_data_size;
-    int             i_data_pos;
-    uint8_t         *p_data;
+    vlc_bool_t      b_pts;
 
 } dshow_stream_t;
 
@@ -147,6 +175,9 @@ typedef struct dshow_stream_t
  ****************************************************************************/
 struct access_sys_t
 {
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+
     IFilterGraph  *p_graph;
     IMediaControl *p_control;
 
@@ -173,130 +204,72 @@ static int AccessOpen( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     access_sys_t   *p_sys;
+    vlc_value_t    val;
 
-    /* parse url and open device(s) */
-    char *psz_dup, *psz_parser;
-    psz_dup = strdup( p_input->psz_name );
-    psz_parser = psz_dup;
+    /* Get/parse options and open device(s) */
     string vdevname, adevname;
     int i_width = 0, i_height = 0, i_chroma = VLC_FOURCC('I','4','2','0');
 
-    while( *psz_parser && *psz_parser != ':' )
-    {
-        psz_parser++;
-    }
+    var_Create( p_input, "dshow-vdev", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Get( p_input, "dshow-vdev", &val );
+    if( val.psz_string ) vdevname = string( val.psz_string );
+    if( val.psz_string ) free( val.psz_string );
 
-    if( *psz_parser == ':' )
+    var_Create( p_input, "dshow-adev", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Get( p_input, "dshow-adev", &val );
+    if( val.psz_string ) adevname = string( val.psz_string );
+    if( val.psz_string ) free( val.psz_string );
+
+    var_Create( p_input, "dshow-size", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Get( p_input, "dshow-size", &val );
+    if( val.psz_string && *val.psz_string )
     {
-        /* read options */
-        for( ;; )
+        if( !strcmp( val.psz_string, "subqcif" ) )
         {
-            int i_len;
-
-            *psz_parser++ = '\0';
-            if( !strncmp( psz_parser, "vdev=", strlen( "vdev=" ) ) )
+            i_width  = 128; i_height = 96;
+        }
+        else if( !strcmp( val.psz_string, "qsif" ) )
+        {
+            i_width  = 160; i_height = 120;
+        }
+        else if( !strcmp( val.psz_string, "qcif" ) )
+        {
+            i_width  = 176; i_height = 144;
+        }
+        else if( !strcmp( val.psz_string, "sif" ) )
+        {
+            i_width  = 320; i_height = 240;
+        }
+        else if( !strcmp( val.psz_string, "cif" ) )
+        {
+            i_width  = 352; i_height = 288;
+        }
+        else if( !strcmp( val.psz_string, "vga" ) )
+        {
+            i_width  = 640; i_height = 480;
+        }
+        else
+        {
+            /* Width x Height */
+            char *psz_parser;
+            i_width = strtol( val.psz_string, &psz_parser, 0 );
+            if( *psz_parser == 'x' || *psz_parser == 'X')
             {
-                psz_parser += strlen( "vdev=" );
-                if( strchr( psz_parser, ':' ) )
-                {
-                    i_len = strchr( psz_parser, ':' ) - psz_parser;
-                }
-                else
-                {
-                    i_len = strlen( psz_parser );
-                }
-
-                vdevname = string( psz_parser, i_len );
-
-                psz_parser += i_len;
+                i_height = strtol( psz_parser + 1, &psz_parser, 0 );
             }
-            else if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) ) )
-            {
-                psz_parser += strlen( "adev=" );
-                if( strchr( psz_parser, ':' ) )
-                {
-                    i_len = strchr( psz_parser, ':' ) - psz_parser;
-                }
-                else
-                {
-                    i_len = strlen( psz_parser );
-                }
-
-                adevname = string( psz_parser, i_len );
-
-                psz_parser += i_len;
-            }
-            else if( !strncmp( psz_parser, "size=", strlen( "size=" ) ) )
-            {
-                psz_parser += strlen( "size=" );
-                if( !strncmp( psz_parser, "subqcif", strlen( "subqcif" ) ) )
-                {
-                    i_width  = 128;
-                    i_height = 96;
-                }
-                else if( !strncmp( psz_parser, "qsif", strlen( "qsif" ) ) )
-                {
-                    i_width  = 160;
-                    i_height = 120;
-                }
-                else if( !strncmp( psz_parser, "qcif", strlen( "qcif" ) ) )
-                {
-                    i_width  = 176;
-                    i_height = 144;
-                }
-                else if( !strncmp( psz_parser, "sif", strlen( "sif" ) ) )
-                {
-                    i_width  = 320;
-                    i_height = 240;
-                }
-                else if( !strncmp( psz_parser, "cif", strlen( "cif" ) ) )
-                {
-                    i_width  = 352;
-                    i_height = 288;
-                }
-                else if( !strncmp( psz_parser, "vga", strlen( "vga" ) ) )
-                {
-                    i_width  = 640;
-                    i_height = 480;
-                }
-                else
-                {
-                    /* widthxheight */
-                    i_width = strtol( psz_parser, &psz_parser, 0 );
-                    if( *psz_parser == 'x' || *psz_parser == 'X')
-                    {
-                        i_height = strtol( psz_parser + 1, &psz_parser, 0 );
-                    }
-                    msg_Dbg( p_input, "WidthxHeight %dx%d", i_width, i_height );
-                }
-            }
-            else if( !strncmp( psz_parser, "chroma=", strlen( "chroma=" ) ) )
-            {
-                psz_parser += strlen( "chroma=" );
-                if( strlen( psz_parser ) >= 4 )
-                {
-                    i_chroma = VLC_FOURCC( psz_parser[0],psz_parser[1],
-                                           psz_parser[2],psz_parser[3] );
-                }
-            }
-            else
-            {
-                msg_Warn( p_input, "unknown option" );
-            }
-
-            while( *psz_parser && *psz_parser != ':' )
-            {
-                psz_parser++;
-            }
-
-            if( *psz_parser == '\0' )
-            {
-                break;
-            }
+            msg_Dbg( p_input, "Width x Height %dx%d", i_width, i_height );
         }
     }
+    if( val.psz_string ) free( val.psz_string );
 
-    free( psz_dup );
+    var_Create( p_input, "dshow-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Get( p_input, "dshow-chroma", &val );
+    if( val.psz_string && strlen( val.psz_string ) >= 4 )
+    {
+        i_chroma = VLC_FOURCC( val.psz_string[0], val.psz_string[1],
+                               val.psz_string[2], val.psz_string[3] );
+    }
+    if( val.psz_string ) free( val.psz_string );
 
     p_input->pf_read        = Read;
     p_input->pf_seek        = NULL;
@@ -310,7 +283,10 @@ static int AccessOpen( vlc_object_t *p_this )
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.i_method = INPUT_METHOD_FILE;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    p_input->i_pts_delay = config_GetInt( p_input, "dshow-caching" ) * 1000;
+ 
+    var_Create( p_input, "dshow-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    var_Get( p_input, "dshow-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
 
     /* Initialize OLE/COM */
     CoInitializeEx( 0, COINIT_APARTMENTTHREADED );
@@ -367,7 +343,10 @@ static int AccessOpen( vlc_object_t *p_this )
 
     /* Initialize some data */
     p_sys->i_current_stream = 0;
-    p_sys->i_header_pos = 0;
+    p_input->i_mtu += p_sys->i_header_size + 16 /* data header size */;
+
+    vlc_mutex_init( p_input, &p_sys->lock );
+    vlc_cond_init( p_input, &p_sys->wait );
 
     /* Everything is ready. Let's rock baby */
     p_sys->p_control->Run();
@@ -390,10 +369,10 @@ static void AccessClose( vlc_object_t *p_this )
     /* Remove filters from graph */
     for( int i = 0; i < p_sys->i_streams; i++ )
     {
-        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_device_filter );
         p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_capture_filter );
-        p_sys->pp_streams[i]->p_device_filter->Release();
+        p_sys->p_graph->RemoveFilter( p_sys->pp_streams[i]->p_device_filter );
         p_sys->pp_streams[i]->p_capture_filter->Release();
+        p_sys->pp_streams[i]->p_device_filter->Release();
     }
     p_sys->p_graph->Release();
 
@@ -467,8 +446,9 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
     }
 
     AM_MEDIA_TYPE media_type =
-        EnumDeviceCaps( (vlc_object_t *)p_input, p_device_filter, b_audio,
-                        p_sys->i_chroma, p_sys->i_width, p_sys->i_height );
+        EnumDeviceCaps( (vlc_object_t *)p_input, p_device_filter,
+                        p_sys->i_chroma, p_sys->i_width, p_sys->i_height,
+                        0, 0, 0 );
 
     /* Create and add our capture filter */
     CaptureFilter *p_capture_filter = new CaptureFilter( p_input, media_type );
@@ -486,6 +466,7 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
         /* Success */
         dshow_stream_t dshow_stream;
         dshow_stream.b_invert = VLC_FALSE;
+        dshow_stream.b_pts = VLC_FALSE;
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
 
@@ -568,6 +549,11 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             SetDWBE( &p_sys->p_header[p_sys->i_header_pos + 12], i_height );
             SetDWBE( &p_sys->p_header[p_sys->i_header_pos + 16], 0 );
             p_sys->i_header_pos = p_sys->i_header_size;
+
+            /* Greatly simplifies the reading routine */
+            int i_mtu = dshow_stream.header.video.bmiHeader.biWidth *
+                dshow_stream.header.video.bmiHeader.biHeight * 4;
+            p_input->i_mtu = __MAX(p_input->i_mtu,i_mtu);
         }
 
         else if( dshow_stream.mt.majortype == MEDIATYPE_Audio &&
@@ -577,10 +563,8 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
 
             if( dshow_stream.mt.subtype == MEDIASUBTYPE_PCM )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
-#if 0
             else if( dshow_stream.mt.subtype == MEDIASUBTYPE_IEEE_FLOAT )
                 dshow_stream.i_fourcc = VLC_FOURCC( 'f', 'l', '3', '2' );
-#endif
             else goto fail;
 
             dshow_stream.header.audio =
@@ -600,13 +584,35 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             SetDWBE( &p_sys->p_header[p_sys->i_header_pos + 16],
                      dshow_stream.header.audio.wBitsPerSample );
             p_sys->i_header_pos = p_sys->i_header_size;
+
+            /* Greatly simplifies the reading routine */
+            IAMBufferNegotiation *p_ambuf;
+            IPin *p_pin;
+            int i_mtu;
+
+            p_capture_filter->CustomGetPin()->ConnectedTo( &p_pin );
+            if( SUCCEEDED( p_pin->QueryInterface(
+                  IID_IAMBufferNegotiation, (void **)&p_ambuf ) ) )
+            {
+                ALLOCATOR_PROPERTIES AllocProp;
+                memset( &AllocProp, 0, sizeof( ALLOCATOR_PROPERTIES ) );
+                p_ambuf->GetAllocatorProperties( &AllocProp );
+                p_ambuf->Release();
+                i_mtu = AllocProp.cbBuffer;
+            }
+            else
+            {
+                /* Worst case */
+                i_mtu = dshow_stream.header.audio.nSamplesPerSec *
+                        dshow_stream.header.audio.nChannels *
+                        dshow_stream.header.audio.wBitsPerSample / 8;
+            }
+            p_pin->Release();
+            p_input->i_mtu = __MAX( p_input->i_mtu, i_mtu );
         }
         else goto fail;
 
         /* Add directshow elementary stream to our list */
-        dshow_stream.sample.p_sample  = NULL;
-        dshow_stream.i_data_size = 0;
-        dshow_stream.i_data_pos = 0;
         dshow_stream.p_device_filter = p_device_filter;
         dshow_stream.p_capture_filter = p_capture_filter;
 
@@ -732,8 +738,10 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
 }
 
 static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
-                                     IBaseFilter *p_filter, vlc_bool_t b_audio,
-                                     int i_chroma, int i_width, int i_height )
+                                     IBaseFilter *p_filter,
+                                     int i_chroma, int i_width, int i_height,
+                                     int i_channels, int i_samplespersec,
+                                     int i_bitspersample )
 {
     IEnumPins *p_enumpins;
     IPin *p_output_pin;
@@ -752,62 +760,119 @@ static AM_MEDIA_TYPE EnumDeviceCaps( vlc_object_t *p_this,
     /*while*/if( p_enumpins->Next( 1, &p_output_pin, NULL ) == S_OK )
     {
         /* Probe pin */
-        if( !b_audio &&
-            SUCCEEDED( p_output_pin->EnumMediaTypes( &p_enummt ) ) )
+        if( SUCCEEDED( p_output_pin->EnumMediaTypes( &p_enummt ) ) )
         {
             AM_MEDIA_TYPE *p_mt;
             while( p_enummt->Next( 1, &p_mt, NULL ) == S_OK )
             {
-                int i_fourcc = VLC_FOURCC(' ', ' ', ' ', ' ');
 
-                /* Packed RGB formats */
-                if( p_mt->subtype == MEDIASUBTYPE_RGB1 )
-                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
-                if( p_mt->subtype == MEDIASUBTYPE_RGB4 )
-                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
-                if( p_mt->subtype == MEDIASUBTYPE_RGB8 )
-                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
-                else if( p_mt->subtype == MEDIASUBTYPE_RGB555 )
-                    i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
-                else if( p_mt->subtype == MEDIASUBTYPE_RGB565 )
-                    i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
-                else if( p_mt->subtype == MEDIASUBTYPE_RGB24 )
-                    i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
-                else if( p_mt->subtype == MEDIASUBTYPE_RGB32 )
-                    i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
-                else if( p_mt->subtype == MEDIASUBTYPE_ARGB32 )
-                    i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
-                else i_fourcc = *((int *)&p_mt->subtype);
-
-                int i_current_width = p_mt->pbFormat ?
-                  ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth : 0;
-                int i_current_height = p_mt->pbFormat ?
-                  ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biHeight : 0;
-
-                msg_Dbg( p_this, "EnumDeviceCaps: input pin "
-                         "accepts chroma: %4.4s, width:%i, height:%i",
-                         (char *)&i_fourcc, i_current_width,
-                         i_current_height );
-
-                if( i_fourcc == i_chroma )
+                if( p_mt->majortype == MEDIATYPE_Video )
                 {
-                    media_type.subtype = p_mt->subtype;
+                    int i_fourcc = VLC_FOURCC(' ', ' ', ' ', ' ');
+
+                    /* Packed RGB formats */
+                    if( p_mt->subtype == MEDIASUBTYPE_RGB1 )
+                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
+                    if( p_mt->subtype == MEDIASUBTYPE_RGB4 )
+                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
+                    if( p_mt->subtype == MEDIASUBTYPE_RGB8 )
+                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
+                    else if( p_mt->subtype == MEDIASUBTYPE_RGB555 )
+                        i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
+                    else if( p_mt->subtype == MEDIASUBTYPE_RGB565 )
+                        i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
+                    else if( p_mt->subtype == MEDIASUBTYPE_RGB24 )
+                        i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
+                    else if( p_mt->subtype == MEDIASUBTYPE_RGB32 )
+                        i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
+                    else if( p_mt->subtype == MEDIASUBTYPE_ARGB32 )
+                        i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
+                    else i_fourcc = *((int *)&p_mt->subtype);
+
+                    int i_current_width = p_mt->pbFormat ?
+                        ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biWidth : 0;
+                    int i_current_height = p_mt->pbFormat ?
+                        ((VIDEOINFOHEADER *)p_mt->pbFormat)->bmiHeader.biHeight : 0;
+
+                    msg_Dbg( p_this, "EnumDeviceCaps: input pin "
+                             "accepts chroma: %4.4s, width:%i, height:%i",
+                             (char *)&i_fourcc, i_current_width,
+                             i_current_height );
+
+                    if( (!i_chroma || i_fourcc == i_chroma) &&
+                        (!i_width || i_width == i_current_width) &&
+                        (!i_height || i_height == i_current_height) )
+                    {
+                        /* Pick the 1st match */
+                        media_type = *p_mt;
+                        i_chroma = i_fourcc;
+                        i_width = i_current_width;
+                        i_height = i_current_height;
+                    }
+                    else
+                    {
+                        FreeMediaType( *p_mt );
+                    }
+                }
+                else if( p_mt->majortype == MEDIATYPE_Audio )
+                {
+                    int i_fourcc;
+                    int i_current_channels =
+                        ((WAVEFORMATEX *)p_mt->pbFormat)->nChannels;
+                    int i_current_samplespersec =
+                        ((WAVEFORMATEX *)p_mt->pbFormat)->nSamplesPerSec;
+                    int i_current_bitspersample =
+                        ((WAVEFORMATEX *)p_mt->pbFormat)->wBitsPerSample;
+
+                    if( p_mt->subtype == MEDIASUBTYPE_PCM )
+                        i_fourcc = VLC_FOURCC( 'p', 'c', 'm', ' ' );
+                    else i_fourcc = *((int *)&p_mt->subtype);
+
+                    msg_Dbg( p_this, "EnumDeviceCaps: input pin "
+                             "accepts format: %4.4s, channels:%i, "
+                             "samples/sec:%i bits/sample:%i",
+                             (char *)&i_fourcc, i_current_channels,
+                             i_current_samplespersec, i_current_bitspersample);
+
+                    if( (!i_channels || i_channels == i_current_channels) &&
+                        (!i_samplespersec ||
+                         i_samplespersec == i_current_samplespersec) &&
+                        (!i_bitspersample ||
+                         i_bitspersample == i_current_bitspersample) )
+                    {
+                        /* Pick the 1st match */
+                        media_type = *p_mt;
+                        i_channels = i_current_channels;
+                        i_samplespersec = i_current_samplespersec;
+                        i_bitspersample = i_current_bitspersample;
+
+                        /* Setup a few properties like the audio latency */
+                        IAMBufferNegotiation *p_ambuf;
+
+                        if( SUCCEEDED( p_output_pin->QueryInterface(
+                              IID_IAMBufferNegotiation, (void **)&p_ambuf ) ) )
+                        {
+                            ALLOCATOR_PROPERTIES AllocProp;
+                            AllocProp.cbAlign = -1;
+                            AllocProp.cbBuffer = i_channels * i_samplespersec *
+                              i_bitspersample / 8 / 10 ; /*100 ms of latency*/
+                            AllocProp.cbPrefix = -1;
+                            AllocProp.cBuffers = -1;
+                            p_ambuf->SuggestAllocatorProperties( &AllocProp );
+                            p_ambuf->Release();
+                        }
+                    }
+                    else
+                    {
+                        FreeMediaType( *p_mt );
+                    }
                 }
 
-                if( i_fourcc == i_chroma && p_mt->pbFormat &&
-                    i_width && i_height && i_width == i_current_width &&
-                    i_height == i_current_height )
-                {
-                    media_type = *p_mt;
-                }
-                else
-                {
-                    FreeMediaType( *p_mt );
-                }
                 CoTaskMemFree( (PVOID)p_mt );
             }
             p_enummt->Release();
         }
+
         p_output_pin->Release();
     }
 
@@ -825,171 +890,140 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
                      size_t i_len )
 {
     access_sys_t   *p_sys = p_input->p_access_data;
-    dshow_stream_t *p_stream = p_sys->pp_streams[p_sys->i_current_stream];
-    int            i_data = 0;
+    dshow_stream_t *p_stream = NULL;
+    byte_t         *p_buf_orig = p_buffer;
+    VLCMediaSample  sample;
+    int             i_data_size;
+    uint8_t         *p_data;
 
-#if 0
-    msg_Info( p_input, "access read data_size %i, data_pos %i",
-              p_sys->i_data_size, p_sys->i_data_pos );
-#endif
-
-    while( i_len > 0 )
+    if( p_sys->i_header_pos )
     {
-        /* First copy header if any */
-        if( i_len > 0 && p_sys->i_header_pos < p_sys->i_header_size )
-        {
-            int i_copy;
-
-            i_copy = __MIN( p_sys->i_header_size -
-                            p_sys->i_header_pos, (int)i_len );
-            memcpy( p_buffer, &p_sys->p_header[p_sys->i_header_pos], i_copy );
-            p_sys->i_header_pos += i_copy;
-
-            p_buffer += i_copy;
-            i_len -= i_copy;
-            i_data += i_copy;
-        }
-
-        /* Then copy stream data if any */
-        if( i_len > 0 && p_stream->i_data_pos < p_stream->i_data_size )
-        {
-            int i_copy = __MIN( p_stream->i_data_size -
-                                p_stream->i_data_pos, (int)i_len );
-
-            if( !p_stream->b_invert )
-            {
-                p_input->p_vlc->pf_memcpy( p_buffer,
-                    &p_stream->p_data[p_stream->i_data_pos], i_copy );
-            }
-            else
-            {
-                int i_copied;
-                int i_width = p_stream->header.video.bmiHeader.biWidth;
-                int i_height = p_stream->header.video.bmiHeader.biHeight;
-
-                switch( p_stream->i_fourcc )
-                {
-                case VLC_FOURCC( 'R', 'V', '1', '5' ):
-                case VLC_FOURCC( 'R', 'V', '1', '6' ):
-                    i_width *= 2;
-                    break;
-                case VLC_FOURCC( 'R', 'V', '2', '4' ):
-                    i_width *= 3;
-                    break;
-                case VLC_FOURCC( 'R', 'V', '3', '2' ):
-                case VLC_FOURCC( 'R', 'G', 'B', 'A' ):
-                    i_width *= 4;
-                    break;
-                }
-
-                int i_line_pos = i_height - 1 - p_stream->i_data_pos / i_width;
-                int i_offset = p_stream->i_data_pos % i_width;
-
-                i_copied = __MIN( i_width - i_offset, i_copy );
-
-                /* copy already started line if any */
-                if( i_copied )
-                {
-                    memcpy( p_buffer,
-                            &p_stream->p_data[i_line_pos * i_width + i_offset],
-                            i_copied );
-
-                    p_stream->i_data_pos += i_copied;
-                    p_buffer += i_copied;
-                    i_len -= i_copied;
-                    i_data += i_copied;
-                    i_copy -= i_copied;
-                }
-
-                /* The caller got what he wanted */
-                if( i_len <= 0 ) return i_data;
-
-                i_line_pos = i_height - 1 - p_stream->i_data_pos / i_width;
-                i_copied = i_copy / i_width;
-
-                while( i_copied )
-                {
-                    memcpy( p_buffer, &p_stream->p_data[i_line_pos * i_width],
-                            i_width );
-                    p_stream->i_data_pos += i_width;
-                    p_buffer += i_width;
-                    i_len -= i_width;
-                    i_data += i_width;
-                    i_copy -= i_width;
-                    i_line_pos--;
-                    i_copied--;
-                }
-
-                /* copy left over if any */
-                if( i_copy )
-                {
-                    memcpy( p_buffer, &p_stream->p_data[i_line_pos * i_width],
-                            i_copy );
-                }
-            }
-
-            p_stream->i_data_pos += i_copy;
-            p_buffer += i_copy;
-            i_len -= i_copy;
-            i_data += i_copy;
-        }
-
-        /* The caller got what he wanted */
-        if( i_len <= 0 ) return i_data;
-
-        /* Read no more than one frame at a time, otherwise we kill latency */
-        if( p_stream->i_data_size && i_data &&
-            p_stream->i_data_pos == p_stream->i_data_size )
-        {
-            p_stream->i_data_pos = p_stream->i_data_size = 0;
-            return i_data;
-        }
-
-        /* Get new sample/frame from next stream */
-        if( p_stream->sample.p_sample )
-        {
-            p_stream->sample.p_sample->Release();
-            p_stream->sample.p_sample = NULL;
-        }
-        p_sys->i_current_stream =
-            (p_sys->i_current_stream + 1) % p_sys->i_streams;
-        p_stream = p_sys->pp_streams[p_sys->i_current_stream];
-        if( p_stream->p_capture_filter &&
-            p_stream->p_capture_filter->CustomGetPin()
-                ->CustomGetSample( &p_stream->sample ) == S_OK )
-        {
-            p_stream->i_data_pos = 0;
-            p_stream->i_data_size =
-                p_stream->sample.p_sample->GetActualDataLength();
-            p_stream->sample.p_sample->GetPointer( &p_stream->p_data );
-
-            REFERENCE_TIME i_pts, i_end_date;
-            HRESULT hr =
-                p_stream->sample.p_sample->GetTime( &i_pts, &i_end_date );
-            if( hr != VFW_S_NO_STOP_TIME && hr != S_OK ) i_pts = 0;
-
-            if( !i_pts )
-            {
-                /* Use our data timestamp */
-                i_pts = p_stream->sample.i_timestamp;
-            }
-
-#if 0
-            msg_Dbg( p_input, "Read() stream: %i PTS: "I64Fd,
-                     p_sys->i_current_stream, i_pts );
-#endif
-
-            /* Create pseudo header */
-            p_sys->i_header_size = 16;
-            p_sys->i_header_pos  = 0;
-            SetDWBE( &p_sys->p_header[0], p_sys->i_current_stream );
-            SetDWBE( &p_sys->p_header[4], p_stream->i_data_size );
-            SetQWBE( &p_sys->p_header[8], i_pts  * 9 / 1000 );
-        }
-        else msleep( 1000 );
+        /* First header of the stream */
+        memcpy( p_buffer, p_sys->p_header, p_sys->i_header_size );
+        p_buffer += p_sys->i_header_size;
+        p_sys->i_header_pos = 0;
     }
 
-    return i_data;
+    while( 1 )
+    {
+        /* Get new sample/frame from next elementary stream.
+         * We first loop through all the elementary streams and if all our
+         * fifos are empty we block until we are signaled some new data has
+         * arrived. */
+        vlc_mutex_lock( &p_sys->lock );
+
+        int i_stream;
+        for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+        {
+            p_stream = p_sys->pp_streams[i_stream];
+            if( p_stream->mt.majortype == MEDIATYPE_Audio &&
+                p_stream->p_capture_filter &&
+                p_stream->p_capture_filter->CustomGetPin()
+                  ->CustomGetSample( &sample ) == S_OK )
+            {
+                break;
+            }
+        }
+        if( i_stream == p_sys->i_streams )
+        for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+        {
+            p_stream = p_sys->pp_streams[i_stream];
+            if( p_stream->p_capture_filter &&
+                p_stream->p_capture_filter->CustomGetPin()
+                  ->CustomGetSample( &sample ) == S_OK )
+            {
+                break;
+            }
+        }
+        if( i_stream == p_sys->i_streams )
+        {
+            /* No data available. Wait until some data has arrived */
+            vlc_cond_wait( &p_sys->wait, &p_sys->lock );
+            vlc_mutex_unlock( &p_sys->lock );
+            continue;
+        }
+
+        vlc_mutex_unlock( &p_sys->lock );
+
+        /*
+         * We got our sample
+         */
+        i_data_size = sample.p_sample->GetActualDataLength();
+        sample.p_sample->GetPointer( &p_data );
+
+        REFERENCE_TIME i_pts, i_end_date;
+        HRESULT hr = sample.p_sample->GetTime( &i_pts, &i_end_date );
+        if( hr != VFW_S_NO_STOP_TIME && hr != S_OK ) i_pts = 0;
+
+        if( !i_pts )
+        {
+            if( p_stream->mt.majortype == MEDIATYPE_Video || !p_stream->b_pts )
+            {
+                /* Use our data timestamp */
+                i_pts = sample.i_timestamp;
+                p_stream->b_pts = VLC_TRUE;
+            }
+        }
+
+#if 0
+        msg_Dbg( p_input, "Read() stream: %i PTS: "I64Fd, i_stream, i_pts );
+#endif
+
+        /* Create pseudo header */
+        SetDWBE( &p_sys->p_header[0], i_stream );
+        SetDWBE( &p_sys->p_header[4], i_data_size );
+        SetQWBE( &p_sys->p_header[8], i_pts  * 9 / 1000 );
+
+#if 0
+        msg_Info( p_input, "access read %i data_size %i", i_len, i_data_size );
+#endif
+
+        /* First copy header */
+        memcpy( p_buffer, p_sys->p_header, 16 /* header size */ );
+        p_buffer += 16 /* header size */;
+
+        /* Then copy stream data if any */
+        if( !p_stream->b_invert )
+        {
+            p_input->p_vlc->pf_memcpy( p_buffer, p_data, i_data_size );
+            p_buffer += i_data_size;
+        }
+        else
+        {
+            int i_width = p_stream->header.video.bmiHeader.biWidth;
+            int i_height = p_stream->header.video.bmiHeader.biHeight;
+
+            switch( p_stream->i_fourcc )
+            {
+            case VLC_FOURCC( 'R', 'V', '1', '5' ):
+            case VLC_FOURCC( 'R', 'V', '1', '6' ):
+                i_width *= 2;
+                break;
+            case VLC_FOURCC( 'R', 'V', '2', '4' ):
+                i_width *= 3;
+                break;
+            case VLC_FOURCC( 'R', 'V', '3', '2' ):
+            case VLC_FOURCC( 'R', 'G', 'B', 'A' ):
+                i_width *= 4;
+                break;
+            }
+
+            for( int i = i_height - 1; i >= 0; i-- )
+            {
+                p_input->p_vlc->pf_memcpy( p_buffer,
+                     &p_data[i * i_width], i_width );
+
+                p_buffer += i_width;
+            }
+        }
+
+        sample.p_sample->Release();
+
+        /* The caller got what he wanted */
+        return p_buffer - p_buf_orig;
+    }
+
+    return 0; /* never reached */
 }
 
 /****************************************************************************
@@ -1005,18 +1039,11 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     data_packet_t  *p_pk;
 
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE ;
-    }
-
     /* a little test to see if it's a dshow stream */
     if( input_Peek( p_input, &p_peek, 8 ) < 8 )
     {
         msg_Warn( p_input, "dshow plugin discarded (cannot peek)" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     if( strcmp( (const char *)p_peek, ".dsh" ) ||
@@ -1032,13 +1059,13 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot add program" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
@@ -1049,7 +1076,7 @@ static int DemuxOpen( vlc_object_t *p_this )
         < 8 + 20 * i_streams )
     {
         msg_Err( p_input, "dshow plugin discarded (cannot peek)" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
     p_peek += 8;
 
@@ -1146,15 +1173,12 @@ static int Demux( input_thread_t *p_input )
     if( input_Peek( p_input, &p_peek, 16 ) < 16 )
     {
         msg_Warn( p_input, "cannot peek (EOF ?)" );
-        return( 0 );
+        return 0;
     }
 
     i_stream = GetDWBE( &p_peek[0] );
     i_size   = GetDWBE( &p_peek[4] );
     i_pcr    = GetQWBE( &p_peek[8] );
-
-    //msg_Dbg( p_input, "stream=%d size=%d", i_stream, i_size );
-    //p_es = input_FindES( p_input, i_stream );
 
     p_es = p_input->stream.p_selected_program->pp_es[i_stream];
     if( !p_es )
@@ -1167,7 +1191,7 @@ static int Demux( input_thread_t *p_input )
     {
         msg_Warn( p_input, "cannot allocate PES" );
         msleep( 1000 );
-        return( 1 );
+        return 1;
     }
     i_size += 16;
     while( i_size > 0 )
@@ -1175,11 +1199,10 @@ static int Demux( input_thread_t *p_input )
         data_packet_t   *p_data;
         int i_read;
 
-        if( (i_read = input_SplitBuffer( p_input, &p_data,
-                                         __MIN( i_size, 10000 ) ) ) <= 0 )
+        if( (i_read = input_SplitBuffer( p_input, &p_data, i_size ) ) <= 0 )
         {
             input_DeletePES( p_input->p_method_data, p_pes );
-            return( 0 );
+            return 0;
         }
         if( !p_pes->p_first )
         {

@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.5 2003/08/31 22:06:17 gbazin Exp $
+ * $Id: filter.cpp,v 1.6 2003/10/18 20:09:23 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -36,6 +36,12 @@
 
 #define DEBUG_DSHOW 1
 
+struct access_sys_t
+{
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+};
+
 /*****************************************************************************
  * DirectShow GUIDs.
  * Easier to define them hear as mingw doesn't provide them all.
@@ -58,6 +64,8 @@ const GUID IID_IMemInputPin = {0x56a8689d, 0x0ad4, 0x11ce, {0xb0,0x3a, 0x00,0x20
 
 const GUID IID_IEnumPins = {0x56a86892, 0x0ad4, 0x11ce, {0xb0,0x3a, 0x00,0x20,0xaf,0x0b,0xa7,0x70}};
 const GUID IID_IEnumMediaTypes = {0x89c31040, 0x846b, 0x11ce, {0x97,0xd3, 0x00,0xaa,0x00,0x55,0x59,0x5a}};
+
+const GUID IID_IAMBufferNegotiation = {0x56ed71a0, 0xaf5f, 0x11d0, {0xb3, 0xf0, 0x00, 0xaa, 0x00, 0x37, 0x61, 0xc5}};
 
 /*
  * MEDIATYPEs and MEDIASUBTYPEs
@@ -92,6 +100,7 @@ const GUID MEDIASUBTYPE_I420 = {0x30323449, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0
 const GUID MEDIATYPE_Audio = {0x73647561, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID FORMAT_WaveFormatEx = {0x05589f81, 0xc356, 0x11ce, {0xbf, 0x01, 0x00, 0xaa, 0x00, 0x55, 0x59, 0x5a}};
 const GUID MEDIASUBTYPE_PCM = {0x00000001, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+const GUID MEDIASUBTYPE_IEEE_FLOAT = {0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 const GUID GUID_NULL = {0x0000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
@@ -196,7 +205,7 @@ STDMETHODIMP CapturePin::QueryInterface(REFIID riid, void **ppv)
 STDMETHODIMP_(ULONG) CapturePin::AddRef()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CapturePin::AddRef" );
+    msg_Dbg( p_input, "CapturePin::AddRef (ref: %i)", i_ref );
 #endif
 
     return i_ref++;
@@ -204,13 +213,12 @@ STDMETHODIMP_(ULONG) CapturePin::AddRef()
 STDMETHODIMP_(ULONG) CapturePin::Release()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CapturePin::Release" );
+    msg_Dbg( p_input, "CapturePin::Release (ref: %i)", i_ref );
 #endif
 
-    i_ref--;
-    if( !i_ref ) delete this;
+    if( !InterlockedDecrement(&i_ref) ) delete this;
 
-    return i_ref;
+    return 0;
 };
 
 /* IPin methods */
@@ -397,6 +405,7 @@ STDMETHODIMP CapturePin::GetAllocatorRequirements( ALLOCATOR_PROPERTIES *pProps 
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::GetAllocatorRequirements" );
 #endif
+
     return E_NOTIMPL;
 }
 STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
@@ -408,6 +417,9 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
     pSample->AddRef();
     mtime_t i_timestamp = mdate() * 10;
     VLCMediaSample vlc_sample = {pSample, i_timestamp};
+
+    access_sys_t *p_sys = p_input->p_access_data;
+    vlc_mutex_lock( &p_sys->lock );
     samples_queue.push_front( vlc_sample );
 
     /* Make sure we don't cache too many samples */
@@ -418,6 +430,9 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
         msg_Dbg( p_input, "CapturePin::Receive trashing late input sample" );
         vlc_sample.p_sample->Release();
     }
+
+    vlc_cond_signal( &p_sys->wait );
+    vlc_mutex_unlock( &p_sys->lock );
 
     return S_OK;
 }
@@ -504,7 +519,7 @@ STDMETHODIMP CaptureFilter::QueryInterface( REFIID riid, void **ppv )
 STDMETHODIMP_(ULONG) CaptureFilter::AddRef()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureFilter::AddRef" );
+    msg_Dbg( p_input, "CaptureFilter::AddRef (ref: %i)", i_ref );
 #endif
 
     return i_ref++;
@@ -512,13 +527,12 @@ STDMETHODIMP_(ULONG) CaptureFilter::AddRef()
 STDMETHODIMP_(ULONG) CaptureFilter::Release()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureFilter::Release" );
+    msg_Dbg( p_input, "CaptureFilter::Release (ref: %i)", i_ref );
 #endif
 
-    i_ref--;
-    if( !i_ref ) delete this;
+    if( !InterlockedDecrement(&i_ref) ) delete this;
 
-    return i_ref;
+    return 0;
 };
 
 /* IPersist method */
@@ -683,7 +697,7 @@ STDMETHODIMP CaptureEnumPins::QueryInterface( REFIID riid, void **ppv )
 STDMETHODIMP_(ULONG) CaptureEnumPins::AddRef()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureEnumPins::AddRef" );
+    msg_Dbg( p_input, "CaptureEnumPins::AddRef (ref: %i)", i_ref );
 #endif
 
     return i_ref++;
@@ -691,13 +705,12 @@ STDMETHODIMP_(ULONG) CaptureEnumPins::AddRef()
 STDMETHODIMP_(ULONG) CaptureEnumPins::Release()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureEnumPins::Release" );
+    msg_Dbg( p_input, "CaptureEnumPins::Release (ref: %i)", i_ref );
 #endif
 
-    i_ref--;
-    if( !i_ref ) delete this;
+    if( !InterlockedDecrement(&i_ref) ) delete this;
 
-    return i_ref;
+    return 0;
 };
 
 /* IEnumPins */
@@ -807,7 +820,7 @@ STDMETHODIMP CaptureEnumMediaTypes::QueryInterface( REFIID riid, void **ppv )
 STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::AddRef()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureEnumMediaTypes::AddRef" );
+    msg_Dbg( p_input, "CaptureEnumMediaTypes::AddRef (ref: %i)", i_ref );
 #endif
 
     return i_ref++;
@@ -815,13 +828,12 @@ STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::AddRef()
 STDMETHODIMP_(ULONG) CaptureEnumMediaTypes::Release()
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureEnumMediaTypes::Release" );
+    msg_Dbg( p_input, "CaptureEnumMediaTypes::Release (ref: %i)", i_ref );
 #endif
 
-    i_ref--;
-    if( !i_ref ) delete this;
+    if( !InterlockedDecrement(&i_ref) ) delete this;
 
-    return i_ref;
+    return 0;
 };
 
 /* IEnumMediaTypes */
