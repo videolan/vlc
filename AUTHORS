@@ -55,12 +55,13 @@ D: SDL audio and video output
 S: France
 
 N: Gildas Bazin
-E: gbazin@netcourrier.com
+E: gbazin@videolan.org
 C: gbazin
+D: Core improvements, decoders API
 D: Win32 port, win32 VCD/CDDA input and win32 ipv6 code
 D: DirectX audio/video output, win32 WaveOut audio output
-D: DirectShow input plugin, decoders API 
-D: a52 (liba52), vorbis (libvorbis) and theora (libtheora) decoders
+D: DirectShow input
+D: a52, dts, vorbis, speex, flac and theora decoders/packetizers
 D: mpeg1/2 video decoder (libmpeg2), bandlimited resampling
 D: Ogg and Raw DV demultiplexers
 D: Configuration file infrastructure

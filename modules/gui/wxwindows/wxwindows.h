@@ -4,7 +4,7 @@
  * Copyright (C) 1999-2004 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -137,6 +137,7 @@ struct intf_sys_t
  *****************************************************************************/
 wxArrayString SeparateEntries( wxString );
 wxWindow *VideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
+wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
 
 namespace wxvlc
 {
@@ -149,7 +150,6 @@ class Playlist;
 class Messages;
 class FileInfo;
 class StreamDialog;
-class BookmarksDialog;
 class ItemInfoDialog;
 class NewGroup;
 class ExportPlaylist;
@@ -318,7 +318,7 @@ public:
     FileInfo            *p_fileinfo_dialog;
     StreamDialog        *p_streamwizard_dialog;
     wxFrame             *p_prefs_dialog;
-    BookmarksDialog     *p_bookmarks_dialog;
+    wxWindow            *p_bookmarks_dialog;
     wxFileDialog        *p_file_generic_dialog;
 };
 
@@ -999,35 +999,6 @@ private:
     intf_thread_t *p_intf;
 
     int  i_item_id;
-};
-
-class BookmarksDialog: public wxFrame
-{
-public:
-    /* Constructor */
-    BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
-    virtual ~BookmarksDialog();
-
-    bool Show( bool );
-
-private:
-
-    void Update();
-
-    /* Event handlers (these functions should _not_ be virtual) */
-    void OnClose( wxCommandEvent& event );
-    void OnAdd( wxCommandEvent& event );
-    void OnDel( wxCommandEvent& event );
-    void OnClear( wxCommandEvent& event );
-    void OnActivateItem( wxListEvent& event );
-    void OnUpdate( wxCommandEvent &event );
-
-    DECLARE_EVENT_TABLE();
-
-    intf_thread_t *p_intf;
-    wxWindow *p_parent;
-
-    wxListView *list_ctrl;
 };
 
 } // end of wxvlc namespace

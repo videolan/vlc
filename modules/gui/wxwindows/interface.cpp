@@ -4,7 +4,7 @@
  * Copyright (C) 2000-2004, 2003 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -792,7 +792,7 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
             p_settings_menu->AppendCheckItem( Extended_Event,
                              wxU(_("&Extended GUI") ), wxU(_(HELP_EXTENDED)) );
             p_settings_menu->AppendCheckItem( Bookmarks_Event,
-                             wxU(_("&Bookmarks") ), wxU(_(HELP_BOOKMARKS)) );
+                             wxU(_("&Bookmarks...") ), wxU(_(HELP_BOOKMARKS)) );
             p_settings_menu->Append( Prefs_Event, wxU(_("&Preferences...")),
                                      wxU(_(HELP_PREFS)) );
 

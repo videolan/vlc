@@ -39,6 +39,38 @@ static int PlaylistChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
+ * Class declaration.
+ *****************************************************************************/
+class BookmarksDialog: public wxFrame
+{
+public:
+    /* Constructor */
+    BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~BookmarksDialog();
+
+    bool Show( bool );
+
+private:
+
+    void Update();
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnClose( wxCommandEvent& event );
+    void OnAdd( wxCommandEvent& event );
+    void OnDel( wxCommandEvent& event );
+    void OnClear( wxCommandEvent& event );
+    void OnActivateItem( wxListEvent& event );
+    void OnUpdate( wxCommandEvent &event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    wxWindow *p_parent;
+
+    wxListView *list_ctrl;
+};
+
+/*****************************************************************************
  * Event Table.
  *****************************************************************************/
 
@@ -144,6 +176,10 @@ BookmarksDialog::~BookmarksDialog()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
+wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent )
+{
+    return new BookmarksDialog::BookmarksDialog( p_intf, p_parent );
+}
 
 void BookmarksDialog::Update()
 {
@@ -265,7 +301,8 @@ void BookmarksDialog::OnUpdate( wxCommandEvent &event )
 static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
-    BookmarksDialog *p_dialog = (BookmarksDialog *)param;
+    BookmarksDialog::BookmarksDialog *p_dialog =
+        (BookmarksDialog::BookmarksDialog *)param;
 
     wxCommandEvent bookmarks_event( wxEVT_BOOKMARKS, 0 );
     p_dialog->AddPendingEvent( bookmarks_event );
