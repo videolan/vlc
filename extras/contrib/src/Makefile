@@ -713,7 +713,7 @@ libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 	patch -p 0 < Patches/dvdnav.patch
 
 .dvdnav: libdvdnav .dvdread
-	(cd $<; autoconf && ./configure --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	(cd $<; ./autogen.sh noconfig && ./configure --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 

@@ -1,6 +1,6 @@
-diff -ru libdvdnav.orig/configure.ac libdvdnav/configure.ac
---- libdvdnav.orig/configure.ac	Thu Jun 10 23:13:02 2004
-+++ libdvdnav/configure.ac	Sat Jul 17 00:26:08 2004
+diff -ru libdvdnav-original/configure.ac libdvdnav/configure.ac
+--- libdvdnav-original/configure.ac	Wed Jul 28 15:20:06 2004
++++ libdvdnav/configure.ac	Wed Jul 28 15:32:39 2004
 @@ -8,7 +8,7 @@
  dnl --------------------------------------------------------------
  dnl Require autoconf version 2.53
@@ -19,6 +19,15 @@ diff -ru libdvdnav.orig/configure.ac libdvdnav/configure.ac
  dnl --------------------------------------------------------------
  dnl Checks for header files.
  dnl --------------------------------------------------------------
+@@ -139,7 +141,7 @@
+     THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
+     CFLAGS="$THREAD_CFLAGS $CFLAGS"
+     ;;
+-  *mingw32* | *cygwin*)
++  *mingw32* | *cygwin* | *beos*)
+     ;;
+   *)
+     AC_CHECK_LIB(pthread, pthread_create,
 @@ -150,26 +152,63 @@
  AC_SUBST(THREAD_LIBS)
  AC_SUBST(THREAD_CFLAGS)
@@ -101,9 +110,9 @@ diff -ru libdvdnav.orig/configure.ac libdvdnav/configure.ac
  
  dnl ---------------------------------------------
  dnl cflags
-diff -ru libdvdnav.orig/examples/Makefile.am libdvdnav/examples/Makefile.am
---- libdvdnav.orig/examples/Makefile.am	Sun Jan 11 22:43:12 2004
-+++ libdvdnav/examples/Makefile.am	Sat Jul 17 00:37:25 2004
+diff -ru libdvdnav-original/examples/Makefile.am libdvdnav/examples/Makefile.am
+--- libdvdnav-original/examples/Makefile.am	Wed Jul 28 15:20:07 2004
++++ libdvdnav/examples/Makefile.am	Wed Jul 28 15:32:26 2004
 @@ -7,7 +7,7 @@
  noinst_PROGRAMS = menus
  
@@ -113,3 +122,49 @@ diff -ru libdvdnav.orig/examples/Makefile.am libdvdnav/examples/Makefile.am
  menus_LDADD   = $(DVDNAV_LIB)
  
  $(DVDNAV_LIB):
+diff -ru libdvdnav-original/src/dvdnav_internal.h libdvdnav/src/dvdnav_internal.h
+--- libdvdnav-original/src/dvdnav_internal.h	Wed Jul 28 15:20:08 2004
++++ libdvdnav/src/dvdnav_internal.h	Wed Jul 28 15:47:08 2004
+@@ -58,6 +58,15 @@
+ #include <io.h> /* read() */
+ #define lseek64 _lseeki64
+ 
++#elif defined(__BEOS__)
++
++#include <OS.h>
++typedef sem_id pthread_mutex_t;
++#define pthread_mutex_init(a, b) (*a) = create_sem( 1,"" )
++#define pthread_mutex_lock(a)    acquire_sem( *a )
++#define pthread_mutex_unlock(a)  release_sem( *a )
++#define pthread_mutex_destroy(a) delete_sem( *a )
++
+ #else
+ 
+ #include <pthread.h>
+diff -ru libdvdnav-original/src/dvdread/bswap.h libdvdnav/src/dvdread/bswap.h
+--- libdvdnav-original/src/dvdread/bswap.h	Wed Jul 28 15:20:08 2004
++++ libdvdnav/src/dvdread/bswap.h	Wed Jul 28 15:41:25 2004
+@@ -65,7 +65,7 @@
+  * functionality! 
+  */
+ 
+-#elif defined(__FreeBSD__) || defined(__sun) || defined(__bsdi__) || defined(WIN32) || defined(__CYGWIN__)
++#elif defined(__FreeBSD__) || defined(__sun) || defined(__bsdi__) || defined(WIN32) || defined(__CYGWIN__) || defined(__BEOS__)
+ #define B2N_16(x) \
+  x = ((((x) & 0xff00) >> 8) | \
+       (((x) & 0x00ff) << 8))
+diff -ru libdvdnav-original/src/dvdread/dvd_reader.c libdvdnav/src/dvdread/dvd_reader.c
+--- libdvdnav-original/src/dvdread/dvd_reader.c	Wed Jul 28 15:20:08 2004
++++ libdvdnav/src/dvdread/dvd_reader.c	Wed Jul 28 16:22:03 2004
+@@ -398,8 +398,9 @@
+ 		return 0;
+ 	}
+ 
+-#ifndef WIN32 /* don't have fchdir, and getcwd( NULL, ... ) is strange */
+-              /* Also WIN32 does not have symlinks, so we don't need this bit of code. */
++#if !defined(WIN32) && !defined(__BEOS__)
++        /* don't have fchdir, and getcwd( NULL, ... ) is strange */
++        /* Also WIN32 does not have symlinks, so we don't need this bit of code. */
+ 
+ 	/* Resolve any symlinks and get the absolut dir name. */
+ 	{
