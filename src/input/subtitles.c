@@ -194,10 +194,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     }
 
     i_max_sub_len = 0;
-    if( i_nb_subdirs >= 0 )
+    if( i_nb_subdirs > 0 )
     {
         char *psz_parser;
-    
+
         subdirs = (char**)malloc( sizeof(char*) * i_nb_subdirs );
         i = 0;
         psz_parser = psz_path;
@@ -373,6 +373,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             closedir( d );
         }
     }
+
+    if( subdirs ) free( subdirs );
 
     free( f_dir );
     free( f_fname );
