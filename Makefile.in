@@ -567,12 +567,12 @@ $(STD_PLUGIN_OBJ): %.o: %.c
 $(PLUGIN_GTK): %.o: Makefile.dep
 $(PLUGIN_GTK): %.o: .dep/%.d
 $(PLUGIN_GTK): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) `gtk-config --cflags gtk` -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) `glib-config --cflags glib` `gtk-config --cflags gtk` -c -o $@ $<
 
 $(PLUGIN_GNOME): %.o: Makefile.dep
 $(PLUGIN_GNOME): %.o: .dep/%.d
 $(PLUGIN_GNOME): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
+	$(CC) $(CFLAGS) $(PCFLAGS) `glib-config --cflags glib` `gnome-config --cflags gnomeui` -c -o $@ $<
 
 $(PLUGIN_GLIDE): %.o: Makefile.dep
 $(PLUGIN_GLIDE): %.o: .dep/%.d
