@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.277 2004/01/25 17:16:05 zorglub Exp $
+ * $Id: input.c,v 1.278 2004/01/26 20:02:15 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -101,11 +101,11 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     {
         if( !strncmp( p_item->pp_categories[i]->psz_name, _("Options"), 7 ) )
         {
-            msg_Dbg(p_input,"Parsing %i options for item",
-                             p_item->pp_categories[i]->i_infos );
+            msg_Dbg( p_input,"Parsing %i options for item",
+                     p_item->pp_categories[i]->i_infos );
             for( j = 0; j< p_item->pp_categories[i]->i_infos ; j++ )
             {
-                msg_Dbg(p_input,"Option : %s",
+                msg_Dbg( p_input,"Option : %s",
                          p_item->pp_categories[i]->pp_infos[j]->psz_name);
                 ParseOption( p_input,
                              p_item->pp_categories[i]->pp_infos[j]->psz_value);
@@ -837,7 +837,7 @@ static int InitThread( input_thread_t * p_input )
         char **tmp2 = tmp;
         for( i = 0; *tmp2 != NULL; i++ )
         {
-            if( ( p_sub = subtitle_New( p_input, strdup(*tmp2++),
+            if( ( p_sub = subtitle_New( p_input, *tmp2++,
                                         i_microsecondperframe, i ) ) )
             {
                 TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );

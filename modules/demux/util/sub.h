@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: sub.h,v 1.12 2004/01/25 20:05:29 hartman Exp $
+ * $Id: sub.h,v 1.13 2004/01/26 20:02:15 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -114,10 +114,7 @@ static inline subtitle_demux_t *subtitle_New( input_thread_t *p_input,
     p_sub->p_module = module_Need( p_sub, "subtitle demux", "" );
 
     if( p_sub->p_module &&
-        p_sub->pf_open( p_sub,
-                        p_input,
-                        psz_name,
-                        i_microsecperframe,
+        p_sub->pf_open( p_sub, p_input, psz_name, i_microsecperframe,
                         i_track_id ) >=0 )
     {
         msg_Info( p_input, "subtitle started" );

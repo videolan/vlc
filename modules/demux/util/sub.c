@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.41 2004/01/25 20:05:29 hartman Exp $
+ * $Id: sub.c,v 1.42 2004/01/26 20:02:15 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -157,7 +157,6 @@ static int  text_load( text_t *txt, char *psz_name )
             i_line_max += 100;
             txt->line = realloc( txt->line, i_line_max * sizeof( char*) );
         }
-        printf( "hoi, %s", txt->line );
     }
 
     fclose( f );
@@ -256,21 +255,16 @@ static char * local_stristr( char *psz_big, char *psz_little)
 /*****************************************************************************
  * sub_open: Open a subtitle file and add subtitle ES
  *****************************************************************************/
-static int  sub_open ( subtitle_demux_t *p_sub,
-                       input_thread_t  *p_input,
-                       char     *psz_name,
-                       mtime_t i_microsecperframe,
-                       int i_track_id )
+static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
+                     char *psz_name, mtime_t i_microsecperframe,
+                     int i_track_id )
 {
     text_t  txt;
     vlc_value_t val;
-    es_format_t  fmt;
-    char *psz_vobname;
-
-    int     i;
-    int     i_sub_type;
-    int     i_max;
-    int (*pf_read_subtitle)( subtitle_demux_t *, text_t *, subtitle_t *, mtime_t ) = NULL;
+    es_format_t fmt;
+    int i, i_sub_type, i_max;
+    int (*pf_read_subtitle)( subtitle_demux_t *, text_t *, subtitle_t *,
+                             mtime_t ) = NULL;
 
     p_sub->i_sub_type = SUB_TYPE_UNKNOWN;
     p_sub->p_es = NULL;
@@ -281,7 +275,6 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     if( !psz_name || !*psz_name )
     {
         msg_Err( p_sub, "no subtitle file specified" );
-        if( psz_name ) free( psz_name );
         return VLC_EGENERIC;
     }
 
@@ -289,13 +282,10 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     if( text_load( &txt, psz_name ) )
     {
         msg_Err( p_sub, "cannot open `%s' subtitle file", psz_name );
-        free( psz_name );
         return VLC_EGENERIC;
     }
-    
+
     msg_Dbg( p_sub, "opened `%s'", psz_name );
-    psz_vobname = strdup( psz_name );
-    free( psz_name );
 
     var_Get( p_sub, "sub-fps", &val );
     if( val.i_int >= 1.0 )
@@ -474,17 +464,17 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     /* *** add subtitle ES *** */
     if( p_sub->i_sub_type == SUB_TYPE_VOBSUB )
     {
-        int i_len = strlen( psz_vobname );
-        char *extension = psz_vobname + i_len - 4;
-        
-        strcpy( extension, ".sub" );
+        int i_len = strlen( psz_name );
+        char *psz_vobname = strdup(psz_name);
+
+        strcpy( psz_vobname + i_len - 4, ".sub" );
 
         /* open file */
         if( !( p_sub->p_vobsub_file = fopen( psz_vobname, "rb" ) ) )
         {
             msg_Err( p_sub, "couldn't open .sub Vobsub file: %s", psz_vobname );
         }
-        if( psz_vobname ) free( psz_vobname );
+        free( psz_vobname );
 
         es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
     }
