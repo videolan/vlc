@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.284 2004/01/29 17:51:08 zorglub Exp $
+ * $Id: input.c,v 1.285 2004/01/31 05:25:36 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,6 +43,7 @@
 
 #include "vlc_interface.h"
 #include "codecs.h"
+#include "vlc_meta.h"
 #include "../../modules/demux/util/sub.h"
 
 /*****************************************************************************
@@ -524,6 +525,7 @@ static int RunThread( input_thread_t *p_input )
  *****************************************************************************/
 static int InitThread( input_thread_t * p_input )
 {
+    vlc_meta_t *meta;
     float f_fps;
     playlist_t *p_playlist;
     mtime_t i_length;
@@ -777,6 +779,75 @@ static int InitThread( input_thread_t * p_input )
     p_input->p_sys = malloc( sizeof( input_thread_sys_t ) );
     p_input->p_sys->i_sub = 0;
     p_input->p_sys->sub   = NULL;
+
+    /* get meta informations */
+    if( !demux_Control( p_input, DEMUX_GET_META, &meta ) )
+    {
+        playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
+                                         VLC_OBJECT_PLAYLIST,  FIND_PARENT);
+        playlist_item_t *p_item = NULL;
+        input_info_category_t *p_cat;
+        int i;
+
+        if( p_playlist )
+        {
+            vlc_mutex_lock( &p_playlist->object_lock );
+            p_item = playlist_ItemGetByPos( p_playlist, -1 );
+            if( p_item )
+            {
+                vlc_mutex_lock( &p_item->lock );
+            }
+            vlc_mutex_unlock( &p_playlist->object_lock );
+        }
+
+        msg_Dbg( p_input, "meta informations:" );
+        if( meta->i_meta > 0 )
+        {
+            p_cat = input_InfoCategory( p_input, _("File") );
+            for( i = 0; i < meta->i_meta; i++ )
+            {
+                msg_Dbg( p_input, "  - '%s' = '%s'", _(meta->name[i]), meta->value[i] );
+                input_AddInfo( p_cat, _(meta->name[i]), "%s", meta->value[i] );
+                if( p_item )
+                {
+                    playlist_ItemAddInfo( p_item, _("File"),
+                                          _(meta->name[i]), "%s", meta->value[i] );
+                }
+            }
+        }
+        for( i = 0; i < meta->i_track; i++ )
+        {
+            vlc_meta_t *tk = meta->track[i];
+            int j;
+
+            msg_Dbg( p_input, "  - track[%d]:", i );
+            if( tk->i_meta > 0 )
+            {
+                char *psz_cat = malloc( strlen(_("Stream")) + 10 );
+                sprintf( psz_cat, "%s %d", _("Stream"), i );
+                p_cat = input_InfoCategory( p_input, psz_cat );
+
+                for( j = 0; j < tk->i_meta; j++ )
+                {
+                    msg_Dbg( p_input, "     - '%s' = '%s'", _(tk->name[j]), tk->value[j] );
+                    input_AddInfo( p_cat, _(tk->name[j]), "%s", tk->value[j] );
+                    if( p_item )
+                    {
+                        playlist_ItemAddInfo( p_item, psz_cat,
+                                              _(tk->name[j]), "%s", tk->value[j] );
+                    }
+                }
+            }
+        }
+
+        if( p_item )
+        {
+            vlc_mutex_unlock( &p_item->lock );
+        }
+        if( p_playlist ) vlc_object_release( p_playlist );
+
+        vlc_meta_Delete( meta );
+    }
 
     /* get length */
     if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
