@@ -1157,6 +1157,189 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 @end
 
+/* Common QT and OpenGL code to catch mouse events */
+#define CATCH_MOUSE_EVENTS \
+- (BOOL)acceptsFirstResponder \
+{ \
+    return( YES ); \
+} \
+ \
+- (BOOL)becomeFirstResponder \
+{ \
+    id o_window = [self window]; \
+     \
+    [o_window setAcceptsMouseMovedEvents: YES]; \
+    return( YES ); \
+} \
+ \
+- (BOOL)resignFirstResponder \
+{ \
+    vout_thread_t * vout; \
+    id o_window = [self window]; \
+    vout = (vout_thread_t *)[o_window getVout]; \
+     \
+    [o_window setAcceptsMouseMovedEvents: NO]; \
+    VLCHideMouse( vout, NO ); \
+    return( YES ); \
+} \
+ \
+- (void)mouseDown:(NSEvent *)o_event \
+{ \
+    vout_thread_t * vout; \
+    id o_window = [self window]; \
+    vout = (vout_thread_t *)[o_window getVout]; \
+    vlc_value_t val; \
+ \
+    switch( [o_event type] ) \
+    {         \
+        case NSLeftMouseDown: \
+        { \
+            var_Get( vout, "mouse-button-down", &val ); \
+            val.i_int |= 1; \
+            var_Set( vout, "mouse-button-down", val ); \
+        } \
+        break; \
+         \
+        default: \
+            [super mouseDown: o_event]; \
+        break; \
+    } \
+} \
+ \
+- (void)otherMouseDown:(NSEvent *)o_event \
+{ \
+    vout_thread_t * vout; \
+    id o_window = [self window]; \
+    vout = (vout_thread_t *)[o_window getVout]; \
+    vlc_value_t val; \
+ \
+    switch( [o_event type] ) \
+    { \
+        case NSOtherMouseDown: \
+        { \
+            var_Get( vout, "mouse-button-down", &val ); \
+            val.i_int |= 2; \
+            var_Set( vout, "mouse-button-down", val ); \
+        } \
+        break; \
+         \
+        default: \
+            [super mouseDown: o_event]; \
+        break; \
+    } \
+} \
+ \
+- (void)rightMouseDown:(NSEvent *)o_event \
+{ \
+    vout_thread_t * vout; \
+    id o_window = [self window]; \
+    vout = (vout_thread_t *)[o_window getVout]; \
+    vlc_value_t val; \
+ \
+    switch( [o_event type] ) \
+    { \
+        case NSRightMouseDown: \
+        { \
+            var_Get( vout, "mouse-button-down", &val ); \
+            val.i_int |= 4; \
+            var_Set( vout, "mouse-button-down", val ); \
+        } \
+        break; \
+         \
+        default: \
+            [super mouseDown: o_event]; \
+        break; \
+    } \
+} \
+ \
+- (void)mouseUp:(NSEvent *)o_event \
+{ \
+    vout_thread_t * vout; \
+    id o_window = [self window]; \
+    vout = (vout_thread_t *)[o_window getVout]; \
+    vlc_value_t val; \
+ \
+    switch( [o_event type] ) \
+    { \
+        case NSLeftMouseUp: \
+        { \
+            vlc_value_t b_val; \
+            b_val.b_bool = VLC_TRUE; \
+            var_Set( vout, "mouse-clicked", b_val ); \
+             \
+            var_Get( vout, "mouse-button-down", &val ); \
+            val.i_int &= ~1; \
+            var_Set( vout, "mouse-button-down", val ); \
+        } \
+        break; \
+                 \
+        default: \
+            [super mouseUp: o_event]; \
+        break; \
+    } \
+} \
+ \
+- (void)otherMouseUp:(NSEvent *)o_event \
+{ \
+    vout_thread_t * vout; \
+    id o_window = [self window]; \
+    vout = (vout_thread_t *)[o_window getVout]; \
+    vlc_value_t val; \
+ \
+    switch( [o_event type] ) \
+    { \
+        case NSOtherMouseUp: \
+        { \
+            var_Get( vout, "mouse-button-down", &val ); \
+            val.i_int &= ~2; \
+            var_Set( vout, "mouse-button-down", val ); \
+        } \
+        break; \
+                 \
+        default: \
+            [super mouseUp: o_event]; \
+        break; \
+    } \
+} \
+ \
+- (void)rightMouseUp:(NSEvent *)o_event \
+{ \
+    vout_thread_t * vout; \
+    id o_window = [self window]; \
+    vout = (vout_thread_t *)[o_window getVout]; \
+    vlc_value_t val; \
+ \
+    switch( [o_event type] ) \
+    { \
+        case NSRightMouseUp: \
+        { \
+            var_Get( vout, "mouse-button-down", &val ); \
+            val.i_int &= ~4; \
+            var_Set( vout, "mouse-button-down", val ); \
+        } \
+        break; \
+         \
+        default: \
+            [super mouseUp: o_event]; \
+        break; \
+    } \
+} \
+ \
+- (void)mouseDragged:(NSEvent *)o_event \
+{ \
+    [self mouseMoved:o_event]; \
+} \
+ \
+- (void)otherMouseDragged:(NSEvent *)o_event \
+{ \
+    [self mouseMoved:o_event]; \
+} \
+ \
+- (void)rightMouseDragged:(NSEvent *)o_event \
+{ \
+    [self mouseMoved:o_event]; \
+}
+
 /*****************************************************************************
  * VLCQTView implementation
  *****************************************************************************/
@@ -1175,190 +1358,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
 }
 
-- (BOOL)acceptsFirstResponder
-{
-    return( YES );
-}
-
-- (BOOL)becomeFirstResponder
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    
-    [o_window setAcceptsMouseMovedEvents: YES];
-    return( YES );
-}
-
-- (BOOL)resignFirstResponder
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    
-    [o_window setAcceptsMouseMovedEvents: NO];
-    VLCHideMouse( p_vout, NO );
-    return( YES );
-}
-
-- (void)mouseDown:(NSEvent *)o_event
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    vlc_value_t val;
-
-    switch( [o_event type] )
-    {        
-        case NSLeftMouseDown:
-        {
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int |= 1;
-            var_Set( p_vout, "mouse-button-down", val );
-        }
-        break;
-        
-        default:
-            [super mouseDown: o_event];
-        break;
-    }
-}
-
-- (void)otherMouseDown:(NSEvent *)o_event
-{
-    /* This is not the the wheel button. you need to poll the
-     * mouseWheel event for that. other is a third, forth or fifth button */
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    vlc_value_t val;
-
-    switch( [o_event type] )
-    {
-        case NSOtherMouseDown:
-        {
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int |= 2;
-            var_Set( p_vout, "mouse-button-down", val );
-        }
-        break;
-        
-        default:
-            [super mouseDown: o_event];
-        break;
-    }
-}
-
-- (void)rightMouseDown:(NSEvent *)o_event
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    vlc_value_t val;
-
-    switch( [o_event type] )
-    {
-        case NSRightMouseDown:
-        {
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int |= 4;
-            var_Set( p_vout, "mouse-button-down", val );
-        }
-        break;
-        
-        default:
-            [super mouseDown: o_event];
-        break;
-    }
-}
-
-- (void)mouseUp:(NSEvent *)o_event
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    vlc_value_t val;
-
-    switch( [o_event type] )
-    {
-        case NSLeftMouseUp:
-        {
-            vlc_value_t b_val;
-            b_val.b_bool = VLC_TRUE;
-            var_Set( p_vout, "mouse-clicked", b_val );
-            
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int &= ~1;
-            var_Set( p_vout, "mouse-button-down", val );
-        }
-        break;
-                
-        default:
-            [super mouseUp: o_event];
-        break;
-    }
-}
-
-- (void)otherMouseUp:(NSEvent *)o_event
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    vlc_value_t val;
-
-    switch( [o_event type] )
-    {
-        case NSOtherMouseUp:
-        {
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int &= ~2;
-            var_Set( p_vout, "mouse-button-down", val );
-        }
-        break;
-                
-        default:
-            [super mouseUp: o_event];
-        break;
-    }
-}
-
-- (void)rightMouseUp:(NSEvent *)o_event
-{
-    vout_thread_t * p_vout;
-    id o_window = [self window];
-    p_vout = (vout_thread_t *)[o_window getVout];
-    vlc_value_t val;
-
-    switch( [o_event type] )
-    {
-        case NSRightMouseUp:
-        {
-            var_Get( p_vout, "mouse-button-down", &val );
-            val.i_int &= ~4;
-            var_Set( p_vout, "mouse-button-down", val );
-        }
-        break;
-        
-        default:
-            [super mouseUp: o_event];
-        break;
-    }
-}
-
-- (void)mouseDragged:(NSEvent *)o_event
-{
-    [self mouseMoved:o_event];
-}
-
-- (void)otherMouseDragged:(NSEvent *)o_event
-{
-    [self mouseMoved:o_event];
-}
-
-- (void)rightMouseDragged:(NSEvent *)o_event
-{
-    [self mouseMoved:o_event];
-}
+CATCH_MOUSE_EVENTS
 
 - (void)mouseMoved:(NSEvent *)o_event
 {
@@ -1832,6 +1832,50 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Wait for the job to be done */
     [currentContext flushBuffer];
+}
+
+CATCH_MOUSE_EVENTS
+
+- (void)mouseMoved:(NSEvent *)o_event
+{
+    NSPoint ml;
+    NSRect s_rect;
+    BOOL b_inside;
+
+    s_rect = [self bounds];
+    ml = [self convertPoint: [o_event locationInWindow] fromView: nil];
+    b_inside = [self mouse: ml inRect: s_rect];
+
+    if( isFullScreen )
+    {
+        /* TODO */
+        /* Grmbl, mouseDown events aren't sent in fullscreen mode */
+    }
+    else if( b_inside )
+    {
+        vlc_value_t val;
+        int i_width, i_height, i_x, i_y;
+        
+        vout_PlacePicture( p_vout, (unsigned int)s_rect.size.width,
+                                   (unsigned int)s_rect.size.height,
+                                   &i_x, &i_y, &i_width, &i_height );
+
+        val.i_int = ( (int)ml.x - i_x ) * 
+                    p_vout->render.i_width / i_width;
+        var_Set( p_vout, "mouse-x", val );
+
+        /* Y coordinate is inverted in OpenGL */
+        val.i_int = ( ((int)(s_rect.size.height - ml.y)) - i_y ) *
+                    p_vout->render.i_height / i_height;
+        var_Set( p_vout, "mouse-y", val );
+            
+        val.b_bool = VLC_TRUE;
+        var_Set( p_vout, "mouse-moved", val );
+        p_vout->p_sys->i_time_mouse_last_moved = mdate();
+        p_vout->p_sys->b_mouse_moved = YES;
+    }
+
+    [super mouseMoved: o_event];
 }
 
 @end
