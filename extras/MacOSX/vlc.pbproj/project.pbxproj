@@ -137,8 +137,27 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>vlc</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/x-videolan-vlc</string>
+				<string>application/videolan-vlc</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>VLC file</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>spx</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Speex Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -149,6 +168,8 @@
 			<array>
 				<string>sdp</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Session Description Protocol File</string>
 			<key>CFBundleTypeRole</key>
@@ -278,6 +299,8 @@
 			<array>
 				<string>aac</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg4.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>AAC file</string>
 			<key>CFBundleTypeRole</key>
@@ -423,6 +446,8 @@
 			<array>
 				<string>m2a</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-1/2 Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -433,6 +458,8 @@
 			<array>
 				<string>mp1</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG Audio Layer 1</string>
 			<key>CFBundleTypeRole</key>
@@ -443,6 +470,8 @@
 			<array>
 				<string>mp2</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg2.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG Audio Layer 2</string>
 			<key>CFBundleTypeRole</key>
@@ -466,6 +495,8 @@
 				<string>m2p</string>
 				<string>ps</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg2.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-2 Program Stream</string>
 			<key>CFBundleTypeRole</key>
@@ -476,6 +507,8 @@
 			<array>
 				<string>ts</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg2.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-2 Transport Stream</string>
 			<key>CFBundleTypeRole</key>
@@ -499,6 +532,8 @@
 			<array>
 				<string>mpa</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-2 Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -508,6 +543,8 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>mp4</string>
+				<string>m4a</string>
+				<string>m4p</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg4.icns</string>
@@ -521,6 +558,8 @@
 			<array>
 				<string>3gp</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>3GPP File</string>
 			<key>CFBundleTypeRole</key>
@@ -531,6 +570,8 @@
 			<array>
 				<string>mka</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Matroska Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -541,6 +582,8 @@
 			<array>
 				<string>mkv</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Matroska Video File</string>
 			<key>CFBundleTypeRole</key>
@@ -551,6 +594,8 @@
 			<array>
 				<string>mks</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>generic.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>Matroska Elementry Stream</string>
 			<key>CFBundleTypeRole</key>
@@ -562,6 +607,8 @@
 				<string>m4a</string>
 				<string>m4p</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>mpeg4.icns</string>
 			<key>CFBundleTypeName</key>
 			<string>MPEG-4 Audio File</string>
 			<key>CFBundleTypeRole</key>
@@ -616,6 +663,16 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>mms</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLIconFile</key>
+			<string>generic</string>
+			<key>CFBundleURLName</key>
+			<string>RTSP</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rtsp</string>
 			</array>
 		</dict>
 		<dict>

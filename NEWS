@@ -1,7 +1,6 @@
 $Id$
 
 Changes between 0.7.2 and 0.8.0:
-This version is in development and not yet released.
 -----------------------------------------------------
 
 Core support:
@@ -30,7 +29,7 @@ Demuxers:
  * Windows Media Server RTSP support
  * Support for MPEG TS streams with error correction (204/192 bytes TS packets)
  * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
- * Skins2 .vlt file loader (only when skin2 is the current interface)
+ * Skins2 .vlt file loader (only when skins2 is the current interface)
  * Improved Ogg demuxer
  * Support for MPEG PS streams with MPEG 4 video.
  * Support for so called AACPlus webstreams
