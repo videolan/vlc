@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.27 2002/03/21 22:10:32 gbazin Exp $
+ * $Id: vout_directx.c,v 1.28 2002/03/28 10:17:06 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -133,8 +133,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_event_thread_die = 0;
     p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
-    p_vout->p_sys->b_using_overlay =
-        !config_GetIntVariable( "nooverlay" );
+    p_vout->p_sys->b_using_overlay = !config_GetIntVariable( "nooverlay" );
 
     p_vout->p_sys->b_cursor = 1;
 
@@ -470,6 +469,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     else /* using overlay */
     {
 
+#if 0
         /* Flip the overlay buffers */
         dxresult = IDirectDrawSurface3_Flip( p_pic->p_sys->p_front_surface,
                                              NULL, DDFLIP_WAIT );
@@ -488,6 +488,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( dxresult != DD_OK )
             intf_WarnMsg( 8, "vout: couldn't flip overlay surface" );
+#endif
 
         if( !DirectXGetSurfaceDesc( p_pic ) )
         {
@@ -753,11 +754,11 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         ddsd.dwFlags = DDSD_CAPS |
                        DDSD_HEIGHT |
                        DDSD_WIDTH |
-                       DDSD_BACKBUFFERCOUNT |
+                     //DDSD_BACKBUFFERCOUNT |
                        DDSD_PIXELFORMAT;
         ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY |
-                              DDSCAPS_COMPLEX |
-                              DDSCAPS_FLIP |
+                            //DDSCAPS_COMPLEX |
+                            //DDSCAPS_FLIP |
                               DDSCAPS_VIDEOMEMORY;
         ddsd.dwHeight = p_vout->render.i_height;
         ddsd.dwWidth = p_vout->render.i_width;
@@ -1022,7 +1023,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         else p_vout->p_sys->b_using_overlay = 0;
     }
 
-    /* As we can't have overlays, will try to create plain RBG surfaces in
+    /* As we can't have overlays, we'll try to create plain RBG surfaces in
      * system memory. These surfaces will then be blitted onto the primary
      * surface (display) so they can be displayed */
     if( !p_vout->p_sys->b_using_overlay )
@@ -1195,7 +1196,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->V_PIXELS = p_pic->U_PIXELS
               + p_pic->p[U_PLANE].i_lines * p_pic->p[U_PLANE].i_pitch;
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_pitch = p_pic->p[U_PLANE].i_pitch;
+            p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
             p_pic->p[V_PLANE].i_pixel_bytes = 1;
             p_pic->p[V_PLANE].b_margin = 0;
 
@@ -1308,7 +1309,7 @@ static int DirectXGetSurfaceDesc( picture_t *p_pic )
     p_pic->p_sys->ddsd.dwSize = sizeof(DDSURFACEDESC);
     dxresult = IDirectDrawSurface3_Lock( p_pic->p_sys->p_surface,
                                          NULL, &p_pic->p_sys->ddsd,
-                                         DDLOCK_NOSYSLOCK | DDLOCK_WAIT,
+                                         DDLOCK_NOSYSLOCK,
                                          NULL );
     if ( dxresult == DDERR_SURFACELOST )
     {

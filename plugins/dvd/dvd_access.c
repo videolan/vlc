@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.10 2002/03/19 12:48:01 gbazin Exp $
+ * $Id: dvd_access.c,v 1.11 2002/03/28 10:17:06 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -784,6 +784,7 @@ static char * DVDParse( input_thread_t * p_input )
         psz_device = config_GetPszVariable( "dvd_device" );
     }
 
+#ifndef WIN32    
     /* check block device */
     if( stat( psz_device, &stat_info ) == -1 )
     {
@@ -793,7 +794,6 @@ static char * DVDParse( input_thread_t * p_input )
         return NULL;                    
     }
     
-#ifndef WIN32    
     if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode) )
     {
         intf_WarnMsg( 3, "input: DVD plugin discarded"
