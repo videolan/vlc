@@ -2,7 +2,7 @@
  * a52old.c: A52 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: a52old.c,v 1.3 2002/08/21 09:27:40 sam Exp $
+ * $Id: a52old.c,v 1.4 2002/08/23 14:05:22 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -95,9 +95,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     void *       p_orig;                          /* pointer before memalign */
     vlc_bool_t   b_sync = 0;
 
-    mtime_t i_pts;
+    mtime_t i_pts = 0;
     aout_buffer_t *p_aout_buffer;
     audio_sample_format_t output_format;
+    audio_date_t end_date;
 
     /* Allocate the memory needed to store the thread's structure */
     p_a52dec = (a52dec_t *)vlc_memalign( &p_orig, 16, sizeof(a52dec_t) );
@@ -172,6 +173,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             output_format.i_format   = AOUT_FMT_S16_NE;
             output_format.i_channels = 2; /* FIXME ! */
             output_format.i_rate     = sync_info.sample_rate;
+            aout_DateInit( &end_date, output_format.i_rate );
             p_a52dec->p_aout_input = aout_InputNew( p_a52dec->p_fifo,
                                                     &p_a52dec->p_aout,
                                                     &output_format );
@@ -181,6 +183,17 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         {
             msg_Err( p_a52dec->p_fifo, "failed to create aout fifo" );
             p_a52dec->p_fifo->b_error = 1;
+            continue;
+        }
+
+        CurrentPTS( &p_a52dec->bit_stream, &i_pts, NULL );
+        if( i_pts != 0 && i_pts != aout_DateGet( &end_date ) )
+        {
+            aout_DateSet( &end_date, i_pts );
+        }
+
+        if( !aout_DateGet( &end_date ) )
+        {
             continue;
         }
 
@@ -194,15 +207,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             continue;
         }
 
-        CurrentPTS( &p_a52dec->bit_stream, &i_pts, NULL );
-        if( i_pts > 0 )
-        {
-            p_a52dec->i_pts = i_pts;
-        }
-        p_aout_buffer->start_date = p_a52dec->i_pts;
-        p_a52dec->i_pts += (mtime_t)1000000 * (mtime_t)A52DEC_FRAME_SIZE
-                                            / (mtime_t)output_format.i_rate;
-        p_aout_buffer->end_date = p_a52dec->i_pts;
+        p_aout_buffer->start_date = aout_DateGet( &end_date );
+        p_aout_buffer->end_date = aout_DateIncrement( &end_date,
+                                                      A52DEC_FRAME_SIZE );
 
         if (decode_frame (p_a52dec, (s16*)p_aout_buffer->p_buffer))
         {
@@ -318,7 +325,6 @@ static int InitThread( a52dec_t * p_a52dec )
      */
     p_a52dec->p_aout = NULL;
     p_a52dec->p_aout_input = NULL;
-    p_a52dec->i_pts = 0;
 
     /*
      * Bit stream

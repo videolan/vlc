@@ -3,7 +3,7 @@
  *
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: decoder.h,v 1.1 2002/08/10 20:05:21 fenrir Exp $
+ * $Id: decoder.h,v 1.2 2002/08/23 14:05:22 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -62,11 +62,12 @@ typedef struct adec_thread_s
     /*
      * Output properties
      */
-    mtime_t i_pts;
-
     aout_instance_t *   p_aout;       /* opaque */
     aout_input_t *      p_aout_input; /* opaque */
     audio_sample_format_t output_format;
+
+    audio_date_t        date;
+    mtime_t             pts;
 
 } adec_thread_t;
 

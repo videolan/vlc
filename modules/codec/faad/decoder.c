@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.1 2002/08/10 20:05:21 fenrir Exp $
+ * $Id: decoder.c,v 1.2 2002/08/23 14:05:22 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -206,9 +206,9 @@ static inline void __GetFrame( adec_thread_t *p_adec )
     byte_t        *p_buffer;
 
     p_pes = __PES_GET( p_adec->p_fifo );
-    if( p_pes->i_pts > 0 )
+    if( p_pes->i_pts )
     {
-        p_adec->i_pts = p_pes->i_pts;
+        p_adec->pts = p_pes->i_pts;
     }
 
     while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
@@ -449,47 +449,48 @@ static void DecodeThread( adec_thread_t *p_adec )
             /* **** Delete the old **** */
             aout_InputDelete( p_adec->p_aout, p_adec->p_aout_input );
         }
+
         /* **** Create a new audio output **** */
         p_adec->output_format.i_channels = faad_frame.channels;
+        aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
         p_adec->p_aout_input = aout_InputNew( p_adec->p_fifo,
-                                                &p_adec->p_aout,
-                                                &p_adec->output_format );
+                                              &p_adec->p_aout,
+                                              &p_adec->output_format );
     }
 
     if( !p_adec->p_aout_input )
     {
-        msg_Err( p_adec->p_fifo,
-                    "cannot create aout" );
+        msg_Err( p_adec->p_fifo, "cannot create aout" );
         return;
     }
     
+    if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
+    {
+        aout_DateSet( &p_adec->date, p_adec->pts );
+    }
+    else if( !aout_DateGet( &p_adec->date ) )
+    {
+        return;
+    }
+
     p_aout_buffer = aout_BufferNew( p_adec->p_aout, 
                                     p_adec->p_aout_input,
-                                    faad_frame.samples / 
-                                        faad_frame.channels );
+                                    faad_frame.samples / faad_frame.channels );
     if( !p_aout_buffer )
     {
-        msg_Err( p_adec->p_fifo,
-                    "cannot get aout buffer" );
+        msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
         p_adec->p_fifo->b_error = 1;
         return;
     }
-    p_aout_buffer->start_date = p_adec->i_pts;
-    p_adec->i_pts += (mtime_t)1000000 * (mtime_t)faad_frame.samples / 
-                        (mtime_t)p_adec->output_format.i_channels /
-                        (mtime_t)p_adec->output_format.i_rate;
-    p_aout_buffer->end_date = p_adec->i_pts;
-    /* 
-     * FIXME for FAAD_FMT_FLOAT *only*
-     *       test if it works on big endian machine 
-     *       ( I don't know if float have endian issue )
-     *
-     */
+    p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
+    p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
+                                                  faad_frame.samples /
+                                                      faad_frame.channels );
     memcpy( p_aout_buffer->p_buffer,
             p_faad_buffer,
-            faad_frame.samples * 4 ); /* FIXME for FAAD_FMT_FLOAT *only* */
-    aout_BufferPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+            p_aout_buffer->i_nb_bytes );
 
+    aout_BufferPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
 }
 
 
