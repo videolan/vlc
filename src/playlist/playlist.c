@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.11 2002/08/16 12:31:04 sam Exp $
+ * $Id: playlist.c,v 1.12 2002/08/25 19:27:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -426,6 +426,7 @@ static void RunThread ( playlist_t *p_playlist )
 static void SkipItem( playlist_t *p_playlist, int i_arg )
 {
     int i_oldindex = p_playlist->i_index;
+    vlc_bool_t b_random;
 
     /* If the playlist is empty, there is no current item */
     if( p_playlist->i_size == 0 )
@@ -434,23 +435,29 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
         return;
     }
 
+    b_random = config_GetInt( p_playlist, "random" );
+
     /* Increment */
-    if( config_GetInt( p_playlist, "random" ) )
+    if( b_random )
     {
-        /* Simple random stuff */
         srand( mdate() );
-        p_playlist->i_index += 1 + (int) ( 1.0 * p_playlist->i_size * rand()
-                                            / ( RAND_MAX + 1.0 ) );
+
+        /* Simple random stuff - we cheat a bit to minimize the chances to
+         * get the same index again. */
+        i_arg = (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
+        if( i_arg == 0 )
+        {
+            i_arg = (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
+        }
     }
-    else
-    {
-        p_playlist->i_index += i_arg;
-    }
+
+    p_playlist->i_index += i_arg;
 
     /* Boundary check */
     if( p_playlist->i_index >= p_playlist->i_size )
     {
         if( p_playlist->i_status == PLAYLIST_STOPPED
+             || b_random
              || config_GetInt( p_playlist, "loop" ) )
         {
             p_playlist->i_index -= p_playlist->i_size
