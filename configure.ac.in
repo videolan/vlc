@@ -2205,7 +2205,6 @@ then
     if test "x${ac_cv_gtk_headers}" = "xyes"
     then
       PLUGINS="${PLUGINS} familiar"
-      NEED_GTK_MAIN=yes
     fi
     CPPFLAGS="${CPPFLAGS_save}"
 
@@ -2232,8 +2231,9 @@ then
       then
         CFLAGS_familiar="${CFLAGS_familiar} ${CFLAGS_gpe}"
         LDFLAGS_familiar="${LDFLAGS_familiar} ${LDFLAGS_gpe}"
-        NEED_GTK_MAIN=no
       fi
+    else
+	NEED_GTK_MAIN=yes
     fi # end gpe support
   fi # end gtk+ support
 fi

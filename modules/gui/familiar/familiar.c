@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.18 2002/12/20 21:33:40 jpsaman Exp $
+ * $Id: familiar.c,v 1.19 2002/12/22 21:08:36 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -59,10 +59,6 @@ static int Manage        ( intf_thread_t *p_intf );
 #define AUTOPLAYFILE_TEXT  N_("autoplay selected file")
 #define AUTOPLAYFILE_LONGTEXT N_("automatically play a file when selected in the "\
         "file selection list")
-
-#ifndef NEED_GTK_MAIN
-#define NEED_GTK_MAIN
-#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -138,13 +134,13 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-#ifndef NEED_GTK_MAIN
+#ifndef NEED_GTK_MAIN 
     /* gtk_init needs to know the command line. We don't care, so we
      * give it an empty one */
     char  *p_args[] = { "" };
     char **pp_args  = p_args;
     int    i_args   = 1;
-	int    i_dummy;
+    int    i_dummy;
 #endif
 
 #ifdef HAVE_GPE_INIT_H
