@@ -96,7 +96,7 @@ struct intf_sys_t
     int i_socket;
     char *psz_unix_path;
     vlc_bool_t b_extend;
-    
+
 #ifdef WIN32
     HANDLE hConsoleIn;
     vlc_bool_t b_quiet;
@@ -138,7 +138,6 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
             "You can set the address and port the interface will bind to." )
 #define EXTEND_TEXT N_("Extended help")
 #define EXTEND_LONGTEXT N_("List additional commands.")
-            
 
 #ifdef WIN32
 #define QUIET_TEXT N_("Do not open a DOS command box interface")
@@ -151,7 +150,7 @@ void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 
 vlc_module_begin();
     set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     set_description( _("Remote control interface") );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
 #ifdef HAVE_ISATTY

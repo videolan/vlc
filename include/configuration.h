@@ -51,8 +51,9 @@
 #define CONFIG_ITEM_FLOAT                   0x0060  /* Float option */
 #define CONFIG_ITEM_DIRECTORY               0x0070  /* Directory option */
 #define CONFIG_ITEM_KEY                     0x0080  /* Hot key option */
-#define CONFIG_ITEM_MODULE_LIST             0x0090  /* Module option */
-#define CONFIG_ITEM_MODULE_LIST_CAT         0x00A0  /* Module option */
+#define CONFIG_ITEM_MODULE_CAT              0x0090  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST             0x00A0  /* Module option */
+#define CONFIG_ITEM_MODULE_LIST_CAT         0x00B0  /* Module option */
 
 #define CONFIG_ITEM                         0x00F0
 
@@ -276,6 +277,11 @@ int config_CreateDir( vlc_object_t *, char * );
         (i_config+11) * sizeof(module_config_t)); \
     { static module_config_t tmp = { CONFIG_ITEM_MODULE, psz_caps, name, '\0', text, longtext, psz_value }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; }
 
+#define add_module_cat( name, i_subcategory, psz_value, p_callback, text, longtext, advc ) \
+    i_config++; \
+    if(!(i_config%10)) p_config = (module_config_t* )realloc(p_config, \
+        (i_config+11) * sizeof(module_config_t)); \
+    { static module_config_t tmp = { CONFIG_ITEM_MODULE_CAT, NULL, name, '\0', text, longtext, psz_value, 0, 0.0, i_subcategory }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; }
 
 #define add_module_list( name, psz_caps, psz_value, p_callback, text, longtext, advc ) \
     i_config++; \

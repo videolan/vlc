@@ -1126,7 +1126,7 @@ vlc_module_begin();
     set_subcategory( SUBCAT_INTERFACE_GENERAL );
 
     set_section ( N_("Interface module" ), NULL );
-    add_module( "intf", "interface", NULL, NULL, INTF_TEXT,
+    add_module_cat( "intf", SUBCAT_INTERFACE_GENERAL, NULL, NULL, INTF_TEXT,
                 INTF_LONGTEXT, VLC_FALSE );
         change_short('I');
 

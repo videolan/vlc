@@ -53,6 +53,9 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
     case CONFIG_ITEM_MODULE:
         p_control = new ModuleConfigControl( p_this, p_item, parent );
         break;
+    case CONFIG_ITEM_MODULE_CAT:
+        p_control = new ModuleCatConfigControl( p_this, p_item, parent );
+        break;
     case CONFIG_ITEM_MODULE_LIST_CAT:
         p_control = new ModuleListCatConfigControl( p_this, p_item, parent );
         break;
@@ -290,6 +293,68 @@ ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
     this->SetSizerAndFit( sizer );
 }
 
+ModuleCatConfigControl::~ModuleCatConfigControl()
+{
+    ;
+}
+
+wxString ModuleCatConfigControl::GetPszValue()
+{
+    return wxU( (char *)combo->GetClientData( combo->GetSelection() ));
+}
+
+/*****************************************************************************
+ * ModuleCatConfigControl implementation
+ *****************************************************************************/
+ModuleCatConfigControl::ModuleCatConfigControl( vlc_object_t *p_this,
+                                                module_config_t *p_item,
+                                                wxWindow *parent )
+  : ConfigControl( p_this, p_item, parent )
+{
+    vlc_list_t *p_list;
+    module_t *p_parser;
+
+    label = new wxStaticText(this, -1, wxU(p_item->psz_text));
+    combo = new wxComboBox( this, -1, wxL2U(p_item->psz_value),
+                            wxDefaultPosition, wxDefaultSize,
+                            0, NULL, wxCB_READONLY | wxCB_SORT );
+
+    combo->Append( wxU(_("Default")), (void *)NULL );
+    combo->SetSelection( 0 );
+
+    /* build a list of available modules */
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for(  int i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        p_parser = (module_t *)p_list->p_values[i_index].p_object ;
+
+        if( !strcmp( p_parser->psz_object_name, "main" ) )
+              continue;
+
+        module_config_t *p_config = p_parser->p_config;
+        if( p_config ) do
+        {
+            /* Hack: required subcategory is stored in i_min */
+            if( p_config->i_type == CONFIG_SUBCATEGORY &&
+                p_config->i_value == p_item->i_min )
+            {
+                combo->Append( wxU(p_parser->psz_longname),
+                                   p_parser->psz_object_name );
+                if( p_item->psz_value && !strcmp(p_item->psz_value,
+                                        p_parser->psz_object_name) )
+                combo->SetValue( wxU(p_parser->psz_longname) );
+            }
+        } while( p_config->i_type != CONFIG_HINT_END && p_config++ );
+    }
+    vlc_list_release( p_list );
+
+    combo->SetToolTip( wxU(p_item->psz_longtext) );
+    sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+    sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+    sizer->Layout();
+    this->SetSizerAndFit( sizer );
+}
+
 ModuleConfigControl::~ModuleConfigControl()
 {
     ;
@@ -299,6 +364,7 @@ wxString ModuleConfigControl::GetPszValue()
 {
     return wxU( (char *)combo->GetClientData( combo->GetSelection() ));
 }
+
 
 /*****************************************************************************
  * ModuleListCatonfigControl implementation

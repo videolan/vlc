@@ -92,7 +92,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin();
     set_description( _("HTTP remote control interface") );
     set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
         add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
         add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  VLC_TRUE );
         add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );

@@ -205,6 +205,7 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
         (p_config->i_type!=CONFIG_ITEM_DIRECTORY) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE_LIST) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE_LIST_CAT) &&
+        (p_config->i_type!=CONFIG_ITEM_MODULE_CAT) &&
         (p_config->i_type!=CONFIG_ITEM_MODULE) )
     {
         msg_Err( p_this, "option %s does not refer to a string", psz_name );

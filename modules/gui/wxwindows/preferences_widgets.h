@@ -89,6 +89,17 @@ struct moduleCheckBox {
     char *psz_module;
 };
 
+class ModuleCatConfigControl: public ConfigControl
+{
+public:
+    ModuleCatConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
+    ~ModuleCatConfigControl();
+    virtual wxString GetPszValue();
+private:
+    wxComboBox *combo;
+};
+
+
 class ModuleListCatConfigControl: public ConfigControl
 {
 public:
@@ -99,7 +110,7 @@ private:
     std::vector<moduleCheckBox *> pp_checkboxes;
 
     void OnUpdate( wxCommandEvent& );
-    
+
     wxTextCtrl *text;
     DECLARE_EVENT_TABLE()
 };

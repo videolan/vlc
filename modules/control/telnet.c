@@ -82,6 +82,8 @@ static void Close( vlc_object_t * );
 #define TELNETPWD_LONGTEXT N_( "Default to admin" )
 
 vlc_module_begin();
+    set_category( CAT_INTERFACE );
+    set_subcategory( SUBCAT_INTERFACE_GENERAL );
     add_integer( "telnet-port", 4212, NULL, TELNETPORT_TEXT,
                  TELNETPORT_LONGTEXT, VLC_TRUE );
     add_string( "telnet-password", "admin", NULL, TELNETPWD_TEXT,
