@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.13 2003/01/16 13:49:44 hartman Exp $
+ * $Id: vout.m,v 1.14 2003/01/20 00:23:45 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -833,6 +833,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
         case 'q': case 'Q':
             p_vout->p_vlc->b_die = VLC_TRUE;
+            break;
+
+        case ' ':
+            input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
             break;
 
         default:
