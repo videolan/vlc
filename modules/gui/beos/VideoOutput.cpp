@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.13 2003/03/12 23:15:03 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.14 2003/04/18 16:10:28 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -112,7 +112,7 @@ beos_GetAppWindow(char *name)
 BWindow*
 get_interface_window()
 {
-	return beos_GetAppWindow(VOUT_TITLE);
+	return beos_GetAppWindow( "VLC " PACKAGE_VERSION );
 }
 
 class BackgroundView : public BView
@@ -1096,8 +1096,8 @@ VLCView::MouseDown(BPoint where)
 		{
 			if (clicks == 2 && !fIgnoreDoubleClick)
 				Window()->Zoom();
-			else
-				videoWindow->ToggleInterfaceShowing();
+			/* else
+				videoWindow->ToggleInterfaceShowing(); */
 			fIgnoreDoubleClick = false;
 		}
 	    else
@@ -1251,6 +1251,8 @@ VLCView::KeyDown(const char *bytes, int32 numBytes)
 		uint32 mods = modifiers();
 		switch (*bytes) {
 			case B_TAB:
+			case 'f':
+			case 'F':
 				// toggle window and full screen mode
 				// not passing on the tab key to the default KeyDown()
 				// implementation also avoids loosing the keyboard focus

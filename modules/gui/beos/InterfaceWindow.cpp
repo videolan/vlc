@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.32 2003/04/18 15:25:50 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.33 2003/04/18 16:10:28 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -213,9 +213,6 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
                      screen_rect.right - 150,
                      screen_rect.top + 600 );
     fMessagesWindow = new MessagesWindow( p_intf, window_rect, "Messages" );
-
-    // set the title bar
-    SetName( "interface" );
 
     // the media control view
     p_mediaControl = new MediaControlView( BRect( 0.0, 0.0, 250.0, 50.0 ),
