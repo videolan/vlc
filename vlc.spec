@@ -16,7 +16,7 @@
 
 %define with_dvdplay 1
 
-%define with_mozilla 0
+%define with_mozilla 1
 %define with_gtk 1
 %define with_gnome 1
 %define with_qt 0
@@ -44,9 +44,17 @@
 
 %define with_slp 1
 
+## by default we build for MandrakeCooker
 %define	buildfor_rh80	0
 %define	buildfor_mdk82	0
 %define	buildfor_mdk90	0
+
+## but we try to figure out on wich system we are building
+%{expand:%%define buildfor_mdk82 %(A=$(awk '{print $4}' /etc/mandrake-release); if [ "$A" = 8.2 ]; then echo 1; else echo 0; fi)}
+%{expand:%%define buildfor_mdk90 %(A=$(awk '{print $4}' /etc/mandrake-release); if [ "$A" = 9.0 ]; then echo 1; else echo 0; fi)}
+%{expand:%%define buildfor_mdk91 %(A=$(awk '{print $4}' /etc/mandrake-release); if [ "$A" = 9.1 ]; then echo 1; else echo 0; fi)}
+# not a mandrake one.
+%{expand:%%define buildfor_rh80 %([[ -e /etc/mandrake-release ]] && echo 1 || echo 0)}
 
 # new macros
 %if %buildfor_mdk82 || %buildfor_mdk90 || %buildfor_rh80
@@ -61,7 +69,15 @@
 %define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
 %define make %__make
 %define makeinstall_std %__make DESTDIR="$RPM_BUILD_ROOT" install
+%define _menudir /usr/lib/menu
+%define _iconsdir /usr/share/icons
+%define _liconsdir /usr/share/icons/large
+%define _miconsdir /usr/share/icons/mini
 # adjust define for Redhat.
+%define with_ggi 0
+%define with_dvb 0
+%define with_slp 0
+%define with_mozilla 0
 %endif
 
 # without
@@ -142,6 +158,8 @@ Requires:	vlc-plugin-a52
 
 BuildRoot:	%_tmppath/%name-%version-%release-root
 
+# for redhat system, NO buildrequires. rh sux
+%if !%buildfor_rh80
 %if %with_mozilla
 Buildrequires:	mozilla-devel
 %endif
@@ -161,7 +179,6 @@ Buildrequires:	kdelibs-devel
 Buildrequires:	libncurses5-devel
 %if %with_wx
 Buildrequires:	wxGTK-devel
-%endif
 %endif
 %if %with_lirc
 Buildrequires:	liblirc-devel
@@ -199,6 +216,12 @@ Buildrequires:	liba52dec-devel
 %if %with_ffmpeg
 Buildrequires:	libffmpeg-devel
 %endif
+%if %with_dvdplay
+BuildRequires: libdvdplay-devel
+%endif
+%if %with_dvb
+BuildRequires: libdvbpsi-devel
+%endif
 
 %if %with_alsa
 Buildrequires:	libalsa2-devel
@@ -214,6 +237,7 @@ Buildrequires:	libarts-devel
 Buildrequires:	libopenslp-devel
 %endif
 
+%endif #no buildrequires for rh systems.
 
 %description
 VideoLAN is an OpenSource streaming solution for every OS developed by
@@ -244,6 +268,8 @@ for the VLC media player, or standalone applications using features from VLC.
 Summary: A multimedia plugin for Mozilla, based on vlc
 group: Video
 Requires: %name = %version-%release
+%{expand: %%define mozve %(rpm -q mozilla| sed 's/mozilla-\([0-9].*\)-.*$/\1/')}
+Requires: mozilla = %mozve
 %description -n mozilla-plugin-vlc
 This plugin adds support for MPEG, MPEG2, DVD and DivX to your Mozilla
 browser. The decoding process is done by vlc and the output window is
@@ -481,7 +507,11 @@ the VLC media player.
 # yves 0.4.0-1mdk
 # ffmpeg: static linking cause no official ffmpeg release with a stable ABI
 # ffmpeg:no plugin posible on ia64 due to the static linking (can not put .a in a .so)
-
+%if %with_mozilla
+%define moz_ver 1.3a
+export XPIDL=/usr/lib/mozilla-%moz_ver/xpidl
+perl -pi -e  's#-I/usr/share/idl/mozilla#-I/usr/share/idl/mozilla-1.3a#' Makefile.in
+%endif
 export QTDIR=%{_libdir}/qt3
 # mandrake kernel specific
 export CPPFLAGS="${CPPFLAGS:--I/usr/src/linux/3rdparty/mod_dvb/include}"
@@ -582,7 +612,7 @@ export CPPFLAGS="${CPPFLAGS:--I/usr/src/linux/3rdparty/mod_dvb/include}"
 %make
 
 %install
-rm -f %buildroot
+rm -fr %buildroot
 %makeinstall_std
 %find_lang %name
 install -d %buildroot/%_mandir/man1
@@ -647,11 +677,17 @@ install -m 644 %pngdir/qvlc48x48.png %buildroot/%_liconsdir/qvlc.png
 
 #rpm (>= 4.0.4-20mdk) now checks for installed (but unpackaged) files
 rm -f %pngdir/*
+%if %buildfor_rh80
+rm -fr %buildroot/%_menudir
+rm -fr %buildroot/%_iconsdir
+%endif
 
+%if !%buildfor_rh80
 %post
 %update_menus
 %postun
 %clean_menus
+%endif
 
 %clean
 rm -fr %buildroot
@@ -817,10 +853,12 @@ rm -fr %buildroot
 %dir %_libdir/vlc/visualization
 
 %_mandir/man1/vlc.*
+%if !%buildfor_rh80
 %_menudir/vlc
 %_miconsdir/vlc.png
 %_iconsdir/vlc.png
 %_liconsdir/vlc.png
+%endif
 
 %files -n %libname-devel
 %defattr(-,root,root)
@@ -836,9 +874,7 @@ rm -fr %buildroot
 %files -n mozilla-plugin-vlc
 %defattr(-,root,root)
 %doc README
-# FIXME: seems to be mozilla-version/plugin on Mandrake
-#%dir %_libdir/mozilla
-%_libdir/mozilla*/*
+%_libdir/mozilla/*/*
 %endif
 
 # intf plugins
@@ -849,6 +885,7 @@ rm -fr %buildroot
 %_libdir/vlc/misc/libgtk_main_plugin.so
 %_libdir/vlc/gui/libgtk_plugin.so
 %_bindir/gvlc
+%if !%buildfor_rh80
 %_menudir/gvlc
 %_miconsdir/gvlc.png
 %_iconsdir/gvlc.png
@@ -858,6 +895,7 @@ rm -fr %buildroot
 %postun -n gvlc
 %clean_menus
 %endif
+%endif
 
 %if %with_gnome
 %files -n gnome-vlc
@@ -866,6 +904,7 @@ rm -fr %buildroot
 %_libdir/vlc/misc/libgnome_main_plugin.so
 %_libdir/vlc/gui/libgnome_plugin.so
 %_bindir/gnome-vlc
+%if !%buildfor_rh80
 %_menudir/gnome-vlc
 %_miconsdir/gnome-vlc.png
 %_iconsdir/gnome-vlc.png
@@ -875,6 +914,7 @@ rm -fr %buildroot
 %postun -n gnome-vlc
 %clean_menus
 %endif
+%endif
 
 %if %with_qt
 %files -n qvlc
@@ -882,6 +922,7 @@ rm -fr %buildroot
 %doc README
 %_libdir/vlc/gui/libqt_plugin.so
 %_bindir/qvlc
+%if !%buildfor_rh80
 %_menudir/qvlc
 %_miconsdir/qvlc.png
 %_iconsdir/qvlc.png
@@ -891,12 +932,14 @@ rm -fr %buildroot
 %postun -n qvlc
 %clean_menus
 %endif
+%endif
 
 %if %with_kde
 %files -n kvlc
 %doc README
 %_libdir/vlc/gui/libkde_plugin.so
 %_bindir/kvlc
+%if !%buildfor_rh80
 %_menudir/kvlc
 %_miconsdir/kvlc.png
 %_iconsdir/kvlc.png
@@ -905,6 +948,7 @@ rm -fr %buildroot
 %update_menus
 %postun -n kvlc
 %clean_menus
+%endif
 %endif
 
 %if %with_ncurses
