@@ -2367,6 +2367,7 @@ dnl
 dnl   png
 dnl
 AC_CHECK_HEADERS(png.h, [
+  LDFLAGS="${LDFLAGS_save} -lz"
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LDFLAGS([logo],[-lpng -lz])
     VLC_ADD_PLUGINS([logo])
@@ -2374,6 +2375,7 @@ AC_CHECK_HEADERS(png.h, [
     VLC_ADD_LDFLAGS([cvdsub],[-lpng -lz -lm])
     AC_DEFINE(HAVE_LIBPNG, [], [Define if you have the PNG library: libpng])])
   ])
+  LDFLAGS="${LDFLAGS_save}"
 
 dnl
 dnl  Video plugins
