@@ -444,9 +444,9 @@
         if( prefix_range.location != NSNotFound )
         {
             [o_title deleteCharactersInRange: prefix_range];
+            [self setTitleWithRepresentedFilename: o_title];
         }
-
-        [self setTitleWithRepresentedFilename: o_title];
+            [self setTitle: o_title];
     }
     else
     {
