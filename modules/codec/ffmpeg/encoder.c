@@ -330,7 +330,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 		   &p_context->sample_aspect_ratio.den,
 		   p_enc->fmt_in.video.i_aspect *
 		   (int64_t)p_context->height / p_context->width,
-		   VOUT_ASPECT_FACTOR, INT_MAX );
+		   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
 #else
         p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
             VOUT_ASPECT_FACTOR;
