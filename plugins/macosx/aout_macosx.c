@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.15 2002/03/19 03:33:52 jlj Exp $
+ * $Id: aout_macosx.c,v 1.16 2002/03/22 00:47:47 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -50,8 +50,9 @@ typedef struct aout_sys_s
     AudioStreamBasicDescription s_src_stream_format;
     AudioStreamBasicDescription s_dst_stream_format;
 
-    Ptr		            p_buffer;       // ptr to the 32 bit float data
-    UInt32	            ui_buffer_size; // audio device buffer size
+    Ptr                 p_buffer;       // ptr to the 32 bit float data
+    UInt32              ui_buffer_size; // audio device buffer size
+    boolean_t           b_buffer_data;  // available buffer data?
     vlc_mutex_t         mutex_lock;     // pthread locks for sync of
     vlc_cond_t          cond_sync;      // aout_Play and callback
 } aout_sys_t;
@@ -110,7 +111,7 @@ static int aout_Open( aout_thread_t *p_aout )
     memset( p_aout->p_sys, 0, sizeof( aout_sys_t ) );
 
     /* get the default output device */
-    ui_param_size = sizeof( p_aout->p_sys->device );	
+    ui_param_size = sizeof( p_aout->p_sys->device );
     err = AudioHardwareGetProperty( kAudioHardwarePropertyDefaultOutputDevice,
                                     &ui_param_size, 
                                     (void *)&p_aout->p_sys->device );
@@ -283,9 +284,14 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
     vlc_cond_signal( &p_sys->cond_sync );
     
     /* move data into output data buffer */
-    BlockMoveData( p_sys->p_buffer,
-                   outOutputData->mBuffers[ 0 ].mData, 
-                   p_sys->ui_buffer_size );
+    if( p_sys->b_buffer_data )
+    {
+        BlockMoveData( p_sys->p_buffer,
+                       outOutputData->mBuffers[ 0 ].mData, 
+                       p_sys->ui_buffer_size );
+
+        p_sys->b_buffer_data = 0;
+    }
 
     vlc_mutex_unlock( &p_sys->mutex_lock );
 
@@ -308,6 +314,10 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     if( err != noErr )
     {
         intf_ErrMsg( "aout error: ConvertBuffer failed: %d", err );
+    }
+    else
+    {
+        p_aout->p_sys->b_buffer_data = 1;
     }
 
     /* 
@@ -354,7 +364,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
         ((s64)p_aout->i_rate * AOUT_BUFFER_DURATION) / 1000000; 
 
     /* set the buffer size that the device uses for IO */
-    ui_param_size = sizeof( p_aout->p_sys->ui_buffer_size );	
+    ui_param_size = sizeof( p_aout->p_sys->ui_buffer_size );
     err = AudioDeviceSetProperty( p_aout->p_sys->device, 0, 0, false, 
                                   kAudioDevicePropertyBufferSize, 
                                   ui_param_size,

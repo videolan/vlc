@@ -118,8 +118,9 @@ static int vout_Create( vout_thread_t *p_vout )
 
     p_vout->p_sys->b_mouse_pointer_visible = 1;
 
-    p_vout->p_sys->s_rect.size.width = p_vout->render.i_width;
-    p_vout->p_sys->s_rect.size.height = p_vout->render.i_height;
+    /* set window size */
+    p_vout->p_sys->s_rect.size.width = p_vout->i_window_width;
+    p_vout->p_sys->s_rect.size.height = p_vout->i_window_height;
 
     if( ( err = EnterMovies() ) != noErr )
     {
