@@ -4,7 +4,6 @@
  * Copyright (C) 1999, 2000 VideoLAN
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
- *          Henri Fallon <henri@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +60,7 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_spu,
     int i_width  = p_spu->i_width  * i_xscale;
     int i_height = p_spu->i_height * i_yscale;
 
-    int i_x = 0, i_y = 0;
+    int i_x = 0, i_y = 0, i_ytmp, i_yreal, i_ynext;
 
     u8 *p_dest = p_buffer->p_data
                   /* Add the picture coordinates and the SPU coordinates */
@@ -71,36 +70,60 @@ void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_spu,
                        * i_bytes_per_line;
 
     /* Draw until we reach the bottom of the subtitle */
-    while( i_y < i_height )
+    for( i_y = 0 ; i_y < i_height ; /* i_y incremented below */ )
     {
-        /* Get RLE information */
-        i_len = i_xscale * ( *p_source >> 2 );
-        i_color = *p_source++ & 0x3;
+        i_ytmp = i_y >> 6;
+        i_y += i_yscale;
 
-        /* Draw the line */
-        if( i_color )
+        /* Check whether we need to draw one line or more than one */
+        if( i_ytmp + 1 >= ( i_y >> 6 ) )
         {
-            memset( p_dest + i_bytes_per_pixel * ( i_x >> 6 )
-                           + i_bytes_per_line * ( i_y >> 6 ),
-                    p_palette[ i_color ],
-                    i_bytes_per_pixel * ( ( i_len >> 6 ) + 1 ) );
+            /* Just one line : we precalculate i_y >> 6 */
+            i_yreal = i_bytes_per_line * i_ytmp;
 
-            /* Duplicate line if needed */
-            if( i_yscale > 1 << 6 )
+            /* Draw until we reach the end of the line */
+            for( i_x = 0 ; i_x < i_width ; i_x += i_len )
             {
-                memset( p_dest + i_bytes_per_pixel * ( i_x >> 6 )
-                               + i_bytes_per_line * ( ( i_y >> 6 ) + 1 ),
-                        p_palette[ i_color ],
-                        i_bytes_per_pixel * ( ( i_len >> 6 ) + 1 ) );
+                /* Get RLE information */
+                i_len = i_xscale * ( *p_source >> 2 );
+                i_color = *p_source++ & 0x3;
+
+                /* Draw the line */
+                if( i_color )
+                {
+                    memset( p_dest + i_bytes_per_pixel * ( i_x >> 6 )
+                                   + i_yreal,
+                            p_palette[ i_color ],
+                            i_bytes_per_pixel * ( ( i_len >> 6 ) + 1 ) );
+                }
             }
         }
-
-        /* Check for end of line */
-        i_x += i_len;
-        if( i_x >= i_width )
+	else
         {
-            i_y += i_yscale;
-            i_x = 0;
+            i_yreal = i_bytes_per_line * i_ytmp;
+            i_ynext = i_bytes_per_line * i_y >> 6;
+
+            /* Draw until we reach the end of the line */
+            for( i_x = 0 ; i_x < i_width ; i_x += i_len )
+            {
+                /* Get RLE information */
+                i_len = i_xscale * ( *p_source >> 2 );
+                i_color = *p_source++ & 0x3;
+
+                /* Draw as many lines as needed */
+                if( i_color )
+                {
+                    for( i_ytmp = i_yreal ;
+                         i_ytmp < i_ynext ;
+                         i_ytmp += i_bytes_per_line )
+                    {
+                        memset( p_dest + i_bytes_per_pixel * ( i_x >> 6 )
+                                       + i_ytmp,
+                                p_palette[ i_color ],
+                                i_bytes_per_pixel * ( ( i_len >> 6 ) + 1 ) );
+                    }
+                }
+            }
         }
     }
 }

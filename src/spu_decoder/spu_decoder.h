@@ -65,17 +65,18 @@ typedef struct spudec_thread_s
 #define SPU_CMD_END                 0xff
 
 /*****************************************************************************
- * GetNibble: read a nibble from a source packet.
+ * AddNibble: read a nibble from a source packet and add it to our integer.
  *****************************************************************************/
-static __inline__ u8 GetNibble( u8 *p_source, int *pi_index )
+static __inline__ unsigned int AddNibble( unsigned int i_code,
+                                          u8 *p_src, int *pi_index )
 {
     if( *pi_index & 0x1 )
     {
-        return( p_source[(*pi_index)++ >> 1] & 0xf );
+        return( i_code << 4 | ( p_src[(*pi_index)++ >> 1] & 0xf ) );
     }
     else
     {
-        return( p_source[(*pi_index)++ >> 1] >> 4 );
+        return( i_code << 4 | p_src[(*pi_index)++ >> 1] >> 4 );
     }
 }
 

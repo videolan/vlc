@@ -136,6 +136,7 @@ int vout_Create( vout_thread_t *p_vout )
         free( p_vout->p_sys );
         return( 1 );
     }
+
     return( 0 );
 }
 
@@ -146,13 +147,23 @@ int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Init( vout_thread_t *p_vout )
 {
+#define p_b p_vout->p_sys->p_buffer
     /* Acquire first buffer */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceAcquire( p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->resource, GGI_ACTYPE_WRITE );
+        ggiResourceAcquire( p_b[ p_vout->i_buffer_index ]->resource,
+                            GGI_ACTYPE_WRITE );
     }
 
+    /* Listen to the keyboard and the mouse buttons */
+    ggiSetEventMask( p_vout->p_sys->p_display,
+                     emKeyboard | emPtrButtonPress | emPtrButtonRelease );
+
+    /* Set asynchronous display mode -- usually quite faster */
+    ggiAddFlags( p_vout->p_sys->p_display, GGIFLAG_ASYNC );
+
     return( 0 );
+#undef p_b
 }
 
 /*****************************************************************************
@@ -162,11 +173,13 @@ int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_End( vout_thread_t *p_vout )
 {
+#define p_b p_vout->p_sys->p_buffer
     /* Release buffer */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->resource );
+        ggiResourceRelease( p_b[ p_vout->i_buffer_index ]->resource );
     }
+#undef p_b
 }
 
 /*****************************************************************************
@@ -189,21 +202,48 @@ void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Manage( vout_thread_t *p_vout )
 {
-    int         i_key;                                        /* unicode key */
+    struct timeval tv = { 0, 1000 };                        /* 1 millisecond */
+    gii_event_mask mask;
+    gii_event      event;
 
-    /* For all events in queue */
-    while( ggiKbhit( p_vout->p_sys->p_display ) )
+    mask = emKeyboard | emPtrButtonPress | emPtrButtonRelease;
+
+    ggiEventPoll( p_vout->p_sys->p_display, mask, &tv );
+    
+    while( ggiEventsQueued( p_vout->p_sys->p_display, mask) )
     {
-        i_key = ggiGetc( p_vout->p_sys->p_display );
-        switch( i_key )
-        {
-        case 'q':
-            /* FIXME pass message ! */
-            p_main->p_intf->b_die = 1;
-            break;
+        ggiEventRead( p_vout->p_sys->p_display, &event, mask);
 
-        default:
-            break;
+        switch( event.any.type )
+        {
+            case evKeyRelease:
+
+                switch( event.key.sym )
+                {
+                    case 'q':
+                    case 'Q':
+                    case GIIUC_Escape:
+                        /* FIXME pass message ! */
+                        p_main->p_intf->b_die = 1;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                break;
+
+            case evPtrButtonRelease:
+
+                switch( event.pbutton.button )
+                {
+                    case GII_PBUTTON_RIGHT:
+                        /* FIXME: need locking ! */
+                        p_main->p_intf->b_menu_change = 1;
+                        break;
+                }
+
+            default:
         }
     }
 
@@ -218,23 +258,27 @@ int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_Display( vout_thread_t *p_vout )
 {
+#define p_b p_vout->p_sys->p_buffer
     /* Change display frame */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceRelease( p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->resource );
+        ggiResourceRelease( p_b[ p_vout->i_buffer_index ]->resource );
     }
-    ggiFlush( p_vout->p_sys->p_display ); /* XXX?? */
     ggiSetDisplayFrame( p_vout->p_sys->p_display,
-                        p_vout->p_sys->p_buffer[ p_vout->i_buffer_index ]->frame );
+                        p_b[ p_vout->i_buffer_index ]->frame );
 
     /* Swap buffers and change write frame */
     if( p_vout->p_sys->b_must_acquire )
     {
-        ggiResourceAcquire( p_vout->p_sys->p_buffer[ (p_vout->i_buffer_index + 1) & 1]->resource,
+        ggiResourceAcquire( p_b[ (p_vout->i_buffer_index + 1) & 1]->resource,
                             GGI_ACTYPE_WRITE );
     }
     ggiSetWriteFrame( p_vout->p_sys->p_display,
-                      p_vout->p_sys->p_buffer[ (p_vout->i_buffer_index + 1) & 1]->frame );
+                      p_b[ (p_vout->i_buffer_index + 1) & 1]->frame );
+
+    /* Flush the output so that it actually displays */
+    ggiFlush( p_vout->p_sys->p_display );
+#undef p_b
 }
 
 /* following functions are local */
@@ -247,6 +291,7 @@ void vout_Display( vout_thread_t *p_vout )
  *****************************************************************************/
 static int GGIOpenDisplay( vout_thread_t *p_vout )
 {
+#define p_b p_vout->p_sys->p_buffer
     ggi_mode    mode;                                     /* mode descriptor */
     ggi_color   col_fg;                                  /* foreground color */
     ggi_color   col_bg;                                  /* background color */
@@ -287,8 +332,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
     mode.dpp.y =        GGI_AUTO;
     ggiCheckMode( p_vout->p_sys->p_display, &mode );
 
-    /* Check that returned mode has some minimum properties */
-    /* XXX?? */
+    /* FIXME: Check that returned mode has some minimum properties */
 
     /* Set mode */
     if( ggiSetMode( p_vout->p_sys->p_display, &mode ) )
@@ -305,8 +349,9 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
     {
         /* Get buffer address */
         p_vout->p_sys->p_buffer[ i_index ] =
-            (ggi_directbuffer *)ggiDBGetBuffer( p_vout->p_sys->p_display, i_index );
-        if( p_vout->p_sys->p_buffer[ i_index ] == NULL )
+            (ggi_directbuffer *)ggiDBGetBuffer( p_vout->p_sys->p_display,
+                                                i_index );
+        if( p_b[ i_index ] == NULL )
         {
             intf_ErrMsg( "vout error: double buffering is not possible" );
             ggiClose( p_vout->p_sys->p_display );
@@ -315,11 +360,11 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
         }
 
         /* Check buffer properties */
-        if( ! (p_vout->p_sys->p_buffer[ i_index ]->type & GGI_DB_SIMPLE_PLB) ||
-            (p_vout->p_sys->p_buffer[ i_index ]->page_size != 0) ||
-            (p_vout->p_sys->p_buffer[ i_index ]->write == NULL ) ||
-            (p_vout->p_sys->p_buffer[ i_index ]->noaccess != 0) ||
-            (p_vout->p_sys->p_buffer[ i_index ]->align != 0) )
+        if( ! ( p_b[ i_index ]->type & GGI_DB_SIMPLE_PLB )
+           || ( p_b[ i_index ]->page_size != 0 )
+           || ( p_b[ i_index ]->write == NULL )
+           || ( p_b[ i_index ]->noaccess != 0 )
+           || ( p_b[ i_index ]->align != 0 ) )
         {
             intf_ErrMsg( "vout error: incorrect video memory type" );
             ggiClose( p_vout->p_sys->p_display );
@@ -328,17 +373,16 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
         }
 
         /* Check if buffer needs to be acquired before write */
-        if( ggiResourceMustAcquire( p_vout->p_sys->p_buffer[ i_index ]->resource ) )
+        if( ggiResourceMustAcquire( p_b[ i_index ]->resource ) )
         {
             p_vout->p_sys->b_must_acquire = 1;
         }
     }
-#ifdef DEBUG
+
     if( p_vout->p_sys->b_must_acquire )
     {
         intf_DbgMsg("buffers must be acquired");
     }
-#endif
 
     /* Set graphic context colors */
     col_fg.r = col_fg.g = col_fg.b = -1;
@@ -367,18 +411,20 @@ static int GGIOpenDisplay( vout_thread_t *p_vout )
     /* Set thread information */
     p_vout->i_width =           mode.visible.x;
     p_vout->i_height =          mode.visible.y;
-    p_vout->i_bytes_per_line =  p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.stride;
-    p_vout->i_screen_depth =    p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.pixelformat->depth;
-    p_vout->i_bytes_per_pixel = p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.pixelformat->size / 8;
-    p_vout->i_red_mask =        p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.pixelformat->red_mask;
-    p_vout->i_green_mask =      p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.pixelformat->green_mask;
-    p_vout->i_blue_mask =       p_vout->p_sys->p_buffer[ 0 ]->buffer.plb.pixelformat->blue_mask;
-    /* FIXME: palette in 8bpp ?? */
+    p_vout->i_bytes_per_line =  p_b[ 0 ]->buffer.plb.stride;
+    p_vout->i_screen_depth =    p_b[ 0 ]->buffer.plb.pixelformat->depth;
+    p_vout->i_bytes_per_pixel = p_b[ 0 ]->buffer.plb.pixelformat->size / 8;
+    p_vout->i_red_mask =        p_b[ 0 ]->buffer.plb.pixelformat->red_mask;
+    p_vout->i_green_mask =      p_b[ 0 ]->buffer.plb.pixelformat->green_mask;
+    p_vout->i_blue_mask =       p_b[ 0 ]->buffer.plb.pixelformat->blue_mask;
+
+    /* FIXME: set palette in 8bpp */
 
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ]->write, p_vout->p_sys->p_buffer[ 1 ]->write );
+    vout_SetBuffers( p_vout, p_b[ 0 ]->write, p_b[ 1 ]->write );
 
     return( 0 );
+#undef p_b
 }
 
 /*****************************************************************************
