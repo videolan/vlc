@@ -1122,6 +1122,7 @@ static int InitThread( input_thread_t * p_input )
             free( *tmp2++ );
         }
         free( tmp );
+        free( val1.psz_string );
     }
     if( psz_sub_file ) free( psz_sub_file );
 

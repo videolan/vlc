@@ -198,11 +198,12 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
     msg_Dbg( p_input, "opening directory `%s'", psz_name );
     if( ReadDir( p_playlist, psz_name , i_mode, &i_pos ) != VLC_SUCCESS )
     {
-        free( psz_name );
         goto end;
     }
 
 end:
+    if( psz_name ) free( psz_name );
+    if( psz_mode ) free( psz_mode );
     vlc_object_release( p_playlist );
     p_input->b_eof = 1;
     return 0;

@@ -444,7 +444,7 @@
         return;
     }
 
-    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
+    if( val.psz_string ) free( val.psz_string );
     if( text.psz_string ) free( text.psz_string );
 }
 
@@ -534,6 +534,8 @@
             if( !strcmp( val.psz_string, val_list.p_list->p_values[i].psz_string ) && !( i_type & VLC_VAR_ISCOMMAND ) )
                 [o_lmi setState: TRUE ];
 
+            free( another_val.psz_string );
+
             break;
 
         case VLC_VAR_INTEGER:
@@ -559,7 +561,7 @@
     }
     
     /* clean up everything */
-    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
+    if( val.psz_string ) free( val.psz_string );
     var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
 }
 

@@ -116,8 +116,10 @@
                                           FIND_ANYWHERE );
 
 
-    if (p_playlist)
+    if( p_playlist )
     {
+        char *psz_temp;
+
         /*fill uri / title / author info */
         [o_uri_txt setStringValue:
             ([NSString stringWithUTF8String:p_playlist->
@@ -135,9 +137,9 @@
             [NSString stringWithUTF8String:p_playlist->
                 pp_items[i_item]->input.psz_name]];
 
-        [o_author_txt setStringValue:
-            [NSString stringWithUTF8String:playlist_GetInfo
-            (p_playlist, i_item ,_("General"),_("Author") )]];
+        psz_temp = playlist_GetInfo( p_playlist, i_item ,_("General"),_("Author") );
+        [o_author_txt setStringValue: [NSString stringWithUTF8String: psz_temp]];
+        free( psz_temp );
 
         [[VLCInfoTreeItem rootItem] refresh];
         [o_outline_view reloadData];

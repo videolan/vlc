@@ -496,13 +496,15 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     do
     {
+        char *psz_temp;
         i_current++;
 
         vlc_mutex_lock( &p_playlist->object_lock );
         o_current_name = [NSString stringWithUTF8String:
             p_playlist->pp_items[i_current]->input.psz_name];
-        o_current_author = [NSString stringWithUTF8String:
-            playlist_GetInfo(p_playlist, i_current ,_("General"),_("Author") )];
+        psz_temp = playlist_GetInfo(p_playlist, i_current ,_("General"),_("Author") );
+        o_current_author = [NSString stringWithUTF8String: psz_temp];
+        free( psz_temp);
         vlc_mutex_unlock( &p_playlist->object_lock );
 
 
@@ -876,13 +878,24 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     }
     else if( [[o_tc identifier] isEqualToString:@"2"] )
     {
+        char *psz_temp;
         vlc_mutex_lock( &p_playlist->object_lock );
-        o_value = [NSString stringWithUTF8String:
-            playlist_GetInfo(p_playlist, i_row ,_("General"),_("Author") )];
-        if( o_value == NULL )
-            o_value = [NSString stringWithCString:
-                playlist_GetInfo(p_playlist, i_row ,_("General"),_("Author") )];
+        psz_temp = playlist_GetInfo( p_playlist, i_row ,_("General"),_("Author") );
         vlc_mutex_unlock( &p_playlist->object_lock );
+
+        if( psz_temp == NULL )
+        {
+            o_value = @"";
+        }
+        else
+        {
+            o_value = [NSString stringWithUTF8String: psz_temp];
+            if( o_value == NULL )
+            {
+                o_value = [NSString stringWithCString: psz_temp];
+            }
+            free( psz_temp );
+        }
     }
     else if( [[o_tc identifier] isEqualToString:@"3"] )
     {
