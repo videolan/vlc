@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.7 2001/04/06 09:15:47 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.8 2001/04/08 09:04:33 stef Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -216,6 +216,7 @@ int ioctl_LUSendChallenge( css_t *p_css, u8 *p_challenge )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_LU_SEND_CHALLENGE;
+    auth_info.lsa.agid = p_css->i_agid;
 
     i_ret = ioctl( p_css->i_fd, DVD_AUTH, &auth_info );
 
@@ -382,6 +383,7 @@ int ioctl_HostSendChallenge( css_t *p_css, u8 *p_challenge )
     dvd_authinfo auth_info;
 
     auth_info.type = DVD_HOST_SEND_CHALLENGE;
+    auth_info.lsa.agid = p_css->i_agid;
 
     memcpy( auth_info.hsc.chal, p_challenge, sizeof(dvd_challenge) );
 

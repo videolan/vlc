@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.38 2001/04/08 07:24:47 stef Exp $
+ * $Id: input_dvd.c,v 1.39 2001/04/08 09:04:33 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -742,10 +742,13 @@ static void DVDInit( input_thread_t * p_input )
     int                  i_chapter;
     int                  i;
 
+    /* I don't want DVDs to start playing immediately */
+//    p_input->stream.i_new_status = PAUSE_S;
+
     p_dvd = malloc( sizeof(thread_dvd_data_t) );
     if( p_dvd == NULL )
     {
-        intf_ErrMsg( "Out of memory" );
+        intf_ErrMsg( "dvd error: out of memory" );
         p_input->b_error = 1;
         return;
     }
@@ -783,7 +786,7 @@ static void DVDInit( input_thread_t * p_input )
     /* Ifo initialisation */
     if( IfoInit( &p_dvd->p_ifo, p_input->i_handle ) < 0 )
     {
-        intf_ErrMsg( "ifo error: fatal failure" );
+        intf_ErrMsg( "dvd error: fatal failure in IFO" );
         free( p_dvd );
         p_input->b_error = 1;
         return;
@@ -795,7 +798,7 @@ static void DVDInit( input_thread_t * p_input )
         p_dvd->p_css = malloc( sizeof(css_t) );
         if( p_dvd->p_css == NULL )
         {
-            intf_ErrMsg( "css error: couldn't create CSS structure" );
+            intf_ErrMsg( "dvd error: couldn't create CSS structure" );
             free( p_dvd );
             p_input->b_error = 1;
             return;
@@ -806,14 +809,14 @@ static void DVDInit( input_thread_t * p_input )
 
         if( CSSInit( p_dvd->p_css ) )
         {
-            intf_ErrMsg( "css error: fatal failure" );
+            intf_ErrMsg( "dvd error: fatal failure in CSS" );
             free( p_dvd->p_css );
             free( p_dvd );
             p_input->b_error = 1;
             return;
         }
 
-        intf_WarnMsg( 2, "css info: initialized" );
+        intf_WarnMsg( 2, "dvd info: CSS initialized" );
     }
 
     /* Initialize ES structures */
