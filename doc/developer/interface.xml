@@ -293,36 +293,40 @@ a <filename>Modules.am</filename> file in it.  In this file, put
 something like : <constant>SOURCES_yourmodule = myfile1.c
 myfile2.c</constant></para>
 
-<para>Then, go to the main <filename>configure.ac</filename> file, and
-at the end, in the <constant>AC_CONFIG_FILES</constant> section, add a
-line similar to the others.</para>
+<para>Then go to the main <filename>configure.ac</filename> file, and
+add in the <constant>AC_CONFIG_FILES</constant> section (towards the
+end of the file) a line similar to the others.</para>
 
-<para>If you don't create a directory for your plugin (just put it in
-an existing one), you only have to add the two SOURCES_... lines to
-the existing <filename>Modules.am</filename> file</para>
+<para>If you don't create a directory for your plugin (but instead
+just put it in an existing directory), you only have to add the two
+SOURCES_... lines to the existing <filename>Modules.am</filename>
+file</para>
 
-<para>By doing this, your module is declared, but it will never automatically
-compile.</para>
+<para>This declares your module; it does not arrange for it to be
+automatically compiled; automatic compilatoin is described further
+below.</para>
 
-<para>You then have to restart from the beginning the build sequence, so:</para>
+<para>You do not write a <filename>Makefile</filename> for your
+module. Instead this is done via the bootstrap and configuration
+process. So now run: 
+</para>
+
 <!---don't know if <xmp> or <example> works. Until then... -->
 <para><filename>./bootstrap</filename></para>
-<para><filename>./configure...</filename></para>
+<para><filename>./configure</filename> <emphasis>configure-options</emphasis></para>
 <para><filename>make</filename></para>
 
-<para>To build the module, you have to do it manually, by going to its
-directory, and typing
-<constant>make libyourmodule_plugin.so</constant> (or .dll, ora
+<para>To build the module manually, go to the 
+directory it resides and type
+<constant>make libyourmodule_plugin.so</constant> (or .dll, or
   whatever the file type for a shared library is on your Operating
   System.)</para>
 
-<para>To automatize the build of your module, you must ask this in the
-configure.ac file.</para>
-
-<para>If you want it to be always built, add it to
-the <constant>default modules</constant> section
-in <filename>configure.ac</filename>, in one
-<constant>AX_ADD_PLUGINS</constant> directive.</para>
+<para>To <emphasis>automatically</emphasis> have your module get
+built, you also set this in the <filename>configure.ac</filename>
+file; add your module name to the <constant>default modules</constant>
+section in one of the
+<constant>AX_ADD_PLUGINS</constant> directives.</para>
 </sect2>
 
   </sect1>
