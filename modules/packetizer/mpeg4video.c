@@ -312,7 +312,10 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             {
                 p_sys->i_pts = p_block->i_dts;
             }
-            p_sys->i_dts = p_block->i_dts;
+            if( p_block->i_dts > 0 )
+            {
+                p_sys->i_dts = p_block->i_dts;
+            }
         }
         p_start += 4; /* Next */
     }
