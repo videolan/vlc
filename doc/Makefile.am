@@ -7,8 +7,6 @@ doc_DATA = \
 	fortunes.txt \
 	intf-cdda.txt \
 	intf-vcd.txt \
-	web-streaming.html \
-	vlc-howto.sgml \
 	$(NULL)
 
 EXTRA_DIST = \
@@ -24,8 +22,6 @@ EXTRA_DIST = \
 	intf-cdda.txt \
 	intf-vcd.txt \
 	release-howto.txt \
-	web-streaming.html \
-	vlc-howto.sgml \
 	arm-crosscompile-howto.sgml \
 	Configure.help \
 	lirc/example.lircrc \

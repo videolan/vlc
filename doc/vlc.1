@@ -16,7 +16,7 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-vlc, gnome-vlc, gvlc, kvlc, qvlc, wxvlc \- the VLC media player
+vlc, wxvlc, svlc, gvlc, kvlc, qvlc \- the VLC media player
 .SH SYNOPSIS
 .B vlc
 .RI [ OPTIONS ]
@@ -24,7 +24,7 @@ vlc, gnome-vlc, gvlc, kvlc, qvlc, wxvlc \- the VLC media player
 .SH DESCRIPTION
 This manual page documents briefly the
 .B VLC
-multimedia player.
+multimedia player and server.
 
 .SH OPTIONS
 .B VLC
@@ -52,9 +52,9 @@ must have been prepared beforehands.
 .B vcd:<device>
 VCD device (for instance vcd:/dev/cdrom).
 .TP
-.B udpstream:[@[<multicast address>][:<local port>]]
+.B udp:[@[<multicast address>][:<local port>]]
 UDP stream, such as one sent by VLS or another VLC.
-Usually "udpstream:" is enough.
+Usually "udp:" is enough.
 .TP
 .B vlc:<command>
 Execute a playlist command. Commands are :
@@ -64,7 +64,7 @@ Execute a playlist command. Commands are :
 (close VLC).
 
 .SH SEE ALSO
-.BR vls (1), vlms (1)
+.BR vls (1)
 .br
 .SH AUTHOR
 This manual page was written by Sam Hocevar <sam@zoy.org>, for the Debian
