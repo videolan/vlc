@@ -442,7 +442,8 @@ PLUGINS="${PLUGINS} misc/dummy/dummy misc/null/null"
 PLUGINS="${PLUGINS} control/rc/rc misc/logger/logger access/file access/udp access/http misc/network/ipv4 misc/memcpy/memcpy"
 PLUGINS="${PLUGINS} demux/mpeg/es demux/mpeg/audio demux/mpeg/mpeg_system demux/mpeg/ps demux/mpeg/ts"
 PLUGINS="${PLUGINS} codec/mpeg_video/idct/idct codec/mpeg_video/idct/idctclassic codec/mpeg_video/motion/motion codec/mpeg_video/mpeg_video codec/spudec/spudec"
-#PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/mpeg_audio/mpeg_audio codec/a52old/a52old codec/lpcm/lpcm codec/spdif/spdif"
+PLUGINS="${PLUGINS} codec/spdif"
+#PLUGINS="${PLUGINS} codec/a52old/imdct/imdct codec/a52old/downmix/downmix codec/mpeg_audio/mpeg_audio codec/a52old/a52old codec/lpcm/lpcm"
 PLUGINS="${PLUGINS} video_filter/deinterlace/deinterlace video_filter/invert video_filter/wall video_filter/transform video_filter/distort video_filter/clone video_filter/crop"
 PLUGINS="${PLUGINS} audio_filter/converter/float32tos16"
 PLUGINS="${PLUGINS} audio_filter/resampler/trivial"
@@ -1155,7 +1156,7 @@ then
       a52_LDFLAGS="${a52_LDFLAGS} -L${real_a52_tree}/liba52/.libs"
       LDFLAGS="${save_LDFLAGS} ${a52_LDFLAGS}"
       AC_CHECK_LIB(a52, a52_free, [
-        BUILTINS="${BUILTINS} codec/a52/a52"
+        BUILTINS="${BUILTINS} codec/a52"
         a52_LDFLAGS="${a52_LDFLAGS} -la52 -lm"
         a52_CFLAGS="${a52_CFLAGS} -DUSE_A52DEC_TREE"
         ],[
@@ -1186,7 +1187,7 @@ then
     LDFLAGS="${save_LDFLAGS} ${test_LDFLAGS}"
     AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
-        BUILTINS="${BUILTINS} codec/a52/a52"
+        BUILTINS="${BUILTINS} codec/a52"
         a52_LDFLAGS="${a52_LDFLAGS} ${test_LDFLAGS} -la52 -lm"
         a52_CFLAGS="${a52_CFLAGS} ${test_CFLAGS}"
       ],[

@@ -129,11 +129,15 @@
 #define VOLUME_MAX                      1024
 #define VOLUME_MIN                      0
 
-/* Max number of pre-filters per input, and max-number of post-filters */
+/* Max number of pre-filters per input, and max number of post-filters */
 #define AOUT_MAX_FILTERS                10
 
 /* Max number of inputs */
 #define AOUT_MAX_INPUTS                 5
+
+/* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
+ * will cause the calling thread to sleep */
+#define AOUT_MAX_PREPARE_TIME           (mtime_t)(.5*CLOCK_FREQ)
 
 /*****************************************************************************
  * Video configuration

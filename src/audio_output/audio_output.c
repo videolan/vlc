@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.91 2002/08/09 23:47:23 massiot Exp $
+ * $Id: audio_output.c,v 1.92 2002/08/11 01:27:01 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -136,6 +136,9 @@ void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                                 + (mtime_t)(p_buffer->i_nb_samples * 1000000)
                                     / p_input->input.i_rate;
     }
+
+    /* If the buffer is too early, wait a while. */
+    mwait( p_buffer->start_date - AOUT_MAX_PREPARE_TIME );
 
     aout_InputPlay( p_aout, p_input, p_buffer );
 

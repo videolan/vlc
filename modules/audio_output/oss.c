@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.4 2002/08/09 23:47:23 massiot Exp $
+ * $Id: oss.c,v 1.5 2002/08/11 01:27:01 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -293,39 +293,44 @@ static int OSSThread( aout_instance_t * p_aout )
         int i_bytes_per_sample;
         aout_buffer_t * p_buffer;
         mtime_t next_date;
-        int i_tmp;
+        int i_tmp, i_size;
         byte_t * p_bytes;
 
-        /* Get the presentation date of the next write() operation. It
-         * is equal to the current date + duration of buffered samples.
-         * Order is important here, since GetBufInfo is believed to take
-         * more time than mdate(). */
         if( !p_sys->b_initialized )
         {
             msleep( THREAD_SLEEP );
             continue;
         }
 
-        i_bytes_per_sample = aout_FormatToSize( &p_aout->output.output, 1 );
-        next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
-                      / i_bytes_per_sample
-                      / p_aout->output.output.i_rate;
-        next_date += mdate();
+        if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
+        {
+            /* Get the presentation date of the next write() operation. It
+             * is equal to the current date + duration of buffered samples.
+             * Order is important here, since GetBufInfo is believed to take
+             * more time than mdate(). */
+            next_date = (mtime_t)GetBufInfo( p_aout ) * 1000000
+                      / aout_FormatToByterate( &p_aout->output.output,
+                                               p_aout->output.output.i_rate );
+            next_date += mdate();
+        }
 
         p_buffer = aout_OutputNextBuffer( p_aout, next_date );
 
         if ( p_buffer != NULL )
         {
             p_bytes = p_buffer->p_buffer;
+            i_size = aout_FormatToSize( &p_aout->output.output,
+                                        p_buffer->i_nb_samples );
         }
         else
         {
-            p_bytes = alloca( DEFAULT_FRAME_SIZE * i_bytes_per_sample );
-            memset( p_bytes, 0, DEFAULT_FRAME_SIZE * i_bytes_per_sample );
+            i_size = aout_FormatToSize( &p_aout->output.output,
+                                        DEFAULT_FRAME_SIZE );
+            p_bytes = alloca( i_size );
+            memset( p_bytes, 0, i_size );
         }
 
-        i_tmp = write( p_sys->i_fd, p_bytes,
-                       DEFAULT_FRAME_SIZE * i_bytes_per_sample );
+        i_tmp = write( p_sys->i_fd, p_bytes, i_size );
 
         if( i_tmp < 0 )
         {
