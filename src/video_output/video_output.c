@@ -1292,6 +1292,8 @@ static void SuxorRestartVideoES( suxor_thread_t *p_this )
 {
     vlc_value_t val;
 
+    vlc_thread_ready( p_this );
+
     /* Now restart current video stream */
     var_Get( p_this->p_input, "video-es", &val );
     if( val.i_int >= 0 )
