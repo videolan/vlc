@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.10 2004/02/01 04:50:13 fenrir Exp $
+ * $Id: ts.c,v 1.11 2004/02/14 01:53:17 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -932,7 +932,7 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
     {
         msg_Warn( p_demux, "empty pes" );
     }
-};
+}
 
 static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {

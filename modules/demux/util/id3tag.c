@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: id3tag.c,v 1.20 2004/01/29 17:51:07 zorglub Exp $
+ * $Id: id3tag.c,v 1.21 2004/02/14 01:53:17 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -85,6 +85,7 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
 
     while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
+        int i_strings;
         playlist_item_t *p_item = playlist_ItemGetByPos( p_playlist, -1 );
         if( !p_item )
         {
@@ -94,7 +95,7 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
 
         vlc_mutex_lock( &p_item->lock );
 
-        int i_strings = id3_field_getnstrings( &p_frame->fields[1] );
+        i_strings = id3_field_getnstrings( &p_frame->fields[1] );
 
         while ( i_strings > 0 )
         {

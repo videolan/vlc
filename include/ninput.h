@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.27 2004/01/31 05:24:55 fenrir Exp $
+ * $Id: ninput.h,v 1.28 2004/02/14 01:53:17 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,7 +54,7 @@ enum es_out_query_e
     /* XXX XXX XXX Don't use them YET !!! */
     ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
-    ES_OUT_RESET_PCR,   /* no arg */
+    ES_OUT_RESET_PCR    /* no arg */
 };
 
 struct es_out_t
@@ -118,7 +118,7 @@ enum stream_query_e
 
     STREAM_GET_SIZE,            /**< arg1= int64_t *      res=cannot fail (0 if no sense)*/
 
-    STREAM_GET_MTU,             /**< arg1= int *          res=cannot fail (0 if no sense)*/
+    STREAM_GET_MTU              /**< arg1= int *          res=cannot fail (0 if no sense)*/
 };
 
 /**
@@ -133,7 +133,7 @@ struct stream_t
     int      (*pf_peek)   ( stream_t *, uint8_t **pp_peek, int i_peek );
     int      (*pf_control)( stream_t *, int i_query, va_list );
 
-    stream_sys_t    *p_sys;
+    stream_sys_t *p_sys;
 };
 
 /**
@@ -286,10 +286,10 @@ enum demux_query_e
 
 
 /* Demux */
-VLC_EXPORT( int,            demux_vaControl,        ( input_thread_t *, int i_query, va_list  ) );
-VLC_EXPORT( int,            demux_Control,          ( input_thread_t *, int i_query, ...  ) );
+VLC_EXPORT( int, demux_vaControl,        ( input_thread_t *, int i_query, va_list  ) );
+VLC_EXPORT( int, demux_Control,          ( input_thread_t *, int i_query, ...  ) );
 
-VLC_EXPORT( int,            demux_vaControlDefault, ( input_thread_t *, int i_query, va_list  ) );
+VLC_EXPORT( int, demux_vaControlDefault, ( input_thread_t *, int i_query, va_list  ) );
 
 
 /* New demux arch: don't touch that */
@@ -319,11 +319,10 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
 
 
 /* Subtitles */
-VLC_EXPORT( char **,        subtitles_Detect,       ( input_thread_t *, char* path, char *fname ) );
+VLC_EXPORT( char **, subtitles_Detect, ( input_thread_t *, char* path, char *fname ) );
 
 /**
  * @}
  */
 
 #endif
-
