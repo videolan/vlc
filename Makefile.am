@@ -67,7 +67,6 @@ HEADERS_include = \
 	include/configuration.h \
 	include/darwin_specific.h \
 	include/codecs.h \
-	include/error.h \
 	include/encoder.h \
 	include/input_ext-dec.h \
 	include/input_ext-intf.h \
@@ -90,6 +89,7 @@ HEADERS_include = \
 	include/vlc_common.h \
 	include/vlc_config.h \
 	include/vlc_cpu.h \
+	include/vlc_error.h \
 	include/vlc_interface.h \
 	include/vlc_messages.h \
 	include/vlc_objects.h \
