@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.55 2002/03/01 00:33:18 massiot Exp $
+ * $Id: modules.c,v 1.56 2002/03/01 16:07:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -258,9 +258,10 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
         struct module_s *p_module;
         struct module_list_s* p_next;
     } module_list_t;
-    struct module_list_s *p_list, *p_first;
+    struct module_list_s *p_list, *p_first, *p_tolock;
 
     int i_ret, i_index = 0;
+    boolean_t  b_intf = 0;
 
     module_t *p_module;
     char     *psz_realname = NULL;
@@ -325,25 +326,36 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
             }
         }
 
-        /* Test if we requested a particular intf plugin */
-#if 0
-        if( i_capability == MODULE_CAPABILITY_INTF
-             && p_module->psz_program != NULL
-             && strcmp( p_module->psz_program, p_main->psz_arg0 ) )
+        /* Special case: test if we requested a particular intf plugin */
+        if( i_capability == MODULE_CAPABILITY_INTF )
         {
-            continue;
+            if( p_module->psz_program != NULL
+                 && !strcmp( p_module->psz_program, p_main->psz_arg0 ) )
+            {
+                if( !b_intf ) 
+                {
+                    /* Remove previous non-matching plugins */
+                    i_index = 0;
+                    b_intf = 1;
+                }
+            }
+            else
+            {
+                if( b_intf )
+                {
+                    /* This one doesn't match */
+                    continue;
+                }
+            }
         }
-#endif
 
         /* Store this new module */
         p_list[ i_index ].p_module = p_module;
 
-        /* Lock it */
-        LockModule( p_module );
-
+        /* Add it to the modules-to-probe list */
         if( i_index == 0 )
         {
-            p_list[ i_index ].p_next = NULL;
+            p_list[ 0 ].p_next = NULL;
             p_first = p_list;
         }
         else
@@ -376,7 +388,15 @@ module_t * module_Need( int i_capability, char *psz_name, void *p_data )
         i_index++;
     }
 
-    /* We can release the global lock, module refcount were incremented */
+    /* Lock all selected modules */
+    p_tolock = p_first;
+    while( p_tolock != NULL )
+    {
+        LockModule( p_tolock->p_module );
+        p_tolock = p_tolock->p_next;
+    }
+
+    /* We can release the global lock, module refcounts were incremented */
     vlc_mutex_unlock( &p_module_bank->lock );
 
     /* Parse the linked list and use the first successful module */

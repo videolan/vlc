@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.7 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: kde.cpp,v 1.8 2002/03/01 16:07:00 sam Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -53,6 +53,7 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     SET_DESCRIPTION( "KDE interface module" )
     ADD_CAPABILITY( INTF, 80 )
+    ADD_SHORTCUT( "kde" )
     ADD_PROGRAM( "kvlc" )
 MODULE_INIT_STOP
 

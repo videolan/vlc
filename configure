@@ -1163,7 +1163,7 @@ fi
 fi
 
 
-ALL_LINGUAS="de fr ru"
+ALL_LINGUAS="de fr no ru"
 
 cat >> confdefs.h <<EOF
 #define PACKAGE "vlc"

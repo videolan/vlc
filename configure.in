@@ -34,7 +34,7 @@ dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 dnl Gettext stuff
-ALL_LINGUAS="de fr ru"
+ALL_LINGUAS="de fr no ru"
 
 AC_DEFINE_UNQUOTED(PACKAGE, "vlc")
 AC_DEFINE_UNQUOTED(VERSION, "$VLC_VERSION")

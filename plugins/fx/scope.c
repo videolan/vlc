@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.2 2002/02/27 22:57:10 sam Exp $
+ * $Id: scope.c,v 1.3 2002/03/01 16:07:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -35,8 +35,8 @@
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#define SCOPE_WIDTH 640
-#define SCOPE_HEIGHT 200
+#define SCOPE_WIDTH 320
+#define SCOPE_HEIGHT 240
 #define SCOPE_ASPECT (VOUT_ASPECT_FACTOR*SCOPE_WIDTH/SCOPE_HEIGHT)
 
 /*****************************************************************************
@@ -111,13 +111,37 @@ static int aout_Open( aout_thread_t *p_aout )
     if( p_aout->p_sys == NULL )
     {
         intf_ErrMsg("error: %s", strerror(ENOMEM) );
-        return( 1 );
+        return -1;
     }
 
+    /* Open video output */
     p_aout->p_sys->p_vout =
         vout_CreateThread( NULL, SCOPE_WIDTH, SCOPE_HEIGHT,
                            FOURCC_I420, SCOPE_ASPECT );
 
+    /* Open audio output  */
+    p_aout->p_sys->aout.i_format   = p_aout->i_format;
+    p_aout->p_sys->aout.i_rate     = p_aout->i_rate;
+    p_aout->p_sys->aout.i_channels = p_aout->i_channels;
+
+    p_aout->p_sys->aout.p_module = module_Need( MODULE_CAPABILITY_AOUT, "",
+                                    (void *)&p_aout->p_sys->aout );
+    if( p_aout->p_sys->aout.p_module == NULL )
+    {
+        intf_ErrMsg( "aout error: no suitable aout module" );
+        vout_DestroyThread( p_aout->p_sys->p_vout, NULL );
+        free( p_aout->p_sys );
+        return -1;
+    }
+
+#define aout_functions p_aout->p_sys->aout.p_module->p_functions->aout.functions.aout
+    p_aout->p_sys->aout.pf_open       = aout_functions.pf_open;
+    p_aout->p_sys->aout.pf_setformat  = aout_functions.pf_setformat;
+    p_aout->p_sys->aout.pf_getbufinfo = aout_functions.pf_getbufinfo;
+    p_aout->p_sys->aout.pf_play       = aout_functions.pf_play;
+    p_aout->p_sys->aout.pf_close      = aout_functions.pf_close;
+#undef aout_functions
+    
     return( 0 );
 }
 
@@ -126,15 +150,35 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
-    /* Force the output method */
-    p_aout->i_format = AOUT_FMT_U16_LE;
-    p_aout->i_channels = 2;
+    int i_ret;
 
+    /* Force the output method */
     p_aout->p_sys->aout.i_format = p_aout->i_format;
     p_aout->p_sys->aout.i_channels = p_aout->i_channels;
     p_aout->p_sys->aout.i_rate = p_aout->i_rate;
 
-    return( 0 );
+    /*
+     * Initialize audio device
+     */
+    i_ret = p_aout->p_sys->aout.pf_setformat( &p_aout->p_sys->aout );
+
+    if( i_ret )
+    {
+        return i_ret;
+    }
+
+    if( p_aout->p_sys->aout.i_format != p_aout->i_format
+         || p_aout->p_sys->aout.i_channels != p_aout->i_channels )
+    {
+        intf_ErrMsg( "aout error: plugin isn't cooperative" );
+        return 0;
+    }
+
+    p_aout->i_channels = p_aout->p_sys->aout.i_channels;
+    p_aout->i_format = p_aout->p_sys->aout.i_format;
+    p_aout->i_rate = p_aout->p_sys->aout.i_rate;
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -142,8 +186,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 {
-    /* arbitrary value that should be changed */
-    return( i_buffer_limit );
+    return p_aout->p_sys->aout.pf_getbufinfo( &p_aout->p_sys->aout,
+                                              i_buffer_limit );
 }
 
 /*****************************************************************************
@@ -154,67 +198,87 @@ static int aout_GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
 {
     picture_t *p_outpic;
-    int i_index;
-    u8 *p_pixel;
+    int i_index, i_image;
+    u8  *ppp_area[2][3];
     u16 *p_sample;
 
-    /* This is a new frame. Get a structure from the video_output. */
-    while( ( p_outpic = vout_CreatePicture( p_aout->p_sys->p_vout, 0, 0, 0 ) )
-              == NULL )
+    /* Play the real sound */
+    p_aout->p_sys->aout.pf_play( &p_aout->p_sys->aout, p_buffer, i_size );
+
+    for( i_image = 0; (i_image + 1) * SCOPE_WIDTH * 8 < i_size ; i_image++ )
     {
-        if( p_aout->b_die )
+        /* Don't stay here forever */
+        if( mdate() >= p_aout->date - 10000 )
         {
-            return;
+            break;
         }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }
 
-    /* Blank the picture */
-    for( i_index = 0 ; i_index < p_outpic->i_planes ; i_index++ )
-    {
-        memset( p_outpic->p[i_index].p_pixels, i_index ? 0x80 : 0x00,
-                p_outpic->p[i_index].i_lines * p_outpic->p[i_index].i_pitch );
-    }
-
-    /* Left channel */
-    for( i_index = 0, p_sample = (u16*)p_buffer;
-         i_index < SCOPE_WIDTH && i_index < i_size / 2;
-         i_index++ )
-    {
-        int i;
-        u8 i_value = *p_sample / 256;
-
-        for( i = 0 ; i < 8 ; i++ )
+        /* This is a new frame. Get a structure from the video_output. */
+        while( ( p_outpic = vout_CreatePicture( p_aout->p_sys->p_vout, 0, 0, 0 ) )
+                  == NULL )
         {
-            p_pixel = p_outpic->p[0].p_pixels + (p_outpic->p[0].i_pitch * i_index) / SCOPE_WIDTH + p_outpic->p[0].i_lines * (u8)(i_value+128) / 512 * p_outpic->p[0].i_pitch;
-            *p_pixel = 0x9f;
-            p_pixel = p_outpic->p[1].p_pixels + (p_outpic->p[1].i_pitch * i_index) / SCOPE_WIDTH + p_outpic->p[1].i_lines * (u8)(i_value+128) / 512 * p_outpic->p[1].i_pitch;
-            *p_pixel = 0x00;
-            p_sample += 2;
+            if( p_aout->b_die )
+            {
+                return;
+            }
+            msleep( VOUT_OUTMEM_SLEEP );
         }
-    }
 
-    /* Right channel */
-    for( i_index = 0, p_sample = (u16*)p_buffer + 1;
-         i_index < SCOPE_WIDTH && i_index < i_size / 2;
-         i_index++ )
-    {
-        int i;
-        u8 i_value = *p_sample / 256;
-
-        for( i = 0 ; i < 8 ; i++ )
+        /* Blank the picture */
+        for( i_index = 0 ; i_index < p_outpic->i_planes ; i_index++ )
         {
-            p_pixel = p_outpic->p[0].p_pixels + (p_outpic->p[0].i_pitch * i_index) / SCOPE_WIDTH + (p_outpic->p[0].i_lines * (u8)(i_value+128) / 512 + p_outpic->p[0].i_lines / 2) * p_outpic->p[0].i_pitch;
-            *p_pixel = 0x7f;
-            p_pixel = p_outpic->p[2].p_pixels + (p_outpic->p[2].i_pitch * i_index) / SCOPE_WIDTH + (p_outpic->p[2].i_lines * (u8)(i_value+128) / 512 + p_outpic->p[2].i_lines / 2) * p_outpic->p[2].i_pitch;
-            *p_pixel = 0xdd;
-            p_sample += 2;
+            memset( p_outpic->p[i_index].p_pixels, i_index ? 0x80 : 0x00,
+                    p_outpic->p[i_index].i_lines * p_outpic->p[i_index].i_pitch );
         }
-    }
 
-    /* Display the picture */
-    vout_DatePicture( p_aout->p_sys->p_vout, p_outpic, p_aout->date );
-    vout_DisplayPicture( p_aout->p_sys->p_vout, p_outpic );
+        /* We only support 2 channels for now */
+        for( i_index = 0 ; i_index < 2 ; i_index++ )
+        {
+           ppp_area[i_index][0] = p_outpic->p[0].p_pixels + i_index * p_outpic->p[0].i_lines / p_aout->i_channels * p_outpic->p[0].i_pitch;
+           ppp_area[i_index][1] = p_outpic->p[1].p_pixels + i_index * p_outpic->p[1].i_lines / p_aout->i_channels * p_outpic->p[1].i_pitch;
+           ppp_area[i_index][2] = p_outpic->p[2].p_pixels + i_index * p_outpic->p[2].i_lines / p_aout->i_channels * p_outpic->p[2].i_pitch;
+        }
+
+        for( i_index = 0, p_sample = (u16*)p_buffer;
+             i_index < SCOPE_WIDTH;
+             i_index++ )
+        {
+            int i;
+            u8 i_value;
+
+            for( i = 0 ; i < 2 ; i++ )
+            {
+                /* Left channel */
+                i_value = *p_sample++ / 256 + 128;
+                *(ppp_area[0][0]
+                   + p_outpic->p[0].i_pitch * i_index / SCOPE_WIDTH
+                   + p_outpic->p[0].i_lines * i_value / 512
+                       * p_outpic->p[0].i_pitch) = 0xbf;
+                *(ppp_area[0][1]
+                   + p_outpic->p[1].i_pitch * i_index / SCOPE_WIDTH
+                   + p_outpic->p[1].i_lines * i_value / 512
+                      * p_outpic->p[1].i_pitch) = 0xff;
+
+                /* Right channel */
+                i_value = *p_sample++ / 256 + 128;
+                *(ppp_area[1][0]
+                   + p_outpic->p[0].i_pitch * i_index / SCOPE_WIDTH
+                   + p_outpic->p[0].i_lines * i_value / 512
+                      * p_outpic->p[0].i_pitch) = 0x9f;
+                *(ppp_area[1][2]
+                   + p_outpic->p[2].i_pitch * i_index / SCOPE_WIDTH
+                   + p_outpic->p[2].i_lines * i_value / 512
+                      * p_outpic->p[2].i_pitch) = 0xdd;
+            }
+        }
+
+        /* Display the picture - FIXME: find a better date :-) */
+        vout_DatePicture( p_aout->p_sys->p_vout, p_outpic,
+                          p_aout->date + i_image * 10000 );
+        vout_DisplayPicture( p_aout->p_sys->p_vout, p_outpic );
+
+        p_buffer += SCOPE_WIDTH * 4;
+    }
 }
 
 /*****************************************************************************
@@ -222,6 +286,8 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *p_buffer, int i_size )
  *****************************************************************************/
 static void aout_Close( aout_thread_t *p_aout )
 {
+    p_aout->p_sys->aout.pf_close( &p_aout->p_sys->aout );
+    module_Unneed( p_aout->p_sys->aout.p_module );
     vout_DestroyThread( p_aout->p_sys->p_vout, NULL );
     free( p_aout->p_sys );
 }
