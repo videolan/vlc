@@ -343,6 +343,7 @@ static int Open( vlc_object_t * p_this )
                 MP4_Box_t *p_rdrf = MP4_BoxGet( p_rmra, "rmda[%d]/rdrf", i );
                 char      *psz_ref;
                 uint32_t  i_ref_type;
+                int       i_position = p_playlist->i_index;
 
                 if( !p_rdrf || !( psz_ref = p_rdrf->data.p_rdrf->psz_ref ) )
                 {
@@ -365,7 +366,7 @@ static int Open( vlc_object_t * p_this )
                     {
                         msg_Dbg( p_demux, "adding ref = `%s'", psz_ref );
                         playlist_Add( p_playlist, psz_ref, psz_ref,
-                                      PLAYLIST_APPEND, PLAYLIST_END );
+                                      PLAYLIST_APPEND, i_position );
                     }
                     else
                     {
@@ -388,7 +389,7 @@ static int Open( vlc_object_t * p_this )
                         strcat( psz_absolute, psz_ref );
                         msg_Dbg( p_demux, "adding ref = `%s'", psz_absolute );
                         playlist_Add( p_playlist, psz_absolute, psz_absolute,
-                                      PLAYLIST_APPEND, PLAYLIST_END );
+                                      PLAYLIST_APPEND, i_position );
                     }
                 }
                 else

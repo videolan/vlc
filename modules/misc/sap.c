@@ -445,9 +445,8 @@ static void Run( intf_thread_t *p_intf )
                    int i_pos = playlist_GetPositionById( p_playlist,
                               p_intf->p_sys->pp_announces[i]->i_id );
                    playlist_Delete( p_playlist, i_pos );
+                   vlc_object_release( p_playlist );
                }
-
-               vlc_object_release( p_playlist );
 
                /* Free the p_announce */
                p_announce =  p_intf->p_sys->pp_announces[i];
@@ -987,7 +986,7 @@ static sess_descr_t *  parse_sdp( vlc_object_t * p_parent, char *p_packet )
         char *psz_end;
 
         /* Search begin of field */
-        while( *p_packet == '\n' || *p_packet == ' ' || *p_packet == '\t' )
+        while( *p_packet == '\r' || *p_packet == '\n' || *p_packet == ' ' || *p_packet == '\t' )
         {
             p_packet++;
         }
@@ -1241,7 +1240,7 @@ static int Demux( demux_t *p_demux )
     }
     
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
-    i_position = p_playlist->i_index + 1;
+    i_position = p_playlist->i_index;
     
     /* Gather the complete sdp file */
     for( ;; )
@@ -1287,6 +1286,7 @@ static int Demux( demux_t *p_demux )
             i_id = playlist_Add( p_playlist, psz_uri, p_sd->psz_sessionname ,
                           PLAYLIST_CHECK_INSERT, i_position );
             free( psz_uri );
+            vlc_object_release( p_playlist );
             return 0;
         }
         
@@ -1303,6 +1303,7 @@ static int Demux( demux_t *p_demux )
 
             if( !p_sd->pp_media[i_count] )
             {
+                vlc_object_release( p_playlist );
                 return -1;
             }
 
@@ -1311,6 +1312,7 @@ static int Demux( demux_t *p_demux )
 
             if( !psz_proto || !psz_port )
             {
+                vlc_object_release( p_playlist );
                 return -1;
             }
 
@@ -1326,6 +1328,7 @@ static int Demux( demux_t *p_demux )
 
             if( psz_uri == NULL )
             {
+                vlc_object_release( p_playlist );
                 return -1;
             }
 
