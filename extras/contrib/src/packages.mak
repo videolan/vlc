@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.4 2003/12/07 20:47:19 hartman Exp $
+# $Id: packages.mak,v 1.5 2003/12/07 22:23:00 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -83,4 +83,7 @@ LIBDVBPSI_URL=http://www.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbp
 LIVEDOTCOM_VERSION=2003.11.06
 LIVEDOTCOM_URL=http://www.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
+LIBCACA_VERSION=0.2
+LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
+
 

@@ -22,3 +22,47 @@ diff -ru live/groupsock/NetInterface.cpp live-patched/groupsock/NetInterface.cpp
  #endif
  
  ////////// NetInterface //////////
+diff -ru live/liveMedia/MP3Internals.cpp live-patched/liveMedia/MP3Internals.cpp
+--- live/liveMedia/MP3Internals.cpp	Thu Nov  6 03:53:16 2003
++++ live-patched/liveMedia/MP3Internals.cpp	Sun Dec  7 23:10:46 2003
+@@ -27,7 +27,7 @@
+ 
+ // This is crufty old code that needs to be cleaned up #####
+ 
+-unsigned tabsel_123[2][3][16] = {
++unsigned live_tabsel_123[2][3][16] = {
+    { {32,32,64,96,128,160,192,224,256,288,320,352,384,416,448,448},
+      {32,32,48,56, 64, 80, 96,112,128,160,192,224,256,320,384,384},
+      {32,32,40,48, 56, 64, 80, 96,112,128,160,192,224,256,320,320} },
+@@ -36,9 +36,9 @@
+      {8,8,16,24,32,40,48,56,64,80,96,112,128,144,160,160},
+      {8,8,16,24,32,40,48,56,64,80,96,112,128,144,160,160} }
+ };
+-/* Note: tabsel_123[*][*][0 or 15] shouldn't occur; use dummy values there */
++/* Note: live_tabsel_123[*][*][0 or 15] shouldn't occur; use dummy values there */
+ 
+-long freqs[7] = { 44100, 48000, 32000, 22050, 24000, 16000 , 11025 };
++long live_freqs[7] = { 44100, 48000, 32000, 22050, 24000, 16000 , 11025 };
+ 
+ static double ispow[8207];
+ static double aa_ca[8], aa_cs[8];
+@@ -369,8 +369,8 @@
+ #endif
+   }
+ 
+-  bitrate = tabsel_123[isMPEG2][layer-1][bitrateIndex];
+-  samplingFreq = freqs[samplingFreqIndex];
++  bitrate = live_tabsel_123[isMPEG2][layer-1][bitrateIndex];
++  samplingFreq = live_freqs[samplingFreqIndex];
+   isStereo = (stereo > 1);
+   isFreeFormat = (bitrateIndex == 0);
+   frameSize
+@@ -831,7 +831,7 @@
+ static unsigned MP3BitrateToBitrateIndex(unsigned bitrate /* in kbps */,
+ 					 Boolean isMPEG2) {
+   for (unsigned i = 1; i < 15; ++i) {
+-    if (tabsel_123[isMPEG2][2][i] >= bitrate)
++    if (live_tabsel_123[isMPEG2][2][i] >= bitrate)
+       return i;
+   }
+ 

@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.7 2003/12/07 20:47:19 hartman Exp $
+# $Id: Makefile,v 1.8 2003/12/07 22:23:00 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -42,7 +42,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdplay .dvbpsi .live .goom
+	.dvdcss .dvdread .dvdplay .dvbpsi .live .goom .caca
 FORCE:
 
 # ***************************************************************************
@@ -668,6 +668,25 @@ CLEAN_FILE += .goom
 CLEAN_PKG += goom
 DISTCLEAN_PKG += goom-dj.tar.gz
 
+# ***************************************************************************
+# libcaca
+# ***************************************************************************
+
+libcaca-$(LIBCACA_VERSION).tar.gz:
+	$(WGET) $(LIBCACA_URL)
+
+libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.caca: libcaca
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .caca
+CLEAN_PKG += libcaca
+DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
+
+# ***************************************************************************
 # ***************************************************************************
 # Some cleansing
 # ***************************************************************************
