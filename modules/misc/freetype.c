@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.19 2003/08/17 23:11:55 sigmunau Exp $
+ * $Id: freetype.c,v 1.20 2003/08/27 12:24:52 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -337,39 +337,21 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
 #define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ]
-                    pen_y--;
                     for(y = 0; y < p_glyph->bitmap.rows; y++ )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
                         {
+                            pen_y--;
                             pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                            pen_y++; pen_x--;
+                            pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                            pen_x += 2;
+                            pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                            pen_y++; pen_x--;
+                            pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                            pen_y--;
                         }
                     }
-                    pen_y++; pen_x--;
-                    for(y = 0; y < p_glyph->bitmap.rows; y++ )
-                    {
-                        for( x = 0; x < p_glyph->bitmap.width; x++ )
-                        {
-                            pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                        }
-                    }
-                    pen_x += 2;
-                    for(y = 0; y < p_glyph->bitmap.rows; y++ )
-                    {
-                        for( x = 0; x < p_glyph->bitmap.width; x++ )
-                        {
-                            pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                        }
-                    }
-                    pen_y++; pen_x--;
-                    for(y = 0; y < p_glyph->bitmap.rows; y++ )
-                    {
-                        for( x = 0; x < p_glyph->bitmap.width; x++ )
-                        {
-                            pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                        }
-                    }
-                    pen_y--;
                     for(y = 0; y < p_glyph->bitmap.rows; y++ )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
@@ -478,39 +460,21 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
 #define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + 2 * ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) ]
-            pen_y--;
             for(y = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
+                    pen_y--;
                     pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                    pen_y++; pen_x--;
+                    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                    pen_x += 2;
+                    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                    pen_y++; pen_x--;
+                    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
+                    pen_y--;
                 }
             }
-            pen_y++; pen_x--;
-            for(y = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( x = 0; x < p_glyph->bitmap.width; x++ )
-                {
-                    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                }
-            }
-            pen_x += 2;
-            for(y = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( x = 0; x < p_glyph->bitmap.width; x++ )
-                {
-                    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                }
-            }
-            pen_y++; pen_x--;
-            for(y = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( x = 0; x < p_glyph->bitmap.width; x++ )
-                {
-                    pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                }
-            }
-            pen_y--;
             for(y = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
@@ -575,47 +539,29 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 #define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
 #define pixel( c ) p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pitch + ( x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ) * 4 + c ]
-            pen_y--;
             for(y = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
+                    pen_y--;
                     pixel( 0 ) = ( ( pixel( 0 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 1 ) = ( ( pixel( 1 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 2 ) = ( ( pixel( 2 ) * ( 255 - alpha ) ) >> 8 );
-                }
-            }
-            pen_y++; pen_x--;
-            for(y = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( x = 0; x < p_glyph->bitmap.width; x++ )
-                {
+                    pen_y++; pen_x--;
                     pixel( 0 ) = ( ( pixel( 0 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 1 ) = ( ( pixel( 1 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 2 ) = ( ( pixel( 2 ) * ( 255 - alpha ) ) >> 8 );
-                }
-            }
-            pen_x += 2;
-            for(y = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( x = 0; x < p_glyph->bitmap.width; x++ )
-                {
+                    pen_x += 2;
                     pixel( 0 ) = ( ( pixel( 0 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 1 ) = ( ( pixel( 1 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 2 ) = ( ( pixel( 2 ) * ( 255 - alpha ) ) >> 8 );
-                }
-            }
-            pen_y++; pen_x--;
-            for(y = 0; y < p_glyph->bitmap.rows; y++ )
-            {
-                for( x = 0; x < p_glyph->bitmap.width; x++ )
-                {
+                    pen_y++; pen_x--;
                     pixel( 0 ) = ( ( pixel( 0 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 1 ) = ( ( pixel( 1 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 2 ) = ( ( pixel( 2 ) * ( 255 - alpha ) ) >> 8 );
+                    pen_y--;
                 }
             }
-            pen_y--;
             for(y = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
@@ -803,11 +749,6 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     result.y += line.yMax - line.yMin;
     p_string->i_height = result.y;
     p_string->i_width = result.x;
-    msg_Dbg( p_vout, "string height is %d, width is %d",
-             p_string->i_height, p_string->i_width );
-    msg_Dbg( p_vout, "adding string \"%s\" at (%d,%d) start_date "I64Fd
-             " end_date" I64Fd, p_string->psz_text, p_string->i_x_margin,
-             p_string->i_y_margin, i_start, i_stop );
     vout_DisplaySubPicture( p_vout, p_subpic );
     return VLC_SUCCESS;
 
