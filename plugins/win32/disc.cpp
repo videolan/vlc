@@ -45,6 +45,7 @@ extern  struct intf_thread_s *p_intfGlobal;
 __fastcall TDiscDlg::TDiscDlg( TComponent* Owner )
         : TForm( Owner )
 {
+    /* Simulate a click to get the correct device name */
     RadioGroupTypeClick( RadioGroupType );
 }
 //---------------------------------------------------------------------------

@@ -185,6 +185,11 @@ void __fastcall TMainFrameDlg::MenuExitClick( TObject *Sender )
     Close();
 }
 //---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::MenuHideinterfaceClick( TObject *Sender )
+{
+     this->SendToBack();
+}
+//---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MenuFullscreenClick( TObject *Sender )
 {
     if( p_vout_bank->i_count )

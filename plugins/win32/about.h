@@ -40,6 +40,7 @@ __published:	// IDE-managed Components
     TBitBtn *BitBtnOk;
     TLabel *Label3;
     TImage *Image1;
+    TLabel *Label5;
 private:	// User declarations
 public:		// User declarations
     __fastcall TAboutDlg( TComponent* Owner );

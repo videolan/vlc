@@ -3,7 +3,7 @@ object AboutDlg: TAboutDlg
   Top = 281
   BorderStyle = bsDialog
   Caption = 'About'
-  ClientHeight = 204
+  ClientHeight = 214
   ClientWidth = 286
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -267,12 +267,13 @@ object AboutDlg: TAboutDlg
   end
   object Label4: TLabel
     Left = 15
-    Top = 115
-    Width = 255
+    Top = 123
+    Width = 253
     Height = 39
     Caption = 
-      'This is the VideoLAN Client, a DVD and MPEG player. It can play ' +
-      'MPEG and MPEG 2 files from a file or from a network source.'
+      'This is the VideoLAN Client, a DVD, MPEG and DivX player. It can' +
+      ' play MPEG and MPEG 2 files from a file or from a network source' +
+      '.'
     WordWrap = True
   end
   object Label3: TLabel
@@ -288,9 +289,16 @@ object AboutDlg: TAboutDlg
     Width = 49
     Height = 49
   end
+  object Label5: TLabel
+    Left = 82
+    Top = 96
+    Width = 121
+    Height = 13
+    Caption = 'http://www.videolan.org/'
+  end
   object BitBtnOk: TBitBtn
     Left = 64
-    Top = 170
+    Top = 178
     Width = 145
     Height = 25
     Caption = 'OK'

@@ -160,8 +160,15 @@ void __fastcall TNetworkDlg::BitBtnOkClick( TObject *Sender )
             config_PutIntVariable( "network-channel", FALSE );
             Address = EditHTTPURL->Text;
 
-            /* Build source name */
-            Source = "http:" + Address;
+            /* Build source name with a basic test */
+            if( Address.SubString( 1, 4 ) == "http" )
+            {
+                Source = Address;
+            }
+            else
+            {
+                Source = "http://" + Address;
+            }
 
             intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, Source.c_str() );
 

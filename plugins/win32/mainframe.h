@@ -135,6 +135,7 @@ __published:	// IDE-managed Components
     TMenuItem *PopupClose;
     TMenuItem *N9;
     TCSpinEdit *SpinEditChannel;
+        TToolButton *ToolButton1;
     void __fastcall TimerManageTimer( TObject *Sender );
     void __fastcall TrackBarChange( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );
@@ -142,6 +143,7 @@ __published:	// IDE-managed Components
     void __fastcall MenuOpenDiscClick( TObject *Sender );
     void __fastcall MenuNetworkStreamClick( TObject *Sender );
     void __fastcall MenuExitClick( TObject *Sender );
+    void __fastcall MenuHideinterfaceClick( TObject *Sender );
     void __fastcall MenuFullscreenClick( TObject *Sender );
     void __fastcall MenuPlaylistClick( TObject *Sender );
     void __fastcall MenuMessagesClick( TObject *Sender );

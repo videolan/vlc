@@ -11,8 +11,8 @@
     <RESDEPEN value="$(RESFILES) mainframe.dfm network.dfm playlist.dfm preferences.dfm 
       about.dfm disc.dfm messages.dfm"/>
     <LIBFILES value=""/>
-    <LIBRARIES value="VCL50.lib"/>
-    <SPARELIBS value="VCL50.lib"/>
+    <LIBRARIES value="VCLX50.lib bcbsmp50.lib VCL50.lib"/>
+    <SPARELIBS value="VCL50.lib bcbsmp50.lib VCLX50.lib"/>
     <PACKAGES value="VCL50.bpi VCLX50.bpi bcbsmp50.bpi QRPT50.bpi VCLDB50.bpi VCLBDE50.bpi 
       ibsmp50.bpi VCLDBX50.bpi TEEUI50.bpi TEEDB50.bpi TEE50.bpi TEEQR50.bpi 
       VCLIB50.bpi bcbie50.bpi VCLIE50.bpi INETDB50.bpi INET50.bpi NMFAST50.bpi"/>
