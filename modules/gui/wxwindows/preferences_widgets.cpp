@@ -445,19 +445,41 @@ wxString ModuleListCatConfigControl::GetPszValue()
 
 void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
 {
-    wxString newtext = wxU("");
+    bool b_waschecked = false;
+    wxString newtext =  text->GetValue();
+    
     for( unsigned int i = 0 ; i< pp_checkboxes.size() ; i++ )
     {
-        if( pp_checkboxes[i]->checkbox->IsChecked() )
+        b_waschecked = newtext.Find( wxU(pp_checkboxes[i]->psz_module)) != -1 ;
+        /* For some reasons, ^^ doesn't compile :( */
+        if( (pp_checkboxes[i]->checkbox->IsChecked() && ! b_waschecked )||
+			(! pp_checkboxes[i]->checkbox->IsChecked() && b_waschecked) )
         {
-            if( newtext.Len() == 0 )
+            if( b_waschecked )
             {
-                newtext = newtext + wxU( pp_checkboxes[i]->psz_module );
+                /* Maybe not the clest solution */
+                if( ! newtext.Replace(wxU(",")
+                                      +wxU(pp_checkboxes[i]->psz_module),
+                                      wxU("")))
+                {
+                    if( ! newtext.Replace(wxU(pp_checkboxes[i]->psz_module)
+                                           + wxU(","),wxU("")))
+		    { 
+                        newtext.Replace(wxU(pp_checkboxes[i]->psz_module),wxU(""));
+                    }
+                }
             }
             else
             {
-                newtext += wxU( "," );
-                newtext += wxU(pp_checkboxes[i]->psz_module);
+                if( newtext.Len() == 0 )
+                {
+                    newtext = wxU(pp_checkboxes[i]->psz_module);
+                }
+                else
+                {
+                    newtext += wxU( "," );
+                    newtext += wxU(pp_checkboxes[i]->psz_module);
+                }
             }
         }
     }
