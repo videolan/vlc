@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: logo.c,v 1.3 2003/09/18 21:42:54 garf Exp $
+ * $Id: logo.c,v 1.4 2003/10/15 22:49:48 gbazin Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -276,7 +276,9 @@ static int Init( vout_thread_t *p_vout )
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-    
+
+    ADD_PARENT_CALLBACKS( SendEventsToChild );
+
     p_vout->p_sys->posx = config_GetInt( p_vout, "logo_x" );
     p_vout->p_sys->posy = config_GetInt( p_vout, "logo_y" );
     p_vout->p_sys->trans = (int)(config_GetFloat( p_vout, "logo_transparency" ) * 255);
@@ -327,6 +329,8 @@ static void End( vout_thread_t *p_vout )
 static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
 
     free( p_vout->p_sys );
 }
@@ -497,5 +501,16 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     #undef height
     #undef trans
 
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * SendEventsToChild: forward events to the child/children vout
+ *****************************************************************************/
+static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
     return VLC_SUCCESS;
 }

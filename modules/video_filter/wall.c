@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: wall.c,v 1.10 2003/05/15 22:27:37 massiot Exp $
+ * $Id: wall.c,v 1.11 2003/10/15 22:49:48 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -273,6 +273,8 @@ static int Init( vout_thread_t *p_vout )
 
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
+    ADD_PARENT_CALLBACKS( SendEventsToChild );
+
     return VLC_SUCCESS;
 }
 
@@ -301,6 +303,8 @@ static void Destroy( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     RemoveAllVout( p_vout );
+
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
 
     free( p_vout->p_sys->pp_vout );
     free( p_vout->p_sys );
@@ -474,3 +478,24 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * SendEventsToChild: forward events to the child/children vout
+ *****************************************************************************/
+static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    int i_row, i_col, i_vout = 0;
+
+    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
+    {
+        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        {
+            var_Set( p_vout->p_sys->pp_vout[ i_vout ].p_vout, psz_var, newval);
+            if( !strcmp( psz_var, "fullscreen" ) ) break;
+            i_vout++;
+        }
+    }
+
+    return VLC_SUCCESS;
+}

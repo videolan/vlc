@@ -2,7 +2,7 @@
  * filter_common.h: Common filter functions
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: filter_common.h,v 1.2 2003/01/17 16:18:03 sam Exp $
+ * $Id: filter_common.h,v 1.3 2003/10/15 22:49:48 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,7 +61,20 @@
         I_OUTPUTPICTURES++;                                                   \
     }                                                                         \
 
+/*****************************************************************************
+ * SetParentVal: forward variable value to parent whithout triggering the
+ *               callback
+ *****************************************************************************/
+static int SetParentVal( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    var_Change( (vlc_object_t *)p_data, psz_var, VLC_VAR_SETVALUE,
+                 &newval, NULL );
+    return VLC_SUCCESS;
+}
+
 #define ADD_CALLBACKS( newvout, handler ) \
+    var_AddCallback( newvout, "fullscreen", SetParentVal, p_vout );           \
     var_AddCallback( newvout, "mouse-x", SendEvents, p_vout );                \
     var_AddCallback( newvout, "mouse-y", SendEvents, p_vout );                \
     var_AddCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
@@ -69,9 +82,22 @@
     var_AddCallback( newvout, "key-pressed", SendEvents, p_vout )
 
 #define DEL_CALLBACKS( newvout, handler ) \
+    var_DelCallback( newvout, "fullscreen", SetParentVal, p_vout );           \
     var_DelCallback( newvout, "mouse-x", SendEvents, p_vout );                \
     var_DelCallback( newvout, "mouse-y", SendEvents, p_vout );                \
     var_DelCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
     var_DelCallback( newvout, "mouse-clicked", SendEvents, p_vout );          \
     var_DelCallback( newvout, "key-pressed", SendEvents, p_vout )
 
+#define ADD_PARENT_CALLBACKS( handler ) \
+    var_AddCallback( p_vout, "fullscreen", handler, NULL );                   \
+    var_AddCallback( p_vout, "aspect-ratio", handler, NULL );                 \
+    var_AddCallback( p_vout, "crop", handler, NULL );
+
+#define DEL_PARENT_CALLBACKS( handler ) \
+    var_DelCallback( p_vout, "fullscreen", handler, NULL );                   \
+    var_DelCallback( p_vout, "aspect-ratio", handler, NULL );                 \
+    var_DelCallback( p_vout, "crop", handler, NULL );
+
+static int  SendEventsToChild( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );

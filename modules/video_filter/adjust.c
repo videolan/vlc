@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: adjust.c,v 1.13 2003/05/26 01:25:12 hartman Exp $
+ * $Id: adjust.c,v 1.14 2003/10/15 22:49:48 gbazin Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>
  *
@@ -156,6 +156,8 @@ static int Init( vout_thread_t *p_vout )
 
     ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
 
+    ADD_PARENT_CALLBACKS( SendEventsToChild );
+
     return VLC_SUCCESS;
 }
 
@@ -186,6 +188,8 @@ static void Destroy( vlc_object_t *p_this )
     DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
     vlc_object_detach( p_vout->p_sys->p_vout );
     vout_Destroy( p_vout->p_sys->p_vout );
+
+    DEL_PARENT_CALLBACKS( SendEventsToChild );
 
     free( p_vout->p_sys );
 }
@@ -379,3 +383,13 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * SendEventsToChild: forward events to the child/children vout
+ *****************************************************************************/
+static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
+    return VLC_SUCCESS;
+}
