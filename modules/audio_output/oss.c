@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.31 2002/10/24 17:36:42 gbazin Exp $
+ * $Id: oss.c,v 1.32 2002/10/25 15:21:42 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,16 +63,14 @@ struct aout_sys_t
 {
     int i_fd;
     int b_workaround_buggy_driver;
+    int i_fragstotal;
+    mtime_t max_buffer_duration;
 };
 
 /* This must be a power of 2. */
 #define FRAME_SIZE 1024
-#define FRAME_COUNT 8
+#define FRAME_COUNT 4
 #define A52_FRAME_NB 1536
-
-/* estimation of the size of the internal soundcard driver
- * (used for buggy drivers) */
-#define OSS_BUFFER_SIZE 20000
 
 /*****************************************************************************
  * Local prototypes
@@ -82,6 +80,8 @@ static void Close        ( vlc_object_t * );
 
 static void Play         ( aout_instance_t * );
 static int  OSSThread    ( aout_instance_t * );
+
+static mtime_t BufferDuration( aout_instance_t * p_aout );
 
 /*****************************************************************************
  * Module descriptor
@@ -131,23 +131,15 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_aout->output.p_sys->b_workaround_buggy_driver =
-        config_GetInt( p_aout, "oss-buggy" );
-
-    if( p_aout->output.p_sys->b_workaround_buggy_driver )
-        p_sys->i_fd = open( psz_device, O_WRONLY|O_NONBLOCK );
-    else
-        p_sys->i_fd = open( psz_device, O_WRONLY );
-
     /* Open the sound device */
+    p_sys->i_fd = open( psz_device, O_WRONLY );
+    free( psz_device );
     if( p_sys->i_fd < 0 )
     {
         msg_Err( p_aout, "cannot open audio device (%s)", psz_device );
-        free( psz_device );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    free( psz_device );
 
     p_aout->output.pf_play = Play;
 
@@ -187,6 +179,7 @@ static int Open( vlc_object_t *p_this )
         int i_frame_size, i_fragments;
         int i_rate;
         int i_nb_channels;
+        audio_buf_info audio_buf;
 
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
         {
@@ -222,26 +215,6 @@ static int Open( vlc_object_t *p_this )
             close( p_sys->i_fd );
             free( p_sys );
             return VLC_EGENERIC;
-        }
-
-        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-        p_aout->output.i_nb_samples = FRAME_SIZE;
-
-        aout_VolumeSoftInit( p_aout );
-
-        /* Set the fragment size
-         * i_fragment = xxxxyyyy where: xxxx        is fragtotal
-         *                              1 << yyyy   is fragsize */
-        i_fragments = 0;
-        i_frame_size = FRAME_SIZE;
-        while( i_frame_size >>= 1 )
-        {
-            ++i_fragments;
-        }
-        i_fragments |= FRAME_COUNT << 16;
-        if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFRAGMENT, &i_fragments ) < 0 )
-        {
-            msg_Warn( p_aout, "cannot set fragment size (%.8x)", i_fragments );
         }
 
         /* These cases are desperate because of the OSS API and A/52 spec. */
@@ -353,6 +326,48 @@ static int Open( vlc_object_t *p_this )
         {
             p_aout->output.output.i_rate = i_rate;
         }
+
+        /* Set the fragment size */
+        aout_FormatPrepare( &p_aout->output.output );
+
+        /* i_fragment = xxxxyyyy where: xxxx        is fragtotal
+         *                              1 << yyyy   is fragsize */
+        i_fragments = 0;
+        i_frame_size = FRAME_SIZE * p_aout->output.output.i_bytes_per_frame;
+        while( i_frame_size >>= 1 )
+        {
+            ++i_fragments;
+        }
+        i_fragments |= FRAME_COUNT << 16;
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFRAGMENT, &i_fragments ) < 0 )
+        {
+            msg_Warn( p_aout, "cannot set fragment size (%.8x)", i_fragments );
+        }
+
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_GETOSPACE, &audio_buf ) < 0 )
+        {
+            msg_Warn( p_aout, "cannot get fragment size" );
+            close( p_sys->i_fd );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+	else
+        {
+            /* Number of fragments actually allocated */
+            p_aout->output.p_sys->i_fragstotal = audio_buf.fragstotal;
+
+            /* Maximum duration the soundcard's buffer can hold */
+            p_aout->output.p_sys->max_buffer_duration =
+                (mtime_t)audio_buf.fragstotal * audio_buf.fragsize * 1000000
+                / p_aout->output.output.i_bytes_per_frame
+                / p_aout->output.output.i_rate
+                * p_aout->output.output.i_frame_length;
+
+            p_aout->output.i_nb_samples = audio_buf.fragsize /
+                p_aout->output.output.i_bytes_per_frame;
+        }
+
+        aout_VolumeSoftInit( p_aout );
     }
 
     /* Create OSS thread and wait for its readiness. */
@@ -361,10 +376,12 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "cannot create OSS thread (%s)", strerror(errno) );
         close( p_sys->i_fd );
-        free( psz_device );
         free( p_sys );
         return VLC_ETHREAD;
     }
+
+    p_aout->output.p_sys->b_workaround_buggy_driver =
+        config_GetInt( p_aout, "oss-buggy" );
 
     return VLC_SUCCESS;
 }
@@ -393,7 +410,6 @@ static void Close( vlc_object_t * p_this )
 
     free( p_sys );
 }
-
 
 /*****************************************************************************
  * BufferDuration: buffer status query
@@ -443,12 +459,16 @@ static int OSSThread( aout_instance_t * p_aout )
 
             if( p_aout->output.p_sys->b_workaround_buggy_driver )
             {
+#define i_fragstotal p_aout->output.p_sys->i_fragstotal
                 /* Wait a bit - we don't want our buffer to be full */
-                while( buffered > OSS_BUFFER_SIZE )
+                if( buffered > (p_aout->output.p_sys->max_buffer_duration
+                                / i_fragstotal * (i_fragstotal - 1)) )
                 {
-                    msleep( buffered - OSS_BUFFER_SIZE * 2 );
+                    msleep((p_aout->output.p_sys->max_buffer_duration
+                                / i_fragstotal ));
                     buffered = BufferDuration( p_aout );
                 }
+#undef i_fragstotal
             }
 
             if( !next_date )
