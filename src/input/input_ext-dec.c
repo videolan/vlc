@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.16 2001/05/08 00:43:57 sam Exp $
+ * $Id: input_ext-dec.c,v 1.17 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,8 +39,7 @@
 #include "stream_control.h"
 #include "input_ext-dec.h"
 #include "input_ext-intf.h"
-
-#include "input.h"
+#include "input_ext-plugins.h"
 
 /*****************************************************************************
  * InitBitstream: initialize a bit_stream_t structure

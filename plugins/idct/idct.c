@@ -2,7 +2,7 @@
  * idct.c : IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.c,v 1.12 2001/07/11 02:01:04 sam Exp $
+ * $Id: idct.c,v 1.13 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -40,7 +40,7 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "video_decoder.h"
+#include "vdec_ext-plugins.h"
 
 #include "vdec_block.h"
 #include "vdec_idct.h"
@@ -121,8 +121,7 @@ static void vdec_NormScan( u8 ppi_scan[2][64] )
 /*****************************************************************************
  * vdec_IDCT : IDCT function for normal matrices
  *****************************************************************************/
-void _M( vdec_IDCT )( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                int i_idontcare )
+void _M( vdec_IDCT )( void * p_idct_data, dctelem_t * p_block, int i_idontcare )
 {
     s32 tmp0, tmp1, tmp2, tmp3;
     s32 tmp10, tmp11, tmp12, tmp13;

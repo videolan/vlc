@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.9 2001/07/11 02:01:04 sam Exp $
+ * $Id: idctaltivec.c,v 1.10 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,10 +39,10 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "video_decoder.h"
-
 #include "modules.h"
 #include "modules_inner.h"
+
+#include "vdec_ext-plugins.h"
 
 #include "vdec_block.h"
 #include "vdec_idct.h"
@@ -128,8 +128,7 @@ static void vdec_NormScan( u8 ppi_scan[2][64] )
 /*****************************************************************************
  * vdec_IDCT :
  *****************************************************************************/
-void _M( vdec_IDCT )( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                int i_idontcare )
+void _M( vdec_IDCT )( void * p_idct_data, dctelem_t * p_block, int i_idontcare )
 {
     IDCT( p_block, p_block );
 }

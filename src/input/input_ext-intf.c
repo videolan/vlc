@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.25 2001/07/08 17:45:52 gbazin Exp $
+ * $Id: input_ext-intf.c,v 1.26 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,8 +39,7 @@
 #include "stream_control.h"
 #include "input_ext-dec.h"
 #include "input_ext-intf.h"
-
-#include "input.h"
+#include "input_ext-plugins.h"
 
 /*****************************************************************************
  * input_SetStatus: change the reading status

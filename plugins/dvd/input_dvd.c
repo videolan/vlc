@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.79 2001/07/11 02:01:04 sam Exp $
+ * $Id: input_dvd.c,v 1.80 2001/07/17 09:48:07 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -80,14 +80,12 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
-
-#include "input.h"
+#include "input_ext-plugins.h"
 
 #include "input_dvd.h"
 #include "dvd_netlist.h"
 #include "dvd_ifo.h"
 #include "dvd_summary.h"
-#include "mpeg_system.h"
 
 #include "debug.h"
 

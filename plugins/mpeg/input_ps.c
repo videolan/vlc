@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.29 2001/06/27 09:53:56 massiot Exp $
+ * $Id: input_ps.c,v 1.30 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -62,11 +62,9 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
-
-#include "input.h"
+#include "input_ext-plugins.h"
 
 #include "input_ps.h"
-#include "mpeg_system.h"
 
 #include "debug.h"
 

@@ -2,7 +2,7 @@
  * vdec_block_h: Macroblock copy functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block.h,v 1.2 2001/05/30 17:03:12 sam Exp $
+ * $Id: vdec_block.h,v 1.3 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,7 +47,8 @@ void _M( vdec_DecodeMacroblockBW ) ( struct vdec_thread_s *p_vdec,
             /*                                                          \
              * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
              */                                                         \
-            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
+            (p_mb->pf_idct[i_b])( p_vdec->p_idct_data,                  \
+                                  p_mb->ppi_blocks[i_b],                \
                                   p_mb->pi_sparse_pos[i_b] );           \
                                                                         \
             /*                                                          \
@@ -68,7 +69,8 @@ void _M( vdec_DecodeMacroblockBW ) ( struct vdec_thread_s *p_vdec,
             /*                                                          \
              * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
              */                                                         \
-            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
+            (p_mb->pf_idct[i_b])( p_vdec->p_idct_data,                  \
+                                  p_mb->ppi_blocks[i_b],                \
                                   p_mb->pi_sparse_pos[i_b] );           \
                                                                         \
             /*                                                          \
@@ -95,7 +97,8 @@ void _M( vdec_DecodeMacroblockBW ) ( struct vdec_thread_s *p_vdec,
             /*                                                          \
              * Inverse DCT (ISO/IEC 13818-2 section Annex A)            \
              */                                                         \
-            (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],        \
+            (p_mb->pf_idct[i_b])( p_vdec->p_idct_data,                  \
+                                  p_mb->ppi_blocks[i_b],                \
                                   p_mb->pi_sparse_pos[i_b] );           \
                                                                         \
             /*                                                          \

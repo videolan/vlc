@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.35 2001/05/30 17:03:11 sam Exp $
+ * $Id: video_parser.h,v 1.10 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -88,11 +88,6 @@ typedef struct vpar_thread_s
     /* Thread properties and locks */
     vlc_thread_t        thread_id;                /* id for thread functions */
 
-    /* Thread configuration */
-    /* XXX?? */
-//    int *pi_status;
-
-
     /* Input properties */
     decoder_fifo_t *    p_fifo;                            /* PES input fifo */
     vdec_config_t *     p_config;
@@ -138,8 +133,8 @@ typedef struct vpar_thread_s
     /* IDCT plugin used and shortcuts to access its capabilities */
     struct module_s *           p_idct_module;
     void ( * pf_idct_init )   ( struct vdec_thread_s * );
-    void ( * pf_sparse_idct ) ( struct vdec_thread_s *, dctelem_t*, int );
-    void ( * pf_idct )        ( struct vdec_thread_s *, dctelem_t*, int );
+    void ( * pf_sparse_idct ) ( void *, dctelem_t*, int );
+    void ( * pf_idct )        ( void *, dctelem_t*, int );
     void ( * pf_norm_scan )   ( u8 ppi_scan[2][64] );
     void ( * pf_decode_init ) ( struct vdec_thread_s * );
     void ( * pf_decode_mb_c ) ( struct vdec_thread_s *, struct macroblock_s * );

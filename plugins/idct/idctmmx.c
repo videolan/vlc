@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.14 2001/07/11 02:01:04 sam Exp $
+ * $Id: idctmmx.c,v 1.15 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -43,10 +43,10 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "video_decoder.h"
-
 #include "modules.h"
 #include "modules_inner.h"
+
+#include "vdec_ext-plugins.h"
 
 #include "vdec_block.h"
 #include "vdec_idct.h"
@@ -434,8 +434,7 @@ static s32 rounder3[] ATTR_ALIGN(8) =
 static s32 rounder5[] ATTR_ALIGN(8) =
     rounder (-0.441341716183);  // C3*(-C5/C4+C5-C3)/2
 
-void _M( vdec_IDCT )( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                      int i_idontcare )
+void _M( vdec_IDCT )( void * p_idct_data, dctelem_t * p_block, int i_idontcare )
 {
     static dctelem_t table04[] ATTR_ALIGN(16) =
         table (22725, 21407, 19266, 16384, 12873,  8867, 4520);

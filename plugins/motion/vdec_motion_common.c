@@ -2,7 +2,7 @@
  * vdec_motion_common.c : common motion compensation routines common
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_common.c,v 1.8 2001/06/07 15:27:44 sam Exp $
+ * $Id: vdec_motion_common.c,v 1.9 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -44,8 +44,7 @@
 
 #include "video.h"
 
-#include "vdec_motion.h"
-#include "vpar_blocks.h"
+#include "vdec_ext-plugins.h"
 
 #include "modules.h"
 #include "modules_export.h"

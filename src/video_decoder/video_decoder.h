@@ -2,7 +2,7 @@
  * video_decoder.h : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.h,v 1.24 2001/05/30 17:03:11 sam Exp $
+ * $Id: video_decoder.h,v 1.3 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,37 +34,6 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * vdec_thread_t: video decoder thread descriptor
- *****************************************************************************
- * XXX??
- *****************************************************************************/
-typedef struct vdec_thread_s
-{
-    /* Thread properties and locks */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_run;                                 /* `run' flag */
-    boolean_t           b_error;                             /* `error' flag */
-    boolean_t           b_active;                           /* `active' flag */
-    vlc_thread_t        thread_id;                /* id for thread functions */
-
-    /* Thread configuration */
-    /* XXX?? */
-//    int *pi_status;
-
-    /* idct iformations */
-    dctelem_t              p_pre_idct[64*64];
-
-    /* Macroblock copy functions */
-    void ( * pf_decode_init ) ( struct vdec_thread_s * );
-    void ( * pf_decode_mb_c ) ( struct vdec_thread_s *, struct macroblock_s * );
-    void ( * pf_decode_mb_bw )( struct vdec_thread_s *, struct macroblock_s * );
-
-    /* Input properties */
-    struct vpar_thread_s * p_vpar;                    /* video_parser thread */
-
-} vdec_thread_t;
-
-/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 struct vpar_thread_s;
@@ -80,8 +49,6 @@ void            vdec_DecodeMacroblockC  ( struct vdec_thread_s *p_vdec,
                                           struct macroblock_s *p_mb );
 void            vdec_DecodeMacroblockBW ( struct vdec_thread_s *p_vdec,
                                           struct macroblock_s *p_mb );
-vdec_thread_t * vdec_CreateThread       ( struct vpar_thread_s *p_vpar /*,
-                                          int *pi_status */ );
-void            vdec_DestroyThread      ( vdec_thread_t *p_vdec /*,
-                                          int *pi_status */ );
+struct vdec_thread_s * vdec_CreateThread( struct vpar_thread_s *p_vpar );
+void            vdec_DestroyThread      ( struct vdec_thread_s *p_vdec );
 

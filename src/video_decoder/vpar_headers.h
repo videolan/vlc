@@ -2,7 +2,7 @@
  * vpar_headers.h : video parser : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.h,v 1.26 2001/05/06 04:32:02 sam Exp $
+ * $Id: vpar_headers.h,v 1.8 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -176,11 +176,6 @@ typedef struct picture_parsing_s
 #define B_CODING_TYPE           3
 #define D_CODING_TYPE           4 /* MPEG-1 ONLY */
 /* other values are reserved */
-
-/* Structures */
-#define TOP_FIELD               1
-#define BOTTOM_FIELD            2
-#define FRAME_STRUCTURE         3
 
 /*****************************************************************************
  * Prototypes

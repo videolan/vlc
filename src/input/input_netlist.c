@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.39 2001/05/31 03:57:54 sam Exp $
+ * $Id: input_netlist.c,v 1.40 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -50,9 +50,7 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
-
-#include "input.h"
-#include "input_netlist.h"
+#include "input_ext-plugins.h"
 
 /*****************************************************************************
  * input_NetlistInit: allocates netlist buffers and init indexes

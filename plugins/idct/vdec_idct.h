@@ -2,7 +2,7 @@
  * vdec_idct.h : macros for the inverse discrete cosine transform
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_idct.h,v 1.1 2001/05/06 04:32:02 sam Exp $
+ * $Id: vdec_idct.h,v 1.2 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -143,9 +143,7 @@
 /*****************************************************************************
  * Protoypes
  *****************************************************************************/
-void _M( vdec_SparseIDCT ) ( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                             int i_sparse_pos);
-void _M( vdec_InitIDCT )   ( vdec_thread_t * p_vdec );
-void _M( vdec_IDCT )       ( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                             int i_idontcare );
+void _M( vdec_SparseIDCT ) ( void *, dctelem_t * p_block, int i_sparse_pos);
+void _M( vdec_InitIDCT )   ( struct vdec_thread_s * );
+void _M( vdec_IDCT )       ( void *, dctelem_t * p_block, int i_idontcare );
 

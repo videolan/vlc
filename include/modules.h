@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.26 2001/06/27 09:53:56 massiot Exp $
+ * $Id: modules.h,v 1.27 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -179,10 +179,8 @@ typedef struct function_list_s
         struct
         {
             void ( * pf_idct_init )    ( struct vdec_thread_s * );
-            void ( * pf_sparse_idct )  ( struct vdec_thread_s *,
-                                         dctelem_t *, int );
-            void ( * pf_idct )         ( struct vdec_thread_s *,
-                                         dctelem_t *, int );
+            void ( * pf_sparse_idct )  ( void *, dctelem_t *, int );
+            void ( * pf_idct )         ( void *, dctelem_t *, int );
             void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
 
             void ( * pf_decode_init )  ( struct vdec_thread_s * );

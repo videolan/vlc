@@ -2,7 +2,7 @@
  * vpar_synchro.h : video parser blocks management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.h,v 1.33 2001/05/06 04:32:02 sam Exp $
+ * $Id: vpar_synchro.h,v 1.10 2001/07/17 09:48:08 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *

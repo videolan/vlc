@@ -2,7 +2,7 @@
  * vdec_idct.c : common IDCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_idct.c,v 1.1 2001/05/06 04:32:02 sam Exp $
+ * $Id: vdec_idct.c,v 1.2 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -43,21 +43,22 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "video_decoder.h"
-
 #include "modules.h"
 
+#include "vdec_ext-plugins.h"
 #include "vdec_idct.h"
 
 /*****************************************************************************
  * vdec_InitIDCT : initialize datas for vdec_SparseIDCT
  *****************************************************************************/
-void _M( vdec_InitIDCT ) (vdec_thread_t * p_vdec)
+void _M( vdec_InitIDCT ) ( vdec_thread_t * p_vdec )
 {
     int i;
+    dctelem_t * p_pre;
 
-    dctelem_t * p_pre = p_vdec->p_pre_idct;
-    memset( p_pre, 0, 64*64*sizeof(dctelem_t) );
+    p_vdec->p_idct_data = malloc( sizeof(dctelem_t) * 64 * 64 );
+    p_pre = (dctelem_t *) p_vdec->p_idct_data;
+    memset( p_pre, 0, 64 * 64 * sizeof(dctelem_t) );
 
     for( i=0 ; i < 64 ; i++ )
     {
@@ -70,8 +71,8 @@ void _M( vdec_InitIDCT ) (vdec_thread_t * p_vdec)
 /*****************************************************************************
  * vdec_SparseIDCT : IDCT function for sparse matrices
  *****************************************************************************/
-void _M( vdec_SparseIDCT ) ( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                             int i_sparse_pos)
+void _M( vdec_SparseIDCT ) ( void * p_idct_data,
+                             dctelem_t * p_block, int i_sparse_pos )
 {
     short int val;
     int * dp;
@@ -79,6 +80,7 @@ void _M( vdec_SparseIDCT ) ( vdec_thread_t * p_vdec, dctelem_t * p_block,
     short int * p_dest;
     short int * p_source;
     int coeff, rr;
+    dctelem_t * p_pre = (dctelem_t *) p_idct_data;
 
     /* If DC Coefficient. */
     if ( i_sparse_pos == 0 )
@@ -99,7 +101,7 @@ void _M( vdec_SparseIDCT ) ( vdec_thread_t * p_vdec, dctelem_t * p_block,
     }
     /* Some other coefficient. */
     p_dest = (s16*)p_block;
-    p_source = (s16*)&p_vdec->p_pre_idct[i_sparse_pos];
+    p_source = (s16*)&p_pre[i_sparse_pos * 64];
     coeff = (int)p_dest[i_sparse_pos];
     for( rr=0 ; rr < 4 ; rr++ )
     {

@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.11 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_dec.c,v 1.12 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,8 +39,7 @@
 #include "stream_control.h"
 #include "input_ext-dec.h"
 #include "input_ext-intf.h"
-
-#include "input.h"
+#include "input_ext-plugins.h"
 
 /*****************************************************************************
  * input_RunDecoder: spawns a new decoder thread

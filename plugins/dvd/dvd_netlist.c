@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.11 2001/06/15 05:12:30 sam Exp $
+ * $Id: dvd_netlist.c,v 1.12 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -56,8 +56,8 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
+#include "input_ext-plugins.h"
 
-#include "input.h"
 #include "dvd_netlist.h"
 
 #include "modules.h"

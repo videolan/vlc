@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.59 2001/06/27 09:53:57 massiot Exp $
+ * $Id: input_programs.c,v 1.60 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,7 +41,7 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
-#include "input.h"
+#include "input_ext-plugins.h"
 
 #include "main.h"                                     /* --noaudio --novideo */
 

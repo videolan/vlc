@@ -2,7 +2,7 @@
  * vdec_block_c.c: Macroblock copy functions in C
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vdec_block_c.c,v 1.4 2001/06/20 07:43:48 sam Exp $
+ * $Id: vdec_block_c.c,v 1.5 2001/07/17 09:48:07 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,15 +47,7 @@
 #include "video.h"
 #include "video_output.h"
 
-#include "vdec_motion.h"
-#include "video_decoder.h"
-
-#include "vpar_blocks.h"
-
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
-#include "video_fifo.h"
+#include "vdec_ext-plugins.h"
 
 #include "vdec_block.h"
 

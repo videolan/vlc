@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.1 2001/07/16 16:39:00 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.2 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -43,8 +43,8 @@
 #include "video.h"
 #include "video_output.h"
 
+#include "vdec_ext-plugins.h"
 #include "video_decoder.h"
-#include "vdec_motion.h"
 
 #include "vpar_blocks.h"
 #include "vpar_headers.h"

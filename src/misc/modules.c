@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.39 2001/07/16 22:00:45 gbazin Exp $
+ * $Id: modules.c,v 1.40 2001/07/17 09:48:08 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -73,9 +73,7 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
-#include "input.h"
-#include "input_netlist.h"
-#include "mpeg_system.h"
+#include "input_ext-plugins.h"
 
 #include "video.h"
 #include "video_output.h"
