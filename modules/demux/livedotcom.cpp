@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.14 2004/01/25 20:05:28 hartman Exp $
+ * $Id: livedotcom.cpp,v 1.15 2004/02/22 16:01:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -548,7 +548,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
                 if( ( p_extra = parseStreamMuxConfigStr( sub->fmtp_config(), i_extra ) ) )
                 {
                     tk->fmt.i_extra = i_extra;
-                    tk->fmt.p_extra = malloc( sizeof( i_extra ) );
+                    tk->fmt.p_extra = malloc( i_extra );
                     memcpy( tk->fmt.p_extra, p_extra, i_extra );
                     delete[] p_extra;
                 }
