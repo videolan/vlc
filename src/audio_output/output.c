@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.34 2003/01/27 22:50:01 sam Exp $
+ * $Id: output.c,v 1.35 2003/01/28 12:23:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -117,7 +117,9 @@ int aout_OutputNew( aout_instance_t * p_aout,
                          NULL );
     }
     else if ( p_aout->output.output.i_physical_channels ==
-                 (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
+               (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
+                && (p_aout->output.output.i_original_channels &
+                     (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
     {
         /* Stereo - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
