@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.34 2003/01/25 18:42:17 hartman Exp $
+ * $Id: intf.m,v 1.35 2003/01/25 21:34:45 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1192,7 +1192,7 @@ static void Run( intf_thread_t *p_intf )
 
 - (IBAction)reportABug:(id)sender
 {
-    NSURL *bugURL = [NSURL URLWithString:@"http://www.videolan.org/vlc/bug-reporting.html"];
+    NSURL *bugURL = [NSURL URLWithString:@"http://www.videolan.org/support/bug-reporting.html"];
     
     [[NSWorkspace sharedWorkspace] openURL: bugURL];
 }
