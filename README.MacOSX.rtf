@@ -29,9 +29,8 @@ The following frequently asked questions are answered below :\
 8. I think I found a bug. What should I do ?\
 9. Support for files with subtitles.\
 10. What do all the options in the preferences do ?\
-11. How do I enable deinterlacing ? \
-12. How do i get fullscreen video on my other monitor ?\
-13. Multiple sound-devices and multi-channel sound?
+11. How do i get fullscreen video on my other monitor ?\
+12. Multiple sound-devices and multi-channel sound?
 \f0\b0 \ulnone \
 \
 \
@@ -48,9 +47,9 @@ To use VLC media player, you will need to open the application first and then fr
 
 \f1\b \ul \
 \
-3. How do I read an (S)VCD ?
+3. How do I read a CD/(S)VCD/DVD ?
 \f0\b0 \ulnone \
-To view a VCD, you will need to choose "Open Disc" from the "File" menu. Choose VCD and then choose the drive in which you inserted the VCD. VLC media player is currently unable to read SVCD directly from the drive. Some SVCDs can be read if you tell VLC they're VCDs, in the "Open Disc" dialog.\
+To view a (S)VCD, DVD or Audio CD, you will need to choose "Open Disc" from the "File" menu. Choose your disk type and then choose the drive in which you inserted the disk. VLC media player is currently unable to read SVCD directly from the drive. Some SVCDs can be read if you tell VLC they're VCDs, in the "Open Disc" dialog.\
 \
 \
 
@@ -60,10 +59,10 @@ To view a VCD, you will need to choose "Open Disc" from the "File" menu. Choose 
 \
 If you experience problems playing DivX/Xvid then you can try the following:\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
-\cf0 - Preferences -> show advanced options\
-- Now go to the Decoders part of the preferences.\
-- From the dropdown list choose 'ffmpeg' and click 'configure'\
-- Enable 'hurry up' -> click OK -> click OK (never click the 'select' button)\
+\cf0 - Open the preferences.\
+- Now go to the Modules part of the preferences.\
+- Select decoder and then 'ffmpeg'\
+- Enable 'hurry up' -> click 'Save'\
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
 \cf0 \
 If VLC media player is slow on your G4 system, try to quit or hide all running applications. See with 
@@ -105,9 +104,8 @@ Simply drag VLC from the place where you have installed it, to the Trash.\
 - You need to specify the subtitle when you open the file.\
 - A subtitle is global instead of bound to a playlist-item.  This will be fixed in a future version.\
 - Only MicroDVD, SubRIP, SSA1-4. SAMI and vplayer subtitle files are supported at the moment.\
-- Subs can only be added to .avi and .ogm movie files at the moment.\
-- You cannot change the size of the subtitles.\
-- Don't bug us asking for the features mentioned above, they are coming.\
+- Subs can only be added to .avi files. .ogm file can have subs included into the .ogm file, these should work as well.\
+- Don't bug us asking for the features mentioned above, they are coming ;)\
 \
 \
 
@@ -117,19 +115,13 @@ Hold your mouse still on top of an option for just over a second and a ToolTip w
 \
 \
 
-\f1\b \ul 11. How do I enable deinterlacing ? \
-
-\f0\b0 \ulnone You must select the "Deinterlace" menu-item before opening any file. If the item is selected while reading a file, nothing will happen. This is a known issue, please do not report it.\
-\
-\
-
-\f1\b \ul 12. How do i get fullscreen video on my other monitor ? 
+\f1\b \ul 11. How do i get fullscreen video on my other monitor ? 
 \f0\b0 \ulnone \
 If you want to use your second screen for fullscreen playback, then look at the Video->Screen menuitem. You can set this option permanently by going into the Preferences and choosing Interface->Interface module: macosx ->Configure->Video (You will need to choose "Show Advanced options" first).\
 \
 \
 
-\f1\b \ul 13. Multiple sound-devices and multi-channel sound? \
+\f1\b \ul 12. Multiple sound-devices and multi-channel sound? \
 
 \f0\b0 \ulnone Look at the Audio->Device menuitem. You can set this option permanently by going into the Preferences and choosing Audio -> audio output module: coreaudio -> Configure (You will need to choose "Show Advanced options" first).\
 - AC3 over SPDIF with M-Audio Sonica Theater does not work. This is most likely a driver bug which has been reported to M-Audio.\
@@ -140,4 +132,4 @@ Thanks for reading this file. For additional information, subscribe to the VLC m
 -- \
 Christophe Massiot <massiot@via.ecp.fr> and\
 Derk-Jan Hartman <thedj@users.sourceforge.net> for the VideoLAN team.\
-$Id: README.MacOSX.rtf,v 1.19 2003/05/15 02:02:13 hartman Exp $}
+$Id: README.MacOSX.rtf,v 1.20 2003/06/15 14:00:40 hartman Exp $}

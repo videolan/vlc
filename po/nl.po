@@ -272,7 +272,6 @@ msgid "Extra interface modules"
 msgstr "Extra interface modules"
 
 #: src/libvlc.h:49
-#, fuzzy
 msgid ""
 "This option allows you to select additional interfaces used by VLC. They "
 "will be launched in the background in addition to the default interface. Use "
@@ -281,7 +280,8 @@ msgid ""
 msgstr ""
 "Via deze optie kunnen extra interfaces gebruikt worden. Ze worden in de "
 "achtergrond geopend als aanvulling op de standaard interface. Maak een lijst "
-"van door komma's gescheiden interface modules."
+"van door komma's gescheiden interface modules. (gebruikelijke waarden zijn: "
+"logger,gestures,sap,rc,http,screensaver)"
 
 #: src/libvlc.h:54
 msgid "Verbosity (0,1,2)"
@@ -334,13 +334,12 @@ msgid "Show advanced options"
 msgstr "Toon geavanceerde opties"
 
 #: src/libvlc.h:75
-#, fuzzy
 msgid ""
 "When this option is turned on, the preferences and/or interfaces  will show "
 "all the available options, including those that most users should never touch"
 msgstr ""
-"Als deze optie aan staat, dan zullen standaard alle voorkeuren worden "
-"getoond, ook die opties die de meeste gebruikers beter niet kunnen wijzigen."
+"Als deze optie aan staat, dan zullen de voorkeuren en interfaces standaard "
+"alle opties tonen, ook die opties die de meeste gebruikers beter niet kunnen wijzigen."
 
 #: src/libvlc.h:79
 msgid "Interface default search path"
@@ -382,7 +381,6 @@ msgid "Enable audio"
 msgstr "Schakel geluid in"
 
 #: src/libvlc.h:97
-#, fuzzy
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "will not take place, and it will save some processing power."
@@ -468,7 +466,6 @@ msgid "Headphone virtual spatialization effect"
 msgstr "Koptelefoon virtueel ruimtelijk effect"
 
 #: src/libvlc.h:136
-#, fuzzy
 msgid ""
 "This effect gives you the feeling that you are standing in a room with a "
 "complete 5.1 speaker set when using only a headphone, providing a more "
@@ -500,7 +497,6 @@ msgid "Enable video"
 msgstr "Schakel video in"
 
 #: src/libvlc.h:151
-#, fuzzy
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage will not take place, which will save some processing power."
@@ -513,12 +509,11 @@ msgid "Video width"
 msgstr "Video breedte"
 
 #: src/libvlc.h:156
-#, fuzzy
 msgid ""
 "You can enforce the video width here. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Forceer de breedte van de video. Standaard probeert VLC zich aan de "
+"Forceer de breedte van de video. Standaard (-1) probeert VLC zich aan de "
 "karakteristieken van de video aan te passen."
 
 #: src/libvlc.h:159
@@ -526,12 +521,11 @@ msgid "Video height"
 msgstr "Video hoogte"
 
 #: src/libvlc.h:161
-#, fuzzy
 msgid ""
 "You can enforce the video height here. By default (-1) VLC will adapt to the "
 "video characteristics."
 msgstr ""
-"Forceer de hoogte van de video hier. Standaard zal VLC zich aan de "
+"Forceer de hoogte van de video hier. Standaard (-1) zal VLC zich aan de "
 "karakteristieken van de video aan te passen."
 
 #: src/libvlc.h:164
@@ -570,7 +564,6 @@ msgid "Overlay video output"
 msgstr "Overlay video uitvoer"
 
 #: src/libvlc.h:180
-#, fuzzy
 msgid ""
 "If enabled, VLC will try to take advantage of the overlay capabilities of "
 "your graphics card."
@@ -699,10 +692,10 @@ msgid "Choose audio"
 msgstr "Selecteer audio"
 
 #: src/libvlc.h:239
-#, fuzzy
 msgid ""
 "Give the default type of audio you want to use in a DVD. (Developers only)"
-msgstr "Stel het standaard type audio in voor gebruik bij DVD."
+msgstr ""
+"Stel het standaard type audio in voor gebruik bij DVD. (Alleen ontwikkelaars)"
 
 #: src/libvlc.h:242
 msgid "Choose channel"
@@ -825,9 +818,8 @@ msgid "This allows you to play the stream while streaming it."
 msgstr "Hiermee kunt u naar de stream kijken terwijl u aan het streamen bent."
 
 #: src/libvlc.h:302
-#, fuzzy
 msgid "Enable video stream output"
-msgstr "gebruik video stream uitvoer"
+msgstr "Gebruik video stream uitvoer"
 
 #: src/libvlc.h:304 src/libvlc.h:317
 msgid ""
@@ -1030,9 +1022,8 @@ msgstr ""
 "modules mogelijk maakt."
 
 #: src/libvlc.h:395
-#, fuzzy
 msgid "Fast mutex on NT/2K/XP (developers only)"
-msgstr "snelle mutex op NT/2K/XP (alleen ontwikkelaars)"
+msgstr "Snelle mutex op NT/2K/XP (alleen ontwikkelaars)"
 
 #: src/libvlc.h:397
 msgid ""
@@ -1197,28 +1188,24 @@ msgid "Deinterlace"
 msgstr "Deinterlace"
 
 #: src/video_output/video_output.c:399
-#, fuzzy
 msgid "Discard"
-msgstr "Disk"
+msgstr "Discard"
 
 #: src/video_output/video_output.c:401
-#, fuzzy
 msgid "Blend"
-msgstr "Blues"
+msgstr "Blend"
 
 #: src/video_output/video_output.c:403
-#, fuzzy
 msgid "Mean"
-msgstr "Media"
+msgstr "Mean"
 
 #: src/video_output/video_output.c:405
 msgid "Bob"
-msgstr ""
+msgstr "Bob"
 
 #: src/video_output/video_output.c:407
-#, fuzzy
 msgid "Linear"
-msgstr "heel getal"
+msgstr "Linear"
 
 #: modules/access/cdda.c:86 modules/access/file.c:72 modules/access/ftp.c:86
 #: modules/access/http.c:80 modules/access/mms/mms.c:57
@@ -1788,7 +1775,6 @@ msgid "3D Now! A52 IMDCT module"
 msgstr "3D Now! A52 IMDCT module"
 
 #: modules/codec/adpcm.c:92
-#, fuzzy
 msgid "ADPCM audio decoder"
 msgstr "ADPCM audio decoder"
 
@@ -1814,11 +1800,11 @@ msgstr "AAC audio decoder (gebruikt libfaad2)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:86
 msgid "Direct rendering"
-msgstr ""
+msgstr "Direct renderen"
 
 #: modules/codec/ffmpeg/ffmpeg.c:88
 msgid "Error resilience"
-msgstr ""
+msgstr "Fout weerstand"
 
 #: modules/codec/ffmpeg/ffmpeg.c:90
 msgid ""
@@ -1827,10 +1813,13 @@ msgid ""
 "will produce a lot of errors.\n"
 "Valid range is -1 to 99 (-1 disables all errors resiliences)."
 msgstr ""
+"Je kan instellen hoe ffmpeg om moet gaan met fouten."
+"Toegestane waarden lopen van -1 tot 99 (-1 betekend geen weerstand "
+"tegen fouten)"
 
 #: modules/codec/ffmpeg/ffmpeg.c:95
 msgid "Workaround bugs"
-msgstr ""
+msgstr "Probeer fouten te omzeilen"
 
 #: modules/codec/ffmpeg/ffmpeg.c:97
 msgid ""
@@ -1843,10 +1832,17 @@ msgid ""
 "32 ac vlc\n"
 "64 Qpel chroma"
 msgstr ""
+"1  autodetectie\n"
+"2  msmpeg4 oude stijl\n"
+"4  xvid met interlacing\n"
+"8  ump4\n"
+"16 geen padding\n"
+"32 ac vlc\n"
+"64 Qpel chroma"
 
 #: modules/codec/ffmpeg/ffmpeg.c:106
 msgid "Hurry up"
-msgstr ""
+msgstr "Schiet op"
 
 #: modules/codec/ffmpeg/ffmpeg.c:108
 msgid ""
@@ -1854,9 +1850,11 @@ msgid ""
 "enough time. It's useful with low CPU power but it can produce distorted "
 "pictures."
 msgstr ""
+"Sta de decoder toe om beelden gedeeltelijk te decoderen of over te slaan "
+"indien er niet genoeg tijd is. Dit is handig bij een gebrek aan CPU kracht "
+"maar kan verstoorde beelden produceren."
 
 #: modules/codec/ffmpeg/ffmpeg.c:112
-#, fuzzy
 msgid "Truncated stream"
 msgstr "Dupliceer stream"
 
@@ -1865,9 +1863,8 @@ msgid "truncated stream -1:auto,0:disable,:1:enable"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:115
-#, fuzzy
 msgid "Post processing quality"
-msgstr "Nabewerking"
+msgstr "Kwaliteit van nabewerking"
 
 #: modules/codec/ffmpeg/ffmpeg.c:117
 msgid ""
@@ -1875,20 +1872,21 @@ msgid ""
 "Higher levels require considerable more CPU power, but produce better "
 "looking pictures."
 msgstr ""
+"Stel de kwaliteit van de nabewerking in. Toegestane waarden lopen van 0 tot 6\n"
+"Hogere waarden vragen behoorlijk meer CPU kracht, maar produceren ook veel "
+"betere beelden."
 
 #: modules/codec/ffmpeg/ffmpeg.c:121
 msgid "Ffmpeg postproc filter chains"
-msgstr ""
+msgstr "Lijst van ffmpeg nabewerkingsfilters"
 
 #: modules/codec/ffmpeg/ffmpeg.c:158
-#, fuzzy
 msgid "Ffmpeg postprocessing module"
 msgstr "ffmpeg nabewerkingsmodule"
 
 #: modules/codec/ffmpeg/ffmpeg.c:160
-#, fuzzy
 msgid "Auto-level Post processing quality"
-msgstr "C nabewerkingsmodule"
+msgstr "Automatische instellen van nabewerkingskwaliteit"
 
 #: modules/codec/ffmpeg/ffmpeg.c:162
 msgid ""
@@ -2046,9 +2044,8 @@ msgstr ""
 "Noot: Standaard wordt automatisch de beste beschikbare methode gekozen."
 
 #: modules/codec/mpeg_video/parser.c:65
-#, fuzzy
 msgid "Motion compensation module"
-msgstr "compensatie van beweging"
+msgstr "Compensatie van beweging"
 
 #: modules/codec/mpeg_video/parser.c:67
 msgid ""
@@ -2096,7 +2093,7 @@ msgstr "MPEG I/II video decoder"
 
 #: modules/codec/quicktime.c:65
 msgid "QuickTime library decoder"
-msgstr ""
+msgstr "QuickTime decoder (extern)"
 
 #: modules/codec/rawvideo.c:65
 msgid "Pseudo Raw Video decoder"
@@ -4349,9 +4346,8 @@ msgid "ReadMe..."
 msgstr "Lees mij..."
 
 #: modules/gui/macosx/intf.m:417
-#, fuzzy
 msgid "Online Documentation"
-msgstr "compensatie van beweging"
+msgstr "Online Documentatie"
 
 #: modules/gui/macosx/intf.m:418
 msgid "Report a Bug"
@@ -4425,9 +4421,8 @@ msgstr ""
 "transparant(default), 0 is volledig transparant. (Zeer processor intensief)"
 
 #: modules/gui/macosx/macosx.m:57
-#, fuzzy
 msgid "Always float on top"
-msgstr "Altijd boven"
+msgstr "Altijd boven alles"
 
 #: modules/gui/macosx/macosx.m:59
 msgid "Let the video window float on top of other windows."
@@ -4455,9 +4450,8 @@ msgstr "VIDEO_TS map"
 
 #: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:389
 #: modules/gui/macosx/open.m:480
-#, fuzzy
 msgid "Audio CD"
-msgstr "Audio"
+msgstr "Audio CD"
 
 #: modules/gui/macosx/open.m:171
 msgid "Load subtitles file:"
@@ -4807,9 +4801,8 @@ msgid "Input menu"
 msgstr "Input menu"
 
 #: modules/gui/wxwindows/menus.cpp:173
-#, fuzzy
 msgid "Close Menu"
-msgstr "Wis menu"
+msgstr "Sluit menu"
 
 #: modules/gui/wxwindows/menus.cpp:337
 msgid "Empty"
@@ -4913,7 +4906,6 @@ msgid "No configuration options available"
 msgstr "Geen configuratie opties beschikbaar"
 
 #: modules/gui/wxwindows/preferences.cpp:865
-#, fuzzy
 msgid "Advanced options"
 msgstr "Toon geavanceerde opties"
 
@@ -5243,9 +5235,8 @@ msgid "Set image contrast"
 msgstr "Wijzig contrast"
 
 #: modules/video_filter/adjust.c:61
-#, fuzzy
 msgid "Set the image contrast, between 0 and 2. Defaults to 1"
-msgstr "Wijzig de tint van het beeld. Waarden tussen 0 en 360, 0 is normaal."
+msgstr "Wijzig het contrast van het beeld. Waarden tussen 0 en 2, 1 is normaal."
 
 #: modules/video_filter/adjust.c:62
 msgid "Set image hue"
@@ -5260,18 +5251,18 @@ msgid "Set image saturation"
 msgstr "Wijzig de kleurverzadiging"
 
 #: modules/video_filter/adjust.c:65
-#, fuzzy
 msgid "Set the image saturation, between 0 and 3. Defaults to 1"
-msgstr "Wijzig de tint van het beeld. Waarden tussen 0 en 360, 0 is normaal."
+msgstr "Wijzig de kleurverziging van het beeld. Waarden tussen 0 en 3,"
+" 0 is normaal."
 
 #: modules/video_filter/adjust.c:66
 msgid "Set image brightness"
 msgstr "Wijzig helderheid"
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Set the image brightness, between 0 and 2. Defaults to 1"
-msgstr "Wijzig de tint van het beeld. Waarden tussen 0 en 360, 0 is normaal."
+msgstr "Wijzig de helderheid van het beeld. Waarden tussen 0 en 2, "
+"0 is normaal."
 
 #: modules/video_filter/adjust.c:71
 msgid "Adjust"
