@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.40 2002/04/05 03:27:27 sam Exp $
+ * $Id: threads.h,v 1.41 2002/04/18 12:51:59 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -339,7 +339,7 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
         _vlc_mutex_lock( __FILE__, __LINE__, P_MUTEX )
 #else
 #   define vlc_mutex_lock( P_MUTEX )                                        \
-        _vlc_mutex_lock( NULL, 0, P_MUTEX )
+        _vlc_mutex_lock( "(unknown)", 0, P_MUTEX )
 #endif
 
 static __inline__ int _vlc_mutex_lock( char * psz_file, int i_line,
@@ -402,7 +402,7 @@ static __inline__ int _vlc_mutex_lock( char * psz_file, int i_line,
         _vlc_mutex_unlock( __FILE__, __LINE__, P_MUTEX )
 #else
 #   define vlc_mutex_unlock( P_MUTEX )                                      \
-        _vlc_mutex_unlock( NULL, 0, P_MUTEX )
+        _vlc_mutex_unlock( "(unknown)", 0, P_MUTEX )
 #endif
 
 static __inline__ int _vlc_mutex_unlock( char * psz_file, int i_line,
@@ -463,7 +463,7 @@ static __inline__ int _vlc_mutex_unlock( char * psz_file, int i_line,
         _vlc_mutex_destroy( __FILE__, __LINE__, P_MUTEX )
 #else
 #   define vlc_mutex_destroy( P_MUTEX )                                     \
-        _vlc_mutex_destroy( NULL, 0, P_MUTEX )
+        _vlc_mutex_destroy( "(unknown)", 0, P_MUTEX )
 #endif
 
 static __inline__ int _vlc_mutex_destroy( char * psz_file, int i_line,
@@ -717,7 +717,7 @@ static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
         _vlc_cond_wait( __FILE__, __LINE__, P_COND, P_MUTEX  )
 #else
 #   define vlc_cond_wait( P_COND, P_MUTEX )                                 \
-        _vlc_cond_wait( NULL, 0, P_COND, P_MUTEX )
+        _vlc_cond_wait( "(unknown)", 0, P_COND, P_MUTEX )
 #endif
 
 static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
@@ -844,7 +844,7 @@ static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
         _vlc_cond_destroy( __FILE__, __LINE__, P_COND )
 #else
 #   define vlc_cond_destroy( P_COND )                                       \
-        _vlc_cond_destroy( NULL, 0, P_COND )
+        _vlc_cond_destroy( "(unknown)", 0, P_COND )
 #endif
 
 static __inline__ int _vlc_cond_destroy( char * psz_file, int i_line,
@@ -886,7 +886,7 @@ static __inline__ int _vlc_cond_destroy( char * psz_file, int i_line,
         _vlc_thread_create( __FILE__, __LINE__, P_THREAD, PSZ_NAME, FUNC, P_DATA )
 #else
 #   define vlc_thread_create( P_THREAD, PSZ_NAME, FUNC, P_DATA )            \
-        _vlc_thread_create( NULL, 0, P_THREAD, PSZ_NAME, FUNC, P_DATA )
+        _vlc_thread_create( "(unknown)", 0, P_THREAD, PSZ_NAME, FUNC, P_DATA )
 #endif
 
 static __inline__ int _vlc_thread_create( char * psz_file, int i_line,
@@ -1009,7 +1009,7 @@ static __inline__ void vlc_thread_exit( void )
         _vlc_thread_join( __FILE__, __LINE__, THREAD ) 
 #else
 #   define vlc_thread_join( THREAD )                                        \
-        _vlc_thread_join( NULL, 0, THREAD ) 
+        _vlc_thread_join( "(unknown)", 0, THREAD ) 
 #endif
 
 static __inline__ void _vlc_thread_join( char * psz_file, int i_line,

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.14 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: spu_decoder.c,v 1.15 2002/04/18 12:51:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -76,7 +76,7 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    SET_DESCRIPTION( "DVD subtitles decoder module" )
+    SET_DESCRIPTION( _("DVD subtitles decoder module") )
     ADD_CAPABILITY( DECODER, 50 )
 MODULE_INIT_STOP
 
@@ -813,6 +813,7 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
 {
     /* Common variables */
     u16  p_clut16[4];
+    u32  p_clut32[4];
     u8  *p_dest;
     u16 *p_source = (u16 *)p_spu->p_sys->p_data;
 
@@ -873,8 +874,11 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
     case FOURCC_RV16:
 
     /* FIXME: get this from the DVD */
-    p_clut16[0] = 0xaaaa; p_clut16[1] = 0xffff;
-    p_clut16[2] = 0x8888; p_clut16[3] = 0x0000;
+    for( i_color = 0; i_color < 4; i_color++ )
+    {
+        p_clut16[i_color] = 0x1111
+                             * ( (u16)p_spu->p_sys->pi_yuv[i_color][0] >> 4 );
+    }
 
     i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
     i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
@@ -969,6 +973,119 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
                         memset( p_dest - 2 * ( i_x >> 6 ) + i_ytmp,
                                 p_clut16[ i_color ],
                                 2 * ( ( i_len >> 6 ) + 1 ) );
+                    }
+                    i_x -= i_len;
+                    break;
+                }
+            }
+        }
+    }
+
+    break;
+
+    /* RV32 target, scaling */
+    case FOURCC_RV24:
+    case FOURCC_RV32:
+
+    /* XXX: this is a COMPLETE HACK, memcpy is unable to do u32s anyway */
+    /* FIXME: get this from the DVD */
+    for( i_color = 0; i_color < 4; i_color++ )
+    {
+        p_clut32[i_color] = 0x11111111
+                             * ( (u16)p_spu->p_sys->pi_yuv[i_color][0] >> 4 );
+    }
+
+    i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
+    i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
+
+    i_width  = p_spu->i_width  * i_xscale;
+    i_height = p_spu->i_height * i_yscale;
+
+    p_dest = p_pic->p->p_pixels + ( i_width >> 6 ) * 4
+              /* Add the picture coordinates and the SPU coordinates */
+              + ( (p_spu->i_x * i_xscale) >> 6 ) * 4
+              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_vout->output.i_width * 4;
+
+    /* Draw until we reach the bottom of the subtitle */
+    for( i_y = 0 ; i_y < i_height ; )
+    {
+        i_ytmp = i_y >> 6;
+        i_y += i_yscale;
+
+        /* Check whether we need to draw one line or more than one */
+        if( i_ytmp + 1 >= ( i_y >> 6 ) )
+        {
+            /* Just one line : we precalculate i_y >> 6 */
+            i_yreal = p_vout->output.i_width * 4 * i_ytmp;
+
+            /* Draw until we reach the end of the line */
+            for( i_x = i_width ; i_x ; )
+            {
+                /* Get the RLE part, then draw the line */
+                i_color = *p_source & 0x3;
+
+                switch( p_spu->p_sys->pi_alpha[ i_color ] )
+                {
+                case 0x00:
+                    i_x -= i_xscale * ( *p_source++ >> 2 );
+                    break;
+
+                case 0x0f:
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    memset( p_dest - 4 * ( i_x >> 6 ) + i_yreal,
+                            p_clut32[ i_color ], 4 * ( ( i_len >> 6 ) + 1 ) );
+                    i_x -= i_len;
+                    break;
+
+                default:
+                    /* FIXME: we should do transparency */
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    memset( p_dest - 4 * ( i_x >> 6 ) + i_yreal,
+                            p_clut32[ i_color ], 4 * ( ( i_len >> 6 ) + 1 ) );
+                    i_x -= i_len;
+                    break;
+                }
+
+            }
+        }
+        else
+        {
+            i_yreal = p_vout->output.i_width * 4 * i_ytmp;
+            i_ynext = p_vout->output.i_width * 4 * i_y >> 6;
+
+            /* Draw until we reach the end of the line */
+            for( i_x = i_width ; i_x ; )
+            {
+                /* Get the RLE part, then draw as many lines as needed */
+                i_color = *p_source & 0x3;
+
+                switch( p_spu->p_sys->pi_alpha[ i_color ] )
+                {
+                case 0x00:
+                    i_x -= i_xscale * ( *p_source++ >> 2 );
+                    break;
+
+                case 0x0f:
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
+                         i_ytmp += p_vout->output.i_width * 4 )
+                    {
+                        memset( p_dest - 4 * ( i_x >> 6 ) + i_ytmp,
+                                p_clut32[ i_color ],
+                                4 * ( ( i_len >> 6 ) + 1 ) );
+                    }
+                    i_x -= i_len;
+                    break;
+
+                default:
+                    /* FIXME: we should do transparency */
+                    i_len = i_xscale * ( *p_source++ >> 2 );
+                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
+                         i_ytmp += p_vout->output.i_width * 4 )
+                    {
+                        memset( p_dest - 4 * ( i_x >> 6 ) + i_ytmp,
+                                p_clut32[ i_color ],
+                                4 * ( ( i_len >> 6 ) + 1 ) );
                     }
                     i_x -= i_len;
                     break;
