@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.12 2003/04/22 22:57:40 ipkiss Exp $
+ * $Id: theme.cpp,v 1.13 2003/04/29 20:36:56 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -245,17 +245,18 @@ void Theme::MoveSkin( SkinWindow *wnd, int left, int top )
              hang++ )
         {
             win = (*hang)->GetParent();
-            win->GetPos( x, y );
-            MoveSkin( win, left, top );
+            // Check that the window hasn't already moved (this avoids
+            // infinite recursion with circular anchoring)
+            if( !win->Moved )
+            {
+                win->Moved = true;
+                MoveSkin( win, left, top );
+            }
         }
     }
 
-    // Move window only if has not been moved yet
-    if( !wnd->Moved )
-    {
-        wnd->Moved = true;
-        wnd->Move( oldx + left, oldy + top );
-    }
+    // Move window
+    wnd->Move( oldx + left, oldy + top );
 }
 //---------------------------------------------------------------------------
 bool Theme::MoveSkinMagnet( SkinWindow *wnd, int left, int top )
