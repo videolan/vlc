@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.13 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: skin_common.h,v 1.14 2003/06/04 16:03:33 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -78,6 +78,9 @@ struct intf_sys_t
 #endif
 
 #ifdef WIN32
+    // Interface thread id used to post broadcast messages
+    DWORD dwThreadId;
+
     // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
     HINSTANCE h_msimg32_dll;
     BOOL (WINAPI *TransparentBlt)( HDC,int,int,int,int,HDC,int,

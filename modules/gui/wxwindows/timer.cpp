@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.20 2003/05/27 11:35:34 gbazin Exp $
+ * $Id: timer.cpp,v 1.21 2003/06/04 16:03:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -318,8 +318,8 @@ void DisplayStreamDate( wxControl *p_slider_frame, intf_thread_t * p_intf ,
 }
 
 /*****************************************************************************
- * PlaylistChanged: callback triggered by the intf-change playlist variable
- *  We don't rebuild the playlist directly here because we don't want the
+ * PopupMenuCB: callback triggered by the intf-popupmenu playlist variable.
+ *  We don't show the menu directly here because we don't want the
  *  caller to block for a too long time.
  *****************************************************************************/
 int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,

@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.29 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.30 2003/06/04 16:03:33 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -51,11 +51,6 @@
 #include "skin_common.h"
 #include "dialogs.h"
 
-#ifndef BASIC_SKINS
-#include "../../wxwindows/wxwindows.h"
-#endif
-
-
 //---------------------------------------------------------------------------
 // VlcProc
 //---------------------------------------------------------------------------
@@ -103,10 +98,8 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_OPEN:
-#ifndef BASIC_SKINS
             p_intf->p_sys->p_dialogs->ShowOpen( TRUE );
             InterfaceRefresh();
-#endif
             return true;
 
         case VLC_LOAD_SKIN:
@@ -138,13 +131,10 @@ bool VlcProc::EventProc( Event *evt )
             return true;
 
         case VLC_PLAYLIST_ADD_FILE:
-#ifndef BASIC_SKINS
             p_intf->p_sys->p_dialogs->ShowOpen( FALSE );
             InterfaceRefresh();
-#endif
             return true;
 
-#ifndef BASIC_SKINS
         case VLC_LOG_SHOW:
             p_intf->p_sys->p_dialogs->ShowMessages();
             return true;
@@ -159,7 +149,6 @@ bool VlcProc::EventProc( Event *evt )
         case VLC_INFO_SHOW:
             p_intf->p_sys->p_dialogs->ShowFileInfo();
             return true;
-#endif
 
         case VLC_INTF_REFRESH:
             InterfaceRefresh( (bool)evt->GetParam2() );
@@ -330,31 +319,14 @@ void VlcProc::EnabledEvent( string type, bool state )
 //---------------------------------------------------------------------------
 
 
-
 //---------------------------------------------------------------------------
 // Common VLC procedures
 //---------------------------------------------------------------------------
 void VlcProc::LoadSkin()
 {
-#ifndef BASIC_SKINS
     if( p_intf->p_sys->p_new_theme_file == NULL )
     {
-        wxFileDialog dialog( NULL,
-            wxU(_("Open a skin file")), wxT(""), wxT(""),
-            wxT("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
-                "All files|*.*"), wxOPEN );
-
-        if( dialog.ShowModal() == wxID_OK )
-        {
-            p_intf->p_sys->p_new_theme_file =
-                new char[strlen(dialog.GetPath().mb_str()) + 1];
-
-            strcpy( p_intf->p_sys->p_new_theme_file,
-                    dialog.GetPath().mb_str() );
-
-            // Tell vlc to change skin after hiding interface
-            OSAPI_PostMessage( NULL, VLC_HIDE, VLC_LOAD_SKIN, 0 );
-        }
+        p_intf->p_sys->p_dialogs->ShowOpenSkin();
     }
     else
     {
@@ -392,9 +364,9 @@ void VlcProc::LoadSkin()
         delete (char *)p_intf->p_sys->p_new_theme_file;
         p_intf->p_sys->p_new_theme_file = NULL;
     }
-#endif
 }
 //---------------------------------------------------------------------------
+
 void VlcProc::DropFile( unsigned int param )
 {
     // Get pointer to file

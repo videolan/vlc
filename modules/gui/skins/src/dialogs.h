@@ -2,7 +2,7 @@
  * dialogs.h: Dialogs class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.h,v 1.1 2003/06/03 22:20:00 gbazin Exp $
+ * $Id: dialogs.h,v 1.2 2003/06/04 16:03:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -48,6 +48,14 @@ class SoutDialog;
 class PrefsDialog;
 class FileInfo;
 class wxIcon;
+
+typedef struct dialogs_thread_t
+{
+    VLC_COMMON_MEMBERS
+    intf_thread_t * p_intf;
+
+} dialogs_thread_t;
+
 #endif
 
 //---------------------------------------------------------------------------
@@ -64,9 +72,12 @@ class Dialogs
         virtual ~Dialogs();
 
         void ShowOpen( bool b_play );
+        void ShowOpenSkin();
         void ShowMessages();
         void ShowPrefs();
         void ShowFileInfo();
+
+        vlc_bool_t b_popup_change;
 
 #ifndef BASIC_SKINS
         // Dialogs
@@ -75,9 +86,10 @@ class Dialogs
         PrefsDialog *PrefsDlg;
         FileInfo    *FileInfoDlg;
 
-        wxIcon      *p_icon;
+        dialogs_thread_t *p_thread;
 
         void OnShowOpen( wxCommandEvent& event );
+        void OnShowOpenSkin( wxCommandEvent& event );
         void OnShowMessages( wxCommandEvent& event );
         void OnShowPrefs( wxCommandEvent& event );
         void OnShowFileInfo( wxCommandEvent& event );

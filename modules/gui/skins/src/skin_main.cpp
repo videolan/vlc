@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.31 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.32 2003/06/04 16:03:33 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -133,6 +133,9 @@ static int Open ( vlc_object_t *p_this )
     vlc_mutex_init( p_intf, &p_intf->p_sys->xlock );
 
 #elif defined WIN32
+    // Interface thread id used to post broadcast messages
+    p_intf->p_sys->dwThreadId = GetCurrentThreadId();
+
     // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
     p_intf->p_sys->h_msimg32_dll = LoadLibrary("msimg32.dll");
     if( !p_intf->p_sys->h_msimg32_dll ||

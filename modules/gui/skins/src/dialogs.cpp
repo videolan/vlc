@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.1 2003/06/03 22:20:00 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.2 2003/06/04 16:03:33 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -39,6 +39,10 @@
 #include "skin_common.h"
 #include "dialogs.h"
 
+/* Callback prototype */
+int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                 vlc_value_t old_val, vlc_value_t new_val, void *param );
+
 #ifdef BASIC_SKINS
 
 // Constructor
@@ -47,6 +51,7 @@ Dialogs::Dialogs( intf_thread_t *_p_intf ){}
 Dialogs::~Dialogs(){}
 
 void Dialogs::ShowOpen( bool b_play ){}
+void Dialogs::ShowOpenSkin(){}
 void Dialogs::ShowMessages(){}
 void Dialogs::ShowPrefs(){}
 void Dialogs::ShowFileInfo(){}
@@ -57,9 +62,10 @@ void Dialogs::ShowFileInfo(){}
 #include "share/vlc32x32.xpm"       // include the graphic icon
 
 #define ShowOpen_Event     0
-#define ShowMessages_Event 1
-#define ShowPrefs_Event    2
-#define ShowFileInfo_Event 3
+#define ShowOpenSkin_Event 1
+#define ShowMessages_Event 2
+#define ShowPrefs_Event    3
+#define ShowFileInfo_Event 4
 #define ExitThread_Event   99
 
 //---------------------------------------------------------------------------
@@ -93,6 +99,7 @@ private:
 
 BEGIN_EVENT_TABLE(Instance, wxApp)
     EVT_COMMAND(ShowOpen_Event, wxEVT_DIALOG, Dialogs::OnShowOpen)
+    EVT_COMMAND(ShowOpenSkin_Event, wxEVT_DIALOG, Dialogs::OnShowOpenSkin)
     EVT_COMMAND(ShowMessages_Event, wxEVT_DIALOG, Dialogs::OnShowMessages)
     EVT_COMMAND(ShowPrefs_Event, wxEVT_DIALOG, Dialogs::OnShowPrefs)
     EVT_COMMAND(ShowFileInfo_Event, wxEVT_DIALOG, Dialogs::OnShowFileInfo)
@@ -145,7 +152,18 @@ bool Instance::OnInit()
 #endif
 
     // OK, initialization is over, now the other thread can go on working...
-    vlc_thread_ready( p_intf );
+    vlc_thread_ready( p_intf->p_sys->p_dialogs->p_thread );
+
+    /* Register callback for the intf-popupmenu variable */
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        var_AddCallback( p_playlist, "intf-popupmenu", PopupMenuCB,
+			 p_intf->p_sys->p_dialogs );
+        vlc_object_release( p_playlist );
+    }
 
     return TRUE;
 }
@@ -178,11 +196,12 @@ DllMain (HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
 // We create all wxWindows dialogs in a separate thread because we don't want
 // any interaction with our own message loop
 //---------------------------------------------------------------------------
-void SkinsDialogsThread( intf_thread_t *p_intf )
+void SkinsDialogsThread( dialogs_thread_t *p_thread )
 {
 #if !defined( WIN32 )
     static char  *p_args[] = { "" };
 #endif
+    intf_thread_t *p_intf = p_thread->p_intf;
 
     /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
     wxTheApp = new Instance( p_intf );
@@ -207,10 +226,15 @@ Dialogs::Dialogs( intf_thread_t *_p_intf )
 {
     p_intf = _p_intf;
     p_intf->p_sys->p_dialogs = this;
+    b_popup_change = VLC_FALSE;
+
+    p_thread = (dialogs_thread_t *)vlc_object_create( p_intf,
+                                                sizeof(dialogs_thread_t) );
+    p_thread->p_intf = p_intf;
 
     // Create a new thread for wxWindows
-    if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
-                           0, VLC_TRUE ) )
+    if( vlc_thread_create( p_thread, "Skins Dialogs Thread",
+			   SkinsDialogsThread, 0, VLC_TRUE ) )
     {
         OpenDlg = NULL;
         msg_Err( p_intf, "cannot create SkinsDialogsThread" );
@@ -224,7 +248,7 @@ Dialogs::~Dialogs()
 
     wxTheApp->AddPendingEvent( event );
 
-    vlc_thread_join( p_intf ); //FIXME, use own vlc_object
+    vlc_thread_join( p_thread );
 }
 
 void Dialogs::ShowOpen( bool b_play )
@@ -232,6 +256,14 @@ void Dialogs::ShowOpen( bool b_play )
     wxCommandEvent event( wxEVT_DIALOG, ShowOpen_Event );
     event.SetClientData( this );
     event.SetInt( b_play );
+
+    wxTheApp->AddPendingEvent( event );
+}
+
+void Dialogs::ShowOpenSkin()
+{
+    wxCommandEvent event( wxEVT_DIALOG, ShowOpenSkin_Event );
+    event.SetClientData( this );
 
     wxTheApp->AddPendingEvent( event );
 }
@@ -265,7 +297,7 @@ void Dialogs::OnShowOpen( wxCommandEvent& event )
     Dialogs *p_dialogs = (Dialogs *)event.GetClientData();
     bool b_play = event.GetInt() ? TRUE : FALSE;
 
-    //p_dialogs->OpenDlg->Show( !p_dialogs->OpenDlg->IsShown() );
+    if( p_dialogs->OpenDlg->IsShown() ) return;
  
     if( p_dialogs->OpenDlg->ShowModal() != wxID_OK )
     {
@@ -308,6 +340,29 @@ void Dialogs::OnShowOpen( wxCommandEvent& event )
     return;
 }
 
+void Dialogs::OnShowOpenSkin( wxCommandEvent& event )
+{
+    Dialogs *p_dialogs = (Dialogs *)event.GetClientData();
+    intf_thread_t *p_intf = p_dialogs->p_intf;
+
+    wxFileDialog dialog( NULL,
+        wxU(_("Open a skin file")), wxT(""), wxT(""),
+        wxT("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
+            "All files|*.*"), wxOPEN );
+
+    if( dialog.ShowModal() == wxID_OK )
+    {
+        p_intf->p_sys->p_new_theme_file =
+           new char[strlen(dialog.GetPath().mb_str()) + 1];
+
+        strcpy( p_intf->p_sys->p_new_theme_file,
+                dialog.GetPath().mb_str() );
+
+        // Tell vlc to change skin after hiding interface
+        OSAPI_PostMessage( NULL, VLC_HIDE, VLC_LOAD_SKIN, 0 );
+    }
+}
+
 void Dialogs::OnShowMessages( wxCommandEvent& event )
 {
     Dialogs *p_dialogs = (Dialogs *)event.GetClientData();
@@ -331,3 +386,18 @@ void Dialogs::OnExitThread( wxCommandEvent& event )
     wxTheApp->ExitMainLoop();
 }
 #endif // BASIC_SKINS
+
+/*****************************************************************************
+ * PopupMenuCB: callback triggered by the intf-popupmenu playlist variable.
+ *  We don't show the menu directly here because we don't want the
+ *  caller to block for a too long time.
+ *****************************************************************************/
+int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
+                 vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    Dialogs *p_dialogs = (Dialogs *)param;
+
+    p_dialogs->b_popup_change = VLC_TRUE;
+
+    return VLC_SUCCESS;
+}

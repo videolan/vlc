@@ -2,7 +2,7 @@
  * win32_api.cpp: Various win32-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_api.cpp,v 1.4 2003/04/21 21:51:16 asmax Exp $
+ * $Id: win32_api.cpp,v 1.5 2003/06/04 16:03:33 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,12 +29,14 @@
 #include <windows.h>
 
 //--- SKIN ------------------------------------------------------------------
+#include <vlc/intf.h>
+#include "../src/skin_common.h"
 #include "../src/window.h"
 #include "../os_window.h"
 #include "../os_api.h"
 #include "../src/event.h"         // for MAX_PARAM_SIZE
 
-
+extern intf_thread_t *g_pIntf;  // ugly, but it's not my fault ;)
 
 //---------------------------------------------------------------------------
 // Event API
@@ -53,7 +55,8 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int para
                         long param2 )
 {
     if( win == NULL )
-        PostMessage( NULL, message, param1, param2 );
+        PostThreadMessage( g_pIntf->p_sys->dwThreadId, message, param1,
+                           param2 );
     else
         PostMessage( ( (Win32Window *)win )->GetHandle(), message, param1,
                      param2 );
