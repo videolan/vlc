@@ -1500,11 +1500,11 @@ dnl
 dnl  XOSD plugin
 dnl
 AC_ARG_ENABLE(xosd,
-  [  --enable-xosd           xosd interface support (default disabled)]
+  [  --enable-xosd           xosd interface support (default disabled)])
 if test x$enable_xosd = xyes
 then
-  AC_CHECK_HEADER(xosd.h), AC_CHECK_LIB(xosd, xosd_init, have_xosd="true", have_xosd="false")
-  if test x$have_xosd = xyes
+  AC_CHECK_HEADER(xosd.h, AC_CHECK_LIB(xosd, xosd_init, have_xosd="true", have_xosd="false"),have_xosd="false")
+  if test x$have_xosd = xtrue
   then
     PLUGINS="${PLUGINS} xosd"
     xosd_LDFLAGS="${xosd_LDFLAGS} -lxosd"
