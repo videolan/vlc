@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.10 2003/11/21 09:23:49 jpsaman Exp $
+ * $Id: pda.c,v 1.11 2003/11/25 20:41:35 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -436,6 +436,7 @@ static int Manage( intf_thread_t *p_intf )
                     PlaylistRebuildListStore(p_liststore, p_playlist);
                     msg_Dbg(p_intf, "Manage: Updating GtkTreeView Playlist" );
                     gtk_tree_view_set_model(p_intf->p_sys->p_tvplaylist, (GtkTreeModel*) p_liststore);
+                    vlc_object_release( p_playlist );
                 }
             }
 

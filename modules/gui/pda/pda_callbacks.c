@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.16 2003/11/25 20:01:08 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.17 2003/11/25 20:41:35 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -124,19 +124,20 @@ void PlaylistAddItem(GtkWidget *widget, gchar *name)
 #if 0
             if (p_intf->p_sys->b_autoplayfile)
             {
-                playlist_Add( p_playlist, (char*)name, 0, 0,
+                playlist_Add( p_playlist, (const char*)name, 0, 0,
                               PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END);
             }
             else
             {
-                playlist_Add( p_playlist, (char*)name, 0, 0,
+                playlist_Add( p_playlist, (const char*)name, 0, 0,
                               PLAYLIST_APPEND, PLAYLIST_END );
             }
+            
 #endif
+            vlc_object_release( p_playlist );
             msg_Dbg( p_intf, "done");
         }
     }
-    vlc_object_release(  p_playlist );
 }
 
 void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
@@ -767,8 +768,39 @@ onClearPlaylist                        (GtkButton       *button,
                                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GtkGetIntf( button );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    GtkTreeView    *p_tvplaylist;
+    int item;
 
-    msg_Dbg(p_intf, "Clear playlist" );
+    msg_Dbg(p_intf, "Clear VLC playlist" );
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    for(item = p_playlist->i_size - 1 ; item >= 0 ; item-- )
+    {
+        playlist_Delete( p_playlist, item);
+    }
+    vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_object_release( p_playlist );
+
+    // Remove all entries from the Playlist widget.
+    msg_Dbg(p_intf, "Clear playlist widget" );
+    p_tvplaylist = (GtkTreeView*) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
+    if (p_tvplaylist)
+    {
+        GtkTreeModel *p_play_model;
+
+        p_play_model = gtk_tree_view_get_model(p_tvplaylist);
+        if (p_play_model)
+        {
+            gtk_list_store_clear(GTK_LIST_STORE(p_play_model));
+        }
+    }
 }
 
 
