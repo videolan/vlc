@@ -3,7 +3,7 @@
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads.h,v 1.32 2003/06/14 00:49:58 titer Exp $
+ * $Id: vlc_threads.h,v 1.33 2003/08/28 17:19:42 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -27,10 +27,8 @@
 
 #include <stdio.h>
 
-#if defined(GPROF) || defined(DEBUG)
-#   ifdef HAVE_SYS_TIME_H
-#       include <sys/time.h>
-#   endif
+#if defined(DEBUG) && defined(HAVE_SYS_TIME_H)
+#   include <sys/time.h>
 #endif
 
 #if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */

@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.40 2003/03/10 00:04:14 massiot Exp $
+ * $Id: threads.c,v 1.41 2003/08/28 17:19:41 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -211,46 +211,6 @@ int __vlc_threads_end( vlc_object_t *p_this )
 #endif
     return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * Prototype for GPROF wrapper
- *****************************************************************************/
-#ifdef GPROF
-typedef void *(*vlc_thread_func_t)(void *p_data);
-
-/* Wrapper function for profiling */
-static void *      vlc_thread_wrapper ( void *p_wrapper );
-
-#   if defined( WIN32 ) && !defined( UNDER_CE )
-
-#       define ITIMER_REAL 1
-#       define ITIMER_PROF 2
-
-struct itimerval
-{
-    struct timeval it_value;
-    struct timeval it_interval;
-};
-
-int setitimer(int kind, const struct itimerval* itnew, struct itimerval* itold);
-#   endif /* WIN32 && !UNDER_CE */
-
-typedef struct wrapper_t
-{
-    /* Data lock access */
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
-
-    /* Data used to spawn the real thread */
-    vlc_thread_func_t func;
-    void *p_data;
-
-    /* Profiling timer passed to the thread */
-    struct itimerval itimer;
-
-} wrapper_t;
-
-#endif /* GPROF */
 
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
@@ -549,28 +509,9 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
                          int i_priority, vlc_bool_t b_wait )
 {
     int i_ret;
-    void *p_data;
+    void *p_data = (void *)p_this;
 
     vlc_mutex_lock( &p_this->object_lock );
-
-#ifdef GPROF
-    wrapper_t wrapper;
-
-    /* Initialize the wrapper structure */
-    wrapper.func = func;
-    wrapper.p_data = (void *)p_this;
-    getitimer( ITIMER_PROF, &wrapper.itimer );
-    vlc_mutex_init( p_this, &wrapper.lock );
-    vlc_cond_init( p_this, &wrapper.wait );
-    vlc_mutex_lock( &wrapper.lock );
-
-    /* Alter user-passed data so that we call the wrapper instead
-     * of the real function */
-    p_data = &wrapper;
-    func = vlc_thread_wrapper;
-#else
-    p_data = (void *)p_this;
-#endif
 
 #if defined( PTH_INIT_IN_PTH_H )
     p_this->thread_id = pth_spawn( PTH_ATTR_DEFAULT, func, p_data );
@@ -646,17 +587,6 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
                                       i_priority, p_data );
     i_ret = resume_thread( p_this->thread_id );
 
-#endif
-
-#ifdef GPROF
-    if( i_ret == 0 )
-    {
-        vlc_cond_wait( &wrapper.wait, &wrapper.lock );
-    }
-
-    vlc_mutex_unlock( &wrapper.lock );
-    vlc_mutex_destroy( &wrapper.lock );
-    vlc_cond_destroy( &wrapper.wait );
 #endif
 
     if( i_ret == 0 )
@@ -800,25 +730,3 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
     p_this->b_thread = 0;
 }
 
-/*****************************************************************************
- * vlc_thread_wrapper: wrapper around thread functions used when profiling.
- *****************************************************************************/
-#ifdef GPROF
-static void *vlc_thread_wrapper( void *p_wrapper )
-{
-    /* Put user data in thread-local variables */
-    void *            p_data = ((wrapper_t*)p_wrapper)->p_data;
-    vlc_thread_func_t func   = ((wrapper_t*)p_wrapper)->func;
-
-    /* Set the profile timer value */
-    setitimer( ITIMER_PROF, &((wrapper_t*)p_wrapper)->itimer, NULL );
-
-    /* Tell the calling thread that we don't need its data anymore */
-    vlc_mutex_lock( &((wrapper_t*)p_wrapper)->lock );
-    vlc_cond_signal( &((wrapper_t*)p_wrapper)->wait );
-    vlc_mutex_unlock( &((wrapper_t*)p_wrapper)->lock );
-
-    /* Call the real function */
-    return func( p_data );
-}
-#endif
