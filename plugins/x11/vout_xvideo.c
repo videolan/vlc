@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.6 2001/04/13 06:20:23 sam Exp $
+ * $Id: vout_xvideo.c,v 1.7 2001/04/15 04:46:41 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -66,6 +66,10 @@
 #include "netutils.h"                                 /* network_ChannelJoin */
 
 #include "main.h"
+
+
+#define GUID_YUV12_PLANAR 0x32315659
+
 
 /*****************************************************************************
  * vout_sys_t: video output X11 method descriptor
@@ -235,6 +239,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( (p_vout->p_sys->xv_port = XVideoGetPort( p_vout->p_sys->p_display ))<0 )
         return 1;
+    intf_DbgMsg( 1, "Using xv port %d" , p_vout->p_sys->xv_port );
 
 #if 0
     /* XXX The brightness and contrast values should be read from environment
@@ -540,7 +545,7 @@ static int XVideoUpdateImgSizeIfRequired( vout_thread_t *p_vout )
                                   &p_vout->p_sys->shm_info,
                                   i_img_width, i_img_height ) )
         {
-            intf_Msg( "vout: failed to create xvimage." );
+            intf_ErrMsg( "vout: failed to create xvimage." );
             p_vout->p_sys->i_image_width = 0;
             return( 1 );
         }
@@ -785,24 +790,37 @@ static int XVideoCreateShmImage( Display* dpy, int xv_port,
                                     XShmSegmentInfo *p_shm_info,
                                     int i_width, int i_height )
 {
-    #define GUID_YUV12_PLANAR 0x32315659
-
     *pp_xvimage = XvShmCreateImage( dpy, xv_port,
                                     GUID_YUV12_PLANAR, 0,
                                     i_width, i_height,
                                     p_shm_info );
+    if( !(*pp_xvimage) )
+    {
+        intf_ErrMsg( "vout error: XvShmCreateImage failed." );
+        return( -1 );
+    }
 
     p_shm_info->shmid    = shmget( IPC_PRIVATE, (*pp_xvimage)->data_size,
                                    IPC_CREAT | 0777 );
+    if( p_shm_info->shmid < 0)                                      /* error */
+    {
+        intf_ErrMsg( "vout error: cannot allocate shared image data (%s)",
+                    strerror(errno));
+        return( 1 );
+    }
+
     p_shm_info->shmaddr  = (*pp_xvimage)->data = shmat( p_shm_info->shmid,
                                                         0, 0 );
     p_shm_info->readOnly = False;
 
-    shmctl( p_shm_info->shmid, IPC_RMID, 0 ); /* XXX */
+    /* Mark the shm segment to be removed when there will be no more
+     * attachements, so it is automatic on process exit or after shmdt */
+    shmctl( p_shm_info->shmid, IPC_RMID, 0 );
 
     if( !XShmAttach( dpy, p_shm_info ) )
     {
         intf_ErrMsg( "vout error: XShmAttach failed" );
+        shmdt( p_shm_info->shmaddr );
         return( -1 );
     }
 
@@ -974,6 +992,7 @@ static void XVideoOutputCoords( const picture_t *p_pic, const boolean_t scale,
 static int XVideoGetPort( Display *dpy )
 {
     int            i, i_adaptors;
+    int            xv_port = -1;
     XvAdaptorInfo *adaptor_info;
 
     switch( XvQueryAdaptors( dpy, DefaultRootWindow( dpy ),
@@ -995,15 +1014,38 @@ static int XVideoGetPort( Display *dpy )
             return( -1 );
     }
 
-    for( i=0; i < i_adaptors; ++i )
+    for( i=0; i < i_adaptors && xv_port == -1; ++i )
         if( ( adaptor_info[ i ].type & XvInputMask ) &&
             ( adaptor_info[ i ].type & XvImageMask ) )
-            {
-                return adaptor_info[ i ].base_id;
-            }
+        {
+            /* check that port supports YUV12 planar format... */
+            int port = adaptor_info[ i ].base_id;
+            int i_num_formats, i;
+            XvImageFormatValues *imageFormats;
 
-    intf_ErrMsg( "vout error: didn't find an Xvideo image input port." );
-    return( -1 );
+            imageFormats = XvListImageFormats( dpy, port, &i_num_formats );
+
+            for( i=0; i < i_num_formats && xv_port == -1; ++i )
+                if( imageFormats[ i ].id == GUID_YUV12_PLANAR )
+                    xv_port = port;
+
+            if( xv_port == -1 )
+                intf_WarnMsg( 3, "vout: XVideo image input port %d "
+                        "does not support the YUV12 planar format which is "
+                        "currently required by the xvideo output plugin.",
+                        port );
+
+            if( imageFormats )
+                XFree( imageFormats );
+        }
+
+    if( i_adaptors > 0 )
+        XvFreeAdaptorInfo(adaptor_info);
+
+    if( xv_port == -1 )
+        intf_ErrMsg( "vout error: didn't find a suitable Xvideo image input port." );
+
+    return( xv_port );
 }
 
 
@@ -1012,7 +1054,7 @@ static int XVideoGetPort( Display *dpy )
  * XVideoSetAttribute
  *****************************************************************************
  * This function can be used to set attributes, e.g. XV_BRIGHTNESS and
- * XV_CONTRAST. "value" should be in the range of 0 to 1.
+ * XV_CONTRAST. "f_value" should be in the range of 0 to 1.
  *****************************************************************************/
 static void XVideoSetAttribute( vout_thread_t *p_vout,
                                 char *attr_name, float f_value )
@@ -1036,9 +1078,12 @@ static void XVideoSetAttribute( vout_thread_t *p_vout,
 
             XvSetPortAttribute( p_dpy, xv_port,
                             XInternAtom( p_dpy, attr_name, False ), i_sv );
-            return;
+            break;
         }
 
     } while( i_attrib > 0 );
+
+    if( p_attrib )
+        XFree( p_attrib );
 }
 #endif

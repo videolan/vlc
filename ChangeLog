@@ -4,6 +4,8 @@
 
 HEAD
 
+  * A few Makefile fixes for BeOS
+  * XVideo patches by Shane Harper <shanegh@optusnet.com.au>.
   * Beginning of the built-in modules support.
   * Got rid of the sleep() hack in beos_specific.cpp.
   * Fixed a segfault when launched without argument under Darwin.

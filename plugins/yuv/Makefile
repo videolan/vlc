@@ -30,7 +30,7 @@ all:
 
 clean:
 	rm -f $(ALL_OBJ)
-	rm -f *.o *.moc *.bak *.so *.a *.builtin
+	rm -f *.o *.moc *.bak *.builtin
 	rm -rf .dep
 
 FORCE:
@@ -38,7 +38,7 @@ FORCE:
 $(cdependancies): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
 
-$(ALL_OBJ): %.o: ../../Makefile.dep
+$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
 
 $(STD_PLUGIN_OBJ): %.o: .dep/%.d
 $(STD_PLUGIN_OBJ): %.o: %.c
