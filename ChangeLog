@@ -3,6 +3,26 @@
 #===================#
 
 HEAD
+  * Nothing yet.
+
+0.2.81
+Fri, 27 Jul 2001 03:30:44 +0200
+
+  * Changed libdvdcss API to force binary incompatibility. Yeah, this is
+    evil, but if we don't do it now we'll have to do it when more people
+    are using it.
+  * Fixed minor libdvdcss stuff such as the soname and compilation flags.
+  * New --with-dvdcss flag.
+  * Fixed a bug in aout spdif with dolby stereo (use of obsolete PTS).
+  * Format asm functions for gcc, fixed the segfaults with imdct_sse.
+  * Now using gcc -pipe.
+  * (Hopefully) fixed the #@!$ field pictures bug.
+  * Fixed the MMX YUV plugin issues with gcc 2.96 and 3.0.
+  * Updated TODO, cosmetic changes.
+  * Now use sdl-config for SDL.
+  * Fixed a stupid bug in buffer management with field pictures.
+  * Fixed a reinit bug after a discontinuity - such as seek().
+  * The spdif audio output won't kill itself anymore at the beginning.
   * dvdcss_readv() optimisations for Win32.
   * Fixed _win32_dvdcss_aread() to work around the WinASPI32 64kb transfer
     size restriction.
@@ -10,6 +30,9 @@ HEAD
   * dvd_ifo.c now takes into account error messages from UDFFindFile.
   * Fixed the "quit" event handling in directx/vout_events.c.
   * Temporarily disabled aout_Probe() in aout_SDL (libSDL bug).
+  * ncurses compilation fix by Michael Mondragon <mammon@lokmail.net>.
+  * Fix for large inline functions and gcc 3.0.
+  * Fixed the gnome plugin so that it does not include gtk headers.
   * libdvdcss segfault fixes.
   * Tuned constants, since it seems to make people happy.
   * Fixed the "paused movie won't restart" bug.

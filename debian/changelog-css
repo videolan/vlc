@@ -1,3 +1,9 @@
+vlc-css (0.2.81-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri, 27 Jul 2001 03:30:44 +0200
+
 vlc-css (0.2.80-1) unstable; urgency=low
 
   * New upstream release.
