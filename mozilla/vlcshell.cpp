@@ -82,6 +82,9 @@
 #   define WINDOW_TEXT "(no libvlc)"
 #endif
 
+/* Enable/disable debugging printf's for X11 resizing */
+#undef X11_RESIZE_DEBUG
+
 /*****************************************************************************
  * Unix-only declarations
 ******************************************************************************/
@@ -90,6 +93,7 @@
 #   define AOUT_PLUGINS "oss,dummy"
 
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
+static void Resize( Widget w, XtPointer closure, XEvent *event );
 #endif
 
 /*****************************************************************************
@@ -136,9 +140,9 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
         case NPPVpluginDescriptionString:
 #if USE_LIBVLC
             snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, VLC_Version() );
-#else
+#else /* USE_LIBVLC */
             snprintf( psz_desc, 1000-1, PLUGIN_DESCRIPTION, "(disabled)" );
-#endif
+#endif /* USE_LIBVLC */
             psz_desc[1000-1] = 0;
             *((char **)value) = psz_desc;
             return NPERR_NO_ERROR;
@@ -208,7 +212,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
 
     return eventHandled;
 }
-#endif
+#endif /* XP_MACOSX */
 
 /******************************************************************************
  * General Plug-in Calls
@@ -237,7 +241,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     vlc_value_t value;
     int i_ret;
 
-#endif
+#endif /* USE_LIBVLC */
 
     if( instance == NULL )
     {
@@ -256,12 +260,12 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 #ifdef XP_WIN
     p_plugin->p_hwnd = NULL;
     p_plugin->pf_wndproc = NULL;
-#endif
+#endif /* XP_WIN */
 
 #ifdef XP_UNIX
     p_plugin->window = 0;
     p_plugin->p_display = NULL;
-#endif
+#endif /* XP_UNIX */
 
     p_plugin->p_npwin = NULL;
     p_plugin->i_npmode = mode;
@@ -317,14 +321,14 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 
         if( !ppsz_argv[0] ) ppsz_argv[0] = "vlc";
 
-#else
+#else /* XP_MACOSX */
         char *ppsz_argv[] =
         {
             "vlc"
             /*, "--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins"*/
         };
 
-#endif
+#endif /* XP_MACOSX */
 
         i_ret = VLC_Init( p_plugin->i_vlc, sizeof(ppsz_argv)/sizeof(char*),
                           ppsz_argv );
@@ -333,7 +337,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         free( home_user );
         free( directory );
         free( plugin_path );
-#endif
+#endif /* XP_MACOSX */
     }
 
     if( i_ret )
@@ -352,7 +356,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     value.psz_string = AOUT_PLUGINS;
     VLC_VariableSet( p_plugin->i_vlc, "conf::aout", value );
 
-#else
+#else /* USE_LIBVLC */
     p_plugin->i_vlc = 1;
 
 #endif /* USE_LIBVLC */
@@ -414,7 +418,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
                 VLC_VolumeMute( p_plugin->i_vlc );
             }
         }
-#endif
+#endif /* USE_LIBVLC */
     }
 
     if( p_plugin->psz_target )
@@ -454,7 +458,7 @@ static void HackStopVout( VlcPlugin* p_plugin )
     }
     while( (hwnd = FindWindowEx( (HWND)value.i_int, 0, 0, 0 )) );
 }
-#endif
+#endif /* XP_WIN */
 
 NPError NPP_Destroy( NPP instance, NPSavedData** save )
 {
@@ -472,10 +476,10 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 #if USE_LIBVLC
 #   ifdef XP_WIN
             HackStopVout( p_plugin );
-#   endif
+#   endif /* XP_WIN */
             VLC_CleanUp( p_plugin->i_vlc );
             VLC_Destroy( p_plugin->i_vlc );
-#endif
+#endif /* USE_LIBVLC */
             p_plugin->i_vlc = 0;
         }
 
@@ -509,7 +513,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     vlc_value_t valueporty;
     Rect black_rect;
     char * text;
-#endif
+#endif /* XP_MACOSX */
 
     if( instance == NULL )
     {
@@ -569,13 +573,13 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     DrawText( text , 0 , strlen(text) );
     free(text);
 
-#else
+#else /* XP_MACOSX */
     /* FIXME: this cast sucks */
     value.i_int = (int) (ptrdiff_t) (void *) window->window;
     VLC_VariableSet( p_plugin->i_vlc, "drawable", value );
-#endif
+#endif /* XP_MACOSX */
 
-#endif
+#endif /* USE_LIBVLC */
 
     /*
      * PLUGIN DEVELOPERS:
@@ -594,7 +598,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #if !USE_LIBVLC
             SetWindowLong( p_plugin->p_hwnd, GWL_WNDPROC,
                            (LONG)p_plugin->pf_wndproc );
-#endif
+#endif /* !USE_LIBVLC */
             p_plugin->pf_wndproc = NULL;
             p_plugin->p_hwnd = NULL;
         }
@@ -615,7 +619,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #if !USE_LIBVLC
             InvalidateRect( p_plugin->p_hwnd, NULL, TRUE );
             UpdateWindow( p_plugin->p_hwnd );
-#endif
+#endif /* !USE_LIBVLC */
             return NPERR_NO_ERROR;
         }
 
@@ -624,7 +628,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #if !USE_LIBVLC
         SetWindowLong( p_plugin->p_hwnd, GWL_WNDPROC,
                        (LONG)p_plugin->pf_wndproc );
-#endif
+#endif /* !USE_LIBVLC */
         p_plugin->pf_wndproc = NULL;
         p_plugin->p_hwnd = NULL;
     }
@@ -632,28 +636,32 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 #if !USE_LIBVLC
     p_plugin->pf_wndproc = (WNDPROC)SetWindowLong( (HWND)window->window,
                                                    GWL_WNDPROC, (LONG)Manage );
-#endif
+#endif /* !USE_LIBVLC */
 
     p_plugin->p_hwnd = (HWND)window->window;
     SetProp( p_plugin->p_hwnd, "w00t", (HANDLE)p_plugin );
     InvalidateRect( p_plugin->p_hwnd, NULL, TRUE );
     UpdateWindow( p_plugin->p_hwnd );
-#endif
-
-#ifdef XP_UNIX
-    p_plugin->window = (Window) window->window;
-    p_plugin->p_display = ((NPSetWindowCallbackStruct *)window->ws_info)->display;
-
-    Widget w = XtWindowToWidget( p_plugin->p_display, p_plugin->window );
-    XtAddEventHandler( w, ExposureMask, FALSE,
-                       (XtEventHandler)Redraw, p_plugin );
-    Redraw( w, (XtPointer)p_plugin, NULL );
-#endif
-
-    p_plugin->p_npwin = window;
+#endif /* XP_WIN */
 
     p_plugin->i_width = window->width;
     p_plugin->i_height = window->height;
+    p_plugin->p_npwin = window;
+
+#ifdef XP_UNIX
+    p_plugin->window = (Window) window->window;
+    p_plugin->p_display =
+        ((NPSetWindowCallbackStruct *)window->ws_info)->display;
+
+    XResizeWindow( p_plugin->p_display, p_plugin->window,
+                   p_plugin->i_width, p_plugin->i_height );
+    Widget w = XtWindowToWidget( p_plugin->p_display, p_plugin->window );
+    XtAddEventHandler( w, ExposureMask, FALSE,
+                       (XtEventHandler)Redraw, p_plugin );
+    XtAddEventHandler( w, StructureNotifyMask, FALSE,
+                       (XtEventHandler)Resize, p_plugin );
+    Redraw( w, (XtPointer)p_plugin, NULL );
+#endif /* XP_UNIX */
 
     if( !p_plugin->b_stream )
     {
@@ -770,7 +778,7 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
 
     VLC_AddTarget( p_plugin->i_vlc, fname, 0, 0,
                    PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-#endif
+#endif /* USE_LIBVLC */
 }
 
 
@@ -884,7 +892,7 @@ LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
     }
     return 0;
 }
-#endif
+#endif /* XP_WIN */
 
 /******************************************************************************
  * UNIX-only methods
@@ -911,5 +919,74 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
 
     XFreeGC( p_plugin->p_display, gc );
 }
-#endif
+
+static void Resize ( Widget w, XtPointer closure, XEvent *event )
+{
+    VlcPlugin* p_plugin = (VlcPlugin*)closure;
+    int i_ret;
+    Window root_return, parent_return, * children_return;
+    Window base_window;
+    unsigned int i_nchildren;
+
+#ifdef X11_RESIZE_DEBUG
+    XWindowAttributes attr;
+
+    if( event && event->type == ConfigureNotify )
+    {
+        fprintf( stderr, "vlcshell::Resize() ConfigureNotify %d x %d, "
+                 "send_event ? %s\n", event->xconfigure.width,
+                 event->xconfigure.height,
+                 event->xconfigure.send_event ? "TRUE" : "FALSE" );
+    }
+#endif /* X11_RESIZE_DEBUG */
+
+    i_ret = XResizeWindow( p_plugin->p_display, p_plugin->window,
+            p_plugin->i_width, p_plugin->i_height );
+
+#ifdef X11_RESIZE_DEBUG
+    fprintf( stderr,
+             "vlcshell::Resize() XResizeWindow(owner) returned %d\n", i_ret );
+
+    XGetWindowAttributes ( p_plugin->p_display, p_plugin->window, &attr );
+
+    /* X is asynchronous, so the current size reported here is not
+       necessarily the requested size as the Resize request may not
+       yet have been handled by the plugin host */
+    fprintf( stderr, "vlcshell::Resize() current (owner) size %d x %d\n",
+             attr.width, attr.height );
+#endif /* X11_RESIZE_DEBUG */
+
+    XQueryTree( p_plugin->p_display, p_plugin->window,
+                &root_return, &parent_return, &children_return,
+                &i_nchildren );
+
+    if( i_nchildren > 0 )
+    {
+        /* XXX: Make assumptions related to the window parenting structure in
+           vlc/modules/video_output/x11/xcommon.c */
+        base_window = children_return[i_nchildren - 1];
+
+#ifdef X11_RESIZE_DEBUG
+        fprintf( stderr, "vlcshell::Resize() got %d children\n", i_nchildren );
+        fprintf( stderr, "vlcshell::Resize() got base_window %p\n",
+                 base_window );
+#endif /* X11_RESIZE_DEBUG */
+
+        i_ret = XResizeWindow( p_plugin->p_display, base_window,
+                p_plugin->i_width, p_plugin->i_height );
+
+#ifdef X11_RESIZE_DEBUG
+        fprintf( stderr,
+                 "vlcshell::Resize() XResizeWindow(base) returned %d\n",
+                 i_ret );
+
+        XGetWindowAttributes( p_plugin->p_display, base_window, &attr );
+
+        fprintf( stderr, "vlcshell::Resize() new size %d x %d\n",
+                 attr.width, attr.height );
+#endif /* X11_RESIZE_DEBUG */
+    }
+}
+
+#endif /* XP_UNIX */
 
