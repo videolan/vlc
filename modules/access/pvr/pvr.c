@@ -2,7 +2,7 @@
  * pvr.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pvr.c,v 1.6 2003/07/24 18:30:03 bigben Exp $
+ * $Id: pvr.c,v 1.7 2003/09/08 11:05:02 bigben Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -43,21 +43,23 @@
 
 
 /* for use with IVTV_IOC_G_CODEC and IVTV_IOC_S_CODEC */
+
 struct ivtv_ioctl_codec {
-    uint32_t aspect;
-    uint32_t audio;
-    uint32_t bframes;
-    uint32_t bitrate;
-    uint32_t bitrate_peak;
-    uint32_t dnr_mode;
-    uint32_t dnr_spatial;
-    uint32_t dnr_temporal;
-    uint32_t dnr_type;
-    uint32_t framerate;
-    uint32_t framespergop;
-    uint32_t gop_closure;
-    uint32_t pulldown;
-    uint32_t stream_type;
+        uint32_t aspect;
+        uint32_t audio_bitmask;
+        uint32_t bframes;
+        uint32_t bitrate_mode;
+        uint32_t bitrate;
+        uint32_t bitrate_peak;
+        uint32_t dnr_mode;
+        uint32_t dnr_spatial;
+        uint32_t dnr_temporal;
+        uint32_t dnr_type;
+        uint32_t framerate;
+        uint32_t framespergop;
+        uint32_t gop_closure;
+        uint32_t pulldown;
+        uint32_t stream_type;
 };
 
 /*****************************************************************************
@@ -94,6 +96,7 @@ struct access_sys_t
     int i_framerate;
     int i_bitrate;
     int i_bitrate_peak;
+    int i_bitrate_mode;
 };
 
 /*****************************************************************************
@@ -219,6 +222,30 @@ static int Open( vlc_object_t * p_this )
                     strtol( psz_parser + strlen( "maxbitrate=" ),
                             &psz_parser, 0 );
             }
+            else if( !strncmp( psz_parser, "bitratemode=",
+                               strlen( "bitratemode=" ) ) )
+            {
+                char *psz_parser_init;
+                psz_parser += strlen( "bitratemode=" );
+                psz_parser_init = psz_parser;
+                while ( *psz_parser != ':' && *psz_parser != ','
+                                                    && *psz_parser != '\0' )
+                {
+                    psz_parser++;
+                }
+
+                if (!strncmp( psz_parser_init, "vbr" ,
+                                                psz_parser - psz_parser_init ) )
+                    {
+                    p_sys->i_bitrate_mode = 0;
+                    }
+                else if  (!strncmp( psz_parser_init, "cbr" ,
+                                                psz_parser - psz_parser_init ) )
+                    {
+                    p_sys->i_bitrate_mode = 1;
+                    }
+            }
+
             else if( !strncmp( psz_parser, "size=",
                                strlen( "size=" ) ) )
             {
@@ -261,10 +288,10 @@ static int Open( vlc_object_t * p_this )
     free( psz_tofree );
 
     msg_Dbg( p_input, "device: %s, standard: %x, size: %dx%d, "
-             "frequency: %d, framerate: %d, bitrate: %d/%d",
+             "frequency: %d, framerate: %d, bitrate: %d/%d/%d",
              psz_device, p_sys->i_standard, p_sys->i_width,
              p_sys->i_height, p_sys->i_frequency, p_sys->i_framerate,
-             p_sys->i_bitrate, p_sys->i_bitrate_peak );
+             p_sys->i_bitrate, p_sys->i_bitrate_peak,p_sys->i_bitrate_mode );
 
     /* open the device */
     if( ( p_sys->i_fd = open( psz_device, O_RDWR ) ) < 0 )
@@ -336,6 +363,7 @@ static int Open( vlc_object_t * p_this )
         }
         codec.bitrate = p_sys->i_bitrate;
         codec.bitrate_peak = p_sys->i_bitrate_peak;
+        codec.bitrate_mode = p_sys->i_bitrate_mode;
         if( ioctl( p_sys->i_fd, IVTV_IOC_S_CODEC, &codec ) < 0 )
         {
             msg_Warn( p_input, "IVTV_IOC_S_CODEC failed" );
