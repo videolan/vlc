@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.45 2003/09/10 15:50:25 zorglub Exp $
+ * $Id: http.c,v 1.46 2003/09/10 21:03:56 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>
-#include <string.h>
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
@@ -151,6 +150,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                    "Range: bytes="I64Fd"-\r\n"
                    HTTP_USERAGENT
                    "%s"
+                   "Connection: Close\r\n"
                    HTTP_END,
                    p_access_data->psz_buffer, i_tell, p_access_data->psz_auth_string );
     }
@@ -160,6 +160,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
                    "%s"
                    HTTP_USERAGENT
                    "%s"
+                   "Connection: Close\r\n"
                    HTTP_END,
                    p_access_data->psz_buffer, p_access_data->psz_auth_string );
     }
@@ -214,7 +215,6 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
 
         psz_parser += strlen("HTTP/1.x");
         i_size -= strlen("HTTP/1.x");
-        
     }
     else if( ( (size_t)i_size >= strlen("ICY") &&
              !strncmp( psz_parser, "ICY", strlen("ICY") ) ) )
@@ -234,7 +234,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         msg_Err( p_input, "invalid HTTP reply '%s'", psz_parser );
         return VLC_EGENERIC;
     }
-    
+
     /* Check for buggy Icecast servers */
     if( strstr( psz_parser , "x-audiocast") )
     {
@@ -245,7 +245,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
             p_input->psz_demux = "mp3";    // FIXME strdup ?
         }
     }
-    
+
     /* Check the HTTP return code */
     i_code = atoi( (char*)psz_parser );
     msg_Dbg( p_input, "%s server replied: %i",
@@ -325,18 +325,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         if( !strcasecmp( psz_line, "Content-Length" ) )
         {
             off_t i_size = 0;
-#ifdef HAVE_ATOLL
-            i_size = i_tell + atoll( psz_value );
-#else
-            int sign = 1;
 
-            if( *psz_value == '-' ) sign = -1;
-            while( *psz_value >= '0' && *psz_value <= '9' )
-            {
-                i_size = i_size * 10 + *psz_value++ - '0';
-            }
-            i_size = i_tell + ( i_size * sign );
-#endif
+            i_size = i_tell + atoll( psz_value );
             msg_Dbg( p_input, "stream size is "I64Fd, i_size );
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
