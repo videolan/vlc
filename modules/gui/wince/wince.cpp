@@ -30,10 +30,7 @@
 
 #if defined( UNDER_CE ) && defined(__MINGW32__)
 /* This is a gross hack for the wince gcc cross-compiler */
-#undef strerror
 #define _off_t long
-char *strerror( int i_err ){ return "error message not available"; };
-void abort (void){};
 #endif
 
 #include "wince.h"
@@ -77,9 +74,18 @@ DllMain( HANDLE hModule, DWORD fdwReason, LPVOID lpReserved )
 /*****************************************************************************
  * Open: initialize interface
  *****************************************************************************/
-static int Open ( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
+    // Check if the application is running.
+    // If it's running then focus its window and bail out.
+    HWND hwndMain = FindWindow( _T("VLC WinCE"), _T("VLC media player") );  
+    if( hwndMain )
+    {
+        SetForegroundWindow( hwndMain );
+        return VLC_EGENERIC;
+    }
 
     // Allocate instance and initialize some members
     p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
@@ -112,7 +118,7 @@ static int Open ( vlc_object_t *p_this )
 /*****************************************************************************
  * Close: destroy interface
  *****************************************************************************/
-static void Close ( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 

@@ -59,7 +59,7 @@ public:
                      unsigned int * );
     void ReleaseWindow( void * );
     int  ControlWindow( void *, int, va_list );
-	
+        
     HWND p_child_window; // public because of menu
 
 private:
@@ -69,14 +69,14 @@ private:
     vlc_mutex_t lock;
 
     virtual LRESULT WndProc( HWND hwnd, UINT msg,
-	 		     WPARAM wParam, LPARAM lParam, PBOOL pbProcessed );
+                             WPARAM wParam, LPARAM lParam, PBOOL pbProcessed );
 };
 
 /*****************************************************************************
  * Public methods.
  *****************************************************************************/
 CBaseWindow *CreateVideoWindow( intf_thread_t *p_intf, HINSTANCE hInst,
-				HWND p_parent )
+                                HWND p_parent )
 {
     return new VideoWindow( p_intf, hInst, p_parent );
 }
@@ -124,7 +124,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, HINSTANCE _hInst,
         rect.bottom - rect.top - 2*(MENU_HEIGHT-1) - SLIDER_HEIGHT - 20,
         p_parent, NULL, _hInst, (void *)this );
 
-    // ShowWindow( p_child_window, 1 );
+    ShowWindow( p_child_window, SW_SHOW );
     UpdateWindow( p_child_window );
 
     ReleaseWindow( (void*)p_child_window );
@@ -165,6 +165,7 @@ void *VideoWindow::GetWindow( vout_thread_t *_p_vout,
 
     vlc_mutex_unlock( &lock );
 
+    ShowWindow( (HWND)p_child_window, SW_SHOW );
     return p_child_window;
 }
 
@@ -176,11 +177,11 @@ static void ReleaseWindow( intf_thread_t *p_intf, void *p_window )
 void VideoWindow::ReleaseWindow( void *p_window )
 {
     vlc_mutex_lock( &lock );
-
     p_vout = NULL;
-    ShowWindow( (HWND)p_window, SW_HIDE );
-
     vlc_mutex_unlock( &lock );
+
+    ShowWindow( (HWND)p_window, SW_HIDE );
+    SetForegroundWindow( p_parent );
 }
 
 /***********************************************************************

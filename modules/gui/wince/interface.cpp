@@ -115,15 +115,6 @@ BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
 
     hInst = hInstance; // Store instance handle in our global variable
 
-    // Check if the application is running.
-    // If it's running then focus its window.
-    hwndMain = FindWindow( _T("VLC WinCE"), _T("VLC media player") );  
-    if( hwndMain ) 
-    {
-        SetForegroundWindow( hwndMain );
-        return TRUE;
-    }
-
     // Register window class
     WNDCLASS wc;
     wc.style = CS_HREDRAW | CS_VREDRAW ;
