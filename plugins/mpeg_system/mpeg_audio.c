@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.3 2002/05/13 21:55:30 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.4 2002/05/13 23:12:10 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -160,6 +160,24 @@ static __inline__ u32 __GetDWBE( byte_t *p_buff )
                     ( (*(p_buff+2)) << 8 ) +  ( (*(p_buff+3)) ) );
 }
 
+static int __CheckPS( input_thread_t *p_input )
+{
+    byte_t *p_buff;
+    int i_size = input_Peek( p_input, &p_buff, 8192 );
+
+    while( i_size > 0 )
+    {
+        if( !(*p_buff) && !(*(p_buff + 1)) 
+                && (*(p_buff + 2) == 1 ) && (*(p_buff + 3) >= 0xB9 ) )
+        {
+            return( 1 );  /* it could be ps so ...*/
+        }
+        p_buff++;
+        i_size--;
+    }
+    return( 0 );
+}
+
 /*
 #define __GetDWBE( p_buff ) \
     ( ( (*(p_buff)) << 24 ) + ( (*(p_buff+1)) << 16 ) + \
@@ -266,11 +284,18 @@ static int MPEGAudio_FindFrame( input_thread_t *p_input,
         {
             MPEGAudio_ParseHeader( i_header, p_mpeg );
             i_framesize = MPEGAudio_FrameSize( p_mpeg );
-            if( ( i_pos + i_framesize + 4 > i_size )
-                ||( MPEGAudio_CheckHeader( __GetDWBE( p_buff + i_framesize ) ) ) )
+            if(  i_pos + i_framesize + 4 > i_size )
             {
                 *pi_pos = i_pos;
                 return( 1 );
+            }
+            else
+            {
+                if( MPEGAudio_CheckHeader( __GetDWBE( p_buff + i_framesize ) ) )
+                {
+                    *pi_pos = i_pos;
+                    return( 2 );
+                }
             }
         }
         p_buff++;
@@ -375,10 +400,15 @@ static int MPEGAudioInit( input_thread_t * p_input )
     /* Improve speed. */
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
-    
-    if( !(MPEGAudio_FindFrame( p_input, &i_pos, &mpeg )) )
+    /* check if it can be a ps stream */
+    if( __CheckPS(  p_input ) )
     {
-        intf_WarnMsg( 2,"input: MPEGAudio plug-in discarded (no MPEG header)" );
+        return( -1 );
+    }
+    /* must be sure that is mpeg audio stream */
+    if( MPEGAudio_FindFrame( p_input, &i_pos, &mpeg ) != 2 )
+    {
+        intf_WarnMsg( 2,"input: MPEGAudio plug-in discarded" );
         return( -1 );
     }
     
