@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.115 2003/11/22 15:53:18 sam Exp $
+dnl $Id: configure.ac,v 1.116 2003/11/22 17:03:57 fenrir Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -866,7 +866,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc logger gestures memcpy hotkeys])
-AX_ADD_PLUGINS([es mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv])
+AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv])
 AX_ADD_PLUGINS([spudec mpeg_audio lpcm a52 dts cinepak dvbsub])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])

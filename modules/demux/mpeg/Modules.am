@@ -1,30 +1,7 @@
-SOURCES_mpeg_system = \
-	system.c \
-	system.h \
-	$(NULL)
-
-SOURCES_es = \
-	es.c \
-	$(NULL)
-
-SOURCES_m4v = \
-	m4v.c \
-	$(NULL)
-
-
-SOURCES_ps = \
-	ps.c \
-	$(NULL)
-
-SOURCES_ts = \
-	ts.c \
-	$(NULL)
-
-SOURCES_ts_dvbpsi = \
-	ts.c \
-	$(NULL)
-
-SOURCES_mpga = \
-	mpga.c \
-	$(NULL)
-
+SOURCES_mpeg_system = system.c system.h
+SOURCES_m4v = m4v.c
+SOURCES_ps = ps.c
+SOURCES_ts = ts.c
+SOURCES_ts_dvbpsi = ts.c
+SOURCES_mpga = mpga.c
+SOURCES_mpgv = mpgv.c

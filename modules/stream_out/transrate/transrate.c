@@ -6,7 +6,7 @@
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- * $Id: transrate.c,v 1.3 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: transrate.c,v 1.4 2003/11/22 17:03:57 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1957,12 +1957,37 @@ static void process_frame( sout_stream_t *p_stream,
 static int transrate_video_process( sout_stream_t *p_stream,
                sout_stream_id_t *id, sout_buffer_t *in, sout_buffer_t **out )
 {
-    transrate_t *tr = &id->tr;
+    transrate_t    *tr = &id->tr;
     bs_transrate_t *bs = &tr->bs;
+    vlc_bool_t     b_gop = VLC_FALSE;
 
     *out = NULL;
 
-    if ( in->i_flags & SOUT_BUFFER_FLAGS_GOP )
+    if( GetDWBE( in->p_buffer ) != 0x100 )
+    {
+        uint8_t *p = in->p_buffer;
+        uint8_t *p_end = &in->p_buffer[in->i_buffer];
+        uint32_t code = GetDWBE( p );
+
+        /* We may have a GOP */
+        while( p < p_end - 4 )
+        {
+            if( code == 0x1b8 )
+            {
+                b_gop = VLC_TRUE;
+                break;
+            }
+            else if( code == 0x100 )
+            {
+                break;
+            }
+            code = ( code << 8 )|p[4];
+            p++;
+        }
+    }
+
+
+    if( b_gop )
     {
         while ( id->p_current_buffer != NULL )
         {
