@@ -170,17 +170,17 @@ static int CreateFilter( vlc_object_t *p_this )
     var_SetInteger( p_libvlc, "mosaic-" #name, p_sys->i_##name );           \
     var_AddCallback( p_libvlc, "mosaic-" #name, MosaicCallback, p_sys );
 
-    GET_VAR( width, 0, INT32_MAX );
-    GET_VAR( height, 0, INT32_MAX );
-    GET_VAR( xoffset, 0, INT32_MAX );
-    GET_VAR( yoffset, 0, INT32_MAX );
-    GET_VAR( vborder, 0, INT32_MAX );
-    GET_VAR( hborder, 0, INT32_MAX );
-    GET_VAR( rows, 1, INT32_MAX );
-    GET_VAR( cols, 1, INT32_MAX );
+    GET_VAR( width, 0, INT_MAX );
+    GET_VAR( height, 0, INT_MAX );
+    GET_VAR( xoffset, 0, INT_MAX );
+    GET_VAR( yoffset, 0, INT_MAX );
+    GET_VAR( vborder, 0, INT_MAX );
+    GET_VAR( hborder, 0, INT_MAX );
+    GET_VAR( rows, 1, INT_MAX );
+    GET_VAR( cols, 1, INT_MAX );
     GET_VAR( alpha, 0, 255 );
     GET_VAR( position, 0, 1 );
-    GET_VAR( delay, 100, INT32_MAX );
+    GET_VAR( delay, 100, INT_MAX );
     p_sys->i_delay *= 1000;
 
     p_sys->b_ar = var_CreateGetBool( p_filter, "mosaic-keep-aspect-ratio" );
