@@ -714,8 +714,15 @@ static void ExtensionAndUserData( vpar_thread_t * p_vpar )
 static void SequenceDisplayExtension( vpar_thread_t * p_vpar )
 {
     /* We don't care sequence_display_extension. */
-    DumpBits32( &p_vpar->bit_stream );
-    DumpBits( &p_vpar->bit_stream, 25 );
+    /* video_format */
+    DumpBits( &p_vpar->bit_stream, 3 );
+    if( GetBits( &p_vpar->bit_stream, 1 ) )
+    {
+        /* Three bytes for color_desciption */
+        DumpBits( &p_vpar->bit_stream, 24 );
+    }
+    /* display_horizontal and vertical_size and a marker_bit */
+    DumpBits( &p_vpar->bit_stream, 29 );
 }
 
 
@@ -791,8 +798,8 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
 
 static void SequenceScalableExtension( vpar_thread_t * p_vpar )
 {
-    /* We don't care about anything scalable. */
-    switch( GetBits( &p_vpar->bit_stream, 2 ) )
+    /* We don't care about anything scalable except the scalable mode. */
+    switch( p_vpar->sequence.i_scalable_mode = GetBits( &p_vpar->bit_stream, 2 ) )
     /* The length of the structure depends on the value of the scalable_mode */
     {
         case 1:
@@ -820,7 +827,7 @@ static void PictureDisplayExtension( vpar_thread_t * p_vpar )
     nb = p_vpar->sequence.b_progressive ? p_vpar->sequence.b_progressive +
                                           p_vpar->picture.b_repeat_first_field +
                                           p_vpar->picture.b_top_field_first
-                         : ( (p_vpar->picture.i_structure + 1 ) / 2 ) +
+                         : ( p_vpar->picture.b_frame_structure + 1 ) +
                            p_vpar->picture.b_repeat_first_field;
     DumpBits( &p_vpar->bit_stream, 34 * nb );
 }
@@ -830,7 +837,7 @@ static void PictureDisplayExtension( vpar_thread_t * p_vpar )
  * PictureSpatialScalableExtension                                           *
  *****************************************************************************/
 
-static void PictureScalablePictureExtension( vpar_thread_t * p_vpar )
+static void PictureSpatialScalableExtension( vpar_thread_t * p_vpar )
 {
     /* That's scalable, so we trash it */
     DumpBits32( &p_vpar->bit_stream );
@@ -855,25 +862,25 @@ static void PictureTemporalScalableExtension( vpar_thread_t * p_vpar )
 
 static void CopytrightExtension( vpar_thread_t * p_vpar )
 {
-    u32 copyright_number_1, copyright_number_2;
-    p_vpar->sequence.copyright_flag = GetBits( &p_vpar->bit_stream, 1 );
+    u32     i_copyright_nb_1, i_copyright_nb_2; /* local integers */
+    p_vpar->sequence.b_copyright_flag = GetBits( &p_vpar->bit_stream, 1 );
         /* A flag that says whether the copyright information is significant */
-    p_vpar->sequence.copyright_identifier = GetBits( &p_vpar->bit_stream, 8 );
+    p_vpar->sequence.i_copyright_id = GetBits( &p_vpar->bit_stream, 8 );
         /* An identifier compliant with ISO/CEI JTC 1/SC 29 */
-    p_vpar->sequence.original_or_copy = GetBits( &p_vpar->bit_stream, 1 );
+    p_vpar->sequence.b_original = GetBits( &p_vpar->bit_stream, 1 );
         /* Reserved bits */
     DumpBits( &p_vpar->bit_stream, 8 );
         /* The copyright_number is split in three parts */
         /* first part */
-    copyright_number_1 = GetBits( &p_vpar->bit_stream, 20 );
+    i_copyright_nb_1 = GetBits( &p_vpar->bit_stream, 20 );
     DumpBits( &p_vpar->bit_stream, 1 );
         /* second part */
-    copyright_number_2 = GetBits( &p_vpar->bit_stream, 22 );
+    i_copyright_nb_2 = GetBits( &p_vpar->bit_stream, 22 );
     DumpBits( &p_vpar->bit_stream, 1 );
         /* third part and sum */
-    p_vpar->sequence.copyright_number = ( copyright_number_1 << 44 ) +
-                                        ( copyright_number_2 << 22 ) +
-                                        ( GetBits( &p_vpar->bit_stream, 22 ) );
+    p_vpar->sequence.i_copyright_nb = ( i_copyright_nb_1 << 44 ) +
+                                      ( i_copyright_nb_2 << 22 ) +
+                                      ( GetBits( &p_vpar->bit_stream, 22 ) );
 }
 
 

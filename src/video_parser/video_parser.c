@@ -183,6 +183,11 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.chroma_intra_quant.b_allocated = FALSE;
     p_vpar->sequence.chroma_nonintra_quant.b_allocated = FALSE;
     p_vpar->sequence.i_frame_number = 0;
+    /* Initialize copyright information */
+    p_vpar->sequence.b_copyright_flag = 0;
+    p_vpar->sequence.b_original = 0;
+    p_vpar->sequence.i_copyright_id = 0;
+    p_vpar->sequence.i_copyright_nb = 0;
 
     /* Initialize other properties */
 #ifdef STATS
