@@ -459,9 +459,15 @@ static void Run( intf_thread_t *p_intf )
                 vlc_value_t val, list, list2;
                 int i_count, i;
                 var_Get( p_input, "spu-es", &val );
+                
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
                             &list, &list2 );
                 i_count = list.p_list->i_count;
+                if( i_count <= 1 )
+                {
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, _("Subtitle track: %s"), _("N/A") );
+                    continue;
+                }
                 for( i = 0; i < i_count; i++ )
                 {
                     if( val.i_int == list.p_list->p_values[i].i_int )
@@ -469,7 +475,7 @@ static void Run( intf_thread_t *p_intf )
                         break;
                     }
                 }
-                /* value of audio-es was not in choices list */
+                /* value of spu-es was not in choices list */
                 if( i == i_count )
                 {
                     msg_Warn( p_input, "invalid current subtitle track, selecting 0" );
