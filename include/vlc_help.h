@@ -2,7 +2,7 @@
  * vlc_help.h: Help strings
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_help.h,v 1.3 2003/10/08 19:40:42 gbazin Exp $
+ * $Id: vlc_help.h,v 1.4 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
@@ -57,6 +57,9 @@
 
 #define AOUT_TITLE N_("Audio output modules settings")
 #define AOUT_HELP N_("These are general settings for audio output modules.")
+
+#define AOUT_ENC_TITLE N_("Audio encoders settings")
+#define AOUT_ENC_HELP N_("These are general settings for audio encoding modules.")
 
 #define CHROMA_TITLE N_("Chroma modules settings")
 #define CHROMA_HELP N_(" ")

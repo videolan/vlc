@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.14 2003/10/06 16:23:30 zorglub Exp $
+ * $Id: vlc_playlist.h,v 1.15 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,6 +59,12 @@ struct playlist_item_t
     char *     psz_author;     /**< Author */
 };
 
+struct playlist_group_t
+{
+    char *   psz_name;        /**< name of the group */
+    int      i_id;            /**< Identifier for the group */
+};
+
 /**
  * Playlist status
  */
@@ -81,7 +87,10 @@ struct playlist_t
     int                   i_enabled; /**< How many items are enabled ? */
     playlist_item_t **    pp_items; /**< array of pointers to the
                                      * playlist items */
-
+    int                   i_groups; /**< How many groups are in the playlist */
+    playlist_group_t **   pp_groups;/**< array of pointers to the playlist
+                                     * groups */
+    int                   i_max_id; /**< Maximal group id given */
     input_thread_t *      p_input;  /**< the input thread ascosiated
                                      * with the current item */
     /*@}*/
@@ -90,8 +99,8 @@ struct playlist_t
 #define SORT_NORMAL 0
 #define SORT_REVERSE 1
 
-#define PLAYLIST_TYPE_MANUAL 0
-#define PLAYLIST_TYPE_SAP 1
+#define PLAYLIST_TYPE_MANUAL 1
+#define PLAYLIST_TYPE_SAP 2
 
 /*****************************************************************************
  * Prototypes
@@ -117,7 +126,15 @@ VLC_EXPORT( int,  playlist_Disable, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_Enable, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_DisableGroup, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_EnableGroup, ( playlist_t *, int ) );
-VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int) );
+
+VLC_EXPORT( playlist_group_t *, playlist_CreateGroup, (playlist_t *, char* ) );
+VLC_EXPORT( int, playlist_DeleteGroup, (playlist_t *, int ) );
+VLC_EXPORT( char *, playlist_FindGroup, (playlist_t *, int ) );
+
+VLC_EXPORT( int,  playlist_SortTitle, ( playlist_t *, int) );
+VLC_EXPORT( int,  playlist_SortAuthor, ( playlist_t *, int) );
+VLC_EXPORT( int,  playlist_SortGroup, ( playlist_t *, int) );
+
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );
 VLC_EXPORT( int,  playlist_LoadFile, ( playlist_t *, const char * ) );
 VLC_EXPORT( int,  playlist_SaveFile, ( playlist_t *, const char * ) );

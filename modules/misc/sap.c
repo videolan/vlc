@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.27 2003/10/13 05:48:08 zorglub Exp $
+ * $Id: sap.c,v 1.28 2003/10/29 17:32:55 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -115,6 +115,12 @@ static void free_sd( sess_descr_t * );
 /* Detect multicast addresses */
 static int  ismult( char * );
 
+/* Our custom structure */
+struct intf_sys_t
+{
+    int i_group;
+};
+
 /* The struct that contains sdp informations */
 struct  sess_descr_t
 {
@@ -160,9 +166,6 @@ struct attr_descr_t
 #define SAP_IPV6_LONGTEXT N_("Set this if you want SAP to listen for IPv6 announces")
 #define SAP_SCOPE_TEXT N_("IPv6 SAP scope")
 #define SAP_SCOPE_LONGTEXT N_("Sets the scope for IPv6 announces (default is 8)")
-#define SAP_GROUP_ID_TEXT N_("SAP Playlist group ID")
-#define SAP_GROUP_ID_LONGTEXT N_("Sets the default group ID in which" \
-                      "SAP items are put" )
 
 vlc_module_begin();
     add_category_hint( N_("SAP"), NULL, VLC_TRUE );
@@ -177,9 +180,6 @@ vlc_module_begin();
 
         add_string( "sap-ipv6-scope", "8" , NULL,
                     SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
-
-        add_integer( "sap-group-id", 42, NULL,
-                     SAP_GROUP_ID_TEXT, SAP_GROUP_ID_LONGTEXT, VLC_TRUE);
 
     set_description( _("SAP interface") );
     set_capability( "interface", 0 );
@@ -221,12 +221,30 @@ static void Run( intf_thread_t *p_intf )
 
     module_t            *p_network;
     network_socket_t    socket_desc;
+    playlist_t          *p_playlist;
+    playlist_group_t    *p_group;
 
     if( sap_ipv4 == -1 || sap_ipv6 == -1 || sap_ipv6_scope == NULL )
     {
         msg_Warn( p_intf, "Unable to parse module configuration" );
         return;
     }
+
+
+    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_intf->p_sys )
+    {
+        msg_Err( p_intf, "Out of memory !");
+        return VLC_EGENERIC;
+    }
+    /* Create our playlist group */
+    p_playlist =
+          (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                 FIND_ANYWHERE );
+    p_group = playlist_CreateGroup( p_playlist , "SAP" );
+    p_intf->p_sys->i_group = p_group->i_id;
+
+    vlc_object_release( p_playlist );
 
     /* Prepare IPv4 Networking */
     if ( sap_ipv4 == 1)
@@ -487,7 +505,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
         if( p_item )
         {
-            p_item->i_group = config_GetInt( p_intf, "sap-group-id" );
+            p_item->i_group = p_intf->p_sys->i_group;
             p_item->b_enabled = VLC_TRUE;
             p_item->psz_author = NULL;
             p_playlist = vlc_object_find( p_intf,
@@ -784,8 +802,18 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
                         *psz_eof = '\0';
                     sd->pp_attributes[sd->i_attributes]->psz_field =
                             strdup( p_packet );
-                    sd->pp_attributes[sd->i_attributes]->psz_value =
+                    if( psz_eof + 1 )
+                    {
+                        sd->pp_attributes[sd->i_attributes]->psz_value =
                             strdup( ++psz_eof );
+                    }
+                    else
+                    {
+                        if( sd->pp_attributes[sd->i_attributes]->psz_field )
+                            free( sd->pp_attributes[sd->i_attributes]
+                                              ->psz_field );
+                        break;
+                    }
                     for( i=0 ; i<
                       strlen(sd->pp_attributes[sd->i_attributes]->psz_value) ;
                              i++ )

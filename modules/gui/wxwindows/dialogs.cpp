@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.9 2003/10/15 12:24:14 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.10 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -60,6 +60,8 @@ BEGIN_EVENT_TABLE(DialogsProvider, wxFrame)
                 DialogsProvider::OnMessages)
     EVT_COMMAND(INTF_DIALOG_PREFS, wxEVT_DIALOG,
                 DialogsProvider::OnPreferences)
+    EVT_COMMAND(INTF_DIALOG_STREAM, wxEVT_DIALOG,
+                DialogsProvider::OnStreamDialog)
     EVT_COMMAND(INTF_DIALOG_FILEINFO, wxEVT_DIALOG,
                 DialogsProvider::OnFileInfo)
     EVT_COMMAND(INTF_DIALOG_POPUPMENU, wxEVT_DIALOG,
@@ -83,6 +85,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
     p_fileinfo_dialog = NULL;
     p_prefs_dialog = NULL;
     p_file_generic_dialog = NULL;
+    p_stream_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -104,6 +107,8 @@ DialogsProvider::~DialogsProvider()
     if( p_messages_dialog ) delete p_messages_dialog;
     if( p_fileinfo_dialog ) delete p_fileinfo_dialog;
     if( p_file_generic_dialog ) delete p_file_generic_dialog;
+    if( p_stream_dialog ) delete p_stream_dialog;
+
 
     if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
 
@@ -174,6 +179,18 @@ void DialogsProvider::OnPreferences( wxCommandEvent& WXUNUSED(event) )
     if( p_prefs_dialog )
     {
         p_prefs_dialog->Show( !p_prefs_dialog->IsShown() );
+    }
+}
+
+void DialogsProvider::OnStreamDialog( wxCommandEvent& WXUNUSED(event) )
+{
+    /* Show/hide the stream window */
+    if( !p_stream_dialog )
+        p_stream_dialog = new StreamDialog( p_intf, this );
+
+    if( p_stream_dialog )
+    {
+        p_stream_dialog->Show( !p_stream_dialog->IsShown() );
     }
 }
 
@@ -306,7 +323,8 @@ void DialogsProvider::Open( int i_access_method, int i_arg )
 {
     /* Show/hide the open dialog */
     if( !p_open_dialog )
-        p_open_dialog = new OpenDialog( p_intf, this, i_access_method, i_arg );
+        p_open_dialog = new OpenDialog(p_intf, this, i_access_method, i_arg ,
+                                       OPEN_NORMAL );
 
     if( p_open_dialog )
     {

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.68 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: interface.cpp,v 1.69 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -39,10 +39,13 @@
 
 /* include the toolbar graphics */
 #include "bitmaps/file.xpm"
+
+#include "bitmaps/stream.xpm"
+
 #include "bitmaps/disc.xpm"
 #include "bitmaps/net.xpm"
 #if 0
-#include "bitmaps/sat.xpm"
+ #include "bitmaps/sat.xpm"
 #endif
 #include "bitmaps/play.xpm"
 #include "bitmaps/pause.xpm"
@@ -52,6 +55,8 @@
 #include "bitmaps/playlist.xpm"
 #include "bitmaps/fast.xpm"
 #include "bitmaps/slow.xpm"
+
+#include <wx/listctrl.h>
 
 #define TOOLBAR_BMP_WIDTH 36
 #define TOOLBAR_BMP_HEIGHT 36
@@ -113,13 +118,18 @@ END_EVENT_TABLE()
 enum
 {
     /* menu items */
+    MenuDummy_Event = wxID_HIGHEST + 1000,
     Exit_Event = wxID_HIGHEST,
     OpenFileSimple_Event,
+    OpenAdv_Event,
     OpenFile_Event,
     OpenDisc_Event,
     OpenNet_Event,
     OpenSat_Event,
+    OpenOther_Event,
     EjectDisc_Event,
+
+    Stream_Event,
 
     Playlist_Event,
     Logs_Event,
@@ -144,6 +154,8 @@ enum
     Saturation_Event,
 
     Ratio_Event,
+    Visual_Event,
+
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
      * (where it is special and put into the "Apple" menu) */
@@ -166,6 +178,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_CHECKBOX( Adjust_Event, Interface::OnEnableAdjust)
 
     EVT_COMBOBOX( Ratio_Event, Interface::OnRatio)
+    EVT_CHECKBOX( Visual_Event, Interface::OnEnableVisual)
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )
     EVT_CONTEXT_MENU(Interface::OnContextMenu2)
@@ -174,10 +187,12 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
 
     /* Toolbar events */
     EVT_MENU(OpenFileSimple_Event, Interface::OnShowDialog)
+    EVT_MENU(OpenAdv_Event, Interface::OnShowDialog)
     EVT_MENU(OpenFile_Event, Interface::OnShowDialog)
     EVT_MENU(OpenDisc_Event, Interface::OnShowDialog)
     EVT_MENU(OpenNet_Event, Interface::OnShowDialog)
     EVT_MENU(OpenSat_Event, Interface::OnShowDialog)
+    EVT_MENU(Stream_Event, Interface::OnStream)
     EVT_MENU(StopStream_Event, Interface::OnStopStream)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
     EVT_MENU(PrevStream_Event, Interface::OnPrevStream)
@@ -211,7 +226,6 @@ Interface::Interface( intf_thread_t *_p_intf ):
     SetIcon( wxIcon( vlc_xpm ) );
 
     /* Create a sizer for the main frame */
-    //frame_sizer= new wxFlexGridSizer( 1, 0, 0);
     frame_sizer = new wxBoxSizer( wxVERTICAL );
     SetSizer( frame_sizer );
 
@@ -280,12 +294,17 @@ Interface::~Interface()
  *****************************************************************************/
 void Interface::CreateOurMenuBar()
 {
+#define HELP_SIMPLE N_("Quick file open")
+#define HELP_ADV N_("Advanced open")
 #define HELP_FILE  N_("Open a file")
 #define HELP_DISC  N_("Open a DVD or (S)VCD")
 #define HELP_NET   N_("Open a network stream")
 #define HELP_SAT   N_("Open a satellite stream")
 #define HELP_EJECT N_("Eject the DVD/CD")
 #define HELP_EXIT  N_("Exit this program")
+
+#define HELP_STREAM N_("Streaming wizard")
+#define HELP_OTHER N_("Open other types of inputs")
 
 #define HELP_PLAYLIST   N_("Open the playlist")
 #define HELP_LOGS       N_("Show the program logs")
@@ -299,22 +318,23 @@ void Interface::CreateOurMenuBar()
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
     file_menu->Append( OpenFileSimple_Event, wxU(_("Simple &Open ...")),
-                       wxU(_(HELP_FILE)) );
+                       wxU(_(HELP_SIMPLE)) );
+
+    file_menu->AppendSeparator();
     file_menu->Append( OpenFile_Event, wxU(_("Open &File...")),
-                       wxU(_(HELP_FILE)) );
+                      wxT(_(HELP_FILE)));
     file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...")),
-                       wxU(_(HELP_DISC)) );
+                      wxT(_(HELP_DISC)));
     file_menu->Append( OpenNet_Event, wxU(_("Open &Network Stream...")),
-                       wxU(_(HELP_NET)) );
+                      wxT(_(HELP_NET)));
+
 #if 0
     file_menu->Append( OpenSat_Event, wxU(_("Open &Satellite Stream...")),
                        wxU(_(HELP_NET)) );
 #endif
-#if 0
     file_menu->AppendSeparator();
-    file_menu->Append( EjectDisc_Event, wxU(_("&Eject Disc")),
-                       wxU(_(HELP_EJECT)) );
-#endif
+    file_menu->Append( Stream_Event, wxU(_("Streaming Wizard...")),
+                       wxU(_(HELP_STREAM)) );
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, wxU(_("E&xit")), wxU(_(HELP_EXIT)) );
 
@@ -379,6 +399,7 @@ void Interface::CreateOurMenuBar()
 void Interface::CreateOurToolBar()
 {
 #define HELP_STOP N_("Stop current playlist item")
+
 #define HELP_PLAY N_("Play current playlist item")
 #define HELP_PAUSE N_("Pause current playlist item")
 #define HELP_PLO N_("Open playlist")
@@ -395,6 +416,11 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
+    toolbar->AddTool( OpenFileSimple_Event, wxU(_("Simple open")), wxBitmap( file_xpm ),
+                      wxU(_(HELP_SIMPLE)) );
+
+    toolbar->AddSeparator();
+
     toolbar->AddTool( OpenFile_Event, wxU(_("File")), wxBitmap( file_xpm ),
                       wxU(_(HELP_FILE)) );
     toolbar->AddTool( OpenDisc_Event, wxU(_("Disc")), wxBitmap( disc_xpm ),
@@ -406,6 +432,12 @@ void Interface::CreateOurToolBar()
                       wxU(_(HELP_SAT)) );
 #endif
     toolbar->AddSeparator();
+
+    toolbar->AddTool( Stream_Event, wxU(_("Stream")), wxBitmap( stream_xpm ),
+                      wxU(_(HELP_STREAM)) );
+
+    toolbar->AddSeparator();
+
     toolbar->AddTool( StopStream_Event, wxU(_("Stop")), wxBitmap( stop_xpm ),
                       wxU(_(HELP_STOP)) );
     toolbar->AddTool( PlayStream_Event, wxU(_("Play")), wxBitmap( play_xpm ),
@@ -489,7 +521,8 @@ void Interface::CreateOurExtraPanel()
     wxBoxSizer *extra_sizer = new wxBoxSizer( wxHORIZONTAL );
 
     /* Create static box to surround the adjust controls */
-    adjust_box = new wxStaticBox( extra_frame, -1, wxU(_("Image adjust")) );
+    wxStaticBox *adjust_box =
+           new wxStaticBox( extra_frame, -1, wxU(_("Image adjust")) );
 
     /* Create the size for the frame */
     wxStaticBoxSizer *adjust_sizer =
@@ -549,13 +582,16 @@ void Interface::CreateOurExtraPanel()
     extra_sizer->Add(adjust_sizer,1,wxBOTTOM,5);
 
 
-    /* Create static box to surround the other controls */
-    other_box = new wxStaticBox( extra_frame, -1, wxU(_("Video Options")) );
+    /* Create sizer to surround the other controls */
+    wxBoxSizer *other_sizer = new wxBoxSizer( wxVERTICAL );
 
+
+    wxStaticBox *video_box =
+            new wxStaticBox( extra_frame, -1, wxU(_("Video Options")) );
     /* Create the sizer for the frame */
-    wxStaticBoxSizer *other_sizer =
-        new wxStaticBoxSizer( other_box, wxVERTICAL );
-    other_sizer->SetMinSize( -1, 50 );
+    wxStaticBoxSizer *video_sizer =
+       new wxStaticBoxSizer( video_box, wxVERTICAL );
+    video_sizer->SetMinSize( -1, 50 );
 
     static const wxString ratio_array[] =
     {
@@ -576,7 +612,30 @@ void Interface::CreateOurExtraPanel()
     ratio_sizer->Add( ratio_combo, 0, wxALL, 2 );
     ratio_sizer->Layout();
 
-    other_sizer->Add(ratio_sizer,0,wxALL,0 );
+    video_sizer->Add( ratio_sizer  , 0 , wxALL , 0 );
+    video_sizer->Layout();
+
+    wxBoxSizer *visual_sizer = new wxBoxSizer( wxHORIZONTAL );
+
+    wxCheckBox *visual_checkbox = new wxCheckBox( extra_frame, Visual_Event,
+                                            wxU(_("Visualisation")) );
+
+    visual_sizer->Add( visual_checkbox, 0, wxEXPAND, 0);
+    visual_sizer->Layout();
+
+    wxStaticBox *audio_box =
+              new wxStaticBox( extra_frame, -1, wxU(_("Audio Options")) );
+    /* Create the sizer for the frame */
+    wxStaticBoxSizer *audio_sizer =
+        new wxStaticBoxSizer( audio_box, wxVERTICAL );
+    audio_sizer->SetMinSize( -1, 50 );
+
+    audio_sizer->Add( visual_sizer, 0, wxALL, 0);
+    audio_sizer->Layout();
+
+    other_sizer->Add( video_sizer, 0, wxALL | wxEXPAND , 0);
+    other_sizer->Add( audio_sizer , 0 , wxALL | wxEXPAND , 0 );
+    other_sizer->Layout();
 
     extra_sizer->Add(other_sizer,0,wxBOTTOM,5);
 
@@ -588,6 +647,12 @@ void Interface::CreateOurExtraPanel()
     extra_sizer->SetSizeHints(extra_frame);
 
     /* Write down initial values */
+
+    if( strstr( config_GetPsz( p_intf, "audio-filter" ), "visual" ) )
+    {
+        visual_checkbox->SetValue(1);
+    }
+
     psz_filters = config_GetPsz( p_intf, "filter" );
 
     if(psz_filters == NULL) psz_filters=strdup("");
@@ -820,7 +885,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     msg.Printf( wxString(wxT("VLC media player " VERSION)) +
         wxU(_(" (wxWindows interface)\n\n")) +
         wxU(_("(C) 1996-2003 - the VideoLAN Team\n\n")) +
-        wxU( INTF_ABOUT_MSG ) + wxT("\n\n") +
+        wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,ISUTF8) ) + wxT("\n\n") +
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
               "http://www.videolan.org/\n\n")) );
 
@@ -839,6 +904,8 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         case OpenFileSimple_Event:
             i_id = INTF_DIALOG_FILE_SIMPLE;
             break;
+        case OpenAdv_Event:
+            i_id = INTF_DIALOG_FILE;
         case OpenFile_Event:
             i_id = INTF_DIALOG_FILE;
             break;
@@ -872,6 +939,14 @@ void Interface::OnShowDialog( wxCommandEvent& event )
         p_intf->p_sys->pf_show_dialog( p_intf, i_id, 1, 0 );
     }
 }
+
+
+void Interface::OnStream( wxCommandEvent& event )
+{
+    StreamDialog *p_stream_dialog = new StreamDialog(p_intf,this);
+    p_stream_dialog->Show();
+}
+
 
 void Interface::OnExtra(wxCommandEvent& event)
 {
@@ -993,6 +1068,18 @@ void Interface::OnContrastUpdate(wxScrollEvent& event)
 void Interface::OnRatio( wxCommandEvent& event )
 {
    config_PutPsz( p_intf, "aspect-ratio", ratio_combo->GetValue().mb_str() );
+}
+
+void Interface::OnEnableVisual(wxCommandEvent& event)
+{
+    if( event.IsChecked() )
+    {
+        config_PutPsz( p_intf, "audio-filter", "visual" );
+    }
+    else
+    {
+        config_PutPsz( p_intf, "audio-filter", "" );
+    }
 }
 
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
@@ -1157,7 +1244,7 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
             vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
             var_Set( p_playlist->p_input, "next-title", val );
             vlc_mutex_unlock( &p_playlist->object_lock );
-            vlc_object_release( p_playlist );  
+            vlc_object_release( p_playlist );
             return;
         }
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
@@ -1205,13 +1292,13 @@ void Interface::TogglePlayButton( int i_playing_status )
 
     if( i_playing_status == PLAYING_S )
     {
-        GetToolBar()->InsertTool( 5, PlayStream_Event, wxU(_("Pause")),
+        GetToolBar()->InsertTool( 8, PlayStream_Event, wxU(_("Pause")),
                                   wxBitmap( pause_xpm ), wxNullBitmap,
                                   wxITEM_NORMAL, wxU(_(HELP_PAUSE)) );
     }
     else
     {
-        GetToolBar()->InsertTool( 5, PlayStream_Event, wxU(_("Play")),
+        GetToolBar()->InsertTool( 8, PlayStream_Event, wxU(_("Play")),
                                   wxBitmap( play_xpm ), wxNullBitmap,
                                   wxITEM_NORMAL, wxU(_(HELP_PLAY)) );
     }

@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.13 2003/10/25 00:49:14 sam Exp $
+ * $Id: id3tag.c,v 1.14 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -76,6 +76,7 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
         return;
     }
 
+    val.b_bool = VLC_FALSE;
     p_id3_tag = id3_tag_parse( p_data, i_size );
     p_category = input_InfoCategory( p_input, "ID3" );
     i = 0;
@@ -93,42 +94,64 @@ static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
                 i_genre = strtol( psz_temp, &psz_endptr, 10 );
                 if( psz_temp != psz_endptr && i_genre >= 0 && i_genre < NUM_GENRES )
                 {
-                    input_AddInfo( p_category, (char *)p_frame->description, ppsz_genres[atoi(psz_temp)]);
+                    input_AddInfo( p_category, (char *)p_frame->description,
+                                   ppsz_genres[atoi(psz_temp)]);
                 }
                 else
                 {
-                    input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+                    input_AddInfo( p_category, (char *)p_frame->description,
+                                                psz_temp );
                 }
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_TITLE ) )
             {
-                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
+                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                              FIND_PARENT );
                 if( p_playlist )
                 {
-                    p_playlist->pp_items[p_playlist->i_index]->psz_name = strdup( psz_temp );
+                    p_playlist->pp_items[p_playlist->i_index]->psz_name =
+                                                       strdup( psz_temp );
+                    val.b_bool = VLC_TRUE;
                     vlc_object_release( p_playlist );
                 }
-                input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+                input_AddInfo( p_category, (char *)p_frame->description,
+                                            psz_temp );
             }
             else if ( !strcmp(p_frame->id, ID3_FRAME_ARTIST ) )
             {
-                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST, FIND_PARENT );
+                p_playlist = vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
+                                              FIND_PARENT );
                 if( p_playlist )
                 {
-                    p_playlist->pp_items[p_playlist->i_index]->psz_author = strdup( psz_temp );
+                    p_playlist->pp_items[p_playlist->i_index]->psz_author =
+                                                strdup( psz_temp );
+                    val.b_bool = VLC_TRUE;
                     vlc_object_release( p_playlist );
                 }
-                input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+                input_AddInfo( p_category, (char *)p_frame->description,
+                                            psz_temp );
             }
             else
             {
-                input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+                input_AddInfo( p_category, (char *)p_frame->description,
+                                            psz_temp );
             }
             free( psz_temp );
         }
         i++;
     }
     id3_tag_delete( p_id3_tag );
+    if(val.b_bool == VLC_TRUE )
+    {
+        p_playlist = vlc_object_find( p_input,
+                     VLC_OBJECT_PLAYLIST, FIND_PARENT );
+        if( p_playlist )
+        {
+            val.b_bool = VLC_TRUE;
+            var_Set( p_playlist, "intf-change", val );
+            vlc_object_release( p_playlist );
+        }
+    }
     val.b_bool = VLC_TRUE;
     var_Change( p_input, "demuxed-id3", VLC_VAR_SETVALUE, &val, NULL );
 }

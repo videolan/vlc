@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.39 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: preferences.cpp,v 1.40 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,7 +173,7 @@ END_EVENT_TABLE()
  *****************************************************************************/
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
   :  wxFrame( p_parent, -1, wxU(_("Preferences")), wxDefaultPosition,
-              wxSize(700,450), wxDEFAULT_FRAME_STYLE )
+              wxSize(830,450), wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -305,6 +305,8 @@ static char * GetCapabilityHelp( char *psz_capability, int i_type)
         return i_type == 1 ? AUDIO_FILTER_TITLE : AUDIO_FILTER_HELP;
     if( !strcasecmp(psz_capability,"audio output") )
         return i_type == 1 ? AOUT_TITLE : AOUT_HELP;
+    if( !strcasecmp(psz_capability,"audio encoder") )
+        return i_type == 1 ? AOUT_ENC_TITLE : AOUT_ENC_HELP;
     if( !strcasecmp(psz_capability,"chroma") )
         return i_type == 1 ? CHROMA_TITLE : CHROMA_HELP;
     if( !strcasecmp(psz_capability,"decoder") )

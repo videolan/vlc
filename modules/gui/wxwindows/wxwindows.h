@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.65 2003/10/14 22:41:41 gbazin Exp $
+ * $Id: wxwindows.h,v 1.66 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -72,6 +72,14 @@ class FileInfo;
 #endif
 
 #define WRAPCOUNT 80
+
+#define OPEN_NORMAL 0
+#define OPEN_STREAM 1
+
+#define MODE_NONE 0
+#define MODE_GROUP 1
+#define MODE_AUTHOR 2
+#define MODE_TITLE 3
 
 wxArrayString SeparateEntries( wxString );
 
@@ -185,6 +193,7 @@ private:
     void OnOpenNet( wxCommandEvent& event );
     void OnOpenSat( wxCommandEvent& event );
     void OnOpenV4L( wxCommandEvent& event );
+    void OnStream( wxCommandEvent& event );
     void OnExtra( wxCommandEvent& event );
     void OnShowDialog( wxCommandEvent& event );
     void OnPlayStream( wxCommandEvent& event );
@@ -202,6 +211,7 @@ private:
     void OnSaturationUpdate( wxScrollEvent& event );
 
     void OnRatio( wxCommandEvent& event );
+    void OnEnableVisual( wxCommandEvent& event );
 
     void OnMenuOpen( wxMenuEvent& event );
 
@@ -229,6 +239,8 @@ private:
     vlc_bool_t b_misc_menu;
 };
 
+class StreamDialog;
+
 /* Dialogs Provider */
 class DialogsProvider: public wxFrame
 {
@@ -246,6 +258,7 @@ private:
     void OnMessages( wxCommandEvent& event );
     void OnFileInfo( wxCommandEvent& event );
     void OnPreferences( wxCommandEvent& event );
+    void OnStreamDialog( wxCommandEvent& event );
 
     void OnOpenFileGeneric( wxCommandEvent& event );
     void OnOpenFileSimple( wxCommandEvent& event );
@@ -271,6 +284,7 @@ public:
     Playlist            *p_playlist_dialog;
     Messages            *p_messages_dialog;
     FileInfo            *p_fileinfo_dialog;
+    StreamDialog        *p_stream_dialog;
     wxFrame             *p_prefs_dialog;
     wxFileDialog        *p_file_generic_dialog;
 };
@@ -284,7 +298,11 @@ class OpenDialog: public wxFrame
 public:
     /* Constructor */
     OpenDialog( intf_thread_t *p_intf, wxWindow *p_parent,
-                int i_access_method, int i_arg = 0 );
+                int i_access_method, int i_arg = 0  );
+
+    /* Extended Contructor */
+    OpenDialog( intf_thread_t *p_intf, wxWindow *p_parent,
+                int i_access_method, int i_arg = 0 , int _i_method = 0 );
     virtual ~OpenDialog();
 
     int Show();
@@ -344,6 +362,7 @@ private:
     wxWindow *p_parent;
     int i_current_access_method;
 
+    int i_method; /* Normal or for the stream dialog ? */
     wxComboBox *mrl_combo;
     wxNotebook *notebook;
 
@@ -610,6 +629,36 @@ private:
     wxWindow *p_parent;
 };
 
+/* Stream */
+class StreamDialog: public wxFrame
+{
+public:
+    /* Constructor */
+    StreamDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~StreamDialog();
+
+private:
+    void OnClose( wxCommandEvent& event );
+    void OnOpen( wxCommandEvent& event );
+    void OnSout( wxCommandEvent& event );
+    void OnStart( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+
+    wxStaticText *step2_label;
+    wxStaticText *step3_label;
+    wxButton *sout_button;
+    wxButton *start_button;
+    wxArrayString mrl;
+    wxArrayString sout_mrl;
+    OpenDialog *p_open_dialog;
+    SoutDialog *p_sout_dialog;
+};
+
+
+
 /* Preferences Dialog */
 class PrefsTreeCtrl;
 class PrefsDialog: public wxFrame
@@ -668,6 +717,7 @@ private:
 
 /* Playlist */
 class ItemInfoDialog;
+class NewGroup;
 class Playlist: public wxFrame
 {
 public:
@@ -687,8 +737,6 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnAddFile( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
-    void OnSort( wxCommandEvent& event );
-    void OnRSort( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnSearch( wxCommandEvent& event );
     void OnEnDis( wxCommandEvent& event );
@@ -696,6 +744,12 @@ private:
     void OnSearchTextChange( wxCommandEvent& event );
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
+
+    void OnSort( wxCommandEvent& event );
+
+    void OnUp( wxCommandEvent& event);
+    void OnDown( wxCommandEvent& event);
+
     void OnEnableSelection( wxCommandEvent& event );
     void OnDisableSelection( wxCommandEvent& event );
     void OnInvertSelection( wxCommandEvent& event );
@@ -706,6 +760,8 @@ private:
     void OnLoop ( wxCommandEvent& event );
     void OnActivateItem( wxListEvent& event );
     void OnKeyDown( wxListEvent& event );
+    void OnNewGroup( wxCommandEvent& event );
+
     void Rebuild();
 
     wxTextCtrl *search_text;
@@ -717,7 +773,34 @@ private:
 
     intf_thread_t *p_intf;
     wxListView *listview;
+    wxTreeCtrl *treeview;
     int i_update_counter;
+    int i_sort_mode;
+};
+
+
+class NewGroup: public wxDialog
+{
+public:
+    /* Constructor */
+    NewGroup( intf_thread_t *p_intf, wxWindow *p_parent );
+    virtual ~NewGroup();
+
+private:
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    wxTextCtrl *groupname;
+
+protected:
+    friend class Playlist;
+    friend class ItemInfoDialog;
+    char *psz_name;
 };
 
 
@@ -739,6 +822,7 @@ private:
     /* Event handlers (these functions should _not_ be virtual) */
     void OnOk( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
+    void OnNewGroup( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -758,7 +842,8 @@ private:
     wxTextCtrl *author_text;
 
     wxCheckBox *enabled_checkbox;
-    wxSpinCtrl *group_spin;
+    wxComboBox *group_combo;
+    int ids_array[100];
 };
 
 
@@ -782,6 +867,7 @@ private:
     wxString fileinfo_root_label;
 
 };
+
 
 #if !defined(__WXX11__)
 /* Drag and Drop class */

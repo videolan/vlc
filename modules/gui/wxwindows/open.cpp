@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.38 2003/08/22 14:03:40 adn Exp $
+ * $Id: open.cpp,v 1.39 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -165,7 +165,16 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     wxFrame( _p_parent, -1, wxU(_("Open Target")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
+    OpenDialog( _p_intf, _p_parent, i_access_method, i_arg, OPEN_NORMAL );
+}
+
+OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
+                        int i_access_method, int i_arg, int _i_method ):
+    wxFrame( _p_parent, -1, wxU(_("Open Target")), wxDefaultPosition,
+             wxDefaultSize, wxDEFAULT_FRAME_STYLE )
+{
     /* Initializations */
+    i_method = _i_method;
     p_intf = _p_intf;
     p_parent = _p_parent;
     SetIcon( *p_intf->p_sys->p_icon );
@@ -206,57 +215,70 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         wxU(_("Alternatively, you can build an MRL using one of the "
               "following predefined targets:")) );
 
-    /* Create Stream Output checkox */
-    wxFlexGridSizer *sout_sizer = new wxFlexGridSizer( 2, 1, 20 );
-    sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
-                                    wxU(_("Stream output")) );
-    sout_checkbox->SetToolTip( wxU(_("Use VLC as a stream server")) );
-    sout_sizer->Add( sout_checkbox, 0,
-                     wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
-    sout_button = new wxButton( panel, SoutSettings_Event,
-                                wxU(_("Settings...")) );
-    sout_button->Disable();
+    wxFlexGridSizer *sout_sizer = NULL;
+    wxBoxSizer *demuxdump_sizer = NULL;
+    wxStaticLine *static_line = NULL;
 
-    char *psz_sout = config_GetPsz( p_intf, "sout" );
-    if( psz_sout && *psz_sout )
+    demuxdump_checkbox = NULL;
+    demuxdump_textctrl = NULL;
+
+    if( i_method == OPEN_NORMAL )
     {
-        sout_checkbox->SetValue(TRUE);
-        sout_button->Enable();
-        subsfile_mrl.Add( wxString(wxT("sout=")) + wxU(psz_sout) );
+        /* Create Stream Output checkox */
+        sout_sizer = new wxFlexGridSizer( 2, 1, 20 );
+
+
+        sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
+                                         wxU(_("Stream output")) );
+        sout_checkbox->SetToolTip( wxU(_("Use VLC as a stream server")) );
+        sout_sizer->Add( sout_checkbox, 0,
+                         wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
+        sout_button = new wxButton( panel, SoutSettings_Event,
+                                    wxU(_("Settings...")) );
+         sout_button->Disable();
+
+        char *psz_sout = config_GetPsz( p_intf, "sout" );
+        if( psz_sout && *psz_sout )
+        {
+            sout_checkbox->SetValue(TRUE);
+            sout_button->Enable();
+            subsfile_mrl.Add( wxString(wxT("sout=")) + wxU(psz_sout) );
+        }
+        if( psz_sout ) free( psz_sout );
+
+        sout_sizer->Add( sout_button, 1, wxALIGN_LEFT |
+                         wxALIGN_CENTER_VERTICAL );
+
+        /* Create Demux Dump checkox */
+        demuxdump_sizer = new wxBoxSizer( wxHORIZONTAL );
+        demuxdump_checkbox = new wxCheckBox( panel, DemuxDumpEnable_Event,
+                                   wxU(_("Capture input stream")) );
+        demuxdump_checkbox->SetToolTip(
+             wxU(_("Capture the stream you are playing to a file")) );
+        demuxdump_textctrl = new wxTextCtrl( panel, DemuxDump_Event, wxT(""),
+                                             wxDefaultPosition, wxDefaultSize,
+                                             wxTE_PROCESS_ENTER );
+       demuxdump_button = new wxButton( panel, DemuxDumpBrowse_Event,
+                                         wxU(_("Browse...")) );
+
+        char *psz_demuxdump = config_GetPsz( p_intf, "demuxdump-file" );
+        if( psz_demuxdump && *psz_demuxdump )
+        {
+            demuxdump_textctrl->SetValue( wxU(psz_demuxdump) );
+        }
+        if( psz_demuxdump ) free( psz_demuxdump );
+
+        demuxdump_textctrl->Disable();
+        demuxdump_button->Disable();
+        demuxdump_sizer->Add( demuxdump_checkbox, 0,
+                               wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+        demuxdump_sizer->Add( demuxdump_button, 0,
+                              wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 10 );
+        demuxdump_sizer->Add( demuxdump_textctrl, 1, wxRIGHT, 10 );
+
+        /* Separation */
+        static_line = new wxStaticLine( panel, wxID_OK );
     }
-    if( psz_sout ) free( psz_sout );
-
-    sout_sizer->Add( sout_button, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
-
-    /* Create Demux Dump checkox */
-    wxBoxSizer *demuxdump_sizer = new wxBoxSizer( wxHORIZONTAL );
-    demuxdump_checkbox = new wxCheckBox( panel, DemuxDumpEnable_Event,
-                               wxU(_("Capture input stream")) );
-    demuxdump_checkbox->SetToolTip(
-        wxU(_("Capture the stream you are playing to a file")) );
-    demuxdump_textctrl = new wxTextCtrl( panel, DemuxDump_Event, wxT(""),
-                                         wxDefaultPosition, wxDefaultSize,
-                                         wxTE_PROCESS_ENTER );
-    demuxdump_button = new wxButton( panel, DemuxDumpBrowse_Event,
-                                     wxU(_("Browse...")) );
-
-    char *psz_demuxdump = config_GetPsz( p_intf, "demuxdump-file" );
-    if( psz_demuxdump && *psz_demuxdump )
-    {
-        demuxdump_textctrl->SetValue( wxU(psz_demuxdump) );
-    }
-    if( psz_demuxdump ) free( psz_demuxdump );
-
-    demuxdump_textctrl->Disable();
-    demuxdump_button->Disable();
-    demuxdump_sizer->Add( demuxdump_checkbox, 0,
-                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
-    demuxdump_sizer->Add( demuxdump_button, 0,
-                          wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 10 );
-    demuxdump_sizer->Add( demuxdump_textctrl, 1, wxRIGHT, 10 );
-
-    /* Separation */
-    wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
 
     /* Create the buttons */
     wxButton *ok_button = new wxButton( panel, wxID_OK, wxU(_("OK")) );
@@ -310,9 +332,13 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     panel_sizer->Add( mrl_sizer_sizer, 0, wxEXPAND, 5 );
     panel_sizer->Add( label, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( notebook_sizer, 1, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( sout_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
-    panel_sizer->Add( demuxdump_sizer, 0, wxEXPAND | wxALIGN_LEFT | wxALL, 5 );
-    panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
+    if( i_method == OPEN_NORMAL)
+    {
+        panel_sizer->Add( sout_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
+        panel_sizer->Add( demuxdump_sizer, 0, wxEXPAND | wxALIGN_LEFT
+                          | wxALL, 5 );
+        panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
+    }
     panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT | wxALL, 5 );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
@@ -614,11 +640,13 @@ void OpenDialog::UpdateMRL( int i_access_method )
     i_current_access_method = i_access_method;
 
     /* Check if the user asked for demuxdump */
-    if( demuxdump_checkbox->GetValue() )
+    if( demuxdump_checkbox )
     {
-        demux = wxT("/demuxdump");
+        if( demuxdump_checkbox->GetValue() )
+        {
+            demux = wxT("/demuxdump");
+        }
     }
-
     switch( i_access_method )
     {
     case FILE_ACCESS:
@@ -712,6 +740,12 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     mrl_combo->Append( mrl_combo->GetValue() );
     if( mrl_combo->GetCount() > 10 ) mrl_combo->Delete( 0 );
     mrl_combo->SetSelection( mrl_combo->GetCount() - 1 );
+
+    if( i_method == OPEN_STREAM )
+    {
+        Hide();
+        return;
+    }
 
     /* Update the playlist */
     playlist_t *p_playlist =
@@ -979,12 +1013,15 @@ void OpenDialog::OnV4LSettingsChange( wxCommandEvent& WXUNUSED(event) )
 void OpenDialog::OnSubsFileEnable( wxCommandEvent& event )
 {
     subsfile_button->Enable( event.GetInt() != 0 );
-    if( event.GetInt() && demuxdump_checkbox->IsChecked() )
+    if( demuxdump_checkbox )
     {
-        demuxdump_checkbox->SetValue( 0 );
-        wxCommandEvent event = wxCommandEvent( wxEVT_NULL );
-        event.SetInt( 0 );
-        OnDemuxDumpEnable( event );
+        if( event.GetInt() && demuxdump_checkbox->IsChecked() )
+        {
+            demuxdump_checkbox->SetValue( 0 );
+            wxCommandEvent event = wxCommandEvent( wxEVT_NULL );
+            event.SetInt( 0 );
+            OnDemuxDumpEnable( event );
+        }
     }
 }
 

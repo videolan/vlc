@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.84 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: vlc_common.h,v 1.85 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -184,6 +184,7 @@ typedef struct msg_subscription_t msg_subscription_t;
 /* Playlist */
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
+typedef struct playlist_group_t playlist_group_t;
 
 /* Modules */
 typedef struct module_bank_t module_bank_t;

@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.16 2003/09/14 16:41:48 zorglub Exp $
+ * $Id: slp.c,v 1.17 2003/10/29 17:32:54 zorglub Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -43,6 +43,8 @@ static ssize_t Read  ( input_thread_t *, byte_t *, size_t );
 static int  Init  ( vlc_object_t * );
 static void End   ( vlc_object_t * );
 static int  Demux ( input_thread_t * );
+
+int i_group;
 
 /*****************************************************************************
  * Module descriptor
@@ -112,10 +114,12 @@ static SLPBoolean AttrCallback( SLPHandle slph_slp,
     /* or there was a problem with getting the data we requested */
     if( (slpe_errcode != SLP_OK) )
     {
-/*        msg_Err( (vlc_object_t*)NULL,
+#if 0
+        msg_Err( (vlc_object_t*)NULL,
                  "AttrCallback got an error %i with attribute %s",
                  slpe_errcode,
-                 psz_attrlist ); */
+                 psz_attrlist );
+#endif
         return SLP_TRUE;
     }
 
@@ -145,7 +149,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     {
         return SLP_TRUE;
     }
-    
+
     msg_Dbg(p_input,"URL: %s",psz_srvurl);
 
     /* or there was a problem with getting the data we requested */
@@ -188,6 +192,9 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
     p_playlist_item->b_autodeletion = VLC_FALSE;
     p_playlist_item->i_options = 0;
     p_playlist_item->ppsz_options = 0;
+    p_playlist_item->psz_author = NULL;
+    p_playlist_item->i_group = i_group;
+    p_playlist_item->b_enabled = VLC_TRUE;
 
     /* search the description of the stream */
     if( SLPOpen( config_GetPsz( p_input, "slp-lang" ),
@@ -258,7 +265,7 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
     {
         return SLP_TRUE;
     }
-    
+
     msg_Dbg(p_input,"Services: %s",psz_srvurl);
 
     /* or there was a problem with getting the data we requested */
@@ -289,14 +296,14 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
                     if(!psz_eos) break;
                     if(!strncasecmp(psz_eos+1,"service:",8)) break;
                 }
-        
-                if(psz_eos) 
+
+                if(psz_eos)
                     *psz_eos = '\0';
 
                 psz_service = strdup( psz_srvurl);
-               
+
                 msg_Dbg(p_input,"Getting details for %s",psz_service);
-                
+
                 slpe_result = SLPFindSrvs( slph_slp2,
                                    psz_service,
                                    config_GetPsz( p_input, "slp-scopelist" ),
@@ -306,9 +313,10 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
 
                 if(psz_eos)
                     psz_srvurl = psz_eos;
-                
-//                SLPClose( slph_slp2 );
 
+#if 0
+                SLPClose( slph_slp2 );
+#endif
                 if( slpe_result != SLP_OK )
                 {
                    msg_Err( p_input,
@@ -330,10 +338,11 @@ static SLPBoolean SrvTypeCallback( SLPHandle slph_slp,
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
-    input_thread_t * p_input = (input_thread_t *)p_this;
-    SLPError         slpe_result;
-    SLPHandle        slph_slp;
-    playlist_t *     p_playlist;
+    input_thread_t *   p_input = (input_thread_t *)p_this;
+    SLPError           slpe_result;
+    SLPHandle          slph_slp;
+    playlist_t *       p_playlist;
+    playlist_group_t * p_group;
 
     /* remove the "slp:" entry of the playlist */
     p_playlist = (playlist_t *) vlc_object_find( p_input, VLC_OBJECT_PLAYLIST,
@@ -344,6 +353,8 @@ static int Open( vlc_object_t * p_this )
         return VLC_FALSE;
     }
 
+    p_group = playlist_CreateGroup( p_playlist , "SLP" );
+    i_group = p_group->i_id;
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
     vlc_object_release( (vlc_object_t *)p_playlist );
 
