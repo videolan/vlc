@@ -147,6 +147,7 @@ static void   CacheLoad        ( vlc_object_t * );
 static int    CacheLoadConfig  ( module_t *, FILE * );
 static void   CacheSave        ( vlc_object_t * );
 static void   CacheSaveConfig  ( module_t *, FILE * );
+static char * CacheName        ( void );
 static void   CacheMerge       ( vlc_object_t *, module_t *, module_t * );
 static module_cache_t * CacheFind( vlc_object_t *, char *, int64_t, int64_t );
 
@@ -1545,7 +1546,7 @@ static void CacheLoad( vlc_object_t *p_this )
     char *psz_filename, *psz_homedir;
     FILE *file;
     int i, j, i_size, i_read;
-    char p_cachestring[sizeof(PLUGINSCACHE_FILE COPYRIGHT_MESSAGE)];
+    char p_cachestring[sizeof(PLUGINSCACHE_DIR COPYRIGHT_MESSAGE)];
     int i_cache;
     module_cache_t **pp_cache = 0;
     int32_t i_file_size;
@@ -1557,18 +1558,17 @@ static void CacheLoad( vlc_object_t *p_this )
         return;
     }
     psz_filename =
-        (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
-                        strlen(psz_homedir) );
-
-    if( psz_filename )
-        sprintf( psz_filename, "%s/" CONFIG_DIR "/" PLUGINSCACHE_FILE,
-                 psz_homedir );
+        (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_DIR "/" ) +
+                        strlen(psz_homedir) + strlen(CacheName()) );
 
     if( !psz_filename )
     {
         msg_Err( p_this, "out of memory" );
         return;
     }
+
+    sprintf( psz_filename, "%s/%s/%s/%s", psz_homedir, CONFIG_DIR,
+             PLUGINSCACHE_DIR, CacheName() );
 
     if( p_this->p_libvlc->p_module_bank->b_cache_delete )
     {
@@ -1616,10 +1616,10 @@ static void CacheLoad( vlc_object_t *p_this )
     fseek( file, sizeof(i_file_size), SEEK_SET );
 
     /* Check the file is a plugins cache */
-    i_size = sizeof(PLUGINSCACHE_FILE COPYRIGHT_MESSAGE) - 1;
+    i_size = sizeof(PLUGINSCACHE_DIR COPYRIGHT_MESSAGE) - 1;
     i_read = fread( p_cachestring, sizeof(char), i_size, file );
     if( i_read != i_size ||
-        memcmp( p_cachestring, PLUGINSCACHE_FILE COPYRIGHT_MESSAGE, i_size ) )
+        memcmp( p_cachestring, PLUGINSCACHE_DIR COPYRIGHT_MESSAGE, i_size ) )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         fclose( file );
@@ -1841,11 +1841,8 @@ static void CacheSave( vlc_object_t *p_this )
         return;
     }
     psz_filename =
-       (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_FILE) +
-                       strlen(psz_homedir) );
-
-    if( psz_filename )
-        sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+       (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_DIR "/" ) +
+                       strlen(psz_homedir) + strlen(CacheName()) );
 
     if( !psz_filename )
     {
@@ -1853,9 +1850,16 @@ static void CacheSave( vlc_object_t *p_this )
         return;
     }
 
+    sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+
     config_CreateDir( p_this, psz_filename );
 
-    strcat( psz_filename, "/" PLUGINSCACHE_FILE );
+    strcat( psz_filename, "/" PLUGINSCACHE_DIR );
+
+    config_CreateDir( p_this, psz_filename );
+
+    strcat( psz_filename, "/" );
+    strcat( psz_filename, CacheName() );
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
@@ -1873,7 +1877,7 @@ static void CacheSave( vlc_object_t *p_this )
     fwrite( &i_file_size, sizeof(char), sizeof(i_file_size), file );
 
     /* Contains version number */
-    fprintf( file, PLUGINSCACHE_FILE COPYRIGHT_MESSAGE );
+    fprintf( file, "%s", PLUGINSCACHE_DIR COPYRIGHT_MESSAGE );
 
     i_cache = p_this->p_libvlc->p_module_bank->i_cache;
     pp_cache = p_this->p_libvlc->p_module_bank->pp_cache;
@@ -2005,6 +2009,26 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
 
         SAVE_IMMEDIATE( p_module->p_config[i].pf_callback );
     }
+}
+
+/*****************************************************************************
+ * CacheName: Return the cache file name for this platform.
+ *****************************************************************************/
+static char * CacheName( void )
+{
+    static char psz_cachename[32];
+    static vlc_bool_t b_initialised = VLC_FALSE;
+
+    if( !b_initialised )
+    {
+        /* Code int size, pointer size and endianness in the filename */
+        int32_t x = 0xbe00001e;
+        sprintf( psz_cachename, "plugins-%.2x%.2x%.2x.dat", sizeof(int),
+                 sizeof(void *), (unsigned int)((unsigned char *)&x)[0] );
+        b_initialised = VLC_TRUE;
+    }
+
+    return psz_cachename;
 }
 
 /*****************************************************************************

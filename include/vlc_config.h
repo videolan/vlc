@@ -58,7 +58,7 @@
 #  define CONFIG_DIR                    ".vlc"
 #endif
 #define CONFIG_FILE                     "vlcrc"
-#define PLUGINSCACHE_FILE               "vlcplugins"
+#define PLUGINSCACHE_DIR                "cache"
 
 /*****************************************************************************
  * Interface configuration
