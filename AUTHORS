@@ -214,6 +214,11 @@ D: XVideo video output
 D: Gnome and Gtk+ interface enhancements
 S: United Kingdom
 
+N: Derk-Jan Hartman
+E: pjotr@sidekick.student.utwente.nl
+D: Mac OS X interface
+S: Netherlands
+
 N: Gaël Hendryckx
 E: jimmy@via.ecp.fr
 C: jimmy
