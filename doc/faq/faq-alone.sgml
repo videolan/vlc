@@ -4,7 +4,7 @@
   <!ENTITY faq SYSTEM "faq.sgml">
 ]>
 
-<article>
+<article id="faq">
 
 <articleinfo>
 

@@ -2,10 +2,9 @@ all: clean html html-zip txt pdf ps rtf
 
 html:
 	rm -f *.html
-	sgmltools -b html -s ../common/stylesheet-html.dsl faq-alone.sgml
-	mv faq-alone/*.html .
-	rmdir faq-alone
-	ln -s article1.html index.html
+	sgmltools -b onehtml -s ../common/stylesheet-html.dsl faq-alone.sgml
+	rm -f faq-alone.html
+	ln -s faq.html index.html
 
 clean:
 	rm -f *.html *.txt *.zip *.pdf *.ps *.rtf
