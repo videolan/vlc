@@ -35,8 +35,8 @@
 #include "../utils/var_text.hpp"
 
 
-#define MOVING_TEXT_STEP 3
-#define MOVING_TEXT_DELAY 200
+#define MOVING_TEXT_STEP 1
+#define MOVING_TEXT_DELAY 30
 #define SEPARATOR_STRING "   "
 
 
