@@ -332,6 +332,7 @@ public:
     std::vector<chapter_item_t> sub_chapters;
     int                         i_current_sub_chapter;
     int                         i_seekpoint_num;
+    int64_t                     i_uid;
 };
 
 class chapter_edition_t 
@@ -343,6 +344,7 @@ public:
     {}
 	
 	void RefreshChapters();
+	double Duration() const;
     
     std::vector<chapter_item_t> chapters;
     int64_t                     i_uid;
@@ -2735,9 +2737,8 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, cha
 
         if( MKV_IS_ID( l, KaxChapterUID ) )
         {
-            KaxChapterUID &uid = *(KaxChapterUID*)l;
-            uint32_t i_uid = uint32( uid );
-            msg_Dbg( p_demux, "|   |   |   |   + ChapterUID: 0x%x", i_uid );
+            chapters.i_uid = uint64_t(*(KaxChapterUID*)l);
+            msg_Dbg( p_demux, "|   |   |   |   + ChapterUID: %lld", chapters.i_uid );
         }
         else if( MKV_IS_ID( l, KaxChapterFlagHidden ) )
         {
@@ -2810,7 +2811,7 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, cha
     if (b_display_seekpoint)
     {
         // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
-        p_sys->title->i_seekpoint++;
+		chapters.i_seekpoint_num = p_sys->title->i_seekpoint++;
         p_sys->title->seekpoint = (seekpoint_t**)realloc( p_sys->title->seekpoint, p_sys->title->i_seekpoint * sizeof( seekpoint_t* ) );
         p_sys->title->seekpoint[p_sys->title->i_seekpoint-1] = sk;
     }
@@ -2893,6 +2894,7 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
     if ( p_sys->editions[i_default_edition].b_ordered )
     {
         /* update the duration of the segment according to the sum of all sub chapters */
+		p_sys->f_duration = p_sys->editions[i_default_edition].Duration();
     }
 }
 
@@ -3065,4 +3067,18 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
 	}
 	
 	return i_user_end_time;
+}
+
+double chapter_edition_t::Duration() const
+{
+	double f_result = 0.0;
+	
+	if ( chapters.size() )
+	{
+		std::vector<chapter_item_t>::const_iterator index = chapters.end();
+		index--;
+		f_result = (*index).i_user_end_time;
+	}
+	
+	return f_result;
 }
