@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.24 2003/01/15 00:49:49 jlj Exp $
+ * $Id: intf.m,v 1.25 2003/01/15 23:55:22 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -94,6 +94,11 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+    /* Do it again - for some unknown reason, vlc_thread_create() often
+     * fails to go to real-time priority with the first launched thread
+     * (???) --Meuuh */
+    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
+
     [NSApp run];
 }
 

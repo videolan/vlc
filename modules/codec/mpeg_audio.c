@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.3 2003/01/15 13:58:28 massiot Exp $
+ * $Id: mpeg_audio.c,v 1.4 2003/01/15 23:55:22 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -113,6 +113,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     dec_thread_t * p_dec;
     audio_date_t end_date;
     unsigned int i_layer = 0;
+    byte_t p_sync[MAD_BUFFER_GUARD];
+    mtime_t pts;
 
     /* Allocate the memory needed to store the thread's structure */
     p_dec = malloc( sizeof(dec_thread_t) );
@@ -140,39 +142,73 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         return -1;
     }
 
+    /* Init sync buffer. */
+    NextPTS( &p_dec->bit_stream, &pts, NULL );
+    GetChunk( &p_dec->bit_stream, p_sync, MAD_BUFFER_GUARD );
+
     /* Decoder thread's main loop */
     while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
     {
         int i_bit_rate;
         unsigned int i_rate, i_original_channels, i_frame_size, i_frame_length;
         unsigned int i_new_layer, i_current_frame_size;
-        mtime_t pts;
         uint32_t i_header;
         aout_buffer_t * p_buffer;
+        int i;
 
-        /* Look for sync word - should be 0xfff */
-        RealignBits( &p_dec->bit_stream );
-        if ( ShowBits( &p_dec->bit_stream, 11 ) != 0x07ff )
+        /* Look for sync word - should be 0xffe */
+        if ( (p_sync[0] != 0xff) || ((p_sync[1] & 0xe0) != 0xe0) )
         {
             msg_Warn( p_dec->p_fifo, "no sync - skipping" );
-        }
-        while ( ShowBits( &p_dec->bit_stream, 11 ) != 0x07ff &&
-                (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
-        {
-            RemoveBits( &p_dec->bit_stream, 8 );
+            /* Look inside the sync buffer. */
+            for ( i = 1; i < MAD_BUFFER_GUARD - 1; i++ )
+            {
+                if ( (p_sync[i] == 0xff) && ((p_sync[i + 1] & 0xe0) != 0xe0) )
+                    break;
+            }
+            if ( i < MAD_BUFFER_GUARD - 1 )
+            {
+                /* Found it ! */
+                memmove( p_sync, &p_sync[i], MAD_BUFFER_GUARD - i );
+                GetChunk( &p_dec->bit_stream, &p_sync[MAD_BUFFER_GUARD - i],
+                          i );
+            }
+            else
+            {
+                if ( p_sync[MAD_BUFFER_GUARD - 1] == 0xff
+                      && ShowBits( &p_dec->bit_stream, 3 ) == 0x3 )
+                {
+                    /* Found it ! */
+                    p_sync[0] = p_sync[MAD_BUFFER_GUARD - 1];
+                    GetChunk( &p_dec->bit_stream,
+                              &p_sync[1], MAD_BUFFER_GUARD - 1 );
+                }
+                else
+                {
+                    /* Scan the stream. */
+                    while ( ShowBits( &p_dec->bit_stream, 11 ) != 0x07ff &&
+                            (!p_dec->p_fifo->b_die) &&
+                            (!p_dec->p_fifo->b_error) )
+                    {
+                        RemoveBits( &p_dec->bit_stream, 8 );
+                    }
+                    if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
+                        break;
+                    GetChunk( &p_dec->bit_stream,p_sync, MAD_BUFFER_GUARD );
+                }
+            }
         }
         if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error ) break;
 
         /* Set the Presentation Time Stamp */
-        NextPTS( &p_dec->bit_stream, &pts, NULL );
         if ( pts != 0 && pts != aout_DateGet( &end_date ) )
         {
             aout_DateSet( &end_date, pts );
         }
 
         /* Get frame header */
-        i_header = ShowBits( &p_dec->bit_stream, 32 );
-        if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error ) break;
+        i_header = (p_sync[0] << 24) | (p_sync[1] << 16) | (p_sync[2] << 8)
+                     | p_sync[3];
 
         /* Check if frame is valid and get frame info */
         i_current_frame_size = SyncInfo( i_header,
@@ -180,12 +216,21 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                                          &i_bit_rate, &i_frame_length,
                                          &i_frame_size, &i_new_layer );
 
-        if( !i_current_frame_size )
+        if ( !i_current_frame_size )
         {
             msg_Warn( p_dec->p_fifo, "syncinfo failed" );
             /* This is probably an emulated startcode, drop the first byte
              * to force looking for the next startcode. */
-            RemoveBits( &p_dec->bit_stream, 8 );
+            memmove( p_sync, &p_sync[1], MAD_BUFFER_GUARD - 1 );
+            p_sync[MAD_BUFFER_GUARD - 1] = GetBits( &p_dec->bit_stream, 8 );
+            continue;
+        }
+        if ( i_current_frame_size > i_frame_size )
+        {
+            msg_Warn( p_dec->p_fifo, "frame too big %d > %d",
+                      i_current_frame_size, i_frame_size );
+            memmove( p_sync, &p_sync[1], MAD_BUFFER_GUARD - 1 );
+            p_sync[MAD_BUFFER_GUARD - 1] = GetBits( &p_dec->bit_stream, 8 );
             continue;
         }
 
@@ -240,6 +285,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
             /* We've just started the stream, wait for the first PTS. */
             GetChunk( &p_dec->bit_stream, p_junk, i_current_frame_size );
+            memcpy( p_sync, &p_junk[i_current_frame_size - MAD_BUFFER_GUARD],
+                    MAD_BUFFER_GUARD );
             continue;
         }
 
@@ -255,14 +302,23 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                                                  i_frame_length );
 
         /* Get the whole frame. */
-        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer,
-                  i_current_frame_size );
+        memcpy( p_buffer->p_buffer, p_sync, MAD_BUFFER_GUARD );
+        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + MAD_BUFFER_GUARD,
+                  i_current_frame_size - MAD_BUFFER_GUARD );
         if( p_dec->p_fifo->b_die )
         {
             aout_DecDeleteBuffer( p_dec->p_aout, p_dec->p_aout_input,
                                   p_buffer );
             break;
         }
+        /* Get beginning of next frame. */
+        NextPTS( &p_dec->bit_stream, &pts, NULL );
+        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + i_current_frame_size,
+                  MAD_BUFFER_GUARD );
+        memcpy( p_sync, p_buffer->p_buffer + i_current_frame_size,
+                MAD_BUFFER_GUARD );
+
+        p_buffer->i_nb_bytes = i_current_frame_size + MAD_BUFFER_GUARD;
 
         /* Send the buffer to the aout core. */
         aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
@@ -337,6 +393,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     vlc_bool_t b_padding, b_mpeg_2_5;
     int i_current_frame_size = 0;
     int i_bitrate_index, i_samplerate_index;
+    int i_max_bit_rate;
 
     b_mpeg_2_5  = 1 - ((i_header & 0x100000) >> 20);
     i_version   = 1 - ((i_header & 0x80000) >> 19);
@@ -370,6 +427,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
             break;
         }
         *pi_bit_rate = pppi_mpegaudio_bitrate[i_version][*pi_layer-1][i_bitrate_index];
+        i_max_bit_rate = pppi_mpegaudio_bitrate[i_version][*pi_layer-1][14];
         *pi_sample_rate = ppi_mpegaudio_samplerate[i_version][i_samplerate_index];
 
         if ( b_mpeg_2_5 )
@@ -384,7 +442,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
                                         *pi_bit_rate / *pi_sample_rate
                                         + b_padding ) * 4;
             *pi_frame_size = ( ( i_version ? 6000 : 12000 ) *
-                                  *pi_bit_rate / *pi_sample_rate + 1 ) * 4;
+                                  i_max_bit_rate / *pi_sample_rate + 1 ) * 4;
             *pi_frame_length = 384;
             break;
 
@@ -393,7 +451,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
                                       *pi_bit_rate / *pi_sample_rate
                                       + b_padding;
             *pi_frame_size = ( i_version ? 72000 : 144000 ) *
-                                      *pi_bit_rate / *pi_sample_rate + 1;
+                                      i_max_bit_rate / *pi_sample_rate + 1;
             *pi_frame_length = 1152;
             break;
 
@@ -402,7 +460,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
                                       *pi_bit_rate / *pi_sample_rate
                                       + b_padding;
             *pi_frame_size = ( i_version ? 72000 : 144000 ) *
-                                      *pi_bit_rate / *pi_sample_rate + 1;
+                                      i_max_bit_rate / *pi_sample_rate + 1;
             *pi_frame_length = i_version ? 576 : 1152;
             break;
 

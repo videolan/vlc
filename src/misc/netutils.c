@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.77 2002/11/13 20:51:05 sam Exp $
+ * $Id: netutils.c,v 1.78 2003/01/15 23:55:22 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -127,8 +127,8 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 int __network_ChannelCreate( vlc_object_t *p_this )
 {
 #if !defined( SYS_LINUX ) && !( defined( WIN32 ) && !defined( UNDER_CE ) )
-    msg_Err( p_this, "VLAN-based channels are not supported "
-                     "on this architecture" );
+    msg_Warn( p_this, "VLAN-based channels are not supported "
+                      "on this architecture" );
 #endif
 
     /* Allocate structure */
