@@ -2,12 +2,13 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.8 2002/10/29 17:33:11 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.9 2002/10/30 00:59:22 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Tony Casltey <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
+ *          Eric Petit <titer@videolan.org>
  *
  * This program is free software{} you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,16 +34,6 @@
 
 #include "VlcWrapper.h"
 
-Intf_VLCWrapper *Intf_VLCWrapper::getVLCWrapper(intf_thread_t *p_interface)
-{
-    static Intf_VLCWrapper *one_wrapper;
-    if (one_wrapper == NULL )
-    {
-       one_wrapper = new Intf_VLCWrapper(p_interface);
-    }
-    return one_wrapper;
-}
-
 Intf_VLCWrapper::Intf_VLCWrapper(intf_thread_t *p_interface)
 {
     p_intf = p_interface;
@@ -50,47 +41,6 @@ Intf_VLCWrapper::Intf_VLCWrapper(intf_thread_t *p_interface)
 
 Intf_VLCWrapper::~Intf_VLCWrapper()
 {
-}
-
-#if 0
-bool Intf_VLCWrapper::manage()
-{
-   /* p_main->p_intf->pf_manage( p_intf ); */
-   
-   if ( p_intf->b_die )
-   {
-       // exit the lot
-       return( 1 );
-   }
-   
-   if ( p_intf->p_sys->p_input != NULL )
-   {
-       vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        if( !p_intf->p_sys->p_input->b_die )
-        {
-            /* New input or stream map change */
-            if( p_intf->p_sys->p_input->stream.b_changed ||
-                p_intf->p_sys->i_part !=
-                    p_intf->p_sys->p_input->stream.p_selected_area->i_part )
-            {
-                setupMenus();
-                p_intf->p_sys->b_disabled_menus = 0;
-            }
-        }
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-    }
-    else if ( !p_intf->p_sys->b_disabled_menus )
-    {
-        setupMenus();
-        p_intf->p_sys->b_disabled_menus = 1;
-    }
-    return( 0 );
-}
-#endif
-
-void Intf_VLCWrapper::quit()
-{
-    p_intf->b_die = 1;
 }
     
 /* playlist control */
@@ -131,7 +81,6 @@ void Intf_VLCWrapper::playlistStop()
     playlist_t *p_playlist = 
                 (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
 }
@@ -609,16 +558,6 @@ bool Intf_VLCWrapper::has_audio()
     return( p_intf->p_sys->p_aout != NULL );
 }
 
-//void Intf_VLCWrapper::fullscreen()
-//{
-//    if( p_vout_bank->pp_vout[0] != NULL )
-//    {
-//        p_vout_bank->pp_vout[0]->i_changes |= VOUT_FULLSCREEN_CHANGE;
-//    }
-//}
-
-void Intf_VLCWrapper::eject(){}
-
     /* playback info */
 
 const char*  Intf_VLCWrapper::getTimeAsString()
@@ -800,7 +739,6 @@ void Intf_VLCWrapper::toggleTitle(int i_title)
                           p_intf->p_sys->p_input->stream.pp_areas[i_title] );
 
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-        //setupMenus();
 
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
@@ -815,7 +753,6 @@ void Intf_VLCWrapper::toggleChapter(int i_chapter)
                           p_intf->p_sys->p_input->stream.p_selected_area );
 
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-//        setupMenus();
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
 }
@@ -885,8 +822,6 @@ void Intf_VLCWrapper::toggleSubtitle(int i_subtitle)
     }
 }
 
-
-void Intf_VLCWrapper::setupMenus(){}
 int  Intf_VLCWrapper::inputGetStatus()
 {
     return 0;

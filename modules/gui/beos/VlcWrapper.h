@@ -2,12 +2,13 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.5 2002/10/28 19:42:24 titer Exp $
+ * $Id: VlcWrapper.h,v 1.6 2002/10/30 00:59:22 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
- *          Tony Casltey <tony@castley.net>
+ *          Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
+ *          Eric Petit <titer@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,12 +31,11 @@ class InterfaceWindow;
 class Intf_VLCWrapper;
 
 /*****************************************************************************
- * intf_sys_t: description and status of FB interface
+ * intf_sys_t: internal variables of the BeOS interface
  *****************************************************************************/
 struct intf_sys_t
 {
     InterfaceWindow * p_window;
-    char              i_key;
     
     input_thread_t *  p_input;
     playlist_t *      p_playlist;
@@ -52,17 +52,21 @@ struct intf_sys_t
     Intf_VLCWrapper * p_vlc_wrapper;
 };
 
-/* Intf_VLCWrapper is a singleton class
-    (only one instance at any time) */
+/*****************************************************************************
+ * Intf_VLCWrapper
+ *****************************************************************************
+ * This class makes the link between the BeOS interface and the vlc core.
+ * There is only one Intf_VLCWrapper instance at any time, which is stored
+ * in p_intf->p_sys->p_vlc_wrapper
+ *****************************************************************************/
 class Intf_VLCWrapper
 {
 public:
-    static Intf_VLCWrapper *getVLCWrapper(intf_thread_t *p_if);
+    Intf_VLCWrapper( intf_thread_t *p_intf );
     ~Intf_VLCWrapper();
     
-    /* static bool manage(); */
-    void quit();
     int inputGetStatus();
+    void inputSeek();
     
     /* playlist control */
     bool playlistPlay();
@@ -70,32 +74,27 @@ public:
     void playlistStop();
     void playlistNext();
     void playlistPrev();
-    /* void playlistJumpTo( int pos );
-    int playlistCurrentPos();
-    int playlistSize();
-	playlistLock();
-	playlistUnlock();*/
-	void playlistSkip(int i);
+    void playlistJumpTo( int );
+    int  playlistSize();
+    int  playlistCurrentPos();
+    void playlistLock();
+    void playlistUnlock();
+    void playlistSkip(int i);
     void playlistGoto(int i);
+    void loop(); 
 
-/*  Playback Modes
-		PLAYLIST_REPEAT_CURRENT
-		PLAYLIST_FORWARD       
-		PLAYLIST_BACKWARD      
-		PLAYLIST_FORWARD_LOOP  
-		PLAYLIST_BACKWARD_LOOP 
-		PLAYLIST_RANDOM        
-		PLAYLIST_REVERSE_RANDOM
-*/
-
+    bool playlistPlaying();
+    BList* playlistAsArray();
+    void   getPlaylistInfo( int32& currentIndex,
+                            int32& maxIndex );
+    void   getTitleInfo( int32& currentIndex,
+                         int32& maxIndex );
+    void   getChapterInfo( int32& currentIndex,
+                           int32& maxIndex );
     void getNavCapabilities( bool* canSkipPrev,
-    								bool* canSkipNext );
-	void	navigatePrev();
-	void	navigateNext();
-
-//    void channelNext();
-//    void channelPrev();
-//    void loop();
+                             bool* canSkipNext );
+	void navigatePrev();
+	void navigateNext();
 
     /*  Stream Control */
     void playSlower();
@@ -110,31 +109,16 @@ public:
     bool is_playing();
     void maxvolume();
     bool has_audio();
-//    void fullscreen();
-    void eject();
     
-    int getStatus();    
-    void setStatus(int status);
-    void inputSeek();
-
     /* playback info */
     const char* getTimeAsString();
     float  getTimeAsFloat();
     void   setTimeAsFloat( float i_offset );
-    bool   playlistPlaying();
-    BList* playlistAsArray();
-    
-    void   getPlaylistInfo( int32& currentIndex,
-                            int32& maxIndex );
-    void   getTitleInfo( int32& currentIndex,
-                                int32& maxIndex );
-    void   getChapterInfo( int32& currentIndex,
-                                  int32& maxIndex );
 
     /* open file/disc/network */
     void openFiles( BList *o_files, bool replace = true );
     void openDisc( BString o_type, BString o_device,
-    					  int i_title, int i_chapter );
+                   int i_title, int i_chapter );
     void openNet( BString o_addr, int i_port );
     void openNetChannel( BString o_addr, int i_port );
     void openNetHTTP( BString o_addr );
@@ -147,18 +131,8 @@ public:
     void toggleSubtitle( int i_subtitle );
     void channelNext();
     void channelPrev();
-    void setupMenus();
-    
-    void playlistJumpTo( int );
-    int  playlistSize();
-    int  playlistCurrentPos();
-    void playlistLock();
-    void playlistUnlock();
-    void loop(); 
-    
-//private:
-    Intf_VLCWrapper( intf_thread_t *p_intf );
-    es_descriptor_t *  p_audio_es;
+
+private:
     intf_thread_t *p_intf;
 };
 

@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.3 2002/10/28 16:55:05 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.4 2002/10/30 00:59:21 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -124,7 +124,6 @@ class InterfaceWindow : public BWindow
 			void			_StoreSettings();
 
 	intf_thread_t*			p_intf;
-	es_descriptor_t*		p_audio_es;
 	es_descriptor_t*		p_spu_es;
 	input_thread_t*			fInputThread;
 

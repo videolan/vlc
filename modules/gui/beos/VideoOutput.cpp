@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.4 2002/10/29 17:33:11 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.5 2002/10/30 00:59:22 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -486,7 +486,8 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     {
         if (noOverlay) break;
         bitmap[0] = new BBitmap ( bitmapFrame, 
-                                  B_BITMAP_WILL_OVERLAY,
+                                  B_BITMAP_WILL_OVERLAY |
+                                  B_BITMAP_RESERVE_OVERLAY_CHANNEL,
                                   colspace[i].colspace);
 
         if(bitmap[0] && bitmap[0]->InitCheck() == B_OK) 
