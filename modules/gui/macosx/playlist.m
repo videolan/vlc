@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.57 2004/02/08 20:08:28 hartman Exp $
+ * $Id: playlist.m,v 1.58 2004/02/26 14:40:29 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -297,7 +297,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     if( [o_save_panel runModalForDirectory: nil
             file: o_name] == NSOKButton )
     {
-        playlist_Export( p_playlist, [[o_save_panel filename] fileSystemRepresentation], "m3u" );
+        playlist_Export( p_playlist, [[o_save_panel filename] fileSystemRepresentation], "export-m3u" );
     }
 
 }
