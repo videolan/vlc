@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.26 2004/02/25 17:48:52 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.27 2004/03/02 16:44:21 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -104,7 +104,11 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("MPEG audio layer I/II/III parser") );
+#if defined(SYS_DARWIN)
+    set_capability( "decoder", 5 );
+#else
     set_capability( "decoder", 100 );
+#endif
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_submodule();
