@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.26 2003/05/24 17:52:49 gbazin Exp $
+ * $Id: open.cpp,v 1.27 2003/06/14 21:18:36 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -611,10 +611,13 @@ wxArrayString OpenDialog::SeparateEntries( wxString entries )
         else if( !b_quotes_mode && entry.Last() != wxT('\"') )
         {
             /* we found a non-quoted standalone string */
-            entry.RemoveLast();
+            if( token.HasMoreTokens() ||
+                entry.Last() == wxT(' ') || entry.Last() == wxT('\t') ||
+                entry.Last() == wxT('\r') || entry.Last() == wxT('\n') )
+                entry.RemoveLast();
             if( !entry.IsEmpty() ) entries_array.Add( entry );
             entry.Empty();
-        } 
+        }
         else
         {;}
     }
@@ -629,8 +632,10 @@ wxArrayString OpenDialog::SeparateEntries( wxString entries )
  *****************************************************************************/
 void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
-    mrl_combo->Append( mrl_combo->GetValue() );
     mrl = SeparateEntries( mrl_combo->GetValue() );
+    mrl_combo->Append( mrl_combo->GetValue() );
+    if( mrl_combo->GetCount() > 10 ) mrl_combo->Delete( 0 );
+    mrl_combo->SetSelection( mrl_combo->GetCount() - 1 );
     EndModal( wxID_OK );
 }
 
@@ -680,6 +685,7 @@ void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 
         file_combo->SetValue( path );
         file_combo->Append( path );
+        if( file_combo->GetCount() > 10 ) file_combo->Delete( 0 );
         UpdateMRL( FILE_ACCESS );
     }
 }
