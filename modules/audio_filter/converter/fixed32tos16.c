@@ -2,7 +2,7 @@
  * fixed32tos16.c : converter from fixed32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tos16.c,v 1.8 2002/11/20 16:43:32 sam Exp $
+ * $Id: fixed32tos16.c,v 1.9 2002/12/24 15:28:57 massiot Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -204,16 +204,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         /* Accurate scaling */
 //        p_out = mpg321_s24_to_s16_pcm(16, *p_in++, &dither);
         /* Fast Scaling */
-        sample = s24_to_s16_pcm(*p_in++);
-
-#ifndef WORDS_BIGENDIAN
-        *p_out++ = (s16) (sample >> 0);
-        *p_out++ = (s16) (sample >> 8);
-#else
-        *p_out++ = (s16) (sample >> 8);
-        *p_out++ = (s16) (sample >> 0);
-#endif
-//        p_in++; p_out++;
+        *p_out++ = s24_to_s16_pcm(*p_in++);
     }
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 2;
