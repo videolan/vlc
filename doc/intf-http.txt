@@ -179,6 +179,8 @@ You have access to :
     strncmp         : compare the ST(3) first characters of ST(1) and ST(2),
                       push -1, 0, or 1
     strlen          : push the length of ST(1)
+    strsub          : extract substring of ST(1) from character number ST(2)
+                      to character number ST(3)
  * stack manipulation
     dup             : duplicate ST(1) on the stack
     drop            : remove ST(1)
