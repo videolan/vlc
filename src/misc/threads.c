@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.34 2003/01/10 17:01:53 titer Exp $
+ * $Id: threads.c,v 1.35 2003/01/24 06:31:56 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -627,7 +627,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     p_this->thread_id = spawn_thread( (thread_func)func, psz_name,
-                                      i_priority/* B_NORMAL_PRIORITY */, (void *)p_this );
+                                      i_priority, (void *)p_this );
     i_ret = resume_thread( p_this->thread_id );
 
 #endif

@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.11 2003/01/22 01:13:22 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.12 2003/01/24 06:31:56 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -1009,8 +1009,6 @@ VolumeSlider::Draw(BRect updateRect)
 		SetDrawingMode(B_OP_OVER); // part of knob is transparent
 		DrawBitmapAsync(fKnobBits, BPoint(knobPos - kVolumeSliderKnobWidth / 2, r.top));
 	}
-	else
-		fprintf(stderr, "VolumeSlider::Draw() - Error: no valid bitmaps!");
 }
 
 /*****************************************************************************

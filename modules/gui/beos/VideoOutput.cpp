@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.9 2002/12/07 22:00:36 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.10 2003/01/24 06:31:56 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -284,7 +284,6 @@ VideoWindow::MessageReceived( BMessage *p_message )
 				else
 				{
 					delete temp;
-					fprintf( stderr, "error copying bitmaps\n" );
 				}
 			}
 			break;
@@ -826,23 +825,12 @@ VideoWindow::_save_screen_shot( void* cookie )
 									nodeInfo.SetType( mime );
 							}
 						}
-					} else {
-						fprintf( stderr, "  failed to write bitmap: %s\n",
-								 strerror( status ) );
 					}
-				} else {
-					fprintf( stderr, "  failed to create output file: %s\n",
-							 strerror( status ) );
 				}
 				outStream.DetachBitmap( &converted );
 				outFile.Unset();
 			}
-			else
-				fprintf( stderr, "  failed to find translator\n");
 		}
-		else
-				fprintf( stderr, "  failed to convert colorspace: %s\n",
-						 strerror( status ) );
 		delete converted;
 	}
 	if ( info )

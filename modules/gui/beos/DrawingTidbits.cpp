@@ -2,7 +2,7 @@
  * DrawingTidbits.cpp
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DrawingTidbits.cpp,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: DrawingTidbits.cpp,v 1.3 2003/01/24 06:31:56 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -340,7 +340,6 @@ convert_bitmap( BBitmap* inBitmap, BBitmap* outBitmap )
 					status = B_OK;
 					break;
 				default:
-//printf("unkown colorspace: %ld\n", inBitmap->ColorSpace());
 					status = B_MISMATCHED_VALUES;
 					break;
 			}
