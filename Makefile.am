@@ -326,7 +326,6 @@ SOURCES_libvlc = \
 	src/stream_output/stream_output.c \
 	src/misc/mtime.c \
 	src/misc/modules.c \
-	src/misc/modules_plugin.h \
 	src/misc/threads.c \
 	src/misc/cpu.c \
 	src/misc/configuration.c \
