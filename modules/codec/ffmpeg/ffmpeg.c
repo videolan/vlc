@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.70 2004/01/08 12:07:07 hartman Exp $
+ * $Id: ffmpeg.c,v 1.71 2004/01/08 15:11:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -110,6 +110,7 @@ vlc_module_begin();
     set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );
 
     /* demux submodule */
+    add_submodule();
     set_description( _("ffmpeg demuxer" ) );
     set_capability( "demux2", 1 );
     set_callbacks( E_(OpenDemux), E_(CloseDemux) );
