@@ -278,7 +278,8 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
     {
        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
-           *pb_bool = VLC_TRUE;
+           if( p_sys->b_asf_http ) *pb_bool = VLC_TRUE;
+           else *pb_bool = VLC_FALSE;
            return VLC_SUCCESS;
 
        case MUX_GET_ADD_STREAM_WAIT:
@@ -834,6 +835,8 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     block_t *out;
     bo_t bo;
     int i;
+
+    msg_Dbg( p_mux, "Asf muxer creating header" );
 
     if( p_sys->i_dts_first > 0 )
     {
