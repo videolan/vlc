@@ -103,7 +103,7 @@ struct intf_sys_t
 
 
 #ifdef HAVE_VARIADIC_MACROS
-#   define msg_rcs( psz_format, args... ) \
+#   define msg_rc( psz_format, args... ) \
       __msg_rc( p_intf, psz_format, ## args )
 #endif
 
