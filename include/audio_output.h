@@ -36,13 +36,6 @@
 #define AOUT_DEFAULT_RATE       44100
 #define AOUT_MAX_RATE           48000
 
-/* Number of audio samples (s16 integers) contained in an audio output frame...
- * - Layer I        : a decoded frame contains 384 samples
- * - Layer II & III : a decoded frame contains 1152 = 3*384 samples */
-/*
-#define AOUT_FRAME_SIZE         384
-*/
-
 /* Number of audio output frames contained in an audio output fifo.
  * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
  * %(AOUT_FIFO_SIZE + 1) operation with an &AOUT_FIFO_SIZE.
@@ -115,11 +108,6 @@ typedef struct
     long                l_euclidean_denominator;
 
 } aout_increment_t;
-
-/******************************************************************************
- * aout_frame_t
- ******************************************************************************/
-/*typedef s16 aout_frame_t[ AOUT_FRAME_SIZE ];*/
 
 /******************************************************************************
  * aout_fifo_t

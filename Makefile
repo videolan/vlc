@@ -22,7 +22,7 @@ VIDEO=X11
 
 # Target architecture and optimization
 #ARCH=
-#ARCH=MMX
+ARCH=MMX
 #ARCH=PPC
 
 # Decoder choice - ?? old decoder will be removed soon
@@ -175,6 +175,8 @@ audio_output_obj = 		audio_output/audio_output.o \
 video_output_obj = 		video_output/video_output.o \
 						video_output/video_$(video).o
 
+ac3_decoder_obj =		ac3_decoder/ac3_decoder.o
+
 audio_decoder_obj =		audio_decoder/audio_decoder.o \
 						audio_decoder/audio_math.o
 
@@ -219,6 +221,7 @@ C_OBJ = $(interface_obj) \
 		$(input_obj) \
 		$(audio_output_obj) \
 		$(video_output_obj) \
+		$(ac3_decoder_obj) \
 		$(audio_decoder_obj) \
 		$(generic_decoder_obj) \
 		$(video_parser_obj) \

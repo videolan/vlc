@@ -33,5 +33,3 @@ $(dependancies): dep/%.d: %.c
 		| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
 		dep\/$(subst /,\/,$*).d : /g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
-
-

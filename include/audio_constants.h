@@ -113,6 +113,7 @@
  * The frame sizes are stored in the following array :
  * frame_size = ADEC_FRAME_SIZE[ 128*layer + 64*padding_bit + 16*sampling_frequency + bitrate_index ]
  ******************************************************************************/
+#if 0
 #define ADEC_FRAME_SIZE \
 { \
     /* Layer == `00' (reserved) */ \
@@ -214,6 +215,7 @@
             /* sampling_frequency == `11' (reserved) */ \
                 0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0 \
 }
+#endif
 
 
 /******************************************************************************

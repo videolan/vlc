@@ -47,6 +47,7 @@ static void     RunThread               ( adec_thread_t * p_adec );
 static void     ErrorThread             ( adec_thread_t * p_adec );
 static void     EndThread               ( adec_thread_t * p_adec );
 
+/*
 static int      adec_Layer1_Mono        ( adec_thread_t * p_adec );
 static int      adec_Layer1_Stereo      ( adec_thread_t * p_adec );
 static int      adec_Layer2_Mono        ( adec_thread_t * p_adec );
@@ -56,6 +57,7 @@ static byte_t   GetByte                 ( bit_stream_t * p_bit_stream );
 static void     NeedBits                ( bit_stream_t * p_bit_stream, int i_bits );
 static void     DumpBits                ( bit_stream_t * p_bit_stream, int i_bits );
 static int      FindHeader              ( adec_thread_t * p_adec );
+*/
 
 /******************************************************************************
  * adec_CreateThread: creates an audio decoder thread
@@ -489,7 +491,7 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
 #define NEXT_BUF \
 /* fprintf(stderr, "%p\n", p_adec->p_aout_fifo->buffer); */ \
 /* fprintf(stderr, "l_end_frame == %li, %p\n", l_end_frame, (aout_frame_t *)p_adec->p_aout_fifo->buffer + l_end_frame); */ \
-    p_s16 = ((aout_frame_t *)p_adec->p_aout_fifo->buffer)[ l_end_frame ]; \
+    p_s16 = ((adec_frame_t *)p_adec->p_aout_fifo->buffer)[ l_end_frame ]; \
 /* fprintf(stderr, "p_s16 == %p\n", p_s16); */ \
     l_end_frame += 1; \
     l_end_frame &= AOUT_FIFO_SIZE;
@@ -762,7 +764,7 @@ static int InitThread( adec_thread_t * p_adec )
             return( -1 );
     }
 
-    aout_fifo.l_frame_size = AOUT_FRAME_SIZE;
+    aout_fifo.l_frame_size = ADEC_FRAME_SIZE;
 
     /* Creating the audio output fifo */
     if ( (p_adec->p_aout_fifo = aout_CreateFifo(p_adec->p_aout, &aout_fifo)) == NULL )

@@ -65,6 +65,7 @@
 /* Audio */
 #include "audio_output.h"
 #include "audio_decoder.h"
+#include "ac3_decoder.h"
 
 /* Video */
 #include "video.h"
@@ -77,5 +78,3 @@
 #include "interface.h"
 
 #include "main.h"
-
-
