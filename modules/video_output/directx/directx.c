@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.29 2003/12/15 20:21:45 gbazin Exp $
+ * $Id: directx.c,v 1.30 2003/12/23 02:11:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -352,16 +352,8 @@ static int Init( vout_thread_t *p_vout )
     }
 
     /* Change the window title bar text */
-    if( p_vout->p_sys->hparent )
-        ; /* Do nothing */
-    else if( p_vout->p_sys->b_using_overlay )
-        SetWindowText( p_vout->p_sys->hwnd,
-                       VOUT_TITLE " (hardware YUV overlay DirectX output)" );
-    else if( p_vout->p_sys->b_hw_yuv )
-        SetWindowText( p_vout->p_sys->hwnd,
-                       VOUT_TITLE " (hardware YUV DirectX output)" );
-    else SetWindowText( p_vout->p_sys->hwnd,
-                        VOUT_TITLE " (software RGB DirectX output)" );
+    if( p_vout->p_sys->hparent ) ; /* Do nothing */
+    else PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 
     return VLC_SUCCESS;
 }

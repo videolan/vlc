@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.33 2003/12/16 22:10:56 gbazin Exp $
+ * $Id: events.c,v 1.34 2003/12/23 02:11:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -94,7 +94,7 @@ void DirectXEventThread( event_thread_t *p_event )
         p_event->b_dead = VLC_TRUE;
     }
 
-    /* signal the creation of the window */
+    /* Signal the creation of the window */
     vlc_thread_ready( p_event );
 
     /* Main loop */
@@ -229,6 +229,17 @@ void DirectXEventThread( event_thread_t *p_event )
 
                 var_Set( p_event->p_vlc, "key-pressed", val );
             }
+            break;
+
+        case WM_VLC_CHANGE_TEXT:
+            if( p_event->p_vout->p_sys->b_using_overlay )
+                SetWindowText( p_event->p_vout->p_sys->hwnd,
+                    VOUT_TITLE " (hardware YUV overlay DirectX output)" );
+            else if( p_event->p_vout->p_sys->b_hw_yuv )
+                SetWindowText( p_event->p_vout->p_sys->hwnd,
+                    VOUT_TITLE " (hardware YUV DirectX output)" );
+            else SetWindowText( p_event->p_vout->p_sys->hwnd,
+                    VOUT_TITLE " (software RGB DirectX output)" );
             break;
 
         default:
@@ -661,6 +672,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
         else
         {
+            msg_Warn( p_vout, "Created video sub-window" );
             SetWindowLong( p_vout->p_sys->hvideownd,
                            GWL_WNDPROC, (LONG)DirectXVideoEventProc );
         }
