@@ -66,6 +66,7 @@ vlc_module_begin();
     add_shortcut( "rawdv" );
     add_shortcut( "ogg" );
     add_shortcut( "h264" );
+    add_shortcut( "avi" );
 vlc_module_end();
 
 /*****************************************************************************
