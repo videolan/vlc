@@ -135,6 +135,8 @@ modules/access/cdda/callback.c
 modules/access/cdda/callback.h
 modules/access/cdda/cdda.c
 modules/access/cdda/cdda.h
+modules/access/cdda/info.c
+modules/access/cdda/info.h
 modules/access/directory.c
 modules/access/dshow/common.h
 modules/access/dshow/crossbar.cpp
@@ -143,6 +145,7 @@ modules/access/dshow/filter.cpp
 modules/access/dshow/filter.h
 modules/access/dvb/access.c
 modules/access/dvb/dvb.h
+modules/access/dvb/en50221.c
 modules/access/dvb/linux_dvb.c
 modules/access/dvdnav.c
 modules/access/dvdread.c
@@ -235,6 +238,7 @@ modules/audio_output/esd.c
 modules/audio_output/file.c
 modules/audio_output/hd1000a.cpp
 modules/audio_output/oss.c
+modules/audio_output/portaudio.c
 modules/audio_output/sdl.c
 modules/audio_output/waveout.c
 modules/codec/a52.c
@@ -270,12 +274,6 @@ modules/codec/ffmpeg/encoder.c
 modules/codec/ffmpeg/ffmpeg.c
 modules/codec/ffmpeg/ffmpeg.h
 modules/codec/ffmpeg/postprocess.c
-modules/codec/ffmpeg/postprocessing/postprocessing.c
-modules/codec/ffmpeg/postprocessing/postprocessing.h
-modules/codec/ffmpeg/postprocessing/postprocessing_c.c
-modules/codec/ffmpeg/postprocessing/postprocessing_common.h
-modules/codec/ffmpeg/postprocessing/postprocessing_mmx.c
-modules/codec/ffmpeg/postprocessing/postprocessing_mmxext.c
 modules/codec/ffmpeg/video.c
 modules/codec/ffmpeg/video_filter.c
 modules/codec/flac.c
@@ -325,6 +323,7 @@ modules/control/netsync.c
 modules/control/ntservice.c
 modules/control/rc.c
 modules/control/rtci.c
+modules/control/showintf.c
 modules/control/telnet.c
 modules/demux/a52.c
 modules/demux/aac.c
