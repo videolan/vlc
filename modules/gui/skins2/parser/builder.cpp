@@ -116,8 +116,16 @@ void Builder::addTheme( const BuilderData::Theme &rData )
     rManager.setMagnetValue( rData.m_magnet );
     rManager.setAlphaValue( rData.m_alpha );
     rManager.setMoveAlphaValue( rData.m_moveAlpha );
-    GenericFont *pFont = new FT2Font( getIntf(), "FreeSans.ttf", 12 );
-    pFont->init();
+    GenericFont *pFont = getFont( rData.m_tooltipfont );
+    if( pFont )
+    {
+        rManager.createTooltip( *pFont );
+    }
+    else
+    {
+        msg_Warn( getIntf(), "Invalid tooltip font: %s",
+                  rData.m_tooltipfont.c_str() );
+    }
 }
 
 
@@ -381,7 +389,7 @@ void Builder::addText( const BuilderData::Text &rData )
         return;
     }
 
-    GenericFont *pFont = m_pTheme->m_fonts[rData.m_fontId].get();
+    GenericFont *pFont = getFont( rData.m_fontId );
     if( pFont == NULL )
     {
         msg_Err( getIntf(), "Unknown font id: %s", rData.m_fontId.c_str() );
@@ -524,7 +532,7 @@ void Builder::addList( const BuilderData::List &rData )
         return;
     }
 
-    GenericFont *pFont = m_pTheme->m_fonts[rData.m_fontId].get();
+    GenericFont *pFont = getFont( rData.m_fontId );
     if( pFont == NULL )
     {
         msg_Err( getIntf(), "Unknown font id: %s", rData.m_fontId.c_str() );
@@ -648,6 +656,32 @@ const Position Builder::makePosition( const string &rLeftTop,
 
     return Position( left, top, right, bottom, rBox, refLeftTop,
                      refRightBottom );
+}
+
+
+GenericFont *Builder::getFont( const string &fontId )
+{
+    GenericFont *pFont = m_pTheme->m_fonts[fontId].get();
+    if( !pFont && fontId == "defaultfont" )
+    {
+#ifdef WIN32_SKINS
+        string defaultFont = (string)getIntf()->p_libvlc->psz_vlcpath +
+                             "\\skins2\\fonts\\FreeSans.ttf";
+#else
+        string defaultFont = (string)DATA_PATH + "/skins2/fonts/FreeSans.ttf";
+#endif
+        pFont = new FT2Font( getIntf(), defaultFont, 12 );
+        if( pFont->init() )
+        {
+            m_pTheme->m_fonts["defaultfont"] = GenericFontPtr( pFont );
+        }
+        else
+        {
+            delete pFont;
+            pFont = NULL;
+        }
+    }
+    return pFont;
 }
 
 

@@ -84,6 +84,9 @@ class Builder: public SkinObject
                                      int xPos, int yPos, int width, int height,
                                      const Box &rBox ) const;
 
+        /// Get a font from its id
+        GenericFont *getFont( const string &fontId );
+
         /// Function to parse "points" tags
         Bezier *getPoints( const char *pTag ) const;
 };
