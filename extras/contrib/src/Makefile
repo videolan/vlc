@@ -712,7 +712,7 @@ libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/dvdnav.patch
 ifeq ($(SYS),DARWIN)
-	(cd $@; autoheader)
+	(cd $@; autoconf)
 endif
 ifeq ($(SYS),BEOS)
 	(cd $@; ./autogen.sh noconfig)
