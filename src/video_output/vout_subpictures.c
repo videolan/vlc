@@ -605,54 +605,14 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
-            /* Force cropping if requested */
-            if( p_spu->b_force_crop )
-            {
-                video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
-
-                /* Find the intersection */
-                if( p_spu->i_crop_x + p_spu->i_crop_width <= i_x_offset ||
-                    i_x_offset + (int)p_fmt->i_visible_width <
-                        p_spu->i_crop_x ||
-                    p_spu->i_crop_y + p_spu->i_crop_height <= i_y_offset ||
-                    i_y_offset + (int)p_fmt->i_visible_height <
-                        p_spu->i_crop_y )
-                {
-                    /* No intersection */
-                    p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
-                }
-                else
-                {
-                    int i_x, i_y, i_x_end, i_y_end;
-                    i_x = __MAX( p_spu->i_crop_x, i_x_offset );
-                    i_y = __MAX( p_spu->i_crop_y, i_y_offset );
-                    i_x_end = __MIN( p_spu->i_crop_x + p_spu->i_crop_width,
-                                   i_x_offset + (int)p_fmt->i_visible_width );
-                    i_y_end = __MIN( p_spu->i_crop_y + p_spu->i_crop_height,
-                                   i_y_offset + (int)p_fmt->i_visible_height );
-
-                    p_fmt->i_x_offset = i_x - i_x_offset;
-                    p_fmt->i_y_offset = i_y - i_y_offset;
-                    p_fmt->i_visible_width = i_x_end - i_x;
-                    p_fmt->i_visible_height = i_y_end - i_y;
-
-                    i_x_offset = i_x;
-                    i_y_offset = i_y;
-                }
-            }
-
             /* Force palette if requested */
             if( p_spu->b_force_alpha && VLC_FOURCC('Y','U','V','P') ==
-                p_spu->p_blend->fmt_in.video.i_chroma )
+                p_region->fmt.i_chroma )
             {
-                p_spu->p_blend->fmt_in.video.p_palette->palette[0][3] =
-                    p_spu->pi_alpha[0];
-                p_spu->p_blend->fmt_in.video.p_palette->palette[1][3] =
-                    p_spu->pi_alpha[1];
-                p_spu->p_blend->fmt_in.video.p_palette->palette[2][3] =
-                    p_spu->pi_alpha[2];
-                p_spu->p_blend->fmt_in.video.p_palette->palette[3][3] =
-                    p_spu->pi_alpha[3];
+                p_region->fmt.p_palette->palette[0][3] = p_spu->pi_alpha[0];
+                p_region->fmt.p_palette->palette[1][3] = p_spu->pi_alpha[1];
+                p_region->fmt.p_palette->palette[2][3] = p_spu->pi_alpha[2];
+                p_region->fmt.p_palette->palette[3][3] = p_spu->pi_alpha[3];
             }
 
             /* Scale SPU if necessary */
@@ -720,6 +680,44 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             }
 
             p_spu->p_blend->fmt_in.video = p_region->fmt;
+
+            /* Force cropping if requested */
+            if( p_spu->b_force_crop )
+            {
+                video_format_t *p_fmt = &p_spu->p_blend->fmt_in.video;
+		int i_crop_x = p_spu->i_crop_x * i_scale_width / 1000;
+		int i_crop_y = p_spu->i_crop_y * i_scale_height / 1000;
+		int i_crop_width = p_spu->i_crop_width * i_scale_width / 1000;
+		int i_crop_height = p_spu->i_crop_height * i_scale_height/1000;
+
+                /* Find the intersection */
+                if( i_crop_x + i_crop_width <= i_x_offset ||
+                    i_x_offset + (int)p_fmt->i_visible_width < i_crop_x ||
+                    i_crop_y + i_crop_height <= i_y_offset ||
+                    i_y_offset + (int)p_fmt->i_visible_height < i_crop_y )
+                {
+                    /* No intersection */
+                    p_fmt->i_visible_width = p_fmt->i_visible_height = 0;
+                }
+                else
+                {
+                    int i_x, i_y, i_x_end, i_y_end;
+                    i_x = __MAX( i_crop_x, i_x_offset );
+                    i_y = __MAX( i_crop_y, i_y_offset );
+                    i_x_end = __MIN( i_crop_x + i_crop_width,
+                                   i_x_offset + (int)p_fmt->i_visible_width );
+                    i_y_end = __MIN( i_crop_y + i_crop_height,
+                                   i_y_offset + (int)p_fmt->i_visible_height );
+
+                    p_fmt->i_x_offset = i_x - i_x_offset;
+                    p_fmt->i_y_offset = i_y - i_y_offset;
+                    p_fmt->i_visible_width = i_x_end - i_x;
+                    p_fmt->i_visible_height = i_y_end - i_y;
+
+                    i_x_offset = i_x;
+                    i_y_offset = i_y;
+                }
+            }
 
             /* Update the output picture size */
             p_spu->p_blend->fmt_out.video.i_width =
