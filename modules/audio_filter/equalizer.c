@@ -238,98 +238,99 @@ typedef struct
 {
     char *psz_name;
     int  i_band;
+    float f_preamp;
     float f_amp[];
 } eqz_preset_t;
 
 static const eqz_preset_t eqz_preset_flat_10b=
 {
-    "flat", 10,
+    "flat", 10, 12.0,
     { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
 };
 static const eqz_preset_t eqz_preset_classical_10b=
 {
-    "classical", 10,
+    "classical", 10, 12.0,
     { -1.11022e-15, -1.11022e-15, -1.11022e-15, -1.11022e-15, -1.11022e-15, -1.11022e-15, -7.2, -7.2, -7.2, -9.6 }
 };
 static const eqz_preset_t eqz_preset_club_10b=
 {
-    "club", 10,
+    "club", 10, 6.0,
     { -1.11022e-15, -1.11022e-15, 8, 5.6, 5.6, 5.6, 3.2, -1.11022e-15, -1.11022e-15, -1.11022e-15 }
 };
 static const eqz_preset_t eqz_preset_dance_10b=
 {
-    "dance", 10,
+    "dance", 10, 5.0,
     { 9.6, 7.2, 2.4, -1.11022e-15, -1.11022e-15, -5.6, -7.2, -7.2, -1.11022e-15, -1.11022e-15 }
 };
 static const eqz_preset_t eqz_preset_fullbass_10b=
 {
-    "fullbass", 10,
+    "fullbass", 10, 5.0,
     { -8, 9.6, 9.6, 5.6, 1.6, -4, -8, -10.4, -11.2, -11.2  }
 };
 static const eqz_preset_t eqz_preset_fullbasstreeble_10b=
 {
-    "fullbasstreeble", 10,
+    "fullbasstreeble", 10, 4.0,
     { 7.2, 5.6, -1.11022e-15, -7.2, -4.8, 1.6, 8, 11.2, 12, 12 }
 };
 
 static const eqz_preset_t eqz_preset_fulltreeble_10b=
 {
-    "fulltreeble", 10,
+    "fulltreeble", 10, 3.0,
     { -9.6, -9.6, -9.6, -4, 2.4, 11.2, 16, 16, 16, 16.8 }
 };
 static const eqz_preset_t eqz_preset_headphones_10b=
 {
-    "headphones", 10,
+    "headphones", 10, 4.0,
     { 4.8, 11.2, 5.6, -3.2, -2.4, 1.6, 4.8, 9.6, 12.8, 14.4 }
 };
 static const eqz_preset_t eqz_preset_largehall_10b=
 {
-    "largehall", 10,
+    "largehall", 10, 5.0,
     { 10.4, 10.4, 5.6, 5.6, -1.11022e-15, -4.8, -4.8, -4.8, -1.11022e-15, -1.11022e-15 }
 };
 static const eqz_preset_t eqz_preset_live_10b=
 {
-    "live", 10,
+    "live", 10, 7.0,
     { -4.8, -1.11022e-15, 4, 5.6, 5.6, 5.6, 4, 2.4, 2.4, 2.4 }
 };
 static const eqz_preset_t eqz_preset_party_10b=
 {
-    "party", 10,
+    "party", 10, 6.0,
     { 7.2, 7.2, -1.11022e-15, -1.11022e-15, -1.11022e-15, -1.11022e-15, -1.11022e-15, -1.11022e-15, 7.2, 7.2 }
 };
 static const eqz_preset_t eqz_preset_pop_10b=
 {
-    "pop", 10,
+    "pop", 10, 6.0,
     { -1.6, 4.8, 7.2, 8, 5.6, -1.11022e-15, -2.4, -2.4, -1.6, -1.6 }
 };
 static const eqz_preset_t eqz_preset_reggae_10b=
 {
-    "reggae", 10,
+    "reggae", 10, 8.0,
     { -1.11022e-15, -1.11022e-15, -1.11022e-15, -5.6, -1.11022e-15, 6.4, 6.4, -1.11022e-15, -1.11022e-15, -1.11022e-15 }
 };
 static const eqz_preset_t eqz_preset_rock_10b=
 {
-    "rock", 10,
+    "rock", 10, 5.0,
     { 8, 4.8, -5.6, -8, -3.2, 4, 8.8, 11.2, 11.2, 11.2 }
 };
 static const eqz_preset_t eqz_preset_ska_10b=
 {
-    "ska", 10,
+    "ska", 10, 6.0,
     { -2.4, -4.8, -4, -1.11022e-15, 4, 5.6, 8.8, 9.6, 11.2, 9.6 }
 };
 static const eqz_preset_t eqz_preset_soft_10b=
 {
-    "soft", 10,
+    "soft", 10, 5.0,
     { 4.8, 1.6, -1.11022e-15, -2.4, -1.11022e-15, 4, 8, 9.6, 11.2, 12 }
 };
 static const eqz_preset_t eqz_preset_softrock_10b=
 {
-    "softrock", 10,
+    "softrock", 10, 7.0,
     { 4, 4, 2.4, -1.11022e-15, -4, -5.6, -3.2, -1.11022e-15, 2.4, 8.8 }
 };
 static const eqz_preset_t eqz_preset_techno_10b=
 {
-    "techno", 10,
+    "techno", 10, 5.0,
     { 8, 5.6, -1.11022e-15, -5.6, -4.8, -1.11022e-15, 8, 9.6, 9.6, 8.8 }
 };
 
@@ -455,6 +456,7 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
             if( !strcasecmp( eqz_preset_10b[i]->psz_name, psz ) )
             {
                 int j;
+                p_sys->f_gamp *= pow( 10, eqz_preset_10b[i]->f_preamp / 20.0 );
                 for( j = 0; j < p_sys->i_band; j++ )
                     p_sys->f_amp[j] = EqzConvertdB( eqz_preset_10b[i]->f_amp[j] );
                 break;
