@@ -49,6 +49,17 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
 
     p_playlist->i_sort = i_mode;
     p_playlist->i_order = i_type;
+    /* playlist with one or less items are allways sorted in all
+       manners, quit fast. */
+    if( p_playlist->i_size <= 1 )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
+        /* Notify the interfaces, is this necessary? */
+        var_Set( p_playlist, "intf-change", val );
+
+        return VLC_SUCCESS;
+    }
 
     if( i_mode == SORT_RANDOM )
     {
