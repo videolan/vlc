@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.2 2001/07/17 09:48:08 massiot Exp $
+ * $Id: vpar_headers.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -44,13 +44,8 @@
 #include "video_output.h"
 
 #include "vdec_ext-plugins.h"
-#include "video_decoder.h"
-
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
+#include "vpar_pool.h"
 #include "video_parser.h"
-#include "video_fifo.h"
 
 /*
  * Local prototypes
@@ -450,7 +445,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     /* XXX: The vout request and fifo opening will eventually be here */
 
-    /* Spawn an audio output if there is none */
+    /* Spawn a video output if there is none */
     vlc_mutex_lock( &p_vout_bank->lock );
     
     if( p_vout_bank->i_count == 0 )
@@ -510,15 +505,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         ReferenceUpdate( p_vpar, I_CODING_TYPE, NULL );
         if( p_vpar->picture.p_picture != NULL )
         {
-#ifdef VDEC_SMP
-            int     i_mb;
-
-            for( i_mb = 0; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
-            {
-                vpar_DestroyMacroblock( &p_vpar->vfifo,
-                                        p_vpar->picture.pp_mb[i_mb] );
-            }
-#endif
             vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
         }
         p_vpar->sequence.b_expect_discontinuity = 0;
@@ -613,14 +599,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             ReferenceReplace( p_vpar,
                       p_vpar->picture.i_coding_type,
                       NULL );
-
-#ifdef VDEC_SMP
-            for( i_mb = 0; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
-            {
-                vpar_DestroyMacroblock( &p_vpar->vfifo,
-                                        p_vpar->picture.pp_mb[i_mb] );
-            }
-#endif
             vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
         }
 
@@ -747,30 +725,11 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.i_c_stride = ( p_vpar->sequence.i_chroma_width
                     << ( 1 - p_vpar->picture.b_frame_structure ));
 
-        P_picture->i_deccount = p_vpar->sequence.i_mb_size;
-#ifdef VDEC_SMP
-        memset( p_vpar->picture.pp_mb, 0, MAX_MB*sizeof(macroblock_t *) );
-#endif
 /* FIXME ! remove asap ?? */
 //memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
-
-#ifdef VDEC_SMP
-        /* Link referenced pictures for the decoder
-         * They are unlinked in vpar_ReleaseMacroblock() &
-         * vpar_DestroyMacroblock() */
-        if( p_vpar->picture.i_coding_type == P_CODING_TYPE ||
-            p_vpar->picture.i_coding_type == B_CODING_TYPE )
-        {
-            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-        }
-        if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
-        {
-            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-        }
-#endif
     }
     p_vpar->picture.i_current_structure |= i_structure;
     p_vpar->picture.i_structure = i_structure;
@@ -855,6 +814,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 #endif
     }
 
+    /* Wait for all the macroblocks to be decoded. */
+    p_vpar->pool.pf_wait_pool( &p_vpar->pool );
+
+    /* Re-spawn decoder threads if the user changed settings. */
+    vpar_SpawnPool( p_vpar );
+
     if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
     {
         return;
@@ -863,22 +828,13 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
-#ifdef VDEC_SMP
-        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
-        {
-            vpar_DestroyMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
-        }
-#endif
-
 #ifdef STATS
         p_vpar->pc_malformed_pictures[p_vpar->picture.i_coding_type]++;
 #endif
 
-        if( P_picture->i_deccount != 1 )
-        {
-            vpar_SynchroEnd( p_vpar, 1 );
-            vout_DestroyPicture( p_vpar->p_vout, P_picture );
-        }
+        vpar_SynchroEnd( p_vpar, p_vpar->picture.i_coding_type,
+                         p_vpar->picture.i_structure, 1 );
+        vout_DestroyPicture( p_vpar->p_vout, P_picture );
 
         ReferenceReplace( p_vpar, p_vpar->picture.i_coding_type, NULL );
 
@@ -890,17 +846,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
         /* Frame completely parsed. */
-#ifdef VDEC_SMP
-        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
-        {
-            vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
-        }
-
-        /* Send signal to the video_decoder. */
-        vlc_mutex_lock( &p_vpar->vfifo.lock );
-        vlc_cond_signal( &p_vpar->vfifo.wait );
-        vlc_mutex_unlock( &p_vpar->vfifo.lock );
-#endif
+        vpar_SynchroEnd( p_vpar, p_vpar->picture.i_coding_type,
+                         p_vpar->picture.i_structure, 0 );
+        vout_DisplayPicture( p_vpar->p_vout, P_picture );
 
         /* Prepare context for the next picture. */
         P_picture = NULL;

@@ -30,7 +30,7 @@ AC3_SPDIF := ac3_spdif ac3_iec958
 LPCM_DECODER := lpcm_decoder_thread
 AUDIO_DECODER := audio_decoder adec_generic adec_layer1 adec_layer2 adec_math
 SPU_DECODER := spu_decoder
-VIDEO_DECODER := video_parser vpar_headers vpar_blocks vpar_synchro video_fifo video_decoder
+VIDEO_DECODER := video_parser vpar_headers vpar_blocks vpar_synchro vpar_pool video_decoder
 MISC := mtime tests modules netutils
 
 C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \

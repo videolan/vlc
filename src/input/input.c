@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.126 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input.c,v 1.127 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -138,6 +138,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.i_selected_es_number = 0;
     p_input->stream.i_pgrm_number = 0;
     p_input->stream.i_new_status = p_input->stream.i_new_rate = 0;
+    p_input->stream.b_new_mute = MUTE_NO_CHANGE;
     p_input->stream.i_mux_rate = 0;
 
     /* no stream, no area */
@@ -154,7 +155,10 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.i_status = PLAYING_S;
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
-    p_input->stream.control.b_bw = 0;
+    p_input->stream.control.b_grayscale = main_GetIntVariable(
+                            VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT );
+    p_input->stream.control.i_smp = main_GetIntVariable(
+                            VDEC_SMP_VAR, VDEC_SMP_DEFAULT );
 
     /* Setup callbacks */
     p_input->pf_file_open     = FileOpen;
@@ -320,6 +324,20 @@ static void RunThread( input_thread_t *p_input )
         {
             input_SelectES( p_input, p_input->stream.p_newly_selected_es );
             p_input->stream.p_newly_selected_es = NULL;
+        }
+
+        if( p_input->stream.b_new_mute != MUTE_NO_CHANGE )
+        {
+            if( p_input->stream.b_new_mute )
+            {
+                input_EscapeAudioDiscontinuity( p_input );
+            }
+
+            vlc_mutex_lock( &p_input->stream.control.control_lock );
+            p_input->stream.control.b_mute = p_input->stream.b_new_mute;
+            vlc_mutex_unlock( &p_input->stream.control.control_lock );
+
+            p_input->stream.b_new_mute = MUTE_NO_CHANGE;
         }
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );

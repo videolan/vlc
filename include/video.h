@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.30 2001/05/07 04:42:42 sam Exp $
+ * $Id: video.h,v 1.31 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -70,11 +70,6 @@ typedef struct picture_s
     int             i_display_width;                 /* useful picture width */
     int             i_display_height;               /* useful picture height */
     int             i_aspect_ratio;                          /* aspect ratio */
-
-    /* Macroblock counter - the decoder use it to verify if it has
-     * decoded all the macroblocks of the picture */
-    int             i_deccount;
-    vlc_mutex_t     lock_deccount;
 
     /* Picture data - data can always be freely modified. p_data itself
      * (the pointer) should NEVER be modified. In YUV format, the p_y, p_u and

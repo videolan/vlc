@@ -62,7 +62,6 @@ typedef struct module_symbols_s
     int  ( * network_ChannelJoin )  ( int );
 
     void ( * input_SetStatus )      ( struct input_thread_s *, int );
-    void ( * input_SetRate )        ( struct input_thread_s *, int );
     void ( * input_Seek )           ( struct input_thread_s *, off_t );
     void ( * input_DumpStream )     ( struct input_thread_s * );
     char * ( * input_OffsetToTime ) ( struct input_thread_s *, char *, off_t );
@@ -152,7 +151,6 @@ typedef struct module_symbols_s
     (p_symbols)->network_ChannelCreate = network_ChannelCreate; \
     (p_symbols)->network_ChannelJoin = network_ChannelJoin; \
     (p_symbols)->input_SetStatus = input_SetStatus; \
-    (p_symbols)->input_SetRate = input_SetRate; \
     (p_symbols)->input_Seek = input_Seek; \
     (p_symbols)->input_DumpStream = input_DumpStream; \
     (p_symbols)->input_OffsetToTime = input_OffsetToTime; \
@@ -238,7 +236,6 @@ extern module_symbols_t* p_symbols;
 #   define network_ChannelJoin(a) p_symbols->network_ChannelJoin(a)
 
 #   define input_SetStatus(a,b) p_symbols->input_SetStatus(a,b)
-#   define input_SetRate(a,b) p_symbols->input_SetRate(a,b)
 #   define input_Seek(a,b) p_symbols->input_Seek(a,b)
 #   define input_DumpStream(a) p_symbols->input_DumpStream(a)
 #   define input_OffsetToTime(a,b,c) p_symbols->input_OffsetToTime(a,b,c)

@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.26 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input_ext-intf.c,v 1.27 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -128,14 +128,6 @@ void input_SetStatus( input_thread_t * p_input, int i_mode )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
-/*****************************************************************************
- * input_SetRate: change the reading rate
- *****************************************************************************/
-void input_SetRate( input_thread_t * p_input, int i_mode )
-{
-    ; /* FIXME: stub */
-}
- 
 /*****************************************************************************
  * input_Seek: changes the stream postion
  *****************************************************************************/
@@ -339,3 +331,55 @@ int input_ChangeArea( input_thread_t * p_input, input_area_t * p_area )
 
     return 0;
 }
+
+/****************************************************************************
+ * input_ToggleGrayscale: change to grayscale or color output
+ ****************************************************************************/
+int input_ToggleGrayscale( input_thread_t * p_input )
+{
+    /* No need to warn the input thread since only the decoders and outputs
+     * worry about it. */
+    vlc_mutex_lock( &p_input->stream.control.control_lock );
+    p_input->stream.control.b_grayscale =
+                    !p_input->stream.control.b_grayscale;
+
+    intf_WarnMsg( 3, "input warning: changing to %s output",
+            p_input->stream.control.b_grayscale ? "grayscale" : "color" );
+
+    vlc_mutex_unlock( &p_input->stream.control.control_lock );
+
+    return 0;
+}
+
+/****************************************************************************
+ * input_ToggleMute: activate/deactivate mute mode
+ ****************************************************************************/
+int input_ToggleMute( input_thread_t * p_input )
+{
+    /* We need to feed the decoders with 0, and only input can do that, so
+     * pass the message to the input thread. */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.b_new_mute = !p_input->stream.control.b_mute;
+
+    intf_WarnMsg( 3, "input warning: %s mute mode",
+            p_input->stream.control.b_mute ? "activating" : "deactivating" );
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    return 0;
+}
+
+/****************************************************************************
+ * input_SetSMP: change the number of video decoder threads
+ ****************************************************************************/
+int input_SetSMP( input_thread_t * p_input, int i_smp )
+{
+    /* No need to warn the input thread since only the decoders
+     * worry about it. */
+    vlc_mutex_lock( &p_input->stream.control.control_lock );
+    p_input->stream.control.i_smp = i_smp;
+    vlc_mutex_unlock( &p_input->stream.control.control_lock );
+
+    return 0;
+}
+

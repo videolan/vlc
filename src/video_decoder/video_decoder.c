@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.53 2001/07/17 09:48:08 massiot Exp $
+ * $Id: video_decoder.c,v 1.54 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -50,32 +50,20 @@
 
 #include "vdec_ext-plugins.h"
 #include "video_decoder.h"
-
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
-#include "video_parser.h"
-#include "video_fifo.h"
+#include "vpar_pool.h"
 
 /*
  * Local prototypes
  */
-#ifdef VDEC_SMP
-static int      vdec_InitThread     ( vdec_thread_t *p_vdec );
-#endif
 static void     RunThread           ( vdec_thread_t *p_vdec );
-static void     ErrorThread         ( vdec_thread_t *p_vdec );
-static void     EndThread           ( vdec_thread_t *p_vdec );
 
 /*****************************************************************************
  * vdec_CreateThread: create a video decoder thread
  *****************************************************************************
  * This function creates a new video decoder thread, and returns a pointer
  * to its description. On error, it returns NULL.
- * Following configuration properties are used:
- * XXX??
  *****************************************************************************/
-vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
+vdec_thread_t * vdec_CreateThread( vdec_pool_t * p_pool )
 {
     vdec_thread_t *     p_vdec;
 
@@ -92,12 +80,11 @@ vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
      * Initialize the thread properties
      */
     p_vdec->b_die = 0;
-    p_vdec->b_error = 0;
 
     /*
      * Initialize the parser properties
      */
-    p_vdec->p_vpar = p_vpar;
+    p_vdec->p_pool = p_pool;
 
     /* Spawn the video decoder thread */
     if ( vlc_thread_create(&p_vdec->thread_id, "video decoder",
@@ -114,27 +101,20 @@ vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 
 /*****************************************************************************
  * vdec_DestroyThread: destroy a video decoder thread
- *****************************************************************************
- * Destroy and terminate thread. This function will return 0 if the thread could
- * be destroyed, and non 0 else. The last case probably means that the thread
- * was still active, and another try may succeed.
  *****************************************************************************/
-void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
+void vdec_DestroyThread( vdec_thread_t *p_vdec )
 {
     intf_DbgMsg("vdec debug: requesting termination of video decoder thread %p", p_vdec);
 
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
 
-#ifdef VDEC_SMP
     /* Make sure the decoder thread leaves the vpar_GetMacroblock() function */
-    vlc_mutex_lock( &(p_vdec->p_vpar->vfifo.lock) );
-    vlc_cond_signal( &(p_vdec->p_vpar->vfifo.wait) );
-    vlc_mutex_unlock( &(p_vdec->p_vpar->vfifo.lock) );
-#endif
+    vlc_mutex_lock( &p_vdec->p_pool->lock );
+    vlc_cond_broadcast( &p_vdec->p_pool->wait_undecoded );
+    vlc_mutex_unlock( &p_vdec->p_pool->lock );
 
     /* Waiting for the decoder thread to exit */
-    /* Remove this as soon as the "status" flag is implemented */
     vlc_thread_join( p_vdec->thread_id );
 }
 
@@ -144,65 +124,28 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
  * vdec_InitThread: initialize video decoder thread
  *****************************************************************************
  * This function is called from RunThread and performs the second step of the
- * initialization. It returns 0 on success. Note that the thread's flag are not
- * modified inside this function.
+ * initialization.
  *****************************************************************************/
-#ifdef VDEC_SMP
-static int vdec_InitThread( vdec_thread_t *p_vdec )
-#else
-int vdec_InitThread( vdec_thread_t *p_vdec )
-#endif
+void vdec_InitThread( vdec_thread_t *p_vdec )
 {
     intf_DbgMsg("vdec debug: initializing video decoder thread %p", p_vdec);
 
     p_vdec->p_idct_data = NULL;
 
-    p_vdec->pf_decode_init  = p_vdec->p_vpar->pf_decode_init;
-    p_vdec->pf_decode_mb_c  = p_vdec->p_vpar->pf_decode_mb_c;
-    p_vdec->pf_decode_mb_bw = p_vdec->p_vpar->pf_decode_mb_bw;
-
-    p_vdec->pf_decode_init( p_vdec );
-
-#ifdef VDEC_SMP
-    /* Re-nice ourself */
-    if( nice(VDEC_NICE) == -1 )
-    {
-        intf_WarnMsg( 2, "vdec warning : couldn't nice() (%s)",
-                      strerror(errno) );
-    }
-#endif
+    p_vdec->p_pool->pf_decode_init( p_vdec );
+    p_vdec->p_pool->pf_idct_init( p_vdec );
 
     /* Mark thread as running and return */
     intf_DbgMsg("vdec debug: InitThread(%p) succeeded", p_vdec);
-    return( 0 );
 }
 
 /*****************************************************************************
- * ErrorThread: RunThread() error loop
- *****************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
- *****************************************************************************/
-static void ErrorThread( vdec_thread_t *p_vdec )
-{
-    macroblock_t *       p_mb;
-
-    /* Wait until a `die' order */
-    while( !p_vdec->b_die )
-    {
-        p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo );
-        vpar_DestroyMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
-    }
-}
-
-/*****************************************************************************
- * EndThread: thread destruction
+ * vdec_EndThread: thread destruction
  *****************************************************************************
  * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
-static void EndThread( vdec_thread_t *p_vdec )
+void vdec_EndThread( vdec_thread_t *p_vdec )
 {
     intf_DbgMsg("vdec debug: EndThread(%p)", p_vdec);
 
@@ -210,6 +153,8 @@ static void EndThread( vdec_thread_t *p_vdec )
     {
         free( p_vdec->p_idct_data );
     }
+
+    free( p_vdec );
 }
 
 /*****************************************************************************
@@ -223,44 +168,26 @@ static void RunThread( vdec_thread_t *p_vdec )
     intf_DbgMsg("vdec debug: running video decoder thread (%p) (pid == %i)",
                 p_vdec, getpid());
 
-    /*
-     * Initialize thread and free configuration
-     */
-    p_vdec->b_error = vdec_InitThread( p_vdec );
-    if( p_vdec->b_error )
-    {
-        return;
-    }
-    p_vdec->b_run = 1;
+    vdec_InitThread( p_vdec );
 
     /*
-     * Main loop - it is not executed if an error occured during
-     * initialization
+     * Main loop
      */
-    while( (!p_vdec->b_die) && (!p_vdec->b_error) )
+    while( !p_vdec->b_die )
     {
         macroblock_t *          p_mb;
 
-        if( (p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo )) != NULL )
+        if( (p_mb = vpar_GetMacroblock( p_vdec->p_pool, &p_vdec->b_die )) != NULL )
         {
-            p_vdec->pf_decode_mb_c( p_vdec, p_mb );
+            p_vdec->p_pool->pf_vdec_decode( p_vdec, p_mb );
 
             /* Decoding is finished, release the macroblock and free
              * unneeded memory. */
-            vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
+            p_vdec->p_pool->pf_free_mb( p_vdec->p_pool, p_mb );
         }
     }
 
-    /*
-     * Error loop
-     */
-    if( p_vdec->b_error )
-    {
-        ErrorThread( p_vdec );
-    }
-
     /* End of thread */
-    EndThread( p_vdec );
-    p_vdec->b_run = 0;
+    vdec_EndThread( p_vdec );
 }
 

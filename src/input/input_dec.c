@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.12 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input_dec.c,v 1.13 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -147,20 +147,24 @@ void input_EscapeDiscontinuity( input_thread_t * p_input,
 /*****************************************************************************
  * input_EscapeAudioDiscontinuity: send a NULL packet to the audio decoders
  *****************************************************************************/
-void input_EscapeAudioDiscontinuity( input_thread_t * p_input,
-                                     pgrm_descriptor_t * p_pgrm )
+void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
 {
-    int     i_es, i;
+    int     i_pgrm, i_es, i;
 
-    for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
+    for( i_pgrm = 0; i_pgrm < p_input->stream.i_pgrm_number; i_pgrm++ )
     {
-        es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
+        pgrm_descriptor_t * p_pgrm = p_input->stream.pp_programs[i_pgrm];
 
-        if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
+        for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
         {
-            for( i = 0; i < PADDING_PACKET_NUMBER; i++ )
+            es_descriptor_t * p_es = p_pgrm->pp_es[i_es];
+
+            if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
             {
-                input_NullPacket( p_input, p_es );
+                for( i = 0; i < PADDING_PACKET_NUMBER; i++ )
+                {
+                    input_NullPacket( p_input, p_es );
+                }
             }
         }
     }

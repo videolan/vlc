@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.2 2001/07/17 09:48:08 massiot Exp $
+ * $Id: video_parser.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -55,13 +55,8 @@
 #include "video_output.h"
 
 #include "vdec_ext-plugins.h"
-#include "video_decoder.h"
-
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
+#include "vpar_pool.h"
 #include "video_parser.h"
-#include "video_fifo.h"
 
 /*
  * Local prototypes
@@ -98,6 +93,34 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     p_vpar->p_fifo = p_config->decoder_config.p_decoder_fifo;
     p_vpar->p_config = p_config;
     p_vpar->p_vout = NULL;
+
+    /* Spawn the video parser thread */
+    if ( vlc_thread_create( &p_vpar->thread_id, "video parser",
+                            (vlc_thread_func_t)RunThread, (void *)p_vpar ) )
+    {
+        intf_ErrMsg("vpar error: can't spawn video parser thread");
+        module_Unneed( p_vpar->p_idct_module );
+        module_Unneed( p_vpar->p_motion_module );
+        free( p_vpar );
+        return( 0 );
+    }
+
+    intf_DbgMsg("vpar debug: video parser thread (%p) created", p_vpar);
+    return( p_vpar->thread_id );
+}
+
+/* following functions are local */
+
+/*****************************************************************************
+ * InitThread: initialize vpar output thread
+ *****************************************************************************
+ * This function is called from RunThread and performs the second step of the
+ * initialization. It returns 0 on success. Note that the thread's flag are not
+ * modified inside this function.
+ *****************************************************************************/
+static int InitThread( vpar_thread_t *p_vpar )
+{
+    intf_DbgMsg("vpar debug: initializing video parser thread %p", p_vpar);
 
     /*
      * Choose the best motion compensation module
@@ -164,9 +187,9 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
 #undef S
 #undef M
 
-     /*
-      * Choose the best IDCT module
-      */
+    /*
+     * Choose the best IDCT module
+     */
     p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT, NULL );
 
     if( p_vpar->p_idct_module == NULL )
@@ -178,47 +201,16 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     }
 
 #define f p_vpar->p_idct_module->p_functions->idct.functions.idct
-    p_vpar->pf_idct_init    = f.pf_idct_init;
+    p_vpar->pool.pf_idct_init    = f.pf_idct_init;
     p_vpar->pf_sparse_idct  = f.pf_sparse_idct;
     p_vpar->pf_idct         = f.pf_idct;
     p_vpar->pf_norm_scan    = f.pf_norm_scan;
-    p_vpar->pf_decode_init  = f.pf_decode_init;
+    p_vpar->pool.pf_decode_init  = f.pf_decode_init;
     p_vpar->pf_decode_mb_c  = f.pf_decode_mb_c;
     p_vpar->pf_decode_mb_bw = f.pf_decode_mb_bw;
 #undef f
 
-    /* Spawn the video parser thread */
-    if ( vlc_thread_create( &p_vpar->thread_id, "video parser",
-                            (vlc_thread_func_t)RunThread, (void *)p_vpar ) )
-    {
-        intf_ErrMsg("vpar error: can't spawn video parser thread");
-        module_Unneed( p_vpar->p_idct_module );
-        module_Unneed( p_vpar->p_motion_module );
-        free( p_vpar );
-        return( 0 );
-    }
-
-    intf_DbgMsg("vpar debug: video parser thread (%p) created", p_vpar);
-    return( p_vpar->thread_id );
-}
-
-/* following functions are local */
-
-/*****************************************************************************
- * InitThread: initialize vpar output thread
- *****************************************************************************
- * This function is called from RunThread and performs the second step of the
- * initialization. It returns 0 on success. Note that the thread's flag are not
- * modified inside this function.
- *****************************************************************************/
-static int InitThread( vpar_thread_t *p_vpar )
-{
-#ifdef VDEC_SMP
-    int i_dummy;
-#endif
-
-    intf_DbgMsg("vpar debug: initializing video parser thread %p", p_vpar);
-
+    /* Initialize input bitstream */
     p_vpar->p_config->decoder_config.pf_init_bit_stream( &p_vpar->bit_stream,
         p_vpar->p_config->decoder_config.p_decoder_fifo, BitstreamCallback,
         (void *)p_vpar );
@@ -253,51 +245,6 @@ static int InitThread( vpar_thread_t *p_vpar )
            sizeof(p_vpar->pc_malformed_pictures));
 #endif
 
-    /* Initialize video FIFO */
-    vpar_InitFIFO( p_vpar );
-
-    memset( p_vpar->pp_vdec, 0, NB_VDEC*sizeof(vdec_thread_t *) );
-
-#ifdef VDEC_SMP
-    /* Spawn video_decoder threads */
-    /* FIXME: modify the number of vdecs at runtime ?? */
-    for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )
-    {
-        if( (p_vpar->pp_vdec[i_dummy] = vdec_CreateThread( p_vpar )) == NULL )
-        {
-            return( 1 );
-        }
-    }
-#else
-    /* Fake a video_decoder thread */
-    p_vpar->pp_vdec[0] = (vdec_thread_t *)malloc(sizeof( vdec_thread_t ));
-
-    if( p_vpar->pp_vdec[0] == NULL )
-    {
-        return( 1 );
-    }
-
-    p_vpar->pp_vdec[0]->b_die = 0;
-    p_vpar->pp_vdec[0]->b_error = 0;
-    p_vpar->pp_vdec[0]->p_vpar = p_vpar;
-
-    if( vdec_InitThread( p_vpar->pp_vdec[0] ) )
-    {
-        return( 1 );
-    }
-
-#   if !defined(SYS_BEOS) && !defined(WIN32)
-#       if VDEC_NICE
-    /* Re-nice ourself */
-    if( nice(VDEC_NICE) == -1 )
-    {
-        intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)",
-                      strerror(errno) );
-    }
-#       endif
-#   endif
-#endif
-
     /* Initialize lookup tables */
     vpar_InitMbAddrInc( p_vpar );
     vpar_InitDCTTables( p_vpar );
@@ -310,6 +257,9 @@ static int InitThread( vpar_thread_t *p_vpar )
      * Initialize the synchro properties
      */
     vpar_SynchroInit( p_vpar );
+
+    /* Spawn optional video decoder threads */
+    vpar_InitPool( p_vpar );
 
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded", p_vpar);
@@ -350,7 +300,7 @@ static void RunThread( vpar_thread_t *p_vpar )
             {
                 /* End of sequence */
                 break;
-            };
+            }
         }
     }
 
@@ -406,10 +356,6 @@ static void ErrorThread( vpar_thread_t *p_vpar )
  *****************************************************************************/
 static void EndThread( vpar_thread_t *p_vpar )
 {
-#ifdef VDEC_SMP
-    int i_dummy;
-#endif
-
     intf_DbgMsg("vpar debug: destroying video parser thread %p", p_vpar);
 
     /* Release used video buffers. */
@@ -489,30 +435,10 @@ static void EndThread( vpar_thread_t *p_vpar )
         free( p_vpar->sequence.chroma_nonintra_quant.pi_matrix );
     }
 
-#ifdef VDEC_SMP
-    /* Destroy vdec threads */
-    for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )
-    {
-        if( p_vpar->pp_vdec[i_dummy] != NULL )
-            vdec_DestroyThread( p_vpar->pp_vdec[i_dummy] );
-        else
-            break;
-    }
-#else
-    free( p_vpar->pp_vdec[0] );
-#endif
+    vpar_EndPool( p_vpar );
 
     free( p_vpar->p_config );
 
-#ifdef VDEC_SMP
-    /* Destroy lock and cond */
-    vlc_mutex_destroy( &(p_vpar->vbuffer.lock) );
-    vlc_cond_destroy( &(p_vpar->vfifo.wait) );
-    vlc_mutex_destroy( &(p_vpar->vfifo.lock) );
-#endif
-    
-    vlc_mutex_destroy( &(p_vpar->synchro.fifo_lock) );
-    
     module_Unneed( p_vpar->p_idct_module );
     module_Unneed( p_vpar->p_motion_module );
 

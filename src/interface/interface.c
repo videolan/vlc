@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.79 2001/05/15 14:49:48 stef Exp $
+ * $Id: interface.c,v 1.80 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -394,6 +394,13 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
         break;
 
     case INTF_KEY_TOGGLE_VOLUME:                              /* toggle mute */
+        /* Start/stop feeding audio data. */
+        if( p_intf->p_input != NULL )
+        {
+            input_ToggleMute( p_intf->p_input );
+        }
+
+        /* Start/stop playing sound. */
         vlc_mutex_lock( &p_aout_bank->lock );
         for( i_index = 0 ; i_index < p_aout_bank->i_count ; i_index++ )
         {

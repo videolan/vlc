@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.1 2001/07/17 09:48:07 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.2 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,8 +74,7 @@ void input_EndDecoder( struct input_thread_s *, struct es_descriptor_s * );
 void input_DecodePES ( struct decoder_fifo_s *, struct pes_packet_s * );
 void input_EscapeDiscontinuity( struct input_thread_s *,
                                 struct pgrm_descriptor_s * );
-void input_EscapeAudioDiscontinuity( struct input_thread_s *,
-                                     struct pgrm_descriptor_s * );
+void input_EscapeAudioDiscontinuity( struct input_thread_s * );
 
 /*****************************************************************************
  * Prototypes from input_clock.c

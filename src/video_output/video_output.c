@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.134 2001/07/11 02:01:05 sam Exp $
+ * $Id: video_output.c,v 1.135 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -685,9 +685,6 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
 #endif
         vlc_mutex_unlock( &p_vout->picture_lock );
 
-        /* Initialize mutex */
-        vlc_mutex_init( &(p_free_picture->lock_deccount) );
-
         return( p_free_picture );
     }
 
@@ -724,9 +721,6 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #ifdef TRACE_VOUT
     intf_DbgMsg("picture %p", p_pic);
 #endif
-
-    /* destroy the lock that had been initialized in CreatePicture */
-    vlc_mutex_destroy( &(p_pic->lock_deccount) );
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }

@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.2 2001/07/17 09:48:08 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -112,11 +112,7 @@
 #include "video_output.h"
 
 #include "vdec_ext-plugins.h"
-#include "video_decoder.h"
-
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
+#include "vpar_pool.h"
 #include "video_parser.h"
 
 #include "main.h"
@@ -138,8 +134,6 @@ static int  SynchroType( void );
 void vpar_SynchroInit( vpar_thread_t * p_vpar )
 {
     p_vpar->synchro.i_type = SynchroType();
-    p_vpar->synchro.i_start = p_vpar->synchro.i_end = 0;
-    vlc_mutex_init( &p_vpar->synchro.fifo_lock );
 
     /* We use a fake stream pattern, which is often right. */
     p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p = DEFAULT_NB_P;
@@ -234,9 +228,6 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         vlc_mutex_lock( &p_vpar->p_vout->change_lock );
         tau_yuv = p_vpar->p_vout->render_time;
         vlc_mutex_unlock( &p_vpar->p_vout->change_lock );
-#ifdef VDEC_SMP
-        vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
-#endif
 
         switch( i_coding_type )
         {
@@ -317,9 +308,6 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             }
         }
 
-#ifdef VDEC_SMP
-        vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
-#endif
 #ifdef TRACE_VPAR
         intf_DbgMsg("vpar synchro debug: %s picture scheduled for %s, %s (%lld)",
                     i_coding_type == B_CODING_TYPE ? "B" :
@@ -356,46 +344,20 @@ void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
                          int i_structure )
 {
-#ifdef VDEC_SMP
-    vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
-#endif
-
-    if( ((p_vpar->synchro.i_end + 1 - p_vpar->synchro.i_start)
-            % MAX_DECODING_PIC) )
-    {
-        p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_end] = mdate();
-        p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_end] = i_coding_type;
-
-        FIFO_INCREMENT( i_end );
-    }
-    else
-    {
-        /* FIFO full, panic() */
-        intf_ErrMsg("vpar error: synchro fifo full, estimations will be biased (%d:%d)",
-                    p_vpar->synchro.i_start, p_vpar->synchro.i_end);
-    }
-#ifdef VDEC_SMP
-    vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
-#endif
+    p_vpar->synchro.decoding_start = mdate();
 }
 
 /*****************************************************************************
  * vpar_SynchroEnd : Called when the image is totally decoded
  *****************************************************************************/
-void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
+void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_coding_type,
+                      int i_structure, int i_garbage )
 {
     mtime_t     tau;
-    int         i_coding_type;
-
-#ifdef VDEC_SMP
-    vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
-#endif
-
-    i_coding_type = p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_start];
 
     if( !i_garbage )
     {
-        tau = mdate() - p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_start];
+        tau = mdate() - p_vpar->synchro.decoding_start;
 
         /* If duration too high, something happened (pause ?), so don't
          * take it into account. */
@@ -425,12 +387,6 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar, int i_garbage )
                     i_coding_type == B_CODING_TYPE ? "B" :
                     (i_coding_type == P_CODING_TYPE ? "P" : "I"));
     }
-
-    FIFO_INCREMENT( i_start );
-
-#ifdef VDEC_SMP
-    vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
-#endif
 }
 
 /*****************************************************************************

@@ -439,13 +439,6 @@
  * that raising this level dramatically lengthens the compilation time. */
 #define VPAR_OPTIM_LEVEL                2
 
-/* The following directives only apply if you define VDEC_SMP below. */
-
-/* Number of macroblock buffers available. It should be always greater than
- * twice the number of macroblocks in a picture. VFIFO_SIZE + 1 should also
- * be a power of two. */
-#define VFIFO_SIZE                      8191
-
 /* Maximum number of macroblocks in a picture. */
 #define MAX_MB                          2048
 
@@ -456,26 +449,16 @@
  * Video decoder configuration
  *****************************************************************************/
 
-//#define VDEC_SMP
-
 #define VDEC_IDLE_SLEEP                 ((int)(0.100*CLOCK_FREQ))
-
-/* Number of video_decoder threads to launch on startup of the video_parser.
- * It should always be less than half the number of macroblocks of a
- * picture. Only available if you defined VDEC_SMP above. */
-#define NB_VDEC                         1
 
 /* Maximum range of values out of the IDCT + motion compensation. */
 #define VDEC_CROPRANGE                  2048
 
-/* Nice increments for decoders -- necessary for x11 scheduling */
-#define VDEC_NICE                       3
+/* Environment variable containing the SMP value. */
+#define VDEC_SMP_VAR                   "vlc_smp"
 
-/*****************************************************************************
- * Generic decoder configuration
- *****************************************************************************/
-
-#define GDEC_IDLE_SLEEP                 ((int)(0.100*CLOCK_FREQ))
+/* No SMP by default, since it slows down things on non-smp machines. */
+#define VDEC_SMP_DEFAULT               0
 
 /*****************************************************************************
  * Messages and console interfaces configuration

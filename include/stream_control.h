@@ -4,7 +4,7 @@
  * of the reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: stream_control.h,v 1.5 2001/02/08 13:52:34 massiot Exp $
+ * $Id: stream_control.h,v 1.6 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,7 +39,9 @@ typedef struct stream_ctrl_s
     int                     i_rate;
 
     boolean_t               b_mute;
-    boolean_t               b_bw;                           /* black & white */
+    boolean_t               b_grayscale;           /* use color or grayscale */
+    int                     i_smp; /* number of symmetrical threads to launch
+                                    * to decode the video | 0 == disabled    */
 } stream_ctrl_t;
 
 /* Possible status : */

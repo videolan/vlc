@@ -2,7 +2,7 @@
  * vdec_common.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.1 2001/07/17 09:48:07 massiot Exp $
+ * $Id: vdec_ext-plugins.h,v 1.2 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,24 +98,13 @@ typedef struct macroblock_s
  *****************************************************************************/
 typedef struct vdec_thread_s
 {
-    /* Thread properties and locks */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_run;                                 /* `run' flag */
-    boolean_t           b_error;                             /* `error' flag */
-    boolean_t           b_active;                           /* `active' flag */
     vlc_thread_t        thread_id;                /* id for thread functions */
+    boolean_t           b_die;
 
     /* IDCT iformations */
-    void *			p_idct_data;
-    dctelem_t              p_pre_idct[64*64];
-
-    /* Macroblock copy functions */
-    void ( * pf_decode_init ) ( struct vdec_thread_s * );
-    void ( * pf_decode_mb_c ) ( struct vdec_thread_s *, struct macroblock_s * );
-    void ( * pf_decode_mb_bw )( struct vdec_thread_s *, struct macroblock_s * );
+    void *              p_idct_data;
 
     /* Input properties */
-    struct vpar_thread_s * p_vpar;                    /* video_parser thread */
-
+    struct vdec_pool_s * p_pool;
 } vdec_thread_t;
 

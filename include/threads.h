@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.19 2001/06/14 20:21:04 sam Exp $
+ * $Id: threads.h,v 1.20 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -438,6 +438,74 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_signal( p_condvar );
+
+#elif defined( HAVE_CTHREADS_H )
+    /* condition_signal() */
+    if ( p_condvar->queue.head || p_condvar->implications )
+    {
+        cond_signal( (condition_t)p_condvar );
+    }
+    return 0;
+
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    if( !p_condvar )
+    {
+        return B_BAD_VALUE;
+    }
+
+    if( p_condvar->init < 2000 )
+    {
+        return B_NO_INIT;
+    }
+
+    while( p_condvar->thread != -1 )
+    {
+        thread_info info;
+        if( get_thread_info(p_condvar->thread, &info) == B_BAD_VALUE )
+        {
+            return 0;
+        }
+
+        if( info.state != B_THREAD_SUSPENDED )
+        {
+            /* The  waiting thread is not suspended so it could
+             * have been interrupted beetwen the unlock and the
+             * suspend_thread line. That is why we sleep a little
+             * before retesting p_condver->thread. */
+            snooze( 10000 );
+        }
+        else
+        {
+            /* Ok, we have to wake up that thread */
+            resume_thread( p_condvar->thread );
+            return 0;
+        }
+    }
+    return 0;
+
+#elif defined( WIN32 )
+    /* Try to release one waiting thread. */
+    PulseEvent ( *p_condvar );
+    return 0;
+
+#endif
+}
+
+/*****************************************************************************
+ * vlc_cond_broadcast: start all threads waiting on condition completion
+ *****************************************************************************/
+/*
+ * FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+ * Only works with pthreads, you need to adapt it for others
+ * FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+ */
+static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
+{
+#if defined( PTH_INIT_IN_PTH_H )
+    return pth_cond_notify( p_condvar, FALSE );
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    return pthread_cond_broadcast( p_condvar );
 
 #elif defined( HAVE_CTHREADS_H )
     /* condition_signal() */

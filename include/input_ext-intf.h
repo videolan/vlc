@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.40 2001/06/27 09:53:56 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.41 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -205,6 +205,7 @@ typedef struct stream_descriptor_s
 
     /* New status and rate requested by the interface */
     int                     i_new_status, i_new_rate;
+    int                     b_new_mute;          /* int because it can be -1 */
     vlc_cond_t              stream_wait; /* interface -> input in case of a
                                           * status change request            */
 
@@ -228,6 +229,8 @@ typedef struct stream_descriptor_s
     /* Stream control */
     stream_ctrl_t           control;
 } stream_descriptor_t;
+
+#define MUTE_NO_CHANGE      -1
 
 /*****************************************************************************
  * i_p_config_t
@@ -360,7 +363,6 @@ struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
 void input_DestroyThread( struct input_thread_s *, int *pi_status );
 
 void input_SetStatus( struct input_thread_s *, int );
-void input_SetRate  ( struct input_thread_s *, int );
 void input_Seek     ( struct input_thread_s *, off_t );
 void input_DumpStream( struct input_thread_s * );
 char * input_OffsetToTime( struct input_thread_s *, char * psz_buffer, off_t );
@@ -368,5 +370,8 @@ int  input_ChangeES ( struct input_thread_s *, struct es_descriptor_s *, u8 );
 int  input_ToggleES ( struct input_thread_s *,
                       struct es_descriptor_s *,
                       boolean_t );
-int  input_ChangeArea( input_thread_t *, input_area_t * );
+int  input_ChangeArea( struct input_thread_s *, struct input_area_s * );
+int  input_ToggleGrayscale( struct input_thread_s * );
+int  input_ToggleMute( struct input_thread_s * );
+int  input_SetSMP( struct input_thread_s *, int );
 

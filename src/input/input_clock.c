@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.19 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input_clock.c,v 1.20 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -197,7 +197,7 @@ int input_ClockManageControl( input_thread_t * p_input,
 
             /* Feed the audio decoders with a NULL packet to avoid
              * discontinuities. */
-            input_EscapeAudioDiscontinuity( p_input, p_pgrm );
+            input_EscapeAudioDiscontinuity( p_input );
         }
 
         p_input->stream.i_new_status = UNDEF_S;

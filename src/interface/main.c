@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.107 2001/07/16 22:00:45 gbazin Exp $
+ * $Id: main.c,v 1.108 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -113,6 +113,7 @@
 #define OPT_COLOR               164
 #define OPT_FULLSCREEN          165
 #define OPT_OVERLAY             166
+#define OPT_SMP                 167
 
 #define OPT_CHANNELS            170
 #define OPT_SERVER              171
@@ -183,6 +184,7 @@ static const struct option longopts[] =
     {   "yuv",              1,          0,      OPT_YUV },
     {   "fullscreen",       0,          0,      OPT_FULLSCREEN },
     {   "overlay",          0,          0,      OPT_OVERLAY },
+    {   "smp",              1,          0,      OPT_SMP },
 
     /* DVD options */
     {   "dvdtitle",         1,          0,      't' },
@@ -693,6 +695,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_YUV:                                               /* --yuv */
             main_PutPszVariable( YUV_METHOD_VAR, optarg );
             break;
+        case OPT_SMP:                                               /* --smp */
+            main_PutIntVariable( VDEC_SMP_VAR, atoi(optarg) );
+            break;
 
         /* DVD options */
         case 't':
@@ -836,6 +841,7 @@ static void Usage( int i_fashion )
           "\n      --idct <module>            \tIDCT method"
           "\n      --yuv <module>             \tYUV method"
           "\n      --synchro <type>           \tforce synchro algorithm"
+          "\n      --smp <number of threads>  \tuse several processors"
           "\n"
           "\n  -t, --dvdtitle <num>           \tchoose DVD title"
           "\n  -T, --dvdchapter <num>         \tchoose DVD chapter"
@@ -887,7 +893,8 @@ static void Usage( int i_fashion )
         "\n  " MOTION_METHOD_VAR "=<method name>      \tmotion compensation method"
         "\n  " IDCT_METHOD_VAR "=<method name>        \tIDCT method"
         "\n  " YUV_METHOD_VAR "=<method name>         \tYUV method"
-        "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm" );
+        "\n  " VPAR_SYNCHRO_VAR "={I|I+|IP|IP+|IPB}   \tsynchro algorithm"
+        "\n  " VDEC_SMP_VAR "=<number of threads>     \tuse several processors" );
 
     /* DVD parameters */
     intf_MsgImm( "\nDVD parameters:"

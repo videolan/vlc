@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.2 2001/07/17 09:48:08 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.3 2001/07/18 14:21:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -44,13 +44,8 @@
 #include "video_output.h"
 
 #include "vdec_ext-plugins.h"
-#include "video_decoder.h"
-
-#include "vpar_blocks.h"
-#include "vpar_headers.h"
-#include "vpar_synchro.h"
+#include "vpar_pool.h"
 #include "video_parser.h"
-#include "video_fifo.h"
 
 /*
  * Welcome to vpar_blocks.c ! Here's where the heavy processor-critical parsing
@@ -1644,14 +1639,7 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
         return;
     }
 
-    if( (p_mb = vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
-    {
-        /* b_die == 1 */
-        return;
-    }
-#ifdef VDEC_SMP
-    p_vpar->picture.pp_mb[i_mb_base + i_mb] = p_mb;
-#endif
+    p_mb = p_vpar->pool.pf_new_mb( &p_vpar->pool );
 
     InitMacroblock( p_vpar, p_mb, i_coding_type, i_structure );
 
@@ -1679,10 +1667,8 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
 
     UpdateContext( p_vpar, i_structure );
 
-#ifndef VDEC_SMP
     /* Decode the macroblock NOW ! */
-    vpar_DecodeMacroblock ( &p_vpar->vfifo, p_mb );
-#endif
+    p_vpar->pool.pf_decode_mb( &p_vpar->pool, p_mb );
 }
 
 /*****************************************************************************
@@ -1776,7 +1762,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
 if( p_vpar->picture.b_error )                                           \
 {                                                                       \
     /* Go to the next slice. */                                         \
-    vpar_FreeMacroblock( &p_vpar->vfifo, p_mb );                        \
+    p_vpar->pool.pf_free_mb( &p_vpar->pool, p_mb );                     \
     return;                                                             \
 }
 
@@ -1830,14 +1816,7 @@ static __inline__ void ParseMacroblock(
     }
 
     /* Get a macroblock structure. */
-    if( (p_mb = vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
-    {
-        /* b_die == 1 */
-        return;
-    }
-#ifdef VDEC_SMP
-    p_vpar->picture.pp_mb[i_mb_base + *pi_mb_address] = p_mb;
-#endif
+    p_mb = p_vpar->pool.pf_new_mb( &p_vpar->pool );
 
     InitMacroblock( p_vpar, p_mb, i_coding_type, i_structure );
 
@@ -1960,24 +1939,27 @@ static __inline__ void ParseMacroblock(
          * Effectively decode blocks.
          */
         if( b_mpeg2 )
+        {
             DecodeMPEG2IntraMB( p_vpar, p_mb );
+        }
         else
+        {
             DecodeMPEG1IntraMB( p_vpar, p_mb );
+        }
         PARSEERROR
     }
 
     if( !p_vpar->picture.b_error )
     {
         UpdateContext( p_vpar, i_structure );
-#ifndef VDEC_SMP
+
         /* Decode the macroblock NOW ! */
-        vpar_DecodeMacroblock ( &p_vpar->vfifo, p_mb );
-#endif
+        p_vpar->pool.pf_decode_mb( &p_vpar->pool, p_mb );
     }
     else
     {
         /* Go to the next slice. */
-        vpar_FreeMacroblock( &p_vpar->vfifo, p_mb );
+        p_vpar->pool.pf_free_mb( &p_vpar->pool, p_mb );
     }
 }
 
@@ -2090,7 +2072,7 @@ static __inline__ void vpar_PictureData( vpar_thread_t * p_vpar,
     }
 
 #if 0
-    /* Buggy */
+    /* BUGGY */
     /* Try to recover from error. If we missed less than half the
      * number of macroblocks of the picture, mark the missed ones
      * as skipped. */
