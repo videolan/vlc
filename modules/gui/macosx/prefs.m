@@ -125,12 +125,21 @@
             break;
     
         case CONFIG_ITEM_STRING:
+            {
+                char *psz_value;
+                NSString *o_value = [o_vlc_config stringValue];
+                psz_value = (char *)[o_value UTF8String];
+    
+                config_PutPsz( p_intf, psz_name, psz_value );
+            }
+            break;
+
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_DIRECTORY:
             {
                 char *psz_value;
                 NSString *o_value = [o_vlc_config stringValue];
-                psz_value = (char *)[o_value UTF8String];
+                psz_value = (char *)[o_value fileSystemRepresentation];
     
                 config_PutPsz( p_intf, psz_name, psz_value );
             }

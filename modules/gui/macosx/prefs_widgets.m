@@ -649,7 +649,7 @@
 
 - (char *)stringValue
 {
-    return strdup( [NSApp delocalizeString: [o_textfield stringValue]] );
+    return strdup( [[o_textfield stringValue] fileSystemRepresentation] );
 }
 
 @end
