@@ -327,6 +327,7 @@ SOURCES_libvlc_common = \
 	src/input/control.c \
 	src/input/es_out.c \
 	src/input/stream.c \
+	src/input/access.c \
 	src/input/demux.c \
 	src/input/subtitles.c \
 	src/input/input_ext-plugins.c \
