@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.9 2001/12/29 03:07:51 massiot Exp $
+ * $Id: input_ps.c,v 1.10 2001/12/30 04:26:53 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -181,6 +181,7 @@ static void PSInit( input_thread_t * p_input )
         if( p_input->p_stream == NULL )
         {
             intf_ErrMsg( "Cannot open file (%s)", strerror(errno) );
+            input_BuffersEnd( p_input->p_method_data );
             p_input->b_error = 1;
             return;
         }

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.9 2001/12/29 03:07:51 massiot Exp $
+ * $Id: input_es.c,v 1.10 2001/12/30 04:26:53 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -222,15 +222,13 @@ static int ESRead( input_thread_t * p_input,
          * back to the buffer allocator. */
         int i_loop;
 
-        for( i_loop = 0; i_loop + 1 < i_read; i_loop++ )
+        for( i_loop = 0; i_loop < i_read; i_loop++ )
         {
-            p_data = p_data->p_next;
+            pp_data = &(*pp_data)->p_next;
         }
-        p_input->pf_delete_packet( p_input->p_method_data, p_data->p_next );
-        if( i_read != 0 )
-        {
-            p_data->p_next = NULL;
-        }
+
+        p_input->pf_delete_packet( p_input->p_method_data, *pp_data );
+        *pp_data = NULL;
     }
 
     return( i_read );

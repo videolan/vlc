@@ -241,6 +241,9 @@ static void VCDInit( input_thread_t * p_input )
     if ( VCDReadToc( p_vcd ) == -1 )
     {
         intf_ErrMsg( "vcd error: could not read TOC" );
+        input_BuffersEnd( p_input->p_method_data );
+        p_input->b_error = 1;
+        return;
     }
 
     /* Set stream and area data */
@@ -413,8 +416,7 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_data )
     i_packet = 0;
     *pp_data = NULL;
 
-    while( i_packet < VCD_DATA_ONCE
-            && !p_vcd->b_end_of_track )
+    while( i_packet < VCD_DATA_ONCE && !p_vcd->b_end_of_track )
     {
         if ( VCDReadSector( p_vcd, p_buffer ) == -1 )
         {
@@ -436,7 +438,8 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_data )
                 /* It is common for MPEG-1 streams to pad with zeros
                  * (although it is forbidden by the recommendation), so
                  * don't bother everybody in this case. */
-                intf_WarnMsg( 3, "vcd warning: garbage at input" );
+                intf_WarnMsg( 12, "vcd warning: garbage at input" );
+                break;
             }
 
             while( (i_header & 0xFFFFFF00) != 0x100L
@@ -524,6 +527,8 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_data )
             /* Give the packet to the other input stages. */
             *pp_data = p_data;
             pp_data = &p_data->p_next;
+
+            i_packet++;
         }
     }
 

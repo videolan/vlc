@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.8 2001/12/29 03:07:51 massiot Exp $
+ * $Id: input_ts.c,v 1.9 2001/12/30 04:26:53 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -325,33 +325,22 @@ static int TSRead( input_thread_t * p_input,
         i_read /= TS_PACKET_SIZE;
 
         /* Check correct TS header */
-        for( i_loop = 0; i_loop + 1 < i_read; i_loop++ )
+        for( i_loop = 0; i_loop < i_read; i_loop++ )
         {
-            if( p_data->p_demux_start[0] != 0x47 )
+            if( (*pp_data)->p_demux_start[0] != 0x47 )
             {
                 intf_ErrMsg( "input error: bad TS packet (starts with "
                              "0x%.2x, should be 0x47)",
                              p_data->p_demux_start[0] );
             }
-            p_data = p_data->p_next;
-        }
-
-        /* Last packet */
-        if( p_data->p_demux_start[0] != 0x47 )
-        {
-            intf_ErrMsg( "input error: bad TS packet (starts with "
-                         "0x%.2x, should be 0x47)",
-                         p_data->p_demux_start[0] );
+            pp_data = &(*pp_data)->p_next;
         }
 
         if( i_read != TS_READ_ONCE )
         {
             /* Delete remaining packets */
-            p_input->pf_delete_packet( p_input->p_method_data, p_data->p_next );
-            if( i_read != 0 )
-            {
-                p_data->p_next = NULL;
-            }
+            p_input->pf_delete_packet( p_input->p_method_data, *pp_data );
+            *pp_data = NULL;
         }
     }
     return( i_read );

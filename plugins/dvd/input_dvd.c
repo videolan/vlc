@@ -9,7 +9,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.114 2001/12/29 15:40:53 massiot Exp $
+ * $Id: input_dvd.c,v 1.115 2001/12/30 04:26:53 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -216,6 +216,7 @@ static void DVDInit( input_thread_t * p_input )
     if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
     {
         intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
+        input_BuffersEnd( p_input->p_method_data );
         p_input->b_error = 1;
         return;
     }
@@ -229,6 +230,7 @@ static void DVDInit( input_thread_t * p_input )
         intf_ErrMsg( "dvd error: allcation error in ifo" );
         dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
+        input_BuffersEnd( p_input->p_method_data );
         p_input->b_error = 1;
         return;
     }
@@ -239,6 +241,7 @@ static void DVDInit( input_thread_t * p_input )
         IfoDestroy( p_dvd->p_ifo );
         dvdcss_close( p_dvd->dvdhandle );
         free( p_dvd );
+        input_BuffersEnd( p_input->p_method_data );
         p_input->b_error = 1;
         return;
     }

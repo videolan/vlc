@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.10 2001/12/29 22:22:01 massiot Exp $
+ * $Id: input_dvdread.c,v 1.11 2001/12/30 04:26:53 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -203,6 +203,7 @@ static void DvdReadInit( input_thread_t * p_input )
 
     if( (p_input->p_method_data = input_BuffersInit()) == NULL )
     {
+        free( p_dvd );
         p_input->b_error = 1;
         return;
     }
@@ -216,6 +217,7 @@ static void DvdReadInit( input_thread_t * p_input )
     {
         intf_ErrMsg( "dvdread error: can't open VMG info" );
         DVDClose( p_dvd->p_dvdread );
+        input_BuffersEnd( p_input->p_method_data );
         free( p_dvd );
         p_input->b_error = 1;
         return;
