@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.68 2003/07/08 13:40:57 sam Exp $
+##  $Id: bootstrap,v 1.69 2003/07/16 15:52:04 sam Exp $
 ##
 ##  Authors: Sam Hocevar <sam@zoy.org>
 
@@ -318,14 +318,14 @@ if automake-1.7 --version >/dev/null 2>&1; then
   amvers="-1.7"
   # If we also have 1.6, use it instead because it is faster
   if automake-1.6 --version >/dev/null 2>&1; then
-    if expr "`automake-1.6 --version | sed -e '1s/[^0-9]*//' -e q`" ">" "1.6.1" > /dev/null 2>&1
-    then amvers="-1.6"
+    if expr "`automake-1.6 --version | sed -e '1s/[^0-9]*//' -e q`" ">" "1.6.1" > /dev/null 2>&1; then
+      amvers="-1.6"
     fi
   fi
 elif automake-1.6 --version >/dev/null 2>&1; then
   amvers="-1.6"
-  if expr "`automake-1.6 --version | sed -e '1s/[^0-9]*//' -e q`" "<=" "1.6.1" > /dev/null 2>&1
-  then AUTOMAKESUCKS=yes
+  if expr "`automake-1.6 --version | sed -e '1s/[^0-9]*//' -e q`" "<=" "1.6.1" > /dev/null 2>&1; then
+    AUTOMAKESUCKS=yes
   fi
 elif automake-1.5 --version >/dev/null 2>&1; then
   INSTALLSUCKS=yes

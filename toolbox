@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.41 2003/07/14 20:36:55 sigmunau Exp $
+##  $Id: toolbox,v 1.42 2003/07/16 15:52:04 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -369,11 +369,13 @@ then
   echo "# automatically created by toolbox --update-po" > po/POTFILES.in
   echo "" >> po/POTFILES.in
   echo "# main sources" >> po/POTFILES.in
-  find include src -name '*.[chm]' -o -name '*.[ch]pp' | sort >> po/POTFILES.in
+  find include src -name '*.[chm]' -o -name '*.[ch]pp' \
+    | grep -v '\(vlc_symbols\|misc/modules_\)' \
+    | sort >> po/POTFILES.in
   echo "" >> po/POTFILES.in
   echo "# modules" >> po/POTFILES.in
   find modules -name '*.[chm]' -o -name '*.[ch]pp' \
-    | grep -v '\(gui/win32/\|\.moc\.\)' \
+    | grep -v '\(gui/win32/\)' \
     | sort >> po/POTFILES.in
   # clean old potfiles
   cd po
@@ -569,6 +571,9 @@ then
   # FIXME: a lot of Makefiles are still there
 fi
 
+##
+##  Build a woody-friendly package
+##
 if test "${action}" = "woody"
 then
   set -ex

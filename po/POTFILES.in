@@ -590,7 +590,9 @@ modules/misc/dummy/dummy.c
 modules/misc/dummy/dummy.h
 modules/misc/dummy/input.c
 modules/misc/dummy/interface.c
+modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
+modules/misc/freetype.c
 modules/misc/gtk_main.c
 modules/misc/httpd.c
 modules/misc/logger/logger.c
@@ -648,7 +650,6 @@ modules/video_filter/filter_common.h
 modules/video_filter/invert.c
 modules/video_filter/logo.c
 modules/video_filter/motionblur.c
-modules/video_filter/osd_text.c
 modules/video_filter/transform.c
 modules/video_filter/wall.c
 modules/video_output/aa.c
