@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.61 2001/07/30 13:57:46 massiot Exp $
+ * $Id: vout_sdl.c,v 1.62 2001/08/06 20:45:55 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -111,8 +111,11 @@ static void vout_Display   ( struct vout_thread_s * );
 static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
                              u16 *blue, u16 *transp );
 
-static int  SDLOpenDisplay      ( vout_thread_t *p_vout );
-static void SDLCloseDisplay     ( vout_thread_t *p_vout );
+static int  SDLOpenDisplay     ( vout_thread_t *p_vout );
+static void SDLCloseDisplay    ( vout_thread_t *p_vout );
+static void OutputCoords       ( const picture_t *p_pic, const boolean_t scale,
+                                 const int win_w, const int win_h,
+                                 int *dx, int *dy, int *w, int *h );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -530,7 +533,7 @@ static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
         colors[ i ].g = green[ i ] >> 8;
         colors[ i ].b = blue[ i ] >> 8;
     }
-    
+
     /* Set palette */
     if( SDL_SetColors( p_vout->p_sys->p_display, colors, 0, 256 ) == 0 )
     {
@@ -548,6 +551,7 @@ static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
 static void vout_Display( vout_thread_t *p_vout )
 {
     SDL_Rect    disp;
+
     if((p_vout->p_sys->p_display != NULL) && !p_vout->p_sys->b_reopen_display)
     {
         if( !p_vout->b_need_render )
@@ -582,6 +586,8 @@ static void vout_Display( vout_thread_t *p_vout )
             }
             else
             {
+                int i_x, i_y, i_w, i_h;
+
                 SDL_LockYUVOverlay( p_vout->p_sys->p_overlay );
                 /* copy the data into video buffers */
                 /* Y first */
@@ -599,14 +605,17 @@ static void vout_Display( vout_thread_t *p_vout )
                         p_vout->p_rendered_pic->p_u,
                         p_vout->p_sys->p_overlay->h *
                         p_vout->p_sys->p_overlay->pitches[2] / 2 );
-    
-#define BUFFER (&p_vout->p_buffer[p_vout->i_buffer_index])
-                disp.w = BUFFER->i_pic_width;
-                disp.h = BUFFER->i_pic_height;
-#undef BUFFER
-                disp.x = (p_vout->i_width - disp.w)/2;
-                disp.y = (p_vout->i_height - disp.h)/2;
-    
+
+                OutputCoords( p_vout->p_rendered_pic, 1,
+                              p_vout->p_sys->i_width,
+                              p_vout->p_sys->i_height,
+                              &i_x, &i_y,
+                              &i_w, &i_h);
+                disp.x = i_x;
+                disp.y = i_y;
+                disp.w = i_w;
+                disp.h = i_h;
+
                 SDL_DisplayYUVOverlay( p_vout->p_sys->p_overlay , &disp );
                 SDL_UnlockYUVOverlay(p_vout->p_sys->p_overlay);
 
@@ -757,3 +766,70 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
     }
 }
 
+/*****************************************************************************
+ * OutputCoords: compute the dimensions of the destination image
+ *****************************************************************************
+ * This based on some code in SetBufferPicture... , it is also in use in the
+ * the xvideo plugin. Maybe we should think about putting standard video
+ * processing functions in a common library ?
+ *****************************************************************************/
+static void OutputCoords( const picture_t *p_pic, const boolean_t scale,
+                          const int win_w, const int win_h,
+                          int *dx, int *dy, int *w, int *h )
+{
+    if( !scale )
+    {
+        *w = p_pic->i_width; *h = p_pic->i_height;
+    }
+    else
+    {
+        *w = win_w;
+        switch( p_pic->i_aspect_ratio )
+        {
+            case AR_3_4_PICTURE:
+                *h = win_w * 3 / 4;
+                break;
+
+            case AR_16_9_PICTURE:
+                *h = win_w * 9 / 16;
+                break;
+
+            case AR_221_1_PICTURE:
+                *h = win_w * 100 / 221;
+                break;
+
+            case AR_SQUARE_PICTURE:
+            default:
+                *h = win_w * p_pic->i_height / p_pic->i_width;
+                break;
+        }
+
+        if( *h > win_h )
+        {
+            *h = win_h;
+            switch( p_pic->i_aspect_ratio )
+            {
+                case AR_3_4_PICTURE:
+                    *w = win_h * 4 / 3;
+                    break;
+
+                case AR_16_9_PICTURE:
+                    *w = win_h * 16 / 9;
+                    break;
+
+                case AR_221_1_PICTURE:
+                    *w = win_h * 221 / 100;
+                    break;
+
+                case AR_SQUARE_PICTURE:
+                default:
+                    *w = win_h * p_pic->i_width / p_pic->i_height;
+                    break;
+            }
+        }
+    }
+
+    /* Set picture position */
+    *dx = (win_w - *w) / 2;
+    *dy = (win_h - *h) / 2;
+}
