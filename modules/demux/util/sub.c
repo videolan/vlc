@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.19 2003/07/23 23:05:25 gbazin Exp $
+ * $Id: sub.c,v 1.20 2003/07/27 23:58:32 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -254,7 +254,6 @@ static int  sub_open ( subtitle_demux_t *p_sub,
         if( !val.psz_string || !*val.psz_string )
         {
             if( val.psz_string ) free( val.psz_string );
-        msg_Err( p_sub, "cannot open `%s' subtitle fileeee", val.psz_string );
             return VLC_EGENERIC;
         }
         psz_name = val.psz_string;
