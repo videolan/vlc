@@ -1596,14 +1596,11 @@ static int DemuxOpen( vlc_object_t *p_this )
     /* a little test to see if it's a v4l stream */
     if( stream_Peek( p_input->s, &p_peek, 8 ) < 8 )
     {
-        msg_Warn( p_input, "v4l plugin discarded (cannot peek)" );
         return VLC_EGENERIC;
     }
 
-    if( strncmp( p_peek, ".v4l", 4 ) ||
-        ( i_es = GetDWBE( &p_peek[4] ) ) <= 0 )
+    if( strncmp( p_peek, ".v4l", 4 ) || ( i_es = GetDWBE( &p_peek[4] ) ) <= 0 )
     {
-        msg_Warn( p_input, "v4l plugin discarded (not a valid stream)" );
         return VLC_EGENERIC;
     }
 
@@ -1612,7 +1609,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
     p_input->stream.i_mux_rate =  0 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -1636,8 +1633,8 @@ static int DemuxOpen( vlc_object_t *p_this )
 
         if( !strncmp( p_peek, "auds", 4 ) )
         {
-            es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( p_peek[4], p_peek[5],
-                                                        p_peek[6], p_peek[7] ) );
+            es_format_Init( &fmt, AUDIO_ES,
+                VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] ) );
 
             fmt.audio.i_channels = GetDWBE( &p_peek[8] );
             fmt.audio.i_rate = GetDWBE( &p_peek[12] );
