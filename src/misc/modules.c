@@ -1828,6 +1828,11 @@ int CacheLoadConfig( module_t *p_module, FILE *file )
  *****************************************************************************/
 static void CacheSave( vlc_object_t *p_this )
 {
+    static char const psz_tag[] =
+        "Signature: 8a477f597d28d172789f06886806bc55\r\n"
+        "# This file is a cache directory tag created by VLC.\r\n"
+        "# For information about cache directory tags, see:\r\n"
+        "#   http://www.brynosaurus.com/cachedir/\r\n";
     char *psz_filename, *psz_homedir;
     FILE *file;
     int i, j, i_cache;
@@ -1850,7 +1855,7 @@ static void CacheSave( vlc_object_t *p_this )
         return;
     }
 
-    sprintf( psz_filename, "%s/" CONFIG_DIR, psz_homedir );
+    sprintf( psz_filename, "%s/%s", psz_homedir, CONFIG_DIR );
 
     config_CreateDir( p_this, psz_filename );
 
@@ -1858,8 +1863,17 @@ static void CacheSave( vlc_object_t *p_this )
 
     config_CreateDir( p_this, psz_filename );
 
-    strcat( psz_filename, "/" );
-    strcat( psz_filename, CacheName() );
+    strcat( psz_filename, "/CACHEDIR.TAG" );
+
+    file = fopen( psz_filename, "wb" );
+    if( file )
+    {
+        fwrite( psz_tag, 1, strlen(psz_tag), file );
+        fclose( file );
+    }
+
+    sprintf( psz_filename, "%s/%s/%s/%s", psz_homedir, CONFIG_DIR,
+             PLUGINSCACHE_DIR, CacheName() );
 
     msg_Dbg( p_this, "saving plugins cache file %s", psz_filename );
 
