@@ -164,33 +164,20 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
     if( i_coding_type != B_CODING_TYPE )
     {
         if( p_vpar->sequence.p_forward != NULL )
+        {
             vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        }
         if( p_vpar->sequence.p_backward != NULL )
         {
-#ifdef POLUX_SYNCHRO
             vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
                               vpar_SynchroDate( p_vpar ) );
-#endif
-#ifdef SAM_SYNCHRO
-            vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
-                              vpar_SynchroDate( p_vpar ) );
-#endif
-#ifdef MEUUH_SYNCHRO
-            mtime_t     date;
-            date = vpar_SynchroDate( p_vpar );
-            vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
-                              date );
-            if( p_vpar->synchro.i_coding_type == I_CODING_TYPE )
-                vpar_SynchroKludge( p_vpar, date );
-#endif
         }
         p_vpar->sequence.p_forward = p_vpar->sequence.p_backward;
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
+        {
             vout_LinkPicture( p_vpar->p_vout, p_newref );
-#ifdef MEUUH_SYNCHRO
-        p_vpar->synchro.i_coding_type = i_coding_type;
-#endif
+        }
     }
     else if( p_newref != NULL )
     {
@@ -210,10 +197,14 @@ static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
     if( i_coding_type != B_CODING_TYPE )
     {
         if( p_vpar->sequence.p_backward != NULL )
+        {
             vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        }
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
+        {
             vout_LinkPicture( p_vpar->p_vout, p_newref );
+        }
     }
 }
 
@@ -613,7 +604,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         if( p_vpar->picture.i_current_structure )
         {
             /* Second field of a frame. We will decode it if, and only if we
-            * have decoded the first field. */
+             * have decoded the first field. */
             b_parsable = (p_vpar->picture.p_picture != NULL);
         }
         else
@@ -623,21 +614,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                p_vpar->picture.i_coding_type, i_structure );
         }
     }
-#ifdef POLUX_SYNCHRO
-    else if( !p_vpar->picture.i_current_structure )
-    {
-        vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
-    }
-#endif
 
     if( !b_parsable )
     {
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, NULL );
-#ifndef POLUX_SYNCHRO
-        /* Warn Synchro we have trashed a picture. */
-        vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
-#endif
+
         /* Update context. */
         if( i_structure != FRAME_STRUCTURE )
         {
@@ -648,8 +630,15 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             }
             else
             {
+                /* The frame is complete. */
                 p_vpar->picture.i_current_structure = i_structure;
+                vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
             }
+        }
+        else
+        {
+            /* Warn Synchro we have trashed a picture. */
+            vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
         }
         p_vpar->picture.p_picture = NULL;
 
