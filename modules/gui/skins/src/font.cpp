@@ -2,7 +2,7 @@
  * font.cpp: Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: font.cpp,v 1.2 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: font.cpp,v 1.3 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,7 +36,7 @@
 //---------------------------------------------------------------------------
 // Font object
 //---------------------------------------------------------------------------
-Font::Font( intf_thread_t *_p_intf, string fontname, int size, int color,
+SkinFont::SkinFont( intf_thread_t *_p_intf, string fontname, int size, int color,
     int weight, bool italic, bool underline )
 {
     p_intf = _p_intf;
@@ -53,7 +53,7 @@ Font::Font( intf_thread_t *_p_intf, string fontname, int size, int color,
         Weight = 1;
 }
 //---------------------------------------------------------------------------
-Font::~Font()
+SkinFont::~SkinFont()
 {
 }
 //---------------------------------------------------------------------------

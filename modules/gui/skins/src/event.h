@@ -2,7 +2,7 @@
  * event.h: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.h,v 1.7 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: event.h,v 1.8 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -132,7 +132,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 struct intf_thread_t;
 class GenericControl;
-class Window;
+class SkinWindow;
 class Event;
 
 

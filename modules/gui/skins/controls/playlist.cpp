@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.8 2003/04/21 21:51:16 asmax Exp $
+ * $Id: playlist.cpp,v 1.9 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -323,7 +323,7 @@ void ControlPlayList::DrawCase( Graphics *dest, int i, int x, int y, int w,
     }
 
     // Choose font
-    Font *F;
+    SkinFont *F;
     if( PlayList->i_index == i )
         F = PlayFont;
     else

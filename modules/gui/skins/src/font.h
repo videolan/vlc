@@ -2,7 +2,7 @@
  * font.h: Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: font.h,v 1.3 2003/04/17 19:56:31 karibu Exp $
+ * $Id: font.h,v 1.4 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -36,7 +36,7 @@ struct intf_thread_t;
 class Graphics;
 
 //---------------------------------------------------------------------------
-class Font
+class SkinFont
 {
     private:
         // Assign font to Device Context
@@ -56,11 +56,11 @@ class Font
 
     public:
         // Constructor
-        Font( intf_thread_t *_p_intf, string fontname, int size, int color,
+        SkinFont( intf_thread_t *_p_intf, string fontname, int size, int color,
               int weight, bool italic, bool underline );
 
         // Destructor
-        virtual ~Font();
+        virtual ~SkinFont();
 
         // Get size of text
         virtual void GetSize( string text, int &w, int &h ) = 0;

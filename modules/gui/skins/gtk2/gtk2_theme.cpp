@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.23 2003/04/21 21:51:16 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.24 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -27,6 +27,7 @@
 //--- GTK2 -----------------------------------------------------------------
 #include <gdk/gdk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#include <X11/Xlib.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -110,6 +111,9 @@ void GTK2Theme::OnLoadTheme()
         msg_Err( p_intf, "gdk_window_new failed" );
         return;
     }
+
+    Display *display = XOpenDisplay( NULL );
+    Window root = DefaultRootWindow( display );
 }
 //---------------------------------------------------------------------------
 void GTK2Theme::AddSystemMenu( string name, Event *event )

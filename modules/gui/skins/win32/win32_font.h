@@ -2,7 +2,7 @@
  * win32_font.h: Win32 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_font.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_font.h,v 1.3 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -37,7 +37,7 @@ struct intf_thread_t;
 class Graphics;
 
 //---------------------------------------------------------------------------
-class Win32Font : Font
+class Win32Font : SkinFont
 {
     private:
         // Assign font to Device Context

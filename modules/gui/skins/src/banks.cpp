@@ -2,7 +2,7 @@
  * banks.cpp: Bitmap bank, Event, bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.4 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: banks.cpp,v 1.5 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -99,7 +99,7 @@ FontBank::FontBank( intf_thread_t *_p_intf )
 //---------------------------------------------------------------------------
 FontBank::~FontBank()
 {
-    for( map<string,Font *>::iterator iter = Bank.begin();
+    for( map<string,SkinFont *>::iterator iter = Bank.begin();
          iter != Bank.end(); iter++ )
     {
         delete (OSFont *)iter->second;
@@ -115,12 +115,12 @@ bool FontBank::Add( string name, string fontname, int size,
         return false;
     }
 
-    Bank[name] = (Font *)new OSFont( p_intf, fontname, size, color,
+    Bank[name] = (SkinFont *)new OSFont( p_intf, fontname, size, color,
                                      weight, italic, underline );
     return true;
 }
 //---------------------------------------------------------------------------
-Font * FontBank::Get( string Id )
+SkinFont * FontBank::Get( string Id )
 {
     // If the specified font doesn't exist, use the default one
     if( Bank[Id] == NULL )

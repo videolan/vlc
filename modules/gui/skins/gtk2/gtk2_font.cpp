@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.12 2003/04/21 18:39:38 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.13 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -44,7 +44,7 @@
 //---------------------------------------------------------------------------
 GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
     int color, int weight, bool italic, bool underline )
-    : Font( _p_intf, fontname, size, color, weight, italic, underline )
+    : SkinFont( _p_intf, fontname, size, color, weight, italic, underline )
 {
     Context = gdk_pango_context_get();
     Layout = pango_layout_new( Context );

@@ -2,7 +2,7 @@
  * text.h: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.h,v 1.3 2003/04/21 21:51:16 asmax Exp $
+ * $Id: text.h,v 1.4 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -37,7 +37,7 @@ class BitmapBank;
 class Graphics;
 class SkinWindow;
 class Region;
-class Font;
+class SkinFont;
 
 //---------------------------------------------------------------------------
 class ControlText : public GenericControl
@@ -62,7 +62,7 @@ class ControlText : public GenericControl
         // General parameters
         string   Text;
         int      Align;
-        Font    *TextFont;
+        SkinFont    *TextFont;
         string   FontName;
         list<string> DisplayList;
         list<string>::const_iterator Display;

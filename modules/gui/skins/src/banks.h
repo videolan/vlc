@@ -2,7 +2,7 @@
  * banks.h: Bitmap bank, Event bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: banks.h,v 1.2 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -42,7 +42,7 @@ using namespace std;
 //---------------------------------------------------------------------------
 struct intf_thread_t;
 class Bitmap;
-class Font;
+class SkinFont;
 class Event;
 
 //---------------------------------------------------------------------------
@@ -61,14 +61,14 @@ class BitmapBank
 class FontBank
 {
     private:
-        map<string,Font *> Bank;
+        map<string,SkinFont *> Bank;
         intf_thread_t *p_intf;
     public:
         FontBank( intf_thread_t *_p_intf );
         ~FontBank();
         bool Add( string name, string fontname, int size,
                   int color, int weight, bool italic, bool underline );
-        Font * Get( string Id ); // Return the font with matching ID
+        SkinFont * Get( string Id ); // Return the font with matching ID
 };
 //---------------------------------------------------------------------------
 class EventBank

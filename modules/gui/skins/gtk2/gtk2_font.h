@@ -2,7 +2,7 @@
  * gtk2_font.h: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.h,v 1.5 2003/04/17 15:43:29 karibu Exp $
+ * $Id: gtk2_font.h,v 1.6 2003/04/21 22:12:37 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -38,7 +38,7 @@ struct intf_thread_t;
 class Graphics;
 
 //---------------------------------------------------------------------------
-class GTK2Font : Font
+class GTK2Font : SkinFont
 {
     private:
         PangoContext  *Context;
