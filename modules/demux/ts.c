@@ -645,7 +645,8 @@ static int Demux( demux_t *p_demux )
                     int i_prg;
                     for( i_prg = 0; i_prg < p_pid->psi->i_prg; i_prg++ )
                     {
-                        dvbpsi_PushPacket( p_pid->psi->prg[i_prg]->handle, p_pkt->p_buffer );
+                        dvbpsi_PushPacket( p_pid->psi->prg[i_prg]->handle,
+                                           p_pkt->p_buffer );
                     }
                 }
                 block_Release( p_pkt );
@@ -811,8 +812,10 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
         if( pid->psi->handle ) dvbpsi_DetachPMT( pid->psi->handle );
         for( i = 0; i < pid->psi->i_prg; i++ )
         {
-            if( pid->psi->prg[i]->iod ) IODFree( pid->psi->prg[i]->iod );
-            if( pid->psi->prg[i]->handle ) dvbpsi_DetachPMT( pid->psi->prg[i]->handle );
+            if( pid->psi->prg[i]->iod )
+                IODFree( pid->psi->prg[i]->iod );
+            if( pid->psi->prg[i]->handle )
+                dvbpsi_DetachPMT( pid->psi->prg[i]->handle );
             free( pid->psi->prg[i] );
         }
         if( pid->psi->prg ) free( pid->psi->prg );
@@ -978,7 +981,8 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
     {
         i_skip += 1;
     }
-    else if( pid->es->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) && pid->es->p_mpeg4desc )
+    else if( pid->es->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) &&
+             pid->es->p_mpeg4desc )
     {
         decoder_config_descriptor_t *dcd = &pid->es->p_mpeg4desc->dec_descr;
 
@@ -1103,17 +1107,22 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     const vlc_bool_t  b_adaptation= p[3]&0x20;
     const vlc_bool_t  b_payload   = p[3]&0x10;
     const int         i_cc        = p[3]&0x0f;   /* continuity counter */
+
     /* transport_scrambling_control is ignored */
 
     int         i_skip = 0;
-    vlc_bool_t  i_ret   = VLC_FALSE;
-
+    vlc_bool_t  i_ret  = VLC_FALSE;
     int         i_diff;
 
-    //msg_Dbg( p_demux, "pid=0x%x unit_start=%d adaptation=%d payload=%d cc=0x%x", i_pid, b_unit_start, b_adaptation, b_payload, i_continuity_counter);
+#if 0
+    msg_Dbg( p_demux, "pid=0x%x unit_start=%d adaptation=%d payload=%d "
+             "cc=0x%x", pid->i_pid, p[1]&0x40, b_adaptation, b_payload, i_cc);
+#endif
+
     if( p[1]&0x80 )
     {
-        msg_Dbg( p_demux, "transport_error_indicator set (pid=0x%x)", pid->i_pid );
+        msg_Dbg( p_demux, "transport_error_indicator set (pid=0x%x)",
+                 pid->i_pid );
     }
 
     if( p_demux->p_sys->csa )
@@ -1138,11 +1147,13 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             }
         }
     }
+
     /* test continuity counter */
     /* continuous when (one of this):
         * diff == 1
         * diff == 0 and payload == 0
-        * diff == 0 and duplicate packet (playload != 0) <- do we should test the content ?
+        * diff == 0 and duplicate packet (playload != 0) <- should we
+        *   test the content ?
      */
 
     i_diff = ( i_cc - pid->i_cc )&0x0f;
@@ -1181,7 +1192,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     }
     else
     {
-        const vlc_bool_t b_unit_start= p[1]&0x40;
+        const vlc_bool_t b_unit_start = p[1]&0x40;
 
         /* we have to gather it */
         p_bk->p_buffer += i_skip;
@@ -1687,7 +1698,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         int i_prg;
         for( i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
         {
-            if( p_sys->pmt[i]->psi->prg[i_prg]->i_number == p_pmt->i_program_number )
+            if( p_sys->pmt[i]->psi->prg[i_prg]->i_number ==
+                p_pmt->i_program_number )
             {
                 pmt = p_sys->pmt[i];
                 prg = p_sys->pmt[i]->psi->prg[i_prg];
@@ -1717,7 +1729,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     {
         ts_pid_t *pid = &p_sys->pid[i];
 
-        if( pid->b_valid && pid->p_owner == pmt->psi && pid->i_owner_number == prg->i_number && pid->psi == NULL )
+        if( pid->b_valid && pid->p_owner == pmt->psi &&
+            pid->i_owner_number == prg->i_number && pid->psi == NULL )
         {
             PIDClean( p_demux->out, pid );
         }
@@ -1764,7 +1777,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         PIDFillFormat( pid, p_es->i_type );
         pid->i_owner_number = prg->i_number;
 
-        if( p_es->i_type == 0x10 || p_es->i_type == 0x11 || p_es->i_type == 0x12 )
+        if( p_es->i_type == 0x10 || p_es->i_type == 0x11 ||
+            p_es->i_type == 0x12 )
         {
             /* MPEG-4 stream: search SL_DESCRIPTOR */
             dvbpsi_descriptor_t *p_dr = p_es->p_first_descriptor;;
@@ -1887,6 +1901,20 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     pid->es->fmt.i_cat = AUDIO_ES;
                     pid->es->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
                 }
+                else if( p_dr->i_tag == 0x05 )
+                {
+
+                    /* DTS registration descriptor (ETSI TS 101 154 Annex F) */
+                    pid->es->fmt.i_cat = AUDIO_ES;
+                    pid->es->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
+                }
+                else if( p_dr->i_tag == 0x73 )
+                {
+                    /* DTS audio descriptor (ETSI TS 101 154 Annex F) */
+                    msg_Dbg( p_demux, "  * DTS audio descriptor not decoded" );
+                    pid->es->fmt.i_cat = AUDIO_ES;
+                    pid->es->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
+                }
 #ifdef _DVBPSI_DR_59_H_
                 else if( p_dr->i_tag == 0x59 )
                 {
@@ -1912,6 +1940,9 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                         pid->es->fmt.subs.dvb.i_id =
                             sub->p_subtitle[0].i_composition_page_id;
+                        /* Hack, FIXME */
+                        pid->es->fmt.subs.dvb.i_id |=
+                            (sub->p_subtitle[0].i_ancillary_page_id << 16);
                     }
                     else pid->es->fmt.i_cat = UNKNOWN_ES;
 
@@ -2040,7 +2071,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     msg_Dbg( p_demux, "PATCallBack called" );
 
     if( pat->psi->i_pat_version != -1 &&
-        ( !p_pat->b_current_next || p_pat->i_version == pat->psi->i_pat_version ) )
+        ( !p_pat->b_current_next ||
+          p_pat->i_version == pat->psi->i_pat_version ) )
     {
         dvbpsi_DeletePAT( p_pat );
         return;
@@ -2069,7 +2101,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                     int i_prg;
                     for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
                     {
-                        if( p_program->i_number == pmt->psi->prg[i_prg]->i_number )
+                        if( p_program->i_number ==
+                            pmt->psi->prg[i_prg]->i_number )
                         {
                             b_keep = VLC_TRUE;
                             break;
@@ -2097,8 +2130,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                 int i_prg;
                 for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                 {
-                    if( pid->p_owner->prg[i_prg]->i_pid_pcr == pmt_rm[j]->i_pid &&
-                        pid->es->id )
+                    if( pid->p_owner->prg[i_prg]->i_pid_pcr ==
+                        pmt_rm[j]->i_pid && pid->es->id )
                     {
                         /* We only remove es that aren't defined by extra pmt */
                         PIDClean( p_demux->out, pid );
@@ -2155,8 +2188,10 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                 PIDInit( pmt, VLC_TRUE, pat->psi );
                 pmt->psi->prg[pmt->psi->i_prg-1]->handle =
                     dvbpsi_AttachPMT( p_program->i_number,
-                                      (dvbpsi_pmt_callback)PMTCallBack, p_demux );
-                pmt->psi->prg[pmt->psi->i_prg-1]->i_number = p_program->i_number;
+                                      (dvbpsi_pmt_callback)PMTCallBack,
+                                      p_demux );
+                pmt->psi->prg[pmt->psi->i_prg-1]->i_number =
+                    p_program->i_number;
             }
         }
     }
