@@ -5,7 +5,7 @@ This version is in development and not yet released.
 --------------------------------
 
 Core support:
- * Major work on libvlc. Changed/renamed/added funtionality
+ * Major work on libvlc. Changed/renamed/added functions
  * Complete switch to the new access2 and demux2 systems
  * New plugins cache to speed up launch time
  * Fix crash with deinterlace switching
@@ -14,15 +14,17 @@ Core support:
  * Technical improvements to the subtitle/OSD subsystem
 
 Input:
- * New screen capture input plugin for X11, Win32, BeOS and Mac OS X (Stream your desktop)
+ * New screen capture input plugin for X11, Win32, BeOS and Mac OS X 
+    (Stream your desktop)
  * Improved DVD support:
     - uses libdvdnav for playing DVDs with menus support
     - uses libdvdread for simple playback with menus (eg. for streaming)
- * Experimental --input-slave option to start playing with multi-input
+ * Experimental multi-input support ( use --input-slave to play with it )
  * Automatic MTU discovery for UDP streams
- * More powerful MRL syntax for DVD/VCD/CDDA access (selection of titles/chapters).
+ * More powerful MRL syntax for DVD/VCD/CDDA access 
+    (selection of titles/chapters).
 
-Demux:
+Demuxers:
  * Support iTunes Music Store previews
  * Support for MJPEG webcams (i.e. AXIS cams)
  * Added initial mp4 and mpeg-ts text track support
@@ -40,21 +42,24 @@ Codecs:
  * Enabled color in DVB subtitles rendering
 
 Stream Output:
- * Text track muxing for mp4
- * Multipart mjpeg muxing. Your video is directly viewable in a Mozilla Browser
- * 14496-17 text track muxing for MPEG TS
+ Encoders:
+  * Re-use audio/video/spu decoders in transcoder module. From now on,
+     everything that is playable by VLC should be transcodable as well
+  * Subtitles overlaying in transcoder
+  * Frame rate selection in the transcoder
+  * DVB subtitles encoder
+  * MPEG 1 layer 2 audio encoder using libtoolame
+  * Improved vorbis/theora encoding
+ Muxers: 
+  * Text track muxing for mp4
+  * Multipart mjpeg muxing. Your video is directly viewable in a Mozilla Browser
+  * 14496-17 text track muxing for MPEG TS
+  * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
+  * Experimental WAV muxer
+  * Improved ASF muxer
+ Misc:
  * H.263 RTP streaming support
- * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
- * Experimental WAV muxer
  * SDP generation outputs more compliant SDPs and can create SDP files now
- * Frame rate selection in the transcoder
- * Improved ASF muxer
- * DVB subtitles encoder
- * Subtitles overlaying in transcoder
- * MPEG 1 layer 2 audio encoder using libtoolame
- * Improved vorbis/theora encoding
- * Re-use audio/video/spu decoders in transcoder module. From now on,
-   everything that is playable by VLC should be transcodable as well
 
 Audio Output:
  * New audio equalizer filter
