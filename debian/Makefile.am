@@ -1,7 +1,7 @@
 NULL =
 
 EXTRA_DIST = \
-	README \
+	README.Debian \
 	changelog \
 	control \
 	control.woody \
