@@ -6,9 +6,6 @@
 *.dylib
 *.sl
 *.so
+Makefile.am
 Makefile.in
 Makefile
-vlcintf.h
-vlcintf.xpt
-stamp-*
-*-stamp
