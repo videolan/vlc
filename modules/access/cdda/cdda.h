@@ -31,6 +31,8 @@
 #include <cddb/cddb.h>
 #endif
 
+#define CDDA_MRL_PREFIX "cddax://"
+
 /* Frequency of sample in bits per second. */
 #define CDDA_FREQUENCY_SAMPLE 44100
 
@@ -69,10 +71,6 @@ typedef struct cdda_data_s
   /* Current position */
   track_t        i_track;                  /* Current track */
   lsn_t          i_lsn;                    /* Current Logical Sector Number */
-  lsn_t          lsn[CDIO_CD_MAX_TRACKS];  /* Track LSNs. Origin is NOT 
-					      0 origin but origin of track
-					      number (usually 1).
-					    */
   
   int            i_blocks_per_read;        /* # blocks to get in a read */
   int            i_debug;                  /* Debugging mask */
@@ -80,6 +78,7 @@ typedef struct cdda_data_s
   /* Information about CD */
   vlc_meta_t    *p_meta;
   char *         psz_mcn;                  /* Media Catalog Number */
+  char *         psz_source;               /* CD drive or CD image filename */
   input_title_t *p_title[CDIO_CD_MAX_TRACKS]; /* This *is* 0 origin, not
 					         track number origin */
   
