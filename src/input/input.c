@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.88 2001/03/02 03:32:46 stef Exp $
+ * $Id: input.c,v 1.89 2001/03/07 00:18:46 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,6 +35,15 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+
+/* Network functions */
+
+#include <netdb.h>                                             /* hostent ... */
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #ifdef STATS
 #   include <sys/times.h>
@@ -316,7 +325,6 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_rewind        = f.pf_rewind;
     p_input->pf_seek          = f.pf_seek;
 #undef f
-
     p_input->pf_open( p_input );
 
     if( p_input->b_error )
@@ -426,16 +434,16 @@ void input_FileOpen( input_thread_t * p_input )
             /* get rid of the 'dvd:' stuff and try again */
             psz_name += 4;
             i_stat = stat( psz_name, &stat_info );
-	}
+        }
 	else if( ( i_size > 5 )
                  && !strncasecmp( psz_name, "file:", 5 ) )
         {
             /* get rid of the 'file:' stuff and try again */
             psz_name += 5;
             i_stat = stat( psz_name, &stat_info );
-	}
+        }
 
-	if( i_stat == (-1) )
+    	if( i_stat == (-1) )
         {
             intf_ErrMsg( "input error: cannot stat() file `%s' (%s)",
                          psz_name, strerror(errno));
@@ -497,3 +505,212 @@ void input_FileClose( input_thread_t * p_input )
     return;
 }
 
+/*****************************************************************************
+ * input_BuildLocalAddr : fill a sockaddr_in structure for local binding
+ *****************************************************************************/
+int input_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port, 
+                      boolean_t b_broadcast )
+{
+    char                psz_hostname[INPUT_MAX_SOURCE_LENGTH];
+    struct hostent    * p_hostent;
+    
+    /* Reset struct */
+    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
+    p_socket->sin_family = AF_INET;                                 /* family */
+    p_socket->sin_port = htons( i_port );
+    
+    if( !b_broadcast )
+    {
+        /* Try to get our own IP */
+        if( gethostname( psz_hostname, sizeof(psz_hostname) ) )
+        {
+            intf_ErrMsg( "BuildLocalAddr : unable to resolve local name : %s",
+                         strerror( errno ) );
+            return( -1 );
+        }
+
+    }
+    else
+    {
+        /* Using broadcast address. There are many ways of doing it, one of
+         * the simpliest being a #define ...
+         * FIXME : this is ugly */ 
+        strncpy( psz_hostname, INPUT_BCAST_ADDR,INPUT_MAX_SOURCE_LENGTH );
+    }
+
+    /* Try to convert address directly from in_addr - this will work if
+     * psz_in_addr is dotted decimal. */
+
+#ifdef HAVE_ARPA_INET_H
+    if( !inet_aton( psz_hostname, &p_socket->sin_addr) )
+#else
+    if( (p_socket->sin_addr.s_addr = inet_addr( psz_hostname )) == -1 )
+#endif
+    {
+        /* We have a fqdn, try to find its address */
+        if ( (p_hostent = gethostbyname( psz_hostname )) == NULL )
+        {
+            intf_ErrMsg( "BuildLocalAddr: unknown host %s", psz_hostname );
+            return( -1 );
+        }
+        
+        /* Copy the first address of the host in the socket address */
+        memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0], 
+                 p_hostent->h_length );
+    }
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * input_BuildRemoteAddr : fill a sockaddr_in structure for remote host
+ *****************************************************************************/
+int input_BuildRemoteAddr( input_thread_t * p_input, 
+                           struct sockaddr_in * p_socket )
+{
+    struct hostent            * p_hostent;
+
+    /* Reset structure */
+    memset( p_socket, 0, sizeof( struct sockaddr_in ) );
+    p_socket->sin_family = AF_INET;                                 /* family */
+    p_socket->sin_port = htons( 0 );                /* This is for remote end */
+    
+    /* Get the remote server */
+    if( p_input->p_source == NULL )
+    {
+        p_input->p_source = main_GetPszVariable( INPUT_SERVER_VAR, 
+                                                 INPUT_SERVER_DEFAULT );
+    }
+
+     /* Try to convert address directly from in_addr - this will work if
+      * psz_in_addr is dotted decimal. */
+#ifdef HAVE_ARPA_INET_H
+    if( !inet_aton( p_input->p_source, &p_socket->sin_addr) )
+#else
+    if( (p_socket->sin_addr.s_addr = inet_addr( p_input->p_source )) == -1 )
+#endif
+    {
+        /* We have a fqdn, try to find its address */
+        if ( (p_hostent = gethostbyname(p_input->p_source)) == NULL )
+        {
+            intf_ErrMsg( "BuildRemoteAddr: unknown host %s", 
+                         p_input->p_source );
+            return( -1 );
+        }
+        
+        /* Copy the first address of the host in the socket address */
+        memcpy( &p_socket->sin_addr, p_hostent->h_addr_list[0], 
+                 p_hostent->h_length );
+    }
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * input_NetworkOpen : open a network socket 
+ *****************************************************************************/
+void input_NetworkOpen( input_thread_t * p_input )
+{
+ 
+    int                 i_option_value, i_port;
+    struct sockaddr_in  s_socket;
+    boolean_t           b_broadcast;
+    
+    /* FIXME : we don't handle channels for the moment */
+
+    /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
+     * protocol */
+    p_input->i_handle = socket( AF_INET, SOCK_DGRAM, 0 );
+    if( p_input->i_handle == -1 )
+    {
+        intf_ErrMsg("NetworkOpen : can't create socket : %s", strerror(errno));
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* We may want to reuse an already used socket */
+    i_option_value = 1;
+    if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_REUSEADDR,
+                    &i_option_value,sizeof( i_option_value ) ) == -1 )
+    {
+        intf_ErrMsg("NetworkOpen : can't configure socket (SO_REUSEADDR: %s)",
+                    strerror(errno));
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+#ifndef SYS_BEOS
+    /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
+     * packet loss caused by scheduling problems */
+    i_option_value = 524288;
+    if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_RCVBUF, &i_option_value,
+                    sizeof( i_option_value ) ) == -1 )
+    {
+        intf_ErrMsg("NetworkOpen : can't configure socket (SO_RCVBUF: %s)", 
+                    strerror(errno));
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+#endif /* SYS_BEOS */
+
+    /* Get details about what we are supposed to do */
+    b_broadcast = (boolean_t)main_GetIntVariable( INPUT_BROADCAST_VAR, 0 );
+    i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
+
+    /* TODO : here deal with channel stufs */
+
+    /* Build the local socket */
+    if ( input_BuildLocalAddr( &s_socket, i_port, b_broadcast ) 
+         == -1 )
+    {
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+    
+    /* Bind it */
+    if( bind( p_input->i_handle, (struct sockaddr *)&s_socket, 
+              sizeof( s_socket ) ) < 0 )
+    {
+        intf_ErrMsg("NetworkOpen: can't bind socket (%s)", strerror(errno));
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* Build socket for remote connection */
+    if ( input_BuildRemoteAddr( p_input, &s_socket ) 
+         == -1 )
+    {
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* And connect it ... should we really connect ? */
+    if( connect( p_input->i_handle, (struct sockaddr *) &s_socket,
+                 sizeof( s_socket ) ) == (-1) )
+    {
+        intf_ErrMsg("NetworkOpen: can't connect socket" );
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* We can't pace control, but FIXME : bug in meuuh's code to sync PCR
+     * with the server. */
+    p_input->stream.b_pace_control = 1;
+    
+    return;
+}
+
+/*****************************************************************************
+ * input_NetworkClose : close a network socket
+ *****************************************************************************/
+void input_NetworkClose( input_thread_t * p_input )
+{
+    close( p_input->i_handle );
+    /* FIXME: deal with channels */
+}

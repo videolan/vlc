@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.7 2001/03/05 11:53:44 sam Exp $
+ * $Id: input_ts.c,v 1.8 2001/03/07 00:18:46 henri Exp $
  *
  * Authors: 
  *
@@ -76,8 +76,10 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = TSProbe;
     input.pf_init             = TSInit;
-    input.pf_open             = input_FileOpen;
-    input.pf_close            = input_FileClose;
+//    input.pf_open             = input_FileOpen;
+//    input.pf_close            = input_FileClose;
+    input.pf_open             = input_NetworkOpen;
+    input.pf_close            = input_NetworkClose;
     input.pf_end              = TSEnd;
     input.pf_set_area         = NULL;
     input.pf_read             = TSRead;
@@ -213,7 +215,6 @@ static int TSRead( input_thread_t * p_input,
     } 
 
     i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
-    
     if( i_read == -1 )
     {
         intf_ErrMsg( "Could not readv" );

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.42 2001/03/06 17:54:48 massiot Exp $
+ * $Id: mpeg_system.c,v 1.43 2001/03/07 00:18:46 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -934,7 +934,6 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
 
     #define p (p_data->p_buffer)
-   
     /* Extract flags values from TS common header. */
     i_pid = U16_AT(&p[1]) & 0x1fff;
     b_unit_start = (p[1] & 0x40);
@@ -943,7 +942,6 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-
         
     p_es= input_FindES( p_input, i_pid );
     
@@ -953,10 +951,11 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
         
         if( p_es_demux->b_psi )
             b_psi = 1;
+        else
+            p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data; 
     }
 
     vlc_mutex_lock( &p_input->stream.control.control_lock );
-
     if( ( p_es == NULL ) || (p_es->b_audio && p_input->stream.control.b_mute) )
     {
         /* Not selected. Just read the adaptation field for a PCR. */
@@ -969,17 +968,12 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
 
+    /* Don't change the order of the tests : if b_psi then p_pgrm_demux 
+     * may still be null. Who said it was ugly ? */
     if( ( p_es != NULL ) && 
         ((p_es->p_decoder_fifo != NULL) || b_psi 
                                    || (p_pgrm_demux->i_pcr_pid == i_pid) ) )
     {
-        p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
-
-        if( ! p_es_demux->b_psi )
-        {
-            p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data; 
-        }
-
 #ifdef STATS
         p_es->c_packets++;
 #endif
@@ -1288,7 +1282,6 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
     stream_ts_data_t  * p_stream_data;
     es_ts_data_t      * p_demux_data;
 
-   
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
     
@@ -1394,6 +1387,9 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         p_current_data = p_psi->buffer;
         
         p_pgrm_data->i_pcr_pid = U16_AT(p_current_section + 8) & 0x1fff;
+        
+        /* Lock stream information */
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
         /* Delete all ES in this program  except the PSI */
         for( i_loop=0; i_loop < p_es->p_pgrm->i_es_number; i_loop++ )
@@ -1430,7 +1426,6 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                 
                 /* We want to decode */
                 input_SelectES( p_input, p_new_es );
-
                 p_current_data += 5 + i_es_info_length;
             }
 
@@ -1446,4 +1441,7 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
     }
     
 #undef p_psi
+
+    /*  Remove lock */
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 }

@@ -179,6 +179,7 @@
 /* Default remote server */
 #define INPUT_SERVER_VAR                "vlc_server"
 #define INPUT_SERVER_DEFAULT            "138.195.143.220"
+#define INPUT_BCAST_ADDR                "138.195.143.255"
 
 /* Default input port */
 #define INPUT_PORT_VAR                  "vlc_server_port"
