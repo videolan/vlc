@@ -1,8 +1,8 @@
 /*****************************************************************************
- * playlist.cpp : wxWindows plugin for vlc
+ * messages.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.19 2003/12/27 14:36:30 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: messages.cpp,v 1.20 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -33,7 +33,6 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
-#include <wx/textctrl.h>
 
 /*****************************************************************************
  * Event Table.

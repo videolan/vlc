@@ -1,8 +1,8 @@
 /*****************************************************************************
  * iteminfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: iteminfo.cpp,v 1.6 2004/01/05 13:00:39 zorglub Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: iteminfo.cpp,v 1.7 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -31,20 +31,7 @@
 
 #include <vlc/vlc.h>
 
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/notebook.h>
-#include <wx/textctrl.h>
 #include <wx/combobox.h>
-#include <wx/spinctrl.h>
 #include <wx/statline.h>
 
 #include <vlc/intf.h>
@@ -84,7 +71,7 @@ END_EVENT_TABLE()
 ItemInfoDialog::ItemInfoDialog( intf_thread_t *_p_intf,
                                 playlist_item_t *_p_item,
                                 wxWindow* _p_parent ):
-    wxDialog( _p_parent, -1, wxU(_("Playlist item options")),
+    wxDialog( _p_parent, -1, wxU(_("Playlist item info")),
              wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -147,7 +134,7 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
 
     /* Create a box to surround the controls */
     wxStaticBox *panel_box = new wxStaticBox( info_panel, -1,
-                                   wxU(_("Item informations")) );
+                                   wxU(_("Item Info")) );
 
     wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
@@ -225,14 +212,14 @@ wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
     wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
                                   wxDefaultSize );
     wxStaticBox *panel_box = new wxStaticBox( panel, -1,
-                                   wxU(_("Group info")) );
+                                   wxU(_("Group Info")) );
     wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
                                                          wxVERTICAL);
     wxBoxSizer *subpanel_sizer;
     group_subpanel = new wxPanel( panel, -1 );
     subpanel_sizer = new wxBoxSizer( wxVERTICAL) ;
     enabled_checkbox = new wxCheckBox( group_subpanel,
-                                     -1, wxU(_("Item enabled")) );
+                                     -1, wxU(_("Item Enabled")) );
 
     enabled_checkbox->SetValue( p_item->b_enabled);
 

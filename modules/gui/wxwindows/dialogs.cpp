@@ -1,8 +1,8 @@
 /*****************************************************************************
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.13 2004/01/05 13:00:39 zorglub Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: dialogs.cpp,v 1.14 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -277,7 +277,7 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
     }
 
     if( p_file_dialog == NULL )
-        p_file_dialog = new wxFileDialog( this, wxU(_("Open file")),
+        p_file_dialog = new wxFileDialog( this, wxU(_("Open File")),
             wxT(""), wxT(""), wxT("*"), wxOPEN | wxMULTIPLE );
 
     if( p_file_dialog && p_file_dialog->ShowModal() == wxID_OK )

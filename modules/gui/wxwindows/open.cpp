@@ -1,8 +1,8 @@
 /*****************************************************************************
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.62 2004/01/05 13:00:39 zorglub Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: open.cpp,v 1.63 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -31,27 +31,13 @@
 
 #include <vlc/vlc.h>
 
-#ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield
-#undef CreateDialog
-#endif
-
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/notebook.h>
-#include <wx/textctrl.h>
 #include <wx/combobox.h>
-#include <wx/spinctrl.h>
 #include <wx/statline.h>
 #include <wx/tokenzr.h>
 
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
-
 #include "preferences_widgets.h"
 
 #ifndef wxRB_SINGLE
@@ -219,7 +205,7 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
  *****************************************************************************/
 OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                         int i_access_method, int i_arg ):
-    wxFrame( _p_parent, -1, wxU(_("Open Target")), wxDefaultPosition,
+    wxFrame( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     OpenDialog( _p_intf, _p_parent, i_access_method, i_arg, OPEN_NORMAL );
@@ -227,7 +213,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 
 OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
                         int i_access_method, int i_arg, int _i_method ):
-    wxFrame( _p_parent, -1, wxU(_("Open Target")), wxDefaultPosition,
+    wxFrame( _p_parent, -1, wxU(_("Open...")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -256,7 +242,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     wxStaticBoxSizer *mrl_sizer = new wxStaticBoxSizer( mrl_box,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
-                                                wxU(_("Open Target:")) );
+                                                wxU(_("Open :")) );
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(120, -1),
                                 0, NULL );
@@ -285,7 +271,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
 
         sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
                                          wxU(_("Stream output")) );
-        sout_checkbox->SetToolTip( wxU(_("Use VLC as a stream server")) );
+        sout_checkbox->SetToolTip( wxU(_("Use VLC as a server of streams")) );
         sout_sizer->Add( sout_checkbox, 0,
                          wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
         sout_button = new wxButton( panel, SoutSettings_Event,
@@ -432,9 +418,8 @@ wxPanel *OpenDialog::FilePanel( wxWindow* parent )
     /* Create Subtitles File checkox */
     wxFlexGridSizer *subsfile_sizer = new wxFlexGridSizer( 2, 1, 20 );
     subsfile_checkbox = new wxCheckBox( panel, SubsFileEnable_Event,
-                                        wxU(_("Subtitles file")) );
-    subsfile_checkbox->SetToolTip( wxU(_("Load an additional subtitles file. "
-                                   "Currently only works with AVI files.")) );
+                                        wxU(_("Subtitle options")) );
+    subsfile_checkbox->SetToolTip( wxU(_("Force options for seperate subtitle files.")) );
     subsfile_sizer->Add( subsfile_checkbox, 0,
                          wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subsfile_button = new wxButton( panel, SubsFileSettings_Event,
@@ -977,7 +962,7 @@ void OpenDialog::OnFilePanelChange( wxCommandEvent& WXUNUSED(event) )
 void OpenDialog::OnFileBrowse( wxCommandEvent& WXUNUSED(event) )
 {
     if( file_dialog == NULL )
-        file_dialog = new wxFileDialog( this, wxU(_("Open file")),
+        file_dialog = new wxFileDialog( this, wxU(_("Open File")),
             wxT(""), wxT(""), wxT("*"), wxOPEN | wxMULTIPLE );
 
     if( file_dialog && file_dialog->ShowModal() == wxID_OK )
@@ -1057,7 +1042,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         if( !b_disc_device_changed )
         {
             disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
-            disc_title_label->SetLabel ( wxT("Title") );
+            disc_title_label->SetLabel ( wxU(_("Title")) );
         }
         disc_title->SetRange( i_selection, 255 );
         disc_title->SetValue( i_selection );
@@ -1080,11 +1065,11 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         */
 #ifdef HAVE_VCDX
         disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
-                                     ? wxT("PBC LID") : wxT("Entry") );
+                                     ? wxU(_("PBC LID")_) : wxU(_("Entry")) );
         disc_title->SetRange( 0, 999 );
         i_selection = 0;
 #else
-        disc_title_label->SetLabel ( wxT("Track") );
+        disc_title_label->SetLabel ( wxU(_("Track")) );
         disc_title->SetRange( 1, 98 );
 #endif
         disc_title->SetValue( i_selection );
@@ -1096,7 +1081,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         {
             disc_device->SetValue( psz_device ? wxL2U(psz_device) : wxT("") );
         }
-        disc_title_label->SetLabel ( wxT("Track") );
+        disc_title_label->SetLabel ( wxU(_("Track")) );
 #ifdef HAVE_CDDAX
         i_selection = 0;
 #endif
@@ -1157,7 +1142,7 @@ void OpenDialog::OnV4LPanelChange( wxCommandEvent& WXUNUSED(event) )
 
 void OpenDialog::OnV4LTypeChange( wxCommandEvent& WXUNUSED(event) )
 {
-    video_device->SetValue( wxU( "/dev/video" ) );
+    video_device->SetValue( wxT( "/dev/video" ) );
 
     v4l_button->Enable();
     video_channel->Disable();

@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.38 2004/01/16 00:01:19 gbazin Exp $
+ * $Id: playlist.cpp,v 1.39 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -28,7 +28,6 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
-#include <wx/listctrl.h>
 
 /* Callback prototype */
 int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
@@ -179,12 +178,9 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_group_sorted = 0;
 
 
-    var_Create( p_intf, "random", VLC_VAR_BOOL );
-    var_Change( p_intf, "random", VLC_VAR_INHERITVALUE, & val, NULL );
-    var_Create( p_intf, "loop", VLC_VAR_BOOL );
-    var_Create( p_intf, "loop", VLC_VAR_BOOL );
-    var_Change( p_intf, "repeat", VLC_VAR_INHERITVALUE, & val, NULL );
-    var_Change( p_intf, "repeat", VLC_VAR_INHERITVALUE, & val, NULL );
+    var_Create( p_intf, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_intf, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_intf, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );;
 
     /* Create our "Manage" menu */
     wxMenu *manage_menu = new wxMenu;
@@ -202,12 +198,12 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     sort_menu->Append( RSortTitle_Event, wxU(_("&Reverse sort by title")) );
     sort_menu->AppendSeparator();
     sort_menu->Append( SortAuthor_Event, wxU(_("Sort by &author")) );
-    sort_menu->Append( RSortAuthor_Event, wxU(_("&Reverse sort by author")) );
+    sort_menu->Append( RSortAuthor_Event, wxU(_("Reverse sort by author")) );
     sort_menu->AppendSeparator();
     sort_menu->Append( SortGroup_Event, wxU(_("Sort by &group")) );
-    sort_menu->Append( RSortGroup_Event, wxU(_("&Reverse sort by group")) );
+    sort_menu->Append( RSortGroup_Event, wxU(_("Reverse sort by group")) );
     sort_menu->AppendSeparator();
-    sort_menu->Append( Randomize_Event, wxU(_("&Randomize Playlist")) );
+    sort_menu->Append( Randomize_Event, wxU(_("&Shuffle Playlist")) );
 
     /* Create our "Selection" menu */
     wxMenu *selection_menu = new wxMenu;
@@ -215,7 +211,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     selection_menu->Append( DisableSelection_Event, wxU(_("&Disable")) );
     selection_menu->AppendSeparator();
     selection_menu->Append( InvertSelection_Event, wxU(_("&Invert")) );
-    selection_menu->Append( DeleteSelection_Event, wxU(_("&Delete")) );
+    selection_menu->Append( DeleteSelection_Event, wxU(_("D&elete")) );
     selection_menu->Append( SelectAll_Event, wxU(_("&Select All")) );
 
     /* Create our "Group" menu */
@@ -236,10 +232,10 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create the popup menu */
     popup_menu = new wxMenu;
-    popup_menu->Append( PopupPlay_Event, wxU(_("Play item")) );
-    popup_menu->Append( PopupDel_Event, wxU(_("Delete item")) );
+    popup_menu->Append( PopupPlay_Event, wxU(_("Play")) );
+    popup_menu->Append( PopupDel_Event, wxU(_("Delete")) );
     popup_menu->Append( PopupEna_Event, wxU(_("Toggle enabled")) );
-    popup_menu->Append( PopupInfo_Event, wxU(_("Info on item")) );
+    popup_menu->Append( PopupInfo_Event, wxU(_("Info")) );
 
     /* Create a panel to put everything in */
     wxPanel *playlist_panel = new wxPanel( this, -1 );
@@ -254,14 +250,14 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     /* Create the Loop Checkbox */
     wxCheckBox *loop_checkbox =
-        new wxCheckBox( playlist_panel, Loop_Event, wxU(_("Loop")) );
+        new wxCheckBox( playlist_panel, Loop_Event, wxU(_("Repeat All")) );
     var_Get( p_intf, "loop", &val );
     int b_loop = val.b_bool ;
     loop_checkbox->SetValue( b_loop );
 
     /* Create the Repeat one checkbox */
     wxCheckBox *repeat_checkbox =
-        new wxCheckBox( playlist_panel, Repeat_Event, wxU(_("Repeat one")) );
+        new wxCheckBox( playlist_panel, Repeat_Event, wxU(_("Repeat One")) );
     var_Get( p_intf, "repeat", &val );
     int b_repeat = val.b_bool ;
     repeat_checkbox->SetValue( b_repeat );
@@ -395,6 +391,8 @@ Playlist::~Playlist()
 
     delete iteminfo_dialog;
 
+    var_DelCallback( p_playlist, "item-change", ItemChanged, this );
+    var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     vlc_object_release( p_playlist );
 }
@@ -727,22 +725,22 @@ void Playlist::OnSort( wxCommandEvent& event )
     switch( event.GetId() )
     {
         case SortTitle_Event:
-           playlist_SortTitle( p_playlist , 0 );
+           playlist_SortTitle( p_playlist , ORDER_NORMAL );
            break;
         case RSortTitle_Event:
-           playlist_SortTitle( p_playlist , 1 );
+           playlist_SortTitle( p_playlist , ORDER_REVERSE );
            break;
         case SortAuthor_Event:
-           playlist_SortAuthor(p_playlist , 0 );
+           playlist_SortAuthor(p_playlist , ORDER_NORMAL );
            break;
         case RSortAuthor_Event:
-           playlist_SortAuthor( p_playlist , 1 );
+           playlist_SortAuthor( p_playlist , ORDER_REVERSE );
            break;
         case SortGroup_Event:
-           playlist_SortGroup( p_playlist , 0 );
+           playlist_SortGroup( p_playlist , ORDER_NORMAL );
            break;
         case RSortGroup_Event:
-           playlist_SortGroup( p_playlist , 1 );
+           playlist_SortGroup( p_playlist , ORDER_REVERSE );
            break;
         case Randomize_Event:
            playlist_Sort( p_playlist , SORT_RANDOM, ORDER_NORMAL );
@@ -769,36 +767,36 @@ void Playlist::OnColSelect( wxListEvent& event )
         case 0:
             if( i_title_sorted != 1 )
             {
-                playlist_SortTitle( p_playlist, 0 );
+                playlist_SortTitle( p_playlist, ORDER_NORMAL );
                 i_title_sorted = 1;
             }
             else
             {
-                playlist_SortTitle( p_playlist, 1 );
+                playlist_SortTitle( p_playlist, ORDER_REVERSE );
                 i_title_sorted = -1;
             }
             break;
         case 1:
             if( i_author_sorted != 1 )
             {
-                playlist_SortAuthor( p_playlist, 0 );
+                playlist_SortAuthor( p_playlist, ORDER_NORMAL );
                 i_author_sorted = 1;
             }
             else
             {
-                playlist_SortAuthor( p_playlist, 1 );
+                playlist_SortAuthor( p_playlist, ORDER_REVERSE );
                 i_author_sorted = -1;
             }
             break;
         case 2:
             if( i_group_sorted != 1 )
             {
-                playlist_SortGroup( p_playlist, 0 );
+                playlist_SortGroup( p_playlist, ORDER_NORMAL );
                 i_group_sorted = 1;
             }
             else
             {
-                playlist_SortGroup( p_playlist, 1 );
+                playlist_SortGroup( p_playlist, ORDER_REVERSE );
                 i_group_sorted = -1;
             }
             break;
@@ -1193,10 +1191,10 @@ NewGroup::NewGroup( intf_thread_t *_p_intf, wxWindow *_p_parent ):
 
     wxStaticText *group_label =
             new wxStaticText( panel , -1,
-                wxU(_("Enter a name for the new group")));
+                wxU(_("Enter a name for the new group:")));
 
     groupname = new wxTextCtrl(panel, -1, wxU(""),wxDefaultPosition,
-                               wxSize(80,27),wxTE_PROCESS_ENTER);
+                               wxSize(100,27),wxTE_PROCESS_ENTER);
 
     wxButton *ok_button = new wxButton(panel, wxID_OK, wxU(_("OK")) );
     ok_button->SetDefault();

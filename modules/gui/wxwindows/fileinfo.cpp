@@ -1,8 +1,8 @@
 /*****************************************************************************
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001,2003 VideoLAN
- * $Id: fileinfo.cpp,v 1.22 2003/12/27 14:36:30 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: fileinfo.cpp,v 1.23 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -28,7 +28,6 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
-#include <wx/treectrl.h>
 
 /*****************************************************************************
  * Event Table.

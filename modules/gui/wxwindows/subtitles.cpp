@@ -2,7 +2,7 @@
  * subtitles.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subtitles.cpp,v 1.9 2003/12/22 15:42:44 gbazin Exp $
+ * $Id: subtitles.cpp,v 1.10 2004/01/25 03:29:02 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -33,9 +33,7 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
-#include <wx/textctrl.h>
 #include <wx/combobox.h>
-#include <wx/spinctrl.h>
 #include <wx/statline.h>
 
 #ifndef wxRB_SINGLE
@@ -64,7 +62,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
-    wxDialog( _p_parent, -1, wxU(_("Open subtitles file")),
+    wxDialog( _p_parent, -1, wxU(_("Subtitle options")),
               wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */

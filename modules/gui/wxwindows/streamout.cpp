@@ -1,8 +1,8 @@
 /*****************************************************************************
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.41 2003/12/22 02:24:52 sam Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: streamout.cpp,v 1.42 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -33,10 +33,7 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
-#include <wx/notebook.h>
-#include <wx/textctrl.h>
 #include <wx/combobox.h>
-#include <wx/spinctrl.h>
 #include <wx/statline.h>
 
 #ifndef wxRB_SINGLE

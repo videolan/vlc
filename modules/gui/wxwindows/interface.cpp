@@ -1,8 +1,8 @@
 /*****************************************************************************
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.84 2004/01/22 15:00:10 sigmunau Exp $
+ * Copyright (C) 2000-2004, 2003 VideoLAN
+ * $Id: interface.cpp,v 1.85 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -48,8 +48,6 @@
 #include "bitmaps/playlist.xpm"
 #include "bitmaps/fast.xpm"
 #include "bitmaps/slow.xpm"
-
-#include <wx/listctrl.h>
 
 #define TOOLBAR_BMP_WIDTH 36
 #define TOOLBAR_BMP_HEIGHT 36
@@ -311,7 +309,7 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
-    file_menu->Append( OpenFileSimple_Event, wxU(_("Quick &Open ...")),
+    file_menu->Append( OpenFileSimple_Event, wxU(_("Quick &Open File...")),
                        wxU(_(HELP_SIMPLE)) );
 
     file_menu->AppendSeparator();
@@ -358,7 +356,7 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
-    help_menu->Append( About_Event, wxU(_("&About...")), wxU(_(HELP_ABOUT)) );
+    help_menu->Append( About_Event, wxU(_("About VLC media player")), wxU(_(HELP_ABOUT)) );
 
     /* Append the freshly created menus to the menu bar... */
     wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
@@ -384,11 +382,11 @@ void Interface::CreateOurMenuBar()
 
 void Interface::CreateOurToolBar()
 {
-#define HELP_STOP N_("Stop current playlist item")
+#define HELP_STOP N_("Stop")
 
-#define HELP_PLAY N_("Play current playlist item")
-#define HELP_PAUSE N_("Pause current playlist item")
-#define HELP_PLO N_("Open playlist")
+#define HELP_PLAY N_("Play")
+#define HELP_PAUSE N_("Pause")
+#define HELP_PLO N_("Playlist")
 #define HELP_PLP N_("Previous playlist item")
 #define HELP_PLN N_("Next playlist item")
 #define HELP_SLOW N_("Play slower")
@@ -402,15 +400,15 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
-    toolbar->AddTool( OpenFileSimple_Event, wxU(_("Quick")),
+    toolbar->AddTool( OpenFileSimple_Event, wxU(_("Quick Open File...")),
                       wxBitmap( file_xpm ), wxU(_(HELP_SIMPLE)) );
 
     toolbar->AddSeparator();
-    toolbar->AddTool( OpenFile_Event, wxU(_("File")), wxBitmap( file_xpm ),
+    toolbar->AddTool( OpenFile_Event, wxU(_("Open File...")), wxBitmap( file_xpm ),
                       wxU(_(HELP_FILE)) );
-    toolbar->AddTool( OpenDisc_Event, wxU(_("Disc")), wxBitmap( disc_xpm ),
+    toolbar->AddTool( OpenDisc_Event, wxU(_("Open Disc...")), wxBitmap( disc_xpm ),
                       wxU(_(HELP_DISC)) );
-    toolbar->AddTool( OpenNet_Event, wxU(_("Net")), wxBitmap( net_xpm ),
+    toolbar->AddTool( OpenNet_Event, wxU(_("Open Network Stream...")), wxBitmap( net_xpm ),
                       wxU(_(HELP_NET)) );
     toolbar->AddSeparator();
 
@@ -422,7 +420,7 @@ void Interface::CreateOurToolBar()
     toolbar->AddSeparator();
     toolbar->AddTool( Playlist_Event, wxU(_("Playlist")),
                       wxBitmap( playlist_xpm ), wxU(_(HELP_PLO)) );
-    toolbar->AddTool( PrevStream_Event, wxU(_("Prev")),
+    toolbar->AddTool( PrevStream_Event, wxU(_("Previous")),
                       wxBitmap( previous_xpm ), wxU(_(HELP_PLP)) );
     toolbar->AddTool( NextStream_Event, wxU(_("Next")), wxBitmap( next_xpm ),
                       wxU(_(HELP_PLN)) );
@@ -490,6 +488,7 @@ void Interface::CreateOurSlider()
 void Interface::CreateOurExtraPanel()
 {
     char *psz_filters;
+    vlc_value_t val;
 
     extra_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
     extra_frame->SetAutoLayout( TRUE );
@@ -497,7 +496,7 @@ void Interface::CreateOurExtraPanel()
 
     /* Create static box to surround the adjust controls */
     wxStaticBox *adjust_box =
-           new wxStaticBox( extra_frame, -1, wxU(_("Image adjust")) );
+           new wxStaticBox( extra_frame, -1, wxU(_("Adjust Image")) );
 
     /* Create the size for the frame */
     wxStaticBoxSizer *adjust_sizer =
@@ -585,7 +584,7 @@ void Interface::CreateOurExtraPanel()
 
     wxBoxSizer *ratio_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticText *ratio_text = new wxStaticText( extra_frame, -1,
-                                          wxU(_("Ratio")) );
+                                          wxU(_("Aspect Ratio")) );
 
     ratio_combo = new wxComboBox( extra_frame, Ratio_Event, wxT(""),
                                   wxDefaultPosition, wxSize(120,-1),
@@ -603,7 +602,7 @@ void Interface::CreateOurExtraPanel()
     wxBoxSizer *visual_sizer = new wxBoxSizer( wxHORIZONTAL );
 
     wxCheckBox *visual_checkbox = new wxCheckBox( extra_frame, Visual_Event,
-                                            wxU(_("Visualisation")) );
+                                            wxU(_("Visualisations")) );
 
     visual_sizer->Add( visual_checkbox, 0, wxEXPAND, 0);
     visual_sizer->Layout();
@@ -677,7 +676,7 @@ void Interface::CreateOurExtraPanel()
     if( f_value > 0 && f_value < 2 )
         brightness_slider->SetValue( (int)(100 * f_value) );
     f_value = config_GetFloat( p_intf, "gamma" );
-    if (f_value > 0 && f_value < 10 )
+    if( f_value > 0 && f_value < 10 )
         gamma_slider->SetValue( (int)(10 * f_value) );
 
     extra_frame->Hide();
@@ -887,7 +886,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     wxString msg;
     msg.Printf( wxString(wxT("VLC media player " VERSION)) +
         wxU(_(" (wxWindows interface)\n\n")) +
-        wxU(_("(c) 1996-2003 - the VideoLAN Team\n\n")) +
+        wxU(_("(c) 1996-2004 - the VideoLAN Team\n\n")) +
         wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,ISUTF8) ) + wxT("\n\n") +
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
               "http://www.videolan.org/\n\n")) );
@@ -1051,23 +1050,22 @@ void Interface::OnEnableAdjust(wxCommandEvent& event)
 
 void Interface::OnHueUpdate( wxScrollEvent& event)
 {
-   config_PutInt( p_intf , "hue" , event.GetPosition() );
+    config_PutInt( p_intf , "hue" , event.GetPosition() );
 }
 
 void Interface::OnSaturationUpdate( wxScrollEvent& event)
 {
-   config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/100 );
+    config_PutFloat( p_intf , "saturation" , (float)event.GetPosition()/100 );
 }
 
 void Interface::OnBrightnessUpdate( wxScrollEvent& event)
 {
-   config_PutFloat( p_intf , "brightness", (float)event.GetPosition()/100 );
+    config_PutFloat( p_intf , "brightness", (float)event.GetPosition()/100 );
 }
 
 void Interface::OnContrastUpdate(wxScrollEvent& event)
 {
-   config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/100 );
-
+    config_PutFloat( p_intf , "contrast" , (float)event.GetPosition()/100 );
 }
 
 void Interface::OnGammaUpdate(wxScrollEvent& event)

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * v4l.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: v4l.cpp,v 1.6 2003/12/22 02:24:52 sam Exp $
+ * Copyright (C) 2000-2003 VideoLAN
+ * $Id: v4l.cpp,v 1.7 2004/01/25 03:29:02 hartman Exp $
  *
  * Authors: Mohammed Adnène Trojette <adn@via.ecp.fr>
  *
@@ -36,15 +36,7 @@
 #undef CreateDialog
 #endif
 
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-
-#include <wx/wxprec.h>
-#include <wx/wx.h>
-#include <wx/notebook.h>
-#include <wx/textctrl.h>
 #include <wx/combobox.h>
-#include <wx/spinctrl.h>
 #include <wx/statline.h>
 
 #include <vlc/intf.h>
@@ -127,7 +119,7 @@ V4LDialog::V4LDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     mrl_combo = new wxComboBox( panel, MRL_Event, wxT(""),
                                 wxPoint(20,25), wxSize(200, -1), 0, NULL );
     mrl_combo->SetToolTip( wxU(_("You can use this field directly by typing "
-        "the full MRL you want to open.\n""Alternatively, the field will be "
+        "the full MRL you want to open.\n Alternatively, the field will be "
         "filled automatically when you use the controls below")) );
 
     mrl_sizer->Add( mrl_label, 0, wxALL | wxALIGN_CENTER, 5 );
@@ -294,7 +286,7 @@ wxPanel *V4LDialog::CommonPanel( wxWindow* parent )
                                  WXSIZEOF(norm_array), norm_array,
                                  wxCB_READONLY );
     norm_combo->SetSelection(1);
-    norm_combo->SetToolTip( wxU(_( "Standard of the analogic signal" )) );
+    norm_combo->SetToolTip( wxU(_( "Standard of the analog signal" )) );
     subpanel_sizer->Add( norm_checkbox, 0, wxALIGN_LEFT |
                          wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( norm_combo, 0, wxALIGN_RIGHT |
@@ -302,10 +294,10 @@ wxPanel *V4LDialog::CommonPanel( wxWindow* parent )
 
     frequency_checkbox = new wxCheckBox( common_subpanel,
                                          FrequencyEnable_Event,
-                                         wxU(_("Frequency")) );
+                                         wxU(_("Frequency (kHz)")) );
     frequency = new wxSpinCtrl( common_subpanel, Frequency_Event,
                                 wxT("479250") );
-    frequency->SetToolTip( wxU(_("The frequency in kHz" )) );
+    frequency->SetToolTip( wxU(_("The channel frequency in kHz" )) );
 
     subpanel_sizer->Add( frequency_checkbox, 0, wxALIGN_LEFT |
                          wxALIGN_CENTER_VERTICAL );
@@ -355,7 +347,7 @@ wxPanel *V4LDialog::AudioPanel( wxWindow* parent )
     audio_device->SetToolTip( wxU(_("Audio device")) );
     label = new wxStaticText( audio_subpanel, -1, wxU(_("Channel")) );
     audio_channel = new wxSpinCtrl( audio_subpanel, AudioChannel_Event,
-                                    wxT("0") );
+                                    wxT("1") );
     audio_channel->SetToolTip( wxU(_("Usually 0 is for mono "
                                      "and 1 for stereo")) );
     subpanel_sizer->Add( audio_checkbox, 0, wxALIGN_RIGHT |
@@ -410,6 +402,7 @@ wxPanel *V4LDialog::BitratePanel( wxWindow* parent )
                                           MaxBitrateEnable_Event,
                                           wxU(_("Maximum bitrate")) );
     maxbitrate = new wxSpinCtrl( bitrate_subpanel, MaxBitrate_Event, wxT("3000") );
+    maxbitrate->SetToolTip( wxU(_("The maximum bitrate of the stream")) );
 
     subpanel_sizer->Add( maxbitrate_checkbox, 0, wxALIGN_LEFT |
                          wxALIGN_CENTER_VERTICAL );

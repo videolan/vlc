@@ -1,8 +1,8 @@
 /*****************************************************************************
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.45 2004/01/11 00:45:06 zorglub Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: preferences.cpp,v 1.46 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -36,12 +36,9 @@
 
 #include "wxwindows.h"
 #include "preferences_widgets.h"
-#include <wx/notebook.h>
-#include <wx/textctrl.h>
+
 #include <wx/combobox.h>
-#include <wx/spinctrl.h>
 #include <wx/statline.h>
-#include <wx/treectrl.h>
 #include <wx/clntdata.h>
 #include <wx/dynarray.h>
 
@@ -273,9 +270,9 @@ void PrefsDialog::OnSave( wxCommandEvent& WXUNUSED(event) )
 void PrefsDialog::OnResetAll( wxCommandEvent& WXUNUSED(event) )
 {
     wxMessageDialog dlg( this,
-        wxU(_("Beware this will reset your VLC Media Player config file.\n"
+        wxU(_("Beware this will reset your VLC media player preferences.\n"
               "Are you sure you want to continue?")),
-        wxU(_("Reset config file")), wxYES_NO|wxNO_DEFAULT|wxCENTRE );
+        wxU(_("Reset Preferences")), wxYES_NO|wxNO_DEFAULT|wxCENTRE );
 
     if ( dlg.ShowModal() == wxID_YES )
     {
@@ -421,8 +418,8 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     config_data->i_object_id = PLUGIN_ID;
     config_data->psz_help = wraptext( PLUGIN_HELP, 72, ISUTF8 );
     config_data->psz_section = strdup( PLUGIN_TITLE );
-    plugins_item = AppendItem( root_item, wxU(_("Plugins")),
-                        -1,-1,config_data );
+    plugins_item = AppendItem( root_item, wxU(_("Modules")),
+                        -1, -1,config_data );
 
     for( i_index = 0; i_index < p_list->i_count; i_index++ )
     {

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.37 2004/01/15 00:05:04 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: wxwindows.cpp,v 1.38 2004/01/25 03:29:02 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -44,7 +44,7 @@
 extern int wxEntry( HINSTANCE hInstance, HINSTANCE hPrevInstance = NULL,
                     char *pCmdLine = NULL, int nCmdShow = SW_NORMAL );
 #endif
-#ifdef __DARWIN__
+#ifdef SYS_DARWIN
 int wxEntry( int argc, char *argv[] , bool enterLoop = TRUE );
 #endif
 

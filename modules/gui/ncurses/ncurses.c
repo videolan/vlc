@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.13 2004/01/11 19:48:45 garf Exp $
+ * $Id: ncurses.c,v 1.14 2004/01/25 03:29:02 hartman Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -807,7 +807,7 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
     {
         /* Info box */
         int l = 0;
-        DrawBox( p_sys->w, y++, 0, h, COLS, " Informations " );
+        DrawBox( p_sys->w, y++, 0, h, COLS, " Information " );
 
         if( p_input )
         {

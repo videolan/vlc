@@ -1,8 +1,8 @@
 /*****************************************************************************
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.29 2003/12/08 19:50:21 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: menus.cpp,v 1.30 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -33,7 +33,6 @@
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
-#include <wx/listctrl.h>
 
 class wxMenuItemExt: public wxMenuItem
 {
@@ -90,7 +89,7 @@ END_EVENT_TABLE()
 wxMenu *OpenStreamMenu( intf_thread_t *p_intf )
 {
     wxMenu *menu = new wxMenu;
-    menu->Append( OpenFileSimple_Event, wxU(_("Simple &Open ...")) );
+    menu->Append( OpenFileSimple_Event, wxU(_("Quick &Open File...")) );
     menu->Append( OpenFile_Event, wxU(_("Open &File...")) );
     menu->Append( OpenDisc_Event, wxU(_("Open &Disc...")) );
     menu->Append( OpenNet_Event, wxU(_("Open &Network Stream...")) );
@@ -217,7 +216,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
 #if 1
     /* Add static entries */
     popupmenu.AppendSeparator();
-    popupmenu.Append( MenuDummy_Event, wxU("Open"),
+    popupmenu.Append( MenuDummy_Event, wxU("Open..."),
                       OpenStreamMenu( p_intf ), wxT("") );
 #endif
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.21 2004/01/24 12:30:32 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: preferences_widgets.cpp,v 1.22 2004/01/25 03:29:01 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
