@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.2 2002/04/30 12:35:24 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.3 2002/05/02 10:54:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -47,12 +47,8 @@ static int            RIFF_FindListChunk( input_thread_t *p_input, riffchunk_t *
 static void           RIFF_DeleteChunk( input_thread_t * p_input, riffchunk_t *p_chunk );
 
 
-/* 
- ces fonctions on besoin de pouvoir faire des seek 
  static int            RIFF_GoToChunk(input_thread_t * p_input,riffchunk_t *p_riff);
-*/
 
-static u32            RIFF_4cToI(char c1,char c2,char c3,char c4);
 static char         * RIFF_IToStr(u32 i);
 
 /*************************************************************************/
@@ -373,15 +369,6 @@ static int	RIFF_GoToChunk(input_thread_t * p_input, riffchunk_t *p_riff)
     return( -1 );
 }
 
-
-static u32   RIFF_4cToI(char c1,char c2,char c3,char c4)
-{
- u32 i;
-	i = ( ((u32)c1) << 24 ) + ( ((u32)c2) << 16 ) + ( ((u32)c3) << 8 ) + (u32)c4;
-	return i;
-}
-
-
 static char	* RIFF_IToStr(u32 l)
 {
  char *str;
@@ -389,7 +376,7 @@ static char	* RIFF_IToStr(u32 l)
 	str=calloc(5,sizeof(char));
 	for( i = 0; i < 4; i++)
 	{
-		str[i] = ( l >> ( (3-i) * 8) )&0xFF;
+		str[i] = ( l >>  ( i * 8) )&0xFF;
 	}
 	str[5] = 0;
 	return( str );
