@@ -925,7 +925,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
         return( 0 );
     }
 
-    p_sys->i_time = AVI_GetPTS( p_stream_master ) * 9 / 100;
+    p_sys->i_time = AVI_GetPTS( p_stream_master );
 
     for( i_packet = 0; i_packet < 10; i_packet++)
     {
