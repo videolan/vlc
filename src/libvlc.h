@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.26 2002/12/06 10:10:39 sam Exp $
+ * $Id: libvlc.h,v 1.27 2002/12/07 22:29:15 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -479,7 +479,11 @@ vlc_module_begin();
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), NULL );
+#if defined( SYS_BEOS )
+    add_bool( "sap", 0, NULL, SAP_TEXT, SAP_LONGTEXT );
+#else
     add_bool( "sap", 1, NULL, SAP_TEXT, SAP_LONGTEXT );
+#endif
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT );
