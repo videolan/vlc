@@ -4,7 +4,7 @@ Priority: optional
 Version: 0.5.1
 Release: 2
 Architecture: arm
-Conflicts: gpe-vlc, gpe-apps, opie-vlc, opie-libsdl,  opie-oipkg, opie-base, opie-multikey, opie-handwriting, opie-volumeapplet, opie-embeddedkonsole, opie-handwriting, opie-irdaapplet, opie-launcher-settings, opie-networksetup
+Conflicts: gpe-vlc, opie-vlc, opie-libsdl, opie-base, opie-handwriting, opie-volumeapplet, opie-embeddedkonsole, opie-launcher-settings, opie-netsetup
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>
 Depends: libc6, procps, xserver-tiny-h3600, xbase-clients, xfonts-base, xfonts-75dpi, xfonts-ttf, matchbox, xcalibrate, libsdl, libgtk1.2, esddsp, libffmpeg
 Copyright: GPL

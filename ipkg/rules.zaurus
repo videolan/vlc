@@ -76,6 +76,7 @@ install: build
 	cp share/vlc48x48.png  ${PKGDIR}/usr/share/vlc
 	cp vlc $(PKGDIR)/usr/bin
 	cp ipkg/vlc.zaurus ${PKGDIR}/opt/QtPalmtop/sharp/bin/opie-vlc
+	cp ipkg/vlc.zaurus ${PKGDIR}/opt/QtPalmtop/sharp/bin/zaurus-vlc
 	cp ipkg/vlc.desktop ${PKGDIR}/opt/QtPalmtop/sharp/apps/Applications
 
 install-plugins: install
