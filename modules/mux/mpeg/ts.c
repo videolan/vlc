@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.42 2004/01/25 02:26:04 fenrir Exp $
+ * $Id: ts.c,v 1.43 2004/01/30 17:53:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -32,7 +32,8 @@
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include "codecs.h"
+#include "iso_lang.h"
+
 #include "bits.h"
 #include "pes.h"
 #include "csa.h"
@@ -174,6 +175,9 @@ typedef struct ts_stream_s
 
     int             i_decoder_specific_info;
     uint8_t         *p_decoder_specific_info;
+
+    /* language is iso639-2T */
+    uint8_t         lang[3];
 
     sout_buffer_chain_t chain_pes;
     mtime_t             i_pes_dts;
@@ -544,6 +548,40 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             return VLC_EGENERIC;
     }
 
+    p_stream->lang[0] =
+    p_stream->lang[1] =
+    p_stream->lang[2] = '\0';
+    if( p_input->p_fmt->psz_language )
+    {
+        char *psz = p_input->p_fmt->psz_language;
+        const iso639_lang_t *pl = NULL;
+
+        if( strlen( psz ) == 2 )
+        {
+            pl = GetLang_1( psz );
+        }
+        else if( strlen( psz ) == 3 )
+        {
+            pl = GetLang_2B( psz );
+            if( !strcmp( pl->psz_iso639_1, "??" ) )
+            {
+                pl = GetLang_2T( psz );
+            }
+        }
+        if( pl && strcmp( pl->psz_iso639_1, "??" ) )
+        {
+            p_stream->lang[0] = pl->psz_iso639_2T[0];
+            p_stream->lang[1] = pl->psz_iso639_2T[1];
+            p_stream->lang[2] = pl->psz_iso639_2T[2];
+
+            msg_Dbg( p_mux, "    - lang=%c%c%c",
+                     p_stream->lang[0],
+                     p_stream->lang[1],
+                     p_stream->lang[2] );
+        }
+    }
+
+
     /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
     p_stream->i_decoder_specific_info = p_input->p_fmt->i_extra;
     if( p_stream->i_decoder_specific_info > 0 )
@@ -759,6 +797,12 @@ static int Mux( sout_mux_t *p_mux )
                     }
                     else
                     {
+                        if( p_data->i_length < 0 || p_data->i_length > 2000000 )
+                        {
+                            /* FIXME choose a better value, but anyway we should never
+                             * have to do that */
+                            p_data->i_length = 1000;
+                        }
                         p_stream->i_pes_length += p_data->i_length;
                         if( p_stream->i_pes_dts == 0 )
                         {
@@ -1625,6 +1669,20 @@ static void GetPMT( sout_mux_t *p_mux,
 
             /* "registration" descriptor : "AC-3" */
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
+        }
+
+        if( p_stream->lang[0] != 0 )
+        {
+            uint8_t data[4];
+
+            /* I construct the content myself, way faster than looking at
+             * over complicated/mind broken libdvbpsi way */
+            data[0] = p_stream->lang[0];
+            data[1] = p_stream->lang[1];
+            data[2] = p_stream->lang[2];
+            data[3] = 0x00; /* audio type: 0x00 undefined */
+
+            dvbpsi_PMTESAddDescriptor( p_es, 0x0a, 4, data );
         }
     }
 
