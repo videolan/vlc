@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.6 2003/01/17 19:35:22 sam Exp $
+ * $Id: menu.cpp,v 1.7 2003/01/19 17:55:18 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -168,7 +168,7 @@ void __fastcall TMenusGen::MenuChapterClick( TObject *Sender )
 
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
-    i_chapter = __MIN( i_chapter, p_area->.i_part_nb - 1 );
+    i_chapter = __MIN( i_chapter, p_area->i_part_nb - 1 );
     i_chapter = __MAX( i_chapter, 1 );
     p_area->i_part = i_chapter;
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -202,7 +202,7 @@ void __fastcall TMenusGen::PopupNavigationClick( TObject *Sender )
                      p_intf->p_sys->p_input->stream.i_area_nb - 1 );
     i_title = __MAX( i_title, 1 );
     p_area = p_intf->p_sys->p_input->stream.pp_areas[i_title];
-    i_chapter = __MIN( i_chapter, p_area->.i_part_nb - 1 );
+    i_chapter = __MIN( i_chapter, p_area->i_part_nb - 1 );
     i_chapter = __MAX( i_chapter, 1 );
     p_area->i_part = i_chapter;
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
