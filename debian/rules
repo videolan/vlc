@@ -45,6 +45,7 @@ CONFIG_FLAGS += \
 	--disable-basic-skins \
 	--disable-freetype \
 	--disable-mkv \
+	--enable-v4l \
 	$(NULL)
 
 # These ones are currently shipped with VLC
