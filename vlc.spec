@@ -38,7 +38,7 @@ Buildrequires: XFree86-devel, desktop-file-utils, libpostproc
 %{!?_without_mozilla:BuildRequires: mozilla-devel}
 %{!?_without_id3tag:BuildRequires: libid3tag-devel}
 %{!?_without_mpeg2dec:BuildRequires: mpeg2dec-devel >= 0.3.2}
-%{?_with_wxwindows:BuildRequires: wxGTK-devel >= 2.4.1}
+%{!?_without_wxwindows:BuildRequires: wxGTK-devel >= 2.4.1}
 %{!?_without_mozilla:BuildRequires: mozilla-devel = %{mozver}}
 Obsoletes: videolan-client
 
@@ -47,27 +47,28 @@ Requires: XFree86, desktop-file-utils
 %{!?_without_dvdread:Requires: libdvdread}
 %{!?_without_dvdplay:Requires: libdvdplay}
 %{!?_without_dvbpsi:Requires: libdvbpsi}
-#%%{!?_without_ogg:Requires: libogg}
+%{!?_without_ogg:Requires: libogg}
 %{!?_without_mad:Requires: libmad}
 %{!?_without_ffmpeg:Requires: ffmpeg}
-#%%{!?_without_xvid:Requires: xvidcore}
+%{!?_without_xvid:Requires: xvidcore >= 0.9.2}
 %{!?_without_a52:Requires: a52dec}
-#%%{!?_without_dv:Requires: libdv}
-#%%{!?_without_flac:Requires: flac}
-#%%{!?_without_vorbis:Requires: libvorbis}
-#%%{!?_without_sdl:Requires: SDL}
-#%%{!?_without_aa:Requires: aalib}
-#%%{!?_without_esd:Requires: esound}
-#%%{!?_without_arts:Requires: arts}
-#%%{!?_without_alsa:Requires: alsa-lib}
-#%%{!?_without_gtk:Requires: gtk+}
-#%%{!?_without_gnome:Requires: gnome-libs}
-#%%{?_with_qt:Requires: qt}
-#%%{?_with_kde:Requires: kdelibs}
-#%%{?_with_ncurses:Requires: ncurses}
-#%%{!?_without_xosd:Requires: xosd}
-#%%{!?_without_lirc:Requires: lirc}
+%{!?_without_dv:Requires: libdv}
+%{!?_without_flac:Requires: flac}
+%{!?_without_vorbis:Requires: libvorbis}
+%{!?_without_sdl:Requires: SDL}
+%{!?_without_aa:Requires: aalib}
+%{!?_without_esd:Requires: esound}
+%{!?_without_arts:Requires: arts}
+%{!?_without_alsa:Requires: alsa-lib}
+%{!?_without_gtk:Requires: gtk+}
+%{!?_without_gnome:Requires: gnome-libs}
+%{?_with_qt:Requires: qt}
+%{?_with_kde:Requires: kdelibs}
+%{?_with_ncurses:Requires: ncurses}
+%{!?_without_xosd:Requires: xosd}
+%{!?_without_lirc:Requires: lirc}
 %{?_with_mozilla:Requires: mozilla = %{mozver}}
+%{!?_without_wxwindows:Requires: wxGTK >= 2.4.1}
 
 %description
 VideoLAN Client (VLC) is a highly portable multimedia player for various
@@ -77,14 +78,10 @@ well as DVDs, VCDs, and various streaming protocols.
 Available rpmbuild rebuild options :
 --without dvd dvdread dvdplay dvbpsi dv v4l avi asf aac ogg rawdv mad ffmpeg xvid
           mp4 a52 vorbis mpeg2dec flac aa esd arts gtk gnome xosd lsp lirc
-          pth id3tag dv qt kde ncurses faad
+          pth id3tag dv qt kde ncurses faad alsa wxwindows skins
 
 Options that would need not yet existing add-on packages :
 --with tremor tarkin theora ggi glide svgalib mga
-
-Options removed for better Red Hat compatibility
---with alsa wxwindows
-
 
 %package devel
 Summary: Header files and static library from the Videolan Client.
@@ -158,7 +155,8 @@ ln %{_libdir}/libxvidcore.so.2 %{_libdir}/libxvidcore.so -sf
 	%{!?_without_gtk:--enable-gtk} \
 	--disable-familiar \
 	%{!?_without_gnome:--enable-gnome} \
-	%{!?_with_wxwindows:--disable-wxwindows} \
+	%{?_without_wxwindows:--disable-wxwindows} \
+        %{!?_without_wxwindows:--enable-skins} \
 	%{!?_without_qt:--enable-qt} \
 	%{!?_without_kde:--enable-kde} \
 	--disable-opie \
@@ -239,6 +237,10 @@ rm %{_libdir}/libxvidcore.so -f
 %{_libdir}/libvlc.a
 
 %changelog
+* Sat Sep 22 2003 Jason Luka
+- Added wxwindows, alsa, and skin support
+- Fixed dependancies, specifically a version conflict of xvidcore
+
 * Thu Sep 20 2003 Jason Luka
 - Removed wxinterface because it's redundant
 - Removed alsa support because it's not needed in Red Hat
