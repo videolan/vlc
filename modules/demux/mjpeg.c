@@ -212,7 +212,6 @@ static vlc_bool_t CheckMimeHeader( demux_t *p_demux, int *p_header_size )
     psz_line = GetLine( p_demux, &i_pos );
     while( psz_line && *psz_line )
     {
-        msg_Dbg( p_demux, "%s", psz_line );
         if( !strncasecmp( psz_line, "Content-Type:", 13 ) )
         {
             p_ch = psz_line + 13;
@@ -436,17 +435,14 @@ static int MimeDemux( demux_t *p_demux )
                       strlen( p_sys->psz_separator ) ) )
         {
             b_done = VLC_TRUE;
-            msg_Dbg( p_demux, "MIME boundary detected at %d", i );
         }
         else
         {
             i++;
             i_size++;
-            msg_Dbg( p_demux, "not done" );
         }
     }
 
-    msg_Dbg( p_demux, "i is %d", i );  
     if( !b_match )
     {
         msg_Err( p_demux, "Discard non-JPEG part" );
