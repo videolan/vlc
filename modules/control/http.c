@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.32 2003/11/12 02:43:33 garf Exp $
+ * $Id: http.c,v 1.33 2003/11/12 02:56:13 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -2599,8 +2599,8 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         }
         else if( !strcmp( s, "-" ) )
         {
-            int i = SSPopN( st, vars );
             int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
             SSPushN( st, i - j );
         }
         else if( !strcmp( s, "*" ) )
@@ -2611,8 +2611,8 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         {
             int i, j;
 
-            i = SSPopN( st, vars );
             j = SSPopN( st, vars );
+            i = SSPopN( st, vars );
 
             SSPushN( st, j != 0 ? i / j : 0 );
         }
@@ -2620,8 +2620,8 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         {
             int i, j;
 
-            i = SSPopN( st, vars );
             j = SSPopN( st, vars );
+            i = SSPopN( st, vars );
 
             SSPushN( st, j != 0 ? i % j : 0 );
         }
@@ -2632,37 +2632,37 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         }
         else if( !strcmp( s, "<" ) )
         {
-            int i = SSPopN( st, vars );
             int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
             SSPushN( st, i < j ? -1 : 0 );
         }
         else if( !strcmp( s, ">" ) )
         {
-            int i = SSPopN( st, vars );
             int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
             SSPushN( st, i > j ? -1 : 0 );
         }
         else if( !strcmp( s, "<=" ) )
         {
-            int i = SSPopN( st, vars );
             int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
             SSPushN( st, i <= j ? -1 : 0 );
         }
         else if( !strcmp( s, ">=" ) )
         {
-            int i = SSPopN( st, vars );
             int j = SSPopN( st, vars );
+            int i = SSPopN( st, vars );
 
             SSPushN( st, i >= j ? -1 : 0 );
         }
         /* 3. string functions */
         else if( !strcmp( s, "strcat" ) )
         {
-            char *s1 = SSPop( st );
             char *s2 = SSPop( st );
+            char *s1 = SSPop( st );
             char *str = malloc( strlen( s1 ) + strlen( s2 ) + 1 );
 
             strcpy( str, s1 );
@@ -2675,8 +2675,8 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         }
         else if( !strcmp( s, "strcmp" ) )
         {
-            char *s1 = SSPop( st );
             char *s2 = SSPop( st );
+            char *s1 = SSPop( st );
 
             SSPushN( st, strcmp( s1, s2 ) );
             free( s1 );
@@ -2684,9 +2684,9 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         }
         else if( !strcmp( s, "strncmp" ) )
         {
-            char *s1 = SSPop( st );
-            char *s2 = SSPop( st );
             int n = SSPopN( st, vars );
+            char *s2 = SSPop( st );
+            char *s1 = SSPop( st );
 
             SSPushN( st, strncmp( s1, s2 , n ) );
             free( s1 );
@@ -2729,8 +2729,8 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         }
         else if( !strcmp( s, "store" ) )
         {
-            char *name  = SSPop( st );
             char *value = SSPop( st );
+            char *name  = SSPop( st );
 
             mvar_PushNewVar( vars, name, value );
             free( name );
