@@ -809,7 +809,7 @@ static void RunThread( vout_thread_t *p_vout)
         else if( p_vout->b_active )          /* idle or interface screen alone */
         {
             //?? clear: SetBufferPicture( p_vout, NULL );
-            if( p_vout->b_interface /* && ?? intf_change -> cause use of 100% CPU ! */ )
+            if( p_vout->b_interface && 0 /* && ?? intf_change */ )
             {
                 /* Interface has changed, so a new rendering is required - force
                  * it by setting last idle date to 0 */
