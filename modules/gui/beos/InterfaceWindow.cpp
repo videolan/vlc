@@ -8,7 +8,7 @@
  *          Samuel Hocevar <sam@zoy.org>
  *          Tony Castley <tony@castley.net>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
- *          Stephan Aßmus <stippi@yellowbites.com>
+ *          Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ collect_folder_contents( BDirectory& dir, BList& list, bool& deep, bool& asked, 
 				// ask user if we should parse sub-folders as well
 				BAlert* alert = new BAlert( "sub-folders?",
 											_("Open files from all sub-folders as well?"),
-											_("No"), _("Yes"), NULL, B_WIDTH_AS_USUAL,
+											_("Cancel"), _("Open"), NULL, B_WIDTH_AS_USUAL,
 											B_IDEA_ALERT );
 				int32 buttonIndex = alert->Go();
 				deep = buttonIndex == 1;
@@ -232,7 +232,6 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
 
     p_mediaControl->MoveTo( fMenuBar->Bounds().LeftBottom() + BPoint(0.0, 1.0) );
     AddChild( fMenuBar );
-    AddChild( p_mediaControl );
 
     // Add the file Menu
     BMenu* fileMenu = new BMenu( _("File") );
@@ -308,6 +307,11 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Preferences")),
                                        new BMessage( OPEN_PREFERENCES ), 'S' ) );
     fMenuBar->AddItem( fShowMenu );
+
+	// add the media control view after the menubar is complete
+	// because it will set the window size limits in AttachedToWindow()
+	// and the menubar needs to report the correct PreferredSize()
+    AddChild( p_mediaControl );
 
     /* Prepare fow showing */
     _SetMenusEnabled( false );
