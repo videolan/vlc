@@ -37,16 +37,10 @@
 #   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE
 #endif
 
+#include "common.h"
 #include "filter.h"
 
 #define DEBUG_DSHOW 1
-
-struct access_sys_t
-{
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
-};
-
 
 #define FILTER_NAME  L"VideoLAN Capture Filter"
 #define PIN_NAME     L"Capture"
@@ -218,71 +212,71 @@ HRESULT WINAPI CopyMediaType( AM_MEDIA_TYPE *pmtTarget,
     return S_OK;
 }
 
-int GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type)
+int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
 {
     int i_fourcc = 0;
 
     if( media_type.majortype == MEDIATYPE_Video )
     {
         /* currently only support this type of video info format */
-	if( media_type.formattype == FORMAT_VideoInfo )
-	{
-	    /* Packed RGB formats */
-	    if( media_type.subtype == MEDIASUBTYPE_RGB1 )
-	       i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
-	    else if( media_type.subtype == MEDIASUBTYPE_RGB4 )
-	       i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
-	    else if( media_type.subtype == MEDIASUBTYPE_RGB8 )
-	       i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
-	    else if( media_type.subtype == MEDIASUBTYPE_RGB555 )
-	       i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
-	    else if( media_type.subtype == MEDIASUBTYPE_RGB565 )
-	       i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
-	    else if( media_type.subtype == MEDIASUBTYPE_RGB24 )
-	       i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
-	    else if( media_type.subtype == MEDIASUBTYPE_RGB32 )
-	       i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
-	    else if( media_type.subtype == MEDIASUBTYPE_ARGB32 )
-	       i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
+        if( media_type.formattype == FORMAT_VideoInfo )
+        {
+            /* Packed RGB formats */
+            if( media_type.subtype == MEDIASUBTYPE_RGB1 )
+               i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '1' );
+            else if( media_type.subtype == MEDIASUBTYPE_RGB4 )
+               i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '4' );
+            else if( media_type.subtype == MEDIASUBTYPE_RGB8 )
+               i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
+            else if( media_type.subtype == MEDIASUBTYPE_RGB555 )
+               i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
+            else if( media_type.subtype == MEDIASUBTYPE_RGB565 )
+               i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
+            else if( media_type.subtype == MEDIASUBTYPE_RGB24 )
+               i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
+            else if( media_type.subtype == MEDIASUBTYPE_RGB32 )
+               i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
+            else if( media_type.subtype == MEDIASUBTYPE_ARGB32 )
+               i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
 
-	    /* Planar YUV formats */
-	    else if( media_type.subtype == MEDIASUBTYPE_I420 )
-	       i_fourcc = VLC_FOURCC( 'I', '4', '2', '0' );
-	    else if( media_type.subtype == MEDIASUBTYPE_Y41P )
-	       i_fourcc = VLC_FOURCC( 'I', '4', '1', '1' );
-	    else if( media_type.subtype == MEDIASUBTYPE_YV12 )
-	       i_fourcc = VLC_FOURCC( 'Y', 'V', '1', '2' );
-	    else if( media_type.subtype == MEDIASUBTYPE_IYUV )
-	       i_fourcc = VLC_FOURCC( 'Y', 'V', '1', '2' );
-	    else if( media_type.subtype == MEDIASUBTYPE_YVU9 )
-	       i_fourcc = VLC_FOURCC( 'Y', 'V', 'U', '9' );
+            /* Planar YUV formats */
+            else if( media_type.subtype == MEDIASUBTYPE_I420 )
+               i_fourcc = VLC_FOURCC( 'I', '4', '2', '0' );
+            else if( media_type.subtype == MEDIASUBTYPE_Y41P )
+               i_fourcc = VLC_FOURCC( 'I', '4', '1', '1' );
+            else if( media_type.subtype == MEDIASUBTYPE_YV12 )
+               i_fourcc = VLC_FOURCC( 'Y', 'V', '1', '2' );
+            else if( media_type.subtype == MEDIASUBTYPE_IYUV )
+               i_fourcc = VLC_FOURCC( 'Y', 'V', '1', '2' );
+            else if( media_type.subtype == MEDIASUBTYPE_YVU9 )
+               i_fourcc = VLC_FOURCC( 'Y', 'V', 'U', '9' );
 
-	    /* Packed YUV formats */
-	    else if( media_type.subtype == MEDIASUBTYPE_YVYU )
-	       i_fourcc = VLC_FOURCC( 'Y', 'V', 'Y', 'U' );
-	    else if( media_type.subtype == MEDIASUBTYPE_YUYV )
-	       i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
-	    else if( media_type.subtype == MEDIASUBTYPE_Y411 )
-	       i_fourcc = VLC_FOURCC( 'I', '4', '1', 'N' );
-	    else if( media_type.subtype == MEDIASUBTYPE_Y211 )
-	       i_fourcc = VLC_FOURCC( 'Y', '2', '1', '1' );
-	    else if( media_type.subtype == MEDIASUBTYPE_YUY2 )
-	       i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
-	    else if( media_type.subtype == MEDIASUBTYPE_UYVY )
-	       i_fourcc = VLC_FOURCC( 'U', 'Y', 'V', 'Y' );
+            /* Packed YUV formats */
+            else if( media_type.subtype == MEDIASUBTYPE_YVYU )
+               i_fourcc = VLC_FOURCC( 'Y', 'V', 'Y', 'U' );
+            else if( media_type.subtype == MEDIASUBTYPE_YUYV )
+               i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
+            else if( media_type.subtype == MEDIASUBTYPE_Y411 )
+               i_fourcc = VLC_FOURCC( 'I', '4', '1', 'N' );
+            else if( media_type.subtype == MEDIASUBTYPE_Y211 )
+               i_fourcc = VLC_FOURCC( 'Y', '2', '1', '1' );
+            else if( media_type.subtype == MEDIASUBTYPE_YUY2 )
+               i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
+            else if( media_type.subtype == MEDIASUBTYPE_UYVY )
+               i_fourcc = VLC_FOURCC( 'U', 'Y', 'V', 'Y' );
 
-	    /* MPEG2 video elementary stream */
-	    else if( media_type.subtype == MEDIASUBTYPE_MPEG2_VIDEO )
-	       i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'v' );
+            /* MPEG2 video elementary stream */
+            else if( media_type.subtype == MEDIASUBTYPE_MPEG2_VIDEO )
+               i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'v' );
 
-	    /* DV formats */
-	    else if( media_type.subtype == MEDIASUBTYPE_dvsl )
-	       i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'l' );
-	    else if( media_type.subtype == MEDIASUBTYPE_dvsd )
-	       i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'd' );
-	    else if( media_type.subtype == MEDIASUBTYPE_dvhd )
-	       i_fourcc = VLC_FOURCC( 'd', 'v', 'h', 'd' );
-	}
+            /* DV formats */
+            else if( media_type.subtype == MEDIASUBTYPE_dvsl )
+               i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'l' );
+            else if( media_type.subtype == MEDIASUBTYPE_dvsd )
+               i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'd' );
+            else if( media_type.subtype == MEDIASUBTYPE_dvhd )
+               i_fourcc = VLC_FOURCC( 'd', 'v', 'h', 'd' );
+        }
     }
     else if( media_type.majortype == MEDIATYPE_Audio )
     {
@@ -296,12 +290,13 @@ int GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type)
         }
     }
     else if( media_type.majortype == MEDIATYPE_Stream )
-        {
+    {
         if( media_type.subtype == MEDIASUBTYPE_MPEG2_PROGRAM )
-                   i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'p' );
+            i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'p' );
         else if( media_type.subtype == MEDIASUBTYPE_MPEG2_TRANSPORT )
-                   i_fourcc = VLC_FOURCC( 'm', 'p', '2', 't' );
+            i_fourcc = VLC_FOURCC( 'm', 'p', '2', 't' );
     }
+
     return i_fourcc;
 }
 
@@ -309,10 +304,12 @@ int GetFourCCFromMediaType(const AM_MEDIA_TYPE &media_type)
  * Implementation of our dummy directshow filter pin class
  ****************************************************************************/
 
-CapturePin::CapturePin( access_t * _p_input, CaptureFilter *_p_filter,
+CapturePin::CapturePin( vlc_object_t *_p_input, access_sys_t *_p_sys,
+                        CaptureFilter *_p_filter,
                         AM_MEDIA_TYPE *mt, size_t mt_count )
-  : p_input( _p_input ), p_filter( _p_filter ), p_connected_pin( NULL ),
-    media_types(mt), media_type_count(mt_count), i_ref( 1 )
+  : p_input( _p_input ), p_sys( _p_sys ), p_filter( _p_filter ),
+    p_connected_pin( NULL ),  media_types(mt), media_type_count(mt_count),
+    i_ref( 1 )
 {
     cx_media_type.majortype = mt[0].majortype;
     cx_media_type.subtype   = GUID_NULL;
@@ -338,7 +335,6 @@ HRESULT CapturePin::CustomGetSample( VLCMediaSample *vlc_sample )
     msg_Dbg( p_input, "CapturePin::CustomGetSample" );
 #endif
 
-    access_sys_t *p_sys = p_input->p_sys;
     vlc_mutex_lock( &p_sys->lock );
     if( samples_queue.size() )
     {
@@ -415,70 +411,73 @@ STDMETHODIMP_(ULONG) CapturePin::Release()
 STDMETHODIMP CapturePin::Connect( IPin * pReceivePin,
                                   const AM_MEDIA_TYPE *pmt )
 {
-    if( State_Running != p_filter->state )
+    if( State_Running == p_filter->state )
     {
-        if( ! p_connected_pin )
-        {
-            if( ! pmt )
-                return S_OK;
-                
-            if( (GUID_NULL != pmt->majortype) && (media_types[0].majortype != pmt->majortype) )
-		msg_Dbg( p_input, "CapturePin::Connect [media major type mismatch]" );
-                return S_FALSE;
+        msg_Dbg( p_input, "CapturePin::Connect [not stopped]" );
+        return VFW_E_NOT_STOPPED;
+    }
 
-            if( (GUID_NULL != pmt->subtype) && (! GetFourCCFromMediaType(*pmt)) )
-		msg_Dbg( p_input, "CapturePin::Connect [media subtype type not supported]" );
-                return S_FALSE;
-
-            if( pmt->pbFormat )
-            {
-                if( pmt->majortype == MEDIATYPE_Video  )
-                {
-                    if( (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight == 0) )
-		    {
-			msg_Dbg( p_input, "CapturePin::Connect [video height == 0]" );
-                        return S_FALSE;
-		    }
-                    if( (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth == 0) )
-		    {
-			msg_Dbg( p_input, "CapturePin::Connect [video width == 0]" );
-                        return S_FALSE;
-		    }
-                }
-            }
-	    msg_Dbg( p_input, "CapturePin::Connect [OK]" );
-            return S_OK;
-        }
-	msg_Dbg( p_input, "CapturePin::Connect [already connected]" );
+    if( p_connected_pin )
+    {
+        msg_Dbg( p_input, "CapturePin::Connect [already connected]" );
         return VFW_E_ALREADY_CONNECTED;
     }
-    msg_Dbg( p_input, "CapturePin::Connect [not stopped]" );
-    return VFW_E_NOT_STOPPED;
+
+    if( !pmt ) return S_OK;
+                
+    if( GUID_NULL != pmt->majortype &&
+        media_types[0].majortype != pmt->majortype )
+    {
+        msg_Dbg( p_input, "CapturePin::Connect [media major type mismatch]" );
+        return S_FALSE;
+    }
+
+    if( GUID_NULL != pmt->subtype && !GetFourCCFromMediaType(*pmt) )
+    {
+        msg_Dbg( p_input, "CapturePin::Connect [media subtype type "
+                 "not supported]" );
+        return S_FALSE;
+    }
+
+    if( pmt->pbFormat && pmt->majortype == MEDIATYPE_Video  )
+    {
+        if( !((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight ||
+            !((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth )
+        {
+            msg_Dbg( p_input, "CapturePin::Connect "
+                     "[video width/height == 0 ]" );
+            return S_FALSE;
+        }
+    }
+
+    msg_Dbg( p_input, "CapturePin::Connect [OK]" );
+    return S_OK;
 }
 STDMETHODIMP CapturePin::ReceiveConnection( IPin * pConnector,
                                             const AM_MEDIA_TYPE *pmt )
 {
     if( State_Stopped != p_filter->state )
     {
-	msg_Dbg( p_input, "CapturePin::ReceiveConnection [not stopped]" );
+        msg_Dbg( p_input, "CapturePin::ReceiveConnection [not stopped]" );
         return VFW_E_NOT_STOPPED;
     }
 
     if( !pConnector || !pmt )
     {
-	msg_Dbg( p_input, "CapturePin::ReceiveConnection [null pointer]" );
+        msg_Dbg( p_input, "CapturePin::ReceiveConnection [null pointer]" );
         return E_POINTER;
     }
 
     if( p_connected_pin )
     {
-	msg_Dbg( p_input, "CapturePin::ReceiveConnection [already connected]" );
+        msg_Dbg( p_input, "CapturePin::ReceiveConnection [already connected]");
         return VFW_E_ALREADY_CONNECTED;
     }
 
     if( S_OK != QueryAccept(pmt) )
     {
-	msg_Dbg( p_input, "CapturePin::ReceiveConnection [media type not accepted]" );
+        msg_Dbg( p_input, "CapturePin::ReceiveConnection "
+                 "[media type not accepted]" );
         return VFW_E_TYPE_NOT_ACCEPTED;
     }
 
@@ -494,15 +493,14 @@ STDMETHODIMP CapturePin::Disconnect()
 {
     if( ! p_connected_pin )
     {
-	msg_Dbg( p_input, "CapturePin::Disconnect [not connected]" );
-	return S_FALSE;
+        msg_Dbg( p_input, "CapturePin::Disconnect [not connected]" );
+        return S_FALSE;
     }
 
     msg_Dbg( p_input, "CapturePin::Disconnect [OK]" );
 
 #if 0 // FIXME: This does seem to create crashes sometimes
     VLCMediaSample vlc_sample;
-    access_sys_t *p_sys = p_input->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
     while( samples_queue.size() )
@@ -525,8 +523,8 @@ STDMETHODIMP CapturePin::ConnectedTo( IPin **pPin )
 {
     if( !p_connected_pin )
     {
-	msg_Dbg( p_input, "CapturePin::ConnectedTo [not connected]" );
-	return VFW_E_NOT_CONNECTED;
+        msg_Dbg( p_input, "CapturePin::ConnectedTo [not connected]" );
+        return VFW_E_NOT_CONNECTED;
     }
 
     p_connected_pin->AddRef();
@@ -540,8 +538,8 @@ STDMETHODIMP CapturePin::ConnectionMediaType( AM_MEDIA_TYPE *pmt )
 {
     if( !p_connected_pin )
     {
-	msg_Dbg( p_input, "CapturePin::ConnectionMediaType [not connected]" );
-	return VFW_E_NOT_CONNECTED;
+        msg_Dbg( p_input, "CapturePin::ConnectionMediaType [not connected]" );
+        return VFW_E_NOT_CONNECTED;
     }
 
     return CopyMediaType( pmt, &cx_media_type );
@@ -581,56 +579,59 @@ STDMETHODIMP CapturePin::QueryId( LPWSTR * Id )
 }
 STDMETHODIMP CapturePin::QueryAccept( const AM_MEDIA_TYPE *pmt )
 {
-    if( State_Stopped == p_filter->state )
+    if( State_Stopped != p_filter->state )
     {
-        if( media_types[0].majortype == pmt->majortype )
-        {
-	    int i_chroma = GetFourCCFromMediaType(*pmt);
-            if( 0 != i_chroma )
-            {
-                if( pmt->majortype == MEDIATYPE_Video )
-		{
-                    if( pmt->pbFormat &&
-                        ((((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight == 0) ||
-                         (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth == 0)) )
-		    {
-			msg_Dbg( p_input, "CapturePin::QueryAccept [video size wxh == 0]" );
-                        return S_FALSE;
-		    }
-		    msg_Dbg( p_input, "CapturePin::QueryAccept [OK] (width=%ld, height=%ld, chroma=%4.4s)",
-			((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth,
-			((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight,
-			(char *)&i_chroma	
-		    );
-		}
-		else {
-		    msg_Dbg( p_input, "CapturePin::QueryAccept [OK] (channels=%d, samples/sec=%lu, bits/samples=%d, format=%4.4s)",
-			((WAVEFORMATEX *)pmt->pbFormat)->nChannels,
-			((WAVEFORMATEX *)pmt->pbFormat)->nSamplesPerSec,
-			((WAVEFORMATEX *)pmt->pbFormat)->wBitsPerSample,
-			 (char *)&i_chroma
-		    );
-		}	
+        msg_Dbg( p_input, "CapturePin::QueryAccept [not stopped]" );
+        return S_FALSE;
+    }
 
-                if( p_connected_pin )
-		{
-		    FreeMediaType( cx_media_type );
-		    CopyMediaType( &cx_media_type, pmt );
-		}
-		return S_OK;
-            }
-	    else {	
-		msg_Dbg( p_input, "CapturePin::QueryAccept [media type not supported]" );
-	    }
+    if( media_types[0].majortype != pmt->majortype )
+    {
+        msg_Dbg( p_input, "CapturePin::QueryAccept [media type mismatch]" );
+        return S_FALSE;
+    }
+
+    int i_fourcc = GetFourCCFromMediaType(*pmt);
+    if( !i_fourcc )
+    {   
+        msg_Dbg( p_input, "CapturePin::QueryAccept "
+                 "[media type not supported]" );
+        return S_FALSE;
+    }
+
+    if( pmt->majortype == MEDIATYPE_Video )
+    {
+        if( pmt->pbFormat &&
+            ( (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight == 0) ||
+              (((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth == 0) ) )
+        {
+            msg_Dbg( p_input, "CapturePin::QueryAccept [video size wxh == 0]");
+            return S_FALSE;
         }
-	else {	
-	    msg_Dbg( p_input, "CapturePin::QueryAccept [media type mismatch]" );
-	}
+
+        msg_Dbg( p_input, "CapturePin::QueryAccept [OK] "
+                 "(width=%ld, height=%ld, chroma=%4.4s)",
+                 ((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biWidth,
+                 ((VIDEOINFOHEADER *)pmt->pbFormat)->bmiHeader.biHeight,
+                 (char *)&i_fourcc );
     }
-    else {	
-	msg_Dbg( p_input, "CapturePin::QueryAccept [not stopped]" );
+    else
+    {
+        msg_Dbg( p_input, "CapturePin::QueryAccept [OK] (channels=%d, "
+                 "samples/sec=%lu, bits/samples=%d, format=%4.4s)",
+                 ((WAVEFORMATEX *)pmt->pbFormat)->nChannels,
+                 ((WAVEFORMATEX *)pmt->pbFormat)->nSamplesPerSec,
+                 ((WAVEFORMATEX *)pmt->pbFormat)->wBitsPerSample,
+                 (char *)&i_fourcc );
+    }   
+
+    if( p_connected_pin )
+    {
+        FreeMediaType( cx_media_type );
+        CopyMediaType( &cx_media_type, pmt );
     }
-    return S_FALSE;
+
+    return S_OK;
 }
 STDMETHODIMP CapturePin::EnumMediaTypes( IEnumMediaTypes **ppEnum )
 {
@@ -718,7 +719,6 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
     mtime_t i_timestamp = mdate() * 10;
     VLCMediaSample vlc_sample = {pSample, i_timestamp};
 
-    access_sys_t *p_sys = p_input->p_sys;
     vlc_mutex_lock( &p_sys->lock );
     samples_queue.push_front( vlc_sample );
 
@@ -763,10 +763,11 @@ STDMETHODIMP CapturePin::ReceiveCanBlock( void )
 /****************************************************************************
  * Implementation of our dummy directshow filter class
  ****************************************************************************/
-CaptureFilter::CaptureFilter( access_t * _p_input, AM_MEDIA_TYPE *mt,
-                              size_t mt_count )
-  : p_input( _p_input ), p_pin( new CapturePin( _p_input, this, mt, mt_count ) ),
-  state( State_Stopped ), i_ref( 1 ) 
+CaptureFilter::CaptureFilter( vlc_object_t *_p_input, access_sys_t *p_sys,
+                              AM_MEDIA_TYPE *mt, size_t mt_count )
+  : p_input( _p_input ),
+    p_pin( new CapturePin( _p_input, p_sys, this, mt, mt_count ) ),
+    state( State_Stopped ), i_ref( 1 ) 
 {
 }
 
@@ -967,7 +968,7 @@ CapturePin *CaptureFilter::CustomGetPin()
  * Implementation of our dummy directshow enumpins class
  ****************************************************************************/
 
-CaptureEnumPins::CaptureEnumPins( access_t * _p_input,
+CaptureEnumPins::CaptureEnumPins( vlc_object_t *_p_input,
                                   CaptureFilter *_p_filter,
                                   CaptureEnumPins *pEnumPins )
   : p_input( _p_input ), p_filter( _p_filter ), i_ref( 1 )
@@ -1096,7 +1097,7 @@ STDMETHODIMP CaptureEnumPins::Clone( IEnumPins **ppEnum )
 /****************************************************************************
  * Implementation of our dummy directshow enummediatypes class
  ****************************************************************************/
-CaptureEnumMediaTypes::CaptureEnumMediaTypes( access_t * _p_input,
+CaptureEnumMediaTypes::CaptureEnumMediaTypes( vlc_object_t *_p_input,
     CapturePin *_p_pin, CaptureEnumMediaTypes *pEnumMediaTypes )
   : p_input( _p_input ), p_pin( _p_pin ), i_ref( 1 )
 {
@@ -1106,12 +1107,12 @@ CaptureEnumMediaTypes::CaptureEnumMediaTypes( access_t * _p_input,
     /* Are we creating a new enumerator */
     if( pEnumMediaTypes == NULL )
     {
-	CopyMediaType(&cx_media_type, &p_pin->cx_media_type); 
+        CopyMediaType(&cx_media_type, &p_pin->cx_media_type); 
         i_position = 0;
     }
     else
     {
-	CopyMediaType(&cx_media_type, &pEnumMediaTypes->cx_media_type); 
+        CopyMediaType(&cx_media_type, &pEnumMediaTypes->cx_media_type); 
         i_position = pEnumMediaTypes->i_position;
     }
 }
@@ -1186,31 +1187,33 @@ STDMETHODIMP CaptureEnumMediaTypes::Next( ULONG cMediaTypes,
     ** use connection media type as first entry in iterator if it exists
     */
     copied = 0;
-    if( cx_media_type.subtype != GUID_NULL ) {
-	++max;
-	if( i_position == 0 ) {
-	    ppMediaTypes[copied] = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-	    if( CopyMediaType(ppMediaTypes[copied], &cx_media_type) != S_OK )
-		return E_OUTOFMEMORY;
-	    ++i_position; 
-	    ++copied;
-	}
+    if( cx_media_type.subtype != GUID_NULL )
+    {
+        ++max;
+        if( i_position == 0 )
+        {
+            ppMediaTypes[copied] =
+                (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
+            if( CopyMediaType(ppMediaTypes[copied], &cx_media_type) != S_OK )
+                return E_OUTOFMEMORY;
+            ++i_position; 
+            ++copied;
+        }
     }
 
     while( (copied < cMediaTypes) && (i_position < max)  )
     {
-        ppMediaTypes[copied] = (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-        if( CopyMediaType(ppMediaTypes[copied], &p_pin->media_types[i_position-offset]) != S_OK )
+        ppMediaTypes[copied] =
+            (AM_MEDIA_TYPE *)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
+        if( CopyMediaType( ppMediaTypes[copied],
+                           &p_pin->media_types[i_position-offset]) != S_OK )
             return E_OUTOFMEMORY;
 
-	++copied;
+        ++copied;
         ++i_position; 
     }
 
-    if( pcFetched ) 
-    {
-        *pcFetched = copied;
-    }
+    if( pcFetched )  *pcFetched = copied;
 
     return (copied == cMediaTypes) ? S_OK : S_FALSE;
 };
@@ -1219,7 +1222,7 @@ STDMETHODIMP CaptureEnumMediaTypes::Skip( ULONG cMediaTypes )
     ULONG max =  p_pin->media_type_count;
     if( cx_media_type.subtype != GUID_NULL )
     {
-	max = 1;
+        max = 1;
     }
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureEnumMediaTypes::Skip" );
