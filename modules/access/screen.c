@@ -74,6 +74,13 @@ struct demux_sys_t
 
 #ifndef WIN32
     Display *p_display;
+
+#else
+    HDC hdc_src;
+    HDC hdc_dst;
+    HBITMAP hbmp;
+    HGDIOBJ hgdi_backup;
+    uint8_t *p_buffer;
 #endif
 };
 
@@ -105,6 +112,10 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
+
+    msg_Dbg( p_demux, "screen width: %i, height: %i, depth: %i",
+             p_sys->fmt.video.i_width, p_sys->fmt.video.i_height,
+             p_sys->fmt.video.i_bits_per_pixel );
 
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 
@@ -166,7 +177,88 @@ static int Demux( demux_t *p_demux )
 #ifdef WIN32
 static int InitCapture( demux_t *p_demux )
 {
-    return VLC_EGENERIC;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    int i_chroma;
+
+    BITMAPINFO bmi;
+
+    /* Get the device context for the whole screen */
+    p_sys->hdc_src = CreateDC( "DISPLAY", NULL, NULL, NULL );
+    if( !p_sys->hdc_src )
+    {
+        msg_Err( p_demux, "cannot get device context" );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->hdc_dst = CreateCompatibleDC( p_sys->hdc_src );
+    if( !p_sys->hdc_dst )
+    {
+        msg_Err( p_demux, "cannot get compat device context" );
+        ReleaseDC( 0, p_sys->hdc_src );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->fmt.video.i_bits_per_pixel =
+        GetDeviceCaps( p_sys->hdc_src, BITSPIXEL );
+    switch( p_sys->fmt.video.i_bits_per_pixel )
+    {
+    case 8: /* FIXME: set the palette */
+        i_chroma = VLC_FOURCC('R','G','B','2'); break;
+    case 15:
+        i_chroma = VLC_FOURCC('R','V','1','5'); break;
+    case 16:
+        i_chroma = VLC_FOURCC('R','V','1','6'); break;
+    case 24:
+        i_chroma = VLC_FOURCC('R','V','2','4'); break;
+    case 32:
+        i_chroma = VLC_FOURCC('R','V','3','2'); break;
+    default:
+        msg_Err( p_demux, "unknown screen depth %i",
+                 p_sys->fmt.video.i_bits_per_pixel );
+        ReleaseDC( 0, p_sys->hdc_src );
+        ReleaseDC( 0, p_sys->hdc_dst );
+        return VLC_EGENERIC;
+    }
+
+    es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
+    p_sys->fmt.video.i_width  = GetDeviceCaps( p_sys->hdc_src, HORZRES );
+    p_sys->fmt.video.i_height = GetDeviceCaps( p_sys->hdc_src, VERTRES );
+    p_sys->fmt.video.i_bits_per_pixel =
+        GetDeviceCaps( p_sys->hdc_src, BITSPIXEL );
+
+    /* Create the bitmap info header */
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = p_sys->fmt.video.i_width;
+    bmi.bmiHeader.biHeight = - p_sys->fmt.video.i_height;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = p_sys->fmt.video.i_bits_per_pixel;
+    bmi.bmiHeader.biCompression = BI_RGB;
+    bmi.bmiHeader.biSizeImage = 0;
+    bmi.bmiHeader.biXPelsPerMeter =
+        bmi.bmiHeader.biYPelsPerMeter = 0;
+    bmi.bmiHeader.biClrUsed = 0;
+    bmi.bmiHeader.biClrImportant = 0;
+
+    /* Create the bitmap storage space */
+    p_sys->hbmp = CreateDIBSection( p_sys->hdc_dst, (BITMAPINFO *)&bmi,
+        DIB_RGB_COLORS, (void **)&p_sys->p_buffer, NULL, 0 );
+    if( !p_sys->hbmp || !p_sys->p_buffer )
+    {
+        msg_Err( p_demux, "cannot create bitmap" );
+        if( p_sys->hbmp ) DeleteObject( p_sys->hbmp );
+        ReleaseDC( 0, p_sys->hdc_src );
+        DeleteDC( p_sys->hdc_dst );
+        return VLC_EGENERIC;
+    }
+
+    /* Select the bitmap into the compatible DC */
+    p_sys->hgdi_backup = SelectObject( p_sys->hdc_dst, p_sys->hbmp );
+    if( !p_sys->hgdi_backup )
+    {
+        msg_Err( p_demux, "cannot select bitmap" );
+    }
+
+    return VLC_SUCCESS;
 }
 #else
 
@@ -215,6 +307,7 @@ static int InitCapture( demux_t *p_demux )
     es_format_Init( &p_sys->fmt, VIDEO_ES, i_chroma );
     p_sys->fmt.video.i_width  = win_info.width;
     p_sys->fmt.video.i_height = win_info.height;
+    p_sys->fmt.video.i_bits_per_pixel = win_info.depth;
 
 #if 0
     win_info.visual->red_mask;
@@ -230,8 +323,15 @@ static int InitCapture( demux_t *p_demux )
 #ifdef WIN32
 static int CloseCapture( demux_t *p_demux )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    SelectObject( p_sys->hdc_dst, p_sys->hgdi_backup );
+    DeleteObject( p_sys->hbmp );
+    DeleteDC( p_sys->hdc_dst );
+    ReleaseDC( 0, p_sys->hdc_src );
     return VLC_SUCCESS;
 }
+
 #else
 static int CloseCapture( demux_t *p_demux )
 {
@@ -245,8 +345,32 @@ static int CloseCapture( demux_t *p_demux )
 #ifdef WIN32
 static block_t *Capture( demux_t *p_demux )
 {
-    return NULL;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t *p_block;
+    int i_size;
+
+    if( !BitBlt( p_sys->hdc_dst, 0, 0,
+                 p_sys->fmt.video.i_width, p_sys->fmt.video.i_height,
+                 p_sys->hdc_src, 0, 0, SRCCOPY ) )
+    {
+        msg_Err( p_demux, "error during BitBlt()" );
+        return NULL;
+    }
+
+    i_size = (p_sys->fmt.video.i_bits_per_pixel + 7) / 8 *
+        p_sys->fmt.video.i_width * p_sys->fmt.video.i_height;
+
+    if( !( p_block = block_New( p_demux, i_size ) ) )
+    {
+        msg_Warn( p_demux, "cannot get block" );
+        return 0;
+    }
+
+    memcpy( p_block->p_buffer, p_sys->p_buffer, i_size );
+
+    return p_block;
 }
+
 #else
 static block_t *Capture( demux_t *p_demux )
 {
