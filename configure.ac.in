@@ -2440,8 +2440,13 @@ if test "x${enable_skins}" != "xno"; then
         CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
         LDFLAGS_skins="${LDFLAGS_skins} -lstdc++  ${GTK2_LIBS}"
       else
+
       	IMLIB2_PATH="${PATH}"
         AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
+        if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
+          AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-skins.])
+        fi
+
         PLUGINS="${PLUGINS} skins"
         CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
         LDFLAGS_skins="${LDFLAGS_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
@@ -2473,8 +2478,13 @@ if test "x${enable_basic_skins}" = "xyes"; then
       CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
       LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++  ${GTK2_LIBS}"
     else
+
       IMLIB2_PATH="${PATH}"
       AC_PATH_PROG(IMLIB2_CONFIG_SKINS, imlib2-config, no, ${IMLIB2_PATH})
+      if test "x${IMLIB2_CONFIG_SKINS}" = "xno"; then
+      AC_MSG_ERROR([Couldn't find the imlib2 package. You can download imlib2 from http://enlightenment.org/, or configure with --disable-basic-skins.])
+      fi
+
       CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} `${IMLIB2_CONFIG_SKINS} --cflags` -DX11_SKINS"
       LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++ -L${x_libraries} -lXext -lX11 `${IMLIB2_CONFIG_SKINS} --libs`"
     fi

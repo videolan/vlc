@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.17 2003/05/26 02:09:27 gbazin Exp $
+ * $Id: win32_run.cpp,v 1.18 2003/06/03 22:18:58 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,16 +30,6 @@
 #include <vlc/intf.h>
 
 //--- GENERAL ---------------------------------------------------------------
-#ifndef BASIC_SKINS
-#ifdef WIN32                                               /* mingw32 hack */
-#   undef Yield
-#   undef CreateDialog
-#endif
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-#include <wx/wx.h>
-#endif
-
 #include <windows.h>
 
 //--- SKIN ------------------------------------------------------------------
@@ -54,153 +44,11 @@
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
 
-#ifndef BASIC_SKINS
-#include "../../wxwindows/wxwindows.h"
-#include "share/vlc32x32.xpm"       // include the graphic icon
-#endif
-
 //---------------------------------------------------------------------------
 // Specific method
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg );
 int  SkinManage( intf_thread_t *p_intf );
-
-
-#ifndef BASIC_SKINS
-//---------------------------------------------------------------------------
-// Local classes declarations.
-//---------------------------------------------------------------------------
-class Instance: public wxApp
-{
-public:
-    Instance();
-    Instance( intf_thread_t *_p_intf );
-
-    bool OnInit();
-    int  OnExit();
-    OpenDialog *open;
-
-private:
-    intf_thread_t *p_intf;
-};
-
-class ExitTimer: public wxTimer
-{
-public:
-    ExitTimer( intf_thread_t *_p_intf );
-
-    void Notify();
-
-private:
-    intf_thread_t *p_intf;
-};
-
-
-//---------------------------------------------------------------------------
-// Implementation of Instance class
-//---------------------------------------------------------------------------
-Instance::Instance( )
-{
-}
-
-Instance::Instance( intf_thread_t *_p_intf )
-{
-    // Initialization
-    p_intf = _p_intf;
-}
-
-IMPLEMENT_APP_NO_MAIN(Instance)
-
-bool Instance::OnInit()
-{
-    p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
-
-    // Create all the dialog boxes
-    p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
-    p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
-    p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
-    p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
-    p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
-
-    // Start a timer checking if we must exit the main loop
-    p_intf->p_sys->b_wx_die = 0;
-    p_intf->p_sys->p_kludgy_timer = new ExitTimer( p_intf );
-    p_intf->p_sys->p_kludgy_timer->Start( 100 );
-
-    // OK, initialization is over, now the other thread can go on working...
-    vlc_thread_ready( p_intf );
-
-    return TRUE;
-}
-
-int Instance::OnExit()
-{
-    // Delete evertything
-    delete p_intf->p_sys->p_kludgy_timer;
-    delete p_intf->p_sys->InfoDlg;
-    delete p_intf->p_sys->PrefsDlg;
-    delete p_intf->p_sys->SoutDlg;
-    delete p_intf->p_sys->MessagesDlg;
-    delete p_intf->p_sys->OpenDlg;
-    delete p_intf->p_sys->p_icon;
-
-    return 0;
-}
-
-
-//---------------------------------------------------------------------------
-// Implementation of ExitTimer class
-// This timer is only there to call wxApp::ExitMainLoop() from the wxWindows
-// thread (otherwise we never exit from the wxEntry call).
-//---------------------------------------------------------------------------
-ExitTimer::ExitTimer( intf_thread_t *_p_intf ) : wxTimer()
-{
-    p_intf = _p_intf;
-}
-
-void ExitTimer::Notify()
-{
-    if( p_intf->p_sys->b_wx_die )
-        wxTheApp->ExitMainLoop();
-}
-
-
-//---------------------------------------------------------------------------
-#if !defined(__BUILTIN__) && defined( WIN32 )
-HINSTANCE hInstance = 0;
-extern "C" BOOL WINAPI
-DllMain (HANDLE hModule, DWORD fdwReason, LPVOID lpReserved)
-{
-    hInstance = (HINSTANCE)hModule;
-    return TRUE;
-}
-#endif
-
-
-//---------------------------------------------------------------------------
-// Thread callback
-// We create all wxWindows dialogs in a separate thread because we don't want
-// any interaction with our own message loop
-//---------------------------------------------------------------------------
-void SkinsDialogsThread( intf_thread_t *p_intf )
-{
-    /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
-    wxTheApp = new Instance( p_intf );
-
-#if defined( WIN32 )
-#if !defined(__BUILTIN__)
-    wxEntry( hInstance/*GetModuleHandle(NULL)*/, NULL, NULL, SW_SHOW, TRUE );
-#else
-    wxEntry( GetModuleHandle( NULL ), NULL, NULL, SW_SHOW, TRUE );
-#endif
-#else
-    wxEntry( 1, p_args );
-#endif
-
-    return;
-}
-
-#endif // WX_SKINS
 
 //---------------------------------------------------------------------------
 // Refresh Timer Callback
@@ -214,7 +62,6 @@ void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
 //---------------------------------------------------------------------------
 
 
-
 //---------------------------------------------------------------------------
 // Win32 interface
 //---------------------------------------------------------------------------
@@ -225,17 +72,6 @@ void OSRun( intf_thread_t *p_intf )
     list<SkinWindow *>::const_iterator win;
     Event *ProcessEvent;
     int KeyModifier = 0;
-
-#ifndef BASIC_SKINS
-    // Create a new thread for wxWindows
-    if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
-                           0, VLC_TRUE ) )
-    {
-        msg_Err( p_intf, "cannot create SkinsDialogsThread" );
-        // Don't even enter the main loop
-        return;
-    }
-#endif
 
      // Create refresh timer
     SetTimer( ((OSTheme *)p_intf->p_sys->p_theme)->GetParentWindow(), 42, 200,
@@ -349,11 +185,6 @@ void OSRun( intf_thread_t *p_intf )
         // Check if vlc is closing
         Proc->IsClosing();
     }
-
-#ifndef BASIC_SKINS
-    // Tell wxWindows it's time to exit
-    p_intf->p_sys->b_wx_die = 1;
-#endif
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )

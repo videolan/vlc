@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.33 2003/05/27 11:35:34 gbazin Exp $
+ * $Id: wxwindows.h,v 1.34 2003/06/03 22:18:58 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -355,8 +355,8 @@ private:
     int i_access_type;
 
     wxComboBox *file_combo;
-    wxSpinCtrl *net_port;
-    wxTextCtrl *net_addr;
+    wxSpinCtrl *net_ports[5];
+    wxTextCtrl *net_addrs[5];
 
     /* Controls for the encapsulation */
     wxRadioButton *encapsulation_radios[5];

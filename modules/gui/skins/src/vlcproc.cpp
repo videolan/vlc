@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.28 2003/06/01 16:39:49 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.29 2003/06/03 22:18:58 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -49,6 +49,7 @@
 #include "window.h"
 #include "vlcproc.h"
 #include "skin_common.h"
+#include "dialogs.h"
 
 #ifndef BASIC_SKINS
 #include "../../wxwindows/wxwindows.h"
@@ -103,10 +104,9 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_OPEN:
 #ifndef BASIC_SKINS
-            wxMutexGuiEnter();
-            OpenFile( true );
-            wxMutexGuiLeave();
-#endif            
+            p_intf->p_sys->p_dialogs->ShowOpen( TRUE );
+            InterfaceRefresh();
+#endif
             return true;
 
         case VLC_LOAD_SKIN:
@@ -139,35 +139,25 @@ bool VlcProc::EventProc( Event *evt )
 
         case VLC_PLAYLIST_ADD_FILE:
 #ifndef BASIC_SKINS
-            wxMutexGuiEnter();
-            OpenFile( false );
-            wxMutexGuiLeave();
-#endif            
+            p_intf->p_sys->p_dialogs->ShowOpen( FALSE );
+            InterfaceRefresh();
+#endif
             return true;
 
 #ifndef BASIC_SKINS
         case VLC_LOG_SHOW:
-            wxMutexGuiEnter();
-            p_intf->p_sys->MessagesDlg->Show(
-                !p_intf->p_sys->MessagesDlg->IsShown() );
-            wxMutexGuiLeave();
+            p_intf->p_sys->p_dialogs->ShowMessages();
             return true;
 
         case VLC_LOG_CLEAR:
             return true;
 
         case VLC_PREFS_SHOW:
-            wxMutexGuiEnter();
-            p_intf->p_sys->PrefsDlg->Show(
-                !p_intf->p_sys->PrefsDlg->IsShown() );
-            wxMutexGuiLeave();
+            p_intf->p_sys->p_dialogs->ShowPrefs();
             return true;
 
         case VLC_INFO_SHOW:
-            wxMutexGuiEnter();
-            p_intf->p_sys->InfoDlg->Show(
-                !p_intf->p_sys->InfoDlg->IsShown() );
-            wxMutexGuiLeave();
+            p_intf->p_sys->p_dialogs->ShowFileInfo();
             return true;
 #endif
 
@@ -405,50 +395,6 @@ void VlcProc::LoadSkin()
 #endif
 }
 //---------------------------------------------------------------------------
-void VlcProc::OpenFile( bool play )
-{
-#ifndef BASIC_SKINS
-    if( p_intf->p_sys->OpenDlg->ShowModal() != wxID_OK )
-    {
-        return;
-    }
-
-    // Check if playlist is available
-    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-    if( p_playlist == NULL )
-    {
-        return;
-    }
-
-    if( play )
-    {
-        // Append and play
-        for( size_t i = 0; i < p_intf->p_sys->OpenDlg->mrl.GetCount(); i++ )
-        {
-            playlist_Add( p_playlist,
-                (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
-                PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
-        }
-        p_intf->p_sys->p_theme->EvtBank->Get( "play" )->SendEvent();
-    }
-    else
-    {
-        // Append only
-        for( size_t i = 0; i < p_intf->p_sys->OpenDlg->mrl.GetCount(); i++ )
-        {
-            playlist_Add( p_playlist,
-                (const char *)p_intf->p_sys->OpenDlg->mrl[i].mb_str(),
-                PLAYLIST_APPEND, PLAYLIST_END );
-        }
-    }
-
-    // Refresh interface !
-    p_intf->p_sys->p_theme->EvtBank->Get( "playlist_refresh" )
-        ->PostSynchroMessage();
-    InterfaceRefresh();
-#endif
-}
-//---------------------------------------------------------------------------
 void VlcProc::DropFile( unsigned int param )
 {
     // Get pointer to file
@@ -628,4 +574,3 @@ void VlcProc::AddNetworkUDP( int port )
     InterfaceRefresh();
 }
 //---------------------------------------------------------------------------
-

@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.13 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_run.cpp,v 1.14 2003/06/03 22:18:58 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -27,13 +27,6 @@
 //--- X11 -------------------------------------------------------------------
 #include <X11/Xlib.h>
 
-//--- WXWINDOWS -------------------------------------------------------------
-#ifndef BASIC_SKINS
-/* Let vlc take care of the i18n stuff */
-#define WXINTL_NO_GETTEXT_MACRO
-#include <wx/wx.h>
-#endif
-
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
 
@@ -49,100 +42,11 @@
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
 
-#ifndef BASIC_SKINS
-#include "../../wxwindows/wxwindows.h"
-#endif
-
-// include the icon graphic
-#include "share/vlc32x32.xpm"
-
 //---------------------------------------------------------------------------
 // Specific method
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg );
 int  SkinManage( intf_thread_t *p_intf );
-
-
-#ifndef BASIC_SKINS
-//---------------------------------------------------------------------------
-// Local classes declarations.
-//---------------------------------------------------------------------------
-class Instance: public wxApp
-{
-public:
-    Instance();
-    Instance( intf_thread_t *_p_intf );
-
-    bool OnInit();
-    int  OnExit();
-    OpenDialog *open;
-
-private:
-    intf_thread_t *p_intf;
-};
-
-//---------------------------------------------------------------------------
-// Implementation of Instance class
-//---------------------------------------------------------------------------
-Instance::Instance( )
-{
-}
-
-Instance::Instance( intf_thread_t *_p_intf )
-{
-    // Initialization
-    p_intf = _p_intf;
-}
-
-IMPLEMENT_APP_NO_MAIN(Instance)
-
-bool Instance::OnInit()
-{
-    p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
-
-    // Create all the dialog boxes
-    p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
-    p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
-    p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
-    p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
-    p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
-
-    // OK, initialization is over, now the other thread can go on working...
-    vlc_thread_ready( p_intf );
-
-    return TRUE;
-}
-
-int Instance::OnExit()
-{
-    // Delete evertything
-    delete p_intf->p_sys->InfoDlg;
-    delete p_intf->p_sys->PrefsDlg;
-    delete p_intf->p_sys->SoutDlg;
-    delete p_intf->p_sys->MessagesDlg;
-    delete p_intf->p_sys->OpenDlg;
-    delete p_intf->p_sys->p_icon;
-
-    return 0;
-}
-
-//---------------------------------------------------------------------------
-// Thread callback
-// We create all wxWindows dialogs in a separate thread because we don't want
-// any interaction with our own message loop
-//---------------------------------------------------------------------------
-void SkinsDialogsThread( intf_thread_t *p_intf )
-{
-    /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
-    wxTheApp = new Instance( p_intf );
-
-    static char  *p_args[] = { "" };
-    wxEntry( 1, p_args );
-
-    return;
-}
-
-#endif // WX_SKINS
 
 //---------------------------------------------------------------------------
 // X11 event processing
@@ -203,9 +107,6 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     {
         if( !proc->EventProc( evt ) )
         {
-#ifndef BASIC_SKINS
-            wxExit();
-#endif
             return 1;      // Exit VLC !
         }
     }
@@ -259,17 +160,6 @@ void OSRun( intf_thread_t *p_intf )
 
     Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
 
-#ifndef BASIC_SKINS
-    // Create a new thread for wxWindows
-    if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
-                           0, VLC_TRUE ) )
-    {
-        msg_Err( p_intf, "cannot create SkinsDialogsThread" );
-        // Don't even enter the main loop
-        return;
-    }
-#endif
-    
     // Main event loop
     int close = 0;
     int count = 0;

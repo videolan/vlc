@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.24 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: gtk2_run.cpp,v 1.25 2003/06/03 22:18:58 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -29,11 +29,6 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
-//--- WWWINDOWS -------------------------------------------------------------
-#ifndef BASIC_SKINS
-#include <wx/wx.h>
-#endif
-
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
 
@@ -49,12 +44,6 @@
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
 
-#ifndef BASIC_SKINS
-#include "../../wxwindows/wxwindows.h"
-#include "share/vlc32x32.xpm"           // include the icon graphic
-#endif
-
-
 //---------------------------------------------------------------------------
 class CallBackObjects
 {
@@ -68,27 +57,6 @@ class CallBackObjects
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg );
 int  SkinManage( intf_thread_t *p_intf );
-
-
-//---------------------------------------------------------------------------
-// Local classes declarations.
-//---------------------------------------------------------------------------
-#ifndef BASIC_SKINS
-class Instance: public wxApp
-{
-public:
-    Instance();
-    Instance( intf_thread_t *_p_intf, CallBackObjects *callback );
-
-    bool OnInit();
-    OpenDialog *open;
-
-private:
-    intf_thread_t *p_intf;
-    CallBackObjects *callbackobj;
-};
-#endif
-
 
 //---------------------------------------------------------------------------
 // GTK2 interface
@@ -156,9 +124,6 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     {
         if( !proc->EventProc( evt ) )
         {
-#ifndef BASIC_SKINS
-            wxExit();
-#endif
             return;      // Exit VLC !
         }
     }
@@ -216,43 +181,6 @@ gboolean RefreshTimer( gpointer data )
     return true;
 }
 //---------------------------------------------------------------------------
-
-
-//---------------------------------------------------------------------------
-// Implementation of Instance class
-//---------------------------------------------------------------------------
-#ifndef BASIC_SKINS
-Instance::Instance( )
-{
-}
-
-Instance::Instance( intf_thread_t *_p_intf, CallBackObjects *callback )
-{
-    // Initialization
-    p_intf = _p_intf;
-    callbackobj = callback;
-}
-
-IMPLEMENT_APP_NO_MAIN(Instance)
-
-bool Instance::OnInit()
-{
-    // Set event callback. Yes, it's a big hack ;)
-    gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
-
-    p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
-    p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
-    p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
-    p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
-    p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
-    p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
-    
-    // Add timer
-    g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
-
-    return TRUE;
-}
-#endif
 
 
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.12 2003/06/01 22:11:24 asmax Exp $
+ * $Id: skin_common.h,v 1.13 2003/06/03 22:18:58 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,19 +30,9 @@
 #define SLIDER_RANGE        1048576  // 1024*1024
 #define DEFAULT_SKIN_FILE   "skins/default.vlt"
 
-
 class Theme;
-class OpenDialog;
-class Messages;
-class SoutDialog;
-class PrefsDialog;
-class FileInfo;
-#ifndef BASIC_SKINS
+class Dialogs;
 class wxIcon;
-#endif
-#ifdef WIN32
-class ExitTimer;
-#endif
 
 #ifdef X11_SKINS
 #include <X11/Xlib.h>
@@ -74,15 +64,11 @@ struct intf_sys_t
     int i_index;        // Set which file is being played
     int i_size;         // Size of playlist;
 
-#ifndef BASIC_SKINS
-    wxIcon *p_icon;
+    // Interface dialogs
+    Dialogs *p_dialogs;
 
-    // Dialogs
-    OpenDialog  *OpenDlg;
-    Messages    *MessagesDlg;
-    SoutDialog  *SoutDlg;
-    PrefsDialog *PrefsDlg;
-    FileInfo    *InfoDlg;
+#ifndef BASIC_SKINS
+    wxIcon      *p_icon;
 #endif
 
 #ifdef X11_SKINS
@@ -92,11 +78,6 @@ struct intf_sys_t
 #endif
 
 #ifdef WIN32
-#ifndef BASIC_SKINS
-    bool b_wx_die;
-    ExitTimer *p_kludgy_timer;
-#endif
-
     // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
     HINSTANCE h_msimg32_dll;
     BOOL (WINAPI *TransparentBlt)( HDC,int,int,int,int,HDC,int,
@@ -109,5 +90,3 @@ struct intf_sys_t
 };
 
 #endif
-
-

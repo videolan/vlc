@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.30 2003/06/01 22:11:24 asmax Exp $
+ * $Id: skin_main.cpp,v 1.31 2003/06/03 22:18:58 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -49,6 +49,8 @@
 #include "themeloader.h"
 #include "vlcproc.h"
 #include "skin_common.h"
+#include "dialogs.h"
+
 #ifndef BASIC_SKINS
 #include "../../wxwindows/wxwindows.h"
 #endif
@@ -209,6 +211,13 @@ static void Run( intf_thread_t *p_intf )
 
     int a = OSAPI_GetTime();
 
+#ifndef BASIC_SKINS
+    // Initialize the dialog boxes
+    p_intf->p_sys->p_dialogs = new Dialogs( p_intf );
+    if( !p_intf->p_sys->p_dialogs ||
+        !p_intf->p_sys->p_dialogs->OpenDlg ) return;
+#endif
+
     // Load a theme
     char *skin_last = config_GetPsz( p_intf, "skin_last" );
     ThemeLoader *Loader = new ThemeLoader( p_intf );
@@ -235,17 +244,16 @@ static void Run( intf_thread_t *p_intf )
 #endif
         {
             // Last chance: the user can  select a new theme file
-// FIXME: wxWindows isn't initialized yet !!!
-#if 0
 #ifndef BASIC_SKINS
-            wxFileDialog dialog( NULL, _("Open a skin file"), "", "",
-                "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
-                    "All files|*.*", wxOPEN );
+            wxFileDialog dialog( NULL,
+                wxU(_("Open a skin file")), wxT(""), wxT(""),
+                wxT("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
+                    "All files|*.*"), wxOPEN );
 
             if( dialog.ShowModal() == wxID_OK )
             {
                 // try to load selected file
-                if( ! Loader->Load( dialog.GetPath().c_str() ) )
+                if( ! Loader->Load( (string)dialog.GetPath().mb_str() ) )
                 {
                     // He, he, what the hell is he doing ?
                     delete Loader;
@@ -253,7 +261,6 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
             else
-#endif
 #endif
             {
                 delete Loader;
@@ -274,6 +281,11 @@ static void Run( intf_thread_t *p_intf )
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (int)true );
 
     OSRun( p_intf );
+
+#ifndef BASIC_SKINS
+    // clean up the dialog boxes
+    delete p_intf->p_sys->p_dialogs;
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -324,12 +336,12 @@ int SkinManage( intf_thread_t *p_intf )
 
     OSAPI_PostMessage( NULL, VLC_INTF_REFRESH, 0, (long)false );
 
-#ifndef BASIC_SKINS
+#ifndef BASIC_SKINS //FIXME
     // Update the log window
-    p_intf->p_sys->MessagesDlg->UpdateLog();
+    p_intf->p_sys->p_dialogs->MessagesDlg->UpdateLog();
 
     // Update the file info window
-    p_intf->p_sys->InfoDlg->UpdateFileInfo();
+    p_intf->p_sys->p_dialogs->FileInfoDlg->UpdateFileInfo();
 #endif
 
     //-------------------------------------------------------------------------
