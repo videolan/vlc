@@ -47,8 +47,6 @@
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
-#elif defined( UNDER_CE )
-#   include <windows.h>                               /* GetFileAttributes() */
 #else
 #   include "../../src/extras/dirent.h"
 #endif
@@ -574,9 +572,9 @@ static int Open( vlc_object_t * p_this )
 
         if (p_src_dir != NULL)
         {
-            while (p_file_item = readdir(p_src_dir))
+            while ((p_file_item = readdir(p_src_dir)))
             {
-                if (p_file_item->d_namlen > 4)
+                if (strlen(p_file_item->d_name) > 4)
                 {
                     s_filename = s_path + DIRECTORY_SEPARATOR + p_file_item->d_name;
 
@@ -624,7 +622,7 @@ static int Open( vlc_object_t * p_this )
 
                                 ep = new EbmlParser(p_stream, p_l0);
                                 bool b_this_segment_matches = false;
-                                while (p_l1 = ep->Get())
+                                while ((p_l1 = ep->Get()))
                                 {
                                     if (MKV_IS_ID(p_l1, KaxInfo))
                                     {
