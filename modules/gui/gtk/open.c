@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.c,v 1.17 2003/12/12 18:34:30 gbazin Exp $
+ * $Id: open.c,v 1.18 2003/12/12 22:41:31 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -206,6 +206,7 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
     GString * p_target = g_string_new( "" );
     GtkWidget * p_open;
     vlc_bool_t b_menus = VLC_FALSE;
+    vlc_bool_t b_chapter_menu = VLC_TRUE;
 
     p_open = gtk_widget_get_toplevel( GTK_WIDGET (button) );
 
@@ -296,6 +297,7 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
                            GTK_SPIN_BUTTON( lookup_widget(
 			   GTK_WIDGET(button), "disc_title" ) ) ) );
 #endif
+	b_chapter_menu = VLC_FALSE;
     }
 
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
@@ -303,9 +305,9 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
                     "disc_title" ), !b_menus );
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "disc_chapter_label" ), !b_menus );
+                    "disc_chapter_label" ), b_chapter_menu & !b_menus );
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "disc_chapter" ), !b_menus );
+                    "disc_chapter" ), b_chapter_menu & !b_menus );
 
     gtk_entry_set_text( GTK_ENTRY( lookup_widget(
                                    GTK_WIDGET(button), "entry_open" ) ),
