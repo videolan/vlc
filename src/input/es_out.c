@@ -46,7 +46,6 @@ struct es_out_id_t
 struct es_out_sys_t
 {
     input_thread_t *p_input;
-    vlc_bool_t      b_convert_ts_auto;  /* automatically convert TimeStamp */
 
     /* all es */
     int         i_id;
@@ -99,7 +98,6 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     out->p_sys      = p_sys;
 
     p_sys->p_input = p_input;
-    p_sys->b_convert_ts_auto = VLC_TRUE;
 
     p_sys->b_active = VLC_FALSE;
     p_sys->i_mode   = ES_OUT_MODE_AUTO;
@@ -450,28 +448,24 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
     es_out_sys_t *p_sys = out->p_sys;
+    pgrm_descriptor_t *p_pgrm = es->p_es->p_pgrm;
+    input_thread_t    *p_input = p_sys->p_input;
 
-    if( p_sys->b_convert_ts_auto )
+    if( p_pgrm == NULL )
     {
-        pgrm_descriptor_t *p_pgrm = es->p_es->p_pgrm;
-        input_thread_t    *p_input = p_sys->p_input;
+        p_pgrm = p_sys->p_input->stream.p_selected_program;
+    }
 
-        if( p_pgrm == NULL )
-        {
-            p_pgrm = p_sys->p_input->stream.p_selected_program;
-        }
-
-        /* +11 -> avoid null value with non null dts/pts */
-        if( p_block->i_dts > 0 && p_pgrm )
-        {
-            p_block->i_dts =
-                input_ClockGetTS( p_input, p_pgrm, ( p_block->i_dts + 11 ) * 9 / 100 );
-        }
-        if( p_block->i_pts > 0 && p_pgrm )
-        {
-            p_block->i_pts =
-                input_ClockGetTS( p_input, p_pgrm, ( p_block->i_pts + 11 )* 9 / 100 );
-        }
+    /* +11 -> avoid null value with non null dts/pts */
+    if( p_block->i_dts > 0 && p_pgrm )
+    {
+        p_block->i_dts =
+            input_ClockGetTS( p_input, p_pgrm, ( p_block->i_dts + 11 ) * 9 / 100 );
+    }
+    if( p_block->i_pts > 0 && p_pgrm )
+    {
+        p_block->i_pts =
+            input_ClockGetTS( p_input, p_pgrm, ( p_block->i_pts + 11 )* 9 / 100 );
     }
 
     vlc_mutex_lock( &out->p_sys->p_input->stream.stream_lock );
@@ -700,30 +694,6 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 p_sys->p_input->stream.pp_programs[i]->last_pts = 0;
             }
             return VLC_SUCCESS;
-
-        case ES_OUT_CONVERT_TIMESTAMP:
-        case ES_OUT_CONVERT_GROUP_TIMESTAMP:
-        {
-            pgrm_descriptor_t *p_pgrm = NULL;
-
-            if( i_query == ES_OUT_CONVERT_TIMESTAMP )
-            {
-                p_pgrm = p_sys->p_input->stream.p_selected_program;
-            }
-            else
-            {
-                int i_group = (int)va_arg( args, int );
-                p_pgrm = input_FindProgram( p_sys->p_input, i_group );
-            }
-            if( p_pgrm )
-            {
-                int64_t *pi_ts = (int64_t*)va_arg( args, int64_t* );
-
-                *pi_ts = input_ClockGetTS( p_sys->p_input, p_pgrm, ( *pi_ts + 11 ) * 9 / 100 );
-            }
-            p_sys->b_convert_ts_auto = VLC_FALSE;
-            return VLC_SUCCESS;
-        }
 
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
