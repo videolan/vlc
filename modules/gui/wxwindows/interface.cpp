@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
+#include <vlc/input.h>
 #include <vlc/intf.h>
 
 #include "wxwindows.h"
@@ -138,6 +139,10 @@ enum
     SlowStream_Event,
     FastStream_Event,
 
+    DiscMenu_Event,
+    DiscPrev_Event,
+    DiscNext_Event,
+
     /* it is important for the id corresponding to the "About" command to have
      * this standard value as otherwise it won't be handled properly under Mac
      * (where it is special and put into the "Apple" menu) */
@@ -181,6 +186,11 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(NextStream_Event, Interface::OnNextStream)
     EVT_MENU(SlowStream_Event, Interface::OnSlowStream)
     EVT_MENU(FastStream_Event, Interface::OnFastStream)
+
+    /* Disc Buttons events */
+    EVT_BUTTON(DiscMenu_Event, Interface::OnDiscMenu)
+    EVT_BUTTON(DiscPrev_Event, Interface::OnDiscPrev)
+    EVT_BUTTON(DiscNext_Event, Interface::OnDiscNext)
 
     /* Slider events */
     EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
@@ -350,7 +360,7 @@ void Interface::CreateOurMenuBar()
     help_menu->Append( About_Event, wxU(_("About VLC media player")) );
 
     /* Append the freshly created menus to the menu bar... */
-    wxMenuBar *menubar = new wxMenuBar( wxMB_DOCKABLE );
+    wxMenuBar *menubar = new wxMenuBar();
     menubar->Append( file_menu, wxU(_("&File")) );
     menubar->Append( view_menu, wxU(_("&View")) );
     menubar->Append( p_settings_menu, wxU(_("&Settings")) );
@@ -445,7 +455,7 @@ void Interface::CreateOurToolBar()
                          * version because we don't include wx.rc */
 
     wxToolBar *toolbar =
-        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT  ); //| wxTB_DOCKABLE );
+        CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT );
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
@@ -495,23 +505,47 @@ void Interface::CreateOurSlider()
     /* Create a new frame and sizer containing the slider */
     slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
     slider_frame->SetAutoLayout( TRUE );
-    wxBoxSizer *frame_sizer = new wxBoxSizer( wxHORIZONTAL );
-    //frame_sizer->SetMinSize( -1, 50 );
+    slider_sizer = new wxBoxSizer( wxHORIZONTAL );
+    //slider_sizer->SetMinSize( -1, 50 );
 
     /* Create slider */
     slider = new wxSlider( slider_frame, SliderScroll_Event, 0, 0,
                            SLIDER_MAX_POS, wxDefaultPosition, wxDefaultSize );
 
+    /* Add Disc Buttons */
+    disc_frame = new wxPanel( slider_frame, -1, wxDefaultPosition,
+                              wxDefaultSize );
+    disc_frame->SetAutoLayout( TRUE );
+    disc_sizer = new wxBoxSizer( wxHORIZONTAL );
+
+    disc_menu_button = new wxBitmapButton( disc_frame, DiscMenu_Event,
+                                           wxBitmap( playlist_xpm ) );
+    disc_prev_button = new wxBitmapButton( disc_frame, DiscPrev_Event,
+                                           wxBitmap( prev_xpm ) );
+    disc_next_button = new wxBitmapButton( disc_frame, DiscNext_Event,
+                                           wxBitmap( next_xpm ) );
+
+    disc_sizer->Add( disc_menu_button, 1, wxEXPAND | wxLEFT | wxRIGHT, 1 );
+    disc_sizer->Add( disc_prev_button, 1, wxEXPAND | wxLEFT | wxRIGHT, 1 );
+    disc_sizer->Add( disc_next_button, 1, wxEXPAND | wxLEFT | wxRIGHT, 1 );
+
+    disc_frame->SetSizer( disc_sizer );
+    disc_sizer->Layout();
+
     /* Add everything to the frame */
-    frame_sizer->Add( slider, 1, wxEXPAND | wxALL, 5 );
-    slider_frame->SetSizer( frame_sizer );
-    frame_sizer->Layout();
-    frame_sizer->SetSizeHints(slider_frame);
+    slider_sizer->Add( slider, 1, wxEXPAND | wxALL, 5 );
+    slider_sizer->Add( disc_frame, 0, wxALL, 2 );
+    slider_frame->SetSizer( slider_sizer );
+
+    disc_frame->Hide();
+    slider_sizer->Hide( disc_frame );
+
+    slider_sizer->Layout();
+    slider_sizer->Fit( slider_frame );
 
     /* Hide the slider by default */
     slider_frame->Hide();
 }
-
 
 static int ConvertHotkeyModifiers( int i_hotkey )
 {
@@ -1066,6 +1100,54 @@ void Interface::TogglePlayButton( int i_playing_status )
     GetToolBar()->Realize();
 
     i_old_playing_status = i_playing_status;
+}
+
+void Interface::OnDiscMenu( wxCommandEvent& WXUNUSED(event) )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( p_input )
+    {
+        vlc_value_t val; val.i_int = 2;
+
+        var_Set( p_input, "title  0", val);
+        vlc_object_release( p_input );
+    }
+}
+
+void Interface::OnDiscPrev( wxCommandEvent& WXUNUSED(event) )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( p_input )
+    {
+        int i_type = var_Type( p_input, "prev-chapter" );
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, ( i_type & VLC_VAR_TYPE ) != 0 ?
+                 "prev-chapter" : "prev-title", val );
+
+        vlc_object_release( p_input );
+    }
+}
+
+void Interface::OnDiscNext( wxCommandEvent& WXUNUSED(event) )
+{
+    input_thread_t *p_input =
+        (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( p_input )
+    {
+        int i_type = var_Type( p_input, "next-chapter" );
+        vlc_value_t val; val.b_bool = VLC_TRUE;
+
+        var_Set( p_input, ( i_type & VLC_VAR_TYPE ) != 0 ?
+                 "next-chapter" : "next-title", val );
+
+        vlc_object_release( p_input );
+    }
 }
 
 #if wxUSE_DRAG_AND_DROP

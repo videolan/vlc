@@ -95,6 +95,7 @@ Timer::~Timer()
  *****************************************************************************/
 void Timer::Notify()
 {
+    input_thread_t *p_input = NULL;
 #if defined( __WXMSW__ ) /* Work-around a bug with accelerators */
     if( !b_init )
     {
@@ -122,6 +123,7 @@ void Timer::Notify()
         {
             p_main_interface->slider->SetValue( 0 );
             b_old_seekable = VLC_FALSE;
+            b_disc_shown = VLC_FALSE;
 
             p_main_interface->statusbar->SetStatusText(
                 wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
@@ -132,7 +134,13 @@ void Timer::Notify()
     }
     else if( p_intf->p_sys->p_input->b_dead )
     {
-        /* Hide slider */
+        /* Hide slider and Disc Buttons */
+        p_main_interface->disc_frame->Hide();
+        p_main_interface->slider_sizer->Hide(
+            p_main_interface->disc_frame );
+        p_main_interface->slider_sizer->Layout();
+        p_main_interface->slider_sizer->Fit( p_main_interface->slider_frame );
+
         p_main_interface->slider_frame->Hide();
         p_main_interface->frame_sizer->Hide(
             p_main_interface->slider_frame );
@@ -147,7 +155,6 @@ void Timer::Notify()
 
         p_intf->p_sys->p_input = NULL;
     }
-
 
     if( p_intf->p_sys->p_input )
     {
@@ -170,19 +177,67 @@ void Timer::Notify()
             /* Change the name of b_old_seekable into b_show_bar or something like that */
             var_Get( p_input, "position", &pos );
 
-            if( !b_old_seekable )
+            vlc_value_t val;
+            var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+            if( val.i_int > 0 && !b_disc_shown )
+            {
+                b_disc_shown = VLC_TRUE;
+                vlc_value_t val;
+
+                    #define HELP_MENU N_("Menu")
+                    #define HELP_PCH N_("Previous chapter")
+                    #define HELP_NCH N_("Next chapter")
+                    #define HELP_PTR N_("Previous track")
+                    #define HELP_NTR N_("Next track")
+
+                var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val,
+                            NULL );
+
+                if( val.i_int > 0 )
+                {
+                    p_main_interface->disc_menu_button->Show();
+                    p_main_interface->disc_sizer->Show(
+                        p_main_interface->disc_menu_button );
+                    p_main_interface->disc_sizer->Layout();
+                    p_main_interface->disc_sizer->Fit(
+                        p_main_interface->disc_frame );
+
+                    p_main_interface->disc_menu_button->SetToolTip(
+                        wxU(_( HELP_MENU ) ) );
+                    p_main_interface->disc_prev_button->SetToolTip(
+                        wxU(_( HELP_PCH ) ) );
+                    p_main_interface->disc_next_button->SetToolTip(
+                        wxU(_( HELP_NCH ) ) );
+                }
+                else
+                {
+                    p_main_interface->disc_menu_button->Hide();
+                    p_main_interface->disc_sizer->Hide(
+                        p_main_interface->disc_menu_button );
+
+                    p_main_interface->disc_prev_button->SetToolTip(
+                        wxU(_( HELP_PTR ) ) );
+                    p_main_interface->disc_next_button->SetToolTip(
+                        wxU(_( HELP_NTR ) ) );
+                }
+
+                p_main_interface->disc_frame->Show();
+                p_main_interface->slider_sizer->Show(
+                    p_main_interface->disc_frame );
+            }
+
+            if( ! b_old_seekable )
             {
                 if( pos.f_float > 0.0 )
                 {
-                    /* Done like this, as it's the only way to know if the slider
-                     * has to be displayed */
+                    /* Done like this, as it's the only way to know if the */
+                    /* slider has to be displayed */
                     b_old_seekable = VLC_TRUE;
                     p_main_interface->slider_frame->Show();
                     p_main_interface->frame_sizer->Show(
                         p_main_interface->slider_frame );
                     p_main_interface->frame_sizer->Layout();
                     p_main_interface->frame_sizer->Fit( p_main_interface );
-
                 }
             }
 

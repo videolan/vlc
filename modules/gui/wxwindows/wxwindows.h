@@ -187,6 +187,7 @@ private:
     int i_old_playing_status;
     int i_old_rate;
     vlc_bool_t b_old_seekable;
+    vlc_bool_t b_disc_shown;
 };
 
 
@@ -303,7 +304,14 @@ public:
 
     wxSlider    *slider;
     wxWindow    *slider_frame;
+    wxBoxSizer  *slider_sizer;
     wxPanel     *extra_frame;
+
+    wxPanel         *disc_frame;
+    wxBoxSizer      *disc_sizer;
+    wxBitmapButton  *disc_menu_button;
+    wxBitmapButton  *disc_prev_button;
+    wxBitmapButton  *disc_next_button;
 
     wxFrame    *extra_window;
 
@@ -344,6 +352,10 @@ private:
     void OnNextStream( wxCommandEvent& event );
     void OnSlowStream( wxCommandEvent& event );
     void OnFastStream( wxCommandEvent& event );
+
+    void OnDiscMenu( wxCommandEvent& event );
+    void OnDiscPrev( wxCommandEvent& event );
+    void OnDiscNext( wxCommandEvent& event );
 
     void OnMenuOpen( wxMenuEvent& event );
 
