@@ -10,8 +10,7 @@ Depends: gpe, libc6, libsdl, libgpewidget0, libgtk1.2, esddsp
 Copyright: GPL
 Description: VideoLAN Client is a free network-aware MPEG and DVD player.
  VideoLAN is a free MPEG1/2 software solution licensed under GPL. The original 
- source can be found on: 
- http://www.videolan.org/pub/videolan/vlc/
+ source can be found on: http://www.videolan.org/pub/videolan/vlc/
  The VideoLAN Client allows to play MPEG1, MPEG2 Transport Streams and 
  Program Streams, MP3, Divx and other codecs from the network or from a file,
  as well as direct DVD playback. 
