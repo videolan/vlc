@@ -1,0 +1,4 @@
+SOURCES_subsdec = \
+	subsdec.c \
+	subsdec.h \
+	$(NULL)

@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.11 2003/03/09 19:25:08 gbazin Exp $
+ * $Id: parse.c,v 1.12 2003/07/22 20:49:10 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -166,6 +166,7 @@ void E_(ParsePacket)( spudec_thread_t *p_spudec )
 
             vlc_mutex_lock( p_mutex );
             UpdateSPU( p_spu, VLC_OBJECT(p_spu->p_sys->p_input) );
+
             var_AddCallback( p_spu->p_sys->p_input,
                              "highlight", CropCallback, p_spu );
             vlc_mutex_unlock( p_mutex );
@@ -273,18 +274,18 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
             /* Get the control sequence date */
             date = (mtime_t)GetBits( &p_spudec->bit_stream, 16 ) * 11000
                     * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;
-
+ 
             /* Next offset */
             i_cur_seq = i_index;
             i_next_seq = GetBits( &p_spudec->bit_stream, 16 );
-
+ 
             /* Skip what we just read */
             i_index += 4;
         }
-
+ 
         i_command = GetBits( &p_spudec->bit_stream, 8 );
         i_index++;
-
+ 
         switch( i_command )
         {
         case SPU_CMD_FORCE_DISPLAY: /* 00 (force displaying) */
@@ -412,11 +413,11 @@ static int ParseControlSeq( spudec_thread_t *p_spudec,
         msg_Err( p_spudec->p_fifo, "no `start display' command" );
     }
 
-    if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
+    if( !p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
         p_spu->i_stop = p_spu->i_start + (mtime_t)500 * 11000
-                         * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;
+                        * p_spudec->bit_stream.p_pes->i_rate / DEFAULT_RATE;
         p_spu->b_ephemer = VLC_TRUE;
     }
 

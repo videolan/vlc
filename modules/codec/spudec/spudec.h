@@ -1,9 +1,8 @@
-
 /*****************************************************************************
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spudec.h,v 1.6 2003/07/14 21:32:58 sigmunau Exp $
+ * $Id: spudec.h,v 1.7 2003/07/22 20:49:10 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -11,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,11 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#if defined(HAVE_ICONV)
-#include <iconv.h>
-#endif
-
 
 typedef struct spudec_thread_t spudec_thread_t;
 
@@ -49,18 +43,6 @@ struct subpicture_sys_t
     vlc_bool_t   b_crop;
     unsigned int i_x_start, i_y_start, i_x_end, i_y_end;
 };
-
-/*****************************************************************************
- * subtitler_font_t : proportional font
- *****************************************************************************/
-typedef struct subtitler_font_s
-{
-    unsigned int        i_height;              /* character height in pixels */
-    unsigned int        i_width[256];          /* character widths in pixels */
-    unsigned int        i_memory[256]; /* amount of memory used by character */
-    unsigned int *      p_length[256];                   /* line byte widths */
-    uint16_t **         p_offset[256];                /* pointer to RLE data */
-} subtitler_font_t;
 
 /*****************************************************************************
  * spudec_thread_t : sub picture unit decoder thread descriptor
@@ -89,9 +71,6 @@ struct spudec_thread_t
      */
     unsigned int        i_spu_size;            /* size of current SPU packet */
     unsigned int        i_rle_size;                  /* size of the RLE part */
-#if defined(HAVE_ICONV)
-    iconv_t             iconv_handle;     /* handle to iconv instance */
-#endif
 };
 
 /*****************************************************************************
@@ -120,9 +99,3 @@ void E_(ParsePacket)          ( spudec_thread_t * );
 void E_(RenderSPU)            ( vout_thread_t *, picture_t *,
                                 const subpicture_t * );
 
-void E_(ParseText)            ( spudec_thread_t *, subtitler_font_t * );
-
-subtitler_font_t *E_(subtitler_LoadFont) ( vout_thread_t *, const char * );
-void E_(subtitler_UnloadFont)   ( vout_thread_t *, subtitler_font_t * );
-void E_(subtitler_PlotSubtitle) ( vout_thread_t *, char *, subtitler_font_t *,
-                                  mtime_t, mtime_t );

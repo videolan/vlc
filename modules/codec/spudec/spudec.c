@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.23 2003/07/21 18:24:51 gbazin Exp $
+ * $Id: spudec.c,v 1.24 2003/07/22 20:49:10 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,40 +36,17 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
+static int  OpenDecoder   ( vlc_object_t * );      
 static int  RunDecoder    ( decoder_fifo_t * );
 static int  InitThread    ( spudec_thread_t * );
 static void EndThread     ( spudec_thread_t * );
-static vout_thread_t *FindVout( spudec_thread_t * );
+static vout_thread_t *FindVout( spudec_thread_t *);
 
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-#define FONT_TEXT N_("Font used by the text subtitler")
-#define FONT_LONGTEXT N_(\
-    "When the subtitles are coded in text form then, you can choose " \
-    "which font will be used to display them.")
-
-#define DEFAULT_FONT "font-eutopiabold21.rle"
-
-#define ENCODING_TEXT N_("subtitle text encoding")
-#define ENCODING_LONGTEXT N_("change the encoding used in text subtitles")
-
 vlc_module_begin();
-    add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
-#if defined(SYS_DARWIN) || defined(SYS_BEOS) \
-     || (defined(WIN32) && !defined(UNDER_CE))
-    add_file( "spudec-font", NULL, NULL,
-              FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
-#else
-    add_file( "spudec-font", "share/" DEFAULT_FONT, NULL,
-              FONT_TEXT, FONT_LONGTEXT, VLC_TRUE );
-#endif
-#if defined(HAVE_ICONV)
-    add_string( "spudec-encoding", "ISO-8859-1", NULL, ENCODING_TEXT,
-		ENCODING_LONGTEXT, VLC_FALSE );
-#endif
-    set_description( _("subtitles decoder") );
+    set_description( _("DVD subtitles decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();
@@ -77,7 +54,7 @@ vlc_module_end();
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************
- * Tries to launch a decoder and return score so that the interface is able
+ * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
 static int OpenDecoder( vlc_object_t *p_this )
@@ -85,12 +62,11 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
 
     if( p_fifo->i_fourcc != VLC_FOURCC('s','p','u',' ')
-         && p_fifo->i_fourcc != VLC_FOURCC('s','p','u','b')
-         && p_fifo->i_fourcc != VLC_FOURCC('s','u','b','t') )
-    {
+         && p_fifo->i_fourcc != VLC_FOURCC('s','p','u','b') )
+    {   
         return VLC_EGENERIC;
     }
-
+    
     p_fifo->pf_run = RunDecoder;
 
     return VLC_SUCCESS;
@@ -102,11 +78,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     spudec_thread_t *     p_spudec;
-    subtitler_font_t *    p_font = NULL;
-    char *                psz_font;
-#if 0
-    vout_thread_t *       p_vout_backup = NULL;
-#endif
 
     /* Allocate the memory needed to store the thread's structure */
     p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
@@ -117,16 +88,13 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         DecoderError( p_fifo );
         return( -1 );
     }
-
+    
     /*
      * Initialize the thread properties
      */
     p_spudec->p_vout = NULL;
     p_spudec->p_fifo = p_fifo;
-#if defined(HAVE_ICONV)
-    p_spudec->iconv_handle = (iconv_t)-1;
-#endif
-
+        
     /*
      * Initialize thread and free configuration
      */
@@ -136,106 +104,19 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
      * Main loop - it is not executed if an error occured during
      * initialization
      */
-    if( p_fifo->i_fourcc == VLC_FOURCC('s','u','b','t') )
+    while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
     {
-        /* Here we are dealing with text subtitles */
-
-#if defined(SYS_DARWIN) || defined(SYS_BEOS)
-        if ( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
+        if( E_(SyncPacket)( p_spudec ) )
         {
-            char * psz_vlcpath = p_fifo->p_libvlc->psz_vlcpath;
-            psz_font = malloc( strlen(psz_vlcpath) + strlen("/share/")
-                                + strlen(DEFAULT_FONT) + 1 );
-            sprintf(psz_font, "%s/share/" DEFAULT_FONT, psz_vlcpath);
-        }
-#elif defined(WIN32) && !defined(UNDER_CE)
-        if ( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
-        {
-            char * psz_vlcpath = p_fifo->p_libvlc->psz_vlcpath;
-            psz_font = malloc( strlen(psz_vlcpath) + strlen("\\share\\")
-                                + strlen(DEFAULT_FONT) + 1 );
-            sprintf(psz_font, "%s\\share\\" DEFAULT_FONT, psz_vlcpath);
-        }
-#else
-        if( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
-        {
-            msg_Err( p_fifo, "no default font selected" );
-            p_spudec->p_fifo->b_error = VLC_TRUE;
-        }
-#endif
-#if defined(HAVE_ICONV)
-	p_spudec->iconv_handle = iconv_open( "UTF-8",
-            config_GetPsz( p_spudec->p_fifo, "spudec-encoding" ) );
-	if( p_spudec->iconv_handle == (iconv_t)-1 )
-	{
-	    msg_Warn( p_spudec->p_fifo, "Unable to do requested conversion" );
-	}
-#endif
-        while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
-        {
-            /* Find/Wait for a video output */
-            p_spudec->p_vout = FindVout( p_spudec );
-
-            if( p_spudec->p_vout )
-            {
-#if 0
-                if( p_spudec->p_vout != p_vout_backup )
-                {
-                    /* The vout has changed, we need to reload the fonts */
-                    p_vout_backup = p_spudec->p_vout;
-
-                    p_font = E_(subtitler_LoadFont)( p_spudec->p_vout,
-                                                     psz_font );
-                    if( p_font == NULL )
-                    {
-                        msg_Err( p_fifo, "unable to load font: %s", psz_font );
-                        p_spudec->p_fifo->b_error = VLC_TRUE;
-
-                        vlc_object_release( p_spudec->p_vout );
-                        break;
-                    }
-                }
-#endif
-
-                E_(ParseText)( p_spudec, p_font );
-
-                vlc_object_release( p_spudec->p_vout );
-            }
+            continue;
         }
 
-        if( psz_font ) free( psz_font );
-
-        if( p_font )
+        /* Find/Wait for a video output */
+        p_spudec->p_vout = FindVout( p_spudec );
+        if( p_spudec->p_vout)
         {
-            /* Find/Wait for a video output */
-            p_spudec->p_vout = FindVout( p_spudec );
-
-            if( p_spudec->p_vout )
-            {
-                E_(subtitler_UnloadFont)( p_spudec->p_vout, p_font );
-
-                vlc_object_release( p_spudec->p_vout );
-            }
-        }
-    }
-    else
-    {
-        /* Here we are dealing with sub-pictures subtitles*/
-
-        while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
-        {
-            if( E_(SyncPacket)( p_spudec ) )
-            {
-                continue;
-            }
-
-            /* Find/Wait for a video output */
-            p_spudec->p_vout = FindVout( p_spudec );
-            if( p_spudec->p_vout )
-            {
-                E_(ParsePacket)( p_spudec );
-                vlc_object_release( p_spudec->p_vout );
-            }
+            E_(ParsePacket)( p_spudec );
+            vlc_object_release( p_spudec->p_vout );
         }
     }
 
@@ -268,24 +149,24 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
 static int InitThread( spudec_thread_t *p_spudec )
 {
     int i_ret;
-
+    
     /* Call InitBitstream anyway so p_spudec->bit_stream is in a known
      * state before calling CloseBitstream */
     i_ret = InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
-                           NULL, NULL );
+                            NULL, NULL );
 
     /* Check for a video output */
     p_spudec->p_vout = FindVout( p_spudec );
-
+    
     if( !p_spudec->p_vout )
     {
         return -1;
     }
-
+    
     /* It was just a check */
     vlc_object_release( p_spudec->p_vout );
     p_spudec->p_vout = NULL;
-
+    
     return i_ret;
 }
 
@@ -295,7 +176,7 @@ static int InitThread( spudec_thread_t *p_spudec )
 static vout_thread_t *FindVout( spudec_thread_t *p_spudec )
 {
     vout_thread_t *p_vout = NULL;
-
+    
     /* Find an available video output */
     do
     {
@@ -305,7 +186,7 @@ static vout_thread_t *FindVout( spudec_thread_t *p_spudec )
         }
 
         p_vout = vlc_object_find( p_spudec->p_fifo, VLC_OBJECT_VOUT,
-                                  FIND_ANYWHERE );
+                                                              FIND_ANYWHERE );
 
         if( p_vout )
         {
@@ -327,12 +208,12 @@ static vout_thread_t *FindVout( spudec_thread_t *p_spudec )
  *****************************************************************************/
 static void EndThread( spudec_thread_t *p_spudec )
 {
-    if( p_spudec->p_vout != NULL
+    if( p_spudec->p_vout != NULL 
          && p_spudec->p_vout->p_subpicture != NULL )
     {
         subpicture_t *  p_subpic;
         int             i_subpic;
-
+    
         for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
         {
             p_subpic = &p_spudec->p_vout->p_subpicture[i_subpic];
@@ -345,12 +226,8 @@ static void EndThread( spudec_thread_t *p_spudec )
             }
         }
     }
-#if defined(HAVE_ICONV)
-    if( p_spudec->iconv_handle != (iconv_t)-1 )
-    {
-	iconv_close( p_spudec->iconv_handle );
-    }
-#endif
+    
     CloseBitstream( &p_spudec->bit_stream );
     free( p_spudec );
 }
+

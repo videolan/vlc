@@ -2,7 +2,7 @@
  * render.c : SPU renderer
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: render.c,v 1.4 2002/11/06 21:48:24 gbazin Exp $
+ * $Id: render.c,v 1.5 2003/07/22 20:49:10 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
