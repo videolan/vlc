@@ -645,6 +645,25 @@ static int Open( vlc_object_t * p_this )
         else if( !strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
             tk.fmt.i_codec = VLC_FOURCC( 's','p','u',' ' );
+            if( tk.i_extra_data )
+            {
+                char *p_start;
+                char *p_buf = (char *)malloc( tk.i_extra_data + 1);
+                memcpy( p_buf, tk.p_extra_data , tk.i_extra_data );
+                p_buf[tk.i_extra_data] = '\0';
+                
+                p_start = strstr( p_buf, "size:" );
+                if( sscanf( p_start, "size: %dx%d",
+                        &tk.fmt.subs.spu.i_original_frame_width, &tk.fmt.subs.spu.i_original_frame_height ) == 2 )
+                {
+                    msg_Dbg( p_demux, "original frame size vobsubs: %dx%d", tk.fmt.subs.spu.i_original_frame_width, tk.fmt.subs.spu.i_original_frame_height );
+                }
+                else
+                {
+                    msg_Warn( p_demux, "reading original frame size for vobsub failed" );
+                }
+                free( p_buf );
+            }
         }
         else
         {
