@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.73 2001/01/21 01:36:25 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.74 2001/01/26 14:47:16 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -1601,7 +1601,7 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
     }
     p_mb->i_addb_l_stride = (p_mb->i_l_stride = p_vpar->picture.i_l_stride) - 8;
     p_mb->i_addb_c_stride = (p_mb->i_c_stride = p_vpar->picture.i_c_stride) - 8;
-    p_mb->b_P_second = ( (i_structure == p_vpar->picture.i_current_structure)
+    p_mb->b_P_second = ( (i_structure != p_vpar->picture.i_current_structure)
                            && i_coding_type == P_CODING_TYPE );
 }
 
