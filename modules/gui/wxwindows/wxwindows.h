@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.57 2003/08/27 11:53:26 gbazin Exp $
+ * $Id: wxwindows.h,v 1.58 2003/08/28 15:59:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -445,6 +445,36 @@ private:
 };
 
 /* Stream output Dialog */
+enum
+{
+    PLAY_ACCESS_OUT = 0,
+    FILE_ACCESS_OUT,
+    HTTP_ACCESS_OUT,
+    MMSH_ACCESS_OUT,
+    UDP_ACCESS_OUT,
+    RTP_ACCESS_OUT,
+    ACCESS_OUT_NUM
+};
+
+enum
+{
+    TS_ENCAPSULATION = 0,
+    PS_ENCAPSULATION,
+    MPEG1_ENCAPSULATION,
+    OGG_ENCAPSULATION,
+    ASF_ENCAPSULATION,
+    AVI_ENCAPSULATION,
+    MP4_ENCAPSULATION,
+    MOV_ENCAPSULATION,
+    ENCAPS_NUM
+};
+
+enum
+{
+    ANN_MISC_SOUT = 0,
+    MISC_SOUT_NUM
+};
+
 class SoutDialog: public wxDialog
 {
 public:
@@ -497,23 +527,23 @@ private:
     wxComboBox *mrl_combo;
 
     /* Controls for the access outputs */
-    wxPanel *access_subpanels[5];
-    wxCheckBox *access_checkboxes[5];
+    wxPanel *access_subpanels[ACCESS_OUT_NUM];
+    wxCheckBox *access_checkboxes[ACCESS_OUT_NUM];
 
     int i_access_type;
 
     wxComboBox *file_combo;
-    wxSpinCtrl *net_ports[5];
-    wxTextCtrl *net_addrs[5];
+    wxSpinCtrl *net_ports[ACCESS_OUT_NUM];
+    wxTextCtrl *net_addrs[ACCESS_OUT_NUM];
 
     /* Controls for the SAP announces */
-    wxPanel *misc_subpanels[1];
+    wxPanel *misc_subpanels[MISC_SOUT_NUM];
     wxCheckBox *sap_checkbox;
     wxCheckBox *slp_checkbox;
     wxTextCtrl *announce_addr;
 
     /* Controls for the encapsulation */
-    wxRadioButton *encapsulation_radios[5];
+    wxRadioButton *encapsulation_radios[ENCAPS_NUM];
     int i_encapsulation_type;
 
     /* Controls for transcoding */

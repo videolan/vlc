@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.21 2003/07/29 21:46:44 gbazin Exp $
+ * $Id: events.c,v 1.22 2003/08/28 15:59:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -50,6 +50,19 @@ static int  DirectXCreateWindow( vout_thread_t *p_vout );
 static void DirectXCloseWindow ( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc ( HWND hwnd, UINT message,
                                           WPARAM wParam, LPARAM lParam );
+
+static void DirectXPopupMenu( event_thread_t *p_event, vlc_bool_t b_open )
+{
+    playlist_t *p_playlist =
+        vlc_object_find( p_event, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist != NULL )
+    {
+        vlc_value_t val;
+        val.b_bool = b_open;
+        var_Set( p_playlist, "intf-popupmenu", val );
+        vlc_object_release( p_playlist );
+    }
+}
 
 /*****************************************************************************
  * DirectXEventThread: Create video window & handle its messages
@@ -132,6 +145,7 @@ void DirectXEventThread( event_thread_t *p_event )
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int |= 1;
             var_Set( p_event->p_vout, "mouse-button-down", val );
+            DirectXPopupMenu( p_event, VLC_FALSE );
             break;
 
         case WM_LBUTTONUP:
@@ -151,6 +165,7 @@ void DirectXEventThread( event_thread_t *p_event )
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int |= 2;
             var_Set( p_event->p_vout, "mouse-button-down", val );
+            DirectXPopupMenu( p_event, VLC_FALSE );
             break;
 
         case WM_MBUTTONUP:
@@ -163,24 +178,14 @@ void DirectXEventThread( event_thread_t *p_event )
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int |= 4;
             var_Set( p_event->p_vout, "mouse-button-down", val );
+            DirectXPopupMenu( p_event, VLC_FALSE );
             break;
 
         case WM_RBUTTONUP:
             var_Get( p_event->p_vout, "mouse-button-down", &val );
             val.i_int &= ~4;
             var_Set( p_event->p_vout, "mouse-button-down", val );
-            {
-                playlist_t *p_playlist =
-                    vlc_object_find( p_event, VLC_OBJECT_PLAYLIST,
-                                     FIND_ANYWHERE );
-                if( p_playlist != NULL )
-                {
-                    vlc_value_t val;
-                    val.b_bool = VLC_TRUE; /* make compiler happy */
-                    var_Set( p_playlist, "intf-popupmenu", val );
-                    vlc_object_release( p_playlist );
-                }
-            }
+            DirectXPopupMenu( p_event, VLC_TRUE );
             break;
 
         case WM_KEYDOWN:

@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.19 2003/08/27 11:53:26 gbazin Exp $
+ * $Id: menus.cpp,v 1.20 2003/08/28 15:59:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -179,8 +179,6 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     popupmenu.AppendSeparator();
     popupmenu.Append( MenuDummy_Event, wxU("Open"),
                       OpenStreamMenu( p_intf ), wxT("") );
-    popupmenu.AppendSeparator();
-    popupmenu.Append( MenuDummy_Event, wxU(_("Close Menu")) );
 #endif
 
     p_intf->p_sys->p_popup_menu = &popupmenu;

@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.30 2003/08/27 11:53:26 gbazin Exp $
+ * $Id: timer.cpp,v 1.31 2003/08/28 15:59:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -272,7 +272,8 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
     intf_thread_t *p_intf = (intf_thread_t *)param;
 
     if( p_intf->p_sys->pf_show_dialog )
-        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU, 0, 0 );
+        p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU,
+                                       new_val.b_bool, 0 );
 
     return VLC_SUCCESS;
 }

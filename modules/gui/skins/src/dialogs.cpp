@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.12 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.13 2003/08/28 15:59:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,10 +173,11 @@ void Dialogs::ShowFileInfo()
         p_provider->pf_show_dialog( p_provider, INTF_DIALOG_FILEINFO, 0, 0 );
 }
 
-void Dialogs::ShowPopup()
+void Dialogs::ShowPopup( bool b_show )
 {
     if( p_provider && p_provider->pf_show_dialog )
-        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_POPUPMENU, 0, 0 );
+        p_provider->pf_show_dialog( p_provider, INTF_DIALOG_POPUPMENU,
+                                    b_show, 0 );
 }
 
 /*****************************************************************************
@@ -188,7 +189,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Dialogs *p_dialogs = (Dialogs *)param;
-    p_dialogs->ShowPopup();
+    p_dialogs->ShowPopup( new_val.b_bool );
 
     return VLC_SUCCESS;
 }
