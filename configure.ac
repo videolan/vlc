@@ -409,7 +409,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad vlc],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad equalizer vlc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer],[-lm])
@@ -917,7 +917,7 @@ VLC_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dt
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_resampler])
 VLC_ADD_PLUGINS([trivial_channel_mixer headphone_channel_mixer])
 VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
-VLC_ADD_PLUGINS([aout_file])
+VLC_ADD_PLUGINS([aout_file equalizer])
 VLC_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
 VLC_ADD_PLUGINS([m3u id3 playlist export sgimb])
 VLC_ADD_PLUGINS([rawvideo])
