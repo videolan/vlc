@@ -433,8 +433,8 @@ esac
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} idct idctclassic motion imdct downmix mpeg_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_audio mpeg_ps mpeg_ts file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga"
+BUILTINS="${BUILTINS}"
+PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_audio mpeg_ps mpeg_ts idct idctclassic motion imdct downmix mpeg_adec ac3_adec mpeg_vdec file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga"
 
 dnl
 dnl  Accelerated modules
@@ -1780,6 +1780,13 @@ then
   AC_PATH_PROG(MOZILLA_CONFIG, mozilla-config, no)
   if test "x${MOZILLA_CONFIG}" != "xno"
   then
+    if test "x${SYS}" != "xmingw32"; then
+      LDFLAGS="${save_LDFLAGS} -L${x_libraries}"
+      AC_CHECK_LIB(Xt,XtStrings,[
+        mozilla_LDFLAGS="${mozilla_LDFLAGS} -L${x_libraries} -lXt"
+      ])
+      LDFLAGS="${save_LDFLAGS}"
+    fi
     MOZILLA=1
     mozilla_CFLAGS="${mozilla_CFLAGS} `${MOZILLA_CONFIG} --cflags plugin java --defines | xargs`"
     dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490

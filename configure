@@ -5531,8 +5531,8 @@ case "x${target_cpu}" in
     ;;
 esac
 
-BUILTINS="${BUILTINS} idct idctclassic motion imdct downmix mpeg_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_audio mpeg_ps mpeg_ts file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga"
+BUILTINS="${BUILTINS}"
+PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_audio mpeg_ps mpeg_ts idct idctclassic motion imdct downmix mpeg_adec ac3_adec mpeg_vdec file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga"
 
 MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mmx chroma_i422_yuy2_mmx chroma_i420_ymga_mmx"
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
@@ -9159,6 +9159,52 @@ fi
 
   if test "x${MOZILLA_CONFIG}" != "xno"
   then
+    if test "x${SYS}" != "xmingw32"; then
+      LDFLAGS="${save_LDFLAGS} -L${x_libraries}"
+      echo $ac_n "checking for XtStrings in -lXt""... $ac_c" 1>&6
+echo "configure:9166: checking for XtStrings in -lXt" >&5
+ac_lib_var=`echo Xt'_'XtStrings | sed 'y%./+-%__p_%'`
+if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  ac_save_LIBS="$LIBS"
+LIBS="-lXt  $LIBS"
+cat > conftest.$ac_ext <<EOF
+#line 9174 "configure"
+#include "confdefs.h"
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char XtStrings();
+
+int main() {
+XtStrings()
+; return 0; }
+EOF
+if { (eval echo configure:9185: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_lib_$ac_lib_var=no"
+fi
+rm -f conftest*
+LIBS="$ac_save_LIBS"
+
+fi
+if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+  
+        mozilla_LDFLAGS="${mozilla_LDFLAGS} -L${x_libraries} -lXt"
+      
+else
+  echo "$ac_t""no" 1>&6
+fi
+
+      LDFLAGS="${save_LDFLAGS}"
+    fi
     MOZILLA=1
     mozilla_CFLAGS="${mozilla_CFLAGS} `${MOZILLA_CONFIG} --cflags plugin java --defines | xargs`"
         mozilla_LDFLAGS="${mozilla_LDFLAGS} `${MOZILLA_CONFIG} --libs | sed 's#-I\(.*\)/mozilla/\([^ ]*\)#-I\1/\2 -I\1/mozilla/\2#g'`"

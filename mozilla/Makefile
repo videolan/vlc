@@ -16,6 +16,8 @@ PLUGIN_OBJ = libvlcplugin.so
 #
 all: $(PLUGIN_OBJ)
 
+distclean: clean
+
 clean:
 	rm -f *.o *.so
 	rm -Rf .dep
@@ -34,4 +36,7 @@ $(PLUGIN_OBJ): Makefile ../lib/libvlc.a $(BUILTIN_OBJ:%=../%) $(C_OBJ)
 
 $(C_OBJ): %.o: %.c vlcplugin.h
 	$(CC) $(CFLAGS) -I../include $(mozilla_CFLAGS) -c $< -o $@
+
+../%:
+	@cd .. && $(MAKE) $(@:../%=%)
 
