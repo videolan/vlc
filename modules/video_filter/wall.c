@@ -247,9 +247,11 @@ static int Init( vout_thread_t *p_vout )
 
     w1 = p_vout->output.i_width / p_vout->p_sys->i_col;
     h1 = w1 * VOUT_ASPECT_FACTOR / i_aspect;
+    w1 &= ~1; h1 &= ~1;
     
     h2 = p_vout->output.i_height / p_vout->p_sys->i_row;
     w2 = h2 * i_aspect / VOUT_ASPECT_FACTOR;
+    w2 &= ~1; h2 &= ~1;
     
     if ( h1 * p_vout->p_sys->i_row < p_vout->output.i_height )
     {
@@ -347,9 +349,7 @@ static int Init( vout_thread_t *p_vout )
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
                 vout_Create( p_vout, i_width, i_height,
                              p_vout->render.i_chroma,
-                             p_vout->render.i_aspect
-                              * p_vout->render.i_height / i_height
-                              * i_width / p_vout->render.i_width );
+                             VOUT_ASPECT_FACTOR * i_width / i_height );
             if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout == NULL )
             {
                 msg_Err( p_vout, "failed to get %ix%i vout threads",
