@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.16 2003/03/17 21:47:21 hartman Exp $
+ * $Id: playlist.m,v 1.17 2003/03/17 23:13:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -395,11 +395,17 @@
 {
     if ( o_operation == NSTableViewDropAbove )
     {
-        if ( i_row != i_moveRow && i_moveRow >= 0 )
+        if ( i_moveRow >= 0 )
         {
-            return NSDragOperationMove;
+            if ( i_row != i_moveRow )
+            {
+                return NSDragOperationMove;
+            }
+            /* what if in the previous run, the row wasn't actually moved? 
+               then we can't drop new files on this location */
+            return NSDragOperationNone;
         }
-        return NSDragOperationLink;
+        return NSDragOperationGeneric;
     }
     return NSDragOperationNone;
 }
