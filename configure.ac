@@ -953,7 +953,7 @@ VLC_ADD_PLUGINS([trivial_channel_mixer simple_channel_mixer headphone_channel_mi
 VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 VLC_ADD_PLUGINS([aout_file equalizer])
 VLC_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
-VLC_ADD_PLUGINS([m3u id3 playlist export sgimb])
+VLC_ADD_PLUGINS([id3 playlist export sgimb])
 VLC_ADD_PLUGINS([rawvideo blend scale time marq])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au])
 VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
