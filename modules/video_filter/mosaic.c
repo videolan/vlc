@@ -176,8 +176,8 @@ static int CreateFilter( vlc_object_t *p_this )
 
     if( psz_order[0] != 0 )
     {
-        i_index = 0;
         char* psz_end=NULL;
+        i_index = 0;
         do
         { 
             psz_end = strchr( psz_order, ',' );
