@@ -372,7 +372,11 @@ void Interface::CreateOurMenuBar()
 #if defined(__WXGTK__)
             22 /* approximate margin */;
 #else
+#if (wxMAJOR_VERSION <= 2) && (wxMINOR_VERSION <= 5) && (wxRELEASE_NUMBER < 3)
             4 /* approximate margin */;
+#else
+            15 /* approximate margin */;
+#endif
 #endif
     }
     frame_sizer->SetMinSize( i_size, -1 );

@@ -705,6 +705,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
     b_advanced = VLC_TRUE;
     SetAutoLayout( TRUE );
+    Hide();
 
     wxBoxSizer *sizer = new wxBoxSizer( wxVERTICAL );
 
@@ -814,6 +815,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
     }
     sizer->Layout();
     SetSizer( sizer );
+    Show();
 }
 
 void PrefsPanel::ApplyChanges()
