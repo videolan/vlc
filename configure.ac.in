@@ -2855,9 +2855,9 @@ AC_DEFINE_UNQUOTED(MODULE_SUFFIX, "__${VLC_SYMBOL}", [String suffix for module f
 AC_DEFINE_UNQUOTED(MODULE_SYMBOL, ${VLC_SYMBOL}, [Symbol suffix for module functions])
 AC_DEFINE_UNQUOTED(LIBEXT, "${LIBEXT}", [Dynamic object extension])
 
-DATA_PATH="${ac_tool_prefix}/share/videolan"
+DATA_PATH="${ac_tool_prefix}/share/vlc"
 AC_SUBST(DATA_PATH)
-PLUGIN_PATH="${ac_tool_prefix}/share/videolan"
+PLUGIN_PATH="${ac_tool_prefix}/lib/vlc"
 AC_SUBST(PLUGIN_PATH)
 
 dnl
