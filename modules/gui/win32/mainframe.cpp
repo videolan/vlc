@@ -319,6 +319,44 @@ void __fastcall TMainFrameDlg::EjectActionExecute( TObject *Sender )
     }
 }
 //--------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::VolumeUpActionExecute( TObject *Sender )
+{
+    aout_instance_t *p_aout;
+    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                 FIND_ANYWHERE );
+    if ( p_aout != NULL )
+    {
+        aout_VolumeUp( p_aout, 1, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::VolumeDownActionExecute( TObject *Sender )
+{
+    aout_instance_t *p_aout;
+    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                 FIND_ANYWHERE );
+    if ( p_aout != NULL )
+    {
+        aout_VolumeDown( p_aout, 1, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::MuteActionExecute( TObject *Sender )
+{
+    aout_instance_t *p_aout;
+    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                 FIND_ANYWHERE );
+    if ( p_aout != NULL )
+    {
+        aout_VolumeMute( p_aout, NULL );
+        vlc_object_release( (vlc_object_t *)p_aout );
+
+//        MenuMute->Checked = ! MenuMute->Checked;
+    }
+}
+//---------------------------------------------------------------------------
 
 
 /*****************************************************************************
@@ -375,7 +413,7 @@ void __fastcall TMainFrameDlg::PopupCloseClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PopupJumpClick( TObject *Sender )
 {
-    // TODO
+    /* TODO */
 }
 //---------------------------------------------------------------------------
 
@@ -590,10 +628,10 @@ void __fastcall TMainFrameDlg::ModeManage()
         MenuProgram->Enabled = false;
         MenuTitle->Enabled = false;
         MenuChapter->Enabled = false;
-        MenuAudio->Enabled = false;
+        MenuLanguage->Enabled = false;
         MenuSubtitles->Enabled = false;
         PopupNavigation->Enabled = false;
-        PopupAudio->Enabled = false;
+        PopupLanguage->Enabled = false;
         PopupSubtitles->Enabled = false;
     }
 

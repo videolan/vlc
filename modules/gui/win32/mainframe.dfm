@@ -256,7 +256,7 @@ object MainFrameDlg: TMainFrameDlg
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 238
+    Top = 241
     Width = 533
     Height = 19
     Panels = <>
@@ -464,14 +464,6 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '-'
         Visible = False
       end
-      object MenuEjectDisc: TMenuItem
-        Tag = 3
-        Action = EjectAction
-        Caption = '&Eject disc'
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
       object MenuExit: TMenuItem
         Tag = 3
         Action = ExitAction
@@ -486,16 +478,66 @@ object MainFrameDlg: TMainFrameDlg
         Hint = 'Hide the main interface window'
         OnClick = MenuHideinterfaceClick
       end
-      object MenuFullscreen: TMenuItem
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object MenuPlaylist: TMenuItem
         Tag = 3
-        Action = FullscreenAction
+        Action = PlaylistAction
+        Caption = '&Playlist...'
+      end
+      object MenuMessages: TMenuItem
+        Tag = 3
+        Action = MessagesAction
+      end
+      object MenuPreferences: TMenuItem
+        Tag = 3
+        Action = PreferencesAction
+      end
+    end
+    object MenuControls: TMenuItem
+      Tag = 3
+      Caption = '&Controls'
+      object MenuADevice: TMenuItem
+        Tag = 3
+        Caption = 'Audio device'
+        Enabled = False
+      end
+      object MenuVolumeUp: TMenuItem
+        Tag = 3
+        Action = VolumeUpAction
+      end
+      object MenuVolumeDown: TMenuItem
+        Tag = 3
+        Action = VolumeDownAction
+      end
+      object MenuMute: TMenuItem
+        Action = MuteAction
+      end
+      object MenuChannel: TMenuItem
+        Tag = 3
+        Caption = 'C&hannels'
+        Enabled = False
+        Hint = 'Select audio channel'
       end
       object N2: TMenuItem
         Caption = '-'
       end
+      object MenuVDevice: TMenuItem
+        Tag = 3
+        Caption = 'Sc&reen'
+        Enabled = False
+      end
+      object MenuFullscreen: TMenuItem
+        Tag = 3
+        Action = FullscreenAction
+      end
+      object N11: TMenuItem
+        Caption = '-'
+      end
       object MenuProgram: TMenuItem
         Tag = 3
-        Caption = 'Progr&am'
+        Caption = '&Program'
         Enabled = False
         Hint = 'Select program'
       end
@@ -513,29 +555,13 @@ object MainFrameDlg: TMainFrameDlg
       end
       object MenuAngle: TMenuItem
         Tag = 3
-        Caption = 'An&gle'
+        Caption = '&Angle'
         Enabled = False
         Hint = 'Select angle'
       end
-      object N3: TMenuItem
-        Caption = '-'
-      end
-      object MenuPlaylist: TMenuItem
+      object MenuLanguage: TMenuItem
         Tag = 3
-        Action = PlaylistAction
-        Caption = '&Playlist...'
-      end
-      object MenuMessages: TMenuItem
-        Tag = 3
-        Action = MessagesAction
-      end
-    end
-    object MenuSettings: TMenuItem
-      Tag = 3
-      Caption = '&Settings'
-      object MenuAudio: TMenuItem
-        Tag = 3
-        Caption = '&Audio'
+        Caption = '&Language'
         Enabled = False
         Hint = 'Select audio language'
       end
@@ -544,13 +570,6 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '&Subtitles'
         Enabled = False
         Hint = 'Select subtitles language'
-      end
-      object N4: TMenuItem
-        Caption = '-'
-      end
-      object MenuPreferences: TMenuItem
-        Tag = 3
-        Action = PreferencesAction
       end
     end
     object MenuHelp: TMenuItem
@@ -2299,16 +2318,17 @@ object MainFrameDlg: TMainFrameDlg
   end
   object PopupMenuMain: TPopupMenu
     AutoPopup = False
+    TrackButton = tbLeftButton
     Left = 72
     Top = 208
     object PopupClose: TMenuItem
       Tag = 3
-      Caption = '&Close this popup'
+      Caption = 'Close this popup'
       OnClick = PopupCloseClick
     end
     object PopupToggleInterface: TMenuItem
       Tag = 3
-      Caption = '&Toggle interface'
+      Caption = 'Show interface'
       OnClick = PopupToggleInterfaceClick
     end
     object N9: TMenuItem
@@ -2363,8 +2383,37 @@ object MainFrameDlg: TMainFrameDlg
       object PopupFullscreen: TMenuItem
         Tag = 3
         Action = FullscreenAction
-        ShortCut = 70
       end
+    end
+    object PopupAudioSettings: TMenuItem
+      Tag = 3
+      Caption = 'Audio settings'
+      object PopupADevice: TMenuItem
+        Tag = 3
+        Caption = 'Device'
+      end
+      object VolumeUp1: TMenuItem
+        Tag = 3
+        Action = VolumeUpAction
+      end
+      object VolumeDown1: TMenuItem
+        Tag = 3
+        Action = VolumeDownAction
+      end
+      object Mute1: TMenuItem
+        Tag = 3
+        Action = MuteAction
+      end
+      object PopupChannel: TMenuItem
+        Tag = 3
+        Caption = 'Channels'
+      end
+    end
+    object PopupVDevice: TMenuItem
+      Caption = 'Screen'
+    end
+    object N1: TMenuItem
+      Caption = '-'
     end
     object PopupNavigation: TMenuItem
       Tag = 3
@@ -2374,9 +2423,9 @@ object MainFrameDlg: TMainFrameDlg
       Tag = 3
       Caption = 'Program'
     end
-    object PopupAudio: TMenuItem
+    object PopupLanguage: TMenuItem
       Tag = 3
-      Caption = 'Audio'
+      Caption = 'Language'
     end
     object PopupSubtitles: TMenuItem
       Tag = 3
@@ -2553,8 +2602,9 @@ object MainFrameDlg: TMainFrameDlg
     object FullscreenAction: TAction
       Tag = 3
       Category = 'Control'
-      Caption = 'Fullscreen'
+      Caption = '&Fullscreen'
       Hint = 'Toggle fullscreen'
+      ShortCut = 70
       OnExecute = FullscreenActionExecute
     end
     object PreferencesAction: TAction
@@ -2606,6 +2656,29 @@ object MainFrameDlg: TMainFrameDlg
       Caption = 'Next'
       Hint = 'Jump to next chapter'
       OnExecute = NextChapterActionExecute
+    end
+    object VolumeUpAction: TAction
+      Tag = 3
+      Category = 'Control'
+      Caption = 'Volume &Up'
+      Hint = 'Increase the volume'
+      ShortCut = 16469
+      OnExecute = VolumeUpActionExecute
+    end
+    object VolumeDownAction: TAction
+      Tag = 3
+      Category = 'Control'
+      Caption = 'Volume &Down'
+      Hint = 'Decrease the volume'
+      ShortCut = 16452
+      OnExecute = VolumeDownActionExecute
+    end
+    object MuteAction: TAction
+      Tag = 3
+      Category = 'Control'
+      Caption = '&Mute'
+      Hint = 'Toggle mute'
+      OnExecute = MuteActionExecute
     end
   end
 end

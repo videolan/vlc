@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: win32.cpp,v 1.6 2002/12/13 17:05:12 babal Exp $
+ * $Id: win32.cpp,v 1.7 2003/01/08 02:16:09 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -129,6 +129,9 @@ static void Run( intf_thread_t *p_intf )
  *****************************************************************************/
 int Win32Manage( intf_thread_t *p_intf )
 {
+    aout_instance_t * p_aout;
+    vout_thread_t   * p_vout;
+
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* If the "display popup" flag has changed */
@@ -228,6 +231,42 @@ int Win32Manage( intf_thread_t *p_intf )
     {
         p_intf->p_sys->p_window->ModeManage();
         p_intf->p_sys->b_playing = 0;
+    }
+
+    /* Does the audio output require to update the menus ? */
+    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                 FIND_ANYWHERE );
+    if( p_aout != NULL )
+    {
+        vlc_value_t val;
+        if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val ) >= 0
+            && val.b_bool )
+        {
+#if 0
+            p_intf->p_sys->b_aout_update = 1;
+            p_intf->p_sys->p_menus->SetupMenus();
+#endif
+        }
+
+        vlc_object_release( (vlc_object_t *)p_aout );
+    }
+
+    /* Does the video output require to update the menus ? */
+    p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                               FIND_ANYWHERE );
+    if( p_vout != NULL )
+    {
+        vlc_value_t val;
+        if( var_Get( (vlc_object_t *)p_vout, "intf-change", &val ) >= 0
+            && val.b_bool )
+        {
+#if 0
+            p_intf->p_sys->b_vout_update = 1;
+            p_intf->p_sys->p_menus->SetupMenus();
+#endif
+        }
+
+        vlc_object_release( (vlc_object_t *)p_vout );
     }
 
     if( p_intf->b_die )

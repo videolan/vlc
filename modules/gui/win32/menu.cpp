@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: menu.cpp,v 1.2 2002/12/13 03:52:58 videolan Exp $
+ * $Id: menu.cpp,v 1.3 2003/01/08 02:16:09 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -31,23 +31,72 @@
 
 /*****************************************************************************
  * TMenusGen::*Click: callbacks for the menuitems
- ****************************************************************************
- * These functions need to be in a class, or we won't be able to pass them
- * as arguments (since TNotifyEvent uses __closure)
  ****************************************************************************/
 
- /*
+/*
+ * Variables
+ */
+
+/* variables of the audio output */
+void __fastcall TMenusGen::AoutVarClick( TObject *Sender )
+{
+    TMenuItem * Item = (TMenuItem *)Sender;
+
+    vlc_object_t * p_aout;
+    p_aout = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                              FIND_ANYWHERE );
+    if( p_aout == NULL )
+    {
+        msg_Warn( p_intf, "cannot set variable (%s)", Item->Caption.c_str() );
+        return;
+    }
+
+    if( Item->Parent == MenuADevice || Item->Parent == PopupADevice )
+    {
+        VarChange( p_aout, "audio-device", MenuADevice, PopupADevice, Item );
+    }
+    else if( Item->Parent == MenuChannel || Item->Parent == PopupChannel )
+    {
+        VarChange( p_aout, "audio-channels", MenuChannel, PopupChannel, Item );
+    }
+
+    vlc_object_release( p_aout );
+}
+
+/* variables of the video output */
+void __fastcall TMenusGen::VoutVarClick( TObject *Sender )
+{
+    TMenuItem * Item = (TMenuItem *)Sender;
+
+    vlc_object_t * p_vout;
+    p_vout = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+    if( p_vout == NULL )
+    {
+        msg_Warn( p_intf, "cannot set variable (%s)", Item->Caption.c_str() );
+        return;
+    }
+
+    if( Item->Parent == MenuVDevice || Item->Parent == PopupVDevice )
+    {
+        VarChange( p_vout, "video-device", MenuVDevice, PopupVDevice, Item );
+    }
+
+    vlc_object_release( p_vout );
+}
+
+/*
  * Audio
  */
 
-void __fastcall TMenusGen::MenuAudioClick( TObject *Sender )
+void __fastcall TMenusGen::MenuLanguageClick( TObject *Sender )
 {
-    LangChange( MenuAudio, (TMenuItem *)Sender, PopupAudio, AUDIO_ES );
+    LangChange( MenuLanguage, (TMenuItem *)Sender, PopupLanguage, AUDIO_ES );
 }
 
-void __fastcall TMenusGen::PopupAudioClick( TObject *Sender )
+void __fastcall TMenusGen::PopupLanguageClick( TObject *Sender )
 {
-    LangChange( PopupAudio, (TMenuItem *)Sender, MenuAudio, AUDIO_ES );
+    LangChange( PopupLanguage, (TMenuItem *)Sender, MenuLanguage, AUDIO_ES );
 }
 
 /*
@@ -56,14 +105,12 @@ void __fastcall TMenusGen::PopupAudioClick( TObject *Sender )
 
 void __fastcall TMenusGen::MenuSubtitleClick( TObject *Sender )
 {
-    LangChange( MenuSubtitles, (TMenuItem *)Sender,
-        PopupSubtitles, SPU_ES );
+    LangChange( MenuSubtitles, (TMenuItem *)Sender, PopupSubtitles, SPU_ES );
 }
 
 void __fastcall TMenusGen::PopupSubtitleClick( TObject *Sender )
 {
-    LangChange( PopupSubtitles, (TMenuItem *)Sender,
-        MenuSubtitles, SPU_ES );
+    LangChange( PopupSubtitles, (TMenuItem *)Sender, MenuSubtitles, SPU_ES );
 }
 
 /*
@@ -170,12 +217,18 @@ __fastcall TMenusGen::TMenusGen( intf_thread_t *_p_intf ) : TObject()
     TMainFrameDlg * p_window = p_intf->p_sys->p_window;
     if( p_window == NULL )
     {
-        msg_Err( p_intf, "Main window wasn't created, expect problems..." );
+        msg_Warn( p_intf, "Main window wasn't created, expect problems..." );
         return;
     }
 
-    MenuAudio = p_window->MenuAudio;
-    PopupAudio = p_window->PopupAudio;
+    MenuChannel = p_window->MenuChannel;
+    PopupChannel = p_window->PopupChannel;
+    MenuADevice = p_window->MenuADevice;
+    PopupADevice = p_window->PopupADevice;
+    MenuVDevice = p_window->MenuVDevice;
+    PopupVDevice = p_window->PopupVDevice;
+    MenuLanguage = p_window->MenuLanguage;
+    PopupLanguage = p_window->PopupLanguage;
     MenuSubtitles = p_window->MenuSubtitles;
     PopupSubtitles = p_window->PopupSubtitles;
     MenuProgram = p_window->MenuProgram;
@@ -185,18 +238,19 @@ __fastcall TMenusGen::TMenusGen( intf_thread_t *_p_intf ) : TObject()
     PopupNavigation = p_window->PopupNavigation;
 }
 
+
 void __fastcall TMenusGen::SetupMenus()
 {
-    TMainFrameDlg * p_window = p_intf->p_sys->p_window;
-    input_thread_t *p_input = p_intf->p_sys->p_input;
+    TMainFrameDlg  * p_window = p_intf->p_sys->p_window;
+    input_thread_t * p_input  = p_intf->p_sys->p_input;
     es_descriptor_t   * p_audio_es;
     es_descriptor_t   * p_spu_es;
 
     p_intf->p_sys->b_chapter_update |= p_intf->p_sys->b_title_update;
-    p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_program_update;
-//  p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_title_update;
-    p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_program_update;
-//  p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_title_update;
+    p_intf->p_sys->b_audio_update |= p_intf->p_sys->b_program_update |
+                                     p_intf->p_sys->b_title_update;
+    p_intf->p_sys->b_spu_update |= p_intf->p_sys->b_program_update |
+                                   p_intf->p_sys->b_title_update;
 
     if( p_intf->p_sys->b_program_update )
     {
@@ -211,8 +265,8 @@ void __fastcall TMenusGen::SetupMenus()
             p_pgrm = p_input->stream.p_selected_program;
         }
 
-        ProgramMenu( p_window->MenuProgram, p_pgrm, MenuProgramClick );
-        ProgramMenu( p_window->PopupProgram, p_pgrm, PopupProgramClick );
+        ProgramMenu( MenuProgram, p_pgrm, MenuProgramClick );
+        ProgramMenu( PopupProgram, p_pgrm, PopupProgramClick );
 
         p_intf->p_sys->b_program_update = 0;
     }
@@ -220,7 +274,7 @@ void __fastcall TMenusGen::SetupMenus()
     if( p_intf->p_sys->b_title_update )
     {
 // why "-1" ?
-        RadioMenu( p_window->MenuTitle, "Title",
+        RadioMenu( MenuTitle, "Title",
                    p_input->stream.i_area_nb - 1,
                    p_input->stream.p_selected_area->i_id,
                    MenuTitleClick );
@@ -234,13 +288,12 @@ void __fastcall TMenusGen::SetupMenus()
 
     if( p_intf->p_sys->b_chapter_update )
     {
-        RadioMenu( p_window->MenuChapter, "Chapter",
+        RadioMenu( MenuChapter, "Chapter",
                    p_input->stream.p_selected_area->i_part_nb,
                    p_input->stream.p_selected_area->i_part,
                    MenuChapterClick );
 
-        NavigationMenu( p_window->PopupNavigation,
-                        PopupNavigationClick );
+        NavigationMenu( PopupNavigation, PopupNavigationClick );
 
         AnsiString CurrentChapter;
         CurrentChapter.sprintf( "%d", p_input->stream.p_selected_area->i_part );
@@ -275,10 +328,8 @@ void __fastcall TMenusGen::SetupMenus()
     /* audio menus */
     if( p_intf->p_sys->b_audio_update )
     {
-        LanguageMenu( p_window->MenuAudio, p_audio_es, AUDIO_ES,
-                      MenuAudioClick );
-        LanguageMenu( p_window->PopupAudio, p_audio_es, AUDIO_ES,
-                      PopupAudioClick );
+        LanguageMenu( MenuLanguage, p_audio_es, AUDIO_ES, MenuLanguageClick );
+        LanguageMenu( PopupLanguage, p_audio_es, AUDIO_ES, PopupLanguageClick );
 
         p_intf->p_sys->b_audio_update = 0;
     }
@@ -286,12 +337,63 @@ void __fastcall TMenusGen::SetupMenus()
     /* sub picture menus */
     if( p_intf->p_sys->b_spu_update )
     {
-        LanguageMenu( p_window->PopupSubtitles, p_spu_es, SPU_ES,
-                      PopupSubtitleClick );
-        LanguageMenu( p_window->MenuSubtitles, p_spu_es, SPU_ES,
-                      MenuSubtitleClick );
+        LanguageMenu( PopupSubtitles, p_spu_es, SPU_ES, PopupSubtitleClick );
+        LanguageMenu( MenuSubtitles, p_spu_es, SPU_ES, MenuSubtitleClick );
 
         p_intf->p_sys->b_spu_update = 0;
+    }
+
+    if( p_intf->p_sys->b_aout_update )
+    {
+        aout_instance_t * p_aout;
+        p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                     FIND_ANYWHERE );
+
+        if ( p_aout != NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = 0;
+
+            var_Set( (vlc_object_t *)p_aout, "intf-change", val );
+
+            SetupVarMenu( (vlc_object_t *)p_aout, "audio-channels",
+                          MenuChannel, AoutVarClick );
+            SetupVarMenu( (vlc_object_t *)p_aout, "audio-channels",
+                          PopupChannel, AoutVarClick );
+
+            SetupVarMenu( (vlc_object_t *)p_aout, "audio-device",
+                          MenuADevice, AoutVarClick );
+            SetupVarMenu( (vlc_object_t *)p_aout, "audio-device",
+                          PopupADevice, AoutVarClick );
+
+            vlc_object_release( (vlc_object_t *)p_aout );
+        }
+
+        p_intf->p_sys->b_aout_update = 0;
+    }
+
+    if( p_intf->p_sys->b_vout_update )
+    {
+        vout_thread_t * p_vout;
+        p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                   FIND_ANYWHERE );
+
+        if ( p_vout != NULL )
+        {
+            vlc_value_t val;
+            val.b_bool = 0;
+
+            var_Set( (vlc_object_t *)p_vout, "intf-change", val );
+
+            SetupVarMenu( (vlc_object_t *)p_vout, "video-device",
+                          MenuVDevice, VoutVarClick );
+            SetupVarMenu( (vlc_object_t *)p_vout, "video-device",
+                          PopupVDevice, VoutVarClick );
+
+            vlc_object_release( (vlc_object_t *)p_vout );
+        }
+
+        p_intf->p_sys->b_vout_update = 0;
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -301,7 +403,8 @@ void __fastcall TMenusGen::SetupMenus()
 /*****************************************************************************
  * Private functions
  *****************************************************************************/
-TMenuItem * TMenusGen::Index2Item( TMenuItem *Root, int i_index, bool SingleColumn )
+TMenuItem * TMenusGen::Index2Item( TMenuItem *Root, int i_index,
+                                   bool SingleColumn )
 {
     if( SingleColumn || ( i_index < 20 ) )
         return Root->Items[i_index];
@@ -330,6 +433,30 @@ int __fastcall TMenusGen::Data2Chapter( int data )
 int __fastcall TMenusGen::Pos2Data( int title, int chapter )
 {
     return (int) (( title << 16 ) | ( chapter & 0xffff ));
+}
+
+/****************************************************************************
+ * VarChange: change a variable in a vlc_object_t
+ ****************************************************************************
+ * Change the variable and update the menuitems.
+ ****************************************************************************/
+void __fastcall TMenusGen::VarChange( vlc_object_t *p_object,
+        const char *psz_variable, TMenuItem *RootMenu, TMenuItem *RootPopup,
+        TMenuItem *Item )
+{
+    vlc_value_t val;
+    int i_index;
+
+    /* set the new value */
+    val.psz_string = Item->Name.c_str();
+    if( var_Set( p_object, psz_variable, val ) < 0 )
+    {
+        msg_Warn( p_object, "cannot set variable (%s)", val.psz_string );
+    }
+
+    i_index = Item->MenuIndex;
+    RootMenu->Items[i_index]->Checked = true;
+    RootPopup->Items[i_index]->Checked = true;
 }
 
 /****************************************************************************
@@ -412,22 +539,69 @@ void __fastcall TMenusGen::ProgramChange( TMenuItem *Item,
 }
 
 /*****************************************************************************
+ * SetupVarMenu: build a menu allowing to change a variable
+ *****************************************************************************/
+void __fastcall TMenusGen::SetupVarMenu( vlc_object_t *p_object,
+        const char *psz_variable, TMenuItem *Root, TNotifyEvent MenuItemClick )
+{
+    TMenuItem * Item;
+    vlc_value_t val;
+    char * psz_value;
+    int i;
+
+    /* remove previous menu */
+    Root->Clear();
+
+    /* get the current value */
+    if ( var_Get( p_object, psz_variable, &val ) < 0 )
+    {
+        return;
+    }
+    psz_value = val.psz_string;
+
+    if ( var_Change( p_object, psz_variable, VLC_VAR_GETLIST, &val ) < 0 )
+    {
+        free( psz_value );
+        return;
+    }
+
+    /* append a menuitem for each option */
+    for ( i = 0; i < val.p_list->i_count; i++ )
+    {
+        Item = new TMenuItem( Root );
+        Item->Caption = val.p_list->p_values[i].psz_string;
+        Item->Hint = val.p_list->p_values[i].psz_string;
+        Item->RadioItem = true;
+        Item->OnClick = MenuItemClick;
+        if( !strcmp( psz_value, val.p_list->p_values[i].psz_string ) )
+            Item->Checked = true;
+
+        /* Add the item to the submenu */
+        Root->Add( Item );
+    }
+
+    /* enable the menu if there is at least 1 item */
+    Root->Enabled = ( val.p_list->i_count > 0 );
+
+    /* clean up everything */
+    var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val );
+    free( psz_value );
+}
+
+/*****************************************************************************
  * ProgramMenu: update the programs menu of the interface
  *****************************************************************************
  * Builds the program menu according to what have been found in the PAT
  * by the input. Useful for multi-programs streams such as DVB ones.
  *****************************************************************************/
 void __fastcall TMenusGen::ProgramMenu( TMenuItem *Root,
-    pgrm_descriptor_t *p_pgrm, TNotifyEvent MenuItemClick)
+    pgrm_descriptor_t *p_pgrm, TNotifyEvent MenuItemClick )
 {
     TMenuItem * Item;
-    TMenuItem * ItemActive;
 
     /* remove previous menu */
     Root->Clear();
     Root->Enabled = false;
-
-    ItemActive = NULL;
 
     /* create a set of program buttons and append them to the container */
     for( int i = 0; i < p_intf->p_sys->p_input->stream.i_pgrm_number; i++ )
@@ -446,20 +620,14 @@ void __fastcall TMenusGen::ProgramMenu( TMenuItem *Root,
          * It will be used in the callback. */
         Item->Tag = i + 1;
 
+        /* check the currently selected program */
         if( p_pgrm == p_intf->p_sys->p_input->stream.pp_programs[i] )
         {
-            /* don't lose Item when we append into menu */
-            ItemActive = Item;
+            Item->Checked = true;
         }
 
-        /* Add the item to the submenu */
+        /* add the item to the submenu */
         Root->Add( Item );
-    }
-
-    /* check currently selected program */
-    if( ItemActive != NULL )
-    {
-        ItemActive->Checked = true;
     }
 
     /* be sure that menu is enabled if more than 1 program */
@@ -481,14 +649,11 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
 {
     TMenuItem  * ItemGroup;
     TMenuItem  * Item;
-    TMenuItem  * ItemActive;
     AnsiString   Name;
 
     /* remove previous menu */
     Root->Enabled = false;
     Root->Clear();
-
-    ItemActive = NULL;
 
     for( int i_item = 0; i_item < i_nb; i_item++ )
     {
@@ -523,9 +688,10 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
          * It will be used in the callback. */
         Item->Tag = i_item + 1;
 
+        /* check the currently selected chapter */
         if( i_selected == i_item + 1 )
         {
-            ItemActive = Item;
+            Item->Checked = true;
         }
 
         /* setup signal handling */
@@ -541,12 +707,6 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
     if( i_nb > 20 )
     {
         Root->Add( ItemGroup );
-    }
-
-    /* check currently selected chapter */
-    if( ItemActive != NULL )
-    {
-        ItemActive->Checked = true;
     }
 
     /* be sure that menu is enabled, if there are several items */
@@ -570,7 +730,6 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
 {
     TMenuItem     * Separator;
     TMenuItem     * Item;
-    TMenuItem     * ItemActive;
     AnsiString      Name;
 
     /* remove previous menu */
@@ -592,7 +751,6 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
     Separator->Caption = "-";
     Root->Add( Separator );
 
-    ItemActive = NULL;
     int i_item = 0;
 
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -619,10 +777,10 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
             Item->Caption = Name;
             Item->Tag = i;
 
+            /* check the currently selected item */
             if( p_es == p_intf->p_sys->p_input->stream.pp_es[i] )
             {
-                /* don't lose Item when we append into menu */
-                ItemActive = Item;
+                Item->Checked = true;
             }
 
             /* setup signal hanling */
@@ -633,12 +791,6 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
 #undef ES
 
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-    /* check currently selected item */
-    if( ItemActive != NULL )
-    {
-        ItemActive->Checked = true;
-    }
 
     /* be sure that menu is enabled if non empty */
     if( i_item > 0 )
@@ -659,7 +811,6 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
 {
     TMenuItem     * TitleGroup;
     TMenuItem     * TitleItem;
-    TMenuItem     * ItemActive;
     TMenuItem     * ChapterGroup;
     TMenuItem     * ChapterItem;
     AnsiString      Name;
@@ -671,7 +822,6 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     Root->Enabled = false;
     Root->Clear();
 
-    ItemActive = NULL;
     i_title_nb = p_intf->p_sys->p_input->stream.i_area_nb;
 
     /* loop on titles */
@@ -733,11 +883,12 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
                  ChapterItem->Tag = Pos2Data( i_title, i_chapter + 1 );
 
 #define p_area p_intf->p_sys->p_input->stream.pp_areas[i_title]
+                /* check the currently selected chapter */
                 if( ( p_area ==
                         p_intf->p_sys->p_input->stream.p_selected_area ) &&
                     ( p_area->i_part == i_chapter + 1 ) )
                 {
-                    ItemActive = ChapterItem;
+                    ChapterItem->Checked = true;
                 }
 #undef p_area
 
@@ -772,12 +923,6 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     if( i_title_nb > 20 )
     {
         Root->Add( TitleGroup );
-    }
-
-    /* Default selected chapter */
-    if( ItemActive != NULL )
-    {
-        ItemActive->Checked = true;
     }
 
     /* be sure that menu is sensitive */

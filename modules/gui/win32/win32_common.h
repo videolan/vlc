@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "about.h"
 #include "disc.h"
 #include "mainframe.h"
 #include "menu.h"
@@ -47,7 +46,11 @@ struct intf_sys_t
     vlc_bool_t          b_slider_free;                      /* slider status */
 
     /* menus handlers */
-    vlc_bool_t          b_program_update;   /* do we need to update programs 
+    vlc_bool_t          b_aout_update;         /* do we need to update menus
+                                                   related with audio output */
+    vlc_bool_t          b_vout_update;         /* do we need to update menus
+                                                   related with video output */
+    vlc_bool_t          b_program_update;   /* do we need to update programs
                                                                         menu */
     vlc_bool_t          b_title_update;  /* do we need to update title menus */
     vlc_bool_t          b_chapter_update;    /* do we need to update chapter

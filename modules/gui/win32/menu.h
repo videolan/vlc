@@ -2,7 +2,7 @@
  * menu.h: prototypes for menu functions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: menu.h,v 1.2 2002/12/13 03:52:58 videolan Exp $
+ * $Id: menu.h,v 1.3 2003/01/08 02:16:09 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -30,8 +30,14 @@ private:
     intf_thread_t *p_intf;
 
     /* local pointers to main window menu items */
-    TMenuItem *MenuAudio;
-    TMenuItem *PopupAudio;
+    TMenuItem *MenuChannel;
+    TMenuItem *PopupChannel;
+    TMenuItem *MenuADevice;
+    TMenuItem *PopupADevice;
+    TMenuItem *MenuVDevice;
+    TMenuItem *PopupVDevice;
+    TMenuItem *MenuLanguage;
+    TMenuItem *PopupLanguage;
     TMenuItem *MenuSubtitles;
     TMenuItem *PopupSubtitles;
     TMenuItem *MenuProgram;
@@ -51,8 +57,13 @@ private:
     int __fastcall Data2Chapter( int data );
     int __fastcall Pos2Data( int title, int chapter );
 
+    void __fastcall VarChange( vlc_object_t *, const char *, TMenuItem *,
+                               TMenuItem *, TMenuItem * );
     void __fastcall LangChange( TMenuItem *, TMenuItem *, TMenuItem *, int );
     void __fastcall ProgramChange( TMenuItem *, TMenuItem * );
+
+    void __fastcall SetupVarMenu( vlc_object_t *, const char *, TMenuItem *,
+                                  TNotifyEvent );
     void __fastcall ProgramMenu( TMenuItem *, pgrm_descriptor_t *,
                                  TNotifyEvent );
     void __fastcall RadioMenu( TMenuItem *, AnsiString, int, int,
@@ -67,8 +78,10 @@ public:
     void __fastcall SetupMenus();
 
     /* callbacks for menuitems */
-    void __fastcall MenuAudioClick( TObject *Sender );
-    void __fastcall PopupAudioClick( TObject *Sender );
+    void __fastcall AoutVarClick( TObject *Sender );
+    void __fastcall VoutVarClick( TObject *Sender );
+    void __fastcall MenuLanguageClick( TObject *Sender );
+    void __fastcall PopupLanguageClick( TObject *Sender );
     void __fastcall MenuSubtitleClick( TObject *Sender );
     void __fastcall PopupSubtitleClick( TObject *Sender );
     void __fastcall MenuProgramClick( TObject *Sender );
