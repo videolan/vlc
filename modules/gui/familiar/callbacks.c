@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.11 2002/12/09 21:37:41 jpsaman Exp $
+ * $Id: callbacks.c,v 1.12 2002/12/12 12:24:23 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -103,12 +103,12 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
     if( p_playlist )
     {
         if (p_intf->p_sys->b_autoplayfile)
-	    {
+        {
             playlist_Add( p_playlist, (char*)psz_url,
                           PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         }
-	    else
-	    {
+        else
+        {
             playlist_Add( p_playlist, (char*)psz_url,
                           PLAYLIST_APPEND, PLAYLIST_END );
         }
@@ -125,11 +125,12 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     struct dirent **namelist;
     int n,status;
 
+msg_Err(p_intf, "changing to dir %s\n", psz_dir);
     if (psz_dir)
     {
        status = chdir(psz_dir);
        if (status<0)
-          intf_ErrMsg("File is not a directory.");
+          msg_Err( p_intf, "file is not a directory" );
     }
     n = scandir(".", &namelist, 0, alphasort);
 
@@ -138,7 +139,7 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     else
     {
         gchar *ppsz_text[2];
-		int i;
+        int i;
 
         gtk_clist_freeze( clist );
         gtk_clist_clear( clist );
@@ -316,7 +317,6 @@ on_toolbar_play_clicked                (GtkButton       *button,
     if( p_playlist != NULL )
     {
         input_SetStatus( p_playlist, INPUT_STATUS_PLAY );
-        p_main->p_playlist->b_stopped = 0;
         gdk_window_lower( p_intf->p_sys->p_window->window );
     }
     else
@@ -453,7 +453,7 @@ on_clistmedia_select_row               (GtkCList        *clist,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = p_main->p_intf;
+    intf_thread_t * p_intf = GtkGetIntf( clist );
     gchar *text[2];
     gint ret;
     struct stat st;

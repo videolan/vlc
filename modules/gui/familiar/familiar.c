@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.11 2002/12/09 21:37:41 jpsaman Exp $
+ * $Id: familiar.c,v 1.12 2002/12/12 12:24:23 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -47,11 +47,11 @@
  * Local prototypes.
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );             
+static void Close        ( vlc_object_t * );
 
-static void Run          ( intf_thread_t * );                  
+static void Run          ( intf_thread_t * );
 
-void GtkAutoPlayFile( void );
+void GtkAutoPlayFile( vlc_object_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -64,8 +64,8 @@ void GtkAutoPlayFile( void );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_Hint( N_("Miscellaneous"), NULL )
-    add_bool( "familiar-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT)
+    add_category_hint( N_("Miscellaneous"), NULL );
+    add_bool( "familiar-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT );
     set_description( _("Familiar Linux Gtk+ interface module") );
     set_capability( "interface", 70 );
     set_callbacks( Open, Close );
@@ -75,7 +75,7 @@ vlc_module_end();
  * Open: initialize and create window
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
-{   
+{
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     /* Allocate instance and initialize some members */
@@ -107,7 +107,7 @@ static int Open( vlc_object_t *p_this )
  * Close: destroy interface window
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
-{   
+{
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     if( p_intf->p_sys->p_input )
@@ -132,7 +132,7 @@ static void Run( intf_thread_t *p_intf )
 #ifdef HAVE_GPE_INIT_H
    /* Initialize GPE interface */
    if (gpe_application_init(&i_args, &pp_args) == FALSE)
-        exit (1);	
+        exit (1);
 #else
    /* Initialize Gtk+ */
    gtk_set_locale ();
@@ -194,19 +194,40 @@ static void Run( intf_thread_t *p_intf )
 
 /*****************************************************************************
  * GtkAutoplayFile: Autoplay file depending on configuration settings
- *****************************************************************************
- * FIXME: we should get the intf as parameter
  *****************************************************************************/
-void GtkAutoPlayFile( void )
+void GtkAutoPlayFile( vlc_object_t *p_this )
 {
     GtkWidget *cbautoplay;
+    intf_thread_t **pp_intf;
+    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
+                                                FIND_ANYWHERE );
 
-    cbautoplay = GTK_WIDGET( gtk_object_get_data(
-                   GTK_OBJECT( p_main->p_intf->p_sys->p_window ), "cbautoplay" ) );
-    if( !config_GetIntVariable( "familiar-autoplayfile" ) )
-       p_main->p_intf->p_sys->b_autoplayfile=0;
-    else
-       p_main->p_intf->p_sys->b_autoplayfile=1;
+    for( pp_intf = (intf_thread_t **)p_list->pp_objects ;
+         *pp_intf ;
+         pp_intf++ )
+    {
+        if( strcmp( MODULE_STRING, (*pp_intf)->p_module->psz_object_name ) )
+        {
+            continue;
+        }
 
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(cbautoplay),p_main->p_intf->p_sys->b_autoplayfile);
+        cbautoplay = GTK_WIDGET( gtk_object_get_data(
+                            GTK_OBJECT( (*pp_intf)->p_sys->p_window ),
+                            "cbautoplay" ) );
+
+        if( !config_GetInt( p_this, "familiar-autoplayfile" ) )
+        {
+            (*pp_intf)->p_sys->b_autoplayfile = VLC_FALSE;
+        }
+        else
+        {
+            (*pp_intf)->p_sys->b_autoplayfile = VLC_TRUE;
+        }
+
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( cbautoplay ),
+                                      (*pp_intf)->p_sys->b_autoplayfile );
+    }
+
+    vlc_list_release( p_list );
 }
+
