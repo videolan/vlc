@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.20 2003/03/02 18:17:58 fenrir Exp $
+ * $Id: mms.c,v 1.21 2003/03/03 01:38:07 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -500,7 +500,7 @@ static void asf_HeaderParse( mms_stream_t stream[128],
         stream[i].i_cat = MMS_STREAM_UNKNOWN;
     }
 
-//    fprintf( stderr, " ---------------------header:%d\n", i_header );
+    //fprintf( stderr, " ---------------------header:%d\n", i_header );
     var_buffer_initread( &buffer, p_header, i_header );
 
     var_buffer_getguid( &buffer, &guid );
@@ -514,35 +514,40 @@ static void asf_HeaderParse( mms_stream_t stream[128],
 
     for( ;; )
     {
-//    fprintf( stderr, " ---------------------data:%d\n", buffer.i_data );
-        if( var_buffer_readempty( &buffer ) )
-        {
-            return;
-        }
+        //fprintf( stderr, " ---------------------data:%d\n", buffer.i_data );
 
         var_buffer_getguid( &buffer, &guid );
         i_size = var_buffer_get64( &buffer );
+
+        //fprintf( stderr, "  guid=0x%8.8x-0x%4.4x-0x%4.4x-%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x%2.2x size=%lld\n",
+        //                  guid.v1,guid.v2, guid.v3,
+        //                  guid.v4[0],guid.v4[1],guid.v4[2],guid.v4[3],
+        //                  guid.v4[4],guid.v4[5],guid.v4[6],guid.v4[7],
+        //                  i_size );
+
         if( CmpGuid( &guid, &asf_object_stream_properties_guid ) )
         {
             int     i_stream_id;
             guid_t  stream_type;
-//            msg_Dbg( p_input, "found stream_properties" );
+            //msg_Dbg( p_input, "found stream_properties" );
 
             var_buffer_getguid( &buffer, &stream_type );
             var_buffer_getmemory( &buffer, NULL, 32 );
             i_stream_id = var_buffer_get8( &buffer ) & 0x7f;
 
- //           fprintf( stderr, " 1---------------------skip:%lld\n", i_size - 24 - 32 - 16 - 1 );
+            //fprintf( stderr, " 1---------------------skip:%lld\n", i_size - 24 - 32 - 16 - 1 );
             var_buffer_getmemory( &buffer, NULL, i_size - 24 - 32 - 16 - 1);
 
             if( CmpGuid( &stream_type, &asf_object_stream_type_video ) )
             {
-//                msg_Dbg( p_input, "video stream[%d] found", i_stream_id );
+                //fprintf( stderr, "\nvideo stream[%d] found\n", i_stream_id );
+                //msg_Dbg( p_input, "video stream[%d] found", i_stream_id );
                 stream[i_stream_id].i_cat = MMS_STREAM_VIDEO;
             }
             else if( CmpGuid( &stream_type, &asf_object_stream_type_audio ) )
             {
-//                msg_Dbg( p_input, "audio stream[%d] found", i_stream_id );
+                //fprintf( stderr, "\naudio stream[%d] found\n", i_stream_id );
+                //msg_Dbg( p_input, "audio stream[%d] found", i_stream_id );
                 stream[i_stream_id].i_cat = MMS_STREAM_AUDIO;
             }
             else
@@ -565,14 +570,19 @@ static void asf_HeaderParse( mms_stream_t stream[128],
                 i_count--;
                 i_size -= 6;
             }
-//            fprintf( stderr, " 2---------------------skip:%lld\n", i_size - 24);
+            //fprintf( stderr, " 2---------------------skip:%lld\n", i_size - 24);
             var_buffer_getmemory( &buffer, NULL, i_size - 24 );
         }
         else
         {
+            //fprintf( stderr, " 3---------------------skip:%lld\n", i_size - 24);
             // skip unknown guid
             var_buffer_getmemory( &buffer, NULL, i_size - 24 );
-//            fprintf( stderr, " 3---------------------skip:%lld\n", i_size - 24);
+        }
+
+        if( var_buffer_readempty( &buffer ) )
+        {
+            return;
         }
     }
 }
@@ -1057,13 +1067,29 @@ static int MMSOpen( input_thread_t  *p_input,
         return( -1 );
     }
     /* *** now read header packet *** */
-    if( mms_HeaderMediaRead( p_input, MMS_PACKET_HEADER ) < 0 )
+    /* XXX could be split over multiples packets */
+    for( ;; )
     {
-        msg_Err( p_input, "cannot receive header" );
-        var_buffer_free( &buffer );
-        MMSClose( p_input );
-        return( -1 );
+        if( mms_HeaderMediaRead( p_input, MMS_PACKET_HEADER ) < 0 )
+        {
+            msg_Err( p_input, "cannot receive header" );
+            var_buffer_free( &buffer );
+            MMSClose( p_input );
+            return( -1 );
+        }
+        if( p_access->i_header >= p_access->i_header_size )
+        {
+            msg_Dbg( p_input,
+                     "header complete(%d)",
+                     p_access->i_header );
+            break;
+        }
+        msg_Dbg( p_input,
+                 "header incomplete (%d/%d), reading more",
+                 p_access->i_header,
+                 p_access->i_header_size );
     }
+
     /* *** parse header and get stream and their id *** */
     /* get all streams properties,
      *
@@ -1621,6 +1647,7 @@ static int  mms_ParsePacket( input_thread_t *p_input,
     i_packet_seq_num = GetDWLE( p_data );
     i_packet_length = GetWLE( p_data + 6 );
 
+    //msg_Warn( p_input, "------->i_packet_length=%d, i_data=%d", i_packet_length, i_data );
 
     if( i_packet_length > i_data || i_packet_length <= 8)
     {
@@ -1666,9 +1693,22 @@ static int  mms_ParsePacket( input_thread_t *p_input,
 
     if( i_packet_id == p_access->i_header_packet_id_type )
     {
-        FREE( p_access->p_header );
-        p_access->p_header = p_packet;
-        p_access->i_header = i_packet_length - 8;
+        if( p_access->p_header )
+        {
+            p_access->p_header = realloc( p_access->p_header,
+                                          p_access->i_header + i_packet_length - 8 );
+            memcpy( &p_access->p_header[p_access->i_header],
+                    p_packet,
+                    i_packet_length - 8 );
+            p_access->i_header += i_packet_length - 8;
+
+            free( p_packet );
+        }
+        else
+        {
+            p_access->p_header = p_packet;
+            p_access->i_header = i_packet_length - 8;
+        }
 /*        msg_Dbg( p_input,
                  "receive header packet (%d bytes)",
                  i_packet_length - 8 ); */

@@ -2,7 +2,7 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.7 2003/01/28 14:00:49 fenrir Exp $
+ * $Id: mms.h,v 1.8 2003/03/03 01:38:07 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -123,7 +123,7 @@ typedef struct access_s
     size_t      i_packet_length;
     uint32_t    i_packet_count;
     int         i_max_bit_rate;
-    size_t      i_header_size;
+    int         i_header_size;
 
 } access_t;
 
