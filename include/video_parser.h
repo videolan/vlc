@@ -67,7 +67,6 @@ typedef struct vpar_thread_s
                                                         address increment */
     /* variable length codes for the structure dct_dc_size */
     lookup_t                pppl_dct_dc_size[2][2][32];  
-    lookup_t                pppl_dct_dc_size[2][2][32];
     /* tables for macroblock types 0=P 1=B */
     lookup_t                pl_mb_type[2][64];
     /* table for coded_block_pattern */
