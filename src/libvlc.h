@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.99 2003/10/30 17:58:07 gbazin Exp $
+ * $Id: libvlc.h,v 1.100 2003/10/30 22:34:48 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -219,6 +219,10 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "es", "de", "fr", "it", 
 #define SPUMARGIN_LONGTEXT N_( \
     "You can use this option to place the subtitles under the movie, " \
     "instead of over the movie. Try several positions.")
+
+#define OSD_TEXT N_("On Screen Display")
+#define OSD_LONGTEXT N_( \
+    "You can disable the messages VLC creates in the video.")
 
 #define FILTER_TEXT N_("Video filter module")
 #define FILTER_LONGTEXT N_( \
@@ -639,6 +643,7 @@ vlc_module_begin();
 #endif
     add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT, 
                         SPUMARGIN_LONGTEXT, VLC_TRUE );
+    add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
     add_module( "filter", "video filter", NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
     add_string( "aspect-ratio", "", NULL,

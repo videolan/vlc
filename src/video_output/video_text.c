@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.45 2003/08/04 23:35:25 gbazin Exp $
+ * $Id: video_text.c,v 1.46 2003/10/30 22:34:48 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include <vlc/vout.h>
+#include <osd.h>
 
 /**
  * \brief Show text on the video for some time
@@ -77,3 +78,28 @@ void vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
 	msg_Warn( p_vout, "No text renderer found" );
     }
 }
+
+
+/**
+ * \brief Write an informative message at the default location,
+ *        for the default duration and only if the OSD option is enabled. 
+ * \param p_caller The object that called the function.
+ * \param psz_string The text to be shown
+ **/
+void vout_OSDMessage( vlc_object_t *p_caller, char *psz_string )
+{
+    vout_thread_t *p_vout;
+
+    if( !config_GetInt( p_caller, "osd" ) ) return;
+
+    p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+
+    if( p_vout )
+    {
+        vout_ShowTextRelative( p_vout, psz_string, NULL,
+                               OSD_ALIGN_TOP|OSD_ALIGN_RIGHT,
+                               30,20,1000000 );
+        vlc_object_release( p_vout );
+    }
+}
+

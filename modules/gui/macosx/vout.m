@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.59 2003/10/29 11:54:48 hartman Exp $
+ * $Id: vout.m,v 1.60 2003/10/30 22:34:48 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -987,7 +987,8 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     unichar key = 0;
     vlc_value_t val;
     unsigned int i_pressed_modifiers = 0;
-
+    val.i_int = 0;
+    
     i_pressed_modifiers = [o_event modifierFlags];
 
     if( i_pressed_modifiers & NSShiftKeyMask )
@@ -999,7 +1000,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     if( i_pressed_modifiers & NSCommandKeyMask )
         val.i_int |= KEY_MODIFIER_COMMAND;
 
-    NSLog( @"detected the modifiers: %x", val.i_int );
+    NSLog( @"detected the modifiers: %x", i_pressed_modifiers );
 
     key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
 

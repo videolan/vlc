@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.4 2003/10/30 17:58:07 gbazin Exp $
+ * $Id: hotkeys.c,v 1.5 2003/10/30 22:34:48 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -58,7 +58,6 @@ struct intf_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
-static void Feedback( intf_thread_t *, char * );
 static int  GetKey  ( intf_thread_t *);
 static int  KeyEvent( vlc_object_t *, char const *,
                       vlc_value_t, vlc_value_t, void * );
@@ -197,7 +196,7 @@ static void Run( intf_thread_t *p_intf )
         if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_vlc->b_die = VLC_TRUE;
-            Feedback( p_intf, _("Quit" ) );
+            vout_OSDMessage( p_intf, _("Quit" ) );
             continue;
         }
         else if( i_action == ACTIONID_VOL_UP )
@@ -206,7 +205,7 @@ static void Run( intf_thread_t *p_intf )
             char string[9];
             aout_VolumeUp( p_intf, 1, &i_newvol );
             sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
-            Feedback( p_intf, string );
+            vout_OSDMessage( p_intf, string );
         }
         else if( i_action == ACTIONID_VOL_DOWN )
         {
@@ -214,7 +213,7 @@ static void Run( intf_thread_t *p_intf )
             char string[9];
             aout_VolumeDown( p_intf, 1, &i_newvol );
             sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
-            Feedback( p_intf, string );
+            vout_OSDMessage( p_intf, string );
         }
         else if( i_action == ACTIONID_FULLSCREEN )
         {
@@ -243,7 +242,7 @@ static void Run( intf_thread_t *p_intf )
             if( p_input &&
                 p_input->stream.control.i_status != PAUSE_S )
             {
-                Feedback( p_intf, _( "Pause" ) );
+                vout_OSDMessage( p_intf, _( "Pause" ) );
                 input_SetStatus( p_input, INPUT_STATUS_PAUSE );
             }
             else
@@ -256,7 +255,7 @@ static void Run( intf_thread_t *p_intf )
                     if( p_playlist->i_size )
                     {
                         vlc_mutex_unlock( &p_playlist->object_lock );
-                        Feedback( p_intf, _( "Play" ) );
+                        vout_OSDMessage( p_intf, _( "Play" ) );
                         playlist_Play( p_playlist );
                         vlc_object_release( p_playlist );
                     }
@@ -267,7 +266,7 @@ static void Run( intf_thread_t *p_intf )
         {
             if( i_action == ACTIONID_PAUSE )
             {
-                Feedback( p_intf, _( "Pause" ) );
+                vout_OSDMessage( p_intf, _( "Pause" ) );
                 input_SetStatus( p_input, INPUT_STATUS_PAUSE );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
@@ -342,16 +341,6 @@ static void Run( intf_thread_t *p_intf )
             }
         }
 
-    }
-}
-
-static void Feedback( intf_thread_t *p_intf, char *psz_string )
-{
-    if ( p_intf->p_sys->p_vout )
-    {
-        vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL, 
-                               OSD_ALIGN_TOP | OSD_ALIGN_RIGHT,
-                               30, 20, 1500000 );
     }
 }
 

@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.18 2003/08/03 23:11:21 gbazin Exp $
+ * $Id: intf.c,v 1.19 2003/10/30 22:34:48 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,6 +74,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
  *****************************************************************************/
 int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 {
+    vlc_value_t val;
     aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
     int i_result = 0;
@@ -90,6 +91,9 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
     vlc_mutex_unlock( &p_aout->mixer_lock );
 
     vlc_object_release( p_aout );
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_aout, "intf-change", val );
     return i_result;
 }
 
