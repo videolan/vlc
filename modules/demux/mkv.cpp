@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.18 2003/08/01 00:05:07 gbazin Exp $
+ * $Id: mkv.cpp,v 1.19 2003/08/10 14:21:15 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -398,7 +398,8 @@ static int Activate( vlc_object_t * p_this )
                     tcs.ReadData( p_sys->es->I_O() );
                     p_sys->i_timescale = uint64(tcs);
 
-                    msg_Dbg( p_input, "|   |   + TimecodeScale=%lld", p_sys->i_timescale );
+                    msg_Dbg( p_input, "|   |   + TimecodeScale="I64Fd,
+                             p_sys->i_timescale );
                 }
                 else if( EbmlId( *el2 ) == KaxDuration::ClassInfos.GlobalId )
                 {
@@ -603,7 +604,7 @@ static int Activate( vlc_object_t * p_this )
                             defd.ReadData( p_sys->es->I_O() );
 
                             tk.i_default_duration = uint64(defd);
-                            msg_Dbg( p_input, "|   |   |   + Track Default Duration=%lld", uint64(defd) );
+                            msg_Dbg( p_input, "|   |   |   + Track Default Duration="I64Fd, uint64(defd) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackTimecodeScale::ClassInfos.GlobalId )
                         {
@@ -649,7 +650,7 @@ static int Activate( vlc_object_t * p_this )
                                 tk.p_extra_data = (uint8_t*)malloc( tk.i_extra_data );
                                 memcpy( tk.p_extra_data, cpriv.GetBuffer(), tk.i_extra_data );
                             }
-                            msg_Dbg( p_input, "|   |   |   + Track CodecPrivate size=%lld", cpriv.GetSize() );
+                            msg_Dbg( p_input, "|   |   |   + Track CodecPrivate size="I64Fd, cpriv.GetSize() );
                         }
                         else if( EbmlId( *el3 ) == KaxCodecName::ClassInfos.GlobalId )
                         {
@@ -892,17 +893,17 @@ static int Activate( vlc_object_t * p_this )
                     {
                         if( id == KaxCues::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = cues at %lld", i_pos );
+                            msg_Dbg( p_input, "|   |   |   = cues at "I64Fd, i_pos );
                             p_sys->i_cues_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
                         else if( id == KaxChapters::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = chapters at %lld", i_pos );
+                            msg_Dbg( p_input, "|   |   |   = chapters at "I64Fd, i_pos );
                             p_sys->i_chapters_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
                         else if( id == KaxTags::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = tags at %lld", i_pos );
+                            msg_Dbg( p_input, "|   |   |   = tags at "I64Fd, i_pos );
                             p_sys->i_tags_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
 
@@ -1661,7 +1662,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     int         i_track_skipping;
     int         i_track;
 
-    msg_Dbg( p_input, "seek request to %lld (%d%%)", i_date, i_percent );
+    msg_Dbg( p_input, "seek request to "I64Fd" (%d%%)", i_date, i_percent );
     if( i_date < 0 && i_percent < 0 )
     {
         return;
@@ -1732,7 +1733,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
             i_index--;
         }
 
-        msg_Dbg( p_input, "seek got %lld (%d%%)",
+        msg_Dbg( p_input, "seek got "I64Fd" (%d%%)",
                  p_sys->index[i_index].i_time, (int)(100 * p_sys->index[i_index].i_position /p_input->stream.p_selected_area->i_size ) );
 
         p_sys->in->setFilePointer( p_sys->index[i_index].i_position, seek_beginning );
@@ -1934,7 +1935,7 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
     if( i_pos < 0 ||
         ( i_pos > p_input->stream.p_selected_area->i_size && p_input->stream.p_selected_area->i_size != 0 ) )
     {
-        msg_Err( p_input, "seeking to wrong place (i_pos=%lld)", i_pos );
+        msg_Err( p_input, "seeking to wrong place (i_pos="I64Fd")", i_pos );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         mb_eof = VLC_TRUE;
@@ -1949,7 +1950,8 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
         return;
     }
 
-    msg_Dbg( p_input, "####################seek new=%lld old=%lld", i_pos, getFilePointer() );
+    msg_Dbg( p_input, "####################seek new="I64Fd" old="I64Fd,
+             i_pos, getFilePointer() );
 
     if( p_input->stream.b_seekable &&
         ( /*p_input->stream.i_method == INPUT_METHOD_FILE ||*/ i_pos < i_last || i_pos - i_last > p_input->i_bufsize / 4 ) )
@@ -1992,7 +1994,8 @@ void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
     }
     else
     {
-        msg_Err( p_input, "cannot seek or emulate seek to %lld from %lld", i_pos, i_last );
+        msg_Err( p_input, "cannot seek or emulate seek to "I64Fd" from "I64Fd,
+                 i_pos, i_last );
         mb_eof = VLC_TRUE;
     }
 }
@@ -2221,8 +2224,9 @@ static void LoadCues( input_thread_t *p_input )
             }
             ep->Up();
 
-            msg_Dbg( p_input, " * added time=%lld pos=%lld track=%d bnum=%d",
-                     idx.i_time, idx.i_position, idx.i_track, idx.i_block_number );
+            msg_Dbg( p_input, " * added time="I64Fd" pos="I64Fd
+                     " track=%d bnum=%d", idx.i_time, idx.i_position,
+                     idx.i_track, idx.i_block_number );
 
             p_sys->i_index++;
             if( p_sys->i_index >= p_sys->i_index_max )

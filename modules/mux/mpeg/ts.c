@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.24 2003/08/04 22:49:02 fenrir Exp $
+ * $Id: ts.c,v 1.25 2003/08/10 14:21:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -300,7 +300,8 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_bitrate_min > 0 && p_sys->i_bitrate_max > 0 &&
         p_sys->i_bitrate_min > p_sys->i_bitrate_max )
     {
-        msg_Err( p_mux, "incompatible minimum and maximum bitrate, disabling bitrate control" );
+        msg_Err( p_mux, "incompatible minimum and maximum bitrate, "
+                 "disabling bitrate control" );
         p_sys->i_bitrate_min = 0;
         p_sys->i_bitrate_max = 0;
     }
@@ -311,7 +312,7 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->i_pcr_delay <= 0 )
         {
             msg_Err( p_mux,
-                     "invalid pcr delay (%lldms) reseting to 100ms",
+                     "invalid pcr delay ("I64Fd"ms) reseting to 100ms",
                      p_sys->i_pcr_delay / 1000 );
             p_sys->i_pcr_delay = 100000;
         }
@@ -324,14 +325,15 @@ static int Open( vlc_object_t *p_this )
             p_sys->i_pcr_soft_delay >= p_sys->i_pcr_delay )
         {
             msg_Err( p_mux,
-                     "invalid pcr-soft delay (%lldms) disabled",
+                     "invalid pcr-soft delay ("I64Fd"ms) disabled",
                      p_sys->i_pcr_soft_delay / 1000 );
             p_sys->i_pcr_soft_delay = 0;
         }
     }
 
-    msg_Dbg( p_mux, "pcr_delay=%lld pcr_soft_delay=%lld",
+    msg_Dbg( p_mux, "pcr_delay="I64d" pcr_soft_delay="I64Fd,
              p_sys->i_pcr_delay, p_sys->i_pcr_soft_delay );
+
     /* for TS génération */
     p_sys->i_pcr    = 0;
     p_sys->i_dts    = 0;
@@ -764,10 +766,11 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
             break;
         }
 
-        if( ( p_sys->i_dts +p_sys->i_length ) - i_dts > 2000000 ||
+        if( ( p_sys->i_dts + p_sys->i_length ) - i_dts > 2000000 ||
             ( p_sys->i_dts + p_sys->i_length ) - i_dts < -2000000 )
         {
-            msg_Err( p_mux, "| buffer_dts - pcr_pts | > 2s empting pcr TS buffers" );
+            msg_Err( p_mux, "| buffer_dts - pcr_pts | > 2s ("I64Fd") empting "
+                     "pcr TS buffers", p_sys->i_dts + p_sys->i_length - i_dts);
 
             sout_BufferDelete( p_mux->p_sout, p_data );
 
@@ -787,9 +790,8 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
             break;
         }
 
-        msg_Dbg( p_mux,
-                 "dropping buffer size=%d dts=%lld pcr_dts=%lld",
-                 p_data->i_size, i_dts, p_sys->i_dts );
+        msg_Dbg( p_mux, "dropping buffer size=%d dts="I64Fd" pcr_dts="I64Fd
+                 " diff="I64Fd, p_data->i_size, i_dts, p_sys->i_dts );
         sout_BufferDelete( p_mux->p_sout, p_data );
     }
 

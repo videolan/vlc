@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.13 2003/05/02 00:33:42 fenrir Exp $
+ * $Id: avi.c,v 1.14 2003/08/10 14:21:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -231,7 +231,8 @@ static void Close( vlc_object_t * p_this )
                     (uint64_t)p_stream->i_totalsize /
                     (uint64_t)p_stream->i_duration;
         }
-        msg_Info( p_mux, "stream[%d] duration:%lld totalsize:%lld frames:%d fps:%f kb/s:%d",
+        msg_Info( p_mux, "stream[%d] duration:"I64Fd" totalsize:"I64Fd
+                  " frames:%d fps:%f kb/s:%d",
                   i_stream,
                   (int64_t)p_stream->i_duration / (int64_t)1000000,
                   p_stream->i_totalsize,
