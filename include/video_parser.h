@@ -22,9 +22,20 @@
  *******************************************************************************/
 typedef struct sequence_s
 {
-    u32                 i_height, i_width;
+    u16                 i_height, i_width;
+    u16                 i_mb_height, i_mb_width;
     unsigned int        i_aspect_ratio;
-    double              frame_rate;
+    double              d_frame_rate;
+    unsigned int        i_chroma_format;
+    boolean_t           b_mpeg2;
+    boolean_t           b_progressive;
+    
+    /* Parser context */
+    picture_t *             p_forward, p_backward;
+    pel_lookup_table_t *    p_frame_lum_lookup, p_field_lum_lookup;
+    pel_lookup_table_t *    p_frame_chroma_lookup, p_field_chroma_lookup;
+    quant_matrix_t          intra_quant, nonintra_quant;
+    quant_matrix_t          chroma_intra_quant, chroma_nonintra_quant;
 } sequence_t;
 
 /*******************************************************************************

@@ -55,6 +55,7 @@ void vpar_InitFIFO( vpar_thread_t * p_vpar )
     for( i_dummy = 0; i_dummy < VFIFO_SIZE + 1; i_dummy++ )
     {
         p_vpar->vfifo.pp_undec_free[i_dummy] = p_vpar->vfifo.p_undec_p + i;
+        p_vpar->vfifo.p_undec_p[i].p_mb_info = NULL;
     }
 }
 

@@ -62,6 +62,7 @@ typedef struct undec_picture_s
     boolean_t                   b_mpeg2;
     int                         i_mb_height, i_mb_width;
     int                         i_structure;
+    mtime_t                     i_pts;
 
     macroblock_info_t *         p_mb_info;
 
@@ -87,15 +88,32 @@ typedef struct undec_picture_s
 /*******************************************************************************
  * pel_lookup_table_t : lookup table for pixels
  *******************************************************************************/
-typedef struct pel_lookup_table_s {
 #ifdef BIG_PICTURES
-    u32 *                       pi_pel;
+#   define PEL_P                u32
 #else
-    u16 *                       pi_pel;
+#   define PEL_P                u16
 #endif
+
+typedef struct pel_lookup_table_s {
+    PEL_P *                     pi_pel;
 
     /* When the size of the picture changes, this structure is freed, so we
      * keep a reference count. */
     int                         i_refcount;
     vlc_mutex_t                 lock;
 } pel_lookup_table_t;
+
+#define LINK_LOOKUP(p_l) \
+    vlc_mutex_lock( (p_l)->lock ); \
+    (p_l)->i_refcount++; \
+    vlc_mutex_unlock( (p_l)->lock );
+
+#define UNLINK_LOOKUP(p_l) \
+    vlc_mutex_lock( (p_l)->lock ); \
+    (p_l)->i_refcount--; \
+    if( (p_l)->i_refcount <= 0 ) \
+    { \
+        vlc_mutex_unlock( (p_l)->lock ); \
+        free( p_l ); \
+    } \
+    vlc_mutex_unlock( (p_l)->lock );

@@ -166,12 +166,21 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->i_stream =  vout_CreateStream( p_vpar->p_vout );
     if( p_vpar->i_stream < 0 )                                        /* error */
     {
-        return( 1 );        
+        return( 1 );
     }
-    
-    /* Initialize parsing data */    
-    /* ?? */
 #endif
+
+    /* Initialize parsing data */
+    p_vpar->sequence.p_forward = p_vpar->sequence.p_backward = NULL;
+    p_vpar->sequence.p_frame_lum_lookup
+        = p_vpar->sequence.p_field_lum_lookup
+        = p_vpar->sequence.p_frame_chroma_lookup
+        = p_vpar->sequence.p_field_chroma_lookup
+        = NULL;
+    p_vpar->sequence.intra_quant.b_allocated = FALSE;
+    p_vpar->sequence.nonintra_quant.b_allocated = FALSE;
+    p_vpar->sequence.chroma_intra_quant.b_allocated = FALSE;
+    p_vpar->sequence.chroma_nonintra_quant.b_allocated = FALSE;
 
     /* Initialize other properties */
 #ifdef STATS
@@ -255,7 +264,7 @@ static void RunThread( vpar_thread_t *p_vpar )
      */
     if( p_vpar->b_error )
     {
-        ErrorThread( p_vpar );        
+        ErrorThread( p_vpar );
     }
 
     /* End of thread */
