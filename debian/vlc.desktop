@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=VLC
-Name[fr]=VLC
-Comment=multimedia player
-Comment[fr]=Lecteur multimédia
-Exec=vlc
-Icon=vlc.png
-Terminal=0
-Type=Application

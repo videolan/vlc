@@ -11,6 +11,7 @@ vlc (0.5.0-1) unstable; urgency=low
   * New GUI package: wxvlc (wxWindows).
   * New debian/woody-buildpackage file that can be used to build Woody
     packages.
+  * Made the GNOME desktop entries more user-friendly (Closes: #149749).
 
  -- Samuel Hocevar <sam@zoy.org>  Thu,  4 Jul 2002 17:44:25 +0200
 
