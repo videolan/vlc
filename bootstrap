@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.38 2002/12/26 10:55:35 massiot Exp $
+##  $Id: bootstrap,v 1.39 2003/01/27 23:42:59 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -155,7 +155,7 @@ lib${mod}_DATA = \$(D_${mod}_p)
 lib${mod}dir = \$(libdir)/vlc/${topdir}
 ${PRIVATE}noinst_LIBRARIES += \$(L_${mod}_p)
 ${PRIVATE}${dir}/lib${mod}_plugin\$(LIBEXT): \$(${sym}_lib${mod}_plugin_a_OBJECTS)
-${PRIVATE}	\$(${LINKER}) \$^ -shared \$(LDFLAGS_plugins) \$(LDFLAGS_${mod})
+${PRIVATE}	\$(${LINKER}) \$(${sym}_lib${mod}_plugin_a_OBJECTS) -shared \$(LDFLAGS_plugins) \$(LDFLAGS_${mod})
 
 
 EOF
