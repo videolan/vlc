@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.19 2002/10/08 18:10:09 sam Exp $
+ * $Id: libvlc.h,v 1.20 2002/10/15 12:30:00 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -168,7 +168,7 @@
 #define SERVER_PORT_LONGTEXT N_( \
     "This is the port used for UDP streams. By default, we chose 1234.")
 
-#define MTU_TEXT N_("MTU of the interface")
+#define MTU_TEXT N_("MTU of the network interface")
 #define MTU_LONGTEXT N_( \
     "This is the typical size of UDP packets that we expect. On Ethernet " \
     "it is usually 1500.")
@@ -302,7 +302,7 @@
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
-#define FAST_MUTEX_TEXT N_("fast mutex on NT/2K/XP (developpers only)")
+#define FAST_MUTEX_TEXT N_("fast mutex on NT/2K/XP (developers only)")
 #define FAST_MUTEX_LONGTEXT N_( \
     "On Windows NT/2K/XP we use a slow mutex implementation but which " \
     "allows us to correctely implement condition variables. " \

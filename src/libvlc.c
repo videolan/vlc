@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.40 2002/10/15 08:35:24 sam Exp $
+ * $Id: libvlc.c,v 1.41 2002/10/15 12:30:00 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -86,6 +86,7 @@ static vlc_t *  p_static_vlc;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static void SetLanguage   ( char const * );
 static int  GetFilenames  ( vlc_t *, int, char *[] );
 static void Usage         ( vlc_t *, char const *psz_module_name );
 static void ListModules   ( vlc_t * );
@@ -222,25 +223,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         return VLC_ENOOBJ;
     }
 
-    /* Support for gettext */
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
-#   if defined( HAVE_LOCALE_H ) && defined( HAVE_LC_MESSAGES )
-    if( !setlocale( LC_MESSAGES, "" ) )
-    {
-        fprintf( stderr, "warning: unsupported locale settings\n" );
-    }
-
-    setlocale( LC_CTYPE, "" );
-#   endif
-
-    if( !bindtextdomain( PACKAGE, LOCALEDIR ) )
-    {
-        fprintf( stderr, "warning: no domain %s in directory %s\n",
-                 PACKAGE, LOCALEDIR );
-    }
-
-    textdomain( PACKAGE );
-#endif
+    /*
+     * Support for gettext
+     */
+    SetLanguage( "" );
 
     /*
      * System specific initialization code
@@ -916,6 +902,35 @@ int VLC_FullScreen( int i_object )
 }
 
 /* following functions are local */
+
+/*****************************************************************************
+ * SetLanguage: set the interface language.
+ *****************************************************************************
+ * We set the LC_MESSAGES locale category for interface messages and buttons,
+ * as well as the LC_CTYPE category for string sorting and possible wide
+ * character support.
+ *****************************************************************************/
+static void SetLanguage ( char const *psz_lang )
+{
+#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
+#   if defined( HAVE_LOCALE_H ) && defined( HAVE_LC_MESSAGES )
+    if( !setlocale( LC_MESSAGES, psz_lang ) )
+    {
+        fprintf( stderr, "warning: unsupported locale settings\n" );
+    }
+
+    setlocale( LC_CTYPE, psz_lang );
+#   endif
+
+    if( !bindtextdomain( PACKAGE, LOCALEDIR ) )
+    {
+        fprintf( stderr, "warning: no domain %s in directory %s\n",
+                 PACKAGE, LOCALEDIR );
+    }
+
+    textdomain( PACKAGE );
+#endif
+}
 
 /*****************************************************************************
  * GetFilenames: parse command line options which are not flags

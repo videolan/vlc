@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.4 2002/10/15 08:35:24 sam Exp $
+ * $Id: variables.c,v 1.5 2002/10/15 12:30:01 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -130,7 +130,6 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 
     if( i_del < 0 )
     {
-        msg_Err( p_this, "variable %s was not found", psz_name );
         vlc_mutex_unlock( &p_this->var_lock );
         return VLC_ENOVAR;
     }
