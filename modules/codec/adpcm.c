@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.5 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: adpcm.c,v 1.6 2003/01/13 17:39:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -47,16 +47,17 @@ typedef struct adec_thread_s
     int i_codec;
 
     WAVEFORMATEX    *p_wf;
-    
-    /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
+
     int                 i_block;
     uint8_t             *p_block;
     int                 i_samplesperblock;
-    
+
+    uint8_t             *p_buffer;      /* buffer for gather pes */  \
+    int                 i_buffer;       /* bytes present in p_buffer */
+
     /* Input properties */
     decoder_fifo_t *p_fifo;
-    
+
     /* Output properties */
     aout_instance_t *   p_aout;       /* opaque */
     aout_input_t *      p_aout_input; /* opaque */
@@ -266,7 +267,7 @@ static int InitThread( adec_thread_t * p_adec )
                  "block size undefined, using %d default", 
                  p_adec->i_block );
     }
-    p_adec->p_block = malloc( p_adec->i_block );
+    p_adec->p_block = NULL;
 
     /* calculate samples per block */
     switch( p_adec->i_codec )
@@ -320,12 +321,45 @@ static int InitThread( adec_thread_t * p_adec )
     }
 
     /* Init the BitStream */
-    InitBitstream( &p_adec->bit_stream, p_adec->p_fifo,
-                   NULL, NULL );
+//    InitBitstream( &p_adec->bit_stream, p_adec->p_fifo,
+//                   NULL, NULL );
 
     return( 0 );
 }
 
+
+static void GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
+{
+    int i_copy;
+    int i_count;
+
+    data_packet_t   *p_data;
+
+    i_count = 0;
+    p_data = p_pes->p_first;
+    while( p_data != NULL && i_count < i_max )
+    {
+
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
+                        i_max - i_count );
+
+        if( i_copy > 0 )
+        {
+            memcpy( p_buf,
+                    p_data->p_payload_start,
+                    i_copy );
+        }
+
+        p_data = p_data->p_next;
+        i_count += i_copy;
+        p_buf   += i_copy;
+    }
+
+    if( i_count < i_max )
+    {
+        memset( p_buf, 0, i_max - i_count );
+    }
+}
 
 /*****************************************************************************
  * DecodeThread: decodes a frame
@@ -333,57 +367,89 @@ static int InitThread( adec_thread_t * p_adec )
 static void DecodeThread( adec_thread_t *p_adec )
 {
     aout_buffer_t   *p_aout_buffer;
+    pes_packet_t    *p_pes;
 
-    /* get pts */
-    CurrentPTS( &p_adec->bit_stream, &p_adec->pts, NULL );
-    /* gather block */
-    GetChunk( &p_adec->bit_stream,
-              p_adec->p_block,
-              p_adec->i_block );
+    int             i_frame_size;
 
-    /* get output buffer */
-    if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
+    /* **** Get a new frames from streams **** */
+    do
     {
-        aout_DateSet( &p_adec->date, p_adec->pts );
-    }
-    else if( !aout_DateGet( &p_adec->date ) )
+        input_ExtractPES( p_adec->p_fifo, &p_pes );
+        if( !p_pes )
+        {
+            p_adec->p_fifo->b_error = 1;
+            return;
+        }
+        if( p_pes->i_pts != 0 )
+        {
+            p_adec->pts = p_pes->i_pts;
+        }
+        i_frame_size = p_pes->i_pes_size;
+
+        if( i_frame_size > 0 )
+        {
+            if( p_adec->i_buffer < i_frame_size + 16 )
+            {
+                FREE( p_adec->p_buffer );
+                p_adec->p_buffer = malloc( i_frame_size + 16 );
+                p_adec->i_buffer = i_frame_size + 16;
+            }
+
+            GetPESData( p_adec->p_buffer, p_adec->i_buffer, p_pes );
+        }
+        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+
+    } while( i_frame_size <= 0 );
+
+    for( p_adec->p_block = p_adec->p_buffer;
+         i_frame_size >= p_adec->i_block;
+         p_adec->p_block += p_adec->i_block, i_frame_size -= p_adec->i_block  )
     {
-        return;
+        /* get output buffer */
+        if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
+        {
+            aout_DateSet( &p_adec->date, p_adec->pts );
+        }
+        else if( !aout_DateGet( &p_adec->date ) )
+        {
+            return;
+        }
+        p_adec->pts = 0;
+
+        p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
+                                           p_adec->p_aout_input,
+                                           p_adec->i_samplesperblock );
+        if( !p_aout_buffer )
+        {
+            msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
+            p_adec->p_fifo->b_error = 1;
+            return;
+        }
+
+        p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
+        p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
+                                                      p_adec->i_samplesperblock );
+
+        /* decode */
+
+        switch( p_adec->i_codec )
+        {
+            case ADPCM_IMA_QT:
+                break;
+            case ADPCM_IMA_WAV:
+                DecodeAdpcmImaWav( p_adec, p_aout_buffer );
+                break;
+            case ADPCM_MS:
+                DecodeAdpcmMs( p_adec, p_aout_buffer );
+                break;
+            default:
+                break;
+        }
+
+
+        /* **** Now we can output these samples **** */
+        aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
     }
-
-    p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout, 
-                                       p_adec->p_aout_input,
-                                       p_adec->i_samplesperblock );
-    if( !p_aout_buffer )
-    {
-        msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
-        p_adec->p_fifo->b_error = 1;
-        return;
-    }
-    
-    p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
-    p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
-                                                  p_adec->i_samplesperblock );
-
-    /* decode */
-    
-    switch( p_adec->i_codec )
-    {
-        case ADPCM_IMA_QT:
-            break;
-        case ADPCM_IMA_WAV:
-            DecodeAdpcmImaWav( p_adec, p_aout_buffer );
-            break;
-        case ADPCM_MS:
-            DecodeAdpcmMs( p_adec, p_aout_buffer );
-            break;
-        default:
-            break;
-    }
-
-
-    /* **** Now we can output these samples **** */
-    aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
 }
 
 
@@ -398,8 +464,8 @@ static void EndThread (adec_thread_t *p_adec)
     }
 
     msg_Dbg( p_adec->p_fifo, "adpcm audio decoder closed" );
-        
-    free( p_adec->p_block );
+
+    FREE( p_adec->p_buffer );
     free( p_adec );
 }
 #define CLAMP( v, min, max ) \
