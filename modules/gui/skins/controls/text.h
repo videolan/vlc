@@ -2,7 +2,7 @@
  * text.h: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: text.h,v 1.2 2003/04/17 13:08:02 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -106,8 +106,9 @@ class ControlText : public GenericControl
         // Keep on scrolling
         void DoScroll();
 
-        // To avoid auto scrolling when manual scrolling
+        // Getters
         bool GetSelected() { return Selected; };
+        bool IsScrolling() { return Scroll; };
 };
 //---------------------------------------------------------------------------
 

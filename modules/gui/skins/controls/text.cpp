@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: text.cpp,v 1.4 2003/04/17 13:08:02 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -77,20 +77,37 @@
     //-----------------------------------------------------------------------
 
     #else
+
     //-----------------------------------------------------------------------
     // Gtk2 methods
     //-----------------------------------------------------------------------
+    gboolean ScrollingTextTimer( gpointer data )
+    {
+        if( (ControlText *)data != NULL )
+        {
+            if( !( (ControlText *)data )->IsScrolling() )
+                return false;
+
+            /* FIXME
+            if( !( (ControlText *)data )->GetSelected() )
+               ( (ControlText *)data )->DoScroll();
+            */
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    //-----------------------------------------------------------------------
     void ControlText::StartScrolling()
     {
-/* FIXME: kluge */
- /*       SetTimer( ( (Win32Window *)ParentWindow )->GetHandle(), (UINT_PTR)this,
-                  100, (TIMERPROC)ScrollingTextTimer );*/
+        g_timeout_add( 100, (GSourceFunc)ScrollingTextTimer, (gpointer)this );
     }
     //-----------------------------------------------------------------------
     void ControlText::StopScrolling()
     {
-/*        KillTimer( ( (Win32Window *)ParentWindow )->GetHandle(),
-                   (UINT_PTR)this );*/
     }
     //-----------------------------------------------------------------------
 
@@ -173,8 +190,8 @@ void ControlText::SetScrolling()
     }
     else if( Scroll && TextWidth <= Width )
     {
-        StopScrolling();
         Scroll = false;
+        StopScrolling();
     }
 }
 //---------------------------------------------------------------------------

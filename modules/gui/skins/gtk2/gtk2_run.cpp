@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.11 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: gtk2_run.cpp,v 1.12 2003/04/17 13:08:02 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -63,12 +63,12 @@ int  SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 // REFRESH TIMER CALLBACK
 //---------------------------------------------------------------------------
-/*void CALLBACK RefreshTimer( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
+gboolean RefreshTimer( gpointer data )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)GetWindowLongPtr( hwnd,
-        GWLP_USERDATA );
+    intf_thread_t *p_intf = (intf_thread_t *)data;
     SkinManage( p_intf );
-}*/
+    return true;
+}
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -191,7 +191,6 @@ void GTK2Proc( GdkEvent *event, gpointer data )
 //---------------------------------------------------------------------------
 
 
-
 //---------------------------------------------------------------------------
 // GTK2 interface
 //---------------------------------------------------------------------------
@@ -204,6 +203,9 @@ void OSRun( intf_thread_t *p_intf )
 
     // Set event callback
     gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
+
+    // Add timer
+    g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
 
     // Main event loop
     g_main_loop_run( callbackobj->Loop );

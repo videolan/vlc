@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.9 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: button.cpp,v 1.10 2003/04/17 13:08:02 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -135,6 +135,8 @@ void ControlButton::Draw( int x, int y, int w, int h, Graphics *dest )
 bool ControlButton::MouseUp( int x, int y, int button )
 {
     // If hit in the button
+
+
     if( Img[1]->Hit( x - Left, y - Top ) )
     {
         if( !Enabled )
