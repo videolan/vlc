@@ -96,14 +96,6 @@ Task
 Difficulty: Medium
 Urgency: Wishlist
 Platform: any
-Description: no blocking primary interface
-Do away with the strange primary blocking interface. The first interface should be run in the same thread, but not be the blocking call. Load other interfaces in new threads.
-Status: Todo
-
-Task
-Difficulty: Medium
-Urgency: Wishlist
-Platform: any
 Description: OSD Icons
  Make OSD Icons for Play/Pause/Stop. Integrate them better into the core system.
 Status: Assigned to yoann

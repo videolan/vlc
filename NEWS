@@ -12,23 +12,41 @@ Core support:
  * New --play-and-stop feature which stops the playlist after each played item
  * Daemon mode
 
+Input:
+ * New screen capture input plugin for X11
+ * Improved DVD support:
+    - uses libdvdnav for playing DVDs with menus support
+    - uses libdvdread for simple playback with menus (eg. for streaming)
+ * Experimental --input-slave option to start playing with multi-input
+ * Automatic MTU discovery for UDP streams
+
 Demux:
  * Support iTunes Music Store previews
  * Support for MJPEG webcams (i.e. AXIS cams)
  * Added initial mp4 and mpeg-ts text track support
  * Windows Media Server RTSP support
+ * Support for MPEG TS streams with error correction (204/192 bytes TS packets)
+ * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
+ * Skin2 .vlt file loader (only when skin2 is the current interface)
 
 Codecs:
  * G.726 audio support
  * 14496-17 MPEG TS text support
  * MPEG-4 text support
- * DirectX Media Object decoder (allows playing some media types, like WMV3 on Windows)
+ * Vastly improved DVB subtitles decoder (ETS 300 743)
+ * Enabled color in DVB subtitles rendering
 
 Stream Output:
  * Text track muxing for mp4
  * Multipart mjpeg muxing. Your video is directly viewable in a Mozilla Browser
  * 14496-17 text track muxing for MPEG TS
  * H.263 RTP streaming support
+ * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
+ * Experimental WAV muxer
+
+Audio Output:
+ * New audio equalizer filter
+ * Very trivial volume normalizer
 
 Interfaces:
  * Added search, volume, loop and random functions to the ncurses interface
@@ -36,14 +54,21 @@ Interfaces:
  * OSD sliders for volume and postition information
  * OSD icons for Play and Pause
  * New Streaming Wizard for Windows and Linux default interfaces
+ * A few skins2 improvements
 
 Mac OS X port:
  * Fixed the "cannot set buffersize:[nope]" coreaudio problem
  * The MacOSX interface is no longer required to display video
 
-Windows CE PocketPC port:
- * Brand new port of VLC. Still very experimental
- * Works with MPEG and Divx
+Linux port:
+ * New galaktos visualization plugin (MilkDrop-compatible)
+ * Experimental SVG rendering module
+
+Windows port:
+ * DirectX Media Object decoder (allows playing some media types, like WMV3)
+ * Fixed long standing win32 thread handles leak
+ * Fixed problem with CPU useage with subtitles rendering
+ * Wallpaper mode for the DirectX video output (only in overlay mode)
 
 Mozilla plugin:
  * Added a lot of Javascript accessible funtionality
@@ -51,11 +76,11 @@ Mozilla plugin:
 
 Misc:
  * Roku HD1000 Video output
- * Server-network synchronization module
- * Experimental SVG rendering module
+ * Server/client network synchronization module
  * VBrick streams fully supported
  * Kasenna MediaBase streams largely supported
  * Cisco IP/TV streams supported
+ * Experimental OpenGL video output for X11 and win32
 
 Changes between 0.7.1 and 0.7.2:
 --------------------------------
