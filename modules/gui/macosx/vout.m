@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.83 2004/02/26 13:04:55 hartman Exp $
+ * $Id: vout.m,v 1.84 2004/02/26 13:24:55 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -694,6 +694,9 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
 
     ScaleMatrix( p_vout->p_sys->p_matrix,
                  factor_x, factor_y,
+                 Long2Fix(0), Long2Fix(0) );
+                 
+    TranslateMatrix( p_vout->p_sys->p_matrix,
                  Long2Fix(i_offset_x), Long2Fix(i_offset_y) );
 }
 
