@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.42 2002/07/02 19:14:59 sam Exp $
+ * $Id: xcommon.c,v 1.43 2002/07/17 21:34:57 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -749,10 +749,16 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Mouse click */
         else if( xevent.type == ButtonPress )
         {
-            p_vout->i_mouse_x = (int)( (float)xevent.xmotion.x
-                / p_vout->p_sys->p_win->i_width * p_vout->render.i_width );
-            p_vout->i_mouse_y = (int)( (float)xevent.xmotion.y
-                / p_vout->p_sys->p_win->i_height * p_vout->render.i_height );
+            int i_width, i_height, i_x, i_y;
+
+            vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
+                               p_vout->p_sys->p_win->i_height,
+                               &i_x, &i_y, &i_width, &i_height );
+
+            p_vout->i_mouse_x = ( xevent.xmotion.x - i_x )
+                * p_vout->render.i_width / i_width;
+            p_vout->i_mouse_y = ( xevent.xmotion.y - i_y )
+                * p_vout->render.i_height / i_height;
             p_vout->i_mouse_button = 1;
 
             switch( ((XButtonEvent *)&xevent)->button )
@@ -803,16 +809,25 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Mouse move */
         else if( xevent.type == MotionNotify )
         {
+            int i_width, i_height, i_x, i_y;
+
+            /* somewhat different use for vout_PlacePicture:
+             * here the values are needed to give to mouse coordinates
+             * in the original picture space */
+            vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
+                               p_vout->p_sys->p_win->i_height,
+                               &i_x, &i_y, &i_width, &i_height );
+
+            p_vout->i_mouse_x = ( xevent.xmotion.x - i_x )
+                * p_vout->render.i_width / i_width;
+            p_vout->i_mouse_y = ( xevent.xmotion.y - i_y )
+                * p_vout->render.i_height / i_height;
+ 
             p_vout->p_sys->i_time_mouse_last_moved = mdate();
             if( ! p_vout->p_sys->b_mouse_pointer_visible )
             {
                 ToggleCursor( p_vout ); 
             }
-            
-            p_vout->i_mouse_x = (int)( (float)xevent.xmotion.x
-                / p_vout->p_sys->p_win->i_width * p_vout->render.i_width );
-            p_vout->i_mouse_y = (int)( (float)xevent.xmotion.y
-                / p_vout->p_sys->p_win->i_height * p_vout->render.i_height );
         }
         /* Reparent move -- XXX: why are we getting this ? */
         else if( xevent.type == ReparentNotify )
