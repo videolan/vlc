@@ -279,7 +279,7 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
                                   BUTTONWIDTH, BUTTONHEIGHT,
                                   IMAGEWIDTH, IMAGEHEIGHT, sizeof(TBBUTTON) );
         if( !hwndTB ) break;
-
+  
         // Add ToolTips to the toolbar.
         SendMessage( hwndTB, TB_SETTOOLTIPS, (WPARAM) NUMIMAGES,
                      (LPARAM)szToolTips2 );
@@ -368,14 +368,14 @@ LRESULT Playlist::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
         case ID_MANAGE_ADDFILE:
             SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
-            OnAddFile( VLC_FALSE );
+            OnAddFile();
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
             break;
 
         case ID_MANAGE_ADDDIRECTORY:
             SHFullScreen( GetForegroundWindow(), SHFS_SHOWSIPBUTTON );
-            OnAddFile( VLC_TRUE );
+            OnAddFile();
             SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
             b_need_update = VLC_TRUE;
             break;
@@ -735,7 +735,7 @@ void Playlist::OnOpen()
     ofn.lpfnHook = NULL;
     ofn.lpTemplateName = NULL;
 
-    if( GetOpenFile( &ofn ) )
+    if( GetOpenFileName((LPOPENFILENAME)&ofn) )
     {
         playlist_Import( p_playlist, _TOMB(ofn.lpstrFile) );
     }
@@ -797,7 +797,7 @@ void Playlist::OnSave()
     }
 }
 
-void Playlist::OnAddFile( vlc_bool_t b_directory )
+void Playlist::OnAddFile()
 {
     // Same code as in Interface
     OPENFILENAME ofn;
@@ -828,7 +828,7 @@ void Playlist::OnAddFile( vlc_bool_t b_directory )
 
     SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
 
-    if( GetOpenFile( &ofn ) )
+    if( GetOpenFileName( (LPOPENFILENAME)&ofn ) )
     {
         playlist_t *p_playlist = (playlist_t *)
 	    vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );

@@ -134,11 +134,12 @@ class Interface : public CBaseWindow
 {
 public:
     /* Constructor */
-    Interface(){}
-    ~Interface(){}
+    Interface();
+    ~Interface();
 
     BOOL InitInstance( HINSTANCE, intf_thread_t * );
 
+    HWND CreateMenuBar( HWND, HINSTANCE );
     void TogglePlayButton( int i_playing_status );
 
     HWND hwndMain;      // Handle to the main window.
@@ -151,11 +152,12 @@ public:
     HWND hwndSB;        // Handle to the status bar.
     HMENU hPopUpMenu;
     HMENU hMenu;
-    FileInfo *fi; // pas besoin de la plupart de ses attributs
-    Messages *hmsg;
-    PrefsDialog *pref;
-    Playlist *pl;
-    Timer *ti;
+
+    FileInfo *fileinfo;
+    Messages *messages;
+    PrefsDialog *preferences;
+    Playlist *playlist;
+    Timer *timer;
     OpenDialog *open;
     CBaseWindow *video;
 
@@ -177,6 +179,12 @@ protected:
     void OnFastStream( void );
 
     int i_old_playing_status;
+
+private:
+    HMENU menu_settings;
+    HMENU menu_video;
+    HMENU menu_audio;
+    HMENU menu_navigation;
 };
 
 /* File Info */
@@ -384,7 +392,7 @@ protected:
 
     void OnOpen();
     void OnSave();
-    void OnAddFile( vlc_bool_t );
+    void OnAddFile();
     void OnAddMRL();
 
     void OnDeleteSelection();
@@ -456,6 +464,8 @@ public:
                  int _i_object_id, vlc_value_t _val, int _i_val_type );
 
     virtual ~MenuItemExt();
+
+    static void ClearList( vector<MenuItemExt*> * );
 
     int id;
     intf_thread_t *p_intf;

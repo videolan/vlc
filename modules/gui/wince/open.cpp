@@ -82,6 +82,18 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, HINSTANCE _hInst,
     i_current_access_method = _i_access_method;
     i_open_arg = _i_arg;
     i_method = _i_method;
+
+    for( int i = 0; i < 4; i++ )
+    {
+        net_radios[i] = 0;
+        net_label[i] = 0;
+        net_port_label[i] = 0;
+        net_ports[i] = 0;
+        hUpdown[i] = 0;
+        i_net_ports[i] = 0;
+        net_addrs_label[i] = 0;
+        net_addrs[i] = 0;
+    }
 }
 
 /***********************************************************************

@@ -87,7 +87,6 @@ private:
     PrefsDialog *p_prefs_dialog;
     vlc_bool_t b_advanced;
 
-    HTREEITEM root_item;
     HTREEITEM general_item;
     HTREEITEM plugins_item;
 };
@@ -251,10 +250,13 @@ LRESULT PrefsDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
         TVITEM tvi = {0};
         tvi.mask = TVIF_PARAM;
         tvi.hItem = TreeView_GetSelection( prefs_tree->hwndTV );
-        TreeView_GetItem( prefs_tree->hwndTV, &tvi );
+	if( !tvi.hItem ) break;
+
+        if( !TreeView_GetItem( prefs_tree->hwndTV, &tvi ) ) break;
+
         ConfigTreeData *config_data =
             prefs_tree->FindModuleConfig( (ConfigTreeData *)tvi.lParam );
-        if ( hwnd == config_data->panel->config_window ) 
+        if( config_data && hwnd == config_data->panel->config_window ) 
         {
             int dy;
             RECT rc;
@@ -349,17 +351,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         5, 10 + 2*(15 + 10) + 105 + 5, rcClient.right - 5 - 5, 6*15,
         hwnd, NULL, hInst, NULL );
 
-    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM; 
-    tvi.pszText = _T("root");
-    tvi.cchTextMax = lstrlen(_T("root"));
-    tvi.lParam = (LPARAM) 1; // root level
-    tvins.item = tvi;
-    tvins.hInsertAfter = TVI_FIRST; 
-    tvins.hParent = TVI_ROOT; 
-
-    // Add the item to the tree-view control. 
-    hPrev = (HTREEITEM) TreeView_InsertItem( hwndTV, &tvins );
-    root_item = hPrev;
+    tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
     /* List the plugins */
     p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -374,10 +366,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     config_data->psz_section = strdup( GENERAL_TITLE );
     tvi.pszText = _T("General settings");
     tvi.cchTextMax = lstrlen(_T("General settings"));
-    tvi.lParam = (long) config_data;
+    tvi.lParam = (long)config_data;
     tvins.item = tvi;
-    tvins.hInsertAfter = hPrev;
-    tvins.hParent = root_item; //level 2
+    tvins.hInsertAfter = TVI_FIRST;
+    tvins.hParent = TVI_ROOT;
 
     // Add the item to the tree-view control.
     hPrev = (HTREEITEM) TreeView_InsertItem( hwndTV, &tvins);
@@ -444,10 +436,10 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     config_data->psz_section = strdup("nothing");//strdup( PLUGIN_TITLE );
     tvi.pszText = _T("Modules");
     tvi.cchTextMax = lstrlen(_T("Modules"));
-    tvi.lParam = (long) config_data;
+    tvi.lParam = (long)config_data;
     tvins.item = tvi;
-    tvins.hInsertAfter = hPrev;
-    tvins.hParent = root_item;// level 2
+    tvins.hInsertAfter = TVI_LAST;
+    tvins.hParent = TVI_ROOT;
 
     // Add the item to the tree-view control.
     hPrev = (HTREEITEM) TreeView_InsertItem( hwndTV, &tvins);
@@ -513,7 +505,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
             config_data->i_object_id = CAPABILITY_ID;
             tvi.pszText = _FROMMB(p_module->psz_capability);
             tvi.cchTextMax = _tcslen(tvi.pszText);
-            tvi.lParam = (long) config_data;
+            tvi.lParam = (long)config_data;
             tvins.item = tvi;
             tvins.hInsertAfter = plugins_item; 
             tvins.hParent = plugins_item;// level 3
@@ -533,7 +525,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
         config_data->psz_help = NULL;
         tvi.pszText = _FROMMB(p_module->psz_object_name);
         tvi.cchTextMax = _tcslen(tvi.pszText);
-        tvi.lParam = (long) config_data;
+        tvi.lParam = (long)config_data;
         tvins.item = tvi;
         tvins.hInsertAfter = capability_item; 
         tvins.hParent = capability_item;// level 4
@@ -555,7 +547,6 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     /* Clean-up everything */
     vlc_list_release( p_list );
 
-    TreeView_Expand( hwndTV, root_item, TVE_EXPANDPARTIAL |TVE_EXPAND );
     TreeView_Expand( hwndTV, general_item, TVE_EXPANDPARTIAL |TVE_EXPAND );
 }
 
@@ -727,11 +718,10 @@ PrefsPanel::PrefsPanel( HWND parent, HINSTANCE hInst, intf_thread_t *_p_intf,
         /* Find the category if it has been specified */
         if( psz_section && p_item->i_type == CONFIG_HINT_CATEGORY )
         {
-            while( !p_item->i_type == CONFIG_HINT_CATEGORY ||
+            while( !(p_item->i_type == CONFIG_HINT_CATEGORY) ||
                    strcmp( psz_section, p_item->psz_text ) )
             {
-                if( p_item->i_type == CONFIG_HINT_END )
-                    break;
+                if( p_item->i_type == CONFIG_HINT_END ) break;
                 p_item++;
             }
         }

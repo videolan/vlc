@@ -82,7 +82,6 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
     vlc_object_t *p_object, *p_input;
     char *ppsz_varnames[MAX_POPUP_ITEMS];
     int pi_objects[MAX_POPUP_ITEMS];
-    vector<MenuItemExt*>::iterator iter;
     int i = 0, i_last_separator = 0;
 
     /* Initializations */
@@ -199,6 +198,8 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
     HMENU hmenu = CreatePopupMenu();
     RefreshMenu( p_intf, &popup_menu, hmenu, i,
                  ppsz_varnames, pi_objects, PopupMenu_Events );
+    MenuItemExt::ClearList( &popup_menu );
+
 
     /* Add static entries */
     if( p_input != NULL )
@@ -247,21 +248,16 @@ void RefreshAudioMenu( intf_thread_t *p_intf, HMENU hMenu )
     vlc_object_t *p_object;
     char *ppsz_varnames[MAX_AUDIO_ITEMS];
     int pi_objects[MAX_AUDIO_ITEMS];
-    vector<MenuItemExt*>::iterator iter;
     int i;
 
     /* Delete old menu */
     int count = wce_GetMenuItemCount( hMenu );
     for( i = 0; i <= count; i++ ) RemoveMenu( hMenu, 0, MF_BYPOSITION );
-        
+
     if( p_intf->p_sys->p_audio_menu )
-    {
-        for( iter = p_intf->p_sys->p_audio_menu->begin();
-             iter != p_intf->p_sys->p_audio_menu->end(); iter++ )
-            delete *iter;
-        p_intf->p_sys->p_audio_menu->clear();
-    }
+        MenuItemExt::ClearList( p_intf->p_sys->p_audio_menu );
     else p_intf->p_sys->p_audio_menu = new vector<MenuItemExt*>;
+
 
     /* Initializations */
     memset( pi_objects, 0, MAX_AUDIO_ITEMS * sizeof(int) );
@@ -301,7 +297,6 @@ void RefreshVideoMenu( intf_thread_t *p_intf, HMENU hMenu )
     vlc_object_t *p_object;
     char *ppsz_varnames[MAX_VIDEO_ITEMS];
     int pi_objects[MAX_VIDEO_ITEMS];
-    vector<MenuItemExt*>::iterator iter;
     int i;
 
     /* Delete old menu */
@@ -309,12 +304,7 @@ void RefreshVideoMenu( intf_thread_t *p_intf, HMENU hMenu )
     for( i = 0; i <= count; i++ ) RemoveMenu( hMenu, 0, MF_BYPOSITION );
 
     if( p_intf->p_sys->p_video_menu )
-    {
-        for( iter = p_intf->p_sys->p_video_menu->begin();
-             iter != p_intf->p_sys->p_video_menu->end(); iter++ )
-            delete *iter;
-        p_intf->p_sys->p_video_menu->clear();
-    }
+        MenuItemExt::ClearList( p_intf->p_sys->p_video_menu );
     else p_intf->p_sys->p_video_menu = new vector<MenuItemExt*>;
 
     /* Initializations */
@@ -379,7 +369,6 @@ void RefreshNavigMenu( intf_thread_t *p_intf, HMENU hMenu )
     vlc_object_t *p_object;
     char *ppsz_varnames[MAX_NAVIG_ITEMS];
     int pi_objects[MAX_NAVIG_ITEMS];
-    vector<MenuItemExt*>::iterator iter;
     int i;
 
     /* Delete old menu */
@@ -387,12 +376,7 @@ void RefreshNavigMenu( intf_thread_t *p_intf, HMENU hMenu )
     for( i = 0; i <= count; i++ ) RemoveMenu( hMenu, 0, MF_BYPOSITION );
         
     if( p_intf->p_sys->p_navig_menu )
-    {
-        for( iter = p_intf->p_sys->p_navig_menu->begin();
-             iter != p_intf->p_sys->p_navig_menu->end(); iter++ )
-            delete *iter;
-        p_intf->p_sys->p_navig_menu->clear();
-    }
+        MenuItemExt::ClearList( p_intf->p_sys->p_navig_menu );
     else p_intf->p_sys->p_navig_menu = new vector<MenuItemExt*>;
 
     /* Initializations */
@@ -438,7 +422,6 @@ void RefreshSettingsMenu( intf_thread_t *p_intf, HMENU hMenu )
     vlc_object_t *p_object;
     char *ppsz_varnames[MAX_SETTINGS_ITEMS];
     int pi_objects[MAX_SETTINGS_ITEMS];
-    vector<MenuItemExt*>::iterator iter;
     int i;
 
     /* Delete old menu */
@@ -446,12 +429,7 @@ void RefreshSettingsMenu( intf_thread_t *p_intf, HMENU hMenu )
     for( i = 0; i <= count; i++ ) RemoveMenu( hMenu, 0, MF_BYPOSITION );
 
     if( p_intf->p_sys->p_settings_menu )
-    {
-        for( iter = p_intf->p_sys->p_settings_menu->begin();
-             iter != p_intf->p_sys->p_settings_menu->end(); iter++ )
-            delete(*iter);
-        p_intf->p_sys->p_settings_menu->clear();
-    }
+        MenuItemExt::ClearList( p_intf->p_sys->p_settings_menu );
     else p_intf->p_sys->p_settings_menu = new vector<MenuItemExt*>;
 
     /* Initializations */
@@ -479,7 +457,7 @@ void RefreshSettingsMenu( intf_thread_t *p_intf, HMENU hMenu )
 /*****************************************************************************
  * Refresh the menu.
  *****************************************************************************/
-void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
+void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
                   HMENU hMenu , int i_count, char **ppsz_varnames, 
                   int *pi_objects, int i_start_id )
 {
@@ -518,7 +496,7 @@ void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
         if( p_object == NULL ) continue;
 
         b_section_empty = VLC_FALSE;
-        CreateMenuItem( p_intf, _p_menuList, hMenu, ppsz_varnames[i],
+        CreateMenuItem( p_intf, p_menu_list, hMenu, ppsz_varnames[i],
                         p_object, &i_item_id );
         vlc_object_release( p_object );
     }
@@ -534,7 +512,7 @@ void RefreshMenu( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
+void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *p_menu_list,
                      HMENU hMenu, char *psz_var, vlc_object_t *p_object,
                      int *pi_item_id )
 {
@@ -576,10 +554,11 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
 
     if( i_type & VLC_VAR_HASCHOICE )
     {
-        hMenuItem = CreateChoicesMenu( p_intf, _p_menuList, psz_var,
+        hMenuItem = CreateChoicesMenu( p_intf, p_menu_list, psz_var,
                                        p_object, pi_item_id );
         AppendMenu( hMenu, MF_STRING | MF_POPUP, (UINT)hMenuItem,
                     _FROMMB(text.psz_string ? text.psz_string : psz_var) );
+        if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
         if( text.psz_string ) free( text.psz_string );
         return;
     }
@@ -591,7 +570,7 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
                     _FROMMB(text.psz_string ? text.psz_string : psz_var) );
         pMenuItemExt = new MenuItemExt( p_intf, *pi_item_id, psz_var,
                                         p_object->i_object_id, val, i_type );
-        _p_menuList->push_back( pMenuItemExt );
+        p_menu_list->push_back( pMenuItemExt );
         break;
 
     case VLC_VAR_BOOL:
@@ -600,7 +579,7 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
                     _FROMMB(text.psz_string ? text.psz_string : psz_var) );
         pMenuItemExt = new MenuItemExt( p_intf, *pi_item_id, psz_var,
                                         p_object->i_object_id, val, i_type );
-        _p_menuList->push_back( pMenuItemExt );
+        p_menu_list->push_back( pMenuItemExt );
         CheckMenuItem( hMenu, *pi_item_id ,
                        ( val.b_bool ? MF_UNCHECKED : MF_CHECKED ) |
                        MF_BYCOMMAND ); 
@@ -616,7 +595,7 @@ void CreateMenuItem( intf_thread_t *p_intf, vector<MenuItemExt*> *_p_menuList,
 }
 
 HMENU CreateChoicesMenu( intf_thread_t *p_intf,
-                         vector<MenuItemExt*> *_p_menuList, char *psz_var, 
+                         vector<MenuItemExt*> *p_menu_list, char *psz_var, 
                          vlc_object_t *p_object, int *pi_item_id )
 {
     MenuItemExt *pMenuItemExt;
@@ -671,7 +650,7 @@ HMENU CreateChoicesMenu( intf_thread_t *p_intf,
         switch( i_type & VLC_VAR_TYPE )
         {
         case VLC_VAR_VARIABLE:
-            hMenuItem = CreateChoicesMenu( p_intf, _p_menuList,
+            hMenuItem = CreateChoicesMenu( p_intf, p_menu_list,
               val_list.p_list->p_values[i].psz_string, p_object, pi_item_id );
             AppendMenu( hSubMenu, MF_STRING | MF_POPUP, (UINT)hMenuItem,
                         _FROMMB(text_list.p_list->p_values[i].psz_string ?
@@ -688,7 +667,7 @@ HMENU CreateChoicesMenu( intf_thread_t *p_intf,
                           val_list.p_list->p_values[i].psz_string) );
             pMenuItemExt = new MenuItemExt( p_intf, *pi_item_id, psz_var,
                           p_object->i_object_id, another_val, i_type );
-            _p_menuList->push_back( pMenuItemExt );
+            p_menu_list->push_back( pMenuItemExt );
 
             if( !(i_type & VLC_VAR_ISCOMMAND) && val.psz_string &&
                 !strcmp( val.psz_string,
@@ -703,7 +682,7 @@ HMENU CreateChoicesMenu( intf_thread_t *p_intf,
                           text_list.p_list->p_values[i].psz_string : psz_tmp));
             pMenuItemExt = new MenuItemExt( p_intf, *pi_item_id, psz_var,
                 p_object->i_object_id, val_list.p_list->p_values[i], i_type );
-            _p_menuList->push_back( pMenuItemExt );
+            p_menu_list->push_back( pMenuItemExt );
 
             if( val_list.p_list->p_values[i].i_int == val.i_int )
               CheckMenuItem( hSubMenu, *pi_item_id, MF_CHECKED | MF_BYCOMMAND);
@@ -821,3 +800,15 @@ MenuItemExt::~MenuItemExt()
     if( ((i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING)
         && val.psz_string ) free( val.psz_string );
 };
+
+void MenuItemExt::ClearList( vector<MenuItemExt*> *p_menu_list )
+{
+    vector<MenuItemExt*>::iterator iter;
+
+    if( !p_menu_list ) return;
+    for( iter = p_menu_list->begin(); iter != p_menu_list->end(); iter++ )
+    {
+        delete *iter;
+    }
+    p_menu_list->clear();
+}

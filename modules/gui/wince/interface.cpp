@@ -104,11 +104,24 @@ TCHAR * szToolTips[] =
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
+Interface::Interface()
+  : hwndMain(0), hwndCB(0), hwndTB(0), hwndSlider(0), hwndLabel(0),
+    hwndVol(0), hwndSB(0),
+    fileinfo(0), messages(0), preferences(0), playlist(0),
+    timer(0), open(0), video(0)
+{
+}
+
+Interface::~Interface()
+{
+    if( timer ) delete timer;
+    if( video ) delete video;
+}
+
 BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
 {
     /* Initializations */
     p_intf = _p_intf;
-    hwndMain = hwndCB = hwndTB = hwndSlider = hwndLabel = hwndVol = hwndSB = 0;
     i_old_playing_status = PAUSE_S;
 
     hInst = hInstance; // Store instance handle in our global variable
@@ -154,8 +167,10 @@ FUNCTION:
 PURPOSE: 
   Creates a menu bar.
 ***********************************************************************/
-static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
+HWND Interface::CreateMenuBar( HWND hwnd, HINSTANCE hInst )
 {
+    HMENU menu_file, menu_view;
+
 #ifdef UNDER_CE
     SHMENUBARINFO mbi;
     memset( &mbi, 0, sizeof(SHMENUBARINFO) );
@@ -175,44 +190,50 @@ static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
     tbbi.dwMask = TBIF_LPARAM;
 
     SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_FILE, (LPARAM)&tbbi );
-    HMENU hmenu_file = (HMENU)tbbi.lParam;
+    menu_file = (HMENU)tbbi.lParam;
     RemoveMenu( hmenu_file, 0, MF_BYPOSITION );
     SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_VIEW, (LPARAM)&tbbi );
-    HMENU hmenu_view = (HMENU)tbbi.lParam;
+    menu_view = (HMENU)tbbi.lParam;
     RemoveMenu( hmenu_view, 0, MF_BYPOSITION );
     SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_SETTINGS, (LPARAM)&tbbi );
-    HMENU hmenu_settings = (HMENU)tbbi.lParam;
+    menu_settings = (HMENU)tbbi.lParam;
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_VIDEO, (LPARAM)&tbbi );
+    menu_video = (HMENU)tbbi.lParam;
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_AUDIO, (LPARAM)&tbbi );
+    menu_audio = (HMENU)tbbi.lParam;
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_NAVIGATION, (LPARAM)&tbbi );
+    menu_navigation = (HMENU)tbbi.lParam;
 
 #else
-    HMENU hmenu_file = CreatePopupMenu();
-    HMENU hmenu_view = CreatePopupMenu();
-    HMENU hmenu_settings = CreatePopupMenu();
-    HMENU hmenu_audio = CreatePopupMenu();
-    HMENU hmenu_video = CreatePopupMenu();
-    HMENU hmenu_navigation = CreatePopupMenu();
+    menu_file = CreatePopupMenu();
+    menu_view = CreatePopupMenu();
+    menu_settings = CreatePopupMenu();
+    menu_audio = CreatePopupMenu();
+    menu_video = CreatePopupMenu();
+    menu_navigation = CreatePopupMenu();
 #endif
 
-    AppendMenu( hmenu_file, MF_STRING, ID_FILE_QUICKOPEN,
+    AppendMenu( menu_file, MF_STRING, ID_FILE_QUICKOPEN,
                 _T("Quick &Open File...") );
-    AppendMenu( hmenu_file, MF_SEPARATOR, 0, 0 );
-    AppendMenu( hmenu_file, MF_STRING, ID_FILE_OPENFILE,
+    AppendMenu( menu_file, MF_SEPARATOR, 0, 0 );
+    AppendMenu( menu_file, MF_STRING, ID_FILE_OPENFILE,
                 _T("Open &File...") );
-    AppendMenu( hmenu_file, MF_STRING, ID_FILE_OPENNET,
+    AppendMenu( menu_file, MF_STRING, ID_FILE_OPENNET,
                 _T("Open &Network Stream...") );
-    AppendMenu( hmenu_file, MF_SEPARATOR, 0, 0 );
-    AppendMenu( hmenu_file, MF_STRING, ID_FILE_ABOUT,
+    AppendMenu( menu_file, MF_SEPARATOR, 0, 0 );
+    AppendMenu( menu_file, MF_STRING, ID_FILE_ABOUT,
                 _T("About VLC") );
-    AppendMenu( hmenu_file, MF_STRING, ID_FILE_EXIT,
+    AppendMenu( menu_file, MF_STRING, ID_FILE_EXIT,
                 _T("E&xit") );
 
-    AppendMenu( hmenu_view, MF_STRING, ID_VIEW_PLAYLIST,
+    AppendMenu( menu_view, MF_STRING, ID_VIEW_PLAYLIST,
                 _T("&Playlist...") );
-    AppendMenu( hmenu_view, MF_STRING, ID_VIEW_MESSAGES,
+    AppendMenu( menu_view, MF_STRING, ID_VIEW_MESSAGES,
                 _T("&Messages...") );
-    AppendMenu( hmenu_view, MF_STRING, ID_VIEW_STREAMINFO,
+    AppendMenu( menu_view, MF_STRING, ID_VIEW_STREAMINFO,
                 _T("Stream and Media &info...") );
 
-    AppendMenu( hmenu_settings, MF_STRING, ID_PREFERENCES,
+    AppendMenu( menu_settings, MF_STRING, ID_PREFERENCES,
                 _T("&Preferences...") );
 
 
@@ -222,17 +243,16 @@ static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
 #else
     HMENU hmenu = CreateMenu();
 
-    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_file, _T("File") );
-    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_view, _T("View") );
-    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_settings,
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)menu_file, _T("File") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)menu_view, _T("View") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)menu_settings,
                 _T("Settings") );
-    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_audio, _T("Audio") );
-    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_video, _T("Video") );
-    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_navigation,
-                _T("Nav.") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)menu_audio, _T("Audio") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)menu_video, _T("Video") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)menu_navigation, _T("Nav") );
 
     SetMenu( hwnd, hmenu );
-    return hwnd;
+    return 0;
 
 #endif
 }
@@ -506,8 +526,7 @@ FUNCTION:
 PURPOSE: 
   Processes messages sent to the main window.
 ***********************************************************************/
-LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
-                                     LPARAM lp )
+LRESULT Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
     switch( msg )
     {
@@ -525,7 +544,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         if( config_GetInt( p_intf, "wince-embed" ) )
             video = CreateVideoWindow( p_intf, hwnd );
 
-        ti = new Timer(p_intf, hwnd, this);
+        timer = new Timer( p_intf, hwnd, this );
 
         // Hide the SIP button (WINCE only)
         SetForegroundWindow( hwnd );
@@ -595,27 +614,27 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
             break;
 
         case ID_VIEW_STREAMINFO:
-            fi = new FileInfo( p_intf, hInst );
-            CreateDialogBox( hwnd, fi );
-            delete fi;
+            fileinfo = new FileInfo( p_intf, hInst );
+            CreateDialogBox( hwnd, fileinfo );
+            delete fileinfo;
             break;
 
         case ID_VIEW_MESSAGES:
-            hmsg = new Messages( p_intf, hInst );
-            CreateDialogBox( hwnd, hmsg );
-            delete hmsg;
+            messages = new Messages( p_intf, hInst );
+            CreateDialogBox( hwnd, messages );
+            delete messages;
             break;
 
         case ID_VIEW_PLAYLIST:
-            pl = new Playlist( p_intf, hInst );
-            CreateDialogBox( hwnd, pl );
-            delete pl;
+            playlist = new Playlist( p_intf, hInst );
+            CreateDialogBox( hwnd, playlist );
+            delete playlist;
             break;
 
         case ID_PREFERENCES:
-            pref = new PrefsDialog( p_intf, hInst );
-            CreateDialogBox( hwnd, pref );
-            delete pref;
+            preferences = new PrefsDialog( p_intf, hInst );
+            CreateDialogBox( hwnd, preferences );
+            delete preferences;
             break;
                   
         default:
@@ -625,7 +644,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         break;
   
     case WM_TIMER:
-        ti->Notify();
+        timer->Notify();
         break;
 
     case WM_CTLCOLORSTATIC: 
@@ -649,18 +668,22 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         break;
 
     case WM_INITMENUPOPUP:
-        RefreshSettingsMenu( p_intf,
-            (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
-                                (LPARAM)IDM_SETTINGS ) );
-        RefreshAudioMenu( p_intf,
-            (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
-                                (LPARAM)IDM_AUDIO ) );
-        RefreshVideoMenu( p_intf,
-            (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
-                                (LPARAM)IDM_VIDEO ) );
-        RefreshNavigMenu( p_intf,
-            (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
-                                (LPARAM)IDM_NAVIGATION ) );
+        RefreshSettingsMenu( p_intf, menu_settings );
+        RefreshAudioMenu( p_intf, menu_audio );
+        RefreshVideoMenu( p_intf, menu_video );
+        RefreshNavigMenu( p_intf, menu_navigation );
+        /* Fall through */
+
+    case WM_ENTERMENULOOP:
+    case WM_KILLFOCUS:
+        if( video && video->hWnd )
+            SendMessage( video->hWnd, WM_KILLFOCUS, 0, 0 );
+        break;
+
+    case WM_EXITMENULOOP:
+    case WM_SETFOCUS:
+        if( video && video->hWnd )
+            SendMessage( video->hWnd, WM_SETFOCUS, 0, 0 );
         break;
 
     case WM_LBUTTONDOWN:
@@ -677,25 +700,22 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         }
         break;
 
+   case WM_RBUTTONUP:
+        {
+            POINT point;
+            point.x = LOWORD(lp);
+            point.y = HIWORD(lp);
+            PopupMenu( p_intf, hwnd, point );
+        }
+        break;
+
     case WM_HELP:
         MessageBox (hwnd, _T("Help"), _T("Help"), MB_OK);
         break;
 
     case WM_CLOSE:
-        DestroyWindow( hwndCB );
+        if( hwndCB ) DestroyWindow( hwndCB );
         DestroyWindow( hwnd );
-        break;
-
-    case WM_ENTERMENULOOP:
-    case WM_KILLFOCUS:
-        if( video && video->hWnd )
-            SendMessage( video->hWnd, WM_KILLFOCUS, 0, 0 );
-        break;
-
-    case WM_EXITMENULOOP:
-    case WM_SETFOCUS:
-        if( video && video->hWnd )
-            SendMessage( video->hWnd, WM_SETFOCUS, 0, 0 );
         break;
 
     case WM_DESTROY:

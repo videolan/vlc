@@ -11,10 +11,8 @@
 #define _WIN32_WCE UNDER_CE
 #endif
 
-#if defined(_WIN32_WCE)
-    #define _WIN32_IE 0x0500
-    #include <commctrl.h>
-#endif // _WIN32_WCE
+#define _WIN32_IE 0x0501
+#include <commctrl.h>
 
 #ifdef RC_INVOKED
 #ifndef _INC_WINDOWS
@@ -28,6 +26,7 @@
 // Menubar
 //
 
+#if defined(UNDER_CE) // Menus are dynamically built on Win32
 IDR_MENUBAR MENU DISCARDABLE 
 BEGIN
     POPUP "File"
@@ -71,7 +70,7 @@ BEGIN
         MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
 END
-
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //

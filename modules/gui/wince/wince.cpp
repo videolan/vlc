@@ -146,6 +146,15 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
+    MenuItemExt::ClearList( p_intf->p_sys->p_video_menu );
+    delete p_intf->p_sys->p_video_menu;
+    MenuItemExt::ClearList( p_intf->p_sys->p_audio_menu );
+    delete p_intf->p_sys->p_audio_menu;
+    MenuItemExt::ClearList( p_intf->p_sys->p_settings_menu );
+    delete p_intf->p_sys->p_settings_menu;
+    MenuItemExt::ClearList( p_intf->p_sys->p_navig_menu );
+    delete p_intf->p_sys->p_navig_menu;
+
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
@@ -162,12 +171,12 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     MSG msg;
-    Interface *pInterface = new Interface();
-    p_intf->p_sys->p_main_window = pInterface;
+    Interface interface;
 
+    p_intf->p_sys->p_main_window = &interface;
     if( !hInstance ) hInstance = GetModuleHandle(NULL);
 
-    if( !pInterface->InitInstance( hInstance, p_intf ) ) return;
+    if( !interface.InitInstance( hInstance, p_intf ) ) return;
 
     // Main message loop
     while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
