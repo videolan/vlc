@@ -851,7 +851,7 @@ AC_ARG_WITH(dvdread,
         CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD} -I../../extras/libdvdread"
         LIB_DVDREAD="${LIB_DVDREAD} lib/libdvdread.a ${LIB_DVD}"
       else
-	AC_MSG_ERROR([Can't link static dvdread with shared dvdcss])
+        AC_MSG_ERROR([Can't link static dvdread with shared dvdcss])
       fi
     ;;
     xno)
@@ -879,7 +879,7 @@ AC_ARG_WITH(dvdread,
       fi
       if test x${STATIC_LIBDVDCSS} = x1
       then
-	AC_MSG_ERROR([Can't link shared dvdread with static dvdcss])
+        AC_MSG_ERROR([Can't link shared dvdread with static dvdcss])
       else
         PLUGINS="${PLUGINS} dvdread"
         CFLAGS_DVDREAD="${CFLAGS_DVDREAD} ${CFLAGS_DVD}"
@@ -1068,8 +1068,8 @@ AC_ARG_ENABLE(liba52,
 if ((test "x$enableval" != "xno") && (test x$SYS != xmingw32))
   then
     AC_CHECK_HEADERS(a52dec/a52.h, [
-      PLUGINS="${PLUGINS} liba52_adec"
-      LIB_LIBA52_ADEC="-la52"
+      BUILTINS="${BUILTINS} liba52_adec"
+      LIB_LIBA52_ADEC="${LIB_LIBA52_ADEC} -la52"
      ],[])
 fi
 
@@ -1408,6 +1408,21 @@ if test x$enable_xvideo != xno &&
 fi
 
 dnl
+dnl  Lirc plugin
+dnl
+AC_ARG_ENABLE(lirc,
+  [  --enable-lirc           lirc support (default disabled)])
+if test x$enable_lirc = xyes
+then
+  AC_CHECK_HEADER(lirc/lirc_client.h, AC_CHECK_LIB(lirc_client, lirc_init, have_lirc="true", have_lirc="false"),have_lirc="false")
+  if test x$have_lirc = xtrue
+  then
+    PLUGINS="${PLUGINS} lirc"
+    LIB_LIRC="${LIB_LIRC} -llirc_client"
+  fi
+fi
+
+dnl
 dnl  ALSA module
 dnl
 AC_ARG_ENABLE(alsa,
@@ -1514,6 +1529,7 @@ AC_SUBST(LIB_KDE)
 AC_SUBST(LIB_LIBA52_ADEC)
 AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_LIBDVDREAD)
+AC_SUBST(LIB_LIRC)
 AC_SUBST(LIB_MACOSX)
 AC_SUBST(LIB_MAD)
 AC_SUBST(LIB_MOTIONALTIVEC)

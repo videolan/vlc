@@ -175,6 +175,12 @@
 /* Define if you have the <X11/extensions/Xv.h> header file.  */
 #undef HAVE_X11_EXTENSIONS_XV_H
 
+/* Define if you have the <X11/extensions/dpms.h> header file.  */
+#undef HAVE_X11_EXTENSIONS_DPMS_H
+
+/* Define if you have the <a52dec/a52.h> header file.  */
+#undef HAVE_A52DEC_A52_H
+
 /* Define if you have the <argz.h> header file.  */
 #undef HAVE_ARGZ_H
 
@@ -341,6 +347,9 @@
 /* Define if <strings.h> defines strncasecmp. */
 #undef STRNCASECMP_IN_STRINGS_H
 
+/* Define if <X11/extensions/dpms.h> defines DPMSInfo. */
+#undef DPMSINFO_IN_DPMS_H
+
 /* Define if <sys/param.h> defines ntohl. */
 #undef NTOHL_IN_SYS_PARAM_H
 
@@ -403,7 +412,4 @@
 
 /* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
 #undef SDL_INCLUDE_FILE
-
-/* Define if <X11/extensions/dmps.h> defines DPMSInfo. */
-#undef DPMSINFO_IN_DPMS_H
 

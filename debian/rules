@@ -9,7 +9,7 @@
 export DH_COMPAT=3
 
 # Compilation options
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --enable-sdl --enable-esd --enable-qt --with-mad --enable-arts"
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --with-ggi --enable-sdl --enable-esd --enable-qt --with-mad --enable-arts --enable-alsa --enable-lirc --enable-liba52"
 export LIBDVDCSS_FLAGS="--with-dvdcss=local-shared"
 export VIDDIR="usr/share/videolan"
 export PIXDIR="usr/share/pixmaps"
@@ -25,9 +25,7 @@ build-stamp:
 
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
-		ARCH_FLAGS="--enable-alsa --with-glide" ;; \
-	alpha|arm|hppa|ia64|m68k|mips|mipsel|powerpc|s390|sparc) \
-		ARCH_FLAGS="--enable-alsa" ;; \
+		ARCH_FLAGS="--with-glide" ;; \
 	*) \
 		ARCH_FLAGS="" ;; \
 	esac ;\
@@ -59,11 +57,9 @@ install: build
 	# make symlinks for packages and install plugins
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa glide" ;; \
-	alpha|ia64|m68k|powerpc) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa a52 lirc glide" ;; \
 	*) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa a52 lirc" ;; \
 	esac ;\
 	for alias in $$ARCH_ALIASES ; do \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
@@ -121,9 +117,9 @@ binary-arch: build install
 	dh_installman doc/vlc.1
 #	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad ChangeLog
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 ChangeLog
 # libdvdcss start
-	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad ChangeLog.libdvdcss
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-alsa -Nvlc-sdl -Nvlc-qt -Nvlc-arts -Nvlc-mad -Nvlc-lirc -Nvlc-a52 ChangeLog.libdvdcss
 # libdvdcss stop
 	dh_link
 	dh_strip
@@ -136,10 +132,8 @@ binary-arch: build install
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
 		ARCH_EXCLUDE="" ;; \
-	alpha|arm|hppa|ia64|m68k|mips|mipsel|powerpc|s390|sparc) \
-		ARCH_EXCLUDE="-Nvlc-glide" ;; \
 	*) \
-		ARCH_EXCLUDE="-Nvlc-glide -Nvlc-alsa" ;; \
+		ARCH_EXCLUDE="-Nvlc-glide" ;; \
 	esac ;\
 	dh_shlibdeps $$ARCH_EXCLUDE ;\
 	dh_gencontrol $$ARCH_EXCLUDE ;\

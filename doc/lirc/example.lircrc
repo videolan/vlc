@@ -1,0 +1,48 @@
+begin
+  prog = vlc
+  button = PLAY_UP
+  config = PLAY
+  config = PAUSE
+end
+
+begin
+  prog = vlc
+  button = STOP_UP
+  config = STOP
+end
+
+begin
+  prog = vlc
+  button = POWER_UP
+  config = QUIT
+end
+
+begin
+  prog = vlc
+  button = SKIP_FORWARD_UP
+  config = NEXT
+end
+
+begin
+  prog = vlc
+  button = SKIP_BACKWARD
+  config = LAST
+end
+
+begin
+  prog = vlc
+  button = RED_BUTTON_UP
+  config = FULLSCREEN
+end
+
+begin
+  prog = vlc
+  button = REWIND_UP
+  config = SLOW
+end
+
+begin
+  prog = vlc
+  button = FORWARD_UP
+  config = FAST
+end

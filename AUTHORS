@@ -10,6 +10,10 @@ C: marcari
 E: marcari@via.ecp.fr
 D: communication with channel server
 
+N: Sigmund Augdal
+E: sigmunau@idi.ntnu.no
+D: lirc plugin
+
 N: Pierre Baillet
 E: oct@zoy.org
 C: octplane
