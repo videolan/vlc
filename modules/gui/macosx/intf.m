@@ -867,7 +867,7 @@ static VLCMain *_o_sharedMainInstance = nil;
             {
                 return;
             }
-
+/*
             vlc_mutex_lock( &p_playlist->object_lock );
             o_temp = [NSString stringWithUTF8String:
                 p_playlist->pp_items[p_playlist->i_index]->input.psz_name];
@@ -876,7 +876,7 @@ static VLCMain *_o_sharedMainInstance = nil;
                     p_playlist->pp_items[p_playlist->i_index]->input.psz_name];
             vlc_mutex_unlock( &p_playlist->object_lock );
             [o_scrollfield setStringValue: o_temp ];
-
+*/
 
             /*p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                     FIND_ANYWHERE );
