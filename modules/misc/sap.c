@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.42 2003/12/11 20:40:37 zorglub Exp $
+ * $Id: sap.c,v 1.43 2003/12/12 15:37:23 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -635,10 +635,8 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
-            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_name,
-                                    p_item->psz_name ) &&
-                !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
-                                    p_item->psz_uri ) )
+            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
+                        p_item->psz_uri ) )
             {
                 return;
             }
@@ -647,9 +645,23 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END );
         vlc_object_release( p_playlist );
         p_announce = (struct sap_announce_t *)malloc(
-                      sizeof(struct sap_announce_t *) );
-        p_announce->psz_name = strdup( p_item->psz_name );
-        p_announce->psz_uri = strdup( p_item->psz_uri );
+                      sizeof(struct sap_announce_t) );
+        if( p_item->psz_name )
+        {
+            p_announce->psz_name = strdup( p_item->psz_name );
+        }
+        else
+        {
+            p_announce->psz_name = strdup( "" );
+        }
+        if( p_item->psz_uri )
+        {
+            p_announce->psz_uri  = strdup( p_item->psz_uri );
+        }
+        else
+        {
+            p_announce->psz_uri = strdup( "" );
+        }
 
         INSERT_ELEM( p_intf->p_sys->pp_announces,
                      p_intf->p_sys->i_announces,
@@ -748,7 +760,6 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             }
         }
 
-
         /* Filling p_item->psz_uri */
         if( b_http == VLC_FALSE )
         {
@@ -785,22 +796,38 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
          for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
          {
-            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_name,
-                                    p_item->psz_name ) &&
-                !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
-                                    p_item->psz_uri ) )
+            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
+                        p_item->psz_uri ) )
             {
                 return;
             }
         }
 
         /* Enqueueing p_item in the playlist */
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END );
+        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                      FIND_ANYWHERE );
+        playlist_AddItem ( p_playlist, p_item,
+                           PLAYLIST_CHECK_INSERT, PLAYLIST_END );
+
+        /* Store it in the list */
         p_announce = (struct sap_announce_t *)malloc(
-                      sizeof(struct sap_announce_t *) );
-        p_announce->psz_name = strdup( p_item->psz_name );
-        p_announce->psz_uri = strdup( p_item->psz_uri );
+                      sizeof(struct sap_announce_t) );
+        if( p_item->psz_name )
+        {
+            p_announce->psz_name = strdup( p_item->psz_name );
+        }
+        else
+        {
+            p_announce->psz_name = strdup( "" );
+        }
+        if( p_item->psz_uri )
+        {
+            p_announce->psz_uri  = strdup( p_item->psz_uri );
+        }
+        else
+        {
+            p_announce->psz_uri = strdup( "" );
+        }
 
         INSERT_ELEM( p_intf->p_sys->pp_announces,
                      p_intf->p_sys->i_announces,
