@@ -141,7 +141,7 @@ wxMenu *MiscMenu( intf_thread_t *p_intf )
 void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
                 const wxPoint& pos )
 {
-#define MAX_POPUP_ITEMS 35
+#define MAX_POPUP_ITEMS 45
 
     vlc_object_t *p_object;
     char *ppsz_varnames[MAX_POPUP_ITEMS];
@@ -396,7 +396,7 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 
 wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
 {
-#define MAX_NAVIG_ITEMS 10
+#define MAX_NAVIG_ITEMS 15
 
     vlc_object_t *p_object;
     char *ppsz_varnames[MAX_NAVIG_ITEMS];
