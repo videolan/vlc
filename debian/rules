@@ -57,11 +57,11 @@ clean:
 	rm -f build-stamp
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
-	test -d ffmpeg
-	-(cd ffmpeg ; make distclean)
+	test -d extras/ffmpeg
+	-(cd extras/ffmpeg ; make distclean)
 	# Check that we have an faad tree in here (can be a symlink)
-	test -d faad
-	-(cd faad ; make distclean)
+	test -d extras/faad
+	-(cd extras/faad ; make distclean)
 	-$(MAKE) distclean
 
 	dh_clean
@@ -182,6 +182,11 @@ endif
 	ln -s vlc debian/vlc-plugin-svgalib/usr/share/doc/vlc-plugin-svgalib
 	mv debian/vlc/usr/lib/vlc/video_output/svgalib.so \
 		debian/vlc-plugin-svgalib/usr/lib/vlc/video_output
+
+	# Package: vlc-plugin-dv
+	ln -s vlc debian/vlc-plugin-dv/usr/share/doc/vlc-plugin-dv
+	mv debian/vlc/usr/lib/vlc/codec/dv.so \
+		debian/vlc-plugin-dv/usr/lib/vlc/codec
 
 	# Clean up
 	rm -f debian/vlc/$(VIDDIR)/*.png

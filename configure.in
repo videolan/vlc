@@ -1267,7 +1267,7 @@ AC_ARG_ENABLE(dv,
 if test "x${enable_dv}" = "xyes"
 then
   AC_CHECK_HEADERS(libdv/dv.h, [
-    BUILTINS="${BUILTINS} codec/dv/dv"
+    PLUGINS="${PLUGINS} codec/dv/dv"
     dv_LDFLAGS="${dv_LDFLAGS} -ldv"
    ],[])
 fi  
