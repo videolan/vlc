@@ -50,11 +50,10 @@ Section "Install"
 	SetOutPath $INSTDIR
 
 	File  vlc.exe
-	File  directx.so
-	File  gtk.so
-	File  sdl.so
+	File  *.so
+	File  *.dll
+	File  *.txt
 
-	File  INSTALL-win32.txt
 	File  AUTHORS
 	File  COPYING
 	File  ChangeLog
@@ -63,16 +62,6 @@ Section "Install"
 	File  README.libdvdcss
 	File  FAQ
 	File  TODO
-
-	File  SDL.dll
-	File  gtk-1.3.dll
-	File  gdk-1.3.dll
-	File  glib-1.3.dll
-	File  gmodule-1.3.dll
-	File  gnu-intl.dll
-
-	;File  README-GTK.txt
-	File  README-SDL.txt
 
 	File  /r share
 

@@ -1218,6 +1218,16 @@ AC_ARG_ENABLE(plugins,
      PLUGINS=
    fi])
 
+dnl
+dnl  DLLs - used for Win32 package build
+dnl
+DLL_PATH=.
+AC_ARG_WITH(dll-path,
+  [  --with-dll-path=path    Path to Win32 DLLs (default search in \$PWD)],
+  [ if test "x$withval" != "xno"
+    then
+      DLL_PATH=$withval
+    fi ])
 
 dnl 
 dnl  Configuration is finished
@@ -1237,9 +1247,9 @@ AC_SUBST(GPROF)
 AC_SUBST(OPTIMS)
 AC_SUBST(TUNING)
 AC_SUBST(RELEASE)
-AC_SUBST(NEED_GETOPT)
 AC_SUBST(MOC)
 AC_SUBST(WINDRES)
+AC_SUBST(DLL_PATH)
 AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 
@@ -1295,6 +1305,7 @@ AC_SUBST(CFLAGS_XVIDEO)
 AC_SUBST(OBJ_DVD)
 AC_SUBST(OBJ_LIBDVDCSS)
 
+AC_SUBST(NEED_GETOPT)
 AC_SUBST(NEED_LIBDVDCSS)
 
 AC_OUTPUT([Makefile.opts include/config.h po/Makefile.in])
