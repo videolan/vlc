@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.17 2002/10/03 18:56:09 sam Exp $
+ * $Id: libvlc.h,v 1.18 2002/10/05 19:26:23 jlj Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -398,7 +398,11 @@ vlc_module_begin();
     add_integer( "channel-port", 6010, NULL,
                  CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT );
     add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT );
+#ifdef SYS_DARWIN
+    add_string( "iface", "en0", NULL, IFACE_TEXT, IFACE_LONGTEXT );
+#else
     add_string( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT );
+#endif
     add_string( "iface-addr", "", NULL, IFACE_ADDR_TEXT, IFACE_ADDR_LONGTEXT );
 
     add_integer( "program", 0, NULL,

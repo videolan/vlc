@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.73 2002/07/31 20:56:53 sam Exp $
+ * $Id: netutils.c,v 1.74 2002/10/05 19:26:23 jlj Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -10,6 +10,7 @@
  *          Xavier Marchesini <xav@alarue.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
+ *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,6 +61,12 @@
 #include <sys/ioctl.h>                                            /* ioctl() */
 #endif
 
+#ifdef SYS_DARWIN
+#include <IOKit/IOKitLib.h>
+#include <IOKit/network/IOEthernetInterface.h>
+#include <IOKit/network/IOEthernetController.h>
+#endif
+
 #if defined( WIN32 )                    /* tools to get the MAC adress from  */
 #include <windows.h>                    /* the interface under Windows       */
 #include <stdio.h>
@@ -97,7 +104,10 @@ struct input_channel_t
  * Local prototypes
  *****************************************************************************/
 static int GetMacAddress   ( vlc_object_t *, int i_fd, char *psz_mac );
-#ifdef WIN32
+#ifdef SYS_DARWIN
+static int GetNetIntfCtrl  ( const char *psz_interface, 
+                             io_object_t *ctrl_service );
+#elif defined( WIN32 )
 static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 #endif
 
@@ -329,6 +339,47 @@ static int GetMacAddress( vlc_object_t *p_this, int i_fd, char *psz_mac )
 
     return( 0 );
 
+#elif defined( SYS_DARWIN )
+    char *psz_interface;
+    io_object_t ctrl_service;
+    CFTypeRef cfd_mac_address;
+    UInt8 ui_mac_address[kIOEthernetAddressSize];
+
+    if( !(psz_interface = config_GetPsz( p_this, "iface" )) )
+    {
+        msg_Err( p_this, "configuration variable iface empty" );
+        return( -1 );
+    }
+
+    if( GetNetIntfCtrl( psz_interface, &ctrl_service ) )
+    {
+        msg_Err( p_this, "GetNetIntfCtrl failed" );
+        return( -1 );
+    }
+
+    cfd_mac_address = IORegistryEntryCreateCFProperty( ctrl_service,
+                                                       CFSTR(kIOMACAddress),
+                                                       kCFAllocatorDefault,
+                                                       0 ); 
+    IOObjectRelease( ctrl_service );
+    if( cfd_mac_address == NULL )
+    {
+        msg_Err( p_this, "IORegistryEntryCreateCFProperty failed" );
+        return( -1 );
+    }
+
+    CFDataGetBytes( cfd_mac_address, 
+                    CFRangeMake(0, kIOEthernetAddressSize), 
+                    ui_mac_address );
+    CFRelease( cfd_mac_address );
+
+    sprintf( psz_mac, "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+                      ui_mac_address[0], ui_mac_address[1],
+                      ui_mac_address[2], ui_mac_address[3],
+                      ui_mac_address[4], ui_mac_address[5] ); 
+
+    return( 0 );
+
 #elif defined( WIN32 )
     int i, i_ret = -1;
 
@@ -362,7 +413,51 @@ static int GetMacAddress( vlc_object_t *p_this, int i_fd, char *psz_mac )
 #endif
 }
 
-#ifdef WIN32
+#ifdef SYS_DARWIN
+/*****************************************************************************
+ * GetNetIntfCtrl : get parent controller for network interface 
+ *****************************************************************************/
+static int GetNetIntfCtrl( const char *psz_interface,
+                           io_object_t *ctrl_service )
+{
+    mach_port_t port;
+    kern_return_t ret;
+    io_object_t intf_service;
+    io_iterator_t intf_iterator;
+
+    /* get port for IOKit communication */
+    if( ( ret = IOMasterPort( MACH_PORT_NULL, &port ) ) != KERN_SUCCESS )
+    {
+        return( -1 );
+    }
+
+    /* look up the IOService object for the interface */
+    ret = IOServiceGetMatchingServices( port, IOBSDNameMatching( port, 0, 
+                                        psz_interface ), &intf_iterator ); 
+    if( ret != KERN_SUCCESS )
+    {
+        return( -1 );
+    }
+
+    intf_service = IOIteratorNext( intf_iterator );
+    if( intf_service == NULL )
+    {
+        return( -1 );
+    }
+
+    ret = IORegistryEntryGetParentEntry( intf_service,
+                                         kIOServicePlane,
+                                         ctrl_service );
+    IOObjectRelease( intf_service );
+    if( ret != KERN_SUCCESS )
+    {
+        return( -1 );
+    }
+
+    return( 0 );
+}
+
+#elif defined( WIN32 )
 /*****************************************************************************
  * GetAdapterInfo : gets some informations about the interface using NETBIOS
  *****************************************************************************/

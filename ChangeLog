@@ -1,6 +1,8 @@
 0.5.0
 Not released yet
 
+  * ./src/misc/netutils.c: GetMacAddress Darwin support
+  * ./src/libvlc.h: default to en0 instead of eth0 under Darwin
   * ./plugins/dvdplay/access.c: use dvdplay after it has completed
     initialization.
   * ./configure.in: better detection of IPv6, fixed solaris handling.
