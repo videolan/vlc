@@ -873,6 +873,12 @@ static struct
       AUDIO_ES, "AMR wide band" },
 #endif
 
+#if LIBAVCODEC_BUILD >= 4703
+    /* FLAC */
+    { VLC_FOURCC('f','l','a','c'), CODEC_ID_FLAC,
+      AUDIO_ES, "FLAC (Free Lossless Audio Codec)" },
+#endif
+
 #if LIBAVCODEC_BUILD >= 4745
     /* ALAC */
     { VLC_FOURCC('a','l','a','c'), CODEC_ID_ALAC,

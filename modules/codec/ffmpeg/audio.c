@@ -112,11 +112,20 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
     if( ( p_sys->p_context->extradata_size = p_dec->fmt_in.i_extra ) > 0 )
     {
+        int i_offset = 0;
+
+        if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
+            i_offset = 8;
+
+        p_sys->p_context->extradata_size -= i_offset;
         p_sys->p_context->extradata =
-            malloc( p_dec->fmt_in.i_extra + FF_INPUT_BUFFER_PADDING_SIZE );
+            malloc( p_sys->p_context->extradata_size +
+                    FF_INPUT_BUFFER_PADDING_SIZE );
         memcpy( p_sys->p_context->extradata,
-                p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-        memset( (char*)p_sys->p_context->extradata + p_dec->fmt_in.i_extra, 0,
+                p_dec->fmt_in.p_extra + i_offset,
+                p_sys->p_context->extradata_size );
+        memset( (char*)p_sys->p_context->extradata +
+                p_sys->p_context->extradata_size, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
