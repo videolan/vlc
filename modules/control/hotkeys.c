@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.10 2003/12/10 17:19:05 yoann Exp $
+ * $Id: hotkeys.c,v 1.11 2003/12/10 20:56:09 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -353,7 +353,7 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_POSITION )
             {
-                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
                 char psz_duration[MSTRTIME_MAX_SIZE];
                 char psz_time[MSTRTIME_MAX_SIZE];
