@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input_info.c,v 1.12 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: input_info.c,v 1.13 2004/01/15 23:40:44 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -69,7 +69,7 @@ input_info_category_t * input_InfoCategory( input_thread_t * p_input,
         p_category->psz_name = strdup( psz_name );
         p_category->p_next = NULL;
         p_category->p_info = NULL;
-        p_prev->p_next = p_category;
+        if( p_prev ) p_prev->p_next = p_category;
         return p_category;
     }
 }

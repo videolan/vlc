@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.275 2004/01/10 23:46:39 sigmunau Exp $
+ * $Id: input.c,v 1.276 2004/01/15 23:40:44 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -85,7 +85,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
                                       playlist_item_t *p_item )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
-    input_info_category_t * p_info;
     vlc_value_t val;
     int i,j;
 
@@ -245,23 +244,15 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->stream.control.i_status = INIT_S;
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
-    p_input->stream.control.b_grayscale = config_GetInt( p_input, "grayscale" );
-
-    /* Initialize input info */
-    p_input->stream.p_info = malloc( sizeof( input_info_category_t ) );
-    if( !p_input->stream.p_info )
-    {
-        msg_Err( p_input, "No memory!" );
-        return NULL;
-    }
-    p_input->stream.p_info->psz_name = strdup("General") ;
-    p_input->stream.p_info->p_info = NULL;
-    p_input->stream.p_info->p_next = NULL;
+    p_input->stream.control.b_grayscale = config_GetInt( p_input, "grayscale");
 
     msg_Info( p_input, "playlist item `%s'", p_input->psz_source );
 
-    p_info = input_InfoCategory( p_input, _("General") );
-    input_AddInfo( p_info, _("Playlist Item"), p_input->psz_source );
+    /* Initialize input info */
+    p_input->stream.p_info = NULL;
+    p_input->stream.p_info = input_InfoCategory( p_input, _("General") );
+    input_AddInfo( p_input->stream.p_info, _("Playlist Item"),
+                   p_input->psz_source );
     vlc_object_attach( p_input, p_parent );
 
     /* Create thread and wait for its readiness. */
@@ -269,6 +260,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
                            VLC_THREAD_PRIORITY_INPUT, VLC_TRUE ) )
     {
         msg_Err( p_input, "cannot create input thread" );
+        input_DelInfo( p_input );
         free( p_input );
         return NULL;
     }
@@ -330,6 +322,8 @@ static int RunThread( input_thread_t *p_input )
 
         /* Tell we're dead */
         p_input->b_dead = 1;
+
+        input_DelInfo( p_input );
 
         return 0;
     }

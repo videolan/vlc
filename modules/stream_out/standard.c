@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.16 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: standard.c,v 1.17 2004/01/15 23:40:44 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -69,7 +69,8 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_instance_t     *p_sout = p_stream->p_sout;
-    sout_stream_sys_t   *p_sys = malloc( sizeof( sout_stream_sys_t) );
+    slp_session_t       *p_slp = NULL;
+    sap_session_t       *p_sap = NULL;
 
     char *psz_mux      = sout_cfg_find_value( p_stream->p_cfg, "mux" );
     char *psz_access   = sout_cfg_find_value( p_stream->p_cfg, "access" );
@@ -86,9 +87,6 @@ static int Open( vlc_object_t *p_this )
     sout_mux_t          *p_mux;
 
     char                *psz_mux_byext = NULL;
-
-    p_sys->p_sap = NULL;
-    p_sys->p_slp = NULL;
 
     msg_Dbg( p_this, "creating `%s/%s://%s'",
              psz_access, psz_mux, psz_url );
@@ -257,11 +255,11 @@ static int Open( vlc_object_t *p_this )
         }
         msg_Dbg( p_sout , "Creating SAP with IPv%i", atoi(psz_ipv) );
 
-        p_sys->p_sap = sout_SAPNew( p_sout , psz_url ,
+        p_sap = sout_SAPNew( p_sout , psz_url ,
             p_sap_cfg->psz_value ? p_sap_cfg->psz_value : psz_url,
             atoi(psz_ipv), psz_v6_scope );
 
-        if( !p_sys->p_sap )
+        if( !p_sap )
             msg_Err( p_sout,"Unable to initialize SAP. SAP disabled");
     }
 
@@ -278,14 +276,15 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            p_sys->p_slp = (slp_session_t*)malloc(sizeof(slp_session_t));
-            if(!p_sys->p_slp)
+            p_slp = (slp_session_t*)malloc(sizeof(slp_session_t));
+            if(!p_slp)
             {
                 msg_Warn(p_sout,"Out of memory");
+                if( p_sap ) free( p_sap );
                 return -1;
             }
-            p_sys->p_slp->psz_url= strdup(psz_url);
-            p_sys->p_slp->psz_name = strdup(
+            p_slp->psz_url= strdup(psz_url);
+            p_slp->psz_name = strdup(
                     p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url);
         }
     }
@@ -294,14 +293,15 @@ static int Open( vlc_object_t *p_this )
     /* XXX beurk */
     p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader );
 
-
-    p_sys->p_mux = p_mux;
-
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
 
-    p_stream->p_sys     = p_sys;
+    p_stream->p_sys        = malloc( sizeof( sout_stream_sys_t) );
+    p_stream->p_sys->p_mux = p_mux;
+    p_stream->p_sys->p_slp = p_slp;
+    p_stream->p_sys->p_sap = p_sap;
+
     return VLC_SUCCESS;
 }
 
