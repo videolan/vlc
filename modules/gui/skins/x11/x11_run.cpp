@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.6 2003/05/19 21:39:34 asmax Exp $
+ * $Id: x11_run.cpp,v 1.7 2003/05/24 20:54:27 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -344,9 +344,10 @@ void OSRun( intf_thread_t *p_intf )
 
     VlcProc *proc = new VlcProc( p_intf );
     
-/*    wxTheApp = new Instance( p_intf, callbackobj );
-    wxEntry( 1, p_args );*/
-
+#ifndef BASIC_SKINS
+    wxTheApp = new Instance( p_intf );
+    wxEntry( 1, p_args );
+#endif
 
     Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();
     

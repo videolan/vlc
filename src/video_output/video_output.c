@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.222 2003/05/21 13:27:25 gbazin Exp $
+ * $Id: video_output.c,v 1.223 2003/05/24 20:54:27 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -60,6 +60,8 @@ static void     InitWindowSize    ( vout_thread_t *, int *, int * );
 /* Object variables callbacks */
 static int FullscreenCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
+static int DeinterlaceCallback( vlc_object_t *, char const *,
+                                vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
@@ -382,6 +384,25 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     text.psz_string = _("Fullscreen");
     var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
+
+    var_Create( p_vout, "deinterlace", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+    text.psz_string = _("Deinterlace");
+    var_Change( p_vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL );
+    val.psz_string = ""; text.psz_string = _("Disable");
+    var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+    var_Set( p_vout, "deinterlace", val );
+    val.psz_string = "discard"; text.psz_string = _("Discard");
+    var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "blend"; text.psz_string = _("Blend");
+    var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "mean"; text.psz_string = _("Mean");
+    var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "bob"; text.psz_string = _("Bob");
+    var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "linear"; text.psz_string = _("Linear");
+    var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
+    //var_Change( p_vout, "deinterlace", VLC_VAR_INHERITVALUE, NULL, NULL );
+    var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );
 
     /* Calculate delay created by internal caching */
     p_input_thread = (input_thread_t *)vlc_object_find( p_vout,
@@ -1171,6 +1192,79 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vlc_value_t val;
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
+    return VLC_SUCCESS;
+}
+
+static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    input_thread_t *p_input;
+    vlc_value_t val;
+
+    char *psz_mode = newval.psz_string;
+    char *psz_filter;
+    unsigned int  i;
+
+    psz_filter = config_GetPsz( p_vout, "filter" );
+
+    if( !psz_mode || !*psz_mode )
+    {
+        config_PutPsz( p_vout, "filter", "" );
+    }
+    else
+    {
+        if( !psz_filter || !*psz_filter )
+        {
+            config_PutPsz( p_vout, "filter", "deinterlace" );
+        }
+        else
+        {
+            if( strstr( psz_filter, "deinterlace" ) == NULL )
+            {
+                psz_filter = realloc( psz_filter, strlen( psz_filter ) + 20 );
+                strcat( psz_filter, ",deinterlace" );
+            }
+            config_PutPsz( p_vout, "filter", psz_filter );
+        }
+    }
+
+    if( psz_filter ) free( psz_filter );
+
+    /* now restart all video streams */
+    p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
+                                                 FIND_PARENT );
+    if( p_input )
+    {
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+
+        p_vout->b_filter_change = VLC_TRUE;
+
+#define ES p_input->stream.pp_es[i]
+
+        for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
+        {
+            if( ( ES->i_cat == VIDEO_ES ) && ES->p_decoder_fifo != NULL )
+            {
+                input_UnselectES( p_input, ES );
+                input_SelectES( p_input, ES );
+            }
+#undef ES
+        }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        vlc_object_release( p_input );
+    }
+
+    if( psz_mode && *psz_mode )
+    {
+        val.psz_string = psz_mode;
+        if( var_Set( p_vout, "deinterlace-mode", val ) != VLC_SUCCESS )
+            config_PutPsz( p_vout, "deinterlace-mode", psz_mode );
+    }
+
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;

@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.12 2003/05/21 13:27:25 gbazin Exp $
+ * $Id: menus.cpp,v 1.13 2003/05/24 20:54:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -129,6 +129,8 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
     {
         ppsz_varnames[i] = "fullscreen";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "deinterlace";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-on-top";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
@@ -224,6 +226,8 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     if( p_object != NULL )
     {
         ppsz_varnames[i] = "fullscreen";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "deinterlace";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-on-top";
         pi_objects[i++] = p_object->i_object_id;
