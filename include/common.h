@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.55 2001/12/10 04:53:10 sam Exp $
+ * $Id: common.h,v 1.56 2001/12/11 23:53:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -410,7 +410,7 @@ typedef __int64 off_t;
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#ifdef ENABLE_NLS
+#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
 #   include <libintl.h>
 #else
 #   define _(String) (String)

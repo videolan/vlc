@@ -1292,7 +1292,6 @@ AC_SUBST(OBJ_LIBDVDCSS)
 AC_SUBST(NEED_LIBDVDCSS)
 
 AC_OUTPUT([Makefile.opts include/config.h po/Makefile.in])
-#AC_OUTPUT([Makefile.opts include/config.h intl/Makefile po/Makefile.in])
 
 echo "
 global configuration
