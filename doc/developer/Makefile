@@ -1,63 +1,42 @@
-# Extract from the Debian SGML/XML HOWTO by Stéphane Bortzmeyer
+# Makefile for VideoLAN Doc
+#  Clément Stenac
+#  Anil Daoud
 
-MAX_TEX_RECURSION=4
+XSLTPROC=xsltproc
+LYNX=lynx
+JADE=jade
 
-# For Debian :
-#XML_DECL=/usr/lib/sgml/declaration/xml.decl
-#HTML_SS=/usr/lib/sgml/stylesheet/dsssl/docbook/nwalsh/html/docbook.dsl
-#PRINT_SS=/usr/lib/sgml/stylesheet/dsssl/docbook/nwalsh/print/docbook.dsl
-
-# For RedHat :
-# XML_DECL=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/dtds/decls/xml.dcl
-# HTML_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/html/docbook.dsl
-# PRINT_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/print/docbook.dsl
-
-# For Mac OS X :
-#XML_DECL=/sw/share/sgml/dsssl/docbook-dsssl-nwalsh/dtds/decls/xml.dcl
-#HTML_SS=/sw/share/sgml/dsssl/docbook-dsssl-nwalsh/html/docbook.dsl
-#PRINT_SS=/sw/share/sgml/dsssl/docbook-dsssl-nwalsh/print/docbook.dsl
-#JADE=openjade
-
-JADE=openjade
-LYNX=/usr/bin/lynx
-DVIPS=/usr/bin/dvips
-JADETEX=/usr/bin/jadetex
-
-XML_DECL=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/dtds/decls/xml.dcl
-HTML_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/html/docbook.dsl
-PRINT_SS=/usr/share/sgml/docbook/dsssl-stylesheets-1.76/print/docbook.dsl
-
-DOCS=manual.html manual.txt manual.ps
+XML_DECL := /usr/lib/sgml/declaration/xml.decl
+XSL_CHUNK = videolan-doc-chunk.xsl
+XSL = videolan-doc.xsl
 
 all: manual
 
+manual: manual.html all-html manual.pdf manual.txt
 
-manual: manual.txt manual.ps manual.html
+# HTML
+all-html: *.xml
+	xsltproc $(XSL_CHUNK) manual.xml
+	mv *.html html
 
-manual.tex: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
-	$(JADE) -t tex -V %section-autolabel% -d $(PRINT_SS) $(XML_DECL) manual.xml
-	perl -i.bak -pe 's/\000//g' $@ && rm $*.tex.bak
-# No it's not a joke
+manual.html: *.xml
+	xsltproc $(XSL) manual.xml > manual.html
 
-manual.html: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
-	$(JADE) -t sgml -V %section-autolabel% -V nochunks \
-         -d $(HTML_SS) $(XML_DECL) manual.xml > $@
-
-manual.dvi: manual.tex modules.eps ps.eps stream.eps ts.eps
-	$(JADETEX) manual.tex
-	$(JADETEX) manual.tex
-	$(JADETEX) manual.tex
-
-manual.ps: manual.dvi
-	$(DVIPS) -f $< > $@
-
-manual.txt: audio_output.xml debugging.xml decoders.xml gfdl.xml glossary.xml history.xml input.xml interface.xml manual.xml overview.xml ports.xml video_output.xml
-	$(JADE) -t sgml -V nochunks -d $(HTML_SS) $(XML_DECL) manual.xml > dump.html
-	$(LYNX) -force_html -dump dump.html > $@
-	-rm -f dump.html
+# PDF
+manual.pdf: *.xml
+	jade -t tex -d stylesheet-print-noicones.dsl -o manual.tex $(XML_DECL) manual.xml
+	pdfjadetex manual.tex
+	pdfjadetex manual.tex
+	pdfjadetex manual.tex
+	rm -f *.tex *.out *.aux *.log
+	
+# TXT
+manual.txt:  *.xml
+	$(JADE) -t sgml -d stylesheet-txt.dsk $(XML_DECL) manual.xml > text.html
+	$(LYNX) -force_html -dump text.html > manual.txt
+	rm -f text.html
 
 clean:
 	rm -f manual.txt
-	rm -f *.html *.aux *.log *.dvi *.ps *.tex
-	rm -f *.bck *~ .\#* \#*
-
+	rm -f *.html *.aux *.log *.tex
+	rm -f html/*.html

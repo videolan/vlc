@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "/usr/share/sgml/docbook/xml-dtd-4.1.2/docbookx.dtd"
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "/usr/share/sgml/docbook/dtd/xml/4.1/docbookx.dtd"
 [
     <!ENTITY glossary SYSTEM "glossary.xml">
     <!ENTITY overview SYSTEM "overview.xml">
@@ -15,7 +15,7 @@
     <!ENTITY gfdl SYSTEM "gfdl.xml">
 ]>
 
-<book>
+<book id="vlc-dev-doc">
 
 <title> VLC media player API Documentation </title>
 
