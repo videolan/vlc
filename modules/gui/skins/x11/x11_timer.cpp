@@ -2,7 +2,7 @@
  * x11_timer.cpp: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.cpp,v 1.1 2003/06/05 22:16:15 asmax Exp $
+ * $Id: x11_timer.cpp,v 1.2 2003/06/07 12:19:23 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -55,9 +55,9 @@ mtime_t X11Timer::getNextDate( mtime_t current )
 }
 
 
-void X11Timer::Execute()
+bool X11Timer::Execute()
 {
-    (*_callback)( _data );
+    return (*_callback)( _data );
 }
 
 //---------------------------------------------------------------------------
@@ -112,6 +112,7 @@ void X11TimerManager::Destroy()
 void *X11TimerManager::Thread( void *p_timer )
 {
     vlc_thread_ready( (vlc_object_t*) p_timer );
+
     while( !((timer_thread_t*)p_timer)->die )
     {
         list<X11Timer*>::iterator timer;
@@ -119,11 +120,14 @@ void *X11TimerManager::Thread( void *p_timer )
         for( timer = _instance->_timers.begin(); 
              timer != _instance->_timers.end(); timer++ )
         {
-            (*timer)->Execute();
+            bool ret = (*timer)->Execute();
+            if( !ret ) 
+            {   _instance->_timers.remove( *timer );
+                break;
+            }
         }
         msleep( 100000 );
     }
-    
 }
 
 #endif

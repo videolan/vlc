@@ -2,7 +2,7 @@
  * x11_timer.h: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.h,v 1.1 2003/06/05 22:16:15 asmax Exp $
+ * $Id: x11_timer.h,v 1.2 2003/06/07 12:19:23 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -36,7 +36,7 @@ typedef struct
 
 class X11Timer;  // forward declaration
 
-typedef void(*callback_t)( void* );
+typedef bool(*callback_t)( void* );
 
 //---------------------------------------------------------------------------
 class X11Timer
@@ -53,7 +53,7 @@ class X11Timer
         ~X11Timer();
 
         mtime_t getNextDate( mtime_t current );
-        void Execute();
+        bool Execute();
 };
 //---------------------------------------------------------------------------
 class X11TimerManager
@@ -74,6 +74,7 @@ class X11TimerManager
         void Destroy();
 
         void addTimer( X11Timer *timer ) { _timers.push_back( timer ); }
+        void removeTimer( X11Timer *timer ) { _timers.remove( timer ); }
 
 };
 //---------------------------------------------------------------------------

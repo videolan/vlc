@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.11 2003/06/07 00:36:28 asmax Exp $
+ * $Id: x11_window.cpp,v 1.12 2003/06/07 12:19:23 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -47,6 +47,10 @@
 #include "../src/skin_common.h"
 #include "../src/theme.h"
 #include "../os_theme.h"
+#include "x11_timer.h"
+
+
+bool ToolTipCallback( void *data );
 
 
 //---------------------------------------------------------------------------
@@ -78,24 +82,6 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     CursorPos    = new POINT;
     WindowPos    = new POINT;
 
-    // Create Tool Tip Window
-    ToolTipWindow = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
-        WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-        hWnd, 0, GetModuleHandle( NULL ), 0);
-
-    // Create Tool Tip infos
-    ToolTipInfo.cbSize = sizeof(TOOLINFO);
-    ToolTipInfo.uFlags = TTF_SUBCLASS|TTF_IDISHWND;
-    ToolTipInfo.hwnd = hWnd;
-    ToolTipInfo.hinst = GetModuleHandle( NULL );
-    ToolTipInfo.uId = (unsigned int)hWnd;
-    ToolTipInfo.lpszText = NULL;
-    ToolTipInfo.rect.left = ToolTipInfo.rect.top = 0;
-        ToolTipInfo.rect.right = ToolTipInfo.rect.bottom = 0;
-
-    SendMessage( ToolTipWindow, TTM_ADDTOOL, 0,
-                    (LPARAM)(LPTOOLINFO) &ToolTipInfo );
 */
 
     if( DragDrop )
@@ -107,6 +93,9 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
 
     // Create Tool Tip window
     ToolTipWindow = XCreateSimpleWindow( display, wnd, 0, 0, 1, 1, 0, 0, 0 );
+    X11Timer *timer = new X11Timer( p_intf, 100, ToolTipCallback, &ToolTipInfo );
+    ToolTipInfo.p_intf = p_intf;
+    ToolTipInfo.timer = timer;
 
     // Double-click handling
     ClickedX = 0;
@@ -369,6 +358,15 @@ void X11Window::Size( int width, int height )
     XResizeWindow( display, Wnd, width, height );
 }
 //---------------------------------------------------------------------------
+
+
+bool ToolTipCallback( void *data )
+{
+    fprintf(stderr," TOOLTIP: %s\n", ((tooltip_t*)data)->text.c_str());
+    return False;
+}
+
+
 void X11Window::ChangeToolTipText( string text )
 {
     if( text == "none" )
@@ -385,10 +383,10 @@ void X11Window::ChangeToolTipText( string text )
         if( text != ToolTipText )
         {
             ToolTipText = text;
+            ToolTipInfo.text = text;
+            X11TimerManager *timerManager = X11TimerManager::Instance( p_intf );
+            timerManager->addTimer( ToolTipInfo.timer );
   //          ToolTipInfo.lpszText = (char *)ToolTipText.c_str();
-  /*          SendMessage( ToolTipWindow, TTM_ACTIVATE, 1 , 0 );
-            SendMessage( ToolTipWindow, TTM_UPDATETIPTEXT, 0,
-                             (LPARAM)(LPTOOLINFO)&ToolTipInfo );*/
         }
     }
 }

@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.16 2003/06/06 19:40:37 asmax Exp $
+ * $Id: x11_run.cpp,v 1.17 2003/06/07 12:19:23 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -150,9 +150,10 @@ int ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
 }
 
 
-void RefreshCallback( void *data )
+bool RefreshCallback( void *data )
 {
     SkinManage( (intf_thread_t*)data );
+    return True;
 }
 
 

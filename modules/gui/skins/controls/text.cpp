@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.10 2003/06/05 22:16:15 asmax Exp $
+ * $Id: text.cpp,v 1.11 2003/06/07 12:19:23 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -121,13 +121,14 @@ extern intf_thread_t *g_pIntf;
     //-----------------------------------------------------------------------
     // X11 methods
     //----------------------------------------------------------------------- 
-    void ScrollingTextTimer( void *data )
+    bool ScrollingTextTimer( void *data )
     { 
         if( (ControlText *)data != NULL
             && !( (ControlText *)data )->GetSelected() )
         {
             ( (ControlText *)data )->DoScroll();
         }
+        return True;
     }
 
     //-----------------------------------------------------------------------
