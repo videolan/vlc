@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.92 2003/01/28 22:03:21 sam Exp $
+ * $Id: video_output.h,v 1.93 2003/03/24 23:50:46 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -114,6 +114,8 @@ struct vout_thread_t
     mtime_t             display_jitter;    /* average deviation from the PTS */
     count_t             c_jitter_samples;  /* number of samples used for the *
                                             * calculation of the jitter      */
+    /* delay created by internal caching */
+    int                 i_pts_delay;
 
     /* Filter chain */
     char *psz_filter_chain;

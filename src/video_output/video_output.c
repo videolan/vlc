@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.213 2003/02/26 18:15:33 massiot Exp $
+ * $Id: video_output.c,v 1.214 2003/03/24 23:50:46 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -37,6 +37,7 @@
 
 #include "video.h"
 #include "video_output.h"
+#include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
 
 #if defined( SYS_DARWIN )
 #include "darwin_specific.h"
@@ -179,10 +180,11 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
                                unsigned int i_width, unsigned int i_height,
                                vlc_fourcc_t i_chroma, unsigned int i_aspect )
 {
-    vout_thread_t * p_vout;                             /* thread descriptor */
-    int             i_index;                                /* loop variable */
-    char          * psz_plugin;
-    vlc_value_t     val;
+    vout_thread_t  * p_vout;                            /* thread descriptor */
+    input_thread_t * p_input_thread;
+    int              i_index;                               /* loop variable */
+    char           * psz_plugin;
+    vlc_value_t      val;
 
     /* Allocate descriptor */
     p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
@@ -355,6 +357,19 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         msg_Err( p_vout, "no suitable vout module" );
         vlc_object_destroy( p_vout );
         return NULL;
+    }
+
+    /* Calculate delay created by internal caching */
+    p_input_thread = (input_thread_t *)vlc_object_find( p_vout,
+                                           VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_input_thread )
+    {
+        p_vout->i_pts_delay = p_input_thread->i_pts_delay + VOUT_BOGUS_DELAY;
+        vlc_object_release( p_input_thread );
+    }
+    else
+    {
+        p_vout->i_pts_delay = VOUT_BOGUS_DELAY;
     }
 
     /* Create thread and set locks */
@@ -699,7 +714,7 @@ static void RunThread( vout_thread_t *p_vout)
                 continue;
             }
 
-            if( display_date > current_date + VOUT_BOGUS_DELAY )
+            if( display_date > current_date + p_vout->i_pts_delay )
             {
                 /* Picture is waaay too early: it will be destroyed */
                 vlc_mutex_lock( &p_vout->picture_lock );
