@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.9 2003/12/22 02:24:53 sam Exp $
+ * $Id: asf.c,v 1.10 2004/01/25 13:37:12 kuehne Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -447,7 +447,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             else
             {
-                tk->psz_name = "Unknow Video";
+                tk->psz_name = _("Unknown Video");
                 tk->i_fourcc = p_input->p_fmt->i_codec;
             }
             bo_add_mem( &bo, (uint8_t*)&tk->i_fourcc, 4 );

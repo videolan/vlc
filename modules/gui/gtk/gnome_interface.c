@@ -30,7 +30,7 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
     0, (GdkModifierType) 0, NULL
   },
   {
-    GNOME_APP_UI_ITEM, N_("_Network Stream..."),
+    GNOME_APP_UI_ITEM, N_("_Network stream..."),
     N_("Select a network stream"),
     (gpointer) GtkNetworkOpenShow, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_REFRESH,
@@ -271,7 +271,7 @@ create_intf_window (void)
 
   tooltips = gtk_tooltips_new ();
 
-  intf_window = gnome_app_new ("VideoLAN Client", _("VLC media player"));
+  intf_window = gnome_app_new ("VLC media player", _("VLC media player"));
   gtk_object_set_data (GTK_OBJECT (intf_window), "intf_window", intf_window);
   gtk_window_set_policy (GTK_WINDOW (intf_window), FALSE, TRUE, TRUE);
 
@@ -513,7 +513,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Disc"),
-                                _("Open Disc Media"), NULL,
+                                _("Open disc"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_disc);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_disc", toolbar_disc,
@@ -537,7 +537,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Sat"),
-                                _("Open a Satellite Card"), NULL,
+                                _("Open a satellite card"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_sat);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_sat", toolbar_sat,
@@ -551,7 +551,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Back"),
-                                _("Go Backward"), NULL,
+                                _("Go backward"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_back);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_back", toolbar_back,
@@ -564,7 +564,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Stop"),
-                                _("Stop Stream"), NULL,
+                                _("Stop stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_stop);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_stop", toolbar_stop,
@@ -588,7 +588,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Play"),
-                                _("Play Stream"), NULL,
+                                _("Play stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_play);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_play", toolbar_play,
@@ -600,7 +600,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Pause"),
-                                _("Pause Stream"), NULL,
+                                _("Pause stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_pause);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_pause", toolbar_pause,
@@ -615,7 +615,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Slow"),
-                                _("Play Slower"), NULL,
+                                _("Play slower"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_slow);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_slow", toolbar_slow,
@@ -628,7 +628,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Fast"),
-                                _("Play Faster"), NULL,
+                                _("Play faster"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_fast);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_fast", toolbar_fast,
@@ -641,7 +641,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Playlist"),
-                                _("Open Playlist"), NULL,
+                                _("Open playlist"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_playlist);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_playlist", toolbar_playlist,
@@ -665,7 +665,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Next"),
-                                _("Next File"), NULL,
+                                _("Next file"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_next);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_next", toolbar_next,
@@ -906,14 +906,14 @@ static GnomeUIInfo popup_audio_menu_uiinfo[] =
   },
   GNOMEUIINFO_SEPARATOR,
   {
-    GNOME_APP_UI_ITEM, N_("Volume Up"),
+    GNOME_APP_UI_ITEM, N_("Volume up"),
     NULL,
     (gpointer) GtkVolumeUp, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
-    GNOME_APP_UI_ITEM, N_("Volume Down"),
+    GNOME_APP_UI_ITEM, N_("Volume down"),
     NULL,
     (gpointer) GtkVolumeDown, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
@@ -1357,8 +1357,8 @@ create_intf_about (void)
   };
   GtkWidget *intf_about;
 
-  intf_about = gnome_about_new ("VideoLAN Client", VERSION,
-                        _("(c) 1996-2003 the VideoLAN team"),
+  intf_about = gnome_about_new ("VLC media player", VERSION,
+                        _("(c) 1996-2004 the VideoLAN team"),
                         authors,
                         _("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."),
                         NULL);
@@ -1474,7 +1474,7 @@ create_intf_open (void)
   gtk_widget_show (open_vbox);
   gtk_box_pack_start (GTK_BOX (dialog_vbox5), open_vbox, TRUE, TRUE, 0);
 
-  frame10 = gtk_frame_new (_("Media Resource Locator (MRL)"));
+  frame10 = gtk_frame_new ("Media Resource Locator (MRL)");
   gtk_widget_ref (frame10);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "frame10", frame10,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1713,7 +1713,7 @@ create_intf_open (void)
   gtk_table_set_row_spacings (GTK_TABLE (table4), 5);
   gtk_table_set_col_spacings (GTK_TABLE (table4), 5);
 
-  network_udp = gtk_radio_button_new_with_label (table4_group, _("UDP/RTP"));
+  network_udp = gtk_radio_button_new_with_label (table4_group, "UDP/RTP");
   table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_udp));
   gtk_widget_ref (network_udp);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "network_udp", network_udp,
@@ -1733,7 +1733,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  network_http = gtk_radio_button_new_with_label (table4_group, _("HTTP/FTP/MMS"));
+  network_http = gtk_radio_button_new_with_label (table4_group, "HTTP/FTP/MMS");
   table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_http));
   gtk_widget_ref (network_http);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "network_http", network_http,
@@ -2048,7 +2048,7 @@ create_intf_open (void)
   gtk_widget_show (hbox28);
   gtk_box_pack_start (GTK_BOX (dialog_vbox5), hbox28, TRUE, TRUE, 2);
 
-  show_sout_settings = gtk_check_button_new_with_label (_("Stream output"));
+  show_sout_settings = gtk_check_button_new_with_label (_("stream output"));
   gtk_widget_ref (show_sout_settings);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "show_sout_settings", show_sout_settings,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2297,7 +2297,7 @@ static GnomeUIInfo playlist_add_menu_uiinfo[] =
     0, (GdkModifierType) 0, NULL
   },
   {
-    GNOME_APP_UI_ITEM, N_("Url"),
+    GNOME_APP_UI_ITEM, N_("URL"),
     NULL,
     (gpointer) GtkPlaylistAddUrl, NULL, NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
@@ -2438,7 +2438,7 @@ create_intf_playlist (void)
   gtk_clist_set_selection_mode (GTK_CLIST (playlist_clist), GTK_SELECTION_EXTENDED);
   gtk_clist_column_titles_show (GTK_CLIST (playlist_clist));
 
-  playlist_label_url = gtk_label_new (_("Url"));
+  playlist_label_url = gtk_label_new (_("URL"));
   gtk_widget_ref (playlist_label_url);
   gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_label_url", playlist_label_url,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2614,7 +2614,7 @@ create_intf_jump (void)
   gtk_container_add (GTK_CONTAINER (jump_frame), jump_box);
   gtk_container_set_border_width (GTK_CONTAINER (jump_box), 5);
 
-  jump_label3 = gtk_label_new (_("s."));
+  jump_label3 = gtk_label_new ("s.");
   gtk_widget_ref (jump_label3);
   gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_label3", jump_label3,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2629,7 +2629,7 @@ create_intf_jump (void)
   gtk_widget_show (jump_second_spinbutton);
   gtk_box_pack_end (GTK_BOX (jump_box), jump_second_spinbutton, FALSE, FALSE, 5);
 
-  jump_label1 = gtk_label_new (_("m:"));
+  jump_label1 = gtk_label_new ("m:");
   gtk_widget_ref (jump_label1);
   gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_label1", jump_label1,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2644,7 +2644,7 @@ create_intf_jump (void)
   gtk_widget_show (jump_minute_spinbutton);
   gtk_box_pack_end (GTK_BOX (jump_box), jump_minute_spinbutton, FALSE, FALSE, 5);
 
-  jump_label2 = gtk_label_new (_("h:"));
+  jump_label2 = gtk_label_new ("h:");
   gtk_widget_ref (jump_label2);
   gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_label2", jump_label2,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2805,7 +2805,7 @@ create_intf_sout (void)
   gtk_widget_show (vbox16);
   gtk_box_pack_start (GTK_BOX (dialog_vbox7), vbox16, TRUE, TRUE, 0);
 
-  frame11 = gtk_frame_new (_("Stream output (MRL)"));
+  frame11 = gtk_frame_new (_("stream output (MRL)"));
   gtk_widget_ref (frame11);
   gtk_object_set_data_full (GTK_OBJECT (intf_sout), "frame11", frame11,
                             (GtkDestroyNotify) gtk_widget_unref);

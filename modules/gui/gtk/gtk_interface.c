@@ -627,7 +627,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Disc"),
-                                _("Open Disc Media"), NULL,
+                                _("Open Disc"), NULL,
                                 NULL, NULL, NULL);
   gtk_widget_ref (toolbar_disc);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_disc", toolbar_disc,
@@ -756,7 +756,7 @@ create_intf_window (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Prev"),
-                                _("Previous file"), NULL,
+                                _("Previous File"), NULL,
                                 NULL, NULL, NULL);
   gtk_widget_ref (toolbar_prev);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_prev", toolbar_prev,
@@ -1600,7 +1600,7 @@ create_intf_about (void)
   gtk_box_pack_start (GTK_BOX (vbox3), label14, TRUE, TRUE, 0);
   gtk_misc_set_padding (GTK_MISC (label14), 0, 10);
 
-  label18 = gtk_label_new (_("(c) 1996-2003 the VideoLAN team"));
+  label18 = gtk_label_new (_("(c) 1996-2004 the VideoLAN team"));
   gtk_widget_ref (label18);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label18", label18,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1643,7 +1643,7 @@ create_intf_about (void)
   gtk_misc_set_alignment (GTK_MISC (label39), 0.5, 0);
   gtk_misc_set_padding (GTK_MISC (label39), 5, 0);
 
-  label17 = gtk_label_new (_("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."));
+  label17 = gtk_label_new (_("This is the VLC media player, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."));
   gtk_widget_ref (label17);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label17", label17,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1789,7 +1789,7 @@ create_intf_open (void)
   gtk_widget_show (open_vbox);
   gtk_box_pack_start (GTK_BOX (dialog_vbox7), open_vbox, TRUE, TRUE, 0);
 
-  frame10 = gtk_frame_new (_("Media Resource Locator (MRL)"));
+  frame10 = gtk_frame_new ("Media Resource Locator (MRL)");
   gtk_widget_ref (frame10);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "frame10", frame10,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2581,7 +2581,7 @@ create_intf_jump (void)
   gtk_object_set_data (GTK_OBJECT (intf_jump), "dialog_vbox3", dialog_vbox3);
   gtk_widget_show (dialog_vbox3);
 
-  jump_frame = gtk_frame_new (_("Go to:"));
+  jump_frame = gtk_frame_new (_("Go To:"));
   gtk_widget_ref (jump_frame);
   gtk_object_set_data_full (GTK_OBJECT (intf_jump), "jump_frame", jump_frame,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2756,7 +2756,7 @@ create_intf_playlist (void)
   gtk_widget_show (playlist_add_network);
   gtk_container_add (GTK_CONTAINER (playlist_add_menu), playlist_add_network);
 
-  playlist_add_url = gtk_menu_item_new_with_label (_("Url"));
+  playlist_add_url = gtk_menu_item_new_with_label (_("URL"));
   gtk_widget_ref (playlist_add_url);
   gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_add_url", playlist_add_url,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -3121,7 +3121,7 @@ create_intf_sout (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  sout_access_udp = gtk_radio_button_new_with_label (sout_access_group, _("UDP"));
+  sout_access_udp = gtk_radio_button_new_with_label (sout_access_group, "UDP");
   sout_access_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_access_udp));
   gtk_widget_ref (sout_access_udp);
   gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_access_udp", sout_access_udp,
@@ -3131,7 +3131,7 @@ create_intf_sout (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  sout_access_rtp = gtk_radio_button_new_with_label (sout_access_group, _("RTP"));
+  sout_access_rtp = gtk_radio_button_new_with_label (sout_access_group, "RTP");
   sout_access_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_access_rtp));
   gtk_widget_ref (sout_access_rtp);
   gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_access_rtp", sout_access_rtp,
