@@ -2,7 +2,7 @@
  * mmsh.h:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.h,v 1.1 2003/04/20 19:29:43 fenrir Exp $
+ * $Id: mmsh.h,v 1.2 2003/05/06 02:01:35 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -20,23 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#if 0
-/* url: [/]host[:port][/path][@username[:password]] */
-typedef struct url_s
-{
-    char    *psz_host;
-    int     i_port;
-
-    char    *psz_path;
-
-    char    *psz_username;
-    char    *psz_password;
-} url_t;
-
-static url_t *url_new   ( char * );
-static void   url_free  ( url_t * );
-#endif
 
 typedef struct
 {

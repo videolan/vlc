@@ -2,7 +2,7 @@
  * mms.c: MMS over tcp, udp and http access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.32 2003/04/20 19:29:43 fenrir Exp $
+ * $Id: mms.c,v 1.33 2003/05/06 02:01:35 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -96,24 +96,24 @@ static int Open( vlc_object_t *p_this )
     {
         if( !strncmp( p_input->psz_access, "mmsu", 4 ) )
         {
-            return MMSTUOpen( p_input );
+            return E_( MMSTUOpen )( p_input );
         }
         else if( !strncmp( p_input->psz_access, "mmst", 4 ) )
         {
-            return MMSTUOpen( p_input );
+            return E_( MMSTUOpen )( p_input );
         }
         else if( !strncmp( p_input->psz_access, "mmsh", 4 ) )
         {
-            return MMSHOpen( p_input );
+            return E_( MMSHOpen )( p_input );
         }
     }
 
 
-    i_err = MMSTUOpen( p_input );
+    i_err = E_( MMSTUOpen )( p_input );
 
     if( i_err )
     {
-        i_err = MMSHOpen( p_input );
+        i_err = E_( MMSHOpen )( p_input );
     }
 
     return i_err;
@@ -129,11 +129,11 @@ static void Close( vlc_object_t *p_this )
 
     if( p_sys->i_proto == MMS_PROTO_TCP || p_sys->i_proto == MMS_PROTO_UDP )
     {
-        MMSTUClose( p_input );
+        E_( MMSTUClose )( p_input );
     }
     else if( p_sys->i_proto == MMS_PROTO_HTTP )
     {
-        MMSHClose( p_input );
+        E_( MMSHClose )( p_input );
     }
 }
 
