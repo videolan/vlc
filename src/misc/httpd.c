@@ -49,6 +49,10 @@
 #   endif
 #endif
 
+#if defined(WIN32)
+static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
+#endif
+
 #if 0
 typedef struct httpd_t          httpd_t;
 
@@ -999,37 +1003,35 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
 #ifdef AF_INET6
             if( httpd->host[i]->sock.ss_family == AF_INET6 )
             {
-                    const struct sockaddr_in6 *p_hsock, *p_sock;
-        
-                    p_hsock = (const struct sockaddr_in6 *)&httpd->host[i]->sock;
-                    p_sock = (const struct sockaddr_in6 *)res->ai_addr;
+                const struct sockaddr_in6 *p_hsock, *p_sock;
 
-                    if( memcmp( &p_hsock->sin6_addr, &in6addr_any,
-                                sizeof( struct in6_addr ) ) &&
-                        ( p_sock->sin6_family != AF_INET6 ||
-                          memcmp( &p_hsock->sin6_addr, &p_sock->sin6_addr,
-                                  sizeof( struct in6_addr ) ) ) )
-                        continue; /* does not match */
+                p_hsock = (const struct sockaddr_in6 *)&httpd->host[i]->sock;
+                p_sock = (const struct sockaddr_in6 *)res->ai_addr;
+
+                if( memcmp( &p_hsock->sin6_addr, &in6addr_any,
+                            sizeof( struct in6_addr ) ) &&
+                            ( p_sock->sin6_family != AF_INET6 ||
+                              memcmp( &p_hsock->sin6_addr, &p_sock->sin6_addr,
+                                      sizeof( struct in6_addr ) ) ) )
+                    continue; /* does not match */
             }
-            else
-            if( res->ai_family == PF_INET6 )
+            else if( res->ai_family == PF_INET6 )
                 continue;
             else
 #endif
             if( httpd->host[i]->sock.ss_family == AF_INET )
             {
-                    const struct sockaddr_in *p_hsock, *p_sock;
-        
-                    p_hsock = (const struct sockaddr_in *)&httpd->host[i]->sock;
-                    p_sock = (const struct sockaddr_in *)res->ai_addr;
+                const struct sockaddr_in *p_hsock, *p_sock;
 
-                    if( p_hsock->sin_addr.s_addr != INADDR_ANY &&
-                        ( p_sock->sin_family != AF_INET ||
-                          p_hsock->sin_addr.s_addr != p_sock->sin_addr.s_addr ) )
-                        continue; /* does not match */
+                p_hsock = (const struct sockaddr_in *)&httpd->host[i]->sock;
+                p_sock = (const struct sockaddr_in *)res->ai_addr;
+
+                if( p_hsock->sin_addr.s_addr != INADDR_ANY &&
+                    ( p_sock->sin_family != AF_INET ||
+                      p_hsock->sin_addr.s_addr != p_sock->sin_addr.s_addr ) )
+                    continue; /* does not match */
             }
-            else
-            if( res->ai_family == PF_INET )
+            else if( res->ai_family == PF_INET )
                 continue;
             else
             {
@@ -1487,7 +1489,8 @@ char* httpd_ClientIP( httpd_client_t *cl )
     }
     
     return strdup( &sz_ip[1] );
-#else        
+
+#else
     /* FIXME not thread safe */
     return strdup( inet_ntoa( ((const struct sockaddr_in *)&cl->sock)->sin_addr ) );
 #endif
