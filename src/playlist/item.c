@@ -55,6 +55,7 @@ playlist_item_t * __playlist_ItemNew( vlc_object_t *p_obj,
 
     p_item->b_enabled = VLC_TRUE;
     p_item->i_group = PLAYLIST_TYPE_MANUAL;
+    p_item->i_nb_played = 0;
 
     p_item->input.i_duration = -1;
     p_item->input.ppsz_options = NULL;

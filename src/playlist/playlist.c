@@ -510,20 +510,33 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     if( b_random )
     {
         srand( (unsigned int)mdate() );
-
-        /* Simple random stuff - we cheat a bit to minimize the chances to
-         * get the same index again. */
-        i_arg = (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
-        if( i_arg == 0 )
+        int i_count = 0;
+        while( i_count < p_playlist->i_size )
         {
-            i_arg = (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
+            p_playlist->i_index =
+                (int)((float)p_playlist->i_size * rand() / (RAND_MAX+1.0));
+            /* Check if the item has not already been played */
+            if( p_playlist->pp_items[p_playlist->i_index]->i_nb_played == 0 )
+                break;
+            i_count++;
+        }
+        if( i_count == p_playlist->i_size )
+        {
+            /* The whole playlist has been played: reset the counters */
+            while( i_count > 0 )
+            {
+                p_playlist->pp_items[--i_count]->i_nb_played = 0;
+            }
+            if( !b_loop )
+            {
+                p_playlist->i_status = PLAYLIST_STOPPED;
+            }
         }
     }
-    if( b_repeat )
+    else if( !b_repeat )
     {
-        i_arg = 0;
+        p_playlist->i_index += i_arg;
     }
-    p_playlist->i_index += i_arg;
 
     /* Boundary check */
     if( p_playlist->i_index >= p_playlist->i_size )
