@@ -170,8 +170,17 @@ void DirectXEventThread( event_thread_t *p_event )
             break;
 
         case WM_VLC_HIDE_MOUSE:
+            if( p_event->p_vout->p_sys->b_cursor_hidden ) break;
+            p_event->p_vout->p_sys->b_cursor_hidden = VLC_TRUE;
             GetCursorPos( &old_mouse_pos );
             ShowCursor( FALSE );
+            break;
+
+        case WM_VLC_SHOW_MOUSE:
+            if( !p_event->p_vout->p_sys->b_cursor_hidden ) break;
+            p_event->p_vout->p_sys->b_cursor_hidden = VLC_FALSE;
+            GetCursorPos( &old_mouse_pos );
+            ShowCursor( TRUE );
             break;
 
         case WM_LBUTTONDOWN:

@@ -132,8 +132,8 @@ void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
  * Constants
  *****************************************************************************/
 #define WM_VLC_HIDE_MOUSE WM_APP
-#define WM_VLC_CREATE_VIDEO_WIN WM_APP + 1
-#define WM_VLC_DESTROY_VIDEO_WIN WM_APP + 2
+#define WM_VLC_SHOW_MOUSE WM_APP + 1
+#define WM_VLC_CREATE_VIDEO_WIN WM_APP + 2
 #define WM_VLC_CHANGE_TEXT WM_APP + 3
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
 #define DX_POSITION_CHANGE 0x1000

@@ -462,7 +462,7 @@ static int Manage( vout_thread_t *p_vout )
             p_vout->p_sys->rect_parent = rect_parent;
 
             /* This one is to force the update even if only
-	     * the position has changed */
+             * the position has changed */
             SetWindowPos( p_vout->p_sys->hwnd, 0, 1, 1,
                           rect_parent.right - rect_parent.left,
                           rect_parent.bottom - rect_parent.top, 0 );
@@ -539,6 +539,9 @@ static int Manage( vout_thread_t *p_vout )
 
             /* Normal window */
             window_placement.showCmd = SW_SHOWNORMAL;
+
+            /* Make sure the mouse cursor is displayed */
+            PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
         }
 
         /* Change window style, borders and title bar */
@@ -556,8 +559,8 @@ static int Manage( vout_thread_t *p_vout )
     /*
      * Pointer change
      */
-    if( (!p_vout->p_sys->b_cursor_hidden) &&
-        ( (mdate() - p_vout->p_sys->i_lastmoved) > 5000000 ) )
+    if( p_vout->b_fullscreen && !p_vout->p_sys->b_cursor_hidden &&
+        (mdate() - p_vout->p_sys->i_lastmoved) > 5000000 )
     {
         POINT point;
         RECT rect;
@@ -570,7 +573,6 @@ static int Manage( vout_thread_t *p_vout )
         GetCursorPos( &point );
         if( PtInRect( &rect, point ) )
         {
-            p_vout->p_sys->b_cursor_hidden = VLC_TRUE;
             PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
         }
         else
