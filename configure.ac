@@ -1930,7 +1930,7 @@ then
       dnl  Use a custom faad
       AC_MSG_RESULT(${real_faad_tree}/libfaad/.libs/libfaad.a)
       AX_ADD_BUILTINS([faad])
-      AX_ADD_LDFLAGS([faad],[-L${real_faad_tree}/libfaad/.libs/libfaad.a])
+      AX_ADD_LDFLAGS([faad],[${real_faad_tree}/libfaad/.libs/libfaad.a])
       AX_ADD_CPPFLAGS([faad],[-I${real_faad_tree}/include])
     else
       dnl  The given libfaad wasn't built

@@ -1408,13 +1408,14 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 {
     if( ! strncmp( &p_oggpacket->packet[0], "Annodex", 7 ) )
     {
-        Ogg_ReadTheoraHeader( p_stream, p_oggpacket );
         oggpack_buffer opb;
 
         uint16_t major_version;
         uint16_t minor_version;
         uint64_t timebase_numerator;
         uint64_t timebase_denominator;
+
+        Ogg_ReadTheoraHeader( p_stream, p_oggpacket );
 
         oggpack_readinit( &opb, p_oggpacket->packet, p_oggpacket->bytes);
         oggpack_adv( &opb, 8*8 ); /* "Annodex\0" header */
