@@ -230,13 +230,11 @@ static void Close ( vlc_object_t *p_this )
 
     if( i_flag == 1 ){
         vlc_mutex_unlock( &p_picture_vout->lock );
-        fprintf( stderr, "this wasn't the last picture\n");
     } else {
         free( p_picture_vout->p_pic );
         vlc_mutex_unlock( &p_picture_vout->lock );
         vlc_mutex_destroy( &p_picture_vout->lock );
         var_Destroy( p_libvlc, "p_picture_vout" );
-        fprintf( stderr, "this was the last picture\n");
     }
 
     free( p_vout->p_sys );
@@ -267,13 +265,10 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     dest : p_picture_pout->p_pic[p_vout->p_sys.i_picture_pos]->p_picture
     */
 
-
     vlc_mutex_lock( &p_picture_vout->lock );
     if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture )
     {
-      // FIXME !!!
-      //nfprintf( stderr, "i_type : %i ( MEMORY_PICTURE == %i)\n", p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->i_type, MEMORY_PICTURE );
-      if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->i_type  == 200 /* MEMORY_PICTURE*/)
+      if( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos].p_picture->p_data_orig )
       {
         free( p_picture_vout->p_pic[p_vout->p_sys->i_picture_pos]
                         .p_picture->p_data_orig );

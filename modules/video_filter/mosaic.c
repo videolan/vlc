@@ -59,6 +59,7 @@ struct filter_sys_t
     picture_t *p_pic;
 
     int i_pos; /* mosaic positioning method */
+    int i_ar; /* do we keep aspect ratio ? */
     int i_width, i_height; /* mosaic height and width */
     int i_cols, i_rows; /* mosaic rows and cols */
     int i_xoffset, i_yoffset; /* top left corner offset */
@@ -84,6 +85,7 @@ struct filter_sys_t
 #define POS_TEXT N_("Mosaic positioning method")
 #define ROWS_TEXT N_("Mosaic number of rows")
 #define COLS_TEXT N_("Mosaic number of columns")
+#define AR_TEXT N_("Keep aspect ratio when resizing")
 
 static int pi_pos_values[] = { 0, 1 };
 static char * ppsz_pos_descriptions[] =
@@ -110,6 +112,7 @@ vlc_module_begin();
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     add_integer( "mosaic-rows", 2, NULL, ROWS_TEXT, ROWS_TEXT, VLC_FALSE );
     add_integer( "mosaic-cols", 2, NULL, COLS_TEXT, COLS_TEXT, VLC_FALSE );
+    add_bool( "mosaic-keep-aspect-ratio", 0, NULL, AR_TEXT, AR_TEXT, VLC_FALSE );
 vlc_module_end();
 
 
@@ -152,6 +155,8 @@ static int CreateFilter( vlc_object_t *p_this )
 
     p_sys->i_pos = config_GetInt( p_filter, "mosaic-position" );
     if( p_sys->i_pos > 1 || p_sys->i_pos < 0 ) p_sys->i_pos = 0;
+
+    p_sys->i_ar = config_GetInt( p_filter, "mosaic-keep-aspect-ratio" );
 
     return VLC_SUCCESS;
 }
@@ -262,6 +267,17 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
         fmt_out.i_width = fmt_in.i_width *( p_sys->i_width / p_sys->i_cols ) / fmt_in.i_width;
         fmt_out.i_height = fmt_in.i_height*( p_sys->i_height / p_sys->i_rows ) / fmt_in.i_height;
+        if( p_sys->i_ar ) /* keep aspect ratio */
+        {
+            if( (float)fmt_out.i_width/(float)fmt_out.i_height
+                > (float)fmt_in.i_width/(float)fmt_in.i_height )
+            {
+                fmt_out.i_width = ( fmt_out.i_height * fmt_in.i_width ) / fmt_in.i_height ;
+            } else {
+                fmt_out.i_height = ( fmt_out.i_width * fmt_in.i_height ) / fmt_in.i_width ;
+            }
+         }
+
         fmt_out.i_visible_width = fmt_out.i_width;
         fmt_out.i_visible_height = fmt_out.i_height;
 
