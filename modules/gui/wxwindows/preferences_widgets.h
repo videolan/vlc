@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.8 2004/01/29 17:04:01 gbazin Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -68,6 +68,8 @@ private:
     wxCheckBox *ctrl;
     wxCheckBox *shift;
     wxComboBox *combo;
+    // Array of key descriptions, for the ComboBox
+    static wxString *m_keysList;
 };
 
 class ModuleConfigControl: public ConfigControl
@@ -79,7 +81,7 @@ public:
 private:
     wxComboBox *combo;
 };
-    
+
 class StringConfigControl: public ConfigControl
 {
 public:

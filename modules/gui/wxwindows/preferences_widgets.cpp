@@ -158,84 +158,25 @@ void ConfigControl::OnUpdate( wxCommandEvent& WXUNUSED(event) )
 /*****************************************************************************
  * KeyConfigControl implementation
  *****************************************************************************/
-static wxString KeysList[] =
-{
-    wxT("Unset"),
-    wxT("Left"),
-    wxT("Right"),
-    wxT("Up"),
-    wxT("Down"),
-    wxT("Space"),
-    wxT("Enter"),
-    wxT("F1"),
-    wxT("F2"),
-    wxT("F3"),
-    wxT("F4"),
-    wxT("F5"),
-    wxT("F6"),
-    wxT("F7"),
-    wxT("F8"),
-    wxT("F9"),
-    wxT("F10"),
-    wxT("F11"),
-    wxT("F12"),
-    wxT("Home"),
-    wxT("End"),
-    wxT("Menu"),
-    wxT("Esc"),
-    wxT("Page Up"),
-    wxT("Page Down"),
-    wxT("Tab"),
-    wxT("Backspace"),
-    wxT("Mouse Wheel Up"),
-    wxT("Mouse Wheel Down"),
-    wxT("a"),
-    wxT("b"),
-    wxT("c"),
-    wxT("d"),
-    wxT("e"),
-    wxT("f"),
-    wxT("g"),
-    wxT("h"),
-    wxT("i"),
-    wxT("j"),
-    wxT("k"),
-    wxT("l"),
-    wxT("m"),
-    wxT("n"),
-    wxT("o"),
-    wxT("p"),
-    wxT("q"),
-    wxT("r"),
-    wxT("s"),
-    wxT("t"),
-    wxT("u"),
-    wxT("v"),
-    wxT("w"),
-    wxT("x"),
-    wxT("y"),
-    wxT("z"),
-    wxT("+"),
-    wxT("="),
-    wxT("-"),
-    wxT(","),
-    wxT("."),
-    wxT("<"),
-    wxT(">"),
-    wxT("`"),
-    wxT("/"),
-    wxT(";"),
-    wxT("'"),
-    wxT("\\"),
-    wxT("["),
-    wxT("]"),
-    wxT("*")
-};
+wxString *KeyConfigControl::m_keysList = NULL;
 
 KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
                                     module_config_t *p_item, wxWindow *parent )
   : ConfigControl( p_this, p_item, parent )
 {
+    // Number of keys descriptions
+    unsigned int i_keys = sizeof(vlc_keys)/sizeof(key_descriptor_t);
+
+    // Init the keys decriptions array
+    if( m_keysList == NULL )
+    {
+        m_keysList = new wxString[i_keys];
+        for( unsigned int i = 0; i < i_keys; i++ )
+        {
+            m_keysList[i] = wxT(vlc_keys[i].psz_key_string);
+        }
+    }
+
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     alt = new wxCheckBox( this, -1, wxU(_("Alt")) );
     alt->SetValue( p_item->i_value & KEY_MODIFIER_ALT );
@@ -244,9 +185,9 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
     shift = new wxCheckBox( this, -1, wxU(_("Shift")) );
     shift->SetValue( p_item->i_value & KEY_MODIFIER_SHIFT );
     combo = new wxComboBox( this, -1, wxT(""), wxDefaultPosition,
-                            wxDefaultSize, WXSIZEOF(KeysList), KeysList,
+                            wxDefaultSize, i_keys, m_keysList,
                             wxCB_READONLY );
-    for( unsigned int i = 0; i < WXSIZEOF(KeysList); i++ )
+    for( unsigned int i = 0; i < i_keys; i++ )
     {
         combo->SetClientData( i, (void*)vlc_keys[i].i_key_code );
         if( (unsigned int)vlc_keys[i].i_key_code ==
@@ -268,7 +209,11 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
 
 KeyConfigControl::~KeyConfigControl()
 {
-    ;
+    if( m_keysList )
+    {
+        delete[] m_keysList;
+        m_keysList = NULL;
+    }
 }
 
 int KeyConfigControl::GetIntValue()
