@@ -99,9 +99,9 @@ static int SendEvents( vlc_object_t *, char const *,
     "Allows you to select different visual effects.")
 
 static char *ppsz_effects[] = {
-        "none", "cube", "transparent-cube", NULL };
+        "none", "cube", "transparent-cube" };
 static char *ppsz_effects_text[] = {
-        N_("None"), N_("Cube"), N_("Transparent Cube"), NULL };
+        N_("None"), N_("Cube"), N_("Transparent Cube") };
 
 vlc_module_begin();
     set_description( _("OpenGL video output") );

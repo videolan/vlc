@@ -528,8 +528,8 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
                 if( p_module->p_config[i].ppsz_list )
                 {
                     for( j = 0; j < p_orig[i].i_list; j++ )
-                        p_module->p_config[i].ppsz_list[j] =
-                            strdup( p_orig[i].ppsz_list[j] );
+                        p_module->p_config[i].ppsz_list[j] = p_orig[i].ppsz_list[j] ?
+                            strdup( p_orig[i].ppsz_list[j] ) : NULL ;
                     p_module->p_config[i].ppsz_list[j] = NULL;
                 }
             }
@@ -540,8 +540,8 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
                 if( p_module->p_config[i].ppsz_list_text )
                 {
                     for( j = 0; j < p_orig[i].i_list; j++ )
-                        p_module->p_config[i].ppsz_list_text[j] =
-                            strdup( _(p_orig[i].ppsz_list_text[j]) );
+                        p_module->p_config[i].ppsz_list_text[j] = _(p_orig[i].ppsz_list_text[j]) ?
+                            strdup( _(p_orig[i].ppsz_list_text[j] ) ) : NULL ;
                     p_module->p_config[i].ppsz_list_text[j] = NULL;
                 }
             }
