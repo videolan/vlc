@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.28 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: alsa.c,v 1.29 2003/07/09 21:42:28 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -57,6 +57,12 @@ struct aout_sys_t
 #ifdef DEBUG
     snd_output_t      * p_snd_stderr;
 #endif
+
+    int b_playing;                                         /* playing status */
+    mtime_t start_date;
+
+    vlc_mutex_t lock;
+    vlc_cond_t  wait ;
 };
 
 #define A52_FRAME_NB 1536
@@ -65,7 +71,7 @@ struct aout_sys_t
    To convert them to a number of bytes you have to multiply them by the
    number of channel(s) (eg. 2 for stereo) and the size of a sample (eg.
    2 for s16). */
-#define ALSA_DEFAULT_PERIOD_SIZE        2048
+#define ALSA_DEFAULT_PERIOD_SIZE        1024
 #define ALSA_DEFAULT_BUFFER_SIZE        ( ALSA_DEFAULT_PERIOD_SIZE << 4 )
 #define ALSA_SPDIF_PERIOD_SIZE          A52_FRAME_NB
 #define ALSA_SPDIF_BUFFER_SIZE          ( ALSA_SPDIF_PERIOD_SIZE << 4 )
@@ -262,6 +268,10 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "out of memory" );
         return VLC_ENOMEM;
     }
+    p_sys->b_playing = VLC_FALSE;
+    p_sys->start_date = 0;
+    vlc_cond_init( p_aout, &p_sys->wait );
+    vlc_mutex_init( p_aout, &p_sys->lock );
 
     /* Get device name */
     if( (psz_device = config_GetPsz( p_aout, "alsadev" )) == NULL )
@@ -561,6 +571,19 @@ error:
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
+    if( !p_aout->output.p_sys->b_playing )
+    {
+        p_aout->output.p_sys->b_playing = 1;
+
+        /* get the playing date of the first aout buffer */
+        p_aout->output.p_sys->start_date =
+            aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
+
+        /* wake up the audio output thread */
+        vlc_mutex_lock( &p_aout->output.p_sys->lock );
+        vlc_cond_signal( &p_aout->output.p_sys->wait );
+        vlc_mutex_unlock( &p_aout->output.p_sys->lock );
+    }
 }
 
 /*****************************************************************************
@@ -571,6 +594,11 @@ static void Close( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     int i_snd_rc;
+
+    /* make sure the audio output thread is waken up */
+    vlc_mutex_lock( &p_aout->output.p_sys->lock );
+    vlc_cond_signal( &p_aout->output.p_sys->wait );
+    vlc_mutex_unlock( &p_aout->output.p_sys->lock );
 
     p_aout->b_die = VLC_TRUE;
     vlc_thread_join( p_aout );
@@ -596,20 +624,18 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int ALSAThread( aout_instance_t * p_aout )
 {
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    /* Wait for the exact time to start playing (avoids resampling) */
+    vlc_mutex_lock( &p_aout->output.p_sys->lock );
+    if( !p_aout->output.p_sys->start_date )
+        vlc_cond_wait( &p_aout->output.p_sys->wait,
+                       &p_aout->output.p_sys->lock );
+    vlc_mutex_unlock( &p_aout->output.p_sys->lock );
+
+    mwait( p_aout->output.p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
     while ( !p_aout->b_die )
     {
         ALSAFill( p_aout );
-
-        /* Sleep during less than one period to avoid a lot of buffer
-           underruns */
-
-        /* Why do we need to sleep ? --Meuuh */
-        /* Maybe because I don't want to eat all the cpu by looping
-           all the time. --Bozo */
-        /* Shouldn't snd_pcm_wait() make us wait ? --Meuuh */
-        msleep( p_sys->i_period_time >> 1 );
     }
 
     return 0;
@@ -630,18 +656,7 @@ static void ALSAFill( aout_instance_t * p_aout )
 
     snd_pcm_status_alloca( &p_status );
 
-    /* Wait for the device's readiness (ie. there is enough space in the
-       buffer to write at least one complete chunk) */
-    i_snd_rc = snd_pcm_wait( p_sys->p_snd_pcm, THREAD_SLEEP );
-    if( i_snd_rc < 0 )
-    {
-        msg_Err( p_aout, "ALSA device not ready !!! (%s)",
-                         snd_strerror( i_snd_rc ) );
-        return;
-    }
-
     /* Fill in the buffer until space or audio output buffer shortage */
-    for ( ; ; )
     {
         /* Get the status */
         i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
@@ -649,6 +664,8 @@ static void ALSAFill( aout_instance_t * p_aout )
         {
             msg_Err( p_aout, "unable to get the device's status (%s)",
                              snd_strerror( i_snd_rc ) );
+
+            msleep( p_sys->i_period_time >> 1 );
             return;
         }
 
@@ -666,15 +683,18 @@ static void ALSAFill( aout_instance_t * p_aout )
                 i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
                 if( i_snd_rc < 0 )
                 {
-                    msg_Err( p_aout,
-                        "unable to get the device's status after recovery (%s)",
-                        snd_strerror( i_snd_rc ) );
+                    msg_Err( p_aout, "unable to get the device's status after "
+                             "recovery (%s)", snd_strerror( i_snd_rc ) );
+
+                    msleep( p_sys->i_period_time >> 1 );
                     return;
                 }
             }
             else
             {
                 msg_Err( p_aout, "unable to recover from buffer underrun" );
+
+                msleep( p_sys->i_period_time >> 1 );
                 return;
             }
         }
@@ -691,10 +711,12 @@ static void ALSAFill( aout_instance_t * p_aout )
                         (p_aout->output.output.i_format ==
                          VLC_FOURCC('s','p','d','i')) );
 
-        /* Audio output buffer shortage -> stop the fill process and
-           wait in ALSAThread */
+        /* Audio output buffer shortage -> stop the fill process and wait */
         if( p_buffer == NULL )
+        {
+            msleep( p_sys->i_period_time >> 1 );
             return;
+        }
 
         i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
                                    p_buffer->i_nb_samples );
@@ -706,8 +728,5 @@ static void ALSAFill( aout_instance_t * p_aout )
         }
 
         aout_BufferFree( p_buffer );
-
-        msleep( p_sys->i_period_time >> 2 );
     }
 }
-

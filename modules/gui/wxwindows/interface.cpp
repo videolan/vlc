@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.43 2003/07/01 13:12:19 sam Exp $
+ * $Id: interface.cpp,v 1.44 2003/07/09 21:42:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -706,7 +706,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
         }
 
         /* Stream is paused, resume it */
-        playlist_Play( p_playlist );
+        input_SetStatus( p_input, INPUT_STATUS_PLAY );
         TogglePlayButton( PLAYING_S );
         vlc_object_release( p_input );
         vlc_object_release( p_playlist );

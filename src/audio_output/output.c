@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.40 2003/05/11 01:00:26 massiot Exp $
+ * $Id: output.c,v 1.41 2003/07/09 21:42:28 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -304,8 +304,13 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     /* Here we suppose that all buffers have the same duration - this is
      * generally true, and anyway if it's wrong it won't be a disaster. */
     if ( p_buffer->start_date > start_date
-                         + (p_buffer->end_date - p_buffer->start_date)
-                         + AOUT_PTS_TOLERANCE )
+                         + (p_buffer->end_date - p_buffer->start_date) )
+    /*
+     *                   + AOUT_PTS_TOLERANCE )
+     * There is no reason to want that, it just worsen the scheduling of
+     * an audio sample after an output starvation (ie. on start or on resume)
+     * --Gibalou
+     */
     {
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
         if ( !p_aout->output.b_starving )
