@@ -2,7 +2,7 @@
  * dshow.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.4 2003/08/26 19:14:09 gbazin Exp $
+ * $Id: dshow.cpp,v 1.5 2003/08/27 07:31:26 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -140,6 +140,7 @@ typedef struct dshow_stream_t
     CaptureFilter   *p_capture_filter;
     AM_MEDIA_TYPE   mt;
     int             i_fourcc;
+    vlc_bool_t      b_invert;
 
     union
     {
@@ -428,6 +429,7 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
     {
         /* Success */
         dshow_stream_t dshow_stream;
+        dshow_stream.b_invert = VLC_FALSE;
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
 
@@ -467,6 +469,19 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
             dshow_stream.header.video =
                 *(VIDEOINFOHEADER *)dshow_stream.mt.pbFormat;
 
+            int i_height = dshow_stream.header.video.bmiHeader.biHeight;
+
+            /* Check if the image is inverted (bottom to top) */
+            if( dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '5' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '6' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '2', '4' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'V', '3', '2' ) ||
+                dshow_stream.i_fourcc == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+            {
+                if( i_height > 0 ) dshow_stream.b_invert = VLC_TRUE;
+                else i_height = - i_height;
+            }
+
             /* Add video stream to header */
             p_sys->i_header_size += 20;
             p_sys->p_header = (uint8_t *)realloc( p_sys->p_header,
@@ -476,8 +491,7 @@ static int OpenDevice( input_thread_t *p_input, string devicename,
                      &dshow_stream.i_fourcc, 4 );
             SetDWBE( &p_sys->p_header[p_sys->i_header_pos + 8],
                      dshow_stream.header.video.bmiHeader.biWidth );
-            SetDWBE( &p_sys->p_header[p_sys->i_header_pos + 12],
-                     dshow_stream.header.video.bmiHeader.biHeight );
+            SetDWBE( &p_sys->p_header[p_sys->i_header_pos + 12], i_height );
             SetDWBE( &p_sys->p_header[p_sys->i_header_pos + 16], 0 );
             p_sys->i_header_pos = p_sys->i_header_size;
         }
@@ -683,10 +697,79 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             int i_copy = __MIN( p_stream->i_data_size -
                                 p_stream->i_data_pos, (int)i_len );
 
-            memcpy( p_buffer, &p_stream->p_data[p_stream->i_data_pos],
-                    i_copy );
-            p_stream->i_data_pos += i_copy;
+            if( !p_stream->b_invert )
+            {
+                p_input->p_vlc->pf_memcpy( p_buffer,
+                    &p_stream->p_data[p_stream->i_data_pos], i_copy );
+            }
+            else
+            {
+                int i_copied;
+                int i_width = p_stream->header.video.bmiHeader.biWidth;
+                int i_height = p_stream->header.video.bmiHeader.biHeight;
 
+                switch( p_stream->i_fourcc )
+                {
+                case VLC_FOURCC( 'R', 'V', '1', '5' ):
+                case VLC_FOURCC( 'R', 'V', '1', '6' ):
+                    i_width *= 2;
+                    break;
+                case VLC_FOURCC( 'R', 'V', '2', '4' ):
+                    i_width *= 3;
+                    break;
+                case VLC_FOURCC( 'R', 'V', '3', '2' ):
+                case VLC_FOURCC( 'R', 'G', 'B', 'A' ):
+                    i_width *= 4;
+                    break;
+                }
+
+                int i_line_pos = i_height - 1 - p_stream->i_data_pos / i_width;
+                int i_offset = p_stream->i_data_pos % i_width;
+
+                i_copied = __MIN( i_width - i_offset, i_copy );
+
+                /* copy already started line if any */
+                if( i_copied )
+                {
+                    memcpy( p_buffer,
+                            &p_stream->p_data[i_line_pos * i_width + i_offset],
+                            i_copied );
+
+                    p_stream->i_data_pos += i_copied;
+                    p_buffer += i_copied;
+                    i_len -= i_copied;
+                    i_data += i_copied;
+                    i_copy -= i_copied;
+                }
+
+                /* The caller got what he wanted */
+                if( i_len <= 0 ) return i_data;
+
+                i_line_pos = i_height - 1 - p_stream->i_data_pos / i_width;
+                i_copied = i_copy / i_width;
+
+                while( i_copied )
+                {
+                    memcpy( p_buffer, &p_stream->p_data[i_line_pos * i_width],
+                            i_width );
+                    p_stream->i_data_pos += i_width;
+                    p_buffer += i_width;
+                    i_len -= i_width;
+                    i_data += i_width;
+                    i_copy -= i_width;
+                    i_line_pos--;
+                    i_copied--;
+                }
+
+                /* copy left over if any */
+                if( i_copy )
+                {
+                    memcpy( p_buffer, &p_stream->p_data[i_line_pos * i_width],
+                            i_copy );
+                }
+            }
+
+            p_stream->i_data_pos += i_copy;
             p_buffer += i_copy;
             i_len -= i_copy;
             i_data += i_copy;
@@ -704,7 +787,11 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         }
 
         /* Get new sample/frame from next stream */
-        //if( p_stream->sample.p_sample ) p_stream->sample.p_sample->Release();
+        if( p_stream->sample.p_sample )
+        {
+            p_stream->sample.p_sample->Release();
+            p_stream->sample.p_sample = NULL;
+        }
         p_sys->i_current_stream =
             (p_sys->i_current_stream + 1) % p_sys->i_streams;
         p_stream = p_sys->pp_streams[p_sys->i_current_stream];
@@ -729,7 +816,8 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             }
 
 #if 0
-            msg_Dbg( p_input, "Read() PTS: "I64Fd, i_pts );
+            msg_Dbg( p_input, "Read() stream: %i PTS: "I64Fd,
+                     p_sys->i_current_stream, i_pts );
 #endif
 
             /* Create pseudo header */
@@ -739,7 +827,7 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             SetDWBE( &p_sys->p_header[4], p_stream->i_data_size );
             SetQWBE( &p_sys->p_header[8], i_pts  * 9 / 1000 );
         }
-        else msleep( 10000 );
+        else msleep( 1000 );
     }
 
     return i_data;

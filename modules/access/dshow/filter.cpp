@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.3 2003/08/26 19:14:10 gbazin Exp $
+ * $Id: filter.cpp,v 1.4 2003/08/27 07:31:26 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -387,7 +387,7 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
     //msg_Dbg( p_input, "CapturePin::Receive" );
 #endif
 
-    //pSample->AddRef();
+    pSample->AddRef();
     mtime_t i_timestamp = mdate() * 10;
     VLCMediaSample vlc_sample = {pSample, i_timestamp};
     samples_queue.push_front( vlc_sample );
@@ -398,7 +398,7 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
         vlc_sample = samples_queue.back();
         samples_queue.pop_back();
         msg_Dbg( p_input, "CapturePin::Receive trashing late input sample" );
-        // vlc_sample.p_sample->Release();
+        vlc_sample.p_sample->Release();
     }
 
     return S_OK;
