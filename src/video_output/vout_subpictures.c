@@ -372,6 +372,7 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
     memset( p_subpic, 0, sizeof(subpicture_t) );
     p_subpic->i_status   = RESERVED_SUBPICTURE;
     p_subpic->b_absolute = VLC_TRUE;
+    p_subpic->b_fade     = VLC_FALSE;
     p_subpic->pf_render  = 0;
     p_subpic->pf_destroy = 0;
     p_subpic->p_sys      = 0;
@@ -538,6 +539,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         else while( p_region && p_spu->p_blend &&
                     p_spu->p_blend->pf_video_blend )
         {
+            int i_fade_alpha = 255;
             int i_x_offset = p_region->i_x + p_subpic->i_x;
             int i_y_offset = p_region->i_y + p_subpic->i_y;
 
@@ -733,8 +735,21 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_blend->fmt_out.video.i_visible_height =
                     p_fmt->i_height;
 
-           p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
-                p_pic_src, &p_region->picture, i_x_offset, i_y_offset, 255 );
+            if( p_subpic->b_fade )
+            {
+                mtime_t i_fade_start = ( p_subpic->i_stop +
+                                         p_subpic->i_start ) / 2;
+                mtime_t i_now = mdate();
+                if( i_now >= i_fade_start && p_subpic->i_stop > i_fade_start )
+                {
+                    i_fade_alpha = 255 * ( p_subpic->i_stop - i_now ) /
+                                   ( p_subpic->i_stop - i_fade_start );
+                }
+            }
+
+            p_spu->p_blend->pf_video_blend( p_spu->p_blend, p_pic_dst,
+                p_pic_src, &p_region->picture, i_x_offset, i_y_offset,
+                i_fade_alpha );
 
             p_region = p_region->p_next;
         }
