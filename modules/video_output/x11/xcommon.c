@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.1 2002/08/04 17:23:44 sam Exp $
+ * $Id: xcommon.c,v 1.2 2002/08/16 16:26:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -51,6 +51,7 @@
 #endif
 
 #include <X11/Xlib.h>
+#include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #ifdef HAVE_SYS_SHM_H
