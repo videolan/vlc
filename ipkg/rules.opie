@@ -34,13 +34,14 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
 	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
-	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
+	--with-ffmpeg-tree=/home/jpsaman/svn/ipaq/Work/ffmpeg"
+#	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/opie-vlc-0.5.0
+export PKGDIR=/home/jpsaman/iPaq/packages/opie-vlc-0.5.1
 export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
 
 build: build-stamp

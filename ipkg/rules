@@ -38,13 +38,14 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
+	--with-ffmpeg-tree=/home/jpsaman/svn/ipaq/Work/ffmpeg"
+#	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.5.0
+export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.5.1
 
 config:
 	./configure --mandir=$${prefix}/share/man \
