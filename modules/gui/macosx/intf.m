@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.102 2003/11/20 14:39:31 hartman Exp $
+ * $Id: intf.m,v 1.103 2003/11/22 06:26:16 titer Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1068,19 +1068,29 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 {
     NSEvent * o_event;
     playlist_t * p_playlist;
+    vout_thread_t * p_vout;
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    /*
-     * Free playlists
-     */
-    msg_Dbg( p_intf, "removing all playlists" );
-    while( (p_playlist = vlc_object_find( p_intf->p_vlc, VLC_OBJECT_PLAYLIST,
-                                          FIND_CHILD )) )
+    /* Stop playback */
+    if( ( p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                        FIND_ANYWHERE ) ) )
     {
-        vlc_object_detach( p_playlist );
+        playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
-        playlist_Destroy( p_playlist );
     }
+
+    /* FIXME - Wait here until all vouts are terminated because
+       libvlc's VLC_Stop destroys interfaces before vouts, which isn't
+       good on OS X. We definitly need a cleaner way to handle this,
+       but this may hopefully be good enough for now.
+         -- titer 2003/11/22 */
+    while( ( p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                       FIND_ANYWHERE ) ) )
+    {
+        vlc_object_release( p_vout );
+        msleep( 100000 );
+    }
+    msleep( 500000 );
 
     if( o_img_pause_pressed != nil )
     {
