@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.37 2004/01/03 18:40:01 rocky Exp $
+ * $Id: v4l.c,v 1.38 2004/01/03 18:41:36 rocky Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -75,7 +75,7 @@ static void DemuxClose ( vlc_object_t * );
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for v4l streams. This " \
-    "value should be set in milliseconds units." )
+    "value should be set in millisecond units." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
     "Specify the name of the video device that will be used. " \
