@@ -306,7 +306,9 @@ static void QueueMsg(interface_msg_t *p_intf_msg, int i_type, char *psz_format, 
      */
     msg.i_type = i_type; 
     msg.psz_msg = psz_str;
+#ifdef DEBUG
     msg.date = mdate();
+#endif
     PrintMsg( &msg );                                         /* print message */
     free( psz_str );                                      /* free message data */    
 
