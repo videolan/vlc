@@ -9,7 +9,11 @@ nodist_SOURCES_corba = \
 	MediaControl.h \
 	$(NULL)
 
+if ENABLE_CORBA
+
 GENERATEDFILES = MediaControl-common.c MediaControl-skels.c MediaControl.h
+
+endif
 
 EXTRA_DIST += $(CORBAIDLFILE)
 BUILT_SOURCES += $(GENERATEDFILES)
