@@ -128,26 +128,25 @@ gnutls_Recv( void *p_session, void *buf, int i_length )
 
 
 /*****************************************************************************
- * tls_SessionHandshake:
+ * tls_Session(Continue)?Handshake:
  *****************************************************************************
  * Establishes TLS session with a peer through socket <fd>.
- * Returns NULL on error (do NOT call tls_SessionClose in case of error or
- * re-use the session structure).
+ * Returns -1 on error (you need not and must not call tls_SessionClose)
+ * 0 on succesful handshake completion, 1 if more would-be blocking recv is
+ * needed, 2 if more would-be blocking send is required.
  *****************************************************************************/
-static tls_session_t *
-gnutls_SessionHandshake( tls_session_t *p_session, int fd )
+static int
+gnutls_SessionContinueHandshake( tls_session_t *p_session)
 {
     tls_session_sys_t *p_sys;
     int val;
 
     p_sys = (tls_session_sys_t *)(p_session->p_sys);
 
-    gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)fd);
-
-    do
-        /* TODO: handle fatal error */
-        val = gnutls_handshake( p_sys->session );
-    while( ( val == GNUTLS_E_AGAIN ) || ( val == GNUTLS_E_INTERRUPTED ) );
+     /* TODO: handle fatal error */
+    val = gnutls_handshake( p_sys->session );
+    if( ( val == GNUTLS_E_AGAIN ) || ( val == GNUTLS_E_INTERRUPTED ) )
+        return 1 + gnutls_record_get_direction( p_sys->session );
 
     if( val < 0 )
     {
@@ -156,10 +155,22 @@ gnutls_SessionHandshake( tls_session_t *p_session, int fd )
                  gnutls_strerror( val ) );
         free( p_sys );
         free( p_session );
-        return NULL;
+        return -1;
     }
 
-    return p_session;
+    return 0;
+}
+
+static int
+gnutls_SessionHandshake( tls_session_t *p_session, int fd )
+{
+    tls_session_sys_t *p_sys;
+
+    p_sys = (tls_session_sys_t *)(p_session->p_sys);
+
+    gnutls_transport_set_ptr (p_sys->session, (gnutls_transport_ptr)fd);
+
+    return gnutls_SessionContinueHandshake( p_session );
 }
 
 
@@ -376,6 +387,7 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
     p_session->sock.pf_send = gnutls_Send;
     p_session->sock.pf_recv = gnutls_Recv;
     p_session->pf_handshake = gnutls_SessionHandshake;
+    p_session->pf_handshake2 = gnutls_SessionContinueHandshake;
     p_session->pf_close = gnutls_SessionClose;
 
     return p_session;

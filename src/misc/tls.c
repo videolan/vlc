@@ -114,8 +114,7 @@ tls_ClientCreate( vlc_object_t *p_this, const char *psz_ca, int fd )
         p_session = __tls_ClientCreate( p_tls, psz_ca );
         if( p_session != NULL )
         {
-            p_session = tls_SessionHandshake( p_session, fd );
-            if( p_session != NULL )
+            if( tls_SessionHandshake( p_session, fd ) )
             {
                 msg_Dbg( p_this, "TLS/SSL provider initialized" );
                 return p_session;

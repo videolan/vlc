@@ -264,6 +264,9 @@ enum
     HTTPD_CLIENT_WAITING,
 
     HTTPD_CLIENT_DEAD,
+
+    HTTPD_CLIENT_TLS_HS_IN,
+    HTTPD_CLIENT_TLS_HS_OUT
 };
 /* mode */
 enum
@@ -2020,6 +2023,41 @@ static void httpd_ClientSend( httpd_client_t *cl )
     }
 }
 
+static void httpd_ClientTlsHsIn( httpd_client_t *cl )
+{
+    switch( tls_SessionContinueHandshake( cl->p_tls ) )
+    {
+        case 0:
+            cl->i_state = HTTPD_CLIENT_RECEIVING;
+            break;
+
+        case -1:
+            cl->i_state = HTTPD_CLIENT_DEAD;
+            break;
+
+        case 2:
+            cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
+    }
+}
+
+static void httpd_ClientTlsHsOut( httpd_client_t *cl )
+{
+    switch( tls_SessionContinueHandshake( cl->p_tls ) )
+    {
+        case 0:
+            cl->i_state = HTTPD_CLIENT_RECEIVING;
+            break;
+
+        case -1:
+            cl->i_state = HTTPD_CLIENT_DEAD;
+            break;
+
+        case 1:
+            cl->i_state = HTTPD_CLIENT_TLS_HS_IN;
+            break;
+    }
+}
+
 static void httpd_HostThread( httpd_host_t *host )
 {
     tls_session_t *p_tls = NULL;
@@ -2077,12 +2115,14 @@ static void httpd_HostThread( httpd_host_t *host )
                 i_client--;
                 continue;
             }
-            else if( cl->i_state == HTTPD_CLIENT_RECEIVING )
+            else if( ( cl->i_state == HTTPD_CLIENT_RECEIVING )
+                  || ( cl->i_state == HTTPD_CLIENT_TLS_HS_IN ) )
             {
                 FD_SET( cl->fd, &fds_read );
                 i_handle_max = __MAX( i_handle_max, cl->fd );
             }
-            else if( cl->i_state == HTTPD_CLIENT_SENDING )
+            else if( ( cl->i_state == HTTPD_CLIENT_SENDING )
+                  || ( cl->i_state == HTTPD_CLIENT_TLS_HS_OUT ) )
             {
                 FD_SET( cl->fd, &fds_write );
                 i_handle_max = __MAX( i_handle_max, cl->fd );
@@ -2422,6 +2462,8 @@ static void httpd_HostThread( httpd_host_t *host )
             fd = accept( host->fd, (struct sockaddr *)&sock, &i_sock_size );
             if( fd >= 0 )
             {
+                int i_state = 0;
+
                 /* set this new socket non-block */
 #if defined( WIN32 ) || defined( UNDER_CE )
                 {
@@ -2435,12 +2477,21 @@ static void httpd_HostThread( httpd_host_t *host )
                 /* FIXME: that MUST be non-blocking */
                 if( p_tls != NULL)
                 {
-                    p_tls = tls_SessionHandshake( p_tls, fd );
-                    if ( p_tls == NULL )
+                    switch ( tls_SessionHandshake( p_tls, fd ) )
                     {
-                        msg_Err( host, "Rejecting TLS connection" );
-                        net_Close( fd );
-                        fd = -1;
+                        case -1:
+                            msg_Err( host, "Rejecting TLS connection" );
+                            net_Close( fd );
+                            fd = -1;
+                            break;
+
+                        case 1: /* missing input - most likely */
+                            i_state = HTTPD_CLIENT_TLS_HS_IN;
+                            break;
+
+                        case 2: /* missing output */
+                            i_state = HTTPD_CLIENT_TLS_HS_OUT;
+                            break;
                     }
                 }
                 
@@ -2455,7 +2506,9 @@ static void httpd_HostThread( httpd_host_t *host )
                     TAB_APPEND( host->i_client, host->client, cl );
                     vlc_mutex_unlock( &host->lock );
 
-    
+                    if( i_state != 0 )
+                        cl->i_state = i_state; // override state for TLS
+
                     // FIXME: it sucks to allocate memory for debug
                     ip = httpd_ClientIP( cl );
                     msg_Dbg( host, "new connection (%s)",
@@ -2477,6 +2530,14 @@ static void httpd_HostThread( httpd_host_t *host )
             else if( cl->i_state == HTTPD_CLIENT_SENDING )
             {
                 httpd_ClientSend( cl );
+            }
+            else if( cl->i_state == HTTPD_CLIENT_TLS_HS_IN )
+            {
+                httpd_ClientTlsHsIn( cl );
+            }
+            else if( cl->i_state == HTTPD_CLIENT_TLS_HS_OUT )
+            {
+                httpd_ClientTlsHsOut( cl );
             }
 
             if( cl->i_mode == HTTPD_CLIENT_BIDIR &&

@@ -59,7 +59,8 @@ struct tls_session_t
     void *p_sys;
 
     struct virtual_socket_t sock;
-    tls_session_t * (*pf_handshake) ( tls_session_t *, int );
+    int (*pf_handshake) ( tls_session_t *, int );
+    int (*pf_handshake2) ( tls_session_t * );
     void (*pf_close) ( tls_session_t * );
 };
 
@@ -102,6 +103,7 @@ VLC_EXPORT( tls_session_t *, tls_ClientCreate, ( vlc_object_t *, const char *, i
 VLC_EXPORT( void, tls_ClientDelete, ( tls_session_t * ) );
 
 # define tls_SessionHandshake( a, b ) (((tls_session_t *)a)->pf_handshake (a, b))
+# define tls_SessionContinueHandshake( a ) (((tls_session_t *)a)->pf_handshake2 (a))
 
 # define tls_SessionClose( a ) (((tls_session_t *)a)->pf_close (a))
 
