@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.59 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: libvlc.c,v 1.60 2003/01/31 13:52:26 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -166,6 +166,11 @@ int VLC_Create( void )
         /* Announce who we are */
         msg_Dbg( &libvlc, COPYRIGHT_MESSAGE );
         msg_Dbg( &libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
+
+        /* Set language now, otherwise the main module's strings will not
+         * be translated. FIXME: this is a hack, the correct way is to have
+         * SetLanguage dynamically retranslate all module strings. */
+        SetLanguage( "" );
 
         /* Initialize the module bank and load the configuration of the
          * main module. We need to do this at this stage to be able to display
