@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.1 2001/04/12 01:52:45 sam Exp $
+ * $Id: darwin_specific.c,v 1.2 2001/04/13 14:33:22 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -38,10 +38,11 @@ static char * psz_program_path;
 
 void system_Create( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
-    char *p_char, *p_oldchar;
+    char i_dummy;
+    char *p_char, *p_oldchar = &i_dummy;
 
     /* Get the full program path and name */
-    p_char = p_oldchar = psz_program_path = strdup( ppsz_argv[ 0 ] );
+    p_char = psz_program_path = strdup( ppsz_argv[ 0 ] );
 
     /* Remove trailing program name */
     for( ; *p_char ; )

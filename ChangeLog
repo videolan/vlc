@@ -3,7 +3,7 @@
 
 HEAD
 
-  * Nothing yet.
+  * Fix for Darwin program path handling.
 
 0.2.71
 Fri, 13 Apr 2001 08:13:26 +0200
