@@ -29,6 +29,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <ctype.h>
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
 #include <vlc_filter.h>
@@ -48,6 +49,9 @@ static void DeleteDecoder( decoder_t * );
 static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
                                video_format_t * );
 static void DeleteFilter( filter_t * );
+
+static vlc_fourcc_t Ext2Fourcc( const char * );
+static const char *Fourcc2Ext( vlc_fourcc_t );
 
 /**
  * Create an image_handler_t instance
@@ -193,6 +197,12 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     fread( p_block->p_buffer, sizeof(char), i_size, file );
     fclose( file );
 
+    if( !p_fmt_in->i_chroma )
+    {
+        /* Try to guess format from file name */
+        p_fmt_in->i_chroma = Ext2Fourcc( psz_url );
+    }
+
     p_pic = ImageRead( p_image, p_block, p_fmt_in, p_fmt_out );
 
     return p_pic;
@@ -221,6 +231,58 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
  * Misc functions
  *
  */
+static struct
+{
+    vlc_fourcc_t i_codec;
+    char *psz_ext;
+
+} ext_table[] =
+{
+    { VLC_FOURCC('j','p','e','g'), "jpeg" },
+    { VLC_FOURCC('j','p','e','g'), "jpg"  },
+    { VLC_FOURCC('l','j','p','g'), "ljpg" },
+    { VLC_FOURCC('p','n','g',' '), "png" },
+    { VLC_FOURCC('p','g','m',' '), "pgm" },
+    { VLC_FOURCC('p','g','m','y'), "pgmyuv" },
+    { VLC_FOURCC('p','b','m',' '), "pbm" },
+    { VLC_FOURCC('p','a','m',' '), "pam" },
+    { 0, NULL }
+};
+
+static vlc_fourcc_t Ext2Fourcc( const char *psz_name )
+{
+    int i;
+
+    psz_name = strrchr( psz_name, '.' );
+    if( !psz_name ) return 0;
+    psz_name++;
+
+    for( i = 0; ext_table[i].i_codec; i++ )
+    {
+        int j;
+        for( j = 0; toupper(ext_table[i].psz_ext[j]) == toupper(psz_name[j]);
+             j++ )
+        {
+            if( !ext_table[i].psz_ext[j] && !psz_name[j] )
+                return ext_table[i].i_codec;
+        }
+    }
+
+    return 0;
+}
+
+static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
+{
+    int i;
+
+    for( i = 0; ext_table[i].i_codec != 0; i++ )
+    {
+        if( ext_table[i].i_codec == i_codec ) return ext_table[i].psz_ext;
+    }
+
+    return NULL;
+}
+
 static void video_release_buffer( picture_t *p_pic )
 {
     if( p_pic && p_pic->p_data_orig ) free( p_pic->p_data_orig );
@@ -285,6 +347,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     p_dec->fmt_in.video = *fmt;
     p_dec->fmt_in.i_cat = VIDEO_ES;
     p_dec->fmt_in.i_codec = fmt->i_chroma;
+    p_dec->b_pace_control = VLC_TRUE;
 
     p_dec->pf_vout_buffer_new = video_new_buffer;
     p_dec->pf_vout_buffer_del = video_del_buffer;
