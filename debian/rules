@@ -13,16 +13,46 @@ export DH_COMPAT=3
 #
 
 CONFIG_FLAGS = --enable-release --prefix=/usr
-CONFIG_FLAGS += --enable-gnome --enable-gtk --enable-familiar --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib --enable-satellite --enable-ogg --enable-vorbis
+CONFIG_FLAGS += \
+	--enable-gnome \
+	--enable-gtk \
+	--enable-familiar \
+	--enable-fb \
+	--enable-ggi \
+	--enable-sdl \
+	--enable-esd \
+	--enable-qt \
+	--enable-mad \
+	--enable-arts \
+	--enable-alsa \
+	--enable-lirc \
+	--enable-a52 \
+	--enable-aa \
+	--enable-dvbpsi \
+	--enable-xosd \
+	--enable-mozilla \
+	--enable-kde \
+	--enable-mp4 \
+	--enable-dvb \
+	--enable-dv \
+	--enable-svgalib \
+	--enable-satellite \
+	--enable-ogg \
+	--enable-vorbis \
+	$(NULL)
+
+# These ones are currently shipped with VLC
 CONFIG_FLAGS += --enable-ffmpeg --with-ffmpeg-tree=extras/ffmpeg
 CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad
+
+# Glide is only for x86
 ifeq ($(DEB_BUILD_ARCH),i386)
 CONFIG_FLAGS += --enable-glide
 else
 ARCH_EXCLUDE = -Nvlc-plugin-glide
 endif
 
-# Remove --without-dvdcss here in non-totalitarian countries
+# Remove --without-dvdcss in non-totalitarian countries
 CONFIG_FLAGS += --enable-dvd --without-dvdcss
 
 VIDDIR = usr/share/vlc
@@ -39,15 +69,15 @@ build-stamp:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/ffmpeg && ./configure && make; fi
+	if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/ffmpeg && ./configure && make; fi
 
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/faad && ./configure && cd libfaad && make; fi
+	if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/faad && ./configure --disable-shared && cd libfaad && make; fi
 
+	# Configure VLC and build it
 	./configure --mandir=$${prefix}/share/man \
 		--infodir=$${prefix}/share/info $(CONFIG_FLAGS)
-
 	$(MAKE)
 
 	touch build-stamp
@@ -59,10 +89,10 @@ clean:
 
 	# Check that we have an ffmpeg tree in here (can be a symlink)
 	test -d extras/ffmpeg
-	-if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/ffmpeg && make distclean; fi
+	-if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/ffmpeg && make distclean; fi
 	# Check that we have an faad tree in here (can be a symlink)
 	test -d extras/faad
-	-if test "$(PRESERVE_EXTRAS)" != "1"; then cd extras/faad && make distclean; fi
+	-if test "$(PRESERVE_EXTRAS)" = ""; then cd extras/faad && make distclean; fi
 
 	-$(MAKE) distclean
 
