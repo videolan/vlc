@@ -20,7 +20,9 @@
  *****************************************************************************/
 struct vpar_thread_s;
 
-typedef void    (*f_slice_header_t)( struct vpar_thread_s*, int*, int, elem_t*, u32);
+typedef void    (*f_slice_header_t)( struct vpar_thread_s*, int*, int, u32);
+typedef void    (*f_chroma_pattern_t)( struct vpar_thread_s* );
+typedef int     (*f_macroblock_type_t)( struct vpar_thread_s* );
 
 /*****************************************************************************
  * quant_matrix_t : Quantization Matrix
@@ -53,7 +55,7 @@ typedef struct sequence_s
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
     void                (*pf_decode_mv)( struct vpar_thread_s *, int );
-    void                (*pf_decode_pattern)( struct vpar_thread_s * );
+    f_chroma_pattern_t  pf_decode_pattern;
 
     /* Parser context */
     picture_t *         p_forward;
@@ -79,6 +81,7 @@ typedef struct picture_parsing_s
     int                 ppi_f_code[2][2];
     int                 i_intra_dc_precision;
     boolean_t           b_frame_pred_frame_dct, b_q_scale_type;
+    boolean_t           b_intra_vlc_format;
     boolean_t           b_alternate_scan, b_progressive_frame;
     boolean_t           b_top_field_first, b_concealment_mv;
     boolean_t           b_repeat_first_field;
@@ -93,7 +96,7 @@ typedef struct picture_parsing_s
     /* Relative to the current field */
     int                 i_coding_type, i_structure;
     boolean_t           b_frame_structure;
-    int                 (*pf_macroblock_type)( struct vpar_thread_s * );
+    f_macroblock_type_t pf_macroblock_type;
 
     boolean_t           b_error;
 } picture_parsing_t;

@@ -31,7 +31,7 @@
  *****************************************************************************
  * This rotative FIFO contains undecoded macroblocks that are to be decoded
  *****************************************************************************/
-struct video_parser_s;
+struct vpar_thread_s;
 
 typedef struct video_fifo_s
 {
@@ -43,7 +43,7 @@ typedef struct video_fifo_s
     int                         i_start;
     int                         i_end;
 
-    struct video_parser_s *     p_vpar;
+    struct vpar_thread_s *      p_vpar;
 } video_fifo_t;
 
 /*****************************************************************************

@@ -28,41 +28,54 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
-#include "vpar_blocks.h"
-#include "video_parser.h"
 
-#include "macroblock.h"
-#include "video_fifo.h"
+#include "vdec_idct.h"
 #include "video_decoder.h"
+#include "vdec_motion.h"
+
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "video_fifo.h"
+#include "video_parser.h"
 
 /*
  * Local prototypes
  */
 static __inline__ void NextStartCode( vpar_thread_t * p_vpar );
-static void GroupHeader( vpar_thread_t * p_vpar )
-static void PictureHeader( vpar_thread_t * p_vpar )
+static void SequenceHeader( vpar_thread_t * p_vpar );
+static void GroupHeader( vpar_thread_t * p_vpar );
+static void PictureHeader( vpar_thread_t * p_vpar );
 static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
                                         int i_coding_type,
-                                        picture_t * p_newref )
+                                        picture_t * p_newref );
 static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
                                          int i_coding_type,
-                                         picture_t * p_newref )
+                                         picture_t * p_newref );
 static void SliceHeader00( vpar_thread_t * p_vpar,
                            int * pi_mb_address, int i_mb_base,
-                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+                           u32 i_vert_code );
 static void SliceHeader01( vpar_thread_t * p_vpar,
                            int * pi_mb_address, int i_mb_base,
-                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+                           u32 i_vert_code );
 static void SliceHeader10( vpar_thread_t * p_vpar,
                            int * pi_mb_address, int i_mb_base,
-                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+                           u32 i_vert_code );
 static void SliceHeader11( vpar_thread_t * p_vpar,
                            int * pi_mb_address, int i_mb_base,
-                           elem_t * p_y, p_u, p_v, u32 i_vert_code )
+                           u32 i_vert_code );
 static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
                                     int * pi_mb_address, int i_mb_base,
-                                    elem_t * p_y, p_u, p_v, u32 i_vert_code )
-static void ExtensionAndUserData( vpar_thread_t * p_vpar )
+                                    u32 i_vert_code );
+static void ExtensionAndUserData( vpar_thread_t * p_vpar );
+static void QuantMatrixExtension( vpar_thread_t * p_vpar );
+static void SequenceScalableExtension( vpar_thread_t * p_vpar );
+static void SequenceDisplayExtension( vpar_thread_t * p_vpar );
+static void PictureDisplayExtension( vpar_thread_t * p_vpar );
+static void PictureSpatialScalableExtension( vpar_thread_t * p_vpar );
+static void PictureTemporalScalableExtension( vpar_thread_t * p_vpar );
+static void CopyrightExtension( vpar_thread_t * p_vpar );
+static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix );
+static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array );
 
 /*****************************************************************************
  * vpar_NextSequenceHeader : Find the next sequence header
@@ -72,7 +85,7 @@ int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
     while( !p_vpar->b_die )
     {
         NextStartCode( p_vpar );
-        if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_START_CODE )
+        if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_HEADER_CODE )
             return 0;
     }
     return 1;
@@ -158,20 +171,20 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     i_height_save = p_vpar->sequence.i_height;
     i_width_save = p_vpar->sequence.i_width;
 
-    p_vpar->sequence.i_height = GetBits( p_vpar->bit_stream, 12 );
-    p_vpar->sequence.i_width = GetBits( p_vpar->bit_stream, 12 );
-    p_vpar->sequence.i_ratio = GetBits( p_vpar->bit_stream, 4 );
+    p_vpar->sequence.i_height = GetBits( &p_vpar->bit_stream, 12 );
+    p_vpar->sequence.i_width = GetBits( &p_vpar->bit_stream, 12 );
+    p_vpar->sequence.i_aspect_ratio = GetBits( &p_vpar->bit_stream, 4 );
     p_vpar->sequence.d_frame_rate =
-            d_frame_rate_table( GetBits( p_vpar->bit_stream, 4 ) );
+            d_frame_rate_table[ GetBits( &p_vpar->bit_stream, 4 ) ];
 
     /* We don't need bit_rate_value, marker_bit, vbv_buffer_size,
      * constrained_parameters_flag */
-    DumpBits( p_vpar->bit_stream, 30 );
+    DumpBits( &p_vpar->bit_stream, 30 );
     
     /*
      * Quantization matrices
      */
-    if( GetBits( p_vpar->bit_stream, 1 ) ) /* load_intra_quantizer_matrix */
+    if( GetBits( &p_vpar->bit_stream, 1 ) ) /* load_intra_quantizer_matrix */
     {
         LoadMatrix( p_vpar, &p_vpar->sequence.intra_quant );
     }
@@ -181,7 +194,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         LinkMatrix( &p_vpar->sequence.intra_quant, pi_default_intra_quant );
     }
     
-    if( GetBits( p_vpar->bit_stream, 1 ) ) /* load_non_intra_quantizer_matrix */
+    if( GetBits( &p_vpar->bit_stream, 1 ) ) /* load_non_intra_quantizer_matrix */
     {
         LoadMatrix( p_vpar, &p_vpar->sequence.nonintra_quant );
     }
@@ -204,9 +217,9 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     NextStartCode( p_vpar );
     if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
     {
-        int             i_dummy;
-        static int      pi_chroma_nb_blocks[4] = {0, 1, 2, 4};
-        static (void *) ppf_chroma_pattern[4]( vpar_thread_t * ) =
+        int                         i_dummy;
+        static int                  pi_chroma_nb_blocks[4] = {0, 1, 2, 4};
+        static f_chroma_pattern_t   ppf_chroma_pattern[4] =
                             {NULL, vpar_CodedPattern420,
                              vpar_CodedPattern422, vpar_CodedPattern444};
     
@@ -239,7 +252,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* It's an MPEG-1 stream. Put adequate parameters. */
         p_vpar->sequence.b_progressive = 1;
         p_vpar->sequence.i_chroma_format = CHROMA_420;
-        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i->width >> 2;
+        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 2;
         p_vpar->sequence.i_chroma_nb_blocks = 2;
         p_vpar->sequence.pf_decode_pattern = vpar_CodedPattern420;
 
@@ -282,10 +295,9 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     }
 
     if(    p_vpar->sequence.i_width != i_width_save
-        || p_vpar->sequence.i_height != i_height_save
-        || p_vpar->sequence.p_frame_lum_lookup == NULL )
+        || p_vpar->sequence.i_height != i_height_save )
     {
-
+         /* What do we do in case of a size change ??? */
     }
 
     /* Extension and User data */
@@ -307,7 +319,8 @@ static void GroupHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
-    static (int *)      ppf_macroblock_type[4] = {vpar_IMBType, vpar_PMBType,
+    static f_macroblock_type_t ppf_macroblock_type[4] =
+                                                 {vpar_IMBType, vpar_PMBType,
                                                   vpar_BMBType, vpar_DMBType};
 
     int                 i_structure;
@@ -358,7 +371,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_q_scale_type = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_intra_vlc_format = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.b_alternate_scan = GetBits( &p_vpar->bit_stream, 1 );
-        p_vpar->picture.b_repeat_first_field = GetBits( &vpar->bit_stream, 1 );
+        p_vpar->picture.b_repeat_first_field = GetBits( &p_vpar->bit_stream, 1 );
         /* repeat_first_field (ISO/IEC 13818-2 6.3.10 is necessary to know
          * the length of the picture_display_extension structure.
          * chroma_420_type (obsolete) */
@@ -376,15 +389,15 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     else
     {
         /* MPEG-1 compatibility flags */
-        p_vpar->i_intra_dc_precision = 0; /* 8 bits */
+        p_vpar->picture.i_intra_dc_precision = 0; /* 8 bits */
         i_structure = FRAME_STRUCTURE;
-        p_vpar->b_frame_pred_frame_dct = TRUE;
+        p_vpar->picture.b_frame_pred_frame_dct = 1;
         p_vpar->picture.b_concealment_mv = 0;
         p_vpar->picture.b_q_scale_type = 0;
         p_vpar->picture.b_intra_vlc_format = 0;
         p_vpar->picture.b_alternate_scan = 0; /* zigzag */
-        b_repeat_first_field = FALSE;
-        p_vpar->picture.b_progressive_frame = TRUE;
+        p_vpar->picture.b_repeat_first_field = 0;
+        p_vpar->picture.b_progressive_frame = 1;
     }
 
     if( p_vpar->picture.i_current_structure &&
@@ -392,10 +405,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
          i_structure == p_vpar->picture.i_current_structure) )
     {
         /* We don't have the second field of the buffered frame. */
-        if( p_pvar->picture.p_picture != NULL )
+        if( p_vpar->picture.p_picture != NULL )
         {
             ReferenceReplace( p_vpar,
-                      p_vpar->picture.p_second_field_buffer->i_coding_type,
+                      p_vpar->picture.i_coding_type,
                       NULL );
 
             for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size >> 1; i_mb++ )
@@ -406,7 +419,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
         }
         
-        p_pvar->picture.i_current_structure = 0;
+        p_vpar->picture.i_current_structure = 0;
 
         intf_DbgMsg("vpar debug: odd number of field picture.");
     }
@@ -415,28 +428,32 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* Second field of a frame. We will decode it if, and only if we
          * have decoded the first frame. */
-        b_parsable = (p_vpar->picture.p_second_field_buffer != NULL);
+        b_parsable = (p_vpar->picture.p_picture != NULL);
     }
     else
     {
         /* Do we have the reference pictures ? */
-        b_parsable = !((i_coding_type == P_CODING_TYPE) &&
+        b_parsable = !((p_vpar->picture.i_coding_type == P_CODING_TYPE) &&
                        (p_vpar->sequence.p_forward == NULL)) ||
-                      ((i_coding_type == B_CODING_TYPE) &&
+                      ((p_vpar->picture.i_coding_type == B_CODING_TYPE) &&
                        (p_vpar->sequence.p_forward == NULL ||
                         p_vpar->sequence.p_backward == NULL));
 
-        /* Does synchro say we have enough time to decode it ? */
-        b_parsable &&= vpar_SynchroChoose( p_vpar, i_coding_type, i_structure );
+        if( b_parsable )
+        {
+            /* Does synchro say we have enough time to decode it ? */
+            b_parsable = vpar_SynchroChoose( p_vpar,
+                               p_vpar->picture.i_coding_type, i_structure );
+        }
     }
 
     if( !b_parsable )
     {
         /* Update the reference pointers. */
-        ReferenceUpdate( p_vpar, i_coding_type, NULL );
+        ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, NULL );
         
         /* Warn Synchro we have trashed a picture. */
-        vpar_SynchroTrash( p_vpar, i_coding_type, i_structure );
+        vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
 
         /* Update context. */
         if( i_structure != FRAME_STRUCTURE )
@@ -448,7 +465,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
     /* OK, now we are sure we will decode the picture. */
 #define P_picture p_vpar->picture.p_picture
-    p_vpar->picture.b_error = FALSE;
+    p_vpar->picture.b_error = 0;
 
     if( !p_vpar->picture.i_current_structure )
     {
@@ -460,7 +477,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                         p_vpar->sequence.i_chroma_format );
 
         /* Initialize values. */
-        P_picture->date = vpar_SynchroDecode( p_vpar, i_coding_type,
+        P_picture->date = vpar_SynchroDecode( p_vpar,
+                                              p_vpar->picture.i_coding_type,
                                               i_structure );
         p_vpar->picture.i_lum_incr = - 8 + ( p_vpar->sequence.i_width
                     << ( i_structure != FRAME_STRUCTURE ) );
@@ -469,7 +487,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                         ( 3 - p_vpar->sequence.i_chroma_format )) );
 
         /* Update the reference pointers. */
-        ReferenceUpdate( p_vpar, i_coding_type, p_picture );
+        ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
     }
     p_vpar->picture.i_current_structure |= i_structure;
     p_vpar->picture.i_structure = i_structure;
@@ -499,7 +517,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
             (i_dummy > SLICE_START_CODE_MAX) )
         {
             intf_DbgMsg("vpar debug: premature end of picture");
-            p_vpar->picture.b_error = TRUE;
+            p_vpar->picture.b_error = 1;
             break;
         }
         DumpBits32( &p_vpar->bit_stream );
@@ -520,7 +538,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         vout_DestroyPicture( p_vpar->p_vout, P_picture );
 
         /* Prepare context for the next picture. */
-        P_picture = NULL:
+        P_picture = NULL;
     }
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
@@ -640,8 +658,8 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
 
     /* Reset DC coefficients predictors (ISO/IEC 13818-2 7.2.1). Why
      * does the reference decoder put 0 instead of the normative values ? */
-    p_vpar->slice.pi_dct_pred[0] = p_vpar->slice.pi_dct_pred[1]
-        = p_vpar->slice.pi_dct_pred[2]
+    p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
+        = p_vpar->slice.pi_dc_dct_pred[2]
         = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
 
     /* Reset motion vector predictors (ISO/IEC 13818-2 7.6.3.4). */
@@ -747,7 +765,7 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
         /* Load non_intra_quantiser_matrix for luminance. */
-        LoadMatrix( p_vpar, &p_vpar->sequence.non_intra_quant );
+        LoadMatrix( p_vpar, &p_vpar->sequence.nonintra_quant );
     }
     else
     {
@@ -764,7 +782,7 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
     {
         /* Link the chrominance intra matrix to the luminance one. */
         LinkMatrix( &p_vpar->sequence.chroma_intra_quant,
-                    &p_vpar->sequence.intra_quant );
+                    p_vpar->sequence.intra_quant.pi_matrix );
     }
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
@@ -775,7 +793,7 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
     {
         /* Link the chrominance intra matrix to the luminance one. */
         LinkMatrix( &p_vpar->sequence.chroma_intra_quant,
-                    &p_vpar->sequence.intra_quant );
+                    p_vpar->sequence.intra_quant.pi_matrix );
     }
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
@@ -786,7 +804,7 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
     {
         /* Link the chrominance nonintra matrix to the luminance one. */
         LinkMatrix( &p_vpar->sequence.chroma_nonintra_quant,
-                    &p_vpar->sequence.nonintra_quant );
+                    p_vpar->sequence.nonintra_quant.pi_matrix );
     }
 }
 
@@ -860,7 +878,7 @@ static void PictureTemporalScalableExtension( vpar_thread_t * p_vpar )
  * CopyrightExtension : Keeps some legal informations                        *
  *****************************************************************************/
 
-static void CopytrightExtension( vpar_thread_t * p_vpar )
+static void CopyrightExtension( vpar_thread_t * p_vpar )
 {
     u32     i_copyright_nb_1, i_copyright_nb_2; /* local integers */
     p_vpar->sequence.b_copyright_flag = GetBits( &p_vpar->bit_stream, 1 );
@@ -878,16 +896,16 @@ static void CopytrightExtension( vpar_thread_t * p_vpar )
     i_copyright_nb_2 = GetBits( &p_vpar->bit_stream, 22 );
     DumpBits( &p_vpar->bit_stream, 1 );
         /* third part and sum */
-    p_vpar->sequence.i_copyright_nb = ( i_copyright_nb_1 << 44 ) +
-                                      ( i_copyright_nb_2 << 22 ) +
-                                      ( GetBits( &p_vpar->bit_stream, 22 ) );
+    p_vpar->sequence.i_copyright_nb = ( (u64)i_copyright_nb_1 << 44 ) +
+                                      ( (u64)i_copyright_nb_2 << 22 ) +
+                                      ( (u64)GetBits( &p_vpar->bit_stream, 22 ) );
 }
 
 
 /*****************************************************************************
  * LoadMatrix : Load a quantization matrix
  *****************************************************************************/
-static void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
+static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
 {
     int i_dummy;
     
@@ -895,13 +913,13 @@ static void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
     {
         /* Allocate a piece of memory to load the matrix. */
         p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) );
-        p_matrix->b_allocated = TRUE;
+        p_matrix->b_allocated = 1;
     }
     
     for( i_dummy = 0; i_dummy < 64; i_dummy++ )
     {
         p_matrix->pi_matrix[pi_scan[SCAN_ZIGZAG][i_dummy]]
-             = GetBits( p_vpar->bit_stream, 8 );
+             = GetBits( &p_vpar->bit_stream, 8 );
     }
 
 #ifdef FOURIER_IDCT
@@ -914,7 +932,7 @@ static void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
 /*****************************************************************************
  * LinkMatrix : Link a quantization matrix to another
  *****************************************************************************/
-static void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
+static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
 {
     int i_dummy;
     
@@ -922,7 +940,7 @@ static void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
     {
         /* Deallocate the piece of memory. */
         free( p_matrix->pi_matrix );
-        p_matrix->b_allocated = FALSE;
+        p_matrix->b_allocated = 0;
     }
     
     p_matrix->pi_matrix = pi_array;

@@ -77,3 +77,15 @@ typedef struct
 #define MOTION_FRAME                    2
 #define MOTION_16X8                     2
 #define MOTION_DMV                      3
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+void vpar_CodedPattern420( struct vpar_thread_s* p_vpar );
+void vpar_CodedPattern422( struct vpar_thread_s* p_vpar );
+void vpar_CodedPattern444( struct vpar_thread_s* p_vpar );
+int  vpar_IMBType( struct vpar_thread_s* p_vpar );
+int  vpar_PMBType( struct vpar_thread_s* p_vpar );
+int  vpar_BMBType( struct vpar_thread_s* p_vpar );
+int  vpar_DMBType( struct vpar_thread_s* p_vpar );
+
