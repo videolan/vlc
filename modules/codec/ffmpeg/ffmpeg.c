@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.76 2004/01/09 02:28:30 hartman Exp $
+ * $Id: ffmpeg.c,v 1.77 2004/01/15 19:46:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -600,6 +600,20 @@ static struct
     { VLC_FOURCC('i','m','v','e'), CODEC_ID_INTERPLAY_VIDEO,
       VIDEO_ES, "Interplay MVE Video" },
 
+    /* Id RoQ */
+    { VLC_FOURCC('R','o','Q','v'), CODEC_ID_ROQ,
+      VIDEO_ES, "Id RoQ Video" },
+
+    /* Sony Playstation MDEC */
+    { VLC_FOURCC('M','D','E','C'), CODEC_ID_MDEC,
+      VIDEO_ES, "PSX MDEC Video" },
+
+#if LIBAVCODEC_BUILD >= 4699
+    /* Sierra VMD */
+    { VLC_FOURCC('v','m','d','v'), CODEC_ID_VMDVIDEO,
+      VIDEO_ES, "Sierra VMD Video" },
+#endif
+
     /*
      *  Audio Codecs
      */
@@ -659,6 +673,26 @@ static struct
     /* Interplay DPCM */
     { VLC_FOURCC('i','d','p','c'), CODEC_ID_INTERPLAY_DPCM,
       AUDIO_ES, "Interplay DPCM Audio" },
+
+    /* Id RoQ */
+    { VLC_FOURCC('R','o','Q','a'), CODEC_ID_ROQ_DPCM,
+      AUDIO_ES, "Id RoQ DPCM Audio" },
+
+#if LIBAVCODEC_BUILD >= 4685
+    /* Sony Playstation XA ADPCM */
+    { VLC_FOURCC('x','a',' ',' '), CODEC_ID_ADPCM_XA,
+      AUDIO_ES, "PSX XA ADPCM Audio" },
+
+    /* ADX ADPCM */
+    { VLC_FOURCC('a','d','x',' '), CODEC_ID_ADPCM_ADX,
+      AUDIO_ES, "ADX ADPCM Audio" },
+#endif
+
+#if LIBAVCODEC_BUILD >= 4699
+    /* Sierra VMD */
+    { VLC_FOURCC('v','m','d','a'), CODEC_ID_VMDAUDIO,
+      AUDIO_ES, "Sierra VMD Audio" },
+#endif
 
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,

@@ -2,7 +2,7 @@
  * demux.c: demuxer using ffmpeg (libavformat).
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: demux.c,v 1.2 2004/01/08 21:48:43 gbazin Exp $
+ * $Id: demux.c,v 1.3 2004/01/15 19:46:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -256,7 +256,7 @@ static int Demux( demux_t *p_demux )
     msg_Dbg( p_demux, "tk[%d] dts="I64Fd" pts="I64Fd,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
 
-    if( pkt.dts >= 0  &&
+    if( pkt.dts > 0  &&
         ( pkt.stream_index == p_sys->i_pcr_tk || p_sys->i_pcr_tk < 0 ) )
     {    
         p_sys->i_pcr_tk = pkt.stream_index;
