@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse pls, m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.17 2003/03/30 11:43:38 gbazin Exp $
+ * $Id: m3u.c,v 1.18 2003/04/06 20:08:11 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -79,7 +79,8 @@ static int Activate( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     char           *psz_ext;
     demux_sys_t    *p_m3u;
-    int            i_type = 0;
+    int             i_type = 0;
+    int             i_type2 = 0;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -119,7 +120,7 @@ static int Activate( vlc_object_t * p_this )
      * at the content. This is useful for .asp, .php and similar files
      * that are actually html. Also useful for som asx files that have
      * another extention */
-    if( !i_type )
+    if( i_type != TYPE_M3U )
     {
         byte_t *p_peek;
         int i_size = input_Peek( p_input, &p_peek, MAX_LINE );
@@ -135,21 +136,33 @@ static int Activate( vlc_object_t * p_this )
             }
             if ( !i_size )
             {
-                return -1;
+                ;
             }
             else if ( !strncasecmp( p_peek, "[playlist]", sizeof("[playlist]") -1 ) )
             {
-                i_type = TYPE_PLS;
+                i_type2 = TYPE_PLS;
             }
             else if ( !strncasecmp( p_peek, "<html>", sizeof("<html>") -1 ) )
             {
-                i_type = TYPE_HTML;
+                i_type2 = TYPE_HTML;
             }
             else if ( !strncasecmp( p_peek, "<asx", sizeof("<asx") -1 ) )
             {
-                i_type = TYPE_ASX;
+                i_type2 = TYPE_ASX;
             }
         }
+    }
+    if ( !i_type && !i_type2 )
+    {
+        return -1;
+    }
+    if ( i_type  && !i_type2 )
+    {
+        i_type = TYPE_M3U;
+    }
+    else
+    {
+        i_type = i_type2;
     }
 
     /* Allocate p_m3u */
@@ -236,6 +249,10 @@ static int ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
         while( *psz_bol &&
                strncasecmp( psz_bol, "mms://",
                             sizeof("mms://") - 1 ) &&
+               strncasecmp( psz_bol, "mmsu://",
+                            sizeof("mmsu://") - 1 ) &&
+               strncasecmp( psz_bol, "mmst://",
+                            sizeof("mmst://") - 1 ) &&
                strncasecmp( psz_bol, "http://",
                             sizeof("http://") - 1 ) &&
                strncasecmp( psz_bol, "file://",
