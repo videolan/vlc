@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.73 2002/07/31 20:56:50 sam Exp $
+ * $Id: input_ext-intf.h,v 1.74 2002/08/04 17:23:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -31,7 +31,7 @@
  */
 /* FIXME ! */
 #define REQUESTED_MPEG         1
-#define REQUESTED_AC3          2
+#define REQUESTED_A52          2
 #define REQUESTED_LPCM         3
 #define REQUESTED_NOAUDIO    255
 

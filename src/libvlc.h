@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.9 2002/07/31 20:56:52 sam Exp $
+ * $Id: libvlc.h,v 1.10 2002/08/04 17:23:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -89,8 +89,8 @@
     "4 ->  8 bits signed\n"                         \
     "5 -> 16 bits unsigned little endian\n"         \
     "6 -> 16 bits unsigned big endian\n"            \
-    "7 -> mpeg2 audio (unsupported)\n"              \
-    "8 -> ac3 pass-through")
+    "7 -> MPEG2 audio (unsupported)\n"              \
+    "8 -> A52 pass-through")
 
 #define RATE_TEXT N_("audio output frequency (Hz)")
 #define RATE_LONGTEXT N_( \
@@ -223,10 +223,11 @@
 #define CODEC_TEXT N_("choose preferred codec list")
 #define CODEC_LONGTEXT N_( \
     "This allows you to select the order in which vlc will choose its " \
-    "codecs. For instance, 'a52,ac3,any' will try the a52 codec before " \
-    "the ac3 one. Please be aware that vlc does not make any difference " \
-    "between audio or video codecs, so you should always specify 'any' at " \
-    "the end of the list to make sure there is a fallback for all types.")
+    "codecs. For instance, 'a52old,a52,any' will try the old a52 codec " \
+    "before the new one. Please be aware that vlc does not make any " \
+    "difference between audio or video codecs, so you should always specify " \
+    "'any' at the end of the list to make sure there is a fallback for the " \
+    "types you didn't specify.")
 
 #define MMX_TEXT N_("enable CPU MMX support")
 #define MMX_LONGTEXT N_( \

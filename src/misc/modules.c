@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.76 2002/08/04 12:18:41 sam Exp $
+ * $Id: modules.c,v 1.77 2002/08/04 17:23:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -569,7 +569,7 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
     /* Yes, there are two NULLs because we replace one with "plugin-path". */
-    char *          path[] = { "plugins", PLUGIN_PATH, NULL, NULL };
+    char *          path[] = { "modules", PLUGIN_PATH, NULL, NULL };
 
     char **         ppsz_path = path;
     char *          psz_fullpath;

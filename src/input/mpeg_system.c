@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.100 2002/07/23 00:39:17 sam Exp $
+ * $Id: mpeg_system.c,v 1.101 2002/08/04 17:23:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -339,7 +339,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 
         if( p_es->i_fourcc == VLC_FOURCC('a','5','2',' ') )
         {
-            /* With ac3 audio, we need to skip first 3 bytes */
+            /* With A52 audio, we need to skip first 3 bytes */
             i_pes_header_size += 3;
         }
 
@@ -617,7 +617,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                 p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                 p_es->i_cat = AUDIO_ES;
                 break;
-            case AC3_AUDIO_ES:
+            case A52_AUDIO_ES:
                 p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
                 p_es->i_cat = AUDIO_ES;
                 break;
@@ -842,7 +842,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     }
                     else if( (i_id & 0xF0FF) == 0x80BD )
                     {
-                        /* AC3 audio (0x80->0x8F) */
+                        /* A52 audio (0x80->0x8F) */
                         p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
@@ -854,7 +854,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         switch( config_GetInt( p_input, "audio-type" ) )
                         {
                         case -1:
-                        case REQUESTED_AC3:
+                        case REQUESTED_A52:
                             input_SelectES( p_input, p_es );
                         }
 #endif

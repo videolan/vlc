@@ -13,165 +13,6 @@ endif
 # Objects and files
 ###############################################################################
 
-# 
-# All possible plugin directories, needed for make clean
-#
-PLUGINS_DIR :=	a52 \
-		a52_system \
-		aa \
-		ac3_adec \
-		ac3_spdif \
-		access \
-		alsa \
-		arts \
-		avi \
-		beos \
-		chroma \
-		cinepak \
-		directx \
-		downmix \
-		dsp \
-		dummy \
-		dvd \
-		dvdread \
-		dvdplay \
-		esd \
-		familiar \
-		fb \
-		ffmpeg \
-		mp4 \
-		filter \
-		fx \
-		ggi \
-		glide \
-		gtk \
-		idct \
-		imdct \
-		kde \
-		lirc \
-		lpcm_adec \
-		macosx \
-		mad \
-		memcpy \
-		mga \
-		motion \
-		mpeg_system \
-		mpeg_adec \
-		mpeg_vdec \
-		mp4 \
-		network \
-		ogg \
-		qnx \
-		qt \
-		satellite \
-		sdl \
-		spudec \
-		text \
-		vcd \
-		win32 \
-		x11 \
-		xosd
-
-PLUGINS_TARGETS := a52/a52 \
-		aa/aa \
-		a52_system/a52_system \
-		ac3_adec/ac3_adec \
-		ac3_spdif/ac3_spdif \
-		access/file \
-		access/udp \
-		access/http \
-		alsa/alsa \
-		arts/arts \
-		avi/avi \
-		beos/beos \
-		chroma/chroma_i420_rgb \
-		chroma/chroma_i420_rgb_mmx \
-		chroma/chroma_i420_yuy2 \
-		chroma/chroma_i420_yuy2_mmx \
-		chroma/chroma_i422_yuy2 \
-		chroma/chroma_i422_yuy2_mmx \
-		chroma/chroma_i420_ymga \
-		chroma/chroma_i420_ymga_mmx \
-		cinepak/cinepak \
-		directx/directx \
-		downmix/downmix \
-		downmix/downmixsse \
-		downmix/downmix3dn \
-		dsp/dsp \
-		dummy/dummy \
-		dummy/null \
-		dvd/dvd \
-		dvdread/dvdread \
-		dvdplay/dvdplay \
-		esd/esd \
-		familiar/familiar \
-		fb/fb \
-		ffmpeg/ffmpeg \
-		mp4/mp4 \
-		filter/filter_clone \
-		filter/filter_crop \
-		filter/filter_deinterlace \
-		filter/filter_distort \
-		filter/filter_invert \
-		filter/filter_transform \
-		filter/filter_wall \
-		filter/filter_clone \
-		fx/fx_scope \
-		ggi/ggi \
-		glide/glide \
-		gtk/gnome \
-		gtk/gtk \
-		idct/idct \
-		idct/idctclassic \
-		idct/idctmmx \
-		idct/idctmmxext \
-		idct/idctaltivec \
-		imdct/imdct \
-		imdct/imdct3dn \
-		imdct/imdctsse \
-		kde/kde \
-		lirc/lirc \
-		lpcm_adec/lpcm_adec \
-		macosx/macosx \
-		mad/mad \
-		memcpy/memcpy \
-		memcpy/memcpymmx \
-		memcpy/memcpymmxext \
-		memcpy/memcpy3dn \
-		memcpy/memcpyaltivec \
-		mga/mga \
-		mga/xmga \
-		motion/motion \
-		motion/motionmmx \
-		motion/motionmmxext \
-		motion/motion3dnow \
-		motion/motionaltivec \
-		mpeg_system/mpeg_audio \
-		mpeg_system/mpeg_es \
-		mpeg_system/mpeg_ps \
-		mpeg_system/mpeg_ts \
-		mpeg_system/mpeg_ts_dvbpsi \
-		mpeg_adec/mpeg_adec \
-		mpeg_vdec/mpeg_vdec \
-		mp4/mp4 \
-		network/ipv4 \
-		network/ipv6 \
-		ogg/vorbis \
-		qnx/qnx \
-		qt/qt \
-		satellite/satellite \
-		sdl/sdl \
-		spudec/spudec \
-		text/logger \
-		text/ncurses \
-		text/rc \
-		vcd/vcd \
-		win32/waveout \
-		win32/intfwin \
-		x11/x11 \
-		x11/xvideo \
-		xosd/xosd
-
 #
 # C Objects
 # 
@@ -238,10 +79,10 @@ CPP_DEP := $(CPP_OBJ:%.o=.dep/%.dpp)
 # Translate plugin names
 #
 ifneq (,$(PLUGINS))
-PLUGIN_OBJ := $(shell for i in $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@plugins/\1.so@' -e 's@^ .*@@' ; done)
+PLUGIN_OBJ := $(PLUGINS:%=modules/%.so)
 endif
 ifneq (,$(BUILTINS))
-BUILTIN_OBJ := $(shell for i in $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@plugins/\1.a@' -e 's@^ .*@@' ; done)
+BUILTIN_OBJ := $(BUILTINS:%=modules/%.a)
 endif
 
 #
@@ -295,9 +136,9 @@ po-clean:
 
 plugins-clean:
 	for dir in $(PLUGINS_DIR) ; do \
-		( cd plugins/$${dir} \
+		( cd modules/$${dir} \
 			&& $(MAKE) -f ../../Makefile.modules clean ) ; done
-	rm -f plugins/*/*.o plugins/*/*.lo plugins/*/*.moc plugins/*/*.bak
+	rm -f modules/**/*.o modules/**/*.lo modules/**/*.moc modules/**/*.bak
 
 vlc-clean:
 	rm -f $(C_OBJ) $(CPP_OBJ)
@@ -348,7 +189,7 @@ endif
 plugins-install:
 	mkdir -p $(DESTDIR)$(libdir)/vlc
 ifneq (,$(PLUGINS))
-	$(INSTALL) $(PLUGINS:%=plugins/%.so) $(DESTDIR)$(libdir)/vlc
+	$(INSTALL) $(PLUGINS:%=modules/%.so) $(DESTDIR)$(libdir)/vlc
 endif
 
 plugins-uninstall:
@@ -357,7 +198,7 @@ plugins-uninstall:
 builtins-install:
 	mkdir -p $(DESTDIR)$(libdir)/vlc
 ifneq (,$(BUILTINS))
-	$(INSTALL) -m 644 $(BUILTINS:%=plugins/%.a) $(DESTDIR)$(libdir)/vlc
+	$(INSTALL) -m 644 $(BUILTINS:%=modules/%.a) $(DESTDIR)$(libdir)/vlc
 endif
 
 builtins-uninstall:
@@ -410,13 +251,13 @@ dist:
 	find debian -mindepth 1 -maxdepth 1 -type d | \
 		while read i ; do rm -Rf tmp/vlc/$$i ; done
 	# Copy .c .h .in .cpp .m and .glade files
-	find include src plugins -type f -name '*.[bcdhigmrst]*' | while read i ; \
+	find include src modules -type f -name '*.[bcdhigmrst]*' | while read i ; \
 		do cp $$i tmp/vlc/$$i ; done
 	# Grmbl... special case...
 	for i in API BUGS DESIGN TODO ; \
-		do cp plugins/mad/$$i tmp/vlc/plugins/mad ; done
+		do cp modules/mad/$$i tmp/vlc/modules/mad ; done
 	# Copy plugin Makefiles
-	find plugins -type f -name Makefile | while read i ; \
+	find modules -type f -name Makefile | while read i ; \
 		do cp $$i tmp/vlc/$$i ; done
 	# Copy extra programs and documentation
 	cp -a extras/* tmp/vlc/extras
@@ -472,12 +313,12 @@ package-win32:
 	for file in AUTHORS COPYING ChangeLog README FAQ TODO ; \
 			do cp $$file tmp/$${file}.txt ; \
 			unix2dos tmp/$${file}.txt ; done
-	mkdir tmp/plugins
-	cp $(PLUGINS:%=plugins/%.so) tmp/plugins/ 
+	mkdir tmp/modules
+	cp $(PLUGINS:%=modules/%.so) tmp/modules/ 
 	# don't include these two
-	#rm -f tmp/plugins/gtk.so tmp/plugins/sdl.so
+	#rm -f tmp/modules/gtk.so tmp/modules/sdl.so
 ifneq (,$(PLUGINS))
-	for i in $(PLUGINS) ; do if test $$i != intfwin ; then $(STRIP) tmp/plugins/$$i.so ; fi ; done
+	for i in $(PLUGINS) ; do if test $$i != intfwin ; then $(STRIP) tmp/modules/$$i.so ; fi ; done
 endif
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
@@ -504,9 +345,9 @@ package-beos:
 	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/vlc/
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/vlc/share/ ; done
-	mkdir tmp/vlc/plugins
-	cp $(PLUGINS:%=plugins/%.so) tmp/vlc/plugins/ 
-	strip $(PLUGINS:%=tmp/vlc/plugins/%.so)
+	mkdir tmp/vlc/modules
+	cp $(PLUGINS:%=modules/%.so) tmp/vlc/modules/ 
+	strip $(PLUGINS:%=tmp/vlc/modules/%.so)
 	# Create package 
 	mv tmp/vlc tmp/vlc-${VERSION}
 	(cd tmp ; find vlc-${VERSION} | \
@@ -546,10 +387,10 @@ ifneq (,$(findstring darwin,$(SYS)))
 	cd extras/MacOSX ; pbxbuild | grep -v '^ ' | grep -v '^\t' | grep -v "^$$"
 	cp -r extras/MacOSX/build/vlc.bundle ./vlc.app
 	$(INSTALL) -d vlc.app/Contents/MacOS/share
-	$(INSTALL) -d vlc.app/Contents/MacOS/plugins
+	$(INSTALL) -d vlc.app/Contents/MacOS/modules
 	$(INSTALL) vlc vlc.app/Contents/MacOS/
 ifneq (,$(PLUGINS))
-	$(INSTALL) $(PLUGINS:%=plugins/%.so) vlc.app/Contents/MacOS/plugins
+	$(INSTALL) $(PLUGINS:%=modules/%.so) vlc.app/Contents/MacOS/modules
 endif
 	$(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
 endif
@@ -564,7 +405,7 @@ src/misc/modules_builtin.h: Makefile.opts Makefile Makefile.config
 	@rm -f $@ && cp $@.in $@
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
-		echo "int vlc_entry__"$$i"( module_t* );" >>$@; \
+		echo "int vlc_entry__"`basename $$i`"( module_t* );" >>$@; \
 	done
 	@echo "" >> $@ ;
 endif
@@ -573,7 +414,7 @@ endif
 	@echo "    { \\" >> $@ ;
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
-		echo "        ALLOCATE_BUILTIN("$$i"); \\" >> $@ ; \
+		echo "        ALLOCATE_BUILTIN("`basename $$i`"); \\" >> $@ ; \
 	done
 endif
 	@echo "    } while( 0 );" >> $@ ;
@@ -634,19 +475,11 @@ lib/libvlc.a: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
 #lib/libvlc.so: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
 #	$(CC) -shared $(LIBVLC_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) -o $@
 
-#
-# Plugins target
-#
-plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
-$(PLUGIN_OBJ): $(H_OBJ) FORCE
-	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.so=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) -f ../../Makefile.modules $(@:plugins/%=../%)
-
-#
-# Built-in modules target
-#
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
-$(BUILTIN_OBJ): $(H_OBJ) FORCE
-	@cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:plugins/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) -f ../../Makefile.modules $(@:plugins/%=../%)
+plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
+
+modules/%.a modules/%.so: $(H_OBJ) FORCE
+	@cd $(shell echo $@ | sed -e 's@\(.*\)/.*@\1@') && $(MAKE) -f $(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@')/Makefile.modules $(shell echo $@ | sed -e 's@.*/@@') PARENT=$(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@')
 
 #
 # Mozilla plugin target

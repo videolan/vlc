@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout_spdif.h: AC3 passthrough output
+ * aout_spdif.h: A52 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.h,v 1.1 2002/02/24 22:12:45 sam Exp $
+ * $Id: aout_spdif.h,v 1.2 2002/08/04 17:23:44 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>

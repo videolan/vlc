@@ -1,0 +1,546 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>Familiar</name>
+  <program_name>familiar</program_name>
+  <directory></directory>
+  <source_directory></source_directory>
+  <pixmaps_directory>../../share</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>False</gnome_support>
+  <gettext_support>True</gettext_support>
+  <use_widget_names>True</use_widget_names>
+  <output_main_file>False</output_main_file>
+  <output_build_files>False</output_build_files>
+  <main_source_file>interface.c</main_source_file>
+  <main_header_file>interface.h</main_header_file>
+  <handler_source_file>callbacks.c</handler_source_file>
+  <handler_header_file>callbacks.h</handler_header_file>
+  <support_source_file>support.c</support_source_file>
+  <support_header_file>support.h</support_header_file>
+</project>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>familiar</name>
+  <width>240</width>
+  <height>320</height>
+  <signal>
+    <name>destroy_event</name>
+    <handler>on_familiar_destroy_event</handler>
+    <last_modification_time>Tue, 23 Jul 2002 18:16:11 GMT</last_modification_time>
+  </signal>
+  <signal>
+    <name>destroy</name>
+    <handler>gtk_main_quit</handler>
+    <last_modification_time>Tue, 23 Jul 2002 18:17:28 GMT</last_modification_time>
+  </signal>
+  <title>vlc (familiar)</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>True</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>True</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <name>vbox</name>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkToolbar</class>
+      <name>toolbar</name>
+      <width>112</width>
+      <height>16</height>
+      <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+      <type>GTK_TOOLBAR_ICONS</type>
+      <space_size>5</space_size>
+      <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+      <relief>GTK_RELIEF_NORMAL</relief>
+      <tooltips>True</tooltips>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_open</name>
+	<tooltip>Open file</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_open_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:28:31 GMT</last_modification_time>
+	</signal>
+	<label>Open</label>
+	<icon>familiar-openb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_preferences</name>
+	<tooltip>Preferences</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_preferences_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:29:05 GMT</last_modification_time>
+	</signal>
+	<label>Preferences</label>
+	<icon>familiar-preferencesb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_rewind</name>
+	<tooltip>Rewind stream</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_rewind_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:28:45 GMT</last_modification_time>
+	</signal>
+	<label>Rewind</label>
+	<icon>familiar-rewindb16x16.xpm</icon>
+	<child>
+	  <new_group>True</new_group>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_pause</name>
+	<tooltip>Pause stream</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_pause_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:28:58 GMT</last_modification_time>
+	</signal>
+	<label>Pause</label>
+	<icon>familiar-pauseb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_play</name>
+	<tooltip>Play stream</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_play_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:29:12 GMT</last_modification_time>
+	</signal>
+	<label>Play</label>
+	<icon>familiar-playb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_stop</name>
+	<tooltip>Stop stream</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_stop_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:29:18 GMT</last_modification_time>
+	</signal>
+	<label>Stop</label>
+	<icon>familiar-stopb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_forward</name>
+	<tooltip>Forward stream</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_forward_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:29:25 GMT</last_modification_time>
+	</signal>
+	<label>Forward</label>
+	<icon>familiar-forwardb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_about</name>
+	<tooltip>About</tooltip>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_toolbar_about_clicked</handler>
+	  <last_modification_time>Wed, 24 Jul 2002 18:29:31 GMT</last_modification_time>
+	</signal>
+	<label>About</label>
+	<icon>vlc16x16.xpm</icon>
+	<child>
+	  <new_group>True</new_group>
+	</child>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkProgressBar</class>
+      <name>progress</name>
+      <value>0</value>
+      <lower>0</lower>
+      <upper>100</upper>
+      <bar_style>GTK_PROGRESS_CONTINUOUS</bar_style>
+      <orientation>GTK_PROGRESS_LEFT_TO_RIGHT</orientation>
+      <activity_mode>True</activity_mode>
+      <show_text>False</show_text>
+      <format>%P %%</format>
+      <text_xalign>0.5</text_xalign>
+      <text_yalign>0.5</text_yalign>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+    </widget>
+
+    <widget>
+      <class>GtkNotebook</class>
+      <name>notebook</name>
+      <can_focus>True</can_focus>
+      <show_tabs>True</show_tabs>
+      <show_border>True</show_border>
+      <tab_pos>GTK_POS_TOP</tab_pos>
+      <scrollable>False</scrollable>
+      <tab_hborder>2</tab_hborder>
+      <tab_vborder>2</tab_vborder>
+      <popup_enable>False</popup_enable>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkFixed</class>
+	<name>fixedMedia</name>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>labelUrl</name>
+	  <x>4</x>
+	  <y>8</y>
+	  <width>38</width>
+	  <height>18</height>
+	  <label>URL:</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkList</class>
+	  <name>listMedia</name>
+	  <x>8</x>
+	  <y>40</y>
+	  <width>220</width>
+	  <height>200</height>
+	  <tooltip>Select multimedia file.</tooltip>
+	  <selection_mode>GTK_SELECTION_MULTIPLE</selection_mode>
+	</widget>
+
+	<widget>
+	  <class>GtkCombo</class>
+	  <name>comboURL</name>
+	  <x>46</x>
+	  <y>6</y>
+	  <width>185</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items>file://
+ftp://localhost
+http://localhost
+udp://localhost:1234/
+</items>
+
+	  <widget>
+	    <class>GtkEntry</class>
+	    <child_name>GtkCombo:entry</child_name>
+	    <name>combo-entry1</name>
+	    <can_focus>True</can_focus>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>0</text_max_length>
+	    <text>file://</text>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>media</name>
+	<label>Media</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+
+      <widget>
+	<class>GtkFixed</class>
+	<name>fixedPreferences</name>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>buttonSave</name>
+	  <x>8</x>
+	  <y>216</y>
+	  <width>54</width>
+	  <height>24</height>
+	  <can_focus>True</can_focus>
+	  <label>Save</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>buttonApply</name>
+	  <x>64</x>
+	  <y>216</y>
+	  <width>54</width>
+	  <height>24</height>
+	  <can_focus>True</can_focus>
+	  <label>Apply</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>buttonCancel</name>
+	  <x>176</x>
+	  <y>216</y>
+	  <width>54</width>
+	  <height>24</height>
+	  <can_focus>True</can_focus>
+	  <label>Cancel</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	</widget>
+
+	<widget>
+	  <class>GtkFrame</class>
+	  <name>frameDefaultURL</name>
+	  <x>8</x>
+	  <y>8</y>
+	  <width>220</width>
+	  <height>60</height>
+	  <label>Default URL:</label>
+	  <label_xalign>0</label_xalign>
+	  <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+
+	  <widget>
+	    <class>GtkFixed</class>
+	    <name>fixed3</name>
+
+	    <widget>
+	      <class>GtkCombo</class>
+	      <name>comboDefaultURL</name>
+	      <x>8</x>
+	      <y>4</y>
+	      <width>200</width>
+	      <height>24</height>
+	      <value_in_list>False</value_in_list>
+	      <ok_if_empty>True</ok_if_empty>
+	      <case_sensitive>False</case_sensitive>
+	      <use_arrows>True</use_arrows>
+	      <use_arrows_always>False</use_arrows_always>
+	      <items>file://
+ftp://localhost
+http://localhost
+udp://localhost:1234/
+</items>
+
+	      <widget>
+		<class>GtkEntry</class>
+		<child_name>GtkCombo:entry</child_name>
+		<name>combo-entry2</name>
+		<can_focus>True</can_focus>
+		<editable>True</editable>
+		<text_visible>True</text_visible>
+		<text_max_length>0</text_max_length>
+		<text>file://</text>
+	      </widget>
+	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkFrame</class>
+	  <name>frameIP</name>
+	  <x>8</x>
+	  <y>72</y>
+	  <width>220</width>
+	  <height>60</height>
+	  <label>IP version:</label>
+	  <label_xalign>0</label_xalign>
+	  <shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+
+	  <widget>
+	    <class>GtkFixed</class>
+	    <name>fixed2</name>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>rbIPv4</name>
+	      <x>8</x>
+	      <y>8</y>
+	      <width>104</width>
+	      <height>26</height>
+	      <can_focus>True</can_focus>
+	      <label>IPv4</label>
+	      <active>True</active>
+	      <draw_indicator>True</draw_indicator>
+	    </widget>
+
+	    <widget>
+	      <class>GtkRadioButton</class>
+	      <name>rbIPv6</name>
+	      <x>112</x>
+	      <y>8</y>
+	      <width>104</width>
+	      <height>26</height>
+	      <can_focus>True</can_focus>
+	      <label>IPv6</label>
+	      <active>False</active>
+	      <draw_indicator>True</draw_indicator>
+	    </widget>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>preferences</name>
+	<label>Preference</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+
+      <widget>
+	<class>GtkFixed</class>
+	<name>fixedAbout</name>
+
+	<widget>
+	  <class>GtkPixmap</class>
+	  <name>logo</name>
+	  <x>8</x>
+	  <y>0</y>
+	  <width>50</width>
+	  <height>50</height>
+	  <filename>vlc32x32.xpm</filename>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	  <build_insensitive>True</build_insensitive>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>labelVlc</name>
+	  <x>64</x>
+	  <y>8</y>
+	  <width>120</width>
+	  <height>40</height>
+	  <label>VideoLAN Client
+ for familiar Linux</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>True</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>labelCopyright</name>
+	  <x>16</x>
+	  <y>56</y>
+	  <width>200</width>
+	  <height>18</height>
+	  <label>(c) 2002, the VideoLAN Team</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>labelAuthors</name>
+	  <x>16</x>
+	  <y>80</y>
+	  <width>200</width>
+	  <height>40</height>
+	  <label>Authors: The VideoLAN Team, http://www.videolan.org</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>True</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>labelAbout</name>
+	  <x>16</x>
+	  <y>128</y>
+	  <width>200</width>
+	  <height>70</height>
+	  <label>The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from local or network sources.</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>True</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>about</name>
+	<label>About</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+</GTK-Interface>

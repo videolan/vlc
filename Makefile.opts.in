@@ -60,7 +60,7 @@ mozilla_CFLAGS = @mozilla_CFLAGS@
 
 a52_CFLAGS = @a52_CFLAGS@
 arts_CFLAGS = @arts_CFLAGS@
-chroma_i420_yuy2_mmx_CFLAGS = @chroma_i420_yuy2_mmx_CFLAGS@
+i420_yuy2_mmx_CFLAGS = @i420_yuy2_mmx_CFLAGS@
 directx_CFLAGS = @directx_CFLAGS@
 dvd_CFLAGS = @dvd_CFLAGS@
 dvdread_CFLAGS = @dvdread_CFLAGS@
@@ -76,7 +76,7 @@ kde_CFLAGS = @kde_CFLAGS@
 mad_CFLAGS = @mad_CFLAGS@
 memcpyaltivec_CFLAGS = @memcpyaltivec_CFLAGS@
 motionaltivec_CFLAGS = @motionaltivec_CFLAGS@
-mpeg_ts_dvbpsi_CFLAGS = @mpeg_ts_dvbpsi_CFLAGS@
+ts_dvbpsi_CFLAGS = @ts_dvbpsi_CFLAGS@
 qt_CFLAGS = @qt_CFLAGS@
 sdl_CFLAGS = @sdl_CFLAGS@
 x11_CFLAGS = @x11_CFLAGS@
@@ -95,7 +95,7 @@ aa_LDFLAGS = @aa_LDFLAGS@
 alsa_LDFLAGS = @alsa_LDFLAGS@
 arts_LDFLAGS = @arts_LDFLAGS@
 beos_LDFLAGS = @beos_LDFLAGS@
-chroma_i420_rgb_LDFLAGS = @chroma_i420_rgb_LDFLAGS@
+i420_rgb_LDFLAGS = @i420_rgb_LDFLAGS@
 directx_LDFLAGS = @directx_LDFLAGS@
 dsp_LDFLAGS = @dsp_LDFLAGS@
 dvd_LDFLAGS = @dvd_LDFLAGS@
@@ -103,7 +103,7 @@ dvdread_LDFLAGS = @dvdread_LDFLAGS@
 dvdplay_LDFLAGS = @dvdplay_LDFLAGS@
 esd_LDFLAGS = @esd_LDFLAGS@
 familiar_LDFLAGS = @familiar_LDFLAGS@
-filter_distort_LDFLAGS = @filter_distort_LDFLAGS@
+distort_LDFLAGS = @distort_LDFLAGS@
 ffmpeg_LDFLAGS = @ffmpeg_LDFLAGS@
 mp4_LDFLAGS = @mp4_LDFLAGS@
 ggi_LDFLAGS = @ggi_LDFLAGS@
@@ -123,7 +123,7 @@ macosx_LDFLAGS = @macosx_LDFLAGS@
 mad_LDFLAGS = @mad_LDFLAGS@
 memcpyaltivec_LDFLAGS = @memcpyaltivec_LDFLAGS@
 motionaltivec_LDFLAGS = @motionaltivec_LDFLAGS@
-mpeg_ts_dvbpsi_LDFLAGS = @mpeg_ts_dvbpsi_LDFLAGS@
+ts_dvbpsi_LDFLAGS = @ts_dvbpsi_LDFLAGS@
 ncurses_LDFLAGS = @ncurses_LDFLAGS@
 qnx_LDFLAGS = @qnx_LDFLAGS@
 qt_LDFLAGS = @qt_LDFLAGS@
@@ -251,15 +251,9 @@ endif
 endif
 
 #
-# C compiler flags: plugins and builtins compilation
-#
-plugins_CFLAGS += -D__PLUGIN__ -I../../include -I../../extras
-builtins_CFLAGS += -D__BUILTIN__ -I../../include -I../../extras
-
-#
 # Linker flags: plugins and builtins linking
 #
-builtins_LDFLAGS += $(patsubst %,$$%_LDFLAGS,$(BUILTINS))
+builtins_LDFLAGS += $(patsubst %,$$%_LDFLAGS,$(shell echo $(BUILTINS) | sed -e 's@\([^ ]*/\)*@@g'))
 
 #
 # Debugging and profiling support

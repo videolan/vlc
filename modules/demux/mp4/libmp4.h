@@ -1,0 +1,804 @@
+/*****************************************************************************
+ * libmp4.h : LibMP4 library for mp4 module for vlc
+ *****************************************************************************
+ * Copyright (C) 2001 VideoLAN
+ * $Id: libmp4.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+#define FOURCC_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )
+
+#define FOURCC_ftyp VLC_FOURCC( 'f', 't', 'y', 'p' )
+#define FOURCC_moov VLC_FOURCC( 'm', 'o', 'o', 'v' )
+#define FOURCC_cmov VLC_FOURCC( 'c', 'm', 'o', 'v' )
+#define FOURCC_dcom VLC_FOURCC( 'd', 'c', 'o', 'm' )
+#define FOURCC_cmvd VLC_FOURCC( 'c', 'm', 'v', 'd' )
+    
+#define FOURCC_moof VLC_FOURCC( 'm', 'o', 'o', 'f' )
+#define FOURCC_mdat VLC_FOURCC( 'm', 'd', 'a', 't' )
+#define FOURCC_skip VLC_FOURCC( 's', 'k', 'i', 'p' )
+#define FOURCC_free VLC_FOURCC( 'f', 'r', 'e', 'e' )
+#define FOURCC_udta VLC_FOURCC( 'u', 'd', 't', 'a' )
+#define FOURCC_wide VLC_FOURCC( 'w', 'i', 'd', 'e' )
+
+#define FOURCC_trak VLC_FOURCC( 't', 'r', 'a', 'k' )
+#define FOURCC_mvhd VLC_FOURCC( 'm', 'v', 'h', 'd' )
+#define FOURCC_tkhd VLC_FOURCC( 't', 'k', 'h', 'd' )
+#define FOURCC_tref VLC_FOURCC( 't', 'r', 'e', 'f' )
+#define FOURCC_mdia VLC_FOURCC( 'm', 'd', 'i', 'a' )
+#define FOURCC_mdhd VLC_FOURCC( 'm', 'd', 'h', 'd' )
+#define FOURCC_hdlr VLC_FOURCC( 'h', 'd', 'l', 'r' )
+#define FOURCC_minf VLC_FOURCC( 'm', 'i', 'n', 'f' )
+#define FOURCC_vmhd VLC_FOURCC( 'v', 'm', 'h', 'd' )
+#define FOURCC_smhd VLC_FOURCC( 's', 'm', 'h', 'd' )
+#define FOURCC_hmhd VLC_FOURCC( 'h', 'm', 'h', 'd' )
+#define FOURCC_dinf VLC_FOURCC( 'd', 'i', 'n', 'f' )
+#define FOURCC_url  VLC_FOURCC( 'u', 'r', 'l', ' ' )
+#define FOURCC_urn  VLC_FOURCC( 'u', 'r', 'n', ' ' )
+#define FOURCC_dref VLC_FOURCC( 'd', 'r', 'e', 'f' )
+#define FOURCC_stbl VLC_FOURCC( 's', 't', 'b', 'l' )
+#define FOURCC_stts VLC_FOURCC( 's', 't', 't', 's' )
+#define FOURCC_ctts VLC_FOURCC( 'c', 't', 't', 's' )
+#define FOURCC_stsd VLC_FOURCC( 's', 't', 's', 'd' )
+#define FOURCC_stsz VLC_FOURCC( 's', 't', 's', 'z' )
+#define FOURCC_stz2 VLC_FOURCC( 's', 't', 'z', '2' )
+#define FOURCC_stsc VLC_FOURCC( 's', 't', 's', 'c' )
+#define FOURCC_stco VLC_FOURCC( 's', 't', 'c', 'o' )
+#define FOURCC_co64 VLC_FOURCC( 'c', 'o', '6', '4' )
+#define FOURCC_stss VLC_FOURCC( 's', 't', 's', 's' )
+#define FOURCC_stsh VLC_FOURCC( 's', 't', 's', 'h' )
+#define FOURCC_stdp VLC_FOURCC( 's', 't', 'd', 'p' )
+#define FOURCC_padb VLC_FOURCC( 'p', 'a', 'd', 'b' )
+#define FOURCC_edts VLC_FOURCC( 'e', 'd', 't', 's' )
+#define FOURCC_elst VLC_FOURCC( 'e', 'l', 's', 't' )
+#define FOURCC_udta VLC_FOURCC( 'u', 'd', 't', 'a' )
+#define FOURCC_mvex VLC_FOURCC( 'm', 'v', 'e', 'x' )
+#define FOURCC_trex VLC_FOURCC( 't', 'r', 'e', 'x' )
+#define FOURCC_mfhd VLC_FOURCC( 'm', 'f', 'h', 'd' )
+#define FOURCC_traf VLC_FOURCC( 't', 'r', 'a', 'f' )
+#define FOURCC_tfhd VLC_FOURCC( 't', 'f', 'h', 'd' )
+#define FOURCC_trun VLC_FOURCC( 't', 'r', 'u', 'n' )
+#define FOURCC_cprt VLC_FOURCC( 'c', 'p', 'r', 't' )
+#define FOURCC_iods VLC_FOURCC( 'i', 'o', 'd', 's' )
+
+#define FOURCC_nmhd VLC_FOURCC( 'n', 'm', 'h', 'd' )
+#define FOURCC_mp4v VLC_FOURCC( 'm', 'p', '4', 'v' )
+#define FOURCC_mp4a VLC_FOURCC( 'm', 'p', '4', 'a' )
+#define FOURCC_mp4s VLC_FOURCC( 'm', 'p', '4', 's' )
+#define FOURCC_vide VLC_FOURCC( 'v', 'i', 'd', 'e' )
+#define FOURCC_soun VLC_FOURCC( 's', 'o', 'u', 'n' )
+#define FOURCC_hint VLC_FOURCC( 'h', 'i', 'n', 't' )
+    
+#define FOURCC_dpnd VLC_FOURCC( 'd', 'p', 'n', 'd' )
+#define FOURCC_ipir VLC_FOURCC( 'i', 'p', 'i', 'r' )
+#define FOURCC_mpod VLC_FOURCC( 'm', 'p', 'o', 'd' )
+#define FOURCC_hnti VLC_FOURCC( 'h', 'n', 't', 'i' )
+#define FOURCC_rtp  VLC_FOURCC( 'r', 't', 'p', ' ' )
+
+#define FOURCC_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
+#define FOURCC_esds VLC_FOURCC( 'e', 's', 'd', 's' )
+
+#define FOURCC_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
+#define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
+#define FOURCC__mp3 VLC_FOURCC( '.', 'm', 'p', '3' )
+#define FOURCC_ms55 VLC_FOURCC( 'm', 's', 0x0, 0x55 )
+#define FOURCC_3IV1 VLC_FOURCC( '3', 'I', 'V', '1' )
+#define FOURCC_3IV2 VLC_FOURCC( '3', 'I', 'V', '2' )
+#define FOURCC_h263 VLC_FOURCC( 'h', '2', '6', '3' )
+#define FOURCC_DIVX VLC_FOURCC( 'D', 'I', 'V', 'X' )
+#define FOURCC_cvid VLC_FOURCC( 'c', 'v', 'i', 'd' )
+#define FOURCC_mjpa VLC_FOURCC( 'm', 'j', 'p', 'a' )
+#define FOURCC_mjpb VLC_FOURCC( 'm', 'j', 'q', 't' )
+#define FOURCC_mjqt VLC_FOURCC( 'm', 'j', 'h', 't' )
+#define FOURCC_mjht VLC_FOURCC( 'm', 'j', 'p', 'b' )
+ 
+#define FOURCC_jpeg VLC_FOURCC( 'j', 'p', 'e', 'g' )
+
+/* Do you want some debug information on all read boxes ? */
+#define MP4_VERBOSE  1
+
+/* memory stream and file stream object */
+
+typedef struct MP4_Stream_s
+{
+    int b_memory;   /* do we uses a memory buffer */
+
+    input_thread_t *p_input;
+    
+    off_t i_start; /* in the buffer position for memory stream */
+    off_t i_stop;
+    u8  *p_buffer;
+
+} MP4_Stream_t;
+    
+struct MP4_Box_s;
+
+
+/* uuid Universal Unique IDentifiers */
+typedef struct UUID_s 
+{
+    u8 b[16];
+} UUID_t;
+
+/* specific structure for all boxes */
+
+typedef struct MP4_Box_data_ftyp_s
+{
+    u32 i_major_brand;
+    u32 i_minor_version;
+
+    u32 i_compatible_brands_count;
+    u32 *i_compatible_brands;
+
+} MP4_Box_data_ftyp_t;
+
+typedef struct MP4_Box_data_mvhd_s
+{
+    u8  i_version;
+    u32 i_flags;
+        
+    u64 i_creation_time;
+    u64 i_modification_time;
+    u32 i_timescale;
+    u64 i_duration;
+
+    s32 i_rate;
+    s16 i_volume;
+    s16 i_reserved1;
+    u32 i_reserved2[2];
+    s32 i_matrix[9];
+    u32 i_predefined[6];
+    u32 i_next_track_id;
+
+} MP4_Box_data_mvhd_t;
+
+#define MP4_TRACK_ENABLED    0x000001
+#define MP4_TRACK_IN_MOVIE   0x000002
+#define MP4_TRACK_IN_PREVIEW 0x000004
+typedef struct MP4_Box_data_tkhd_s
+{
+    u8  i_version;
+    u32 i_flags;
+        
+    u64 i_creation_time;
+    u64 i_modification_time;
+    u32 i_track_ID;
+    u32 i_reserved;
+    u64 i_duration;
+    
+    u32 i_reserved2[2];
+    s16 i_layer;
+    s16 i_predefined;
+    
+    s16 i_volume;
+    u16 i_reserved3;
+    s32 i_matrix[9];
+    s32 i_width;
+    s32 i_height;
+    
+} MP4_Box_data_tkhd_t;
+
+typedef struct MP4_Box_data_mdhd_s
+{
+    u8  i_version;
+    u32 i_flags;
+        
+    u64 i_creation_time;
+    u64 i_modification_time;
+    u32 i_timescale;
+    u64 i_duration;
+
+    /* one bit for pad */
+    /* unsigned int(5)[3] language difference with 0x60*/
+    unsigned char i_language[3]; 
+    u16 i_predefined;
+
+} MP4_Box_data_mdhd_t;
+
+typedef struct MP4_Box_data_hdlr_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    u32 i_predefined;
+    u32 i_handler_type; /* "vide" "soun" "hint" "odsm" 
+                           "crsm" "sdsm" "m7sm" "ocsm" 
+                           "ipsm" "mjsm" */
+    
+    unsigned char *psz_name; /* in UTF-8 */
+
+} MP4_Box_data_hdlr_t;
+
+typedef struct MP4_Box_data_vmhd_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    s16 i_graphics_mode;
+    s16 i_opcolor[3];    
+
+} MP4_Box_data_vmhd_t;
+
+typedef struct MP4_Box_data_smhd_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    s16 i_balance;
+    s16 i_reserved;
+
+} MP4_Box_data_smhd_t;
+
+typedef struct MP4_Box_data_hmhd_s
+{
+    u8  i_version;
+    u32 i_flags;
+       
+    u16 i_max_PDU_size;
+    u16 i_avg_PDU_size;
+    u32 i_max_bitrate;
+    u32 i_avg_bitrate;
+    u32 i_reserved;
+
+} MP4_Box_data_hmhd_t;
+
+typedef struct MP4_Box_data_url_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    unsigned char *psz_location;
+    
+} MP4_Box_data_url_t;
+
+typedef struct MP4_Box_data_urn_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    unsigned char *psz_name;
+    unsigned char *psz_location;
+    
+} MP4_Box_data_urn_t;
+
+typedef struct MP4_Box_data_dref_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_entry_count;
+/* XXX it's also a container with i_entry_count entry */
+} MP4_Box_data_dref_t;
+
+typedef struct MP4_Box_data_stts_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_entry_count;
+    u32 *i_sample_count; /* these are array */
+    s32 *i_sample_delta;
+
+} MP4_Box_data_stts_t;
+
+typedef struct MP4_Box_data_ctts_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    u32 i_entry_count;
+
+    u32 *i_sample_count; /* these are array */
+    s32 *i_sample_offset;
+
+} MP4_Box_data_ctts_t;
+
+
+typedef struct MP4_Box_data_sample_soun_s
+{
+    u8  i_reserved1[6];
+    u16 i_data_reference_index;
+
+    u32 i_reserved2[2];
+    u16 i_channelcount;
+    u16 i_samplesize;
+    u16 i_predefined;
+    u16 i_reserved3;
+    u16 i_sampleratehi; /* timescale of track */
+    u16 i_sampleratelo;
+    
+} MP4_Box_data_sample_soun_t;
+
+typedef struct MP4_Box_data_sample_vide_s
+{
+    u8  i_reserved1[6];
+    u16 i_data_reference_index;
+
+    u16 i_predefined1;
+    u16 i_reserved2;
+    u32 i_predefined2[3];
+
+    s16 i_width;
+    s16 i_height;
+
+    u32 i_horizresolution;
+    u32 i_vertresolution;
+
+    u32 i_reserved3;
+    u16 i_predefined3;
+    
+    u8  i_compressorname[32];
+    s16 i_depth;
+
+    s16 i_predefined4;
+    
+} MP4_Box_data_sample_vide_t;
+
+typedef struct MP4_Box_data_sample_hint_s
+{
+    u8  i_reserved1[6];
+    u16 i_data_reference_index;
+
+    u8 *p_data;
+
+} MP4_Box_data_sample_hint_t;
+
+typedef struct MP4_Box_data_moviehintinformation_rtp_s
+{
+    u32 i_description_format;
+    unsigned char *psz_text;
+
+} MP4_Box_data_moviehintinformation_rtp_t;
+
+
+
+typedef struct MP4_Box_data_stsd_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    u32 i_entry_count;
+
+    /* it contains SampleEntry handled as if it was Box */
+    
+} MP4_Box_data_stsd_t;
+
+
+typedef struct MP4_Box_data_stsz_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_sample_size;
+    u32 i_sample_count;
+   
+    u32 *i_entry_size; /* array , empty if i_sample_size != 0 */
+
+} MP4_Box_data_stsz_t;
+
+typedef struct MP4_Box_data_stz2_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_sample_size; /* 24 bits */
+    u8  i_field_size;
+    u32 i_sample_count;
+
+    u32 *i_entry_size; /* array: unsigned int(i_field_size) entry_size */
+
+} MP4_Box_data_stz2_t;
+
+typedef struct MP4_Box_data_stsc_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_entry_count;
+
+    u32 *i_first_chunk; /* theses are arrays */
+    u32 *i_samples_per_chunk;
+    u32 *i_sample_description_index;
+    
+} MP4_Box_data_stsc_t;
+
+
+typedef struct MP4_Box_data_co64_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_entry_count;
+    
+    u64 *i_chunk_offset;
+
+} MP4_Box_data_co64_t;
+
+
+typedef struct MP4_Box_data_stss_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    u32 i_entry_count;
+    
+    u32 *i_sample_number;
+    
+} MP4_Box_data_stss_t;
+
+typedef struct MP4_Box_data_stsh_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_entry_count;
+    
+    u32 *i_shadowed_sample_number;
+    u32 *i_sync_sample_number;
+
+} MP4_Box_data_stsh_t;
+
+typedef struct MP4_Box_data_stdp_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u16 *i_priority;
+
+} MP4_Box_data_stdp_t;
+
+typedef struct MP4_Box_data_padb_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_sample_count;
+
+    u16 *i_reserved1;   /* 1bit  */
+    u16 *i_pad2;        /* 3bits */
+    u16 *i_reserved2;   /* 1bit  */
+    u16 *i_pad1;        /* 3bits */
+    
+
+} MP4_Box_data_padb_t;
+
+
+typedef struct MP4_Box_data_elst_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+    u32 i_entry_count;
+
+    u64 *i_segment_duration;
+    s64 *i_media_time;
+    u16 *i_media_rate_integer;
+    u16 *i_media_rate_fraction;
+
+    
+} MP4_Box_data_elst_t;
+
+typedef struct MP4_Box_data_cprt_s
+{
+    u8  i_version;
+    u32 i_flags;
+    /* 1 pad bit */
+    unsigned char i_language[3];
+    
+    unsigned char *psz_notice;
+} MP4_Box_data_cprt_t;
+
+
+/* DecoderConfigDescriptor */
+typedef struct MP4_descriptor_decoder_config_s
+{
+    u8  i_objectTypeIndication;
+    u8  i_streamType;
+    int b_upStream;
+    int i_buffer_sizeDB;
+    int i_max_bitrate;
+    int i_avg_bitrate;
+    
+    int i_decoder_specific_info_len;
+    u8  *p_decoder_specific_info;
+    /* some other stuff */
+    
+} MP4_descriptor_decoder_config_t;
+
+typedef struct MP4_descriptor_SL_config_s
+{
+    
+} MP4_descriptor_SL_config_t;
+
+
+typedef struct MP4_descriptor_ES_s
+{
+    u16 i_ES_ID;
+    int b_stream_dependence;
+    int b_url;
+    int b_OCRstream;
+    int i_stream_priority;
+
+    int i_depend_on_ES_ID; /* if b_stream_dependence set */
+
+    unsigned char *psz_URL;
+
+    u16 i_OCR_ES_ID;       /* if b_OCRstream */
+    MP4_descriptor_decoder_config_t *p_decConfigDescr;
+    
+    MP4_descriptor_SL_config_t *p_slConfigDescr;
+
+    /* some other stuff ... */
+
+} MP4_descriptor_ES_t;
+
+/* ES descriptor */
+typedef struct MP4_Box_data_esds_s
+{
+    u8  i_version;
+    u32 i_flags;
+    
+    MP4_descriptor_ES_t es_descriptor;
+    
+} MP4_Box_data_esds_t;
+
+
+typedef struct MP4_Box_data_dcom_s
+{
+    u32 i_algorithm; /* fourcc */
+    
+} MP4_Box_data_dcom_t;
+
+typedef struct MP4_Box_data_cmvd_s
+{
+    u32 i_uncompressed_size;
+    u32 i_compressed_size;
+
+    int b_compressed; /* Set to 1 if compressed data, 0 if uncompressed */
+    u8 *p_data;
+
+} MP4_Box_data_cmvd_t;
+
+typedef struct MP4_Box_data_cmov_s
+{
+    struct MP4_Box_s *p_moov; /* uncompressed moov */
+    
+} MP4_Box_data_cmov_t;
+
+/*
+typedef struct MP4_Box_data_cmov_s
+{
+    u8  i_version;
+    u32 i_flags;
+
+} MP4_Box_data__t;
+
+*/
+
+typedef union MP4_Box_data_s
+{
+    MP4_Box_data_ftyp_t *p_ftyp;
+    MP4_Box_data_mvhd_t *p_mvhd;
+    MP4_Box_data_tkhd_t *p_tkhd;
+    MP4_Box_data_mdhd_t *p_mdhd;
+    MP4_Box_data_hdlr_t *p_hdlr;
+    MP4_Box_data_vmhd_t *p_vmhd;
+    MP4_Box_data_smhd_t *p_smhd;
+    MP4_Box_data_hmhd_t *p_hmhd;
+    MP4_Box_data_url_t  *p_url;
+    MP4_Box_data_urn_t  *p_urn;
+    MP4_Box_data_dref_t *p_dref;
+    MP4_Box_data_stts_t *p_stts;
+    MP4_Box_data_ctts_t *p_ctts;
+    MP4_Box_data_stsd_t *p_stsd;
+        MP4_Box_data_sample_vide_t *p_sample_vide;
+        MP4_Box_data_sample_soun_t *p_sample_soun;
+        MP4_Box_data_sample_hint_t *p_sample_hint;
+
+        MP4_Box_data_esds_t *p_esds;
+
+    MP4_Box_data_stsz_t *p_stsz;
+    MP4_Box_data_stz2_t *p_stz2;
+    MP4_Box_data_stsc_t *p_stsc;
+    MP4_Box_data_co64_t *p_co64;
+    MP4_Box_data_stss_t *p_stss;
+    MP4_Box_data_stsh_t *p_stsh;
+    MP4_Box_data_stdp_t *p_stdp;
+    MP4_Box_data_padb_t *p_padb;
+    MP4_Box_data_elst_t *p_elst;
+    MP4_Box_data_cprt_t *p_cprt;
+
+    MP4_Box_data_dcom_t *p_dcom;
+    MP4_Box_data_cmvd_t *p_cmvd;
+    MP4_Box_data_cmov_t *p_cmov;
+
+    MP4_Box_data_moviehintinformation_rtp_t p_moviehintinformation_rtp;
+    
+    void                *p_data; /* for unknow type */
+} MP4_Box_data_t;
+
+
+
+/* the most basic structure */
+typedef struct MP4_Box_s
+{
+    off_t   i_pos;      /* absolute position */
+    
+    u32     i_type;
+    u32     i_shortsize;
+
+    UUID_t  i_uuid;  /* Set if i_type == "uuid" */
+    
+    u64     i_size; /* always set so use it */
+
+    MP4_Box_data_t   data;   /* union of pointers on extended data depending on i_type (or i_usertype) */
+
+    struct MP4_Box_s *p_father; /* pointer on the father Box */
+
+    struct MP4_Box_s *p_first;  /* pointer on the first child Box */
+    struct MP4_Box_s *p_last;
+
+    struct MP4_Box_s *p_next;   /* pointer on the next boxes at the same level */
+
+} MP4_Box_t;
+
+/*---------------------------------------------------------------------------*/
+/****----------------------- High level functions ------------------------****/
+/*---------------------------------------------------------------------------*/
+
+/*****************************************************************************
+ * Function for manipulate stream easily
+ *****************************************************************************/
+
+off_t MP4_TellAbsolute( input_thread_t *p_input );
+int   MP4_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
+int   MP4_ReadData( input_thread_t *p_input, u8 *p_buff, int i_size );
+
+/*****************************************************************************
+ * MP4_ReadRoot : Parse the entire file, and create all boxes in memory
+ *****************************************************************************
+ *  The first box is a virtual box "root" and is the father for all first 
+ *  level boxes 
+ *
+ *  RETURN : 1 if succes and 0 if it failed
+ *****************************************************************************/
+int MP4_ReadBoxRoot( input_thread_t *p_input, MP4_Box_t *p_root );
+
+/*****************************************************************************
+ * MP4_FreeBox : free memory allocated after read with MP4_ReadBox
+ *               this, means also children boxes
+ * XXX : all children have to be allocated by a malloc !! and 
+ *         p_box isn't freeing  
+ *****************************************************************************/
+void MP4_FreeBox( input_thread_t *p_input, MP4_Box_t *p_box );
+
+/*****************************************************************************
+ * MP4_DumpBoxStructure: print the structure of the p_box
+ *****************************************************************************/
+void MP4_DumpBoxStructure( input_thread_t *p_input, MP4_Box_t *p_box );
+
+/*****************************************************************************
+ * MP4_CountBox: given a box, count how many child have the requested type 
+ * FIXME : support GUUID 
+ *****************************************************************************/
+int MP4_CountBox( MP4_Box_t *p_box, u32 i_type );
+    
+/*****************************************************************************
+ * MP4_FindBox:  find first box with i_type child of p_box
+ *      return NULL if not found
+ *****************************************************************************/
+MP4_Box_t *MP4_FindBox( MP4_Box_t *p_box, u32 i_type );
+
+/*****************************************************************************
+ * MP4_FindNextBox:  find next box with thesame type and at the same level 
+ *                  than p_box
+ *****************************************************************************/
+MP4_Box_t *MP4_FindNextBox( MP4_Box_t *p_box );
+
+/*****************************************************************************
+ * MP4_FindNbBox:  find the box i_number 
+ *****************************************************************************/
+MP4_Box_t *MP4_FindNbBox( MP4_Box_t *p_box, u32 i_number );
+   
+
+/*---------------------------------------------------------------------------*/
+/****----------------------- Lower level functions -----------------------****/
+/****                                                                     ****/
+/****------Use them only when you known what they really do and need------****/  
+/****                                                                     ****/
+/****---------------------------------------------------------------------****/
+/*---------------------------------------------------------------------------*/
+
+
+/****  ------- First some function to make abstract from input --------  */
+
+/****************************************************************************
+ * MP4_InputStream create an stram with an input
+ *
+ ****************************************************************************/
+MP4_Stream_t *MP4_InputStream( input_thread_t *p_input );
+
+/****************************************************************************
+ * MP4_MemoryStream create a memory stream
+ * if p_buffer == NULL, will allocate a buffer of i_size, else 
+ *     it uses p_buffer XXX you have to unallocate yourself !
+ *
+ ****************************************************************************/
+MP4_Stream_t *MP4_MemoryStream( input_thread_t *p_input,
+                                int i_size, u8 *p_buffer );
+
+/****************************************************************************
+ * MP4_ReadStream read from a MP4_Stream_t
+ *
+ ****************************************************************************/
+int MP4_ReadStream( MP4_Stream_t *p_stream, u8 *p_buff, int i_size );
+
+/****************************************************************************
+ * MP4_PeekStream guess it ;)
+ *
+ ****************************************************************************/
+int MP4_PeekStream( MP4_Stream_t *p_stream, u8 **pp_peek, int i_size );
+    
+/****************************************************************************
+ * MP4_TellStream give absolute position in the stream
+ * XXX for a memory stream give position from begining of the buffer
+ ****************************************************************************/
+off_t MP4_TellStream( MP4_Stream_t *p_stream );
+
+/****************************************************************************
+ * MP4_SeekStream seek in a MP4_Stream_t
+ *
+ ****************************************************************************/
+int MP4_SeekStream( MP4_Stream_t *p_stream, off_t i_pos);
+
+
+
+/*****************************************************************************
+ * MP4_ReadBox : parse the actual box and the children if they exist
+ *  
+ *  RETURN : 1 if succes and 0 if it failed
+ *****************************************************************************/
+int MP4_ReadBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box, MP4_Box_t *p_father );
+
+
+/*****************************************************************************
+ * MP4_ReadBoxCommon : Load only common parameters for all boxes 
+ *****************************************************************************
+ * p_box need to be an already allocated MP4_Box_t, and all data 
+ *  will only be peek not read
+ *
+ * RETURN : 0 if it fail, 1 otherwise
+ *****************************************************************************/
+int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box );
+
+
+/*****************************************************************************
+ * MP4_MP4_GotoBox : Go to this particular box 
+ *****************************************************************************
+ * RETURN : 0 if it fail, 1 otherwise
+ *****************************************************************************/
+int MP4_GotoBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box );
+
+    
+/*****************************************************************************
+ * MP4_MP4_NextBox : Go to the next box wiithin p_box->p_father 
+ *****************************************************************************
+ * if p_box == NULL, go to the next box in witch we are( at the begining ).
+ *****************************************************************************/
+int MP4_NextBox( MP4_Stream_t *p_stream, MP4_Box_t *p_box );
+
+

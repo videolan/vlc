@@ -1,0 +1,40 @@
+TODO: (Jean-Paul Saman <jpsaman@wxs.nl>)
+
+[1 - 30 October 2001, done]
+introduce libmad in vlc-dev code tree, this includes:
+	configure from top level of source tree
+	compilable from top level of source tree
+
+[2 - 25 November 2001, done]
+creating basic mad plugin in vlc-dev code tree, this include:
+	writing most simple vlc-plugin (no fancy stuf)
+	configurable from top level of source tree
+	compilable from top level of source tree
+
+[3 - 25 November 2001, done]
+test basic mad plugin 
+	native Intel
+	native iPaq
+
+[4 - 26 November 2001, done]
+commit to current vlc-dev tree in CVS at VideoLan 
+	fix broken things and conflicts
+	run tests again (see [3])
+	
+[5 - all ready done by Christophe Massiot]
+make cross-compile possible for vlc without interface. With interface it is to damn difficult to do cross-compilation.
+
+[6 - done by fenrir ]
+extending mad plugin with more features
+	do fancy stuff (enable MP3 decoding)
+
+[7 - done ]
+test extended plugin 
+	native Intel
+	native iPaq
+
+[8 - done ]
+commit to current vlc-dev tree in CVS at Videolan
+	fix broken things and conflicts
+	run tests again (see [7])
+ 

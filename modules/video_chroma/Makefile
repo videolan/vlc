@@ -1,0 +1,8 @@
+i420_rgb_SOURCES = i420_rgb.c i420_rgb8.c i420_rgb16.c
+i420_rgb_mmx_SOURCES = i420_rgb.c i420_rgb16.c
+i420_yuy2_SOURCES = i420_yuy2.c
+i420_yuy2_mmx_SOURCES = i420_yuy2.c
+i422_yuy2_SOURCES = i422_yuy2.c
+i422_yuy2_mmx_SOURCES = i422_yuy2.c
+i420_ymga_SOURCES = i420_ymga.c
+i420_ymga_mmx_SOURCES = i420_ymga.c

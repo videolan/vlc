@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout_spdif.c: AC3 passthrough output
+ * aout_spdif.c: A52 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.29 2002/06/01 12:32:01 sam Exp $
+ * $Id: aout_spdif.c,v 1.30 2002/08/04 17:23:44 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -83,8 +83,8 @@ void iec958_build_burst( u8 * p_buf, aout_fifo_t * p_fifo )
  *****************************************************************************
  * This output thread is quite specific as it can only handle one fifo now.
  *
- * Note: spdif can demux up to 8 ac3 streams, and can even take
- * care of time stamps (cf ac3 spec) but I'm not sure all decoders
+ * Note: spdif can demux up to 8 A52 streams, and can even take
+ * care of time stamps (cf A52 spec) but I'm not sure all decoders
  * implement it.
  *****************************************************************************/
 void aout_SpdifThread( aout_thread_t * p_aout )
@@ -124,8 +124,8 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                     (p_aout->fifo[i_fifo].i_start_frame + 1 )
                     & AOUT_FIFO_SIZE;
 
-                /* Compute the theorical duration of an ac3 frame */
-                m_frame_time = 1000000 * AC3_FRAME_SIZE
+                /* Compute the theorical duration of an A52 frame */
+                m_frame_time = 1000000 * A52_FRAME_SIZE
                                        / p_aout->fifo[i_fifo].i_rate;
 
                 vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );

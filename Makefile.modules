@@ -13,7 +13,7 @@ include Makefile
 #
 # Analyze the target we are asked to build
 #
-module_name := $(shell echo $(MAKECMDGOALS) | sed 's@.*/\(.*\)\..*@\1@')
+module_name := $(shell echo $(MAKECMDGOALS) | sed 's@\..*@@')
 suff := $(shell echo $(MAKECMDGOALS) | sed 's@.*\.@@' | tr so/a lo/o)
 
 #
@@ -22,6 +22,9 @@ suff := $(shell echo $(MAKECMDGOALS) | sed 's@.*\.@@' | tr so/a lo/o)
 SRC_C := $(filter %.c,$($(module_name)_SOURCES))
 SRC_CPP := $(filter %.cpp,$($(module_name)_SOURCES))
 SRC_M := $(filter %.m,$($(module_name)_SOURCES))
+
+plugins_CFLAGS += -D__PLUGIN__ -I$(PARENT)/include -I$(PARENT)/extras
+builtins_CFLAGS += -D__BUILTIN__ -I$(PARENT)/include -I$(PARENT)/extras
 
 ifeq (lo,$(suff))
 extra_CFLAGS := $(plugins_CFLAGS) $($(module_name)_CFLAGS) \
@@ -57,17 +60,17 @@ clean:
 
 FORCE:
 
-$(OBJ_ALL): ../../Makefile.modules ../../Makefile.dep ../../Makefile ../../Makefile.opts Makefile
-$(OBJ_ALL): $(H_DEP:%=../../include/%)
+$(OBJ_ALL): $(PARENT)/Makefile.modules $(PARENT)/Makefile.dep $(PARENT)/Makefile $(PARENT)/Makefile.opts Makefile
+$(OBJ_ALL): $(H_DEP:%=$(PARENT)/include/%)
 
 $(C_DEP): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
+	@$(MAKE) -s --no-print-directory -f $(PARENT)/Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
 
 $(CPP_DEP): %.dpp: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
+	@$(MAKE) -s --no-print-directory -f $(PARENT)/Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
 
 $(M_DEP): %.dm: FORCE
-	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
+	@$(MAKE) -s --no-print-directory -f $(PARENT)/Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
 
 $(SRC_C:%.c=%.$(suff).$(module_name)): %.$(suff).$(module_name): .dep/%.d
 $(SRC_C:%.c=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.c
@@ -83,10 +86,10 @@ $(SRC_M:%.m=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.m
 
 # foo_CUSTOM lets us override all target rules for foo.so and foo.a
 ifeq (,$($(module_name)_CUSTOM))
-../$(module_name).so: $(EXTRA_DEP) $(OBJ_ALL)
+$(module_name).so: $(EXTRA_DEP) $(OBJ_ALL)
 	$(CC) $(OBJ_ALL) $(LDFLAGS) $(plugins_LDFLAGS) $($(module_name)_LDFLAGS) -o $@
 
-../$(module_name).a: $(EXTRA_DEP) $(OBJ_ALL)
+$(module_name).a: $(EXTRA_DEP) $(OBJ_ALL)
 	rm -f $@
 	ar rc $@ $(OBJ_ALL)
 	$(RANLIB) $@

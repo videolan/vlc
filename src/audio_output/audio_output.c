@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.87 2002/07/31 20:56:52 sam Exp $
+ * $Id: audio_output.c,v 1.88 2002/08/04 17:23:44 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -181,9 +181,9 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
             i_bytes = 2 * p_aout->i_units * p_aout->i_channels;
             break;
 
-        case AOUT_FMT_AC3:
+        case AOUT_FMT_A52:
             pf_aout_thread = aout_SpdifThread;
-            psz_format = "ac3 pass-through";
+            psz_format = "A52 pass-through";
             i_bytes = SPDIF_FRAME_SIZE;
             break;
 

@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.50 2002/07/31 20:56:50 sam Exp $
+ * $Id: audio_output.h,v 1.51 2002/08/04 17:23:41 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -163,7 +163,7 @@ struct aout_thread_t
 #define AOUT_FMT_S8          0x00000040
 #define AOUT_FMT_U16_LE      0x00000080                 /* Little endian U16 */
 #define AOUT_FMT_U16_BE      0x00000100                    /* Big endian U16 */
-#define AOUT_FMT_AC3         0x00000400                 /* Dolby Digital AC3 */
+#define AOUT_FMT_A52         0x00000400                 /* Dolby Digital A52 */
 
 #ifdef WORDS_BIGENDIAN
 #define AOUT_FMT_S16_NE      AOUT_FMT_S16_BE
@@ -171,8 +171,8 @@ struct aout_thread_t
 #define AOUT_FMT_S16_NE      AOUT_FMT_S16_LE
 #endif
 
-/* Number of samples in an AC3 frame */
-#define AC3_FRAME_SIZE      1536
+/* Number of samples in an A52 frame */
+#define A52_FRAME_SIZE      1536
 
 /* Size of a frame for spdif output */
 #define SPDIF_FRAME_SIZE    6144
