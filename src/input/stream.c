@@ -860,7 +860,13 @@ static int AStreamPeekStream( stream_t *s, uint8_t **pp_peek, int i_read )
 
     while( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read )
     {
-        if( AStreamRefillStream( s ) ) break;
+        if( p_sys->stream.i_used <= 1 )
+        {
+            /* Be sure we will read something */
+            p_sys->stream.i_used += i_read - (tk->i_end - tk->i_start - p_sys->stream.i_offset);
+        }
+        if( AStreamRefillStream( s ) )
+            break;
     }
 
     if( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read )
