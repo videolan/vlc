@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.28 2002/01/15 05:22:21 stef Exp $
+ * $Id: libdvdcss.c,v 1.29 2002/01/21 07:00:21 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -158,11 +158,16 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
         return NULL;
     }
 
+#if defined( WIN32 )
+    /* it's not possible to stat a drive letter. Fake a block device */
+    fileinfo.st_mode = S_IFBLK;
+#else
     if( stat( psz_target, &fileinfo ) < 0 )
     {
         _dvdcss_error( dvdcss, "dvdcss: can't stat target" );
     }
-    
+#endif
+
     if( S_ISBLK( fileinfo.st_mode ) || 
         S_ISCHR( fileinfo.st_mode ) )
     {        
@@ -479,10 +484,25 @@ static int _dvdcss_open ( dvdcss_handle dvdcss, char *psz_target )
     {
         char psz_dvd[7];
         _snprintf( psz_dvd, 7, "\\\\.\\%c:", psz_target[0] );
+
+        /* To have access to ioctls, we need read and write access to the
+         * device. This is only allowed if you have administrator priviledges
+         * so we allow for a fallback method where ioctls are not available but
+         * we at least have read access to the device.
+         * (See Microsoft Q241374: Read and Write Access Required for SCSI
+         * Pass Through Requests) */
         (HANDLE) dvdcss->i_fd =
                 CreateFile( psz_dvd, GENERIC_READ | GENERIC_WRITE,
                                 FILE_SHARE_READ | FILE_SHARE_WRITE,
-                                NULL, OPEN_EXISTING, 0, NULL );
+                                NULL, OPEN_EXISTING,
+                                FILE_FLAG_RANDOM_ACCESS, NULL );
+
+        if( (HANDLE) dvdcss->i_fd == INVALID_HANDLE_VALUE )
+            (HANDLE) dvdcss->i_fd =
+                    CreateFile( psz_dvd, GENERIC_READ, FILE_SHARE_READ,
+                                    NULL, OPEN_EXISTING,
+                                    FILE_FLAG_RANDOM_ACCESS, NULL );
+
         if( (HANDLE) dvdcss->i_fd == INVALID_HANDLE_VALUE )
         {
             _dvdcss_error( dvdcss, "failed opening device" );

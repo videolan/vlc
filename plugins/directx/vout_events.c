@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.8 2002/01/17 23:02:45 gbazin Exp $
+ * $Id: vout_events.c,v 1.9 2002/01/21 07:00:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -142,7 +142,8 @@ void DirectXEventThread( vout_thread_t *p_vout )
             {
             case VK_ESCAPE:
             case VK_F12:
-                PostQuitMessage( 0 );
+                /* exit application */
+                p_main->p_intf->b_die = 1;
                 break;
             }
             TranslateMessage(&msg);
@@ -154,7 +155,8 @@ void DirectXEventThread( vout_thread_t *p_vout )
             {
             case 'q':
             case 'Q':
-                PostQuitMessage( 0 );
+                /* exit application */
+                p_main->p_intf->b_die = 1;
                 break;
 
             case 'f':                            /* switch to fullscreen */
@@ -385,7 +387,7 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
                      hInstance );          /* handle to application instance */
 
     /* free window background brush */
-    if( p_vout->p_sys->hwnd != NULL )
+    if( p_vout->p_sys->hbrush != NULL )
     {
         DeleteObject( p_vout->p_sys->hbrush );
         p_vout->p_sys->hbrush = NULL;
@@ -538,7 +540,10 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     /* the window has been closed so shut down everything now */
     case WM_DESTROY:
         intf_WarnMsg( 4, "vout: WinProc WM_DESTROY" );
+        /* exit application */
+        p_main->p_intf->b_die = 1;
         PostQuitMessage( 0 );
+        return 0;
         break;
 
     case WM_SYSCOMMAND:
