@@ -324,9 +324,11 @@ public:
     ,i_user_end_time(-1)
     ,i_current_sub_chapter(-1)
     ,i_seekpoint_num(-1)
+    ,b_display_seekpoint(false)
     {}
     
-    int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
+    int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time, input_title_t & title );
+    const chapter_item_t * FindTimecode( mtime_t i_timecode ) const;
     
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
@@ -334,6 +336,8 @@ public:
     int                         i_current_sub_chapter;
     int                         i_seekpoint_num;
     int64_t                     i_uid;
+    bool                        b_display_seekpoint;
+    std::string                 psz_name;
     
     bool operator<( const chapter_item_t & item ) const
     {
@@ -353,9 +357,9 @@ public:
     ,b_ordered(false)
     {}
     
-    void RefreshChapters();
+    void RefreshChapters( input_title_t & title );
     double Duration() const;
-    const chapter_item_t * FindTimecode();
+    const chapter_item_t * FindTimecode( mtime_t i_timecode ) const;
     
     std::vector<chapter_item_t> chapters;
     int64_t                     i_uid;
@@ -443,7 +447,7 @@ public:
     
     std::vector<chapter_edition_t> editions;
     int                            i_current_edition;
-    chapter_item_t                 *psz_current_chapter;
+    const chapter_item_t           *psz_current_chapter;
 };
 
 #define MKVD_TIMECODESCALE 1000000
@@ -1444,17 +1448,32 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
-static void UpdateCurrentChapter()
+static void UpdateCurrentChapter( demux_t & demux, mtime_t i_pts )
 {
+    demux_sys_t & sys = *demux.p_sys;
+    const chapter_item_t *psz_curr_chapter;
+
     /* update current chapter/seekpoint */
-#ifdef TODO
-    i_chapter
-    if (p_sys->title->seekpoint[i_skp]->i_time_offset)
+    if ( sys.editions.size())
     {
-        p_demux->info.i_update |= INPUT_UPDATE_SEEKPOINT;
-        p_demux->info.i_seekpoint = i_chapter;
+        /* 1st, we need to know in which chapter we are */
+        psz_curr_chapter = sys.editions[sys.i_current_edition].FindTimecode( i_pts );
+
+        if (sys.psz_current_chapter != NULL && psz_curr_chapter != NULL && sys.psz_current_chapter->i_seekpoint_num != psz_curr_chapter->i_seekpoint_num)
+        {
+            demux.info.i_update |= INPUT_UPDATE_SEEKPOINT;
+            demux.info.i_seekpoint = psz_curr_chapter->i_seekpoint_num - 1;
+        }
+
+        sys.psz_current_chapter = psz_curr_chapter;
+
+        if (sys.editions[sys.i_current_edition].b_ordered )
+        {
+            /* TODO check if we need to silently seek to a new location in the stream (switch to another chapter) */
+            /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
+            /* only seek after each duration >= end timecode of the current chapter */
+        }
     }
-#endif
 }
 
 static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
@@ -1637,15 +1656,6 @@ static int Demux( demux_t *p_demux)
 
     for( ;; )
     {
-        if ( p_sys->editions.size() && p_sys->editions[p_sys->i_current_edition].b_ordered )
-        {
-            /* TODO 1st, we need to know in which chapter we are */
-            
-            /* check if we need to silently seek to a new location in the stream (switch to another chapter) */
-            /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
-            /* only seek after each duration >= end timecode of the current chapter */
-        }
-        
         if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             msg_Warn( p_demux, "cannot get block EOF?" );
@@ -1662,7 +1672,7 @@ static int Demux( demux_t *p_demux)
 
         BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration );
 
-        UpdateCurrentChapter();
+        UpdateCurrentChapter( *p_demux, p_sys->i_pts );
         
         delete block;
         i_block_count++;
@@ -2731,16 +2741,11 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, cha
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i;
-    seekpoint_t *sk;
-    bool b_display_seekpoint = true;
 
     if( p_sys->title == NULL )
     {
         p_sys->title = vlc_input_title_New();
     }
-    sk = vlc_seekpoint_New();
-
-    sk->i_level = i_level;
 
     msg_Dbg( p_demux, "|   |   |   + ChapterAtom (level=%d)", i_level );
     for( i = 0; i < ca->ListSize(); i++ )
@@ -2755,17 +2760,16 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, cha
         else if( MKV_IS_ID( l, KaxChapterFlagHidden ) )
         {
             KaxChapterFlagHidden &flag =*(KaxChapterFlagHidden*)l;
-            b_display_seekpoint = uint8( flag ) == 0;
+            chapters.b_display_seekpoint = uint8( flag ) == 0;
 
-            msg_Dbg( p_demux, "|   |   |   |   + ChapterFlagHidden: %s", b_display_seekpoint ? "no":"yes" );
+            msg_Dbg( p_demux, "|   |   |   |   + ChapterFlagHidden: %s", chapters.b_display_seekpoint ? "no":"yes" );
         }
         else if( MKV_IS_ID( l, KaxChapterTimeStart ) )
         {
             KaxChapterTimeStart &start =*(KaxChapterTimeStart*)l;
-            sk->i_time_offset = uint64( start ) / I64C(1000);
-            chapters.i_start_time = sk->i_time_offset;
+            chapters.i_start_time = uint64( start ) / I64C(1000);
 
-            msg_Dbg( p_demux, "|   |   |   |   + ChapterTimeStart: %lld", sk->i_time_offset );
+            msg_Dbg( p_demux, "|   |   |   |   + ChapterTimeStart: %lld", chapters.i_start_time );
         }
         else if( MKV_IS_ID( l, KaxChapterTimeEnd ) )
         {
@@ -2786,15 +2790,14 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, cha
 
                 if( MKV_IS_ID( l, KaxChapterString ) )
                 {
-                    std::string psz;
                     int k;
 
                     KaxChapterString &name =*(KaxChapterString*)l;
                     for (k = 0; k < i_level; k++)
-                        psz += '+';
-                    psz += ' ';
-                    psz += UTF8ToStr( UTFstring( name ) );
-                    sk->psz_name = strdup( psz.c_str() );
+                        chapters.psz_name += '+';
+                    chapters.psz_name += ' ';
+                    chapters.psz_name += UTF8ToStr( UTFstring( name ) );
+
                     msg_Dbg( p_demux, "|   |   |   |   |    + ChapterString '%s'", UTF8ToStr(UTFstring(name)) );
                 }
                 else if( MKV_IS_ID( l, KaxChapterLanguage ) )
@@ -2819,18 +2822,6 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, cha
             ParseChapterAtom( p_demux, i_level+1, static_cast<EbmlMaster *>(l), new_sub_chapter );
             chapters.sub_chapters.push_back( new_sub_chapter );
         }
-    }
-
-    if (b_display_seekpoint)
-    {
-        // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
-        chapters.i_seekpoint_num = p_sys->title->i_seekpoint++;
-        p_sys->title->seekpoint = (seekpoint_t**)realloc( p_sys->title->seekpoint, p_sys->title->i_seekpoint * sizeof( seekpoint_t* ) );
-        p_sys->title->seekpoint[p_sys->title->i_seekpoint-1] = sk;
-    }
-    else
-    {
-        vlc_seekpoint_Delete(sk);
     }
 }
 
@@ -2900,7 +2891,7 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
 
     for( i = 0; i < p_sys->editions.size(); i++ )
     {
-        p_sys->editions[i].RefreshChapters();
+        p_sys->editions[i].RefreshChapters( *p_sys->title );
     }
     
     p_sys->i_current_edition = i_default_edition;
@@ -3041,18 +3032,18 @@ static char * UTF8ToStr( const UTFstring &u )
     return dst;
 }
 
-void chapter_edition_t::RefreshChapters()
+void chapter_edition_t::RefreshChapters( input_title_t & title )
 {
     int64_t i_prev_user_time = 0;
     std::vector<chapter_item_t>::iterator index = chapters.begin();
     while ( index != chapters.end() )
     {
-        i_prev_user_time = (*index).RefreshChapters( b_ordered, i_prev_user_time );
+        i_prev_user_time = (*index).RefreshChapters( b_ordered, i_prev_user_time, title );
         index++;
     }
 }
 
-int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_time )
+int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_time, input_title_t & title )
 {
     int64_t i_user_time = i_prev_user_time;
     
@@ -3060,7 +3051,7 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
     std::vector<chapter_item_t>::iterator index = sub_chapters.begin();
     while ( index != sub_chapters.end() )
     {
-        i_user_time = (*index).RefreshChapters( b_ordered, i_user_time );
+        i_user_time = (*index).RefreshChapters( b_ordered, i_user_time, title );
         index++;
     }
 
@@ -3082,7 +3073,23 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
         i_user_start_time = i_start_time;
         i_user_end_time = i_end_time;
     }
-    
+
+    i_seekpoint_num = title.i_seekpoint;
+
+    if (b_display_seekpoint)
+    {
+        seekpoint_t *sk = vlc_seekpoint_New();
+
+//        sk->i_level = i_level;
+        sk->i_time_offset = i_start_time;
+        sk->psz_name = strdup( psz_name.c_str() );
+
+        // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
+        title.i_seekpoint++;
+        title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
+        title.seekpoint[title.i_seekpoint-1] = sk;
+    }
+
     return i_user_end_time;
 }
 
@@ -3098,4 +3105,38 @@ double chapter_edition_t::Duration() const
     }
     
     return f_result;
+}
+
+const chapter_item_t *chapter_item_t::FindTimecode( mtime_t i_user_timecode ) const
+{
+    const chapter_item_t *psz_result = NULL;
+
+    if (i_user_timecode >= i_user_start_time && i_user_timecode < i_user_end_time)
+    {
+        std::vector<chapter_item_t>::const_iterator index = sub_chapters.begin();
+        while ( index != sub_chapters.end() && psz_result == NULL )
+        {
+            psz_result = (*index).FindTimecode( i_user_timecode );
+            index++;
+        }
+        
+        if ( psz_result == NULL )
+            psz_result = this;
+    }
+
+    return psz_result;
+}
+
+const chapter_item_t *chapter_edition_t::FindTimecode( mtime_t i_user_timecode ) const
+{
+    const chapter_item_t *psz_result = NULL;
+
+    std::vector<chapter_item_t>::const_iterator index = chapters.begin();
+    while ( index != chapters.end() && psz_result == NULL )
+    {
+        psz_result = (*index).FindTimecode( i_user_timecode );
+        index++;
+    }
+
+    return psz_result;
 }
