@@ -121,9 +121,7 @@ static int  WriteRaw( sout_access_out_t *, block_t * );
 static int  Seek    ( sout_access_out_t *, off_t  );
 
 static void ThreadWrite( vlc_object_t * );
-
 static block_t *NewUDPPacket( sout_access_out_t *, mtime_t );
-
 
 typedef struct sout_access_thread_t
 {
@@ -147,12 +145,13 @@ struct sout_access_out_sys_t
     uint16_t            i_sequence_number;
     uint32_t            i_ssrc;
 
-    unsigned int        i_mtu;
+    int                 i_mtu;
 
     block_t             *p_buffer;
 
     sout_access_thread_t *p_thread;
 
+    vlc_bool_t          b_mtu_warning;
 };
 
 #define DEFAULT_PORT 1234
@@ -174,15 +173,16 @@ static int Open( vlc_object_t *p_this )
 
     vlc_value_t         val;
 
-    sout_CfgParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
+    sout_CfgParse( p_access, SOUT_CFG_PREFIX,
+                   ppsz_sout_options, p_access->p_cfg );
 
-    if( !( p_sys = p_access->p_sys =
-                malloc( sizeof( sout_access_out_sys_t ) ) ) )
+    if( !( p_sys = malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
         msg_Err( p_access, "not enough memory" );
         return VLC_EGENERIC;
     }
-
+    memset( p_sys, 0, sizeof(sout_access_out_sys_t) );
+    p_access->p_sys = p_sys;
 
     if( p_access->psz_access != NULL &&
         !strcmp( p_access->psz_access, "rtp" ) )
@@ -285,18 +285,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ssrc            = rand()&0xffffffff;
 
     var_Get( p_access, SOUT_CFG_PREFIX "raw", &val );
-    if( val.b_bool )
-    {
-        p_access->pf_write = WriteRaw;
-    }
-    else
-    {
-        p_access->pf_write = Write;
-    }
+    if( val.b_bool )  p_access->pf_write = WriteRaw;
+    else p_access->pf_write = Write;
 
     p_access->pf_seek = Seek;
 
-    msg_Dbg( p_access, "udp access output opened(%s:%d)", psz_dst_addr, i_dst_port );
+    msg_Dbg( p_access, "udp access output opened(%s:%d)",
+             psz_dst_addr, i_dst_port );
 
     free( psz_dst_addr );
 
@@ -328,10 +323,7 @@ static void Close( vlc_object_t * p_this )
 
     block_FifoRelease( p_sys->p_thread->p_fifo );
 
-    if( p_sys->p_buffer )
-    {
-        block_Release( p_sys->p_buffer );
-    }
+    if( p_sys->p_buffer ) block_Release( p_sys->p_buffer );
 
     net_Close( p_sys->p_thread->i_handle );
 
@@ -348,40 +340,54 @@ static void Close( vlc_object_t * p_this )
 static int Write( sout_access_out_t *p_access, block_t *p_buffer )
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    unsigned int i_write;
 
     while( p_buffer )
     {
         block_t *p_next;
-        if( p_buffer->i_buffer > p_sys->i_mtu )
+        int i_packets = 0;
+
+        if( !p_sys->b_mtu_warning && p_buffer->i_buffer > p_sys->i_mtu )
         {
-            msg_Warn( p_access, "arggggggggggggg packet size > mtu" );
-            i_write = p_sys->i_mtu;
-        }
-        else
-        {
-            i_write = p_buffer->i_buffer;
+            msg_Warn( p_access, "packet size > MTU, you should probably "
+                      "increase the MTU" );
+            p_sys->b_mtu_warning = VLC_TRUE;
         }
 
-        /* if we have enough data, enque the buffer */
+        /* Check if there is enough space in the buffer */
         if( p_sys->p_buffer &&
-            p_sys->p_buffer->i_buffer + i_write > p_sys->i_mtu )
+            p_sys->p_buffer->i_buffer + p_buffer->i_buffer > p_sys->i_mtu )
         {
             block_FifoPut( p_sys->p_thread->p_fifo, p_sys->p_buffer );
             p_sys->p_buffer = NULL;
         }
 
-        if( !p_sys->p_buffer )
+        while( p_buffer->i_buffer )
         {
-            p_sys->p_buffer = NewUDPPacket( p_access, p_buffer->i_dts );
-        }
+            int i_write = __MIN( p_buffer->i_buffer, p_sys->i_mtu );
 
-        if( p_buffer->i_buffer > 0 )
-        {
+            i_packets++;
+
+            if( !p_sys->p_buffer )
+            {
+                p_sys->p_buffer = NewUDPPacket( p_access, p_buffer->i_dts );
+                if( !p_sys->p_buffer ) break;
+            }
+
             memcpy( p_sys->p_buffer->p_buffer + p_sys->p_buffer->i_buffer,
                     p_buffer->p_buffer, i_write );
+
             p_sys->p_buffer->i_buffer += i_write;
+            p_buffer->p_buffer += i_write;
+            p_buffer->i_buffer -= i_write;
+
+            if( p_sys->p_buffer->i_buffer == p_sys->i_mtu || i_packets > 1 )
+            {
+                /* Flush */
+                block_FifoPut( p_sys->p_thread->p_fifo, p_sys->p_buffer );
+                p_sys->p_buffer = NULL;
+            }
         }
+
         p_next = p_buffer->p_next;
         block_Release( p_buffer );
         p_buffer = p_next;
@@ -474,7 +480,8 @@ static void ThreadWrite( vlc_object_t *p_this )
             if( i_date - i_date_last > 2000000 )
             {
                 if( !i_dropped_packets )
-                    msg_Dbg( p_thread, "mmh, hole > 2s -> drop" );
+                    msg_Dbg( p_thread, "mmh, hole ("I64Fd" > 2s) -> drop",
+                             i_date - i_date_last );
 
                 block_Release( p_pk  );
                 i_date_last = i_date;
@@ -484,7 +491,8 @@ static void ThreadWrite( vlc_object_t *p_this )
             else if( i_date - i_date_last < 0 )
             {
                 if( !i_dropped_packets )
-                    msg_Dbg( p_thread, "mmh, packets in the past -> drop" );
+                    msg_Dbg( p_thread, "mmh, packets in the past ("I64Fd")"
+                             " -> drop", i_date - i_date_last );
 
                 block_Release( p_pk  );
                 i_date_last = i_date;
