@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.8 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: mp4.h,v 1.9 2003/11/27 12:32:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,37 +20,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-
-
-/*****************************************************************************
- * Structure needed for decoder
- *****************************************************************************/
-typedef struct bitmapinfoheader_s
-{
-    uint32_t i_size; /* size of header 40 + size of data follwoing this header */
-    uint32_t i_width;
-    uint32_t i_height;
-    uint16_t i_planes;
-    uint16_t i_bitcount;
-    uint32_t i_compression;
-    uint32_t i_sizeimage;
-    uint32_t i_xpelspermeter;
-    uint32_t i_ypelspermeter;
-    uint32_t i_clrused;
-    uint32_t i_clrimportant;
-} bitmapinfoheader_t;
-
-typedef struct waveformatex_s
-{
-    uint16_t i_format;
-    uint16_t i_channels;
-    uint32_t i_samplepersec;
-    uint32_t i_avgbytespersec;
-    uint16_t i_blockalign;
-    uint16_t i_bitspersample;
-    uint16_t i_size;          /* This give size of data
-                            imediatly following this header. */
-} waveformatex_t;
 
 /*****************************************************************************
  * Contain all information about a chunk
@@ -85,13 +54,14 @@ typedef struct track_data_mp4_s
 
     int b_ok;           /* The track is usable */
     int b_enable;       /* is the trak enable by default */
-    int b_selected;     /* is the trak being played */
-    int i_cat;          /* Type of the track, VIDEO_ES, AUDIO_ES, UNKNOWN_ES  ... */
-    char        i_language[3];
+    vlc_bool_t b_selected;     /* is the trak being played */
+
+    es_format_t fmt;
+    es_out_id_t *p_es;
 
     /* display size only ! */
-    int         i_width;
-    int         i_height;
+    int i_width;
+    int i_height;
 
     /* more internal data */
     uint64_t         i_timescale;  /* time scale for this track only */
@@ -115,9 +85,6 @@ typedef struct track_data_mp4_s
     MP4_Box_t *p_stbl;  /* will contain all timing information */
     MP4_Box_t *p_stsd;  /* will contain all data to initialize decoder */
     MP4_Box_t *p_sample;/* point on actual sdsd */
-
-    es_descriptor_t *p_es;       /* vlc es for this track */
-    pes_packet_t    *p_pes_init; /* to be send when p_es is selected */
 
 } track_data_mp4_t;
 
