@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.8 2004/01/25 23:04:06 asmax Exp $
+ * $Id: theme_loader.cpp,v 1.9 2004/02/08 11:23:17 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -73,7 +73,7 @@ bool ThemeLoader::load( const string &fileName )
     }
 
     // Check if the skin to load is in the config file, to load its config
-    char *skin_last = config_GetPsz( getIntf(), "skin_last" );
+    char *skin_last = config_GetPsz( getIntf(), "skins2-last" );
     if( skin_last != NULL && fileName == (string)skin_last )
     {
         // Used to anchor the windows at the beginning
@@ -83,7 +83,7 @@ bool ThemeLoader::load( const string &fileName )
     }
     else
     {
-        config_PutPsz( getIntf(), "skin_last", fileName.c_str() );
+        config_PutPsz( getIntf(), "skins2-last", fileName.c_str() );
         // Show the windows
         pNewTheme->getWindowManager().showAll();
     }

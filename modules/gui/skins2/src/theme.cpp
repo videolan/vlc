@@ -2,7 +2,7 @@
  * theme.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.2 2004/01/25 23:04:06 asmax Exp $
+ * $Id: theme.cpp,v 1.3 2004/02/08 11:23:17 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -45,7 +45,7 @@ void Theme::loadConfig()
     msg_Dbg( getIntf(), "Loading theme configuration");
 
     // Get config from vlcrc file
-    char *save = config_GetPsz( getIntf(), "skin_config" );
+    char *save = config_GetPsz( getIntf(), "skins2-config" );
     if( save == NULL )
         return;
 
@@ -97,8 +97,8 @@ void Theme::saveConfig()
     }
 
     // Save config to file
-    config_PutPsz( getIntf(), "skin_config", save );
-    config_SaveConfigFile( getIntf(), "skins" );
+    config_PutPsz( getIntf(), "skins2-config", save );
+    config_SaveConfigFile( getIntf(), "skins2" );
 
     // Free memory
     delete[] save;

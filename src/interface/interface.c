@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: interface.c,v 1.112 2004/01/25 17:16:06 zorglub Exp $
+ * $Id: interface.c,v 1.113 2004/02/08 11:23:17 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -256,6 +256,8 @@ static void RunInterface( intf_thread_t *p_intf )
     var_Change( p_intf, "intf-switch", VLC_VAR_SETTEXT, &text, NULL );
 
     val.psz_string = "skins"; text.psz_string = "Skins";
+    var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "skins2"; text.psz_string = "Skins 2";
     var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "wxwin"; text.psz_string = "wxWindows";
     var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );

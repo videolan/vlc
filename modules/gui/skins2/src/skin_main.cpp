@@ -2,7 +2,7 @@
  * skin_main.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.5 2004/01/25 23:04:06 asmax Exp $
+ * $Id: skin_main.cpp,v 1.6 2004/02/08 11:23:17 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -166,7 +166,7 @@ static void Run( intf_thread_t *p_intf )
 {
     // Load a theme
     ThemeLoader *pLoader = new ThemeLoader( p_intf );
-    char *skin_last = config_GetPsz( p_intf, "skin_last" );
+    char *skin_last = config_GetPsz( p_intf, "skins2-last" );
 
     if( skin_last == NULL || !pLoader->load( skin_last ) )
     {
@@ -229,13 +229,12 @@ static void Run( intf_thread_t *p_intf )
 #define SKIN_CONFIG_LONG    N_("Config of last used skin.")
 
 vlc_module_begin();
-    add_string( "skin_last", "", NULL, DEFAULT_SKIN, DEFAULT_SKIN_LONG,
+    add_string( "skins2-last", "", NULL, DEFAULT_SKIN, DEFAULT_SKIN_LONG,
                 VLC_TRUE );
-    add_string( "skin_config", "", NULL, SKIN_CONFIG, SKIN_CONFIG_LONG,
+    add_string( "skins2-config", "", NULL, SKIN_CONFIG, SKIN_CONFIG_LONG,
                 VLC_TRUE );
     set_description( _("Skinnable Interface") );
     set_capability( "interface", 30 );
     set_callbacks( Open, Close );
-    set_program( "svlc" );
+    set_program( "s2vlc" );
 vlc_module_end();
-
