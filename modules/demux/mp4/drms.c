@@ -30,7 +30,12 @@
 #   include <stdio.h>
 #endif
 
-#include <vlc/vlc.h>
+#ifdef __VLC__
+#   include <vlc/vlc.h>
+#   include "libmp4.h"
+#else
+#   include "drmsvl.h"
+#endif
 
 #ifdef HAVE_ERRNO_H
 #   include <errno.h>
@@ -66,8 +71,6 @@
 
 #include "drms.h"
 #include "drmstables.h"
-
-#include "libmp4.h"
 
 /*****************************************************************************
  * aes_s: AES keys structure
@@ -334,10 +337,18 @@ int drms_init( void *_p_drms, uint32_t i_type,
             AddMD5( &md5, p_drms->p_iviv, 16 );
             EndMD5( &md5 );
 
-            if( GetUserKey( p_drms, p_drms->p_key ) )
+            if( p_drms->i_user == 0 && p_drms->i_key == 0 )
             {
-                i_ret = -1;
-                break;
+                static char const p_secret[] = "tr1-th3n.y00_by3";
+                memcpy( p_drms->p_key, p_secret, 16 );
+            }
+            else
+            {
+                if( GetUserKey( p_drms, p_drms->p_key ) )
+                {
+                    i_ret = -1;
+                    break;
+                }
             }
 
             InitAES( &p_drms->aes, p_drms->p_key );
