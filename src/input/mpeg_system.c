@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.41 2001/03/05 16:00:30 massiot Exp $
+ * $Id: mpeg_system.c,v 1.42 2001/03/06 17:54:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -224,7 +224,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     }
                     p_pes->i_pts = input_ClockGetTS( p_input, p_es->p_pgrm,
                     ( ((mtime_t)(p_full_header[2] & 0x0E) << 29) |
-                      (((mtime_t)U32_AT(p_full_header + 2) & 0xFFFE00) << 6) |
+                      ((mtime_t)(p_full_header[3]) << 22) |
+                      ((mtime_t)(p_full_header[4] & 0xFE) << 14) |
                       ((mtime_t)p_full_header[5] << 7) |
                       ((mtime_t)p_full_header[6] >> 1) ) );
 
