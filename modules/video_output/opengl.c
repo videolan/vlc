@@ -6,6 +6,7 @@
  *
  * Authors: Cyril Deguet <asmax@videolan.org>
  *          Gildas Bazin <gbazin@videolan.org>
+ *          Eric Petit <titer@m0k.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -310,6 +311,13 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 1;
 
+    if( p_sys->p_vout->pf_lock &&
+        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    {
+        msg_Warn( p_vout, "could not lock OpenGL provider" );
+        return 0;
+    }
+
     InitTextures( p_vout );
 
     glDisable(GL_BLEND);
@@ -359,6 +367,11 @@ static int Init( vout_thread_t *p_vout )
         glTranslatef( 0.0, 0.0, - 5.0 );
     }
 
+    if( p_sys->p_vout->pf_unlock )
+    {
+        p_sys->p_vout->pf_unlock( p_sys->p_vout );
+    }
+
     return 0;
 }
 
@@ -367,8 +380,22 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    if( p_sys->p_vout->pf_lock &&
+        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    {
+        msg_Warn( p_vout, "could not lock OpenGL provider" );
+        return;
+    }
+
     glFinish();
     glFlush();
+
+    if( p_sys->p_vout->pf_unlock )
+    {
+        p_sys->p_vout->pf_unlock( p_sys->p_vout );
+    }
 }
 
 /*****************************************************************************
@@ -410,6 +437,13 @@ static int Manage( vout_thread_t *p_vout )
     p_vout->i_changes = p_sys->p_vout->i_changes;
 
 #ifdef SYS_DARWIN
+    if( p_sys->p_vout->pf_lock &&
+        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    {
+        msg_Warn( p_vout, "could not lock OpenGL provider" );
+        return i_ret;
+    }
+
     /* On OS X, we create the window and the GL view when entering
        fullscreen - the textures have to be inited again */
     if( i_fullscreen_change )
@@ -441,6 +475,11 @@ static int Manage( vout_thread_t *p_vout )
             glTranslatef( 0.0, 0.0, - 5.0 );
         }
     }
+
+    if( p_sys->p_vout->pf_unlock )
+    {
+        p_sys->p_vout->pf_unlock( p_sys->p_vout );
+    }
 #endif
 
     return i_ret;
@@ -470,9 +509,17 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
        OS X, we first render, then reload the texture to be used next
        time. */
 
+    if( p_sys->p_vout->pf_lock &&
+        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    {
+        msg_Warn( p_vout, "could not lock OpenGL provider" );
+        return;
+    }
+
 #ifdef SYS_DARWIN
     int i_new_index;
     i_new_index = ( p_sys->i_index + 1 ) & 1;
+
 
     /* Update the texture */
     glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_new_index] );
@@ -493,6 +540,11 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
                      p_vout->render.i_width, p_vout->render.i_height,
                      VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->pp_buffer[0] );
 #endif
+
+    if( p_sys->p_vout->pf_unlock )
+    {
+        p_sys->p_vout->pf_unlock( p_sys->p_vout );
+    }
 }
 
 /*****************************************************************************
@@ -516,6 +568,13 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call pf_display to force redraw. Currently,
        the OS X provider uses it to get a smooth window resizing */
+
+    if( p_sys->p_vout->pf_lock &&
+        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    {
+        msg_Warn( p_vout, "could not lock OpenGL provider" );
+        return;
+    }
 
     glClear( GL_COLOR_BUFFER_BIT );
 
@@ -577,6 +636,11 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     glDisable( VLCGL_TARGET );
 
     p_sys->p_vout->pf_swap( p_sys->p_vout );
+
+    if( p_sys->p_vout->pf_unlock )
+    {
+        p_sys->p_vout->pf_unlock( p_sys->p_vout );
+    }
 }
 
 int GetAlignedSize( int i_size )

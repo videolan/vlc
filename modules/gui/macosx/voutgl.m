@@ -61,6 +61,7 @@ struct vout_sys_t
     vlc_bool_t          b_saved_frame;
     NSRect              s_frame;
     vlc_bool_t          b_got_frame;
+    vlc_mutex_t         lock;
 };
 
 /*****************************************************************************
@@ -72,6 +73,8 @@ static void End    ( vout_thread_t * p_vout );
 static int  Manage ( vout_thread_t * p_vout );
 static int  Control( vout_thread_t *, int, va_list );
 static void Swap   ( vout_thread_t * p_vout );
+static int  Lock   ( vout_thread_t * p_vout );
+static void Unlock ( vout_thread_t * p_vout );
 
 int E_(OpenVideoGL)  ( vlc_object_t * p_this )
 {
@@ -94,6 +97,7 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
+    vlc_mutex_init( p_vout, &p_vout->p_sys->lock );
 
     /* Spawn window */
     p_vout->p_sys->b_got_frame = VLC_FALSE;
@@ -117,6 +121,8 @@ int E_(OpenVideoGL)  ( vlc_object_t * p_this )
     p_vout->pf_manage = Manage;
     p_vout->pf_control= Control;
     p_vout->pf_swap   = Swap;
+    p_vout->pf_lock   = Lock;
+    p_vout->pf_unlock = Unlock;
 
     return VLC_SUCCESS;
 }
@@ -136,6 +142,7 @@ void E_(CloseVideoGL) ( vlc_object_t * p_this )
     [p_vout->p_sys->o_window close];
 
     /* Clean up */
+    vlc_mutex_destroy( &p_vout->p_sys->lock );
     [o_pool release];
     free( p_vout->p_sys );
 }
@@ -220,11 +227,18 @@ static void Swap( vout_thread_t * p_vout )
 {
     p_vout->p_sys->b_got_frame = VLC_TRUE;
     [[p_vout->p_sys->o_glview openGLContext] makeCurrentContext];
-    if( [p_vout->p_sys->o_glview lockFocusIfCanDraw] )
-    {
-        glFlush();
-        [p_vout->p_sys->o_glview unlockFocus];
-    }
+    glFlush();
+}
+
+static int Lock( vout_thread_t * p_vout )
+{
+    vlc_mutex_lock( &p_vout->p_sys->lock );
+    return 0;
+}
+
+static void Unlock( vout_thread_t * p_vout )
+{
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
 }
 
 /*****************************************************************************
@@ -296,8 +310,11 @@ static void Swap( vout_thread_t * p_vout )
         x = bounds.size.width;
         y = bounds.size.width * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
     }
+
+    Lock( p_vout );
     glViewport( ( bounds.size.width - x ) / 2,
                 ( bounds.size.height - y ) / 2, x, y );
+    Unlock( p_vout );
 
     if( p_vout->p_sys->b_got_frame )
     {
@@ -311,14 +328,18 @@ static void Swap( vout_thread_t * p_vout )
     }
     else
     {
+        Lock( p_vout );
         glClear( GL_COLOR_BUFFER_BIT );
+        Unlock( p_vout );
     }
 }
 
 - (void) drawRect: (NSRect) rect
 {
     [[self openGLContext] makeCurrentContext];
+    Lock( p_vout );
     glFlush();
+    Unlock( p_vout );
 }
 
 @end

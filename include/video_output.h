@@ -103,6 +103,8 @@ struct vout_thread_t
     void      ( *pf_render )     ( vout_thread_t *, picture_t * );
     void      ( *pf_display )    ( vout_thread_t *, picture_t * );
     void      ( *pf_swap )       ( vout_thread_t * );         /* OpenGL only */
+    int       ( *pf_lock )       ( vout_thread_t * );         /* OpenGL only */
+    void      ( *pf_unlock )     ( vout_thread_t * );         /* OpenGL only */
     int       ( *pf_control )    ( vout_thread_t *, int, va_list );
     /**@}*/
 
