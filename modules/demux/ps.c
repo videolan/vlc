@@ -329,9 +329,33 @@ static block_t *ps_pkt_read( stream_t *s, uint32_t i_code )
     int      i_peek = stream_Peek( s, &p_peek, 14 );
     int      i_size = ps_pkt_size( p_peek, i_peek );
 
-    if( i_size > 0 )
+    if( i_size <= 6 && p_peek[3] > 0xba )
     {
+        /* Special case, search the next start code */
+        i_size = 6;
+        for( ;; )
+        {
+            i_peek = stream_Peek( s, &p_peek, i_size + 1024 );
+            if( i_peek <= i_size + 4 )
+            {
+                return NULL;
+            }
+            while( i_size <= i_peek - 4 )
+            {
+                if( p_peek[i_size] == 0x00 && p_peek[i_size+1] == 0x00 && p_peek[i_size+2] == 0x01 && p_peek[i_size+3] >= 0xb9 )
+                {
+                    return stream_Block( s, i_size );
+                }
+                i_size++;
+            }
+        }
+    }
+    else
+    {
+        /* Normal case */
         return  stream_Block( s, i_size );
     }
+
     return NULL;
 }
+
