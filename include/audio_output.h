@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.76 2003/02/02 00:57:20 jobi Exp $
+ * $Id: audio_output.h,v 1.77 2003/02/06 15:14:41 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -67,9 +67,6 @@ struct audio_sample_format_t
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','l')
 #   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','l')
 #endif
-
-#define AFMT_S16_NE AOUT_FMT_S16_NE
-#define AFMT_U16_NE AOUT_FMT_U16_NE
 
 #define AOUT_FMT_NON_LINEAR( p_format )                                    \
     ( ((p_format)->i_format == VLC_FOURCC('s','p','d','i'))                \
