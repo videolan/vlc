@@ -493,6 +493,8 @@ void Playlist::CreateNode( playlist_t *p_playlist, playlist_item_t *p_node,
                     wxL2U( p_node->pp_children[i]->input.psz_name ), -1,-1,
                            new PlaylistItem( p_node->pp_children[i]) );
 
+            UpdateTreeItem( p_playlist, item );
+
             treectrl->SetItemImage( item,
                                     p_node->pp_children[i]->input.i_type );
         }
@@ -593,22 +595,18 @@ void Playlist::UpdateItem( int i )
 
     wxTreeItemId item = FindItem( treectrl->GetRootItem(), p_item);
 
-    UpdateTreeItem( p_playlist, item );
+    if( item.IsOk() )
+    {
+        UpdateTreeItem( p_playlist, item );
+    }
 
     vlc_object_release(p_playlist);
-
 }
 
 void Playlist::UpdateTreeItem( playlist_t *p_playlist ,wxTreeItemId item )
 {
-    playlist_item_t *p_item;
-
-   if( !item.IsOk() )
-   {
-        return;
-   }
-
-    p_item  =  ((PlaylistItem *)treectrl->GetItemData( item ))->p_item;
+    playlist_item_t *p_item  =
+            ((PlaylistItem *)treectrl->GetItemData( item ))->p_item;
 
     if( !p_item )
     {
@@ -617,15 +615,16 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist ,wxTreeItemId item )
 
     wxString msg;
     char *psz_author = playlist_ItemGetInfo( p_item, _("Meta-information"),
-                                                         _("Artist"));
+                                                     _("Artist"));
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = p_item->input.i_duration;
+
     if( dur != -1 )
         secstotimestr( psz_duration, dur/1000000 );
     else
         memcpy( psz_duration, "-:--:--", sizeof("-:--:--") );
 
-    if( !strcmp( psz_author, "" ) )
+    if( !strcmp( psz_author, "" ) || p_item->input.b_fixed_name == VLC_TRUE )
     {
         msg.Printf( wxString( wxL2U( p_item->input.psz_name ) ) + wxU( " ( ") +
                     wxString(wxL2U(psz_duration ) ) + wxU( ")") );
@@ -735,25 +734,7 @@ void Playlist::UpdatePlaylist()
     {
         return;
     }
-#if 0
-    /* Update the colour of items */
-    int i_playlist_index = p_playlist->i_index;
-    if( p_intf->p_sys->i_playing != i_playlist_index )
-    {
-        wxListItem listitem;
-        listitem.m_itemId = i_playlist_index;
-        listitem.SetTextColour( *wxRED );
-        listview->SetItem( listitem );
 
-        if( p_intf->p_sys->i_playing != -1 )
-        {
-            listitem.m_itemId = p_intf->p_sys->i_playing;
-            listitem.SetTextColour( *wxBLACK );
-            listview->SetItem( listitem );
-        }
-        p_intf->p_sys->i_playing = i_playlist_index;
-    }
-#endif
     vlc_object_release( p_playlist );
 }
 

@@ -490,7 +490,6 @@ static int Demux( demux_t *p_demux )
    /* Gather the complete sdp file */
    for( ;; )
    {
-        fprintf(stderr,"read %i at %p\n",i_max_sdp - i_sdp - 1, &psz_sdp[i_sdp]);
         int i_read = stream_Read( p_demux->s,
                                   &psz_sdp[i_sdp], i_max_sdp - i_sdp - 1 );
 
@@ -515,7 +514,11 @@ static int Demux( demux_t *p_demux )
 
    p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
 
-   if( !p_sdp ) return -1;
+   if( !p_sdp )
+   {
+       msg_Warn( p_demux, "invalid SDP");
+       return -1;
+   }
 
    if( p_sdp->i_media > 1 )
    {
@@ -966,6 +969,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
 static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 {
     sdp_t *p_sdp;
+    vlc_bool_t b_invalid = VLC_FALSE;
 
     if( psz_sdp == NULL )
     {
@@ -985,6 +989,9 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     p_sdp->psz_sessionname = NULL;
     p_sdp->psz_media       = NULL;
     p_sdp->psz_connection  = NULL;
+    p_sdp->psz_uri         = NULL;
+    p_sdp->psz_address     = NULL;
+    p_sdp->psz_address_type= NULL;
 
     p_sdp->i_media         = 0;
     p_sdp->i_attributes    = 0;
@@ -1036,13 +1043,25 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
                 break;
             case ( 'o' ):
             {
+                int i_field = 0;
                 /* o field is <username> <session id> <version>
                  *  <network type> <address type> <address> */
 
-#define GET_FIELD(  store ) \
+#define GET_FIELD( store ) \
                 psz_eof = strchr( psz_parse, ' ' ); \
-                if( psz_eof ) { *psz_eof=0; store = strdup( psz_parse ); } \
-                else { store = strdup( psz_parse );}; psz_parse = psz_eof + 1 ;
+                if( psz_eof ) \
+                { \
+                    *psz_eof=0; store = strdup( psz_parse ); \
+                } \
+                else \
+                { \
+                    if( i_field != 5 ) \
+                    { \
+                        b_invalid = VLC_TRUE; break; \
+                    } \
+                }; \
+                psz_parse = psz_eof + 1; i_field++;
+
 
                 psz_parse = &psz_sdp[2];
                 GET_FIELD( p_sdp->psz_username );
@@ -1116,6 +1135,12 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
 
             default:
                break;
+        }
+
+        if( b_invalid )
+        {
+            FreeSDP( p_sdp );
+            return NULL;
         }
 
         psz_sdp = psz_eol;
@@ -1234,6 +1259,10 @@ static void FreeSDP( sdp_t *p_sdp )
     FREE( p_sdp->psz_connection );
     FREE( p_sdp->psz_media );
     FREE( p_sdp->psz_uri );
+
+    FREE( p_sdp->psz_address );
+    FREE( p_sdp->psz_address_type );
+
     for( i= p_sdp->i_attributes - 1; i >= 0 ; i-- )
     {
         struct attribute_t *p_attr = p_sdp->pp_attributes[i];
