@@ -130,7 +130,7 @@ void vout_SDLEnd( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_SDLDestroy( vout_thread_t *p_vout )
 {
-    // SDLCloseDisplay( p_vout );
+    SDLCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
@@ -163,10 +163,8 @@ void vout_SDLDisplay( vout_thread_t *p_vout )
         {
             
             SDL_Flip( p_vout->p_sys->p_display );
-        }
-        /* Swap buffers and change write frame */
-        if( p_vout->p_sys->b_must_acquire )
-        {
+            
+            /* Swap buffers and change write frame */
             SDL_LockSurface ( p_vout->p_sys->p_display );
         }
     } 
