@@ -1531,7 +1531,7 @@ then
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
       VLC_ADD_PLUGINS([ts])
       if test "${enable_sout}" != "no"; then
-        VLC_ADD_BUILTINS([mux_ts])
+        VLC_ADD_PLUGINS([mux_ts])
       fi
       VLC_ADD_CPPFLAGS([mux_ts ts dvb],[${CPPFLAGS_test}])
       VLC_ADD_LDFLAGS([mux_ts ts dvb],[${LDFLAGS_test} -ldvbpsi])
