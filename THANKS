@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.6 2003/04/06 15:43:02 massiot Exp $
+$Id: THANKS,v 1.7 2003/05/20 15:51:03 hartman Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -23,6 +23,7 @@ Colin Simmonds <colin_simmonds@Mac.lover.org> - compile fix for Mac OS X
 Damian Ivereigh <damian@cisco.com> - ac3dec uninitialized data structure fix
 David Kennedy <dkennedy@tinytoad.com> - X11 fullscreen patch
 David Weber <david_weber@gmx.de> - Mac OS X interface design & graphics
+Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
 Emmanuel Blindauer <manu@agat.net> - aRts audio output
 Espen Skoglund <esk@ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE@cadmus.com> - directory browsing code
