@@ -4,6 +4,7 @@ Priority: optional
 Version: 0.4.6
 Release: 1
 Architecture: arm
+Conflicts: task-opie, gpe
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>
 Depends: libc6, task-x, sdl, libgtk1.2
 Copyright: GPL

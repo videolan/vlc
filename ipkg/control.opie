@@ -2,8 +2,8 @@ Package: opie-vlc
 Section: graphics
 Priority: optional
 Version: 0.4.6
-Release: 1
-Conflicts: gpe
+Release: 2
+Conflicts: gpe, vlc
 Architecture: arm
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>
 Depends: libc6, task-opie

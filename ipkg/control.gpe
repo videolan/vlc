@@ -3,7 +3,7 @@ Section: graphics
 Priority: optional
 Version: 0.4.6
 Release: 1
-Conflicts: opie
+Conflicts: task-opie, vlc
 Architecture: arm
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>
 Depends: gpe, libc6, libsdl, libgpewidget0, libgtk1.2 
