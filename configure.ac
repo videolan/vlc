@@ -1886,7 +1886,7 @@ then
       AC_CHECK_LIB(avformat, av_open_input_stream, [
         AC_DEFINE(HAVE_LIBAVFORMAT, 1,
         [Define if you have ffmpeg's libavformat.])
-        VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ])
+        VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ], [], [-lavcodec -lz])
       LDFLAGS="${LDFLAGS_save}"
       CPPFLAGS="${CPPFLAGS_save}"
     fi
