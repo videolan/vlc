@@ -239,8 +239,6 @@ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
         {
             input_StopThread( p_playlist->p_input );
         }
-        val.b_bool = VLC_TRUE;
-        var_Set( p_playlist, "prevent-skip", val );
         p_playlist->i_status = PLAYLIST_RUNNING;
         break;
 
@@ -323,6 +321,8 @@ static void RunThread ( playlist_t *p_playlist )
     mtime_t    i_vout_destroyed_date = 0;
     mtime_t    i_sout_destroyed_date = 0;
 
+    playlist_item_t *p_autodelete_item = 0;
+
     /* Tell above that we're ready */
     vlc_thread_ready( p_playlist );
 
@@ -359,23 +359,11 @@ static void RunThread ( playlist_t *p_playlist )
                 i_sout_destroyed_date = 0;
 
                 /* Check for autodeletion */
-                if( p_playlist->pp_items[p_playlist->i_index]->b_autodeletion )
+                if( p_autodelete_item )
                 {
-                    playlist_Delete( p_playlist, p_playlist->i_index );
-                    p_playlist->i_status = PLAYLIST_RUNNING;
+                    playlist_ItemDelete( p_autodelete_item );
+                    p_autodelete_item = 0;
                 }
-
-                /* Select the next playlist item if necessary */
-                vlc_mutex_lock( &p_playlist->object_lock );
-                var_Get( p_playlist, "prevent-skip", &val );
-                if( val.b_bool == VLC_FALSE )
-                {
-                    SkipItem( p_playlist, 1 );
-                }
-                /* Reset forced status */
-                val.b_bool = VLC_FALSE;
-                var_Set( p_playlist, "prevent-skip", val );
-                vlc_mutex_unlock( &p_playlist->object_lock );
 
                 continue;
             }
@@ -390,7 +378,24 @@ static void RunThread ( playlist_t *p_playlist )
             {
                 input_StopThread( p_playlist->p_input );
 
-                vlc_mutex_unlock( &p_playlist->object_lock );
+                if( p_playlist->pp_items[p_playlist->i_index]->b_autodeletion )
+                {
+                    /* This ain't pretty but hey it works */
+                    p_autodelete_item =
+                        p_playlist->pp_items[p_playlist->i_index];
+                    p_playlist->pp_items[p_playlist->i_index] =
+                        playlist_ItemNew( p_playlist,
+                                          p_autodelete_item->input.psz_uri, 0);
+
+                    vlc_mutex_unlock( &p_playlist->object_lock );
+                    playlist_Delete( p_playlist, p_playlist->i_index );
+                    p_playlist->i_status = PLAYLIST_RUNNING;
+                }
+                else
+                {
+                    SkipItem( p_playlist, 1 );
+                    vlc_mutex_unlock( &p_playlist->object_lock );
+                }
                 continue;
             }
             else if( p_playlist->p_input->i_state != INIT_S )
