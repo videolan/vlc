@@ -283,7 +283,7 @@ static char *ppsz_align_descriptions[] =
 
 #define INPUT_PROGRAMS_TEXT N_("Choose programs")
 #define INPUT_PROGRAMS_LONGTEXT N_( \
-    "Choose the programs to select by giving a comma-separated list of" \
+    "Choose the programs to select by giving a comma-separated list of " \
     "SIDs.")
 
 #define INPUT_AUDIO_TEXT N_("Choose audio")
