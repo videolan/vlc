@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.185 2002/06/11 09:44:22 gbazin Exp $
+ * $Id: video_output.c,v 1.186 2002/07/02 22:07:02 jlj Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -40,6 +40,10 @@
 
 #include "video.h"
 #include "video_output.h"
+
+#if defined( SYS_DARWIN )
+#include "darwin_specific.h"
+#endif
 
 /*****************************************************************************
  * Local prototypes

@@ -2,7 +2,7 @@
  * darwin_specific.h: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.h,v 1.3 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: darwin_specific.h,v 1.4 2002/07/02 22:07:02 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -25,3 +25,4 @@
  * Prototypes
  *****************************************************************************/
 char  * system_GetProgramPath( void );
+extern char *strndup( const char *string, size_t n );

@@ -154,7 +154,10 @@ AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
 ])
 AC_CHECK_FUNC(textdomain,,[
-  AC_CHECK_LIB(intl,textdomain,vlc_LDFLAGS="${vlc_LDFLAGS} -lintl")
+  AC_CHECK_LIB(intl,textdomain,
+    vlc_LDFLAGS="${vlc_LDFLAGS} -lintl"
+    plugins_LDFLAGS="${plugins_LDFLAGS} -lintl"
+  )
 ])
 
 dnl Check for getopt
