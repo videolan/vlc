@@ -556,16 +556,16 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
               break;
 #ifdef HAVE_LIBCDDB
             case 'a':
-	        if (p_cdda->p_cdtext[0] 
-		    && p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER])
-		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER];
-		if (want_cddb_info(p_cdda, psz))
-		  psz = p_cdda->cddb.disc->artist;
+                if (p_cdda->p_cdtext[0]
+                    && p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER])
+                  psz = p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER];
+                if (want_cddb_info(p_cdda, psz))
+                  psz = p_cdda->cddb.disc->artist;
                 goto format_str;
             case 'A':
-	        if (p_cdda->p_cdtext[0] 
-		    && p_cdda->p_cdtext[0]->field[CDTEXT_TITLE])
-		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_TITLE];
+                if (p_cdda->p_cdtext[0]
+                    && p_cdda->p_cdtext[0]->field[CDTEXT_TITLE])
+                  psz = p_cdda->p_cdtext[0]->field[CDTEXT_TITLE];
 		if (want_cddb_info(p_cdda, psz))
 		  psz =  p_cdda->cddb.disc->title;
                 goto format_str;
@@ -576,20 +576,20 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                                   CDDB_CATEGORY[p_cdda->cddb.disc->category]);
                 break;
             case 'G':
-	        if (p_cdda->p_cdtext[0] 
-		    && p_cdda->p_cdtext[0]->field[CDTEXT_GENRE])
-		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_GENRE];
-		if (want_cddb_info(p_cdda, psz))
-		  psz = p_cdda->cddb.disc->genre;
-		goto format_str;
+                if (p_cdda->p_cdtext[0]
+                    && p_cdda->p_cdtext[0]->field[CDTEXT_GENRE])
+                  psz = p_cdda->p_cdtext[0]->field[CDTEXT_GENRE];
+                if (want_cddb_info(p_cdda, psz))
+                  psz = p_cdda->cddb.disc->genre;
+                goto format_str;
             case 'I':
-	        if (p_cdda->p_cdtext[0] 
-		    && p_cdda->p_cdtext[0]->field[CDTEXT_DISCID])
-		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_DISCID];
-		if (want_cddb_info(p_cdda, psz)) {
+                if (p_cdda->p_cdtext[0]
+                    && p_cdda->p_cdtext[0]->field[CDTEXT_DISCID])
+                  psz = p_cdda->p_cdtext[0]->field[CDTEXT_DISCID];
+                if (want_cddb_info(p_cdda, psz)) {
                      add_format_num_info(p_cdda->cddb.disc->discid, "%x");
-		} else if (psz)
-		     add_format_str_info(psz);
+                } else if (psz)
+                     add_format_str_info(psz);
                 break;
             case 'Y':
                 if (!p_cdda->b_cddb_enabled) goto not_special;
@@ -597,18 +597,18 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                     add_format_num_info(p_cdda->cddb.disc->year, "%5d");
                 break;
             case 't':
-	        if ( CDIO_INVALID_TRACK == i_track ) break;
+                if ( CDIO_INVALID_TRACK == i_track ) break;
                 if (p_cdda && p_cdda->b_cddb_enabled && p_cdda->cddb.disc)
                 {
                     cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
                                                         i_track-1);
                     if (t != NULL && t->title != NULL) {
                       add_format_str_info(t->title);
-		    } else {
+                    } else {
                       add_format_str_info(psz_mrl);
-		    }
+                    }
                 } else {
-		  if (p_cdda->p_cdtext[i_track] 
+                  if (p_cdda->p_cdtext[i_track]
 		      && p_cdda->p_cdtext[i_track]->field[CDTEXT_TITLE]) {
 		    add_format_str_info(p_cdda->p_cdtext[i_track]->field[CDTEXT_TITLE]);
 		  
@@ -847,8 +847,6 @@ int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
                        playlist_item_t *p_item, int i_track,
                        vlc_bool_t b_single )
 {
-    vlc_mutex_lock( &p_item->input.lock );
-
     add_playlist_track_info_str("Source",  p_cdda->psz_source);
     vlc_input_item_AddInfo( &p_item->input, _("Track"), _("Track Number"),
                            "%d", i_track );
@@ -883,17 +881,15 @@ int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
             if (t->artist)
                 add_playlist_track_info_str("Artist (CDDB)",
                                              t->artist);
-	    if (t->title)
+            if (t->title)
                 add_playlist_track_info_str("Title (CDDB)",
                                             t->title);
-	    if (t->ext_data)
+            if (t->ext_data)
                 add_playlist_track_info_str("Extended information (CDDB)",
                                             t->ext_data);
         }
     }
 #endif /*HAVE_LIBCDDB*/
-
-    vlc_mutex_unlock( &p_item->input.lock );
 
     return VLC_SUCCESS;
 }
