@@ -327,7 +327,8 @@ static int Demux( demux_t * p_demux )
                     }
                     else
                     {
-                        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
+                        es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                                        p_stream->i_pcr );
                     }
                     continue;
                 }
@@ -394,9 +395,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             ogg_sync_reset( &p_sys->oy );
 
         default:
-            return demux2_vaControlHelper( p_demux->s,
-                                           0, -1,
-                                           p_sys->i_bitrate, 1, i_query, args );
+            return demux2_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
+                                           1, i_query, args );
     }
 }
 
@@ -464,8 +464,9 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
             /* 1 frame per packet */
             p_stream->i_interpolated_pcr += (I64C(1000000) / p_stream->f_rate);
         else if( p_stream->fmt.i_bitrate )
-            p_stream->i_interpolated_pcr += ( p_oggpacket->bytes * I64C(1000000)
-                                              / p_stream->fmt.i_bitrate / 8 );
+            p_stream->i_interpolated_pcr +=
+                ( p_oggpacket->bytes * I64C(1000000) /
+                  p_stream->fmt.i_bitrate / 8 );
     }
 }
 
@@ -615,7 +616,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             {
                 /* Set correct starting date in header packets */
                 p_stream->p_packets_backup[i].granulepos =
-                    p_stream->i_interpolated_pcr * p_stream->f_rate / I64C(1000000);
+                    p_stream->i_interpolated_pcr * p_stream->f_rate /
+                    I64C(1000000);
 
                 Ogg_DecodePacket( p_demux, p_stream,
                                   &p_stream->p_packets_backup[i] );
@@ -638,7 +640,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 /* Call the pace control */
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR,
+                                p_stream->i_pcr );
             }
 
             p_stream->i_previous_pcr = p_stream->i_pcr;
@@ -690,8 +693,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_block->i_dts = p_block->i_pts = i_pts;
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
-        p_block->i_pts = i_pts;
-        p_block->i_dts = 0;
+        p_block->i_dts = p_block->i_pts = i_pts;
+        p_block->i_length = 0;
     }
     else if( p_stream->fmt.i_codec == VLC_FOURCC( 't','h','e','o' ) )
         p_block->i_dts = p_block->i_pts = i_pts;
@@ -731,7 +734,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                   p_oggpacket->packet[i_header_len + 1] != '\n' &&
                   p_oggpacket->packet[i_header_len + 1] != '\r' ) )
             {
-                p_block->i_dts = p_block->i_pts + (mtime_t)lenbytes * 1000;
+                p_block->i_length = (mtime_t)lenbytes * 1000;
             }
         }
 

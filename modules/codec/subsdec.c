@@ -371,9 +371,9 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
     }
 
     vout_ShowTextAbsolute( p_vout, psz_subtitle, NULL, 
-                           OSD_ALIGN_BOTTOM | p_sys->i_align,
-                           i_align_h, i_align_v, 
-                           p_block->i_pts, p_block->i_dts );
+        OSD_ALIGN_BOTTOM | p_sys->i_align, i_align_h,
+        i_align_v, p_block->i_pts,
+        p_block->i_length ? p_block->i_pts + p_block->i_length : 0 );
 
     free( psz_subtitle );
 }

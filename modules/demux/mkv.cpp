@@ -1532,14 +1532,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts, mtime
 
         if( tk.fmt.i_cat == SPU_ES && strcmp( tk.psz_codec, "S_VOBSUB" ) )
         {
-            if( i_duration > 0 )
-            {
-                p_block->i_dts += i_duration * 1000;
-            }
-            else
-            {
-                p_block->i_dts = 0;
-            }
+            p_block->i_length = i_duration * 1000;
         }
         es_out_Send( p_demux->out, tk.p_es, p_block );
 

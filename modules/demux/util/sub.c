@@ -566,14 +566,15 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             }
 
             p_block->i_pts = p_sub->subtitle[p_sub->i_subtitle].i_start;
-            p_block->i_dts = 0;
+            p_block->i_dts = p_block->i_pts;
             if( p_sub->subtitle[p_sub->i_subtitle].i_stop > 0 )
             {
-                /* FIXME kludge i_dts means end of display... */
-                p_block->i_dts = p_sub->subtitle[p_sub->i_subtitle].i_stop;
+                p_block->i_length =
+                    p_sub->subtitle[p_sub->i_subtitle].i_stop - p_block->i_pts;
             }
 
-            memcpy( p_block->p_buffer, p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
+            memcpy( p_block->p_buffer,
+                    p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
             if( p_block->i_pts > 0 )
             {
                 es_out_Send( p_input->p_es_out, p_sub->p_es, p_block );
@@ -1329,8 +1330,8 @@ static int  DemuxVobSub( subtitle_demux_t *p_demux, block_t *p_bk )
         /* FIXME i_spu == determines which of the spu tracks we will show. */
         if( p_demux->p_es && i_spu == 0 )
         {
-            p_pkt->i_pts = p_bk->i_pts;
-            p_pkt->i_dts = 0;
+            p_pkt->i_dts = p_pkt->i_pts = p_bk->i_pts;
+            p_pkt->i_length = 0;
             es_out_Send( p_demux->p_input->p_es_out, p_demux->p_es, p_pkt );
 
             p_bk->i_pts = 0;    /* only first packet has a pts */
