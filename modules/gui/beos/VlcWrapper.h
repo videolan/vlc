@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.10 2002/12/09 13:37:38 titer Exp $
+ * $Id: VlcWrapper.h,v 1.11 2003/01/08 02:09:15 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -62,17 +62,19 @@ public:
     bool UpdateInputAndAOut();
     
     /* input */
+    bool HasInput();
     int InputStatus();
     int InputRate();
     int InputTell();
     int InputSize();
     void InputSlower();
     void InputFaster();
+    BList * InputGetChannels( int i_cat );
     void openFiles( BList *o_files, bool replace = true );
     void openDisc( BString o_type, BString o_device,
                    int i_title, int i_chapter );
-    void toggleLanguage( int i_language );
-    void toggleSubtitle( int i_subtitle );
+    void ToggleLanguage( int i_language );
+    void ToggleSubtitle( int i_subtitle );
     const char* getTimeAsString();
     float getTimeAsFloat();
     void setTimeAsFloat( float i_offset );
@@ -102,6 +104,7 @@ public:
 	void navigateNext();
 
     /* audio */
+    unsigned short GetVolume();
     void SetVolume( int value );
     void VolumeMute();
     void VolumeRestore();

@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.14 2002/12/26 18:17:38 stippi Exp $
+ * $Id: VlcWrapper.cpp,v 1.15 2003/01/08 02:09:15 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -24,6 +24,8 @@
  * along with this program{} if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#include <AppKit.h>
+#include <InterfaceKit.h>
 #include <SupportKit.h>
 
 #include <vlc/vlc.h>
@@ -34,6 +36,7 @@ extern "C" {
 }
 
 #include "VlcWrapper.h"
+#include "MsgVals.h"
 
 /* constructor */
 VlcWrapper::VlcWrapper( intf_thread_t *p_interface )
@@ -100,6 +103,11 @@ bool VlcWrapper::UpdateInputAndAOut()
  * input infos and control *
  ***************************/
 
+bool VlcWrapper::HasInput()
+{
+    return( p_input != NULL );
+}
+
 /* status (UNDEF_S, PLAYING_S, PAUSE_S, FORWARD_S, BACKWARD_S,
    REWIND_S, NOT_STARTED_S, START_S) */
 int VlcWrapper::InputStatus()
@@ -146,7 +154,6 @@ void VlcWrapper::InputSlower()
     {
         input_SetStatus( p_input, INPUT_STATUS_SLOWER );
     }
-    //VolumeMute();
 }
 
 void VlcWrapper::InputFaster()
@@ -155,7 +162,80 @@ void VlcWrapper::InputFaster()
     {
         input_SetStatus( p_input, INPUT_STATUS_FASTER );
     }
-    //VolumeMute();
+}
+
+BList * VlcWrapper::InputGetChannels( int i_cat )
+{
+    if( p_input )
+    {
+        unsigned int i;
+        uint32 what;
+        const char* fieldName;
+
+        switch( i_cat )
+        {
+            case AUDIO_ES:
+            {
+                what = SELECT_CHANNEL;
+                fieldName = "channel";
+                break;
+            }
+            case SPU_ES:
+            {
+                what = SELECT_SUBTITLE;
+                fieldName = "subtitle";
+                break;
+            }
+            default:
+            return NULL;
+       }
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+      
+        /* find which track is currently playing */
+        es_descriptor_t *p_es = NULL;
+        for( i = 0; i < p_input->stream.i_selected_es_number; i++ )
+        {
+            if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
+                p_es = p_input->stream.pp_selected_es[i];
+        }
+        
+        /* build a list of all tracks */
+        BList *list = new BList( p_input->stream.i_es_number );
+        BMenuItem *menuItem;
+        BMessage *message;
+        char *trackName;
+        
+        /* "None" */
+        message = new BMessage( what );
+        message->AddInt32( fieldName, -1 );
+        menuItem = new BMenuItem( "None", message );
+        if( !p_es )
+            menuItem->SetMarked( true );
+        list->AddItem( menuItem );
+        
+        for( i = 0; i < p_input->stream.i_es_number; i++ )
+        {
+            if( p_input->stream.pp_es[i]->i_cat == i_cat )
+            {
+                message = new BMessage( what );
+                message->AddInt32( fieldName, i );
+                if( strlen( p_input->stream.pp_es[i]->psz_desc ) )
+                    trackName = strdup( p_input->stream.pp_es[i]->psz_desc );
+                else
+                    trackName = "<unknown>";
+                menuItem = new BMenuItem( trackName, message );
+                if( p_input->stream.pp_es[i] == p_es )
+                    menuItem->SetMarked( true );
+                list->AddItem( menuItem );
+            }
+        }
+        
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        return list;
+    }
+    return NULL;
 }
 
 void VlcWrapper::openFiles( BList* o_files, bool replace )
@@ -182,68 +262,71 @@ void VlcWrapper::openDisc(BString o_type, BString o_device, int i_title, int i_c
 
 
 
-void VlcWrapper::toggleLanguage(int i_language)
+void VlcWrapper::ToggleLanguage( int i_language )
 {
-
-    int32 i_old = -1;
-    int i_cat = AUDIO_ES;
+    es_descriptor_t * p_es = NULL;
+    es_descriptor_t * p_es_old = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     for( unsigned int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
     {
-        if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
+        if( p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
         {
-            i_old = i;
-            break;
-        }
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    msg_Info( p_intf, "Old: %d,  New: %d", i_old, i_language);
-    if( i_language != -1 )
-    {
-        input_ToggleES( p_input, 
-                        p_input->stream.pp_selected_es[i_language],
-                        VLC_TRUE );
-    }
-
-    if( (i_old != -1) && (i_old != i_language) )
-    {
-        input_ToggleES( p_input, 
-                        p_input->stream.pp_selected_es[i_old],
-                        VLC_FALSE );
-    }
-}
-
-void VlcWrapper::toggleSubtitle(int i_subtitle)
-{
-    int32 i_old = -1;
-    int i_cat = SPU_ES;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    for( unsigned int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
-    {
-        if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
-        {
-            i_old = i;
+            p_es_old = p_input->stream.pp_selected_es[i];
             break;
         }
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     
-    msg_Info( p_intf, "Old: %d,  New: %d", i_old, i_subtitle);
+    if( i_language != -1 )
+    {
+        p_es = p_input->stream.pp_es[i_language];
+    }
+    if( p_es == p_es_old )
+    {
+        return;
+    }
+    if( p_es_old )
+    {
+        input_ToggleES( p_input, p_es_old, VLC_FALSE );
+    }
+    if( p_es )
+    {
+        input_ToggleES( p_input, p_es, VLC_TRUE );
+    }
+}
+
+void VlcWrapper::ToggleSubtitle( int i_subtitle )
+{
+    es_descriptor_t * p_es = NULL;
+    es_descriptor_t * p_es_old = NULL;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    for( unsigned int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
+    {
+        if( p_input->stream.pp_selected_es[i]->i_cat == SPU_ES )
+        {
+            p_es_old = p_input->stream.pp_selected_es[i];
+            break;
+        }
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    
     if( i_subtitle != -1 )
     {
-        input_ToggleES( p_input, 
-                        p_input->stream.pp_selected_es[i_subtitle],
-                        VLC_TRUE );
+        p_es = p_input->stream.pp_es[i_subtitle];
     }
-
-    if( (i_old != -1) && (i_old != i_subtitle) )
+    if( p_es == p_es_old )
     {
-        input_ToggleES( p_input, 
-                        p_input->stream.pp_selected_es[i_old],
-                        VLC_FALSE );
+        return;
+    }
+    if( p_es_old )
+    {
+        input_ToggleES( p_input, p_es_old, VLC_FALSE );
+    }
+    if( p_es )
+    {
+        input_ToggleES( p_input, p_es, VLC_TRUE );
     }
 }
 
@@ -346,7 +429,6 @@ bool VlcWrapper::PlaylistPlay()
     if( PlaylistSize() )
     {
         playlist_Play( p_playlist );
-        //VolumeRestore();
     }
     return( true );
 }
@@ -600,6 +682,17 @@ void VlcWrapper::navigateNext()
 /***************************
  * audio infos and control *
  ***************************/
+
+unsigned short VlcWrapper::GetVolume()
+{
+    if( p_aout != NULL )
+    {
+        unsigned short i_volume;
+        aout_VolumeGet( p_aout, (audio_volume_t*)&i_volume );
+        return i_volume;
+    }
+    return 0;
+}
 
 void VlcWrapper::SetVolume(int value)
 {

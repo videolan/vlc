@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.12 2002/12/09 07:57:04 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.13 2003/01/08 02:09:15 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -135,8 +135,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	fileMenu->AddItem( item );
 	fileMenu->AddItem( new BMenuItem( "Quit", new BMessage( B_QUIT_REQUESTED ), 'Q') );
 
-	fLanguageMenu = new LanguageMenu("Language", AUDIO_ES, p_intf);
-	fSubtitlesMenu = new LanguageMenu("Subtitles", SPU_ES, p_intf);
+	fLanguageMenu = new LanguageMenu("Language", AUDIO_ES, p_wrapper);
+	fSubtitlesMenu = new LanguageMenu("Subtitles", SPU_ES, p_wrapper);
 
 	/* Add the Audio menu */
 	fAudioMenu = new BMenu( "Audio" );
@@ -346,7 +346,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				int32 channel;
 				if ( p_message->FindInt32( "channel", &channel ) == B_OK )
 				{
-					p_wrapper->toggleLanguage( channel );
+					p_wrapper->ToggleLanguage( channel );
 				}
 			}
 			break;
@@ -356,7 +356,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				int32 subtitle;
 				if ( p_message->FindInt32( "subtitle", &subtitle ) == B_OK )
-					 p_wrapper->toggleSubtitle( subtitle );
+					 p_wrapper->ToggleSubtitle( subtitle );
 			}
 			break;
 	
@@ -473,7 +473,7 @@ bool InterfaceWindow::QuitRequested()
  *****************************************************************************/
 void InterfaceWindow::updateInterface()
 {
-    if( /* has_input */ true )
+    if( p_wrapper->HasInput() )
     {
 		if ( acquire_sem( p_mediaControl->fScrubSem ) == B_OK )
 		{
@@ -522,6 +522,13 @@ void InterfaceWindow::updateInterface()
 		p_mediaControl->SetEnabled( p_wrapper->PlaylistSize() );
 		Unlock();
 	}
+
+    /* always force the user-specified volume */
+    /* FIXME : I'm quite sure there is a cleaner way to do this */
+    if( p_wrapper->GetVolume() != p_mediaControl->GetVolume() )
+    {
+        p_wrapper->SetVolume( p_mediaControl->GetVolume() );
+    }
 
 	fLastUpdateTime = system_time();
 }
@@ -890,12 +897,12 @@ int CDMenu::GetCD( const char *directory )
 /*****************************************************************************
  * LanguageMenu::LanguageMenu
  *****************************************************************************/
-LanguageMenu::LanguageMenu(const char *name, int menu_kind, 
-							intf_thread_t  *p_interface)
+LanguageMenu::LanguageMenu( const char *name, int menu_kind, 
+							VlcWrapper *p_wrapper )
 	:BMenu(name)
 {
 	kind = menu_kind;
-	p_intf = p_interface;
+	this->p_wrapper = p_wrapper;
 }
 
 /*****************************************************************************
@@ -924,82 +931,21 @@ void LanguageMenu::AttachedToWindow()
  *****************************************************************************/
 void LanguageMenu::_GetChannels()
 {
-#if 0 // must be ported to 0.5.0
-	char  *psz_name;
-	bool   b_active;
-	BMessage *msg;
-	BMenuItem *menu_item;
-	int	i;
-	es_descriptor_t *p_es  = NULL;
-
-	// Insert the "None" item if in subtitle mode
-	if( kind != AUDIO_ES ) //subtitle
-	{
-		msg = new BMessage( SELECT_SUBTITLE );
-		msg->AddInt32( "subtitle", -1 );
-		menu_item = new BMenuItem( "None", msg );
-		AddItem( menu_item );
-		menu_item->SetMarked( true );
-	}
-
-	input_thread_t* input = p_intf->p_sys->p_input;
-	if ( input )
-	{
-		vlc_mutex_lock( &input->stream.stream_lock );
-		for( i = 0; i < input->stream.i_selected_es_number; i++ )
-		{
-			if( kind == input->stream.pp_selected_es[i]->i_cat )
-				p_es = input->stream.pp_selected_es[i];
-		}
-	
-		int32 addedItems = 0;
-		bool emptyItemAdded = false;
-		uint32 what = kind == AUDIO_ES ? SELECT_CHANNEL : SELECT_SUBTITLE;
-		const char* fieldName = kind == AUDIO_ES ? "channel" : "subtitle";
-	
-		for ( i = 0; i < input->stream.i_es_number; i++ )
-		{
-			if ( kind == input->stream.pp_es[i]->i_cat )
-			{
-				bool addItem = true;
-				psz_name = input->stream.pp_es[i]->psz_desc;
-				// workarround for irritating empty strings
-				if ( strcmp(psz_name, "") == 0 )
-				{
-//					if ( kind != AUDIO_ES )	// don't add empty subtitle items, they don't work anyways
-//						addItem = false;
-//					else
-//					{
-						if (!emptyItemAdded)
-						{
-							psz_name = "<default>";
-							emptyItemAdded = true;
-						}
-						else
-							psz_name = "<unkown>";
-//					}
-				}
-				if ( addItem )
-				{
-					addedItems++;
-					msg = new BMessage( what );
-					msg->AddInt32( fieldName, i );
-					menu_item = new BMenuItem( psz_name, msg );
-					AddItem( menu_item );
-					b_active = ( p_es == input->stream.pp_es[i] );
-					menu_item->SetMarked( b_active );
-				}
-			}
-		}
-		vlc_mutex_unlock( &input->stream.stream_lock );
-	
-		// enhance readability and separate first item from rest
-		if ( ( emptyItemAdded || kind != AUDIO_ES ) && addedItems > 1 )
-			 AddItem( new BSeparatorItem(), 1 );
-	}
-#endif
+    BMenuItem *item;
+    BList *list;
+    
+    if( ( list = p_wrapper->InputGetChannels( kind ) ) == NULL )
+        return;
+    
+    for( int i = 0; i < list->CountItems(); i++ )
+    {
+        item = (BMenuItem*)list->ItemAt( i );
+        AddItem( item );
+    }
+    
+    if( list->CountItems() > 1 )
+        AddItem( new BSeparatorItem(), 1 );
 }
-
 
 
 /*****************************************************************************
