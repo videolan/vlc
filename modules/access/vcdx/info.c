@@ -341,7 +341,7 @@ VCDCreatePlayListItem(const access_t *p_access,
     break;
   }
 
-  snprintf(psz_mrl, psz_mrl_max, "%s%s@%c%u", VCD_MRL_PREFIX, psz_source,
+  snprintf(psz_mrl, psz_mrl_max, "%s%s@%c%3u", VCD_MRL_PREFIX, psz_source,
            c_type, itemid->num);
 
   p_title =
