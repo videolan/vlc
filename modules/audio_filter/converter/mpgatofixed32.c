@@ -3,7 +3,7 @@
  * using MAD (MPEG Audio Decoder)
  *****************************************************************************
  * Copyright (C) 2001 by Jean-Paul Saman
- * $Id: mpgatofixed32.c,v 1.5 2003/02/21 14:17:46 hartman Exp $
+ * $Id: mpgatofixed32.c,v 1.6 2003/02/21 15:16:52 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -123,18 +123,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         msg_Warn( p_aout, "libmad error: %s",
                   mad_stream_errorstr( &p_sys->mad_stream ) );
-        if( p_filter->output.i_format == VLC_FOURCC('f','l','3','2') )
-        {
-            int i;
-	    float * a = (float *)p_out_buf->p_buffer;
-            for ( i = 0 ; i < p_out_buf->i_nb_samples ; i++ )
-                *a++ = 0.0;
-            return;
-        }
-        else
-        {
-            memset( p_out_buf->p_buffer, 0, p_out_buf->i_nb_bytes );
-        } 
+        memset( p_out_buf->p_buffer, 0, p_out_buf->i_nb_bytes );
     }
     mad_synth_frame( &p_sys->mad_synth, &p_sys->mad_frame );
 
