@@ -803,7 +803,7 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} mpeg_video idct idctclassic motion"
-PLUGINS="${PLUGINS} dummy rc logger gestures access_file memcpy"
+PLUGINS="${PLUGINS} dummy rc logger gestures memcpy"
 PLUGINS="${PLUGINS} es audio m4v mpeg_system ps ts avi asf aac mp4 rawdv"
 PLUGINS="${PLUGINS} spudec mpeg_audio lpcm a52 dts cinepak"
 PLUGINS="${PLUGINS} deinterlace invert adjust wall transform distort clone crop motionblur"
@@ -816,8 +816,8 @@ PLUGINS="${PLUGINS} aout_file"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm a52sys au"
-PLUGINS="${PLUGINS} access_udp access_http ipv4 access_mms access_ftp"
-PLUGINS="${PLUGINS} sap httpd"
+PLUGINS="${PLUGINS} access_file access_udp access_http ipv4 access_mms"
+PLUGINS="${PLUGINS} access_ftp access_directory sap httpd"
 
 dnl
 dnl Some plugins aren't useful on some platforms
