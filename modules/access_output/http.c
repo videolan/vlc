@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.11 2004/02/03 20:12:53 fenrir Exp $
+ * $Id: http.c,v 1.12 2004/03/03 13:25:53 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -32,7 +32,7 @@
 #include <vlc/input.h>
 #include <vlc/sout.h>
 
-#include "httpd.h"
+#include "vlc_httpd.h"
 
 #define FREE( p ) if( p ) { free( p); (p) = NULL; }
 
@@ -60,8 +60,6 @@ vlc_module_end();
 
 struct sout_access_out_sys_t
 {
-    httpd_t             *p_httpd;
-
     /* host */
     httpd_host_t        *p_httpd_host;
 
@@ -75,6 +73,7 @@ struct sout_access_out_sys_t
     vlc_bool_t          b_header_complete;
 };
 
+#if 0
 static struct
 {
     char *psz_ext;
@@ -122,6 +121,8 @@ static char *GetMime( char *psz_name )
     }
     return( "application/octet-stream" );
 }
+#endif
+
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -136,7 +137,7 @@ static int Open( vlc_object_t *p_this )
     int                 i_bind_port;
     char                *psz_file_name;
 
-    char                *psz_mime;
+    char                *psz_mime = NULL;
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
@@ -196,58 +197,35 @@ static int Open( vlc_object_t *p_this )
         psz_file_name = strdup( psz_file_name );
     }
 
-    p_sys->p_httpd = httpd_Find( VLC_OBJECT(p_access), VLC_TRUE );
-    if( !p_sys->p_httpd )
-    {
-        msg_Err( p_access, "cannot start httpd daemon" );
-
-        free( psz_name );
-        free( psz_file_name );
-        free( p_sys );
-        return( VLC_EGENERIC );
-    }
-
-    p_sys->p_httpd_host =
-        p_sys->p_httpd->pf_register_host( p_sys->p_httpd,
-                                          psz_bind_addr, i_bind_port );
-
-    if( !p_sys->p_httpd_host )
+    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_access), psz_bind_addr, i_bind_port );
+    if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_access, "cannot listen on %s:%d", psz_bind_addr, i_bind_port );
-        httpd_Release( p_sys->p_httpd );
 
         free( psz_name );
         free( psz_file_name );
         free( p_sys );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     if( p_access->psz_access && !strcmp( p_access->psz_access, "mmsh" ) )
     {
         psz_mime = "video/x-ms-asf-stream";
     }
-    else
-    {
-        psz_mime = GetMime( psz_file_name );
-    }
-    p_sys->p_httpd_stream =
-        p_sys->p_httpd->pf_register_stream( p_sys->p_httpd,
-                                            psz_file_name,
-                                            psz_mime,
-                                            sout_cfg_find_value( p_access->p_cfg, "user" ),
-                                            sout_cfg_find_value( p_access->p_cfg, "pwd" ) );
 
-    if( !p_sys->p_httpd_stream )
+    p_sys->p_httpd_stream = httpd_StreamNew( p_sys->p_httpd_host,
+                                             psz_file_name, psz_mime,
+                                             sout_cfg_find_value( p_access->p_cfg, "user" ),
+                                             sout_cfg_find_value( p_access->p_cfg, "pwd" ) );
+    if( p_sys->p_httpd_stream == NULL )
     {
         msg_Err( p_access, "cannot add stream %s", psz_file_name );
-        p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd, p_sys->p_httpd_host );
-        httpd_Release( p_sys->p_httpd );
+        httpd_HostDelete( p_sys->p_httpd_host );
 
         free( psz_name );
         free( psz_file_name );
         free( p_sys );
-
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
     free( psz_file_name );
@@ -272,14 +250,12 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
 
-    p_sys->p_httpd->pf_unregister_stream( p_sys->p_httpd, p_sys->p_httpd_stream );
-    p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd, p_sys->p_httpd_host );
-
-    httpd_Release( p_sys->p_httpd );
+    httpd_StreamDelete( p_sys->p_httpd_stream );
+    httpd_HostDelete( p_sys->p_httpd_host );
 
     FREE( p_sys->p_header );
 
-    msg_Info( p_access, "Close" );
+    msg_Dbg( p_access, "Close" );
 
     free( p_sys );
 }
@@ -319,13 +295,11 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
         {
             p_sys->b_header_complete = VLC_TRUE;
 
-            p_sys->p_httpd->pf_header_stream( p_sys->p_httpd,
-                                              p_sys->p_httpd_stream,
-                                              p_sys->p_header, p_sys->i_header_size );
+            httpd_StreamHeader( p_sys->p_httpd_stream, p_sys->p_header, p_sys->i_header_size );
         }
-            /* send data */
-        i_err = p_sys->p_httpd->pf_send_stream( p_sys->p_httpd, p_sys->p_httpd_stream,
-                                                p_buffer->p_buffer, p_buffer->i_size );
+
+        /* send data */
+        i_err = httpd_StreamSend( p_sys->p_httpd_stream, p_buffer->p_buffer, p_buffer->i_size );
 
         p_next = p_buffer->p_next;
         sout_BufferDelete( p_access->p_sout, p_buffer );
