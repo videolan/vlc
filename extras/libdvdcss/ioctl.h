@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.10 2001/12/11 14:43:38 sam Exp $
+ * $Id: ioctl.h,v 1.11 2001/12/16 18:00:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,6 +31,10 @@ int ioctl_ReportASF         ( int, int *, int * );
 int ioctl_InvalidateAgid    ( int, int * );
 int ioctl_SendChallenge     ( int, int *, u8 * );
 int ioctl_SendKey2          ( int, int *, u8 * );
+
+#define DVD_KEY_SIZE 5
+#define DVD_CHALLENGE_SIZE 10
+#define DVD_DISCKEY_SIZE 2048
 
 /*****************************************************************************
  * Common macro, BeOS specific
@@ -102,9 +106,16 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 #endif
 
 /*****************************************************************************
+ * Additional types, OpenBSD specific
+ *****************************************************************************/
+#if defined( HAVE_OPENBSD_DVD_STRUCT )
+typedef union dvd_struct dvd_struct;
+typedef union dvd_authinfo dvd_authinfo;
+#endif
+
+/*****************************************************************************
  * Various DVD I/O tables
  *****************************************************************************/
-
 #if defined( SYS_BEOS ) || defined( WIN32 ) || defined ( SOLARIS_USCSI ) || defined ( HPUX_SCTL_IO )
     /* The generic packet command opcodes for CD/DVD Logical Units,
      * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
@@ -123,30 +134,20 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 #   define DVD_SEND_CHALLENGE       0x01
 #   define DVD_REPORT_KEY1          0x02
 #   define DVD_SEND_KEY2            0x03
+#   define DVD_REPORT_TITLE_KEY     0x04
 #   define DVD_REPORT_ASF           0x05
+#   define DVD_SEND_RPC             0x06
+#   define DVD_REPORT_RPC           0x08
 #   define DVD_INVALIDATE_AGID      0x3f
 #endif
-
-#if defined( HAVE_OPENBSD_DVD_STRUCT )
-
-/*****************************************************************************
- * OpenBSD ioctl specific
- *****************************************************************************/
-typedef union dvd_struct dvd_struct;
-typedef union dvd_authinfo dvd_authinfo;
-typedef u_int8_t dvd_key[5];
-typedef u_int8_t dvd_challenge[10];
-#endif
-
-
-#if defined( WIN32 )
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 /*****************************************************************************
  * win32 ioctl specific
  *****************************************************************************/
+#if defined( WIN32 )
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 #define IOCTL_DVD_START_SESSION         CTL_CODE(FILE_DEVICE_DVD, 0x0400, METHOD_BUFFERED, FILE_READ_ACCESS)
 #define IOCTL_DVD_READ_KEY              CTL_CODE(FILE_DEVICE_DVD, 0x0401, METHOD_BUFFERED, FILE_READ_ACCESS)

@@ -4,6 +4,8 @@
 
 HEAD
 
+  * Support for REPORT_TITLE_KEY and RPC commands by Håkan Hjort
+    <d95hjort@dtek.chalmers.se>.
   * HP-UX port courtesy of David Siebörger <drs-videolan@rucus.ru.ac.za>.
 
 1.0.1

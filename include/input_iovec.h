@@ -61,14 +61,14 @@ static __inline__ int readv( int i_fd, struct iovec *p_iovec, int i_count )
                 return -1;
             }
 
-	    i_total += i_bytes;
+            i_total += i_bytes;
 
             if( i_bytes != i_len )
-	    {
+            {
                 /* we reached the end of the file or a signal interrupted
-		   the read */
+                   the read */
                 return i_total;
-	    }
+            }
         }
 
         p_iovec++;

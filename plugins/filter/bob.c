@@ -2,7 +2,7 @@
  * bob.c : BOB deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: bob.c,v 1.1 2001/12/16 16:18:36 sam Exp $
+ * $Id: bob.c,v 1.2 2001/12/16 18:00:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -352,19 +352,24 @@ static int BobNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         i_chroma_bytes = p_pic->i_chroma_size * sizeof(pixel_data_t);
 
         /* Y buffer */
-        p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes + 2 * i_chroma_bytes );
+        p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes
+                                                   + 2 * i_chroma_bytes );
         p_pic->planes[ Y_PLANE ].i_bytes = i_luma_bytes;
         p_pic->planes[ Y_PLANE ].i_line_bytes = i_width * sizeof(pixel_data_t);
 
         /* U buffer */
-        p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data + i_height * i_width;
+        p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data
+                                           + i_height * i_width;
         p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ U_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof(pixel_data_t);
+        p_pic->planes[ U_PLANE ].i_line_bytes = p_pic->i_chroma_width
+                                                 * sizeof(pixel_data_t);
 
         /* V buffer */
-        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data + i_height * p_pic->i_chroma_width;
+        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data
+                                           + i_height * p_pic->i_chroma_width;
         p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes / 2;
-        p_pic->planes[ V_PLANE ].i_line_bytes = p_pic->i_chroma_width * sizeof(pixel_data_t);
+        p_pic->planes[ V_PLANE ].i_line_bytes = p_pic->i_chroma_width
+                                                 * sizeof(pixel_data_t);
 
         /* We allocated 3 planes */
         p_pic->i_planes = 3;
