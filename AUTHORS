@@ -338,5 +338,6 @@ N: Rémi Denis-Courmont
 E: rem@videolan.org
 C: courmisch
 D: SSL/TLS support (core, HTTP server, HTTP input)
+D: VOC files demultiplexer
 S: France
 
