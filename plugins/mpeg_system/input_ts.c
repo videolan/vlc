@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.11 2001/12/31 04:53:33 sam Exp $
+ * $Id: input_ts.c,v 1.12 2002/01/09 23:32:40 stef Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -323,9 +323,11 @@ static int TSRead( input_thread_t * p_input,
         {
             /* Delete remaining packets */
             p_input->pf_delete_packet( p_input->p_method_data, *pp_data );
-            *pp_data = NULL;
         }
     }
+   
+    *pp_data = NULL;
+
     return( i_read );
 }
 
