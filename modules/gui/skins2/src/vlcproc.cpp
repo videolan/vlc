@@ -2,7 +2,7 @@
  * vlcproc.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: vlcproc.cpp,v 1.2 2004/01/11 00:21:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -64,9 +64,15 @@ VlcProc::VlcProc( intf_thread_t *pIntf ):
     m_pTimer = pOsFactory->createOSTimer( Callback( this, &doManage ) );
     m_pTimer->start( 100, false );
 
-    // Callbacks for object variables
+    // Called when the playlist changes
     var_AddCallback( pIntf->p_sys-> p_playlist, "intf-change",
+                     onIntfChange, this );
+    // Called when the current played item changes
+    var_AddCallback( pIntf->p_sys-> p_playlist, "playlist-current",
                      onPlaylistChange, this );
+    // Called when a playlist items changed
+    var_AddCallback( pIntf->p_sys-> p_playlist, "item-change",
+                     onItemChange, this );
 
     getIntf()->p_sys->p_input = NULL;
 }
@@ -159,9 +165,9 @@ void VlcProc::doManage( SkinObject *pObj )
 }
 
 
-int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
-                               vlc_value_t oldVal, vlc_value_t newVal,
-                               void *pParam )
+int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
+                           vlc_value_t oldVal, vlc_value_t newVal,
+                           void *pParam )
 {
     VlcProc *pThis = ( VlcProc* )pParam;
 
@@ -173,6 +179,47 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     pQueue->remove( "notify playlist" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 
+    return VLC_SUCCESS;
+}
+
+
+int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
+                           vlc_value_t oldVal, vlc_value_t newVal,
+                           void *pParam )
+{
+    VlcProc *pThis = ( VlcProc* )pParam;
+
+    // Create a playlist notify command
+    // TODO: selective update
+    CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
+
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->remove( "notify playlist" );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+/*
+    p_playlist_dialog->UpdateItem( new_val.i_int );*/
+    return VLC_SUCCESS;
+}
+
+
+int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
+                               vlc_value_t oldVal, vlc_value_t newVal,
+                               void *pParam )
+{
+    VlcProc *pThis = ( VlcProc* )pParam;
+
+    // Create a playlist notify command
+    // TODO: selective update
+    CmdNotifyPlaylist *pCmd = new CmdNotifyPlaylist( pThis->getIntf() );
+
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->remove( "notify playlist" );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+/*
+    p_playlist_dialog->UpdateItem( old_val.i_int );
+    p_playlist_dialog->UpdateItem( new_val.i_int );*/
     return VLC_SUCCESS;
 }
 

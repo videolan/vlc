@@ -2,7 +2,7 @@
  * vlcproc.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: vlcproc.hpp,v 1.2 2004/01/11 00:21:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -33,7 +33,7 @@
 class OSTimer;
 
 
-/// Singleton object handling VLC internal state
+/// Singleton object handling VLC internal state and playlist
 class VlcProc: public SkinObject
 {
     public:
@@ -94,7 +94,17 @@ class VlcProc: public SkinObject
         /// always write "pThis->"
         static void doManage( SkinObject *pObj );
 
-        /// Callback for the playlist
+        /// Callback for intf-change variable
+        static int onIntfChange( vlc_object_t *pObj, const char *pVariable,
+                                 vlc_value_t oldVal, vlc_value_t newVal,
+                                 void *pParam );
+
+        /// Callback for item-change variable
+        static int onItemChange( vlc_object_t *pObj, const char *pVariable,
+                                 vlc_value_t oldVal, vlc_value_t newVal,
+                                 void *pParam );
+
+        /// Callback for playlist-current variable
         static int onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
                                      vlc_value_t oldVal, vlc_value_t newVal,
                                      void *pParam );

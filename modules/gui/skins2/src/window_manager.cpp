@@ -2,7 +2,7 @@
  * window_manager.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window_manager.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: window_manager.cpp,v 1.2 2004/01/11 00:21:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -139,21 +139,18 @@ void WindowManager::move( GenericWindow *pWindow, int left, int top ) const
 
 void WindowManager::raise( GenericWindow *pWindow )
 {
-    // Build a set of windows anchored to pWindow
-    WinSet_t winSet;
-    buildDependSet( winSet, pWindow );
-
-    // Raise the windows in the set
-    WinSet_t::const_iterator iter;
-    for( iter = winSet.begin(); iter != winSet.end(); iter++ )
+    // Raise all the windows
+    WinSet_t::const_iterator it;
+    for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        (*iter)->raise();
+        (*it)->raise();
     }
 }
 
 
 void WindowManager::showAll() const
 {
+    // Show all the windows
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {

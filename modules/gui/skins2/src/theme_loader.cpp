@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.2 2004/01/10 23:22:21 anil Exp $
+ * $Id: theme_loader.cpp,v 1.3 2004/01/11 00:21:22 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -475,7 +475,6 @@ int makedir( char *newdir )
     free( buffer );
     return 1;
 }
-
 #endif
 
 #ifdef HAVE_ZLIB_H
