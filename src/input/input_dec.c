@@ -133,8 +133,16 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         return NULL;
     }
 
-    var_Get( p_input, "minimize-threads", &val );
-    p_dec->p_owner->b_own_thread = val.b_bool ? VLC_FALSE : VLC_TRUE;
+    if( !p_es->b_force_decoder && p_input->stream.p_sout )
+    {
+        msg_Dbg( p_input, "stream out mode -> no decoder thread" );
+        p_dec->p_owner->b_own_thread = VLC_FALSE;
+    }
+    else
+    {
+        var_Get( p_input, "minimize-threads", &val );
+        p_dec->p_owner->b_own_thread = !val.b_bool;
+    }
 
     if( p_dec->p_owner->b_own_thread )
     {

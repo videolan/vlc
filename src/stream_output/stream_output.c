@@ -499,6 +499,14 @@ void sout_MuxDeleteStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     int i_index;
 
+    if( p_mux->b_waiting_stream && p_input->p_fifo->i_depth > 0 )
+    {
+        /* We stop waiting, and call the muxer for taking care of the data
+         * before we remove this es */
+        p_mux->b_waiting_stream = VLC_FALSE;
+        p_mux->pf_mux( p_mux );
+    }
+
     TAB_FIND( p_mux->i_nb_inputs, p_mux->pp_inputs, p_input, i_index );
     if( i_index >= 0 )
     {
