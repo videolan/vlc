@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.13 2003/02/01 18:54:10 sam Exp $
+ * $Id: xcommon.c,v 1.14 2003/02/09 23:42:06 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -613,7 +613,10 @@ static int ManageVideo( vout_thread_t *p_vout )
             switch( ((XButtonEvent *)&xevent)->button )
             {
                 case Button1:
-
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int |= 1;
+                    var_Set( p_vout, "mouse-button-down", val );
+                    
                     /* detect double-clicks */
                     if( ( ((XButtonEvent *)&xevent)->time -
                           p_vout->p_sys->i_time_button_last_pressed ) < 300 )
@@ -624,12 +627,29 @@ static int ManageVideo( vout_thread_t *p_vout )
                     p_vout->p_sys->i_time_button_last_pressed =
                         ((XButtonEvent *)&xevent)->time;
                     break;
-
+                case Button2:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int |= 2;
+                    var_Set( p_vout, "mouse-button-down", val );
+                    break;
+                
+                case Button3:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int |= 4;
+                    var_Set( p_vout, "mouse-button-down", val );
+                    break;
+                
                 case Button4:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int |= 8;
+                    var_Set( p_vout, "mouse-button-down", val );
                     input_Seek( p_vout, 15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                     break;
 
                 case Button5:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int |= 16;
+                    var_Set( p_vout, "mouse-button-down", val );
                     input_Seek( p_vout, -15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                     break;
             }
@@ -640,13 +660,26 @@ static int ManageVideo( vout_thread_t *p_vout )
             switch( ((XButtonEvent *)&xevent)->button )
             {
                 case Button1:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int &= ~1;
+                    var_Set( p_vout, "mouse-button-down", val );
+
                     val.b_bool = VLC_TRUE;
                     var_Set( p_vout, "mouse-clicked", val );
                     break;
-
+                    
+                case Button2:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int &= ~2;
+                    var_Set( p_vout, "mouse-button-down", val );
+                    break;
+                    
                 case Button3:
                     {
                         intf_thread_t *p_intf;
+                        var_Get( p_vout, "mouse-button-down", &val );
+                        val.i_int &= ~4;
+                        var_Set( p_vout, "mouse-button-down", val );
                         p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
                                                           FIND_ANYWHERE );
                         if( p_intf )
@@ -656,6 +689,19 @@ static int ManageVideo( vout_thread_t *p_vout )
                         }
                     }
                     break;
+
+                case Button4:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int &= ~8;
+                    var_Set( p_vout, "mouse-button-down", val );
+                    break;
+
+                case Button5:
+                    var_Get( p_vout, "mouse-button-down", &val );
+                    val.i_int &= ~16;
+                    var_Set( p_vout, "mouse-button-down", val );
+                    break;
+                    
             }
         }
         /* Mouse move */

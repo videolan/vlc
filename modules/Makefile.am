@@ -28,6 +28,7 @@ EXTRA_DIST = \
 	codec/spudec/Modules.am \
 	control/lirc/Modules.am \
 	control/rc/Modules.am \
+	control/Modules.am \
 	demux/Modules.am \
 	demux/aac/Modules.am \
 	demux/avi/Modules.am \
