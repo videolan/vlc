@@ -311,6 +311,8 @@ static char *preset_list[] = {
             b_2p = var_GetBool( p_aout, "equalizer-2pass" );
             vlc_object_release( p_aout );
         }
+        if( !p )
+            p = "0 0 0 0 0 0 0 0 0 0";
 
 /* Set the preamp slider */
         [o_slider_preamp setFloatValue: preamp];
