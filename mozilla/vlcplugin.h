@@ -2,7 +2,7 @@
  * vlcplugin.h: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.h,v 1.10 2003/02/18 13:13:12 sam Exp $
+ * $Id: vlcplugin.h,v 1.11 2003/07/17 09:25:58 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -95,6 +95,8 @@ private:
     "application/x-ogg:ogg:Ogg stream;" \
     /* explicit plugin call */ \
     "application/x-vlc-plugin::VLC plugin;" \
+    /* windows media */ \
     "video/x-ms-asf-plugin:asf,asx:Windows Media Video;" \
-    "application/x-mplayer2::Windows Media"
+    "application/x-mplayer2::Windows Media;" \
+    "video/x-ms-wmv:wmv:Windows Media" \
 
