@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.71 2002/01/14 12:15:10 asmax Exp $
+ * $Id: audio_output.c,v 1.72 2002/01/14 19:54:36 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -171,6 +171,27 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
 
     return( p_aout );
 }
+
+
+/*****************************************************************************
+ * Declare the different aout thread fucntions
+ *****************************************************************************/
+ DECLARE_AOUT_THREAD( S16, s16, ( p_aout->s32_buffer[l_buffer] / 
+        AOUT_MAX_FIFOS ) * p_aout->i_volume / 256 )
+
+ DECLARE_AOUT_THREAD( U8, u8, (( p_aout->s32_buffer[l_buffer] / 
+        AOUT_MAX_FIFOS / 256) + 128 ) * p_aout->i_volume / 256 )
+
+void aout_S8Thread( aout_thread_t * p_aout )
+{
+    intf_ErrMsg( "aout error: 8 bit signed thread unsupported" );
+}
+
+void aout_U16Thread( aout_thread_t * p_aout )
+{
+    intf_ErrMsg( "aout error: 16 bit unsigned thread unsupported" );
+}
+
 
 /*****************************************************************************
  * aout_SpawnThread

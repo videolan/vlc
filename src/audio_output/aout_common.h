@@ -2,7 +2,7 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_common.h,v 1.7 2002/01/14 12:15:10 asmax Exp $
+ * $Id: aout_common.h,v 1.8 2002/01/14 19:54:36 asmax Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>   
@@ -39,16 +39,70 @@ void aout_SpdifThread         ( aout_thread_t * p_aout );
 void aout_FillBuffer          ( aout_thread_t * p_aout, aout_fifo_t * p_fifo );
 
 
-#define UPDATE_INCREMENT( increment, integer ) \
-    if ( ((increment).l_remainder += (increment).l_euclidean_remainder) >= 0 )\
-    { \
-        (integer) += (increment).l_euclidean_integer + 1; \
-        (increment).l_remainder -= (increment).l_euclidean_denominator; \
-    } \
-    else \
-    { \
-        (integer) += (increment).l_euclidean_integer; \
-    }
+/* Generic main thread function "aout_XXXThread"
+ */
+#define DECLARE_AOUT_THREAD( format, type, buffer_copy )                      \
+void aout_##format##Thread( aout_thread_t * p_aout )                          \
+{                                                                             \
+                                                                              \
+    int i_fifo;                                                               \
+    long l_buffer, l_buffer_limit, l_bytes;                                   \
+                                                                              \
+    /* As the s32_buffer was created with calloc(), we don't have to set this \
+     * memory to zero and we can immediately jump into the thread's loop */   \
+    while ( ! p_aout->b_die )                                                 \
+    {                                                                         \
+        vlc_mutex_lock( &p_aout->fifos_lock );                                \
+                                                                              \
+        for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )                 \
+        {                                                                     \
+            if( p_aout->fifo[i_fifo].b_die )                                  \
+            {                                                                 \
+                aout_FreeFifo( &p_aout->fifo[i_fifo] );                       \
+            }                                                                 \
+            else                                                              \
+            {                                                                 \
+                aout_FillBuffer( p_aout, &p_aout->fifo[i_fifo] );             \
+            }                                                                 \
+        }                                                                     \
+                                                                              \
+        vlc_mutex_unlock( &p_aout->fifos_lock );                              \
+                                                                              \
+        l_buffer_limit = p_aout->l_units << p_aout->b_stereo;                 \
+                                                                              \
+        for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )           \
+        {                                                                     \
+            ((type *)p_aout->buffer)[l_buffer] = (type)( buffer_copy );       \
+            p_aout->s32_buffer[l_buffer] = 0;                                 \
+        }                                                                     \
+                                                                              \
+        l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );            \
+                                                                              \
+        p_aout->date = mdate() + ((((mtime_t)((l_bytes + 4 *                  \
+                p_aout->i_latency) /                                          \
+                (sizeof(type) << p_aout->b_stereo))) * 1000000) /             \
+                ((mtime_t)p_aout->l_rate)) + p_main->i_desync;                \
+                                                                              \
+        p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit *   \
+                sizeof(type) );                                               \
+                                                                              \
+        if ( l_bytes > (l_buffer_limit * sizeof(type)) )                      \
+        {                                                                     \
+            msleep( p_aout->l_msleep );                                       \
+        }                                                                     \
+    }                                                                         \
+                                                                              \
+    vlc_mutex_lock( &p_aout->fifos_lock );                                    \
+                                                                              \
+    for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )                     \
+    {                                                                         \
+        aout_FreeFifo( &p_aout->fifo[i_fifo] );                               \
+    }                                                                         \
+                                                                              \
+    vlc_mutex_unlock( &p_aout->fifos_lock );                                  \
+                                                                              \
+}                                                                             \
+
 
 /*****************************************************************************
  * InitializeIncrement
@@ -71,89 +125,21 @@ static __inline__ void InitializeIncrement( aout_increment_t * p_increment,
     p_increment->l_euclidean_denominator = l_denominator;
 }
 
+
 /*****************************************************************************
- * NextFrame
+ * UpdateIncrement
  *****************************************************************************/
-static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
-                                 mtime_t aout_date )
+static __inline__ void UpdateIncrement( aout_increment_t * p_increment, 
+        long * p_integer )
 {
-    long l_units, l_rate;
-    u64 l_delta;    
-
-    /* We take the lock */
-    vlc_mutex_lock( &p_fifo->data_lock );
-
-    /* Are we looking for a dated start frame ? */
-    if ( !p_fifo->b_start_frame )
+    if( (p_increment->l_remainder += p_increment->l_euclidean_remainder) >= 0 )
     {
-        while ( p_fifo->l_start_frame != p_fifo->l_end_frame )
-        {
-            if ( p_fifo->date[p_fifo->l_start_frame] != LAST_MDATE )
-            {
-                p_fifo->b_start_frame = 1;
-                p_fifo->l_next_frame = (p_fifo->l_start_frame + 1) & AOUT_FIFO_SIZE;
-                p_fifo->l_unit = p_fifo->l_start_frame * (p_fifo->l_frame_size >> (p_fifo->b_stereo));
-                break;
-            }
-            p_fifo->l_start_frame = (p_fifo->l_start_frame + 1) & AOUT_FIFO_SIZE;
-        }
-
-        if ( p_fifo->l_start_frame == p_fifo->l_end_frame )
-        {
-            vlc_mutex_unlock( &p_fifo->data_lock );
-            return( -1 );
-        }
-    }
-
-    /* We are looking for the next dated frame */
-    /* FIXME : is the output fifo full ?? */
-    while ( !p_fifo->b_next_frame )
-    {
-        while ( p_fifo->l_next_frame != p_fifo->l_end_frame )
-        {
-            if ( p_fifo->date[p_fifo->l_next_frame] != LAST_MDATE )
-            {
-                p_fifo->b_next_frame = 1;
-                break;
-            }
-            p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;
-        }
-
-        while ( p_fifo->l_next_frame == p_fifo->l_end_frame )
-        {
-            vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
-            if ( p_fifo->b_die )
-            {
-                vlc_mutex_unlock( &p_fifo->data_lock );
-                return( -1 );
-            }
-        }
-    }
-
-    l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> (p_fifo->b_stereo));
-
-    l_delta = aout_date - p_fifo->date[p_fifo->l_start_frame];
-
-/* Resample if delta is too long */
-    if( abs(l_delta) > MAX_DELTA )
-    {
-        l_rate = p_fifo->l_rate + (l_delta / 256);
+        *p_integer += p_increment->l_euclidean_integer + 1;
+        p_increment->l_remainder -= p_increment->l_euclidean_denominator;
     }
     else
     {
-        l_rate = p_fifo->l_rate;
+        *p_integer += p_increment->l_euclidean_integer;
     }
-
-    intf_DbgMsg( "aout debug: %lli (%li);", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
-
-    InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->l_rate );
-
-    p_fifo->l_units = (((l_units - (p_fifo->l_unit -
-        (p_fifo->l_start_frame * (p_fifo->l_frame_size >> (p_fifo->b_stereo)))))
-        * p_aout->l_rate) / l_rate) + 1;
-
-    /* We release the lock before leaving */
-    vlc_mutex_unlock( &p_fifo->data_lock );
-    return( 0 );
 }
 
