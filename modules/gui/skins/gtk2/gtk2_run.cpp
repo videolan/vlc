@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.9 2003/04/16 19:22:53 karibu Exp $
+ * $Id: gtk2_run.cpp,v 1.10 2003/04/16 21:30:56 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -45,6 +45,14 @@
 
 
 //---------------------------------------------------------------------------
+class CallBackObjects
+{
+    public:
+        VlcProc *Proc;
+        GMainLoop *Loop;
+};
+
+//---------------------------------------------------------------------------
 // Specific method
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg );
@@ -68,10 +76,15 @@ int  SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 void GTK2Proc( GdkEvent *event, gpointer data )
 {
+    // Get objects from data
+    CallBackObjects *obj = (CallBackObjects *)data;
+    VlcProc *proc        = obj->Proc;
+
     // Get pointer to thread info
-    unsigned int msg;
-    VlcProc *proc = (VlcProc *)data;
     intf_thread_t *p_intf = proc->GetpIntf();
+
+    // Variables
+    unsigned int msg;
     Event *evt;
     list<Window *>::const_iterator win;
     GdkWindow *gwnd = ((GdkEventAny *)event)->window;
@@ -91,7 +104,7 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     else
     {
         msg = event->type;
-        evt = (Event *)new OSEvent( p_intf, 
+        evt = (Event *)new OSEvent( p_intf,
             ((GdkEventAny *)event)->window, msg, 0, (long)event );
     }
 
@@ -101,7 +114,7 @@ void GTK2Proc( GdkEvent *event, gpointer data )
         if( !proc->EventProc( evt ) )
         {
             fprintf( stderr, "Quit\n" );
-            g_main_context_unref( g_main_context_default() );
+            g_main_loop_quit( obj->Loop );
             return;      // Exit VLC !
         }
     }
@@ -185,13 +198,17 @@ void GTK2Proc( GdkEvent *event, gpointer data )
 void OSRun( intf_thread_t *p_intf )
 {
     // Create VLC event object processing
-    VlcProc *proc = new VlcProc( p_intf );
+    CallBackObjects *callbackobj = new CallBackObjects();
+    callbackobj->Proc = new VlcProc( p_intf );
+    callbackobj->Loop = g_main_loop_new( NULL, TRUE );
 
-    gdk_event_handler_set( GTK2Proc, (gpointer)proc, NULL );
+    // Set event callback
+    gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
 
     // Main event loop
-    GMainLoop *loop = g_main_loop_new( NULL, TRUE );
-    g_main_loop_run( loop );
+    g_main_loop_run( callbackobj->Loop );
+
+    delete callbackobj;
 }
 //---------------------------------------------------------------------------
 bool IsVLCEvent( unsigned int msg )
