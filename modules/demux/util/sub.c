@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.15 2003/05/13 22:33:33 gbazin Exp $
+ * $Id: sub.c,v 1.16 2003/06/26 18:14:56 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,7 +36,7 @@
 #if defined(USE_FREETYPE)
 #include <osd.h>
 #endif
-#include "video.h"
+#include "vlc_video.h"
 
 #include "sub.h"
 
