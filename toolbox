@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.14 2003/03/12 05:12:05 sam Exp $
+##  $Id: toolbox,v 1.15 2003/03/17 16:59:46 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -42,11 +42,6 @@ getfiles()
 ###
 ###  argument check
 ###
-do_changelog=no
-do_po=no
-do_vc=no
-do_includes=no
-do_glade=no
 
 if test "$1" = ""
 then
@@ -55,19 +50,19 @@ fi
 
 case "$1" in
   --update-changelog)
-    do_changelog=yes
+    action=changelog
     ;;
   --update-vc)
-    do_vc=yes
+    action=vc
     ;;
   --update-po)
-    do_po=yes
+    action=po
     ;;
   --update-includes)
-    do_includes=yes
+    action=includes
     ;;
   --update-glade|--fix-glade)
-    do_glade=yes
+    action=glade
     ;;
   --help)
     help
@@ -82,7 +77,7 @@ shift
 ##
 ##  Update the CVS changelog
 ##
-if test "$do_changelog" = "yes"
+if test "${action}" = "changelog"
 then
   cvs2cl --help >/dev/null 2>&1 || exit 1
   rm -f ChangeLog
@@ -95,7 +90,7 @@ fi
 ##
 ##  Update the MSVC project files
 ##
-if test "$do_vc" = "yes"
+if test "${action}" = "vc"
 then
   echo "generating Visual Studio files..."
 
@@ -311,7 +306,7 @@ fi
 ##
 ##  Update the potfiles because no one ever does it
 ##
-if test "$do_po" = "yes"
+if test "${action}" = "po"
 then
   # create a fake file containing win32 strings
   rm -f modules/gui/win32/strings.cpp
@@ -335,7 +330,7 @@ fi
 ##
 ##  Create include files
 ##
-if test "$do_includes" = "yes"
+if test "${action}" = "includes"
 then
   set -x
 
@@ -409,7 +404,7 @@ fi
 ##
 ##  Fix glade-generated files
 ##
-if test "$do_glade" = "yes"
+if test "${action}" = "glade"
 then
   for file in modules/gui/gtk/gnome.glade modules/gui/gtk/gtk.glade modules/gui/familiar/familiar.glade
   do

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.44 2003/03/12 04:16:02 sam Exp $
+##  $Id: bootstrap,v 1.45 2003/03/17 16:59:46 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -173,7 +173,17 @@ echo "done."
 ###  classic bootstrap stuff
 ###
 set -x
-rm -f aclocal.m4 m4/oldgettext.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh ABOUT-NLS
+
+# remove autotools cruft
+rm -f aclocal.m4 configure config.log
+# remove old autotools extra cruft
+rm -f config.guess config.sub missing mkinstalldirs compile depcomp install-sh
+# remove new autotools extra cruft
+(cd autotools && rm -f config.guess config.sub missing mkinstalldirs compile depcomp install-sh)
+# remove libtool cruft
+rm -f ltmain.sh libtool ltconfig
+# remove gettext cruft
+rm -f m4/oldgettext.m4 ABOUT-NLS
 rm -Rf intl
 
 # Check for gettext

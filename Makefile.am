@@ -6,7 +6,7 @@
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
 SUBDIRS = po intl m4 share
-DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib
+DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib autotools
 
 EXTRA_DIST = HACKING MAINTAINERS src/extras/COPYING \
              INSTALL.win32 README.MacOSX.rtf vlc.spec install-win32 \
