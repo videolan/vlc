@@ -625,7 +625,7 @@ PLUGINS="${PLUGINS} wav araw demuxdump demuxsub"
 dnl
 dnl  Network modules
 dnl
-NETWORK_MODULES="access_udp access_http access_rtp ipv4 access_mms"
+NETWORK_MODULES="access_udp access_http access_rtp ipv4 access_mms sap"
 
 dnl
 dnl  Accelerated modules

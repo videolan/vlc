@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.24 2002/12/03 12:59:21 sam Exp $
+ * $Id: libvlc.h,v 1.25 2002/12/03 16:29:04 gitan Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -358,6 +358,10 @@
     "\n  vlc:quit                       quit VLC" \
     "\n")
 
+#define SAP_TEXT N_( "Session Announcement Protocol support" )
+#define SAP_LONGTEXT N_( "Session Announcement Protocol support" )
+
+
 /*
  * Quick usage guide for the configuration options:
  *
@@ -475,6 +479,7 @@ vlc_module_begin();
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), NULL );
+    add_bool( "sap", 1, NULL, SAP_TEXT, SAP_LONGTEXT );
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT );

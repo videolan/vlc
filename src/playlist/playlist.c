@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.23 2002/11/21 15:51:57 gbazin Exp $
+ * $Id: playlist.c,v 1.24 2002/12/03 16:29:04 gitan Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -105,8 +105,37 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
 {
     playlist_item_t *p_item;
 
-    msg_Dbg( p_playlist, "adding playlist item « %s »", psz_target );
 
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    /*
+     * CHECK_INSERT : checks if the item is already enqued before 
+     * enqueing it
+     */
+    if ( i_mode & PLAYLIST_CHECK_INSERT )
+    {
+         int j;
+       
+         if ( p_playlist->pp_items )
+         {
+             for ( j = 0; j < p_playlist->i_size; j++ )
+             {
+                 if ( !strcmp( p_playlist->pp_items[j]->psz_name, psz_target ) )
+                 {
+                      msg_Dbg( p_playlist, "item « %s » already enqued", 
+                                        psz_target );
+                      vlc_mutex_unlock( &p_playlist->object_lock );
+                      return 0;   
+                 }
+             }
+         }
+         i_mode &= ~PLAYLIST_CHECK_INSERT;
+         i_mode |= PLAYLIST_APPEND;
+    }
+
+    
+    msg_Dbg( p_playlist, "adding playlist item « %s »", psz_target );
+    
     /* Create the new playlist item */
     p_item = malloc( sizeof( playlist_item_t ) );
     if( p_item == NULL )
@@ -119,7 +148,6 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     p_item->i_status = 0;
     p_item->b_autodeletion = VLC_FALSE;
 
-    vlc_mutex_lock( &p_playlist->object_lock );
 
     /* Do a few boundary checks and allocate space for the item */
     if( i_pos == PLAYLIST_END )

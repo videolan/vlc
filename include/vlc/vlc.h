@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.17 2002/10/17 13:15:30 sam Exp $
+ * $Id: vlc.h,v 1.18 2002/12/03 16:29:04 gitan Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,10 +74,11 @@ typedef union
  *****************************************************************************/
 
 /* Used by playlist_Add */
-#define PLAYLIST_INSERT      0x0001
-#define PLAYLIST_REPLACE     0x0002
-#define PLAYLIST_APPEND      0x0004
-#define PLAYLIST_GO          0x0008
+#define PLAYLIST_INSERT          0x0001
+#define PLAYLIST_REPLACE         0x0002
+#define PLAYLIST_APPEND          0x0004
+#define PLAYLIST_GO              0x0008
+#define PLAYLIST_CHECK_INSERT    0x0010
 
 #define PLAYLIST_END           -666
 

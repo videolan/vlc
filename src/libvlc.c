@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.48 2002/11/28 17:35:00 sam Exp $
+ * $Id: libvlc.c,v 1.49 2002/12/03 16:29:04 gitan Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -755,7 +755,15 @@ int VLC_Play( int i_object )
     {
         return VLC_ENOOBJ;
     }
+    
+    /* add pseudo sap interface; non blocking */
+    if( config_GetInt( p_vlc, "sap" ) )
+    {
+        msg_Dbg( p_vlc, "adding sap interface" );
+        VLC_AddIntf( 0, "sap", VLC_FALSE );
+    }
 
+    
     p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_CHILD );
 
     if( !p_playlist )
