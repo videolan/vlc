@@ -2,7 +2,7 @@
  * item.c : Playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item.c,v 1.11 2004/01/06 08:50:20 zorglub Exp $
+ * $Id: item.c,v 1.12 2004/01/17 14:08:37 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -40,7 +40,7 @@
  * \param i_pos the possition in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of it's size
- * \return position of the new item
+ * \return The id of the playlist item
 */
 int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
                 int i_mode, int i_pos)

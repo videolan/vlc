@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.9 2004/01/17 12:28:57 gbazin Exp $
+ * $Id: item-ext.c,v 1.10 2004/01/17 14:08:37 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -42,7 +42,7 @@
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of it's size
  * \param i_duration length of the item in milliseconds.
- * \return the position of the new item
+ * \return The id of the playlist item
 */
 int playlist_AddWDuration( playlist_t *p_playlist, const char * psz_uri,
                            const char *psz_name, int i_mode, int i_pos,
@@ -89,7 +89,7 @@ int playlist_AddWDuration( playlist_t *p_playlist, const char * psz_uri,
  * \param i_pos the position in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of it's size
- * \return the position of the new item
+ * \return The id of the playlist item
 */
 int playlist_Add( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, int i_mode, int i_pos )
