@@ -1065,13 +1065,13 @@ AC_CACHE_CHECK([if \$CC groks AltiVec C extensions],
      AC_TRY_COMPILE([],
        [vec_ld(0, (unsigned char *)0);],
        [ac_cv_c_altivec="-faltivec"],
-       [# Linux/PPC test
-        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -maltivec -mabi=altivec"
+       [# Linux/PPC test (no flags)
+        CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec}"
         AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
                         #include <altivec.h>
                         #endif],
           [vec_ld(0, (unsigned char *)0);],
-          [ac_cv_c_altivec="-maltivec -mabi=altivec"],
+          [ac_cv_c_altivec=""],
           [# Linux/PPC test (old GCC versions)
            CFLAGS="${CFLAGS_save} ${CFLAGS_idctaltivec} -fvec"
            AC_TRY_COMPILE([#ifdef HAVE_ALTIVEC_H
@@ -1774,85 +1774,103 @@ AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
 if test "${enable_ffmpeg}" != "no"
 then
-  AC_ARG_WITH(ffmpeg-mp3lame,
-    [    --with-ffmpeg-mp3lame   if ffmpeg has been compiled with mp3lame support],
-    [
-      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-      dnl       linker would miserably barf on multiple definitions.
-      VLC_ADD_LDFLAGS([stream_out_transcode],[])
-      VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
+  FFMPEG_PATH="${PATH}"
+  AC_ARG_WITH(ffmpeg-config-path,
+    [    --with-ffmpeg-config-path=PATH ffmpeg-config path (default search in \$PATH)],
+    [ if test "${with_ffmpeg_config_path}" != "no"
+      then
+        FFMPEG_PATH="${with_ffmpeg_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(FFMPEG_CONFIG, ffmpeg-config, no, ${FFMPEG_PATH})
+  if test "${FFMPEG_CONFIG}" != "no"
+  then
+    AC_CHECK_HEADERS(ffmpeg/avcodec.h)
+    AC_CHECK_HEADERS(postproc/postprocess.h)
+    VLC_ADD_PLUGINS([ffmpeg stream_out_transcode])
+    VLC_ADD_CFLAGS([ffmpeg stream_out_transcode],[`${FFMPEG_CONFIG} --cflags`])
+    VLC_ADD_LDFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
+    VLC_ADD_LDFLAGS([stream_out_transcode],[`${FFMPEG_CONFIG} --libs avcodec`])
+  else
+    AC_ARG_WITH(ffmpeg-mp3lame,
+      [    --with-ffmpeg-mp3lame   if ffmpeg has been compiled with mp3lame support],
+      [
+        dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+        dnl       linker would miserably barf on multiple definitions.
+        VLC_ADD_LDFLAGS([stream_out_transcode],[])
+        VLC_ADD_LDFLAGS([ffmpeg],[-lmp3lame]) ])
 
-  AC_ARG_WITH(ffmpeg-faac,
-    [    --with-ffmpeg-faac      if ffmpeg has been compiled with faac support],
-    [
-      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-      dnl       linker would miserably barf on multiple definitions.
-      VLC_ADD_LDFLAGS([stream_out_transcode],[])
-      VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
+    AC_ARG_WITH(ffmpeg-faac,
+      [    --with-ffmpeg-faac      if ffmpeg has been compiled with faac support],
+      [
+        dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+        dnl       linker would miserably barf on multiple definitions.
+        VLC_ADD_LDFLAGS([stream_out_transcode],[])
+        VLC_ADD_LDFLAGS([ffmpeg],[-lfaac]) ])
 
-  AC_ARG_WITH(ffmpeg-tree,
-    [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
+    AC_ARG_WITH(ffmpeg-tree,
+      [    --with-ffmpeg-tree=PATH ffmpeg tree for static linking])
 
-  dnl
-  dnl test for !(--with-ffmpeg-tree)
-  dnl
-  if test "${with_ffmpeg_tree}" = "no" -o -z "${with_ffmpeg_tree}"; then
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
-    AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
-    AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
-    AC_CHECK_LIB(avcodec, avcodec_init, [
+    dnl
+    dnl test for !(--with-ffmpeg-tree)
+    dnl
+    if test "${with_ffmpeg_tree}" = "no" -o -z "${with_ffmpeg_tree}"; then
+      CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
+      AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
+      AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
+      AC_CHECK_LIB(avcodec, avcodec_init, [
+        VLC_ADD_BUILTINS([ffmpeg stream_out_transcode])
+        VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
+        dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+        dnl       linker would miserably barf on multiple definitions.
+        VLC_ADD_LDFLAGS([stream_out_transcode],[]) ],
+         [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
+      AC_CHECK_LIB(avformat, av_open_input_stream, [
+        AC_DEFINE(HAVE_LIBAVFORMAT, 1,
+        [Define if you have ffmpeg's libavformat.])
+        VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ])
+      LDFLAGS="${LDFLAGS_save}"
+      CPPFLAGS="${CPPFLAGS_save}"
+    fi
+
+    dnl
+    dnl test for --with-ffmpeg-tree
+    dnl
+    if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
+      AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
+      real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
+      if test -z "${real_ffmpeg_tree}"; then
+        dnl  The given directory can't be found
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
+      fi
+      if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
+        dnl  The given libavcodec wasn't built
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
+      fi
+      if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
+        dnl  The given libavcodec wasn't built with --enable-pp
+        AC_MSG_RESULT(no)
+        AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
+      fi
+      dnl  Use a custom libffmpeg
+      AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
       VLC_ADD_BUILTINS([ffmpeg stream_out_transcode])
-      VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])
+      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
+      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
+
+      if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
+        AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
+        VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
+        VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
+      fi
+
       dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
       dnl       linker would miserably barf on multiple definitions.
-      VLC_ADD_LDFLAGS([stream_out_transcode],[]) ],
-       [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
-    AC_CHECK_LIB(avformat, av_open_input_stream, [
-      AC_DEFINE(HAVE_LIBAVFORMAT, 1,
-      [Define if you have ffmpeg's libavformat.])
-      VLC_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ])
-    LDFLAGS="${LDFLAGS_save}"
-    CPPFLAGS="${CPPFLAGS_save}"
-  fi
-
-  dnl
-  dnl test for --with-ffmpeg-tree
-  dnl
-  if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
-    AC_MSG_CHECKING(for libavcodec.a in ${with_ffmpeg_tree})
-    real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
-    if test -z "${real_ffmpeg_tree}"; then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
+      VLC_ADD_LDFLAGS([stream_out_transcode],[-L${real_ffmpeg_tree}/libavcodec])
+      VLC_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
     fi
-    if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-      dnl  The given libavcodec wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
-    fi
-    if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-      dnl  The given libavcodec wasn't built with --enable-pp
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
-    fi
-    dnl  Use a custom libffmpeg
-    AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-    VLC_ADD_BUILTINS([ffmpeg stream_out_transcode])
-    VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
-    VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
-
-    if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-      AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
-      VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
-      VLC_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
-    fi
-
-    dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-    dnl       linker would miserably barf on multiple definitions.
-    VLC_ADD_LDFLAGS([stream_out_transcode],[-L${real_ffmpeg_tree}/libavcodec])
-    VLC_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
   fi
 fi
 
