@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.62 2004/01/25 21:39:37 gbazin Exp $
+ * $Id: video.c,v 1.63 2004/02/08 12:09:50 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -518,7 +518,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
-        if( !p_sys->b_direct_rendering || p_sys->b_pp )
+        if( !p_sys->b_direct_rendering ||
+            p_sys->b_pp || !p_sys->p_ff_pic->opaque )
         {
             /* Get a new picture */
             p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
@@ -689,6 +690,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     else p_ff_pic->pts = 0;
 
     p_sys->input_pts = p_sys->input_dts = 0;
+    p_ff_pic->opaque = 0;
 
     /* Not much to do in indirect rendering mode */
     if( !p_sys->b_direct_rendering || p_sys->b_pp )
