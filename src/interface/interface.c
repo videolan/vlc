@@ -447,12 +447,12 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
         intf_SelectChannel( p_intf, k_reply.param );
         break;
     case INTF_KEY_INC_VOLUME:                                                    /* volume + */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLMAX) )
-            p_main->p_aout->vol += VOLSTEP;
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLUME_MAX) )
+            p_main->p_aout->vol += VOLUME_STEP;
         break;
     case INTF_KEY_DEC_VOLUME:                                                    /* volume - */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol > VOLSTEP) )
-            p_main->p_aout->vol -= VOLSTEP;
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol > VOLUME_STEP) )
+            p_main->p_aout->vol -= VOLUME_STEP;
         break;
     case INTF_KEY_TOGGLE_VOLUME:                                                 /* toggle mute */
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol))

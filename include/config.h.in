@@ -229,7 +229,7 @@
 
 /* Default server and port */
 #define INPUT_VLAN_SERVER_VAR           "vlc_vlan_server"
-#define INPUT_VLAN_SERVER_DEFAULT       "138.195.140.31"
+#define INPUT_VLAN_SERVER_DEFAULT       "138.195.139.95"
 #define INPUT_VLAN_PORT_VAR             "vlc_vlan_port"
 #define INPUT_VLAN_PORT_DEFAULT         6010
 
@@ -253,19 +253,50 @@
 #define AOUT_METHOD_VAR                 "vlc_aout"
 
 /* The fallback method */
-#define AOUT_DEFAULT_METHOD "dsp"
+#define AOUT_DEFAULT_METHOD             "dsp"
 
 /* Environment variable used to store dsp device name, and default value */
 #define AOUT_DSP_VAR                    "vlc_dsp"
 #define AOUT_DSP_DEFAULT                "/dev/dsp"
 
+/* Default audio output format (AOUT_FMT_S16_NE = Native Endianess) */
+#define AOUT_FORMAT_DEFAULT             AOUT_FMT_S16_NE
+/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_S8 */
+/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U8 */
+/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_S16_BE */
+/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_S16_LE */
+/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U16_BE */
+/* #define AOUT_FORMAT_DEFAULT          AOUT_FMT_U16_LE */
+
 /* Environment variable for stereo, and default value */
 #define AOUT_STEREO_VAR                 "vlc_stereo"
 #define AOUT_STEREO_DEFAULT             1
 
+/* Volume */
+#define VOLUME_DEFAULT                  256
+#define VOLUME_STEP                     5
+#define VOLUME_MAX                      765
+
 /* Environment variable for output rate, and default value */
 #define AOUT_RATE_VAR                   "vlc_audio_rate"
 #define AOUT_RATE_DEFAULT               44100
+
+/* Number of audio output frames contained in an audio output fifo.
+ * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
+ * %(AOUT_FIFO_SIZE + 1) operation with an &AOUT_FIFO_SIZE.
+ * With 511 we have at least 511*384/2/48000=2 seconds of sound */
+#define AOUT_FIFO_SIZE                  511
+
+/* Maximum number of audio fifos. The value of AOUT_MAX_FIFOS should be a power
+ * of two, in order to optimize the '/AOUT_MAX_FIFOS' and '*AOUT_MAX_FIFOS'
+ * operations with '>>' and '<<' (gcc changes this at compilation-time) */
+#define AOUT_MAX_FIFOS                  2
+
+/* Duration (in microseconds) of an audio output buffer should be :
+ * - short, in order to be able to play a new song very quickly (especially a
+ *   song from the interface)
+ * - long, in order to perform the buffer calculations as few as possible */
+#define AOUT_BUFFER_DURATION            100000
 
 /*****************************************************************************
  * Video configuration

@@ -181,7 +181,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* Initialize the vomue level */
-    p_aout->vol = VOL;
+    p_aout->vol = VOLUME_DEFAULT;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype
      * see vout to handle status correctly ?? however, it is not critical since

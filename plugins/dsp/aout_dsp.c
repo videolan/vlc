@@ -90,7 +90,7 @@ int aout_DspOpen( aout_thread_t *p_aout )
     }
 
     /* Initialize some variables */
-    p_aout->i_format = AOUT_DEFAULT_FORMAT;
+    p_aout->i_format = AOUT_FORMAT_DEFAULT;
     p_aout->psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
     p_aout->i_channels = 1 + main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
     p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );

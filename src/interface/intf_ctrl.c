@@ -314,8 +314,8 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     }
 
     /* Set default configuration */
-    fifo.i_channels = 1 + ( fifo.b_stereo = AOUT_DEFAULT_STEREO );
-    fifo.l_rate = AOUT_DEFAULT_RATE;
+    fifo.i_channels = 1 + ( fifo.b_stereo = AOUT_STEREO_DEFAULT );
+    fifo.l_rate = AOUT_RATE_DEFAULT;
 
     /* The channels and rate parameters are essential ! */
     /* Parse parameters - see command list above */

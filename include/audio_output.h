@@ -33,59 +33,8 @@
  * - Créer un flag destroy dans les fifos audio pour indiquer au thread audio
  *   qu'il peut libérer la mémoire occupée par le buffer de la fifo lorsqu'il
  *   le désire (fin du son ou fin du thread)
- * - Redéplacer les #define dans config.h
  *
  */
-
-/*
- * Defines => "config.h"
- */
-
-/* Default output device. You probably should not change this. */
-#define AOUT_DEFAULT_DEVICE     "/dev/dsp"
-
-/* Default audio output format (AOUT_FMT_S16_NE = Native Endianess) */
-#define AOUT_DEFAULT_FORMAT     AOUT_FMT_S16_NE
-
-/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_S8 */
-/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_U8 */
-/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_S16_BE */
-/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_S16_LE */
-/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_U16_BE */
-/* #define AOUT_DEFAULT_FORMAT     AOUT_FMT_U16_LE */
-
-
-/* Default stereo mode (0 stands for mono, 1 for stereo) */
-#define AOUT_DEFAULT_STEREO     1
-/* #define AOUT_DEFAULT_STEREO     0 */
-
-/* Audio output rate, in Hz */
-#define AOUT_MIN_RATE           22050 /* XXX?? */
-#define AOUT_DEFAULT_RATE       44100
-#define AOUT_MAX_RATE           48000
-
-
-/* Volume (default 256) */
-#define VOL     256
-#define VOLSTEP 5
-#define VOLMAX  765
-
-/* Number of audio output frames contained in an audio output fifo.
- * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
- * %(AOUT_FIFO_SIZE + 1) operation with an &AOUT_FIFO_SIZE.
- * With 511 we have at least 511*384/2/48000=2 seconds of sound */
-#define AOUT_FIFO_SIZE          511
-
-/* Maximum number of audio fifos. The value of AOUT_MAX_FIFOS should be a power
- * of two, in order to optimize the '/AOUT_MAX_FIFOS' and '*AOUT_MAX_FIFOS'
- * operations with '>>' and '<<' (gcc changes this at compilation-time) */
-#define AOUT_MAX_FIFOS          2
-
-/* Duration (in microseconds) of an audio output buffer should be :
- * - short, in order to be able to play a new song very quickly (especially a
- *   song from the interface)
- * - long, in order to perform the buffer calculations as few as possible */
-#define AOUT_BUFFER_DURATION    100000
 
 /*
  * Macros
