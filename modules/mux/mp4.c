@@ -39,6 +39,8 @@
 
 #include "codecs.h"
 
+#include "iso_lang.h"
+
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
@@ -610,9 +612,10 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     int64_t i_dts, i_dts_q;
 
     stbl = box_new( "stbl" );
+
+    /* sample description */
     stsd = box_full_new( "stsd", 0, 0 );
     bo_add_32be( stsd, 1 );
-
     if( p_stream->p_fmt->i_cat == AUDIO_ES )
     {
         bo_t *soun = GetSounBox( p_mux, p_stream );
@@ -623,13 +626,9 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         bo_t *vide = GetVideBox( p_mux, p_stream );
         box_gather( stsd, vide );
     }
-
-    /* append stsd to stbl */
     box_fix( stsd );
-    box_gather( stbl, stsd );
 
     /* chunk offset table */
-    p_stream->i_stco_pos = stbl->i_buffer + 16;
     if( p_sys->i_pos >= (((uint64_t)0x1) << 32) )
     {
         /* 64 bits version */
@@ -685,17 +684,11 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     /* Fix stco entry count */
     bo_fix_32be( stco, 12, i_chunk );
     msg_Dbg( p_mux, "created %d chunks (stco)", i_chunk );
-
-    /* append stco to stbl */
     box_fix( stco );
-    box_gather( stbl, stco );
 
     /* Fix stsc entry count */
     bo_fix_32be( stsc, 12, i_stsc_entries  );
-
-    /* append stsc to stbl */
     box_fix( stsc );
-    box_gather( stbl, stsc );
 
     /* add stts */
     stts = box_full_new( "stts", 0, 0 );
@@ -738,10 +731,7 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         bo_add_32be( stts, i_delta );     // sample-delta
     }
     bo_fix_32be( stts, 12, i_index );
-
-    /* append stts to stbl */
     box_fix( stts );
-    box_gather( stbl, stts );
 
     /* FIXME add ctts ?? FIXME */
 
@@ -752,9 +742,7 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     {
         bo_add_32be( stsz, p_stream->entry[i].i_size ); // sample-size
     }
-    /* append stsz to stbl */
     box_fix( stsz );
-    box_gather( stbl, stsz );
 
     /* create stss table */
     stss = NULL;
@@ -775,9 +763,21 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     {
         bo_fix_32be( stss, 12, i_index );
         box_fix( stss );
-        box_gather( stbl, stss );
     }
 
+    /* Now gather all boxes into stbl */
+    box_gather( stbl, stsd );
+    box_gather( stbl, stts );
+    if( stss )
+    {
+        box_gather( stbl, stss );
+    }
+    box_gather( stbl, stsc );
+    box_gather( stbl, stsz );
+    p_stream->i_stco_pos = stbl->i_buffer + 16;
+    box_gather( stbl, stco );
+
+    /* finish stbl */
     box_fix( stbl );
 
     return stbl;
@@ -958,7 +958,36 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
                                (mtime_t)1000000 );  // duration
         }
 
-        bo_add_16be( mdhd, 0    );              // language   FIXME
+        if( p_stream->p_fmt->psz_language )
+        {
+            char *psz = p_stream->p_fmt->psz_language;
+            const iso639_lang_t *pl = NULL;
+            uint16_t lang = 0x0;
+
+            if( strlen( psz ) == 2 )
+            {
+                pl = GetLang_1( psz );
+            }
+            else if( strlen( psz ) == 3 )
+            {
+                pl = GetLang_2B( psz );
+                if( !strcmp( pl->psz_iso639_1, "??" ) )
+                {
+                    pl = GetLang_2T( psz );
+                }
+            }
+            if( pl && strcmp( pl->psz_iso639_1, "??" ) )
+            {
+                lang = ( ( pl->psz_iso639_2T[0] - 0x60 ) << 10 ) |
+                       ( ( pl->psz_iso639_2T[1] - 0x60 ) <<  5 ) |
+                       ( ( pl->psz_iso639_2T[2] - 0x60 ) );
+            }
+            bo_add_16be( mdhd, lang );          // language
+        }
+        else
+        {
+            bo_add_16be( mdhd, 0    );          // language
+        }
         bo_add_16be( mdhd, 0    );              // predefined
         box_fix( mdhd );
         box_gather( mdia, mdhd );
