@@ -3102,7 +3102,7 @@ fi
 # Check whether --enable-sdl or --disable-sdl was given.
 if test "${enable_sdl+set}" = set; then
   enableval="$enable_sdl"
-  if test x$enable_sdl = xyes; then PLUGINS=${PLUGINS}"sdl "; ALIASES=${ALIASES}"sdlvlc ";fi
+  if test x$enable_sdl = xyes; then PLUGINS=${PLUGINS}"sdl "; fi
 fi
 
 # Check whether --enable-glide or --disable-glide was given.

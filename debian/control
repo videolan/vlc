@@ -56,3 +56,12 @@ Description: Esound plugin for the VideoLAN MPEG2 and DVD player vlc
  This plugin adds support for the Enlightened Sound Daemon to
  the VideoLAN Client.
 
+Package: vlc-sdl
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: SDL plugin for the VideoLAN MPEG2 and DVD player vlc
+ VideoLAN is a free MPEG2 software solution.
+ .
+ This plugin adds support for the Simple DirectMedia Layer library to
+ the VideoLAN Client.
+

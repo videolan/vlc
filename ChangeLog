@@ -1,9 +1,11 @@
 Thu Aug 18 00:21:33 BST 2000
 0.1.99g :
 
-	* added support for the SDL vout : the --display fullscreen allows 
-		fullscreen when possible. Disabled by default.
-	* added sdlvlc (which probably should start in fullscreen, no ?)
+  * added support for the SDL vout : the --display fullscreen allows 
+    fullscreen when possible. Disabled by default.
+  * added sdlvlc (which probably should start in fullscreen, no ?)
+  * removed sdlvlc :)
+  * updated debian directory to build vlc-sdl
  
 Wed Aug 16 01:07:14 CEST 2000
 0.1.99g :

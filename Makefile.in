@@ -409,7 +409,11 @@ else
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
-sdlvlc gvlc xvlc fbvlc: vlc
+#
+# Gnome and Framebuffer aliases - don't add new aliases which could bloat
+# the namespace
+#
+gvlc fbvlc: vlc
 	rm -f $@ && ln -s vlc $@
 
 plugins: $(PLUGINS)

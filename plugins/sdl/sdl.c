@@ -81,11 +81,6 @@ plugin_info_t * GetConfig( void )
      * initialization part at least, even if we fail afterwards */
     p_info->i_score = 0x100;
 
-    if( TestProgram( "sdlvlc" ) )
-    {
-        p_info->i_score += 0x180;
-    }
-
     /* If this plugin was requested, score it higher */
     if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
     {
