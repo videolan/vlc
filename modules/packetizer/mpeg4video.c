@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.3 2003/01/08 10:26:49 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.4 2003/01/12 04:11:35 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -249,10 +249,11 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         p_pack->p_fifo->b_error = 1;
         return;
     }
-    if( p_pack->i_pts_start < 0 && p_pes->i_pts > 0 )
+    if( p_pack->i_pts_start < 0 )
     {
         p_pack->i_pts_start = p_pes->i_pts;
     }
+
     i_size = p_pes->i_pes_size;
     if( i_size > 0 )
     {
@@ -357,8 +358,8 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
                     p_bih->biWidth  = 0;
                     p_bih->biHeight = 0;
                     p_bih->biPlanes = 1;
-                    p_bih->biBitCount = 0;
-                    p_bih->biCompression = 0; /* FIXME */
+                    p_bih->biBitCount = 24;
+                    p_bih->biCompression = 0x64697678; /* "divx" */
                     p_bih->biSizeImage = 0;
                     p_bih->biXPelsPerMeter = 0;
                     p_bih->biYPelsPerMeter = 0;
@@ -387,7 +388,23 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
         input_ShowPES( p_pack->p_fifo, &p_pes_next );
         if( p_pes_next )
         {
-            p_sout_buffer->i_length = p_pes_next->i_pts - p_pes->i_pts;
+            mtime_t i_gap;
+
+            i_gap = p_pes_next->i_pts - p_pes->i_pts;
+
+            if( i_gap > 1000000 / 80 )  // too big fps > 80 is no sense
+            {
+                i_gap = 1000000 / 25;
+                p_pack->i_pts_start =
+                    ( p_pes->i_pts - p_pack->i_pts_start ) + p_pes_next->i_pts - i_gap;
+            }
+            else if( i_gap < 0 )
+            {
+                p_pack->i_pts_start =
+                    ( p_pes->i_pts - p_pack->i_pts_start ) + p_pes_next->i_pts;
+                i_gap = 0;
+            }
+            p_sout_buffer->i_length = i_gap;
         }
         sout_InputSendBuffer( p_pack->p_sout_input,
                                p_sout_buffer );
