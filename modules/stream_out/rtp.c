@@ -94,8 +94,8 @@ vlc_module_begin();
                 SDP_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
                 MUX_LONGTEXT, VLC_TRUE );
-    
-    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
+
+    add_string( SOUT_CFG_PREFIX "name", "NONE", NULL, NAME_TEXT,
                 NAME_LONGTEXT, VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "description", "", NULL, DESC_TEXT,
                 DESC_LONGTEXT, VLC_TRUE );
@@ -121,7 +121,7 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "dst", "name", "port", "port-audio", "port-video", "sdp", "ttl", "mux",
+    "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
     "description", "url","email", NULL
 };
 
@@ -161,6 +161,7 @@ struct sout_stream_sys_t
 
     /* */
     vlc_bool_t b_export_sdp_file;
+    char *psz_sdp_file;
     /* sap */
     vlc_bool_t b_export_sap;
     session_descriptor_t *p_session;
@@ -243,6 +244,8 @@ struct sout_stream_id_t
 
 static int AccessOutGrabberWrite( sout_access_out_t *, block_t * );
 
+static void SDPHandleUrl( sout_stream_t *, char * );
+
 static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
@@ -272,24 +275,23 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = malloc( sizeof( sout_stream_sys_t ) );
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "dst", &val );
-    p_sys->psz_destination = *val.psz_string ? val.psz_string : NULL;
+    p_sys->psz_destination = var_GetString( p_stream, SOUT_CFG_PREFIX "dst" );
+    if( *p_sys->psz_destination == '\0' )
+    {
+        free( p_sys->psz_destination );
+        p_sys->psz_destination = NULL;
+    }
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
-    p_sys->psz_session_name = *val.psz_string ? val.psz_string : NULL;
-    
-    var_Get( p_stream, SOUT_CFG_PREFIX "description", &val );
-    p_sys->psz_session_description = *val.psz_string ? val.psz_string : NULL;
-    
-    var_Get( p_stream, SOUT_CFG_PREFIX "url", &val );
-    p_sys->psz_session_url = *val.psz_string ? val.psz_string : NULL;
-    
-    var_Get( p_stream, SOUT_CFG_PREFIX "email", &val );
-    p_sys->psz_session_email = *val.psz_string ? val.psz_string : NULL;
+    p_sys->psz_session_name = var_GetString( p_stream, SOUT_CFG_PREFIX "name" );
+    p_sys->psz_session_description = var_GetString( p_stream, SOUT_CFG_PREFIX "description" );
+    p_sys->psz_session_url = var_GetString( p_stream, SOUT_CFG_PREFIX "url" );
+    p_sys->psz_session_email = var_GetString( p_stream, SOUT_CFG_PREFIX "email" );
 
     p_sys->i_port       = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port" );
     p_sys->i_port_audio = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-audio" );
     p_sys->i_port_video = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-video" );
+
+    p_sys->psz_sdp_file = NULL;
 
     if( p_sys->i_port_audio == p_sys->i_port_video )
     {
@@ -308,16 +310,36 @@ static int Open( vlc_object_t *p_this )
 
     if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
     {
-        var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val );
+        sout_cfg_t *p_cfg;
+        vlc_bool_t b_ok = VLC_FALSE;
 
-        if( strncasecmp( val.psz_string, "rtsp", 4 ) )
+        for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
+        {
+            if( !strcmp( p_cfg->psz_name, "sdp" ) )
+            {
+                if( p_cfg->psz_value && !strncasecmp( p_cfg->psz_value, "rtsp", 4 ) )
+                {
+                    b_ok = VLC_TRUE;
+                    break;
+                }
+            }
+        }
+        if( !b_ok )
+        {
+            vlc_value_t val2;
+            var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val2 );
+            if( !strncasecmp( val2.psz_string, "rtsp", 4 ) )
+                b_ok = VLC_TRUE;
+            free( val2.psz_string );
+        }
+
+        if( !b_ok )
         {
             msg_Err( p_stream, "missing destination and not in rtsp mode" );
             free( p_sys );
             return VLC_EGENERIC;
         }
         p_sys->psz_destination = NULL;
-        free( val.psz_string );
     }
     else if( p_sys->i_port <= 0 )
     {
@@ -495,39 +517,23 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val );
     if( *val.psz_string )
     {
-        vlc_url_t url;
+        sout_cfg_t *p_cfg;
 
-        vlc_UrlParse( &url, val.psz_string, 0 );
-        if( url.psz_protocol && !strcasecmp( url.psz_protocol, "http" ) )
+        SDPHandleUrl( p_stream, val.psz_string );
+
+        for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
         {
-            if( HttpSetup( p_stream, &url ) )
+            if( !strcmp( p_cfg->psz_name, "sdp" ) )
             {
-                msg_Err( p_stream, "cannot export sdp as http" );
+                if( p_cfg->psz_value == NULL || *p_cfg->psz_value == '\0' )
+                    continue;
+
+                if( !strcmp( p_cfg->psz_value, val.psz_string ) )   /* needed both :sout-rtp-sdp= and rtp{sdp=} can be used */
+                    continue;
+
+                SDPHandleUrl( p_stream, p_cfg->psz_value );
             }
         }
-        else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "rtsp" ) )
-        {
-            /* FIXME test if destination is multicast or no destination at all FIXME */
-            if( RtspSetup( p_stream, &url ) )
-            {
-                msg_Err( p_stream, "cannot export sdp as rtsp" );
-            }
-        }
-        else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) )
-        {
-            p_sys->b_export_sap = VLC_TRUE;
-            SapSetup( p_stream );
-        }
-        else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "file" ) )
-        {
-            p_sys->b_export_sdp_file = VLC_TRUE;
-        }
-        else
-        {
-            msg_Warn( p_stream, "unknown protocol for SDP (%s)",
-                      url.psz_protocol );
-        }
-        vlc_UrlClean( &url );
     }
     free( val.psz_string );
 
@@ -613,6 +619,68 @@ static void Close( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
+ * SDPHandleUrl:
+ *****************************************************************************/
+static void SDPHandleUrl( sout_stream_t *p_stream, char *psz_url )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    vlc_url_t url;
+
+    vlc_UrlParse( &url, psz_url, 0 );
+    if( url.psz_protocol && !strcasecmp( url.psz_protocol, "http" ) )
+    {
+        if( p_sys->p_httpd_file )
+        {
+            msg_Err( p_stream, "You can used sdp=http:// only once" );
+            return;
+        }
+
+        if( HttpSetup( p_stream, &url ) )
+        {
+            msg_Err( p_stream, "cannot export sdp as http" );
+        }
+    }
+    else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "rtsp" ) )
+    {
+        if( p_sys->p_rtsp_url )
+        {
+            msg_Err( p_stream, "You can used sdp=rtsp:// only once" );
+            return;
+        }
+
+        /* FIXME test if destination is multicast or no destination at all FIXME */
+        if( RtspSetup( p_stream, &url ) )
+        {
+            msg_Err( p_stream, "cannot export sdp as rtsp" );
+        }
+    }
+    else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "sap" ) )
+    {
+        p_sys->b_export_sap = VLC_TRUE;
+        SapSetup( p_stream );
+    }
+    else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "file" ) )
+    {
+        if( p_sys->b_export_sdp_file )
+        {
+            msg_Err( p_stream, "You can used sdp=file:// only once" );
+            return;
+        }
+        p_sys->b_export_sdp_file = VLC_TRUE;
+        psz_url = &psz_url[5];
+        if( psz_url[0] == '/' && psz_url[1] == '/' )
+            psz_url += 2;
+        p_sys->psz_sdp_file = strdup( psz_url );
+    }
+    else
+    {
+        msg_Warn( p_stream, "unknown protocol for SDP (%s)",
+                  url.psz_protocol );
+    }
+    vlc_UrlClean( &url );
+}
+
+/*****************************************************************************
  * SDPGenerate
  *****************************************************************************/
         /* FIXME  http://www.faqs.org/rfcs/rfc2327.html
@@ -669,19 +737,15 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     p += sprintf( p, "v=0\r\n" );
     p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\r\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version );
-    p += sprintf( p, "s=%s\r\n", p_sys->psz_session_name );
-    if( p_sys->psz_session_description )
-    {
+    if( *p_sys->psz_session_name )
+        p += sprintf( p, "s=%s\r\n", p_sys->psz_session_name );
+    if( *p_sys->psz_session_description )
         p += sprintf( p, "i=%s\r\n", p_sys->psz_session_description );
-    }
-    if( p_sys->psz_session_url )
-    {
+    if( *p_sys->psz_session_url )
         p += sprintf( p, "u=%s\r\n", p_sys->psz_session_url );
-    }
-    if( p_sys->psz_session_email )
-    {
+    if( *p_sys->psz_session_email )
         p += sprintf( p, "e=%s\r\n", p_sys->psz_session_email );
-    }
+
     p += sprintf( p, "t=0 0\r\n" ); /* permanent stream */ /* when scheduled from vlm, we should set this info correctly */
     p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
 
@@ -1192,37 +1256,14 @@ static int SapSetup( sout_stream_t *p_stream )
 static int FileSetup( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    vlc_value_t      val;
-    char            *psz;
     FILE            *f;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "sdp", &val );
-    if( strncasecmp( val.psz_string, "file:", 5 ) )
-    {
-        msg_Err( p_stream, "FileSetup called with invalid sdp option" );
-        free( val.psz_string );
-        return VLC_EGENERIC;
-    }
-    psz = &val.psz_string[5];
-
-    if( psz[0] == '/' && psz[1] == '/' )
-        psz += 2;
-
-    if( *psz == '\0' )
-    {
-        msg_Err( p_stream, "FileSetup called with empty sdp option" );
-        free( val.psz_string );
-        return VLC_EGENERIC;
-    }
-
-    if( ( f = fopen( psz, "wt" ) ) == NULL )
+    if( ( f = fopen( p_sys->psz_sdp_file, "wt" ) ) == NULL )
     {
         msg_Err( p_stream, "cannot open file '%s' (%s)",
-                 psz, strerror(errno) );
-        free( val.psz_string );
+                 p_sys->psz_sdp_file, strerror(errno) );
         return VLC_EGENERIC;
     }
-    free( val.psz_string );
 
     fprintf( f, "%s", p_sys->psz_sdp );
     fclose( f );
