@@ -108,7 +108,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_data_offset = 0;
     p_sys->i_track = 0;
     p_sys->track   = NULL;
-    p_sys->i_pcr   = 0;
+    p_sys->i_pcr   = 1;
 
 
     /* Parse the headers */
