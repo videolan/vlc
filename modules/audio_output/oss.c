@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.30 2002/10/20 12:23:47 massiot Exp $
+ * $Id: oss.c,v 1.31 2002/10/24 17:36:42 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -61,13 +61,18 @@
  *****************************************************************************/
 struct aout_sys_t
 {
-    int                   i_fd;
+    int i_fd;
+    int b_workaround_buggy_driver;
 };
 
 /* This must be a power of 2. */
 #define FRAME_SIZE 1024
 #define FRAME_COUNT 8
 #define A52_FRAME_NB 1536
+
+/* estimation of the size of the internal soundcard driver
+ * (used for buggy drivers) */
+#define OSS_BUFFER_SIZE 20000
 
 /*****************************************************************************
  * Local prototypes
@@ -81,10 +86,17 @@ static int  OSSThread    ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define BUGGY_TEXT N_("Try to work around buggy OSS drivers")
+#define BUGGY_LONGTEXT N_( \
+    "Some buggy OSS drivers just don't like when their internal buffers " \
+    "are completely filled (the sound gets heavily hashed). If you have one " \
+    "of these drivers, then you need to enable this option." )
+
 vlc_module_begin();
     add_category_hint( N_("OSS"), NULL );
     add_file( "dspdev", "/dev/dsp", aout_FindAndRestart,
               N_("OSS dsp device"), NULL );
+    add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT );
     set_description( _("Linux OSS /dev/dsp module") );
     set_capability( "audio output", 100 );
     add_shortcut( "oss" );
@@ -119,8 +131,16 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_aout->output.p_sys->b_workaround_buggy_driver =
+        config_GetInt( p_aout, "oss-buggy" );
+
+    if( p_aout->output.p_sys->b_workaround_buggy_driver )
+        p_sys->i_fd = open( psz_device, O_WRONLY|O_NONBLOCK );
+    else
+        p_sys->i_fd = open( psz_device, O_WRONLY );
+
     /* Open the sound device */
-    if( (p_sys->i_fd = open( psz_device, O_WRONLY )) < 0 )
+    if( p_sys->i_fd < 0 )
     {
         msg_Err( p_aout, "cannot open audio device (%s)", psz_device );
         free( psz_device );
@@ -421,11 +441,14 @@ static int OSSThread( aout_instance_t * p_aout )
         {
             mtime_t buffered = BufferDuration( p_aout );
 
-            /* Wait a bit - we don't want our buffer to be full */
-            while( buffered > AOUT_PTS_TOLERANCE * 2 )
+            if( p_aout->output.p_sys->b_workaround_buggy_driver )
             {
-                msleep( buffered / 2 - 10000 );
-                buffered = BufferDuration( p_aout );
+                /* Wait a bit - we don't want our buffer to be full */
+                while( buffered > OSS_BUFFER_SIZE )
+                {
+                    msleep( buffered - OSS_BUFFER_SIZE * 2 );
+                    buffered = BufferDuration( p_aout );
+                }
             }
 
             if( !next_date )
