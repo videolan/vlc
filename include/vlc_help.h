@@ -2,7 +2,7 @@
  * vlc_help.h: Help strings
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_help.h,v 1.4 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: vlc_help.h,v 1.5 2003/12/03 12:33:21 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Anil Daoud <anil@videolan.org>
@@ -33,12 +33,12 @@
 #define GENERAL_HELP N_( \
     "Configure some global options in General Settings " \
      "and configure each VLC plugin in the Plugins section.\n" \
-     "Click on 'Advanced Options' to see every options." )
+     "Click on \"Advanced Options\" to see all options." )
 
 #define PLUGIN_TITLE N_( "VLC Plugins Preferences" )
 #define PLUGIN_HELP N_( \
     "In this tree, you can set options for every plugin used by VLC.\n" \
-    "Plugins are sorted by type.\nHave fun tuning VLC !" )
+    "Plugins are sorted by type.\nHave fun tuning VLC!" )
 
 /*
  *  Then, help for each module capabilities.
@@ -47,7 +47,7 @@
 #define ACCESS_TITLE N_( "Access modules settings" )
 #define ACCESS_HELP N_( \
     "Settings related to the various access methods used by VLC.\n" \
-    "Common settings you may want to alter are http proxy or " \
+    "Common settings you may want to alter are HTTP proxy or " \
     "caching settings." )
 
 #define AUDIO_FILTER_TITLE N_("Audio filters settings")
@@ -66,8 +66,8 @@
 
 #define DECODER_TITLE  N_("Decoder modules settings" )
 #define DECODER_HELP N_( \
-    "In the Subsdec section you may want to set your preferred subtitles " \
-    "text encoding.")
+    "In the Subsdec section you may want to set the text encoding of your " \
+    "preferred subtitles.")
 
 #define DEMUX_TITLE N_("Demuxers settings")
 #define DEMUX_HELP N_( " ")
@@ -84,7 +84,7 @@
 
 #define SUBTITLE_DEMUX_TITLE N_("Subtitle demuxer settings")
 #define SUBTITLE_DEMUX_HELP N_( \
-    "In this section you can force the behaviour of the subtitle demuxer, " \
+    "In this section you can force the behavior of the subtitle demuxer, " \
     "for example by setting the subtitles type or file name.")
 
 #define TEXT_TITLE N_("Text renderer settings")
