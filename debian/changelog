@@ -1,3 +1,10 @@
+vlc (0.6.0+cvs-20030627-2) unstable; urgency=low
+
+  * extras/ffmpeg:
+    + Fixed compilation for Alpha.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat, 21 Jun 2003 17:55:07 +0200
+
 vlc (0.6.0+cvs-20030627-1) unstable; urgency=low
 
   * New upstream release.

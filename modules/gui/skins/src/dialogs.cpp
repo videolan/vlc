@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.7 2003/06/11 10:42:34 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.8 2003/06/28 13:04:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -59,7 +59,7 @@ void Dialogs::ShowPopup(){}
 #else // !MODULE_NAME_IS_basic_skins
 
 #include "../../wxwindows/wxwindows.h"
-#include "share/vlc32x32.xpm"       // include the graphic icon
+#include "../../../../share/vlc32x32.xpm"       // include the graphic icon
 
 #define ShowOpen_Event     0
 #define ShowOpenSkin_Event 1

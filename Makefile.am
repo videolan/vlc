@@ -110,13 +110,13 @@ HEADERS_include_built = \
 	$(NULL)
 
 include/vlc_symbols.h: Makefile $(HEADERS_include)
-	cd $(srcdir) && $(srcdir)/toolbox --update-includes
+	$(srcdir)/toolbox --update-includes
 
 src/misc/modules_plugin.h: Makefile src/misc/modules_plugin.h.in $(HEADERS_include)
-	cd $(srcdir) && $(srcdir)/toolbox --update-includes
+	$(srcdir)/toolbox --update-includes
 
 src/misc/modules_builtin.h: Makefile src/misc/modules_builtin.h.in
-	cd $(srcdir) && $(srcdir)/toolbox --update-includes
+	$(srcdir)/toolbox --update-includes
 
 # These dependencies are mandatory
 $(SOURCES): include/vlc_symbols.h
@@ -373,10 +373,10 @@ endif
 
 # Install the modules and the symlinks
 install-exec-local:
-	for i in "" `$(srcdir)/vlc-config --target plugin` ; do if test -n "$$i" ; then \
+	for i in "" `$(VLC_CONFIG) --target plugin` ; do if test -n "$$i" ; then \
 	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`" ; \
 	fi ; done
-	for i in "" `$(srcdir)/vlc-config --target builtin` `$(srcdir)/vlc-config --target builtin pic` ; do if test -n "$$i" ; then \
+	for i in "" `$(VLC_CONFIG) --target builtin` `$(VLC_CONFIG) --target builtin pic` ; do if test -n "$$i" ; then \
 	  $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
 	fi ; done
 	for i in "" $(ALIASES) ; do if test -n "$$i" ; then \
@@ -395,7 +395,7 @@ VLC.app: vlc plugins
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS
 	$(INSTALL) vlc $(srcdir)/VLC.app/Contents/MacOS/VLC
 	$(INSTALL) -d $(srcdir)/VLC.app/Contents/MacOS/modules
-	for i in "" `$(srcdir)/vlc-config --target plugin` ; do \
+	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" \
 	    "$(srcdir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
@@ -461,7 +461,7 @@ package-win32:
 	  unix2dos "$(srcdir)/tmp/$${file}.txt" ; done
 
 	mkdir -p "$(srcdir)/tmp/plugins"
-	for i in "" `$(srcdir)/vlc-config --target plugin` ; do \
+	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
 	    $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" "$(srcdir)/tmp/plugins/" ; \
 	  fi ; done
@@ -603,9 +603,9 @@ endif
 
 mozilla_libplugin_a_SOURCES = $(SOURCES_mozilla)
 mozilla_libplugin_a_CFLAGS = `$(VLC_CONFIG) --cflags mozilla pic` \
-                             $(CPPFLAGS_mozilla_EXTRA)
+                             $(CPPFLAGS_mozilla_EXTRA) -Imozilla
 mozilla_libplugin_a_CXXFLAGS = `$(VLC_CONFIG) --cxxflags mozilla pic` \
-                               $(CPPFLAGS_mozilla_EXTRA)
+                               $(CPPFLAGS_mozilla_EXTRA) -Imozilla
 mozilla_libplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(DATA_npvlc_rc) builtins_pic
 
 BUILT_SOURCES_mozilla = mozilla/vlcintf.h
@@ -623,11 +623,11 @@ mozilla_vlcintf_xpt_DATA = mozilla/vlcintf.xpt
 mozilla_vlcintf_xptdir = $(libdir)/mozilla/components
 mozilla/vlcintf.xpt: Makefile mozilla/vlcintf.idl
 	$(XPIDL) -I/usr/share/idl/mozilla -m typelib \
-	  -o mozilla/vlcintf mozilla/vlcintf.idl
+	  -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
 
 mozilla/vlcintf.h: Makefile mozilla/vlcintf.idl
 	$(XPIDL) -I/usr/share/idl/mozilla -m header \
-	  -o mozilla/vlcintf mozilla/vlcintf.idl
+	  -o mozilla/vlcintf $(srcdir)/mozilla/vlcintf.idl
 
 if HAVE_WIN32
 DATA_npvlc_rc = $(noinst_mozilla_npvlc_rc_DATA)

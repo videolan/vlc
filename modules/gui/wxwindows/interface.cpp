@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.41 2003/06/19 12:21:53 gbazin Exp $
+ * $Id: interface.cpp,v 1.42 2003/06/28 13:04:52 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -68,7 +68,7 @@
 #define TOOLBAR_BMP_HEIGHT 36
 
 /* include the icon graphic */
-#include "share/vlc32x32.xpm"
+#include "../../../share/vlc32x32.xpm"
 
 /*****************************************************************************
  * Local class declarations.
