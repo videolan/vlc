@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.87 2002/08/15 12:11:15 sam Exp $
+ * $Id: modules.c,v 1.88 2002/08/15 12:22:45 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -299,7 +299,6 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
                 {
                     p_submodule =
                             (module_t*)p_module->pp_children[ i_submodule ];
-                    p_submodule->next = p_module->next;
                     break;
                 }
             }

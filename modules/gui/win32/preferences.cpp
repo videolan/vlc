@@ -183,26 +183,29 @@ __fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
 void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
         TListItem *Item, bool Selected )
 {
-    module_t *p_module;
+    module_t **pp_parser;
+    vlc_list_t *p_list;
     AnsiString Name;
 
     Name = Item->Caption;
-    if( Name != "" )
+    if( Name == "" )
     {
-        /* look for module 'Name' */
-        for( p_module = p_intfGlobal->p_vlc->p_module_bank->first ;
-             p_module != NULL ;
-             p_module = p_module->next )
-        {
-            if( strcmp( p_module->psz_object_name, Name.c_str() ) == 0 )
-            {
-                ModuleSelected = p_module;
-                LabelHint->Caption = p_module->psz_longname ?
-                                     p_module->psz_longname : "";
-                ButtonConfig->Enabled = p_module->i_config_items ? true : false;
+        return;
+    }
 
-                break;
-            }
+    /* look for module 'Name' */
+    for( pp_parser = (module_t **)p_list->pp_objects ;
+         *pp_parser ;
+         pp_parser++ )
+    {
+        if( strcmp( (*pp_parser)->psz_object_name, Name.c_str() ) == 0 )
+        {
+            ModuleSelected = (*pp_parser);
+            LabelHint->Caption = (*pp_parser)->psz_longname ?
+                                 (*pp_parser)->psz_longname : "";
+            ButtonConfig->Enabled = (*pp_parser)->i_config_items ? true : false;
+
+            break;
         }
     }
 }
@@ -360,7 +363,6 @@ void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
 
 void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 {
-    module_t           *p_module;
     module_t          **pp_parser;
     vlc_list_t         *p_list;
 
@@ -377,23 +379,30 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TListItem          *ListItem;
 
     /* Look for the selected module */
-    for( p_module = p_intfGlobal->p_vlc->p_module_bank->first ; p_module != NULL ;
-         p_module = p_module->next )
+    p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
+    for( pp_parser = (module_t **)p_list->pp_objects ;
+         *pp_parser ;
+         pp_parser++ )
     {
         if( psz_module_name
-             && !strcmp( psz_module_name, p_module->psz_object_name ) )
+             && !strcmp( psz_module_name, (*pp_parser)->psz_object_name ) )
         {
             break;
         }
     }
-    if( !p_module ) return;
+    if( !(*pp_parser) )
+    {
+        vlc_list_release( p_list );
+        return;
+    }
 
     /*
      * We found it, now we can start building its configuration interface
      */
 
     /* Enumerate config options and add corresponding config boxes */
-    p_item = p_module->p_config;
+    p_item = (*pp_parser)->p_config;
     if( p_item ) do
     {
         switch( p_item->i_type )
@@ -426,7 +435,6 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             ADD_PANEL;
 
             /* Look for valid modules */
-            p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
             pp_parser = (module_t **)p_list->pp_objects;
 
             for( ; *pp_parser ; pp_parser++ )
@@ -437,8 +445,6 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                     ListItem->Caption = (*pp_parser)->psz_object_name;
                 }
             }
-
-            vlc_list_release( p_list );
 
             break;
 
@@ -493,6 +499,8 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             ScrollBox->Controls[i_ctrl]->Align = alTop;
         }
     }
+
+    vlc_list_release( p_list );
 
     /* set active tabsheet
      * FIXME: i don't know why, but both lines are necessary */
