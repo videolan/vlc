@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.25 2003/04/16 00:12:36 fenrir Exp $
+ * $Id: stream_output.c,v 1.26 2003/04/18 22:38:11 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -212,6 +212,7 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
 int sout_InputSendBuffer( sout_packetizer_input_t *p_input, sout_buffer_t *p_buffer )
 {
     sout_instance_t     *p_sout = p_input->p_sout;
+    int                 i_ret;
 
     if( p_input->p_fmt->i_fourcc == VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
     {
@@ -219,8 +220,11 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input, sout_buffer_t *p_buf
         return VLC_SUCCESS;
     }
 
+    vlc_mutex_lock( &p_sout->lock );
+    i_ret = p_sout->p_stream->pf_send( p_sout->p_stream, p_input->id, p_buffer );
+    vlc_mutex_unlock( &p_sout->lock );
 
-    return( p_sout->p_stream->pf_send( p_sout->p_stream, p_input->id, p_buffer ) );
+    return i_ret;
 }
 
 /*****************************************************************************
