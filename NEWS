@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.26 2003/03/04 21:54:03 hartman Exp $
+$Id: NEWS,v 1.27 2003/03/04 22:08:33 gbazin Exp $
 
 Changes between 0.5.1a and 0.5.2:
 --------------------------------
@@ -17,10 +17,10 @@ UNIX ports:
  * fixed the GNU-pth support.
 
 Win32 port:
- * multi-channel audio and S/PDIF support for both the DirectX
-   and Waveout plugins.
+ * multi-channel audio and S/PDIF support for both the DirectX and Waveout plugins.
  * localization support via gettext is now fully working.
  * rc interface is now fully useable.
+ * fixed the MSVC project files generation.
 
 Mac OS X port:
  * several fixes for multi channel audio devices. AC3 over SPDIF with M-Audio Sonica Theater still does not work. this is most likely a driver bug and has been reported to M-Audio. ( Delta, Griffin iMate and MOTU firewire devices should work).

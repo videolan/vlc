@@ -2,7 +2,7 @@
  * bandlimited.c : bandlimited interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: bandlimited.c,v 1.2 2003/03/04 19:28:39 gbazin Exp $
+ * $Id: bandlimited.c,v 1.3 2003/03/04 22:08:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -179,21 +179,18 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                          p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
                 memcpy( p_in_buf->p_buffer, p_filter->p_sys->p_buf +
                         i_nb_channels * p_filter->p_sys->i_old_wing,
-                        i_nb_channels * p_filter->p_sys->i_old_wing *
+                        p_filter->p_sys->i_old_wing *
                         p_filter->input.i_bytes_per_frame );
 
                 p_out_buf->i_nb_samples = p_in_buf->i_nb_samples +
                     p_filter->p_sys->i_old_wing;
-
-                aout_DateSet( &p_filter->p_sys->end_date,
-                              p_in_buf->start_date );
 
                 p_out_buf->end_date =
                     aout_DateIncrement( &p_filter->p_sys->end_date,
                                         p_out_buf->i_nb_samples );
 
                 p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
-                    i_nb_channels * sizeof(int32_t);
+                    p_filter->input.i_bytes_per_frame;
             }
         }
         p_filter->b_continuity = VLC_FALSE;
@@ -207,7 +204,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         p_filter->b_continuity = VLC_TRUE;
         p_filter->p_sys->i_remainder = 0;
         aout_DateInit( &p_filter->p_sys->end_date, p_filter->output.i_rate );
-
+        aout_DateSet( &p_filter->p_sys->end_date, p_in_buf->start_date );
         p_filter->p_sys->i_old_rate   = p_filter->input.i_rate;
         p_filter->p_sys->d_old_factor = 1;
         p_filter->p_sys->i_old_wing   = 0;
@@ -419,12 +416,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Finalize aout buffer */
     p_out_buf->i_nb_samples = i_out;
     p_out_buf->start_date = p_in_buf->start_date;
-
-    if( p_in_buf->start_date !=
-        aout_DateGet( &p_filter->p_sys->end_date ) )
-    {
-        aout_DateSet( &p_filter->p_sys->end_date, p_in_buf->start_date );
-    }
 
     p_out_buf->end_date = aout_DateIncrement( &p_filter->p_sys->end_date,
                                               p_out_buf->i_nb_samples );
