@@ -20,33 +20,39 @@
     <div class="section">
      <table class="add">
       <tr>
-       <td nowrap="1">Current State: <vlc id="value" param1="stream_state" /></td>
+       <td nowrap="nowrap">Current State: <vlc id="value" param1="stream_state" /></td>
        <td align="right"><a href="info.html">Information</a> <a href="admin/">Administration</a></td>
       </tr>
       <tr>
-       <form method="get" action="">
-        <td nowrap="1">
-         <input type="submit" name="control" value="stop" />
-         <input type="submit" name="control" value="pause" />
-         <input type="submit" name="control" value="previous" />
-         <input type="submit" name="control" value="next" />
-         <input type="submit" name="control" value="fullscreen" />
+        <td nowrap="nowrap">
+          <form method="get" action="">
+            <input type="submit" name="control" value="stop" />
+            <input type="submit" name="control" value="pause" />
+            <input type="submit" name="control" value="previous" />
+            <input type="submit" name="control" value="next" />
+            <input type="submit" name="control" value="fullscreen" />
+          </form>
         </td>
-       </form>
       </tr>
       <tr>
        <td colspan="2">
         <table>
          <tr>
-          <form>
-           <td><input type="submit" name="seek_value" value="-1min"><input type="hidden" name="control" value="seek"></td>
-          </form>
-          <form>
-           <td><input type="text" name="seek_value" size="14"><input type="hidden" name="control" value="seek"></td>
-          </form>
-          <form>
-           <td><input type="submit" name="seek_value" value="+1min"><input type="hidden" name="control" value="seek"></td>
-          </form>
+           <td>
+             <form method="get" action="">             
+               <input type="submit" name="seek_value" value="-1min"/><input type="hidden" name="control" value="seek"/>
+             </form>
+           </td>
+           <td>
+             <form method="get" action="">
+               <input type="text" name="seek_value" size="14"/><input type="hidden" name="control" value="seek"/>
+             </form>
+           </td>
+           <td>
+             <form method="get" action="">
+               <input type="submit" name="seek_value" value="+1min"/><input type="hidden" name="control" value="seek"/>
+             </form>
+           </td>
            <td>
             ( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )
            </td>
@@ -55,11 +61,11 @@
        </td>
       </tr>
       <tr>
-       <form>
         <td>
-         Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"><input type="hidden" name="control" value="volume"><input type="submit" name="Set" value="Set">
+          <form method="get" action="">
+          Current Volume: <vlc id="value" param1="volume" /> <input type="text" name="value" size="5"/><input type="hidden" name="control" value="volume"/><input type="submit" name="Set" value="Set"/>
+          </form>
         </td>
-       </form>
       </tr>
      </table>
     </div>
@@ -80,43 +86,51 @@
     </div>
 
     <div class="sectitle">VLC Playlist</div>
-     <div class="section"> 
-      <tr>
-       <td>
-        <form>
-         <input type="submit" name="control" value="sort" /> by
-         <select name="type">
-          <option value="title">title
-          <option value="group">group
-          <option value="author">author
-         </select> with
-         <select name="order">
-          <option value="0">normal order
-          <option value="1">reverse order
-         </select>
-        </form>
-       </td>
-      </tr>
+     <div class="section">
       <form method="get" action="">
       <table>
-       <vlc id="foreach" param1="pl" param2="playlist" />
-        <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
-         <td>
-          <input type=checkbox name="item" value="<vlc id="value" param1="pl.index" />">
-          <vlc id="if" param1="pl.current" />
-               <b>
-           <vlc id="end" />
-           <a href="?control=play&item=<vlc id="value" param1="pl.index" />"><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a>
-          <vlc id="if" param1="pl.current" />
-               </b>
-          <vlc id="end" />
-         </td>
+        <tr>
+          <td>
+            <input type="submit" name="control" value="sort" /> by
+            <select name="type">
+              <option value="title">title</option>
+              <option value="group">group</option>
+              <option value="author">author</option>
+            </select> with
+            <select name="order">
+              <option value="0">normal order</option>
+              <option value="1">reverse order</option>
+            </select>
+          </td>
         </tr>
-       <vlc id="end" />
+        <tr>
+          <td>
+            <table>
+              <vlc id="foreach" param1="pl" param2="playlist" />
+              <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
+                <td>
+                  <input type="checkbox" name="item" value="<vlc id="value" param1="pl.index" />"/>
+                  <vlc id="if" param1="pl.current" />
+                  <b>
+                  <vlc id="end" />
+                  <a href="?control=play&amp;item=<vlc id="value" param1="pl.index" />"><vlc id="value" param1="pl.index" /> - <vlc id="value" param1="pl.name" /></a>
+                  <vlc id="if" param1="pl.current" />
+                  </b>
+                  <vlc id="end" />
+                </td>
+              </tr>
+              <vlc id="end" />
+            </table>
+          </td>
+        </tr>
+        <tr>  
+          <td>
+            <input type="submit" name="control" value="delete" />
+            <input type="submit" name="control" value="keep" />
+          </td>
+        </tr>
       </table>
-      <td><input type="submit" name="control" value="delete" /></td>
-      <td><input type="submit" name="control" value="keep" /></td>
-     </form>
+      </form>
     </div>
     <hr/>
     <p> <vlc id="value" param1="copyright" /> </p>
