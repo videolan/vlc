@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.1 2001/11/12 22:42:56 sam Exp $
+ * $Id: win32_specific.c,v 1.2 2001/11/14 00:01:36 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,6 +24,7 @@
 
 #include <string.h>                                              /* strdup() */
 #include <stdlib.h>                                                /* free() */
+#include <fcntl.h>
 
 #include <winsock2.h>
 
@@ -48,6 +49,8 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     {
         fprintf( stderr, "error: can't initiate WinSocks, error %i", i_err );
     }
+
+    _fmode = _O_BINARY;  /* sets the default file-translation mode */
 }
 
 /*****************************************************************************

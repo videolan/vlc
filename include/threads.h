@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.25 2001/10/01 12:48:01 massiot Exp $
+ * $Id: threads.h,v 1.26 2001/11/14 00:01:36 jlj Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -534,7 +534,7 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
            && p_condvar->i_waiting_threads == i_waiting_threads )
     {
         PulseEvent( p_condvar->signal );
-        Sleep( 1 ); /* deschedule the current thread */
+        Sleep( 0 ); /* deschedule the current thread */
     }
     return 0;
 
@@ -608,7 +608,7 @@ static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
     while( p_condvar->i_waiting_threads )
     {
         PulseEvent( p_condvar->signal );
-        Sleep( 1 ); /* deschedule the current thread */
+        Sleep( 0 ); /* deschedule the current thread */
     }
     return 0;
 
