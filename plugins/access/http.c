@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.10.2.3 2002/07/25 20:22:17 sigmunau Exp $
+ * $Id: http.c,v 1.10.2.4 2002/10/03 22:14:58 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -157,7 +157,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
          snprintf( psz_buffer, sizeof(psz_buffer),
                    "%s"
                    HTTP_USERAGENT HTTP_END,
-                   p_access_data->psz_buffer, i_tell );
+                   p_access_data->psz_buffer );
     }
     psz_buffer[sizeof(psz_buffer) - 1] = '\0';
 

@@ -74,6 +74,7 @@ PLUGINS_TARGETS := a52/a52 \
 		ac3_spdif/ac3_spdif \
 		access/file \
 		access/udp \
+		access/rtp \
 		access/http \
 		alsa/alsa \
 		arts/arts \

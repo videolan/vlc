@@ -446,7 +446,7 @@ PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file
 dnl
 dnl  Network modules
 dnl
-NETWORK_MODULES="udp http ipv4"
+NETWORK_MODULES="udp http rtp ipv4"
 
 dnl
 dnl  Accelerated modules
