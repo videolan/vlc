@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.22 2003/07/04 16:35:20 sam Exp $
+ * $Id: transcode.c,v 1.23 2003/07/06 16:22:15 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -479,6 +479,7 @@ static struct
 {
     /* audio */
     { VLC_FOURCC( 'm', 'p', 'g', 'a' ), CODEC_ID_MP2 },
+    { VLC_FOURCC( 'm', 'p', '3', ' ' ), CODEC_ID_MP3LAME },
     { VLC_FOURCC( 'a', '5', '2', ' ' ), CODEC_ID_AC3 },
     { VLC_FOURCC( 'a', 'c', '3', ' ' ), CODEC_ID_AC3 },
     { VLC_FOURCC( 'w', 'm', 'a', '1' ), CODEC_ID_WMAV1 },

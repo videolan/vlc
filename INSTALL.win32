@@ -1,4 +1,4 @@
-$Id: INSTALL.win32,v 1.16 2003/06/22 16:00:56 gbazin Exp $
+$Id: INSTALL.win32,v 1.17 2003/07/06 16:22:15 gbazin Exp $
 
 INSTALL file for the Windows9x/Me/NT4/2k/XP version of the VLC media player
 
@@ -93,7 +93,8 @@ actually really easy to compile a full-featured version of vlc (these compiled
 libraries will only work with mingw or cygwin):
 http://www.videolan.org/pub/testing/win32/contrib-20030622-win32-bin.tar.bz2
 All you need to do is extract it in your root directory (the include files
-and libraries will be put in /usr/win32)
+and libraries will be put in /usr/win32). You can do this with the following
+command: "tar xjvf contrib-20030622-win32-bin.tar.bz2 -C /"
 
 A complete list of the libraries on which we depend can be found here:
 http://developers.videolan.org/vlc/
