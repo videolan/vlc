@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.13 2002/03/25 02:06:24 jobi Exp $
+ * $Id: gnome.c,v 1.14 2002/03/25 20:37:00 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -250,6 +250,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_network = NULL;
     p_intf->p_sys->p_sat = NULL;
     p_intf->p_sys->p_jump = NULL;
+    p_intf->p_sys->p_tooltips = gtk_tooltips_new();
 
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
@@ -279,6 +280,9 @@ static void intf_Run( intf_thread_t *p_intf )
 
     /* Remove the timeout */
     gtk_timeout_remove( i_dummy );
+
+    /* Destroy the Tooltips structure */
+    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_tooltips) );
 
     /* Get rid of stored callbacks so we can unload the plugin */
     for( i_dummy = 0;

@@ -2,10 +2,10 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.15 2002/03/25 02:06:24 jobi Exp $
+ * $Id: gtk.c,v 1.16 2002/03/25 20:37:00 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -198,11 +198,12 @@ static void intf_Run( intf_thread_t *p_intf )
     gtk_init( &i_args, &pp_args );
 
     /* Create some useful widgets that will certainly be used */
-    p_intf->p_sys->p_window = create_intf_window( );
-    p_intf->p_sys->p_popup = create_intf_popup( );
+    p_intf->p_sys->p_window = create_intf_window();
+    p_intf->p_sys->p_popup = create_intf_popup();
     p_intf->p_sys->p_playlist = create_intf_playlist();
     p_intf->p_sys->p_messages = create_intf_messages();
-    
+    p_intf->p_sys->p_tooltips = gtk_tooltips_new();
+
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
                           VOUT_TITLE " (Gtk+ interface)");
@@ -220,7 +221,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
     /* Get the slider object */
     p_intf->p_sys->p_slider_frame = GTK_FRAME( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "slider_frame" ) ); 
+        GTK_OBJECT( p_intf->p_sys->p_window ), "slider_frame" ) );
 
     /* Configure the log window */
     p_intf->p_sys->p_messages_text = GTK_TEXT( gtk_object_get_data(
@@ -283,6 +284,9 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Remove the timeout */
     gtk_timeout_remove( i_dummy );
 
+    /* Destroy the Tooltips structure */
+    gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_tooltips) );
+
     /* Launch stored callbacks */
     for( i_dummy = 0;
          i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
@@ -311,7 +315,7 @@ static gint GtkManage( gpointer p_data )
     int i_start, i_stop;
 
     vlc_mutex_lock( &p_intf->change_lock );
-    
+
     /* If the "display popup" flag has changed */
     if( p_intf->b_menu_change )
     {
@@ -387,7 +391,7 @@ static gint GtkManage( gpointer p_data )
                 p_intf->p_sys->b_playing )
             {
                 float newvalue = p_intf->p_sys->p_adj->value;
-    
+
 #define p_area p_input_bank->pp_input[0]->stream.p_selected_area
                 /* If the user hasn't touched the slider since the last time,
                  * then the input can safely change it */
@@ -396,7 +400,7 @@ static gint GtkManage( gpointer p_data )
                     /* Update the value */
                     p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
                         ( 100. * p_area->i_tell ) / p_area->i_size;
-        
+
                     gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
                                              "value_changed" );
                 }
@@ -405,18 +409,18 @@ static gint GtkManage( gpointer p_data )
                 else if( p_intf->p_sys->b_slider_free )
                 {
                     off_t i_seek = ( newvalue * p_area->i_size ) / 100;
-    
+
                     /* release the lock to be able to seek */
                     vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
                     input_Seek( p_input_bank->pp_input[0], i_seek );
                     vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
-        
+
                     /* Update the old value */
                     p_intf->p_sys->f_adj_oldvalue = newvalue;
                 }
 #    undef p_area
             }
-    
+
             if( p_intf->p_sys->i_part !=
                 p_input_bank->pp_input[0]->stream.p_selected_area->i_part )
             {

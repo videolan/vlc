@@ -2,10 +2,10 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.14 2002/03/16 01:40:58 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.15 2002/03/25 20:37:00 lool Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -55,7 +55,6 @@ static void GtkCreateConfigDialog( char *, intf_thread_t * );
 static void GtkConfigOk          ( GtkButton *, gpointer );
 static void GtkConfigApply       ( GtkButton *, gpointer );
 static void GtkConfigCancel      ( GtkButton *, gpointer );
-static void GtkConfigSave        ( GtkButton *, gpointer );
 
 static void GtkConfigDialogDestroyed ( GtkObject *, gpointer );
 
@@ -77,7 +76,9 @@ static void GtkPluginHighlighted ( GtkCList *, int, int, GdkEventButton *,
  ****************************************************************************/
 void GtkPreferencesActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
+    intf_thread_t * p_intf;
+
+    p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
 
     GtkCreateConfigDialog( "main", p_intf );
 }
@@ -86,31 +87,59 @@ void GtkPreferencesActivate( GtkMenuItem * menuitem, gpointer user_data )
  * GtkCreateConfigDialog: dynamically creates the configuration dialog
  * box from all the configuration data provided by the selected module.
  ****************************************************************************/
+
+/* create a new tooltipped area */
+#define TOOLTIP( container, text, ev_box )                                \
+    /* create an event box to catch some events */                        \
+    ev_box = gtk_event_box_new();                                         \
+    gtk_container_add( GTK_CONTAINER(container), ev_box );                \
+    /* add a tooltip on mouseover */                                      \
+    /* FIXME: have a different text for the private text */               \
+    gtk_tooltips_set_tip( p_intf->p_sys->p_tooltips,                      \
+                          ev_box, text, text );                           \
+    gtk_container_set_border_width( GTK_CONTAINER(ev_box), 2 );
+
+/* draws a right aligned label in side of a widget */
+#define LABEL_AND_WIDGET( text, widget, hbox, label, align )              \
+    gtk_table_resize( GTK_TABLE(category_table), ++rows, 2 );             \
+    align = gtk_alignment_new( 1, .5, 0, 0 );                             \
+    label = gtk_label_new( text );                                        \
+    gtk_container_add( GTK_CONTAINER(align), label );                     \
+    gtk_table_attach_defaults( GTK_TABLE(category_table), align,          \
+                               0, 1, rows - 1, rows );                    \
+    align = gtk_alignment_new( 0, .5, 0, 0 );                             \
+    gtk_container_add( GTK_CONTAINER(align), widget );                    \
+    gtk_table_attach_defaults( GTK_TABLE(category_table), align,          \
+                               1, 2, rows - 1, rows );
+
 static void GtkCreateConfigDialog( char *psz_module_name,
                                    intf_thread_t *p_intf )
 {
     module_t *p_module, *p_module_bis;
     int i;
 
+    guint rows = 0;
+
     GHashTable *config_hash_table;
+
+    GtkWidget *item_event_box;
 
     GtkWidget *config_dialog;
     GtkWidget *config_dialog_vbox;
     GtkWidget *config_notebook;
-    GtkWidget *scrolled_window;
+    GtkWidget *category_table = NULL;
     GtkWidget *category_vbox = NULL;
 
     GtkWidget *dialog_action_area;
     GtkWidget *ok_button;
     GtkWidget *apply_button;
-    GtkWidget *save_button;
     GtkWidget *cancel_button;
 
+    GtkWidget *item_align;
     GtkWidget *item_frame;
-    GtkWidget *item_table;
     GtkWidget *item_hbox;
     GtkWidget *item_label;
-    GtkWidget *item_text;
+    GtkWidget *item_vbox;
     GtkWidget *string_entry;
     GtkWidget *integer_spinbutton;
     GtkObject *item_adj;
@@ -125,6 +154,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
      * close the dialog window, but remember that it is only hidden if you
      * clicked on the action buttons). This trick also allows us not to
      * duplicate identical dialog windows. */
+
     config_dialog = (GtkWidget *)gtk_object_get_data(
                     GTK_OBJECT(p_intf->p_sys->p_window), psz_module_name );
     if( config_dialog )
@@ -146,33 +176,24 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     }
     if( !p_module ) return;
 
-
-    /*
-     * We found it, now we can start building its configuration interface
-     */
-
+    /* We found it, now we can start building its configuration interface */
     /* Create the configuration dialog box */
     config_dialog = gtk_dialog_new();
     gtk_window_set_title( GTK_WINDOW(config_dialog), p_module->psz_longname );
-    gtk_window_set_default_size( GTK_WINDOW(config_dialog),
-                                 600 /*width*/, 400/*height*/ );
 
     config_dialog_vbox = GTK_DIALOG(config_dialog)->vbox;
-    gtk_widget_show( config_dialog_vbox );
     gtk_container_set_border_width( GTK_CONTAINER(config_dialog_vbox), 0 );
 
     /* Create our config hash table and associate it with the dialog box */
     config_hash_table = g_hash_table_new( NULL, NULL );
-    gtk_object_set_data_full( GTK_OBJECT(config_dialog), "config_hash_table",
-                              config_hash_table,
+    gtk_object_set_data_full( GTK_OBJECT(config_dialog),
+                              "config_hash_table", config_hash_table,
                               (GtkDestroyNotify)GtkFreeHashTable );
 
     /* Create notebook */
     config_notebook = gtk_notebook_new();
-    gtk_notebook_set_scrollable( GTK_NOTEBOOK(config_notebook), TRUE);
-    gtk_widget_show( config_notebook );
-    gtk_box_pack_start( GTK_BOX(config_dialog_vbox), config_notebook,
-                        TRUE, TRUE, 0 );
+    gtk_notebook_set_scrollable( GTK_NOTEBOOK(config_notebook), TRUE );
+    gtk_container_add( GTK_CONTAINER(config_dialog_vbox), config_notebook );
 
     /* Enumerate config options and add corresponding config boxes */
     for( i = 0; i < p_module->i_config_lines; i++ )
@@ -182,101 +203,87 @@ static void GtkCreateConfigDialog( char *psz_module_name,
         {
         case MODULE_CONFIG_HINT_CATEGORY:
 
-            /* create a new scrolled window. */
-            scrolled_window = gtk_scrolled_window_new( NULL, NULL );
-            gtk_scrolled_window_set_policy(
-                GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_NEVER,
-                GTK_POLICY_AUTOMATIC );
-            gtk_widget_show( scrolled_window );
+            /* pack a new vbox in the notebook */
+            category_vbox = gtk_vbox_new( FALSE, 2 );
+            gtk_container_set_border_width( GTK_CONTAINER(category_vbox), 2 );
 
-            /* add scrolled window as a notebook page */
+            /* add category vbox as a notebook page */
             item_label = gtk_label_new( p_module->p_config[i].psz_text );
-            gtk_widget_show( item_label );
             gtk_notebook_append_page( GTK_NOTEBOOK(config_notebook),
-                                      scrolled_window, item_label );
+                                      category_vbox, item_label );
 
-            /* pack a new vbox into the scrolled window */
-            category_vbox = gtk_vbox_new( FALSE, 10 );
-            gtk_container_set_border_width( GTK_CONTAINER(category_vbox), 5 );
-            gtk_scrolled_window_add_with_viewport(
-                GTK_SCROLLED_WINDOW( scrolled_window ), category_vbox );
-            gtk_widget_show( category_vbox );
+            /* add a new table for right-left alignment */
+            category_table = gtk_table_new( 0, 0, FALSE );
+            gtk_table_set_col_spacings( GTK_TABLE(category_table), 2 );
+            rows = 0;
+            gtk_container_add( GTK_CONTAINER(category_vbox), category_table );
 
             break;
 
         case MODULE_CONFIG_ITEM_PLUGIN:
 
-            /* add new frame for the config option */
             item_frame = gtk_frame_new( p_module->p_config[i].psz_text );
-            gtk_widget_show( item_frame );
-            gtk_box_pack_start( GTK_BOX(category_vbox), item_frame,
-                                FALSE, FALSE, 5 );
 
-            /* add a new table for the config option */
-            item_table = gtk_table_new( 3, 3, FALSE );
-            gtk_widget_show( item_table );
-            gtk_container_add( GTK_CONTAINER(item_frame), item_table );
+            gtk_table_resize( GTK_TABLE(category_table), ++rows, 2 );
+            gtk_table_attach_defaults( GTK_TABLE(category_table), item_frame,
+                                       0, 2, rows - 1, rows );
 
-            /* create a new scrolled window */
-            scrolled_window = gtk_scrolled_window_new( NULL, NULL );
-            gtk_scrolled_window_set_policy(
-                GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_NEVER,
-                GTK_POLICY_AUTOMATIC );
-            gtk_widget_set_usize( scrolled_window, -2, 150 );
-            gtk_widget_show( scrolled_window );
-            gtk_table_attach( GTK_TABLE(item_table), scrolled_window,
-                              0, 2, 0, 1, GTK_FILL, GTK_FILL, 5, 5 );
+            TOOLTIP( item_frame, p_module->p_config[i].psz_longtext,
+                     item_event_box )
 
-            /* create a new clist widget and add it to the scrolled win */
-            plugin_clist = gtk_clist_new_with_titles( 1,
-                               &p_module->p_config[i].psz_text );
+            item_vbox = gtk_vbox_new( FALSE, 2 );
+            gtk_container_add( GTK_CONTAINER(item_event_box), item_vbox );
+
+            /* create a new clist widget */
+            {
+                gchar * titles[] = { "Name", "Description" };
+
+                plugin_clist =
+                    gtk_clist_new_with_titles( 2, titles );
+            }
             gtk_clist_column_titles_passive( GTK_CLIST(plugin_clist) );
             gtk_clist_set_selection_mode( GTK_CLIST(plugin_clist),
                                           GTK_SELECTION_SINGLE);
-            gtk_container_add( GTK_CONTAINER(scrolled_window), plugin_clist );
-            gtk_widget_show( plugin_clist );
+            gtk_container_add( GTK_CONTAINER(item_vbox), plugin_clist );
 
             /* build a list of available plugins */
-            for( p_module_bis = p_module_bank->first ;
-                 p_module_bis != NULL ;
-                 p_module_bis = p_module_bis->next )
             {
-                if( p_module_bis->i_capabilities &
-                    (1 << p_module->p_config[i].i_value) )
+                gchar * entry[2];
 
-                    gtk_clist_append( GTK_CLIST(plugin_clist),
-                                      (gchar **)&p_module_bis->psz_name );
+                for( p_module_bis = p_module_bank->first ;
+                     p_module_bis != NULL ;
+                     p_module_bis = p_module_bis->next )
+                {
+                    if( p_module_bis->i_capabilities &
+                        (1 << p_module->p_config[i].i_value) )
+                    {
+                        entry[0] = p_module_bis->psz_name;
+                        entry[1] = p_module_bis->psz_longname;
+                        gtk_clist_append( GTK_CLIST(plugin_clist), entry );
+                    }
+                }
             }
 
-            /* add text box for config description */
-            if( p_module->p_config[i].psz_longtext )
-            {
-                item_text = gtk_label_new( p_module->p_config[i].psz_longtext);
-                gtk_label_set_justify( GTK_LABEL(item_text), GTK_JUSTIFY_LEFT);
-                gtk_label_set_line_wrap( GTK_LABEL(item_text), TRUE );
-                gtk_widget_show( item_text );
-                gtk_table_attach( GTK_TABLE(item_table), item_text,
-                                  2, 3, 0, 1, GTK_FILL, GTK_FILL, 5, 5 );
-            }
-
-            /* pack a label into the config line */
-            item_label = gtk_label_new( "" );
-            gtk_widget_show( item_label );
-            gtk_table_attach( GTK_TABLE(item_table), item_label,
-                              2, 3, 1, 2, GTK_FILL, GTK_FILL, 5, 5 );
+            gtk_clist_set_column_auto_resize( GTK_CLIST(plugin_clist),
+                                              0, TRUE );
+            gtk_clist_set_column_auto_resize( GTK_CLIST(plugin_clist),
+                                              1, TRUE );
 
             /* connect signals to the plugins list */
             gtk_signal_connect( GTK_OBJECT(plugin_clist), "select_row",
                                 GTK_SIGNAL_FUNC(GtkPluginHighlighted),
-                                (gpointer)item_label );
+                                NULL );
+
+            /* hbox holding the "select" and "configure" buttons */
+            item_hbox = gtk_hbox_new( FALSE, 2 );
+            gtk_container_add( GTK_CONTAINER(item_vbox), item_hbox);
 
             /* add configure button */
             plugin_config_button =
                 gtk_button_new_with_label( _("Configure") );
             gtk_widget_set_sensitive( plugin_config_button, FALSE );
-            gtk_widget_show( plugin_config_button );
-            gtk_table_attach( GTK_TABLE(item_table), plugin_config_button,
-                              0, 1, 1, 2, GTK_FILL, GTK_FILL, 5, 5 );
+            gtk_container_add( GTK_CONTAINER(item_hbox),
+                               plugin_config_button );
             gtk_object_set_data( GTK_OBJECT(plugin_config_button),
                                  "p_intf", p_intf );
             gtk_object_set_data( GTK_OBJECT(plugin_clist),
@@ -285,23 +292,21 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             /* add select button */
             plugin_select_button =
                 gtk_button_new_with_label( _("Select") );
-            gtk_widget_show( plugin_select_button );
-            gtk_table_attach( GTK_TABLE(item_table), plugin_select_button,
-                              1, 2, 1, 2, GTK_FILL, GTK_FILL, 5, 5 );
+            gtk_container_add( GTK_CONTAINER(item_hbox),
+                               plugin_select_button );
 
+            /* hbox holding the "selected" label and text input */
+            item_hbox = gtk_hbox_new( FALSE, 2 );
+            gtk_container_add( GTK_CONTAINER(item_vbox), item_hbox);
             /* add new label */
             item_label = gtk_label_new( _("Selected:") );
-            gtk_widget_show( item_label );
-            gtk_table_attach( GTK_TABLE(item_table), item_label,
-                              0, 1, 2, 3, GTK_FILL, GTK_FILL, 5, 5 );
+            gtk_container_add( GTK_CONTAINER(item_hbox), item_label );
 
             /* add input box with default value */
             string_entry = gtk_entry_new();
             gtk_object_set_data( GTK_OBJECT(plugin_clist),
                                  "plugin_entry", string_entry );
-            gtk_widget_show( string_entry );
-            gtk_table_attach( GTK_TABLE(item_table), string_entry,
-                              2, 3, 2, 3, GTK_FILL, GTK_FILL, 5, 5 );
+            gtk_container_add( GTK_CONTAINER(item_hbox), string_entry );
             vlc_mutex_lock( p_module->p_config[i].p_lock );
             gtk_entry_set_text( GTK_ENTRY(string_entry),
                                 p_module->p_config[i].psz_value ?
@@ -327,40 +332,13 @@ static void GtkCreateConfigDialog( char *psz_module_name,
         case MODULE_CONFIG_ITEM_STRING:
         case MODULE_CONFIG_ITEM_FILE:
 
-            /* add new frame for the config option */
-            item_frame = gtk_frame_new( p_module->p_config[i].psz_text );
-            gtk_widget_show( item_frame );
-            gtk_box_pack_start( GTK_BOX(category_vbox), item_frame,
-                                FALSE, FALSE, 5 );
-
-            /* add a new table for the config option */
-            item_table = gtk_table_new( 1, 1, FALSE );
-            gtk_widget_show( item_table );
-            gtk_container_add( GTK_CONTAINER(item_frame), item_table );
-
             /* add input box with default value */
             string_entry = gtk_entry_new();
-            gtk_widget_show( string_entry );
-            gtk_table_attach( GTK_TABLE(item_table), string_entry,
-                              0, 1, 0, 1, GTK_FILL, GTK_FILL, 5, 5 );
             vlc_mutex_lock( p_module->p_config[i].p_lock );
             gtk_entry_set_text( GTK_ENTRY(string_entry),
                                 p_module->p_config[i].psz_value ?
                                 p_module->p_config[i].psz_value : "" );
             vlc_mutex_unlock( p_module->p_config[i].p_lock );
-
-            /* add text box for config description */
-            if( p_module->p_config[i].psz_longtext )
-            {
-                item_text = gtk_label_new( p_module->p_config[i].psz_longtext);
-                gtk_label_set_justify( GTK_LABEL(item_text), GTK_JUSTIFY_LEFT);
-                gtk_label_set_line_wrap( GTK_LABEL(item_text), TRUE );
-                gtk_widget_set_usize( item_text, 500, -2 );
-                gtk_widget_show( item_text );
-                gtk_table_resize( GTK_TABLE(item_table), 2, 1 );
-                gtk_table_attach( GTK_TABLE(item_table), item_text,
-                                  0, 1, 1, 2, GTK_FILL, GTK_FILL, 5, 5 );
-            }
 
             /* connect signal to track changes in the text box */
             gtk_object_set_data( GTK_OBJECT(string_entry), "config_option",
@@ -368,85 +346,44 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             gtk_signal_connect( GTK_OBJECT(string_entry), "changed",
                                 GTK_SIGNAL_FUNC(GtkStringChanged),
                                 (gpointer)config_dialog );
+
+            TOOLTIP( category_vbox, p_module->p_config[i].psz_longtext,
+                     item_event_box )
+
+            LABEL_AND_WIDGET( p_module->p_config[i].psz_text, string_entry,
+                              item_hbox, item_label, item_align );
             break;
 
         case MODULE_CONFIG_ITEM_INTEGER:
-
-            /* add new frame for the config option */
-            item_frame = gtk_frame_new( p_module->p_config[i].psz_text );
-            gtk_widget_show( item_frame );
-            gtk_box_pack_start( GTK_BOX(category_vbox), item_frame,
-                                FALSE, FALSE, 5 );
-
-            /* add a new table for the config option */
-            item_table = gtk_table_new( 2, 1, FALSE );
-            gtk_widget_show( item_table );
-            gtk_container_add( GTK_CONTAINER(item_frame), item_table );
 
             /* add input box with default value */
             item_adj = gtk_adjustment_new( p_module->p_config[i].i_value,
                                            -1, 1000, 1, 10, 10 );
             integer_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj),
                                                       1, 0 );
-            gtk_widget_show( integer_spinbutton );
-            gtk_table_attach( GTK_TABLE(item_table), integer_spinbutton,
-                                  0, 1, 0, 1, GTK_FILL, GTK_FILL, 5, 5 );
-
-            /* add text box for config description */
-            if( p_module->p_config[i].psz_longtext )
-            {
-                item_text = gtk_label_new( p_module->p_config[i].psz_longtext);
-                gtk_label_set_justify( GTK_LABEL(item_text), GTK_JUSTIFY_LEFT);
-                gtk_label_set_line_wrap( GTK_LABEL(item_text), TRUE );
-                gtk_widget_set_usize( item_text, 500, -2 );
-                gtk_widget_show( item_text );
-                gtk_table_resize( GTK_TABLE(item_table), 2, 1 );
-                gtk_table_attach( GTK_TABLE(item_table), item_text,
-                                  0, 2, 1, 2, GTK_FILL, GTK_FILL, 5, 5 );
-            }
 
             /* connect signal to track changes in the spinbutton value */
             gtk_object_set_data( GTK_OBJECT(integer_spinbutton),
-                "config_option", p_module->p_config[i].psz_name );
+                                 "config_option",
+                                 p_module->p_config[i].psz_name );
             gtk_signal_connect( GTK_OBJECT(integer_spinbutton), "changed",
                                 GTK_SIGNAL_FUNC(GtkIntChanged),
                                 (gpointer)config_dialog );
+
+            TOOLTIP( category_vbox, p_module->p_config[i].psz_longtext,
+                     item_event_box )
+
+            LABEL_AND_WIDGET( p_module->p_config[i].psz_text,
+                              integer_spinbutton, item_hbox, item_label,
+                              item_align );
             break;
 
         case MODULE_CONFIG_ITEM_BOOL:
 
-            /* add new frame for the config option */
-            item_frame = gtk_frame_new( p_module->p_config[i].psz_text );
-            gtk_widget_show( item_frame );
-            gtk_box_pack_start( GTK_BOX(category_vbox), item_frame,
-                                FALSE, FALSE, 5 );
-
-            /* add a new table for the config option */
-            item_table = gtk_table_new( 2, 1, FALSE );
-            gtk_widget_show( item_table );
-            gtk_container_add( GTK_CONTAINER(item_frame), item_table );
-
             /* add check button */
-            bool_checkbutton = gtk_check_button_new_with_label(
-                                   _(p_module->p_config[i].psz_text) );
+            bool_checkbutton = gtk_check_button_new();
             gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(bool_checkbutton),
                                           p_module->p_config[i].i_value );
-            gtk_widget_show( bool_checkbutton );
-            gtk_table_attach( GTK_TABLE(item_table), bool_checkbutton,
-                                  0, 1, 0, 1, GTK_FILL, GTK_FILL, 5, 5 );
-
-            /* add text box for config description */
-            if( p_module->p_config[i].psz_longtext )
-            {
-                item_text = gtk_label_new( p_module->p_config[i].psz_longtext);
-                gtk_label_set_justify( GTK_LABEL(item_text), GTK_JUSTIFY_LEFT);
-                gtk_label_set_line_wrap( GTK_LABEL(item_text), TRUE );
-                gtk_widget_set_usize( item_text, 500, -2 );
-                gtk_widget_show( item_text );
-                gtk_table_resize( GTK_TABLE(item_table), 2, 1 );
-                gtk_table_attach( GTK_TABLE(item_table), item_text,
-                                  0, 2, 1, 2, GTK_FILL, GTK_FILL, 5, 5 );
-            }
 
             /* connect signal to track changes in the button state */
             gtk_object_set_data( GTK_OBJECT(bool_checkbutton), "config_option",
@@ -454,6 +391,12 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             gtk_signal_connect( GTK_OBJECT(bool_checkbutton), "toggled",
                                 GTK_SIGNAL_FUNC(GtkBoolChanged),
                                 (gpointer)config_dialog );
+
+            TOOLTIP( category_vbox, p_module->p_config[i].psz_longtext,
+                     item_event_box )
+
+            LABEL_AND_WIDGET( p_module->p_config[i].psz_text, bool_checkbutton,
+                              item_hbox, item_label, item_align );
             break;
         }
     }
@@ -461,37 +404,26 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     /* Now let's add the action buttons at the bottom of the page */
 
     dialog_action_area = GTK_DIALOG(config_dialog)->action_area;
-    gtk_widget_show( dialog_action_area );
-    //gtk_container_set_border_width( GTK_CONTAINER(dialog_action_area), 10 );
+    gtk_container_set_border_width( GTK_CONTAINER(dialog_action_area), 4 );
 
     /* add a new table for the config option */
     item_hbox = gtk_hbox_new( FALSE, 0 );
-    gtk_widget_show( item_hbox );
     gtk_box_pack_end( GTK_BOX(dialog_action_area), item_hbox,
                       TRUE, FALSE, 0 );
     item_hbox = gtk_hbox_new( FALSE, 0 );
-    gtk_widget_show( item_hbox );
     gtk_box_pack_end( GTK_BOX(dialog_action_area), item_hbox,
                       TRUE, FALSE, 0 );
 
     /* Create the OK button */
     ok_button = gtk_button_new_with_label( _("Ok") );
-    gtk_widget_show( ok_button );
     gtk_box_pack_start( GTK_BOX(dialog_action_area), ok_button,
                         TRUE, TRUE, 0 );
 
     apply_button = gtk_button_new_with_label( _("Apply") );
-    gtk_widget_show( apply_button );
     gtk_box_pack_start( GTK_BOX(dialog_action_area), apply_button,
                         TRUE, TRUE, 0 );
 
-    save_button = gtk_button_new_with_label( _("Save") );
-    gtk_widget_show( save_button );
-    gtk_box_pack_start( GTK_BOX(dialog_action_area), save_button,
-                        TRUE, TRUE, 0 );
-
     cancel_button = gtk_button_new_with_label( _("Cancel") );
-    gtk_widget_show( cancel_button );
     gtk_box_pack_start( GTK_BOX(dialog_action_area), cancel_button,
                         TRUE, TRUE, 0 );
 
@@ -500,9 +432,6 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                         config_dialog );
     gtk_signal_connect( GTK_OBJECT(apply_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigApply),
-                        config_dialog );
-    gtk_signal_connect( GTK_OBJECT(save_button), "clicked",
-                        GTK_SIGNAL_FUNC(GtkConfigSave),
                         config_dialog );
     gtk_signal_connect( GTK_OBJECT(cancel_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigCancel),
@@ -519,8 +448,13 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                        GTK_SIGNAL_FUNC(GtkConfigDialogDestroyed),
                        (gpointer)p_intf );
 
-    gtk_widget_show( config_dialog );
+    gtk_widget_show_all( config_dialog );
 }
+
+#undef FRAME
+#undef SCROLLED_WINDOW
+#undef LABEL
+#undef TOOLTIP
 
 /****************************************************************************
  * GtkConfigApply: store the changes to the config inside the modules
@@ -532,6 +466,7 @@ void GtkConfigApply( GtkButton * button, gpointer user_data )
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
     g_hash_table_foreach( hash_table, GtkSaveHashValue, NULL );
+
 }
 
 void GtkConfigOk( GtkButton * button, gpointer user_data )
@@ -540,15 +475,10 @@ void GtkConfigOk( GtkButton * button, gpointer user_data )
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
+
 void GtkConfigCancel( GtkButton * button, gpointer user_data )
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
-}
-
-void GtkConfigSave( GtkButton * button, gpointer user_data )
-{
-    GtkConfigApply( button, user_data );
-    config_SaveConfigFile( NULL );
 }
 
 /****************************************************************************
@@ -562,9 +492,8 @@ void GtkPluginHighlighted( GtkCList *plugin_clist, int row, int column,
     module_t *p_module;
     char *psz_name;
 
-    if( gtk_clist_get_text( GTK_CLIST(plugin_clist), row, column, &psz_name ) )
+    if( gtk_clist_get_text( GTK_CLIST(plugin_clist), row, 0, &psz_name ) )
     {
-
         /* look for plugin 'psz_name' */
         for( p_module = p_module_bank->first ;
              p_module != NULL ;
@@ -572,12 +501,8 @@ void GtkPluginHighlighted( GtkCList *plugin_clist, int row, int column,
         {
           if( !strcmp( p_module->psz_name, psz_name ) )
           {
-              gtk_label_set_text( GTK_LABEL(user_data),
-                                  p_module->psz_longname ?
-                                      p_module->psz_longname : "" );
               gtk_object_set_data( GTK_OBJECT(plugin_clist),
                                    "plugin_highlighted", p_module );
-
               config_button = gtk_object_get_data( GTK_OBJECT(plugin_clist),
                                                    "config_button" );
               if( p_module->i_config_items )
@@ -604,7 +529,6 @@ void GtkPluginConfigure( GtkButton *button, gpointer user_data )
                                                 "plugin_highlighted" );
 
     if( !p_module ) return;
-
     p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(button),
                                                    "p_intf" );
     GtkCreateConfigDialog( p_module->psz_name, (gpointer)p_intf );
@@ -637,6 +561,7 @@ static void GtkStringChanged( GtkEditable *editable, gpointer user_data )
     module_config_t *p_config;
 
     GHashTable *hash_table;
+
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
     /* free old p_config */
@@ -662,6 +587,7 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
     module_config_t *p_config;
 
     GHashTable *hash_table;
+
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
 
@@ -689,6 +615,7 @@ static void GtkBoolChanged( GtkToggleButton *button, gpointer user_data )
     module_config_t *p_config;
 
     GHashTable *hash_table;
+
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
 

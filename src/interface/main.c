@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.169 2002/03/25 19:16:20 gbazin Exp $
+ * $Id: main.c,v 1.170 2002/03/25 20:37:00 lool Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -89,7 +89,7 @@
  * define its own configuration options.
  * Look into configuration.h if you need to know more about the following
  * macros.
- * 
+ *
  *****************************************************************************/
 #define BUILTIN
 #define MODULE_NAME main
@@ -112,7 +112,7 @@
 
 #define INTF_PATH_TEXT "interface default search path"
 #define INTF_PATH_LONGTEXT "This option allows you to set the default path" \
-                           "that the interface will open when looking for a" \
+                           " that the interface will open when looking for a" \
                            " file"
 
 #define AOUT_TEXT "audio output method"
@@ -144,36 +144,39 @@
                         "6 -> 16 bits unsigned big endian\n"            \
                         "7 -> mpeg2 audio (unsupported)\n"              \
                         "8 -> ac3 pass-through"
-                         
+
 #define RATE_TEXT "audio output frequency (Hz)"
 #define RATE_LONGTEXT "You can force the audio output frequency here.\n"    \
                       "Common values are 48000, 44100, 32000, 22050,"       \
                       " 16000, 11025, 8000"
 
 #define DESYNC_TEXT "Compensate desynchronization of audio (in ms)"
-#define DESYNC_LONGTEXT "This option allows you to delay the audio output." \
-                        "This can be handy if you notice a lag between the" \
+#define DESYNC_LONGTEXT "This option allows you to delay the audio output."  \
+                        " This can be handy if you notice a lag between the" \
                         " video and the audio"
 
 #define VOUT_TEXT "video output method"
-#define VOUT_LONGTEXT "This option allows you to select the video output" \
-                      "method used by vlc.\nNote that the default behaviour" \
-                      "is to automatically select the best method available"
+#define VOUT_LONGTEXT "This option allows you to select the video output"     \
+                      " method used by vlc.\nNote that the default behaviour" \
+                      " is to automatically select the best method available"
 
 #define NOVIDEO_TEXT "disable video"
 #define NOVIDEO_LONGTEXT "This will completely disable the video output. The" \
-                         "video decoding stage shouldn't even be done, so it" \
-                         "can allow you to save some processing power"
+                         " video decoding stage shouldn't even be done, so"   \
+                         " it can allow you to save some processing power"
+
+#define DISPLAY_TEXT "display identifier"
+#define DISPLAY_LONGTEXT NULL
 
 #define WIDTH_TEXT "video width"
-#define WIDTH_LONGTEXT "You can enforce the video width here.\nNote" \
-                       "that by default vlc will adapt to the video " \
-                       "characteristics"
+#define WIDTH_LONGTEXT "You can enforce the video width here.\nNote"  \
+                       " that by default vlc will adapt to the video" \
+                       " characteristics"
 
 #define HEIGHT_TEXT "video height"
-#define HEIGHT_LONGTEXT "You can enforce the video height here.\nNote" \
-                        "that by default vlc will adapt to the video " \
-                        "characteristics"
+#define HEIGHT_LONGTEXT "You can enforce the video height here.\nNote"  \
+                        " that by default vlc will adapt to the video " \
+                        " characteristics"
 
 #define GRAYSCALE_TEXT "grayscale video output"
 #define GRAYSCALE_LONGTEXT "Using this option, vlc will not decode the color "\
@@ -235,7 +238,7 @@
 
 #define SAT_SRATE_TEXT "Satellite transponder symbol rate"
 #define SAT_SRATE_LONGTEXT NULL
-                       
+
 #define IPV6_TEXT "force IPv6"
 #define IPV6_LONGTEXT NULL
 
@@ -272,7 +275,7 @@
 #define PLAYLIST_LAUNCH_TEXT "launch playlist on startup"
 #define PLAYLIST_LAUNCH_LONGTEXT NULL
 
-#define PLAYLIST_ENQUEUE_TEXT "enqeue playlist as default"
+#define PLAYLIST_ENQUEUE_TEXT "enqueue playlist as default"
 #define PLAYLIST_ENQUEUE_LONGTEXT NULL
 
 #define PLAYLIST_LOOP_TEXT "loop playlist on end"
@@ -343,7 +346,7 @@ ADD_STRING  ( "vcd_device", "/dev/cdrom", NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
 #ifdef HAVE_SATELLITE
 ADD_INTEGER ( "sat_frequency", 12553, NULL, SAT_FREQ_TEXT, SAT_FREQ_LONGTEXT )
 ADD_INTEGER ( "sat_polarization", 0, NULL, SAT_POL_TEXT, SAT_POL_LONGTEXT )
-ADD_INTEGER ( "sat_symbol_rate", 27500, NULL, SAT_SRATE_TEXT, 
+ADD_INTEGER ( "sat_symbol_rate", 27500, NULL, SAT_SRATE_TEXT,
             SAT_SRATE_LONGTEXT )
 #endif
 
@@ -735,7 +738,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         network_ChannelCreate() )
     {
         /* On error during Channels initialization, switch off channels */
-        intf_ErrMsg( "intf error: channels initialization failed, " 
+        intf_ErrMsg( "intf error: channels initialization failed, "
                                  "deactivating channels" );
         config_PutIntVariable( "network_channel", 0 );
     }
