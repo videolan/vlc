@@ -2,7 +2,7 @@
  * ogt.c : Overlay Graphics Text (SVCD subtitles) decoder thread
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: ogt.c,v 1.12 2004/01/25 19:27:09 rocky Exp $
+ * $Id$
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -39,13 +39,13 @@
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-static int  DecoderOpen   ( vlc_object_t * );
+static int  VCDSubOpen   ( vlc_object_t * );
 static int  PacketizerOpen( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Philips OGT (SVCD subtitle) decoder") );
     set_capability( "decoder", 50 );
-    set_callbacks( DecoderOpen, VCDSubClose );
+    set_callbacks( VCDSubOpen, VCDSubClose );
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
 		  DEBUG_TEXT, DEBUG_LONGTEXT, VLC_TRUE );
@@ -80,13 +80,13 @@ static block_t *Packetize( decoder_t *, block_t ** );
 
 
 /*****************************************************************************
- * DecoderOpen
+ * VCDSubOpen
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
 static int
-DecoderOpen( vlc_object_t *p_this )
+VCDSubOpen( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -128,7 +128,7 @@ static int PacketizerOpen( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    if( DecoderOpen( p_this ) )
+    if( VCDSubOpen( p_this ) )
     {
         return VLC_EGENERIC;
     }
@@ -244,8 +244,25 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
 	       p_block->i_buffer);
 
+#if 1
     if( config_GetInt( p_dec, "spu-channel" ) != p_buffer[1] )
       return NULL;
+#else
+    /* Attach to our input thread and see if subtitle is selected. */
+    {
+        vlc_object_t * p_input;
+        vlc_value_t val;
+      
+	p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_PARENT );
+
+	if( !p_input ) return NULL;
+
+        if( var_Get( p_input, "spu-channel", &val ) ) return NULL;
+	
+	if( val.i_int == -1 || val.i_int != p_buffer[1] )
+	  return NULL;
+    }
+#endif
 
     if ( p_sys->state == SUBTITLE_BLOCK_EMPTY ) {
       i_expected_image  = p_sys->i_image+1;

@@ -1431,6 +1431,34 @@ E_(DebugCallback)   ( vlc_object_t *p_this, const char *psz_name,
   return VLC_SUCCESS;
 }
 
+
+/*
+  The front-ends change spu-es - which sort of represents a symbolic
+  name. Internally we use spu-channel which runs from 0..3.
+
+  So we add a callback to intercept changes to spu-es and change them
+  to updates to spu-channel. Ugly.
+
+*/
+
+static int 
+VCDSPUCallback( vlc_object_t *p_this, const char *psz_variable,
+                vlc_value_t old_val, vlc_value_t new_val, void *param)
+{
+
+  input_thread_t    *p_input = (input_thread_t *)p_this;
+  thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
+  vlc_value_t val;
+  
+  dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EVENT), "old_val: %x, new_val %x", 
+	     old_val.i_int, new_val.i_int);
+
+  val.i_int =  new_val.i_int;
+  var_Set( p_this, "spu-channel", val );
+  
+  return VLC_SUCCESS;
+}
+
 /*****************************************************************************
   Open: open VCD.
   read in meta-information about VCD: the number of tracks, segments,
@@ -1582,6 +1610,9 @@ E_(Open) ( vlc_object_t *p_this )
 
     free( psz_source );
 
+    var_AddCallback( p_this, "spu-es", VCDSPUCallback, NULL );
+
+
     return VLC_SUCCESS;
  err_exit:
     free( psz_source );
@@ -1599,6 +1630,8 @@ E_(Close) ( vlc_object_t *p_this )
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "VCDClose" );
+
+    var_DelCallback( p_this, "spu-es", VCDSPUCallback, NULL );
     vcdinfo_close( p_vcd->vcd );
 
     free( p_vcd->p_entries );
