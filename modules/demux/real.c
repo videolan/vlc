@@ -37,7 +37,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Real demuxer" ) );
-    set_capability( "demux2", 1);
+    set_capability( "demux2", 15 );
     set_callbacks( Open, Close );
     add_shortcut( "real" );
     add_shortcut( "rm" );

@@ -63,7 +63,7 @@ static int Control    ( demux_t *, int, va_list );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("Playlist metademux") );
-    set_capability( "demux2", 180 );
+    set_capability( "demux2", 10 );
     set_callbacks( Activate, Deactivate );
     add_shortcut( "m3u" );
     add_shortcut( "asx" );
