@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for the VLC media player
-##  $Id: bootstrap,v 1.50 2003/06/21 20:45:53 sam Exp $
+##  $Id: bootstrap,v 1.51 2003/06/23 10:21:25 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -187,8 +187,9 @@ rm -Rf intl
 # Check for gettext
 if gettextize --version >/dev/null 2>&1
 then
+# Autopoint is available from 0.11.3, but we need 0.11.5
 if expr `gettextize --version | sed -e '1s/[^0-9]*//' -e q` \
-        '>' 0.11.2 >/dev/null 2>&1
+        '>=' 0.11.5 >/dev/null 2>&1
 then
   # We have gettext, and a recent version! Everything is cool.
   autopoint || exit 1
@@ -340,7 +341,7 @@ EOF
 NOTE: you have an old version of gettext installed on your
 system. The vlc build will work, but if your system does not
 have libintl you will not have internationalization support.
-We suggest upgrading to gettext 0.11.3 or later.
+We suggest upgrading to gettext 0.11.5 or later.
 EOF
   ;;
 esac
