@@ -180,6 +180,7 @@ private:
     Interface *p_main_interface;
     int i_old_playing_status;
     int i_old_rate;
+    vlc_bool_t b_old_seekable;
 };
 
 /* Main Interface */

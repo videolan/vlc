@@ -90,8 +90,6 @@ Timer::~Timer()
  *****************************************************************************/
 void Timer::Notify()
 {
-    vlc_bool_t b_pace_control;
-
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* Update the input */
@@ -101,27 +99,17 @@ void Timer::Notify()
             (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                FIND_ANYWHERE );
 
-        /* Show slider */
+        /* Refresh interface */
         if( p_intf->p_sys->p_input )
         {
-            if( p_intf->p_sys->p_input->stream.b_seekable )
-            {
-                p_main_interface->slider->SetValue( 0 );
-                p_main_interface->slider_frame->Show();
-                p_main_interface->frame_sizer->Show(
-                    p_main_interface->slider_frame );
-                p_main_interface->frame_sizer->Layout();
-                p_main_interface->frame_sizer->Fit( p_main_interface );
-            }
+            p_main_interface->slider->SetValue( 0 );
+            b_old_seekable = VLC_FALSE;
 
             p_main_interface->statusbar->SetStatusText(
                 wxU(p_intf->p_sys->p_input->psz_source), 2 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
-
-            /* control buttons for free pace streams */
-            b_pace_control = p_intf->p_sys->p_input->stream.b_pace_control;
         }
     }
     else if( p_intf->p_sys->p_input->b_dead )
@@ -144,7 +132,6 @@ void Timer::Notify()
     }
 
 
-
     if( p_intf->p_sys->p_input )
     {
         input_thread_t *p_input = p_intf->p_sys->p_input;
@@ -157,6 +144,17 @@ void Timer::Notify()
             p_intf->p_sys->b_playing = 1;
 
             /* Manage the slider */
+            if( p_intf->p_sys->p_input->stream.b_seekable && !b_old_seekable )
+            {
+                /* Done like this because b_seekable is set slightly after
+                 * the new input object is available. */
+                b_old_seekable = VLC_TRUE;
+                p_main_interface->slider_frame->Show();
+                p_main_interface->frame_sizer->Show(
+                    p_main_interface->slider_frame );
+                p_main_interface->frame_sizer->Layout();
+                p_main_interface->frame_sizer->Fit( p_main_interface );
+            }
             if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
             {
                 /* Update the slider if the user isn't dragging it. */
