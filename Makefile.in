@@ -188,6 +188,7 @@ INPUT =		src/input/input_ps.o \
 		src/input/input_dvd.o \
 		src/input/mpeg_system.o \
 		src/input/input_ext-dec.o \
+		src/input/input_ext-intf.o \
 		src/input/input_dec.o \
 		src/input/input_programs.o \
 		src/input/input_netlist.o \
