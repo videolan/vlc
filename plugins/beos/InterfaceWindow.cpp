@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.16.2.6 2002/10/11 00:46:59 stippi Exp $
+ * $Id: InterfaceWindow.cpp,v 1.16.2.7 2002/10/11 14:18:17 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -749,64 +749,6 @@ InterfaceWindow::_InputStreamChanged()
 }
 
 /*****************************************************************************
- * InterfaceWindow::_LoadSettings
- *****************************************************************************/
-status_t
-InterfaceWindow::_LoadSettings( BMessage* message, const char* fileName, const char* folder )
-{
-	status_t ret = B_BAD_VALUE;
-	if ( message )
-	{
-		BPath path;
-		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
-		{
-			// passing folder is optional
-			if ( folder )
-				ret = path.Append( folder );
-			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
-			{
-				BFile file( path.Path(), B_READ_ONLY );
-				if ( ( ret = file.InitCheck() ) == B_OK )
-				{
-					ret = message->Unflatten( &file );
-					file.Unset();
-				}
-			}
-		}
-	}
-	return ret;
-}
-
-/*****************************************************************************
- * InterfaceWindow::_SaveSettings
- *****************************************************************************/
-status_t
-InterfaceWindow::_SaveSettings( BMessage* message, const char* fileName, const char* folder )
-{
-	status_t ret = B_BAD_VALUE;
-	if ( message )
-	{
-		BPath path;
-		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
-		{
-			// passing folder is optional
-			if ( folder && ( ret = path.Append( folder ) ) == B_OK )
-				ret = create_directory( path.Path(), 0777 );
-			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
-			{
-				BFile file( path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
-				if ( ( ret = file.InitCheck() ) == B_OK )
-				{
-					ret = message->Flatten( &file );
-					file.Unset();
-				}
-			}
-		}
-	}
-	return ret;
-}
-
-/*****************************************************************************
  * InterfaceWindow::_RestoreSettings
  *****************************************************************************/
 bool
@@ -855,7 +797,7 @@ make_sure_frame_is_within_limits( BRect& frame, float minWidth, float minHeight,
 void
 InterfaceWindow::_RestoreSettings()
 {
-	if ( _LoadSettings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
+	if ( load_settings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
 	{
 		BRect mainFrame;
 		if ( fSettings->FindRect( "main frame", &mainFrame ) == B_OK )
@@ -927,7 +869,7 @@ InterfaceWindow::_StoreSettings()
 			fSettings->AddBool( "playlist showing", !fPlaylistWindow->IsHidden() );
 		fPlaylistWindow->Unlock();
 	}
-	_SaveSettings( fSettings, "interface_settings", "VideoLAN Client" );
+	save_settings( fSettings, "interface_settings", "VideoLAN Client" );
 }
 
 /*****************************************************************************
@@ -1200,3 +1142,61 @@ void ChapterMenu::AttachedToWindow()
 	BMenu::AttachedToWindow();
 }
 
+
+/*****************************************************************************
+ * load_settings
+ *****************************************************************************/
+status_t
+load_settings( BMessage* message, const char* fileName, const char* folder )
+{
+	status_t ret = B_BAD_VALUE;
+	if ( message )
+	{
+		BPath path;
+		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
+		{
+			// passing folder is optional
+			if ( folder )
+				ret = path.Append( folder );
+			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
+			{
+				BFile file( path.Path(), B_READ_ONLY );
+				if ( ( ret = file.InitCheck() ) == B_OK )
+				{
+					ret = message->Unflatten( &file );
+					file.Unset();
+				}
+			}
+		}
+	}
+	return ret;
+}
+
+/*****************************************************************************
+ * save_settings
+ *****************************************************************************/
+status_t
+save_settings( BMessage* message, const char* fileName, const char* folder )
+{
+	status_t ret = B_BAD_VALUE;
+	if ( message )
+	{
+		BPath path;
+		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
+		{
+			// passing folder is optional
+			if ( folder && ( ret = path.Append( folder ) ) == B_OK )
+				ret = create_directory( path.Path(), 0777 );
+			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
+			{
+				BFile file( path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
+				if ( ( ret = file.InitCheck() ) == B_OK )
+				{
+					ret = message->Flatten( &file );
+					file.Unset();
+				}
+			}
+		}
+	}
+	return ret;
+}

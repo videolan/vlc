@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.58.2.6 2002/09/29 12:04:27 titer Exp $
+ * $Id: vout_beos.cpp,v 1.58.2.7 2002/10/11 14:18:17 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -47,6 +47,8 @@ extern "C"
 {
 #include <videolan/vlc.h>
 
+#include "stream_control.h"	// just so that we can include InterfaceWindow.h
+#include "input_ext-intf.h" // just so that we can include InterfaceWindow.h
 #include "video.h"
 #include "video_output.h"
 
@@ -54,9 +56,11 @@ extern "C"
 
 }
 
-#include "VideoWindow.h"
 #include "DrawingTidbits.h"
+#include "InterfaceWindow.h"
 #include "MsgVals.h"
+
+#include "VideoWindow.h"
 
 /*****************************************************************************
  * vout_sys_t: BeOS video output method descriptor
@@ -154,22 +158,101 @@ class BackgroundView : public BView
 };
 
 /*****************************************************************************
+ * VideoSettings constructor and destructor
+ *****************************************************************************/
+VideoSettings::VideoSettings()
+	: fVideoSize( SIZE_100 ),
+	  fFlags( FLAG_CORRECT_RATIO ),
+	  fSettings( new BMessage( 'sett' ) )
+{
+	// read settings from disk
+	status_t ret = load_settings( fSettings, "video_settings", "VideoLAN Client" );
+	if ( ret == B_OK )
+	{
+		uint32 flags;
+		if ( fSettings->FindInt32( "flags", (int32*)&flags ) == B_OK )
+			SetFlags( flags );
+		uint32 size;
+		if ( fSettings->FindInt32( "video size", (int32*)&size ) == B_OK )
+			SetVideoSize( size );
+	}
+	else
+		fprintf( stderr, "error loading video settings: %s\n", strerror( ret ) );
+	// vlc settings override settings from disk
+//	if ( config_GetIntVariable( "fullscreen" ) )
+//		AddFlags( FLAG_FULL_SCREEN );
+}
+
+VideoSettings::VideoSettings( const VideoSettings& clone )
+	: fVideoSize( clone.VideoSize() ),
+	  fFlags( clone.Flags() ),
+	  fSettings( NULL )
+{
+}
+
+
+VideoSettings::~VideoSettings()
+{
+	if ( fSettings )
+	{
+		// we are the default settings
+		// and write our settings to disk
+		if (fSettings->ReplaceInt32( "video size", VideoSize() ) != B_OK)
+			fSettings->AddInt32( "video size", VideoSize() );
+		if (fSettings->ReplaceInt32( "flags", Flags() ) != B_OK)
+			fSettings->AddInt32( "flags", Flags() );
+
+		status_t ret = save_settings( fSettings, "video_settings", "VideoLAN Client" );
+		if ( ret != B_OK )
+			fprintf( stderr, "error saving video settings: %s\n", strerror( ret ) );
+		delete fSettings;
+	}
+	else
+	{
+		// we are just a clone of the default settings
+		fDefaultSettings.SetVideoSize( VideoSize() );
+		fDefaultSettings.SetFlags( Flags() );
+	}
+}
+
+/*****************************************************************************
+ * VideoSettings::DefaultSettings
+ *****************************************************************************/
+VideoSettings*
+VideoSettings::DefaultSettings()
+{
+	return &fDefaultSettings;
+}
+
+/*****************************************************************************
+ * VideoSettings::SetVideoSize
+ *****************************************************************************/
+void
+VideoSettings::SetVideoSize( uint32 mode )
+{
+	fVideoSize = mode;
+}
+
+// static variable initialization
+VideoSettings
+VideoSettings::fDefaultSettings;
+
+/*****************************************************************************
  * VideoWindow constructor and destructor
  *****************************************************************************/
 VideoWindow::VideoWindow(int v_width, int v_height, BRect frame)
 	: BWindow(frame, NULL, B_TITLED_WINDOW, B_NOT_CLOSABLE | B_NOT_MINIMIZABLE),
 	  i_width(frame.IntegerWidth()),
 	  i_height(frame.IntegerHeight()),
-	  is_zoomed(false),
-	  vsync(false),
+	  winSize(frame),
 	  i_buffer(0),
 	  teardownwindow(false),
 	  fTrueWidth(v_width),
 	  fTrueHeight(v_height),
-	  fCorrectAspect(true),
 	  fCachedFeel(B_NORMAL_WINDOW_FEEL),
 	  fInterfaceShowing(false),
-	  fInitStatus(B_ERROR)
+	  fInitStatus(B_ERROR),
+	  fSettings(new VideoSettings(*VideoSettings::DefaultSettings()))
 {
     // create the view to do the display
     view = new VLCView( Bounds() );
@@ -187,7 +270,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame)
 		screen.GetMode(&mode); 
 		float refresh = (mode.timing.pixel_clock * 1000)
 						/ ((mode.timing.h_total)* (mode.timing.v_total)); 
-		vsync = (refresh < MIN_AUTO_VSYNC_REFRESH);
+		SetSyncToRetrace(refresh < MIN_AUTO_VSYNC_REFRESH);
 	}
 
 	// allocate bitmap buffers
@@ -206,6 +289,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame)
        SetSizeLimits((i_width * r.min_width_scale), i_width * r.max_width_scale,
                      (i_height * r.min_height_scale), i_height * r.max_height_scale);
     }
+    _SetToSettings();
 }
 
 VideoWindow::~VideoWindow()
@@ -215,6 +299,7 @@ VideoWindow::~VideoWindow()
     teardownwindow = true;
     wait_for_thread(fDrawThreadID, &result);
     _FreeBuffers();
+   delete fSettings;
 }
 
 /*****************************************************************************
@@ -231,12 +316,12 @@ VideoWindow::MessageReceived( BMessage *p_message )
 		case RESIZE_50:
 		case RESIZE_100:
 		case RESIZE_200:
-			if (is_zoomed)
+			if (IsFullScreen())
 				BWindow::Zoom();
 			_SetVideoSize(p_message->what);
 			break;
 		case VERT_SYNC:
-			vsync = !vsync;
+			SetSyncToRetrace(!IsSyncedToRetrace());
 			break;
 		case WINDOW_FEEL:
 			{
@@ -245,11 +330,15 @@ VideoWindow::MessageReceived( BMessage *p_message )
 				{
 					SetFeel(winFeel);
 					fCachedFeel = winFeel;
+					if (winFeel == B_FLOATING_ALL_WINDOW_FEEL)
+						fSettings->AddFlags(VideoSettings::FLAG_ON_TOP_ALL);
+					else
+						fSettings->ClearFlags(VideoSettings::FLAG_ON_TOP_ALL);
 				}
 			}
 			break;
 		case ASPECT_CORRECT:
-			SetCorrectAspectRatio(!fCorrectAspect);
+			SetCorrectAspectRatio(!CorrectAspectRatio());
 			break;
 		case SCREEN_SHOT:
 			// save a screen shot
@@ -263,7 +352,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 				BBitmap* temp = new BBitmap( current->Bounds(), current->ColorSpace() );
 				if ( temp && temp->IsValid() )
 				{
-					int32 height = current->Bounds().Height();
+					int32 height = current->Bounds().IntegerHeight() + 1;
 					uint8* dst = (uint8*)temp->Bits();
 					uint8* src = (uint8*)current->Bits();
 					int32 dstBpr = temp->BytesPerRow();
@@ -298,24 +387,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 void
 VideoWindow::Zoom(BPoint origin, float width, float height )
 {
-	if(is_zoomed)
-	{
-		MoveTo(winSize.left, winSize.top);
-		ResizeTo(winSize.IntegerWidth(), winSize.IntegerHeight());
-		be_app->ShowCursor();
-		fInterfaceShowing = true;
-	}
-	else
-	{
-		BScreen screen(this);
-		BRect rect = screen.Frame();
-		Activate();
-		MoveTo(0.0, 0.0);
-		ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
-		be_app->ObscureCursor();
-		fInterfaceShowing = false;
-	}
-	is_zoomed = !is_zoomed;
+	ToggleFullScreen();
 }
 
 /*****************************************************************************
@@ -324,7 +396,8 @@ VideoWindow::Zoom(BPoint origin, float width, float height )
 void
 VideoWindow::FrameMoved(BPoint origin) 
 {
-	if (is_zoomed) return ;
+	if (IsFullScreen())
+		return ;
     winSize = Frame();
 }
 
@@ -334,8 +407,8 @@ VideoWindow::FrameMoved(BPoint origin)
 void
 VideoWindow::FrameResized( float width, float height )
 {
-	int32 useWidth = fCorrectAspect ? i_width : fTrueWidth;
-	int32 useHeight = fCorrectAspect ? i_height : fTrueHeight;
+	int32 useWidth = CorrectAspectRatio() ? i_width : fTrueWidth;
+	int32 useHeight = CorrectAspectRatio() ? i_height : fTrueHeight;
     float out_width, out_height;
     float out_left, out_top;
     float width_scale = width / useWidth;
@@ -358,7 +431,7 @@ VideoWindow::FrameResized( float width, float height )
     view->MoveTo(out_left,out_top);
     view->ResizeTo(out_width, out_height);
 
-	if (!is_zoomed)
+	if (!IsFullScreen())
         winSize = Frame();
 }
 
@@ -373,8 +446,7 @@ VideoWindow::ScreenChanged(BRect frame, color_space format)
 	screen.GetMode(&mode); 
 	float refresh = (mode.timing.pixel_clock * 1000)
 					/ ((mode.timing.h_total) * (mode.timing.v_total)); 
-    if (refresh < MIN_AUTO_VSYNC_REFRESH) 
-        vsync = true; 
+	SetSyncToRetrace(refresh < MIN_AUTO_VSYNC_REFRESH);
 }
 
 /*****************************************************************************
@@ -394,7 +466,7 @@ VideoWindow::drawBuffer(int bufferIndex)
     i_buffer = bufferIndex;
 
     // sync to the screen if required
-    if (vsync)
+    if (IsSyncedToRetrace())
     {
         BScreen screen(this);
         screen.WaitForRetrace(22000);
@@ -463,12 +535,91 @@ VideoWindow::SetInterfaceShowing(bool showIt)
 void
 VideoWindow::SetCorrectAspectRatio(bool doIt)
 {
-	if (fCorrectAspect != doIt)
+	if (CorrectAspectRatio() != doIt)
 	{
-		fCorrectAspect = doIt;
+		if (doIt)
+			fSettings->AddFlags(VideoSettings::FLAG_CORRECT_RATIO);
+		else
+			fSettings->ClearFlags(VideoSettings::FLAG_CORRECT_RATIO);
 		FrameResized(Bounds().Width(), Bounds().Height());
 	}
 }
+
+/*****************************************************************************
+ * VideoWindow::CorrectAspectRatio
+ *****************************************************************************/
+bool
+VideoWindow::CorrectAspectRatio() const
+{
+	return fSettings->HasFlags(VideoSettings::FLAG_CORRECT_RATIO);
+}
+
+/*****************************************************************************
+ * VideoWindow::ToggleFullScreen
+ *****************************************************************************/
+void
+VideoWindow::ToggleFullScreen()
+{
+	SetFullScreen(!IsFullScreen());
+}
+
+/*****************************************************************************
+ * VideoWindow::SetFullScreen
+ *****************************************************************************/
+void
+VideoWindow::SetFullScreen(bool doIt)
+{
+	if (doIt)
+	{
+		BScreen screen(this);
+		BRect rect = screen.Frame();
+		Activate();
+		MoveTo(0.0, 0.0);
+		ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
+		be_app->ObscureCursor();
+		fInterfaceShowing = false;
+		fSettings->AddFlags(VideoSettings::FLAG_FULL_SCREEN);
+	}
+	else
+	{
+		MoveTo(winSize.left, winSize.top);
+		ResizeTo(winSize.IntegerWidth(), winSize.IntegerHeight());
+		be_app->ShowCursor();
+		fInterfaceShowing = true;
+		fSettings->ClearFlags(VideoSettings::FLAG_FULL_SCREEN);
+	}
+}
+
+/*****************************************************************************
+ * VideoWindow::IsFullScreen
+ *****************************************************************************/
+bool
+VideoWindow::IsFullScreen() const
+{
+	return fSettings->HasFlags(VideoSettings::FLAG_FULL_SCREEN);
+}
+
+/*****************************************************************************
+ * VideoWindow::SetSyncToRetrace
+ *****************************************************************************/
+void
+VideoWindow::SetSyncToRetrace(bool doIt)
+{
+	if (doIt)
+		fSettings->AddFlags(VideoSettings::FLAG_SYNC_RETRACE);
+	else
+		fSettings->ClearFlags(VideoSettings::FLAG_SYNC_RETRACE);
+}
+
+/*****************************************************************************
+ * VideoWindow::IsSyncedToRetrace
+ *****************************************************************************/
+bool
+VideoWindow::IsSyncedToRetrace() const
+{
+	return fSettings->HasFlags(VideoSettings::FLAG_SYNC_RETRACE);
+}
+
 
 /*****************************************************************************
  * VideoWindow::_AllocateBuffers
@@ -653,8 +804,8 @@ void
 VideoWindow::_SetVideoSize(uint32 mode)
 {
 	// let size depend on aspect correction
-	int32 width = fCorrectAspect ? i_width : fTrueWidth;
-	int32 height = fCorrectAspect ? i_height : fTrueHeight;
+	int32 width = CorrectAspectRatio() ? i_width : fTrueWidth;
+	int32 height = CorrectAspectRatio() ? i_height : fTrueHeight;
 	switch (mode)
 	{
 		case RESIZE_50:
@@ -669,8 +820,42 @@ VideoWindow::_SetVideoSize(uint32 mode)
 		default:
 	        break;
 	}
+	fSettings->ClearFlags(VideoSettings::FLAG_FULL_SCREEN);
 	ResizeTo(width, height);
-	is_zoomed = false;
+}
+
+/*****************************************************************************
+ * VideoWindow::_SetToSettings
+ *****************************************************************************/
+void
+VideoWindow::_SetToSettings()
+{
+	// adjust dimensions
+	uint32 mode = RESIZE_100;
+	switch (fSettings->VideoSize())
+	{
+		case VideoSettings::SIZE_50:
+			mode = RESIZE_50;
+			break;
+		case VideoSettings::SIZE_200:
+			mode = RESIZE_200;
+			break;
+		case VideoSettings::SIZE_100:
+		case VideoSettings::SIZE_OTHER:
+		default:
+			break;
+	}
+	bool fullscreen = IsFullScreen();	// remember settings
+	_SetVideoSize(mode);				// because this will reset settings
+	// the fullscreen status is reflected in the settings,
+	// but not yet in the windows state
+	if (fullscreen)
+		SetFullScreen(true);
+	if (fSettings->HasFlags(VideoSettings::FLAG_ON_TOP_ALL))
+		fCachedFeel = B_FLOATING_ALL_WINDOW_FEEL;
+	else
+		fCachedFeel = B_NORMAL_WINDOW_FEEL;
+	SetFeel(fCachedFeel);
 }
 
 /*****************************************************************************
@@ -685,8 +870,8 @@ VideoWindow::_SaveScreenShot( BBitmap* bitmap, char* path,
 	info->bitmap = bitmap;
 	info->path = path;
 	info->translatorID = translatorID;
-	info->width = fCorrectAspect ? i_width : fTrueWidth;
-	info->height = fCorrectAspect ? i_height : fTrueHeight;
+	info->width = CorrectAspectRatio() ? i_width : fTrueWidth;
+	info->height = CorrectAspectRatio() ? i_height : fTrueHeight;
 	// spawn a new thread to take care of the actual saving to disk
 	thread_id thread = spawn_thread( _save_screen_shot,
 									 "screen shot saver",
@@ -933,14 +1118,14 @@ VLCView::MouseDown(BPoint where)
 				menu->AddItem(doubleItem);
 				// Toggle FullScreen
 				BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
-				zoomItem->SetMarked(videoWindow->is_zoomed);
+				zoomItem->SetMarked(videoWindow->IsFullScreen());
 				menu->AddItem(zoomItem);
 	
 				menu->AddSeparatorItem();
 	
 				// Toggle vSync
 				BMenuItem *vsyncItem = new BMenuItem("Vertical Sync", new BMessage(VERT_SYNC));
-				vsyncItem->SetMarked(videoWindow->vsync);
+				vsyncItem->SetMarked(videoWindow->IsSyncedToRetrace());
 				menu->AddItem(vsyncItem);
 				// Correct Aspect Ratio
 				BMenuItem *aspectItem = new BMenuItem("Correct Aspect Ratio", new BMessage(ASPECT_CORRECT));
@@ -1021,7 +1206,7 @@ VLCView::Pulse()
 			fCursorHidden = true;
 			VideoWindow *videoWindow = dynamic_cast<VideoWindow*>(Window());
 			// hide the interface window as well if full screen
-			if (videoWindow && videoWindow->is_zoomed)
+			if (videoWindow && videoWindow->IsFullScreen())
 				videoWindow->SetInterfaceShowing(false);
 		}
 	}
@@ -1046,7 +1231,7 @@ VLCView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 			case B_ESCAPE:
 				// go back to window mode
-				if (videoWindow->is_zoomed)
+				if (videoWindow->IsFullScreen())
 					videoWindow->PostMessage(TOGGLE_FULL_SCREEN);
 				break;
 			case B_SPACE:

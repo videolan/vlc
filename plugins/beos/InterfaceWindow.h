@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.12.2.5 2002/10/09 15:29:51 stippi Exp $
+ * $Id: InterfaceWindow.h,v 1.12.2.6 2002/10/11 14:18:17 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -109,12 +109,6 @@ class InterfaceWindow : public BWindow
 											  bool hasTitles = false );
 			void			_UpdateSpeedMenu( int rate );
 			void			_InputStreamChanged();
-			status_t		_LoadSettings( BMessage* message,
-										   const char* fileName,
-										   const char* subFolder = NULL );
-			status_t		_SaveSettings( BMessage* message,
-										   const char* fileName,
-										   const char* subFolder = NULL );
 			void			_RestoreSettings();
 			void			_StoreSettings();
 
@@ -147,5 +141,15 @@ class InterfaceWindow : public BWindow
 	BMessage*				fSettings;	// we keep the message arround
 										// for forward compatibility
 };
+
+// some global support functions
+status_t load_settings( BMessage* message,
+						const char* fileName,
+						const char* folder = NULL );
+
+status_t save_settings( BMessage* message,
+						const char* fileName,
+						const char* folder = NULL );
+
 
 #endif	// BEOS_INTERFACE_WINDOW_H
