@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.10 2003/01/26 02:22:59 ipkiss Exp $
+ * $Id: directx.c,v 1.11 2003/02/01 09:40:50 babal Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -377,6 +377,9 @@ static void CloseVideo( vlc_object_t *p_this )
 static int Manage( vout_thread_t *p_vout )
 {
     WINDOWPLACEMENT window_placement;
+    HWND hwnd;
+    HMENU hMenu;
+    vlc_value_t val;
 
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
@@ -471,9 +474,8 @@ static int Manage( vout_thread_t *p_vout )
     /*
      * "Always on top" status change
      */
-    HWND hwnd = p_vout->p_sys->hwnd;
-    HMENU hMenu = GetSystemMenu( hwnd , FALSE );
-    vlc_value_t val;
+    hwnd = p_vout->p_sys->hwnd;
+    hMenu = GetSystemMenu( hwnd , FALSE );
     var_Get( p_vout, "directx-on-top", &val );
     if( val.b_bool )
     {
