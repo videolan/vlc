@@ -632,7 +632,7 @@ static void FreeHost( services_discovery_t *p_sd, dhost_t *p_host )
                                                  FIND_ANYWHERE );
     if( p_playlist )
     {
-        playlist_NodeDelete( p_playlist, p_host->p_node, VLC_TRUE );
+        playlist_NodeDelete( p_playlist, p_host->p_node, VLC_TRUE , VLC_TRUE);
         vlc_object_release( p_playlist );
     }
 
