@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_dsp.c,v 1.14 2001/07/12 20:44:52 reno Exp $
+ * $Id: aout_dsp.c,v 1.15 2001/08/24 16:28:49 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -159,7 +159,7 @@ static int aout_Open( aout_thread_t *p_aout )
                                               AOUT_RATE_DEFAULT );
 
     /* Open the sound device */
-    if( (p_aout->i_fd = open( p_aout->psz_device, O_WRONLY|O_NONBLOCK )) < 0 )
+    if( (p_aout->i_fd = open( p_aout->psz_device, O_WRONLY )) < 0 )
     {
         intf_ErrMsg( "aout error: can't open audio device (%s)",
                      p_aout->psz_device );
@@ -202,8 +202,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     if( i_format != p_aout->i_format )
     {
-        intf_DbgMsg( "aout debug: audio output format not supported (%i)",
-                     p_aout->i_format );
+        intf_WarnMsg( 2, "aout warning: audio output format not supported (%i)",
+                      p_aout->i_format );
         p_aout->i_format = i_format;
     }
 
@@ -217,8 +217,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     if( b_stereo != p_aout->b_stereo )
     {
-        intf_DbgMsg( "aout debug: number of audio channels not supported (%i)",
-                     p_aout->i_channels );
+        intf_WarnMsg( 2, "aout warning: number of audio channels not supported (%i)",
+                      p_aout->i_channels );
         p_aout->b_stereo = b_stereo;
         p_aout->i_channels = 1 + b_stereo;
     }
@@ -234,8 +234,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 
     if( l_rate != p_aout->l_rate )
     {
-        intf_DbgMsg( "aout debug: audio output rate not supported (%li)",
-                     p_aout->l_rate );
+        intf_WarnMsg( 1, "aout warning: audio output rate not supported (%li)",
+                      p_aout->l_rate );
         p_aout->l_rate = l_rate;
     }
 
