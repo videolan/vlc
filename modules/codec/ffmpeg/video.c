@@ -372,7 +372,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_late_frames = 0;
     p_sys->i_buffer = 0;
     p_sys->i_buffer_orig = 1;
-    p_sys->p_buffer_orig = p_sys->p_buffer = malloc( p_sys->i_buffer );
+    p_sys->p_buffer_orig = p_sys->p_buffer = malloc( p_sys->i_buffer_orig );
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -652,7 +652,7 @@ void E_(EndVideoDec)( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->p_ff_pic ) free( p_sys->p_ff_pic );
+    if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
 
 #ifdef LIBAVCODEC_PP
     E_(ClosePostproc)( p_dec, p_sys->p_pp );
