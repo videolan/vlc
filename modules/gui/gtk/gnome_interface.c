@@ -1676,7 +1676,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (disc_dvd_use_menu), TRUE);
 
-  disc_title_adj = gtk_adjustment_new (1, 0, 65536, 1, 10, 10);
+  disc_title_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
   disc_title = gtk_spin_button_new (GTK_ADJUSTMENT (disc_title_adj), 1, 0);
   gtk_widget_ref (disc_title);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_title", disc_title,

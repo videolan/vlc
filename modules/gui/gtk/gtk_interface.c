@@ -1982,7 +1982,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_entry_set_text (GTK_ENTRY (disc_name), "/dev/dvd");
 
-  disc_title_adj = gtk_adjustment_new (1, 1, 65536, 1, 10, 10);
+  disc_title_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
   disc_title = gtk_spin_button_new (GTK_ADJUSTMENT (disc_title_adj), 1, 0);
   gtk_widget_ref (disc_title);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_title", disc_title,

@@ -2022,10 +2022,10 @@ http://www.videolan.org/
 	    <numeric>False</numeric>
 	    <update_policy>GTK_UPDATE_ALWAYS</update_policy>
 	    <snap>False</snap>
-	    <wrap>False</wrap>
+	    <wrap>True</wrap>
 	    <value>1</value>
 	    <lower>0</lower>
-	    <upper>65536</upper>
+	    <upper>100</upper>
 	    <step>1</step>
 	    <page>10</page>
 	    <page_size>10</page_size>
