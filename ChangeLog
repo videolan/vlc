@@ -1,4 +1,88 @@
 ------------------------------------------------------------------------
+r9123 | sam | 2004-11-03 00:51:21 +0100 (Wed, 03 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/access/cdda/cdda.c
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+  * modules/access/cdda/cdda.c: Spelling fix.
+
+------------------------------------------------------------------------
+r9122 | gbazin | 2004-11-03 00:43:41 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/configure.ac
+
+* configure.ac: added normvol to the list of plugins.
+------------------------------------------------------------------------
+r9121 | gbazin | 2004-11-03 00:42:08 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/audio_filter/normvol.c
+
+* modules/audio_filter/normvol.c: compilation fix (C99ism).
+------------------------------------------------------------------------
+r9120 | hartman | 2004-11-03 00:41:36 +0100 (Wed, 03 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+
+* Disable cddb, libcdio and vcdimager building on OSX, since basically they aren't used yet on OS X. (guarding for unused 3rd party libraries)
+
+------------------------------------------------------------------------
+r9119 | gbazin | 2004-11-03 00:40:20 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/src/misc/variables.c
+
+* src/misc/variables.c: fixed bug (config_GetPsz() can return NULL).
+------------------------------------------------------------------------
+r9117 | sam | 2004-11-02 23:29:07 +0100 (Tue, 02 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/src/misc/modules.c
+
+  * src/misc/modules:
+    + Only consider psz_program when looking for an interface plugin.
+
+------------------------------------------------------------------------
+r9116 | hartman | 2004-11-02 22:35:54 +0100 (Tue, 02 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/extras/contrib/src/Makefile
+   A /trunk/extras/contrib/src/Patches/kasenna.patch
+
+* kasenna patch for OS X. cheating while i can :)
+  patch is for the 2004.10.28a version of vlc
+
+------------------------------------------------------------------------
+r9115 | hartman | 2004-11-02 21:59:41 +0100 (Tue, 02 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/extras/contrib/src/packages.mak
+
+* newer liveMedia version for OSX.
+
+------------------------------------------------------------------------
+r9114 | hartman | 2004-11-02 21:52:45 +0100 (Tue, 02 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/subtitle.c
+
+* fixed a problem with sub-fps overriding
+  If subtitle format  doesn't have their own reference, they should define 25fps as the the standard reference, BUT NOT GLOBALLY. Cause then ALL subtitle formats will use this correction factor of 25fps.
+
+------------------------------------------------------------------------
+r9112 | gbazin | 2004-11-02 20:25:31 +0100 (Tue, 02 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/ChangeLog
+
+* ChangeLog: updated for the 0.8.0 release.
+------------------------------------------------------------------------
 r9111 | gbazin | 2004-11-02 20:23:40 +0100 (Tue, 02 Nov 2004) | 1 line
 Changed paths:
    M /trunk/modules/gui/wxwindows/interface.cpp

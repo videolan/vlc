@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-02 14:40+0100\n"
+"POT-Creation-Date: 2004-11-03 00:50+0100\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Clément Stenac <zorglub@videolan.org> 2003-12-04\n"
 "Language-Team: French\n"
@@ -223,9 +223,10 @@ msgid "No help is available for these modules"
 msgstr "Aucune aide n’est disponible pour ces modules"
 
 #: include/vlc_interface.h:129
+#, fuzzy
 msgid ""
 "\n"
-"Warning: if you can’t access the GUI anymore, open a dos command box, go to "
+"Warning: if you can't access the GUI anymore, open a dos command box, go to "
 "the directory where you installed VLC and run \"vlc -I wxwin\"\n"
 msgstr ""
 "\n"
@@ -724,8 +725,8 @@ msgstr "Changer d’interface"
 msgid "Add Interface"
 msgstr "Ajouter une interface"
 
-#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1628
-#: src/misc/modules.c:1918
+#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1629
+#: src/misc/modules.c:1919
 msgid "C"
 msgstr "Fr"
 
@@ -1809,8 +1810,8 @@ msgid ""
 "specified)"
 msgstr ""
 "Ceci permet de garder une instance unique du flux de sortie tout au long de "
-"la liste de lecture (insère automatiquement le module de flux de sortie "
-"« regroupement » si non spécifié)."
+"la liste de lecture (insère automatiquement le module de flux de sortie « "
+"regroupement » si non spécifié)."
 
 #: src/libvlc.h:488
 msgid "Preferred packetizer list"
@@ -5143,11 +5144,11 @@ msgstr "Techno"
 msgid "audio filter for PCM format conversion"
 msgstr "Filtre audio de conversion de formats PCM"
 
-#: modules/audio_filter/normvol.c:68
+#: modules/audio_filter/normvol.c:69
 msgid "Number of audio buffers"
 msgstr "Nombre de tampons audio"
 
-#: modules/audio_filter/normvol.c:69
+#: modules/audio_filter/normvol.c:70
 msgid ""
 "This is the number of audio buffers on which the power measurement is made. "
 "A higher number of buffers will increase the response time of the filter to "
@@ -5158,11 +5159,11 @@ msgstr ""
 "filtre à un pic de puissance, mais le rendra moins sensible à de petites "
 "variations."
 
-#: modules/audio_filter/normvol.c:74
+#: modules/audio_filter/normvol.c:75
 msgid "Max level"
 msgstr "Niveau maximal"
 
-#: modules/audio_filter/normvol.c:75
+#: modules/audio_filter/normvol.c:76
 msgid ""
 "If the average power over the last N buffers is higher than this value, the "
 "volume will be normalized. This value is a positive floating point number. A "
@@ -5172,7 +5173,7 @@ msgstr ""
 "volume sera normalisé. La valeur est un nombre en virgule flottante positif. "
 "Une valeur entre 0.5 et 10 semble correcte."
 
-#: modules/audio_filter/normvol.c:81
+#: modules/audio_filter/normvol.c:82
 msgid "Volume normalizer"
 msgstr "Normaliseur de volume"
 
@@ -6868,8 +6869,8 @@ msgstr "Interface de commande à distance temps réel"
 #, c-format
 msgid "Real time control interface initialized, `h' for help\n"
 msgstr ""
-"Interface de commande à distance temps réel initialisée, « h » pour obtenir de "
-"l’aide.\n"
+"Interface de commande à distance temps réel initialisée, « h » pour obtenir "
+"de l’aide.\n"
 
 #: modules/control/showintf.c:62
 #, fuzzy
@@ -13152,8 +13153,8 @@ msgstr "Interface XOSD"
 #~ "this cube transparent."
 #~ msgstr ""
 #~ "Utilisez « None » pour afficher la vidéo sans effet fantaisiste, « Cube » "
-#~ "pour que la vidéo soit jouée sur les faces d’un cube en mouvement, "
-#~ "« Transparent Cube » pour que ce cube soit transparent."
+#~ "pour que la vidéo soit jouée sur les faces d’un cube en mouvement, « "
+#~ "Transparent Cube » pour que ce cube soit transparent."
 
 #~ msgid "Last skin actually used"
 #~ msgstr "Dernière skin utilisée"

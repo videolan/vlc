@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-02 14:40+0100\n"
+"POT-Creation-Date: 2004-11-03 00:50+0100\n"
 "PO-Revision-Date: 2004-05-16 00:41+0200\n"
 "Last-Translator: Derk-Jan Hartman <hartman at videolan dot org>\n"
 "Language-Team: Nederlands <www-doc@videolan.org>\n"
@@ -720,8 +720,8 @@ msgstr "Wijzig interface"
 msgid "Add Interface"
 msgstr "Voeg Interface Toe"
 
-#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1628
-#: src/misc/modules.c:1918
+#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1629
+#: src/misc/modules.c:1919
 msgid "C"
 msgstr "nl"
 
@@ -5035,29 +5035,29 @@ msgstr "Techno"
 msgid "audio filter for PCM format conversion"
 msgstr "audio filter voor PCM conversie"
 
-#: modules/audio_filter/normvol.c:68
+#: modules/audio_filter/normvol.c:69
 msgid "Number of audio buffers"
 msgstr "Aantal audio buffers"
 
-#: modules/audio_filter/normvol.c:69
+#: modules/audio_filter/normvol.c:70
 msgid ""
 "This is the number of audio buffers on which the power measurement is made. "
 "A higher number of buffers will increase the response time of the filter to "
 "a high power but will make it less sensitive to short variations."
 msgstr ""
 
-#: modules/audio_filter/normvol.c:74
+#: modules/audio_filter/normvol.c:75
 msgid "Max level"
 msgstr ""
 
-#: modules/audio_filter/normvol.c:75
+#: modules/audio_filter/normvol.c:76
 msgid ""
 "If the average power over the last N buffers is higher than this value, the "
 "volume will be normalized. This value is a positive floating point number. A "
 "value between 0.5 and 10 seems sensible."
 msgstr ""
 
-#: modules/audio_filter/normvol.c:81
+#: modules/audio_filter/normvol.c:82
 msgid "Volume normalizer"
 msgstr "Volume uitbalancering"
 

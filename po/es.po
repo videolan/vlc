@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-02 14:40+0100\n"
+"POT-Creation-Date: 2004-11-03 00:50+0100\n"
 "PO-Revision-Date: 2004-10-21 01:40+0100\n"
 "Last-Translator: Antonio Javier Varela Calvo <tonxabar@hotmail.com>\n"
 "Language-Team: Spanish-English\n"
@@ -719,8 +719,8 @@ msgstr "Cambiar interfaz"
 msgid "Add Interface"
 msgstr "Añadir Interfaz"
 
-#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1628
-#: src/misc/modules.c:1918
+#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1629
+#: src/misc/modules.c:1919
 msgid "C"
 msgstr "es"
 
@@ -5045,11 +5045,11 @@ msgstr "Tecno"
 msgid "audio filter for PCM format conversion"
 msgstr "filtro de audio para conversión formato PCM"
 
-#: modules/audio_filter/normvol.c:68
+#: modules/audio_filter/normvol.c:69
 msgid "Number of audio buffers"
 msgstr "Número de buffers de audio"
 
-#: modules/audio_filter/normvol.c:69
+#: modules/audio_filter/normvol.c:70
 msgid ""
 "This is the number of audio buffers on which the power measurement is made. "
 "A higher number of buffers will increase the response time of the filter to "
@@ -5059,11 +5059,11 @@ msgstr ""
 "Un número mayor de buffers aumentará el tiempo de respuesta del filtro a una "
 "alta potencia pero lo hará menos sensible a variaciones cortas."
 
-#: modules/audio_filter/normvol.c:74
+#: modules/audio_filter/normvol.c:75
 msgid "Max level"
 msgstr "Nivel máx"
 
-#: modules/audio_filter/normvol.c:75
+#: modules/audio_filter/normvol.c:76
 msgid ""
 "If the average power over the last N buffers is higher than this value, the "
 "volume will be normalized. This value is a positive floating point number. A "
@@ -5073,7 +5073,7 @@ msgstr ""
 "volumen se normalizará. Este valor es un número positivo de punto flotante. "
 "Un "
 
-#: modules/audio_filter/normvol.c:81
+#: modules/audio_filter/normvol.c:82
 msgid "Volume normalizer"
 msgstr "Normalizador de volumen"
 
