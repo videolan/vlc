@@ -650,7 +650,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                           break;
 
                       case DVD_SPU_ES:
-                          if ( p_main->b_audio )
+                          if ( p_main->b_video )
                           {
                               /* Spawn a spu decoder thread */
                               input_AddPgrmElem( p_input,

@@ -95,7 +95,7 @@ spudec_thread_t * spudec_CreateThread( input_thread_t * p_input )
 void spudec_DestroyThread( spudec_thread_t *p_spudec )
 {
     intf_DbgMsg("spudec debug: requesting termination of spu decoder thread %p\n", p_spudec);
-    fprintf(stderr, "spudec debug: requesting termination of spu decoder thread %p\n", p_spudec);
+//    fprintf(stderr, "spudec debug: requesting termination of spu decoder thread %p\n", p_spudec);
 
     /* Ask thread to kill itself */
     p_spudec->b_die = 1;
@@ -173,7 +173,7 @@ static void RunThread( spudec_thread_t *p_spudec )
     {
 
 
-        fprintf(stderr, "I'm in the spu decoder main loop !\n");
+//        fprintf(stderr, "I'm in the spu decoder main loop !\n");
 	sleep(1);
     } 
 
