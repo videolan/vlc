@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.14 2003/01/28 14:49:12 sigmunau Exp $
+ * $Id: vorbis.c,v 1.15 2003/03/14 00:24:08 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -182,11 +182,11 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         msg_Err( p_dec->p_fifo, "2nd Vorbis header is corrupted" );
         goto error;
     }
-    /* parse the vorbis comment */
+    /* parse the vorbis comment. FIXME should be done in demuxer*/
     {
         input_thread_t *p_input = (input_thread_t *)p_fifo->p_parent;
         input_info_category_t *p_cat = input_InfoCategory( p_input,
-                                                           "Vorbis Comment" );
+                                                           _("Vorbis Comment") );
         int i = 0;
         char *psz_name, *psz_value, *psz_comment;
         while ( i < p_dec->vc.comments )

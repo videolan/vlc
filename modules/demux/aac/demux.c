@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.5 2003/01/25 16:58:34 fenrir Exp $
+ * $Id: demux.c,v 1.6 2003/03/14 00:24:07 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -546,16 +546,16 @@ static int Activate( vlc_object_t * p_this )
                  p_aac->i_samplerate );
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_category = input_InfoCategory( p_input, "aac" );
+        p_category = input_InfoCategory( p_input, _("Aac") );
 
-        input_AddInfo( p_category, "input type", "MPEG-%d AAC",
+        input_AddInfo( p_category, _("Input Type"), "MPEG-%d AAC",
                        p_aac->adts_header.i_id == 1 ? 2 : 4 );
 
-        input_AddInfo( p_category, "layer", "%d", 
+        input_AddInfo( p_category, _("Layer"), "%d", 
                        4 - p_aac->adts_header.i_layer );
-        input_AddInfo( p_category, "channels", "%d", 
+        input_AddInfo( p_category, _("Channels"), "%d", 
                        p_aac->i_channels );
-        input_AddInfo( p_category, "sample rate", "%dHz", 
+        input_AddInfo( p_category, _("Sample Rate"), "%dHz", 
                        p_aac->i_samplerate );
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );

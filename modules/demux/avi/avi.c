@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.40 2003/03/13 16:09:20 hartman Exp $
+ * $Id: avi.c,v 1.41 2003/03/14 00:24:07 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -930,9 +930,9 @@ static int AVIInit( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
     {
-        input_info_category_t *p_cat = input_InfoCategory( p_input, "Avi" );
-        input_AddInfo( p_cat, "Number of streams", "%d", p_avi->i_streams );
-        input_AddInfo( p_cat, "Flags", "%s%s%s%s",
+        input_info_category_t *p_cat = input_InfoCategory( p_input, _("Avi") );
+        input_AddInfo( p_cat, _("Number of Streams"), "%d", p_avi->i_streams );
+        input_AddInfo( p_cat, _("Flags"), "%s%s%s%s",
                        p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
                        p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
                        p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
@@ -1001,15 +1001,15 @@ static int AVIInit( vlc_object_t * p_this )
                     input_info_category_t *p_cat;
                     sprintf(hepp, "Stream %d", i);
                     p_cat = input_InfoCategory( p_input, hepp);
-                    input_AddInfo( p_cat, "Type", "audio(0x%x)",
+                    input_AddInfo( p_cat, _("Type"), "Audio(0x%x)",
                                    p_avi_strf_auds->p_wf->wFormatTag );
-                    input_AddInfo( p_cat, "Codec", "%4.4s",
+                    input_AddInfo( p_cat, _("Codec"), "%4.4s",
                                    (const char*)&(p_info->i_codec) );
-                    input_AddInfo( p_cat, "Channels", "%d",
+                    input_AddInfo( p_cat, _("Channels"), "%d",
                                    p_avi_strf_auds->p_wf->nChannels );
-                    input_AddInfo( p_cat, "Samplerate", "%d",
+                    input_AddInfo( p_cat, _("Sample Rate"), "%d",
                                    p_avi_strf_auds->p_wf->nSamplesPerSec );
-                    input_AddInfo( p_cat, "Bits Per Sample", "%d",
+                    input_AddInfo( p_cat, _("Bits Per Sample"), "%d",
                                    p_avi_strf_auds->p_wf->wBitsPerSample );
                 }
                 break;
@@ -1035,18 +1035,18 @@ static int AVIInit( vlc_object_t * p_this )
                 {
                     char hepp[sizeof("Stream") + 10];
                     input_info_category_t *p_cat;
-                    sprintf(hepp, "stream %d", i);
+                    sprintf(hepp, "Stream %d", i);
                     p_cat = input_InfoCategory( p_input, hepp);
-                    input_AddInfo( p_cat, "Type", "video" );
-                    input_AddInfo( p_cat, "Codec", "%4.4s",
+                    input_AddInfo( p_cat, _("Type"), _("Video") );
+                    input_AddInfo( p_cat, _("Codec"), "%4.4s",
                                    (const char*)&(p_info->i_codec) );
-                    input_AddInfo( p_cat, "Resolution", "%dx%d",
+                    input_AddInfo( p_cat, _("Resolution"), "%dx%d",
                                    p_avi_strf_vids->p_bih->biWidth,
                                    p_avi_strf_vids->p_bih->biHeight );
-                    input_AddInfo( p_cat, "Frame Rate", "%f",
+                    input_AddInfo( p_cat, _("Frame Rate"), "%f",
                                    (float)p_info->i_rate /
                                        (float)p_info->i_scale );
-                    input_AddInfo( p_cat, "Bits Per Pixel", "%d",
+                    input_AddInfo( p_cat, _("Bits Per Pixel"), "%d",
                                    p_avi_strf_vids->p_bih->biBitCount );
                 }
 #ifdef __AVI_SUBTITLE__
@@ -1066,9 +1066,9 @@ static int AVIInit( vlc_object_t * p_this )
                 {
                     char psz_cat[32]; /* We'll clip i just in case */
                     input_info_category_t *p_cat;
-                    sprintf( psz_cat, "stream %d", __MIN( i, 100000 ) );
+                    sprintf( psz_cat, "Stream %d", __MIN( i, 100000 ) );
                     p_cat = input_InfoCategory( p_input, psz_cat );
-                    input_AddInfo( p_cat, "Type", "unknown" );
+                    input_AddInfo( p_cat, _("Type"), _("Unknown") );
                 }
                 break;
         }

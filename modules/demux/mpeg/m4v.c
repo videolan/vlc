@@ -2,7 +2,7 @@
  * m4v.c : MPEG-4 video Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: m4v.c,v 1.2 2003/01/20 13:06:34 fenrir Exp $
+ * $Id: m4v.c,v 1.3 2003/03/14 00:24:08 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -148,8 +148,8 @@ static int Activate( vlc_object_t * p_this )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_category = input_InfoCategory( p_input, "mpeg" );
-    input_AddInfo( p_category, "input type", "video MPEG-4 (raw ES)" );
+    p_category = input_InfoCategory( p_input, _("mpeg") );
+    input_AddInfo( p_category, _("Input Type"), _("Video MPEG-4 (raw ES)") );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     return( 0 );

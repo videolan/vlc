@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.22 2003/03/02 17:13:33 fenrir Exp $
+ * $Id: asf.c,v 1.23 2003/03/14 00:24:08 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -152,7 +152,7 @@ static int Activate( vlc_object_t * p_this )
     {
         input_info_category_t *p_cat = input_InfoCategory( p_input, "Asf" );
         msg_Dbg( p_input, "found %d streams", p_demux->i_streams );
-        input_AddInfo( p_cat, "Number of streams", "%d" , p_demux->i_streams );
+        input_AddInfo( p_cat, _("Number of streams"), "%d" , p_demux->i_streams );
     }
 
     /*  create one program */
@@ -215,7 +215,7 @@ static int Activate( vlc_object_t * p_this )
             }
 
             p_stream->i_cat = AUDIO_ES;
-            input_AddInfo( p_cat, "Type", "Audio" );
+            input_AddInfo( p_cat, _("Type"), _("Audio") );
             msg_Dbg( p_input,
                     "adding new audio stream(codec:0x%x,ID:%d)",
                     i_codec,
@@ -247,7 +247,7 @@ static int Activate( vlc_object_t * p_this )
                     p_stream->p_es->i_fourcc =
                         VLC_FOURCC( 'm','s',(i_codec >> 8)&0xff,i_codec&0xff );
             }
-            input_AddInfo( p_cat, "Codec", "%.4s", (char*)&p_stream->p_es->i_fourcc );
+            input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&p_stream->p_es->i_fourcc );
             if( p_sp->i_type_specific_data_length > 0 )
             {
                 WAVEFORMATEX    *p_wf;
@@ -262,14 +262,14 @@ static int Activate( vlc_object_t * p_this )
 
                 p_wf->wFormatTag        = GetWLE( p_data );
                 p_wf->nChannels         = GetWLE( p_data + 2 );
-                input_AddInfo( p_cat, "Channels", "%d", p_wf->nChannels );
+                input_AddInfo( p_cat, _("Channels"), "%d", p_wf->nChannels );
                 p_wf->nSamplesPerSec    = GetDWLE( p_data + 4 );
-                input_AddInfo( p_cat, "Sample rate", "%d", p_wf->nSamplesPerSec );
+                input_AddInfo( p_cat, _("Sample rate"), "%d", p_wf->nSamplesPerSec );
                 p_wf->nAvgBytesPerSec   = GetDWLE( p_data + 8 );
-                input_AddInfo( p_cat, "Avg. byterate", "%d", p_wf->nAvgBytesPerSec );
+                input_AddInfo( p_cat, _("Avg. byterate"), "%d", p_wf->nAvgBytesPerSec );
                 p_wf->nBlockAlign       = GetWLE( p_data + 12 );
                 p_wf->wBitsPerSample    = GetWLE( p_data + 14 );
-                input_AddInfo( p_cat, "Bits Per Sample", "%d", p_wf->wBitsPerSample );
+                input_AddInfo( p_cat, _("Bits Per Sample"), "%d", p_wf->wBitsPerSample );
                 p_wf->cbSize            = __MAX( 0,
                                               i_size - sizeof( WAVEFORMATEX ));
                 if( i_size > sizeof( WAVEFORMATEX ) )
@@ -285,7 +285,7 @@ static int Activate( vlc_object_t * p_this )
         if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) )
         {
             p_stream->i_cat = VIDEO_ES;
-            input_AddInfo( p_cat, "Type", "Video" );
+            input_AddInfo( p_cat, _("Type"), _("Video") );
             msg_Dbg( p_input,
                     "adding new video stream(ID:%d)",
                     p_sp->i_stream_number );
@@ -302,7 +302,7 @@ static int Activate( vlc_object_t * p_this )
                 p_stream->p_es->i_fourcc =
                     VLC_FOURCC( 'u','n','d','f' );
             }
-            input_AddInfo( p_cat, "Codec", "%.4s", (char*)&p_stream->p_es->i_fourcc );
+            input_AddInfo( p_cat, _("Codec"), "%.4s", (char*)&p_stream->p_es->i_fourcc );
             if( p_sp->i_type_specific_data_length > 11 )
             {
                 BITMAPINFOHEADER *p_bih;
@@ -316,22 +316,22 @@ static int Activate( vlc_object_t * p_this )
                 p_data = p_sp->p_type_specific_data + 11;
 
                 p_bih->biSize       = GetDWLE( p_data );
-                input_AddInfo( p_cat, "Size", "%d", p_bih->biSize );
+                input_AddInfo( p_cat, _("Size"), "%d", p_bih->biSize );
                 p_bih->biWidth      = GetDWLE( p_data + 4 );
                 p_bih->biHeight     = GetDWLE( p_data + 8 );
-                input_AddInfo( p_cat, "Resolution", "%dx%d", p_bih->biWidth, p_bih->biHeight );
+                input_AddInfo( p_cat, _("Resolution"), "%dx%d", p_bih->biWidth, p_bih->biHeight );
                 p_bih->biPlanes     = GetDWLE( p_data + 12 );
-                input_AddInfo( p_cat, "Planes", "%d", p_bih->biPlanes );
+                input_AddInfo( p_cat, _("Planes"), "%d", p_bih->biPlanes );
                 p_bih->biBitCount   = GetDWLE( p_data + 14 );
-                input_AddInfo( p_cat, "Bits per pixel", "%d", p_bih->biBitCount );
+                input_AddInfo( p_cat, _("Bits per pixel"), "%d", p_bih->biBitCount );
                 p_bih->biCompression= GetDWLE( p_data + 16 );
-                input_AddInfo( p_cat, "Compression Rate", "%d", p_bih->biCompression );
+                input_AddInfo( p_cat, _("Compression Rate"), "%d", p_bih->biCompression );
                 p_bih->biSizeImage  = GetDWLE( p_data + 20 );
-                input_AddInfo( p_cat, "Image Size", "%d", p_bih->biSizeImage );
+                input_AddInfo( p_cat, _("Image Size"), "%d", p_bih->biSizeImage );
                 p_bih->biXPelsPerMeter = GetDWLE( p_data + 24 );
-                input_AddInfo( p_cat, "X pixels per meter", "%d", p_bih->biXPelsPerMeter );
+                input_AddInfo( p_cat, _("X pixels per meter"), "%d", p_bih->biXPelsPerMeter );
                 p_bih->biYPelsPerMeter = GetDWLE( p_data + 28 );
-                input_AddInfo( p_cat, "Y pixels per meter", "%d", p_bih->biYPelsPerMeter );
+                input_AddInfo( p_cat, _("Y pixels per meter"), "%d", p_bih->biYPelsPerMeter );
                 p_bih->biClrUsed       = GetDWLE( p_data + 32 );
                 p_bih->biClrImportant  = GetDWLE( p_data + 36 );
 

@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.13 2003/02/18 00:51:40 fenrir Exp $
+ * $Id: audio.c,v 1.14 2003/03/14 00:24:08 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -611,15 +611,15 @@ static int Activate( vlc_object_t * p_this )
                     );
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_category = input_InfoCategory( p_input, "mpeg" );
-        input_AddInfo( p_category, "input type", "audio MPEG-%d",
+        p_category = input_InfoCategory( p_input, _("mpeg") );
+        input_AddInfo( p_category, _("Input Type"), "Audio MPEG-%d",
                        p_demux->mpeg.i_version +1 );
-        input_AddInfo( p_category, "layer", "%d", p_demux->mpeg.i_layer + 1 );
-        input_AddInfo( p_category, "mode",
+        input_AddInfo( p_category, _("Layer"), "%d", p_demux->mpeg.i_layer + 1 );
+        input_AddInfo( p_category, _("Mode"),
                        mpegaudio_mode[p_demux->mpeg.i_mode] );
-        input_AddInfo( p_category, "sample rate", "%dHz",
+        input_AddInfo( p_category, _("Sample Rate"), "%dHz",
                        p_demux->mpeg.i_samplerate );
-        input_AddInfo( p_category, "average bitrate", "%dKb/s",
+        input_AddInfo( p_category, _("Average Bitrate"), "%dKb/s",
                        p_demux->xingheader.i_avgbitrate / 1000 );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -628,8 +628,8 @@ static int Activate( vlc_object_t * p_this )
         msg_Dbg( p_input,
                  "assuming audio MPEG, but not frame header yet found" );
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_category = input_InfoCategory( p_input, "mpeg" );
-        input_AddInfo( p_category, "input type", "audio MPEG-?" );
+        p_category = input_InfoCategory( p_input, _("mpeg") );
+        input_AddInfo( p_category, _("Input Type"), "Audio MPEG-?" );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     }

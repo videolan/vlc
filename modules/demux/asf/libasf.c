@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.11 2003/02/24 09:26:26 fenrir Exp $
+ * $Id: libasf.c,v 1.12 2003/03/14 00:24:08 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -611,8 +611,8 @@ int  ASF_ReadObject_codec_list( input_thread_t *p_input,
         p_cat = input_InfoCategory( p_input, psz_cat);
 
 #define codec p_cl->codec[i_codec]
-        input_AddInfo( p_cat, "Codec name", codec.psz_name );
-        input_AddInfo( p_cat, "Codec description", codec.psz_description );
+        input_AddInfo( p_cat, _("Codec name"), codec.psz_name );
+        input_AddInfo( p_cat, _("Codec description"), codec.psz_description );
         msg_Dbg( p_input,
                  "Read \"Codec List Object\" codec[%d] %s name:\"%s\" description:\"%s\" information_length:%d",
                  i_codec,
@@ -692,12 +692,12 @@ int  ASF_ReadObject_content_description( input_thread_t *p_input,
 
 #ifdef ASF_DEBUG
     {
-        input_info_category_t *p_cat = input_InfoCategory( p_input, "Asf" );
-        input_AddInfo( p_cat, "Title", p_cd->psz_title );
-        input_AddInfo( p_cat, "Author", p_cd->psz_author );
-        input_AddInfo( p_cat, "Copyright", p_cd->psz_copyright );
-        input_AddInfo( p_cat, "Description", p_cd->psz_description );
-        input_AddInfo( p_cat, "Rating", p_cd->psz_rating );
+        input_info_category_t *p_cat = input_InfoCategory( p_input, _("Asf") );
+        input_AddInfo( p_cat, _("Title"), p_cd->psz_title );
+        input_AddInfo( p_cat, _("Author"), p_cd->psz_author );
+        input_AddInfo( p_cat, _("Copyright"), p_cd->psz_copyright );
+        input_AddInfo( p_cat, _("Description"), p_cd->psz_description );
+        input_AddInfo( p_cat, _("Rating"), p_cd->psz_rating );
     }
     msg_Dbg( p_input,
              "Read \"Content Description Object\" title:\"%s\" author:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",

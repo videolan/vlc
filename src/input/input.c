@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.224 2003/03/11 23:56:54 gbazin Exp $
+ * $Id: input.c,v 1.225 2003/03/14 00:24:08 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -148,8 +148,8 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     msg_Info( p_input, "playlist item `%s'", p_input->psz_source );
 
-    p_info = input_InfoCategory( p_input, "General" );
-    input_AddInfo( p_info, "playlist item", p_input->psz_source );
+    p_info = input_InfoCategory( p_input, _("General") );
+    input_AddInfo( p_info, _("Playlist Item"), p_input->psz_source );
     vlc_object_attach( p_input, p_parent );
 
     /* Create thread and wait for its readiness. */
