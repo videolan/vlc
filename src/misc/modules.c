@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.61 2002/05/22 17:19:46 sam Exp $
+ * $Id: modules.c,v 1.62 2002/05/22 19:31:33 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -228,9 +228,7 @@ void module_ManageBank( void )
         {
             if( p_module->i_unused_delay < MODULE_HIDE_DELAY )
             {
-                /* FIXME: sometimes a module that has been unloaded does not
-                 * work properly when loaded again. Check what's wrong. */
-                //p_module->i_unused_delay++;
+                p_module->i_unused_delay++;
             }
             else
             {

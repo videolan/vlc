@@ -2,7 +2,7 @@
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.8 2002/05/18 13:30:28 gbazin Exp $
+ * $Id: directx.c,v 1.9 2002/05/22 19:31:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -74,4 +74,9 @@ MODULE_ACTIVATE_START
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
+    /* check if we registered a window class because we need to
+     * unregister it */
+    WNDCLASS wndclass;
+    if( GetClassInfo( GetModuleHandle(NULL), "VLC DirectX", &wndclass ) )
+        UnregisterClass( "VLC DirectX", GetModuleHandle(NULL) );
 MODULE_DEACTIVATE_STOP
