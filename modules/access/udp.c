@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.6 2002/12/12 15:10:58 gbazin Exp $
+ * $Id: udp.c,v 1.7 2002/12/16 16:48:04 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -210,6 +210,11 @@ static int Open( vlc_object_t *p_this )
             free(psz_name);
             return( -1 );
         }
+    }
+
+    if( i_bind_port == 0 )
+    {
+        i_bind_port = config_GetInt( p_this, "server-port" );
     }
 
     p_input->pf_read = Read;

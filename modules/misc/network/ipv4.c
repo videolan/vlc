@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.9 2002/12/06 16:34:07 sam Exp $
+ * $Id: ipv4.c,v 1.10 2002/12/16 16:48:04 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -147,11 +147,6 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     int i_handle, i_opt;
     socklen_t i_opt_size;
     struct sockaddr_in sock;
-
-    if( i_bind_port == 0 )
-    {
-        i_bind_port = config_GetInt( p_this, "server-port" );
-    }
 
     /* Open a SOCK_DGRAM (UDP) socket, in the AF_INET domain, automatic (0)
      * protocol */
