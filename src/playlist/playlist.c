@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.70 2003/12/13 17:16:11 gbazin Exp $
+ * $Id: playlist.c,v 1.71 2004/01/05 12:59:43 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,10 +44,6 @@ static void RunThread ( playlist_t * );
 static void SkipItem  ( playlist_t *, int );
 static void PlayItem  ( playlist_t * );
 
-#if 0
-static void Poubellize ( playlist_t *, input_thread_t * );
-#endif
-
 /**
  * Create playlist
  *
@@ -72,6 +68,14 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
 
+    var_Create( p_playlist, "item-change", VLC_VAR_INTEGER );
+    val.i_int = -1;
+    var_Set( p_playlist, "item-change", val );
+
+    var_Create( p_playlist, "playlist-current", VLC_VAR_INTEGER );
+    val.i_int = -1;
+    var_Set( p_playlist, "playlist-current", val );
+
     var_Create( p_playlist, "intf-popupmenu", VLC_VAR_BOOL );
 
     var_Create( p_playlist, "intf-show", VLC_VAR_BOOL );
@@ -90,7 +94,8 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
 
     p_playlist->i_groups = 0;
     p_playlist->pp_groups = NULL;
-    p_playlist->i_max_id = 0;
+    p_playlist->i_last_group = 0;
+    p_playlist->i_last_id = 0;
 
     playlist_CreateGroup( p_playlist, "Normal" );
 
@@ -121,6 +126,7 @@ void playlist_Destroy( playlist_t * p_playlist )
     vlc_thread_join( p_playlist );
 
     var_Destroy( p_playlist, "intf-change" );
+    var_Destroy( p_playlist, "item-change" );
 
     while( p_playlist->i_groups > 0 )
     {
@@ -157,6 +163,8 @@ void playlist_Destroy( playlist_t * p_playlist )
         if( p_playlist->p_input )
         {
             input_StopThread( p_playlist->p_input );
+            val.i_int = p_playlist->i_index;
+            var_Set( p_playlist, "item-change",val );
         }
         break;
 
@@ -231,13 +239,13 @@ void playlist_Destroy( playlist_t * p_playlist )
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
-
+#if 0
     val.b_bool = VLC_TRUE;
     var_Set( p_playlist, "intf-change", val );
-
+#endif
     return;
 }
-/* Following functions are local */
+
 
 static void ObjectGarbageCollector( playlist_t *p_playlist,
                                     int i_type,
@@ -353,8 +361,12 @@ static void RunThread ( playlist_t *p_playlist )
                     vlc_mutex_unlock( &p_playlist->object_lock );
                 }
 
+                val.i_int = p_playlist->i_index;
+                var_Set( p_playlist, "playlist-current", val);
+#if 0
                 val.b_bool = VLC_TRUE;
                 var_Set( p_playlist, "intf-change", val );
+#endif
                 continue;
             }
             else if( p_playlist->p_input->stream.control.i_status != INIT_S )
@@ -538,6 +550,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
  *****************************************************************************/
 static void PlayItem( playlist_t *p_playlist )
 {
+    vlc_value_t val;
     if( p_playlist->i_index == -1 )
     {
         if( p_playlist->i_size == 0 || p_playlist->i_enabled == 0)
@@ -556,4 +569,7 @@ static void PlayItem( playlist_t *p_playlist )
     msg_Dbg( p_playlist, "creating new input thread" );
     p_playlist->p_input = input_CreateThread( p_playlist,
                                   p_playlist->pp_items[p_playlist->i_index] );
+
+    val.i_int = p_playlist->i_index;
+    var_Set( p_playlist, "item-change", val );
 }

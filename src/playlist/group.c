@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: group.c,v 1.4 2003/12/11 11:30:37 zorglub Exp $
+ * $Id: group.c,v 1.5 2004/01/05 12:59:43 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -61,7 +61,7 @@ playlist_group_t * playlist_CreateGroup(playlist_t * p_playlist, char *psz_name)
     }
 
     p_group->psz_name = strdup( psz_name );
-    p_group->i_id = ++p_playlist->i_max_id;
+    p_group->i_id = ++p_playlist->i_last_group;
 
     msg_Dbg(p_playlist,"Creating group %s with id %i at position %i",
                      p_group->psz_name,
@@ -110,7 +110,7 @@ int playlist_DeleteGroup( playlist_t *p_playlist, int i_id )
 }
 
 /**
- * Find the name with the ID
+ * Find the name of the group given its ID
  *
  * \param p_playlist the playlist where to find the group
  * \param i_id the ID to search for
@@ -124,14 +124,14 @@ char *playlist_FindGroup( playlist_t *p_playlist, int i_id )
         if( p_playlist->pp_groups[i]->i_id == i_id )
         {
             if( p_playlist->pp_groups[i]->psz_name)
-            return strdup( p_playlist->pp_groups[i]->psz_name );
+                return strdup( p_playlist->pp_groups[i]->psz_name );
         }
     }
     return NULL;
 }
 
 /**
- * Find the Id with the given name
+ * Find the Id of a group given its name
  *
  * \param p_playlist the playlist where to find the group
  * \param char * the name to search for

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.271 2003/12/03 22:14:38 sigmunau Exp $
+ * $Id: input.c,v 1.272 2004/01/05 12:59:43 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -86,8 +86,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     input_info_category_t * p_info;
+    item_info_category_t *p_cat;
     vlc_value_t val;
-    int i;
+    int i,j;
 
     /* Allocate descriptor */
     p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
@@ -98,9 +99,21 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     }
 
     /* Parse input options */
-    for( i = 0; i < p_item->i_options; i++ )
+    for( i = 0 ; i < p_item->i_categories ; i++ )
     {
-        ParseOption( p_input, p_item->ppsz_options[i] );
+        if( !strncmp( p_item->pp_categories[i]->psz_name, "Options", 7 ) )
+        {
+            msg_Dbg(p_input,"Parsing %i options for item",
+                             p_item->pp_categories[i]->i_infos );
+            for( j = 0; j< p_item->pp_categories[i]->i_infos ; j++ )
+            {
+                msg_Dbg(p_input,"Option : %s",
+                         p_item->pp_categories[i]->pp_infos[j]->psz_name);
+                ParseOption( p_input,
+                             p_item->pp_categories[i]->pp_infos[j]->psz_value);
+            }
+            break;
+        }
     }
 
     /* Create a few object variables we'll need later on */
@@ -789,15 +802,13 @@ static int InitThread( input_thread_t * p_input )
                                                    FIND_PARENT );
         if( p_playlist )
         {
-            vlc_mutex_lock( &p_playlist->object_lock );
-            p_playlist->pp_items[ p_playlist->i_index ]->i_duration = i_length;
+            playlist_SetDuration( p_playlist, -1 , i_length );
             val.b_bool = VLC_TRUE;
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            var_Set( p_playlist, "intf-change", val );
+            var_Set( p_playlist, "item-change", val );
             vlc_object_release( p_playlist );
         }
-    }            
-       
+    }
+
 
     /* get fps */
     if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )

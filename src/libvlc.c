@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.106 2003/12/24 10:06:53 gbazin Exp $
+ * $Id: libvlc.c,v 1.107 2004/01/05 12:59:43 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -796,6 +796,7 @@ int VLC_AddTarget( int i_object, char const *psz_target,
                    char const **ppsz_options, int i_options,
                    int i_mode, int i_pos )
 {
+    int i;
     int i_err;
     playlist_t *p_playlist;
     vlc_t *p_vlc = vlc_current_object( i_object );
@@ -821,8 +822,13 @@ int VLC_AddTarget( int i_object, char const *psz_target,
         vlc_object_yield( p_playlist );
     }
 
-    i_err = playlist_Add( p_playlist, psz_target, ppsz_options, i_options,
+    i_err = playlist_Add( p_playlist, psz_target, psz_target,
                           i_mode, i_pos );
+
+    for( i = 0 ; i< i_options ; i++ )
+    {
+        playlist_AddOption( p_playlist, i_err , ppsz_options[i] );
+    }
 
     vlc_object_release( p_playlist );
 

@@ -2,7 +2,7 @@
  * sort.c : Playlist sorting functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sort.c,v 1.3 2003/12/13 17:46:07 asmax Exp $
+ * $Id: sort.c,v 1.4 2004/01/05 12:59:43 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -64,7 +64,7 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
         }
         vlc_mutex_unlock( &p_playlist->object_lock );
 
-        /* Notify the interfaces (XXX: use a different variable) */
+        /* Notify the interfaces */
         var_Set( p_playlist, "intf-change", val );
 
         return 0;
@@ -89,8 +89,11 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
             }
             else if( i_mode == SORT_AUTHOR )
             {
-                 i_test = strcasecmp( p_playlist->pp_items[i]->psz_author,
-                                 p_playlist->pp_items[i_small]->psz_author );
+                 i_test = strcasecmp(
+                          playlist_GetInfo( p_playlist, i,
+                                            _("General") , _("Author") ),
+                          playlist_GetInfo( p_playlist, i_small,
+                                            _("General") , _("Author") ) );
             }
 
             if( ( i_type == SORT_NORMAL  && i_test < 0 ) ||
@@ -111,7 +114,7 @@ int playlist_Sort( playlist_t * p_playlist , int i_mode, int i_type )
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 
-    /* Notify the interfaces (XXX: use a different variable) */
+    /* Notify the interfaces  */
     var_Set( p_playlist, "intf-change", val );
 
     return 0;

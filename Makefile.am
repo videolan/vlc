@@ -317,6 +317,8 @@ SOURCES_libvlc_common = \
 	src/playlist/loadsave.c \
 	src/playlist/group.c \
 	src/playlist/item.c \
+	src/playlist/item-ext.c \
+        src/playlist/info.c \
 	src/input/input.c \
 	src/input/es_out.c \
 	src/input/stream.c \

@@ -2,7 +2,7 @@
  * loadsave.c : Playlist loading / saving functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: loadsave.c,v 1.1 2003/10/29 18:00:46 zorglub Exp $
+ * $Id: loadsave.c,v 1.2 2004/01/05 12:59:43 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -118,8 +118,8 @@ int playlist_LoadFile( playlist_t * p_playlist, const char *psz_filename )
        }
        if( i_format == 5 )
        {
-           playlist_Add ( p_playlist , (char *)&line ,
-                      0, 0, PLAYLIST_APPEND , PLAYLIST_END );
+           playlist_Add ( p_playlist , (char *)&line , (char *)&line,
+                         PLAYLIST_APPEND , PLAYLIST_END );
        }
        else
        {
