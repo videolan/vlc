@@ -4527,6 +4527,7 @@ fi
 
 
 
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -4693,6 +4694,7 @@ s%@PROFILING@%$PROFILING%g
 s%@OPTIMS@%$OPTIMS%g
 s%@CSS@%$CSS%g
 s%@MOC@%$MOC%g
+s%@WINDRES@%$WINDRES%g
 s%@LCFLAGS@%$LCFLAGS%g
 s%@PLCFLAGS@%$PLCFLAGS%g
 s%@LIB@%$LIB%g

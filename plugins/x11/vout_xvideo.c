@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.20 2001/06/25 11:34:08 sam Exp $
+ * $Id: vout_xvideo.c,v 1.21 2001/07/07 17:45:29 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -1144,6 +1144,7 @@ static int XVideoGetPort( Display *dpy )
     }
 
     for( i=0; i < i_adaptors && xv_port == -1; ++i )
+    {
         if( ( adaptor_info[ i ].type & XvInputMask ) &&
             ( adaptor_info[ i ].type & XvImageMask ) )
         {
@@ -1155,24 +1156,37 @@ static int XVideoGetPort( Display *dpy )
             imageFormats = XvListImageFormats( dpy, port, &i_num_formats );
 
             for( i=0; i < i_num_formats && xv_port == -1; ++i )
+            {
                 if( imageFormats[ i ].id == GUID_YUV12_PLANAR )
+                {
                     xv_port = port;
+                }
+            }
 
             if( xv_port == -1 )
+            {
                 intf_WarnMsg( 3, "vout: XVideo image input port %d "
                         "does not support the YUV12 planar format which is "
-                        "currently required by the xvideo output plugin.",
+                        "currently required by the xvideo output plugin",
                         port );
+            }
 
             if( imageFormats )
+            {
                 XFree( imageFormats );
+            }
         }
+    }
 
     if( i_adaptors > 0 )
+    {
         XvFreeAdaptorInfo(adaptor_info);
+    }
 
     if( xv_port == -1 )
-        intf_ErrMsg( "vout error: didn't find a suitable Xvideo image input port." );
+    {
+        intf_ErrMsg( "vout error: no suitable Xvideo image input port" );
+    }
 
     return( xv_port );
 }
@@ -1189,7 +1203,10 @@ static void XVideoDisplay( vout_thread_t *p_vout )
 {
     int     i_dest_width, i_dest_height, i_dest_x, i_dest_y;
 
-    if( !p_vout->p_sys->p_xvimage ) return;
+    if( !p_vout->p_sys->p_xvimage )
+    {
+        return;
+    }
 
     XVideoOutputCoords( p_vout->p_rendered_pic, p_vout->b_scale,
                         p_vout->p_sys->i_window_width,
@@ -1204,12 +1221,15 @@ static void XVideoDisplay( vout_thread_t *p_vout )
                    p_vout->p_rendered_pic->i_width,
                    p_vout->p_rendered_pic->i_height,
                    0 /*dest_x*/, 0 /*dest_y*/, i_dest_width, i_dest_height,
-                   True );
+                   False );
 
-     XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
-             i_dest_width, i_dest_height );
-     XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
-             i_dest_x, i_dest_y );
+    XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
+                   i_dest_width, i_dest_height );
+    XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
+                 i_dest_x, i_dest_y );
+
+    /* Send the order to the X server */
+    XSync( p_vout->p_sys->p_display, False );
 }
 
 #if 0
