@@ -141,7 +141,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_frame = VLC_FALSE;
 
     /* Setup properties */
-    p_dec->fmt_out = p_dec->fmt_in;
+    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
 
     if( p_dec->fmt_in.i_extra )

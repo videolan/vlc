@@ -75,13 +75,7 @@ static int Open( vlc_object_t *p_this )
     p_dec->pf_packetize = Packetize;
 
     /* Create the output format */
-    memcpy( &p_dec->fmt_out, &p_dec->fmt_in, sizeof( es_format_t ) );
-    if( p_dec->fmt_in.i_extra > 0 )
-    {
-        p_dec->fmt_out.p_extra = malloc( p_dec->fmt_in.i_extra );
-        memcpy( p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
-                p_dec->fmt_in.i_extra );
-    }
+    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
     /* Fix the value of the fourcc */
     switch( p_dec->fmt_in.i_codec )
