@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: ts.c,v 1.44 2004/01/09 00:30:29 gbazin Exp $
+ * $Id: ts.c,v 1.45 2004/01/15 22:15:40 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -156,42 +156,63 @@ static int Activate( vlc_object_t * p_this )
     es_ts_data_t *      p_demux_data;
     stream_ts_data_t *  p_stream_data;
     byte_t *            p_peek;
+    vlc_bool_t          b_force = VLC_FALSE;
+    int                 i_sync_pos;
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
     p_input->pf_demux_control = demux_vaControlDefault;
 
-#if 0
-    /* XXX Unused already done by src/input.c */
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        msg_Dbg( p_input, "using default mtu (%d) with bufsize (%d)\n",
-                 p_input->i_mtu, INPUT_DEFAULT_BUFSIZE );
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    }
-#endif
-
-    /* Have a peep at the show. */
-    if( input_Peek( p_input, &p_peek, 1 ) < 1 )
+    /* Have a peep at the show */
+    if( input_Peek( p_input, &p_peek, TS_PACKET_SIZE ) < TS_PACKET_SIZE )
     {
         msg_Err( p_input, "cannot peek()" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    if( *p_peek != TS_SYNC_CODE )
+    if( *p_input->psz_demux && ( !strncmp( p_input->psz_demux, "ts", 3 )
+         || !strncmp( p_input->psz_demux, "ts_dvbpsi", 10 ) ) )
+        b_force = VLC_TRUE;
+
+    /* In a TS_PACKET_SIZE buffer we should find a sync byte */
+    for( i_sync_pos = 0; i_sync_pos < TS_PACKET_SIZE &&
+         p_peek[i_sync_pos] != TS_SYNC_CODE; i_sync_pos++ );
+
+    if( i_sync_pos >= TS_PACKET_SIZE )
     {
-        if( *p_input->psz_demux && ( !strncmp( p_input->psz_demux, "ts", 3 )
-                         || !strncmp( p_input->psz_demux, "ts_dvbpsi", 10 ) ) )
+        if( b_force )
         {
             /* User forced */
-            msg_Err( p_input, "this does not look like a TS stream, continuing" );
+            msg_Err( p_input, "this does not look like a TS stream, "
+                     "continuing anyway" );
         }
         else
         {
             msg_Warn( p_input, "TS module discarded (no sync)" );
-            return -1;
+            return VLC_EGENERIC;
+        }
+    }
+
+    /* Now that we have the first TS_SYNC_CODE, check the following
+     * TS_SYNC_CODEs are where they are supposed to be (one byte sync code
+     * is not enough to ensure the sync). */
+    if( !b_force )
+    {
+        if( input_Peek( p_input, &p_peek, TS_PACKET_SIZE * TS_SYNC_CODES_MIN )
+            < TS_PACKET_SIZE * TS_SYNC_CODES_MIN )
+        {
+            msg_Err( p_input, "cannot peek()" );
+            return VLC_EGENERIC;
+        }
+
+        for( ; i_sync_pos < TS_PACKET_SIZE * TS_SYNC_CODES_MIN;
+             i_sync_pos += TS_PACKET_SIZE )
+        {
+            if( p_peek[i_sync_pos] != TS_SYNC_CODE )
+            {
+                msg_Warn( p_input, "TS module discarded (lost sync)" );
+                return VLC_EGENERIC;
+            }
         }
     }
 

@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.13 2004/01/09 00:30:29 gbazin Exp $
+ * $Id: system.h,v 1.14 2004/01/15 22:15:40 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -30,6 +30,7 @@
  *****************************************************************************/
 #define TS_PACKET_SIZE      188                       /* Size of a TS packet */
 #define TS_SYNC_CODE        0x47                /* First byte of a TS packet */
+#define TS_SYNC_CODES_MIN   5        /* Min number of sync codes to look for */
 #define PSI_SECTION_SIZE    4096            /* Maximum size of a PSI section */
 
 #define PAT_UNINITIALIZED    (1 << 6)
