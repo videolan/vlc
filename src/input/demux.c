@@ -226,6 +226,8 @@ int demux2_vaControlHelper( stream_t *s,
 
         case DEMUX_GET_FPS:
         case DEMUX_GET_META:
+        case DEMUX_SET_NEXT_DEMUX_TIME:
+        case DEMUX_GET_TITLE_INFO:
             return VLC_EGENERIC;
 
         default:
