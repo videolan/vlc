@@ -1,63 +1,63 @@
 # Italian translation for vlc.
 # Copyright (C) 2002 VideoLAN <videolan@videolan.org>
 #
-# Vella Bruno <allevb@tin.it>, 2002.
+# Vella Bruno, 2002.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-31 12:35+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Vella Bruno <allevb@tin.it>\n"
+"POT-Creation-Date: 2003-02-01 14:33+0100\n"
+"PO-Revision-Date: 2003-01-31 16:35+0100\n"
+"Last-Translator: Vella Bruno\n"
 "Language-Team: Italian <it@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
-#: src/libvlc.c:256
+#: src/libvlc.c:261
 msgid "C"
 msgstr "it"
 
 #. Usage
-#: src/libvlc.c:286 src/libvlc.c:1274
+#: src/libvlc.c:291 src/libvlc.c:1279
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr "Utilizzo: %s [opzioni] [elementi]...\n"
 
-#: src/libvlc.c:1131 src/misc/configuration.c:916
+#: src/libvlc.c:1136 src/misc/configuration.c:916
 msgid "string"
 msgstr "stringa"
 
-#: src/libvlc.c:1149 src/misc/configuration.c:901
+#: src/libvlc.c:1154 src/misc/configuration.c:901
 msgid "integer"
 msgstr "intero"
 
-#: src/libvlc.c:1152 src/misc/configuration.c:908
+#: src/libvlc.c:1157 src/misc/configuration.c:908
 msgid "float"
 msgstr "virgola mobile"
 
-#: src/libvlc.c:1158
+#: src/libvlc.c:1163
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:1159
+#: src/libvlc.c:1164
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1249 src/libvlc.c:1304 src/libvlc.c:1328
+#: src/libvlc.c:1254 src/libvlc.c:1309 src/libvlc.c:1333
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 
-#: src/libvlc.c:1277
+#: src/libvlc.c:1282
 msgid "[module]              [description]\n"
 msgstr ""
 
-#: src/libvlc.c:1322
+#: src/libvlc.c:1327
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -596,7 +596,7 @@ msgstr ""
 
 #: src/libvlc.h:324
 msgid "enable CPU 3D Now! support"
-msgstr ""
+msgstr "abilita supporto CPU 3D Now!"
 
 #: src/libvlc.h:326
 msgid ""
@@ -606,7 +606,7 @@ msgstr ""
 
 #: src/libvlc.h:329
 msgid "enable CPU MMX EXT support"
-msgstr ""
+msgstr "abilita supporto CPU MMX EXT"
 
 #: src/libvlc.h:331
 msgid ""
@@ -616,7 +616,7 @@ msgstr ""
 
 #: src/libvlc.h:334
 msgid "enable CPU SSE support"
-msgstr ""
+msgstr "abilita supporto CPU SSE"
 
 #: src/libvlc.h:336
 msgid ""
@@ -626,7 +626,7 @@ msgstr ""
 
 #: src/libvlc.h:339
 msgid "enable CPU AltiVec support"
-msgstr ""
+msgstr "abilita supporto CPU Altivec"
 
 #: src/libvlc.h:341
 msgid ""
@@ -740,7 +740,7 @@ msgstr ""
 #. Interface options
 #: src/libvlc.h:424
 msgid "Interface"
-msgstr ""
+msgstr "Interfaccia"
 
 #. Audio options
 #: src/libvlc.h:437 modules/audio_output/file.c:108
@@ -1837,13 +1837,13 @@ msgstr "Seleziona canale audio"
 #: modules/gui/gtk/gtk_interface.c:457 modules/gui/gtk/gtk_interface.c:1294
 #: modules/gui/macosx/intf.m:304 modules/gui/macosx/controls.m:670
 msgid "Volume Up"
-msgstr "Volume Su"
+msgstr "Alza Volume"
 
 #: modules/gui/gtk/gnome_interface.c:133 modules/gui/gtk/gnome_interface.c:957
 #: modules/gui/gtk/gtk_interface.c:464 modules/gui/gtk/gtk_interface.c:1301
 #: modules/gui/macosx/intf.m:305 modules/gui/macosx/controls.m:671
 msgid "Volume Down"
-msgstr "Volume Gi˘"
+msgstr "Abbassa Volume"
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:964
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
@@ -2103,8 +2103,9 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1402 modules/gui/gtk/gtk_interface.c:1642
 #: modules/gui/kde/kde.cpp:111 modules/gui/win32/strings.cpp:9
+#, fuzzy
 msgid "(C) 1996-2003 - the VideoLAN Team"
-msgstr "© 1996-2003, il Team VideoLAN"
+msgstr "(c) 2002, il Team VideoLAN"
 
 #: modules/gui/gtk/gnome_interface.c:1404 modules/gui/gtk/gtk_interface.c:1668
 #: modules/gui/kde/kde.cpp:108 modules/gui/win32/strings.cpp:10
@@ -2369,9 +2370,8 @@ msgid "Messages"
 msgstr "Messaggi"
 
 #: modules/gui/gtk/gnome_interface.c:2912 modules/gui/gtk/gtk_interface.c:3148
-#, fuzzy
 msgid "Stream output (MRL)"
-msgstr "Info Sorgente..."
+msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2927 modules/gui/gtk/gtk_interface.c:3163
 msgid "Destination Target: "
@@ -2390,9 +2390,8 @@ msgid "RTP"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:2993 modules/gui/gtk/gtk_interface.c:3229
-#, fuzzy
 msgid "Path:"
-msgstr "Porta"
+msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:3003 modules/gui/gtk/gtk_interface.c:3254
 #: modules/gui/win32/strings.cpp:166 modules/gui/win32/strings.cpp:167
@@ -2499,11 +2498,10 @@ msgid "Authors"
 msgstr "Autori"
 
 #: modules/gui/gtk/gtk_interface.c:1658
-#, fuzzy
 msgid ""
 "the VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/"
-msgstr "Autori: Il Team VideoLAN, http://www.videolan.org"
+msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:1683 modules/gui/gtk/gtk_interface.c:2484
 #: modules/gui/gtk/gtk_interface.c:2735 modules/gui/gtk/gtk_interface.c:2966
@@ -2524,7 +2522,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2372
 #, fuzzy
 msgid "Use a subtitles file"
-msgstr "Seleziona canale sottotitoli"
+msgstr "scegli sottotitoli"
 
 #: modules/gui/gtk/gtk_interface.c:2394 modules/gui/win32/strings.cpp:242
 #, fuzzy
@@ -2542,7 +2540,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:2455
 #, fuzzy
 msgid "Use stream output"
-msgstr "Apri Sorgente"
+msgstr "Pausa sorgente"
 
 #: modules/gui/gtk/gtk_interface.c:2463
 msgid "Stream output configuration "
@@ -2637,9 +2635,8 @@ msgid "Messages:"
 msgstr "Messaggi:"
 
 #: modules/gui/macosx/intf.m:245
-#, fuzzy
 msgid "VLC - Controller"
-msgstr "Controlli"
+msgstr ""
 
 #: modules/gui/macosx/intf.m:250 modules/gui/macosx/intf.m:294
 #: modules/gui/macosx/controls.m:644
@@ -2660,7 +2657,7 @@ msgstr "Veloce"
 #: modules/gui/macosx/intf.m:257
 #, fuzzy
 msgid "Volume"
-msgstr "Volume Su"
+msgstr "Alza Volume"
 
 #: modules/gui/macosx/intf.m:258
 #, fuzzy
@@ -2788,9 +2785,8 @@ msgid "Help"
 msgstr "Aiuto"
 
 #: modules/gui/macosx/intf.m:325
-#, fuzzy
 msgid "ReadMe..."
-msgstr "Messaggi..."
+msgstr ""
 
 #: modules/gui/macosx/intf.m:326
 msgid "Report A Bug"
@@ -2878,12 +2874,12 @@ msgstr "Seleziona File"
 #: modules/gui/macosx/controls.m:523
 #, fuzzy
 msgid "Open subtitlefile"
-msgstr "Seleziona canale sottotitoli"
+msgstr "Apri file"
 
 #: modules/gui/macosx/vout.m:935
-#, c-format
+#, fuzzy, c-format
 msgid "Screen %d"
-msgstr "Schermo %d"
+msgstr "Schermo"
 
 #: modules/gui/ncurses/ncurses.c:66
 msgid "ncurses interface module"
@@ -3113,7 +3109,7 @@ msgstr "Impostazioni"
 #: modules/gui/win32/strings.cpp:83
 #, fuzzy
 msgid "Video settings"
-msgstr "Impostazioni"
+msgstr "altezza video"
 
 #: modules/gui/win32/strings.cpp:85
 #, fuzzy
@@ -3187,12 +3183,12 @@ msgstr "Info su..."
 #: modules/gui/win32/strings.cpp:136
 #, fuzzy
 msgid "Select next title"
-msgstr "Seleziona File"
+msgstr "Seleziona prossimo capitolo"
 
 #: modules/gui/win32/strings.cpp:141
 #, fuzzy
 msgid "Volume &Up"
-msgstr "Volume Su"
+msgstr "Alza Volume"
 
 #: modules/gui/win32/strings.cpp:142
 msgid "Increase the volume"
@@ -3201,7 +3197,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:143
 #, fuzzy
 msgid "Volume &Down"
-msgstr "Volume Gi˘"
+msgstr "Abbassa Volume"
 
 #: modules/gui/win32/strings.cpp:144
 msgid "Decrease the volume"
@@ -3859,78 +3855,20 @@ msgstr ""
 msgid "xosd interface module"
 msgstr ""
 
-#, fuzzy
-#~ msgid "Slowmotion"
-#~ msgstr "Selezione"
+#~ msgid "audio output format"
+#~ msgstr "formato uscita audio"
 
-#, fuzzy
-#~ msgid "Fast Forward"
-#~ msgstr "Avanza"
+#~ msgid "number of channels of audio output"
+#~ msgstr "numero di canali di uscita audio"
 
-#, fuzzy
-#~ msgid "Play/Pause"
-#~ msgstr "Pausa"
-
-#~ msgid "Open a File"
-#~ msgstr "Apri un File"
-
-#~ msgid "View"
-#~ msgstr "Vista"
-
-#, fuzzy
-#~ msgid "Open a network stream"
-#~ msgstr "Seleziona una Sorgente di Rete"
-
-#, fuzzy
-#~ msgid "Open file..."
-#~ msgstr "Apri File..."
-
-#, fuzzy
-#~ msgid "Open disc..."
-#~ msgstr "Apri Disco..."
-
-#, fuzzy
-#~ msgid "Network stream..."
-#~ msgstr "Sorgente di Rete"
-
-#~ msgid "Previous File"
-#~ msgstr "File Precedente"
-
-#, fuzzy
-#~ msgid "(C) Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002"
+#~ msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"
 #~ msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - il Team VideoLAN"
 
-#, fuzzy
-#~ msgid "Select program"
-#~ msgstr "Cambia programma"
+#~ msgid "About vlc"
+#~ msgstr "Info su vlc"
 
-#, fuzzy
-#~ msgid "Select title"
-#~ msgstr "Seleziona File"
+#~ msgid "Louder"
+#~ msgstr "Più Alto"
 
-#, fuzzy
-#~ msgid "Select chapter"
-#~ msgstr "Seleziona prossimo capitolo"
-
-#, fuzzy
-#~ msgid "Select audio language"
-#~ msgstr "Seleziona canale audio"
-
-#, fuzzy
-#~ msgid "Toggle fullscreen"
-#~ msgstr "A schermo pieno"
-
-#~ msgid "Jump to previous title"
-#~ msgstr "Seleziona titolo precedente"
-
-#, fuzzy
-#~ msgid "Jump to previous chapter"
-#~ msgstr "Seleziona capitolo precedente"
-
-#, fuzzy
-#~ msgid "Jump to next chapter"
-#~ msgstr "Seleziona prossimo capitolo"
-
-#, fuzzy
-#~ msgid "Channel Server"
-#~ msgstr "Canale server "
+#~ msgid "Softer"
+#~ msgstr "Più Basso"
