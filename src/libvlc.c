@@ -1947,6 +1947,9 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_MODULE: /* We could also have "=<" here */
+            case CONFIG_ITEM_MODULE_CAT:
+            case CONFIG_ITEM_MODULE_LIST:
+            case CONFIG_ITEM_MODULE_LIST_CAT:
                 if( !p_item->ppsz_list )
                 {
                     psz_bra = " <"; psz_type = _("string"); psz_ket = ">";

@@ -244,13 +244,13 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                     sizeof(audio_sample_format_t) );
 
             p_filter->p_module =
-                module_Need( p_filter,"audio filter", psz_parser, VLC_TRUE );
+                module_Need( p_filter,"audio filter", psz_parser, VLC_FALSE );
 
             if( p_filter->p_module== NULL )
             {
                 p_filter->p_module =
                     module_Need( p_filter,"visualization", psz_parser,
-                                                           VLC_TRUE );
+                                                           VLC_FALSE );
                 if( p_filter->p_module == NULL )
                 {
                     msg_Err( p_aout, "cannot add user filter %s (skipped)",
