@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.36 2003/04/06 23:00:24 hartman Exp $
+$Id: NEWS,v 1.37 2003/04/08 08:35:59 massiot Exp $
 
 Changes between 0.5.2 and 0.5.3:
 ---------------------------------
@@ -10,6 +10,7 @@ Core Support:
  * video outputs are now destroyed when the associated input ends
  * the video output takes into account the caching delay introduced at the
    input level before dropping out of date frames.
+ * configuration option to disable the translation of the interface
 
 Input access:
  * fixed HTTP redirects
@@ -30,7 +31,7 @@ Codecs:
  * support for SAMI subtitles (untested and incomplete)
  * better SSA4 subtitles recognition
  * new codec for raw I420 video
- * improvements to the libmpeg2 based MPEG video decoder
+ * improvements to the libmpeg2-based MPEG video decoder
 
 Interfaces:
  * improvements to wxWindows based interface

@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.12 2003/02/17 23:47:29 hartman Exp $
+ * $Id: darwin_specific.m,v 1.13 2003/04/08 08:36:00 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -28,6 +28,10 @@
 
 #include <Cocoa/Cocoa.h>
 
+#ifdef HAVE_LOCALE_H
+#   include <locale.h>
+#endif
+
 /*****************************************************************************
  * system_Init: fill in program path & retrieve language
  *****************************************************************************/
@@ -41,6 +45,7 @@ static int FindLanguage( const char * psz_lang )
         "English", "en",
         "French", "fr",
         "Italian", "it",
+
         "Japanese", "ja",
         "Dutch", "nl",
         "Norwegian", "no",

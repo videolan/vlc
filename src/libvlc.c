@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.76 2003/04/07 21:51:27 massiot Exp $
+ * $Id: libvlc.c,v 1.77 2003/04/08 08:35:59 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -331,7 +331,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     config_LoadConfigFile( p_vlc, "main" );
     config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
 
-#   ifndef SYS_DARWIN
     if( !config_GetInt( p_vlc, "translation" ) )
     {
         /* Reset the default domain */
@@ -343,7 +342,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         module_InitBank( &libvlc );
         module_LoadMain( &libvlc );
     }
-#   endif
 #endif
 
     /*
@@ -1037,6 +1035,11 @@ static void SetLanguage ( char const *psz_lang )
     else
     {
         setlocale( LC_ALL, psz_lang );
+#ifdef SYS_DARWIN
+        /* I need that under Darwin, please check it doesn't disturb
+         * other platforms. --Meuuh */
+        setenv( "LANG", psz_lang, 1 );
+#endif
     }
 
     /* Specify where to find the locales for current domain */
