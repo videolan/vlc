@@ -1,5 +1,5 @@
 /*******************************************************************************
- * all.h: all headers
+ * vlc.h: all headers
  * (c)1998 VideoLAN
  *******************************************************************************
  * This header includes all vlc .h headers and depending headers. A source file
@@ -12,22 +12,54 @@
  *******************************************************************************/
 
 /* System headers */
+#include <errno.h>
+#include <fcntl.h>
+#include <getopt.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <arpa/inet.h>
+
+#include <net/if.h>
+
 #include <netinet/in.h>
+
+#include <sys/ioctl.h>
+#include <sys/shm.h>
 #include <sys/soundcard.h>
 #include <sys/uio.h>
+
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
+#include <X11/extensions/xf86dga.h>
+
+
 
 /* Common headers */
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
 #include "vlc_thread.h"
+#include "netutils.h"
+#include "debug.h"
+#include "xutils.h"
+#include "intf_msg.h"
 
 /* Input */
 #include "input.h"
+#include "input_psi.h"
+#include "input_pcr.h"
+#include "input_netlist.h"
 #include "input_vlan.h"
 #include "decoder_fifo.h"
+#include "input_file.h"
+#include "input_network.h"
 
 /* Audio */
 #include "audio_output.h"
@@ -35,16 +67,17 @@
 
 /* Video */
 #include "video.h"
+#include "video_sys.h"
 #include "video_output.h"
 #include "video_decoder.h"
 
 /* Interface */
-#include "xconsole.h"
+#include "intf_cmd.h"
+#include "intf_ctrl.h"
+#include "intf_sys.h"
+#include "intf_console.h"
 #include "interface.h"
-#include "intf_msg.h"
 
-/* Shared resources */
-#include "pgm_data.h"
-
+#include "main.h"
 
 

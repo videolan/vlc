@@ -200,10 +200,9 @@ typedef struct aout_thread_s
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
-int             aout_Open               ( aout_thread_t *p_aout );
-int             aout_SpawnThread        ( aout_thread_t *p_aout );
-void            aout_CancelThread       ( aout_thread_t *p_aout );
-void            aout_Close              ( aout_thread_t *p_aout );
+aout_thread_t * aout_CreateThread       ( int *pi_status );
+void            aout_DestroyThread      ( aout_thread_t *p_aout, int *pi_status );
+
 
 aout_fifo_t *   aout_CreateFifo         ( aout_thread_t *p_aout, aout_fifo_t *p_fifo );
 void            aout_DestroyFifo        ( aout_fifo_t *p_fifo );

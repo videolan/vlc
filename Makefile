@@ -9,32 +9,71 @@
 # Configuration
 ################################################################################
 
+# Environment
 #CC = gcc
 #SHELL = /bin/sh
 
+# Video output settings
+VIDEO=X11
+#VIDEO=DGA
+#VIDEO=FB
+#VIDEO=BEOS
+
+# Target architecture and optimization
+#ARCH=
+ARCH=MMX
+#ARCH=PPC
+
+#----------------- do not change anything below this line ----------------------
+
 ################################################################################
-# Settings and other variables
+# Configuration pre-processing
 ################################################################################
+
+# DEFINE will contain all the constants definitions decided in Makefile
+DEFINE = -DVIDEO_$(VIDEO)
+
+# video is a lowercase version of VIDEO used for filenames
+video = $(shell echo $(VIDEO) | tr 'A-Z' 'a-z')
+
+################################################################################
+# Tunning and other variables
+################################################################################
+
+#
+# Transformation for video decompression (Fourier or cosine)
+#
+TRANSFORM=vdec_idct
+#TRANSFORM=vdec_idft
 
 #
 # C headers directories
 #
 INCLUDE += -Iinclude
+
+ifeq ($(VIDEO),X11)
 INCLUDE += -I/usr/X11R6/include/X11
+endif
 
 #
 # Libraries
 #
+LIB += -lpthread
+
+ifeq ($(VIDEO),X11)
 LIB += -L/usr/X11R6/lib
 LIB += -lX11
 LIB += -lXext 
-LIB += -lpthread
 LIB += -lXpm
+endif
+
+# System dependant libraries
+#??LIB += -lXxf86dga
 
 #
 # C compiler flags: compilation
 #
-CCFLAGS += $(INCLUDE)
+CCFLAGS += $(DEFINE) $(INCLUDE)
 CCFLAGS += -Wall
 CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
@@ -44,21 +83,24 @@ CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer
 #CCFLAGS += -fomit-frame-pointer -s
-#LCFLAGS += -s
 
-# Platform-specific optimizations
-# Optimizations for x86 familiy :
+# Optimizations for x86 familiy, without MMX
+ifeq ($(ARCH),)
 CCFLAGS += -malign-double
 CCFLAGS += -march=pentiumpro
 #CCFLAGS += -march=pentium
+endif
 
-# MMX support :
-CFLAGS += -DHAVE_MMX
-ASM_OBJ =   video_decoder_ref/idctmmx.o \
-		    video_decoder_ref/yuv12-rgb16.o
+# Optimization for x86 with MMX support
+ifeq ($(ARCH),MMX)
+CCFLAGS += -malign-double
+CCFLAGS += -march=pentiumpro
+endif
 
-#Optimizations for PowerPC :
-#CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
+# Optimizations for PowerPC
+ifeq ($(ARCH),PPC)
+CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
+endif
 
 #
 # C compiler flags: dependancies
@@ -71,31 +113,16 @@ DCFLAGS += -MM
 #
 LCFLAGS += $(LIB)
 LCFLAGS += -Wall
-
-#
-# C compiler flags: functions flow
-#
-FCFLAGS += $(INCLUDE)
-FCFLAGS += -A
-FCFLAGS += -P
-FCFLAGS += -v
-FCFLAGS	+= -a
-FCFLAGS += -X errno.h
-FCFLAGS += -X fcntl.h
-FCFLAGS += -X signal.h
-FCFLAGS += -X stdio.h
-FCFLAGS += -X stdlib.h
-FCFLAGS += -X string.h
-FCFLAGS += -X unistd.h
-FCFLAGS += -X sys/ioctl.h
-FCFLAGS += -X sys/stat.h
-FCFLAGS += -X X11/Xlib.h
-FFILTER = grep -v "intf_.*Msg.*\.\.\."
+#LCFLAGS += -s
 
 #
 # C compiler flags: common flags
 #
-# CFLAGS
+
+# Optimizations for x86 with MMX support
+ifeq ($(ARCH),MMX)
+CFLAGS += -DHAVE_MMX
+endif
 
 #
 # Additionnal debugging flags
@@ -104,7 +131,7 @@ FFILTER = grep -v "intf_.*Msg.*\.\.\."
 # Note that electric fence and accurate profiling are quite uncompatible.
 #CCFLAGS += -g
 #CCFLAGS += -pg
-#LCFLAGS += -g
+#LCFLAGS += -g 
 #LCFLAGS += -pg
 #LIB += -ldmalloc
 #LIB += -lefence
@@ -122,7 +149,8 @@ interface_obj =  		interface/main.o \
 						interface/intf_cmd.o \
 						interface/intf_ctrl.o \
 						interface/control.o \
-						interface/xconsole.o 
+						interface/intf_console.o \
+						interface/intf_$(video).o
 
 input_obj =         		input/input_vlan.o \
 						input/input_file.o \
@@ -136,14 +164,14 @@ input_obj =         		input/input_vlan.o \
 audio_output_obj = 		audio_output/audio_output.o \
 						audio_output/audio_dsp.o
 
-#video_output_obj = 		video_output/video_output.o \
-#						video_output/video_x11.o \
-#						video_output/video_graphics.o 
+video_output_obj = 		video_output/video_output.o \
+						video_output/video_$(video).o
 
 audio_decoder_obj =		audio_decoder/audio_decoder.o \
 						audio_decoder/audio_math.o
 
-#generic_decoder_obj =		generic_decoder/generic_decoder.o
+#??generic_decoder_obj =		generic_decoder/generic_decoder.o
+# remeber to add it to OBJ 
 
 video_decoder_obj =		video_decoder_ref/video_decoder.o \
 						video_decoder_ref/display.o \
@@ -155,7 +183,8 @@ video_decoder_obj =		video_decoder_ref/video_decoder.o \
 						video_decoder_ref/motion.o \
 						video_decoder_ref/mpeg2dec.o \
 						video_decoder_ref/recon.o \
-						video_decoder_ref/spatscal.o
+						video_decoder_ref/spatscal.o 
+#						video_decoder_ref/$(TRANSFORM).o
 
 #video_parser_obj = 		video_parser/video_parser.o \
 #						video_parser/vpar_headers.o \
@@ -173,6 +202,12 @@ misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \
 						misc/netutils.o
 
+
+ifeq ($(ARCH),MMX)
+ASM_OBJ = 			video_decoder_ref/idctmmx.o \
+						video_decoder_ref/yuv12-rgb16.o
+endif
+
 C_OBJ = $(interface_obj) \
 		$(input_obj) \
 		$(audio_output_obj) \
@@ -182,7 +217,7 @@ C_OBJ = $(interface_obj) \
 		$(video_parser_obj) \
 		$(video_decoder_obj) \
 		$(vlan_obj) \
-		$(misc_obj) \
+		$(misc_obj)
 
 #
 # Other lists of files
@@ -207,7 +242,7 @@ clean:
 
 distclean: clean
 	rm -f **/*.o **/*~ *.log
-	rm -f vlc gmon.out core Documentation/cflow
+	rm -f vlc gmon.out core
 	rm -rf dep
 
 FORCE:
@@ -217,9 +252,6 @@ FORCE:
 #
 vlc: $(C_OBJ) $(ASM_OBJ)
 	$(CC) $(LCFLAGS) $(CFLAGS) -o $@ $(C_OBJ) $(ASM_OBJ)
-
-Documentation/cflow: $(sources)
-	cflow $(FCFLAGS) $(CFLAGS) $(sources) | $(FFILTER) > $@
 
 #
 # Generic rules (see below)
@@ -232,7 +264,7 @@ $(C_OBJ): %.o: dep/%.d
 $(C_OBJ): %.o: %.c
 	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 $(ASM_OBJ): %.o: %.S
-	$(CC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 ################################################################################
 # Note on generic rules and dependancies

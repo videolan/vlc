@@ -39,71 +39,10 @@
 #define VLAN_ID( iface, vlan )      ( ((iface) << 8) | (vlan) )
 
 /*******************************************************************************
- * input_vlan_server_t: vlan server
- *******************************************************************************
- * This structure describes a vlan server.
- *******************************************************************************/
-typedef struct
-{
-    struct sockaddr_in  sa_in;                               /* server address */
-    int                 i_socket;                         /* socket descriptor */
-
-    /* Login informations */
-    char *              psz_login;                             /* server login */
-    char *              psz_passwd;                         /* server password */
-} input_vlan_server_t;
-
-/*******************************************************************************
- * input_vlan_iface_t: vlan-capable network interface
- *******************************************************************************
- * This structure describes the abilities of a network interface capable of
- * vlan management. Note that an interface could have several IP adresses, but
- * since only the MAC address is used to change vlan, only one needs to be
- * retrieved.
- * ?? it could be interesting to send a port id on vlan request, to know if two
- * interfaces are dependant regarding vlan changes.
- *******************************************************************************/
-typedef struct
-{
-    char *                  psz_name;                        /* interface name */
-    struct sockaddr_in      sa_in;                             /* interface IP */
-    char                    psz_mac[20];                      /* interface MAC */
-
-    /* Hardware properties */
-    int                     i_master;                /* master interface index */
-    int                     i_switch;                         /* switch number */
-    int                     i_port;                             /* port number */
-    int                     i_sharers;          /* number of MACs on this port */
-    
-    /* Vlan properties - these are only used if i_master is negative */
-    int                     i_refcount;                       /* locks counter */
-    int                     i_vlan;                            /* current vlan */
-    int                     i_default_vlan;                    /* default vlan */
-} input_vlan_iface_t;
-
-/*******************************************************************************
- * vlan_method_data_t
- *******************************************************************************
- * Store global vlan library data.
- *******************************************************************************/
-typedef struct
-{    
-    vlc_mutex_t             lock;                              /* library lock */
-
-    /* Server */
-    input_vlan_server_t     server;                             /* vlan server */
- 
-    /* Network interfaces */
-    int                     i_ifaces;   /* number of vlan-compliant interfaces */
-    input_vlan_iface_t *    p_iface;                             /* interfaces */
-} input_vlan_method_t;
-
-/*******************************************************************************
  * Prototypes
  *******************************************************************************/
-int     input_VlanMethodInit    ( input_vlan_method_t *p_method,
-                                  char *psz_server, int i_port);
-void    input_VlanMethodFree    ( input_vlan_method_t *p_method );
+int     input_VlanCreate  ( void );
+void    input_VlanDestroy ( void );
 
 int     input_VlanId            ( char *psz_iface, int i_vlan );
 int     input_VlanJoin          ( int i_vlan_id );

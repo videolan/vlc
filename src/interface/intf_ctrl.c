@@ -24,7 +24,8 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
-#include <errno.h>
+#include "vlc.h"
+/*??#include <errno.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -67,6 +68,7 @@
 #include "intf_ctrl.h"
 
 #include "pgm_data.h"
+*/
 
 /*
  * Local prototypes
@@ -309,7 +311,7 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     struct stat stat_buffer;       /* needed to find out the size of psz_file */
     int i_arg;                                              /* argument index */
 
-    if ( !p_program_data->cfg.b_audio )                  /* audio is disabled */
+    if ( !p_main->b_audio )                  /* audio is disabled */
     {
         intf_IntfMsg("play-audio error: audio is disabled");
         return( INTF_NO_ERROR );
@@ -383,10 +385,10 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     close( i_fd );
 
     /* Now we can work out how many output units we can compute with the fifo */
-    fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_program_data->aout_thread.dsp.l_rate)/(s64)fifo.l_rate);
+    fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_main->p_aout->dsp.l_rate)/(s64)fifo.l_rate);
 
     /* Create the fifo */
-    if ( aout_CreateFifo(&p_program_data->aout_thread, &fifo) == NULL )
+    if ( aout_CreateFifo(p_main->p_aout, &fifo) == NULL )
     {
         intf_IntfMsg("play-audio error: can't create audio fifo");
         free( fifo.buffer );
@@ -414,7 +416,7 @@ static int PlayVideo( int i_argc, intf_arg_t *p_argv )
  *******************************************************************************/
 static int Quit( int i_argc, intf_arg_t *p_argv )
 {
-    p_program_data->intf_thread.b_die = 1;
+    p_main->p_intf->b_die = 1;
     return( INTF_NO_ERROR );
 }
 
@@ -435,6 +437,7 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
       switch( p_argv[i_arg].i_index )
       {
       case 0:
+	  // ?? useless
           i_input = p_argv[i_arg].i_num;
           break;
       case 1:
@@ -445,20 +448,10 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
 
 
     /* Find to which input this command is destinated */
-    if(i_input < INPUT_MAX_THREADS )
-    {
-        if( p_program_data->intf_thread.pp_input[i_input] )
-        {
-            intf_IntfMsg( "Adding PID %d to input %d\n", i_pid, i_input );
-            input_AddPgrmElem( p_program_data->intf_thread.pp_input[i_input],
-                               i_pid );
-            return( INTF_NO_ERROR );
-        }
-    }      
-
-    /* No such input was created */
-    intf_IntfMsg("No such input thread is currently running: %d\n", i_input);
-    return(  INTF_OTHER_ERROR );
+    intf_IntfMsg( "Adding PID %d to input %d\n", i_pid, i_input );
+//????    input_AddPgrmElem( p_main->p_intf->p_x11->p_input,
+//????		       i_pid );
+    return( INTF_NO_ERROR );
 }
 
 
@@ -528,10 +521,10 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
     }
 
     /* Default settings for the decoder threads */
-    cfg.p_aout = p_program_data->intf_thread.p_aout;
+    cfg.p_aout = p_main->p_aout;
 
     /* Create the input thread */
-    if( intf_CreateInputThread( &p_program_data->intf_thread, &cfg ) == -1)
+    if( intf_SelectInput( p_main->p_intf, &cfg ) == -1)
     {
         return( INTF_OTHER_ERROR );
     }
@@ -551,15 +544,15 @@ static int Test( int i_argc, intf_arg_t *p_argv )
 {
     int i_thread;    
 
-    if( i_argc == 1 )
+/*??    if( i_argc == 1 )
     {
-        i_thread = intf_CreateVoutThread( &p_program_data->intf_thread, NULL, -1, -1);
+        i_thread = intf_CreateVoutThread( &p_main->intf_thread, NULL, -1, -1);
         intf_IntfMsg("return value: %d", i_thread );        
     }
-    else
+    else*/
     {
         i_thread = p_argv[1].i_num;        
-        intf_DestroyVoutThread( &p_program_data->intf_thread, i_thread );        
+    //??    intf_DestroyVoutThread( &p_main->intf_thread, i_thread );        
     }    
 
     return( INTF_NO_ERROR );
@@ -576,7 +569,7 @@ static int Vlan( int i_argc, intf_arg_t *p_argv  )
     int i_command;                                  /* command argument number */
 
     /* Do not try anything if vlans are desactivated */
-    if( !p_program_data->cfg.b_vlans )
+    if( !p_main->b_vlans )
     {
         intf_IntfMsg("vlans are desactivated");
         return( INTF_OTHER_ERROR );
@@ -629,19 +622,7 @@ static int Psi( int i_argc, intf_arg_t *p_argv )
 {
     int i_index = p_argv[1].i_num;
   
-    if(i_index < INPUT_MAX_THREADS )
-    {
-      if(p_program_data->intf_thread.pp_input[i_index])
-      {
-        /* Read the Psi table for that thread */
-        intf_IntfMsg("Reading PSI table for input %d\n", i_index);
-        input_PsiRead(p_program_data->intf_thread.pp_input[i_index]);
-        return( INTF_NO_ERROR );
-      }
-    }      
-
-    /* No such input was created */
-    intf_IntfMsg("No such input thread is currently running: %d\n", i_index);
-    
-    return(  INTF_OTHER_ERROR );
+    intf_IntfMsg("Reading PSI table for input %d\n", i_index);
+//????    input_PsiRead(p_main->p_intf->p_x11->p_input );
+    return( INTF_NO_ERROR );
 }

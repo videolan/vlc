@@ -65,7 +65,7 @@ typedef struct vdec_thread_s
  *******************************************************************************/
 
 /* Thread management functions */
-vdec_thread_t * vdec_CreateThread       ( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
+p_vdec_thread_t  vdec_CreateThread       ( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
                                           vout_thread_t *p_vout, int *pi_status */ );
 void             vdec_DestroyThread      ( vdec_thread_t *p_vdec /*, int *pi_status */ );
 

@@ -9,194 +9,142 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
+#include <errno.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <sys/soundcard.h>
-#include <sys/uio.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/XShm.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/uio.h>                                        /* for input.h */
 
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
 #include "vlc_thread.h"
-#include "thread.h"
-#include "debug.h"
-
-#include "intf_msg.h"
-
 #include "input.h"
-#include "input_netlist.h"
-#include "input_vlan.h"
-#include "decoder_fifo.h"
-
-#include "audio_output.h"
-#include "audio_decoder.h"
-
-#include "video.h"
-#include "video_output.h"
-#include "video_decoder.h"
-
-#include "xconsole.h"
+#include "intf_msg.h"
 #include "interface.h"
 #include "intf_cmd.h"
+#include "intf_console.h"
+#include "main.h"
 
-#include "pgm_data.h"
-/* ?? remove useless headers */
+#include "intf_sys.h"
 
-/*
- * Local prototypes
- */
-static int  StartInterface  ( intf_thread_t *p_intf );
-static void EndInterface    ( intf_thread_t *p_intf );
+
+/*******************************************************************************
+ * intf_Create: prepare interface before main loop
+ *******************************************************************************
+ * This function opens output devices and create specific interfaces. It send
+ * it's own error messages.
+ *******************************************************************************/
+intf_thread_t* intf_Create( void )
+{    
+    intf_thread_t *p_intf;                                        
+
+    /* Allocate structure */
+    p_intf = malloc( sizeof( intf_thread_t ) );
+    if( !p_intf )
+    {
+	errno = ENOMEM;
+	return( NULL );
+    }
+    p_intf->b_die = 0;
+    intf_DbgMsg( "0x%x\n", p_intf );
+
+    /* Initialize structure */
+    p_intf->p_vout = NULL;
+    p_intf->p_input = NULL;   
+
+    /* Start interfaces */
+    p_intf->p_console = intf_ConsoleCreate();
+    if( p_intf->p_console == NULL )
+    {
+        intf_ErrMsg("intf error: can't create control console\n");
+	free( p_intf );
+        return( NULL );
+    }
+    if( intf_SysCreate( p_intf ) )
+    {
+	intf_ErrMsg("intf error: can't create interface\n");
+	intf_ConsoleDestroy( p_intf->p_console );
+	free( p_intf );
+	return( NULL );
+    }   
+
+    return( p_intf );
+}
 
 /*******************************************************************************
  * intf_Run
  *******************************************************************************
- * what it does:
- *     - Create an X11 console
- *     - wait for a command and try to execute it
- *     - interpret the order returned after the command execution
- *     - print the messages of the message queue (intf_FlushMsg)
- * return value: 0 if successful, < 0 otherwise
+ * Initialization script and main interface loop.
  *******************************************************************************/
-int intf_Run( intf_thread_t *p_intf )
-{
-    /* When it is started, interface won't die immediatly */
-    p_intf->b_die = 0;
-    if( StartInterface( p_intf ) )                                    /* error */
+void intf_Run( intf_thread_t *p_intf )
+{ 
+    intf_DbgMsg("0x%x begin\n", p_intf );
+
+    /* Execute the initialization script - if a positive number is returned, 
+     * the script could be executed but failed */
+    if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
     {
-        return( 1 );
+	intf_ErrMsg("intf error: error during initialization script\n");
     }
-    
+
     /* Main loop */
     while(!p_intf->b_die)
     {
         /* Flush waiting messages */
         intf_FlushMsg();
 
-#ifndef FRAMEBUFFER
-        /* Manage specific interfaces */
-        intf_ManageXConsole( &p_intf->xconsole );               /* X11 console */
-#endif
+        /* Manage specific interface */
+        intf_SysManage( p_intf );
 
         /* Sleep to avoid using all CPU - since some interfaces needs to access 
          * keyboard events, a 100ms delay is a good compromise */
         msleep( INTF_IDLE_SLEEP );
     }
 
-    /* End of interface thread - the main() function will close all remaining
-     * output threads */
-    EndInterface( p_intf );
-    return ( 0 );
-}
-
-/* following functions are local */
-
-/*******************************************************************************
- * StartInterface: prepare interface before main loop
- *******************************************************************************
- * This function opens output devices and create specific interfaces. It send
- * it's own error messages.
- *******************************************************************************/
-static int StartInterface( intf_thread_t *p_intf )
-{
-    int i_thread;                                              /* thread index */
-#ifdef INIT_SCRIPT
-    int fd;
-#endif
-
-#if 0
-    /* Empty all threads array */
-    for( i_thread = 0; i_thread < VOUT_MAX_THREADS; i_thread++ )
-    {
-        p_intf->pp_vout[i_thread] = NULL;        
-    }
-#endif
-    for( i_thread = 0; i_thread < INPUT_MAX_THREADS; i_thread++ )
-    {
-        p_intf->pp_input[i_thread] = NULL;        
-    }    
-
-#ifdef FRAMEBUFFER
-    intf_DbgMsg("intf debug: not opening X11 console\n");
-#else
-    /* Start X11 Console*/
-    if( intf_OpenXConsole( &p_intf->xconsole ) )
-    {
-        intf_ErrMsg("intf error: can't open X11 console\n");
-        return( 1 );
-    }
-#endif
-
-#ifdef INIT_SCRIPT
-    /* Execute the initialization script (typically spawn an input thread) */
-    if ( (fd = open( INIT_SCRIPT, O_RDONLY )) != -1 )
-    {
-        /* Startup script does exist */
-        close( fd );
-        intf_ExecScript( INIT_SCRIPT );
-    }
-#endif
-
-    return( 0 );
+    intf_DbgMsg("0x%x end\n", p_intf );
 }
 
 /*******************************************************************************
- * EndInterface: clean interface after main loop
+ * intf_Destroy: clean interface after main loop
  *******************************************************************************
  * This function destroys specific interfaces and close output devices.
  *******************************************************************************/
-static void EndInterface( intf_thread_t *p_intf )
+void intf_Destroy( intf_thread_t *p_intf )
 {
-    int         i_thread;                                      /* thread index */
-    boolean_t   b_thread;                          /* flag for remaing threads */
-    int         pi_vout_status[VOUT_MAX_THREADS];       /* vout threads status */
-    
-    
-#ifndef FRAMEBUFFER    
-    /* Close X11 console */
-    intf_CloseXConsole( &p_intf->xconsole );        
-#endif
+    intf_DbgMsg("0x%x\n", p_intf );
 
-    /* Destroy all remaining input threads */
-    for( i_thread = 0; i_thread < INPUT_MAX_THREADS; i_thread++ )
-    {
-        if( p_intf->pp_input[i_thread] != NULL )
-        {
-            input_DestroyThread( p_intf->pp_input[i_thread] );
-        }        
-    }
+    /* Destroy interfaces */
+    intf_SysDestroy( p_intf );
+    intf_ConsoleDestroy( p_intf->p_console );
 
-#if 0
-    /* Destroy all remaining video output threads - all destruction orders are send,
-     * then all THREAD_OVER status are received */
-    for( i_thread = 0, b_thread = 0; i_thread < VOUT_MAX_THREADS; i_thread++ )
-    {
-        if( p_intf->pp_vout[i_thread] != NULL )
-        {
-            vout_DestroyThread( p_intf->pp_vout[i_thread], &pi_vout_status[i_thread] );
-            b_thread = 1;            
-        }
-    }
-    while( b_thread )
-    {
-        msleep( INTF_IDLE_SLEEP );        
-        b_thread = 0;        
-        for( i_thread = 0; i_thread < VOUT_MAX_THREADS; i_thread++ )
-        {
-            if( (p_intf->pp_vout[i_thread] != NULL) 
-                && (pi_vout_status[i_thread] != THREAD_OVER) )
-            {
-                b_thread = 1;
-            }     
-        }
-    }
-#endif
-
+    /* Free structure */
+    free( p_intf );
 }
+
+/*******************************************************************************
+ * intf_SelectInput: change input stream
+ *******************************************************************************
+ * Kill existing input, if any, and try to open a new one. If p_cfg is NULL,
+ * no new input will be openned.
+ *******************************************************************************/
+int intf_SelectInput( intf_thread_t * p_intf, input_cfg_t *p_cfg )
+{
+    intf_DbgMsg("0x%x\n", p_intf );
+    
+    /* Kill existing input, if any */
+    if( p_intf->p_input != NULL )
+    {        
+        input_DestroyThread( p_intf->p_input /*??, NULL*/ );
+        p_intf->p_input = NULL;        
+    }
+    
+    /* Open new one */
+    if( p_cfg != NULL )
+    {        
+        p_intf->p_input = input_CreateThread( p_cfg /*??, NULL*/ );    
+    }
+    
+    return( (p_cfg != NULL) && (p_intf->p_input == NULL) );    
+}
+
+

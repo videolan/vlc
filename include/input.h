@@ -310,7 +310,7 @@ typedef int (*f_read_t)( struct input_thread_struct *, const struct iovec *,
                          size_t );
 typedef void (*f_clean_t)( struct input_thread_struct * );
 
-typedef struct input_thread_struct
+typedef struct input_thread_s
 {
     /* Thread properties and locks */
     boolean_t               b_die;                              /* 'die' flag */
@@ -369,7 +369,7 @@ typedef struct input_thread_struct
  * properties, asking the called function to use default settings for
  * the other ones.
  ******************************************************************************/
-typedef struct input_cfg_struct
+typedef struct input_cfg_s
 {
     u64     i_properties;
 

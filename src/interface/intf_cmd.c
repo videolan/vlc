@@ -10,6 +10,9 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
+#include "vlc.h"
+
+/*
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -38,8 +41,7 @@
 #include "intf_msg.h"
 #include "intf_cmd.h"
 #include "intf_ctrl.h"
-
-#include "pgm_data.h"
+*/
 
 /*
  * Local prototypes
@@ -111,7 +113,7 @@ int intf_ExecCommand( char *psz_cmd )
     case INTF_FATAL_ERROR:                                      /* fatal error */
         /* Print message and terminates the interface thread */
         intf_ErrMsg( "intf fatal: in command `%s'\n", psz_argv[0] );
-        p_program_data->intf_thread.b_die = 1;
+        p_main->p_intf->b_die = 1;
         break;
 
     case INTF_CRITICAL_ERROR:                                /* critical error */

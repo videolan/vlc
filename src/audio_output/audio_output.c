@@ -34,10 +34,14 @@
 
 #include "audio_output.h"
 #include "audio_dsp.h"
+#include "main.h"
 
 /******************************************************************************
  * Local prototypes
  ******************************************************************************/
+
+
+static int aout_SpawnThread( aout_thread_t * p_aout );
 
 /* Creating as much aout_Thread functions as configurations is one solution,
  * examining the different cases in the Thread loop of an unique function is
@@ -55,56 +59,87 @@ static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long
 static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*, mtime_t aout_date*/ );
 
 /******************************************************************************
- * aout_Open
+ * aout_CreateThread: initialize audio thread
  ******************************************************************************/
-int aout_Open( aout_thread_t * p_aout )
+aout_thread_t *aout_CreateThread( int *pi_status )
 {
-    if ( aout_dspOpen( &p_aout->dsp ) )
+    aout_thread_t * p_aout;                               /* thread descriptor */
+    int             i_status;                                 /* thread status */
+   
+    /* Allocate descriptor */
+    p_aout = (aout_thread_t *) malloc( sizeof(aout_thread_t) );
+    if( p_aout == NULL )
     {
-        return( -1 );
+        return( NULL );
     }
 
+    //???? kludge to initialize some audio parameters - place this section somewhere
+    //???? else
+    p_aout->dsp.i_format = AOUT_DEFAULT_FORMAT;
+    p_aout->dsp.psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
+    p_aout->dsp.b_stereo   = main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
+    p_aout->dsp.l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );    
+    // ???? end of kludge
+
+    /* 
+     * Initialize DSP 
+     */
+    if ( aout_dspOpen( &p_aout->dsp ) )
+    {
+        free( p_aout );
+        return( NULL );
+    }
     if ( aout_dspReset( &p_aout->dsp ) )
     {
 	aout_dspClose( &p_aout->dsp );
-	return( -1 );
+	free( p_aout );
+	return( NULL );
     }
-
     if ( aout_dspSetFormat( &p_aout->dsp ) )
     {
 	aout_dspClose( &p_aout->dsp );
-	return( -1 );
+	free( p_aout );
+	return( NULL );
     }
-
     if ( aout_dspSetChannels( &p_aout->dsp ) )
     {
 	aout_dspClose( &p_aout->dsp );
-        return( -1 );
+	free( p_aout );
+        return( NULL );
     }
-
     if ( aout_dspSetRate( &p_aout->dsp ) )
     {
 	aout_dspClose( &p_aout->dsp );
-	return( -1 );
+	free( p_aout );
+	return( NULL );
     }
-
     intf_DbgMsg("aout debug: audio device (%s) opened (format=%i, stereo=%i, rate=%li)\n",
         p_aout->dsp.psz_device,
         p_aout->dsp.i_format,
         p_aout->dsp.b_stereo, p_aout->dsp.l_rate);
 
-    return( 0 );
+    //?? maybe it would be cleaner to change SpawnThread prototype
+    //?? see vout to handle status correctly - however, it is not critical since
+    //?? this thread is only called in main is all calls are blocking
+    if( aout_SpawnThread( p_aout ) )
+    {
+	aout_dspClose( &p_aout->dsp );
+	free( p_aout );
+	return( NULL );
+    }
+
+    return( p_aout );
 }
 
 /******************************************************************************
  * aout_SpawnThread
  ******************************************************************************/
-int aout_SpawnThread( aout_thread_t * p_aout )
+static int aout_SpawnThread( aout_thread_t * p_aout )
 {
-    int         i_fifo;
-    long        l_bytes;
-    s64         s64_numerator, s64_denominator;
-    void *      aout_thread = NULL;
+    int             i_fifo;
+    long            l_bytes;
+    s64             s64_numerator, s64_denominator;
+    void *          aout_thread = NULL;
 
     intf_DbgMsg("aout debug: spawning audio output thread (%p)\n", p_aout);
 
@@ -239,7 +274,7 @@ int aout_SpawnThread( aout_thread_t * p_aout )
     p_aout->date = mdate();
 
     /* Launch the thread */
-    if ( vlc_thread_create( &p_aout->thread_id, "audio output", (vlc_thread_func)aout_thread, p_aout ) )
+    if ( vlc_thread_create( &p_aout->thread_id, "audio output", (vlc_thread_func_t)aout_thread, p_aout ) )
     {
         intf_ErrMsg("aout error: can't spawn audio output thread (%p)\n", p_aout);
         free( p_aout->buffer );
@@ -252,28 +287,26 @@ int aout_SpawnThread( aout_thread_t * p_aout )
 }
 
 /******************************************************************************
- * aout_CancelThread
+ * aout_DestroyThread
  ******************************************************************************/
-void aout_CancelThread( aout_thread_t * p_aout )
+void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
 {
+    //???? pi_status is not handled correctly: check vout how to do! 
+
     intf_DbgMsg("aout debug: requesting termination of audio output thread (%p)\n", p_aout);
 
     /* Ask thread to kill itself and wait until it's done */
     p_aout->b_die = 1;
-    vlc_thread_join( p_aout->thread_id );
+    vlc_thread_join( p_aout->thread_id ); // only if pi_status is NULL
 
     /* Free the allocated memory */
     free( p_aout->buffer );
     free( p_aout->s32_buffer );
-}
 
-/******************************************************************************
- * aout_Close
- ******************************************************************************/
-void aout_Close( aout_thread_t * p_aout )
-{
+    /* Free the structure */
     aout_dspClose( &p_aout->dsp );
     intf_DbgMsg("aout debug: audio device (%s) closed\n", p_aout->dsp.psz_device);
+    free( p_aout );
 }
 
 /******************************************************************************

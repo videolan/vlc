@@ -3,75 +3,8 @@
  * (c)1999 VideoLAN
  *******************************************************************************
  * This library provides basic functions for threads to interact with user
- * interface, such as message output. If INTF_MSG_QUEUE is defined (which is the
- * defaul), messages are not printed directly by threads, to bypass console 
- * limitations and slow printf() calls, but sent to a queue and printed later by
- * interface thread. 
- * If INTF_MSG_QUEUE is not defined, output is directly performed on stderr.
- *******************************************************************************
- * required headers:
- * "config.h"
- * "mtime.h"
- * "vlc_thread.h"
+ * interface, such as message output. See config.h for output configuration.
  *******************************************************************************/
-
-/*******************************************************************************
- * interface_message_t                                             
- *******************************************************************************
- * Store a single message. Messages have a maximal size of INTF_MSG_MSGSIZE.
- * If DEBUG is defined, messages have a date field and debug messages are
- * printed with a date to allow more precise profiling.
- *******************************************************************************/
-typedef struct
-{
-    int     i_type;                                 /* message type, see below */
-    char *  psz_msg;                                     /* the message itself */
-
-#ifdef DEBUG
-    /* Debugging informations - in DEBUG mode, all messages are dated and debug
-     * messages have calling location informations printed */
-    mtime_t date;                        /* date of the message (all messages) */
-    char *  psz_file;                 /* file in which the function was called */
-    char *  psz_function;       /* function from which the function was called */
-    int     i_line;                   /* line at which the function was called */
-#endif
-} interface_msg_message_t;
-
-/* Message types */
-#define INTF_MSG_STD    0                                  /* standard message */
-#define INTF_MSG_ERR    1                                     /* error message */
-#define INTF_MSG_INTF   2                                 /* interface message */
-#define INTF_MSG_DBG    3                                     /* debug message */
-
-/*******************************************************************************
- * interface_msg_t                                                    
- *******************************************************************************
- * Store all data requiered by messages interfaces. It has a singe instance in
- * program_data.
- *******************************************************************************/
-typedef struct
-{
-#ifdef INTF_MSG_QUEUE
-    /* Message queue */
-    vlc_mutex_t             lock;                        /* message queue lock */
-    int                     i_count;              /* number of messages stored */
-    interface_msg_message_t msg[INTF_MSG_QSIZE];              /* message queue */
-#endif
-
-#ifdef DEBUG_LOG
-    /* Log file */
-    FILE *                  p_log_file;                            /* log file */
-#endif
-
-#ifndef INTF_MSG_QUEUE
-#ifndef DEBUG_LOG
-    /* If neither messages queue, neither log file is used, then the structure
-     * is empty. However, empty structures are not allowed in C. Therefore, a
-     * dummy integer is used to fill it. */
-    int                     i_dummy;                          /* unused filler */
-#endif
-#endif
-} interface_msg_t;
 
 /*******************************************************************************
  * intf_DbgMsg macros and functions
@@ -125,14 +58,12 @@ void    intf_FlushMsg       ( void );
 /*******************************************************************************
  * Prototypes                                                      
  *******************************************************************************/
-int     intf_InitMsg        ( interface_msg_t *p_intf_msg );
-void    intf_TerminateMsg   ( interface_msg_t *p_intf_msg );
+p_intf_msg_t intf_MsgCreate      ( void );
+void         intf_MsgDestroy     ( void );
 
-void    intf_Msg            ( char *psz_format, ... );
-void    intf_ErrMsg         ( char *psz_format, ... );
-void    intf_IntfMsg        ( char *psz_format, ... );
+void         intf_Msg            ( char *psz_format, ... );
+void         intf_ErrMsg         ( char *psz_format, ... );
+void         intf_IntfMsg        ( char *psz_format, ... );
 
-void    intf_MsgImm         ( char *psz_format, ... );
-void    intf_ErrMsgImm      ( char *psz_format, ... );
-
-
+void         intf_MsgImm         ( char *psz_format, ... );
+void         intf_ErrMsgImm      ( char *psz_format, ... );

@@ -9,9 +9,12 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
+#include "vlc.h"
+
+/*
 #include <errno.h>
-#include <sys/uio.h>                                                 /* iovec */
-#include <stdlib.h>                               /* atoi(), malloc(), free() */
+#include <sys/uio.h>                                                
+#include <stdlib.h>                             
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -19,7 +22,7 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #include <sys/soundcard.h>
-#include <netinet/in.h>                                              /* ntohs */
+#include <netinet/in.h>                                             
 
 #include "common.h"
 #include "config.h"
@@ -39,8 +42,7 @@
 
 #include "video.h"
 #include "video_output.h"
-#include "video_decoder.h"
-
+#include "video_decoder.h" */
 
 /******************************************************************************
  * input_AddPgrmElem: Start the extraction and the decoding of a program element

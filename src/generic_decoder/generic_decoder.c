@@ -14,8 +14,10 @@
 
 /******************************************************************************
  * Preamble
- ******************************************************************************/
-#include <errno.h>
+ *******************************************************************************/
+#include "vlc.h"
+
+/*#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -31,8 +33,8 @@
 #include "thread.h"
 
 #include "intf_msg.h"
-#include "debug.h"                      /* ?? temporaire, requis par netlist.h */
-
+#include "debug.h"   */               
+/*
 #include "input.h"
 #include "input_netlist.h"
 #include "decoder_fifo.h"
@@ -41,7 +43,7 @@
 
 #include "video.h"
 #include "video_output.h"
-#include "video_decoder.h"
+#include "video_decoder.h"*/
 
 /*
  * Local prototypes

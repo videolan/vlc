@@ -28,6 +28,10 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
+#include "vlc.h"
+
+/*#include <errno.h>
+#include <pthread.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -60,7 +64,67 @@
 #include "interface.h"
 #include "intf_msg.h"
 
-#include "pgm_data.h"
+#include "pgm_data.h"*/
+
+/*******************************************************************************
+ * input_vlan_iface_t: vlan-capable network interface
+ *******************************************************************************
+ * This structure describes the abilities of a network interface capable of
+ * vlan management. Note that an interface could have several IP adresses, but
+ * since only the MAC address is used to change vlan, only one needs to be
+ * retrieved.
+ * ?? it could be interesting to send a port id on vlan request, to know if two
+ * interfaces are dependant regarding vlan changes.
+ *******************************************************************************/
+typedef struct
+{
+    char *                  psz_name;                        /* interface name */
+    struct sockaddr_in      sa_in;                             /* interface IP */
+    char                    psz_mac[20];                      /* interface MAC */
+
+    /* Hardware properties */
+    int                     i_master;                /* master interface index */
+    int                     i_switch;                         /* switch number */
+    int                     i_port;                             /* port number */
+    int                     i_sharers;          /* number of MACs on this port */
+    
+    /* Vlan properties - these are only used if i_master is negative */
+    int                     i_refcount;                       /* locks counter */
+    int                     i_vlan;                            /* current vlan */
+    int                     i_default_vlan;                    /* default vlan */
+} input_vlan_iface_t;
+
+/*******************************************************************************
+ * input_vlan_server_t: vlan server
+ *******************************************************************************
+ * This structure describes a vlan server.
+ *******************************************************************************/
+typedef struct
+{
+    struct sockaddr_in  sa_in;                               /* server address */
+    int                 i_socket;                         /* socket descriptor */
+
+    /* Login informations */
+    char *              psz_login;                             /* server login */
+    char *              psz_passwd;                         /* server password */
+} input_vlan_server_t;
+
+/*******************************************************************************
+ * vlan_method_data_t
+ *******************************************************************************
+ * Store global vlan library data.
+ *******************************************************************************/
+typedef struct input_vlan_method_s
+{    
+    vlc_mutex_t             lock;                              /* library lock */
+
+    /* Server */
+    input_vlan_server_t     server;                             /* vlan server */
+ 
+    /* Network interfaces */
+    int                     i_ifaces;   /* number of vlan-compliant interfaces */
+    input_vlan_iface_t *    p_iface;                             /* interfaces */
+} input_vlan_method_t;
 
 /*
  * Constants
@@ -82,16 +146,19 @@ static int  ServerRequestInfo       ( input_vlan_server_t *p_server,
                                       input_vlan_iface_t *p_iface );
 
 /*******************************************************************************
- * input_VlanMethodInit: initialize global vlan method data
+ * input_VlanCreate: initialize global vlan method data
  *******************************************************************************
  * Initialize vlan input method global data. This function should be called
  * once before any input thread is created or any call to other input_Vlan*()
  * function is attempted.
  *******************************************************************************/
-int input_VlanMethodInit( input_vlan_method_t *p_method, char *psz_server, int i_port )
+int input_VlanCreate( void )
 {
+    char *                  psz_server; // ??? get from environment
+    int                     i_port;     // ??? get from environment
     int                     i_index;                /* interface/servers index */
     input_vlan_iface_t *    p_iface;                             /* interfaces */
+    input_vlan_method_t *p_method = p_main->p_input_vlan; //??
 
     /* Build vlan server descriptor */
     if( BuildInetAddr( &p_method->server.sa_in, psz_server, i_port ) )
@@ -179,14 +246,15 @@ int input_VlanMethodInit( input_vlan_method_t *p_method, char *psz_server, int i
 }
 
 /*******************************************************************************
- * input_VlanMethodFree: free global vlan method data
+ * input_VlanDestroy: free global vlan method data
  *******************************************************************************
  * Free resources allocated by input_VlanMethodInit. This function should be
  * called at the end of the program.
  *******************************************************************************/
-void input_VlanMethodFree( input_vlan_method_t *p_method )
+void input_VlanDestroy( void )
 {
     int i_index;                                     /* server/interface index */
+    input_vlan_method_t *p_method = p_main->p_input_vlan; // ??
 
     /* Leave all remaining vlans */
     for( i_index = 0; i_index < p_method->i_ifaces; i_index++ )
@@ -222,7 +290,7 @@ int input_VlanId( char *psz_iface, int i_vlan )
     input_vlan_method_t *   p_method;                    /* method global data */
     int                     i_index;                        /* interface index */
 
-    p_method = &p_program_data->input_vlan_method;
+    p_method = p_main->p_input_vlan;
 
     /* If psz_iface is NULL, use first (default) interface (if there is one) */
     if( psz_iface == NULL )
@@ -231,10 +299,10 @@ int input_VlanId( char *psz_iface, int i_vlan )
     }
         
     /* Browse all interfaces */
-    for( i_index = 0; i_index < p_program_data->input_vlan_method.i_ifaces ; i_index++ )
+    for( i_index = 0; i_index < p_main->p_input_vlan->i_ifaces ; i_index++ )
     {
         /* If interface has been found, return */
-        if( !strcmp( p_program_data->input_vlan_method.p_iface[i_index].psz_name, psz_iface ) )
+        if( !strcmp( p_main->p_input_vlan->p_iface[i_index].psz_name, psz_iface ) )
         {
             return( VLAN_ID( i_index, i_vlan ) );
         }        
@@ -262,7 +330,7 @@ int input_VlanJoin( int i_vlan_id )
 
     /* Initialize shortcuts, and use master if interface is dependant */
     i_err = 0;    
-    p_method = &p_program_data->input_vlan_method;
+    p_method = p_main->p_input_vlan;
     p_iface = &p_method->p_iface[ VLAN_ID_IFACE( i_vlan_id ) ];
     if( p_iface->i_master >= 0 )
     {
@@ -319,7 +387,7 @@ void input_VlanLeave( int i_vlan_id )
 
     /* Initialize shortcuts, and use master if interface is dependant */
     i_err = 0;    
-    p_method = &p_program_data->input_vlan_method;
+    p_method = p_main->p_input_vlan;
     p_iface = &p_method->p_iface[ VLAN_ID_IFACE( i_vlan_id ) ];
     if( p_iface->i_master >= 0 )
     {
@@ -348,7 +416,7 @@ int input_VlanRequest( char *psz_iface )
     input_vlan_method_t *   p_method;                    /* method global data */
     int                     i_index;                        /* interface index */
     
-    p_method = &p_program_data->input_vlan_method;
+    p_method = p_main->p_input_vlan;
 
     /* If psz_iface is NULL, use first (default) interface (if there is one) - 
      * note that interface 0 can't be dependant, so dependance does not need
@@ -390,8 +458,12 @@ int input_VlanSynchronize( void )
     int                     i_vlan;              /* vlan for current interface */
     
     /* Get lock */
+    p_method = p_main->p_input_vlan;
+    pthread_mutex_lock( &p_method->lock );
+/* ??
     p_method = &p_program_data->input_vlan_method;
     vlc_mutex_lock( &p_method->lock );
+*/
 
     for( i_index = 0; i_index < p_method->i_ifaces; i_index++ )
     {        

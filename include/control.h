@@ -24,12 +24,6 @@
 /*******************************************************************************
  * Prototypes
  *******************************************************************************/
-int     intf_CreateVoutThread   ( intf_thread_t *p_intf, char *psz_title, 
-                                  int i_width, int i_height );
-void    intf_DestroyVoutThread  ( intf_thread_t *p_intf, int i_thread );
-int     intf_CreateInputThread  ( intf_thread_t *p_intf, input_cfg_t* p_cfg );
-void    intf_DestroyInputThread ( intf_thread_t *p_intf, int i_thread );
-
 int     intf_SelectAudioStream  ( intf_thread_t *p_intf, int i_input, int i_id );
 void    intf_DeselectAudioStream( intf_thread_t *p_intf, int i_input, int i_id );
 int     intf_SelectVideoStream  ( intf_thread_t *p_intf, int i_input, 

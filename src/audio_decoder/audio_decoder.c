@@ -110,7 +110,7 @@ adec_thread_t * adec_CreateThread( input_thread_t * p_input )
     p_adec->p_aout_fifo = NULL;
 
     /* Spawn the audio decoder thread */
-    if ( vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func)RunThread, (void *)p_adec) )
+    if ( vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func_t)RunThread, (void *)p_adec) )
     {
         intf_ErrMsg("adec error: can't spawn audio decoder thread\n");
         free( p_adec );

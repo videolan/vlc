@@ -8,13 +8,18 @@
 
 /*******************************************************************************
  * Preamble
- ******************************************************************************/
+ *******************************************************************************/
+#include "vlc.h"
+
+/*
+#include <errno.h>
+#include <pthread.h>
 #include <errno.h>
 #include <stdio.h>
-#include <sys/uio.h>                                                 /* iovec */
-#include <stdlib.h>                               /* atoi(), malloc(), free() */
+#include <sys/uio.h>                                                 
+#include <stdlib.h>                              
 #include <string.h>
-#include <netinet/in.h>                                              /* ntohs */
+#include <netinet/in.h>                                             
 #include <sys/soundcard.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
@@ -37,7 +42,7 @@
 #include "xconsole.h"
 #include "interface.h"
 
-#include "pgm_data.h"
+#include "pgm_data.h"*/
 
 /*
  * Precalculated 32-bits CRC table, shared by all instances of the PSI decoder
@@ -50,7 +55,7 @@ u32 i_crc_32_table[256];
  * the option (audio and video) passed to the VideoLAN client.
  */
 #ifdef AUTO_SPAWN
-extern program_data_t *p_program_data;
+//??extern program_data_t *p_main;
 #endif
 
 /*
@@ -627,7 +632,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                   {
                   case MPEG1_VIDEO_ES:
                   case MPEG2_VIDEO_ES:
-                      if( p_program_data->cfg.b_video )
+                      if( p_main->b_video )
                       {
                            /* Spawn a video thread */
                            input_AddPgrmElem( p_input,
@@ -636,7 +641,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                       break;
                   case MPEG1_AUDIO_ES:
                   case MPEG2_AUDIO_ES:
-                      if( p_program_data->cfg.b_audio )
+                      if( p_main->b_audio )
                       {
                           /* Spawn an audio thread */
                           input_AddPgrmElem( p_input,

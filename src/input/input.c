@@ -8,19 +8,22 @@
 
 /*******************************************************************************
  * Preamble
- ******************************************************************************/
+ *******************************************************************************/
+#include "vlc.h"
+
+/*
 #include <errno.h>
-#include <sys/uio.h>                                                 /* iovec */
+#include <sys/uio.h>                                               
 #include <string.h>
 
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #include <sys/soundcard.h>
 
-#include <stdlib.h>                               /* atoi(), malloc(), free() */
+#include <stdlib.h>                            
 #include <stdio.h>
-#include <sys/ioctl.h>                                             /* ioctl() */
-#include <net/if.h>                                                  /* ifreq */
+#include <sys/ioctl.h>                                            
+#include <net/if.h>                                                
 #include <netinet/in.h>
 
 #include "common.h"
@@ -44,6 +47,7 @@
 #include "video.h"
 #include "video_output.h"
 #include "video_decoder.h"
+*/
 
 /******************************************************************************
  * Local prototypes
@@ -192,7 +196,7 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
 #ifdef NO_THREAD
     input_Thread( p_input );
 #else
-    if( vlc_thread_create(&p_input->thread_id, "input", (vlc_thread_func)input_Thread, 
+    if( vlc_thread_create(&p_input->thread_id, "input", (vlc_thread_func_t)input_Thread, 
                        (void *) p_input) )
     {
         intf_ErrMsg("input error: can't spawn input thread (%s)\n", 
@@ -304,7 +308,7 @@ static void input_Thread( input_thread_t *p_input )
     EndThread( p_input );
 
     intf_DbgMsg("input debug: thread %p destroyed\n", p_input);
-    vlc_thread_exit( 0 );
+    vlc_thread_exit();
 }
 
 

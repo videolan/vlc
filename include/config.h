@@ -3,17 +3,29 @@
  * (c)1999 VideoLAN
  *******************************************************************************
  * Defines all compilation-time configuration constants and size limits
- *******************************************************************************
- * required headers:
- *  none
  *******************************************************************************/
+
+/* Conventions regarding names of symbols and variables
+ * ----------------------------------------------------
+ *
+ * - Symbols should begin with a prefix indicating in which module they are
+ *   used, such as INTF_, VOUT_ or ADEC_.
+ *
+ * - Regarding environment variables, which are used as initialization parameters 
+ *   for threads :
+ *   + variable names should end with '_VAR'
+ *   + environment variable default value should end with '_DEFAULT'
+ *   + values having a special meaning with '_VAL' 
+ *   + complete environment strings with '_ENV'
+ *   
+ */
 
 /*******************************************************************************
  * Program information
  *******************************************************************************/
 
 /* Program version and copyright message */
-#define PROGRAM_VERSION		"0.0.x"
+#define PROGRAM_VERSION		"DR 2.1"
 #define COPYRIGHT_MESSAGE	"VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - (c)1999 VideoLAN\n"
 
 /*******************************************************************************
@@ -45,6 +57,10 @@
 /* General debugging support */
 #define DEBUG
 
+/* Extended debugging support - in this mode, debugging messages will have their
+ * date and context printed */
+#define DEBUG_CONTEXT
+
 /* Modules specific debugging */
 #define DEBUG_INTF
 #define DEBUG_INPUT
@@ -54,10 +70,9 @@
 /* Debugging log file - if defined, a file can be used to store all messages. If
  * DEBUG_LOG_ONLY is defined, debug messages will only be printed to the log and
  * will not appear on the screen */
-//#define DEBUG_LOG       "vlc-debug.log"
-//#define DEBUG_LOG_ONLY  
+#define DEBUG_LOG       "vlc-debug.log"
+#define DEBUG_LOG_ONLY  
 
-/* ?? VOUT_DEBUG and co have changed ! */
 
 /*******************************************************************************
  * Common settings
@@ -67,7 +82,8 @@
 #define AUTO_SPAWN
 
 /* Startup script */
-#define INIT_SCRIPT	"vlc.init"
+#define INTF_INIT_SCRIPT_VAR	  "vlc_init"
+#define INTF_INIT_SCRIPT_DEFAULT  "vlc.init"
 
 /* ?? */
 #define THREAD_SLEEP    100000
@@ -164,11 +180,23 @@
 #define VLAN_DEFAULT_SERVER_PORT        6010
 
 /*******************************************************************************
- * Audio output thread configuration
+ * Audio configuration
  *******************************************************************************/
 
+/* Environment variable used to store dsp device name, and default value */
+#define AOUT_DSP_VAR                    "vlc_dsp"
+#define AOUT_DSP_DEFAULT                "/dev/dsp"
+
+/* Environment variable for stereo, and default value */
+#define AOUT_STEREO_VAR                 "vlc_stereo"
+#define AOUT_STEREO_DEFAULT             1
+
+/* Environment variable for output rate, and default value */
+#define AOUT_RATE_VAR                   "vlc_audio_rate"
+#define AOUT_RATE_DEFAULT               44100 
+
 /*******************************************************************************
- * Video output thread configuration
+ * Video configuration
  *******************************************************************************/
 
 /*
@@ -176,34 +204,19 @@
  */
 
 /* Title of the window */
-#define VOUT_TITLE                      "VideoLAN Client: output"
+#define VOUT_TITLE                      "VideoLAN Client"
 
-/* Default use of XShm extension */
-#define VOUT_SHM_EXT                    1
-
-/* Dimensions for display window */
+/* Default dimensions for display window - these dimensions are the standard 
+ * width and height for broadcasted MPEG-2 */
 #define VOUT_WIDTH                      544
 #define VOUT_HEIGHT                     576
 
-/* Default heap size */
-#define VOUT_HEAP_SIZE                  100
-
-/*
- * Limitations
- */
-
-/* Maximum number of video output threads - this value is used exclusively by
- * interface, and is in fact an interface limitation */
-#define VOUT_MAX_THREADS                10
-
-/* Maximum number of video streams per video output thread */
-#define VOUT_MAX_STREAMS                10
-
-/* Maximum number of pictures which can be rendered in one loop, plus one */
+/* Default video heap size - remember that a decompressed picture is big 
+ * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES               10
 
 /*
- * Other settings
+ * Time settings
  */
 
 /* Time during which the thread will sleep if it has nothing to 
@@ -219,12 +232,12 @@
 /* ?? this constant will probably evolve to a calculated value */
 #define VOUT_DISPLAY_DELAY              150000
 
-/* Maximum lap of time during which images are rendered in the same 
- * time. It should be greater than the maximum time between two succesive
- * images to avoid useless renderings and calls to the display driver,
- * but not to high to avoid desynchronization */
-/* ?? this constant will probably evolve to a calculated value */
-#define VOUT_DISPLAY_TOLERANCE          150000
+/*
+ * Environment settings 
+ */
+
+/* Allow use of X11 XShm (shared memory) extension if possible */
+#define VOUT_XSHM                       1
 
 /*******************************************************************************
  * Video parser configuration
@@ -277,28 +290,12 @@
 
 /* Maximal size of a command line in a script */
 #define INTF_MAX_CMD_SIZE               240
-
 /*
- * Messages functions
+ * X11 interface properties
  */
-
-/* Maximal size of the message queue - in case of overflow, all messages in the
- * queue are printed by the calling thread */
-#define INTF_MSG_QSIZE                  32
-
-/* Define to enable messages queues - disabling messages queue can be usefull
- * when debugging, since it allows messages which would not otherwise be printed,
- * due to a crash, to be printed anyway */
-/*#define INTF_MSG_QUEUE*/
-
-/* Format of the header for debug messages. The arguments following this header
- * are the file (char *), the function (char *) and the line (int) in which the
- * message function was called */
-#define INTF_MSG_DBG_FORMAT "## %s:%s(),%i: "
-
-/* Filename to log message
- * Note that messages are only logged when debugging */
-//#define INTF_MSG_LOGFILE "vlc.log"
+#define INTF_APP_CLASS                  "vlc"
+#define INTF_APP_NAME                   "vlc"
+//??#define 
 
 /*
  * X11 console properties
@@ -323,15 +320,37 @@
 #define INTF_XCONSOLE_FONT              "-*-helvetica-medium-r-normal-*-18-*-*-*-*-*-iso8859-1"
 
 /* Number of memorized lines in X11 console window text zone */
-#define INTF_XCONSOLE_MAX_LINES         100
+#define INTF_CONSOLE_MAX_TEXT         100
 
 /* Maximal number of commands which can be saved in history list */
-#define INTF_XCONSOLE_HISTORY_SIZE      20
+#define INTF_CONSOLE_MAX_HISTORY      20
 
 /* Maximum width of a line in an X11 console window. If a larger line is
  * printed, it will be wrapped. */
 #define INTF_XCONSOLE_MAX_LINE_WIDTH    120
 
+#define ENV_VLC_DISPLAY "vlc_DISPLAY"
+
+#define INTF_MAIN_WIDTH  600
+#define INTF_MAIN_HEIGHT 600
+
+/*******************************************************************************
+ * Interface messages functions
+ *******************************************************************************/
+
+/* Maximal size of the message queue - in case of overflow, all messages in the
+ * queue are printed by the calling thread */
+#define INTF_MSG_QSIZE                  32
+
+/* Define to enable messages queues - disabling messages queue can be usefull
+ * when debugging, since it allows messages which would not otherwise be printed,
+ * due to a crash, to be printed anyway */
+//#define INTF_MSG_QUEUE
+
+/* Format of the header for debug messages. The arguments following this header
+ * are the file (char *), the function (char *) and the line (int) in which the
+ * message function was called */
+#define INTF_MSG_DBG_FORMAT "## %s:%s(),%i: "
 
 /*******************************************************************************
  * Network and VLAN management

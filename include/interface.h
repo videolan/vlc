@@ -26,23 +26,25 @@
  * This structe describes all interface-specific data of the main (interface)
  * thread.
  ******************************************************************************/
-typedef struct
+typedef struct intf_thread_s
 {
     boolean_t           b_die;                                  /* `die' flag */
 
-    /* Threads control */
-    input_thread_t *    pp_input[INPUT_MAX_THREADS];         /* input threads */
-    vout_thread_t *     pp_vout[VOUT_MAX_THREADS];            /* vout threads */
-    aout_thread_t *     p_aout;                                /* aout thread */
-
-    int                 i_input;                      /* default input thread */
-    int                 i_vout;                      /* default output thread */
-
     /* Specific interfaces */     
-    xconsole_t          xconsole;                              /* X11 console */
+    p_intf_console_t    p_console;                                 /* console */
+    p_intf_sys_t        p_sys;                            /* system interface */
+
+    /* Main threads - NULL if not active */
+    p_vout_thread_t     p_vout;
+    p_input_thread_t    p_input;        
 } intf_thread_t;
 
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
-int intf_Run( intf_thread_t * p_intf );
+intf_thread_t * intf_Create             ( void );
+void            intf_Run                ( intf_thread_t * p_intf );
+void            intf_Destroy            ( intf_thread_t * p_intf );
+
+int             intf_SelectInput        ( intf_thread_t * p_intf, p_input_cfg_t p_cfg );
+

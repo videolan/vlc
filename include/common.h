@@ -9,7 +9,7 @@
  *******************************************************************************/
 
 /*******************************************************************************
- * Types definitions
+ * Basic types definitions
  *******************************************************************************/
 
 /* Basic types definitions */
@@ -29,6 +29,48 @@ typedef int                 boolean_t;
 
 /* Counter for statistics and profiling */
 typedef unsigned long       count_t;
+
+/*******************************************************************************
+ * Classes declaration
+ *******************************************************************************/
+
+/* Interface */
+struct intf_thread_s;
+struct intf_sys_s;
+struct intf_console_s;
+struct intf_msg_s;
+
+typedef struct intf_thread_s *          p_intf_thread_t;
+typedef struct intf_sys_s *             p_intf_sys_t;
+typedef struct intf_console_s *         p_intf_console_t;
+typedef struct intf_msg_s *             p_intf_msg_t;
+
+/* Input */
+struct input_thread_s;
+struct input_vlan_method_s;
+struct input_cfg_s;
+
+typedef struct input_thread_s *         p_input_thread_t;
+typedef struct input_vlan_method_s *    p_input_vlan_method_t;
+typedef struct input_cfg_s *            p_input_cfg_t;
+
+/* Audio */
+struct aout_thread_s;
+
+typedef struct aout_thread_s *          p_aout_thread_t;
+
+/* Video */
+struct vout_thread_s;
+struct vout_sys_s;
+struct vdec_thread_s;
+struct vpar_thread_s;
+struct video_parser_s;
+
+typedef struct vout_thread_s *          p_vout_thread_t;
+typedef struct vout_sys_s *             p_vout_sys_t;
+typedef struct vdec_thread_s *          p_vdec_thread_t;
+typedef struct vpar_thread_s *          p_vpar_thread_t;
+typedef struct video_parser_s *         p_video_parser_t;
 
 /*******************************************************************************
  * Macros and inline functions
