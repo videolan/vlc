@@ -256,7 +256,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     vlc_mutex_init( &p_vout->picture_lock );
     vlc_mutex_init( &p_vout->subpicture_lock );
     vlc_mutex_init( &p_vout->change_lock );
-    vlc_mutex_lock( &p_vout->change_lock );
+
     if( vlc_thread_create( &p_vout->thread_id, "video output",
                            (void *) RunThread, (void *) p_vout) )
     {
@@ -911,6 +911,8 @@ static int InitThread( vout_thread_t *p_vout )
 {
     /* Update status */
     *p_vout->pi_status = THREAD_START;
+
+    vlc_mutex_lock( &p_vout->change_lock );
 
 #ifdef STATS
     p_vout->c_loops = 0;

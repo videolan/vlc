@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.43 2000/12/27 18:35:45 massiot Exp $
+ * $Id: audio_decoder.c,v 1.44 2001/01/04 18:47:18 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -44,9 +44,9 @@
 #include <sys/uio.h>                                            /* "input.h" */
 #include <netinet/in.h>                                             /* ntohl */
 
-#include "threads.h"
-#include "common.h"
 #include "config.h"
+#include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
 #include "debug.h"                                      /* "input_netlist.h" */
