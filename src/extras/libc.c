@@ -434,8 +434,8 @@ vlc_bool_t vlc_reduce( int *pi_dst_nom, int *pi_dst_den,
 
     if( i_den == 0 )
     {
-        i_nom = 0;
-        i_den = 1;
+        *pi_dst_nom = 0;
+        *pi_dst_den = 1;
         return 1;
     }
 
@@ -454,6 +454,8 @@ vlc_bool_t vlc_reduce( int *pi_dst_nom, int *pi_dst_den,
     i_gcd = GCD( i_nom, i_den );
     i_nom /= i_gcd;
     i_den /= i_gcd;
+
+    if( i_max == 0 ) i_max = I64C(0xFFFFFFFF);
 
     if( i_nom > i_max || i_den > i_max )
     {
