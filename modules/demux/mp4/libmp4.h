@@ -203,19 +203,6 @@
 /* Do you want some debug information on all read boxes ? */
 #define MP4_VERBOSE  1
 
-/* memory stream and file stream object */
-
-typedef struct MP4_Stream_s
-{
-    int     b_memory;   /* do we uses a memory buffer */
-
-    stream_t *s;
-
-    off_t   i_start; /* in the buffer position for memory stream */
-    off_t   i_stop;
-    uint8_t *p_buffer;
-
-} MP4_Stream_t;
 
 struct MP4_Box_s;
 
@@ -927,8 +914,6 @@ MP4_Box_t *MP4_BoxGet( MP4_Box_t *p_box, char *psz_fmt, ... );
  *****************************************************************************/
 int MP4_BoxCount( MP4_Box_t *p_box, char *psz_fmt, ... );
 
-MP4_Stream_t *MP4_MemoryStream( stream_t *s,
-                                int i_size, uint8_t *p_buffer );
-int MP4_ReadBoxCommon( MP4_Stream_t *p_stream, MP4_Box_t *p_box );
-int MP4_ReadBox_sample_vide( MP4_Stream_t *p_stream, MP4_Box_t *p_box );
+int MP4_ReadBoxCommon( stream_t *p_stream, MP4_Box_t *p_box );
+int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box );
 void MP4_FreeBox_sample_vide( MP4_Box_t *p_box );

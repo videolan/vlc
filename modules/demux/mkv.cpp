@@ -574,9 +574,9 @@ static int Open( vlc_object_t * p_this )
         else if( !strcmp( tk.psz_codec, "V_QUICKTIME" ) )
         {
             MP4_Box_t *p_box = (MP4_Box_t*)malloc( sizeof( MP4_Box_t ) );
-            MP4_Stream_t *p_mp4_stream = MP4_MemoryStream( p_demux->s,
-                                                           tk.i_extra_data,
-                                                           tk.p_extra_data );
+            stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(p_demux),
+                                                       tk.p_extra_data,
+                                                       tk.i_extra_data );
             MP4_ReadBoxCommon( p_mp4_stream, p_box );
             MP4_ReadBox_sample_vide( p_mp4_stream, p_box );
             tk.fmt.i_codec = p_box->i_type;
@@ -586,8 +586,7 @@ static int Open( vlc_object_t * p_this )
             tk.fmt.p_extra = malloc( tk.fmt.i_extra );
             memcpy( tk.fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, tk.fmt.i_extra );
             MP4_FreeBox_sample_vide( p_box );
-            free( p_box );
-            free( p_mp4_stream );
+            stream_MemoryDelete( p_mp4_stream, VLC_TRUE );
         }
         else if( !strcmp( tk.psz_codec, "A_MS/ACM" ) )
         {
