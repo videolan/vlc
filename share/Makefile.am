@@ -11,11 +11,9 @@ dist_pkgdata_DATA = \
 	$(DIST_icons16) \
 	$(DIST_icons32) \
 	$(DIST_icons48) \
+	$(DIST_skins) \
 	$(NULL)
 
-nobase_pkgdata_DATA = \
-	$(DIST_skins)
-	
 DIST_fonts = \
 	default8x16.psf \
 	default8x9.psf \
