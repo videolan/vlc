@@ -65,12 +65,6 @@
     return( [[self delegate] menuForEvent: o_event] );
 }
 
-- reloadPlaylist
-{
-    [[self delegate] initDict];
-    [self reloadData];
-}
-
 - (bool)isItem:(playlist_item_t *)p_item inNode:(playlist_item_t *)p_node
 {
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
@@ -165,7 +159,7 @@ msg_Dbg( p_intf, "KEYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY");
                     }
                     playlist_Delete( p_playlist, p_item->input.i_id );
                 }
-                [self reloadPlaylist];
+                [[self delegate] playlistUpdated];
             }
             break;
 
@@ -239,15 +233,10 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 - (void)initStrings
 {
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
-#if 0
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
-    [o_mi_toggleItemsEnabled setTitle: _NS("Item Enabled")];
-    [o_mi_enableGroup setTitle: _NS("Enable all group items")];
-    [o_mi_disableGroup setTitle: _NS("Disable all group items")];
     [o_mi_info setTitle: _NS("Properties")];
-#endif
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
@@ -266,6 +255,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
 - (void)playlistUpdated
 {
+    [o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
 }
 
@@ -318,6 +308,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         vlc_object_release( p_playlist );
     }
 }
+
+- (IBAction)selectAll:(id)sender
+{
+    [o_outline_view selectAll: nil];
+}
+
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {
@@ -595,11 +591,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_info setEnabled: b_item_sel];
 
     return( o_ctx_menu );
-}
-
-- (void)initDict
-{
-    [o_outline_dict removeAllObjects];
 }
 
 @end

@@ -80,7 +80,6 @@
             ACTIONS = {
                 createOutlineGroup = id; 
                 deleteOutlineGroup = id; 
-                handleGroup = id; 
                 infoCancel = id; 
                 infoOk = id; 
                 toggleInfoPanel = id; 
@@ -91,13 +90,8 @@
             OUTLETS = {
                 "o_author_lbl" = id; 
                 "o_author_txt" = id; 
-                "o_btn_add_group" = id; 
                 "o_btn_cancel" = id; 
-                "o_btn_delete_group" = id; 
                 "o_btn_ok" = id; 
-                "o_group_cbx" = id; 
-                "o_group_color" = id; 
-                "o_group_lbl" = id; 
                 "o_info_window" = id; 
                 "o_outline_view" = id; 
                 "o_title_lbl" = id; 
@@ -395,13 +389,18 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {handlePopUp = id; searchItem = id; }; 
+            ACTIONS = {handlePopUp = id; playItem = id; searchItem = id; selectAll = id; }; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 "o_btn_playlist" = id; 
+                "o_ctx_menu" = id; 
                 "o_loop_popup" = id; 
+                "o_mi_delete" = id; 
+                "o_mi_info" = id; 
+                "o_mi_play" = id; 
                 "o_mi_save_playlist" = id; 
+                "o_mi_selectall" = id; 
                 "o_outline_view" = id; 
                 "o_random_ckb" = id; 
                 "o_search_field" = id; 

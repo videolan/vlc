@@ -68,10 +68,11 @@
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;
 
 - (void)playlistUpdated;
-- (void)playItem:(id)sender;
+
+- (IBAction)playItem:(id)sender;
+- (IBAction)selectAll:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
-- (void)initDict;
 
 @end
 
