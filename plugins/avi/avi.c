@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.26 2002/06/29 14:16:17 fenrir Exp $
+ * $Id: avi.c,v 1.27 2002/06/30 03:51:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -159,8 +159,6 @@ static void AVI_Parse_WaveFormatEx( waveformatex_t *h, byte_t *p_data )
     h->i_size          = GetWLE( p_data + 16 );
 }
 
-
-
 static inline int AVI_GetESTypeFromTwoCC( u16 i_type )
 {
     switch( i_type )
@@ -245,6 +243,10 @@ static int AVI_VideoGetType( u32 i_type )
  *****************************************************************************/
 #define BUFFER_MAXTOTALSIZE   512*1024 /* 1/2 Mo */
 #define BUFFER_MAXSPESSIZE 1024*200
+static int  AVI_PESBuffer_IsFull( AVIStreamInfo_t *p_info )
+{
+    return( p_info->i_pes_totalsize > BUFFER_MAXTOTALSIZE ? 1 : 0);
+}
 static void AVI_PESBuffer_Add( input_buffers_t *p_method_data,
                                AVIStreamInfo_t *p_info,
                                pes_packet_t *p_pes,
@@ -351,6 +353,7 @@ static void AVI_ParseStreamHeader( u32 i_id, int *i_number, int *i_type )
         *i_type = ( c4 << 8) + c3;
     }
 }
+
 /* Function to manipulate stream easily */
 static off_t AVI_TellAbsolute( input_thread_t *p_input )
 {
@@ -485,7 +488,7 @@ static void __AVI_UpdateIndexOffset( input_thread_t *p_input )
                         (demux_data_avi_file_t*)p_input->p_demux_data;
 
 /* FIXME some work to do :
-        * test in the ile if it's true, if not do a RIFF_Find...
+        * test in the file if it's true, if not do a RIFF_Find...
 */
 #define p_info p_avi_demux->pp_info[i_stream]
     for( i_stream = 0; i_stream < p_avi_demux->i_streams; i_stream++ )
@@ -725,7 +728,7 @@ static int AVIInit( input_thread_t *p_input )
                     AVI_AudioGetType( p_info->audio_format.i_formattag );
                 if( !p_es->i_type )
                 {
-                    msg_Err( p_input, "stream(%d,0x%x) not supported", i,
+                    msg_Warn( p_input, "stream(%d,0x%x) not supported", i,
                                        p_info->audio_format.i_formattag );
                     p_es->i_cat = UNKNOWN_ES;
                 }
@@ -740,7 +743,7 @@ static int AVIInit( input_thread_t *p_input )
                     AVI_VideoGetType( p_info->video_format.i_compression );
                 if( !p_es->i_type )
                 {
-                    msg_Err( p_input, "stream(%d,%4.4s) not supported", i,
+                    msg_Warn( p_input, "stream(%d,%4.4s) not supported", i,
                               (char*)&p_info->video_format.i_compression);
                     p_es->i_cat = UNKNOWN_ES;
                 }
@@ -849,8 +852,7 @@ static int AVIInit( input_thread_t *p_input )
                     vlc_mutex_unlock( &p_input->stream.stream_lock );
                 }
                 break;
-            case( UNKNOWN_ES ):
-                msg_Warn( p_input, "unhandled stream %d", i );
+            default:
                 break;
         }
 #undef p_info    
@@ -1016,10 +1018,172 @@ static int __AVI_GetDataInPES( input_thread_t *p_input,
 
 	return( i_size );
 }
- 
+
+static int __AVI_SeekAndGetChunk( input_thread_t  *p_input,
+                                  AVIStreamInfo_t *p_info )
+{
+    pes_packet_t *p_pes;
+    int i_length;
+    i_length = __MIN( p_info->p_index[p_info->i_idxposc].i_length 
+                        - p_info->i_idxposb,
+                            BUFFER_MAXSPESSIZE );
+
+    AVI_SeekAbsolute( p_input, 
+                      (off_t)p_info->p_index[p_info->i_idxposc].i_pos + 
+                            p_info->i_idxposb + 8);
+
+    if( __AVI_GetDataInPES( p_input, 
+                            &p_pes, 
+                            i_length , 
+                            0) != i_length )
+    {
+        return( 0 );
+    }
+    AVI_PESBuffer_Add( p_input->p_method_data,
+                       p_info,
+                       p_pes,
+                       p_info->i_idxposc,
+                       p_info->i_idxposb );
+    return( 1 );
+}
+/* TODO check if is correct (humm...) and optimisation ... */
+/* return 0 if we choose to get only the ck we want 
+ *        1 if index is invalid
+ *        2 if we can profit from parsing */
+/* XXX XXX XXX avi file is some BIG shit, and sometime index give 
+ * a refenrence to the same chunk BUT with a different size ( usually 0 )
+ */
+
+static inline int __AVI_GetChunkMethod( input_thread_t  *p_input,
+                                 AVIStreamInfo_t *p_info,
+                                 AVIStreamInfo_t *p_other )
+{
+    int i_info_pos;
+    int i_other_pos;
+    
+    int i_info_pos_last;
+    int i_other_pos_last;
+
+    /* If we don't have a valid entry we need to parse from last defined chunk */
+    if( p_info->i_idxposc >= p_info->i_idxnb )
+    {
+        return( 1 );
+    }
+
+    /* KNOW we have a valid entry for p_info */
+   
+        /* so p_info is the only stream, get it */
+    if( !p_other )
+    {
+        return( 0 );
+    }
+
+    /* KNOW there are 2 streams */
+   
+        /* so if we need to go into a chunk, go */
+    if( p_info->i_idxposb )
+    { 
+        return( 0 );
+    }
+    
+    /* KNOW we want an aligned ck */
+         /* if entry for p_other isn't valid, it's useless to parse */
+    if( p_other->i_idxposc >= p_other->i_idxnb )
+    {
+        return( 0 );
+    }
+        /* if for the other we don't want an aligned ck, it's useless to parse */
+    if( p_other->i_idxposb )
+    {
+        return( 0 );
+    }
+
+    /* KNOW we have a valid entry for the 2 streams
+         and for the 2 we want an aligned chunk (given by i_idxposc )*/
+        /* if in stream, the next chunk is back than the one we 
+           have just read, it's useless to parse */
+    i_info_pos  = p_info->p_index[p_info->i_idxposc].i_pos;
+    i_other_pos = p_other->p_index[p_other->i_idxposc].i_pos ;
+
+    i_info_pos_last  = p_info->i_idxposc ? 
+                            p_info->p_index[p_info->i_idxposc - 1].i_pos : 0;
+    i_other_pos_last = p_other->i_idxposc ?
+                            p_other->p_index[p_other->i_idxposc - 1].i_pos : 0 ;
+   
+    
+    if( ( ( p_info->i_idxposc )&&( i_info_pos <= i_info_pos_last ) ) ||
+        ( ( p_other->i_idxposc )&&( i_other_pos <= i_other_pos_last ) ) )
+    {
+        return( 0 );
+    }
+
+    /* KNOW for the 2 streams, the ck we want are after the last read 
+           or it's the first */
+
+    /* if the first ck_other we want isn't between ck_info_last 
+       and ck_info, don't parse */
+    /* TODO fix this, use also number in buffered PES */
+    if( ( i_other_pos > i_info_pos) /* ck_other too far */
+        ||( i_other_pos < i_info_pos_last ) ) /* it's too late for ck_other */
+    {
+        return( 0 );
+    } 
+   
+
+    /* we Know we will find ck_other, and before ck_info 
+        "if ck_info is too far" will be handle after */
+    return( 2 );
+}
+
+                         
+int __AVI_ChooseSize( int l1, int l2 )
+{
+    /* XXX l2 is prefered if 0 otherwise min not equal to 0 */
+    if( !l2 )
+    { 
+        return( 0 );
+    }
+      
+    return( !l1 ? l2 : __MIN( l1,l2 ) );
+}
+
+/* We know we will read chunk align */
+int __AVI_GetAndPutChunkInBuffer( input_thread_t  *p_input,
+                                  AVIStreamInfo_t *p_info,
+                                  int i_size,
+                                  int i_ck )
+{
+
+    pes_packet_t    *p_pes;
+    int i_length; 
+
+    i_length = __MIN( i_size, BUFFER_MAXSPESSIZE );
+
+    /* Skip chunk header */
+    AVI_SeekAbsolute( p_input,AVI_TellAbsolute( p_input ) + 8 );
+
+    if( __AVI_GetDataInPES( p_input, &p_pes, i_length,1 ) != i_length)
+    {
+        return( 0 );
+    }
+    AVI_PESBuffer_Add( p_input->p_method_data,
+                       p_info,
+                       p_pes,
+                       i_ck,
+                       0 );
+    /* skip unwanted bytes */
+    if( i_size != i_length )
+    {
+        AVI_SeekAbsolute( p_input,
+                          __EVEN( AVI_TellAbsolute( p_input ) + 
+                                            i_size - i_length ) );
+    }
+    return( 1 );
+}
+
 /* XXX FIXME up to now, we assume that all chunk are one after one */
 /* XXX Don't use this function directly ! XXX */
-                         
+
 static int __AVI_GetChunk( input_thread_t  *p_input,
                            AVIStreamInfo_t *p_info,
                            int b_load )
@@ -1027,9 +1191,10 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
     demux_data_avi_file_t *p_avi_demux =
                         (demux_data_avi_file_t*)p_input->p_demux_data;
     AVIStreamInfo_t *p_other;
-    int i_other_ck; /* dernier ck lu pour p_other */
-    int b_parse;
-    
+    int i_method;
+    off_t i_posmax;
+    int i;
+   
 #define p_video p_avi_demux->p_info_video
 #define p_audio p_avi_demux->p_info_audio
 #define p_info_i p_avi_demux->pp_info[i]
@@ -1041,7 +1206,7 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
                      p_info->p_pes_first->p_pes->i_pes_size ) )
   
         {
-            return( 1 );
+            return( 1 ); /* we have it in buffer */
         }
         else
         {
@@ -1050,222 +1215,185 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
     }
     /* up to now we handle only one audio and one video stream at the same time */
     p_other = (p_info == p_video ) ? p_audio : p_video ;
-    if( p_other )
+
+    i_method = __AVI_GetChunkMethod( p_input, p_info, p_other );
+
+    if( !i_method )
     {
-        i_other_ck = p_other->p_pes_last ? p_other->p_pes_last->i_posc : 
-                                               p_other->i_idxposc - 1;
+        /* get directly the good chunk */
+        return( b_load ? __AVI_SeekAndGetChunk( p_input, p_info ) : 1 );
     }
-    else
-    {
-        i_other_ck  = -1;
-    }
-    /* XXX -1 --> aucun lu */
+    /* We will parse
+        * because invalid index
+        * or will find ck_other before ck_info 
+    */
     
-    if( p_info->i_idxposc >= p_info->i_idxnb )
+    /* we will calculate the better position we have to reach */
+    if( i_method == 1 )
     {
-        /* invalid index for p_info -> read one after one, load all ck
-            for p_other until the one for p_info */
-        b_parse = 1;
-    }
-    else
-    if( p_info->i_idxposb )
-    {
-        b_parse = 0;
-    }
-    else
-    if( !p_other )
-    {
-        b_parse = 0;
-    }
-    else
-    if( ( i_other_ck +1 >= p_other->i_idxnb )||( i_other_ck == -1 )||( p_info->i_idxposc == 0) ) 
-        /* XXX see if i_other_ck +1 >= p_other->i_idxnb if it is necessary */
-    {
-        b_parse = 1;
-    }
-    else
-    {
-        /* Avoid : * read an already read ck
-                   * create a discontinuity */
-        if( p_info->p_index[p_info->i_idxposc].i_pos < p_other->p_index[i_other_ck].i_pos )
-        {
-            b_parse = 0;
-        }
-        else
-        {
-            if( p_info->p_index[p_info->i_idxposc-1].i_pos > p_other->p_index[i_other_ck + 1].i_pos )
-            {
-                b_parse = 0;
-            }
-            else
-            {
-                b_parse = 1;
-            }
-        }
-
-    }
-
-    /* XXX XXX just for test */
-//     b_parse = 0;
-    /* XXX XXX */
-
-    if( !b_parse )
-    {
-        pes_packet_t *p_pes;
-        int i_length;
-//        msg_Warn( p_input, "parsing 0" );   
-        i_length = __MIN( p_info->p_index[p_info->i_idxposc].i_length - p_info->i_idxposb,
-                              BUFFER_MAXSPESSIZE );
-
-        AVI_SeekAbsolute( p_input, 
-                          (off_t)p_info->p_index[p_info->i_idxposc].i_pos + 
-                                p_info->i_idxposb + 8);
-        /* FIXME lit aligné donc risque de lire un car de trop si position non aligné */
-        if( !b_load )
-        {
-            return( 1 );
-        }
+        /* invalid index */
+    /*  the position max we have already reached */
+        /* FIXME this isn't the better because sometime will fail to
+            put in buffer p_other since it could be too far */
+        AVIStreamInfo_t *p_info_max = p_info;
         
-        if( __AVI_GetDataInPES( p_input, 
-                                &p_pes, 
-                                i_length , 
-                                0) != i_length )
+        for( i = 0; i < p_avi_demux->i_streams; i++ )
         {
-            msg_Err( p_input, "%d ERROR", p_info->i_cat );
-            return( 0 );
+            if( p_info_i->i_idxnb )
+            {
+                if( p_info_max->i_idxnb )
+                {
+                    if( p_info_i->p_index[p_info_i->i_idxnb -1 ].i_pos >
+                            p_info_max->p_index[p_info_max->i_idxnb -1 ].i_pos )
+                    {
+                        p_info_max = p_info_i;
+                    }
+                }
+                else
+                {
+                    p_info_max = p_info_i;
+                }
+            }
         }
-        AVI_PESBuffer_Add( p_input->p_method_data,
-                           p_info,
-                           p_pes,
-                           p_info->i_idxposc,
-                           p_info->i_idxposb );
-        return( 1 );
-    }
-    else
-    {
-        int i;
-        off_t i_posmax;
-
-//        msg_Warn( p_input, "parsing 1" );   
-        if( p_info->i_idxposc - 1 >= 0 )
+        if( p_info_max->i_idxnb )
         {
-            i_posmax = p_info->p_index[p_info->i_idxposc - 1].i_pos +
-                         __EVEN( p_info->p_index[p_info->i_idxposc - 1].i_length ) + 8;
+            /* be carefull that size between index and ck can sometime be 
+              different without any error (and other time it's an error) */
+           i_posmax = p_info_max->p_index[p_info_max->i_idxnb -1 ].i_pos; 
+           /* so choose this, and I know that we have already reach it */
         }
         else
         {
             i_posmax = p_avi_demux->p_movi->i_pos + 12;
         }
-        if( i_other_ck >= 0 )
+    }
+    else
+    {
+        if( !b_load )
         {
-            i_posmax = __MAX( i_posmax,
-                              p_other->p_index[i_other_ck].i_pos + 
-                                __EVEN( p_other->p_index[i_other_ck].i_length ) + 8 );
+            return( 1 ); /* all is ok */
         }
-        AVI_SeekAbsolute( p_input, i_posmax );
+        /* valid index */
+        /* we know that the entry and the last one are valid for the 2 stream */
+        /* and ck_other will come *before* index so go directly to it*/
+        i_posmax = p_other->p_index[p_other->i_idxposc].i_pos;
+    }
 
-        for( ;; )
+    AVI_SeekAbsolute( p_input, i_posmax );
+    /* the first chunk we will see is :
+            * the last chunk that we have already seen for broken index 
+            * the first ck for other with good index */ 
+    for( ; ; ) /* infinite parsing until the ck we want */
+    {
+        riffchunk_t  *p_ck;
+        int i_type;
+        
+        /* Get the actual chunk in the stream */
+        if( !(p_ck = RIFF_ReadChunk( p_input )) )
         {
-            riffchunk_t  *p_ck;
-            int i_ck;
-            int i_type;
-    
-            if( !(p_ck = RIFF_ReadChunk( p_input )) )
+            return( 0 );
+        }
+//        msg_Dbg( p_input, "ck: %4.4s len %d", &p_ck->i_id, p_ck->i_size );
+        /* special case for LIST-rec chunk */
+        if( ( p_ck->i_id == FOURCC_LIST )&&( p_ck->i_type == FOURCC_rec ) )
+        {
+            RIFF_DescendChunk( p_input );
+            RIFF_DeleteChunk( p_input, p_ck );
+            continue;
+        }
+        AVI_ParseStreamHeader( p_ck->i_id, &i, &i_type );
+        /* littles checks but not too much if you want to read all file */ 
+        if( i >= p_avi_demux->i_streams )
+        /* (AVI_GetESTypeFromTwoCC(i_type) != p_info_i->i_cat) perhaps add it*/
+            
+        {
+            RIFF_DeleteChunk( p_input, p_ck );
+            if( RIFF_NextChunk( p_input, p_avi_demux->p_movi ) != 0 )
             {
                 return( 0 );
             }
+        }
+        else
+        {
+            int i_size;
 
-            if( p_ck->i_id == FOURCC_LIST )
+            /* have we found a new entry (not present in index)? */
+            if( ( !p_info_i->i_idxnb )
+                ||(p_info_i->p_index[p_info_i->i_idxnb-1].i_pos < p_ck->i_pos))
             {
-                if( p_ck->i_type == FOURCC_rec )
-                {
-                    RIFF_DescendChunk( p_input );
-                    continue;
-                }
+                AVIIndexEntry_t index;
+
+                index.i_id = p_ck->i_id;
+                index.i_flags = AVIIF_KEYFRAME; /* TODO it could be fixed after */
+                index.i_pos = p_ck->i_pos;
+                index.i_length = p_ck->i_size;
+                __AVI_AddEntryIndex( p_info_i, &index );   
             }
 
-            AVI_ParseStreamHeader( p_ck->i_id, &i, &i_type );
-//            msg_Dbg( p_input, "ck: %4.4s", &p_ck->i_id );
-            if( ( i >= p_avi_demux->i_streams )
-                ||(AVI_GetESTypeFromTwoCC( i_type ) != p_info_i->i_cat ) )
+
+            /* TODO check if p_other is full and then if is possible go directly to the good chunk */
+            if( ( p_info_i == p_other )
+                &&( !AVI_PESBuffer_IsFull( p_other ) )
+                &&( ( !p_other->p_pes_last )||
+                    ( p_other->p_pes_last->p_pes->i_pes_size != BUFFER_MAXSPESSIZE ) ) )
             {
+                int i_ck = p_other->p_pes_last ? 
+                        p_other->p_pes_last->i_posc + 1 : p_other->i_idxposc;
+                i_size = __AVI_ChooseSize( p_ck->i_size,
+                                           p_other->p_index[i_ck].i_length);
+               
+                if( p_other->p_index[i_ck].i_pos == p_ck->i_pos )
+                {
+                    if( !__AVI_GetAndPutChunkInBuffer( p_input, p_other, i_size, i_ck ) )
+                    {
+                        RIFF_DeleteChunk( p_input, p_ck );
+                        return( 0 );
+                    }
+                }
+                else
+                {
+                    if( RIFF_NextChunk( p_input, p_avi_demux->p_movi ) != 0 )
+                    {
+                        RIFF_DeleteChunk( p_input, p_ck );
+
+                        return( 0 );
+                    }
+
+                }
+                        
+                RIFF_DeleteChunk( p_input, p_ck );
+            }
+            else
+            if( ( p_info_i == p_info)
+                &&( p_info->i_idxposc < p_info->i_idxnb ) )
+            {
+                /* the first ck_info is ok otherwise it should be loaded without parsing */
+                /* TODO support the way that i_ck_size != index_size */
+                i_size = __AVI_ChooseSize( p_ck->i_size,
+                                       p_info->p_index[p_info->i_idxposc].i_length);
+
+
+                RIFF_DeleteChunk( p_input, p_ck );
+                
+                return( b_load ? __AVI_GetAndPutChunkInBuffer( p_input,
+                                                               p_info,
+                                                               i_size,
+                                                               p_info->i_idxposc ) : 1 );
+            }
+            else
+            {
+                /* skip it */
+                RIFF_DeleteChunk( p_input, p_ck );
                 if( RIFF_NextChunk( p_input, p_avi_demux->p_movi ) != 0 )
                 {
                     return( 0 );
                 }
             }
-            else
-            {
-                if( ( !p_info_i->i_idxnb )
-                    ||( p_info_i->p_index[p_info_i->i_idxnb-1].i_pos +
-                            __EVEN( p_info_i->p_index[p_info_i->i_idxnb-1].i_length ) + 8 <=
-                                p_ck->i_pos ) )
-                {
-                    /* add a new entry */
-                    AVIIndexEntry_t index;
-
-                    index.i_id = p_ck->i_id;
-                    index.i_flags = AVIIF_KEYFRAME;
-                    index.i_pos = p_ck->i_pos;
-                    index.i_length = p_ck->i_size;
-                    __AVI_AddEntryIndex( p_info_i, &index );
-                }
-                RIFF_DeleteChunk( p_input, p_ck );
-
-                /* load the packet */
-                if( p_info_i == p_info )
-                {
-                    /* special case with broken index */
-                    i_ck = p_info->i_idxposc > p_info->i_idxnb - 1 ? p_info->i_idxnb - 1 : p_info->i_idxposc;
-                }
-                else
-                {
-                    i_ck = p_info_i->p_pes_last ? p_info_i->p_pes_last->i_posc + 1 : p_info_i->i_idxposc;
-                }
-                /* TODO check if buffer overflow and if so seek to get the good ck if possible */
-                /*       check if last ck was troncated */
-                if( ( b_load )
-                    &&( ( p_info_i == p_audio )||( p_info_i == p_video ) ) 
-                    &&( ( !p_info_i->p_pes_last )
-                        ||( p_info_i->p_pes_last->p_pes->i_pes_size != BUFFER_MAXSPESSIZE ) ) )
-                {
-                    pes_packet_t    *p_pes;
-                    int i_offset = ( ( p_info_i == p_info )&&( i_ck == p_info->i_idxposc ) ) ?
-                                        p_info->i_idxposb : 0;
-                    int i_length = __MIN( p_info_i->p_index[i_ck].i_length - i_offset,
-                                          BUFFER_MAXSPESSIZE );
-
-                    AVI_SeekAbsolute( p_input, 
-                                      (off_t)p_info_i->p_index[i_ck].i_pos + 
-                                            i_offset + 8);
-                    if( __AVI_GetDataInPES( p_input, &p_pes, i_length,1 ) != i_length)
-                    {
-                        return( 0 );
-                    }
-                    AVI_PESBuffer_Add( p_input->p_method_data,
-                                       p_info_i,
-                                       p_pes,
-                                       i_ck,
-                                       i_offset );
-                    if( ( p_info_i == p_info )
-                        &&( p_info->i_idxposc == i_ck ) )
-                    {
-                        return( 1 );
-                    }
-                }
-                else
-                {
-                    RIFF_NextChunk( p_input, p_avi_demux->p_movi );
-                    if( ( p_info_i == p_info )
-                        &&( p_info->i_idxposc == i_ck ) )
-                    {
-                        return( 1 );
-                    }
-                }
-            }
         }
-    }
 
+    
+    }
+    
 #undef p_video
 #undef p_audio
 #undef p_info_i

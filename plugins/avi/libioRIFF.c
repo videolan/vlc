@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.9 2002/06/27 19:05:17 sam Exp $
+ * $Id: libioRIFF.c,v 1.10 2002/06/30 03:51:29 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -32,18 +32,18 @@
 
 #include "libioRIFF.h"
 
-inline u16 __GetWLE( byte_t *p_buff )
+static inline u16 __GetWLE( byte_t *p_buff )
 {
     return( (*p_buff) + ( *(p_buff+1) <<8 ) );
 }
 
-inline u32 __GetDWLE( byte_t *p_buff )
+static inline u32 __GetDWLE( byte_t *p_buff )
 {
     return( *(p_buff) + ( *(p_buff+1) <<8 ) + 
             ( *(p_buff+2) <<16 ) + ( *(p_buff+3) <<24 ) );
 }
 
-inline u32 __EVEN( u32 i )
+static inline u32 __EVEN( u32 i )
 {
     return( (i & 1) ? ++i : i );
 }
