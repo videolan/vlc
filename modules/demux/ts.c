@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.2 2004/01/16 02:01:11 fenrir Exp $
+ * $Id: ts.c,v 1.3 2004/01/18 01:49:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -737,15 +737,9 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
         {
             p_pes->i_pts = i_pts * 100 / 9;
         }
-        if( pid->es->p_mpeg4desc )
-        {
-            /* For mpeg4 we first gather the packet -> will make ffmpeg happier */
-            es_out_Send( p_demux->out, pid->es->id, block_ChainGather( p_pes ) );
-        }
-        else
-        {
-            es_out_Send( p_demux->out, pid->es->id, p_pes );
-        }
+
+        /* For mpeg4/mscodec we first gather the packet -> will make ffmpeg happier */
+        es_out_Send( p_demux->out, pid->es->id, block_ChainGather( p_pes ) );
     }
     else
     {
@@ -806,7 +800,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     {
         if( pid->i_cc == 0xff )
         {
-            msg_Warn( p_demux, "first packet for pid=0x%x c=0x%x", pid->i_pid, i_cc );
+            msg_Warn( p_demux, "first packet for pid=0x%x cc=0x%x", pid->i_pid, i_cc );
             pid->i_cc = i_cc;
         }
         else if( i_diff != 0 )
@@ -1546,8 +1540,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
             if( p_dr && p_dr->i_length >= 8 )
             {
+                pid->es->fmt.i_cat = VIDEO_ES;
                 pid->es->fmt.i_codec = VLC_FOURCC( p_dr->p_data[0], p_dr->p_data[1],
                                                    p_dr->p_data[2], p_dr->p_data[3] );
+                pid->es->fmt.video.i_width = ( p_dr->p_data[4] << 8 )|p_dr->p_data[5];
+                pid->es->fmt.video.i_height= ( p_dr->p_data[6] << 8 )|p_dr->p_data[7];
                 pid->es->fmt.i_extra = (p_dr->p_data[8] << 8) | p_dr->p_data[9];
 
                 if( pid->es->fmt.i_extra > 0 )
