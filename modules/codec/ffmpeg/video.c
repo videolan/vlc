@@ -108,10 +108,13 @@ static uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
     switch( i_ff_chroma )
     {
     case PIX_FMT_YUV420P:
+    case PIX_FMT_YUVJ420P: /* Hacky but better then chroma conversion */
         return VLC_FOURCC('I','4','2','0');
     case PIX_FMT_YUV422P:
+    case PIX_FMT_YUVJ422P: /* Hacky but better then chroma conversion */
         return VLC_FOURCC('I','4','2','2');
     case PIX_FMT_YUV444P:
+    case PIX_FMT_YUVJ444P: /* Hacky but better then chroma conversion */
         return VLC_FOURCC('I','4','4','4');
 
     case PIX_FMT_YUV422:
