@@ -110,8 +110,8 @@ typedef struct
 
 } telnet_client_t;
 
-static char* MessageToString( vlm_message_t* , int );
-static void Write_message( telnet_client_t * , vlm_message_t* , char * , int );
+static char *MessageToString( vlm_message_t *, int );
+static void Write_message( telnet_client_t *, vlm_message_t *, char *, int );
 
 struct intf_sys_t
 {
@@ -325,7 +325,7 @@ static void Run( intf_thread_t *p_intf )
 
                 if( cl->p_buffer_read - cl->buffer_read == 999 )
                 {
-                    Write_message( cl, NULL, "Line too long\n",
+                    Write_message( cl, NULL, "Line too long\r\n",
                                    cl->i_mode + 2 );
                 }
             }
@@ -392,8 +392,8 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
-static void Write_message( telnet_client_t * client, vlm_message_t * message,
-                           char * string_message, int i_mode )
+static void Write_message( telnet_client_t *client, vlm_message_t *message,
+                           char *string_message, int i_mode )
 {
     char *psz_message;
 
@@ -402,73 +402,75 @@ static void Write_message( telnet_client_t * client, vlm_message_t * message,
     if( client->buffer_write ) free( client->buffer_write );
 
     /* generate the psz_message string */
-    if( message != NULL ) /* ok, look for vlm_message_t */
+    if( message )
     {
-        psz_message = MessageToString( message , 0 );
-        psz_message = realloc( psz_message , strlen( psz_message ) +
-                               strlen( "\r\n> " ) + 1 );
-        strcat( psz_message , "\r\n> " );
-    }
-    else /* it is a basic string_message */
-    {
-        psz_message = strdup( string_message );
-    }
-
-    client->buffer_write = malloc( strlen( psz_message ) + 1 );
-    strcpy( client->buffer_write , psz_message );
-    client->p_buffer_write = client->buffer_write;
-    client->i_buffer_write = strlen( psz_message );
-    client->i_mode = i_mode;
-    free( psz_message );
-}
-
-/* we need the level of the message to put a beautiful indentation.
-   first level is 0 */
-static char* MessageToString( vlm_message_t* message , int i_level )
-{
-    int i;
-    char *psz_message;
-
-    if( message == NULL )
-    {
-        return strdup( "" );
-    }
-    else if( i_level == 0 && message->i_child == 0 &&
-             message->psz_value == NULL  ) /* a command is successful */
-    {
-        /* don't write anything */
-        return strdup( "" );
+        /* ok, look for vlm_message_t */
+        psz_message = MessageToString( message, 0 );
     }
     else
     {
-        psz_message = strdup( "" );
-        psz_message = realloc( psz_message, strlen( psz_message ) +
-                               strlen( message->psz_name ) + i_level * 4 + 1 );
-        for( i = 0 ; i < i_level ; i++ )
-        {
-            strcat( psz_message , "    " );
-        }
-        strcat( psz_message , message->psz_name );
-        if( message->psz_value )
-        {
-            psz_message = realloc( psz_message, strlen( psz_message ) +
-                                   strlen( message->psz_value ) + 3 + 1 );
-            strcat( psz_message, " : " );
-            strcat( psz_message, message->psz_value );
-        }
-
-        for( i = 0 ; i < message->i_child ; i++ )
-        {
-            char *child_message =
-                MessageToString( message->child[i], i_level + 1 );
-
-            psz_message = realloc( psz_message, strlen( psz_message ) +
-                                   strlen( child_message ) + 2 + 1 );
-            strcat( psz_message, "\r\n" );
-            strcat( psz_message, child_message );
-            free( child_message );
-        }
-
-        return psz_message;
+        /* it is a basic string_message */
+        psz_message = strdup( string_message );
     }
+
+    client->buffer_write = client->p_buffer_write = psz_message;
+    client->i_buffer_write = strlen( psz_message );
+    client->i_mode = i_mode;
+}
+
+/* We need the level of the message to put a beautiful indentation.
+ * first level is 0 */
+static char *MessageToString( vlm_message_t *message, int i_level )
+{
+#define STRING_CR "\r\n"
+#define STRING_TAIL "> "
+
+    char *psz_message;
+    int i, i_message = sizeof( STRING_TAIL );
+
+    if( !message || !message->psz_name )
+    {
+        return strdup( STRING_CR STRING_TAIL );
+    }
+    else if( !i_level && !message->i_child && !message->psz_value  )
+    {
+        /* A command is successful. Don't write anything */
+        return strdup( STRING_CR STRING_TAIL );
+    }
+
+    i_message += strlen( message->psz_name ) + i_level * sizeof( "    " ) + 1;
+    psz_message = malloc( i_message ); *psz_message = 0;
+    for( i = 0; i < i_level; i++ ) strcat( psz_message, "    " );
+    strcat( psz_message, message->psz_name );
+
+    if( message->psz_value )
+    {
+        i_message += sizeof( " : " ) + strlen( message->psz_value ) +
+            sizeof( STRING_CR );
+        psz_message = realloc( psz_message, i_message );
+        strcat( psz_message, " : " );
+        strcat( psz_message, message->psz_value );
+        strcat( psz_message, STRING_CR );
+    }
+    else
+    {
+        i_message += sizeof( STRING_CR );
+        psz_message = realloc( psz_message, i_message );
+        strcat( psz_message, STRING_CR );
+    }
+
+    for( i = 0; i < message->i_child; i++ )
+    {
+        char *child_message =
+            MessageToString( message->child[i], i_level + 1 );
+
+        i_message += strlen( child_message );
+        psz_message = realloc( psz_message, i_message );
+        strcat( psz_message, child_message );
+        free( child_message );
+    }
+
+    if( i_level == 0 ) strcat( psz_message, STRING_TAIL );
+
+    return psz_message;
 }

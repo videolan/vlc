@@ -659,8 +659,8 @@ static int ExecuteCommand(vlm_t *vlm, char *command, vlm_message_t **p_message)
                     else
                     {
                         vlm_MediaSetup( vlm, media, p_command[i],
-					p_command[i+1] );
-			i++;
+                                        p_command[i+1] );
+                        i++;
                     }
                 }
                 else if( strcmp( p_command[i], "loop" ) == 0 ||
@@ -1715,37 +1715,48 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
 
 static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
 {
-    vlm_message_t *message;
+    vlm_message_t *message, *message_child;
+
+#define MessageAdd( a ) \
+        vlm_MessageAdd( message, vlm_MessageNew( a, NULL ) );
+#define MessageAddChild( a ) \
+        vlm_MessageAdd( message_child, vlm_MessageNew( a, NULL ) );
 
     if( psz_filter == NULL )
     {
-        char *help= strdup(
-                 "Commands Syntax:"
-                 "\n new (name) vod|broadcast|schedule [properties]"
-                 "\n setup (name) (properties)"
-                 "\n show [(name)|media|schedule]"
-                 "\n del (name)|all|media|schedule"
-                 "\n control (name) (command)"
-                 "\n save (config_file)"
-                 "\n load (config_file)"
-                 "\nMedia Proprieties Syntax:"
-                 "\n input (input_name)"
-                 "\n output (output_name)"
-                 "\n option (option_name)[=value]"
-                 "\n enabled|disabled"
-                 "\n loop|unloop (broadcast only)"
-                 "\nSchedule Proprieties Syntax:"
-                 "\n enabled|disabled"
-                 "\n append (command_until_rest_of_the_line)"
-                 "\n date (year)/(month)/(day)-(hour):(minutes):(seconds)|now"
-                 "\n period (years_aka_12_months)/(months_aka_30_days)/(days)-(hours):(minutes):(seconds)"
-                 "\n repeat (number_of_repetitions)"
-                 "\nControl Commands Syntax:"
-                 "\n play\n pause\n stop\n seek (percentage)\n" );
-
         message = vlm_MessageNew( "help", NULL );
-        vlm_MessageAdd( message, vlm_MessageNew( "Help", help ) );
-        free( help );
+
+        message_child = MessageAdd( "Commands Syntax:" );
+        MessageAddChild( "new (name) vod|broadcast|schedule [properties]" );
+        MessageAddChild( "setup (name) (properties)" );
+        MessageAddChild( "show [(name)|media|schedule]" );
+        MessageAddChild( "del (name)|all|media|schedule" );
+        MessageAddChild( "control (name) [instance_name] (command)" );
+        MessageAddChild( "save (config_file)" );
+        MessageAddChild( "load (config_file)" );
+
+        message_child = MessageAdd( "Media Proprieties Syntax:" );
+        MessageAddChild( "input (input_name)" );
+        MessageAddChild( "output (output_name)" );
+        MessageAddChild( "enabled|disabled" );
+        MessageAddChild( "loop|unloop (broadcast only)" );
+        MessageAddChild( "mux (mux_name)" );
+
+        message_child = MessageAdd( "Schedule Proprieties Syntax:" );
+        MessageAddChild( "enabled|disabled" );
+        MessageAddChild( "append (command_until_rest_of_the_line)" );
+        MessageAddChild( "date (year)/(month)/(day)-(hour):(minutes):"
+                         "(seconds)|now" );
+        MessageAddChild( "period (years_aka_12_months)/(months_aka_30_days)/"
+                         "(days)-(hours):(minutes):(seconds)" );
+        MessageAddChild( "repeat (number_of_repetitions)" );
+
+        message_child = MessageAdd( "Control Commands Syntax:" );
+        MessageAddChild( "play" );
+        MessageAddChild( "pause" );
+        MessageAddChild( "stop" );
+        MessageAddChild( "seek (percentage)" );
+
         return message;
     }
 
