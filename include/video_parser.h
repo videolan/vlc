@@ -58,6 +58,9 @@ typedef struct vpar_thread_s
     macroblock_parsing_t    mb;
     video_synchro_t         synchro;
 
+    /* Lookup table for Macroblock_Address_Increment */
+    mb_addr_inc_t           mb_addr_inc[2048];
+
 #ifdef STATS
     /* Statistics */
     count_t         c_loops;                              /* number of loops */

@@ -47,12 +47,93 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar );
 static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb );
+typedef (void *)    f_decode_block_t( vpar_thread_t *, macroblock_t *, int );
 static void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 static void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 
-typedef void      (*f_decode_block_t)( vpar_thread_t *, macroblock_t *, int );
+
+/*****************************************************************************
+ * InitMbAddrInc : Initialize the lookup table for mb_addr_inc               *
+ *****************************************************************************/
+
+void InitMbAddrInc( vpar_thread_t * p_vpar )
+{
+    bzero( &p_vpar->mb_addr_inc, 4096*sizeof( int ) );
+    p_vpar->mb_addr_inc[8].i_value = MACROBLOCK_ESCAPE;
+    p_vpar->mb_addr_inc[15].i_value = MACROBLOCK_STUFFING;
+    p_vpar->mb_addr_inc[24].i_value = 33;
+    p_vpar->mb_addr_inc[25].i_value = 32;
+    p_vpar->mb_addr_inc[26].i_value = 31;
+    p_vpar->mb_addr_inc[27].i_value = 30;
+    p_vpar->mb_addr_inc[28].i_value = 29;
+    p_vpar->mb_addr_inc[29].i_value = 28;
+    p_vpar->mb_addr_inc[30].i_value = 27;
+    p_vpar->mb_addr_inc[31].i_value = 26;
+    p_vpar->mb_addr_inc[32].i_value = 25;
+    p_vpar->mb_addr_inc[33].i_value = 24;
+    p_vpar->mb_addr_inc[34].i_value = 23;
+    p_vpar->mb_addr_inc[35].i_value = 22;
+    p_vpar->mb_addr_inc[36].i_value = 21;
+    p_vpar->mb_addr_inc[38].i_value = 20;
+    p_vpar->mb_addr_inc[40].i_value = 19;
+    p_vpar->mb_addr_inc[42].i_value = 18;
+    p_vpar->mb_addr_inc[44].i_value = 17;
+    p_vpar->mb_addr_inc[46].i_value = 16;
+    p_vpar->mb_addr_inc[48].i_value = 15;
+    p_vpar->mb_addr_inc[56].i_value = 14;
+    p_vpar->mb_addr_inc[64].i_value = 13;
+    p_vpar->mb_addr_inc[72].i_value = 12;
+    p_vpar->mb_addr_inc[80].i_value = 11;
+    p_vpar->mb_addr_inc[88].i_value = 10;
+    p_vpar->mb_addr_inc[96].i_value = 9;
+    p_vpar->mb_addr_inc[112].i_value = 8;
+    p_vpar->mb_addr_inc[128].i_value = 7;
+    p_vpar->mb_addr_inc[192].i_value = 6;
+    p_vpar->mb_addr_inc[256].i_value = 5;
+    p_vpar->mb_addr_inc[384].i_value = 4;
+    p_vpar->mb_addr_inc[512].i_value = 3;
+    p_vpar->mb_addr_inc[768].i_value = 2;
+    p_vpar->mb_addr_inc[1024].i_value = 1;
+    /* Length of the variable length code */
+    p_vpar->mb_addr_inc[8].i_length = 11;
+    p_vpar->mb_addr_inc[15].i_length = 11;
+    p_vpar->mb_addr_inc[24].i_length = 11;
+    p_vpar->mb_addr_inc[25].i_length = 11;
+    p_vpar->mb_addr_inc[26].i_length = 11;
+    p_vpar->mb_addr_inc[27].i_length = 11;
+    p_vpar->mb_addr_inc[28].i_length = 11;
+    p_vpar->mb_addr_inc[29].i_length = 11;
+    p_vpar->mb_addr_inc[30].i_length = 11;
+    p_vpar->mb_addr_inc[31].i_length = 11;
+    p_vpar->mb_addr_inc[32].i_length = 11;
+    p_vpar->mb_addr_inc[33].i_length = 11;
+    p_vpar->mb_addr_inc[34].i_length = 11;
+    p_vpar->mb_addr_inc[35].i_length = 11;
+    p_vpar->mb_addr_inc[36].i_length = 10;
+    p_vpar->mb_addr_inc[38].i_length = 10;
+    p_vpar->mb_addr_inc[40].i_length = 10;
+    p_vpar->mb_addr_inc[42].i_length = 10;
+    p_vpar->mb_addr_inc[44].i_length = 10;
+    p_vpar->mb_addr_inc[46].i_length = 10;
+    p_vpar->mb_addr_inc[48].i_length = 8;
+    p_vpar->mb_addr_inc[56].i_length = 8;
+    p_vpar->mb_addr_inc[64].i_length = 8;
+    p_vpar->mb_addr_inc[72].i_length = 8;
+    p_vpar->mb_addr_inc[80].i_length = 8;
+    p_vpar->mb_addr_inc[88].i_length = 8;
+    p_vpar->mb_addr_inc[96].i_length = 7;   
+    p_vpar->mb_addr_inc[112].i_length = 7;
+    p_vpar->mb_addr_inc[128].i_length = 5;
+    p_vpar->mb_addr_inc[192].i_length = 5;
+    p_vpar->mb_addr_inc[256].i_length = 4;
+    p_vpar->mb_addr_inc[384].i_length = 4;
+    p_vpar->mb_addr_inc[512].i_length = 3;
+    p_vpar->mb_addr_inc[768].i_length = 3;   
+    p_vpar->mb_addr_inc[1024].i_length = 1;
+}
+
 
 /*****************************************************************************
  * vpar_ParseMacroblock : Parse the next macroblock
@@ -303,7 +384,20 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
  *****************************************************************************/
 static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley */
+    /* Index in the lookup table mb_addr_inc */
+    int    i_index = ShowBits( &p_vpar->bit_stream, 11 );
+    p_vpar->mb.i_addr_inc = 0;
+    /* Test the presence of the escape character */
+    while( i_index == 8 )
+    {
+        DumpBits( &p_vpar->bit_stream, 11 );
+        p_vpar->mb.i_addr_inc += 33;
+        i_index = ShowBits( &p_vpar->bit_stream, 11 );
+    }
+    /* Affect the value from the lookup table */
+    p_vpar->mb.i_addr_inc += p_vpar->mb_addr_inc[i_index].i_value;
+    /* Dump the good number of bits */
+    DumpBits( &p_vpar->bit_stream, p_vpar->mb_addr_inc[i_index].i_length );
 }
 
 /*****************************************************************************

@@ -60,6 +60,8 @@ typedef struct macroblock_s
 typedef struct
 {
     int                     i_mb_type, i_motion_type, i_mv_count, i_mv_format;
+    /* AddressIncrement information */
+    int                     i_addr_inc;
     int                     i_coded_block_pattern;
     boolean_t               b_dct_type;
 
@@ -82,6 +84,10 @@ typedef struct
 #define MOTION_16X8                     2
 #define MOTION_DMV                      3
 
+/* Macroblock Address Increment types */
+#define MACROBLOCK_ESCAPE               8
+#define MACROBLOCK_STUFFING             15
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -92,4 +98,3 @@ int  vpar_IMBType( struct vpar_thread_s* p_vpar );
 int  vpar_PMBType( struct vpar_thread_s* p_vpar );
 int  vpar_BMBType( struct vpar_thread_s* p_vpar );
 int  vpar_DMBType( struct vpar_thread_s* p_vpar );
-

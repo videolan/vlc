@@ -220,6 +220,9 @@ static int InitThread( vpar_thread_t *p_vpar )
         }
     }
 
+    /* Initialize lookup tables */
+    InitMbAddrInc( p_vpar );
+
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
     return( 0 );
