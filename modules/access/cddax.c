@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.7 2003/11/24 03:28:27 rocky Exp $
+ * $Id: cddax.c,v 1.8 2003/11/24 17:11:23 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -67,12 +67,6 @@ typedef struct cdda_data_s
 
 } cdda_data_t;
 
-struct demux_sys_t
-{
-    es_descriptor_t *p_es;
-    mtime_t         i_pts;
-};
-
 /*****************************************************************************
  * Debugging 
  *****************************************************************************/
@@ -133,10 +127,6 @@ static int  CDDASetArea      ( input_thread_t *, input_area_t * );
 static int  CDDAPlay         ( input_thread_t *, int );
 static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 
-static int  CDDAOpenDemux    ( vlc_object_t * );
-static void CDDACloseDemux   ( vlc_object_t * );
-static int  CDDADemux        ( input_thread_t * p_input );
-
 static int  CDDAOpenIntf     ( vlc_object_t * );
 static void CDDACloseIntf    ( vlc_object_t * );
 
@@ -173,12 +163,12 @@ vlc_module_begin();
     add_integer ( MODULE_STRING "-debug", 0, debug_callback, DEBUG_TEXT, 
                   DEBUG_LONGTEXT, VLC_TRUE );
     add_string( MODULE_STRING "-device", "", NULL, DEV_TEXT, 
-		DEV_LONGTEXT, VLC_TRUE );
+                DEV_LONGTEXT, VLC_TRUE );
 
     add_submodule();
         set_description( _("CD Audio demux") );
         set_capability( "demux", 0 );
-        set_callbacks( CDDAOpenDemux, CDDACloseDemux );
+        set_callbacks( DemuxOpen, DemuxClose );
         add_shortcut( "cdda" );
 
     add_submodule();
@@ -566,130 +556,103 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
 
 }
 
+/*****************************************************************************
+ * Demux: local prototypes
+ *****************************************************************************/
+struct demux_sys_t
+{
+    es_out_id_t *p_es;
+    mtime_t     i_pts;
+};
+
+static int  Demux     ( input_thread_t * p_input );
+
 /****************************************************************************
- * Demux Part
+ * DemuxOpen:
  ****************************************************************************/
-static int  CDDAOpenDemux    ( vlc_object_t * p_this)
+static int  DemuxOpen    ( vlc_object_t * p_this)
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_demux;
-    WAVEFORMATEX   *p_wf;
+    demux_sys_t    *p_sys;
+
+    es_format_t    fmt;
 
     if( p_input->stream.i_method != INPUT_METHOD_CDDA )
     {
         return VLC_EGENERIC;
     }
 
-    p_demux = malloc( sizeof( es_descriptor_t ) );
-    p_demux->i_pts = 0;
-    p_demux->p_es = NULL;
-
-    p_input->pf_demux  = CDDADemux;
-    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->pf_demux  = Demux;
     p_input->pf_rewind = NULL;
-    p_input->p_demux_data = p_demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->p_demux_data = p_sys = malloc( sizeof( es_descriptor_t ) );
+    p_sys->i_pts = 0;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        msg_Err( p_input, "cannot add program" );
-        free( p_input->p_demux_data );
-        return( -1 );
-    }
-    p_input->stream.pp_programs[0]->b_is_ok = 0;
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
-    /* create our ES */ 
-    p_demux->p_es = input_AddES( p_input, 
-                                 p_input->stream.p_selected_program, 
-                                 1 /* id */, AUDIO_ES, NULL, 0 );
-    if( !p_demux->p_es )
+    if( input_InitStream( p_input, 0 ) == -1)
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "out of memory" );
-        free( p_input->p_demux_data );
-        return( -1 );
+        msg_Err( p_input, "cannot init stream" );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
-    p_demux->p_es->i_stream_id = 1;
-    p_demux->p_es->i_fourcc = VLC_FOURCC('a','r','a','w');
-
-    p_demux->p_es->p_waveformatex = p_wf = malloc( sizeof( WAVEFORMATEX ) );
-    p_wf->wFormatTag = WAVE_FORMAT_PCM;
-    p_wf->nChannels = 2;
-    p_wf->nSamplesPerSec = 44100;
-    p_wf->nAvgBytesPerSec = 2 * 44100 * 2;
-    p_wf->nBlockAlign = 4;
-    p_wf->wBitsPerSample = 16;
-    p_wf->cbSize = 0;
-
-    input_SelectES( p_input, p_demux->p_es );
-
-    p_input->stream.p_selected_program->b_is_ok = 1;
+    p_input->stream.i_mux_rate = 4 * 44100 / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'a', 'r', 'a', 'w' ) );
+    fmt.audio.i_channels = 2;
+    fmt.audio.i_rate = 44100;
+    fmt.audio.i_bitspersample = 16;
+    fmt.audio.i_blockalign = 4;
+    fmt.i_bitrate = 4 * 44100 * 8;
+
+    p_sys->p_es =  es_out_Add( p_input->p_es_out, &fmt );
 
     return VLC_SUCCESS;
 }
 
-static void CDDACloseDemux( vlc_object_t * p_this)
+/****************************************************************************
+ * DemuxClose:
+ ****************************************************************************/
+static void DemuxClose( vlc_object_t * p_this)
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    demux_sys_t    *p_demux = (demux_sys_t*)p_input->p_demux_data;
+    demux_sys_t    *p_sys = (demux_sys_t*)p_input->p_demux_data;
 
-    free( p_demux );
-    p_input->p_demux_data = NULL;
+    free( p_sys );
     return;
 }
 
-static int  CDDADemux( input_thread_t * p_input )
+/****************************************************************************
+ * Demux:
+ ****************************************************************************/
+static int  Demux( input_thread_t * p_input )
 {
-    demux_sys_t    *p_demux = (demux_sys_t*)p_input->p_demux_data;
-    ssize_t         i_read;
-    data_packet_t * p_data;
-    pes_packet_t *  p_pes;
+    demux_sys_t    *p_sys = (demux_sys_t*)p_input->p_demux_data;
+    block_t        *p_block;
+
 
     input_ClockManageRef( p_input,
                           p_input->stream.p_selected_program,
-                          p_demux->i_pts );
+                          p_sys->i_pts );
 
-    i_read = input_SplitBuffer( p_input, &p_data, CDIO_CD_FRAMESIZE_RAW );
-    if( i_read <= 0 )
+    if( ( p_block = stream_Block( p_input->s, CDIO_CD_FRAMESIZE_RAW ) ) == NULL )
     {
-        return 0; // EOF
+        /* eof */
+        return 0;
     }
+    p_block->i_dts =
+    p_block->i_pts = input_ClockGetTS( p_input,
+                                       p_input->stream.p_selected_program,
+                                       p_sys->i_pts );
+    p_block->i_length = (mtime_t)90000 * (mtime_t)p_block->i_buffer/44100/4;
 
-    p_pes = input_NewPES( p_input->p_method_data );
+    p_sys->i_pts += p_block->i_length;
 
-    if( p_pes == NULL )
-    {
-        msg_Err( p_input, "out of memory" );
-        input_DeletePacket( p_input->p_method_data, p_data );
-        return -1;
-    }
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
 
-    p_pes->i_rate = p_input->stream.control.i_rate;
-    p_pes->p_first = p_pes->p_last = p_data;
-    p_pes->i_nb_data = 1;
-    p_pes->i_pes_size = i_read;
-
-    p_pes->i_dts =
-        p_pes->i_pts = input_ClockGetTS( p_input,
-                                         p_input->stream.p_selected_program,
-                                         p_demux->i_pts );
-
-    if( p_demux->p_es->p_dec )
-    {
-        input_DecodePES( p_demux->p_es->p_dec, p_pes );
-    }
-    else
-    {
-        input_DeletePES( p_input->p_method_data, p_pes );
-    }
-
-    p_demux->i_pts += ((mtime_t)90000) * i_read
-                      / (mtime_t)44100 / 4 /* stereo 16 bits */;
     return 1;
 }
-
 
 /*****************************************************************************
  * OpenIntf: initialize dummy interface
@@ -963,7 +926,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_intf->change_lock );
 
     p_intf->p_sys->b_key_pressed = VLC_TRUE;
-    
+
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return VLC_SUCCESS;
