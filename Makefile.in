@@ -290,6 +290,7 @@ distclean: clean
 install:
 	$(INSTALL) vlc $(prefix)/bin
 	mkdir -p $(prefix)/lib/videolan/vlc
+	mkdir -p $(prefix)/share/videolan/vlc
 	$(INSTALL) $(PLUGIN_OBJ) $(prefix)/lib/videolan/vlc
 	$(INSTALL) share/*.psf $(prefix)/share/videolan/vlc
 	$(INSTALL) share/*.png $(prefix)/share/videolan/vlc
