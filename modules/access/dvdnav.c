@@ -259,7 +259,7 @@ static int Open( vlc_object_t *p_this )
 
     var_Create( p_demux, "dvdnav-menu", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     var_Get( p_demux, "dvdnav-menu", &val );
-    if( i_title == 0 || val.b_bool )
+    if( (i_title < 0 && val.b_bool) || i_title == 0 )
     {
         msg_Dbg( p_demux, "trying to go to dvd menu" );
 
