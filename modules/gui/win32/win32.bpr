@@ -3,8 +3,8 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\intfwin.so"/>
-    <OBJFILES value="win32.obj intf.obj mainframe.obj network.obj playlist.obj 
+    <PROJECT value="win32.so"/>
+    <OBJFILES value="win32.obj mainframe.obj network.obj playlist.obj 
       preferences.obj about.obj disc.obj control.obj menu.obj messages.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
@@ -25,8 +25,8 @@
     <LINKER value="tlink32"/>
     <USERDEFINES value="_DEBUG"/>
     <SYSDEFINES value="NO_STRICT"/>
-    <MAINSOURCE value="intfwin.bpf"/>
-    <INCLUDEPATH value="..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\include;..\..\src\misc"/>
+    <MAINSOURCE value="win32.bpf"/>
+    <INCLUDEPATH value="..\..\win32;$(BCB)\include;$(BCB)\include\vcl;..\..\..\include;..\..\src\misc"/>
     <LIBPATH value="..\..\win32;$(BCB)\lib\obj;$(BCB)\lib"/>
     <WARNINGS value="-w-par"/>
   </MACROS>
