@@ -200,12 +200,20 @@ static block_t * CDDAReadBlocks( access_t * p_access )
             return NULL;
         }
 
-        p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SIZE;
+        p_access->info.i_update |= INPUT_UPDATE_TITLE;
         p_access->info.i_title++;
-        p_access->info.i_size =
-                  p_cdda->p_title[p_access->info.i_title]->i_size;
-        p_access->info.i_pos = 0;
         p_cdda->i_track++;
+
+	if ( p_cdda-> b_nav_mode ) {
+	  char *psz_title = CDDAFormatTitle( p_access, p_cdda->i_track );
+	  input_Control( p_cdda->p_input, INPUT_SET_NAME, psz_title );
+	  free(psz_title);
+	} else {
+	  p_access->info.i_size =
+	    p_cdda->p_title[p_access->info.i_title]->i_size;
+	  p_access->info.i_pos = 0;
+	  p_access->info.i_update |= INPUT_UPDATE_SIZE;
+	}
     }
 
     /* Possibly adjust i_blocks so we don't read past the end of a track. */
@@ -255,8 +263,30 @@ static int CDDASeek( access_t * p_access, int64_t i_pos )
 {
     cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
 
-    p_cdda->i_lsn = cdio_get_track_lsn(p_cdda->p_cdio, p_cdda->i_track)
-                  + (i_pos / CDIO_CD_FRAMESIZE_RAW);
+    p_cdda->i_lsn = (i_pos / CDIO_CD_FRAMESIZE_RAW);
+
+    if ( ! p_cdda->b_nav_mode ) 
+      p_cdda->i_lsn += cdio_get_track_lsn(p_cdda->p_cdio, p_cdda->i_track);
+
+    /* Seeked backwards and we are doing disc mode. */
+    if ( p_cdda->b_nav_mode && p_access->info.i_pos > i_pos ) {
+      track_t i_track;
+      char *psz_title;
+      
+      for( i_track = p_cdda->i_track; 
+	   i_track > 1 && 
+	     p_cdda->i_lsn < cdio_get_track_lsn(p_cdda->p_cdio, i_track);
+	   i_track--, p_access->info.i_title-- ) ;
+
+      p_cdda->i_track = i_track;
+      p_access->info.i_update |= INPUT_UPDATE_TITLE;
+      psz_title  = CDDAFormatTitle( p_access, p_cdda->i_track );
+      input_Control( p_cdda->p_input, INPUT_SET_NAME, 
+		     psz_title );
+      free(psz_title);
+
+    }
+    
     p_access->info.i_pos = i_pos;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
@@ -273,7 +303,8 @@ static int CDDASeek( access_t * p_access, int64_t i_pos )
  * Open: open cdda device or image file and initialize structures
  *       for subsequent operations.
  *****************************************************************************/
-int E_(CDDAOpen)( vlc_object_t *p_this )
+int 
+CDDAOpen( vlc_object_t *p_this )
 {
     access_t    *p_access = (access_t*)p_this;
     char *      psz_source = NULL;
@@ -379,7 +410,10 @@ int E_(CDDAOpen)( vlc_object_t *p_this )
     p_cdda->i_tracks   = 0;
     p_cdda->i_titles   = 0;
     p_cdda->i_track    = i_track;
-    p_cdda->i_debug    = config_GetInt(p_this, MODULE_STRING "-debug");
+    p_cdda->i_debug    = config_GetInt(p_this, MODULE_STRING 
+				       "-debug");
+    p_cdda->b_nav_mode = config_GetInt(p_this, MODULE_STRING 
+				       "-navigation-mode" );
     p_cdda->i_blocks_per_read
       = config_GetInt(p_this, MODULE_STRING "-blocks-per-read");
 
@@ -466,7 +500,8 @@ int E_(CDDAOpen)( vlc_object_t *p_this )
 /*****************************************************************************
  * CDDAClose: closes cdda and frees any resources associded with it.
  *****************************************************************************/
-void E_(CDDAClose)( vlc_object_t *p_this )
+void 
+CDDAClose (vlc_object_t *p_this )
 {
     access_t    *p_access = (access_t *) p_this;
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
@@ -562,11 +597,8 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_TITLE_INFO:
         {
-	    unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) 
-	      + strlen(p_cdda->psz_source) + 1;
 	    input_title_t ***ppp_title = 
 	      (input_title_t***)va_arg( args, input_title_t*** );
-	    char *psz_mrl = malloc( psz_mrl_max );
 
             pi_int    = (int*)va_arg( args, int* );
             *((int*)va_arg( args, int* )) = 1; /* Title offset */
@@ -575,13 +607,14 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
                         "GET TITLE: i_tracks %d, i_tracks %d",
                         p_cdda->i_tracks, p_cdda->i_tracks );
 
-	    if( psz_mrl == NULL ) {
-	       msg_Warn( p_access, "out of memory" );
-	    } else {
-  	       snprintf(psz_mrl, psz_mrl_max, "%s%s",
-			CDDA_MRL_PREFIX, p_cdda->psz_source);
-	       CDDAMetaInfo( p_access, CDIO_INVALID_TRACK, psz_mrl );
-	       free(psz_mrl);
+	    CDDAMetaInfo( p_access, CDIO_INVALID_TRACK );
+
+	    if ( p_cdda->b_nav_mode) {
+	        char *psz_title = 
+		  CDDAFormatTitle( p_access, p_cdda->i_track );
+		input_Control( p_cdda->p_input, INPUT_SET_NAME, 
+			       psz_title );
+		free(psz_title);
 	    }
 
             /* Duplicate title info */
@@ -613,11 +646,23 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             if( i != p_access->info.i_title )
             {
                 /* Update info */
-                p_access->info.i_update |=
-                    INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
+                p_access->info.i_update |= INPUT_UPDATE_TITLE;
                 p_access->info.i_title = i;
-                p_access->info.i_size = p_cdda->p_title[i]->i_size;
-                p_access->info.i_pos = 0;
+		if ( p_cdda->b_nav_mode) {
+		    char *psz_title = 
+		      CDDAFormatTitle( p_access, i+1 );
+		    input_Control( p_cdda->p_input, INPUT_SET_NAME, 
+				   psz_title );
+		    free(psz_title);
+		    p_cdda->i_track = i+1;
+		    p_access->info.i_pos = 
+		      cdio_get_track_lsn( p_cdda->p_cdio, p_cdda->i_track ) 
+		      * CDIO_CD_FRAMESIZE_RAW;
+		} else {
+		   p_access->info.i_update |= INPUT_UPDATE_SIZE;
+		   p_access->info.i_size = p_cdda->p_title[i]->i_size;
+		   p_access->info.i_pos = 0;
+		}
 
                 /* Next sector to read */
                 p_cdda->i_lsn = 

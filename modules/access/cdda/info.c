@@ -42,6 +42,8 @@ static char *CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
 			    const char format_str[], const char *psz_mrl, 
 			    track_t i_track);
 
+static char *CDDAFormatMRL( const access_t *p_access, track_t i_track );
+
 #ifdef HAVE_LIBCDDB
 
 #define free_and_dup(var, val) \
@@ -259,13 +261,11 @@ CDDAMetaInfoInit( access_t *p_access )
  CD.
  */
 void 
-CDDAMetaInfo( access_t *p_access, track_t i_track, /*const*/ char *psz_mrl )
+CDDAMetaInfo( access_t *p_access, track_t i_track )
 {
     cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
-    char *psz_meta_title = psz_mrl;
+    char *psz_meta_title = CDDAFormatMRL( p_access, i_track );
     char *psz_meta_artist = NULL;
-    char *psz_name = NULL;
-    char *config_varname = MODULE_STRING "-title-format";
     
     if ( ! p_cdda ) return;
 
@@ -274,11 +274,6 @@ CDDAMetaInfo( access_t *p_access, track_t i_track, /*const*/ char *psz_mrl )
     /* Set up for Meta and name for CDDB access. */
     if ( p_cdda->b_cddb_enabled &&  p_cdda->cddb.disc )
     {
-        if (p_cdda->b_cddb_enabled)
-	{
-	    config_varname = MODULE_STRING "-cddb-title-format";
-	}
-
         if( CDIO_INVALID_TRACK == i_track )
 	{
 
@@ -384,7 +379,7 @@ CDDAMetaInfo( access_t *p_access, track_t i_track, /*const*/ char *psz_mrl )
 	    cdio_get_track_lsn(p_cdda->p_cdio, i_track);
 
 	  mtime_t i_duration = i_track_frames / CDIO_CD_FRAMES_PER_SEC;
-	  char *psz_mrl;
+	  char *psz_mrl = CDDAFormatMRL( p_access, i_track );
 	  
 	  snprintf(psz_track, TITLE_MAX, "%s %02d", _("Track"), i_track);
 
@@ -392,9 +387,6 @@ CDDAMetaInfo( access_t *p_access, track_t i_track, /*const*/ char *psz_mrl )
 			 _("Duration"), "%s",
 			 secstotimestr( psz_buffer, i_duration ) );
 	  
-	  asprintf(&psz_mrl, "%s%s@T%u",
-		   CDDA_MRL_PREFIX, p_cdda->psz_source, i_track);
-
 	  input_Control( p_cdda->p_input, INPUT_ADD_INFO, psz_track,
 			 _("MRL"), "%s", psz_mrl );
 	  free(psz_mrl);
@@ -438,8 +430,6 @@ CDDAMetaInfo( access_t *p_access, track_t i_track, /*const*/ char *psz_mrl )
 	   to CDDB or CD-Text values or the default value depending on
 	   availablity and user preferences. 
 
-	   We also set above config_varname to the format used
-	   
 	   So now add the title and artist to VLC's meta, and the 
 	   name as shown in the status bar and playlist entry.
 	 */
@@ -449,12 +439,9 @@ CDDAMetaInfo( access_t *p_access, track_t i_track, /*const*/ char *psz_mrl )
 
 	if ( CDIO_INVALID_TRACK != i_track )
 	{ 
-	    psz_name = 
-	      CDDAFormatStr( p_access, p_cdda,
-			     config_GetPsz( p_access, config_varname ),
-			     psz_mrl, i_track );
-	    
+	    char *psz_name = CDDAFormatTitle( p_access, i_track ) ;
 	    input_Control( p_cdda->p_input, INPUT_SET_NAME, psz_name );
+	    free(psz_name);
 	}
     }
 }
@@ -523,7 +510,7 @@ cdda_data_t *p_cdda, char *psz_cdtext)
    %Y : The year 19xx or 20xx **
    %% : a %
 */
-static char *
+char *
 CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                const char format_str[], const char *psz_mrl, track_t i_track)
 {
@@ -748,6 +735,56 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
     return strdup(temp_str);
 }
 
+/* Return a MRL for the given track. The caller must free the 
+   allocated string. */
+static char *
+CDDAFormatMRL( const access_t *p_access, track_t i_track )
+{
+    cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
+    const unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) 
+      + strlen(p_cdda->psz_source) +
+      + strlen("@T") + strlen("100") + 1;
+    char *psz_mrl = malloc( psz_mrl_max );
+    
+    if (CDIO_INVALID_TRACK == i_track)
+      snprintf(psz_mrl, psz_mrl_max, "%s%s",
+	       CDDA_MRL_PREFIX, p_cdda->psz_source);
+    else 
+      snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u",
+	       CDDA_MRL_PREFIX, p_cdda->psz_source, i_track);
+    return psz_mrl;
+}
+
+
+/* Return a title string as specified by the titel format string for the 
+   given track. The caller must free the allocated string. */
+char *
+CDDAFormatTitle( const access_t *p_access, track_t i_track )
+{ 
+
+    char *config_varname = MODULE_STRING "-title-format";
+    cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
+    char *psz_mrl = CDDAFormatMRL( p_access, i_track );
+
+    if( psz_mrl ) 
+    {
+        char *psz_name;
+#ifdef HAVE_LIBCDDB
+	if (p_cdda->b_cddb_enabled)
+	{
+	    config_varname = MODULE_STRING "-cddb-title-format";
+	}
+#endif /*HAVE_LIBCDDB*/
+	psz_name = 
+	  CDDAFormatStr( p_access, p_cdda,
+			 config_GetPsz( p_access, config_varname ),
+			 psz_mrl, i_track );
+	free(psz_mrl);
+	return psz_name;
+    }
+    return(NULL);
+}
+
 /* Adds a string-valued entry to the playlist information under "Track"
    if the string is not null or the null string.
  */
@@ -758,46 +795,33 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                               "%s", FIELD);                              \
     }
 
-playlist_item_t *
+static playlist_item_t *
 CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
                         playlist_t *p_playlist, playlist_item_t *p_item, 
-                        track_t i_track, char *psz_mrl, int psz_mrl_max )
+                        track_t i_track )
 {
   unsigned int i_track_frames = 
     cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) - 
     cdio_get_track_lsn(p_cdda->p_cdio, i_track);
     mtime_t i_mduration = 
       i_track_frames * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) ;
-    char *psz_title;
-    char *config_varname = MODULE_STRING "-title-format";
+    char *psz_title = NULL;
+    char *psz_mrl   = NULL;
 
     playlist_item_t *p_child = NULL;
 
-    if( !p_item )
-    {
-        return NULL;
-    }
+    if( !p_item ) return NULL;
 
-#ifdef HAVE_LIBCDDB
-    if (p_cdda->b_cddb_enabled)
-    {
-        config_varname = MODULE_STRING "-cddb-title-format";
-    }
-#endif /*HAVE_LIBCDDB*/
-
-
-    snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u",
-             CDDA_MRL_PREFIX, p_cdda->psz_source, i_track);
-
-    psz_title = CDDAFormatStr( p_access, p_cdda,
-                               config_GetPsz( p_access, config_varname ),
-                               psz_mrl, i_track);
+    psz_title = CDDAFormatTitle( p_access, i_track ) ;
+    psz_mrl = CDDAFormatMRL( p_access, i_track  ) ;
 
     dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld",
                psz_mrl, psz_title, (long int) i_mduration / 1000000 );
 
     p_child = playlist_ItemNew( p_playlist, psz_mrl, psz_title );
     p_child->input.i_duration   = i_mduration;
+    free(psz_mrl);
+    free(psz_title);
 
     if( !p_child ) return NULL;
 
@@ -869,14 +893,11 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
                    vlc_bool_t b_single_track )
 {
     int i;
-    playlist_t * p_playlist;
-    char       * psz_mrl = NULL;
-    unsigned int psz_mrl_max = strlen(CDDA_MRL_PREFIX) 
-      + strlen(p_cdda->psz_source) +
-      + strlen("@T") + strlen("100") + 1;
+    playlist_t * p_playlist = NULL;
     const track_t i_first_track = p_cdda->i_first_track;
-    playlist_item_t *p_item;
+    playlist_item_t *p_item = NULL;
     vlc_bool_t b_play = VLC_FALSE;
+    track_t    i_track;
 
 #ifdef HAVE_LIBCDDB
     p_cdda->b_cddb_enabled =
@@ -888,48 +909,39 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         return VLC_SUCCESS;
 #endif
 
-    psz_mrl = malloc( psz_mrl_max );
-
-    if( psz_mrl == NULL )
-    {
-        msg_Warn( p_access, "out of memory" );
-        return VLC_ENOMEM;
+    if (! p_cdda->b_nav_mode ) {
+        p_playlist = (playlist_t *) vlc_object_find( p_access, 
+						     VLC_OBJECT_PLAYLIST,
+						     FIND_ANYWHERE );
+	if( !p_playlist )
+	  {
+	      msg_Warn( p_access, "can't find playlist" );
+	      return VLC_EGENERIC;
+	  }
     }
 
-    p_playlist = (playlist_t *) vlc_object_find( p_access, VLC_OBJECT_PLAYLIST,
-                                               FIND_ANYWHERE );
-    if( !p_playlist )
-    {
-        msg_Warn( p_access, "can't find playlist" );
-        free(psz_mrl);
-        return VLC_EGENERIC;
-    }
-
-    if( b_single_track )
-    {
-        snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", CDDA_MRL_PREFIX, 
-		 p_cdda->psz_source, p_cdda->i_track);
-        CDDAMetaInfoInit( p_access );
-        CDDAMetaInfo( p_access, p_cdda->i_track, psz_mrl );
+    if( b_single_track || p_cdda->b_nav_mode ) {
+        i_track = p_cdda->i_track;
     }
     else
     {
-        snprintf(psz_mrl, psz_mrl_max, "%s%s", CDDA_MRL_PREFIX, 
-		 p_cdda->psz_source);
-        CDDAMetaInfoInit( p_access );
-        CDDAMetaInfo( p_access, CDIO_INVALID_TRACK, psz_mrl );
+        i_track = CDIO_INVALID_TRACK;
     }
+    CDDAMetaInfoInit( p_access );
+    CDDAMetaInfo( p_access, p_cdda->i_track );
 
-    p_item = playlist_LockItemGetByInput( p_playlist,
+    if (p_playlist) {
+      p_item = playlist_LockItemGetByInput( p_playlist,
                         ((input_thread_t *)p_access->p_parent)->input.p_item );
 
-    if( p_item == p_playlist->status.p_item && !b_single_track )
-    {
-        b_play = VLC_TRUE;
-    }
-    else
-    {
-        b_play = VLC_FALSE;
+      if( p_item == p_playlist->status.p_item && !b_single_track )
+	{
+	  b_play = VLC_TRUE;
+	}
+      else
+	{
+	  b_play = VLC_FALSE;
+	}
     }
 
     if( b_single_track )
@@ -952,20 +964,25 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         t->i_length = I64C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
 
 
-        CDDAAddMetaToItem( p_access, p_cdda, p_item, i_track, VLC_FALSE );
+	if (p_item)
+	  CDDAAddMetaToItem( p_access, p_cdda, p_item, i_track, VLC_FALSE );
 
         p_cdda->i_titles = 1;
         p_access->info.i_size =
 	  i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
-	p_item->input.psz_uri    = strdup(psz_mrl);
+	p_item->input.psz_uri    = CDDAFormatMRL(p_access, i_track);
 	p_item->input.i_duration = i_track_frames 
 	  * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC);
     }
     else
     {
-        input_title_t *t;
-        playlist_ItemToNode( p_playlist, p_item );
+	input_title_t *t;
+
+
+	if ( ! p_cdda->b_nav_mode )
+	  playlist_ItemToNode( p_playlist, p_item );
+
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
         {
             playlist_item_t *p_child;
@@ -979,13 +996,16 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
             asprintf( &t->psz_name, _("Track %i"), i_track );
             t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 
-            t->i_length = I64C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
+            t->i_length = I64C(1000000) * t->i_size 
+	      / CDDA_FREQUENCY_SAMPLE / 4;
 
-            p_child = CDDACreatePlaylistItem( p_access, p_cdda, p_playlist,
-                                              p_item,
-                                              i_track, psz_mrl,
-                                              psz_mrl_max ) ;
-            CDDAAddMetaToItem( p_access, p_cdda, p_child, i_track, VLC_TRUE );
+	    if ( ! p_cdda->b_nav_mode ) {
+	      p_child = CDDACreatePlaylistItem( p_access, p_cdda, p_playlist,
+						p_item,
+						i_track );
+	      CDDAAddMetaToItem( p_access, p_cdda, p_child, i_track, 
+				 VLC_TRUE );
+	    }
         }
 
         p_cdda->i_titles = p_cdda->i_tracks;
@@ -993,19 +1013,22 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 	  cdio_get_track_lba(p_cdda->p_cdio, CDIO_CDROM_LEADOUT_TRACK)
 	  * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
-	p_item->input.i_duration = 
-	  p_access->info.i_size * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) ;
-	p_item->input.psz_uri    = strdup(psz_mrl);
+	if (p_item) {
+	    p_item->input.i_duration = 
+	      p_access->info.i_size * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) ;
+	    p_item->input.psz_uri    = CDDAFormatMRL(p_access, 
+						     p_cdda->i_track);
+	}
     }
+    
 
     if( b_play )
     {
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                           p_playlist->status.i_view,
                           p_playlist->status.p_item, NULL );
+	vlc_object_release( p_playlist );
     }
-
-    vlc_object_release( p_playlist );
 
     return VLC_SUCCESS;
 }

@@ -99,14 +99,14 @@ vlc_module_begin();
     set_description( _("Compact Disc Digital Audio (CD-DA) input") );
     set_capability( "access2", 10 /* compare with priority of cdda */ );
     set_shortname( N_("Audio CD"));
-    set_callbacks( E_(CDDAOpen), E_(CDDAClose) );
+    set_callbacks( CDDAOpen, CDDAClose );
     add_shortcut( "cddax" );
     add_shortcut( "cd" );
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_ACCESS );
 
     /* Configuration options */
-    add_integer ( MODULE_STRING "-debug", 0, E_(CDDADebugCB),
+    add_integer ( MODULE_STRING "-debug", 0, CDDADebugCB,
                   N_("If nonzero, this gives additional debug information."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
@@ -116,7 +116,7 @@ vlc_module_begin();
                  CACHING_LONGTEXT, VLC_TRUE );
 
     add_integer( MODULE_STRING "-blocks-per-read",
-                 DEFAULT_BLOCKS_PER_READ, E_(CDDABlocksPerReadCB),
+                 DEFAULT_BLOCKS_PER_READ, CDDABlocksPerReadCB,
                  N_("Number of blocks per CD read"),
                  BLOCKS_PER_READ_LONGTEXT, VLC_TRUE );
 
@@ -132,11 +132,11 @@ vlc_module_begin();
 
 #ifdef HAVE_LIBCDDB
     add_string( MODULE_STRING "-cddb-title-format",
-                "Track %T. %t - %p", NULL,
+                "Track %T. %t - %p %A", NULL,
                 N_("Format to use in playlist \"title\" field when using CDDB"),
                 CDDB_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
-    add_bool( MODULE_STRING "-cddb-enabled", 1, E_(CDDBEnabledCB),
+    add_bool( MODULE_STRING "-cddb-enabled", 1, CDDBEnabledCB,
               N_("Do CDDB lookups?"),
               N_("If set, lookup CD-DA track information using the CDDB "
                  "protocol"),
@@ -179,7 +179,7 @@ vlc_module_begin();
                 N_("Directory to cache CDDB requests"),
 		VLC_TRUE );
 
-    add_bool( MODULE_STRING "-cdtext-prefer", VLC_TRUE, E_(CDTextPreferCB),
+    add_bool( MODULE_STRING "-cdtext-prefer", VLC_TRUE, CDTextPreferCB,
               N_("Prefer CD-Text info to CDDB info?"),
               N_("If set, CD-Text information will be preferred "
 		 "to CDDB information when both are available"),
@@ -187,9 +187,20 @@ vlc_module_begin();
 
 #endif
 
-    add_bool( MODULE_STRING "-cdtext-enabled", VLC_TRUE, E_(CDTextEnabledCB),
+    add_bool( MODULE_STRING "-cdtext-enabled", VLC_TRUE, CDTextEnabledCB,
               N_("Do CD-Text lookups?"),
               N_("If set, get CD-Text information"),
+              VLC_FALSE );
+
+    add_bool( MODULE_STRING "-navigation-mode", VLC_TRUE, 
+#if FIXED
+	      CDDANavModeCB,
+#else
+	      NULL,
+#endif
+              N_("Use Navigation-style playback?"),
+              N_("If set, tracks are navigated via Navagation rather than "
+		 "a playlist entries"),
               VLC_FALSE );
 
 vlc_module_end();

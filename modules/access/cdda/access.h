@@ -25,9 +25,9 @@
  * Open: open cdda device or image file and initialize structures 
  * for subsequent operations.
  *****************************************************************************/
-int  E_(CDDAOpen)     ( vlc_object_t * );
+int  CDDAOpen     ( vlc_object_t * );
 
 /*****************************************************************************
  * CDDAClose: closes cdda and frees any resources associded with it.
  *****************************************************************************/
-void E_(CDDAClose)    ( vlc_object_t * );
+void CDDAClose    ( vlc_object_t * );

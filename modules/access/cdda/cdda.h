@@ -107,6 +107,7 @@ typedef struct cdda_data_s
 
   WAVEHEADER   waveheader;            /* Wave header for the output data  */
   vlc_bool_t   b_header;
+  vlc_bool_t   b_nav_mode;
   
   input_thread_t *p_input;
   

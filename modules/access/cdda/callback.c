@@ -25,7 +25,7 @@
 #include "cdda.h"
 
 int
-E_(CDDADebugCB)   ( vlc_object_t *p_this, const char *psz_name,
+CDDADebugCB   ( vlc_object_t *p_this, const char *psz_name,
                     vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     cdda_data_t *p_cdda;
@@ -46,7 +46,7 @@ E_(CDDADebugCB)   ( vlc_object_t *p_this, const char *psz_name,
 /* FIXME: could probably shorten some of the below boilerplate code...
 */
 int
-E_(CDDBEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
+CDDBEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
                       vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     cdda_data_t *p_cdda;
@@ -68,7 +68,7 @@ E_(CDDBEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
 }
 
 int
-E_(CDTextEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
+CDTextEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
                         vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     cdda_data_t *p_cdda;
@@ -79,16 +79,35 @@ E_(CDTextEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
 
     if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
     {
-        msg_Dbg( p_cdda_input, "Old CDText Enabled (x%0x) %d, new (x%0x) %d",
-                 p_cdda->b_cdtext_enabled, p_cdda->b_cdtext_enabled,
-                 val.b_bool, val.b_bool);
+        msg_Dbg( p_cdda_input, "Old CDText Enabled %d, new %d",
+                 p_cdda->b_cdtext_enabled, val.b_bool);
     }
     p_cdda->b_cdtext_enabled = val.b_bool;
     return VLC_SUCCESS;
 }
 
 int
-E_(CDTextPreferCB)   ( vlc_object_t *p_this, const char *psz_name,
+CDDANavModeCB( vlc_object_t *p_this, const char *psz_name,
+                        vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+    cdda_data_t *p_cdda;
+
+    if (NULL == p_cdda_input) return VLC_EGENERIC;
+
+    p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
+    {
+        msg_Dbg( p_cdda_input, 
+		 "Old Navigation Mode Enabled %d, new %d",
+                 p_cdda->b_nav_mode, val.b_bool);
+    }
+    p_cdda->b_nav_mode = val.b_bool;
+    return VLC_SUCCESS;
+}
+
+int
+CDTextPreferCB   ( vlc_object_t *p_this, const char *psz_name,
                        vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     cdda_data_t *p_cdda;
@@ -110,7 +129,7 @@ E_(CDTextPreferCB)   ( vlc_object_t *p_this, const char *psz_name,
 }
 
 int
-E_(CDDABlocksPerReadCB) ( vlc_object_t *p_this, const char *psz_name,
+CDDABlocksPerReadCB ( vlc_object_t *p_this, const char *psz_name,
                           vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     cdda_data_t *p_cdda;

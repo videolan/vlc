@@ -32,8 +32,7 @@ int      CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
  we handle Meta Information requests and basically copy what we've
  saved here.
  */
-void     CDDAMetaInfo( access_t *p_access, track_t i_track, 
-		       /*const*/ char *psz_mrl  );
+void     CDDAMetaInfo( access_t *p_access, track_t i_track );
 
 /*
  Saves Meta Information about the CD-DA.
@@ -43,12 +42,5 @@ void     CDDAMetaInfo( access_t *p_access, track_t i_track,
  */
 void     CDDAMetaInfoInit( access_t *p_access );
 
+char *CDDAFormatTitle( const access_t *p_access, track_t i_track );
 
-/*
- Creates a playlist item filling the meta information about that playlist
- item.
- */
-playlist_item_t *
-CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
-                        playlist_t *p_playlist, playlist_item_t *p_item,
-                        track_t i_track, char *psz_mrl, int psz_mrl_max );
