@@ -893,14 +893,13 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
 
     /* resolv */
 #ifdef HAVE_GETADDRINFO
-
     {
         vlc_value_t val;
         char psz_port[6];
         struct addrinfo hints;
-        
-        memset( &hints, 0, sizeof( hints ) );
+
 #if 0
+        memset( &hints, 0, sizeof( hints ) );
         /* Check if we have force ipv4 or ipv6 */
         var_Create( p_this, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv4", &val );
@@ -915,12 +914,12 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
          *
          */
         hints.ai_family = PF_INET;
-#endif
 
         var_Create( p_this, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
         var_Get( p_this, "ipv6", &val );
         if( val.b_bool )
-            hints.ai_family = PF_INET6;
+            hints.ai_family = 0; // try IPv6, then IPv4
+#endif
 
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_flags = AI_PASSIVE;
@@ -1052,7 +1051,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
 
         /* create the listening socket */
         fd = socket( res->ai_family, res->ai_socktype, res->ai_protocol );
-        if( fd < 0 )
+        if( fd == -1 )
             continue;
 
         /* reuse socket */
@@ -1069,7 +1068,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         if( bind( fd, res->ai_addr, res->ai_addrlen ) )
         {
             msg_Err( p_this, "cannot bind socket" );
-            continue;
+            goto socket_error;
         }
         /* set to non-blocking */
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -1078,7 +1077,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
             if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
             {
                 msg_Err( p_this, "cannot set socket to non-blocking mode" );
-                continue;
+                goto socket_error;
             }
         }
 #else
@@ -1087,12 +1086,12 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
             if( ( i_flags = fcntl( fd, F_GETFL, 0 ) ) < 0 )
             {
                 msg_Err( p_this, "cannot F_GETFL socket" );
-                continue;
+                goto socket_error;
             }
             if( fcntl( fd, F_SETFL, i_flags | O_NONBLOCK ) < 0 )
             {
                 msg_Err( p_this, "cannot F_SETFL O_NONBLOCK" );
-                continue;
+                goto socket_error;
             }
         }
 #endif
@@ -1100,8 +1099,15 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, char *psz_host, int i_port )
         if( listen( fd, LISTEN_BACKLOG ) < 0 )
         {
             msg_Err( p_this, "cannot listen socket" );
-            continue;
+            close( fd );
+            fd = -1;
         }
+
+        continue;
+
+socket_error:
+        close( fd );
+        fd = -1;
     }
 
     freeaddrinfo( res );
