@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.6 2002/08/18 14:11:35 sigmunau Exp $
+ * $Id: audio.c,v 1.7 2002/08/18 14:33:00 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -35,7 +35,6 @@
 #ifdef HAVE_ID3TAG_H
 #include <id3tag.h>
 #endif
-#undef HAVE_ID3TAG_H
 
 /*****************************************************************************
  * Local prototypes
