@@ -1,5 +1,5 @@
 /*****************************************************************************
- * rc.cpp : stdin/stdout plugin for vlc
+ * rc.cpp : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  * $Id: rc.cpp,v 0.1 2001/04/27 shurdeek
@@ -62,7 +62,7 @@ void _M( intf_getfunctions )( function_list_t * p_function_list );
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "rc interface module";
+    p_module->psz_longname = "remote control interface module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL

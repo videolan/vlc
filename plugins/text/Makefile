@@ -31,10 +31,12 @@ include ../../Makefile.modules
 
 ../../lib/ncurses.a: $(BUILTIN_NCURSES)
 	ar r $@ $^
+	$(RANLIB) $@
 
 ../../lib/rc.so: $(PLUGIN_RC)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS)
 
 ../../lib/rc.a: $(BUILTIN_RC)
 	ar r $@ $^
+	$(RANLIB) $@
 

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.21 2001/04/28 03:36:25 sam Exp $
+ * $Id: modules.h,v 1.22 2001/05/01 04:18:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -24,6 +24,25 @@
 #ifdef WIN32
 #include <sys/types.h>                                              /* off_t */
 #endif
+
+/*****************************************************************************
+ * bank_t, p_bank (global variable)
+ *****************************************************************************
+ * This global variable is accessed by any function using modules.
+ *****************************************************************************/
+typedef struct
+{
+    struct module_s *   first; /* First module of the bank */
+
+    vlc_mutex_t         lock;  /* Global lock -- you can't imagine how awful it
+                                  is to design thread-safe linked lists. */
+} bank_t;
+
+extern bank_t *p_bank;
+
+/*****************************************************************************
+ * Module #defines.
+ *****************************************************************************/
 
 /* Number of tries before we unload an unused module */
 #define MODULE_HIDE_DELAY 100
@@ -224,15 +243,6 @@ typedef struct module_config_s
  * Bank and module description structures
  *****************************************************************************/
 
-/* The module bank structure */
-typedef struct module_bank_s
-{
-    struct module_s *   first; /* First module of the bank */
-
-    vlc_mutex_t         lock;  /* Global lock -- you can't imagine how awful it
-                                  is to design thread-safe linked lists. */
-} module_bank_t;
-
 /* The module description structure */
 typedef struct module_s
 {
@@ -275,14 +285,10 @@ typedef struct module_s
 /*****************************************************************************
  * Exported functions.
  *****************************************************************************/
-module_bank_t * module_CreateBank   ( void );
-void            module_InitBank     ( module_bank_t * p_bank );
-void            module_DestroyBank  ( module_bank_t * p_bank );
-void            module_ResetBank    ( module_bank_t * p_bank );
-void            module_ManageBank   ( module_bank_t * p_bank );
-
-module_t *      module_Need         ( module_bank_t *p_bank,
-                                      int i_capabilities, void *p_data );
-void            module_Unneed       ( module_bank_t * p_bank,
-                                      module_t * p_module );
+void            module_InitBank     ( void );
+void            module_EndBank      ( void );
+void            module_ResetBank    ( void );
+void            module_ManageBank   ( void );
+module_t *      module_Need         ( int i_capabilities, void *p_data );
+void            module_Unneed       ( module_t * p_module );
 

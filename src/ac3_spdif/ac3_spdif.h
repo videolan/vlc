@@ -2,7 +2,7 @@
  * ac3_spdif.h: header for ac3 pass-through
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.h,v 1.1 2001/04/29 02:48:51 stef Exp $
+ * $Id: ac3_spdif.h,v 1.2 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -21,10 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  ****************************************************************************/
 
-#ifndef _AC3_SPDIF_H
-#define _AC3_SPDIF_H
+#define SPDIF_FRAME_SIZE 6144
 
-#define SPDIF_FRAME 6144
+typedef struct ac3_info_s
+{
+    int i_bit_rate;
+    int i_frame_size;
+    int i_sample_rate;
+    int i_bs_mod;
+} ac3_info_t;
 
 /*****************************************************************************
  * ac3_spdif_thread_t : ac3 pass-through thread descriptor
@@ -45,12 +50,18 @@ typedef struct ac3_spdif_thread_s
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
     int                 i_available;
-                
+
+    /*
+     * Decoder properties
+     */
+    ac3_info_t          ac3_info;
+    u8 *                p_ac3;
+    u8 *                p_iec;
+
     /*
      * Output properties
      */
-    aout_fifo_t *       p_aout_fifo;/* stores the decompressed audio frames */
-    aout_thread_t *     p_aout;         /* needed to create the audio fifo */
+    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
 
 } ac3_spdif_thread_t;
 
@@ -59,4 +70,3 @@ typedef struct ac3_spdif_thread_s
  *****************************************************************************/
 vlc_thread_t    spdif_CreateThread( adec_config_t * p_config );
 
-#endif

@@ -33,4 +33,5 @@ include ../../Makefile.modules
 
 ../../lib/gtk.a: $(BUILTIN_C)
 	ar r $@ $^
+	$(RANLIB) $@
 

@@ -47,7 +47,10 @@ Disable audio output.
 Specify an audio output module: "dsp", "esd", for instance.
 .TP
 .B \-\-stereo, \-\-mono
-Choose stereo or mono audio output
+Choose stereo or mono audio output.
+.TP
+.B \-\-spdif
+Activate hardware AC3 pass-through mode.
 .TP
 .B \-\-novideo
 Disable video output.
@@ -145,6 +148,7 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_aout=<method name>   audio method
  vlc_dsp=<filename>       dsp device path
  vlc_stereo={1|0}         stereo or mono output
+ vlc_spdif={1|0}          AC3 pass-through mode
  vlc_audio_rate=<rate>    output rate
 .TP
 .B Video parameters:

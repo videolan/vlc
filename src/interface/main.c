@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.90 2001/04/29 02:48:51 stef Exp $
+ * $Id: main.c,v 1.91 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -182,9 +182,11 @@ static const struct option longopts[] =
 static const char *psz_shortopts = "hHvgt:T:u:a:s:c:I:A:V:";
 
 /*****************************************************************************
- * Global variable program_data - this is the one and only, see main.h
+ * Global variable program_data - these are the only ones, see main.h and
+ * modules.h
  *****************************************************************************/
 main_t *p_main;
+bank_t *p_bank;
 
 /*****************************************************************************
  * Local prototypes
@@ -214,8 +216,18 @@ static int  CPUCapabilities         ( void );
 int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     main_t  main_data;                      /* root of all data - see main.h */
+    bank_t  module_bank;
 
-    p_main = &main_data;                       /* set up the global variable */
+    p_main = &main_data;                      /* set up the global variables */
+    p_bank = &module_bank;
+
+    /*
+     * Initialize the main structure
+     */
+    p_main->i_cpu_capabilities = CPUCapabilities();
+    
+    p_main->p_aout = NULL;
+    p_main->p_vout = NULL;
 
     /*
      * System specific initialization code
@@ -224,8 +236,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     system_Create( &i_argc, ppsz_argv, ppsz_env );
 #endif
 
-    p_main->i_cpu_capabilities = CPUCapabilities();
-    
     /*
      * Test if our code is likely to run on this CPU 
      */
@@ -272,7 +282,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize playlist and get commandline files
      */
-    p_main->p_playlist = intf_PlaylistCreate( );
+    p_main->p_playlist = intf_PlaylistCreate();
     if( !p_main->p_playlist )
     {
         intf_ErrMsg( "playlist error: playlist initialization failed" );
@@ -289,15 +299,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize module bank
      */
-    p_main->p_bank = module_CreateBank( );
-    if( !p_main->p_bank )
-    {
-        intf_ErrMsg( "module error: module bank initialization failed" );
-        intf_PlaylistDestroy( p_main->p_playlist );
-        intf_MsgDestroy();
-        return( errno );
-    }
-    module_InitBank( p_main->p_bank );
+    module_InitBank();
 
     /*
      * Initialize shared resources and libraries
@@ -317,7 +319,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     if( !p_main->p_intf )
     {
         intf_ErrMsg( "intf error: interface initialization failed" );
-        module_DestroyBank( p_main->p_bank );
+        module_EndBank();
         intf_PlaylistDestroy( p_main->p_playlist );
         intf_MsgDestroy();
         return( errno );
@@ -329,57 +331,27 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     InitSignalHandler();
 
     /*
-     * Open audio device and start aout thread
-     */
-    if( p_main->b_audio )
-    {
-        p_main->p_aout = aout_CreateThread( NULL );
-        if( p_main->p_aout == NULL )
-        {
-            /* On error during audio initialization, switch off audio */
-            intf_ErrMsg( "aout error: audio initialization failed,"
-                         " audio is deactivated" );
-            p_main->b_audio = 0;
-        }
-    }
-
-    /*
-     * Open video device and start vout thread
-     */
-    if( p_main->b_video )
-    {
-        p_main->p_vout = vout_CreateThread( NULL );
-        if( p_main->p_vout == NULL )
-        {
-            /* On error during video initialization, switch off video */
-            intf_ErrMsg( "vout error: video initialization failed,"
-                         " video is deactivated" );
-            p_main->b_video = 0;
-        }
-    }
-
-    /* Flush messages before entering the main loop */
-    intf_FlushMsg();
-
-    /*
      * This is the main loop
      */
     p_main->p_intf->pf_run( p_main->p_intf );
 
+    /*
+     * Finished, destroy the interface
+     */
     intf_Destroy( p_main->p_intf );
 
     /*
-     * Close video device
+     * Close all video devices
      */
-    if( p_main->b_video )
+    if( p_main->p_vout != NULL )
     {
         vout_DestroyThread( p_main->p_vout, NULL );
     }
 
     /*
-     * Close audio device
+     * Close all audio devices
      */
-    if( p_main->b_audio )
+    if( p_main->p_aout != NULL )
     {
         aout_DestroyThread( p_main->p_aout, NULL );
     }
@@ -395,7 +367,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free module bank
      */
-    module_DestroyBank( p_main->p_bank );
+    module_EndBank();
 
     /*
      * Free playlist
@@ -524,7 +496,6 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->b_audio     = 1;
     p_main->b_video     = 1;
     p_main->b_channels  = 0;
-    p_main->b_spdif     = 0;
 
     p_main->i_warning_level = 4;
 
@@ -609,7 +580,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutIntVariable( AOUT_STEREO_VAR, 0 );
             break;
         case OPT_SPDIF:                                           /* --spdif */
-            p_main->b_spdif = 1;
+            main_PutIntVariable( AOUT_SPDIF_VAR, 1 );
             break;
 
         /* Video options */
@@ -763,7 +734,7 @@ static void Usage( int i_fashion )
           "\n      --noaudio                  \tdisable audio"
           "\n  -A, --aout <module>            \taudio output method"
           "\n      --stereo, --mono           \tstereo/mono audio"
-          "\n      --spdif                    \tac3 pass-through mode"
+          "\n      --spdif                    \tAC3 pass-through mode"
           "\n"
           "\n      --novideo                  \tdisable video"
           "\n  -V, --vout <module>            \tvideo output method"
@@ -809,6 +780,7 @@ static void Usage( int i_fashion )
         "\n  " AOUT_METHOD_VAR "=<method name>        \taudio method"
         "\n  " AOUT_DSP_VAR "=<filename>              \tdsp device path"
         "\n  " AOUT_STEREO_VAR "={1|0}                \tstereo or mono output"
+        "\n  " AOUT_SPDIF_VAR "={1|0}                 \tAC3 pass-through mode"
         "\n  " AOUT_RATE_VAR "=<rate>             \toutput rate" );
 
     /* Video parameters */

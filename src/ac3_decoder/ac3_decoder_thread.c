@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.30 2001/04/30 21:04:20 reno Exp $
+ * $Id: ac3_decoder_thread.c,v 1.31 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -97,7 +97,6 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
     /*
      * Initialize the output properties
      */
-    p_ac3dec_t->p_aout = p_config->p_aout;
     p_ac3dec_t->p_aout_fifo = NULL;
 
     /* Spawn the ac3 decoder thread */
@@ -120,8 +119,6 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
  *****************************************************************************/
 static int InitThread (ac3dec_thread_t * p_ac3dec_t)
 {
-    aout_fifo_t         aout_fifo;
-
     intf_DbgMsg("ac3dec debug: initializing ac3 decoder thread %p",p_ac3dec_t);
 
     p_ac3dec_t->p_config->decoder_config.pf_init_bit_stream(
@@ -129,15 +126,10 @@ static int InitThread (ac3dec_thread_t * p_ac3dec_t)
             p_ac3dec_t->p_config->decoder_config.p_decoder_fifo,
             BitstreamCallback, (void *) p_ac3dec_t );
 
-    
-    aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
-    aout_fifo.i_channels = 2;
-    aout_fifo.b_stereo = 1;
-
-    aout_fifo.l_frame_size = AC3DEC_FRAME_SIZE;
-
     /* Creating the audio output fifo */
-    if ((p_ac3dec_t->p_aout_fifo = aout_CreateFifo(p_ac3dec_t->p_aout, &aout_fifo)) == NULL)
+    p_ac3dec_t->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 0, 0,
+                                               AC3DEC_FRAME_SIZE, NULL  );
+    if ( p_ac3dec_t->p_aout_fifo == NULL )
     {
         return -1;
     }

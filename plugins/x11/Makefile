@@ -42,6 +42,7 @@ endif
 
 ../../lib/x11.a: $(BUILTIN_X11)
 	ar r $@ $^
+	$(RANLIB) $@
 
 ../../lib/xvideo.so: $(PLUGIN_XVIDEO)
 ifeq ($(SYS),nto-qnx)
@@ -52,4 +53,5 @@ endif
 
 ../../lib/xvideo.a: $(BUILTIN_XVIDEO)
 	ar r $@ $^
+	$(RANLIB) $@
 

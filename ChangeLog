@@ -4,7 +4,16 @@
 
 HEAD
 
-  * DVD title change no longer restart the input.
+  * Mandatory step for video output IV and the audio output quality
+    fix: the output threads are now spawned when a decoder needs one,
+    so it can decide the audio frequency or the video window size.
+  * Fixed a few buffer overflows in the Gnome interface.
+  * The module bank is now a global variable. The video output bank and
+    the audio output bank might follow (when they exist).
+  * Coding style and organization fixes to the spdif decoder.
+  * autoconf and Makefile changes by Arnaud Gomes-do-Vale
+    <arnaud@carrosse.frmug.org>.
+  * DVD title change no longer restarts the input.
   * BeOS crash fix by Wade Majors <guru@startrek.com>.
   * Slight modification in ClockManageRef: after a synchro reinit, we still
     do the mwait and re-init last-cr.

@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: main.h,v 1.16 2001/04/29 02:48:51 stef Exp $
+ * $Id: main.h,v 1.17 2001/05/01 04:18:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -48,7 +48,6 @@ typedef struct
     boolean_t              b_audio;             /* is audio output allowed ? */
     boolean_t              b_video;             /* is video output allowed ? */
     boolean_t              b_channels;    /* is channel changing supported ? */
-    boolean_t              b_spdif;                          /* spdif mode ? */
 
     /* Unique threads */
     p_vout_thread_t        p_vout;                    /* video output thread */
@@ -57,7 +56,6 @@ typedef struct
 
     /* Shared data - these structures are accessed directly from p_main by
      * several modules */
-    struct module_bank_s * p_bank;                            /* module bank */
     p_playlist_t           p_playlist;                           /* playlist */
     p_intf_msg_t           p_msg;                 /* messages interface data */
     p_input_channel_t      p_channel;                /* channel library data */

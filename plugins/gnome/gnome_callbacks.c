@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.24 2001/04/22 00:08:26 stef Exp $
+ * $Id: gnome_callbacks.c,v 1.25 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -1011,7 +1011,8 @@ on_disc_ok_clicked                     (GtkButton       *button,
                                          GTK_WIDGET(button), "disc_name" ) ) );
 
     /* "dvd:foo" has size 5 + strlen(foo) */
-    psz_source = malloc( 5 + strlen( psz_device ) );
+    psz_source = malloc( 3 /* "dvd" */ + 1 /* ":" */
+                           + strlen( psz_device ) + 1 /* "\0" */ );
     if( psz_source == NULL )
     {
         return;
@@ -1110,7 +1111,9 @@ on_network_ok_clicked                  (GtkButton       *button,
     }
 
     /* Allocate room for "protocol://server:port" */
-    psz_source = malloc( strlen( psz_protocol ) + strlen( psz_server ) + 10 );
+    psz_source = malloc( strlen( psz_protocol ) + 3 /* "://" */
+                           + strlen( psz_server ) + 1 /* ":" */
+                           + 5 /* 0-65535 */ + 1 /* "\0" */ );
     if( psz_source == NULL )
     {
         return;

@@ -46,7 +46,7 @@ D: AC3 decoder
 
 N: Nilmoni Deb
 E: ndeb@ece.cmu.edu
-D: Minor configure.in and Makefile.in fixes
+D: Minor autoconf and Makefile fixes
 
 N: Cyril Deguet
 C: asmax
@@ -74,6 +74,10 @@ C: henri
 D: ALSA audio output
 D: input netlist
 D: MPEG TS input
+
+N: Arnaud Gomes-do-Vale
+E: arnaud@carrosse.frmug.org
+D: autoconf patches
 
 N: Jean-Philippe Grimaldi
 E: jeanphi@via.ecp.fr
@@ -148,7 +152,7 @@ D: MPEG video decoder
 
 N: Arkadiusz Miskiewicz
 E: misiek@pld.ORG.PL
-D: Makefile and configure patches
+D: autoconf and Makefile patches
 
 N: Olivier Pomel
 E: pomel@via.ecp.fr
@@ -169,7 +173,7 @@ D: BeOS video output (BBitmap and Overlay)
 
 N: Espen Skoglund
 E: esk@ira.uka.de
-D: FreeBSD configure.in and Makefile patches
+D: FreeBSD autoconf and Makefile patches
 
 N: Benoit Steiner
 E: benny@via.ecp.fr

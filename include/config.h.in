@@ -238,6 +238,10 @@
 #define AOUT_STEREO_VAR                 "vlc_stereo"
 #define AOUT_STEREO_DEFAULT             1
 
+/* Environment variable for spdif mode */
+#define AOUT_SPDIF_VAR                  "vlc_spdif"
+#define AOUT_SPDIF_DEFAULT              0
+
 /* Volume */
 #define VOLUME_DEFAULT                  512
 #define VOLUME_STEP                     128

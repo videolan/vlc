@@ -22,13 +22,13 @@ $(PLUGIN_QT): %.o: .dep/%.dpp
 $(PLUGIN_QT): %.o: %.moc
 	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:%.moc=%.cpp)
 $(PLUGIN_QT:%.o=%.moc): %.moc: %.cpp
-	moc -i $< -o $@
+	$(MOC) -i $< -o $@
 
 $(BUILTIN_QT): BUILTIN_%.o: .dep/%.dpp
 $(BUILTIN_QT): %.o: %.moc
 	$(CC) $(CFLAGS) -DBUILTIN -I/usr/include/qt -I${QTDIR}/include -c -o $@ $(<:BUILTIN_%.moc=%.cpp)
 $(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
-	moc -i $< -o $@
+	$(MOC) -i $< -o $@
 
 #
 # Real targets
@@ -39,4 +39,5 @@ $(BUILTIN_QT:%.o=%.moc): BUILTIN_%.moc: %.cpp
 
 ../../lib/qt.a: $(BUILTIN_QT)
 	ar r $@ $^
+	$(RANLIB) $@
 

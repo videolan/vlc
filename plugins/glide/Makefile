@@ -35,4 +35,5 @@ $(BUILTIN_GLIDE): BUILTIN_%.o: %.c
 
 ../../lib/glide.a: $(BUILTIN_GLIDE)
 	ar r $@ $^
+	$(RANLIB) $@
 

@@ -2,7 +2,7 @@
  * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.c,v 1.49 2001/04/25 10:22:32 massiot Exp $
+ * $Id: audio_decoder.c,v 1.50 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -102,7 +102,6 @@ vlc_thread_t adec_CreateThread ( adec_config_t * p_config )
     /*
      * Initialize the output properties
      */
-    p_adec->p_aout = p_config->p_aout;
     p_adec->p_aout_fifo = NULL;
 
     /* Spawn the audio decoder thread */
@@ -128,21 +127,15 @@ vlc_thread_t adec_CreateThread ( adec_config_t * p_config )
  *****************************************************************************/
 static int InitThread (adec_thread_t * p_adec)
 {
-    aout_fifo_t          aout_fifo;
-
     intf_DbgMsg ("adec debug: initializing audio decoder thread %p", p_adec);
 
     p_adec->p_config->decoder_config.pf_init_bit_stream( &p_adec->bit_stream,
         p_adec->p_config->decoder_config.p_decoder_fifo, NULL, NULL );
 
-    aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
-    aout_fifo.i_channels = 2;
-    aout_fifo.b_stereo = 1;
-    aout_fifo.l_frame_size = ADEC_FRAME_SIZE;
-
     /* Creating the audio output fifo */
-    if ( (p_adec->p_aout_fifo =
-                aout_CreateFifo(p_adec->p_aout, &aout_fifo)) == NULL ) 
+    p_adec->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 0, 0,
+                                           ADEC_FRAME_SIZE, NULL );
+    if ( p_adec->p_aout_fifo == NULL ) 
     {
         return -1;
     }
@@ -163,9 +156,6 @@ static void RunThread (adec_thread_t * p_adec)
 
     intf_DbgMsg ( "adec debug: running audio decoder thread (%p) (pid == %i)",
                   p_adec, getpid() );
-
-    /* You really suck */
-    //msleep ( INPUT_PTS_DELAY );
 
     /* Initializing the audio decoder thread */
     p_adec->p_fifo->b_error = InitThread (p_adec);

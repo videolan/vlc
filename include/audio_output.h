@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.32 2001/04/29 02:48:51 stef Exp $
+ * $Id: audio_output.h,v 1.33 2001/05/01 04:18:17 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -20,27 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/*****************************************************************************
- * Required headers:
- * - "common.h"                                                   ( boolean_t )
- * - "mtime.h"                                                      ( mtime_t )
- * - "threads.h"                                               ( vlc_thread_t )
- *****************************************************************************/
-
-/* TODO :
- *
- * - Créer un flag destroy dans les fifos audio pour indiquer au thread audio
- *   qu'il peut libérer la mémoire occupée par le buffer de la fifo lorsqu'il
- *   le désire (fin du son ou fin du thread)
- *
- */
-
-/*
- * Macros
- */
-#define AOUT_FIFO_ISEMPTY( fifo )       ( (fifo).l_end_frame == (fifo).l_start_frame )
-#define AOUT_FIFO_ISFULL( fifo )        ( ((((fifo).l_end_frame + 1) - (fifo).l_start_frame) & AOUT_FIFO_SIZE) == 0 )
 
 /*****************************************************************************
  * aout_increment_t
@@ -112,23 +91,22 @@ typedef struct aout_fifo_s
 
 } aout_fifo_t;
 
+#define AOUT_FIFO_ISEMPTY( fifo ) \
+  ( (fifo).l_end_frame == (fifo).l_start_frame )
+
+#define AOUT_FIFO_ISFULL( fifo ) \
+  ( ((((fifo).l_end_frame + 1) - (fifo).l_start_frame) & AOUT_FIFO_SIZE) == 0 )
+
 #define AOUT_EMPTY_FIFO         0
 #define AOUT_INTF_MONO_FIFO     1
 #define AOUT_INTF_STEREO_FIFO   2
 #define AOUT_ADEC_MONO_FIFO     3
 #define AOUT_ADEC_STEREO_FIFO   4
+#define AOUT_ADEC_SPDIF_FIFO    5
 
 /*****************************************************************************
  * aout_thread_t : audio output thread descriptor
  *****************************************************************************/
-typedef int  (aout_open_t)       ( p_aout_thread_t p_aout );
-typedef int  (aout_setformat_t)  ( p_aout_thread_t p_aout );
-typedef long (aout_getbufinfo_t) ( p_aout_thread_t p_aout,
-                                   long l_buffer_limit );
-typedef void (aout_play_t)       ( p_aout_thread_t p_aout,
-                                   byte_t *buffer, int i_size );
-typedef void (aout_close_t)      ( p_aout_thread_t p_aout );
-
 typedef struct aout_thread_s
 {
     vlc_thread_t        thread_id;
@@ -140,11 +118,11 @@ typedef struct aout_thread_s
 
     /* Plugin used and shortcuts to access its capabilities */
     struct module_s *   p_module;
-    aout_open_t *       pf_open;
-    aout_setformat_t *  pf_setformat;
-    aout_getbufinfo_t * pf_getbufinfo;
-    aout_play_t *       pf_play;
-    aout_close_t *      pf_close;
+    int              ( *pf_open )       ( p_aout_thread_t );
+    int              ( *pf_setformat )  ( p_aout_thread_t );
+    long             ( *pf_getbufinfo ) ( p_aout_thread_t, long );
+    void             ( *pf_play )       ( p_aout_thread_t, byte_t *, int );
+    void             ( *pf_close )      ( p_aout_thread_t );
 
     void *              buffer;
     /* The s32 buffer is used to mix all the audio fifos together before
@@ -164,6 +142,8 @@ typedef struct aout_thread_s
     char *              psz_device;
     int                 i_fd;
 
+    /* The current volume */
+    int                 i_vol;
     /* Format of the audio output samples */
     int                 i_format;
     /* Number of channels */
@@ -177,10 +157,6 @@ typedef struct aout_thread_s
     /* there might be some useful private structure, such as audio_buf_info
      * for the OSS output */
     p_aout_sys_t        p_sys;
-
-
-    /* there is the current volume */
-    int                 vol;
 
 } aout_thread_t;
 
@@ -205,11 +181,9 @@ typedef struct aout_thread_s
  * Prototypes
  *****************************************************************************/
 aout_thread_t * aout_CreateThread       ( int *pi_status );
-void            aout_DestroyThread      ( aout_thread_t *p_aout,
-                                          int *pi_status );
+void            aout_DestroyThread      ( aout_thread_t *, int * );
 
-aout_fifo_t *   aout_CreateFifo         ( aout_thread_t *p_aout,
-                                          aout_fifo_t *p_fifo );
+aout_fifo_t *   aout_CreateFifo         ( int, int, long, long, long, void * );
 void            aout_DestroyFifo        ( aout_fifo_t *p_fifo );
 void            aout_FreeFifo           ( aout_fifo_t *p_fifo );
 

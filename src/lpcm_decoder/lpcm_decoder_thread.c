@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.c,v 1.13 2001/04/06 09:15:48 sam Exp $
+ * $Id: lpcm_decoder_thread.c,v 1.14 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -84,7 +84,6 @@ vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
     /*
      * Initialize the output properties
      */
-    p_lpcmdec->p_aout = p_config->p_aout;
     p_lpcmdec->p_aout_fifo = NULL;
 
     /* Spawn the lpcm decoder thread */
@@ -105,7 +104,6 @@ vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
  *****************************************************************************/
 static int InitThread (lpcmdec_thread_t * p_lpcmdec)
 {
-    aout_fifo_t         aout_fifo;
     lpcm_byte_stream_t * byte_stream;
 
     intf_DbgMsg ( "LPCM Debug: initializing lpcm decoder thread %p", p_lpcmdec );
@@ -127,14 +125,11 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
     byte_stream->info = p_lpcmdec;
     vlc_mutex_unlock (&p_lpcmdec->p_fifo->data_lock);
 
-    aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
-    aout_fifo.i_channels = 2;
-    aout_fifo.b_stereo = 1;
-
-    aout_fifo.l_frame_size = LPCMDEC_FRAME_SIZE;
-
     /* Creating the audio output fifo */
-    if ((p_lpcmdec->p_aout_fifo = aout_CreateFifo(p_lpcmdec->p_aout, &aout_fifo)) == NULL) {
+    p_lpcmdec->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_STEREO_FIFO, 2, 0, 0,
+                                              LPCMDEC_FRAME_SIZE, NULL  );
+    if ( p_lpcmdec->p_aout_fifo == NULL )
+    {
         return -1;
     }
 

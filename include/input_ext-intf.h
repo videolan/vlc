@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.34 2001/04/20 05:40:03 stef Exp $
+ * $Id: input_ext-intf.h,v 1.35 2001/05/01 04:18:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -134,7 +134,6 @@ typedef struct pgrm_descriptor_s
 
     /* Decoders control */
     struct vout_thread_s *  p_vout;
-    struct aout_thread_s *  p_aout;
 
     int                     i_es_number;      /* size of the following array */
     es_descriptor_t **      pp_es;                /* array of pointers to ES */
@@ -250,7 +249,6 @@ typedef struct i_p_config_s
  *****************************************************************************
  * This structure includes all the local static variables of an input thread
  *****************************************************************************/
-struct aout_thread_s;
 struct vout_thread_s;
 
 typedef struct input_thread_s
@@ -305,7 +303,6 @@ typedef struct input_thread_s
     stream_descriptor_t     stream;                            /* PAT tables */
 
     /* For auto-launch of decoders */
-    struct aout_thread_s *  p_default_aout;
     struct vout_thread_s *  p_default_vout;
 
 #ifdef STATS

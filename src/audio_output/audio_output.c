@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.58 2001/04/29 02:48:51 stef Exp $
+ * $Id: audio_output.c,v 1.59 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -82,8 +82,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* Choose the best module */
-    p_aout->p_module = module_Need( p_main->p_bank,
-                                    MODULE_CAPABILITY_AOUT, NULL );
+    p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT, NULL );
 
     if( p_aout->p_module == NULL )
     {
@@ -105,7 +104,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
      */
     if ( p_aout->pf_open( p_aout ) )
     {
-        module_Unneed( p_main->p_bank, p_aout->p_module );
+        module_Unneed( p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -114,13 +113,13 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     {
         intf_ErrMsg( "aout error: null sample rate" );
         p_aout->pf_close( p_aout );
-        module_Unneed( p_main->p_bank, p_aout->p_module );
+        module_Unneed( p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
 
     /* special setting for ac3 pass-through mode */
-    if( p_main->b_spdif )
+    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) )
     {
         p_aout->i_format   = AOUT_FMT_AC3;
         p_aout->i_channels = 1;
@@ -133,13 +132,13 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if ( p_aout->pf_setformat( p_aout ) )
     {
         p_aout->pf_close( p_aout );
-        module_Unneed( p_main->p_bank, p_aout->p_module );
+        module_Unneed( p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
 
     /* Initialize the volume level */
-    p_aout->vol = VOLUME_DEFAULT;
+    p_aout->i_vol = VOLUME_DEFAULT;
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype
      * see vout to handle status correctly ?? however, it is not critical since
@@ -147,7 +146,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if( aout_SpawnThread( p_aout ) )
     {
         p_aout->pf_close( p_aout );
-        module_Unneed( p_main->p_bank, p_aout->p_module );
+        module_Unneed( p_aout->p_module );
         free( p_aout );
         return( NULL );
     }
@@ -337,7 +336,7 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     p_aout->pf_close( p_aout );
 
     /* Release the aout module */
-    module_Unneed( p_main->p_bank, p_aout->p_module );
+    module_Unneed( p_aout->p_module );
 
     /* Free structure */
     free( p_aout );

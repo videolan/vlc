@@ -535,7 +535,7 @@ void playorpause ( intf_thread_t *p_intf )
             {
                     if (p_main->p_aout != NULL)
                     {
-                            p_main->p_aout->vol = 0;
+                            p_main->p_aout->i_vol = 0;
                     }
                     p_main->p_vout->p_sys->playback_status = PAUSED;
                 SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPlay");
@@ -545,7 +545,7 @@ void playorpause ( intf_thread_t *p_intf )
             {
                     if (p_main->p_aout != NULL)
                     {
-                            p_main->p_aout->vol = p_main->p_vout->p_sys->vol_val;
+                            p_main->p_aout->i_vol = p_main->p_vout->p_sys->vol_val;
                     }
                     p_main->p_vout->p_sys->playback_status = PLAYING;
                 SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPause");
@@ -563,7 +563,7 @@ void stop ( intf_thread_t *p_intf )
             // silence the sound, otherwise very horrible
             if (p_main->p_aout != NULL)
             {
-                    p_main->p_aout->vol = 0;
+                    p_main->p_aout->i_vol = 0;
             }
             //snooze(400000);
             input_SetStatus(p_intf->p_input, INPUT_STATUS_END);
@@ -659,7 +659,7 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
                     {
                             if (p_main->p_aout != NULL)
                             {
-                                    p_main->p_aout->vol = 0;
+                                    p_main->p_aout->i_vol = 0;
                             }
                             //snooze(400000);
                             input_SetStatus(p_intf->p_input, INPUT_STATUS_FASTER);
@@ -672,7 +672,7 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
                     {
                             if (p_main->p_aout != NULL)
                             {
-                                    p_main->p_aout->vol = 0;
+                                    p_main->p_aout->i_vol = 0;
                             }
                             //snooze(400000);
                             input_SetStatus(p_intf->p_input, INPUT_STATUS_SLOWER);
@@ -706,7 +706,7 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 		// adjust the volume
                     if (p_main->p_aout != NULL) 
                     {
-                        p_main->p_aout->vol++;
+                        p_main->p_aout->i_vol++;
                     }
                     break;
 
@@ -714,7 +714,7 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 		// adjust the volume
                     if (p_main->p_aout != NULL) 
                     {
-                        p_main->p_aout->vol--;
+                        p_main->p_aout->i_vol--;
                     }
                     break;
 
@@ -722,16 +722,16 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
                 // mute
                     if (p_main->p_aout != NULL) 
                         {
-                                    if (p_main->p_aout->vol == 0)
+                                    if (p_main->p_aout->i_vol == 0)
                                     {
                                             //p_vol->SetEnabled(true);
-                                            p_main->p_aout->vol = p_main->p_vout->p_sys->vol_val;
+                                            p_main->p_aout->i_vol = p_main->p_vout->p_sys->vol_val;
                                     }	
                                     else
                                     {
                                             //p_vol->SetEnabled(false);
-                                            p_main->p_vout->p_sys->vol_val = p_main->p_aout->vol;
-                                            p_main->p_aout->vol = 0;
+                                            p_main->p_vout->p_sys->vol_val = p_main->p_aout->i_vol;
+                                            p_main->p_aout->i_vol = 0;
                                     }
                             }
                             break;

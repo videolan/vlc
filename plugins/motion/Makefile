@@ -49,22 +49,26 @@ $(BUILTIN_MOTIONMMXEXT): BUILTIN_MOTIONMMXEXT_%.o: %.c
 
 ../../lib/motion.a: $(BUILTIN_MOTION)
 	ar r $@ $^
+	$(RANLIB) $@
 
 ../../lib/motionclassic.so: $(PLUGIN_MOTIONCLASSIC) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/motionclassic.a: $(BUILTIN_MOTIONCLASSIC)
 	ar r $@ $^
+	$(RANLIB) $@
 
 ../../lib/motionmmx.so: $(PLUGIN_MOTIONMMX) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/motionmmx.a: $(BUILTIN_MOTIONMMX)
 	ar r $@ $^
+	$(RANLIB) $@
 
 ../../lib/motionmmxext.so: $(PLUGIN_MOTIONMMXEXT) $(PLUGIN_MOTIONCOMMON)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/motionmmxext.a: $(BUILTIN_MOTIONMMXEXT)
 	ar r $@ $^
+	$(RANLIB) $@
 

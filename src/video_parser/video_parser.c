@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.81 2001/04/29 14:52:42 stef Exp $
+ * $Id: video_parser.c,v 1.82 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -60,17 +60,14 @@
 #include "../video_decoder/video_parser.h"
 #include "../video_decoder/video_fifo.h"
 
-#include "main.h"
-
 /*
  * Local prototypes
  */
-static int      InitThread          ( vpar_thread_t *p_vpar );
-static void     RunThread           ( vpar_thread_t *p_vpar );
-static void     ErrorThread         ( vpar_thread_t *p_vpar );
-static void     EndThread           ( vpar_thread_t *p_vpar );
-static void     BitstreamCallback   ( bit_stream_t *p_bit_stream,
-                                      boolean_t b_new_pes );
+static int      InitThread          ( vpar_thread_t * );
+static void     RunThread           ( vpar_thread_t * );
+static void     ErrorThread         ( vpar_thread_t * );
+static void     EndThread           ( vpar_thread_t * );
+static void     BitstreamCallback   ( bit_stream_t *, boolean_t );
 
 /*****************************************************************************
  * vpar_CreateThread: create a generic parser thread
@@ -103,8 +100,7 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     /*
      * Choose the best motion compensation module
      */
-    p_vpar->p_motion_module = module_Need( p_main->p_bank,
-                                           MODULE_CAPABILITY_MOTION, NULL );
+    p_vpar->p_motion_module = module_Need( MODULE_CAPABILITY_MOTION, NULL );
 
     if( p_vpar->p_motion_module == NULL )
     {
@@ -113,69 +109,68 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
         return( 0 );
     }
 
-#define m ( p_vpar->pppf_motion )
-#define s ( p_vpar->ppf_motion_skipped )
-#define f ( p_vpar->p_motion_module->p_functions->motion.functions.motion )
-    m[0][0][0] = m[0][0][1] = m[0][0][2] = m[0][0][3] = NULL;
-    m[0][1][0] = m[0][1][1] = m[0][1][2] = m[0][1][3] = NULL;
-    m[1][0][0] = NULL;
-    m[1][1][0] = NULL;
-    m[2][0][0] = NULL;
-    m[2][1][0] = NULL;
-    m[3][0][0] = NULL;
-    m[3][1][0] = NULL;
+#define M ( p_vpar->pppf_motion )
+#define S ( p_vpar->ppf_motion_skipped )
+#define F ( p_vpar->p_motion_module->p_functions->motion.functions.motion )
+    M[0][0][0] = M[0][0][1] = M[0][0][2] = M[0][0][3] = NULL;
+    M[0][1][0] = M[0][1][1] = M[0][1][2] = M[0][1][3] = NULL;
+    M[1][0][0] = NULL;
+    M[1][1][0] = NULL;
+    M[2][0][0] = NULL;
+    M[2][1][0] = NULL;
+    M[3][0][0] = NULL;
+    M[3][1][0] = NULL;
 
-    m[1][0][1] = f.pf_field_field_420;
-    m[1][1][1] = f.pf_frame_field_420;
-    m[2][0][1] = f.pf_field_field_422;
-    m[2][1][1] = f.pf_frame_field_422;
-    m[3][0][1] = f.pf_field_field_444;
-    m[3][1][1] = f.pf_frame_field_444;
+    M[1][0][1] = F.pf_field_field_420;
+    M[1][1][1] = F.pf_frame_field_420;
+    M[2][0][1] = F.pf_field_field_422;
+    M[2][1][1] = F.pf_frame_field_422;
+    M[3][0][1] = F.pf_field_field_444;
+    M[3][1][1] = F.pf_frame_field_444;
 
-    m[1][0][2] = f.pf_field_16x8_420;
-    m[1][1][2] = f.pf_frame_frame_420;
-    m[2][0][2] = f.pf_field_16x8_422;
-    m[2][1][2] = f.pf_frame_frame_422;
-    m[3][0][2] = f.pf_field_16x8_444;
-    m[3][1][2] = f.pf_frame_frame_444;
+    M[1][0][2] = F.pf_field_16x8_420;
+    M[1][1][2] = F.pf_frame_frame_420;
+    M[2][0][2] = F.pf_field_16x8_422;
+    M[2][1][2] = F.pf_frame_frame_422;
+    M[3][0][2] = F.pf_field_16x8_444;
+    M[3][1][2] = F.pf_frame_frame_444;
 
-    m[1][0][3] = f.pf_field_dmv_420;
-    m[1][1][3] = f.pf_frame_dmv_420;
-    m[2][0][3] = f.pf_field_dmv_422;
-    m[2][1][3] = f.pf_frame_dmv_422;
-    m[3][0][3] = f.pf_field_dmv_444;
-    m[3][1][3] = f.pf_frame_dmv_444;
+    M[1][0][3] = F.pf_field_dmv_420;
+    M[1][1][3] = F.pf_frame_dmv_420;
+    M[2][0][3] = F.pf_field_dmv_422;
+    M[2][1][3] = F.pf_frame_dmv_422;
+    M[3][0][3] = F.pf_field_dmv_444;
+    M[3][1][3] = F.pf_frame_dmv_444;
 
-    s[0][0] = s[0][1] = s[0][2] = s[0][3] = NULL;
-    s[1][0] = NULL;
-    s[2][0] = NULL;
-    s[3][0] = NULL;
+    S[0][0] = S[0][1] = S[0][2] = S[0][3] = NULL;
+    S[1][0] = NULL;
+    S[2][0] = NULL;
+    S[3][0] = NULL;
 
-    s[1][1] = f.pf_field_field_420;
-    s[2][1] = f.pf_field_field_422;
-    s[3][1] = f.pf_field_field_444;
+    S[1][1] = F.pf_field_field_420;
+    S[2][1] = F.pf_field_field_422;
+    S[3][1] = F.pf_field_field_444;
 
-    s[1][2] = f.pf_field_field_420;
-    s[2][2] = f.pf_field_field_422;
-    s[3][2] = f.pf_field_field_444;
+    S[1][2] = F.pf_field_field_420;
+    S[2][2] = F.pf_field_field_422;
+    S[3][2] = F.pf_field_field_444;
 
-    s[1][3] = f.pf_frame_frame_420;
-    s[2][3] = f.pf_frame_frame_422;
-    s[3][3] = f.pf_frame_frame_444;
-#undef f
-#undef s
-#undef m
+    S[1][3] = F.pf_frame_frame_420;
+    S[2][3] = F.pf_frame_frame_422;
+    S[3][3] = F.pf_frame_frame_444;
+#undef F
+#undef S
+#undef M
 
      /*
       * Choose the best IDCT module
       */
-    p_vpar->p_idct_module = module_Need( p_main->p_bank,
-                                         MODULE_CAPABILITY_IDCT, NULL );
+    p_vpar->p_idct_module = module_Need( MODULE_CAPABILITY_IDCT, NULL );
 
     if( p_vpar->p_idct_module == NULL )
     {
         intf_ErrMsg( "vpar error: no suitable IDCT module" );
-        module_Unneed( p_main->p_bank, p_vpar->p_motion_module );
+        module_Unneed( p_vpar->p_motion_module );
         free( p_vpar );
         return( 0 );
     }
@@ -192,8 +187,8 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
                             (vlc_thread_func_t)RunThread, (void *)p_vpar ) )
     {
         intf_ErrMsg("vpar error: can't spawn video parser thread");
-        module_Unneed( p_main->p_bank, p_vpar->p_idct_module );
-        module_Unneed( p_main->p_bank, p_vpar->p_motion_module );
+        module_Unneed( p_vpar->p_idct_module );
+        module_Unneed( p_vpar->p_motion_module );
         free( p_vpar );
         return( 0 );
     }
@@ -506,8 +501,8 @@ static void EndThread( vpar_thread_t *p_vpar )
     
     vlc_mutex_destroy( &(p_vpar->synchro.fifo_lock) );
     
-    module_Unneed( p_main->p_bank, p_vpar->p_idct_module );
-    module_Unneed( p_main->p_bank, p_vpar->p_motion_module );
+    module_Unneed( p_vpar->p_idct_module );
+    module_Unneed( p_vpar->p_motion_module );
 
     free( p_vpar );
 

@@ -45,6 +45,7 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 SHELL = @SHELL@
 RANLIB = @RANLIB@
+MOC = @MOC@
 
 # 
 # Installation environment

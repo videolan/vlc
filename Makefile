@@ -40,17 +40,17 @@ INTERFACE =	src/interface/main.o \
 		src/interface/intf_channels.o \
 		src/interface/intf_urldecode.o \
 
-INPUT =		src/input/input_ext-dec.o \
+INPUT =		src/input/input.o \
+		src/input/input_ext-dec.o \
 		src/input/input_ext-intf.o \
 		src/input/input_dec.o \
 		src/input/input_programs.o \
 		src/input/input_netlist.o \
 		src/input/input_clock.o \
-		src/input/input.o \
 		src/input/mpeg_system.o
 
 AUDIO_OUTPUT = 	src/audio_output/audio_output.o \
-		src/audio_output/aout_fifo.o \
+		src/audio_output/aout_ext-dec.o \
 		src/audio_output/aout_u8.o \
 		src/audio_output/aout_s8.o \
 		src/audio_output/aout_u16.o \
@@ -356,5 +356,4 @@ $(PLUGIN_OBJ): FORCE
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
 	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
-	$(RANLIB) $@
 

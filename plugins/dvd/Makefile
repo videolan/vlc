@@ -27,4 +27,5 @@ include ../../Makefile.modules
 
 ../../lib/dvd.a: $(BUILTIN_C)
 	ar r $@ $^
+	$(RANLIB) $@
 

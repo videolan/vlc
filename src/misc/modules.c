@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.27 2001/04/28 03:36:25 sam Exp $
+ * $Id: modules.c,v 1.28 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -60,19 +60,18 @@
 #include "intf_msg.h"
 #include "modules.h"
 #ifdef HAVE_DYNAMIC_PLUGINS
-#include "modules_core.h"
+#   include "modules_core.h"
 #endif
 #include "modules_builtin.h"
 
 /* Local prototypes */
 #ifdef HAVE_DYNAMIC_PLUGINS
-static int AllocatePluginModule ( module_bank_t *, char * );
+static int AllocatePluginModule ( char * );
 #endif
-static int AllocateBuiltinModule( module_bank_t *,
-                                  int ( * ) ( module_t * ),
+static int AllocateBuiltinModule( int ( * ) ( module_t * ),
                                   int ( * ) ( module_t * ),
                                   int ( * ) ( module_t * ) );
-static int DeleteModule ( module_bank_t * p_bank, module_t * );
+static int DeleteModule ( module_t * );
 static int LockModule   ( module_t * );
 static int UnlockModule ( module_t * );
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -81,26 +80,12 @@ static int CallSymbol   ( module_t *, char * );
 #endif
 
 /*****************************************************************************
- * module_CreateBank: create the module bank.
- *****************************************************************************
- * This function creates a module bank structure.
- *****************************************************************************/
-module_bank_t * module_CreateBank( void )
-{
-    module_bank_t * p_bank;
-
-    p_bank = malloc( sizeof( module_bank_t ) );
-
-    return( p_bank );
-}
-
-/*****************************************************************************
  * module_InitBank: create the module bank.
  *****************************************************************************
  * This function creates a module bank structure and fills it with the
  * built-in modules, as well as all the plugin modules it can find.
  *****************************************************************************/
-void module_InitBank( module_bank_t * p_bank )
+void module_InitBank( )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     static char * path[] = { ".", "lib", PLUGIN_PATH, NULL, NULL };
@@ -119,8 +104,6 @@ void module_InitBank( module_bank_t * p_bank )
 
     p_bank->first = NULL;
     vlc_mutex_init( &p_bank->lock );
-
-    intf_WarnMsg( 1, "module: module bank initialized" );
 
     intf_WarnMsg( 2, "module: checking built-in modules" );
 
@@ -178,7 +161,7 @@ void module_InitBank( module_bank_t * p_bank )
 
                     /* We created a nice filename -- now we just try to load
                      * it as a plugin module. */
-                    AllocatePluginModule( p_bank, psz_file );
+                    AllocatePluginModule( psz_file );
 
                     /* We don't care if the allocation succeeded */
                     free( psz_file );
@@ -198,22 +181,24 @@ void module_InitBank( module_bank_t * p_bank )
     }
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
+    intf_WarnMsg( 1, "module: module bank initialized" );
+
     return;
 }
 
 /*****************************************************************************
- * module_DestroyBank: destroy the module bank.
+ * module_EndBank: destroy the module bank.
  *****************************************************************************
  * This function unloads all unused plugin modules and removes the module
  * bank in case of success.
  *****************************************************************************/
-void module_DestroyBank( module_bank_t * p_bank )
+void module_EndBank( )
 {
     module_t * p_next;
 
     while( p_bank->first != NULL )
     {
-        if( DeleteModule( p_bank, p_bank->first ) )
+        if( DeleteModule( p_bank->first ) )
         {
             /* Module deletion failed */
             intf_ErrMsg( "module error: `%s' can't be removed. trying harder.",
@@ -228,9 +213,6 @@ void module_DestroyBank( module_bank_t * p_bank )
 
     /* Destroy the lock */
     vlc_mutex_destroy( &p_bank->lock );
-    
-    /* We can free the module bank */
-    free( p_bank );
 
     return;
 }
@@ -241,7 +223,7 @@ void module_DestroyBank( module_bank_t * p_bank )
  * This function resets the module bank by unloading all unused plugin
  * modules.
  *****************************************************************************/
-void module_ResetBank( module_bank_t * p_bank )
+void module_ResetBank( )
 {
     intf_ErrMsg( "FIXME: module_ResetBank unimplemented" );
     return;
@@ -253,7 +235,7 @@ void module_ResetBank( module_bank_t * p_bank )
  * This function parses the module bank and hides modules that have been
  * unused for a while.
  *****************************************************************************/
-void module_ManageBank( module_bank_t * p_bank )
+void module_ManageBank( )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
     module_t * p_module;
@@ -297,8 +279,7 @@ void module_ManageBank( module_bank_t * p_bank )
  *****************************************************************************
  * This function returns the module that best fits the asked capabilities.
  *****************************************************************************/
-module_t * module_Need( module_bank_t *p_bank,
-                        int i_capabilities, void *p_data )
+module_t * module_Need( int i_capabilities, void *p_data )
 {
     module_t * p_module;
     module_t * p_bestmodule = NULL;
@@ -379,7 +360,7 @@ module_t * module_Need( module_bank_t *p_bank,
  * This function must be called by the thread that called module_Need, to
  * decrease the reference count and allow for hiding of modules.
  *****************************************************************************/
-void module_Unneed( module_bank_t * p_bank, module_t * p_module )
+void module_Unneed( module_t * p_module )
 {
     /* We take the global lock */
     vlc_mutex_lock( &p_bank->lock );
@@ -408,7 +389,7 @@ void module_Unneed( module_bank_t * p_bank, module_t * p_module )
  * for its information data. The module can then be handled by module_Need,
  * module_Unneed and HideModule. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocatePluginModule( module_bank_t * p_bank, char * psz_filename )
+static int AllocatePluginModule( char * psz_filename )
 {
     module_t * p_module, * p_othermodule;
     module_handle_t handle;
@@ -527,8 +508,7 @@ static int AllocatePluginModule( module_bank_t * p_bank, char * psz_filename )
  * for its information data. The module can then be handled by module_Need,
  * module_Unneed and HideModule. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocateBuiltinModule( module_bank_t * p_bank,
-                                  int ( *pf_init ) ( module_t * ),
+static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
                                   int ( *pf_activate ) ( module_t * ),
                                   int ( *pf_deactivate ) ( module_t * ) )
 {
@@ -627,7 +607,7 @@ static int AllocateBuiltinModule( module_bank_t * p_bank,
  *****************************************************************************
  * This function can only be called if i_usage <= 0.
  *****************************************************************************/
-static int DeleteModule( module_bank_t * p_bank, module_t * p_module )
+static int DeleteModule( module_t * p_module )
 {
     /* If the module is not in use but is still in memory, we first have
      * to hide it and remove it from memory before we can free the

@@ -14,13 +14,13 @@ Here is a shortcut to copy-paste for a complete build:
 
    make distclean && ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
-      --enable-alsa --enable-mga --enable-gtk --enable-qt --enable-xvideo
+      --enable-mga --enable-gtk --enable-qt --enable-xvideo
 
 If you intend to debug stuff, you may want to disable optimizations:
 
    make distclean && ./configure --prefix=/usr --enable-gnome \
       --enable-fb --with-glide --with-ggi --with-sdl --enable-esd \
-      --enable-alsa --enable-mga --enable-gtk --enable-qt --enable-xvideo \
+      --enable-mga --enable-gtk --enable-qt --enable-xvideo \
       --disable-optimizatons
 
 

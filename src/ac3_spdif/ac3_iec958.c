@@ -2,7 +2,7 @@
  * ac3_iec958.c: ac3 to spdif converter
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_iec958.c,v 1.1 2001/04/29 02:48:51 stef Exp $
+ * $Id: ac3_iec958.c,v 1.2 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -102,72 +102,85 @@ static const frame_size_t p_frame_size_code[64] =
 /****************************************************************************
  * ac3_iec958_build_burst: builds an iec958/spdif frame based on an ac3 frame
  ****************************************************************************/
-void ac3_iec958_build_burst( int i_length, u8 * pi_data, u8 * pi_out )
+void ac3_iec958_build_burst( ac3_spdif_thread_t *p_spdif )
 {
-    const u8 pi_sync[4] = { 0x72, 0xF8, 0x1F, 0x4E };
+    const u8 p_sync[4] = { 0x72, 0xF8, 0x1F, 0x4E };
+    int      i_length  = p_spdif->ac3_info.i_frame_size;
+#ifndef HAVE_SWAB
+    /* Skip the first byte if i_length is odd */
+    u16 * p_in  = (u16 *)( p_spdif->p_ac3 + ( i_length & 0x1 ) );
+    u16 * p_out = (u16 *)p_spdif->p_iec;
+#endif
 
-    /* add the spdif headers */
-    memcpy( pi_out, pi_sync, 4 );
-    if( i_length )
-        pi_out[4] = 0x01;
-    else
-        pi_out[4] = 0;
-    pi_out[5] = 0x00;
-    pi_out[6] = ( i_length *8 ) & 0xFF;
-    pi_out[7] = ( ( i_length *8 ) >> 8 ) & 0xFF;
+    /* Add the spdif headers */
+    memcpy( p_spdif->p_iec, p_sync, 4 );
+    p_spdif->p_iec[4] = i_length ? 0x01 : 0x00;
+    p_spdif->p_iec[5] = 0x00;
+    p_spdif->p_iec[6] = ( i_length * 8 ) & 0xFF;
+    p_spdif->p_iec[7] = ( ( i_length * 8 ) >> 8 ) & 0xFF;
 
-    swab( pi_data, pi_out + 8, i_length );
-    /* adds zero to complete the spdif frame
+#ifdef HAVE_SWAB
+    swab( p_spdif->p_ac3, p_spdif->p_iec + 8, i_length );
+#else
+    /* i_length should be even */
+    i_length &= ~0x1;
+
+    while( i_length )
+    {
+        *p_out = ( (*p_in & 0x00ff) << 16 ) | ( (*p_in & 0xff00) >> 16 );
+        p_in++;
+        p_out++;
+        i_length -= 2;
+    }
+#endif
+
+    /* Add zeroes to complete the spdif frame,
      * they will be ignored by the decoder */
-    memset( pi_out + 8 + i_length, 0, SPDIF_FRAME - 8 - i_length );
+    memset( p_spdif->p_iec + 8 + i_length, 0, SPDIF_FRAME_SIZE - 8 - i_length );
 }
 
 /****************************************************************************
  * ac3_iec958_parse_syncinfo: parse ac3 sync info
  ****************************************************************************/
-int ac3_iec958_parse_syncinfo( ac3_spdif_thread_t *p_spdif,
-                               ac3_info_t *ac3_info,
-                               u8 * pi_ac3 )
+int ac3_iec958_parse_syncinfo( ac3_spdif_thread_t *p_spdif )
 {
-    int             pi_sample_rates[4] = { 48000, 44100, 32000, -1 };
+    int             p_sample_rates[4] = { 48000, 44100, 32000, -1 };
     int             i_frame_rate_code;
     int             i_frame_size_code;
-//    u8 *            pi_tmp;
     sync_frame_t *  p_sync_frame;
 
-    /* find sync word */
+    /* Find sync word */
     while( ShowBits( &p_spdif->bit_stream, 16 ) != 0xb77 )
     {
         RemoveBits( &p_spdif->bit_stream, 8 );
     }
 
-    /* read sync frame */
-    pi_ac3 = malloc( sizeof(sync_frame_t) );
-    GetChunk( &p_spdif->bit_stream, pi_ac3, sizeof(sync_frame_t) );
-    p_sync_frame = (sync_frame_t*)pi_ac3;
+    /* Read sync frame */
+    GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3, sizeof(sync_frame_t) );
+    p_sync_frame = (sync_frame_t*)p_spdif->p_ac3;
 
-    /* compute frame rate */
+    /* Compute frame rate */
     i_frame_rate_code = (p_sync_frame->syncinfo.code >> 6) & 0x03;
-    ac3_info->i_sample_rate = pi_sample_rates[i_frame_rate_code];
-    if (ac3_info->i_sample_rate == -1)
+    p_spdif->ac3_info.i_sample_rate = p_sample_rates[i_frame_rate_code];
+    if( p_spdif->ac3_info.i_sample_rate == -1 )
     {
         return -1;
     }
 
-    /* compute frame size */
+    /* Compute frame size */
     i_frame_size_code = p_sync_frame->syncinfo.code & 0x3f;
-    ac3_info->i_frame_size = 2 *
+    p_spdif->ac3_info.i_frame_size = 2 *
         p_frame_size_code[i_frame_size_code].i_frame_size[i_frame_rate_code];
-    ac3_info->i_bit_rate = p_frame_size_code[i_frame_size_code].i_bit_rate;
+    p_spdif->ac3_info.i_bit_rate =
+        p_frame_size_code[i_frame_size_code].i_bit_rate;
 
     if( ( ( p_sync_frame->bsi.bsidmod >> 3 ) & 0x1f ) != 0x08 )
     {
         return -1;
     }
 
-    ac3_info->i_bs_mod = p_sync_frame->bsi.bsidmod & 0x7;
-
-//    free( pi_tmp );
+    p_spdif->ac3_info.i_bs_mod = p_sync_frame->bsi.bsidmod & 0x7;
 
     return 0;
 }
+

@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.26 2001/04/29 17:03:20 sam Exp $
+ * $Id: intf_beos.cpp,v 1.27 2001/05/01 04:18:17 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -281,7 +281,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			// silence the sound, otherwise very horrible
 			if (p_main->p_aout != NULL)
 			{
-				p_main->p_aout->vol = 0;
+				p_main->p_aout->i_vol = 0;
 			}
 			snooze(400000);
 			input_SetStatus(p_intf->p_input, INPUT_STATUS_END);
@@ -293,7 +293,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 //		{			
 //			if (p_main->p_aout != NULL)
 //			{
-//				p_main->p_aout->vol = vol_val;
+//				p_main->p_aout->i_vol = vol_val;
 //			}
 //			snooze(400000);
 //			input_SetStatus(p_intf->p_input, INPUT_STATUS_PLAY);
@@ -309,7 +309,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				if (p_main->p_aout != NULL)
 				{
-					p_main->p_aout->vol = 0;
+					p_main->p_aout->i_vol = 0;
 				}
 				playback_status = PAUSED;
 			}
@@ -318,7 +318,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			{
 				if (p_main->p_aout != NULL)
 				{
-					p_main->p_aout->vol = vol_val;
+					p_main->p_aout->i_vol = vol_val;
 				}
 				playback_status = PLAYING;
 			}
@@ -332,7 +332,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		{
 			if (p_main->p_aout != NULL)
 			{
-				p_main->p_aout->vol = 0;
+				p_main->p_aout->i_vol = 0;
 			}
 			snooze(400000);
 			input_SetStatus(p_intf->p_input, INPUT_STATUS_FASTER);
@@ -344,7 +344,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		{
 			if (p_main->p_aout != NULL)
 			{
-				p_main->p_aout->vol = 0;
+				p_main->p_aout->i_vol = 0;
 			}
 			snooze(400000);
 			input_SetStatus(p_intf->p_input, INPUT_STATUS_SLOWER);
@@ -357,22 +357,22 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 		// adjust the volume
         if (p_main->p_aout != NULL) 
         {
-			p_main->p_aout->vol = vol_val;
+			p_main->p_aout->i_vol = vol_val;
 		}
 		break;
 	case VOLUME_MUTE:
 		// mute
         if (p_main->p_aout != NULL) 
    	    {
-			if (p_main->p_aout->vol == 0)
+			if (p_main->p_aout->i_vol == 0)
 			{
 				p_vol->SetEnabled(true);
-				p_main->p_aout->vol = vol_val;
+				p_main->p_aout->i_vol = vol_val;
 			}	
 			else
 			{
 				p_vol->SetEnabled(false);
-				p_main->p_aout->vol = 0;
+				p_main->p_aout->i_vol = 0;
 			}
 		}
 		break;

@@ -48,6 +48,7 @@ AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,LIB="${LIB} -lresolv")
 ])
 AC_CHECK_FUNCS(vasprintf)
+AC_CHECK_FUNCS(swab)
 
 AC_CHECK_FUNC(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 [ # FreeBSD has a gnugetopt library for this:
@@ -392,6 +393,12 @@ AC_ARG_ENABLE(qt,
      PLUGINS="${PLUGINS} qt"
      ALIASES="${ALIASES} qvlc"
      LIB_QT="-lqt -L${QTDIR}/lib"
+     if test -x ${QTDIR}/bin/moc ;
+     then
+       MOC=${QTDIR}/bin/moc
+     else
+       MOC=moc
+     fi
    fi])
 
 dnl 
@@ -499,6 +506,7 @@ AC_SUBST(STATS)
 AC_SUBST(TRACE)
 AC_SUBST(OPTIMS)
 AC_SUBST(CSS)
+AC_SUBST(MOC)
 
 AC_SUBST(LCFLAGS)
 AC_SUBST(LIB)
@@ -539,8 +547,8 @@ trace mode            : ${TRACE}
 optimizations         : ${OPTIMS}
 CSS decryption        : ${CSS}
 need builtin getopt   : ${GETOPT}
-plugin modules        :${PLUGINS}
 built-in modules      :${BUILTINS}
+plugin modules        :${PLUGINS}
 vlc aliases           :${ALIASES}
 
 You may now tune Makefile.opts at your convenience."

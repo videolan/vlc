@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.1 2001/04/29 02:48:51 stef Exp $
+ * $Id: ac3_spdif.c,v 1.2 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -69,20 +69,30 @@ vlc_thread_t spdif_CreateThread( adec_config_t * p_config )
     intf_DbgMsg( "spdif debug: creating ac3 pass-through thread" );
 
     /* Allocate the memory needed to store the thread's structure */
-    if( ( p_spdif = malloc( sizeof(ac3_spdif_thread_t) ) ) == NULL )
+    p_spdif = malloc( sizeof(ac3_spdif_thread_t) );
+
+    if( p_spdif == NULL )
     {
         intf_ErrMsg ( "spdif error: not enough memory "
                       "for spdif_CreateThread() to create the new thread");
         return 0;
     }
     
+    /* Temporary buffer to store ac3 frames to be transformed */
+    p_spdif->p_ac3 = malloc( /*ac3_info.i_frame_size*/SPDIF_FRAME_SIZE );
+
+    if( p_spdif->p_ac3 == NULL )
+    {
+        free( p_spdif->p_ac3 );
+        return 0;
+    }
+
     /*
      * Initialize the thread properties
      */
     p_spdif->p_config = p_config;
     p_spdif->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
-    p_spdif->p_aout = p_config->p_aout;
     p_spdif->p_aout_fifo = NULL;
 
     /* Spawn the ac3 to spdif thread */
@@ -90,6 +100,7 @@ vlc_thread_t spdif_CreateThread( adec_config_t * p_config )
                 (vlc_thread_func_t)RunThread, (void *)p_spdif))
     {
         intf_ErrMsg( "spdif error: can't spawn spdif thread" );
+        free( p_spdif->p_ac3 );
         free( p_spdif );
         return 0;
     }
@@ -108,27 +119,44 @@ vlc_thread_t spdif_CreateThread( adec_config_t * p_config )
  ****************************************************************************/
 static int InitThread( ac3_spdif_thread_t * p_spdif )
 {
-    aout_fifo_t         aout_fifo;
-
     p_spdif->p_config->decoder_config.pf_init_bit_stream(
             &p_spdif->bit_stream,
             p_spdif->p_config->decoder_config.p_decoder_fifo,
             BitstreamCallback, (void*)p_spdif );
 
-    aout_fifo.i_type = AOUT_ADEC_MONO_FIFO;
-    aout_fifo.i_channels = 1;
-    aout_fifo.b_stereo = 0;
-
-    aout_fifo.l_frame_size = SPDIF_FRAME;
-
     /* Creating the audio output fifo */
-    if( (p_spdif->p_aout_fifo =
-                aout_CreateFifo( p_spdif->p_aout, &aout_fifo ) ) == NULL )
+    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_SPDIF_FIFO, 1, 0, 0,
+                                            SPDIF_FRAME_SIZE, NULL );
+
+    if( p_spdif->p_aout_fifo == NULL )
     {
         return -1;
     }
 
-    intf_WarnMsg( 1, "aout fifo for spdif created" );
+    intf_WarnMsg( 1, "spdif: aout fifo created" );
+
+    /* Check stream properties */
+    if( ac3_iec958_parse_syncinfo( p_spdif ) < 0 )
+    {
+        intf_ErrMsg( "spdif error: stream not valid");
+
+        aout_DestroyFifo( p_spdif->p_aout_fifo );
+        return -1;
+    }
+
+    /* Check that we can handle the rate */
+    if( p_spdif->ac3_info.i_sample_rate != 48000 )
+    {
+        intf_ErrMsg( "spdif error: Only 48000 Hz streams supported");
+
+        aout_DestroyFifo( p_spdif->p_aout_fifo );
+        return -1;
+    }
+
+    GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + sizeof(sync_frame_t),
+        p_spdif->ac3_info.i_frame_size - sizeof(sync_frame_t) );
+    
+    vlc_cond_signal( &p_spdif->p_aout_fifo->data_wait );
 
     return 0;
 }
@@ -139,34 +167,15 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
  ****************************************************************************/
 static void RunThread( ac3_spdif_thread_t * p_spdif )
 {
-    ac3_info_t  ac3_info;
-    u8 *        pi_ac3;
-    u8 *        pi_iec;
-    
-    InitThread( p_spdif );
-
-    /* temporary buffer to store ac3 frames to be transformed */
-    pi_ac3 = malloc( /*ac3_info.i_frame_size*/SPDIF_FRAME );
-
-    /* check stream properties */
-    if( ac3_iec958_parse_syncinfo( p_spdif, &ac3_info, pi_ac3 ) < 0)
+    /* Initializing the spdif decoder thread */
+    if( InitThread( p_spdif ) )
     {
-        intf_ErrMsg( "spdif error: stream not valid");
-        exit(1);
+         p_spdif->p_fifo->b_error = 1;
     }
 
-    if( ac3_info.i_sample_rate != 48000) {
-        intf_ErrMsg( "spdif error: Only 48000 Hz streams supported");
-        exit(1);
-    }
-
-    GetChunk( &p_spdif->bit_stream, pi_ac3 + sizeof(sync_frame_t),
-        ac3_info.i_frame_size - sizeof(sync_frame_t) );
-    
-    vlc_cond_signal( &p_spdif->p_aout_fifo->data_wait );
     while( !p_spdif->p_fifo->b_die && !p_spdif->p_fifo->b_error )
     {
-        /* handle the dates */
+        /* Handle the dates */
         if(DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts)
         {
             p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->l_end_frame] =
@@ -179,12 +188,12 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
                 LAST_MDATE;
         }
 
-        /* write in the first free packet of aout fifo */
-        pi_iec = (p_spdif->p_aout_fifo->buffer) + 
-            (p_spdif->p_aout_fifo->l_end_frame * SPDIF_FRAME );
+        /* Write in the first free packet of aout fifo */
+        p_spdif->p_iec = (p_spdif->p_aout_fifo->buffer) + 
+            (p_spdif->p_aout_fifo->l_end_frame * SPDIF_FRAME_SIZE );
 
-        /* build burst to be sent to hardware decoder */
-        ac3_iec958_build_burst( ac3_info.i_frame_size, pi_ac3, pi_iec );
+        /* Build burst to be sent to hardware decoder */
+        ac3_iec958_build_burst( p_spdif );
 
         vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);
 
@@ -193,17 +202,16 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
 
         vlc_mutex_unlock (&p_spdif->p_aout_fifo->data_lock);
 
-        /* find syncword */
+        /* Find syncword */
         while( ShowBits( &p_spdif->bit_stream, 16 ) != 0xb77 ) 
         {
             RemoveBits( &p_spdif->bit_stream, 8 );
         }
 
-        /* read data from bitstream */
-        GetChunk( &p_spdif->bit_stream, pi_ac3, ac3_info.i_frame_size );
+        /* Read data from bitstream */
+        GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3,
+                  p_spdif->ac3_info.i_frame_size );
     }
-
-    free( pi_ac3 );
 
     /* If b_error is set, the ac3 spdif thread enters the error loop */
     if( p_spdif->p_fifo->b_error )
@@ -267,6 +275,7 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
 
     /* Destroy descriptor */
     free( p_spdif->p_config );
+    free( p_spdif->p_ac3 );
     free( p_spdif );
 
     intf_DbgMsg ("spdif debug: thread %p destroyed", p_spdif );

@@ -35,4 +35,5 @@ $(BUILTIN_GNOME): BUILTIN_%.o: %.c
 
 ../../lib/gnome.a: $(BUILTIN_GNOME)
 	ar r $@ $^
+	$(RANLIB) $@
 

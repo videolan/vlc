@@ -21,9 +21,9 @@
  *****************************************************************************/
 
 #define ALLOCATE_BUILTIN( NAME ) \
-    AllocateBuiltinModule( p_bank, module_ ## NAME ## _InitModule, \
-                                   module_ ## NAME ## _ActivateModule, \
-                                   module_ ## NAME ## _DeactivateModule );
+    AllocateBuiltinModule( module_ ## NAME ## _InitModule, \
+                           module_ ## NAME ## _ActivateModule, \
+                           module_ ## NAME ## _DeactivateModule );
 
 /* Add stuff here */
 

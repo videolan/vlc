@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.12 2001/04/27 19:29:11 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.13 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -207,7 +207,7 @@ static int vout_Probe( probedata_t *p_data )
         return( 999 );
     }
 
-    return( 110 );
+    return( 60 );
 }
 
 /*****************************************************************************

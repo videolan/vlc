@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.103 2001/04/28 23:19:19 henri Exp $
+ * $Id: input.c,v 1.104 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -144,7 +144,6 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.b_bw = 0;
 
     /* Initialize default settings for spawned decoders */
-    p_input->p_default_aout = p_main->p_aout;
     p_input->p_default_vout = p_main->p_vout;
 
     /* Create thread and set locks. */
@@ -318,8 +317,7 @@ static int InitThread( input_thread_t * p_input )
     p_input->c_packets_trashed          = 0;
 #endif
 
-    p_input->p_input_module = module_Need( p_main->p_bank,
-                                           MODULE_CAPABILITY_INPUT,
+    p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT,
                                            (probedata_t *)p_input );
 
     if( p_input->p_input_module == NULL )
@@ -350,7 +348,7 @@ static int InitThread( input_thread_t * p_input )
     {
         /* We barfed -- exit nicely */
         p_input->pf_close( p_input );
-        module_Unneed( p_main->p_bank, p_input->p_input_module );
+        module_Unneed( p_input->p_input_module );
         return( -1 );
     }
 
@@ -360,7 +358,7 @@ static int InitThread( input_thread_t * p_input )
     {
         /* We barfed -- exit nicely */
         p_input->pf_close( p_input );
-        module_Unneed( p_main->p_bank, p_input->p_input_module );
+        module_Unneed( p_input->p_input_module );
         return( -1 );
     }
 
@@ -414,7 +412,7 @@ static void EndThread( input_thread_t * p_input )
     p_input->pf_close( p_input );
 
     /* Release modules */
-    module_Unneed( p_main->p_bank, p_input->p_input_module );
+    module_Unneed( p_input->p_input_module );
 
 }
 

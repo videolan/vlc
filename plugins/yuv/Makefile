@@ -32,10 +32,12 @@ include ../../Makefile.modules
 
 ../../lib/yuv.a: $(BUILTIN_YUV)
 	ar r $@ $^
+	$(RANLIB) $@
 
 ../../lib/yuvmmx.so: $(PLUGIN_YUVMMX)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
 ../../lib/yuvmmx.a: $(BUILTIN_YUVMMX)
 	ar r $@ $^
+	$(RANLIB) $@
 

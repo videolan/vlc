@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.57 2001/03/21 13:42:33 sam Exp $
+ * $Id: video_output.h,v 1.58 2001/05/01 04:18:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -105,6 +105,28 @@ typedef struct vout_buffer_s
     /* Picture data */
     byte_t *    p_data;                                    /* memory address */
 } vout_buffer_t;
+
+/*****************************************************************************
+ * vout_fifo_t
+ *****************************************************************************/
+typedef struct vout_fifo_s
+{
+    /* See the fifo types below */
+    int                 i_type;
+    boolean_t           b_die;
+    int                 i_fifo;      /* Just to keep track of the fifo index */
+
+    int                 i_width;
+    int                 i_height;
+
+    vlc_mutex_t         data_lock;
+    vlc_cond_t          data_wait;
+
+} vout_fifo_t;
+
+#define VOUT_EMPTY_FIFO         0
+#define VOUT_YUV_FIFO           1
+#define VOUT_SPU_FIFO           2
 
 /*****************************************************************************
  * vout_thread_t: video output thread descriptor
@@ -236,6 +258,11 @@ typedef struct vout_thread_s
  *****************************************************************************/
 vout_thread_t * vout_CreateThread   ( int *pi_status );
 void            vout_DestroyThread  ( vout_thread_t *p_vout, int *pi_status );
+
+vout_fifo_t *   vout_CreateFifo         ( void );
+void            vout_DestroyFifo        ( vout_fifo_t *p_fifo );
+void            vout_FreeFifo           ( vout_fifo_t *p_fifo );
+
 picture_t *     vout_CreatePicture  ( vout_thread_t *p_vout, int i_type,
                                       int i_width, int i_height );
 void            vout_DestroyPicture ( vout_thread_t *p_vout, picture_t *p_pic );

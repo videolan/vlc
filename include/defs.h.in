@@ -46,6 +46,9 @@
 /* Define if you have the strtol function.  */
 #undef HAVE_STRTOL
 
+/* Define if you have the swab function.  */
+#undef HAVE_SWAB
+
 /* Define if you have the usleep function.  */
 #undef HAVE_USLEEP
 

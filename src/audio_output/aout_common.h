@@ -2,7 +2,7 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_common.h,v 1.3 2001/04/29 02:48:51 stef Exp $
+ * $Id: aout_common.h,v 1.4 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -44,8 +44,6 @@ void aout_SpdifThread         ( aout_thread_t * p_aout );
     { \
         (integer) += (increment).l_euclidean_integer; \
     }
-
-#define FIFO p_aout->fifo[i_fifo]
 
 /*****************************************************************************
  * InitializeIncrement

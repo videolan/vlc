@@ -2,7 +2,7 @@
  * ac3_iec958.h: ac3 to spdif converter headers
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_iec958.h,v 1.1 2001/04/29 02:48:51 stef Exp $
+ * $Id: ac3_iec958.h,v 1.2 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -23,20 +23,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  ****************************************************************************/
 
-#ifndef _AC3_IEC958_H
-#define _AC3_IEC958_H
-
 /****************************************************************************
  * information about ac3 frame
  ****************************************************************************/
-typedef struct ac3_info_s
-{
-    int i_bit_rate;
-    int i_frame_size;
-    int i_sample_rate;
-    int i_bs_mod;
-} ac3_info_t;
-
 typedef struct sync_frame_s
 {
     struct syncinfo
@@ -56,7 +45,6 @@ typedef struct sync_frame_s
 /****************************************************************************
  * Prototypes
  ****************************************************************************/
-void    ac3_iec958_build_burst      ( int, u8 *, u8 * );
-int     ac3_iec958_parse_syncinfo   ( struct ac3_spdif_thread_s *,
-                                      struct ac3_info_s *, u8 * );
-#endif
+void    ac3_iec958_build_burst      ( struct ac3_spdif_thread_s * );
+int     ac3_iec958_parse_syncinfo   ( struct ac3_spdif_thread_s * );
+

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.53 2001/04/29 02:48:51 stef Exp $
+ * $Id: input_programs.c,v 1.54 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -174,8 +174,6 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
 
     p_input->stream.pp_programs[i_pgrm_index]->p_vout
                                             = p_input->p_default_vout;
-    p_input->stream.pp_programs[i_pgrm_index]->p_aout
-                                            = p_input->p_default_aout;
 
     if( i_data_len )
     {
@@ -580,7 +578,7 @@ static adec_config_t * GetAdecConfig( input_thread_t * p_input,
         intf_ErrMsg( "Unable to allocate memory in GetAdecConfig" );
         return( NULL );
     }
-    p_config->p_aout = p_input->p_default_aout;
+
     if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
     {
         free( p_config );
@@ -661,13 +659,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case AC3_AUDIO_ES:
         if( p_main->b_audio )
         {
-            if( !p_main->b_spdif )
+            if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) )
             {
-                decoder.pf_create_thread = ac3dec_CreateThread;
+                decoder.pf_create_thread = spdif_CreateThread;
             }
             else
             {
-                decoder.pf_create_thread = spdif_CreateThread;
+                decoder.pf_create_thread = ac3dec_CreateThread;
             }
 
             p_config = (void *)GetAdecConfig( p_input, p_es );

@@ -27,4 +27,5 @@ include ../../Makefile.modules
 
 ../../lib/beos.a: $(BUILTIN_CPP)
 	ar r $@ $^
+	$(RANLIB) $@
 

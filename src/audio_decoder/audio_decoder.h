@@ -2,7 +2,7 @@
  * audio_decoder.h : audio decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_decoder.h,v 1.6 2001/03/21 13:42:34 sam Exp $
+ * $Id: audio_decoder.h,v 1.7 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -52,7 +52,6 @@ typedef struct adec_thread_s
      * Output properties
      */
     struct aout_fifo_s *    p_aout_fifo;   /* stores the decompressed frames */
-    struct aout_thread_s *  p_aout;       /* needed to create the audio fifo */
 
 } adec_thread_t;
 

@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.30 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_ext-dec.h,v 1.31 2001/05/01 04:18:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -545,15 +545,10 @@ typedef struct vdec_config_s
  *****************************************************************************
  * Pointers given to audio decoders threads.
  *****************************************************************************/
-struct aout_thread_s;
-
 typedef struct adec_config_s
 {
-    struct aout_thread_s *  p_aout;
-
-    struct aout_fifo_s * (* pf_create_fifo)( struct aout_thread_s *,
-                                            struct aout_fifo_s * );
-    void                 (* pf_destroy_fifo)( struct aout_thread_s *);
+    struct aout_fifo_s * (* pf_create_fifo)( struct aout_fifo_s * );
+    void                 (* pf_destroy_fifo)( void );
 
     decoder_config_t        decoder_config;
 } adec_config_t;

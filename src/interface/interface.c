@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.74 2001/04/30 15:00:59 massiot Exp $
+ * $Id: interface.c,v 1.75 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -81,8 +81,7 @@ intf_thread_t* intf_Create( void )
     }
 
     /* Choose the best module */
-    p_intf->p_module = module_Need( p_main->p_bank,
-                                    MODULE_CAPABILITY_INTF, NULL );
+    p_intf->p_module = module_Need( MODULE_CAPABILITY_INTF, NULL );
 
     if( p_intf->p_module == NULL )
     {
@@ -111,7 +110,7 @@ intf_thread_t* intf_Create( void )
     if( p_intf->pf_open( p_intf ) )
     {
         intf_ErrMsg("intf error: cannot create interface");
-        module_Unneed( p_main->p_bank, p_intf->p_module );
+        module_Unneed( p_intf->p_module );
         free( p_intf );
         return( NULL );
     }
@@ -142,7 +141,7 @@ static void intf_Manage( intf_thread_t *p_intf )
     intf_FlushMsg();
 
     /* Manage module bank */
-    module_ManageBank( p_main->p_bank );
+    module_ManageBank( );
 
     if( ( p_intf->p_input != NULL ) &&
             ( p_intf->p_input->b_error || p_intf->p_input->b_eof ) )
@@ -205,7 +204,7 @@ void intf_Destroy( intf_thread_t *p_intf )
     }
          
     /* Unlock module */
-    module_Unneed( p_main->p_bank, p_intf->p_module );
+    module_Unneed( p_intf->p_module );
 
     vlc_mutex_destroy( &p_intf->change_lock );
 
@@ -336,21 +335,21 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
  * half handled directly by the plugins. We should decide what to do. */        
         break;
     case INTF_KEY_INC_VOLUME:                                    /* volume + */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol < VOLUME_MAX) )
-            p_main->p_aout->vol += VOLUME_STEP;
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->i_vol < VOLUME_MAX) )
+            p_main->p_aout->i_vol += VOLUME_STEP;
         break;
     case INTF_KEY_DEC_VOLUME:                                    /* volume - */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol > VOLUME_STEP) )
-            p_main->p_aout->vol -= VOLUME_STEP;
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->i_vol > VOLUME_STEP) )
+            p_main->p_aout->i_vol -= VOLUME_STEP;
         break;
     case INTF_KEY_TOGGLE_VOLUME:                              /* toggle mute */
-        if( (p_main->p_aout != NULL) && (p_main->p_aout->vol))
+        if( (p_main->p_aout != NULL) && (p_main->p_aout->i_vol))
         {
-            i_volbackup = p_main->p_aout->vol;
-            p_main->p_aout->vol = 0;
+            i_volbackup = p_main->p_aout->i_vol;
+            p_main->p_aout->i_vol = 0;
         }
-        else if( (p_main->p_aout != NULL) && (!p_main->p_aout->vol))
-            p_main->p_aout->vol = i_volbackup;
+        else if( (p_main->p_aout != NULL) && (!p_main->p_aout->i_vol))
+            p_main->p_aout->i_vol = i_volbackup;
         break;
     case INTF_KEY_DEC_GAMMA:                                      /* gamma - */
         if( (p_main->p_vout != NULL) && (p_main->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )

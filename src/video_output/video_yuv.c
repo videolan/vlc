@@ -3,7 +3,7 @@
  * These functions set up YUV tables for colorspace conversion
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuv.c,v 1.47 2001/03/21 13:42:35 sam Exp $
+ * $Id: video_yuv.c,v 1.48 2001/05/01 04:18:18 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -45,8 +45,6 @@
 
 #include "intf_msg.h"
 
-#include "main.h"
-
 /*****************************************************************************
  * vout_InitYUV: allocate and initialize translation tables
  *****************************************************************************
@@ -56,8 +54,7 @@
 int vout_InitYUV( vout_thread_t *p_vout )
 {
     /* Choose the best module */
-    p_vout->yuv.p_module = module_Need( p_main->p_bank,
-                                        MODULE_CAPABILITY_YUV, NULL );
+    p_vout->yuv.p_module = module_Need( MODULE_CAPABILITY_YUV, NULL );
 
     if( p_vout->yuv.p_module == NULL )
     {
@@ -94,6 +91,6 @@ int vout_ResetYUV( vout_thread_t *p_vout )
 void vout_EndYUV( vout_thread_t *p_vout )
 {
     p_vout->yuv.pf_end( p_vout );
-    module_Unneed( p_main->p_bank, p_vout->yuv.p_module );
+    module_Unneed( p_vout->yuv.p_module );
 }
 

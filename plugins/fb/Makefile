@@ -27,4 +27,5 @@ include ../../Makefile.modules
 
 ../../lib/fb.a: $(BUILTIN_C)
 	ar r $@ $^
+	$(RANLIB) $@
 

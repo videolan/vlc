@@ -35,4 +35,5 @@ $(BUILTIN_MACOSX): BUILTIN_%.o: %.c
 
 ../../lib/macosx.a: $(BUILTIN_MACOSX)
 	ar r $@ $^
+	$(RANLIB) $@
 
