@@ -10,8 +10,8 @@
 ################################################################################
 
 # Environment
-#CC=gcc
-#SHELL=/bin/sh
+CC=egcc
+SHELL=/bin/sh
 
 # Audio output settings
 AUDIO = dsp
@@ -21,7 +21,8 @@ AUDIO = dsp
 AUDIO += dummy
 
 # Video output settings
-VIDEO = x11 fb
+VIDEO = x11
+#VIDEO += fb
 #VIDEO += ggi
 #VIDEO += glide
 # Not yet supported
@@ -269,7 +270,8 @@ endif
 
 misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \
-						misc/netutils.o
+						misc/netutils.o \
+						misc/decoder_fifo.o
 
 C_OBJ = $(interface_obj) \
 		$(input_obj) \
