@@ -1958,6 +1958,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     char name[512];
                     char *psz = malloc( strlen( p_request ) + 1000 );
                     char *p = psz;
+                    char *vlm_error;
                     int i;
 
                     if( p_intf->p_sys->p_vlm == NULL )
@@ -1979,6 +1980,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         char val[512];
                         uri_extract_value( p_request, vlm_properties[i], val, 512 );
+                        uri_decode_url_encoded( val );
                         if( strlen( val ) > 0 && i >= 4 )
                         {
                             p += sprintf( p, " %s %s", vlm_properties[i], val );
@@ -1989,8 +1991,23 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         }
                     }
                     vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
-                    /* FIXME do a vlm_answer -> var stack conversion */
+                    if( vlm_answer->psz_value == NULL ) /* there is no error */
+                    {
+                        vlm_error = strdup( "" );
+                    }
+                    else
+                    {
+                        vlm_error = malloc( strlen(vlm_answer->psz_name) +
+                                            strlen(vlm_answer->psz_value) +
+                                            strlen( " : ") + 1 );
+                        sprintf( vlm_error , "%s : %s" , vlm_answer->psz_name,
+                                                         vlm_answer->psz_value );
+                    }
+
+                    mvar_AppendNewVar( p_args->vars, "vlm_error", vlm_error );
+
                     vlm_MessageDelete( vlm_answer );
+                    free( vlm_error );
                     free( psz );
                     break;
                 }
