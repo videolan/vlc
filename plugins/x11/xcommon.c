@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.23 2002/03/17 13:53:21 gbazin Exp $
+ * $Id: xcommon.c,v 1.24 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -123,6 +123,10 @@ static void ToggleCursor   ( vout_thread_t * );
 #ifdef MODULE_NAME_IS_xvideo
 static int  XVideoGetPort         ( Display *, u32, u32 * );
 static void XVideoReleasePort     ( Display *, int );
+#endif
+
+#ifdef MODULE_NAME_IS_x11
+static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 #endif
 
 /*****************************************************************************
@@ -453,7 +457,7 @@ static int vout_Init( vout_thread_t *p_vout )
     switch( p_vout->p_sys->i_screen_depth )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_RGB; break;
+            p_vout->output.i_chroma = FOURCC_RGB2; break;
         case 15:
             p_vout->output.i_chroma = FOURCC_RV15; break;
         case 16:
@@ -1307,6 +1311,29 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             break;
 
 #else
+        case FOURCC_RGB2:
+
+            p_pic->p->p_pixels = p_pic->p_sys->p_image->data
+                                  + p_pic->p_sys->p_image->xoffset;
+            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
+            p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
+            p_pic->p->i_pixel_bytes = p_pic->p_sys->p_image->depth;
+
+            if( p_pic->p->i_pitch == p_pic->p_sys->p_image->width )
+            {
+                p_pic->p->b_margin = 0;
+            }
+            else
+            {
+                p_pic->p->b_margin = 1;
+                p_pic->p->b_hidden = 1;
+                p_pic->p->i_visible_bytes = p_pic->p_sys->p_image->width;
+            }
+
+            p_pic->i_planes = 1;
+
+            break;
+
         case FOURCC_RV16:
         case FOURCC_RV15:
 
@@ -1331,7 +1358,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
             break;
 
-        case FOURCC_BI_BITFIELDS:
+        case FOURCC_RV32:
+        case FOURCC_RV24:
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->xoffset;
@@ -2057,6 +2085,7 @@ static int InitDisplay( vout_thread_t *p_vout )
             return( 1 );
         }
         p_vout->p_sys->i_bytes_per_pixel = 1;
+        p_vout->output.pf_setpalette = SetPalette;
         break;
     case 15:
     case 16:
@@ -2249,4 +2278,35 @@ static IMAGE_TYPE * CreateImage( Display *p_display, EXTRA_ARGS,
 
     return p_image;
 }
+
+#ifdef MODULE_NAME_IS_x11
+/*****************************************************************************
+ * SetPalette: sets an 8 bpp palette
+ *****************************************************************************
+ * This function sets the palette given as an argument. It does not return
+ * anything, but could later send information on which colors it was unable
+ * to set.
+ *****************************************************************************/
+static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+{
+    int i;
+    XColor p_colors[255];
+
+    /* allocate palette */
+    for( i = 0; i < 255; i++ )
+    {
+        /* kludge: colors are indexed reversely because color 255 seems
+         * to be reserved for black even if we try to set it to white */
+        p_colors[ i ].pixel = 255 - i;
+        p_colors[ i ].pad   = 0;
+        p_colors[ i ].flags = DoRed | DoGreen | DoBlue;
+        p_colors[ i ].red   = red[ 255 - i ];
+        p_colors[ i ].blue  = blue[ 255 - i ];
+        p_colors[ i ].green = green[ 255 - i ];
+    }
+
+    XStoreColors( p_vout->p_sys->p_display,
+                  p_vout->p_sys->colormap, p_colors, 255 );
+}
+#endif
 

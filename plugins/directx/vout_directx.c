@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.25 2002/03/16 23:03:19 sam Exp $
+ * $Id: vout_directx.c,v 1.26 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -963,15 +963,15 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     switch( )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_BI_RGB; break;
+            p_vout->output.i_chroma = FOURCC_RGB2; break;
         case 15:
             p_vout->output.i_chroma = FOURCC_RV15; break;
         case 16:
             p_vout->output.i_chroma = FOURCC_RV16; break;
         case 24:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV24; break;
         case 32:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV32; break;
         default:
             intf_ErrMsg( "vout error: unknown screen depth" );
             return( 0 );

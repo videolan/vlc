@@ -238,6 +238,9 @@
 /* Define if you have the <linux/cdrom.h> header file.  */
 #undef HAVE_LINUX_CDROM_H
 
+/* Define if you have the <linux/fb.h> header file.  */
+#undef HAVE_LINUX_FB_H
+
 /* Define if you have the <locale.h> header file.  */
 #undef HAVE_LOCALE_H
 

@@ -2,7 +2,7 @@
  * i420_rgb16.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb16.c,v 1.4 2002/03/16 23:03:19 sam Exp $
+ * $Id: i420_rgb16.c,v 1.5 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -73,7 +73,7 @@ void _M( I420_RGB15 )( vout_thread_t *p_vout, picture_t *p_src,
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    u16 *       p_yuv = p_vout->chroma.p_sys->yuv.p_rgb16;
+    u16 *       p_yuv = p_vout->chroma.p_sys->p_rgb16;
     u16 *       p_ybase;                     /* Y dependant conversion table */
 #endif
 
@@ -208,7 +208,7 @@ void _M( I420_RGB16 )( vout_thread_t *p_vout, picture_t *p_src,
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    u16 *       p_yuv = p_vout->chroma.p_sys->yuv.p_rgb16;
+    u16 *       p_yuv = p_vout->chroma.p_sys->p_rgb16;
     u16 *       p_ybase;                     /* Y dependant conversion table */
 #endif
 
@@ -340,6 +340,12 @@ void _M( I420_RGB32 )( vout_thread_t *p_vout, picture_t *p_src,
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
     u32 *       p_pic_start;       /* beginning of the current line for copy */
+#if defined (MODULE_NAME_IS_chroma_i420_rgb)
+    int         i_uval, i_vval;                           /* U and V samples */
+    int         i_red, i_green, i_blue;          /* U and V modified samples */
+    u32 *       p_yuv = p_vout->chroma.p_sys->p_rgb32;
+    u32 *       p_ybase;                     /* Y dependant conversion table */
+#endif
 
     /* Conversion buffer pointer */
     u32 *       p_buffer_start = (u32*)p_vout->chroma.p_sys->p_buffer;
@@ -374,11 +380,6 @@ void _M( I420_RGB32 )( vout_thread_t *p_vout, picture_t *p_src,
                p_vout->output.i_width, p_vout->output.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
-#if defined (MODULE_NAME_IS_chroma_i420_rgb)
-    intf_ErrMsg( "vout error: I420_RGB32 unimplemented, "
-                 "please harass sam@zoy.org" );
-#endif
-
     /*
      * Perform conversion
      */
@@ -392,7 +393,10 @@ void _M( I420_RGB32 )( vout_thread_t *p_vout, picture_t *p_src,
         for ( i_x = p_vout->render.i_width / 8; i_x--; )
         {
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-            /* FIXME: TODO */
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
 #elif defined (MODULE_NAME_IS_chroma_i420_rgb_mmx)
             __asm__( MMX_INIT_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
@@ -419,7 +423,10 @@ void _M( I420_RGB32 )( vout_thread_t *p_vout, picture_t *p_src,
             p_v -= i_rewind >> 1;
             p_buffer -= i_rewind;
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-            /* FIXME: TODO */
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
+            CONVERT_YUV_PIXEL(4);  CONVERT_Y_PIXEL(4);
 #elif defined (MODULE_NAME_IS_chroma_i420_rgb_mmx)
             __asm__( MMX_INIT_32
                      : : "r" (p_y), "r" (p_u), "r" (p_v), "r" (p_buffer) );
@@ -494,7 +501,7 @@ static void SetOffset( int i_width, int i_height, int i_pic_width,
             p_offset++;
             i_scale_count += i_width;
         }
-     }
+    }
 
     /*
      * Set vertical scaling indicator

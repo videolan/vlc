@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.15 2002/03/16 23:03:19 sam Exp $
+ * $Id: fb.c,v 1.16 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -261,15 +261,15 @@ static int vout_Init( vout_thread_t *p_vout )
     switch( p_vout->p_sys->var_info.bits_per_pixel )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_BI_RGB; break;
+            p_vout->output.i_chroma = FOURCC_RGB2; break;
         case 15:
             p_vout->output.i_chroma = FOURCC_RV15; break;
         case 16:
             p_vout->output.i_chroma = FOURCC_RV16; break;
         case 24:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV24; break;
         case 32:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV32; break;
         default:
             intf_ErrMsg( "vout error: unknown screen depth" );
             return 0;

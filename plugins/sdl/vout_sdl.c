@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.83 2002/03/16 23:03:19 sam Exp $
+ * $Id: vout_sdl.c,v 1.84 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -125,9 +125,10 @@ static int  vout_Manage     ( struct vout_thread_s * );
 static void vout_Render     ( struct vout_thread_s *, struct picture_s * );
 static void vout_Display    ( struct vout_thread_s *, struct picture_s * );
 
-static int  SDLOpenDisplay      ( vout_thread_t *p_vout );
-static void SDLCloseDisplay     ( vout_thread_t *p_vout );
-static int  SDLNewPicture       ( vout_thread_t *p_vout, picture_t *p_pic );
+static int  OpenDisplay     ( struct vout_thread_s * );
+static void CloseDisplay    ( struct vout_thread_s * );
+static int  NewPicture      ( struct vout_thread_s *, struct picture_s * );
+static void SetPalette      ( struct vout_thread_s *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -215,7 +216,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 #endif
 
-    if( SDLOpenDisplay( p_vout ) )
+    if( OpenDisplay( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't set up SDL (%s)", SDL_GetError() );
         SDL_QuitSubSystem( SDL_INIT_VIDEO );
@@ -275,7 +276,7 @@ static int vout_Init( vout_thread_t *p_vout )
         }
 
         /* Allocate the picture if we found one */
-        if( p_pic == NULL || SDLNewPicture( p_vout, p_pic ) )
+        if( p_pic == NULL || NewPicture( p_vout, p_pic ) )
         {
             break;
         }
@@ -326,7 +327,7 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
-    SDLCloseDisplay( p_vout );
+    CloseDisplay( p_vout );
 
     SDL_QuitSubSystem( SDL_INIT_VIDEO );
 
@@ -351,8 +352,8 @@ static int vout_Manage( vout_thread_t *p_vout )
         case SDL_VIDEORESIZE:                          /* Resizing of window */
             p_vout->p_sys->i_width = event.resize.w;
             p_vout->p_sys->i_height = event.resize.h;
-            SDLCloseDisplay( p_vout );
-            SDLOpenDisplay( p_vout );
+            CloseDisplay( p_vout );
+            OpenDisplay( p_vout );
             break;
 
         case SDL_MOUSEMOTION:
@@ -547,12 +548,12 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 /* following functions are local */
 
 /*****************************************************************************
- * SDLOpenDisplay: open and initialize SDL device
+ * OpenDisplay: open and initialize SDL device
  *****************************************************************************
  * Open and initialize display according to preferences specified in the vout
  * thread fields.
  *****************************************************************************/
-static int SDLOpenDisplay( vout_thread_t *p_vout )
+static int OpenDisplay( vout_thread_t *p_vout )
 {
     Uint32 i_flags;
     int    i_bpp;
@@ -607,7 +608,6 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->p_overlay =
         SDL_CreateYUVOverlay( 32, 32, p_vout->output.i_chroma,
                               p_vout->p_sys->p_display );
-
     /* FIXME: if the first overlay we find is software, don't stop,
      * because we may find a hardware one later ... */
 
@@ -645,7 +645,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         switch( p_vout->p_sys->p_display->format->BitsPerPixel )
         {
             case 8:
-                p_vout->output.i_chroma = FOURCC_RGB;
+                p_vout->output.i_chroma = FOURCC_RGB2;
+                p_vout->output.pf_setpalette = SetPalette;
                 break;
             case 15:
                 p_vout->output.i_chroma = FOURCC_RV15;
@@ -693,12 +694,12 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * SDLCloseDisplay: close and reset SDL device
+ * CloseDisplay: close and reset SDL device
  *****************************************************************************
- * This function returns all resources allocated by SDLOpenDisplay and restore
+ * This function returns all resources allocated by OpenDisplay and restore
  * the original state of the device.
  *****************************************************************************/
-static void SDLCloseDisplay( vout_thread_t *p_vout )
+static void CloseDisplay( vout_thread_t *p_vout )
 {
     SDL_FreeYUVOverlay( p_vout->p_sys->p_overlay );
     SDL_UnlockSurface ( p_vout->p_sys->p_display );
@@ -706,11 +707,11 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * SDLNewPicture: allocate a picture
+ * NewPicture: allocate a picture
  *****************************************************************************
  * Returns 0 on success, -1 otherwise
  *****************************************************************************/
-static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
+static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int i_width  = p_vout->output.i_width;
     int i_height = p_vout->output.i_height;
@@ -731,12 +732,29 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             return -1;
         }
 
+        switch( p_vout->p_sys->p_display->format->BitsPerPixel )
+        {
+            case 8:
+                p_pic->p->i_pixel_bytes = 1;
+                break;
+            case 15:
+            case 16:
+                p_pic->p->i_pixel_bytes = 2;
+                break;
+            case 24:
+            case 32:
+                p_pic->p->i_pixel_bytes = 4;
+                break;
+            default:
+                return( -1 );
+        }
+
         p_pic->p->p_pixels = p_vout->p_sys->p_display->pixels;
         p_pic->p->i_lines = p_vout->p_sys->p_display->h;
         p_pic->p->i_pitch = p_vout->p_sys->p_display->pitch;
-        p_pic->p->i_pixel_bytes = 2;
 
-        if( p_pic->p->i_pitch == 2 * p_vout->p_sys->p_display->w )
+        if( p_pic->p->i_pitch ==
+                p_pic->p->i_pixel_bytes * p_vout->p_sys->p_display->w )
         {
             p_pic->p->b_margin = 0;
         }
@@ -744,7 +762,8 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         {
             p_pic->p->b_margin = 1;
             p_pic->p->b_hidden = 1;
-            p_pic->p->i_visible_bytes = 2 * p_vout->p_sys->p_display->w;
+            p_pic->p->i_visible_bytes =
+                p_pic->p->i_pixel_bytes * p_vout->p_sys->p_display->w;
         }
 
         p_vout->p_sys->i_surfaces++;
@@ -827,5 +846,28 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     return 0;
+}
+
+/*****************************************************************************
+ * SetPalette: sets an 8 bpp palette
+ *****************************************************************************/
+static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+{
+    SDL_Color colors[256];
+    int i;
+  
+    /* Fill colors with color information */
+    for( i = 0; i < 256; i++ )
+    {
+        colors[ i ].r = red[ i ] >> 8;
+        colors[ i ].g = green[ i ] >> 8;
+        colors[ i ].b = blue[ i ] >> 8;
+    }
+
+    /* Set palette */
+    if( SDL_SetColors( p_vout->p_sys->p_display, colors, 0, 256 ) == 0 )
+    {
+        intf_ErrMsg( "vout error: failed setting palette" );
+    }
 }
 

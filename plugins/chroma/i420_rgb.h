@@ -2,7 +2,7 @@
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb.h,v 1.4 2002/03/16 23:03:19 sam Exp $
+ * $Id: i420_rgb.h,v 1.5 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,13 +34,10 @@ typedef struct chroma_sys_s
 
 #ifdef MODULE_NAME_IS_chroma_i420_rgb
     /* Pre-calculated conversion tables */
-    void *              p_base;            /* base for all conversion tables */
-    union
-    {
-        u8 *            p_rgb8;                          /* RGB 8 bits table */
-        u16 *           p_rgb16;                        /* RGB 16 bits table */
-        u32 *           p_rgb32;                        /* RGB 32 bits table */
-    } yuv;
+    void *p_base;                          /* base for all conversion tables */
+    u8   *p_rgb8;                                        /* RGB 8 bits table */
+    u16  *p_rgb16;                                      /* RGB 16 bits table */
+    u32  *p_rgb32;                                      /* RGB 32 bits table */
 #endif
 
 } chroma_sys_t;

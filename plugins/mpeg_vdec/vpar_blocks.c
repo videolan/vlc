@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_blocks.c,v 1.6 2002/01/04 14:01:34 sam Exp $
+ * $Id: vpar_blocks.c,v 1.7 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -535,7 +535,7 @@ coeff_2:
             if( i_coeff >= 64 )
             {
                 /* Illegal, but needed to avoid overflow */
-                intf_WarnMsg( 2, "MPEG2NonIntra coeff is out of bound" );
+                intf_WarnMsg( 2, "vpar warning: MPEG2NonIntra coeff is out of bound" );
                 p_vpar->picture.b_error = 1;
                 break;
             }
@@ -589,7 +589,7 @@ coeff_2:
             }
         }
 
-        intf_WarnMsg( 2, "MPEG2NonIntra coeff is out of bound" );
+        intf_WarnMsg( 2, "vpar warning: MPEG2NonIntra coeff is out of bound" );
         p_vpar->picture.b_error = 1;
         break;
     }
@@ -693,7 +693,7 @@ store_coeff:
             if( i_coeff >= 64 )
             {
                 /* Illegal, but needed to avoid overflow */
-                intf_WarnMsg( 2, "MPEG1Intra coeff is out of bound" );
+                intf_WarnMsg( 2, "vpar warning: MPEG1Intra coeff is out of bound" );
                 p_vpar->picture.b_error = 1;
                 break;
             }
@@ -755,7 +755,7 @@ store_coeff:
             }
         }
 
-        intf_WarnMsg( 2, "MPEG1Intra coeff is out of bound" );
+        intf_WarnMsg( 2, "vpar warning: MPEG1Intra coeff is out of bound" );
         p_vpar->picture.b_error = 1;
         break;
     }
@@ -848,7 +848,7 @@ coeff_2:
             if( i_coeff >= 64 )
             {
                 /* Illegal, but needed to avoid overflow */
-                intf_WarnMsg( 2, "MPEG1NonIntra coeff is out of bound" );
+                intf_WarnMsg( 2, "vpar warning: MPEG1NonIntra coeff is out of bound" );
                 p_vpar->picture.b_error = 1;
                 break;
             }
@@ -910,7 +910,7 @@ coeff_2:
             }
         }
 
-        intf_WarnMsg( 2, "MPEG1NonIntra coeff is out of bound" );
+        intf_WarnMsg( 2, "vpar warning: MPEG1NonIntra coeff is out of bound" );
         p_vpar->picture.b_error = 1;
         break;
     }

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.167 2002/03/16 23:03:19 sam Exp $
+ * $Id: video_output.c,v 1.168 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -365,18 +365,8 @@ static int InitThread( vout_thread_t *p_vout )
         }
 
 #define f p_vout->chroma.p_module->p_functions->chroma.functions.chroma
-        p_vout->chroma.pf_init       = f.pf_init;
         p_vout->chroma.pf_end        = f.pf_end;
 #undef f
-
-        if( p_vout->chroma.pf_init( p_vout ) )
-        {
-            intf_ErrMsg( "vout error: could not initialize chroma module" );
-            module_Unneed( p_vout->chroma.p_module );
-            p_vout->pf_end( p_vout );
-            vlc_mutex_unlock( &p_vout->change_lock );
-            return( 1 );
-        }
 
         if( I_OUTPUTPICTURES < VOUT_MAX_PICTURES )
         {

@@ -2,7 +2,7 @@
  * i420_rgb8.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb8.c,v 1.2 2002/01/12 01:25:57 sam Exp $
+ * $Id: i420_rgb8.c,v 1.3 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,43 +42,66 @@ static void SetOffset( int, int, int, int, boolean_t *, int *, int * );
 /*****************************************************************************
  * I420_RGB8: color YUV 4:2:0 to RGB 8 bpp
  *****************************************************************************/
-void _M( I420_RGB8 )( vout_thread_t *p_vout, picture_t *p_source,
+void _M( I420_RGB8 )( vout_thread_t *p_vout, picture_t *p_src,
                                              picture_t *p_dest )
 {
     /* We got this one from the old arguments */
-    u16 *p_pic = (u16*)p_dest->p->p_pixels;
-    u8 *p_y = p_source->Y_PIXELS;
-    u8 *p_u = p_source->U_PIXELS, *p_v = p_source->V_PIXELS;
-
-    /* FIXME: add margins here */
-    int i_pic_line_width = p_dest->p->i_pitch / 2;
+    u8 *p_pic = (u8*)p_dest->p->p_pixels;
+    u8 *p_y   = p_src->Y_PIXELS;
+    u8 *p_u   = p_src->U_PIXELS;
+    u8 *p_v   = p_src->V_PIXELS;
 
     boolean_t   b_hscale;             /* horizontal scaling type */
     int         i_vscale;                 /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
+    int         i_real_y;                                           /* y % 4 */
+    int         i_right_margin;
+    int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
-    int         i_chroma_width;                              /* chroma width */
-    u16 *       p_pic_start;       /* beginning of the current line for copy */
-    u16 *       p_buffer_start;                   /* conversion buffer start */
-    u16 *       p_buffer;                       /* conversion buffer pointer */
-    int *       p_offset_start;                        /* offset array start */
-    int *       p_offset;                            /* offset array pointer */
+    int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
 
-    /*
-     * Initialize some values  - i_pic_line_width will store the line skip
-     */
-    i_pic_line_width -= p_vout->output.i_width;
-    i_chroma_width = p_vout->render.i_width / 2;
-    p_buffer_start = (u16*)p_vout->chroma.p_sys->p_buffer;
-    p_offset_start = p_vout->chroma.p_sys->p_offset;
+    /* Lookup table */
+    u8 *        p_lookup = p_vout->chroma.p_sys->p_base;
+
+    /* Offset array pointer */
+    int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
+    int *       p_offset;
+
+    /* The dithering matrices */
+    static int dither10[4] = {  0x0,  0x8,  0x2,  0xa };
+    static int dither11[4] = {  0xc,  0x4,  0xe,  0x6 };
+    static int dither12[4] = {  0x3,  0xb,  0x1,  0x9 };
+    static int dither13[4] = {  0xf,  0x7,  0xd,  0x5 };
+
+    static int dither20[4] = {  0x0, 0x10,  0x4, 0x14 };
+    static int dither21[4] = { 0x18,  0x8, 0x1c,  0xc };
+    static int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
+    static int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
+
     SetOffset( p_vout->render.i_width, p_vout->render.i_height,
                p_vout->output.i_width, p_vout->output.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
-    /* FIXME */
-#warning "Please ignore the following warnings, I already know about them"
-    intf_ErrMsg( "vout error: I420_RGB8 unimplemented, "
-                 "please harass sam@zoy.org" );
+    if( p_dest->p->b_margin )
+    {
+        i_right_margin = (p_dest->p->i_pitch - p_dest->p->i_visible_bytes);
+    }
+    else
+    {
+        i_right_margin = 0;
+    }
+
+    /*
+     * Perform conversion
+     */
+    i_scale_count = ( i_vscale == 1 ) ?
+                    p_vout->output.i_height : p_vout->render.i_height;
+    for( i_y = 0, i_real_y = 0; i_y < p_vout->render.i_height; i_y++ )
+    {
+        /* Do horizontal and vertical scaling */
+        SCALE_WIDTH_DITHER( 420 );
+        SCALE_HEIGHT_DITHER( 420 );
+    }
 }
 
 /* Following functions are local */
@@ -145,7 +168,7 @@ static void SetOffset( int i_width, int i_height, int i_pic_width,
             i_remainder = i_jump & 1;
             i_scale_count += i_width;
         }
-     }
+    }
 
     /*
      * Set vertical scaling indicator

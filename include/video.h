@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.46 2002/03/16 23:03:19 sam Exp $
+ * $Id: video.h,v 1.47 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -103,13 +103,16 @@ typedef struct picture_heap_s
     u32 i_chroma;                                          /* picture chroma */
     int i_aspect;                                            /* aspect ratio */
 
-    /* Variables used for RGB planes */
+    /* Real pictures */
+    picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
+
+    /* Stuff used for truecolor RGB planes */
     int i_rmask, i_rrshift, i_lrshift;
     int i_gmask, i_rgshift, i_lgshift;
     int i_bmask, i_rbshift, i_lbshift;
 
-    /* Real pictures */
-    picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
+    /* Stuff used for palettized RGB planes */
+    void (* pf_setpalette) ( struct vout_thread_s *, u16 *, u16 *, u16 * );
 
 } picture_heap_t;
 
@@ -143,7 +146,7 @@ typedef struct picture_heap_s
 
 /* Packed RGB formats */
 #define FOURCC_BI_RGB        0x00000000                      /* RGB for 8bpp */
-#define FOURCC_RGB           0x32424752                  /* alias for BI_RGB */
+#define FOURCC_RGB2          0x32424752                  /* alias for BI_RGB */
 #define FOURCC_BI_BITFIELDS  0x00000003            /* RGB, for 16, 24, 32bpp */
 #define FOURCC_RV15          0x35315652    /* RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
 #define FOURCC_RV16          0x36315652    /* RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */

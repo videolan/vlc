@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.17 2002/03/16 23:03:19 sam Exp $
+ * $Id: ggi.c,v 1.18 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,6 +54,7 @@ static void vout_Display   ( vout_thread_t *, picture_t * );
 
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
+static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
  * Building configuration tree
@@ -145,6 +146,7 @@ int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 int vout_Init( vout_thread_t *p_vout )
 {
+#define p_b p_vout->p_sys->pp_buffer
     int i_index;
     picture_t *p_pic;
 
@@ -158,16 +160,18 @@ int vout_Init( vout_thread_t *p_vout )
 
     switch( p_vout->p_sys->i_bits_per_pixel )
     {
-        case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_BI_RGB; break;
+        case 8:
+            p_vout->output.i_chroma = FOURCC_RGB2;
+            p_vout->output.pf_setpalette = SetPalette;
+            break;
         case 15:
             p_vout->output.i_chroma = FOURCC_RV15; break;
         case 16:
             p_vout->output.i_chroma = FOURCC_RV16; break;
         case 24:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV24; break;
         case 32:
-            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS; break;
+            p_vout->output.i_chroma = FOURCC_RV32; break;
         default:
             intf_ErrMsg( "vout error: unknown screen depth" );
             return 0;
@@ -195,7 +199,6 @@ int vout_Init( vout_thread_t *p_vout )
         return 0;
     }
 
-#define p_b p_vout->p_sys->pp_buffer
     /* We know the chroma, allocate a buffer which will be used
      * directly by the decoder */
     p_vout->p_sys->i_index = 0;
@@ -514,3 +517,28 @@ static void CloseDisplay( vout_thread_t *p_vout )
     /* Exit library */
     ggiExit();
 }
+
+/*****************************************************************************
+ * SetPalette: sets an 8 bpp palette
+ *****************************************************************************/
+static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+{
+    ggi_color colors[256];
+    int i;
+  
+    /* Fill colors with color information */
+    for( i = 0; i < 256; i++ )
+    {
+        colors[ i ].r = red[ i ];
+        colors[ i ].g = green[ i ];
+        colors[ i ].b = blue[ i ];
+        colors[ i ].a = 0;
+    }
+
+    /* Set palette */
+    if( ggiSetPalette( p_vout->p_sys->p_display, 0, 256, colors ) < 0 )
+    {
+        intf_ErrMsg( "vout error: failed setting palette" );
+    }
+}
+

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.84 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: mpeg_system.c,v 1.85 2002/03/17 17:00:38 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -670,7 +670,7 @@ ssize_t input_ReadPS( input_thread_t * p_input, data_packet_t ** pp_data )
             /* It is common for MPEG-1 streams to pad with zeros
              * (although it is forbidden by the recommendation), so
              * don't bother everybody in this case. */
-            intf_WarnMsg( 3, "input warning: garbage at input (0x%x%x%x%x)",
+            intf_WarnMsg( 3, "input warning: garbage (0x%.2x%.2x%.2x%.2x)",
                  *p_peek, *(p_peek + 1), *(p_peek + 2), *(p_peek + 3) );
         }
 
