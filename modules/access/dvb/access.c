@@ -124,7 +124,7 @@ int E_(Open) ( vlc_object_t *p_this )
     }
     else /* no frontend probing is done so use default border values. */
     {
-        msg_Dbg( p_input, "using default bvalues for frontend info" );
+        msg_Dbg( p_input, "using default values for frontend info" );
         i_len = sizeof(FRONTEND);
         if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
         {
@@ -145,8 +145,8 @@ int E_(Open) ( vlc_object_t *p_this )
 
         frontend_info.frequency_max = 12999 * 1000;
         frontend_info.frequency_min = 9750 * 1000;
-        frontend_info.symbol_rate_max = 30000;
-        frontend_info.symbol_rate_min = 1000;
+        frontend_info.symbol_rate_max = 30000 * 1000;
+        frontend_info.symbol_rate_min = 1000 * 1000;
     }
     
     /* Register Callback functions */
@@ -179,6 +179,7 @@ int E_(Open) ( vlc_object_t *p_this )
     {
         msg_Warn( p_input, "invalid frequency %d (kHz), using default one", u_freq );
         u_freq = config_GetInt( p_input, "frequency" );
+        u_freq *= 1000;
         if ( ((u_freq) > frontend_info.frequency_max) ||
              ((u_freq) < frontend_info.frequency_min) )
         {
@@ -187,11 +188,13 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
+    u_srate *= 1000;
     if ( ((u_srate) > frontend_info.symbol_rate_max) ||
          ((u_srate) < frontend_info.symbol_rate_min) )
     {
         msg_Warn( p_input, "invalid symbol rate, using default one" );
         u_srate = config_GetInt( p_input, "symbol-rate" );
+        u_srate *= 1000;
         if ( ((u_srate) > frontend_info.symbol_rate_max) ||
              ((u_srate) < frontend_info.symbol_rate_min) )
         {
@@ -235,7 +238,7 @@ int E_(Open) ( vlc_object_t *p_this )
         case FE_QPSK:
             fep.frequency = u_freq;
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
-            fep.u.qpsk.symbol_rate = u_srate * 1000;
+            fep.u.qpsk.symbol_rate = u_srate;
             fep.u.qpsk.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
             msg_Dbg( p_input, "satellite (QPSK) frontend found on %s", frontend_info.name );
             break;
@@ -246,7 +249,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
             fep.frequency = u_freq;
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
-            fep.u.qam.symbol_rate = u_srate * 1000;
+            fep.u.qam.symbol_rate = u_srate;
             fep.u.qam.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
             fep.u.qam.modulation = dvb_DecodeModulation(p_input, i_modulation); 
             msg_Dbg( p_input, "cable (QAM) frontend found on %s", frontend_info.name );
@@ -347,7 +350,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
     msg_Dbg( p_input, "setting filter on PAT" );
 
-    if ( ioctl_SetDMXFilter(p_input, 0, &i_fd, 3, u_adapter, u_device ) < 0 )
+    if ( ioctl_SetDMXFilter(p_input, 0, &i_fd, 21, u_adapter, u_device ) < 0 )
     {
 #   ifdef HAVE_ERRNO_H
         msg_Err( p_input, "an error occured when setting filter on PAT (%s)", strerror(errno) );
@@ -432,7 +435,7 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
         {
             ioctl_SetDMXFilter(p_input, p_input->stream.pp_programs[i]->pp_es[0]->i_id,
                        &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
-                       3, u_adapter, u_device );
+                       21, u_adapter, u_device );
         }
     }
 
@@ -509,7 +512,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
                 {
                     ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_video_type,
                                        u_adapter, u_device);
-                    u_video_type += 3;
+                    u_video_type += 5;
                 }
                 break;
             case MPEG1_AUDIO_ES:
@@ -519,12 +522,13 @@ int SatelliteSetProgram( input_thread_t    * p_input,
                     ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, u_audio_type,
                                        u_adapter, u_device);
                     input_SelectES( p_input , p_es );
-                    u_audio_type += 3;
+                    u_audio_type += 5;
                 }
                 break;
             default:
-                ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 3, u_adapter, u_device);
+                ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 21, u_adapter, u_device);
                 input_SelectES( p_input , p_es );
+                msg_Dbg(p_input, "Warning ES streamtype 0x%d found used as DMX_PES_OTHER !!",(int) p_es->i_cat);
                 break;
 #undef p_es
         }

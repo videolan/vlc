@@ -488,45 +488,96 @@ int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int * pi_fd , int i_
     s_filter_params.input   =   DMX_IN_FRONTEND;
     s_filter_params.output  =   DMX_OUT_TS_TAP;
     switch ( i_type )
-    {
+    {   /* First device */
         case 1:
-            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO for PMT %d", i_pid);
-            s_filter_params.pes_type = DMX_PES_VIDEO;
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO0 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_VIDEO0;
             break;
         case 2:
-            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO for PMT %d", i_pid);
-            s_filter_params.pes_type = DMX_PES_AUDIO;
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO0 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_AUDIO0;
             break;
-        case 3:
-            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_OTHER for PMT %d", i_pid);
-            s_filter_params.pes_type = DMX_PES_OTHER;
+        case 3: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_TELETEXT0 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_TELETEXT0;
             break;
-        case 4:
+        case 4: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_SUBTITLE0 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_SUBTITLE0;
+            break;
+        case 5: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_PCR0 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_PCR0;
+            break;
+        /* Second device */    
+        case 6:
             msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO1 for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_VIDEO1;
             break;
-        case 5:
+        case 7:
             msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO1 for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO1;
+            break;            
+        case 8: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_TELETEXT1 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_TELETEXT1;
             break;
-
-        case 7:
+        case 9: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_SUBTITLE1 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_SUBTITLE1;
+            break;
+        case 10: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_PCR1 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_PCR1;
+            break;
+        /* Third device */
+        case 11:
             msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO2 for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_VIDEO2;
             break;
-        case 8:
+        case 12:
             msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO2 for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO2;
+            break;            
+        case 13: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_TELETEXT2 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_TELETEXT2;
+            break;        
+        case 14: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_SUBTITLE2 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_SUBTITLE2;
             break;
-            
-        case 10:
+        case 15: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_PCR2 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_PCR2;
+            break;
+        /* Forth device */    
+        case 16:
             msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_VIDEO3 for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_VIDEO3;
             break;
-        case 11:
+        case 17:
             msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_AUDIO3 for PMT %d", i_pid);
             s_filter_params.pes_type = DMX_PES_AUDIO3;
             break;
+        case 18: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_TELETEXT3 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_TELETEXT3;
+            break;
+        case 19: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_SUBTITLE3 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_SUBTITLE3;
+            break;
+        case 20: 
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_PCR3 for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_PCR3;
+            break;
+        /* Usually used by Nova cards */    
+        case 21:
+            msg_Dbg(p_input, "ioctl_SetDMXFilter: DMX_PES_OTHER for PMT %d", i_pid);
+            s_filter_params.pes_type = DMX_PES_OTHER;
+            break;
+        /* What to do with i? */    
         default:
             msg_Err(p_input, "trying to set PMT id to=%d for unknown type %d", i_pid, i_type );
             break;

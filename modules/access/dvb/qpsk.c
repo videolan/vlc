@@ -99,7 +99,7 @@ void E_(Close)   ( vlc_object_t * );
 
 vlc_module_begin();
     add_category_hint( N_("Input"), NULL, VLC_FALSE );
-        add_integer( "adapter", 1, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT, VLC_FALSE );
+        add_integer( "adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT, VLC_FALSE );
         add_integer( "device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT, VLC_FALSE );
         add_integer( "frequency", 11954, NULL, FREQ_TEXT, FREQ_LONGTEXT, VLC_FALSE );
         add_integer( "polarization", 0, NULL, POL_TEXT, POL_LONGTEXT, VLC_FALSE );
