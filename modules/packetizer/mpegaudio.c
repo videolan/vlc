@@ -2,7 +2,7 @@
  * mpegaudio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegaudio.c,v 1.1 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: mpegaudio.c,v 1.2 2002/12/18 01:34:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -280,8 +280,10 @@ static void PacketizeThread( packetizer_t *p_pack )
                     i_samplesperframe = 1152;
                     break;
                 case 2:
-                    i_samplesperframe = i_version ? 1152 : 576;
+                    i_samplesperframe = i_version ? 576 : 1152;
                     break;
+                default:
+                    i_samplesperframe = 0;
             }
             break;
         }
