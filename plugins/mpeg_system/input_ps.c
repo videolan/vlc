@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.7 2001/12/27 01:49:34 massiot Exp $
+ * $Id: input_ps.c,v 1.8 2001/12/27 03:47:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -85,8 +85,7 @@ static __inline__ off_t fseeko( FILE *p_file, off_t i_offset, int i_pos )
  * Local prototypes
  *****************************************************************************/
 static int  PSProbe         ( probedata_t * );
-static int  PSRead          ( struct input_thread_s *,
-                             data_packet_t * p_packets[INPUT_READ_ONCE] );
+static int  PSRead          ( struct input_thread_s *, data_packet_t ** );
 static void PSInit          ( struct input_thread_s * );
 static void PSEnd           ( struct input_thread_s * );
 static int  PSSetProgram    ( struct input_thread_s * , pgrm_descriptor_t * );
@@ -210,12 +209,22 @@ static void PSInit( input_thread_t * p_input )
         while( !p_input->b_die && !p_input->b_error
                 && !p_demux_data->b_has_PSM )
         {
-            int                 i_result, i;
-            data_packet_t *     pp_packets[INPUT_READ_ONCE];
+            int                 i_result;
+            data_packet_t *     p_data;
+            data_packet_t *     p_saved_data;
 
-            i_result = PSRead( p_input, pp_packets );
+            i_result = PSRead( p_input, &p_data );
+            p_saved_data = p_data;
 
-            if( i_result == 1 )
+            while( p_data != NULL )
+            {
+                input_ParsePS( p_input, p_data );
+                p_data = p_data->p_next;
+            }
+
+            p_input->pf_delete_packet( p_input->p_method_data, p_saved_data );
+
+            if( i_result == 0 )
             {
                 /* EOF */
                 vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -227,13 +236,6 @@ static void PSInit( input_thread_t * p_input )
             {
                 p_input->b_error = 1;
                 break;
-            }
-
-            for( i = 0; i < INPUT_READ_ONCE && pp_packets[i] != NULL; i++ )
-            {
-                /* FIXME: use i_p_config_t */
-                input_ParsePS( p_input, pp_packets[i] );
-                p_input->pf_delete_packet( p_input->p_method_data, pp_packets[i] );
             }
 
             /* File too big. */
@@ -361,7 +363,7 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
     {
         if( feof( p_input->p_stream ) )
         {
-            return( 1 );
+            return( 0 );
         }
 
         if( (i_error = ferror( p_input->p_stream )) )
@@ -373,28 +375,29 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_tell += i_len;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    return( 0 );
+    return( i_len );
 }
 
 /*****************************************************************************
  * PSRead: reads data packets
  *****************************************************************************
- * Returns -1 in case of error, 0 if everything went well, and 1 in case of
- * EOF.
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * packets.
  *****************************************************************************/
 static int PSRead( input_thread_t * p_input,
-                   data_packet_t * pp_packets[INPUT_READ_ONCE] )
+                   data_packet_t ** pp_data )
 {
     byte_t              p_header[6];
     data_packet_t *     p_data;
     size_t              i_packet_size;
     int                 i_packet, i_error;
 
-    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
-    for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
+    *pp_data = NULL;
+
+    for( i_packet = 0; i_packet < PS_READ_ONCE; i_packet++ )
     {
         /* Read what we believe to be a packet header. */
-        if( (i_error = SafeRead( p_input, p_header, 4 )) )
+        if( (i_error = SafeRead( p_input, p_header, 4 )) <= 0 )
         {
             return( i_error );
         }
@@ -423,7 +426,7 @@ static int PSRead( input_thread_t * p_input,
                 }
                 else
                 {
-                    return( 1 );
+                    return( 0 );
                 }
             }
             /* Packet found. */
@@ -434,7 +437,7 @@ static int PSRead( input_thread_t * p_input,
         if( U32_AT(p_header) != 0x1B9 )
         {
             /* The packet is at least 6 bytes long. */
-            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) )
+            if( (i_error = SafeRead( p_input, p_header + 4, 2 )) <= 0 )
             {
                 return( i_error );
             }
@@ -486,8 +489,10 @@ static int PSRead( input_thread_t * p_input,
 
             /* Read the remaining of the packet. */
             if( i_packet_size && (i_error =
-                    SafeRead( p_input, p_data->p_demux_start + 6, i_packet_size )) )
+                    SafeRead( p_input, p_data->p_demux_start + 6,
+                              i_packet_size )) <= 0 )
             {
+                p_input->pf_delete_packet( p_input->p_method_data, p_data );
                 return( i_error );
             }
 
@@ -499,8 +504,10 @@ static int PSRead( input_thread_t * p_input,
                     /* MPEG-2 stuffing bytes */
                     byte_t      p_garbage[8];
                     if( (i_error = SafeRead( p_input, p_garbage,
-                                             p_data->p_demux_start[13] & 0x7)) )
+                                     p_data->p_demux_start[13] & 0x7)) <= 0 )
                     {
+                        p_input->pf_delete_packet( p_input->p_method_data,
+                                                   p_data );
                         return( i_error );
                     }
                 }
@@ -513,10 +520,11 @@ static int PSRead( input_thread_t * p_input,
         }
 
         /* Give the packet to the other input stages. */
-        pp_packets[i_packet] = p_data;
+        *pp_data = p_data;
+        pp_data = &p_data->p_next;
     }
 
-    return( 0 );
+    return( i_packet + 1 );
 }
 
 /*****************************************************************************

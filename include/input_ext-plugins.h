@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.12 2001/12/27 01:49:34 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.13 2001/12/27 03:47:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,10 +27,6 @@
  */
 
 /* FIXME: you've gotta move this move this, you've gotta move this move this */
-#define INPUT_READ_ONCE     7   /* We live in a world dominated by Ethernet. *
-                                 * Ethernet MTU is 1500 bytes, so in a UDP   *
-                                 * packet we can put : 1500/188 = 7 TS       *
-                                 * packets. Have a nice day and merry Xmas.  */
 #define PADDING_PACKET_SIZE 188 /* Size of the NULL packet inserted in case
                                  * of data loss (this should be < 188).      */
 #define PADDING_PACKET_NUMBER 10 /* Number of padding packets top insert to
@@ -185,17 +181,16 @@ typedef struct input_buffers_s                                              \
     vlc_mutex_t lock;                                                       \
     PACKETS_LIFO( pes_packet_t, pes )                                       \
     PACKETS_LIFO( data_packet_t, data )                                     \
-    BUFFERS_LIFO( data_buffer_t, buffers[NB_LIFO] )                         \
+    BUFFERS_LIFO( _data_buffer_t, buffers[NB_LIFO] )                        \
     size_t i_allocated;                                                     \
 } input_buffers_t;
 
-typedef struct data_buffer_s
+typedef struct _data_buffer_s
 {
     int i_refcount;
     unsigned int i_size;
-    struct data_buffer_s * p_next;
-    byte_t payload_start;
-} data_buffer_t;
+    struct _data_buffer_s * p_next;
+} _data_buffer_t;
 
 
 /*****************************************************************************
@@ -282,8 +277,8 @@ static void * input_BuffersInit( void )                                     \
                                                                             \
     for( i = 0; i < NB_LIFO; i++ )                                          \
     {                                                                       \
-        data_buffer_t * p_next;                                             \
-        data_buffer_t * p_buf = p_buffers->buffers[i].p_stack;              \
+        _data_buffer_t * p_next;                                            \
+        _data_buffer_t * p_buf = p_buffers->buffers[i].p_stack;             \
         BUFFERS_END_BUFFERS_LOOP;                                           \
     }                                                                       \
 
@@ -479,7 +474,7 @@ static data_packet_t * input_NewPacket( void * _p_buffers, size_t i_size )  \
             BUFFERS_NEWPACKET_END )
 
 #define DECLARE_BUFFERS_NEWPACKET_SHARED( FLAGS, NB_LIFO )                  \
-    BUFFERS_NEWPACKET( FLAGS, NB_LIFO, data_buffer_t, buffers,              \
+    BUFFERS_NEWPACKET( FLAGS, NB_LIFO, _data_buffer_t, buffers,             \
             BUFFERS_NEWPACKET_EXTRA_DECLARATION_SHARED,                     \
             BUFFERS_NEWPACKET_EXTRA_SHARED, BUFFERS_NEWPACKET_END_SHARED )
 
@@ -490,7 +485,7 @@ static data_packet_t * input_NewPacket( void * _p_buffers, size_t i_size )  \
     data_packet_t * p_buf = p_data;
 
 #define BUFFERS_DELETEPACKET_EXTRA_SHARED( FLAGS, NB_LIFO, DATA_CACHE_SIZE )\
-    data_buffer_t * p_buf = (data_buffer_t *)p_data->p_buffer;              \
+    _data_buffer_t * p_buf = (_data_buffer_t *)p_data->p_buffer;            \
                                                                             \
     /* Get rid of the data packet */                                        \
     if( p_buffers->data.i_depth < DATA_CACHE_SIZE )                         \
@@ -577,7 +572,7 @@ static void input_DeletePacket( void * _p_buffers, data_packet_t * p_data ) \
 
 #define DECLARE_BUFFERS_DELETEPACKET_SHARED( FLAGS, NB_LIFO,                \
                                              DATA_CACHE_SIZE )              \
-    BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE, data_buffer_t,   \
+    BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE, _data_buffer_t,  \
                           buffers, BUFFERS_DELETEPACKET_EXTRA_SHARED )
 
 /*****************************************************************************
@@ -731,7 +726,7 @@ static data_packet_t * input_ShareBuffer( void * _p_buffers,                \
 {                                                                           \
     input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
     data_packet_t *     p_data;                                             \
-    data_buffer_t *     p_buf = (data_buffer_t *)p_shared_data->p_buffer;   \
+    _data_buffer_t *    p_buf = (_data_buffer_t *)p_shared_data->p_buffer;  \
                                                                             \
     vlc_mutex_lock( &p_buffers->lock );                                     \
                                                                             \
@@ -741,7 +736,7 @@ static data_packet_t * input_ShareBuffer( void * _p_buffers,                \
     /* Finish initialization of p_data */                                   \
     p_data->p_buffer = p_shared_data->p_buffer;                             \
     p_data->p_demux_start = p_data->p_payload_start                         \
-                = p_shared_data->p_buffer + sizeof( data_buffer_t );        \
+                = p_shared_data->p_buffer + sizeof( _data_buffer_t );       \
     p_data->p_payload_end = p_shared_data->p_buffer + p_buf->i_size;        \
                                                                             \
     /* Update refcount */                                                   \

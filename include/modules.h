@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.36 2001/12/09 17:01:35 sam Exp $
+ * $Id: modules.h,v 1.37 2001/12/27 03:47:08 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -125,8 +125,7 @@ typedef struct function_list_s
                                            void * );
 
             int  ( * pf_read ) ( struct input_thread_s *,
-                                 struct data_packet_s *
-                                        pp_packets[] );
+                                 struct data_packet_s ** );
             void ( * pf_demux )( struct input_thread_s *,
                                  struct data_packet_s * );
 

@@ -2,9 +2,9 @@
  * input_es.h: thread structure of the ES plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.h,v 1.2 2001/12/12 17:41:15 massiot Exp $
+ * $Id: input_es.h,v 1.3 2001/12/27 03:47:09 massiot Exp $
  *
- * Authors: 
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,4 +22,5 @@
  *****************************************************************************/
 
 #define ES_PACKET_SIZE 2048
-#define MAX_PACKETS_IN_FIFO 14
+#define ES_READ_ONCE 50
+#define MAX_PACKETS_IN_FIFO 50

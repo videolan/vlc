@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.53 2001/12/12 13:48:09 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.54 2001/12/27 03:47:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -26,7 +26,6 @@
 /*
  * Communication input -> interface
  */
-#define INPUT_MAX_PLUGINS   1
 /* FIXME ! */
 #define REQUESTED_MPEG         1
 #define REQUESTED_AC3          2
@@ -94,6 +93,7 @@ typedef struct es_descriptor_s
 #define SPU_ES          0x02
 #define NAV_ES          0x03
 #define UNKNOWN_ES      0xFF
+
 /*****************************************************************************
  * pgrm_descriptor_t
  *****************************************************************************
@@ -262,7 +262,7 @@ typedef struct input_thread_s
 
     /* Read & Demultiplex */
     int                  (* pf_read)( struct input_thread_s *,
-                                      struct data_packet_s * pp_packets[] );
+                                      struct data_packet_s ** );
     void                 (* pf_demux)( struct input_thread_s *,
                                        struct data_packet_s * );
 
@@ -288,8 +288,6 @@ typedef struct input_thread_s
     int                     i_handle;           /* socket or file descriptor */
     FILE *                  p_stream;                       /* if applicable */
     void *                  p_handle;          /* if i_handle isn't suitable */
-    int                     i_read_once;        /* number of packet read by
-                                                 * pf_read once */
     void *                  p_method_data;     /* data of the packet manager */
     void *                  p_plugin_data;             /* data of the plugin */
 

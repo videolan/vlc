@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
- * Copyright (C) 1999-2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.46 2001/12/27 01:49:34 massiot Exp $
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: input_ext-dec.h,v 1.47 2001/12/27 03:47:08 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.7 2001/12/27 01:49:34 massiot Exp $
+ * $Id: input_es.c,v 1.8 2001/12/27 03:47:08 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -74,8 +74,7 @@
  * Local prototypes
  *****************************************************************************/
 static int  ESProbe     ( probedata_t * );
-static int  ESRead      ( struct input_thread_s *,
-                          data_packet_t * p_packets[INPUT_READ_ONCE] );
+static int  ESRead      ( struct input_thread_s *, data_packet_t ** );
 static void ESInit          ( struct input_thread_s * );
 static void ESEnd           ( struct input_thread_s * );
 static void ESSeek          ( struct input_thread_s *, off_t );
@@ -188,56 +187,53 @@ static void ESEnd( input_thread_t * p_input )
 /*****************************************************************************
  * ESRead: reads data packets
  *****************************************************************************
- * Returns -1 in case of error, 0 if everything went well, and 1 in case of
- * EOF.
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * packets.
  *****************************************************************************/
 static int ESRead( input_thread_t * p_input,
-                   data_packet_t * pp_packets[INPUT_READ_ONCE] )
+                   data_packet_t ** pp_data )
 {
-    int             i_read, i_loop;
-    struct iovec    p_iovec[INPUT_READ_ONCE];
+    int             i_read;
+    struct iovec    p_iovec[ES_READ_ONCE];
     data_packet_t * p_data;
 
     /* Get iovecs */
-    p_data = input_BuffersToIO( p_input->p_method_data, p_iovec,
-                                INPUT_READ_ONCE );
+    *pp_data = p_data = input_BuffersToIO( p_input->p_method_data, p_iovec,
+                                           ES_READ_ONCE );
 
     if ( p_data == NULL )
     {
         return( -1 );
     }
 
-    memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
-
-    i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+    i_read = readv( p_input->i_handle, p_iovec, ES_READ_ONCE );
     if( i_read == -1 )
     {
         intf_ErrMsg( "input error: ES readv error" );
+        p_input->pf_delete_packet( p_input->p_method_data, p_data );
         return( -1 );
     }
-
-    for( i_loop = 0; i_loop * ES_PACKET_SIZE < i_read; i_loop++ )
-    {
-        pp_packets[i_loop] = p_data;
-        p_data = p_data->p_next;
-        pp_packets[i_loop]->p_next = NULL;
-    }
-    /* Delete remaining packets */
-    input_DeletePacket( p_input->p_method_data, p_data );
-    for( ; i_loop < INPUT_READ_ONCE ; i_loop++ )
-    {
-        pp_packets[i_loop] = NULL;
-    }
-
-    /* EOF */
-    if( i_read == 0 && p_input->stream.b_seekable )
-    {
-        return( 1 );
-    }
-
     p_input->stream.p_selected_area->i_tell += i_read;
+    i_read /= ES_PACKET_SIZE;
 
-    return( 0 );
+    if( i_read != ES_READ_ONCE )
+    {
+        /* We got fewer packets than wanted. Give remaining packets
+         * back to the buffer allocator. */
+        int i_loop;
+
+        for( i_loop = 0; i_loop + 1 < i_read; i_loop++ )
+        {
+            p_data = p_data->p_next;
+        }
+        p_input->pf_delete_packet( p_input->p_method_data, p_data->p_next );
+        if( i_read != 0 )
+        {
+            p_data->p_next = NULL;
+        }
+    }
+
+    return( i_read );
 }
 
 /*****************************************************************************

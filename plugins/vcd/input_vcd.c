@@ -243,8 +243,6 @@ static void VCDInit( input_thread_t * p_input )
         intf_ErrMsg( "vcd error: could not read TOC" );
     }
 
-    p_input->i_read_once = VCD_DATA_ONCE;
-
     /* Set stream and area data */
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -396,10 +394,10 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
 /*****************************************************************************
  * VCDRead: reads from the VCD into PES packets.
  *****************************************************************************
- * Returns -1 in case of error, 0 if everything went well, and 1 in case of
- * EOF.
+ * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
+ * packets.
  *****************************************************************************/
-static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_packets )
+static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_data )
 {
     thread_vcd_data_t *     p_vcd;
     data_packet_t *         p_data;
@@ -413,6 +411,7 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_packets )
     p_vcd = (thread_vcd_data_t *)p_input->p_plugin_data;
 
     i_packet = 0;
+    *pp_data = NULL;
 
     while( i_packet < VCD_DATA_ONCE
             && !p_vcd->b_end_of_track )
@@ -489,10 +488,8 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_packets )
                     break;
             }
 
-#ifdef DEBUG
             intf_DbgMsg("i_index : %d\n", i_index);
             intf_DbgMsg("i_packet_size : %d\n", i_packet_size);
-#endif
 
             if ( i_index + i_packet_size > BUFFER_SIZE )
             {
@@ -525,12 +522,10 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_packets )
             }
 
             /* Give the packet to the other input stages. */
-            pp_packets[i_packet] = p_data;
-            i_packet++;
+            *pp_data = p_data;
+            pp_data = &p_data->p_next;
         }
     }
-
-    pp_packets[i_packet] = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -553,7 +548,7 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_packets )
         if( p_vcd->i_track >= p_vcd->nb_tracks - 1 )
         {
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            return 1;
+            return 0;
         }
 
         intf_WarnMsg( 4, "vcd info: new title" );
@@ -569,7 +564,7 @@ static int VCDRead( input_thread_t * p_input, data_packet_t ** pp_packets )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return 0;
+    return( i_packet + 1 );
 }
 
 /*****************************************************************************
