@@ -350,7 +350,7 @@ dist:
 		echo "OK."; mkdir tmp; \
 	fi
 	# Copy directory structure in tmp
-	find -type d | grep -v '\(\.dep\|snapshot\|CVS\)' | while read i ; \
+	find . -type d | grep -v '\(\.dep\|snapshot\|CVS\)' | while read i ; \
 		do mkdir -p tmp/vlc/$$i ; \
 	done
 	rm -Rf tmp/vlc/tmp
