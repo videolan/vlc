@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.15 2003/03/17 16:59:46 sam Exp $
+##  $Id: toolbox,v 1.16 2003/03/18 01:26:13 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -25,6 +25,7 @@ recognized flags are:
   --update-po                   update translation files
   --update-includes [BUILTINS]  generate various include files
   --update-glade                generate and fix Glade code
+  --update-glade2               generate and fix Glade 2 code
 EOF
   exit 1
 }
@@ -63,6 +64,9 @@ case "$1" in
     ;;
   --update-glade|--fix-glade)
     action=glade
+    ;;
+  --update-glade2|--update-glade-2|--fix-glade2)
+    action=glade2
     ;;
   --help)
     help
@@ -448,6 +452,20 @@ EOF
           < $file > $file.$$.bak
       mv -f $file.$$.bak $file
     fi
+  done
+
+  exit 0
+fi
+
+##
+##  Fix glade2-generated files
+##
+if test "${action}" = "glade2"
+then
+  for file in modules/gui/gtk2/gnome2.glade modules/gui/gtk2/gtk2.glade
+  do
+    echo "generating code from $file"
+    glade-2 -w $file || exit 1
   done
 
   exit 0

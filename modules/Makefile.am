@@ -42,6 +42,7 @@ EXTRA_DIST = \
 	gui/beos/Modules.am \
 	gui/familiar/Modules.am \
 	gui/gtk/Modules.am \
+	gui/gtk2/Modules.am \
 	gui/kde/Modules.am \
 	gui/macosx/Modules.am \
 	gui/ncurses/Modules.am \
@@ -67,5 +68,6 @@ EXTRA_DIST = \
 	video_output/qte/Modules.am \
 	video_output/x11/Modules.am \
 	visualization/scope/Modules.am \
-	visualization/xosd/Modules.am
+	visualization/xosd/Modules.am \
+	$(NULL)
 
