@@ -569,20 +569,14 @@ static int      DStreamControl( stream_t *s, int i_query, va_list args )
 static int      DStreamThread ( stream_t *s )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
-    char         *psz_mrl;
     demux_t      *p_demux;
 
     /* Create the demuxer */
 
-    psz_mrl = malloc( strlen( p_sys->psz_name ) + 3 );
-    sprintf( psz_mrl, "/%s:", p_sys->psz_name );
-
-    if( ( p_demux = demux2_New( s, psz_mrl, s, p_sys->out ) ) == NULL )
+    if( ( p_demux = demux2_New( s, "", p_sys->psz_name, "", s, p_sys->out ) ) == NULL )
     {
-        free( psz_mrl );
         return VLC_EGENERIC;
     }
-    free( psz_mrl );
 
     vlc_mutex_lock( &p_sys->lock );
     p_sys->p_demux = p_demux;

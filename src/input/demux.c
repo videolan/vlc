@@ -169,64 +169,23 @@ static void SeekOffset( input_thread_t *p_input, int64_t i_pos )
  * demux2_New:
  *****************************************************************************/
 demux_t *__demux2_New( vlc_object_t *p_obj,
-                       char *psz_mrl, stream_t *s, es_out_t *out )
+                       char *psz_access, char *psz_demux, char *psz_path,
+                       stream_t *s, es_out_t *out )
 {
     demux_t *p_demux = vlc_object_create( p_obj, VLC_OBJECT_DEMUX );
-
-    char    *psz_dup = strdup( psz_mrl ? psz_mrl : "" );
-    char    *psz = strchr( psz_dup, ':' );
-    char    *psz_module;
+    char *psz_module;
 
     if( p_demux == NULL )
     {
-        free( psz_dup );
         return NULL;
     }
 
     /* Parse URL */
-    p_demux->psz_access = NULL;
-    p_demux->psz_demux  = NULL;
-    p_demux->psz_path   = NULL;
+    p_demux->psz_access = strdup( psz_access );
+    p_demux->psz_demux  = strdup( psz_demux );
+    p_demux->psz_path   = strdup( psz_path );
 
-    if( psz )
-    {
-        *psz++ = '\0';
-
-        if( psz[0] == '/' && psz[1] == '/' )
-        {
-            psz += 2;
-        }
-        p_demux->psz_path = strdup( psz );
-
-        psz = strchr( psz_dup, '/' );
-        if( psz )
-        {
-            *psz++ = '\0';
-            p_demux->psz_demux  = strdup( psz );
-        }
-        p_demux->psz_access = strdup( psz_dup );
-    }
-    else
-    {
-        p_demux->psz_path = strdup( psz_mrl );
-    }
-    free( psz_dup );
-
-
-    if( p_demux->psz_access == NULL )
-    {
-        p_demux->psz_access = strdup( "" );
-    }
-    if( p_demux->psz_demux == NULL )
-    {
-        p_demux->psz_demux = strdup( "" );
-    }
-    if( p_demux->psz_path == NULL )
-    {
-        p_demux->psz_path = strdup( "" );
-    }
-    msg_Dbg( p_obj, "demux2_New: '%s' -> access='%s' demux='%s' path='%s'",
-             psz_mrl,
+    msg_Dbg( p_obj, "demux2_New: access='%s' demux='%s' path='%s'",
              p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
 
     p_demux->s          = s;

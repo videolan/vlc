@@ -1198,7 +1198,7 @@ static void ErrorThread( input_thread_t *p_input )
  *****************************************************************************/
 static void EndThread( input_thread_t * p_input )
 {
-    int i;
+    int i, j;
 #ifdef HAVE_SYS_TIMES_H
     /* Display statistics */
     struct tms  cpu_usage;
@@ -1210,7 +1210,44 @@ static void EndThread( input_thread_t * p_input )
     msg_Dbg( p_input, "%ld loops", p_input->c_loops );
 #endif
 
-    input_DumpStream( p_input );
+
+    /* DumpStream: printf some info for debugging purpose */
+#define S   p_input->stream
+    msg_Dbg( p_input, "dumping stream ID 0x%x [OK:%ld/D:%ld]", S.i_stream_id,
+             S.c_packets_read, S.c_packets_trashed );
+    if( S.b_seekable )
+    {
+        char psz_time1[MSTRTIME_MAX_SIZE];
+        char psz_time2[MSTRTIME_MAX_SIZE];
+
+        msg_Dbg( p_input, "seekable stream, position: "I64Fd"/"I64Fd" (%s/%s)",
+                 S.p_selected_area->i_tell, S.p_selected_area->i_size,
+                 input_OffsetToTime( p_input, psz_time1,
+                                     S.p_selected_area->i_tell ),
+                 input_OffsetToTime( p_input, psz_time2,
+                                     S.p_selected_area->i_size ) );
+    }
+    else
+        msg_Dbg( p_input, "pace %scontrolled", S.b_pace_control ? "" : "un-" );
+#undef S
+    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+    {
+#define P   p_input->stream.pp_programs[i]
+        msg_Dbg( p_input, "dumping program 0x%x, version %d (%s)",
+                 P->i_number, P->i_version,
+                 P->b_is_ok ? "complete" : "partial" );
+#undef P
+        for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
+        {
+#define ES  p_input->stream.pp_programs[i]->pp_es[j]
+            msg_Dbg( p_input, "ES 0x%x, "
+                     "stream 0x%x, fourcc `%4.4s', %s [OK:%ld/ERR:%ld]",
+                     ES->i_id, ES->i_stream_id, (char*)&ES->i_fourcc,
+                     ES->p_dec != NULL ? "selected" : "not selected",
+                     ES->c_packets, ES->c_invalid_packets );
+#undef ES
+        }
+    }
 
     /* Free demultiplexer's data */
     if( p_input->p_demux ) module_Unneed( p_input, p_input->p_demux );
@@ -1413,6 +1450,152 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
   cleanup:
     if( psz_name ) free( psz_name );
     return;
+}
+
+/*****************************************************************************
+ * input_SetStatus: change the reading status
+ *****************************************************************************/
+static void input_SetStatus( input_thread_t *p_input, int i_mode )
+{
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    switch( i_mode )
+    {
+    case INPUT_STATUS_END:
+        p_input->stream.i_new_status = PLAYING_S;
+        p_input->b_eof = 1;
+        msg_Dbg( p_input, "end of stream" );
+        break;
+
+    case INPUT_STATUS_PLAY:
+        p_input->stream.i_new_status = PLAYING_S;
+        msg_Dbg( p_input, "playing at normal rate" );
+        break;
+
+    case INPUT_STATUS_PAUSE:
+        /* XXX: we don't need to check i_status, because input_clock.c
+         * does it for us */
+        p_input->stream.i_new_status = PAUSE_S;
+        msg_Dbg( p_input, "toggling pause" );
+        break;
+
+    case INPUT_STATUS_FASTER:
+        if( p_input->stream.control.i_rate * 4 <= DEFAULT_RATE )
+        {
+            msg_Dbg( p_input, "can not play any faster" );
+        }
+        else
+        {
+            p_input->stream.i_new_status = FORWARD_S;
+            p_input->stream.i_new_rate =
+                                    p_input->stream.control.i_rate / 2;
+
+            if ( p_input->stream.i_new_rate < DEFAULT_RATE )
+            {
+                msg_Dbg( p_input, "playing at %i:1 fast forward",
+                     DEFAULT_RATE / p_input->stream.i_new_rate );
+            }
+            else if ( p_input->stream.i_new_rate > DEFAULT_RATE )
+            {
+                msg_Dbg( p_input, "playing at 1:%i slow motion",
+                      p_input->stream.i_new_rate / DEFAULT_RATE );
+            }
+            else if ( p_input->stream.i_new_rate == DEFAULT_RATE )
+            {
+                p_input->stream.i_new_status = PLAYING_S;
+                msg_Dbg( p_input, "playing at normal rate" );
+            }
+        }
+        break;
+
+    case INPUT_STATUS_SLOWER:
+        if( p_input->stream.control.i_rate >= 8 * DEFAULT_RATE )
+        {
+            msg_Dbg( p_input, "can not play any slower" );
+        }
+        else
+        {
+            p_input->stream.i_new_status = FORWARD_S;
+            p_input->stream.i_new_rate =
+                                    p_input->stream.control.i_rate * 2;
+
+            if ( p_input->stream.i_new_rate < DEFAULT_RATE )
+            {
+                msg_Dbg( p_input, "playing at %i:1 fast forward",
+                     DEFAULT_RATE / p_input->stream.i_new_rate );
+            }
+            else if ( p_input->stream.i_new_rate > DEFAULT_RATE )
+            {
+                msg_Dbg( p_input, "playing at 1:%i slow motion",
+                      p_input->stream.i_new_rate / DEFAULT_RATE );
+            }
+            else if ( p_input->stream.i_new_rate == DEFAULT_RATE )
+            {
+                p_input->stream.i_new_status = PLAYING_S;
+                msg_Dbg( p_input, "playing at normal rate" );
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    vlc_cond_signal( &p_input->stream.stream_wait );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+}
+/*****************************************************************************
+ * input_SetRate:
+ *****************************************************************************/
+static void input_SetRate( vlc_object_t * p_this, int i_rate )
+{
+    input_thread_t *p_input;
+
+    p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+
+    if( p_input == NULL )
+    {
+        msg_Err( p_this, "no input found" );
+        return;
+    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    if( i_rate * 8 < DEFAULT_RATE )
+    {
+        msg_Dbg( p_input, "can not play faster than 8x" );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        return;
+    }
+    if( i_rate > DEFAULT_RATE * 8 )
+    {
+        msg_Dbg( p_input, "can not play slower than 1/8x" );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        return;
+    }
+    p_input->stream.i_new_status = FORWARD_S;
+    p_input->stream.i_new_rate = i_rate;
+
+    if ( p_input->stream.i_new_rate < DEFAULT_RATE )
+    {
+        msg_Dbg( p_input, "playing at %i:1 fast forward",
+             DEFAULT_RATE / p_input->stream.i_new_rate );
+    }
+    else if ( p_input->stream.i_new_rate > DEFAULT_RATE )
+    {
+        msg_Dbg( p_input, "playing at 1:%i slow motion",
+              p_input->stream.i_new_rate / DEFAULT_RATE );
+    }
+    else if ( p_input->stream.i_new_rate == DEFAULT_RATE )
+    {
+        p_input->stream.i_new_status = PLAYING_S;
+        msg_Dbg( p_input, "playing at normal rate" );
+    }
+
+    vlc_cond_signal( &p_input->stream.stream_wait );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    vlc_object_release( p_input );
 }
 
 /*****************************************************************************

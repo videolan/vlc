@@ -289,8 +289,8 @@ struct access_t
     access_sys_t *p_sys;
 };
 
-#define access2_New( a, b ) __access2_New(VLC_OBJECT(a), b )
-VLC_EXPORT( access_t *, __access2_New,  ( vlc_object_t *p_obj, char *psz_mrl ) );
+#define access2_New( a, b, c, d ) __access2_New(VLC_OBJECT(a), b, c, d )
+VLC_EXPORT( access_t *, __access2_New,  ( vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path ) );
 VLC_EXPORT( void,      access2_Delete, ( access_t * ) );
 
 static inline int access2_vaControl( access_t *p_access, int i_query, va_list args )
@@ -541,8 +541,8 @@ VLC_EXPORT( int, access_vaControlDefault,( input_thread_t *, int i_query, va_lis
 
 
 /* stream_t *s could be null and then it mean a access+demux in one */
-#define demux2_New( a, b, c, d ) __demux2_New(VLC_OBJECT(a), b, c, d)
-VLC_EXPORT( demux_t *, __demux2_New,  ( vlc_object_t *p_obj, char *psz_mrl, stream_t *s, es_out_t *out ) );
+#define demux2_New( a, b, c, d, e, f ) __demux2_New(VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( demux_t *, __demux2_New,  ( vlc_object_t *p_obj, char *psz_access, char *psz_demux, char *psz_path, stream_t *s, es_out_t *out ) );
 VLC_EXPORT( void,      demux2_Delete, ( demux_t * ) );
 VLC_EXPORT( int,       demux2_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
 
@@ -579,17 +579,27 @@ VLC_EXPORT( char **, subtitles_Detect, ( input_thread_t *, char* path, char *fna
  */
 enum input_query_e
 {
+    /* input variable "position" */
     INPUT_GET_POSITION,         /* arg1= double *       res=    */
     INPUT_SET_POSITION,         /* arg1= double         res=can fail    */
 
+    /* input variable "length" */
+    INPUT_GET_LENGTH,           /* arg1= int64_t *      res=can fail    */
+
+    /* input variable "time" */
     INPUT_GET_TIME,             /* arg1= int64_t *      res=    */
     INPUT_SET_TIME,             /* arg1= int64_t        res=can fail    */
 
-    INPUT_GET_LENGTH,           /* arg1= int64_t *      res=can fail    */
+    /* input variable "rate" (1 is DEFAULT_RATE) */
+    INPUT_GET_RATE,             /* arg1= int *          res=    */
+    INPUT_SET_RATE,             /* arg1= int            res=can fail    */
 
-    INPUT_GET_FPS,              /* arg1= float *        res=can fail    */
-    INPUT_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
+    /* input variable "state" */
+    INPUT_GET_STATE,            /* arg1= int *          res=    */
+    INPUT_SET_STATE,            /* arg1= int            res=can fail    */
 
+
+    /* bookmarks */
     INPUT_GET_BOOKMARKS,   /* arg1= seekpoint_t *** arg2= int * res=can fail */
     INPUT_CLEAR_BOOKMARKS, /* res=can fail */
     INPUT_ADD_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
@@ -599,15 +609,15 @@ enum input_query_e
 
     INPUT_ADD_OPTION, /* arg1= char * arg2= char *  res=can fail    */
 
+    /* */
     INPUT_ADD_INFO,   /* arg1= char * arg2= char * arg3=...  res=can fail    */
     INPUT_GET_INFO,   /* arg1= char * arg2= char * arg3= char ** res=can fail*/
 
     INPUT_SET_NAME,   /* arg1= char * res=can fail    */
 
+    /* */
     INPUT_GET_SUBDELAY,    /* arg1 = int* res=can fail */
     INPUT_SET_SUBDELAY,    /* arg1 = int  res=can fail */
-
-    INPUT_GET_DIVISIONS
 };
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );

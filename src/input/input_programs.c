@@ -1017,7 +1017,7 @@ static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         input_ChangeProgram( p_input, (uint16_t)newval.i_int );
-        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_input, "state", PLAYING_S );
         vlc_mutex_lock( &p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -1066,7 +1066,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     input_ChangeArea( p_input, p_area );
-    input_SetStatus( p_input, INPUT_STATUS_PLAY );
+    var_SetInteger( p_input, "state", PLAYING_S );
 
     val.b_bool = VLC_TRUE;
     var_Set( p_input, "intf-change", val );
@@ -1111,7 +1111,7 @@ static int ChapterCallback( vlc_object_t *p_this, char const *psz_cmd,
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     input_ChangeArea( p_input, p_area );
-    input_SetStatus( p_input, INPUT_STATUS_PLAY );
+    var_SetInteger( p_input, "state", PLAYING_S );
 
     val.b_bool = VLC_TRUE;
     var_Set( p_input, "intf-change", val );
@@ -1144,7 +1144,7 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
         p_area->i_part = newval.i_int;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         input_ChangeArea( p_input, p_area );
-        input_SetStatus( p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_input, "state", PLAYING_S );
         vlc_mutex_lock( &p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );

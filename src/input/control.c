@@ -71,10 +71,58 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
     int i, *pi;
     vlc_value_t val, text;
     char *psz_option, *psz_value;
+    int i_int, *pi_int;
+    double f, *pf;
+    int64_t i_64, *pi_64;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     switch( i_query )
     {
+        case INPUT_GET_POSITION:
+            pf = (double*)va_arg( args, double * );
+            *pf = var_GetFloat( p_input, "position" );
+            i_ret = VLC_SUCCESS;
+            break;
+        case INPUT_SET_POSITION:
+            f = (double)va_arg( args, double );
+            i_ret = var_SetFloat( p_input, "position", f );
+            break;
+
+        case INPUT_GET_LENGTH:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = var_GetTime( p_input, "length" );
+            i_ret = VLC_SUCCESS;
+            break;
+        case INPUT_GET_TIME:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = var_GetTime( p_input, "time" );
+            i_ret = VLC_SUCCESS;
+            break;
+        case INPUT_SET_TIME:
+            i_64 = (int64_t)va_arg( args, int64_t );
+            i_ret = var_SetTime( p_input, "time", i_64 );
+            break;
+
+        case INPUT_GET_RATE:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = var_GetInteger( p_input, "rate" );
+            i_ret = VLC_SUCCESS;
+            break;
+        case INPUT_SET_RATE:
+            i_int = (int)va_arg( args, int );
+            i_ret = var_SetInteger( p_input, "rate", i_int );
+            break;
+
+        case INPUT_GET_STATE:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = var_GetInteger( p_input, "state" );
+            i_ret = VLC_SUCCESS;
+            break;
+        case INPUT_SET_STATE:
+            i_int = (int)va_arg( args, int );
+            i_ret = var_SetInteger( p_input, "state", i_int );
+            break;
+
         case INPUT_ADD_OPTION:
         {
             psz_option = (char *)va_arg( args, char * );

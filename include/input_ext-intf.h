@@ -218,20 +218,6 @@ struct stream_descriptor_t
     count_t                 c_packets_trashed;            /* trashed packets */
 };
 
-/*****************************************************************************
- * stream_position_t
- *****************************************************************************
- * Describes the current position in the stream.
- *****************************************************************************/
-struct stream_position_t
-{
-    off_t    i_tell;     /* actual location in the area (in arbitrary units) */
-    off_t    i_size;          /* total size of the area (in arbitrary units) */
-
-    uint32_t i_mux_rate;                /* the rate we read the stream (in
-                                         * units of 50 bytes/s) ; 0 if undef */
-};
-
 #define MUTE_NO_CHANGE      -1
 
 /*****************************************************************************
@@ -392,25 +378,9 @@ VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
-#define input_SetStatus(a,b) __input_SetStatus(VLC_OBJECT(a),b)
-VLC_EXPORT( void, __input_SetStatus, ( vlc_object_t *, int ) );
-
-#define input_SetRate(a,b) __input_SetRate(VLC_OBJECT(a),b)
-VLC_EXPORT( void, __input_SetRate, ( vlc_object_t *, int ) );
-
-#define input_Seek(a,b,c) __input_Seek(VLC_OBJECT(a),b,c)
-VLC_EXPORT( void, __input_Seek, ( vlc_object_t *, off_t, int ) );
-
-#define input_Tell(a,b) __input_Tell(VLC_OBJECT(a),b)
-VLC_EXPORT( void, __input_Tell, ( vlc_object_t *, stream_position_t * ) );
-
-VLC_EXPORT( void, input_DumpStream, ( input_thread_t * ) );
 VLC_EXPORT( char *, input_OffsetToTime, ( input_thread_t *, char *, off_t ) );
 VLC_EXPORT( int, input_ToggleES, ( input_thread_t *, es_descriptor_t *, vlc_bool_t ) );
 VLC_EXPORT( int, input_ChangeArea, ( input_thread_t *, input_area_t * ) );
 VLC_EXPORT( int, input_ChangeProgram, ( input_thread_t *, uint16_t ) );
-
-int    input_ToggleGrayscale( input_thread_t * );
-int    input_ToggleMute     ( input_thread_t * );
 
 #endif /* "input_ext-intf.h" */

@@ -56,59 +56,23 @@ int access_vaControlDefault( input_thread_t *p_input, int i_query, va_list args 
 /*****************************************************************************
  * access2_New:
  *****************************************************************************/
-access_t *__access2_New( vlc_object_t *p_obj, char *psz_mrl )
+access_t *__access2_New( vlc_object_t *p_obj,
+                         char *psz_access, char *psz_demux, char *psz_path )
 {
     access_t *p_access = vlc_object_create( p_obj, VLC_OBJECT_ACCESS );
 
-    char    *psz_dup = strdup( psz_mrl ? psz_mrl : "" );
-    char    *psz = strchr( psz_dup, ':' );
-
     if( p_access == NULL )
     {
-        msg_Err( p_obj, "vlc_object_create( p_obj, VLC_OBJECT_ACCESS ) had failed" );
-        free( psz_dup );
+        msg_Err( p_obj, "vlc_object_create( p_obj, VLC_OBJECT_ACCESS ) failed" );
         return NULL;
     }
 
     /* Parse URL */
-    p_access->psz_access = NULL;
-    p_access->psz_path   = NULL;
+    p_access->psz_access = strdup( psz_access );
+    p_access->psz_path   = strdup( psz_path );
+    p_access->psz_demux  = strdup( "" );
 
-    if( psz )
-    {
-        *psz++ = '\0';
-
-        if( psz[0] == '/' && psz[1] == '/' )
-        {
-            psz += 2;
-        }
-        p_access->psz_path = strdup( psz );
-
-        psz = strchr( psz_dup, '/' );
-        if( psz )
-        {
-            *psz++ = '\0';
-        }
-        p_access->psz_access = strdup( psz_dup );
-    }
-    else
-    {
-        p_access->psz_path = strdup( psz_mrl );
-    }
-    free( psz_dup );
-
-
-    p_access->psz_demux = strdup( "" );
-    if( p_access->psz_access == NULL )
-    {
-        p_access->psz_access = strdup( "" );
-    }
-    if( p_access->psz_path == NULL )
-    {
-        p_access->psz_path = strdup( "" );
-    }
-    msg_Dbg( p_obj, "access2_New: '%s' -> access='%s' path='%s'",
-             psz_mrl,
+    msg_Dbg( p_obj, "access2_New: access='%s' path='%s'",
              p_access->psz_access, p_access->psz_path );
 
     p_access->pf_read    = NULL;
