@@ -37,6 +37,8 @@
 #include "bits.h"
 #include "pes.h"
 
+#include "iso_lang.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -81,6 +83,7 @@ static int  MuxGetStream        ( sout_mux_t *, int *, mtime_t * );
 
 static void MuxWritePackHeader  ( sout_mux_t *, block_t **, mtime_t );
 static void MuxWriteSystemHeader( sout_mux_t *, block_t **, mtime_t );
+static void MuxWritePSM         ( sout_mux_t *, block_t **, mtime_t );
 
 static void StreamIdInit        ( vlc_bool_t *id, int i_range );
 static int  StreamIdGet         ( vlc_bool_t *id, int i_id_min, int i_id_max );
@@ -89,6 +92,10 @@ static void StreamIdRelease     ( vlc_bool_t *id, int i_id_min, int i_id );
 typedef struct ps_stream_s
 {
     int i_stream_id;
+    int i_stream_type;
+
+    /* Language is iso639-2T */
+    uint8_t lang[3];
 
 } ps_stream_t;
 
@@ -113,6 +120,9 @@ struct sout_mux_sys_t
     int64_t i_instant_dts;
 
     vlc_bool_t b_mpeg2;
+
+    int i_psm_version;
+    uint32_t crc32_table[256];
 };
 
 static const char *ppsz_sout_options[] = {
@@ -150,6 +160,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_system_header = 0;
     p_sys->i_pes_count     = 0;
 
+    p_sys->i_psm_version   = 0;
+
     p_sys->i_instant_bitrate  = 0;
     p_sys->i_instant_size     = 0;
     p_sys->i_instant_dts      = 0;
@@ -158,6 +170,21 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
     p_sys->i_dts_delay = (int64_t)val.i_int * 1000;
+
+    /* Initialise CRC32 table */
+    if( p_sys->b_mpeg2 )
+    {
+        uint32_t i, j, k;
+
+        for(i = 0; i < 256; i++)
+        {
+            k = 0;
+            for( j = (i << 24) | 0x800000; j != 0x80000000; j <<= 1 )
+                k = (k << 1) ^ (((k ^ j) & 0x80000000) ? 0x04c11db7 : 0);
+
+            p_sys->crc32_table[i] = k;
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -225,13 +252,31 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
              (char*)&p_input->p_fmt->i_codec );
 
     p_input->p_sys = p_stream = malloc( sizeof( ps_stream_t ) );
+    p_stream->i_stream_type = 0x81;
 
     /* Init this new stream */
     switch( p_input->p_fmt->i_codec )
     {
+        case VLC_FOURCC( 'm', 'p', '1', 'v' ):
+            p_stream->i_stream_id =
+                StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
+            p_stream->i_stream_type = 0x01; /* ISO/IEC 11172 Video */
+            break;
+        case VLC_FOURCC( 'm', 'p', '2', 'v' ):
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
+            p_stream->i_stream_type = 0x02; /* ISO/IEC 13818 Video */
+            break;
+        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+            p_stream->i_stream_id =
+                StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
+            p_stream->i_stream_type = 0x10;
+            break;
+        case VLC_FOURCC( 'h', '2', '6', '4' ):
+            p_stream->i_stream_id =
+                StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
+            p_stream->i_stream_type = 0x1b;
             break;
         case VLC_FOURCC( 'l', 'p', 'c', 'm' ):
             p_stream->i_stream_id =
@@ -248,6 +293,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
+            p_stream->i_stream_type = 0x03; /* ISO/IEC 11172 Audio */
+            break;
+        case VLC_FOURCC( 'm', 'p', '4', 'a' ):
+            p_stream->i_stream_id =
+                StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
+            p_stream->i_stream_type = 0x0f;
             break;
         case VLC_FOURCC( 's', 'p', 'u', ' ' ):
             p_stream->i_stream_id =
@@ -257,10 +308,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             goto error;
     }
 
-    if( p_stream->i_stream_id < 0 )
-    {
-        goto error;
-    }
+    if( p_stream->i_stream_id < 0 ) goto error;
 
     if( p_input->p_fmt->i_cat == AUDIO_ES )
     {
@@ -273,6 +321,37 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     /* Try to set a sensible default value for the instant bitrate */
     p_sys->i_instant_bitrate += p_input->p_fmt->i_bitrate + 1000/* overhead */;
+
+    p_sys->i_psm_version++;
+
+    p_stream->lang[0] = p_stream->lang[1] = p_stream->lang[2] = 0;
+    if( p_input->p_fmt->psz_language )
+    {
+        char *psz = p_input->p_fmt->psz_language;
+        const iso639_lang_t *pl = NULL;
+
+        if( strlen( psz ) == 2 )
+        {
+            pl = GetLang_1( psz );
+        }
+        else if( strlen( psz ) == 3 )
+        {
+            pl = GetLang_2B( psz );
+            if( !strcmp( pl->psz_iso639_1, "??" ) )
+            {
+                pl = GetLang_2T( psz );
+            }
+        }
+        if( pl && strcmp( pl->psz_iso639_1, "??" ) )
+        {
+            p_stream->lang[0] = pl->psz_iso639_2T[0];
+            p_stream->lang[1] = pl->psz_iso639_2T[1];
+            p_stream->lang[2] = pl->psz_iso639_2T[2];
+
+            msg_Dbg( p_mux, "    - lang=%c%c%c",
+                     p_stream->lang[0], p_stream->lang[1], p_stream->lang[2] );
+        }
+    }
 
     return VLC_SUCCESS;
 
@@ -329,6 +408,11 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
         p_sys->i_video_bound--;
     }
+
+    /* Try to set a sensible default value for the instant bitrate */
+    p_sys->i_instant_bitrate -= (p_input->p_fmt->i_bitrate + 1000);
+
+    p_sys->i_psm_version++;
 
     free( p_stream );
     return VLC_SUCCESS;
@@ -397,6 +481,12 @@ static int Mux( sout_mux_t *p_mux )
             {
                 p_pk->i_flags |= BLOCK_FLAG_HEADER;
             }
+        }
+
+        /* Write regulary ProgramStreamMap */
+        if( p_sys->b_mpeg2 && p_sys->i_pes_count % 300 == 0 )
+        {
+            MuxWritePSM( p_mux, &p_ps, i_dts );
         }
 
         /* Get and mux a packet */
@@ -605,6 +695,80 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
             bits_write( &bits, 1, 0 );
             bits_write( &bits, 13, /* stream->max_buffer_size */ 0 );
         }
+    }
+
+    block_ChainAppend( p_buf, p_hdr );
+}
+
+static void MuxWritePSM( sout_mux_t *p_mux, block_t **p_buf, mtime_t i_dts )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    block_t *p_hdr;
+    bits_buffer_t bits;
+    int i, i_psm_size = 16, i_es_map_size = 0;
+
+    for( i = 0; i < p_mux->i_nb_inputs; i++ )
+    {
+        sout_input_t *p_input = p_mux->pp_inputs[i];
+        ps_stream_t *p_stream = p_input->p_sys;
+
+        i_es_map_size += 4;
+        if( p_stream->lang[0] != 0 ) i_es_map_size += 6;
+    }
+
+    i_psm_size += i_es_map_size;
+
+    p_hdr = block_New( p_mux, i_psm_size );
+    p_hdr->i_dts = p_hdr->i_pts = i_dts;
+
+    bits_initwrite( &bits, i_psm_size, p_hdr->p_buffer );
+    bits_write( &bits, 32, 0x01bc );
+    bits_write( &bits, 16, i_psm_size - 3 );
+    bits_write( &bits, 1, 1 ); /* current_next_indicator */
+    bits_write( &bits, 2, 0xF ); /* reserved */
+    bits_write( &bits, 5, p_sys->i_psm_version );
+    bits_write( &bits, 7, 0xFF ); /* reserved */
+    bits_write( &bits, 1, 1 ); /* marker */
+
+    bits_write( &bits, 16, 0 ); /* program_stream_info_length */
+    /* empty */
+
+    bits_write( &bits, 16, i_es_map_size ); /* elementary_stream_map_length */
+    for( i = 0; i < p_mux->i_nb_inputs; i++ )
+    {
+        sout_input_t *p_input = p_mux->pp_inputs[i];
+        ps_stream_t *p_stream = p_input->p_sys;
+
+        bits_write( &bits, 8, p_stream->i_stream_type ); /* stream_type */
+        bits_write( &bits, 8, p_stream->i_stream_id ); /* elementary_stream_id */
+
+        /* ISO639 language descriptor */
+        if( p_stream->lang[0] != 0 )
+        {
+            bits_write( &bits, 16, 6 ); /* elementary_stream_info_length */
+
+            bits_write( &bits, 8, 0x0a ); /* descriptor_tag */
+            bits_write( &bits, 8, 4 ); /* descriptor_length */
+
+            bits_write( &bits, 8, p_stream->lang[0] );
+            bits_write( &bits, 8, p_stream->lang[1] );
+            bits_write( &bits, 8, p_stream->lang[2] );
+            bits_write( &bits, 8, 0 ); /* audio type: 0x00 undefined */
+        }
+        else
+        {
+            bits_write( &bits, 16, 0 ); /* elementary_stream_info_length */
+        }
+    }
+
+    /* CRC32 */
+    {
+        uint32_t i_crc = 0xffffffff;
+        for( i = 0; i < p_hdr->i_buffer; i++ )
+        i_crc = (i_crc << 8) ^
+            p_sys->crc32_table[((i_crc >> 24) ^ p_hdr->p_buffer[i]) & 0xff];
+
+        bits_write( &bits, 32, i_crc );
     }
 
     block_ChainAppend( p_buf, p_hdr );
