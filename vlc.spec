@@ -20,9 +20,9 @@ Version:	%{version}
 Release:	%{release}
 
 %if %{cvs} 
-Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.bz2
+Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.gz
 %else
-Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}.tar.bz2
+Source0:	http://www.videolan.org/packages/%{version}/%{name}-%{version}.tar.gz
 %endif
 License:	GPL
 Group:		Video
@@ -134,8 +134,7 @@ If you are going to watch DVD with the ALSA plugin, you should install vlc-alsa
 %ifarch ppc
 # Dadou - 0.1.99h-mdk - Don't use configure here. It breaks build at present
 #                       time.
-./configure --enable-release \
-	    --enable-dvd --without-dvdcss \
+./configure --enable-release --enable-dvd --without-dvdcss \
 	    --prefix=%_prefix \
 	    --enable-gnome --enable-x11 --enable-gtk --enable-qt \
 	    --enable-esd \
@@ -146,8 +145,7 @@ perl -pi -e "s|CFLAGS \+= -mcpu=604e|#CFLAGS \+= -mcpu=604e|" Makefile
 perl -pi -e "s|#CFLAGS \+= -mcpu=750|CFLAGS \+= -mcpu=750 -mtune=750|" Makefile
 %else
 #export CC="gcc-3.0.1" CXX="g++-3.0.1"
-%configure --enable-release \
-           --enable-dvd --without-dvdcss \
+%configure --enable-release --enable-dvd --without-dvdcss \
            --enable-gnome --enable-gtk \
 	   --enable-x11 --disable-qt --enable-ncurses \
 	   --enable-esd --enable-alsa \
@@ -210,13 +208,35 @@ rm -fr %buildroot
 %doc README COPYING
 %{_bindir}/vlc
 %dir %{_libdir}/videolan/vlc
-%{_libdir}/videolan/vlc/dsp.so
-%{_libdir}/videolan/vlc/fb.so
-%{_libdir}/videolan/vlc/x11.so
-# ac3_spdif: AC3 decoder using SPDIF pass-through.
 %{_libdir}/videolan/vlc/ac3_spdif.so
-# spudec: DVD subtitles decoder.
-%{_libdir}/videolan/vlc/spu_dec.so
+%{_libdir}/videolan/vlc/dsp.so
+%{_libdir}/videolan/vlc/dummy.so
+%{_libdir}/videolan/vlc/dvd.so
+%{_libdir}/videolan/vlc/fb.so
+%{_libdir}/videolan/vlc/file.so
+%{_libdir}/videolan/vlc/filter_deinterlace.so
+%{_libdir}/videolan/vlc/filter_distort.so
+%{_libdir}/videolan/vlc/filter_invert.so
+%{_libdir}/videolan/vlc/filter_transform.so
+%{_libdir}/videolan/vlc/filter_wall.so
+%{_libdir}/videolan/vlc/fx_scope.so
+%{_libdir}/videolan/vlc/http.so
+%{_libdir}/videolan/vlc/ipv4.so
+%{_libdir}/videolan/vlc/ipv6.so
+%{_libdir}/videolan/vlc/logger.so
+%{_libdir}/videolan/vlc/lpcm_adec.so
+%{_libdir}/videolan/vlc/memcpy.so
+%{_libdir}/videolan/vlc/mga.so
+%{_libdir}/videolan/vlc/mpeg_es.so
+%{_libdir}/videolan/vlc/mpeg_ps.so
+%{_libdir}/videolan/vlc/mpeg_ts.so
+%{_libdir}/videolan/vlc/null.so
+%{_libdir}/videolan/vlc/rc.so
+%{_libdir}/videolan/vlc/spudec.so
+%{_libdir}/videolan/vlc/udp.so
+%{_libdir}/videolan/vlc/vcd.so
+%{_libdir}/videolan/vlc/x11.so
+%{_libdir}/videolan/vlc/xmga.so
 # nothing useful for the moment.
 #%dir %{_datadir}/videolan
 #%{_datadir}/videolan/*

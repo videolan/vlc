@@ -9,6 +9,8 @@ HEAD
 0.3.0
 Sat,  6 Apr 2002 04:27:50 +0200
 
+  * ./doc/release-howto.txt: updated documentation.
+  * ./vlc.spec: added missing plugin filenames to the build process.
   * ./plugins/win32/mainframe.dfm: swapped two mixed up tooltips.
   * ./Makefile: fixed make dist and make distclean.
   * ./plugins/dvd/dvd.c: compilation fix.
@@ -255,7 +257,7 @@ Sat,  6 Apr 2002 04:27:50 +0200
   * ./include/common.h: compilation fix for Borland C++.
   * ./plugins/macosx/aout_macosx.c: MacOS X aout now uses AudioConverter for
     int->float.
-  * ./plugins/macosx/*:Various MacOS X intf improvements and bug fixes.
+  * ./plugins/macosx/*: Various MacOS X intf improvements and bug fixes.
   * ./plugins/chroma/i420_rgb8.c: fixed a warning.
   * ./plugins/filter/deinterlace.c: fixed chroma deinterlacing.
   * ./plugins/kde/kde.cpp: the KDE interface compiles again.
@@ -423,7 +425,7 @@ Sat,  6 Apr 2002 04:27:50 +0200
     options input_title or so.
   * ./Makefile: added network to the list of the plugins directories.
   * ./plugins/dvd/input_dvd.c: fixed DVD input under Win32.
-  * ./src/input/input.c: fixed input parser under win32, chich couldn't
+  * ./src/input/input.c: fixed input parser under win32, which couldn't
     understand that c:\windows\bureau is a valid file and doesn't need to be
     accessed with the plugin 'C' :-)
   * ./AUTHORS: added xav.
@@ -593,7 +595,7 @@ Sat,  6 Apr 2002 04:27:50 +0200
     having a lot of underflows, this plugin is currently better adapted than
     the directx plugin.
   * ./src/audio_output/audio_output.c: moved some initialization stuff in
-    audio_out.c so we can now the caracteristics of the audio stream before
+    audio_out.c so we can know the caracteristics of the audio stream before
     calling aout_Open().
   * ./configure.in, Makefile: configure and Makefile tweaking for dvdread
     module.
@@ -645,7 +647,7 @@ Sat,  6 Apr 2002 04:27:50 +0200
   * ./vlc.spec: imported MandrakeSoft's new spec file.
   * ./debian/control: fixed build-dependencies for vlc-mad.
   * ./debian/rules: fixed the vlc-arts and vlc-mad package builds.
-  * ./plugins/gtk/{gtk|gnome}.c: the gnome/gtk interface should no longer user
+  * ./plugins/gtk/{gtk|gnome}.c: the gnome/gtk interface should no longer use
     p_input->stream before it has been initialized.
   * ./src/input/input.c: stream lock is initialized in input_CreateThread
     instead of initThread, to have it initialized when we call it in the
@@ -929,7 +931,7 @@ Sat,  6 Apr 2002 04:27:50 +0200
   * ./plugins/spudec/*: renamed spu_dec to spudec and mad_adec to mad to stay
     coherent with other plugins. Also, renamed mpeg to mpeg_system.
   * ./AUTHORS: added jobi.
-  * ./plugins/x11/vout_common.c: voutFactored code common to vout_x11.c and
+  * ./plugins/x11/vout_common.c: factored code common to vout_x11.c and
     vout_xvideo.c.
 
 0.2.92
