@@ -119,4 +119,44 @@ class CmdPlaylistRepeat: public CmdGeneric
 };
 
 
+/// Command to load a playlist
+class CmdPlaylistLoad: public CmdGeneric
+{
+    public:
+        CmdPlaylistLoad( intf_thread_t *pIntf, const string& rFile ):
+            CmdGeneric( pIntf ), m_file( rFile ) {}
+        virtual ~CmdPlaylistLoad() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playlist load"; }
+
+    private:
+        /// Playlist file to load
+        string m_file;
+};
+
+
+/// Command to save a playlist
+class CmdPlaylistSave: public CmdGeneric
+{
+    public:
+        CmdPlaylistSave( intf_thread_t *pIntf, const string& rFile ):
+            CmdGeneric( pIntf ), m_file( rFile ) {}
+        virtual ~CmdPlaylistSave() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "playlist save"; }
+
+    private:
+        /// Playlist file to save
+        string m_file;
+};
+
+
 #endif

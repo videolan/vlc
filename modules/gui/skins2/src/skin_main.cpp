@@ -35,6 +35,7 @@
 #include "../parser/interpreter.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_quit.hpp"
+#include "../commands/cmd_dialogs.hpp"
 
 
 //---------------------------------------------------------------------------
@@ -198,10 +199,11 @@ static void Run( intf_thread_t *p_intf )
         if( it == resPath.end() )
         {
             // Last chance: the user can select a new theme file
-            Dialogs *pDialogs = Dialogs::instance( p_intf );
-            if( pDialogs )
+            if( Dialogs::instance( p_intf ) )
             {
-                pDialogs->showChangeSkin();
+                CmdDlgChangeSkin *pCmd = new CmdDlgChangeSkin( p_intf );
+                AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
+                pQueue->push( CmdGenericPtr( pCmd ) );
             }
             else
             {

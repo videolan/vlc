@@ -100,3 +100,25 @@ void CmdPlaylistRepeat::execute()
     }
 }
 
+
+void CmdPlaylistLoad::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    if( pPlaylist != NULL )
+    {
+        playlist_Import( pPlaylist, m_file.c_str() );
+    }
+}
+
+
+void CmdPlaylistSave::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    if( pPlaylist != NULL )
+    {
+        // FIXME: when the PLS export will be working, we'll need to remove
+        // this hardcoding...
+        playlist_Export( pPlaylist, m_file.c_str(), "export-m3u" );
+    }
+}
+

@@ -26,10 +26,11 @@
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_change_skin.hpp"
 #include "../commands/cmd_quit.hpp"
+#include "../commands/cmd_playlist.hpp"
 
 
 /// Callback called when a new skin is chosen
-static void showChangeSkinCB( intf_dialog_args_t *pArg )
+void Dialogs::showChangeSkinCB( intf_dialog_args_t *pArg )
 {
     intf_thread_t *pIntf = (intf_thread_t *)pArg->p_arg;
 
@@ -38,8 +39,8 @@ static void showChangeSkinCB( intf_dialog_args_t *pArg )
         if( pArg->psz_results[0] )
         {
             // Create a change skin command
-            CmdChangeSkin *pCmd = new CmdChangeSkin( pIntf,
-                                                     pArg->psz_results[0] );
+            CmdChangeSkin *pCmd =
+                new CmdChangeSkin( pIntf, pArg->psz_results[0] );
 
             // Push the command in the asynchronous command queue
             AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
@@ -52,6 +53,42 @@ static void showChangeSkinCB( intf_dialog_args_t *pArg )
         // If no theme is already loaded, it's time to quit!
         CmdQuit *pCmd = new CmdQuit( pIntf );
         AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+}
+
+
+void Dialogs::showPlaylistLoadCB( intf_dialog_args_t *pArg )
+{
+    intf_thread_t *pIntf = (intf_thread_t *)pArg->p_arg;
+
+    if( pArg->i_results && pArg->psz_results[0] )
+    {
+        // Create a Playlist Load command
+        CmdPlaylistLoad *pCmd =
+            new CmdPlaylistLoad( pIntf, pArg->psz_results[0] );
+
+        // Push the command in the asynchronous command queue
+        AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+        pQueue->remove( "load playlist" );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+}
+
+
+void Dialogs::showPlaylistSaveCB( intf_dialog_args_t *pArg )
+{
+    intf_thread_t *pIntf = (intf_thread_t *)pArg->p_arg;
+
+    if( pArg->i_results && pArg->psz_results[0] )
+    {
+        // Create a Playlist Save command
+        CmdPlaylistSave *pCmd =
+            new CmdPlaylistSave( pIntf, pArg->psz_results[0] );
+
+        // Push the command in the asynchronous command queue
+        AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+        pQueue->remove( "load playlist" );
         pQueue->push( CmdGenericPtr( pCmd ) );
     }
 }
@@ -159,7 +196,8 @@ bool Dialogs::init()
 }
 
 
-void Dialogs::showChangeSkin()
+void Dialogs::showFileGeneric( const string &rTitle, const string &rExtensions,
+                               DlgCallback callback, int flags )
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
@@ -167,16 +205,41 @@ void Dialogs::showChangeSkin()
             (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
         memset( p_arg, 0, sizeof(intf_dialog_args_t) );
 
-        p_arg->psz_title = strdup( _("Open a skin file") );
-        p_arg->psz_extensions =
-            strdup( _("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|") );
+        p_arg->psz_title = strdup( rTitle.c_str() );
+        p_arg->psz_extensions = strdup( rExtensions.c_str() );
+
+        p_arg->b_save = flags & kSAVE;
+        p_arg->b_multiple = flags & kMULTIPLE;
 
         p_arg->p_arg = getIntf();
-        p_arg->pf_callback = showChangeSkinCB;
+        p_arg->pf_callback = callback;
 
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_FILE_GENERIC,
                                      0, p_arg );
     }
+}
+
+
+void Dialogs::showChangeSkin()
+{
+    showFileGeneric( _("Open a skin file"),
+                     _("Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"),
+                     showChangeSkinCB, kOPEN );
+}
+
+
+void Dialogs::showPlaylistLoad()
+{
+    showFileGeneric( _("Open playlist"),
+                     _("All playlists|*.pls;*.m3u;*.asx;*.b4s|M3U files|*.m3u"),
+                     showPlaylistLoadCB, kOPEN );
+}
+
+
+void Dialogs::showPlaylistSave()
+{
+    showFileGeneric( _("Save playlist"), _("M3U file|*.m3u"),
+                     showPlaylistSaveCB, kSAVE );
 }
 
 
