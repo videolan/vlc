@@ -43,7 +43,7 @@
  * Local prototypes
  */
 
-#if 0
+#ifdef SAM_SYNCHRO
 /*****************************************************************************
  * vpar_SynchroUpdateTab : Update a mean table in the synchro structure
  *****************************************************************************/

@@ -156,7 +156,7 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
             vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
         if( p_vpar->sequence.p_backward != NULL )
         {
-#if 0
+#ifdef SAM_SYNCHRO
             vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
                               vpar_SynchroDate( p_vpar ) );
 #else
@@ -172,7 +172,7 @@ static void __inline__ ReferenceUpdate( vpar_thread_t * p_vpar,
         p_vpar->sequence.p_backward = p_newref;
         if( p_newref != NULL )
             vout_LinkPicture( p_vpar->p_vout, p_newref );
-#if 1
+#ifndef SAM_SYNCHRO
         p_vpar->synchro.i_coding_type = i_coding_type;
 #endif
     }

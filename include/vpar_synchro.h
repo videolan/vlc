@@ -18,7 +18,7 @@
 /*****************************************************************************
  * video_synchro_t and video_synchro_tab_s : timers for the video synchro
  *****************************************************************************/
-#if 0
+#ifdef SAM_SYNCHRO
 typedef struct video_synchro_tab_s
 {
     double mean;

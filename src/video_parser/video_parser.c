@@ -245,7 +245,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Initialize the synchro properties
      */
-#if 0
+#ifdef SAM_SYNCHRO
     p_vpar->synchro.i_last_decode_pts = 0;
     p_vpar->synchro.i_last_display_pts = 0;
     p_vpar->synchro.i_images_since_pts = 0;
