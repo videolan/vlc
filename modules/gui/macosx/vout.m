@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.40 2003/03/18 04:07:23 hartman Exp $
+ * $Id: vout.m,v 1.41 2003/03/18 22:14:42 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -61,7 +61,7 @@ static int  CoCreateWindow     ( vout_thread_t * );
 static int  CoDestroyWindow    ( vout_thread_t * );
 static int  CoToggleFullscreen ( vout_thread_t * );
 
-static void VLShowHideCursors  ( vout_thread_t *, BOOL );
+static void VLCHideMouse       ( vout_thread_t *, BOOL );
 
 static void QTScaleMatrix      ( vout_thread_t * );
 static int  QTCreateSequence   ( vout_thread_t * );
@@ -100,7 +100,8 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     if( NSApp == NULL )
     {
-        msg_Err( p_vout, "no MacOS X interface present" );
+        /* we need an NSApp to create a window from */
+        msg_Err( p_vout, "no MacOS X application present" );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -130,7 +131,9 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->p_matrix = (MatrixRecordPtr)malloc( sizeof(MatrixRecord) );
     p_vout->p_sys->p_fullscreen_state = NULL;
 
-    p_vout->p_sys->b_mouse_pointer_visible = 1;
+    p_vout->p_sys->b_mouse_pointer_visible = YES;
+    p_vout->p_sys->b_mouse_moved = YES;
+    p_vout->p_sys->i_time_mouse_last_moved = mdate();
 
     /* set window size */
     p_vout->p_sys->s_rect.size.width = p_vout->i_window_width;
@@ -339,10 +342,7 @@ void E_(CloseVideo) ( vlc_object_t *p_this )
  * console events. It returns a non null value on error.
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
-{    
-    vlc_bool_t b_change = 0;
-    intf_thread_t * p_intf = [NSApp getIntf];
-    
+{
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         if( CoToggleFullscreen( p_vout ) )  
@@ -362,43 +362,52 @@ static int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
 
-    /* hide/show mouse cursor */
-    if( p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen && 
-                        p_intf->p_sys->b_play_status )
+    /* hide/show mouse cursor 
+     * this code looks unnecessarily complicated, but is necessary like this.
+     * it has to deal with multiple monitors and therefore checks a lot */
+    if( !p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen )
     {
-        if( !p_vout->p_sys->b_mouse_pointer_visible )
-        {
-            VLShowHideCursors( p_vout, NO );
-            b_change = 1;
-        }
-        else if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 && 
+        if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 && 
                    p_vout->p_sys->b_mouse_pointer_visible )
         {
-            VLShowHideCursors( p_vout, YES );
-            b_change = 1;
+            VLCHideMouse( p_vout, YES );
         }
+        else if ( !p_vout->p_sys->b_mouse_pointer_visible )
+        {
+            vlc_bool_t b_playing = NO;
+            playlist_t * p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                                                    FIND_ANYWHERE );
 
+            if ( p_playlist != nil )
+            {
+                vlc_mutex_lock( &p_playlist->object_lock );
+                if( p_playlist->p_input != NULL )
+                {
+                    vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
+                    b_playing = p_playlist->p_input->stream.control.i_status != PAUSE_S;
+                    vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+                }
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                vlc_object_release( p_playlist );
+            }
+            if ( ![p_vout->p_sys->o_window isKeyWindow] || !b_playing )
+            {
+                VLCHideMouse( p_vout, NO );
+            }
+        }
     }
-    else if ( p_vout->b_fullscreen && !p_intf->p_sys->b_play_status )
+    else if ( p_vout->p_sys->b_mouse_moved && p_vout->b_fullscreen )
     {
         if( !p_vout->p_sys->b_mouse_pointer_visible )
         {
-            VLShowHideCursors( p_vout, NO );
-            b_change = 1;
+            VLCHideMouse( p_vout, NO );
         }
-        else if( p_vout->p_sys->b_mouse_pointer_visible )
+        else
         {
-            p_vout->p_sys->i_time_mouse_last_moved = mdate();
-            p_vout->p_sys->b_mouse_moved = 1;
+            p_vout->p_sys->b_mouse_moved = NO;
         }
     }
     
-    if( b_change )
-    {
-        p_vout->p_sys->b_mouse_moved = 0;
-        p_vout->p_sys->i_time_mouse_last_moved = 0;
-    }
-
     return( 0 );
 }
 
@@ -472,8 +481,7 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
 {
     if( !p_vout->p_sys->b_mouse_pointer_visible )
     {
-        VLShowHideCursors( p_vout, NO );
-        p_vout->p_sys->b_mouse_pointer_visible = 1;
+        VLCHideMouse( p_vout, NO );
     }
 
     if( CoSendRequest( p_vout, @selector(destroyWindow:) ) )
@@ -523,44 +531,41 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * VLShowHideCursors: if b_hide then hide the cursors on every display
- * that contains p_vout, else show the cursors instead.
- *****************************************************************************
- * We cannot use kCGDirectMainDisplay, because this is always the display with
- * the menubar.
+ * VLCHideMouse: if b_hide then hide the cursor
  *****************************************************************************/
-static void VLShowHideCursors ( vout_thread_t *p_vout, BOOL b_hide )
+static void VLCHideMouse ( vout_thread_t *p_vout, BOOL b_hide )
 {
-    NSRect frame;
-    NSScreen *o_screen;
-    CGDirectDisplayID displays[VL_MAX_DISPLAYS];
-    CGDisplayCount displayCount;
+    BOOL b_inside;
+    NSRect s_rect;
+    NSPoint ml;
+    NSWindow *o_window = p_vout->p_sys->o_window;
+    NSView *o_contents = [o_window contentView];
     
-    o_screen = [p_vout->p_sys->o_window screen];
-    frame = [o_screen frame];
+    s_rect = [o_contents bounds];
+    ml = [o_window convertScreenToBase:[NSEvent mouseLocation]];
+    ml = [o_contents convertPoint:ml fromView:nil];
+    b_inside = [o_contents mouse: ml inRect: s_rect];
     
-    int err = CGGetDisplaysWithRect( CGRectMake( NSMinX( frame ), NSMinY( frame ), 
-    NSWidth( frame ), NSHeight( frame ) ), VL_MAX_DISPLAYS, displays, &displayCount );
-    
-    if ( displayCount > 0 && !err )
+    if ( b_hide && b_inside )
     {
-        unsigned int i;
-        /* multiple displays are possible, because of mirroring.
-         * mirroring is essential one screen on mult. displays. */
-        for ( i=0 ; i < displayCount ; i++ )
-        {
-            if ( b_hide )
-            {
-                CGDisplayHideCursor( displays[i] );
-                p_vout->p_sys->b_mouse_pointer_visible = 0;
-            }
-            else
-            {
-                CGDisplayShowCursor( displays[i] );
-                p_vout->p_sys->b_mouse_pointer_visible = 1;
-            }
-        }
+        /* only hide if mouse over VLCView */
+        [NSCursor hide];
+        p_vout->p_sys->b_mouse_pointer_visible = 0;
     }
+    else if ( !b_hide )
+    {
+        if ( ![o_window isKeyWindow] && b_inside )
+        {
+            /* be nice for ppl with multi monitors */
+            p_vout->p_sys->b_mouse_moved = NO;
+            p_vout->p_sys->i_time_mouse_last_moved = mdate();
+            return;
+        }
+        [NSCursor unhide];
+        p_vout->p_sys->b_mouse_pointer_visible = 1;
+    }
+    p_vout->p_sys->b_mouse_moved = NO;
+    p_vout->p_sys->i_time_mouse_last_moved = mdate();
     return;
 }
 
@@ -874,9 +879,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 - (void)updateTitle
 {
     NSMutableString * o_title;
-
-    intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    playlist_t * p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     
     if( p_playlist == NULL )
@@ -911,8 +914,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 /* This is actually the same as VLCControls::stop. */
 - (BOOL)windowShouldClose:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    playlist_t * p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )      
     {
@@ -953,13 +955,22 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (BOOL)becomeFirstResponder
 {
-    [[self window] setAcceptsMouseMovedEvents: YES];
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    
+    [o_window setAcceptsMouseMovedEvents: YES];
     return( YES );
 }
 
 - (BOOL)resignFirstResponder
 {
-    [[self window] setAcceptsMouseMovedEvents: NO];
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    
+    [o_window setAcceptsMouseMovedEvents: NO];
+    VLCHideMouse( p_vout, NO );
     return( YES );
 }
 
@@ -1155,9 +1166,16 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             
         val.b_bool = VLC_TRUE;
         var_Set( p_vout, "mouse-moved", val );
+        p_vout->p_sys->i_time_mouse_last_moved = mdate();
+        p_vout->p_sys->b_mouse_moved = YES;
     }
-    p_vout->p_sys->i_time_mouse_last_moved = mdate();
-    p_vout->p_sys->b_mouse_moved = 1;
+    else if ( !b_inside && !p_vout->p_sys->b_mouse_pointer_visible )
+    {
+        /* people with multiple monitors need their mouse,
+         * even if VLCView in fullscreen. */
+        VLCHideMouse( p_vout, NO );
+    }
+    
     [super mouseMoved: o_event];
 }
 
