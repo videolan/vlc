@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.31 2003/11/06 09:59:45 gbazin Exp $
+ * $Id: sap.c,v 1.32 2003/11/08 12:25:59 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -599,7 +599,11 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
         {
             psz_end = p_packet + strlen( p_packet );
         }
-
+        if( psz_end > p_packet && *(psz_end - 1 ) == '\r' )
+        {
+            psz_end--;
+        }
+        
         if( psz_end <= p_packet )
         {
             break;
