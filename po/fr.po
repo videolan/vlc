@@ -1106,7 +1106,7 @@ msgstr ""
 
 #: src/libvlc.h:265
 msgid "Clock reference average counter"
-msgstr ""
+msgstr "Compteur moyen de référence de l'horloge"
 
 #: src/libvlc.h:267
 msgid ""
