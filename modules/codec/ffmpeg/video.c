@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.27 2003/05/09 23:23:45 fenrir Exp $
+ * $Id: video.c,v 1.28 2003/05/10 18:16:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -297,15 +297,14 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 #if LIBAVCODEC_BUILD >= 4666
         else if( p_vdec->i_codec_id == CODEC_ID_SVQ3 )
         {
-            p_vdec->p_context->extradata_size = i_size + 28;
-            p_vdec->p_context->extradata      = malloc( p_vdec->p_context->extradata_size );
-            memcpy ( &((char*)p_vdec->p_context->extradata)[ 0],  "stsd", 4 );
-            SetDWBE( &((char*)p_vdec->p_context->extradata)[ 4], 0 );       /* version and flag */
-            SetDWBE( &((char*)p_vdec->p_context->extradata)[ 8], 0 );       /* entry count */
-            SetDWBE( &((char*)p_vdec->p_context->extradata)[12], 0 );       /* sample soun size FIXME */
-            memcpy ( &((char*)p_vdec->p_context->extradata)[16], "SVQ3", 4 );
-            memset ( &((char*)p_vdec->p_context->extradata)[20], 0, 8 );    /* reserved[6] and ref index(16b) */
-            memcpy ( &((char*)p_vdec->p_context->extradata)[28], &p_vdec->p_format[1], i_size );
+            uint8_t *p;
+
+            p_vdec->p_context->extradata_size = i_size + 12;
+            p = p_vdec->p_context->extradata  = malloc( p_vdec->p_context->extradata_size );
+
+            memcpy( &p[0],  "SVQ3", 4 );
+            memset( &p[4], 0, 8 );
+            memcpy( &p[12], &p_vdec->p_format[1], i_size );
         }
 #endif
         else
