@@ -2155,16 +2155,18 @@ if test "${enable_dts}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have dts.h])
     fi
   else
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_dtstofloat32}"
     AC_CHECK_HEADERS(dts.h, [
       AC_CHECK_LIB(dts, dts_free, [
         AX_ADD_PLUGINS([dtstofloat32])
         AX_ADD_LDFLAGS([dtstofloat32],[-ldts])
       ],[
         if test "${enable_dts}" = "yes"; then
-          AC_MSG_ERROR([Could not find libdts on your system: you may get it from http://www.videolan.org/dtsdec.])
+          AC_MSG_ERROR([Could not find libdts on your system: you may get it from http://www.videolan.org/dtsdec.html])
         fi
       ])
     ])
+    LDFLAGS="${LDFLAGS_save}"
   fi
 fi
 
