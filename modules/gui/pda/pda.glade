@@ -151,11 +151,12 @@
 	  <property name="draw_value">False</property>
 	  <property name="value_pos">GTK_POS_RIGHT</property>
 	  <property name="digits">3</property>
-	  <property name="update_policy">GTK_UPDATE_CONTINUOUS</property>
+	  <property name="update_policy">GTK_UPDATE_DISCONTINUOUS</property>
 	  <property name="inverted">False</property>
-	  <property name="adjustment">3 0 100 1 6.25 0</property>
+	  <property name="adjustment">0 0 100 1 6.25 0</property>
 	  <signal name="button_release_event" handler="SliderRelease" last_modification_time="Fri, 26 Sep 2003 12:28:09 GMT"/>
 	  <signal name="button_press_event" handler="SliderPress" last_modification_time="Fri, 26 Sep 2003 12:28:14 GMT"/>
+	  <signal name="move_slider" handler="SliderMove" last_modification_time="Sat, 06 Dec 2003 22:37:00 GMT"/>
 	</widget>
 	<packing>
 	  <property name="padding">4</property>
@@ -1809,7 +1810,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">huffyuv</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2150,7 +2151,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">127.0.0.1</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2221,7 +2222,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">ps</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2346,7 +2347,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">alaw</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
@@ -2543,7 +2544,7 @@
 				  <property name="editable">True</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">udp</property>
+				  <property name="text" translatable="yes"></property>
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>

@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.16 2003/12/04 10:25:47 gbazin Exp $
+ * $Id: pda.c,v 1.17 2003/12/06 22:41:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -49,7 +49,7 @@ static void Run          ( intf_thread_t * );
 
 void GtkAutoPlayFile     ( vlc_object_t * );
 static int Manage        ( intf_thread_t *p_intf );
-void E_(GtkDisplayDate)  ( GtkAdjustment *p_adj );
+void E_(GtkDisplayDate)  ( GtkAdjustment *p_adj, gpointer userdata );
 gint E_(GtkModeManage)   ( intf_thread_t * p_intf );
 
 /*****************************************************************************
@@ -190,31 +190,21 @@ static void Run( intf_thread_t *p_intf )
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
     
     /* Get the slider object */
-    p_intf->p_sys->p_slider = GTK_HSCALE( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "timeSlider" ) );
-    p_intf->p_sys->p_slider_label = GTK_LABEL( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "timeLabel" ) );
-
+    p_intf->p_sys->p_slider = (GtkHScale*) lookup_widget( p_intf->p_sys->p_window, "timeSlider" );
+    p_intf->p_sys->p_slider_label = (GtkLabel*) lookup_widget( p_intf->p_sys->p_window, "timeLabel" );
     if (p_intf->p_sys->p_slider == NULL)
         msg_Err( p_intf, "Time slider widget not found." );
     if (p_intf->p_sys->p_slider_label == NULL)
         msg_Err( p_intf, "Time label widget not found." );
 
-#if 0
     /* Connect the date display to the slider */
-    msg_Dbg( p_intf, "setting slider adjustment ... " );
-#define P_SLIDER GTK_RANGE( gtk_object_get_data( \
-                         GTK_OBJECT( p_intf->p_sys->p_window ), "timeSlider" ) )
-    p_intf->p_sys->p_adj = gtk_range_get_adjustment( P_SLIDER );
+    p_intf->p_sys->p_adj = gtk_range_get_adjustment( GTK_RANGE(p_intf->p_sys->p_slider) );
     if (p_intf->p_sys->p_adj == NULL)
         msg_Err( p_intf, "Adjustment range not found." );
-    gtk_signal_connect ( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
-                         GTK_SIGNAL_FUNC( E_(GtkDisplayDate) ), NULL );
+    g_signal_connect( GTK_OBJECT( p_intf->p_sys->p_adj ), "value_changed",
+                         G_CALLBACK( E_(GtkDisplayDate) ), p_intf );
     p_intf->p_sys->f_adj_oldvalue = 0;
     p_intf->p_sys->i_adj_oldvalue = 0;
-#undef P_SLIDER
-    msg_Dbg( p_intf, "setting slider adjustment ... done" );
-#endif
 
     /* BEGIN OF FILEVIEW GTK_TREE_VIEW */
     p_intf->p_sys->p_tvfile = NULL;
@@ -449,6 +439,7 @@ static int Manage( intf_thread_t *p_intf )
             }
 
             /* Manage the slider */
+#define p_area p_input->stream.p_selected_area
             if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
             {
                 /* Manage the slider for CPU_CAPABILITY_FPU hardware */	
@@ -456,7 +447,6 @@ static int Manage( intf_thread_t *p_intf )
                 {
                     float newvalue = p_intf->p_sys->p_adj->value;
 
-#define p_area p_input->stream.p_selected_area
                     /* If the user hasn't touched the slider since the last time,
                      * then the input can safely change it */
                     if( newvalue == p_intf->p_sys->f_adj_oldvalue )
@@ -465,7 +455,7 @@ static int Manage( intf_thread_t *p_intf )
                         p_intf->p_sys->p_adj->value =
                         p_intf->p_sys->f_adj_oldvalue =
                             ( 100. * p_area->i_tell ) / p_area->i_size;
-                        gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                        g_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
                                                  "value_changed" );
                     }
                     /* Otherwise, send message to the input if the user has
@@ -482,7 +472,6 @@ static int Manage( intf_thread_t *p_intf )
                         /* Update the old value */
                         p_intf->p_sys->f_adj_oldvalue = newvalue;
                     }
-#undef p_area
                 }
             }
             else
@@ -492,7 +481,6 @@ static int Manage( intf_thread_t *p_intf )
                 {
                     off_t newvalue = p_intf->p_sys->p_adj->value;
 
-#define p_area p_input->stream.p_selected_area
                     /* If the user hasn't touched the slider since the last time,
                      * then the input can safely change it */
                     if( newvalue == p_intf->p_sys->i_adj_oldvalue )
@@ -501,7 +489,7 @@ static int Manage( intf_thread_t *p_intf )
                         p_intf->p_sys->p_adj->value =
                         p_intf->p_sys->i_adj_oldvalue =
                             ( 100 * p_area->i_tell ) / p_area->i_size;
-                        gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
+                        g_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
                                                  "value_changed" );
                     }
                     /* Otherwise, send message to the input if the user has
@@ -518,9 +506,9 @@ static int Manage( intf_thread_t *p_intf )
                         /* Update the old value */
                         p_intf->p_sys->i_adj_oldvalue = newvalue;
                     }
-#undef p_area
                 }
             }
+#undef p_area
         }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -554,13 +542,14 @@ static int Manage( intf_thread_t *p_intf )
  * the stream. It is called whenever the slider changes its value.
  * The lock has to be taken before you call the function.
  *****************************************************************************/
-void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
+void E_(GtkDisplayDate)( GtkAdjustment *p_adj, gpointer userdata )
 {
     intf_thread_t *p_intf;
 
-    p_intf = gtk_object_get_data( GTK_OBJECT( p_adj ), "p_intf" );
+    p_intf = (intf_thread_t*) userdata;
+    if (p_intf == NULL)
+        return;
 
-#ifdef WIN32
     if( p_intf->p_sys->p_input )
     {
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
@@ -571,7 +560,6 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
                                    ( p_area->i_size * p_adj->value ) / 100 ) );
 #undef p_area
      }
-#endif
 }
 
 /*****************************************************************************
@@ -582,15 +570,15 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
  *****************************************************************************/
 gint E_(GtkModeManage)( intf_thread_t * p_intf )
 {
-    GtkWidget *     p_slider;
+    GtkWidget *     p_slider = NULL;
     vlc_bool_t      b_control;
 
-#define GETWIDGET( ptr, name ) GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( \
-                           p_intf->p_sys->ptr ) , ( name ) ) )
-    /* hide slider */
-    p_slider = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                           p_intf->p_sys->p_window ), "slider" ) );
-    gtk_widget_hide( GTK_WIDGET( p_slider ) );
+    if ( p_intf->p_sys->p_window == NULL )
+        msg_Err( p_intf, "Main widget not found" );
+
+    p_slider = lookup_widget( p_intf->p_sys->p_window, "timeSlider");
+    if (p_slider == NULL)
+        msg_Err( p_intf, "Slider widget not found" );
 
     /* controls unavailable */
     b_control = 0;
@@ -601,14 +589,12 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
         /* initialize and show slider for seekable streams */
         if( p_intf->p_sys->p_input->stream.b_seekable )
         {
-            msg_Dbg( p_intf, "Updating slider widget" );
-            if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
-                p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
-            else
-                p_intf->p_sys->p_adj->value = p_intf->p_sys->i_adj_oldvalue = 0;
-            gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
-                                     "value_changed" );
             gtk_widget_show( GTK_WIDGET( p_slider ) );
+        }
+        else
+        {
+            /* hide slider */
+            gtk_widget_hide( GTK_WIDGET( p_slider ) );
         }
 
         /* control buttons for free pace streams */
@@ -619,11 +605,9 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
     }
 
     /* set control items */
-    gtk_widget_set_sensitive( GETWIDGET(p_window, "tbRewind"), b_control );
-    gtk_widget_set_sensitive( GETWIDGET(p_window, "tbPause"), b_control );
-    gtk_widget_set_sensitive( GETWIDGET(p_window, "tbForward"), b_control );
-
-#undef GETWIDGET
+    gtk_widget_set_sensitive( lookup_widget( p_intf->p_sys->p_window, "tbRewind"), b_control );
+    gtk_widget_set_sensitive( lookup_widget( p_intf->p_sys->p_window, "tbPause"), b_control );
+    gtk_widget_set_sensitive( lookup_widget( p_intf->p_sys->p_window, "tbForward"), b_control );
     return TRUE;
 }
 

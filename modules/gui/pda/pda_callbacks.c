@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.21 2003/11/30 23:19:13 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.22 2003/12/06 22:41:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -431,6 +431,7 @@ gboolean SliderRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_d
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
+    msg_Dbg( p_intf, "SliderButton Release" );
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->b_slider_free = 1;
     vlc_mutex_unlock( &p_intf->change_lock );
@@ -443,12 +444,20 @@ gboolean SliderPress(GtkWidget *widget, GdkEventButton *event, gpointer user_dat
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
+    msg_Dbg( p_intf, "SliderButton Press" );
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->b_slider_free = 0;
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return TRUE;
 }
+
+void SliderMove(GtkRange *range, GtkScrollType scroll, gpointer user_data)
+{
+    intf_thread_t *p_intf = GtkGetIntf( range );
+    msg_Dbg( p_intf, "SliderButton Move" );
+}
+
 
 void addSelectedToPlaylist(GtkTreeModel *model, GtkTreePath *path,
                            GtkTreeIter *iter, gpointer *userdata)
@@ -1081,7 +1090,7 @@ void onEntryStdAccessChanged(GtkEditable *editable, gpointer user_data)
     GtkCheckButton *p_checkSAP = NULL;
     GtkCheckButton *p_checkSLP = NULL;
     GtkEntry       *p_entryStdAccess = NULL;
-    const gchar    *p_std_access;    
+    const gchar    *p_std_access = NULL;    
     gboolean        b_announce = FALSE;
 
     p_entryStdAccess = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryStdAccess" );

@@ -309,13 +309,14 @@ create_pda (void)
 
   gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), timeLabel, NULL, NULL);
 
-  timeSlider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (3, 0, 100, 1, 6.25, 0)));
+  timeSlider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 6.25, 0)));
   gtk_widget_set_name (timeSlider, "timeSlider");
   gtk_widget_show (timeSlider);
   gtk_box_pack_start (GTK_BOX (vbox), timeSlider, FALSE, TRUE, 4);
   gtk_scale_set_draw_value (GTK_SCALE (timeSlider), FALSE);
   gtk_scale_set_value_pos (GTK_SCALE (timeSlider), GTK_POS_RIGHT);
   gtk_scale_set_digits (GTK_SCALE (timeSlider), 3);
+  gtk_range_set_update_policy (GTK_RANGE (timeSlider), GTK_UPDATE_DISCONTINUOUS);
 
   notebook = gtk_notebook_new ();
   gtk_widget_set_name (notebook, "notebook");
@@ -893,7 +894,6 @@ create_pda (void)
   entryVideoCodec = GTK_COMBO (comboVideoCodec)->entry;
   gtk_widget_set_name (entryVideoCodec, "entryVideoCodec");
   gtk_widget_show (entryVideoCodec);
-  gtk_entry_set_text (GTK_ENTRY (entryVideoCodec), _("huffyuv"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryVideoCodec), TRUE);
 
   labelVideoBitrate = gtk_label_new (_("Video Bitrate:"));
@@ -1003,7 +1003,6 @@ create_pda (void)
   entryStdURL = GTK_COMBO (comboStdURL)->entry;
   gtk_widget_set_name (entryStdURL, "entryStdURL");
   gtk_widget_show (entryStdURL);
-  gtk_entry_set_text (GTK_ENTRY (entryStdURL), _("127.0.0.1"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryStdURL), TRUE);
 
   comboStdMuxer = gtk_combo_new ();
@@ -1028,7 +1027,6 @@ create_pda (void)
   entryStdMuxer = GTK_COMBO (comboStdMuxer)->entry;
   gtk_widget_set_name (entryStdMuxer, "entryStdMuxer");
   gtk_widget_show (entryStdMuxer);
-  gtk_entry_set_text (GTK_ENTRY (entryStdMuxer), _("ps"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryStdMuxer), TRUE);
 
   entryAudioBitrate_adj = gtk_adjustment_new (256, 0, 65535, 1, 10, 10);
@@ -1061,7 +1059,6 @@ create_pda (void)
   entryAudioCodec = GTK_COMBO (comboAudioCodec)->entry;
   gtk_widget_set_name (entryAudioCodec, "entryAudioCodec");
   gtk_widget_show (entryAudioCodec);
-  gtk_entry_set_text (GTK_ENTRY (entryAudioCodec), _("alaw"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryAudioCodec), TRUE);
 
   checkVideoDeinterlace = gtk_check_button_new_with_mnemonic (_("enable"));
@@ -1131,7 +1128,6 @@ create_pda (void)
   entryStdAccess = GTK_COMBO (comboStdAccess)->entry;
   gtk_widget_set_name (entryStdAccess, "entryStdAccess");
   gtk_widget_show (entryStdAccess);
-  gtk_entry_set_text (GTK_ENTRY (entryStdAccess), _("udp"));
   gtk_entry_set_activates_default (GTK_ENTRY (entryStdAccess), TRUE);
 
   labelSAP = gtk_label_new (_("SAP Announce:"));
@@ -1370,6 +1366,9 @@ create_pda (void)
                     NULL);
   g_signal_connect ((gpointer) timeSlider, "button_press_event",
                     G_CALLBACK (SliderPress),
+                    NULL);
+  g_signal_connect ((gpointer) timeSlider, "move_slider",
+                    G_CALLBACK (SliderMove),
                     NULL);
   g_signal_connect ((gpointer) tvFileList, "row_activated",
                     G_CALLBACK (onFileListRow),

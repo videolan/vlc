@@ -2,7 +2,7 @@
  * callbacks.h : pda plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: pda_callbacks.h,v 1.10 2003/11/30 23:19:13 jpsaman Exp $
+ * $Id: pda_callbacks.h,v 1.11 2003/12/06 22:41:40 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -148,3 +148,9 @@ onAddTranscodeToPlaylist               (GtkButton       *button,
 void
 onEntryStdAccessChanged                (GtkEditable     *editable,
                                         gpointer         user_data);
+
+void
+SliderMove                             (GtkRange        *range,
+                                        GtkScrollType    scroll,
+                                        gpointer         user_data);
+
