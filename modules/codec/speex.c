@@ -1,8 +1,8 @@
 /*****************************************************************************
- * speex.c: speex decoder module making use of libspeex.
+ * speex.c: speex decoder/packetizer module making use of libspeex.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: speex.c,v 1.1 2003/10/22 17:12:30 gbazin Exp $
+ * $Id: speex.c,v 1.2 2003/10/22 18:24:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -217,6 +217,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
         if( ProcessHeader( p_dec, &oggpacket ) != VLC_SUCCESS )
         {
             msg_Err( p_dec, "Initial Speex header is corrupted" );
+            block_Release( p_block );
             return VLC_EGENERIC;
         }
 
@@ -359,7 +360,7 @@ static int ProcessHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
         return VLC_EGENERIC;
     }
 
-    if( p_header->nb_channels == 1 )
+    if( p_header->nb_channels == 2 )
     {
         SpeexStereoState stereo = SPEEX_STEREO_STATE_INIT;
         p_sys->stereo = stereo;
@@ -470,6 +471,7 @@ static int DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input, p_aout_buffer );
     }
 
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
