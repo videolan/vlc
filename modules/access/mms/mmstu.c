@@ -263,7 +263,12 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+
+#if 0       /* Disable for now until we have a clock synchro algo
+             * which works with something else than MPEG over UDP */
             *pb_bool = VLC_FALSE;
+#endif
+            *pb_bool = VLC_TRUE;
             break;
 
         /* */

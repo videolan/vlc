@@ -822,7 +822,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_CAN_CONTROL_PACE:
             pb = (vlc_bool_t*)va_arg( args, vlc_bool_t * );
+
+#if 0       /* Disable for now until we have a clock synchro algo
+             * which works with something else than MPEG over UDP */
             *pb = VLC_FALSE;
+#endif
+            *pb = VLC_TRUE;
             return VLC_SUCCESS;
 
         case DEMUX_SET_PAUSE_STATE:

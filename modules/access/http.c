@@ -384,8 +384,9 @@ static int Open( vlc_object_t *p_this )
             msg_Info( p_access, "Raw-audio server found, %s demuxer selected",
                       p_access->psz_demux );
 
-#if 0       /* Doesn't work really well because of the pre-buffering in shoutcast
-             * servers (the buffer content will be sent as fast as possible). */
+#if 0       /* Doesn't work really well because of the pre-buffering in
+             * shoutcast servers (the buffer content will be sent as fast as
+             * possible). */
             p_sys->b_pace_control = VLC_FALSE;
 #endif
         }
@@ -705,7 +706,12 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+
+#if 0       /* Disable for now until we have a clock synchro algo
+             * which works with something else than MPEG over UDP */
             *pb_bool = p_sys->b_pace_control;
+#endif
+            *pb_bool = VLC_TRUE;
             break;
 
         /* */
