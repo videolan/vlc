@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.27 2003/04/22 16:36:16 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.28 2003/04/23 15:18:24 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -43,9 +43,10 @@ extern "C"
 
 const char * _AddEllipsis( char * string )
 {
-    BString newString( string );
-    newString << B_UTF8_ELLIPSIS;
-    return newString.String();
+    char * temp;
+    temp = (char*) calloc( strlen( string ) + 4, 1 );
+    sprintf( temp, "%s%s", string, B_UTF8_ELLIPSIS );
+    return temp;
 }
 
 /* constructor */
