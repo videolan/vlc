@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.58 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: oss.c,v 1.59 2003/05/09 22:03:06 sigmunau Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -249,7 +249,11 @@ static void Probe( aout_instance_t * p_aout )
             if( config_GetInt( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
-    }
+        else if( config_GetInt( p_aout, "spdif" ) )
+        {
+            msg_Warn( p_aout, "s/pdif not supported by card" );
+        }
+    }    
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
                      NULL );
