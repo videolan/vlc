@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.28 2003/05/13 22:59:16 gbazin Exp $
+ * $Id: interface.cpp,v 1.29 2003/05/18 16:27:18 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -164,6 +164,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     p_intf = _p_intf;
     p_prefs_dialog = NULL;
     i_old_playing_status = PAUSE_S;
+    p_open_dialog = NULL;
 
     /* Give our interface a nice little icon */
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
@@ -207,6 +208,8 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
 Interface::~Interface()
 {
+    /* Clean up */
+    if( p_open_dialog ) delete p_open_dialog;
     if( p_prefs_dialog ) p_prefs_dialog->Destroy();
 }
 
@@ -391,9 +394,10 @@ void Interface::CreateOurSlider()
 void Interface::Open( int i_access_method )
 {
     /* Show/hide the open dialog */
-    OpenDialog dialog( p_intf, this, i_access_method );
+    if( p_open_dialog == NULL )
+        p_open_dialog = new OpenDialog( p_intf, this, i_access_method );
 
-    if( dialog.ShowModal() == wxID_OK )
+    if( p_open_dialog && p_open_dialog->ShowModal() == wxID_OK )
     {
         /* Update the playlist */
         playlist_t *p_playlist =
@@ -404,7 +408,7 @@ void Interface::Open( int i_access_method )
             return;
         }
 
-        playlist_Add( p_playlist, (const char *)dialog.mrl.mb_str(),
+        playlist_Add( p_playlist, (const char *)p_open_dialog->mrl.mb_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
         TogglePlayButton( PLAYING_S );

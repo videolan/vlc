@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.27 2003/05/15 15:59:35 gbazin Exp $
+ * $Id: wxwindows.h,v 1.28 2003/05/18 16:27:18 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -118,6 +118,7 @@ private:
 };
 
 /* Main Interface */
+class OpenDialog;
 class Interface: public wxFrame
 {
 public:
@@ -132,6 +133,10 @@ public:
     wxSlider    *slider;
     wxWindow    *slider_frame;
     wxStaticBox *slider_box;
+
+    /* So we don't recreate the open dialog box each time
+     * (and keep the last settings) */
+    OpenDialog  *p_open_dialog;
 
     wxMenu      *p_popup_menu;
 
