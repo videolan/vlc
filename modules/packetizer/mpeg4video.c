@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.11 2003/04/24 20:24:44 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.12 2003/05/03 02:09:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -451,6 +451,7 @@ static void EndThread ( packetizer_thread_t *p_pack)
     {
         sout_InputDelete( p_pack->p_sout_input );
     }
+    free( p_pack );
 }
 
 static void input_ShowPES( decoder_fifo_t *p_fifo, pes_packet_t **pp_pes )

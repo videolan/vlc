@@ -2,7 +2,7 @@
  * a52.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.4 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: a52.c,v 1.5 2003/05/03 02:09:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -132,8 +132,6 @@ static int Run( decoder_fifo_t *p_fifo )
     }
 
     EndThread( p_pack );
-
-    FREE( p_pack );
 
     if( b_error )
     {
@@ -306,6 +304,7 @@ static void EndThread ( packetizer_t *p_pack)
     {
         sout_InputDelete( p_pack->p_sout_input );
     }
+    free( p_pack );
 }
 
 /*****************************************************************************
@@ -325,6 +324,7 @@ static int SyncInfo( const byte_t * p_buf, int * pi_channels,
                                 512, 576, 640 };
     static const uint8_t lfeon[8] = { 0x10, 0x10, 0x04, 0x04,
                                       0x04, 0x01, 0x04, 0x01 };
+    static const int acmod_to_channels[8] = { 2, 1, 2, 3, 3, 4, 4, 5 };
     int frmsizecod;
     int bitrate;
     int half;
@@ -346,36 +346,9 @@ static int SyncInfo( const byte_t * p_buf, int * pi_channels,
                         | AOUT_CHAN_DOLBYSTEREO;*/
         *pi_channels = 2; /* FIXME ???  */
     }
-    else switch ( acmod )
+    else
     {
-    case 0x0:
-        /* Dual-mono = stereo + dual-mono */
-//        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-//                        | AOUT_CHAN_DUALMONO;
-        *pi_channels = 2; /* FIXME ???  */
-        break;
-    case 0x1:
-        /* Mono */
-        *pi_channels = 1;
-        break;
-    case 0x2:
-        /* Stereo */
-        *pi_channels = 2;
-        break;
-    case 0x3: /* 3F */
-    case 0x4: /* 2F1R */
-        *pi_channels = 3;
-        break;
-    case 0x5: /* 3F1R */
-    case 0x6: /* 2F2R */
-        *pi_channels = 4;
-        break;
-    case 0x7:
-        /* 3F2R */
-        *pi_channels = 5;
-        break;
-    default:
-        return 0;
+        *pi_channels = acmod_to_channels[acmod&0x07];
     }
 
     if ( p_buf[6] & lfeon[acmod] ) *pi_channels += 1;//|= AOUT_CHAN_LFEA;

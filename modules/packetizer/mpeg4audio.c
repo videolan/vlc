@@ -2,7 +2,7 @@
  * mpeg4audio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.5 2003/04/13 20:00:21 fenrir Exp $
+ * $Id: mpeg4audio.c,v 1.6 2003/05/03 02:09:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -361,5 +361,6 @@ static void EndThread ( packetizer_thread_t *p_pack)
     {
         free( p_pack->p_wf );
     }
+    free( p_pack );
 }
 
