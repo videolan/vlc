@@ -5,8 +5,8 @@
   <name>Familiar</name>
   <program_name>familiar</program_name>
   <directory></directory>
-  <source_directory>src</source_directory>
-  <pixmaps_directory>share</pixmaps_directory>
+  <source_directory></source_directory>
+  <pixmaps_directory>../../share</pixmaps_directory>
   <language>C</language>
   <gnome_support>False</gnome_support>
   <gettext_support>True</gettext_support>
@@ -24,9 +24,14 @@
   <width>240</width>
   <height>320</height>
   <signal>
+    <name>destroy_event</name>
+    <handler>on_familiar_destroy_event</handler>
+    <last_modification_time>Tue, 23 Jul 2002 18:16:11 GMT</last_modification_time>
+  </signal>
+  <signal>
     <name>destroy</name>
-    <handler>on_familiar_destroy</handler>
-    <last_modification_time>Mon, 22 Jul 2002 18:58:45 GMT</last_modification_time>
+    <handler>gtk_main_quit</handler>
+    <last_modification_time>Tue, 23 Jul 2002 18:17:28 GMT</last_modification_time>
   </signal>
   <title>vlc (familiar)</title>
   <type>GTK_WINDOW_TOPLEVEL</type>

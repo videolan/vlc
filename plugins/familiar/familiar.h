@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.3 2002/07/22 21:04:55 jpsaman Exp $
+ * $Id: familiar.h,v 1.4 2002/07/23 18:39:29 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -37,4 +37,10 @@ struct intf_sys_t
     /* XXX: Ugly kludge, see gtk.c */
     void             ( *pf_callback[MAX_ATEXIT] ) ( void );
 };
+
+/*****************************************************************************
+ * Useful macro
+ ****************************************************************************/
+#define  GtkGetIntf( widget ) __GtkGetIntf( GTK_WIDGET( widget ) )
+void * __GtkGetIntf( GtkWidget * );
 

@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.4 2002/07/22 21:04:55 jpsaman Exp $
+ * $Id: familiar.c,v 1.5 2002/07/23 18:39:29 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -96,11 +96,6 @@ static void intf_Close        ( intf_thread_t *p_intf );
 static void intf_Run          ( intf_thread_t *p_intf );
 
 /*****************************************************************************
- * Local variables (mutex-protected).
- *****************************************************************************/
-//static void ** pp_global_data = NULL;
-
-/*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
 MODULE_CONFIG_START
@@ -179,7 +174,7 @@ static void intf_Run( intf_thread_t *p_intf )
     char  *p_args[] = { "" };
     char **pp_args  = p_args;
     int    i_args   = 1;
-    int    i_dummy;
+    int    i_dummy  = 0;
 
     /* Initialize Gtk+ */
     gtk_set_locale ();
@@ -193,7 +188,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
     /* Create some useful widgets that will certainly be used */
 // FIXME: magic path
-    add_pixmap_directory("/home/jpsaman/vlc/share");
+    add_pixmap_directory("share");
     p_intf->p_sys->p_window = create_familiar();
     if (p_intf->p_sys->p_window == NULL)
     {

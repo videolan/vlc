@@ -395,8 +395,11 @@ create_familiar (void)
   gtk_widget_show (about);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 2), about);
 
+  gtk_signal_connect (GTK_OBJECT (familiar), "destroy_event",
+                      GTK_SIGNAL_FUNC (on_familiar_destroy_event),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (familiar), "destroy",
-                      GTK_SIGNAL_FUNC (on_familiar_destroy),
+                      GTK_SIGNAL_FUNC (gtk_main_quit),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (xpm_open), "button_press_event",
                       GTK_SIGNAL_FUNC (on_xpm_open_button_press_event),

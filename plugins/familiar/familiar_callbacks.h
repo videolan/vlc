@@ -1,4 +1,7 @@
+
 #include <gtk/gtk.h>
+
+gboolean GtkExit                ( GtkWidget *, gpointer );
 
 gboolean
 on_xpm_open_button_press_event         (GtkWidget       *widget,
@@ -35,6 +38,7 @@ on_xpm_forward_button_press_event      (GtkWidget       *widget,
                                         GdkEventButton  *event,
                                         gpointer         user_data);
 
-void
-on_familiar_destroy                    (GtkObject       *object,
+gboolean
+on_familiar_destroy_event              (GtkWidget       *widget,
+                                        GdkEvent        *event,
                                         gpointer         user_data);
