@@ -153,7 +153,23 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
         if( !strcmp( p_parser->psz_capability, "services_discovery" ) )
         {
+            /* create the menu entries used in the playlist menu */
             o_lmi = [[o_mi_services submenu] addItemWithTitle:
+                     [NSString stringWithCString:
+                     p_parser->psz_longname ? p_parser->psz_longname :
+                     ( p_parser->psz_shortname ? p_parser->psz_shortname:
+                     p_parser->psz_object_name)]
+                                             action: @selector(servicesChange:)
+                                             keyEquivalent: @""];
+            [o_lmi setTarget: self];
+            [o_lmi setRepresentedObject:
+                   [NSString stringWithCString: p_parser->psz_object_name]];
+            if( playlist_IsServicesDiscoveryLoaded( p_playlist,
+                    p_parser->psz_object_name ) )
+                [o_lmi setState: NSOnState];
+                
+            /* create the menu entries for the main menu */
+            o_lmi = [[o_mm_mi_services submenu] addItemWithTitle:
                      [NSString stringWithCString:
                      p_parser->psz_longname ? p_parser->psz_longname :
                      ( p_parser->psz_shortname ? p_parser->psz_shortname:

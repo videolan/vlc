@@ -265,6 +265,8 @@
                 "o_mi_services" = id; 
                 "o_mi_sort_author" = id; 
                 "o_mi_sort_name" = id; 
+                "o_mm_mi_services" = id; 
+                "o_mm_mu_services" = id; 
                 "o_mu_services" = id; 
                 "o_outline_view" = id; 
                 "o_playlist_view" = id; 
