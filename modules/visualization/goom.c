@@ -2,7 +2,7 @@
  * goom.c: based on libgoom (see http://ios.free.fr/?page=projet&quoi=1)
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: goom.c,v 1.2 2003/08/23 22:49:50 fenrir Exp $
+ * $Id: goom.c,v 1.3 2003/12/22 23:46:23 hartman Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -251,7 +251,7 @@ static void Thread( vlc_object_t *p_this )
             msleep( VOUT_OUTMEM_SLEEP );
         }
 
-        if( p_thread->b_die || p_pic == NULL )
+        if( p_pic == NULL )
         {
             break;
         }
