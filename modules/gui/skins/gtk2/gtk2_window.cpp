@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.27 2003/04/21 21:51:16 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.28 2003/04/22 17:56:44 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -175,7 +175,6 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
                            (int)( (GdkEventButton *)p2 )->y, 0 );
             gdk_window_get_pointer( gWnd, 0, 0, 0 );
             return true;
-
 
         case GDK_BUTTON_PRESS:
             // Raise all the windows

@@ -2,7 +2,7 @@
  * slider.cpp: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.cpp,v 1.7 2003/04/21 21:51:16 asmax Exp $
+ * $Id: slider.cpp,v 1.8 2003/04/22 17:56:44 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -321,7 +321,6 @@ bool ControlSlider::MouseScroll( int x, int y, int direction )
         return false;
 
     int val = Value;
-
     switch( direction )
     {
         case MOUSE_SCROLL_DOWN:
@@ -334,6 +333,9 @@ bool ControlSlider::MouseScroll( int x, int y, int direction )
     }
 
     MoveCursor( val );
+    UpdateEvent->SetParam2( GetCursorPosition() );
+    UpdateEvent->SendEvent();
+
     return true;
 }
 //---------------------------------------------------------------------------
