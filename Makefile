@@ -20,6 +20,7 @@ PLUGINS_DIR :=	ac3_adec \
 		beos \
 		chroma \
 		directx \
+		downmix \
 		dsp \
 		dummy \
 		dvd \
@@ -30,7 +31,6 @@ PLUGINS_DIR :=	ac3_adec \
 		ggi \
 		glide \
 		gtk \
-		downmix \
 		idct \
 		imdct \
 		kde \
@@ -65,6 +65,9 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		chroma/chroma_i420_ymga \
 		chroma/chroma_i420_ymga_mmx \
 		directx/directx \
+		downmix/downmix \
+		downmix/downmixsse \
+		downmix/downmix3dn \
 		dsp/dsp \
 		dummy/dummy \
 		dummy/null \
@@ -81,9 +84,6 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		glide/glide \
 		gtk/gnome \
 		gtk/gtk \
-		downmix/downmix \
-		downmix/downmixsse \
-		downmix/downmix3dn \
 		idct/idct \
 		idct/idctclassic \
 		idct/idctmmx \
@@ -118,6 +118,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		text/ncurses \
 		text/rc \
 		vcd/vcd \
+		win32/waveout \
 		win32/win32 \
 		x11/x11 \
 		x11/xvideo

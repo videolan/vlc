@@ -1136,13 +1136,13 @@ dnl
 dnl  Windows DirectX module
 dnl
 AC_ARG_ENABLE(directx,
-  [  --disable-directx       Windows DirectX support (default enabled on WIN32)])
+  [  --disable-directx       Win32 DirectX support (default enabled on Win32)])
 if test "x$enableval" != "xno"
 then
   if test $SYS = mingw32
   then
     AC_ARG_WITH(directx-path, 
-    [  --with-directx-path=path Windows DirectX headers and libraries])
+    [  --with-directx-path=path Win32 DirectX headers and libraries])
     if test "x$with_directx_path" = "x"
     then
       AC_CHECK_HEADERS(directx.h,
@@ -1165,10 +1165,21 @@ then
 fi
 
 dnl
+dnl  win32 waveOut plugin
+dnl
+AC_ARG_ENABLE(waveout,
+  [  --disable-waveout       Win32 waveOut module (default enabled on Win32)])
+if ((test "x$enableval" != "xno") && (test $SYS = mingw32))
+  then
+    PLUGINS="${PLUGINS} waveout"
+    LIB_WAVEOUT="-lwinmm"
+fi
+
+dnl
 dnl  Windows MFC interface module
 dnl
 AC_ARG_ENABLE(win32,
-  [  --enable-win32          Windows DirectX support (default disabled)],
+  [  --enable-win32          Win32 interface support (default disabled)],
   [ if test "x$enableval" != "xno"
     then
       PLUGINS="${PLUGINS} win32"
@@ -1482,6 +1493,7 @@ AC_SUBST(LIB_QNX)
 AC_SUBST(LIB_QT)
 AC_SUBST(LIB_RC)
 AC_SUBST(LIB_SDL)
+AC_SUBST(LIB_WAVEOUT)
 AC_SUBST(LIB_WIN32)
 AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)

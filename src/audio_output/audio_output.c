@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.73 2002/01/15 11:51:11 asmax Exp $
+ * $Id: audio_output.c,v 1.74 2002/01/25 06:43:34 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -92,6 +92,28 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
         return( NULL );
     }
 
+    p_aout->l_rate = l_rate;
+    p_aout->i_channels = i_channels;
+
+    /* special setting for ac3 pass-through mode */
+    /* FIXME is it necessary ? (cf ac3_adec.c) */
+    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && p_main->b_ac3 )
+    {
+        intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
+        p_aout->i_format = AOUT_FMT_AC3;
+        p_aout->l_rate = 48000;
+    }
+
+    if( p_aout->l_rate == 0 )
+    {
+        intf_ErrMsg( "aout error: null sample rate" );
+        free( p_aout );
+        return( NULL );
+    }
+
+    /* FIXME: only works for i_channels == 1 or 2 ?? */
+    p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0;
+
     /* Choose the best module */
     p_aout->p_module = module_Need( MODULE_CAPABILITY_AOUT,
                            main_GetPszVariable( AOUT_METHOD_VAR, NULL ), 
@@ -121,30 +143,6 @@ aout_thread_t *aout_CreateThread( int *pi_status, int i_channels, long l_rate )
         free( p_aout );
         return( NULL );
     }
-
-    p_aout->l_rate = l_rate;
-    p_aout->i_channels = i_channels;
-
-    /* special setting for ac3 pass-through mode */
-    /* FIXME is it necessary ? (cf ac3_adec.c) */
-    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && p_main->b_ac3 )
-    {
-        intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
-        p_aout->i_format = AOUT_FMT_AC3;
-        p_aout->l_rate = 48000;
-    }
-
-    if( p_aout->l_rate == 0 )
-    {
-        intf_ErrMsg( "aout error: null sample rate" );
-        p_aout->pf_close( p_aout );
-        module_Unneed( p_aout->p_module );
-        free( p_aout );
-        return( NULL );
-    }
-
-    /* FIXME: only works for i_channels == 1 or 2 ?? */
-    p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0;
 
     if ( p_aout->pf_setformat( p_aout ) )
     {
