@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.191 2002/05/19 09:37:02 gbazin Exp $
+ * $Id: main.c,v 1.192 2002/05/19 11:02:46 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -169,7 +169,9 @@
     "processing power.")
 
 #define DISPLAY_TEXT N_("display identifier")
-#define DISPLAY_LONGTEXT ""
+#define DISPLAY_LONGTEXT N_( \
+    "This is the local display port that will be used for X11 drawing. " \
+    "For instance :0.1.")
 
 #define WIDTH_TEXT N_("video width")
 #define WIDTH_LONGTEXT N_( \
@@ -201,66 +203,95 @@
     "of you graphics card.")
 
 #define SPUMARGIN_TEXT N_("force SPU position")
-#define SPUMARGIN_LONGTEXT ""
+#define SPUMARGIN_LONGTEXT N_( \
+    "You can use this option to place the sub-titles under the movie, " \
+    "instead of over the movie. Try several positions.")
 
 #define FILTER_TEXT N_("video filter module")
 #define FILTER_LONGTEXT N_( \
-    "This option allows you to select the video filter module that vlc " \
-    "will use.\nNote that by default no video filter is used.")
+    "This will allow you to add a post-processing filter to enhance the " \
+    "picture quality, for instance deinterlacing, or to clone or distort " \
+    "the video window.")
 
 #define SERVER_PORT_TEXT N_("server port")
-#define SERVER_PORT_LONGTEXT ""
+#define SERVER_PORT_LONGTEXT N_( \
+    "This is the port used for UDP streams. By default, we chose 1234.")
 
 #define NETCHANNEL_TEXT N_("enable network channel mode")
-#define NETCHANNEL_LONGTEXT ""
+#define NETCHANNEL_LONGTEXT N_( \
+    "Activate this option if you want to use the VideoLAN Channel Server.")
 
 #define CHAN_SERV_TEXT N_("channel server address")
-#define CHAN_SERV_LONGTEXT ""
+#define CHAN_SERV_LONGTEXT N_( \
+    "Indicate here the address of the VideoLAN Channel Server.")
 
 #define CHAN_PORT_TEXT N_("channel server port")
-#define CHAN_PORT_LONGTEXT ""
+#define CHAN_PORT_LONGTEXT N_( \
+    "Indicate here the port on which the VideoLAN Channel Server runs.")
 
 #define IFACE_TEXT N_("network interface")
-#define IFACE_LONGTEXT ""
+#define IFACE_LONGTEXT N_( \
+    "If you have several interfaces on your Linux machine and use the " \
+    "VLAN solution, you may indicate here which interface to use.")
 
 #define INPUT_PROGRAM_TEXT N_("choose program (SID)")
 #define INPUT_PROGRAM_LONGTEXT N_( \
     "Choose the program to select by giving its Service ID.")
 
 #define INPUT_AUDIO_TEXT N_("choose audio")
-#define INPUT_AUDIO_LONGTEXT ""
+#define INPUT_AUDIO_LONGTEXT N_( \
+    "Give the default type of audio you want to use in a DVD.")
 
 #define INPUT_CHAN_TEXT N_("choose channel")
-#define INPUT_CHAN_LONGTEXT ""
+#define INPUT_CHAN_LONGTEXT N_( \
+    "Give the stream number of the audio channel you want to use in a DVD " \
+    "(from 1 to n).")
 
 #define INPUT_SUBT_TEXT N_("choose subtitles")
-#define INPUT_SUBT_LONGTEXT ""
+#define INPUT_SUBT_LONGTEXT N_( \
+    "Give the stream number of the subtitle channel you want to use in a DVD " \
+    "(from 1 to n).")
 
 #define DVD_DEV_TEXT N_("DVD device")
 #define DVD_DEV_LONGTEXT N_( \
-    "This option allows you to set the DVD device that vlc will try to use " \
-    "by default.")
+    "This is the default DVD device to use. Under UNIX it is /dev/dvd, under " \
+    "Windows it is D:.")
 
 #define VCD_DEV_TEXT N_("VCD device")
 #define VCD_DEV_LONGTEXT N_( \
-    "This option allows you to set the VCD device that vlc will try to use " \
-    "by default.")
+    "This is the default VCD device to use. Under UNIX it is /dev/dvd, under " \
+    "Windows it is D:.")
 
 #define IPV6_TEXT N_("force IPv6")
-#define IPV6_LONGTEXT ""
+#define IPV6_LONGTEXT N_( \
+    "If you check this box, IPv6 will be used by default for all UDP and " \
+    "HTTP connections.")
 
 #define IPV4_TEXT N_("force IPv4")
-#define IPV4_LONGTEXT ""
+#define IPV4_LONGTEXT N_( \
+    "If you check this box, IPv4 will be used by default for all UDP and " \
+    "HTTP connections.")
 
 #define ADEC_MPEG_TEXT N_("choose MPEG audio decoder")
 #define ADEC_MPEG_LONGTEXT N_( \
-    "This option allows you to select the MPEG audio decoder you want to use."\
-    "\nBy default vlc will use mpeg_adec.")
+    "This allows you to select the MPEG audio decoder you want to use. " \
+    "Common choices are builtin and mad.")
 
 #define ADEC_AC3_TEXT N_("choose AC3 audio decoder")
 #define ADEC_AC3_LONGTEXT N_( \
-    "This option allows you to select the AC3 audio decoder you want to use." \
-    "\nBy default vlc will use ac3_adec.")
+    "This allows you to select the AC3/A52 audio decoder you want to use. " \
+    "Common choices are builtin and a52.")
+
+#define VDEC_SMP_TEXT N_("use additional processors")
+#define VDEC_SMP_LONGTEXT N_( \
+    "This option is deprecated.")
+
+#define VPAR_SYNCHRO_TEXT N_("force synchro algorithm {I|I+|IP|IP+|IPB}")
+#define VPAR_SYNCHRO_LONGTEXT N_( \
+    "This allows you to force the synchro algorithm, by directly selecting " \
+    "the types of picture you want to decode. Please bear in mind that if " \
+    "you select more pictures than what your CPU is capable to decode, " \
+    "you won't get anything.")
 
 #define NOMMX_TEXT N_("disable CPU's MMX support")
 #define NOMMX_LONGTEXT N_( \
