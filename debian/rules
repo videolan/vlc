@@ -366,7 +366,7 @@ binary-arch: build install
 	dh_installman doc/vlc-config.1 -p libvlc0-dev
 #	dh_installchangelogs ChangeLog -p vlc
 	cp ChangeLog debian/vlc/usr/share/doc/vlc/changelog
-	for x in doc/ChangeLog-* ; do cp "doc/ChangeLog-$${x\#*/\#*-}" "debian/vlc/usr/share/doc/vlc/changelog-$$x\#*/\#*-}" ; done
+	for x in doc/ChangeLog-* ; do cp "doc/ChangeLog-$${x\#*/\#*-}" "debian/vlc/usr/share/doc/vlc/changelog-$${x\#*/\#*-}" ; done
 	cp debian/changelog debian/vlc/usr/share/doc/vlc/changelog.Debian
 	dh_link -s
 	dh_strip -s
