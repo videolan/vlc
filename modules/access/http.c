@@ -805,8 +805,15 @@ static int Connect( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "Server" ) )
         {
             msg_Dbg( p_access, "Server: %s", p );
-            if( !strncasecmp( p, "Icecast", 7 ) )
+            if( !strncasecmp( p, "Icecast", 7 ) ||
+                !strncasecmp( p, "Nanocaster", 10 ) )
             {
+                /* Remember if this is Icecast 
+                 * we need to force mp3 in some cases without breaking autodetection */
+
+                /* Let live365 streams (nanocaster) piggyback on the icecast routine. 
+                 * They look very similar */
+
                 p_sys->b_reconnect = VLC_TRUE;
                 p_sys->b_pace_control = VLC_FALSE;
                 p_sys->b_icecast = VLC_TRUE;
@@ -819,6 +826,12 @@ static int Connect( access_t *p_access, int64_t i_tell )
             {
                 p_sys->b_chunked = VLC_TRUE;
             }
+        }
+        else if( !strncasecmp( psz, "icy-", 4 ) ||
+                 !strncasecmp( psz, "ice-", 4 ) ||
+                 !strncasecmp( psz, "x-audiocast", 11 ) )
+        {
+            msg_Dbg( p_access, "Meta-Info: %s: %s", psz, p );
         }
 
         free( psz );
