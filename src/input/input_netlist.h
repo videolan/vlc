@@ -24,7 +24,6 @@ typedef struct netlist_s
     /* Index */
     unsigned int            i_data_start, i_data_end;
     unsigned int            i_pes_start, i_pes_end;
-    unsigned int            i_iovec_start, i_iovec_end;
 } netlist_t;
 
 /*****************************************************************************
