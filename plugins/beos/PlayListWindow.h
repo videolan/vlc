@@ -2,7 +2,7 @@
  * PlayListWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.h,v 1.1 2001/06/15 09:07:10 tcastley Exp $
+ * $Id: PlayListWindow.h,v 1.2 2002/06/01 08:54:48 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -26,13 +26,17 @@ class CDMenu;
 class PlayListWindow : public BWindow
 {
 public:
-    PlayListWindow( BRect frame, const char *name, playlist_t *p_pl);
+    static PlayListWindow *getPlayList(BRect frame, const char *name, 
+                                      playlist_t *p_pl);
     ~PlayListWindow();
+    bool QuitRequested();
+    void ReallyQuit();
 
     // standard window member
     virtual void    MessageReceived(BMessage *message);
     
 private:	
+    PlayListWindow( BRect frame, const char *name, playlist_t *p_pl);
     playlist_t  *p_playlist;
     BListView  *p_listview;
     BFilePanel *file_panel;
