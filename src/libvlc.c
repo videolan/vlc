@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.74 2003/04/07 13:01:39 gbazin Exp $
+ * $Id: libvlc.c,v 1.75 2003/04/07 13:46:06 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -322,16 +322,22 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /* Check for translation config option */
-#ifndef SYS_DARWIN
+#if defined( ENABLE_NLS ) \
+     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
+
+    /* This ain't really nice to have to reload the config here but it seems
+     * the only way to do it. */
+    p_vlc->psz_homedir = config_GetHomeDir();
+    config_LoadConfigFile( p_vlc, "main" );
+    config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
+
     if( !config_GetInt( p_vlc, "translation" ) )
     {
         /* Reset the default domain */
         SetLanguage( "C" );
 
-#if defined( ENABLE_NLS ) \
-     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
         textdomain( "dummy" );
-#endif
+
         module_EndBank( p_vlc );
         module_InitBank( &libvlc );
         module_LoadMain( &libvlc );
