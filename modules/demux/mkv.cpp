@@ -1087,10 +1087,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-			if (p_sys->i_pts < p_sys->i_start_pts)
-				*pf = (double)p_sys->i_start_pts / (1000.0 * p_sys->f_duration);
-			else
-				*pf = (double)p_sys->i_pts / (1000.0 * p_sys->f_duration);
+/*            if (p_sys->i_pts < p_sys->i_start_pts)
+                *pf = (double)p_sys->i_start_pts / (1000.0 * p_sys->f_duration);
+            else*/
+                *pf = (double)p_sys->i_pts / (1000.0 * p_sys->f_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
@@ -1100,10 +1100,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-			if (p_sys->i_pts < p_sys->i_start_pts)
-				*pi64 = p_sys->i_start_pts;
-			else
-				*pi64 = p_sys->i_pts;
+/*            if (p_sys->i_pts < p_sys->i_start_pts)
+                *pi64 = p_sys->i_start_pts;
+            else*/
+                *pi64 = p_sys->i_pts;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
@@ -1312,6 +1312,10 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         msg_Err( p_demux, "unknown track number=%d", block->TrackNum() );
         return;
     }
+    if( i_pts < p_sys->i_start_pts && tk.fmt.i_cat == AUDIO_ES )
+    {
+        return; /* discard audio packets that shouldn't be rendered */
+    }
 
     es_out_Control( p_demux->out, ES_OUT_GET_ES_STATE, tk.p_es, &b );
     if( !b )
@@ -1351,11 +1355,12 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
-/*		if (p_sys->i_start_pts > i_pts)
-		{
-            p_block->i_dts = p_block->i_pts = -1;
-		}
-		else*/
+        if (p_sys->i_start_pts > i_pts)
+        {
+            p_block->i_dts = 0;
+            p_block->i_pts = -1;
+        }
+        else
         if( tk.fmt.i_cat != VIDEO_ES )
         {
             p_block->i_dts = p_block->i_pts = i_pts;
@@ -1500,6 +1505,8 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
 
     p_sys->i_start_pts = i_date;
 
+    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
     while( i_track_skipping > 0 )
     {
         if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
@@ -1531,7 +1538,6 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
                 if( !tk.b_search_keyframe )
                 {
                     BlockDecode( p_demux, block, 0, 0 );
-/*                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, block->GlobalTimecode() / (mtime_t) 1000 );*/
                 }
             }
         }
