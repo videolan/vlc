@@ -4,9 +4,9 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.35 2004/01/29 17:04:01 gbazin Exp $
+ * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,6 +129,9 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 #define config_LoadConfigFile(a,b) __config_LoadConfigFile(VLC_OBJECT(a),b)
 #define config_SaveConfigFile(a,b) __config_SaveConfigFile(VLC_OBJECT(a),b)
 #define config_ResetAll(a) __config_ResetAll(VLC_OBJECT(a))
+
+/* internal only */
+int config_CreateDir( vlc_object_t *, char * );
 
 /*****************************************************************************
  * Macros used to build the configuration structure.

@@ -246,7 +246,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     vlc_t *      p_vlc = vlc_current_object( i_object );
     module_t    *p_help_module;
     playlist_t  *p_playlist;
-    vlc_value_t  lockval;
 
     if( !p_vlc )
     {
@@ -285,22 +284,13 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
      * main module. We need to do this at this stage to be able to display
      * a short help if required by the user. (short help == main module
      * options) */
-    var_Create( p_libvlc, "libvlc", VLC_VAR_MUTEX );
-    var_Get( p_libvlc, "libvlc", &lockval );
-    vlc_mutex_lock( lockval.p_address );
-    if( libvlc.p_module_bank == NULL )
-    {
-        module_InitBank( p_vlc );
-        module_LoadMain( p_vlc );
-    }
-    vlc_mutex_unlock( lockval.p_address );
-    var_Destroy( p_libvlc, "libvlc" );
+    module_InitBank( p_vlc );
 
     /* Hack: insert the help module here */
     p_help_module = vlc_object_create( p_vlc, VLC_OBJECT_MODULE );
     if( p_help_module == NULL )
     {
-        /*module_EndBank( p_vlc );*/
+        module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -315,7 +305,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        /*module_EndBank( p_vlc );*/
+        module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -354,7 +344,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        /*module_EndBank( p_vlc );*/
+        module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
     }
@@ -372,6 +362,8 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     psz_language = config_GetPsz( p_vlc, "language" );
     if( psz_language && *psz_language && strcmp( psz_language, "auto" ) )
     {
+        vlc_bool_t b_cache_delete = libvlc.p_module_bank->b_cache_delete;
+
         /* Reset the default domain */
         SetLanguage( psz_language );
 
@@ -386,8 +378,9 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 
         module_EndBank( p_vlc );
         module_InitBank( p_vlc );
-        module_LoadMain( p_vlc );
+        config_LoadConfigFile( p_vlc, "main" );
         config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
+        libvlc.p_module_bank->b_cache_delete = b_cache_delete;
     }
     if( psz_language ) free( psz_language );
 #endif
@@ -458,7 +451,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        /*module_EndBank( p_vlc );*/
+        module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
     }
@@ -487,7 +480,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
-        /*module_EndBank( p_vlc );*/
+        module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -598,7 +591,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         {
             module_Unneed( p_vlc, p_vlc->p_memcpy_module );
         }
-        /*module_EndBank( p_vlc );*/
+        module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
@@ -736,7 +729,7 @@ int VLC_Destroy( int i_object )
     }
 
     /*
-     * XXX: Free module bank !
+     * Free module bank !
      */
     module_EndBank( p_vlc );
 

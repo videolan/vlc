@@ -910,7 +910,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 }
 
 /*****************************************************************************
- * config_CreateConfigDir: Create configuration directory if it doesn't exist.
+ * config_CreateDir: Create configuration directory if it doesn't exist.
  *****************************************************************************/
 int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
 {

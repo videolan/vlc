@@ -54,6 +54,7 @@ struct module_bank_t
 {
     VLC_COMMON_MEMBERS
 
+    int              i_usage;
     module_symbols_t symbols;
 
     /* Plugins cache */

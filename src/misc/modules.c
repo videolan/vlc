@@ -168,9 +168,24 @@ static char * GetWindowsError  ( void );
 void __module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank;
+    vlc_value_t  lockval;
+
+    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+    if( p_this->p_libvlc->p_module_bank )
+    {
+        p_this->p_libvlc->p_module_bank->i_usage++;
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "libvlc" );
+        return;
+    }
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_this->p_libvlc, "libvlc" );
 
     p_bank = vlc_object_create( p_this, sizeof(module_bank_t) );
     p_bank->psz_object_name = "module bank";
+    p_bank->i_usage = 1;
     p_bank->i_cache = p_bank->i_loaded_cache = 0;
     p_bank->pp_cache = p_bank->pp_loaded_cache = 0;
     p_bank->b_cache = p_bank->b_cache_dirty =
@@ -186,6 +201,8 @@ void __module_InitBank( vlc_object_t *p_this )
     /* Everything worked, attach the object */
     p_this->p_libvlc->p_module_bank = p_bank;
     vlc_object_attach( p_bank, p_this->p_libvlc );
+
+    module_LoadMain( p_this );
 
     return;
 }
@@ -211,6 +228,25 @@ void __module_ResetBank( vlc_object_t *p_this )
 void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next;
+    vlc_value_t  lockval;
+
+    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+    if( !p_this->p_libvlc->p_module_bank )
+    {
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "libvlc" );
+        return;
+    }
+    if( --p_this->p_libvlc->p_module_bank->i_usage )
+    {
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "libvlc" );
+        return;
+    }
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_this->p_libvlc, "libvlc" );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
     if( p_this->p_libvlc->p_module_bank->b_cache ) CacheSave( p_this );
