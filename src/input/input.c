@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.244 2003/09/30 15:36:39 hartman Exp $
+ * $Id: input.c,v 1.245 2003/09/30 16:09:58 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -726,6 +726,17 @@ static int InitThread( input_thread_t * p_input )
     }
 
     /* Look for and add subtitle files */
+    var_Get( p_input, "sub-file", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe ) ) )
+        {
+            TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
+            subtitle_Select( p_sub );
+        }
+    }
+    if( val.psz_string ) free( val.psz_string );
+    
     var_Get( p_input, "sub-autodetect-file", &val );
     if( val.b_bool )
     {
@@ -737,21 +748,8 @@ static int InitThread( input_thread_t * p_input )
             {
                 TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
             }
-	}
-        free(tmp);
-    }
-    else
-    {
-        var_Get( p_input, "sub-file", &val );
-        if( val.psz_string )
-        {
-            if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe ) ) )
-            {
-                TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
-		subtitle_Select( p_sub );
-            }
-            free( val.psz_string );
         }
+        free(tmp);
     }
 
     return VLC_SUCCESS;

@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.21 2003/09/10 21:54:27 hartman Exp $
+ * $Id: freetype.c,v 1.22 2003/09/30 16:09:58 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -258,7 +258,7 @@ static int Create( vlc_object_t *p_this )
             i_fontsize = val.i_int;
         }
         if( i_font_factor )
-            i_fontsize = (int) p_vout->i_window_height / i_font_factor;
+            i_fontsize = (int) p_vout->i_render_height / i_font_factor;
         free( val.psz_string );
     }
     else
