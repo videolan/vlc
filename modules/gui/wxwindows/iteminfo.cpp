@@ -245,6 +245,11 @@ wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
     for( int i=0; i< p_playlist->i_groups ; i++)
     {
         group_combo->Append( wxU( p_playlist->pp_groups[i]->psz_name ) );
+        if( p_playlist->pp_groups[i]->i_id == p_item->i_group )
+        {
+            group_combo->SetSelection( i );
+            group_combo->SetValue( wxU( p_playlist->pp_groups[i]->psz_name ) );
+        }
     }
 
     vlc_object_release ( p_playlist );
