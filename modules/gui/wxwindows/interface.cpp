@@ -1,8 +1,8 @@
 /*****************************************************************************
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.72 2003/11/29 13:39:43 gbazin Exp $
+ * Copyright (C) 2000-2001,2003 VideoLAN
+ * $Id: interface.cpp,v 1.73 2003/12/03 00:24:16 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -341,7 +341,7 @@ void Interface::CreateOurMenuBar()
     view_menu->Append( Playlist_Event, wxU(_("&Playlist...")),
                        wxU(_(HELP_PLAYLIST)) );
     view_menu->Append( Logs_Event, wxU(_("&Messages...")), wxU(_(HELP_LOGS)) );
-    view_menu->Append( FileInfo_Event, wxU(_("&File info...")),
+    view_menu->Append( FileInfo_Event, wxU(_("&Stream and Media info...")),
                        wxU(_(HELP_FILEINFO)) );
 
     /* Create the "Settings" menu */

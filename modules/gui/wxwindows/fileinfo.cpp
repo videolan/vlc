@@ -1,8 +1,8 @@
 /*****************************************************************************
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.19 2003/09/21 18:07:51 gbazin Exp $
+ * Copyright (C) 2000-2001,2003 VideoLAN
+ * $Id: fileinfo.cpp,v 1.20 2003/12/03 00:24:16 rocky Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -24,11 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
@@ -58,7 +53,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 FileInfo::FileInfo( intf_thread_t *_p_intf, wxWindow *p_parent ):
-    wxFrame( p_parent, -1, wxU(_("FileInfo")), wxDefaultPosition,
+    wxFrame( p_parent, -1, wxU(_("Stream and Media Info")), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
