@@ -29,11 +29,14 @@ set -x
 AUTOMAKESUCKS=no
 INSTALLSUCKS=no
 
+ACLOCAL_ARGS="-I m4"
+
 # Check for contrib directory
 if test -d extras/contrib/bin; then
   export PATH=./extras/contrib/bin:$PATH
   export LD_LIBRARY_PATH=./extras/contrib/lib:$LD_LIBRARY_PATH
   export DYLD_LIBRARY_PATH=./extras/contrib/lib:$DYLD_LIBRARY_PATH
+  ACLOCAL_ARGS="${ACLOCAL_ARGS} -I extras/contrib/share/aclocal"
 fi
 
 # Check for automake
@@ -360,7 +363,7 @@ fi
 
 # Do the rest
 ${autopoint} -f
-${aclocal} -I m4 -I extras/contrib/share/aclocal
+${aclocal} ${ACLOCAL_ARGS}
 ${autoconf}
 ${autoheader}
 ${automake} --add-missing --copy
