@@ -710,6 +710,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             for( i = 0; i < p_sys->p_input->stream.i_pgrm_number; i++ )
             {
                 p_sys->p_input->stream.pp_programs[i]->i_synchro_state = SYNCHRO_REINIT;
+                p_sys->p_input->stream.pp_programs[i]->last_pts = 0;
             }
             p_sys->b_pcr_set = VLC_TRUE;
             return VLC_SUCCESS;
