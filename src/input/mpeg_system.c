@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.11 2000/12/20 17:49:40 massiot Exp $
+ * $Id: mpeg_system.c,v 1.12 2000/12/20 20:09:19 sam Exp $
  *
  * Authors: 
  *
@@ -816,8 +816,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         /* MPEG audio */
                         p_es->i_type = MPEG2_AUDIO_ES;
 #ifdef AUTO_SPAWN
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR,
-                                                 REQUESTED_MPEG ) 
+                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
+                                == REQUESTED_MPEG
                           && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == (p_es->i_stream_id & 0x1F) )
                         {
@@ -830,8 +830,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         /* AC3 audio (0x80->0x8F) */
                         p_es->i_type = AC3_AUDIO_ES;
 #ifdef AUTO_SPAWN
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR,
-                                                 REQUESTED_AC3 )
+                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
+                                == REQUESTED_AC3
                          && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == ((p_es->i_stream_id & 0xF00) >> 8) )
                         {
