@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: adjust.c,v 1.6 2003/01/09 15:38:09 sam Exp $
+ * $Id: adjust.c,v 1.7 2003/01/09 16:26:14 sam Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>, Samuel Hocevar <sam@zoy.org>
  *
@@ -195,7 +195,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     int pi_luma[256];
 
     picture_t *p_outpic;
-    uint8_t *p_in, *p_out, *p_in_u, *p_in_v, *p_in_end, *p_out_u, *p_out_v;
+    uint8_t *p_in, *p_in_u, *p_in_v, *p_in_end, *p_line_end;
+    uint8_t *p_out, *p_out_u, *p_out_v;
 
     double  f_hue;
     int32_t i_cont, i_lum;
@@ -232,7 +233,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         pi_luma[ i ] = clip( i_lum + i_cont * i / 256 );
     }
 
-    /* Do the Y plane */
+    /*
+     * Do the Y plane
+     */
+
     p_in = p_pic->p[0].p_pixels;
     p_in_end = p_in + p_pic->p[0].i_lines * p_pic->p[0].i_pitch - 8;
 
@@ -240,21 +244,31 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     for( ; p_in < p_in_end ; )
     {
-        /* Do 8 pixels at a time */
-        *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
-        *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
-        *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
-        *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
+        p_line_end = p_in + p_pic->p[0].i_visible_pitch - 8;
+
+        for( ; p_in < p_line_end ; )
+        {
+            /* Do 8 pixels at a time */
+            *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
+            *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
+            *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
+            *p_out++ = pi_luma[ *p_in++ ]; *p_out++ = pi_luma[ *p_in++ ];
+        }
+
+        p_line_end += 8;
+
+        for( ; p_in < p_line_end ; )
+        {
+            *p_out++ = pi_luma[ *p_in++ ];
+        }
+
+        p_in += p_pic->p[0].i_pitch - p_pic->p[0].i_visible_pitch;
     }
 
-    p_in_end += 8;
+    /*
+     * Do the U and V planes
+     */
 
-    for( ; p_in < p_in_end ; )
-    {
-        *p_out++ = pi_luma[ *p_in++ ];
-    }
-
-    /* Do the U and V planes */
     p_in_u = p_pic->p[1].p_pixels;
     p_in_v = p_pic->p[2].p_pixels;
     p_in_end = p_in_u + p_pic->p[1].i_lines * p_pic->p[1].i_pitch - 8;
@@ -281,16 +295,28 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( ; p_in_u < p_in_end ; )
         {
-            /* Do 8 pixels at a time */
-            WRITE_UV_CLIP(); WRITE_UV_CLIP(); WRITE_UV_CLIP(); WRITE_UV_CLIP();
-            WRITE_UV_CLIP(); WRITE_UV_CLIP(); WRITE_UV_CLIP(); WRITE_UV_CLIP();
-        }
+            p_line_end = p_in_u + p_pic->p[1].i_visible_pitch - 8;
 
-        p_in_end += 8;
+            for( ; p_in_u < p_line_end ; )
+            {
+                /* Do 8 pixels at a time */
+                WRITE_UV_CLIP(); WRITE_UV_CLIP();
+                WRITE_UV_CLIP(); WRITE_UV_CLIP();
+                WRITE_UV_CLIP(); WRITE_UV_CLIP();
+                WRITE_UV_CLIP(); WRITE_UV_CLIP();
+            }
 
-        for( ; p_in_u < p_in_end ; )
-        {
-            WRITE_UV_CLIP();
+            p_line_end += 8;
+
+            for( ; p_in_u < p_line_end ; )
+            {
+                WRITE_UV_CLIP();
+            }
+
+            p_in_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
+            p_in_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
+            p_out_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
+            p_out_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
         }
     }
     else
@@ -306,16 +332,26 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( ; p_in_u < p_in_end ; )
         {
-            /* Do 8 pixels at a time */
-            WRITE_UV(); WRITE_UV(); WRITE_UV(); WRITE_UV();
-            WRITE_UV(); WRITE_UV(); WRITE_UV(); WRITE_UV();
-        }
+            p_line_end = p_in + p_pic->p[1].i_visible_pitch - 8;
 
-        p_in_end += 8;
+            for( ; p_in_u < p_line_end ; )
+            {
+                /* Do 8 pixels at a time */
+                WRITE_UV(); WRITE_UV(); WRITE_UV(); WRITE_UV();
+                WRITE_UV(); WRITE_UV(); WRITE_UV(); WRITE_UV();
+            }
 
-        for( ; p_in_u < p_in_end ; )
-        {
-            WRITE_UV();
+            p_line_end += 8;
+
+            for( ; p_in_u < p_line_end ; )
+            {
+                WRITE_UV();
+            }
+
+            p_in_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
+            p_in_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
+            p_out_u += p_pic->p[1].i_pitch - p_pic->p[1].i_visible_pitch;
+            p_out_v += p_pic->p[2].i_pitch - p_pic->p[2].i_visible_pitch;
         }
     }
 
