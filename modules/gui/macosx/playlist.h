@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.h,v 1.14 2003/11/17 13:05:17 bigben Exp $
+ * $Id: playlist.h,v 1.15 2003/11/17 23:36:12 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -56,6 +56,7 @@
     IBOutlet id o_repeat_ckb;
 
     IBOutlet id o_search_keyword;
+    IBOutlet id o_search_button;
 
 }
 

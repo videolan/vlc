@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.42 2003/11/17 19:05:03 hartman Exp $
+ * $Id: playlist.m,v 1.43 2003/11/17 23:36:12 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -144,6 +144,7 @@
     [o_random_ckb setTitle: _NS("Random")];
     [o_loop_ckb setTitle: _NS("Repeat All")];
     [o_repeat_ckb setTitle: _NS("Repeat One")];
+    [o_search_button setTitle: _NS("Search")];
 
 
     vlc_value_t val;
@@ -163,8 +164,6 @@
 
         vlc_object_release( p_playlist );
     }
-
-
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 
@@ -285,7 +284,7 @@
 
 - (IBAction)searchItem:(id)sender
 {
-    int i_start, i_current;
+    int i_current = 0, i_counter;
     NSString *o_current_name;
     NSString *o_current_author;
 
@@ -298,16 +297,16 @@
         return;
     }
 
-    if ( [o_table_view selectedRow] == [o_table_view numberOfRows]-1 )
+    if ([o_table_view selectedRow] == [o_table_view numberOfRows]-1 )
     {
-         i_start = -1;
+        i_current = 0;
     }
-    else 
+    else
     {
-         i_start = [o_table_view selectedRow];
+        i_current = [o_table_view selectedRow]+1; 
     }
 
-    for ( i_current = i_start + 1 ; i_current < [o_table_view numberOfRows] ; i_current++ )
+    for ( i_counter = 0 ; i_counter < [o_table_view numberOfRows] ; i_counter++ )
     {
         vlc_mutex_lock( &p_playlist->object_lock );
         o_current_name = [NSString stringWithUTF8String: 
@@ -316,6 +315,7 @@
             p_playlist->pp_items[i_current]->psz_author];
         vlc_mutex_unlock( &p_playlist->object_lock );
 
+
         if( [o_current_name rangeOfString:[o_search_keyword stringValue] options:NSCaseInsensitiveSearch ].length ||
              [o_current_author rangeOfString:[o_search_keyword stringValue] options:NSCaseInsensitiveSearch ].length )
         {
@@ -323,8 +323,14 @@
              [o_table_view scrollRowToVisible: i_current];
              break;
         }
-        [o_table_view selectRow: i_start byExtendingSelection: NO];
-        [o_table_view scrollRowToVisible: i_start];
+        if ( i_current == [o_table_view numberOfRows] - 1 )
+        {
+             i_current = 0;
+        }
+        else
+        {
+             i_current++;
+        }
     }
     vlc_object_release( p_playlist );
 }
