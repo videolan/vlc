@@ -336,13 +336,13 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf, "next", Playlist, NULL );
   
     var_Create( p_intf, "marquee", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marquee", Input, NULL );
+    var_AddCallback( p_intf, "marquee", Playlist, NULL );
     var_Create( p_intf, "marq-x", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-x", Input, NULL );
+    var_AddCallback( p_intf, "marq-x", Playlist, NULL );
     var_Create( p_intf, "marq-y", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-y", Input, NULL );
+    var_AddCallback( p_intf, "marq-y", Playlist, NULL );
     var_Create( p_intf, "marq-timeout", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_intf, "marq-timeout", Input, NULL );
+    var_AddCallback( p_intf, "marq-timeout", Playlist, NULL );
 
     var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     var_AddCallback( p_intf, "pause", Input, NULL );
@@ -699,76 +699,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
-    else if( !strcmp( psz_cmd, "marquee" ) )
-    {
-        if( strlen( newval.psz_string ) > 0 )
-        {
-            val.psz_string = newval.psz_string;
-            /* check for the playlist structure */
-            vlc_object_t *p_pl =
-                  vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( !p_pl )
-                {
-                  return VLC_ENOOBJ;
-                }
-            var_Set( p_pl, "marquee", val );
-            vlc_object_release( p_pl );
-        }
-        vlc_object_release( p_input );
-        return VLC_SUCCESS;
-    }
-    else if( !strcmp( psz_cmd, "marq-x" ) )
-    {
-        if( strlen( newval.psz_string ) > 0) 
-        {
-            vlc_object_t *p_pl =
-                  vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( !p_pl )
-                {
-                  return VLC_ENOOBJ;
-                }
-            val.i_int = atoi( newval.psz_string );
-            var_Set( p_pl, "marq-x", val );
-             vlc_object_release( p_pl );
-        }
-        vlc_object_release( p_input );
-        return VLC_SUCCESS;
-    }
-    else if( !strcmp( psz_cmd, "marq-y" ) )
-    {
-        if( strlen( newval.psz_string ) > 0) 
-        {
-            vlc_object_t *p_pl =
-                  vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( !p_pl )
-                {
-                  return VLC_ENOOBJ;
-                }
-            val.i_int = atoi( newval.psz_string );
-            var_Set( p_pl, "marq-y", val );
-             vlc_object_release( p_pl );
-        }
-        vlc_object_release( p_input );
-        return VLC_SUCCESS;
-    }
-    else if( !strcmp( psz_cmd, "marq-timeout" ) )
-    {
-        if( strlen( newval.psz_string ) > 0) 
-        {
-            vlc_object_t *p_pl =
-                  vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-            if( !p_pl )
-                {
-                  return VLC_ENOOBJ;
-                }
-            val.i_int = atoi( newval.psz_string );
-            var_Set( p_pl, "marq-timeout", val );
-             vlc_object_release( p_pl );
-        }
-        vlc_object_release( p_input );
-        return VLC_SUCCESS;
-    }
-    
+   
     else if( !strcmp( psz_cmd, "chapter" ) ||
              !strcmp( psz_cmd, "chapter_n" ) ||
              !strcmp( psz_cmd, "chapter_p" ) )
@@ -859,6 +790,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist;
+    vlc_value_t     val;
 
     p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
                                            FIND_ANYWHERE );
@@ -904,6 +836,44 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
             printf( _("| no entries\n") );
         }
     }
+        else if( !strcmp( psz_cmd, "marquee" ) )
+    {
+        if( strlen( newval.psz_string ) > 0 )
+        {
+            val.psz_string = newval.psz_string;
+            var_Set( p_playlist, "marquee", val );
+        }
+        else 
+        {
+	        val.psz_string = "";
+	        var_Set( p_playlist, "marquee", val);
+        }
+    }
+    else if( !strcmp( psz_cmd, "marq-x" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_playlist, "marq-x", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "marq-y" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_playlist, "marq-y", val );
+        }
+    }
+    else if( !strcmp( psz_cmd, "marq-timeout" ) )
+    {
+        if( strlen( newval.psz_string ) > 0) 
+        {
+            val.i_int = atoi( newval.psz_string );
+            var_Set( p_playlist, "marq-timeout", val );
+        }
+    }
+ 
     /*
      * sanity check
      */
