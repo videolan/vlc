@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.1 2002/05/10 02:04:17 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.2 2002/05/13 16:28:44 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -154,6 +154,17 @@ static char* mpegaudio_mode[4] =
     "stereo", "joint stereo", "dual channel", "mono"
 };
 
+static __inline__ u32 __GetDWBE( byte_t *p_buff )
+{
+    return( ( (*(p_buff)) << 24 ) + ( (*(p_buff+1)) << 16 ) +
+                    ( (*(p_buff+2)) << 8 ) +  ( (*(p_buff+3)) ) );
+}
+
+/*
+#define __GetDWBE( p_buff ) \
+    ( ( (*(p_buff)) << 24 ) + ( (*(p_buff+1)) << 16 ) + \
+      ( (*(p_buff+2)) << 8 ) +  ( (*(p_buff+3)) ) )
+*/
 /*****************************************************************************
  * MPEGAudio_CheckHeader : Test the validity of the header 
  *****************************************************************************/
@@ -250,13 +261,13 @@ static int MPEGAudio_FindFrame( input_thread_t *p_input,
 
     while( i_pos + 4 <= i_size ) /* need at least 4 bytes */
     {
-        i_header = U32_AT( p_buff );
+        i_header = __GetDWBE( p_buff );
         if( MPEGAudio_CheckHeader( i_header ) )
         {
             MPEGAudio_ParseHeader( i_header, p_mpeg );
             i_framesize = MPEGAudio_FrameSize( p_mpeg );
             if( ( i_pos + i_framesize + 4 > i_size )
-                ||( MPEGAudio_CheckHeader( U32_AT( p_buff + i_framesize ) ) ) )
+                ||( MPEGAudio_CheckHeader( __GetDWBE( p_buff + i_framesize ) ) ) )
             {
                 *pi_pos = i_pos;
                 return( 1 );
@@ -315,17 +326,17 @@ static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
     }
     p_buff += 4;
 
-    p_xh->i_flags = U32_AT( p_buff ); 
+    p_xh->i_flags = __GetDWBE( p_buff ); 
     p_buff += 4;
 
     if( p_xh->i_flags&FRAMES_FLAG ) 
     {
-        p_xh->i_frames = U32_AT( p_buff );
+        p_xh->i_frames = __GetDWBE( p_buff );
         p_buff += 4;
     }
     if( p_xh->i_flags&BYTES_FLAG ) 
     {
-        p_xh->i_bytes = U32_AT( p_buff );
+        p_xh->i_bytes = __GetDWBE( p_buff );
         p_buff += 4;
     }
     if( p_xh->i_flags&TOC_FLAG ) 
@@ -335,7 +346,7 @@ static void MPEGAudio_ExtractXingHeader( input_thread_t *p_input,
     }
     if( p_xh->i_flags&VBR_SCALE_FLAG ) 
     {
-        p_xh->i_vbr_scale = U32_AT( p_buff );
+        p_xh->i_vbr_scale = __GetDWBE( p_buff );
         p_buff += 4;
     }
     if( ( p_xh->i_flags&FRAMES_FLAG )&&( p_xh->i_flags&BYTES_FLAG ) )
