@@ -1,4 +1,12 @@
-$Id: NEWS,v 1.22 2003/02/17 14:43:37 massiot Exp $
+$Id: NEWS,v 1.23 2003/02/17 18:58:46 hartman Exp $
+
+Changes between 0.5.1 and 0.5.1a:
+--------------------------------
+
+Mac OS X port:
+ * fixed a problem that caused VLC to select the wrong language when
+   English was set as the preferred language.
+
 
 Changes between 0.5.0 and 0.5.1:
 --------------------------------
