@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.46 2003/01/20 10:59:29 massiot Exp $
+ * $Id: oss.c,v 1.47 2003/01/27 21:35:06 jobi Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,7 +57,9 @@
 #ifndef AFMT_AC3
 #   define AFMT_AC3        0x00000400                   /* Dolby Digital AC3 */
 #endif
-
+#ifndef AFMT_S16_NE
+#   define AFMT_S16_NE     0x00000010
+#endif
 /*****************************************************************************
  * aout_sys_t: OSS audio output method descriptor
  *****************************************************************************

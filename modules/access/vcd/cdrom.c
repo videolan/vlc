@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.6 2002/12/02 18:19:43 sam Exp $
+ * $Id: cdrom.c,v 1.7 2003/01/27 21:35:06 jobi Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -438,7 +438,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         struct ioc_toc_header tochdr;
         struct ioc_read_toc_entry toc_entries;
 
-        if( ioctl( p_vcddev->i_devicd_handle, CDIOREADTOCHEADER, &tochdr )
+        if( ioctl( p_vcddev->i_device_handle, CDIOREADTOCHEADER, &tochdr )
             == -1 )
         {
             msg_Err( p_this, "could not read TOCHDR" );
