@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.66 2003/05/14 21:29:43 fenrir Exp $
+ * $Id: libvlc.h,v 1.67 2003/05/17 11:35:14 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -110,6 +110,13 @@ static char *ppsz_language[] = { "auto", "de", "en_GB", "fr", "it",
 #define AOUT_RATE_LONGTEXT N_( \
     "You can force the audio output frequency here. Common values are " \
     "-1 (default), 48000, 44100, 32000, 22050, 16000, 11025, 8000.")
+
+#if !defined( SYS_DARWIN )
+#define AOUT_RESAMP_TEXT N_("High quality audio resampling")
+#define AOUT_RESAMP_LONGTEXT N_( \
+    "High quality audio resampling can be processor intensive so you can " \
+    "disable it and a cheaper resampling algorithm will be used instead.")
+#endif
 
 #define DESYNC_TEXT N_("Compensate desynchronization of audio (in ms)")
 #define DESYNC_LONGTEXT N_( \
@@ -466,6 +473,9 @@ vlc_module_begin();
                             AOUT_VOLUME_MIN, AOUT_VOLUME_MAX, NULL,
                             VOLUME_SAVE_TEXT, VOLUME_SAVE_LONGTEXT, VLC_TRUE );
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT, AOUT_RATE_LONGTEXT, VLC_TRUE );
+#if !defined( SYS_DARWIN )
+    add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT, AOUT_RESAMP_LONGTEXT, VLC_TRUE );
+#endif
     add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     add_bool( "headphone-opt", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT, VLC_FALSE );

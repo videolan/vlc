@@ -2,7 +2,7 @@
  * bandlimited.c : bandlimited interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: bandlimited.c,v 1.5 2003/03/05 22:37:05 gbazin Exp $
+ * $Id: bandlimited.c,v 1.6 2003/05/17 11:35:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -103,6 +103,13 @@ static int Create( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
+
+#if !defined( SYS_DARWIN )
+    if( !config_GetInt( p_this, "hq-resampling" ) )
+    {
+        return VLC_EGENERIC;
+    }
+#endif
 
     /* Allocate the memory needed to store the module's structure */
     p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );

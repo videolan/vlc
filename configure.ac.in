@@ -1533,7 +1533,7 @@ then
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
     AC_CHECK_HEADERS(ffmpeg/avcodec.h postproc/postprocess.h)
     AC_CHECK_LIB(avcodec, avcodec_init, [
-      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode encoder_ffmpeg"
+      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec"
       dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
       dnl       linker would miserably barf on multiple definitions.
@@ -1557,7 +1557,7 @@ then
     if test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode encoder_ffmpeg"
+      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${real_ffmpeg_tree}/libavcodec -lavcodec"
       CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${real_ffmpeg_tree}/libavcodec"
 
@@ -1675,7 +1675,7 @@ then
     then
       dnl  Use a custom xvid
       AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
-      BUILTINS="${BUILTINS} xvid encoder_xvid"
+      BUILTINS="${BUILTINS} xvid"
       LDFLAGS_xvid="${LDFLAGS_xvid} -L${real_xvid_tree}/build/generic -lxvidcore"
       CPPFLAGS_xvid="${CPPFLAGS_xvid} -I${real_xvid_tree}/src"
     else
@@ -1689,7 +1689,7 @@ then
     AC_CHECK_HEADERS(xvid.h, ,
       [ AC_MSG_ERROR([Cannot find development headers for libxvidcore...]) ])
     AC_CHECK_LIB(xvidcore, xvid_init, [
-      PLUGINS="${PLUGINS} xvid encoder_xvid"
+      PLUGINS="${PLUGINS} xvid"
       LDFLAGS_xvid="${LDFLAGS_xvid} -lxvidcore" ],
       [ AC_MSG_ERROR([Cannot find libxvidcore library...]) ])
     LDFLAGS="${LDFLAGS_save}"
