@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.40 2003/10/29 17:32:54 zorglub Exp $
+ * $Id: preferences.cpp,v 1.41 2003/10/29 21:04:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,7 +173,7 @@ END_EVENT_TABLE()
  *****************************************************************************/
 PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, wxWindow *p_parent)
   :  wxFrame( p_parent, -1, wxU(_("Preferences")), wxDefaultPosition,
-              wxSize(830,450), wxDEFAULT_FRAME_STYLE )
+              wxSize(700,450), wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
