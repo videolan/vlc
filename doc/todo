@@ -1,9 +1,9 @@
------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 * marque les points prioritaires
 + les points à ne pas oublier avant la fin de l'année
 - les trucs qu'il faudra faire, mais qui ne sont pas urgents
 ? les idées à discuter
------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 Input
 =====
@@ -11,14 +11,14 @@ Input
     * gestion du décodeur générique/par défaut
     - passage en b_run    
     + trouver des flux de test bien tordus pour tester l'update des
-	PSI, les discontinuites, la gestion des PCR, etc...
+      PSI, les discontinuites, la gestion des PCR, etc...
 
 Input: vlan method
 ==================
     + faire une libvlan rapide (benny est dessus)
     - reconcevoir l'API et les dialogues du vlan serveur, faire une
-        libvlan avancée, l'encapsuler proprement dans input_vlan, 
-        refaire le vlan server
+      libvlan avancée, l'encapsuler proprement dans input_vlan, refaire
+      le vlan server
 
 Main
 ====
@@ -26,21 +26,25 @@ Main
 
 Audio output
 ============
-    * moyenne mobile des fréquences des décodeurs ;
     - détection automatique du materiel ;
     - 8/16 Bits, Signed/Unsigned, Mono/Stereo (sauf 16 Bits Signed Stereo) ;
 
 Audio decoder
 =============
-    * AC3 ;
+    + implémenter une synkronisation absolue et non relative ;
     - MPEG2 Layer I, II, III (sauf Layer II Stereo) ;
+
+AC3 decoder
+===========
+    * éviter le SIGSEGV lorsque le décodeur mange du garbage en entrée ;
+    + implémenter une synkronisation absolue et non relative ;
 
 Video output
 ============
     + nettoyer la boucle principale
         + tenir compte du fait que lorsque b_die est mis, normalement tous
-            les flux et images doivent déjà être detruits -> afficher une
-            erreur plutôt que de les supprimer
+          les flux et images doivent déjà être detruits -> afficher une
+          erreur plutôt que de les supprimer
         + gestion de b_active
         + arbre de décisions avec goto pour les passes
     * convertion et affichage des images
@@ -109,4 +113,4 @@ General: X11
 Documentation
 =============
     - documentation des interfaces de programmation dès qu'elles sont
-        au point. En LaTeX ? (pour latex2html).
+      au point. En LaTeX ? (pour latex2html).

@@ -23,3 +23,6 @@
     l'audio decoder... parce que les PCRs sont contenus dans la partie
     video... solution : traiter TOUS les TS, afin de pouvoir récupérer les
     PCRs (MaXX)
+
+* ac3_decoder :
+  + éviter le SIGSEGV lorsque le décodeur se mange du garbage (MaXX)
