@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.1 2003/11/26 03:35:26 rocky Exp $
+ * $Id: access.c,v 1.2 2003/11/26 03:40:31 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -50,32 +50,6 @@
 /* how many blocks Open will read in each loop */
 #define CDDA_BLOCKS_ONCE 1
 #define CDDA_DATA_ONCE   (CDDA_BLOCKS_ONCE * CDIO_CD_FRAMESIZE_RAW)
-
-#define DEBUG_TEXT N_("set debug mask for additional debugging.")
-#define DEBUG_LONGTEXT N_( \
-    "This integer when viewed in binary is a debugging mask\n" \
-    "MRL             1\n" \
-    "events          2\n" \
-    "external call   4\n" \
-    "all calls       8\n" \
-    "LSN      (10)  16\n" \
-    "libcdio  (20)  32\n" \
-    "seeks    (40)  64\n" )
-
-#define DEV_TEXT N_("CD-ROM device name")
-#define DEV_LONGTEXT N_( \
-    "Specify the name of the CD-ROM device that will be used by default. " \
-    "If you don't specify anything, we'll scan for a suitable CD-ROM device.")
-
-/*****************************************************************************
- * intf_sys_t: description and status of interface
- *****************************************************************************/
-struct intf_sys_t
-{
-    input_thread_t    * p_input;
-    cdda_data_t       * p_cdda;
-    vlc_bool_t          b_click, b_move, b_key_pressed;
-};
 
 /* FIXME: This variable is a hack. Would be nice to eliminate. */
 static input_thread_t *p_cdda_input = NULL;
