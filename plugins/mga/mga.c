@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.13 2002/01/06 17:18:12 sam Exp $
+ * $Id: mga.c,v 1.14 2002/01/06 18:01:58 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -69,7 +69,7 @@ MODULE_INIT_START
     SET_DESCRIPTION( "Matrox Graphic Array video module" )
     ADD_CAPABILITY( VOUT, 10 )
     ADD_SHORTCUT( "mga" )
-#else
+#elif defined( MODULE_NAME_IS_mgammx )
     SET_DESCRIPTION( "MMX-accelerated Matrox Graphic Array video module" )
     ADD_CAPABILITY( VOUT, 11 )
     ADD_SHORTCUT( "mgammx" )
@@ -398,28 +398,26 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
             *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
             *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
             *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-#else
+#elif defined( MODULE_NAME_IS_mgammx )
+            __asm__( ".align 32 \n\
+            movd       (%0), %%mm0  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
+            movd      4(%0), %%mm2  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
+            movd      8(%0), %%mm4  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
+            movd     12(%0), %%mm6  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
+            movd       (%1), %%mm1  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
+            movd      4(%1), %%mm3  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
+            movd      8(%1), %%mm5  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
+            movd     12(%1), %%mm7  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
+            punpcklbw %%mm1, %%mm0  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
+            punpcklbw %%mm3, %%mm2  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
+            punpcklbw %%mm5, %%mm4  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
+            punpcklbw %%mm7, %%mm6  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
+            movq      %%mm0, (%2)   # Store CrCb                          \n\
+            movq      %%mm2, 8(%2)  # Store CrCb                          \n\
+            movq      %%mm4, 16(%2) # Store CrCb                          \n\
+            movq      %%mm6, 24(%2) # Store CrCb"
+            : : "r" (p_cr), "r" (p_cb), "r" (p_dest) );
 
-#   define MMX_MERGECBCR "                                                \n\
-movd       (%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
-movd       (%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-movq      %%mm0, (%2)   # Store CrCb                                      \n\
-movd      4(%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
-movd      4(%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-movq      %%mm0, 8(%2)  # Store CrCb                                      \n\
-movd      8(%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
-movd      8(%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-movq      %%mm0, 16(%2) # Store CrCb                                      \n\
-movd     16(%0), %%mm0  # Load 4 Cr           00 00 00 00 v3 v2 v1 v0     \n\
-movd     16(%1), %%mm1  # Load 4 Cb           00 00 00 00 u3 u2 u1 u0     \n\
-punpcklbw %%mm1, %%mm0  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-movq      %%mm0, 32(%2) # Store CrCb                                      \n\
-"
-            __asm__( ".align 8" MMX_MERGECBCR
-                     : : "r" (p_cr), "r" (p_cb), "r" (p_dest) );
             p_cr += 16; p_cb += 16; p_dest += 32;
 #endif
         }
