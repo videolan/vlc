@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.69 2003/11/18 20:34:23 fenrir Exp $
+ * $Id: input_dec.c,v 1.70 2003/11/18 22:08:07 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -303,6 +303,7 @@ struct decoder_owner_sys_t
     vout_thread_t   *p_vout;
 
     sout_packetizer_input_t *p_sout;
+    sout_format_t           sout_format;
 
     /* Current format in use by the output */
     video_format_t video;
@@ -486,26 +487,26 @@ static int DecoderThread( decoder_t * p_dec )
             {
                 if( !p_dec->p_owner->p_sout )
                 {
-                    sout_format_t sout_format;
+                    sout_format_t *p_format = &p_dec->p_owner->sout_format;
 
-                    sout_format.i_cat = p_dec->fmt_out.i_cat;
-                    sout_format.i_fourcc = p_dec->fmt_out.i_codec;
-                    sout_format.i_sample_rate =
+                    p_format->i_cat = p_dec->fmt_out.i_cat;
+                    p_format->i_fourcc = p_dec->fmt_out.i_codec;
+                    p_format->i_sample_rate =
                         p_dec->fmt_out.audio.i_rate;
-                    sout_format.i_channels =
+                    p_format->i_channels =
                         p_dec->fmt_out.audio.i_channels;
-                    sout_format.i_block_align =
+                    p_format->i_block_align =
                         p_dec->fmt_out.audio.i_blockalign;
-                    sout_format.i_width  =
+                    p_format->i_width  =
                         p_dec->fmt_out.video.i_width;
-                    sout_format.i_height =
+                    p_format->i_height =
                         p_dec->fmt_out.video.i_height;
-                    sout_format.i_bitrate     = p_dec->fmt_out.i_bitrate;
-                    sout_format.i_extra_data  = p_dec->fmt_out.i_extra;
-                    sout_format.p_extra_data  = p_dec->fmt_out.p_extra;
+                    p_format->i_bitrate     = p_dec->fmt_out.i_bitrate;
+                    p_format->i_extra_data  = p_dec->fmt_out.i_extra;
+                    p_format->p_extra_data  = p_dec->fmt_out.p_extra;
 
                     p_dec->p_owner->p_sout =
-                        sout_InputNew( p_dec, &sout_format );
+                        sout_InputNew( p_dec, p_format );
 
                     if( p_dec->p_owner->p_sout == NULL )
                     {
