@@ -290,7 +290,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_in.p_extra =
             realloc( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra +
                      oggpacket.bytes + 2 );
-        p_extra = p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra;
+        p_extra = (uint8_t *)p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra;
         *(p_extra++) = oggpacket.bytes >> 8;
         *(p_extra++) = oggpacket.bytes & 0xFF;
 
@@ -483,7 +483,11 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 #endif
 
     if( p_oggpacket->bytes &&
+#ifdef MODULE_NAME_IS_tremor
+        vorbis_synthesis( &p_sys->vb, p_oggpacket, 1 ) == 0 )
+#else
         vorbis_synthesis( &p_sys->vb, p_oggpacket ) == 0 )
+#endif
         vorbis_synthesis_blockin( &p_sys->vd, &p_sys->vb );
 
     /* **pp_pcm is a multichannel float vector. In stereo, for
@@ -599,24 +603,27 @@ static void ParseVorbisComments( decoder_t *p_dec )
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void Interleave(
 #ifdef MODULE_NAME_IS_tremor
-                        int32_t *p_out, const int32_t **pp_in,
-#else
-                        float *p_out, const float **pp_in,
-#endif
+static void Interleave( int32_t *p_out, const int32_t **pp_in,
                         int i_nb_channels, int i_samples )
 {
     int i, j;
 
     for ( j = 0; j < i_samples; j++ )
-    {
         for ( i = 0; i < i_nb_channels; i++ )
-        {
-            p_out[j * i_nb_channels + i] = pp_in[i][j];
-        }
-    }
+            p_out[j * i_nb_channels + i] = pp_in[i][j] * (FIXED32_ONE >> 24);
 }
+#else
+static void Interleave( float *p_out, const float **pp_in,
+                        int i_nb_channels, int i_samples )
+{
+    int i, j;
+
+    for ( j = 0; j < i_samples; j++ )
+        for ( i = 0; i < i_nb_channels; i++ )
+            p_out[j * i_nb_channels + i] = pp_in[i][j];
+}
+#endif
 
 /*****************************************************************************
  * CloseDecoder: vorbis decoder destruction
