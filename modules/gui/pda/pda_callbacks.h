@@ -2,7 +2,7 @@
  * callbacks.h : pda plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: pda_callbacks.h,v 1.3 2003/11/07 13:01:51 jpsaman Exp $
+ * $Id: pda_callbacks.h,v 1.4 2003/11/07 14:15:23 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -33,18 +33,6 @@ void PlaylistRebuildListStore( GtkListStore *p_list, playlist_t * p_playlist );
 gboolean
 onPDADeleteEvent                       (GtkWidget       *widget,
                                         GdkEvent        *event,
-                                        gpointer         user_data);
-
-void
-onFileOpen                             (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-onPlaylist                             (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-onPreferences                          (GtkButton       *button,
                                         gpointer         user_data);
 
 void

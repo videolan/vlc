@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.5 2003/11/07 13:01:51 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.6 2003/11/07 14:15:23 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -325,68 +325,6 @@ onPDADeleteEvent                       (GtkWidget       *widget,
 
 
 void
-onFileOpen                             (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GtkGetIntf( button );
-    GtkListStore *p_list;
-
-    if (p_intf->p_sys->p_notebook)
-    {
-       gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-       gtk_notebook_set_page(p_intf->p_sys->p_notebook,0);
-    }
-    gdk_window_raise( p_intf->p_sys->p_window->window );
-    if (p_intf->p_sys->p_tvfile)
-    {
-       /* Get new directory listing */
-       p_list = gtk_list_store_new (5,
-                                  G_TYPE_STRING,
-                                  G_TYPE_STRING,
-                                  G_TYPE_UINT64,
-                                  G_TYPE_STRING,
-                                  G_TYPE_STRING);
-       ReadDirectory(p_list, ".");
-
-       /* Update TreeView */
-       gtk_tree_view_set_model(p_intf->p_sys->p_tvfile, (GtkTreeModel*) p_list);
-       g_object_unref(p_list);
-    }
-}
-
-
-void
-onPlaylist                             (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(button) );
-
-    // Toggle notebook
-    if (p_intf->p_sys->p_notebook)
-    {
-        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-        gtk_notebook_set_page(p_intf->p_sys->p_notebook,1);
-    }
-    gdk_window_raise( p_intf->p_sys->p_window->window );
-}
-
-
-void
-onPreferences                          (GtkButton       *button,
-                                        gpointer         user_data)
-{
-    intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET( button ) );
-
-    if (p_intf->p_sys->p_notebook)
-    {
-       gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-       gtk_notebook_set_page(p_intf->p_sys->p_notebook,2);
-    }
-    gdk_window_raise( p_intf->p_sys->p_window->window );
-}
-
-
-void
 onRewind                               (GtkButton       *button,
                                         gpointer         user_data)
 {
@@ -416,30 +354,22 @@ void
 onPlay                                 (GtkButton       *button,
                                         gpointer         user_data)
 {
-     intf_thread_t *  p_intf = GtkGetIntf( GTK_WIDGET( button ) );
-     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    intf_thread_t *  p_intf = GtkGetIntf( GTK_WIDGET( button ) );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
-     if( p_playlist == NULL )
-     {
-         /* Display open page */
-         onFileOpen(button,user_data);
-     }
-
-     /* If the playlist is empty, open a file requester instead */
-     vlc_mutex_lock( &p_playlist->object_lock );
-     if( p_playlist->i_size )
-     {
-         vlc_mutex_unlock( &p_playlist->object_lock );
-         playlist_Play( p_playlist );
-         vlc_object_release( p_playlist );
-         gdk_window_lower( p_intf->p_sys->p_window->window );
-     }
-     else
-     {
-         vlc_mutex_unlock( &p_playlist->object_lock );
-         vlc_object_release( p_playlist );
-         /* Display open page */
-         onFileOpen(button,user_data);
+    if( p_playlist  )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        if( p_playlist->i_size )
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            playlist_Play( p_playlist );
+        }
+        else
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+        }
+        vlc_object_release( p_playlist );
     }
 }
 
@@ -455,7 +385,6 @@ onStop                                 (GtkButton       *button,
     {
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
-        gdk_window_raise( p_intf->p_sys->p_window->window );
     }
 }
 
@@ -483,9 +412,8 @@ onAbout                                (GtkButton       *button,
     if (p_intf->p_sys->p_notebook)
     {
         gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
-        gtk_notebook_set_page(p_intf->p_sys->p_notebook,3);
+        gtk_notebook_set_page(p_intf->p_sys->p_notebook,6);
     }
-    gdk_window_raise( p_intf->p_sys->p_window->window );
 }
 
 
@@ -536,13 +464,13 @@ void addSelectedToPlaylist(GtkTreeModel *model,
         GtkTreeIter   p_play_iter;
 
         p_play_model = gtk_tree_view_get_model(p_tvplaylist);
+
         /* Add a new row to the playlist treeview model */
         gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
         gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
                                 0, filename,   /* Add path to it !!! */
-                                1, "00:00:00",
+                                1, "no info",
                                 -1 );
-        /* do we need to unref ?? */
     }
     else
        g_print("Error obtaining pointer to Play List");

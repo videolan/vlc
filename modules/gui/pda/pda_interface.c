@@ -34,9 +34,6 @@ create_pda (void)
   GtkWidget *vbox;
   GtkWidget *toolbar;
   GtkWidget *tmp_toolbar_icon;
-  GtkWidget *tbOpen;
-  GtkWidget *tbPlaylist;
-  GtkWidget *tbPreferences;
   GtkWidget *tbRewind;
   GtkWidget *tbPause;
   GtkWidget *tbPlay;
@@ -144,12 +141,11 @@ create_pda (void)
   GtkWidget *scrolledwindow3;
   GtkWidget *viewport1;
   GtkWidget *fixed2;
-  GtkWidget *labelCopyright;
-  GtkWidget *labelProgramName;
-  GtkWidget *labelAuthors;
-  GtkWidget *labelDescription;
-  GtkWidget *labelWebSite;
   GtkWidget *aboutImage;
+  GtkWidget *labelDescription;
+  GtkWidget *labelAuthors;
+  GtkWidget *labelProgramName;
+  GtkWidget *labelCopyright;
   GtkWidget *about;
 
   pda = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -174,42 +170,6 @@ create_pda (void)
   gtk_box_pack_start (GTK_BOX (vbox), toolbar, FALSE, FALSE, 5);
   gtk_widget_set_size_request (toolbar, 240, 22);
   gtk_toolbar_set_style (GTK_TOOLBAR (toolbar), GTK_TOOLBAR_ICONS);
-
-  tmp_toolbar_icon = create_pixmap (pda, "pda-openb16x16.xpm");
-  tbOpen = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
-                                GTK_TOOLBAR_CHILD_BUTTON,
-                                NULL,
-                                _("Open"),
-                                _("File"), NULL,
-                                tmp_toolbar_icon, NULL, NULL);
-  gtk_label_set_use_underline (GTK_LABEL (((GtkToolbarChild*) (g_list_last (GTK_TOOLBAR (toolbar)->children)->data))->label), TRUE);
-  gtk_widget_set_name (tbOpen, "tbOpen");
-  gtk_widget_show (tbOpen);
-  gtk_widget_set_size_request (tbOpen, 22, 22);
-
-  tmp_toolbar_icon = create_pixmap (pda, "pda-playlistb16x16.xpm");
-  tbPlaylist = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
-                                GTK_TOOLBAR_CHILD_BUTTON,
-                                NULL,
-                                _("Playlist"),
-                                _("Playlist"), NULL,
-                                tmp_toolbar_icon, NULL, NULL);
-  gtk_label_set_use_underline (GTK_LABEL (((GtkToolbarChild*) (g_list_last (GTK_TOOLBAR (toolbar)->children)->data))->label), TRUE);
-  gtk_widget_set_name (tbPlaylist, "tbPlaylist");
-  gtk_widget_show (tbPlaylist);
-  gtk_widget_set_size_request (tbPlaylist, 22, 22);
-
-  tmp_toolbar_icon = create_pixmap (pda, "pda-preferencesb16x16.xpm");
-  tbPreferences = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
-                                GTK_TOOLBAR_CHILD_BUTTON,
-                                NULL,
-                                _("Preferences"),
-                                _("Preferences"), NULL,
-                                tmp_toolbar_icon, NULL, NULL);
-  gtk_label_set_use_underline (GTK_LABEL (((GtkToolbarChild*) (g_list_last (GTK_TOOLBAR (toolbar)->children)->data))->label), TRUE);
-  gtk_widget_set_name (tbPreferences, "tbPreferences");
-  gtk_widget_show (tbPreferences);
-  gtk_widget_set_size_request (tbPreferences, 22, 22);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -287,7 +247,7 @@ create_pda (void)
   gtk_widget_show (tbAbout);
   gtk_widget_set_size_request (tbAbout, 22, 22);
 
-  timeLabel = gtk_label_new (_("0:00:00"));
+  timeLabel = gtk_label_new (_("00:00:00"));
   gtk_widget_set_name (timeLabel, "timeLabel");
   gtk_widget_show (timeLabel);
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
@@ -911,20 +871,21 @@ create_pda (void)
   gtk_widget_show (fixed2);
   gtk_container_add (GTK_CONTAINER (viewport1), fixed2);
 
-  labelCopyright = gtk_label_new (_("(c) 1996-2003 the VideoLAN team"));
-  gtk_widget_set_name (labelCopyright, "labelCopyright");
-  gtk_widget_show (labelCopyright);
-  gtk_fixed_put (GTK_FIXED (fixed2), labelCopyright, 16, 48);
-  gtk_widget_set_size_request (labelCopyright, 0, 0);
+  aboutImage = create_pixmap (pda, "vlc48x48.png");
+  gtk_widget_set_name (aboutImage, "aboutImage");
+  gtk_widget_show (aboutImage);
+  gtk_fixed_put (GTK_FIXED (fixed2), aboutImage, 0, 0);
+  gtk_widget_set_size_request (aboutImage, 48, 48);
 
-  labelProgramName = gtk_label_new (_("VLC media player"));
-  gtk_widget_set_name (labelProgramName, "labelProgramName");
-  gtk_widget_show (labelProgramName);
-  gtk_fixed_put (GTK_FIXED (fixed2), labelProgramName, 64, 16);
-  gtk_widget_set_size_request (labelProgramName, 0, 0);
-  gtk_label_set_line_wrap (GTK_LABEL (labelProgramName), TRUE);
+  labelDescription = gtk_label_new (_("The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from  local or network sources and is licensed under the GPL (http://www.gnu.org/copyleft/gpl.html)."));
+  gtk_widget_set_name (labelDescription, "labelDescription");
+  gtk_widget_show (labelDescription);
+  gtk_fixed_put (GTK_FIXED (fixed2), labelDescription, 16, 112);
+  gtk_widget_set_size_request (labelDescription, 200, 112);
+  gtk_label_set_justify (GTK_LABEL (labelDescription), GTK_JUSTIFY_LEFT);
+  gtk_label_set_line_wrap (GTK_LABEL (labelDescription), TRUE);
 
-  labelAuthors = gtk_label_new (_("Authors: The VideoLAN Team, http://www.videolan.org"));
+  labelAuthors = gtk_label_new (_("Authors: The VideoLAN Team, http://www.videolan.org/team/"));
   gtk_widget_set_name (labelAuthors, "labelAuthors");
   gtk_widget_show (labelAuthors);
   gtk_fixed_put (GTK_FIXED (fixed2), labelAuthors, 16, 72);
@@ -932,25 +893,18 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelAuthors), GTK_JUSTIFY_LEFT);
   gtk_label_set_line_wrap (GTK_LABEL (labelAuthors), TRUE);
 
-  labelDescription = gtk_label_new (_("The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from local or network sources."));
-  gtk_widget_set_name (labelDescription, "labelDescription");
-  gtk_widget_show (labelDescription);
-  gtk_fixed_put (GTK_FIXED (fixed2), labelDescription, 16, 112);
-  gtk_widget_set_size_request (labelDescription, 208, 72);
-  gtk_label_set_justify (GTK_LABEL (labelDescription), GTK_JUSTIFY_LEFT);
-  gtk_label_set_line_wrap (GTK_LABEL (labelDescription), TRUE);
+  labelProgramName = gtk_label_new (_("VLC media player"));
+  gtk_widget_set_name (labelProgramName, "labelProgramName");
+  gtk_widget_show (labelProgramName);
+  gtk_fixed_put (GTK_FIXED (fixed2), labelProgramName, 48, 16);
+  gtk_widget_set_size_request (labelProgramName, 152, 16);
+  gtk_label_set_line_wrap (GTK_LABEL (labelProgramName), TRUE);
 
-  labelWebSite = gtk_label_new (_("http://www.videolan.org"));
-  gtk_widget_set_name (labelWebSite, "labelWebSite");
-  gtk_widget_show (labelWebSite);
-  gtk_fixed_put (GTK_FIXED (fixed2), labelWebSite, 16, 192);
-  gtk_widget_set_size_request (labelWebSite, 208, 16);
-
-  aboutImage = create_pixmap (pda, "vlc48x48.png");
-  gtk_widget_set_name (aboutImage, "aboutImage");
-  gtk_widget_show (aboutImage);
-  gtk_fixed_put (GTK_FIXED (fixed2), aboutImage, 0, 0);
-  gtk_widget_set_size_request (aboutImage, 48, 48);
+  labelCopyright = gtk_label_new (_("(C) 1996-2003 the VideoLAN team"));
+  gtk_widget_set_name (labelCopyright, "labelCopyright");
+  gtk_widget_show (labelCopyright);
+  gtk_fixed_put (GTK_FIXED (fixed2), labelCopyright, 16, 48);
+  gtk_widget_set_size_request (labelCopyright, 208, 16);
 
   about = gtk_label_new (_("About"));
   gtk_widget_set_name (about, "about");
@@ -959,15 +913,6 @@ create_pda (void)
 
   g_signal_connect ((gpointer) pda, "delete_event",
                     G_CALLBACK (onPDADeleteEvent),
-                    NULL);
-  g_signal_connect ((gpointer) tbOpen, "clicked",
-                    G_CALLBACK (onFileOpen),
-                    NULL);
-  g_signal_connect ((gpointer) tbPlaylist, "clicked",
-                    G_CALLBACK (onPlaylist),
-                    NULL);
-  g_signal_connect ((gpointer) tbPreferences, "clicked",
-                    G_CALLBACK (onPreferences),
                     NULL);
   g_signal_connect ((gpointer) tbRewind, "clicked",
                     G_CALLBACK (onRewind),
@@ -1136,9 +1081,6 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT_NO_REF (pda, pda, "pda");
   GLADE_HOOKUP_OBJECT (pda, vbox, "vbox");
   GLADE_HOOKUP_OBJECT (pda, toolbar, "toolbar");
-  GLADE_HOOKUP_OBJECT (pda, tbOpen, "tbOpen");
-  GLADE_HOOKUP_OBJECT (pda, tbPlaylist, "tbPlaylist");
-  GLADE_HOOKUP_OBJECT (pda, tbPreferences, "tbPreferences");
   GLADE_HOOKUP_OBJECT (pda, tbRewind, "tbRewind");
   GLADE_HOOKUP_OBJECT (pda, tbPause, "tbPause");
   GLADE_HOOKUP_OBJECT (pda, tbPlay, "tbPlay");
@@ -1238,12 +1180,11 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, scrolledwindow3, "scrolledwindow3");
   GLADE_HOOKUP_OBJECT (pda, viewport1, "viewport1");
   GLADE_HOOKUP_OBJECT (pda, fixed2, "fixed2");
-  GLADE_HOOKUP_OBJECT (pda, labelCopyright, "labelCopyright");
-  GLADE_HOOKUP_OBJECT (pda, labelProgramName, "labelProgramName");
-  GLADE_HOOKUP_OBJECT (pda, labelAuthors, "labelAuthors");
-  GLADE_HOOKUP_OBJECT (pda, labelDescription, "labelDescription");
-  GLADE_HOOKUP_OBJECT (pda, labelWebSite, "labelWebSite");
   GLADE_HOOKUP_OBJECT (pda, aboutImage, "aboutImage");
+  GLADE_HOOKUP_OBJECT (pda, labelDescription, "labelDescription");
+  GLADE_HOOKUP_OBJECT (pda, labelAuthors, "labelAuthors");
+  GLADE_HOOKUP_OBJECT (pda, labelProgramName, "labelProgramName");
+  GLADE_HOOKUP_OBJECT (pda, labelCopyright, "labelCopyright");
   GLADE_HOOKUP_OBJECT (pda, about, "about");
 
   return pda;
