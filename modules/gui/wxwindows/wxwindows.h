@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.75 2003/11/29 13:39:43 gbazin Exp $
+ * $Id: wxwindows.h,v 1.76 2003/12/09 00:46:03 yoann Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -337,6 +337,7 @@ private:
     /* Event handlers for the disc page */
     void OnDiscPanelChange( wxCommandEvent& event );
     void OnDiscTypeChange( wxCommandEvent& event );
+    void OnDiscDeviceChange( wxCommandEvent& event );
 
     /* Event handlers for the net page */
     void OnNetPanelChange( wxCommandEvent& event );
@@ -374,7 +375,10 @@ private:
     wxTextCtrl *disc_device;
     wxSpinCtrl *disc_title;
     wxSpinCtrl *disc_chapter;
-
+    
+    /* Indicates if the disc device control was modified */
+    bool b_disc_device_changed;
+    
     /* Controls for the net panel */
     wxRadioBox *net_type;
     int i_net_type;

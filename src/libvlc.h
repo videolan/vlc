@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.114 2003/12/08 19:50:22 gbazin Exp $
+ * $Id: libvlc.h,v 1.115 2003/12/09 00:46:03 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -339,6 +339,10 @@ static char *ppsz_language_text[] =
 #define VCD_DEV_LONGTEXT N_( \
     "This is the default VCD device to use.")
 
+#define CDAUDIO_DEV_TEXT N_("CD Audio device")
+#define CDAUDIO_DEV_LONGTEXT N_( \
+    "This is the default CD Audio device to use.")
+                                                                                                                            
 #define IPV6_TEXT N_("Force IPv6")
 #define IPV6_LONGTEXT N_( \
     "If you check this box, IPv6 will be used by default for all UDP and " \
@@ -708,6 +712,7 @@ vlc_module_begin();
 
     add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
     add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
+    add_file( "cd-audio", CDAUDIO_DEVICE, NULL, CDAUDIO_DEV_TEXT, CDAUDIO_DEV_LONGTEXT, VLC_FALSE );
 
     add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
         change_short('6');

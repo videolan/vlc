@@ -120,9 +120,11 @@
 #if !defined( WIN32 ) && !defined( UNDER_CE )
 #   define DVD_DEVICE "/dev/dvd"
 #   define VCD_DEVICE "/dev/cdrom"
+#   define CDAUDIO_DEVICE "/dev/cdrom"
 #else
 #   define DVD_DEVICE "D:"
 #   define VCD_DEVICE "D:"
+#   define CDAUDIO_DEVICE "D:"
 #endif
 
 /*****************************************************************************
