@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.9 2002/05/15 13:07:18 marcari Exp $
+ * $Id: http.c,v 1.10 2002/05/22 23:11:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -37,6 +37,16 @@
 #   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
 #   include <io.h>
+#endif
+
+#ifdef WIN32
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   ifndef IN_MULTICAST
+#       define IN_MULTICAST(a) IN_CLASSD(a)
+#   endif
+#else
+#   include <sys/socket.h>
 #endif
 
 #include "stream_control.h"
@@ -140,8 +150,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     psz_buffer[sizeof(psz_buffer) - 1] = '\0';
 
     /* Send GET ... */
-    if( write( p_access_data->_socket.i_handle, psz_buffer,
-               strlen( psz_buffer ) ) == (-1) )
+    if( send( p_access_data->_socket.i_handle, psz_buffer,
+               strlen( psz_buffer ), 0 ) == (-1) )
     {
         intf_ErrMsg( "http error: cannot send request (%s)", strerror(errno) );
         input_FDNetworkClose( p_input );

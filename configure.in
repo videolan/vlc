@@ -80,6 +80,7 @@ case x"${target_os}" in
     vlc_LDFLAGS="${vlc_LDFLAGS} -lws2_32 -lnetapi32"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lws2_32"
     ipv6_LDFLAGS="${ipv6_LDFLAGS} -lws2_32"
+    http_LDFLAGS="${http_LDFLAGS} -lws2_32"
     rc_LDFLAGS="${rc_LDFLAGS} -lws2_32"
     ;;
   x*nto*)
@@ -1702,6 +1703,7 @@ AC_SUBST(ggi_LDFLAGS)
 AC_SUBST(glide_LDFLAGS)
 AC_SUBST(gnome_LDFLAGS)
 AC_SUBST(gtk_LDFLAGS)
+AC_SUBST(http_LDFLAGS)
 AC_SUBST(idctaltivec_LDFLAGS)
 AC_SUBST(imdct_LDFLAGS)
 AC_SUBST(imdct3dn_LDFLAGS)

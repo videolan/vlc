@@ -102,6 +102,7 @@ ggi_LDFLAGS = @ggi_LDFLAGS@
 glide_LDFLAGS = @glide_LDFLAGS@
 gnome_LDFLAGS = @gnome_LDFLAGS@
 gtk_LDFLAGS = @gtk_LDFLAGS@
+http_LDFLAGS = @http_LDFLAGS@
 idctaltivec_LDFLAGS = @idctaltivec_LDFLAGS@
 imdct_LDFLAGS = @imdct_LDFLAGS@
 imdct3dn_LDFLAGS = @imdct3dn_LDFLAGS@
