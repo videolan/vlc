@@ -16,7 +16,7 @@ test basic mad plugin
 	native Intel
 	native iPaq
 
-[4 - 26 November 2001, working]
+[4 - 26 November 2001, done]
 commit to current vlc-dev tree in CVS at VideoLan 
 	fix broken things and conflicts
 	run tests again (see [3])
@@ -32,7 +32,6 @@ extending mad plugin with more features
 test extended plugin 
 	native Intel
 	native iPaq
-	cross-compile iPaq
 
 [8 - ]
 commit to current vlc-dev tree in CVS at Videolan
@@ -45,3 +44,12 @@ incorporate new libmad version if possible
 	see 7
 	see 8
 
+[10 - ]
+rewrite the audio decoding process by using a lower level API. In this way the decoding process can be steered and tuned better.
+Hopefully it will get rid of audio cracks and jitter.
+
+[11 - ]
+test plugin: native Intel, native iPaq
+
+[12 - ]
+commit to vlc-dev tree.
