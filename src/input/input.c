@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.270 2003/12/02 12:57:35 gbazin Exp $
+ * $Id: input.c,v 1.271 2003/12/03 22:14:38 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -529,6 +529,9 @@ static int RunThread( input_thread_t *p_input )
 static int InitThread( input_thread_t * p_input )
 {
     float f_fps;
+    playlist_t *p_playlist;
+    mtime_t i_length;
+    
     /* Parse source string. Syntax : [[<access>][/<demux>]:][<source>] */
     char * psz_parser = p_input->psz_dupsource = strdup(p_input->psz_source);
     vlc_value_t val;
@@ -777,6 +780,24 @@ static int InitThread( input_thread_t * p_input )
     p_input->p_sys = malloc( sizeof( input_thread_sys_t ) );
     p_input->p_sys->i_sub = 0;
     p_input->p_sys->sub   = NULL;
+
+    /* get length */
+    if( !demux_Control( p_input, DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
+    {
+        p_playlist = (playlist_t*)vlc_object_find( p_input,
+                                                   VLC_OBJECT_PLAYLIST,
+                                                   FIND_PARENT );
+        if( p_playlist )
+        {
+            vlc_mutex_lock( &p_playlist->object_lock );
+            p_playlist->pp_items[ p_playlist->i_index ]->i_duration = i_length;
+            val.b_bool = VLC_TRUE;
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            var_Set( p_playlist, "intf-change", val );
+            vlc_object_release( p_playlist );
+        }
+    }            
+       
 
     /* get fps */
     if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
