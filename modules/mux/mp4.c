@@ -279,6 +279,7 @@ static void Close( vlc_object_t * p_this )
                 msg_Warn( p_this, "read() not supported by acces output, "
                           "won't create a fast start file" );
                 p_sys->b_fast_start = VLC_FALSE;
+                block_Release( p_buf );
                 break;
             }
             sout_AccessOutSeek( p_mux->p_access, p_sys->i_mdat_pos + i_size +
