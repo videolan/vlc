@@ -1,5 +1,5 @@
 /*****************************************************************************
- * cddax.c : CD digital audio input module for vlc using libcdio
+ * access.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
  * $Id$
@@ -372,6 +372,7 @@ int E_(CDDAOpen)( vlc_object_t *p_this )
 
     p_cdda->b_header = VLC_FALSE;
     p_cdda->p_cdio   = p_cdio;
+    p_cdda->i_tracks = 0;
     p_cdda->i_titles = 0;
     p_cdda->i_track  = i_track;
     p_cdda->i_debug  = config_GetInt(p_this, MODULE_STRING "-debug");
@@ -561,10 +562,11 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
             pi_int    = (int*)va_arg( args, int* );
             *((int*)va_arg( args, int* )) = 1; /* Title offset */
 
-            /* Duplicate title info */
             dbg_print ( INPUT_DBG_EVENT,
-                        "GET TITLE: i_tracks %d, i_titles %d",
-                        p_cdda->i_tracks, p_cdda->i_titles );
+                        "GET TITLE: i_tracks %d, i_tracks %d",
+                        p_cdda->i_tracks, p_cdda->i_tracks );
+
+            /* Duplicate title info */
             if( p_cdda->i_titles == 0 )
             {
                 *pi_int = 0; ppp_title = NULL;
@@ -587,6 +589,8 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_TITLE:
         {
             i = (int)va_arg( args, int );
+
+	    dbg_print( INPUT_DBG_EVENT, "set title %d", i );
             if( i != p_access->info.i_title )
             {
                 /* Update info */
@@ -665,3 +669,10 @@ static int CDDAInit( access_t *p_access, cdda_data_t *p_cdda )
 
     return VLC_SUCCESS;
 }
+
+/* 
+ * Local variables:
+ *  mode: C
+ *  style: gnu
+ * End:
+ */

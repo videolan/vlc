@@ -1,5 +1,5 @@
 /*****************************************************************************
- * cddax.c : CD digital audio input module for vlc using libcdio
+ * cdda.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
  * $Id$
@@ -73,7 +73,7 @@
 "   %p : The artist/performer/composer in the track\n" \
 "   %T : The track number\n" \
 "   %s : Number of seconds in this track \n" \
-"   %t : The title\n" \
+"   %t : The track title or MRL if no title\n" \
 "   %Y : The year 19xx or 20xx\n" \
 "   %% : a % \n")
 
@@ -85,6 +85,7 @@
 "   %n : The number of tracks on the CD\n" \
 "   %T : The track number\n" \
 "   %s : Number of seconds in this track \n" \
+"   %t : The track title or MRL if no title\n" \
 "   %% : a % \n")
 
 /*****************************************************************************
@@ -120,7 +121,7 @@ vlc_module_begin();
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
 
     add_string( MODULE_STRING "-title-format",
-                "%T %M", NULL,
+                "Track %T. %t", NULL,
                 N_("Format to use in playlist \"title\" field when no CDDB"),
                 TITLE_FMT_LONGTEXT, VLC_TRUE );
 
