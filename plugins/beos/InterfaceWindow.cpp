@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.12 2002/02/08 15:57:29 sam Exp $
+ * $Id: InterfaceWindow.cpp,v 1.13 2002/03/22 13:16:35 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -84,6 +84,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     BMenu *mAudio;
     CDMenu *cd_menu;
     BMenu *mNavigation;
+    BMenu *mConfig;
     
     /* Add the file Menu */
     BMenuItem *mItem;
@@ -124,6 +125,12 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     mNavigation->AddItem( new BMenuItem( "Next Chapter",
                                         new BMessage(NEXT_CHAPTER)) );
                                         
+    /* Add the Config menu */
+    menu_bar->AddItem( mConfig = new BMenu( "Config" ) );
+    menu_bar->ResizeToPreferred();
+    mConfig->AddItem( miOnTop = new BMenuItem( "Always on Top",
+                                        new BMessage(TOGGLE_ON_TOP)) );
+    miOnTop->SetMarked(false);                                    
 
     ResizeTo(260,50 + menu_bar->Bounds().IntegerHeight()+1);
     controlRect = Bounds();
@@ -169,6 +176,20 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         alert->Go();
         break;
 
+    case TOGGLE_ON_TOP:
+        miOnTop->SetMarked(! miOnTop->IsMarked() );
+        if ( miOnTop->IsMarked() )
+        {
+            SetFeel(B_FLOATING_APP_WINDOW_FEEL);
+            SetWorkspaces(B_CURRENT_WORKSPACE); 
+        }
+        else
+        {
+            SetFeel(B_NORMAL_WINDOW_FEEL);
+            SetWorkspaces(B_CURRENT_WORKSPACE); 
+        }
+        break;
+        
     case OPEN_FILE:
         if( file_panel )
         {

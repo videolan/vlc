@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.47 2002/03/20 10:33:42 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.48 2002/03/22 13:16:35 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -225,19 +225,20 @@ void directWindow::drawBuffer(int bufferIndex)
 /*****************************************************************************
  * VideoWindow constructor and destructor
  *****************************************************************************/
-VideoWindow::VideoWindow( int width, int height, 
-                          vout_thread_t *p_video_output )
+VideoWindow::VideoWindow( int v_width, int v_height, 
+                          int w_width, int w_height )
 {
+    // need to centre the window on the screeen.
     if ( BDirectWindow::SupportsWindowMode() )
     { 
-        voutWindow = new directWindow( BRect( 80, 50, 
-                                          80 + width, 50 + height ), this );
+        voutWindow = new directWindow( BRect( 20, 50, 
+                                              20 + w_width, 50 + w_height ), this );
         mode = DIRECT;
     }
     else
     {
-        voutWindow = new bitmapWindow( BRect( 80, 50, 
-                                          80 + width, 50 + height ), this );
+        voutWindow = new bitmapWindow( BRect( 20, 50, 
+                                              20 + w_width, 50 + w_height ), this );
         mode = BITMAP;
     }
 
@@ -245,6 +246,7 @@ VideoWindow::VideoWindow( int width, int height,
     teardownwindow = false;
     is_zoomed = false;
     resized = true;
+
     /* call ScreenChanged to set vsync correctly */
     BScreen *screen;
     screen = new BScreen(voutWindow);
@@ -257,23 +259,15 @@ VideoWindow::VideoWindow( int width, int height,
     
     /* Bitmap mode overlay not available, set the system to 32bits
      * and let BeOS do all the work */
-    bitmap[0] = new BBitmap( voutWindow->Bounds(), B_RGB32);
-    bitmap[1] = new BBitmap( voutWindow->Bounds(), B_RGB32);
+    bitmap[0] = new BBitmap( BRect( 0, 0, v_width, v_height ), B_RGB32);
+    bitmap[1] = new BBitmap( BRect( 0, 0, v_width, v_height ), B_RGB32);
     memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
     memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
 
-    i_width = bitmap[0]->Bounds().IntegerWidth();
-    i_height = bitmap[0]->Bounds().IntegerHeight();
-    
-    winSize = voutWindow->Frame();
-    out_top = 0;
-    out_left = 0;
-    out_height = winSize.Height();
-    out_width = winSize.Width();
-    width_scale = out_width / i_width;
-    height_scale = out_height / i_height;
-
-
+    // remember current settings
+    i_width = w_width;
+    i_height = w_height;
+    FrameResized(w_width, w_height);
     voutWindow->Show();
 }
 
@@ -333,7 +327,7 @@ void VideoWindow::Zoom(BPoint origin, float width, float height )
         voutWindow->ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
         width_scale = rect.IntegerWidth() / i_width;
         height_scale = rect.IntegerHeight() / i_height;
-        be_app->HideCursor();
+        be_app->ObscureCursor();
     }
     resized = true;
 }
@@ -495,10 +489,13 @@ int vout_Init( vout_thread_t *p_vout )
     p_vout->p_sys->pp_buffer[0] = (u8*)p_vout->p_sys->p_window->bitmap[0]->Bits();
     p_vout->p_sys->pp_buffer[1] = (u8*)p_vout->p_sys->p_window->bitmap[1]->Bits();
 
-    p_vout->output.i_width  = p_vout->p_sys->i_width;
-    p_vout->output.i_height = p_vout->p_sys->i_height;
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+
+    /* Assume we have square pixels */
     p_vout->output.i_aspect = p_vout->p_sys->i_width
                                * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
+
     p_vout->output.i_chroma = FOURCC_RV32;
 
     p_vout->output.i_rmask  = 0x00ff0000;
@@ -606,9 +603,11 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
+
     p_vout->p_sys->p_window = new VideoWindow( p_vout->p_sys->i_width - 1,
                                                p_vout->p_sys->i_height - 1,
-                                               p_vout );
+                                               p_vout->i_window_width,
+                                               p_vout->i_window_height);
 
     if( p_vout->p_sys->p_window == NULL )
     {

@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.12 2002/03/20 10:33:42 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.13 2002/03/22 13:16:35 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -42,8 +42,8 @@ class VideoWindow
 {
 public:
     // standard constructor and destructor
-    VideoWindow( int width, int height,
-                 struct vout_thread_s *p_video_output); 
+    VideoWindow( int v_width, int v_height,
+                 int w_width, int w_height); 
     ~VideoWindow();
     
     void	        Zoom(BPoint origin, float width, float height);
