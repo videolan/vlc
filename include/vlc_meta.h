@@ -108,7 +108,8 @@ static inline void vlc_meta_Delete( vlc_meta_t *m )
     free( m );
 }
 
-static inline void vlc_meta_Add( vlc_meta_t *m, char *name, char *value )
+static inline void vlc_meta_Add( vlc_meta_t *m,
+                                 const char *name, const char *value )
 {
     m->name  = (char**)realloc( m->name, sizeof(char*) * ( m->i_meta + 1 ) );
     m->name[m->i_meta] = strdup( name );
@@ -156,7 +157,7 @@ static inline void vlc_meta_Merge( vlc_meta_t *dst, vlc_meta_t *src )
     }
 }
 
-static inline char *vlc_meta_GetValue( vlc_meta_t *m, char *name )
+static inline char *vlc_meta_GetValue( vlc_meta_t *m, const char *name )
 {
     int i;
 

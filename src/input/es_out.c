@@ -479,6 +479,28 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     return p_pgrm;
 }
 
+/* EsOutProgramMeta:
+ */
+static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    input_thread_t    *p_input = p_sys->p_input;
+    char              *psz_cat = malloc( strlen(_("Program")) + 10 );
+    int i;
+
+    msg_Dbg( p_input, "EsOutProgramMeta: number=%d", i_group );
+    sprintf( psz_cat, "%s %d", _("Program"), i_group );
+
+    for( i = 0; i < p_meta->i_meta; i++ )
+    {
+        msg_Dbg( p_input, "  - %s = %s", p_meta->name[i], p_meta->value[i] );
+
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
+                      _(p_meta->name[i]), "%s", p_meta->value[i] );
+    }
+    free( psz_cat );
+}
+
 /* EsOutAdd:
  *  Add an es_out
  */
@@ -1209,6 +1231,14 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             es->i_preroll_end = i_date;
             input_DecoderPreroll( es->p_dec, i_date );
 
+            return VLC_SUCCESS;
+        }
+        case ES_OUT_SET_GROUP_META:
+        {
+            int i_group = (int)va_arg( args, int );
+            vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t * );
+
+            EsOutProgramMeta( out, i_group, p_meta );
             return VLC_SUCCESS;
         }
 
