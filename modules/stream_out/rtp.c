@@ -2,7 +2,7 @@
  * rtp.c: rtp stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: rtp.c,v 1.13 2004/03/03 13:27:25 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -338,6 +338,9 @@ static int Open( vlc_object_t *p_this )
         vlc_UrlClean( &url );
     }
 
+    /* update p_sout->i_out_pace_nocontrol */
+    p_stream->p_sout->i_out_pace_nocontrol++;
+
     return VLC_SUCCESS;
 }
 
@@ -348,6 +351,9 @@ static void Close( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    /* update p_sout->i_out_pace_nocontrol */
+    p_stream->p_sout->i_out_pace_nocontrol--;
 
     if( p_sys->p_mux )
     {

@@ -2,7 +2,7 @@
  * display.c: display stream output module
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.12 2004/01/25 14:34:25 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -102,6 +102,9 @@ static int Open( vlc_object_t *p_this )
 
     p_stream->p_sys     = p_sys;
 
+    /* update p_sout->i_out_pace_nocontrol */
+    p_stream->p_sout->i_out_pace_nocontrol++;
+
     return VLC_SUCCESS;
 }
 
@@ -112,6 +115,9 @@ static void Close( vlc_object_t * p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    /* update p_sout->i_out_pace_nocontrol */
+    p_stream->p_sout->i_out_pace_nocontrol--;
 
     vlc_object_release( p_sys->p_input );
 
