@@ -855,7 +855,7 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
                 }
 
                 i_len = strlen( s );
-                if( i_len <= 1 )
+                if( i_len <= 0 )
                 {
                     /* empty line -> end of this subtitle */
                     buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
@@ -949,7 +949,7 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
                 }
 
                 i_len = strlen( s );
-                if( i_len <= 1 )
+                if( i_len <= 0 )
                 {
                     /* empty line -> end of this subtitle */
                     buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
@@ -957,14 +957,15 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle )
                     p_subtitle->i_stop = i_stop;
 
                     /* replace [br] by \n */
-                    for( i = 0; i < strlen( buffer_text ) - 3; i++ )
+                    for( i = 0; i < i_buffer_text - 3; i++ )
                     {
                         if( buffer_text[i] == '[' && buffer_text[i+1] == 'b' &&
                             buffer_text[i+2] == 'r' && buffer_text[i+3] == ']' )
                         {
                             char *temp = buffer_text + i + 1;
                             buffer_text[i] = '\n';
-                            memmove( temp, temp+3, strlen( temp-3 ));
+                            memmove( temp, temp+3, strlen( temp ) -3 );
+                            temp[strlen( temp )-3] = '\0';
                         }
                     }
                     p_subtitle->psz_text = strdup( buffer_text );
