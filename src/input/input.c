@@ -126,7 +126,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->bookmark = NULL;
     p_input->p_es_out = NULL;
     p_input->p_sout  = NULL;
-    p_input->b_out_pace_control = VLC_FALSE;
+    p_input->b_out_pace_control = VLC_TRUE;
     p_input->i_pts_delay = 0;
 
 
