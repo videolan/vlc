@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.9 2002/11/12 13:57:12 sam Exp $
+ * $Id: http.c,v 1.10 2002/11/15 14:41:49 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -65,7 +65,12 @@ static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define PROXY_TEXT N_("Use an http proxy")
+#define PROXY_LONGTEXT N_( \
+    "The htpp proxy must be in the form http://myproxy.mydomain:myport" )
 vlc_module_begin();
+    add_category_hint( N_("http"), NULL );
+    add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT );
     set_description( _("HTTP access module") );
     set_capability( "access", 0 );
     add_shortcut( "http" );
@@ -173,8 +178,8 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     {
         psz_protocol = "HTTP";
     }
-    else if( ( i_size >= sizeof( "ICY" ) &&
-             !strncmp( psz_parser, "ICY", strlen( "ICY" ) ) ) )
+    else if( ( i_size >= sizeof("ICY") &&
+             !strncmp( psz_parser, "ICY", sizeof("ICY") - 1 ) ) )
     {
         psz_protocol = "ICY";
         if( !p_input->psz_demux || !*p_input->psz_demux  )
@@ -190,10 +195,10 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     }
     msg_Dbg( p_input, "detected %s server", psz_protocol );
 
-    if( !strncmp( psz_protocol, "ICY", sizeof( "ICY" ) ) )
+    if( !strncmp( psz_protocol, "ICY", sizeof("ICY") - 1 ) )
     { // ICY server
-        psz_parser += sizeof( "ICY" );
-        i_size -= sizeof( "ICY" );
+        psz_parser += (sizeof("ICY") - 1);
+        i_size -= (sizeof("ICY") - 1);
     }
     else
     { // HTTP/1.0 or HTTP/1.1
@@ -299,7 +304,7 @@ static int Open( vlc_object_t *p_this )
     char *              psz_server_addr = "";
     char *              psz_server_port = "";
     char *              psz_path = "";
-    char *              psz_proxy;
+    char *              psz_proxy, *psz_proxy_orig;
     int                 i_server_port = 0;
 
     p_access_data = malloc( sizeof(_input_socket_t) );
@@ -392,11 +397,17 @@ static int Open( vlc_object_t *p_this )
         return( -1 );
     }
 
-    /* Check proxy */
-    if( (psz_proxy = getenv( "http_proxy" )) != NULL && *psz_proxy )
+    /* Check proxy config variable */
+    if( (psz_proxy_orig = config_GetPsz( p_input, "http-proxy" )) == NULL )
+        /* Check proxy environment variable */
+        if( (psz_proxy_orig = getenv( "http_proxy" )) != NULL )
+            psz_proxy_orig = strdup( psz_proxy_orig );
+
+    psz_proxy = psz_proxy_orig;
+    if( psz_proxy != NULL && *psz_proxy )
     {
         /* http://myproxy.mydomain:myport/ */
-        int                 i_proxy_port = 0;
+        int i_proxy_port = 0;
  
         /* Skip the protocol name */
         while( *psz_proxy && *psz_proxy != ':' )
@@ -446,18 +457,26 @@ static int Open( vlc_object_t *p_this )
                     i_proxy_port = atoi( psz_port );
                 }
             }
+
+            psz_proxy = strdup( psz_proxy );
+
+            msg_Dbg( p_input, "using http proxy server=%s port=%d",
+                     psz_proxy, i_proxy_port );
         }
         else
         {
-            msg_Err( p_input, "http_proxy environment variable is invalid!" );
+            msg_Err( p_input, "http proxy %s is invalid!", psz_proxy_orig );
             free( p_input->p_access_data );
             free( psz_name );
+            if( psz_proxy_orig ) free( psz_proxy_orig );
             return( -1 );
         }
 
-        p_access_data->socket_desc.i_type = NETWORK_TCP;
+        if( psz_proxy_orig ) free( psz_proxy_orig );
+
         p_access_data->socket_desc.psz_server_addr = psz_proxy;
         p_access_data->socket_desc.i_server_port = i_proxy_port;
+        p_access_data->socket_desc.i_type = NETWORK_TCP;
 
         snprintf( p_access_data->psz_buffer, sizeof(p_access_data->psz_buffer),
                   "GET http://%s:%d/%s\r\n HTTP/1.0\r\n",
@@ -620,4 +639,3 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
 #endif
 }
-
