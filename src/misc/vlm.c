@@ -981,6 +981,13 @@ int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
 
         TAB_APPEND( media->i_input, media->input, input );
     }
+    else if( !strcmp( psz_cmd, "inputdel" ) && !strcmp( psz_value, "all" ) )
+    {
+        while( media->i_input > 0 )
+        {
+            TAB_REMOVE( media->i_input, media->input, media->input[0] );
+        }
+    }
     else if( !strcmp( psz_cmd, "inputdel" ) )
     {
         char *input;
@@ -1866,7 +1873,8 @@ static vlm_message_t *vlm_Help( vlm_t *vlm, char *psz_filter )
         MessageAddChild( "load (config_file)" );
 
         message_child = MessageAdd( "Media Proprieties Syntax:" );
-        MessageAddChild( "input|inputdel (input_name)" );
+        MessageAddChild( "input (input_name)" );
+        MessageAddChild( "inputdel (input_name)|all" );
         MessageAddChild( "output (output_name)" );
         MessageAddChild( "enabled|disabled" );
         MessageAddChild( "loop|unloop (broadcast only)" );
