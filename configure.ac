@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.96 2003/10/26 12:49:24 gbazin Exp $
+dnl $Id: configure.ac,v 1.97 2003/10/26 16:12:34 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -3199,24 +3199,14 @@ elif test "${enable_mozilla}" = "yes"
 then
   AC_ARG_WITH(mozilla-sdk-path,
     [    --with-mozilla-sdk-path=PATH path to win32 mozilla sdk], [
-    AC_MSG_CHECKING(for mozilla-config.h in ${with_mozilla_sdk_path})
     real_mozilla_sdk="`cd ${with_mozilla_sdk_path} 2>/dev/null && pwd`"
-    if test -z "${real_mozilla_sdk}"; then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_mozilla_sdk_path}])
-    fi
-    if test -f "${real_mozilla_sdk}/mozilla-config.h"; then
-      AC_MSG_RESULT(${real_mozilla_sdk}/mozilla-config.h)
+    CPPFLAGS="${CPPFLAGS_save} ${real_mozilla_sdk}"
+    AC_CHECK_HEADERS(mozilla-config.h, [
       mozilla=:
       AX_ADD_CPPFLAGS([mozilla],[-DXPCOM_GLUE -I${real_mozilla_sdk} -I${real_mozilla_sdk}/embedstring/include -I${real_mozilla_sdk}/xpcom/include -I${real_mozilla_sdk}/nspr/include -I${real_mozilla_sdk}/string/include -I${real_mozilla_sdk}/plugin/include -I${real_mozilla_sdk}/java/include])
       AX_ADD_LDFLAGS([mozilla],[-L${real_mozilla_sdk}/embedstring/bin -L${real_mozilla_sdk}/xpcom/bin -L${real_mozilla_sdk}/nspr/bin -L${real_mozilla_sdk}/string/bin -lnspr4 -lplds4 -lplc4 -lembedstring -lxpcomglue -Wl,--kill-at])
-      XPIDL_INCL="-I${real_mozilla_sdk}/xpcom/idl"
-    else
-      dnl  The given path is incorrect
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_mozilla_sdk}/mozilla-config.h])
-    fi
+      XPIDL_INCL="-I${real_mozilla_sdk}/xpcom/idl" ])
+    CPPFLAGS="${CPPFLAGS_save}"
   ])
 fi
 

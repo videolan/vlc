@@ -35,6 +35,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+#include "config.h"
+
+#ifdef HAVE_MOZILLA_CONFIG_H
+#   include <mozilla-config.h>
+#endif
+
 #include "nscore.h"
 #include "npapi.h"
 #include "npupp.h"
