@@ -2,7 +2,7 @@
  * text.cpp: Text control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: text.cpp,v 1.5 2003/04/17 16:34:31 karibu Exp $
+ * $Id: text.cpp,v 1.6 2003/04/17 19:56:31 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,6 +34,7 @@
 #include "../src/graphics.h"
 #include "../os_graphics.h"
 #include "../src/font.h"
+#include "../os_font.h"
 #include "generic.h"
 #include "text.h"
 #include "../src/event.h"
@@ -210,12 +211,12 @@ void ControlText::SetSize()
     Height = h;
 
     // Set position wether alignment
-    if( Align == DT_CENTER )
+    if( Align == VLC_FONT_ALIGN_CENTER )
     {
         Left     = InitLeft - Width / 2;
         TextLeft = InitLeft - TextWidth / 2;
     }
-    else if( Align == DT_RIGHT )
+    else if( Align == VLC_FONT_ALIGN_RIGHT )
     {
         Left     = InitLeft - Width;
         TextLeft = InitLeft - TextWidth;

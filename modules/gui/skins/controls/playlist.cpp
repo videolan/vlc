@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.2 2003/04/16 21:40:07 ipkiss Exp $
+ * $Id: playlist.cpp,v 1.3 2003/04/17 19:56:31 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -328,21 +328,21 @@ void ControlPlayList::DrawCase( Graphics *dest, int i, int x, int y, int w,
     F->Print( dest,
         Num,
         CaseTextLeft[j] - x, TextTop + j * CaseHeight - y,
-        NumWidth - Margin, CaseHeight, DT_RIGHT );
+        NumWidth - Margin, CaseHeight, VLC_FONT_ALIGN_RIGHT );
 
     // Print name
     F->Print( dest,
         GetFileName( i ),
         NumWidth + Margin + CaseTextLeft[j] - x,
         TextTop + j * CaseHeight - y,
-        FileWidth - 2 * Margin, CaseHeight, DT_LEFT );
+        FileWidth - 2 * Margin, CaseHeight, VLC_FONT_ALIGN_LEFT );
 
     // Print info
     F->Print( dest,
         "no info",
         NumWidth + FileWidth + Margin + CaseTextLeft[j] - x,
         TextTop + j * CaseHeight - y,
-        InfoWidth - Margin, CaseHeight, DT_CENTER );
+        InfoWidth - Margin, CaseHeight, VLC_FONT_ALIGN_CENTER );
 }
 //---------------------------------------------------------------------------
 char * ControlPlayList::GetFileName( int i )
