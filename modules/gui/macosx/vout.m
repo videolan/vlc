@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.35 2003/02/23 05:53:53 jlj Exp $
+ * $Id: vout.m,v 1.36 2003/03/04 23:32:06 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -909,26 +909,161 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     return( YES );
 }
 
+- (void)mouseDown:(NSEvent *)o_event
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    vlc_value_t val;
+
+    switch( [o_event type] )
+    {        
+        case NSLeftMouseDown:
+        {
+            var_Get( p_vout, "mouse-button-down", &val );
+            val.i_int |= 1;
+            var_Set( p_vout, "mouse-button-down", val );
+        }
+        break;
+        
+        default:
+            [super mouseDown: o_event];
+        break;
+    }
+}
+
+- (void)otherMouseDown:(NSEvent *)o_event
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    vlc_value_t val;
+
+    switch( [o_event type] )
+    {
+        case NSOtherMouseDown:
+        {
+            var_Get( p_vout, "mouse-button-down", &val );
+            val.i_int |= 2;
+            var_Set( p_vout, "mouse-button-down", val );
+        }
+        break;
+        
+        default:
+            [super mouseDown: o_event];
+        break;
+    }
+}
+
+- (void)rightMouseDown:(NSEvent *)o_event
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    vlc_value_t val;
+
+    switch( [o_event type] )
+    {
+        case NSRightMouseDown:
+        {
+            var_Get( p_vout, "mouse-button-down", &val );
+            val.i_int |= 4;
+            var_Set( p_vout, "mouse-button-down", val );
+        }
+        break;
+        
+        default:
+            [super mouseDown: o_event];
+        break;
+    }
+}
+
 - (void)mouseUp:(NSEvent *)o_event
 {
     vout_thread_t * p_vout;
     id o_window = [self window];
     p_vout = (vout_thread_t *)[o_window getVout];
+    vlc_value_t val;
 
     switch( [o_event type] )
     {
         case NSLeftMouseUp:
         {
-            vlc_value_t val;
-            val.b_bool = VLC_TRUE;
-            var_Set( p_vout, "mouse-clicked", val );        
+            vlc_value_t b_val;
+            b_val.b_bool = VLC_TRUE;
+            var_Set( p_vout, "mouse-clicked", b_val );
+            
+            var_Get( p_vout, "mouse-button-down", &val );
+            val.i_int &= ~1;
+            var_Set( p_vout, "mouse-button-down", val );
         }
         break;
-
+                
         default:
             [super mouseUp: o_event];
         break;
     }
+}
+
+- (void)otherMouseUp:(NSEvent *)o_event
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    vlc_value_t val;
+
+    switch( [o_event type] )
+    {
+        case NSOtherMouseUp:
+        {
+            var_Get( p_vout, "mouse-button-down", &val );
+            val.i_int &= ~2;
+            var_Set( p_vout, "mouse-button-down", val );
+        }
+        break;
+                
+        default:
+            [super mouseUp: o_event];
+        break;
+    }
+}
+
+- (void)rightMouseUp:(NSEvent *)o_event
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    vlc_value_t val;
+
+    switch( [o_event type] )
+    {
+        case NSRightMouseUp:
+        {
+            var_Get( p_vout, "mouse-button-down", &val );
+            val.i_int &= ~4;
+            var_Set( p_vout, "mouse-button-down", val );
+        }
+        break;
+        
+        default:
+            [super mouseUp: o_event];
+        break;
+    }
+}
+
+- (void)mouseDragged:(NSEvent *)o_event
+{
+    [self mouseMoved:o_event];
+}
+
+- (void)otherMouseDragged:(NSEvent *)o_event
+{
+    [self mouseMoved:o_event];
+}
+
+- (void)rightMouseDragged:(NSEvent *)o_event
+{
+    [self mouseMoved:o_event];
 }
 
 - (void)mouseMoved:(NSEvent *)o_event
