@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.28 2003/06/25 19:28:10 fenrir Exp $
+ * $Id: ts.c,v 1.29 2003/07/13 12:35:13 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -656,7 +656,6 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                             i_cat = AUDIO_ES;
                             break;
                         case A52_AUDIO_ES:
-                        case A52DVB_AUDIO_ES:
                             if ( !b_vls_compat )
                                 i_fourcc = VLC_FOURCC('a','5','2',' ');
                             else
@@ -1317,7 +1316,6 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     i_cat = AUDIO_ES;
                     break;
                 case A52_AUDIO_ES:
-                case A52DVB_AUDIO_ES:
                     if ( !b_vls_compat )
                         i_fourcc = VLC_FOURCC('a','5','2',' ');
                     else
@@ -1604,7 +1602,6 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                         strcat( psz_desc, " (lpcm)" );
                         break;
                     case A52_AUDIO_ES:
-                    case A52DVB_AUDIO_ES:
                     case A52B_AUDIO_ES:
                         strcat( psz_desc, " (A52)" );
                         break;
