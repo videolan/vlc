@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: adjust.c,v 1.15 2004/01/22 15:00:10 sigmunau Exp $
+ * $Id: adjust.c,v 1.16 2004/01/25 03:28:32 hartman Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>
  *
@@ -57,15 +57,15 @@ static int  SendEvents( vlc_object_t *, char const *,
  * Module descriptor
  *****************************************************************************/
 
-#define CONT_TEXT N_("Set image contrast")
+#define CONT_TEXT N_("Image contrast (0-2)")
 #define CONT_LONGTEXT N_("Set the image contrast, between 0 and 2. Defaults to 1")
-#define HUE_TEXT N_("Set image hue")
+#define HUE_TEXT N_("Image hue (0-360)")
 #define HUE_LONGTEXT N_("Set the image hue, between 0 and 360. Defaults to 0")
-#define SAT_TEXT N_("Set image saturation")
+#define SAT_TEXT N_("Image saturation (0-3)")
 #define SAT_LONGTEXT N_("Set the image saturation, between 0 and 3. Defaults to 1")
-#define LUM_TEXT N_("Set image brightness")
+#define LUM_TEXT N_("Image brightness (0-2)")
 #define LUM_LONGTEXT N_("Set the image brightness, between 0 and 2. Defaults to 1")
-#define GAMMA_TEXT N_("Set image gamma")
+#define GAMMA_TEXT N_("Image gamma (0-10)")
 #define GAMMA_LONGTEXT N_("Set the image gamma, between 0.01 and 10. Defaults to 1")
 
 
@@ -76,7 +76,7 @@ vlc_module_begin();
     add_integer_with_range( "hue", 0, 0, 360, NULL, HUE_TEXT, HUE_LONGTEXT, VLC_FALSE );
     add_float_with_range( "saturation", 1.0, 0.0, 3.0, NULL, SAT_TEXT, SAT_LONGTEXT, VLC_FALSE );
     add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL, GAMMA_TEXT, GAMMA_LONGTEXT, VLC_FALSE );
-    set_description( _("contrast/hue/saturation/brightness/gamma filter") );
+    set_description( _("Image properties filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "adjust" );
     set_callbacks( Create, Destroy );
@@ -120,6 +120,12 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_manage = NULL;
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
+    
+    var_Create( p_vout, "contrast", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "brightness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "saturation", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "gamma", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
 
     return VLC_SUCCESS;
 }
@@ -218,6 +224,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     int32_t i_cont, i_lum;
     int i_sat, i_sin, i_cos, i_x, i_y;
     int i;
+    vlc_value_t val;
 
     /* This is a new frame. Get a structure from the video_output. */
     while( ( p_outpic = vout_CreatePicture( p_vout->p_sys->p_vout, 0, 0, 0 ) )
@@ -233,12 +240,17 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
-    /* Get configuration variables */
-    i_cont = config_GetFloat( p_vout, "contrast" ) * 255;
-    i_lum = (config_GetFloat( p_vout, "brightness" ) - 1.0) * 255;
-    f_hue = config_GetInt( p_vout, "hue" ) * M_PI / 180;
-    i_sat = config_GetFloat( p_vout, "saturation" ) * 256;
-    f_gamma = 1.0 / config_GetFloat( p_vout, "gamma" );
+    /* Getvariables */
+    var_Get( p_vout, "contrast", &val );
+    i_cont = (int) ( val.f_float * 255 );
+    var_Get( p_vout, "brightness", &val );
+    i_lum = (int) (( val.f_float - 1.0 ) * 255 );
+    var_Get( p_vout, "hue", &val );
+    f_hue = (float) ( val.i_int * M_PI / 180 );
+    var_Get( p_vout, "saturation", &val );
+    i_sat = (int) (val.f_float * 256 );
+    var_Get( p_vout, "gamma", &val );
+    f_gamma = 1.0 / val.f_float;
 
     /* Contrast is a fast but kludged function, so I put this gap to be
      * cleaner :) */
