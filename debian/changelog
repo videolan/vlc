@@ -1,10 +1,19 @@
+vlc (0.5.2-4) unstable; urgency=low
+
+  * Changed the section of gnome-vlc and kvlc according to new Debian
+    archive sections.
+  * Updated woody-buildpackage so that packages say "stable".
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue,  1 Apr 2003 18:08:01 +0200
+
 vlc (0.5.2-3) unstable; urgency=low
 
   * Added explicit dependencies on vlc to legacy packages to make linda and
     lintian happier.
   * Added correct versioned build-dependency on debhelper.
+  * Updated the autotools helper files in extras/faad.
 
- -- Samuel Hocevar <sam@zoy.org>  Tue, 25 Mar 2003 23:21:51 +0100
+ -- Samuel Hocevar <sam@zoy.org>  Wed, 26 Mar 2003 02:50:34 +0100
 
 vlc (0.5.2-2) unstable; urgency=low
 

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: woody-buildpackage,v 1.11 2003/03/25 22:55:32 sam Exp $
+# $Id: woody-buildpackage,v 1.12 2003/04/01 16:13:39 sam Exp $
 # Build VLC for a Woody Debian system
 
 if test ! -d debian
@@ -11,6 +11,7 @@ fi
 
 # changelog: replace (1.2.3-4) with (1.2.3-0woody.4)
 sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
+    -e 's/ unstable; / stable; /' \
     < debian/changelog > debian/changelog.woody
 
 # control: replace liba52-*-dev with a52dec-dev (>=0.7.3)
@@ -24,6 +25,8 @@ sed -e 's/^vlc (\([^)]*\)-\([^-)]*\))/vlc (\1-0woody.\2)/' \
 #                 libflac-dev
 #                 libidl0 (workaround for mozilla-dev's bad deps)
 #                 libglib2.0-0 (workaround for mozilla-dev's bad deps)
+#          change Section: gnome with Section: graphics
+#                 Section: kde with Section: kde
 sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/libdv[0-9]*-dev/libdv-dev/' \
     -e 's/kdelibs[0-9]*-dev/kdelibs-dev/' \
@@ -37,6 +40,8 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
     -e 's/, libflac-dev[^,]*//' \
     -e 's/, libidl0[^,]*//' \
     -e 's/, libglib2.0-0[^,]*//' \
+    -e 's/Section: gnome/Section: graphics/' \
+    -e 's/Section: kde/Section: graphics/' \
     < debian/control > debian/control.woody
 
 # rules: remove wxwindows stuff

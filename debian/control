@@ -28,7 +28,7 @@ Description: development files for VLC
  for VLC, or standalone applications that use VLC features.
 
 Package: gnome-vlc
-Section: graphics
+Section: gnome
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Recommends: vlc-plugin-esd
@@ -40,6 +40,7 @@ Description: GNOME frontend for VLC
  it, use the `--intf gnome' flag or run the `gnome-vlc' program.
 
 Package: vlc-gnome
+Section: gnome
 Architecture: any
 Depends: vlc, gnome-vlc
 Description: legacy package that you should remove
@@ -179,6 +180,7 @@ Description: a multimedia plugin for Mozilla based on VLC
  window. There is also support for fullscreen display and javascript control.
 
 Package: kvlc
+Section: kde
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Recommends: vlc-plugin-arts
