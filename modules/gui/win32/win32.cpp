@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.9 2003/01/21 21:20:54 ipkiss Exp $
+ * $Id: win32.cpp,v 1.10 2003/01/22 21:42:51 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *

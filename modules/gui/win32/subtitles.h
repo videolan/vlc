@@ -1,8 +1,8 @@
 /*****************************************************************************
- * sout.h: the stream ouput dialog box
+ * subtitles.h: Dialog box for divx subtitle selection
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: sout.h,v 1.2 2003/01/22 21:42:51 ipkiss Exp $
+ * $Id: subtitles.h,v 1.1 2003/01/22 21:42:51 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -21,49 +21,35 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef soutH
-#define soutH
+#ifndef subtitlesH
+#define subtitlesH
 //---------------------------------------------------------------------------
 #include <Classes.hpp>
 #include <Controls.hpp>
 #include <StdCtrls.hpp>
 #include <Forms.hpp>
-#include <ExtCtrls.hpp>
-#include "CSPIN.h"
 #include <Dialogs.hpp>
 #include <Buttons.hpp>
 //---------------------------------------------------------------------------
-class TSoutDlg : public TForm
+class TSubtitlesDlg : public TForm
 {
 __published:	// IDE-managed Components
-    TGroupBox *GroupBoxStreamOut;
-    TEdit *EditMrl;
-    TPanel *PanelAccess;
-    TRadioButton *RadioButtonFile;
-    TRadioButton *RadioButtonUDP;
-    TRadioButton *RadioButtonRTP;
     TOpenDialog *OpenDialog1;
-    TButton *ButtonBrowse;
+    TGroupBox *GroupBoxSubtitles;
+    TEdit *EditDelay;
+    TEdit *EditFPS;
     TEdit *EditFile;
-    TCSpinEdit *SpinEditPort;
-    TEdit *EditAddress;
-    TLabel *LabelPort;
-    TLabel *LabelAddress;
+    TButton *ButtonBrowse;
     TBitBtn *BitBtnOK;
     TBitBtn *BitBtnCancel;
-    TPanel *PanelMux;
-    TRadioButton *RadioButtonPS;
-    TRadioButton *RadioButtonTS;
+    TLabel *LabelDelay;
+    TLabel *LabelFPS;
     void __fastcall ButtonBrowseClick( TObject *Sender );
-    void __fastcall CustomEditChange( TObject *Sender );
-    void __fastcall RadioButtonMuxClick( TObject *Sender );
-    void __fastcall RadioButtonAccessClick( TObject *Sender );
     void __fastcall BitBtnOKClick( TObject *Sender );
 private:	// User declarations
-    void __fastcall RebuildMrl();
     intf_thread_t *p_intf;
 public:		// User declarations
-    __fastcall TSoutDlg( TComponent* Owner, intf_thread_t *_p_intf );
+    __fastcall TSubtitlesDlg( TComponent* Owner, intf_thread_t *p_intf );
 };
 //---------------------------------------------------------------------------
 #endif

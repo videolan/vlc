@@ -460,7 +460,12 @@ object MainFrameDlg: TMainFrameDlg
         Action = NetworkStreamAction
         Caption = '&Network stream...'
       end
-      object Streamouput1: TMenuItem
+      object MenuAddSubtitles: TMenuItem
+        Tag = 3
+        Action = AddSubtitlesAction
+      end
+      object MenuStreamOuput: TMenuItem
+        Tag = 3
         Action = StreamOutputAction
       end
       object N8: TMenuItem
@@ -2594,6 +2599,13 @@ object MainFrameDlg: TMainFrameDlg
       Caption = '&Stream output...'
       Hint = 'Open the stream output'
       OnExecute = StreamOutputActionExecute
+    end
+    object AddSubtitlesAction: TAction
+      Tag = 3
+      Category = 'Menu'
+      Caption = '&Add subtitles...'
+      Hint = 'Add a subtitle file'
+      OnExecute = AddSubtitlesActionsExecute
     end
     object PlaylistAction: TAction
       Tag = 3

@@ -37,6 +37,7 @@
 #include "messages.h"
 #include "playlist.h"
 #include "sout.h"
+#include "subtitles.h"
 #include "misc.h"
 #include "win32_common.h"
 
@@ -176,6 +177,13 @@ void __fastcall TMainFrameDlg::NetworkStreamActionExecute( TObject *Sender )
         p_intf->p_sys->p_network = p_network;
     }
     p_network->Show();
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::AddSubtitlesActionsExecute( TObject *Sender )
+{
+    TSubtitlesDlg *p_subtitles = new TSubtitlesDlg( this, p_intf );
+    p_subtitles->ShowModal();
+    delete p_subtitles;
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::StreamOutputActionExecute( TObject *Sender )

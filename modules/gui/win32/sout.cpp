@@ -2,7 +2,7 @@
  * sout.cpp: the stream ouput dialog box
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: sout.cpp,v 1.1 2003/01/21 19:49:09 ipkiss Exp $
+ * $Id: sout.cpp,v 1.2 2003/01/22 21:42:51 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *

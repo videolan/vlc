@@ -27,7 +27,7 @@
 #include <vlc/intf.h>
 
 #include "disc.h"
-#include "misc.h";
+#include "misc.h"
 #include "win32_common.h"
 
 //---------------------------------------------------------------------------

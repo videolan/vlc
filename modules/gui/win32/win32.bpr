@@ -5,11 +5,11 @@
     <VERSION value="BCB.05.03"/>
     <PROJECT value="libwin32_plugin.dll"/>
     <OBJFILES value="win32.obj mainframe.obj network.obj playlist.obj preferences.obj about.obj 
-      disc.obj menu.obj messages.obj misc.obj dragdrop.obj sout.obj"/>
+      disc.obj menu.obj messages.obj misc.obj dragdrop.obj sout.obj subtitles.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) mainframe.dfm network.dfm playlist.dfm preferences.dfm 
-      about.dfm disc.dfm messages.dfm sout.dfm"/>
+      about.dfm disc.dfm messages.dfm sout.dfm subtitles.dfm"/>
     <LIBFILES value=""/>
     <LIBRARIES value="VCLX50.lib bcbsmp50.lib VCL50.lib"/>
     <SPARELIBS value="VCL50.lib bcbsmp50.lib VCLX50.lib"/>
