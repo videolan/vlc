@@ -118,7 +118,7 @@ gboolean GtkControlPause( GtkWidget       *widget,
         return FALSE;
     }
 
-    var_SetInteger( p_intf->p_sys->p_input, PAUSE_S );
+    var_SetInteger( p_intf->p_sys->p_input, "state", PAUSE_S );
 
     return TRUE;
 }
