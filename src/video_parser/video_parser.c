@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.58 2000/12/22 13:04:45 sam Exp $
+ * $Id: video_parser.c,v 1.59 2000/12/29 12:49:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -140,6 +140,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.nonintra_quant.b_allocated = 0;
     p_vpar->sequence.chroma_intra_quant.b_allocated = 0;
     p_vpar->sequence.chroma_nonintra_quant.b_allocated = 0;
+    /* FIXME : initialize matrix_coefficients, but to what value ? */
 
     /* Initialize copyright information */
     p_vpar->sequence.b_copyright_flag = 0;

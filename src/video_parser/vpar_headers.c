@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.64 2000/12/29 10:52:40 massiot Exp $
+ * $Id: vpar_headers.c,v 1.65 2000/12/29 12:49:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -622,7 +622,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     else
     {
         /* Warn synchro we have a new picture (updates pictures index). */
-        vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
+        vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type,
+                                p_vpar->picture.b_repeat_first_field );
 
         if( b_parsable )
         {

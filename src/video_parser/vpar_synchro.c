@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.67 2000/12/29 10:52:40 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.68 2000/12/29 12:49:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -414,7 +414,8 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * vpar_SynchroNewPicture: Update stream structure and PTS
  *****************************************************************************/
-void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
+void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
+                             boolean_t b_repeat_field )
 {
     pes_packet_t *  p_pes;
     mtime_t         period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
@@ -468,7 +469,17 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
     /* FIXME: use decoder_fifo callback */
     p_pes = DECODER_FIFO_START( *p_vpar->bit_stream.p_decoder_fifo );
 
-    p_vpar->synchro.current_pts += period;
+    if( b_repeat_field )
+    {
+        /* MPEG-2 repeat_first_field */
+        /* FIXME : this is not exactly what we should do, repeat_first_field
+         * only regards the next picture */
+        p_vpar->synchro.current_pts += period + (period >> 1);
+    }
+    else
+    {
+        p_vpar->synchro.current_pts += period;
+    }
 
     if( i_coding_type == B_CODING_TYPE )
     {
@@ -526,12 +537,16 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
 
         if( p_pes->i_pts )
         {
+#if 0
             int     i_n_b;
+#endif
 
             /* Store the PTS for the next time we have to date an I picture. */
             p_vpar->synchro.backward_pts = p_pes->i_pts;
             p_pes->i_pts = 0;
-
+            /* FIXME : disabled because it conflicts with streams having
+             * b_repeat_first_field */
+#if 0
             i_n_b = (p_vpar->synchro.backward_pts
                         - p_vpar->synchro.current_pts) / period - 1;
             if( i_n_b != p_vpar->synchro.i_n_b )
@@ -542,6 +557,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
                               p_vpar->synchro.i_n_b, i_n_b );
                 p_vpar->synchro.i_n_b = i_n_b;
             }
+#endif
         }
     }
 
