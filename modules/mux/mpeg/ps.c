@@ -88,7 +88,7 @@ static void StreamIdRelease     ( vlc_bool_t *id, int i_id_min, int i_id );
 
 typedef struct ps_stream_s
 {
-    int             i_stream_id;
+    int i_stream_id;
 
 } ps_stream_t;
 
@@ -107,7 +107,10 @@ struct sout_mux_sys_t
     int i_pes_count;
     int i_system_header;
     int i_dts_delay;
-    int64_t         i_bitrate;
+
+    int64_t i_instant_bitrate;
+    int64_t i_instant_size;
+    int64_t i_instant_dts;
 
     vlc_bool_t b_mpeg2;
 };
@@ -133,7 +136,6 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = Mux;
     p_mux->p_sys        = p_sys = malloc( sizeof( sout_mux_sys_t ) );
-    p_sys->i_bitrate    = 2000; /* account for header overhead, an approximation */
 
     /* Init free stream id */
     StreamIdInit( p_sys->stream_id_a52,  8  );
@@ -147,6 +149,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_video_bound   = 0;
     p_sys->i_system_header = 0;
     p_sys->i_pes_count     = 0;
+
+    p_sys->i_instant_bitrate  = 0;
+    p_sys->i_instant_size     = 0;
+    p_sys->i_instant_dts      = 0;
 
     p_sys->b_mpeg2 = !(p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mpeg1" ));
 
@@ -169,10 +175,8 @@ static void Close( vlc_object_t * p_this )
     msg_Info( p_mux, "Close" );
 
     p_end = block_New( p_mux, 4 );
-    p_end->p_buffer[0] = 0x00;
-    p_end->p_buffer[1] = 0x00;
-    p_end->p_buffer[2] = 0x01;
-    p_end->p_buffer[3] = 0xb9;
+    p_end->p_buffer[0] = 0x00; p_end->p_buffer[1] = 0x00;
+    p_end->p_buffer[2] = 0x01; p_end->p_buffer[3] = 0xb9;
 
     sout_AccessOutWrite( p_mux->p_access, p_end );
 
@@ -261,14 +265,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     if( p_input->p_fmt->i_cat == AUDIO_ES )
     {
         p_sys->i_audio_bound++;
-        p_sys->i_bitrate += p_input->p_fmt->i_bitrate * 
-                            p_input->p_fmt->audio.i_channels;  /* set the bitrate */
     }
     else if( p_input->p_fmt->i_cat == VIDEO_ES )
     {
         p_sys->i_video_bound++;
-        p_sys->i_bitrate += p_input->p_fmt->i_bitrate;  /* set the bitrate */
     }
+
+    /* Try to set a sensible default value for the instant bitrate */
+    p_sys->i_instant_bitrate += p_input->p_fmt->i_bitrate + 1000/* overhead */;
 
     return VLC_SUCCESS;
 
@@ -360,6 +364,24 @@ static int Mux( sout_mux_t *p_mux )
         /* Write regulary PackHeader */
         if( p_sys->i_pes_count % 30 == 0)
         {
+            /* Update the instant bitrate every second or so */
+            if( p_sys->i_instant_size &&
+                i_dts - p_sys->i_instant_dts > 1000000 )
+            {
+                int64_t i_instant_bitrate = p_sys->i_instant_size * 8000000 /
+                    ( i_dts - p_sys->i_instant_dts );
+
+                p_sys->i_instant_bitrate += i_instant_bitrate;
+                p_sys->i_instant_bitrate /= 2;
+
+                p_sys->i_instant_size = 0;
+                p_sys->i_instant_dts = i_dts;
+            }
+            else if( !p_sys->i_instant_size )
+            {
+                p_sys->i_instant_dts = i_dts;
+            }
+
             MuxWritePackHeader( p_mux, &p_ps, i_dts );
         }
 
@@ -381,9 +403,15 @@ static int Mux( sout_mux_t *p_mux )
         p_data = block_FifoGet( p_input->p_fifo );
         E_( EStoPES )( p_mux->p_sout, &p_data, p_data,
                        p_input->p_fmt, p_stream->i_stream_id,
-                       p_mux->p_sys->b_mpeg2, 0, 0 );
+                       p_sys->b_mpeg2, 0, 0 );
 
         block_ChainAppend( &p_ps, p_data );
+
+        /* Get size of output data so we can calculate the instant bitrate */
+        for( p_data = p_ps; p_data; p_data = p_data->p_next )
+        {
+            p_sys->i_instant_size += p_data->i_buffer;
+        }
 
         sout_AccessOutWrite( p_mux->p_access, p_ps );
 
@@ -434,17 +462,17 @@ static void MuxWritePackHeader( sout_mux_t *p_mux, block_t **p_buf,
     block_t *p_hdr;
     mtime_t i_scr;
     int i_mux_rate;
-    
+
     i_scr = (i_dts - p_sys->i_dts_delay) * 9 / 100;
 
     p_hdr = block_New( p_mux, 18 );
     p_hdr->i_pts = p_hdr->i_dts = i_dts;
     bits_initwrite( &bits, 14, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01ba );
-    i_mux_rate = p_sys->i_bitrate / (8 * 50); 
-//    i_mux_rate = (p_sys->i_bitrate + (8 * 50) - 1) / (8 * 50); 
-   /* magic, from MPEG1/2 mux/demux    Copyright (c) 2000, 2001, 2002 Fabrice Bellard */
-    
+
+    /* The spec specifies that the mux rate must be rounded upwards */
+    i_mux_rate = (p_sys->i_instant_bitrate + 8 * 50 - 1 ) / (8 * 50);
+
     if( p_sys->b_mpeg2 )
     {
         bits_write( &bits, 2, 0x01 );
@@ -513,8 +541,9 @@ static void MuxWriteSystemHeader( sout_mux_t *p_mux, block_t **p_buf,
 
     p_hdr = block_New( p_mux, 12 + i_nb_stream * 3 );
     p_hdr->i_dts = p_hdr->i_pts = i_dts;
-    i_mux_rate = p_sys->i_bitrate / (8 * 50); 
-//    i_mux_rate = (p_sys->i_bitrate + (8 * 50) - 1) / (8 * 50); 
+
+    /* The spec specifies that the mux rate must be rounded upwards */
+    i_mux_rate = (p_sys->i_instant_bitrate + 8 * 50 - 1 ) / (8 * 50);
 
     bits_initwrite( &bits, 12 + i_nb_stream * 3, p_hdr->p_buffer );
     bits_write( &bits, 32, 0x01bb );
