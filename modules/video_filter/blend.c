@@ -756,20 +756,22 @@ static void BlendPalYUY2( filter_t *p_filter, picture_t *p_dst_pic,
             else if( i_trans == MAX_TRANS )
             {
                 /* Completely opaque. Completely overwrite underlying pixel */
+		/* NOTE: YUVP is actually YVUP */
                 p_dst[i_x * 2]     = p_pal[p_src2[i_x]][0];
-                p_dst[i_x * 2 + 1] = p_pal[p_src2[i_x]][1];
-                p_dst[i_x * 2 + 3] = p_pal[p_src2[i_x]][2];
+                p_dst[i_x * 2 + 1] = p_pal[p_src2[i_x]][2];
+                p_dst[i_x * 2 + 3] = p_pal[p_src2[i_x]][1];
             }
             else
             {
                 /* Blending */
+		/* NOTE: YUVP is actually YVUP */
                 p_dst[i_x * 2]     = ( (uint16_t)p_pal[p_src2[i_x]][0] *
                     i_trans + (uint16_t)p_src1[i_x * 2] *
                     (MAX_TRANS - i_trans) ) >> TRANS_BITS;
-                p_dst[i_x * 2 + 1] = ( (uint16_t)p_pal[p_src2[i_x]][1] *
+                p_dst[i_x * 2 + 1] = ( (uint16_t)p_pal[p_src2[i_x]][2] *
                     i_trans + (uint16_t)p_src1[i_x * 2 + 1] *
                     (MAX_TRANS - i_trans) ) >> TRANS_BITS;
-                p_dst[i_x * 2 + 3] = ( (uint16_t)p_pal[p_src2[i_x]][2] *
+                p_dst[i_x * 2 + 3] = ( (uint16_t)p_pal[p_src2[i_x]][1] *
                     i_trans + (uint16_t)p_src1[i_x * 2 + 3] *
                     (MAX_TRANS - i_trans) ) >> TRANS_BITS;
             }
