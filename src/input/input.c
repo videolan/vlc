@@ -1434,6 +1434,7 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
 
         newval.f_float += val.f_float;
     }
+    var_Change( p_input, "position", VLC_VAR_SETVALUE, &newval, NULL );
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_seek =
@@ -1465,11 +1466,17 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
         val.f_float = (double)newval.i_time / (double)val.i_time;
         if( !strcmp( psz_cmd, "time-offset" ) )
         {
+            vlc_value_t t;
             var_Set( p_input, "position-offset", val );
+
+            var_Get( p_input, "time", &t );
+            t.i_time += newval.i_time;
+            var_Change( p_input, "time", VLC_VAR_SETVALUE, &t, NULL );
         }
         else
         {
             var_Set( p_input, "position", val );
+            var_Change( p_input, "time", VLC_VAR_SETVALUE, &newval, NULL );
         }
     }
     else
