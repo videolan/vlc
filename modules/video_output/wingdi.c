@@ -2,7 +2,7 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: wingdi.c,v 1.6 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: wingdi.c,v 1.7 2003/10/25 00:42:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -194,9 +194,9 @@ static int Init( vout_thread_t *p_vout )
             break;
         }
 
-        vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_width,
-                              p_vout->output.i_height,
-                              p_vout->output.i_chroma );
+        vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,
+                              p_vout->output.i_width, p_vout->output.i_height,
+                              p_vout->output.i_aspect );
 
         if( p_pic->i_planes == 0 )
         {
