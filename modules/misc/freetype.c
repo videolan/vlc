@@ -82,9 +82,12 @@ static line_desc_t *NewLine( byte_t * );
 #define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module. " \
     "If set to something different than 0 this option will override the " \
     "relative font size " )
-#define OPACITY_TEXT N_("Opacity, 0..100%")
+#define OPACITY_TEXT N_("Opacity, 0..255")
 #define OPACITY_LONGTEXT N_("The opacity (inverse of transparency) of overlay text. " \
-    "0 = totally transparent, 100 = totally opaque. " )
+    "0 = totally transparent, 255 = totally opaque. " )
+#define COLOR_TEXT N_("Color, RGB, 0x000000 - 0xFFFFFF")
+#define COLOR_LONGTEXT N_("The color of overlay text. 1 byte for each color, hexadecimal." \
+    "#000000 = all colors off, 0xFF0000 = just Red, 0xFFFFFF = all color on [White]" )
 #define FONTSIZER_TEXT N_("Font size")
 #define FONTSIZER_LONGTEXT N_("The size of the fonts used by the osd module" )
 
@@ -101,8 +104,10 @@ vlc_module_begin();
               VLC_FALSE );
     add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT,
                  FONTSIZE_LONGTEXT, VLC_TRUE );
-    add_integer( "freetype-opacity", 100, NULL, OPACITY_TEXT,
+    add_integer( "freetype-opacity", 255, NULL, OPACITY_TEXT,
                  OPACITY_LONGTEXT, VLC_TRUE );
+    add_integer( "freetype-color", 0xFFFFFF, NULL, COLOR_TEXT,
+                 COLOR_LONGTEXT, VLC_TRUE );
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, VLC_FALSE );
         change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
@@ -136,7 +141,8 @@ struct line_desc_t
     line_desc_t    *p_next;
 };
 
-static void Render    ( filter_t *, subpicture_t *, subpicture_data_t * );
+static void Render    ( filter_t *, subpicture_t *, subpicture_data_t *, uint8_t,
+                        uint8_t, uint8_t, uint8_t );
 static void FreeString( subpicture_data_t * );
 static void FreeLine( line_desc_t * );
 
@@ -151,7 +157,8 @@ struct filter_sys_t
     FT_Library     p_library;   /* handle to library     */
     FT_Face        p_face;      /* handle to face object */
     vlc_bool_t     i_use_kerning;
-    int            i_opacity;   /* default is opaque */
+    uint8_t        i_opacity;   
+    uint8_t        i_red, i_green, i_blue; /* color components */
     uint8_t        pi_gamma[256];
 };
 
@@ -178,7 +185,11 @@ static int Create( vlc_object_t *p_this )
     }
     p_sys->p_face = 0;
     p_sys->p_library = 0;
-    p_sys->i_opacity = 100; /* default to fully opaque */
+    /* default to opaque letters, white (all colors set to 255): */
+    p_sys->i_opacity = 255;
+    p_sys->i_red = 255;
+    p_sys->i_green = 255;
+    p_sys->i_blue = 255;
 
     for( i = 0; i < 256; i++ )
     {
@@ -192,6 +203,8 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_filter, "freetype-rel-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "freetype-opacity",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_filter, "freetype-color",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* Look what method was requested */
@@ -244,12 +257,24 @@ static int Create( vlc_object_t *p_this )
     var_Get( p_filter, "freetype-opacity", &val );
     if( val.i_int )
     {
-	    if ( ( val.i_int > -1 ) && ( val.i_int < 101 ) )  /* valid range 0 to 100% */
+	    if ( ( val.i_int > -1 ) && ( val.i_int < 256 ) )  /* valid range 0 to 255 */
 	    {
            p_sys->i_opacity = val.i_int;
         }
-        else msg_Warn(p_filter, "Invalid freetype opacity specified, using 100%");        
+        else msg_Warn(p_filter, "Invalid freetype opacity specified, using 255");        
     }
+    var_Get( p_filter, "freetype-color", &val );
+    if( val.i_int )
+    {
+	    if ( ( val.i_int > -1 ) && ( val.i_int < 0xFFFFFF ) )  /* valid range */
+	    {
+           p_sys->i_blue = val.i_int & 0x000000FF;
+           p_sys->i_green = (val.i_int & 0x0000FF00)/256;
+           p_sys->i_red = (val.i_int & 0x00FF0000)/(256*256);
+        }
+        else msg_Warn(p_filter, "Invalid freetype color specified, using white [0xFFFFFF]");        
+    }
+    
     var_Get( p_filter, "freetype-fontsize", &val );
     if( val.i_int )
     {
@@ -307,13 +332,20 @@ static void Destroy( vlc_object_t *p_this )
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
 static void Render( filter_t *p_filter, subpicture_t *p_spu,
-                    subpicture_data_t *p_string )
+                    subpicture_data_t *p_string, uint8_t opacity, 
+                    uint8_t red, uint8_t green, uint8_t blue )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     line_desc_t *p_line;
     uint8_t *p_y, *p_u, *p_v, *p_a;
     video_format_t fmt;
     int i, x, y, i_pitch;
+    uint8_t i_y, i_u, i_v;  /* YUV values, derived from incoming RGB */
+    
+    /* calculate text color components: */
+    i_y = (uint8_t) (0.257 * red) + (0.504 * green) + (0.098 * blue) + 16;
+    i_u = (uint8_t) -(0.148 * red) - (0.291 * green) + (0.439 * blue) + 128;
+    i_v = (uint8_t) (0.439 * red) - (0.368 * green) - (0.071 * blue) + 128;
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
@@ -343,7 +375,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
     memset( p_a, 0x00, i_pitch * p_spu->p_region->fmt.i_height );
 
 #define pi_gamma p_sys->pi_gamma
-#define opacity  p_sys->i_opacity
+/* #define opacity  p_sys->i_opacity */
 
     for( p_line = p_string->p_lines; p_line != NULL; p_line = p_line->p_next )
     {
@@ -372,16 +404,16 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
 
                     i_offset -= i_pitch;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/512;
                     i_offset += i_pitch; x--;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/512;
                     x += 2;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/512;
                     i_offset += i_pitch; x--;
                     p_a[i_offset + x] = ((uint16_t)p_a[i_offset + x] +
-                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/200;
+                      pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]])*opacity/512;
                     i_offset -= i_pitch;
                 }
                 i_offset += i_pitch;
@@ -396,7 +428,8 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
                for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                {
                    p_y[i_offset + x] =
-                       pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]]*opacity/100;
+                       pi_gamma[p_glyph->bitmap.buffer[i_bitmap_offset]]*opacity/256;
+                   p_u[i_offset + x] = i_u; p_v[i_offset + x] = i_v;
                }
                i_offset += i_pitch;
             }
@@ -659,7 +692,8 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 #undef face
 #undef glyph
 
-    Render( p_filter, p_subpic, p_string );
+    Render( p_filter, p_subpic, p_string, p_sys->i_opacity, 
+                 p_sys->i_red, p_sys->i_green, p_sys->i_blue );
     FreeString( p_string );
     block_Release( p_block );
     if( psz_unicode_orig ) free( psz_unicode_orig );
