@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004, 2003 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -715,7 +715,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
     wxString msg;
     msg.Printf( wxString(wxT("VLC media player " PACKAGE_VERSION)) +
         wxU(_(" (wxWindows interface)\n\n")) +
-        wxU(_("(c) 1996-2004 - the VideoLAN Team\n\n")) +
+        wxU(_("(c) 1996-2005 - the VideoLAN Team\n\n")) +
         wxU( vlc_wraptext(INTF_ABOUT_MSG,WRAPCOUNT,ISUTF8) ) + wxT("\n\n") +
         wxU(_("The VideoLAN team <videolan@videolan.org>\n"
               "http://www.videolan.org/\n\n")) );
