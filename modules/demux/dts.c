@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.3 2004/02/03 08:16:16 gbazin Exp $
+ * $Id: dts.c,v 1.4 2004/02/04 08:11:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -58,6 +58,41 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
+ * CheckSync: Check if buffer starts with a DTS sync code
+ *****************************************************************************/
+int CheckSync( uint8_t *p_peek )
+{
+    /* 14 bits, little endian version of the bitstream */
+    if( p_peek[0] == 0xff && p_peek[1] == 0x1f &&
+        p_peek[2] == 0x00 && p_peek[3] == 0xe8 &&
+        (p_peek[4] & 0xf0) == 0xf0 && p_peek[5] == 0x07 )
+    {
+        return VLC_SUCCESS;
+    }
+    /* 14 bits, big endian version of the bitstream */
+    else if( p_peek[0] == 0x1f && p_peek[1] == 0xff &&
+             p_peek[2] == 0xe8 && p_peek[3] == 0x00 &&
+             p_peek[4] == 0x07 && (p_peek[5] & 0xf0) == 0xf0)
+    {
+        return VLC_SUCCESS;
+    }
+    /* 16 bits, big endian version of the bitstream */
+    else if( p_peek[0] == 0x7f && p_peek[1] == 0xfe &&
+             p_peek[2] == 0x80 && p_peek[3] == 0x01 )
+    {
+        return VLC_SUCCESS;
+    }
+    /* 16 bits, little endian version of the bitstream */
+    else if( p_peek[0] == 0xfe && p_peek[1] == 0x7f &&
+             p_peek[2] == 0x01 && p_peek[3] == 0x80 )
+    {
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
+}
+
+/*****************************************************************************
  * Open: initializes ES structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
@@ -82,6 +117,25 @@ static int Open( vlc_object_t * p_this )
         {
             i_peek += GetDWLE( p_peek + i_peek - 4 ) + 8;
         }
+ 
+        /* TODO: should check wave format and sample_rate */
+
+        /* Some DTS wav files don't begin with a sync code so we do a more
+         * extensive search */
+        if( input_Peek( p_input, &p_peek, i_peek + DTS_PACKET_SIZE ) ==
+            i_peek + DTS_PACKET_SIZE )
+        {
+            int i_size = i_peek + DTS_PACKET_SIZE - DTS_MAX_HEADER_SIZE;
+
+            while( i_peek < i_size )
+            {
+                if( CheckSync( p_peek + i_peek ) != VLC_SUCCESS )
+                    /* The data is stored in 16 bits words */
+                    i_peek += 2;
+                else
+                    break;
+            }
+        }
     }
 
     /* Have a peep at the show. */
@@ -93,29 +147,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    /* 14 bits, little endian version of the bitstream */
-    if( p_peek[i_peek + 0] == 0xff && p_peek[i_peek + 1] == 0x1f &&
-        p_peek[i_peek + 2] == 0x00 && p_peek[i_peek + 3] == 0xe8 &&
-        (p_peek[i_peek + 4] & 0xf0) == 0xf0 && p_peek[i_peek + 5] == 0x07 )
-    {
-    }
-    /* 14 bits, big endian version of the bitstream */
-    else if( p_peek[i_peek + 0] == 0x1f && p_peek[i_peek + 1] == 0xff &&
-             p_peek[i_peek + 2] == 0xe8 && p_peek[i_peek + 3] == 0x00 &&
-             p_peek[i_peek + 4] == 0x07 && (p_peek[i_peek + 5] & 0xf0) == 0xf0)
-    {
-    }
-    /* 16 bits, big endian version of the bitstream */
-    else if( p_peek[i_peek + 0] == 0x7f && p_peek[i_peek + 1] == 0xfe &&
-             p_peek[i_peek + 2] == 0x80 && p_peek[i_peek + 3] == 0x01 )
-    {
-    }
-    /* 16 bits, little endian version of the bitstream */
-    else if( p_peek[i_peek + 0] == 0xfe && p_peek[i_peek + 1] == 0x7f &&
-             p_peek[i_peek + 2] == 0x01 && p_peek[i_peek + 3] == 0x80 )
-    {
-    }
-    else
+    if( CheckSync( p_peek + i_peek ) != VLC_SUCCESS )
     {
         if( p_input->psz_demux && !strncmp( p_input->psz_demux, "dts", 3 ) )
         {
