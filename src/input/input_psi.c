@@ -491,7 +491,7 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
 //  intf_DbgMsg("Section %d (last section %d)\n", i_current_section, i_last_section);
 
   /* Is this an update of the description for this program ? */
-  i_version = (p_pms[5] >> 1) && 0x1F;
+  i_version = (p_pms[5] >> 1) & 0x1F;
     if( p_pgrm->i_version != i_version )
     {
         intf_DbgMsg("Updating PMT for program %d\n", i_pgrm_number);
