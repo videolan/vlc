@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.4 2002/11/18 17:31:54 gbazin Exp $
+ * $Id: interface.cpp,v 1.5 2002/11/20 14:24:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -36,15 +36,14 @@
 #undef _
 
 #ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield()
-#undef CreateDialog()
+#undef Yield
+#undef CreateDialog
 #endif
 
 #include <wx/wxprec.h>
 #include <wx/wx.h>
 
 #include "wxwindows.h"
-#include "wx/artprov.h"
 
 /* include the toolbar graphics */
 #include "bitmaps/file.xpm"
@@ -59,11 +58,10 @@
 #include "bitmaps/previous.xpm"
 #include "bitmaps/next.xpm"
 #include "bitmaps/playlist.xpm"
+
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
-
-const int ID_TOOLBAR = 500;
 
 /* IDs for the controls and the menu commands */
 enum
@@ -192,7 +190,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     wxBitmap *p_bmp_playlist = new wxBitmap( playlist_xpm );
 
     wxToolBar *toolbar = CreateToolBar(
-        wxTB_HORIZONTAL | wxTB_TEXT | wxTB_FLAT | wxTB_DOCKABLE, ID_TOOLBAR );
+        wxTB_HORIZONTAL | wxTB_TEXT | wxTB_FLAT | wxTB_DOCKABLE );
 
     toolbar->AddTool( OpenFile_Event, _("File"), *p_bmp_file, HELP_FILE );
     toolbar->AddTool( OpenFile_Event, _("Disc"), *p_bmp_disc, HELP_DISC );
@@ -215,7 +213,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     wxBoxSizer *slider_sizer = new wxBoxSizer( wxVERTICAL );
     slider = new wxSlider( this, SliderScroll_Event, 0, 0, 100,
                            wxDefaultPosition, wxSize( 450, 50 ),
-                           wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_TOP );
+                           wxSL_HORIZONTAL | wxSL_TOP );
     slider_sizer->Add( slider, 0, wxGROW | wxALL | wxALIGN_CENTER, 5 );
 
     /* use the sizer for layout */
@@ -229,7 +227,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
      * for menu items and toolbar tools will automatically get displayed
      * here. */
     statusbar = CreateStatusBar(2);
-    int i_status_width[2] = {-1,-2};
+    int i_status_width[2] = {-2,-3};
     statusbar->SetStatusWidths( 2, i_status_width );
 
     SetTitle( COPYRIGHT_MESSAGE );

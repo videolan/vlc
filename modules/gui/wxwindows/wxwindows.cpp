@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.1 2002/11/18 13:02:16 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.2 2002/11/20 14:24:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -175,9 +175,6 @@ IMPLEMENT_APP_NO_MAIN(Instance)
  *****************************************************************************/
 bool Instance::OnInit()
 {
-    wxImage::AddHandler(new wxPNGHandler);
-    //wxImage::AddHandler(new wxXPMHandler);
-
     /* Make an instance of your derived frame. Passing NULL (the default value
      * of Frame's constructor is NULL) as the frame doesn't have a frame
      * since it is the first window */

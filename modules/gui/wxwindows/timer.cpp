@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.1 2002/11/18 13:02:16 gbazin Exp $
+ * $Id: timer.cpp,v 1.2 2002/11/20 14:24:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -36,8 +36,8 @@
 #undef _
 
 #ifdef WIN32                                                 /* mingw32 hack */
-#undef Yield()
-#undef CreateDialog()
+#undef Yield
+#undef CreateDialog
 #endif
 
 #include <wx/wxprec.h>
@@ -214,6 +214,15 @@ void Timer::Notify()
     {
         wxModeManage( p_intf );
         p_intf->p_sys->b_playing = 0;
+    }
+
+    if( p_intf->b_die )
+    {
+        vlc_mutex_unlock( &p_intf->change_lock );
+
+        /* Prepare to die, young Skywalker */
+        p_main_interface->Close(TRUE);
+        return;
     }
 
     vlc_mutex_unlock( &p_intf->change_lock );
