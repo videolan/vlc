@@ -1,104 +1,114 @@
 # German locale definition for vlc
 # Copyright (C) 1999, 2000 VideoLAN
 #
-# Thomas Graf <tgraf@europe.com>
+# Thomas Graf <tgr@reeler.org>
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"POT-Creation-Date: 2002-04-19 15:54+0200\n"
-"PO-Revision-Date: 2001-05-19 01:42+0200\n"
-"Last-Translator: Thomas Graf <tgraf@europe.com>\n"
+"POT-Creation-Date: 2002-04-20 14:25+0200\n"
+"PO-Revision-Date: 2002-04-18 23:38+0100\n"
+"Last-Translator: Thomas Graf <tgr@reeler.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
-"Content-Transfer-Encoding: 8-bit\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: src/interface/main.c:97
-#, fuzzy
 msgid "interface method"
 msgstr "Standard Oberfläche: "
 
-#: src/interface/main.c:99
+#: src/interface/main.c:98
 msgid ""
 "This option allows you to select the interface used by vlc.\n"
 "Note that the default behaviour is to automatically select the best method "
-"available."
+"available"
 msgstr ""
+"Diese Option erlaubt Dir die Standard Oberfläche festzulegen.\n"
+"Merke Dir, standardmässig wird die beste Methode verwendet."
+
+#: src/interface/main.c:102
+msgid "warning level (or use -v, -vv, etc...)"
+msgstr "Warnstufe (oder benutz -v, -vv, usw...)"
 
 #: src/interface/main.c:103
-msgid "warning level (or use -v, -vv, etc...)"
-msgstr ""
-
-#: src/interface/main.c:105
 msgid ""
 "Increasing the warning level will allow you to see more debug messages and "
-"can sometimes help you to troubleshoot a problem."
+"can sometimes help you to troubleshoot a problem"
 msgstr ""
+"Erhöhen der Warnstufe erlaubt es Dir Debug-Meldungen zu sehen welche Dir "
+"helfen können ein Problem zu lösen."
+
+#: src/interface/main.c:107
+msgid "output statistics"
+msgstr "Ausgabestatistiken"
 
 #: src/interface/main.c:108
-msgid "output statistics"
-msgstr ""
-
-#: src/interface/main.c:110
 msgid ""
 "Enabling the stats mode will flood your log console with various statistics "
-"messages."
+"messages"
 msgstr ""
+"Aktivieren des Statusmodus wird deine Logkonsole mit verschiedenene "
+"Statistikmeldungen überfluten."
 
-#: src/interface/main.c:113
+#: src/interface/main.c:111
 msgid "interface default search path"
-msgstr ""
+msgstr "Standard Suchpfad"
 
-#: src/interface/main.c:115
+#: src/interface/main.c:112
 msgid ""
 "This option allows you to set the default path that the interface will open "
-"when looking for a file."
+"when looking for a file"
 msgstr ""
+"Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
 
-#: src/interface/main.c:118
+#: src/interface/main.c:116
 msgid "audio output method"
-msgstr ""
+msgstr "Audio Ausgabemodus"
 
-#: src/interface/main.c:120
+#: src/interface/main.c:117
 msgid ""
 "This option allows you to select the audio audio output method used by vlc.\n"
 "Note that the default behaviour is to automatically select the best method "
-"available."
+"available"
 msgstr ""
+"Diese Option erlaubt Dir den Audio Ausgabemodus festzulegen.\n"
+"Merke Dir, standardmässig wird die beste Methode ausgewählt."
 
-#: src/interface/main.c:124
+#: src/interface/main.c:122
 msgid "disable audio"
-msgstr ""
+msgstr "Audio deaktivieren"
 
-#: src/interface/main.c:126
+#: src/interface/main.c:123
 msgid ""
 "This will completely disable the audio output. The audio decoding stage "
-"shouldn't even be done, so it can allow you to save some processing power."
+"shouldn't even be done, so it can allow you to save some processing power"
 msgstr ""
+"Dies wird die Audio Ausgabe komplett deaktivieren. Die Audiodekodierung wird "
+"ebenfalls deaktiviert, dadurch kann Prozessorzeit gespart werden."
+
+#: src/interface/main.c:127
+msgid "mono audio"
+msgstr "Mono Audio"
+
+#: src/interface/main.c:128
+msgid "This will force a mono audio output"
+msgstr "Dies wird Audio Mono Ausgabe forcieren."
 
 #: src/interface/main.c:130
-msgid "mono audio"
-msgstr ""
+msgid "audio output volume"
+msgstr "Audio Ausgabelautstärke"
 
 #: src/interface/main.c:131
-msgid "This will force a mono audio output"
-msgstr ""
+msgid ""
+"You can set the default audio output volume here, in a range from 0 to 1024"
+msgstr "Du kannst hier die standard Lautstärke zwischen 0 und 1024 festlegen."
 
-#: src/interface/main.c:133
-msgid "audio output volume"
-msgstr ""
+#: src/interface/main.c:134
+msgid "audio output format"
+msgstr "Audio Ausgabeformat"
 
 #: src/interface/main.c:135
-msgid ""
-"You can set the default audio output volume here, in a range from 0 to 1024."
-msgstr ""
-
-#: src/interface/main.c:138
-msgid "audio output format"
-msgstr ""
-
-#: src/interface/main.c:140
 msgid ""
 "You can force the audio output format here.\n"
 "0 -> 16 bits signed native endian (default)\n"
@@ -111,364 +121,383 @@ msgid ""
 "7 -> mpeg2 audio (unsupported)\n"
 "8 -> ac3 pass-through"
 msgstr ""
+"Hiermit kannst du ein Ausgabeformat forcieren.\n"
+"0 -> 16 bits signed native endian (default)\n"
+"1 ->  8 bits unsigned\n"
+"2 -> 16 bits signed little endian\n"
+"3 -> 16 bits signed big endian\n"
+"4 ->  8 bits signed\n"
+"5 -> 16 bits unsigned little endian\n"
+"6 -> 16 bits unsigned big endian\n"
+"7 -> mpeg2 audio (unsupported)\n"
+"8 -> ac3 pass-through"
 
-#: src/interface/main.c:151
+#: src/interface/main.c:146
 msgid "audio output frequency (Hz)"
-msgstr ""
+msgstr "Audio Ausgabefrequenz (Hz)"
 
-#: src/interface/main.c:153
+#: src/interface/main.c:147
 msgid ""
 "You can force the audio output frequency here.\n"
-"Common values are 48000, 44100, 32000, 22050, 16000, 11025, 8000."
+"Common values are 48000, 44100, 32000, 22050, 16000, 11025, 8000"
 msgstr ""
+"Hiermit kannst du die standard Audio Ausgabefrequenz festlegen.\n"
+"Normale Werte sind 48000, 44100, 32000, 22050, 16000, 11025, 8000"
 
-#: src/interface/main.c:156
+#: src/interface/main.c:151
 msgid "compensate desynchronization of audio (in ms)"
-msgstr ""
+msgstr "Audio Desynchronisation ausgleichen (in ms)"
 
-#: src/interface/main.c:158
+#: src/interface/main.c:152
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
-"notice a lag between the video and the audio."
+"notice a lag between the video and the audio"
 msgstr ""
+"Diese Option erlaubt Dir die Audio Ausgabe zu verzögern. Dies kann hilfreich "
+"sein wenn du eine Verzögerung zwischen Video und Audio feststellst."
 
-#: src/interface/main.c:161
+#: src/interface/main.c:156
 msgid "video output method"
-msgstr ""
+msgstr "Video Ausgabemodus"
 
-#: src/interface/main.c:163
+#: src/interface/main.c:157
 msgid ""
 "This option allows you to select the video output method used by vlc.\n"
 "Note that the default behaviour is to automatically select the best method "
-"available."
+"available"
 msgstr ""
+"Diese Option erlaubt Dir den standard Video Ausgabemodus festzulegen.\n"
+"Merke Dir, standardmässig wird die beste Methode ausgewählt."
 
-#: src/interface/main.c:167
+#: src/interface/main.c:162
 msgid "disable video"
-msgstr ""
+msgstr "Video deaktivieren"
 
-#: src/interface/main.c:169
+#: src/interface/main.c:163
 msgid ""
 "This will completely disable the video output. The video decoding stage "
-"shouldn't even be done, so it can allow you to save some processing power."
+"shouldn't even be done, so it can allow you to save some processing power"
 msgstr ""
+"Dies wird die Video Ausgabe komplett deaktivieren. Die Videodekodierung wird "
+"ebenfalls deaktiviert, dadurch kann Prozessorzeit gespart werden."
 
-#: src/interface/main.c:173
+#: src/interface/main.c:167
 msgid "display identifier"
 msgstr ""
 
-#: src/interface/main.c:176
+#: src/interface/main.c:170
 msgid "video width"
-msgstr ""
+msgstr "Video Breite"
 
-#: src/interface/main.c:178
+#: src/interface/main.c:171
 msgid ""
 "You can enforce the video width here.\n"
-"Note that by default vlc will adapt to the video characteristics."
+"Note that by default vlc will adapt to the video characteristics"
 msgstr ""
 
-#: src/interface/main.c:181
+#: src/interface/main.c:175
 msgid "video height"
-msgstr ""
+msgstr "Video Höhe"
 
-#: src/interface/main.c:183
+#: src/interface/main.c:176
 msgid ""
 "You can enforce the video height here.\n"
-"Note that by default vlc will adapt to the video characteristics."
+"Note that by default vlc will adapt to the video  characteristics"
 msgstr ""
 
-#: src/interface/main.c:186
+#: src/interface/main.c:180
 msgid "grayscale video output"
-msgstr ""
+msgstr "Graustufen Videoausgabe"
 
-#: src/interface/main.c:188
+#: src/interface/main.c:181
 msgid ""
 "Using this option, vlc will not decode the color information from the video "
-"(this can also allow you to save some processing power)."
+"(this can also allow you to save some processing power)"
 msgstr ""
+"Dies wird die Farbendekodierung komplett deaktivieren, dadurch kann Prozessorzeit gespart werden."
 
-#: src/interface/main.c:191
-#, fuzzy
+
+#: src/interface/main.c:185
 msgid "fullscreen video output"
-msgstr "Vollbild Farbtiefe"
+msgstr "Vollbild Videoausgabe"
 
-#: src/interface/main.c:193
+#: src/interface/main.c:186
 msgid ""
-"If this option is enabled, vlc will always start a video in fullscreen mode."
+"If this option is enabled, vlc will always start a video in fullscreen mode"
 msgstr ""
+"Wenn diese Option aktiviert ist, wird vlc immer im Vollbildmodus starten"
 
-#: src/interface/main.c:196
+#: src/interface/main.c:189
 msgid "disable hardware acceleration for the video output"
-msgstr ""
+msgstr "Hardware Beschleuning für Video Ausgabe deaktivieren"
 
-#: src/interface/main.c:198
+#: src/interface/main.c:190
 msgid ""
 "By default vlc will try to take advantage of the overlay capabilities of you "
-"graphics card."
+"graphics card.\n"
 msgstr ""
+"Standardmässig wird vlc versuchen die Vorteile (Overlay Erweiterungen) deiner Grafikkarte"
+"zu nutzen.\n"
 
-#: src/interface/main.c:201
+#: src/interface/main.c:193
 msgid "force SPU position"
-msgstr ""
+msgstr "SPU Position forcieren"
 
-#: src/interface/main.c:204
-#, fuzzy
+#: src/interface/main.c:196
 msgid "video filter module"
-msgstr "Standard Oberfläche: "
+msgstr "Video Filter Modul"
 
-#: src/interface/main.c:207
-#, fuzzy
+#: src/interface/main.c:199
 msgid "server port"
-msgstr "Kein Server !"
+msgstr "Server Port"
 
-#: src/interface/main.c:210
-#, fuzzy
+#: src/interface/main.c:202
 msgid "enable network channel mode"
-msgstr "Netzwerk Kanal"
+msgstr "Netzwerk Kanal Modus aktivieren"
 
-#: src/interface/main.c:213
-#, fuzzy
+#: src/interface/main.c:205
 msgid "channel server address"
-msgstr "Kanäle:"
+msgstr "Kanal Server Adresse"
 
-#: src/interface/main.c:216
-#, fuzzy
+#: src/interface/main.c:208
 msgid "channel server port"
-msgstr "Kanäle:"
+msgstr "Kanal Server Port"
 
-#: src/interface/main.c:219
-#, fuzzy
+#: src/interface/main.c:211
 msgid "network interface"
-msgstr "Oberfläche _verstecken"
+msgstr "Netzwerk Schnittstelle"
 
-#: src/interface/main.c:222
-#, fuzzy
+#: src/interface/main.c:214
 msgid "choose program (SID)"
-msgstr "Programm beenden"
+msgstr "Programm wählen (SID)"
+
+#: src/interface/main.c:215
+msgid "choose the program to select by giving its Service ID"
+msgstr "Wähl das Programm indem du eine Service ID eingibst"
+
+#: src/interface/main.c:218
+msgid "choose audio"
+msgstr "Audio wählen"
+
+#: src/interface/main.c:221
+msgid "choose channel"
+msgstr "Kanal wählen"
 
 #: src/interface/main.c:224
-msgid "Choose the program to select by giving its Service ID."
-msgstr ""
-
-#: src/interface/main.c:226
-msgid "choose audio"
-msgstr ""
-
-#: src/interface/main.c:229
-#, fuzzy
-msgid "choose channel"
-msgstr "Kapitel festlegen"
-
-#: src/interface/main.c:232
-#, fuzzy
 msgid "choose subtitles"
-msgstr "Titel festlegen"
+msgstr "Untertitel wählen"
 
-#: src/interface/main.c:235
+#: src/interface/main.c:227
 msgid "DVD device"
-msgstr ""
+msgstr "DVD Gerät"
 
-#: src/interface/main.c:238
+#: src/interface/main.c:230
 msgid "VCD device"
-msgstr ""
+msgstr "VCD Gerät"
 
-#: src/interface/main.c:241
+#: src/interface/main.c:233
 msgid "satellite transponder frequency"
-msgstr ""
+msgstr "Satellit Transponder Frequenz"
 
-#: src/interface/main.c:244
+#: src/interface/main.c:236
 msgid "satellite transponder polarization"
-msgstr ""
+msgstr "Satellit Transponder Polarisation"
 
-#: src/interface/main.c:247
+#: src/interface/main.c:239
 msgid "satellite transponder FEC"
-msgstr ""
+msgstr "Satellit Transponder FEC"
 
-#: src/interface/main.c:250
+#: src/interface/main.c:242
 msgid "satellite transponder symbol rate"
-msgstr ""
+msgstr "Satellit Transponder Symbol Rate"
 
-#: src/interface/main.c:253
+#: src/interface/main.c:245
 msgid "use diseqc with antenna"
-msgstr ""
+msgstr "Verwende diseqc mit Antenne"
 
-#: src/interface/main.c:256
+#: src/interface/main.c:248
 msgid "antenna lnb_lof1 (kHz)"
-msgstr ""
+msgstr "Antenne lnb_lof1 (kHz)"
 
-#: src/interface/main.c:259
+#: src/interface/main.c:251
 msgid "antenna lnb_lof2 (kHz)"
-msgstr ""
+msgstr "Antenne lnb_lof2 (kHz)"
 
-#: src/interface/main.c:262
+#: src/interface/main.c:254
 msgid "antenna lnb_slof (kHz)"
-msgstr ""
+msgstr "Antenne lnb_slof (kHz)"
 
-#: src/interface/main.c:265
+#: src/interface/main.c:257
 msgid "force IPv6"
-msgstr ""
+msgstr "IPv6 forcieren"
 
-#: src/interface/main.c:268
+#: src/interface/main.c:260
 msgid "force IPv4"
-msgstr ""
+msgstr "IPv4 forcieren"
 
-#: src/interface/main.c:271
+#: src/interface/main.c:263
 msgid "choose MPEG audio decoder"
-msgstr ""
+msgstr "MPEG Audio Dekoder wählen"
 
-#: src/interface/main.c:274
+#: src/interface/main.c:266
 msgid "choose AC3 audio decoder"
-msgstr ""
+msgstr "AC3 Audio Dekoder wählen"
 
-#: src/interface/main.c:277
+#: src/interface/main.c:269
 msgid "use additional processors"
-msgstr ""
+msgstr "Benutz zusätzliche Prozessoren"
 
-#: src/interface/main.c:280
+#: src/interface/main.c:272
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
-msgstr ""
+msgstr "Synchro Algorithmus focieren {I|I+|IP|IP+|IPB}"
 
-#: src/interface/main.c:283
+#: src/interface/main.c:275
 msgid "disable CPU's MMX support"
-msgstr ""
+msgstr "MMX Unterstützung deaktivieren"
 
-#: src/interface/main.c:286
+#: src/interface/main.c:278
 msgid "disable CPU's 3D Now! support"
-msgstr ""
+msgstr "3D Now! Unterstützung deaktivieren"
 
-#: src/interface/main.c:289
+#: src/interface/main.c:281
 msgid "disable CPU's MMX EXT support"
-msgstr ""
+msgstr "MMX EXT Unterstützung deaktivieren."
 
-#: src/interface/main.c:292
+#: src/interface/main.c:284
 msgid "disable CPU's SSE support"
-msgstr ""
+msgstr "SSE Unterstüzung deaktivieren"
 
-#: src/interface/main.c:295
+#: src/interface/main.c:287
 msgid "disable CPU's AltiVec support"
-msgstr ""
+msgstr "AltiVec Unterstützung deaktiveren"
 
-#: src/interface/main.c:298
-#, fuzzy
+#: src/interface/main.c:290
 msgid "launch playlist on startup"
-msgstr "Aufrufen beim Starten"
+msgstr "Abspielliste aufrufen beim Starten"
 
-#: src/interface/main.c:301
-#, fuzzy
+#: src/interface/main.c:293
 msgid "enqueue playlist as default"
-msgstr "Als Standard einreihen"
+msgstr "Standardmässig in die Abspielliste einreihen"
 
-#: src/interface/main.c:304
-#, fuzzy
+#: src/interface/main.c:296
 msgid "loop playlist on end"
-msgstr "Playlist endlos abspielen"
+msgstr "Abspielliste endlos abspielen"
 
-#: src/interface/main.c:307
+#: src/interface/main.c:299
 msgid "memory copy method"
-msgstr ""
+msgstr "Speicherkopier Methode"
 
-#: src/interface/main.c:310
+#: src/interface/main.c:302
 msgid "fast pthread on NT/2K/XP (developpers only)"
 msgstr ""
 
-#: src/interface/main.c:312
+#: src/interface/main.c:303
 msgid ""
 "On Windows NT/2K/XP we use a slow but correct pthread implementation, you "
 "can also use this faster implementation but you might experience problems "
-"with it."
+"with it"
 msgstr ""
 
 #. Interface options
-#: src/interface/main.c:334
+#: src/interface/main.c:326
 msgid "Interface"
 msgstr "Oberfläche"
 
 #. Audio options
-#: src/interface/main.c:341
+#: src/interface/main.c:333
 msgid "Audio"
-msgstr "Audio"
+msgstr ""
 
 #. Video options
-#: src/interface/main.c:352
+#: src/interface/main.c:344
 msgid "Video"
-msgstr "Video"
+msgstr ""
 
 #. Input options
-#: src/interface/main.c:364
+#: src/interface/main.c:356
 msgid "Input"
-msgstr ""
+msgstr "Eingabe"
 
 #. Decoder options
-#: src/interface/main.c:398
+#: src/interface/main.c:390
 msgid "Decoders"
-msgstr ""
+msgstr "Dekoder"
 
 #. CPU options
-#: src/interface/main.c:405
+#: src/interface/main.c:397
 msgid "CPU"
-msgstr ""
+msgstr "Prozessor"
 
 #. Playlist options
 #: plugins/gtk/gnome_interface.c:506 plugins/gtk/gnome_interface.c:1806
 #: plugins/gtk/gnome_interface.c:1830 plugins/gtk/gtk_interface.c:611
-#: plugins/gtk/gtk_interface.c:2084 src/interface/main.c:413
+#: plugins/gtk/gtk_interface.c:2084 src/interface/main.c:405
 msgid "Playlist"
-msgstr "Playlist"
+msgstr "Abspielliste"
 
 #. Misc options
 #: plugins/ac3_adec/ac3_adec.c:77 plugins/dsp/dsp.c:42 plugins/fb/fb.c:72
 #: plugins/ggi/ggi.c:68 plugins/gtk/gnome.c:73 plugins/gtk/gtk.c:74
 #: plugins/mga/xmga.c:111 plugins/mpeg_vdec/video_parser.c:80
-#: plugins/x11/x11.c:55 plugins/x11/xvideo.c:60 src/interface/main.c:419
+#: plugins/x11/x11.c:55 plugins/x11/xvideo.c:60 src/interface/main.c:411
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Sonstiges"
 
-#: src/interface/main.c:429
-#, fuzzy
+#: src/interface/main.c:421
 msgid "main program"
-msgstr "Programm beenden"
+msgstr "Hauptprogramm"
+
+#: src/interface/main.c:434
+msgid "print help (or use -h)"
+msgstr "Hilfetext anzeigen (oder benutz -h)"
+
+#: src/interface/main.c:436
+msgid "print detailed help (or use -H)"
+msgstr "Detailierter Hilfetext anzeigen (oder benutz -H)"
+
+#: src/interface/main.c:438
+msgid "print a list of available plugins (or use -l)"
+msgstr "Liste aller verfügbaren Plugins ausgeben (oder benutz -l)"
+
+#: src/interface/main.c:440
+msgid "print help on plugin (or use -p)"
+msgstr "Hilfe über Plugins ausgeben (oder benutz -p)"
 
 #: src/interface/main.c:442
-msgid "print help (or use -h)"
-msgstr ""
-
-#: src/interface/main.c:444
-msgid "print detailed help (or use -H)"
-msgstr ""
-
-#: src/interface/main.c:446
-msgid "print a list of available plugins (or use -l)"
-msgstr ""
-
-#: src/interface/main.c:448
-msgid "print help on plugin (or use -p)"
-msgstr ""
-
-#: src/interface/main.c:450
 msgid "print version information"
-msgstr ""
+msgstr "Versionsinformationen ausgeben."
 
 #. Usage
-#: src/interface/main.c:614 src/interface/main.c:1038
+#: src/interface/main.c:607 src/interface/main.c:1029
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
-msgstr ""
+msgstr "Usage: %s [Optionen] [Parameter] [Date]...\n"
 
 #. print module name
-#: src/interface/main.c:939
+#: src/interface/main.c:932
 #, c-format
 msgid "%s module options:\n"
-msgstr ""
+msgstr "%s Modul Optionen:\n"
 
-#: src/interface/main.c:959 src/interface/main.c:963
+#: src/interface/main.c:952
 msgid " <string>"
-msgstr ""
+msgstr "<text>"
 
-#: src/interface/main.c:970 src/interface/main.c:974
+#: src/interface/main.c:955
+#, c-format
+msgid "  --%s <string>%s %s"
+msgstr " --%s <text>%s %s"
+
+#: src/interface/main.c:963
 msgid " <integer>"
-msgstr ""
+msgstr " <zahl>"
 
-#: src/interface/main.c:995
+#: src/interface/main.c:966
+#, c-format
+msgid "  --%s <integer>%s %s"
+msgstr " --%s <zahl>%s %s"
+
+#: src/interface/main.c:987
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -483,19 +512,33 @@ msgid ""
 "  vlc:pause                      \tpause execution of playlist items\n"
 "  vlc:quit                       \tquit VLC"
 msgstr ""
+"\n"
+"Abspielliste Elemente:\n"
+"  *.mpg, *.vob                   \tMPEG-1/2 Dateien\n"
+"  [dvd:][Gerät][@Raw_Gerät][@[title][,[Kapitel][,Winkel]]]\n"
+"                                 \tDVD Gerät\n"
+"  [vcd:][Gerät][@[Titel][,[Kapitel]]\n"
+"                                 \tVCD Gerät\n"
+"  udpstream:[@[<bind Adresse>][:<bind port>]]\n"
+"                                 \tUDP stream gesendet von VLS\n"
+"  vlc:loop                       \tAbspielen der Abspielliste endlos wiederholen\n"
+"  vlc:pause                      \tAbspielen von Abspiellistenelemten pausieren\n"
+"  vlc:quit                       \tVLC beenden"
 
-#: src/interface/main.c:1015 src/interface/main.c:1064
-#: src/interface/main.c:1088
+#: src/interface/main.c:1006 src/interface/main.c:1055
+#: src/interface/main.c:1079
 msgid ""
 "\n"
 "Press the RETURN key to continue..."
 msgstr ""
+"\n"
+"Drück die Eingabetaste um weiterzufahren..."
 
-#: src/interface/main.c:1041
+#: src/interface/main.c:1032
 msgid "[plugin]              [description]"
-msgstr ""
+msgstr "[Plugin]              [Beschreibung]"
 
-#: src/interface/main.c:1082
+#: src/interface/main.c:1073
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -505,40 +548,40 @@ msgstr ""
 
 #: src/misc/configuration.c:612
 msgid "<boolean>"
-msgstr ""
+msgstr "<boolesch>"
 
 #: src/misc/configuration.c:613
 msgid "<integer>"
-msgstr ""
+msgstr "<zahl>"
 
 #: src/misc/configuration.c:620
 #, c-format
 msgid "# %s <string>\n"
-msgstr ""
+msgstr "# %s <text>\n"
 
 #: plugins/a52/a52.c:76
 msgid "a52 ATSC A/52 aka AC-3 audio decoder module"
-msgstr ""
+msgstr "a52 ATSC A/52 aka AC-3 Audio Dekoder Modul"
 
 #: plugins/aa/aa.c:51
 msgid "ASCII-art video output module"
-msgstr ""
+msgstr "ACII-Art Video Ausgabemodul"
 
 #: plugins/ac3_adec/ac3_adec.c:79
 msgid "AC3 downmix method"
-msgstr ""
+msgstr "AC3 downmix Methode"
 
 #: plugins/ac3_adec/ac3_adec.c:81
 msgid "AC3 IMDCT method"
-msgstr ""
+msgstr "AC3 IMDCT Methode"
 
 #: plugins/ac3_adec/ac3_adec.c:85
 msgid "software AC3 decoder"
-msgstr ""
+msgstr "Software AC3 Dekoder"
 
 #: plugins/ac3_spdif/ac3_spdif.c:119
 msgid "SPDIF pass-through AC3 decoder"
-msgstr ""
+msgstr "SPDIF pass-through AC3 Dekoder"
 
 #: plugins/access/file.c:60
 msgid "Standard filesystem file reading"
@@ -546,80 +589,79 @@ msgstr ""
 
 #: plugins/access/http.c:65
 msgid "HTTP access plug-in"
-msgstr ""
+msgstr "HTTP Zugriff Modul"
 
 #: plugins/access/udp.c:62
 msgid "Raw UDP access plug-in"
-msgstr ""
+msgstr "Raw UDP Zugriff Modul"
 
 #: plugins/alsa/alsa.c:58
 msgid "Alsa audio module"
-msgstr ""
+msgstr "Alsa Audio Modul"
 
 #: plugins/arts/arts.c:43
 msgid "aRts audio module"
-msgstr ""
+msgstr "aRts Audio MOdul"
 
 #: plugins/beos/beos.cpp:49
 msgid "BeOS standard API module"
-msgstr ""
+msgstr "BeOS Standard API Modul"
 
 #: plugins/chroma/i420_rgb.c:64
 msgid "I420,IYUV,YV12 to RGB,RV15,RV16,RV24,RV32 conversions"
-msgstr ""
+msgstr "I420,IYUV,YV12 to RGB,RV15,RV16,RV24,RV32 Umwandlungen"
 
 #: plugins/chroma/i420_rgb.c:68
 msgid "MMX I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions"
-msgstr ""
+msgstr "MMX I420,IYUV,YV12 to RV15,RV16,RV24,RV32 Umwandlungen"
 
 #: plugins/chroma/i420_ymga.c:57 plugins/chroma/i420_yuy2.c:71
 #: plugins/chroma/i422_yuy2.c:70
 msgid "conversions from "
-msgstr ""
+msgstr "Wandlungen von "
 
 #: plugins/chroma/i420_ymga.c:57 plugins/chroma/i420_ymga.c:60
 #: plugins/chroma/i420_yuy2.c:71 plugins/chroma/i420_yuy2.c:74
 #: plugins/chroma/i422_yuy2.c:70 plugins/chroma/i422_yuy2.c:73
-#, fuzzy
 msgid " to "
-msgstr "Spring zu:"
+msgstr "zu "
 
 #: plugins/chroma/i420_ymga.c:60 plugins/chroma/i420_yuy2.c:74
 #: plugins/chroma/i422_yuy2.c:73
 msgid "MMX conversions from "
-msgstr ""
+msgstr "MXX Wandlungen von "
 
 #: plugins/directx/directx.c:50
 msgid "DirectX extension module"
-msgstr ""
+msgstr "DirectX Erweiterung Modul"
 
 #: plugins/downmix/downmix.c:47
 msgid "AC3 downmix module"
-msgstr ""
+msgstr "AC3 downmix Modul"
 
 #: plugins/downmix/downmix3dn.c:47
 msgid "3D Now! AC3 downmix module"
-msgstr ""
+msgstr "3D Now! AC3 downmix Modul"
 
 #: plugins/downmix/downmixsse.c:47
 msgid "SSE AC3 downmix module"
-msgstr ""
+msgstr "SSE AC3 downmix Modul"
 
 #: plugins/dsp/dsp.c:43
 msgid "OSS dsp device"
-msgstr ""
+msgstr "OSS dsp Gerät"
 
 #: plugins/dsp/dsp.c:47
 msgid "Linux OSS /dev/dsp module"
-msgstr ""
+msgstr "Linux OSS /dev/dsp Modul"
 
 #: plugins/dummy/dummy.c:49
 msgid "dummy functions module"
-msgstr ""
+msgstr "Dummy Funktions Modul"
 
 #: plugins/dummy/null.c:52
 msgid "the Null module that does nothing"
-msgstr ""
+msgstr "Das Null Modul tut nichts"
 
 #: plugins/dvd/dvd.c:66
 msgid "[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
@@ -627,58 +669,55 @@ msgstr ""
 
 #: plugins/dvd/dvd.c:72
 msgid "DVD input module, uses libdvdcss if present"
-msgstr ""
+msgstr "DVD Eingabe Modul, benutzt libdvdcss falls vorhanden"
 
 #: plugins/dvd/dvd.c:75
 msgid "DVD input module, uses libdvdcss"
-msgstr ""
+msgstr "DVD Eingabe Modul, benutzt libdvdcss"
 
 #: plugins/dvdread/dvdread.c:42
 msgid "[dvdread:][device][@[title][,[chapter][,angle]]]"
-msgstr ""
+msgstr "[dvdread:][Gerät][@[Titel][,[Kapitel][,Winkel]]]"
 
 #: plugins/dvdread/dvdread.c:46
 msgid "DVDRead input module"
-msgstr ""
+msgstr "DVDRead Eingabe Modul"
 
 #: plugins/esd/esd.c:44
 msgid "EsounD audio module"
-msgstr ""
+msgstr "EsounD Audio Modul"
 
 #: plugins/fb/fb.c:73
-#, fuzzy
 msgid "framebuffer device"
-msgstr "Standard Adapter:"
+msgstr "Frambuffer Gerät"
 
 #: plugins/fb/fb.c:77
 msgid "Linux console framebuffer module"
-msgstr ""
+msgstr "Linux Konsolen Framebuffer Modul"
 
 #: plugins/filter/deinterlace.c:55
-#, fuzzy
 msgid "deinterlacing module"
-msgstr "Standard Oberfläche: "
+msgstr "Deinterlacing Modul"
 
 #: plugins/filter/distort.c:55
 msgid "miscellaneous video effects module"
-msgstr ""
+msgstr "Verschiedene Videoeffekt Module"
 
 #: plugins/filter/invert.c:50
-#, fuzzy
 msgid "invert video module"
-msgstr "Standard Oberfläche: "
+msgstr "Umkehren Video Modul"
 
 #: plugins/filter/transform.c:56
 msgid "image transformation module"
-msgstr ""
+msgstr "Bildtransformations Modul"
 
 #: plugins/filter/wall.c:50
 msgid "image wall video module"
-msgstr ""
+msgstr "Bildwand Video Modul"
 
 #: plugins/fx/scope.c:69
 msgid "scope effect module"
-msgstr ""
+msgstr "Scope Effekt Modul"
 
 #. ****************************************************************************
 #. * Building configuration tree
@@ -686,10 +725,10 @@ msgstr ""
 #: plugins/ggi/ggi.c:62 plugins/mga/xmga.c:105 plugins/x11/x11.c:49
 #: plugins/x11/xvideo.c:54
 msgid "X11 display name"
-msgstr ""
+msgstr "X11 Display Name"
 
-#: plugins/ggi/ggi.c:63 plugins/mga/xmga.c:107 plugins/x11/x11.c:51
-#: plugins/x11/xvideo.c:56
+#: plugins/ggi/ggi.c:63 plugins/mga/xmga.c:106 plugins/x11/x11.c:50
+#: plugins/x11/xvideo.c:55
 msgid ""
 "Specify the X11 hardware display you want to use.\n"
 "By default vlc will use the value of the DISPLAY environment variable."
@@ -704,30 +743,30 @@ msgstr ""
 #. ****************************************************************************
 #: plugins/gtk/gnome.c:64 plugins/gtk/gtk.c:65
 msgid "hide tooltips"
-msgstr ""
+msgstr "Tooltips verstecken"
 
 #: plugins/gtk/gnome.c:65 plugins/gtk/gtk.c:66
-msgid "Do not show tooltips for configuration options."
-msgstr ""
+msgid "Do not show tooltips for configuration options"
+msgstr "Keine Tooltips für Konfigurationsoptionen anzeigen"
 
 #: plugins/gtk/gnome.c:67 plugins/gtk/gtk.c:68
 msgid "maximum height for the configuration windows"
-msgstr ""
+msgstr "Maximale Höhe des Konfigurationsfenster"
 
-#: plugins/gtk/gnome.c:69 plugins/gtk/gtk.c:70
+#: plugins/gtk/gnome.c:68 plugins/gtk/gtk.c:69
 msgid ""
 "You can set the maximum height that the configuration windows in the "
-"preferences menu will occupy."
+"prefences menu will take"
 msgstr ""
+"Du kannst die maximale Höhe des Konfigurationsfesnter festlegen."
 
 #: plugins/gtk/gtk.c:81
-#, fuzzy
 msgid "Gtk+ interface module"
-msgstr "Standard Oberfläche: "
+msgstr "Gtk+ Oberfläche Modul"
 
 #: plugins/gtk/gnome.c:81
 msgid "Gnome interface module"
-msgstr ""
+msgstr "Gnome Benutzeroberfläche Modul"
 
 #: plugins/gtk/gnome_interface.c:202 plugins/gtk/gtk_interface.c:109
 #: plugins/gtk/gtk_interface.c:1338
@@ -772,15 +811,13 @@ msgid "Select a Network Stream"
 msgstr "Netzwerk Stream laden"
 
 #: plugins/gtk/gnome_interface.c:41 plugins/gtk/gtk_interface.c:206
-#, fuzzy
 msgid "_Eject Disc"
-msgstr "DVD/VCD öffnen"
+msgstr "DVD/VCD auswerfen"
 
 #: plugins/gtk/gnome_interface.c:42 plugins/gtk/gnome_interface.c:442
 #: plugins/gtk/gtk_interface.c:214
-#, fuzzy
 msgid "Eject disc"
-msgstr "DVD/VCD öffnen"
+msgstr "DVD/VCD auswerfen"
 
 #: plugins/gtk/gtk_interface.c:226 plugins/gtk/gtk_interface.c:1237
 msgid "E_xit"
@@ -795,7 +832,6 @@ msgid "_View"
 msgstr "_Ansicht"
 
 #: plugins/gtk/gnome_interface.c:55 plugins/gtk/gtk_interface.c:259
-#, fuzzy
 msgid "_Hide interface"
 msgstr "Oberfläche _verstecken"
 
@@ -809,14 +845,12 @@ msgid "_Fullscreen"
 msgstr "_Vollbild"
 
 #: plugins/gtk/gnome_interface.c:70 plugins/gtk/gtk_interface.c:290
-#, fuzzy
 msgid "Progr_am"
-msgstr "Programm beenden"
+msgstr "Progr_amm"
 
 #: plugins/gtk/gnome_interface.c:71 plugins/gtk/gtk_interface.c:299
-#, fuzzy
 msgid "Choose the program"
-msgstr "Programm beenden"
+msgstr "Programm wählen"
 
 #: plugins/gtk/gnome_interface.c:77 plugins/gtk/gtk_interface.c:303
 msgid "_Title"
@@ -847,12 +881,10 @@ msgid "Open the plugin manager"
 msgstr "Plugin Manager öffnen"
 
 #: plugins/gtk/gnome_interface.c:106 plugins/gtk/gtk_interface.c:359
-#, fuzzy
 msgid "Messages..."
 msgstr "Meldungen"
 
 #: plugins/gtk/gnome_interface.c:107 plugins/gtk/gtk_interface.c:365
-#, fuzzy
 msgid "Open the messages window"
 msgstr "Playlist Fenster öffnen"
 
@@ -916,12 +948,11 @@ msgstr "Netzwerk"
 
 #: plugins/gtk/gnome_interface.c:402 plugins/gtk/gtk_interface.c:515
 msgid "Sat"
-msgstr ""
+msgstr "Sat"
 
 #: plugins/gtk/gnome_interface.c:403 plugins/gtk/gtk_interface.c:516
-#, fuzzy
 msgid "Open a Satellite Card"
-msgstr "Playlist Fenster öffnen"
+msgstr "Abspielisten Fenster öffnen"
 
 #: plugins/gtk/gnome_interface.c:416 plugins/gtk/gnome_interface.c:850
 #: plugins/gtk/gtk_interface.c:528 plugins/gtk/gtk_interface.c:1005
@@ -942,9 +973,8 @@ msgid "Stop Stream"
 msgstr "Stream stoppen"
 
 #: plugins/gtk/gnome_interface.c:441 plugins/gtk/gtk_interface.c:551
-#, fuzzy
 msgid "Eject"
-msgstr "DVD/VCD öffnen"
+msgstr "Auswerfen"
 
 #: plugins/gtk/gnome_interface.c:453 plugins/gtk/gnome_interface.c:829
 #: plugins/gtk/gtk_interface.c:562
@@ -984,13 +1014,13 @@ msgstr "Schneller abspielen"
 
 #: plugins/gtk/gnome_interface.c:507 plugins/gtk/gtk_interface.c:612
 msgid "Open Playlist"
-msgstr "Playliste öffnen"
+msgstr "Abspielliste öffnen"
 
 #: plugins/gtk/gnome_interface.c:518 plugins/gtk/gnome_interface.c:894
 #: plugins/gtk/gtk_interface.c:622 plugins/gtk/gtk_interface.c:708
 #: plugins/gtk/gtk_interface.c:752 plugins/gtk/gtk_interface.c:1074
 msgid "Prev"
-msgstr "Vorheriges"
+msgstr "Vorher"
 
 #: plugins/gtk/gnome_interface.c:519 plugins/gtk/gtk_interface.c:623
 msgid "Previous File"
@@ -1027,7 +1057,6 @@ msgid "---"
 msgstr "---"
 
 #: plugins/gtk/gtk_interface.c:775
-#, fuzzy
 msgid "No server !"
 msgstr "Kein Server"
 
@@ -1037,25 +1066,23 @@ msgstr "Kanal:  "
 
 #: plugins/gtk/gnome_interface.c:703 plugins/gtk/gtk_interface.c:804
 msgid "Go!"
-msgstr ""
+msgstr "Los!"
 
 #: plugins/gtk/gtk_interface.c:981
 msgid "_Play"
 msgstr "_Play"
 
 #: plugins/gtk/gnome_interface.c:872 plugins/gtk/gtk_interface.c:1039
-#, fuzzy
 msgid "Toggle _Interface"
-msgstr "Oberfläche"
+msgstr "Oberfläche ein/ausschalten"
 
 #: plugins/gtk/gnome_interface.c:901 plugins/gtk/gtk_interface.c:1083
 msgid "_Jump..."
 msgstr "_Springen"
 
 #: plugins/gtk/gnome_interface.c:908 plugins/gtk/gtk_interface.c:1092
-#, fuzzy
 msgid "Program"
-msgstr "Programm beenden"
+msgstr "Programm"
 
 #: plugins/gtk/gnome_interface.c:915 plugins/gtk/gtk_interface.c:1102
 msgid "_Navigation"
@@ -1075,9 +1102,8 @@ msgid "About"
 msgstr "Über uns"
 
 #: plugins/gtk/gtk_interface.c:1346
-#, fuzzy
 msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"
-msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"
+msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - das VideoLAN Team"
 
 #: plugins/gtk/gtk_interface.c:1355
 msgid "Authors"
@@ -1132,14 +1158,12 @@ msgid "Starting position"
 msgstr "Startposition"
 
 #: plugins/gtk/gnome_interface.c:1319 plugins/gtk/gnome_interface.c:2251
-#: plugins/gtk/gtk_interface.c:1556 plugins/gtk/gtk_menu.c:799
-#: plugins/gtk/gtk_menu.c:934
+#: plugins/gtk/gtk_interface.c:1556
 msgid "Chapter"
 msgstr "Kapitel"
 
 #: plugins/gtk/gnome_interface.c:1309 plugins/gtk/gnome_interface.c:2241
-#: plugins/gtk/gtk_interface.c:1566 plugins/gtk/gtk_menu.c:904
-#: plugins/gtk/gtk_menu.c:925
+#: plugins/gtk/gtk_interface.c:1566
 msgid "Title"
 msgstr "Titel"
 
@@ -1207,23 +1231,20 @@ msgstr "vls"
 
 #: plugins/gtk/gnome_interface.c:1592 plugins/gtk/gnome_interface.c:2468
 #: plugins/gtk/gtk_interface.c:1836
-#, fuzzy
 msgid "Channels"
-msgstr "Kanäle:"
+msgstr "Kanäle"
 
 #: plugins/gtk/gnome_interface.c:1607 plugins/gtk/gtk_interface.c:1851
-#, fuzzy
 msgid "Channel server:"
-msgstr "Kanäle:"
+msgstr "Kanal Server:"
 
 #: plugins/gtk/gnome_interface.c:1627 plugins/gtk/gtk_interface.c:1870
 msgid "138.195.143.120"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:1629 plugins/gtk/gtk_interface.c:1872
-#, fuzzy
 msgid "port:"
-msgstr "Port"
+msgstr "Port:"
 
 #: plugins/gtk/gtk_interface.c:1952
 msgid "Jump"
@@ -1274,7 +1295,7 @@ msgstr "Alle"
 
 #: plugins/gtk/gtk_interface.c:2162
 msgid "Selected"
-msgstr "Festgelegt"
+msgstr "Selektiert"
 
 #: plugins/gtk/gnome_interface.c:1781 plugins/gtk/gtk_interface.c:2169
 msgid "Selection"
@@ -1301,9 +1322,8 @@ msgid "Messages"
 msgstr "Meldungen"
 
 #: plugins/gtk/gtk_interface.c:2411
-#, fuzzy
 msgid "Open Satellite card"
-msgstr "Playlist Fenster öffnen"
+msgstr "Satelliten Karte öffnen"
 
 #: plugins/gtk/gtk_interface.c:2435
 msgid "Transponder settings"
@@ -1314,22 +1334,20 @@ msgid "Symbol Rate"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:2671 plugins/gtk/gtk_interface.c:2482
-#, fuzzy
 msgid "Frequency"
-msgstr "Frequenz:"
+msgstr "Frequenz"
 
 #: plugins/gtk/gnome_interface.c:2691 plugins/gtk/gtk_interface.c:2492
-#, fuzzy
 msgid "Polarization"
-msgstr "_Navigation"
+msgstr "Polarisation"
 
 #: plugins/gtk/gnome_interface.c:2711 plugins/gtk/gtk_interface.c:2502
 msgid "Vertical"
-msgstr ""
+msgstr "Vertikal"
 
 #: plugins/gtk/gnome_interface.c:2701 plugins/gtk/gtk_interface.c:2512
 msgid "Horizontal"
-msgstr ""
+msgstr "Horizontal"
 
 #: plugins/gtk/gnome_interface.c:2742 plugins/gtk/gtk_interface.c:2522
 msgid "FEC"
@@ -1361,14 +1379,12 @@ msgid "7/8"
 msgstr ""
 
 #: plugins/gtk/gnome_interface.c:78
-#, fuzzy
 msgid "Choose title"
-msgstr "Titel festlegen"
+msgstr "Titel wählen"
 
 #: plugins/gtk/gnome_interface.c:85
-#, fuzzy
 msgid "Choose chapter"
-msgstr "Kapitel festlegen"
+msgstr "Kapitel wählen"
 
 #: plugins/gtk/gnome_interface.c:119 plugins/gtk/gnome_interface.c:923
 msgid "Select audio channel"
@@ -1403,23 +1419,20 @@ msgid "No server"
 msgstr "Kein Server"
 
 #: plugins/gtk/gnome_interface.c:688
-#, fuzzy
 msgid "Network Channel:"
-msgstr "Kanal:  "
+msgstr "Netzwerk Kanal:"
 
 #: plugins/gtk/gnome_interface.c:880
-#, fuzzy
 msgid "Toggle fullscreen mode"
-msgstr "In Vollbildmodus wechseln"
+msgstr "Vollbildmodus ändern"
 
 #: plugins/gtk/gnome_interface.c:902
 msgid "Got directly so specified point"
 msgstr "Geh direkt zum "
 
 #: plugins/gtk/gnome_interface.c:909
-#, fuzzy
 msgid "Switch program"
-msgstr "Programm beenden"
+msgstr ""
 
 #: plugins/gtk/gnome_interface.c:916
 msgid "Navigate through titles and chapters"
@@ -1430,9 +1443,8 @@ msgid "Select subtitle channel"
 msgstr "Untertitel festlegen"
 
 #: plugins/gtk/gnome_interface.c:1119
-#, fuzzy
 msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002  - the VideoLAN Team"
-msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team"
+msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - das VideoLAN Team"
 
 #: plugins/gtk/gnome_interface.c:1135
 msgid "Open File"
@@ -1479,497 +1491,272 @@ msgid "Select"
 msgstr "Auswählen"
 
 #: plugins/gtk/gnome_interface.c:2008
-#, fuzzy
 msgid "Jump to: "
 msgstr "Spring zu:"
 
 #: plugins/gtk/gnome_interface.c:2162
-#, fuzzy
 msgid "Open Stream"
-msgstr "Stream stoppen"
+msgstr "Stream öffnen"
 
 #: plugins/gtk/gnome_interface.c:2340
-#, fuzzy
 msgid "UDP stream"
 msgstr "Stream abspielen"
 
 #: plugins/gtk/gnome_interface.c:2483
-#, fuzzy
 msgid "Channel server"
-msgstr "Kanäle:"
+msgstr "Kanal Server"
 
 #: plugins/gtk/gnome_interface.c:2638
-#, fuzzy
 msgid "Open Satellite Card"
-msgstr "Playlist Fenster öffnen"
+msgstr "Satelliten Karte öffnen"
 
 #: plugins/gtk/gnome_interface.c:2654
 msgid "Transponder Settings"
-msgstr ""
+msgstr "Transponder Einstellungen"
 
 #: plugins/gtk/gnome_interface.c:2765
 msgid "6/7"
 msgstr ""
 
-#: plugins/gtk/gtk_preferences.c:304
-msgid "Name"
-msgstr ""
-
-#: plugins/gtk/gtk_preferences.c:304
-#, fuzzy
-msgid "Description"
-msgstr "Dauer"
-
 #: plugins/gtk/gtk_preferences.c:347
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurieren"
 
 #. add new label
 #: plugins/gtk/gtk_preferences.c:370
-#, fuzzy
 msgid "Selected:"
-msgstr "Festgelegt"
+msgstr "Selektiert"
 
 #: plugins/gtk/gtk_preferences.c:493 plugins/gtk/gtk_preferences.c:510
-#, fuzzy
 msgid "Save"
-msgstr "Server"
+msgstr "Speichern"
 
 #: plugins/gtk/gtk_preferences.c:506
 msgid "Apply"
-msgstr "Anwenden"
-
-#. special case for "off" item
-#: plugins/gtk/gtk_menu.c:525
-msgid "None"
-msgstr ""
-
-#: plugins/gtk/gtk_menu.c:684
-#, fuzzy, c-format
-msgid "Title %d (%d)"
-msgstr "Titel:  "
-
-#: plugins/gtk/gtk_menu.c:747
-#, fuzzy, c-format
-msgid "Chapter %d"
-msgstr "Kapitel"
+msgstr "Übernehmen"
 
 #: plugins/idct/idct.c:47
 msgid "IDCT module"
-msgstr ""
+msgstr "IDCT Modul"
 
 #: plugins/idct/idctaltivec.c:49
 msgid "Altivec IDCT module"
-msgstr ""
+msgstr "ALtiVec IDCT Modul"
 
 #: plugins/idct/idctclassic.c:47
 msgid "classic IDCT module"
-msgstr ""
+msgstr "klassisches IDCT Modul"
 
 #: plugins/idct/idctmmx.c:53
 msgid "MMX IDCT module"
-msgstr ""
+msgstr "MMX IDCT Modul"
 
 #: plugins/idct/idctmmxext.c:53
 msgid "MMX EXT IDCT module"
-msgstr ""
+msgstr "MMX EXT IDCT Modul"
 
 #: plugins/imdct/imdct.c:47
 msgid "AC3 IMDCT module"
-msgstr ""
+msgstr "AC3 IMDCT Modul"
 
 #: plugins/imdct/imdct3dn.c:47
 msgid "3D Now! AC3 IMDCT module"
-msgstr ""
+msgstr "3D Now! AC3 IMDCT MOdul"
 
 #: plugins/imdct/imdctsse.c:47
 msgid "SSE AC3 IMDCT module"
-msgstr ""
+msgstr "SSE AC3 IMDCT Modul"
 
 #: plugins/kde/kde.cpp:54
-#, fuzzy
 msgid "KDE interface module"
-msgstr "Standard Oberfläche: "
+msgstr "KDE Öberflace Modul"
 
 #: plugins/lirc/lirc.c:71
 msgid "infrared remote control module"
-msgstr ""
+msgstr "Infrarot Fernbedienung Modul"
 
 #: plugins/lpcm_adec/lpcm_adec.c:71
 msgid "linear PCM audio decoder"
-msgstr ""
+msgstr "linearer PCM Audio Dekoder"
 
 #: plugins/macosx/macosx.c:49
 msgid "MacOS X interface, sound and video module"
-msgstr ""
+msgstr "MaxOS X Oberfläche, Audio und Video Modul"
 
 #: plugins/mad/mad_adec.c:69
 msgid "libmad MPEG 1/2/3 audio decoder library"
-msgstr ""
+msgstr "libmad MPEG 1/2/3 Audio Dekoder Bibliothek"
 
 #: plugins/memcpy/memcpy.c:66
 msgid "libc memcpy module"
-msgstr ""
+msgstr "libc Speicherkopier Modul"
 
 #: plugins/memcpy/memcpy.c:72
 msgid "3D Now! memcpy module"
-msgstr ""
+msgstr "3D Now! Speicherkopier Modul"
 
 #: plugins/memcpy/memcpy.c:80
 msgid "MMX memcpy module"
-msgstr ""
+msgstr "MMX Speicherkopier Modul"
 
 #: plugins/memcpy/memcpy.c:86
 msgid "MMX EXT memcpy module"
-msgstr ""
+msgstr "MMX EXT Speicherkopier Modul"
 
 #: plugins/memcpy/memcpyaltivec.c:47
 msgid "AltiVec memcpy module"
-msgstr ""
+msgstr "AltiVec Speicherkopier Modul"
 
 #: plugins/mga/mga.c:67
 msgid "Matrox Graphic Array video module"
-msgstr ""
+msgstr "Matrox Graphic Array Video Ausgabe"
 
 #. ****************************************************************************
 #. * Building configuration tree
 #. ****************************************************************************
 #: plugins/mga/xmga.c:96 plugins/x11/x11.c:40 plugins/x11/xvideo.c:45
-#, fuzzy
 msgid "alternate fullscreen method"
-msgstr "In Vollbildmodus wechseln"
+msgstr "Alternativer Vollbildmodus"
 
-#: plugins/mga/xmga.c:98 plugins/x11/x11.c:42 plugins/x11/xvideo.c:47
+#: plugins/mga/xmga.c:97 plugins/x11/x11.c:41 plugins/x11/xvideo.c:46
 msgid ""
 "There are two ways to make a fullscreen window, unfortunately each one has "
 "its drawbacks.\n"
 "1) Let the window manager handle your fullscreen window (default). But "
-"things like taskbars will likely show on top of the video.\n"
+"things like taskbars will likely show on top of the video\n"
 "2) Completly bypass the window manager, but then nothing will be able to "
-"show on top of the video."
+"show on top of the video"
 msgstr ""
+"Es gibt zwei Methoden um den Vollbildmodus zu implementieren, leider hat "
+"jeder von ihnen Nachteile.\n"
+"1) Der Window Manager soll das Vollbild Fenster verwalten (Standard). But "
+"Sachen wie die Taskbar werden wahrscheinlich über dem Ausgabefenster angezeigt.\n"
+"2) Den Window Manager nicht beachten, damit wird es jedoch unmöglich andere Fenster "
+"über dem Ausgabefenster zu haben."
 
 #: plugins/mga/xmga.c:117
 msgid "X11 MGA module"
-msgstr ""
+msgstr "X11 MGA Modul"
 
 #: plugins/motion/motion.c:45
 msgid "motion compensation module"
-msgstr ""
+msgstr "Motion Compensation Modul"
 
 #: plugins/motion/motion3dnow.c:47
 msgid "3DNow! motion compensation module"
-msgstr ""
+msgstr "3DNow! Motion Compensation Modul"
 
 #: plugins/motion/motionaltivec.c:48
 msgid "AltiVec motion compensation module"
-msgstr ""
+msgstr "AltiVec Motion Compensation Modul"
 
 #: plugins/motion/motionmmx.c:47
 msgid "MMX motion compensation module"
-msgstr ""
+msgstr "MMX Motion Compensation Modul"
 
 #: plugins/motion/motionmmxext.c:47
 msgid "MMXEXT motion compensation module"
-msgstr ""
+msgstr "MMXEXT Motion Compensation Modul"
 
 #: plugins/mpeg_adec/mpeg_adec.c:69
 msgid "MPEG I/II layer 1/2 audio decoder"
-msgstr ""
+msgstr "MPEG I/II layer 1/2 Audio Dekoder"
 
 #: plugins/mpeg_system/mpeg_es.c:61
 msgid "ISO 13818-2 MPEG Elementary Stream input"
-msgstr ""
+msgstr "ISO 13818-2 MPEG Elementarz Stream Eingabe"
 
 #: plugins/mpeg_system/mpeg_ps.c:60
 msgid "ISO 13818-1 MPEG Program Stream input"
-msgstr ""
+msgstr "ISO 13818-1 MPEG Program Stream Eingabe"
 
 #: plugins/mpeg_system/mpeg_ts.c:58
 msgid "ISO 13818-1 MPEG Transport Stream input"
-msgstr ""
+msgstr "ISO 13818-1 MPEG Transport Stream Eingabe"
 
 #: plugins/mpeg_vdec/video_parser.c:82
 msgid "IDCT method"
-msgstr ""
+msgstr "IDCT Methode"
 
 #: plugins/mpeg_vdec/video_parser.c:84
 msgid "motion compensation method"
-msgstr ""
+msgstr "Motion Compensation Methode"
 
 #: plugins/mpeg_vdec/video_parser.c:88
 msgid "MPEG I/II video decoder module"
-msgstr ""
+msgstr "MPEG I/II Video Dekoder Modul"
 
 #: plugins/network/ipv4.c:77
 msgid "IPv4 network abstraction layer"
-msgstr ""
+msgstr "IPv4 Netzwerk Abstraktionsschicht"
 
 #: plugins/network/ipv6.c:74
 msgid "IPv6 network abstraction layer"
-msgstr ""
+msgstr "IPv6 Netzwerk Abstraktionsschict"
 
 #: plugins/qnx/qnx.c:47
 msgid "QNX RTOS module"
-msgstr ""
+msgstr "QNX RTOS Modul"
 
 #: plugins/qt/qt.cpp:46
-#, fuzzy
 msgid "Qt interface module"
-msgstr "Standard Oberfläche: "
+msgstr "Qt Oberfläche Modul"
 
 #: plugins/satellite/satellite.c:48
 msgid "satellite input module"
-msgstr ""
+msgstr "Satellit Eingabe Modul"
 
 #: plugins/sdl/sdl.c:52
 msgid "Simple DirectMedia Layer module"
-msgstr ""
+msgstr "SDL (Simple DirectMedia Layer) Modul"
 
 #: plugins/spudec/spu_decoder.c:79
 msgid "DVD subtitles decoder module"
-msgstr ""
+msgstr "DVD Untertitel Dekoder Modul"
 
 #: plugins/text/logger.c:67
-#, fuzzy
 msgid "file logging interface module"
-msgstr "Standard Oberfläche: "
+msgstr "Datei Logger Oberflächen Modul"
 
 #: plugins/text/ncurses.c:56
-#, fuzzy
 msgid "ncurses interface module"
-msgstr "Standard Oberfläche: "
+msgstr "NCurses Oberfläche Modul"
 
 #: plugins/text/rc.c:84
-#, fuzzy
 msgid "remote control interface module"
-msgstr "Standard Oberfläche: "
+msgstr "Fernbedienung Schnittstelle Modul"
 
 #: plugins/vcd/vcd.c:45
 msgid "VCD input module"
-msgstr ""
+msgstr "VCD Eingabe Modul"
 
 #: plugins/win32/waveout.c:51
 msgid "Win32 waveOut extension module"
-msgstr ""
+msgstr "Win32 waveOut Erweiterung Modul"
 
 #: plugins/win32/win32.cpp:45
-#, fuzzy
 msgid "Win32 interface module"
-msgstr "Standard Oberfläche: "
+msgstr "Win32 Oberfläche Modul"
 
 #: plugins/x11/x11.c:61
 msgid "X11 module"
-msgstr ""
+msgstr "X11 Modul"
 
 #. ****************************************************************************
 #. * Building configuration tree
 #. ****************************************************************************
 #: plugins/x11/xvideo.c:40
 msgid "XVideo adaptor number"
-msgstr ""
+msgstr "XVideo Adapter Nummer"
 
-#: plugins/x11/xvideo.c:42
+#: plugins/x11/xvideo.c:41
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
-"choose which one will be used (you shouldn't have to change this)."
+"choose which one will be used (you shouldn't have to change this)"
 msgstr ""
+"Diese Option erlaubt dir den Adapter zu wählen, falls deine Grafikkarte mehrere "
+"Adapter eingebaut hat (du solltest das eigentlich nicht ändern müssen)"
 
 #: plugins/x11/xvideo.c:67
 msgid "XVideo extension module"
-msgstr ""
-
-#~ msgid "An_gle"
-#~ msgstr "Wi_nkel"
-
-#~ msgid "Choose angle"
-#~ msgstr "Winkel festlegen"
-
-#~ msgid "DVD  "
-#~ msgstr "DVD"
-
-#~ msgid "/dev/dvd"
-#~ msgstr "/dev/dvd"
-
-#~ msgid "Preferences"
-#~ msgstr "Einstellungen"
-
-#~ msgid "Default path: "
-#~ msgstr "Standard Pfad:"
-
-#~ msgid "Default DVD path: "
-#~ msgstr "Standard DVD Pfad:"
-
-#~ msgid "Default VCD path: "
-#~ msgstr "Standard VCD Pfad:"
-
-#~ msgid "Default server: "
-#~ msgstr "Standard Server:"
-
-#~ msgid "Broadcast address: "
-#~ msgstr "Broadcast Adresse:"
-
-#~ msgid "Default port: "
-#~ msgstr "Standard Port: "
-
-#~ msgid "Broadcast mode"
-#~ msgstr "Broadcast Modus"
-
-#~ msgid "Default protocol: "
-#~ msgstr "Standard Protokoll: "
-
-#~ msgid "Default output: "
-#~ msgstr "Standard Ausgabe: "
-
-#~ msgid "Default height: "
-#~ msgstr "Standard Höhe: "
-
-#~ msgid "Default width: "
-#~ msgstr "Standard Breite: "
-
-#~ msgid "Default depth:"
-#~ msgstr "Standard Farbtiefe: "
-
-#~ msgid "15 bits"
-#~ msgstr "15 bits"
-
-#~ msgid "16 bits"
-#~ msgstr "16 bits"
-
-#~ msgid "32 bits"
-#~ msgstr "32 bits"
-
-#~ msgid "Fullscreen on play"
-#~ msgstr "Vollbild beim Abspielen"
-
-#~ msgid "Grayscale"
-#~ msgstr "Graustufen"
-
-#~ msgid "Gamma:"
-#~ msgstr "Gamma:"
-
-#~ msgid "Spdif output"
-#~ msgstr "Spdif Ausgabe"
-
-#~ msgid "Frequency: "
-#~ msgstr "Frequenz: "
-
-#~ msgid "48000 Hz"
-#~ msgstr "48000 Hz"
-
-#~ msgid "44100 Hz"
-#~ msgstr "44100 Hz"
-
-#~ msgid "32000 Hz"
-#~ msgstr "32000 Hz"
-
-#~ msgid "22050 Hz"
-#~ msgstr "22050 Hz"
-
-#~ msgid "Quality: "
-#~ msgstr "Qualität: "
-
-#~ msgid "8 bits"
-#~ msgstr "8 bits"
-
-#~ msgid "Channels: "
-#~ msgstr "Kanäle: "
-
-#~ msgid "Mono"
-#~ msgstr "Mono"
-
-#~ msgid "Stereo"
-#~ msgstr "Stereo"
-
-#~ msgid "Files associated with vlc"
-#~ msgstr "Zu vlc zugeordnete Dateien"
-
-#~ msgid "ts"
-#~ msgstr "ts"
-
-#~ msgid "vob"
-#~ msgstr "vob"
-
-#~ msgid "mp2"
-#~ msgstr "mp2"
-
-#~ msgid "mpeg"
-#~ msgstr "mpeg"
-
-#~ msgid "Warning level: "
-#~ msgstr "Warnlevel: "
-
-#~ msgid "Misc"
-#~ msgstr "Anders"
-
-#~ msgid "Default path:"
-#~ msgstr "Standard Pfad:"
-
-#~ msgid "Browse"
-#~ msgstr "Durchsuchen"
-
-#~ msgid "Default VCD path"
-#~ msgstr "Standard VCD Pfad"
-
-#~ msgid "Default DVD path:"
-#~ msgstr "Standard DVD Pfad"
-
-#~ msgid "/dev/cdrom"
-#~ msgstr "/dev/cdrom"
-
-#~ msgid "vls "
-#~ msgstr "vls"
-
-#~ msgid "Default server:"
-#~ msgstr "Standard server:"
-
-#~ msgid "Default port:"
-#~ msgstr "Standard Port:"
-
-#~ msgid "Broadcast address:"
-#~ msgstr "Broadcast Adresse:"
-
-#~ msgid "Default protocol:"
-#~ msgstr "Standard Protokoll:"
-
-#~ msgid "Gtk+"
-#~ msgstr "Gtk+"
-
-#~ msgid "Gnome"
-#~ msgstr "Gnome"
-
-#~ msgid "Default interface:"
-#~ msgstr "Standard Oberfläche:"
-
-#~ msgid "sdl"
-#~ msgstr "sdl"
-
-#~ msgid "xvideo"
-#~ msgstr "xvideo"
-
-#~ msgid "x11"
-#~ msgstr "x11"
-
-#~ msgid "Default output:"
-#~ msgstr "Standard Ausgabe:"
-
-#~ msgid "Default width:"
-#~ msgstr "Standard Breite:"
-
-#~ msgid "Default height:"
-#~ msgstr "Stanradrd Höhe:"
-
-#~ msgid "Quality:"
-#~ msgstr "Qualität:"
-
-#~ msgid "dsp"
-#~ msgstr "dsp"
-
-#~ msgid "alsa"
-#~ msgstr "alsa"
-
-#~ msgid "/dev/dsp"
-#~ msgstr "/dev/dsp"
-
-#~ msgid "Types associated with vlc"
-#~ msgstr "Zu vlc zugeordnete Dateien"
+msgstr "XVideo Erweiterung Modul"
