@@ -28,6 +28,10 @@
  * - "input.h"
  *****************************************************************************/
 
+#define WORD_TYPE           u32
+#define WORD_BYTE_LENGTH    4
+#define WORD_LENGTH         32
+
 /*****************************************************************************
  * Macros
  *****************************************************************************/
@@ -71,7 +75,7 @@ typedef struct bit_fifo_s
     /* This unsigned integer allows us to work at the bit level. This buffer
      * can contain 32 bits, and the used space can be found on the MSb's side
      * and the available space on the LSb's side. */
-    u32                 buffer;
+    WORD_TYPE           buffer;
 
     /* Number of bits available in the bit buffer */
     int                 i_available;
@@ -166,7 +170,7 @@ static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
  * DumpBits32 : removes 32 bits from the bit buffer
  *****************************************************************************
  * This function actually believes that you have already put 32 bits in the
- * bit buffer, so you can't you use it anytime.
+ * bit buffer, so you can't use it anytime.
  *****************************************************************************/
 static __inline__ void DumpBits32( bit_stream_t * p_bit_stream )
 {
@@ -181,31 +185,90 @@ static __inline__ void DumpBits32( bit_stream_t * p_bit_stream )
  * need to call RealignBits() before).
  */
 
+void PeekNextPacket( bit_stream_t * p_bit_stream );
+
+//(stolen from the kernel)
+#if __BYTE_ORDER == __BIG_ENDIAN
+#   define swab32(x) (x)
+#else
+#   if defined (__i386__)
+#       define swab32(x) __i386_swab32(x)
+static inline const u32 __i386_swab32(u32 x)
+{
+    __asm__("bswap %0" : "=r" (x) : "0" (x));
+    return x;
+}
+#   else
+#       define swab32(x)\
+            ((((u8*)&x)[0] << 24) | (((u8*)&x)[1] << 16) |  \
+            (((u8*)&x)[2] << 8)  | (((u8*)&x)[3]))
+#   endif
+#endif
+
+static __inline__ WORD_TYPE GetWord( bit_stream_t * p_bit_stream )
+{
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - WORD_BYTE_LENGTH )
+    {
+        return( swab32( *(((WORD_TYPE *)p_bit_stream->p_byte)++) ) );
+    }
+    else
+    {
+        PeekNextPacket( p_bit_stream );
+        return( swab32( *(((WORD_TYPE *)p_bit_stream->p_byte)++) ) );
+    }
+}
+
 /*****************************************************************************
  * RemoveBits : removes i_bits bits from the bit buffer
  *****************************************************************************/
 static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
 {
-    NeedBits( p_bit_stream, i_bits );
-    DumpBits( p_bit_stream, i_bits );
+    p_bit_stream->fifo.i_available -= i_bits;
+
+    if( p_bit_stream->fifo.i_available >= 0 )
+    {
+        p_bit_stream->fifo.buffer <<= i_bits;
+        return;
+    }
+    p_bit_stream->fifo.buffer = GetWord( p_bit_stream )
+                            << ( -p_bit_stream->fifo.i_available );
+    p_bit_stream->fifo.i_available += WORD_LENGTH;
 }
 
 /*****************************************************************************
- * RemoveBits32 : removes 32 bits from the bit buffer
+ * RemoveBits32 : removes 32 bits from the bit buffer (and as a side effect,
+ * refill it)
  *****************************************************************************/
 static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
 {
-    NeedBits( p_bit_stream, 32 );
-    DumpBits32( p_bit_stream );
+    p_bit_stream->fifo.buffer = GetWord( p_bit_stream )
+                        << (32 - p_bit_stream->fifo.i_available);
 }
 
 /*****************************************************************************
  * ShowBits : return i_bits bits from the bit stream
  *****************************************************************************/
+static __inline__ WORD_TYPE ShowWord( bit_stream_t * p_bit_stream )
+{
+    if( p_bit_stream->p_byte <= p_bit_stream->p_end - WORD_BYTE_LENGTH )
+    {
+        return( swab32( *((WORD_TYPE *)p_bit_stream->p_byte) ) );
+    }
+
+    PeekNextPacket( p_bit_stream );
+    return( swab32( *((WORD_TYPE *)p_bit_stream->p_byte) ) );
+}
+
 static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream, int i_bits )
 {
-    NeedBits( p_bit_stream, i_bits );
-    return( p_bit_stream->fifo.buffer >> (32 - i_bits) );
+    if( p_bit_stream->fifo.i_available >= i_bits )
+    {
+        return( p_bit_stream->fifo.buffer >> (32 - i_bits) );
+    }
+
+    return( (p_bit_stream->fifo.buffer |
+            (ShowWord( p_bit_stream ) >> p_bit_stream->fifo.i_available))
+                    >> (32 - i_bits) );
 }
 
 /*****************************************************************************
@@ -213,12 +276,24 @@ static __inline__ u32 ShowBits( bit_stream_t * p_bit_stream, int i_bits )
  *****************************************************************************/
 static __inline__ u32 GetBits( bit_stream_t * p_bit_stream, int i_bits )
 {
-    u32 i_buffer;
+    u32             i_result;
 
-    NeedBits( p_bit_stream, i_bits );
-    i_buffer = p_bit_stream->fifo.buffer >> (32 - i_bits);
-    DumpBits( p_bit_stream, i_bits );
-    return( i_buffer );
+    p_bit_stream->fifo.i_available -= i_bits;
+    if( p_bit_stream->fifo.i_available >= 0 )
+    {
+        i_result = p_bit_stream->fifo.buffer >> (32 - i_bits);
+        p_bit_stream->fifo.buffer <<= i_bits;
+        return( i_result );
+    }
+
+    i_result = p_bit_stream->fifo.buffer >> (32 - i_bits);
+    p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
+    i_result |= p_bit_stream->fifo.buffer
+                             >> (32 + p_bit_stream->fifo.i_available);
+    p_bit_stream->fifo.buffer <<= ( -p_bit_stream->fifo.i_available );
+    p_bit_stream->fifo.i_available += WORD_LENGTH;
+
+    return( i_result );
 }
 
 /*****************************************************************************
@@ -226,12 +301,15 @@ static __inline__ u32 GetBits( bit_stream_t * p_bit_stream, int i_bits )
  *****************************************************************************/
 static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
 {
-    u32 i_buffer;
+    u32             i_result;
 
-    NeedBits( p_bit_stream, 32 );
-    i_buffer = p_bit_stream->fifo.buffer;
-    DumpBits32( p_bit_stream );
-    return( i_buffer );
+    i_result = p_bit_stream->fifo.buffer;
+    p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
+    i_result |= p_bit_stream->fifo.buffer
+                             >> (p_bit_stream->fifo.i_available);
+    p_bit_stream->fifo.buffer <<= (32 - p_bit_stream->fifo.i_available);
+    
+    return( i_result );
 }
 
 /*****************************************************************************
@@ -239,6 +317,7 @@ static __inline__ u32 GetBits32( bit_stream_t * p_bit_stream )
  *****************************************************************************/
 static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
 {
-    DumpBits( p_bit_stream, p_bit_stream->fifo.i_available & 0x7 );
+    p_bit_stream->fifo.buffer <<= (p_bit_stream->fifo.i_available & 0x7);
+    p_bit_stream->fifo.i_available &= ~0x7;
 }
 

@@ -1,4 +1,10 @@
 [insert date here]
+0.1.99e :
+
+  * new bitstream syntax and slight performance increase
+  * BeOS build fix
+
+Wed Jul 12 01:24:40 CEST 2000
 0.1.99d :
 
   * fixed RPM build

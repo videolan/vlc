@@ -282,8 +282,8 @@
  * standard width and height broadcasted MPEG-2 streams or DVDs */
 #define VOUT_WIDTH_VAR                  "vlc_width"
 #define VOUT_HEIGHT_VAR                 "vlc_height"
-#define VOUT_WIDTH_DEFAULT              400
-#define VOUT_HEIGHT_DEFAULT             300
+#define VOUT_WIDTH_DEFAULT              720
+#define VOUT_HEIGHT_DEFAULT             576
 
 /* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */

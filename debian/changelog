@@ -1,8 +1,24 @@
+vlc (0.1.99e) unstable; urgency=low
+
+  * new bitstream syntax and slight performance increase
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  [ insert date here ]
+
 vlc (0.1.99d) unstable; urgency=low
 
   * .deb is now more lintian-friendly
+  * removed a few useless warning messages
+  * new plugin API
+  * plugin auto-detection
+  * removed the default --enable-ppro option because it didn't work on K6-2
+  * the framebuffer client now leaves the console in a working state
+  * the dithered 8 bpp YUV transformation works again (blame bbp !)
+  * the YUV transformations are now plugins as well
+  * alternative symlinks like gvlc, fbvlc are now created at compile time
+  * borrowed libmpeg2's GPLed MMX YUV transformations (16 and 32 bits)
+  * fixed an endianness problem which occured on iMacs
 
- -- Samuel Hocevar <sam@via.ecp.fr>  [Insert date here]
+ -- Samuel Hocevar <sam@via.ecp.fr>  Wed, 12 Jul 2000 01:24:40 +0200
 
 vlc (0.1.99c) unstable; urgency=low
 
