@@ -2,7 +2,7 @@
  * ac3_decoder_thread.c: ac3 decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder_thread.c,v 1.36 2001/08/05 15:32:46 gbazin Exp $
+ * $Id: ac3_decoder_thread.c,v 1.37 2001/09/05 16:46:10 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -84,6 +84,7 @@ vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
 
     /* Allocate the memory needed to store the thread's structure */
     p_ac3thread_temp = (ac3dec_thread_t *)malloc(sizeof(ac3dec_thread_t) + 15);
+    memset( p_ac3thread_temp, 0, sizeof(ac3dec_thread_t) + 15 );
 
     /* We need to be 16 bytes aligned */
     p_ac3thread = (ac3dec_thread_t *)(((unsigned long)p_ac3thread_temp + 15)

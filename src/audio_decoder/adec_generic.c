@@ -2,7 +2,7 @@
  * adec_generic.c: MPEG audio decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: adec_generic.c,v 1.5 2001/04/06 09:15:47 sam Exp $
+ * $Id: adec_generic.c,v 1.6 2001/09/05 16:46:10 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -86,8 +86,8 @@ int adec_SyncFrame( adec_thread_t * p_adec, adec_sync_info_t * p_sync_info )
 
     p_adec->header = header;
 
-    /* basic header check : sync word, no emphasis */
-    if( (header & 0xfff00003) != 0xfff00000 )
+    /* basic header check : sync word */
+    if( (header & 0xfff00000) != 0xfff00000 )
     {
         return 1;
     }
@@ -95,7 +95,7 @@ int adec_SyncFrame( adec_thread_t * p_adec, adec_sync_info_t * p_sync_info )
     /* calculate bit rate */
     index = ( header >> 17 ) & 7; /* mpeg ID + layer */
     bit_rates = bit_rate_table[ index ];
-    if( bit_rate_table == NULL )
+    if( bit_rates == NULL )
     {
         return 1; /* invalid layer */
     }
