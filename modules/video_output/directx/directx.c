@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.8 2002/11/26 19:31:50 gbazin Exp $
+ * $Id: directx.c,v 1.9 2002/11/26 22:20:18 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1415,7 +1415,6 @@ static int DirectXGetSurfaceDesc( vout_thread_t *p_vout, picture_t *p_pic )
         {
             /* DirectX 3 doesn't support the DDLOCK_NOSYSLOCK flag, resulting
              * in an invalid params error */
-            dxresult = IDirectDrawSurface2_Restore( p_pic->p_sys->p_surface );
             dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface, NULL,
                                              &p_pic->p_sys->ddsd,
                                              DDLOCK_WAIT, NULL);

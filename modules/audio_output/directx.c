@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.8 2002/11/15 16:27:10 gbazin Exp $
+ * $Id: directx.c,v 1.9 2002/11/26 22:20:18 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -86,9 +86,6 @@ struct aout_sys_t
 {
     LPDIRECTSOUND       p_dsobject;              /* main Direct Sound object */
 
-    LPDIRECTSOUNDBUFFER p_dsbuffer_primary;     /* the actual sound card buffer
-                                                   (not used directly) */
-
     LPDIRECTSOUNDBUFFER p_dsbuffer;   /* the sound buffer we use (direct sound
                                        * takes care of mixing all the
                                        * secondary buffers into the primary) */
@@ -136,8 +133,6 @@ vlc_module_end();
 static int OpenAudio( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
-    HRESULT dsresult;
-    DSBUFFERDESC dsbuffer_desc;
     int i;
 
     msg_Dbg( p_aout, "Open" );
@@ -152,7 +147,6 @@ static int OpenAudio( vlc_object_t *p_this )
 
     /* Initialize some variables */
     p_aout->output.p_sys->p_dsobject = NULL;
-    p_aout->output.p_sys->p_dsbuffer_primary = NULL;
     p_aout->output.p_sys->p_dsbuffer = NULL;
     p_aout->output.p_sys->p_dsnotify = NULL;
     p_aout->output.p_sys->p_notif = NULL;
@@ -165,21 +159,6 @@ static int OpenAudio( vlc_object_t *p_this )
     if( DirectxInitDSound( p_aout ) )
     {
         msg_Err( p_aout, "cannot initialize DirectSound" );
-        goto error;
-    }
-
-    /* Obtain (not create) Direct Sound primary buffer */
-    memset( &dsbuffer_desc, 0, sizeof(DSBUFFERDESC) );
-    dsbuffer_desc.dwSize = sizeof(DSBUFFERDESC);
-    dsbuffer_desc.dwFlags = DSBCAPS_PRIMARYBUFFER;
-    msg_Warn( p_aout, "create direct sound primary buffer" );
-    dsresult = IDirectSound_CreateSoundBuffer(p_aout->output.p_sys->p_dsobject,
-                                     &dsbuffer_desc,
-                                     &p_aout->output.p_sys->p_dsbuffer_primary,
-                                     NULL);
-    if( dsresult != DS_OK )
-    {
-        msg_Err( p_aout, "cannot create direct sound primary buffer" );
         goto error;
     }
 
@@ -282,10 +261,6 @@ static void CloseAudio( vlc_object_t *p_this )
 
     /* release the secondary buffer */
     DirectxDestroySecondaryBuffer( p_aout );
-
-    /* then release the primary buffer */
-    if( p_aout->output.p_sys->p_dsbuffer_primary )
-        IDirectSoundBuffer_Release( p_aout->output.p_sys->p_dsbuffer_primary );
 
     /* finally release the DirectSound object */
     if( p_aout->output.p_sys->p_dsobject )
