@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.29 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: open.cpp,v 1.30 2003/07/24 16:07:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -209,6 +209,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     {
         subsfile_checkbox->SetValue(TRUE);
         subsfile_button->Enable();
+        subsfile_mrl.Add( wxString(wxT("sub-file=")) + wxU(psz_subsfile) );
     }
     if( psz_subsfile ) free( psz_subsfile );
 
@@ -231,6 +232,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     {
         sout_checkbox->SetValue(TRUE);
         sout_button->Enable();
+        subsfile_mrl.Add( wxString(wxT("sout=")) + wxU(psz_sout) );
     }
     if( psz_sout ) free( psz_sout );
 
@@ -652,17 +654,72 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
 				       FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
+    if( p_playlist == NULL ) return;
 
-    for( size_t i = 0; i < mrl.GetCount(); i++ )
+    for( int i = 0; i < (int)mrl.GetCount(); i++ )
     {
+        int i_options = 0, i_total_options;
+        char **ppsz_options = NULL;
+
+        /* Count the input options */
+        while( i + i_options + 1 < (int)mrl.GetCount() &&
+               mrl[i + i_options + 1].mb_str()[0] == ':' )
+        {
+            i_options++;
+        }
+
+        /* Allocate ppsz_options */
+        for( int j = 0; j < i_options; j++ )
+        {
+            if( !ppsz_options )
+                ppsz_options = (char **)malloc( sizeof(char *) * i_options );
+
+            ppsz_options[j] = strdup( mrl[i + j  + 1].mb_str() );
+        }
+
+	i_total_options = i_options;
+
+        /* Get the options from the subtitles dialog */
+        if( subsfile_checkbox->IsChecked() && subsfile_mrl.GetCount() )
+        {
+            ppsz_options = (char **)realloc( ppsz_options, sizeof(char *) *
+                               (i_total_options + subsfile_mrl.GetCount()) );
+
+            for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
+            {
+                ppsz_options[i_total_options + j] =
+                    strdup( subsfile_mrl[j].mb_str() );
+            }
+
+            i_total_options += subsfile_mrl.GetCount();
+        }
+
+        /* Get the options from the stream output dialog */
+        if( sout_checkbox->IsChecked() && sout_mrl.GetCount() )
+        {
+            ppsz_options = (char **)realloc( ppsz_options, sizeof(char *) *
+                               (i_total_options + sout_mrl.GetCount()) );
+
+            for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
+            {
+                ppsz_options[i_total_options + j] =
+                    strdup( sout_mrl[j].mb_str() );
+            }
+
+            i_total_options += sout_mrl.GetCount();
+        }
+
         playlist_Add( p_playlist, (const char *)mrl[i].mb_str(),
-		      0, 0,
+                      (const char **)ppsz_options, i_total_options,
                       PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
-    }
+
+        /* clean up */
+        for( int j = 0; j < i_total_options; j++ )
+            free( ppsz_options[j] );
+        if( ppsz_options ) free( ppsz_options );
+
+        i += i_options;
+   }
 
     //TogglePlayButton( PLAYING_S );
 
@@ -797,11 +854,7 @@ void OpenDialog::OnNetTypeChange( wxCommandEvent& event )
 void OpenDialog::OnSubsFileEnable( wxCommandEvent& event )
 {
     subsfile_button->Enable( event.GetInt() != 0 );
-    if( !event.GetInt() )
-    {
-        config_PutPsz( p_intf, "sub-file", "" );
-    }
-    else
+    if( event.GetInt() && demuxdump_checkbox->IsChecked() )
     {
         demuxdump_checkbox->SetValue( 0 );
         wxCommandEvent event = wxCommandEvent( wxEVT_NULL );
@@ -818,12 +871,13 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
 
     if( subsfile_dialog && subsfile_dialog->ShowModal() == wxID_OK )
     {
-        config_PutPsz( p_intf, "sub-file",
-            (const char *)subsfile_dialog->file_combo->GetValue().mb_str() );
-        config_PutInt( p_intf, "sub-delay",
-                       subsfile_dialog->delay_spinctrl->GetValue() );
-        config_PutFloat( p_intf, "sub-fps",
-                         subsfile_dialog->fps_spinctrl->GetValue() );
+        subsfile_mrl.Empty();
+        subsfile_mrl.Add( wxString(wxT("sub-file=")) +
+                          subsfile_dialog->file_combo->GetValue() );
+        subsfile_mrl.Add( wxString::Format( wxT("sub-delay=%i"),
+                          subsfile_dialog->delay_spinctrl->GetValue() ) );
+        subsfile_mrl.Add( wxString::Format( wxT("sub-fps=%i"),
+                          subsfile_dialog->fps_spinctrl->GetValue() ) );
     }
 }
 
@@ -833,11 +887,7 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
 void OpenDialog::OnSoutEnable( wxCommandEvent& event )
 {
     sout_button->Enable( event.GetInt() != 0 );
-    if( !event.GetInt() )
-    {
-        config_PutPsz( p_intf, "sout", "" );
-    }
-    else
+    if( event.GetInt() && demuxdump_checkbox->IsChecked() )
     {
         demuxdump_checkbox->SetValue( 0 );
         wxCommandEvent event = wxCommandEvent( wxEVT_NULL );
@@ -854,8 +904,8 @@ void OpenDialog::OnSoutSettings( wxCommandEvent& WXUNUSED(event) )
 
     if( sout_dialog && sout_dialog->ShowModal() == wxID_OK )
     {
-        config_PutPsz( p_intf, "sout",
-                       (const char *)sout_dialog->mrl.mb_str() );
+        sout_mrl.Empty();
+        sout_mrl.Add( wxString(wxT("sout=")) + sout_dialog->mrl );
     }
 }
 

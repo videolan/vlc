@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.47 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: wxwindows.h,v 1.48 2003/07/24 16:07:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -324,11 +324,13 @@ private:
     wxButton *subsfile_button;
     wxCheckBox *subsfile_checkbox;
     SubsFileDialog *subsfile_dialog;
+    wxArrayString subsfile_mrl;
 
     /* Controls for the stream output */
     wxButton *sout_button;
     wxCheckBox *sout_checkbox;
     SoutDialog *sout_dialog;
+    wxArrayString sout_mrl;
 
     /* Controls for the demux dump */
     wxTextCtrl *demuxdump_textctrl;

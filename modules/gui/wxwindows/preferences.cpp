@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.23 2003/07/20 12:22:32 gbazin Exp $
+ * $Id: preferences.cpp,v 1.24 2003/07/24 16:07:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -814,6 +814,9 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 for( int i_index = 0; p_item->ppsz_list[i_index]; i_index++ )
                 {
                     combo->Append( wxU(p_item->ppsz_list[i_index]) );
+                    if( p_item->psz_value && !strcmp( p_item->psz_value,
+                                 p_item->ppsz_list[i_index] ) )
+                        combo->SetSelection( i_index );
                 }
 
                 if( p_item->psz_value )
