@@ -13,6 +13,15 @@ Status: Todo
 
 Task
 Difficulty: Medium
+Urgency: Critical
+Platform: any
+Description: pointers in int
+ We have been very persistent in storing pointers in int's. We knew this was gonna hunt us one day.
+The time is near. See this forum <a href="http://forum.videolan.org/viewtopic.php?p=14378">post</a>.
+Status: Todo
+
+Task
+Difficulty: Medium
 Platform: any
 Urgency: Wishlist
 Description: RAR/ZIP/... access
@@ -27,8 +36,6 @@ Description: DVTS support
 DV over RTP support. See <a href="http://www.sfc.wide.ad.jp/DVTS/">DVTS homepage</a>
 Status: Todo
 
-Task
-Difficulty: Easy
 Task
 Difficulty: Easy
 Platform: any
@@ -72,19 +79,12 @@ Windows taskbar reports two windows in the video embed mode.
 Status: Assigned to gibalou
 
 Task
-Difficulty: Easy
-Urgency: Normal
-Platform: any
-Description: Multichannel downmixing
-5:1 to Stereo proper downmixing
-Status: Todo
-
-Task
 Difficulty: Guru
 Urgency: Normal
 Platform: any
 Description: External audio file playing
- Allow several access from an input thread to allow for multi-input (30% done)
+ Allow several access from an input thread to allow for multi-input<br />
+(90% done) Add GUI elements
 Status: Assigned to fenrir
 
 Task
@@ -109,7 +109,8 @@ Urgency: Normal
 Platform: any
 Description: Rewrite the SAP parser
  The SAP parser is very dirty at the moment, and needs a complete rewrite.
- - caching support
+ - caching support<br />
+Mostly finished. Closely tied to the new playlist system
 Status: Assigned to zorglub
 
 Task
@@ -118,7 +119,8 @@ Urgency: Normal
 Platform: any
 Description: Tree playlist
  A hierarchized playlist structure, eventually using a media library.
-Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas (not up-to-date)</a>
+Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas (not up-to-date)</a><br />
+Mostly finished. will be done after 0.8.0
 Status: Assigned to zorglub
 
 Task
@@ -191,7 +193,7 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: flash video playing/streaming
-A flash video muxer and demuxer. FFMPEG can already output flash video. a wast not to make use of that capability.
+A flash video muxer and demuxer. FFMPEG can already output flash video. a waste not to make use of that capability.
 Status: Todo
 
 Task
@@ -282,7 +284,7 @@ Difficulty: Easy
 Urgency: Wishlist
 Platform: any
 Description: More Picture filters
-There are several picture filters (blend, scale), but we can use more
+There are several picture filters (blend, scale), but we can use more (crop, move..)
 Status: Todo
 
 Task
@@ -305,8 +307,8 @@ Urgency: Wishlist
 Platform: any
 Description: Subtitle work
 - better SSA support with postioning, colors etc.
-- VobSub tracks support
-- Fix subtitles dialogs
+- Vobsub seeking
+- Fix subtitles dialogs (mac done)
 Status: Todo
 
 Task
@@ -334,6 +336,7 @@ Implement a system to: <br />
  - Alert the user of critical errors (cannot play file). Should be blocking. <br />
  - Ask the user a question (Are you sure? or Try to Fix index of avi? or Overwrite File?)<br />
  - Inform the user, without disturbing him. (Buffering stream). This might require a displaytime or something. Because how do we know how long this information should be displayed? Also think of buffering 0-100%<br /> 
+ - present a user/passwd dialog when we get an authentication failure on a stream.<br />
 Status: Todo
 
 Task
@@ -375,12 +378,12 @@ Difficulty: Easy
 Urgency: Normal
 Platform: any
 Description: Controlling the mozilla plugin
-The mozilla plugin needs to be better controllable (via javascript). 
-- retrieve variable values.
-- open VLC media player
-- default html page to control the plugin
-- XUL controls
-(80% done) see:
+The mozilla plugin needs to be better controllable (via javascript). <br />
+- retrieve variable values.<br />
+- open VLC media player<br />
+- default html page to control the plugin<br />
+- XUL controls<br />
+(80% done) see:<br />
 <a href="http://sierra.via.ecp.fr/~zorglub/vlc/plugin/vlc.html">Javascript controls</a>
 <a href="http://sierra.via.ecp.fr/~zorglub/vlc/xul/">XUL controls</a>
 <a href="http://mplayerplug-in.sourceforge.net/">MPlayer Mozilla plugin</a>
@@ -498,7 +501,7 @@ Platform: any
 Description: Protocol rollover
 It would be cool if VLC supported something like a protocol rollover mechanism, much like WM server has as well. Multicast, UDP, TCP, HTTP etc.
 However, how spec compliant can this be?<br />
-We require a timeout on udp connecting. Beyond this a playlist file can be used to do a form of protocol rollover when one of the links fails.
+We require a timeout on udp connecting. Beyond this a playlist file can be used to do a form of protocol rollover when one of the links fails ( or implement this in the new style playlist system [only advance index on failure]).
 Status: Todo
 
 Task
@@ -559,6 +562,25 @@ Description: Option to automatically deinterlace when needed
   Mkv stores wether a video track is interlaced in the traxk descriptor
   libmpeg2 etc output this information on a per-picture bases
 Status: Todo
+
+Task
+Difficulty: Easy
+Platform: any
+Urgency: Wishlist
+Description: UDF decoder
+Support for the new XML based subtitle format called UDF
+Status: Todo
+
+Task
+Difficulty: Hard
+Platform: any
+Urgency: Wishlist
+Description: Faster deinterlacing
+Our deinterlacers are relatively slow. DScaler has the best Soft deinterlacers out there.
+Unfortunatly it is very Win32 focused.
+
+Status: Todo
+
 
 # Do not remove me
 Task

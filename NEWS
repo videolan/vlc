@@ -68,6 +68,7 @@ Stream Output:
 Audio Output:
  * New audio equalizer filter
  * Very trivial volume normalizer
+ * True channel downmixing when playing 5:1 material on Stereo
  * More gradual resampling which should improve the pitch changing effect
 
 Video Output:
