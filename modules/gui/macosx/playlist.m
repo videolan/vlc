@@ -23,6 +23,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/* TODO
+ * connect delegates, actions and outlets in IB
+ * implement play by double click
+ * implement delete by backspace
+ * implement playlist item rightclick menu
+ * implement sorting
+ * reconnect menu items etc
+ * add 'icons' for different types of nodes?
+ * create a new 'playlist toggle' that hides the playlist and in effect give you the old controller
+ * create a new search field build with pictures from the 'regular' search field, so it can be emulated on 10.2
+ * create toggle buttons for the shuffle, repeat one, repeat all functions.
+ * implement drag and drop and item reordering.
+ * reimplement enable/disable item
+ * create a new 'tool' button (see the gear button in the Finder window) for 'actions'
+   (adding service discovery, other views, new node/playlist, save node/playlist) stuff like that
+ */
+
+
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
