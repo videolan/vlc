@@ -1097,8 +1097,10 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                 /* we don't have this section in our list so we need to back
                  * it up */
                 *p_index2 = 0;
+#if 0
                 msg_Dbg( p_this, "backing up config for unknown module \"%s\"",
                                  &p_line[1] );
+#endif
                 *p_index2 = ']';
 
                 b_backup = 1;
