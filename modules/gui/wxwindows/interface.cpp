@@ -80,7 +80,7 @@ public:
                wxPoint = wxDefaultPosition, wxSize = wxSize( 20, -1 ) );
     virtual ~wxVolCtrl() {};
 
-    void Change( int i_volume );
+    void UpdateVolume();
 
     void OnChange( wxMouseEvent& event );
 
@@ -297,6 +297,12 @@ Interface::~Interface()
     delete timer;
 }
 
+void Interface::Update()
+{
+    /* Misc updates */
+    ((wxVolCtrl *)volctrl)->UpdateVolume();
+}
+
 void Interface::OnControlEvent( wxCommandEvent& event )
 {
     switch( event.GetId() )
@@ -414,10 +420,10 @@ END_EVENT_TABLE()
 
 VLCVolCtrl::VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent,
                         wxGauge **pp_volctrl )
-  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, 16 ), wxBORDER_NONE )
+  :wxControl( p_parent, -1, wxDefaultPosition, wxSize(64, 16), wxBORDER_NONE )
 {
-    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint(18,0),
-                                  wxSize(44,16) );
+    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint( 18, 0 ),
+                                 wxSize( 44, 16 ) );
 }
 
 void VLCVolCtrl::OnPaint( wxPaintEvent &evt )
@@ -1390,20 +1396,14 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
 #endif
 
 /*****************************************************************************
- * Definition of wxVolCtrl class.
+ * Definition of VolCtrl class.
  *****************************************************************************/
 wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id,
                       wxPoint point, wxSize size )
   : wxGauge( parent, id, 200, point, size, wxGA_HORIZONTAL | wxGA_SMOOTH )
 {
     p_intf = _p_intf;
-
-    audio_volume_t i_volume;
-    aout_VolumeGet( p_intf, &i_volume );
-    i_volume = i_volume * 200 * 2 / AOUT_VOLUME_MAX;
-    SetValue( i_volume );
-    SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
-                i_volume ) );
+    UpdateVolume();
 }
 
 void wxVolCtrl::OnChange( wxMouseEvent& event )
@@ -1411,13 +1411,21 @@ void wxVolCtrl::OnChange( wxMouseEvent& event )
     if( !event.LeftDown() && !event.LeftIsDown() ) return;
 
     int i_volume = event.GetX() * 200 / GetClientSize().GetWidth();
-    Change( i_volume );
+    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
+    UpdateVolume();
 }
 
-void wxVolCtrl::Change( int i_volume )
+void wxVolCtrl::UpdateVolume()
 {
-    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
-    SetValue( i_volume );
+    audio_volume_t i_volume;
+    aout_VolumeGet( p_intf, &i_volume );
+
+    int i_gauge_volume = i_volume * 200 * 2 / AOUT_VOLUME_MAX;
+    if( i_gauge_volume == GetValue() ) return;
+
+    msg_Err( p_intf, "volume: %i", i_gauge_volume / 2 );
+
+    SetValue( i_gauge_volume );
     SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
-                i_volume ) );
+                i_gauge_volume / 2 ) );
 }

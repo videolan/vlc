@@ -190,6 +190,7 @@ public:
     Interface( intf_thread_t *p_intf );
     virtual ~Interface();
     void TogglePlayButton( int i_playing_status );
+    void Update();
 
     wxBoxSizer  *frame_sizer;
     wxStatusBar *statusbar;
@@ -822,7 +823,6 @@ private:
     wxString fileinfo_root_label;
 
 };
-
 
 #if wxUSE_DRAG_AND_DROP
 /* Drag and Drop class */

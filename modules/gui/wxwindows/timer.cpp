@@ -104,29 +104,23 @@ void Timer::Notify()
         /* Show slider */
         if( p_intf->p_sys->p_input )
         {
-            //if( p_intf->p_sys->p_input->stream.b_seekable )
-            {
-                p_main_interface->slider_frame->Show();
-                p_main_interface->frame_sizer->Show(
-                    p_main_interface->slider_frame );
-                p_main_interface->frame_sizer->Layout();
-                p_main_interface->frame_sizer->Fit( p_main_interface );
-            }
+            p_main_interface->slider->SetValue( 0 );
+            p_main_interface->slider_frame->Show();
+            p_main_interface->frame_sizer->Show(
+                p_main_interface->slider_frame );
+            p_main_interface->frame_sizer->Layout();
+            p_main_interface->frame_sizer->Fit( p_main_interface );
+
+            if( p_intf->p_sys->p_input->stream.b_seekable )
+                p_main_interface->slider->Enable();
+            else
+                p_main_interface->slider->Disable();
 
             p_main_interface->statusbar->SetStatusText(
                 wxU(p_intf->p_sys->p_input->psz_source), 2 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
-
-            /* Take care of the volume */
-            audio_volume_t i_volume;
-            aout_VolumeGet( p_intf, &i_volume );
-            p_main_interface->volctrl->SetValue( i_volume * 200 * 2 /
-                                                 AOUT_VOLUME_MAX );
-            p_main_interface->volctrl->SetToolTip(
-                wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
-                i_volume * 200 / AOUT_VOLUME_MAX ) );
 
             /* control buttons for free pace streams */
             b_pace_control = p_intf->p_sys->p_input->stream.b_pace_control;
@@ -135,17 +129,14 @@ void Timer::Notify()
     else if( p_intf->p_sys->p_input->b_dead )
     {
         /* Hide slider */
-        //if( p_intf->p_sys->p_input->stream.b_seekable )
-        {
-            p_main_interface->slider_frame->Hide();
-            p_main_interface->frame_sizer->Hide(
-                p_main_interface->slider_frame );
-            p_main_interface->frame_sizer->Layout();
-            p_main_interface->frame_sizer->Fit( p_main_interface );
+        p_main_interface->slider_frame->Hide();
+        p_main_interface->frame_sizer->Hide(
+            p_main_interface->slider_frame );
+        p_main_interface->frame_sizer->Layout();
+        p_main_interface->frame_sizer->Fit( p_main_interface );
 
-            p_main_interface->TogglePlayButton( PAUSE_S );
-            i_old_playing_status = PAUSE_S;
-        }
+        p_main_interface->TogglePlayButton( PAUSE_S );
+        i_old_playing_status = PAUSE_S;
 
         p_main_interface->statusbar->SetStatusText( wxT(""), 0 );
         p_main_interface->statusbar->SetStatusText( wxT(""), 2 );
@@ -166,17 +157,6 @@ void Timer::Notify()
         {
             /* New input or stream map change */
             p_intf->p_sys->b_playing = 1;
-#if 0
-            if( p_input->stream.b_changed )
-            {
-                wxModeManage( p_intf );
-                wxSetupMenus( p_intf );
-                p_intf->p_sys->b_playing = 1;
-
-                p_main_interface->TogglePlayButton( PLAYING_S );
-                i_old_playing_status = PLAYING_S;
-            }
-#endif
 
             /* Manage the slider */
             if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
@@ -214,14 +194,9 @@ void Timer::Notify()
                     }
                 }
             }
-            /* Take care of the volume */
-            audio_volume_t i_volume;
-            aout_VolumeGet( p_intf, &i_volume );
-            p_main_interface->volctrl->SetValue( i_volume * 200 *2  /
-                                                 AOUT_VOLUME_MAX );
-            p_main_interface->volctrl->SetToolTip(
-                wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
-                i_volume * 200 / AOUT_VOLUME_MAX ) );
+
+            /* Take care of the volume, etc... */
+            p_main_interface->Update();
 
             /* Manage Playing status */
             if( i_old_playing_status != p_input->stream.control.i_status )
