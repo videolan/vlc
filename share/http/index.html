@@ -10,7 +10,7 @@
         <meta http-equiv="refresh" content="0;URL=/" />
     <vlc id="end" />
 
-    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort" />
+    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort,move" />
     <vlc id="set" param1="sout" param2="string" />
  </head>
  <body>
@@ -85,6 +85,14 @@
      </form>
     </div>
 
+    <div class="sectitle">Move Item</div>
+     <div class="section">
+      <form method="get" action="">
+       Move the item number <input type="text" name="psz_pos" size="5" /> to <input type="text" name="psz_newpos" size="5" /> <input type="submit" name="control" value="move" />
+      </form>
+     </div>
+    </div>
+
     <div class="sectitle">VLC Playlist</div>
      <div class="section">
       <form method="get" action="">
@@ -96,7 +104,7 @@
               <option value="title">title</option>
               <option value="group">group</option>
               <option value="author">author</option>
-	      <option value="Shuffle">Shuffle</option>
+	      <option value="shuffle">shuffle</option>
             </select> with
             <select name="order">
               <option value="0">normal order</option>

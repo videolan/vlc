@@ -1254,6 +1254,7 @@ enum macroType
         MVLC_SEEK,
         MVLC_KEEP,
         MVLC_SORT,
+        MVLC_MOVE,
         MVLC_VOLUME,
         MVLC_FULLSCREEN,
 
@@ -1297,6 +1298,7 @@ StrToMacroTypeTab [] =
         { "delete",         MVLC_DEL },
         { "empty",          MVLC_EMPTY },
         { "sort",           MVLC_SORT },
+        { "move",           MVLC_MOVE },
 
         /* admin control */
         { "close",          MVLC_CLOSE },
@@ -1798,12 +1800,26 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         playlist_SortAuthor( p_sys->p_playlist , i_order );
                         msg_Dbg( p_intf, "requested playlist sort by author (%d)" , i_order );
-                    } else if( !strcmp( type , "Shuffle" ) )
+                    } else if( !strcmp( type , "shuffle" ) )
                     {
                         playlist_Sort( p_sys->p_playlist , SORT_RANDOM, ORDER_NORMAL );
                         msg_Dbg( p_intf, "requested playlist shuffle");
                     } 
 
+                    break;
+                }
+                case MVLC_MOVE:
+                {
+                    char psz_pos[6];
+                    char psz_newpos[6];
+                    int i_pos;
+                    int i_newpos;
+                    uri_extract_value( p_request, "psz_pos", psz_pos, 6 );
+                    uri_extract_value( p_request, "psz_newpos", psz_newpos, 6 );
+                    i_pos = atoi( psz_pos );
+                    i_newpos = atoi( psz_newpos );
+                    playlist_Move( p_sys->p_playlist, i_pos, i_newpos + 1 );
+                    msg_Dbg( p_intf, "requested move playlist item %d to %d", i_pos, i_newpos);
                     break;
                 }
 
