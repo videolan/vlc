@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.64 2003/02/14 18:22:23 sam Exp $
+ * $Id: libvlc.c,v 1.65 2003/02/19 10:02:57 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1388,9 +1388,12 @@ static void ShowConsole( void )
  *****************************************************************************/
 static int ConsoleWidth( void )
 {
+    int i_width = 80;
+
+#ifndef WIN32
     char buf[20], *psz_parser;
     FILE *file;
-    int i_ret, i_width = 80;
+    int i_ret;
 
     file = popen( "stty size 2>/dev/null", "r" );
     if( file )
@@ -1412,6 +1415,7 @@ static int ConsoleWidth( void )
 
         pclose( file );
     }
+#endif
 
     return i_width;
 }
