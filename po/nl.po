@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-10 00:54+0100\n"
+"POT-Creation-Date: 2003-02-10 22:48+0100\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Derk-Jan Hartman <thedj@users.sourceforge.net>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -900,21 +900,21 @@ msgid "Interface"
 msgstr "Interface"
 
 #. Audio options
-#: src/libvlc.h:441 modules/audio_output/file.c:108
-#: modules/gui/gtk/gnome_interface.c:1133 modules/gui/gtk/gtk_interface.c:1260
-#: modules/gui/macosx/intf.m:332
+#: modules/audio_output/file.c:108 modules/gui/gtk/gnome_interface.c:1133
+#: modules/gui/gtk/gtk_interface.c:1260 modules/gui/macosx/intf.m:332
+#: src/libvlc.h:441
 msgid "Audio"
 msgstr "Audio"
 
 #. Video options
-#: src/libvlc.h:458 modules/gui/gtk/gnome_interface.c:1140
-#: modules/gui/gtk/gtk_interface.c:1337 modules/gui/macosx/intf.m:339
-#: modules/misc/dummy/dummy.c:64 modules/video_output/directx/directx.c:107
+#: modules/gui/gtk/gnome_interface.c:1140 modules/gui/gtk/gtk_interface.c:1337
+#: modules/gui/macosx/intf.m:339 modules/misc/dummy/dummy.c:64
+#: modules/video_output/directx/directx.c:107 src/libvlc.h:458
 msgid "Video"
 msgstr "Video"
 
 #. Input options
-#: src/libvlc.h:478 modules/access/satellite/satellite.c:66
+#: modules/access/satellite/satellite.c:66 src/libvlc.h:478
 msgid "Input"
 msgstr "Input"
 
@@ -928,9 +928,9 @@ msgid "Encoders"
 msgstr "Encoders"
 
 #. Stream output options
-#: src/libvlc.h:519 modules/gui/gtk/gnome_interface.c:2149
-#: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
-#: modules/gui/macosx/open.m:209 modules/gui/win32/strings.cpp:221
+#: modules/gui/gtk/gnome_interface.c:2149 modules/gui/gtk/gtk_interface.c:2468
+#: modules/gui/gtk/gtk_interface.c:3150 modules/gui/macosx/open.m:209
+#: modules/gui/win32/strings.cpp:221 src/libvlc.h:519
 msgid "Stream output"
 msgstr "Stream uitvoer"
 
@@ -940,17 +940,17 @@ msgid "CPU"
 msgstr "CPU"
 
 #. Playlist options
-#: src/libvlc.h:544 modules/gui/gtk/gnome_interface.c:648
+#: modules/gui/gtk/gnome_interface.c:648
 #: modules/gui/gtk/gnome_interface.c:2500
 #: modules/gui/gtk/gnome_interface.c:2525 modules/gui/gtk/gtk_interface.c:752
 #: modules/gui/gtk/gtk_interface.c:2813 modules/gui/macosx/intf.m:275
 #: modules/gui/macosx/intf.m:351 modules/gui/win32/strings.cpp:120
-#: modules/gui/win32/strings.cpp:180
+#: modules/gui/win32/strings.cpp:180 src/libvlc.h:544
 msgid "Playlist"
 msgstr "Speellijst"
 
 #. Misc options
-#: src/libvlc.h:551 modules/audio_filter/converter/a52tofloat32.c:85
+#: modules/audio_filter/converter/a52tofloat32.c:85
 #: modules/audio_filter/converter/mpgatofixed32.c:60
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
 #: modules/demux/mpeg/ts.c:118 modules/gui/familiar/familiar.c:69
@@ -960,7 +960,7 @@ msgstr "Speellijst"
 #: modules/video_filter/distort.c:65 modules/video_filter/motionblur.c:58
 #: modules/video_filter/transform.c:63 modules/video_filter/wall.c:66
 #: modules/video_output/fb.c:68 modules/video_output/ggi.c:62
-#: modules/video_output/mga/xmga.c:104
+#: modules/video_output/mga/xmga.c:104 src/libvlc.h:551
 msgid "Miscellaneous"
 msgstr "Overige"
 
@@ -996,12 +996,12 @@ msgstr "boolean"
 msgid "Reverse stereo"
 msgstr ""
 
-#: src/audio_output/output.c:77 src/audio_output/output.c:103
-#: src/audio_output/output.c:132 modules/audio_output/alsa.c:182
-#: modules/audio_output/alsa.c:333 modules/audio_output/oss.c:208
-#: modules/audio_output/oss.c:317 modules/audio_output/sdl.c:114
-#: modules/audio_output/sdl.c:177 modules/audio_output/sdl.c:188
-#: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:362
+#: modules/audio_output/alsa.c:182 modules/audio_output/alsa.c:333
+#: modules/audio_output/oss.c:208 modules/audio_output/oss.c:317
+#: modules/audio_output/sdl.c:114 modules/audio_output/sdl.c:177
+#: modules/audio_output/sdl.c:188 modules/audio_output/sdl.c:194
+#: modules/audio_output/waveout.c:362 src/audio_output/output.c:77
+#: src/audio_output/output.c:103 src/audio_output/output.c:132
 msgid "Stereo"
 msgstr "Stereo"
 
@@ -1766,9 +1766,9 @@ msgstr "Familiar Linux Gtk+ interface module"
 msgid "VLC media player"
 msgstr "VLC media speler"
 
-#: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:387
-#: modules/gui/macosx/open.m:423 modules/gui/macosx/open.m:584
-#: modules/gui/macosx/open.m:846 modules/gui/macosx/controls.m:568
+#: modules/gui/familiar/interface.c:90 modules/gui/macosx/controls.m:580
+#: modules/gui/macosx/open.m:387 modules/gui/macosx/open.m:423
+#: modules/gui/macosx/open.m:584 modules/gui/macosx/open.m:846
 msgid "Open"
 msgstr "Open"
 
@@ -1822,9 +1822,9 @@ msgstr "Start stream"
 
 #: modules/gui/familiar/interface.c:157 modules/gui/gtk/gnome_interface.c:571
 #: modules/gui/gtk/gnome_interface.c:1068 modules/gui/gtk/gtk_interface.c:681
-#: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/intf.m:279
-#: modules/gui/macosx/intf.m:318 modules/gui/macosx/intf.m:364
-#: modules/gui/macosx/controls.m:683 modules/gui/win32/strings.cpp:104
+#: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/controls.m:695
+#: modules/gui/macosx/intf.m:279 modules/gui/macosx/intf.m:318
+#: modules/gui/macosx/intf.m:364 modules/gui/win32/strings.cpp:104
 msgid "Stop"
 msgstr "Stop"
 
@@ -1893,7 +1893,7 @@ msgstr "Pas Toe"
 #: modules/gui/familiar/interface.c:368 modules/gui/gtk/gtk_interface.c:2510
 #: modules/gui/gtk/gtk_interface.c:2761 modules/gui/gtk/gtk_interface.c:2992
 #: modules/gui/gtk/gtk_interface.c:3373 modules/gui/gtk/preferences.c:613
-#: modules/gui/macosx/prefs.m:580 modules/gui/macosx/open.m:170
+#: modules/gui/macosx/open.m:170 modules/gui/macosx/prefs.m:580
 #: modules/gui/win32/strings.cpp:27 modules/gui/win32/strings.cpp:174
 #: modules/gui/win32/strings.cpp:215 modules/gui/win32/strings.cpp:234
 #: modules/gui/win32/strings.cpp:250
@@ -2103,7 +2103,7 @@ msgstr "Geluid Zachter"
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:964
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
-#: modules/gui/macosx/intf.m:335 modules/gui/macosx/controls.m:730
+#: modules/gui/macosx/controls.m:742 modules/gui/macosx/intf.m:335
 msgid "Mute"
 msgstr "Geluid Stil"
 
@@ -2136,8 +2136,8 @@ msgstr "Volledig Scherm"
 
 #: modules/gui/gtk/gnome_interface.c:183
 #: modules/gui/gtk/gnome_interface.c:1007 modules/gui/gtk/gtk_interface.c:558
-#: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/intf.m:345
-#: modules/gui/macosx/controls.m:754
+#: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/controls.m:766
+#: modules/gui/macosx/intf.m:345
 msgid "Deinterlace"
 msgstr "Deinterface"
 
@@ -2260,9 +2260,9 @@ msgstr "Vorig Bestand"
 #: modules/gui/gtk/gnome_interface.c:672
 #: modules/gui/gtk/gnome_interface.c:1097 modules/gui/gtk/gtk_interface.c:774
 #: modules/gui/gtk/gtk_interface.c:857 modules/gui/gtk/gtk_interface.c:901
-#: modules/gui/gtk/gtk_interface.c:1207 modules/gui/macosx/intf.m:281
-#: modules/gui/macosx/intf.m:322 modules/gui/macosx/intf.m:365
-#: modules/gui/macosx/controls.m:691 modules/gui/win32/strings.cpp:114
+#: modules/gui/gtk/gtk_interface.c:1207 modules/gui/macosx/controls.m:703
+#: modules/gui/macosx/intf.m:281 modules/gui/macosx/intf.m:322
+#: modules/gui/macosx/intf.m:365 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
 msgid "Next"
 msgstr "Volgende"
@@ -2742,8 +2742,8 @@ msgstr "het VideoLAN team <videolan@videolan.org>"
 #: modules/gui/gtk/gtk_interface.c:1702 modules/gui/gtk/gtk_interface.c:2503
 #: modules/gui/gtk/gtk_interface.c:2754 modules/gui/gtk/gtk_interface.c:2985
 #: modules/gui/gtk/gtk_interface.c:3092 modules/gui/gtk/gtk_interface.c:3366
-#: modules/gui/gtk/preferences.c:601 modules/gui/macosx/prefs.m:576
-#: modules/gui/macosx/prefs.m:791 modules/gui/macosx/open.m:169
+#: modules/gui/gtk/preferences.c:601 modules/gui/macosx/open.m:169
+#: modules/gui/macosx/prefs.m:576 modules/gui/macosx/prefs.m:791
 #: modules/gui/win32/strings.cpp:13 modules/gui/win32/strings.cpp:26
 #: modules/gui/win32/strings.cpp:154 modules/gui/win32/strings.cpp:173
 #: modules/gui/win32/strings.cpp:183 modules/gui/win32/strings.cpp:214
@@ -2872,18 +2872,18 @@ msgstr "Berichten:"
 msgid "VLC - Controller"
 msgstr "VLC - Bedieningspaneel"
 
-#: modules/gui/macosx/intf.m:276 modules/gui/macosx/intf.m:321
-#: modules/gui/macosx/intf.m:366 modules/gui/macosx/controls.m:690
+#: modules/gui/macosx/controls.m:702 modules/gui/macosx/intf.m:276
+#: modules/gui/macosx/intf.m:321 modules/gui/macosx/intf.m:366
 msgid "Previous"
 msgstr "Vorige"
 
-#: modules/gui/macosx/intf.m:277 modules/gui/macosx/intf.m:320
-#: modules/gui/macosx/controls.m:670
+#: modules/gui/macosx/controls.m:682 modules/gui/macosx/intf.m:277
+#: modules/gui/macosx/intf.m:320
 msgid "Slower"
 msgstr "Langzamer"
 
-#: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:319
-#: modules/gui/macosx/controls.m:669
+#: modules/gui/macosx/controls.m:681 modules/gui/macosx/intf.m:280
+#: modules/gui/macosx/intf.m:319
 msgid "Faster"
 msgstr "Sneller"
 
@@ -2982,16 +2982,16 @@ msgstr "Alles Selecteren"
 msgid "Controls"
 msgstr "Bediening"
 
-#: modules/gui/macosx/intf.m:323 modules/gui/macosx/controls.m:709
+#: modules/gui/macosx/controls.m:721 modules/gui/macosx/intf.m:323
 msgid "Loop"
 msgstr "Herhaal"
 
-#: modules/gui/macosx/intf.m:324 modules/gui/macosx/controls.m:716
+#: modules/gui/macosx/controls.m:728 modules/gui/macosx/intf.m:324
 #, fuzzy
 msgid "Step Forward"
 msgstr "Sneller"
 
-#: modules/gui/macosx/intf.m:325 modules/gui/macosx/controls.m:717
+#: modules/gui/macosx/controls.m:729 modules/gui/macosx/intf.m:325
 #, fuzzy
 msgid "Step Backward"
 msgstr "Ga Terug"
@@ -3000,20 +3000,20 @@ msgstr "Ga Terug"
 msgid "Language"
 msgstr "Taal"
 
-#: modules/gui/macosx/intf.m:340 modules/gui/macosx/controls.m:735
+#: modules/gui/macosx/controls.m:747 modules/gui/macosx/intf.m:340
 #, fuzzy
 msgid "Half Size"
 msgstr "Grootte"
 
-#: modules/gui/macosx/intf.m:341 modules/gui/macosx/controls.m:736
+#: modules/gui/macosx/controls.m:748 modules/gui/macosx/intf.m:341
 msgid "Normal Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:342 modules/gui/macosx/controls.m:737
+#: modules/gui/macosx/controls.m:749 modules/gui/macosx/intf.m:342
 msgid "Double Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:343 modules/gui/macosx/controls.m:734
+#: modules/gui/macosx/controls.m:746 modules/gui/macosx/intf.m:343
 msgid "Fullscreen"
 msgstr "Volledig Scherm"
 
@@ -3149,12 +3149,12 @@ msgstr "Open VIDEO_TS map"
 msgid "Save File"
 msgstr "Bewaar Bestand"
 
-#: modules/gui/macosx/controls.m:567
+#: modules/gui/macosx/controls.m:579
 #, fuzzy
 msgid "Open subtitle file"
 msgstr "Open bestand met ondertitels"
 
-#: modules/gui/macosx/vout.m:956
+#: modules/gui/macosx/vout.m:959
 #, c-format
 msgid "Screen %d"
 msgstr "Scherm %d"

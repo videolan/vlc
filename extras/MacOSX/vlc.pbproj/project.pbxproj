@@ -399,7 +399,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>0.5.1-cvs</string>
+	<string>0.5.1-test1</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2003-02-10 00:54+0100\n"
+"POT-Creation-Date: 2003-02-10 22:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1554,7 +1554,7 @@ msgstr ""
 
 #: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:387
 #: modules/gui/macosx/open.m:423 modules/gui/macosx/open.m:584
-#: modules/gui/macosx/open.m:846 modules/gui/macosx/controls.m:568
+#: modules/gui/macosx/open.m:846 modules/gui/macosx/controls.m:580
 msgid "Open"
 msgstr ""
 
@@ -1610,7 +1610,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1068 modules/gui/gtk/gtk_interface.c:681
 #: modules/gui/gtk/gtk_interface.c:1168 modules/gui/macosx/intf.m:279
 #: modules/gui/macosx/intf.m:318 modules/gui/macosx/intf.m:364
-#: modules/gui/macosx/controls.m:683 modules/gui/win32/strings.cpp:104
+#: modules/gui/macosx/controls.m:695 modules/gui/win32/strings.cpp:104
 msgid "Stop"
 msgstr ""
 
@@ -1884,7 +1884,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:964
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
-#: modules/gui/macosx/intf.m:335 modules/gui/macosx/controls.m:730
+#: modules/gui/macosx/intf.m:335 modules/gui/macosx/controls.m:742
 msgid "Mute"
 msgstr ""
 
@@ -1918,7 +1918,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:183
 #: modules/gui/gtk/gnome_interface.c:1007 modules/gui/gtk/gtk_interface.c:558
 #: modules/gui/gtk/gtk_interface.c:1390 modules/gui/macosx/intf.m:345
-#: modules/gui/macosx/controls.m:754
+#: modules/gui/macosx/controls.m:766
 msgid "Deinterlace"
 msgstr ""
 
@@ -2042,7 +2042,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:857 modules/gui/gtk/gtk_interface.c:901
 #: modules/gui/gtk/gtk_interface.c:1207 modules/gui/macosx/intf.m:281
 #: modules/gui/macosx/intf.m:322 modules/gui/macosx/intf.m:365
-#: modules/gui/macosx/controls.m:691 modules/gui/win32/strings.cpp:114
+#: modules/gui/macosx/controls.m:703 modules/gui/win32/strings.cpp:114
 #: modules/gui/win32/strings.cpp:134 modules/gui/win32/strings.cpp:138
 msgid "Next"
 msgstr ""
@@ -2648,17 +2648,17 @@ msgid "VLC - Controller"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:276 modules/gui/macosx/intf.m:321
-#: modules/gui/macosx/intf.m:366 modules/gui/macosx/controls.m:690
+#: modules/gui/macosx/intf.m:366 modules/gui/macosx/controls.m:702
 msgid "Previous"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:277 modules/gui/macosx/intf.m:320
-#: modules/gui/macosx/controls.m:670
+#: modules/gui/macosx/controls.m:682
 msgid "Slower"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:280 modules/gui/macosx/intf.m:319
-#: modules/gui/macosx/controls.m:669
+#: modules/gui/macosx/controls.m:681
 msgid "Faster"
 msgstr ""
 
@@ -2756,15 +2756,15 @@ msgstr ""
 msgid "Controls"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:323 modules/gui/macosx/controls.m:709
+#: modules/gui/macosx/intf.m:323 modules/gui/macosx/controls.m:721
 msgid "Loop"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:324 modules/gui/macosx/controls.m:716
+#: modules/gui/macosx/intf.m:324 modules/gui/macosx/controls.m:728
 msgid "Step Forward"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:325 modules/gui/macosx/controls.m:717
+#: modules/gui/macosx/intf.m:325 modules/gui/macosx/controls.m:729
 msgid "Step Backward"
 msgstr ""
 
@@ -2772,19 +2772,19 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:340 modules/gui/macosx/controls.m:735
+#: modules/gui/macosx/intf.m:340 modules/gui/macosx/controls.m:747
 msgid "Half Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:341 modules/gui/macosx/controls.m:736
+#: modules/gui/macosx/intf.m:341 modules/gui/macosx/controls.m:748
 msgid "Normal Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:342 modules/gui/macosx/controls.m:737
+#: modules/gui/macosx/intf.m:342 modules/gui/macosx/controls.m:749
 msgid "Double Size"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:343 modules/gui/macosx/controls.m:734
+#: modules/gui/macosx/intf.m:343 modules/gui/macosx/controls.m:746
 msgid "Fullscreen"
 msgstr ""
 
@@ -2910,11 +2910,11 @@ msgstr ""
 msgid "Save File"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:567
+#: modules/gui/macosx/controls.m:579
 msgid "Open subtitle file"
 msgstr ""
 
-#: modules/gui/macosx/vout.m:956
+#: modules/gui/macosx/vout.m:959
 #, c-format
 msgid "Screen %d"
 msgstr ""
