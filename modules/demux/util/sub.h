@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: sub.h,v 1.13 2004/01/26 20:02:15 gbazin Exp $
+ * $Id: sub.h,v 1.14 2004/01/26 20:26:54 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -159,6 +159,7 @@ static inline void subtitle_Close( subtitle_demux_t *p_sub )
     msg_Info( p_sub, "subtitle stopped" );
     if( p_sub )
     {
+        p_sub->pf_close( p_sub );
         vlc_object_detach( p_sub );
         if( p_sub->p_module )
         {

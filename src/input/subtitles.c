@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: subtitles.c,v 1.9 2004/01/26 19:20:10 gbazin Exp $
+ * $Id: subtitles.c,v 1.10 2004/01/26 20:26:54 gbazin Exp $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -243,7 +243,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                     if( strcmp(sub_exts[i], tmp_fname_ext ) == 0 )
                     {
                         b_found = 1;
-                        msg_Dbg( p_this, "found a possible subtitle: %s", de->d_name );
+                        msg_Dbg( p_this, "found a possible subtitle: %s",
+                                 de->d_name );
                         break;
                     }
                 }
@@ -252,12 +253,13 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 if( b_found )
                 {
                     int i_prio = 0;
-                    if( !i_prio && strcmp( tmp_fname_trim, f_fname_trim ) == 0 )
+                    if( !i_prio && !strcmp( tmp_fname_trim, f_fname_trim ) )
                     {
                         /* matches the movie name exactly */
                         i_prio = 4;
                     }
-                    if( !i_prio && ( tmp = strstr( tmp_fname_trim, f_fname_trim ) ) )
+                    if( !i_prio &&
+                        ( tmp = strstr( tmp_fname_trim, f_fname_trim ) ) )
                     {
                         /* contains the movie name */
                         tmp += strlen( f_fname_trim );
@@ -281,17 +283,18 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
                     if( i_prio >= fuzzy.i_int )
                     {
-                        sprintf( tmpresult, "%s%s", j == 0 ? f_dir : psz_path, de->d_name );
-                        msg_Dbg( p_this, "autodetected subtitle: %s with priority %d", de->d_name, i_prio );
+                        sprintf( tmpresult, "%s%s", j == 0 ? f_dir : psz_path,
+                                 de->d_name );
+                        msg_Dbg( p_this, "autodetected subtitle: %s with "
+                                 "priority %d", de->d_name, i_prio );
                         if( ( f = fopen( tmpresult, "rt" ) ) )
                         {
                             fclose( f );
                             result[i_sub_count].priority = i_prio;
-                            result[i_sub_count].psz_fname = strdup( tmpresult );
+                            result[i_sub_count].psz_fname = strdup(tmpresult);
                             i_sub_count++;
                         }
                     }
-
                 }
                 if( i_sub_count >= MAX_SUBTITLE_FILES ) break;
             }
@@ -323,4 +326,3 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     free( result );
     return result2;
 }
-

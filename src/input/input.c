@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.278 2004/01/26 20:02:15 gbazin Exp $
+ * $Id: input.c,v 1.279 2004/01/26 20:26:54 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -837,13 +837,14 @@ static int InitThread( input_thread_t * p_input )
         char **tmp2 = tmp;
         for( i = 0; *tmp2 != NULL; i++ )
         {
-            if( ( p_sub = subtitle_New( p_input, *tmp2++,
+            if( ( p_sub = subtitle_New( p_input, *tmp2,
                                         i_microsecondperframe, i ) ) )
             {
                 TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
             }
+            free( *tmp2++ );
         }
-        free(tmp);
+        free( tmp );
     }
 
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );

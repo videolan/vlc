@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.42 2004/01/26 20:02:15 gbazin Exp $
+ * $Id: sub.c,v 1.43 2004/01/26 20:26:54 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -270,6 +270,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
     p_sub->p_es = NULL;
     p_sub->i_subtitles = 0;
     p_sub->subtitle = NULL;
+    p_sub->p_vobsub_file = 0;
     p_sub->p_input = p_input;
 
     if( !psz_name || !*psz_name )
@@ -423,22 +424,11 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
         if( p_sub->i_subtitles >= i_max )
         {
             i_max += 128;
-            if( p_sub->subtitle )
+            if( !( p_sub->subtitle = realloc( p_sub->subtitle,
+                                              sizeof(subtitle_t) * i_max ) ) )
             {
-                if( !( p_sub->subtitle = realloc( p_sub->subtitle,
-                                           sizeof( subtitle_t ) * i_max ) ) )
-                {
-                    msg_Err( p_sub, "out of memory");
-                    return VLC_ENOMEM;
-                }
-            }
-            else
-            {
-                if( !(  p_sub->subtitle = malloc( sizeof( subtitle_t ) * i_max ) ) )
-                {
-                    msg_Err( p_sub, "out of memory");
-                    return VLC_ENOMEM;
-                }
+                msg_Err( p_sub, "out of memory");
+                return VLC_ENOMEM;
             }
         }
         if( pf_read_subtitle( p_sub, &txt,
