@@ -447,6 +447,9 @@ enum input_query_e
     INPUT_CHANGE_BOOKMARK, /* arg1= seekpoint_t * arg2= int * res=can fail   */
     INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
+
+    /* On the fly input slave */
+    INPUT_ADD_SLAVE,       /* arg1= char * */
 };
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
