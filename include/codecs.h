@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.12 2004/02/23 23:01:05 gbazin Exp $
+ * $Id$
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -133,7 +133,7 @@ typedef struct
 #define WAVE_FORMAT_IEEE_FLOAT          0x0003 /* Microsoft Corporation */
 #define WAVE_FORMAT_ALAW                0x0006 /* Microsoft Corporation */
 #define WAVE_FORMAT_MULAW               0x0007 /* Microsoft Corporation */
-#define WAVE_FORMAT_DTS                 0x0008 /* Microsoft Corporation */
+#define WAVE_FORMAT_DTS_MS              0x0008 /* Microsoft Corporation */
 #define WAVE_FORMAT_IMA_ADPCM           0x0011 /* Intel Corporation */
 #define WAVE_FORMAT_GSM610              0x0031 /* Microsoft Corporation */
 #define WAVE_FORMAT_MSNAUDIO            0x0032 /* Microsoft Corporation */
@@ -142,6 +142,7 @@ typedef struct
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
 
 #define WAVE_FORMAT_A52                 0x2000
+#define WAVE_FORMAT_DTS                 0x2001
 #define WAVE_FORMAT_WMA1                0x0160
 #define WAVE_FORMAT_WMA2                0x0161
 #define WAVE_FORMAT_WMA3                0x0162
@@ -197,6 +198,8 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_WMA3,     VLC_FOURCC( 'w', 'm', 'a', '3' ), "Window Media Audio 3" },
     { WAVE_FORMAT_DK3,      VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
     { WAVE_FORMAT_DK4,      VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
+    { WAVE_FORMAT_DTS,      VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
+    { WAVE_FORMAT_DTS_MS,   VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
     { WAVE_FORMAT_UNKNOWN,  VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
 };
 
