@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.24 2003/12/06 05:15:54 rocky Exp $
+ * $Id: system.c,v 1.25 2003/12/07 01:02:08 rocky Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -968,16 +968,22 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                 else if( (i_id & 0xFFFF) == 0x70BD )
                 {
                     /* SVCD OGT subtitles in stream 0x070 */
-                    i_fourcc = VLC_FOURCC('s','o','g','t');
+		    i_fourcc = VLC_FOURCC('o','g','t', ' ');
                     i_cat = SPU_ES;
-		    msg_Warn( p_input,  
-			      "SVCD OGT subtitles not implemented yet" );
+#ifdef FINISHED_DEBUGGING
+                    if( !p_input->stream.b_seekable )
+                    if( config_GetInt( p_input, "spu-channel" )
+                           == ((i_id & 0x0300) >> 8) )
+#endif
+                    {
+                        b_auto_spawn = VLC_TRUE;
+                    }
                 }
                 else if( ((i_id >> 8) & 0xFF) <= 0x03 && 
 			 (i_id & 0x00FF) == 0x00BD )
                 {
                     /* CVD subtitles (0x00->0x03) */
-                    i_fourcc = VLC_FOURCC('s','c','v','d');
+		    i_fourcc = VLC_FOURCC('c','v','d', ' ');
                     i_cat = SPU_ES;
 		    msg_Warn( p_input,  
 			      "CVD subtitles not implemented yet" );
