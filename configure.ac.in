@@ -128,10 +128,10 @@ case "x${target_os}" in
         LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows"
         LDFLAGS_ipv4="${LDFLAGS_ipv4} -lws2_32"
         LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
-        LDFLAGS_access_http="${LDFLAGS_http} -lws2_32"
-        LDFLAGS_access_mms="${LDFLAGS_mms} -lws2_32"
-        LDFLAGS_access_rtp="${LDFLAGS_rtp} -lws2_32"
-        LDFLAGS_access_udp="${LDFLAGS_udp} -lws2_32"
+        LDFLAGS_access_http="${LDFLAGS_access_http} -lws2_32"
+        LDFLAGS_access_mms="${LDFLAGS_access_mms} -lws2_32"
+        LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lws2_32"
+        LDFLAGS_access_udp="${LDFLAGS_access_udp} -lws2_32"
         LDFLAGS_rc="${LDFLAGS_rc} -lws2_32"
     fi
     ;;
@@ -240,10 +240,10 @@ AC_CHECK_FUNC(connect,,[
 
 AC_CHECK_FUNC(send,,[
   AC_CHECK_LIB(socket,send,
-    LDFLAGS_http="${LDFLAGS_http} -lsocket"
-    LDFLAGS_mms="${LDFLAGS_mms} -lsocket"
-    LDFLAGS_rtp="${LDFLAGS_rtp} -lsocket"
-    LDFLAGS_udp="${LDFLAGS_udp} -lsocket"
+    LDFLAGS_access_http="${LDFLAGS_access_http} -lsocket"
+    LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket"
+    LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lsocket"
+    LDFLAGS_access_udp="${LDFLAGS_access_udp} -lsocket"
 )])
 
 AC_CHECK_FUNC(gethostbyname,,[
@@ -1755,7 +1755,7 @@ if test "x${enable_oss}" != "xno" &&
   (test "x${SYS}" != "xmingw32" || test "x${enable_oss}" = "xyes")
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
-    #PLUGINS="${PLUGINS} oss"
+    PLUGINS="${PLUGINS} oss"
     AC_CHECK_LIB(ossaudio,main,LDFLAGS_oss="${LDFLAGS_oss} -lossaudio")
   ])
 fi
