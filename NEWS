@@ -61,6 +61,8 @@ Interfaces:
     - Fixes
  * HTTP
     - Support for the new playlist system
+ * Lirc
+    - Now uses new config settings. See doc/lirc/example.lirc
 
 Windows port:
  * Screensaver disabling fix

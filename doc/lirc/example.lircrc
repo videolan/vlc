@@ -1,120 +1,133 @@
 # This is an example .lircrc file that shows the different config strings that
-# vlc understand. button names are from an animax remote, and these may change
-# with different remotes
+# vlc understand. Button names are from an animax remote, and these may change
+# with different remotes.
+
+# The current full list of config strings vlc understands is always in vlc's
+# src/libvlc.h file. Look for lines like:
+# add_key( "key-fullscreen", KEY_FULLSCREEN, NULL, FULLSCREEN_KEY_TEXT,
+#          FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
+# You will need the first argument of these lines. in this case: key-fullscreen
 
 begin
   prog = vlc
   button = PLAY_UP
-  config = PLAY
+  config = key-play
 end
 
 begin
   prog = vlc
   button = PAUSE_UP
-  config = PAUSE
+  config = key-pause
 end
 
-#use this target if you have a combined play/pause button
+# Use this target if you have a combined play/pause button
 begin
   prog = vlc
   button = PLAY_UP
-  config = PLAYPAUSE
+  config = key-play-pause
 end
 
 begin
   prog = vlc
   button = STOP_UP
-  config = STOP
+  config = key-stop
 end
 
 begin
   prog = vlc
   button = POWER_UP
-  config = QUIT
+  config = key-quit
 end
 
 begin
   prog = vlc
   button = SKIP_FORWARD_UP
-  config = NEXT
+  config = key-next
 end
 
 begin
   prog = vlc
   button = SKIP_BACKWARD
-  config = PREV
+  config = key-prev
 end
 
 begin
   prog = vlc
   button = RED_BUTTON_UP
-  config = FULLSCREEN
+  config = key-fullscreen
 end
 
 begin
   prog = vlc
   button = REWIND_UP
-  config = SLOW
+  config = key-slower
 end
 
 begin
   prog = vlc
   button = FORWARD_UP
-  config = FAST
+  config = key-faster
 end
 
 #Audio controls
 begin
   prog = vlc
   button = VOLUME_DOWN_DOWN
-  config = VOL_DOWN
+  config = key-vol-down
 end
 
 begin
   prog = vlc
   button = VOLUME_UP_DOWN
-  config = VOL_UP
+  config = key-vol-up
 end
 
 begin
   prog = vlc
   button = SOMEBUTTON
-  config = AUDIO_TRACK
+  config = key-audio-track
 end
 
 begin
   prog = vlc
   button = MUTE_UP
-  config = MUTE
+  config = key-vol-mute
 end
 
 #For dvd navigation
 begin
   prog = vlc
   button = 4_UP
-  config = LEFT
+  config = key-nav-left 
 end
 
 begin
   prog = vlc
   button = 5_UP
-  config = DOWN
+  config = key-nav-down
 end
 
 begin
   prog = vlc
   button = 2_UP
-  config = UP
+  config = key-nav-up
 end
 
 begin
   prog = vlc
   button = 6_UP
-  config = RIGHT
+  config = key-nav-right
 end
 
 begin
   prog = vlc
   button = MENU_UP
-  config = ACTIVATE
+  config = key-nav-activate
 end
+
+begin
+  prog = vlc
+  button = 9_UP
+  config = key-subtitle-track
+end
+
