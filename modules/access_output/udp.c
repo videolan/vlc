@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.21 2004/03/01 12:50:39 gbazin Exp $
+ * $Id: udp.c,v 1.22 2004/03/03 10:51:55 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -85,7 +85,7 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
-typedef struct sout_access_thread_s
+typedef struct sout_access_thread_t
 {
     VLC_COMMON_MEMBERS
 
@@ -96,6 +96,7 @@ typedef struct sout_access_thread_s
     int         i_handle;
 
     int64_t     i_caching;
+    int         i_group;
 
 } sout_access_thread_t;
 
@@ -134,7 +135,7 @@ static int Open( vlc_object_t *p_this )
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
     {
-        msg_Err( p_access, "Not enough memory" );
+        msg_Err( p_access, "not enough memory" );
         return VLC_EGENERIC;
     }
 
@@ -142,8 +143,8 @@ static int Open( vlc_object_t *p_this )
     if( p_access->psz_access != NULL &&
         !strcmp( p_access->psz_access, "rtp" ) )
     {
-        msg_Warn( p_access, "be carefull that rtp ouput work only with ts "
-                  "payload(not an error)" );
+        msg_Warn( p_access, "be careful that rtp output only works with ts "
+                  "payload (not an error)" );
         p_sys->b_rtpts = 1;
     }
     else
@@ -218,6 +219,12 @@ static int Open( vlc_object_t *p_this )
     if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "caching" ) ) )
     {
         p_sys->p_thread->i_caching = atoll( psz_val ) * 1000;
+    }
+
+    p_sys->p_thread->i_group = 1;
+    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "group" ) ) )
+    {
+        p_sys->p_thread->i_group = atoi( psz_val );
     }
 
     p_sys->i_mtu = socket_desc.i_mtu;
@@ -415,9 +422,10 @@ static void ThreadWrite( vlc_object_t *p_this )
     sout_access_thread_t *p_thread = (sout_access_thread_t*)p_this;
     sout_instance_t      *p_sout = p_thread->p_sout;
     mtime_t              i_date_last = -1;
+    mtime_t              i_to_send = p_thread->i_group;
     int                  i_dropped_packets = 0;
 
-    while( ! p_thread->b_die )
+    while( !p_thread->b_die )
     {
         sout_buffer_t *p_pk;
         mtime_t       i_date, i_sent;
@@ -461,7 +469,12 @@ static void ThreadWrite( vlc_object_t *p_this )
             continue;
         }
 
-        mwait( i_date );
+        i_to_send--;
+        if ( !i_to_send )
+        {
+            mwait( i_date );
+            i_to_send = p_thread->i_group;
+        }
         send( p_thread->i_handle, p_pk->p_buffer, p_pk->i_size, 0 );
 
         if( i_dropped_packets )
