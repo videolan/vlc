@@ -117,8 +117,9 @@ PngBitmap::PngBitmap( intf_thread_t *pIntf, string fileName,
             // Transparent pixel ?
             if( aColor == (r<<16 | g<<8 | b) )
             {
-                *(pData++) = 0;
+                *pData = 0;
             }
+            pData++;
         }
     }
 
