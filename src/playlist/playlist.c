@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.52 2003/09/15 00:01:49 fenrir Exp $
+ * $Id: playlist.c,v 1.53 2003/09/19 21:53:48 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -386,8 +386,8 @@ int playlist_Sort( playlist_t * p_playlist , int i_type )
             i_test = strcasecmp( p_playlist->pp_items[i]->psz_name,
                                  p_playlist->pp_items[i_small]->psz_name );
 
-            if( i_type == SORT_NORMAL  && i_test < 0 ||
-                i_type == SORT_REVERSE && i_test > 0 )
+            if( ( i_type == SORT_NORMAL  && i_test < 0 ) ||
+                ( i_type == SORT_REVERSE && i_test > 0 ) )
             {
                 i_small = i;
             }
@@ -677,10 +677,14 @@ static void RunThread ( playlist_t *p_playlist )
             }
             else if( p_playlist->p_input->stream.control.i_status != INIT_S )
             {
+                vlc_mutex_unlock( &p_playlist->object_lock );
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                        &b_vout_destroyed, &i_vout_destroyed_date );
+                                        &b_vout_destroyed,
+                                        &i_vout_destroyed_date );
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
-                                        &b_sout_destroyed, &i_sout_destroyed_date );
+                                        &b_sout_destroyed,
+                                        &i_sout_destroyed_date );
+                vlc_mutex_lock( &p_playlist->object_lock );
             }
         }
         else if( p_playlist->i_status != PLAYLIST_STOPPED )
@@ -690,10 +694,12 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->i_status == PLAYLIST_STOPPED )
         {
+            vlc_mutex_unlock( &p_playlist->object_lock );
             ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
                                     &b_sout_destroyed, &i_sout_destroyed_date );
             ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
                                     &b_vout_destroyed, &i_vout_destroyed_date );
+            vlc_mutex_lock( &p_playlist->object_lock );
         }
         vlc_mutex_unlock( &p_playlist->object_lock );
 

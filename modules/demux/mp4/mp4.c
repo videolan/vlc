@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.38 2003/09/13 17:42:16 fenrir Exp $
+ * $Id: mp4.c,v 1.39 2003/09/19 21:53:48 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1047,14 +1047,19 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
             case VLC_FOURCC( 'V', 'P', '3', '1' ):
             case VLC_FOURCC( '3', 'I', 'V', '1' ):
             case VLC_FOURCC( 'Z', 'y', 'G', 'o' ):
-                i_decoder_specific_info_len = p_sample->data.p_sample_vide->i_qt_image_description;
-                p_decoder_specific_info     = p_sample->data.p_sample_vide->p_qt_image_description;
+                i_decoder_specific_info_len =
+                    p_sample->data.p_sample_vide->i_qt_image_description;
+                p_decoder_specific_info =
+                    p_sample->data.p_sample_vide->p_qt_image_description;
                 break;
             case VLC_FOURCC( 'Q', 'D', 'M', 'C' ):
             case VLC_FOURCC( 'Q', 'D', 'M', '2' ):
             case VLC_FOURCC( 'Q', 'c', 'l', 'p' ):
-                i_decoder_specific_info_len = p_sample->data.p_sample_soun->i_qt_description;
-                p_decoder_specific_info     = p_sample->data.p_sample_soun->p_qt_description;
+            case VLC_FOURCC( 's', 'a', 'm', 'r' ):
+                i_decoder_specific_info_len =
+                    p_sample->data.p_sample_soun->i_qt_description;
+                p_decoder_specific_info =
+                    p_sample->data.p_sample_soun->p_qt_description;
                 break;
             default:
                 break;
