@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.13 2002/12/13 01:56:29 gbazin Exp $
+ * $Id: familiar.c,v 1.14 2002/12/14 23:17:56 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -130,6 +130,10 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
 #ifdef HAVE_GPE_INIT_H
+    char  *p_args[] = { "" };
+    char **pp_args  = p_args;
+    int    i_args   = 1;
+
    /* Initialize GPE interface */
    if (gpe_application_init(&i_args, &pp_args) == FALSE)
         exit (1);
