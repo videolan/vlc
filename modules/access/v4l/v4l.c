@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.9 2003/04/30 19:20:32 gbazin Exp $
+ * $Id: v4l.c,v 1.10 2003/05/02 17:35:48 fenrir Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,7 +45,7 @@
 #include <linux/videodev.h>
 
 /* enable audio grabbing */
-#undef _V4L_AUDIO_
+#define _V4L_AUDIO_
 
 #ifdef _V4L_AUDIO_
     #include <sys/soundcard.h>
@@ -576,7 +576,7 @@ static int AccessOpen( vlc_object_t *p_this )
             if( p_sys->psz_adev )
             {
                 int    i_format;
-                if( ( p_sys->fd_audio = open( p_sys->psz_adev, O_RDONLY ) ) < 0 )
+                if( ( p_sys->fd_audio = open( p_sys->psz_adev, O_RDONLY|O_NONBLOCK ) ) < 0 )
                 {
                     msg_Err( p_input, "cannot open audio device" );
                     goto failed;
@@ -923,30 +923,7 @@ static int GrabAudio( input_thread_t * p_input,
                       int      *pi_data )
 {
     access_sys_t    *p_sys   = p_input->p_access_data;
-    fd_set  fds;
-    struct timeval  timeout;
-    int i_ret;
     int i_read;
-
-    /* we first try to get an audio frame */
-    FD_ZERO( &fds );
-    FD_SET( p_sys->fd_audio, &fds );
-
-    timeout.tv_sec  = 0;
-    timeout.tv_usec = 0;
-
-    i_ret = select( p_sys->fd_audio + 1, &fds, NULL, NULL, &timeout );
-
-    if( i_ret < 0 && errno != EINTR )
-    {
-        msg_Warn( p_input, "audio select failed" );
-        return VLC_EGENERIC;
-    }
-
-    if( !FD_ISSET( p_sys->fd_audio , &fds) )
-    {
-        return VLC_EGENERIC;
-    }
 
     i_read = read( p_sys->fd_audio, p_sys->p_audio_frame,
                    p_sys->i_audio_frame_size_allocated );
@@ -1282,13 +1259,17 @@ static int Demux( input_thread_t *p_input )
     //msg_Dbg( p_input, "stream=%d size=%d", i_stream, i_size );
 //    p_es = input_FindES( p_input, i_stream );
     p_es = p_input->stream.p_selected_program->pp_es[i_stream];
-
+    if( !p_es )
+    {
+        msg_Err( p_input, "cannot find ES" );
+    }
+#if 0
     if( p_es == NULL || p_es->p_decoder_fifo == NULL )
     {
         msg_Err( p_input, "cannot find decoder" );
-        return 0;
+        return 1;
     }
-
+#endif
     p_pes = input_NewPES( p_input->p_method_data );
     if( p_pes == NULL )
     {
@@ -1325,19 +1306,24 @@ static int Demux( input_thread_t *p_input )
     }
 //    input_SplitBuffer( p_input, &p_pk, i_size + 8 );
     p_pes->p_first->p_payload_start += 8;
-
-    vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
-    if( p_es->p_decoder_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
+    if( p_es && p_es->p_decoder_fifo )
     {
-        /* Wait for the decoder. */
-        vlc_cond_wait( &p_es->p_decoder_fifo->data_wait,
-                       &p_es->p_decoder_fifo->data_lock );
+        vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
+        if( p_es->p_decoder_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
+        {
+            /* Wait for the decoder. */
+            vlc_cond_wait( &p_es->p_decoder_fifo->data_wait,
+                           &p_es->p_decoder_fifo->data_lock );
+        }
+        vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
+        p_pes->i_pts = mdate() + p_input->i_pts_delay;
+
+        input_DecodePES( p_es->p_decoder_fifo, p_pes );
     }
-    vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
-
-    p_pes->i_pts = mdate() + p_input->i_pts_delay;
-
-    input_DecodePES( p_es->p_decoder_fifo, p_pes );
+    else
+    {
+        input_DeletePES( p_input->p_method_data, p_pes );
+    }
 
     return 1;
 }
