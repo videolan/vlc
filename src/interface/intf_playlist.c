@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: intf_playlist.c,v 1.13 2002/01/10 04:11:25 sam Exp $
+ * $Id: intf_playlist.c,v 1.14 2002/05/17 00:58:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -198,8 +198,16 @@ int intf_PlaylistDelete( playlist_t * p_playlist, int i_pos )
 
     /* Decrement playlist size */
     p_playlist->i_size--;
-    p_playlist->p_item = realloc( p_playlist->p_item,
-                    p_playlist->i_size * sizeof( playlist_item_t ) );
+    if( p_playlist->i_size )
+    {
+        p_playlist->p_item = realloc( p_playlist->p_item,
+                        p_playlist->i_size * sizeof( playlist_item_t ) );
+    }
+    else
+    {
+        free( p_playlist->p_item );
+        p_playlist->p_item = NULL;
+    }
 
     intf_WarnMsg( 3, "intf: removed `%s' from playlist", psz_name );
 

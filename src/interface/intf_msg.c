@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.48 2002/04/24 00:36:24 sam Exp $
+ * $Id: intf_msg.c,v 1.49 2002/05/17 00:58:13 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -180,8 +180,16 @@ void intf_MsgUnsub( intf_subscription_t *p_sub )
     }
 
     msg_bank.i_sub--;
-    msg_bank.pp_sub = realloc( msg_bank.pp_sub,
-        msg_bank.i_sub * sizeof( intf_subscription_t* ) );
+    if( msg_bank.i_sub )
+    {
+        msg_bank.pp_sub = realloc( msg_bank.pp_sub,
+            msg_bank.i_sub * sizeof( intf_subscription_t* ) );
+    }
+    else
+    {
+        free( msg_bank.pp_sub );
+        msg_bank.pp_sub = NULL;
+    }
 
     vlc_mutex_unlock( &msg_bank.lock );
 }
