@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.23 2003/01/23 10:25:40 gbazin Exp $
+ * $Id: rc.c,v 1.24 2003/02/06 23:59:40 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -662,16 +662,8 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_newintf;
-    char *psz_oldmodule = config_GetPsz( p_this->p_vlc, "intf" );
 
-    config_PutPsz( p_this->p_vlc, "intf", newval.psz_string );
-    p_newintf = intf_Create( p_this->p_vlc );
-    config_PutPsz( p_this->p_vlc, "intf", psz_oldmodule );
-
-    if( psz_oldmodule )
-    {
-        free( psz_oldmodule );
-    }
+    p_newintf = intf_Create( p_this->p_vlc, newval.psz_string );
 
     if( p_newintf )
     {

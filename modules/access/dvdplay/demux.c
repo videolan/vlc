@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.3 2002/08/12 09:34:15 sam Exp $
+ * $Id: demux.c,v 1.4 2003/02/06 23:59:40 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -79,17 +79,16 @@ int E_(InitDVD) ( vlc_object_t *p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     dvd_data_t *    p_dvd = (dvd_data_t *)p_input->p_access_data;
     demux_sys_t *   p_demux;
-    char *          psz_intf = NULL;
 
     if( p_input->stream.i_method != INPUT_METHOD_DVD )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_demux = p_input->p_demux_data = malloc( sizeof(demux_sys_t ) );
     if( p_demux == NULL )
     {
-        return -1;
+        return VLC_ENOMEM;
     }
 
     p_input->p_private = (void*)&p_demux->mpeg;
@@ -97,7 +96,7 @@ int E_(InitDVD) ( vlc_object_t *p_this )
     if( p_demux->p_module == NULL )
     {
         free( p_input->p_demux_data );
-        return -1;
+        return VLC_ENOMOD;
     }
 
     p_input->p_demux_data->p_dvd = p_dvd;
@@ -105,18 +104,11 @@ int E_(InitDVD) ( vlc_object_t *p_this )
     p_input->pf_demux = Demux;
     p_input->pf_rewind = NULL;
 
-    psz_intf = config_GetPsz( p_input, "intf" );
-    config_PutPsz( p_input, "intf", "dvdplay" );
-    p_dvd->p_intf = intf_Create( p_input );
+    p_dvd->p_intf = intf_Create( p_input, "dvdplay" );
     p_dvd->p_intf->b_block = VLC_FALSE;
     intf_RunThread( p_dvd->p_intf );
-    
-    if( psz_intf != NULL )
-    {
-        config_PutPsz( p_input, "intf", psz_intf );
-    }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

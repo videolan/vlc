@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.12 2003/02/01 22:21:44 ipkiss Exp $
+ * $Id: menu.cpp,v 1.13 2003/02/06 23:59:40 sam Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -97,16 +97,8 @@ void __fastcall TMenusGen::InterfaceModuleClick( TObject *Sender )
     AnsiString IntfName = CleanCaption( Item->Caption );
 
     intf_thread_t *p_newintf;
-    char *psz_oldmodule = config_GetPsz( p_intf->p_vlc, "intf" );
 
-    config_PutPsz( p_intf->p_vlc, "intf", IntfName.c_str() );
-    p_newintf = intf_Create( p_intf->p_vlc );
-    config_PutPsz( p_intf->p_vlc, "intf", psz_oldmodule );
-
-    if( psz_oldmodule )
-    {
-        free( psz_oldmodule );
-    }
+    p_newintf = intf_Create( p_intf->p_vlc, IntfName.c_str() );
 
     if( p_newintf )
     {

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.62 2003/02/01 23:39:02 sam Exp $
+ * $Id: libvlc.c,v 1.63 2003/02/06 23:59:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -547,7 +547,6 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
     int i_err;
     intf_thread_t *p_intf;
     vlc_t *p_vlc;
-    char *psz_oldmodule = NULL;
 
     p_vlc = i_object ? vlc_object_get( &libvlc, i_object ) : p_static_vlc;
 
@@ -556,23 +555,8 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
         return VLC_ENOOBJ;
     }
 
-    if( psz_module )
-    {
-        psz_oldmodule = config_GetPsz( p_vlc, "intf" );
-        config_PutPsz( p_vlc, "intf", psz_module );
-    }
-
     /* Try to create the interface */
-    p_intf = intf_Create( p_vlc );
-
-    if( psz_module )
-    {
-        config_PutPsz( p_vlc, "intf", psz_oldmodule );
-        if( psz_oldmodule )
-        {
-            free( psz_oldmodule );
-        }
-    }
+    p_intf = intf_Create( p_vlc, psz_module ? psz_module : "$intf" );
 
     if( p_intf == NULL )
     {

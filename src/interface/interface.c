@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.101 2002/11/10 18:04:23 sam Exp $
+ * $Id: interface.c,v 1.102 2003/02/06 23:59:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -53,9 +53,10 @@ static void Manager( intf_thread_t *p_intf );
  * This function opens output devices and creates specific interfaces. It sends
  * its own error messages.
  *****************************************************************************/
-intf_thread_t* __intf_Create( vlc_object_t *p_this )
+intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 {
     intf_thread_t * p_intf;
+    char *psz_intf;
 
     /* Allocate structure */
     p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
@@ -65,8 +66,20 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this )
         return NULL;
     }
 
+    /* XXX: workaround for a bug in VLC 0.5.0 where the dvdplay plugin was
+     * registering itself in $interface, which we do not want to happen. */
+    psz_intf = config_GetPsz( p_intf, "interface" );
+    if( psz_intf )
+    {
+        if( !strcasecmp( psz_intf, "dvdplay" ) )
+        {
+            config_PutPsz( p_intf, "interface", "" );
+        }
+        free( psz_intf );
+    }
+
     /* Choose the best module */
-    p_intf->p_module = module_Need( p_intf, "interface", "$intf" );
+    p_intf->p_module = module_Need( p_intf, "interface", psz_module );
 
     if( p_intf->p_module == NULL )
     {
