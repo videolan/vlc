@@ -6,7 +6,7 @@ Release: 5
 Conflicts: gpe, vlc, libsdl
 Architecture: arm
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>,  Christophe Massiot <massiot@via.ecp.fr>
-Depends: libc6, task-opie, opie-libsdl, libavcodec
+Depends: libc6, task-opie, opie-libsdl, ffmpeg
 Copyright: GPL
 Description: VideoLAN Client is a free network-aware MPEG and DVD player.
  VideoLAN is a free MPEG1/2 software solution licensed under GPL. The original 
