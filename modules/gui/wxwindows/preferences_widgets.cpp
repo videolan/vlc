@@ -695,21 +695,12 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
   : ConfigControl( p_this, p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
-#ifdef WIN32 //WIN32 only uses a 16 bit integer
-    spin = new wxSpinCtrl( this, -1,
-                           wxString::Format(wxT("%d"),
-                                            p_item->i_value),
-                           wxDefaultPosition, wxDefaultSize,
-                           wxSP_ARROW_KEYS,
-                           -32768,32767, p_item->i_value);
-#else
     spin = new wxSpinCtrl( this, -1,
                            wxString::Format(wxT("%d"),
                                             p_item->i_value),
                            wxDefaultPosition, wxDefaultSize,
                            wxSP_ARROW_KEYS,
                            -100000000, 100000000, p_item->i_value);
-#endif
     spin->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
