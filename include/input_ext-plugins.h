@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.8 2001/12/10 04:53:10 sam Exp $
+ * $Id: input_ext-plugins.h,v 1.9 2001/12/12 11:18:38 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -195,6 +195,359 @@ void                    input_NetlistDeletePacket( void *,
 void                    input_NetlistDeletePES( void *,
                                                 struct pes_packet_s * );
 void                    input_NetlistEnd( struct input_thread_s * );
+
+
+/*
+ * Optional Next Generation buffer manager
+ *
+ * Either buffers can only be used in one data packet (PS case), or buffers
+ * contain several data packets (DVD case). In the first case, buffers are
+ * embedded into data packets, otherwise they are allocated separately and
+ * shared with a refcount. --Meuuh
+ */
+
+/* Number of buffers for the calculation of the mean */
+#define INPUT_BRESENHAM_NB      50
+
+/* Flags */
+#define BUFFERS_NOFLAGS         0
+#define BUFFERS_SHARED          1
+#define BUFFERS_UNIQUE_SIZE     2
+
+/*****************************************************************************
+ * input_buffers_t: defines a LIFO per data type to keep
+ *****************************************************************************/
+#define PACKETS_LIFO( TYPE, NAME )                                           \
+struct                                                                      \
+{                                                                           \
+    TYPE * p_stack;                                                         \
+    unsigned int i_depth;                                                   \
+} NAME;
+
+#define BUFFERS_LIFO( TYPE, NAME )                                          \
+struct                                                                      \
+{                                                                           \
+    TYPE * p_stack; /* First item in the LIFO */                            \
+    unsigned int i_depth; /* Number of items in the LIFO */                 \
+    unsigned int i_average_size; /* Average size of the items (Bresenham) */\
+} NAME;
+
+#define DECLARE_BUFFERS_EMBEDDED( FLAGS, NB_LIFO )                          \
+typedef struct input_buffers_s                                              \
+{                                                                           \
+    vlc_mutex_t lock;                                                       \
+    PACKETS_LIFO( pes_packet_t, pes )                                       \
+    BUFFERS_LIFO( data_packet_t, data[NB_LIFO] )                            \
+    size_t i_allocated;                                                     \
+} input_buffers_t;
+
+#define DECLARE_BUFFERS_SHARED( FLAGS, NB_LIFO )                            \
+typedef struct data_buffer_s                                                \
+{                                                                           \
+    int i_refcount;                                                         \
+    int i_size;                                                             \
+    struct data_buffers_s * p_next;                                         \
+    byte_t payload_start;                                                   \
+} data_buffer_t;                                                            \
+                                                                            \
+typedef struct input_buffers_s                                              \
+{                                                                           \
+    vlc_mutex_t lock;                                                       \
+    PACKETS_LIFO( pes_packet_t, pes )                                       \
+    PACKETS_LIFO( data_packet_t, data )                                     \
+    BUFFERS_LIFO( data_buffers_t, buffers[NB_LIFO] )                        \
+    size_t i_allocated;                                                     \
+} input_buffers_t;
+
+
+/*****************************************************************************
+ * input_BuffersInit: initialize the cache structures, return a pointer to it
+ *****************************************************************************/
+#define DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO )                              \
+static void * input_BuffersInit( void )                                     \
+{                                                                           \
+    input_buffers_t * p_buffers = malloc( sizeof( input_buffers_t ) );      \
+                                                                            \
+    if( p_buffers == NULL )                                                 \
+    {                                                                       \
+        return( NULL );                                                     \
+    }                                                                       \
+                                                                            \
+    memset( p_buffers, 0, sizeof( input_buffers_t ) );                      \
+    vlc_mutex_init( &p_buffers->lock );                                     \
+                                                                            \
+    return (void *)p_buffers;                                               \
+}
+
+/*****************************************************************************
+ * input_BuffersEnd: free all cached structures
+ *****************************************************************************/
+#define DECLARE_BUFFERS_END( FLAGS, NB_LIFO )                               \
+static void input_BuffersEnd( void * _p_buffers )                           \
+{                                                                           \
+    input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
+                                                                            \
+    if( _p_buffers != NULL )                                                \
+    {                                                                       \
+        pes_packet_t * p_pes = p_buffers->pes.p_stack;                      \
+        int i;                                                              \
+                                                                            \
+        if( p_main->b_stats )                                               \
+        {                                                                   \
+            int i;                                                          \
+            for( i = 0; i < NB_LIFO; i++ )                                  \
+            {                                                               \
+                intf_StatMsg(                                               \
+                     "input buffers stats: data[%d]: %d bytes, %d packets", \
+                              i, p_buffers->data[i].i_average_size,         \
+                              p_buffers->data[i].i_depth );                 \
+            }                                                               \
+        }                                                                   \
+                                                                            \
+        /* Free PES */                                                      \
+        while( p_pes != NULL )                                              \
+        {                                                                   \
+            pes_packet_t * p_next = p_pes->p_next;                          \
+            free( p_pes );                                                  \
+            p_pes = p_next;                                                 \
+        }                                                                   \
+                                                                            \
+        for( i = 0; i < NB_LIFO; i++ )                                      \
+        {                                                                   \
+            data_packet_t * p_data = p_buffers->data[i].p_stack;            \
+                                                                            \
+            /* Free data packets */                                         \
+            while( p_data != NULL )                                         \
+            {                                                               \
+                data_packet_t * p_next = p_data->p_next;                    \
+                p_buffers->i_allocated -= p_data->p_buffer_end              \
+                                            - p_data->p_buffer;             \
+                free( p_data );                                             \
+                p_data = p_next;                                            \
+            }                                                               \
+        }                                                                   \
+                                                                            \
+        if( p_buffers->i_allocated )                                        \
+        {                                                                   \
+            intf_ErrMsg( "input buffers error: %d bytes have not been"      \
+                         " freed, expect memory leak",                      \
+                         p_buffers->i_allocated );                          \
+        }                                                                   \
+                                                                            \
+        vlc_mutex_destroy( &p_buffers->lock );                              \
+        free( _p_buffers );                                                 \
+    }                                                                       \
+}
+
+/*****************************************************************************
+ * input_NewPacket: return a pointer to a data packet of the appropriate size
+ *****************************************************************************/
+#define DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO )                         \
+static data_packet_t * input_NewPacket( void * _p_buffers, size_t i_size )  \
+{                                                                           \
+    input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
+    int                 i_select;                                           \
+    data_packet_t *     p_data;                                             \
+                                                                            \
+    /* Safety checks */                                                     \
+    if( i_size > INPUT_MAX_PACKET_SIZE )                                    \
+    {                                                                       \
+        intf_ErrMsg( "Packet too big (%d)", i_size );                       \
+        return NULL;                                                        \
+    }                                                                       \
+                                                                            \
+    vlc_mutex_lock( &p_buffers->lock );                                     \
+                                                                            \
+    if( p_buffers->i_allocated > INPUT_MAX_ALLOCATION )                     \
+    {                                                                       \
+        vlc_mutex_unlock( &p_buffers->lock );                               \
+        intf_ErrMsg( "INPUT_MAX_ALLOCATION reached (%d)",                   \
+                     p_buffers->i_allocated );                              \
+        return NULL;                                                        \
+    }                                                                       \
+                                                                            \
+    for( i_select = 0; i_select < NB_LIFO - 1; i_select++ )                 \
+    {                                                                       \
+        if( i_size <= (2 * p_buffers->data[i_select].i_average_size         \
+                      + p_buffers->data[i_select + 1].i_average_size) / 3 ) \
+        {                                                                   \
+            break;                                                          \
+        }                                                                   \
+    }                                                                       \
+                                                                            \
+    if( p_buffers->data[i_select].p_stack != NULL )                         \
+    {                                                                       \
+        /* Take the packet from the cache */                                \
+        p_data = p_buffers->data[i_select].p_stack;                         \
+        p_buffers->data[i_select].p_stack = p_data->p_next;                 \
+        p_buffers->data[i_select].i_depth--;                                \
+                                                                            \
+        /* Reallocate the packet if it is too small or too large */         \
+        if( p_data->p_buffer_end - p_data->p_buffer < i_size ||             \
+            p_data->p_buffer_end - p_data->p_buffer > 3 * i_size )          \
+        {                                                                   \
+            p_buffers->i_allocated -= p_data->p_buffer_end                  \
+                                        - p_data->p_buffer;                 \
+            p_data = realloc( p_data, sizeof( data_packet_t ) + i_size );   \
+            if( p_data == NULL )                                            \
+            {                                                               \
+                vlc_mutex_unlock( &p_buffers->lock );                       \
+                intf_ErrMsg( "Out of memory" );                             \
+                return NULL;                                                \
+            }                                                               \
+            p_data->p_buffer = (byte_t *)p_data + sizeof( data_packet_t );  \
+            p_data->p_buffer_end = p_data->p_buffer + i_size;               \
+            p_buffers->i_allocated += i_size;                               \
+        }                                                                   \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        /* Allocate a new packet */                                         \
+        p_data = malloc( sizeof( data_packet_t ) + i_size );                \
+        if( p_data == NULL )                                                \
+        {                                                                   \
+            vlc_mutex_unlock( &p_buffers->lock );                           \
+            intf_ErrMsg( "Out of memory" );                                 \
+            return NULL;                                                    \
+        }                                                                   \
+        p_data->p_buffer = (byte_t *)p_data + sizeof( data_packet_t );      \
+        p_data->p_buffer_end = p_data->p_buffer + i_size;                   \
+        p_buffers->i_allocated += i_size;                                   \
+    }                                                                       \
+                                                                            \
+    vlc_mutex_unlock( &p_buffers->lock );                                   \
+                                                                            \
+    /* Initialize data */                                                   \
+    p_data->p_next = NULL;                                                  \
+    p_data->b_discard_payload = 0;                                          \
+    p_data->p_payload_start = p_data->p_buffer;                             \
+    p_data->p_payload_end = p_data->p_buffer + i_size;                      \
+                                                                            \
+    return( p_data );                                                       \
+}
+
+/*****************************************************************************
+ * input_DeletePacket: put a packet back into the cache
+ *****************************************************************************/
+#define DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE )     \
+static __inline__ void _input_DeletePacket( void * _p_buffers,              \
+                                            data_packet_t * p_data )        \
+{                                                                           \
+    input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
+    int                 i_select, i_size;                                   \
+                                                                            \
+    i_size = p_data->p_buffer_end - p_data->p_buffer;                       \
+    for( i_select = 0; i_select < NB_LIFO - 1; i_select++ )                 \
+    {                                                                       \
+        if( i_size <= (2 * p_buffers->data[i_select].i_average_size         \
+                      + p_buffers->data[i_select + 1].i_average_size) / 3 ) \
+        {                                                                   \
+            break;                                                          \
+        }                                                                   \
+    }                                                                       \
+                                                                            \
+    if( p_buffers->data[i_select].i_depth < DATA_CACHE_SIZE )               \
+    {                                                                       \
+        /* Cache not full : store the packet in it */                       \
+        p_data->p_next = p_buffers->data[i_select].p_stack;                 \
+        p_buffers->data[i_select].p_stack = p_data;                         \
+        p_buffers->data[i_select].i_depth++;                                \
+                                                                            \
+        /* Update Bresenham mean (very approximative) */                    \
+        p_buffers->data[i_select].i_average_size = ( i_size                 \
+            + p_buffers->data[i_select].i_average_size                      \
+              * (INPUT_BRESENHAM_NB - 1) )                                  \
+            / INPUT_BRESENHAM_NB;                                           \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        p_buffers->i_allocated -= p_data->p_buffer_end - p_data->p_buffer;  \
+        free( p_data );                                                     \
+    }                                                                       \
+}                                                                           \
+                                                                            \
+static void input_DeletePacket( void * _p_buffers, data_packet_t * p_data ) \
+{                                                                           \
+    input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
+                                                                            \
+    vlc_mutex_lock( &p_buffers->lock );                                     \
+    _input_DeletePacket( _p_buffers, p_data );                              \
+    vlc_mutex_unlock( &p_buffers->lock );                                   \
+}
+
+/*****************************************************************************
+ * input_NewPES: return a pointer to a new PES packet
+ *****************************************************************************/
+#define DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO )                            \
+static pes_packet_t * input_NewPES( void * _p_buffers )                     \
+{                                                                           \
+    input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
+    pes_packet_t *      p_pes;                                              \
+                                                                            \
+    vlc_mutex_lock( &p_buffers->lock );                                     \
+                                                                            \
+    if( p_buffers->pes.p_stack != NULL )                                    \
+    {                                                                       \
+        p_pes = p_buffers->pes.p_stack;                                     \
+        p_buffers->pes.p_stack = p_pes->p_next;                             \
+        p_buffers->pes.i_depth--;                                           \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        p_pes = malloc( sizeof( pes_packet_t ) );                           \
+        if( p_pes == NULL )                                                 \
+        {                                                                   \
+            intf_ErrMsg( "Out of memory" );                                 \
+            vlc_mutex_unlock( &p_buffers->lock );                           \
+            return( NULL );                                                 \
+        }                                                                   \
+    }                                                                       \
+                                                                            \
+    vlc_mutex_unlock( &p_buffers->lock );                                   \
+                                                                            \
+    /* Initialize data */                                                   \
+    p_pes->p_next = NULL;                                                   \
+    p_pes->b_data_alignment = p_pes->b_discontinuity =                      \
+        p_pes->i_pts = p_pes->i_dts = 0;                                    \
+    p_pes->i_pes_size = 0;                                                  \
+    p_pes->p_first = NULL;                                                  \
+                                                                            \
+    return( p_pes );                                                        \
+}
+
+/*****************************************************************************
+ * input_DeletePES: put a pes and all data packets back into the cache
+ *****************************************************************************/
+#define DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, PES_CACHE_SIZE )         \
+static void input_DeletePES( void * _p_buffers, pes_packet_t * p_pes )      \
+{                                                                           \
+    input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
+    data_packet_t *     p_data;                                             \
+                                                                            \
+    vlc_mutex_lock( &p_buffers->lock );                                     \
+                                                                            \
+    p_data = p_pes->p_first;                                                \
+    while( p_data != NULL )                                                 \
+    {                                                                       \
+        data_packet_t * p_next = p_data->p_next;                            \
+        _input_DeletePacket( _p_buffers, p_data );                          \
+        p_data = p_next;                                                    \
+    }                                                                       \
+                                                                            \
+    if( p_buffers->pes.i_depth < PES_CACHE_SIZE )                           \
+    {                                                                       \
+        /* Cache not full : store the packet in it */                       \
+        p_pes->p_next = p_buffers->pes.p_stack;                             \
+        p_buffers->pes.p_stack = p_pes;                                     \
+        p_buffers->pes.i_depth++;                                           \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        free( p_pes );                                                      \
+    }                                                                       \
+                                                                            \
+    vlc_mutex_unlock( &p_buffers->lock );                                   \
+}
 
 
 /*
