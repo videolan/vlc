@@ -286,12 +286,35 @@
 	    <last_modification_time>Sun, 11 Feb 2001 17:06:43 GMT</last_modification_time>
 	  </signal>
 	  <label>Pause</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_BOTTOM</stock_pixmap>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_slow</name>
+	  <tooltip>Play Slower</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_slow_clicked</handler>
+	    <last_modification_time>Mon, 12 Feb 2001 07:20:42 GMT</last_modification_time>
+	  </signal>
+	  <label>Slow</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_TIMER_STOP</stock_pixmap>
 	</widget>
 
 	<widget>
-	  <class>GtkVSeparator</class>
-	  <name>vseparator2</name>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_fast</name>
+	  <tooltip>Play Faster</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_fast_clicked</handler>
+	    <last_modification_time>Mon, 12 Feb 2001 07:20:48 GMT</last_modification_time>
+	  </signal>
+	  <label>Fast</label>
+	  <stock_pixmap>GNOME_STOCK_PIXMAP_TIMER</stock_pixmap>
 	</widget>
 
 	<widget>
@@ -355,7 +378,7 @@
 	<name>text1</name>
 	<can_focus>True</can_focus>
 	<editable>False</editable>
-	<text>This is some random text. Nah.</text>
+	<text>This is some random text. Nah. Eat at Sam's. Rent this place. Wazaaa.</text>
       </widget>
     </widget>
   </widget>
@@ -401,7 +424,33 @@
     </signal>
     <label>Pause</label>
     <right_justify>False</right_justify>
+    <stock_icon>GNOME_STOCK_MENU_BOTTOM</stock_icon>
+  </widget>
+
+  <widget>
+    <class>GtkPixmapMenuItem</class>
+    <name>popup_slow</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_slow_activate</handler>
+      <last_modification_time>Mon, 12 Feb 2001 07:19:57 GMT</last_modification_time>
+    </signal>
+    <label>Slow</label>
+    <right_justify>False</right_justify>
     <stock_icon>GNOME_STOCK_MENU_TIMER_STOP</stock_icon>
+  </widget>
+
+  <widget>
+    <class>GtkPixmapMenuItem</class>
+    <name>popup_fast</name>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_fast_activate</handler>
+      <last_modification_time>Mon, 12 Feb 2001 07:19:57 GMT</last_modification_time>
+    </signal>
+    <label>Fast</label>
+    <right_justify>False</right_justify>
+    <stock_icon>GNOME_STOCK_MENU_TIMER</stock_icon>
   </widget>
 
   <widget>
@@ -521,6 +570,160 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
     </signal>
     <label>Cancel</label>
     <relief>GTK_RELIEF_NORMAL</relief>
+  </widget>
+</widget>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>intf_playlist</name>
+  <signal>
+    <name>destroy</name>
+    <handler>on_intf_playlist_destroy</handler>
+    <last_modification_time>Mon, 12 Feb 2001 06:02:25 GMT</last_modification_time>
+  </signal>
+  <title>Playlist</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>True</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <name>vbox1</name>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <name>scrolledwindow2</name>
+      <hscrollbar_policy>GTK_POLICY_ALWAYS</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkCList</class>
+	<name>clist1</name>
+	<can_focus>True</can_focus>
+	<columns>3</columns>
+	<column_widths>189,80,80</column_widths>
+	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+	<show_titles>True</show_titles>
+	<shadow_type>GTK_SHADOW_IN</shadow_type>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label3</name>
+	  <label>Name</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label4</name>
+	  <label>Type</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label5</name>
+	  <label>Length</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkHSeparator</class>
+      <name>hseparator1</name>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
+      </child>
+    </widget>
+
+    <widget>
+      <class>GtkHBox</class>
+      <name>hbox1</name>
+      <homogeneous>True</homogeneous>
+      <spacing>0</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+
+      <widget>
+	<class>GtkButton</class>
+	<name>button1</name>
+	<can_focus>True</can_focus>
+	<label>Wazaaaa !</label>
+	<relief>GTK_RELIEF_NORMAL</relief>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<name>playlist_close</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>clicked</name>
+	  <handler>on_playlist_close_clicked</handler>
+	  <last_modification_time>Mon, 12 Feb 2001 06:19:17 GMT</last_modification_time>
+	</signal>
+	<stock_button>GNOME_STOCK_BUTTON_CLOSE</stock_button>
+	<relief>GTK_RELIEF_NORMAL</relief>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<name>playlist_help</name>
+	<can_focus>True</can_focus>
+	<stock_button>GNOME_STOCK_BUTTON_HELP</stock_button>
+	<relief>GTK_RELIEF_NORMAL</relief>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>False</fill>
+	</child>
+      </widget>
+    </widget>
   </widget>
 </widget>
 

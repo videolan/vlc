@@ -120,3 +120,27 @@ on_popup_open_activate                 (GtkMenuItem     *menuitem,
 void
 on_popup_about_activate                (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
+
+void
+on_intf_playlist_destroy               (GtkObject       *object,
+                                        gpointer         user_data);
+
+void
+on_playlist_close_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_popup_slow_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_popup_fast_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_toolbar_slow_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_fast_clicked                (GtkButton       *button,
+                                        gpointer         user_data);

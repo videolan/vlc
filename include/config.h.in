@@ -219,9 +219,10 @@
 
 #define INPUT_DVD_DEVICE_VAR            "vlc_dvd_device"
 #define INPUT_DVD_DEVICE_DEFAULT        "/dev/dvd"
-#define INPUT_DVD_AUDIO_VAR             "vlc_dvd_audio"
-#define INPUT_DVD_CHANNEL_VAR           "vlc_dvd_channel"
-#define INPUT_DVD_SUBTITLE_VAR          "vlc_dvd_subtitle"
+
+#define INPUT_AUDIO_VAR                 "vlc_input_audio"
+#define INPUT_CHANNEL_VAR               "vlc_input_channel"
+#define INPUT_SUBTITLE_VAR              "vlc_input_subtitle"
 
 /*****************************************************************************
  * Audio configuration

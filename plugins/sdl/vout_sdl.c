@@ -54,12 +54,12 @@
 /*****************************************************************************
  * FIXME: this file is ...                                                   *
  *                                                                           *
- *    XXX     XXX         XXX XXX     XXX             XXX     XXX     XXX    *
- *    XXX     XXX     XXX             XXX             XXX     XXX     XXX    *
- *    XXX     XXX     XXX             XXX                 XXX         XXX    *
- *    XXX     XXX     XXX     XXX     XXX                 XXX         XXX    *
- *    XXX     XXX     XXX     XXX     XXX                 XXX                *
- *        XXX             XXX XXX         XXX XXX         XXX         XXX    *
+ *              XXX   XXX     FIXME     XXX     XXX   XXX   XXX              *
+ *              XXX   XXX   XXX   XXX   XXX     XXX   XXX   XXX              *
+ *              XXX   XXX   XXX         XXX       FIXME     XXX              *
+ *              XXX   XXX   XXX  TODO   XXX        XXX      XXX              *
+ *              XXX   XXX   XXX   XXX   XXX        XXX                       *
+ *                FIXME       FIXME       FIXME    XXX      XXX              *
  *                                                                           *
  *****************************************************************************/
 
@@ -79,8 +79,7 @@ typedef struct vout_sys_s
     boolean_t   b_overlay;
     boolean_t   b_cursor;
     boolean_t   b_reopen_display;
-    Uint8   *   p_buffer[2];
-                                                     /* Buffers informations */
+    Uint8   *   p_sdl_buf[2];                           /* Buffer information */
 }   vout_sys_t;
 
 /*****************************************************************************
@@ -631,9 +630,9 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     if( p_vout->b_need_render )
     {
-        p_vout->p_sys->p_buffer[ 0 ] = p_vout->p_sys->p_display->pixels;
+        p_vout->p_sys->p_sdl_buf[ 0 ] = p_vout->p_sys->p_display->pixels;
         SDL_Flip(p_vout->p_sys->p_display);
-        p_vout->p_sys->p_buffer[ 1 ] = p_vout->p_sys->p_display->pixels;
+        p_vout->p_sys->p_sdl_buf[ 1 ] = p_vout->p_sys->p_display->pixels;
         SDL_Flip(p_vout->p_sys->p_display);
 
         /* Set clipping for text */
@@ -659,21 +658,21 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
         /* FIXME: palette in 8bpp ?? */
         /* Set and initialize buffers */
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ],
-                                 p_vout->p_sys->p_buffer[ 1 ] );
+        vout_SetBuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
+                                 p_vout->p_sys->p_sdl_buf[ 1 ] );
     }
     else
     {
-        p_vout->p_sys->p_buffer[ 0 ] = p_vout->p_sys->p_display->pixels;
-        p_vout->p_sys->p_buffer[ 1 ] = p_vout->p_sys->p_display->pixels;
+        p_vout->p_sys->p_sdl_buf[ 0 ] = p_vout->p_sys->p_display->pixels;
+        p_vout->p_sys->p_sdl_buf[ 1 ] = p_vout->p_sys->p_display->pixels;
 
         /* Set thread information */
         p_vout->i_width =           p_vout->p_sys->p_display->w;
         p_vout->i_height =          p_vout->p_sys->p_display->h;
         p_vout->i_bytes_per_line =  p_vout->p_sys->p_display->pitch;
 
-        vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ],
-                                 p_vout->p_sys->p_buffer[ 1 ] );
+        vout_SetBuffers( p_vout, p_vout->p_sys->p_sdl_buf[ 0 ],
+                                 p_vout->p_sys->p_sdl_buf[ 1 ] );
     }
 
     p_vout->p_sys->b_reopen_display = 0;

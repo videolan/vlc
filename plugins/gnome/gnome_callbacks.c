@@ -90,7 +90,15 @@ void
 on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
 
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
+    {
+        p_intf->p_sys->p_playlist = create_intf_playlist();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_playlist );
 }
 
 
@@ -119,6 +127,8 @@ on_menubar_about_activate              (GtkMenuItem     *menuitem,
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_about ) )
     {
         p_intf->p_sys->p_about = create_intf_about();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_about ),
+                             "p_intf", p_intf );
     }
     gtk_widget_show( p_intf->p_sys->p_about );
 }
@@ -189,7 +199,15 @@ void
 on_toolbar_playlist_clicked            (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
 
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
+    {
+        p_intf->p_sys->p_playlist = create_intf_playlist();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_playlist );
 }
 
 
@@ -197,7 +215,15 @@ void
 on_toolbar_prev_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
 
+    if( p_intf->p_input != NULL )
+    {
+        /* FIXME: temporary hack */
+        intf_PlstPrev( p_main->p_playlist );
+        intf_PlstPrev( p_main->p_playlist );
+        p_intf->p_input->b_eof = 1;
+    }
 }
 
 
@@ -205,7 +231,13 @@ void
 on_toolbar_next_clicked                (GtkButton       *button,
                                         gpointer         user_data)
 {
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
 
+    if( p_intf->p_input != NULL )
+    {
+        /* FIXME: temporary hack */
+        p_intf->p_input->b_eof = 1;
+    }
 }
 
 
@@ -318,7 +350,105 @@ on_popup_about_activate                (GtkMenuItem     *menuitem,
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_about ) )
     {
         p_intf->p_sys->p_about = create_intf_about();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_about ),
+                             "p_intf", p_intf );
     }
     gtk_widget_show( p_intf->p_sys->p_about );
+}
+
+
+void
+on_intf_playlist_destroy               (GtkObject       *object,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(object), "intf_playlist" );
+
+    p_intf->p_sys->p_playlist = NULL;
+}
+
+
+void
+on_playlist_close_clicked              (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+}
+
+
+void
+on_popup_slow_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+    int i_rate;
+
+    if( p_intf->p_input != NULL )
+    {
+        i_rate = p_intf->p_input->stream.control.i_rate * 2;
+        if ( i_rate <= MAXIMAL_RATE )
+        {
+             if ( i_rate > 500 && i_rate < 1000 )
+                 i_rate = 1000;
+
+             input_Forward( p_intf->p_input, i_rate );
+        }
+    }
+}
+
+
+void
+on_popup_fast_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+    int i_rate;
+
+    if( p_intf->p_input != NULL )
+    {
+        i_rate = p_intf->p_input->stream.control.i_rate / 2;
+        if ( i_rate >= MINIMAL_RATE )
+        {
+             input_Forward( p_intf->p_input, i_rate );
+        }
+    }
+}
+
+
+void
+on_toolbar_slow_clicked                (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    int i_rate;
+
+    if( p_intf->p_input != NULL )
+    {
+        i_rate = p_intf->p_input->stream.control.i_rate * 2;
+        if ( i_rate <= MAXIMAL_RATE )
+        {
+             if ( i_rate > 500 && i_rate < 1000 )
+                 i_rate = 1000;
+
+             input_Forward( p_intf->p_input, i_rate );
+        }
+    }
+}
+
+
+void
+on_toolbar_fast_clicked                (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+    int i_rate;
+
+    if( p_intf->p_input != NULL )
+    {
+        i_rate = p_intf->p_input->stream.control.i_rate / 2;
+        if ( i_rate >= MINIMAL_RATE )
+        {
+             input_Forward( p_intf->p_input, i_rate );
+        }
+    }
 }
 

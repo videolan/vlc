@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.4 2001/02/08 17:44:12 massiot Exp $
+ * $Id: input_ps.c,v 1.5 2001/02/12 07:52:40 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -211,12 +211,12 @@ static void PSInit( input_thread_t * p_input )
 
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
                                 == (p_es->i_id & 0x1F) )
-                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
+                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
                         {
                         case 0:
-                            main_PutIntVariable( INPUT_DVD_CHANNEL_VAR,
+                            main_PutIntVariable( INPUT_AUDIO_VAR,
                                                  REQUESTED_MPEG );
                         case REQUESTED_MPEG:
                             input_SelectES( p_input, p_es );
@@ -224,12 +224,12 @@ static void PSInit( input_thread_t * p_input )
                         break;
 
                     case AC3_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
                                 == ((p_es->i_id & 0xF00) >> 8) )
-                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
+                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
                         {
                         case 0:
-                            main_PutIntVariable( INPUT_DVD_CHANNEL_VAR,
+                            main_PutIntVariable( INPUT_AUDIO_VAR,
                                                  REQUESTED_AC3 );
                         case REQUESTED_AC3:
                             input_SelectES( p_input, p_es );
@@ -237,7 +237,7 @@ static void PSInit( input_thread_t * p_input )
                         break;
 
                     case DVD_SPU_ES:
-                        if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, -1 )
+                        if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             input_SelectES( p_input, p_es );

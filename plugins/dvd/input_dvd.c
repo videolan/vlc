@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.6 2001/02/09 03:51:42 stef Exp $
+ * $Id: input_dvd.c,v 1.7 2001/02/12 07:52:40 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -289,12 +289,12 @@ static void DVDInit( input_thread_t * p_input )
 
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
                                 == (p_es->i_id & 0x1F) )
-                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
+                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
                         {
                         case 0:
-                            main_PutIntVariable( INPUT_DVD_AUDIO_VAR,
+                            main_PutIntVariable( INPUT_AUDIO_VAR,
                                                  REQUESTED_MPEG );
                         case REQUESTED_MPEG:
                             input_SelectES( p_input, p_es );
@@ -302,12 +302,12 @@ static void DVDInit( input_thread_t * p_input )
                         break;
 
                     case AC3_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
                                 == ((p_es->i_id & 0xF00) >> 8) )
-                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
+                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
                         {
                         case 0:
-                            main_PutIntVariable( INPUT_DVD_AUDIO_VAR,
+                            main_PutIntVariable( INPUT_AUDIO_VAR,
                                                  REQUESTED_AC3 );
                         case REQUESTED_AC3:
                             input_SelectES( p_input, p_es );
@@ -315,7 +315,7 @@ static void DVDInit( input_thread_t * p_input )
                         break;
 
                     case DVD_SPU_ES:
-                        if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, -1 )
+                        if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
                             input_SelectES( p_input, p_es );

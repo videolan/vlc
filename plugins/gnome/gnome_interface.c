@@ -77,7 +77,8 @@ create_intf_window (void)
   GtkWidget *toolbar_stop;
   GtkWidget *toolbar_play;
   GtkWidget *toolbar_pause;
-  GtkWidget *vseparator2;
+  GtkWidget *toolbar_slow;
+  GtkWidget *toolbar_fast;
   GtkWidget *toolbar_playlist;
   GtkWidget *toolbar_prev;
   GtkWidget *toolbar_next;
@@ -214,7 +215,7 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_play);
 
-  tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_TIMER_STOP);
+  tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_BOTTOM);
   toolbar_pause = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
@@ -226,12 +227,29 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_pause);
 
-  vseparator2 = gtk_vseparator_new ();
-  gtk_widget_ref (vseparator2);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "vseparator2", vseparator2,
+  tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_TIMER_STOP);
+  toolbar_slow = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Slow"),
+                                _("Play Slower"), NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_slow);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_slow", toolbar_slow,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (vseparator2);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), vseparator2, NULL, NULL);
+  gtk_widget_show (toolbar_slow);
+
+  tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_TIMER);
+  toolbar_fast = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Fast"),
+                                _("Play Faster"), NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_fast);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_fast", toolbar_fast,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (toolbar_fast);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -286,7 +304,7 @@ create_intf_window (void)
   gtk_widget_show (text1);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), text1);
   gtk_text_insert (GTK_TEXT (text1), NULL, NULL, NULL,
-                   _("This is some random text. Nah."), 30);
+                   _("This is some random text. Nah. Eat at Sam's. Rent this place. Wazaaa."), 69);
 
   appbar = gnome_appbar_new (TRUE, TRUE, GNOME_PREFERENCES_NEVER);
   gtk_widget_ref (appbar);
@@ -314,6 +332,12 @@ create_intf_window (void)
   gtk_signal_connect (GTK_OBJECT (toolbar_pause), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_pause_clicked),
                       NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_slow), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_slow_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_fast), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_fast_clicked),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (toolbar_playlist), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_playlist_clicked),
                       NULL);
@@ -340,7 +364,21 @@ static GnomeUIInfo intf_popup_uiinfo[] =
     GNOME_APP_UI_ITEM, N_("Pause"),
     NULL,
     (gpointer) on_popup_pause_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_BOTTOM,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Slow"),
+    NULL,
+    (gpointer) on_popup_slow_activate, NULL, NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TIMER_STOP,
+    0, (GdkModifierType) 0, NULL
+  },
+  {
+    GNOME_APP_UI_ITEM, N_("Fast"),
+    NULL,
+    (gpointer) on_popup_fast_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TIMER,
     0, (GdkModifierType) 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
@@ -372,28 +410,38 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[2].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator2",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_slow",
                             intf_popup_uiinfo[2].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[3].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_open",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_fast",
                             intf_popup_uiinfo[3].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[4].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator3",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator2",
                             intf_popup_uiinfo[4].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[5].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_about",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_open",
                             intf_popup_uiinfo[5].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[6].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_exit",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator3",
                             intf_popup_uiinfo[6].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[7].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_about",
+                            intf_popup_uiinfo[7].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[8].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_exit",
+                            intf_popup_uiinfo[8].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   return intf_popup;
@@ -465,5 +513,116 @@ create_intf_fileopen (void)
                       NULL);
 
   return intf_fileopen;
+}
+
+GtkWidget*
+create_intf_playlist (void)
+{
+  GtkWidget *intf_playlist;
+  GtkWidget *vbox1;
+  GtkWidget *scrolledwindow2;
+  GtkWidget *clist1;
+  GtkWidget *label3;
+  GtkWidget *label4;
+  GtkWidget *label5;
+  GtkWidget *hseparator1;
+  GtkWidget *hbox1;
+  GtkWidget *button1;
+  GtkWidget *playlist_close;
+  GtkWidget *playlist_help;
+
+  intf_playlist = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_object_set_data (GTK_OBJECT (intf_playlist), "intf_playlist", intf_playlist);
+  gtk_window_set_title (GTK_WINDOW (intf_playlist), _("Playlist"));
+
+  vbox1 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "vbox1", vbox1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vbox1);
+  gtk_container_add (GTK_CONTAINER (intf_playlist), vbox1);
+
+  scrolledwindow2 = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_ref (scrolledwindow2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "scrolledwindow2", scrolledwindow2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (scrolledwindow2);
+  gtk_box_pack_start (GTK_BOX (vbox1), scrolledwindow2, TRUE, TRUE, 0);
+
+  clist1 = gtk_clist_new (3);
+  gtk_widget_ref (clist1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "clist1", clist1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (clist1);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow2), clist1);
+  gtk_clist_set_column_width (GTK_CLIST (clist1), 0, 189);
+  gtk_clist_set_column_width (GTK_CLIST (clist1), 1, 80);
+  gtk_clist_set_column_width (GTK_CLIST (clist1), 2, 80);
+  gtk_clist_column_titles_show (GTK_CLIST (clist1));
+
+  label3 = gtk_label_new (_("Name"));
+  gtk_widget_ref (label3);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label3", label3,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label3);
+  gtk_clist_set_column_widget (GTK_CLIST (clist1), 0, label3);
+
+  label4 = gtk_label_new (_("Type"));
+  gtk_widget_ref (label4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label4", label4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label4);
+  gtk_clist_set_column_widget (GTK_CLIST (clist1), 1, label4);
+
+  label5 = gtk_label_new (_("Length"));
+  gtk_widget_ref (label5);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "label5", label5,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label5);
+  gtk_clist_set_column_widget (GTK_CLIST (clist1), 2, label5);
+
+  hseparator1 = gtk_hseparator_new ();
+  gtk_widget_ref (hseparator1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "hseparator1", hseparator1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hseparator1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hseparator1, FALSE, TRUE, 0);
+
+  hbox1 = gtk_hbox_new (TRUE, 0);
+  gtk_widget_ref (hbox1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "hbox1", hbox1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox1);
+  gtk_box_pack_start (GTK_BOX (vbox1), hbox1, FALSE, FALSE, 0);
+
+  button1 = gtk_button_new_with_label (_("Wazaaaa !"));
+  gtk_widget_ref (button1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "button1", button1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button1);
+  gtk_box_pack_start (GTK_BOX (hbox1), button1, FALSE, FALSE, 0);
+
+  playlist_close = gnome_stock_button (GNOME_STOCK_BUTTON_CLOSE);
+  gtk_widget_ref (playlist_close);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_close", playlist_close,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_close);
+  gtk_box_pack_start (GTK_BOX (hbox1), playlist_close, FALSE, FALSE, 0);
+
+  playlist_help = gnome_stock_button (GNOME_STOCK_BUTTON_HELP);
+  gtk_widget_ref (playlist_help);
+  gtk_object_set_data_full (GTK_OBJECT (intf_playlist), "playlist_help", playlist_help,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (playlist_help);
+  gtk_box_pack_start (GTK_BOX (hbox1), playlist_help, FALSE, FALSE, 0);
+
+  gtk_signal_connect (GTK_OBJECT (intf_playlist), "destroy",
+                      GTK_SIGNAL_FUNC (on_intf_playlist_destroy),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (playlist_close), "clicked",
+                      GTK_SIGNAL_FUNC (on_playlist_close_clicked),
+                      NULL);
+
+  return intf_playlist;
 }
 

@@ -616,19 +616,19 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /* DVD options */
         case 'a':
             if ( ! strcmp(optarg, "ac3") )
-                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_AC3 );
+                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_AC3 );
             else if ( ! strcmp(optarg, "lpcm") )
-                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_LPCM );
+                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_LPCM );
             else if ( ! strcmp(optarg, "mpeg") )
-                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_MPEG );
+                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_MPEG );
             else
-                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_NOAUDIO );
+                main_PutIntVariable( INPUT_AUDIO_VAR, REQUESTED_NOAUDIO );
             break;
         case 'c':
-            main_PutIntVariable( INPUT_DVD_CHANNEL_VAR, atoi(optarg) );
+            main_PutIntVariable( INPUT_CHANNEL_VAR, atoi(optarg) );
             break;
         case 's':
-            main_PutIntVariable( INPUT_DVD_SUBTITLE_VAR, atoi(optarg) );
+            main_PutIntVariable( INPUT_SUBTITLE_VAR, atoi(optarg) );
             break;
 
         /* Input options */
@@ -776,9 +776,9 @@ static void Usage( int i_fashion )
     /* DVD parameters */
     intf_MsgImm( "\nDVD parameters:"
         "\n  " INPUT_DVD_DEVICE_VAR "=<device>           \tDVD device"
-        "\n  " INPUT_DVD_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type"
-        "\n  " INPUT_DVD_CHANNEL_VAR "=[0-15]            \taudio channel"
-        "\n  " INPUT_DVD_SUBTITLE_VAR "=[0-31]           \tsubtitle channel" );
+        "\n  " INPUT_AUDIO_VAR "={ac3|lpcm|mpeg|off}     \taudio type"
+        "\n  " INPUT_CHANNEL_VAR "=[0-15]                \taudio channel"
+        "\n  " INPUT_SUBTITLE_VAR "=[0-31]               \tsubtitle channel" );
 
     /* Input parameters */
     intf_MsgImm( "\nInput parameters:\n"
