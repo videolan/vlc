@@ -2,7 +2,7 @@
  * skin_parser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: skin_parser.cpp,v 1.5 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -95,7 +95,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::Image imageData( uniqueId( attr["id"] ), atoi( attr["x"] ) +
                 m_xOffset, atoi( attr["y"] ) + m_yOffset, attr["lefttop"],
                 attr["rightbottom"], ConvertBoolean( attr["visible"] ),
-                attr["image"], attr["onclick"], attr["help"], m_curLayer,
+                attr["image"], attr["action"], attr["help"], m_curLayer,
                 m_curWindowId, m_curLayoutId );
         m_curLayer++;
         m_data.m_listImage.push_back( imageData );

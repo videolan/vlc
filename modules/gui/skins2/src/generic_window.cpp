@@ -2,7 +2,7 @@
  * generic_window.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic_window.cpp,v 1.3 2004/02/29 16:49:55 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -212,7 +212,11 @@ void GenericWindow::processEvent( EvtKey &rEvtKey )
         if( (rEvtKey.getMod() & EvtInput::kModCtrl) &&
             rEvtKey.getKey() == 's' )
         {
-            Dialogs::instance( getIntf() )->showChangeSkin();
+            Dialogs *pDialogs = Dialogs::instance( getIntf() );
+            if( pDialogs != NULL )
+            {
+                pDialogs->showChangeSkin();
+            }
             return;
         }
 

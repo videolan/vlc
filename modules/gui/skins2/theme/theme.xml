@@ -68,7 +68,7 @@
 
     <Layout id="testlayout" width="424" height="152">
     <Group x="0" y="0">
-      <Image x="0" y="0" image="mainbody" onclick="move"/>
+      <Image x="0" y="0" image="mainbody" action="move"/>
       <Button x="8" y="5" up="close" down="close_onclick" over="close_mouseover" action="vlc.quit()" tooltiptext="Quit VLC"/>
     </Group>
    </Layout>
@@ -76,7 +76,7 @@
    <Layout id="mainlayout" width="424" height="152">
     <Group x="0" y="0">
       <Anchor x="7" y="151" points="(0,0)" priority="100"/>
-      <Image x="0" y="0" image="mainbody" onclick="move"/>
+      <Image x="0" y="0" image="mainbody" action="move"/>
       <Text font="default_font" width="70" x="287" y="79" text="$T" color="#000000"/>
       <Button x="42" y="42" up="preferences" down="preferences_onclick" over="preferences" action="dialogs.prefs()" tooltiptext="Preferences"/>
       <Button x="17" y="64" up="stop" down="stop_onclick" over="stop" action="vlc.stop()" tooltiptext="Stop"/>
@@ -97,15 +97,15 @@
    <Layout id="playlistLayout" width="410" height="250" minwidth="200" minheight="150" maxwidth="1000" maxheight="800">
     <Group x="0" y="0">
       <Anchor x="0" y="0" points="(0,0)" priority="50"/>
-      <Image image="playlist1" x="0" y="0" lefttop="lefttop" rightbottom="lefttop" onclick="move"/>
-      <Image image="playlist2" x="17" y="0" lefttop="lefttop" rightbottom="righttop" onclick="move"/>
-      <Image image="playlist3" x="350" y="0" lefttop="righttop" rightbottom="righttop" onclick="move"/>
-      <Image image="playlist4" x="0" y="70" lefttop="lefttop" rightbottom="leftbottom" onclick="move"/>
-      <Image image="playlist6" x="350" y="70" lefttop="righttop" rightbottom="rightbottom" onclick="move"/>
-      <Image image="playlist7" x="0" y="200" lefttop="leftbottom" rightbottom="leftbottom" onclick="move"/>
-      <Image image="playlist8" x="17" y="200" lefttop="leftbottom" rightbottom="rightbottom" onclick="move"/>
-      <Image image="playlist9" x="350" y="200" lefttop="rightbottom" rightbottom="rightbottom" onclick="move"/> 
-      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" onclick="resize"/>
+      <Image image="playlist1" x="0" y="0" lefttop="lefttop" rightbottom="lefttop" action="move"/>
+      <Image image="playlist2" x="17" y="0" lefttop="lefttop" rightbottom="righttop" action="move"/>
+      <Image image="playlist3" x="350" y="0" lefttop="righttop" rightbottom="righttop" action="move"/>
+      <Image image="playlist4" x="0" y="70" lefttop="lefttop" rightbottom="leftbottom" action="move"/>
+      <Image image="playlist6" x="350" y="70" lefttop="righttop" rightbottom="rightbottom" action="move"/>
+      <Image image="playlist7" x="0" y="200" lefttop="leftbottom" rightbottom="leftbottom" action="move"/>
+      <Image image="playlist8" x="17" y="200" lefttop="leftbottom" rightbottom="rightbottom" action="move"/>
+      <Image image="playlist9" x="350" y="200" lefttop="rightbottom" rightbottom="rightbottom" action="move"/> 
+      <Image image="resize" x="392" y="232" lefttop="rightbottom" rightbottom="rightbottom" action="resize"/>
 
       <Button x="374" y="12" lefttop="righttop" rightbottom="righttop" up="add_item" down="add_item_onclick" over="add_item" action="playlist.add()" tooltiptext="Add item"/>
       <Button x="374" y="40" up="delete_item" lefttop="righttop" rightbottom="righttop" down="delete_item_onclick" over="delete_item" action="playlist.del()" tooltiptext="Del item"/>

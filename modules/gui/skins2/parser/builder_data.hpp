@@ -2,7 +2,7 @@
  * builder_data.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder_data.hpp,v 1.6 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,12 +28,12 @@
 #ifndef BUILDER_DATA_HPP
 #define BUILDER_DATA_HPP
 
-using namespace std;
-
 #include <vlc/vlc.h>
 #include <list>
 #include <map>
 #include <string>
+
+using namespace std;
 
 /// Structure for mapping data from XML file
 struct BuilderData
@@ -186,8 +186,8 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
     /// Type definition
     struct Image
     {
-        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool visible, const string & bmpId, const string & onclickId, const string & help, int layer, const string & windowId, const string & layoutId ):
-m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_bmpId( bmpId ), m_onclickId( onclickId ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
+        Image( const string & id, int xPos, int yPos, const string & leftTop, const string & rightBottom, bool visible, const string & bmpId, const string & actionId, const string & help, int layer, const string & windowId, const string & layoutId ):
+m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom( rightBottom ), m_visible( visible ), m_bmpId( bmpId ), m_actionId( actionId ), m_help( help ), m_layer( layer ), m_windowId( windowId ), m_layoutId( layoutId ) {}
 
         const string m_id;
         int m_xPos;
@@ -196,7 +196,7 @@ m_id( id ), m_xPos( xPos ), m_yPos( yPos ), m_leftTop( leftTop ), m_rightBottom(
         const string m_rightBottom;
         bool m_visible;
         const string m_bmpId;
-        const string m_onclickId;
+        const string m_actionId;
         const string m_help;
         int m_layer;
         const string m_windowId;

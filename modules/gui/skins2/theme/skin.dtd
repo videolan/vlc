@@ -81,7 +81,7 @@
         lefttop     CDATA   "lefttop"
         rightbottom CDATA   "lefttop"
         image       CDATA   #REQUIRED
-        onclick     CDATA   "none"
+        action      CDATA   "none"
         help        CDATA   ""
     >
 <!ELEMENT Button EMPTY>

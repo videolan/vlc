@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.9 2004/03/02 21:45:15 ipkiss Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -342,14 +342,14 @@ void Builder::addImage( const BuilderData::Image &rData )
                                        pBmp->getHeight(), *pLayout );
 
     // XXX: test to be changed! XXX
-    if( rData.m_onclickId == "move" )
+    if( rData.m_actionId == "move" )
     {
         CtrlMove *pMove = new CtrlMove( getIntf(), m_pTheme->getWindowManager(),
              *pImage, *pWindow, UString( getIntf(), rData.m_help.c_str() ),
              NULL);
         pLayout->addControl( pMove, pos, rData.m_layer );
     }
-    else if( rData.m_onclickId == "resize" )
+    else if( rData.m_actionId == "resize" )
     {
         CtrlResize *pResize = new CtrlResize( getIntf(), *pImage, *pLayout,
                 UString( getIntf(), rData.m_help.c_str() ), NULL );
