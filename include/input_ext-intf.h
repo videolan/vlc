@@ -29,6 +29,7 @@ typedef struct es_descriptor_s
     struct pes_packet_s *   p_pes;                            /* Current PES */
     struct data_packet_s *  p_last;   /* The last packet gathered at present */
     int                     i_pes_real_size;   /* as indicated by the header */
+    boolean_t               b_discontinuity;               /* Stream changed */
 
     /* Decoder information */
     struct decoder_fifo_s * p_decoder_fifo;

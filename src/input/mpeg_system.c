@@ -390,7 +390,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
  *****************************************************************************
  * Gather a PES packet.
  *****************************************************************************/
-void input_GatherPES( input_thread_t * p_input, data_packet_t *p_data,
+void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                       es_descriptor_t * p_es,
                       boolean_t b_unit_start, boolean_t b_packet_lost )
 {
@@ -401,10 +401,12 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t *p_data,
     /* If we lost data, insert an NULL data packet (philosophy : 0 is quite
      * often an escape sequence in decoders, so that should make them wait
      * for the next start code). */
-    if( b_packet_lost && p_pes != NULL )
+    if( b_packet_lost || p_es->b_discontinuity )
     {
         data_packet_t *             p_pad_data;
-        if( (p_pad_data = p_input->p_plugin->pf_new_packet( p_input,
+
+        if( (p_pad_data = p_input->p_plugin->pf_new_packet(
+                                            p_input->p_method_data,
                                             PADDING_PACKET_SIZE )) == NULL )
         {
             intf_ErrMsg("Out of memory\n");
@@ -413,8 +415,28 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t *p_data,
         }
         memset( p_data->p_buffer, 0, PADDING_PACKET_SIZE );
         p_pad_data->b_discard_payload = 1;
-        p_pes->b_messed_up = 1;
-        input_GatherPES( p_input, p_pad_data, p_es, 0, 0 );
+
+        if( p_pes != NULL )
+        {
+            p_pes->b_messed_up = p_pes->b_discontinuity = 1;
+            input_GatherPES( p_input, p_pad_data, p_es, 0, 0 );
+        }
+        else
+        {
+            if( (p_pes = p_input->p_plugin->pf_new_pes(
+                                            p_input->p_method_data )) == NULL )
+            {
+                intf_ErrMsg("Out of memory\n");
+                p_input->b_error = 1;
+                return;
+            }
+
+            p_pes->p_first = p_pad_data;
+            p_pes->b_messed_up = p_pes->b_discontinuity = 1;
+            input_DecodePES( p_input, p_es );
+        }
+
+        p_es->b_discontinuity = 0;
     }
 
     if( b_unit_start && p_pes != NULL )
@@ -571,11 +593,19 @@ static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
                   (    (p_pgrm->last_cr - cr_time) > CR_MAX_GAP
                     || (p_pgrm->last_cr - cr_time) < - CR_MAX_GAP ) ) )
         {
+            int i_es;
+
             /* Stream discontinuity. */
             intf_WarnMsg( 3, "CR re-initialiazed" );
             CRReInit( p_pgrm );
             p_pgrm->i_synchro_state = SYNCHRO_REINIT;
             p_pgrm->b_discontinuity = 0;
+
+            /* Warn all the elementary streams */
+            for( i_es = 0; i_es < p_pgrm->i_es_number; i_es++ )
+            {
+                p_pgrm->pp_es[i_es]->b_discontinuity = 1;
+            }
         }
         p_pgrm->last_cr = cr_time;
 
