@@ -56,7 +56,7 @@ Description: Cope with vls/vlc clock jitter
  The internal clocks of the server and the client are not assured to be
  in perfect synchronization, which may be annoying when playing a movie.
  Reduce this jitter by using a well-chosen filter.
-Status: Todo
+Status: Done 1 May 2001 (henri)
 
 Task: 0x58
 Difficulty: Medium
@@ -541,7 +541,7 @@ Urgency: Normal
 Description: LPCM decoder
  The LPCM decoder is full of stubs, it only parses the stream
  but does not decode it. Fix this.
-Status: Todo
+Status: Done 12 Jun 2001 (henri)
 
 Task: 0x1c
 Difficulty: Guru

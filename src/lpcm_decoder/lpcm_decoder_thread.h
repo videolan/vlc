@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.h : lpcm decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: lpcm_decoder_thread.h,v 1.5 2001/05/01 04:18:18 sam Exp $
+ * $Id: lpcm_decoder_thread.h,v 1.6 2001/06/12 13:50:09 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,6 +21,8 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
+
+#define LPCMDEC_FRAME_SIZE (2008)
 
 /*****************************************************************************
  * lpcmdec_thread_t : lpcm decoder thread descriptor
@@ -41,14 +43,12 @@ typedef struct lpcmdec_thread_s
     adec_config_t *     p_config;
 
     /*
-     * Decoder properties
-     */
-    lpcmdec_t            lpcm_decoder;
-
-    /*
      * Output properties
      */
     aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
+
+    /* The bit stream structure handles the PES stream at the bit level */
+    bit_stream_t bit_stream;
 
 } lpcmdec_thread_t;
 
@@ -56,4 +56,3 @@ typedef struct lpcmdec_thread_s
  * Prototypes
  *****************************************************************************/
 vlc_thread_t            lpcmdec_CreateThread( adec_config_t * p_config );
-
