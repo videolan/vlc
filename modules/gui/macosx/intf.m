@@ -526,6 +526,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     [o_mi_prefs setTitle: _NS("Preferences...")];
     [o_mi_add_intf setTitle: _NS("Add Interface")];
     [o_mu_add_intf setTitle: _NS("Add Interface")];
+    [o_mi_services setTitle: _NS("Services")];
     [o_mi_hide setTitle: _NS("Hide VLC")];
     [o_mi_hide_others setTitle: _NS("Hide Others")];
     [o_mi_show_all setTitle: _NS("Show All")];

@@ -3237,7 +3237,7 @@
 			  <property name="width_request">200</property>
 			  <property name="height_request">112</property>
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">VLC Media Player is an MPEG, MPEG 2, MP3 and DivX player that accepts input from local or network sources and is licensed under the GPL (http://www.gnu.org/copyleft/gpl.html).</property>
+			  <property name="label" translatable="yes">VLC media player is an MPEG, MPEG 2, MP3 and DivX player that accepts input from local or network sources and is licensed under the GPL (http://www.gnu.org/copyleft/gpl.html).</property>
 			  <property name="use_underline">False</property>
 			  <property name="use_markup">False</property>
 			  <property name="justify">GTK_JUSTIFY_LEFT</property>

@@ -141,6 +141,7 @@ struct intf_sys_t
     IBOutlet id o_mi_prefs;
     IBOutlet id o_mi_add_intf;
     IBOutlet id o_mu_add_intf;
+    IBOutlet id o_mi_services;
     IBOutlet id o_mi_hide;
     IBOutlet id o_mi_hide_others;
     IBOutlet id o_mi_show_all;
