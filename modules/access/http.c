@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.11 2002/11/23 04:40:53 sam Exp $
+ * $Id: http.c,v 1.12 2002/11/28 15:18:27 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -97,6 +97,8 @@ typedef struct _input_socket_s
     char *              psz_name;
 } _input_socket_t;
 
+#define MAX_LINE 1024
+
 /*****************************************************************************
  * HTTPConnect: connect to the server and seek to i_tell
  *****************************************************************************/
@@ -106,9 +108,11 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     module_t *          p_network;
     char                psz_buffer[256];
     byte_t *            psz_parser;
-    int                 i_returncode, i, i_size;
+    int                 i_pos, i_returncode, i, i_size;
     char *              psz_return_alpha;
     char                *psz_protocol;
+    char                psz_line[MAX_LINE];
+    char                *psz_header_name, *psz_header_value;
 
     /* Find an appropriate network module */
     p_access_data = (_input_socket_t *)p_input->p_access_data;
@@ -172,7 +176,6 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     }
 
     /* Parse HTTP header. */
-#define MAX_LINE 1024
 
     /* get the returncode */
     if( (i_size = input_Peek( p_input, &psz_parser, MAX_LINE )) <= 0 )
@@ -233,6 +236,7 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     psz_return_alpha = malloc( i + 1 );
     memcpy( psz_return_alpha, psz_parser, i );
     psz_return_alpha[i] = '\0';
+    p_input->p_current_data = &psz_parser[i + 2];
 
     if ( i_returncode >= 400 ) /* something is wrong */
     {
@@ -240,43 +244,61 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
         return VLC_EGENERIC;
     }
     
-    for( ; ; ) 
+    for ( ; ; )
     {
-        if( input_Peek( p_input, &psz_parser, MAX_LINE ) <= 0 )
+        if( ( i_size = input_Peek( p_input, &psz_parser, MAX_LINE ) ) <= 0 )
         {
             msg_Err( p_input, "not enough data" );
             Close( VLC_OBJECT(p_input) );
             return VLC_EGENERIC;
         }
-
-        if( psz_parser[0] == '\r' && psz_parser[1] == '\n' )
+        
+        i_pos = 0;
+        while( i_size && psz_parser[i_pos] != '\r'
+               && psz_parser[i_pos + 1] != '\n' )
         {
-            /* End of header. */
-            p_input->p_current_data += 2;
-            break;
+            psz_line[i_pos] = psz_parser[i_pos];
+            i_pos++;
+            i_size--;
         }
-
-        if( !strncmp( psz_parser, "Content-Length: ",
-                      strlen("Content-Length: ") ) )
+        p_input->p_current_data = &psz_parser[i_pos + 2];
+        if (!i_pos)
         {
-            psz_parser += strlen("Content-Length: ");
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-#ifdef HAVE_ATOLL
-            p_input->stream.p_selected_area->i_size = atoll( (char*)psz_parser )
-                                                        + i_tell;
-#else
-            /* FIXME : this won't work for 64-bit lengths */
-            p_input->stream.p_selected_area->i_size = atoi( (char*)psz_parser )
-                                                        + i_tell;
-#endif
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            break; /* end of header*/
         }
-
-        while( *psz_parser != '\r' && psz_parser < p_input->p_last_data )
+        psz_line[i_pos] = '\0';
+        psz_parser = strchr( psz_line, ':' );
+        if ( !psz_parser )
+        {
+            msg_Err( p_input, "malformed header line: %s", psz_line );
+            return VLC_EGENERIC;
+        }
+        *psz_parser = '\0';
+        psz_parser++;
+        psz_header_name = psz_line;
+        while ( *psz_parser == ' ' || *psz_parser == '\t' )
         {
             psz_parser++;
         }
-        p_input->p_current_data = psz_parser + 2;
+        psz_header_value = psz_parser;
+        msg_Dbg( p_input, "found header \"%s: %s\"",
+                 psz_header_name, psz_header_value );
+        
+        if( !strcasecmp( psz_header_name, "Content-Length" ) )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+#ifdef HAVE_ATOLL
+            p_input->stream.p_selected_area->i_size = atoll( (char*)psz_header_value )
+                                                        + i_tell;
+#else
+            /* FIXME : this won't work for 64-bit lengths */
+            p_input->stream.p_selected_area->i_size = atoi( (char*)psz_header_value )
+                                                        + i_tell;
+#endif
+            msg_Dbg( p_input, "stream size is %d", p_input->stream.p_selected_area->i_size );
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+/* parse other headers here */
     }
     
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -293,6 +315,10 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     {
         p_input->stream.p_selected_area->i_tell = i_tell
             + (p_input->p_last_data - p_input->p_current_data);
+    }
+    else
+    {
+        p_input->stream.b_seekable = 0;
     }
     p_input->stream.b_changed = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
