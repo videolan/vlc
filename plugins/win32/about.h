@@ -41,6 +41,7 @@ __published:	// IDE-managed Components
     TLabel *Label3;
     TImage *Image1;
     TLabel *Label5;
+    TLabel *LabelVersion;
 private:	// User declarations
 public:		// User declarations
     __fastcall TAboutDlg( TComponent* Owner );

@@ -59,8 +59,9 @@ __fastcall TMainFrameDlg::TMainFrameDlg( TComponent* Owner )
 
     TrackBar->Max = SLIDER_MAX_VALUE;
 
-    /* default height */
+    /* default height and caption */
     ClientHeight = 37 + ToolBar->Height;
+    Caption = VOUT_TITLE " (Win32 interface)";
 
     StringListPref = new TStringList();
 }

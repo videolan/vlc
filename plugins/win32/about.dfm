@@ -296,6 +296,13 @@ object AboutDlg: TAboutDlg
     Height = 13
     Caption = 'http://www.videolan.org/'
   end
+  object LabelVersion: TLabel
+    Left = 114
+    Top = 40
+    Width = 59
+    Height = 13
+    Caption = 'Version x.y.z'
+  end
   object BitBtnOk: TBitBtn
     Left = 64
     Top = 178
