@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.43 2003/02/01 23:46:24 massiot Exp $
+ * $Id: intf.m,v 1.44 2003/02/02 23:11:17 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1253,7 +1253,8 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
         NSMenuItem * o_lmi;
         NSString * o_title;
 
-        o_title = [NSApp localizedString: val.p_list->p_values[i].psz_string];
+        //o_title = [NSApp localizedString: val.p_list->p_values[i].psz_string];
+        o_title = [NSString stringWithCString: val.p_list->p_values[i].psz_string];
         o_lmi = [o_menu addItemWithTitle: o_title
                  action: pf_callback keyEquivalent: @""];
         /* FIXME: this isn't 64-bit clean ! */

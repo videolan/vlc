@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.21 2003/01/31 02:53:52 jlj Exp $
+ * $Id: vout.m,v 1.22 2003/02/02 23:11:17 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -191,7 +191,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
             NSRect s_rect = [o_screen frame];
 
             snprintf( psz_temp, sizeof(psz_temp)/sizeof(psz_temp[0])-1, 
-                      "%s %d (%dx%d)", _("Screen"), i,
+                      "%s %d (%dx%d)", "Screen", i,
                       (int)s_rect.size.width, (int)s_rect.size.height ); 
 
             val.psz_string = psz_temp;
@@ -932,7 +932,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         unsigned int i_index = 0;
         NSArray *o_screens = [NSScreen screens];
 
-        if( !sscanf( val.psz_string, _("Screen %d"), &i_index ) ||
+        if( !sscanf( val.psz_string, "Screen %d", &i_index ) ||
             [o_screens count] < i_index )
         {
             o_screen = [NSScreen mainScreen];
