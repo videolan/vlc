@@ -313,9 +313,13 @@ static void
 gnutls_ClientDelete( tls_session_t *p_session )
 {
     /* On the client-side, credentials are re-allocated per session */
-    gnutls_certificate_free_credentials( ((tls_client_sys_t *)
-                                          (p_session->p_sys))->x509_cred );
+    gnutls_certificate_credentials x509_cred =
+                        ((tls_client_sys_t *)(p_session->p_sys))->x509_cred;
+
     gnutls_SessionClose( p_session );
+
+    /* credentials must be free'd *after* gnutls_deinit() */
+    gnutls_certificate_free_credentials( x509_cred );
 }
 
 
@@ -631,17 +635,17 @@ static void
 gnutls_ServerDelete( tls_server_t *p_server )
 {
     tls_server_sys_t *p_sys;
-
     p_sys = (tls_server_sys_t *)p_server->p_sys;
 
-    gnutls_certificate_free_credentials( p_sys->x509_cred );
-    gnutls_dh_params_deinit( p_sys->dh_params );
     vlc_mutex_destroy( &p_sys->cache_lock );
+    free( p_sys->p_cache );
 
     vlc_object_detach( p_server );
     vlc_object_destroy( p_server );
 
-    free( p_sys->p_cache );
+    /* all sessions depending on the server are now deinitialized */
+    gnutls_certificate_free_credentials( p_sys->x509_cred );
+    gnutls_dh_params_deinit( p_sys->dh_params );
     free( p_sys );
 }
 
