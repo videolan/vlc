@@ -844,7 +844,8 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     /* header object */
     bo_add_guid ( &bo, &asf_object_header_guid );
     bo_addle_u64( &bo, i_size );
-    bo_addle_u32( &bo, 2 + p_sys->i_track );
+    bo_addle_u32( &bo, 2 + p_sys->i_track +
+                  (i_cd_size ? 1 : 0) + (i_cm_size ? 1 : 0) );
     bo_add_u8   ( &bo, 1 );
     bo_add_u8   ( &bo, 2 );
 
