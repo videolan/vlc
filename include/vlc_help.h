@@ -118,7 +118,7 @@
 /*****************************************************************************
  * GetCapabilityHelp: Display the help for one capability.
  *****************************************************************************/
-static char * GetCapabilityHelp( char *psz_capability, int i_type)
+static inline char * GetCapabilityHelp( char *psz_capability, int i_type)
 {
     if( psz_capability == NULL) return "";
 

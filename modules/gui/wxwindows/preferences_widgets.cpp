@@ -527,7 +527,7 @@ IntegerConfigControl::IntegerConfigControl( vlc_object_t *p_this,
                                             p_item->i_value),
                            wxDefaultPosition, wxDefaultSize,
                            wxSP_ARROW_KEYS,
-                           -10000000, 10000000, p_item->i_value);
+                           -100000000, 100000000, p_item->i_value);
     spin->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Add( spin, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
