@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.50 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: interface.cpp,v 1.51 2003/07/20 20:33:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -633,12 +633,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        /* If the playlist is empty, open a file requester instead */
-        OnShowDialog( dummy );
-        return;
-    }
+    if( p_playlist == NULL ) return;
 
     if( p_playlist->i_size )
     {
@@ -672,7 +667,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
     }
     else
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
+        /* If the playlist is empty, open a file requester instead */
         vlc_object_release( p_playlist );
         OnShowDialog( dummy );
     }
