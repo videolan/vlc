@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.65 2003/11/25 00:56:35 fenrir Exp $
+ * $Id: playlist.c,v 1.66 2003/11/29 11:12:46 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -238,11 +238,10 @@ void playlist_Destroy( playlist_t * p_playlist )
 
 static void ObjectGarbageCollector( playlist_t *p_playlist,
                                     int i_type,
-                                    vlc_bool_t *pb_obj_destroyed,
                                     mtime_t *pi_obj_destroyed_date )
 {
     vlc_object_t *p_obj;
-    if( *pb_obj_destroyed || *pi_obj_destroyed_date > mdate() )
+    if( *pi_obj_destroyed_date > mdate() )
     {
         return;
     }
@@ -277,7 +276,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist,
                 sout_DeleteInstance( (sout_instance_t*)p_obj );
             }
         }
-        *pb_obj_destroyed = VLC_TRUE;
+        *pi_obj_destroyed_date = 0;
     }
 }
 
@@ -289,10 +288,7 @@ static void RunThread ( playlist_t *p_playlist )
     vlc_object_t *p_obj;
     vlc_value_t val;
 
-    vlc_bool_t b_vout_destroyed = VLC_FALSE; /*we do vout garbage collector */
     mtime_t    i_vout_destroyed_date = 0;
-
-    vlc_bool_t b_sout_destroyed = VLC_FALSE; /*we do vout garbage collector */
     mtime_t    i_sout_destroyed_date = 0;
 
     /* Tell above that we're ready */
@@ -327,9 +323,7 @@ static void RunThread ( playlist_t *p_playlist )
                 /* Destroy object */
                 vlc_object_destroy( p_input );
 
-                b_vout_destroyed = VLC_FALSE;
                 i_vout_destroyed_date = 0;
-                b_sout_destroyed = VLC_FALSE;
                 i_sout_destroyed_date = 0;
                 continue;
             }
@@ -364,10 +358,8 @@ static void RunThread ( playlist_t *p_playlist )
             {
                 vlc_mutex_unlock( &p_playlist->object_lock );
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                        &b_vout_destroyed,
                                         &i_vout_destroyed_date );
                 ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
-                                        &b_sout_destroyed,
                                         &i_sout_destroyed_date );
                 vlc_mutex_lock( &p_playlist->object_lock );
             }
@@ -381,9 +373,9 @@ static void RunThread ( playlist_t *p_playlist )
         {
             vlc_mutex_unlock( &p_playlist->object_lock );
             ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
-                                    &b_sout_destroyed, &i_sout_destroyed_date );
+                                    &i_sout_destroyed_date );
             ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
-                                    &b_vout_destroyed, &i_vout_destroyed_date );
+                                    &i_vout_destroyed_date );
             vlc_mutex_lock( &p_playlist->object_lock );
         }
         vlc_mutex_unlock( &p_playlist->object_lock );

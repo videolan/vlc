@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.124 2003/11/25 00:56:35 fenrir Exp $
+ * $Id: input_programs.c,v 1.125 2003/11/29 11:12:46 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1136,13 +1136,25 @@ static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t *)p_this;
     unsigned int i;
     vlc_value_t val;
+    unsigned int i_cat = UNKNOWN_ES;
+    es_descriptor_t *p_es = NULL;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    /* Unselect old ES */
+    /* First search old es type */
     for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
     {
-        if( p_input->stream.pp_es[i]->i_id == oldval.i_int &&
+        if( p_input->stream.pp_es[i]->i_id == oldval.i_int )
+        {
+            i_cat = p_input->stream.pp_es[i]->i_cat;
+        }
+    }
+
+    /* Unselect all old ES */
+    for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
+    {
+        if( p_input->stream.pp_es[i]->i_cat == i_cat &&
+            p_input->stream.pp_es[i]->i_id != newval.i_int &&
             p_input->stream.pp_es[i]->p_dec != NULL )
         {
             input_UnselectES( p_input, p_input->stream.pp_es[i] );
@@ -1152,10 +1164,31 @@ static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
     /* Select new ES */
     for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
     {
-        if( p_input->stream.pp_es[i]->i_id == newval.i_int &&
-            p_input->stream.pp_es[i]->p_dec == NULL )
+        if( p_input->stream.pp_es[i]->i_id == newval.i_int )
         {
-            input_SelectES( p_input, p_input->stream.pp_es[i] );
+            p_es = p_input->stream.pp_es[i];
+            if( p_es->p_dec == NULL )
+            {
+                input_SelectES( p_input, p_es );
+            }
+        }
+    }
+
+    if( p_es )
+    {
+        /* Fix value (mainly for multiple selected ES */
+        val.i_int = p_es->i_id;
+        switch( p_es->i_cat )
+        {
+        case AUDIO_ES:
+            var_Change( p_input, "audio-es", VLC_VAR_SETVALUE, &val, NULL );
+            break;
+        case SPU_ES:
+            var_Change( p_input, "spu-es", VLC_VAR_SETVALUE, &val, NULL );
+            break;
+        case VIDEO_ES:
+            var_Change( p_input, "video-es", VLC_VAR_SETVALUE, &val, NULL );
+            break;
         }
     }
 
