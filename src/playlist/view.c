@@ -401,6 +401,7 @@ int playlist_NodeInsert( playlist_t *p_playlist,
    if( !p_parent || p_parent->i_children == -1 )
    {
         msg_Err( p_playlist, "invalid node" );
+        return VLC_EGENERIC;
    }
 
    if( i_position == -1 ) i_position = p_parent->i_children ;
@@ -510,22 +511,20 @@ int playlist_NodeChildrenCount( playlist_t *p_playlist, playlist_item_t*p_node)
 playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
                                            const char *psz_search )
 {
-   int i;
+    int i;
 
-   if( p_node->i_children < 0 )
-   {
-        return NULL;
-   }
-
-   for( i = 0 ; i< p_node->i_children; i++ )
-   {
-        if( !strncmp( p_node->pp_children[i]->input.psz_name, psz_search,
-                      strlen( p_node->pp_children[i]->input.psz_name ) ) )
+    if( p_node->i_children < 0 )
+    {
+         return NULL;
+    }
+    for( i = 0 ; i< p_node->i_children; i++ )
+    {
+        if( !strcmp( p_node->pp_children[i]->input.psz_name, psz_search ) )
         {
             return p_node->pp_children[i];
         }
-   }
-   return NULL;
+    }
+    return NULL;
 }
 
 

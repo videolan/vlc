@@ -587,10 +587,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * Local functions
  **************************************************************/
 
+/* i_read is at least > 6 */
 static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
 {
     int                 i_version, i_address_type, i_hash, i;
     uint8_t             *psz_sdp;
+    uint8_t             *psz_initial_sdp;
     sdp_t               *p_sdp;
     vlc_bool_t          b_compressed;
     vlc_bool_t          b_need_delete = VLC_FALSE;
@@ -638,14 +640,25 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     }
 
     psz_sdp  = &p_buffer[4];
+    psz_initial_sdp = psz_sdp;
 
     if( i_address_type == 0 ) /* ipv4 source address */
     {
         psz_sdp += 4;
+        if( i_read <= 9 )
+        {
+            msg_Warn( p_sd,"too short SAP packet\n" );
+            return VLC_EGENERIC;
+        }
     }
     else /* ipv6 source address */
     {
         psz_sdp += 16;
+        if( i_read <= 21 )
+        {
+            msg_Warn( p_sd,"too short SAP packet\n" );
+            return VLC_EGENERIC;
+        }
     }
 
     if( b_compressed )
@@ -666,12 +679,21 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     }
 
     /* Add the size of authentification info */
+    if( i_read < p_buffer[1] + (psz_sdp - psz_initial_sdp ) )
+    {
+        msg_Warn( p_sd, "too short SAP packet\n");
+        return VLC_EGENERIC;
+    }
     psz_sdp += p_buffer[1];
 
     /* Skip payload type */
     /* Handle announces without \0 between SAP and SDP */
     while( *psz_sdp != '\0' && ( psz_sdp[0] != 'v' && psz_sdp[1] != '=' ) )
     {
+        if( psz_sdp - psz_initial_sdp >= i_read - 5 )
+        {
+            msg_Warn( p_sd, "empty SDP ?");
+        }
         psz_sdp++;
     }
 
@@ -679,7 +701,6 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
     {
         psz_sdp++;
     }
-
 
     /* Parse SDP info */
     p_sdp = ParseSDP( VLC_OBJECT(p_sd), psz_sdp );

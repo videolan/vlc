@@ -226,7 +226,6 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
             p_add->i_view = VIEW_SIMPLE;
             val.p_address = p_add;
             var_Set( p_playlist, "item-append", val );
-
         }
         else
         {
