@@ -141,65 +141,16 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
 }
 
 /*******************************************************************************
- * CONVERT_YUV_RGB: color YUV convertion
- *******************************************************************************
- * This macro does not perform any scaling, but crops the picture. It is
- * provided as a temporary way of implementing an YUV convertion function.
- *******************************************************************************/
-#define CONVERT_YUV_RGB( CHROMA, CRV, CGV, CBU, CGU )                   \
-/* Change boundaries according to picture size */                       \
-i_width =               MIN( i_width, i_pic_width );                    \
-i_height =              MIN( i_height, i_pic_height );                  \
-i_chroma_width =        (CHROMA == 444) ? i_width : i_width / 2;        \
-i_pic_line_width -=     i_width;                                        \
-                                                                        \
-/* Loop */                                                              \
-for (i_y = 0; i_y < i_height ; i_y++)                                   \
-{                                                                       \
-    for (i_x = 0; i_x < i_width; )                                      \
-    {                                                                   \
-        /* First sample (complete) */                                   \
-        i_yval = 76309 * p_y[i_x] - 1188177;                            \
-        i_uval = *p_u++ - 128;                                          \
-        i_vval = *p_v++ - 128;                                          \
-        p_pic[i_x++] =                                                  \
-            p_red  [(i_yval+CRV*i_vval)              >>16] |            \
-            p_green[(i_yval-CGU*i_uval-CGV*i_vval)   >>16] |            \
-            p_blue [(i_yval+CBU*i_uval)              >>16];             \
-        i_yval = 76309 * p_y[i_x] - 1188177;                            \
-        /* Second sample (partial) */                                   \
-        if( CHROMA == 444 )                                             \
-        {                                                               \
-            i_uval = *p_u++ - 128;                                      \
-            i_vval = *p_v++ - 128;                                      \
-        }                                                               \
-        p_pic[i_x++] =                                                  \
-            p_red  [(i_yval+CRV*i_vval)              >>16] |            \
-            p_green[(i_yval-CGU*i_uval-CGV*i_vval)   >>16] |            \
-            p_blue [(i_yval+CBU*i_uval)              >>16];             \
-    }                                                                   \
-                                                                        \
-    /* Rewind in 4:2:0 */                                               \
-    if( (CHROMA == 420) && !(i_y & 0x1) )                               \
-    {                                                                   \
-        p_u -= i_chroma_width;                                          \
-        p_v -= i_chroma_width;                                          \
-    }                                                                   \
-                                                                        \
-    /* Skip until beginning of next line */                             \
-    p_pic += i_pic_line_width;                                          \
-}
-
-/*******************************************************************************
  * CONVERT_YUV_PIXEL, CONVERT_Y_PIXEL: pixel convertion blocks
  *******************************************************************************
  * These convertion routines are used by YUV convertion functions.
- * Convertion are made from p_y, p_u, p_v, which are modified, to i_dst. ??
+ * Convertion are made from p_y, p_u, p_v, which are modified, to p_buffer,
+ * which is also modified.
  *******************************************************************************/
 #define CONVERT_Y_PIXEL                                                         \
     /* Only Y sample is present */                                              \
     p_ybase = p_yuv + *(p_y++);                                                 \
-    *p_pic++ = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |              \
+    *p_buffer++ = p_ybase[1501 - ((V_RED_COEF*128)>>SHIFT) + i_red] |           \
         p_ybase[135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) + i_green ] |  \
         p_ybase[818 - ((U_BLUE_COEF*128)>>SHIFT) + i_blue];                     \
 
@@ -211,14 +162,6 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
     i_green =   (U_GREEN_COEF * i_uval + V_GREEN_COEF * i_vval) >> SHIFT;       \
     i_blue =    (U_BLUE_COEF * i_uval) >> SHIFT;                                \
     CONVERT_Y_PIXEL                                                             \
-
-#define COPY_PIXEL                                                              \
-    /* Pixel may be copied, but only once */                                    \
-    while( (i_width_count -= i_width) > 0 )                                     \
-    {                                                                           \
-        *p_pic++ = *(p_pic - 1);                                                \
-    }                                                                           \
-    i_width_count += i_pic_width;                                               \
 
 /*******************************************************************************
  * vout_InitYUV: allocate and initialize translations tables
@@ -251,10 +194,6 @@ int vout_InitYUV( vout_thread_t *p_vout )
         break;        
 #endif      
     }
-
-    /* Add conversion buffer size. The conversions functions need one comple line
-     * plus one pixel, so we give them two. */
-    tables_size += p_vout->i_bytes_per_line * 2;    
     
     /* Allocate memory */
     p_vout->yuv.p_base = malloc( tables_size );
@@ -264,8 +203,25 @@ int vout_InitYUV( vout_thread_t *p_vout )
         return( 1 );                
     }
 
+    /* Allocate memory for convertion buffer and offset array */
+    p_vout->yuv.p_buffer = malloc( VOUT_MAX_WIDTH * p_vout->i_bytes_per_pixel );
+    if( p_vout->yuv.p_buffer == NULL )
+    {
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        free( p_vout->yuv.p_base );
+        return( 1 );                
+    }
+    p_vout->yuv.p_offset = malloc( p_vout->i_width * sizeof( int ) );    
+    if( p_vout->yuv.p_offset == NULL )
+    {
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        free( p_vout->yuv.p_base );
+        free( p_vout->yuv.p_buffer );        
+        return( 1 );                
+    }
+
     /* Initialize tables */
-    SetYUV( p_vout );    
+    SetYUV( p_vout );
     return( 0 );    
 }
 
@@ -289,6 +245,8 @@ int vout_ResetYUV( vout_thread_t *p_vout )
 void vout_EndYUV( vout_thread_t *p_vout )
 {
     free( p_vout->yuv.p_base );
+    free( p_vout->yuv.p_buffer );
+    free( p_vout->yuv.p_offset );    
 }
 
 /* following functions are local */
@@ -458,7 +416,6 @@ static void SetYUV( vout_thread_t *p_vout )
             p_vout->yuv.yuv.rgb16.p_green =  (u16 *)p_vout->yuv.p_base +   1024 + 384;
             p_vout->yuv.yuv.rgb16.p_blue =   (u16 *)p_vout->yuv.p_base + 2*1024 + 384;
             p_vout->yuv.yuv2.p_rgb16 =       (u16 *)p_vout->yuv.p_base + 3*1024;
-            p_vout->yuv.p_buffer =           (u16 *)p_vout->yuv.p_base + 3*1024 + 1935;            
             for( i_index = -384; i_index < 640; i_index++) 
             {
                 p_vout->yuv.yuv.rgb16.p_red[i_index] =   (pi_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
@@ -493,7 +450,6 @@ static void SetYUV( vout_thread_t *p_vout )
             p_vout->yuv.yuv.rgb32.p_green =  (u32 *)p_vout->yuv.p_base +   1024 + 384;
             p_vout->yuv.yuv.rgb32.p_blue =   (u32 *)p_vout->yuv.p_base + 2*1024 + 384;
             p_vout->yuv.yuv2.p_rgb32 =       (u32 *)p_vout->yuv.p_base + 3*1024;
-            p_vout->yuv.p_buffer =           (u32 *)p_vout->yuv.p_base + 3*1024 + 1935;            
             for( i_index = -384; i_index < 640; i_index++) 
             {
                 p_vout->yuv.yuv.rgb32.p_red[i_index] =   (pi_gamma[CLIP_BYTE(i_index)]>>i_red_right)<<i_red_left;
@@ -612,55 +568,74 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                            i_scale, (u8 *)p_pic, 0, 0, (i_width + i_pic_eol) * sizeof( u16 ),
                            p_vout->i_screen_depth == 15 );    
 */
-
-#if 0
-    u16 *       p_red;                                            /* red table */
-    u16 *       p_green;                                        /* green table */
-    u16 *       p_blue;                                          /* blue table */
-    int         i_uval, i_yval, i_vval;                             /* samples */   
-    int         i_x, i_y;                               /* picture coordinates */
-    int         i_chroma_width, i_chroma_skip;     /* width and eol for chroma */
-    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
-
-    p_red   = p_vout->yuv.yuv.rgb16.p_red;
-    p_green = p_vout->yuv.yuv.rgb16.p_green;
-    p_blue  = p_vout->yuv.yuv.rgb16.p_blue;
-    i_crv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][0];
-    i_cbu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][1];
-    i_cgu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][2];
-    i_cgv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][3];
-    
-    CONVERT_YUV_RGB( 420, i_crv, i_cgv, i_cbu, i_cgu );        
-#else
-    int         i_horizontal_scaling;               /* horizontal scaling type */
+    boolean_t   b_horizontal_scaling;               /* horizontal scaling type */
     int         i_vertical_scaling;                   /* vertical scaling type */
     int         i_x, i_y;                   /* horizontal and vertical indexes */
+    int         i_scale_count;                         /* scale modulo counter */
     int         i_uval, i_vval;                             /* U and V samples */
     int         i_red, i_green, i_blue;            /* U and V modified samples */
     int         i_chroma_width;                                /* chroma width */
-    int         i_width_count;                         /* width modulo counter */    
-    int         i_height_count;                       /* height modulo counter */
     u16 *       p_yuv;                                /* base convertion table */
     u16 *       p_ybase;                       /* Y dependant convertion table */   
-    u16 *       p_pic_start;                  /* beginning of the current line */
+    u16 *       p_pic_start;         /* beginning of the current line for copy */
+    u16 *       p_buffer_start;                     /* convertion buffer start */
+    u16 *       p_buffer;                         /* convertion buffer pointer */
+    int *       p_offset_start;                          /* offset array start */
+    int *       p_offset;                              /* offset array pointer */
     
-    /* Initialize values */
-    i_height_count =    i_pic_height;
+    /* 
+     * Initialize some values  - i_pic_line_width will store the line skip 
+     */
+    i_pic_line_width -= i_pic_width;
     i_chroma_width =    i_width / 2;
     p_yuv =             p_vout->yuv.yuv2.p_rgb16;
-
-    /* Set scalings */
+   
+    /* 
+     * Set scalings 
+     */
     if( i_pic_width - i_width > 0 )
     {
-        i_horizontal_scaling = 1;        
+        /* Prepare scaling array for horizontal extension */
+        b_horizontal_scaling =  1;   
+        p_buffer_start =        p_vout->yuv.p_buffer;        
+        p_offset_start =        p_vout->yuv.p_offset;                    
+        p_offset =              p_offset_start;
+        i_scale_count =         i_pic_width;
+        for( i_x = i_width; i_x--; )
+        {
+            while( (i_scale_count -= i_width) > 0 )
+            {
+                *p_offset++ = 0;                
+            }
+            *p_offset++ = 1;            
+            i_scale_count += i_pic_width;            
+        }        
     }
     else if( i_pic_width - i_width < 0 )
     {
-        i_horizontal_scaling = -1;        
+        /* Prepare scaling array for horizontal reduction */
+        b_horizontal_scaling =  1;
+        p_buffer_start =        p_vout->yuv.p_buffer;
+        p_offset_start =        p_vout->yuv.p_offset;                    
+        p_offset =              p_offset_start;        
+        i_scale_count =         i_pic_width;
+        for( i_x = i_pic_width; i_x--; )
+        {
+            *p_offset = 1;            
+            while( (i_scale_count -= i_pic_width) >= 0 )
+            {                
+                *p_offset += 1;                
+            }
+            p_offset++;
+            i_scale_count += i_width;
+        }        
     }
     else
     {
-        i_horizontal_scaling = 0;        
+        /* No horizontal scaling: YUV convertion is done directly to picture */          
+        b_horizontal_scaling = 0;        
+        p_buffer_start = p_pic;                
+        p_offset_start = NULL;                             /* to avoid warning */
     }
     if( i_pic_height - i_height > 0 )
     {
@@ -678,95 +653,59 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     /*
      * Perform convertion
      */
-    i_height_count = i_pic_height;
+    i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
     {
-        /* Mark beginnning of line */
-        p_pic_start = p_pic;        
+        /* Mark beginnning of line for possible later line copy, and initialize
+         * buffer */
+        p_pic_start =   p_pic;
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Convert line using 16 pixels blocks, since picture come from 16 pixels 
-         * width macroblocks - several loops will be used, depending of the 
-         * scaling type */
-        switch( i_horizontal_scaling )
+        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+         * pixels wide blocks */
+        for( i_x = i_width / 16; i_x--;  )
         {
-        case 1:                                   /* horizontal scaling is > 1 */
-            i_width_count = i_pic_width;
-            for( i_x = i_width / 16; i_x--; )
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+            CONVERT_YUV_PIXEL;  CONVERT_Y_PIXEL;
+        }             
+
+        if( b_horizontal_scaling )
+        {
+            /* Horizontal scaling, convertion has been done to buffer.
+             * Rewind buffer and offset, then copy and scale line */
+            p_buffer = p_buffer_start;
+            p_offset = p_offset_start;            
+            for( i_x = i_pic_width / 16; i_x--; )
             {
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                COPY_PIXEL;
-                CONVERT_Y_PIXEL;
-                COPY_PIXEL;
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
+                *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                
             }            
-            break;            
-        case 0:
-            for( i_x = i_width / 16; i_x--;  )
-            {
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-                CONVERT_YUV_PIXEL;            
-                CONVERT_Y_PIXEL;
-            }
-            break;            
-        case -1:
-            i_width_count = i_width;            
-/*            {
-                while( (i_width_count -= i_pic_width) > 0)
-                {
-                    p_y++;
-                    p_u++;                    
-                }
-                i_width_count += i_width;            
-            }            
-            CONVERT_Y_PIXEL;
-            while( (i_width_count -= i_width) > 0)
-            {
-                *p_pic++ = *(p_pic - 1);                
-            }
-            i_width_count += i_pic_width;
-            break;            
-  */
-            break;
+        }        
+        else
+        {
+            /* No scaling, convertion has been done directly in picture memory.
+             * Increment of picture pointer to end of line is still needed */
+            p_pic += i_pic_width;            
         }
 
         /* If line is odd, rewind U and V samples */
@@ -777,16 +716,16 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         }
 
         /* End of line: skip picture to reach beginning of next line */
-        p_pic += i_pic_line_width - i_pic_width;
+        p_pic += i_pic_line_width;
  
         /* 
-         * Handle vertical scaling. The current line is copied or next one
-         * is ignored.
+         * Handle vertical scaling. The current line can be copied or next one
+         * can be ignored.
          */
         switch( i_vertical_scaling )
         {
         case -1:                         /* vertical scaling factor is < 1 */
-            while( (i_height_count -= i_pic_height) >= 0 )
+            while( (i_scale_count -= i_pic_height) >= 0 )
             {                
                 /* Height reduction: skip next source line */
                 p_y += i_width;
@@ -796,10 +735,10 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                     p_v += i_chroma_width;
                 }                
             }            
-            i_height_count += i_height;
+            i_scale_count += i_height;
             break;            
         case 1:                          /* vertical scaling factor is > 1 */
-            while( (i_height_count -= i_height) > 0 )
+            while( (i_scale_count -= i_height) > 0 )
             {                
                 /* Height increment: copy previous picture line */
                 for( i_x = i_pic_width / 16; i_x--; )
@@ -809,14 +748,13 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                     *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
                     *(((u64 *) p_pic)++) = *(((u64 *) p_pic_start)++ );
                 }
-                p_pic +=        i_pic_line_width - i_pic_width;
-                p_pic_start +=  i_pic_line_width - i_pic_width;
+                p_pic +=        i_pic_line_width;
+                p_pic_start +=  i_pic_line_width;
             }
-            i_height_count += i_pic_height; 
+            i_scale_count += i_pic_height; 
             break;
         }
-    }    
-#endif
+    }
 }
 
 /*******************************************************************************
@@ -979,201 +917,6 @@ static int rgbTable32 (int table [1935],
     return 0;
 }
 
-
- void yuvToRgb16 (unsigned char * Y,
-			unsigned char * U, unsigned char * V,
-			short * dest, short table[1935], int width)
-{
-    int i;
-    int u;
-    int v;
-    int uvRed;
-    int uvGreen;
-    int uvBlue;
-    short * tableY;
-
-    i = width >> 4;
-    while (i--) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-    }
-
-    i = (width & 15) >> 1;
-    while (i--) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-    }
-
-    if (width & 1) {
-	u = *(U++);
-	v = *(V++);
-	uvRed = (V_RED_COEF*v) >> SHIFT;
-	uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	tableY = table + *(Y++);
-	*(dest++) = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		     tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-			    uvGreen] |
-		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-    }
-}
 
 static void yuvToRgb24 (unsigned char * Y,
 			unsigned char * U, unsigned char * V,
@@ -1526,633 +1269,3 @@ static void yuvToRgb32 (unsigned char * Y,
 		     tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
     }
 }
-
-/* yuv routines with scaling */
-/* 4:2:2 i, 16 bpp*/
-
-void yuv422ToRgb16_scaled (unsigned char * Y,
-			unsigned char * U, unsigned char * V,
-			short * dest, short table[1935], int width , int dest_width,
-            int height, int dest_height, int skip, int dest_skip,short * buffer)
-{
-    int i, i_hcount, i_vcount, j, k;
-    int u;
-    int v;
-    int uvRed;
-    int uvGreen;
-    int uvBlue;
-    short * tableY;
-    short pix;
-
-    if ( ( width < dest_width ) && ( height < dest_height ) )
-    {
-        i_vcount = dest_height;
-        k = height;
-        while ( k-- )
-        {
-            j = 0;
-            i = width >> 1;
-            i_hcount = dest_width;
-            while ( i-- ) 
-            {
-	            u = *(U++);
-	            v = *(V++);
-	            uvRed = (V_RED_COEF*v) >> SHIFT;
-	            uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	            uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    buffer[j++] = pix;
-                }
-                i_hcount += dest_width;
-            
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    buffer[j++] = pix;
-                }
-                i_hcount += dest_width;
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-            for (j=0; j<dest_width; j+=16)
-                {
-                    dest[j]=buffer[j];
-                    dest[j+1]=buffer[j+1];
-                    dest[j+2]=buffer[j+2];
-                    dest[j+3]=buffer[j+3];
-                    dest[j+4]=buffer[j+4];
-                    dest[j+6]=buffer[j+7];
-                    dest[j+8]=buffer[j+9];
-                    dest[j+10]=buffer[j+10];
-                    dest[j+11]=buffer[j+11];
-                    dest[j+12]=buffer[j+12];
-                    dest[j+13]=buffer[j+13];
-                    dest[j+14]=buffer[j+14];
-                    dest[j+15]=buffer[j+15];
-                }
-                dest += dest_skip;
-            }
-        i_vcount += dest_height;
-        }
-    }
-    else if ( ( width > dest_width ) && ( height < dest_height ) )
-    {
-        i_vcount = dest_height;
-        k = height;
-        while ( k-- )
-        {
-            j = 0;
-            i_hcount = 0;
-            i = width >> 1;
-            while ( i-- ) 
-            {
-                u = *(U++);
-                v = *(V++);
-                uvRed = (V_RED_COEF*v) >> SHIFT;
-                uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-                uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-                                                                        
-	            if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {
-                    tableY = table + *(Y++);
-                    buffer[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                   uvRed] | 
-                                   tableY [135 - 
-                                   (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                   uvGreen] |
-                                   tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                   uvBlue]);
-                    i_hcount += width;
-                }
-                if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {     
-                    tableY = table + *(Y++);
-                    buffer[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                   uvRed] |
-                                   tableY [135 - 
-                                   (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                   uvGreen] |
-                                   tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                   uvBlue]);
-                                   i_hcount += width;
-                }
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                for (j=0; j<dest_width; j+=16)
-                 {
-                    dest[j]=buffer[j];
-                    dest[j+1]=buffer[j+1];
-                    dest[j+2]=buffer[j+2];
-                    dest[j+3]=buffer[j+3];
-                    dest[j+4]=buffer[j+4];
-                    dest[j+6]=buffer[j+7];
-                    dest[j+8]=buffer[j+9];
-                    dest[j+10]=buffer[j+10];
-                    dest[j+11]=buffer[j+11];
-                    dest[j+12]=buffer[j+12];
-                    dest[j+13]=buffer[j+13];
-                    dest[j+14]=buffer[j+14];
-                    dest[j+15]=buffer[j+15];
-                }
-                dest += dest_skip;
-            }
-            i_vcount += dest_height;
-        }
-    }
-    else if ( ( width < dest_width ) && ( height > dest_height ) )
-    {
-        i_vcount = 0;
-        k = height;
-        while ( k-- )
-        {
-            j = 0;
-            i = width >> 1;
-            i_hcount = dest_width;
-            while ( i-- ) 
-            {
-	            u = *(U++);
-	            v = *(V++);
-	            uvRed = (V_RED_COEF*v) >> SHIFT;
-	            uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	            uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    dest[j++] = pix;
-                }
-                i_hcount += dest_width;
-            
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    dest[j++] = pix;
-                }
-                i_hcount += dest_width;
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                Y += skip;
-                U += skip >> 1;
-                V += skip >> 1;
-            }
-            i_vcount += dest_height;
-        }
-    }
-    else if ( ( width > dest_width ) && ( height > dest_height ) )
-    {
-        i_vcount = dest_height;
-        k = height;
-        while ( k-- )
-        {
-            j = 0;
-            i_hcount = 0;
-            i = width >> 1;
-            while ( i-- ) 
-            {
-                u = *(U++);
-                v = *(V++);
-                uvRed = (V_RED_COEF*v) >> SHIFT;
-                uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-                uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-                                                                        
-	            if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {
-                    tableY = table + *(Y++);
-                    dest[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                 uvRed] | 
-                                 tableY [135 - 
-                                 (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                 uvGreen] |
-                                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                 uvBlue]);
-                    i_hcount += width;
-                }
-                if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {     
-                    tableY = table + *(Y++);
-                    dest[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                 uvRed] |
-                                 tableY [135 - 
-                                 (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                 uvGreen] |
-                                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                 uvBlue]);
-                                 i_hcount += width;
-                }
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                Y += skip;
-                U += skip >> 1;
-                V += skip >> 1;
-            }
-            i_vcount += dest_height;
-        }
-    }
-}
-
-/* yuv routines with scaling */
-/* 4:2:0 i, 16 bpp*/
-
-void yuv420ToRgb16_scaled (unsigned char * Y,
-			unsigned char * U, unsigned char * V,
-			short * dest, short table[1935], int width , int dest_width,
-            int height, int dest_height, int skip, int dest_skip,short * buffer)
-{
-    int i, i_hcount, i_vcount, j, k;
-    int u;
-    int v;
-    int uvRed;
-    int uvGreen;
-    int uvBlue;
-    short * tableY;
-    short pix;
-
-    if ( ( width < dest_width ) && ( height < dest_height ) )
-    {
-        i_vcount = dest_height;
-        k = height >> 1;
-        while ( k-- )
-        {
-            j = 0;
-            i = width >> 1;
-            i_hcount = dest_width;
-            while ( i-- ) 
-            {
-	            u = *(U++);
-	            v = *(V++);
-	            uvRed = (V_RED_COEF*v) >> SHIFT;
-	            uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	            uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    buffer[j++] = pix;
-                }
-                i_hcount += dest_width;
-            
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    buffer[j++] = pix;
-                }
-                i_hcount += dest_width;
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                for (j=0; j<dest_width; j+=16)
-                    {
-                        dest[j]=buffer[j];
-                        dest[j+1]=buffer[j+1];
-                        dest[j+2]=buffer[j+2];
-                        dest[j+3]=buffer[j+3];
-                        dest[j+4]=buffer[j+4];
-                        dest[j+6]=buffer[j+7];
-                        dest[j+8]=buffer[j+9];
-                        dest[j+10]=buffer[j+10];
-                        dest[j+11]=buffer[j+11];
-                        dest[j+12]=buffer[j+12];
-                        dest[j+13]=buffer[j+13];
-                        dest[j+14]=buffer[j+14];
-                        dest[j+15]=buffer[j+15];
-                    }
-                dest += dest_skip;
-            }
-            i_vcount += dest_height;
-            U -= skip >> 1;
-            V -= skip >> 1;
-            j = 0;
-            i = width >> 1;
-            i_hcount = dest_width;
-            while ( i-- ) 
-            {
-	            u = *(U++);
-	            v = *(V++);
-	            uvRed = (V_RED_COEF*v) >> SHIFT;
-	            uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	            uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    buffer[j++] = pix;
-                }
-                i_hcount += dest_width;
-            
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    buffer[j++] = pix;
-                }
-                i_hcount += dest_width;
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                for (j=0; j<dest_width; j+=16)
-                    {
-                        dest[j]=buffer[j];
-                        dest[j+1]=buffer[j+1];
-                        dest[j+2]=buffer[j+2];
-                        dest[j+3]=buffer[j+3];
-                        dest[j+4]=buffer[j+4];
-                        dest[j+6]=buffer[j+7];
-                        dest[j+8]=buffer[j+9];
-                        dest[j+10]=buffer[j+10];
-                        dest[j+11]=buffer[j+11];
-                        dest[j+12]=buffer[j+12];
-                        dest[j+13]=buffer[j+13];
-                        dest[j+14]=buffer[j+14];
-                        dest[j+15]=buffer[j+15];
-                    }
-                dest += dest_skip;
-            }
-            i_vcount += dest_height;
-        }
-    }
-    else if ( ( width > dest_width ) && ( height < dest_height ) )
-    {
-        i_vcount = dest_height;
-        k = height;
-        while ( k-- )
-        {
-            j = 0;
-            i_hcount = 0;
-            i = width >> 1;
-            while ( i-- ) 
-            {
-                u = *(U++);
-                v = *(V++);
-                uvRed = (V_RED_COEF*v) >> SHIFT;
-                uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-                uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-                                                                        
-	            if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {
-                    tableY = table + *(Y++);
-                    buffer[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                   uvRed] | 
-                                   tableY [135 - 
-                                   (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                   uvGreen] |
-                                   tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                   uvBlue]);
-                    i_hcount += width;
-                }
-                if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {     
-                    tableY = table + *(Y++);
-                    buffer[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                   uvRed] |
-                                   tableY [135 - 
-                                   (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                   uvGreen] |
-                                   tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                   uvBlue]);
-                                   i_hcount += width;
-                }
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                for (j=0; j<dest_width; j+=16)
-                 {
-                    dest[j]=buffer[j];
-                    dest[j+1]=buffer[j+1];
-                    dest[j+2]=buffer[j+2];
-                    dest[j+3]=buffer[j+3];
-                    dest[j+4]=buffer[j+4];
-                    dest[j+6]=buffer[j+7];
-                    dest[j+8]=buffer[j+9];
-                    dest[j+10]=buffer[j+10];
-                    dest[j+11]=buffer[j+11];
-                    dest[j+12]=buffer[j+12];
-                    dest[j+13]=buffer[j+13];
-                    dest[j+14]=buffer[j+14];
-                    dest[j+15]=buffer[j+15];
-                }
-                dest += dest_skip;
-            }
-            i_vcount += dest_height;
-            U -= skip >> 1;
-            V -= skip >> 1;
-            j = 0;
-            i_hcount = 0;
-            i = width >> 1;
-            while ( i-- ) 
-            {
-                u = *(U++);
-                v = *(V++);
-                uvRed = (V_RED_COEF*v) >> SHIFT;
-                uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-                uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-                                                                        
-	            if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {
-                    tableY = table + *(Y++);
-                    buffer[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                   uvRed] | 
-                                   tableY [135 - 
-                                   (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                   uvGreen] |
-                                   tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                   uvBlue]);
-                    i_hcount += width;
-                }
-                if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {     
-                    tableY = table + *(Y++);
-                    buffer[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                   uvRed] |
-                                   tableY [135 - 
-                                   (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                   uvGreen] |
-                                   tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                   uvBlue]);
-                                   i_hcount += width;
-                }
-            }
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                for (j=0; j<dest_width; j+=16)
-                 {
-                    dest[j]=buffer[j];
-                    dest[j+1]=buffer[j+1];
-                    dest[j+2]=buffer[j+2];
-                    dest[j+3]=buffer[j+3];
-                    dest[j+4]=buffer[j+4];
-                    dest[j+6]=buffer[j+7];
-                    dest[j+8]=buffer[j+9];
-                    dest[j+10]=buffer[j+10];
-                    dest[j+11]=buffer[j+11];
-                    dest[j+12]=buffer[j+12];
-                    dest[j+13]=buffer[j+13];
-                    dest[j+14]=buffer[j+14];
-                    dest[j+15]=buffer[j+15];
-                }
-                dest += dest_skip;
-            }
-            i_vcount += dest_height;
-        }
-    }
-    else if ( ( width < dest_width ) && ( height > dest_height ) )
-    {
-        i_vcount = 0;
-        k = height;
-        while ( k-- )
-        {
-            j = 0;
-            i = width >> 1;
-            i_hcount = dest_width;
-            while ( i-- ) 
-            {
-	            u = *(U++);
-	            v = *(V++);
-	            uvRed = (V_RED_COEF*v) >> SHIFT;
-	            uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-	            uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    dest[j++] = pix;
-                }
-                i_hcount += dest_width;
-            
-	            tableY = table + *(Y++);
-	            pix = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + uvRed] |
-		               tableY [135 - (((U_GREEN_COEF+V_GREEN_COEF)*128)
-                       >>SHIFT) + uvGreen] |
-		               tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + uvBlue]);
-                while ( ( i_hcount -= width ) >= 0 )
-                {
-                    dest[j++] = pix;
-                }
-                i_hcount += dest_width;
-            }
-            j = 0;
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                Y += skip;
-                j++;
-            }
-            U += skip * ( j >> 1 );
-            V += skip * ( j >> 1 );
-            i_vcount += dest_height;
-        }
-    }
-    else if ( ( width > dest_width ) && ( height > dest_height ) )
-    {
-        i_vcount = dest_height;
-        k = height;
-        while ( k-- )
-        {
-            j = 0;
-            i_hcount = 0;
-            i = width >> 1;
-            while ( i-- ) 
-            {
-                u = *(U++);
-                v = *(V++);
-                uvRed = (V_RED_COEF*v) >> SHIFT;
-                uvGreen = (U_GREEN_COEF*u + V_GREEN_COEF*v) >> SHIFT;
-                uvBlue = (U_BLUE_COEF*u) >> SHIFT;
-                                                                        
-	            if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {
-                    tableY = table + *(Y++);
-                    dest[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                 uvRed] | 
-                                 tableY [135 - 
-                                 (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                 uvGreen] |
-                                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                 uvBlue]);
-                    i_hcount += width;
-                }
-                if ( ( i_hcount -= dest_width ) >= 0 )
-                    Y++;
-                else
-                {     
-                    tableY = table + *(Y++);
-                    dest[j++] = (tableY [1501 - ((V_RED_COEF*128)>>SHIFT) + 
-                                 uvRed] |
-                                 tableY [135 - 
-                                 (((U_GREEN_COEF+V_GREEN_COEF)*128)>>SHIFT) +
-                                 uvGreen] |
-                                 tableY [818 - ((U_BLUE_COEF*128)>>SHIFT) + 
-                                 uvBlue]);
-                                 i_hcount += width;
-                }
-            }
-            j = 0;
-            while ( ( i_vcount -= height ) >= 0 )
-            {
-                Y += skip;
-                j++;
-            }
-            U += skip * ( j >> 1 );
-            V += skip * ( j >> 1 );
-            i_vcount += dest_height;
-        }
-    }
-}
-

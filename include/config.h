@@ -236,6 +236,10 @@
 #define VOUT_WIDTH_DEFAULT              640
 #define VOUT_HEIGHT_DEFAULT             480
 
+/* Maximum width of a scaled source picture - this should be relatively high, 
+ * since higher stream values will result in no display at all. */
+#define VOUT_MAX_WIDTH                  4096
+
 /* Video heap size - remember that a decompressed picture is big 
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES               10

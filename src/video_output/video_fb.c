@@ -128,9 +128,7 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 {
     /* tout est bien affiché, on peut échanger les 2 écrans */
     p_vout->p_sys->var_info.xoffset = 0;
-    p_vout->p_sys->var_info.yoffset =
-        0;
-        //p_vout->p_sys->i_buffer_index ? 0 : p_vout->p_sys->var_info.yres;
+    p_vout->p_sys->var_info.yoffset = p_vout->i_buffer_index ? p_vout->p_sys->var_info.yres : 0;
 
     //ioctl( p_vout->p_sys->i_fb_dev, FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );	
     ioctl( p_vout->p_sys->i_fb_dev, FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );	

@@ -41,7 +41,7 @@ typedef struct vout_yuv_s
     vout_yuv_convert_t *        p_Convert444;           /* YUV 4:4:4 converter */
 
     /* Pre-calculated convertion tables */
-    void *              p_base;             /* base for all translation tables */    
+    void *              p_base;              /* base for all convertion tables */    
     union 
     {        
         struct { u16 *p_red, *p_green, *p_blue; } rgb16;   /* color 15, 16 bpp */
@@ -55,9 +55,9 @@ typedef struct vout_yuv_s
         u32 *           p_rgb32;        
     } yuv2;//??    
 
-    /* Temporary convertion buffer - this buffer may be used by convertion
-     * functions and should be 2 screen lines width */
+    /* Temporary convertion buffer and offset array */
     void *              p_buffer;                         /* convertion buffer */    
+    int *               p_offset;                              /* offset array */    
 } vout_yuv_t;
 
 /*******************************************************************************
