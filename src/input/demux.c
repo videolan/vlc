@@ -48,7 +48,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     p_demux->psz_demux  = strdup( psz_demux );
     p_demux->psz_path   = strdup( psz_path );
 
-    /* Take into account "demux" to be able to do :demux=demuxdump */
+    /* Take into account "demux" to be able to do :demux=dump */
     if( *p_demux->psz_demux == '\0' )
     {
         free( p_demux->psz_demux );
