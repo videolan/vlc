@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.28 2003/10/19 20:05:56 asmax Exp $
+ * $Id: x11_window.cpp,v 1.29 2003/10/19 22:25:10 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -182,8 +182,7 @@ void X11Window::ToggleOnTop()
     ev.xclient.send_event = True;
     ev.xclient.message_type = XInternAtom( display, "_NET_WM_STATE", True );
     ev.xclient.format = 32;
-    ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_ABOVE",
-                                        False);
+    ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_ABOVE", False);
     ev.xclient.data.l[2] = 0;
     ev.xclient.data.l[3] = 0;
     ev.xclient.data.l[4] = 0;
@@ -199,6 +198,14 @@ void X11Window::ToggleOnTop()
         ev.xclient.data.l[0] = 0; // _NET_WM_STATE_REMOVE
     }
 
+    XLOCK;
+    XSendEvent( display, DefaultRootWindow( display ), False,
+                SubstructureRedirectMask | SubstructureNotifyMask, &ev );
+    XUNLOCK;
+
+    /* For KDE */
+    ev.xclient.data.l[1] = XInternAtom( display, "_NET_WM_STATE_STAYS_ON_TOP",
+                                        False);
     XLOCK;
     XSendEvent( display, DefaultRootWindow( display ), False,
                 SubstructureRedirectMask | SubstructureNotifyMask, &ev );
