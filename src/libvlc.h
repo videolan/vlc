@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.98 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: libvlc.h,v 1.99 2003/10/30 17:58:07 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -515,6 +515,23 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "es", "de", "fr", "it", 
 #define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the playlist")
 #define STOP_KEY_TEXT N_("Stop")
 #define STOP_KEY_LONGTEXT N_("Select the hotkey to stop the playback")
+
+#define JB10SEC_KEY_TEXT N_("Jump backward 10 seconds")
+#define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump backward by 10 seconds")
+
+#define JB1MIN_KEY_TEXT N_("Jump backward 1 minute")
+#define JB1MIN_KEY_LONGTEXT N_("Select the hotkey to jump backward by 1 minute")
+#define JB5MIN_KEY_TEXT N_("Jump backward 5 minutes")
+#define JB5MIN_KEY_LONGTEXT N_("Select the hotkey to jump backward by 5 minutes")
+#define JF10SEC_KEY_TEXT N_("Jump forward 10 seconds")
+#define JF10SEC_KEY_LONGTEXT N_("Select the hotkey to jump forward by 10 seconds")
+
+#define JF1MIN_KEY_TEXT N_("Jump forward 1 minute")
+#define JF1MIN_KEY_LONGTEXT N_("Select the hotkey to jump forward by 1 minute")
+
+#define JF5MIN_KEY_TEXT N_("Jump forward 5 minutes")
+#define JF5MIN_KEY_LONGTEXT N_("Select the hotkey to jump forward by 5 minutes")
+
 #define QUIT_KEY_TEXT N_("Quit")
 #define QUIT_KEY_LONGTEXT N_("Select the hotkey to quit the application")
 #define NAV_UP_KEY_TEXT N_("Navigate up")
@@ -728,6 +745,12 @@ vlc_module_begin();
     add_key( "key-next", 'n', NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-prev", 'p', NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-stop", 's', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-10sec", KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB10SEC_KEY_TEXT, JB10SEC_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+10sec", KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF10SEC_KEY_TEXT, JF10SEC_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-1min", KEY_MODIFIER_CTRL|KEY_LEFT, NULL, JB1MIN_KEY_TEXT, JB1MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+1min", KEY_MODIFIER_CTRL|KEY_RIGHT, NULL, JF1MIN_KEY_TEXT, JF1MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump-5min", KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB5MIN_KEY_TEXT, JB5MIN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-jump+5min", KEY_MODIFIER_CTRL|KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF5MIN_KEY_TEXT, JF5MIN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-activate", KEY_ENTER, NULL, NAV_ACTIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-up", KEY_UP, NULL, NAV_UP_KEY_TEXT, NAV_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-down", KEY_DOWN, NULL, NAV_DOWN_KEY_TEXT, NAV_DOWN_KEY_LONGTEXT, VLC_FALSE );
@@ -779,6 +802,12 @@ static struct hotkey p_hotkeys[] =
     { "key-play", ACTIONID_PLAY, 0 },
     { "key-pause", ACTIONID_PAUSE, 0 },
     { "key-stop", ACTIONID_STOP, 0 },
+    { "key-jump-10sec", ACTIONID_JUMP_BACKWARD_10SEC, 0 },
+    { "key-jump+10sec", ACTIONID_JUMP_FORWARD_10SEC, 0 },
+    { "key-jump-1min", ACTIONID_JUMP_BACKWARD_1MIN, 0 },
+    { "key-jump+1min", ACTIONID_JUMP_FORWARD_1MIN, 0 },
+    { "key-jump-5min", ACTIONID_JUMP_BACKWARD_5MIN, 0 },
+    { "key-jump+5min", ACTIONID_JUMP_FORWARD_5MIN, 0 },
     { "key-prev", ACTIONID_PREV, 0 },
     { "key-next", ACTIONID_NEXT, 0 },
     { "key-faster", ACTIONID_FASTER, 0 },

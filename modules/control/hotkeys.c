@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.3 2003/10/29 02:13:04 hartman Exp $
+ * $Id: hotkeys.c,v 1.4 2003/10/30 17:58:07 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -270,6 +270,36 @@ static void Run( intf_thread_t *p_intf )
                 Feedback( p_intf, _( "Pause" ) );
                 input_SetStatus( p_input, INPUT_STATUS_PAUSE );
             }
+            else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
+            {
+                Feedback( p_intf, _( "Jump -10 seconds" ) );
+                input_Seek( p_input, -10, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+            }
+            else if( i_action == ACTIONID_JUMP_FORWARD_10SEC )
+            {
+                Feedback( p_intf, _( "Jump +10 seconds" ) );
+                input_Seek( p_input, 10, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+            }
+            else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN )
+            {
+                Feedback( p_intf, _( "Jump -1 minute" ) );
+                input_Seek( p_input, -60, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+            }
+            else if( i_action == ACTIONID_JUMP_FORWARD_1MIN )
+            {
+                Feedback( p_intf, _( "Jump +1 minute" ) );
+                input_Seek( p_input, 60, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+            }
+            else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN )
+            {
+                Feedback( p_intf, _( "Jump -5 minutes" ) );
+                input_Seek( p_input, -300, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+            }
+            else if( i_action == ACTIONID_JUMP_FORWARD_5MIN )
+            {
+                Feedback( p_intf, _( "Jump +5 minutes" ) );
+                input_Seek( p_input, 300, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+            }
             else if( i_action == ACTIONID_NEXT )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -320,7 +350,8 @@ static void Feedback( intf_thread_t *p_intf, char *psz_string )
     if ( p_intf->p_sys->p_vout )
     {
         vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL, 
-                                 OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,400000 );
+                               OSD_ALIGN_TOP | OSD_ALIGN_RIGHT,
+                               30, 20, 1500000 );
     }
 }
 
