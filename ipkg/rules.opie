@@ -47,7 +47,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/opie-vlc-0.5.4
+export PKGDIR=/home/jpsaman/iPaq/packages/opie-vlc-0.6.0
 export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
 
 build: build-stamp
