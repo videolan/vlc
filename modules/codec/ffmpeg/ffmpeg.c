@@ -873,6 +873,12 @@ static struct
       AUDIO_ES, "AMR wide band" },
 #endif
 
+#if LIBAVCODEC_BUILD >= 4745
+    /* ALAC */
+    { VLC_FOURCC('a','l','a','c'), CODEC_ID_ALAC,
+      AUDIO_ES, "Apple Lossless Audio Codec" },
+#endif
+
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },

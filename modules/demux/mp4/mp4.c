@@ -1381,6 +1381,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             case VLC_FOURCC( 'Q', 'D', 'M', '2' ):
             case VLC_FOURCC( 'Q', 'c', 'l', 'p' ):
             case VLC_FOURCC( 's', 'a', 'm', 'r' ):
+            case VLC_FOURCC( 'a', 'l', 'a', 'c' ):
                 p_track->fmt.i_extra =
                     p_sample->data.p_sample_soun->i_qt_description;
                 if( p_track->fmt.i_extra > 0 )

@@ -1138,7 +1138,19 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
         p_box->data.p_sample_soun->i_channelcount = 1;
     }
 
-    MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
+    if( p_box->i_type == FOURCC_alac )
+    {
+        if( p_box->data.p_sample_soun->p_qt_description )
+            free( p_box->data.p_sample_soun->p_qt_description );
+
+        p_box->data.p_sample_soun->p_qt_description = malloc( i_read );
+        p_box->data.p_sample_soun->i_qt_description = i_read;
+        memcpy( p_box->data.p_sample_soun->p_qt_description, p_peek, i_read );
+    }
+    else
+    {
+        MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
+    }
 
 #ifdef MP4_VERBOSE
     msg_Dbg( p_stream, "read box: \"soun\" in stsd channel %d "
@@ -2137,6 +2149,7 @@ static struct
     { FOURCC_samr,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
     { FOURCC_sawb,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
     { FOURCC_OggS,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_alac,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
 
     { FOURCC_vide,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
     { FOURCC_mp4v,  MP4_ReadBox_sample_vide,    MP4_FreeBox_sample_vide },
