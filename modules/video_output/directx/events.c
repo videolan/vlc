@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.30 2003/11/20 17:48:44 gbazin Exp $
+ * $Id: events.c,v 1.31 2003/12/08 19:50:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -646,11 +646,11 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                 msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
 
                 /* Get the current value... */
-                if( var_Get( p_vout, "directx-on-top", &val ) < 0 )
+                if( var_Get( p_vout, "video-on-top", &val ) < 0 )
                     return 0;
                 /* ...and change it */
                 val.b_bool = !val.b_bool;
-                var_Set( p_vout, "directx-on-top", val );
+                var_Set( p_vout, "video-on-top", val );
                 return 0;
                 break;
             }

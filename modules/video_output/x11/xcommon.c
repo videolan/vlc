@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.39 2003/12/04 16:02:54 sam Exp $
+ * $Id: xcommon.c,v 1.40 2003/12/08 19:50:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -119,8 +119,11 @@ static void SetPalette     ( vout_thread_t *,
 #endif
 
 static void TestNetWMSupport( vout_thread_t * );
-
 static int ConvertKey( int );
+
+/* Object variables callbacks */
+static int OnTopCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Activate: allocate X11 video thread output method
@@ -132,7 +135,9 @@ static int ConvertKey( int );
 int E_(Activate) ( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    char *       psz_display;
+    char *        psz_display;
+     vlc_value_t  val, text;
+
 #ifdef MODULE_NAME_IS_xvideo
     char *       psz_chroma;
     vlc_fourcc_t i_chroma = 0;
@@ -275,6 +280,15 @@ int E_(Activate) ( vlc_object_t *p_this )
     p_vout->p_sys->i_time_button_last_pressed = 0;
 
     TestNetWMSupport( p_vout );
+
+    /* Add a variable to indicate if the window should be on top of others */
+    var_Create( p_vout, "video-on-top",	VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    text.psz_string = _("Always on top");
+    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
+    /* Trigger a callback right now */
+    var_Get( p_vout, "video-on-top", &val );
+    var_Set( p_vout, "video-on-top", val );
 
     return VLC_SUCCESS;
 }
@@ -2181,4 +2195,36 @@ static int ConvertKey( int i_key )
     }
 
     return 0;
+}
+
+/*****************************************************************************
+ * object variables callbacks: a bunch of object variables are used by the
+ * interfaces to interact with the vout.
+ *****************************************************************************/
+static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    if( p_vout->p_sys->b_net_wm_state_stays_on_top )
+    {
+        XClientMessageEvent event;
+
+        memset( &event, 0, sizeof( XClientMessageEvent ) );
+
+        event.type = ClientMessage;
+        event.message_type = p_vout->p_sys->net_wm_state;
+        event.display = p_vout->p_sys->p_display;
+        event.window = p_vout->p_sys->p_win->base_window;
+        event.format = 32;
+        event.data.l[ 0 ] = newval.b_bool; /* set property */
+        event.data.l[ 1 ] = p_vout->p_sys->net_wm_state_stays_on_top;
+
+        XSendEvent( p_vout->p_sys->p_display,
+                    DefaultRootWindow( p_vout->p_sys->p_display ),
+                    False, SubstructureRedirectMask,
+                    (XEvent*)&event );
+    }
+
+    return VLC_SUCCESS;
 }

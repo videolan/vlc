@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.56 2003/11/20 14:39:30 hartman Exp $
+ * $Id: controls.m,v 1.57 2003/12/08 19:50:22 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -713,7 +713,7 @@
         
         if ( [[o_mi title] isEqualToString: _NS("Float On Top")] )
         {
-            int i_state = config_GetInt( p_playlist, "macosx-float" ) ?
+            int i_state = config_GetInt( p_playlist, "video-on-top" ) ?
                       NSOnState : NSOffState;
             [o_mi setState: i_state];
         }

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.113 2003/12/07 20:48:21 hartman Exp $
+ * $Id: libvlc.h,v 1.114 2003/12/08 19:50:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -220,6 +220,10 @@ static char *ppsz_language_text[] =
 #define OVERLAY_LONGTEXT N_( \
     "If enabled, VLC will try to take advantage of the overlay capabilities " \
     "of your graphics card.")
+
+#define VIDEO_ON_TOP_TEXT N_("Always on top")
+#define VIDEO_ON_TOP_LONGTEXT N_("Always place the video window on top of " \
+    "other windows" )
 
 #define SPUMARGIN_TEXT N_("Force SPU position")
 #define SPUMARGIN_LONGTEXT N_( \
@@ -664,6 +668,8 @@ vlc_module_begin();
 #ifndef SYS_DARWIN
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
 #endif
+
+    add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT, VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
     add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT,
                         SPUMARGIN_LONGTEXT, VLC_TRUE );
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.25 2003/11/20 17:48:44 gbazin Exp $
+ * $Id: directx.c,v 1.26 2003/12/08 19:50:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -93,8 +93,6 @@ static int OnTopCallback( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ON_TOP_TEXT N_("Always on top")
-#define ON_TOP_LONGTEXT N_("Place the directx window on top of other windows")
 #define HW_YUV_TEXT N_("Use hardware YUV->RGB conversions")
 #define HW_YUV_LONGTEXT N_( \
     "Try to use hardware acceleration for YUV->RGB conversions. " \
@@ -112,7 +110,6 @@ static int OnTopCallback( vlc_object_t *, char const *,
 
 vlc_module_begin();
     add_category_hint( N_("Video"), NULL, VLC_FALSE );
-    add_bool( "directx-on-top", 0, NULL, ON_TOP_TEXT, ON_TOP_LONGTEXT, VLC_FALSE );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT, VLC_TRUE );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT, VLC_TRUE );
     add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT, TRIPLEBUF_LONGTEXT, VLC_TRUE );
@@ -221,12 +218,12 @@ static int OpenVideo( vlc_object_t *p_this )
     }
 
     /* Add a variable to indicate if the window should be on top of others */
-    var_Create( p_vout, "directx-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     text.psz_string = _("Always on top");
-    var_Change( p_vout, "directx-on-top", VLC_VAR_SETTEXT, &text, NULL );
-    var_Get( p_vout, "directx-on-top", &val );
+    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
+    var_Get( p_vout, "video-on-top", &val );
     p_vout->p_sys->b_on_top_change = val.b_bool; 
-    var_AddCallback( p_vout, "directx-on-top", OnTopCallback, NULL );
+    var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
 
     return VLC_SUCCESS;
 
@@ -343,7 +340,7 @@ static void CloseVideo( vlc_object_t *p_this )
 
     msg_Dbg( p_vout, "CloseVideo" );
 
-    var_Destroy( p_vout, "directx-on-top" );
+    var_Destroy( p_vout, "video-on-top" );
 
     if( p_vout->p_sys->p_event )
     {
@@ -483,7 +480,7 @@ static int Manage( vout_thread_t *p_vout )
         vlc_value_t val;
         HMENU hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
 
-        var_Get( p_vout, "directx-on-top", &val );
+        var_Get( p_vout, "video-on-top", &val );
  
         /* Set the window on top if necessary */
         if( val.b_bool && !( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )

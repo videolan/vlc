@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.65 2003/11/15 22:42:16 hartman Exp $
+ * $Id: vout.m,v 1.66 2003/12/08 19:50:22 gbazin Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -791,14 +791,14 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (void)toggleFloatOnTop
 {
-    if( config_GetInt( p_vout, "macosx-float" ) )
+    if( config_GetInt( p_vout, "video-on-top" ) )
     {
-        config_PutInt( p_vout, "macosx-float", 0 );
+        config_PutInt( p_vout, "video-on-top", 0 );
         [p_vout->p_sys->o_window setLevel: NSNormalWindowLevel];
     }
     else
     {
-        config_PutInt( p_vout, "macosx-float", 1 );
+        config_PutInt( p_vout, "video-on-top", 1 );
         [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
     }
 }
@@ -1250,7 +1250,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
         [p_vout->p_sys->o_window setAlphaValue: config_GetFloat( p_vout, "macosx-opaqueness" )];
         
-        if( config_GetInt( p_vout, "macosx-float" ) )
+        if( config_GetInt( p_vout, "video-on-top" ) )
         {
             [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
         }
