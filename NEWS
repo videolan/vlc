@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.48 2003/06/11 18:45:41 gbazin Exp $
+$Id: NEWS,v 1.49 2003/06/15 01:23:31 massiot Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -11,7 +11,7 @@ Input access:
  * fixed large file support on Windows
  * Video 4 Linux support
  * CD Digital Audio support
- * Fixed an ipv6 link-local multicasting bug.
+ * Fixed an ipv6 link-local multicasting bug affecting all platforms but GNU/Linux
 
 Input demux:
  * Better detection of AAC and mp3 files

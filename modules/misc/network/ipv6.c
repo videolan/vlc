@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.12 2003/06/13 12:08:13 gbazin Exp $
+ * $Id: ipv6.c,v 1.13 2003/06/15 01:23:31 massiot Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -120,7 +120,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
     }
     if( !_getaddrinfo || !_freeaddrinfo )
     {
-        msg_Err( p_this, "no IPv6 stack installed" );
+        msg_Warn( p_this, "no IPv6 stack installed" );
         if( wship6_dll ) FreeLibrary( wship6_dll );
         free( psz_backup );
         return( -1 );
@@ -150,11 +150,11 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
                              psz_multicast_interface );
 
             /* now convert that interface name to an index */
-#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)
-            p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
-#elif defined( WIN32 )
+#if defined( WIN32 )
             /* FIXME ?? */
             p_socket->sin6_scope_id = atol(psz_multicast_interface);
+#elif defined( HAVE_IF_NAMETOINDEX )
+            p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
 #endif
             msg_Dbg( p_this, " = #%i", p_socket->sin6_scope_id );
         }
@@ -188,7 +188,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
         /* We have a fqdn, try to find its address */
         if ( (p_hostent = gethostbyname2( psz_address, AF_INET6 )) == NULL )
         {
-            msg_Err( p_this, "ipv6 error: unknown host %s", psz_address );
+            msg_Warn( p_this, "ipv6 error: unknown host %s", psz_address );
             free( psz_backup );
             return( -1 );
         }
@@ -210,7 +210,7 @@ static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
         _freeaddrinfo( res );
 
 #else
-        msg_Err( p_this, "ipv6 error: IPv6 address %s is invalid",
+        msg_Warn( p_this, "ipv6 error: IPv6 address %s is invalid",
                  psz_address );
         free( psz_backup );
         return( -1 );
@@ -253,7 +253,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
      * protocol */
     if( (i_handle = socket( AF_INET6, SOCK_DGRAM, 0 )) == -1 )
     {
-        msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
         return( -1 );
     }
 
@@ -262,7 +262,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( setsockopt( i_handle, SOL_SOCKET, SO_REUSEADDR,
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
-        msg_Err( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
+        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
                          strerror(errno) );
         close( i_handle );
         return( -1 );
@@ -313,7 +313,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         /* Bind it */
         if( bind( i_handle, (struct sockaddr *)&sockany, sizeof( sock ) ) < 0 )
         {
-            msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
+            msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
             close( i_handle );
             return( -1 );
         }
@@ -322,7 +322,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     /* Bind it */
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
-        msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
         close( i_handle );
         return( -1 );
     }
@@ -340,7 +340,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
 
     /* Join the multicast group if the socket is a multicast address */
-#if defined(WIN32) || __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)
+#if defined( WIN32 ) || defined( HAVE_IF_NAMETOINDEX )
     if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
     {
         struct ipv6_mreq     imr;
@@ -357,11 +357,11 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
         if( res == -1 )
         {
-            msg_Err( p_this, "setsockopt JOIN_GROUP failed" );
+            msg_Err( p_this, "cannot join multicast group" );
         } 
     }
 #else
-    msg_Warn( p_this, "setsockopt JOIN_GROUP not supported with glibc < 2.2" );
+    msg_Warn( p_this, "Multicast IPv6 is not supported on your OS" );
 #endif
 
 
@@ -373,7 +373,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         /* Build socket for remote connection */
         if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
         {
-            msg_Err( p_this, "cannot build remote address" );
+            msg_Warn( p_this, "cannot build remote address" );
             close( i_handle );
             return( -1 );
         }
@@ -382,7 +382,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         if( connect( i_handle, (struct sockaddr *) &sock,
                      sizeof( sock ) ) == (-1) )
         {
-            msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
+            msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
             close( i_handle );
             return( -1 );
         }
@@ -390,34 +390,34 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         /* Set the time-to-live */
         if( ttl > 1 )
         {
-#if defined(WIN32) || __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)
+#if defined( WIN32 ) || defined( HAVE_IF_NAMETOINDEX )
             if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
             {
                 if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
                                 (void *)&ttl, sizeof( ttl ) ) < 0 )
                 {
 #ifdef HAVE_ERRNO_H
-                    msg_Warn( p_this, "failed to set multicast ttl (%s)",
-                              strerror(errno) );
+                    msg_Err( p_this, "failed to set multicast ttl (%s)",
+                             strerror(errno) );
 #else
-                    msg_Warn( p_this, "failed to set multicast ttl" );
+                    msg_Err( p_this, "failed to set multicast ttl" );
 #endif
                 }
             }
             else
+#endif
             {
                 if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
                                 (void *)&ttl, sizeof( ttl ) ) < 0 )
                 {
 #ifdef HAVE_ERRNO_H
-                    msg_Warn( p_this, "failed to set unicast ttl (%s)",
+                    msg_Err( p_this, "failed to set unicast ttl (%s)",
                               strerror(errno) );
 #else
-                    msg_Warn( p_this, "failed to set unicast ttl" );
+                    msg_Err( p_this, "failed to set unicast ttl" );
 #endif
                 }
             }
-#endif
         }
     }
 
@@ -452,7 +452,7 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
      * protocol */
     if( (i_handle = socket( AF_INET6, SOCK_STREAM, 0 )) == -1 )
     {
-        msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
         return( -1 );
     }
 
@@ -467,7 +467,7 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( connect( i_handle, (struct sockaddr *) &sock,
                  sizeof( sock ) ) == (-1) )
     {
-        msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
         close( i_handle );
         return( -1 );
     }

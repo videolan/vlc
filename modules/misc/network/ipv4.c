@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.18 2003/04/21 16:22:43 gbazin Exp $
+ * $Id: ipv4.c,v 1.19 2003/06/15 01:23:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -157,9 +157,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( (i_handle = socket( AF_INET, SOCK_DGRAM, 0 )) == -1 )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
 #else
-        msg_Err( p_this, "cannot create socket" );
+        msg_Warn( p_this, "cannot create socket" );
 #endif
         return( -1 );
     }
@@ -170,10 +170,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                     (void *) &i_opt, sizeof( i_opt ) ) == -1 )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Err( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
+        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR: %s)",
                           strerror(errno));
 #else
-        msg_Err( p_this, "cannot configure socket (SO_REUSEADDR)" );
+        msg_Warn( p_this, "cannot configure socket (SO_REUSEADDR)" );
 #endif
         close( i_handle );
         return( -1 );
@@ -243,9 +243,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( bind( i_handle, (struct sockaddr *)&sock, sizeof( sock ) ) < 0 )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Err( p_this, "cannot bind socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot bind socket (%s)", strerror(errno) );
 #else
-        msg_Err( p_this, "cannot bind socket" );
+        msg_Warn( p_this, "cannot bind socket" );
 #endif
         close( i_handle );
         return( -1 );
@@ -309,10 +309,10 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
 #ifdef HAVE_ERRNO_H
-            msg_Warn( p_this, "failed to join IP multicast group (%s)",
+            msg_Err( p_this, "failed to join IP multicast group (%s)",
                               strerror(errno) );
 #else
-            msg_Warn( p_this, "failed to join IP multicast group" );
+            msg_Err( p_this, "failed to join IP multicast group" );
 #endif
             close( i_handle );
             return( -1 );
@@ -325,7 +325,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
         /* Build socket for remote connection */
         if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
         {
-            msg_Err( p_this, "cannot build remote address" );
+            msg_Warn( p_this, "cannot build remote address" );
             close( i_handle );
             return( -1 );
         }
@@ -335,9 +335,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                      sizeof( sock ) ) == (-1) )
         {
 #ifdef HAVE_ERRNO_H
-            msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
+            msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
 #else
-            msg_Err( p_this, "cannot connect socket" );
+            msg_Warn( p_this, "cannot connect socket" );
 #endif
             close( i_handle );
             return( -1 );
@@ -354,9 +354,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
                             (void *) &ttl, sizeof( ttl ) ) < 0 )
             {
 #ifdef HAVE_ERRNO_H
-                msg_Warn( p_this, "failed to set ttl (%s)", strerror(errno) );
+                msg_Err( p_this, "failed to set ttl (%s)", strerror(errno) );
 #else
-                msg_Warn( p_this, "failed to set ttl" );
+                msg_Err( p_this, "failed to set ttl" );
 #endif
                 close( i_handle );
                 return( -1 );
@@ -396,9 +396,9 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( (i_handle = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Err( p_this, "cannot create socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot create socket (%s)", strerror(errno) );
 #else
-        msg_Err( p_this, "cannot create socket" );
+        msg_Warn( p_this, "cannot create socket" );
 #endif
         return( -1 );
     }
@@ -416,9 +416,9 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
                  sizeof( sock ) ) == (-1) )
     {
 #ifdef HAVE_ERRNO_H
-        msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
+        msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
 #else
-        msg_Err( p_this, "cannot connect socket" );
+        msg_Warn( p_this, "cannot connect socket" );
 #endif
         close( i_handle );
         return( -1 );
