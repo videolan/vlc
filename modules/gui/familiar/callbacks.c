@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.6 2002/08/18 20:36:04 jpsaman Exp $
+ * $Id: callbacks.c,v 1.7 2002/08/21 19:30:03 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -237,16 +237,6 @@ gboolean GtkExit( GtkWidget       *widget,
     return TRUE;
 }
 
-gboolean
-on_familiar_destroy_event              (GtkWidget       *widget,
-                                        GdkEvent        *event,
-                                        gpointer         user_data)
-{
-    GtkExit( GTK_WIDGET( widget ), user_data );
-    return TRUE;
-}
-
-
 void
 on_toolbar_open_clicked                (GtkButton       *button,
                                         gpointer         user_data)
@@ -478,5 +468,15 @@ on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
         else
            p_intf->p_sys->b_autoplayfile = 1;
     }
+}
+
+
+gboolean
+on_familiar_delete_event               (GtkWidget       *widget,
+                                        GdkEvent        *event,
+                                        gpointer         user_data)
+{
+    GtkExit( GTK_WIDGET( widget ), user_data );
+    return TRUE;
 }
 
