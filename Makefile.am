@@ -2,20 +2,31 @@
 # Automake targets and declarations
 ###############################################################################
 
+NULL =
+
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
 SUBDIRS = po intl m4 share
 DIST_SUBDIRS = $(SUBDIRS) modules src debian doc ipkg lib autotools
 
-EXTRA_DIST = HACKING MAINTAINERS src/extras/COPYING \
-             INSTALL.win32 README.MacOSX.rtf vlc.spec install-win32 \
-             Modules.am \
-             configure.ac.in mkinstalldirs bootstrap
+EXTRA_DIST = \
+	HACKING \
+	INSTALL.win32 \
+	MAINTAINERS \
+	Modules.am \
+	README.MacOSX.rtf \
+	bootstrap \
+	configure.ac.in \
+	install-win32 \
+	src/extras/COPYING \
+	toolbox \
+	vlc.spec \
+	$(NULL)
+
 MOSTLYCLEANFILES =
 BUILT_SOURCES =
 SUFFIXES = 
-NULL =
 
 # List of programs, libraries and headers that need to be built and/or
 # distributed. Initialized to empty because we'll use += later.
