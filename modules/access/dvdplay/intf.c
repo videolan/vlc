@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.6 2003/01/29 15:55:44 sam Exp $
+ * $Id: intf.c,v 1.7 2003/08/13 01:45:13 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -424,3 +424,15 @@ int dvdIntfStillTime( intf_thread_t *p_intf, int i_sec )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * dvdIntfStillTime: function provided to reset still image
+ *****************************************************************************/
+int dvdIntfResetStillTime( intf_thread_t *p_intf )
+{
+    vlc_mutex_lock( &p_intf->change_lock );
+    p_intf->p_sys->m_still_time = 0;
+    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return VLC_SUCCESS;
+}

@@ -2,7 +2,7 @@
  * intf.h: send info to intf.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: intf.h,v 1.2 2003/08/13 01:45:13 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -22,3 +22,4 @@
  *****************************************************************************/
 
 int dvdIntfStillTime( struct intf_thread_t *, int );
+int dvdIntfResetStillTime( intf_thread_t *p_intf );

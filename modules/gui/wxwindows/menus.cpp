@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.17 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: menus.cpp,v 1.18 2003/08/13 01:45:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -169,9 +169,11 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "chapter";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "program";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "navigation";
         pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "program";
+        ppsz_varnames[i] = "dvd_menus";
         pi_objects[i++] = p_object->i_object_id;
 
         ppsz_varnames[i] = "video-es";
@@ -294,9 +296,11 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "chapter";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "program";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "navigation";
         pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "program";
+        ppsz_varnames[i] = "dvd_menus";
         pi_objects[i++] = p_object->i_object_id;
 
         ppsz_varnames[i] = "prev-title";
@@ -518,8 +522,10 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
               new wxMenuItemExt( menu, ++i_item_id,
                                  wxU(text_list.p_list->p_values[i].psz_string ?
                                  text_list.p_list->p_values[i].psz_string :
-                                 another_val.psz_string),
-                                 wxT(""), wxITEM_RADIO, strdup(psz_var),
+                                 another_val.psz_string), wxT(""),
+                                 i_type & VLC_VAR_ISCOMMAND ?
+                                   wxITEM_NORMAL : wxITEM_RADIO,
+                                 strdup(psz_var),
                                  p_object->i_object_id, another_val, i_type );
 
           menu->Append( menuitem );
@@ -536,8 +542,10 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
                                  (wxString)wxU(
                                    text_list.p_list->p_values[i].psz_string) :
                                  wxString::Format(wxT("%d"),
-                                 val_list.p_list->p_values[i].i_int),
-                                 wxT(""), wxITEM_RADIO, strdup(psz_var),
+                                 val_list.p_list->p_values[i].i_int), wxT(""),
+                                 i_type & VLC_VAR_ISCOMMAND ?
+                                   wxITEM_NORMAL : wxITEM_RADIO,
+                                 strdup(psz_var),
                                  p_object->i_object_id,
                                  val_list.p_list->p_values[i], i_type );
 

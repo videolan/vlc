@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.116 2003/07/30 21:09:06 gbazin Exp $
+ * $Id: input_programs.c,v 1.117 2003/08/13 01:45:13 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -271,7 +271,7 @@ void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
         return;
     }
 
-    val.i_int = i_pgrm_index;
+    val.i_int = p_input->stream.pp_programs[i_pgrm_index]->i_number;
     var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
 
     /* Free the structures that describe the es that belongs to that program */

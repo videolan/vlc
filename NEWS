@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.63 2003/08/10 21:26:07 gbazin Exp $
+$Id: NEWS,v 1.64 2003/08/13 01:45:13 gbazin Exp $
 
 Changes between 0.6.1 and 0.6.2:
 ---------------------------------
@@ -13,6 +13,9 @@ Stream output:
 Access input:
  * Support for DVB-S/C/T cards using v4l2 API for Linux 2.6.x kernels.
  * Few fixes to the VCD navigation.
+
+Interfaces:
+ * Support for DVD menus navigation added to the wxWindows interface.
 
 UNIX ports:
  * ALSA multi-channel support fixed and tested.

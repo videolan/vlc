@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.18 2003/05/08 19:06:44 titer Exp $
+ * $Id: access.c,v 1.19 2003/08/13 01:45:13 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -65,6 +65,10 @@ static void    pf_vmg_callback       ( void*, dvdplay_event_t );
 static int dvdNewArea( input_thread_t *, input_area_t * );
 static int dvdNewPGC ( input_thread_t * );
 
+
+static int MenusCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * OpenDVD: open libdvdplay
  *****************************************************************************/
@@ -79,6 +83,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     unsigned int            i_chapter;
     unsigned int            i_angle;
     unsigned int            i;
+    vlc_value_t             val, text;
 
     p_dvd = malloc( sizeof(dvd_data_t) );
     if( p_dvd == NULL )
@@ -191,6 +196,27 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     var_Create( p_input, "highlight", VLC_VAR_BOOL );
     var_Create( p_input, "highlight-mutex", VLC_VAR_MUTEX );
 
+    /* Create a few object variables used for navigation in the interfaces */
+    var_Create( p_input, "dvd_menus",
+                VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("DVD menus");
+    var_Change( p_input, "dvd_menus", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_input, "dvd_menus", MenusCallback, NULL );
+    val.i_int = ROOT_MENU; text.psz_string = _("Root");
+    var_Change( p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = TITLE_MENU; text.psz_string = _("Title");
+    var_Change( p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = PART_MENU; text.psz_string = _("Chapter");
+    var_Change( p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = SUBPICTURE_MENU; text.psz_string = _("Subtitle");
+    var_Change( p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = AUDIO_MENU; text.psz_string = _("Audio");
+    var_Change( p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = ANGLE_MENU; text.psz_string = _("Angle");
+    var_Change( p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+    val.i_int = 99; text.psz_string = _("Resume");
+    var_Change( p_input, "dvd_menus", VLC_VAR_ADDCHOICE, &val, &text );
+
     return 0;
 }
 
@@ -286,7 +312,6 @@ static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
 
         dvdNewArea( p_input, p_area );
 
-        /* Reinit ES */
         dvdNewPGC( p_input );
 
         dvdplay_start( p_dvd->vmg, p_area->i_id );
@@ -411,11 +436,15 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
         }
 
         /* new pgc in same title: reinit ES */
+        dvdplay_ES( p_input );
         dvdNewPGC( p_input );
 
         p_input->stream.b_changed = 1;
 
         break;
+    case JUMP:
+        dvdplay_ES( p_input );
+        dvdNewPGC( p_input );
     case NEW_PG:
         /* update current chapter */
         p_input->stream.p_selected_area->i_part =
@@ -437,9 +466,6 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
         break;
     case END_OF_CELL:
         p_dvd->b_end_of_cell = 1;
-        break;
-    case JUMP:
-        dvdplay_ES( p_input );
         break;
     case STILL_TIME:
         /* we must pause only from demux
@@ -534,6 +560,9 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
     /* No PSM to read in DVD mode, we already have all information */
     p_input->stream.p_selected_program->b_is_ok = 1;
 
+    /* Reinit ES */
+    dvdplay_ES( p_input );
+
     /* Update the navigation variables without triggering a callback */
     val.i_int = p_area->i_id;
     var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
@@ -553,19 +582,8 @@ static int dvdNewArea( input_thread_t * p_input, input_area_t * p_area )
 
 static int dvdNewPGC( input_thread_t * p_input )
 {
-    dvd_data_t *    p_dvd;
-//    int             i_audio_nr  = -1;
-//    int             i_audio     = -1;
-//    int             i_subp_nr   = -1;
-//    int             i_subp      = -1;
-//    int             i_sec;
+    dvd_data_t * p_dvd = (dvd_data_t*)p_input->p_access_data;
 
-    p_dvd = (dvd_data_t*)p_input->p_access_data;
-
-//    dvdplay_audio_info( p_dvd->vmg, &i_audio_nr, &i_audio );
-//    dvdplay_subp_info( p_dvd->vmg, &i_subp_nr, &i_subp );
-
-    dvdplay_ES( p_input );
     p_input->stream.p_selected_area->i_start =
         LB2OFF( dvdplay_title_first( p_dvd->vmg ) );
     p_input->stream.p_selected_area->i_size  =
@@ -582,11 +600,26 @@ static int dvdNewPGC( input_thread_t * p_input )
         p_input->stream.b_seekable = 0;
     }
 
-#if 0
-    i_sec = dvdplay_title_time( p_dvd->vmg );
-    msg_Dbg( p_input, "title time: %d:%02d:%02d (%d)",
-                     i_sec/3600, (i_sec%3600)/60, i_sec%60, i_sec );
-#endif
-
     return 0;
+}
+
+static int MenusCallback( vlc_object_t *p_this, char const *psz_name,
+                          vlc_value_t oldval, vlc_value_t newval, void *p_arg )
+{
+    input_thread_t *    p_input;
+    dvd_data_t *        p_dvd;
+
+    p_input = (input_thread_t*)p_this;
+    p_dvd   = (dvd_data_t*)p_input->p_access_data;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( newval.i_int < 99 )
+        dvdplay_menu( p_dvd->vmg, newval.i_int, 0 );
+    else
+        dvdplay_resume( p_dvd->vmg );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    if( p_dvd->p_intf ) dvdIntfResetStillTime( p_dvd->p_intf );
+
+    return VLC_SUCCESS;
 }
