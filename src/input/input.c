@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.134 2001/10/02 17:04:43 massiot Exp $
+ * $Id: input.c,v 1.135 2001/10/02 17:09:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -1161,8 +1161,9 @@ static void HTTPOpen( input_thread_t * p_input )
     }
     else
     {
-        snprintf( psz_buffer, sizeof(psz_buffer), "GET /%s HTTP/1.0\r\n\r\n",
-                  psz_path );
+        snprintf( psz_buffer, sizeof(psz_buffer),
+                  "GET /%s HTTP/1.0\r\nHost: %s\r\n\r\n",
+                  psz_path, psz_server );
     }
     psz_buffer[sizeof(psz_buffer) - 1] = '\0';
 
