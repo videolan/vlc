@@ -2,7 +2,7 @@
  * mpeg4audio.c: parse and packetize an MPEG 4 audio stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.10 2003/10/23 20:51:20 gbazin Exp $
+ * $Id: mpeg4audio.c,v 1.11 2003/10/24 17:55:14 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -78,7 +78,7 @@ struct decoder_sys_t
 
     int i_frame_size, i_raw_blocks;
     unsigned int i_channels;
-    unsigned int i_rate, i_frame_length;
+    unsigned int i_rate, i_frame_length, i_header_size;
 };
 
 enum {
@@ -96,7 +96,7 @@ static int i_sample_rates[] =
     16000, 12000, 11025, 8000,  7350,  0,     0,     0
 };
 
-#define ADTS_HEADER_SIZE 6
+#define ADTS_HEADER_SIZE 9
 
 /****************************************************************************
  * Local prototypes
@@ -112,6 +112,7 @@ static int ADTSSyncInfo( decoder_t *, const byte_t * p_buf,
                          unsigned int * pi_channels,
                          unsigned int * pi_sample_rate,
                          unsigned int * pi_frame_length,
+                         unsigned int * pi_header_size,
                          unsigned int * pi_raw_blocks );
 
 /*****************************************************************************
@@ -333,8 +334,9 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
                                                 &p_sys->i_channels,
                                                 &p_sys->i_rate,
                                                 &p_sys->i_frame_length,
+                                                &p_sys->i_header_size,
                                                 &p_sys->i_raw_blocks );
-            if( !p_sys->i_frame_size )
+            if( p_sys->i_frame_size <= 0 )
             {
                 msg_Dbg( p_dec, "emulated sync word" );
                 block_SkipByte( &p_sys->bytestream );
@@ -349,8 +351,8 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
              * next sync word */
 
             /* Check if next expected frame contains the sync word */
-            if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                       p_sys->i_frame_size, p_header, 2 )
+            if( block_PeekOffsetBytes( &p_sys->bytestream, p_sys->i_frame_size
+                                       + p_sys->i_header_size, p_header, 2 )
                 != VLC_SUCCESS )
             {
                 /* Need more data */
@@ -370,6 +372,18 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
             if( GetSoutBuffer( p_dec, &p_sys->p_sout_buffer ) != VLC_SUCCESS )
             {
                 return VLC_EGENERIC;
+            }
+
+            /* Skip the ADTS header */
+            if( p_sys->i_header_size )
+            {
+                if( block_SkipBytes( &p_sys->bytestream,
+                                     p_sys->i_header_size ) != VLC_SUCCESS )
+                {
+                    /* Need more data */
+                    return VLC_SUCCESS;
+                }
+                p_sys->i_header_size = 0;
             }
 
             /* Copy the whole frame into the buffer */
@@ -482,13 +496,16 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
                          unsigned int * pi_channels,
                          unsigned int * pi_sample_rate,
                          unsigned int * pi_frame_length,
+                         unsigned int * pi_header_size,
                          unsigned int * pi_raw_blocks_in_frame )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_id, i_profile, i_sample_rate_idx, i_frame_size;
+    vlc_bool_t b_crc;
 
     /* Fixed header between frames */
     i_id = ( (p_buf[1] >> 3) & 0x01 ) ? 2 : 4;
+    b_crc = !(p_buf[1] & 0x01);
     i_profile = p_buf[2] >> 6;
     i_sample_rate_idx = (p_buf[2] >> 2) & 0x0f;
     *pi_sample_rate = i_sample_rates[i_sample_rate_idx];
@@ -513,10 +530,13 @@ static int ADTSSyncInfo( decoder_t * p_dec, const byte_t * p_buf,
         p_sys->sout_format.i_extra_data = 2;
         p_sys->sout_format.p_extra_data = malloc( 2 );
         p_sys->sout_format.p_extra_data[0] =
-            (i_profile + 1) << 3 | (i_sample_rate_idx > 1);
+            (i_profile + 1) << 3 | (i_sample_rate_idx >> 1);
         p_sys->sout_format.p_extra_data[1] =
             ((i_sample_rate_idx & 0x01) << 7) | (*pi_channels <<3);
     }
 
-    return i_frame_size;
+    /* ADTS header length */
+    *pi_header_size = b_crc ? 9 : 7;
+
+    return i_frame_size - *pi_header_size;
 }
