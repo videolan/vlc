@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.4 2003/11/23 14:34:19 rocky Exp $
+ * $Id: cddax.c,v 1.5 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -629,9 +629,9 @@ static int  CDDADemux( input_thread_t * p_input )
                                          p_input->stream.p_selected_program,
                                          p_demux->i_pts );
 
-    if( p_demux->p_es->p_decoder_fifo )
+    if( p_demux->p_es->p_dec )
     {
-        input_DecodePES( p_demux->p_es->p_decoder_fifo, p_pes );
+        input_DecodePES( p_demux->p_es->p_dec, p_pes );
     }
     else
     {

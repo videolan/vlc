@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.42 2003/10/14 22:41:41 gbazin Exp $
+ * $Id: objects.c,v 1.43 2003/11/24 00:39:02 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -129,10 +129,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             break;
         case VLC_OBJECT_DECODER:
             i_size = sizeof(decoder_t);
-            psz_type = "decoder";
-            break;
-        case VLC_OBJECT_DECODER_FIFO: /* tmp for backward compat */
-            i_size = sizeof(decoder_fifo_t);
             psz_type = "decoder";
             break;
         case VLC_OBJECT_PACKETIZER:

@@ -2,7 +2,7 @@
  * vlc_codec.h: codec related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vlc_codec.h,v 1.4 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: vlc_codec.h,v 1.5 2003/11/24 00:39:00 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -47,12 +47,6 @@ struct decoder_t
     /* Module properties */
     module_t *          p_module;
     decoder_sys_t *     p_sys;
-
-    /* Deprecated */
-    int                 ( * pf_decode )( decoder_t *, block_t * );
-    decoder_fifo_t *    p_fifo;
-    int                 ( * pf_run ) ( decoder_fifo_t * );
-    /* End deprecated */
 
     picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
     aout_buffer_t *     ( * pf_decode_audio )( decoder_t *, block_t ** );

@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.31 2003/11/23 18:31:54 alexis Exp $
+ * $Id: v4l.c,v 1.32 2003/11/24 00:39:01 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -1657,19 +1657,12 @@ static int Demux( input_thread_t *p_input )
     p_pes->p_first->p_payload_start += 16;
     p_pes->i_pes_size               -= 16;
 
-    if( p_es && p_es->p_decoder_fifo )
+    if( p_es && p_es->p_dec )
     {
-        vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
-        if( p_es->p_decoder_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
-        {
-            /* Wait for the decoder. */
-            vlc_cond_wait( &p_es->p_decoder_fifo->data_wait,
-                           &p_es->p_decoder_fifo->data_lock );
-        }
-        vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
-        p_pes->i_pts = p_pes->i_dts = i_pts + p_input->i_pts_delay;
+        p_pes->i_pts =
+        p_pes->i_dts = i_pts + p_input->i_pts_delay;
 
-        input_DecodePES( p_es->p_decoder_fifo, p_pes );
+        input_DecodePES( p_es->p_dec, p_pes );
     }
     else
     {

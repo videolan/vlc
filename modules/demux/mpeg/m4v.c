@@ -2,7 +2,7 @@
  * m4v.c : MPEG-4 video Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: m4v.c,v 1.8 2003/09/10 11:51:00 fenrir Exp $
+ * $Id: m4v.c,v 1.9 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -275,7 +275,7 @@ static int Demux( input_thread_t * p_input )
                                          p_input->stream.p_selected_program,
                                          p_demux->i_dts );
 
-    if( !p_demux->p_es->p_decoder_fifo )
+    if( !p_demux->p_es->p_dec )
     {
         msg_Err( p_input, "no video decoder" );
         input_DeletePES( p_input->p_method_data, p_pes );
@@ -283,7 +283,7 @@ static int Demux( input_thread_t * p_input )
     }
     else
     {
-        input_DecodePES( p_demux->p_es->p_decoder_fifo, p_pes );
+        input_DecodePES( p_demux->p_es->p_dec, p_pes );
     }
     /* FIXME FIXME FIXME FIXME */
     p_demux->i_dts += (mtime_t)90000 / 25;

@@ -2,7 +2,7 @@
  * mpgv.c : MPEG-I/II Video demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpgv.c,v 1.1 2003/11/22 17:03:57 fenrir Exp $
+ * $Id: mpgv.c,v 1.2 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -130,12 +130,10 @@ static int Open( vlc_object_t * p_this )
      * Load the mpegvideo packetizer
      */
     p_sys->p_packetizer = vlc_object_create( p_input, VLC_OBJECT_PACKETIZER );
-    p_sys->p_packetizer->pf_decode = NULL;
     p_sys->p_packetizer->pf_decode_audio = NULL;
     p_sys->p_packetizer->pf_decode_video = NULL;
     p_sys->p_packetizer->pf_decode_sub = NULL;
     p_sys->p_packetizer->pf_packetize = NULL;
-    p_sys->p_packetizer->pf_run = NULL;
     es_format_Init( &p_sys->p_packetizer->fmt_in,  VIDEO_ES,   VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
     es_format_Init( &p_sys->p_packetizer->fmt_out, UNKNOWN_ES, 0 );
     p_sys->p_packetizer->p_module =

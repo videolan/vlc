@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: audio.c,v 1.25 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: audio.c,v 1.26 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -79,6 +79,9 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
+    vlc_value_t lockval;
+
+    var_Get( p_dec->p_libvlc, "avcodec", &lockval );
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -110,15 +113,16 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     /* ***** Open the codec ***** */
+    vlc_mutex_lock( lockval.p_address );
     if (avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0)
     {
+        vlc_mutex_unlock( lockval.p_address );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         return VLC_EGENERIC;
     }
-    else
-    {
-        msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
-    }
+    vlc_mutex_unlock( lockval.p_address );
+
+    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
     p_sys->p_output = malloc( 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
 

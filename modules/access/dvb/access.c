@@ -554,7 +554,7 @@ void E_(Close) ( vlc_object_t *p_this )
                 i_es_index ++ )
         {
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
-            if ( p_es->p_decoder_fifo )
+            if ( p_es->p_dec )
             {
                 ioctl_UnsetDMXFilter(p_input, p_es->i_demux_fd );
             }
@@ -641,7 +641,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
                 i_es_index ++ )
         {
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
-            if ( p_es->p_decoder_fifo )
+            if ( p_es->p_dec )
             {
                 input_UnselectES( p_input , p_es );
             }

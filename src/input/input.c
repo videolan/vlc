@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.260 2003/11/22 13:19:30 gbazin Exp $
+ * $Id: input.c,v 1.261 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -30,6 +30,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include <vlc/decoder.h>
 #include <vlc/vout.h>
 
 #ifdef HAVE_SYS_TIMES_H
@@ -1134,7 +1135,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             msg_Err( p_input, "FIXME unselect es in es_out_Add" );
         }
         input_SelectES( p_input, id->p_es );
-        if( id->p_es->p_decoder_fifo )
+        if( id->p_es->p_dec )
         {
             out->p_sys->i_audio = fmt->i_priority;
         }
@@ -1146,7 +1147,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             msg_Err( p_input, "FIXME unselect es in es_out_Add" );
         }
         input_SelectES( p_input, id->p_es );
-        if( id->p_es->p_decoder_fifo )
+        if( id->p_es->p_dec )
         {
             out->p_sys->i_video = fmt->i_priority;
         }
@@ -1220,31 +1221,9 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
 static int EsOutSend( es_out_t *out, es_out_id_t *id, block_t *p_block )
 {
-    if( id->p_es->p_decoder_fifo )
+    if( id->p_es->p_dec )
     {
-        pes_packet_t *p_pes;
-
-        if( !(p_pes = input_NewPES( out->p_sys->p_input->p_method_data ) ) )
-        {
-            return VLC_SUCCESS;
-        }
-
-        p_pes->p_first = p_pes->p_last =
-            input_NewPacket( out->p_sys->p_input->p_method_data,
-                             p_block->i_buffer );
-
-        p_pes->i_nb_data = 1;
-        p_pes->i_pts = p_block->i_pts;
-        p_pes->i_dts = p_block->i_dts;
-
-        p_pes->p_first->p_payload_end =
-            p_pes->p_first->p_payload_start + p_block->i_buffer;
-        memcpy( p_pes->p_first->p_payload_start,
-                p_block->p_buffer, p_block->i_buffer );
-
-        block_Release( p_block );
-
-        input_DecodePES( id->p_es->p_decoder_fifo, p_pes );
+        input_DecodeBlock( id->p_es->p_dec, p_block );
     }
     else
     {
@@ -1255,9 +1234,9 @@ static int EsOutSend( es_out_t *out, es_out_id_t *id, block_t *p_block )
 
 static int EsOutSendPES( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
 {
-    if( id->p_es->p_decoder_fifo )
+    if( id->p_es->p_dec )
     {
-        input_DecodePES( id->p_es->p_decoder_fifo, p_pes );
+        input_DecodePES( id->p_es->p_dec, p_pes );
     }
     else
     {
@@ -1273,7 +1252,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *id )
     TAB_REMOVE( p_sys->i_id, p_sys->id, id );
 
     vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
-    if( id->p_es->p_decoder_fifo )
+    if( id->p_es->p_dec )
     {
         input_UnselectES( p_sys->p_input, id->p_es );
     }
@@ -1304,13 +1283,13 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
             id = (es_out_id_t*) va_arg( args, es_out_id_t * );
             b = (vlc_bool_t) va_arg( args, vlc_bool_t );
-            if( b && id->p_es->p_decoder_fifo == NULL )
+            if( b && id->p_es->p_dec == NULL )
             {
                 input_SelectES( p_sys->p_input, id->p_es );
                 vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
-                return id->p_es->p_decoder_fifo ? VLC_SUCCESS : VLC_EGENERIC;
+                return id->p_es->p_dec ? VLC_SUCCESS : VLC_EGENERIC;
             }
-            else if( !b && id->p_es->p_decoder_fifo )
+            else if( !b && id->p_es->p_dec )
             {
                 input_UnselectES( p_sys->p_input, id->p_es );
                 vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
@@ -1320,7 +1299,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             id = (es_out_id_t*) va_arg( args, es_out_id_t * );
             pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
 
-            *pb = id->p_es->p_decoder_fifo ? VLC_TRUE : VLC_FALSE;
+            *pb = id->p_es->p_dec ? VLC_TRUE : VLC_FALSE;
             return VLC_SUCCESS;
 
         default:

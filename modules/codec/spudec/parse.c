@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.15 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: parse.c,v 1.16 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -225,8 +225,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t * p_spu )
         case SPU_CMD_SET_PALETTE:
 
             /* 03xxxx (palette) */
-            if( p_dec->p_fifo->p_demux_data
-                 && *(int*)p_dec->p_fifo->p_demux_data == 0xBeeF )
+            if( p_dec->fmt_in.subs.spu.palette[0] == 0xBeeF )
             {
                 unsigned int idx[4];
 
@@ -239,9 +238,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t * p_spu )
 
                 for( i = 0; i < 4 ; i++ )
                 {
-                    uint32_t i_color;
-                    i_color = ((uint32_t*)((char*)p_dec->p_fifo->p_demux_data +
-                                                   sizeof(int)))[idx[i]];
+                    uint32_t i_color = p_dec->fmt_in.subs.spu.palette[1+idx[i]];
 
                     /* FIXME: this job should be done sooner */
                     p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>16) & 0xff;

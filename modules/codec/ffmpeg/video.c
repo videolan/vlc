@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.51 2003/11/23 20:37:04 gbazin Exp $
+ * $Id: video.c,v 1.52 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -184,8 +184,12 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
+    vlc_value_t lockval;
     vlc_value_t val;
     int i_tmp;
+
+
+    var_Get( p_dec->p_libvlc, "avcodec", &lockval );
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -224,15 +228,15 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 #endif
 
     /* ***** Open the codec ***** */
+    vlc_mutex_lock( lockval.p_address );
     if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
     {
+        vlc_mutex_unlock( lockval.p_address );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         return VLC_EGENERIC;
     }
-    else
-    {
-        msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
-    }
+    vlc_mutex_unlock( lockval.p_address );
+    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );

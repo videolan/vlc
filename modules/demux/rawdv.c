@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.10 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: rawdv.c,v 1.11 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -374,7 +374,7 @@ static int Demux( input_thread_t * p_input )
     }
 
     /* Build video PES packet */
-    if( p_rawdv->p_video_es->p_decoder_fifo )
+    if( p_rawdv->p_video_es->p_dec )
     {
         p_pes = input_NewPES( p_input->p_method_data );
         if( p_pes == NULL )
@@ -394,7 +394,7 @@ static int Demux( input_thread_t * p_input )
     }
 
     /* Do the same for audio */
-    if( p_rawdv->p_audio_es->p_decoder_fifo )
+    if( p_rawdv->p_audio_es->p_dec )
     {
         p_audio_pes = input_NewPES( p_input->p_method_data );
         if( p_audio_pes == NULL )
@@ -405,7 +405,7 @@ static int Demux( input_thread_t * p_input )
         }
         p_audio_pes->i_rate = p_input->stream.control.i_rate;
 
-        if( p_rawdv->p_video_es->p_decoder_fifo )
+        if( p_rawdv->p_video_es->p_dec )
             p_audio_pes->p_first = p_audio_pes->p_last =
                 input_ShareBuffer( p_input->p_method_data, p_data->p_buffer );
         else
@@ -422,15 +422,15 @@ static int Demux( input_thread_t * p_input )
     }
 
     /* Decode PES packets if stream is selected */
-    if( p_rawdv->p_video_es->p_decoder_fifo )
-        input_DecodePES( p_rawdv->p_video_es->p_decoder_fifo, p_pes );
-    if( p_rawdv->p_audio_es->p_decoder_fifo )
-        input_DecodePES( p_rawdv->p_audio_es->p_decoder_fifo, p_audio_pes );
+    if( p_rawdv->p_video_es->p_dec )
+        input_DecodePES( p_rawdv->p_video_es->p_dec, p_pes );
+    if( p_rawdv->p_audio_es->p_dec )
+        input_DecodePES( p_rawdv->p_audio_es->p_dec, p_audio_pes );
 
     p_rawdv->i_pcr += ( 90000 / p_rawdv->f_rate );
 
-    if( !p_rawdv->p_video_es->p_decoder_fifo &&
-        !p_rawdv->p_audio_es->p_decoder_fifo )
+    if( !p_rawdv->p_video_es->p_dec &&
+        !p_rawdv->p_audio_es->p_dec )
         input_DeletePacket( p_input->p_method_data, p_data );
 
     return 1;

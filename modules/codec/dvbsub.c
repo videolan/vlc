@@ -2,7 +2,8 @@
  * dvbsub.c : DVB subtitles decoder thread
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
- * $Id: dvbsub.c,v 1.4 2003/11/22 23:39:14 fenrir Exp $
+ * Copyright (C) 2003 VideoLAN
+ * $Id: dvbsub.c,v 1.5 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *
@@ -27,7 +28,21 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
-#include "codecs.h"
+#include "vlc_bits.h"
+
+/*****************************************************************************
+ * Module descriptor.
+ *****************************************************************************/
+static int  Open ( vlc_object_t *p_this );
+static void Close( vlc_object_t *p_this );
+
+vlc_module_begin();
+    add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
+    set_description( _("subtitles decoder") );
+    set_capability( "decoder", 50 );
+    set_callbacks( Open, Close );
+vlc_module_end();
+
 
 // Wow, that's ugly but very usefull for a memory leak track
 // so I just keep it
@@ -175,16 +190,7 @@ typedef struct
     dvbsub_object_t*        p_objects;
     subpicture_t*           p_spu[16];
 } dvbsub_all_t;
-typedef struct
-{
-    /* Thread properties and locks */
-    vlc_thread_t        thread_id;                /* Id for thread functions */
-    /* Input properties */
-    decoder_fifo_t*     p_fifo;                /* Stores the PES stream data */
-    bit_stream_t        bit_stream;             /* PES data at the bit level */
-    /* Output properties */
-    vout_thread_t*      p_vout;          /* Needed to create the subpictures */
-} dvbsub_thread_t;
+
 struct subpicture_sys_t
 {
     mtime_t         i_pts;
@@ -192,6 +198,16 @@ struct subpicture_sys_t
     vlc_object_t*   p_input;                            /* Link to the input */
     vlc_bool_t      b_obsolete;
 };
+
+struct decoder_sys_t
+{
+    vout_thread_t *p_vout;
+    mtime_t       i_pts;
+
+    bs_t          bs;
+};
+
+
 // List of different SEGMENT TYPES
 // According to EN 300-743, table 2
 #define DVBSUB_ST_PAGE_COMPOSITION      0x10
@@ -218,11 +234,10 @@ struct subpicture_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
-static int  RunDecoder    ( decoder_fifo_t * );
-static int  InitThread    ( dvbsub_thread_t * );
-static void EndThread     ( dvbsub_thread_t *i, dvbsub_all_t*);
-static vout_thread_t *FindVout( dvbsub_thread_t * );
+static void Decode   ( decoder_t *, block_t ** );
+
+static vout_thread_t *FindVout( decoder_t * );
+
 static void RenderI42x( vout_thread_t *, picture_t *, const subpicture_t *,
                         vlc_bool_t );
 static void RenderYUY2( vout_thread_t *, picture_t *, const subpicture_t *,
@@ -256,30 +271,59 @@ static void free_all ( dvbsub_all_t* p_a );
 
 
 /*****************************************************************************
- * Module descriptor.
- *****************************************************************************/
-vlc_module_begin();
-    add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
-    set_description( _("subtitles decoder") );
-    set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, NULL );
-vlc_module_end();
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
+ * Open: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*) p_this;
+    decoder_t     *p_dec = (decoder_t*) p_this;
+    decoder_sys_t *p_sys;
+
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('d','v','b','s') )
     {
         return VLC_EGENERIC;
     }
-    p_dec->pf_run = RunDecoder;
+
+    p_dec->pf_decode_subs = Decode;
+    p_sys = p_dec->p_sys = malloc( sizeof( decoder_sys_t ) );
+
+    p_sys->p_vout = NULL;
+    p_sys->i_pts  = 0;
+
+    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 'd','v','b','s' ) );
+
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Close:
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    decoder_t     *p_dec = (decoder_t*) p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_vout && p_sys->p_vout->p_subpicture != NULL )
+    {
+        subpicture_t *  p_subpic;
+        int i_subpic;
+        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
+        {
+            p_subpic = &p_sys->p_vout->p_subpicture[i_subpic];
+            if( p_subpic != NULL &&
+              ( ( p_subpic->i_status == RESERVED_SUBPICTURE )
+             || ( p_subpic->i_status == READY_SUBPICTURE ) ) )
+            {
+                vout_DestroySubPicture( p_sys->p_vout, p_subpic );
+            }
+        }
+    }
+
+    trox_call();
+}
+
 /*****************************************************************************
  * RunDecoder: this function is called just after the thread is created
  *****************************************************************************/
@@ -350,56 +394,30 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     free_all(&dvbsub);
     return 0;
 }
+
 /* following functions are local */
-/*****************************************************************************
- * InitThread: initialize dvbsub decoder thread
- *****************************************************************************
- * This function is called from RunThread and performs the second step of the
- * initialization. It returns 0 on success. Note that the thread's flag are not
- * modified inside this function.
- *****************************************************************************/
-static int InitThread( dvbsub_thread_t *p_dvbsubdec )
-{
-    int i_ret;
-    /* Call InitBitstream anyway so p_spudec->bit_stream is in a known
-     * state before calling CloseBitstream */
-    i_ret = InitBitstream( &p_dvbsubdec->bit_stream, p_dvbsubdec->p_fifo,
-                           NULL, NULL );
-    /* Check for a video output */
-    p_dvbsubdec->p_vout = FindVout( p_dvbsubdec );
-    if( !p_dvbsubdec->p_vout )
-    {
-        return -1;
-    }
-    /* It was just a check */
-    vlc_object_release( p_dvbsubdec->p_vout );
-    p_dvbsubdec->p_vout = NULL;
-    return i_ret;
-}
 /*****************************************************************************
  * FindVout: Find a vout or wait for one to be created.
  *****************************************************************************/
-static vout_thread_t *FindVout( dvbsub_thread_t *p_spudec )
+static vout_thread_t *FindVout( decoder_t *p_dec )
 {
-    vout_thread_t *p_vout = NULL;
-    /* Find an available video output */
-    do
+    for( ;; )
     {
-        if( p_spudec->p_fifo->b_die || p_spudec->p_fifo->b_error )
+        vout_thread_t *p_vout;
+
+        if( p_dec->b_die || p_dec->b_error )
         {
-            break;
+            return NULL;
         }
-        p_vout = vlc_object_find( p_spudec->p_fifo, VLC_OBJECT_VOUT,
-                                  FIND_ANYWHERE );
+        p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
         if( p_vout )
         {
-            break;
+            return p_vout;
         }
         msleep( VOUT_OUTMEM_SLEEP );
     }
-    while( 1 );
-    return p_vout;
 }
+
 /*****************************************************************************
  * EndThread: thread destruction
  *****************************************************************************

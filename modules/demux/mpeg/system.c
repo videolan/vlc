@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.19 2003/11/06 16:36:41 nitrox Exp $
+ * $Id: system.c,v 1.20 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -414,11 +414,11 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 
         /* Now we can eventually put the PES packet in the decoder's
          * PES fifo */
-        if( p_es->p_decoder_fifo != NULL )
+        if( p_es->p_dec != NULL )
         {
-            input_DecodePES( p_es->p_decoder_fifo, p_pes );
+            input_DecodePES( p_es->p_dec, p_pes );
         }
-        else if ( p_es->p_decoder_fifo == NULL &&
+        else if ( p_es->p_dec == NULL &&
                    ((es_ts_data_t*)p_es->p_demux_data)->b_dvbsub)
         {
             es_descriptor_t* p_dvbsub;
@@ -430,9 +430,9 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             for(i = 0; i < i_count; i++)
             {
                 p_dvbsub = ((es_ts_data_t*)p_es->p_demux_data)->p_dvbsub_es[i];
-                if(p_dvbsub->p_decoder_fifo!=NULL)
+                if(p_dvbsub->p_dec !=NULL)
                 {
-                    input_DecodePES ( p_dvbsub->p_decoder_fifo, p_pes );
+                    input_DecodePES ( p_dvbsub->p_dec, p_pes );
                     break;
                 }
             }
@@ -1112,7 +1112,7 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         p_es = ParsePS( p_input, p_data );
 
         vlc_mutex_lock( &p_input->stream.control.control_lock );
-        if( p_es != NULL && p_es->p_decoder_fifo != NULL
+        if( p_es != NULL && p_es->p_dec != NULL
              && (p_es->i_cat != AUDIO_ES || !p_input->stream.control.b_mute) )
         {
             vlc_mutex_unlock( &p_input->stream.control.control_lock );
@@ -1271,7 +1271,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         /* Not selected. Just read the adaptation field for a PCR. */
         b_trash = 1;
     }
-    else if( p_es->p_decoder_fifo == NULL && !b_psi && !b_dvbsub )
+    else if( p_es->p_dec == NULL && !b_psi && !b_dvbsub )
     {
         b_trash = 1;
     }
@@ -1284,7 +1284,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
      * may still be null. Who said it was ugly ?
      * I have written worse. --Meuuh */
     if( ( p_es ) &&
-        ((p_es->p_decoder_fifo != NULL) || b_psi || b_pcr || b_dvbsub) )
+        ((p_es->p_dec != NULL) || b_psi || b_pcr || b_dvbsub) )
     {
         p_es->c_packets++;
 

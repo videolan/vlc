@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.121 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: input_programs.c,v 1.122 2003/11/24 00:39:02 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -425,7 +425,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                 i_es_index ++ )
         {
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
-            if ( p_es->p_decoder_fifo ) /* if the ES was selected */
+            if ( p_es->p_dec ) /* if the ES was selected */
             {
                 input_UnselectES( p_input , p_es );
             }
@@ -614,7 +614,7 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     /* Init its values */
     p_es->i_id = i_es_id;
     p_es->p_pes = NULL;
-    p_es->p_decoder_fifo = NULL;
+    p_es->p_dec = NULL;
     p_es->i_cat = i_category;
     p_es->i_demux_fd = 0;
     p_es->c_packets = 0;
@@ -756,7 +756,7 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     /* Kill associated decoder, if any. */
-    if( p_es->p_decoder_fifo != NULL )
+    if( p_es->p_dec != NULL )
     {
         input_UnselectES( p_input, p_es );
     }
@@ -860,7 +860,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     msg_Dbg( p_input, "selecting ES 0x%x", p_es->i_id );
 
-    if( p_es->p_decoder_fifo != NULL )
+    if( p_es->p_dec != NULL )
     {
         msg_Err( p_input, "ES 0x%x is already selected", p_es->i_id );
         return -1;
@@ -869,10 +869,10 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     /* Release the lock, not to block the input thread during
      * the creation of the thread. */
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-    p_es->p_decoder_fifo = input_RunDecoder( p_input, p_es );
+    p_es->p_dec = input_RunDecoder( p_input, p_es );
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    if( p_es->p_decoder_fifo == NULL )
+    if( p_es->p_dec == NULL )
     {
         return -1;
     }
@@ -917,7 +917,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     msg_Dbg( p_input, "unselecting ES 0x%x", p_es->i_id );
 
-    if( p_es->p_decoder_fifo == NULL )
+    if( p_es->p_dec == NULL )
     {
         msg_Err( p_input, "ES 0x%x is not selected", p_es->i_id );
         return( -1 );
@@ -947,7 +947,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
     input_EndDecoder( p_input, p_es );
     p_es->p_pes = NULL;
 
-    if( ( p_es->p_decoder_fifo == NULL ) &&
+    if( ( p_es->p_dec == NULL ) &&
         ( p_input->stream.i_selected_es_number > 0 ) )
     {
         while( ( i_index < p_input->stream.i_selected_es_number - 1 ) &&
@@ -1140,7 +1140,7 @@ static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
     for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
     {
         if( p_input->stream.pp_es[i]->i_id == oldval.i_int &&
-            p_input->stream.pp_es[i]->p_decoder_fifo != NULL )
+            p_input->stream.pp_es[i]->p_dec != NULL )
         {
             input_UnselectES( p_input, p_input->stream.pp_es[i] );
         }
@@ -1150,7 +1150,7 @@ static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
     for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
     {
         if( p_input->stream.pp_es[i]->i_id == newval.i_int &&
-            p_input->stream.pp_es[i]->p_decoder_fifo == NULL )
+            p_input->stream.pp_es[i]->p_dec == NULL )
         {
             input_SelectES( p_input, p_input->stream.pp_es[i] );
         }

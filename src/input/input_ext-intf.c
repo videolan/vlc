@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.51 2003/07/13 19:58:41 massiot Exp $
+ * $Id: input_ext-intf.c,v 1.52 2003/11/24 00:39:02 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -360,7 +360,7 @@ void input_DumpStream( input_thread_t * p_input )
             msg_Dbg( p_input, "ES 0x%x, "
                      "stream 0x%x, fourcc `%4.4s', %s [OK:%ld/ERR:%ld]",
                      ES->i_id, ES->i_stream_id, (char*)&ES->i_fourcc,
-                     ES->p_decoder_fifo != NULL ? "selected" : "not selected",
+                     ES->p_dec != NULL ? "selected" : "not selected",
                      ES->c_packets, ES->c_invalid_packets );
 #undef ES
         }

@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.38 2003/10/21 01:48:02 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.39 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -1005,7 +1005,7 @@ void VlcWrapper::FilterChange()
     for( unsigned int i = 0; i < p_input->stream.i_es_number; i++ )
     {
         if( ( p_input->stream.pp_es[i]->i_cat == VIDEO_ES ) &&
-            ( p_input->stream.pp_es[i]->p_decoder_fifo != NULL ) )
+            ( p_input->stream.pp_es[i]->p_dec != NULL ) )
         {
             input_UnselectES( p_input, p_input->stream.pp_es[i] );
             input_SelectES( p_input, p_input->stream.pp_es[i] );

@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.13 2003/11/05 02:43:55 gbazin Exp $
+ * $Id: dshow.cpp,v 1.14 2003/11/24 00:39:01 fenrir Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1331,7 +1331,7 @@ static int Demux( input_thread_t *p_input )
     p_pes->p_first->p_payload_start += 16;
     p_pes->i_pes_size               -= 16;
 
-    if( p_es && p_es->p_decoder_fifo )
+    if( p_es && p_es->p_dec )
     {
         /* Call the pace control. */
         input_ClockManageRef( p_input, p_input->stream.p_selected_program,
@@ -1341,7 +1341,7 @@ static int Demux( input_thread_t *p_input )
             input_ClockGetTS( p_input, p_input->stream.p_selected_program,
                               i_pcr );
 
-        input_DecodePES( p_es->p_decoder_fifo, p_pes );
+        input_DecodePES( p_es->p_dec, p_pes );
     }
     else
     {

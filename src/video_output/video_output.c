@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.239 2003/10/26 13:10:05 sigmunau Exp $
+ * $Id: video_output.c,v 1.240 2003/11/24 00:39:02 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -1360,7 +1360,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
     {
-        if( ( ES->i_cat == VIDEO_ES ) && ES->p_decoder_fifo != NULL )
+        if( ( ES->i_cat == VIDEO_ES ) && ES->p_dec != NULL )
         {
             input_UnselectES( p_input, ES );
             input_SelectES( p_input, ES );
@@ -1401,7 +1401,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
     {
-        if( ( ES->i_cat == VIDEO_ES ) && ES->p_decoder_fifo != NULL )
+        if( ( ES->i_cat == VIDEO_ES ) && ES->p_dec != NULL )
         {
             input_UnselectES( p_input, ES );
             input_SelectES( p_input, ES );

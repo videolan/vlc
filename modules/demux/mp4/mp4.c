@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.41 2003/11/23 13:15:27 gbazin Exp $
+ * $Id: mp4.c,v 1.42 2003/11/24 00:39:01 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -425,11 +425,11 @@ static int Demux( input_thread_t *p_input )
         }
         else if( track.b_ok )
         {
-            if( track.b_selected && track.p_es->p_decoder_fifo == NULL )
+            if( track.b_selected && track.p_es->p_dec == NULL )
             {
                 MP4_TrackUnselect( p_input, &track );
             }
-            else if( !track.b_selected && track.p_es->p_decoder_fifo != NULL )
+            else if( !track.b_selected && track.p_es->p_dec != NULL )
             {
                 MP4_TrackSelect( p_input, &track, MP4_GetMoviePTS( p_demux ) );
             }
@@ -532,11 +532,11 @@ static int Demux( input_thread_t *p_input )
                     p_pes->i_pts = 0;
                 }
 
-                if( track.p_es->p_decoder_fifo )
+                if( track.p_es->p_dec )
                 {
 
                     p_pes->i_rate = p_input->stream.control.i_rate;
-                    input_DecodePES( track.p_es->p_decoder_fifo, p_pes );
+                    input_DecodePES( track.p_es->p_dec, p_pes );
                 }
                 else
                 {
@@ -1372,19 +1372,19 @@ static int  TrackGotoChunkSample( input_thread_t   *p_input,
     }
 
     /* select again the new decoder */
-    if( p_track->b_selected && p_track->p_es && p_track->p_es->p_decoder_fifo == NULL )
+    if( p_track->b_selected && p_track->p_es && p_track->p_es->p_dec == NULL )
     {
         vlc_mutex_lock( &p_input->stream.stream_lock );
         input_SelectES( p_input, p_track->p_es );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-        if( p_track->p_es->p_decoder_fifo )
+        if( p_track->p_es->p_dec )
         {
             if( p_track->p_pes_init != NULL )
             {
                 p_track->p_pes_init->i_rate = p_input->stream.control.i_rate;
 
-                input_DecodePES( p_track->p_es->p_decoder_fifo,
+                input_DecodePES( p_track->p_es->p_dec,
                                  p_track->p_pes_init );
                 p_track->p_pes_init = NULL;
             }
@@ -1663,7 +1663,7 @@ static void MP4_TrackUnselect(input_thread_t    *p_input,
         return;
     }
 
-    if( p_track->p_es->p_decoder_fifo )
+    if( p_track->p_es->p_dec )
     {
         vlc_mutex_lock( &p_input->stream.stream_lock );
         input_UnselectES( p_input, p_track->p_es );

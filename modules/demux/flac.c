@@ -2,7 +2,7 @@
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.8 2003/11/21 20:49:13 gbazin Exp $
+ * $Id: flac.c,v 1.9 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -117,12 +117,10 @@ static int Open( vlc_object_t * p_this )
      * Load the FLAC packetizer
      */
     p_sys->p_packetizer = vlc_object_create( p_input, VLC_OBJECT_DECODER );
-    p_sys->p_packetizer->pf_decode = 0;
     p_sys->p_packetizer->pf_decode_audio = 0;
     p_sys->p_packetizer->pf_decode_video = 0;
     p_sys->p_packetizer->pf_decode_sub = 0;
     p_sys->p_packetizer->pf_packetize = 0;
-    p_sys->p_packetizer->pf_run = 0;
 
     /* Initialization of decoder structure */
     es_format_Init( &p_sys->p_packetizer->fmt_in, AUDIO_ES,

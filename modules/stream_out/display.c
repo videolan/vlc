@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.7 2003/11/21 15:32:08 fenrir Exp $
+ * $Id: display.c,v 1.8 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -271,9 +271,9 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
                                         p_buffer->p_buffer,
                                         p_buffer->i_size );
 
-            if( id->p_es->p_decoder_fifo )
+            if( id->p_es->p_dec )
             {
-                input_DecodePES( id->p_es->p_decoder_fifo, p_pes );
+                input_DecodePES( id->p_es->p_dec, p_pes );
             }
             else
             {

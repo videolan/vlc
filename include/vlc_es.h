@@ -2,7 +2,7 @@
  * vlc_es.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.3 2003/11/22 18:04:10 gbazin Exp $
+ * $Id: vlc_es.h,v 1.4 2003/11/24 00:39:00 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -87,6 +87,11 @@ struct subs_format_t
 {
     char *psz_encoding;
 
+    struct
+    {
+        /* FIXME */
+        uint32_t palette[16+1];
+    } spu;
 };
 
 /**

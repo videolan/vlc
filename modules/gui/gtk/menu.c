@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.11 2003/08/04 12:34:20 jpsaman Exp $
+ * $Id: menu.c,v 1.12 2003/11/24 00:39:01 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -398,7 +398,7 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
         for( i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
         {
             if( ( ES->i_cat == VIDEO_ES ) &&
-                    ES->p_decoder_fifo != NULL )
+                    ES->p_dec != NULL )
             {
                 input_UnselectES( p_intf->p_sys->p_input, ES );
                 input_SelectES( p_intf->p_sys->p_input, ES );

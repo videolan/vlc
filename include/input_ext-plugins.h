@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_ext-plugins.h,v 1.42 2003/05/05 22:23:31 gbazin Exp $
+ * $Id: input_ext-plugins.h,v 1.43 2003/11/24 00:39:00 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -55,9 +55,12 @@ VLC_EXPORT( int,  input_UnselectES,( input_thread_t *, es_descriptor_t * ) );
 /*****************************************************************************
  * Prototypes from input_dec.c
  *****************************************************************************/
-decoder_fifo_t * input_RunDecoder( input_thread_t *, es_descriptor_t * );
+decoder_t * input_RunDecoder( input_thread_t *, es_descriptor_t * );
 void input_EndDecoder( input_thread_t *, es_descriptor_t * );
-VLC_EXPORT( void, input_DecodePES, ( decoder_fifo_t *, pes_packet_t * ) );
+
+VLC_EXPORT( void, input_DecodePES, ( decoder_t *, pes_packet_t * ) );
+void input_DecodeBlock( decoder_t *, block_t * );
+
 void input_EscapeDiscontinuity( input_thread_t * );
 void input_EscapeAudioDiscontinuity( input_thread_t * );
 VLC_EXPORT( void, input_NullPacket, ( input_thread_t *, es_descriptor_t * ) );
