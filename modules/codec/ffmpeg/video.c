@@ -438,7 +438,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         p_sys->i_buffer = 0;
         p_sys->i_pts = 0; /* To make sure we recover properly */
@@ -448,6 +448,14 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
         block_Release( p_block );
         return NULL;
+    }
+
+    if( p_block->i_flags & BLOCK_FLAG_PREROLL )
+    {
+        /* Do not care about late frames when prerolling
+         * TODO avoid decoding of non reference frame
+         * (ie all B except for H264 where it depends only on nal_ref_idc) */
+        p_sys->i_late_frames = 0;
     }
 
     if( !p_dec->b_pace_control && p_sys->i_late_frames > 0 &&
@@ -579,8 +587,9 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
-        /* Update frame late count*/
-        if( p_sys->i_pts && p_sys->i_pts <= mdate() )
+        /* Update frame late count (except when doing preroll) */
+        if( p_sys->i_pts && p_sys->i_pts <= mdate() &&
+            !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
         {
             p_sys->i_late_frames++;
             if( p_sys->i_late_frames == 1 )
@@ -630,6 +639,10 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         {
             p_pic->date = p_sys->i_pts;
 
+            static int64_t i_old = 0;
+            msg_Dbg( p_dec, "pts=%lld diff=%lld", p_pic->date, p_pic->date - i_old );
+            i_old = p_pic->date;
+
             /* interpolate the next PTS */
             if( p_sys->p_context->frame_rate > 0 )
             {
@@ -657,6 +670,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         else
         {
             p_dec->pf_vout_buffer_del( p_dec, p_pic );
+            msg_Dbg( p_dec, "pts=0" );
         }
     }
 

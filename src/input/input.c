@@ -1210,6 +1210,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
             }
             if( f_pos < 0.0 ) f_pos = 0.0;
             if( f_pos > 1.0 ) f_pos = 1.0;
+            /* Reset the decoders states and clock synch (before calling the demuxer */
+            es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+            input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
             if( demux2_Control( p_input->input.p_demux, DEMUX_SET_POSITION,
                                 f_pos ) )
             {
@@ -1221,8 +1224,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( p_input->i_slave > 0 )
                     SlaveSeek( p_input );
 
-                input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
-                es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+                //input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
+                //es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
                 b_force_update = VLC_TRUE;
             }
             break;
@@ -1246,6 +1249,11 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 i_time += val.i_time;
             }
             if( i_time < 0 ) i_time = 0;
+
+            /* Reset the decoders states and clock synch (before calling the demuxer */
+            es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+            input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
+
             i_ret = demux2_Control( p_input->input.p_demux,
                                     DEMUX_SET_TIME, i_time );
             if( i_ret )
@@ -1272,9 +1280,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 if( p_input->i_slave > 0 )
                     SlaveSeek( p_input );
 
-                input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
-
-                es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
+                //input_EsOutDiscontinuity( p_input->p_es_out, VLC_FALSE );
+                //es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
                 b_force_update = VLC_TRUE;
             }
             break;

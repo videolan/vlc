@@ -74,7 +74,10 @@ typedef struct
     /* with this we can calculate dts/pts without waste memory */
     uint64_t     i_first_dts;
     uint32_t     *p_sample_count_dts;
-    uint32_t     *p_sample_delta_dts; /* dts delta */
+    uint32_t     *p_sample_delta_dts;   /* dts delta */
+
+    uint32_t     *p_sample_count_pts;
+    uint32_t     *p_sample_offset_pts;  /* pts-dts */
 
     /* TODO if needed add pts
         but quickly *add* support for edts and seeking */
@@ -162,7 +165,7 @@ static int      MP4_TrackNextSample( demux_t *, mp4_track_t * );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 
 /* Return time in µs of a track */
-static inline int64_t MP4_TrackGetPTS( demux_t *p_demux, mp4_track_t *p_track )
+static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
 #define chunk p_track->chunk[p_track->i_chunk]
 
@@ -211,6 +214,24 @@ static inline int64_t MP4_TrackGetPTS( demux_t *p_demux, mp4_track_t *p_track )
     }
 
     return I64C(1000000) * i_dts / p_track->i_timescale;
+}
+
+static inline int64_t MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track )
+{
+    mp4_chunk_t *ck = &p_track->chunk[p_track->i_chunk];
+    unsigned int i_index = 0;
+    unsigned int i_sample = p_track->i_sample - ck->i_sample_first;
+
+    if( ck->p_sample_count_pts == NULL || ck->p_sample_offset_pts == NULL )
+        return -1;
+
+    for( i_index = 0;; i_index++ )
+    {
+        if( i_sample < ck->p_sample_count_pts[i_index] )
+            return ck->p_sample_offset_pts[i_index] * I64C(1000000) / p_track->i_timescale;
+
+        i_sample -= ck->p_sample_count_pts[i_index];
+    }
 }
 
 static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
@@ -604,17 +625,18 @@ static int Demux( demux_t *p_demux )
             continue;
         }
 
-        while( MP4_TrackGetPTS( p_demux, tk ) < MP4_GetMoviePTS( p_sys ) )
+        while( MP4_TrackGetDTS( p_demux, tk ) < MP4_GetMoviePTS( p_sys ) )
         {
 #if 0
             msg_Dbg( p_demux, "tk(%i)=%lld mv=%lld", i_track,
-                     MP4_TrackGetPTS( p_demux, tk ),
+                     MP4_TrackGetDTS( p_demux, tk ),
                      MP4_GetMoviePTS( p_sys ) );
 #endif
 
             if( MP4_TrackSampleSize( tk ) > 0 )
             {
                 block_t *p_block;
+                int64_t i_delta;
 
                 /* go,go go ! */
                 if( stream_Seek( p_demux->s, MP4_TrackGetPos( tk ) ) )
@@ -669,15 +691,22 @@ static int Demux( demux_t *p_demux )
                         }
                     }
                 }
-                p_block->i_dts = MP4_TrackGetPTS( p_demux, tk ) + 1;
+                /* dts */
+                p_block->i_dts = MP4_TrackGetDTS( p_demux, tk ) + 1;
+                /* pts */
+                i_delta = MP4_TrackGetPTSDelta( p_demux, tk );
+                if( i_delta >= 0 )
+                    p_block->i_pts = p_block->i_dts + i_delta;
+                else if( tk->fmt.i_cat != VIDEO_ES )
+                    p_block->i_pts = p_block->i_dts;
+                else
+                    p_block->i_pts = 0;
 
-                p_block->i_pts = tk->fmt.i_cat == VIDEO_ES ?
-                    0 : p_block->i_dts + 1;
+                if( tk->fmt.i_cat == VIDEO_ES )
+                    msg_Dbg( p_demux, "pts=%lld dts=%lld", p_block->i_pts, p_block->i_dts );
 
                 if( !tk->b_drms || ( tk->b_drms && tk->p_drms ) )
-                {
                     es_out_Send( p_demux->out, tk->p_es, p_block );
-                }
             }
 
             /* Next sample */
@@ -918,8 +947,15 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
     /* first we read chunk offset */
     for( i_chunk = 0; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
     {
-        p_demux_track->chunk[i_chunk].i_offset =
-                p_co64->data.p_co64->i_chunk_offset[i_chunk];
+        mp4_chunk_t *ck = &p_demux_track->chunk[i_chunk];
+
+        ck->i_offset = p_co64->data.p_co64->i_chunk_offset[i_chunk];
+
+        ck->i_first_dts = 0;
+        ck->p_sample_count_dts = NULL;
+        ck->p_sample_delta_dts = NULL;
+        ck->p_sample_count_pts = NULL;
+        ck->p_sample_offset_pts = NULL;
     }
 
     /* now we read index for SampleEntry( soun vide mp4a mp4v ...)
@@ -963,12 +999,9 @@ static int TrackCreateChunksIndex( demux_t *p_demux,
 static int TrackCreateSamplesIndex( demux_t *p_demux,
                                     mp4_track_t *p_demux_track )
 {
-    MP4_Box_t *p_stts; /* makes mapping between sample and decoding time,
-                          ctts make same mapping but for composition time,
-                          not yet used and probably not usefull */
-    MP4_Box_t *p_stsz; /* gives sample size of each samples, there is also stz2
-                          that uses a compressed form FIXME make them in libmp4
-                          as a unique type */
+    MP4_Box_t *p_box;
+    MP4_Box_data_stsz_t *stsz;
+    MP4_Box_data_stts_t *stts;
     /* TODO use also stss and stsh table for seeking */
     /* FIXME use edit table */
     int64_t i_sample;
@@ -979,23 +1012,35 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
 
     int64_t i_last_dts;
 
-    p_stts = MP4_BoxGet( p_demux_track->p_stbl, "stts" );
-    p_stsz = MP4_BoxGet( p_demux_track->p_stbl, "stsz" ); /* FIXME and stz2 */
-
-    if( ( !p_stts )||( !p_stsz ) )
+    /* Find stsz
+     *  Gives the sample size for each samples. There is also a stz2 table
+     *  (compressed form) that we need to implement TODO */
+    p_box = MP4_BoxGet( p_demux_track->p_stbl, "stsz" );
+    if( !p_box )
     {
-        msg_Warn( p_demux, "cannot read sample table" );
-        return( VLC_EGENERIC );
+        /* FIXME and stz2 */
+        msg_Warn( p_demux, "cannot find STSZ box" );
+        return VLC_EGENERIC;
     }
+    stsz = p_box->data.p_stsz;
 
-    p_demux_track->i_sample_count = p_stsz->data.p_stsz->i_sample_count;
+    /* Find stts
+     *  Gives mapping between sample and decoding time
+     */
+    p_box = MP4_BoxGet( p_demux_track->p_stbl, "stts" );
+    if( !p_box )
+    {
+        msg_Warn( p_demux, "cannot find STTS box" );
+        return VLC_EGENERIC;
+    }
+    stts = p_box->data.p_stts;
 
-
-    /* for sample size, there are 2 case */
-    if( p_stsz->data.p_stsz->i_sample_size )
+    /* Use stsz table to create a sample number -> sample size table */
+    p_demux_track->i_sample_count = stsz->i_sample_count;
+    if( stsz->i_sample_size )
     {
         /* 1: all sample have the same size, so no need to construct a table */
-        p_demux_track->i_sample_size = p_stsz->data.p_stsz->i_sample_size;
+        p_demux_track->i_sample_size = stsz->i_sample_size;
         p_demux_track->p_sample_size = NULL;
     }
     else
@@ -1008,78 +1053,132 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
         for( i_sample = 0; i_sample < p_demux_track->i_sample_count; i_sample++ )
         {
             p_demux_track->p_sample_size[i_sample] =
-                    p_stsz->data.p_stsz->i_entry_size[i_sample];
+                    stsz->i_entry_size[i_sample];
         }
     }
-    /* we have extracted all the information from stsz, now use stts */
 
-    /* if we don't want to waste too much memory, we can't expand
-       the box! so each chunk will contain an "extract" of this table
-       for fast research */
+    /* Use stts table to crate a sample number -> dts table.
+     * XXX: if we don't want to waste too much memory, we can't expand
+     *  the box! so each chunk will contain an "extract" of this table
+     *  for fast research (problem with raw stream where a sample is sometime
+     *  just channels*bits_per_sample/8 */
 
     i_last_dts = 0;
     i_index = 0; i_index_sample_used = 0;
-
-    /* create and init last data for each chunk */
     for( i_chunk = 0; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
     {
-
+        mp4_chunk_t *ck = &p_demux_track->chunk[i_chunk];
         int64_t i_entry, i_sample_count, i;
 
         /* save last dts */
-        p_demux_track->chunk[i_chunk].i_first_dts = i_last_dts;
+        ck->i_first_dts = i_last_dts;
 
         /* count how many entries are needed for this chunk
          * for p_sample_delta_dts and p_sample_count_dts */
-        i_sample_count = p_demux_track->chunk[i_chunk].i_sample_count;
+        i_sample_count = ck->i_sample_count;
 
         i_entry = 0;
         while( i_sample_count > 0 )
         {
-            i_sample_count -=
-                p_stts->data.p_stts->i_sample_count[i_index+i_entry];
+            i_sample_count -= stts->i_sample_count[i_index+i_entry];
+            /* don't count already used sample in this entry */
             if( i_entry == 0 )
-            {
-                /* don't count already used sample in this entry */
                 i_sample_count += i_index_sample_used;
-            }
+
             i_entry++;
         }
 
         /* allocate them */
-        p_demux_track->chunk[i_chunk].p_sample_count_dts =
-            calloc( i_entry, sizeof( uint32_t ) );
-        p_demux_track->chunk[i_chunk].p_sample_delta_dts =
-            calloc( i_entry, sizeof( uint32_t ) );
+        ck->p_sample_count_dts = calloc( i_entry, sizeof( uint32_t ) );
+        ck->p_sample_delta_dts = calloc( i_entry, sizeof( uint32_t ) );
 
         /* now copy */
-        i_sample_count = p_demux_track->chunk[i_chunk].i_sample_count;
+        i_sample_count = ck->i_sample_count;
         for( i = 0; i < i_entry; i++ )
         {
             int64_t i_used;
             int64_t i_rest;
 
-            i_rest = p_stts->data.p_stts->i_sample_count[i_index] -
-                i_index_sample_used;
+            i_rest = stts->i_sample_count[i_index] - i_index_sample_used;
 
             i_used = __MIN( i_rest, i_sample_count );
 
             i_index_sample_used += i_used;
             i_sample_count -= i_used;
 
-            p_demux_track->chunk[i_chunk].p_sample_count_dts[i] = i_used;
+            ck->p_sample_count_dts[i] = i_used;
+            ck->p_sample_delta_dts[i] = stts->i_sample_delta[i_index];
 
-            p_demux_track->chunk[i_chunk].p_sample_delta_dts[i] =
-                p_stts->data.p_stts->i_sample_delta[i_index];
+            i_last_dts += i_used * ck->p_sample_delta_dts[i];
 
-            i_last_dts += i_used *
-                p_demux_track->chunk[i_chunk].p_sample_delta_dts[i];
-
-            if( i_index_sample_used >=
-                p_stts->data.p_stts->i_sample_count[i_index] )
+            if( i_index_sample_used >= stts->i_sample_count[i_index] )
             {
                 i_index++;
                 i_index_sample_used = 0;
+            }
+        }
+    }
+
+    /* Find ctts
+     *  Gives the delta between decoding time (dts) and composition table (pts)
+     */
+    p_box = MP4_BoxGet( p_demux_track->p_stbl, "ctts" );
+    if( p_box )
+    {
+        MP4_Box_data_ctts_t *ctts = p_box->data.p_ctts;
+
+        msg_Warn( p_demux, "CTTS table" );
+
+        /* Create pts-dts table per chunk */
+        i_index = 0; i_index_sample_used = 0;
+        for( i_chunk = 0; i_chunk < p_demux_track->i_chunk_count; i_chunk++ )
+        {
+            mp4_chunk_t *ck = &p_demux_track->chunk[i_chunk];
+            int64_t i_entry, i_sample_count, i;
+
+            /* count how many entries are needed for this chunk
+             * for p_sample_delta_dts and p_sample_count_dts */
+            i_sample_count = ck->i_sample_count;
+
+            i_entry = 0;
+            while( i_sample_count > 0 )
+            {
+                i_sample_count -= ctts->i_sample_count[i_index+i_entry];
+
+                /* don't count already used sample in this entry */
+                if( i_entry == 0 )
+                    i_sample_count += i_index_sample_used;
+
+                i_entry++;
+            }
+
+            /* allocate them */
+            ck->p_sample_count_pts = calloc( i_entry, sizeof( uint32_t ) );
+            ck->p_sample_offset_pts = calloc( i_entry, sizeof( uint32_t ) );
+
+            /* now copy */
+            i_sample_count = ck->i_sample_count;
+            for( i = 0; i < i_entry; i++ )
+            {
+                int64_t i_used;
+                int64_t i_rest;
+
+                i_rest = ctts->i_sample_count[i_index] -
+                    i_index_sample_used;
+
+                i_used = __MIN( i_rest, i_sample_count );
+
+                i_index_sample_used += i_used;
+                i_sample_count -= i_used;
+
+                ck->p_sample_count_pts[i] = i_used;
+                ck->p_sample_offset_pts[i] = ctts->i_sample_offset[i_index];
+
+                if( i_index_sample_used >= ctts->i_sample_count[i_index] )
+                {
+                    i_index++;
+                    i_index_sample_used = 0;
+                }
             }
         }
     }
@@ -1821,6 +1920,9 @@ static void MP4_TrackDestroy( demux_t *p_demux, mp4_track_t *p_track )
         {
            FREE(p_track->chunk[i_chunk].p_sample_count_dts);
            FREE(p_track->chunk[i_chunk].p_sample_delta_dts );
+
+           FREE(p_track->chunk[i_chunk].p_sample_count_pts);
+           FREE(p_track->chunk[i_chunk].p_sample_offset_pts );
         }
     }
     FREE( p_track->chunk );
@@ -2055,7 +2157,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
     {
         demux_sys_t *p_sys = p_demux->p_sys;
         MP4_Box_data_elst_t *elst = p_track->p_elst->data.p_elst;
-        int64_t i_mvt = MP4_TrackGetPTS( p_demux, p_track ) *
+        int64_t i_mvt = MP4_TrackGetDTS( p_demux, p_track ) *
                         p_sys->i_timescale / (int64_t)1000000;
 
         if( p_track->i_elst < elst->i_entry_count &&
@@ -2063,7 +2165,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
                      elst->i_segment_duration[p_track->i_elst] )
         {
             MP4_TrackSetELST( p_demux, p_track,
-                              MP4_TrackGetPTS( p_demux, p_track ) );
+                              MP4_TrackGetDTS( p_demux, p_track ) );
         }
     }
 

@@ -68,6 +68,10 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_CLOCK         0x0200
 /** This block is scrambled */
 #define BLOCK_FLAG_SCRAMBLED     0x0400
+/** This block has to be decoded but not be displayed */
+#define BLOCK_FLAG_PREROLL       0x0800
+/** This block is corrupted and/or there is data loss  */
+#define BLOCK_FLAG_CORRUPTED     0x1000
 
 #define BLOCK_FLAG_PRIVATE_MASK  0xffff0000
 #define BLOCK_FLAG_PRIVATE_SHIFT 16

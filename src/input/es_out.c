@@ -61,6 +61,9 @@ struct es_out_id_t
     int       i_id;
     es_out_pgrm_t *p_pgrm;
 
+    /* */
+    int64_t i_preroll_end;
+
     /* Channel in the track type */
     int         i_channel;
     es_format_t fmt;
@@ -517,6 +520,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es->i_id = fmt->i_id;
     es->p_pgrm = p_pgrm;
     es_format_Copy( &es->fmt, fmt );
+    es->i_preroll_end = -1;
+
     switch( fmt->i_cat )
     {
     case AUDIO_ES:
@@ -601,6 +606,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         }
     }
 
+    es->i_preroll_end = -1;
     es->p_dec = input_DecoderNew( p_input, &es->fmt, VLC_FALSE );
     if( es->p_dec == NULL || es->p_pgrm != p_sys->p_pgrm )
         return;
@@ -859,6 +865,18 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     p_block->i_rate = p_input->i_rate;
+    /* Mark preroll blocks */
+    if( es->i_preroll_end >= 0 )
+    {
+        int64_t i_date = p_block->i_pts;
+        if( i_date <= 0 )
+            i_date = p_block->i_dts;
+
+        if( i_date < es->i_preroll_end )
+            p_block->i_flags |= BLOCK_FLAG_PREROLL;
+        else
+            es->i_preroll_end = -1;
+    }
 
     /* TODO handle mute */
     if( es->p_dec && ( es->fmt.i_cat != AUDIO_ES ||
@@ -1165,6 +1183,22 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 memcpy( es->p_dec->fmt_in.p_extra,
                         p_fmt->p_extra, p_fmt->i_extra );
             }
+
+            return VLC_SUCCESS;
+        }
+
+        case ES_OUT_SET_NEXT_DISPLAY_TIME:
+        {
+            int64_t i_date;
+
+            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            i_date = (int64_t)va_arg( args, int64_t );
+
+            if( !es || !es->p_dec )
+                return VLC_EGENERIC;
+
+            es->i_preroll_end = i_date;
+            input_DecoderPreroll( es->p_dec, i_date );
 
             return VLC_SUCCESS;
         }

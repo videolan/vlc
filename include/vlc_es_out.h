@@ -59,7 +59,12 @@ enum es_out_query_e
     ES_OUT_SET_GROUP,   /* arg1= int                            */
     ES_OUT_GET_GROUP,   /* arg1= int*                           */
 
-    /* PCR handling, dts/pts will be automatically computed using thoses PCR */
+    /* PCR handling, dts/pts will be automatically computed using thoses PCR
+     * XXX: SET_PCR(_GROUP) is in charge of the pace control. They will wait to slow
+     * down the demuxer to read at the right speed.
+     * XXX: if you want PREROLL just call RESET_PCR and ES_OUT_SET_NEXT_DISPLAY_TIME and send
+     * data to the decoder *without* calling SET_PCR until preroll is finished.
+     */
     ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
     ES_OUT_RESET_PCR,           /* no arg */
@@ -69,7 +74,10 @@ enum es_out_query_e
     ES_OUT_GET_TS,             /* arg1=int64_t i_ts(microsecond!) (using default group 0), arg2=int64_t* converted i_ts */
 
     /* Try not to use this one as it is a bit hacky */
-    ES_OUT_SET_FMT      /* arg1= es_out_id_t* arg2=es_format_t* */
+    ES_OUT_SET_FMT,     /* arg1= es_out_id_t* arg2=es_format_t* */
+
+    /* Allow preroll of data (data with dts/pts < i_pts for one ES will be decoded but not displayed */
+    ES_OUT_SET_NEXT_DISPLAY_TIME,   /* arg1=es_out_id_t* arg2=int64_t i_pts(microsecond) */
 };
 
 struct es_out_t

@@ -1420,7 +1420,7 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
             {
                 /* Small video artifacts are usually better then
                  * dropping full frames */
-                pid->es->p_pes->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                pid->es->p_pes->i_flags |= BLOCK_FLAG_CORRUPTED;
             }
         }
     }

@@ -60,6 +60,8 @@ struct decoder_owner_sys_t
 {
     vlc_bool_t      b_own_thread;
 
+    int64_t         i_preroll_end;
+
     input_thread_t  *p_input;
 
     aout_instance_t *p_aout;
@@ -276,6 +278,11 @@ vlc_bool_t input_DecoderEmpty( decoder_t * p_dec )
     return VLC_TRUE;
 }
 
+void input_DecoderPreroll( decoder_t *p_dec, int64_t i_preroll_end )
+{
+    p_dec->p_owner->i_preroll_end = i_preroll_end;
+}
+
 #if 0
 /**
  * Create a NULL packet for padding in case of a data loss
@@ -392,6 +399,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         return NULL;
     }
     p_dec->p_owner->b_own_thread = VLC_TRUE;
+    p_dec->p_owner->i_preroll_end = -1;
     p_dec->p_owner->p_input = p_input;
     p_dec->p_owner->p_aout = NULL;
     p_dec->p_owner->p_aout_input = NULL;
@@ -610,9 +618,21 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     while( (p_aout_buf = p_dec->pf_decode_audio( p_dec,
                                                        &p_packetized_block )) )
                     {
-                        aout_DecPlay( p_dec->p_owner->p_aout,
-                                      p_dec->p_owner->p_aout_input,
-                                      p_aout_buf );
+                        /* FIXME the best would be to handle the case start_date < preroll < end_date
+                         * but that's not easy with non raw audio stream */
+                        if( p_dec->p_owner->i_preroll_end > 0 &&
+                            p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
+                        {
+                            aout_DecDeleteBuffer( p_dec->p_owner->p_aout,
+                                                  p_dec->p_owner->p_aout_input, p_aout_buf );
+                        }
+                        else
+                        {
+                            p_dec->p_owner->i_preroll_end = -1;
+                            aout_DecPlay( p_dec->p_owner->p_aout,
+                                          p_dec->p_owner->p_aout_input,
+                                          p_aout_buf );
+                        }
                     }
 
                     p_packetized_block = p_next;
@@ -621,8 +641,19 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         }
         else while( (p_aout_buf = p_dec->pf_decode_audio( p_dec, &p_block )) )
         {
-            aout_DecPlay( p_dec->p_owner->p_aout,
-                          p_dec->p_owner->p_aout_input, p_aout_buf );
+            if( p_dec->p_owner->i_preroll_end > 0 &&
+                p_aout_buf->start_date < p_dec->p_owner->i_preroll_end )
+            {
+                aout_DecDeleteBuffer( p_dec->p_owner->p_aout,
+                                      p_dec->p_owner->p_aout_input, p_aout_buf );
+            }
+            else
+            {
+                p_dec->p_owner->i_preroll_end = -1;
+                aout_DecPlay( p_dec->p_owner->p_aout,
+                              p_dec->p_owner->p_aout_input,
+                              p_aout_buf );
+            }
         }
     }
     else if( p_dec->fmt_in.i_cat == VIDEO_ES )
@@ -646,9 +677,18 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
                     while( (p_pic = p_dec->pf_decode_video( p_dec,
                                                        &p_packetized_block )) )
                     {
-                        vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
-                                          p_pic->date );
-                        vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+                        if( p_dec->p_owner->i_preroll_end > 0 &&
+                            p_pic->date < p_dec->p_owner->i_preroll_end )
+                        {
+                            vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
+                        }
+                        else
+                        {
+                            p_dec->p_owner->i_preroll_end = -1;
+                            vout_DatePicture( p_dec->p_owner->p_vout, p_pic,
+                                              p_pic->date );
+                            vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+                        }
                     }
 
                     p_packetized_block = p_next;
@@ -657,8 +697,17 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         }
         else while( (p_pic = p_dec->pf_decode_video( p_dec, &p_block )) )
         {
-            vout_DatePicture( p_dec->p_owner->p_vout, p_pic, p_pic->date );
-            vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+            if( p_dec->p_owner->i_preroll_end > 0 &&
+                p_pic->date < p_dec->p_owner->i_preroll_end )
+            {
+                vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
+            }
+            else
+            {
+                p_dec->p_owner->i_preroll_end = -1;
+                vout_DatePicture( p_dec->p_owner->p_vout, p_pic, p_pic->date );
+                vout_DisplayPicture( p_dec->p_owner->p_vout, p_pic );
+            }
         }
     }
     else if( p_dec->fmt_in.i_cat == SPU_ES )
@@ -667,6 +716,15 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         subpicture_t *p_spu;
         while( (p_spu = p_dec->pf_decode_sub( p_dec, &p_block ) ) )
         {
+            if( p_dec->p_owner->i_preroll_end > 0 &&
+                p_spu->i_start < p_dec->p_owner->i_preroll_end &&
+                ( p_spu->i_stop <= 0 || p_spu->i_stop <= p_dec->p_owner->i_preroll_end ) )
+            {
+                spu_DestroySubpicture( p_dec->p_owner->p_vout->p_spu, p_spu );
+                continue;
+            }
+
+            p_dec->p_owner->i_preroll_end = -1;
             p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
             if( p_vout )
             {
