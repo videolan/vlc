@@ -1082,19 +1082,20 @@ void Interface::TogglePlayButton( int i_playing_status )
     if( i_playing_status == i_old_playing_status )
         return;
 
-    GetToolBar()->DeleteTool( PlayStream_Event );
+    wxToolBarToolBase *p_tool = GetToolBar()->FindById( PlayStream_Event );
+    if( !p_tool ) return;
 
     if( i_playing_status == PLAYING_S )
     {
-        GetToolBar()->InsertTool( 2, PlayStream_Event, wxU(_("Pause")),
-                                  wxBitmap( pause_xpm ), wxNullBitmap,
-                                  wxITEM_NORMAL, wxU(_(HELP_PAUSE)) );
+        p_tool->SetNormalBitmap( wxBitmap( pause_xpm ) );
+        p_tool->SetLabel( wxU(_("Pause")) );
+        p_tool->SetShortHelp( wxU(_(HELP_PAUSE)) );
     }
     else
     {
-        GetToolBar()->InsertTool( 2, PlayStream_Event, wxU(_("Play")),
-                                  wxBitmap( play_xpm ), wxNullBitmap,
-                                  wxITEM_NORMAL, wxU(_(HELP_PLAY)) );
+        p_tool->SetNormalBitmap( wxBitmap( play_xpm ) );
+        p_tool->SetLabel( wxU(_("Play")) );
+        p_tool->SetShortHelp( wxU(_(HELP_PLAY)) );
     }
 
     GetToolBar()->Realize();
