@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.42 2003/03/18 23:51:29 jlj Exp $
+ * $Id: vout.m,v 1.43 2003/03/19 13:55:43 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -390,7 +390,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                 vlc_mutex_unlock( &p_playlist->object_lock );
                 vlc_object_release( p_playlist );
             }
-            if ( ![p_vout->p_sys->o_window isKeyWindow] || !b_playing )
+            if ( !b_playing )
             {
                 VLCHideMouse( p_vout, NO );
             }
@@ -554,13 +554,6 @@ static void VLCHideMouse ( vout_thread_t *p_vout, BOOL b_hide )
     }
     else if ( !b_hide )
     {
-        if ( ![o_window isKeyWindow] && b_inside )
-        {
-            /* be nice for ppl with multi monitors */
-            p_vout->p_sys->b_mouse_moved = NO;
-            p_vout->p_sys->i_time_mouse_last_moved = mdate();
-            return;
-        }
         [NSCursor unhide];
         p_vout->p_sys->b_mouse_pointer_visible = 1;
     }
@@ -1243,7 +1236,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             defer: NO screen: o_screen];
 
         [p_vout->p_sys->o_window setLevel: NSPopUpMenuWindowLevel - 1];
-        p_vout->p_sys->b_mouse_moved = 1;
+        p_vout->p_sys->b_mouse_moved = YES;
         p_vout->p_sys->i_time_mouse_last_moved = mdate();
     }
     else
@@ -1298,7 +1291,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         s_rect = [p_vout->p_sys->o_window frame];
         p_vout->p_sys->s_rect.origin = s_rect.origin;
 
-        p_vout->p_sys->b_pos_saved = 1;
+        p_vout->p_sys->b_pos_saved = YES;
     }
     
     p_vout->p_sys->p_qdport = nil;
