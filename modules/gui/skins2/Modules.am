@@ -3,6 +3,7 @@ SOURCES_skins2 = \
 	commands/async_queue.hpp \
 	commands/cmd_add_item.cpp \
 	commands/cmd_add_item.hpp \
+	commands/cmd_dummy.hpp \
 	commands/cmd_generic.hpp \
 	commands/cmd_change_skin.cpp \
 	commands/cmd_change_skin.hpp \
