@@ -614,8 +614,12 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p_sys->p_info = (void *)&p_pic->p_sys->pixmap_i420;
             p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420);
 
+            /* Allocate the memory buffer */
+            p_pic->p_data = vlc_memalign( 16, i_width * i_height * 3 / 2,
+                                          &p_pic->p_data_orig );
+
             /* Y buffer */
-            p_pic->Y_PIXELS = memalign( 16, i_width * i_height * 3 / 2 );
+            p_pic->Y_PIXELS = p_pic->p_data; 
             p_pic->p[Y_PLANE].i_lines = i_height;
             p_pic->p[Y_PLANE].i_pitch = i_width;
             p_pic->p[Y_PLANE].i_pixel_bytes = 1;
@@ -671,6 +675,13 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    switch( p_vout->output.i_chroma )
+    {
+        case FOURCC_I420:
+            free( p_pic->p_data_orig );
+            break;
+    }
+
     free( p_pic->p_sys );
 }
 
