@@ -876,11 +876,25 @@ static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 static subpicture_t *spu_new_buffer( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
-    vout_thread_t *p_vout;
+    vout_thread_t *p_vout = NULL;
     subpicture_t *p_spu;
+    int i_attempts = 30;
 
-    p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( !p_vout ) return NULL;
+    while( i_attempts-- )
+    {
+        if( p_dec->b_die || p_dec->b_error ) break;
+
+        p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        if( p_vout ) break;
+
+        msleep( VOUT_DISPLAY_DELAY );
+    }
+
+    if( !p_vout )
+    {
+        msg_Warn( p_dec, "no vout found, dropping subpicture" );
+        return NULL;
+    }
 
     if( p_sys->p_spu_vout != p_vout )
     {
