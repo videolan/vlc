@@ -1473,7 +1473,7 @@ AC_ARG_ENABLE(waveout,
   [  --enable-waveout        Win32 waveOut module (default enabled on Win32)])
 if test "x${enable_waveout}" != "xno" -a "x${SYS}" = "xmingw32"
   then
-    #PLUGINS="${PLUGINS} audio_output/waveout"
+    PLUGINS="${PLUGINS} audio_output/waveout"
     waveout_LDFLAGS="-lwinmm"
 fi
 
