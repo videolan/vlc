@@ -5,6 +5,8 @@
 0.5.0
 Not released yet
 
+  * ./po/se.po : Swedish translation, courtesy of Joel Arvidsson
+    <dogai@privat.utfors.se> ;
   * ./plugins/access/http.c: fixed a double free bug and a memory leak.
   * MacOS X: added messages and playlist panel, dock menu, context menu 
     in video view and localization support.
