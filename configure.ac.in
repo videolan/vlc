@@ -961,7 +961,7 @@ then
       AC_CHECK_HEADERS(dvbpsi/dr.h,
         [ PLUGINS="${PLUGINS} ts_dvbpsi"
           LDFLAGS_ts_dvbpsi="${LDFLAGS_ts_dvbpsi} -ldvbpsi" ],
-        [  AC_MSG_ERROR([cannot find libdvbpsi headers]) ],
+        [  AC_MSG_WARN([cannot find libdvbpsi headers]) ],
         [#include <stdint.h>
 #include <dvbpsi/dvbpsi.h>
 #include <dvbpsi/descriptor.h>
