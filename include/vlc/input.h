@@ -35,6 +35,7 @@ extern "C" {
  * Required internal headers
  *****************************************************************************/
 #include "vlc_block.h"
+#include "vlc_meta.h"
 
 #include "vlc_es.h"
 #include "vlc_es_out.h"

@@ -211,6 +211,7 @@ static inline char *vlc_b64_encode( unsigned char *src )
     return ret;
 }
 
+VLC_EXPORT( int, net_ConvertIPv4, ( uint32_t *p_addr, const char * psz_address ) );
 
 /* Portable networking layer communication */
 #define net_OpenTCP(a, b, c) __net_OpenTCP(VLC_OBJECT(a), b, c)

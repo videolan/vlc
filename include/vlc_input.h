@@ -346,6 +346,9 @@ struct input_thread_t
     int         i_bookmark;
     seekpoint_t **bookmark;
 
+    /* Global meta datas FIXME move to input_item_t ? */
+    vlc_meta_t  *p_meta;
+
     /* Output */
     es_out_t    *p_es_out;
     sout_instance_t *p_sout;            /* XXX Move it to es_out ? */
