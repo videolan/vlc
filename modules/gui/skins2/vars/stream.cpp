@@ -2,7 +2,7 @@
  * time.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: time.cpp 6996 2004-03-07 12:55:32Z ipkiss $
+ * $Id$
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -72,7 +72,8 @@ const string Stream::getAsStringFullName() const
     }
     else
     {
-        ret = getIntf()->p_sys->p_playlist->p_input->psz_source;
+#warning "FIXME!"
+        ret = getIntf()->p_sys->p_playlist->p_input->input.p_item->psz_uri;
     }
 
     return ret;

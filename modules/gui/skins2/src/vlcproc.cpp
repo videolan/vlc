@@ -192,7 +192,8 @@ void VlcProc::manage()
     if( pInput && !pInput->b_die )
     {
         // Refresh time variables
-        if( pInput->stream.b_seekable )
+#warning "FIXME!"
+        if( true /* pInput->stream.b_seekable */ )
         {
             // Refresh position in the stream
             vlc_value_t pos;
@@ -213,7 +214,9 @@ void VlcProc::manage()
         pVarPlaying->set( status == PLAYLIST_RUNNING );
         pVarStopped->set( status == PLAYLIST_STOPPED );
         pVarPaused->set( status == PLAYLIST_PAUSED );
-        pVarSeekable->set( pInput->stream.b_seekable );
+
+#warning "FIXME!"
+        pVarSeekable->set( true /* pInput->stream.b_seekable */ );
     }
     else
     {
@@ -291,11 +294,12 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     if( p_playlist->p_input )
     {
         // Create a command to update the stream variable
-        // XXX: we should not need to access p_inpu->psz_source directly, a
+        // XXX: we should not need to access p_input->psz_source directly, a
         // getter should be provided by VLC core
         Stream *pStream = (Stream*)pThis->m_cVarStream.get();
+#warning "FIXME!"
         UString srcName( pThis->getIntf(),
-                         p_playlist->p_input->psz_source );
+                         p_playlist->p_input->input.p_item->psz_uri );
         CmdSetStream *pCmd = new CmdSetStream( pThis->getIntf(), *pStream,
                                                srcName, false );
         // Push the command in the asynchronous command queue

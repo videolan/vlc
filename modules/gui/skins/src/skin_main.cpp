@@ -353,8 +353,6 @@ int SkinManage( intf_thread_t *p_intf )
     {
         input_thread_t  * p_input = p_intf->p_sys->p_input;
 
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
         // Refresh sound volume
         audio_volume_t volume;
 
@@ -367,18 +365,17 @@ int SkinManage( intf_thread_t *p_intf )
             p_intf->p_sys->p_theme->EvtBank->Get( "volume_refresh" ),
             (long)( volume * SLIDER_RANGE / (AOUT_VOLUME_DEFAULT * 2) ) );
 
+#if 1
+#warning "FIXME!"
+#else
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+
         // Refresh slider
         // if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
 #define p_area p_input->stream.p_selected_area
         if( p_input->stream.b_seekable && p_area->i_size )
+#endif
         {
-
-            // Set value of sliders
-            long Value = SLIDER_RANGE * p_area->i_tell / p_area->i_size;
-
-            // Update sliders
-            OSAPI_PostMessage( NULL, CTRL_SET_SLIDER, (unsigned int)
-                p_intf->p_sys->p_theme->EvtBank->Get( "time" ), (long)Value );
 
             // Text char * for updating text controls
             char *text = new char[MSTRTIME_MAX_SIZE];
@@ -387,6 +384,13 @@ int SkinManage( intf_thread_t *p_intf )
 
             i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
             i_length = var_GetTime( p_intf->p_sys->p_input, "length" ) / I64C(1000000 );
+
+            // Set value of sliders
+            long Value = SLIDER_RANGE * i_seconds / i_length;
+
+            // Update sliders
+            OSAPI_PostMessage( NULL, CTRL_SET_SLIDER, (unsigned int)
+                p_intf->p_sys->p_theme->EvtBank->Get( "time" ), (long)Value );
 
             // Create end time text
             secstotimestr( &text[1], i_length - i_seconds );
@@ -409,7 +413,11 @@ int SkinManage( intf_thread_t *p_intf )
 
 #undef p_area
         }
+
+#warning "FIXME!"
+#if 0
         vlc_mutex_unlock( &p_input->stream.stream_lock );
+#endif
     }
     //-------------------------------------------------------------------------
     vlc_mutex_unlock( &p_intf->change_lock );

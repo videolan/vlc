@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <stdlib.h>
+#include <vlc/input.h>
 #include "dialogs.hpp"
 #include "os_factory.hpp"
 #include "os_loop.hpp"
