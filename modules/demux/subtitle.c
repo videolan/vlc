@@ -66,6 +66,9 @@ vlc_module_begin();
     add_float( "sub-fps", 0.0, NULL,
                N_("Frames per second"),
                SUB_FPS_LONGTEXT, VLC_TRUE );
+    add_integer( "sub-delay", 0, NULL,
+               N_("Subtitles delay"),
+               SUB_DELAY_LONGTEXT, VLC_TRUE );
     add_string( "sub-type", "auto", NULL, "Subtitles fileformat",
                 SUB_TYPE_LONGTEXT, VLC_TRUE );
         change_string_list( ppsz_sub_type, 0, 0 );
@@ -116,12 +119,12 @@ struct demux_sys_t
     int64_t     i_next_demux_date;
 
     int64_t     i_microsecperframe;
+    mtime_t     i_original_mspf;
 
     char        *psz_header;
     int         i_subtitle;
     int         i_subtitles;
     subtitle_t  *subtitle;
-    mtime_t     i_original_mspf;
 
     int64_t     i_length;
 };
@@ -182,7 +185,6 @@ static int Open ( vlc_object_t *p_this )
     p_sys->i_subtitle = 0;
     p_sys->i_subtitles= 0;
     p_sys->subtitle   = NULL;
-    p_sys->i_original_mspf = 0;
 
 
     /* Get the FPS */
@@ -191,6 +193,16 @@ static int Open ( vlc_object_t *p_this )
     if( f_fps >= 1.0 )
     {
         p_sys->i_microsecperframe = (mtime_t)( (float)1000000 / f_fps );
+    }
+
+    f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" );
+    if( f_fps >= 1.0 )
+    {
+        p_sys->i_original_mspf = (mtime_t)( (float)1000000 / f_fps );
+    }
+    else
+    {
+        p_sys->i_original_mspf = 0;
     }
 
     /* Get or probe the type */
@@ -769,11 +781,11 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle )
                         p_sys->i_original_mspf != 0)
                     {
                         p_subtitle->i_start = (mtime_t)i_start *
-                                              p_sys->i_original_mspf /
-                                              p_sys->i_microsecperframe;
+                                              p_sys->i_microsecperframe/
+                                              p_sys->i_original_mspf;
                         p_subtitle->i_stop  = (mtime_t)i_stop  *
-                                              p_sys->i_original_mspf /
-                                              p_sys->i_microsecperframe;
+                                              p_sys->i_microsecperframe /
+                                              p_sys->i_original_mspf;
                     }
                     return 0;
                 }

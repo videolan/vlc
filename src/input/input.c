@@ -514,7 +514,7 @@ static int Init( input_thread_t * p_input )
     vlc_value_t val;
     double f_fps;
     vlc_meta_t *p_meta, *p_meta_user;
-    int i;
+    int i, i_delay;
 
     /* Initialize optional stream output. (before access/demuxer) */
     psz = var_GetString( p_input, "sout" );
@@ -628,13 +628,26 @@ static int Init( input_thread_t * p_input )
         f_fps > 1.0 )
     {
         vlc_value_t fps;
+        float f_requested_fps;
 
-        if( var_Get( p_input, "sub-fps", &fps ) )
+        var_Create( p_input, "sub-original-fps", VLC_VAR_FLOAT );
+        var_SetFloat( p_input, "sub-original-fps", f_fps );
+
+        f_requested_fps = var_CreateGetFloat( p_input, "sub-fps" );
+        if( f_requested_fps != f_fps )
         {
             var_Create( p_input, "sub-fps", VLC_VAR_FLOAT| VLC_VAR_DOINHERIT );
-            var_SetFloat( p_input, "sub-fps", f_fps );
+            var_SetFloat( p_input, "sub-fps", f_requested_fps );
         }
     }
+
+    i_delay = var_CreateGetInteger( p_input, "sub-delay" );
+
+    if( i_delay != 0 )
+    {
+        var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
+    }
+
 
     /* Look for and add subtitle files */
     psz_subtitle = var_GetString( p_input, "sub-file" );

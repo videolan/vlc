@@ -293,7 +293,7 @@ static void Run( intf_thread_t *p_intf )
         {
             int64_t i_delay = var_GetTime( p_input, "spu-delay" );
 
-            i_delay -= 10000;    /* 10 ms */
+            i_delay -= 50000;    /* 50 ms */
 
             var_SetTime( p_input, "spu-delay", i_delay );
             ClearChannels( p_intf, p_vout );
@@ -304,7 +304,7 @@ static void Run( intf_thread_t *p_intf )
         {
             int64_t i_delay = var_GetTime( p_input, "spu-delay" );
 
-            i_delay += 10000;    /* 10 ms */
+            i_delay += 50000;    /* 50 ms */
 
             var_SetTime( p_input, "spu-delay", i_delay );
             ClearChannels( p_intf, p_vout );
