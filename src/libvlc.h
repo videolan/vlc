@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.133 2004/02/11 19:17:13 fenrir Exp $
+ * $Id: libvlc.h,v 1.134 2004/02/20 17:20:01 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -523,6 +523,12 @@ static char *ppsz_align_descriptions[] = { N_("Center"),
     "slow. You should only activate this if you know what you're " \
     "doing.")
 
+#define RT_OFFSET_TEXT N_("Adjust VLC priority")
+#define RT_OFFSET_LONGTEXT N_( \
+    "This options adds an offset (positive or negative) to VLC default " \
+    "priorities. You can use it to tune VLC priority against other " \
+    "programs, or against other VLC instances.")
+
 #define MINIMIZE_THREADS_TXT N_("Minimize number of threads")
 #define MINIMIZE_THREADS_LONGTXT N_( \
      "This option minimizes the number of threads needed to run VLC")
@@ -848,6 +854,10 @@ vlc_module_begin();
 
 #if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT, RT_PRIORITY_LONGTEXT, VLC_TRUE );
+#endif
+
+#if !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+    add_integer( "rt-offset", 0, NULL, RT_OFFSET_TEXT, RT_OFFSET_LONGTEXT, VLC_TRUE );
 #endif
 
 #if defined(WIN32)
