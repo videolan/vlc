@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.5 2003/06/14 21:06:30 hartman Exp $
+# $Id: vlc.ebuild,v 1.6 2003/06/20 01:27:55 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -20,7 +20,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 ###############################################################################
-IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows"
+IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows imlib"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
@@ -66,13 +66,14 @@ DEPEND="X? ( virtual/x11 )
 	slp? ( >=net-libs/openslp-1.0.10 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
 	lirc? ( app-misc/lirc )
+	imlib? ( >=media-libs/imlib2-1.0.6 )
 	wxwindows? ( >=x11-libs/wxGTK-2.4.0 )
         >=media-libs/libdvbpsi-0.1.2
 	>=media-sound/mad-0.14.2b
+	>=media-libs/faad2-1.1
 	>=media-libs/a52dec-0.7.4"
 # other optional libraries
 #	>=media-libs/flac-1.1.0
-#	>=media-libs/faad2-1.2
 #	>=media-libs/libdv-0.98
 
 # not in gentoo
@@ -211,6 +212,8 @@ src_compile(){
 	use v4l && myconf="${myconf} --enable-v4l"
 
 	# wxwindows is a local USE var. already enabled by default, but depends on wxGTK
+	# but if we use wxwindows and imlib, then we can also use skins
+	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins"
 
 	# vlc uses its own ultraoptimizaed CXXFLAGS
 	# and forcing custom ones generally fails building
@@ -224,6 +227,7 @@ src_compile(){
 		--enable-dvbpsi \
 		--enable-release \
 		--enable-mad \
+		--enable-faad \
 		--enable-a52"
 
 	ewarn ${myconf}
