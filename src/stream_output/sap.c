@@ -248,9 +248,9 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         if( p_method->i_ip_version == 6 )
         {
             char sz_scope;
-            if( p_method->psz_ipv6_scope != NULL )
+            if( p_method->sz_ipv6_scope )
             {
-                sz_scope = *p_method->psz_ipv6_scope;
+                sz_scope = p_method->sz_ipv6_scope;
             }
             else
             {
@@ -318,6 +318,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
             p_address->b_enabled = VLC_TRUE;
             p_address->b_ready = VLC_TRUE;
             p_address->i_interval = config_GetInt( p_sap,"sap-interval");
+            p_address->i_rfd = -1;
         }
 
         if( p_address->i_wfd == -1 || (p_address->i_rfd == -1
@@ -435,6 +436,10 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
             REMOVE_ELEM( p_sap->pp_sessions,
                          p_sap->i_sessions,
                          i );
+
+            FREE( p_session->p_sap->psz_sdp );
+            FREE( p_session->p_sap->psz_data );
+            free( p_session->p_sap );
             break;
         }
     }

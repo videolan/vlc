@@ -260,8 +260,8 @@ struct announce_method_t
 
     /* For SAP */
     int i_ip_version;
-    char *psz_ipv6_scope;
     char *psz_address; /* If we use a custom address */
+    char sz_ipv6_scope;
 };
 
 
