@@ -10,7 +10,7 @@ diff -ru ffmpeg.orig/configure ffmpeg/configure
  CFLAGS="$CFLAGS -fno-expensive-optimizations"
  ;;
  esac
-@@ -374,11 +374,11 @@
+@@ -374,7 +374,7 @@
    ;;
    --extra-ldflags=*) LDFLAGS="$LDFLAGS ${opt#--extra-ldflags=}"
    ;;
