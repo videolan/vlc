@@ -1355,11 +1355,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
-        if (i_pts < p_sys->i_start_pts)
-        {
-            p_block->i_pts = -1;
-        }
-        else if( tk.fmt.i_cat != VIDEO_ES )
+        if( tk.fmt.i_cat != VIDEO_ES )
         {
             p_block->i_dts = p_block->i_pts = i_pts;
         }
@@ -1391,7 +1387,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
     int64_t     i_block_ref1;
     int64_t     i_block_ref2;
 
-    int         i_index;
+    int         i_index = 0;
     int         i_track_skipping;
     int         i_track;
 
@@ -1409,73 +1405,80 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
     /* seek without index or without date */
     if( i_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 ))
     {
-        int64_t i_pos = i_percent * stream_Size( p_demux->s ) / 100;
-
-        msg_Dbg( p_demux, "inacurate way of seeking" );
-        for( i_index = 0; i_index < p_sys->i_index; i_index++ )
+        if (p_sys->f_duration >= 0)
         {
-            if( p_sys->index[i_index].i_position >= i_pos)
-            {
-                break;
-            }
+            i_date = i_percent * p_sys->f_duration * 10;
         }
-        if( i_index == p_sys->i_index )
+        else
         {
-            i_index--;
-        }
+            int64_t i_pos = i_percent * stream_Size( p_demux->s ) / 100;
 
-        p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
-                                   seek_beginning );
-
-        if( p_sys->index[i_index].i_position < i_pos )
-        {
-            EbmlElement *el;
-
-            msg_Warn( p_demux, "searching for cluster, could take some time" );
-
-            /* search a cluster */
-            while( ( el = p_sys->ep->Get() ) != NULL )
+            msg_Dbg( p_demux, "inacurate way of seeking" );
+            for( i_index = 0; i_index < p_sys->i_index; i_index++ )
             {
-                if( MKV_IS_ID( el, KaxCluster ) )
+                if( p_sys->index[i_index].i_position >= i_pos)
                 {
-                    KaxCluster *cluster = (KaxCluster*)el;
+                    break;
+                }
+            }
+            if( i_index == p_sys->i_index )
+            {
+                i_index--;
+            }
 
-                    /* add it to the index */
-                    IndexAppendCluster( p_demux, cluster );
+            i_date = p_sys->index[i_index].i_time;
 
-                    if( (int64_t)cluster->GetElementPosition() >= i_pos )
+#if 0
+            if( p_sys->index[i_index].i_position < i_pos )
+            {
+                EbmlElement *el;
+
+                msg_Warn( p_demux, "searching for cluster, could take some time" );
+
+                /* search a cluster */
+                while( ( el = p_sys->ep->Get() ) != NULL )
+                {
+                    if( MKV_IS_ID( el, KaxCluster ) )
                     {
-                        p_sys->cluster = cluster;
-                        p_sys->ep->Down();
-                        break;
+                        KaxCluster *cluster = (KaxCluster*)el;
+
+                        /* add it to the index */
+                        IndexAppendCluster( p_demux, cluster );
+
+                        if( (int64_t)cluster->GetElementPosition() >= i_pos )
+                        {
+                            p_sys->cluster = cluster;
+                            p_sys->ep->Down();
+                            break;
+                        }
                     }
                 }
             }
+#endif
         }
     }
-    else
+
+    for( ; i_index < p_sys->i_index; i_index++ )
     {
-        for( i_index = 0; i_index < p_sys->i_index; i_index++ )
+        if( p_sys->index[i_index].i_time > i_date )
         {
-            if( p_sys->index[i_index].i_time >= i_date )
-            {
-                break;
-            }
+            break;
         }
-
-        if( i_index > 0 )
-        {
-            i_index--;
-        }
-
-        msg_Dbg( p_demux, "seek got "I64Fd" (%d%%)",
-                 p_sys->index[i_index].i_time,
-                 (int)( 100 * p_sys->index[i_index].i_position /
-                        stream_Size( p_demux->s ) ) );
-
-        p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
-                                   seek_beginning );
     }
+
+    if( i_index > 0 )
+    {
+        i_index--;
+    }
+
+    msg_Dbg( p_demux, "seek got "I64Fd" (%d%%)",
+                p_sys->index[i_index].i_time,
+                (int)( 100 * p_sys->index[i_index].i_position /
+                    stream_Size( p_demux->s ) ) );
+
+    p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
+                                seek_beginning );
+
 
     /* now parse until key frame */
 #define tk  p_sys->track[i_track]
@@ -1512,14 +1515,18 @@ static void Seek( demux_t *p_demux, mtime_t i_date, int i_percent)
 
         if( i_track < p_sys->i_track )
         {
-            if( tk.fmt.i_cat == VIDEO_ES && i_block_ref1 == -1 && tk.b_search_keyframe )
+            if( tk.fmt.i_cat == VIDEO_ES )
             {
-                tk.b_search_keyframe = VLC_FALSE;
-                i_track_skipping--;
-            }
-            if( tk.fmt.i_cat == VIDEO_ES && !tk.b_search_keyframe )
-            {
-                BlockDecode( p_demux, block, 0, 0 );
+                if( i_block_ref1 == -1 && tk.b_search_keyframe )
+                {
+                    tk.b_search_keyframe = VLC_FALSE;
+                    i_track_skipping--;
+                }
+                if( !tk.b_search_keyframe )
+                {
+                    BlockDecode( p_demux, block, 0, 0 );
+/*                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, block->GlobalTimecode() / (mtime_t) 1000 );*/
+                }
             }
         }
 
@@ -1557,7 +1564,7 @@ static int Demux( demux_t *p_demux)
 
         p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000;
 
-        if( p_sys->i_pts > p_sys->i_start_pts  )
+        if( p_sys->i_pts >= p_sys->i_start_pts  )
         {
             es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pts );
         }
@@ -1567,11 +1574,7 @@ static int Demux( demux_t *p_demux)
         delete block;
         i_block_count++;
 
-        if( i_start_pts == -1 )
-        {
-            i_start_pts = p_sys->i_pts;
-        }
-        else if( p_sys->i_pts > i_start_pts + (mtime_t)100000 || i_block_count > 5 )
+        if( p_sys->i_pts > i_start_pts + (mtime_t)100000 || i_block_count > 5 )
         {
             return 1;
         }
@@ -2623,7 +2626,7 @@ static void ParseInfo( demux_t *p_demux, EbmlElement *info )
         }
     }
 
-    p_sys->f_duration = p_sys->f_duration * p_sys->i_timescale / 1000000.0;
+    p_sys->f_duration *= p_sys->i_timescale / 1000000.0;
 }
 
 
