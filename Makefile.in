@@ -106,10 +106,9 @@ endif
 
 # Optimizations : don't compile debug versions with them
 ifeq ($(OPTIMS),1)
-CFLAGS += -O6
-CFLAGS += -ffast-math -funroll-loops -funroll-all-loops
+CFLAGS += -O3
+CFLAGS += -ffast-math -funroll-loops
 CFLAGS += -fomit-frame-pointer
-CFLAGS += @BIZARRE_OPTIMS@
 
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
