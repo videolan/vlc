@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.9 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: ioctl.h,v 1.10 2001/12/11 14:43:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,6 +43,19 @@ int ioctl_SendKey2          ( int, int *, u8 * );
     rdc.data = (char *)p_buffer; \
     rdc.data_length = (SIZE); \
     BeInitRDC( &rdc, (TYPE) );
+#endif
+
+/*****************************************************************************
+ * Common macro, HP-UX specific
+ *****************************************************************************/
+#if defined( HPUX_SCTL_IO )
+#define INIT_SCTL_IO( TYPE, SIZE ) \
+    struct sctl_io sctl_io; \
+    u8 p_buffer[ (SIZE) ]; \
+    memset( &sctl_io, 0, sizeof( sctl_io ) ); \
+    sctl_io.data = (void *)p_buffer; \
+    sctl_io.data_length = (SIZE); \
+    HPUXInitSCTL( &sctl_io, (TYPE) );
 #endif
 
 /*****************************************************************************
@@ -92,7 +105,7 @@ int ioctl_SendKey2          ( int, int *, u8 * );
  * Various DVD I/O tables
  *****************************************************************************/
 
-#if defined( SYS_BEOS ) || defined( WIN32 ) || defined ( SOLARIS_USCSI )
+#if defined( SYS_BEOS ) || defined( WIN32 ) || defined ( SOLARIS_USCSI ) || defined ( HPUX_SCTL_IO )
     /* The generic packet command opcodes for CD/DVD Logical Units,
      * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */
 #   define GPCMD_READ_DVD_STRUCTURE 0xad

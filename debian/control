@@ -115,4 +115,12 @@ Description: MAD plugin for vlc
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.
  .
  This plugin adds support for libmad, the MPEG audio decoder library, to
- the VideoLAN Client. MAD is 100% fixed-point based.
+ the VideoLAN Client. MAD is 100% fixed-point based.Package: vlc-mad
+
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: aRts plugin for vlc
+ VideoLAN is a free MPEG, MPEG2 and DVD software solution.
+ .
+ This plugin adds support for the aRts Sound System to vlc, the
+ VideoLAN Client.

@@ -512,6 +512,14 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
     ])
   ])
   dnl
+  dnl HP-UX: sys/scsi.h
+  dnl
+  AC_CHECK_HEADER(sys/scsi.h,[
+    AC_EGREP_HEADER(sctl_io,sys/scsi.h,[
+      AC_DEFINE(HPUX_SCTL_IO, 1, Define if <sys/scsi.h> defines sctl_io.)
+    ])
+  ])
+  dnl
   dnl Final tests to check what was detected
   dnl
   if test x$LINUX_DVD_STRUCT = x1; then

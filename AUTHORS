@@ -244,6 +244,10 @@ E: richard@rshepherd.demon.co.uk
 C: richards
 D: BeOS video output (BBitmap and Overlay)
 
+N: David Siebörger
+E: drs-videolan@rucus.ru.ac.za
+D: HP-UX port of the DVD ioctls
+
 N: Espen Skoglund
 E: esk@ira.uka.de
 D: FreeBSD autoconf and Makefile patches
