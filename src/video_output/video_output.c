@@ -167,7 +167,6 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
                  p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
 
     /* Initialize idle screen */
-    p_vout->last_display_date   = mdate();
     p_vout->last_display_date   = 0;
     p_vout->last_idle_date      = 0;
 
@@ -930,8 +929,6 @@ static int InitThread( vout_thread_t *p_vout )
     /* Mark thread as running and return */
     p_vout->b_active =          1;
     *p_vout->pi_status =        THREAD_READY;
-    /* cheats the clock so that the display come as soon as the thread is run */
-    p_vout->last_display_date = mdate()-5000000;
 
     
     intf_DbgMsg("thread ready\n");
@@ -1766,20 +1763,20 @@ static int RenderIdle( vout_thread_t *p_vout )
                        &i_width, &i_height );
         if( !Align( p_vout, &i_x, &i_y, i_width, i_height, CENTER_RALIGN, CENTER_RALIGN ) )
         {
-            i_amount = (int) ((current_date - p_vout->last_display_date- VOUT_IDLE_DELAY) / 5000LL);            
+            i_amount = (int) ((current_date - p_vout->last_display_date ) / 5000LL);            
             vout_Print( p_vout->p_large_font,
                         p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                         i_x * p_vout->i_bytes_per_pixel + i_y * p_vout->i_bytes_per_line,
                         p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                         p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
-                        WIDE_TEXT | OUTLINED_TEXT, psz_text,  i_amount );
+                        WIDE_TEXT | OUTLINED_TEXT, psz_text,  (i_amount / 10 ) %100);
 
             vout_Print( p_vout->p_large_font,
                     p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                     i_x * p_vout->i_bytes_per_pixel + (i_y + 16) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
-                    WIDE_TEXT | OUTLINED_TEXT, psz_wtext,  (i_amount/2)%110 );
+                    WIDE_TEXT | OUTLINED_TEXT, psz_wtext,  (i_amount/30)%110 );
             
 
             SetBufferArea( p_vout, i_x, i_y, i_width, i_height + 16 );

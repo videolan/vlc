@@ -56,7 +56,7 @@ typedef struct intf_sys_s
 {
     /* SDL system information */
     SDL_Surface * p_display;
-    int isFullscreen;	
+    boolean_t b_Fullscreen;	
 } intf_sys_t;
 
 typedef struct vout_sys_s
@@ -181,7 +181,7 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
 {
     SDL_FreeSurface( p_intf->p_vout->p_sys->p_display );
     
-    if(p_intf->p_sys->isFullscreen == 1)
+    if(p_intf->p_sys->b_Fullscreen == 0)
     {
         p_intf->p_vout->p_sys->p_display = 
                 SDL_SetVideoMode(
@@ -191,7 +191,7 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
                                  SDL_ANYFORMAT |
                                  SDL_HWSURFACE |
                                  SDL_DOUBLEBUF);
-        p_intf->p_sys->isFullscreen = 0;
+        p_intf->p_sys->b_Fullscreen = 1;
     }
     else
     {
@@ -204,7 +204,7 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
                                  SDL_HWSURFACE |
                                  SDL_DOUBLEBUF |
                                  SDL_FULLSCREEN );
-        p_intf->p_sys->isFullscreen = 1;                        
+        p_intf->p_sys->b_Fullscreen = 0;                        
     }
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);
     p_intf->p_vout->p_sys->p_buffer[ 0 ] = p_intf->p_vout->p_sys->p_display->pixels;
