@@ -30,6 +30,7 @@
 #include "os_timer.hpp"
 #include "var_manager.hpp"
 #include "../commands/async_queue.hpp"
+#include "../commands/cmd_change_skin.hpp"
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_vars.hpp"
 #include "../utils/var_bool.hpp"
@@ -99,6 +100,8 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // Called when a playlist item changed
     var_AddCallback( pIntf->p_sys->p_playlist, "item-change",
                      onItemChange, this );
+    // Called when our skins2 demux wants us to load a new skin
+    var_AddCallback( pIntf, "skin-to-load", onSkinToLoad, this );
 
     // Callbacks for vout requests
     getIntf()->pf_request_window = &getWindow;
@@ -306,6 +309,25 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
 
     // Push the command in the asynchronous command queue
     pQueue->remove( "notify playlist" );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+
+    return VLC_SUCCESS;
+}
+
+
+int VlcProc::onSkinToLoad( vlc_object_t *pObj, const char *pVariable,
+                           vlc_value_t oldVal, vlc_value_t newVal,
+                           void *pParam )
+{
+    VlcProc *pThis = ( VlcProc* )pParam;
+
+    // Create a playlist notify command
+    CmdChangeSkin *pCmd =
+        new CmdChangeSkin( pThis->getIntf(), newVal.psz_string );
+
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->remove( "change skin" );
     pQueue->push( CmdGenericPtr( pCmd ) );
 
     return VLC_SUCCESS;
