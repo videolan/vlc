@@ -129,6 +129,15 @@ void Printf( intf_thread_t *p_intf, const char *psz_fmt, ... )
 #define HOST_LONGTEXT N_("Accept commands over a socket rather than stdin. " \
             "You can set the address and port the interface will bind to." )
 
+#ifdef WIN32
+#define QUIET_TEXT N_("Do not open a DOS command box interface")
+#define QUIET_LONGTEXT N_( \
+    "By default the rc interface plugin will start a DOS command box. " \
+    "Enabling the quiet mode will not bring this command box but can also " \
+    "be pretty annoying when you want to stop VLC and no video window is " \
+    "open." )
+#endif
+
 vlc_module_begin();
     set_description( _("Remote control interface") );
     add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
@@ -137,6 +146,11 @@ vlc_module_begin();
 #endif
     add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, VLC_TRUE );
     add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, VLC_TRUE );
+
+#ifdef WIN32
+    add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_FALSE );
+#endif
+
     set_capability( "interface", 20 );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();
@@ -243,7 +257,11 @@ static int Activate( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
+#ifdef WIN32
+    if( !config_GetInt( p_intf, "rc-quiet" ) ) { CONSOLE_INTRO_MSG; }
+#else
     CONSOLE_INTRO_MSG;
+#endif
 
     printf( _("Remote control interface initialized, `h' for help\n") );
     return VLC_SUCCESS;
