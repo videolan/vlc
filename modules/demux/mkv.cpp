@@ -431,7 +431,7 @@ static int Open( vlc_object_t * p_this )
 
                     msg_Dbg( p_input, "|   |   + Title=%s", p_sys->psz_title );
                 }
-#ifdef HAVE_GMTIME_R
+#if defined( HAVE_GMTIME_R ) && !defined( SYS_DARWIN )
                 else if( EbmlId( *el2 ) == KaxDateUTC::ClassInfos.GlobalId )
                 {
                     KaxDateUTC &date = *(KaxDateUTC*)el2;
