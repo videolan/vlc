@@ -1,8 +1,8 @@
 /*****************************************************************************
- * error.h: error handling routine
+ * vlc_error.h: error handling routine
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: error.h,v 1.2 2003/01/28 02:03:32 sam Exp $
+ * $Id: vlc_error.h,v 1.1 2003/07/01 12:56:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.123 2003/06/26 12:19:59 sam Exp $
+ * $Id: modules.c,v 1.124 2003/07/01 12:56:47 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -67,7 +67,7 @@
 #   undef HAVE_DYNAMIC_PLUGINS
 #endif
 
-#include "error.h"
+#include "vlc_error.h"
 
 #include "vlc_interface.h"
 #include "vlc_playlist.h"

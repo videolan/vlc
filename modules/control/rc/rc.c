@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.34 2003/05/15 22:27:37 massiot Exp $
+ * $Id: rc.c,v 1.35 2003/07/01 12:56:47 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -46,7 +46,7 @@
 #endif
 #include <sys/types.h>
 
-#include "error.h"
+#include "vlc_error.h"
 
 #define MAX_LINE_LENGTH 256
 
