@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.43 2003/11/17 23:36:12 bigben Exp $
+ * $Id: playlist.m,v 1.44 2003/11/19 14:58:54 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -306,7 +306,7 @@
         i_current = [o_table_view selectedRow]+1; 
     }
 
-    for ( i_counter = 0 ; i_counter < [o_table_view numberOfRows] ; i_counter++ )
+    while (i_current != [o_table_view selectedRow])
     {
         vlc_mutex_lock( &p_playlist->object_lock );
         o_current_name = [NSString stringWithUTF8String: 
