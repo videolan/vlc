@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.5 2000/12/21 14:18:15 massiot Exp $
+ * $Id: input.h,v 1.6 2000/12/21 19:24:27 massiot Exp $
  *
  * Authors:
  *
@@ -78,13 +78,15 @@ void NextDataPacket ( struct bit_stream_s * );
  *****************************************************************************/
 void input_InitStream( struct input_thread_s *, size_t );
 void input_EndStream( struct input_thread_s * );
+struct pgrm_descriptor_s * input_FindProgram( struct input_thread_s *, u16 );
 struct pgrm_descriptor_s * input_AddProgram( struct input_thread_s *,
                                              u16, size_t );
-void input_DelProgram( struct input_thread_s *, u16 );
+void input_DelProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
 void input_DumpStream( struct input_thread_s * );
+struct es_descriptor_s * input_FindES( struct input_thread_s *, u16 );
 struct es_descriptor_s * input_AddES( struct input_thread_s *,
                                       struct pgrm_descriptor_s *, u16,
                                       size_t );
-void input_DelES( struct input_thread_s *, u16 );
+void input_DelES( struct input_thread_s *, struct es_descriptor_s * );
 int input_SelectES( struct input_thread_s *, struct es_descriptor_s * );
 

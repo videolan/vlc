@@ -3,7 +3,7 @@
  * FIXME : check the return value of realloc() and malloc() !
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.12 2000/12/21 14:18:15 massiot Exp $
+ * $Id: input_programs.c,v 1.13 2000/12/21 19:24:27 massiot Exp $
  *
  * Authors:
  *
@@ -41,6 +41,7 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input.h"
+#include "input_dec.h"
 
 #include "main.h"                                     /* --noaudio --novideo */
 
@@ -55,7 +56,8 @@
 void input_InitStream( input_thread_t * p_input, size_t i_data_len )
 {
     p_input->stream.i_stream_id = 0;
-    p_input->stream.i_pgrm_number = 0;
+    p_input->stream.pp_es = NULL;
+    p_input->stream.pp_selected_es = NULL;
     p_input->stream.pp_programs = NULL;
 
     if( i_data_len )
@@ -70,25 +72,41 @@ void input_InitStream( input_thread_t * p_input, size_t i_data_len )
  *****************************************************************************/
 void input_EndStream( input_thread_t * p_input )
 {
-    int i, j;
+    int i;
+
+    /* Free all programs and associated ES, and associated decoders. */
+    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+    {
+        /* Don't put i instead of 0 !! */
+        input_DelProgram( p_input, p_input->stream.pp_programs[0] );
+    }
+    free( p_input->stream.pp_programs );
+
+    /* Free standalone ES */
+    for( i = 0; i < p_input->stream.i_es_number; i++ )
+    {
+        input_DelES( p_input, p_input->stream.pp_es[0] );
+    }
+    free( p_input->stream.pp_es );
+    free( p_input->stream.pp_selected_es );
+}
+
+/*****************************************************************************
+ * input_FindProgram: returns a pointer to a program described by its ID
+ *****************************************************************************/
+pgrm_descriptor_t * input_FindProgram( input_thread_t * p_input, u16 i_pgrm_id )
+{
+    int     i;
 
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
-        for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
+        if( p_input->stream.pp_programs[i]->i_number == i_pgrm_id )
         {
-            if( p_input->stream.pp_programs[i]->pp_es[j]->p_demux_data != NULL )
-            {
-                free( p_input->stream.pp_programs[i]->pp_es[j]->p_demux_data );
-            }
-            free( p_input->stream.pp_programs[i]->pp_es[j] );
+            return p_input->stream.pp_programs[i];
         }
-
-        if( p_input->stream.pp_programs[i]->p_demux_data != NULL )
-        {
-            free( p_input->stream.pp_programs[i]->p_demux_data );
-        }
-        free( p_input->stream.pp_programs[i] );
     }
+
+    return( NULL );
 }
 
 /*****************************************************************************
@@ -151,32 +169,18 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
  *****************************************************************************
  * All ES descriptions referenced in the descriptor will be deleted.
  *****************************************************************************/
-void input_DelProgram( input_thread_t * p_input, u16 i_pgrm_id )
+void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 {
-    int i_index, i_pgrm_index = -1;
-    pgrm_descriptor_t * p_pgrm = NULL;
+    int i_index, i_pgrm_index;
 
-    intf_DbgMsg("Deleting description for pgrm %d", i_pgrm_id);
+    ASSERT( p_pgrm );
 
-    /* Find where this program is described */
-    for( i_index = 0; i_index < p_input->stream.i_pgrm_number; i_index++ )
-    {
-        if( p_input->stream.pp_programs[i_index]->i_number == i_pgrm_id )
-        {
-            i_pgrm_index = i_index;
-            p_pgrm = p_input->stream.pp_programs[ i_pgrm_index ];
-            break;
-        }
-    }
-
-    /* Make sure that the pgrm exists */
-    ASSERT(i_pgrm_index >= 0);
-    ASSERT(p_pgrm);
+    intf_DbgMsg("Deleting description for pgrm %d", p_pgrm->i_stream_id);
 
     /* Free the structures that describe the es that belongs to that program */
     for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
     {
-        input_DelES( p_input, p_pgrm->pp_es[i_index]->i_id );
+        input_DelES( p_input, p_pgrm->pp_es[i_index] );
     }
 
     /* Free the table of es descriptors */
@@ -188,8 +192,13 @@ void input_DelProgram( input_thread_t * p_input, u16 i_pgrm_id )
         free( p_pgrm->p_demux_data );
     }
 
-    /* Free the description of this stream */
-    free( p_pgrm );
+    /* Find the program in the programs table */
+    for( i_pgrm_index = 0; i_pgrm_index < p_input->stream.i_pgrm_number;
+         i_pgrm_index++ )
+    {
+        if( p_input->stream.pp_programs[i_pgrm_index] == p_pgrm )
+            break;
+    }
 
     /* Remove this program from the stream's list of programs */
     p_input->stream.i_pgrm_number--;
@@ -198,6 +207,27 @@ void input_DelProgram( input_thread_t * p_input, u16 i_pgrm_id )
     p_input->stream.pp_programs = realloc( p_input->stream.pp_programs,
                                            p_input->stream.i_pgrm_number
                                             * sizeof(pgrm_descriptor_t *) );
+
+    /* Free the description of this program */
+    free( p_pgrm );
+}
+
+/*****************************************************************************
+ * input_FindES: returns a pointer to an ES described by its ID
+ *****************************************************************************/
+es_descriptor_t * input_FindES( input_thread_t * p_input, u16 i_es_id )
+{
+    int     i;
+
+    for( i = 0; i < p_input->stream.i_es_number; i++ )
+    {
+        if( p_input->stream.pp_es[i]->i_id == i_es_id )
+        {
+            return p_input->stream.pp_es[i];
+        }
+    }
+
+    return( NULL );
 }
 
 /*****************************************************************************
@@ -216,10 +246,11 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     intf_DbgMsg("Adding description for ES %d", i_es_id);
 
     p_es = (es_descriptor_t *)malloc( sizeof(es_descriptor_t) );
-    p_input->i_es_number++;
-    p_input->pp_es = realloc( p_input->pp_es, p_input->i_es_number
-                                               * sizeof(es_descriptor_t *) );
-    p_input->pp_es[p_input->i_es_number - 1] = p_es;
+    p_input->stream.i_es_number++;
+    p_input->stream.pp_es = realloc( p_input->stream.pp_es,
+                                     p_input->stream.i_es_number
+                                      * sizeof(es_descriptor_t *) );
+    p_input->stream.pp_es[p_input->stream.i_es_number - 1] = p_es;
     p_es->i_id = i_es_id;
 
     /* Init its values */
@@ -254,32 +285,28 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
 /*****************************************************************************
  * input_DelES:
  *****************************************************************************/
-void input_DelES( input_thread_t * p_input, u16 i_id )
+void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    int                     i_index, i_es;
-    pgrm_descriptor_t *     p_pgrm = NULL;
-    es_descriptor_t *       p_es = NULL;
-
-    /* Look for the description of the ES */
-    for( i_es = 0; i_es < p_input->i_es_number; i_es++ )
-    {
-        if( p_input->pp_es[i_es]->i_id == i_id )
-        {
-            p_es = p_input->pp_es[i_es];
-            p_pgrm = p_input->pp_es[i_es]->p_pgrm;
-            break;
-        }
-    }
+    int                     i_index, i_es_index;
+    pgrm_descriptor_t *     p_pgrm;
 
     ASSERT( p_es );
+    p_pgrm = p_es->p_pgrm;
+
+    /* Kill associated decoder, if any. */
+    if( p_es->p_decoder_fifo != NULL )
+    {
+        input_EndDecoder( p_es->p_decoder_fifo, p_es->thread_id );
+        free( p_es->p_decoder_fifo );
+    }
 
     /* Remove this ES from the description of the program if it is associated to
      * one */
     if( p_pgrm )
     {
-        for( i_index = 0; ; i_index++ )
+        for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
         {
-            if( p_pgrm->pp_es[i_index]->i_id == i_id )
+            if( p_pgrm->pp_es[i_index] == p_es )
             {
                 p_pgrm->i_es_number--;
                 p_pgrm->pp_es[i_index] = p_pgrm->pp_es[p_pgrm->i_es_number];
@@ -297,12 +324,22 @@ void input_DelES( input_thread_t * p_input, u16 i_id )
         free( p_es->p_demux_data );
     }
 
+    /* Find the ES in the ES table */
+    for( i_es_index = 0; i_es_index < p_input->stream.i_es_number;
+         i_es_index++ )
+    {
+        if( p_input->stream.pp_es[i_es_index] == p_es )
+            break;
+    }
+
     /* Free the ES */
     free( p_es );
-    p_input->i_es_number--;
-    p_input->pp_es[i_es] = p_input->pp_es[p_input->i_es_number];
-    p_input->pp_es = realloc( p_input->pp_es, p_input->i_es_number
-                                               * sizeof(es_descriptor_t *));
+    p_input->stream.i_es_number--;
+    p_input->stream.pp_es[i_es_index] =
+                    p_input->stream.pp_es[p_input->stream.i_es_number];
+    p_input->stream.pp_es = realloc( p_input->stream.pp_es,
+                                     p_input->stream.i_es_number
+                                      * sizeof(es_descriptor_t *));
 }
 
 #ifdef STATS
@@ -417,9 +454,16 @@ static adec_config_t * GetAdecConfig( input_thread_t * p_input,
 /*****************************************************************************
  * input_SelectES: selects an ES and spawns the associated decoder
  *****************************************************************************/
+/* FIXME */
+vlc_thread_t adec_CreateThread( void * );
+vlc_thread_t ac3dec_CreateThread( void * );
+vlc_thread_t vpar_CreateThread( void * );
+vlc_thread_t spudec_CreateThread( void * );
+
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    int                 i;
+    /* FIXME ! */
+    decoder_capabilities_t  decoder;
 
 #ifdef DEBUG_INPUT
     intf_DbgMsg( "Selecting ES %d", p_es->i_id );
@@ -437,8 +481,9 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case MPEG2_AUDIO_ES:
         if( p_main->b_audio )
         {
-            p_es->thread_id = adec_CreateThread( GetAdecConfig( p_input,
-                                                                p_es ) );
+            decoder.pf_create_thread = adec_CreateThread;
+            p_es->thread_id = input_RunDecoder( &decoder,
+                                    (void *)GetAdecConfig( p_input, p_es ) );
         }
         break;
 
@@ -446,24 +491,27 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case MPEG2_VIDEO_ES:
         if( p_main->b_video )
         {
-            p_es->thread_id = vpar_CreateThread( GetVdecConfig( p_input,
-                                                                p_es ) );
+            decoder.pf_create_thread = vpar_CreateThread;
+            p_es->thread_id = input_RunDecoder( &decoder,
+                                    (void *)GetVdecConfig( p_input, p_es ) );
         }
         break;
 
     case AC3_AUDIO_ES:
         if( p_main->b_audio )
         {
-            p_es->thread_id = ac3dec_CreateThread( GetAdecConfig( p_input,
-                                                                  p_es ) );
+            decoder.pf_create_thread = ac3dec_CreateThread;
+            p_es->thread_id = input_RunDecoder( &decoder,
+                                    (void *)GetAdecConfig( p_input, p_es ) );
         }
         break;
 
     case DVD_SPU_ES:
         if( p_main->b_video )
         {
-            p_es->thread_id = spudec_CreateThread( GetVdecConfig( p_input,
-                                                                  p_es ) );
+            decoder.pf_create_thread = spudec_CreateThread;
+            p_es->thread_id = input_RunDecoder( &decoder,
+                                    (void *)GetVdecConfig( p_input, p_es ) );
         }
         break;
 
@@ -475,11 +523,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     if( p_es->p_decoder_fifo != NULL )
     {
-        p_input->i_selected_es_number++;
-        p_input->pp_selected_es = realloc( p_input->pp_selected_es,
-                                           p_input->i_selected_es_number
+        p_input->stream.i_selected_es_number++;
+        p_input->stream.pp_selected_es = realloc(
+                                           p_input->stream.pp_selected_es,
+                                           p_input->stream.i_selected_es_number
                                             * sizeof(es_descriptor_t *) );
-        p_input->pp_selected_es[p_input->i_selected_es_number - 1] = p_es;
+        p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
+                = p_es;
     }
     return( 0 );
 }

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.62 2000/12/21 14:18:15 massiot Exp $
+ * $Id: input.c,v 1.63 2000/12/21 19:24:26 massiot Exp $
  *
  * Authors: 
  *
@@ -95,10 +95,8 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     p_input->p_config = p_config;
 
     /* Initialize stream description */
-    p_input->pp_es = NULL;
-    p_input->pp_selected_es = NULL;
-    p_input->i_es_number = 0;
-    p_input->i_selected_es_number = 0;
+    p_input->stream.i_es_number = 0;
+    p_input->stream.i_selected_es_number = 0;
     p_input->stream.i_pgrm_number = 0;
 
     /* Initialize stream control properties. */
@@ -296,7 +294,6 @@ static void ErrorThread( input_thread_t *p_input )
 static void EndThread( input_thread_t * p_input )
 {
     int *       pi_status;                                  /* thread status */
-    int         i_es_loop;                                       /* es index */
 
     /* Store status */
     pi_status = p_input->pi_status;
@@ -312,41 +309,14 @@ static void EndThread( input_thread_t * p_input )
     }
 #endif
 
-    /* Destroy all decoder threads */
-    for( i_es_loop = 0; i_es_loop < p_input->i_selected_es_number;
-         i_es_loop++ )
-    {
-        decoder_fifo_t *    p_decoder_fifo;
-
-        p_decoder_fifo = p_input->pp_selected_es[i_es_loop]->p_decoder_fifo;
-        p_decoder_fifo->b_die = 1;
-
-        /* Make sure the thread leaves the NextDataPacket() function */
-        vlc_mutex_lock( &p_decoder_fifo->data_lock);
-        vlc_cond_signal( &p_decoder_fifo->data_wait );
-        vlc_mutex_unlock( &p_decoder_fifo->data_lock );
-
-        /* Waiting for the thread to exit */
-        vlc_thread_join( p_input->pp_selected_es[i_es_loop]->thread_id );
-
-        /* Freeing all packets still in the decoder fifo. */
-        while( !DECODER_FIFO_ISEMPTY( *p_decoder_fifo ) )
-        {
-            p_decoder_fifo->pf_delete_pes( p_decoder_fifo->p_packets_mgt,
-                                     DECODER_FIFO_START( *p_decoder_fifo ) );
-            DECODER_FIFO_INCSTART( *p_decoder_fifo );
-        }
-        free( p_input->pp_selected_es[i_es_loop]->p_decoder_fifo );
-    }
+    /* Free all ES and destroy all decoder threads */
+    input_EndStream( p_input );
 
     /* Free demultiplexer's data */
     p_input->p_plugin->pf_end( p_input );
     free( p_input->p_plugin );
 
-    /* Free input structures */
-    input_EndStream( p_input );
-    free( p_input->pp_es );
-    free( p_input->pp_selected_es );
+    /* Free input structure */
     free( p_input );
 
     /* Update status */

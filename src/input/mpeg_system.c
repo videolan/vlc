@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.13 2000/12/21 13:54:15 massiot Exp $
+ * $Id: mpeg_system.c,v 1.14 2000/12/21 19:24:27 massiot Exp $
  *
  * Authors: 
  *
@@ -673,11 +673,14 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     stream_ps_data_t *  p_demux =
                  (stream_ps_data_t *)p_input->stream.p_demux_data;
 
+    intf_Msg("input info: Your stream contains Program Stream Map information");
+    intf_Msg("input info: Please send a mail to <massiot@via.ecp.fr>");
+
+#if 0
     if( !p_demux->b_is_PSM_complete )
     {
         byte_t *    p_byte;
         byte_t *    p_end;
-        int         i_es = 0;
 
         intf_DbgMsg( "Building PSM" );
         if( p_data->p_payload_start + 10 > p_data->p_payload_end )
@@ -710,34 +713,12 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
         /* 4 == minimum useful size of a section */
         while( p_byte + 4 <= p_end )
         {
-#if 0
-            p_input->p_es[i_es].i_id
-                = p_input->p_es[i_es].i_stream_id
-                = p_byte[1];
-            p_input->p_es[i_es].i_type = p_byte[0];
-            p_input->p_es[i_es].p_pgrm = p_input->stream.pp_programs[0];
-            p_input->p_es[i_es].p_pes = NULL;
+            es_descriptor_t *   p_es;
+
+            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                p_byte[1], 0 );
+            p_es->i_type = p_byte[0];
             p_byte += 4 + U16_AT(&p_byte[2]);
-
-#ifdef AUTO_SPAWN
-            switch( p_input->p_es[i_es].i_type )
-            {
-                case MPEG1_AUDIO_ES:
-                case MPEG2_AUDIO_ES:
-                    /* Spawn audio thread. */
-                    intf_DbgMsg( "Starting an MPEG-audio decoder" );
-                    break;
-
-                case MPEG1_VIDEO_ES:
-                case MPEG2_VIDEO_ES:
-                    /* Spawn video thread. */
-                    intf_DbgMsg( "Starting an MPEG-video decoder" );
-                    break;
-            }
-#endif
-
-            i_es++;
-#endif
         }
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -750,6 +731,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
         intf_ErrMsg( "PSM changed, this is not supported yet !" );
         p_demux->i_PSM_version = p_data->p_buffer[6] & 0x1F;
     }
+#endif
 }
 
 /*****************************************************************************
@@ -774,13 +756,13 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
         if( p_input->stream.pp_programs[0]->b_is_ok )
         {
             /* Look only at the selected ES. */
-            for( i_dummy = 0; i_dummy < p_input->i_selected_es_number;
+            for( i_dummy = 0; i_dummy < p_input->stream.i_selected_es_number;
                  i_dummy++ )
             {
-                if( p_input->pp_selected_es[i_dummy] != NULL
-                    && p_input->pp_selected_es[i_dummy]->i_id == i_id )
+                if( p_input->stream.pp_selected_es[i_dummy] != NULL
+                    && p_input->stream.pp_selected_es[i_dummy]->i_id == i_id )
                 {
-                    p_es = p_input->pp_selected_es[i_dummy];
+                    p_es = p_input->stream.pp_selected_es[i_dummy];
                     break;
                 }
             }
@@ -788,15 +770,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
         else
         {
             /* Search all ES ; if not found -> AddES */
-            for( i_dummy = 0; i_dummy < p_input->i_es_number; i_dummy++ )
-            {
-                if( p_input->pp_es[i_dummy] != NULL
-                    && p_input->pp_es[i_dummy]->i_id == i_id )
-                {
-                    p_es = p_input->pp_es[i_dummy];
-                    break;
-                }
-            }
+            p_es = input_FindES( p_input, i_id );
 
             if( p_es == NULL )
             {
@@ -927,7 +901,6 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
             break;
 
         case 0x1BC: /* PROGRAM_STREAM_MAP_CODE */
-            intf_ErrMsg("meuuuuh\n");
             DecodePSM( p_input, p_data );
             b_trash = 1;
             break;
@@ -947,12 +920,16 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     {
         p_es = input_ParsePS( p_input, p_data );
 
-        if( p_es != NULL && p_es->p_decoder_fifo != NULL && !b_trash )
+        if( p_es != NULL && p_es->p_decoder_fifo != NULL )
         {
 #ifdef STATS
             p_es->c_packets++;
 #endif
             input_GatherPES( p_input, p_data, p_es, 1, 0 );
+        }
+        else
+        {
+            b_trash = 1;
         }
     }
 
@@ -999,26 +976,10 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    for( i_dummy = 0; i_dummy < p_input->i_es_number; i_dummy++ )
-    {
-        if( p_input->pp_es[i_dummy] != NULL )
-        {
-            if( p_input->pp_es[i_dummy]->i_id == i_pid )
-            {
-                p_es = p_input->pp_es[i_dummy];
-                p_es_demux = (es_ts_data_t *)p_es->p_demux_data;
-                p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
-                break;
-            }
-        }
-    }
+    p_es = input_FindES( p_input, i_pid );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-#ifdef STATS
-    p_es->c_packets++;
-#endif
-
-    if( p_es->p_decoder_fifo == NULL )
+    if( p_es == NULL || p_es->p_decoder_fifo == NULL )
     {
         /* Not selected. Just read the adaptation field for a PCR. */
         b_trash = 1;
@@ -1026,6 +987,10 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
 
     if( (p_es->p_decoder_fifo != NULL) || (p_pgrm_demux->i_pcr_pid == i_pid) )
     {
+#ifdef STATS
+        p_es->c_packets++;
+#endif
+
         /* Extract adaptation field information if any */
         if( !b_adaptation )
         {
