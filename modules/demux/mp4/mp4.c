@@ -1915,58 +1915,58 @@ static int MP4_TrackSampleSize( mp4_track_t *p_track )
     if( p_track->i_sample_size == 0 )
     {
         /* most simple case */
-        return( p_track->p_sample_size[p_track->i_sample] );
+        return p_track->p_sample_size[p_track->i_sample];
     }
     if( p_track->fmt.i_cat != AUDIO_ES )
     {
-        return( p_track->i_sample_size );
+        return p_track->i_sample_size;
     }
 
     if( p_track->i_sample_size != 1 )
     {
         //msg_Warn( p_demux, "SampleSize != 1" );
-        return( p_track->i_sample_size );
+        return p_track->i_sample_size;
     }
 
     p_soun = p_track->p_sample->data.p_sample_soun;
 
     if( p_soun->i_qt_version == 1 )
     {
-        i_size = p_track->chunk[p_track->i_chunk].i_sample_count / p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame;
+        i_size = p_track->chunk[p_track->i_chunk].i_sample_count /
+            p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame;
     }
     else
     {
         /* FIXME */
         int i_samples = p_track->chunk[p_track->i_chunk].i_sample_count -
-                ( p_track->i_sample - p_track->chunk[p_track->i_chunk].i_sample_first );
-        if( i_samples > QT_V0_MAX_SAMPLES )
-        {
-            i_samples = QT_V0_MAX_SAMPLES;
-        }
+            ( p_track->i_sample -
+              p_track->chunk[p_track->i_chunk].i_sample_first );
+
+        if( i_samples > QT_V0_MAX_SAMPLES ) i_samples = QT_V0_MAX_SAMPLES;
         i_size = i_samples * p_soun->i_channelcount * p_soun->i_samplesize / 8;
     }
 
     //fprintf( stderr, "size=%d\n", i_size );
-    return( i_size );
+    return i_size;
 }
-
 
 static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
 {
     unsigned int i_sample;
     uint64_t i_pos;
 
-
     i_pos = p_track->chunk[p_track->i_chunk].i_offset;
 
     if( p_track->i_sample_size )
     {
-        MP4_Box_data_sample_soun_t *p_soun = p_track->p_sample->data.p_sample_soun;
+        MP4_Box_data_sample_soun_t *p_soun =
+            p_track->p_sample->data.p_sample_soun;
 
         if( p_soun->i_qt_version == 0 )
         {
-            i_pos += ( p_track->i_sample - p_track->chunk[p_track->i_chunk].i_sample_first ) *
-                        p_soun->i_channelcount * p_soun->i_samplesize / 8;
+            i_pos += ( p_track->i_sample -
+                       p_track->chunk[p_track->i_chunk].i_sample_first ) *
+                     p_track->i_sample_size;
         }
         else
         {
@@ -1977,16 +1977,16 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
     else
     {
         for( i_sample = p_track->chunk[p_track->i_chunk].i_sample_first;
-                i_sample < p_track->i_sample; i_sample++ )
+             i_sample < p_track->i_sample; i_sample++ )
         {
             i_pos += p_track->p_sample_size[i_sample];
         }
-
     }
-    return( i_pos );
+
+    return i_pos;
 }
 
-static int  MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
+static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
 {
 
     if( p_track->fmt.i_cat == AUDIO_ES &&
