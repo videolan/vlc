@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.16 2002/11/15 17:17:29 gbazin Exp $
+ * $Id: arts.c,v 1.17 2003/01/29 09:54:45 sam Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -58,7 +58,6 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Play         ( aout_instance_t * );
-static int  aRtsThread   ( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -84,17 +83,17 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return -1;
+        return VLC_ENOMEM;
     }
     p_aout->output.p_sys = p_sys;
 
     i_err = arts_init();
-    
-    if (i_err < 0)
+
+    if( i_err < 0 )
     {
         msg_Err( p_aout, "arts_init failed (%s)", arts_error_text(i_err) );
         free( p_sys );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_aout->output.pf_play = Play;
@@ -117,7 +116,7 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_aout, "cannot open aRts socket" );
         free( p_sys );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     /* Try not to bufferize more than 200 ms */
@@ -133,20 +132,10 @@ static int Open( vlc_object_t *p_this )
                      arts_stream_get( p_sys->stream, ARTS_P_PACKET_COUNT ),
                      arts_stream_get( p_sys->stream, ARTS_P_PACKET_SIZE ) );
 
-    p_aout->output.i_nb_samples = p_sys->i_size / sizeof(u16) / i_nb_channels;
+    p_aout->output.i_nb_samples = p_sys->i_size / sizeof(uint16_t)
+                                                / i_nb_channels;
 
-    /* Create aRts thread and wait for its readiness. */
-    if( vlc_thread_create( p_aout, "aout", aRtsThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create aRts thread (%s)", strerror(errno) );
-        arts_close_stream( p_sys->stream );
-        arts_free();
-        free( p_sys );
-        return -1;
-    }
-
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -154,7 +143,31 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
-    ;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    aout_buffer_t * p_buffer;
+    int i_tmp;
+
+#if 0
+    while( arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) < 16384*3/2 )
+    {
+        msleep( 10000 );
+    }
+#endif
+
+    p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+
+    if( p_buffer != NULL )
+    {
+        i_tmp = arts_write( p_sys->stream, p_buffer->p_buffer,
+                                           p_buffer->i_nb_bytes );
+
+        if( i_tmp < 0 )
+        {
+            msg_Err( p_aout, "write failed (%s)", arts_error_text(i_tmp) );
+        }
+
+        aout_BufferFree( p_buffer );
+    }
 }
 
 /*****************************************************************************
@@ -165,75 +178,8 @@ static void Close( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    p_aout->b_die = 1;
-    vlc_thread_join( p_aout );
-
     arts_close_stream( p_sys->stream );
     arts_free();
     free( p_sys );
-}
-
-/*****************************************************************************
- * aRtsThread: asynchronous thread used to DMA the data to the device
- *****************************************************************************/
-static int aRtsThread( aout_instance_t * p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-mtime_t calldate = mdate();
-
-    while ( !p_aout->b_die )
-    {
-        aout_buffer_t * p_buffer;
-        int i_tmp, i_size;
-        byte_t * p_bytes;
-
-fprintf(stderr, "can write %i\n", arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) );
-while( arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) < 16384*3/2 )
-{
-fprintf(stderr, "sleep\n");
-    msleep( 10000 );
-}
-fprintf(stderr, "after sleep: can write %i\n", arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) );
-
-        /* Get the presentation date of the next write() operation. It
-         * is equal to the current date + latency */
-        p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency / 4,
-                                                  VLC_TRUE );
-
-        if ( p_buffer != NULL )
-        {
-fprintf(stderr, "buffer duration "I64Fd", bytes %i\n", p_buffer->end_date - p_buffer->start_date, p_buffer->i_nb_bytes);
-            p_bytes = p_buffer->p_buffer;
-            i_size = p_buffer->i_nb_bytes;
-        }
-        else
-        {
-            i_size = p_sys->i_size;
-            p_bytes = malloc( i_size );
-            memset( p_bytes, 0, i_size );
-        }
-
-fprintf(stderr, "WRITING %i bytes\n", i_size);
-        i_tmp = arts_write( p_sys->stream, p_bytes, i_size );
-fprintf(stderr, "mdate: "I64Fd"\n", mdate() - calldate);
-calldate = mdate();
-fprintf(stderr, "can write %i\n", arts_stream_get( p_sys->stream, ARTS_P_BUFFER_SPACE ) );
-
-        if( i_tmp < 0 )
-        {
-            msg_Err( p_aout, "write failed (%s)", arts_error_text(i_tmp) );
-        }
-
-        if ( p_buffer != NULL )
-        {
-            aout_BufferFree( p_buffer );
-        }
-        else
-        {
-            free( p_bytes );
-        }
-    }
-
-    return 0;
 }
 
