@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.87 2003/10/07 21:13:01 sam Exp $
+dnl $Id: configure.ac,v 1.88 2003/10/21 01:05:32 titer Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -137,6 +137,7 @@ case "${target_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     AX_ADD_LDFLAGS([vlc beos],[-lbe])
     AX_ADD_LDFLAGS([beos],[-lmedia -ltranslation -ltracker -lgame])
+    AX_ADD_LDFLAGS([mkv],[-lstdc++.r4])
 
     dnl Check for BONE presence
     AC_CHECK_LIB(socket, connect,
@@ -1547,12 +1548,9 @@ AC_ARG_ENABLE(mkv,
 if test "${enable_mkv}" != "no"
 then
 AC_LANG_PUSH(C++)
-  dnl matroska headers include ebml headers directly... pouah that stinks
-  CPPFLAGS="${CPPFLAGS_save} -I/usr/local/include/ebml -I/usr/include/ebml"
-  AC_CHECK_HEADERS(EbmlVersion.h matroska/KaxVersion.h, [
+  AC_CHECK_HEADERS(ebml/EbmlVersion.h matroska/KaxVersion.h, [
     AC_CHECK_HEADERS(matroska/KaxAttachments.h)
     AX_ADD_PLUGINS([mkv])
-    AX_ADD_CXXFLAGS([mkv],[-I/usr/local/include/ebml -I/usr/include/ebml])
     AC_CHECK_LIB(ebml_pic,main,[
       # We have ebml_pic, that's good, we can build an mkv.so plugin !
       AX_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])

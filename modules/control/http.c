@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.23 2003/10/17 18:59:00 zorglub Exp $
+ * $Id: http.c,v 1.24 2003/10/21 01:05:32 titer Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1422,14 +1422,16 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
 
 #define PRINTS( str, s ) \
     ALLOC( strlen( str ) + strlen( s ) + 1 ); \
-    char * psz_cur = *pp_dst; \
-    *pp_dst += sprintf( *pp_dst, str, s ); \
-    while( psz_cur && *psz_cur ) \
-    {  \
-        /* Prevent script injection */ \
-        if( *psz_cur == '<' ) *psz_cur = '*'; \
-        if( *psz_cur == '>' ) *psz_cur = '*'; \
-        psz_cur++ ; \
+    { \
+        char * psz_cur = *pp_dst; \
+        *pp_dst += sprintf( *pp_dst, str, s ); \
+        while( psz_cur && *psz_cur ) \
+        {  \
+            /* Prevent script injection */ \
+            if( *psz_cur == '<' ) *psz_cur = '*'; \
+            if( *psz_cur == '>' ) *psz_cur = '*'; \
+            psz_cur++ ; \
+        } \
     }
 
     switch( StrToMacroType( m->id ) )
