@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.102 2001/04/28 03:36:25 sam Exp $
+ * $Id: input.c,v 1.103 2001/04/28 23:19:19 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -686,7 +686,7 @@ void input_NetworkOpen( input_thread_t * p_input )
 
     /* We can't pace control, but FIXME : bug in meuuh's code to sync PCR
      * with the server. */
-    p_input->stream.b_pace_control = 1;
+    p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
     
     return;

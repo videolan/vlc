@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.11 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_clock.c,v 1.12 2001/04/28 23:19:19 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -244,14 +244,14 @@ void input_ClockManageRef( input_thread_t * p_input,
             {
                 p_pgrm->delta_cr = ( p_pgrm->delta_cr
                                         * (CR_MAX_AVERAGE_COUNTER - 1)
-                                      + i_extrapoled_clock )
+                                      + ( i_extrapoled_clock - i_clock ) )
                                     / CR_MAX_AVERAGE_COUNTER;
             }
             else
             {
                 p_pgrm->delta_cr = ( p_pgrm->delta_cr
                                         * p_pgrm->c_average_count
-                                      + i_extrapoled_clock )
+                                      + ( i_extrapoled_clock - i_clock ) )
                                     / (p_pgrm->c_average_count + 1);
                 p_pgrm->c_average_count++;
             }

@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.34 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_netlist.c,v 1.35 2001/04/28 23:19:19 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -259,6 +259,7 @@ while (i_loop < i_nb_iovec )
             i_current-=p_netlist->i_nb_data;
         
         pp_packets[i_loop] = p_netlist->pp_free_data[i_current];
+        pp_packets[i_loop]->b_discard_payload = 0;
 
         i_loop ++;
         i_current ++;
