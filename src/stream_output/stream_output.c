@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.7 2003/01/08 10:38:32 fenrir Exp $
+ * $Id: stream_output.c,v 1.8 2003/01/08 14:59:23 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -95,7 +95,7 @@ static int InitInstance( sout_instance_t * p_sout )
     if( psz_parser - p_sout->psz_dest == 1 )
     {
         msg_Warn( p_sout, "drive letter %c: found in source string",
-                           p_sout->psz_dest ) ;
+                          *p_sout->psz_dest ) ;
         psz_parser = "";
     }
 #endif
