@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.9 2003/12/02 23:03:31 gbazin Exp $
+ * $Id: filter.cpp,v 1.10 2003/12/15 00:47:18 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,16 +173,27 @@ CapturePin::CapturePin( input_thread_t * _p_input, CaptureFilter *_p_filter,
 
 CapturePin::~CapturePin()
 {
+#ifdef DEBUG_DSHOW
+    msg_Dbg( p_input, "CapturePin::~CapturePin" );
+#endif
 }
 
 HRESULT CapturePin::CustomGetSample( VLCMediaSample *vlc_sample )
 {
+#if 0 //def DEBUG_DSHOW
+    msg_Dbg( p_input, "CapturePin::CustomGetSample" );
+#endif
+
+    access_sys_t *p_sys = p_input->p_access_data;
+    vlc_mutex_lock( &p_sys->lock );
     if( samples_queue.size() )
     {
         *vlc_sample = samples_queue.back();
         samples_queue.pop_back();
+        vlc_mutex_unlock( &p_sys->lock );
         return S_OK;
     }
+    vlc_mutex_unlock( &p_sys->lock );
     return S_FALSE;
 }
 
@@ -283,7 +294,21 @@ STDMETHODIMP CapturePin::Disconnect()
     msg_Dbg( p_input, "CapturePin::Disconnect" );
 #endif
 
-    p_connected_pin->Release();
+    VLCMediaSample vlc_sample;
+    access_sys_t *p_sys = p_input->p_access_data;
+
+#if 0 // FIXME: This does seem to create crashes sometimes
+    vlc_mutex_lock( &p_sys->lock );
+    while( samples_queue.size() )
+    {
+        vlc_sample = samples_queue.back();
+        samples_queue.pop_back();
+        vlc_sample.p_sample->Release();
+    }
+    vlc_mutex_unlock( &p_sys->lock );
+#endif
+
+    if( p_connected_pin ) p_connected_pin->Release();
     p_connected_pin = NULL;
     FreeMediaType( media_type );
     return S_OK;
@@ -425,8 +450,8 @@ STDMETHODIMP CapturePin::GetAllocatorRequirements( ALLOCATOR_PROPERTIES *pProps 
 }
 STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
 {
-#ifdef DEBUG_DSHOW
-    //msg_Dbg( p_input, "CapturePin::Receive" );
+#if 0 //def DEBUG_DSHOW
+    msg_Dbg( p_input, "CapturePin::Receive" );
 #endif
 
     pSample->AddRef();
@@ -491,6 +516,9 @@ CaptureFilter::CaptureFilter( input_thread_t * _p_input, AM_MEDIA_TYPE mt )
 
 CaptureFilter::~CaptureFilter()
 {
+#ifdef DEBUG_DSHOW
+    msg_Dbg( p_input, "CaptureFilter::~CaptureFilter" );
+#endif
     p_pin->Release();
 }
 
@@ -563,7 +591,7 @@ STDMETHODIMP CaptureFilter::GetClassID(CLSID *pClsID)
 STDMETHODIMP CaptureFilter::GetState(DWORD dwMSecs, FILTER_STATE *State)
 {
 #ifdef DEBUG_DSHOW
-    msg_Dbg( p_input, "CaptureFilter::GetStat" );
+    msg_Dbg( p_input, "CaptureFilter::GetState" );
 #endif
     return E_NOTIMPL;
 };
@@ -688,6 +716,9 @@ CaptureEnumPins::CaptureEnumPins( input_thread_t * _p_input,
 
 CaptureEnumPins::~CaptureEnumPins()
 {
+#ifdef DEBUG_DSHOW
+    msg_Dbg( p_input, "CaptureEnumPins::~CaptureEnumPins" );
+#endif
     p_filter->Release();
 }
 
@@ -811,6 +842,9 @@ CaptureEnumMediaTypes::CaptureEnumMediaTypes( input_thread_t * _p_input,
 
 CaptureEnumMediaTypes::~CaptureEnumMediaTypes()
 {
+#ifdef DEBUG_DSHOW
+    msg_Dbg( p_input, "CaptureEnumMediaTypes::~CaptureEnumMediaTypes" );
+#endif
     p_pin->Release();
 }
 

@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.20 2003/12/04 17:15:59 gbazin Exp $
+ * $Id: dshow.cpp,v 1.21 2003/12/15 00:47:18 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -385,7 +385,7 @@ static void AccessClose( vlc_object_t *p_this )
     access_sys_t    *p_sys  = p_input->p_access_data;
 
     /* Stop capturing stuff */
-    p_sys->p_control->Stop();
+    //p_sys->p_control->Stop(); /* FIXME?: we get stuck here sometimes */
     p_sys->p_control->Release();
 
     /* Remove filters from graph */
