@@ -522,13 +522,12 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         /* One item */
         NSDictionary *o_one_item;
-        int j, i_total_options = 0, i_new_id = -1;
-        int i_mode = PLAYLIST_INSERT;
+        playlist_item_t *p_item;
+        int i;
         BOOL b_rem = FALSE, b_dir = FALSE;
         NSString *o_uri, *o_name;
         NSArray *o_options;
         NSURL *o_true_file;
-        char **ppsz_options = NULL;
 
         /* Get the item */
         o_one_item = [o_array objectAtIndex: i_item];
@@ -581,27 +580,21 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
             [o_temp replaceOccurrencesOfString: @"s1" withString: @"" options:NULL range:NSMakeRange(0, [o_temp length]) ];
             o_uri = o_temp;
         }
+        
+        p_item = playlist_ItemNew( p_intf, [o_uri fileSystemRepresentation], [o_name UTF8String] );
+        if( !p_item )
+            continue;
 
-        if( o_options && [o_options count] > 0 )
+        if( o_options )
         {
-            /* Count the input options */
-            i_total_options = [o_options count];
-
-            /* Allocate ppsz_options */
-            for( j = 0; j < i_total_options; j++ )
+            for( i = 0; i < (int)[o_options count]; i++ )
             {
-                if( !ppsz_options )
-                    ppsz_options = (char **)malloc( sizeof(char *) * i_total_options );
-
-                ppsz_options[j] = strdup([[o_options objectAtIndex:j] UTF8String]);
+                playlist_ItemAddOption( p_item, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
             }
         }
 
         /* Add the item */
-        i_new_id = playlist_AddExt( p_playlist, [o_uri fileSystemRepresentation],
-                      [o_name UTF8String], i_mode,
-                      i_position == -1 ? PLAYLIST_END : i_position + i_item,
-                      0, (ppsz_options != NULL ) ? (const char **)ppsz_options : 0, i_total_options );
+        playlist_AddItem( p_playlist, p_item, PLAYLIST_APPEND, i_position == -1 ? PLAYLIST_END : i_position + i_item );
 
         /* Recent documents menu */
         o_true_file = [NSURL fileURLWithPath: o_uri];
@@ -613,8 +606,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
         if( i_item == 0 && !b_enqueue )
         {
-            playlist_Goto( p_playlist, playlist_GetPositionById( p_playlist, i_new_id ) );
-            playlist_Play( p_playlist );
+            playlist_Control( p_playlist, PLAYLIST_ITEMPLAY, p_item );
         }
     }
 
