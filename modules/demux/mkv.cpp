@@ -2877,7 +2877,7 @@ static void ParseChapters( demux_t *p_demux, EbmlElement *chapters )
                 else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
                 {
                     if (uint8(*static_cast<KaxEditionFlagDefault *>( l )) != 0)
-                        p_sys->i_current_edition = p_sys->editions.size();
+                        i_default_edition = p_sys->editions.size();
                 }
                 else
                 {
