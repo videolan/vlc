@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.23 2003/07/10 22:24:09 fenrir Exp $
+ * $Id: httpd.c,v 1.24 2003/07/10 22:37:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -953,7 +953,7 @@ static void httpd_info_add_ss( httpd_info_t *p_info, char *name, char *value )
                      sizeof( httpd_val_t ) * ( p_info->i_count + 1 ) );
     }
     p_info->info[p_info->i_count].psz_name  = strdup( name );
-    p_info->info[p_info->i_count].psz_value = strdup( value );
+    p_info->info[p_info->i_count].psz_value = strdup( value ? value : "(null)");
     p_info->i_count++;
 }
 
@@ -1029,14 +1029,17 @@ static int Control( httpd_t *p_httpd,
             /* we can't take lock */
             for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
             {
-                httpd_info_add_sp( p_info,
-                                   "id", p_con );
-                httpd_info_add_ss( p_info,
-                                   "ip", inet_ntoa( p_con->sock.sin_addr ) );
-                httpd_info_add_ss( p_info,
-                                   "url", p_con->psz_file );
-                httpd_info_add_si( p_info,
-                                   "status", p_con->i_http_error );
+                if( p_con->i_state != HTTPD_CONNECTION_TO_BE_CLOSED )
+                {
+                    httpd_info_add_sp( p_info,
+                                       "id", p_con );
+                    httpd_info_add_ss( p_info,
+                                       "ip", inet_ntoa( p_con->sock.sin_addr ) );
+                    httpd_info_add_ss( p_info,
+                                       "url", p_con->psz_file );
+                    httpd_info_add_si( p_info,
+                                       "status", p_con->i_http_error );
+                }
             }
             return VLC_SUCCESS;
         case HTTPD_GET_ACL:
