@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.16 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: win32_run.cpp,v 1.17 2003/05/26 02:09:27 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -128,9 +128,7 @@ bool Instance::OnInit()
     p_intf->p_sys->p_kludgy_timer->Start( 100 );
 
     // OK, initialization is over, now the other thread can go on working...
-    vlc_mutex_lock( &p_intf->p_sys->init_lock );
-    vlc_cond_signal( &p_intf->p_sys->init_cond );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+    vlc_thread_ready( p_intf );
 
     return TRUE;
 }
@@ -231,15 +229,12 @@ void OSRun( intf_thread_t *p_intf )
 #ifndef BASIC_SKINS
     // Create a new thread for wxWindows
     if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
-                           0, 0 ) )
+                           0, VLC_TRUE ) )
     {
         msg_Err( p_intf, "cannot create SkinsDialogsThread" );
         // Don't even enter the main loop
         return;
     }
-    vlc_mutex_lock( &p_intf->p_sys->init_lock );
-    vlc_cond_wait( &p_intf->p_sys->init_cond, &p_intf->p_sys->init_lock );
-    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
 #endif
 
      // Create refresh timer

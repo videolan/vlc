@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.8 2003/05/24 21:28:29 asmax Exp $
+ * $Id: x11_run.cpp,v 1.9 2003/05/26 02:09:27 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -27,8 +27,10 @@
 //--- X11 -------------------------------------------------------------------
 #include <X11/Xlib.h>
 
-//--- WWWINDOWS -------------------------------------------------------------
+//--- WXWINDOWS -------------------------------------------------------------
 #ifndef BASIC_SKINS
+/* Let vlc take care of the i18n stuff */
+#define WXINTL_NO_GETTEXT_MACRO
 #include <wx/wx.h>
 #endif
 
@@ -46,6 +48,7 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
+
 #ifndef BASIC_SKINS
 #include "../../wxwindows/wxwindows.h"
 #endif
@@ -63,10 +66,10 @@ bool IsVLCEvent( unsigned int msg );
 int  SkinManage( intf_thread_t *p_intf );
 
 
+#ifndef BASIC_SKINS
 //---------------------------------------------------------------------------
 // Local classes declarations.
 //---------------------------------------------------------------------------
-#ifndef BASIC_SKINS
 class Instance: public wxApp
 {
 public:
@@ -74,130 +77,16 @@ public:
     Instance( intf_thread_t *_p_intf );
 
     bool OnInit();
+    int  OnExit();
     OpenDialog *open;
 
 private:
     intf_thread_t *p_intf;
 };
-#endif
-
-
-//---------------------------------------------------------------------------
-// GTK2 interface
-//---------------------------------------------------------------------------
-/*void GTK2Proc( GdkEvent *event, gpointer data )
-{
-    // Get objects from data
-    CallBackObjects *obj = (CallBackObjects *)data;
-    VlcProc *proc        = obj->Proc;
-
-    // Get pointer to thread info
-    intf_thread_t *p_intf = proc->GetpIntf();
-
-    // Variables
-    unsigned int msg;
-    Event *evt;
-    list<SkinWindow *>::const_iterator win;
-    GdkWindow *gwnd = ((GdkEventAny *)event)->window;
-
-    // Create event to dispatch in windows
-    // Skin event
-    if( event->type == GDK_CLIENT_EVENT )
-    {
-        msg = ( (GdkEventClient *)event )->data.l[0];
-        evt = (Event *)new OSEvent( p_intf, 
-            ((GdkEventAny *)event)->window,
-            msg,
-            ( (GdkEventClient *)event )->data.l[1],
-            ( (GdkEventClient *)event )->data.l[2] );
-    }
-    // System event
-    else
-    {
-        msg = event->type;
-        evt = (Event *)new OSEvent( p_intf,
-            ((GdkEventAny *)event)->window, msg, 0, (long)event );
-    }
-
-    // Process keyboard shortcuts
-    if( msg == GDK_KEY_PRESS )
-    {
-        int KeyModifier = 0;
-        // If key is ALT
-        if( ((GdkEventKey *)event)->state & GDK_MOD1_MASK )
-        {
-            KeyModifier = 1;
-        }
-        // If key is CTRL
-        else if( ((GdkEventKey *)event)->state & GDK_CONTROL_MASK )
-        {
-            KeyModifier = 2;
-        }
-        int key = ((GdkEventKey *)event)->keyval;
-        // Translate into lower case
-        if( key >= 'a' && key <= 'z' )
-        {
-            key -= ('a' - 'A');
-        }
-        if( KeyModifier > 0 )
-            p_intf->p_sys->p_theme->EvtBank->TestShortcut( key , KeyModifier );
-    }
-
-    // Send event
-    else if( IsVLCEvent( msg ) )
-    {
-        if( !proc->EventProc( evt ) )
-        {
-            wxExit();
-            return;      // Exit VLC !
-        }
-    }
-    else if( gwnd == NULL )
-    {
-        for( win = p_intf->p_sys->p_theme->WindowList.begin();
-             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
-        {
-            (*win)->ProcessEvent( evt );
-        }
-    }
-    else
-    {
-        // Find window matching with gwnd
-        for( win = p_intf->p_sys->p_theme->WindowList.begin();
-             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
-        {
-            // If it is the correct window
-            if( gwnd == ( (GTK2Window *)(*win) )->GetHandle() )
-            {
-                // Send event and check if processed
-                if( (*win)->ProcessEvent( evt ) )
-                {
-                    delete (OSEvent *)evt;
-                    return;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-    }
-
-    evt->DestructParameters();
-    delete (OSEvent *)evt;
-
-    // Check if vlc is closing
-    proc->IsClosing();
-
-    gtk_main_do_event( event )
-}*/
-//---------------------------------------------------------------------------
-
 
 //---------------------------------------------------------------------------
 // Implementation of Instance class
 //---------------------------------------------------------------------------
-#ifndef BASIC_SKINS
 Instance::Instance( )
 {
 }
@@ -212,23 +101,51 @@ IMPLEMENT_APP_NO_MAIN(Instance)
 
 bool Instance::OnInit()
 {
-    // Set event callback. Yes, it's a big hack ;)
-//    gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
-
     p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
+
+    // Create all the dialog boxes
     p_intf->p_sys->OpenDlg = new OpenDialog( p_intf, NULL, FILE_ACCESS );
     p_intf->p_sys->MessagesDlg = new Messages( p_intf, NULL );
     p_intf->p_sys->SoutDlg = new SoutDialog( p_intf, NULL );
     p_intf->p_sys->PrefsDlg = new PrefsDialog( p_intf, NULL );
     p_intf->p_sys->InfoDlg = new FileInfo( p_intf, NULL );
-    
-    // Add timer
-//    g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
+
+    // OK, initialization is over, now the other thread can go on working...
+    vlc_thread_ready( p_intf );
 
     return TRUE;
 }
-#endif
 
+int Instance::OnExit()
+{
+    // Delete evertything
+    delete p_intf->p_sys->InfoDlg;
+    delete p_intf->p_sys->PrefsDlg;
+    delete p_intf->p_sys->SoutDlg;
+    delete p_intf->p_sys->MessagesDlg;
+    delete p_intf->p_sys->OpenDlg;
+    delete p_intf->p_sys->p_icon;
+
+    return 0;
+}
+
+//---------------------------------------------------------------------------
+// Thread callback
+// We create all wxWindows dialogs in a separate thread because we don't want
+// any interaction with our own message loop
+//---------------------------------------------------------------------------
+void SkinsDialogsThread( intf_thread_t *p_intf )
+{
+    /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
+    wxTheApp = new Instance( p_intf );
+
+    static char  *p_args[] = { "" };
+    wxEntry( 1, p_args );
+
+    return;
+}
+
+#endif // WX_SKINS
 
 //---------------------------------------------------------------------------
 // X11 event processing
@@ -290,7 +207,9 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     {
         if( !proc->EventProc( evt ) )
         {
-//            wxExit();
+#ifndef BASIC_SKINS
+            wxExit();
+#endif
             return;      // Exit VLC !
         }
     }
@@ -328,11 +247,10 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     evt->DestructParameters();
     delete (OSEvent *)evt;
 
-// Check if vlc is closing
+    // Check if vlc is closing
     proc->IsClosing();
 
 }
-
 
 //---------------------------------------------------------------------------
 // X11 interface
@@ -342,10 +260,16 @@ void OSRun( intf_thread_t *p_intf )
     static char  *p_args[] = { "" };
 
     VlcProc *proc = new VlcProc( p_intf );
-    
+
 #ifndef BASIC_SKINS
-    wxTheApp = new Instance( p_intf );
-    wxEntry( 1, p_args );
+    // Create a new thread for wxWindows
+    if( vlc_thread_create( p_intf, "Skins Dialogs Thread", SkinsDialogsThread,
+                           0, VLC_TRUE ) )
+    {
+        msg_Err( p_intf, "cannot create SkinsDialogsThread" );
+        // Don't even enter the main loop
+        return;
+    }
 #endif
 
     Display *display = ((OSTheme *)p_intf->p_sys->p_theme)->GetDisplay();

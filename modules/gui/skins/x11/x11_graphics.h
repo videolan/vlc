@@ -2,7 +2,7 @@
  * x11_graphics.h: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.h,v 1.2 2003/04/30 21:16:24 asmax Exp $
+ * $Id: x11_graphics.h,v 1.3 2003/05/26 02:09:27 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,6 +28,10 @@
 #ifndef VLC_SKIN_X11_GRAPHICS
 #define VLC_SKIN_X11_GRAPHICS
 
+//--- GENERAL ---------------------------------------------------------------
+#include <vector>
+using namespace std;
+
 //--- X11 -------------------------------------------------------------------
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -35,6 +39,10 @@
 //---------------------------------------------------------------------------
 class SkinRegion;
 class SkinWindow;
+
+struct CoordsPoint{ int x, y; };
+struct CoordsRectangle{ int x, y, w, h; };
+struct CoordsElipse{ int x, y, w, h; };
 
 //---------------------------------------------------------------------------
 class X11Graphics : public Graphics
@@ -85,6 +93,11 @@ class X11Region : public SkinRegion
 
         // Specific X11 methods
         Region *GetHandle() { return Rgn; };
+
+        vector<CoordsRectangle> RectanglesList;
+        vector<CoordsElipse> ElipsesList;
+
+        CoordsPoint RefPoint;
 };
 //---------------------------------------------------------------------------
 

@@ -2431,10 +2431,22 @@ if test "x${enable_skins}" != "xno"; then
     LDFLAGS_skins="${LDFLAGS_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
   else
     if test "x${enable_skins}" = "xyes"; then
-      PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+
+      AC_ARG_WITH(gtk2-skins,
+      [    --with-gtk2-skins        skins using GTK2 (default disabled)])
+
+      if test "x${with_gtk2_skins}" = "xyes"; then
+        PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+        CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
+        LDFLAGS_skins="${LDFLAGS_skins} -lstdc++  ${GTK2_LIBS}"
+      else
+        PLUGINS="${PLUGINS} skins"
+        CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} -DX11_SKINS"
+        LDFLAGS_skins="${LDFLAGS_skins} -lstdc++ -L${x_libraries} -lXext -lX11"
+      fi
+
       PLUGINS="${PLUGINS} skins"
-      CPPFLAGS_skins="${CPPFLAGS_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
-      LDFLAGS_skins="${LDFLAGS_skins} -lstdc++  ${GTK2_LIBS}"
+
     fi
   fi
 fi
@@ -2446,15 +2458,26 @@ AC_ARG_ENABLE(basic-skins,
   [  --enable-basic-skins    Skins interface module without wxWindows dialogs (default disabled)])
 if test "x${enable_basic_skins}" = "xyes"; then
   if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
-    PLUGINS="${PLUGINS} basic_skins"
+
     CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -U_OFF_T_ -U_off_t -fno-rtti -Imodules/gui/skins"
     LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lstdc++ -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32"
+
   else
-    PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-    PLUGINS="${PLUGINS} basic_skins"
-    CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
-    LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++  ${GTK2_LIBS}"
+    AC_ARG_WITH(gtk2-basic-skins,
+    [    --with-gtk2-basic-skins        skins using GTK2 (default disabled)])
+
+    if test "x${with_gtk2_basic_skins}" = "xyes"; then
+      PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
+      CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins ${GTK2_CFLAGS} -DGTK2_SKINS"
+      LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++  ${GTK2_LIBS}"
+    else
+      CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -O2 -fno-rtti -Imodules/gui/skins -I${x_includes} -DX11_SKINS"
+      LDFLAGS_basic_skins="${LDFLAGS_basic_skins} -lstdc++ -L${x_libraries} -lXext -lX11"
+    fi
+
   fi
+
+  PLUGINS="${PLUGINS} basic_skins"
   CPPFLAGS_basic_skins="${CPPFLAGS_basic_skins} -DBASIC_SKINS"
 fi
 

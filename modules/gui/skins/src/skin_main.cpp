@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.26 2003/05/12 17:33:19 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.27 2003/05/26 02:09:27 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -157,12 +157,6 @@ static int Open ( vlc_object_t *p_this )
 
 #endif
 
-#ifndef BASIC_SKINS
-    // Initialize conditions and mutexes
-    vlc_mutex_init( p_intf, &p_intf->p_sys->init_lock );
-    vlc_cond_init( p_intf, &p_intf->p_sys->init_cond );
-#endif
-
     p_intf->p_sys->p_theme = (Theme *)new OSTheme( p_intf );
 
     return( 0 );
@@ -191,12 +185,6 @@ static void Close ( vlc_object_t *p_this )
 
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-
-#ifndef BASIC_SKINS
-    // Destroy conditions and mutexes
-    vlc_cond_destroy( &p_intf->p_sys->init_cond );
-    vlc_mutex_destroy( &p_intf->p_sys->init_lock );
-#endif
 
 #ifdef WIN32
     // Unload msimg32.dll and user32.dll

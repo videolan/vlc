@@ -2,7 +2,7 @@
  * x11_graphics.cpp: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.3 2003/05/18 17:48:05 asmax Exp $
+ * $Id: x11_graphics.cpp,v 1.4 2003/05/26 02:09:27 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -115,22 +115,17 @@ void X11Graphics::ResetClipRegion()
 //---------------------------------------------------------------------------
 X11Region::X11Region()
 {
-/*    Rgn = gdk_region_new();*/
+    RefPoint.x = RefPoint.y = 0;
 }
 //---------------------------------------------------------------------------
 X11Region::X11Region( int x, int y, int w, int h )
 {
-/*    GdkRectangle rect;
-    rect.x = x;
-    rect.y = y;
-    rect.width = w;
-    rect.height = h;
-    Rgn = gdk_region_rectangle( &rect );*/
+    RefPoint.x = RefPoint.y = 0;
+    AddRectangle( x, y, w, h );
 }
 //---------------------------------------------------------------------------
 X11Region::~X11Region()
 {
-/*    gdk_region_destroy( Rgn );*/
 }
 //---------------------------------------------------------------------------
 void X11Region::AddPoint( int x, int y )
@@ -140,57 +135,59 @@ void X11Region::AddPoint( int x, int y )
 //---------------------------------------------------------------------------
 void X11Region::AddRectangle( int x, int y, int w, int h )
 {
-/*    GdkRectangle rect;
-    rect.x = x;
-    rect.y = y;
-    rect.width = w;
-    rect.height = h;
-    GdkRegion *Buffer = gdk_region_rectangle( &rect );
-    gdk_region_union( Rgn, Buffer );*/
+    CoordsRectangle coords;
+    coords.x = x - RefPoint.x; coords.y = y - RefPoint.y;
+    coords.w = w; coords.h = h;
+    RectanglesList.push_back( coords );
 }
 //---------------------------------------------------------------------------
 void X11Region::AddElipse( int x, int y, int w, int h )
 {
-/*    GdkRegion *Buffer;
-    GdkRectangle rect;
-    rect.height = 1;
-
-    double ex, ey;
-    double a = w / 2;
-    double b = h / 2;
-
-    if( !a || !b )
-        return;
-
-    for( ey = 0; ey < h; ey++ )
-    {
-        // Calculate coords
-        ex = a * sqrt( 1 - ey * ey / ( b * b ) );
-
-        // Upper line
-        rect.x     = (gint)( x + a - ex );
-        rect.y     = (gint)( y + b - ey );
-        rect.width = (gint)( 2 * ex );
-        Buffer = gdk_region_rectangle( &rect );
-        gdk_region_union( Rgn, Buffer );
-        gdk_region_destroy( Buffer );
-
-        // Lower line
-        rect.y = (gint)( y + b + ey );
-        Buffer = gdk_region_rectangle( &rect );
-        gdk_region_union( Rgn, Buffer );
-        gdk_region_destroy( Buffer );
-    }*/
+    CoordsElipse coords;
+    coords.x = x - RefPoint.x; coords.y = y - RefPoint.y;
+    coords.w = w; coords.h = h;
+    ElipsesList.push_back( coords );
 }
 //---------------------------------------------------------------------------
 void X11Region::Move( int x, int y )
 {
-/*    gdk_region_offset( Rgn, x, y );*/
+    RefPoint.x += x;
+    RefPoint.y += y;
 }
 //---------------------------------------------------------------------------
 bool X11Region::Hit( int x, int y )
 {
-/*    return gdk_region_point_in( Rgn, x, y );*/
+    int i;
+
+    x -= RefPoint.x;
+    y -= RefPoint.y;
+
+    // Check our rectangles list first
+    for( i = 0; i < RectanglesList.size(); i++ )
+    {
+        if( x >= RectanglesList[i].x &&
+            x <= RectanglesList[i].x + RectanglesList[i].w &&
+            y >= RectanglesList[i].y &&
+            y <= RectanglesList[i].y + RectanglesList[i].h )
+        {
+            return true;
+        }
+    }
+
+    // Check our elipses list
+    for( i = 0; i < ElipsesList.size(); i++ )
+    {
+        // FIXME!!
+        if( x >= ElipsesList[i].x &&
+            x <= ElipsesList[i].x + ElipsesList[i].w &&
+            y >= ElipsesList[i].y &&
+            y <= ElipsesList[i].y + ElipsesList[i].h )
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 //---------------------------------------------------------------------------
 

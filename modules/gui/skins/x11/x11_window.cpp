@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.6 2003/05/24 21:28:29 asmax Exp $
+ * $Id: x11_window.cpp,v 1.7 2003/05/26 02:09:27 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -114,7 +114,7 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     ToolTipWindow = gdk_window_new( gwnd, &attr, mask);*/
 
     Open();
-    fprintf(stderr, "kludge in x11_window.cpp\n");
+    //fprintf(stderr, "kludge in x11_window.cpp\n");
 
 }
 //---------------------------------------------------------------------------
@@ -149,13 +149,13 @@ void X11Window::OSShow( bool show )
 {
     if( show )
     {
-/*        gdk_window_show( gWnd );
-        gdk_window_move( gWnd, Left, Top );*/
+        XMapWindow( display, Wnd );
         XMoveWindow( display, Wnd, Left, Top );
     }
     else
     {
-/*        gdk_window_hide( gWnd );*/
+        //XWithdrawWindow( display, Wnd, 0 );
+        XUnmapWindow( display, Wnd );
     }
 }
 //---------------------------------------------------------------------------
@@ -164,13 +164,13 @@ bool X11Window::ProcessOSEvent( Event *evt )
     unsigned int msg = evt->GetMessage();
     unsigned int p1  = evt->GetParam1();
     int          p2  = evt->GetParam2();
- 
+
     switch( msg )
     {
         case Expose:
             RefreshFromImage( 0, 0, Width, Height );
             return true;
- 
+
         case MotionNotify:
             if( LButtonDown )
                 MouseMove( (int)( (XMotionEvent *)p2 )->x,
@@ -192,7 +192,7 @@ bool X11Window::ProcessOSEvent( Event *evt )
             {
                 XRaiseWindow( display, ( (X11Window *)(*win) )->GetHandle() );
             }
-          
+
             switch( ( (XButtonEvent *)p2 )->button )
             {
                 case 1:

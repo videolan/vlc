@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.23 2003/05/13 19:25:59 asmax Exp $
+ * $Id: window.cpp,v 1.24 2003/05/26 02:09:27 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -327,6 +327,7 @@ void SkinWindow::RefreshAll()
 //---------------------------------------------------------------------------
 void SkinWindow::MouseDown( int x, int y, int button )
 {
+
     // Checking event in controls
     for( int i = ControlList.size() - 1; i >= 0 ; i-- )
     {
