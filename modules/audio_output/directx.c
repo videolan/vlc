@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.17 2003/04/07 16:02:08 gbazin Exp $
+ * $Id: directx.c,v 1.18 2003/04/29 16:03:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -264,8 +264,7 @@ static int OpenAudio( vlc_object_t *p_this )
     if( var_Get( p_aout, "audio-device", &val ) < 0 )
     {
         /* Probe() has failed. */
-        free( p_aout->output.p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Then create the notification events */
@@ -293,7 +292,7 @@ static int OpenAudio( vlc_object_t *p_this )
                             p_aout->output.p_sys->i_frame_size, VLC_FALSE )
             != VLC_SUCCESS )
         {
-            msg_Err( p_aout, "cannot open waveout audio device" );
+            msg_Err( p_aout, "cannot open directx audio device" );
             free( p_aout->output.p_sys );
             return VLC_EGENERIC;
         }
@@ -332,7 +331,7 @@ static int OpenAudio( vlc_object_t *p_this )
                                p_aout->output.output.i_rate, VLC_FALSE )
             != VLC_SUCCESS )
         {
-            msg_Err( p_aout, "cannot open waveout audio device" );
+            msg_Err( p_aout, "cannot open directx audio device" );
             free( p_aout->output.p_sys );
             return VLC_EGENERIC;
         }
@@ -704,7 +703,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
                    p_aout->output.p_sys->p_dsobject, &dsbdesc,
                    &p_aout->output.p_sys->p_dsbuffer, NULL) )
     {
-        goto error;
+        return VLC_EGENERIC;
     }
 
     /* Stop here if we were just probing */
@@ -753,16 +752,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
     return VLC_SUCCESS;
 
  error:
-    if( p_aout->output.p_sys->p_dsbuffer )
-    {
-        IDirectSoundBuffer_Release( p_aout->output.p_sys->p_dsbuffer );
-        p_aout->output.p_sys->p_dsbuffer = NULL;
-    }
-    if( p_aout->output.p_sys->p_dsnotify )
-    {
-        IDirectSoundBuffer_Release( p_aout->output.p_sys->p_dsbuffer );
-        p_aout->output.p_sys->p_dsnotify = NULL;
-    }
+    DestroyDSBuffer( p_aout );
     return VLC_EGENERIC;
 }
 

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.16 2003/03/30 18:14:39 gbazin Exp $
+ * $Id: directx.c,v 1.17 2003/04/29 16:03:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -552,7 +552,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                                             DDBLT_ASYNC, &ddbltfx );
         if( dxresult != DD_OK )
         {
-            msg_Warn( p_vout, "could not blit surface (error %i)", dxresult );
+            msg_Warn( p_vout, "could not blit surface (error %li)", dxresult );
             return;
         }
 
@@ -569,7 +569,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                                              NULL, DDFLIP_WAIT );
         if( dxresult != DD_OK )
         {
-            msg_Warn( p_vout, "could not flip overlay (error %i)", dxresult );
+            msg_Warn( p_vout, "could not flip overlay (error %li)", dxresult );
         }
 
         /* set currently displayed pic */
@@ -690,7 +690,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
                                            &p_display, NULL );
     if( dxresult != DD_OK )
     {
-        msg_Err( p_vout, "cannot get primary surface (error %i)", dxresult );
+        msg_Err( p_vout, "cannot get primary surface (error %li)", dxresult );
         return VLC_EGENERIC;
     }
 
@@ -702,7 +702,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     if ( dxresult != DD_OK )
     {
         msg_Err( p_vout, "cannot query IDirectDrawSurface2 interface "
-                         "(error %i)", dxresult );
+                         "(error %li)", dxresult );
         return VLC_EGENERIC;
     }
 
@@ -719,7 +719,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
     if( dxresult != DD_OK )
     {
         msg_Warn( p_vout, "DirectXUpdateOverlay GetPixelFormat failed "
-                          "(error %i)", dxresult );
+                          "(error %li)", dxresult );
     }
     p_vout->p_sys->i_colorkey = (DWORD)((( p_vout->p_sys->i_rgb_colorkey
                                            * pixel_format.dwRBitMask) / 255)
@@ -749,7 +749,7 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
                                            &p_vout->p_sys->p_clipper, NULL );
     if( dxresult != DD_OK )
     {
-        msg_Warn( p_vout, "cannot create clipper (error %i)", dxresult );
+        msg_Warn( p_vout, "cannot create clipper (error %li)", dxresult );
         goto error;
     }
 
@@ -758,7 +758,7 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
                                           p_vout->p_sys->hwnd);
     if( dxresult != DD_OK )
     {
-        msg_Warn( p_vout, "cannot attach clipper to window (error %i)",
+        msg_Warn( p_vout, "cannot attach clipper to window (error %li)",
                           dxresult );
         goto error;
     }
@@ -768,7 +768,7 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
                                              p_vout->p_sys->p_clipper);
     if( dxresult != DD_OK )
     {
-        msg_Warn( p_vout, "cannot attach clipper to surface (error %i)",
+        msg_Warn( p_vout, "cannot attach clipper to surface (error %li)",
                           dxresult );
         goto error;
     }
@@ -891,7 +891,7 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
     if ( dxresult != DD_OK )
     {
         msg_Err( p_vout, "cannot query IDirectDrawSurface2 interface "
-                         "(error %i)", dxresult );
+                         "(error %li)", dxresult );
         *pp_surface_final = NULL;
         return VLC_EGENERIC;
     }
@@ -1109,10 +1109,38 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     {
         if( p_vout->p_sys->b_hw_yuv )
         {
-            i_ret = DirectXCreateSurface( p_vout, &p_surface,
-                                          p_vout->output.i_chroma,
-                                          0 /* no overlay */,
-                                          0 /* no back buffers */ );
+            DWORD i_codes;
+            DWORD *pi_codes;
+            vlc_bool_t b_result = VLC_FALSE;
+
+            /* Check if the chroma is supported first. This is required
+             * because a few buggy drivers don't mind creating the surface
+             * even if they don't know about the chroma. */
+            if( IDirectDraw2_GetFourCCCodes( p_vout->p_sys->p_ddobject,
+                                             &i_codes, NULL ) )
+            {
+                pi_codes = malloc( i_codes * sizeof(DWORD) );
+                if( pi_codes && IDirectDraw2_GetFourCCCodes(
+                    p_vout->p_sys->p_ddobject, &i_codes, pi_codes ) )
+                {
+                    for( i = 0; i < (int)i_codes; i++ )
+                    {
+                        if( p_vout->output.i_chroma == pi_codes[i] )
+                        {
+                            b_result = VLC_TRUE;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if( b_result )
+                i_ret = DirectXCreateSurface( p_vout, &p_surface,
+                                              p_vout->output.i_chroma,
+                                              0 /* no overlay */,
+                                              0 /* no back buffers */ );
+            else
+                p_vout->p_sys->b_hw_yuv = VLC_FALSE;
         }
 
         if( i_ret || !p_vout->p_sys->b_hw_yuv )
@@ -1382,7 +1410,7 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
     else
     {
         BOOL bHasOverlay, bHasOverlayFourCC, bCanClipOverlay,
-             bHasColorKey, bCanStretch;
+             bHasColorKey, bCanStretch, bCanBltFourcc;
 
         /* Determine if the hardware supports overlay surfaces */
         bHasOverlay = ((ddcaps.dwCaps & DDCAPS_OVERLAY) ==
@@ -1399,15 +1427,22 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
         /* Determine if the hardware supports scaling of the overlay surface */
         bCanStretch = ((ddcaps.dwCaps & DDCAPS_OVERLAYSTRETCH) ==
                        DDCAPS_OVERLAYSTRETCH) ? TRUE : FALSE;
+        /* Determine if the hardware supports color conversion during a blit */
+        bCanBltFourcc = ((ddcaps.dwCaps & DDCAPS_BLTFOURCC ) ==
+                        DDCAPS_BLTFOURCC) ? TRUE : FALSE;
+
         msg_Dbg( p_vout, "DirectDraw Capabilities: overlay=%i yuvoverlay=%i "
-                         "can_clip_overlay=%i colorkey=%i stretch=%i",
+                         "can_clip_overlay=%i colorkey=%i stretch=%i "
+                         "bltfourcc=%i",
                          bHasOverlay, bHasOverlayFourCC, bCanClipOverlay,
-                         bHasColorKey, bCanStretch );
+                         bHasColorKey, bCanStretch, bCanBltFourcc );
 
         /* Overlay clipping support is interesting for us as it means we can
          * get rid of the colorkey alltogether */
         p_vout->p_sys->b_caps_overlay_clipping = bCanClipOverlay;
 
+        /* Don't ask for troubles */
+        if( !bCanBltFourcc ) p_vout->p_sys->b_hw_yuv = FALSE; 
     }
 }
 
