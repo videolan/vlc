@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.21 2003/02/03 00:39:42 sam Exp $
+ * $Id: alsa.c,v 1.22 2003/02/10 17:43:21 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -159,7 +159,7 @@ static void Probe( aout_instance_t * p_aout,
 
         i_channels = aout_FormatNbChannels( &p_aout->output.output );
 
-        while ( i_channels > 1 )
+        while ( i_channels > 0 )
         {
             /* Here we have to probe multi-channel capabilities but I have
                no idea (at the moment) of how its managed by the ALSA
@@ -342,6 +342,15 @@ static int Open( vlc_object_t *p_this )
         p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
     }
 
+    else
+    {
+        /* This should not happen ! */
+        msg_Err( p_aout, "internal: can't find audio-device (%s)",
+                 val.psz_string );
+        free( p_sys );
+        free( val.psz_string );
+        return VLC_EGENERIC;
+    }
     free( val.psz_string );
 
 #ifdef DEBUG

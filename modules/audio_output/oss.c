@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.50 2003/02/06 15:14:41 massiot Exp $
+ * $Id: oss.c,v 1.51 2003/02/10 17:43:21 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -331,6 +331,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "internal: can't find audio-device (%s)",
                  val.psz_string );
         free( p_sys );
+        free( val.psz_string );
         return VLC_EGENERIC;
     }
     free( val.psz_string );
