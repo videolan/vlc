@@ -1,6 +1,6 @@
 #!/bin/sh
 ldconfig
-if [ -x /usr/share/vlc ] ; then
-   ln -s /usr/share/vlc /opt/QtPalmtop/pics/vlc
+if [ -x /usr/share/videolan ] ; then
+   ln -s /usr/share/videolan /opt/QtPalmtop/pics/videolan
 fi
 exit 0
