@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.23 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.24 2003/07/24 23:21:18 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -35,10 +35,11 @@
 #undef Yield
 #undef CreateDialog
 
-extern int wxEntry( HINSTANCE hInstance,
-                    HINSTANCE hPrevInstance = NULL,
-                    char *pCmdLine = NULL,
-                    int nCmdShow = SW_NORMAL );
+/* Hack to detect wxWindows 2.5 which has a different wxEntry() prototype */
+#ifdef _WX_INIT_H_
+extern int wxEntry( HINSTANCE hInstance, HINSTANCE hPrevInstance = NULL,
+                    char *pCmdLine = NULL, int nCmdShow = SW_NORMAL );
+#endif
 #endif
 
 /* Let vlc take care of the i18n stuff */
