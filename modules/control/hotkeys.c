@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.6 2003/10/30 23:17:59 hartman Exp $
+ * $Id: hotkeys.c,v 1.7 2003/10/31 18:18:46 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -29,6 +29,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc/input.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
 #include <osd.h>
@@ -196,7 +197,7 @@ static void Run( intf_thread_t *p_intf )
         if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_vlc->b_die = VLC_TRUE;
-            vout_OSDMessage( p_intf, _("Quit" ) );
+            vout_OSDMessage( VLC_OBJECT(p_intf), _("Quit" ) );
             continue;
         }
         else if( i_action == ACTIONID_VOL_UP )
@@ -205,7 +206,7 @@ static void Run( intf_thread_t *p_intf )
             char string[9];
             aout_VolumeUp( p_intf, 1, &i_newvol );
             sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
-            vout_OSDMessage( p_intf, string );
+            vout_OSDMessage( VLC_OBJECT(p_intf), string );
         }
         else if( i_action == ACTIONID_VOL_DOWN )
         {
@@ -213,7 +214,7 @@ static void Run( intf_thread_t *p_intf )
             char string[9];
             aout_VolumeDown( p_intf, 1, &i_newvol );
             sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
-            vout_OSDMessage( p_intf, string );
+            vout_OSDMessage( VLC_OBJECT(p_intf), string );
         }
         else if( i_action == ACTIONID_FULLSCREEN )
         {
@@ -242,7 +243,7 @@ static void Run( intf_thread_t *p_intf )
             if( p_input &&
                 p_input->stream.control.i_status != PAUSE_S )
             {
-                vout_OSDMessage( p_intf, _( "Pause" ) );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
                 input_SetStatus( p_input, INPUT_STATUS_PAUSE );
             }
             else
@@ -255,7 +256,7 @@ static void Run( intf_thread_t *p_intf )
                     if( p_playlist->i_size )
                     {
                         vlc_mutex_unlock( &p_playlist->object_lock );
-                        vout_OSDMessage( p_intf, _( "Play" ) );
+                        vout_OSDMessage( VLC_OBJECT(p_intf), _( "Play" ) );
                         playlist_Play( p_playlist );
                         vlc_object_release( p_playlist );
                     }
@@ -264,40 +265,48 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( p_input )
         {
+            uint64_t i_time;
+
             if( i_action == ACTIONID_PAUSE )
             {
-                vout_OSDMessage( p_intf, _( "Pause" ) );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
                 input_SetStatus( p_input, INPUT_STATUS_PAUSE );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
             {
-                vout_OSDMessage( p_intf, _( "Jump -10 seconds" ) );
-                input_Seek( p_input, -10, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -10 seconds" ) );
+                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
+                demux_Control( p_input, DEMUX_SET_TIME, i_time - 10000000 );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC )
             {
-                vout_OSDMessage( p_intf, _( "Jump +10 seconds" ) );
-                input_Seek( p_input, 10, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +10 seconds" ) );
+                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
+                demux_Control( p_input, DEMUX_SET_TIME, i_time + 10000000 );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN )
             {
-                vout_OSDMessage( p_intf, _( "Jump -1 minute" ) );
-                input_Seek( p_input, -60, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -1 minute" ) );
+                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
+                demux_Control( p_input, DEMUX_SET_TIME, i_time - 60000000 );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN )
             {
-                vout_OSDMessage( p_intf, _( "Jump +1 minute" ) );
-                input_Seek( p_input, 60, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +1 minute" ) );
+                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
+                demux_Control( p_input, DEMUX_SET_TIME, i_time + 60000000 );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN )
             {
-                vout_OSDMessage( p_intf, _( "Jump -5 minutes" ) );
-                input_Seek( p_input, -300, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -5 minutes" ) );
+                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
+                demux_Control( p_input, DEMUX_SET_TIME, i_time - 300000000 );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN )
             {
-                vout_OSDMessage( p_intf, _( "Jump +5 minutes" ) );
-                input_Seek( p_input, 300, INPUT_SEEK_SECONDS|INPUT_SEEK_CUR );
+                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +5 minutes" ) );
+                demux_Control( p_input, DEMUX_GET_TIME, &i_time );
+                demux_Control( p_input, DEMUX_SET_TIME, i_time + 300000000 );
             }
             else if( i_action == ACTIONID_NEXT )
             {
@@ -331,12 +340,12 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_FASTER )
             {
-            	vlc_value_t val; val.b_bool = VLC_TRUE;
+                vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-faster", val );
             }
             else if( i_action == ACTIONID_FASTER )
             {
-            	vlc_value_t val; val.b_bool = VLC_TRUE;
+                vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-slower", val );
             }
         }

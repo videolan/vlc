@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.27 2003/10/29 12:23:51 gbazin Exp $
+ * $Id: events.c,v 1.28 2003/10/31 18:18:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -195,6 +195,7 @@ void DirectXEventThread( event_thread_t *p_event )
             break;
 
         case WM_KEYDOWN:
+        case WM_SYSKEYDOWN:
             /* The key events are first processed here and not translated
              * into WM_CHAR events because we need to know the status of the
              * modifier keys. */
@@ -211,11 +212,11 @@ void DirectXEventThread( event_thread_t *p_event )
                 {
                     val.i_int |= KEY_MODIFIER_CTRL;
                 }
-                else if( GetKeyState(VK_SHIFT) & 0x8000 )
+                if( GetKeyState(VK_SHIFT) & 0x8000 )
                 {
                     val.i_int |= KEY_MODIFIER_SHIFT;
                 }
-                else if( GetKeyState(VK_MENU) & 0x8000 )
+                if( GetKeyState(VK_MENU) & 0x8000 )
                 {
                     val.i_int |= KEY_MODIFIER_ALT;
                 }
@@ -711,7 +712,6 @@ static struct
     { VK_SPACE, KEY_SPACE },
     { VK_ESCAPE, KEY_ESC },
 
-    { VK_MENU, KEY_MENU },
     { VK_LEFT, KEY_LEFT },
     { VK_RIGHT, KEY_RIGHT },
     { VK_UP, KEY_UP },
@@ -721,6 +721,11 @@ static struct
     { VK_END, KEY_END },
     { VK_PRIOR, KEY_PAGEUP },
     { VK_NEXT, KEY_PAGEDOWN },
+
+    { VK_CONTROL, 0 },
+    { VK_SHIFT, 0 },
+    { VK_MENU, 0 },
+
     { 0, 0 }
 };
 
