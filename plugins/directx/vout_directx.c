@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.8 2001/07/12 23:06:54 gbazin Exp $
+ * $Id: vout_directx.c,v 1.9 2001/07/30 00:53:04 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -56,7 +56,12 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include <directx.h>
+
+#if defined( _MSC_VER )
+#   include <ddraw.h>
+#else
+#   include <directx.h>
+#endif
 
 #include "config.h"
 #include "common.h"
@@ -616,19 +621,19 @@ static void vout_Display( vout_thread_t *p_vout )
                    i_image_width/2);
 #else
             /* copy Y, we copy two lines at once */
-            memcpy(ddsd.lpSurface + i*2*ddsd.lPitch,
+            memcpy((u8*)ddsd.lpSurface + i*2*ddsd.lPitch,
                    p_vout->p_rendered_pic->p_y + i*2*i_image_width,
                    i_image_width);
-            memcpy(ddsd.lpSurface + (i*2+1)*ddsd.lPitch,
+            memcpy((u8*)ddsd.lpSurface + (i*2+1)*ddsd.lPitch,
                    p_vout->p_rendered_pic->p_y + (i*2+1)*i_image_width,
                    i_image_width);
             /* then V */
-            memcpy((ddsd.lpSurface + ddsd.dwHeight * ddsd.lPitch)
+            memcpy(((u8*)ddsd.lpSurface + ddsd.dwHeight * ddsd.lPitch)
                       + i * ddsd.lPitch/2,
                    p_vout->p_rendered_pic->p_v + i*i_image_width/2,
                    i_image_width/2);
             /* and U */
-            memcpy((ddsd.lpSurface + ddsd.dwHeight * ddsd.lPitch)
+            memcpy(((u8*)ddsd.lpSurface + ddsd.dwHeight * ddsd.lPitch)
                       + (ddsd.dwHeight * ddsd.lPitch/4)
                       + i * ddsd.lPitch/2,
                    p_vout->p_rendered_pic->p_u + i*i_image_width/2,

@@ -529,22 +529,25 @@ if test "x$withval" != "xno"
 then
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
   SDL_HEADER="SDL/SDL.h"
-  if test x${SDL_CONFIG} = xno; then
+  if test x${SDL_CONFIG} = xno
+  then
     AC_PATH_PROG(SDL11_CONFIG, sdl11-config, no)
     SDL_CONFIG=${SDL11_CONFIG}
     SDL_HEADER="SDL11/SDL.h"
   fi
-  if test x${SDL_CONFIG} = xno; then
+  if test x${SDL_CONFIG} = xno
+  then
     AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no)
     SDL_CONFIG=${SDL12_CONFIG}
     SDL_HEADER="SDL12/SDL.h"
   fi
-  if test x${SDL_CONFIG} != xno; then
+  if test x${SDL_CONFIG} != xno
+  then
     AC_CHECK_HEADERS($SDL_HEADER, [],
 	[ echo "The development package for SDL is not installed. Please install it"
 	  echo "and try again."
 	  exit ])
-    if expr 1.1.5 \> $($SDL_CONFIG --version) >/dev/null
+    if expr 1.1.5 \> `$SDL_CONFIG --version` >/dev/null
     then
       echo "You need SDL version 1.1.5 or later."
       exit

@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_events.c,v 1.3 2001/07/25 08:41:21 gbazin Exp $
+ * $Id: vout_events.c,v 1.4 2001/07/30 00:53:04 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -44,7 +44,12 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include <directx.h>
+
+#if defined( _MSC_VER )
+#   include <ddraw.h>
+#else
+#   include <directx.h>
+#endif
 
 #include "intf_msg.h"
 #include "interface.h"

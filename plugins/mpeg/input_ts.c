@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.30 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input_ts.c,v 1.31 2001/07/30 00:53:05 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -58,7 +58,6 @@
 #if defined( WIN32 )
 #   include <io.h>
 #   include <winsock2.h>
-#   include "input_iovec.h"
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
@@ -68,6 +67,10 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
+
+#if defined( WIN32 )
+#   include "input_iovec.h"
+#endif
 
 #include "intf_msg.h"
 

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.108 2001/07/18 14:21:00 massiot Exp $
+ * $Id: main.c,v 1.109 2001/07/30 00:53:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,11 +49,13 @@
 #endif
 
 #ifndef WIN32
-#include <netinet/in.h>                               /* BSD: struct in_addr */
+#   include <netinet/in.h>                            /* BSD: struct in_addr */
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#   include <unistd.h>
+#elif defined( _MSC_VER ) && defined( _WIN32 )
+#   include <io.h>
 #endif
 
 #include <errno.h>                                                 /* ENOMEM */

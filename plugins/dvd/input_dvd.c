@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.81 2001/07/27 01:05:17 sam Exp $
+ * $Id: input_dvd.c,v 1.82 2001/07/30 00:53:05 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -54,8 +54,7 @@
 #endif
 
 #if defined( WIN32 )
-#   include <io.h>
-#   include "input_iovec.h"
+#   include <io.h>                                                 /* read() */
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
@@ -67,6 +66,10 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
+
+#if defined( WIN32 )
+#   include "input_iovec.h"
+#endif
 
 #include "intf_msg.h"
 

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.36 2001/07/08 17:45:51 gbazin Exp $
+ * $Id: common.h,v 1.37 2001/07/30 00:53:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -207,13 +207,11 @@ struct pgrm_descriptor_s;
 #endif
 
 #if defined( WIN32 )
+#   ifndef _OFF_T_DEFINED
 typedef __int64 off_t;
-#ifndef snprintf
-#define snprintf _snprintf         /* snprintf not defined in mingw32 (bug?) */
+#       define _OFF_T_DEFINED
+#   endif
+#   ifndef snprintf
+#       define snprintf _snprintf  /* snprintf not defined in mingw32 (bug?) */
+#   endif
 #endif
-#endif
-
-
-
-
-

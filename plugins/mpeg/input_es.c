@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.8 2001/07/17 09:48:07 massiot Exp $
+ * $Id: input_es.c,v 1.9 2001/07/30 00:53:05 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,15 +38,12 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#elif defined( _MSC_VER ) && defined( _WIN32 )
-#   include <io.h>
 #endif
 
 #include <fcntl.h>
 
 #if defined( WIN32 )
-#   include <io.h>
-#   include "input_iovec.h"
+#   include <io.h>                                                 /* read() */
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
@@ -56,6 +53,10 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
+
+#if defined( WIN32 )
+#   include "input_iovec.h"
+#endif
 
 #include "intf_msg.h"
 

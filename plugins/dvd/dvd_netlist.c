@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.12 2001/07/17 09:48:07 massiot Exp $
+ * $Id: dvd_netlist.c,v 1.13 2001/07/30 00:53:05 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -41,8 +41,7 @@
 #endif
 
 #if defined( WIN32 )
-#   include <io.h>
-#   include "input_iovec.h"
+#   include <io.h>                                                 /* read() */
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
@@ -52,6 +51,10 @@
 #include "threads.h"                                                /* mutex */
 #include "mtime.h"
 #include "intf_msg.h"                                           /* intf_*Msg */
+
+#if defined( WIN32 )
+#   include "input_iovec.h"
+#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

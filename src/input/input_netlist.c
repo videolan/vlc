@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.40 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input_netlist.c,v 1.41 2001/07/30 00:53:05 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -34,11 +34,10 @@
 #   include <unistd.h>
 #endif
 
-#if !defined( WIN32 )
-#   include <sys/uio.h>                                      /* struct iovec */
+#if defined( WIN32 )
+#   include <io.h>                                                 /* read() */
 #else
-#   include <io.h>
-#   include "input_iovec.h"
+#   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
 #include "config.h"
@@ -46,6 +45,10 @@
 #include "threads.h"                                                /* mutex */
 #include "mtime.h"
 #include "intf_msg.h"                                           /* intf_*Msg */
+
+#if defined( WIN32 )
+#   include "input_iovec.h"
+#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.11 2001/07/28 02:17:37 sam Exp $
+ * $Id: libdvdcss.c,v 1.12 2001/07/30 00:53:04 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,14 +38,17 @@
 #endif
 
 #if defined( WIN32 )
-#   include <io.h>
-#   include "input_iovec.h"
+#   include <io.h>                                                 /* read() */
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
 #include "config.h"
 #include "common.h"
+
+#if defined( WIN32 )
+#   include "input_iovec.h"
+#endif
 
 #include "videolan/dvdcss.h"
 #include "libdvdcss.h"
@@ -807,7 +810,7 @@ static int _win32_dvdcss_aread( int i_fd, void *p_data, int i_blocks )
 
         /* transfer the next 64kb (_win32_dvdcss_aread is called recursively)
          * We need to check the status of the read on return */
-        if( _win32_dvdcss_aread( i_fd, p_data + 32 * DVDCSS_BLOCK_SIZE,
+        if( _win32_dvdcss_aread( i_fd, (u8*) p_data + 32 * DVDCSS_BLOCK_SIZE,
                                  i_blocks - 32) < 0 )
         {
             return -1;

@@ -3,6 +3,7 @@
 #===================#
 
 HEAD
+  * VC++/Intel compiler fixes by Jon Lech Johansen <jon-vl@nanocrew.net>.
   * Better gtk-config detection.
   * Removed duplicate checks in configure.in.
   * Fixed a typo in vlc.spec.
