@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.23 2003/08/25 20:47:41 fenrir Exp $
+ * $Id: mkv.cpp,v 1.24 2003/08/26 18:11:02 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,6 +36,7 @@
 
 #include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "iso_lang.h"
+#include "ninput.h"
 
 #include <iostream>
 #include <cassert>
@@ -84,17 +85,12 @@
 using namespace LIBMATROSKA_NAMESPACE;
 using namespace std;
 
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Activate  ( vlc_object_t * );
-static void Deactivate( vlc_object_t * );
-static int  Demux     ( input_thread_t * );
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
 vlc_module_begin();
     add_category_hint( N_("mkv-demuxer"), NULL, VLC_TRUE );
         add_bool( "mkv-seek-percent", 1, NULL,
@@ -103,10 +99,16 @@ vlc_module_begin();
 
     set_description( _("mka/mkv stream demuxer" ) );
     set_capability( "demux", 50 );
-    set_callbacks( Activate, Deactivate );
+    set_callbacks( Open, Close );
     add_shortcut( "mka" );
     add_shortcut( "mkv" );
 vlc_module_end();
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int  Demux   ( input_thread_t * );
+static void Seek    ( input_thread_t *, mtime_t i_date, int i_percent );
 
 
 /*****************************************************************************
@@ -115,11 +117,11 @@ vlc_module_end();
 class vlc_stream_io_callback: public IOCallback
 {
   private:
-    input_thread_t *p_input;
+    stream_t       *s;
     vlc_bool_t     mb_eof;
 
   public:
-    vlc_stream_io_callback( input_thread_t * );
+    vlc_stream_io_callback( stream_t * );
 
     virtual uint32_t read            ( void *p_buffer, size_t i_size);
     virtual void     setFilePointer  ( int64_t i_offset, seek_mode mode = seek_beginning );
@@ -232,6 +234,8 @@ typedef struct
 
 struct demux_sys_t
 {
+    stream_t                *s;
+
     vlc_stream_io_callback  *in;
     EbmlStream              *es;
     EbmlParser              *ep;
@@ -280,9 +284,9 @@ static void InformationsCreate  ( input_thread_t *p_input );
 static char *LanguageGetName    ( const char *psz_code );
 
 /*****************************************************************************
- * Activate: initializes matroska demux structures
+ * Open: initializes matroska demux structures
  *****************************************************************************/
-static int Activate( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys;
@@ -293,14 +297,6 @@ static int Activate( vlc_object_t * p_this )
     int             i_spu_channel, i_audio_channel;
 
     EbmlElement     *el = NULL, *el1 = NULL, *el2 = NULL, *el3 = NULL, *el4 = NULL;
-
-
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    }
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
@@ -313,7 +309,8 @@ static int Activate( vlc_object_t * p_this )
     }
 
     /* is a valid file */
-    if( p_peek[0] != 0x1a || p_peek[1] != 0x45 || p_peek[2] != 0xdf || p_peek[3] != 0xa3 )
+    if( p_peek[0] != 0x1a || p_peek[1] != 0x45 ||
+        p_peek[2] != 0xdf || p_peek[3] != 0xa3 )
     {
         msg_Warn( p_input, "matroska module discarded "
                            "(invalid header 0x%.2x%.2x%.2x%.2x)",
@@ -321,10 +318,16 @@ static int Activate( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_input->p_demux_data = p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );
+    p_input->p_demux_data = p_sys = (demux_sys_t*)malloc(sizeof( demux_sys_t ));
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
-    p_sys->in = new vlc_stream_io_callback( p_input );
+    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
+    {
+        msg_Err( p_input, "cannot create stream" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    p_sys->in = new vlc_stream_io_callback( p_sys->s );
     p_sys->es = new EbmlStream( *p_sys->in );
     p_sys->f_duration   = -1;
     p_sys->i_timescale     = MKVD_TIMECODESCALE;
@@ -338,7 +341,8 @@ static int Activate( vlc_object_t * p_this )
     p_sys->b_cues       = VLC_FALSE;
     p_sys->i_index      = 0;
     p_sys->i_index_max  = 1024;
-    p_sys->index        = (mkv_index_t*)malloc( sizeof( mkv_index_t ) * p_sys->i_index_max );
+    p_sys->index        = (mkv_index_t*)malloc( sizeof( mkv_index_t ) *
+                                                p_sys->i_index_max );
 
     p_sys->psz_muxing_application = NULL;
     p_sys->psz_writing_application = NULL;
@@ -350,6 +354,7 @@ static int Activate( vlc_object_t * p_this )
     {
         msg_Err( p_input, "failed to create EbmlStream" );
         delete p_sys->in;
+        stream_Release( p_sys->s );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -404,7 +409,8 @@ static int Activate( vlc_object_t * p_this )
                     dur.ReadData( p_sys->es->I_O() );
                     p_sys->f_duration = float(dur);
 
-                    msg_Dbg( p_input, "|   |   + Duration=%f", p_sys->f_duration );
+                    msg_Dbg( p_input, "|   |   + Duration=%f",
+                             p_sys->f_duration );
                 }
                 else if( EbmlId( *el2 ) == KaxMuxingApp::ClassInfos.GlobalId )
                 {
@@ -414,7 +420,8 @@ static int Activate( vlc_object_t * p_this )
 
                     p_sys->psz_muxing_application = UTF8ToStr( UTFstring( mapp ) );
 
-                    msg_Dbg( p_input, "|   |   + Muxing Application=%s", p_sys->psz_muxing_application );
+                    msg_Dbg( p_input, "|   |   + Muxing Application=%s",
+                             p_sys->psz_muxing_application );
                 }
                 else if( EbmlId( *el2 ) == KaxWritingApp::ClassInfos.GlobalId )
                 {
@@ -424,7 +431,8 @@ static int Activate( vlc_object_t * p_this )
 
                     p_sys->psz_writing_application = UTF8ToStr( UTFstring( wapp ) );
 
-                    msg_Dbg( p_input, "|   |   + Wrinting Application=%s", p_sys->psz_writing_application );
+                    msg_Dbg( p_input, "|   |   + Wrinting Application=%s",
+                             p_sys->psz_writing_application );
                 }
                 else if( EbmlId( *el2 ) == KaxSegmentFilename::ClassInfos.GlobalId )
                 {
@@ -434,7 +442,8 @@ static int Activate( vlc_object_t * p_this )
 
                     p_sys->psz_segment_filename = UTF8ToStr( UTFstring( sfn ) );
 
-                    msg_Dbg( p_input, "|   |   + Segment Filename=%s", p_sys->psz_segment_filename );
+                    msg_Dbg( p_input, "|   |   + Segment Filename=%s",
+                             p_sys->psz_segment_filename );
                 }
                 else if( EbmlId( *el2 ) == KaxTitle::ClassInfos.GlobalId )
                 {
@@ -521,14 +530,16 @@ static int Activate( vlc_object_t * p_this )
                             tnum.ReadData( p_sys->es->I_O() );
 
                             tk.i_number = uint32( tnum );
-                            msg_Dbg( p_input, "|   |   |   + Track Number=%u", uint32( tnum ) );
+                            msg_Dbg( p_input, "|   |   |   + Track Number=%u",
+                                     uint32( tnum ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackUID::ClassInfos.GlobalId )
                         {
                             KaxTrackUID &tuid = *(KaxTrackUID*)el3;
                             tuid.ReadData( p_sys->es->I_O() );
 
-                            msg_Dbg( p_input, "|   |   |   + Track UID=%u", uint32( tuid ) );
+                            msg_Dbg( p_input, "|   |   |   + Track UID=%u",
+                                     uint32( tuid ) );
                         }
                         else  if( EbmlId( *el3 ) == KaxTrackType::ClassInfos.GlobalId )
                         {
@@ -844,14 +855,16 @@ static int Activate( vlc_object_t * p_this )
                         }
                         else
                         {
-                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)", typeid(*el3).name() );
+                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)",
+                                     typeid(*el3).name() );
                         }
                     }
                     p_sys->ep->Up();
                 }
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid(*el2).name() );
+                    msg_Dbg( p_input, "|   |   + Unknown (%s)",
+                             typeid(*el2).name() );
                 }
 #undef tk
             }
@@ -890,7 +903,8 @@ static int Activate( vlc_object_t * p_this )
                         }
                         else
                         {
-                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)", typeid(*el).name() );
+                            msg_Dbg( p_input, "|   |   |   + Unknown (%s)",
+                                     typeid(*el).name() );
                         }
                     }
                     p_sys->ep->Up();
@@ -899,17 +913,20 @@ static int Activate( vlc_object_t * p_this )
                     {
                         if( id == KaxCues::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = cues at "I64Fd, i_pos );
+                            msg_Dbg( p_input, "|   |   |   = cues at "I64Fd,
+                                     i_pos );
                             p_sys->i_cues_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
                         else if( id == KaxChapters::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = chapters at "I64Fd, i_pos );
+                            msg_Dbg( p_input, "|   |   |   = chapters at "I64Fd,
+                                     i_pos );
                             p_sys->i_chapters_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
                         else if( id == KaxTags::ClassInfos.GlobalId )
                         {
-                            msg_Dbg( p_input, "|   |   |   = tags at "I64Fd, i_pos );
+                            msg_Dbg( p_input, "|   |   |   = tags at "I64Fd,
+                                     i_pos );
                             p_sys->i_tags_position = p_sys->segment->GetGlobalPosition( i_pos );
                         }
 
@@ -917,7 +934,8 @@ static int Activate( vlc_object_t * p_this )
                 }
                 else
                 {
-                    msg_Dbg( p_input, "|   |   + Unknown (%s)", typeid(*el).name() );
+                    msg_Dbg( p_input, "|   |   + Unknown (%s)",
+                             typeid(*el).name() );
                 }
             }
             p_sys->ep->Up();
@@ -970,14 +988,20 @@ static int Activate( vlc_object_t * p_this )
     }
 
     /* *** Load the cue if found *** */
-    if( p_sys->i_cues_position >= 0 && p_input->stream.b_seekable )
+    if( p_sys->i_cues_position >= 0 )
     {
-        LoadCues( p_input );
+        vlc_bool_t b_seekable;
+
+        stream_Control( p_sys->s, STREAM_CAN_FASTSEEK, &b_seekable );
+        if( b_seekable )
+        {
+            LoadCues( p_input );
+        }
     }
 
     if( !p_sys->b_cues || p_sys->i_index <= 0 )
     {
-        msg_Warn( p_input, "no cues/empty cues found -> seek won't be precise" );
+        msg_Warn( p_input, "no cues/empty cues found->seek won't be precise" );
 
         IndexAppendCluster( p_input, p_sys->cluster );
 
@@ -999,16 +1023,14 @@ static int Activate( vlc_object_t * p_this )
         goto error;
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
+    p_input->stream.i_mux_rate = 0;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     if( p_sys->f_duration > 1001.0 )
     {
         mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000.0 );
-        p_input->stream.i_mux_rate = p_input->stream.p_selected_area->i_size / 50 / i_duration;
+        p_input->stream.i_mux_rate = stream_Size( p_sys->s ) / 50 / i_duration;
     }
-    else
-    {
-        p_input->stream.i_mux_rate = 0;
-    }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* add all es */
     msg_Dbg( p_input, "found %d es", p_sys->i_track );
@@ -1289,14 +1311,15 @@ static int Activate( vlc_object_t * p_this )
 error:
     delete p_sys->es;
     delete p_sys->in;
+    stream_Release( p_sys->s );
     free( p_sys );
     return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * Deactivate: frees unused data
+ * Close: frees unused data
  *****************************************************************************/
-static void Deactivate( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys   = p_input->p_demux_data;
@@ -1332,6 +1355,7 @@ static void Deactivate( vlc_object_t *p_this )
     delete p_sys->ep;
     delete p_sys->es;
     delete p_sys->in;
+    stream_Release( p_sys->s );
 
     free( p_sys );
 }
@@ -1663,7 +1687,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     /* seek without index or without date */
     if( config_GetInt( p_input, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 )
     {
-        int64_t i_pos = i_percent * p_input->stream.p_selected_area->i_size / 100;
+        int64_t i_pos = i_percent * stream_Size( p_sys->s ) / 100;
 
         msg_Dbg( p_input, "imprecise way of seeking" );
         for( i_index = 0; i_index < p_sys->i_index; i_index++ )
@@ -1722,9 +1746,12 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
         }
 
         msg_Dbg( p_input, "seek got "I64Fd" (%d%%)",
-                 p_sys->index[i_index].i_time, (int)(100 * p_sys->index[i_index].i_position /p_input->stream.p_selected_area->i_size ) );
+                 p_sys->index[i_index].i_time,
+                 (int)( 100 * p_sys->index[i_index].i_position /
+                        stream_Size( p_sys->s ) ) );
 
-        p_sys->in->setFilePointer( p_sys->index[i_index].i_position, seek_beginning );
+        p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
+                                   seek_beginning );
     }
 
     /* now parse until key frame */
@@ -1803,12 +1830,12 @@ static int Demux( input_thread_t * p_input )
             i_date = (mtime_t)1000000 *
                      (mtime_t)i_duration*
                      (mtime_t)p_sys->in->getFilePointer() /
-                     (mtime_t)p_input->stream.p_selected_area->i_size;
+                     (mtime_t)stream_Size( p_sys->s );
         }
-        if( p_input->stream.p_selected_area->i_size > 0 )
+        if( stream_Size( p_sys->s ) > 0 )
         {
             i_percent = 100 * p_sys->in->getFilePointer() /
-                            p_input->stream.p_selected_area->i_size;
+                        stream_Size( p_sys->s );
         }
 
         Seek( p_input, i_date, i_percent);
@@ -1863,129 +1890,50 @@ static int Demux( input_thread_t * p_input )
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
-vlc_stream_io_callback::vlc_stream_io_callback( input_thread_t *p_input_ )
+vlc_stream_io_callback::vlc_stream_io_callback( stream_t *s_ )
 {
-    p_input = p_input_;
+    s = s_;
     mb_eof = VLC_FALSE;
 }
+
 uint32_t vlc_stream_io_callback::read( void *p_buffer, size_t i_size )
 {
-    data_packet_t *p_data;
-
-    int i_count;
-    int i_read = 0;
-
-
-    if( !i_size || mb_eof )
+    if( i_size <= 0 || mb_eof )
     {
         return 0;
     }
 
-    do
-    {
-        i_count = input_SplitBuffer(p_input, &p_data, __MIN( i_size, 10240 ) );
-        if( i_count <= 0 )
-        {
-            return i_read;
-        }
-        memcpy( p_buffer, p_data->p_payload_start, i_count );
-        input_DeletePacket( p_input->p_method_data, p_data );
-
-        (uint8_t*)p_buffer += i_count;
-        i_size            -= i_count;
-        i_read            += i_count;
-
-    } while( i_size );
-
-    return i_read;
+    return stream_Read( s, p_buffer, i_size );
 }
 void vlc_stream_io_callback::setFilePointer(int64_t i_offset, seek_mode mode )
 {
     int64_t i_pos;
-    int64_t i_last;
 
-    i_last = getFilePointer();
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
     switch( mode )
     {
         case seek_beginning:
             i_pos = i_offset;
             break;
         case seek_end:
-            i_pos = p_input->stream.p_selected_area->i_size - i_offset;
+            i_pos = stream_Size( s ) - i_offset;
             break;
         default:
-            i_pos= i_last + i_offset;
+            i_pos= stream_Tell( s ) + i_offset;
             break;
     }
 
-    if( i_pos < 0 ||
-        ( i_pos > p_input->stream.p_selected_area->i_size && p_input->stream.p_selected_area->i_size != 0 ) )
+    if( i_pos < 0 || i_pos >= stream_Size( s ) )
     {
-        msg_Err( p_input, "seeking to wrong place (i_pos="I64Fd")", i_pos );
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
         mb_eof = VLC_TRUE;
         return;
     }
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     mb_eof = VLC_FALSE;
-
-    if( i_pos == i_last )
+    if( stream_Seek( s, i_pos ) )
     {
-        return;
-    }
-
-    msg_Dbg( p_input, "####################seek new="I64Fd" old="I64Fd,
-             i_pos, getFilePointer() );
-
-    if( p_input->stream.b_seekable &&
-        ( /*p_input->stream.i_method == INPUT_METHOD_FILE ||*/ i_pos < i_last || i_pos - i_last > p_input->i_bufsize / 4 ) )
-    {
-        input_AccessReinit( p_input );
-        p_input->pf_seek( p_input, i_pos );
-    }
-    else if( i_pos > i_last )
-    {
-        data_packet_t   *p_data;
-        int             i_skip = i_pos - i_last;
-
-        if( i_skip > 1024 )
-        {
-            msg_Warn( p_input, "will skip %d bytes, slow", i_skip );
-        }
-
-        while (i_skip > 0 )
-        {
-            int i_read;
-
-            i_read = input_SplitBuffer( p_input, &p_data,
-                                        __MIN( 4096, i_skip ) );
-            if( i_read <= 0 )
-            {
-                msg_Err( p_input, "seek failed" );
-                mb_eof = VLC_TRUE;
-                return;
-            }
-            i_skip -= i_read;
-
-            input_DeletePacket( p_input->p_method_data, p_data );
-            if( i_read == 0 && i_skip > 0 )
-            {
-                msg_Err( p_input, "seek failed" );
-                mb_eof = VLC_TRUE;
-                return;
-            }
-        }
-    }
-    else
-    {
-        msg_Err( p_input, "cannot seek or emulate seek to "I64Fd" from "I64Fd,
-                 i_pos, i_last );
         mb_eof = VLC_TRUE;
     }
+    return;
 }
 size_t vlc_stream_io_callback::write( const void *p_buffer, size_t i_size )
 {
@@ -1993,13 +1941,7 @@ size_t vlc_stream_io_callback::write( const void *p_buffer, size_t i_size )
 }
 uint64_t vlc_stream_io_callback::getFilePointer( void )
 {
-    uint64_t i_pos;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    i_pos= p_input->stream.p_selected_area->i_tell;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    return i_pos;
+    return stream_Tell( s );
 }
 void vlc_stream_io_callback::close( void )
 {
@@ -2473,9 +2415,16 @@ static void InformationsCreate( input_thread_t *p_input )
 
 #undef  tk
     }
-    if( p_sys->i_tags_position >= 0 && p_input->stream.b_seekable )
+
+    if( p_sys->i_tags_position >= 0 )
     {
-        LoadTags( p_input );
+        vlc_bool_t b_seekable;
+
+        stream_Control( p_sys->s, STREAM_CAN_FASTSEEK, &b_seekable );
+        if( b_seekable )
+        {
+            LoadTags( p_input );
+        }
     }
 }
 
