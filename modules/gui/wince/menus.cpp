@@ -88,6 +88,11 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
     /* Initializations */
     memset( pi_objects, 0, MAX_POPUP_ITEMS * sizeof(int) );
 
+    ppsz_varnames[i] = "VLC media player";
+    pi_objects[i++] = 0;
+    ppsz_varnames[i++] = NULL; /* Separator */
+    i_last_separator = i;
+
     /* Input menu */
     p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
@@ -302,7 +307,7 @@ void RefreshVideoMenu( intf_thread_t *p_intf, HMENU hMenu )
     /* Delete old menu */
     int count = wce_GetMenuItemCount( hMenu );
     for( i = 0; i <= count; i++ ) RemoveMenu( hMenu, 0, MF_BYPOSITION );
-        
+
     if( p_intf->p_sys->p_video_menu )
     {
         for( iter = p_intf->p_sys->p_video_menu->begin();
@@ -311,7 +316,7 @@ void RefreshVideoMenu( intf_thread_t *p_intf, HMENU hMenu )
         p_intf->p_sys->p_video_menu->clear();
     }
     else p_intf->p_sys->p_video_menu = new vector<MenuItemExt*>;
-        
+
     /* Initializations */
     memset( pi_objects, 0, MAX_VIDEO_ITEMS * sizeof(int) );
     i = 0;

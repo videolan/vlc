@@ -100,7 +100,7 @@ struct intf_sys_t
 class CBaseWindow
 {
 public:
-    CBaseWindow(){ hInst = 0; }
+    CBaseWindow() : hWnd(0), hInst(0) {};
     virtual ~CBaseWindow() {};
 
     HWND hWnd;                // The main window handle
@@ -158,7 +158,6 @@ public:
     Timer *ti;
     OpenDialog *open;
     CBaseWindow *video;
-    HWND hwndVideo;
 
 protected:
 

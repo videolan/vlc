@@ -661,29 +661,6 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         RefreshNavigMenu( p_intf,
             (HMENU)SendMessage( hwndCB, SHCMBM_GETSUBMENU, (WPARAM)0,
                                 (LPARAM)IDM_NAVIGATION ) );
-
-#if 0
-        // Undo the video display because menu is opened
-        // due to GAPI, menu top display is not assumed
-        // FIXME verify if p_child_window exits
-        SendMessage( p_intf->p_sys->p_video_window->p_child_window,
-                     WM_INITMENUPOPUP, wp, lp );
-#endif
-
-        //refresh screen
-        /* InvalidateRect(hwnd, NULL, TRUE);
-           /UpdateWindow(hwndCB); //  NULL*/
-        break;
-
-#if 0
-    case WM_NOTIFY:
-        // Redo the video display because menu can be closed
-        // FIXME verify if p_child_window exits
-        if( (((NMHDR *)lp)->code) == NM_CUSTOMDRAW )
-            SendMessage( p_intf->p_sys->p_video_window->p_child_window,
-                         WM_NOTIFY, wp, lp );
-        return lResult;
-#endif
         break;
 
     case WM_LBUTTONDOWN:
@@ -707,6 +684,18 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
     case WM_CLOSE:
         DestroyWindow( hwndCB );
         DestroyWindow( hwnd );
+        break;
+
+    case WM_ENTERMENULOOP:
+    case WM_KILLFOCUS:
+        if( video && video->hWnd )
+            SendMessage( video->hWnd, WM_KILLFOCUS, 0, 0 );
+        break;
+
+    case WM_EXITMENULOOP:
+    case WM_SETFOCUS:
+        if( video && video->hWnd )
+            SendMessage( video->hWnd, WM_SETFOCUS, 0, 0 );
         break;
 
     case WM_DESTROY:

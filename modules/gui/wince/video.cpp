@@ -98,6 +98,7 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, HWND _p_parent )
 
     p_intf->pf_request_window = ::GetWindow;
     p_intf->pf_release_window = ::ReleaseWindow;
+    p_intf->pf_control_window = ::ControlWindow;
 
     p_intf->p_sys->p_video_window = this;
 
@@ -116,7 +117,8 @@ VideoWindow::VideoWindow( intf_thread_t *_p_intf, HWND _p_parent )
     RegisterClass( &wc );
 
     p_child_window = CreateWindow (
-        _T("VIDEOWINDOW"), _T(""), WS_CHILD | WS_VISIBLE | WS_BORDER,
+        _T("VIDEOWINDOW"), _T(""),
+        WS_CHILD | WS_CLIPCHILDREN | WS_VISIBLE | WS_BORDER,
         0, 20, rect.right - rect.left,
         rect.bottom - rect.top - 2*(MENU_HEIGHT-1) - SLIDER_HEIGHT - 20,
         p_parent, NULL, GetModuleHandle(0), (void *)this );
@@ -192,7 +194,24 @@ PURPOSE:
 ***********************************************************************/
 LRESULT VideoWindow::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 {
-    return DefWindowProc( hwnd, msg, wp, lp );
+    switch( msg )
+    {
+    case WM_KILLFOCUS:
+        msg_Err( p_intf, "WM_KILLFOCUS1" );
+        if( p_vout )
+            vout_Control( p_vout, VOUT_SET_FOCUS, (vlc_bool_t)VLC_FALSE );
+        return TRUE;
+
+    case WM_SETFOCUS:
+        msg_Err( p_intf, "WM_SETFOCUS1" );
+        if( p_vout )
+            vout_Control( p_vout, VOUT_SET_FOCUS, (vlc_bool_t)VLC_TRUE );
+        return TRUE;
+
+    default:
+        return DefWindowProc( hwnd, msg, wp, lp );
+    }
+
 }
 
 static int ControlWindow( intf_thread_t *p_intf, void *p_window,
