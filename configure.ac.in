@@ -464,67 +464,78 @@ AC_CACHE_CHECK([if \$CC accepts -W],
     [ac_cv_c_W],
     [CFLAGS="-W ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_W=yes, ac_cv_c_W=no)])
+
+AC_CACHE_CHECK([if \$CC accepts -Wall],
+    [ac_cv_c_Wall],
+    [CFLAGS="-Wall ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wall=yes, ac_cv_c_Wall=no)])
+
+AC_CACHE_CHECK([if \$CC accepts -Wconversion],
+    [ac_cv_c_Wconversion],
+    [CFLAGS="-Wconversion ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wconversion=yes, ac_cv_c_Wconversion=no)])
+
+AC_CACHE_CHECK([if \$CC accepts -Wunreachable-code],
+    [ac_cv_c_Wunreachable_code],
+    [CFLAGS="-Wunreachable-code ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wunreachable_code=yes, ac_cv_c_Wunreachable_code=no)])
+
+AC_CACHE_CHECK([if \$CC accepts -Wsign-compare],
+    [ac_cv_c_Wsign_compare],
+    [CFLAGS="-Wsign-compare ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wsign_compare=yes, ac_cv_c_Wsign_compare=no)])
+
+AC_CACHE_CHECK([if \$CC accepts -Wdisabled-optimization],
+    [ac_cv_c_Wdisabled_optimization],
+    [CFLAGS="-Wdisabled-optimization ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Wdisabled_optimization=yes, ac_cv_c_Wdisabled_optimization=no)])
+
+AC_CACHE_CHECK([if \$CC accepts -Winline],
+    [ac_cv_c_Winline],
+    [CFLAGS="-Winline ${CFLAGS_save}"
+     AC_TRY_COMPILE([],,ac_cv_c_Winline=yes, ac_cv_c_Winline=no)])
+
 if test "x${ac_cv_c_W}" != "xno"; then
     CFLAGS_save="-W ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-W ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-W ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-AC_CACHE_CHECK([if \$CC accepts -Wall],
-    [ac_cv_c_Wall],
-    [CFLAGS="-Wall ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wall=yes, ac_cv_c_Wall=no)])
 if test "x${ac_cv_c_Wall}" != "xno"; then
     CFLAGS_save="-Wall ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wall ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wall ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
-
-AC_CACHE_CHECK([if \$CC accepts -Wunreachable-code],
-    [ac_cv_c_Wunreachable_code],
-    [CFLAGS="-Wunreachable-code ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wunreachable_code=yes, ac_cv_c_Wunreachable_code=no)])
 if test "x${ac_cv_c_Wunreachable_code}" != "xno"; then
     CFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wunreachable-code ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wunreachable-code ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+
+    dnl -Wunreachable-code means gcc-3.x, we can use -Wconversion and we can
+    dnl activate -Winline for C++, it won't choke on system headers.
+    if test "x${ac_cv_c_Wconversion}" != "xno"; then
+        CFLAGS_save="-Wconversion ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
+        CXXFLAGS_save="-Wconversion ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+        OBJCFLAGS_save="-Wconversion ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
+    fi
+    if test "x${ac_cv_c_Winline}" != "xno"; then
+        CXXFLAGS_save="-Winline ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    fi
+
 fi
 
-AC_CACHE_CHECK([if \$CC accepts -Wconversion],
-    [ac_cv_c_Wconversion],
-    [CFLAGS="-Wconversion ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wconversion=yes, ac_cv_c_Wconversion=no)])
-if test "x${ac_cv_c_Wconversion}" != "xno"; then
-    CFLAGS_save="-Wconversion ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wconversion ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="-Wconversion ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
-
-AC_CACHE_CHECK([if \$CC accepts -Wsign-compare],
-    [ac_cv_c_Wsign_compare],
-    [CFLAGS="-Wsign-compare ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wsign_compare=yes, ac_cv_c_Wsign_compare=no)])
 if test "x${ac_cv_c_Wsign_compare}" != "xno"; then
     CFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wsign-compare ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-AC_CACHE_CHECK([if \$CC accepts -Wdisabled-optimization],
-    [ac_cv_c_Wdisabled_optimization],
-    [CFLAGS="-Wdisabled-optimization ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Wdisabled_optimization=yes, ac_cv_c_Wdisabled_optimization=no)])
 if test "x${ac_cv_c_Wdisabled_optimization}" != "xno"; then
     CFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wdisabled-optimization ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
-dnl Check for the -Winline flag
-AC_CACHE_CHECK([if \$CC accepts -W -Winline],
-    [ac_cv_c_Winline],
-    [CFLAGS="-Winline ${CFLAGS_save}"
-     AC_TRY_COMPILE([],,ac_cv_c_Winline=yes, ac_cv_c_Winline=no)])
 if test "x${ac_cv_c_Winline}" != "xno"; then
     CFLAGS_save="-Winline ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     OBJCFLAGS_save="-Winline ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
@@ -1015,7 +1026,7 @@ then
       AC_CHECK_HEADERS(dvdplay/dvdplay.h,
         [ PLUGINS="${PLUGINS} dvdplay"
           LDFLAGS_dvdplay="${LDFLAGS_dvdplay} ${LDFLAGS_dvd} ${LDFLAGS_dvdread} -ldvdplay"
-          CPPFLAGS_dvdplay = "${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread}" ],
+          CPPFLAGS_dvdplay="${CPPFLAGS_dvdplay} ${CPPFLAGS_dvdread}" ],
         [ if test "x${enable_dvdplay}" != "x"
           then
             AC_MSG_WARN([Please get libdvdplay from http://www.videolan.org/.])
