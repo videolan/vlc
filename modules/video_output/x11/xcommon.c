@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.28 2003/08/03 23:11:21 gbazin Exp $
+ * $Id: xcommon.c,v 1.29 2003/08/13 18:39:52 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1484,14 +1484,12 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                         False, SubstructureRedirectMask,
                         (XEvent*)&event );
         }
-        else
-        {
-            /* Make sure the change is effective */
-            XReparentWindow( p_vout->p_sys->p_display,
-                             p_vout->p_sys->p_win->base_window,
-                             DefaultRootWindow( p_vout->p_sys->p_display ),
-                             0, 0 );
-        }
+
+        /* Make sure the change is effective */
+        XReparentWindow( p_vout->p_sys->p_display,
+                         p_vout->p_sys->p_win->base_window,
+                         DefaultRootWindow( p_vout->p_sys->p_display ),
+                         0, 0 );
 
         /* fullscreen window size and position */
         p_vout->p_sys->p_win->i_width =

@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.39 2003/08/12 17:01:35 gbazin Exp $
+ * $Id: video.c,v 1.40 2003/08/13 18:39:53 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -597,7 +597,6 @@ usenextdata:
           p_vdec->p_ff_pic->pict_type == FF_B_TYPE ) )
     {
         p_vdec->pts = p_vdec->p_ff_pic->pts;
-msg_Err( p_vdec->p_fifo, "new pts: "I64Fd, p_vdec->pts );
     }
 
     if( p_vdec->pts <= 0 )
