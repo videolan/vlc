@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.51 2002/04/02 10:44:40 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.52 2002/04/10 10:08:06 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -174,13 +174,10 @@ VideoWindow::~VideoWindow()
     int32 result;
 
     teardownwindow = true;
-    Lock();
-    view->ClearViewOverlay();
     wait_for_thread(fDrawThreadID, &result);
-    delete overlaybitmap;
-    delete bitmap[0];
-    delete bitmap[1];
-    Quit();
+    if (overlaybitmap) delete overlaybitmap;
+    if (bitmap[0]) delete bitmap[0];
+    if (bitmap[1]) delete bitmap[1];
 }
 
 void VideoWindow::drawBuffer(int bufferIndex)
@@ -324,7 +321,7 @@ int VideoWindow::SelectDrawingMode(int width, int height)
     bitmap[1] = new BBitmap( BRect( 0, 0, width, height ), colspace[colspace_index].colspace);
     memset(bitmap[0]->Bits(), 0, bitmap[0]->BitsLength());
     memset(bitmap[1]->Bits(), 0, bitmap[1]->BitsLength());
-    intf_Msg("Color index used: %i", colspace_index);
+    intf_Msg("Color space: %s", colspace[colspace_index].name);
     return drawingMode;
 }
 
@@ -575,8 +572,15 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void BeosCloseDisplay( vout_thread_t *p_vout )
 {    
+    VideoWindow * p_win = p_vout->p_sys->p_window;
     /* Destroy the video window */
-    delete p_vout->p_sys->p_window;
+    if( p_win != NULL && !p_win->teardownwindow)
+    {
+        p_win->Lock();
+        p_win->teardownwindow = true;
+        p_win->Hide();
+        p_win->Quit();
+    }
 }
 
 
