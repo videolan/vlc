@@ -2,7 +2,7 @@
  * drms.c : DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.3 2004/01/09 13:08:08 hartman Exp $
+ * $Id: drms.c,v 1.4 2004/01/09 17:29:17 jlj Exp $
  *
  * Author: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -606,8 +606,26 @@ static int get_sci_data( uint32_t **pp_sci, uint32_t *p_sci_size )
     TCHAR p_path[ PATH_MAX ];
     TCHAR *p_filename = _T("\\Apple Computer\\iTunes\\SC Info\\SC Info.sidb");
 
-    if( SUCCEEDED( SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA,
-                                    NULL, 0, p_path ) ) )
+    typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
+                                               LPTSTR );
+
+    HINSTANCE shfolder_dll = NULL;
+    SHGETFOLDERPATH dSHGetFolderPath = NULL;
+
+    if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
+    {
+        dSHGetFolderPath =
+            (SHGETFOLDERPATH)GetProcAddress( shfolder_dll,
+#ifdef _UNICODE
+                                             _T("SHGetFolderPathW") );
+#else
+                                             _T("SHGetFolderPathA") );
+#endif
+    }
+
+    if( dSHGetFolderPath != NULL &&
+        SUCCEEDED( dSHGetFolderPath( NULL, CSIDL_COMMON_APPDATA,
+                                     NULL, 0, p_path ) ) )
     {
         _tcsncat( p_path, p_filename, min( _tcslen( p_filename ),
                   (PATH_MAX-1) - _tcslen( p_path ) ) );
@@ -639,6 +657,11 @@ static int get_sci_data( uint32_t **pp_sci, uint32_t *p_sci_size )
 
             CloseHandle( i_file );
         }
+    }
+
+    if( shfolder_dll != NULL )
+    {
+        FreeLibrary( shfolder_dll );
     }
 #endif
 
