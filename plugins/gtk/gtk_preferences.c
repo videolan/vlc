@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.15 2002/03/25 20:37:00 lool Exp $
+ * $Id: gtk_preferences.c,v 1.16 2002/03/25 22:38:28 lool Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -89,27 +89,30 @@ void GtkPreferencesActivate( GtkMenuItem * menuitem, gpointer user_data )
  ****************************************************************************/
 
 /* create a new tooltipped area */
-#define TOOLTIP( container, text, ev_box )                                \
+#define TOOLTIP( text )                                                   \
     /* create an event box to catch some events */                        \
-    ev_box = gtk_event_box_new();                                         \
-    gtk_container_add( GTK_CONTAINER(container), ev_box );                \
+    item_event_box = gtk_event_box_new();                                 \
     /* add a tooltip on mouseover */                                      \
     /* FIXME: have a different text for the private text */               \
     gtk_tooltips_set_tip( p_intf->p_sys->p_tooltips,                      \
-                          ev_box, text, text );                           \
-    gtk_container_set_border_width( GTK_CONTAINER(ev_box), 2 );
+                          item_event_box, text, text );                   \
+    gtk_container_set_border_width( GTK_CONTAINER(item_event_box), 4 );
 
 /* draws a right aligned label in side of a widget */
-#define LABEL_AND_WIDGET( text, widget, hbox, label, align )              \
+#define LABEL_AND_WIDGET( label_text, widget, tooltip )                   \
     gtk_table_resize( GTK_TABLE(category_table), ++rows, 2 );             \
-    align = gtk_alignment_new( 1, .5, 0, 0 );                             \
-    label = gtk_label_new( text );                                        \
-    gtk_container_add( GTK_CONTAINER(align), label );                     \
-    gtk_table_attach_defaults( GTK_TABLE(category_table), align,          \
+    item_align = gtk_alignment_new( 1, .5, 0, 0 );                        \
+    item_label = gtk_label_new( label_text );                             \
+    gtk_container_add( GTK_CONTAINER(item_align), item_label );           \
+    TOOLTIP(tooltip)                                                      \
+    gtk_container_add( GTK_CONTAINER(item_event_box), item_align );       \
+    gtk_table_attach_defaults( GTK_TABLE(category_table), item_event_box, \
                                0, 1, rows - 1, rows );                    \
-    align = gtk_alignment_new( 0, .5, 0, 0 );                             \
-    gtk_container_add( GTK_CONTAINER(align), widget );                    \
-    gtk_table_attach_defaults( GTK_TABLE(category_table), align,          \
+    item_align = gtk_alignment_new( 0, .5, .5, 0 );                       \
+    gtk_container_add( GTK_CONTAINER(item_align), widget );               \
+    TOOLTIP(tooltip)                                                      \
+    gtk_container_add( GTK_CONTAINER(item_event_box), item_align );       \
+    gtk_table_attach_defaults( GTK_TABLE(category_table), item_event_box, \
                                1, 2, rows - 1, rows );
 
 static void GtkCreateConfigDialog( char *psz_module_name,
@@ -203,20 +206,21 @@ static void GtkCreateConfigDialog( char *psz_module_name,
         {
         case MODULE_CONFIG_HINT_CATEGORY:
 
-            /* pack a new vbox in the notebook */
-            category_vbox = gtk_vbox_new( FALSE, 2 );
-            gtk_container_set_border_width( GTK_CONTAINER(category_vbox), 2 );
+            /* add a new table for right-left alignment */
+            category_table = gtk_table_new( 0, 0, FALSE );
+            gtk_table_set_col_spacings( GTK_TABLE(category_table), 4 );
+            rows = 0;
+            /* the vbox serves only EXPAND / FILL issues in the notebook */
+            category_vbox = gtk_vbox_new( FALSE, 0 );
+            gtk_box_pack_start( GTK_BOX(category_vbox), category_table,
+                                FALSE, FALSE, 0 );
+            gtk_container_set_border_width( GTK_CONTAINER(category_vbox), 4 );
 
             /* add category vbox as a notebook page */
             item_label = gtk_label_new( p_module->p_config[i].psz_text );
             gtk_notebook_append_page( GTK_NOTEBOOK(config_notebook),
                                       category_vbox, item_label );
 
-            /* add a new table for right-left alignment */
-            category_table = gtk_table_new( 0, 0, FALSE );
-            gtk_table_set_col_spacings( GTK_TABLE(category_table), 2 );
-            rows = 0;
-            gtk_container_add( GTK_CONTAINER(category_vbox), category_table );
 
             break;
 
@@ -228,10 +232,10 @@ static void GtkCreateConfigDialog( char *psz_module_name,
             gtk_table_attach_defaults( GTK_TABLE(category_table), item_frame,
                                        0, 2, rows - 1, rows );
 
-            TOOLTIP( item_frame, p_module->p_config[i].psz_longtext,
-                     item_event_box )
+            TOOLTIP( p_module->p_config[i].psz_longtext )
+            gtk_container_add( GTK_CONTAINER(item_frame), item_event_box );
 
-            item_vbox = gtk_vbox_new( FALSE, 2 );
+            item_vbox = gtk_vbox_new( FALSE, 4 );
             gtk_container_add( GTK_CONTAINER(item_event_box), item_vbox );
 
             /* create a new clist widget */
@@ -275,7 +279,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                 NULL );
 
             /* hbox holding the "select" and "configure" buttons */
-            item_hbox = gtk_hbox_new( FALSE, 2 );
+            item_hbox = gtk_hbox_new( FALSE, 4 );
             gtk_container_add( GTK_CONTAINER(item_vbox), item_hbox);
 
             /* add configure button */
@@ -296,7 +300,7 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                plugin_select_button );
 
             /* hbox holding the "selected" label and text input */
-            item_hbox = gtk_hbox_new( FALSE, 2 );
+            item_hbox = gtk_hbox_new( FALSE, 4 );
             gtk_container_add( GTK_CONTAINER(item_vbox), item_hbox);
             /* add new label */
             item_label = gtk_label_new( _("Selected:") );
@@ -347,18 +351,16 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                 GTK_SIGNAL_FUNC(GtkStringChanged),
                                 (gpointer)config_dialog );
 
-            TOOLTIP( category_vbox, p_module->p_config[i].psz_longtext,
-                     item_event_box )
-
-            LABEL_AND_WIDGET( p_module->p_config[i].psz_text, string_entry,
-                              item_hbox, item_label, item_align );
+            LABEL_AND_WIDGET( p_module->p_config[i].psz_text,
+                              string_entry,
+                              p_module->p_config[i].psz_longtext );
             break;
 
         case MODULE_CONFIG_ITEM_INTEGER:
 
             /* add input box with default value */
             item_adj = gtk_adjustment_new( p_module->p_config[i].i_value,
-                                           -1, 1000, 1, 10, 10 );
+                                           -1, 99999, 1, 10, 10 );
             integer_spinbutton = gtk_spin_button_new( GTK_ADJUSTMENT(item_adj),
                                                       1, 0 );
 
@@ -370,12 +372,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                 GTK_SIGNAL_FUNC(GtkIntChanged),
                                 (gpointer)config_dialog );
 
-            TOOLTIP( category_vbox, p_module->p_config[i].psz_longtext,
-                     item_event_box )
-
             LABEL_AND_WIDGET( p_module->p_config[i].psz_text,
-                              integer_spinbutton, item_hbox, item_label,
-                              item_align );
+                              integer_spinbutton,
+                              p_module->p_config[i].psz_longtext );
             break;
 
         case MODULE_CONFIG_ITEM_BOOL:
@@ -392,11 +391,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
                                 GTK_SIGNAL_FUNC(GtkBoolChanged),
                                 (gpointer)config_dialog );
 
-            TOOLTIP( category_vbox, p_module->p_config[i].psz_longtext,
-                     item_event_box )
-
-            LABEL_AND_WIDGET( p_module->p_config[i].psz_text, bool_checkbutton,
-                              item_hbox, item_label, item_align );
+            LABEL_AND_WIDGET( p_module->p_config[i].psz_text,
+                              bool_checkbutton,
+                              p_module->p_config[i].psz_longtext );
             break;
         }
     }
