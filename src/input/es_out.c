@@ -1292,8 +1292,7 @@ static char **LanguageSplit( const char *psz_langs )
     char **ppsz = NULL;
     int i_psz = 0;
 
-    if( psz_langs == NULL )
-        return NULL;
+    if( psz_langs == NULL ) return NULL;
 
     psz_parser = psz_dup = strdup(psz_langs);
 
@@ -1303,10 +1302,7 @@ static char **LanguageSplit( const char *psz_langs )
         char *psz_code;
 
         psz = strchr(psz_parser, ',' );
-        if( psz )
-        {
-            *psz++ = '\0';
-        }
+        if( psz ) *psz++ = '\0';
 
         psz_code = LanguageGetCode( psz_parser );
         if( strcmp( psz_code, "??" ) )
@@ -1322,6 +1318,7 @@ static char **LanguageSplit( const char *psz_langs )
         TAB_APPEND( i_psz, ppsz, NULL );
     }
 
+    free( psz_dup );
     return ppsz;
 }
 
@@ -1329,12 +1326,10 @@ static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang )
 {
     int i;
 
-    if( !ppsz_langs || !psz_lang )
-        return -1;
+    if( !ppsz_langs || !psz_lang ) return -1;
 
     for( i = 0; ppsz_langs[i]; i++ )
-        if( !strcasecmp( ppsz_langs[i], psz_lang ) )
-            return i;
+        if( !strcasecmp( ppsz_langs[i], psz_lang ) ) return i;
 
     return -1;
 }
