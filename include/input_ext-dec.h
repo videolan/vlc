@@ -362,6 +362,51 @@ static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
 
 
 /*
+ * Philosophy of the third implementation : the decoder asks for n bytes,
+ * and we will copy them in its buffer.
+ */
+
+/*****************************************************************************
+ * GetChunk : reads a large chunk of data
+ *****************************************************************************
+ * The position in the stream must be byte-aligned, if unsure call
+ * RealignBits(). p_buffer must to a buffer at least as big as i_buf_len
+ * otherwise your code will crash.
+ *****************************************************************************/
+static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
+                                 byte_t * p_buffer, size_t i_buf_len )
+{
+    int     i_available;
+
+    if( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
+            >= i_buf_len )
+    {
+        memcpy( p_buffer, p_bit_stream->p_byte, i_buf_len );
+        p_bit_stream->p_byte += i_buf_len;
+    }
+    else
+    {
+        do
+        {
+            memcpy( p_buffer, p_bit_stream->p_byte, i_available );
+            p_bit_stream->p_byte = p_bit_stream->p_end;
+            p_buffer += i_available;
+            i_buf_len -= i_available;
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+        }
+        while( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
+                <= i_buf_len );
+
+        if( i_buf_len )
+        {
+            memcpy( p_buffer, p_bit_stream->p_byte, i_buf_len );
+            p_bit_stream->p_byte += i_buf_len;
+        }
+    }
+}
+
+
+/*
  * Communication interface between input and decoders
  */
 
