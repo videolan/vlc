@@ -147,7 +147,7 @@ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo, macroblock_t * p_mb )
     /* Test if it was the last block of the picture */
     if( b_finished )
     {
-fprintf(stderr, "Image decodee\n");
+//fprintf(stderr, "Image decodee\n");
         /* Mark the picture to be displayed */
         vout_DisplayPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 

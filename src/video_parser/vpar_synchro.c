@@ -145,13 +145,13 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-    static int meuh = 0;
+    static int meuh = 1;
     static int truc = 0;
 //    return( 1 );
-    if( i_coding_type == 1 )
-        meuh = 0;
-    if( i_coding_type == 2 )
-        meuh++;
+//    if( i_coding_type == 1 )
+//        meuh = 0;
+//    if( i_coding_type == 2 )
+//        meuh++;
     truc++;
     if( truc == 3 )
     {

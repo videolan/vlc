@@ -44,7 +44,7 @@
  *****************************************************************************/
 static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
                                    int i_width, int i_height, int i_x_step,
-                                   int i_select )
+                                   int i_x_stride, int i_select )
 {
     int i_x, i_y, i_x1, i_y1;
     unsigned int i_dummy;
@@ -102,7 +102,7 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
                      {
                          i_dummy = p_dest[i_x+i_x1]
                             + ((unsigned int)(p_src[i_x+i_x1] + 1
-                                     + p_src[i_x+i_x1 + i_x_step]) >> 1);
+                                     + p_src[i_x+i_x1 + i_x_stride]) >> 1);
                          p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
                      }
                 }
@@ -123,7 +123,7 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
                      for( i_x1 = 0; i_x1 < 8; i_x1++ )
                      {
                          p_dest[i_x+i_x1] = (unsigned int)(p_src[i_x+i_x1] + 1
-                                            + p_src[i_x+i_x1 + i_x_step])
+                                            + p_src[i_x+i_x1 + i_x_stride])
                                           >> 1;  
                      }
                 }
@@ -190,8 +190,8 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
                             + ((unsigned int)(
                                   p_src[i_x+i_x1]
                                 + p_src[i_x+i_x1 + 1]
-                                + p_src[i_x+i_x1 + i_x_step]
-                                + p_src[i_x+i_x1 + i_x_step + 1]
+                                + p_src[i_x+i_x1 + i_x_stride]
+                                + p_src[i_x+i_x1 + i_x_stride + 1]
                                 + 2) >> 2);
                          p_dest[i_x + i_x1] = (i_dummy + 1) >> 1;
                      }
@@ -216,8 +216,8 @@ static void __inline__ MotionComponent( yuv_data_t * p_src, yuv_data_t * p_dest,
                             = ((unsigned int)(
                                   p_src[i_x+i_x1]
                                 + p_src[i_x+i_x1 + 1] 
-                                + p_src[i_x+i_x1 + i_x_step]
-                                + p_src[i_x+i_x1 + i_x_step + 1]
+                                + p_src[i_x+i_x1 + i_x_stride]
+                                + p_src[i_x+i_x1 + i_x_stride + 1]
                                 + 2) >> 2);
                      }
                 }
@@ -282,6 +282,7 @@ typedef struct motion_arg_s
     int             i_height, i_offset;
     int             i_mv_x, i_mv_y;
     boolean_t       b_average;
+    int             i_l_x_step, i_c_x_step;
 } motion_arg_t;
 
 /*****************************************************************************
@@ -297,13 +298,15 @@ void vdec_MotionDummy( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionFieldField( macroblock_t * p_mb )
 {
-#if 0
+#if 1
     motion_arg_t    args;
 
     args.i_height = 16;
     args.b_average = 0;
     args.b_dest_field = p_mb->b_motion_field;
     args.i_offset = 0;
+    args.i_l_x_step = p_mb->i_l_stride;
+    args.i_c_x_step = p_mb->i_c_stride;
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
@@ -336,13 +339,15 @@ void vdec_MotionFieldField( macroblock_t * p_mb )
  *****************************************************************************/
 void vdec_MotionField16x8( macroblock_t * p_mb )
 {
-#if 0
+#if 1
     motion_arg_t    args;
 
     args.i_height = 8;
     args.b_average = 0;
     args.b_dest_field = p_mb->b_motion_field;
     args.i_offset = 0;
+    args.i_l_x_step = p_mb->i_l_stride;
+    args.i_c_x_step = p_mb->i_c_stride;
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
@@ -441,6 +446,8 @@ void vdec_MotionFrameFrame( macroblock_t * p_mb )
     args.i_height = 16;
     args.b_average = 0;
     args.i_offset = 0;
+    args.i_l_x_step = p_mb->i_l_stride;
+    args.i_c_x_step = p_mb->i_c_stride;
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
@@ -473,8 +480,8 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
     args.i_height = 8;
     args.b_average = 0;
     args.i_offset = 0;
-    p_mb->i_l_stride <<= 1;
-    p_mb->i_c_stride <<= 1;
+    args.i_l_x_step = p_mb->i_l_stride << 1;
+    args.i_c_x_step = p_mb->i_c_stride << 1;
 
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )
     {
@@ -483,14 +490,14 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
         args.b_source_field = p_mb->ppi_field_select[0][0];
         args.b_dest_field = 0;
         args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
+        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1];
         p_mb->pf_chroma_motion( p_mb, &args );
 #endif
 #if 1
         args.b_source_field = p_mb->ppi_field_select[1][0];
         args.b_dest_field = 1;
-        args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
+        args.i_mv_x = p_mb->pppi_motion_vectors[1][0][0];
+        args.i_mv_y = p_mb->pppi_motion_vectors[1][0][1];
         p_mb->pf_chroma_motion( p_mb, &args );
 #endif
         args.b_average = 1;
@@ -503,13 +510,13 @@ void vdec_MotionFrameField( macroblock_t * p_mb )
         args.b_source_field = p_mb->ppi_field_select[0][1];
         args.b_dest_field = 0;
         args.i_mv_x = p_mb->pppi_motion_vectors[0][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1] >> 1;
+        args.i_mv_y = p_mb->pppi_motion_vectors[0][1][1];
         p_mb->pf_chroma_motion( p_mb, &args );
 
         args.b_source_field = p_mb->ppi_field_select[1][1];
         args.b_dest_field = 1;
         args.i_mv_x = p_mb->pppi_motion_vectors[1][1][0];
-        args.i_mv_y = p_mb->pppi_motion_vectors[1][1][1] >> 1;
+        args.i_mv_y = p_mb->pppi_motion_vectors[1][1][1];
         p_mb->pf_chroma_motion( p_mb, &args );
     }
 #endif
@@ -524,8 +531,8 @@ void vdec_MotionFrameDMV( macroblock_t * p_mb )
     motion_arg_t    args;
     int             ppi_dmv[2][2];
 
-    p_mb->i_l_stride <<= 1;
-    p_mb->i_c_stride <<= 1;
+    args.i_l_x_step = p_mb->i_l_stride << 1;
+    args.i_c_x_step = p_mb->i_c_stride << 1;
     args.i_height = 8;
     args.b_average = 0;
     args.b_dest_field = 0;
@@ -587,7 +594,7 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
                      /* prediction width and height */
                      16, p_motion->i_height,
                      /* step */
-                     p_mb->i_l_stride,
+                     p_motion->i_l_x_step, p_mb->i_l_stride,
                      /* select */
                      (p_motion->b_average << 2)
                        | ((p_motion->i_mv_y & 1) << 1)
@@ -604,7 +611,8 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
                        + (p_mb->i_c_x)
                        + (p_mb->i_motion_c_y + p_motion->b_dest_field)
                          * p_mb->p_picture->i_chroma_width,
-                     8, p_motion->i_height >> 1, p_mb->i_c_stride,
+                     8, p_motion->i_height >> 1, p_motion->i_c_x_step,
+                     p_mb->i_c_stride,
                      (p_motion->b_average << 2)
                        | (((p_motion->i_mv_y/2) & 1) << 1)
                        | ((p_motion->i_mv_x/2) & 1) );
@@ -620,7 +628,8 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
                        + (p_mb->i_c_x)
                        + (p_mb->i_motion_c_y + p_motion->b_dest_field)
                          * p_mb->p_picture->i_chroma_width,
-                     8, p_motion->i_height >> 1, p_mb->i_c_stride,
+                     8, p_motion->i_height >> 1, p_motion->i_c_x_step,
+                     p_mb->i_c_stride,
                      (p_motion->b_average << 2)
                        | (((p_motion->i_mv_y/2) & 1) << 1)
                        | ((p_motion->i_mv_x/2) & 1) );
@@ -631,6 +640,7 @@ void vdec_Motion420( macroblock_t * p_mb, motion_arg_t * p_motion )
  *****************************************************************************/
 void vdec_Motion422( macroblock_t * p_mb, motion_arg_t * p_motion )
 {
+#if 0
     /* Luminance */
     MotionComponent( p_motion->p_source->p_y
                        + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
@@ -678,6 +688,7 @@ void vdec_Motion422( macroblock_t * p_mb, motion_arg_t * p_motion )
                      (p_motion->b_average << 2)
                        | ((p_motion->i_mv_y & 1) << 1)
                        | ((p_motion->i_mv_x/2) & 1) );
+#endif
 }
 
 /*****************************************************************************
@@ -685,6 +696,7 @@ void vdec_Motion422( macroblock_t * p_mb, motion_arg_t * p_motion )
  *****************************************************************************/
 void vdec_Motion444( macroblock_t * p_mb, motion_arg_t * p_motion )
 {
+#if 0
     /* Luminance */
     MotionComponent( p_motion->p_source->p_y
                        + (p_mb->i_l_x + (p_motion->i_mv_x >> 1))
@@ -732,4 +744,5 @@ void vdec_Motion444( macroblock_t * p_mb, motion_arg_t * p_motion )
                      (p_motion->b_average << 2)
                        | ((p_motion->i_mv_y & 1) << 1)
                        | (p_motion->i_mv_x & 1) );
+#endif
 }

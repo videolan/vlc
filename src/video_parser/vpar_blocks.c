@@ -704,6 +704,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
         p_mb->pf_motion = pf_motion[p_vpar->picture.b_frame_structure]
                                    [p_vpar->mb.i_motion_type];
     }
+
     p_vpar->mb.i_mv_count = ppi_mv_count[p_vpar->picture.b_frame_structure]
                                         [p_vpar->mb.i_motion_type];
     p_vpar->mb.i_mv_format = ppi_mv_format[p_vpar->picture.b_frame_structure]
@@ -767,7 +768,7 @@ i_count++;
         static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
         static f_motion_t   pf_motion_skipped[4] = {NULL, vdec_MotionFieldField,
                                 vdec_MotionFieldField, vdec_MotionFrameFrame};
-fprintf(stderr, "On sauuuute !\n");
+
         /* Reset DC predictors (7.2.1). */
         p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
             = p_vpar->slice.pi_dc_dct_pred[2]
@@ -799,6 +800,7 @@ fprintf(stderr, "On sauuuute !\n");
         /* Motion type is picture structure. */
         p_mb->pf_motion = pf_motion_skipped[p_vpar->picture.i_structure];
         p_mb->i_mb_type = MB_MOTION_FORWARD;
+        memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
 
         /* Set the field we use for motion compensation */
         p_mb->ppi_field_select[0][0] = p_mb->ppi_field_select[0][1]
@@ -1272,7 +1274,6 @@ if( i_parse >= 64 )
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
 fprintf( stderr, "Non intra MPEG2 end (%d)\n", i_b );
-exit(0);
 //p_vpar->picture.b_error = 1;
 }
 
@@ -1513,6 +1514,5 @@ if( i_parse >= 64 )
     }
     
 fprintf( stderr, "MPEG2 end (%d)\n", i_b );
-exit(0);
 //p_vpar->b_error = 1;
 }

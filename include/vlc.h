@@ -69,7 +69,6 @@
 /* Video */
 #include "video.h"
 #include "video_output.h"
-#include "vdec_idct.h"
 
 #ifdef OLD_DECODER
 #include "video_decoder.h"

@@ -530,8 +530,6 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                          [p_vpar->picture.i_coding_type];
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
 
-fprintf( stderr, "coding type: %d\n", p_vpar->picture.i_coding_type );
-    
     if( p_vpar->picture.i_coding_type == P_CODING_TYPE || p_vpar->picture.i_coding_type == B_CODING_TYPE )
     {
         p_vpar->picture.pb_full_pel_vector[0] = GetBits( &p_vpar->bit_stream, 1 );
@@ -755,7 +753,7 @@ memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
-fprintf(stderr, "Image trashee\n");
+//fprintf(stderr, "Image trashee\n");
         for( i_mb = 1; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
         {
             vpar_DestroyMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
@@ -771,7 +769,7 @@ fprintf(stderr, "Image trashee\n");
     }
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
-fprintf(stderr, "Image parsee (%d)\n", p_vpar->picture.i_coding_type);
+//fprintf(stderr, "Image parsee (%d)\n", p_vpar->picture.i_coding_type);
         /* Frame completely parsed. */
         for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
         {

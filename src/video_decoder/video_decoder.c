@@ -256,7 +256,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
      * Motion Compensation (ISO/IEC 13818-2 section 7.6)
      */
     (*p_mb->pf_motion)( p_mb );
-if( !p_mb->b_P_coding_type ) {
+
     /* luminance */
     for( i_b = 0; i_b < 4; i_b++ )
     {
@@ -288,7 +288,7 @@ if( !p_mb->b_P_coding_type ) {
         (p_mb->pf_addb[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
                               p_mb->p_data[i_b], p_mb->i_addb_c_stride );
     }
-}
+
     /*
      * Decoding is finished, release the macroblock and free
      * unneeded memory.
