@@ -131,7 +131,7 @@ case "${target_os}" in
     VLC_ADD_CFLAGS([vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-multiply_defined,suppress])
     ;;
-  *mingw32* | *cygwin*)
+  *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
 
     case "${target_os}" in
@@ -147,6 +147,9 @@ case "${target_os}" in
              #endif],
             SYS=mingw32, SYS=cygwin)
         ;;
+      *wince* | *mingwce* | *pe*)
+        SYS=mingwce
+        ;;
     esac
 
     if test "${SYS}" = "mingw32"; then
@@ -155,6 +158,12 @@ case "${target_os}" in
         VLC_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
         VLC_ADD_LDFLAGS([vcdx cddax],[-lwinmm])
         VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http stream_out_standard telnet netsync],[-lws2_32])
+    fi
+    if test "${SYS}" = "mingwce"; then
+        # add ws2 for closesocket, select, recv
+        CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
+        VLC_ADD_LDFLAGS([vlc],[-lws2 -e WinMainCRTStartup])
+        VLC_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap http netsync],[-lws2])
     fi
     ;;
   *nto*)
@@ -191,6 +200,7 @@ esac
 AM_CONDITIONAL(HAVE_BEOS, test "${SYS}" = "beos")
 AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
+AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
 
 dnl
 dnl Gettext stuff
@@ -285,6 +295,8 @@ case "${SYS}" in
     VLC_ADD_CFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
     VLC_ADD_CXXFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}])
     VLC_ADD_OBJCFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
+    ;;
+  mingwce)
     ;;
   *)
     VLC_ADD_CFLAGS([pic plugin mozilla],[-fpic -fPIC])
@@ -431,7 +443,7 @@ AC_CHECK_FUNCS(inet_aton,,[
 ])
 
 dnl Check for getopt (always use builtin one on win32)
-if test "${SYS}" = "mingw32"; then
+if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
 need_getopt=:
 else
 need_getopt=false
@@ -444,7 +456,7 @@ AC_CHECK_FUNCS(getopt_long,[AC_DEFINE(HAVE_GETOPT_LONG,1,long getopt support)],
 fi
 AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 
-if test "${SYS}" != "mingw32"; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32 x264 goom],[-lm])
@@ -455,7 +467,7 @@ AC_CHECK_LIB(m,pow,[
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
 ])
-fi # end "${SYS}" != "mingw32"
+fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Check for dynamic plugins
 ac_cv_have_plugins=no
@@ -499,6 +511,14 @@ if test "${ac_cv_have_plugins}" = "no"; then
   fi
 fi
 
+# WinCE style
+if test "${ac_cv_have_plugins}" = "no"; then
+  if test "${SYS}" = "mingwce"; then
+    AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
+    ac_cv_have_plugins=yes
+  fi
+fi
+
 # BeOS style
 if test "${ac_cv_have_plugins}" = "no"; then
   AC_CHECK_HEADERS(image.h)
@@ -525,7 +545,7 @@ if test "${ac_cv_have_plugins}" = "no"; then
   fi
 fi
 
-if test "${SYS}" != "mingw32"; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 dnl Check for pthreads - borrowed from XMMS
 THREAD_LIB=error
 if test "${THREAD_LIB}" = "error"; then
@@ -618,7 +638,7 @@ AC_EGREP_HEADER(pthread_once,pthread.h,[
   AC_DEFINE(PTHREAD_ONCE_IN_PTHREAD_H, 1,
             Define if <pthread.h> defines pthread_once.)],[
   AC_MSG_RESULT(no)])
-fi # end "${SYS}" != "mingw32"
+fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 AC_MSG_CHECKING(for strncasecmp in strings.h)
 AC_EGREP_HEADER(strncasecmp,strings.h,[
@@ -631,10 +651,10 @@ dnl Check for headers
 AC_CHECK_HEADERS(signal.h time.h errno.h stdint.h stdbool.h getopt.h strings.h inttypes.h sys/int_types.h wchar.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
-if test "${SYS}" != "mingw32"; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h altivec.h)
 AC_CHECK_HEADERS(linux/version.h)
-fi # end "${SYS}" != "mingw32"
+fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 AC_HEADER_TIME
 
@@ -644,7 +664,7 @@ AC_CHECK_HEADERS(dirent.h,,[need_dirent=:])
 AM_CONDITIONAL(BUILD_DIRENT, ${need_dirent})
 
 dnl Mac OS X and other OSes don't have declaration for nanosleep
-if test "${SYS}" != "mingw32"; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_MSG_CHECKING(for nanosleep in time.h)
 AC_EGREP_HEADER(nanosleep,time.h,[
   AC_MSG_RESULT(yes)
@@ -653,7 +673,7 @@ AC_EGREP_HEADER(nanosleep,time.h,[
 ],[
   AC_MSG_RESULT(no)
 ])
-fi # end "${SYS}" != "mingw32"
+fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Make sure we have timespecs
 AC_MSG_CHECKING(for timespec in sys/time.h)
@@ -666,9 +686,9 @@ AC_EGREP_HEADER(timespec,sys/time.h,[
 ])
 
 dnl Check for threads library
-if test "${SYS}" != "mingw32"; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
-fi # end "${SYS}" != "mingw32"
+fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 dnl Default X headers and libraries
 if test "${x_includes}" = "NONE"; then
@@ -947,7 +967,7 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-VLC_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync showintf])
+VLC_ADD_PLUGINS([dummy logger memcpy])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak])
 VLC_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur motiondetect])
@@ -957,12 +977,16 @@ VLC_ADD_PLUGINS([trivial_channel_mixer simple_channel_mixer headphone_channel_mi
 VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 VLC_ADD_PLUGINS([aout_file equalizer])
 VLC_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
-VLC_ADD_PLUGINS([image])
 VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
-VLC_ADD_PLUGINS([rawvideo blend scale time marq logo])
+VLC_ADD_PLUGINS([rawvideo blend scale image logo])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au])
-VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
-VLC_ADD_PLUGINS([access_ftp access_directory sap http])
+VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http access_mms])
+VLC_ADD_PLUGINS([access_ftp ipv4])
+
+if test "${SYS}" != "mingwce"; then
+  VLC_ADD_PLUGINS([access_directory sap http])
+  VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq])
+fi
 
 dnl
 dnl  Switch to enable a version of VLC where most modules will be builtin
@@ -977,9 +1001,9 @@ fi
 dnl
 dnl Some plugins aren't useful on some platforms
 dnl
-if test "${SYS}" != "mingw32"; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGINS([screensaver])
-else
+elif test "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGINS([ntservice smb dmo])
     VLC_ADD_LDFLAGS([dmo],[-lole32])
 fi
@@ -1041,7 +1065,7 @@ if test "${ac_cv_sse_inline}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "s
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
 
-if test "${SYS}" != "mingw32"; then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CACHE_CHECK([if \$CC groks AltiVec inline assembly],
     [ac_cv_altivec_inline],
     [CFLAGS="${CFLAGS_save}"
@@ -1107,7 +1131,7 @@ AC_CACHE_CHECK([if linker needs -framework vecLib],
 if test "${ac_cv_ld_altivec}" != "no"; then
   VLC_ADD_LDFLAGS([vlc idctaltivec motionaltivec memcpyaltivec],[-framework vecLib])
 fi
-fi # end "${SYS}" != "mingw32"
+fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
 AC_ARG_WITH(,[])
 AC_ARG_WITH(,[Optimization options:])
@@ -1694,6 +1718,8 @@ if test "${enable_screen}" != "no"; then
   elif test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGINS([screen])
     VLC_ADD_LDFLAGS([screen],[-lgdi32])
+  elif test "${SYS}" = "mingwce"; then
+    CPPFLAGS="${CPPFLAGS_save}"
   elif test "${SYS}" = "beos"; then
     VLC_ADD_PLUGINS([screen])
     VLC_ADD_CXXFLAGS([screen],[])
@@ -1712,7 +1738,8 @@ fi
 dnl
 dnl  ipv6 plugin - not for QNX yet
 dnl
-if test "${SYS}" != "nto" && test "${SYS}" != "mingw32"
+if test "${SYS}" != "nto" &&
+   test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 then
   have_ipv6=false
   AC_CHECK_FUNCS(inet_pton,[have_ipv6=:],[
@@ -1743,7 +1770,10 @@ if test "${enable_ogg}" != "no"
 then
   AC_CHECK_HEADERS(ogg/ogg.h, [
     AC_CHECK_LIB( ogg, oggpack_read, [
-      VLC_ADD_PLUGINS([ogg mux_ogg])
+      VLC_ADD_PLUGINS([ogg])
+      if test "${enable_sout}" != "no"; then
+        VLC_ADD_PLUGINS([mux_ogg])
+      fi
       VLC_ADD_LDFLAGS([ogg mux_ogg],[-logg])])
    ],[])
 fi
@@ -2592,8 +2622,7 @@ dnl
 AC_ARG_WITH(,[Video plugins:])
 
 dnl Check for DPMS
-if test "${SYS}" != "mingw32"
-then
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/extensions/dpms.h, [
     AC_MSG_CHECKING(for DPMSInfo in X11/extensions/dpms.h)
@@ -2617,7 +2646,8 @@ dnl
 AC_ARG_ENABLE(x11,
   [  --enable-x11            X11 support (default enabled)])
 if test "${enable_x11}" != "no" &&
-  (test "${SYS}" != "mingw32" || test "${enable_x11}" = "yes"); then
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_x11}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/Xlib.h, [
     VLC_ADD_PLUGINS([x11])
@@ -2634,7 +2664,8 @@ dnl
 AC_ARG_ENABLE(xvideo,
   [  --enable-xvideo         XVideo support (default enabled)])
 if test "${enable_xvideo}" != "no" &&
-  (test "${SYS}" != "mingw32" || test "${enable_xvideo}" = "yes"); then
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_xvideo}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
@@ -2669,7 +2700,8 @@ dnl
 AC_ARG_ENABLE(glx,
   [  --enable-glx            X11 OpenGL (GLX) support (default enabled)])
 if test "${enable_glx}" != "no" &&
-  (test "${SYS}" != "mingw32" || test "${enable_glx}" = "yes"); then
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_glx}" = "yes"); then
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   AC_CHECK_HEADERS(X11/Xlib.h, [
     AC_CHECK_HEADERS(GL/glx.h, [
@@ -2684,7 +2716,8 @@ dnl
 dnl  Check for the Xinerama extension
 dnl
 if test "${enable_xvideo}" != "no" &&
-  (test "${SYS}" != "mingw32" || test "${enable_xvideo}" = "yes"); then
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_xvideo}" = "yes"); then
   ac_cv_have_xinerama="no"
   CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
   CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
@@ -2716,7 +2749,8 @@ dnl  (enabled by default except on beos)
 dnl
 AC_ARG_ENABLE(opengl,
   [  --enable-opengl         OpenGL support (default enabled)])
-if test "${enable_opengl}" != "no" && test "${SYS}" != "beos"; then
+if test "${enable_opengl}" != "no" &&
+   test "${SYS}" != "beos" -a "${SYS}" != "mingwce"; then
   if test "${SYS}" != "darwin"; then
     AC_CHECK_HEADERS(GL/gl.h, [
       VLC_ADD_PLUGINS([opengl])
@@ -2965,8 +2999,8 @@ dnl
 AC_ARG_ENABLE(hd1000v,
   [  --enable-hd1000v        HD1000 Video Output module (default enabled on HD1000)])
 if test "${enable_hd1000v}" != "no" -a "${CXX}" != "" &&
-  (test "${SYS}" != "mingw32" || test "${enable_hd1000v}" = "yes")
-then
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_hd1000v}" = "yes"); then
   AC_LANG_PUSH([C++])
   AC_CHECK_HEADERS([cascade/graphics/CascadeScreen.h cascade/graphics/CascadeBitmap.h],
   [
@@ -2991,7 +3025,7 @@ AC_ARG_ENABLE(directx,
   [  --enable-directx        Win32 DirectX support (default enabled on Win32)])
 if test "${enable_directx}" != "no"
 then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "cygwin"
   then
     AC_ARG_WITH(directx,
     [    --with-directx=PATH   Win32 DirectX headers])
@@ -3139,6 +3173,9 @@ if test "${enable_wingdi}" != "no"; then
     VLC_ADD_PLUGINS([wingdi])
     VLC_ADD_LDFLAGS([wingdi],[-lgdi32])
   fi
+  if test "${SYS}" = "mingwce"; then
+    VLC_ADD_PLUGINS([wingdi])
+  fi
 fi
 
 dnl
@@ -3154,7 +3191,8 @@ AC_ARG_ENABLE(oss,
   [  --enable-oss            Linux OSS /dev/dsp support (enabled on Linux)])
 
 if test "${enable_oss}" != "no" &&
-  (test "${SYS}" != "mingw32" || test "${enable_oss}" = "yes")
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_oss}" = "yes")
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
     VLC_ADD_PLUGINS([oss])
@@ -3244,6 +3282,9 @@ if test "${enable_waveout}" != "no"; then
     VLC_ADD_PLUGINS([waveout])
     VLC_ADD_LDFLAGS([waveout],[-lwinmm])
   fi
+  if "${SYS}" = "mingwce"; then
+    VLC_ADD_PLUGINS([waveout])
+  fi
 fi
 
 dnl
@@ -3272,7 +3313,8 @@ dnl
 AC_ARG_ENABLE(hd1000a,
   [  --enable-hd1000a        HD1000 audio module (default enabled on HD1000)])
 if test "${enable_hd1000a}" != "no" -a "${CXX}" != "" &&
-  (test "${SYS}" != "mingw32" || test "${enable_hd1000a}" = "yes")
+  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
+   test "${enable_hd1000a}" = "yes")
 then
   AC_LANG_PUSH([C++])
   AC_CHECK_HEADERS(deschutes/libraries/hdmachinex225/PCMAudioPlayer.h, [
@@ -3298,7 +3340,9 @@ dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
   [  --enable-skins2         Skins2 interface module (experimental)])
-if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}" != "beos" && test "${enable_skins2}" != "no"); then
+if test "${enable_skins2}" = "yes" ||
+  (test "${SYS}" != "darwin" && test "${SYS}" != "beos" &&
+   test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no"); then
 
   dnl test for the required libraries
   skins2_missing_lib="no"
@@ -3519,6 +3563,14 @@ then
     CPPFLAGS="${CPPFLAGS_save}"
     AC_LANG_POP(C++)
   fi
+fi
+
+dnl
+dnl  WinCE GUI module
+dnl
+if test "${SYS}" = "mingwce"; then
+  VLC_ADD_PLUGINS([wince])
+  VLC_ADD_LDFLAGS([wince],[-lcommctrl -lcommdlg -laygshell])
 fi
 
 dnl

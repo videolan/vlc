@@ -290,6 +290,9 @@ endif
 if HAVE_WIN32
 OPT_SOURCES_libvlc_win32 = $(SOURCES_libvlc_win32)
 endif
+if HAVE_WINCE
+OPT_SOURCES_libvlc_win32 = $(SOURCES_libvlc_win32)
+endif
 if BUILD_DIRENT
 OPT_SOURCES_libvlc_dirent = $(SOURCES_libvlc_dirent)
 endif
