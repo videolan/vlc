@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.75 2001/01/21 01:36:26 massiot Exp $
+ * $Id: vpar_headers.c,v 1.76 2001/02/06 17:17:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -540,8 +540,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         p_vpar->picture.b_q_scale_type = 0;
         p_vpar->picture.b_intra_vlc_format = 0;
         p_vpar->picture.b_alternate_scan = 0; /* zigzag */
-        p_vpar->picture.b_repeat_first_field = 1; /* FIXME! this contradicts
-                                                   * ISO/IEC */
+        p_vpar->picture.b_repeat_first_field = 0;
         p_vpar->picture.b_progressive = 1;
     }
 
@@ -597,11 +596,11 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         int     i_repeat_field;
 
         /* Compute the number of times the frame will be emitted by the
-         * decoder (number of periods). */
+         * decoder (number of half-periods). */
         if( p_vpar->sequence.b_progressive )
         {
-            i_repeat_field = 1 + p_vpar->picture.b_repeat_first_field
-                               + p_vpar->picture.b_top_field_first;
+            i_repeat_field = (1 + p_vpar->picture.b_repeat_first_field
+                                + p_vpar->picture.b_top_field_first) * 2;
         }
         else
         {
