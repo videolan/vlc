@@ -1,4 +1,4 @@
-$Id: README,v 1.16 2004/01/24 21:06:51 hartman Exp $
+$Id$
 
 README for the VLC media player
 ===============================
@@ -19,7 +19,8 @@ doc/               - Miscellaneous documentation.
 Resources
 =========
 
-The VideoLAN web site : http://www.videolan.org/
-Mailing-lists : http://developers.videolan.org/lists.html
+The VideoLAN web site: http://www.videolan.org/
+Documentation and support: http://w.videolan.org/support/
 Forums: http://forum.videolan.org/
+The Developers site: http://developers.videolan.org/vlc/
 

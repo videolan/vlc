@@ -5,14 +5,14 @@
 \vieww17160\viewh15400\viewkind0
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qc
 
-\f0\fs48 \cf0 VLC media player, version 0.7\
+\f0\fs48 \cf0 VLC media player, version 0.8\
 Mac OS X-specific information
 \fs24 \
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\ql\qnatural
 \cf0 \
 \
 \pard\tx1440\tx2880\tx4320\tx5760\tx7200\qj
-\cf0 Welcome to the VLC media player! VLC media player is a multi-purpose multimedia tool. It can play DVDs, VCDs or read a stream from the network. It plays DivX/MPEG-4 files (and many other files) and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in QuickTime Player. You can also stream content to the network or a file. But above all it is the ONLY media player on Mac OS X, which has support for multi-channel sound-output.\
+\cf0 Welcome to the VLC media player! VLC media player is a multi-purpose multimedia tool. It can play DVDs, VCDs or read a stream from the network. It plays DivX/MPEG-4 files (and many other files) and is unaffected by the dreaded .avi bug which can cause choppy sound when playing DivX in QuickTime Player. You can also stream content to the network or a file.\
 For a full list of features visit: \ul http://www.videolan.org/vlc/features.html\ulnone \
 \
 VLC media player was originally developed for GNU/Linux systems, but has been ported to numerous operating systems, including Mac OS X and Win32. Though there probably are bugs, we are always working hard to improve VLC media player and if you think you can help us in any way, please drop us a line: \ul http://www.videolan.org/support/lists.html\
@@ -38,7 +38,7 @@ The following frequently asked questions are answered below :\
 
 \f1\b \ul 1. How do I install ?
 \f0\b0 \ulnone \
-When you download VLC media player, you will end up with a VLC-0.7.x.dmg file. Double-click, or drop it on the application Disk Copy, to open this file. An icon will now appear on your Desktop, right beside your drive(s). Open it and drag the VLC application from the resulting window to the place where you want to install it. Most often this is the directory Applications on your main harddrive.\
+When you download VLC media player, you will end up with a VLC-0.8.x.dmg file. Double-click, or drop it on the application Disk Copy, to open this file. An icon will now appear on your Desktop, right beside your drive(s). Open it and drag the VLC application from the resulting window to the place where you want to install it. Most often this is the directory Applications on your main harddrive.\
 \
 \
 
@@ -100,20 +100,19 @@ Simply drag VLC from the place where you had installed it, to the Trash.\
 
 \f0\b0 \ulnone - VLC will autodected subtitle files when they are in the same directory as your movie and contain the movie name.\
 - DVD and autodectected subtitles  can be enabled trough the Controls->Subtitles menu-item.\
-- Only MicroDVD, SubRIP, SSA1-4. SAMI and vplayer subtitle files are supported at the moment. (so not VobSub [.idx AND .sub file])\
-- You cannot change anything about DVD subtitles.\
+- Only Vobsub, MicroDVD, SubRIP, SSA1-4. SAMI and vplayer subtitle files are supported at the moment.\
+- You cannot change anything about DVD and Vobsub subtitles.\
 - You can add any subtitle files to a video file via the Open.. dialog.\
-- A text-encoding is automatically chosen, but for some people this can be incorrect. You can change it in Preferences -> Modules ->  decoder -> subsdec\
+- A text-encoding and fontsize is automatically chosen, but for some people this can be incorrect. You can change these by using the Open File menu entry and setting the subtitle options when you open a movie.\
 - Text subtitles are by default centered. If you want them to be aligned left or right you can change this in Preferences -> Modules ->  decoder -> subsdec\
 - For Arabic, Hebrew and Japanese etc, you need to select a font compatible with these languages. You can change the default font in Preferences -> Modules ->  text-renderer -> freetype\
-- You can change the fontsize in Preferences -> Modules ->  text-renderer -> freetype\
 - You cannot change the font color or the thickness of the outlines.\
 \
 \
 
 \f1\b \ul 10. What do all the options in the preferences do ?
 \f0\b0 \ulnone \
-Hold your mouse still on top of an option for just over a second and a ToolTip will come up explaining what the option does. Be very careful with the Advanced options. Changing an option in the wrong value (usually selecting a module by hand instead of letting it be selected automatically) can cause VLC to no longer start. In this case you will need to remove the preference file located in your HOME -> Library -> Preferences -> VLC.\
+Hold your mouse still on top of an option for just over a second and a ToolTip will come up explaining what the option does. Be very careful with the Advanced options. Changing an option in the wrong value (usually selecting a module by hand instead of letting it be selected automatically) can cause VLC to no longer start. In this case you will need to remove the preference files located in your HOME -> Library -> Preferences -> VLC.\
 \
 \
 
@@ -127,12 +126,13 @@ If you want to use your second screen for fullscreen playback, then look at the 
 
 \f0\b0 \ulnone Look at the Audio->Device menuitem. You can set this option permanently by going into the Preferences and choosing Modules -> audio output -> coreaudio -> audio device (You will need to choose "Show Advanced options" first).\
 - AC3 over SPDIF with M-Audio Sonica Theater does not work. This is most likely a driver bug which has been reported to M-Audio.\
+- VLC is known to have lots of problems on G5's. Try going into the preferences -> Modules -> audio output -> coreaudio. Now change the device value from 0 to 1. Choose Save and Quit and restart VLC.\
 - Many problems might still exist. Multiple channel audio support is pretty new on Mac OS X and there are many bugs in the system software, the device drivers and probably in VLC media player as well.\
 - Someone with CoreAudio knowledge is very much invited to assist is in fixing all the bugs that linger in this area.\
 \
 \
-Thanks for reading this file. For additional information, subscribe to the VLC mailing list on \ul http://www.videolan.org/support/lists.html\ulnone .\
+Thanks for reading this file. For additional information and support, please see: \ul http://www.videolan.org/support\ulnone \
 -- \
-Christophe Massiot <massiot@via.ecp.fr> and\
-Derk-Jan Hartman <thedj@users.sourceforge.net> for the VideoLAN team.\
+Christophe Massiot  and\
+Derk-Jan Hartman for the VideoLAN team.\
 $Id$}

@@ -2,7 +2,7 @@ $Id$
 
 INSTALL file for the VLC media player
 
-Mac OS X and BeOS users should read the documentation available at: 
+More extensive information for *nix, Windows, Mac OS X and BeOS users can be found here: 
 http://developers.videolan.org/vlc/
 
 Bootstrapping VLC
@@ -16,14 +16,14 @@ Configuring VLC
 
 A typical way to configure VLC is:
 
-   ./configure --prefix=/usr --enable-gnome
+   ./configure --prefix=/usr --enable-wxwindows
 
 See `./configure --help' for more information.
 
 If you intend to debug stuff, you may want to compile with debugging
 symbols:
 
-   make distclean ; ./configure --prefix=/usr --enable-gnome --enable-debug
+   make distclean ; ./configure --prefix=/usr --enable-wxwindows --enable-debug
 
 
 Building VLC
