@@ -1,11 +1,16 @@
-$Id: NEWS,v 1.81 2004/01/31 18:02:31 alexis Exp $
+$Id: NEWS,v 1.82 2004/02/08 21:36:39 gbazin Exp $
 Changes between 0.7.0 and 0.7.1:
 ---------------------------------
 
 Core support:
  * Fixed a nasty bug that causes preferences not to be saved some times.
- * SVCD (Philips OGT) and CVD subtitles
  * IGMPv3 support for VLC under Windows XP
+
+Codecs:
+ * Brand new DTS Coherent Acoustics audio decoder based on libdts
+   (http://www.videolan.org/dtsdec.html)
+ * Fixed DTS S/PDIF output
+ * SVCD (Philips OGT) and CVD subtitles
 
 Playlist:
  * Internal improvments
@@ -16,9 +21,22 @@ Input:
    container formars.
  * New demux module that uses libavformat from ffmpeg. Adds support for many
    small and strange formats.
+ * Support for DTS wav files
+ * Support for DTS audio CD
+ * New and experimental DVD input plugin with menus support (using libdvdnav).
+
+Stream output:
+ * MP4/MOV muxer improvements (fast-start, aac in mov, etc...)
+ * Fixed a nasty bug in the mpeg video packetizer
 
 Service discovery:
  * Fixed sdp in SAP
+
+Mac OS X port:
+ * New opengl video output plugin.
+
+Win32 port:
+ * A few improvements to the DirectShow input plugin.
 
 Changes between 0.6.2 and 0.7.0:
 ---------------------------------

@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.172 2004/02/08 21:00:19 jpsaman Exp $
+dnl $Id: configure.ac,v 1.173 2004/02/08 21:36:39 gbazin Exp $
 
-AC_INIT(vlc,0.7.1-cvs)
+AC_INIT(vlc,0.7.1)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Bond"
