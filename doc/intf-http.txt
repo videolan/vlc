@@ -207,7 +207,7 @@ Url commands are :
   | next      |              | Go to the next playlist element
   | previous  |              | Got to the previous playlist element
   | add       | mrl(string)  | Add a mrl to the playlist
-  | del       | item(integer)| Del an element of the playlist
+  | delete    | item(integer)| Deletes an (list of) element of the playlist
   | empty     |              | Empty the playlist
   | close     | id(hexa)     | Close a specific connection
   | shutdown  |              | Quit vlc
@@ -298,7 +298,7 @@ variable will be displayed (instead of it name).
           Fields:
             - current : 1 if currently selected else 0
             - index   : the index value (to be used for example for the 
-                        "del" control command.
+                        "delete" control command.
             - name
 
         - "informations"  : Create informations for  the current playing

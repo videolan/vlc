@@ -10,7 +10,7 @@
         <meta http-equiv="refresh" content="0;URL=/" />
     <vlc id="end" />
 
-    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,del,empty" />
+    <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty" />
     <vlc id="set" param1="sout" param2="string" />
  </head>
  <body>
@@ -51,10 +51,12 @@
   
     <div class="sectitle">VLC Playlist</div>
     <div class="section"> 
-    <table>
+    <form method="get" action="">
+     <table>
         <vlc id="foreach" param1="pl" param2="playlist" />
           <tr class="<vlc id="if" param1="2 pl.index % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
           <td>
+           <input type=checkbox name="item" value="<vlc id="value" param1="pl.index" />">
            <vlc id="if" param1="pl.current" />
                 <b>
             <vlc id="end" />
@@ -63,7 +65,9 @@
             <vlc id="end" />
 	   </td></tr>
         <vlc id="end" />
-    </table>
+     </table>
+     <td><input type="submit" name="control" value="delete" /></td>
+    </form>
     </div>
     <hr/>
     <p> <vlc id="value" param1="copyright" /> </p>

@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.24 2003/10/21 01:05:32 titer Exp $
+ * $Id: http.c,v 1.25 2003/11/02 19:26:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -117,8 +117,8 @@ static int  http_get( httpd_file_callback_args_t *p_args,
                       uint8_t *p_request, int i_request,
                       uint8_t **pp_data, int *pi_data );
 
-static void uri_extract_value( char *psz_uri, char *psz_name,
-                               char *psz_value, int i_value_max );
+static char *uri_extract_value( char *psz_uri, char *psz_name,
+                                char *psz_value, int i_value_max );
 static void uri_decode_url_encoded( char *psz );
 
 /*****************************************************************************
@@ -1356,7 +1356,7 @@ StrToMacroTypeTab [] =
 
         /* playlist management */
         { "add",            MVLC_ADD },
-        { "del",            MVLC_DEL },
+        { "delete",         MVLC_DEL },
         { "empty",          MVLC_EMPTY },
 
         /* admin control */
@@ -1492,14 +1492,43 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                 }
                 case MVLC_DEL:
                 {
-                    int i_item;
-                    char item[512];
+                    int i_item, *p_items = NULL, i_nb_items = 0;
+                    char item[512], *p_parser = p_request;
 
-                    uri_extract_value( p_request, "item", item, 512 );
-                    i_item = atoi( item );
+                    /* Get the list of items to delete */
+                    while( (p_parser =
+                            uri_extract_value( p_parser, "item", item, 512 )) )
+                    {
+                        if( !*item ) continue;
 
-                    playlist_Delete( p_sys->p_playlist, i_item );
-                    msg_Dbg( p_intf, "requested playlist del: %d", i_item );
+                        i_item = atoi( item );
+                        p_items = realloc( p_items, i_nb_items+1 );
+                        p_items[i_nb_items] = i_item;
+                        i_nb_items++;
+                    }
+
+                    /* The items need to be deleted from in reversed order */
+                    if( i_nb_items )
+                    {
+                        int i;
+                        for( i = 0; i < i_nb_items; i++ )
+                        {
+                            int j, i_index = 0;
+                            for( j = 0; j < i_nb_items; j++ )
+                            {
+                                if( p_items[j] > p_items[i_index] )
+                                    i_index = j;
+                            }
+
+                            playlist_Delete( p_sys->p_playlist,
+                                             p_items[i_index] );
+                            msg_Dbg( p_intf, "requested playlist delete: %d",
+                                     p_items[i_index] );
+                            p_items[i_index] = -1;
+                        }
+                    }
+
+                    if( p_items ) free( p_items );
                     break;
                 }
                 case MVLC_EMPTY:
@@ -1950,8 +1979,8 @@ static int  http_get( httpd_file_callback_args_t *p_args,
 /****************************************************************************
  * uri parser
  ****************************************************************************/
-static void uri_extract_value( char *psz_uri, char *psz_name,
-                               char *psz_value, int i_value_max )
+static char *uri_extract_value( char *psz_uri, char *psz_name,
+                                char *psz_value, int i_value_max )
 {
     char *p;
 
@@ -1990,11 +2019,14 @@ static void uri_extract_value( char *psz_uri, char *psz_name,
         {
             strncpy( psz_value, "", i_value_max );
         }
+        p += i_len;
     }
     else
     {
         strncpy( psz_value, "", i_value_max );
     }
+
+    return p;
 }
 
 static void uri_decode_url_encoded( char *psz )
@@ -2321,6 +2353,3 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         }
     }
 }
-
-
-
