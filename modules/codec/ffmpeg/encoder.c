@@ -326,10 +326,11 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->b_frame_strategy = 0;
 
 #if LIBAVCODEC_BUILD >= 4687
-        p_context->sample_aspect_ratio =
-            (AVRational){ p_enc->fmt_in.video.i_aspect *
-                          (int64_t)p_context->height / p_context->width,
-                          VOUT_ASPECT_FACTOR };
+        av_reduce( &p_context->sample_aspect_ratio.num,
+		   &p_context->sample_aspect_ratio.den,
+		   p_enc->fmt_in.video.i_aspect *
+		   (int64_t)p_context->height / p_context->width,
+		   VOUT_ASPECT_FACTOR, INT_MAX );
 #else
         p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
             VOUT_ASPECT_FACTOR;
