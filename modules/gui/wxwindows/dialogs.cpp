@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.11 2003/11/10 00:14:05 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.12 2003/12/11 02:26:03 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -243,15 +243,8 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
         vlc_mutex_lock( &p_arg->lock );
         p_arg->b_ready = 1;
         vlc_cond_signal( &p_arg->wait );
-        vlc_mutex_unlock( &p_arg->lock );
     }
 
-    /* Clean-up */
-    if( p_arg->b_blocking )
-    {
-        vlc_mutex_destroy( &p_arg->lock );
-        vlc_cond_destroy( &p_arg->wait );
-    }
     if( p_arg->psz_results )
     {
         for( int i = 0; i < p_arg->i_results; i++ )
@@ -262,7 +255,15 @@ void DialogsProvider::OnOpenFileGeneric( wxCommandEvent& event )
     }
     if( p_arg->psz_title ) free( p_arg->psz_title );
     if( p_arg->psz_extensions ) free( p_arg->psz_extensions );
-    free( p_arg );
+
+    if( p_arg->b_blocking )
+    {
+        vlc_mutex_unlock( &p_arg->lock );
+    }
+    else
+    {
+        free( p_arg );
+    }
 }
 
 void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )

@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.16 2003/10/15 12:24:14 gbazin Exp $
+ * $Id: dialogs.cpp,v 1.17 2003/12/11 02:26:03 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -176,6 +176,9 @@ void Dialogs::ShowOpenSkin( bool b_block )
                 vlc_cond_wait( &p_arg->wait, &p_arg->lock );
             }
             vlc_mutex_unlock( &p_arg->lock );
+            vlc_mutex_destroy( &p_arg->lock );
+            vlc_cond_destroy( &p_arg->wait );
+            free( p_arg );
         }
     }
 }
