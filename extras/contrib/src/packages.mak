@@ -111,4 +111,10 @@ TOOLAME_VERSION=02m-beta8
 TOOLAME_URL=$(VIDEOLAN)/testing/contrib/toolame-$(TOOLAME_VERSION).tar.bz2
 PNG_VERSION=1.2.5
 PNG_URL=$(VIDEOLAN)/testing/contrib/libpng-$(PNG_VERSION).tar.bz2
+GPGERROR_VERSION=1.0
+GPGERROR_URL=$(VIDEOLAN)/testing/contrib/libgpg-error-$(GPGERROR_VERSION).tar.gz
+GCRYPT_VERSION=1.2.0
+GCRYPT_URL=$(VIDEOLAN)/testing/contrib/libgcrypt-$(GCRYPT_VERSION).tar.gz
+GNUTLS_VERSION=1.1.22
+GNUTLS_URL=$(VIDEOLAN)/testing/contrib/gnutls-$(GNUTLS_VERSION).tar.bz2
 
