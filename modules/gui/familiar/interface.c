@@ -259,7 +259,7 @@ create_familiar (void)
   comboURL_items = g_list_append (comboURL_items, (gpointer) _("file://"));
   comboURL_items = g_list_append (comboURL_items, (gpointer) _("ftp://localhost"));
   comboURL_items = g_list_append (comboURL_items, (gpointer) _("http://localhost"));
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udp://localhost:1234/"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udpstream://@localhost:1234/"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboURL), comboURL_items);
   g_list_free (comboURL_items);
 
@@ -347,7 +347,7 @@ create_familiar (void)
   comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("file://"));
   comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("ftp://localhost"));
   comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("http://localhost"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udp://localhost:1234/"));
+  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udpstream://@localhost:1234/"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboDefaultURL), comboDefaultURL_items);
   g_list_free (comboDefaultURL_items);
 

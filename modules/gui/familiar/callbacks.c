@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.2 2002/08/06 19:31:18 jpsaman Exp $
+ * $Id: callbacks.c,v 1.3 2002/08/12 20:38:19 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -33,6 +33,7 @@
 
 #include <unistd.h>
 #include <string.h>
+#include <dirent.h>
 
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
@@ -125,6 +126,32 @@ static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data
 //    gtk_combo_set_item_string (GTK_COMBO (combo), GTK_ITEM (item), p_url);
 //    /* Now we simply add the item to the combo's list. */
 //    gtk_container_add (GTK_CONTAINER (GTK_COMBO (combo)->list), item);
+}
+
+/*****************************************************************
+ * Read directory helper function.
+ ****************************************************************/
+static void ReadDirectory( GtkWidget *widget, char *psz_dir)
+{
+    struct dirent **namelist;
+    int n;
+
+    if (psz_dir)
+       n = scandir(psz_dir, &namelist, 0, alphasort);
+    else
+       n = scandir(".", &namelist, 0, alphasort);
+    if (n<0)
+        perror("scandir");
+    else
+    {
+        while(n--) /* reverse printed list */
+        {
+            /* add list to listMedia widget */
+            g_print("%s\n",namelist[n]->d_name);
+            free(namelist[n]);
+        }
+        free(namelist);
+    }
 }
 
 

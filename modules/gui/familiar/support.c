@@ -113,7 +113,7 @@ create_pixmap                          (GtkWidget       *widget,
   /* If we haven't found the pixmap, try the source directory. */
   if (!found_filename)
     {
-      found_filename = check_file_exists ("../../share", filename);
+      found_filename = check_file_exists ("../../../share", filename);
     }
 
   if (!found_filename)
