@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.17 2003/12/07 17:53:45 gbazin Exp $
+ * $Id: theora.c,v 1.18 2003/12/07 18:15:46 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -475,8 +475,18 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ti.offset_y = frame_y_offset;
     p_sys->ti.fps_numerator = video_hzn;
     p_sys->ti.fps_denominator = video_hzd;
-    p_sys->ti.aspect_numerator = p_enc->fmt_in.video.i_aspect;
-    p_sys->ti.aspect_denominator = VOUT_ASPECT_FACTOR;
+
+    if( p_enc->fmt_in.video.i_aspect )
+    {
+        p_sys->ti.aspect_numerator = p_enc->fmt_in.video.i_aspect;
+        p_sys->ti.aspect_denominator = VOUT_ASPECT_FACTOR;
+    }
+    else
+    {
+        p_sys->ti.aspect_numerator = 4;
+        p_sys->ti.aspect_denominator = 3;
+    }
+
     p_sys->ti.target_bitrate = p_enc->fmt_out.i_bitrate;
     p_sys->ti.quality = video_q;
 
