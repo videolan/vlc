@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.6 2004/01/18 01:21:33 sam Exp $
+ * $Id: drms.c,v 1.7 2004/01/18 04:45:32 rocky Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -47,6 +47,11 @@
 #endif
 #ifdef HAVE_SYS_TYPES_H
    #include <sys/types.h>
+#endif
+
+/* In Solaris (and perhaps others) PATH_MAX is in limits.h. */
+#ifdef HAVE_LIMITS_H
+   #include <limits.h>
 #endif
 
 #include "drms.h"
