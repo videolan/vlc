@@ -26,7 +26,7 @@ PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin dsp/dsp dummy/dummy \
 		dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gnome/gnome gtk/gtk \
 		downmix/downmix downmix/downmixsse downmix/downmix3dn \
 		idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext \
-		imdct/imdct imdct/imdctsse \
+		imdct/imdct imdct/imdct3dn imdct/imdctsse \
 		macosx/macosx mga/mga \
 		motion/motion motion/motionmmx motion/motionmmxext \
 		mpeg/es mpeg/ps mpeg/ts null/null qt/qt sdl/sdl \
@@ -317,12 +317,7 @@ endif
 $(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
-ifneq (,$(findstring darwin,$(SYS)))
-#this is uglier of all
-	@if test "src/ac3_decoder/ac3_imdct.c" = "$<"; then $(CC) `echo $(CFLAGS) | sed -e 's/-O3/-O/'` -c -o $@ $<; echo "(CC) `echo $(CFLAGS) | sed -e 's/-O3/-O/'` -c -o $@ $<"; else $(CC) $(CFLAGS) -c -o $@ $<; echo "$(CC) $(CFLAGS) -c -o $@ $<"; fi
-else
 	$(CC) $(CFLAGS) -c -o $@ $<
-endif
 
 $(CPP_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(CPP_OBJ): %.o: .dep/%.dpp

@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.c,v 1.20 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_imdct.c,v 1.21 2001/05/16 14:51:29 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -54,7 +54,7 @@ void imdct_init(imdct_t * p_imdct)
     int i;
     float scale = 181.019;
 
-        p_imdct->pf_imdct_init( p_imdct );
+    p_imdct->pf_imdct_init( p_imdct );
 
     /* More twiddle factors to turn IFFT into IMDCT */
     for (i=0; i < 64; i++) {

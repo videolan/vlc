@@ -2,7 +2,7 @@
  * ac3_imdct_common.h: common ac3 DCT headers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct_common.h,v 1.1 2001/05/15 16:19:42 sam Exp $
+ * $Id: ac3_imdct_common.h,v 1.2 2001/05/16 14:51:29 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -27,4 +27,3 @@ void _M( imdct_do_256 )     ( imdct_t * p_imdct, float data[], float delay[] );
 void _M( imdct_do_256_nol ) ( imdct_t * p_imdct, float data[], float delay[] );
 void _M( imdct_do_512  )    ( imdct_t * p_imdct, float data[], float delay[] );
 void _M( imdct_do_512_nol ) ( imdct_t * p_imdct, float data[], float delay[] );
-

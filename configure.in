@@ -162,7 +162,7 @@ AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
 
 AC_MSG_CHECKING([if \$CC groks MMX EXT or SSE inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext imdctsse downmix3dn downmixsse"
+  ACCEL_PLUGINS="${ACCEL_PLUGINS} idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl
