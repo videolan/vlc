@@ -846,13 +846,6 @@ static void RunThread( adec_thread_t * p_adec )
                     {
                         vlc_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
                     }
-                    vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
-
-                    /* Decoding the frames */
-                    if ( adec_Layer2_Stereo(p_adec) )
-                    {
-                        vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
-                        /* Frame 1 */
                         if ( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
                         {
                             p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_adec->fifo)->i_pts;
@@ -862,6 +855,24 @@ static void RunThread( adec_thread_t * p_adec )
                         {
                             p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         }
+                    vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
+
+                    /* Decoding the frames */
+                    if ( adec_Layer2_Stereo(p_adec) )
+                    {
+                        vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
+                        /* Frame 1 */
+			/*
+                        if ( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
+                        {
+                            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_adec->fifo)->i_pts;
+                            DECODER_FIFO_START(p_adec->fifo)->b_has_pts = 0;
+                        }
+                        else
+                        {
+                            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
+                        }
+			*/
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         /* Frame 2 */
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
