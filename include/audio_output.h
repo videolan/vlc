@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.54 2002/08/09 23:46:53 massiot Exp $
+ * $Id: audio_output.h,v 1.55 2002/08/09 23:52:31 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,10 +49,10 @@ struct audio_sample_format_t
 #define AOUT_FMT_DTS        0x00200000
 
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
-    (p_first->i_format == p_second->i_format)                               \
-      && (p_first->i_rate == p_second->i_rate)                              \
-      && (p_first->i_channels == p_second->i_channels                       \
-           || p_first->i_channels == -1 || p_second->i_channels == -1) )
+    ((p_first)->i_format == (p_second)->i_format)                           \
+      && ((p_first)->i_rate == (p_second)->i_rate)                          \
+      && ((p_first)->i_channels == (p_second)->i_channels                   \
+           || (p_first)->i_channels == -1 || (p_second)->i_channels == -1) )
 
 #ifdef WORDS_BIGENDIAN
 #   define AOUT_FMT_S16_NE AOUT_FMT_S16_BE
@@ -63,9 +63,9 @@ struct audio_sample_format_t
 #endif
 
 #define AOUT_FMT_IS_SPDIF( p_format )                                      \
-    ( (p_format->i_format == AOUT_FMT_SPDIF)                               \
-       || (p_format->i_format == AOUT_FMT_A52)                             \
-       || (p_format->i_format == AOUT_FMT_DTS) )
+    ( ((p_format)->i_format == AOUT_FMT_SPDIF)                             \
+       || ((p_format)->i_format == AOUT_FMT_A52)                           \
+       || ((p_format)->i_format == AOUT_FMT_DTS) )
 
 /*****************************************************************************
  * aout_buffer_t : audio output buffer
