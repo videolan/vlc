@@ -690,14 +690,14 @@ void __module_Unneed( vlc_object_t * p_this, module_t * p_module )
 static void AllocateAllPlugins( vlc_object_t *p_this )
 {
     /* Yes, there are two NULLs because we replace one with "plugin-path". */
-#ifdef WIN32
-    char *          path[] = { "modules", "", "plugins", 0, 0 };
+#if defined( WIN32 ) || defined( UNDER_CE )
+    char *path[] = { "modules", "", "plugins", 0, 0 };
 #else
-    char *          path[] = { "modules", PLUGIN_PATH, "plugins", 0, 0 };
+    char *path[] = { "modules", PLUGIN_PATH, "plugins", 0, 0 };
 #endif
 
-    char **         ppsz_path = path;
-    char *          psz_fullpath;
+    char **ppsz_path = path;
+    char *psz_fullpath;
 
     /* If the user provided a plugin path, we add it to the list */
     path[ sizeof(path)/sizeof(char*) - 2 ] =
@@ -841,9 +841,27 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
                                    - strlen( LIBEXT ),
                                    LIBEXT, strlen( LIBEXT ) ) )
         {
+            WIN32_FILE_ATTRIBUTE_DATA attrbuf;
+            int64_t i_time = 0, i_size = 0;
+
+#ifdef UNDER_CE
+            if( GetFileAttributesEx( psz_wpath, GetFileExInfoStandard,
+                                     &attrbuf ) )
+#else
+            if( GetFileAttributesEx( psz_path, GetFileExInfoStandard,
+                                     &attrbuf ) )
+#endif
+            {
+                i_time = attrbuf.ftLastWriteTime.dwHighDateTime;
+                i_time <<= 32;
+                i_time |= attrbuf.ftLastWriteTime.dwLowDateTime;
+                i_size = attrbuf.nFileSizeHigh;
+                i_size <<= 32;
+                i_size |= attrbuf.nFileSizeLow;
+            }
             psz_file = psz_path;
 
-            AllocatePluginFile( p_this, psz_file, 0, 0 );
+            AllocatePluginFile( p_this, psz_file, i_time, i_size );
         }
     }
     while( !p_this->p_vlc->b_die && FindNextFile( handle, &finddata ) );
@@ -1554,12 +1572,14 @@ static void CacheLoad( vlc_object_t *p_this )
 
     if( p_this->p_libvlc->p_module_bank->b_cache_delete )
     {
-        msg_Dbg( p_this, "removing plugins cache file %s", psz_filename );
 #if !defined( UNDER_CE )
         unlink( psz_filename );
 #else
-        msg_Err( p_this, "FIXME, unlink not implemented" );
+        wchar_t psz_wf[MAX_PATH];
+        MultiByteToWideChar( CP_ACP, 0, psz_filename, -1, psz_wf, MAX_PATH );
+        DeleteFile( psz_wf );
 #endif
+        msg_Dbg( p_this, "removing plugins cache file %s", psz_filename );
         return;
     }
 

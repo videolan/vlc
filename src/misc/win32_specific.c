@@ -47,33 +47,28 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     WSADATA Data;
 
     /* Get our full path */
-    if( ppsz_argv[0] )
-    {
-        char psz_path[MAX_PATH];
-        char *psz_vlc;
+    char psz_path[MAX_PATH];
+    char *psz_vlc;
 
 #if defined( UNDER_CE )
-        strcpy( psz_path, ppsz_argv[0] );
-        psz_vlc = strrchr( psz_path, '\\' );
-        if( psz_vlc ) psz_vlc++;
+    wchar_t psz_wpath[MAX_PATH];
+    if( GetModuleFileName( NULL, psz_wpath, MAX_PATH ) )
+    {
+        WideCharToMultiByte( CP_ACP, 0, psz_wpath, -1,
+                             psz_path, MAX_PATH, NULL, NULL );
+    }
+    else psz_path[0] = '\0';
+
 #else
-        GetFullPathName( ppsz_argv[0], MAX_PATH, psz_path, &psz_vlc );
+    if( !GetModuleFileName( NULL, psz_path, MAX_PATH ) )
+    {
+        psz_path[0] = '\0';
+    }
 #endif
 
-        if( psz_vlc > psz_path && psz_vlc[-1] == '\\' )
-        {
-            psz_vlc[-1] = '\0';
-            p_this->p_libvlc->psz_vlcpath = strdup( psz_path );
-        }
-        else
-        {
-            p_this->p_libvlc->psz_vlcpath = strdup( "" );
-        }
-    }
-    else
-    {
-        p_this->p_libvlc->psz_vlcpath = strdup( "" );
-    }
+    if( (psz_vlc = strrchr( psz_path, '\\' )) ) *psz_vlc = '\0';
+
+    p_this->p_libvlc->psz_vlcpath = strdup( psz_path );
 
     /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
