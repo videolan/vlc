@@ -582,7 +582,7 @@ PLUGINS="${PLUGINS} wav araw"
 dnl
 dnl  Network modules
 dnl
-NETWORK_MODULES="access_udp access_http access_rtp ipv4"
+NETWORK_MODULES="access_udp access_http access_rtp ipv4 access_mms"
 
 dnl
 dnl  Accelerated modules

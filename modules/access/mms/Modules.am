@@ -1,0 +1,6 @@
+SOURCES_access_mms = modules/access/mms/mms.c
+
+noinst_HEADERS += modules/access/mms/mms.h \
+                  modules/access/mms/var_buffer.h \
+                  modules/access/mms/asf.h
+
