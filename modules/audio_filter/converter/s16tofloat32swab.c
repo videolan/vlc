@@ -3,7 +3,7 @@
  *                      with endianness change
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32swab.c,v 1.4 2002/09/26 22:40:19 massiot Exp $
+ * $Id: s16tofloat32swab.c,v 1.5 2002/09/27 23:38:04 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -103,7 +103,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
 #ifdef HAVE_SWAB
     s16 * p_swabbed = alloca( i * sizeof(s16) );
-    swab( p_in_buf->p_buffer, p_swabbed, i * sizeof(s16) );
+    swab( p_in_buf->p_buffer, (void *)p_swabbed, i * sizeof(s16) );
     p_in = p_swabbed + i - 1;
 #else
     byte_t p_tmp[2];

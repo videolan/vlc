@@ -61,9 +61,9 @@ LIBVLC_OBJ +=	src/misc/win32_specific.o
 RESOURCE_OBJ :=	share/vlc_win32_rc.o
 endif
 
-LIBVLC_OBJ += $(CPP_OBJ) $(M_OBJ) $(BUILTIN_OBJ)
+C_OBJ := $(VLC_OBJ) $(LIBVLC_OBJ) $(BUILTIN_OBJ)
 
-C_OBJ := $(VLC_OBJ) $(LIBVLC_OBJ)
+LIBVLC_OBJ += $(CPP_OBJ) $(M_OBJ) $(BUILTIN_OBJ)
 
 VLC_OBJ += $(RESOURCE_OBJ)
 

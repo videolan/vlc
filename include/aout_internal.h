@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.21 2002/09/26 22:40:18 massiot Exp $
+ * $Id: aout_internal.h,v 1.22 2002/09/27 23:38:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -143,6 +143,10 @@ struct aout_input_t
     /* pre-filters */
     aout_filter_t *         pp_filters[AOUT_MAX_FILTERS];
     int                     i_nb_filters;
+
+    /* resamplers */
+    aout_filter_t *         pp_resamplers[AOUT_MAX_FILTERS];
+    int                     i_nb_resamplers;
 
     aout_fifo_t             fifo;
 

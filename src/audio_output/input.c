@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.13 2002/09/26 22:40:25 massiot Exp $
+ * $Id: input.c,v 1.14 2002/09/27 23:38:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,14 +41,19 @@
  *****************************************************************************/
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 {
+    audio_sample_format_t intermediate_format;
+
     /* Prepare FIFO. */
     aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
     p_input->p_first_byte_to_mix = NULL;
 
     /* Create filters. */
+    memcpy( &intermediate_format, &p_aout->mixer.mixer,
+            sizeof(audio_sample_format_t) );
+    intermediate_format.i_rate = p_input->input.i_rate;
     if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
                                      &p_input->i_nb_filters, &p_input->input,
-                                     &p_aout->mixer.mixer ) < 0 )
+                                     &intermediate_format ) < 0 )
     {
         msg_Err( p_aout, "couldn't set an input pipeline" );
 
@@ -58,9 +63,36 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         return -1;
     }
 
+    /* Create resamplers. */
+    intermediate_format.i_rate = (p_input->input.i_rate
+                             * (100 + AOUT_MAX_RESAMPLING)) / 100;
+    if ( intermediate_format.i_rate == p_aout->mixer.mixer.i_rate )
+    {
+        /* Just in case... */
+        intermediate_format.i_rate++;
+    }
+    if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_resamplers,
+                                     &p_input->i_nb_resamplers,
+                                     &intermediate_format,
+                                     &p_aout->mixer.mixer ) < 0 )
+    {
+        msg_Err( p_aout, "couldn't set a resampler pipeline" );
+
+        aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
+                                     p_input->i_nb_filters );
+        aout_FifoDestroy( p_aout, &p_input->fifo );
+        p_input->b_error = 1;
+
+        return -1;
+    }
+
     /* Prepare hints for the buffer allocator. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     p_input->input_alloc.i_bytes_per_sec = -1;
+
+    aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
+                             p_input->i_nb_resamplers,
+                             &p_input->input_alloc );
 
     aout_FiltersHintBuffers( p_aout, p_input->pp_filters,
                              p_input->i_nb_filters,
@@ -91,6 +123,8 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
                                  p_input->i_nb_filters );
+    aout_FiltersDestroyPipeline( p_aout, p_input->pp_resamplers,
+                                 p_input->i_nb_resamplers );
     aout_FifoDestroy( p_aout, &p_input->fifo );
 
     return 0;
@@ -140,6 +174,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     if ( start_date == 0 ) start_date = p_buffer->start_date;
 
+    /* Run pre-filters. */
+    aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
+                      &p_buffer );
+
     if ( start_date < p_buffer->start_date - AOUT_PTS_TOLERANCE
           || start_date > p_buffer->start_date + AOUT_PTS_TOLERANCE )
     {
@@ -150,81 +188,45 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          *    synchronization
          * Solution : resample the buffer to avoid a scratch.
          */
-        audio_sample_format_t new_input;
-        int i_ratio, i_nb_filters;
+        int i_ratio;
         mtime_t old_duration;
-        aout_filter_t * pp_filters[AOUT_MAX_FILTERS];
-        aout_buffer_t * p_new_buffer;
-        aout_alloc_t dummy_alloc;
         mtime_t drift = p_buffer->start_date - start_date;
 
         msg_Warn( p_aout, "buffer is %lld %s, resampling",
                          drift > 0 ? drift : -drift,
                          drift > 0 ? "in advance" : "late" );
-        memcpy( &new_input, &p_input->input,
-                sizeof(audio_sample_format_t) );
         old_duration = p_buffer->end_date - p_buffer->start_date;
         duration = p_buffer->end_date - start_date;
-        i_ratio = duration * 100 / old_duration;
+        i_ratio = (duration * 100) / old_duration;
         /* If the ratio is too != 100, the sound quality will be awful. */
-        if ( i_ratio < 66 /* % */ )
+        if ( i_ratio < 100 - AOUT_MAX_RESAMPLING /* % */ )
         {
-            duration = old_duration * 66 / 100;
+            duration = (old_duration * (100 - AOUT_MAX_RESAMPLING)) / 100;
         }
-        if ( i_ratio > 150 /* % */ )
+        if ( i_ratio > 100 + AOUT_MAX_RESAMPLING /* % */ )
         {
-            duration = old_duration * 150 / 100;
+            duration = (old_duration * (100 + AOUT_MAX_RESAMPLING)) / 100;
         }
-        new_input.i_rate = new_input.i_rate * old_duration / duration;
-        aout_FormatPrepare( &new_input );
+        p_input->pp_resamplers[0]->input.i_rate 
+            = (p_input->input.i_rate * old_duration) / duration;
 
-        if ( aout_FiltersCreatePipeline( p_aout, pp_filters,
-                                         &i_nb_filters, &new_input,
-                                         &p_aout->mixer.mixer ) < 0 )
-        {
-            msg_Err( p_aout, "couldn't set an input pipeline for resampling" );
-            vlc_mutex_lock( &p_aout->mixer_lock );
-            aout_FifoSet( p_aout, &p_input->fifo, 0 );
-            vlc_mutex_unlock( &p_aout->mixer_lock );
-            aout_BufferFree( p_buffer );
-
-            vlc_mutex_unlock( &p_input->lock );
-            return 0;
-        }
-
-        dummy_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
-        dummy_alloc.i_bytes_per_sec = -1;
-        aout_FiltersHintBuffers( p_aout, pp_filters, i_nb_filters,
-                                 &dummy_alloc );
-        dummy_alloc.i_bytes_per_sec = __MAX(
-                                    dummy_alloc.i_bytes_per_sec,
-                                    new_input.i_bytes_per_frame
-                                     * new_input.i_rate
-                                     / new_input.i_frame_length );
-        dummy_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
-
-        aout_BufferAlloc( &dummy_alloc, duration, NULL, p_new_buffer );
-        memcpy( p_new_buffer->p_buffer, p_buffer->p_buffer,
-                p_buffer->i_nb_bytes );
-        p_new_buffer->i_nb_samples = p_buffer->i_nb_samples;
-        p_new_buffer->i_nb_bytes = p_buffer->i_nb_bytes;
-
-        aout_BufferFree( p_buffer );
-        p_buffer = p_new_buffer;
-
-        aout_FiltersPlay( p_aout, pp_filters, i_nb_filters,
+        aout_FiltersPlay( p_aout, p_input->pp_resamplers,
+                          p_input->i_nb_resamplers,
                           &p_buffer );
-
-        aout_FiltersDestroyPipeline( p_aout, pp_filters,
-                                     i_nb_filters );
     }
     else
     {
-        /* No resampling needed (except maybe the one imposed by the
-         * output). */
         duration = p_buffer->end_date - p_buffer->start_date;
-        aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
-                          &p_buffer );
+
+        if ( p_input->input.i_rate != p_aout->mixer.mixer.i_rate )
+        {
+            /* Standard resampling is needed ! */
+            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+
+            aout_FiltersPlay( p_aout, p_input->pp_resamplers,
+                              p_input->i_nb_resamplers,
+                              &p_buffer );
+        }
     }
 
     /* Adding the start date will be managed by aout_FifoPush(). */

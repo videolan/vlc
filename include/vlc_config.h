@@ -147,6 +147,9 @@
  * time, without resampling */
 #define AOUT_PTS_TOLERANCE              (mtime_t)(.02*CLOCK_FREQ)
 
+/* Max acceptable resampling (in %) */
+#define AOUT_MAX_RESAMPLING             10
+
 /*****************************************************************************
  * Video configuration
  *****************************************************************************/
