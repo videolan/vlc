@@ -1355,15 +1355,11 @@ AC_ARG_ENABLE(macosx,
   [if test x$enable_macosx = xyes
    then
      BUILTINS="${BUILTINS} macosx"
-     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework AGL -framework QuickTime -lobjc"
-     macosx_CFLAGS="${macosx_CFLAGS} -ObjC"
-     LDFLAGS="${LDFLAGS} -ObjC"
+     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework AGL -framework QuickTime -lobjc -ObjC"
    fi],
   [AC_CHECK_HEADERS(Cocoa/Cocoa.h,
      BUILTINS="${BUILTINS} macosx"
-     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework AGL -framework QuickTime -lobjc"
-     macosx_CFLAGS="${macosx_CFLAGS} -ObjC"
-     LDFLAGS="${LDFLAGS} -ObjC"
+     macosx_LDFLAGS="${macosx_LDFLAGS} -framework CoreAudio -framework AudioToolbox -framework IOKit -framework Cocoa -framework AGL -framework QuickTime -lobjc -ObjC"
    )])
 
 dnl

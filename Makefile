@@ -191,7 +191,7 @@ C_OBJ +=	src/misc/win32_specific.o
 RESOURCE_OBJ :=	share/vlc_win32_rc.o
 endif
 
-VLC_OBJ := $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
+VLC_OBJ := $(C_OBJ) $(CPP_OBJ) $(M_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
 
 #
 # Generated header
@@ -344,8 +344,8 @@ dist:
 	rm -Rf tmp/vlc/tmp
 	find debian -mindepth 1 -maxdepth 1 -type d | \
 		while read i ; do rm -Rf tmp/vlc/$$i ; done
-	# Copy .c .h .in .cpp and .glade files
-	find include src plugins -type f -name '*.[bcdhigrst]*' | while read i ; \
+	# Copy .c .h .in .cpp .m and .glade files
+	find include src plugins -type f -name '*.[bcdhigmrst]*' | while read i ; \
 		do cp $$i tmp/vlc/$$i ; done
 	# Grmbl... special case...
 	for i in API BUGS DESIGN TODO ; \
@@ -529,6 +529,12 @@ $(CPP_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(CPP_OBJ): %.o: $(H_OBJ)
 $(CPP_OBJ): %.o: .dep/%.dpp
 $(CPP_OBJ): %.o: %.cpp
+	$(CC) $(CFLAGS) $(vlc_CFLAGS) -c -o $@ $<
+
+$(M_OBJ): %.o: Makefile.opts Makefile.dep Makefile
+$(M_OBJ): %.o: $(H_OBJ)
+$(M_OBJ): %.o: .dep/%.dm
+$(M_OBJ): %.o: %.m
 	$(CC) $(CFLAGS) $(vlc_CFLAGS) -c -o $@ $<
 
 $(RESOURCE_OBJ): %.o: Makefile.dep Makefile

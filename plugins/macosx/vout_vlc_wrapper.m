@@ -2,7 +2,7 @@
  * vout_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_vlc_wrapper.c,v 1.2 2002/05/07 20:17:07 massiot Exp $
+ * $Id: vout_vlc_wrapper.m,v 1.1 2002/05/12 20:56:34 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -84,6 +84,18 @@ static Vout_VLCWrapper *o_vout = nil;
         p_vout->p_sys->i_time_mouse_last_moved = mdate();
     if( ui_status & MOUSE_NOT_LAST_MOVED )
         p_vout->p_sys->i_time_mouse_last_moved = 0;
+    if( ui_status & MOUSE_DOWN )
+    {
+        if( p_vout->p_sys->b_mouse_pointer_visible )
+        {
+            CGDisplayHideCursor( kCGDirectMainDisplay );
+        }
+        else
+        {
+            CGDisplayShowCursor( kCGDirectMainDisplay );
+        }
+        p_vout->p_sys->b_mouse_pointer_visible = !p_vout->p_sys->b_mouse_pointer_visible;
+    }
 }
 
 - (BOOL)keyDown:(NSEvent *)o_event forVout:(void *)_p_vout

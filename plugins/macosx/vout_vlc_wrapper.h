@@ -2,7 +2,7 @@
  * vout_vlc_wrapper.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_vlc_wrapper.h,v 1.2 2002/05/07 20:17:07 massiot Exp $
+ * $Id: vout_vlc_wrapper.h,v 1.3 2002/05/12 20:56:34 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -25,6 +25,7 @@
 #define MOUSE_NOT_MOVED         0x00000002
 #define MOUSE_LAST_MOVED        0x00000004
 #define MOUSE_NOT_LAST_MOVED    0x00000008
+#define MOUSE_DOWN              0x00000010
 
 @interface Vout_VLCWrapper : NSObject
 {

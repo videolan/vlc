@@ -13,8 +13,8 @@
 		};
 		F510A6CD01738ED001A80A1F = {
 			isa = PBXFileReference;
-			name = intf_vlc_wrapper.c;
-			path = plugins/macosx/intf_vlc_wrapper.c;
+			name = intf_vlc_wrapper.m;
+			path = plugins/macosx/intf_vlc_wrapper.m;
 			refType = 4;
 		};
 		F511306E0170620B01A80A1F = {
@@ -103,14 +103,14 @@
 		};
 		F512122B0170635601A80A1F = {
 			isa = PBXFileReference;
-			name = aout_macosx.c;
-			path = plugins/macosx/aout_macosx.c;
+			name = aout_macosx.m;
+			path = plugins/macosx/aout_macosx.m;
 			refType = 4;
 		};
 		F512122C0170635601A80A1F = {
 			isa = PBXFileReference;
-			name = intf_controller.c;
-			path = plugins/macosx/intf_controller.c;
+			name = intf_controller.m;
+			path = plugins/macosx/intf_controller.m;
 			refType = 4;
 		};
 		F512122D0170635601A80A1F = {
@@ -121,8 +121,8 @@
 		};
 		F51212300170635601A80A1F = {
 			isa = PBXFileReference;
-			name = macosx.c;
-			path = plugins/macosx/macosx.c;
+			name = macosx.m;
+			path = plugins/macosx/macosx.m;
 			refType = 4;
 		};
 		F51212310170635601A80A1F = {
@@ -133,8 +133,8 @@
 		};
 		F51212320170635601A80A1F = {
 			isa = PBXFileReference;
-			name = vout_macosx.c;
-			path = plugins/macosx/vout_macosx.c;
+			name = vout_macosx.m;
+			path = plugins/macosx/vout_macosx.m;
 			refType = 4;
 		};
 		F51352740170655D01A80A1F = {
@@ -243,7 +243,7 @@
 	<key>CFBundleExecutable</key>
 	<string>vlc</string>
 	<key>CFBundleGetInfoString</key>
-	<string>VideoLAN Client</string>
+	<string>VideoLAN Client, © 1996-2002 VideoLAN project</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -255,7 +255,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>vlc 0.3.1</string>
+	<string>0.3.1</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleVersion</key>
@@ -370,8 +370,8 @@
 //F64
 		F66B34EC0271A5AF01A80112 = {
 			isa = PBXFileReference;
-			name = intf_open.c;
-			path = plugins/macosx/intf_open.c;
+			name = intf_open.m;
+			path = plugins/macosx/intf_open.m;
 			refType = 4;
 		};
 		F66B34ED0271A5AF01A80112 = {
@@ -382,14 +382,14 @@
 		};
 		F6799746020DCC2A01A80112 = {
 			isa = PBXFileReference;
-			name = intf_macosx.c;
-			path = plugins/macosx/intf_macosx.c;
+			name = intf_macosx.m;
+			path = plugins/macosx/intf_macosx.m;
 			refType = 4;
 		};
 		F6799747020DCC2A01A80112 = {
 			isa = PBXFileReference;
-			name = vout_qdview.c;
-			path = plugins/macosx/vout_qdview.c;
+			name = vout_qdview.m;
+			path = plugins/macosx/vout_qdview.m;
 			refType = 4;
 		};
 		F6799748020DCC2A01A80112 = {
@@ -400,8 +400,8 @@
 		};
 		F6799749020DCC2A01A80112 = {
 			isa = PBXFileReference;
-			name = vout_window.c;
-			path = plugins/macosx/vout_window.c;
+			name = vout_window.m;
+			path = plugins/macosx/vout_window.m;
 			refType = 4;
 		};
 		F679974A020DCC2A01A80112 = {
@@ -412,8 +412,8 @@
 		};
 		F6EA76F5024171E201A80112 = {
 			isa = PBXFileReference;
-			name = vout_vlc_wrapper.c;
-			path = plugins/macosx/vout_vlc_wrapper.c;
+			name = vout_vlc_wrapper.m;
+			path = plugins/macosx/vout_vlc_wrapper.m;
 			refType = 4;
 		};
 		F6EA76F6024171E201A80112 = {

@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.20 2002/05/04 13:48:31 massiot Exp $
+ * $Id: aout_macosx.m,v 1.1 2002/05/12 20:56:33 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>

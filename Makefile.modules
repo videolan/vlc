@@ -21,6 +21,7 @@ suff := $(shell echo $(MAKECMDGOALS) | sed 's@.*\.@@' | tr so/a lo/o)
 #
 SRC_C := $(filter %.c,$($(module_name)_SOURCES))
 SRC_CPP := $(filter %.cpp,$($(module_name)_SOURCES))
+SRC_M := $(filter %.m,$($(module_name)_SOURCES))
 
 ifeq (lo,$(suff))
 extra_CFLAGS := $(plugins_CFLAGS) $($(module_name)_CFLAGS) \
@@ -31,7 +32,8 @@ else
 extra_CFLAGS := $(builtins_CFLAGS) $($(module_name)_CFLAGS) \
                 -DMODULE_NAME=$(module_name) -DMODULE_NAME_IS_$(module_name) \
                 $($(module_name)_a_CFLAGS)
-OBJ_ALL := $(SRC_C:%.c=%.o.$(module_name)) $(SRC_CPP:%.cpp=%.o.$(module_name))
+OBJ_ALL := $(SRC_C:%.c=%.o.$(module_name)) $(SRC_CPP:%.cpp=%.o.$(module_name)) \
+		$(SRC_M:%.m=%.o.$(module_name))
 endif
 
 # 
@@ -39,6 +41,7 @@ endif
 #
 C_DEP := $(SRC_C:%.c=.dep/%.d)
 CPP_DEP := $(SRC_CPP:%.cpp=.dep/%.dpp)
+M_DEP := $(SRC_M:%.m=.dep/%.dm)
 
 export
 
@@ -63,12 +66,19 @@ $(C_DEP): %.d: FORCE
 $(CPP_DEP): %.dpp: FORCE
 	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
 
+$(M_DEP): %.dm: FORCE
+	@$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@ CFLAGS="$(CFLAGS) $(extra_CFLAGS)"
+
 $(SRC_C:%.c=%.$(suff).$(module_name)): %.$(suff).$(module_name): .dep/%.d
 $(SRC_C:%.c=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.c
 	$(CC) $(CFLAGS) $(extra_CFLAGS) -c $< -o $@
 
 $(SRC_CPP:%.cpp=%.$(suff).$(module_name)): %.$(suff).$(module_name): .dep/%.dpp
 $(SRC_CPP:%.cpp=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.cpp
+	$(CC) $(CFLAGS) $(extra_CFLAGS) -c $< -o $@
+
+$(SRC_M:%.m=%.$(suff).$(module_name)): %.$(suff).$(module_name): .dep/%.dm
+$(SRC_M:%.m=%.$(suff).$(module_name)): %.$(suff).$(module_name): %.m
 	$(CC) $(CFLAGS) $(extra_CFLAGS) -c $< -o $@
 
 # foo_CUSTOM lets us override all target rules for foo.so and foo.a

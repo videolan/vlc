@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.18 2002/05/01 19:18:09 sam Exp $
+ * $Id: spu_decoder.c,v 1.19 2002/05/12 20:56:34 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -151,16 +151,19 @@ static int decoder_Run( decoder_config_t * p_config )
         DecoderError( p_spudec->p_fifo );
     }
 
-    /* End of thread */
-    EndThread( p_spudec );
-
-    if( p_spudec->p_fifo->b_error )
     {
-        return( -1 );
+        boolean_t b_error = p_spudec->p_fifo->b_error;
+
+        /* End of thread */
+        EndThread( p_spudec );
+
+        if( b_error )
+        {
+            return( -1 );
+        }
     }
    
     return( 0 );
-
 }
 
 /* following functions are local */

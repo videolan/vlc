@@ -1,10 +1,12 @@
 /*****************************************************************************
- * vout_qdview.c: MacOS X plugin for vlc
+ * macosx.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_qdview.c,v 1.4 2002/05/07 20:17:07 massiot Exp $
+ * $Id: macosx.m,v 1.1 2002/05/12 20:56:34 massiot Exp $
  *
- * Authors: Florian G. Pflug <fgp@phlo.org>
+ * Authors: Colin Delacroix <colin@zoy.org>
+ *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
+ *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,31 +27,38 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#import <Cocoa/Cocoa.h>
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <string.h>
 
-#import "vout_qdview.h"
+#include <videolan/vlc.h>
 
 /*****************************************************************************
- * VLCView implementation 
+ * Capabilities defined in the other files.
  *****************************************************************************/
-@implementation VLCView
+void _M( aout_getfunctions )( function_list_t * p_function_list );
+void _M( vout_getfunctions )( function_list_t * p_function_list );
+void _M( intf_getfunctions )( function_list_t * p_function_list );
 
-- (id)initWithWrapper:(Vout_VLCWrapper *)_o_wrapper forVout:(void *)_p_vout
-{
-    if( [super init] == nil )
-        return nil;
+/*****************************************************************************
+ * Build configuration tree.
+ *****************************************************************************/
+MODULE_CONFIG_START
+MODULE_CONFIG_STOP
 
-    p_vout = _p_vout;
-    o_wrapper = _o_wrapper;
+MODULE_INIT_START
+    SET_DESCRIPTION( _("MacOS X interface, sound and video module") )
+    ADD_CAPABILITY( INTF, 100 )
+    ADD_CAPABILITY( AOUT, 100 )
+    ADD_CAPABILITY( VOUT, 100 )
+    ADD_SHORTCUT( "macosx" )
+MODULE_INIT_STOP
 
-    return( self );
-}
+MODULE_ACTIVATE_START
+    _M( vout_getfunctions )( &p_module->p_functions->vout );
+    _M( aout_getfunctions )( &p_module->p_functions->aout );
+    _M( intf_getfunctions )( &p_module->p_functions->intf );
+MODULE_ACTIVATE_STOP
 
-- (void)drawRect:(NSRect)rect
-{
-    [super drawRect: rect];
-    [[NSColor blackColor] set];
-    NSRectFill(rect);
-}
+MODULE_DEACTIVATE_START
+MODULE_DEACTIVATE_STOP
 
-@end

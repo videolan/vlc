@@ -346,6 +346,7 @@ static int vout_Manage( vout_thread_t *p_vout )
             CGDisplayShowCursor( kCGDirectMainDisplay );
             b_change = 1;
         }
+#if 0
         else if( !p_vout->p_sys->b_mouse_moved && 
             mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 &&
             p_vout->p_sys->b_mouse_pointer_visible )
@@ -353,6 +354,7 @@ static int vout_Manage( vout_thread_t *p_vout )
             CGDisplayHideCursor( kCGDirectMainDisplay );
             b_change = 1;
         }
+#endif
 
         if( b_change )
         {

@@ -2,7 +2,7 @@
  * vout_window.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_window.c,v 1.2 2002/03/19 03:33:52 jlj Exp $
+ * $Id: vout_window.m,v 1.1 2002/05/12 20:56:34 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -47,10 +47,11 @@
 - (void)becomeKeyWindow
 {
     [super becomeKeyWindow];
-
+#if 0
     [o_wrapper 
         mouseEvent: (MOUSE_NOT_MOVED | MOUSE_LAST_MOVED)
         forVout: p_vout];
+#endif
 }
 
 - (void)resignKeyWindow
@@ -74,6 +75,13 @@
 {
     [o_wrapper
         mouseEvent: MOUSE_LAST_MOVED
+        forVout: p_vout];
+}
+
+- (void)mouseDown:(NSEvent *)o_event
+{
+    [o_wrapper
+        mouseEvent: MOUSE_DOWN
         forVout: p_vout];
 }
 

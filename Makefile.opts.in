@@ -83,7 +83,6 @@ gnome_CFLAGS = @gnome_CFLAGS@
 gtk_CFLAGS = @gtk_CFLAGS@
 kde_CFLAGS = @kde_CFLAGS@
 idctaltivec_CFLAGS = @idctaltivec_CFLAGS@
-macosx_CFLAGS = @macosx_CFLAGS@
 mad_CFLAGS = @mad_CFLAGS@
 memcpyaltivec_CFLAGS = @memcpyaltivec_CFLAGS@
 motionaltivec_CFLAGS = @motionaltivec_CFLAGS@

@@ -1,1 +1,1 @@
-macosx_SOURCES = macosx.c aout_macosx.c vout_macosx.c vout_window.c vout_qdview.c vout_vlc_wrapper.c intf_macosx.c intf_controller.c intf_vlc_wrapper.c intf_open.c 
+macosx_SOURCES = macosx.m aout_macosx.m vout_macosx.m vout_window.m vout_qdview.m vout_vlc_wrapper.m intf_macosx.m intf_controller.m intf_vlc_wrapper.m intf_open.m 

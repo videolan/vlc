@@ -57,9 +57,17 @@ $(C_DEP): .dep/%.d: %.c
 
 $(CPP_DEP): .dep/%.dpp: %.cpp
 	@test -d .dep/$(dir $*) || mkdir -p $(shell dirname .dep/$*)
-	#@echo "regenerating dependencies for $*.c"
+	#@echo "regenerating dependencies for $*.cpp"
 	@$(SHELL) -ec '$(CC) -M $(CFLAGS) 2>/dev/null $< \
 	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
 	.dep\/$(subst /,\/,$*).dpp : /g'\'' > $@; \
+	[ -s $@ ] || rm -f $@'
+
+$(M_DEP): .dep/%.dm: %.m
+	@test -d .dep/$(dir $*) || mkdir -p $(shell dirname .dep/$*)
+	#@echo "regenerating dependencies for $*.m"
+	@$(SHELL) -ec '$(CC) -M $(CFLAGS) 2>/dev/null $< \
+	| sed '\''s/$(subst .,\.,$(notdir $*))\.o[ :]*/$(subst /,\/,$*).o \
+	.dep\/$(subst /,\/,$*).dm : /g'\'' > $@; \
 	[ -s $@ ] || rm -f $@'
 

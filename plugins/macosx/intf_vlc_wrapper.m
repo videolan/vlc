@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.14 2002/05/12 01:39:36 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.1 2002/05/12 20:56:34 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -555,8 +555,31 @@ static Intf_VLCWrapper *o_intf = nil;
 
     int i_es = [o_item tag];
 
-    input_ToggleES( p_input, p_input->stream.pp_es[i_es],
-                    [o_item state] == NSOffState );
+    if( [o_item state] == NSOnState )
+    {
+        /* We just have one ES to disable */
+        input_ToggleES( p_input, p_input->stream.pp_es[i_es], 0 );
+    }
+    else
+    {
+        /* Unselect the selected ES in the same class */
+        int i;
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        for( i = 0; i < p_input->stream.i_selected_es_number; i++ )
+        {
+            if( p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
+            {
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                input_ToggleES( p_input, p_input->stream.pp_selected_es[i], 0 );
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+                break;
+            }
+        }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        /* Select the wanted ES */
+        input_ToggleES( p_input, p_input->stream.pp_es[i_es], 1 );
+    }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     [self setupMenus];
@@ -572,8 +595,31 @@ static Intf_VLCWrapper *o_intf = nil;
 
     int i_es = [o_item tag];
 
-    input_ToggleES( p_input, p_input->stream.pp_es[i_es],
-                    [o_item state] == NSOffState );
+    if( [o_item state] == NSOnState )
+    {
+        /* We just have one ES to disable */
+        input_ToggleES( p_input, p_input->stream.pp_es[i_es], 0 );
+    }
+    else
+    {
+        /* Unselect the selected ES in the same class */
+        int i;
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        for( i = 0; i < p_input->stream.i_selected_es_number; i++ )
+        {
+            if( p_input->stream.pp_selected_es[i]->i_cat == SPU_ES )
+            {
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                input_ToggleES( p_input, p_input->stream.pp_selected_es[i], 0 );
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+                break;
+            }
+        }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        /* Select the wanted ES */
+        input_ToggleES( p_input, p_input->stream.pp_es[i_es], 1 );
+    }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     [self setupMenus];
@@ -665,6 +711,8 @@ static Intf_VLCWrapper *o_intf = nil;
                 }
             }
         }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
         /* ----- TITLES ----- */
         if( p_input->stream.i_area_nb < 2 )
@@ -708,6 +756,8 @@ static Intf_VLCWrapper *o_intf = nil;
                 }
             }
         }
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
         /* ----- CHAPTERS ----- */
         if( p_input->stream.p_selected_area->i_part_nb < 2 )
@@ -750,6 +800,8 @@ static Intf_VLCWrapper *o_intf = nil;
             }
         }
         p_main->p_intf->p_sys->i_part = p_input->stream.p_selected_area->i_part;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
         /* ----- LANGUAGES & SUBTITLES ----- */
         o_language = [o_language_item submenu];
