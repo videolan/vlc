@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.5 2002/05/05 17:20:49 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.6 2002/05/25 16:23:07 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -283,11 +283,13 @@ static int	RIFF_LoadChunkData(input_thread_t * p_input,riffchunk_t *p_riff )
 }
 
 static int	RIFF_LoadChunkDataInPES(input_thread_t * p_input,
-                                    pes_packet_t **pp_pes)
+                                    pes_packet_t **pp_pes,
+                                    int i_size_index)
 {
     u32 i_read;
     data_packet_t *p_data;
     riffchunk_t   *p_riff;
+    int i_size;
     
     if( (p_riff = RIFF_ReadChunk( p_input )) == NULL )
     {
@@ -301,6 +303,16 @@ static int	RIFF_LoadChunkDataInPES(input_thread_t * p_input,
     {
         return( -1 );
     }
+
+    if( (!p_riff->i_size) || (!i_size_index ) )
+    {
+        i_size = __MAX( i_size_index, p_riff->i_size );
+    }
+    else
+    {
+        i_size = __MIN( p_riff->i_size, i_size_index );
+    }
+    
     if( p_riff->i_size == 0 )
     {
         p_data = input_NewPacket( p_input->p_method_data, 0 );
@@ -313,7 +325,7 @@ static int	RIFF_LoadChunkDataInPES(input_thread_t * p_input,
         
     do
     {
-        i_read = input_SplitBuffer(p_input, &p_data, p_riff->i_size - 
+        i_read = input_SplitBuffer(p_input, &p_data, i_size - 
                                                     (*pp_pes)->i_pes_size );
         if( i_read < 0 )
         {
@@ -336,9 +348,9 @@ static int	RIFF_LoadChunkDataInPES(input_thread_t * p_input,
             (*pp_pes)->i_pes_size += ( p_data->p_payload_end -
                                        p_data->p_payload_start );
         }
-    } while( ((*pp_pes)->i_pes_size < p_riff->i_size)&&(i_read != 0) );
+    } while( ((*pp_pes)->i_pes_size < i_size)&&(i_read != 0) );
    /* i_read =  0 si fin du stream sinon block */
-	if ( p_riff->i_size%2 != 0) 
+	if ( i_size%2 != 0) 
     {
        __RIFF_SkipBytes(p_input,1);
     } /* aligne sur un mot */

@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.19 2002/05/18 17:47:46 sam Exp $
+ * $Id: avi.c,v 1.20 2002/05/25 16:23:07 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -1110,9 +1110,13 @@ static pes_packet_t *__AVI_ReadStreamChunkInPES(  input_thread_t    *p_input,
     {
         return( NULL );
     }
-
+    /*- XXX avio is sh*t sometime chunk size is broken, and 
+      we must choose index sie */
+    
     if( ( __AVI_GoToStreamChunk( p_input, p_info, p_info->i_idxposc ) != 0 )
-         ||( RIFF_LoadChunkDataInPES( p_input, &p_pes) != 0 ) )
+         ||( RIFF_LoadChunkDataInPES( p_input, 
+                                      &p_pes,
+                            p_info->p_index[p_info->i_idxposc].i_length ) != 0 ) )
     {
         return( NULL );
     }
