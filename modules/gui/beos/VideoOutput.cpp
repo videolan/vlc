@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.15 2003/04/18 16:38:58 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.16 2003/04/18 19:26:38 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -293,6 +293,19 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
 	if (config_GetInt(p_vout, "fullscreen"))
 		fSettings->AddFlags(VideoSettings::FLAG_FULL_SCREEN);
 
+    // add a few useful shortcuts
+    AddShortcut( 'f', 0, new BMessage( TOGGLE_FULL_SCREEN ) );
+    AddShortcut( '1', 0, new BMessage( RESIZE_50 ) );
+    AddShortcut( '2', 0, new BMessage( RESIZE_100 ) );
+    AddShortcut( '3', 0, new BMessage( RESIZE_200 ) );
+    
+    // workaround for french keyboards
+    fprintf( stderr, "%x\n", '&' );
+    AddShortcut( '&', 0, new BMessage( RESIZE_50 ) );
+    AddShortcut( 'é', 0, new BMessage( RESIZE_100 ) );
+        // FIXME - this one doesn't work because 'é' is a multi-byte character
+    AddShortcut( '"', 0, new BMessage( RESIZE_200 ) );
+    
     _SetToSettings();
 }
 
