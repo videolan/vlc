@@ -1581,9 +1581,23 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
     /* Motion type is picture structure. */
     p_mb->pf_motion = pf_motion_skipped[i_chroma_format]
                                        [i_structure];
-    p_mb->i_mb_type = MB_MOTION_FORWARD;
     p_mb->i_coded_block_pattern = 0;
-    memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
+
+    /* Motion direction and motion vectors depend on the coding type. */
+    if( i_coding_type == B_CODING_TYPE )
+    {
+        int i, j, k;
+        p_mb->i_mb_type = p_vpar->mb.i_motion_dir;
+        for( i = 0; i < 2; i++ )
+            for( j = 0; j < 2; j++ )
+                for( k = 0; k < 2; k++ )
+                    p_mb->pppi_motion_vectors[i][j][k] = p_vpar->mb.pppi_pmv[i][j][k];
+    }
+    else if( i_coding_type == P_CODING_TYPE )
+    {
+        p_mb->i_mb_type = MB_MOTION_FORWARD;
+        memset( p_mb->pppi_motion_vectors, 0, 8*sizeof(int) );
+    }
 
     /* Set the field we use for motion compensation */
     p_mb->ppi_field_select[0][0] = p_mb->ppi_field_select[0][1]
@@ -1623,6 +1637,14 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
         break;
     case D_CODING_TYPE:
         p_mb->i_mb_type = DMBType( p_vpar );
+    }
+
+    if( i_coding_type == B_CODING_TYPE )
+    {
+        /* We need to remember the motion direction of the last macroblock
+         * before a skipped macroblock (ISO/IEC 13818-2 7.6.6) */
+        p_vpar->mb.i_motion_dir = p_mb->i_mb_type
+                              & (MB_MOTION_FORWARD | MB_MOTION_BACKWARD);
     }
 
     /* SCALABILITY : warning, we don't know if spatial_temporal_weight_code
