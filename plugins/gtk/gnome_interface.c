@@ -2696,7 +2696,7 @@ create_intf_sat (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label30), 0, 0.5);
 
-  sat_freq_adj = gtk_adjustment_new (11954, 10000, 12999, 1, 10, 10);
+  sat_freq_adj = gtk_adjustment_new (config_GetIntVariable( "frequency" ), 10000, 12999, 1, 10, 10);
   sat_freq = gtk_spin_button_new (GTK_ADJUSTMENT (sat_freq_adj), 1, 0);
   gtk_widget_ref (sat_freq);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_freq", sat_freq,
@@ -2747,7 +2747,7 @@ create_intf_sat (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label33), 0, 0.5);
 
-  sat_srate_adj = gtk_adjustment_new (27500, 1000, 30000, 1, 10, 10);
+  sat_srate_adj = gtk_adjustment_new (config_GetIntVariable( "symbol-rate" ), 1000, 30000, 1, 10, 10);
   sat_srate = gtk_spin_button_new (GTK_ADJUSTMENT (sat_srate_adj), 1, 0);
   gtk_widget_ref (sat_srate);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_srate", sat_srate,

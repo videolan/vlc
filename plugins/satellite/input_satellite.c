@@ -259,29 +259,29 @@ static int SatelliteOpen( input_thread_t * p_input )
             return -1;
             break;
         case -3:
-            intf_ErrMsg( "input: satellite: Frontend returned\
-                    no event" );
+            intf_ErrMsg( "input: satellite: Frontend returned"\
+                    "no event" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
             break;
         case -4:
-            intf_ErrMsg( "input: satellite: Frontend: time out\
-                    when polling for event" );
+            intf_ErrMsg( "input: satellite: Frontend: time out"\
+                    "when polling for event" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
             break;
         case -5:
-             intf_ErrMsg( "input: satellite: An error occured when polling\
-                    Frontend device" );
+             intf_ErrMsg( "input: satellite: An error occured when polling"\
+                    "Frontend device" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
             break;
         case -1:
-             intf_ErrMsg( "input: satellite: Frontend returned\
-                    an failure event" );
+             intf_ErrMsg( "input: satellite: Frontend returned"\
+                    "a failure event" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
@@ -294,8 +294,8 @@ static int SatelliteOpen( input_thread_t * p_input )
 
     if ( ioctl_SetDMXFilter( 0, &i_fd, 3 ) < 0 )
     {
-        intf_ErrMsg( "input: satellite: An error occured when setting\
-                filter on PAT" );
+        intf_ErrMsg( "input: satellite: An error occured when setting"\
+                "filter on PAT" );
         close( p_satellite->i_handle );
         free( p_satellite );
         return -1;
@@ -303,8 +303,8 @@ static int SatelliteOpen( input_thread_t * p_input )
 
     if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
     {
-        intf_ErrMsg( "input: satellite: Not enough memory to allow stream\
-                        structure" );
+        intf_ErrMsg( "input: satellite: Not enough memory to allow stream"\
+                        "structure" );
         close( p_satellite->i_handle );
         free( p_satellite );
         return( -1 );

@@ -139,7 +139,7 @@ create_pixmap                          (GtkWidget       *widget,
 }
 
 /* This is an internally used function to check if a pixmap file exists. */
-gchar*
+static gchar*
 check_file_exists                      (const gchar     *directory,
                                         const gchar     *filename)
 {

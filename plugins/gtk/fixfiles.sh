@@ -15,6 +15,8 @@ do
 EOF
                 tail +8 $file \
                         | sed 's#_("/dev/dvd")#config_GetPszVariable( "dvd" )#' \
+                        | sed 's#11954#config_GetIntVariable( "frequency" )#' \
+                        | sed 's#27500#config_GetIntVariable( "symbol-rate" )#' \
                         >> /tmp/$$.$file.bak
                 mv -f /tmp/$$.$file.bak $file
         fi
