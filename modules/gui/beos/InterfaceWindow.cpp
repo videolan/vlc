@@ -183,12 +183,12 @@ InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
                                   const char * name )
     : BWindow( frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
                B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
-      
+
       /* Initializations */
       p_intf( _p_intf ),
       p_input( NULL ),
       p_playlist( NULL ),
-      
+
       fFilePanel( NULL ),
       fLastUpdateTime( system_time() ),
       fSettings( new BMessage( 'sett' ) )
@@ -374,7 +374,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         case B_ABOUT_REQUESTED:
         {
             BAlert * alert;
-            
+
             alert = new BAlert( "VLC media player" VERSION,
                                 "VLC media player" VERSION " (BeOS interface)\n\n"
                                 "The VideoLAN team <videolan@videolan.org>\n"
@@ -439,27 +439,27 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
             p_mediaControl->SetStatus(-1, INPUT_RATE_DEFAULT);
             break;
-    
+
         case START_PLAYBACK:
-            /*  starts playing in normal mode */
-    
         case PAUSE_PLAYBACK:
+        {
+            vlc_value_t val;
+            val.i_int = PLAYING_S;
             if( p_input )
             {
-                if( var_GetInteger( p_input, "state" ) == PAUSE_S )
-                {
-                    if( p_playlist )
-                    {
-                        playlist_Play( p_playlist );
-                    }
-                }
-                else
-                {
-                    var_SetInteger( p_input, "state", PAUSE_S );
-                }
+                var_Get( p_input, "state", &val );
+            }
+            if( p_input && val.i_int != PAUSE_S )
+            {
+                val.i_int = PAUSE_S;
+                var_Set( p_input, "state", val );
+            }
+            else
+            {
+                playlist_Play( p_playlist );
             }
             break;
-    
+        }
         case HEIGHTH_PLAY:
             if( p_input )
             {
@@ -516,11 +516,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         case VOLUME_CHG:
             aout_VolumeSet( p_intf, p_mediaControl->GetVolume() );
             break;
-    
+
         case VOLUME_MUTE:
             aout_VolumeMute( p_intf, NULL );
             break;
-    
+
         case SELECT_CHANNEL:
         {
             int32 channel;
@@ -537,7 +537,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
             break;
         }
-    
+
         case PREV_TITLE:
             if( p_input )
             {
@@ -708,17 +708,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             {
                 break;
             }
-            
+
             vlc_bool_t b_remove = ( p_message->WasDropped() &&
-                                    !( modifiers() & B_SHIFT_KEY ) ); 
+                                    !( modifiers() & B_SHIFT_KEY ) );
 
             if( b_remove && p_playlist )
             {
-                /* Empty playlist */
-                while( p_playlist->i_size > 0 )
-                {
-                    playlist_Delete( p_playlist, 0 );
-                }
+                playlist_Clear( p_playlist );
             }
 
             entry_ref ref;
@@ -785,7 +781,7 @@ bool InterfaceWindow::QuitRequested()
     p_mediaControl->SetStatus(-1, INPUT_RATE_DEFAULT);
 
      _StoreSettings();
-   
+
     p_intf->b_die = 1;
 
     return( true );
@@ -818,14 +814,14 @@ void InterfaceWindow::UpdateInterface()
     {
         return;
     }
-    
+
     if( p_input )
     {
         vlc_value_t val;
         p_mediaControl->SetEnabled( true );
         bool hasTitles   = !var_Get( p_input, "title", &val );
         bool hasChapters = !var_Get( p_input, "chapter", &val );
-        p_mediaControl->SetStatus( var_GetInteger( p_input, "state" ), 
+        p_mediaControl->SetStatus( var_GetInteger( p_input, "state" ),
                                    var_GetInteger( p_input, "rate" ) );
         var_Get( p_input, "position", &val );
         p_mediaControl->SetProgress( val.f_float );
@@ -857,11 +853,11 @@ void InterfaceWindow::UpdateInterface()
         p_mediaControl->SetAudioEnabled( false );
 
         _SetMenusEnabled( false );
-        
-        if( !p_playlist || p_playlist->i_size <= 0 )
+
+        if( !playlist_IsEmpty( p_playlist ) )
         {
             p_mediaControl->SetProgress( 0 );
-            
+
 #if 0
             // enable/disable skip buttons
             bool canSkipPrev;
@@ -875,7 +871,7 @@ void InterfaceWindow::UpdateInterface()
             p_mediaControl->SetEnabled( false );
         }
     }
-    
+
     Unlock();
     fLastUpdateTime = system_time();
 }
@@ -949,33 +945,33 @@ void
 InterfaceWindow::_UpdateSpeedMenu( int rate )
 {
     BMenuItem * toMark = NULL;
-    
+
     switch( rate )
     {
         case ( INPUT_RATE_DEFAULT * 8 ):
             toMark = fHeighthMI;
             break;
-            
+
         case ( INPUT_RATE_DEFAULT * 4 ):
             toMark = fQuarterMI;
             break;
-            
+
         case ( INPUT_RATE_DEFAULT * 2 ):
             toMark = fHalfMI;
             break;
-            
+
         case ( INPUT_RATE_DEFAULT ):
             toMark = fNormalMI;
             break;
-            
+
         case ( INPUT_RATE_DEFAULT / 2 ):
             toMark = fTwiceMI;
             break;
-            
+
         case ( INPUT_RATE_DEFAULT / 4 ):
             toMark = fFourMI;
             break;
-            
+
         case ( INPUT_RATE_DEFAULT / 8 ):
             toMark = fHeightMI;
             break;
@@ -1069,7 +1065,7 @@ InterfaceWindow::_RestoreSettings()
             frame.bottom = frame.top + fPreferencesWindow->Frame().Height();
             set_window_pos( fPreferencesWindow, frame );
         }
-        
+
         bool showing;
         if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
             launch_window( fPlaylistWindow, showing );
@@ -1224,11 +1220,11 @@ void LanguageMenu::AttachedToWindow()
     {
         return;
     }
-    
+
     vlc_value_t val_list, text_list;
     BMessage * message;
     int i_current;
-    
+
     i_current = var_GetInteger( p_input, psz_variable );
     var_Change( p_input, psz_variable, VLC_VAR_GETLIST, &val_list, &text_list );
     for( int i = 0; i < val_list.p_list->i_count; i++ )
@@ -1243,9 +1239,9 @@ void LanguageMenu::AttachedToWindow()
         AddItem( item );
     }
     var_Change( p_input, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
-    
+
     vlc_object_release( p_input );
-    
+
     BMenu::AttachedToWindow();
 }
 
@@ -1291,7 +1287,7 @@ void TitleMenu::AttachedToWindow()
         vlc_value_t val_list, text_list;
         var_Change( p_input, "title", VLC_VAR_GETCHOICES,
                     &val_list, &text_list );
-        
+
         for( int i = 0; i < val_list.p_list->i_count; i++ )
         {
             message = new BMessage( TOGGLE_TITLE );
@@ -1354,7 +1350,7 @@ void ChapterMenu::AttachedToWindow()
         vlc_value_t val_list, text_list;
         var_Change( p_input, "chapter", VLC_VAR_GETCHOICES,
                     &val_list, &text_list );
-        
+
         for( int i = 0; i < val_list.p_list->i_count; i++ )
         {
             message = new BMessage( TOGGLE_CHAPTER );
