@@ -361,7 +361,7 @@ msgstr "Pista %i"
 
 #: src/libvlc.c:262 src/libvlc.c:352
 msgid "C"
-msgstr "sp"
+msgstr "es"
 
 #: src/libvlc.c:305 src/libvlc.c:1420
 #, c-format
