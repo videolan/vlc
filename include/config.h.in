@@ -214,6 +214,10 @@
 #define INPUT_PORT_VAR                  "vlc_server_port"
 #define INPUT_PORT_DEFAULT              1234
 
+/* Broadcast mode */
+#define INPUT_BROADCAST_VAR             "vlc_broadcast"
+#define INPUT_BROADCAST_DEFAULT         0
+
 /*
  * Vlan method
  */

@@ -125,6 +125,12 @@ int input_NetworkOpen( input_thread_t *p_input )
         p_input->i_port = main_GetIntVariable( INPUT_PORT_VAR, INPUT_PORT_DEFAULT );
     }
 
+    /* See if the user requested broadcast method */
+    if( main_GetIntVariable( INPUT_BROADCAST_VAR, INPUT_BROADCAST_DEFAULT ) )
+    {
+        p_input->i_method = INPUT_METHOD_TS_BCAST;
+    }
+
     /* Find the address. */
     switch( p_input->i_method )
     {

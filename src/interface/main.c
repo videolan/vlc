@@ -79,6 +79,7 @@
 #define OPT_NOVLANS             170
 #define OPT_SERVER              171
 #define OPT_PORT                172
+#define OPT_BROADCAST           173
 
 #define OPT_SYNCHRO             180
 
@@ -122,6 +123,7 @@ static const struct option longopts[] =
     {   "novlans",          0,          0,      OPT_NOVLANS },
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
+    {   "broadcast",        0,          0,      OPT_BROADCAST },
 
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
@@ -541,6 +543,9 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_PORT:                                             /* --port */
             main_PutPszVariable( INPUT_PORT_VAR, optarg );
             break;
+        case OPT_BROADCAST:                                   /* --broadcast */
+            main_PutIntVariable( INPUT_BROADCAST_VAR, 1 );
+            break;
 
         /* Synchro options */
         case OPT_SYNCHRO:
@@ -604,6 +609,7 @@ static void Usage( int i_fashion )
               "      --novlans                  \tdisable vlans\n"
               "      --server <host>            \tvideo server address\n"
               "      --port <port>              \tvideo server port\n"
+              "      --broadcast                \tlisten to a broadcast\n"
               "\n"
               "      --synchro <type>           \tforce synchro algorithm\n"
               "\n"
@@ -651,6 +657,7 @@ static void Usage( int i_fashion )
               "  " INPUT_SERVER_VAR "=<hostname>          \tvideo server\n"
               "  " INPUT_PORT_VAR "=<port>            \tvideo server port\n"
               "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n"
+              "  " INPUT_BROADCAST_VAR "={1|0}            \tbroadcast mode\n"
               "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n"
               "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n" );
 
