@@ -3,7 +3,7 @@
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads.h,v 1.13 2002/09/02 23:17:05 massiot Exp $
+ * $Id: vlc_threads.h,v 1.14 2002/10/08 22:48:25 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -68,7 +68,7 @@
 
 /* Thread priorities */
 #ifdef SYS_DARWIN
-#   define VLC_THREAD_PRIORITY_LOW 0
+#   define VLC_THREAD_PRIORITY_LOW 31
 #   define VLC_THREAD_PRIORITY_INPUT 37
 #   define VLC_THREAD_PRIORITY_AUDIO 38
 #   define VLC_THREAD_PRIORITY_VIDEO 31
