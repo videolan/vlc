@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.24 2001/05/31 16:10:05 stef Exp $
+ * $Id: gtk_callbacks.c,v 1.25 2001/11/12 04:12:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -326,12 +326,16 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
 
         /* FIXME: ugly hack to close input and outputs */
         p_intf->pf_manage( p_intf );
-        p_main->p_playlist->b_stopped = 0;
-        p_intf->pf_manage( p_intf );
     }
-    vlc_mutex_unlock( &p_intf->change_lock );
 
     network_ChannelJoin( i_channel );
+
+    /* FIXME 2 */
+    p_main->p_playlist->b_stopped = 0;
+    p_intf->pf_manage( p_intf );
+
+    vlc_mutex_unlock( &p_intf->change_lock );
+
     input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 }
 

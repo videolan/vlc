@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.c,v 1.8 2001/08/09 08:20:26 sam Exp $
+ * $Id: intf_playlist.c,v 1.9 2001/11/12 04:12:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -164,7 +164,7 @@ void intf_PlaylistNext( playlist_t * p_playlist )
 void intf_PlaylistPrev( playlist_t * p_playlist )
 {
     vlc_mutex_lock( &p_playlist->change_lock );
-    
+
     p_playlist->i_mode = -p_playlist->i_mode;
     NextItem( p_playlist );
     p_playlist->i_mode = -p_playlist->i_mode;
@@ -202,15 +202,15 @@ int intf_PlaylistDelete( playlist_t * p_playlist, int i_pos )
 
     if( i_pos < p_playlist->i_index )
         p_playlist->i_index--;
-        
-    
+
+
     /* Decrement playlist size */
     p_playlist->i_size--;
     p_playlist->p_item = realloc( p_playlist->p_item,
                     p_playlist->i_size * sizeof( playlist_item_t ) );
 
     intf_WarnMsg( 3, "intf: removed `%s' from playlist", psz_name );
-    
+
 
     /* Delete the item */
     free( psz_name );
@@ -252,9 +252,9 @@ void intf_PlaylistDestroy( playlist_t * p_playlist )
 void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
 {
     vlc_mutex_lock( &p_playlist->change_lock );
- 
+
     p_playlist->i_index = i_pos;
-    
+
     if( p_playlist->i_index != -1 )
     {
         if( p_playlist->current.psz_name != NULL )
@@ -270,7 +270,7 @@ void intf_PlaylistJumpto( playlist_t * p_playlist , int i_pos)
     p_main->p_playlist->b_stopped = 0;
 
     vlc_mutex_unlock( &p_playlist->change_lock );
-}   
+}
 
 /* URL-decode a file: URL path, return NULL if it's not what we expect */
 void intf_UrlDecode( char *encoded_path )
@@ -282,11 +282,11 @@ void intf_UrlDecode( char *encoded_path )
     {
         return;
     }
-    
+
     cur = encoded_path ;
-    
+
     tmp = calloc(strlen(encoded_path) + 1,  sizeof(char) );
-    
+
     while ( ( ext = strchr(cur, '%') ) != NULL)
     {
         strncat(tmp, cur, (ext - cur) / sizeof(char));
@@ -299,7 +299,7 @@ void intf_UrlDecode( char *encoded_path )
         }
 
         tmp[strlen(tmp)] = (char)realchar;
-        
+
         cur = ext + 2;
     }
 

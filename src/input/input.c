@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.152 2001/11/09 13:49:26 massiot Exp $
+ * $Id: input.c,v 1.153 2001/11/12 04:12:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -534,7 +534,6 @@ static void EndThread( input_thread_t * p_input )
 
     /* Release modules */
     module_Unneed( p_input->p_input_module );
-
 }
 
 /*****************************************************************************
@@ -812,6 +811,11 @@ static void NetworkOpen( input_thread_t * p_input )
             psz_server = NULL;
         }
     }
+    else
+    {
+        /* This is required or NetworkClose will never be called */
+        p_input->p_source = "ts: network input";
+    }
 
     /* Check that we got a valid server */
     if( psz_server == NULL )
@@ -986,6 +990,8 @@ static void NetworkOpen( input_thread_t * p_input )
  *****************************************************************************/
 static void NetworkClose( input_thread_t * p_input )
 {
+    intf_WarnMsg( 2, "input: closing network target `%s'", p_input->p_source );
+
     close( p_input->i_handle );
 
 #ifdef WIN32 

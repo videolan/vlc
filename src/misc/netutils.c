@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.40 2001/11/12 03:07:13 stef Exp $
+ * $Id: netutils.c,v 1.41 2001/11/12 04:12:38 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -32,6 +32,10 @@
 #include <stdlib.h>                             /* free(), realloc(), atoi() */
 #include <errno.h>                                                /* errno() */
 #include <string.h>                                              /* memset() */
+
+#ifdef STRNCASECMP_IN_STRINGS_H
+#   include <strings.h>
+#endif
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>                                         /* gethostname() */
@@ -77,6 +81,7 @@
 #include "main.h"
 
 #include "intf_msg.h"
+#include "intf_playlist.h"
 
 #include "netutils.h"
 
@@ -97,7 +102,7 @@ typedef struct input_channel_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int GetMacAddress   ( int i_socket, char *psz_mac );
+static int GetMacAddress   ( int i_fd, char *psz_mac );
 #ifdef WIN32
 static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 #endif
@@ -213,14 +218,7 @@ int network_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
  *****************************************************************************/
 int network_ChannelCreate( void )
 {
-/* Even when BSD are supported, BeOS is not likely to be supported, so
- * I prefer to put it apart */
-#if defined( SYS_BEOS )
-    intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
-    return( 1 );
-
-/* FIXME : channel handling only work for linux */
-#elif defined( SYS_LINUX ) || defined( WIN32 )
+#if defined( SYS_LINUX ) || defined( WIN32 )
 
     /* Allocate structure */
     p_main->p_channel = malloc( sizeof( input_channel_t ) );
@@ -234,11 +232,11 @@ int network_ChannelCreate( void )
     p_main->p_channel->i_channel   = 0;
     p_main->p_channel->last_change = 0;
 
-    intf_Msg( "network: channels initialized" );
+    intf_WarnMsg( 2, "network: channels initialized" );
     return( 0 );
 
 #else
-    intf_ErrMsg( "network error : channels not supported" );
+    intf_ErrMsg( "network error : channels not supported on this platform" );
     return( 1 );
 
 #endif
@@ -251,182 +249,154 @@ int network_ChannelCreate( void )
  * already on the good channel, nothing will be done. Else, and if possible
  * (if the interface is not locked), the channel server will be contacted
  * and a change will be requested. The function will block until the change
- * is effective. Note that once a channel is no more used, it's interface
+ * is effective. Note that once a channel is no more used, its interface
  * should be unlocked using input_ChannelLeave().
  * Non 0 will be returned in case of error.
  *****************************************************************************/
 int network_ChannelJoin( int i_channel )
 {
-/* I still prefer to put BeOS a bit apart */
-#if defined( SYS_BEOS )
-    intf_ErrMsg( "network error: channels are not yet supported under BeOS" );
-    return( -1 );
+#if defined( SYS_LINUX ) || defined( WIN32 )
 
-#elif defined( SYS_LINUX ) || defined( WIN32 )
-    int                 i_socket;
-    int                 i_fromlen;
-    struct sockaddr_in  sa_server;
-    struct sockaddr_in  sa_client;
-    unsigned int        i_version = 12;
-    char                psz_mess[ 80 ];
-    char                psz_mac[ 40 ];
-    char                i_mess_length = 80;
-    unsigned long int   i_date;
-    struct timeval      answer_delay;
-    int                 i_nbanswer;
-    char                i_answer;
-    fd_set              fds;
-    unsigned int        i_rc;
-    char *              psz_channel_server;
+#define VLCS_VERSION 12
+#define MESSAGE_LENGTH 80
+
+    char psz_mess[ MESSAGE_LENGTH ];
+    char psz_mac[ 40 ];
+    int i_fd, i_dummy, i_port;
+    char *psz_vlcs;
+    struct sockaddr_in sa_server;
+    struct sockaddr_in sa_client;
+    struct timeval delay;
+    fd_set fds;
 
     if( !main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
                               INPUT_NETWORK_CHANNEL_DEFAULT  ) )
     {
         intf_ErrMsg( "network: channels disabled, to enable them, use the"
                      "--channels option" );
-        return( -1 );
+        return -1;
     }
 
-    /* debug */
-    intf_DbgMsg( "network: ChannelJoin : %d", i_channel );
     /* If last change is too recent, wait a while */
     if( mdate() - p_main->p_channel->last_change < INPUT_CHANNEL_CHANGE_DELAY )
     {
         intf_WarnMsg( 2, "network: waiting before changing channel" );
+        /* XXX Isn't this completely brain-damaged ??? -- Sam */
         mwait( p_main->p_channel->last_change + INPUT_CHANNEL_CHANGE_DELAY );
     }
 
-    p_main->p_channel->last_change = mdate();
-    p_main->p_channel->i_channel   = i_channel;
+    /* Initializing the socket */
+    i_fd = socket( AF_INET, SOCK_DGRAM, 0 );
 
-    intf_WarnMsg( 2, "network: joining channel %d", i_channel );
+    /* Getting information about the channel server */
+    psz_vlcs = main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
+                                    INPUT_CHANNEL_SERVER_DEFAULT );
+    i_port = main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
+                                  INPUT_CHANNEL_PORT_DEFAULT );
 
-    /*
-     * Initializing the socket
-     */
-    i_socket = socket( AF_INET, SOCK_DGRAM, 0 );
+    intf_WarnMsg( 6, "network: vlcs '%s', port %d", psz_vlcs, i_port );
 
-    /*
-     * Getting the server's information
-     */
-    intf_WarnMsg( 6, "Channel server: %s port: %d",
-            main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
-                                 INPUT_CHANNEL_SERVER_DEFAULT ),
-            main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
-                                 INPUT_CHANNEL_PORT_DEFAULT ) );
-
-    memset( &sa_server, 0x00, sizeof(struct sockaddr_in) );
-    sa_server.sin_family = AF_INET;
-    sa_server.sin_port   = htons( main_GetIntVariable( INPUT_CHANNEL_PORT_VAR,
-                                  INPUT_CHANNEL_PORT_DEFAULT ) );
-
-    psz_channel_server = strdup( main_GetPszVariable( INPUT_CHANNEL_SERVER_VAR,
-                                 INPUT_CHANNEL_SERVER_DEFAULT ) );
-#ifdef HAVE_ARPA_INET_H
-    inet_aton( psz_channel_server, &sa_server.sin_addr );
-#else
-    sa_server.sin_addr.s_addr = inet_addr( psz_channel_server );
-#endif
-    free( psz_channel_server );
-
-    /*
-     * Looking for the interface MAC address
-     */
-    if( GetMacAddress( i_socket, psz_mac ) )
-    {
-        intf_ErrMsg( "network error: failed getting MAC address" );
-        return( -1 );
-    }
-
-    /*
-     * Getting date of the client in seconds
-     */
-    i_date = mdate() / 1000000;
-    intf_DbgMsg( "vlcs: date %lu", i_date );
-
-    /*
-     * Build of the message
-     */
-    sprintf( psz_mess, "%d %u %lu %s \n",
-             i_channel, i_version, i_date, psz_mac );
-
-    intf_DbgMsg( "vlcs: The message is %s", psz_mess );
-
-    /*
-     * Open the socket 2
-     */
     memset( &sa_client, 0x00, sizeof(struct sockaddr_in) );
-    sa_client.sin_family = AF_INET;
-    sa_client.sin_port   = htons(4312);
+    memset( &sa_server, 0x00, sizeof(struct sockaddr_in) );
+    sa_client.sin_family      = AF_INET;
+    sa_server.sin_family      = AF_INET;
+    sa_client.sin_port        = htons( 4312 );
+    sa_server.sin_port        = htons( i_port );
     sa_client.sin_addr.s_addr = INADDR_ANY;
-    i_fromlen = sizeof( struct sockaddr );
-    i_rc = bind( i_socket, (struct sockaddr *)(&sa_client),\
-                 sizeof(struct sockaddr) );
-    if ( i_rc )
+#ifdef HAVE_ARPA_INET_H
+    inet_aton( psz_vlcs, &sa_server.sin_addr );
+#else
+    sa_server.sin_addr.s_addr = inet_addr( psz_vlcs );
+#endif
+
+    /* Bind the socket */
+    i_dummy = bind( i_fd, (struct sockaddr *)(&sa_client),
+                          sizeof(struct sockaddr) );
+    if ( i_dummy )
     {
-        intf_ErrMsg( "vlcs: Unable to bind socket:%u ", i_rc );
-    /* TODO put CS_R_BIND in types.h*/
-    /*    return CS_R_SOCKET;*/
+        intf_ErrMsg( "network: unable to bind vlcs socket: %i", i_dummy );
         return -1;
     }
 
-    /*
-     * Send the message
-     */
-    sendto( i_socket, psz_mess, i_mess_length, 0, \
-            (struct sockaddr *)(&sa_server),   \
-            sizeof(struct sockaddr) );
-
-     /*
-     * Waiting 5 sec for one answer from the server
-     */
-    answer_delay.tv_sec  = 5;
-    answer_delay.tv_usec = 0;
-    FD_ZERO( &fds );
-    FD_SET( i_socket, &fds );
-    i_nbanswer = select( i_socket + 1, &fds, NULL, NULL, &answer_delay );
-
-    switch( i_nbanswer )
+    /* Look for the interface MAC address */
+    if( GetMacAddress( i_fd, psz_mac ) )
     {
-    case 0:
-        intf_DbgMsg( "vlcs: no answer" );
-        break;
-
-    case -1:
-        intf_DbgMsg( "vlcs: unable to receive the answer ");
-        break;
-
-    default:
-        recvfrom( i_socket, &i_answer, sizeof(char), 0,\
-                  (struct sockaddr *)(&sa_client), &i_fromlen);
-
-        intf_DbgMsg( "vlcs: the answer : %i", i_answer );
-
-        switch( i_answer )
-        {
-            case -1:
-                intf_DbgMsg( "vlcs: the server failed to create the thread" );
-                break;
-            case 0:
-                intf_DbgMsg( "vlcs: the server tries to change the channel" );
-                break;
-            default:
-                intf_DbgMsg( "vlcs: unknown answer !" );
-                break;
-        }
-        break;
+        intf_ErrMsg( "network error: failed getting MAC address" );
+        return -1;
     }
 
-    /*
-     * Close the socket
-     */
-    close( i_socket );
+    intf_WarnMsg( 6, "network: MAC address is %s", psz_mac );
 
-    return( 0 );
+    /* Build the message */
+    sprintf( psz_mess, "%d %u %lu %s \n", i_channel, VLCS_VERSION,
+                       (unsigned long)(mdate() / (unsigned long long)1000000),
+                       psz_mac );
+
+    /* Send the message */
+    sendto( i_fd, psz_mess, MESSAGE_LENGTH, 0,
+            (struct sockaddr *)(&sa_server), sizeof(struct sockaddr) );
+
+    intf_WarnMsg( 2, "network: attempting to join channel %d", i_channel );
+
+    /* We have changed channels ! (or at least, we tried) */
+    p_main->p_channel->last_change = mdate();
+    p_main->p_channel->i_channel = i_channel;
+
+    /* Wait 5 sec for an answer from the server */
+    delay.tv_sec = 5;
+    delay.tv_usec = 0;
+    FD_ZERO( &fds );
+    FD_SET( i_fd, &fds );
+    i_dummy = select( i_fd + 1, &fds, NULL, NULL, &delay );
+
+    switch( i_dummy )
+    {
+        case 0:
+            intf_ErrMsg( "network error: no answer from vlcs" );
+            close( i_fd );
+            return -1;
+            break;
+
+        case -1:
+            intf_ErrMsg( "network error: error while listening to vlcs" );
+            close( i_fd );
+            return -1;
+            break;
+    }
+
+    i_dummy = sizeof( struct sockaddr );
+    recvfrom( i_fd, psz_mess, MESSAGE_LENGTH, 0,
+              (struct sockaddr *)(&sa_client), &i_dummy);
+    psz_mess[ MESSAGE_LENGTH - 1 ] = 0;
+
+    if( !strncasecmp( psz_mess, "E: ", 3 ) )
+    {
+        intf_ErrMsg( "network error: vlcs said '%s'", psz_mess + 3 );
+        close( i_fd );
+        return -1;
+    }
+    else if( !strncasecmp( psz_mess, "I: ", 3 ) )
+    {
+        intf_WarnMsg( 2, "network info: vlcs said '%s'", psz_mess + 3 );
+    }
+    else /* We got something to play ! FIXME: not very nice */
+    {
+#   define p_item \
+        (&p_main->p_playlist->p_item[ p_main->p_playlist->i_index + 1])
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        free( p_item->psz_name );
+        p_item->psz_name = strdup( psz_mess );
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    }
+
+    /* Close the socket and return nicely */
+    close( i_fd );
+
+    return 0;
 
 #else
-    intf_ErrMsg( "network error: channels not supported" );
-    return( -1 );
+    intf_ErrMsg( "network error: channels not supported on this platform" );
+    return NULL;
 
 #endif
 }
@@ -436,7 +406,7 @@ int network_ChannelJoin( int i_channel )
 /*****************************************************************************
  * GetMacAddress: extract the MAC Address
  *****************************************************************************/
-static int GetMacAddress( int i_socket, char *psz_mac )
+static int GetMacAddress( int i_fd, char *psz_mac )
 {
 #if defined( SYS_LINUX )
     struct ifreq interface;
@@ -449,7 +419,7 @@ static int GetMacAddress( int i_socket, char *psz_mac )
     strcpy( interface.ifr_name, 
             main_GetPszVariable( INPUT_IFACE_VAR, INPUT_IFACE_DEFAULT ) );
 
-    i_ret = ioctl( i_socket, SIOCGIFHWADDR, &interface );
+    i_ret = ioctl( i_fd, SIOCGIFHWADDR, &interface );
 
     if( i_ret )
     {

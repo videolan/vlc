@@ -1,5 +1,6 @@
 .*
 core
+core.*
 .dep
 gmon.out
 vlc-debug.log
