@@ -18,6 +18,14 @@ ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 include ../../Makefile.modules
 
+$(PLUGIN_SDL): %.o: .dep/%.d
+$(PLUGIN_SDL): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_SDL) -DPLUGIN -c -o $@ $<
+
+$(BUILTIN_SDL): BUILTIN_SDL_%.o: .dep/%.d
+$(BUILTIN_SDL): BUILTIN_SDL_%.o: %.c
+	$(CC) $(CFLAGS) $(CFLAGS_SDL) -DBUILTIN -c -o $@ $<
+
 #
 # Real targets
 #

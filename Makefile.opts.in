@@ -82,6 +82,7 @@ LIB_YUV = @LIB_YUV@
 # CFLAGS for special cases
 #
 CFLAGS_GTK = @CFLAGS_GTK@
+CFLAGS_SDL = @CFLAGS_SDL@
 CFLAGS_X11 = @CFLAGS_X11@
 
 ###############################################################################

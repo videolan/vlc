@@ -1,10 +1,10 @@
 Name: vlc
-Version: 0.2.73
+Version: 0.2.80
 Release: 2
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/0.2.73/vlc-0.2.73.tar.gz
+Source0: http://www.videolan.org/packages/0.2.80/vlc-0.2.80.tar.gz
 Prefix: /usr
 Packager: Samuel Hocevar <sam@zoy.org>
 
@@ -13,6 +13,9 @@ Summary: VideoLAN Client.
 Summary(fr): Client VideoLAN.
 
 %changelog
+* Tue Jun 5 2001 Samuel Hocevar <sam@zoy.org>
+New upstream release (0.2.80)
+
 * Mon Apr 30 2001 Arnaud Gomes-do-Vale <arnaud@glou.org>
 Added relocation support and compile fixes for Red Hat 7.x.
 

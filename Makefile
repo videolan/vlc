@@ -331,8 +331,6 @@ $(CPP_OBJ): %.o: %.cpp
 vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ)
 	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(LCFLAGS) $(LIB)
 ifeq ($(SYS),beos)
-	rm -f ./lib/_APP_
-	ln -s ../vlc ./lib/_APP_
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@
 endif

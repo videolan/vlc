@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(include/defs.h)
 
 AC_CANONICAL_HOST
 
-VLC_VERSION=0.2.73
+VLC_VERSION=0.2.80
 AC_SUBST(VLC_VERSION)
 VLC_CODENAME=Ourumov
 AC_SUBST(VLC_CODENAME)
@@ -397,7 +397,7 @@ AC_ARG_WITH(sdl,
       if test "x$withval" != "xyes";
       then
         LIB_SDL="${LIB_SDL} -L/usr/X11R6/lib -L"$withval"/lib -lSDL"
-        INCLUDE="${INCLUDE} -I"$withval"/include"
+        CFLAGS_SDL="-I"$withval"/include"
       else
         AC_CHECK_HEADERS(SDL/SDL.h, , [echo "Cannot find SDL headers !"; exit])
         LIB_SDL="${LIB_SDL} -L/usr/X11R6/lib -lSDL"
@@ -609,6 +609,7 @@ AC_SUBST(LIB_YUV)
 
 AC_SUBST(CFLAGS_VLC)
 AC_SUBST(CFLAGS_GTK)
+AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
 
 AC_OUTPUT([Makefile.opts include/config.h])

@@ -1,3 +1,15 @@
+vlc-css (0.2.80-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue,  5 Jun 2001 04:41:06 +0200
+
+vlc-css (0.2.73-2) unstable; urgency=low
+
+  * We now build without MMX in the main application (Closes: #96036).
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri,  4 May 2001 07:13:04 +0200
+
 vlc-css (0.2.73-1) unstable; urgency=low
 
   * New upstream release.

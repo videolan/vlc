@@ -3,6 +3,55 @@
 #===================#
 
 HEAD
+
+  * Nothing yet.
+
+0.2.80
+Tue,  5 Jun 2001 04:41:06 +0200
+
+  * BeOS interface compilation fix by Rene Gollent.
+  * DirectX plugin compilation fix by Gildas Bazin.
+  * Removed %ebx spill in the iMDCT plugins.
+  * Change to the set out of the BeOS code to allow more logical updates.
+  * Moved modules_builtins.h.in into src/misc. Please remove
+    include/modules_builtins.h in your local tree.
+  * DirectX plugin by Gildas Bazin <gbazin@netcourrier.com>.
+  * Fixed a double malloc/free bug in DVDRead.
+  * Win32 plugin support by Gildas Bazin <gbazin@netcourrier.com>.
+  * BeOS fixes. renamed iovec.h to input_iovec.h because of namespace issues.
+  * Miscellaneous Win32 fixes by Gildas Bazin <gbazin@netcourrier.com>.
+  * Win2000 DVD input by Jon Lech Johansen <jon-vl@nanocrew.net>.
+  * Applied patch from Jon Lech Johansen <jon-vl@nanocrew.net> to compile
+    vlc with MS and Intel C/C++ compilers.
+  * Updated the gtk/gnome interface to work in network mode.
+  * Fixed some bugs in interface (language menus in ts, misnamed fields).
+  * Play/Stop work in network mode to start/stop decoding of the stream.
+  * Fixed the BeOS compile typo.
+  * The ALSA plugin is back.
+  * A gift for Gildas: plugins don't rely on backlinking any more.
+  * Changes and bugfixes to make network work in VLAN Broadcast mode.
+  * Bugfix in the interface to access the network specific features.
+  * Some base of synchro in ac3 spdif.
+  * Fixed a bug with Previous chapter button in gnome.
+  * Added a wrapper for readv() on platforms which don't support it.
+  * Win32 compilation fixes, esp. the MAC retrieval.
+  * Fixed a warning for *BSD compilation.
+  * Patch by Eugenio so that the OS X interface and video output handle the
+    aout and vout banks.
+  * Applied Eugenio's fix to the DVDioctl driver. I didn't test it, but
+    it should not hang the kernel anymore.
+  * Ported most dvd_ioctl.c functions to the DVDioctl driver: ReportAgid,
+    ReportChallenge, ReportKey1, ReportASF, InvalidateAgid, SendChallenge,
+    SendKey2. They should comply with the "Mt. Fuji Commands for Multimedia
+    Devices" paper.
+  * Unification of gnome/gtk intefaces: now all the files are in plugin/gtk.
+  * Updated BeOS interface with new changes for playlist management.
+  * More cleanings in gtk interface.
+  * The dvd plugin reads again blocks of 32 sectors to gain speed.
+  * Added two functions which retrieve the MAC Address under Windows.
+  * 3D Now! imdct.
+  * We now do pthread detection for FreeBSD like the XMMS guys do. It
+    works even better.
   * FreeBSD pthread fixes.
   * AC3 IMDCT and downmix functions are now in plugins, --imdct and
     --downmix options added.
