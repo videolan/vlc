@@ -2,7 +2,7 @@
  * file.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.6 2003/06/11 21:41:56 gbazin Exp $
+ * $Id: file.c,v 1.7 2003/06/12 15:56:27 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -40,10 +40,14 @@
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
-#   ifndef S_IRGRP
+#endif
+
+/* For those platforms that don't use these */
+#ifndef S_IRGRP
 #   define S_IRGRP 0
+#endif
+#ifndef S_IROTH
 #   define S_IROTH 0
-#   endif
 #endif
 
 /*****************************************************************************
