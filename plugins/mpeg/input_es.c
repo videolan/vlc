@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.10 2001/10/02 16:46:59 massiot Exp $
+ * $Id: input_es.c,v 1.11 2001/10/02 17:04:42 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -125,8 +125,6 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int ESProbe( probedata_t *p_data )
 {
-    input_thread_t * p_input = (input_thread_t *)p_data;
-
     int i_score = 5;
 
     if( TestMethod( INPUT_METHOD_VAR, "es" ) )

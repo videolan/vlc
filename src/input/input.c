@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.133 2001/10/02 16:46:59 massiot Exp $
+ * $Id: input.c,v 1.134 2001/10/02 17:04:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -857,14 +857,14 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-    /* Join the m/c group if sock is a multicast address */
+    /* Join the multicast group if the socket is a multicast address */
     if( IN_MULTICAST( ntohl(i_mc_group) ) )
     {
         struct ip_mreq imr;
 
         imr.imr_interface.s_addr = htonl(INADDR_ANY);
         imr.imr_multiaddr.s_addr = i_mc_group;
-        if( setsockopt( p_input->i_handle, IPPROTO_IP,IP_ADD_MEMBERSHIP,
+        if( setsockopt( p_input->i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
             intf_ErrMsg( "input error: failed to join IP multicast group (%s)",
@@ -884,15 +884,19 @@ static void NetworkOpen( input_thread_t * p_input )
         return;
     }
 
-    /* And connect it */
-    if( connect( p_input->i_handle, (struct sockaddr *) &sock,
-                 sizeof( sock ) ) == (-1) )
+    /* Only connect if the user has passed a valid host */
+    if( sock.sin_addr.s_addr != INADDR_ANY )
     {
-        intf_ErrMsg( "input error: can't connect socket (%s)", 
-                     strerror(errno) );
-        close( p_input->i_handle );
-        p_input->b_error = 1;
-        return;
+        /* Connect the socket */
+        if( connect( p_input->i_handle, (struct sockaddr *) &sock,
+                     sizeof( sock ) ) == (-1) )
+        {
+            intf_ErrMsg( "input error: can't connect socket (%s)", 
+                         strerror(errno) );
+            close( p_input->i_handle );
+            p_input->b_error = 1;
+            return;
+        }
     }
 
     p_input->stream.b_pace_control = 0;
