@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.14 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: playlist.cpp,v 1.15 2003/08/16 21:05:14 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -67,6 +67,8 @@ enum
 
     InvertSelection_Event,
     DeleteSelection_Event,
+    Random_Event,
+    Loop_Event,
     SelectAll_Event,
 
     /* controls */
@@ -83,6 +85,8 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_MENU(InvertSelection_Event, Playlist::OnInvertSelection)
     EVT_MENU(DeleteSelection_Event, Playlist::OnDeleteSelection)
     EVT_MENU(SelectAll_Event, Playlist::OnSelectAll)
+    EVT_CHECKBOX(Random_Event, Playlist::OnRandom)
+    EVT_CHECKBOX(Loop_Event, Playlist::OnLoop)
 
     /* Listview events */
     EVT_LIST_ITEM_ACTIVATED(ListView_Event, Playlist::OnActivateItem)
@@ -155,10 +159,26 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxButton *close_button = new wxButton( playlist_panel, Close_Event,
                                            wxU(_("Close")) );
     close_button->SetDefault();
+   
+    /* Create the Random checkbox */
+    wxCheckBox *random_checkbox = 
+        new wxCheckBox( playlist_panel, Random_Event, wxU(_("Random")) );
+    int b_random = config_GetInt( p_intf, "random") ;
+    random_checkbox->SetValue( b_random );
+
+    /* Create the Loop Checkbox */
+    wxCheckBox *loop_checkbox = 
+        new wxCheckBox( playlist_panel, Loop_Event, wxU(_("Loop")) );
+    int b_loop = config_GetInt( p_intf, "loop") ; 
+    loop_checkbox->SetValue( b_loop );
 
     /* Place everything in sizers */
     wxBoxSizer *close_button_sizer = new wxBoxSizer( wxHORIZONTAL );
     close_button_sizer->Add( close_button, 0, wxALL, 5 );
+    close_button_sizer->Add( random_checkbox, 0, 
+			     wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
+    close_button_sizer->Add( loop_checkbox, 0, 
+		              wxEXPAND|wxALIGN_RIGHT|wxALL, 5);
     close_button_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
@@ -401,6 +421,18 @@ void Playlist::OnDeleteSelection( wxCommandEvent& WXUNUSED(event) )
     Rebuild();
 }
 
+void Playlist::OnRandom( wxCommandEvent& event )
+{
+    config_PutInt( p_intf , "random" , 
+		   event.IsChecked() ? VLC_TRUE : VLC_FALSE );
+}
+void Playlist::OnLoop ( wxCommandEvent& event )
+{
+    config_PutInt( p_intf, "loop",
+		   event.IsChecked() ? VLC_TRUE : VLC_FALSE );    
+
+}
+
 void Playlist::OnSelectAll( wxCommandEvent& WXUNUSED(event) )
 {
     for( long item = 0; item < listview->GetItemCount(); item++ )
@@ -423,7 +455,6 @@ void Playlist::OnActivateItem( wxListEvent& event )
 
     vlc_object_release( p_playlist );
 }
-
 void Playlist::OnKeyDown( wxListEvent& event )
 {
     long keycode = event.GetKeyCode();

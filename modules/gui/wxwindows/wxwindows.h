@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.52 2003/08/14 19:25:56 sigmunau Exp $
+ * $Id: wxwindows.h,v 1.53 2003/08/16 21:05:14 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -530,6 +530,8 @@ private:
     void OnInvertSelection( wxCommandEvent& event );
     void OnDeleteSelection( wxCommandEvent& event );
     void OnSelectAll( wxCommandEvent& event );
+    void OnRandom( wxCommandEvent& event );
+    void OnLoop ( wxCommandEvent& event );
     void OnActivateItem( wxListEvent& event );
     void OnKeyDown( wxListEvent& event );
     void Rebuild();

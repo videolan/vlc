@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.60 2003/08/16 16:56:40 gbazin Exp $
+dnl $Id: configure.ac,v 1.61 2003/08/16 21:05:14 zorglub Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -117,7 +117,7 @@ case "${target_os}" in
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         AX_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
-        AX_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_ftp access_output_udp sap slp http httpd],[-lws2_32])
+        AX_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_ftp access_output_udp sap slp http httpd stream_out_standard],[-lws2_32])
     fi
     ;;
   *nto*)
