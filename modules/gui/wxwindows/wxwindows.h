@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: wxwindows.h,v 1.93 2004/02/25 18:42:38 gbazin Exp $
+ * $Id: wxwindows.h,v 1.94 2004/02/26 08:24:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -762,7 +762,6 @@ public:
     void UpdateItem( int );
 
     bool b_need_update;
-    vlc_mutex_t lock;
 
 private:
     void DeleteItem( int item );

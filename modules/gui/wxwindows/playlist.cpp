@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: playlist.cpp,v 1.44 2004/02/26 00:23:04 gbazin Exp $
+ * $Id: playlist.cpp,v 1.45 2004/02/26 08:24:29 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -179,7 +179,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     i_update_counter = 0;
     i_sort_mode = MODE_NONE;
     b_need_update = VLC_FALSE;
-    vlc_mutex_init( p_intf, &lock );
     SetIcon( *p_intf->p_sys->p_icon );
 
     i_title_sorted = 0;
@@ -519,22 +518,14 @@ void Playlist::ShowPlaylist( bool show )
 
 void Playlist::UpdatePlaylist()
 {
-    vlc_bool_t b_need_update = VLC_FALSE;
     i_update_counter++;
 
     /* If the playlist isn't show there's no need to update it */
     if( !IsShown() ) return;
 
-    vlc_mutex_lock( &lock );
     if( this->b_need_update )
     {
-        b_need_update = VLC_TRUE;
         this->b_need_update = VLC_FALSE;
-    }
-    vlc_mutex_unlock( &lock );
-
-    if( b_need_update )
-    {
         Rebuild();
     }
 
@@ -1189,9 +1180,7 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     Playlist *p_playlist_dialog = (Playlist *)param;
-    vlc_mutex_lock( &p_playlist_dialog->lock );
     p_playlist_dialog->b_need_update = VLC_TRUE;
-    vlc_mutex_unlock( &p_playlist_dialog->lock );
     return VLC_SUCCESS;
 }
 
