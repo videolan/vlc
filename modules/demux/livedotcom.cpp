@@ -152,6 +152,10 @@ struct demux_sys_t
     mtime_t          i_length;
     mtime_t          i_start;
 
+    /* */
+    vlc_bool_t       b_no_data;     /* true if we never receive any data */
+    int              i_no_data_ti;  /* consecutive number of TaskInterrupt */
+
     char             event;
 };
 
@@ -159,6 +163,8 @@ static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );
 
 static int ParseASF( demux_t * );
+
+static int RollOverTcp( demux_t * );
 
 static void StreamRead( void *, unsigned int, unsigned int,
                         struct timeval, unsigned int );
@@ -220,6 +226,8 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->i_length = 0;
     p_sys->i_start = 0;
     p_sys->p_out_asf = NULL;
+    p_sys->b_no_data = VLC_TRUE;
+    p_sys->i_no_data_ti = 0;
 
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
@@ -739,6 +747,33 @@ static int Demux( demux_t *p_demux )
         }
     }
 
+    if( p_sys->b_no_data && p_sys->i_no_data_ti > 3 )
+    {
+        vlc_bool_t b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" );
+
+        if( !b_rtsp_tcp && p_sys->rtsp && p_sys->ms )
+        {
+            msg_Warn( p_demux, "no data received in 900ms. Switching to TCP" );
+            if( RollOverTcp( p_demux ) )
+            {
+                msg_Err( p_demux, "TCP rollover failed, aborting" );
+                return 0;
+            }
+            var_SetBool( p_demux, "rtsp-tcp", VLC_TRUE );
+        }
+        else if( p_sys->i_no_data_ti > 10 )
+        {
+            msg_Err( p_demux, "no data received in 3s, aborting" );
+            return 0;
+        }
+    }
+    else if( p_sys->i_no_data_ti > 10 )
+    {
+        /* EOF ? */
+        msg_Warn( p_demux, "no data received in 3s, eof ?" );
+	return 0;
+    }
+
     return p_demux->b_error ? 0 : 1;
 }
 
@@ -881,6 +916,132 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /*****************************************************************************
+ * RollOverTcp: reopen the rtsp into TCP mode
+ * XXX: ugly, a lot of code are duplicated from Open()
+ *****************************************************************************/
+static int RollOverTcp( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    MediaSubsessionIterator *iter;
+    MediaSubsession *sub;
+    char *psz_url;
+    char *psz_options;
+    uint8_t *p_sdp;
+    int i_tk;
+
+    /* We close the old RTSP session */
+    p_sys->rtsp->teardownMediaSession( *p_sys->ms );
+
+    Medium::close( p_sys->ms );
+    Medium::close( p_sys->rtsp );
+
+    p_sys->ms = NULL;
+    p_sys->rtsp = NULL;
+
+    /* Reopen rtsp client */
+    if( ( p_sys->rtsp = RTSPClient::createNew(*p_sys->env, 1/*verbose*/,
+          "VLC Media Player" ) ) == NULL )
+    {
+        msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
+                 p_sys->env->getResultMsg() );
+        return VLC_EGENERIC;
+    }
+
+    asprintf( &psz_url, "rtsp://%s", p_demux->psz_path );
+
+    if( ( psz_options = p_sys->rtsp->sendOptionsCmd( psz_url ) ) )
+        delete [] psz_options;
+
+    p_sdp = (uint8_t*)p_sys->rtsp->describeURL( psz_url,
+                          NULL, var_CreateGetBool( p_demux, "rtsp-kasenna" ) );
+    free( psz_url );
+    if( p_sdp == NULL )
+    {
+        msg_Err( p_demux, "describeURL failed (%s)",
+                 p_sys->env->getResultMsg() );
+        return VLC_EGENERIC;
+    }
+
+    /* malloc-ated copy */
+    p_sys->p_sdp = strdup( (char*)p_sdp );
+    delete[] p_sdp;
+
+    if( !( p_sys->ms = MediaSession::createNew( *p_sys->env, p_sys->p_sdp ) ) )
+    {
+        msg_Err( p_demux, "MediaSession::createNew failed" );
+        return VLC_EGENERIC;
+    }
+
+    /* Initialise each media subsession */
+    iter = new MediaSubsessionIterator( *p_sys->ms );
+    while( ( sub = iter->next() ) != NULL )
+    {
+        Boolean bInit;
+
+        if( !strcmp( sub->codecName(), "X-ASF-PF" ) )
+            bInit = sub->initiate( 4 ); /* Constant ? */
+        else
+            bInit = sub->initiate();
+
+        if( !bInit )
+        {
+            msg_Warn( p_demux, "RTP subsession '%s/%s' failed (%s)",
+                      sub->mediumName(), sub->codecName(),
+                      p_sys->env->getResultMsg() );
+            continue;
+        }
+        msg_Dbg( p_demux, "RTP subsession '%s/%s'", sub->mediumName(),
+                 sub->codecName() );
+
+        /* Issue the SETUP */
+        p_sys->rtsp->setupMediaSubsession( *sub, False, True /* tcp */ );
+    }
+
+    /* The PLAY */
+    if( !p_sys->rtsp->playMediaSession( *p_sys->ms ) )
+    {
+        msg_Err( p_demux, "PLAY failed %s", p_sys->env->getResultMsg() );
+        return VLC_EGENERIC;
+    }
+
+    /* Update all tracks */
+    iter->reset();
+    i_tk = 0;
+    while( ( sub = iter->next() ) != NULL )
+    {
+        live_track_t *tk;
+
+        if( sub->readSource() == NULL )
+            continue;
+        if( i_tk >= p_sys->i_track )
+        {
+            msg_Err( p_demux, "WTF !" );
+            break;
+        }
+
+        tk = p_sys->track[i_tk];
+
+        /* Reset state */
+        tk->waiting = 0;
+        tk->i_pts   = 0;
+        tk->b_rtcp_sync = VLC_FALSE;
+
+        if( sub->rtcpInstance() != NULL )
+            sub->rtcpInstance()->setByeHandler( StreamClose, tk );
+
+        tk->readSource = sub->readSource();
+        tk->rtpSource  = sub->rtpSource();
+
+        i_tk++;
+    }
+
+    delete iter;
+
+    return VLC_SUCCESS;
+}
+
+
+/*****************************************************************************
  *
  *****************************************************************************/
 static void StreamRead( void *p_private, unsigned int i_size,
@@ -986,7 +1147,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     if( i_pts != tk->i_pts && !tk->b_muxed )
     {
-        p_block->i_dts = i_pts;
+        p_block->i_dts = ( tk->fmt.i_cat == VIDEO_ES ) ? 0 : i_pts;
         p_block->i_pts = i_pts;
     }
     //fprintf( stderr, "tk -> dpts=%lld\n", i_pts - tk->i_pts );
@@ -1009,6 +1170,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     /* we have read data */
     tk->waiting = 0;
+    p_demux->p_sys->b_no_data = VLC_FALSE;
+    p_demux->p_sys->i_no_data_ti = 0;
 
     if( i_pts > 0 && !tk->b_muxed )
     {
@@ -1040,6 +1203,8 @@ static void TaskInterrupt( void *p_private )
     demux_t *p_demux = (demux_t*)p_private;
 
     fprintf( stderr, "TaskInterrupt\n" );
+
+    p_demux->p_sys->i_no_data_ti++;
 
     /* Avoid lock */
     p_demux->p_sys->event = 0xff;
