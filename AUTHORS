@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.103 2004/02/08 16:43:17 rocky Exp $
+# $Id$
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -112,6 +112,8 @@ N: Cyril Deguet
 E: asmax@via.ecp.fr
 C: asmax
 D: Audio output
+D: skins module (X11 port)
+D: skins2 module (core and X11 port)
 S: France
 
 N: Colin Delacroix
@@ -265,6 +267,12 @@ D: Stream output
 D: Mac OS X OpenGL video output
 S: France
 
+N: Emmanuel Puig
+E: karibu@videolan.org
+C: karibu
+D: skins module (core and win32 port)
+S: France
+
 N: Jean-Paul Saman
 E: jpsaman@wxs.nl
 D: libmad plug-in
@@ -306,5 +314,7 @@ N: Olivier Teulière
 E: ipkiss@via.ecp.fr
 C: ipkiss
 D: Win32 interface
+D: skins module (core and win32 port)
+D: skins2 module (core and win32 port)
 S: France
 
