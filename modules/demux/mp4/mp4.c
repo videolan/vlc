@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.11 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: mp4.c,v 1.12 2003/01/08 10:46:30 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -190,8 +190,8 @@ static int MP4Init( vlc_object_t * p_this )
         msg_Err( p_input, 
                  "MP4 plugin discarded (%d moov box)",
                  MP4_BoxCount( &p_demux->box_root, "/moov" ) );
-        MP4End( p_input );
-        return( -1 );
+//        MP4End( p_input );
+//        return( -1 );
     }
 
     if( !(p_mvhd = MP4_BoxGet( &p_demux->box_root, "/moov/mvhd" ) ) )
