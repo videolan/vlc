@@ -68,9 +68,9 @@ class VlcProc: public SkinObject
         /// Indicate whether the embedded video output is currently used
         bool isVoutUsed() const { return m_pVout; }
 
-        /// Forget that an embedded video output is used (typically used when
-        /// changing skins, since the video output cannot change parent)
-        void setVoutUnused() { m_pVout = NULL; }
+        /// If an embedded video output is used, drop it (i.e. tell it to stop
+        /// using our window handle)
+        void dropVout();
 
     protected:
         // Protected because it is a singleton

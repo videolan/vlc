@@ -101,7 +101,7 @@ bool ThemeLoader::load( const string &fileName )
     if( skin_last ) free( skin_last );
 
     // The new theme cannot embed a video output yet
-    getIntf()->p_sys->p_vlcProc->setVoutUnused();
+    VlcProc::instance( getIntf() )->dropVout();
 
     return true;
 }

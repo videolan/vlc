@@ -43,7 +43,15 @@ VoutWindow::~VoutWindow()
     {
         delete m_pImage;
     }
-    // XXX we should stop the vout before destroying the window!
+
+    // Get the VlcProc
+    VlcProc *pVlcProc = getIntf()->p_sys->p_vlcProc;
+
+    // Reparent the video output
+    if( pVlcProc && pVlcProc->isVoutUsed() )
+    {
+        pVlcProc->dropVout();
+    }
 }
 
 

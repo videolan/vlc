@@ -163,6 +163,17 @@ void VlcProc::setVoutWindow( void *pVoutWindow )
 }
 
 
+void VlcProc::dropVout()
+{
+    if( m_pVout )
+    {
+        if( vout_Control( m_pVout, VOUT_REPARENT ) != VLC_SUCCESS )
+            vout_Control( m_pVout, VOUT_CLOSE );
+        m_pVout = NULL;
+    }
+}
+
+
 void VlcProc::manage()
 {
     // Did the user requested to quit vlc ?
