@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.8 2002/11/25 15:56:39 sigmunau Exp $
+ * $Id: m3u.c,v 1.9 2002/11/26 18:58:33 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -188,7 +188,7 @@ static int Demux ( input_thread_t *p_input )
 
     /* Depending on wether we are dealing with an m3u/asf file, the end of
      * line token will be different */
-    if( p_m3u->i_type == TYPE_ASX )
+    if( p_m3u->i_type == TYPE_ASX || p_m3u->i_type == TYPE_HTML )
         eol_tok = '>';
     else  
         eol_tok = '\n';
@@ -210,8 +210,11 @@ static int Demux ( input_thread_t *p_input )
                 }
                 else
                 {
-                    psz_line[i_linepos] = p_buf[i_bufpos];
-                    i_linepos++;
+                    if ( eol_tok != '\n' || p_buf[i_bufpos] != '\r' )
+                    {
+                        psz_line[i_linepos] = p_buf[i_bufpos];
+                        i_linepos++;
+                    }
                 }
 
                 i_size--; i_bufpos++;
