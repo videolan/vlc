@@ -54,7 +54,7 @@
  */
 
     /* Table for coded_block_pattern resolution */
-static lookup_t     pl_coded_pattern_init_table[512] = 
+static lookup_t     pl_coded_pattern[512] = 
     { {MB_ERROR, 0}, {0, 9}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
     {58, 8}, {58, 8}, {54, 8}, {54, 8}, {46, 8}, {46, 8}, {30, 8}, {30, 8},
     {57, 8}, {57, 8}, {53, 8}, {53, 8}, {45, 8}, {45, 8}, {29, 8}, {29, 8},
@@ -158,12 +158,6 @@ static lookup_t     pl_dct_dc_chrom_init_table_2[32] =
       {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
     };
     
-    /* 
-     * Structure to store the tables B14 & B15 
-     * Is constructed from the tables below 
-     */
-    dct_lookup_t            ppl_dct_coef[2][16384];
-
 
     /* Tables for ac DCT coefficients. There are cut in many parts to save space */
     /* Table B-14, DCT coefficients table zero,
@@ -505,14 +499,6 @@ void vpar_InitBMBType( vpar_thread_t * p_vpar )
     p_vpar->ppl_mb_type[1][0].i_length = 0;
 }
 
-/*****************************************************************************
- * vpar_InitCodedPattern : Initialize the lookup table for decoding
- *                         coded block pattern
- *****************************************************************************/
-void vpar_InitCodedPattern( vpar_thread_t * p_vpar )
-{
-    p_vpar->pl_coded_pattern = (lookup_t*) pl_coded_pattern_init_table;
-}
 
 /*****************************************************************************
  * vpar_InitDCTTables : Initialize tables giving the length of the dct
@@ -544,26 +530,26 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
     p_vpar->pppl_dct_dc_size[1][0] = pl_dct_dc_chrom_init_table_1;
     p_vpar->pppl_dct_dc_size[1][1] = pl_dct_dc_chrom_init_table_2;
 
-    memset( ppl_dct_coef[0], MB_ERROR, 16 );
-    memset( ppl_dct_coef[1], MB_ERROR, 16 );
+    memset( p_vpar->ppl_dct_coef[0], MB_ERROR, 16 );
+    memset( p_vpar->ppl_dct_coef[1], MB_ERROR, 16 );
     
     /* For table B14 & B15, we have a pointer to tables */
     /* We fill the table thanks to the fonction defined above */
-    FillDCTTable( ppl_dct_coef[0], pl_DCT_tab0, 256, 60,  4 );
-    FillDCTTable( ppl_dct_coef[0], pl_DCT_tab1,  64,  8,  8 );
-    FillDCTTable( ppl_dct_coef[0], pl_DCT_tab2,  16, 16, 16 );
-    FillDCTTable( ppl_dct_coef[0], pl_DCT_tab3,   8, 16, 16 );
-    FillDCTTable( ppl_dct_coef[0], pl_DCT_tab4,   4, 16, 16 );
-    FillDCTTable( ppl_dct_coef[0], pl_DCT_tab5,   2, 16, 16 );
-    FillDCTTable( ppl_dct_coef[0], pl_DCT_tab6,   1, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab0, 256, 60,  4 );
+    FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab1,  64,  8,  8 );
+    FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab2,  16, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab3,   8, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab4,   4, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab5,   2, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[0], pl_DCT_tab6,   1, 16, 16 );
 
-    FillDCTTable( ppl_dct_coef[1], pl_DCT_tab0a, 256, 60, 4 );
-    FillDCTTable( ppl_dct_coef[1], pl_DCT_tab1a,  64,  8,  8 );
-    FillDCTTable( ppl_dct_coef[1], pl_DCT_tab2,   16, 16, 16 );
-    FillDCTTable( ppl_dct_coef[1], pl_DCT_tab3,    8, 16, 16 );
-    FillDCTTable( ppl_dct_coef[1], pl_DCT_tab4,    4, 16, 16 );
-    FillDCTTable( ppl_dct_coef[1], pl_DCT_tab5,    2, 16, 16 );
-    FillDCTTable( ppl_dct_coef[1], pl_DCT_tab6,    1, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab0a, 256, 60, 4 );
+    FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab1a,  64,  8,  8 );
+    FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab2,   16, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab3,    8, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab4,    4, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab5,    2, 16, 16 );
+    FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab6,    1, 16, 16 );
 }
 
 
@@ -671,9 +657,9 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
         }
         else
         {
-            i_run =     ppl_dct_coef[0][i_code].i_run;
-            i_length =  ppl_dct_coef[0][i_code].i_length;
-            i_level =   ppl_dct_coef[0][i_code].i_level;
+            i_run =     p_vpar->ppl_dct_coef[0][i_code].i_run;
+            i_length =  p_vpar->ppl_dct_coef[0][i_code].i_length;
+            i_level =   p_vpar->ppl_dct_coef[0][i_code].i_level;
         }
 
         
@@ -861,9 +847,9 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
         }
         else
         {
-            i_run =     ppl_dct_coef[b_vlc_intra][i_code].i_run;
-            i_length =  ppl_dct_coef[b_vlc_intra][i_code].i_length;
-            i_level =   ppl_dct_coef[b_vlc_intra][i_code].i_level;
+            i_run =     p_vpar->ppl_dct_coef[b_vlc_intra][i_code].i_run;
+            i_length =  p_vpar->ppl_dct_coef[b_vlc_intra][i_code].i_length;
+            i_level =   p_vpar->ppl_dct_coef[b_vlc_intra][i_code].i_level;
         }
 
 #if 0
@@ -1287,10 +1273,10 @@ static __inline__ int CodedPattern420( vpar_thread_t * p_vpar )
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
     
     /* Trash the good number of bits read in the lookup table */
-    RemoveBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    RemoveBits( &p_vpar->bit_stream, pl_coded_pattern[i_vlc].i_length );
     
     /* return the value from the vlc table */
-    return p_vpar->pl_coded_pattern[i_vlc].i_value;
+    return pl_coded_pattern[i_vlc].i_value;
 }
 
 /*****************************************************************************
@@ -1300,10 +1286,10 @@ static __inline__ int CodedPattern422( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
     
-    RemoveBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    RemoveBits( &p_vpar->bit_stream, pl_coded_pattern[i_vlc].i_length );
     
     /* Supplementary 2 bits long code for 4:2:2 format */
-    return p_vpar->pl_coded_pattern[i_vlc].i_value |
+    return pl_coded_pattern[i_vlc].i_value |
            (GetBits( &p_vpar->bit_stream, 2 ) << 6);
 }
 
@@ -1314,9 +1300,9 @@ static __inline__ int CodedPattern444( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
     
-    RemoveBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    RemoveBits( &p_vpar->bit_stream, pl_coded_pattern[i_vlc].i_length );
     
-    return p_vpar->pl_coded_pattern[i_vlc].i_value |
+    return pl_coded_pattern[i_vlc].i_value |
            (GetBits( &p_vpar->bit_stream, 6 ) << 6);
 }
 

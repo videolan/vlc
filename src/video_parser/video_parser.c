@@ -239,7 +239,6 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_InitDCTTables( p_vpar );
     vpar_InitPMBType( p_vpar );
     vpar_InitBMBType( p_vpar );
-    vpar_InitCodedPattern( p_vpar );
     vpar_InitDCTTables( p_vpar );
 
 
