@@ -9,3 +9,4 @@ SOURCES_wingdi = wingdi.c
 SOURCES_mga = mga.c
 SOURCES_hd1000v = hd1000v.cpp
 SOURCES_snapshot = snapshot.c
+SOURCES_opengl = opengl.c

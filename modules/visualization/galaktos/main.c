@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #include "plugin.h"
-#include "vlc_opengl.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <unistd.h>
@@ -270,10 +269,12 @@ int galaktos_update( galaktos_thread_t *p_thread )
     glFinish();
     glFlush();
     //  printf("Flush %d\n",(SDL_GetTicks()-timestart));
-    (p_thread->p_opengl->pf_swap)( p_thread->p_opengl );
+
+    p_thread->p_opengl->pf_swap( p_thread->p_opengl );
 
     /* Process events */
-    if( (p_thread->p_opengl->pf_handle_events)( p_thread->p_opengl ) )
+    if( p_thread->p_opengl->pf_manage &&
+        p_thread->p_opengl->pf_manage( p_thread->p_opengl ) )
     {
         return 1;
     }

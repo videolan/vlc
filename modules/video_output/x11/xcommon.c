@@ -67,6 +67,10 @@
 #   include <X11/extensions/Xvlib.h>
 #endif
 
+#ifdef MODULE_NAME_IS_glx
+#   include <GL/glx.h>
+#endif
+
 #ifdef HAVE_XINERAMA
 #   include <X11/extensions/Xinerama.h>
 #endif
@@ -318,7 +322,7 @@ void E_(Deactivate) ( vlc_object_t *p_this )
     {
         XFreeColormap( p_vout->p_sys->p_display, p_vout->p_sys->colormap );
     }
-#else
+#elif defined(MODULE_NAME_IS_xvideo)
     XVideoReleasePort( p_vout, p_vout->p_sys->i_xvport );
 #endif
 
@@ -368,7 +372,7 @@ static int InitVideo( vout_thread_t *p_vout )
             break;
     }
 
-#else
+#elif defined(MODULE_NAME_IS_x11)
     /* Initialize the output structure: RGB with square pixels, whatever
      * the input format is, since it's the only format we know */
     switch( p_vout->p_sys->i_screen_depth )
@@ -431,7 +435,7 @@ static int InitVideo( vout_thread_t *p_vout )
     return VLC_SUCCESS;
 }
 
- /*****************************************************************************
+/*****************************************************************************
  * DisplayVideo: displays previously rendered output
  *****************************************************************************
  * This function sends the currently rendered image to X11 server.
@@ -1140,6 +1144,8 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
  *****************************************************************************/
 static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+#ifndef MODULE_NAME_IS_glx
+
 #ifdef MODULE_NAME_IS_xvideo
     int i_plane;
 #endif
@@ -1258,6 +1264,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->i_planes = 0;
             return -1;
     }
+
+#endif /* !MODULE_NAME_IS_glx */
 
     return 0;
 }
@@ -2015,7 +2023,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
     /* Allocate memory for image */
 #ifdef MODULE_NAME_IS_xvideo
     p_data = (byte_t *) malloc( i_width * i_height * i_bits_per_pixel / 8 );
-#else
+#elif defined(MODULE_NAME_IS_x11)
     i_bytes_per_line = i_width * i_bytes_per_pixel;
     p_data = (byte_t *) malloc( i_bytes_per_line * i_height );
 #endif
@@ -2046,7 +2054,7 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
 #ifdef MODULE_NAME_IS_xvideo
     p_image = XvCreateImage( p_display, i_xvport, i_chroma,
                              p_data, i_width, i_height );
-#else
+#elif defined(MODULE_NAME_IS_x11)
     p_image = XCreateImage( p_display, p_visual, i_depth, ZPixmap, 0,
                             p_data, i_width, i_height, i_quantum, 0 );
 #endif

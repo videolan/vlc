@@ -26,6 +26,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
+#include <vlc/vout.h>
 
 #define MAX_BLOCKS 10
 
@@ -36,7 +37,7 @@ typedef struct
     char          *psz_title;
 
     /* OpenGL provider */
-    opengl_t      *p_opengl;
+    vout_thread_t *p_opengl;
     module_t      *p_module;
 
     /* Window properties */

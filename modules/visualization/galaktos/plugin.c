@@ -37,7 +37,6 @@
 #include <vlc/input.h>
 #include <vlc/vout.h>
 #include "aout_internal.h"
-#include "vlc_opengl.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -79,7 +78,6 @@ static int Open( vlc_object_t *p_this )
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
     galaktos_thread_t *p_thread;
-    vlc_value_t       width, height;
 
     if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
@@ -103,25 +101,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread = p_thread =
         vlc_object_create( p_filter, sizeof( galaktos_thread_t ) );
     vlc_object_attach( p_thread, p_this );
-
-    /* Get on OpenGL provider */
-    p_thread->p_opengl =
-        (opengl_t *)vlc_object_create( p_this, VLC_OBJECT_OPENGL );
-    if( p_thread->p_opengl == NULL )
-    {
-        msg_Err( p_filter, "out of memory" );
-        return VLC_ENOMEM;
-    }
-
-    p_thread->p_module =
-        module_Need( p_thread->p_opengl, "opengl provider", NULL, 0 );
-    if( p_thread->p_module == NULL )
-    {
-        msg_Err( p_filter, "No OpenGL provider found" );
-        vlc_object_destroy( p_thread->p_opengl );
-        p_thread->p_opengl = NULL;
-        return VLC_ENOOBJ;
-    }
 
 /*
     var_Create( p_thread, "galaktos-width", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
@@ -155,7 +134,6 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-
 /*****************************************************************************
  * float to s16 conversion
  *****************************************************************************/
@@ -168,7 +146,6 @@ static inline int16_t FloatToInt16( float f )
     else
         return (int16_t)( f * 32768.0 );
 }
-
 
 /*****************************************************************************
  * DoWork: process samples buffer
@@ -221,9 +198,31 @@ static void Thread( vlc_object_t *p_this )
     int timestart=0;
     int mspf=0;
 
-    /* Initialize the opengl provider */
-    (p_thread->p_opengl->pf_init)(p_thread->p_opengl, p_thread->i_width,
-                                  p_thread->i_height);
+    /* Get on OpenGL provider */
+    p_thread->p_opengl =
+        (vout_thread_t *)vlc_object_create( p_this, VLC_OBJECT_OPENGL );
+    if( p_thread->p_opengl == NULL )
+    {
+        msg_Err( p_thread, "out of memory" );
+        return;
+    }
+
+    p_thread->p_opengl->i_window_width = p_thread->i_width;
+    p_thread->p_opengl->i_window_height = p_thread->i_height;
+    p_thread->p_opengl->render.i_width = p_thread->i_width;
+    p_thread->p_opengl->render.i_height = p_thread->i_width;
+    p_thread->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
+
+    p_thread->p_module =
+        module_Need( p_thread->p_opengl, "opengl provider", NULL, 0 );
+    if( p_thread->p_module == NULL )
+    {
+        msg_Err( p_thread, "No OpenGL provider found" );
+        vlc_object_destroy( p_thread->p_opengl );
+        return;
+    }
+
+    vlc_object_attach( p_thread->p_opengl, p_this );
 
     setup_opengl( p_thread->i_width, p_thread->i_height );
     CreateRenderTarget(512, &RenderTargetTextureID, NULL);
@@ -275,6 +274,7 @@ static void Close( vlc_object_t *p_this )
 
     /* Free the openGL provider */
     module_Unneed( p_sys->p_thread->p_opengl, p_sys->p_thread->p_module );
+    vlc_object_detach( p_sys->p_thread->p_opengl );
     vlc_object_destroy( p_sys->p_thread->p_opengl );
 
     /* Free data */

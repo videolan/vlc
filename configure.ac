@@ -2415,6 +2415,24 @@ if test "${enable_xvideo}" != "no" &&
 fi
 
 dnl
+dnl  GLX module
+dnl  (enabled by default except on win32)
+dnl
+AC_ARG_ENABLE(glx,
+  [  --enable-glx            X11 OpenGL (GLX) support (default enabled)])
+if test "${enable_glx}" != "no" &&
+  (test "${SYS}" != "mingw32" || test "${enable_glx}" = "yes"); then
+  CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+  AC_CHECK_HEADERS(X11/Xlib.h, [
+    AC_CHECK_HEADERS(GL/glx.h, [
+      VLC_ADD_PLUGINS([glx])
+      VLC_ADD_LDFLAGS([glx],[-L${x_libraries} -lX11 -lXext -lGL -lGLU])
+      VLC_ADD_CPPFLAGS([glx],[-I${x_includes}])
+  ]) ])
+  CPPFLAGS="${CPPFLAGS_save}"
+fi
+
+dnl
 dnl  Check for the Xinerama extension
 dnl
 if test "${enable_xvideo}" != "no" &&
@@ -2426,11 +2444,13 @@ if test "${enable_xvideo}" != "no" &&
     AC_CHECK_LIB(Xinerama_pic, XineramaQueryExtension,[
       VLC_ADD_LDFLAGS([xvideo],[-lXinerama_pic])
       VLC_ADD_LDFLAGS([x11],[-lXinerama_pic])
+      VLC_ADD_LDFLAGS([glx],[-lXinerama_pic])
       ac_cv_have_xinerama="yes"
     ],[
       AC_CHECK_LIB(Xinerama, XineramaQueryExtension,[
         VLC_ADD_LDFLAGS([xvideo],[-lXinerama])
         VLC_ADD_LDFLAGS([x11],[-lXinerama])
+        VLC_ADD_LDFLAGS([glx],[-lXinerama])
         ac_cv_have_xinerama="yes"
       ])
     ])
@@ -2439,6 +2459,20 @@ if test "${enable_xvideo}" != "no" &&
     AC_DEFINE(HAVE_XINERAMA, 1, [Define this if you have libXinerama installed])
   fi
   CFLAGS="${CFLAGS_save}"
+  CPPFLAGS="${CPPFLAGS_save}"
+fi
+
+dnl
+dnl  GLX module
+dnl  (enabled by default except on win32)
+dnl
+AC_ARG_ENABLE(opengl,
+  [  --enable-opengl            OpenGL support (default enabled)])
+if test "${enable_opengl}" != "no"; then
+  AC_CHECK_HEADERS(GL/gl.h, [
+      VLC_ADD_PLUGINS([opengl])
+      VLC_ADD_LDFLAGS([opengl],[-L${x_libraries} -lGL -lGLU])
+  ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
@@ -2753,18 +2787,6 @@ then
         VLC_ADD_LDFLAGS([glide],[-L${with_glide}/lib])
       fi ])
 fi
-
-dnl
-dnl  GLX module
-dnl
-AC_ARG_ENABLE(glx,
-  [  --enable-glx            X11 OpenGL (GLX) support (default disabled)])
-if test "${enable_glx}" = "yes"
-then
-  VLC_ADD_PLUGINS([glx])
-  VLC_ADD_LDFLAGS([glx],[-lGL -lGLU])
-fi
-
 
 dnl
 dnl  AA plugin

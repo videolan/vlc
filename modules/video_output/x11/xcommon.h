@@ -142,6 +142,13 @@ struct vout_sys_t
     vlc_bool_t          b_net_wm_state_stays_on_top;
     Atom                net_wm_state_below;
     vlc_bool_t          b_net_wm_state_below;
+
+#ifdef MODULE_NAME_IS_glx
+    /* GLX properties */
+    int                 b_glx13;
+    GLXContext          gwctx;
+    GLXWindow           gwnd;
+#endif
 };
 
 /*****************************************************************************
@@ -174,6 +181,7 @@ typedef struct mwmhints_t
     uint32_t decorations;
     int32_t  input_mode;
     uint32_t status;
+
 } mwmhints_t;
 
 /*****************************************************************************

@@ -11,5 +11,7 @@ SOURCES_xvideo = \
 	$(NULL)
 
 SOURCES_glx = \
-    glx.c \
-    $(NULL)
+	glx.c \
+	xcommon.c \
+	xcommon.h \
+	$(NULL)
