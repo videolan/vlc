@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.21 2003/07/02 18:44:27 zorglub Exp $
+ * $Id: httpd.c,v 1.22 2003/07/10 18:29:41 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -74,6 +74,11 @@
 #define HTTPD_MAX_CONNECTION    512
 #define HTTPD_CONNECTION_MAX_UNUSED 10000000
 
+
+#define HTTP_ADMIN_DEFAULT_USERNAME "admin"
+#define HTTP_ADMIN_DEFAULT_PASSWORD "admin"
+
+
 #define FREE( p ) if( p ) { free( p); (p) = NULL; }
 
 #if defined( WIN32 ) || defined( UNDER_CE )
@@ -91,9 +96,23 @@ static void             Close  ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ADMIN_USER_TEXT N_( "Admin page's username" )
+#define ADMIN_USER_LONGTEXT N_( \
+    "You can set the username for the administration page \
+     If you do not set it, the default username is \"admin\"" )
+#define ADMIN_PASS_TEXT N_( "Admin page's password" )
+#define ADMIN_PASS_LONGTEXT N_( \
+    "You can set the password for the administration page \
+     If you do not set it, the default password is \"admin\"" )
+
+
 vlc_module_begin();
     set_description( _("HTTP 1.0 daemon") );
     set_capability( "httpd", 42 );
+    add_string( "http-admin-user", NULL, NULL, 
+                   ADMIN_USER_TEXT, ADMIN_USER_LONGTEXT, VLC_TRUE );
+    add_string( "http-admin-pass", NULL, NULL, 
+                    ADMIN_PASS_TEXT, ADMIN_PASS_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -1705,10 +1724,9 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
                 char decoded[1024];
 
                 httpd_RequestGetWord( basic, 1024, &p, p_end );
-                //msg_Dbg( p_httpt, "Authorization: basic:%s", basic );
+//                msg_Dbg( p_httpt, "Authorization: basic:%s", basic );
                 b64_decode( decoded, basic );
-
-                //msg_Dbg( p_httpt, "Authorization: decoded:%s", decoded );
+//                msg_Dbg( p_httpt, "Authorization: decoded:%s", decoded );
                 if( strchr( decoded, ':' ) )
                 {
                     char *p = strchr( decoded, ':' );
@@ -1871,6 +1889,19 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
 
     httpd_connection_t *p_con;
 
+    char *psz_user = config_GetPsz (p_httpt, "http-admin-user" );
+    char *psz_pass = config_GetPsz (p_httpt, "http-admin-pass" );
+
+    if( !psz_user )
+    {
+        psz_user = strdup(HTTP_ADMIN_DEFAULT_USERNAME);
+    }
+    
+    if( !psz_pass )
+    {
+        psz_pass = strdup(HTTP_ADMIN_DEFAULT_PASSWORD);
+    }
+
     msg_Info( p_httpt, "httpd started" );
 
     p_page_401 = _RegisterFile( p_httpt,
@@ -1887,7 +1918,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                                 (httpd_file_callback_args_t*)NULL );
     p_page_admin = _RegisterFile( p_httpt,
                                   "/admin.html", "text/html",
-                                  "admin", "salut",
+                                  psz_user , psz_pass ,
                                   httpd_page_admin_get,
                                   NULL,
                                   (httpd_file_callback_args_t*)p_httpt );
@@ -2202,9 +2233,13 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
 
         vlc_mutex_unlock( &p_httpt->file_lock );
     }
+
     msg_Info( p_httpt, "httpd stopped" );
 
     _UnregisterFile( p_httpt, p_page_401 );
     _UnregisterFile( p_httpt, p_page_404 );
     _UnregisterFile( p_httpt, p_page_admin );
+
+    FREE( psz_user );
+    FREE( psz_pass );
 }

@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.9 2003/05/23 23:53:53 sigmunau Exp $
+ * $Id: http.c,v 1.10 2003/07/10 18:29:41 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -77,11 +77,22 @@ struct intf_sys_t
 #define ADDR_TEXT N_( "HTTP interface bind address" )
 #define ADDR_LONGTEXT N_( \
     "You can set the address on which the http interface will bind" )
+#define USER_TEXT N_( "Username" )
+#define USER_LONGTEXT N_( \
+    "You can set the username that will be allowed to connect \
+    If you do not set it, everyone is allowed without password" )
+#define PASS_TEXT N_( "Password" )
+#define PASS_LONGTEXT N_( \
+    "You can set the password that corresponds to the username \
+    If you do not set it, the password is left blank" )
+
 
 vlc_module_begin();
     add_category_hint( N_("HTTP remote control"), NULL, VLC_TRUE );
     add_string( "http-addr", NULL, NULL, ADDR_TEXT, ADDR_LONGTEXT, VLC_TRUE );
     add_integer( "http-port", 8080, NULL, PORT_TEXT, PORT_LONGTEXT, VLC_TRUE );
+    add_string( "http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT, VLC_TRUE );
+    add_string( "http-pass", NULL, NULL, PASS_TEXT, PASS_LONGTEXT, VLC_TRUE );
     set_description( _("HTTP remote control interface") );
     set_capability( "interface", 10 );
     set_callbacks( Activate, Close );
@@ -150,6 +161,10 @@ static void Run( intf_thread_t *p_intf )
     /* Get bind address and port */
     char *psz_bind_addr = config_GetPsz( p_intf, "http-addr" );
     int i_bind_port = config_GetInt( p_intf, "http-port" );
+
+    char *psz_user = config_GetPsz( p_intf, "http-user" );
+    char *psz_pass = config_GetPsz( p_intf, "http-pass" );
+    
     if( !psz_bind_addr ) psz_bind_addr = strdup( "" );
 
     p_intf->p_sys->p_httpd = httpd_Find( VLC_OBJECT(p_intf), VLC_TRUE );
@@ -178,9 +193,19 @@ static void Run( intf_thread_t *p_intf )
     /*
      * Register our interface page with the httpd daemon
      */
+     if( !psz_user )
+     {
+         psz_pass = NULL; /* No password if no user given */
+     }
+   
+    if( psz_user && !psz_pass)
+    {
+        psz_pass="";
+    } 
+    
     p_page_intf = p_intf->p_sys->p_httpd->pf_register_file(
                       p_intf->p_sys->p_httpd, "/", "text/html",
-                      NULL, NULL, httpd_page_interface_get,
+                      psz_user, psz_pass, httpd_page_interface_get,
                       httpd_page_interface_get,
                       (httpd_file_callback_args_t*)p_intf );
 
