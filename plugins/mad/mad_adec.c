@@ -67,7 +67,7 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "Libmad MPEG 1/2/3 audio decoder library" )
-    ADD_CAPABILITY( DECODER, 950 )
+    ADD_CAPABILITY( DECODER, 50 )
     ADD_SHORTCUT( "mad" )
 MODULE_INIT_STOP
 
@@ -190,19 +190,20 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     /*
      * Initialize the output properties
      */
+    p_mad_adec->p_aout_fifo=NULL;
 
     /* Creating the audio output fifo */
-    p_mad_adec->p_aout_fifo = aout_CreateFifo(  AOUT_ADEC_STEREO_FIFO, /* fifo type */
-						2,                     /* nr. of channels */
-						48000,	 	       /* frame rate in Hz ?*/
-						0,                     /* units */
-                                                ADEC_FRAME_SIZE/2,     /* frame size */
-						NULL  );               /* buffer */
-
-    if ( p_mad_adec->p_aout_fifo == NULL )
-    {
-        return( -1 );
-    }
+//    p_mad_adec->p_aout_fifo = aout_CreateFifo(  AOUT_ADEC_STEREO_FIFO, /* fifo type */
+//						2,                     /* nr. of channels */
+//						48000,	 	       /* frame rate in Hz ?*/
+//						0,                     /* units */
+//                                                ADEC_FRAME_SIZE/2,     /* frame size */
+//						NULL  );               /* buffer */
+//
+//    if ( p_mad_adec->p_aout_fifo == NULL )
+//    {
+//        return( -1 );
+//    }
 
     intf_ErrMsg("mad_adec debug: mad decoder thread %p initialized", p_mad_adec);
 

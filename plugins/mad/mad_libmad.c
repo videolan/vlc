@@ -224,6 +224,24 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
     static struct audio_dither dither;
 #endif
 
+    /* Creating the audio output fifo */
+    if (p_mad_adec->p_aout_fifo==NULL) {
+    	p_mad_adec->p_aout_fifo = aout_CreateFifo(  
+		AOUT_ADEC_STEREO_FIFO,  	/* fifo type */
+		p_libmad_pcm->channels,         /* nr. of channels */
+		p_libmad_pcm->samplerate,       /* frame rate in Hz ?*/
+		0,                     		/* units */
+                ADEC_FRAME_SIZE/2,     		/* frame size */
+		NULL  );               		/* buffer */
+
+    	if ( p_mad_adec->p_aout_fifo == NULL )
+    	{
+        	return( -1 );
+    	}
+
+	intf_ErrMsg("mad_adec debug: in libmad_output aout fifo created");
+    }
+
     /* Set timestamp to synchronize audio and video decoder fifo's */
     vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
     p_mad_adec->p_aout_fifo->l_rate = p_libmad_header->samplerate;
@@ -231,23 +249,23 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 
     buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
 
-    if (p_libmad_pcm->channels == 2)
+    while (nsamples--)
     {
-        while (nsamples--)
-        {
 #ifdef MPG321_ROUTINES
-            sample = audio_linear_dither(16, *left_ch++, &dither);
+        sample = audio_linear_dither(16, *left_ch++, &dither);
 #else
-            sample = s24_to_s16_pcm(*left_ch++);
+     	sample = s24_to_s16_pcm(*left_ch++);
 #endif
 
 #ifndef WORDS_BIGENDIAN
-            *buffer++ = (byte_t) (sample) & 0xFF;
-            *buffer++ = (byte_t) (sample >> 8) & 0xFF;
+        *buffer++ = (byte_t) (sample) & 0xFF;
+        *buffer++ = (byte_t) (sample >> 8) & 0xFF;
 #else
-            *buffer++ = (byte_t) (sample >> 8);
-            *buffer++ = (byte_t) (sample);
+     	*buffer++ = (byte_t) (sample >> 8);
+    	*buffer++ = (byte_t) (sample);
 #endif
+	if (p_libmad_pcm->channels == 2) {
+
 	    /* right audio channel */
 #ifdef MPG321_ROUTINES
             sample = audio_linear_dither(16, *right_ch++, &dither);
@@ -256,31 +274,12 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 #endif
 
 #ifndef WORDS_BIGENDIAN
-            *buffer++ = (byte_t) (sample);
-            *buffer++ = (byte_t) (sample >> 8);
+            *buffer++ = (byte_t) (sample) & 0xFF;
+            *buffer++ = (byte_t) (sample >> 8) & 0xFF;
 #else
             *buffer++ = (byte_t) (sample >> 8);
             *buffer++ = (byte_t) (sample);
 #endif						
-        }
-  }
-  else
-  {
-        while (nsamples--)
-        {
-#ifdef MPG321_ROUTINES
-            sample = audio_linear_dither(16, *left_ch++, &dither);
-#else
-            sample = s24_to_s16_pcm(*left_ch++);
-#endif
-
-#ifndef WORDS_BIGENDIAN
-            *buffer++ = (byte_t) (sample);
-            *buffer++ = (byte_t) (sample >> 8);
-#else
-            *buffer++ = (byte_t) (sample >> 8);
-            *buffer++ = (byte_t) (sample);
-#endif					
         }
     }
 
