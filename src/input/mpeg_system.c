@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.40 2001/03/02 13:20:29 massiot Exp $
+ * $Id: mpeg_system.c,v 1.41 2001/03/05 16:00:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -258,7 +258,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 /* Cannot fail because the previous one succeeded. */
                 MoveChunk( NULL, &p_data, &p_byte, 6 );
 
-                while( *p_byte == 0xFF && i_pes_header_size < 22 )
+                while( *p_byte == 0xFF && i_pes_header_size < 23 )
                 {
                     i_pes_header_size++;
                     if( MoveChunk( NULL, &p_data, &p_byte, 1 ) != 1 )
@@ -270,7 +270,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         return;
                     }
                 }
-                if( i_pes_header_size == 22 )
+                if( i_pes_header_size == 23 )
                 {
                     intf_ErrMsg( "Too much MPEG-1 stuffing" );
                     p_input->pf_delete_pes( p_input->p_method_data, p_pes );
@@ -818,9 +818,8 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                                         >> 11);
 
                     /* mux_rate */
-                    i_mux_rate = (( ((u32)U16_AT(p_header + 10) << 16)
-                                   | (u32)U16_AT(p_header + 12) ) & 0xFFFFFC00)
-                                    >> 11;
+                    i_mux_rate = ((u32)U16_AT(p_header + 10) << 6)
+                                   | (p_header[12] >> 2);
                 }
                 else
                 {
@@ -842,7 +841,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                          ((mtime_t)p_header[8] >> 1);
 
                     /* mux_rate */
-                    i_mux_rate = (U32_AT(p_header + 8) & 0x8FFFFE) >> 11;
+                    i_mux_rate = (U32_AT(p_header + 8) & 0x7FFFFE) >> 1;
                 }
                 /* Call the pace control. */
                 input_ClockManageRef( p_input, p_input->stream.pp_programs[0],
