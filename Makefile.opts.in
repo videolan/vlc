@@ -133,6 +133,7 @@ qt_LDFLAGS = @qt_LDFLAGS@
 qte_LDFLAGS = @qte_LDFLAGS@
 rc_LDFLAGS = @rc_LDFLAGS@
 sdl_LDFLAGS = @sdl_LDFLAGS@
+audio_LDFLAGS = @audio_LDFLAGS@
 ts_dvbpsi_LDFLAGS = @ts_dvbpsi_LDFLAGS@
 vcd_LDFLAGS = @vcd_LDFLAGS@
 vorbis_LDFLAGS = @vorbis_LDFLAGS@
