@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.90 2003/01/31 22:35:44 sam Exp $
+# $Id: AUTHORS,v 1.91 2003/02/01 23:15:27 sam Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -32,6 +32,7 @@ S: Germany
 
 N: Sigmund Augdal
 E: sigmunau@idi.ntnu.no
+C: sigmunau
 D: lirc plugin
 D: norwegian translation
 D: aalib plugin
@@ -147,6 +148,7 @@ S: United Kingdom
 
 N: Derk-Jan Hartman
 E: pjotr@sidekick.student.utwente.nl
+C: hartman
 D: Mac OS X interface
 S: Netherlands
 
@@ -188,6 +190,12 @@ C: maxx
 D: audio output
 D: AC3 decoder
 D: MPEG audio decoder
+S: France
+
+N: Simon Latapie
+E: garf@via.ecp.fr
+C: garf
+D: contrast/HSB video filter
 S: France
 
 N: Pascal Levesque
