@@ -50,6 +50,8 @@
 /* The configuration file and directory */
 #ifdef SYS_BEOS
 #  define CONFIG_DIR                    "config/settings"
+#elif SYS_DARWIN
+#  define CONFIG_DIR			"Library/Preferences/VLC"
 #elif defined( WIN32 ) || defined( UNDER_CE )
 #  define CONFIG_DIR                    "vlc"
 #else
