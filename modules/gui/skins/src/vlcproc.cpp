@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.31 2003/06/04 16:44:39 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.32 2003/06/09 06:52:07 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -418,8 +418,13 @@ void VlcProc::PlayStream()
 {
     if( p_intf->p_sys->p_playlist == NULL )
         return;
+
     if( !p_intf->p_sys->p_playlist->i_size )
+    {
+        p_intf->p_sys->p_dialogs->ShowOpen( true );
+        InterfaceRefresh();
         return;
+    }
 
     playlist_Play( p_intf->p_sys->p_playlist );
 
