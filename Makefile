@@ -40,6 +40,7 @@ CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
 
 # Optimizations : don't compile debug versions with them
+#CCFLAGS += -O2
 #CCFLAGS += -O8
 #CCFLAGS += -s -fargument-noalias-global -fexpensive-optimizations -ffast-math -funroll-loops -fomit-frame-pointer #-march=pentiumpro
 #(Uncomment -march=pentiumpro if it applies)

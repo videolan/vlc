@@ -838,17 +838,20 @@ static void RunThread( adec_thread_t * p_adec )
     {
         switch ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT )
         {
+            /* Reserved */
             case 0:
                 intf_DbgMsg("adec debug: layer == 0 (reserved)\n");
                 p_adec->bit_stream.fifo.buffer = 0;
                 p_adec->bit_stream.fifo.i_available = 0;
                 break;
 
+            /* Layer III */
             case 1:
                 p_adec->bit_stream.fifo.buffer = 0;
                 p_adec->bit_stream.fifo.i_available = 0;
                 break;
 
+            /* Layer II */
             case 2:
                 if ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_MODE_MASK) == ADEC_HEADER_MODE_MASK )
                 {
@@ -873,11 +876,13 @@ static void RunThread( adec_thread_t * p_adec )
 //                        p_adec->bank_1.v2[ i_dummy ] = .0;
 //                    }
 
+                    /* Waiting until there is enough free space in the audio output fifo
+                     * in order to store the new decoded frames */
                     pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
                     /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384)...
-                     * If these 6 frames would be recorded in the audio output fifo,
-                     * the l_end_frame index would be incremented 6 times. But, if after
-                     * this operation the audio output fifo would contain less than 6 frames,
+                     * If these 6 frames were recorded in the audio output fifo, the
+                     * l_end_frame index would be incremented 6 times. But, if after
+                     * this operation the audio output fifo contains less than 6 frames,
                      * it would mean that we had not enough room to store the 6 frames :-P */
                     while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* !! */
                     {
@@ -885,6 +890,7 @@ static void RunThread( adec_thread_t * p_adec )
                     }
                     pthread_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
 
+                    /* Decoding the frames */
                     if ( adec_Layer2_Stereo(p_adec) )
                     {
                         pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
@@ -907,14 +913,15 @@ static void RunThread( adec_thread_t * p_adec )
                         p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
                         p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
                         pthread_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
-                        date += 24000;
 /*
-                        UPDATE_INCREMENT( date_increment, date )
+                        date += 24000;
 */
+                        UPDATE_INCREMENT( date_increment, date )
                     }
                 }
                 break;
 
+            /* Layer I */
             case 3:
                 if ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_MODE_MASK) == ADEC_HEADER_MODE_MASK )
                 {
