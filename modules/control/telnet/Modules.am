@@ -1,1 +1,1 @@
-SOURCES_telnet = telnet.c vlm.c
+SOURCES_telnet = telnet.c vlm.c vlm.h
