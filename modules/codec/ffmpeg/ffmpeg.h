@@ -108,8 +108,8 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "Higher levels require considerable more CPU power, but produce " \
     "better looking pictures." )
 
-#define DEBUG_TEST N_( "Debug mask" )
-#define DEBUG_LONGTEST N_( "Set ffmpeg debug mask" )
+#define DEBUG_TEXT N_( "Debug mask" )
+#define DEBUG_LONGTEXT N_( "Set ffmpeg debug mask" )
 
 #define LIBAVCODEC_PP_TEXT N_("ffmpeg postproc filter chains")
 /* FIXME (cut/past from ffmpeg */
@@ -147,3 +147,73 @@ void E_(ClosePostproc)( decoder_t *, void * );
 "tn     tmpnoise        (3 Thresholds)          Temporal Noise Reducer\n" \
 "                       1. <= 2. <= 3.          larger -> stronger filtering\n" \
 "fq     forceQuant      <quantizer>             Force quantizer\n"
+
+/*
+ * Encoder options
+ */
+#define ENC_CFG_PREFIX "sout-ffmpeg-"
+
+#define ENC_KEYINT_TEXT N_( "Ratio of key frames" )
+#define ENC_KEYINT_LONGTEXT N_( "Allows you to specify the number of frames " \
+  "that will be coded for one key frame." )
+
+#define ENC_BFRAMES_TEXT N_( "Ratio of B frames" )
+#define ENC_BFRAMES_LONGTEXT N_( "Allows you to specify the number of " \
+  "B frames that will be coded between two reference frames." )
+
+#define ENC_VT_TEXT N_( "Video bitrate tolerance" )
+#define ENC_VT_LONGTEXT N_( "Allows you to specify the video bitrate " \
+  "tolerance in kbit/s." )
+
+#define ENC_INTERLACE_TEXT N_( "Enable interlaced encoding" )
+#define ENC_INTERLACE_LONGTEXT N_( "Allows you to enable interlaced " \
+  "encoding." )
+
+#define ENC_PRE_ME_TEXT N_( "Enable pre motion estimation" )
+#define ENC_PRE_ME_LONGTEXT N_( "Allows you to enable the pre motion " \
+  "estimation." )
+
+#define ENC_RC_STRICT_TEXT N_( "Enable strict rate control" )
+#define ENC_RC_STRICT_LONGTEXT N_( "Allows you to enable the strict rate " \
+  "control algorithm." )
+
+#define ENC_RC_BUF_TEXT N_( "Rate control buffer size" )
+#define ENC_RC_BUF_LONGTEXT N_( "Allows you to specify the rate control " \
+  "buffer size." )
+
+#define ENC_RC_BUF_AGGR_TEXT N_( "Rate control buffer aggressivity" )
+#define ENC_RC_BUF_AGGR_LONGTEXT N_( "Allows you to specify the rate control "\
+  "buffer agressivity." )
+
+#define ENC_QUANT_FACTOR_TEXT N_( "Quantization factor" )
+#define ENC_QUANT_FACTOR_LONGTEXT N_( "Allows you to specify the " \
+  "quantization factor." )
+
+#define ENC_NOISE_RED_TEXT N_( "Noise reduction" )
+#define ENC_NOISE_RED_LONGTEXT N_( "Allows you to specify the noise " \
+  "reduction." )
+
+#define ENC_MPEG4_MATRIX_TEXT N_( "Enable mpeg4 quantization matrix" )
+#define ENC_MPEG4_MATRIX_LONGTEXT N_( "Allows you to use the mpeg4 " \
+  "quantization matrix for mpeg2 encoding." )
+
+#define ENC_HQ_TEXT N_( "Quality level" )
+#define ENC_HQ_LONGTEXT N_( "Allows you to specify the quality level " \
+  "for the encoding." )
+
+#define ENC_HURRYUP_TEXT N_( "Hurry up" )
+#define ENC_HURRYUP_LONGTEXT N_( "Allows you to specify if the encoder " \
+  "should make on-the-fly quality tradeoffs if your CPU can't keep up with " \
+  "the encoding rate." )
+
+#define ENC_QMIN_TEXT N_( "Minimum video quantizer scale" )
+#define ENC_QMIN_LONGTEXT N_( "Allows you to specify the minimum video " \
+  "quantizer scale." )
+
+#define ENC_QMAX_TEXT N_( "Maximum video quantizer scale" )
+#define ENC_QMAX_LONGTEXT N_( "Allows you to specify the maximum video " \
+  "quantizer scale." )
+
+#define ENC_TRELLIS_TEXT N_( "Enable trellis quantization" )
+#define ENC_TRELLIS_LONGTEXT N_( "Allows you to enable trellis " \
+  "quantization." )

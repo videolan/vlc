@@ -704,17 +704,6 @@ static void mrl_Clean( mrl_t *p_mrl )
     module{option=*:option=*}[:module{option=*:...}]
  */
 
-static char *_strndup( char *str, int i_len )
-{
-    char *p;
-
-    p = malloc( i_len + 1 );
-    strncpy( p, str, i_len );
-    p[i_len] = '\0';
-
-    return( p );
-}
-
 /*
  * parse module{options=str, option="str "}:
  *  return a pointer on the rest
@@ -778,7 +767,7 @@ static char *_get_chain_end( char *str )
     }
 }
 
-char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
+char *sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
 {
     sout_cfg_t *p_cfg = NULL;
     char       *p = psz_chain;
@@ -786,24 +775,15 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
     *ppsz_name = NULL;
     *pp_cfg    = NULL;
 
-    if( p == NULL )
-    {
-        return NULL;
-    }
+    if( !p ) return NULL;
 
     SKIPSPACE( p );
 
-    while( *p && *p != '{' && *p != ':' && *p != ' ' && *p != '\t' )
-    {
-        p++;
-    }
+    while( *p && *p != '{' && *p != ':' && *p != ' ' && *p != '\t' ) p++;
 
-    if( p == psz_chain )
-    {
-        return NULL;
-    }
+    if( p == psz_chain ) return NULL;
 
-    *ppsz_name = _strndup( psz_chain, p - psz_chain );
+    *ppsz_name = strndup( psz_chain, p - psz_chain );
 
     SKIPSPACE( p );
 
@@ -821,11 +801,8 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
 
             psz_name = p;
 
-            while( *p && *p != '=' && *p != ',' && *p != '}' &&
-                   *p != ' ' && *p != '\t' )
-            {
-                p++;
-            }
+            while( *p && *p != '=' && *p != ',' && *p != '{' && *p != '}' &&
+                   *p != ' ' && *p != '\t' ) p++;
 
             /* fprintf( stderr, "name=%s - rest=%s\n", psz_name, p ); */
             if( p == psz_name )
@@ -834,15 +811,16 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
                 break;
             }
 
-            cfg.psz_name = _strndup( psz_name, p - psz_name );
+            cfg.psz_name = strndup( psz_name, p - psz_name );
 
             SKIPSPACE( p );
 
-            if( *p == '=' )
+            if( *p == '=' || *p == '{' )
             {
                 char *end;
+                vlc_bool_t b_keep_brackets = (*p == '{');
 
-                p++;
+                if( *p == '=' ) p++;
 
                 end = _get_chain_end( p );
                 if( end <= p )
@@ -851,19 +829,14 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
                 }
                 else
                 {
-                    if( *p == '\'' || *p =='"' || *p == '{' )
+                    if( *p == '\'' || *p =='"' ||
+                        ( !b_keep_brackets && *p == '{' ) )
                     {
                         p++;
                         end--;
                     }
-                    if( end <= p )
-                    {
-                        cfg.psz_value = NULL;
-                    }
-                    else
-                    {
-                        cfg.psz_value = _strndup( p, end - p );
-                    }
+                    if( end <= p ) cfg.psz_value = NULL;
+                    else cfg.psz_value = strndup( p, end - p );
                 }
 
                 p = end;
@@ -890,26 +863,19 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
                 *pp_cfg = p_cfg;
             }
 
-            if( *p == ',' )
-            {
-                p++;
-            }
+            if( *p == ',' ) p++;
 
             if( *p == '}' )
             {
                 p++;
-
                 break;
             }
         }
     }
 
-    if( *p == ':' )
-    {
-        return( strdup( p + 1 ) );
-    }
+    if( *p == ':' ) return( strdup( p + 1 ) );
 
-    return( NULL );
+    return NULL;
 }
 
 static void sout_cfg_free( sout_cfg_t *p_cfg )

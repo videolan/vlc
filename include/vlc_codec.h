@@ -111,24 +111,11 @@ struct encoder_t
     /* Properties of the output of the encoder */
     es_format_t         fmt_out;
 
-    /* FIXME: move these to the ffmpeg encoder */
-    int i_key_int;
-    int i_b_frames;
-    int i_vtolerance;
-    int i_qmin;
-    int i_qmax;
-    int i_hq;
-    vlc_bool_t          b_strict_rc;
-    vlc_bool_t          b_pre_me;
-    vlc_bool_t          b_hurry_up;
-    vlc_bool_t          b_interlace;
-    int                 i_rc_buffer_size;
-    float               f_rc_buffer_aggressivity;
-    float               f_i_quant_factor;
-    int                 i_noise_reduction;
-    vlc_bool_t          b_mpeg4_matrix;
+    /* Number of threads to use during encoding */
     int                 i_threads;
-    vlc_bool_t          b_trellis;
+
+    /* Encoder config */
+    sout_cfg_t *p_cfg;
 };
 
 /**

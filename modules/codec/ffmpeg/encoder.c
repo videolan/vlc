@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
+#include <vlc/sout.h>
 #include <vlc/decoder.h>
 
 /* ffmpeg header */
@@ -115,6 +116,31 @@ struct encoder_sys_t
     int i_frame_size;
     int i_samples_delay;
     mtime_t i_pts;
+
+    /* Encoding settings */
+    int        i_key_int;
+    int        i_b_frames;
+    int        i_vtolerance;
+    int        i_qmin;
+    int        i_qmax;
+    int        i_hq;
+    vlc_bool_t b_strict_rc;
+    int        i_rc_buffer_size;
+    float      f_rc_buffer_aggressivity;
+    vlc_bool_t b_pre_me;
+    vlc_bool_t b_hurry_up;
+    vlc_bool_t b_interlace;
+    float      f_i_quant_factor;
+    int        i_noise_reduction;
+    vlc_bool_t b_mpeg4_matrix;
+    vlc_bool_t b_trellis;
+};
+
+static const char *ppsz_enc_options[] = {
+    "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict_rc",
+    "rc_buffer_size", "rc_buffer_aggressivity", "pre_me", "hurry_up",
+    "interlace", "i_quant_factor", "noise_reduction", "mpeg4_matrix",
+    "trellis", NULL
 };
 
 /*****************************************************************************
@@ -131,6 +157,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     AVCodec *p_codec;
     int i_codec_id, i_cat;
     char *psz_namecodec;
+    vlc_value_t val;
 
     if( !E_(GetFfmpegCodec)( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
@@ -206,6 +233,68 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->dsp_mask |= FF_MM_SSE2;
     }
 
+    sout_ParseCfg( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
+
+    var_Get( p_enc, ENC_CFG_PREFIX "keyint", &val );
+    p_sys->i_key_int = val.i_int;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "bframes", &val );
+    p_sys->i_b_frames = val.i_int;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "vt", &val );
+    p_sys->i_vtolerance = val.i_int;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "interlace", &val );
+    p_sys->b_interlace = val.b_bool;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "pre_me", &val );
+    p_sys->b_pre_me = val.b_bool;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "hurry_up", &val );
+    p_sys->b_hurry_up = val.b_bool;
+    if( p_sys->b_hurry_up )
+    {
+        /* hurry up mode needs noise reduction, even small */
+        p_sys->i_noise_reduction = 1;
+    }
+
+    var_Get( p_enc, ENC_CFG_PREFIX "strict_rc", &val );
+    p_sys->b_strict_rc = val.b_bool;
+    var_Get( p_enc, ENC_CFG_PREFIX "rc_buffer_size", &val );
+    p_sys->i_rc_buffer_size = val.i_int;
+    var_Get( p_enc, ENC_CFG_PREFIX "rc_buffer_aggressivity", &val );
+    p_sys->f_rc_buffer_aggressivity = val.f_float;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "i_quant_factor", &val );
+    p_sys->f_i_quant_factor = val.f_float;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "noise_reduction", &val );
+    p_sys->i_noise_reduction = val.i_int;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "mpeg4_matrix", &val );
+    p_sys->b_mpeg4_matrix = val.b_bool;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "hq", &val );
+    if( val.psz_string && *val.psz_string )
+    {
+        if( !strcmp( val.psz_string, "rd" ) )
+            p_sys->i_hq = FF_MB_DECISION_RD;
+        else if( !strcmp( val.psz_string, "bits" ) )
+            p_sys->i_hq = FF_MB_DECISION_BITS;
+        else if( !strcmp( val.psz_string, "simple" ) )
+            p_sys->i_hq = FF_MB_DECISION_SIMPLE;
+        else
+            p_sys->i_hq = FF_MB_DECISION_RD;
+    }
+    if( val.psz_string ) free( val.psz_string );
+
+    var_Get( p_enc, ENC_CFG_PREFIX "qmin", &val );
+    p_sys->i_qmin = val.i_int;
+    var_Get( p_enc, ENC_CFG_PREFIX "qmax", &val );
+    p_sys->i_qmax = val.i_int;
+    var_Get( p_enc, ENC_CFG_PREFIX "trellis", &val );
+    p_sys->b_trellis = val.b_bool;
+
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
         if( !p_enc->fmt_in.video.i_width || !p_enc->fmt_in.video.i_height )
@@ -230,9 +319,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->i_quant_offset = 0.0;
         p_context->i_quant_factor = -0.8;
 
-        p_context->gop_size = p_enc->i_key_int > 0 ? p_enc->i_key_int : 50;
+        p_context->gop_size = p_sys->i_key_int > 0 ? p_sys->i_key_int : 50;
         p_context->max_b_frames =
-            __MIN( p_enc->i_b_frames, FF_MAX_B_FRAMES );
+            __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES );
         p_context->b_frame_strategy = 0;
 
 #if LIBAVCODEC_BUILD >= 4687
@@ -249,35 +338,33 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
 
-        if ( p_enc->b_strict_rc )
+        if ( p_sys->b_strict_rc )
         {
             p_context->rc_max_rate = p_enc->fmt_out.i_bitrate;
-            p_context->rc_buffer_size = p_enc->i_rc_buffer_size;
-            p_context->rc_buffer_aggressivity = p_enc->f_rc_buffer_aggressivity;
+            p_context->rc_buffer_size = p_sys->i_rc_buffer_size;
+            p_context->rc_buffer_aggressivity = p_sys->f_rc_buffer_aggressivity;
         }
 
-        if ( p_enc->f_i_quant_factor != 0.0 )
-        {
-            p_context->i_quant_factor = p_enc->f_i_quant_factor;
-        }
+        if ( p_sys->f_i_quant_factor != 0.0 )
+            p_context->i_quant_factor = p_sys->f_i_quant_factor;
 
 #if LIBAVCODEC_BUILD >= 4690
-        p_context->noise_reduction = p_enc->i_noise_reduction;
+        p_context->noise_reduction = p_sys->i_noise_reduction;
 #endif
 
-        if ( p_enc->b_mpeg4_matrix )
+        if ( p_sys->b_mpeg4_matrix )
         {
             p_context->intra_matrix = ff_mpeg4_default_intra_matrix;
             p_context->inter_matrix = ff_mpeg4_default_non_intra_matrix;
         }
 
-        if ( p_enc->b_pre_me )
+        if ( p_sys->b_pre_me )
         {
             p_context->pre_me = 1;
             p_context->me_pre_cmp = FF_CMP_CHROMA;
         }
 
-        if ( p_enc->b_interlace )
+        if ( p_sys->b_interlace )
         {
             p_context->flags |= CODEC_FLAG_INTERLACED_DCT;
 #if LIBAVCODEC_BUILD >= 4698
@@ -285,28 +372,24 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 #endif
         }
 
-        if ( p_enc->b_trellis )
-        {
+        if ( p_sys->b_trellis )
             p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
-        }
 
 #if LIBAVCODEC_BUILD >= 4702
         if ( p_enc->i_threads >= 1 )
-        {
             p_context->thread_count = p_enc->i_threads;
-        }
 #endif
 
-        if( p_enc->i_vtolerance > 0 )
-        {
-            p_context->bit_rate_tolerance = p_enc->i_vtolerance;
-        }
+        if( p_sys->i_vtolerance > 0 )
+            p_context->bit_rate_tolerance = p_sys->i_vtolerance;
 
-        p_context->mb_qmin = p_context->qmin = p_enc->i_qmin;
-        p_context->mb_qmax = p_context->qmax = p_enc->i_qmax;
+        if( p_sys->i_qmin > 0 )
+            p_context->mb_qmin = p_context->qmin = p_sys->i_qmin;
+        if( p_sys->i_qmax > 0 )
+            p_context->mb_qmax = p_context->qmax = p_sys->i_qmax;
         p_context->max_qdiff = 3;
 
-        p_context->mb_decision = p_enc->i_hq;
+        p_context->mb_decision = p_sys->i_hq;
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
@@ -517,7 +600,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     {
         frame.pts = p_pict->date ? p_pict->date : AV_NOPTS_VALUE;
 
-        if ( p_enc->b_hurry_up && frame.pts != AV_NOPTS_VALUE )
+        if ( p_sys->b_hurry_up && frame.pts != AV_NOPTS_VALUE )
         {
             mtime_t current_date = mdate();
 
@@ -529,24 +612,24 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             }
             else
             {
-                p_sys->p_context->mb_decision = p_enc->i_hq;
+                p_sys->p_context->mb_decision = p_sys->i_hq;
 
                 if ( current_date + HURRY_UP_GUARD2 > frame.pts )
                 {
                     p_sys->p_context->flags &= ~CODEC_FLAG_TRELLIS_QUANT;
 #if LIBAVCODEC_BUILD >= 4690
-                    p_sys->p_context->noise_reduction = p_enc->i_noise_reduction
+                    p_sys->p_context->noise_reduction = p_sys->i_noise_reduction
                          + (HURRY_UP_GUARD2 + current_date - frame.pts) / 500;
 #endif
                     msg_Dbg( p_enc, "hurry up mode 2" );
                 }
                 else
                 {
-                    if ( p_enc->b_trellis )
+                    if ( p_sys->b_trellis )
                         p_sys->p_context->flags |= CODEC_FLAG_TRELLIS_QUANT;
 #if LIBAVCODEC_BUILD >= 4690
                     p_sys->p_context->noise_reduction =
-                                    p_enc->i_noise_reduction;
+                        p_sys->i_noise_reduction;
 #endif
                 }
             }

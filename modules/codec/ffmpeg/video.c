@@ -400,6 +400,9 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_sys->i_buffer = 0;
         p_sys->i_pts = 0; /* To make sure we recover properly */
 
+        p_sys->input_pts = p_sys->input_dts = 0;
+        p_sys->i_late_frames = 0;
+
         block_Release( p_block );
         return NULL;
     }

@@ -48,16 +48,106 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define VCODEC_TEXT N_("Destination video codec")
+#define VCODEC_LONGTEXT N_( \
+    "Allows you to pecify the destination video codec used for the streaming "\
+    "output." )
+#define VB_TEXT N_("Video bitrate")
+#define VB_LONGTEXT N_( \
+    "Allows you to specify the video bitrate used for the streaming " \
+    "output." )
+#define SCALE_TEXT N_("Video scaling")
+#define SCALE_LONGTEXT N_( \
+    "Allows you to scale the video before encoding." )
+#define DEINTERLACE_TEXT N_("Deinterlace video")
+#define DEINTERLACE_LONGTEXT N_( \
+    "Allows you to deinterlace the video before encoding." )
+#define WIDTH_TEXT N_("Video width")
+#define WIDTH_LONGTEXT N_( \
+    "Allows you to specify the output video width." )
+#define HEIGHT_TEXT N_("Video height")
+#define HEIGHT_LONGTEXT N_( \
+    "Allows you to specify the output video height." )
+
+#define CROPTOP_TEXT N_("Video crop top")
+#define CROPTOP_LONGTEXT N_( \
+    "Allows you to specify the top coordinate for the video cropping." )
+#define CROPLEFT_TEXT N_("Video crop left")
+#define CROPLEFT_LONGTEXT N_( \
+    "Allows you to specify the left coordinate for the video cropping." )
+#define CROPBOTTOM_TEXT N_("Video crop bottom")
+#define CROPBOTTOM_LONGTEXT N_( \
+    "Allows you to specify the bottom coordinate for the video cropping." )
+#define CROPRIGHT_TEXT N_("Video crop right")
+#define CROPRIGHT_LONGTEXT N_( \
+    "Allows you to specify the right coordinate for the video cropping." )
+
+#define ACODEC_TEXT N_("Destination audio codec")
+#define ACODEC_LONGTEXT N_( \
+    "Allows you to specify the destination audio codec used for the " \
+    "streaming output." )
+#define AB_TEXT N_("Audio bitrate")
+#define AB_LONGTEXT N_( \
+    "Allows you to specify the audio bitrate used for the streaming " \
+    "output." )
+#define ARATE_TEXT N_("Audio sample rate")
+#define ARATE_LONGTEXT N_( \
+    "Allows you to specify the audio sample rate used for the streaming " \
+    "output." )
+#define ACHANS_TEXT N_("Audio channels")
+#define ACHANS_LONGTEXT N_( \
+    "Allows you to specify the number of audio channels used for the " \
+    "streaming output." )
+
+#define THREADS_TEXT N_("Number of threads")
+#define THREADS_LONGTEXT N_( \
+    "Allows you to specify the number of threads used for the transcoding." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
+
+#define SOUT_CFG_PREFIX "sout-transcode-"
 
 vlc_module_begin();
     set_description( _("Transcode stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "transcode" );
     set_callbacks( Open, Close );
-vlc_module_end();
 
+    add_string( SOUT_CFG_PREFIX "vcodec", NULL, NULL, VCODEC_TEXT,
+                VCODEC_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "vb", 800 * 1000, NULL, VB_TEXT,
+                 VB_LONGTEXT, VLC_FALSE );
+    add_float( SOUT_CFG_PREFIX "scale", 1, NULL, SCALE_TEXT,
+               SCALE_LONGTEXT, VLC_FALSE );
+    add_bool( SOUT_CFG_PREFIX "deinterlace", 0, NULL, DEINTERLACE_TEXT,
+              DEINTERLACE_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
+                 WIDTH_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
+                 HEIGHT_LONGTEXT, VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "croptop", 0, NULL, CROPTOP_TEXT,
+                 CROPTOP_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "cropleft", 0, NULL, CROPLEFT_TEXT,
+                 CROPLEFT_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "cropbottom", 0, NULL, CROPBOTTOM_TEXT,
+                 CROPBOTTOM_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "cropright", 0, NULL, CROPRIGHT_TEXT,
+                 CROPRIGHT_LONGTEXT, VLC_TRUE );
+
+    add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
+                ACODEC_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "ab", 64000, NULL, AB_TEXT,
+                 AB_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "channels", 0, NULL, ACHANS_TEXT,
+                 ACHANS_LONGTEXT, VLC_FALSE );
+    add_integer( SOUT_CFG_PREFIX "samplerate", 0, NULL, ARATE_TEXT,
+                 ARATE_LONGTEXT, VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
+                 THREADS_LONGTEXT, VLC_TRUE );
+vlc_module_end();
 
 /*****************************************************************************
  * Exported prototypes
@@ -89,6 +179,12 @@ static int pi_channels_maps[6] =
      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };
 
+static const char *ppsz_sout_options[] = {
+    "vcodec", "vb", "croptop", "cropbottom", "cropleft", "cropright",
+    "scale", "width", "height", "deinterlace", "threads",
+    "acodec", "ab", "samplerate", "channels", NULL
+};
+
 #define PICTURE_RING_SIZE 64
 
 struct sout_stream_sys_t
@@ -104,33 +200,19 @@ struct sout_stream_sys_t
     int             i_first_pic, i_last_pic;
 
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
+    sout_cfg_t      *p_audio_cfg;
     int             i_sample_rate;
     int             i_channels;
     int             i_abitrate;
 
     vlc_fourcc_t    i_vcodec;   /*    "   video  " "   "      " */
+    sout_cfg_t      *p_video_cfg;
     int             i_vbitrate;
-    int             i_vtolerance;
     double          f_scale;
     int             i_width;
     int             i_height;
-    int             i_b_frames;
-    int             i_key_int;
-    int             i_qmin;
-    int             i_qmax;
-    vlc_bool_t      i_hq;
     vlc_bool_t      b_deinterlace;
-    vlc_bool_t      b_interlace;
-    vlc_bool_t      b_strict_rc;
-    vlc_bool_t      b_pre_me;
-    vlc_bool_t      b_hurry_up;
-    int             i_rc_buffer_size;
-    float           f_rc_buffer_aggressivity;
-    float           f_i_quant_factor;
-    int             i_noise_reduction;
-    vlc_bool_t      b_mpeg4_matrix;
     int             i_threads;
-    vlc_bool_t      b_trellis;
 
     int             i_crop_top;
     int             i_crop_bottom;
@@ -151,213 +233,119 @@ static int Open( vlc_object_t *p_this )
 {
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
-    char *codec;
+    vlc_value_t       val;
+    char              *psz_opts;
 
     p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
+
     p_sys->p_out = sout_stream_new( p_stream->p_sout, p_stream->psz_next );
-
-    p_sys->f_scale      = 1;
-    p_sys->i_vtolerance = -1;
-    p_sys->i_key_int    = -1;
-    p_sys->i_qmin       = 2;
-    p_sys->i_qmax       = 31;
-    p_sys->f_i_quant_factor = 0.0;
-#if LIBAVCODEC_BUILD >= 4673
-    p_sys->i_hq         = FF_MB_DECISION_SIMPLE;
-#else
-    p_sys->i_hq         = VLC_FALSE;
-#endif
-    p_sys->i_rc_buffer_size = 224*1024*8 * 3/2;
-    p_sys->f_rc_buffer_aggressivity = 0.1;
-    p_sys->i_threads = 0;
-    p_sys->b_trellis = 0;
-    p_sys->b_input_has_b_frames = VLC_FALSE;
-    p_sys->i_output_pts = 0;
-
-    if( ( codec = sout_cfg_find_value( p_stream->p_cfg, "acodec" ) ) )
-    {
-        char fcc[4] = "    ";
-        char *val;
-
-        memcpy( fcc, codec, __MIN( strlen( codec ), 4 ) );
-
-        p_sys->i_acodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
-
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "samplerate" ) ) )
-        {
-            p_sys->i_sample_rate = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "channels" ) ) )
-        {
-            p_sys->i_channels = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "ab" ) ) )
-        {
-            p_sys->i_abitrate = atoi( val );
-            if( p_sys->i_abitrate < 4000 )
-            {
-                p_sys->i_abitrate *= 1000;
-            }
-        }
-
-        msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s", fcc,
-                 p_sys->i_sample_rate, p_sys->i_channels,
-                 p_sys->i_abitrate / 1000 );
-    }
-
-    if( ( codec = sout_cfg_find_value( p_stream->p_cfg, "vcodec" ) ) )
-    {
-        char fcc[4] = "    ";
-        char *val;
-
-        memcpy( fcc, codec, __MIN( strlen( codec ), 4 ) );
-
-        p_sys->i_vcodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
-
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "scale" ) ) )
-        {
-            p_sys->f_scale = atof( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "width" ) ) )
-        {
-            p_sys->i_width = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "height" ) ) )
-        {
-            p_sys->i_height = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "vb" ) ) )
-        {
-            p_sys->i_vbitrate = atoi( val );
-            if( p_sys->i_vbitrate < 16000 )
-            {
-                p_sys->i_vbitrate *= 1000;
-            }
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "vt" ) ) )
-        {
-            p_sys->i_vtolerance = atoi( val );
-        }
-        if( sout_cfg_find( p_stream->p_cfg, "deinterlace" ) )
-        {
-            p_sys->b_deinterlace = VLC_TRUE;
-        }
-        if( sout_cfg_find( p_stream->p_cfg, "interlace" ) )
-        {
-            p_sys->b_interlace = VLC_TRUE;
-        }
-        if( sout_cfg_find( p_stream->p_cfg, "strict_rc" ) )
-        {
-            p_sys->b_strict_rc = VLC_TRUE;
-        }
-        if( sout_cfg_find( p_stream->p_cfg, "pre_me" ) )
-        {
-            p_sys->b_pre_me = VLC_TRUE;
-        }
-        if( sout_cfg_find( p_stream->p_cfg, "hurry_up" ) )
-        {
-            p_sys->b_hurry_up = VLC_TRUE;
-            /* hurry up mode needs noise reduction, even small */
-            p_sys->i_noise_reduction = 1;
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "rc_buffer_size" ) ) )
-        {
-            p_sys->i_rc_buffer_size = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "rc_buffer_aggressivity" ) ) )
-        {
-            p_sys->f_rc_buffer_aggressivity = atof( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "i_quant_factor" ) ) )
-        {
-            p_sys->f_i_quant_factor = atof( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "noise_reduction" ) ) )
-        {
-            p_sys->i_noise_reduction = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "mpeg4_matrix" ) ) )
-        {
-            p_sys->b_mpeg4_matrix = VLC_TRUE;
-        }
-        /* crop */
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "croptop" ) ) )
-        {
-            p_sys->i_crop_top = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "cropbottom" ) ) )
-        {
-            p_sys->i_crop_bottom = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "cropleft" ) ) )
-        {
-            p_sys->i_crop_left = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "cropright" ) ) )
-        {
-            p_sys->i_crop_right = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "keyint" ) ) )
-        {
-            p_sys->i_key_int    = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "bframes" ) ) )
-        {
-            p_sys->i_b_frames   = atoi( val );
-        }
-#if LIBAVCODEC_BUILD >= 4673
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "hq" ) ) )
-        {
-            if( !strcmp( val, "rd" ) )
-            {
-                p_sys->i_hq = FF_MB_DECISION_RD;
-            }
-            else if( !strcmp( val, "bits" ) )
-            {
-                p_sys->i_hq = FF_MB_DECISION_BITS;
-            }
-            else if( !strcmp( val, "simple" ) )
-            {
-                p_sys->i_hq = FF_MB_DECISION_SIMPLE;
-            }
-            else
-            {
-                p_sys->i_hq = FF_MB_DECISION_RD;
-            }
-        }
-#else
-        if( sout_cfg_find( p_stream->p_cfg, "hq" ) )
-        {
-            p_sys->i_hq = VLC_TRUE;
-        }
-#endif
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "qmin" ) ) )
-        {
-            p_sys->i_qmin   = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "qmax" ) ) )
-        {
-            p_sys->i_qmax   = atoi( val );
-        }
-        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "threads" ) ) )
-        {
-            p_sys->i_threads = atoi( val );
-        }
-        if( sout_cfg_find( p_stream->p_cfg, "trellis" ) )
-        {
-            p_sys->b_trellis = VLC_TRUE;
-        }
-
-        msg_Dbg( p_stream, "codec video=%4.4s %dx%d scaling: %f %dkb/s",
-                 fcc, p_sys->i_width, p_sys->i_height, p_sys->f_scale,
-                 p_sys->i_vbitrate / 1000 );
-    }
-
     if( !p_sys->p_out )
     {
         msg_Err( p_stream, "cannot create chain" );
         free( p_sys );
         return VLC_EGENERIC;
+    }
+
+    p_sys->b_input_has_b_frames = VLC_FALSE;
+    p_sys->i_output_pts = 0;
+
+    psz_opts = sout_cfg_find_value( p_stream->p_cfg, "aopts" );
+    p_sys->p_audio_cfg = NULL;
+    if( psz_opts && *psz_opts )
+    {
+        char *psz_name, *psz_next, *psz_tmp;
+        asprintf( &psz_tmp, "aopts%s", psz_opts );
+        psz_next = sout_cfg_parser( &psz_name, &p_sys->p_audio_cfg, psz_tmp );
+        if( psz_next ) free( psz_next );
+        free( psz_tmp );
+    }
+
+    psz_opts = sout_cfg_find_value( p_stream->p_cfg, "vopts" );
+    p_sys->p_video_cfg = NULL;
+    if( psz_opts && *psz_opts )
+    {
+        char *psz_name, *psz_next, *psz_tmp;
+        asprintf( &psz_tmp, "vopts%s", psz_opts );
+        psz_next = sout_cfg_parser( &psz_name, &p_sys->p_video_cfg, psz_tmp );
+        if( psz_next ) free( psz_next );
+        free( psz_tmp );
+    }
+
+    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                   p_stream->p_cfg );
+
+    /* Audio transcoding parameters */
+    var_Get( p_stream, SOUT_CFG_PREFIX "acodec", &val );
+    p_sys->i_acodec = 0;
+    if( val.psz_string && *val.psz_string )
+    {
+        char fcc[4] = "    ";
+        memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
+        p_sys->i_acodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
+    }
+    if( val.psz_string ) free( val.psz_string );
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "ab", &val );
+    p_sys->i_abitrate = val.i_int;
+    if( p_sys->i_abitrate < 4000 ) p_sys->i_abitrate *= 1000;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "samplerate", &val );
+    p_sys->i_sample_rate = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "channels", &val );
+    p_sys->i_channels = val.i_int;
+
+    if( p_sys->i_acodec )
+    {
+        msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
+                 (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
+                 p_sys->i_channels, p_sys->i_abitrate / 1000 );
+    }
+
+    /* Video transcoding parameters */
+    var_Get( p_stream, SOUT_CFG_PREFIX "vcodec", &val );
+    p_sys->i_vcodec = 0;
+    if( val.psz_string && *val.psz_string )
+    {
+        char fcc[4] = "    ";
+        memcpy( fcc, val.psz_string, __MIN( strlen( val.psz_string ), 4 ) );
+        p_sys->i_vcodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
+    }
+    if( val.psz_string ) free( val.psz_string );
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "vb", &val );
+    p_sys->i_vbitrate = val.i_int;
+    if( p_sys->i_vbitrate < 16000 ) p_sys->i_vbitrate *= 1000;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "scale", &val );
+    p_sys->f_scale = val.f_float;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "width", &val );
+    p_sys->i_width = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "height", &val );
+    p_sys->i_height = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "deinterlace", &val );
+    p_sys->b_deinterlace = val.b_bool;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "croptop", &val );
+    p_sys->i_crop_top = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "cropbottom", &val );
+    p_sys->i_crop_bottom = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "cropleft", &val );
+    p_sys->i_crop_left = val.i_int;
+    var_Get( p_stream, SOUT_CFG_PREFIX "cropright", &val );
+    p_sys->i_crop_right = val.i_int;
+
+    var_Get( p_stream, SOUT_CFG_PREFIX "threads", &val );
+    p_sys->i_threads = val.i_int;
+
+    if( p_sys->i_vcodec )
+    {
+        msg_Dbg( p_stream, "codec video=%4.4s %dx%d scaling: %f %dkb/s",
+                 (char *)&p_sys->i_vcodec, p_sys->i_width, p_sys->i_height,
+                 p_sys->f_scale, p_sys->i_vbitrate / 1000 );
     }
 
     p_stream->pf_add    = Add;
@@ -380,6 +368,33 @@ static void Close( vlc_object_t * p_this )
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
     sout_stream_delete( p_sys->p_out );
+
+    while( p_sys->p_audio_cfg != NULL )
+    {
+        sout_cfg_t *p_next = p_sys->p_audio_cfg->p_next;
+
+        if( p_sys->p_audio_cfg->psz_name )
+            free( p_sys->p_audio_cfg->psz_name );
+        if( p_sys->p_audio_cfg->psz_value )
+            free( p_sys->p_audio_cfg->psz_value );
+        free( p_sys->p_audio_cfg );
+
+        p_sys->p_audio_cfg = p_next;
+    }
+
+    while( p_sys->p_video_cfg != NULL )
+    {
+        sout_cfg_t *p_next = p_sys->p_video_cfg->p_next;
+
+        if( p_sys->p_video_cfg->psz_name )
+            free( p_sys->p_video_cfg->psz_name );
+        if( p_sys->p_video_cfg->psz_value )
+            free( p_sys->p_video_cfg->psz_value );
+        free( p_sys->p_video_cfg );
+
+        p_sys->p_video_cfg = p_next;
+    }
+
     vlc_object_destroy( p_sys );
 }
 
@@ -441,10 +456,13 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         es_format_Init( &id->f_dst, AUDIO_ES, p_sys->i_acodec );
         id->f_dst.i_id    = id->f_src.i_id;
         id->f_dst.i_group = id->f_src.i_group;
-        if( id->f_src.psz_language ) id->f_dst.psz_language = strdup( id->f_src.psz_language );
-        id->f_dst.audio.i_rate = p_sys->i_sample_rate  > 0 ? p_sys->i_sample_rate : id->f_src.audio.i_rate;
-        id->f_dst.audio.i_channels    = p_sys->i_channels > 0 ? p_sys->i_channels : id->f_src.audio.i_channels;
-        id->f_dst.i_bitrate     = p_sys->i_abitrate > 0 ? p_sys->i_abitrate : 64000;
+        if( id->f_src.psz_language )
+            id->f_dst.psz_language = strdup( id->f_src.psz_language );
+        id->f_dst.audio.i_rate = p_sys->i_sample_rate > 0 ?
+            p_sys->i_sample_rate : id->f_src.audio.i_rate;
+        id->f_dst.audio.i_channels = p_sys->i_channels > 0 ?
+            p_sys->i_channels : id->f_src.audio.i_channels;
+        id->f_dst.i_bitrate = p_sys->i_abitrate;
         id->f_dst.audio.i_blockalign = 0;
         id->f_dst.i_extra  = 0;
         id->f_dst.p_extra  = NULL;
@@ -471,8 +489,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Dbg( p_stream,
                  "creating video transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
-                 (char*)&p_fmt->i_codec,
-                 (char*)&p_sys->i_vcodec );
+                 (char*)&p_fmt->i_codec, (char*)&p_sys->i_vcodec );
 
         memcpy( &id->f_src, p_fmt, sizeof( es_format_t ) );
 
@@ -480,12 +497,13 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         es_format_Init( &id->f_dst, VIDEO_ES, p_sys->i_vcodec );
         id->f_dst.i_id    = id->f_src.i_id;
         id->f_dst.i_group = id->f_src.i_group;
-        if( id->f_src.psz_language ) id->f_dst.psz_language = strdup( id->f_src.psz_language );
-        id->f_dst.video.i_width = p_sys->i_width;
-        id->f_dst.video.i_height= p_sys->i_height;
-        id->f_dst.i_bitrate     = p_sys->i_vbitrate > 0 ? p_sys->i_vbitrate : 800*1000;
-        id->f_dst.i_extra       = 0;
-        id->f_dst.p_extra       = NULL;
+        if( id->f_src.psz_language )
+            id->f_dst.psz_language = strdup( id->f_src.psz_language );
+        id->f_dst.video.i_width  = p_sys->i_width;
+        id->f_dst.video.i_height = p_sys->i_height;
+        id->f_dst.i_bitrate = p_sys->i_vbitrate;
+        id->f_dst.i_extra = 0;
+        id->f_dst.p_extra = NULL;
 
         /* build decoder -> filter -> encoder */
         if( transcode_video_ffmpeg_new( p_stream, id ) )
@@ -799,6 +817,11 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_out.i_codec = id->f_dst.i_codec;
     id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
+    id->p_encoder->p_cfg = p_stream->p_sys->p_audio_cfg;
+
+    /* Attach object to parent so object variables inheritance works */
+    vlc_object_attach( id->p_encoder, p_stream );
+
     id->p_encoder->p_module =
         module_Need( id->p_encoder, "encoder", NULL, 0 );
     if( !id->p_encoder->p_module )
@@ -831,6 +854,8 @@ static void transcode_audio_ffmpeg_close( sout_stream_t *p_stream,
     av_free( id->ff_dec_c );
 
     module_Unneed( id->p_encoder, id->p_encoder->p_module );
+
+    vlc_object_detach( id->p_encoder );
     vlc_object_destroy( id->p_encoder );
 
     free( id->p_buffer );
@@ -1095,8 +1120,7 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
 static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
                                        sout_stream_id_t *id )
 {
-    sout_stream_sys_t   *p_sys = p_stream->p_sys;
-
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
     int i_ff_codec;
 
     /* Open decoder */
@@ -1254,29 +1278,18 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_encoder->fmt_out.i_codec = id->f_dst.i_codec;
     id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
-    id->p_encoder->i_vtolerance = p_sys->i_vtolerance;
-    id->p_encoder->i_key_int = p_sys->i_key_int;
-    id->p_encoder->i_b_frames = p_sys->i_b_frames;
-    id->p_encoder->i_qmin = p_sys->i_qmin;
-    id->p_encoder->i_qmax = p_sys->i_qmax;
-    id->p_encoder->i_hq = p_sys->i_hq;
-    id->p_encoder->b_strict_rc = p_sys->b_strict_rc;
-    id->p_encoder->b_pre_me = p_sys->b_pre_me;
-    id->p_encoder->b_hurry_up = p_sys->b_hurry_up;
-    id->p_encoder->b_interlace = p_sys->b_interlace;
-    id->p_encoder->i_rc_buffer_size = p_sys->i_rc_buffer_size;
-    id->p_encoder->f_rc_buffer_aggressivity = p_sys->f_rc_buffer_aggressivity;
-    id->p_encoder->f_i_quant_factor = p_sys->f_i_quant_factor;
-    id->p_encoder->i_noise_reduction = p_sys->i_noise_reduction;
-    id->p_encoder->b_mpeg4_matrix = p_sys->b_mpeg4_matrix;
     id->p_encoder->i_threads = p_sys->i_threads;
-    id->p_encoder->b_trellis = p_sys->b_trellis;
 
     id->p_ff_pic         = avcodec_alloc_frame();
     id->p_ff_pic_tmp0    = NULL;
     id->p_ff_pic_tmp1    = NULL;
     id->p_ff_pic_tmp2    = NULL;
     id->p_vresample      = NULL;
+
+    id->p_encoder->p_cfg = p_sys->p_video_cfg;
+
+    /* Attach object to parent so object variables inheritance works */
+    vlc_object_attach( id->p_encoder, p_stream );
 
     id->p_encoder->p_module =
         module_Need( id->p_encoder, "encoder", NULL, 0 );
@@ -1338,6 +1351,7 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
     /* Close encoder */
     if( id->p_encoder->p_module )
         module_Unneed( id->p_encoder, id->p_encoder->p_module );
+    vlc_object_detach( id->p_encoder );
     vlc_object_destroy( id->p_encoder );
 
     /* Misc cleanup */
@@ -1802,7 +1816,7 @@ static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
             !p_frame->reference || !p_sys->i_output_pts )
         {
             p_frame->pts = p_sys->i_input_dts +
-                /* Hack: ffmpeg encoding doesn't like frames with identical pts */
+            /* Hack: ffmpeg encoding doesn't like frames with identical pts */
                 (p_sys->i_output_pts ? 0 : 50000);
         }
         else p_frame->pts = AV_NOPTS_VALUE;

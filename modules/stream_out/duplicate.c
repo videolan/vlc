@@ -141,7 +141,7 @@ static void Close( vlc_object_t * p_this )
 
     int i;
 
-    msg_Dbg( p_stream, "closing a duplication");
+    msg_Dbg( p_stream, "closing a duplication" );
     for( i = 0; i < p_sys->i_nb_streams; i++ )
     {
         sout_stream_delete( p_sys->pp_streams[i] );
@@ -176,9 +176,8 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->pp_ids   = NULL;
 
     msg_Dbg( p_stream, "duplicated a new stream codec=%4.4s (es=%d group=%d)",
-             (char*)&p_fmt->i_codec,
-             p_fmt->i_id,
-             p_fmt->i_group );
+             (char*)&p_fmt->i_codec, p_fmt->i_id, p_fmt->i_group );
+
     for( i_stream = 0; i_stream < p_sys->i_nb_streams; i_stream++ )
     {
         void *id_new = NULL;

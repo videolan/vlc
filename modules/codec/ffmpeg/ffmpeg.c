@@ -70,6 +70,8 @@ struct decoder_sys_t
 static int OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
+static char *enc_hq_list[] = { "rd", "bits", "simple" };
+static char *enc_hq_list_text[] = { N_("rd"), N_("bits"), N_("simple") };
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -93,7 +95,8 @@ vlc_module_begin();
     add_string( "ffmpeg-pp-name", "default", NULL, LIBAVCODEC_PP_TEXT,
         LIBAVCODEC_PP_LONGTEXT, VLC_TRUE );
 #endif
-    add_integer( "ffmpeg-debug", 0, NULL, DEBUG_TEST, DEBUG_LONGTEST, VLC_TRUE );
+    add_integer( "ffmpeg-debug", 0, NULL, DEBUG_TEXT, DEBUG_LONGTEXT,
+                 VLC_TRUE );
 
     /* chroma conversion submodule */
     add_submodule();
@@ -106,6 +109,40 @@ vlc_module_begin();
     set_description( _("ffmpeg audio/video encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );
+
+    add_string( ENC_CFG_PREFIX "hq", "simple", NULL, ENC_HQ_TEXT,
+                ENC_HQ_LONGTEXT, VLC_FALSE );
+        change_string_list( enc_hq_list, enc_hq_list_text, 0 );
+    add_integer( ENC_CFG_PREFIX "keyint", 0, NULL, ENC_KEYINT_TEXT,
+                 ENC_KEYINT_LONGTEXT, VLC_FALSE );
+    add_integer( ENC_CFG_PREFIX "bframes", 0, NULL, ENC_BFRAMES_TEXT,
+                 ENC_BFRAMES_LONGTEXT, VLC_FALSE );
+    add_bool( ENC_CFG_PREFIX "hurry_up", 0, NULL, ENC_HURRYUP_TEXT,
+              ENC_HURRYUP_LONGTEXT, VLC_FALSE );
+    add_bool( ENC_CFG_PREFIX "interlace", 0, NULL, ENC_INTERLACE_TEXT,
+              ENC_INTERLACE_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "vt", 0, NULL, ENC_VT_TEXT,
+                 ENC_VT_LONGTEXT, VLC_TRUE );
+    add_bool( ENC_CFG_PREFIX "pre_me", 0, NULL, ENC_PRE_ME_TEXT,
+              ENC_PRE_ME_LONGTEXT, VLC_TRUE );
+    add_bool( ENC_CFG_PREFIX "strict_rc", 0, NULL, ENC_RC_STRICT_TEXT,
+              ENC_RC_STRICT_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "rc_buffer_size", 224*1024*8 * 3/2, NULL,
+                 ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, VLC_TRUE );
+    add_float( ENC_CFG_PREFIX "rc_buffer_aggressivity", 0.1, NULL,
+               ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, VLC_TRUE );
+    add_float( ENC_CFG_PREFIX "i_quant_factor", 0, NULL,
+               ENC_QUANT_FACTOR_TEXT, ENC_QUANT_FACTOR_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "noise_reduction", 0, NULL,
+                 ENC_NOISE_RED_TEXT, ENC_NOISE_RED_LONGTEXT, VLC_TRUE );
+    add_bool( ENC_CFG_PREFIX "mpeg4_matrix", 0, NULL,
+              ENC_MPEG4_MATRIX_TEXT, ENC_MPEG4_MATRIX_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "qmin", 0, NULL,
+                 ENC_QMIN_TEXT, ENC_QMIN_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "qmax", 0, NULL,
+                 ENC_QMAX_TEXT, ENC_QMAX_LONGTEXT, VLC_TRUE );
+    add_bool( ENC_CFG_PREFIX "trellis", 0, NULL,
+              ENC_TRELLIS_TEXT, ENC_TRELLIS_LONGTEXT, VLC_TRUE );
 
     /* demux submodule */
     add_submodule();
