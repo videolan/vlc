@@ -2,7 +2,7 @@
  * builder_data.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder_data.hpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
+ * $Id: builder_data.hpp,v 1.4 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,11 +28,11 @@
 #ifndef BUILDER_DATA_HPP
 #define BUILDER_DATA_HPP
 
-using namespace std;
-
 #include <vlc/vlc.h>
 #include <list>
 #include <string>
+
+using namespace std;
 
 /// Structure for mapping data from XML file
 struct BuilderData

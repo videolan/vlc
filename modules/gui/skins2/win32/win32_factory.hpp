@@ -2,7 +2,7 @@
  * win32_factory.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_factory.hpp,v 1.2 2004/01/27 17:01:51 gbazin Exp $
+ * $Id: win32_factory.hpp,v 1.3 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -24,6 +24,8 @@
 
 #ifndef WIN32_FACTORY_HPP
 #define WIN32_FACTORY_HPP
+
+#define _WIN32_WINNT 0x0500
 
 #include <windows.h>
 #include "../src/os_factory.hpp"

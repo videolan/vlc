@@ -2,7 +2,7 @@
  * ctrl_list.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ctrl_list.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ctrl_list.cpp,v 1.2 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -95,6 +95,9 @@ void CtrlList::onUpdate( Subject<VarPercent> &rPercent )
     if( excessItems > 0 )
     {
         // a simple (int)(...) causes rounding errors !
+#ifdef _MSC_VER
+#   define lrint (int)
+#endif
         firstItem = lrint( (1.0 - rVarPos.get()) * (double)excessItems );
     }
     if( m_lastPos != firstItem )

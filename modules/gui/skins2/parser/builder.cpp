@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.5 2004/02/01 16:15:40 asmax Exp $
+ * $Id: builder.cpp,v 1.6 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -542,11 +542,12 @@ const string Builder::generateId() const
 {
     static int i = 1;
 
-    const string base = "_ReservedId_";
-    char genId[base.size() + 4];
-    snprintf( genId, base.size() + 4, "%s%i", base.c_str(), i );
-    i++;
-    return genId;
+    char genId[5];
+    snprintf( genId, 4, "%i", i++ );
+
+    string base = "_ReservedId_" + (string)genId;
+
+    return base;
 }
 
 

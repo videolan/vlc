@@ -2,7 +2,7 @@
  * skin_common.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: skin_common.hpp,v 1.3 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -28,6 +28,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
+#include <string>
 using namespace std;
 
 class AsyncQueue;
@@ -40,6 +41,9 @@ class VarManager;
 class VlcProc;
 class Theme;
 
+#ifndef M_PI
+#   define M_PI 3.14159265358979323846
+#endif
 
 // Useful macros
 #define SKINS_DELETE( p ) \

@@ -2,7 +2,7 @@
  * ft2_font.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ft2_font.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id: ft2_font.cpp,v 1.2 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -142,8 +142,8 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
     int len = rString.length();
 
     // Array of glyph bitmaps and position
-    FT_Glyph glyphs[len];
-    int pos[len];
+    FT_Glyph *glyphs = new FT_Glyph[len];
+    int *pos = new int[len];
 
     // Does the font support kerning ?
     FT_Bool useKerning = FT_HAS_KERNING( m_face );
@@ -254,6 +254,8 @@ GenericBitmap *FT2Font::drawString( const UString &rString, uint32_t color,
         }
     }
 
+    delete [] glyphs;
+    delete [] pos;
+
     return pBmp;
 }
-

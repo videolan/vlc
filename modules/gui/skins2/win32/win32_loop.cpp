@@ -2,7 +2,7 @@
  * win32_loop.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_loop.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: win32_loop.cpp,v 1.2 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -24,8 +24,8 @@
 
 #ifdef WIN32_SKINS
 
-#include "win32_loop.hpp"
 #include "win32_factory.hpp"
+#include "win32_loop.hpp"
 #include "../src/generic_window.hpp"
 #include "../events/evt_key.hpp"
 #include "../events/evt_leave.hpp"

@@ -2,7 +2,7 @@
  * playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.6 2004/01/05 22:17:32 asmax Exp $
+ * $Id: playlist.cpp,v 1.7 2004/02/27 13:24:12 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -50,7 +50,7 @@ Playlist::Playlist( intf_thread_t *pIntf ): VarList( pIntf )
         msg_Warn( pIntf, "Unable to do requested conversion" );
     }
 #else
-    msg_Dbg( p_dec, "No iconv support available" );
+    msg_Dbg( pIntf, "No iconv support available" );
 #endif
 
     buildList();
