@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.3 2002/10/04 13:13:54 sam Exp $
+ * $Id: ipv6.c,v 1.4 2002/11/19 20:56:45 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -84,7 +84,7 @@ vlc_module_end();
 /*****************************************************************************
  * BuildAddr: utility function to build a struct sockaddr_in6
  *****************************************************************************/
-static int BuildAddr( struct sockaddr_in6 * p_socket,
+static int BuildAddr( vlc_object_t * p_this, struct sockaddr_in6 * p_socket,
                       char * psz_address, int i_port )
 {
     char * psz_multicast_interface = "";
@@ -111,7 +111,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
     }
     if( !_getaddrinfo || !_freeaddrinfo )
     {
-        /* msg_Err( p_this, "no IPv6 stack installed" ); */
+        msg_Err( p_this, "no IPv6 stack installed" );
         if( wship6_dll ) FreeLibrary( wship6_dll );
         return( -1 );
     }
@@ -134,10 +134,9 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         {
             *psz_multicast_interface = '\0';
             psz_multicast_interface++;
-#if 0
             msg_Dbg( p_this, "Interface name specified: \"%s\"",
                              psz_multicast_interface );
-#endif
+
             /* now convert that interface name to an index */
 #if !defined( WIN32 )
             p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
@@ -145,9 +144,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
             /* FIXME: for now we always use the default interface */
             p_socket->sin6_scope_id = 0;
 #endif
-#if 0
             msg_Warn( p_this, " = #%i", p_socket->sin6_scope_id );
-#endif
         }
         psz_address[strlen(psz_address) - 1] = '\0' ;
 
@@ -179,9 +176,7 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         /* We have a fqdn, try to find its address */
         if ( (p_hostent = gethostbyname2( psz_address, AF_INET6 )) == NULL )
         {
-#if 0
-            intf_ErrMsg( "ipv6 error: unknown host %s", psz_address );
-#endif
+            msg_Err( p_this, "ipv6 error: unknown host %s", psz_address );
             return( -1 );
         }
 
@@ -201,9 +196,8 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         _freeaddrinfo( res );
 
 #else
-#if 0
-        intf_ErrMsg( "ipv6 error: IPv6 address %s is invalid", psz_address );
-#endif
+        msg_Err( p_this, "ipv6 error: IPv6 address %s is invalid",
+                 psz_address );
         return( -1 );
 #endif
     }
@@ -286,7 +280,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
     
     /* Build the local socket */
-    if ( BuildAddr( &sock, psz_bind_addr, i_bind_port ) == -1 )        
+    if ( BuildAddr( p_this, &sock, psz_bind_addr, i_bind_port ) == -1 )        
     {
         close( i_handle );
         return( -1 );
@@ -333,7 +327,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     if( *psz_server_addr )
     {
         /* Build socket for remote connection */
-        if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
+        if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
         {
             msg_Err( p_this, "cannot build remote address" );
             close( i_handle );
@@ -386,7 +380,7 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
 
     /* Build remote address */
-    if ( BuildAddr( &sock, psz_server_addr, i_server_port ) == -1 )
+    if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
     {
         close( i_handle );
         return( -1 );
