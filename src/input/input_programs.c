@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.36 2001/02/22 17:00:20 massiot Exp $
+ * $Id: input_programs.c,v 1.37 2001/02/23 12:37:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -281,7 +281,7 @@ void input_DelArea( input_thread_t * p_input, input_area_t * p_area )
 
     ASSERT( p_area );
 
-    intf_DbgMsg("Deleting description for area %d", p_area->i_nb );
+    intf_DbgMsg("Deleting description for area %d", p_area->i_id );
 
     /* Find the area in the areas table */
     for( i_area_index = 0; i_area_index < p_input->stream.i_area_nb;
