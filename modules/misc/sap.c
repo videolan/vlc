@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.14 2003/06/18 12:18:51 zorglub Exp $
+ * $Id: sap.c,v 1.15 2003/06/20 11:42:07 alexis Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -26,7 +26,7 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
- 
+
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
@@ -61,7 +61,7 @@
 #      include <net/netdb.h>
 #   endif
 #endif
- 
+
 #ifdef UNDER_CE
 #   define close(a) CloseHandle(a);
 #elif defined( WIN32 )
@@ -151,9 +151,9 @@ vlc_module_begin();
                    "Set this if you want SAP to listen for IPv6 announces",
                    VLC_TRUE);
 
-        add_string( "sap-ipv6-scope", "3" , NULL,
+        add_string( "sap-ipv6-scope", "8" , NULL,
                     "IPv6-SAP scope",
-                    "Sets the scope for IPv6 announces (default is 3)",
+                    "Sets the scope for IPv6 announces (default is 8)",
                     VLC_TRUE);
 
     set_description( _("SAP interface") );

@@ -1,6 +1,6 @@
 from distutils.core import setup, Extension
 
-FFMPEG_DIR = '/home/cyril/ffmpeg'
+FFMPEG_DIR = '../ffmpeg'
 
 vlc = Extension('vlc',
                 sources = ['vlcmodule.c'],
@@ -9,7 +9,7 @@ vlc = Extension('vlc',
                              'memcpymmx','stream_out_transcode',
                              'i420_rgb_mmx','i420_yuy2_mmx','i420_ymga_mmx',
                              'i422_yuy2_mmx','memcpymmxext','memcpy3dn',
-                             'encoder_ffmpeg','avcodec'],
+                             'avcodec'],
                 library_dirs = [ '../lib',
                                 '../modules/stream_out', '../modules/encoder/ffmpeg',
                                 '../modules/misc/memcpy','../modules/video_chroma',
