@@ -158,7 +158,7 @@
 
 /* Max acceptable delay between the coded PTS and the actual presentation
  * time, without resampling */
-#define AOUT_PTS_TOLERANCE              (mtime_t)(.02*CLOCK_FREQ)
+#define AOUT_PTS_TOLERANCE              (mtime_t)(.04*CLOCK_FREQ)
 
 /* Max acceptable resampling (in %) */
 #define AOUT_MAX_RESAMPLING             10
