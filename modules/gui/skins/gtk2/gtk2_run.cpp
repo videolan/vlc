@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.7 2003/04/15 20:33:58 karibu Exp $
+ * $Id: gtk2_run.cpp,v 1.8 2003/04/15 20:42:04 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -72,18 +72,28 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     unsigned int msg;
     VlcProc *proc = (VlcProc *)data;
     intf_thread_t *p_intf = proc->GetpIntf();
-
+    Event *evt;
     list<Window *>::const_iterator win;
     GdkWindow *gwnd = ((GdkEventAny *)event)->window;
 
-    if( event->type == GDK_CLIENT_EVENT )
-        msg = ( (GdkEventClient *)event )->data.l[0];
-    else
-        msg = event->type;
-
     // Create event to dispatch in windows
-    Event *evt = (Event *)new OSEvent( p_intf, ((GdkEventAny *)event)->window,
-                                       msg, 0, (long)event );
+    // Skin event
+    if( event->type == GDK_CLIENT_EVENT )
+    {
+        msg = ( (GdkEventClient *)event )->data.l[0];
+        evt = (Event *)new OSEvent( p_intf, 
+            ((GdkEventAny *)event)->window,
+            msg,
+            ( (GdkEventClient *)event )->data.l[1],
+            ( (GdkEventClient *)event )->data.l[2] );
+    }
+    // System event
+    else
+    {
+        msg = event->type;
+        evt = (Event *)new OSEvent( p_intf, 
+            ((GdkEventAny *)event)->window, msg, 0, (long)event );
+    }
 
     if( IsVLCEvent( msg ) )
     {
