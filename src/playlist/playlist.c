@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.44 2003/08/14 13:02:55 sigmunau Exp $
+ * $Id: playlist.c,v 1.45 2003/08/17 14:14:01 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -127,10 +127,12 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_target,
  * Add a MRL into the playlist.
  *
  * \param p_playlist the playlist to add into
- * \param psz_target the mrl to add to the playlist
+ * \param psz_uri the mrl to add to the playlist
  * \param psz_name a text giving a name or description of this item
  * \param i_duration a hint about the duration of this item, in miliseconds, or
  *        -1 if unknown.
+ * \param ppsz_options array of options
+ * \param i_options number of items in ppsz_options
  * \param i_mode the mode used when adding
  * \param i_pos the possition in the playlist where to add. If this is
  *        PLAYLIST_END the item will be added at the end of the playlist
