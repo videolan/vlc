@@ -555,3 +555,137 @@ vlc_bool_t vlc_reduce( int *pi_dst_nom, int *pi_dst_den,
 
     return b_exact;
 }
+
+/*************************************************************************
+ * vlc_parse_cmdline: Command line parsing into elements.
+ *
+ * The command line is composed of space/tab separated arguments.
+ * Quotes can be used as argument delimiters and a backslash can be used to
+ * escape a quote.
+ *************************************************************************/
+static void find_end_quote( char **s, char **ppsz_parser, int i_quote )
+{
+    int i_bcount = 0;
+
+    while( **s )
+    {
+        if( **s == '\\' )
+        {
+            **ppsz_parser = **s;
+            (*ppsz_parser)++; (*s)++;
+            i_bcount++;
+        }
+        else if( **s == '"' || **s == '\'' )
+        {
+            /* Preceeded by a number of '\' which we erase. */
+            *ppsz_parser -= i_bcount / 2;
+            if( i_bcount & 1 )
+            {
+                /* '\\' followed by a '"' or '\'' */
+                *ppsz_parser -= 1;
+                **ppsz_parser = **s;
+                (*ppsz_parser)++; (*s)++;
+                i_bcount = 0;
+                continue;
+            }
+
+            if( **s == i_quote )
+            {
+                /* End */
+                return;
+            }
+            else
+            {
+                /* Different quoting */
+                int i_quote = **s;
+                **ppsz_parser = **s;
+                (*ppsz_parser)++; (*s)++;
+                find_end_quote( s, ppsz_parser, i_quote );
+                **ppsz_parser = **s;
+                (*ppsz_parser)++; (*s)++;
+            }
+
+            i_bcount = 0;
+        }
+        else
+        {
+            /* A regular character */
+            **ppsz_parser = **s;
+            (*ppsz_parser)++; (*s)++;
+            i_bcount = 0;
+        }
+    }
+}
+
+char **vlc_parse_cmdline( const char *psz_cmdline, int *i_args )
+{
+    int argc = 0;
+    char **argv = 0;
+    char *s, *psz_parser, *psz_arg;
+    int i_bcount = 0;
+
+    if( !psz_cmdline ) return 0;
+    psz_cmdline = strdup( psz_cmdline );
+    psz_arg = psz_parser = s = psz_cmdline;
+
+    while( *s )
+    {
+        if( *s == '\t' || *s == ' ' )
+        {
+            /* We have a complete argument */
+            *psz_parser = 0;
+            TAB_APPEND( argc, argv, strdup(psz_arg) );
+
+            /* Skip trailing spaces/tabs */
+            do{ s++; } while( *s == '\t' || *s == ' ' );
+
+            /* New argument */
+            psz_arg = psz_parser = s;
+            i_bcount = 0;
+        }
+        else if( *s == '\\' )
+        {
+            *psz_parser++ = *s++;
+            i_bcount++;
+        }
+        else if( *s == '"' || *s == '\'' )
+        {
+            if( ( i_bcount & 1 ) == 0 )
+            {
+                /* Preceeded by an even number of '\', this is half that
+                 * number of '\', plus a quote which we erase. */
+                int i_quote = *s;
+                psz_parser -= i_bcount / 2;
+                s++;
+                find_end_quote( &s, &psz_parser, i_quote );
+                s++;
+            }
+            else
+            {
+                /* Preceeded by an odd number of '\', this is half that
+                 * number of '\' followed by a '"' */
+                psz_parser = psz_parser - i_bcount/2 - 1;
+                *psz_parser++ = '"';
+                s++;
+            }
+            i_bcount = 0;
+        }
+        else
+        {
+            /* A regular character */
+            *psz_parser++ = *s++;
+            i_bcount = 0;
+        }
+    }
+
+    /* Take care of the last arg */
+    if( *psz_arg )
+    {
+        *psz_parser = '\0';
+        TAB_APPEND( argc, argv, strdup(psz_arg) );
+    }
+
+    if( i_args ) *i_args = argc;
+    free( psz_cmdline );
+    return argv;
+}

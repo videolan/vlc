@@ -951,6 +951,7 @@ typedef __int64 off_t;
 #endif
 
 VLC_EXPORT( vlc_bool_t, vlc_reduce, ( int *, int *, int64_t, int64_t, int64_t ) );
+VLC_EXPORT( char **, vlc_parse_cmdline, ( const char *, int * ) );
 
 /* vlc_wraptext (defined in src/extras/libc.c) */
 #define wraptext vlc_wraptext
