@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.177 2002/02/25 23:59:07 sam Exp $
+ * $Id: input.c,v 1.178 2002/02/26 17:22:12 xav Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -932,7 +932,14 @@ static void NetworkOpen( input_thread_t * p_input )
     }
 
     /* Build the local socket */
+
+/* As we have a problem with multicast under win32, let's bind on INADDR_ANY */
+    
+#ifdef WIN32
+    if ( network_BuildAddr( &sock, NULL, i_bind_port ) == -1 )
+#else    
     if ( network_BuildAddr( &sock, psz_bind, i_bind_port ) == -1 )
+#endif
     {
         intf_ErrMsg( "input error: can't build local address" );
         close( p_input->i_handle );
@@ -967,12 +974,20 @@ static void NetworkOpen( input_thread_t * p_input )
 #   define IN_MULTICAST(a)         IN_CLASSD(a)
 #endif
 
+#ifdef WIN32
+    if( IN_MULTICAST( ntohl( inet_addr (psz_bind) ) ) )
+    {
+        struct ip_mreq imr;
+        imr.imr_interface.s_addr = INADDR_ANY;
+        imr.imr_multiaddr.s_addr = inet_addr (psz_bind) ;
+#else
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         struct ip_mreq imr;
 
         imr.imr_interface.s_addr = INADDR_ANY;
         imr.imr_multiaddr.s_addr = sock.sin_addr.s_addr;
+#endif
         if( setsockopt( p_input->i_handle, IPPROTO_IP, IP_ADD_MEMBERSHIP,
                         (char*)&imr, sizeof(struct ip_mreq) ) == -1 )
         {
