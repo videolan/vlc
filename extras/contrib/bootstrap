@@ -3,7 +3,7 @@
 # bootstrap : Set up config.mak
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: bootstrap,v 1.3 2004/01/19 01:11:47 hartman Exp $
+# $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -39,13 +39,15 @@ if test ".`uname -s`" = ".Darwin"; then
 	echo "SYS = DARWIN" >> config.mak
 	echo "EXTRA_CPPFLAGS = -no-cpp-precomp" >> config.mak
 	echo "CONTRIB_URL = http://download.videolan.org/pub/videolan/devtools/contrib-macosx.tar.bz2" >> config.mak
+elif test ".`uname -s`" = ".BeOS"; then
+	echo "SYS = BEOS" >> config.mak
 else
 	echo "SYS = UNKNOWN" >> config.mak
 fi
 
 if which curl >/dev/null; then
 	echo "WGET = curl -O" >> config.mak
-elif which wget >/dev/null; then
+elif wget --version >/dev/null 2>&1; then
 	echo "WGET = wget" >> config.mak
 else
 	echo "You need at least wget or curl to fetch the packages." >&2

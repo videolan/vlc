@@ -1,0 +1,55 @@
+diff -ru gettext-original/gettext-runtime/libasprintf/autosprintf.cc gettext/gettext-runtime/libasprintf/autosprintf.cc
+--- gettext-original/gettext-runtime/libasprintf/autosprintf.cc	Mon Oct 28 19:44:32 2002
++++ gettext/gettext-runtime/libasprintf/autosprintf.cc	Thu Jul 22 10:23:30 2004
+@@ -32,6 +32,51 @@
+ #include <string.h>
+ #include "lib-asprintf.h"
+ 
++#ifdef __BEOS__
++/* vasprintf emulation (borrowed from VLC) */
++#define vasprintf beossux_vasprintf
++int beossux_vasprintf(char **strp, const char *fmt, va_list ap)
++{
++    /* Guess we need no more than 100 bytes. */
++    int     i_size = 100;
++    char    *p = (char *) malloc( i_size );
++    int     n;
++
++    if( p == NULL )
++    {
++        *strp = NULL;
++        return -1;
++    }
++
++    for( ;; )
++    {
++        /* Try to print in the allocated space. */
++        n = vsnprintf( p, i_size, fmt, ap );
++
++        /* If that worked, return the string. */
++        if (n > -1 && n < i_size)
++        {
++            *strp = p;
++            return strlen( p );
++        }
++        /* Else try again with more space. */
++        if (n > -1)    /* glibc 2.1 */
++        {
++           i_size = n+1; /* precisely what is needed */
++        }
++        else           /* glibc 2.0 */
++        {
++           i_size *= 2;  /* twice the old size */
++        }
++        if( (p = (char *) realloc( p, i_size ) ) == NULL)
++        {
++            *strp = NULL;
++            return -1;
++        }
++    }
++}
++#endif
++
+ namespace gnu
+ {
+ 

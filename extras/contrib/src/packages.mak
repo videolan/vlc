@@ -25,11 +25,13 @@
 GNU=http://ftp.gnu.org/pub/gnu
 SF=http://heanet.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://download.videolan.org/pub/videolan
-AUTOCONF_VERSION=2.58
+PERL_VERSION=5.8.5
+PERL_URL=http://ftp.funet.fi/pub/CPAN/src/perl-$(PERL_VERSION).tar.gz
+# Autoconf > 2.57 doesn't work ok on BeOS. Don't ask why.
+AUTOCONF_VERSION=2.57
 AUTOCONF_URL=$(GNU)/autoconf/autoconf-$(AUTOCONF_VERSION).tar.gz
-#LIBTOOL_VERSION=1.5
-#LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
-#LIBTOOL_URL=http://ftp.fr.debian.org/debian/pool/main/libt/libtool/libtool_$(LIBTOOL_VERSION).orig.tar.gz
+LIBTOOL_VERSION=1.5.6
+LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
 AUTOMAKE_VERSION=1.7.8
 AUTOMAKE_URL=$(GNU)/automake/automake-$(AUTOMAKE_VERSION).tar.gz
 PKGCFG_VERSION=0.15.0

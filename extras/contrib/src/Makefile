@@ -29,22 +29,41 @@ include ./packages.mak
 # Set a clean environment
 # ***************************************************************************
 
+ifeq ($(SYS),DARWIN)
 export PATH = $(PREFIX)/bin:/bin:/usr/bin
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
 export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
 export CFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
 export CXXFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
 export LDFLAGS = -L$(PREFIX)/lib
+endif
+ifeq ($(SYS),BEOS)
+export PATH = $(PREFIX)/bin:.:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:/boot/develop/tools/gnupro/bin
+export LIBRARY_PATH = $(PREFIX)/lib:%A/lib:/boot/home/config/lib:/boot/beos/system/lib
+export BELIBRARIES = $(PREFIX)/lib:/boot/develop/lib/x86
+export C_INCLUDE_PATH = $(PREFIX)/include
+export CPLUS_INCLUDE_PATH = $(PREFIX)/include
+endif
 
 # ***************************************************************************
 # Standard rules
 # ***************************************************************************
 
+ifeq ($(SYS),DARWIN)
 all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .dts .mod \
 	.cddb .cdio .vcdimager
+endif
+ifeq ($(SYS),BEOS)
+all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+	.FLAC .speex .faad .faac .lame .ffmpeg .openslp \
+	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .dts .mod \
+	.cddb .cdio .vcdimager
+endif
+
 FORCE:
 
 # ***************************************************************************
@@ -75,6 +94,7 @@ endef
 #	$(INSTALL_NAME)
 #	touch $@
 
+ifeq ($(SYS),DARWIN)
 define INSTALL_NAME_LIB
 	install_name_tool \
 		-change $(PREFIX)/lib/$(shell cd $(PREFIX)/lib; ls | grep "lib$(INSTALL_LIB).[0-9]*.dylib") \
@@ -94,6 +114,37 @@ define INSTALL_NAME
 			$(INSTALL_NAME_LIB)) \
 	fi
 endef
+endif
+
+ifeq ($(SYS),BEOS)
+define INSTALL_NAME
+	mkdir -p $(PREFIX)/vlc-lib ; \
+	cp $(PREFIX)/lib/lib$(patsubst .%,%,$@).so \
+		$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).so ;
+endef
+endif
+
+# ***************************************************************************
+# perl
+# ***************************************************************************
+
+ifeq ($(SYS),BEOS)
+perl-$(PERL_VERSION).tar.gz:
+	$(WGET) $(PERL_URL)
+
+perl: perl-$(PERL_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	mv perl/hints/beos.sh perl/hints/beos.sh.orig
+	sed 's%prefix="/boot/home/config"%prefix="$(PREFIX)"%' < perl/hints/beos.sh.orig > perl/hints/beos.sh
+
+.perl: perl
+	(cd $<; ./Configure -d -e && make && make install && ln -sf perl5/$(PERL_VERSION)/BePC-beos/CORE/libperl.so $(PREFIX)/lib/libperl.so)
+	touch $@
+
+CLEAN_FILE += .perl
+CLEAN_PKG += perl
+DISTCLEAN_PKG += perl-$(PERL_VERSION).tar.gz
+endif
 
 # ***************************************************************************
 # autoconf
@@ -117,25 +168,28 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 # libtool
 # ***************************************************************************
 
-# This breaks under Darwin
-#libtool_$(LIBTOOL_VERSION).orig.tar.gz:
-#	$(WGET) $(LIBTOOL_URL)
-
-#libtool: libtool_$(LIBTOOL_VERSION).orig.tar.gz
-#	$(EXTRACT_GZ)
-#	rm $@
-#	mv libtool-$(LIBTOOL_VERSION) $@
-
-#.libtool: libtool
-#	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-#	touch $@
-
-# Darwin-specific
+ifeq ($(SYS),DARWIN)
 .libtool:
 	if test -x /usr/bin/glibtoolize; then \
 		ln -sf /usr/bin/glibtoolize $(PREFIX)/bin/libtoolize ; \
 	fi
 	touch $@
+endif
+
+ifeq ($(SYS),BEOS)
+libtool-$(LIBTOOL_VERSION).tar.gz:
+	$(WGET) $(LIBTOOL_URL)
+
+libtool: libtool-$(LIBTOOL_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.libtool: libtool
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_PKG += libtool
+DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
+endif
 
 CLEAN_FILE += .libtool
 
@@ -202,9 +256,16 @@ gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/gettext.patch
 
 .intl: gettext .iconv
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	( cd $< && ./configure --prefix=$(PREFIX) )
+ifeq ($(SYS),BEOS)
+# The ugliest kludge ever - so libtool correctly links shared libraries
+# on BeOS. Sorry, I just can't figure out how libtool works
+	( cd $< && for f in `find . -name libtool`; do mv $$f $$f.orig; sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' < $$f.orig > $$f; chmod +x $$f; rm $$f.orig; done )
+endif
+	( cd $< && make && make install )
 	$(INSTALL_NAME)
 	touch $@
 
@@ -224,7 +285,9 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 
 .freetype: freetype2
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
+endif
 	touch $@
 
 CLEAN_FILE += .freetype
@@ -244,7 +307,9 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 
 .fribidi: fribidi
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
+endif
 	touch $@
 
 CLEAN_FILE += .fribidi
