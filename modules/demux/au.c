@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.12 2004/01/25 20:05:28 hartman Exp $
+ * $Id: au.c,v 1.13 2004/01/29 15:11:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -29,31 +29,27 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <codecs.h>
+/* TODO:
+ *  - all adpcm things (I _NEED_ samples)
+ *  - ...
+ */
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open    ( vlc_object_t * );
-static void Close  ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("AU demuxer") );
-    set_capability( "demux", 142 );
+    set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
+    add_shortcut( "au" );
 vlc_module_end();
-
-/*
- * TODO:
- *  - all adpcm things (I _NEED_ samples)
- */
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int    DemuxPCM   ( input_thread_t * );
-/* TODO static int    DemuxADPCM   ( input_thread_t * ); */
-
 enum AuType_e
 {
     AU_UNKNOWN      =  0,
@@ -78,100 +74,85 @@ enum AuCat_e
     AU_CAT_ADPCM    = 2
 };
 
-typedef struct
-#ifdef HAVE_ATTRIBUTE_PACKED
-    __attribute__((__packed__))
-#endif
-{
-    uint32_t    i_header_size;
-    uint32_t    i_data_size;
-    uint32_t    i_encoding;
-    uint32_t    i_sample_rate;
-    uint32_t    i_channels;
-} au_t;
-
 struct demux_sys_t
 {
-    au_t            au;
+    es_format_t     fmt;
+    es_out_id_t     *es;
 
     mtime_t         i_time;
 
-    es_format_t     fmt;
-    es_out_id_t     *p_es;
-
     int             i_frame_size;
     mtime_t         i_frame_length;
+
+    int             i_header_size;
 };
 
+static int DemuxPCM( demux_t * );
+static int Control ( demux_t *, int i_query, va_list args );
 
 /*****************************************************************************
  * Open: check file and initializes structures
  *****************************************************************************/
-static int Open( vlc_object_t * p_this )
+static int Open( vlc_object_t *p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
 
-    uint8_t         *p_peek;
+    uint8_t      hdr[20];
+    uint8_t     *p_peek;
+    int          i_cat;
+    int          i_samples, i_modulo;
 
-    int             i_cat;
-
-    /* a little test to see if it's a au file */
-    if( input_Peek( p_input, &p_peek, 4 ) < 4 )
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
-        msg_Warn( p_input, "AU module discarded (cannot peek)" );
+        msg_Warn( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
     if( strncmp( p_peek, ".snd", 4 ) )
     {
-        msg_Warn( p_input, "AU module discarded (not a valid file)" );
+        msg_Warn( p_demux, "AU module discarded" );
         return VLC_EGENERIC;
     }
 
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->i_time = 0;
-
     /* skip signature */
-    stream_Read( p_input->s, NULL, 4 );   /* cannot fail */
+    stream_Read( p_demux->s, NULL, 4 );   /* cannot fail */
 
     /* read header */
-    if( stream_Read( p_input->s, &p_sys->au, sizeof(au_t) )<(int)sizeof(au_t) )
+    if( stream_Read( p_demux->s, hdr, 20 ) < 20 )
     {
-        msg_Err( p_input, "cannot load header" );
-        goto error;
+        msg_Err( p_demux, "cannot read" );
+        return VLC_EGENERIC;
     }
+
+    if( GetDWBE( &hdr[0]  ) < 24 )
+    {
+        msg_Err( p_demux, "invalid file" );
+        return VLC_EGENERIC;
+    }
+
+    p_sys = p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->i_time = 0;
+    p_sys->i_header_size = GetDWBE( &hdr[0] );
+
+    /* skip extra header data */
+    if( p_sys->i_header_size > 24 )
+    {
+        stream_Read( p_demux->s, NULL, p_sys->i_header_size - 24 );
+    }
+
+    /* init fmt */
+    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
+    p_sys->fmt.audio.i_rate     = GetDWBE( &hdr[12] );
+    p_sys->fmt.audio.i_channels = GetDWBE( &hdr[16] );
+
+#if 0
     p_sys->au.i_header_size   = GetDWBE( &p_sys->au.i_header_size );
     p_sys->au.i_data_size     = GetDWBE( &p_sys->au.i_data_size );
     p_sys->au.i_encoding      = GetDWBE( &p_sys->au.i_encoding );
     p_sys->au.i_sample_rate   = GetDWBE( &p_sys->au.i_sample_rate );
     p_sys->au.i_channels      = GetDWBE( &p_sys->au.i_channels );
-
-    msg_Dbg( p_input,
-             "au file: header_size=%d data_size=%d encoding=0x%x sample_rate=%d channels=%d",
-             p_sys->au.i_header_size,
-             p_sys->au.i_data_size,
-             p_sys->au.i_encoding,
-             p_sys->au.i_sample_rate,
-             p_sys->au.i_channels );
-
-    if( p_sys->au.i_header_size < 24 )
-    {
-        msg_Warn( p_input, "AU module discarded (not a valid file)" );
-        goto error;
-    }
-
-    /* skip extra header data */
-    if( p_sys->au.i_header_size > 4 + sizeof( au_t ) )
-    {
-        stream_Read( p_input->s,
-                     NULL, p_sys->au.i_header_size - 4 - sizeof( au_t ) );
-    }
-
-    /* Create WAVEFORMATEX structure */
-    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
-    p_sys->fmt.audio.i_channels   = p_sys->au.i_channels;
-    p_sys->fmt.audio.i_rate = p_sys->au.i_sample_rate;
-    switch( p_sys->au.i_encoding )
+#endif
+    switch( GetDWBE( &hdr[8] ) )
     {
         case AU_ALAW_8:        /* 8-bit ISDN A-law */
             p_sys->fmt.i_codec               = VLC_FOURCC( 'a','l','a','w' );
@@ -258,10 +239,13 @@ static int Open( vlc_object_t * p_this )
             break;
 
         default:
-            msg_Warn( p_input, "unknow encoding=0x%x", p_sys->au.i_encoding );
+            msg_Warn( p_demux, "unknow encoding=0x%x", GetDWBE( &hdr[8] ) );
+            p_sys->fmt.audio.i_bitspersample = 0;
+            p_sys->fmt.audio.i_blockalign    = 0;
             i_cat                    = AU_CAT_UNKNOWN;
-            goto error;
+            break;
     }
+
     p_sys->fmt.i_bitrate = p_sys->fmt.audio.i_rate *
                            p_sys->fmt.audio.i_channels *
                            p_sys->fmt.audio.i_bitspersample;
@@ -271,50 +255,34 @@ static int Open( vlc_object_t * p_this )
         p_sys->i_frame_size = 0;
         p_sys->i_frame_length = 0;
 
-        msg_Err( p_input, "unsupported codec/type (Please report it)" );
-        goto error;
+        msg_Err( p_demux, "unsupported codec/type (Please report it)" );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
-    else
+
+    /* add the es */
+    p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
+
+    /* calculate 50ms frame size/time */
+    i_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
+    p_sys->i_frame_size = i_samples * p_sys->fmt.audio.i_channels *
+                          ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
+    if( p_sys->fmt.audio.i_blockalign > 0 )
     {
-        int i_samples, i_modulo;
-
-        /* read samples for 50ms of */
-        i_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
-
-        p_sys->i_frame_size = i_samples * p_sys->fmt.audio.i_channels * ( (p_sys->fmt.audio.i_bitspersample + 7) / 8 );
-
-        if( p_sys->fmt.audio.i_blockalign > 0 )
+        if( ( i_modulo = p_sys->i_frame_size % p_sys->fmt.audio.i_blockalign ) != 0 )
         {
-            if( ( i_modulo = p_sys->i_frame_size % p_sys->fmt.audio.i_blockalign ) != 0 )
-            {
-                p_sys->i_frame_size += p_sys->fmt.audio.i_blockalign - i_modulo;
-            }
+            p_sys->i_frame_size += p_sys->fmt.audio.i_blockalign - i_modulo;
         }
-
-        p_sys->i_frame_length = (mtime_t)1000000 *
-                                (mtime_t)i_samples /
-                                (mtime_t)p_sys->fmt.audio.i_rate;
-
-        p_input->pf_demux = DemuxPCM;
-        p_input->pf_demux_control = demux_vaControlDefault;
     }
+    p_sys->i_frame_length = (mtime_t)1000000 *
+                            (mtime_t)i_samples /
+                            (mtime_t)p_sys->fmt.audio.i_rate;
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    if( input_InitStream( p_input, 0 ) == -1)
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot init stream" );
-        goto error;
-    }
-    p_input->stream.i_mux_rate =  p_sys->fmt.i_bitrate / 50 / 8;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    /* finish to set up p_demux */
+    p_demux->pf_demux   = DemuxPCM;
+    p_demux->pf_control = Control;
 
-    p_sys->p_es = es_out_Add( p_input->p_es_out, &p_sys->fmt );
     return VLC_SUCCESS;
-
-error:
-    free( p_sys );
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -322,44 +290,28 @@ error:
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int DemuxPCM( input_thread_t *p_input )
+static int DemuxPCM( demux_t *p_demux )
 {
-    demux_sys_t  *p_sys = p_input->p_demux_data;
-    block_t *p_block;
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t     *p_block;
 
-    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
+    /* set PCR */
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+
+    if( ( p_block = stream_Block( p_demux->s, p_sys->i_frame_size ) ) == NULL )
     {
-        int64_t i_pos = stream_Tell( p_input->s );
-
-        if( p_sys->fmt.audio.i_blockalign != 0 )
-        {
-            i_pos += p_sys->fmt.audio.i_blockalign - i_pos % p_sys->fmt.audio.i_blockalign;
-            if( stream_Seek( p_input->s, i_pos ) )
-            {
-                msg_Err( p_input, "seek failed (cannot resync)" );
-            }
-        }
-    }
-
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_sys->i_time * 9 / 100 );
-
-    if( ( p_block = stream_Block( p_input->s, p_sys->i_frame_size ) ) == NULL )
-    {
-        msg_Warn( p_input, "cannot read data" );
+        msg_Warn( p_demux, "cannot read data" );
         return 0;
     }
-    p_block->i_dts =
-    p_block->i_pts = input_ClockGetTS( p_input,
-                                     p_input->stream.p_selected_program,
-                                     p_sys->i_time * 9 / 100 );
 
-    es_out_Send( p_input->p_es_out, p_sys->p_es, p_block );
+    p_block->i_dts =
+    p_block->i_pts = p_sys->i_time;
+
+    es_out_Send( p_demux->out, p_sys->es, p_block );
 
     p_sys->i_time += p_sys->i_frame_length;
 
-    return( 1 );
+    return 1;
 }
 
 /*****************************************************************************
@@ -367,9 +319,87 @@ static int DemuxPCM( input_thread_t *p_input )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t    *p_sys = p_input->p_demux_data;
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     free( p_sys );
 }
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( demux_t *p_demux, int i_query, va_list args )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    double f, *pf;
+    int64_t *pi64;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_POSITION:
+        {
+            int64_t i_tell = stream_Tell( p_demux->s );
+            int64_t i_end  = stream_Size( p_demux->s );
+
+            pf = (double*) va_arg( args, double* );
+
+            if( p_sys->i_header_size < i_end )
+            {
+                *pf = (double)( i_tell - p_sys->i_header_size ) /
+                      (double)(i_end - p_sys->i_header_size);
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        }
+        case DEMUX_SET_POSITION:
+        {
+            int64_t i_end  = stream_Size( p_demux->s );
+
+            f = (double) va_arg( args, double );
+
+            if( p_sys->i_header_size < i_end )
+            {
+                int64_t i_frame = (f * ( i_end - p_sys->i_header_size )) /
+                                  p_sys->fmt.audio.i_blockalign;
+
+                if( stream_Seek( p_demux->s, p_sys->i_header_size +
+                                             i_frame * p_sys->fmt.audio.i_blockalign ) )
+                {
+                    return VLC_EGENERIC;
+                }
+                p_sys->i_time = 1 + ( i_frame * p_sys->fmt.audio.i_blockalign / p_sys->i_frame_size ) * p_sys->i_frame_length;
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        }
+
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_time;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_LENGTH:
+        {
+            int64_t i_size  = stream_Size( p_demux->s ) - p_sys->i_header_size;
+            if( i_size > 0 )
+            {
+                pi64 = (int64_t*)va_arg( args, int64_t * );
+                *pi64 = i_size / p_sys->i_frame_size * p_sys->i_frame_length;
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        }
+        case DEMUX_SET_TIME:
+        case DEMUX_GET_FPS:
+        default:
+            return VLC_EGENERIC;
+    }
+}
+
+
+
+
+
+
+
 

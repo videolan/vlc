@@ -2,7 +2,7 @@
  * demux2 adaptation layer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: demux2.c,v 1.7 2004/01/25 20:05:28 hartman Exp $
+ * $Id: demux2.c,v 1.8 2004/01/29 15:11:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -51,6 +51,7 @@ vlc_module_begin();
     add_shortcut( "ps2" );
     add_shortcut( "dvdnav" );
     add_shortcut( "ffmpeg" );
+    add_shortcut( "au" );
 vlc_module_end();
 
 /*****************************************************************************
