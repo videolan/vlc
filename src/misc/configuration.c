@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.24 2002/05/18 13:30:28 gbazin Exp $
+ * $Id: configuration.c,v 1.25 2002/05/18 17:53:11 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -994,7 +994,10 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     if( b_ignore_errors ) free( ppsz_argv );
 
     /* Update the warning level */
-    p_main->i_warning_level += config_GetIntVariable( "warning" );
+    if( !p_main->i_warning_level )
+    {
+        p_main->i_warning_level += config_GetIntVariable( "warning" );
+    }
     p_main->i_warning_level = ( p_main->i_warning_level < 0 ) ? 0 :
         p_main->i_warning_level;
     config_PutIntVariable( "warning", p_main->i_warning_level );
