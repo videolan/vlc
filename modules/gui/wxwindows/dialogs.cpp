@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: dialogs.cpp,v 1.14 2004/01/25 03:29:01 hartman Exp $
+ * $Id: dialogs.cpp,v 1.15 2004/01/26 22:10:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -320,8 +320,8 @@ void DialogsProvider::Open( int i_access_method, int i_arg )
 {
     /* Show/hide the open dialog */
     if( !p_open_dialog )
-        p_open_dialog = new OpenDialog(p_intf, this, i_access_method, i_arg ,
-                                       OPEN_NORMAL );
+        p_open_dialog = new OpenDialog( p_intf, this, i_access_method, i_arg,
+                                        OPEN_NORMAL );
 
     if( p_open_dialog )
     {

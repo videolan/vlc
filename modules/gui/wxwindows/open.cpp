@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: open.cpp,v 1.65 2004/01/25 08:01:13 rocky Exp $
+ * $Id: open.cpp,v 1.66 2004/01/26 22:10:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -223,6 +223,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     SetIcon( *p_intf->p_sys->p_icon );
     file_dialog = NULL;
     i_disc_type_selection = 0;
+    i_open_arg = i_arg;
 
 #ifndef WIN32
     v4l_dialog = NULL;
@@ -383,6 +384,7 @@ int OpenDialog::Show( int i_access_method, int i_arg )
     i_ret = wxFrame::Show();
     Raise();
     SetFocus();
+    i_open_arg = i_arg;
     return i_ret;
 }
 
@@ -891,8 +893,8 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
         int i_id = playlist_Add( p_playlist, (const char *)mrl[i].mb_str(),
                       (const char *)mrl[i].mb_str(),
-                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
-        int i_pos = playlist_GetPositionById( p_playlist, i_id );
+                      PLAYLIST_APPEND, PLAYLIST_END );
+        playlist_item_t *p_item = playlist_GetItemById( p_playlist , i_id );
 
         /* Count the input options */
         while( i + i_options + 1 < (int)mrl.GetCount() &&
@@ -904,7 +906,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         /* Insert options */
         for( int j = 0; j < i_options; j++ )
         {
-            playlist_AddOption( p_playlist, i_pos, mrl[i + j  + 1].mb_str() );
+            playlist_AddItemOption( p_item, mrl[i + j  + 1].mb_str() );
         }
 
         /* Get the options from the subtitles dialog */
@@ -912,8 +914,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
             {
-                playlist_AddOption( p_playlist, i_pos ,
-                                    subsfile_mrl[j].mb_str() );
+                playlist_AddItemOption( p_item, subsfile_mrl[j].mb_str() );
             }
         }
 
@@ -922,9 +923,14 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
         {
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
-                playlist_AddOption( p_playlist, i_pos ,
-                                    sout_mrl[j].mb_str() );
+                playlist_AddItemOption( p_item, sout_mrl[j].mb_str() );
             }
+        }
+
+        if( !i && i_open_arg )
+        {
+            int i_pos = playlist_GetPositionById( p_playlist , i_id );
+            playlist_Command( p_playlist, PLAYLIST_GOTO, i_pos );
         }
         i += i_options;
     }
