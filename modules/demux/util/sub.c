@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.1 2002/11/15 18:10:26 fenrir Exp $
+ * $Id: sub.c,v 1.2 2003/01/21 16:46:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -533,7 +533,7 @@ static int  sub_MicroDvdRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_mi
     }
     p_subtitle->i_start = (mtime_t)i_start * (mtime_t)i_microsecperframe;
     p_subtitle->i_stop  = (mtime_t)i_stop  * (mtime_t)i_microsecperframe;
-    p_subtitle->psz_text = strdup( buffer_text );
+    p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
     return( 0 );
 }
 
@@ -557,11 +557,11 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
     for( ;; )
     {
         int h1, m1, s1, d1, h2, m2, s2, d2;
-        if( fgets( buffer, MAX_LINE, p_file ) <= 0) 
+        if( fgets( buffer, MAX_LINE, p_file ) <= 0)
         {
             return( -1 );
         }
-        if( sscanf( buffer, 
+        if( sscanf( buffer,
                     "%d:%d:%d,%d --> %d:%d:%d,%d",
                     &h1, &m1, &s1, &d1,
                     &h2, &m2, &s2, &d2 ) == 8 )
@@ -575,7 +575,7 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
                         (mtime_t)m2 * 60*1000 + 
                         (mtime_t)s2 * 1000 + 
                         (mtime_t)d2 ) * 1000;
-            
+
             /* Now read text until an empty line */
             for( i_buffer_text = 0;; )
             {
@@ -584,9 +584,11 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
                 {
                     return( -1 );
                 }
+                buffer[MAX_LINE] = '\0'; // just in case
                 i_len = strlen( buffer );
-                if( i_len <= 1 ) // newline
+                if( buffer[0] == '\r' || buffer[0] == '\n' || i_len <= 1 )
                 {
+                    // empty line -> end of this subtitle
                     buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
                     p_subtitle->i_start = i_start;
                     p_subtitle->i_stop = i_stop;
@@ -595,12 +597,16 @@ static int  sub_SubRipRead( FILE *p_file, subtitle_t *p_subtitle, mtime_t i_micr
                 }
                 else
                 {
-                    memcpy( buffer_text + i_buffer_text,
-                            buffer,
-                            i_len );
-                    i_buffer_text += i_len;
-                    buffer_text[i_buffer_text] = '\n';
-                    i_buffer_text++;
+                    if( i_buffer_text + i_len + 1 < 10 * MAX_LINE )
+                    {
+                        memcpy( buffer_text + i_buffer_text,
+                                buffer,
+                                i_len );
+                        i_buffer_text += i_len;
+
+                        buffer_text[i_buffer_text] = '\n';
+                        i_buffer_text++;
+                    }
                 }
             }
         }
