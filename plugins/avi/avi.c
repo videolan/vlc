@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.20.2.1 2002/06/03 16:33:51 fenrir Exp $
+ * $Id: avi.c,v 1.20.2.2 2002/07/26 19:39:11 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -627,6 +627,9 @@ static int AVIInit( input_thread_t *p_input )
                 p_es->i_cat = VIDEO_ES;
                 avi_ParseBitMapInfoHeader( &p_info->video_format,
                                    p_strf->p_data->p_payload_start ); 
+                /* XXX quick hack for playing ffmpeg video, I don't know 
+                       who is doing something wrong */
+                p_info->header.i_samplesize = 0;
                 p_es->b_audio = 0;
                 p_es->i_type = 
                     __AVI_VideoGetType( p_info->video_format.i_compression );
