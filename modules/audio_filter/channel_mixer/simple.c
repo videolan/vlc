@@ -66,8 +66,6 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
-    msg_Err( p_this, aout_FormatPrintChannels( &p_filter->input ) );
-
     /* Only conversion to Stereo right now */
     if( p_filter->output.i_physical_channels !=
         (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) ) return -1;
