@@ -2,7 +2,7 @@
  * postprocessing_mmxext.c: Post Processing plugin MMXEXT
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: postprocessing_mmxext.c,v 1.2 2002/08/08 22:28:22 sam Exp $
+ * $Id: postprocessing_mmxext.c,v 1.3 2002/10/28 06:26:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -44,6 +44,15 @@
     static const unsigned long long foo __asm__ (#foo)  __attribute__((unused))
    
 /* to calculate isDC_mode for mmx */   
+UNUSED_LONGLONG( mmx_thr1 ) = ( PP_THR1 << 56 )|
+                              ( PP_THR1 << 48 )|
+                              ( PP_THR1 << 40 )|
+                              ( PP_THR1 << 32 )|
+                              ( PP_THR1 << 24 )|
+                              ( PP_THR1 << 16 )|
+                              ( PP_THR1 <<  8 )|
+                              ( PP_THR1 );
+
 UNUSED_LONGLONG( mmx_127_thr1 ) = ( ( 127ULL - PP_THR1 ) << 56 )|
                                   ( ( 127ULL - PP_THR1 ) << 48 )|
                                   ( ( 127ULL - PP_THR1 ) << 40 )|
@@ -124,6 +133,7 @@ static inline int pp_deblock_isDC_mode( u8 *p_v )
        we add 127-M with wrap around -> good value fit in [ 127-2*M, 127]
        and if x >= 127 - 2 * M ie x > 127 -2*M - 1 value is good
     */
+#if 0
     __asm__ __volatile__ ("                                             \n\
                                     #* Do (v0-v1) to (v7-v8)            \n\
     movq      (%1),         %%mm1   #  load v0->v7                      \n\
@@ -138,7 +148,21 @@ static inline int pp_deblock_isDC_mode( u8 *p_v )
     andl      $255,         %0"
 
        : "=r"(i_eq_cnt) : "r" (p_v) );
+#endif
+     __asm__ __volatile__ ("                                             \n\
+                                    #* Do (v0-v1) to (v7-v8)            \n\
+    movq      (%1),         %%mm1   #  load v0->v7                      \n\
+    pxor      %%mm0,        %%mm0   # mm0 = 0                           \n\
+    movq      1(%1),        %%mm2   #  load v1->v8                      \n\
+    psubb    %%mm2,         %%mm1   #  v[i]-v[i+1]                      \n\
+    paddb     mmx_127_thr1, %%mm1   #  + 127-THR1 with wrap             \n\
+    pcmpgtb   mmx_127_2xthr1_1, %%mm1 #  >  127 -2*thr1 - 1             \n\
+    psadbw    %%mm1,        %%mm0                                       \n\
+    movd      %%mm0,        %0      #                                   \n\
+    negl      %0"
 
+       : "=r"(i_eq_cnt) : "r" (p_v) );
+   
     /* last test, hey, 9 don't fit in MMX */
     if((  ( p_v[8] - p_v[9] + PP_THR1 )&0xffff )<= PP_2xTHR1 ) 
     {   

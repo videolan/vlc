@@ -1,0 +1,311 @@
+/*****************************************************************************
+ * audio.c: audio decoder using ffmpeg library
+ *****************************************************************************
+ * Copyright (C) 1999-2001 VideoLAN
+ * $Id: audio.c,v 1.1 2002/10/28 06:26:11 fenrir Exp $
+ *
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include <vlc/aout.h>
+#include <vlc/decoder.h>
+#include <vlc/input.h>
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>                                              /* getpid() */
+#endif
+
+#include <errno.h>
+#include <string.h>
+
+#ifdef HAVE_SYS_TIMES_H
+#   include <sys/times.h>
+#endif
+
+#include "avcodec.h"                                            /* ffmpeg */
+
+#include "postprocessing/postprocessing.h"
+
+#include "ffmpeg.h"
+#include "audio.h"
+
+/*
+ * Local prototypes
+ */
+int      E_( InitThread_Audio )   ( adec_thread_t * );
+void     E_( EndThread_Audio )    ( adec_thread_t * );
+void     E_( DecodeThread_Audio ) ( adec_thread_t * );
+
+static int i_channels_maps[6] =
+{
+    0,
+    AOUT_CHAN_MONO,     AOUT_CHAN_STEREO,
+    AOUT_CHAN_3F,       AOUT_CHAN_2F2R,
+    AOUT_CHAN_3F2R
+};  
+
+/*****************************************************************************
+ * locales Functions
+ *****************************************************************************/
+
+static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
+                                    u8 *p_data )
+{
+    p_wh->i_formattag     = GetWLE( p_data );
+    p_wh->i_channels      = GetWLE( p_data + 2 );
+    p_wh->i_samplespersec = GetDWLE( p_data + 4 );
+    p_wh->i_avgbytespersec= GetDWLE( p_data + 8 );
+    p_wh->i_blockalign    = GetWLE( p_data + 12 );
+    p_wh->i_bitspersample = GetWLE( p_data + 14 );
+    p_wh->i_size          = GetWLE( p_data + 16 );
+
+    if( p_wh->i_size )
+    {
+        p_wh->p_data = malloc( p_wh->i_size );
+        memcpy( p_wh->p_data, p_data + 18, p_wh->i_size );
+    }
+}
+
+
+/*****************************************************************************
+ *
+ * Functions that initialize, decode and end the decoding process
+ *
+ * Functions exported for ffmpeg.c
+ *   * E_( InitThread_Audio )
+ *   * E_( DecodeThread_Audio )
+ *   * E_( EndThread_Video_Audio )
+ *****************************************************************************/
+
+/*****************************************************************************
+ * InitThread: initialize vdec output thread
+ *****************************************************************************
+ * This function is called from decoder_Run and performs the second step 
+ * of the initialization. It returns 0 on success. Note that the thread's 
+ * flag are not modified inside this function.
+ *
+ * ffmpeg codec will be open, some memory allocated.
+ *****************************************************************************/
+int E_( InitThread_Audio )( adec_thread_t *p_adec )
+{
+    if( p_adec->p_fifo->p_demux_data )
+    {
+        ffmpeg_GetWaveFormatEx( &p_adec->format, 
+                                (u8*)p_adec->p_fifo->p_demux_data );
+    }
+    else
+    {
+        msg_Warn( p_adec->p_fifo, "audio informations missing" );
+    }
+
+    /* ***** Fill p_context with init values ***** */
+    p_adec->p_context->sample_rate = p_adec->format.i_samplespersec;
+    p_adec->p_context->channels = p_adec->format.i_channels;
+    p_adec->p_context->block_align = p_adec->format.i_blockalign;
+    p_adec->p_context->bit_rate = p_adec->format.i_avgbytespersec * 8;
+    
+    if( ( p_adec->p_context->extradata_size = p_adec->format.i_size ) > 0 )
+    {
+        p_adec->p_context->extradata = 
+            malloc( p_adec->format.i_size );
+
+        memcpy( p_adec->p_context->extradata,
+                p_adec->format.p_data,
+                p_adec->format.i_size );
+    }
+    
+    /* ***** Open the codec ***** */ 
+    if (avcodec_open(p_adec->p_context, p_adec->p_codec) < 0)
+    {
+        msg_Err( p_adec->p_fifo, 
+                 "cannot open codec (%s)",
+                 p_adec->psz_namecodec );
+        return( -1 );
+    }
+    else
+    {
+        msg_Dbg( p_adec->p_fifo, 
+                 "ffmpeg codec (%s) started",
+                 p_adec->psz_namecodec );
+    }
+
+    p_adec->p_output = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE );    
+    
+
+    p_adec->output_format.i_format = AOUT_FMT_S16_NE;
+    p_adec->output_format.i_rate = p_adec->format.i_samplespersec;
+    p_adec->output_format.i_channels = p_adec->format.i_channels;
+    
+    p_adec->p_aout = NULL;
+    p_adec->p_aout_input = NULL;
+                        
+    return( 0 );
+}
+
+
+/*****************************************************************************
+ * DecodeThread: Called for decode one frame
+ *****************************************************************************/
+void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
+{
+    pes_packet_t    *p_pes;
+    aout_buffer_t   *p_aout_buffer;
+
+    int     i_samplesperchannel;
+    int     i_output_size;
+    int     i_frame_size;
+    int     i_status;
+
+    do
+    {
+        input_ExtractPES( p_adec->p_fifo, &p_pes );
+        if( !p_pes )
+        {
+            p_adec->p_fifo->b_error = 1;
+            return;
+        }
+        p_adec->pts = p_pes->i_pts;
+        i_frame_size = p_pes->i_pes_size;
+
+        if( i_frame_size > 0 )
+        {
+            if( p_adec->i_buffer < i_frame_size + 16 )
+            {
+                FREE( p_adec->p_buffer );
+                p_adec->p_buffer = malloc( i_frame_size + 16 );
+                p_adec->i_buffer = i_frame_size + 16;
+            }
+            
+            E_( GetPESData )( p_adec->p_buffer, p_adec->i_buffer, p_pes );
+        }
+        input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
+    } while( i_frame_size <= 0 );
+    
+
+    i_status = avcodec_decode_audio( p_adec->p_context,
+                                     (s16*)p_adec->p_output,
+                                     &i_output_size,
+                                     p_adec->p_buffer,
+                                     i_frame_size );
+    if( i_status < 0 )
+    {
+        msg_Warn( p_adec->p_fifo, 
+                  "cannot decode one frame (%d bytes)",
+                  i_frame_size );
+        return;
+    }
+
+    if( i_output_size <= 0 )
+    {
+         msg_Warn( p_adec->p_fifo, 
+                  "decoded %d samples bytes",
+                  i_output_size );
+    }
+
+    if( p_adec->p_context->channels <= 0 || 
+        p_adec->p_context->channels > 5 )
+    {
+        msg_Warn( p_adec->p_fifo,
+                  "invalid channels count", 
+                  p_adec->p_context->channels );
+    }
+
+    /* **** Now we can output these samples **** */
+    i_samplesperchannel = i_output_size / 2 /  p_adec->output_format.i_channels;
+    /* **** First check if we have a valid output **** */
+    if( ( !p_adec->p_aout_input )||
+        ( p_adec->output_format.i_channels != 
+                    p_adec->p_context->channels ) )
+    {
+        if( p_adec->p_aout_input )
+        {
+            /* **** Delete the old **** */
+            aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+        }
+
+        /* **** Create a new audio output **** */
+        p_adec->output_format.i_channels = 
+                i_channels_maps[p_adec->p_context->channels];
+
+        aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
+        p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
+                                            &p_adec->p_aout,
+                                            &p_adec->output_format );
+    }
+
+    if( !p_adec->p_aout_input )
+    {
+        msg_Err( p_adec->p_fifo, "cannot create aout" );
+        return;
+    }
+    
+    if( p_adec->pts != 0 && p_adec->pts != aout_DateGet( &p_adec->date ) )
+    {
+        aout_DateSet( &p_adec->date, p_adec->pts );
+    }
+    else if( !aout_DateGet( &p_adec->date ) )
+    {
+        return;
+    }
+
+    p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
+                                       p_adec->p_aout_input,
+                                       i_samplesperchannel );
+    if( !p_aout_buffer )
+    {
+        msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
+        p_adec->p_fifo->b_error = 1;
+        return;
+    }
+
+    p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
+    p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
+                                                  i_samplesperchannel );
+    memcpy( p_aout_buffer->p_buffer,
+            p_adec->p_output,
+            p_aout_buffer->i_nb_bytes );
+
+    aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+   
+    return;
+}
+
+
+/*****************************************************************************
+ * EndThread: thread destruction
+ *****************************************************************************
+ * This function is called when the thread ends after a sucessful
+ * initialization.
+ *****************************************************************************/
+void E_( EndThread_Audio )( adec_thread_t *p_adec )
+{
+    FREE( p_adec->format.p_data );
+
+    if( p_adec->p_aout_input )
+    {
+        aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
+    }
+    
+}
+

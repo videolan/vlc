@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.6 2002/10/24 10:33:09 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.7 2002/10/28 06:26:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -21,69 +21,44 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/* Pour un flux video */
-typedef struct bitmapinfoheader_s
-{
-    u32 i_size; /* size of header */
-    u32 i_width;
-    u32 i_height;
-    u16 i_planes;
-    u16 i_bitcount;
-    u32 i_compression;
-    u32 i_sizeimage;
-    u32 i_xpelspermeter;
-    u32 i_ypelspermeter;
-    u32 i_clrused;
-    u32 i_clrimportant;
-
-    int i_data;
-    u8  *p_data;
-} bitmapinfoheader_t;
 
 
-#if 0
-typedef struct statistic_s
-{
-    mtime_t i_frame_time[3];  /* total time to decode frame */
-    int     i_frame_count[3]; /* number of frame to calculate frame_time */
-    
-    int     i_frame_late[3];  /* number of frame consecutively late */
-    int     i_frame_skip[3];  /* number of frame skip */
-
-} statistic_t;
-#endif
-
-typedef struct videodec_thread_s
-{
-    decoder_fifo_t      *p_fifo;    
-
-    bitmapinfoheader_t  format;
-
-    AVCodecContext      *p_context;
-    AVCodec             *p_codec;
-    vout_thread_t       *p_vout; 
-
-    /* for post processing */
-    u32                 i_pp_mode; /* valid only with I420 and YV12 */
-    postprocessing_t    *p_pp;
-
-    char *psz_namecodec;
-
-    /* for frame skipping algo */
-//    statistic_s statistic;
-
-    int b_hurry_up;
-    int i_frame_error;
-    int i_frame_skip;
-    int i_frame_late;  /* how may frame decoded are in late */
-
-     /* private */
-    mtime_t i_pts;
-  
-    u8      *p_buffer;      /* buffer for gather pes */
+#define DECODER_THREAD_COMMON \
+    decoder_fifo_t      *p_fifo; \
+    \
+    int i_cat; /* AUDIO_ES, VIDEO_ES */ \
+    int i_codec_id; \
+    char *psz_namecodec; \
+    \
+    AVCodecContext      *p_context; \
+    AVCodec             *p_codec; \
+    mtime_t pts; \
+    \
+    /* Private stuff for frame gathering */ \
+    u8      *p_buffer;      /* buffer for gather pes */  \
     int     i_buffer;       /* size of allocated p_framedata */
-            
-} videodec_thread_t;
+        
+
+typedef struct generic_thread_s
+{
+    DECODER_THREAD_COMMON
+
+} generic_thread_t;
+
+#define GetWLE( p ) \
+    ( *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) )
+
+#define GetDWLE( p ) \
+    (  *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) + \
+     ( *((u8*)(p)+2) << 16 ) + ( *((u8*)(p)+3) << 24 ) )
+
+#define FREE( p ) if( p ) free( p ); p = NULL
+
+void E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
+
+/*****************************************************************************
+ * Video codec fourcc
+ *****************************************************************************/
 
 /* MPEG4 video */
 #define FOURCC_DIVX         VLC_FOURCC('D','I','V','X')
@@ -146,152 +121,12 @@ typedef struct videodec_thread_s
 #define FOURCC_WMV1         VLC_FOURCC('W','M','V','1')
 #define FOURCC_WMV2         VLC_FOURCC('W','M','V','2')
 
-static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
-                                  int *pi_ffmpeg_codec,
-                                  char **ppsz_name )
-{
-    int i_codec = 0;
-    char *psz_name = NULL;
 
-    switch( i_fourcc )
-    {
-#if LIBAVCODEC_BUILD >= 4608 
-        case FOURCC_DIV1:
-        case FOURCC_div1:
-        case FOURCC_MPG4:
-        case FOURCC_mpg4:
-            i_codec = CODEC_ID_MSMPEG4V1;
-            psz_name = "MS MPEG-4 v1";
-            break;
-
-        case FOURCC_DIV2:
-        case FOURCC_div2:
-        case FOURCC_MP42:
-        case FOURCC_mp42:
-            i_codec = CODEC_ID_MSMPEG4V2;
-            psz_name = "MS MPEG-4 v2";
-            break;
-#endif
-
-        case FOURCC_MPG3:
-        case FOURCC_mpg3:
-        case FOURCC_div3:
-        case FOURCC_MP43:
-        case FOURCC_mp43:
-        case FOURCC_DIV3:
-        case FOURCC_DIV4:
-        case FOURCC_div4:
-        case FOURCC_DIV5:
-        case FOURCC_div5:
-        case FOURCC_DIV6:
-        case FOURCC_div6:
-        case FOURCC_AP41:
-        case FOURCC_3IV1:
-#if LIBAVCODEC_BUILD >= 4608 
-            i_codec = CODEC_ID_MSMPEG4V3;
-#else
-            i_codec = CODEC_ID_MSMPEG4;
-#endif
-            psz_name = "MS MPEG-4 v3";
-            break;
-
-#if LIBAVCODEC_BUILD >= 4615
-        case FOURCC_SVQ1:
-            i_codec = CODEC_ID_SVQ1;
-            psz_name = "SVQ-1 (Sorenson Video v1)";
-            break;
-#endif
-
-        case FOURCC_DIVX:
-        case FOURCC_divx:
-        case FOURCC_MP4S:
-        case FOURCC_mp4s:
-        case FOURCC_M4S2:
-        case FOURCC_m4s2:
-        case FOURCC_xvid:
-        case FOURCC_XVID:
-        case FOURCC_XviD:
-        case FOURCC_DX50:
-        case FOURCC_mp4v:
-        case FOURCC_4:
-        case FOURCC_3IV2:
-
-            i_codec = CODEC_ID_MPEG4;
-            psz_name = "MPEG-4";
-            break;
-/* FIXME FOURCC_H263P exist but what fourcc ? */
-        case FOURCC_H263:
-        case FOURCC_h263:
-        case FOURCC_U263:
-            i_codec = CODEC_ID_H263;
-            psz_name = "H263";
-            break;
-
-        case FOURCC_I263:
-        case FOURCC_i263:
-            i_codec = CODEC_ID_H263I;
-            psz_name = "I263.I";
-            break;
-        case FOURCC_WMV1:
-            i_codec = CODEC_ID_WMV1;
-            psz_name ="Windows Media Video 1";
-            break;
-        case FOURCC_WMV2:
-            i_codec = CODEC_ID_WMV2;
-            psz_name ="Windows Media Video 2";
-            break;
-
-    }
-
-    if( i_codec )
-    {
-        if( pi_ffmpeg_codec ) *pi_ffmpeg_codec = i_codec;
-        if( ppsz_name ) *ppsz_name = psz_name;
-        return VLC_TRUE;
-    }
-
-    return VLC_FALSE;
-}
-
-/* FIXME FIXME some of them are wrong */
-static int i_ffmpeg_PixFmtToChroma[] =
-{
-    /* PIX_FMT_ANY = -1, PIX_FMT_YUV420P, 
-       PIX_FMT_YUV422,   PIX_FMT_RGB24,   
-       PIX_FMT_BGR24,    PIX_FMT_YUV422P, 
-       PIX_FMT_YUV444P,  PIX_FMT_YUV410P 
-     */
-    0,                           VLC_FOURCC('I','4','2','0'),
-    VLC_FOURCC('I','4','2','0'), VLC_FOURCC('R','V','2','4'),
-    0,                           VLC_FOURCC('Y','4','2','2'),
-    VLC_FOURCC('I','4','4','4'), 0
-};
-
-static inline u32 ffmpeg_PixFmtToChroma( int i_ffmpegchroma )
-{
-    if( ++i_ffmpegchroma > 7 )
-    {
-        return( 0 );
-    }
-    else
-    {
-        return( i_ffmpeg_PixFmtToChroma[i_ffmpegchroma] );
-    }
-}
-
-static inline int ffmpeg_FfAspect( int i_width, int i_height, int i_ffaspect )
-{
-    switch( i_ffaspect )
-    {
-        case( FF_ASPECT_4_3_625 ):
-        case( FF_ASPECT_4_3_525 ):
-            return( VOUT_ASPECT_FACTOR * 4 / 3);
-        case( FF_ASPECT_16_9_625 ):
-        case( FF_ASPECT_16_9_525 ):
-            return( VOUT_ASPECT_FACTOR * 16 / 9 );
-        case( FF_ASPECT_SQUARE ):
-        default:
-            return( VOUT_ASPECT_FACTOR * i_width / i_height );
-    }
-}
+/*****************************************************************************
+ * Audio codec fourcc
+ *****************************************************************************/
+#define FOURCC_WMA1         VLC_FOURCC('W','M','A','1')
+#define FOURCC_wma1         VLC_FOURCC('w','m','a','1')
+#define FOURCC_WMA2         VLC_FOURCC('W','M','A','2')
+#define FOURCC_wma2         VLC_FOURCC('w','m','a','2')
 
