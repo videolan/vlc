@@ -42,7 +42,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .lame .ebml .matroska .ffmpeg .openslp \
+	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdplay .dvbpsi .live .goom .caca .dts .mod
 FORCE:
 
@@ -458,6 +458,25 @@ CLEAN_PKG += faad2
 DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.gz
 
 # ***************************************************************************
+# faac
+# ***************************************************************************
+
+faac-$(FAAC_VERSION).tar.bz2:
+	$(WGET) $(FAAC_URL)
+	patch -p 0 < Patches/faac.patch
+
+faac: faac-$(FAAC_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.faac: faac
+	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .faac
+CLEAN_PKG += faac
+DISTCLEAN_PKG += faac-$(FAAC_VERSION).tar.bz2
+
+# ***************************************************************************
 # lame
 # ***************************************************************************
 
@@ -520,8 +539,8 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 # ***************************************************************************
 
 ffmpeg:
-	cvs -d $(FFMPEG_CVSROOT) login
-	cvs -d $(FFMPEG_CVSROOT) co ffmpeg
+	echo $(FFMPEG_CVSROOT) A > ./ffmpeg.cvs
+	CVS_PASSFILE=./ffmpeg.cvs cvs -d $(FFMPEG_CVSROOT) co ffmpeg
 	patch -p 0 < Patches/ffmpeg.patch.cvs
 #	(cd $@; ./bootstrap)
 
@@ -533,7 +552,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
-	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
+	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
 	touch $@
 
 CLEAN_FILE += .ffmpeg

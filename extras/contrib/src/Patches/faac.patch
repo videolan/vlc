@@ -1,0 +1,11 @@
+diff -ruN faac.orig/bootstrap faac/bootstrap
+--- faac.orig/bootstrap	Sat May 10 17:42:36 2003
++++ faac/bootstrap	Fri May 14 23:28:50 2004
+@@ -1,6 +1,6 @@
+ #! /bin/sh
+ 
+-aclocal -I .
++aclocal -I /usr/share/aclocal
+ autoheader
+ libtoolize --automake
+ automake --add-missing
