@@ -279,7 +279,7 @@ static int ParseLine ( demux_t *p_demux, char *psz_line )
     else if( !strncasecmp( psz_bol, "sgiFormatName=", sizeof("sgiFormatName=") - 1 ) )
     {
         psz_bol += sizeof("sgiFormatName=") - 1;
-        if( !strcasestr( psz_bol, "MPEG-4") ) /*not mpeg4 */
+        if( strcasestr( psz_bol, "MPEG-4") == NULL ) /*not mpeg4 found in string */
             p_sys->b_rtsp_kasenna = VLC_TRUE;
     }
     else if( !strncasecmp( psz_bol, "sgiMulticastAddress=", sizeof("sgiMulticastAddress=") - 1 ) )
@@ -346,8 +346,8 @@ static int Demux ( demux_t *p_demux )
         return -1;
     }
 
-    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
-    i_position = p_playlist->i_index + 1;
+    p_playlist->status.p_item->i_flags = PLAYLIST_DEL_FLAG;
+    i_position = -1;  /* FIXME p_playlist->i_index + 1; */
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {

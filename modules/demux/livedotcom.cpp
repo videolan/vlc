@@ -242,7 +242,6 @@ static int  Open ( vlc_object_t *p_this )
         psz_url = (char*)malloc( strlen( p_demux->psz_path ) + 8 );
         sprintf( psz_url, "rtsp://%s", p_demux->psz_path );
 
-        /* Add kasenna option */
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
         if( psz_options )
             delete [] psz_options;
