@@ -37,28 +37,22 @@ create_familiar (void)
   GtkWidget *notebook;
   GtkWidget *fixedMedia;
   GtkWidget *labelUrl;
+  GtkWidget *comboURL;
+  GList *comboURL_items = NULL;
+  GtkWidget *comboURL_entry;
   GtkWidget *scrolledwindow1;
   GtkWidget *clistmedia;
   GtkWidget *labelname;
   GtkWidget *labeltype;
-  GtkWidget *comboURL;
-  GList *comboURL_items = NULL;
-  GtkWidget *comboURL_entry;
+  GtkWidget *labelsize;
+  GtkWidget *labeluid;
+  GtkWidget *labelgid;
   GtkWidget *media;
   GtkWidget *fixedPreferences;
   GtkWidget *buttonSave;
   GtkWidget *buttonApply;
   GtkWidget *buttonCancel;
-  GtkWidget *frameDefaultURL;
-  GtkWidget *fixed3;
-  GtkWidget *comboDefaultURL;
-  GList *comboDefaultURL_items = NULL;
-  GtkWidget *comboPrefs_entry;
-  GtkWidget *frameIP;
-  GtkWidget *fixed2;
-  GSList *fixed2_group = NULL;
-  GtkWidget *rbIPv4;
-  GtkWidget *rbIPv6;
+  GtkWidget *cbautoplay;
   GtkWidget *preferences;
   GtkWidget *fixedAbout;
   GtkWidget *logo;
@@ -67,9 +61,6 @@ create_familiar (void)
   GtkWidget *labelAuthors;
   GtkWidget *labelAbout;
   GtkWidget *about;
-  GtkTooltips *tooltips;
-
-  tooltips = gtk_tooltips_new ();
 
   familiar = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_name (familiar, "familiar");
@@ -238,47 +229,6 @@ create_familiar (void)
   gtk_widget_set_uposition (labelUrl, 4, 8);
   gtk_widget_set_usize (labelUrl, 38, 18);
 
-  scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
-  gtk_widget_set_name (scrolledwindow1, "scrolledwindow1");
-  gtk_widget_ref (scrolledwindow1);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "scrolledwindow1", scrolledwindow1,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (scrolledwindow1);
-  gtk_fixed_put (GTK_FIXED (fixedMedia), scrolledwindow1, 0, 32);
-  gtk_widget_set_uposition (scrolledwindow1, 0, 32);
-  gtk_widget_set_usize (scrolledwindow1, 240, 208);
-
-  clistmedia = gtk_clist_new (2);
-  gtk_widget_set_name (clistmedia, "clistmedia");
-  gtk_widget_ref (clistmedia);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "clistmedia", clistmedia,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (clistmedia);
-  gtk_container_add (GTK_CONTAINER (scrolledwindow1), clistmedia);
-  gtk_widget_set_usize (clistmedia, 216, 208);
-  gtk_tooltips_set_tip (tooltips, clistmedia, _("Select files to play"), NULL);
-  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 0, 145);
-  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 1, 54);
-  gtk_clist_column_titles_show (GTK_CLIST (clistmedia));
-
-  labelname = gtk_label_new (_("Name"));
-  gtk_widget_set_name (labelname, "labelname");
-  gtk_widget_ref (labelname);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelname", labelname,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (labelname);
-  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 0, labelname);
-  gtk_label_set_justify (GTK_LABEL (labelname), GTK_JUSTIFY_LEFT);
-
-  labeltype = gtk_label_new (_("Type"));
-  gtk_widget_set_name (labeltype, "labeltype");
-  gtk_widget_ref (labeltype);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "labeltype", labeltype,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (labeltype);
-  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 1, labeltype);
-  gtk_label_set_justify (GTK_LABEL (labeltype), GTK_JUSTIFY_LEFT);
-
   comboURL = gtk_combo_new ();
   gtk_widget_set_name (comboURL, "comboURL");
   gtk_widget_ref (comboURL);
@@ -303,6 +253,70 @@ create_familiar (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (comboURL_entry);
   gtk_entry_set_text (GTK_ENTRY (comboURL_entry), _("file://"));
+
+  scrolledwindow1 = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_set_name (scrolledwindow1, "scrolledwindow1");
+  gtk_widget_ref (scrolledwindow1);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "scrolledwindow1", scrolledwindow1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (scrolledwindow1);
+  gtk_fixed_put (GTK_FIXED (fixedMedia), scrolledwindow1, 0, 32);
+  gtk_widget_set_uposition (scrolledwindow1, 0, 32);
+  gtk_widget_set_usize (scrolledwindow1, 240, 208);
+
+  clistmedia = gtk_clist_new (5);
+  gtk_widget_set_name (clistmedia, "clistmedia");
+  gtk_widget_ref (clistmedia);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "clistmedia", clistmedia,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (clistmedia);
+  gtk_container_add (GTK_CONTAINER (scrolledwindow1), clistmedia);
+  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 0, 123);
+  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 1, 80);
+  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 2, 80);
+  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 3, 80);
+  gtk_clist_set_column_width (GTK_CLIST (clistmedia), 4, 80);
+  gtk_clist_column_titles_show (GTK_CLIST (clistmedia));
+
+  labelname = gtk_label_new (_("Name"));
+  gtk_widget_set_name (labelname, "labelname");
+  gtk_widget_ref (labelname);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelname", labelname,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelname);
+  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 0, labelname);
+
+  labeltype = gtk_label_new (_("Type"));
+  gtk_widget_set_name (labeltype, "labeltype");
+  gtk_widget_ref (labeltype);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labeltype", labeltype,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labeltype);
+  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 1, labeltype);
+
+  labelsize = gtk_label_new (_("Size"));
+  gtk_widget_set_name (labelsize, "labelsize");
+  gtk_widget_ref (labelsize);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelsize", labelsize,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelsize);
+  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 2, labelsize);
+
+  labeluid = gtk_label_new (_("User"));
+  gtk_widget_set_name (labeluid, "labeluid");
+  gtk_widget_ref (labeluid);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labeluid", labeluid,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labeluid);
+  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 3, labeluid);
+
+  labelgid = gtk_label_new (_("Group"));
+  gtk_widget_set_name (labelgid, "labelgid");
+  gtk_widget_ref (labelgid);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelgid", labelgid,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelgid);
+  gtk_clist_set_column_widget (GTK_CLIST (clistmedia), 4, labelgid);
 
   media = gtk_label_new (_("Media"));
   gtk_widget_set_name (media, "media");
@@ -350,89 +364,16 @@ create_familiar (void)
   gtk_widget_set_uposition (buttonCancel, 176, 216);
   gtk_widget_set_usize (buttonCancel, 54, 24);
 
-  frameDefaultURL = gtk_frame_new (_("Default URL:"));
-  gtk_widget_set_name (frameDefaultURL, "frameDefaultURL");
-  gtk_widget_ref (frameDefaultURL);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "frameDefaultURL", frameDefaultURL,
+  cbautoplay = gtk_check_button_new_with_label (_("Automatically play file."));
+  gtk_widget_set_name (cbautoplay, "cbautoplay");
+  gtk_widget_ref (cbautoplay);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "cbautoplay", cbautoplay,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (frameDefaultURL);
-  gtk_fixed_put (GTK_FIXED (fixedPreferences), frameDefaultURL, 8, 8);
-  gtk_widget_set_uposition (frameDefaultURL, 8, 8);
-  gtk_widget_set_usize (frameDefaultURL, 220, 60);
-
-  fixed3 = gtk_fixed_new ();
-  gtk_widget_set_name (fixed3, "fixed3");
-  gtk_widget_ref (fixed3);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "fixed3", fixed3,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (fixed3);
-  gtk_container_add (GTK_CONTAINER (frameDefaultURL), fixed3);
-
-  comboDefaultURL = gtk_combo_new ();
-  gtk_widget_set_name (comboDefaultURL, "comboDefaultURL");
-  gtk_widget_ref (comboDefaultURL);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboDefaultURL", comboDefaultURL,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (comboDefaultURL);
-  gtk_fixed_put (GTK_FIXED (fixed3), comboDefaultURL, 8, 8);
-  gtk_widget_set_uposition (comboDefaultURL, 8, 8);
-  gtk_widget_set_usize (comboDefaultURL, 200, 24);
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("file://"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("ftp://"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("http://"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udpstream://@:1234"));
-  comboDefaultURL_items = g_list_append (comboDefaultURL_items, (gpointer) _("udp://:1234"));
-  gtk_combo_set_popdown_strings (GTK_COMBO (comboDefaultURL), comboDefaultURL_items);
-  g_list_free (comboDefaultURL_items);
-
-  comboPrefs_entry = GTK_COMBO (comboDefaultURL)->entry;
-  gtk_widget_set_name (comboPrefs_entry, "comboPrefs_entry");
-  gtk_widget_ref (comboPrefs_entry);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "comboPrefs_entry", comboPrefs_entry,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (comboPrefs_entry);
-  gtk_entry_set_text (GTK_ENTRY (comboPrefs_entry), _("file://"));
-
-  frameIP = gtk_frame_new (_("IP version:"));
-  gtk_widget_set_name (frameIP, "frameIP");
-  gtk_widget_ref (frameIP);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "frameIP", frameIP,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (frameIP);
-  gtk_fixed_put (GTK_FIXED (fixedPreferences), frameIP, 8, 72);
-  gtk_widget_set_uposition (frameIP, 8, 72);
-  gtk_widget_set_usize (frameIP, 220, 60);
-
-  fixed2 = gtk_fixed_new ();
-  gtk_widget_set_name (fixed2, "fixed2");
-  gtk_widget_ref (fixed2);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "fixed2", fixed2,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (fixed2);
-  gtk_container_add (GTK_CONTAINER (frameIP), fixed2);
-
-  rbIPv4 = gtk_radio_button_new_with_label (fixed2_group, _("IPv4"));
-  fixed2_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv4));
-  gtk_widget_set_name (rbIPv4, "rbIPv4");
-  gtk_widget_ref (rbIPv4);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "rbIPv4", rbIPv4,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (rbIPv4);
-  gtk_fixed_put (GTK_FIXED (fixed2), rbIPv4, 8, 8);
-  gtk_widget_set_uposition (rbIPv4, 8, 8);
-  gtk_widget_set_usize (rbIPv4, 104, 26);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (rbIPv4), TRUE);
-
-  rbIPv6 = gtk_radio_button_new_with_label (fixed2_group, _("IPv6"));
-  fixed2_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv6));
-  gtk_widget_set_name (rbIPv6, "rbIPv6");
-  gtk_widget_ref (rbIPv6);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "rbIPv6", rbIPv6,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (rbIPv6);
-  gtk_fixed_put (GTK_FIXED (fixed2), rbIPv6, 112, 8);
-  gtk_widget_set_uposition (rbIPv6, 112, 8);
-  gtk_widget_set_usize (rbIPv6, 104, 26);
+  gtk_widget_show (cbautoplay);
+  gtk_fixed_put (GTK_FIXED (fixedPreferences), cbautoplay, 8, 8);
+  gtk_widget_set_uposition (cbautoplay, 8, 8);
+  gtk_widget_set_usize (cbautoplay, 216, 24);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (cbautoplay), TRUE);
 
   preferences = gtk_label_new (_("Preference"));
   gtk_widget_set_name (preferences, "preferences");
@@ -542,20 +483,18 @@ create_familiar (void)
   gtk_signal_connect (GTK_OBJECT (toolbar_about), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_about_clicked),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (clistmedia), "click_column",
-                      GTK_SIGNAL_FUNC (on_clistmedia_click_column),
+  gtk_signal_connect (GTK_OBJECT (comboURL_entry), "changed",
+                      GTK_SIGNAL_FUNC (on_comboURL_entry_changed),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (clistmedia), "select_row",
                       GTK_SIGNAL_FUNC (on_clistmedia_select_row),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (comboURL_entry), "changed",
-                      GTK_SIGNAL_FUNC (on_comboURL_entry_changed),
+  gtk_signal_connect (GTK_OBJECT (clistmedia), "click_column",
+                      GTK_SIGNAL_FUNC (on_clistmedia_click_column),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (comboPrefs_entry), "changed",
-                      GTK_SIGNAL_FUNC (on_comboPrefs_entry_changed),
+  gtk_signal_connect (GTK_OBJECT (cbautoplay), "toggled",
+                      GTK_SIGNAL_FUNC (on_cbautoplay_toggled),
                       NULL);
-
-  gtk_object_set_data (GTK_OBJECT (familiar), "tooltips", tooltips);
 
   return familiar;
 }

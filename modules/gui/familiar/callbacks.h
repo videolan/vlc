@@ -2,7 +2,7 @@
  * callbacks.h : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: callbacks.h,v 1.4 2002/08/14 21:50:01 jpsaman Exp $
+ * $Id: callbacks.h,v 1.5 2002/08/18 20:36:04 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -68,10 +68,6 @@ void
 on_comboURL_entry_changed              (GtkEditable     *editable,
                                         gpointer         user_data);
 
-void
-on_comboPrefs_entry_changed            (GtkEditable     *editable,
-                                        gpointer         user_data);
-
 
 void
 on_clistmedia_click_column             (GtkCList        *clist,
@@ -84,3 +80,8 @@ on_clistmedia_select_row               (GtkCList        *clist,
                                         gint             column,
                                         GdkEvent        *event,
                                         gpointer         user_data);
+
+void
+on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+

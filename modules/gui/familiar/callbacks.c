@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.5 2002/08/17 13:33:00 jpsaman Exp $
+ * $Id: callbacks.c,v 1.6 2002/08/18 20:36:04 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -51,8 +51,7 @@
 /*#include "netutils.h"*/
 
 static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
-static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data );
-static char* get_file_type(const char *path);
+static char* get_file_perm(const char *path);
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -112,27 +111,18 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
     }
 }
 
-static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data )
-{
-    gchar *       p_url;
-
-    p_url = gtk_entry_get_text(GTK_ENTRY(editable) );
-    g_print( "%s\n",p_url );
-}
-
 /*****************************************************************
  * Read directory helper function.
  ****************************************************************/
-void ReadDirectory( GtkCList *clist, char *psz_dir)
+void ReadDirectory( GtkCList *clist, char *psz_dir )
 {
     intf_thread_t *p_intf = GtkGetIntf( clist );
     struct dirent **namelist;
     int n,i;
 
     if (psz_dir)
-       n = scandir(psz_dir, &namelist, 0, NULL);
-    else
-       n = scandir(".", &namelist, 0, NULL);
+       chdir(psz_dir);
+    n = scandir(".", &namelist, 0, NULL);
 
     if (n<0)
         perror("scandir");
@@ -147,7 +137,7 @@ void ReadDirectory( GtkCList *clist, char *psz_dir)
         {
             /* This is a list of strings. */
             ppsz_text[0] = namelist[i]->d_name;
-            ppsz_text[1] = get_file_type(namelist[i]->d_name);
+            ppsz_text[1] = get_file_perm(namelist[i]->d_name);
             if (strcmp(ppsz_text[1],"") == 0)
                 msg_Err( p_intf->p_sys->p_input, "File system error unknown filetype encountered.");
             gtk_clist_insert( clist, i, ppsz_text );
@@ -158,30 +148,77 @@ void ReadDirectory( GtkCList *clist, char *psz_dir)
     }
 }
 
-static char* get_file_type(const char *path)
+static char* get_file_perm(const char *path)
 {
     struct stat st;
+    char *perm;
 
+    perm = (char *) malloc(sizeof(char)*10);
+    strncpy( perm, "----------", sizeof("----------"));
     if (lstat(path, &st)==0)
     {
         if (S_ISLNK(st.st_mode))
-           return "link";
+            perm[0]= 'l';
         else if (S_ISDIR(st.st_mode))
-           return "dir";
+            perm[0]= 'd';
         else if (S_ISCHR(st.st_mode))
-           return "char device";
+            perm[0]= 'c';
         else if (S_ISBLK(st.st_mode))
-           return "block device";
+            perm[0]= 'b';
         else if (S_ISFIFO(st.st_mode))
-           return "fifo";
+            perm[0]= 'f';
         else if (S_ISSOCK(st.st_mode))
-           return "socket";
+            perm[0]= 's';
         else if (S_ISREG(st.st_mode))
-           return "file";
+            perm[0]= '-';
         else /* Unknown type is an error */
-           return "";
+            perm[0]= '?';
+        /* Get file permissions */
+        /* User */
+        if (st.st_mode & S_IRUSR)
+            perm[1]= 'r';
+        if (st.st_mode & S_IWUSR)
+            perm[2]= 'w';
+        if (st.st_mode & S_IXUSR)
+        {
+            if (st.st_mode & S_ISUID)
+                perm[3] = 's';
+            else
+                perm[3]= 'x';
+        }
+        else if (st.st_mode & S_ISUID)
+            perm[3] = 'S';
+        /* Group */
+        if (st.st_mode & S_IRGRP)
+            perm[4]= 'r';
+        if (st.st_mode & S_IWGRP)
+            perm[5]= 'w';
+        if (st.st_mode & S_IXGRP)
+        {
+            if (st.st_mode & S_ISGID)
+                perm[6] = 's';
+            else
+                perm[6]= 'x';
+        }
+        else if (st.st_mode & S_ISGID)
+            perm[6] = 'S';
+        /* Other */
+        if (st.st_mode & S_IROTH)
+            perm[7]= 'r';
+        if (st.st_mode & S_IWOTH)
+            perm[8]= 'w';
+        if (st.st_mode & S_IXOTH)
+        {
+            // 'sticky' bit
+            if (st.st_mode &S_ISVTX)
+                perm[9] = 't';
+            else
+                perm[9]= 'x';
+        }
+        else if (st.st_mode &S_ISVTX)
+            perm[9]= 'T';
     }
-    return "";
+    return perm;
 }
 
 /*
@@ -371,24 +408,13 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
 
     if (p_intf)
     {
-        psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
-        MediaURLOpenChanged( GTK_WIDGET(editable), psz_url );
+        if (p_intf->p_sys->b_autoplayfile == 1)
+        {
+            psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
+            MediaURLOpenChanged( GTK_WIDGET(editable), psz_url );
+        }
     }
 }
-
-
-void
-on_comboPrefs_entry_changed            (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-    intf_thread_t * p_intf = GtkGetIntf( editable );
-
-    if (p_intf)
-    {
-        PreferencesURLOpenChanged( editable, NULL );
-    }
-}
-
 
 void
 on_clistmedia_click_column             (GtkCList        *clist,
@@ -397,6 +423,7 @@ on_clistmedia_click_column             (GtkCList        *clist,
 {
     static GtkSortType sort_type = GTK_SORT_ASCENDING;
 
+    // Should sort on column
     switch(sort_type)
     {
         case GTK_SORT_ASCENDING:
@@ -422,35 +449,34 @@ on_clistmedia_select_row               (GtkCList        *clist,
 {
     gchar *text[2];
     gint ret;
+    struct stat st;
 
     ret = gtk_clist_get_text (clist, row, 0, text);
     if (ret)
     {
-        MediaURLOpenChanged( GTK_WIDGET(clist), text[0] );
+        if (lstat((char*)text[0], &st)==0)
+        {
+            if (S_ISDIR(st.st_mode))
+               ReadDirectory(clist, text[0]);
+            else
+               MediaURLOpenChanged(GTK_WIDGET(clist), text[0]);
+       }
+    }
+}
 
-//        /* DO NOT TRY THIS CODE IT SEGFAULTS */
-//        g_print( "dir\n");
-//        /* should be a gchar compare function */
-//        if (strlen(text[1])>0)
-//        {
-//            g_print( "checking dir\n");
-//            /* should be a gchar compare function */
-//            if (strncmp(text[1],"dir",3)==0)
-//            {
-//                g_print( "dir: %s\n", text[0]);
-//                ReadDirectory(clist, text[0]);
-//            }
-//            else
-//            {
-//                g_print( "playing file\n");
-//                MediaURLOpenChanged( GTK_WIDGET(clist), text[0] );
-//            }
-//        }
-//        else
-//        {
-//            g_print( "playing filer\n");
-//            MediaURLOpenChanged( GTK_WIDGET(clist), text[0] );
-//        }
+
+void
+on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
+                                        gpointer         user_data)
+{
+    intf_thread_t * p_intf = GtkGetIntf( togglebutton );
+
+    if (p_intf)
+    {
+        if (p_intf->p_sys->b_autoplayfile == 1)
+           p_intf->p_sys->b_autoplayfile = 0;
+        else
+           p_intf->p_sys->b_autoplayfile = 1;
     }
 }
 

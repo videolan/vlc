@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.3 2002/08/14 21:50:01 jpsaman Exp $
+ * $Id: familiar.c,v 1.4 2002/08/18 20:36:04 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -122,6 +122,8 @@ static int Open( vlc_object_t *p_this )
     /* Initialize Gtk+ thread */
     p_intf->p_sys->p_input = NULL;
 
+    p_intf->p_sys->b_autoplayfile = 1;
+
     p_intf->pf_run = Run;
 
     return( 0 );
@@ -183,10 +185,16 @@ static void Run( intf_thread_t *p_intf )
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
                           VOUT_TITLE " (Familiar Linux interface)");
 
-    /* Get the slider object */
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
 //    gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+
+    p_intf->p_sys->p_clist = GTK_CLIST( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "clistmedia" ) );
+    gtk_clist_set_column_visibility (GTK_CLIST (p_intf->p_sys->p_clist), 2, FALSE);
+    gtk_clist_set_column_visibility (GTK_CLIST (p_intf->p_sys->p_clist), 3, FALSE);
+    gtk_clist_set_column_visibility (GTK_CLIST (p_intf->p_sys->p_clist), 4, FALSE);
+    gtk_clist_column_titles_show (GTK_CLIST (p_intf->p_sys->p_clist));
 
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
