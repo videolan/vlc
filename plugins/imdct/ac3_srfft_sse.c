@@ -2,7 +2,7 @@
  * ac3_srfft_sse.c: accelerated SSE ac3 fft functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_srfft_sse.c,v 1.7 2001/10/31 11:55:53 reno Exp $
+ * $Id: ac3_srfft_sse.c,v 1.8 2001/11/09 10:02:31 reno Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -43,70 +43,83 @@
 #include "ac3_imdct.h"
 #include "ac3_srfft.h"
 
-static void fft_4_sse (complex_t *x);
-static void fft_8_sse (complex_t *x);
-static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
-         const complex_t *d, const complex_t *d_3);
-
-void _M( fft_64p ) ( complex_t *a )
-{
-    fft_8_sse(&a[0]); fft_4_sse(&a[8]); fft_4_sse(&a[12]);
-    fft_asmb_sse(2, &a[0], &a[8], &delta16[0], &delta16_3[0]);
-  
-    fft_8_sse(&a[16]), fft_8_sse(&a[24]);
-    fft_asmb_sse(4, &a[0], &a[16],&delta32[0], &delta32_3[0]);
-
-    fft_8_sse(&a[32]); fft_4_sse(&a[40]); fft_4_sse(&a[44]);
-    fft_asmb_sse(2, &a[32], &a[40], &delta16[0], &delta16_3[0]);
-
-    fft_8_sse(&a[48]); fft_4_sse(&a[56]); fft_4_sse(&a[60]);
-    fft_asmb_sse(2, &a[48], &a[56], &delta16[0], &delta16_3[0]);
-
-    fft_asmb_sse(8, &a[0], &a[32],&delta64[0], &delta64_3[0]);
-}
-
-void _M( fft_128p ) ( complex_t *a )
-{
-    fft_8_sse(&a[0]); fft_4_sse(&a[8]); fft_4_sse(&a[12]);
-    fft_asmb_sse(2, &a[0], &a[8], &delta16[0], &delta16_3[0]);
-  
-    fft_8_sse(&a[16]), fft_8_sse(&a[24]);
-    fft_asmb_sse(4, &a[0], &a[16],&delta32[0], &delta32_3[0]);
-
-    fft_8_sse(&a[32]); fft_4_sse(&a[40]); fft_4_sse(&a[44]);
-    fft_asmb_sse(2, &a[32], &a[40], &delta16[0], &delta16_3[0]);
-
-    fft_8_sse(&a[48]); fft_4_sse(&a[56]); fft_4_sse(&a[60]);
-    fft_asmb_sse(2, &a[48], &a[56], &delta16[0], &delta16_3[0]);
-
-    fft_asmb_sse(8, &a[0], &a[32],&delta64[0], &delta64_3[0]);
-
-    fft_8_sse(&a[64]); fft_4_sse(&a[72]); fft_4_sse(&a[76]);
-    /* fft_16(&a[64]); */
-    fft_asmb_sse(2, &a[64], &a[72], &delta16[0], &delta16_3[0]);
-
-    fft_8_sse(&a[80]); fft_8_sse(&a[88]);
-  
-    /* fft_32(&a[64]); */
-    fft_asmb_sse(4, &a[64], &a[80],&delta32[0], &delta32_3[0]);
-
-    fft_8_sse(&a[96]); fft_4_sse(&a[104]), fft_4_sse(&a[108]);
-    /* fft_16(&a[96]); */
-    fft_asmb_sse(2, &a[96], &a[104], &delta16[0], &delta16_3[0]);
-
-    fft_8_sse(&a[112]), fft_8_sse(&a[120]);
-    /* fft_32(&a[96]); */
-    fft_asmb_sse(4, &a[96], &a[112], &delta32[0], &delta32_3[0]);
-  
-    /* fft_128(&a[0]); */
-    fft_asmb_sse(16, &a[0], &a[64], &delta128[0], &delta128_3[0]);
-}
 
 static float hsqrt2_sse[] ATTR_ALIGN(16) =
     { 0.707106781188, 0.707106781188, -0.707106781188, -0.707106781188 };
 
 static float C_1_sse[] ATTR_ALIGN(16) =
     { -1.0, 1.0, -1.0, 1.0 };
+
+typedef struct {
+        int k;
+        void * C1;
+    } ck_sse_t;
+
+
+static void fft_4_sse (complex_t *x);
+static void fft_8_sse (complex_t *x);
+static void fft_asmb_sse (ck_sse_t * ck, int k, complex_t *x, complex_t *wTB,
+         const complex_t *d, const complex_t *d_3);
+
+void _M( fft_64p ) ( complex_t *a )
+{
+    ck_sse_t ck;
+    ck.C1 = C_1_sse;
+
+    fft_8_sse(&a[0]); fft_4_sse(&a[8]); fft_4_sse(&a[12]);
+    fft_asmb_sse(&ck, 2, &a[0], &a[8], &delta16[0], &delta16_3[0]);
+  
+    fft_8_sse(&a[16]), fft_8_sse(&a[24]);
+    fft_asmb_sse(&ck, 4, &a[0], &a[16],&delta32[0], &delta32_3[0]);
+
+    fft_8_sse(&a[32]); fft_4_sse(&a[40]); fft_4_sse(&a[44]);
+    fft_asmb_sse(&ck, 2, &a[32], &a[40], &delta16[0], &delta16_3[0]);
+
+    fft_8_sse(&a[48]); fft_4_sse(&a[56]); fft_4_sse(&a[60]);
+    fft_asmb_sse(&ck, 2, &a[48], &a[56], &delta16[0], &delta16_3[0]);
+
+    fft_asmb_sse(&ck, 8, &a[0], &a[32],&delta64[0], &delta64_3[0]);
+}
+
+void _M( fft_128p ) ( complex_t *a )
+{
+    ck_sse_t ck;
+    ck.C1 = C_1_sse;
+            
+    fft_8_sse(&a[0]); fft_4_sse(&a[8]); fft_4_sse(&a[12]);
+    fft_asmb_sse(&ck, 2, &a[0], &a[8], &delta16[0], &delta16_3[0]);
+  
+    fft_8_sse(&a[16]), fft_8_sse(&a[24]);
+    fft_asmb_sse(&ck, 4, &a[0], &a[16],&delta32[0], &delta32_3[0]);
+
+    fft_8_sse(&a[32]); fft_4_sse(&a[40]); fft_4_sse(&a[44]);
+    fft_asmb_sse(&ck, 2, &a[32], &a[40], &delta16[0], &delta16_3[0]);
+
+    fft_8_sse(&a[48]); fft_4_sse(&a[56]); fft_4_sse(&a[60]);
+    fft_asmb_sse(&ck, 2, &a[48], &a[56], &delta16[0], &delta16_3[0]);
+
+    fft_asmb_sse(&ck, 8, &a[0], &a[32],&delta64[0], &delta64_3[0]);
+
+    fft_8_sse(&a[64]); fft_4_sse(&a[72]); fft_4_sse(&a[76]);
+    /* fft_16(&a[64]); */
+    fft_asmb_sse(&ck, 2, &a[64], &a[72], &delta16[0], &delta16_3[0]);
+
+    fft_8_sse(&a[80]); fft_8_sse(&a[88]);
+  
+    /* fft_32(&a[64]); */
+    fft_asmb_sse(&ck, 4, &a[64], &a[80],&delta32[0], &delta32_3[0]);
+
+    fft_8_sse(&a[96]); fft_4_sse(&a[104]), fft_4_sse(&a[108]);
+    /* fft_16(&a[96]); */
+    fft_asmb_sse(&ck, 2, &a[96], &a[104], &delta16[0], &delta16_3[0]);
+
+    fft_8_sse(&a[112]), fft_8_sse(&a[120]);
+    /* fft_32(&a[96]); */
+    fft_asmb_sse(&ck, 4, &a[96], &a[112], &delta32[0], &delta32_3[0]);
+  
+    /* fft_128(&a[0]); */
+    fft_asmb_sse(&ck, 16, &a[0], &a[64], &delta128[0], &delta128_3[0]);
+}
 
 static void fft_4_sse (complex_t *x)
 {
@@ -195,15 +208,17 @@ static void fft_8_sse (complex_t *x)
     : "a" (x), "c" (hsqrt2_sse), "d" (C_1_sse));
 }
 
-static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
+static void fft_asmb_sse (ck_sse_t * ck, int k, complex_t *x, complex_t *wTB,
          const complex_t *d, const complex_t *d_3)
 {
+    ck->k = k;
+    
     __asm__ __volatile__ (
     ".align 16\n"
     "pushl %%ebp\n"
     "movl %%esp, %%ebp\n"
 
-    "subl $4, %%esp\n"
+    "subl $8, %%esp\n"
     
     "pushl %%eax\n"
     "pushl %%ebx\n"
@@ -212,10 +227,14 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "pushl %%esi\n"
     "pushl %%edi\n"
 
-    "movl %%ecx, -4(%%ebp)\n"   /* k */
-    "shll $4, %%ecx\n"          /* 16k */ ///
+    "movl 4(%%ecx), %%ebx\n"
+    "movl %%ebx, -4(%%ebp)\n"
+    "movl (%%ecx), %%ecx\n"
+
+    "movl %%ecx, -8(%%ebp)\n"   /* k */
     "addl $8, %%edx\n" 
     "addl $8, %%esi\n"
+    "shll $4, %%ecx\n"          /* 16k */
 
     /* TRANSZERO and TRANS */
     ".align 16\n"
@@ -235,13 +254,14 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "movhlps %%xmm5, %%xmm7\n"      /* wT[1].im * d[1].im | wT[1].re * d[1].im */
     "movlhps %%xmm6, %%xmm5\n"      /* wB[1].im * d3[1].re | wB[1].re * d3[1].re | wT[1].im * d[1].re | wT[1].re * d[1].re */
     "shufps $0xb1, %%xmm6, %%xmm7\n" /* wB[1].re * d3[1].im | wB[i].im * d3[1].im | wT[1].re * d[1].im | wT[1].im * d[1].im */
+    "movl  -4(%%ebp), %%ebx\n"
     "movaps (%%ebx), %%xmm4\n"
     "mulps   %%xmm4, %%xmm7\n"
     "addps   %%xmm7, %%xmm5\n"      /* wB[1] * d3[1] | wT[1] * d[1] */
     "movlhps %%xmm5, %%xmm1\n"      /* d[1] * wT[1] | wT[0] */
     "shufps  $0xe4, %%xmm5, %%xmm2\n" /* d3[1] * wB[1] | wB[0] */
     "movaps  %%xmm1, %%xmm3\n"      /* d[1] * wT[1] | wT[0] */
-    "leal   (%%eax, %%ecx, 2), %%esp\n"
+    "leal   (%%eax, %%ecx, 2), %%ebx\n"
     "addps  %%xmm2, %%xmm1\n"       /* u */
     "subps  %%xmm2, %%xmm3\n"       /* v */
     "mulps  %%xmm4, %%xmm3\n"
@@ -254,14 +274,14 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "addps  %%xmm3, %%xmm5\n"
     "subps  %%xmm3, %%xmm6\n"
     "movaps %%xmm0, (%%eax)\n"
-    "movaps %%xmm2, (%%esp)\n"
+    "movaps %%xmm2, (%%ebx)\n"
     "movaps %%xmm5, (%%eax, %%ecx)\n"
-    "movaps %%xmm6, (%%esp, %%ecx)\n"
+    "movaps %%xmm6, (%%ebx, %%ecx)\n"
     "addl $16, %%eax\n"
     "addl $16, %%edi\n"
     "addl  $8, %%edx\n"
     "addl  $8, %%esi\n"
-    "decl -4(%%ebp)\n"
+    "decl -8(%%ebp)\n"
 
     ".align 16\n"
 ".loop:\n"
@@ -295,6 +315,7 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "mulps   %%xmm5, %%xmm4\n"  /* wB[0].im * d3[0].im | wB[0].re * d3[0].im | wB[0].im * d3[0].re | wB[0].re * d3[0].re */
     "mulps   %%xmm7, %%xmm6\n"  /* wB[1].im * d3[1].im | wB[1].re * d3[1].im | wB[1].im * d3[1].re | wB[1].re * d3[1].re */
     "shufps $0xb1, %%xmm2, %%xmm1\n" /* d[1].im * wT[1].re | d[1].im * wT[1].im | d[0].im * wT[0].re | d[0].im * wT[0].im */
+    "movl -4(%%ebp), %%ebx\n"
     "movaps (%%ebx), %%xmm3\n"  /* 1.0 | -1.0 | 1.0 | -1.0 */
 
     "movhlps %%xmm4, %%xmm5\n"  /* wB[0].im * d3[0].im | wB[0].re * d3[0].im */
@@ -310,7 +331,7 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "addps  %%xmm4, %%xmm0\n"   /* u */
     "subps  %%xmm4, %%xmm1\n"   /* v */
     "movaps (%%eax), %%xmm6\n"  /* x[1] | x[0] */
-    "leal   (%%eax, %%ecx, 2), %%esp\n"
+    "leal   (%%eax, %%ecx, 2), %%ebx\n"
     "mulps  %%xmm3, %%xmm1\n"
     "addl $16, %%edi\n"
     "addl $16, %%esi\n"
@@ -321,15 +342,15 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "addps  %%xmm0, %%xmm6\n"
     "subps  %%xmm0, %%xmm2\n"
     "movaps %%xmm6, (%%eax)\n"
-    "movaps %%xmm2, (%%esp)\n"
+    "movaps %%xmm2, (%%ebx)\n"
     "addps  %%xmm1, %%xmm7\n"
     "subps  %%xmm1, %%xmm4\n"
     "addl $16, %%edx\n"
     "movaps %%xmm7, (%%eax, %%ecx)\n"
-    "movaps %%xmm4, (%%esp, %%ecx)\n"
+    "movaps %%xmm4, (%%ebx, %%ecx)\n"
 
     "addl $16, %%eax\n"
-    "decl -4(%%ebp)\n"
+    "decl -8(%%ebp)\n"
     "jnz .loop\n"
 
     ".align 16\n"
@@ -341,9 +362,9 @@ static void fft_asmb_sse (int k, complex_t *x, complex_t *wTB,
     "popl %%ebx\n"
     "popl %%eax\n"
     
-    "addl $4, %%esp\n"
-
+    "addl $8, %%esp\n"
+    
     "leave\n"
-    : "=c" (k), "=a" (x), "=D" (wTB)
-    : "c" (k), "a" (x), "D" (wTB), "d" (d), "S" (d_3), "b" (C_1_sse) );
+    : "=a" (x), "=D" (wTB)
+    : "c" (ck), "a" (x), "D" (wTB), "d" (d), "S" (d_3) );
 }
