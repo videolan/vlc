@@ -3536,12 +3536,12 @@ else
 fi
 rm -f conftest*
 
-echo $ac_n "checking if \$CC groks Altivec inline assembly""... $ac_c" 1>&6
-echo "configure:3541: checking if \$CC groks Altivec inline assembly" >&5
+echo $ac_n "checking if \$CC groks Altivec code""... $ac_c" 1>&6
+echo "configure:3541: checking if \$CC groks Altivec code" >&5
 cat > conftest.$ac_ext <<EOF
 #line 3543 "configure"
 #include "confdefs.h"
-void quux(){void *p;asm("mtspr 256,%0"::"r"(-1));}
+void quux(){vec_mtvscr( (vector unsigned int)(0) );}
 int main() {
 
 ; return 0; }

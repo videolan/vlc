@@ -240,8 +240,8 @@ AC_TRY_COMPILE([void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],,
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
-AC_MSG_CHECKING([if \$CC groks Altivec inline assembly])
-AC_TRY_COMPILE([void quux(){void *p;asm("mtspr 256,%0"::"r"(-1));}],,
+AC_MSG_CHECKING([if \$CC groks Altivec code])
+AC_TRY_COMPILE([void quux(){vec_mtvscr( (vector unsigned int)(0) );}],,
   ACCEL_MODULES="${ACCEL_MODULES} ${ALTIVEC_MODULES}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
