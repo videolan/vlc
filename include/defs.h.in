@@ -404,3 +404,6 @@
 /* Indicate whether we should use SDL/SDL.h or SDL11/SDL.h */
 #undef SDL_INCLUDE_FILE
 
+/* Define if <X11/extensions/dmps.h> defines DPMSInfo. */
+#undef DPMSINFO_IN_DPMS_H
+

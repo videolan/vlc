@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.6 2002/01/21 23:57:46 massiot Exp $
+ * $Id: modules_plugin.h,v 1.7 2002/01/24 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -198,6 +198,7 @@ module_error( void )
     (p_symbols)->input_DelArea = input_DelArea; \
     (p_symbols)->InitBitstream = InitBitstream; \
     (p_symbols)->NextDataPacket = NextDataPacket; \
+    (p_symbols)->BitstreamNextDataPacket = BitstreamNextDataPacket; \
     (p_symbols)->DecoderError = DecoderError; \
     (p_symbols)->input_InitStream = input_InitStream; \
     (p_symbols)->input_EndStream = input_EndStream; \

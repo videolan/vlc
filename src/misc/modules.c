@@ -2,10 +2,11 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.49 2002/01/21 00:52:07 sam Exp $
+ * $Id: modules.c,v 1.50 2002/01/24 13:32:53 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
+ *          Hans-Peter Jansen <hpj@urpla.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -274,23 +275,23 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
 
     if( psz_name != NULL && *psz_name )
     {
-#define MAX_PLUGIN_NAME 128
         /* A module name was requested. Use the first matching one. */
-        char      psz_realname[ MAX_PLUGIN_NAME + 1 ];
+        char     *psz_realname = NULL;
         int       i_index;
         boolean_t b_ok = 0;
 
-        for( i_index = 0;
-             i_index < MAX_PLUGIN_NAME
-              && psz_name[ i_index ]
-              && psz_name[ i_index ] != ':';
-             i_index++ )
+        psz_realname = strdup( psz_name );
+        if( psz_realname )
         {
-            psz_realname[ i_index ] = psz_name[ i_index ];
+            char *p;
+            p = strchr( psz_realname, ':' );
+            if( p )
+            {
+                *p = '\0';
+            }
+            psz_name = psz_realname;
         }
-
-        psz_realname[ i_index ] = '\0';
-
+            
         for( p_module = p_module_bank->first;
              p_module != NULL;
              p_module = p_module->next )
@@ -313,8 +314,7 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
                  !b_ok && p_module->pp_shortcuts[i_index];
                  i_index++ )
             {
-                b_ok = !strcmp( psz_realname,
-                                p_module->pp_shortcuts[i_index] );
+                b_ok = !strcmp( psz_name, p_module->pp_shortcuts[i_index] );
             }
 
             if( b_ok )
@@ -331,7 +331,12 @@ module_t * module_Need( int i_capability, char *psz_name, probedata_t *p_data )
         else
         {
             intf_ErrMsg( "module error: requested %s module `%s' not found",
-                         GetCapabilityName( i_capability ), psz_realname );
+                         GetCapabilityName( i_capability ), psz_name );
+        }
+
+        if( psz_realname )
+        {
+            free( psz_realname );
         }
     }
     else

@@ -148,6 +148,10 @@ E: aholtzma@ess.engr.uvic.ca
 D: AC3 decoder
 D: MPEG video decoder
 
+N: Hans-Peter Jansen
+E: hpj@urpla.net
+D: patch for module options handling
+
 N: Eugenio Jarosiewicz
 E: ej0@cise.ufl.edu
 C: ej
