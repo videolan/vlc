@@ -180,7 +180,6 @@ HEADERS_include = \
 	include/input_ext-dec.h \
 	include/input_ext-intf.h \
 	include/input_ext-plugins.h \
-	include/interface.h \
 	include/intf_eject.h \
 	include/iso_lang.h \
 	include/httpd.h \
@@ -200,6 +199,7 @@ HEADERS_include = \
 	include/vlc_common.h \
 	include/vlc_config.h \
 	include/vlc_cpu.h \
+	include/vlc_interface.h \
 	include/vlc_messages.h \
 	include/vlc_objects.h \
 	include/vlc_playlist.h \
