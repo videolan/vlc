@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.96 2003/09/13 17:42:15 fenrir Exp $
+ * $Id: input_ext-intf.h,v 1.97 2003/11/06 16:36:41 nitrox Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -68,6 +68,7 @@ struct es_descriptor_t
     decoder_fifo_t *        p_decoder_fifo;
     void *                  p_waveformatex;
     void *                  p_bitmapinfoheader;
+    void *                  p_spuinfo;
 
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */

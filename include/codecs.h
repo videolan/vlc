@@ -2,7 +2,7 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.7 2003/11/05 00:17:50 hartman Exp $
+ * $Id: codecs.h,v 1.8 2003/11/06 16:36:40 nitrox Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -67,6 +67,12 @@ typedef struct {
     int        bmiColors[1];
 } BITMAPINFO, *LPBITMAPINFO;
 #endif
+
+/* dvb_spuinfo_t exports the id of the selected track to the decoder */
+typedef struct
+{
+    unsigned int i_id;
+} dvb_spuinfo_t;
 
 /* WAVE form wFormatTag IDs */
 

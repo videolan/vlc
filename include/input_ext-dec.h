@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.81 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: input_ext-dec.h,v 1.82 2003/11/06 16:36:41 nitrox Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -109,6 +109,7 @@ struct decoder_fifo_t
     sout_instance_t *   p_sout;
     void *              p_waveformatex;
     void *              p_bitmapinfoheader;
+    void *              p_spuinfo;
 
     decoder_t *         p_dec;
 };

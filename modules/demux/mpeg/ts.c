@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.39 2003/11/03 14:02:54 gbazin Exp $
+ * $Id: ts.c,v 1.40 2003/11/06 16:36:41 nitrox Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -63,6 +63,36 @@ struct demux_sys_t
     module_t *   p_module;
     mpeg_demux_t mpeg;
 };
+
+
+
+#define local_iso639_getlang(p1, p2)                                         \
+{                                                                           \
+    const iso639_lang_t * p_iso;                                            \
+    p_iso = GetLang_2T((char*)(p1));                                        \
+    if( p_iso && strcmp(p_iso->psz_native_name,"Unknown"))                  \
+    {                                                                       \
+        if( p_iso->psz_native_name[0] )                                     \
+            strncpy( (p2), p_iso->psz_native_name, 20 );                    \
+        else                                                                \
+            strncpy( (p2), p_iso->psz_eng_name, 20 );                       \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        p_iso = GetLang_2B((char*)(p1));                                    \
+        if ( p_iso )                                                        \
+        {                                                                   \
+            if( p_iso->psz_native_name[0] )                                 \
+                strncpy( (p2), p_iso->psz_native_name, 20 );                \
+            else                                                            \
+                strncpy( (p2), p_iso->psz_eng_name, 20 );                   \
+        }                                                                   \
+        else                                                                \
+        {                                                                   \
+            strncpy( (p2), p1, 3 );                                         \
+        }                                                                   \
+    }                                                                       \
+}
 
 /*****************************************************************************
  * Local prototypes
@@ -1608,9 +1638,58 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     }
                     else if( p_dr->i_tag == 0x59 )
                     {
+                        uint16_t                n;
+                        es_descriptor_t *       p_dvbsub_es;
+                        es_ts_data_t            dvbsub_demux_data;
+                        dvb_spuinfo_t*          p_info;
+                        dvbpsi_subtitling_dr_t* sub;
+                        demux_data.b_dvbsub = 1;
+                        demux_data.i_dvbsub_es_count = 0;
+
                         /* DVB subtitle */
                         i_fourcc = VLC_FOURCC( 'd', 'v', 'b', 's' );
                         i_cat    = SPU_ES;
+
+                        sub = dvbpsi_DecodeSubtitlingDr( p_dr );
+                        for( n = 0; n < sub->i_subtitles_number; n++)
+                        {
+                            /* As each subtitle ES contains n languages, 
+                             * We are going to create n fake ES for the n
+                             * tracks */
+                            local_iso639_getlang(
+                                    sub->p_subtitle[n].i_iso6392_language_code,
+                                    psz_desc);
+                            p_dvbsub_es = input_AddES( p_input,
+                                                       p_pgrm,
+                                                       0xfe12+n,
+                                                       SPU_ES,
+                                                       psz_desc,
+                                                       sizeof(es_ts_data_t) );
+                            if( p_dvbsub_es == NULL )
+                            {
+                                msg_Err( p_input, "could not add ES %d",
+                                                                p_es->i_pid );
+                                p_input->b_error = 1;
+                                return;
+                            }
+
+                            p_dvbsub_es->i_fourcc = i_fourcc;
+                            p_dvbsub_es->i_stream_id = i_stream_id;
+                            p_info = malloc(sizeof(dvb_spuinfo_t));
+                            p_info->i_id =
+                                    sub->p_subtitle[n].i_composition_page_id;
+                            p_dvbsub_es->p_spuinfo = (void*) p_info;
+                            memcpy( p_dvbsub_es->p_demux_data,
+                                    &dvbsub_demux_data,
+                                    sizeof(es_ts_data_t) );
+                            ((es_ts_data_t *)p_dvbsub_es->p_demux_data)
+                                                ->i_continuity_counter = 0xFF;
+                            // Finaly we add this stream to the index
+                            demux_data.p_dvbsub_es[
+                                demux_data.i_dvbsub_es_count++] = p_dvbsub_es;
+                            i_cat = UNKNOWN_ES;
+                        }
+
                     }
                 }
                 if( i_fourcc == VLC_FOURCC(0,0,0,0) )
@@ -1629,6 +1708,8 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                 {
                     dvbpsi_iso639_dr_t *p_decoded =
                                                 dvbpsi_DecodeISO639Dr( p_dr );
+                    local_iso639_getlang(p_decoded->i_iso_639_code, psz_desc);
+#if 0
                     if( p_decoded->i_code_count > 0 )
                     {
                         const iso639_lang_t * p_iso;
@@ -1662,6 +1743,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                             }
                         }
                     }
+#endif
                 }
                 switch( p_es->i_type )
                 {

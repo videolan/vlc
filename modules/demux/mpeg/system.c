@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.18 2003/10/25 00:49:14 sam Exp $
+ * $Id: system.c,v 1.19 2003/11/06 16:36:41 nitrox Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -418,6 +418,29 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             input_DecodePES( p_es->p_decoder_fifo, p_pes );
         }
+        else if ( p_es->p_decoder_fifo == NULL &&
+                   ((es_ts_data_t*)p_es->p_demux_data)->b_dvbsub)
+        {
+            es_descriptor_t* p_dvbsub;
+            uint8_t          i_count;
+            uint8_t         i;
+            i_count = ((es_ts_data_t*)p_es->p_demux_data)->i_dvbsub_es_count;
+
+            // If a language is selected, we send the packet to the decoder
+            for(i = 0; i < i_count; i++)
+            {
+                p_dvbsub = ((es_ts_data_t*)p_es->p_demux_data)->p_dvbsub_es[i];
+                if(p_dvbsub->p_decoder_fifo!=NULL)
+                {
+                    input_DecodePES ( p_dvbsub->p_decoder_fifo, p_pes );
+                    break;
+                }
+            }
+            if(i == i_count)
+            {
+                input_DeletePES( p_input->p_method_data, p_pes );
+            }
+        }
         else
         {
             msg_Err( p_input, "no fifo to receive PES %p "
@@ -444,7 +467,7 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
     /* If we lost data, insert a NULL data packet (philosophy : 0 is quite
      * often an escape sequence in decoders, so that should make them wait
      * for the next start code). */
-    if( b_packet_lost )
+    if( b_packet_lost  && !((es_ts_data_t*)p_es->p_demux_data)->b_dvbsub)
     {
         input_NullPacket( p_input, p_es );
     }
@@ -1187,6 +1210,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     vlc_bool_t          b_trash = 0;             /* Is the packet unuseful ? */
     vlc_bool_t          b_lost = 0;             /* Was there a packet loss ? */
     vlc_bool_t          b_psi = 0;                        /* Is this a PSI ? */
+    vlc_bool_t          b_dvbsub = 0;            /* Is this a dvb subtitle ? */
     vlc_bool_t          b_pcr = 0;                   /* Does it have a PCR ? */
     es_descriptor_t *   p_es = NULL;
     es_ts_data_t *      p_es_demux = NULL;
@@ -1230,6 +1254,10 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         {
             b_psi = 1;
         }
+        else if ( p_es_demux->b_dvbsub )
+        {
+            b_dvbsub = 1;
+        }
         else
         {
             p_pgrm_demux = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
@@ -1243,7 +1271,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         /* Not selected. Just read the adaptation field for a PCR. */
         b_trash = 1;
     }
-    else if( p_es->p_decoder_fifo == NULL && !b_psi )
+    else if( p_es->p_decoder_fifo == NULL && !b_psi && !b_dvbsub )
     {
         b_trash = 1;
     }
@@ -1256,7 +1284,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
      * may still be null. Who said it was ugly ?
      * I have written worse. --Meuuh */
     if( ( p_es ) &&
-        ((p_es->p_decoder_fifo != NULL) || b_psi || b_pcr ) )
+        ((p_es->p_decoder_fifo != NULL) || b_psi || b_pcr || b_dvbsub) )
     {
         p_es->c_packets++;
 

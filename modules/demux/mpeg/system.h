@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.11 2003/11/03 14:02:54 gbazin Exp $
+ * $Id: system.h,v 1.12 2003/11/06 16:36:41 nitrox Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -245,6 +245,11 @@ typedef struct es_ts_data_t
     /* mpeg4 in TS data specific */
     int                     b_mpeg4;
     uint16_t                i_es_id;
+
+    /* dvb subtitles in TS data specific */
+    vlc_bool_t              b_dvbsub;
+    uint8_t                 i_dvbsub_es_count;
+    es_descriptor_t*        p_dvbsub_es[256];
 
     es_mpeg4_descriptor_t   *p_es_descr;   /* es_descr of IOD */
 
