@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.122 2001/06/14 02:47:45 sam Exp $
+ * $Id: input.c,v 1.123 2001/06/15 05:12:30 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -424,7 +424,6 @@ static int InitThread( input_thread_t * p_input )
     if( p_input->b_error )
     {
         /* We barfed -- exit nicely */
-        p_input->pf_close( p_input );
         module_Unneed( p_input->p_input_module );
         return( -1 );
     }

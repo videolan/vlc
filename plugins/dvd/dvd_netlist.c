@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.10 2001/06/13 00:03:08 stef Exp $
+ * $Id: dvd_netlist.c,v 1.11 2001/06/15 05:12:30 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -250,21 +250,40 @@ struct iovec * DVDGetiovec( void * p_method_data )
     p_netlist = (dvd_netlist_t *)p_method_data;
     
     /* check that we have enough free iovec */
-    while( (
+    if( (
      (p_netlist->i_iovec_end - p_netlist->i_iovec_start)
         & p_netlist->i_nb_iovec ) < p_netlist->i_read_once )
     {
         intf_WarnMsg( 12, "input info: waiting for free iovec" );
         msleep( INPUT_IDLE_SLEEP );
+
+        while( (
+         (p_netlist->i_iovec_end - p_netlist->i_iovec_start)
+            & p_netlist->i_nb_iovec ) < p_netlist->i_read_once )
+        {
+            msleep( INPUT_IDLE_SLEEP );
+        }
+
+        intf_WarnMsg( 12, "input info: found free iovec" );
     }
 
-    while( (
+    if( (
      (p_netlist->i_data_end - p_netlist->i_data_start)
         & p_netlist->i_nb_data ) < p_netlist->i_read_once )
     {
         intf_WarnMsg( 12, "input info: waiting for free data packet" );
         msleep( INPUT_IDLE_SLEEP );
+
+        while( (
+         (p_netlist->i_data_end - p_netlist->i_data_start)
+            & p_netlist->i_nb_data ) < p_netlist->i_read_once )
+        {
+            msleep( INPUT_IDLE_SLEEP );
+        }
+
+        intf_WarnMsg( 12, "input info: found free data packet" );
     }
+
     /* readv only takes contiguous buffers 
      * so, as a solution, we chose to have a FIFO a bit longer
      * than i_nb_data, and copy the begining of the FIFO to its end

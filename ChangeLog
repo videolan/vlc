@@ -4,6 +4,9 @@
 
 HEAD
 
+  * Unrolled two loops in dvd_netlist.c to prevent message flooding.
+  * DVD input stuttering fix by Jon Lech Johansen.
+  * Removed a lock that caused late frames in DVDRead.
   * Added gprof profiling support with --enable-profiling.
   * Fully working Windows DVD ioctl support by Jon Lech Johansen.
   * DirectX enhancements by Gildas Bazin, such as software rendering.

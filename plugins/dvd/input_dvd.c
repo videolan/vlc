@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.75 2001/06/15 01:22:58 stef Exp $
+ * $Id: input_dvd.c,v 1.76 2001/06/15 05:12:30 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -157,7 +157,6 @@ static int DVDProbe( probedata_t *p_data )
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
-    dvdcss_handle dvdhandle;
     int i_score = 5;
 
     if( TestMethod( INPUT_METHOD_VAR, "dvd" ) )
@@ -178,12 +177,6 @@ static int DVDProbe( probedata_t *p_data )
         i_score = 90;
 #endif /* HAVE_CSS */
         psz_name += 4;
-    }
-
-    dvdhandle = dvdcss_open( psz_name, DVDCSS_INIT_QUIET );
-    if( dvdhandle == NULL )
-    {
-        return( 0 );
     }
 
     return( i_score );
@@ -211,25 +204,7 @@ static void DVDInit( input_thread_t * p_input )
     p_input->p_plugin_data = (void *)p_dvd;
     p_input->p_method_data = NULL;
 
-    /* XXX: put this shit in an access plugin */
-    if( strlen( p_input->p_source ) > 4
-         && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
-    {
-        p_dvd->dvdhandle = dvdcss_open( p_input->p_source + 4,
-                                        DVDCSS_INIT_QUIET );
-    }
-    else
-    {
-        p_dvd->dvdhandle = dvdcss_open( p_input->p_source,
-                                        DVDCSS_INIT_QUIET );
-    }
-
-    if( p_dvd->dvdhandle == NULL )
-    {
-        free( p_dvd );
-        p_input->b_error = 1;
-        return;
-    }
+    p_dvd->dvdhandle = (dvdcss_handle) p_input->i_handle;
 
     dvdcss_seek( p_dvd->dvdhandle, 0 );
 
@@ -336,6 +311,56 @@ static void DVDInit( input_thread_t * p_input )
 }
 
 /*****************************************************************************
+ * DVDOpen: open dvd
+ *****************************************************************************/
+static void DVDOpen( struct input_thread_s *p_input )
+{
+    dvdcss_handle dvdhandle;
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* If we are here we can control the pace... */
+    p_input->stream.b_pace_control = 1;
+
+    p_input->stream.b_seekable = 1;
+    p_input->stream.p_selected_area->i_size = 0;
+
+    p_input->stream.p_selected_area->i_tell = 0;
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    /* XXX: put this shit in an access plugin */
+    if( strlen( p_input->p_source ) > 4
+         && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        dvdhandle = dvdcss_open( p_input->p_source + 4,
+                                        DVDCSS_INIT_QUIET );
+    }
+    else
+    {
+        dvdhandle = dvdcss_open( p_input->p_source,
+                                        DVDCSS_INIT_QUIET );
+    }
+
+    if( dvdhandle == NULL )
+    {
+        p_input->b_error = 1;
+        return;
+    }
+
+    p_input->i_handle = (int) dvdhandle;
+}
+
+/*****************************************************************************
+ * DVDClose: close dvd
+ *****************************************************************************/
+static void DVDClose( struct input_thread_s *p_input )
+{
+    /* Clean up libdvdcss */
+    dvdcss_close( (dvdcss_handle) p_input->i_handle );
+}
+
+/*****************************************************************************
  * DVDEnd: frees unused data
  *****************************************************************************/
 static void DVDEnd( input_thread_t * p_input )
@@ -347,9 +372,6 @@ static void DVDEnd( input_thread_t * p_input )
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
 
     IfoDestroy( p_dvd->p_ifo );
-
-    /* Clean up libdvdcss */
-    dvdcss_close( p_dvd->dvdhandle );
 
     free( p_dvd );
 
@@ -1054,16 +1076,6 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
                      p_dvd->i_prg_cell, p_dvd->i_cell, p_dvd->i_chapter );
 */
 
-    return;
-}
-
-static void DVDOpen     ( struct input_thread_s *p_input )
-{
-    return;
-}
-
-static void DVDClose    ( struct input_thread_s *p_input )
-{
     return;
 }
 
