@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.20 2003/06/09 14:04:20 asmax Exp $
+ * $Id: x11_window.cpp,v 1.21 2003/06/09 19:08:33 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -262,8 +262,11 @@ bool X11Window::ProcessOSEvent( Event *evt )
             button = 0;
             if( ((XButtonEvent *)p2 )->state & ControlMask )
             {
-                // Control key pressed
                 button |= KEY_CTRL;
+            } 
+            if( ((XButtonEvent *)p2 )->state & ShiftMask )
+            {
+                button |= KEY_SHIFT;
             }
 
             switch( ( (XButtonEvent *)p2 )->button )
@@ -309,9 +312,13 @@ bool X11Window::ProcessOSEvent( Event *evt )
             button = 0;
             if( ((XButtonEvent *)p2 )->state & ControlMask )
             {
-                // Control key pressed
                 button |= KEY_CTRL;
             }
+            if( ((XButtonEvent *)p2 )->state & ShiftMask )
+            {
+                button |= KEY_SHIFT;
+            }
+
             switch( ( (XButtonEvent *)p2 )->button )
             {
                 case 1:

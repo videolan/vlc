@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.17 2003/06/09 14:04:20 asmax Exp $
+ * $Id: skin_common.h,v 1.18 2003/06/09 19:08:33 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -43,6 +43,7 @@ class wxIcon;
 #define MOUSE_LEFT (1<<0)
 #define MOUSE_RIGHT (1<<1)
 #define KEY_CTRL (1<<2)
+#define KEY_SHIFT (1<<3)
 
 
 //---------------------------------------------------------------------------

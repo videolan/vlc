@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.15 2003/06/05 21:22:27 gbazin Exp $
+ * $Id: fileinfo.cpp,v 1.16 2003/06/09 19:08:33 asmax Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -117,7 +117,7 @@ void FileInfo::UpdateFileInfo()
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
 
-    if( !p_input || p_input->b_dead )
+    if( !p_input || p_input->b_dead || !p_input->psz_name )
     {
         if( fileinfo_root )
         {
