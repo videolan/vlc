@@ -934,8 +934,20 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
         }
         else
         {
+            module_config_t *p_item;
+
             p_module = p_cache_entry->p_module;
             p_module->b_loaded = VLC_FALSE;
+
+            /* For now we force loading if the module's config contains
+             * callbacks or actions.
+             * Could be optimized by adding an API call.*/
+            for( p_item = p_module->p_config;
+                 p_item->i_type != CONFIG_HINT_END; p_item++ )
+            {
+                if( p_item->pf_callback || p_item->i_action )
+                    p_module = AllocatePlugin( p_this, psz_file );
+            }
         }
     }
 
