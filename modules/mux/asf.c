@@ -352,17 +352,20 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_FOURCC( 'a', '5', '2', ' ' ):
                     tk->i_tag = WAVE_FORMAT_A52;
                     tk->psz_name = "A/52";
+                    i_bitspersample = 0;
                     break;
                 case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
 #if 1
                     tk->psz_name = "MPEG Audio Layer 3";
                     tk->i_tag = WAVE_FORMAT_MPEGLAYER3;
+                    i_bitspersample = 0;
                     i_blockalign = 1;
                     i_extra = 12;
                     break;
 #else
                     tk->psz_name = "MPEG Audio Layer 1/2";
                     tk->i_tag = WAVE_FORMAT_MPEG;
+                    i_bitspersample = 0;
                     i_blockalign = 1;
                     i_extra = 22;
                     break;
