@@ -67,14 +67,16 @@
 /*****************************************************************************
  * Macros used to build the configuration structure.
  *****************************************************************************/
-#define MODULE_CONFIG_START( text ) \
+#define MODULE_CONFIG_START \
 static module_config_t p_config[] = { \
-    { MODULE_CONFIG_ITEM_START, text, NULL, NULL, NULL },
+    { MODULE_CONFIG_ITEM_START, NULL, NULL, NULL, NULL },
 
-#define MODULE_CONFIG_END   \
+#define MODULE_CONFIG_END \
     { MODULE_CONFIG_ITEM_END, NULL, NULL, NULL, NULL } \
 };
 
+#define ADD_WINDOW( text ) \
+    { MODULE_CONFIG_ITEM_WINDOW, text, NULL, NULL, NULL },
 #define ADD_FRAME( text ) \
     { MODULE_CONFIG_ITEM_FRAME, text, NULL, NULL, NULL },
 #define ADD_PANE( text ) \

@@ -43,7 +43,8 @@
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
-MODULE_CONFIG_START( "Configuration for dsp module" )
+MODULE_CONFIG_START
+ADD_WINDOW( "Configuration for dsp module" )
     ADD_FRAME( "OSS Device" )
         ADD_FILE( "Device name: ", MODULE_VAR(device), NULL )
 MODULE_CONFIG_END
@@ -51,7 +52,7 @@ MODULE_CONFIG_END
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void dsp_aout_getfunctions( function_list_t * p_function_list );
+extern void aout_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * InitModule: get the module structure and configuration.
@@ -89,7 +90,7 @@ int ActivateModule( module_t * p_module )
         return( -1 );
     }
 
-    dsp_aout_getfunctions( &p_module->p_functions->aout );
+    aout_getfunctions( &p_module->p_functions->aout );
 
     p_module->p_config = p_config;
 

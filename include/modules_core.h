@@ -24,20 +24,33 @@
  * Inline functions for handling dynamic modules
  *****************************************************************************/
 
-/* Function to load a dynamic module, returns 0 if successful. */
+/*****************************************************************************
+ * module_load: load a dynamic library
+ *****************************************************************************
+ * This function loads a dynamically linked library using a system dependant
+ * method, and returns a non-zero value on error, zero otherwise.
+ *****************************************************************************/
 static __inline__ int
 module_load( char * psz_filename, module_handle_t * handle )
 {
 #ifdef SYS_BEOS
     *handle = load_add_on( psz_filename );
-    return( *handle >= 0 );
+    return( *handle < 0 );
 #else
-    *handle = dlopen( psz_filename, RTLD_NOW | RTLD_GLOBAL );
-    return( *handle != NULL );
+    /* Do not open modules with RTLD_GLOBAL, or we are going to get namespace
+     * collisions when two modules have common public symbols */
+    *handle = dlopen( psz_filename, RTLD_NOW );
+    return( *handle == NULL );
 #endif
 }
 
-/* Unload a dynamic module. */
+/*****************************************************************************
+ * module_unload: unload a dynamic library
+ *****************************************************************************
+ * This function unloads a previously opened dynamically linked library
+ * using a system dependant method. No return value is taken in consideration,
+ * since some libraries sometimes refuse to close properly.
+ *****************************************************************************/
 static __inline__ void
 module_unload( module_handle_t handle )
 {
@@ -49,7 +62,15 @@ module_unload( module_handle_t handle )
     return;
 }
 
-/* Get a given symbol from a module. */
+/*****************************************************************************
+ * module_getsymbol: get a symbol from a dynamic library
+ *****************************************************************************
+ * This function queries a loaded library for a symbol specified in a
+ * string, and returns a pointer to it.
+ * FIXME: under Unix we should maybe check for dlerror() instead of the
+ * return value of dlsym, since we could have loaded a symbol really set
+ * to NULL (quite unlikely, though).
+ *****************************************************************************/
 static __inline__ void *
 module_getsymbol( module_handle_t handle, char * psz_function )
 {
@@ -62,8 +83,14 @@ module_getsymbol( module_handle_t handle, char * psz_function )
 #endif
 }
 
-/* Wrapper to dlerror() for systems that don't have it. */
-static __inline__ char *
+/*****************************************************************************
+ * module_error: wrapper for dlerror()
+ *****************************************************************************
+ * This function returns the error message of the last module operation. It
+ * returns the string "failed" on systems which do not have the dlerror()
+ * function.
+ *****************************************************************************/
+static __inline__ const char *
 module_error( void )
 {
 #ifdef SYS_BEOS

@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 /* Number of tries before we unload an unused module */
-#define MODULE_HIDE_DELAY 50
+#define MODULE_HIDE_DELAY 100
 
 /* The module handle type. */
 #ifdef SYS_BEOS
@@ -100,20 +100,21 @@ typedef struct module_functions_s * p_module_functions_t;
  *****************************************************************************/
 
 /* Mandatory first and last parts of the structure */
-#define MODULE_CONFIG_ITEM_START       0x01    /* The main window */
-#define MODULE_CONFIG_ITEM_END         0x00    /* End of the window */
+#define MODULE_CONFIG_ITEM_START       0xdead  /* The main window */
+#define MODULE_CONFIG_ITEM_END         0xbeef  /* End of the window */
 
 /* Configuration widgets */
-#define MODULE_CONFIG_ITEM_PANE        0x02    /* A notebook pane */
-#define MODULE_CONFIG_ITEM_FRAME       0x03    /* A frame */
-#define MODULE_CONFIG_ITEM_COMMENT     0x04    /* A comment text */
-#define MODULE_CONFIG_ITEM_STRING      0x05    /* A string */
-#define MODULE_CONFIG_ITEM_FILE        0x06    /* A file selector */
-#define MODULE_CONFIG_ITEM_CHECK       0x07    /* A checkbox */
-#define MODULE_CONFIG_ITEM_CHOOSE      0x08    /* A choose box */
-#define MODULE_CONFIG_ITEM_RADIO       0x09    /* A radio box */
-#define MODULE_CONFIG_ITEM_SCALE       0x0a    /* A horizontal ruler */
-#define MODULE_CONFIG_ITEM_SPIN        0x0b    /* A numerical selector */
+#define MODULE_CONFIG_ITEM_WINDOW      0x0001  /* The main window */
+#define MODULE_CONFIG_ITEM_PANE        0x0002  /* A notebook pane */
+#define MODULE_CONFIG_ITEM_FRAME       0x0003  /* A frame */
+#define MODULE_CONFIG_ITEM_COMMENT     0x0004  /* A comment text */
+#define MODULE_CONFIG_ITEM_STRING      0x0005  /* A string */
+#define MODULE_CONFIG_ITEM_FILE        0x0006  /* A file selector */
+#define MODULE_CONFIG_ITEM_CHECK       0x0007  /* A checkbox */
+#define MODULE_CONFIG_ITEM_CHOOSE      0x0008  /* A choose box */
+#define MODULE_CONFIG_ITEM_RADIO       0x0009  /* A radio box */
+#define MODULE_CONFIG_ITEM_SCALE       0x000a  /* A horizontal ruler */
+#define MODULE_CONFIG_ITEM_SPIN        0x000b  /* A numerical selector */
 
 typedef struct module_config_s
 {

@@ -350,10 +350,10 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     module_handle_t handle;
 
     /* Try to dynamically load the module. */
-    if( ! module_load( psz_filename, &handle ) )
+    if( module_load( psz_filename, &handle ) )
     {
         /* The dynamic module couldn't be opened */
-        intf_DbgMsg( "module error: cannot open %s (%s)",
+        intf_DbgMsg( "module warning: cannot open %s (%s)",
                      psz_filename, module_error() );
         return( -1 );
     }
@@ -603,7 +603,7 @@ static int LockModule( module_t * p_module )
     }
 
     /* i_usage == -1, which means that the module isn't in memory */
-    if( ! module_load( p_module->psz_filename, &p_module->handle ) )
+    if( module_load( p_module->psz_filename, &p_module->handle ) )
     {
         /* The dynamic module couldn't be opened */
         intf_ErrMsg( "module error: cannot open %s (%s)",

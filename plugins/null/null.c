@@ -42,7 +42,8 @@
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
-MODULE_CONFIG_START( "Configuration for null module" )
+MODULE_CONFIG_START
+ADD_WINDOW( "Configuration for null module" )
     ADD_PANE( "First pane" )
         ADD_FRAME( "First frame" )
             ADD_COMMENT( "You can put whatever you want here." )

@@ -90,7 +90,7 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void dsp_aout_getfunctions( function_list_t * p_function_list )
+void aout_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->p_probe = aout_Probe;
     p_function_list->functions.aout.p_open = aout_Open;

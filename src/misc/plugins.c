@@ -176,7 +176,7 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
         }
         close( i_fd );
         
-        *p_plugin_id = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
+        *p_plugin_id = dlopen( psz_plugin, RTLD_NOW );
 #endif
 
 #ifdef SYS_BEOS

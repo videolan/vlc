@@ -42,7 +42,8 @@
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
-MODULE_CONFIG_START( "Configuration for esd module" )
+MODULE_CONFIG_START
+ADD_WINDOW( "Configuration for esd module" )
     ADD_FRAME( "EsounD" )
         ADD_COMMENT( "This module does not need configuration" )
 MODULE_CONFIG_END
@@ -50,7 +51,7 @@ MODULE_CONFIG_END
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void esd_aout_getfunctions( function_list_t * p_function_list );
+extern void aout_getfunctions( function_list_t * p_function_list );
 
 /*****************************************************************************
  * InitModule: get the module structure and configuration.
@@ -88,7 +89,7 @@ int ActivateModule( module_t * p_module )
         return( -1 );
     }
 
-    esd_aout_getfunctions( &p_module->p_functions->aout );
+    aout_getfunctions( &p_module->p_functions->aout );
 
     p_module->p_config = p_config;
 

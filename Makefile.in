@@ -398,8 +398,6 @@ distclean: clean
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp
 	rm -rf .dep
-	rm -rf debian/tmp debian/files debian/*.debhelper debian/*.substvars
-	find debian/* -type d -maxdepth 0 -name 'vlc-*' | xargs rm -rf
 
 install:
 	mkdir -p $(prefix)/bin
@@ -480,8 +478,9 @@ $(PLUGIN_GLIDE): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
 
 #
-# Real targets
+# Main application target
 #
+
 vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 ifeq ($(SYS),beos)
 	$(CC) $(CFLAGS) $(LCFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
@@ -491,61 +490,65 @@ else
 	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic @DYNAMIC_FLAG@ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
+#
+# Plugin targets
+#
+
 lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(CFLAGS) $(LCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(PCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
-	$(CC) -shared -lesd -o $@ $^ $(LCFLAGS) -lesd
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -lesd
 else
-	$(CC) -shared -o $@ $^ $(LCFLAGS) -laudiofile -lesd
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -laudiofile -lesd
 endif
 
 lib/dsp.so: $(PLUGIN_DSP)
-	$(CC) -shared -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/alsa.so: $(PLUGIN_ALSA)
-	$(CC) -shared -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/null.so: $(PLUGIN_NULL)
-	$(CC) -shared -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/dummy.so: $(PLUGIN_DUMMY)
-	$(CC) -shared -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/fb.so: $(PLUGIN_FB)
-	$(CC) -shared -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
 
 lib/x11.so: $(PLUGIN_X11)
-	$(CC) -shared -L/usr/X11R6/lib -o $@ $^ $(LCFLAGS) -lX11 -lXext
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
 
 lib/mga.so: $(PLUGIN_MGA)
-	$(CC) -shared -L/usr/X11R6/lib -o $@ $^ $(LCFLAGS) -lX11 -lXext
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -L/usr/X11R6/lib -lX11 -lXext
 
 lib/gnome.so: $(PLUGIN_GNOME)
-	$(CC) -shared -o $@ $^ $(LCFLAGS) `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
+	$(CC) $(PCFLAGS) -shared -o $@ $^ `gnome-config --libs gnomeui | sed 's,-rdynamic,,'`
 
 lib/glide.so: $(PLUGIN_GLIDE)
-	$(CC) -shared $(LIB_GLIDE) -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_GLIDE)
 
 lib/ggi.so: $(PLUGIN_GGI)
-	$(CC) -shared $(LIB_GGI) -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_GGI)
 
 lib/sdl.so: $(PLUGIN_SDL)
-	$(CC) -shared $(LIB_SDL) -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_SDL)
 
 lib/yuv.so: $(PLUGIN_YUV)
 ifeq ($(SYS),beos)
-	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
-	$(CC) -shared -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
 endif
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
 ifeq ($(SYS),beos)
-	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
-	$(CC) -shared -o $@ $^ $(LCFLAGS)
+	$(CC) $(PCFLAGS) -shared -o $@ $^
 endif
 
 ################################################################################
