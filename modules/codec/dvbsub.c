@@ -852,7 +852,7 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
 
         /* Sanity check */
         if( i_segment_length < i_topfield + i_bottomfield + 7 ||
-            s->p_start + i_topfield + i_bottomfield > s->p_end )
+            p_topfield + i_topfield + i_bottomfield > s->p_end )
         {
             msg_Dbg( p_dec, "corrupted object data" );
             return;
