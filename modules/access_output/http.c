@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.4 2003/07/31 19:10:14 bigben Exp $
+ * $Id: http.c,v 1.5 2003/08/03 16:36:20 bigben Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -55,8 +55,6 @@ vlc_module_begin();
     set_capability( "sout access", 0 );
     add_shortcut( "http" );
     set_callbacks( Open, Close );
-    add_string( "sout-http-user", NULL, NULL, "HTTP Stream Ouput user name", "User name for Basic Authentification on HTTP Stream Output module", VLC_TRUE );
-    add_string( "sout-http-pwd", NULL, NULL, "HTTP Stream Ouput password", "Password for Basic Authentification on HTTP Stream Output module", VLC_TRUE );
 vlc_module_end();
 
 struct sout_access_out_sys_t
@@ -220,8 +218,8 @@ static int Open( vlc_object_t *p_this )
         p_sys->p_httpd->pf_register_stream( p_sys->p_httpd,
                                             psz_file_name,
                                             GetMime( psz_file_name ),
-                                            config_GetPsz( p_access, "sout-http-user" ), 
-                                            config_GetPsz( p_access, "sout-http-pwd" ) );
+                                            sout_cfg_find_value( p_access->p_cfg, "user" ),
+                                            sout_cfg_find_value( p_access->p_cfg, "pwd" ) );
 
     if( !p_sys->p_httpd_stream )
     {
