@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.39 2002/12/18 14:17:09 sam Exp $
+ * $Id: oss.c,v 1.40 2002/12/23 13:49:11 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -241,13 +241,13 @@ static int Open( vlc_object_t *p_this )
 
     /* Open the sound device */
     p_sys->i_fd = open( psz_device, O_WRONLY );
-    free( psz_device );
     if( p_sys->i_fd < 0 )
     {
         msg_Err( p_aout, "cannot open audio device (%s)", psz_device );
         free( p_sys );
         return VLC_EGENERIC;
     }
+    free( psz_device );
 
     p_aout->output.pf_play = Play;
 
