@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.12 2002/09/30 21:32:32 massiot Exp $
+ * $Id: alsa.c,v 1.13 2002/10/05 03:44:50 bozo Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -100,11 +100,14 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
 
-    int i_snd_rc;
+    int i_snd_rc = -1;
 
-    char * psz_device;
+    char * psz_device = NULL;
     char psz_alsadev[128];
     char * psz_userdev;
+
+    int i_format_tries[2];
+    int i_tries_count, i;
 
     int i_format;
     int i_channels;
@@ -126,44 +129,54 @@ static int Open( vlc_object_t *p_this )
     snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
 #endif
 
+    i_tries_count = 0;
+    i_format_tries[i_tries_count++] = p_aout->output.output.i_format;
+    if( i_format_tries[0] == VLC_FOURCC('s','p','d','i') )
+    {
+        /* Try S/PDIF, and then FLOAT32 */
+        i_format_tries[i_tries_count++] = VLC_FOURCC('f','l','3','2');
+    }
+
     /* Read in ALSA device preferences from configuration */
     psz_userdev = config_GetPsz( p_aout, "alsa-device" );
 
-    if( psz_userdev )
+    for( i = 0 ; ( i_snd_rc < 0 ) && ( i < i_tries_count ) ; ++i )
     {
-        psz_device = psz_userdev;
-    }
-    else
-    {
-        /* Use the internal logic to decide on the device name */
-        if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
+        if( i_format_tries[i] == VLC_FOURCC('s','p','d','i') )
         {
-            /* Will probably need some little modification in the case
-               we want to send some data at a different rate
-               (32000, 44100 and 48000 are the possibilities) -- bozo */
-            unsigned char s[4];
-            s[0] = IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO;
-            s[1] = IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER;
-            s[2] = 0;
-            s[3] = IEC958_AES3_CON_FS_48000;
-            sprintf( psz_alsadev,
-                     "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
-                     s[0], s[1], s[2], s[3] );
-            psz_device = psz_alsadev;
-
-            aout_VolumeNoneInit( p_aout );
+            if( psz_userdev )
+            {
+                psz_device = psz_userdev;
+            }
+            else
+            {
+                /* Will probably need some little modification in the case
+                   we want to send some data at a different rate
+                   (32000, 44100 and 48000 are the possibilities) -- bozo */
+                unsigned char s[4];
+                s[0] = IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO;
+                s[1] = IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER;
+                s[2] = 0;
+                s[3] = IEC958_AES3_CON_FS_48000;
+                sprintf( psz_alsadev,
+                         "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
+                         s[0], s[1], s[2], s[3] );
+                psz_device = psz_alsadev;
+            }
         }
         else
         {
-            psz_device = "default";
-
-            aout_VolumeSoftInit( p_aout );
+            if( psz_userdev )
+                psz_device = psz_userdev;
+            else
+                psz_device = "default";
         }
+
+        /* Open device */
+        i_snd_rc = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
+                                 SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
     }
 
-    /* Open device */
-    i_snd_rc = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
-                             SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
     if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
@@ -177,6 +190,8 @@ static int Open( vlc_object_t *p_this )
     if( psz_userdev )
         free( psz_userdev );
 
+    p_aout->output.output.i_format = i_format_tries[i - 1];
+
     /* Default settings */
     p_sys->b_can_sleek = VLC_FALSE;
     i_channels = p_aout->output.output.i_channels;
@@ -184,13 +199,14 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
         p_aout->output.i_nb_samples = ALSA_SPDIF_PERIOD_SIZE;
+        aout_VolumeNoneInit( p_aout );
     }
     else
     {
         p_sys->i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
         p_aout->output.i_nb_samples = ALSA_DEFAULT_PERIOD_SIZE;
+        aout_VolumeSoftInit( p_aout );
     }
-
 
     /* Compute the settings */
     switch (p_aout->output.output.i_format)
@@ -208,8 +224,8 @@ static int Open( vlc_object_t *p_this )
             p_aout->output.output.i_frame_length = ALSA_SPDIF_PERIOD_SIZE;
             break;
         default:
-            msg_Err( p_aout, "audio output format 0x%x not supported",
-                     p_aout->output.output.i_format );
+            msg_Err( p_aout, "audio output format '%.4s' not supported",
+                     &p_aout->output.output.i_format );
             return -1;
             break;
     }
@@ -247,13 +263,15 @@ static int Open( vlc_object_t *p_this )
         return -1;
     }
 
-    i_snd_rc = snd_pcm_hw_params_set_rate( p_sys->p_snd_pcm, p_hw,
-                                           p_aout->output.output.i_rate, 0 );
+    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+                                                p_aout->output.output.i_rate,
+                                                NULL );
     if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set sample rate" );
         return -1;
     }
+    p_aout->output.output.i_rate = i_snd_rc;
 
     i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm, p_hw,
                                                        p_sys->i_buffer_size );
@@ -265,14 +283,13 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_buffer_size = i_snd_rc;
 
     i_snd_rc = snd_pcm_hw_params_set_period_size_near(
-                    p_sys->p_snd_pcm, p_hw, p_aout->output.i_nb_samples, 0 );
+                    p_sys->p_snd_pcm, p_hw, p_aout->output.i_nb_samples, NULL );
     if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set period size" );
         return -1;
     }
     p_aout->output.i_nb_samples = i_snd_rc;
-    p_sys->i_period_time = snd_pcm_hw_params_get_period_time( p_hw, 0 );
 
     i_snd_rc = snd_pcm_hw_params( p_sys->p_snd_pcm, p_hw );
     if (i_snd_rc < 0)
@@ -280,6 +297,8 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "unable to set hardware configuration" );
         return -1;
     }
+
+    p_sys->i_period_time = snd_pcm_hw_params_get_period_time( p_hw, NULL );
 
     snd_pcm_sw_params_current( p_sys->p_snd_pcm, p_sw );
     i_snd_rc = snd_pcm_sw_params_set_sleep_min( p_sys->p_snd_pcm, p_sw, 0 );
@@ -455,7 +474,7 @@ static void ALSAFill( aout_instance_t * p_aout )
                 return;
 
             i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
-                                       p_buffer->i_nb_samples );
+                                       p_buffer->i_nb_bytes );
 
             if( i_snd_rc < 0 )
             {
