@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.22 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: decoder.c,v 1.23 2003/05/09 19:53:51 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -208,6 +208,14 @@ static int InitThread( adec_thread_t * p_adec )
         int i_frame_size;
         pes_packet_t *p_pes;
 
+        faacDecConfigurationPtr cfg;
+
+        cfg = faacDecGetCurrentConfiguration( p_adec->p_handle );
+        if( p_wf->nSamplesPerSec > 0 )
+        {
+            cfg->defSampleRate = p_wf->nSamplesPerSec;
+        }
+        faacDecSetConfiguration( p_adec->p_handle, cfg );
         msg_Warn( p_adec->p_fifo,
                  "DecoderSpecificInfo missing, trying with first frame" );
         // gather first frame
