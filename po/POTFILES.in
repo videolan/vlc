@@ -259,8 +259,17 @@ modules/codec/flac.c
 modules/codec/libmpeg2.c
 modules/codec/lpcm.c
 modules/codec/mpeg_audio.c
+modules/codec/ogt/common.c
+modules/codec/ogt/common.h
+modules/codec/ogt/cvd.c
+modules/codec/ogt/cvd.h
+modules/codec/ogt/cvd_parse.c
 modules/codec/ogt/ogt.c
 modules/codec/ogt/ogt.h
+modules/codec/ogt/ogt_parse.c
+modules/codec/ogt/render.c
+modules/codec/ogt/render.h
+modules/codec/ogt/subtitle.h
 modules/codec/quicktime.c
 modules/codec/rawvideo.c
 modules/codec/speex.c

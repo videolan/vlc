@@ -1,3 +1,41 @@
+2004-01-03 Saturday 10:55  gbazin
+
+ * modules/gui/wxwindows/interface.cpp: fixed and re-enabled aspect-ratio combobox in the extended gui.
+
+2004-01-03 Saturday 00:39  gbazin
+
+ * modules/stream_out/transcode.c: added YV12 raw video fourcc (chroma planes will likely be inverted though).
+
+2004-01-03 Saturday 00:23  gbazin
+
+ * modules/demux/mpeg/mpga.c, src/input/stream.c: fixed mem leaks.
+
+2004-01-02 Friday 23:22  zorglub
+
+ My name is Bond
+ VLC Media Player 0.7.0 Bond
+
+2004-01-02 Friday 22:17  gbazin
+
+ * modules/video_output/directx/*: fixed overlay on 24bpp displays.
+
+2004-01-02 Friday 13:48  sam
+
+   * doc/ChangeLog-2003: Happy new year!
+
+2004-01-02 Friday 13:30  gbazin
+
+ * modules/gui/wxwindows/preferences_widgets.cpp: use wxL2U() (Thanks Anil).
+
+2004-01-02 Friday 04:44  rocky
+
+ Attempt to make easier to understand and easier to complete.
+
+2004-01-01 Thursday 17:41  zorglub
+
+ * Updated german and french translations
+ * Updated version number and Changelog
+
 2004-01-01 Thursday 15:56  rocky
 
  RenderRV16 handles scaling. But seems to slow to render subtitles.
