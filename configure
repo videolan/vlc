@@ -3111,7 +3111,7 @@ else
 fi
 fi
 
-    LIB_MPEG_TS="${LIB_MPEG_TS} -lws2_32"
+    LIB_IPV4="${LIB_IPV4} -lws2_32"
     LIB_RC="${LIB_RC} -lws2_32"
     ;;
   x*nto*)
@@ -8366,6 +8366,8 @@ PLUGIN_PATH="${ac_tool_prefix}/share/videolan"
 
 
 
+
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -8595,6 +8597,8 @@ s%@LIB_IDCTALTIVEC@%$LIB_IDCTALTIVEC%g
 s%@LIB_IMDCT@%$LIB_IMDCT%g
 s%@LIB_IMDCT3DN@%$LIB_IMDCT3DN%g
 s%@LIB_IMDCTSSE@%$LIB_IMDCTSSE%g
+s%@LIB_IPV4@%$LIB_IPV4%g
+s%@LIB_IPV6@%$LIB_IPV6%g
 s%@LIB_KDE@%$LIB_KDE%g
 s%@LIB_A52@%$LIB_A52%g
 s%@LIB_LIBDVDCSS@%$LIB_LIBDVDCSS%g
