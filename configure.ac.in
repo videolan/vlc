@@ -135,6 +135,7 @@ case "x${target_os}" in
         LDFLAGS_access_mms="${LDFLAGS_access_mms} -lws2_32"
         LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lws2_32"
         LDFLAGS_access_udp="${LDFLAGS_access_udp} -lws2_32"
+        LDFLAGS_access_ftp="${LDFLAGS_access_ftp} -lws2_32"
         LDFLAGS_access_output_udp="${LDFLAGS_access_output_udp} -lws2_32"
         LDFLAGS_rc="${LDFLAGS_rc} -lws2_32"
         LDFLAGS_sap="${LDFLAGS_sap} -lws2_32"
@@ -273,6 +274,7 @@ AC_CHECK_FUNC(send,,[
     LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket"
     LDFLAGS_access_rtp="${LDFLAGS_access_rtp} -lsocket"
     LDFLAGS_access_udp="${LDFLAGS_access_udp} -lsocket"
+    LDFLAGS_access_ftp="${LDFLAGS_access_ftp} -lsocket"
     LDFLAGS_sap="${LDFLAGS_sap} -lsocket"
     LDFLAGS_access_output_udp="${LDFLAGS_access_output_udp} -lsocket"
 )])
@@ -697,7 +699,7 @@ PLUGINS="${PLUGINS} aout_file"
 PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm"
-PLUGINS="${PLUGINS} access_udp access_http access_rtp ipv4 access_mms sap"
+PLUGINS="${PLUGINS} access_udp access_http access_rtp ipv4 access_mms sap access_ftp"
 
 dnl
 dnl  Accelerated modules

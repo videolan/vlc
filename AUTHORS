@@ -9,8 +9,13 @@
 N: Laurent Aimar
 E: fenrir@via.ecp.fr
 C: fenrir
-D: AVI demultiplexer
-D: MPEG-4, Div & OpenDivX decoder (ffmpeg)
+D: avi, asf/wmv/wma, mp4/mov, mp3, aac, wav demultiplexers
+D: MPEG-4, Div & OpenDivX and various decoders (ffmpeg)
+D: AAC decoder (libfaad2)
+D: cinepak, adpcm, araw decoders
+D: Subtile file parser.
+D: mms, ftp access
+D: Stream output
 S: France
 
 N: Marc Ariberti
@@ -369,6 +374,7 @@ N: Eric Petit
 E: titer@videolan.org
 C: titer
 D: BeOS module fixes and enhancements
+D: Stream output
 S: France
 
 N: Olivier Pomel

@@ -2,7 +2,7 @@
  * pes.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: pes.c,v 1.1 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: pes.c,v 1.2 2002/12/15 23:39:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -46,11 +46,11 @@
 #include "pes.h"
 #include "bits.h"
 
-int EStoPES( sout_instance_t *p_sout,
-             sout_buffer_t **pp_pes,
-             sout_buffer_t *p_es,
-             int i_stream_id,
-             int b_mpeg2 )
+int E_( EStoPES )( sout_instance_t *p_sout,
+                   sout_buffer_t **pp_pes,
+                   sout_buffer_t *p_es,
+                   int i_stream_id,
+                   int b_mpeg2 )
 {
     sout_buffer_t *p_pes;
     bits_buffer_t bits;

@@ -2,7 +2,7 @@
  * ps.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.1 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: ps.c,v 1.2 2002/12/15 23:39:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -350,7 +350,7 @@ static int Mux      ( sout_instance_t *p_sout )
         }
 
         p_data = sout_FifoGet( p_fifo );
-        EStoPES( p_sout, &p_data, p_data, p_stream->i_stream_id, 1);
+        E_( EStoPES )( p_sout, &p_data, p_data, p_stream->i_stream_id, 1);
         p_sout->pf_write( p_sout, p_data );
 
         p_mux->i_pes_count++;
