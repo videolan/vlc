@@ -71,7 +71,7 @@ static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
 /* The RenderText call maps to pf_render_string, defined in vlc_filter.h */
-static subpicture_t *RenderText( filter_t *, block_t *, int, int, int );
+static subpicture_region_t *RenderText( filter_t *, subpicture_t *, subpicture_region_t* );//block_t *, int, int, int );
 static line_desc_t *NewLine( byte_t * );
 
 /*****************************************************************************
@@ -153,7 +153,7 @@ struct line_desc_t
     line_desc_t    *p_next;
 };
 
-static void Render    ( filter_t *, subpicture_t *, subpicture_data_t *, uint8_t,
+static subpicture_region_t *Render    ( filter_t *, subpicture_t *, subpicture_data_t *, uint8_t,
                         int, int, int );
 static void FreeString( subpicture_data_t * );
 static void FreeLine( line_desc_t * );
@@ -328,9 +328,10 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************
  * This function merges the previously rendered freetype glyphs into a picture
  *****************************************************************************/
-static void Render( filter_t *p_filter, subpicture_t *p_spu,
-                    subpicture_data_t *p_string, uint8_t opacity, 
-                    int red, int green, int blue)
+static subpicture_region_t *Render( filter_t *p_filter, subpicture_t *p_spu,
+                                    subpicture_data_t *p_string,
+                                    uint8_t opacity, 
+                                    int red, int green, int blue)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     line_desc_t *p_line;
@@ -338,6 +339,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
     video_format_t fmt;
     int i, x, y, i_pitch;
     uint8_t i_y, i_u, i_v;  /* YUV values, derived from incoming RGB */
+    subpicture_region_t *p_region;
   
     /* calculate text color components: */
     i_y = (uint8_t) ( (  66 * red + 129 * green +  25 * blue + 128) >> 8) +  16;
@@ -351,25 +353,25 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
     fmt.i_width = fmt.i_visible_width = p_string->i_width + 2;
     fmt.i_height = fmt.i_visible_height = p_string->i_height + 2;
     fmt.i_x_offset = fmt.i_y_offset = 0;
-    p_spu->p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
-    if( !p_spu->p_region )
+    p_region = p_spu->pf_create_region( VLC_OBJECT(p_filter), &fmt );
+    if( !p_region )
     {
         msg_Err( p_filter, "cannot allocate SPU region" );
-        return;
+        return NULL;
     }
 
-    p_spu->p_region->i_x = p_spu->p_region->i_y = 0;
-    p_y = p_spu->p_region->picture.Y_PIXELS;
-    p_u = p_spu->p_region->picture.U_PIXELS;
-    p_v = p_spu->p_region->picture.V_PIXELS;
-    p_a = p_spu->p_region->picture.A_PIXELS;
-    i_pitch = p_spu->p_region->picture.Y_PITCH;
+    p_region->i_x = p_region->i_y = 0;
+    p_y = p_region->picture.Y_PIXELS;
+    p_u = p_region->picture.U_PIXELS;
+    p_v = p_region->picture.V_PIXELS;
+    p_a = p_region->picture.A_PIXELS;
+    i_pitch = p_region->picture.Y_PITCH;
 
     /* Initialize the region pixels */
-    memset( p_y, 0x00, i_pitch * p_spu->p_region->fmt.i_height );
-    memset( p_u, 0x80, i_pitch * p_spu->p_region->fmt.i_height );
-    memset( p_v, 0x80, i_pitch * p_spu->p_region->fmt.i_height );
-    memset( p_a, 0x00, i_pitch * p_spu->p_region->fmt.i_height );
+    memset( p_y, 0x00, i_pitch * p_region->fmt.i_height );
+    memset( p_u, 0x80, i_pitch * p_region->fmt.i_height );
+    memset( p_v, 0x80, i_pitch * p_region->fmt.i_height );
+    memset( p_a, 0x00, i_pitch * p_region->fmt.i_height );
 
 #define pi_gamma p_sys->pi_gamma
 
@@ -433,6 +435,7 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
 #undef pi_gamma
         }
     }
+    return p_region;
 }
 
 /**
@@ -441,11 +444,11 @@ static void Render( filter_t *p_filter, subpicture_t *p_spu,
  * needed glyphs into memory. It is used as pf_add_string callback in
  * the vout method by this module
  */
-static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block, 
-                                 int font_color, int font_opacity, int font_size )
+static subpicture_region_t *RenderText( filter_t *p_filter,
+                                        subpicture_t *p_subpic,
+                                        subpicture_region_t *p_region )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    subpicture_t *p_subpic = 0;
     subpicture_data_t *p_string = 0;
     line_desc_t  *p_line = 0, *p_next = 0, *p_prev = 0;
     int i, i_pen_y, i_pen_x, i_error, i_glyph_index, i_previous;
@@ -453,6 +456,8 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block,
     int i_string_length;
     char *psz_string;
     vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
+    int i_font_color, i_font_opacity, i_font_size;
+    subpicture_region_t *p_res;
 
     FT_BBox line;
     FT_BBox glyph_size;
@@ -460,9 +465,12 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block,
     FT_Glyph tmp_glyph;
 
     /* Sanity check */
-    if( !p_block ) return NULL;
-    psz_string = p_block->p_buffer;
+    if( !p_region ) return NULL;
+    psz_string = p_region->psz_text;
     if( !psz_string || !*psz_string ) goto error;
+    i_font_color   = p_region->i_font_color;
+    i_font_opacity = p_region->i_font_opacity;
+    i_font_size    = p_region->i_font_size;
 
     result.x = 0;
     result.y = 0;
@@ -470,15 +478,6 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block,
     line.xMax = 0;
     line.yMin = 0;
     line.yMax = 0;
-
-    /* Create and initialize a subpicture */
-    p_subpic = p_filter->pf_sub_buffer_new( p_filter );
-    if( !p_subpic ) goto error;
-
-    p_subpic->i_start = p_block->i_pts;
-    p_subpic->i_stop = p_block->i_pts + p_block->i_length;
-    p_subpic->b_ephemer = (p_block->i_length == 0);
-    p_subpic->b_absolute = VLC_FALSE;
 
     /* Create and initialize private data for the subpicture */
     p_string = malloc( sizeof(subpicture_data_t) );
@@ -511,18 +510,18 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block,
     /* Set up the glyphs for the desired font size.  By definition,
        p_sys->i_font_size is a valid value, else the initial Create would
        have failed. Using -1 as a flag to use the freetype-fontsize */
-    if ( font_size < 0 )  
+    if ( i_font_size < 0 )  
     {
 	    FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
     }
     else          
     {
-        i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, font_size );
+        i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_font_size );
         if( i_error )
         {
-	        msg_Warn( p_filter, "Invalid font size to RenderText, using %d", 
-	                  p_sys->i_font_size );
-	        FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
+            msg_Warn( p_filter, "Invalid font size to RenderText, using %d", 
+                      p_sys->i_font_size );
+            FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
         }
     }
 
@@ -707,38 +706,36 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block,
 #undef face
 #undef glyph
 /* check to see whether to use the default color/opacity, or another one: */
-    if( font_color < 0 ) 
+    if( i_font_color < 0 ) 
     {
-	    p_sys->i_blue = p_sys->i_font_color & 0x000000FF;
-        p_sys->i_green = (p_sys->i_font_color & 0x0000FF00)/256;
-        p_sys->i_red = (p_sys->i_font_color & 0x00FF0000)/(256*256);
+        p_sys->i_blue  =   p_sys->i_font_color & 0x000000FF;
+        p_sys->i_green = ( p_sys->i_font_color & 0x0000FF00 ) >>  8;
+        p_sys->i_red   = ( p_sys->i_font_color & 0x00FF0000 ) >> 16;
     }
     else
     {
-	    p_sys->i_blue = font_color & 0x000000FF;
-        p_sys->i_green = (font_color & 0x0000FF00)/256;
-        p_sys->i_red = (font_color & 0x00FF0000)/(256*256);
-	}
-    if( font_opacity < 0 )
+        p_sys->i_blue  =   i_font_color & 0x000000FF;
+        p_sys->i_green = ( i_font_color & 0x0000FF00 ) >>  8;
+        p_sys->i_red   = ( i_font_color & 0x00FF0000 ) >> 16;
+    }
+    if( i_font_opacity < 0 )
     {
         p_sys->i_opacity = p_sys->i_font_opacity;
     }
     else
     {
-	    p_sys->i_opacity = (uint8_t) ( font_opacity & 0x000000FF );
+        p_sys->i_opacity = (uint8_t)( i_font_opacity & 0x000000FF );
     }
 
-    Render( p_filter, p_subpic, p_string, p_sys->i_opacity, 
-                 p_sys->i_red, p_sys->i_green, p_sys->i_blue );
+    p_res = Render( p_filter, p_subpic, p_string, p_sys->i_opacity, 
+                    p_sys->i_red, p_sys->i_green, p_sys->i_blue );
     FreeString( p_string );
-    block_Release( p_block );
     if( psz_unicode_orig ) free( psz_unicode_orig );
-    return p_subpic;
+    return p_res;
 
  error:
     FreeString( p_string );
     if( p_subpic ) p_filter->pf_sub_buffer_del( p_filter, p_subpic );
-    block_Release( p_block );
     if( psz_unicode_orig ) free( psz_unicode_orig );
     return NULL;
 }

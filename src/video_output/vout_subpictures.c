@@ -472,7 +472,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         /* Load the text rendering module */
         if( !p_spu->p_text && p_region )
         {
-	        p_spu->p_text = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
+            p_spu->p_text = vlc_object_create( p_spu, VLC_OBJECT_FILTER );
             vlc_object_attach( p_spu->p_text, p_spu );
 
             p_spu->p_text->fmt_out.video.i_width =
@@ -553,33 +553,15 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 {
                     /* TODO: do it in a less hacky way
                      * (modify text renderer API) */
-                    subpicture_t *p_subpic_tmp;
-                    subpicture_region_t tmp_region;
-                    block_t *p_new_block =
-                        block_New( p_spu, strlen(p_region->psz_text) + 1 );
-                    if( p_new_block )
-                    {
-                        memcpy( p_new_block->p_buffer, p_region->psz_text,
-                                p_new_block->i_buffer );
-                        p_new_block->i_pts = p_new_block->i_dts =
-                            p_subpic->i_start;
-                        p_new_block->i_length =
-                            p_subpic->i_start - p_subpic->i_stop;
+                    subpicture_region_t *p_tmp_region;
                     /*  the actual call  to RenderText in freetype.c: */
-                           p_subpic_tmp = p_spu->p_text->pf_render_string(
-                            p_spu->p_text, p_new_block, 
-                            p_region->i_font_color, p_region->i_font_opacity,
-                            p_region->i_font_size);
+                    p_tmp_region = p_spu->p_text->pf_render_string(
+                        p_spu->p_text, p_subpic, p_region ); 
 
-                        if( p_subpic_tmp )
-                        {
-                            tmp_region = *p_region;
-                            *p_region = *p_subpic_tmp->p_region;
-                            p_region->p_next = tmp_region.p_next;
-                            *p_subpic_tmp->p_region = tmp_region;
-                            p_spu->p_text->pf_sub_buffer_del( p_spu->p_text,
-                                                              p_subpic_tmp );
-                        }
+                    if( p_tmp_region )
+                    {
+//                        p_subpic->pf_destroy_region( p_spu, p_region );
+                        p_region = p_tmp_region;
                     }
                 }
             }
@@ -612,7 +594,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_scale && !p_region->p_cache )
             {
                 picture_t *p_pic;
-
 
                 p_spu->p_scale->fmt_in.video = p_region->fmt;
                 p_spu->p_scale->fmt_out.video = p_region->fmt;
