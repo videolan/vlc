@@ -60,6 +60,8 @@ vlc_module_begin();
     add_shortcut( "flac" );
     add_shortcut( "m3u" );
     add_shortcut( "playlist" );
+    add_shortcut( "m4v" );
+    add_shortcut( "mp4v" );
 vlc_module_end();
 
 /*****************************************************************************
