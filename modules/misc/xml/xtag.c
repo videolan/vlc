@@ -165,14 +165,19 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     xml_reader_t *p_reader;
     xml_reader_sys_t *p_sys;
     char *p_buffer;
-    int i_buffer;
+    int i_size,i_buffer;
     XTag *p_root;
 
     /* Open and read file */
 
-    i_buffer = stream_Size( s );
-    p_buffer = malloc( i_buffer + 1 );
-    i_buffer = stream_Read( s, p_buffer, i_buffer );
+    i_size = stream_Size( s ) - stream_Tell( s );
+    p_buffer = malloc( i_size + 1 );
+    i_buffer = 0;
+    while( i_buffer < i_size )
+    {
+        msg_Dbg( p_xml, "got %d, want %d", i_buffer, i_size );
+        i_buffer += stream_Read( s, &p_buffer[i_buffer], i_size - i_buffer );
+    }
     p_buffer[ i_buffer ] = 0;
 
     if( !i_buffer )
@@ -279,6 +284,13 @@ static char *ReaderName( xml_reader_t *p_reader )
 static char *ReaderValue( xml_reader_t *p_reader )
 {
     const char *psz_name;
+    if( p_reader->p_sys->p_curtag->pcdata )
+    {
+#ifdef XTAG_DEBUG
+        printf( "%s\n", p_reader->p_sys->p_curtag->pcdata );
+#endif
+        return strdup( p_reader->p_sys->p_curtag->pcdata );
+    }
 
     if( !p_reader->p_sys->p_curattr ) return 0;
 
@@ -706,13 +718,25 @@ static XTag *xtag_new_parse( const char *s, int n )
     parser.start = (char *)s;
 
     if( n == -1 ) parser.end = NULL;
-    else if( n == 0 ) return NULL;
+    else if( n == 0 )
+    {
+#ifdef XTAG_DEBUG
+        printf ("empty buffer");
+#endif        
+        return NULL;
+    }
     else parser.end = (char *)&s[n];
+
+    /* can't have whitespace pcdata outside rootnode */
+    xtag_skip_whitespace( &parser );
 
     tag = xtag_parse_tag( &parser );
 
     if( !parser.valid )
     {
+#ifdef XTAG_DEBUG
+        printf ("invalid file");
+#endif
         xtag_free( tag );
         return NULL;
     }
