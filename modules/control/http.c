@@ -79,13 +79,13 @@ static void Close( vlc_object_t * );
 #define SRC_TEXT N_( "Source directory" )
 #define SRC_LONGTEXT N_( "Source directory" )
 #define CERT_TEXT N_( "Certificate file" )
-#define CERT_LONGTEXT N_( "x509 PEM certificates path file" )
+#define CERT_LONGTEXT N_( "HTTP interface x509 PEM certificate file (enables SSL)" )
 #define KEY_TEXT N_( "Private key file" )
-#define KEY_LONGTEXT N_( "x509 PEM private key file" )
+#define KEY_LONGTEXT N_( "HTTP interface x509 PEM private key file" )
 #define CA_TEXT N_( "Root CA file" )
-#define CA_LONGTEXT N_( "x509 PEM trusted root CA certificates file" )
+#define CA_LONGTEXT N_( "HTTP interface x509 PEM trusted root CA certificates file" )
 #define CRL_TEXT N_( "CRL file" )
-#define CRL_LONGTEXT N_( "Certificates revocation list file" )
+#define CRL_LONGTEXT N_( "HTTP interace Certificates Revocation List file" )
 
 vlc_module_begin();
     set_description( _("HTTP remote control interface") );
@@ -190,7 +190,6 @@ struct intf_sys_t
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
-    tls_t               *p_tls;
 };
 
 
@@ -232,32 +231,16 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
 
-    /* TODO: avoid possible code duplication in other modules */
     psz_cert = config_GetPsz( p_intf, "http-intf-cert" );
     if ( psz_cert != NULL )
     {
         const char *psz_pem;
 
-        p_sys->p_tls = vlc_object_create( p_this, VLC_OBJECT_TLS );
-        vlc_object_attach( p_sys->p_tls, p_this );
-
-        p_sys->p_tls->p_module = module_Need( p_sys->p_tls, "tls", 0, 0 );
-        if( p_sys->p_tls->p_module == NULL )
-        {
-            msg_Err( p_this, "cannot find TLS/SSL provider" );
-            vlc_object_detach( p_sys->p_tls );
-            vlc_object_destroy( p_sys->p_tls );
-            p_sys->p_tls = NULL;
-            return VLC_EGENERIC;
-        }
-
         msg_Dbg( p_intf, "enablind TLS for HTTP interface (cert file: %s)",
                  psz_cert );
         psz_pem = config_GetPsz( p_intf, "http-intf-key" );
-        if ( psz_pem == NULL )
-            psz_pem = psz_cert;
 
-        p_tls = tls_ServerCreate( p_sys->p_tls, psz_cert, psz_pem );
+        p_tls = tls_ServerCreate( p_this, psz_cert, psz_pem );
         if ( p_tls == NULL )
         {
             msg_Err( p_intf, "TLS initialization error" );
@@ -288,7 +271,6 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        p_sys->p_tls = NULL;
         p_tls = NULL;
         if( i_port <= 0 )
             i_port= 8080;
@@ -415,13 +397,6 @@ void Close ( vlc_object_t *p_this )
         free( p_sys->pp_files );
     }
     httpd_HostDelete( p_sys->p_httpd_host );
-    /* TODO: do this in the httpd code to avoid code duplication */
-    if( p_sys->p_tls != NULL )
-    {
-        module_Unneed( p_sys->p_tls, p_sys->p_tls->p_module );
-        vlc_object_detach( p_sys->p_tls );
-        vlc_object_destroy( p_sys->p_tls );
-    }
 
     free( p_sys );
 }

@@ -563,6 +563,16 @@ Unfortunatly it is very Win32 focused.
 
 Status: Todo
 
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: More service discovry modules
+- Port UPnP support from http://sourceforge.net/project/showfiles.php?group_id=89768 <br />
+- libhal based discovery (should be able to find cd,dvd,capture cards,etc etc <br />
+- Perhaps a generalized webpage parser (use user supplied templates to parse
+   streams from popular websites )
+Status: Todo
 
 # Do not remove me
 Task
