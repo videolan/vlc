@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.9 2003/11/09 13:59:21 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.10 2003/11/09 15:55:23 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -570,21 +570,6 @@ onAddFileToPlaylist                    (GtkButton       *button,
 
 
 void
-onEntryMRLChanged                      (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-}
-
-
-void
-onEntryMRLEditingDone                  (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-    g_print("onMRLEditingDone\n");
-}
-
-
-void
 NetworkBuildMRL                        (GtkEditable     *editable,
                                         gpointer         user_data)
 {
@@ -660,143 +645,7 @@ onAddNetworkPlaylist                   (GtkButton       *button,
 
 
 void
-onV4LAudioChanged                      (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryV4LAudioEditingDone             (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onV4LVideoChanged                      (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryV4LVideoEditingDone             (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
 onAddCameraToPlaylist                  (GtkButton       *button,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onVideoDeviceChanged                   (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryVideoDeviceEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onVideoCodecChanged                    (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryVideoCodecEditingDone           (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onVideoBitrateChanged                  (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onVideoBitrateEditingDone              (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onAudioDeviceChanged                   (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryAudioDeviceEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onAudioCodecChanged                    (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryAudioCodecEditingDone           (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onAudioBitrateChanged                  (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onAudioBitrateEditingDone              (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onAddServerToPlaylist                  (GtkButton       *button,
                                         gpointer         user_data)
 {
 
@@ -898,4 +747,22 @@ onNetworkMRLAdd                        (GtkContainer    *container,
 
 }
 
+
+
+void
+V4LBuildMRL                            (GtkEditable     *editable,
+                                        gpointer         user_data)
+{
+//    GtkSpinButton *networkPort = NULL;
+//    GtkEntry      *entryMRL = NULL;
+
+}
+
+
+void
+onAddTranscodeToPlaylist               (GtkButton       *button,
+                                        gpointer         user_data)
+{
+
+}
 

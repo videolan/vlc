@@ -2,7 +2,7 @@
  * callbacks.h : pda plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: pda_callbacks.h,v 1.5 2003/11/08 16:04:05 jpsaman Exp $
+ * $Id: pda_callbacks.h,v 1.6 2003/11/09 15:55:23 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -90,87 +90,11 @@ onAddFileToPlaylist                    (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-onEntryMRLChanged                      (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryMRLEditingDone                  (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
 onAddNetworkPlaylist                   (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-onV4LAudioChanged                      (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryV4LAudioEditingDone             (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onV4LVideoChanged                      (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryV4LVideoEditingDone             (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
 onAddCameraToPlaylist                  (GtkButton       *button,
-                                        gpointer         user_data);
-
-void
-onVideoDeviceChanged                   (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryVideoDeviceEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onVideoCodecChanged                    (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryVideoCodecEditingDone           (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onVideoBitrateChanged                  (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onVideoBitrateEditingDone              (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onAudioDeviceChanged                   (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryAudioDeviceEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onAudioCodecChanged                    (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryAudioCodecEditingDone           (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onAudioBitrateChanged                  (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onAudioBitrateEditingDone              (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onAddServerToPlaylist                  (GtkButton       *button,
                                         gpointer         user_data);
 
 gboolean
@@ -225,4 +149,12 @@ onNetworkMRLAdd                        (GtkContainer    *container,
 
 void
 NetworkBuildMRL                        (GtkEditable     *editable,
+                                        gpointer         user_data);
+
+void
+V4LBuildMRL                            (GtkEditable     *editable,
+                                        gpointer         user_data);
+
+void
+onAddTranscodeToPlaylist               (GtkButton       *button,
                                         gpointer         user_data);

@@ -342,10 +342,10 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text" translatable="yes"></property>
+			  <property name="text" translatable="yes">udp://:1234</property>
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
-			  <property name="activates_default">False</property>
+			  <property name="activates_default">True</property>
 			</widget>
 		      </child>
 
@@ -573,10 +573,10 @@
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text" translatable="yes"></property>
+			  <property name="text" translatable="yes">unicast</property>
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
-			  <property name="activates_default">False</property>
+			  <property name="activates_default">True</property>
 			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:34:45 GMT"/>
 			</widget>
 		      </child>
@@ -931,6 +931,7 @@
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
+				  <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:44:46 GMT"/>
 				</widget>
 			      </child>
 
@@ -994,6 +995,7 @@
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
+				  <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:45:10 GMT"/>
 				</widget>
 			      </child>
 
@@ -1080,6 +1082,7 @@
 			      <property name="snap_to_ticks">False</property>
 			      <property name="wrap">False</property>
 			      <property name="adjustment">0 0 100 1 10 10</property>
+			      <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:45:26 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="left_attach">1</property>
@@ -1134,6 +1137,7 @@
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
+				  <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:45:49 GMT"/>
 				</widget>
 			      </child>
 
@@ -1229,6 +1233,7 @@
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
+				  <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:46:04 GMT"/>
 				</widget>
 			      </child>
 
@@ -1339,6 +1344,7 @@
 			      <property name="snap_to_ticks">False</property>
 			      <property name="wrap">False</property>
 			      <property name="adjustment">8692 0 65535 1 10 10</property>
+			      <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:46:20 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="left_attach">1</property>
@@ -1384,6 +1390,7 @@
 			      <property name="snap_to_ticks">False</property>
 			      <property name="wrap">False</property>
 			      <property name="adjustment">44100 0 65535 1 10 10</property>
+			      <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:46:34 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="left_attach">1</property>
@@ -1429,57 +1436,13 @@
 			      <property name="snap_to_ticks">False</property>
 			      <property name="wrap">False</property>
 			      <property name="adjustment">100 0 65535 1 10 10</property>
+			      <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:46:51 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="left_attach">1</property>
 			      <property name="right_attach">2</property>
 			      <property name="top_attach">7</property>
 			      <property name="bottom_attach">8</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkLabel" id="labelV4lDecimation">
-			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Decimation:</property>
-			      <property name="use_underline">False</property>
-			      <property name="use_markup">False</property>
-			      <property name="justify">GTK_JUSTIFY_LEFT</property>
-			      <property name="wrap">False</property>
-			      <property name="selectable">False</property>
-			      <property name="xalign">0</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">0</property>
-			      <property name="right_attach">1</property>
-			      <property name="top_attach">8</property>
-			      <property name="bottom_attach">9</property>
-			      <property name="x_options">fill</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkSpinButton" id="entryV4LDecimation">
-			      <property name="visible">True</property>
-			      <property name="can_focus">True</property>
-			      <property name="climb_rate">1</property>
-			      <property name="digits">0</property>
-			      <property name="numeric">True</property>
-			      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
-			      <property name="snap_to_ticks">False</property>
-			      <property name="wrap">False</property>
-			      <property name="adjustment">1 0 65535 1 10 10</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">1</property>
-			      <property name="right_attach">2</property>
-			      <property name="top_attach">8</property>
-			      <property name="bottom_attach">9</property>
 			      <property name="y_options"></property>
 			    </packing>
 			  </child>
@@ -1519,12 +1482,37 @@
 			      <property name="snap_to_ticks">False</property>
 			      <property name="wrap">False</property>
 			      <property name="adjustment">0 -1 100 1 10 10</property>
+			      <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:47:25 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="left_attach">1</property>
 			      <property name="right_attach">2</property>
 			      <property name="top_attach">9</property>
 			      <property name="bottom_attach">10</property>
+			      <property name="y_options"></property>
+			    </packing>
+			  </child>
+
+			  <child>
+			    <widget class="GtkLabel" id="labelV4LSoundDirection">
+			      <property name="visible">True</property>
+			      <property name="label" translatable="yes">Sound:</property>
+			      <property name="use_underline">False</property>
+			      <property name="use_markup">False</property>
+			      <property name="justify">GTK_JUSTIFY_LEFT</property>
+			      <property name="wrap">False</property>
+			      <property name="selectable">False</property>
+			      <property name="xalign">0</property>
+			      <property name="yalign">0.5</property>
+			      <property name="xpad">0</property>
+			      <property name="ypad">0</property>
+			    </widget>
+			    <packing>
+			      <property name="left_attach">0</property>
+			      <property name="right_attach">1</property>
+			      <property name="top_attach">8</property>
+			      <property name="bottom_attach">9</property>
+			      <property name="x_options">fill</property>
 			      <property name="y_options"></property>
 			    </packing>
 			  </child>
@@ -1549,6 +1537,7 @@
 				  <property name="has_frame">True</property>
 				  <property name="invisible_char" translatable="yes">*</property>
 				  <property name="activates_default">True</property>
+				  <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:47:10 GMT"/>
 				</widget>
 			      </child>
 
@@ -1558,7 +1547,7 @@
 				  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
 
 				  <child>
-				    <widget class="GtkListItem" id="listitem1483">
+				    <widget class="GtkListItem" id="itemV4LSoundDirectionMono">
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
 				      <property name="label" translatable="yes">Mono</property>
@@ -1566,7 +1555,7 @@
 				  </child>
 
 				  <child>
-				    <widget class="GtkListItem" id="listitem1484">
+				    <widget class="GtkListItem" id="itemV4LSoundDirectionStereo">
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
 				      <property name="label" translatable="yes">Stereo</property>
@@ -1578,16 +1567,16 @@
 			    <packing>
 			      <property name="left_attach">1</property>
 			      <property name="right_attach">2</property>
-			      <property name="top_attach">10</property>
-			      <property name="bottom_attach">11</property>
+			      <property name="top_attach">8</property>
+			      <property name="bottom_attach">9</property>
 			      <property name="y_options"></property>
 			    </packing>
 			  </child>
 
 			  <child>
-			    <widget class="GtkLabel" id="labelV4LSound">
+			    <widget class="GtkLabel" id="labelV4LMJPEG">
 			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Sound:</property>
+			      <property name="label" translatable="yes">MJPEG:</property>
 			      <property name="use_underline">False</property>
 			      <property name="use_markup">False</property>
 			      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1604,6 +1593,73 @@
 			      <property name="top_attach">10</property>
 			      <property name="bottom_attach">11</property>
 			      <property name="x_options">fill</property>
+			      <property name="y_options"></property>
+			    </packing>
+			  </child>
+
+			  <child>
+			    <widget class="GtkCheckButton" id="checkV4LMJPEG">
+			      <property name="visible">True</property>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">enable</property>
+			      <property name="use_underline">True</property>
+			      <property name="relief">GTK_RELIEF_NORMAL</property>
+			      <property name="active">False</property>
+			      <property name="inconsistent">False</property>
+			      <property name="draw_indicator">True</property>
+			    </widget>
+			    <packing>
+			      <property name="left_attach">1</property>
+			      <property name="right_attach">2</property>
+			      <property name="top_attach">10</property>
+			      <property name="bottom_attach">11</property>
+			      <property name="x_options">fill</property>
+			      <property name="y_options"></property>
+			    </packing>
+			  </child>
+
+			  <child>
+			    <widget class="GtkLabel" id="labelV4LDecimation">
+			      <property name="visible">True</property>
+			      <property name="label" translatable="yes">Decimation:</property>
+			      <property name="use_underline">False</property>
+			      <property name="use_markup">False</property>
+			      <property name="justify">GTK_JUSTIFY_LEFT</property>
+			      <property name="wrap">False</property>
+			      <property name="selectable">False</property>
+			      <property name="xalign">0</property>
+			      <property name="yalign">0.5</property>
+			      <property name="xpad">0</property>
+			      <property name="ypad">0</property>
+			    </widget>
+			    <packing>
+			      <property name="left_attach">0</property>
+			      <property name="right_attach">1</property>
+			      <property name="top_attach">11</property>
+			      <property name="bottom_attach">12</property>
+			      <property name="x_options">fill</property>
+			      <property name="y_options"></property>
+			    </packing>
+			  </child>
+
+			  <child>
+			    <widget class="GtkSpinButton" id="entryV4LDecimation">
+			      <property name="visible">True</property>
+			      <property name="can_focus">True</property>
+			      <property name="climb_rate">1</property>
+			      <property name="digits">0</property>
+			      <property name="numeric">False</property>
+			      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
+			      <property name="snap_to_ticks">False</property>
+			      <property name="wrap">False</property>
+			      <property name="adjustment">1 0 100 1 10 10</property>
+			      <signal name="changed" handler="V4LBuildMRL" last_modification_time="Sun, 09 Nov 2003 15:48:07 GMT"/>
+			    </widget>
+			    <packing>
+			      <property name="left_attach">1</property>
+			      <property name="right_attach">2</property>
+			      <property name="top_attach">11</property>
+			      <property name="bottom_attach">12</property>
 			      <property name="y_options"></property>
 			    </packing>
 			  </child>
@@ -1688,499 +1744,30 @@
 	      <property name="spacing">0</property>
 
 	      <child>
-		<widget class="GtkVBox" id="vbox6">
+		<widget class="GtkScrolledWindow" id="scrolledwindowTranscode">
 		  <property name="visible">True</property>
-		  <property name="homogeneous">False</property>
-		  <property name="spacing">0</property>
+		  <property name="can_focus">True</property>
+		  <property name="hscrollbar_policy">GTK_POLICY_NEVER</property>
+		  <property name="vscrollbar_policy">GTK_POLICY_ALWAYS</property>
+		  <property name="shadow_type">GTK_SHADOW_NONE</property>
+		  <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
 		  <child>
-		    <widget class="GtkFrame" id="frameVideo">
+		    <widget class="GtkViewport" id="viewport5">
 		      <property name="visible">True</property>
-		      <property name="label_xalign">0</property>
-		      <property name="label_yalign">0.5</property>
-		      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
+		      <property name="shadow_type">GTK_SHADOW_IN</property>
 
 		      <child>
-			<widget class="GtkTable" id="table4">
+			<widget class="GtkTable" id="table6">
 			  <property name="visible">True</property>
-			  <property name="n_rows">3</property>
+			  <property name="n_rows">14</property>
 			  <property name="n_columns">2</property>
 			  <property name="homogeneous">False</property>
 			  <property name="row_spacing">0</property>
 			  <property name="column_spacing">0</property>
-
-			  <child>
-			    <widget class="GtkLabel" id="labelVideoDevice">
-			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Device :</property>
-			      <property name="use_underline">False</property>
-			      <property name="use_markup">False</property>
-			      <property name="justify">GTK_JUSTIFY_LEFT</property>
-			      <property name="wrap">False</property>
-			      <property name="selectable">False</property>
-			      <property name="xalign">0</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">0</property>
-			      <property name="right_attach">1</property>
-			      <property name="top_attach">0</property>
-			      <property name="bottom_attach">1</property>
-			      <property name="x_options">fill</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkLabel" id="labelVideoCodec">
-			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Codec :</property>
-			      <property name="use_underline">False</property>
-			      <property name="use_markup">False</property>
-			      <property name="justify">GTK_JUSTIFY_LEFT</property>
-			      <property name="wrap">False</property>
-			      <property name="selectable">False</property>
-			      <property name="xalign">0</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">0</property>
-			      <property name="right_attach">1</property>
-			      <property name="top_attach">1</property>
-			      <property name="bottom_attach">2</property>
-			      <property name="x_options">fill</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkLabel" id="labelVideoBitrate">
-			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Bitrate :</property>
-			      <property name="use_underline">False</property>
-			      <property name="use_markup">False</property>
-			      <property name="justify">GTK_JUSTIFY_LEFT</property>
-			      <property name="wrap">False</property>
-			      <property name="selectable">False</property>
-			      <property name="xalign">0</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">0</property>
-			      <property name="right_attach">1</property>
-			      <property name="top_attach">2</property>
-			      <property name="bottom_attach">3</property>
-			      <property name="x_options">fill</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkCombo" id="comboVideoDevice">
-			      <property name="visible">True</property>
-			      <property name="value_in_list">False</property>
-			      <property name="allow_empty">True</property>
-			      <property name="case_sensitive">False</property>
-			      <property name="enable_arrow_keys">True</property>
-			      <property name="enable_arrows_always">False</property>
-
-			      <child internal-child="entry">
-				<widget class="GtkEntry" id="entryVideoDevice">
-				  <property name="visible">True</property>
-				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
-				  <property name="visibility">True</property>
-				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">/dev/video</property>
-				  <property name="has_frame">True</property>
-				  <property name="invisible_char" translatable="yes">*</property>
-				  <property name="activates_default">False</property>
-				  <signal name="changed" handler="onVideoDeviceChanged" last_modification_time="Fri, 26 Sep 2003 12:43:13 GMT"/>
-				  <signal name="editing_done" handler="onEntryVideoDeviceEditingDone" last_modification_time="Fri, 26 Sep 2003 13:34:44 GMT"/>
-				</widget>
-			      </child>
-
-			      <child internal-child="list">
-				<widget class="GtkList" id="listVideoDevice">
-				  <property name="visible">True</property>
-				  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
-				</widget>
-			      </child>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">1</property>
-			      <property name="right_attach">2</property>
-			      <property name="top_attach">0</property>
-			      <property name="bottom_attach">1</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkCombo" id="comboVideoCodec">
-			      <property name="visible">True</property>
-			      <property name="value_in_list">False</property>
-			      <property name="allow_empty">True</property>
-			      <property name="case_sensitive">False</property>
-			      <property name="enable_arrow_keys">True</property>
-			      <property name="enable_arrows_always">False</property>
-
-			      <child internal-child="entry">
-				<widget class="GtkEntry" id="entryVideoCodec">
-				  <property name="visible">True</property>
-				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
-				  <property name="visibility">True</property>
-				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">raw</property>
-				  <property name="has_frame">True</property>
-				  <property name="invisible_char" translatable="yes">*</property>
-				  <property name="activates_default">False</property>
-				  <signal name="changed" handler="onVideoCodecChanged" last_modification_time="Fri, 26 Sep 2003 12:43:54 GMT"/>
-				  <signal name="editing_done" handler="onEntryVideoCodecEditingDone" last_modification_time="Fri, 26 Sep 2003 13:34:58 GMT"/>
-				</widget>
-			      </child>
-
-			      <child internal-child="list">
-				<widget class="GtkList" id="listVideoCodec">
-				  <property name="visible">True</property>
-				  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
-
-				  <child>
-				    <widget class="GtkListItem" id="listitem1141">
-				      <property name="visible">True</property>
-				      <property name="can_focus">True</property>
-				      <property name="label" translatable="yes">raw</property>
-				    </widget>
-				  </child>
-
-				  <child>
-				    <widget class="GtkListItem" id="listitem1142">
-				      <property name="visible">True</property>
-				      <property name="can_focus">True</property>
-				      <property name="label" translatable="yes">huff</property>
-				    </widget>
-				  </child>
-
-				  <child>
-				    <widget class="GtkListItem" id="listitem1143">
-				      <property name="visible">True</property>
-				      <property name="can_focus">True</property>
-				      <property name="label" translatable="yes"></property>
-				    </widget>
-				  </child>
-				</widget>
-			      </child>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">1</property>
-			      <property name="right_attach">2</property>
-			      <property name="top_attach">1</property>
-			      <property name="bottom_attach">2</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkSpinButton" id="spinVideoBitrate">
-			      <property name="visible">True</property>
-			      <property name="can_focus">True</property>
-			      <property name="climb_rate">1</property>
-			      <property name="digits">0</property>
-			      <property name="numeric">False</property>
-			      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
-			      <property name="snap_to_ticks">False</property>
-			      <property name="wrap">False</property>
-			      <property name="adjustment">64 0 100 1 10 10</property>
-			      <signal name="changed" handler="onVideoBitrateChanged" last_modification_time="Fri, 26 Sep 2003 12:44:26 GMT"/>
-			      <signal name="editing_done" handler="onVideoBitrateEditingDone" last_modification_time="Fri, 26 Sep 2003 13:35:16 GMT"/>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">1</property>
-			      <property name="right_attach">2</property>
-			      <property name="top_attach">2</property>
-			      <property name="bottom_attach">3</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
 			</widget>
-		      </child>
-
-		      <child>
-			<widget class="GtkLabel" id="label42">
-			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">Video</property>
-			  <property name="use_underline">False</property>
-			  <property name="use_markup">False</property>
-			  <property name="justify">GTK_JUSTIFY_LEFT</property>
-			  <property name="wrap">False</property>
-			  <property name="selectable">False</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-			<packing>
-			  <property name="type">label_item</property>
-			</packing>
 		      </child>
 		    </widget>
-		    <packing>
-		      <property name="padding">0</property>
-		      <property name="expand">True</property>
-		      <property name="fill">True</property>
-		    </packing>
-		  </child>
-
-		  <child>
-		    <widget class="GtkFrame" id="frameAudio">
-		      <property name="visible">True</property>
-		      <property name="label_xalign">0</property>
-		      <property name="label_yalign">0.5</property>
-		      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
-
-		      <child>
-			<widget class="GtkTable" id="table3">
-			  <property name="visible">True</property>
-			  <property name="n_rows">3</property>
-			  <property name="n_columns">2</property>
-			  <property name="homogeneous">False</property>
-			  <property name="row_spacing">0</property>
-			  <property name="column_spacing">0</property>
-
-			  <child>
-			    <widget class="GtkLabel" id="labelAudioDevice">
-			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Device :</property>
-			      <property name="use_underline">False</property>
-			      <property name="use_markup">False</property>
-			      <property name="justify">GTK_JUSTIFY_LEFT</property>
-			      <property name="wrap">False</property>
-			      <property name="selectable">False</property>
-			      <property name="xalign">0</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">0</property>
-			      <property name="right_attach">1</property>
-			      <property name="top_attach">0</property>
-			      <property name="bottom_attach">1</property>
-			      <property name="x_options">fill</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkLabel" id="labelAudioCodec">
-			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Codec :</property>
-			      <property name="use_underline">False</property>
-			      <property name="use_markup">False</property>
-			      <property name="justify">GTK_JUSTIFY_LEFT</property>
-			      <property name="wrap">False</property>
-			      <property name="selectable">False</property>
-			      <property name="xalign">0</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">0</property>
-			      <property name="right_attach">1</property>
-			      <property name="top_attach">1</property>
-			      <property name="bottom_attach">2</property>
-			      <property name="x_options">fill</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkLabel" id="labelAudioBitrate">
-			      <property name="visible">True</property>
-			      <property name="label" translatable="yes">Bitrate :</property>
-			      <property name="use_underline">False</property>
-			      <property name="use_markup">False</property>
-			      <property name="justify">GTK_JUSTIFY_LEFT</property>
-			      <property name="wrap">False</property>
-			      <property name="selectable">False</property>
-			      <property name="xalign">0</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">0</property>
-			      <property name="right_attach">1</property>
-			      <property name="top_attach">2</property>
-			      <property name="bottom_attach">3</property>
-			      <property name="x_options">fill</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkCombo" id="comboAudioDevice">
-			      <property name="visible">True</property>
-			      <property name="value_in_list">False</property>
-			      <property name="allow_empty">True</property>
-			      <property name="case_sensitive">False</property>
-			      <property name="enable_arrow_keys">True</property>
-			      <property name="enable_arrows_always">False</property>
-
-			      <child internal-child="entry">
-				<widget class="GtkEntry" id="entryAudioDevice">
-				  <property name="visible">True</property>
-				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
-				  <property name="visibility">True</property>
-				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">/dev/dsp</property>
-				  <property name="has_frame">True</property>
-				  <property name="invisible_char" translatable="yes">*</property>
-				  <property name="activates_default">False</property>
-				  <signal name="changed" handler="onAudioDeviceChanged" last_modification_time="Fri, 26 Sep 2003 12:45:20 GMT"/>
-				  <signal name="editing_done" handler="onEntryAudioDeviceEditingDone" last_modification_time="Fri, 26 Sep 2003 13:35:30 GMT"/>
-				</widget>
-			      </child>
-
-			      <child internal-child="list">
-				<widget class="GtkList" id="listAudioDevice">
-				  <property name="visible">True</property>
-				  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
-				</widget>
-			      </child>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">1</property>
-			      <property name="right_attach">2</property>
-			      <property name="top_attach">0</property>
-			      <property name="bottom_attach">1</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkCombo" id="comboAudioCodec">
-			      <property name="visible">True</property>
-			      <property name="value_in_list">False</property>
-			      <property name="allow_empty">True</property>
-			      <property name="case_sensitive">False</property>
-			      <property name="enable_arrow_keys">True</property>
-			      <property name="enable_arrows_always">False</property>
-
-			      <child internal-child="entry">
-				<widget class="GtkEntry" id="entryAudioCodec">
-				  <property name="visible">True</property>
-				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
-				  <property name="visibility">True</property>
-				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes">raw</property>
-				  <property name="has_frame">True</property>
-				  <property name="invisible_char" translatable="yes">*</property>
-				  <property name="activates_default">False</property>
-				  <signal name="changed" handler="onAudioCodecChanged" last_modification_time="Fri, 26 Sep 2003 12:45:50 GMT"/>
-				  <signal name="editing_done" handler="onEntryAudioCodecEditingDone" last_modification_time="Fri, 26 Sep 2003 13:35:43 GMT"/>
-				</widget>
-			      </child>
-
-			      <child internal-child="list">
-				<widget class="GtkList" id="listAudioCodec">
-				  <property name="visible">True</property>
-				  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
-
-				  <child>
-				    <widget class="GtkListItem" id="listitem1129">
-				      <property name="visible">True</property>
-				      <property name="can_focus">True</property>
-				      <property name="label" translatable="yes">raw</property>
-				    </widget>
-				  </child>
-
-				  <child>
-				    <widget class="GtkListItem" id="listitem1130">
-				      <property name="visible">True</property>
-				      <property name="can_focus">True</property>
-				      <property name="label" translatable="yes">alaw</property>
-				    </widget>
-				  </child>
-
-				  <child>
-				    <widget class="GtkListItem" id="listitem1131">
-				      <property name="visible">True</property>
-				      <property name="can_focus">True</property>
-				      <property name="label" translatable="yes">ulaw</property>
-				    </widget>
-				  </child>
-				</widget>
-			      </child>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">1</property>
-			      <property name="right_attach">2</property>
-			      <property name="top_attach">1</property>
-			      <property name="bottom_attach">2</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-
-			  <child>
-			    <widget class="GtkSpinButton" id="spinAudioBitrate">
-			      <property name="visible">True</property>
-			      <property name="can_focus">True</property>
-			      <property name="climb_rate">1</property>
-			      <property name="digits">0</property>
-			      <property name="numeric">True</property>
-			      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
-			      <property name="snap_to_ticks">False</property>
-			      <property name="wrap">False</property>
-			      <property name="adjustment">64 0 100 1 10 10</property>
-			      <signal name="changed" handler="onAudioBitrateChanged" last_modification_time="Fri, 26 Sep 2003 12:46:22 GMT"/>
-			      <signal name="editing_done" handler="onAudioBitrateEditingDone" last_modification_time="Fri, 26 Sep 2003 13:35:57 GMT"/>
-			    </widget>
-			    <packing>
-			      <property name="left_attach">1</property>
-			      <property name="right_attach">2</property>
-			      <property name="top_attach">2</property>
-			      <property name="bottom_attach">3</property>
-			      <property name="y_options"></property>
-			    </packing>
-			  </child>
-			</widget>
-		      </child>
-
-		      <child>
-			<widget class="GtkLabel" id="label41">
-			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">Audio</property>
-			  <property name="use_underline">False</property>
-			  <property name="use_markup">False</property>
-			  <property name="justify">GTK_JUSTIFY_LEFT</property>
-			  <property name="wrap">False</property>
-			  <property name="selectable">False</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-			<packing>
-			  <property name="type">label_item</property>
-			</packing>
-		      </child>
-		    </widget>
-		    <packing>
-		      <property name="padding">0</property>
-		      <property name="expand">True</property>
-		      <property name="fill">True</property>
-		    </packing>
 		  </child>
 		</widget>
 		<packing>
@@ -2201,13 +1788,13 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkButton" id="AddServerToPlaylist">
+		    <widget class="GtkButton" id="AddTranscodeToPlaylist">
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="label" translatable="yes">Add to Playlist</property>
 		      <property name="use_underline">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
-		      <signal name="pressed" handler="onAddServerToPlaylist" last_modification_time="Fri, 26 Sep 2003 12:46:58 GMT"/>
+		      <signal name="pressed" handler="onAddTranscodeToPlaylist" last_modification_time="Sun, 09 Nov 2003 15:55:09 GMT"/>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
