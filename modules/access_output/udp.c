@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.18 2004/01/25 17:20:18 kuehne Exp $
+ * $Id: udp.c,v 1.19 2004/01/25 20:40:59 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -73,12 +73,12 @@ static sout_buffer_t *NewUDPPacket( sout_access_out_t *, mtime_t );
 #define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for udp streams. This " \
-    "value should be set in milliseconds." )
+    "value should be set in millisecond units." )
 
 vlc_module_begin();
     set_description( _("UDP stream ouput") );
-    add_category_hint( N_("udp stream output"), NULL , VLC_TRUE );
-    add_integer( "udp-sout-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    add_integer( "udp-sout-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+                 CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );
     add_shortcut( "rtp" ); // Will work only with ts muxer

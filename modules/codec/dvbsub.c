@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
  * Copyright (C) 2003 VideoLAN
- * $Id: dvbsub.c,v 1.8 2004/01/25 19:10:09 bigben Exp $
+ * $Id: dvbsub.c,v 1.9 2004/01/25 20:40:59 gbazin Exp $
  *
  * Authors: Damien LUCAS <damien.lucas@anevia.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -38,7 +38,6 @@ static int  Open ( vlc_object_t *p_this );
 static void Close( vlc_object_t *p_this );
 
 vlc_module_begin();
-    add_category_hint( N_("subtitles"), NULL, VLC_TRUE );
     set_description( _("DVB subtitles decoder") );
     set_capability( "decoder", 50 );
     set_callbacks( Open, Close );

@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.16 2004/01/25 18:20:12 bigben Exp $
+ * $Id: subsdec.c,v 1.17 2004/01/25 20:40:59 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -101,7 +101,6 @@ vlc_module_begin();
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, CloseDecoder );
 
-    add_category_hint( N_("Subtitles"), NULL, VLC_FALSE );
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
                  VLC_TRUE );
         change_integer_list( pi_justification, ppsz_justification_text, 0 );
