@@ -99,7 +99,10 @@ int E_(Open) ( vlc_object_t *p_this )
     char                dvr[] = DVR;
     char                frontend[] = FRONTEND;
     int                 i_len = 0;
+    vlc_value_t         val;
+    int                 i_test;
 
+    
     /* parse the options passed in command line : */
     psz_parser = strdup( p_input->psz_name );
 
@@ -112,6 +115,22 @@ int E_(Open) ( vlc_object_t *p_this )
     u_adapter = config_GetInt( p_input, "adapter" );
     u_device  = config_GetInt( p_input, "device" );
   
+    /* Get antenna configuration options */
+    b_diseqc = config_GetInt( p_input, "diseqc" );
+    u_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" );
+    u_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" );
+    u_lnb_slof = config_GetInt( p_input, "lnb-slof" );
+
+    /*Get modulation parametters*/
+    i_bandwidth = config_GetInt( p_input, "bandwidth");
+    i_code_rate_HP = config_GetInt(p_input, "code-rate-hp");
+    i_code_rate_LP = config_GetInt(p_input, "code-rate-lp");
+    i_modulation  = config_GetInt(p_input, "modulation");
+    i_transmission = config_GetInt(p_input, "transmission");
+    i_guard = config_GetInt(p_input, "guard");
+    i_hierarchy = config_GetInt(p_input, "hierarchy");
+
+
     /* Determine frontend device information and capabilities */
     b_probe = config_GetInt( p_input, "probe" );
     if (b_probe)
@@ -155,19 +174,177 @@ int E_(Open) ( vlc_object_t *p_this )
     p_input->pf_set_area = SatelliteSetArea;
     p_input->pf_seek = SatelliteSeek;
 
-    u_freq = (unsigned int)strtol( psz_parser, &psz_next, 10 );
-    if( *psz_next )
+    i_test = strtol( psz_parser, &psz_next, 10 );
+    if ( psz_next == psz_parser )
     {
-        psz_parser = psz_next + 1;
-        b_polarisation = (vlc_bool_t)strtol( psz_parser, &psz_next, 10 );
+        for ( ;; )
+        {
+            if( !strncmp( psz_parser, "frequency=",
+                               strlen( "frequency=" ) ) )
+            {
+                u_freq =
+                  strtol( psz_parser + strlen( "frequency=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "polarization=",
+                               strlen( "polarization=" ) ) )
+            {
+                char *psz_parser_init;
+                psz_parser += strlen( "polarization=" );
+                psz_parser_init = psz_parser;
+                while ( *psz_parser != ':')
+                {
+                psz_parser++;
+                }
+                if ((!strncmp( psz_parser_init, "V" ,
+                     psz_parser - psz_parser_init ) ) || 
+                   (!strncmp( psz_parser_init, "V" ,
+                     psz_parser - psz_parser_init ) ) )
+                {
+                    b_polarisation = VLC_FALSE;
+                }
+                else if ((!strncmp( psz_parser_init, "H" ,
+                     psz_parser - psz_parser_init ) ) ||
+                   (!strncmp( psz_parser_init, "h" ,
+                     psz_parser - psz_parser_init ) ) )
+
+                {
+                    b_polarisation = VLC_TRUE;
+                }
+            }
+            else if( !strncmp( psz_parser, "fec=",
+                               strlen( "fec=" ) ) )
+            {
+                i_fec =
+                (int)strtol( psz_parser + strlen( "fec=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "srate=",
+                               strlen( "srate=" ) ) )
+            {
+                u_srate =
+                (unsigned int)strtol( psz_parser + strlen( "srate=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "program=",
+                               strlen( "program=" ) ) )
+            {
+                val.i_int = (int)strtol( psz_parser + strlen( "program=" ),
+                            &psz_parser, 0 );
+                var_Set( p_input, "program", val );
+            }
+            else if( !strncmp( psz_parser, "diseqc",
+                               strlen( "disecq" ) ) )
+            {
+                psz_parser += strlen("disecq");
+                b_diseqc = VLC_TRUE;
+            }
+            else if( !strncmp( psz_parser, "lnb-lof1=",
+                               strlen( "lnb-lof1=" ) ) )
+            {
+                u_lnb_lof1 =
+                (unsigned int)strtol( psz_parser + strlen( "lnb_lof1=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "lnb-lof2=",
+                               strlen( "lnb-lof2=" ) ) )
+            {
+                u_lnb_lof2 =
+                (unsigned int)strtol( psz_parser + strlen( "lnb_lof2=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "lnb-slof=",
+                               strlen( "lnb-slof=" ) ) )
+            {
+                u_lnb_slof =
+                (unsigned int)strtol( psz_parser + strlen( "lnb_slof=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "device=",
+                               strlen( "device=" ) ) )
+            {
+                u_device =
+                (unsigned int)strtol( psz_parser + strlen( "device=" ),
+                            &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "adapter=",
+                               strlen( "adapter=" ) ) )
+            {
+                u_adapter =
+                (unsigned int)strtol( psz_parser + strlen( "adapter=" ),
+                            &psz_parser, 0 );
+            }
+            else if (!strncmp( psz_parser, "modulation=",
+                               strlen( "modulation=" ) ) )
+            {
+                i_modulation = (int)strtol( psz_parser + strlen( "modulation=" ),
+                            &psz_parser, 0 );
+            }
+            else if (!strncmp( psz_parser, "bandwidth=",
+                               strlen( "bandwidth=" ) ) )
+            {
+                i_bandwidth = (int)strtol( psz_parser + strlen( "bandwidth=" ),
+                            &psz_parser, 0 );
+            }
+            else if (!strncmp( psz_parser, "guard=",
+                               strlen( "guard=" ) ) )
+            {
+                i_guard = (int)strtol( psz_parser + strlen( "guard=" ),
+                            &psz_parser, 0 );
+            }
+            else if (!strncmp( psz_parser, "transmission=",
+                               strlen( "transmission=" ) ) )
+            {
+                i_transmission = (int)strtol( psz_parser + 
+                            strlen( "transmission=" ),&psz_parser, 0 );
+            }
+            else if (!strncmp( psz_parser, "hierarchy=",
+                               strlen( "hierarchy=" ) ) )
+            {
+                i_hierarchy = (int)strtol( psz_parser + 
+                                strlen( "hierarchy=" ),&psz_parser, 0 );
+            }
+            else if (!strncmp( psz_parser, "code-rate-HP=",
+                               strlen( "code-rate-HP=" ) ) )
+            {
+                i_code_rate_HP = (int)strtol( psz_parser + 
+                                strlen( "code-rate-HP=" ),&psz_parser, 0 );
+            }
+            else if (!strncmp( psz_parser, "code-rate-LP=",
+                               strlen( "code-rate-LP=" ) ) )
+            {
+                i_code_rate_LP = (int)strtol( psz_parser +
+                                strlen( "code-rate-LP=" ),&psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "probe",
+                               strlen( "probe" ) ) )
+            {
+                psz_parser += strlen("probe");
+                b_probe = VLC_TRUE;
+            }
+            if( *psz_parser )
+                psz_parser++;
+            else
+            break;
+        }
+    }
+    else
+    {
+        msg_Warn(p_input,"DVV Input syntax has changed, please see documentation for further informations");
+        u_freq = (unsigned int)i_test;
         if( *psz_next )
         {
             psz_parser = psz_next + 1;
-            i_fec = (int)strtol( psz_parser, &psz_next, 10 );
+            b_polarisation = (vlc_bool_t)strtol( psz_parser, &psz_next, 10 );
             if( *psz_next )
             {
                 psz_parser = psz_next + 1;
-                u_srate = (unsigned int)strtol( psz_parser, &psz_next, 10 );
+                i_fec = (int)strtol( psz_parser, &psz_next, 10 );
+                if( *psz_next )
+                {
+                    psz_parser = psz_next + 1;
+                    u_srate = (unsigned int)strtol( psz_parser, &psz_next, 10 );
+                }
             }
         }
     }
@@ -234,13 +411,6 @@ int E_(Open) ( vlc_object_t *p_this )
             return -1;
         }
     }
-
-    /* Get antenna configuration options */
-    b_diseqc = config_GetInt( p_input, "diseqc" );
-    u_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" );
-    u_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" );
-    u_lnb_slof = config_GetInt( p_input, "lnb-slof" );
-
     /* Setting frontend parameters for tuning the hardware */      
     switch( frontend_info.type )
     {
@@ -255,8 +425,6 @@ int E_(Open) ( vlc_object_t *p_this )
             
         /* DVB-C */
         case FE_QAM:
-            i_modulation  = config_GetInt(p_input, "modulation");
-
             fep.frequency = u_freq;
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.qam.symbol_rate = u_srate;
@@ -267,14 +435,6 @@ int E_(Open) ( vlc_object_t *p_this )
 
         /* DVB-T */
         case FE_OFDM:
-            i_bandwidth = config_GetInt( p_input, "bandwidth");
-            i_code_rate_HP = config_GetInt(p_input, "code-rate-hp");
-            i_code_rate_LP = config_GetInt(p_input, "code-rate-lp");
-            i_modulation  = config_GetInt(p_input, "modulation");
-            i_transmission = config_GetInt(p_input, "transmission");
-            i_guard = config_GetInt(p_input, "guard");
-            i_hierarchy = config_GetInt(p_input, "hierarchy");
-            
             fep.frequency = u_freq;
             fep.inversion = dvb_DecodeInversion(p_input, (int) b_polarisation);
             fep.u.ofdm.bandwidth = dvb_DecodeBandwidth(p_input, i_bandwidth);

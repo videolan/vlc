@@ -114,7 +114,7 @@ vlc_module_begin();
         add_integer( "code-rate-lp", 9, NULL, CODE_RATE_LP_TEXT, CODE_RATE_LP_LONGTEXT, VLC_FALSE );
         add_integer( "bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT, VLC_FALSE );
         add_integer( "modulation", 0, NULL, MODULATION_TEXT, MODULATION_LONGTEXT, VLC_FALSE );
-        add_integer( "quard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, VLC_TRUE );
+        add_integer( "guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, VLC_TRUE );
         add_integer( "transmission", 0, NULL, TRANSMISSION_TEXT, TRANSMISSION_LONGTEXT, VLC_TRUE );
         add_integer( "hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT, VLC_TRUE );
     set_description( _("DVB input module with v4l2 support") );
