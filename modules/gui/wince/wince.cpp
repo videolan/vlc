@@ -74,6 +74,10 @@ DllMain( HANDLE hModule, DWORD fdwReason, LPVOID lpReserved )
 }
 #endif
 
+/* Global variables used by _TOMB() / _FROMB() */
+wchar_t pwsz_mbtow_wince[2048];
+char psz_wtomb_wince[2048];
+
 /*****************************************************************************
  * Open: initialize interface
  *****************************************************************************/

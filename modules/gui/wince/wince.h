@@ -503,19 +503,19 @@ protected:
  * A small helper function for utf8 <-> unicode conversions
  *****************************************************************************/
 #ifdef UNICODE
-    static wchar_t pwsz_mbtow[2048];
-    static char psz_wtomb[2048];
+    extern wchar_t pwsz_mbtow_wince[2048];
+    extern char psz_wtomb_wince[2048];
     static inline wchar_t *_FROMMB( const char *psz_in )
     {
-        mbstowcs( pwsz_mbtow, psz_in, 2048 );
-        pwsz_mbtow[2048-1] = 0;
-        return pwsz_mbtow;
+        mbstowcs( pwsz_mbtow_wince, psz_in, 2048 );
+        pwsz_mbtow_wince[2048-1] = 0;
+        return pwsz_mbtow_wince;
     }
     static inline char *_TOMB( const wchar_t *pwsz_in )
     {
-        wcstombs( psz_wtomb, pwsz_in, 2048 );
-        psz_wtomb[2048-1] = 0;
-        return psz_wtomb;
+        wcstombs( psz_wtomb_wince, pwsz_in, 2048 );
+        psz_wtomb_wince[2048-1] = 0;
+        return psz_wtomb_wince;
     }
 #else
 #   define _FROMMB(a) a
