@@ -91,7 +91,7 @@ vlc_module_begin();
                      VLC_FALSE );
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
                 OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
-        add_bool( "macosx-opengl", 0, NULL, OPENGL_TEXT,
+        add_bool( "macosx-opengl", 1, NULL, OPENGL_TEXT,
                   OPENGL_LONGTEXT, VLC_TRUE );
         add_string( "macosx-opengl-effect", "none", NULL,
                     OPENGL_EFFECT_TEXT, OPENGL_EFFECT_LONGTEXT,
