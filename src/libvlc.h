@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.120 2003/12/11 20:21:12 bigben Exp $
+ * $Id: libvlc.h,v 1.121 2003/12/12 23:03:35 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -594,6 +594,28 @@ static char *ppsz_language_text[] =
 #define VOL_DOWN_KEY_LONGTEXT N_("Select the key to turn down audio volume")
 #define VOL_MUTE_KEY_TEXT N_("Mute")
 #define VOL_MUTE_KEY_LONGTEXT N_("Select the key to turn off audio volume")
+#define PLAY_BOOKMARK1_KEY_TEXT N_("Play playlist bookmark 1")
+#define PLAY_BOOKMARK2_KEY_TEXT N_("Play playlist bookmark 2")
+#define PLAY_BOOKMARK3_KEY_TEXT N_("Play playlist bookmark 3")
+#define PLAY_BOOKMARK4_KEY_TEXT N_("Play playlist bookmark 4")
+#define PLAY_BOOKMARK5_KEY_TEXT N_("Play playlist bookmark 5")
+#define PLAY_BOOKMARK6_KEY_TEXT N_("Play playlist bookmark 6")
+#define PLAY_BOOKMARK7_KEY_TEXT N_("Play playlist bookmark 7")
+#define PLAY_BOOKMARK8_KEY_TEXT N_("Play playlist bookmark 8")
+#define PLAY_BOOKMARK9_KEY_TEXT N_("Play playlist bookmark 9")
+#define PLAY_BOOKMARK10_KEY_TEXT N_("Play playlist bookmark 10")
+#define PLAY_BOOKMARK_KEY_LONGTEXT N_("Select the key to play this bookmark")
+#define SET_BOOKMARK1_KEY_TEXT N_("Set playlist bookmark 1")
+#define SET_BOOKMARK2_KEY_TEXT N_("Set playlist bookmark 2")
+#define SET_BOOKMARK3_KEY_TEXT N_("Set playlist bookmark 3")
+#define SET_BOOKMARK4_KEY_TEXT N_("Set playlist bookmark 4")
+#define SET_BOOKMARK5_KEY_TEXT N_("Set playlist bookmark 5")
+#define SET_BOOKMARK6_KEY_TEXT N_("Set playlist bookmark 6")
+#define SET_BOOKMARK7_KEY_TEXT N_("Set playlist bookmark 7")
+#define SET_BOOKMARK8_KEY_TEXT N_("Set playlist bookmark 8")
+#define SET_BOOKMARK9_KEY_TEXT N_("Set playlist bookmark 9")
+#define SET_BOOKMARK10_KEY_TEXT N_("Set playlist bookmark 10")
+#define SET_BOOKMARK_KEY_LONGTEXT N_("Select the key to set this playlist bookmark")
 
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
@@ -832,6 +854,8 @@ vlc_module_begin();
     add_key( "key-vol-up", KEY_MODIFIER_COMMAND|KEY_UP, NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", KEY_MODIFIER_COMMAND|KEY_DOWN, NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-set-bookmark1", KEY_MODIFIER_COMMAND|KEY_F1, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark1", KEY_F1, NULL, PLAY_BOOKMARK1_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
 #else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
@@ -858,6 +882,26 @@ vlc_module_begin();
     add_key( "key-vol-up", 'a', NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", 'z', NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-mute", 'm', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-set-bookmark1", KEY_MODIFIER_CTRL|KEY_F1, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark2", KEY_MODIFIER_CTRL|KEY_F2, NULL, SET_BOOKMARK2_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark3", KEY_MODIFIER_CTRL|KEY_F3, NULL, SET_BOOKMARK3_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark4", KEY_MODIFIER_CTRL|KEY_F4, NULL, SET_BOOKMARK4_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark5", KEY_MODIFIER_CTRL|KEY_F5, NULL, SET_BOOKMARK5_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark6", KEY_MODIFIER_CTRL|KEY_F6, NULL, SET_BOOKMARK6_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark7", KEY_MODIFIER_CTRL|KEY_F7, NULL, SET_BOOKMARK7_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark8", KEY_MODIFIER_CTRL|KEY_F8, NULL, SET_BOOKMARK8_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark9", KEY_MODIFIER_CTRL|KEY_F9, NULL, SET_BOOKMARK9_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark10", KEY_MODIFIER_CTRL|KEY_F10, NULL, SET_BOOKMARK10_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark1", KEY_F1, NULL, PLAY_BOOKMARK1_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark2", KEY_F2, NULL, PLAY_BOOKMARK2_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark3", KEY_F3, NULL, PLAY_BOOKMARK3_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark4", KEY_F4, NULL, PLAY_BOOKMARK4_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark5", KEY_F5, NULL, PLAY_BOOKMARK5_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark6", KEY_F6, NULL, PLAY_BOOKMARK6_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark7", KEY_F7, NULL, PLAY_BOOKMARK7_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark8", KEY_F8, NULL, PLAY_BOOKMARK8_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark9", KEY_F9, NULL, PLAY_BOOKMARK9_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark10", KEY_F10, NULL, PLAY_BOOKMARK10_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
 #endif
 
     /* Usage (mainly useful for cmd line stuff) */
@@ -922,5 +966,25 @@ static struct hotkey p_hotkeys[] =
     { "key-nav-down", ACTIONID_NAV_DOWN, 0 },
     { "key-nav-left", ACTIONID_NAV_LEFT, 0 },
     { "key-nav-right", ACTIONID_NAV_RIGHT, 0 },
+    { "key-set-bookmark1", ACTIONID_SET_BOOKMARK1, 0},
+    { "key-set-bookmark2", ACTIONID_SET_BOOKMARK2, 0},
+    { "key-set-bookmark3", ACTIONID_SET_BOOKMARK3, 0},
+    { "key-set-bookmark4", ACTIONID_SET_BOOKMARK4, 0},
+    { "key-set-bookmark5", ACTIONID_SET_BOOKMARK5, 0},
+    { "key-set-bookmark6", ACTIONID_SET_BOOKMARK6, 0},
+    { "key-set-bookmark7", ACTIONID_SET_BOOKMARK7, 0},
+    { "key-set-bookmark8", ACTIONID_SET_BOOKMARK8, 0},
+    { "key-set-bookmark9", ACTIONID_SET_BOOKMARK9, 0},
+    { "key-set-bookmark10", ACTIONID_SET_BOOKMARK10, 0},
+    { "key-play-bookmark1", ACTIONID_PLAY_BOOKMARK1, 0},
+    { "key-play-bookmark2", ACTIONID_PLAY_BOOKMARK2, 0},
+    { "key-play-bookmark3", ACTIONID_PLAY_BOOKMARK3, 0},
+    { "key-play-bookmark4", ACTIONID_PLAY_BOOKMARK4, 0},
+    { "key-play-bookmark5", ACTIONID_PLAY_BOOKMARK5, 0},
+    { "key-play-bookmark6", ACTIONID_PLAY_BOOKMARK6, 0},
+    { "key-play-bookmark7", ACTIONID_PLAY_BOOKMARK7, 0},
+    { "key-play-bookmark8", ACTIONID_PLAY_BOOKMARK8, 0},
+    { "key-play-bookmark9", ACTIONID_PLAY_BOOKMARK9, 0},
+    { "key-play-bookmark10", ACTIONID_PLAY_BOOKMARK10, 0},
     { NULL, 0, 0 }
 };

@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.12 2003/12/11 01:36:12 yoann Exp $
+ * $Id: hotkeys.c,v 1.13 2003/12/12 23:03:35 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -63,12 +63,47 @@ static int  KeyEvent( vlc_object_t *, char const *,
                       vlc_value_t, vlc_value_t, void * );
 static int  ActionKeyCB( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
+static void PlayBookmark( intf_thread_t *, int );
+static void SetBookmark ( intf_thread_t *, int );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define BOOKMARK1_TEXT N_("Playlist bookmark 1")
+#define BOOKMARK2_TEXT N_("Playlist bookmark 2")
+#define BOOKMARK3_TEXT N_("Playlist bookmark 3")
+#define BOOKMARK4_TEXT N_("Playlist bookmark 4")
+#define BOOKMARK5_TEXT N_("Playlist bookmark 5")
+#define BOOKMARK6_TEXT N_("Playlist bookmark 6")
+#define BOOKMARK7_TEXT N_("Playlist bookmark 7")
+#define BOOKMARK8_TEXT N_("Playlist bookmark 8")
+#define BOOKMARK9_TEXT N_("Playlist bookmark 9")
+#define BOOKMARK10_TEXT N_("Playlist bookmark 10")
+#define BOOKMARK_LONGTEXT N_( \
+    "This option allows you to define playlist bookmarks")
+
 vlc_module_begin();
     set_description( _("hotkey interface") );
+    add_string( "bookmark1", NULL, NULL,
+                BOOKMARK1_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark2", NULL, NULL,
+                BOOKMARK2_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark3", NULL, NULL,
+                BOOKMARK3_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark4", NULL, NULL,
+                BOOKMARK4_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark5", NULL, NULL,
+                BOOKMARK5_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark6", NULL, NULL,
+                BOOKMARK6_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark7", NULL, NULL,
+                BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark8", NULL, NULL,
+                BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark9", NULL, NULL,
+                BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+    add_string( "bookmark10", NULL, NULL,
+                BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -398,12 +433,20 @@ static void Run( intf_thread_t *p_intf )
                     { 
                         vout_OSDMessage( VLC_OBJECT(p_playlist), psz_time );
                     }
+                    vlc_object_release( p_playlist );
                 }
-                                                                                                                            
-                vlc_object_release( p_playlist );
+            }
+            else if( i_action >= ACTIONID_PLAY_BOOKMARK1 &&
+                     i_action <= ACTIONID_PLAY_BOOKMARK10 )
+            {
+                PlayBookmark( p_intf, i_action - ACTIONID_PLAY_BOOKMARK1 + 1 );
+            }
+            else if( i_action >= ACTIONID_SET_BOOKMARK1 &&
+                     i_action <= ACTIONID_SET_BOOKMARK10 )
+            {
+                SetBookmark( p_intf, i_action - ACTIONID_SET_BOOKMARK1 + 1 );
             }
         }
-
     }
 }
 
@@ -469,4 +512,48 @@ static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
     }
 
     return VLC_SUCCESS;
+}
+
+static void PlayBookmark( intf_thread_t *p_intf, int i_num )
+{   
+    vlc_value_t val;
+    int i_position;
+    char psz_bookmark_name[11];
+    playlist_t *p_playlist = vlc_object_find( p_intf,
+             VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    
+    sprintf( psz_bookmark_name, "bookmark%i", i_num );
+    var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+    var_Get( p_intf, psz_bookmark_name, &val );
+                                                                                                                    
+    if( p_playlist )
+    {
+        char *psz_bookmark = strdup( val.psz_string );
+        for( i_position = 0 ; i_position < p_playlist->i_size ; i_position++)
+        {
+            if( !strcmp( psz_bookmark, p_playlist->pp_items[i_position]->psz_uri ) )
+            {
+                playlist_Goto( p_playlist, i_position );
+                break;
+            }
+        }
+        vlc_object_release( p_playlist );
+    }
+}
+
+static void SetBookmark( intf_thread_t *p_intf, int i_num )
+{
+    vlc_value_t val;
+    playlist_t *p_playlist = vlc_object_find( p_intf,
+            VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist )
+    {
+        char psz_bookmark_name[11];
+        sprintf( psz_bookmark_name, "bookmark%i", i_num );
+        var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
+        val.psz_string = strdup( p_playlist->pp_items[p_playlist->i_index]->psz_uri );
+        var_Set( p_intf, psz_bookmark_name, val );
+        msg_Info( p_intf, "Setting playlist bookmark %i to %s", i_num, val.psz_string );
+        vlc_object_release( p_playlist );
+    }
 }
