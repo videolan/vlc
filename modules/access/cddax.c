@@ -1,8 +1,8 @@
 /*****************************************************************************
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.8 2003/11/24 17:11:23 fenrir Exp $
+ * Copyright (C) 2000,2003 VideoLAN
+ * $Id: cddax.c,v 1.9 2003/11/25 03:54:33 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -132,8 +132,6 @@ static void CDDACloseIntf    ( vlc_object_t * );
 
 
 static int  InitThread     ( intf_thread_t *p_intf );
-static int  MouseEvent     ( vlc_object_t *, char const *,
-                             vlc_value_t, vlc_value_t, void * );
 static int  KeyEvent       ( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
@@ -146,6 +144,10 @@ static int debug_callback   ( vlc_object_t *p_this, const char *psz_name,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+static int  DemuxOpen  ( vlc_object_t * );
+static void DemuxClose ( vlc_object_t * );
+
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for cdda streams. This " \
@@ -835,8 +837,6 @@ static void RunIntf( intf_thread_t *p_intf )
 				    VLC_OBJECT_VOUT, FIND_ANYWHERE );
 	  if( p_vout )
             {
-	      var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
-	      var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
 	      var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             }
         }
@@ -848,8 +848,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
     if( p_vout )
     {
-        var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
-        var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+        var_DelCallback( p_vout, "key-pressed", KeyEvent, p_intf );
         vlc_object_release( p_vout );
     }
 
@@ -890,30 +889,6 @@ static int InitThread( intf_thread_t * p_intf )
     {
         return VLC_EGENERIC;
     }
-}
-
-/*****************************************************************************
- * MouseEvent: callback for mouse events
- *****************************************************************************/
-static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_data;
-
-    vlc_mutex_lock( &p_intf->change_lock );
-
-    if( psz_var[6] == 'c' ) /* "mouse-clicked" */
-    {
-        p_intf->p_sys->b_click = VLC_TRUE;
-    }
-    else if( psz_var[6] == 'm' ) /* "mouse-moved" */
-    {
-        p_intf->p_sys->b_move = VLC_TRUE;
-    }
-
-    vlc_mutex_unlock( &p_intf->change_lock );
-
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
