@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2003 VideoLAN
- * $Id: cdda.c,v 1.16 2004/02/24 17:43:31 gbazin Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -233,7 +233,7 @@ static int AccessOpen( vlc_object_t *p_this )
     SetWLE( &p_sys->waveheader.BytesPerSample,
             2 /*Modus*/ * 16 /*BitsPerSample*/ / 8 );
     SetDWLE( &p_sys->waveheader.BytesPerSec,
-             16 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
+             2*16/8 /*BytesPerSample*/ * 44100 /*SampleFreq*/ );
     p_sys->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
     p_sys->waveheader.DataLength = 0;                 /* we just don't know */
     p_sys->i_header_pos = 0;
