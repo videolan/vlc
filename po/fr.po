@@ -27,7 +27,7 @@ msgstr ""
 
 #: include/vlc_help.h:32
 msgid "VLC preferences"
-msgstr "Préférences de VLC"
+msgstr "Préférences de VLCééééé"
 
 #: include/vlc_help.h:34
 msgid ""
@@ -10303,7 +10303,7 @@ msgstr "Tout répéter"
 
 #: modules/gui/wxwindows/playlist.cpp:39
 msgid "Repeat"
-msgstr "Tout répéter"
+msgstr "Répéter un"
 
 #: modules/gui/wxwindows/playlist.cpp:206
 msgid "&Simple Add..."
