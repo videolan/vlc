@@ -4,16 +4,26 @@ Changes between 0.8.0 and 0.8.1-svn:
 -----------------------------------------------------
 
 Core support:
- * Include TLS/SSL API
+ * Include TLS/SSL API (on plaforms where libgnutls is available)
  * SSL support in the HTTP daemon
 
-Demuxers:
- * Fixed a VLC crash with OpenDML avi files
-
 Windows port:
- * Fixed multichannel audio support (which was broken in 0.8.0)
+ * Fixed win32 multichannel audio output support (which was broken in 0.8.0)
  * Fixed DV and MPEG (WinTV PVR 250/350) support in the dshow input
- * Spurious taskbar item after switching to fullscreen fixed
+ * Fixed spurious taskbar item after switching to fullscreen
+
+WinCE port:
+ * A few more updates (we still miss an interface and a fast video output).
+
+Audio Output:
+ * Portaudio audio output plugin improvements
+
+Video Output:
+ * Proper subpictures scaling using the aspect-ratio info when available
+
+Demuxers:
+ * Fixed crash with ODML avi files
+ * Fixed autodetection of VCD/SVCD bin files
 
 Stream Output:
  Encoders:
