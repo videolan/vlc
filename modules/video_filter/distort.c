@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: distort.c,v 1.7 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: distort.c,v 1.8 2003/03/18 23:30:28 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -232,6 +232,7 @@ static void Destroy( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+    vlc_object_detach( p_vout->p_sys->p_vout );
     vout_Destroy( p_vout->p_sys->p_vout );
 
     free( p_vout->p_sys );

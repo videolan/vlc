@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: clone.c,v 1.7 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: clone.c,v 1.8 2003/03/18 23:30:28 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,6 +32,8 @@
 
 #include "filter_common.h"
 
+#define VOUTSEPARATOR ','
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -54,9 +56,13 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define COUNT_LONGTEXT N_("Select the number of video windows in which to "\
     "clone the video")
 
+#define VOUTLIST_TEXT N_("list of vout modules")
+#define VOUTLIST_LONGTEXT N_("Select the specific vout modules that you want to activate")
+
 vlc_module_begin();
     add_category_hint( N_("Clone"), NULL, VLC_FALSE );
     add_integer( "clone-count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, VLC_FALSE );
+    add_string ( "clone-vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, VLC_FALSE );
     set_description( _("image clone video module") );
     set_capability( "video filter", 0 );
     add_shortcut( "clone" );
@@ -72,6 +78,12 @@ vlc_module_end();
 struct vout_sys_t
 {
     int    i_clones;
+
+    /* list of vout modules to use. "default" will launch a default
+     * module. If specified, overrides the setting in i_clones (which it
+     * sets to the list length) */
+    char **ppsz_vout_list;
+
     vout_thread_t **pp_vout;
 };
 
@@ -83,6 +95,7 @@ struct vout_sys_t
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    char *psz_clonelist;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -98,8 +111,57 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = Render;
     p_vout->pf_display = NULL;
 
-    /* Look what method was requested */
-    p_vout->p_sys->i_clones = config_GetInt( p_vout, "clone-count" );
+    psz_clonelist = config_GetPsz( p_vout, "clone-vout-list" );
+    if( psz_clonelist )
+    {
+        int i_dummy;
+        char *psz_token;
+
+        /* Count the number of defined vout */
+        p_vout->p_sys->i_clones = 1;
+        i_dummy = 0;
+        while( psz_clonelist[i_dummy] != 0 )
+        {
+            if( psz_clonelist[i_dummy] == VOUTSEPARATOR )
+                p_vout->p_sys->i_clones++;
+            i_dummy++;
+        }
+
+        p_vout->p_sys->ppsz_vout_list = malloc( p_vout->p_sys->i_clones
+                                                * sizeof(char *) );
+        if( !p_vout->p_sys->ppsz_vout_list )
+        {
+            msg_Err( p_vout, "out of memory" );
+            free( p_vout->p_sys );
+            return VLC_ENOMEM;
+        }
+
+        /* Tokenize the list */
+        i_dummy = 0;
+        psz_token = psz_clonelist;
+        while( psz_token && *psz_token )
+        {
+           char *psz_module;
+           psz_module = psz_token;
+           psz_token = strchr( psz_module, VOUTSEPARATOR );
+           if( psz_token )
+           {
+               *psz_token = '\0';
+               psz_token++;
+           }
+           p_vout->p_sys->ppsz_vout_list[i_dummy] = strdup( psz_module );
+           i_dummy++;
+        }
+
+        free( psz_clonelist );
+    }
+    else
+    {
+        /* No list was specified. We will use the default vout, and get
+         * the number of clones from clone-count */
+        p_vout->p_sys->i_clones = config_GetInt( p_vout, "clone-count" );
+        p_vout->p_sys->ppsz_vout_list = NULL;
+    }
 
     p_vout->p_sys->i_clones = __MAX( 1, __MIN( 99, p_vout->p_sys->i_clones ) );
 
@@ -124,6 +186,7 @@ static int Init( vout_thread_t *p_vout )
 {
     int   i_index, i_vout;
     picture_t *p_pic;
+    char *psz_default_vout;
 
     I_OUTPUTPICTURES = 0;
 
@@ -136,22 +199,48 @@ static int Init( vout_thread_t *p_vout )
     /* Try to open the real video output */
     msg_Dbg( p_vout, "spawning the real video outputs" );
 
+    /* Save the default vout */
+    psz_default_vout = config_GetPsz( p_vout, "vout" );
+
     for( i_vout = 0; i_vout < p_vout->p_sys->i_clones; i_vout++ )
     {
-        p_vout->p_sys->pp_vout[ i_vout ] = vout_Create( p_vout,
-                            p_vout->render.i_width, p_vout->render.i_height,
-                            p_vout->render.i_chroma, p_vout->render.i_aspect );
+        if( p_vout->p_sys->ppsz_vout_list == NULL 
+            || ( !strncmp( p_vout->p_sys->ppsz_vout_list[i_vout],
+                           "default", 8 ) ) )
+        {
+            p_vout->p_sys->pp_vout[i_vout] =
+                vout_Create( p_vout, p_vout->render.i_width,
+                             p_vout->render.i_height, p_vout->render.i_chroma, 
+                             p_vout->render.i_aspect );
+        }
+        else
+        {
+            /* create the appropriate vout instead of the default one */
+            config_PutPsz( p_vout, "vout",
+                           p_vout->p_sys->ppsz_vout_list[i_vout] );
+            p_vout->p_sys->pp_vout[i_vout] =
+                vout_Create( p_vout, p_vout->render.i_width,
+                             p_vout->render.i_height, p_vout->render.i_chroma, 
+                             p_vout->render.i_aspect );
+
+            /* Reset the default value */
+            config_PutPsz( p_vout, "vout", psz_default_vout );
+        }
+
         if( p_vout->p_sys->pp_vout[ i_vout ] == NULL )
         {
             msg_Err( p_vout, "failed to clone %i vout threads",
-                             p_vout->p_sys->i_clones );
+                     p_vout->p_sys->i_clones );
             p_vout->p_sys->i_clones = i_vout;
+            if( psz_default_vout ) free( psz_default_vout );
             RemoveAllVout( p_vout );
             return VLC_EGENERIC;
         }
+
         ADD_CALLBACKS( p_vout->p_sys->pp_vout[ i_vout ], SendEvents );
     }
 
+    if( psz_default_vout ) free( psz_default_vout );
     ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
 
     return VLC_SUCCESS;
@@ -263,6 +352,7 @@ static void RemoveAllVout( vout_thread_t *p_vout )
          --p_vout->p_sys->i_clones;
          DEL_CALLBACKS( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones],
                         SendEvents );
+         vlc_object_detach( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
          vout_Destroy( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
     }
 }
@@ -277,4 +367,3 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
 
     return VLC_SUCCESS;
 }
-
