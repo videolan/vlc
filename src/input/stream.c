@@ -400,7 +400,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
                             "DON'T USE STREAM_CONTROL_ACCESS !!!" );
                 return VLC_EGENERIC;
             }
-            return access2_Control( p_access, i_int, args );
+            return access2_vaControl( p_access, i_int, args );
 
         default:
             msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
