@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.34 2003/09/07 22:43:17 fenrir Exp $
+ * $Id: stream_output.c,v 1.35 2003/11/21 15:32:09 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -175,7 +175,7 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
  * Packetizer/Input
  *****************************************************************************/
 sout_packetizer_input_t *__sout_InputNew( vlc_object_t  *p_this,
-                                          sout_format_t *p_fmt )
+                                          es_format_t *p_fmt )
 {
     sout_instance_t         *p_sout = NULL;
     sout_packetizer_input_t *p_input;
@@ -195,7 +195,7 @@ sout_packetizer_input_t *__sout_InputNew( vlc_object_t  *p_this,
     p_input->p_sout = p_sout;
     p_input->p_fmt  = p_fmt;
 
-    if( p_fmt->i_fourcc == VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
+    if( p_fmt->i_codec == VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
     {
         vlc_object_release( p_sout );
         return p_input;
@@ -225,7 +225,7 @@ int sout_InputDelete( sout_packetizer_input_t *p_input )
 
     msg_Dbg( p_sout, "removing an input" );
 
-    if( p_input->p_fmt->i_fourcc != VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
+    if( p_input->p_fmt->i_codec != VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
     {
         vlc_mutex_lock( &p_sout->lock );
         p_sout->p_stream->pf_del( p_sout->p_stream, p_input->id );
@@ -243,7 +243,7 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input, sout_buffer_t *p_buf
     sout_instance_t     *p_sout = p_input->p_sout;
     int                 i_ret;
 
-    if( p_input->p_fmt->i_fourcc == VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
+    if( p_input->p_fmt->i_codec == VLC_FOURCC( 'n', 'u', 'l', 'l' ) )
     {
         sout_BufferDelete( p_input->p_sout, p_buffer );
         return VLC_SUCCESS;
@@ -423,7 +423,7 @@ void sout_MuxDelete              ( sout_mux_t *p_mux )
 }
 
 sout_input_t *sout_MuxAddStream( sout_mux_t *p_mux,
-                                 sout_format_t *p_fmt )
+                                 es_format_t *p_fmt )
 {
     sout_input_t *p_input;
 

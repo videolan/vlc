@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.51 2003/11/17 02:55:22 fenrir Exp $
+ * $Id: transcode.c,v 1.52 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -47,7 +47,7 @@
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
 
@@ -316,8 +316,8 @@ static void Close( vlc_object_t * p_this )
 struct sout_stream_id_t
 {
     vlc_fourcc_t  b_transcode;
-    sout_format_t f_src;        /* only if transcoding */
-    sout_format_t f_dst;        /*  "   "      " */
+    es_format_t f_src;        /* only if transcoding */
+    es_format_t f_dst;        /*  "   "      " */
     unsigned int  i_inter_pixfmt; /* intermediary format when transcoding */
 
     /* id of the out stream */
@@ -347,7 +347,7 @@ struct sout_stream_id_t
 };
 
 
-static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
     sout_stream_id_t    *id;
@@ -361,21 +361,21 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
     {
         msg_Dbg( p_stream,
                  "creating audio transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
-                 (char*)&p_fmt->i_fourcc,
+                 (char*)&p_fmt->i_codec,
                  (char*)&p_sys->i_acodec );
 
         /* src format */
-        memcpy( &id->f_src, p_fmt, sizeof( sout_format_t ) );
+        memcpy( &id->f_src, p_fmt, sizeof( es_format_t ) );
 
         /* create dst format */
         id->f_dst.i_cat    = AUDIO_ES;
-        id->f_dst.i_fourcc = p_sys->i_acodec;
-        id->f_dst.i_sample_rate = p_sys->i_sample_rate  > 0 ? p_sys->i_sample_rate : id->f_src.i_sample_rate;
-        id->f_dst.i_channels    = p_sys->i_channels > 0 ? p_sys->i_channels : id->f_src.i_channels;
+        id->f_dst.i_codec = p_sys->i_acodec;
+        id->f_dst.audio.i_rate = p_sys->i_sample_rate  > 0 ? p_sys->i_sample_rate : id->f_src.audio.i_rate;
+        id->f_dst.audio.i_channels    = p_sys->i_channels > 0 ? p_sys->i_channels : id->f_src.audio.i_channels;
         id->f_dst.i_bitrate     = p_sys->i_abitrate > 0 ? p_sys->i_abitrate : 64000;
-        id->f_dst.i_block_align = 0;
-        id->f_dst.i_extra_data  = 0;
-        id->f_dst.p_extra_data  = NULL;
+        id->f_dst.audio.i_blockalign = 0;
+        id->f_dst.i_extra  = 0;
+        id->f_dst.p_extra  = NULL;
 
         /* build decoder -> filter -> encoder */
         if( transcode_audio_ffmpeg_new( p_stream, id ) )
@@ -399,19 +399,19 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
     {
         msg_Dbg( p_stream,
                  "creating video transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
-                 (char*)&p_fmt->i_fourcc,
+                 (char*)&p_fmt->i_codec,
                  (char*)&p_sys->i_vcodec );
 
-        memcpy( &id->f_src, p_fmt, sizeof( sout_format_t ) );
+        memcpy( &id->f_src, p_fmt, sizeof( es_format_t ) );
 
         /* create dst format */
         id->f_dst.i_cat         = VIDEO_ES;
-        id->f_dst.i_fourcc      = p_sys->i_vcodec;
-        id->f_dst.i_width       = p_sys->i_width ; /* > 0 ? p_sys->i_width : id->f_src.i_width; */
-        id->f_dst.i_height      = p_sys->i_height; /* > 0 ? p_sys->i_height: id->f_src.i_height; */
+        id->f_dst.i_codec       = p_sys->i_vcodec;
+        id->f_dst.video.i_width = p_sys->i_width ; /* > 0 ? p_sys->i_width : id->f_src.i_width; */
+        id->f_dst.video.i_height= p_sys->i_height; /* > 0 ? p_sys->i_height: id->f_src.i_height; */
         id->f_dst.i_bitrate     = p_sys->i_vbitrate > 0 ? p_sys->i_vbitrate : 800*1000;
-        id->f_dst.i_extra_data  = 0;
-        id->f_dst.p_extra_data  = NULL;
+        id->f_dst.i_extra       = 0;
+        id->f_dst.p_extra       = NULL;
 
         /* build decoder -> filter -> encoder */
         if( transcode_video_ffmpeg_new( p_stream, id ) )
@@ -428,7 +428,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
     }
     else
     {
-        msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')", (char*)&p_fmt->i_fourcc );
+        msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')", (char*)&p_fmt->i_codec );
         id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
         id->b_transcode = VLC_FALSE;
 
@@ -636,23 +636,23 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
 {
     int i_ff_codec;
 
-    if( id->f_src.i_fourcc == VLC_FOURCC('s','1','6','l') ||
-        id->f_src.i_fourcc == VLC_FOURCC('s','1','6','b') ||
-        id->f_src.i_fourcc == VLC_FOURCC('s','8',' ',' ') ||
-        id->f_src.i_fourcc == VLC_FOURCC('u','8',' ',' ') )
+    if( id->f_src.i_codec == VLC_FOURCC('s','1','6','l') ||
+        id->f_src.i_codec == VLC_FOURCC('s','1','6','b') ||
+        id->f_src.i_codec == VLC_FOURCC('s','8',' ',' ') ||
+        id->f_src.i_codec == VLC_FOURCC('u','8',' ',' ') )
     {
         id->ff_dec = NULL;
 
         id->ff_dec_c = avcodec_alloc_context();
-        id->ff_dec_c->sample_rate = id->f_src.i_sample_rate;
-        id->ff_dec_c->channels    = id->f_src.i_channels;
-        id->ff_dec_c->block_align = id->f_src.i_block_align;
+        id->ff_dec_c->sample_rate = id->f_src.audio.i_rate;
+        id->ff_dec_c->channels    = id->f_src.audio.i_channels;
+        id->ff_dec_c->block_align = id->f_src.audio.i_blockalign;
         id->ff_dec_c->bit_rate    = id->f_src.i_bitrate;
     }
     else
     {
         /* find decoder */
-        i_ff_codec = get_ff_codec( id->f_src.i_fourcc );
+        i_ff_codec = get_ff_codec( id->f_src.i_codec );
         if( i_ff_codec == 0 )
         {
             msg_Err( p_stream, "cannot find decoder id" );
@@ -667,13 +667,13 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
         }
 
         id->ff_dec_c = avcodec_alloc_context();
-        id->ff_dec_c->sample_rate = id->f_src.i_sample_rate;
-        id->ff_dec_c->channels    = id->f_src.i_channels;
-        id->ff_dec_c->block_align = id->f_src.i_block_align;
+        id->ff_dec_c->sample_rate = id->f_src.audio.i_rate;
+        id->ff_dec_c->channels    = id->f_src.audio.i_channels;
+        id->ff_dec_c->block_align = id->f_src.audio.i_blockalign;
         id->ff_dec_c->bit_rate    = id->f_src.i_bitrate;
 
-        id->ff_dec_c->extradata_size = id->f_src.i_extra_data;
-        id->ff_dec_c->extradata      = id->f_src.p_extra_data;
+        id->ff_dec_c->extradata_size = id->f_src.i_extra;
+        id->ff_dec_c->extradata      = id->f_src.p_extra;
         if( avcodec_open( id->ff_dec_c, id->ff_dec ) )
         {
             msg_Err( p_stream, "cannot open decoder" );
@@ -686,7 +686,7 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     id->p_buffer     = malloc( id->i_buffer );
 
     /* Sanity check for audio channels */
-    id->f_dst.i_channels = __MIN( id->f_dst.i_channels, id->f_src.i_channels );
+    id->f_dst.audio.i_channels = __MIN( id->f_dst.audio.i_channels, id->f_src.audio.i_channels );
 
     /* find encoder */
     id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
@@ -694,14 +694,14 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, AOUT_FMT_S16_NE );
     id->p_encoder->fmt_in.audio.i_format = AOUT_FMT_S16_NE;
-    id->p_encoder->fmt_in.audio.i_rate = id->f_dst.i_sample_rate;
+    id->p_encoder->fmt_in.audio.i_rate = id->f_dst.audio.i_rate;
     id->p_encoder->fmt_in.audio.i_physical_channels =
         id->p_encoder->fmt_in.audio.i_original_channels =
-            pi_channels_maps[id->f_dst.i_channels];
-    id->p_encoder->fmt_in.audio.i_channels = id->f_dst.i_channels;
+            pi_channels_maps[id->f_dst.audio.i_channels];
+    id->p_encoder->fmt_in.audio.i_channels = id->f_dst.audio.i_channels;
 
     id->p_encoder->fmt_out = id->p_encoder->fmt_in;
-    id->p_encoder->fmt_out.i_codec = id->f_dst.i_fourcc;
+    id->p_encoder->fmt_out.i_codec = id->f_dst.i_codec;
     id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
     id->p_encoder->p_module =
@@ -715,13 +715,13 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
 
     id->b_enc_inited = VLC_FALSE;
 
-    id->f_dst.i_extra_data = id->p_encoder->fmt_out.i_extra;
-    id->f_dst.p_extra_data = id->p_encoder->fmt_out.p_extra;
+    id->f_dst.i_extra = id->p_encoder->fmt_out.i_extra;
+    id->f_dst.p_extra = id->p_encoder->fmt_out.p_extra;
 
     /* Hack for mp3 transcoding support */
-    if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','3',' ' ) )
+    if( id->f_dst.i_codec == VLC_FOURCC( 'm','p','3',' ' ) )
     {
-        id->f_dst.i_fourcc = VLC_FOURCC( 'm','p','g','a' );
+        id->f_dst.i_codec = VLC_FOURCC( 'm','p','g','a' );
     }
 
     return VLC_SUCCESS;
@@ -784,14 +784,14 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         {
             int16_t *sout = (int16_t*)id->p_buffer;
 
-            if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) ||
-                id->f_src.i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
+            if( id->f_src.i_codec == VLC_FOURCC( 's', '8', ' ', ' ' ) ||
+                id->f_src.i_codec == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
             {
                 int8_t *sin = (int8_t*)p_buffer;
                 int i_used = __MIN( id->i_buffer/2, i_buffer );
                 int i_samples = i_used;
 
-                if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
+                if( id->f_src.i_codec == VLC_FOURCC( 's', '8', ' ', ' ' ) )
                     while( i_samples > 0 )
                     {
                         *sout++ = ( *sin++ ) << 8;
@@ -808,15 +808,15 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
                 p_buffer += i_used;
                 id->i_buffer_pos = i_used * 2;
             }
-            else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) ||
-                     id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
+            else if( id->f_src.i_codec == VLC_FOURCC( 's', '1', '6', 'l' ) ||
+                     id->f_src.i_codec == VLC_FOURCC( 's', '1', '6', 'b' ) )
             {
                 int16_t *sin = (int16_t*)p_buffer;
                 int i_used = __MIN( id->i_buffer, i_buffer );
                 int i_samples = i_used / 2;
                 int b_invert_indianness;
 
-                if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
+                if( id->f_src.i_codec == VLC_FOURCC( 's', '1', '6', 'l' ) )
 #ifdef WORDS_BIGENDIAN
                     b_invert_indianness = 1;
 #else
@@ -879,12 +879,12 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
 
         aout_buf.p_buffer = id->p_buffer;
         aout_buf.i_nb_bytes = id->i_buffer_pos;
-        aout_buf.i_nb_samples = id->i_buffer_pos / 2 / id->f_src.i_channels;
+        aout_buf.i_nb_samples = id->i_buffer_pos / 2 / id->f_src.audio.i_channels;
         aout_buf.start_date = id->i_dts;
         aout_buf.end_date = id->i_dts;
 
         id->i_dts += ( I64C(1000000) * id->i_buffer_pos / 2 /
-            id->f_src.i_channels / id->f_src.i_sample_rate );
+            id->f_src.audio.i_channels / id->f_src.audio.i_rate );
 
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, &aout_buf );
         while( p_block )
@@ -919,26 +919,26 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     int i_ff_codec;
 
     /* Open decoder */
-    if( id->f_src.i_fourcc == VLC_FOURCC( 'I', '4', '2', '0' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'I', '4', '2', '2' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'I', '4', '4', '4' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'Y', 'U', 'Y', '2' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '5' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '1', '6' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '2', '4' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'R', 'V', '3', '2' ) ||
-        id->f_src.i_fourcc == VLC_FOURCC( 'G', 'R', 'E', 'Y' ) )
+    if( id->f_src.i_codec == VLC_FOURCC( 'I', '4', '2', '0' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'I', '4', '2', '2' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'I', '4', '4', '4' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'Y', 'U', 'Y', '2' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'R', 'V', '1', '5' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'R', 'V', '1', '6' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'R', 'V', '2', '4' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'R', 'V', '3', '2' ) ||
+        id->f_src.i_codec == VLC_FOURCC( 'G', 'R', 'E', 'Y' ) )
     {
         id->ff_dec              = NULL;
         id->ff_dec_c            = avcodec_alloc_context();
-        id->ff_dec_c->width     = id->f_src.i_width;
-        id->ff_dec_c->height    = id->f_src.i_height;
-        id->ff_dec_c->pix_fmt   = get_ff_chroma( id->f_src.i_fourcc );
+        id->ff_dec_c->width     = id->f_src.video.i_width;
+        id->ff_dec_c->height    = id->f_src.video.i_height;
+        id->ff_dec_c->pix_fmt   = get_ff_chroma( id->f_src.i_codec );
     }
     else
     {
         /* find decoder */
-        i_ff_codec = get_ff_codec( id->f_src.i_fourcc );
+        i_ff_codec = get_ff_codec( id->f_src.i_codec );
         if( i_ff_codec == 0 )
         {
             msg_Err( p_stream, "cannot find decoder" );
@@ -953,11 +953,11 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         }
 
         id->ff_dec_c = avcodec_alloc_context();
-        id->ff_dec_c->width         = id->f_src.i_width;
-        id->ff_dec_c->height        = id->f_src.i_height;
+        id->ff_dec_c->width         = id->f_src.video.i_width;
+        id->ff_dec_c->height        = id->f_src.video.i_height;
         /* id->ff_dec_c->bit_rate      = id->f_src.i_bitrate; */
-        id->ff_dec_c->extradata_size= id->f_src.i_extra_data;
-        id->ff_dec_c->extradata     = id->f_src.p_extra_data;
+        id->ff_dec_c->extradata_size= id->f_src.i_extra;
+        id->ff_dec_c->extradata     = id->f_src.p_extra;
         id->ff_dec_c->workaround_bugs = FF_BUG_AUTODETECT;
         id->ff_dec_c->error_resilience= -1;
         id->ff_dec_c->get_buffer    = transcode_video_ffmpeg_getframebuf;
@@ -995,17 +995,17 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     es_format_Init( &id->p_encoder->fmt_in,
 		    id->f_src.i_cat, get_vlc_chroma(id->ff_dec_c->pix_fmt) );
 
-    id->p_encoder->fmt_in.video.i_width = id->f_dst.i_width;
-    id->p_encoder->fmt_in.video.i_height = id->f_dst.i_height;
+    id->p_encoder->fmt_in.video.i_width = id->f_dst.video.i_width;
+    id->p_encoder->fmt_in.video.i_height = id->f_dst.video.i_height;
 
     if( id->p_encoder->fmt_in.video.i_width <= 0 )
     {
-        id->p_encoder->fmt_in.video.i_width = id->f_dst.i_width =
+        id->p_encoder->fmt_in.video.i_width = id->f_dst.video.i_width =
             id->ff_dec_c->width - p_sys->i_crop_left - p_sys->i_crop_right;
     }
     if( id->p_encoder->fmt_in.video.i_height <= 0 )
     {
-        id->p_encoder->fmt_in.video.i_height = id->f_dst.i_height =
+        id->p_encoder->fmt_in.video.i_height = id->f_dst.video.i_height =
             id->ff_dec_c->height - p_sys->i_crop_top - p_sys->i_crop_bottom;
     }
 
@@ -1031,7 +1031,7 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     }
 
     id->p_encoder->fmt_out = id->p_encoder->fmt_in;
-    id->p_encoder->fmt_out.i_codec = id->f_dst.i_fourcc;
+    id->p_encoder->fmt_out.i_codec = id->f_dst.i_codec;
     id->p_encoder->fmt_out.i_bitrate = id->f_dst.i_bitrate;
 
     id->p_encoder->i_vtolerance = p_sys->i_vtolerance;
@@ -1179,14 +1179,14 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             if( id->p_encoder->fmt_in.video.i_width <= 0 )
             {
                 id->p_encoder->fmt_in.video.i_width =
-                  id->p_encoder->fmt_out.video.i_width = id->f_dst.i_width =
+                  id->p_encoder->fmt_out.video.i_width = id->f_dst.video.i_width =
                     id->ff_dec_c->width - p_sys->i_crop_left -
                       p_sys->i_crop_right;
             }
             if( id->p_encoder->fmt_in.video.i_height <= 0 )
             {
                 id->p_encoder->fmt_in.video.i_height =
-                  id->p_encoder->fmt_out.video.i_height = id->f_dst.i_height =
+                  id->p_encoder->fmt_out.video.i_height = id->f_dst.video.i_height =
                     id->ff_dec_c->height - p_sys->i_crop_top -
                       p_sys->i_crop_bottom;
             }
@@ -1203,14 +1203,14 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 return VLC_EGENERIC;
             }
 
-            id->f_dst.i_extra_data = id->p_encoder->fmt_out.i_extra;
-            id->f_dst.p_extra_data = id->p_encoder->fmt_out.p_extra;
+            id->f_dst.i_extra = id->p_encoder->fmt_out.i_extra;
+            id->f_dst.p_extra = id->p_encoder->fmt_out.p_extra;
 
             /* Hack for mp2v/mp1v transcoding support */
-            if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','1','v' ) ||
-                id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','2','v' ) )
+            if( id->f_dst.i_codec == VLC_FOURCC( 'm','p','1','v' ) ||
+                id->f_dst.i_codec == VLC_FOURCC( 'm','p','2','v' ) )
             {
-                id->f_dst.i_fourcc = VLC_FOURCC( 'm','p','g','v' );
+                id->f_dst.i_codec = VLC_FOURCC( 'm','p','g','v' );
             }
 
             if( !( id->id =
@@ -1293,8 +1293,8 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         }
 
         /* convert size and crop */
-        if( id->ff_dec_c->width  != id->f_dst.i_width ||
-            id->ff_dec_c->height != id->f_dst.i_height ||
+        if( id->ff_dec_c->width  != id->f_dst.video.i_width ||
+            id->ff_dec_c->height != id->f_dst.video.i_height ||
             p_sys->i_crop_top > 0 || p_sys->i_crop_bottom > 0 ||
             p_sys->i_crop_left > 0 || p_sys->i_crop_right )
         {
@@ -1304,18 +1304,18 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 uint8_t *buf;
                 id->p_ff_pic_tmp2 = avcodec_alloc_frame();
                 i_size = avpicture_get_size( id->i_inter_pixfmt,
-                                             id->f_dst.i_width,
-                                             id->f_dst.i_height );
+                                             id->f_dst.video.i_width,
+                                             id->f_dst.video.i_height );
 
                 buf = malloc( i_size );
 
                 avpicture_fill( (AVPicture*)id->p_ff_pic_tmp2, buf,
                                 id->i_inter_pixfmt,
-                                id->f_dst.i_width, id->f_dst.i_height );
+                                id->f_dst.video.i_width, id->f_dst.video.i_height );
 
                 id->p_vresample =
-                    img_resample_full_init( id->f_dst.i_width,
-                                            id->f_dst.i_height,
+                    img_resample_full_init( id->f_dst.video.i_width,
+                                            id->f_dst.video.i_height,
                                             id->ff_dec_c->width, id->ff_dec_c->height,
                                             p_stream->p_sys->i_crop_top,
                                             p_stream->p_sys->i_crop_bottom,
@@ -1332,9 +1332,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         /* Encoding */
         vout_InitPicture( VLC_OBJECT(p_stream), &pic,
                           id->p_encoder->fmt_in.i_codec,
-                          id->f_dst.i_width, id->f_dst.i_height,
-                          id->f_dst.i_width * VOUT_ASPECT_FACTOR /
-                          id->f_dst.i_height );
+                          id->f_dst.video.i_width, id->f_dst.video.i_height,
+                          id->f_dst.video.i_width * VOUT_ASPECT_FACTOR /
+                          id->f_dst.video.i_height );
 
         for( i_plane = 0; i_plane < pic.i_planes; i_plane++ )
         {

@@ -2,7 +2,7 @@
  * display.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: display.c,v 1.6 2003/11/18 16:46:31 fenrir Exp $
+ * $Id: display.c,v 1.7 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,7 +39,7 @@
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
 
@@ -125,7 +125,7 @@ struct sout_stream_id_t
 };
 
 
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
@@ -155,37 +155,37 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
         return NULL;
     }
     id->p_es->i_stream_id   = 1;
-    id->p_es->i_fourcc      = p_fmt->i_fourcc;
+    id->p_es->i_fourcc      = p_fmt->i_codec;
     id->p_es->b_force_decoder = VLC_TRUE;
     switch( p_fmt->i_cat )
     {
         case AUDIO_ES:
             id->p_es->p_bitmapinfoheader = NULL;
             id->p_es->p_waveformatex =
-                malloc( sizeof( WAVEFORMATEX ) + p_fmt->i_extra_data );
+                malloc( sizeof( WAVEFORMATEX ) + p_fmt->i_extra );
 #define p_wf    ((WAVEFORMATEX*)id->p_es->p_waveformatex)
             p_wf->wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            p_wf->nChannels      = p_fmt->i_channels;
-            p_wf->nSamplesPerSec = p_fmt->i_sample_rate;
+            p_wf->nChannels      = p_fmt->audio.i_channels;
+            p_wf->nSamplesPerSec = p_fmt->audio.i_rate;
             p_wf->nAvgBytesPerSec= p_fmt->i_bitrate / 8;
-            p_wf->nBlockAlign    = p_fmt->i_block_align;
+            p_wf->nBlockAlign    = p_fmt->audio.i_blockalign;
             p_wf->wBitsPerSample = 0;
-            p_wf->cbSize         = p_fmt->i_extra_data;
-            if( p_fmt->i_extra_data > 0 )
+            p_wf->cbSize         = p_fmt->i_extra;
+            if( p_fmt->i_extra > 0 )
             {
                 memcpy( &p_wf[1],
-                        p_fmt->p_extra_data,
-                        p_fmt->i_extra_data );
+                        p_fmt->p_extra,
+                        p_fmt->i_extra );
             }
 #undef p_wf
             break;
         case VIDEO_ES:
             id->p_es->p_waveformatex = NULL;
-            id->p_es->p_bitmapinfoheader = malloc( sizeof( BITMAPINFOHEADER ) + p_fmt->i_extra_data );
+            id->p_es->p_bitmapinfoheader = malloc( sizeof( BITMAPINFOHEADER ) + p_fmt->i_extra );
 #define p_bih ((BITMAPINFOHEADER*)id->p_es->p_bitmapinfoheader)
-            p_bih->biSize   = sizeof( BITMAPINFOHEADER ) + p_fmt->i_extra_data;
-            p_bih->biWidth  = p_fmt->i_width;
-            p_bih->biHeight = p_fmt->i_height;
+            p_bih->biSize   = sizeof( BITMAPINFOHEADER ) + p_fmt->i_extra;
+            p_bih->biWidth  = p_fmt->video.i_width;
+            p_bih->biHeight = p_fmt->video.i_height;
             p_bih->biPlanes   = 0;
             p_bih->biBitCount = 0;
             p_bih->biCompression = 0;
@@ -194,11 +194,11 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
             p_bih->biYPelsPerMeter = 0;
             p_bih->biClrUsed       = 0;
             p_bih->biClrImportant  = 0;
-            if( p_fmt->i_extra_data > 0 )
+            if( p_fmt->i_extra > 0 )
             {
                 memcpy( &p_bih[1],
-                        p_fmt->p_extra_data,
-                        p_fmt->i_extra_data );
+                        p_fmt->p_extra,
+                        p_fmt->i_extra );
             }
 #undef p_bih
             break;

@@ -2,7 +2,7 @@
  * gather.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: gather.c,v 1.1 2003/09/07 20:12:44 fenrir Exp $
+ * $Id: gather.c,v 1.2 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -46,7 +46,7 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
 
@@ -54,7 +54,7 @@ struct sout_stream_id_t
 {
     vlc_bool_t    b_used;
 
-    sout_format_t fmt;
+    es_format_t fmt;
     void          *id;
 };
 
@@ -114,7 +114,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Add:
  *****************************************************************************/
-static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
@@ -126,14 +126,14 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
         id = p_sys->id[i];
         if( !id->b_used &&
             id->fmt.i_cat == p_fmt->i_cat &&
-            id->fmt.i_fourcc == p_fmt->i_fourcc &&
+            id->fmt.i_codec == p_fmt->i_codec &&
             ( ( id->fmt.i_cat == AUDIO_ES &&
-                id->fmt.i_sample_rate == p_fmt->i_sample_rate &&
-                id->fmt.i_channels == p_fmt->i_channels &&
-                id->fmt.i_block_align == p_fmt->i_block_align ) ||
+                id->fmt.audio.i_rate == p_fmt->audio.i_rate &&
+                id->fmt.audio.i_channels == p_fmt->audio.i_channels &&
+                id->fmt.audio.i_blockalign == p_fmt->audio.i_blockalign ) ||
               ( id->fmt.i_cat == VIDEO_ES &&
-                id->fmt.i_width == p_fmt->i_width &&
-                id->fmt.i_height == p_fmt->i_height ) ) )
+                id->fmt.video.i_width == p_fmt->video.i_width &&
+                id->fmt.video.i_height == p_fmt->video.i_height ) ) )
         {
             msg_Dbg( p_stream, "reusing already opened output" );
             id->b_used = VLC_TRUE;
@@ -158,9 +158,9 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
 
     id = malloc( sizeof( sout_stream_id_t ) );
     msg_Dbg( p_stream, "creating new output" );
-    memcpy( &id->fmt, p_fmt, sizeof( sout_format_t ) );
-    id->fmt.i_extra_data = 0;
-    id->fmt.p_extra_data = NULL;
+    memcpy( &id->fmt, p_fmt, sizeof( es_format_t ) );
+    id->fmt.i_extra = 0;
+    id->fmt.p_extra = NULL;
     id->b_used           = VLC_TRUE;
     id->id               = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
     if( id->id == NULL )

@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.15 2003/11/07 16:53:54 massiot Exp $
+ * $Id: stream_output.h,v 1.16 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -26,6 +26,8 @@
 /*****************************************************************************
  * sout_instance_t: stream output thread descriptor
  *****************************************************************************/
+
+#include "vlc_es.h"
 
 /*
  * i_allocated_size: size of allocated buffer
@@ -65,26 +67,6 @@ struct sout_buffer_t
     struct sout_buffer_t    *p_next;
 };
 
-struct sout_format_t
-{
-    int             i_cat;
-    vlc_fourcc_t    i_fourcc;
-
-    /* audio */
-    int             i_sample_rate;
-    int             i_channels;
-    int             i_block_align;
-
-    /* video */
-    int             i_width;
-    int             i_height;
-
-    int             i_bitrate;
-    int             i_extra_data;
-    uint8_t         *p_extra_data;
-
-};
-
 struct sout_fifo_t
 {
     vlc_mutex_t         lock;                         /* fifo data lock */
@@ -102,7 +84,7 @@ struct sout_input_t
 {
     sout_instance_t *p_sout;
 
-    sout_format_t   *p_fmt;
+    es_format_t     *p_fmt;
     sout_fifo_t     *p_fifo;
 
     void            *p_sys;
@@ -114,7 +96,7 @@ struct sout_packetizer_input_t
 
     sout_instance_t     *p_sout;
 
-    sout_format_t       *p_fmt;
+    es_format_t         *p_fmt;
 
     sout_stream_id_t    *id;
 };
@@ -225,7 +207,7 @@ struct sout_stream_t
     char                    *psz_next;
 
     /* add, remove a stream */
-    sout_stream_id_t *      (*pf_add) ( sout_stream_t *, sout_format_t * );
+    sout_stream_id_t *      (*pf_add) ( sout_stream_t *, es_format_t * );
     int                     (*pf_del) ( sout_stream_t *, sout_stream_id_t * );
 
     /* manage a packet */
@@ -296,7 +278,7 @@ VLC_EXPORT( sout_buffer_t *, sout_FifoShow,       ( sout_fifo_t * ) );
 
 
 #define sout_InputNew( a, b ) __sout_InputNew( VLC_OBJECT(a), b )
-VLC_EXPORT( sout_packetizer_input_t *, __sout_InputNew,       ( vlc_object_t *, sout_format_t * ) );
+VLC_EXPORT( sout_packetizer_input_t *, __sout_InputNew,       ( vlc_object_t *, es_format_t * ) );
 VLC_EXPORT( int,            sout_InputDelete,      ( sout_packetizer_input_t * ) );
 VLC_EXPORT( int,            sout_InputSendBuffer,  ( sout_packetizer_input_t *, sout_buffer_t* ) );
 
@@ -313,7 +295,7 @@ VLC_EXPORT( int,                 sout_AccessOutSeek,   ( sout_access_out_t *, of
 VLC_EXPORT( int,                 sout_AccessOutWrite,  ( sout_access_out_t *, sout_buffer_t * ) );
 
 VLC_EXPORT( sout_mux_t *,       sout_MuxNew,          ( sout_instance_t*, char *, sout_access_out_t * ) );
-VLC_EXPORT( sout_input_t *,     sout_MuxAddStream,    ( sout_mux_t *, sout_format_t * ) );
+VLC_EXPORT( sout_input_t *,     sout_MuxAddStream,    ( sout_mux_t *, es_format_t * ) );
 VLC_EXPORT( void,               sout_MuxDeleteStream, ( sout_mux_t *, sout_input_t * ) );
 VLC_EXPORT( void,               sout_MuxDelete,       ( sout_mux_t * ) );
 VLC_EXPORT( void,               sout_MuxSendBuffer, ( sout_mux_t *, sout_input_t  *, sout_buffer_t * ) );

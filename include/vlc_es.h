@@ -2,7 +2,7 @@
  * vlc_es.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.1 2003/11/20 22:10:55 fenrir Exp $
+ * $Id: vlc_es.h,v 1.2 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -83,16 +83,16 @@ struct video_format_t
 /**
  * Description of subs
  */
-typedef struct subs_format_t
+struct subs_format_t
 {
     char *psz_encoding;
 
-} subs_format_t;
+};
 
 /**
  * ES definition
  */
-typedef struct
+struct es_format_t
 {
     int             i_cat;
     vlc_fourcc_t    i_codec;
@@ -116,7 +116,7 @@ typedef struct
     int     i_extra;
     void    *p_extra;
 
-} es_format_t;
+};
 
 static inline void es_format_Init( es_format_t *fmt,
                                    int i_cat, vlc_fourcc_t i_codec )

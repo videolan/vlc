@@ -3,7 +3,7 @@
  *       multiplexer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.15 2003/08/02 01:33:53 fenrir Exp $
+ * $Id: ps.c,v 1.16 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -188,12 +188,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     ps_stream_t         *p_stream;
 
-    msg_Dbg( p_mux, "adding input codec=%4.4s", (char*)&p_input->p_fmt->i_fourcc );
+    msg_Dbg( p_mux, "adding input codec=%4.4s", (char*)&p_input->p_fmt->i_codec );
 
     p_input->p_sys = (void*)p_stream = malloc( sizeof( ps_stream_t ) );
 
     /* Init this new stream */
-    switch( p_input->p_fmt->i_fourcc )
+    switch( p_input->p_fmt->i_codec )
     {
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
             p_stream->i_stream_id = StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
@@ -247,7 +247,7 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     ps_stream_t *p_stream =(ps_stream_t*)p_input->p_sys;
 
     msg_Dbg( p_mux, "removing input" );
-    switch( p_input->p_fmt->i_fourcc )
+    switch( p_input->p_fmt->i_codec )
     {
         case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
             StreamIdRelease( p_sys->stream_id_mpgv, 0xe0, p_stream->i_stream_id);

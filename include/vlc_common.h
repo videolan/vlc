@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.87 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: vlc_common.h,v 1.88 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -217,6 +217,12 @@ typedef struct pgrm_sys_t pgrm_sys_t;
 typedef struct stream_descriptor_t stream_descriptor_t;
 typedef struct stream_sys_t stream_sys_t;
 
+/* Format */
+typedef struct audio_format_t audio_format_t;
+typedef struct video_format_t video_format_t;
+typedef struct subs_format_t subs_format_t;
+typedef struct es_format_t  es_format_t;
+
 /* NInput */
 typedef struct stream_t stream_t;
 typedef struct es_out_t     es_out_t;
@@ -230,7 +236,6 @@ typedef struct aout_sys_t aout_sys_t;
 typedef struct aout_fifo_t aout_fifo_t;
 typedef struct aout_input_t aout_input_t;
 typedef struct aout_buffer_t aout_buffer_t;
-typedef struct audio_format_t audio_format_t;
 typedef audio_format_t audio_sample_format_t;
 typedef struct audio_date_t audio_date_t;
 typedef struct aout_filter_t aout_filter_t;
@@ -239,7 +244,6 @@ typedef struct aout_filter_t aout_filter_t;
 typedef struct vout_thread_t vout_thread_t;
 typedef struct vout_sys_t vout_sys_t;
 typedef struct chroma_sys_t chroma_sys_t;
-typedef struct video_format_t video_format_t;
 typedef video_format_t video_frame_format_t;
 typedef struct picture_t picture_t;
 typedef struct picture_sys_t picture_sys_t;
@@ -260,7 +264,6 @@ typedef struct sout_access_out_t sout_access_out_t;
 typedef struct sout_mux_t sout_mux_t;
 typedef struct sout_stream_t    sout_stream_t;
 typedef struct sout_cfg_t       sout_cfg_t;
-typedef struct sout_format_t    sout_format_t;
 /*typedef struct sap_session_t    sap_session_t;
 typedef struct slp_session_t    slp_session_t;*/
 

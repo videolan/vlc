@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.36 2003/11/20 18:26:44 fenrir Exp $
+ * $Id: ts.c,v 1.37 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -411,7 +411,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     ts_stream_t         *p_stream;
 
-    msg_Dbg( p_mux, "adding input codec=%4.4s", (char*)&p_input->p_fmt->i_fourcc );
+    msg_Dbg( p_mux, "adding input codec=%4.4s", (char*)&p_input->p_fmt->i_codec );
 
     p_input->p_sys = (void*)p_stream = malloc( sizeof( ts_stream_t ) );
 
@@ -425,7 +425,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     switch( p_input->p_fmt->i_cat )
     {
         case VIDEO_ES:
-            switch( p_input->p_fmt->i_fourcc )
+            switch( p_input->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'm', 'p','g', 'v' ):
                     /* TODO: do we need to check MPEG-I/II ? */
@@ -451,9 +451,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
                     p_stream->i_stream_type = 0xa0; // private
                     p_stream->i_stream_id = 0xa0;   // beurk
-                    p_stream->i_bih_codec  = p_input->p_fmt->i_fourcc;
-                    p_stream->i_bih_width  = p_input->p_fmt->i_width;
-                    p_stream->i_bih_height = p_input->p_fmt->i_height;
+                    p_stream->i_bih_codec  = p_input->p_fmt->i_codec;
+                    p_stream->i_bih_width  = p_input->p_fmt->video.i_width;
+                    p_stream->i_bih_height = p_input->p_fmt->video.i_height;
                     break;
                 default:
                     free( p_stream );
@@ -463,10 +463,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             break;
 
         case AUDIO_ES:
-            switch( p_input->p_fmt->i_fourcc )
+            switch( p_input->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'm', 'p','g', 'a' ):
-                    p_stream->i_stream_type = p_input->p_fmt->i_sample_rate >= 32000 ? 0x03 : 0x04;
+                    p_stream->i_stream_type = p_input->p_fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
                     p_stream->i_stream_id = p_sys->i_stream_id_mpga;
                     p_sys->i_stream_id_mpga++;
                     break;
@@ -488,7 +488,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             break;
 
         case SPU_ES:
-            switch( p_input->p_fmt->i_fourcc )
+            switch( p_input->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 's', 'p','u', ' ' ):
                     p_stream->i_stream_type = 0x82;
@@ -506,14 +506,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     /* Copy extra data (VOL for MPEG-4 and extra BitMapInfoHeader for VFW */
-    p_stream->i_decoder_specific_info = p_input->p_fmt->i_extra_data;
+    p_stream->i_decoder_specific_info = p_input->p_fmt->i_extra;
     if( p_stream->i_decoder_specific_info > 0 )
     {
         p_stream->p_decoder_specific_info =
             malloc( p_stream->i_decoder_specific_info );
         memcpy( p_stream->p_decoder_specific_info,
-                p_input->p_fmt->p_extra_data,
-                p_input->p_fmt->i_extra_data );
+                p_input->p_fmt->p_extra,
+                p_input->p_fmt->i_extra );
     }
 
     /* Init pes chain */

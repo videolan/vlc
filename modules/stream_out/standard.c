@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.15 2003/09/13 17:44:13 fenrir Exp $
+ * $Id: standard.c,v 1.16 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -40,7 +40,7 @@
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
 
@@ -341,7 +341,7 @@ struct sout_stream_id_t
 };
 
 
-static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;

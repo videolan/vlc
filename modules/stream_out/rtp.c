@@ -2,7 +2,7 @@
  * rtp.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rtp.c,v 1.6 2003/11/07 18:32:24 fenrir Exp $
+ * $Id: rtp.c,v 1.7 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -49,7 +49,7 @@ vlc_module_end();
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
 
@@ -456,7 +456,7 @@ static void sprintf_hexa( char *s, uint8_t *p_data, int i_data )
     s[2*i_data] = '\0';
 }
 
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_instance_t   *p_sout = p_stream->p_sout;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -509,14 +509,14 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
     id->psz_destination = strdup( p_sys->psz_destination );
     id->i_port = p_sys->i_port;
 
-    switch( p_fmt->i_fourcc )
+    switch( p_fmt->i_codec )
     {
         case VLC_FOURCC( 's', '1', '6', 'b' ):
-            if( p_fmt->i_channels == 1 && p_fmt->i_sample_rate == 44100 )
+            if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
             {
                 id->i_payload_type = 11;
             }
-            else if( p_fmt->i_channels == 2 && p_fmt->i_sample_rate == 44100 )
+            else if( p_fmt->audio.i_channels == 2 && p_fmt->audio.i_rate == 44100 )
             {
                 id->i_payload_type = 10;
             }
@@ -525,15 +525,15 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
                 id->i_payload_type = p_sys->i_payload_type++;
             }
             id->psz_rtpmap = malloc( strlen( "L16/*/*" ) + 20+1 );
-            sprintf( id->psz_rtpmap, "L16/%d/%d", p_fmt->i_sample_rate, p_fmt->i_channels );
-            id->i_clock_rate = p_fmt->i_sample_rate;
+            sprintf( id->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate, p_fmt->audio.i_channels );
+            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l16;
             break;
         case VLC_FOURCC( 'u', '8', ' ', ' ' ):
             id->i_payload_type = p_sys->i_payload_type++;
             id->psz_rtpmap = malloc( strlen( "L8/*/*" ) + 20+1 );
-            sprintf( id->psz_rtpmap, "L8/%d/%d", p_fmt->i_sample_rate, p_fmt->i_channels );
-            id->i_clock_rate = p_fmt->i_sample_rate;
+            sprintf( id->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate, p_fmt->audio.i_channels );
+            id->i_clock_rate = p_fmt->audio.i_rate;
             id->pf_packetize = rtp_packetize_l8;
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
@@ -556,16 +556,16 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
             break;
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
         {
-            char hexa[2*p_fmt->i_extra_data +1];
+            char hexa[2*p_fmt->i_extra +1];
 
             id->i_payload_type = p_sys->i_payload_type++;
             id->i_clock_rate = 90000;
             id->psz_rtpmap = strdup( "MP4V-ES/90000" );
             id->pf_packetize = rtp_packetize_split;
-            if( p_fmt->i_extra_data > 0 )
+            if( p_fmt->i_extra > 0 )
             {
-                id->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra_data );
-                sprintf_hexa( hexa, p_fmt->p_extra_data, p_fmt->i_extra_data );
+                id->psz_fmtp = malloc( 100 + 2 * p_fmt->i_extra );
+                sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
                 sprintf( id->psz_fmtp,
                          "profile-level-id=3; config=%s", hexa );
             }
@@ -573,15 +573,15 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
         }
         case VLC_FOURCC( 'm', 'p', '4', 'a' ):
         {
-            char hexa[2*p_fmt->i_extra_data +1];
+            char hexa[2*p_fmt->i_extra +1];
 
             id->i_payload_type = p_sys->i_payload_type++;
-            id->i_clock_rate = p_fmt->i_sample_rate;
+            id->i_clock_rate = p_fmt->audio.i_rate;
             id->psz_rtpmap = malloc( strlen( "mpeg4-generic/" ) + 12 );
-            sprintf( id->psz_rtpmap, "mpeg4-generic/%d", p_fmt->i_sample_rate );
+            sprintf( id->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate );
             id->pf_packetize = rtp_packetize_mp4a;
-            id->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra_data );
-            sprintf_hexa( hexa, p_fmt->p_extra_data, p_fmt->i_extra_data );
+            id->psz_fmtp = malloc( 200 + 2 * p_fmt->i_extra );
+            sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
             sprintf( id->psz_fmtp,
                      "streamtype=5; profile-level-id=15; mode=AAC-hbr; config=%s; "
                      "SizeLength=13; IndexLength=3; IndexDeltaLength=3; Profile=1;", hexa );
@@ -589,7 +589,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
         }
 
         default:
-            msg_Err( p_stream, "cannot add this stream (unsupported codec:%4.4s)", (char*)&p_fmt->i_fourcc );
+            msg_Err( p_stream, "cannot add this stream (unsupported codec:%4.4s)", (char*)&p_fmt->i_codec );
             free( id );
             return NULL;
     }

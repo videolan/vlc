@@ -6,7 +6,7 @@
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- * $Id: transrate.c,v 1.2 2003/11/12 18:13:31 fenrir Exp $
+ * $Id: transrate.c,v 1.3 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -48,7 +48,7 @@
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t * );
 
@@ -212,7 +212,7 @@ struct sout_stream_id_t
 };
 
 
-static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
     sout_stream_id_t    *id;
@@ -221,11 +221,11 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
     id->id = NULL;
 
     if( p_fmt->i_cat == VIDEO_ES
-            && p_fmt->i_fourcc == VLC_FOURCC('m', 'p', 'g', 'v') )
+            && p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'v') )
     {
         msg_Dbg( p_stream,
                  "creating video transrating for fcc=`%4.4s'",
-                 (char*)&p_fmt->i_fourcc );
+                 (char*)&p_fmt->i_codec );
 
         id->p_current_buffer = NULL;
         id->p_next_gop = NULL;
@@ -242,7 +242,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
     }
     else
     {
-        msg_Dbg( p_stream, "not transrating a stream (fcc=`%4.4s')", (char*)&p_fmt->i_fourcc );
+        msg_Dbg( p_stream, "not transrating a stream (fcc=`%4.4s')", (char*)&p_fmt->i_codec );
         id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
         id->b_transrate = VLC_FALSE;
 

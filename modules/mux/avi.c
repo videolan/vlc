@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.15 2003/08/17 18:44:26 fenrir Exp $
+ * $Id: avi.c,v 1.16 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -264,22 +264,22 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->p_bih = NULL;
 
             p_stream->p_wf  = malloc( sizeof( WAVEFORMATEX ) +
-                                      p_input->p_fmt->i_extra_data );
+                                      p_input->p_fmt->i_extra );
 #define p_wf p_stream->p_wf
-            p_wf->cbSize = p_input->p_fmt->i_extra_data;
+            p_wf->cbSize = p_input->p_fmt->i_extra;
             if( p_wf->cbSize > 0 )
             {
                 memcpy( &p_wf[1],
-                        p_input->p_fmt->p_extra_data,
-                        p_input->p_fmt->i_extra_data );
+                        p_input->p_fmt->p_extra,
+                        p_input->p_fmt->i_extra );
             }
-            p_wf->nChannels      = p_input->p_fmt->i_channels;
-            p_wf->nSamplesPerSec = p_input->p_fmt->i_sample_rate;
-            p_wf->nBlockAlign    = p_input->p_fmt->i_block_align;
+            p_wf->nChannels      = p_input->p_fmt->audio.i_channels;
+            p_wf->nSamplesPerSec = p_input->p_fmt->audio.i_rate;
+            p_wf->nBlockAlign    = p_input->p_fmt->audio.i_blockalign;
             p_wf->nAvgBytesPerSec= p_input->p_fmt->i_bitrate / 8;
             p_wf->wBitsPerSample = 0;
 
-            switch( p_input->p_fmt->i_fourcc )
+            switch( p_input->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'a', '5', '2', ' ' ):
                     p_wf->wFormatTag = WAVE_FORMAT_A52;
@@ -334,18 +334,18 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             p_stream->p_wf  = NULL;
             p_stream->p_bih = malloc( sizeof( BITMAPINFOHEADER ) +
-                                      p_input->p_fmt->i_extra_data );
+                                      p_input->p_fmt->i_extra );
 #define p_bih p_stream->p_bih
             p_bih->biSize  = sizeof( BITMAPINFOHEADER ) +
-                             p_input->p_fmt->i_extra_data;
-            if( p_input->p_fmt->i_extra_data > 0 )
+                             p_input->p_fmt->i_extra;
+            if( p_input->p_fmt->i_extra > 0 )
             {
                 memcpy( &p_bih[1],
-                        p_input->p_fmt->p_extra_data,
-                        p_input->p_fmt->i_extra_data );
+                        p_input->p_fmt->p_extra,
+                        p_input->p_fmt->i_extra );
             }
-            p_bih->biWidth = p_input->p_fmt->i_width;
-            p_bih->biHeight= p_input->p_fmt->i_height;
+            p_bih->biWidth = p_input->p_fmt->video.i_width;
+            p_bih->biHeight= p_input->p_fmt->video.i_height;
             p_bih->biPlanes= 1;
             p_bih->biBitCount       = 24;
             p_bih->biSizeImage      = 0;
@@ -353,13 +353,13 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_bih->biYPelsPerMeter  = 0;
             p_bih->biClrUsed        = 0;
             p_bih->biClrImportant   = 0;
-            switch( p_input->p_fmt->i_fourcc )
+            switch( p_input->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'm', 'p', '4', 'v' ):
                     p_bih->biCompression = VLC_FOURCC( 'X', 'V', 'I', 'D' );
                     break;
                 default:
-                    p_bih->biCompression = p_input->p_fmt->i_fourcc;
+                    p_bih->biCompression = p_input->p_fmt->i_codec;
                     break;
             }
 #undef p_bih

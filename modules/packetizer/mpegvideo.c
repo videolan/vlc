@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.20 2003/11/07 16:53:54 massiot Exp $
+ * $Id: mpegvideo.c,v 1.21 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -59,7 +59,7 @@ typedef struct packetizer_s
 
     /* Output properties */
     sout_packetizer_input_t *p_sout_input;
-    sout_format_t           output_format;
+    es_format_t              output_format;
 
     mtime_t                 i_interpolated_dts;
     mtime_t                 i_old_duration;
@@ -173,12 +173,12 @@ static int InitThread( packetizer_t *p_pack )
 {
 
     p_pack->output_format.i_cat = VIDEO_ES;
-    p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'v');
-    p_pack->output_format.i_width  = 0;
-    p_pack->output_format.i_height = 0;
+    p_pack->output_format.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v');
+    p_pack->output_format.video.i_width  = 0;
+    p_pack->output_format.video.i_height = 0;
     p_pack->output_format.i_bitrate= 0;
-    p_pack->output_format.i_extra_data = 0;
-    p_pack->output_format.p_extra_data = NULL;
+    p_pack->output_format.i_extra = 0;
+    p_pack->output_format.p_extra = NULL;
 
     p_pack->b_expect_discontinuity = 0;
     p_pack->p_sout_input = NULL;
@@ -273,9 +273,9 @@ static void PacketizeThread( packetizer_t *p_pack )
         GetChunk( &p_pack->bit_stream, p_temp, 4 ); i_pos += 4;
 
         /* horizontal_size_value */
-        p_pack->output_format.i_width = ShowBits( &p_pack->bit_stream, 12 );
+        p_pack->output_format.video.i_width = ShowBits( &p_pack->bit_stream, 12 );
         /* vertical_size_value */
-        p_pack->output_format.i_height= ShowBits( &p_pack->bit_stream, 24 ) & 0xFFF;
+        p_pack->output_format.video.i_height= ShowBits( &p_pack->bit_stream, 24 ) & 0xFFF;
         /* frame_rate_code */
         i_frame_rate_code = ShowBits( &p_pack->bit_stream, 32 ) & 0xF;
 
@@ -327,8 +327,8 @@ static void PacketizeThread( packetizer_t *p_pack )
 
         msg_Warn( p_pack->p_fifo,
                   "creating input (image size %dx%d, frame rate %.2f)",
-                  p_pack->output_format.i_width,
-                  p_pack->output_format.i_height,
+                  p_pack->output_format.video.i_width,
+                  p_pack->output_format.video.i_height,
                   p_pack->d_frame_rate );
 
         /* now we have informations to create the input */

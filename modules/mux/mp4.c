@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.6 2003/10/17 16:40:08 gbazin Exp $
+ * $Id: mp4.c,v 1.7 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -73,7 +73,7 @@ typedef struct
 
 typedef struct
 {
-    sout_format_t *p_fmt;
+    es_format_t   *p_fmt;
     int           i_track_id;
 
     /* index */
@@ -209,10 +209,10 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     int  i_object_type_indication;
     int  i_decoder_specific_info_size;
 
-    if( p_stream->p_fmt->i_extra_data > 0 )
+    if( p_stream->p_fmt->i_extra > 0 )
     {
         i_decoder_specific_info_size =
-            GetDescrLength( p_stream->p_fmt->i_extra_data );
+            GetDescrLength( p_stream->p_fmt->i_extra );
     }
     else
     {
@@ -231,7 +231,7 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     /* DecoderConfigDescr */
     bo_add_descr( esds, 0x04, 13 + i_decoder_specific_info_size );
 
-    switch( p_stream->p_fmt->i_fourcc )
+    switch( p_stream->p_fmt->i_codec )
     {
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
             i_object_type_indication = 0x20;
@@ -246,7 +246,7 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
             break;
         case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
             i_object_type_indication =
-                p_stream->p_fmt->i_sample_rate < 32000 ? 0x69 : 0x6b;
+                p_stream->p_fmt->audio.i_rate < 32000 ? 0x69 : 0x6b;
             break;
         default:
             i_object_type_indication = 0x00;
@@ -260,16 +260,16 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
     bo_add_32be( esds, 0x7fffffff );        // maxBitrate
     bo_add_32be( esds, 0 );                 // avgBitrate
 
-    if( p_stream->p_fmt->i_extra_data > 0 )
+    if( p_stream->p_fmt->i_extra > 0 )
     {
         int i;
 
         /* DecoderSpecificInfo */
-        bo_add_descr( esds, 0x05, p_stream->p_fmt->i_extra_data );
+        bo_add_descr( esds, 0x05, p_stream->p_fmt->i_extra );
 
-        for( i = 0; i < p_stream->p_fmt->i_extra_data; i++ )
+        for( i = 0; i < p_stream->p_fmt->i_extra; i++ )
         {
-            bo_add_8( esds, p_stream->p_fmt->p_extra_data[i] );
+            bo_add_8( esds, ((uint8_t*)p_stream->p_fmt->p_extra)[i] );
         }
     }
 
@@ -427,7 +427,7 @@ static void Close( vlc_object_t * p_this )
         }
         if( p_stream->p_fmt->i_cat == AUDIO_ES )
         {
-            i_timescale = p_stream->p_fmt->i_sample_rate;
+            i_timescale = p_stream->p_fmt->audio.i_rate;
         }
         else
         {
@@ -480,8 +480,8 @@ static void Close( vlc_object_t * p_this )
         }
         else
         {
-            bo_add_32be( tkhd, p_stream->p_fmt->i_width  << 16 );     // width (presentation)
-            bo_add_32be( tkhd, p_stream->p_fmt->i_height << 16 );     // height(presentation)
+            bo_add_32be( tkhd, p_stream->p_fmt->video.i_width  << 16 );     // width (presentation)
+            bo_add_32be( tkhd, p_stream->p_fmt->video.i_height << 16 );     // height(presentation)
         }
         box_fix( tkhd );
         box_gather( trak, tkhd );
@@ -599,7 +599,7 @@ static void Close( vlc_object_t * p_this )
             int  i;
             vlc_bool_t b_mpeg4_hdr;
 
-            switch( p_stream->p_fmt->i_fourcc )
+            switch( p_stream->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'm', 'p', '4', 'a' ):
                     memcpy( fcc, "mp4a", 4 );
@@ -615,7 +615,7 @@ static void Close( vlc_object_t * p_this )
                     break;
 
                 default:
-                    memcpy( fcc, (char*)&p_stream->p_fmt->i_fourcc, 4 );
+                    memcpy( fcc, (char*)&p_stream->p_fmt->i_codec, 4 );
                     b_mpeg4_hdr = VLC_FALSE;
                     break;
             }
@@ -631,11 +631,11 @@ static void Close( vlc_object_t * p_this )
             bo_add_16be( soun, 0 );         // version;
             bo_add_16be( soun, 0 );         // revision level (0)
             bo_add_32be( soun, 0 );         // vendor
-            bo_add_16be( soun, p_stream->p_fmt->i_channels );   // channel-count
+            bo_add_16be( soun, p_stream->p_fmt->audio.i_channels );   // channel-count
             bo_add_16be( soun, 16);         // FIXME sample size
             bo_add_16be( soun, -2 );        // compression id
             bo_add_16be( soun, 0 );         // packet size (0)
-            bo_add_16be( soun, p_stream->p_fmt->i_sample_rate ); // sampleratehi
+            bo_add_16be( soun, p_stream->p_fmt->audio.i_rate ); // sampleratehi
             bo_add_16be( soun, 0 );                              // sampleratelo
 
             /* add an ES Descriptor */
@@ -659,7 +659,7 @@ static void Close( vlc_object_t * p_this )
             int  i;
             vlc_bool_t b_mpeg4_hdr;
 
-            switch( p_stream->p_fmt->i_fourcc )
+            switch( p_stream->p_fmt->i_codec )
             {
                 case VLC_FOURCC( 'm', 'p', '4', 'v' ):
                 case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
@@ -673,7 +673,7 @@ static void Close( vlc_object_t * p_this )
                     break;
 
                 default:
-                    memcpy( fcc, (char*)&p_stream->p_fmt->i_fourcc, 4 );
+                    memcpy( fcc, (char*)&p_stream->p_fmt->i_codec, 4 );
                     b_mpeg4_hdr = VLC_FALSE;
                     break;
             }
@@ -692,8 +692,8 @@ static void Close( vlc_object_t * p_this )
                 bo_add_32be( vide, 0 );     // predefined;
             }
 
-            bo_add_16be( vide, p_stream->p_fmt->i_width );  // i_width
-            bo_add_16be( vide, p_stream->p_fmt->i_height ); // i_height
+            bo_add_16be( vide, p_stream->p_fmt->video.i_width );  // i_width
+            bo_add_16be( vide, p_stream->p_fmt->video.i_height ); // i_height
 
             bo_add_32be( vide, 0x00480000 );                // h 72dpi
             bo_add_32be( vide, 0x00480000 );                // v 72dpi
@@ -916,9 +916,9 @@ static void Close( vlc_object_t * p_this )
 
         p_stream = p_sys->pp_streams[i_trak];
 
-        if( p_stream->p_fmt->p_extra_data )
+        if( p_stream->p_fmt->p_extra )
         {
-            free( p_stream->p_fmt->p_extra_data );
+            free( p_stream->p_fmt->p_extra );
         }
         free( p_stream->p_fmt );
         free( p_stream->entry );
@@ -945,7 +945,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     mp4_stream_t    *p_stream;
 
-    switch( p_input->p_fmt->i_fourcc )
+    switch( p_input->p_fmt->i_codec )
     {
         case VLC_FOURCC( 'm', 'p', '4', 'a' ):
         case VLC_FOURCC( 'm', 'p', '4', 'v' ):
@@ -956,20 +956,20 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             break;
         default:
             msg_Err( p_mux, "unsupported codec %4.4s in mp4",
-                     (char*)&p_input->p_fmt->i_fourcc );
+                     (char*)&p_input->p_fmt->i_codec );
             return VLC_EGENERIC;
     }
 
     p_stream                = malloc( sizeof( mp4_stream_t ) );
-    p_stream->p_fmt         = malloc( sizeof( sout_format_t ) );
-    memcpy( p_stream->p_fmt, p_input->p_fmt, sizeof( sout_format_t ) );
-    if( p_stream->p_fmt->i_extra_data )
+    p_stream->p_fmt         = malloc( sizeof( es_format_t ) );
+    memcpy( p_stream->p_fmt, p_input->p_fmt, sizeof( es_format_t ) );
+    if( p_stream->p_fmt->i_extra )
     {
-        p_stream->p_fmt->p_extra_data =
-            malloc( p_stream->p_fmt->i_extra_data );
-        memcpy( p_stream->p_fmt->p_extra_data,
-                p_input->p_fmt->p_extra_data,
-                p_input->p_fmt->i_extra_data );
+        p_stream->p_fmt->p_extra =
+            malloc( p_stream->p_fmt->i_extra );
+        memcpy( p_stream->p_fmt->p_extra,
+                p_input->p_fmt->p_extra,
+                p_input->p_fmt->i_extra );
     }
     p_stream->i_track_id    = p_sys->i_nb_streams + 1;
     p_stream->i_entry_count = 0;

@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.20 2003/11/21 13:01:05 gbazin Exp $
+ * $Id: ogg.c,v 1.21 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -339,7 +339,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     p_input->p_sys = (void *)p_stream = malloc( sizeof( ogg_stream_t ) );
 
     p_stream->i_cat       = p_input->p_fmt->i_cat;
-    p_stream->i_fourcc    = p_input->p_fmt->i_fourcc;
+    p_stream->i_fourcc    = p_input->p_fmt->i_codec;
     p_stream->i_serial_no = p_sys->i_next_serial_no++;
     p_stream->i_packet_no = 0;
 
@@ -372,9 +372,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             SetDWLE( &p_stream->oggds_header.i_buffer_size, 1024*1024 );
             SetWLE( &p_stream->oggds_header.i_bits_per_sample, 0 );
             SetDWLE( &p_stream->oggds_header.header.video.i_width,
-                     p_input->p_fmt->i_width );
+                     p_input->p_fmt->video.i_width );
             SetDWLE( &p_stream->oggds_header.header.video.i_height,
-                     p_input->p_fmt->i_height );
+                     p_input->p_fmt->video.i_height );
             msg_Dbg( p_mux, "mp4v/div3 stream" );
             break;
 
@@ -408,12 +408,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             SetDWLE( &p_stream->oggds_header.i_default_len, 1 );
             SetDWLE( &p_stream->oggds_header.i_buffer_size, 30*1024 );
             SetQWLE( &p_stream->oggds_header.i_samples_per_unit,
-                     p_input->p_fmt->i_sample_rate );
+                     p_input->p_fmt->audio.i_rate );
             SetWLE( &p_stream->oggds_header.i_bits_per_sample, 0 );
             SetDWLE( &p_stream->oggds_header.header.audio.i_channels,
-                     p_input->p_fmt->i_channels );
+                     p_input->p_fmt->audio.i_channels );
             SetDWLE( &p_stream->oggds_header.header.audio.i_block_align,
-                     p_input->p_fmt->i_block_align );
+                     p_input->p_fmt->audio.i_blockalign );
             SetDWLE( &p_stream->oggds_header.header.audio.i_avgbytespersec, 0);
             msg_Dbg( p_mux, "mpga/a52 stream" );
             break;
@@ -710,11 +710,11 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
 
         /* Special case for mp4v */
         if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) &&
-            p_mux->pp_inputs[i]->p_fmt->i_extra_data )
+            p_mux->pp_inputs[i]->p_fmt->i_extra )
         {
             /* Send a packet with the VOL data */
-            op.bytes  = p_mux->pp_inputs[i]->p_fmt->i_extra_data;
-            op.packet = p_mux->pp_inputs[i]->p_fmt->p_extra_data;
+            op.bytes  = p_mux->pp_inputs[i]->p_fmt->i_extra;
+            op.packet = p_mux->pp_inputs[i]->p_fmt->p_extra;
             op.b_o_s  = 0;
             op.e_o_s  = 0;
             op.granulepos = 0;
@@ -903,7 +903,7 @@ static int Mux( sout_mux_t *p_mux )
                 /* number of sample from begining + current packet */
                 op.granulepos =
                     ( i_dts + p_data->i_length - p_sys->i_start_dts ) *
-                    p_input->p_fmt->i_sample_rate / I64C(1000000);
+                    p_input->p_fmt->audio.i_rate / I64C(1000000);
             }
             else
             {

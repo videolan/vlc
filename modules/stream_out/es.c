@@ -2,7 +2,7 @@
  * es.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: es.c,v 1.3 2003/07/05 21:31:02 alexis Exp $
+ * $Id: es.c,v 1.4 2003/11/21 15:32:08 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -38,7 +38,7 @@
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-static sout_stream_id_t *Add ( sout_stream_t *, sout_format_t * );
+static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
 static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
 
@@ -186,7 +186,7 @@ static char * es_print_url( char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count, c
     return( psz_url );
 }
 
-static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_fmt )
+static sout_stream_id_t * Add      ( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_instance_t   *p_sout = p_stream->p_sout;
@@ -230,11 +230,11 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
     /* *** get url (%d expanded as a codec count, %c expanded as codec fcc ) *** */
     if( p_fmt->i_cat == AUDIO_ES && p_sys->psz_url_audio )
     {
-        psz_url = es_print_url( p_sys->psz_url_audio, p_fmt->i_fourcc, p_sys->i_count_audio, psz_access, psz_mux );
+        psz_url = es_print_url( p_sys->psz_url_audio, p_fmt->i_codec, p_sys->i_count_audio, psz_access, psz_mux );
     }
     else if( p_fmt->i_cat == VIDEO_ES && p_sys->psz_url_video )
     {
-        psz_url = es_print_url( p_sys->psz_url_video, p_fmt->i_fourcc, p_sys->i_count_video, psz_access, psz_mux );
+        psz_url = es_print_url( p_sys->psz_url_video, p_fmt->i_codec, p_sys->i_count_video, psz_access, psz_mux );
     }
     else
     {
@@ -252,7 +252,7 @@ static sout_stream_id_t * Add      ( sout_stream_t *p_stream, sout_format_t *p_f
             i_count = p_sys->i_count;
         }
 
-        psz_url = es_print_url( p_sys->psz_url, p_fmt->i_fourcc, i_count, psz_access, psz_mux );
+        psz_url = es_print_url( p_sys->psz_url, p_fmt->i_codec, i_count, psz_access, psz_mux );
     }
 
     p_sys->i_count++;
