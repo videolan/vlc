@@ -2,7 +2,7 @@
  * mpeg4audio.c: parse and packetize an MPEG 4 audio stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.9 2003/10/05 18:09:36 gbazin Exp $
+ * $Id: mpeg4audio.c,v 1.10 2003/10/23 20:51:20 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -59,7 +59,6 @@ struct decoder_sys_t
      * Input properties
      */
     int        i_state;
-    vlc_bool_t b_synchro;
 
     block_t *p_chain;
     block_bytestream_t bytestream;
@@ -160,7 +159,6 @@ static int InitPacketizer( decoder_t *p_dec )
     WAVEFORMATEX *p_wf;
 
     p_sys->i_state = STATE_NOSYNC;
-    p_sys->b_synchro = VLC_FALSE;
 
     aout_DateSet( &p_sys->end_date, 0 );
 
@@ -255,13 +253,16 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t p_header[ADTS_HEADER_SIZE];
 
-    if( (!aout_DateGet( &p_sys->end_date ) && !p_block->i_pts)
-        || p_block->b_discontinuity )
+    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
-        p_sys->b_synchro = VLC_FALSE;
         return VLC_SUCCESS;
+    }
+
+    if( p_block->b_discontinuity )
+    {
+        p_sys->i_state = STATE_SYNC;
     }
 
     if( p_sys->p_chain )
@@ -290,10 +291,16 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
                     break;
                 }
                 block_SkipByte( &p_sys->bytestream );
-                p_sys->b_synchro = VLC_FALSE;
             }
             if( p_sys->i_state != STATE_SYNC )
             {
+                if( block_PeekByte( &p_sys->bytestream, p_header )
+                    == VLC_SUCCESS && p_header[0] == 0xff )
+                {
+                    /* Start of a sync word, need more data */
+                    return VLC_SUCCESS;
+                }
+
                 block_ChainRelease( p_sys->p_chain );
                 p_sys->p_chain = NULL;
 
@@ -332,7 +339,6 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
                 msg_Dbg( p_dec, "emulated sync word" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
-                p_sys->b_synchro = VLC_FALSE;
                 break;
             }
 
@@ -342,26 +348,22 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
             /* TODO: If p_block == NULL, flush the buffer without checking the
              * next sync word */
 
-            if( !p_sys->b_synchro )
+            /* Check if next expected frame contains the sync word */
+            if( block_PeekOffsetBytes( &p_sys->bytestream,
+                                       p_sys->i_frame_size, p_header, 2 )
+                != VLC_SUCCESS )
             {
-                /* Check if next expected frame contains the sync word */
-                if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                           p_sys->i_frame_size, p_header, 2 )
-                    != VLC_SUCCESS )
-                {
-                    /* Need more data */
-                    return VLC_SUCCESS;
-                }
+                /* Need more data */
+                return VLC_SUCCESS;
+            }
 
-                if( p_header[0] != 0xff || (p_header[1] & 0xf6) != 0xf0 )
-                {
-                    msg_Dbg( p_dec, "emulated sync word "
-                             "(no sync on following frame)" );
-                    p_sys->i_state = STATE_NOSYNC;
-                    block_SkipByte( &p_sys->bytestream );
-                    p_sys->b_synchro = VLC_FALSE;
-                    break;
-                }
+            if( p_header[0] != 0xff || (p_header[1] & 0xf6) != 0xf0 )
+            {
+                msg_Dbg( p_dec, "emulated sync word "
+                         "(no sync on following frame)" );
+                p_sys->i_state = STATE_NOSYNC;
+                block_SkipByte( &p_sys->bytestream );
+                break;
             }
 
             if( !p_sys->p_sout_buffer )
@@ -385,7 +387,6 @@ static int RunADTSPacketizer( decoder_t *p_dec, block_t *p_block )
 
             p_sys->i_state = STATE_NOSYNC;
             p_sys->p_sout_buffer = NULL;
-            p_sys->b_synchro = VLC_TRUE;
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->pts == p_sys->bytestream.p_block->i_pts )

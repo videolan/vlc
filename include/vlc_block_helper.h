@@ -2,7 +2,7 @@
  * vlc_block_helper.h: Helper functions for data blocks management.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block_helper.h,v 1.3 2003/10/05 00:50:05 gbazin Exp $
+ * $Id: vlc_block_helper.h,v 1.4 2003/10/23 20:51:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -321,13 +321,14 @@ static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
     {
         i_copy = __MIN( i_size, p_block->i_buffer - i_offset );
         i_size -= i_copy;
-        i_offset = 0;
 
         if( !i_size ) break;
+
+        i_offset = 0;
     }
 
     /* Copy the data */
-    i_offset = i_copy;
+    i_offset += i_copy;
     i_size = i_data;
     i_copy = 0;
     for( ; p_block != NULL; p_block = p_block->p_next )

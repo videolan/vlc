@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.27 2003/10/08 21:03:36 gbazin Exp $
+ * $Id: a52.c,v 1.28 2003/10/23 20:51:20 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -53,7 +53,6 @@ struct decoder_sys_t
      * Input properties
      */
     int        i_state;
-    vlc_bool_t b_synchro;
 
     block_t *p_chain;
     block_bytestream_t bytestream;
@@ -170,7 +169,6 @@ static int OpenPacketizer( vlc_object_t *p_this )
 static int InitDecoder( decoder_t *p_dec )
 {
     p_dec->p_sys->i_state = STATE_NOSYNC;
-    p_dec->p_sys->b_synchro = VLC_FALSE;
 
     p_dec->p_sys->p_out_buffer = NULL;
     aout_DateSet( &p_dec->p_sys->end_date, 0 );
@@ -207,6 +205,11 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
         return VLC_SUCCESS;
     }
 
+    if( p_block->b_discontinuity )
+    {
+        p_sys->i_state = STATE_SYNC;
+    }
+
     if( p_sys->p_chain )
     {
         block_ChainAppend( &p_sys->p_chain, p_block );
@@ -232,10 +235,16 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                     break;
                 }
                 block_SkipByte( &p_sys->bytestream );
-                p_sys->b_synchro = VLC_FALSE;
             }
             if( p_sys->i_state != STATE_SYNC )
             {
+                if( block_PeekByte( &p_sys->bytestream, p_header )
+                    == VLC_SUCCESS && p_header[0] == 0x0b )
+                {
+                    /* Start of a sync word, need more data */
+                    return VLC_SUCCESS;
+                }
+
                 block_ChainRelease( p_sys->p_chain );
                 p_sys->p_chain = NULL;
 
@@ -274,7 +283,6 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 msg_Dbg( p_dec, "emulated sync word" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
-                p_sys->b_synchro = VLC_FALSE;
                 break;
             }
             p_sys->i_state = STATE_DATA;
@@ -283,26 +291,22 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             /* TODO: If p_block == NULL, flush the buffer without checking the
              * next sync word */
 
-            if( !p_sys->b_synchro )
-            {
-                /* Check if next expected frame contains the sync word */
-                if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                           p_sys->i_frame_size, p_header, 2 )
-                    != VLC_SUCCESS )
-                {
-                    /* Need more data */
-                    return VLC_SUCCESS;
-                }
+	    /* Check if next expected frame contains the sync word */
+	    if( block_PeekOffsetBytes( &p_sys->bytestream,
+				       p_sys->i_frame_size, p_header, 2 )
+		!= VLC_SUCCESS )
+	    {
+	        /* Need more data */
+	        return VLC_SUCCESS;
+	    }
 
-                if( p_header[0] != 0x0b || p_header[1] != 0x77 )
-                {
-                    msg_Dbg( p_dec, "emulated sync word "
-                             "(no sync on following frame)" );
-                    p_sys->i_state = STATE_NOSYNC;
-                    block_SkipByte( &p_sys->bytestream );
-                    p_sys->b_synchro = VLC_FALSE;
-                    break;
-                }
+	    if( p_header[0] != 0x0b || p_header[1] != 0x77 )
+	    {
+	        msg_Dbg( p_dec, "emulated sync word "
+			 "(no sync on following frame)" );
+		p_sys->i_state = STATE_NOSYNC;
+		block_SkipByte( &p_sys->bytestream );
+		break;
             }
 
             if( !p_sys->p_out_buffer )
@@ -323,7 +327,6 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
             SendOutBuffer( p_dec );
             p_sys->i_state = STATE_NOSYNC;
-            p_sys->b_synchro = VLC_TRUE;
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->pts == p_sys->bytestream.p_block->i_pts )

@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.19 2003/10/05 00:50:05 gbazin Exp $
+ * $Id: mpeg_audio.c,v 1.20 2003/10/23 20:51:20 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -50,7 +50,6 @@ struct decoder_sys_t
      * Input properties
      */
     int        i_state;
-    vlc_bool_t b_synchro;
 
     block_t *p_chain;
     block_bytestream_t bytestream;
@@ -183,7 +182,6 @@ static int OpenPacketizer( vlc_object_t *p_this )
 static int InitDecoder( decoder_t *p_dec )
 {
     p_dec->p_sys->i_state = STATE_NOSYNC;
-    p_dec->p_sys->b_synchro = VLC_FALSE;
 
     p_dec->p_sys->p_out_buffer = NULL;
     aout_DateSet( &p_dec->p_sys->end_date, 0 );
@@ -217,13 +215,16 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
     uint8_t p_header[MAD_BUFFER_GUARD];
     uint32_t i_header;
 
-    if( (!aout_DateGet( &p_sys->end_date ) && !p_block->i_pts)
-        || p_block->b_discontinuity )
+    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
-        p_sys->b_synchro = VLC_FALSE;
         return VLC_SUCCESS;
+    }
+
+    if( p_block->b_discontinuity )
+    {
+        p_sys->i_state = STATE_SYNC;
     }
 
     if( p_sys->p_chain )
@@ -252,10 +253,16 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                     break;
                 }
                 block_SkipByte( &p_sys->bytestream );
-                p_sys->b_synchro = VLC_FALSE;
             }
             if( p_sys->i_state != STATE_SYNC )
             {
+                if( block_PeekByte( &p_sys->bytestream, p_header )
+                    == VLC_SUCCESS && p_header[0] == 0xff )
+                {
+                    /* Start of a sync word, need more data */
+                    return VLC_SUCCESS;
+                }
+
                 block_ChainRelease( p_sys->p_chain );
                 p_sys->p_chain = NULL;
 
@@ -269,6 +276,8 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             if( p_sys->pts != 0 &&
                 p_sys->pts != aout_DateGet( &p_sys->end_date ) )
             {
+	      msg_Err( p_dec, "set PTS: %lli old: %lli", p_sys->pts,
+		       aout_DateGet( &p_sys->end_date ) );
                 aout_DateSet( &p_sys->end_date, p_sys->pts );
             }
             p_sys->i_state = STATE_HEADER;
@@ -302,7 +311,6 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 msg_Dbg( p_dec, "emulated start code" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
-                p_sys->b_synchro = VLC_FALSE;
                 break;
             }
 
@@ -400,7 +408,6 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                              "(emulated startcode ?)" );
                     block_SkipByte( &p_sys->bytestream );
                     p_sys->i_state = STATE_NOSYNC;
-                    p_sys->b_synchro = VLC_FALSE;
                     break;
                 }
             }
@@ -413,14 +420,11 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                     break;
                 }
 
-                if( !p_sys->b_synchro )
-                {
-                    msg_Dbg( p_dec, "emulated startcode "
-                             "(no startcode on following frame)" );
-                    p_sys->i_state = STATE_NOSYNC;
-                    block_SkipByte( &p_sys->bytestream );
-                    break;
-                }
+                msg_Dbg( p_dec, "emulated startcode "
+                         "(no startcode on following frame)" );
+                p_sys->i_state = STATE_NOSYNC;
+                block_SkipByte( &p_sys->bytestream );
+                break;
             }
 
             if( GetOutBuffer( p_dec, &p_sys->p_out_buffer ) != VLC_SUCCESS )
@@ -456,7 +460,6 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
             SendOutBuffer( p_dec );
             p_sys->i_state = STATE_NOSYNC;
-            p_sys->b_synchro = VLC_TRUE;
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->pts == p_sys->bytestream.p_block->i_pts )
@@ -717,7 +720,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     };
 
     int i_version, i_mode, i_emphasis;
-    vlc_bool_t b_padding, b_mpeg_2_5;
+    vlc_bool_t b_padding, b_mpeg_2_5, b_crc;
     int i_frame_size = 0;
     int i_bitrate_index, i_samplerate_index;
     int i_max_bit_rate;
@@ -725,7 +728,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
     b_mpeg_2_5  = 1 - ((i_header & 0x100000) >> 20);
     i_version   = 1 - ((i_header & 0x80000) >> 19);
     *pi_layer   = 4 - ((i_header & 0x60000) >> 17);
-    /* CRC */
+    b_crc = !((i_header >> 16) & 0x01);
     i_bitrate_index = (i_header & 0xf000) >> 12;
     i_samplerate_index = (i_header & 0xc00) >> 10;
     b_padding   = (i_header & 0x200) >> 9;
