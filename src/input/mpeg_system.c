@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.97.2.3 2002/09/26 22:43:45 massiot Exp $
+ * $Id: mpeg_system.c,v 1.97.2.4 2002/10/01 21:55:53 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -333,15 +333,13 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             break;
         }
 
-        if ( p_es->i_type == A52B_AUDIO_ES
-              || p_es->i_type == AC3_AUDIO_ES )
+        if ( p_es->i_type == A52B_AUDIO_ES )
         {
-            /* With A/52 audio, we need to skip the first 3 bytes */
-            i_pes_header_size += 3;
+            /* With A/52 audio, we need to skip the first 4 bytes */
+            i_pes_header_size += 4;
         }
 
-        if( p_es->i_type == A52B_AUDIO_ES
-             || p_es->i_type == LPCMB_AUDIO_ES
+        if( p_es->i_type == LPCMB_AUDIO_ES
              || p_es->i_type == DVDB_SPU_ES )
         {
             /* stream_private_id */
