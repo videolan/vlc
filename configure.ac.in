@@ -962,7 +962,7 @@ then
   then
     if test "x${with_dvdread_tree}" = x
     then
-      AC_CHECK_HEADERS(dvdread/dvdread.h,
+      AC_CHECK_HEADERS(dvdread/dvd_reader.h,
         [ PLUGINS="${PLUGINS} dvdread"
           LDFLAGS_dvdread="${LDFLAGS_dvdread} -ldvdread" ],
         [ if test "x${enable_dvdread}" != "x"
@@ -994,9 +994,9 @@ then
     fi
   else
     AC_MSG_CHECKING(for dvdread headers in ${with_dvdread})
-    if test -f ${with_dvdread}/include/dvdread/dvdread.h
+    if test -f ${with_dvdread}/include/dvdread/dvd_reader.h
     then
-      dnl  Use ${with_dvdread}/include/dvdread/dvdread.h
+      dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
       AC_MSG_RESULT(yes)
       PLUGINS="${PLUGINS} dvdread"
       LDFLAGS_dvdread="${LDFLAGS_dvdread} -L${with_dvdread}/lib -ldvdread"
@@ -1004,7 +1004,7 @@ then
     else
       dnl  No libdvdread could be found, sorry
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvdread.h])
+      AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
     fi
   fi
 fi
