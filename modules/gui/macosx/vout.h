@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.h,v 1.5 2003/01/31 02:53:52 jlj Exp $
+ * $Id: vout.h,v 1.6 2003/02/07 20:23:17 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -23,6 +23,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define WINDOW_TITLE_HEIGHT 21
+
 /*****************************************************************************
  * VLCWindow interface
  *****************************************************************************/
@@ -34,6 +36,9 @@
 - (void)setVout:(vout_thread_t *)_p_vout;
 - (vout_thread_t *)getVout;
 
+- (void)halfWindow;
+- (void)normalWindow;
+- (void)doubleWindow;
 - (void)toggleFullscreen;
 - (BOOL)isFullscreen;
 

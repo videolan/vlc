@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.19 2003/01/31 02:53:52 jlj Exp $
+ * $Id: controls.m,v 1.20 2003/02/07 20:23:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -59,6 +59,9 @@
 - (IBAction)volumeSliderUpdated:(id)sender;
 - (void)updateVolumeSlider;
 
+- (IBAction)halfWindow:(id)sender;
+- (IBAction)normalWindow:(id)sender;
+- (IBAction)doubleWindow:(id)sender;
 - (IBAction)fullscreen:(id)sender;
 - (IBAction)deinterlace:(id)sender;
 
@@ -366,6 +369,52 @@
         [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)]; 
     }
 }
+
+- (IBAction)halfWindow:(id)sender
+{
+    id o_window = [NSApp keyWindow];
+    NSArray *o_windows = [NSApp windows];
+    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+    
+    while ((o_window = [o_enumerator nextObject]))
+    {
+        if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        {
+            [o_window halfWindow];
+        }
+    }
+}
+
+- (IBAction)normalWindow:(id)sender
+{
+    id o_window = [NSApp keyWindow];
+    NSArray *o_windows = [NSApp windows];
+    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+    
+    while ((o_window = [o_enumerator nextObject]))
+    {
+        if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        {
+            [o_window normalWindow];
+        }
+    }
+}
+
+- (IBAction)doubleWindow:(id)sender
+{
+    id o_window = [NSApp keyWindow];
+    NSArray *o_windows = [NSApp windows];
+    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+    
+    while ((o_window = [o_enumerator nextObject]))
+    {
+        if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        {
+            [o_window doubleWindow];
+        }
+    }
+}
+
 
 - (IBAction)fullscreen:(id)sender
 {
@@ -700,7 +749,10 @@
 
         [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
     }
-    else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )    
+    else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] ||
+                [[o_mi title] isEqualToString: _NS("Half Size")] ||
+                [[o_mi title] isEqualToString: _NS("Normal Size")] ||
+                [[o_mi title] isEqualToString: _NS("Double Size")])    
     {
         id o_window;
         NSArray *o_windows = [NSApp windows];

@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.22 2003/02/05 16:23:06 hartman Exp $
+ * $Id: intf.h,v 1.23 2003/02/07 20:23:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -172,6 +172,9 @@ struct intf_sys_t
     IBOutlet id o_mi_device;
 
     IBOutlet id o_mu_video;
+    IBOutlet id o_mi_half_window;
+    IBOutlet id o_mi_normal_window;
+    IBOutlet id o_mi_double_window;
     IBOutlet id o_mi_fullscreen;
     IBOutlet id o_mi_screen;
     IBOutlet id o_mi_deinterlace;

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.47 2003/02/06 23:55:28 massiot Exp $
+ * $Id: intf.m,v 1.48 2003/02/07 20:23:17 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -309,6 +309,9 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_mi_device setTitle: _NS("Device")];
     
     [o_mu_video setTitle: _NS("Video")];
+    [o_mi_half_window setTitle: _NS("Half Size")];
+    [o_mi_normal_window setTitle: _NS("Normal Size")];
+    [o_mi_double_window setTitle: _NS("Double Size")];
     [o_mi_fullscreen setTitle: _NS("Fullscreen")];
     [o_mi_screen setTitle: _NS("Screen")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];

@@ -5,11 +5,14 @@
         {
             ACTIONS = {
                 deinterlace = id; 
+                doubleWindow = id; 
                 faster = id; 
                 fullscreen = id; 
+                halfWindow = id; 
                 loop = id; 
                 mute = id; 
                 next = id; 
+                normalWindow = id; 
                 pause = id; 
                 play = id; 
                 prev = id; 
@@ -77,8 +80,10 @@
                 "o_mi_cut" = id; 
                 "o_mi_deinterlace" = id; 
                 "o_mi_device" = id; 
+                "o_mi_double_window" = id; 
                 "o_mi_faster" = id; 
                 "o_mi_fullscreen" = id; 
+                "o_mi_half_window" = id; 
                 "o_mi_hide" = id; 
                 "o_mi_hide_others" = id; 
                 "o_mi_language" = id; 
@@ -88,6 +93,7 @@
                 "o_mi_minimize" = id; 
                 "o_mi_mute" = id; 
                 "o_mi_next" = id; 
+                "o_mi_normal_window" = id; 
                 "o_mi_open_disc" = id; 
                 "o_mi_open_file" = id; 
                 "o_mi_open_generic" = id; 

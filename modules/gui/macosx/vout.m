@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.23 2003/02/06 13:47:04 hartman Exp $
+ * $Id: vout.m,v 1.24 2003/02/07 20:23:17 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -723,6 +723,39 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 - (vout_thread_t *)getVout
 {
     return( p_vout );
+}
+
+- (void)halfWindow
+{
+    NSSize newsize;
+    
+    newsize.width = (int) p_vout->render.i_width / 2 ;
+    newsize.height = ((int) p_vout->render.i_height / 2 ) + WINDOW_TITLE_HEIGHT ;
+    [self setContentSize: newsize];
+    //[[self contentView] setFrameSize: newsize];
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+}
+
+- (void)normalWindow
+{
+    NSSize newsize;
+    
+    newsize.width = p_vout->render.i_width ;
+    newsize.height = p_vout->render.i_height + WINDOW_TITLE_HEIGHT ;
+    [self setContentSize: newsize];
+    //[[self contentView] setFrameSize: newsize];
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+}
+
+- (void)doubleWindow
+{
+    NSSize newsize;
+    
+    newsize.width = p_vout->render.i_width * 2 ;
+    newsize.height = (p_vout->render.i_height * 2 ) + WINDOW_TITLE_HEIGHT;
+    [self setContentSize: newsize];
+    //[[self contentView] setFrameSize: newsize];
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
 }
 
 - (void)toggleFullscreen
