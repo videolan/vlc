@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.14 2002/03/26 23:08:40 gbazin Exp $
+ * $Id: aout_ext-dec.c,v 1.15 2002/05/18 15:51:37 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -184,7 +184,9 @@ void aout_DestroyFifo( aout_fifo_t * p_fifo )
 {
     intf_WarnMsg( 2, "aout info: fifo #%i destroyed", p_fifo->i_fifo );
 
+    vlc_mutex_lock( &p_fifo->data_lock );
     p_fifo->b_die = 1;
+    vlc_mutex_unlock( &p_fifo->data_lock );
 }
 
 /*****************************************************************************

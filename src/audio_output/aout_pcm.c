@@ -2,7 +2,7 @@
  * aout_pcm.c: PCM audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_pcm.c,v 1.4 2002/04/30 12:56:11 gbazin Exp $
+ * $Id: aout_pcm.c,v 1.5 2002/05/18 15:51:37 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -300,6 +300,11 @@ static int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
 
     /* We take the lock */
     vlc_mutex_lock( &p_fifo->data_lock );
+    if ( p_fifo->b_die )
+    {
+        vlc_mutex_unlock( &p_fifo->data_lock );
+        return( -1 );
+    }
 
     /* Are we looking for a dated start frame ? */
     if ( !p_fifo->b_start_frame )
