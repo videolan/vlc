@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2002-04-19 15:54+0200\n"
-"PO-Revision-Date: 2002-03-19 16:31GMT\n"
+"PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Jean-Paul Saman <jpsaman@wxs.nl>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -25,40 +25,44 @@ msgid ""
 "Note that the default behaviour is to automatically select the best method "
 "available."
 msgstr ""
+"Via deze optie kan de interface die vlc gebruikt geselecteerd worden.\n"
+"Noot: Standaard wordt automatisch de beste beschikbare methode gekozen."
 
 #: src/interface/main.c:103
 msgid "warning level (or use -v, -vv, etc...)"
-msgstr ""
+msgstr "waarschuwings niveau (of gebruik -v, -vv, etc...)"
 
 #: src/interface/main.c:105
 msgid ""
 "Increasing the warning level will allow you to see more debug messages and "
 "can sometimes help you to troubleshoot a problem."
 msgstr ""
+"Het verhogen van het waarschuwings niveau toont meer debug boodschappen en"
+"kan soms helpen het probleem op te lossen."
 
 #: src/interface/main.c:108
 msgid "output statistics"
-msgstr ""
+msgstr "statistieken"
 
 #: src/interface/main.c:110
 msgid ""
 "Enabling the stats mode will flood your log console with various statistics "
 "messages."
-msgstr ""
+msgstr "De statistiek mode genereert verschillende statistische boodschappen op het scherm. "
 
 #: src/interface/main.c:113
 msgid "interface default search path"
-msgstr ""
+msgstr "interface standaard zoekpad"
 
 #: src/interface/main.c:115
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
-msgstr ""
+msgstr "Stel het standaard zoekpad in waar de interface naar bestanden moet zoeken."
 
 #: src/interface/main.c:118
 msgid "audio output method"
-msgstr ""
+msgstr "audio output methode"
 
 #: src/interface/main.c:120
 msgid ""
@@ -66,16 +70,20 @@ msgid ""
 "Note that the default behaviour is to automatically select the best method "
 "available."
 msgstr ""
+"Deze optie selecteert de audio output methode, die gebruikt wordt door vlc.\n"
+"Noot: Standaard wordt automatisch de best beschikbare methode gekozen."
 
 #: src/interface/main.c:124
 msgid "disable audio"
-msgstr ""
+msgstr "schakel audio uit"
 
 #: src/interface/main.c:126
 msgid ""
 "This will completely disable the audio output. The audio decoding stage "
 "shouldn't even be done, so it can allow you to save some processing power."
 msgstr ""
+"Schakel alle audio output uit. De audio decoding stap wordt overgeslagen, "
+"dit bespaart zelfs wat rekenkracht."
 
 #: src/interface/main.c:130
 msgid "mono audio"
@@ -83,20 +91,19 @@ msgstr ""
 
 #: src/interface/main.c:131
 msgid "This will force a mono audio output"
-msgstr ""
+msgstr "Dit zal mono audio output forceren."
 
 #: src/interface/main.c:133
 msgid "audio output volume"
 msgstr ""
 
 #: src/interface/main.c:135
-msgid ""
-"You can set the default audio output volume here, in a range from 0 to 1024."
-msgstr ""
+msgid "You can set the default audio output volume here, in a range from 0 to 1024."
+msgstr "De standaard audio output volume is instellen tussen 0 en 1024."
 
 #: src/interface/main.c:138
 msgid "audio output format"
-msgstr ""
+msgstr "audio output formaat"
 
 #: src/interface/main.c:140
 msgid ""
@@ -111,30 +118,42 @@ msgid ""
 "7 -> mpeg2 audio (unsupported)\n"
 "8 -> ac3 pass-through"
 msgstr ""
+"Forceer het audio output formaat hier:\n"
+"0 -> 16 bits signed native endian (standaard)\n"
+"1 ->  8 bits unsigned\n"
+"2 -> 16 bits signed little endian\n"
+"3 -> 16 bits signed big endian\n"
+"4 ->  8 bits signed\n"
+"5 -> 16 bits unsigned little endian\n"
+"6 -> 16 bits unsigned big endian\n"
+"7 -> mpeg2 audio (unsupported)\n"
+"8 -> ac3 pass-through"
 
 #: src/interface/main.c:151
 msgid "audio output frequency (Hz)"
-msgstr ""
+msgstr "audio output frequentie (Hz)"
 
 #: src/interface/main.c:153
 msgid ""
 "You can force the audio output frequency here.\n"
 "Common values are 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 msgstr ""
+"Forceer de audio output frequentie hier:\n"
+"Gebruikelijke waarden zijn: 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 
 #: src/interface/main.c:156
 msgid "compensate desynchronization of audio (in ms)"
-msgstr ""
+msgstr "compenseer audio desynchronisatie (in ms)"
 
 #: src/interface/main.c:158
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
-msgstr ""
+msgstr "Vertraag de audio output, deze optie is handig als audio en video niet synchroon lopen."
 
 #: src/interface/main.c:161
 msgid "video output method"
-msgstr ""
+msgstr "video output methode"
 
 #: src/interface/main.c:163
 msgid ""
@@ -142,50 +161,61 @@ msgid ""
 "Note that the default behaviour is to automatically select the best method "
 "available."
 msgstr ""
+"Selecteer de video output methode die vlc gebruikt.\n"
+"Noot: Standaard wordt automatisch de best beschikbare "
+"methode gekozen."
 
 #: src/interface/main.c:167
 msgid "disable video"
-msgstr ""
+msgstr "schakel video uit"
 
 #: src/interface/main.c:169
 msgid ""
 "This will completely disable the video output. The video decoding stage "
 "shouldn't even be done, so it can allow you to save some processing power."
 msgstr ""
+"Schakel de video volledig uit. De video decoding stap wordt overgeslagen. "
+"Op deze manier kan er op rekenkracht bespaard worden."
 
 #: src/interface/main.c:173
 msgid "display identifier"
-msgstr ""
+msgstr "beeldscherm identificatie"
 
 #: src/interface/main.c:176
 msgid "video width"
-msgstr ""
+msgstr "video breedte"
 
 #: src/interface/main.c:178
 msgid ""
 "You can enforce the video width here.\n"
 "Note that by default vlc will adapt to the video characteristics."
 msgstr ""
+"Forceer video breedte hier:\n"
+"Noot: Standaard probeert vlc zich aan de video karakteristieken aan te passen."
 
 #: src/interface/main.c:181
 msgid "video height"
-msgstr ""
+msgstr "video hoogte"
 
 #: src/interface/main.c:183
 msgid ""
 "You can enforce the video height here.\n"
 "Note that by default vlc will adapt to the video characteristics."
 msgstr ""
+"Forceer de video hoogte hier:\n"
+"Noot: Standaard zal vlc zich aan de video karakteristieken aan passen."
 
 #: src/interface/main.c:186
 msgid "grayscale video output"
-msgstr ""
+msgstr "grijswaarden video output"
 
 #: src/interface/main.c:188
 msgid ""
 "Using this option, vlc will not decode the color information from the video "
 "(this can also allow you to save some processing power)."
 msgstr ""
+"Het gebruiken van deze optie resulteert in de afwezigheid van kleuren."
+"(Dit kan rekenkracht besparen.)"
 
 #: src/interface/main.c:191
 #, fuzzy
@@ -193,183 +223,172 @@ msgid "fullscreen video output"
 msgstr "Volledig scherm kleur diepte:"
 
 #: src/interface/main.c:193
-msgid ""
-"If this option is enabled, vlc will always start a video in fullscreen mode."
-msgstr ""
+msgid "If this option is enabled, vlc will always start a video in fullscreen mode."
+msgstr "Als deze optie gebruikt wordt, dan zal vlc een video altijd op volledige scherm grote afspelen."
 
 #: src/interface/main.c:196
 msgid "disable hardware acceleration for the video output"
-msgstr ""
+msgstr "schakel hardware versnelling voor video output uit."
 
 #: src/interface/main.c:198
 msgid ""
 "By default vlc will try to take advantage of the overlay capabilities of you "
 "graphics card."
 msgstr ""
+"Standaard probeert vlc snelheids winst te halen uit het gebruik van "
+"overlay mogelijkheden van de aanwezige grafische kaart."
 
 #: src/interface/main.c:201
 msgid "force SPU position"
-msgstr ""
+msgstr "forceer SPU positie"
 
 #: src/interface/main.c:204
-#, fuzzy
 msgid "video filter module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: src/interface/main.c:207
-#, fuzzy
 msgid "server port"
-msgstr "Geen server:!"
+msgstr "server poort:"
 
 #: src/interface/main.c:210
-#, fuzzy
 msgid "enable network channel mode"
-msgstr "Netwerk Kanaal:"
+msgstr "schakel netwerk kanaal mode in"
 
 #: src/interface/main.c:213
-#, fuzzy
 msgid "channel server address"
-msgstr "Kanaal server:"
+msgstr "Kanaal server adres:"
 
 #: src/interface/main.c:216
-#, fuzzy
 msgid "channel server port"
-msgstr "Kanaal server:"
+msgstr "Kanaal server poort:"
 
 #: src/interface/main.c:219
-#, fuzzy
 msgid "network interface"
-msgstr "_Verstop interface"
+msgstr "netwerk interface"
 
 #: src/interface/main.c:222
-#, fuzzy
 msgid "choose program (SID)"
-msgstr "Sluit programma af"
+msgstr "selecteer programma (SID)"
 
 #: src/interface/main.c:224
 msgid "Choose the program to select by giving its Service ID."
-msgstr ""
+msgstr "Selecteer een programma door middel van zijn bekende Service ID."
 
 #: src/interface/main.c:226
 msgid "choose audio"
-msgstr ""
+msgstr "selecteer audio"
 
 #: src/interface/main.c:229
-#, fuzzy
 msgid "choose channel"
-msgstr "Kies een hoofdstuk"
+msgstr "selecteer een kanaal"
 
 #: src/interface/main.c:232
-#, fuzzy
 msgid "choose subtitles"
-msgstr "Kies een title"
+msgstr "selecteer een ondertitel"
 
 #: src/interface/main.c:235
 msgid "DVD device"
-msgstr ""
+msgstr "DVD apparaat"
 
 #: src/interface/main.c:238
 msgid "VCD device"
-msgstr ""
+msgstr "VCD apparaat"
 
 #: src/interface/main.c:241
 msgid "satellite transponder frequency"
-msgstr ""
+msgstr "sateliet transponder frequentie"
 
 #: src/interface/main.c:244
 msgid "satellite transponder polarization"
-msgstr ""
+msgstr "sateliet transponder polarisatie"
 
 #: src/interface/main.c:247
 msgid "satellite transponder FEC"
-msgstr ""
+msgstr "sateliet transponder FEC"
 
 #: src/interface/main.c:250
 msgid "satellite transponder symbol rate"
-msgstr ""
+msgstr "sateliet transponder symbool snelheid"
 
 #: src/interface/main.c:253
 msgid "use diseqc with antenna"
-msgstr ""
+msgstr "gebruik disecq met antenne"
 
 #: src/interface/main.c:256
 msgid "antenna lnb_lof1 (kHz)"
-msgstr ""
+msgstr "antenne lnb_lof1 (kHz)"
 
 #: src/interface/main.c:259
 msgid "antenna lnb_lof2 (kHz)"
-msgstr ""
+msgstr "antenne lnb_lof2 (kHz)"
 
 #: src/interface/main.c:262
 msgid "antenna lnb_slof (kHz)"
-msgstr ""
+msgstr "antenne lnb_slof (kHz)"
 
 #: src/interface/main.c:265
 msgid "force IPv6"
-msgstr ""
+msgstr "forceer IPv6"
 
 #: src/interface/main.c:268
 msgid "force IPv4"
-msgstr ""
+msgstr "forceer IPv4"
 
 #: src/interface/main.c:271
 msgid "choose MPEG audio decoder"
-msgstr ""
+msgstr "selecteer MPEG audio decoder"
 
 #: src/interface/main.c:274
 msgid "choose AC3 audio decoder"
-msgstr ""
+msgstr "selecteer AC3 audio decoder"
 
 #: src/interface/main.c:277
 msgid "use additional processors"
-msgstr ""
+msgstr "gebruik extra processors"
 
 #: src/interface/main.c:280
 msgid "force synchro algorithm {I|I+|IP|IP+|IPB}"
-msgstr ""
+msgstr "forceer synchronisatie algorithme {I|I+|IP|IP+|IPB}"
 
 #: src/interface/main.c:283
 msgid "disable CPU's MMX support"
-msgstr ""
+msgstr "schakel CPU's MMU support uit"
 
 #: src/interface/main.c:286
 msgid "disable CPU's 3D Now! support"
-msgstr ""
+msgstr "schakel CPU's 3D Now! support uit"
 
 #: src/interface/main.c:289
 msgid "disable CPU's MMX EXT support"
-msgstr ""
+msgstr "schakel CPU's MMX EXT support uit"
 
 #: src/interface/main.c:292
 msgid "disable CPU's SSE support"
-msgstr ""
+msgstr "schakel CPU's SSE support uit"
 
 #: src/interface/main.c:295
 msgid "disable CPU's AltiVec support"
-msgstr ""
+msgstr "schakel CPU's AltiVec support uit"
 
 #: src/interface/main.c:298
-#, fuzzy
 msgid "launch playlist on startup"
-msgstr "Lanceer bij opstarten"
+msgstr "lanceer speellijst bij opstarten"
 
 #: src/interface/main.c:301
-#, fuzzy
 msgid "enqueue playlist as default"
-msgstr "Standaard in wachtrij plaatsen"
+msgstr "standaard in wachtrij plaatsen"
 
 #: src/interface/main.c:304
-#, fuzzy
 msgid "loop playlist on end"
-msgstr "Begin voor aan na einde speellijst"
+msgstr "begin voor aan na einde speellijst"
 
 #: src/interface/main.c:307
 msgid "memory copy method"
-msgstr ""
+msgstr "geheugen kopieer methode"
 
 #: src/interface/main.c:310
 msgid "fast pthread on NT/2K/XP (developpers only)"
-msgstr ""
+msgstr "snelle pthread op NT/2K/XP (alleen ontwikkelaars)"
 
 #: src/interface/main.c:312
 msgid ""
@@ -377,24 +396,24 @@ msgid ""
 "can also use this faster implementation but you might experience problems "
 "with it."
 msgstr ""
+"Op Windows NT/2K/XP gebruiken we een trage maar stabiele pthread implementatie. "
+"Het is mogelijk de snellere implementatie te gebruiken, echter deze is nog experimenteel."
+"Het is dus mogelijk dat er problemen optreden met deze snellere implementatie."
 
 #. Interface options
 #: src/interface/main.c:334
-#, fuzzy
 msgid "Interface"
-msgstr "Optie _Interface"
+msgstr ""
 
 #. Audio options
 #: src/interface/main.c:341
-#, fuzzy
 msgid "Audio"
-msgstr "_Audio"
+msgstr ""
 
 #. Video options
 #: src/interface/main.c:352
-#, fuzzy
 msgid "Video"
-msgstr "_Kijk"
+msgstr ""
 
 #. Input options
 #: src/interface/main.c:364
@@ -424,44 +443,43 @@ msgstr "Speellijst"
 #: plugins/mga/xmga.c:111 plugins/mpeg_vdec/video_parser.c:80
 #: plugins/x11/x11.c:55 plugins/x11/xvideo.c:60 src/interface/main.c:419
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Overige"
 
 #: src/interface/main.c:429
-#, fuzzy
 msgid "main program"
-msgstr "Sluit programma af"
+msgstr "hoofd programma"
 
 #: src/interface/main.c:442
 msgid "print help (or use -h)"
-msgstr ""
+msgstr "print help (of gebruik -h)"
 
 #: src/interface/main.c:444
 msgid "print detailed help (or use -H)"
-msgstr ""
+msgstr "print gedetailleerde help (of gebruik -H)"
 
 #: src/interface/main.c:446
 msgid "print a list of available plugins (or use -l)"
-msgstr ""
+msgstr "print een lijst van beschikbare plugins (of gebruik -l)"
 
 #: src/interface/main.c:448
 msgid "print help on plugin (or use -p)"
-msgstr ""
+msgstr "print help over plugin (of gebruik -p)"
 
 #: src/interface/main.c:450
 msgid "print version information"
-msgstr ""
+msgstr "print versie informatie"
 
 #. Usage
 #: src/interface/main.c:614 src/interface/main.c:1038
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
-msgstr ""
+msgstr "Gebruik: %s [opties] [parameters] [file] ...\n"
 
 #. print module name
 #: src/interface/main.c:939
 #, c-format
 msgid "%s module options:\n"
-msgstr ""
+msgstr "%s module opties:\n"
 
 #: src/interface/main.c:959 src/interface/main.c:963
 msgid " <string>"
@@ -486,6 +504,18 @@ msgid ""
 "  vlc:pause                      \tpause execution of playlist items\n"
 "  vlc:quit                       \tquit VLC"
 msgstr ""
+"\n"
+"Speellijst items:\n"
+"  *.mpg, *.vob                   \tgewone MPEG-1/2 bestanden\n"
+"  [dvd:][apparaat[@raw_device][@[titel][,[hoofdstuk][,hoek]]]\n"
+"                                 \tDVD apparaat\n"
+"  [vcd:][apparaat][@[titel][,[hoofdstuk]]\n"
+"                                 \tVCD apparaat\n"
+"  udpstream:[@[<bind adres>][:<bind poort>]]\n"
+"                                 \tUDP stream verzonde daar VLS\n"
+"  vlc:loop                       \tspeel de speellijst in een loop\n"
+"  vlc:pause                      \tpauzeer speellijst items\n"
+"  vlc:quit                       \tstop VLC"
 
 #: src/interface/main.c:1015 src/interface/main.c:1064
 #: src/interface/main.c:1088
@@ -493,10 +523,12 @@ msgid ""
 "\n"
 "Press the RETURN key to continue..."
 msgstr ""
+"\n"
+"Druk op RETURN om verder te gaan..."
 
 #: src/interface/main.c:1041
 msgid "[plugin]              [description]"
-msgstr ""
+msgstr "[plugin]              [beschrijving]"
 
 #: src/interface/main.c:1082
 msgid ""
@@ -505,6 +537,10 @@ msgid ""
 "see the file named COPYING for details.\n"
 "Written by the VideoLAN team at Ecole Centrale, Paris."
 msgstr ""
+"Dit programma wordt verspreid ZONDER ENIG GARANTIE, tot zover door de wet is toegestaan.\n"
+"Het programma mag verspreid worden onder verplichtingen van de GNU General Public License;\n"
+"zie het bestand COPYING voor details.\n"
+"Geschreven door het VideoLAN team at Ecole Centrale, Paris."
 
 #: src/misc/configuration.c:612
 msgid "<boolean>"
@@ -529,11 +565,11 @@ msgstr ""
 
 #: plugins/ac3_adec/ac3_adec.c:79
 msgid "AC3 downmix method"
-msgstr ""
+msgstr "AC3 downmix methode"
 
 #: plugins/ac3_adec/ac3_adec.c:81
 msgid "AC3 IMDCT method"
-msgstr ""
+msgstr "AC3 IMDCT methode"
 
 #: plugins/ac3_adec/ac3_adec.c:85
 msgid "software AC3 decoder"
@@ -545,7 +581,7 @@ msgstr ""
 
 #: plugins/access/file.c:60
 msgid "Standard filesystem file reading"
-msgstr ""
+msgstr "Standaard filesysteem bestand lezen"
 
 #: plugins/access/http.c:65
 msgid "HTTP access plug-in"
@@ -569,32 +605,31 @@ msgstr ""
 
 #: plugins/chroma/i420_rgb.c:64
 msgid "I420,IYUV,YV12 to RGB,RV15,RV16,RV24,RV32 conversions"
-msgstr ""
+msgstr "I420,IYUV,YV12 to RGB,RV15,RV16,RV24,RV32 conversies"
 
 #: plugins/chroma/i420_rgb.c:68
 msgid "MMX I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions"
-msgstr ""
+msgstr "MMX I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversies"
 
 #: plugins/chroma/i420_ymga.c:57 plugins/chroma/i420_yuy2.c:71
 #: plugins/chroma/i422_yuy2.c:70
 msgid "conversions from "
-msgstr ""
+msgstr "conversies van"
 
 #: plugins/chroma/i420_ymga.c:57 plugins/chroma/i420_ymga.c:60
 #: plugins/chroma/i420_yuy2.c:71 plugins/chroma/i420_yuy2.c:74
 #: plugins/chroma/i422_yuy2.c:70 plugins/chroma/i422_yuy2.c:73
-#, fuzzy
 msgid " to "
-msgstr "Spring naar:"
+msgstr " naar"
 
 #: plugins/chroma/i420_ymga.c:60 plugins/chroma/i420_yuy2.c:74
 #: plugins/chroma/i422_yuy2.c:73
 msgid "MMX conversions from "
-msgstr ""
+msgstr "MMX conversies van "
 
 #: plugins/directx/directx.c:50
 msgid "DirectX extension module"
-msgstr ""
+msgstr "DirectX extensie module"
 
 #: plugins/downmix/downmix.c:47
 msgid "AC3 downmix module"
@@ -610,7 +645,7 @@ msgstr ""
 
 #: plugins/dsp/dsp.c:43
 msgid "OSS dsp device"
-msgstr ""
+msgstr "OSS dsp apparaat"
 
 #: plugins/dsp/dsp.c:47
 msgid "Linux OSS /dev/dsp module"
@@ -618,27 +653,27 @@ msgstr ""
 
 #: plugins/dummy/dummy.c:49
 msgid "dummy functions module"
-msgstr ""
+msgstr "dummy functie module"
 
 #: plugins/dummy/null.c:52
 msgid "the Null module that does nothing"
-msgstr ""
+msgstr "de Null module die niks doet"
 
 #: plugins/dvd/dvd.c:66
 msgid "[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]"
-msgstr ""
+msgstr "[dvd:][device][@raw_device][@[titel][,[hoofdstuk][,hoek]]]"
 
 #: plugins/dvd/dvd.c:72
 msgid "DVD input module, uses libdvdcss if present"
-msgstr ""
+msgstr "DVD input module, gebrukt libdvdcss indien aanwezig"
 
 #: plugins/dvd/dvd.c:75
 msgid "DVD input module, uses libdvdcss"
-msgstr ""
+msgstr "DVD input module, gebruikt libdvdcss"
 
 #: plugins/dvdread/dvdread.c:42
 msgid "[dvdread:][device][@[title][,[chapter][,angle]]]"
-msgstr ""
+msgstr "[dvdread:][device][@[titel][,[hoofdstuk][,hoek]]]"
 
 #: plugins/dvdread/dvdread.c:46
 msgid "DVDRead input module"
@@ -649,35 +684,32 @@ msgid "EsounD audio module"
 msgstr ""
 
 #: plugins/fb/fb.c:73
-#, fuzzy
 msgid "framebuffer device"
-msgstr "Standaard apparaat:"
+msgstr ""
 
 #: plugins/fb/fb.c:77
 msgid "Linux console framebuffer module"
 msgstr ""
 
 #: plugins/filter/deinterlace.c:55
-#, fuzzy
 msgid "deinterlacing module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/filter/distort.c:55
 msgid "miscellaneous video effects module"
-msgstr ""
+msgstr "overige video effecten module"
 
 #: plugins/filter/invert.c:50
-#, fuzzy
 msgid "invert video module"
-msgstr "Standaard interface:"
+msgstr "inverteer video module"
 
 #: plugins/filter/transform.c:56
 msgid "image transformation module"
-msgstr ""
+msgstr "image transformatie module"
 
 #: plugins/filter/wall.c:50
 msgid "image wall video module"
-msgstr ""
+msgstr "image muur video module"
 
 #: plugins/fx/scope.c:69
 msgid "scope effect module"
@@ -689,7 +721,7 @@ msgstr ""
 #: plugins/ggi/ggi.c:62 plugins/mga/xmga.c:105 plugins/x11/x11.c:49
 #: plugins/x11/xvideo.c:54
 msgid "X11 display name"
-msgstr ""
+msgstr "X11 scherm naam"
 
 #: plugins/ggi/ggi.c:63 plugins/mga/xmga.c:107 plugins/x11/x11.c:51
 #: plugins/x11/xvideo.c:56
@@ -697,6 +729,8 @@ msgid ""
 "Specify the X11 hardware display you want to use.\n"
 "By default vlc will use the value of the DISPLAY environment variable."
 msgstr ""
+"Specificeer de X11 hardware scherm dat je wilt gebruiken.\n"
+"Standaard zal vlc de waarde uit de DISPLAY omgevings variable gebruiken."
 
 #: plugins/glide/glide.c:72
 msgid "3dfx Glide module"
@@ -707,26 +741,25 @@ msgstr ""
 #. ****************************************************************************
 #: plugins/gtk/gnome.c:64 plugins/gtk/gtk.c:65
 msgid "hide tooltips"
-msgstr ""
+msgstr "verschuil tooltips"
 
 #: plugins/gtk/gnome.c:65 plugins/gtk/gtk.c:66
 msgid "Do not show tooltips for configuration options."
-msgstr ""
+msgstr "Laat geen tooltips voor configuratie opties zien."
 
 #: plugins/gtk/gnome.c:67 plugins/gtk/gtk.c:68
 msgid "maximum height for the configuration windows"
-msgstr ""
+msgstr "maximum hoofte voor de configuratie schermen"
 
 #: plugins/gtk/gnome.c:69 plugins/gtk/gtk.c:70
 msgid ""
 "You can set the maximum height that the configuration windows in the "
 "preferences menu will occupy."
-msgstr ""
+msgstr "De maximum hoogte voor de configuratie schermen voor het voorkeuren menu is in te stellen."
 
 #: plugins/gtk/gtk.c:81
-#, fuzzy
 msgid "Gtk+ interface module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/gtk/gnome.c:81
 msgid "Gnome interface module"
@@ -775,15 +808,13 @@ msgid "Select a Network Stream"
 msgstr "Selecteer een Netwerk Stream"
 
 #: plugins/gtk/gnome_interface.c:41 plugins/gtk/gtk_interface.c:206
-#, fuzzy
 msgid "_Eject Disc"
-msgstr "Open Disk"
+msgstr ""
 
 #: plugins/gtk/gnome_interface.c:42 plugins/gtk/gnome_interface.c:442
 #: plugins/gtk/gtk_interface.c:214
-#, fuzzy
 msgid "Eject disc"
-msgstr "Open Disk"
+msgstr ""
 
 #: plugins/gtk/gtk_interface.c:226 plugins/gtk/gtk_interface.c:1237
 msgid "E_xit"
@@ -794,9 +825,8 @@ msgid "Exit the program"
 msgstr "Sluit programma af"
 
 #: plugins/gtk/gtk_interface.c:241
-#, fuzzy
 msgid "_View"
-msgstr "_Bestand"
+msgstr "_Toon"
 
 #: plugins/gtk/gnome_interface.c:55 plugins/gtk/gtk_interface.c:259
 #, fuzzy
@@ -813,14 +843,12 @@ msgid "_Fullscreen"
 msgstr "_Volledig Scherm"
 
 #: plugins/gtk/gnome_interface.c:70 plugins/gtk/gtk_interface.c:290
-#, fuzzy
 msgid "Progr_am"
-msgstr "Sluit programma af"
+msgstr "Progr_amma"
 
 #: plugins/gtk/gnome_interface.c:71 plugins/gtk/gtk_interface.c:299
-#, fuzzy
 msgid "Choose the program"
-msgstr "Sluit programma af"
+msgstr "Selecteer het programma"
 
 #: plugins/gtk/gnome_interface.c:77 plugins/gtk/gtk_interface.c:303
 msgid "_Title"
@@ -843,9 +871,8 @@ msgid "Open the playlist window"
 msgstr "Open het speellijst scherm"
 
 #: plugins/gtk/gnome_interface.c:99 plugins/gtk/gtk_interface.c:348
-#, fuzzy
 msgid "_Modules..."
-msgstr "_Informatie..."
+msgstr ""
 
 #: plugins/gtk/gnome_interface.c:100 plugins/gtk/gtk_interface.c:357
 msgid "Open the plugin manager"
@@ -857,18 +884,16 @@ msgid "Messages..."
 msgstr "Boodschappen"
 
 #: plugins/gtk/gnome_interface.c:107 plugins/gtk/gtk_interface.c:365
-#, fuzzy
 msgid "Open the messages window"
-msgstr "Open het speellijst scherm"
+msgstr "Open het boodschappen scherm"
 
 #: plugins/gtk/gtk_interface.c:369
 msgid "_Settings"
-msgstr "_Voorkeuren"
+msgstr "_Instellingen"
 
 #: plugins/gtk/gtk_interface.c:387
-#, fuzzy
 msgid "A_udio"
-msgstr "_Audio"
+msgstr "A_udio"
 
 #: plugins/gtk/gtk_interface.c:396
 msgid "Select audio language"
@@ -889,7 +914,7 @@ msgstr "_Voorkeuren..."
 
 #: plugins/gtk/gtk_interface.c:429
 msgid "Configure the application"
-msgstr "Applicatie voorkeuren"
+msgstr "Stel applicatie voorkeuren in"
 
 #: plugins/gtk/gtk_interface.c:433
 msgid "_Help"
@@ -917,18 +942,16 @@ msgid "Disc"
 msgstr "Disk"
 
 #: plugins/gtk/gnome_interface.c:390 plugins/gtk/gtk_interface.c:504
-#, fuzzy
 msgid "Net"
-msgstr "Volgende"
+msgstr "Netwerk"
 
 #: plugins/gtk/gnome_interface.c:402 plugins/gtk/gtk_interface.c:515
 msgid "Sat"
-msgstr ""
+msgstr "Sateliet"
 
 #: plugins/gtk/gnome_interface.c:403 plugins/gtk/gtk_interface.c:516
-#, fuzzy
 msgid "Open a Satellite Card"
-msgstr "Open het speellijst scherm"
+msgstr "Open een sateliet kaartt speellijst scherm"
 
 #: plugins/gtk/gnome_interface.c:416 plugins/gtk/gnome_interface.c:850
 #: plugins/gtk/gtk_interface.c:528 plugins/gtk/gtk_interface.c:1005
@@ -950,9 +973,8 @@ msgid "Stop Stream"
 msgstr "Pauzeer Stream"
 
 #: plugins/gtk/gnome_interface.c:441 plugins/gtk/gtk_interface.c:551
-#, fuzzy
 msgid "Eject"
-msgstr "Open Disk"
+msgstr ""
 
 #: plugins/gtk/gnome_interface.c:453 plugins/gtk/gnome_interface.c:829
 #: plugins/gtk/gtk_interface.c:562
@@ -1035,9 +1057,8 @@ msgid "---"
 msgstr ""
 
 #: plugins/gtk/gtk_interface.c:775
-#, fuzzy
 msgid "No server !"
-msgstr "Geen server"
+msgstr "Geen server !"
 
 #: plugins/gtk/gtk_interface.c:789
 msgid "Channel:  "
@@ -1061,9 +1082,8 @@ msgid "_Jump..."
 msgstr "_Spring..."
 
 #: plugins/gtk/gnome_interface.c:908 plugins/gtk/gtk_interface.c:1092
-#, fuzzy
 msgid "Program"
-msgstr "Sluit programma af"
+msgstr "Programma"
 
 #: plugins/gtk/gnome_interface.c:915 plugins/gtk/gtk_interface.c:1102
 msgid "_Navigation"
@@ -1096,6 +1116,8 @@ msgid ""
 "the VideoLAN team <videolan@videolan.org>\n"
 "http://www.videolan.org/"
 msgstr ""
+"Het VideoLAN team <videolan@videolan.org>\n"
+"http://www.videolan.org/"
 
 #: plugins/gtk/gnome_interface.c:1121 plugins/gtk/gtk_interface.c:1372
 msgid ""
@@ -1186,9 +1208,8 @@ msgstr ""
 
 #: plugins/gtk/gnome_interface.c:1502 plugins/gtk/gnome_interface.c:2364
 #: plugins/gtk/gtk_interface.c:1743
-#, fuzzy
 msgid "Server"
-msgstr "Geen server"
+msgstr ""
 
 #: plugins/gtk/gnome_interface.c:1529 plugins/gtk/gnome_interface.c:2398
 #: plugins/gtk/gnome_interface.c:2503 plugins/gtk/gtk_interface.c:1770
@@ -1202,9 +1223,8 @@ msgstr "Adres"
 
 #: plugins/gtk/gnome_interface.c:1550 plugins/gtk/gnome_interface.c:2433
 #: plugins/gtk/gnome_interface.c:2448 plugins/gtk/gtk_interface.c:1790
-#, fuzzy
 msgid "Broadcast"
-msgstr "Broadcast adres:"
+msgstr "Broadcast"
 
 #: plugins/gtk/gnome_interface.c:1574 plugins/gtk/gtk_interface.c:1815
 msgid "138.195.143.255"
@@ -1281,7 +1301,7 @@ msgstr "Allemaal"
 
 #: plugins/gtk/gtk_interface.c:2162
 msgid "Selected"
-msgstr "Selectie"
+msgstr "Geselecteerd"
 
 #: plugins/gtk/gnome_interface.c:1781 plugins/gtk/gtk_interface.c:2169
 msgid "Selection"
@@ -1308,13 +1328,12 @@ msgid "Messages"
 msgstr "Boodschappen"
 
 #: plugins/gtk/gtk_interface.c:2411
-#, fuzzy
 msgid "Open Satellite card"
-msgstr "Open het speellijst scherm"
+msgstr "Open Sateliet kaart"
 
 #: plugins/gtk/gtk_interface.c:2435
 msgid "Transponder settings"
-msgstr ""
+msgstr "Transponder instellingen"
 
 #: plugins/gtk/gnome_interface.c:2722 plugins/gtk/gtk_interface.c:2472
 msgid "Symbol Rate"
@@ -1326,17 +1345,16 @@ msgid "Frequency"
 msgstr "Frequentie:"
 
 #: plugins/gtk/gnome_interface.c:2691 plugins/gtk/gtk_interface.c:2492
-#, fuzzy
 msgid "Polarization"
-msgstr "_Navigeer"
+msgstr "Polarisatie"
 
 #: plugins/gtk/gnome_interface.c:2711 plugins/gtk/gtk_interface.c:2502
 msgid "Vertical"
-msgstr ""
+msgstr "Vertikaal"
 
 #: plugins/gtk/gnome_interface.c:2701 plugins/gtk/gtk_interface.c:2512
 msgid "Horizontal"
-msgstr ""
+msgstr "Horizontaal"
 
 #: plugins/gtk/gnome_interface.c:2742 plugins/gtk/gtk_interface.c:2522
 msgid "FEC"
@@ -1410,9 +1428,8 @@ msgid "No server"
 msgstr "Geen server"
 
 #: plugins/gtk/gnome_interface.c:688
-#, fuzzy
 msgid "Network Channel:"
-msgstr "Kanalen:"
+msgstr "Netwerk Kanalen:"
 
 #: plugins/gtk/gnome_interface.c:880
 #, fuzzy
@@ -1424,9 +1441,8 @@ msgid "Got directly so specified point"
 msgstr "Ga! rechtstreeks naar gespecificeerd punt"
 
 #: plugins/gtk/gnome_interface.c:909
-#, fuzzy
 msgid "Switch program"
-msgstr "Sluit programma af"
+msgstr "Verander van Programma"
 
 #: plugins/gtk/gnome_interface.c:916
 msgid "Navigate through titles and chapters"
@@ -1452,12 +1468,11 @@ msgstr ""
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr ""
-"Sorry, de module manager is nog niet functioneel. Probeer een latere versie."
+msgstr "Sorry, de module manager is nog niet functioneel. Probeer een latere versie."
 
 #: plugins/gtk/gnome_interface.c:1356 plugins/gtk/gnome_interface.c:2288
 msgid "Device name:"
-msgstr "Device naam:"
+msgstr "Apparaat naam:"
 
 #: plugins/gtk/gnome_interface.c:1447
 msgid "Network Stream"
@@ -1489,14 +1504,12 @@ msgid "Jump to: "
 msgstr "Spring naar:"
 
 #: plugins/gtk/gnome_interface.c:2162
-#, fuzzy
 msgid "Open Stream"
-msgstr "Pauzeer Stream"
+msgstr ""
 
 #: plugins/gtk/gnome_interface.c:2340
-#, fuzzy
 msgid "UDP stream"
-msgstr "Start Stream"
+msgstr ""
 
 #: plugins/gtk/gnome_interface.c:2483
 #, fuzzy
@@ -1504,13 +1517,12 @@ msgid "Channel server"
 msgstr "Kanaal server:"
 
 #: plugins/gtk/gnome_interface.c:2638
-#, fuzzy
 msgid "Open Satellite Card"
-msgstr "Open het speellijst scherm"
+msgstr "Open Sateliet kaart"
 
 #: plugins/gtk/gnome_interface.c:2654
 msgid "Transponder Settings"
-msgstr ""
+msgstr "Transponder Instellingen"
 
 #: plugins/gtk/gnome_interface.c:2765
 msgid "6/7"
@@ -1518,26 +1530,24 @@ msgstr ""
 
 #: plugins/gtk/gtk_preferences.c:304
 msgid "Name"
-msgstr ""
+msgstr "Naam"
 
 #: plugins/gtk/gtk_preferences.c:304
-#, fuzzy
 msgid "Description"
-msgstr "Duur"
+msgstr "Beschrijving"
 
 #: plugins/gtk/gtk_preferences.c:347
 msgid "Configure"
-msgstr ""
+msgstr "Configureer"
 
 #. add new label
 #: plugins/gtk/gtk_preferences.c:370
-#, fuzzy
 msgid "Selected:"
-msgstr "Selectie"
+msgstr "Geselecteerd:"
 
 #: plugins/gtk/gtk_preferences.c:493 plugins/gtk/gtk_preferences.c:510
 msgid "Save"
-msgstr ""
+msgstr "Bewaar"
 
 #: plugins/gtk/gtk_preferences.c:506
 msgid "Apply"
@@ -1546,17 +1556,17 @@ msgstr "Voer uit"
 #. special case for "off" item
 #: plugins/gtk/gtk_menu.c:525
 msgid "None"
-msgstr ""
+msgstr "Geen"
 
 #: plugins/gtk/gtk_menu.c:684
-#, fuzzy, c-format
+#, c-format
 msgid "Title %d (%d)"
-msgstr "Titel:"
+msgstr "Titel: %d (%d)"
 
 #: plugins/gtk/gtk_menu.c:747
-#, fuzzy, c-format
+#, c-format
 msgid "Chapter %d"
-msgstr "Hoofdstuk"
+msgstr "Hoofdstuk %d"
 
 #: plugins/idct/idct.c:47
 msgid "IDCT module"
@@ -1591,13 +1601,12 @@ msgid "SSE AC3 IMDCT module"
 msgstr ""
 
 #: plugins/kde/kde.cpp:54
-#, fuzzy
 msgid "KDE interface module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/lirc/lirc.c:71
 msgid "infrared remote control module"
-msgstr ""
+msgstr "infrarood remote control module"
 
 #: plugins/lpcm_adec/lpcm_adec.c:71
 msgid "linear PCM audio decoder"
@@ -1605,7 +1614,7 @@ msgstr ""
 
 #: plugins/macosx/macosx.c:49
 msgid "MacOS X interface, sound and video module"
-msgstr ""
+msgstr "MacOS X interface, sound en video module"
 
 #: plugins/mad/mad_adec.c:69
 msgid "libmad MPEG 1/2/3 audio decoder library"
@@ -1639,9 +1648,8 @@ msgstr ""
 #. * Building configuration tree
 #. ****************************************************************************
 #: plugins/mga/xmga.c:96 plugins/x11/x11.c:40 plugins/x11/xvideo.c:45
-#, fuzzy
 msgid "alternate fullscreen method"
-msgstr "Optie: volledig scherm"
+msgstr "alternatief:volledig scherm methode"
 
 #: plugins/mga/xmga.c:98 plugins/x11/x11.c:42 plugins/x11/xvideo.c:47
 msgid ""
@@ -1652,6 +1660,13 @@ msgid ""
 "2) Completly bypass the window manager, but then nothing will be able to "
 "show on top of the video."
 msgstr ""
+"Er zijn twee manieren om een volledig scherm te gebruiken. Jammerlijk genoeg "
+"hebben ze allebei hun problemen.\n"
+"1) Laat de window manager het volledig scherm beheren (standaard)."
+"Echter dingen zoals taskbars zullen waarschijnlijk bovenop de video te zien"
+"zijn.\n"
+"2) Omzeil de window manager kompleet, echter dan zal er niks bovenop de "
+"video te zien zijn."
 
 #: plugins/mga/xmga.c:117
 msgid "X11 MGA module"
@@ -1659,23 +1674,23 @@ msgstr ""
 
 #: plugins/motion/motion.c:45
 msgid "motion compensation module"
-msgstr ""
+msgstr "motion compensatie module"
 
 #: plugins/motion/motion3dnow.c:47
 msgid "3DNow! motion compensation module"
-msgstr ""
+msgstr "3DNow! motion compensatie module"
 
 #: plugins/motion/motionaltivec.c:48
 msgid "AltiVec motion compensation module"
-msgstr ""
+msgstr "AltiVec motion compensatie module"
 
 #: plugins/motion/motionmmx.c:47
 msgid "MMX motion compensation module"
-msgstr ""
+msgstr "MMX motion compensatie module"
 
 #: plugins/motion/motionmmxext.c:47
 msgid "MMXEXT motion compensation module"
-msgstr ""
+msgstr "MMXEXT motion compensatie module"
 
 #: plugins/mpeg_adec/mpeg_adec.c:69
 msgid "MPEG I/II layer 1/2 audio decoder"
@@ -1695,11 +1710,11 @@ msgstr ""
 
 #: plugins/mpeg_vdec/video_parser.c:82
 msgid "IDCT method"
-msgstr ""
+msgstr "IDCT methode"
 
 #: plugins/mpeg_vdec/video_parser.c:84
 msgid "motion compensation method"
-msgstr ""
+msgstr "motion compensatie methode"
 
 #: plugins/mpeg_vdec/video_parser.c:88
 msgid "MPEG I/II video decoder module"
@@ -1707,24 +1722,23 @@ msgstr ""
 
 #: plugins/network/ipv4.c:77
 msgid "IPv4 network abstraction layer"
-msgstr ""
+msgstr "IPv4 network abstractie laag"
 
 #: plugins/network/ipv6.c:74
 msgid "IPv6 network abstraction layer"
-msgstr ""
+msgstr "IPv6 network abstractie laag"
 
 #: plugins/qnx/qnx.c:47
 msgid "QNX RTOS module"
 msgstr ""
 
 #: plugins/qt/qt.cpp:46
-#, fuzzy
 msgid "Qt interface module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/satellite/satellite.c:48
 msgid "satellite input module"
-msgstr ""
+msgstr "sateliet input module"
 
 #: plugins/sdl/sdl.c:52
 msgid "Simple DirectMedia Layer module"
@@ -1735,19 +1749,16 @@ msgid "DVD subtitles decoder module"
 msgstr ""
 
 #: plugins/text/logger.c:67
-#, fuzzy
 msgid "file logging interface module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/text/ncurses.c:56
-#, fuzzy
 msgid "ncurses interface module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/text/rc.c:84
-#, fuzzy
 msgid "remote control interface module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/vcd/vcd.c:45
 msgid "VCD input module"
@@ -1755,12 +1766,11 @@ msgstr ""
 
 #: plugins/win32/waveout.c:51
 msgid "Win32 waveOut extension module"
-msgstr ""
+msgstr "Win32 waveOut extensie module"
 
 #: plugins/win32/win32.cpp:45
-#, fuzzy
 msgid "Win32 interface module"
-msgstr "Standaard interface:"
+msgstr ""
 
 #: plugins/x11/x11.c:61
 msgid "X11 module"
@@ -1771,119 +1781,17 @@ msgstr ""
 #. ****************************************************************************
 #: plugins/x11/xvideo.c:40
 msgid "XVideo adaptor number"
-msgstr ""
+msgstr "XVideo adaptor nummer"
 
 #: plugins/x11/xvideo.c:42
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
 msgstr ""
+"Indien de grafische kaart meedere adaptors (uitgangen) biedt, dan zal"
+" deze optie het mogelijk maken om er een te kiezen."
 
 #: plugins/x11/xvideo.c:67
 msgid "XVideo extension module"
-msgstr ""
+msgstr "XVideo extensie module"
 
-#~ msgid "An_gle"
-#~ msgstr "Kijkers _hoek"
-
-#~ msgid "Choose angle"
-#~ msgstr "Kies een kijkers hoek"
-
-#~ msgid "Preferences"
-#~ msgstr "Voorkeuren"
-
-#~ msgid "Default path: "
-#~ msgstr "Standaard pad:"
-
-#~ msgid "Default DVD path: "
-#~ msgstr "Standaard DVD pad:"
-
-#~ msgid "Default VCD path: "
-#~ msgstr "Standaard VCD pad:"
-
-#~ msgid "Default server: "
-#~ msgstr "Standaard server:"
-
-#~ msgid "Broadcast address: "
-#~ msgstr "Broadcast adres:"
-
-#~ msgid "Default port: "
-#~ msgstr "Standaard poort:"
-
-#~ msgid "Default protocol: "
-#~ msgstr "Standaard protocol:"
-
-#~ msgid "Default output: "
-#~ msgstr "Standaard uitvoer:"
-
-#~ msgid "Default height: "
-#~ msgstr "Standaard hoogte:"
-
-#~ msgid "Default width: "
-#~ msgstr "Standaard breedte:"
-
-#~ msgid "Default depth:"
-#~ msgstr "Standaard kleur diepte:"
-
-#~ msgid "Fullscreen on play"
-#~ msgstr "Volledige scherm afspelen"
-
-#~ msgid "Grayscale"
-#~ msgstr "Grijswaarden"
-
-#~ msgid "Spdif output"
-#~ msgstr "Spdiff uitvoer"
-
-#~ msgid "Frequency: "
-#~ msgstr "Frequentie:"
-
-#~ msgid "Quality: "
-#~ msgstr "Kwaliteit:"
-
-#~ msgid "Channels: "
-#~ msgstr "Kanalen:"
-
-#~ msgid "Files associated with vlc"
-#~ msgstr "Bestand associatie bij vlc"
-
-#~ msgid "Warning level: "
-#~ msgstr "Waarschuwings niveau:"
-
-#~ msgid "Default path:"
-#~ msgstr "Standaard pad:"
-
-#~ msgid "Browse"
-#~ msgstr "Zoek"
-
-#~ msgid "Default VCD path"
-#~ msgstr "Standaard VCD pad"
-
-#~ msgid "Default DVD path:"
-#~ msgstr "Standaard DVD pad"
-
-#~ msgid "Default server:"
-#~ msgstr "Standaard server:"
-
-#~ msgid "Default port:"
-#~ msgstr "Standaard poort:"
-
-#~ msgid "Default protocol:"
-#~ msgstr "Standaard protocol:"
-
-#~ msgid "Default interface:"
-#~ msgstr "Standaard interface:"
-
-#~ msgid "Default output:"
-#~ msgstr "Standaard uitvoer:"
-
-#~ msgid "Default width:"
-#~ msgstr "Standaard breedte:"
-
-#~ msgid "Default height:"
-#~ msgstr "Standaard hoogte:"
-
-#~ msgid "Quality:"
-#~ msgstr "Kwaliteit:"
-
-#~ msgid "Types associated with vlc"
-#~ msgstr "Associatie typen bij vlc"
