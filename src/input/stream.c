@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.2 2003/08/14 11:25:56 sigmunau Exp $
+ * $Id: stream.c,v 1.3 2003/08/18 19:17:54 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -133,7 +133,7 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
             if( s->p_input->stream.b_seekable &&
                 ( s->p_input->stream.i_method == INPUT_METHOD_FILE ||
                   i64 - s->p_input->stream.p_selected_area->i_tell < 0 ||
-                  i64 - s->p_input->stream.p_selected_area->i_tell > 1024 ) )
+                  i64 - s->p_input->stream.p_selected_area->i_tell > 4096 ) )
             {
                 input_AccessReinit( s->p_input );
                 s->p_input->pf_seek( s->p_input, i64 );
@@ -151,7 +151,8 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
                 {
                     int i_read;
 
-                    i_read = input_SplitBuffer( s->p_input, &p_data, __MIN( 4096, i_skip ) );
+                    i_read = input_SplitBuffer( s->p_input, &p_data,
+                                                __MIN( (int)s->p_input->i_bufsize, i_skip ) );
                     if( i_read < 0 )
                     {
                         return VLC_EGENERIC;
@@ -222,7 +223,8 @@ int         stream_Read( stream_t *s, void *p_data, int i_data )
     {
         int i_count;
 
-        i_count = input_SplitBuffer( s->p_input, &p_packet, __MIN( i_data, 4096 ) );
+        i_count = input_SplitBuffer( s->p_input, &p_packet,
+                                     __MIN( i_data, (int)s->p_input->i_bufsize ) );
         if( i_count <= 0 )
         {
             return i_read;
@@ -288,7 +290,8 @@ pes_packet_t    *stream_PesPacket( stream_t *s, int i_data )
     {
         int i_read;
 
-        i_read = input_SplitBuffer( s->p_input, &p_packet, __MIN( i_data, 4096 ) );
+        i_read = input_SplitBuffer( s->p_input, &p_packet,
+                                    __MIN( i_data, (int)s->p_input->i_bufsize ) );
         if( i_read <= 0 )
         {
             /* should occur only with EOF and max allocation reached 
@@ -315,7 +318,57 @@ pes_packet_t    *stream_PesPacket( stream_t *s, int i_data )
     return p_pes;
 }
 
+/**
+ * Read i_size into a data_packet_t. If b_force is not set, fewer bytes can
+ * be returned. You should always set b_force, unless you know what you are
+ * doing.
+ */
+data_packet_t *stream_DataPacket( stream_t *s, int i_size, vlc_bool_t b_force )
+{
+    data_packet_t *p_pk;
+    int           i_read;
 
+    if( i_size <= 0 )
+    {
+        p_pk = input_NewPacket( s->p_input->p_method_data, 0 );
+        if( p_pk )
+        {
+            p_pk->p_payload_end = p_pk->p_payload_start;
+        }
+        return p_pk;
+    }
+
+    i_read = input_SplitBuffer( s->p_input, &p_pk, i_size );
+    if( i_read <= 0 )
+    {
+        return NULL;
+    }
+
+    /* Should be really rare, near 0 */
+    if( i_read < i_size && b_force )
+    {
+        data_packet_t *p_old = p_pk;
+        int           i_missing = i_size - i_read;
+
+        p_pk = input_NewPacket( s->p_input->p_method_data, i_size );
+        if( p_pk == NULL )
+        {
+            input_DeletePacket( s->p_input->p_method_data, p_old );
+            return NULL;
+        }
+        p_pk->p_payload_end = p_pk->p_payload_start + i_size;
+        memcpy( p_pk->p_payload_start, p_old->p_payload_start, i_read );
+        input_DeletePacket( s->p_input->p_method_data, p_old );
+
+        if( stream_Read( s, &p_pk->p_payload_start[i_read], i_missing ) < i_missing )
+        {
+            input_DeletePacket( s->p_input->p_method_data, p_pk );
+            return NULL;
+        }
+    }
+
+    return p_pk;
+}
 
 
 
