@@ -513,6 +513,7 @@ private:
     wxSpinCtrl *net_ports[4];
     int        i_net_ports[4];
     wxTextCtrl *net_addrs[4];
+    wxCheckBox *net_timeshift;
     wxCheckBox *net_ipv6;
 
     /* Controls for the subtitles file */
