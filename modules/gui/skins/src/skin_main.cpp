@@ -388,8 +388,6 @@ int SkinManage( intf_thread_t *p_intf )
             i_seconds = var_GetTime( p_intf->p_sys->p_input, "time" ) / I64C(1000000 );
             i_length = var_GetTime( p_intf->p_sys->p_input, "length" ) / I64C(1000000 );
 
-            secstotimestr( psz_time, i_seconds );
-
             // Create end time text
             secstotimestr( &text[1], i_length - i_seconds );
             text[0] = '-';
