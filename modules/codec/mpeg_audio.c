@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.15 2003/05/04 10:46:28 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.16 2003/06/25 00:40:41 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -217,10 +217,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                                          &i_original_channels, &i_rate,
                                          &i_bit_rate, &i_frame_length,
                                          &i_frame_size, &i_new_layer );
-        if ( !i_current_frame_size )
-            i_current_frame_size = i_free_frame_size;
-
-        if ( i_current_frame_size == -1 )
+        if( i_current_frame_size == -1 )
         {
             msg_Warn( p_dec->p_fifo, "syncinfo failed" );
             /* This is probably an emulated startcode, drop the first byte
@@ -229,6 +226,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             p_sync[MAD_BUFFER_GUARD - 1] = GetBits( &p_dec->bit_stream, 8 );
             continue;
         }
+
+        if( i_bit_rate == 0 )
+        {
+            /* free birate, but 99% emulated startcode :( */
+            i_current_frame_size = i_free_frame_size;
+        }
+
         if ( (unsigned int)i_current_frame_size > i_frame_size )
         {
             msg_Warn( p_dec->p_fifo, "frame too big %d > %d",
