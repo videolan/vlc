@@ -270,16 +270,13 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         vlc_value_t val2, text, text2;
         int j;
 
-        /* Add title choice */
-        val2.i_int = i;
-        var_Change( p_input, "title", VLC_VAR_ADDCHOICE, &val2, NULL );
-
         /* Add Navigation entries */
         sprintf( val.psz_string,  "title %2i", i );
         var_Destroy( p_input, val.psz_string );
         var_Create( p_input, val.psz_string,
                     VLC_VAR_INTEGER|VLC_VAR_HASCHOICE|VLC_VAR_ISCOMMAND );
-        var_AddCallback( p_input, val.psz_string, NavigationCallback, (void *)i );
+        var_AddCallback( p_input, val.psz_string,
+                         NavigationCallback, (void *)i );
 
         if( p_input->title[i]->psz_name == NULL ||
             *p_input->title[i]->psz_name == '\0' )
@@ -292,6 +289,11 @@ void input_ControlVarNavigation( input_thread_t *p_input )
             text.psz_string = strdup( p_input->title[i]->psz_name );
         }
         var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, &text );
+
+        /* Add title choice */
+        val2.i_int = i;
+        var_Change( p_input, "title", VLC_VAR_ADDCHOICE, &val2, &text );
+
         free( text.psz_string );
 
         for( j = 0; j < p_input->title[i]->i_seekpoint; j++ )
@@ -307,10 +309,12 @@ void input_ControlVarNavigation( input_thread_t *p_input )
             }
             else
             {
-                text2.psz_string = strdup( p_input->title[i]->seekpoint[j]->psz_name );
+                text2.psz_string =
+                    strdup( p_input->title[i]->seekpoint[j]->psz_name );
             }
 
-            var_Change( p_input, val.psz_string, VLC_VAR_ADDCHOICE, &val2, &text2 );
+            var_Change( p_input, val.psz_string, VLC_VAR_ADDCHOICE,
+                        &val2, &text2 );
             if( text2.psz_string ) free( text2.psz_string );
         }
 
@@ -353,8 +357,23 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
     var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
     for( i = 0; i <  t->i_seekpoint; i++ )
     {
-        val.i_int = i + 1;
-        var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, NULL );
+        vlc_value_t text;
+        val.i_int = i;
+
+        if( t->seekpoint[i]->psz_name == NULL ||
+            *t->seekpoint[i]->psz_name == '\0' )
+        {
+            /* Default value */
+            text.psz_string = malloc( strlen( _("Chapter %i") ) + 20 );
+            sprintf( text.psz_string, _("Chapter %i"), i );
+        }
+        else
+        {
+            text.psz_string = strdup( t->seekpoint[i]->psz_name );
+        }
+
+        var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, &text );
+        if( text.psz_string ) free( text.psz_string );
     }
 }
 

@@ -366,7 +366,8 @@ static int Run( input_thread_t *p_input )
                 }
                 else
                 {
-                    msg_Dbg( p_input, "repeating the same input (%d)", repeat.i_int );
+                    msg_Dbg( p_input, "repeating the same input (%d)",
+                             repeat.i_int );
                     if( repeat.i_int > 0 )
                     {
                         repeat.i_int--;
@@ -424,18 +425,21 @@ static int Run( input_thread_t *p_input )
             double f_pos;
             int64_t i_time, i_length;
             /* update input status variables */
-            if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_POSITION, &f_pos ) )
+            if( !demux2_Control( p_input->input.p_demux,
+                                 DEMUX_GET_POSITION, &f_pos ) )
             {
                 val.f_float = (float)f_pos;
                 var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
             }
-            if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_TIME, &i_time ) )
+            if( !demux2_Control( p_input->input.p_demux,
+                                 DEMUX_GET_TIME, &i_time ) )
             {
                 p_input->i_time = i_time;
                 val.i_time = i_time;
                 var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
             }
-            if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_LENGTH, &i_length ) )
+            if( !demux2_Control( p_input->input.p_demux,
+                                 DEMUX_GET_LENGTH, &i_length ) )
             {
                 vlc_value_t old_val;
                 var_Get( p_input, "length", &old_val );
@@ -570,7 +574,8 @@ static int Init( input_thread_t * p_input )
 
     /* Load master infos */
     /* Init length */
-    if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_LENGTH, &val.i_time ) && val.i_time > 0 )
+    if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_LENGTH,
+                         &val.i_time ) && val.i_time > 0 )
     {
         var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
         /* TODO update playlist meta data */
@@ -646,7 +651,8 @@ static int Init( input_thread_t * p_input )
 
                 if( count.i_int < list.p_list->i_count )
                 {
-                    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &list.p_list->p_values[count.i_int] );
+                    input_ControlPush( p_input, INPUT_CONTROL_SET_ES,
+                                       &list.p_list->p_values[count.i_int] );
                 }
                 var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
             }
@@ -931,7 +937,8 @@ error:
     {
         subtitle_demux_t *p_sub;
         int i;
-        char **tmp = subtitles_Detect( p_input, val1.psz_string, p_input->psz_name );
+        char **tmp = subtitles_Detect( p_input, val1.psz_string,
+                                       p_input->psz_name );
         char **tmp2 = tmp;
         for( i = 0; *tmp2 != NULL; i++ )
         {
@@ -1081,7 +1088,8 @@ static void ControlReduce( input_thread_t *p_input )
         const int i_ct = p_input->control[i].i_type;
 
         /* XXX We can't merge INPUT_CONTROL_SET_ES */
-        msg_Dbg( p_input, "[%d/%d] l=%d c=%d", i, p_input->i_control, i_lt, i_ct );
+        msg_Dbg( p_input, "[%d/%d] l=%d c=%d", i, p_input->i_control,
+                 i_lt, i_ct );
         if( i_lt == i_ct &&
             ( i_ct == INPUT_CONTROL_SET_STATE ||
               i_ct == INPUT_CONTROL_SET_RATE ||
@@ -1111,7 +1119,8 @@ static void ControlReduce( input_thread_t *p_input )
     }
 }
 
-static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val )
+static vlc_bool_t Control( input_thread_t *p_input, int i_type,
+                           vlc_value_t val )
 {
     vlc_bool_t b_force_update = VLC_FALSE;
 
@@ -1140,15 +1149,17 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
             else
             {
                 /* Should not fail */
-                demux2_Control( p_input->input.p_demux, DEMUX_GET_POSITION, &f_pos );
+                demux2_Control( p_input->input.p_demux,
+                                DEMUX_GET_POSITION, &f_pos );
                 f_pos += val.f_float;
             }
             if( f_pos < 0.0 ) f_pos = 0.0;
             if( f_pos > 1.0 ) f_pos = 1.0;
-            if( demux2_Control( p_input->input.p_demux, DEMUX_SET_POSITION, f_pos ) )
+            if( demux2_Control( p_input->input.p_demux, DEMUX_SET_POSITION,
+                                f_pos ) )
             {
-                msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) %2.1f%% failed",
-                         f_pos * 100 );
+                msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) "
+                         "%2.1f%% failed", f_pos * 100 );
             }
             else
             {
@@ -1198,8 +1209,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
             }
             if( i_ret )
             {
-                msg_Err( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) %lld failed",
-                         i_time );
+                msg_Err( p_input, "INPUT_CONTROL_SET_TIME(_OFFSET) "I64Fd
+                         " failed", i_time );
             }
             else
             {
@@ -1243,7 +1254,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
                 /* Reset clock */
                 es_out_Control( p_input->p_es_out, ES_OUT_RESET_PCR );
             }
-            else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S && p_input->b_can_pause )
+            else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
+                     p_input->b_can_pause )
             {
                 int i_ret;
                 if( p_input->input.p_access )
@@ -1307,7 +1319,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
                 i_rate = INPUT_RATE_MAX;
             }
             if( i_rate != INPUT_RATE_DEFAULT &&
-                ( !p_input->b_can_pace_control || !p_input->b_out_pace_control ) )
+                ( !p_input->b_can_pace_control ||
+                  !p_input->b_out_pace_control ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
                 i_rate = INPUT_RATE_DEFAULT;
@@ -1338,8 +1351,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
 
         case INPUT_CONTROL_SET_ES:
             /* No need to force update, es_out does it if needed */
-            es_out_Control( p_input->p_es_out,
-                            ES_OUT_SET_ES, input_EsOutGetFromID( p_input->p_es_out, val.i_int ) );
+            es_out_Control( p_input->p_es_out, ES_OUT_SET_ES,
+                            input_EsOutGetFromID( p_input->p_es_out,
+                                                  val.i_int ) );
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
@@ -1415,13 +1429,13 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
 
                 if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
                     i_seekpoint = p_demux->info.i_seekpoint - 1;
-                else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
+                else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT )
                     i_seekpoint = p_demux->info.i_seekpoint + 1;
                 else
                     i_seekpoint = val.i_int;
 
-                if( i_seekpoint >= 0 &&
-                    i_seekpoint < p_input->input.title[p_demux->info.i_title]->i_seekpoint )
+                if( i_seekpoint >= 0 && i_seekpoint <
+                    p_input->input.title[p_demux->info.i_title]->i_seekpoint )
                 {
                     demux2_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
 
@@ -1441,8 +1455,8 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type, vlc_value_t val 
                 else
                     i_seekpoint = val.i_int;
 
-                if( i_seekpoint >= 0 &&
-                    i_seekpoint < p_input->input.title[p_access->info.i_title]->i_seekpoint )
+                if( i_seekpoint >= 0 && i_seekpoint <
+                    p_input->input.title[p_access->info.i_title]->i_seekpoint )
                 {
                     access2_Control( p_access, ACCESS_SET_SEEKPOINT, i_seekpoint );
                     stream_AccessReset( p_input->input.p_stream );
@@ -1760,11 +1774,15 @@ static void SlaveDemux( input_thread_t *p_input )
                 int64_t i_stime;
                 if( demux2_Control( in->p_demux, DEMUX_GET_TIME, &i_stime ) )
                 {
-                    msg_Err( p_input, "slave[%d] doesn't like DEMUX_GET_TIME -> EOF", i );
+                    msg_Err( p_input, "slave[%d] doesn't like "
+                             "DEMUX_GET_TIME -> EOF", i );
                     i_ret = 0;
                     break;
                 }
-                //msg_Dbg( p_input, "slave time=%lld input=%lld", i_stime, i_time );
+#if 0
+                msg_Dbg( p_input, "slave time="I64Fd" input="I64Fd,
+                         i_stime, i_time );
+#endif
                 if( i_stime >= i_time )
                     break;
 
