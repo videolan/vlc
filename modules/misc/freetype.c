@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.41 2004/01/25 22:16:51 rocky Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -338,26 +338,25 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic,
  * Draw a string on a i420 (or similar) picture
  */
 static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
-                    const subpicture_t *p_subpic )
+                        const subpicture_t *p_subpic )
 {
     subpicture_sys_t *p_string = p_subpic->p_sys;
     int i_plane, x, y, pen_x, pen_y;
     unsigned int i;
     line_desc_t *p_line;
 
-    for( p_line = p_subpic->p_sys->p_lines; p_line != NULL; p_line = p_line->p_next )
+    for( p_line = p_subpic->p_sys->p_lines; p_line != NULL;
+         p_line = p_line->p_next )
     {
-        for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
         {
-            uint8_t *p_in;
+            uint8_t *p_in = p_pic->p[ i_plane ].p_pixels;
             int i_pic_pitch = p_pic->p[ i_plane ].i_pitch;
             int i_pic_width = p_pic->p[ i_plane ].i_visible_pitch;
 
-            p_in = p_pic->p[ i_plane ].p_pixels;
-
-            if ( i_plane == 0 )
+            if( i_plane == 0 )
             {
-                if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
+                if( p_string->i_flags & OSD_ALIGN_BOTTOM )
                 {
                     pen_y = p_pic->p[ i_plane ].i_lines - p_string->i_height -
                         p_string->i_y_margin;
@@ -367,12 +366,13 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     pen_y = p_string->i_y_margin;
                 }
                 pen_y += p_vout->p_text_renderer_data->p_face->size->metrics.ascender >> 6;
-                if ( p_string->i_flags & OSD_ALIGN_RIGHT )
+
+                if( p_string->i_flags & OSD_ALIGN_RIGHT )
                 {
                     pen_x = i_pic_width - p_line->i_width
                         - p_string->i_x_margin;
                 }
-                else if ( p_string->i_flags & OSD_ALIGN_LEFT )
+                else if( p_string->i_flags & OSD_ALIGN_LEFT )
                 {
                     pen_x = p_string->i_x_margin;
                 }
@@ -385,30 +385,49 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                 for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
                 {
                     FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
-#define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ x + y * p_glyph->bitmap.width ] ]
-#define pixel p_in[ ( p_line->p_glyph_pos[ i ].y + pen_y + y - p_glyph->top ) * i_pic_pitch + x + pen_x + p_line->p_glyph_pos[ i ].x + p_glyph->left ]
-                    for(y = 0; y < p_glyph->bitmap.rows; y++ )
+                    int i_alpha_offset = -1;
+                    int i_offset = ( p_line->p_glyph_pos[ i ].y + pen_y -
+                                     p_glyph->top ) * i_pic_pitch +
+                                   p_line->p_glyph_pos[ i ].x + p_glyph->left;
+
+#define alpha p_vout->p_text_renderer_data->pi_gamma[ p_glyph->bitmap.buffer[ i_alpha_offset ] ]
+#define pixel p_in[ i_offset + x + pen_x ]
+
+                    for( y = 0; y < p_glyph->bitmap.rows; y++ )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
                         {
-                            pen_y--;
+                            i_alpha_offset++;
+                            if( alpha == 0 ) continue;
+
+                            pen_y--; i_offset -= i_pic_pitch;
                             pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                            pen_y++; pen_x--;
+                            pen_y++; i_offset += i_pic_pitch; pen_x--;
                             pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
                             pen_x += 2;
                             pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                            pen_y++; pen_x--;
+                            pen_y++; i_offset += i_pic_pitch; pen_x--;
                             pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
-                            pen_y--;
+                            pen_y--; i_offset -= i_pic_pitch;
                         }
+                        i_offset += i_pic_pitch;
                     }
-                    for(y = 0; y < p_glyph->bitmap.rows; y++ )
+
+                    i_alpha_offset = -1;
+                    i_offset = ( p_line->p_glyph_pos[ i ].y + pen_y -
+                                 p_glyph->top ) * i_pic_pitch +
+                               p_line->p_glyph_pos[ i ].x + p_glyph->left;
+                    for( y = 0; y < p_glyph->bitmap.rows; y++ )
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x++ )
                         {
+                            i_alpha_offset++;
+                            if( alpha == 0 ) continue;
+
                             pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 ) +
                                 ( 255 * alpha >> 8 );
                         }
+                        i_offset += i_pic_pitch;
                     }
 #undef alpha
 #undef pixel
@@ -418,8 +437,8 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
                 {
-                    pen_y = p_pic->p[i_plane].i_lines - ( p_string->i_height>>1) -
-                        (p_string->i_y_margin>>1);
+                    pen_y = p_pic->p[i_plane].i_lines - (p_string->i_height>>1)
+                        - (p_string->i_y_margin>>1);
                 }
                 else
                 {
@@ -450,6 +469,8 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     {
                         for( x = 0; x < p_glyph->bitmap.width; x+=2 )
                         {
+                            if( alpha == 0 ) continue;
+
                             pixel = ( ( pixel * ( 0xFF - alpha ) ) >> 8 ) +
                                 ( 0x80 * alpha >> 8 );
 #undef alpha
@@ -515,6 +536,8 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
+                    if( alpha == 0 ) continue;
+
                     pen_y--;
                     pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 );
                     pen_y++; pen_x--;
@@ -530,6 +553,8 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
+                    if( alpha == 0 ) continue;
+
                     pixel = ( ( pixel * ( 255 - alpha ) ) >> 8 ) +
                         ( 255 * alpha >> 8 );
                 }
@@ -595,6 +620,8 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
+                    if( alpha == 0 ) continue;
+
                     pen_y--;
                     pixel( 0 ) = ( ( pixel( 0 ) * ( 255 - alpha ) ) >> 8 );
                     pixel( 1 ) = ( ( pixel( 1 ) * ( 255 - alpha ) ) >> 8 );
@@ -618,6 +645,8 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++ )
                 {
+                    if( alpha == 0 ) continue;
+
                     pixel( 0 ) = ( ( pixel( 0 ) * ( 255 - alpha ) ) >> 8 ) +
                         ( 255 * alpha >> 8 );
                     pixel( 1 ) = ( ( pixel( 1 ) * ( 255 - alpha ) ) >> 8 ) +
