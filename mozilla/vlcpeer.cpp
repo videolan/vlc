@@ -2,7 +2,7 @@
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.4 2003/07/07 12:04:50 sam Exp $
+ * $Id: vlcpeer.cpp,v 1.5 2003/07/16 16:33:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,10 +26,10 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 
-#include "nsISupports.h"
-#include "nsMemory.h"
+#include <nsISupports.h>
+#include <nsMemory.h>
+#include <npapi.h>
 
-#include "npapi.h"
 #include "vlcpeer.h"
 #include "vlcplugin.h"
 

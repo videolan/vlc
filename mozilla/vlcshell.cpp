@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.13 2003/07/09 13:52:22 sam Exp $
+ * $Id: vlcshell.cpp,v 1.14 2003/07/16 16:33:59 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,6 +37,8 @@
 #endif
 
 /* Mozilla stuff */
+#include <nsISupports.h>
+#include <nsMemory.h>
 #include <npapi.h>
 
 #ifdef XP_WIN
