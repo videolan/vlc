@@ -39,7 +39,6 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 
-
 /* Data common to vout and opengl provider structures */
 typedef struct glx_t
 {
@@ -52,7 +51,20 @@ typedef struct glx_t
     Window      wnd;
     GLXWindow   gwnd;
     Atom        wm_delete;
+
 } glx_t;
+
+/* RV16 */
+//#define VLCGL_RGB_FORMAT GL_RGB
+//#define VLCGL_RGB_TYPE GL_UNSIGNED_SHORT_5_6_5
+
+/* RV24 */
+//#define VLCGL_RGB_FORMAT GL_RGB
+//#define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
+
+/* RV32 */
+#define VLCGL_RGB_FORMAT GL_RGBA
+#define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
 
 
 /*****************************************************************************
@@ -102,7 +114,6 @@ vlc_module_begin();
     set_capability( "opengl provider", 50 );
     set_callbacks( CreateOpenGL, DestroyOpenGL );
 vlc_module_end();
-
 
 /*****************************************************************************
  * vout_sys_t: GLX video output method descriptor
@@ -160,10 +171,8 @@ static int CreateVout( vlc_object_t *p_this )
     //XXX set to 0 to disable the cube effect
     p_vout->p_sys->i_effect = 1;
 
-   /* p_vout->p_sys->glx.i_width = p_vout->i_window_width;
-    p_vout->p_sys->glx.i_height = p_vout->i_window_height; */
-    p_vout->p_sys->glx.i_width = 700;
-    p_vout->p_sys->glx.i_height = 700;
+    p_vout->p_sys->glx.i_width = p_vout->i_window_width;
+    p_vout->p_sys->glx.i_height = p_vout->i_window_height;
     p_vout->p_sys->glx.b_fullscreen = 0;
 
     /* A texture must have a size aligned on a power of 2 */
@@ -195,76 +204,74 @@ static int CreateVout( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index;
-    picture_t *p_pic;
+    int i_pixel_pitch;
 
     /* No YUV textures :( */
+
+#if VLCGL_RGB_FORMAT == GL_RGB
+#   if VLCGL_RGB_TYPE == GL_UNSIGNED_BYTE
+    p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+    p_vout->output.i_rmask = 0x000000ff;
+    p_vout->output.i_gmask = 0x0000ff00;
+    p_vout->output.i_bmask = 0x00ff0000;
+    i_pixel_pitch = 3;
+#   else
+    p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+    p_vout->output.i_rmask = 0xf800;
+    p_vout->output.i_gmask = 0x07e0;
+    p_vout->output.i_bmask = 0x001f;
+    i_pixel_pitch = 2;
+#   endif
+#else
     p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
     p_vout->output.i_rmask = 0x000000ff;
     p_vout->output.i_gmask = 0x0000ff00;
     p_vout->output.i_bmask = 0x00ff0000;
+    i_pixel_pitch = 4;
+#endif
 
+    /* Since OpenGL can do rescaling for us, stick to the default
+     * coordinates and aspect. */
     p_vout->output.i_width  = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
-    I_OUTPUTPICTURES = 0;
-
-    p_pic = NULL;
-
-    /* Find an empty picture slot */
-    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
-    {
-        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-        {
-            p_pic = p_vout->p_picture + i_index;
-            break;
-        }
-    }
-
-    if( p_pic == NULL )
-    {
-        return -1;
-    }
-
-   /* We know the chroma, allocate a buffer which will be used
+    /* We know the chroma, allocate a buffer which will be used
      * directly by the decoder */
-    p_pic->i_planes = 1;
-
+    p_vout->p_picture[0].i_planes = 1;
     p_vout->p_sys->p_buffer =
-        malloc( p_vout->p_sys->i_tex_width * p_vout->p_sys->i_tex_height * 4 );
+        malloc( p_vout->p_sys->i_tex_width * p_vout->p_sys->i_tex_height *
+                i_pixel_pitch );
     if( !p_vout->p_sys->p_buffer )
     {
         msg_Err( p_vout, "Out of memory" );
         return -1;
     }
 
-    p_pic->p->p_pixels = p_vout->p_sys->p_buffer
-        + 2 * p_vout->p_sys->i_tex_width *
-          (p_vout->p_sys->i_tex_height - p_vout->output.i_height)
-        + 2 * (p_vout->p_sys->i_tex_width - p_vout->output.i_width);
-    p_pic->p->i_lines = p_vout->output.i_height;
-    p_pic->p->i_pitch = p_vout->p_sys->i_tex_width * 4;
-    p_pic->p->i_pixel_pitch = 4;
-    p_pic->p->i_visible_pitch = p_vout->output.i_width * 4;
+    p_vout->p_picture[0].p->p_pixels = p_vout->p_sys->p_buffer;
+    p_vout->p_picture[0].p->i_lines = p_vout->output.i_height;
+    p_vout->p_picture[0].p->i_pixel_pitch = i_pixel_pitch;
+    p_vout->p_picture[0].p->i_pitch = p_vout->p_sys->i_tex_width *
+        p_vout->p_picture[0].p->i_pixel_pitch;
+    p_vout->p_picture[0].p->i_visible_pitch = p_vout->output.i_width *
+        p_vout->p_picture[0].p->i_pixel_pitch;
 
-    p_pic->i_status = DESTROYED_PICTURE;
-    p_pic->i_type   = DIRECT_PICTURE;
+    p_vout->p_picture[0].i_status = DESTROYED_PICTURE;
+    p_vout->p_picture[0].i_type   = DIRECT_PICTURE;
 
-    PP_OUTPUTPICTURE[ 0 ] = p_pic;
-
+    PP_OUTPUTPICTURE[ 0 ] = &p_vout->p_picture[0];
     I_OUTPUTPICTURES = 1;
 
     SwitchContext( &p_vout->p_sys->glx );
 
     /* Set the texture parameters */
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
     if( p_vout->p_sys->i_effect )
     {
         glEnable( GL_CULL_FACE);
-/*        glDisable( GL_DEPTH_TEST );
+        /* glDisable( GL_DEPTH_TEST );
         glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE );*/
 
@@ -308,7 +315,6 @@ static void DestroyVout( vlc_object_t *p_this )
     free( p_vout->p_sys );
 }
 
-
 /*****************************************************************************
  * CreateOpenGL: initialize an OpenGL provider
  *****************************************************************************/
@@ -328,7 +334,6 @@ static int CreateOpenGL( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
-
 
 /*****************************************************************************
  * DestroyOpenGL: destroys an OpenGL provider
@@ -362,7 +367,6 @@ static int InitOpenGL( opengl_t *p_opengl, int i_width, int i_height )
     return VLC_SUCCESS;
 }
 
-
 /*****************************************************************************
  * SwapBuffers: swap front/back buffers
  *****************************************************************************/
@@ -380,7 +384,6 @@ static void SwapBuffers( opengl_t *p_opengl )
     }
 }
 
-
 /*****************************************************************************
  * HandleEvents: handle window events
  *****************************************************************************/
@@ -395,7 +398,6 @@ static int HandleEvents( opengl_t *p_opengl )
     }
     return i_ret;
 }
-
 
 /*****************************************************************************
  * Manage: handle X11 events
@@ -419,7 +421,6 @@ static int Manage( vout_thread_t *p_vout )
     }
     return 0;
 }
-
 
 static int HandleX11Events( vlc_object_t *p_thread, glx_t *p_glx )
 {
@@ -450,118 +451,79 @@ static int HandleX11Events( vlc_object_t *p_thread, glx_t *p_glx )
     return 0;
 }
 
-
 /*****************************************************************************
  * Render: render previously calculated output
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
+    float f_width = (float)p_vout->output.i_width / p_sys->i_tex_width;
+    float f_height = (float)p_vout->output.i_height / p_sys->i_tex_height;
+
     glClear(GL_COLOR_BUFFER_BIT);
-    /*glTexImage2D (GL_TEXTURE_2D, 0, 3, p_vout->output.i_width,
-                  p_vout->output.i_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                  p_vout->p_sys->p_buffer);*/
+
     glTexImage2D (GL_TEXTURE_2D, 0, 3, p_vout->p_sys->i_tex_width,
-                  p_vout->p_sys->i_tex_height , 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                  p_vout->p_sys->i_tex_height , 0,
+                  VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE,
                   p_vout->p_sys->p_buffer);
 
     if( !p_vout->p_sys->i_effect )
     {
-        glEnable( GL_TEXTURE_2D);
-        glBegin( GL_POLYGON);
-        glTexCoord2f(0.0,0.0); glVertex2f(-1.0,1.0);
-        glTexCoord2f(1.0,0.0); glVertex2f(1.0,1.0);
-        glTexCoord2f(1.0,1.0); glVertex2f(1.0,-1.0);
-        glTexCoord2f(0.0,1.0); glVertex2f(-1.0,-1.0);
+        glEnable( GL_TEXTURE_2D );
+        glBegin( GL_POLYGON );
+        glTexCoord2f( 0.0, 0.0 ); glVertex2f( -1.0, 1.0 );
+        glTexCoord2f( f_width, 0.0 ); glVertex2f( 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
+        glTexCoord2f( 0.0, f_height ); glVertex2f( -1.0, -1.0 );
         glEnd();
     }
     else
     {
         glRotatef( 1.0, 0.3, 0.5, 0.7 );
 
-        glEnable( GL_TEXTURE_2D);
+        glEnable( GL_TEXTURE_2D );
         glBegin( GL_QUADS );
 
-        float f_width = p_vout->output.i_width;
-        float f_height = p_vout->output.i_height;
-
-        /* Correct the aspect ratio */
- /*       float f_aspect = (float)p_vout->output.i_aspect / VOUT_ASPECT_FACTOR;
-        if( f_aspect > 1.0 )
-        {
-            f_height *= f_aspect;
-        }
-        else
-        {
-            f_width *= f_aspect;
-        }*/
-
-        float f_offset_x = (1.0 - f_width / p_vout->p_sys->i_tex_width) / 2.0;
-        float f_offset_y = (1.0 - f_height / p_vout->p_sys->i_tex_height) / 2.0;
-
         /* Front */
-        glTexCoord2f( f_offset_x, f_offset_y );
-        glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
-        glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
 
         /* Left */
-        glTexCoord2f( f_offset_x, f_offset_y );
-        glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
-        glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, 1.0 );
 
         /* Back */
-        glTexCoord2f( f_offset_x, f_offset_y );
-        glVertex3f( 1.0, 1.0, - 1.0 );
-        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
-        glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
 
         /* Right */
-        glTexCoord2f( f_offset_x, f_offset_y );
-        glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( 1.0, - 1.0, 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
-        glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Top */
-        glTexCoord2f( f_offset_x, f_offset_y );
-        glVertex3f( - 1.0, 1.0, - 1.0 );
-        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( - 1.0, 1.0, 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( 1.0, 1.0, 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
-        glVertex3f( 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, 1.0, - 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, 1.0, 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, 1.0, - 1.0 );
 
         /* Bottom */
-        glTexCoord2f( f_offset_x, f_offset_y );
-        glVertex3f( - 1.0, - 1.0, 1.0 );
-        glTexCoord2f( f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( - 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, 1.0 - f_offset_y );
-        glVertex3f( 1.0, - 1.0, - 1.0 );
-        glTexCoord2f( 1.0 - f_offset_x, f_offset_y );
-        glVertex3f( 1.0, - 1.0, 1.0 );
+        glTexCoord2f( 0, 0 ); glVertex3f( - 1.0, - 1.0, 1.0 );
+        glTexCoord2f( 0, f_height ); glVertex3f( - 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, f_height ); glVertex3f( 1.0, - 1.0, - 1.0 );
+        glTexCoord2f( f_width, 0 ); glVertex3f( 1.0, - 1.0, 1.0 );
         glEnd();
     }
+
     glDisable( GL_TEXTURE_2D);
 }
-
 
 /*****************************************************************************
  * DisplayVideo: displays previously rendered output
@@ -579,7 +541,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                         p_vout->p_sys->glx.wnd );
     }
 }
-
 
 /*****************************************************************************
  * OpenDisplay: open and initialize OpenGL device
@@ -672,7 +633,6 @@ static void CloseDisplay( glx_t *p_glx )
     p_glx->wnd = None;
 }
 
-
 int InitGLX12( vlc_object_t *p_thread, glx_t *p_glx )
 {
     Display *p_display;
@@ -706,7 +666,6 @@ int InitGLX12( vlc_object_t *p_thread, glx_t *p_glx )
 
     return 0;
 }
-
 
 int InitGLX13( vlc_object_t *p_thread, glx_t *p_glx )
 {
@@ -770,7 +729,6 @@ int InitGLX13( vlc_object_t *p_thread, glx_t *p_glx )
     return 0;
 }
 
-
 void CreateWindow( vlc_object_t *p_thread, glx_t *p_glx, XVisualInfo *p_vi )
 {
     Display *p_display;
@@ -824,7 +782,6 @@ void CreateWindow( vlc_object_t *p_thread, glx_t *p_glx, XVisualInfo *p_vi )
     XSelectInput( p_display, wnd, KeyPressMask );
 }
 
-
 void SwitchContext( glx_t *p_glx )
 {
     /* Change the current OpenGL context */
@@ -839,7 +796,6 @@ void SwitchContext( glx_t *p_glx )
                         p_glx->gwctx );
     }
 }
-
 
 int GetAlignedSize( int i_size )
 {
