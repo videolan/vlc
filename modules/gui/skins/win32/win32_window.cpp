@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.14 2003/10/22 19:12:56 ipkiss Exp $
+ * $Id: win32_window.cpp,v 1.15 2003/10/30 17:59:12 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -99,8 +99,6 @@ Win32Window::Win32Window( intf_thread_t *p_intf, HWND hwnd, int x, int y,
     // Drag & drop
     if( DragDrop )
     {
-        // Initialize the OLE library
-        OleInitialize( NULL );
         DropTarget = (LPDROPTARGET) new Win32DropObject( playondrop );
         // register the listview as a drop target
         RegisterDragDrop( hWnd, DropTarget );
@@ -112,21 +110,21 @@ Win32Window::~Win32Window()
     delete CursorPos;
     delete WindowPos;
 
-    if( hWnd != NULL )
-    {
-        DestroyWindow( hWnd );
-    }
     if( ToolTipWindow != NULL )
     {
         DestroyWindow( ToolTipWindow );
     }
-    if( DragDrop )
+
+    if( hWnd != NULL )
     {
-        // Remove the listview from the list of drop targets
-        RevokeDragDrop( hWnd );
-        DropTarget->Release();
-        // Uninitialize the OLE library
-        OleUninitialize();
+        if( DragDrop )
+        {
+            // Remove the listview from the list of drop targets
+            RevokeDragDrop( hWnd );
+            DropTarget->Release();
+        }
+
+        DestroyWindow( hWnd );
     }
 }
 //---------------------------------------------------------------------------

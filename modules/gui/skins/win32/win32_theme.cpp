@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.11 2003/10/23 16:00:48 gbazin Exp $
+ * $Id: win32_theme.cpp,v 1.12 2003/10/30 17:59:12 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -172,6 +172,9 @@ Win32Theme::Win32Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
         }
     }
 
+    // Initialize the OLE library
+    OleInitialize( NULL );
+
     //Initialize value
     ParentWindow = NULL;
 
@@ -201,6 +204,9 @@ Win32Theme::~Win32Theme()
     {
         DestroyWindow( ParentWindow );
     }
+
+    // Uninitialize the OLE library
+    OleUninitialize();
 }
 //---------------------------------------------------------------------------
 void Win32Theme::OnLoadTheme()
