@@ -94,8 +94,10 @@ typedef struct vout_sys_s
     /* position & dimensions */
     PhPoint_t               pos;
     PhDim_t                 dim;
+    PhPoint_t               old_pos;
     PhDim_t                 old_dim;
     PhDim_t                 screen_dim;
+    PhRect_t                frame;
 } vout_sys_t;
 
 /*****************************************************************************
@@ -109,9 +111,9 @@ static void vout_Destroy   ( struct vout_thread_s * );
 static int  vout_Manage    ( struct vout_thread_s * );
 static void vout_Display   ( struct vout_thread_s * );
 
+static int  QNXInitDisplay ( struct vout_thread_s * );
 static int  QNXCreateWnd   ( struct vout_thread_s * );
 static int  QNXDestroyWnd  ( struct vout_thread_s * );
-static int  QNXInitDisplay ( struct vout_thread_s * );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -176,11 +178,11 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->i_mode = 
         main_GetIntVariable( VOUT_OVERLAY_VAR, VOUT_OVERLAY_DEFAULT ) ?
         MODE_VIDEO_OVERLAY : MODE_NORMAL_MEM;
-    p_vout->p_sys->dim.w = 
+    p_vout->p_sys->dim.w =
         main_GetIntVariable( VOUT_WIDTH_VAR, VOUT_WIDTH_DEFAULT );
-    p_vout->p_sys->dim.h = 
+    p_vout->p_sys->dim.h =
         main_GetIntVariable( VOUT_HEIGHT_VAR, VOUT_HEIGHT_DEFAULT );
-    
+
     /* init display and create window */
     if( QNXInitDisplay( p_vout ) || QNXCreateWnd( p_vout ) )
     {
@@ -226,7 +228,7 @@ static int vout_Init( vout_thread_t *p_vout )
         /* set bytes per line, set buffers */
         p_vout->i_bytes_per_line = p_vout->p_sys->p_image[0]->bpl;
         p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_image[0]->image,
-                                 p_vout->p_sys->p_image[1]->image );
+                               p_vout->p_sys->p_image[1]->image );
     }
     else if( p_vout->p_sys->i_mode == MODE_VIDEO_MEM )
     {
@@ -265,49 +267,71 @@ static int vout_Init( vout_thread_t *p_vout )
         }
 
         /* set bytes per line, clear buffers, set buffers */
-        p_vout->i_bytes_per_line = 
-            p_vout->i_bytes_per_pixel * p_vout->p_sys->dim.w;
+        p_vout->i_bytes_per_line = p_vout->p_sys->p_ctx[0]->pitch; 
         memset( p_vout->p_sys->p_buf[0], 0,
             p_vout->i_bytes_per_line * p_vout->p_sys->dim.h );
         memset( p_vout->p_sys->p_buf[1], 0,
             p_vout->i_bytes_per_line * p_vout->p_sys->dim.h );
         p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_buf[0],
-                                 p_vout->p_sys->p_buf[1] );
+                               p_vout->p_sys->p_buf[1] );
     }
     else if( p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY )
     {
+        int i_ret;
         PgScalerProps_t props;
 
-        props.size = sizeof( props );
+        props.size   = sizeof( props );
         props.format = p_vout->p_sys->i_vc_format; 
-        props.viewport.ul.x = p_vout->p_sys->pos.x + 4;
-        props.viewport.ul.y = p_vout->p_sys->pos.y + 20;
+        props.flags  = Pg_SCALER_PROP_SCALER_ENABLE |
+                       Pg_SCALER_PROP_DOUBLE_BUFFER;
+
+        /* enable chroma keying if available */
+        if( p_vout->p_sys->i_vc_flags & Pg_SCALER_CAP_DST_CHROMA_KEY )
+        {
+            props.flags |= Pg_SCALER_PROP_CHROMA_ENABLE;
+        }
+
+        /* set viewport position */
+        props.viewport.ul.x = p_vout->p_sys->pos.x;
+        props.viewport.ul.y = p_vout->p_sys->pos.y;
+        if( !p_vout->b_fullscreen )
+        {
+            props.viewport.ul.x += p_vout->p_sys->frame.ul.x;
+            props.viewport.ul.y += p_vout->p_sys->frame.ul.y;
+        }
+
+        /* set viewport dimension */
         props.viewport.lr.x = p_vout->p_sys->dim.w + props.viewport.ul.x;
         props.viewport.lr.y = p_vout->p_sys->dim.h + props.viewport.ul.y;
-        props.src_dim.w = p_vout->p_sys->dim.w;
-        props.src_dim.h    = p_vout->p_sys->dim.h;
-        props.flags = Pg_SCALER_PROP_SCALER_ENABLE |
-                      Pg_SCALER_PROP_DOUBLE_BUFFER;
 
-        if( PgConfigScalerChannel( p_vout->p_sys->p_channel, &props ) == -1 )
+        /* set source dimension */
+        props.src_dim.w = p_vout->i_width;
+        props.src_dim.h = p_vout->i_height;
+
+        /* configure scaler channel */
+        i_ret = PgConfigScalerChannel( p_vout->p_sys->p_channel, &props );
+
+        if( i_ret == -1 )
         {
             intf_ErrMsg( "vout error: unable to configure video channel" );
             return( 1 );
         }
-
-        p_vout->p_sys->p_vc_y[0] =
-            PdGetOffscreenContextPtr( p_vout->p_sys->p_channel->yplane1 );
-        p_vout->p_sys->p_vc_y[1] =
-            PdGetOffscreenContextPtr( p_vout->p_sys->p_channel->yplane2 );
-
-        if( p_vout->p_sys->p_vc_y[0] == NULL ||
-            p_vout->p_sys->p_vc_y[1] == NULL )
+        else if( i_ret == 1 )
         {
-            intf_ErrMsg( "vout error: unable to get video channel ctx ptr" );
-            return( 1 );
+            p_vout->p_sys->p_vc_y[0] =
+                PdGetOffscreenContextPtr( p_vout->p_sys->p_channel->yplane1 );
+            p_vout->p_sys->p_vc_y[1] =
+                PdGetOffscreenContextPtr( p_vout->p_sys->p_channel->yplane2 );
+
+            if( p_vout->p_sys->p_vc_y[0] == NULL ||
+                p_vout->p_sys->p_vc_y[1] == NULL )
+            {
+                intf_ErrMsg( "vout error: unable to get video channel ctx ptr" );
+                return( 1 );
+            }
         }
 
-        if( p_vout->p_sys->i_vc_format == Pg_VIDEO_FORMAT_YV12 )
+        if( p_vout->p_sys->i_vc_format == Pg_VIDEO_FORMAT_YV12 && i_ret == 1 )
         {
             p_vout->b_need_render = 0;
 
@@ -333,11 +357,11 @@ static int vout_Init( vout_thread_t *p_vout )
         {
             /* set bytes per line, clear buffers, set buffers */
             p_vout->i_bytes_per_line =
-                p_vout->i_bytes_per_pixel * p_vout->p_sys->dim.w;
+                p_vout->p_sys->p_channel->yplane1->pitch;
             memset( p_vout->p_sys->p_vc_y[0], 0,
-                p_vout->i_bytes_per_line * p_vout->p_sys->dim.h );
+                p_vout->i_bytes_per_line * p_vout->i_height );
             memset( p_vout->p_sys->p_vc_y[1], 0,
-                p_vout->i_bytes_per_line * p_vout->p_sys->dim.h );
+                p_vout->i_bytes_per_line * p_vout->i_height );
             p_vout->pf_setbuffers( p_vout,
                 p_vout->p_sys->p_vc_y[0], p_vout->p_sys->p_vc_y[1] );
         }
@@ -435,16 +459,16 @@ static int vout_Manage( vout_thread_t *p_vout )
                     break;
 
                 case Ph_WM_MOVE:
-                    b_repos = 1;
                     p_vout->p_sys->pos.x = p_ev->pos.x;
                     p_vout->p_sys->pos.y = p_ev->pos.y;
+                    b_repos = 1;
                     break;
 
                 case Ph_WM_RESIZE:
                     p_vout->p_sys->old_dim.w = p_vout->p_sys->dim.w;
                     p_vout->p_sys->old_dim.h = p_vout->p_sys->dim.h;
-                    p_vout->p_sys->dim.w = p_vout->i_width = p_ev->size.w;
-                    p_vout->p_sys->dim.h = p_vout->i_height = p_ev->size.h;
+                    p_vout->p_sys->dim.w = p_ev->size.w;
+                    p_vout->p_sys->dim.h = p_ev->size.h;
                     p_vout->i_changes |= VOUT_SIZE_CHANGE;
                     break;
                 }
@@ -501,7 +525,6 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         PhDim_t dim;
-        PhPoint_t pos;
 
         intf_DbgMsg( "vout: changing full-screen status" );
 
@@ -510,42 +533,34 @@ static int vout_Manage( vout_thread_t *p_vout )
 
         if( p_vout->b_fullscreen )
         {
-            pos.x = pos.y = 0;
+            p_vout->p_sys->old_pos.x = p_vout->p_sys->pos.x;
+            p_vout->p_sys->old_pos.y = p_vout->p_sys->pos.y;
+            p_vout->p_sys->pos.x = p_vout->p_sys->pos.y = 0;
             dim.w = p_vout->p_sys->screen_dim.w + 1;
             dim.h = p_vout->p_sys->screen_dim.h + 1;
         }
         else
         {
-            pos.x = p_vout->p_sys->pos.x;
-            pos.y = p_vout->p_sys->pos.y;
+            p_vout->p_sys->pos.x = p_vout->p_sys->old_pos.x;
+            p_vout->p_sys->pos.y = p_vout->p_sys->old_pos.y;
             dim.w = p_vout->p_sys->old_dim.w + 1;
             dim.h = p_vout->p_sys->old_dim.h + 1;
         }
 
+        /* modify render flags, border */
         PtSetResource( p_vout->p_sys->p_window,
             Pt_ARG_WINDOW_RENDER_FLAGS,
             p_vout->b_fullscreen ? Pt_FALSE : Pt_TRUE,
             Ph_WM_RENDER_BORDER | Ph_WM_RENDER_TITLE );
-        PtSetResource( p_vout->p_sys->p_window,
-            Pt_ARG_POS, &pos, 0 );
-        PtSetResource( p_vout->p_sys->p_window,
-            Pt_ARG_DIM, &dim, 0 );
-    }
 
-    /*
-     * vout window resizing
-     */
-    if( ( p_vout->i_width  != p_vout->p_sys->dim.w ) ||
-             ( p_vout->i_height != p_vout->p_sys->dim.h ) )
-    {
-        intf_DbgMsg( "vout: resizing output window" );
-
-        p_vout->p_sys->dim.w = p_vout->i_width;
-        p_vout->p_sys->dim.h = p_vout->i_height;
-
-        /* set new dimension */
+        /* set position and dimension */
         PtSetResource( p_vout->p_sys->p_window,
-            Pt_ARG_DIM, &p_vout->p_sys->dim, 0 );
+                       Pt_ARG_POS, &p_vout->p_sys->pos, 0 );
+        PtSetResource( p_vout->p_sys->p_window,
+                       Pt_ARG_DIM, &dim, 0 );
+
+        /* mark as damaged to force redraw */
+        PtDamageWidget( p_vout->p_sys->p_window );
     }
 
     /*
@@ -556,6 +571,13 @@ static int vout_Manage( vout_thread_t *p_vout )
         intf_DbgMsg( "vout: resizing window" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
+        if( p_vout->p_sys->i_mode != MODE_VIDEO_OVERLAY )
+        {
+            p_vout->i_width = p_vout->p_sys->dim.w;
+            p_vout->i_height = p_vout->p_sys->dim.h;
+            p_vout->i_changes |= VOUT_YUV_CHANGE;
+        }
+
         vout_End( p_vout );
         if( vout_Init( p_vout ) )
         {
@@ -563,9 +585,8 @@ static int vout_Manage( vout_thread_t *p_vout )
             return( 1 );
         }
 
-        p_vout->i_changes |= VOUT_YUV_CHANGE;
         intf_Msg( "vout: video display resized (%dx%d)",
-                    p_vout->i_width, p_vout->i_height );
+                  p_vout->p_sys->dim.w, p_vout->p_sys->dim.h );
     }
 
     /*
@@ -664,6 +685,14 @@ static int QNXInitDisplay( p_vout_thread_t p_vout )
         return( 1 );
     }
 
+    /* switch to normal mode if no overlay support */
+    if( p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY &&
+        !( minfo.mode_capabilities1 & PgVM_MODE_CAP1_VIDEO_OVERLAY ) )
+    {
+        intf_ErrMsg( "vout error: no overlay support detected" );
+        p_vout->p_sys->i_mode = MODE_NORMAL_MEM;
+    }
+
     /* use video ram if we have enough available */
     if( p_vout->p_sys->i_mode == MODE_NORMAL_MEM &&
         hwcaps.currently_available_video_ram >= 
@@ -729,60 +758,42 @@ static int QNXCreateWnd( p_vout_thread_t p_vout )
     PhPoint_t pos = { 0, 0 };
     PgColor_t color = Pg_BLACK;
 
-    /* correct way to check for overlay support:
-
-        1. call PgGetGraphicsHWCaps and check
-           the results for Pg_VIDEO_OVERLAY
-        2. check if the current graphics mode
-           has PgVM_MODE_CAP1_VIDEO_OVERLAY set
-        3. call PgGetScalerCapabilities for info
-
-        problems:
-
-        1. Pg_VIDEO_OVERLAY is not defined in any
-           header files :)
-        2. PgVM_MODE_CAP1_VIDEO_OVERLAY is not set
-           even if the current mode supports overlay
-        3. the flags (chroma, etc) do not reflect
-           the actual capabilities 
-    */
-    
     if( p_vout->p_sys->i_mode == MODE_VIDEO_OVERLAY )
     {
+        int i = 0;
+        PgScalerCaps_t vcaps;
+
         if( ( p_vout->p_sys->p_channel = 
             PgCreateVideoChannel( Pg_VIDEO_CHANNEL_SCALER, 0 ) ) == NULL )
         {
             intf_ErrMsg( "vout error: unable to create video channel" );
             return( 1 );
         }
-        else
-        {
-            int i = 0;
-            PgScalerCaps_t vcaps;
 
-            vcaps.size = sizeof( vcaps );
-            while( PgGetScalerCapabilities( p_vout->p_sys->p_channel, 
-                                            i++, &vcaps ) == 0 )
-            {    
-                if( vcaps.format == Pg_VIDEO_FORMAT_YV12 ||
-                    vcaps.format == Pg_VIDEO_FORMAT_RGB8888 )
-                {
-                    p_vout->p_sys->i_vc_flags  = vcaps.flags;
-                    p_vout->p_sys->i_vc_format = vcaps.format;
-                }
+        vcaps.size = sizeof( vcaps );
+        while( PgGetScalerCapabilities( p_vout->p_sys->p_channel, 
+                                        i++, &vcaps ) == 0 )
+        {    
+            if( vcaps.format == Pg_VIDEO_FORMAT_YV12 ||
+                vcaps.format == Pg_VIDEO_FORMAT_RGB8888 )
+            {
+                p_vout->p_sys->i_vc_flags  = vcaps.flags;
+                p_vout->p_sys->i_vc_format = vcaps.format;
+            }
                 
-                vcaps.size = sizeof( vcaps );
-            }
+            vcaps.size = sizeof( vcaps );
+        }
 
-            if( p_vout->p_sys->i_vc_format == 0 )
-            {
-                intf_ErrMsg( "vout error: need YV12 or RGB8888 overlay" );
-                return( 1 );
-            }
-            else if( vcaps.flags & Pg_SCALER_CAP_DST_CHROMA_KEY )
-            {
-                color = PgGetOverlayChromaColor();
-            }
+        if( p_vout->p_sys->i_vc_format == 0 )
+        {
+            intf_ErrMsg( "vout error: need YV12 or RGB8888 overlay" );
+            
+            return( 1 );
+        }
+        
+        if( p_vout->p_sys->i_vc_flags & Pg_SCALER_CAP_DST_CHROMA_KEY )
+        {
+            color = PgGetOverlayChromaColor();
         }
     }
 
@@ -802,10 +813,10 @@ static int QNXCreateWnd( p_vout_thread_t p_vout )
     PtSetArg( &args[3], Pt_ARG_WINDOW_TITLE, "VideoLan Client", 0 );
     PtSetArg( &args[4], Pt_ARG_WINDOW_MANAGED_FLAGS, Pt_FALSE, Ph_WM_CLOSE );
     PtSetArg( &args[5], Pt_ARG_WINDOW_NOTIFY_FLAGS, Pt_TRUE, 
-                Ph_WM_MOVE | Ph_WM_RESIZE | Ph_WM_CLOSE );
+              Ph_WM_MOVE | Ph_WM_RESIZE | Ph_WM_CLOSE );
     PtSetArg( &args[6], Pt_ARG_WINDOW_RENDER_FLAGS,
-        p_vout->b_fullscreen ? Pt_FALSE : Pt_TRUE,
-        Ph_WM_RENDER_BORDER | Ph_WM_RENDER_TITLE );
+              p_vout->b_fullscreen ? Pt_FALSE : Pt_TRUE,
+              Ph_WM_RENDER_BORDER | Ph_WM_RENDER_TITLE );
 
     /* create window */
     p_vout->p_sys->p_window = PtCreateWidget( PtWindow, Pt_NO_PARENT, 7, args);
@@ -819,6 +830,15 @@ static int QNXCreateWnd( p_vout_thread_t p_vout )
     if( PtRealizeWidget( p_vout->p_sys->p_window ) != 0 )
     {
         intf_ErrMsg( "vout error: unable to realize window widget" );
+        PtDestroyWidget( p_vout->p_sys->p_window );
+        return( 1 );
+    }
+
+    /* get window frame size */
+    if( PtWindowFrameSize( NULL, p_vout->p_sys->p_window, 
+                           &p_vout->p_sys->frame ) != 0 )
+    {
+        intf_ErrMsg( "vout error: unable to get window frame size" );
         PtDestroyWidget( p_vout->p_sys->p_window );
         return( 1 );
     }
