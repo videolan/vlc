@@ -2100,59 +2100,6 @@ then
   fi
 fi
 
-dnl dnl
-dnl dnl  xvid decoder plugin
-dnl dnl
-dnl AC_ARG_ENABLE(xvid,
-dnl [  --enable-xvid           xvid codec (default disabled)])
-dnl if test "${enable_xvid}" = "yes"
-dnl then
-dnl   AC_ARG_WITH(xvid,
-dnl     [    --with-xvid=PATH      path to xvid installation],[],[])
-dnl   if test "${with_xvid}" != "no" -a -n "${with_xvid}"
-dnl   then
-dnl     VLC_ADD_CPPFLAGS([xvid],[-I${with_xvid}/include])
-dnl     VLC_ADD_LDFLAGS([xvid],[-L${with_xvid}/lib])
-dnl   fi
-dnl 
-dnl   AC_ARG_WITH(xvid-tree,
-dnl   [    --with-xvid-tree=PATH xvid tree for static linking])
-dnl   if test -n "${with_xvid_tree}"
-dnl   then
-dnl     AC_MSG_CHECKING(for libxvidcore.a in ${with_xvid_tree})
-dnl     real_xvid_tree="`cd ${with_xvid_tree} 2>/dev/null && pwd`"
-dnl     if test -z "${real_xvid_tree}"
-dnl     then
-dnl       dnl  The given directory can't be found
-dnl       AC_MSG_RESULT(no)
-dnl       AC_MSG_ERROR([cannot cd to ${with_xvid_tree}])
-dnl     fi
-dnl     if test -f "${real_xvid_tree}/build/generic/libxvidcore.a"
-dnl     then
-dnl       dnl  Use a custom xvid
-dnl       AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
-dnl       VLC_ADD_BUILTINS([xvid])
-dnl       VLC_ADD_LDFLAGS([xvid],[-L${real_xvid_tree}/build/generic -lxvidcore])
-dnl       VLC_ADD_CPPFLAGS([xvid],[-I${real_xvid_tree}/src])
-dnl     else
-dnl       dnl  The given libxvidcore wasn't built
-dnl       AC_MSG_RESULT(no)
-dnl       AC_MSG_ERROR([cannot find ${real_xvid_tree}/build/generic/libxvidcore.a, make sure you compiled libxvidcore in ${with_xvid_tree}])
-dnl     fi
-dnl   else
-dnl     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xvid}"
-dnl     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xvid}"
-dnl     AC_CHECK_HEADERS(xvid.h, ,
-dnl       [ AC_MSG_ERROR([Cannot find development headers for libxvidcore...]) ])
-dnl     AC_CHECK_LIB(xvidcore, xvid_init, [
-dnl       VLC_ADD_PLUGINS([xvid])
-dnl       VLC_ADD_LDFLAGS([xvid],[-lxvidcore]) ],
-dnl       [ AC_MSG_ERROR([Cannot find libxvidcore library...]) ])
-dnl     LDFLAGS="${LDFLAGS_save}"
-dnl     CPPFLAGS="${CPPFLAGS_save}"
-dnl   fi
-dnl fi
-
 dnl
 dnl  QuickTime plugin
 dnl
@@ -2328,19 +2275,6 @@ if test "${enable_dts}" != "no"; then
   fi
 fi
 
-dnl dnl
-dnl dnl  DV plugin
-dnl dnl
-dnl AC_ARG_ENABLE(dv,
-dnl   [  --enable-dv             DV decoder support (deprecated in favor of ffmpeg) (default disabled)])
-dnl if test "${enable_dv}" = "yes"
-dnl then
-dnl   AC_CHECK_HEADERS(libdv/dv.h, [
-dnl     VLC_ADD_PLUGINS([dv])
-dnl     VLC_ADD_LDFLAGS([dv],[-ldv])
-dnl    ],[])
-dnl fi
-
 dnl
 dnl  Flac plugin
 dnl
@@ -2501,6 +2435,22 @@ then
       AC_MSG_ERROR([libtheora doesn't appear to be installed on you system.
 You also need to check that you have a libogg posterior to the 1.0 release.])],
       [-logg])
+  ])
+fi
+
+dnl
+dnl  dirac decoder plugin
+dnl
+AC_ARG_ENABLE(dirac,
+[  --enable-dirac         experimental dirac codec (default disabled)])
+if test "${enable_dirac}" = "yes"
+then
+  AC_CHECK_HEADERS(libdirac_decoder/dirac_parser.h, [
+    AC_CHECK_LIB(dirac_decoder, dirac_decoder_init, [
+      VLC_ADD_PLUGINS([dirac])
+      VLC_ADD_LDFLAGS([dirac],[-ldirac_decoder -ldirac_encoder -ldirac_motionest -ldirac_common]) ],[
+      AC_MSG_ERROR([libdirac doesn't appear to be installed on you system.])],
+      [-ldirac_common])
   ])
 fi
 

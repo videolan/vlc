@@ -21,3 +21,4 @@ SOURCES_dvbsub = dvbsub.c
 SOURCES_mash = mash.cpp
 SOURCES_x264 = x264.c
 SOURCES_toolame = toolame.c
+SOURCES_dirac = dirac.c
