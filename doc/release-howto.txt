@@ -10,7 +10,7 @@
 
   - générer un timestamp de release (par exemple avec 822-date)
   - updater le numéro de version partout où c'est nécessaire
-     · configure.ac.in (relancer autoconf)
+     · configure.ac (relancer autoconf)
      · vlc.spec
      · ipkg/control
      · debian/changelog

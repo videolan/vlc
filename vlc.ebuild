@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.6 2003/06/20 01:27:55 hartman Exp $
+# $Id: vlc.ebuild,v 1.7 2003/06/21 17:04:20 sam Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -100,10 +100,6 @@ src_unpack() {
 		cp configure.ac configure.ac.orig
 		sed "s:-lkfile::" \
 			configure.ac.orig > configure.ac
-		# adding configure.ac.in
-		cp configure.ac.in configure.ac.in.orig
-		sed "s:-lkfile::" \
-			configure.ac.in.orig > configure.ac.in
 
 		cd ${S}/modules/gui/kde
 		cp interface.h interface.h.orig

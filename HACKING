@@ -1,4 +1,4 @@
-$Id: HACKING,v 1.6 2002/10/07 21:58:40 massiot Exp $
+$Id: HACKING,v 1.7 2003/06/21 17:04:20 sam Exp $
 
 Hacking vlc
 ===========
@@ -43,8 +43,8 @@ The bootstrap script does the following actions:
    which contains additional build rules for modules, and includes all the
    Modules.am files that were found in modules/
 
- - create a top-level configure.ac file from configure.ac.in, generating
-   the AC_SUBST and AM_CONDITIONAL rules that will be needed.
+ - create an m4/vlc.m4 from configure.ac, generating the AC_SUBST and
+   AM_CONDITIONAL rules that will be needed by configure.ac.
 
  - run autopoint (previously gettextize) to create an intl/ directory,
    needed when libgettext is not available.
