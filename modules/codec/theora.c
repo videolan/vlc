@@ -315,6 +315,21 @@ static int ProcessHeaders( decoder_t *p_dec )
              p_sys->ti.frame_width, p_sys->ti.frame_height,
              p_sys->ti.offset_x, p_sys->ti.offset_y );
 
+    /* Sanity check that seems necessary for some corrupted files */
+    if( p_sys->ti.width < p_sys->ti.frame_width ||
+        p_sys->ti.height < p_sys->ti.frame_height )
+    {
+        msg_Warn( p_dec, "trying to correct invalid theora header "
+                  "(frame size (%dx%d) is smaller than frame content (%d,%d))",
+                  p_sys->ti.width, p_sys->ti.height,
+                  p_sys->ti.frame_width, p_sys->ti.frame_height );
+
+        if( p_sys->ti.width < p_sys->ti.frame_width )
+            p_sys->ti.width = p_sys->ti.frame_width;
+        if( p_sys->ti.height < p_sys->ti.frame_height )
+            p_sys->ti.height = p_sys->ti.frame_height;
+    }
+
     /* The next packet in order is the comments header */
     oggpacket.b_o_s = 0;
     oggpacket.bytes = *(p_extra++) << 8;
