@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.281 2004/01/26 22:42:50 hartman Exp $
+ * $Id: input.c,v 1.282 2004/01/26 23:07:16 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -81,12 +81,13 @@ static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
  *****************************************************************************/
-input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
-                                      playlist_item_t *p_item )
+input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
+                                      char **ppsz_options, int i_options )
+
 {
     input_thread_t *    p_input;                        /* thread descriptor */
     vlc_value_t val;
-    int i,j;
+    int i;
 
     /* Allocate descriptor */
     p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
@@ -97,21 +98,10 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     }
 
     /* Parse input options */
-    for( i = 0 ; i < p_item->i_categories ; i++ )
+    for( i = 0; i < i_options; i++ )
     {
-        if( !strncmp( p_item->pp_categories[i]->psz_name, _("Options"), 7 ) )
-        {
-            msg_Dbg( p_input,"Parsing %i options for item",
-                     p_item->pp_categories[i]->i_infos );
-            for( j = 0; j< p_item->pp_categories[i]->i_infos ; j++ )
-            {
-                msg_Dbg( p_input,"Option : %s",
-                         p_item->pp_categories[i]->pp_infos[j]->psz_name);
-                ParseOption( p_input,
-                             p_item->pp_categories[i]->pp_infos[j]->psz_value);
-            }
-            break;
-        }
+        msg_Dbg( p_input, "option: %s", ppsz_options[i] );
+        ParseOption( p_input, ppsz_options[i] );
     }
 
     /* Create a few object variables we'll need later on */
@@ -181,7 +171,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->p_sys      = NULL;
 
     /* Set target */
-    p_input->psz_source = strdup( p_item->psz_uri );
+    p_input->psz_source = strdup( psz_uri );
 
     /* Stream */
     p_input->s = NULL;

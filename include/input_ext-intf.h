@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2003 VideoLAN
- * $Id: input_ext-intf.h,v 1.103 2004/01/26 20:48:09 fenrir Exp $
+ * $Id: input_ext-intf.h,v 1.104 2004/01/26 23:07:16 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -383,10 +383,10 @@ struct input_thread_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define input_CreateThread(a,b) __input_CreateThread(VLC_OBJECT(a),b)
-input_thread_t * __input_CreateThread ( vlc_object_t *, playlist_item_t * );
-void   input_StopThread     ( input_thread_t * );
-void   input_DestroyThread  ( input_thread_t * );
+#define input_CreateThread(a,b,c,d) __input_CreateThread(VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, char *psz_uri, char **ppsz_options, int i_options ) );
+VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
+VLC_EXPORT( void,             input_DestroyThread,  ( input_thread_t * ) );
 
 #define input_SetStatus(a,b) __input_SetStatus(VLC_OBJECT(a),b)
 VLC_EXPORT( void, __input_SetStatus, ( vlc_object_t *, int ) );
