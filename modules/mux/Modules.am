@@ -1,0 +1,1 @@
+SOURCES_mux_dummy = modules/mux/dummy.c

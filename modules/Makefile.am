@@ -8,6 +8,7 @@ EXTRA_DIST = \
 	access/satellite/Modules.am \
 	access/v4l/Modules.am \
 	access/vcd/Modules.am \
+	access_output/Modules.am \
 	audio_filter/channel_mixer/Modules.am \
 	audio_filter/converter/Modules.am \
 	audio_filter/resampler/Modules.am \
@@ -53,6 +54,9 @@ EXTRA_DIST = \
 	misc/memcpy/Modules.am \
 	misc/network/Modules.am \
 	misc/testsuite/Modules.am \
+	mux/Modules.am \
+	mux/mpeg/Modules.am \
+	packetizer/Modules.am \
 	video_chroma/Modules.am \
 	video_filter/Modules.am \
 	video_filter/deinterlace/Modules.am \

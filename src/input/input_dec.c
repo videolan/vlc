@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.52 2002/12/06 16:34:08 sam Exp $
+ * $Id: input_dec.c,v 1.53 2002/12/14 21:32:42 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,6 +44,7 @@ static void             DeleteDecoderFifo( decoder_fifo_t * );
 decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
                                    es_descriptor_t * p_es )
 {
+    char           *psz_sout;
     decoder_fifo_t *p_fifo;
     int i_priority;
 
@@ -56,8 +57,23 @@ decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
         return NULL;
     }
 
+    p_fifo->p_module = NULL;
+    /* If we are in sout mode, search first for packetizer module then
+     * codec to do transcoding */
+    psz_sout = config_GetPsz( p_input, "sout" );
+    if( psz_sout != NULL && *psz_sout != 0 )
+    {
+        p_fifo->p_module = module_Need( p_fifo, "packetizer", "$packetizer" );
+    }
+    /* default Get a suitable decoder module */
+    if( p_fifo->p_module == NULL )
+    {
+        p_fifo->p_module = module_Need( p_fifo, "decoder", "$codec" );
+    }
+#if 0
     /* Get a suitable module */
     p_fifo->p_module = module_Need( p_fifo, "decoder", "$codec" );
+#endif
     if( p_fifo->p_module == NULL )
     {
         msg_Err( p_fifo, "no suitable decoder module for fourcc `%4.4s'",

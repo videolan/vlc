@@ -1,0 +1,12 @@
+SOURCES_mux_ps = modules/mux/mpeg/ps.c \
+                 modules/mux/mpeg/pes.c \
+                 modules/mux/mpeg/pes.h \
+                 modules/mux/mpeg/bits.h \
+                 $(NULL)
+SOURCES_mux_ts = modules/mux/mpeg/ts.c \
+                 modules/mux/mpeg/pes.c \
+                 modules/mux/mpeg/pes.h \
+                 modules/mux/mpeg/bits.h \
+                 $(NULL)
+
+

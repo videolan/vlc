@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.28 2002/12/09 00:52:42 babal Exp $
+ * $Id: libvlc.h,v 1.29 2002/12/14 21:32:42 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -283,6 +283,17 @@
 #define SOUT_TEXT N_("choose a stream output")
 #define SOUT_LONGTEXT N_( \
     "Empty if no stream output.")
+#define PACKETIZER_TEXT N_("choose prefered packetizer list")
+#define PACKETIZER_LONGTEXT N_( \
+    "This allows you to select the order in which vlc will choose its " \
+    "packetizers."  )
+#define MUX_TEXT N_("mux module")
+#define MUX_LONGTEXT N_( \
+    "This is a legacy entry to let you configure mux modules")
+#define ACCESS_OUTPUT_TEXT N_("access output module")
+#define ACCESS_OUTPUT_LONGTEXT N_( \
+    "This is a legacy entry to let you configure access output modules")
+
 
 #define MMX_TEXT N_("enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
@@ -475,6 +486,13 @@ vlc_module_begin();
     add_category_hint( N_("Decoders"), NULL );
     add_module( "codec", "decoder", NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT );
 
+    /* Stream output */
+    add_category_hint( N_("Stream output"), NULL );
+    add_module( "packetizer", "packetizer", NULL, NULL, PACKETIZER_TEXT, PACKETIZER_LONGTEXT );
+    add_module( "mux", "mux", NULL, NULL, MUX_TEXT, MUX_LONGTEXT );
+    add_module( "access_output", "access_output", NULL, NULL, ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT );
+    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
+
     /* CPU options */
     add_category_hint( N_("CPU"), NULL );
 #if defined( __i386__ )
@@ -504,7 +522,6 @@ vlc_module_begin();
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT );
-    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
 
 #if defined(WIN32)
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT );

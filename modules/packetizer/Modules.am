@@ -1,0 +1,5 @@
+SOURCES_packetizer_copy = modules/packetizer/copy.c
+SOURCES_packetizer_a52 = modules/packetizer/a52.c
+SOURCES_packetizer_mpegaudio = modules/packetizer/mpegaudio.c
+SOURCES_packetizer_mpegvideo = modules/packetizer/mpegvideo.c
+SOURCES_packetizer_mpeg4video = modules/packetizer/mpeg4video.c
