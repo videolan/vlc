@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: mkv.cpp,v 1.59 2004/03/03 12:03:15 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -2095,6 +2095,7 @@ static void LoadTags( input_thread_t *p_input )
     if( tags == NULL )
     {
         msg_Err( p_input, "cannot load tags (broken seekhead or file)" );
+        p_sys->in->setFilePointer( i_sav_position, seek_beginning );
         return;
     }
 
