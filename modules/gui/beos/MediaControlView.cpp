@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.20 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: MediaControlView.cpp,v 1.21 2003/12/28 01:49:12 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -31,6 +31,10 @@
 /* VLC headers */
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+extern "C"
+{
+  #include <audio_output.h>
+}
 
 /* BeOS interface headers */
 #include "VlcWrapper.h"
@@ -279,6 +283,10 @@ MediaControlView::Pulse()
 	InterfaceWindow* window = dynamic_cast<InterfaceWindow*>(Window());
 	if (window && window->IsStopped())
 			fPlayPause->SetStopped();
+
+    unsigned short i_volume;
+    aout_VolumeGet( p_intf, (audio_volume_t*)&i_volume );
+    fVolumeSlider->SetValue( i_volume );
 }
 
 // SetProgress

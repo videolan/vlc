@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.28 2003/12/22 11:14:25 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.29 2003/12/28 01:49:12 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -348,39 +348,6 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
     AddShortcut( '1', 0, new BMessage( RESIZE_50 ) );
     AddShortcut( '2', 0, new BMessage( RESIZE_100 ) );
     AddShortcut( '3', 0, new BMessage( RESIZE_200 ) );
-
-    // workaround to have Alt+X shortcuts working
-    BMessage * message;
-    for( unsigned i = 1; /* skip KEY_UNSET */
-         i < sizeof( vlc_keys ) / sizeof( key_descriptor_t ); i++ )
-    {
-        /* Alt+X */
-        message = new BMessage( SHORTCUT );
-        message->AddInt32( "key", vlc_keys[i].i_key_code | KEY_MODIFIER_ALT );
-        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
-                     0, message );
-
-        /* Alt+Shift+X */
-        message = new BMessage( SHORTCUT );
-        message->AddInt32( "key", vlc_keys[i].i_key_code |
-                KEY_MODIFIER_ALT | KEY_MODIFIER_SHIFT );
-        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
-                     B_SHIFT_KEY, message );
-
-        /* Alt+Ctrl+X */
-        message = new BMessage( SHORTCUT );
-        message->AddInt32( "key", vlc_keys[i].i_key_code |
-                KEY_MODIFIER_ALT | KEY_MODIFIER_CTRL );
-        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
-                     B_CONTROL_KEY, message );
-
-        /* Alt+Shift+Ctrl+X */
-        message = new BMessage( SHORTCUT );
-        message->AddInt32( "key", vlc_keys[i].i_key_code |
-                KEY_MODIFIER_ALT | KEY_MODIFIER_SHIFT | KEY_MODIFIER_CTRL );
-        AddShortcut( ConvertKeyFromVLC( vlc_keys[i].i_key_code ),
-                     B_SHIFT_KEY | B_CONTROL_KEY, message );
-    }
 
     _SetToSettings();
 }
@@ -1249,7 +1216,7 @@ VLCView::MouseDown(BPoint where)
 	
 				menu->AddSeparatorItem();
 	
-				// Windwo Feel Items
+				// Window Feel Items
 /*				BMessage *winNormFeel = new BMessage(WINDOW_FEEL);
 				winNormFeel->AddInt32("WinFeel", (int32_t)B_NORMAL_WINDOW_FEEL);
 				BMenuItem *normWindItem = new BMenuItem("Normal Window", winNormFeel);
@@ -1366,9 +1333,9 @@ VLCView::Pulse()
 }
 
 /*****************************************************************************
- * VLCVIew::KeyDown
+ * VLCVIew::KeyUp
  *****************************************************************************/
-void VLCView::KeyDown( const char *bytes, int32 numBytes )
+void VLCView::KeyUp( const char *bytes, int32 numBytes )
 {
     if( numBytes < 1 )
     {
@@ -1376,9 +1343,13 @@ void VLCView::KeyDown( const char *bytes, int32 numBytes )
     }
 
     uint32_t mods = modifiers();
-    vlc_value_t val;
 
+    vlc_value_t val;
     val.i_int = ConvertKeyToVLC( *bytes );
+    if( mods & B_COMMAND_KEY )
+    {
+        val.i_int |= KEY_MODIFIER_ALT;
+    }
     if( mods & B_SHIFT_KEY )
     {
         val.i_int |= KEY_MODIFIER_SHIFT;
