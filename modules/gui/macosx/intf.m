@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.45 2003/02/05 01:36:00 hartman Exp $
+ * $Id: intf.m,v 1.46 2003/02/05 16:23:06 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -262,6 +262,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_msgs_panel setTitle: _NS("Messages")];
     [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
     [o_msgs_btn_ok setTitle: _NS("Close")];
+    [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog")];
 
     /* main menu */
     [o_mi_about setTitle: _NS("About VLC Media Player")];
@@ -1385,6 +1386,24 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     [[NSWorkspace sharedWorkspace] openFile: o_path 
                                    withApplication: @"TextEdit"];
+}
+
+- (IBAction)openCrashLog:(id)sender
+{
+    NSString * o_path = [@"~/Library/Logs/CrashReporter/vlc.crash.log"
+                                    stringByExpandingTildeInPath]; 
+
+    
+    if ( [[NSFileManager defaultManager] fileExistsAtPath: o_path ] )
+    {
+        [[NSWorkspace sharedWorkspace] openFile: o_path 
+                                    withApplication: @"Console"];
+    }
+    else
+    {
+        NSBeginInformationalAlertSheet(_NS("No CrashLog found"), @"Continue", nil, nil, o_msgs_panel, self, NULL, NULL, nil, _NS("Either you are running Mac OS X pre 10.2 or you haven't experienced any heavy crashes yet.") );
+
+    }
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)o_notification

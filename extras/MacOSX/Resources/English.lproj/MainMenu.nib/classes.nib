@@ -34,6 +34,7 @@
             ACTIONS = {
                 clearRecentItems = id; 
                 closeError = id; 
+                openCrashLog = id; 
                 openLicense = id; 
                 openReadMe = id; 
                 openRecentItem = id; 
@@ -112,6 +113,7 @@
                 "o_mi_vol_down" = id; 
                 "o_mi_vol_up" = id; 
                 "o_mi_website" = id; 
+                "o_msgs_btn_crashog" = id; 
                 "o_msgs_btn_ok" = id; 
                 "o_msgs_panel" = id; 
                 "o_mu_audio" = id; 
