@@ -477,7 +477,7 @@ export
 #
 # Virtual targets
 #
-all: vlc @ALIASES@ plugins
+all: vlc @ALIASES@ plugins vlc.app
 
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
@@ -684,6 +684,8 @@ ifeq ($(SYS),beos)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
 endif
+
+vlc.app:
 ifneq (,$(findstring darwin,$(SYS)))
 	mkdir -p vlc.app/Contents/MacOS
 	mkdir -p vlc.app/Contents/MacOS/lib
