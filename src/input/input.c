@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.222 2003/02/08 22:20:28 massiot Exp $
+ * $Id: input.c,v 1.223 2003/02/08 22:43:02 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -378,10 +378,10 @@ static int InitThread( input_thread_t * p_input )
         psz_parser++;
     }
 #if defined( WIN32 ) || defined( UNDER_CE )
-    if( psz_parser - p_input->psz_source == 1 )
+    if( psz_parser - p_input->psz_dupsource == 1 )
     {
         msg_Warn( p_input, "drive letter %c: found in source string",
-                           p_input->psz_source[0] ) ;
+                           p_input->psz_dupsource[0] ) ;
         psz_parser = "";
     }
 #endif
@@ -390,7 +390,7 @@ static int InitThread( input_thread_t * p_input )
     {
         p_input->psz_access = p_input->psz_demux = "";
         p_input->psz_name = p_input->psz_source;
-        free( p_input->psz_dupsource);
+        free( p_input->psz_dupsource );
         p_input->psz_dupsource = NULL;
     }
     else
@@ -406,7 +406,7 @@ static int InitThread( input_thread_t * p_input )
         p_input->psz_name = psz_parser ;
 
         /* Come back to parse the access and demux plug-ins */
-        psz_parser = p_input->psz_source;
+        psz_parser = p_input->psz_dupsource;
 
         if( !*psz_parser )
         {
