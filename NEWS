@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.7 2003/02/01 21:20:33 massiot Exp $
+$Id: NEWS,v 1.8 2003/02/01 21:24:06 titer Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -77,6 +77,11 @@ Win32 port:
   * support for VCDs
 
 BeOS port:
+  * new settings window for adjusting post-processing, brightness,
+    contrast, etc
+  * enhancements of the playlist window
+  * new messages window to see debug info
+  * fixed a few crashes
 
 iPaq port:
   * slider bar in GTK+/GPE Familiar interface
