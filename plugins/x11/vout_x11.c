@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.29 2001/07/07 17:45:28 sam Exp $
+ * $Id: vout_x11.c,v 1.30 2001/08/03 16:04:17 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -109,11 +109,11 @@ typedef struct vout_sys_s
     int                 i_ss_blanking;                      /* blanking mode */
     int                 i_ss_exposure;                      /* exposure mode */
 
-    /* Auto-hide cursor */
-    mtime_t     i_lastmoved;
-    
     /* Mouse pointer properties */
-    boolean_t           b_mouse;         /* is the mouse pointer displayed ? */
+    mtime_t             i_lastmoved;                     /* Auto-hide cursor */
+    boolean_t           b_mouse_pointer_visible;
+    Cursor              blank_cursor;                   /* the hidden cursor */
+    Pixmap              cursor_pixmap;
 
 } vout_sys_t;
 
@@ -151,7 +151,7 @@ static int  X11CreateShmImage   ( vout_thread_t *p_vout, XImage **pp_ximage,
 static void X11DestroyShmImage  ( vout_thread_t *p_vout, XImage *p_ximage,
                                   XShmSegmentInfo *p_shm_info );
 
-static void X11TogglePointer            ( vout_thread_t *p_vout );
+static void X11ToggleMousePointer       ( vout_thread_t *p_vout );
 static void X11EnableScreenSaver        ( vout_thread_t *p_vout );
 static void X11DisableScreenSaver       ( vout_thread_t *p_vout );
 
@@ -197,6 +197,7 @@ static int vout_Probe( probedata_t *p_data )
 static int vout_Create( vout_thread_t *p_vout )
 {
     char *psz_display;
+    XColor cursor_color;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -244,7 +245,29 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    p_vout->p_sys->b_mouse = 1;
+    /* Create blank cursor (for mouse cursor autohiding) */
+    p_vout->p_sys->b_mouse_pointer_visible = 1;
+    p_vout->p_sys->cursor_pixmap = XCreatePixmap( p_vout->p_sys->p_display,
+                                                  DefaultRootWindow(
+                                                     p_vout->p_sys->p_display),
+                                                  1, 1, 1 );
+    
+    XParseColor( p_vout->p_sys->p_display,
+                 XCreateColormap( p_vout->p_sys->p_display,
+                                  DefaultRootWindow(
+                                                    p_vout->p_sys->p_display ),
+                                  DefaultVisual(
+                                                p_vout->p_sys->p_display,
+                                                p_vout->p_sys->i_screen ),
+                                  AllocNone ),
+                 "black", &cursor_color );
+    
+    p_vout->p_sys->blank_cursor = XCreatePixmapCursor(
+                                      p_vout->p_sys->p_display,
+                                      p_vout->p_sys->cursor_pixmap,
+                                      p_vout->p_sys->cursor_pixmap,
+                                      &cursor_color,
+                                      &cursor_color, 1, 1 );    
 
     /* Disable screen saver and return */
     X11DisableScreenSaver( p_vout );
@@ -354,6 +377,13 @@ static void vout_Destroy( vout_thread_t *p_vout )
 {
     /* Enable screen saver */
     X11EnableScreenSaver( p_vout );
+
+    /* Restore cursor if it was blanked */
+    if( !p_vout->p_sys->b_mouse_pointer_visible )
+        X11ToggleMousePointer( p_vout );
+
+    /* Destroy blank cursor pixmap */
+    XFreePixmap( p_vout->p_sys->p_display, p_vout->p_sys->cursor_pixmap );
 
     /* Destroy colormap */
     if( p_vout->i_screen_depth == 8 )
@@ -528,9 +558,9 @@ static int vout_Manage( vout_thread_t *p_vout )
         else if( xevent.type == MotionNotify )
         {
             p_vout->p_sys->i_lastmoved = mdate();
-            if( ! p_vout->p_sys->b_mouse )
+            if( ! p_vout->p_sys->b_mouse_pointer_visible )
             {
-                X11TogglePointer( p_vout ); 
+                X11ToggleMousePointer( p_vout ); 
             }
         }
         /* Other event */
@@ -658,9 +688,9 @@ static int vout_Manage( vout_thread_t *p_vout )
     if( mdate() - p_vout->p_sys->i_lastmoved > 2000000 )
     {
         /* Hide the mouse automatically */
-        if( p_vout->p_sys->b_mouse )
+        if( p_vout->p_sys->b_mouse_pointer_visible )
         {
-            X11TogglePointer( p_vout ); 
+            X11ToggleMousePointer( p_vout ); 
         }
     }
 
@@ -916,7 +946,6 @@ static int X11InitDisplay( vout_thread_t *p_vout, char *psz_display )
     XVisualInfo *               p_xvisual;           /* visuals informations */
     XVisualInfo                 xvisual_template;         /* visual template */
     int                         i_count;                       /* array size */
-
 
 
     /* Initialize structure */
@@ -1206,49 +1235,24 @@ void X11DisableScreenSaver( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * X11TogglePointer: hide or show the mouse pointer
+ * X11ToggleMousePointer: hide or show the mouse pointer
  *****************************************************************************
  * This function hides the X pointer if it is visible by putting it at
  * coordinates (32,32) and setting the pointer sprite to a blank one. To
  * show it again, we disable the sprite and restore the original coordinates.
  *****************************************************************************/
-void X11TogglePointer( vout_thread_t *p_vout )
+void X11ToggleMousePointer( vout_thread_t *p_vout )
 {
-    static Cursor cursor;
-    static boolean_t b_cursor = 0;
-
-    if( p_vout->p_sys->b_mouse )
+    if( p_vout->p_sys->b_mouse_pointer_visible )
     {
-        p_vout->p_sys->b_mouse = 0;
+        p_vout->p_sys->b_mouse_pointer_visible = 0;
 
-        if( !b_cursor )
-        {
-            XColor color;
-            Pixmap blank = XCreatePixmap( p_vout->p_sys->p_display,
-                               DefaultRootWindow(p_vout->p_sys->p_display),
-                               1, 1, 1 );
-
-            XParseColor( p_vout->p_sys->p_display,
-                         XCreateColormap( p_vout->p_sys->p_display,
-                                          DefaultRootWindow(
-                                                  p_vout->p_sys->p_display ),
-                                          DefaultVisual(
-                                                  p_vout->p_sys->p_display,
-                                                  p_vout->p_sys->i_screen ),
-                                          AllocNone ),
-                         "black", &color );
-
-            cursor = XCreatePixmapCursor( p_vout->p_sys->p_display,
-                           blank, blank, &color, &color, 1, 1 );
-
-            b_cursor = 1;
-        }
         XDefineCursor( p_vout->p_sys->p_display,
-                       p_vout->p_sys->window, cursor );
+                       p_vout->p_sys->window, p_vout->p_sys->blank_cursor );
     }
     else
     {
-        p_vout->p_sys->b_mouse = 1;
+        p_vout->p_sys->b_mouse_pointer_visible = 1;
 
         XUndefineCursor( p_vout->p_sys->p_display, p_vout->p_sys->window );
     }

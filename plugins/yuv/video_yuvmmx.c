@@ -3,7 +3,7 @@
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuvmmx.c,v 1.11 2001/07/11 02:01:05 sam Exp $
+ * $Id: video_yuvmmx.c,v 1.12 2001/08/03 16:04:17 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -128,14 +128,16 @@ static int yuv_Init( vout_thread_t *p_vout )
     if( p_vout->yuv.p_buffer == NULL )
     {
         intf_ErrMsg("error: %s", strerror(ENOMEM));
-        free( p_vout->yuv.p_base );
+        if( p_vout->yuv.p_base )
+            free( p_vout->yuv.p_base );
         return( 1 );
     }
     p_vout->yuv.p_offset = malloc( p_vout->i_width * sizeof( int ) );
     if( p_vout->yuv.p_offset == NULL )
     {
         intf_ErrMsg("error: %s", strerror(ENOMEM));
-        free( p_vout->yuv.p_base );
+        if( p_vout->yuv.p_base )
+            free( p_vout->yuv.p_base );
         free( p_vout->yuv.p_buffer );
         return( 1 );
     }
@@ -152,7 +154,8 @@ static int yuv_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void yuv_End( vout_thread_t *p_vout )
 {
-    free( p_vout->yuv.p_base );
+    if( p_vout->yuv.p_base )
+        free( p_vout->yuv.p_base );
     free( p_vout->yuv.p_buffer );
     free( p_vout->yuv.p_offset );
 }
