@@ -1,4 +1,4 @@
-$Id: HACKING,v 1.5 2002/09/30 11:05:32 sam Exp $
+$Id: HACKING,v 1.6 2002/10/07 21:58:40 massiot Exp $
 
 Hacking vlc
 ===========
@@ -22,6 +22,12 @@ simply not available for the operating system you plan to develop on,
 you can check out a CVS tree on an OS that provides these tools (such
 as a recent Linux distribution), run bootstrap, and then copy the whole
 tree to your retarded OS.
+
+There is a possibility that, at some point, automake might segfault. The
+reason is unsufficient stack size, and can be easily fixed with the
+`ulimit` command (or an equivalent) available in most shells. For instance
+on bash 2.0, the following command solves the automake crash on Mac OS X :
+ulimit -s 20000
 
 
 The bootstrap sequence
