@@ -10,6 +10,8 @@ building from source (can take a long time but is easily customizable)
 and fetching a pre-compiled binary package. Either type 'make src'
 or 'make bin' (also from the contrib directory).
 
+make bin IS NOT WORKING atm USE make src
+
 Once the contribs are built, you can start building VLC.
 See: http://developers.videolan.org/vlc/osx-compile.html 
 for more details on that.
