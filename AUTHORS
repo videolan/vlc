@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.99 2003/12/06 22:42:45 jpsaman Exp $
+# $Id: AUTHORS,v 1.100 2004/01/05 12:24:51 jlj Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -198,7 +198,7 @@ D: Win32 DVD input port
 D: QNX RTOS plug-in
 D: MacOS X port
 D: norwegian translation
-S: Norway
+S: France
 
 N: Michel Kaempf
 E: maxx@via.ecp.fr
