@@ -16,22 +16,20 @@
  *****************************************************************************/
 
 /*****************************************************************************
+ * Function pointers
+ *****************************************************************************/
+typedef void (*f_parse_mb_t)( struct vpar_thread_s*, int *, int, int,
+                              boolean_t, int, int, int, boolean_t);
+
+/*****************************************************************************
  * macroblock_t : information on a macroblock
  *****************************************************************************/
 typedef struct macroblock_s
 {
     int                     i_mb_type;                    /* macroblock type */
     int                     i_coded_block_pattern;
-    int                     i_structure;
-    int                     i_current_structure;
-    boolean_t               b_P_coding_type;        /* Is it P_CODING_TYPE ? */
-    picture_t *             p_picture;
-    int                     i_l_x, i_l_y;    /* position of macroblock (lum) */
-    int                     i_c_x, i_c_y; /* position of macroblock (chroma) */
     int                     i_chroma_nb_blocks;  /* nb of bks for a chr comp */
-    int                     i_l_stride;       /* number of yuv_data_t to ignore
-		                               * when changing lines     */
-    int                     i_c_stride;                  /* idem, for chroma */
+    picture_t *             p_picture;
     
     /* IDCT information */
     dctelem_t               ppi_blocks[12][64];                    /* blocks */
@@ -44,16 +42,24 @@ typedef struct macroblock_s
     picture_t *             p_forward;
     int                     ppi_field_select[2][2];
     int                     pppi_motion_vectors[2][2][2];
-    int                     pi_dm_vector[2];
-    boolean_t               b_top_field_first;
+    int                     ppi_dmv[2][2];
+    int                     i_l_x, i_c_x;
     int                     i_motion_l_y;
     int                     i_motion_c_y;
-    boolean_t               b_motion_field;
-  
+    int                     i_l_stride;         /* number of yuv_data_t to 
+                                                 * ignore when changing line */
+    int                     i_c_stride;                  /* idem, for chroma */
+    boolean_t               b_P_second;  /* Second field of a P picture ?
+                                          * (used to determine the predicting
+                                          * frame)                           */
+    boolean_t               b_motion_field;  /* Field we are predicting
+                                              * (top field or bottom field) */
+
     /* AddBlock information */
     yuv_data_t *            p_data[12];              /* pointer to the position
                                                       * in the final picture */
     int                     i_addb_l_stride, i_addb_c_stride;
+                                 /* nb of coeffs to jump when changing lines */
 } macroblock_t;
 
 /*****************************************************************************
@@ -61,12 +67,8 @@ typedef struct macroblock_s
  *****************************************************************************/
 typedef struct
 {
-    int                     i_mb_type, i_motion_type, i_mv_count, i_mv_format;
-    boolean_t               b_dmv;
-
-    /* Macroblock Type */
-    int                     i_coded_block_pattern;
-    boolean_t               b_dct_type;
+    int                     i_motion_type, i_mv_count, i_mv_format;
+    boolean_t               b_dmv, b_dct_type;
 
     int                     i_l_x, i_l_y, i_c_x, i_c_y;
 } macroblock_parsing_t;
@@ -139,12 +141,53 @@ void vpar_InitPMBType( struct vpar_thread_s * p_vpar );
 void vpar_InitBMBType( struct vpar_thread_s * p_vpar );
 void vpar_InitCodedPattern( struct vpar_thread_s * p_vpar );
 void vpar_InitDCTTables( struct vpar_thread_s * p_vpar );
-void vpar_ParseMacroblock( struct vpar_thread_s * p_vpar, int * pi_mb_address,
-                           int i_mb_previous, int i_mb_base );
-int vpar_CodedPattern420( struct vpar_thread_s* p_vpar );
-int vpar_CodedPattern422( struct vpar_thread_s* p_vpar );
-int vpar_CodedPattern444( struct vpar_thread_s* p_vpar );
-int vpar_IMBType( struct vpar_thread_s* p_vpar );
-int vpar_PMBType( struct vpar_thread_s* p_vpar );
-int vpar_BMBType( struct vpar_thread_s* p_vpar );
-int vpar_DMBType( struct vpar_thread_s* p_vpar );
+void vpar_ParseMacroblockGENERIC( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2I420F0( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2P420F0( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2B420F0( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2I420T0( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2P420T0( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2B420T0( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2I420B1( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2P420B1( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );
+void vpar_ParseMacroblock2B420B1( struct vpar_thread_s* p_vpar, int * pi_mb_address,
+                                  int i_mb_previous, int i_mb_base,
+                                  boolean_t b_mpeg2, int i_coding_type,
+                                  int i_chroma_format, int i_structure,
+                                  boolean_t b_second_field );

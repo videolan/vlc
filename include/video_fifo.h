@@ -74,6 +74,10 @@ static __inline__ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
         /* No more structures available. This should not happen ! */
         intf_DbgMsg("vpar debug: macroblock list is empty, delaying\n");
         vlc_mutex_unlock( &P_buffer.lock );
+        if( p_fifo->p_vpar->b_die )
+        {
+            return( NULL );
+        }
         msleep(VPAR_OUTMEM_SLEEP);
         vlc_mutex_lock( &P_buffer.lock );
     }

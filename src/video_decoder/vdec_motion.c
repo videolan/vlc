@@ -456,59 +456,6 @@ static __inline__ void Motion444(
 }
 
 /*****************************************************************************
- * DualPrimeArithmetic : Dual Prime Additional arithmetic (7.6.3.6)
- *****************************************************************************/ 
-static __inline__ void DualPrimeArithmetic( macroblock_t * p_mb,
-                                            int ppi_dmv[2][2],
-                                            int i_mv_x, int i_mv_y )
-{
-    if( p_mb->i_structure == FRAME_STRUCTURE )
-    {
-        if( p_mb->b_top_field_first )
-        {
-            /* vector for prediction of top field from bottom field */
-            ppi_dmv[0][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
-            ppi_dmv[0][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] - 1;
-
-            /* vector for prediction of bottom field from top field */
-            ppi_dmv[1][0] = ((3*i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
-            ppi_dmv[1][1] = ((3*i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] + 1;
-        }
-        else
-        {
-            /* vector for prediction of top field from bottom field */
-            ppi_dmv[0][0] = ((3*i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
-            ppi_dmv[0][1] = ((3*i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] - 1;
-
-            /* vector for prediction of bottom field from top field */
-            ppi_dmv[1][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
-            ppi_dmv[1][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1] + 1;
-        }
-    }
-    else
-    {
-        /* vector for prediction from field of opposite 'parity' */
-        ppi_dmv[0][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + p_mb->pi_dm_vector[0];
-        ppi_dmv[0][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + p_mb->pi_dm_vector[1];
-
-        /* correct for vertical field shift */
-        if( p_mb->i_structure == TOP_FIELD )
-            ppi_dmv[0][1]--;
-        else
-            ppi_dmv[0][1]++;
-    }
-}
-
-
-/*****************************************************************************
- * vdec_MotionDummy : motion compensation for an intra macroblock
- *****************************************************************************/
-void vdec_MotionDummy( macroblock_t * p_mb )
-{
-    /* Nothing to do :) */
-}
-
-/*****************************************************************************
  * vdec_MotionFieldField : motion compensation for field motion type (field)
  *****************************************************************************/
 #define FIELDFIELD( MOTION )                                            \
@@ -516,8 +463,7 @@ void vdec_MotionDummy( macroblock_t * p_mb )
                                                                         \
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )                           \
     {                                                                   \
-        if( p_mb->b_P_coding_type                                       \
-             && (p_mb->i_current_structure == FRAME_STRUCTURE)          \
+        if( p_mb->b_P_second                                            \
              && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )\
             p_pred = p_mb->p_picture;                                   \
         else                                                            \
@@ -573,8 +519,7 @@ void vdec_MotionFieldField444( macroblock_t * p_mb )
                                                                         \
     if( p_mb->i_mb_type & MB_MOTION_FORWARD )                           \
     {                                                                   \
-        if( p_mb->b_P_coding_type                                       \
-             && (p_mb->i_current_structure == FRAME_STRUCTURE)          \
+        if( p_mb->b_P_second                                            \
              && (p_mb->b_motion_field != p_mb->ppi_field_select[0][0]) )\
             p_pred = p_mb->p_picture;                                   \
         else                                                            \
@@ -586,8 +531,7 @@ void vdec_MotionFieldField444( macroblock_t * p_mb )
                 p_mb->pppi_motion_vectors[0][0][1],                     \
                 p_mb->i_l_stride, p_mb->i_c_stride, 8, 0, 0 );          \
                                                                         \
-        if( p_mb->b_P_coding_type                                       \
-             && (p_mb->i_current_structure == FRAME_STRUCTURE)          \
+        if( p_mb->b_P_second                                            \
              && (p_mb->b_motion_field != p_mb->ppi_field_select[1][0]) )\
             p_pred = p_mb->p_picture;                                   \
         else                                                            \
@@ -649,44 +593,45 @@ void vdec_MotionField16x8444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionFieldDMV : motion compensation for dmv motion type (field)
+ * vdec_MotionFieldDMVXXX : motion compensation for dmv motion type (field)
  *****************************************************************************/
-void vdec_MotionFieldDMV( macroblock_t * p_mb )
+#define FIELDDMV( MOTION )                                              \
+{                                                                       \
+    /* This is necessarily a MOTION_FORWARD only macroblock, in a P     \
+     * picture. */                                                      \
+    picture_t *     p_pred;                                             \
+                                                                        \
+    /* predict from field of same parity */                             \
+    MOTION( p_mb, p_mb->p_forward,                                      \
+            p_mb->b_motion_field, p_mb->b_motion_field,                 \
+            p_mb->pppi_motion_vectors[0][0][0],                         \
+            p_mb->pppi_motion_vectors[0][0][1],                         \
+            p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 0 );             \
+                                                                        \
+    if( p_mb->b_P_second )                                              \
+        p_pred = p_mb->p_picture;                                       \
+    else                                                                \
+        p_pred = p_mb->p_forward;                                       \
+                                                                        \
+    /* predict from field of opposite parity */                         \
+    MOTION( p_mb, p_pred, !p_mb->b_motion_field, p_mb->b_motion_field,  \
+            p_mb->ppi_dmv[0][0], p_mb->ppi_dmv[0][1],                   \
+            p_mb->i_l_stride, p_mb->i_c_stride, 16, 0, 1 );             \
+} /* FIELDDMV */
+
+void vdec_MotionFieldDMV420( macroblock_t * p_mb )
 {
-#if 0
-    /* This is necessarily a MOTION_FORWARD only macroblock */
-    motion_arg_t    args;
-    picture_t *     p_pred;
-    int             ppi_dmv[2][2];
+    FIELDDMV( Motion420 )
+}
 
-    args.i_height = 16;
-    args.b_average = 0;
-    args.b_dest_field = p_mb->b_motion_field;
-    args.i_offset = 0;
+void vdec_MotionFieldDMV422( macroblock_t * p_mb )
+{
+    FIELDDMV( Motion422 )
+}
 
-    if( p_mb->i_current_structure == FRAME_STRUCTURE )
-        p_pred = p_mb->p_picture;
-    else
-        p_pred = p_mb->p_forward;
-
-    DualPrimeArithmetic( p_mb, ppi_dmv, p_mb->pppi_motion_vectors[0][0][0],
-                         p_mb->pppi_motion_vectors[0][0][1] );
-
-    /* predict from field of same parity */
-    args.p_source = p_mb->p_forward;
-    args.b_source_field = p_mb->b_motion_field;
-    args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-    args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1];
-    p_mb->pf_chroma_motion( p_mb, &args );
-
-    /* predict from field of opposite parity */
-    args.b_average = 1;
-    args.p_source = p_pred;
-    args.b_source_field = !p_mb->b_motion_field;
-    args.i_mv_x = ppi_dmv[0][0];
-    args.i_mv_y = ppi_dmv[0][1];
-    p_mb->pf_chroma_motion( p_mb, &args );
-#endif
+void vdec_MotionFieldDMV444( macroblock_t * p_mb )
+{
+    FIELDDMV( Motion444 )
 }
 
 /*****************************************************************************
@@ -800,53 +745,49 @@ void vdec_MotionFrameField444( macroblock_t * p_mb )
 }
 
 /*****************************************************************************
- * vdec_MotionFrameDMV : motion compensation for dmv motion type (frame)
+ * vdec_MotionFrameDMVXXX : motion compensation for dmv motion type (frame)
  *****************************************************************************/
-void vdec_MotionFrameDMV( macroblock_t * p_mb )
+#define FRAMEDMV( MOTION )                                              \
+{                                                                       \
+    /* This is necessarily a MOTION_FORWARD only macroblock, in a P     \
+     * picture. */                                                      \
+                                                                        \
+    /* predict top field from top field */                              \
+    MOTION( p_mb, p_mb->p_forward, 0, 0,                                \
+            p_mb->pppi_motion_vectors[0][0][0],                         \
+            p_mb->pppi_motion_vectors[0][0][1],                         \
+            /* ????? >> 1 ? */                                          \
+            p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 0 );    \
+                                                                        \
+    /* predict and add to top field from bottom field */                \
+    MOTION( p_mb, p_mb->p_forward, 1, 0,                                \
+            p_mb->ppi_dmv[0][0], p_mb->ppi_dmv[0][1],                   \
+            p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 1 );    \
+                                                                        \
+    /* predict bottom field from bottom field */                        \
+    MOTION( p_mb, p_mb->p_forward, 1, 1,                                \
+            p_mb->pppi_motion_vectors[0][0][0],                         \
+            p_mb->pppi_motion_vectors[0][0][1],                         \
+            /* ????? >> 1 ? */                                          \
+            p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 0 );    \
+                                                                        \
+    /* predict and add to bottom field from top field */                \
+    MOTION( p_mb, p_mb->p_forward, 1, 0,                                \
+            p_mb->ppi_dmv[1][0], p_mb->ppi_dmv[1][1],                   \
+            p_mb->i_l_stride << 1, p_mb->i_c_stride << 1, 8, 0, 1 );    \
+} /* FRAMEDMV */
+
+void vdec_MotionFrameDMV420( macroblock_t * p_mb )
 {
-#if 0
-    /* This is necessarily a MOTION_FORWARD only macroblock */
-    motion_arg_t    args;
-    int             ppi_dmv[2][2];
-
-    args.i_l_x_step = p_mb->i_l_stride << 1;
-    args.i_c_x_step = p_mb->i_c_stride << 1;
-    args.i_height = 8;
-    args.b_average = 0;
-    args.b_dest_field = 0;
-    args.i_offset = 0;
-    args.p_source = p_mb->p_forward;
-
-    DualPrimeArithmetic( p_mb, ppi_dmv, p_mb->pppi_motion_vectors[0][0][0],
-                         p_mb->pppi_motion_vectors[0][0][1] );
-
-    /* predict top field from top field */
-    args.b_source_field = 0;
-    args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-    args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
-    p_mb->pf_chroma_motion( p_mb, &args );
-
-    /* predict and add to top field from bottom field */
-    args.b_average = 1;
-    args.b_source_field = 1;
-    args.i_mv_x = ppi_dmv[0][0];
-    args.i_mv_y = ppi_dmv[0][1];
-    p_mb->pf_chroma_motion( p_mb, &args );
-
-    /* predict bottom field from bottom field */
-    args.b_average = 0;
-    args.b_dest_field = 1;
-    args.b_source_field = 0;
-    args.i_mv_x = p_mb->pppi_motion_vectors[0][0][0];
-    args.i_mv_y = p_mb->pppi_motion_vectors[0][0][1] >> 1;
-    p_mb->pf_chroma_motion( p_mb, &args );
-
-    /* predict and add to bottom field from top field */
-    args.b_average = 1;
-    args.b_source_field = 1;
-    args.i_mv_x = ppi_dmv[1][0];
-    args.i_mv_y = ppi_dmv[1][1];
-    p_mb->pf_chroma_motion( p_mb, &args );
-#endif
+    FRAMEDMV( Motion420 )
 }
 
+void vdec_MotionFrameDMV422( macroblock_t * p_mb )
+{
+    FRAMEDMV( Motion422 )
+}
+
+void vdec_MotionFrameDMV444( macroblock_t * p_mb )
+{
+    FRAMEDMV( Motion444 )
+}

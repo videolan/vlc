@@ -126,6 +126,7 @@ void vpar_MotionVector( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_r,
 {
     int i_motion_code, i_motion_residual;
     int i_r_size;
+    int pi_dm_vector[2];
     
     i_r_size = p_vpar->picture.ppi_f_code[i_s][0]-1;
     i_motion_code = vpar_MotionCode( p_vpar );
@@ -140,11 +141,11 @@ void vpar_MotionVector( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_r,
     {
         if( GetBits(&p_vpar->bit_stream, 1) )
         {
-            p_mb->pi_dm_vector[0] = GetBits( &p_vpar->bit_stream, 1 ) ? -1 : 1;
+            pi_dm_vector[0] = GetBits( &p_vpar->bit_stream, 1 ) ? -1 : 1;
         }
         else
         {
-            p_mb->pi_dm_vector[0] = 0;
+            pi_dm_vector[0] = 0;
         }
     }
     
@@ -172,12 +173,55 @@ void vpar_MotionVector( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_r,
     {
         if( GetBits(&p_vpar->bit_stream, 1) )
         {
-            p_mb->pi_dm_vector[1] = GetBits( &p_vpar->bit_stream, 1 ) ? -1 : 1;
+            pi_dm_vector[1] = GetBits( &p_vpar->bit_stream, 1 ) ? -1 : 1;
         }
         else
         {
-            p_mb->pi_dm_vector[1] = 0;
+            pi_dm_vector[1] = 0;
         }
+
+        /* Dual Prime Arithmetic (ISO/IEC 13818-2 section 7.6.3.6) */
+#define i_mv_x  p_mb->pppi_motion_vectors[0][0][0]
+        if( p_vpar->picture.i_structure == FRAME_STRUCTURE )
+        {
+#define i_mv_y  (p_mb->pppi_motion_vectors[0][0][1] << 1)
+            if( p_vpar->picture.b_top_field_first )
+            {
+                /* vector for prediction of top field from bottom field */
+                p_mb->ppi_dmv[0][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + pi_dm_vector[0];
+                p_mb->ppi_dmv[0][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + pi_dm_vector[1] - 1;
+
+                /* vector for prediction of bottom field from top field */
+                p_mb->ppi_dmv[1][0] = ((3*i_mv_x + (i_mv_x > 0)) >> 1) + pi_dm_vector[0];
+                p_mb->ppi_dmv[1][1] = ((3*i_mv_y + (i_mv_y > 0)) >> 1) + pi_dm_vector[1] + 1;
+            }
+            else
+            {
+                /* vector for prediction of top field from bottom field */
+                p_mb->ppi_dmv[0][0] = ((3*i_mv_x + (i_mv_x > 0)) >> 1) + pi_dm_vector[0];
+                p_mb->ppi_dmv[0][1] = ((3*i_mv_y + (i_mv_y > 0)) >> 1) + pi_dm_vector[1] - 1;
+
+                /* vector for prediction of bottom field from top field */
+                p_mb->ppi_dmv[1][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + pi_dm_vector[0];
+                p_mb->ppi_dmv[1][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + pi_dm_vector[1] + 1;
+            }
+#undef i_mv_y
+        }
+        else
+        {
+#define i_mv_y  p_mb->pppi_motion_vectors[0][0][1]
+            /* vector for prediction from field of opposite 'parity' */
+            p_mb->ppi_dmv[0][0] = ((i_mv_x + (i_mv_x > 0)) >> 1) + pi_dm_vector[0];
+            p_mb->ppi_dmv[0][1] = ((i_mv_y + (i_mv_y > 0)) >> 1) + pi_dm_vector[1];
+
+            /* correct for vertical field shift */
+            if( p_vpar->picture.i_structure == TOP_FIELD )
+                p_mb->ppi_dmv[0][1]--;
+            else
+                p_mb->ppi_dmv[0][1]++;
+#undef i_mv_y
+        }
+#undef i_mv_x
     }
 }
 

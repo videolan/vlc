@@ -389,9 +389,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
     {
         int                         i_dummy;
-        static f_chroma_pattern_t   ppf_chroma_pattern[4] =
-                            {NULL, vpar_CodedPattern420,
-                             vpar_CodedPattern422, vpar_CodedPattern444};
 
         /* Turn the MPEG2 flag on */
         p_vpar->sequence.b_mpeg2 = 1;
@@ -402,8 +399,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         RemoveBits( &p_vpar->bit_stream, 12 );
         p_vpar->sequence.b_progressive = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->sequence.i_chroma_format = GetBits( &p_vpar->bit_stream, 2 );
-        p_vpar->sequence.pf_decode_pattern = ppf_chroma_pattern
-                                    [p_vpar->sequence.i_chroma_format];
         p_vpar->sequence.i_width |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
         p_vpar->sequence.i_height |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
         /* bit_rate_extension, marker_bit, vbv_buffer_size_extension, low_delay */
@@ -413,8 +408,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* frame_rate_extension_d */
         p_vpar->sequence.r_frame_rate *= (i_dummy + 1)
                                   / (GetBits( &p_vpar->bit_stream, 5 ) + 1);
-
-        p_vpar->sequence.pf_decode_mv = vpar_MPEG2MotionVector;
     }
     else
     {
@@ -423,9 +416,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.b_mpeg2 = 0;
         p_vpar->sequence.b_progressive = 1;
         p_vpar->sequence.i_chroma_format = CHROMA_420;
-        p_vpar->sequence.pf_decode_pattern = vpar_CodedPattern420;
-
-        p_vpar->sequence.pf_decode_mv = vpar_MPEG1MotionVector;
     }
 
     /* Update sizes */
@@ -513,9 +503,33 @@ static void GroupHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void PictureHeader( vpar_thread_t * p_vpar )
 {
-    static f_macroblock_type_t ppf_macroblock_type[5] = {NULL,
-                                                  vpar_IMBType, vpar_PMBType,
-                                                  vpar_BMBType, vpar_DMBType};
+    static f_parse_mb_t ppf_parse_mb[4][4][2] =
+    {
+        {
+            {NULL, NULL}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL}
+        },
+        {
+            /* I_CODING_TYPE */
+            {NULL, NULL},
+            {vpar_ParseMacroblock2I420T0, vpar_ParseMacroblockGENERIC},
+            {vpar_ParseMacroblockGENERIC, vpar_ParseMacroblock2I420B1},
+            {vpar_ParseMacroblock2I420F0, vpar_ParseMacroblock2I420F0}
+        },
+        {
+            /* P_CODING_TYPE */
+            {NULL, NULL},
+            {vpar_ParseMacroblock2P420T0, vpar_ParseMacroblockGENERIC},
+            {vpar_ParseMacroblockGENERIC, vpar_ParseMacroblock2P420B1},
+            {vpar_ParseMacroblock2P420F0, vpar_ParseMacroblock2P420F0}
+        },
+        {
+            /* B_CODING_TYPE */
+            {NULL, NULL},
+            {vpar_ParseMacroblock2B420T0, vpar_ParseMacroblockGENERIC},
+            {vpar_ParseMacroblockGENERIC, vpar_ParseMacroblock2B420B1},
+            {vpar_ParseMacroblock2B420F0, vpar_ParseMacroblock2B420F0}
+        }
+    };
 
     int                 i_structure;
     int                 i_mb_address, i_mb_base;
@@ -527,11 +541,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     
     RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
-    p_vpar->picture.pf_macroblock_type = ppf_macroblock_type
-                                         [p_vpar->picture.i_coding_type];
     RemoveBits( &p_vpar->bit_stream, 16 ); /* vbv_delay */
 
-    if( p_vpar->picture.i_coding_type == P_CODING_TYPE || p_vpar->picture.i_coding_type == B_CODING_TYPE )
+    if( p_vpar->picture.i_coding_type == P_CODING_TYPE
+        || p_vpar->picture.i_coding_type == B_CODING_TYPE )
     {
         p_vpar->picture.pb_full_pel_vector[0] = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->picture.i_forward_f_code = GetBits( &p_vpar->bit_stream, 3 );
@@ -733,7 +746,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     p_vpar->picture.i_structure = i_structure;
 
     /* Initialize picture data for decoding. */
-    if( (p_vpar->picture.b_motion_field = (i_structure == BOTTOM_FIELD)) )
+    if( i_structure == BOTTOM_FIELD )
     {
         i_mb_base = p_vpar->sequence.i_mb_size >> 1;
         p_vpar->mb.i_l_y = 1;
@@ -750,10 +763,25 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
 
+    /* Macroblock parsing function. */
+    if( p_vpar->sequence.i_chroma_format != CHROMA_420
+        || !p_vpar->sequence.b_mpeg2 )
+    {
+        p_vpar->picture.pf_parse_mb = vpar_ParseMacroblockGENERIC;
+    }
+    else
+    {
+        p_vpar->picture.pf_parse_mb =
+            ppf_parse_mb[p_vpar->picture.i_coding_type]
+                        [p_vpar->picture.i_structure]
+                        [(p_vpar->picture.i_structure !=
+                             p_vpar->picture.i_current_structure)];
+    }
+
     /* Picture data (ISO/IEC 13818-2 6.2.3.7). */
     NextStartCode( p_vpar );
     while( i_mb_address+i_mb_base < p_vpar->sequence.i_mb_size
-           && !p_vpar->picture.b_error && !p_vpar->b_die )
+           && !p_vpar->b_die )
     {
         if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))
                  < SLICE_START_CODE_MIN) ||
@@ -768,7 +796,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         /* Decode slice data. */
         p_vpar->sequence.pf_slice_header( p_vpar, &i_mb_address, i_mb_base, i_dummy & 255 );
     }
-  
+
+    if( p_vpar->b_die || p_vpar->b_error )
+    {
+        return;
+    }
+
     if( p_vpar->picture.b_error )
     {
         /* Trash picture. */
@@ -826,7 +859,9 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
     static int              pi_dc_dct_reinit[4] = {128,256,512,1024};
 
     int                     i_mb_address_save = *pi_mb_address;
-    
+
+    p_vpar->picture.b_error = 0;
+
     /* slice_vertical_position_extension and priority_breakpoint already done */
     LoadQuantizerScale( p_vpar );
 
@@ -853,11 +888,18 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
 
     do
     {
-        vpar_ParseMacroblock( p_vpar, pi_mb_address, i_mb_address_save,
-                              i_mb_base );
+        p_vpar->picture.pf_parse_mb( p_vpar, pi_mb_address,
+                                     i_mb_address_save, i_mb_base,
+                                     p_vpar->sequence.b_mpeg2,
+                                     p_vpar->picture.i_coding_type,
+                                     p_vpar->sequence.i_chroma_format,
+                                     p_vpar->picture.i_structure,
+                                     (p_vpar->picture.i_structure !=
+                                        p_vpar->picture.i_current_structure) );
         i_mb_address_save = *pi_mb_address;
     }
-    while( ShowBits( &p_vpar->bit_stream, 23 ) && !p_vpar->b_die );
+    while( ShowBits( &p_vpar->bit_stream, 23 ) && !p_vpar->picture.b_error
+            && !p_vpar->b_die );
     NextStartCode( p_vpar );
 }
 

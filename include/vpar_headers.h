@@ -19,11 +19,8 @@
  * Function pointers
  *****************************************************************************/
 struct vpar_thread_s;
-struct macroblock_s;
 
 typedef void    (*f_slice_header_t)( struct vpar_thread_s*, int*, int, u32);
-typedef int     (*f_chroma_pattern_t)( struct vpar_thread_s* );
-typedef int     (*f_macroblock_type_t)( struct vpar_thread_s* );
 
 /*****************************************************************************
  * quant_matrix_t : Quantization Matrix
@@ -50,8 +47,6 @@ typedef struct sequence_s
     f_slice_header_t    pf_slice_header;
     quant_matrix_t      intra_quant, nonintra_quant;
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
-    void                (*pf_decode_mv)( struct vpar_thread_s *, struct macroblock_s *, int );
-    f_chroma_pattern_t  pf_decode_pattern;
 
     /* Chromatic information */
     unsigned int        i_chroma_format;
@@ -64,12 +59,12 @@ typedef struct sequence_s
     picture_t *         p_backward;
 
     /* Copyright extension */
-    boolean_t               b_copyright_flag;     /* Whether the following
-                                                     information is significant
-                                                     or not. */
-    u8                      i_copyright_id;
-    boolean_t               b_original;
-    u64                     i_copyright_nb;
+    boolean_t           b_copyright_flag;     /* Whether the following
+                                                 information is significant
+                                                 or not. */
+    u8                  i_copyright_id;
+    boolean_t           b_original;
+    u64                 i_copyright_nb;
 } sequence_t;
 
 /*****************************************************************************
@@ -89,6 +84,8 @@ typedef struct picture_parsing_s
     boolean_t           b_repeat_first_field;
     int                 i_l_stride, i_c_stride;
 
+    f_parse_mb_t        pf_parse_mb;
+
     /* Used for second field management */
     int                 i_current_structure;
 
@@ -100,8 +97,6 @@ typedef struct picture_parsing_s
     /* Relative to the current field */
     int                 i_coding_type, i_structure;
     boolean_t           b_frame_structure;
-    boolean_t           b_motion_field;
-    f_macroblock_type_t pf_macroblock_type;
 
     boolean_t           b_error;
 } picture_parsing_t;
