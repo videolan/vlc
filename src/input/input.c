@@ -1296,7 +1296,9 @@ static vlc_bool_t Control( input_thread_t *p_input, int i_type,
                 {
                     /* FIXME What to do ? */
                     msg_Warn( p_input, "cannot unset pause -> EOF" );
+                    vlc_mutex_unlock( &p_input->lock_control );
                     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
+                    vlc_mutex_lock( &p_input->lock_control );
                 }
 
                 b_force_update = VLC_TRUE;
