@@ -816,7 +816,6 @@ static void RunThread( adec_thread_t * p_adec )
                 }
                 else
                 {
-                    /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384) */
 //                    i_header = p_adec->bit_stream.fifo.buffer;
 //                    i_framesize = pi_framesize[ 128*((i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT) +
 //                        64*((i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT) +
@@ -835,8 +834,12 @@ static void RunThread( adec_thread_t * p_adec )
 //                    }
 
                     pthread_mutex_lock( &p_adec->p_aout_fifo->data_lock );
-                    /* (((end + 6) - start) & AOUT_FIFO_SIZE) < 6 */
-                    while ( ((p_adec->p_aout_fifo->l_start_frame - p_adec->p_aout_fifo->l_end_frame) & AOUT_FIFO_SIZE) < 6 ) /* !! */
+                    /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384)...
+                     * If these 6 frames would be recorded in the audio output fifo,
+                     * the l_end_frame index would be incremented 6 times. But, if after
+                     * this operation the audio output fifo would contain less than 6 frames,
+                     * it would mean that we had not enough room to store the 6 frames :-P */
+                    while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* !! */
                     {
                         pthread_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
                     }
