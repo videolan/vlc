@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.7 2003/09/08 00:35:16 fenrir Exp $
+ * $Id: mp4.h,v 1.8 2003/09/12 16:26:40 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -127,8 +127,6 @@ typedef struct track_data_mp4_s
  *****************************************************************************/
 struct demux_sys_t
 {
-    stream_t     *s;
-
     MP4_Box_t    *p_root;      /* container for the whole file */
 
     mtime_t      i_pcr;

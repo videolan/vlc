@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.60 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: avi.c,v 1.61 2003/09/12 16:26:40 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -150,14 +150,7 @@ static int Open( vlc_object_t * p_this )
     p_avi->b_odml = VLC_FALSE;
     p_avi->b_interleaved = VLC_FALSE;
 
-    /* Create stream facilities */
-    if( ( p_avi->s = stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream_t" );
-        free( p_avi );
-        return VLC_EGENERIC;
-    }
-    stream_Control( p_avi->s, STREAM_CAN_FASTSEEK, &p_avi->b_seekable );
+    stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &p_avi->b_seekable );
 
     p_input->pf_demux_control = Control;
     p_input->pf_demux = Demux_Seekable;
@@ -167,7 +160,7 @@ static int Open( vlc_object_t * p_this )
         p_input->pf_demux = Demux_UnSeekable;
     }
 
-    if( AVI_ChunkReadRoot( p_avi->s, &p_avi->ck_root ) )
+    if( AVI_ChunkReadRoot( p_input->s, &p_avi->ck_root ) )
     {
         msg_Err( p_input, "avi module discarded (invalid file)" );
         return VLC_EGENERIC;
@@ -507,7 +500,7 @@ static int Open( vlc_object_t * p_this )
     if( p_avi->i_length )
     {
         p_input->stream.i_mux_rate =
-            stream_Size( p_avi->s ) / 50 / p_avi->i_length;
+            stream_Size( p_input->s ) / 50 / p_avi->i_length;
 
         p_avi->b_interleaved = AVI_Interleaved( p_input );
         msg_Dbg( p_input, "interleaved=%s",
@@ -547,17 +540,16 @@ static int Open( vlc_object_t * p_this )
     if( p_avi->b_seekable )
     {
         /* we have read all chunk so go back to movi */
-        stream_Seek( p_avi->s, p_movi->i_chunk_pos );
+        stream_Seek( p_input->s, p_movi->i_chunk_pos );
     }
     /* Skip movi header */
-    stream_Read( p_avi->s, NULL, 12 );
+    stream_Read( p_input->s, NULL, 12 );
 
     p_avi->i_movi_begin = p_movi->i_chunk_pos;
     return VLC_SUCCESS;
 
 error:
-    AVI_ChunkFreeRoot( p_avi->s, &p_avi->ck_root );
-    stream_Release( p_avi->s );
+    AVI_ChunkFreeRoot( p_input->s, &p_avi->ck_root );
     free( p_avi );
     return VLC_EGENERIC;
 }
@@ -584,9 +576,8 @@ static void Close ( vlc_object_t * p_this )
     {
         subtitle_Close( p_avi->p_sub );
     }
-    AVI_ChunkFreeRoot( p_avi->s, &p_avi->ck_root );
+    AVI_ChunkFreeRoot( p_input->s, &p_avi->ck_root );
 
-    stream_Release( p_avi->s );
     free( p_avi );
 }
 
@@ -656,32 +647,8 @@ static int Demux_Seekable( input_thread_t *p_input )
         msg_Warn( p_input, "no track selected, exiting..." );
         return( 0 );
     }
-#if 0
-    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
-    {
-        mtime_t i_date;
-        int i_percent;
-        /* first wait for empty buffer, arbitrary time FIXME */
-        //msleep( DEFAULT_PTS_DELAY );
-
-        i_date = (mtime_t)1000000 *
-                 (mtime_t)p_avi->i_length *
-                 (mtime_t)stream_Tell( p_avi->s ) /
-                 (mtime_t)stream_Size( p_avi->s );
-        i_percent = 100 * stream_Tell( p_avi->s ) /
-                          stream_Size( p_avi->s );
-
-        Seek( p_input, i_date, i_percent);
-
-        if( p_avi->p_sub )
-        {
-            subtitle_Seek( p_avi->p_sub, p_avi->i_time );
-        }
-    }
-#endif
 
     /* wait for the good time */
-
     p_avi->i_pcr = p_avi->i_time * 9 / 100;
 
     input_ClockManageRef( p_input,
@@ -788,7 +755,7 @@ static int Demux_Seekable( input_thread_t *p_input )
              * in case we fail we will disable all finished stream */
             if( p_avi->i_movi_lastchunk_pos >= p_avi->i_movi_begin + 12 )
             {
-                stream_Seek( p_avi->s, p_avi->i_movi_lastchunk_pos );
+                stream_Seek( p_input->s, p_avi->i_movi_lastchunk_pos );
                 if( AVI_PacketNext( p_input ) )
                 {
                     return( AVI_StreamStopFinishedStreams( p_input ) ? 0 : 1 );
@@ -796,7 +763,7 @@ static int Demux_Seekable( input_thread_t *p_input )
             }
             else
             {
-                stream_Seek( p_avi->s, p_avi->i_movi_begin + 12 );
+                stream_Seek( p_input->s, p_avi->i_movi_begin + 12 );
             }
 
             for( ;; )
@@ -855,7 +822,7 @@ static int Demux_Seekable( input_thread_t *p_input )
         }
         else
         {
-            stream_Seek( p_avi->s, i_pos );
+            stream_Seek( p_input->s, i_pos );
         }
 
         /* read thoses data */
@@ -888,7 +855,7 @@ static int Demux_Seekable( input_thread_t *p_input )
             i_size += 8; // need to read and skip header
         }
 
-        if( ( p_pes = stream_PesPacket( p_avi->s, __EVEN( i_size ) ) ) == NULL )
+        if( ( p_pes = stream_PesPacket( p_input->s, __EVEN( i_size ) ) )==NULL )
         {
             msg_Warn( p_input, "failled reading data" );
             AVI_StreamStop( p_input, i_stream );
@@ -1165,7 +1132,7 @@ static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
 
             /* try to find chunk that is at i_percent or the file */
             i_pos = __MAX( i_percent *
-                           stream_Size( p_avi->s ) / 100,
+                           stream_Size( p_input->s ) / 100,
                            p_avi->i_movi_begin );
             /* search first selected stream */
             for( i_stream = 0, p_stream = NULL;
@@ -1272,7 +1239,7 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
                 *pf = (double)p_sys->i_time / (double)( p_sys->i_length * (mtime_t)1000000 );
                 return VLC_SUCCESS;
             }
-            else if( stream_Size( p_sys->s ) > 0 )
+            else if( stream_Size( p_input->s ) > 0 )
             {
                 unsigned int i;
                 int64_t i_tmp;
@@ -1293,7 +1260,7 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
                     }
 #undef tk
                 }
-                *pf = (double)i64 / (double)stream_Size( p_sys->s );
+                *pf = (double)i64 / (double)stream_Size( p_input->s );
                 return VLC_SUCCESS;
             }
             else
@@ -1467,7 +1434,7 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
 
     if( p_avi->i_movi_lastchunk_pos >= p_avi->i_movi_begin + 12 )
     {
-        stream_Seek( p_avi->s, p_avi->i_movi_lastchunk_pos );
+        stream_Seek( p_input->s, p_avi->i_movi_lastchunk_pos );
         if( AVI_PacketNext( p_input ) )
         {
             return VLC_EGENERIC;
@@ -1475,7 +1442,7 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
     }
     else
     {
-        stream_Seek( p_avi->s, p_avi->i_movi_begin + 12 );
+        stream_Seek( p_input->s, p_avi->i_movi_begin + 12 );
     }
 
     for( ;; )
@@ -1697,12 +1664,12 @@ static vlc_bool_t AVI_Interleaved( input_thread_t *p_input )
 
     int64_t         i_max;
 
-    if( stream_Size( p_sys->s ) <= 100 )
+    if( stream_Size( p_input->s ) <= 100 )
     {
         return VLC_FALSE;
     }
 
-    i_max = __MIN( 2000000, stream_Size( p_sys->s ) / 100 );
+    i_max = __MIN( 2000000, stream_Size( p_input->s ) / 100 );
 
 #define tk p_sys->pp_info[i]
     while( i_time < p_sys->i_length * (mtime_t)1000000)
@@ -1896,16 +1863,15 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
  ****************************************************************************/
 static int AVI_PacketGetHeader( input_thread_t *p_input, avi_packet_t *p_pk )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
     uint8_t  *p_peek;
 
-    if( stream_Peek( p_sys->s, &p_peek, 16 ) < 16 )
+    if( stream_Peek( p_input->s, &p_peek, 16 ) < 16 )
     {
         return VLC_EGENERIC;
     }
     p_pk->i_fourcc  = VLC_FOURCC( p_peek[0], p_peek[1], p_peek[2], p_peek[3] );
     p_pk->i_size    = GetDWLE( p_peek + 4 );
-    p_pk->i_pos     = stream_Tell( p_sys->s );
+    p_pk->i_pos     = stream_Tell( p_input->s );
     if( p_pk->i_fourcc == AVIFOURCC_LIST || p_pk->i_fourcc == AVIFOURCC_RIFF )
     {
         p_pk->i_type = VLC_FOURCC( p_peek[8],  p_peek[9],
@@ -1924,7 +1890,6 @@ static int AVI_PacketGetHeader( input_thread_t *p_input, avi_packet_t *p_pk )
 
 static int AVI_PacketNext( input_thread_t *p_input )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
     avi_packet_t    avi_ck;
     int             i_skip = 0;
 
@@ -1948,7 +1913,7 @@ static int AVI_PacketNext( input_thread_t *p_input )
         i_skip = __EVEN( avi_ck.i_size ) + 8;
     }
 
-    if( stream_Read( p_sys->s, NULL, i_skip ) != i_skip )
+    if( stream_Read( p_input->s, NULL, i_skip ) != i_skip )
     {
         return VLC_EGENERIC;
     }
@@ -1958,13 +1923,11 @@ static int AVI_PacketRead( input_thread_t   *p_input,
                            avi_packet_t     *p_pk,
                            pes_packet_t     **pp_pes )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
-
     size_t i_size;
 
     i_size = __EVEN( p_pk->i_size + 8 );
 
-    if( ( *pp_pes = stream_PesPacket( p_sys->s, i_size ) ) == NULL )
+    if( ( *pp_pes = stream_PesPacket( p_input->s, i_size ) ) == NULL )
     {
         return VLC_EGENERIC;
     }
@@ -1987,7 +1950,7 @@ static int AVI_PacketSearch( input_thread_t *p_input )
     avi_packet_t    avi_pk;
     for( ;; )
     {
-        if( stream_Read( p_avi->s, NULL, 1 ) != 1 )
+        if( stream_Read( p_input->s, NULL, 1 ) != 1 )
         {
             return VLC_EGENERIC;
         }
@@ -2182,8 +2145,8 @@ static void AVI_IndexLoad_indx( input_thread_t *p_input )
             avi_chunk_indx_t    ck_sub;
             for( i = 0; i < p_indx->i_entriesinuse; i++ )
             {
-                if( stream_Seek( p_avi->s, p_indx->idx.super[i].i_offset )||
-                    AVI_ChunkRead( p_avi->s, &ck_sub, NULL  ) )
+                if( stream_Seek( p_input->s, p_indx->idx.super[i].i_offset )||
+                    AVI_ChunkRead( p_input->s, &ck_sub, NULL  ) )
                 {
                     break;
                 }
@@ -2253,9 +2216,9 @@ static void AVI_IndexCreate( input_thread_t *p_input )
         p_avi->pp_info[i_stream]->p_index  = NULL;
     }
     i_movi_end = __MIN( (off_t)(p_movi->i_chunk_pos + p_movi->i_chunk_size),
-                        stream_Size( p_avi->s ) );
+                        stream_Size( p_input->s ) );
 
-    stream_Seek( p_avi->s, p_movi->i_chunk_pos + 12 );
+    stream_Seek( p_input->s, p_movi->i_chunk_pos + 12 );
     msg_Warn( p_input, "creating index from LIST-movi, will take time !" );
     for( ;; )
     {
@@ -2288,7 +2251,7 @@ static void AVI_IndexCreate( input_thread_t *p_input )
                                                 AVIFOURCC_RIFF, 1 );
 
                         msg_Dbg( p_input, "looking for new RIFF chunk" );
-                        if( stream_Seek( p_avi->s, p_avix->i_chunk_pos + 24 ) )
+                        if( stream_Seek( p_input->s, p_avix->i_chunk_pos + 24))
                         {
                             goto print_stat;
                         }

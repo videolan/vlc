@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.6 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: au.c,v 1.7 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -92,8 +92,6 @@ typedef struct
 
 struct demux_sys_t
 {
-    stream_t        *s;
-
     au_t            au;
     WAVEFORMATEX    wf;
 
@@ -135,18 +133,11 @@ static int Open( vlc_object_t * p_this )
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_time = 0;
 
-
-    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream" );
-        goto error;
-    }
-
     /* skip signature */
-    stream_Read( p_sys->s, NULL, 4 );   /* cannot fail */
+    stream_Read( p_input->s, NULL, 4 );   /* cannot fail */
 
     /* read header */
-    if( stream_Read( p_sys->s, &p_sys->au, sizeof( au_t ) ) < (int)sizeof( au_t ) )
+    if( stream_Read( p_input->s, &p_sys->au, sizeof(au_t) )<(int)sizeof(au_t) )
     {
         msg_Err( p_input, "cannot load header" );
         goto error;
@@ -174,7 +165,8 @@ static int Open( vlc_object_t * p_this )
     /* skip extra header data */
     if( p_sys->au.i_header_size > 4 + sizeof( au_t ) )
     {
-        stream_Read( p_sys->s, NULL, p_sys->au.i_header_size - 4 - sizeof( au_t ) );
+        stream_Read( p_input->s,
+                     NULL, p_sys->au.i_header_size - 4 - sizeof( au_t ) );
     }
 
     /* Create WAVEFORMATEX structure */
@@ -356,10 +348,6 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys->s )
-    {
-        stream_Release( p_sys->s );
-    }
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -376,12 +364,12 @@ static int DemuxPCM( input_thread_t *p_input )
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
-        int64_t i_pos = stream_Tell( p_sys->s );
+        int64_t i_pos = stream_Tell( p_input->s );
 
         if( p_sys->wf.nBlockAlign != 0 )
         {
             i_pos += p_sys->wf.nBlockAlign - i_pos % p_sys->wf.nBlockAlign;
-            if( stream_Seek( p_sys->s, i_pos ) )
+            if( stream_Seek( p_input->s, i_pos ) )
             {
                 msg_Err( p_input, "Seek failed(cannot resync)" );
             }
@@ -392,7 +380,7 @@ static int DemuxPCM( input_thread_t *p_input )
                           p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
-    if( ( p_pes = stream_PesPacket( p_sys->s, p_sys->i_frame_size ) ) == NULL )
+    if( ( p_pes = stream_PesPacket( p_input->s, p_sys->i_frame_size ) )==NULL )
     {
         msg_Warn( p_input, "cannot read data" );
         return 0;
@@ -422,7 +410,6 @@ static void Close( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;
 
-    stream_Release( p_sys->s );
     free( p_sys );
 }
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.237 2003/09/07 22:51:11 fenrir Exp $
+ * $Id: input.c,v 1.238 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -151,6 +151,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     /* Set target */
     p_input->psz_source = strdup( p_item->psz_uri );
+
+    /* Stream */
+    p_input->s = NULL;
 
     /* Demux */
     p_input->p_demux   = NULL;
@@ -626,6 +629,21 @@ static int InitThread( input_thread_t * p_input )
         }
     }
 
+    /* Create the stream_t facilities */
+    p_input->s = stream_OpenInput( p_input );
+    if( p_input->s == NULL )
+    {
+        /* should nver occur yet */
+
+        msg_Err( p_input, "cannot create stream_t !" );
+        module_Unneed( p_input, p_input->p_access );
+        if ( p_input->stream.p_sout != NULL )
+        {
+            sout_DeleteInstance( p_input->stream.p_sout );
+        }
+        return VLC_EGENERIC;
+    }
+
     /* Find and open appropriate demux module */
     p_input->p_demux = module_Need( p_input, "demux",
                                     p_input->psz_demux );
@@ -634,6 +652,7 @@ static int InitThread( input_thread_t * p_input )
     {
         msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
+        stream_Release( p_input->s );
         module_Unneed( p_input, p_input->p_access );
         if ( p_input->stream.p_sout != NULL )
         {
@@ -706,6 +725,9 @@ static void EndThread( input_thread_t * p_input )
 
     /* Free demultiplexer's data */
     module_Unneed( p_input, p_input->p_demux );
+
+    /* Destroy the stream_t facilities */
+    stream_Release( p_input->s );
 
     /* Close the access plug-in */
     module_Unneed( p_input, p_input->p_access );

@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.10 2003/09/10 11:51:00 fenrir Exp $
+ * $Id: sdp.c,v 1.11 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -75,8 +75,6 @@ struct access_sys_t
 
 struct demux_sys_t
 {
-    stream_t       *s;
-
     media_client_t *mc;
 
     /* try to detect end of stream */
@@ -255,11 +253,6 @@ static int SDPOpen( vlc_object_t * p_this )
     var_Create( p_input, "rtsp-tcp", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     var_Get( p_input, "rtsp-tcp", &val );
     p_sys->mc = media_client_create( val.b_bool ? 1 : 0 );
-    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream" );
-        goto error;
-    }
     p_sys->i_no_data = 0;
     p_sys->b_received_data = VLC_FALSE;
 
@@ -271,7 +264,8 @@ static int SDPOpen( vlc_object_t * p_this )
     {
         int i_read;
 
-        i_read = stream_Read( p_sys->s, &psz_sdp[i_sdp], i_sdp_max - i_sdp -1 );
+        i_read = stream_Read( p_input->s,
+                              &psz_sdp[i_sdp], i_sdp_max - i_sdp -1 );
         if( i_read < i_sdp_max - i_sdp -1 )
         {
             if( i_read > 0 )
@@ -342,10 +336,6 @@ static int SDPOpen( vlc_object_t * p_this )
 error:
     media_client_release( p_sys->mc );
 
-    if( p_sys->s )
-    {
-        stream_Release( p_sys->s );
-    }
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -377,7 +367,6 @@ static void SDPClose( vlc_object_t * p_this )
     }
 
     media_client_release( p_sys->mc );
-    stream_Release( p_sys->s );
     free( p_sys );
 }
 

@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.26 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: mkv.cpp,v 1.27 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -233,8 +233,6 @@ typedef struct
 
 struct demux_sys_t
 {
-    stream_t                *s;
-
     vlc_stream_io_callback  *in;
     EbmlStream              *es;
     EbmlParser              *ep;
@@ -321,13 +319,7 @@ static int Open( vlc_object_t * p_this )
     p_input->p_demux_data = p_sys = (demux_sys_t*)malloc(sizeof( demux_sys_t ));
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
-    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream" );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-    p_sys->in = new vlc_stream_io_callback( p_sys->s );
+    p_sys->in = new vlc_stream_io_callback( p_input->s );
     p_sys->es = new EbmlStream( *p_sys->in );
     p_sys->f_duration   = -1;
     p_sys->i_timescale     = MKVD_TIMECODESCALE;
@@ -354,7 +346,6 @@ static int Open( vlc_object_t * p_this )
     {
         msg_Err( p_input, "failed to create EbmlStream" );
         delete p_sys->in;
-        stream_Release( p_sys->s );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -992,7 +983,7 @@ static int Open( vlc_object_t * p_this )
     {
         vlc_bool_t b_seekable;
 
-        stream_Control( p_sys->s, STREAM_CAN_FASTSEEK, &b_seekable );
+        stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &b_seekable );
         if( b_seekable )
         {
             LoadCues( p_input );
@@ -1029,7 +1020,7 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->f_duration > 1001.0 )
     {
         mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000.0 );
-        p_input->stream.i_mux_rate = stream_Size( p_sys->s ) / 50 / i_duration;
+        p_input->stream.i_mux_rate = stream_Size( p_input->s )/50 / i_duration;
     }
 
     /* add all es */
@@ -1320,7 +1311,6 @@ static int Open( vlc_object_t * p_this )
 error:
     delete p_sys->es;
     delete p_sys->in;
-    stream_Release( p_sys->s );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -1364,7 +1354,6 @@ static void Close( vlc_object_t *p_this )
     delete p_sys->ep;
     delete p_sys->es;
     delete p_sys->in;
-    stream_Release( p_sys->s );
 
     free( p_sys );
 }
@@ -1696,7 +1685,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     /* seek without index or without date */
     if( config_GetInt( p_input, "mkv-seek-percent" ) || !p_sys->b_cues || i_date < 0 )
     {
-        int64_t i_pos = i_percent * stream_Size( p_sys->s ) / 100;
+        int64_t i_pos = i_percent * stream_Size( p_input->s ) / 100;
 
         msg_Dbg( p_input, "imprecise way of seeking" );
         for( i_index = 0; i_index < p_sys->i_index; i_index++ )
@@ -1711,7 +1700,8 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
             i_index--;
         }
 
-        p_sys->in->setFilePointer( p_sys->index[i_index].i_position, seek_beginning );
+        p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
+                                   seek_beginning );
 
         if( p_sys->index[i_index].i_position < i_pos )
         {
@@ -1757,7 +1747,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
         msg_Dbg( p_input, "seek got "I64Fd" (%d%%)",
                  p_sys->index[i_index].i_time,
                  (int)( 100 * p_sys->index[i_index].i_position /
-                        stream_Size( p_sys->s ) ) );
+                        stream_Size( p_input->s ) ) );
 
         p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
                                    seek_beginning );
@@ -1839,12 +1829,12 @@ static int Demux( input_thread_t * p_input )
             i_date = (mtime_t)1000000 *
                      (mtime_t)i_duration*
                      (mtime_t)p_sys->in->getFilePointer() /
-                     (mtime_t)stream_Size( p_sys->s );
+                     (mtime_t)stream_Size( p_input->s );
         }
-        if( stream_Size( p_sys->s ) > 0 )
+        if( stream_Size( p_input->s ) > 0 )
         {
             i_percent = 100 * p_sys->in->getFilePointer() /
-                        stream_Size( p_sys->s );
+                        stream_Size( p_input->s );
         }
 
         Seek( p_input, i_date, i_percent);
@@ -2429,7 +2419,7 @@ static void InformationsCreate( input_thread_t *p_input )
     {
         vlc_bool_t b_seekable;
 
-        stream_Control( p_sys->s, STREAM_CAN_FASTSEEK, &b_seekable );
+        stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &b_seekable );
         if( b_seekable )
         {
             LoadTags( p_input );

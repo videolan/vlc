@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.36 2003/09/08 00:35:16 fenrir Exp $
+ * $Id: mp4.c,v 1.37 2003/09/12 16:26:40 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -141,14 +141,6 @@ static int Open( vlc_object_t * p_this )
     /* create our structure that will contains all data */
     p_input->p_demux_data = p_demux = malloc( sizeof( demux_sys_t ) );
     memset( p_demux, 0, sizeof( demux_sys_t ) );
-
-    /* Create stream facilities */
-    if( ( p_demux->s= stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream_t" );
-        free( p_demux );
-        return VLC_EGENERIC;
-    }
 
     /* Now load all boxes ( except raw data ) */
     if( ( p_demux->p_root = MP4_BoxGetRoot( p_input ) ) == NULL )
@@ -398,7 +390,6 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    stream_Release( p_demux->s );
     if( p_demux->p_root )
     {
         MP4_BoxFree( p_input, p_demux->p_root );
@@ -513,7 +504,7 @@ static int Demux( input_thread_t *p_input )
                 //msg_Dbg( p_input, "stream %d size=%6d pos=%8lld",  i_track, i_size, i_pos );
 
                 /* go,go go ! */
-                if( stream_Seek( p_demux->s, i_pos ) )
+                if( stream_Seek( p_input->s, i_pos ) )
                 {
                     msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
                     MP4_TrackUnselect( p_input, &track );
@@ -521,7 +512,7 @@ static int Demux( input_thread_t *p_input )
                 }
 
                 /* now read pes */
-                if( ( p_pes = stream_PesPacket( p_demux->s, i_size ) ) == NULL )
+                if( ( p_pes = stream_PesPacket( p_input->s, i_size ) ) == NULL )
                 {
                     msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
                     MP4_TrackUnselect( p_input, &track );

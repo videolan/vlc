@@ -2,7 +2,7 @@
  * a52.c : Raw a52 Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.5 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: a52sys.c,v 1.6 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -53,7 +53,6 @@ static int  Demux       ( input_thread_t * );
 
 struct demux_sys_t
 {
-    stream_t        *s;
     mtime_t         i_time;
 
     es_descriptor_t *p_es;
@@ -132,13 +131,7 @@ static int Open( vlc_object_t * p_this )
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->i_time = 0;
 
-    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream" );
-        goto error;
-    }
-
-    if( stream_Peek( p_sys->s, &p_peek, 6 ) < 6 )
+    if( stream_Peek( p_input->s, &p_peek, 6 ) < 6 )
     {
         msg_Err( p_input, "cannot peek" );
         goto error;
@@ -198,10 +191,6 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys->s )
-    {
-        stream_Release( p_sys->s );
-    }
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -221,7 +210,7 @@ static int Demux( input_thread_t * p_input )
 
     uint8_t      *p_peek;
 
-    if( stream_Peek( p_sys->s, &p_peek, 6 ) < 6 )
+    if( stream_Peek( p_input->s, &p_peek, 6 ) < 6 )
     {
         msg_Warn( p_input, "cannot peek" );
         return 0;
@@ -234,7 +223,7 @@ static int Demux( input_thread_t * p_input )
         int         i_skip = 0;
         int         i_peek;
 
-        i_peek = stream_Peek( p_sys->s, &p_peek, 8096 );
+        i_peek = stream_Peek( p_input->s, &p_peek, 8096 );
         if( i_peek < 8 )
         {
             msg_Warn( p_input, "cannot peek" );
@@ -255,7 +244,7 @@ static int Demux( input_thread_t * p_input )
         }
 
         msg_Warn( p_input, "garbage=%d bytes", i_skip );
-        stream_Read( p_sys->s, NULL, i_skip );
+        stream_Read( p_input->s, NULL, i_skip );
         return 1;
     }
 
@@ -265,7 +254,7 @@ static int Demux( input_thread_t * p_input )
                           p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
-    if( ( p_pes = stream_PesPacket( p_sys->s, i_frame_size ) ) == NULL )
+    if( ( p_pes = stream_PesPacket( p_input->s, i_frame_size ) ) == NULL )
     {
         msg_Warn( p_input, "cannot read data" );
         return 0;
@@ -298,10 +287,6 @@ static void Close( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t*)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;
 
-    if( p_sys->s )
-    {
-        stream_Release( p_sys->s );
-    }
     free( p_sys );
 }
 

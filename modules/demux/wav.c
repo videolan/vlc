@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.6 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: wav.c,v 1.7 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -52,8 +52,6 @@ static int  Demux       ( input_thread_t * );
 
 struct demux_sys_t
 {
-    stream_t        *s;
-
     WAVEFORMATEX    *p_wf;
     es_descriptor_t *p_es;
 
@@ -109,14 +107,8 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es           = NULL;
     p_sys->i_time         = 0;
 
-    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream" );
-        goto error;
-    }
-
     /* skip riff header */
-    stream_Read( p_sys->s, NULL, 12 );  /* cannot fail as peek succeed */
+    stream_Read( p_input->s, NULL, 12 );  /* cannot fail as peek succeed */
 
     /* search fmt chunk */
     if( ChunkFind( p_input, "fmt ", &i_size ) )
@@ -129,12 +121,13 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "invalid 'fmt ' chunk" );
         goto error;
     }
-    stream_Read( p_sys->s, NULL, 8 );   /* cannot fail */
+    stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
 
     /* load waveformatex */
     p_sys->p_wf = malloc( __EVEN( i_size ) + 2 ); /* +2, for raw audio -> no cbSize */
     p_sys->p_wf->cbSize = 0;
-    if( stream_Read( p_sys->s, p_sys->p_wf, __EVEN( i_size ) ) < (int)__EVEN( i_size ) )
+    if( stream_Read( p_input->s,
+                     p_sys->p_wf, __EVEN( i_size ) ) < (int)__EVEN( i_size ) )
     {
         msg_Err( p_input, "cannot load 'fmt ' chunk" );
         goto error;
@@ -164,9 +157,9 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    p_sys->i_data_pos = stream_Tell( p_sys->s );
+    p_sys->i_data_pos = stream_Tell( p_input->s );
 
-    stream_Read( p_sys->s, NULL, 8 );   /* cannot fail */
+    stream_Read( p_input->s, NULL, 8 );   /* cannot fail */
 
     wf_tag_to_fourcc( p_sys->p_wf->wFormatTag, &i_fourcc, &psz_name );
     if( i_fourcc == VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
@@ -254,10 +247,6 @@ relay:
     {
         free( p_sys->p_wf );
     }
-    if( p_sys->s )
-    {
-        stream_Release( p_sys->s );
-    }
     free( p_sys );
 
     return VLC_EGENERIC;
@@ -276,11 +265,11 @@ static int Demux( input_thread_t *p_input )
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
-        i_pos = stream_Tell( p_sys->s );
+        i_pos = stream_Tell( p_input->s );
         if( p_sys->p_wf->nBlockAlign != 0 )
         {
             i_pos += p_sys->p_wf->nBlockAlign - i_pos % p_sys->p_wf->nBlockAlign;
-            if( stream_Seek( p_sys->s, i_pos ) )
+            if( stream_Seek( p_input->s, i_pos ) )
             {
                 msg_Err( p_input, "stream_Sekk failed (cannot resync)" );
             }
@@ -291,7 +280,7 @@ static int Demux( input_thread_t *p_input )
                           p_input->stream.p_selected_program,
                           p_sys->i_time * 9 / 100 );
 
-    i_pos = stream_Tell( p_sys->s );
+    i_pos = stream_Tell( p_input->s );
 
     if( p_sys->i_data_size > 0 &&
         i_pos >= p_sys->i_data_pos + p_sys->i_data_size )
@@ -300,7 +289,7 @@ static int Demux( input_thread_t *p_input )
         return 0;
     }
 
-    if( ( p_pes = stream_PesPacket( p_sys->s, p_sys->i_frame_size ) ) == NULL )
+    if( ( p_pes = stream_PesPacket( p_input->s, p_sys->i_frame_size ) )==NULL )
     {
         msg_Warn( p_input, "cannot read data" );
         return 0;
@@ -330,7 +319,6 @@ static void Close ( vlc_object_t * p_this )
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;
 
-    stream_Release( p_sys->s );
     free( p_sys->p_wf );
     free( p_sys );
 }
@@ -342,14 +330,13 @@ static void Close ( vlc_object_t * p_this )
 static int ChunkFind( input_thread_t *p_input,
                       char *fcc, unsigned int *pi_size )
 {
-    demux_sys_t *p_sys = p_input->p_demux_data;
     uint8_t     *p_peek;
 
     for( ;; )
     {
         int i_size;
 
-        if( stream_Peek( p_sys->s, &p_peek, 8 ) < 8 )
+        if( stream_Peek( p_input->s, &p_peek, 8 ) < 8 )
         {
             msg_Err( p_input, "cannot peek()" );
             return VLC_EGENERIC;
@@ -369,7 +356,7 @@ static int ChunkFind( input_thread_t *p_input,
         }
 
         i_size = __EVEN( i_size ) + 8;
-        if( stream_Read( p_sys->s, NULL, i_size ) != i_size )
+        if( stream_Read( p_input->s, NULL, i_size ) != i_size )
         {
             return VLC_EGENERIC;
         }

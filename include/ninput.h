@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.8 2003/09/07 22:45:16 fenrir Exp $
+ * $Id: ninput.h,v 1.9 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -23,6 +23,132 @@
 
 #ifndef _NINPUT_H
 #define _NINPUT_H 1
+
+#if 0
+enum es_extra_type_e
+{
+    ES_EXTRA_TYPE_UNKNOWN,
+    ES_EXTRA_TYPE_WAVEFORMATEX,
+    ES_EXTRA_TYPE_BITMAPINFOHEADER
+};
+
+typedef struct
+{
+    int             i_cat;
+    vlc_fourcc_t    i_codec;
+
+    int             i_group;    /* eg -1. if >= 0 then a "group" (program) is
+                                   created for each value */
+
+    int             i_priority; /*  -2 : mean not selectable by the users
+                                    -1 : mean not selected by default even
+                                        when no other stream
+                                    >=0: priority */
+    char            *psz_language;
+    char            *psz_description;
+
+    struct
+    {
+        int i_samplerate;
+        int i_channels;
+        int i_bitrate;
+        int i_blockalign;
+        int i_bitspersample;
+    } audio;
+
+    struct
+    {
+        int i_width;
+        int i_height;
+        int i_display_width;
+        int i_display_height;
+    } video;
+
+    struct
+    {
+        char *psz_encoding;
+    } subs;
+
+    int     i_extra_type;
+    int     i_extra;
+    void    *p_extra;
+} es_format_t;
+
+static inline void es_format_Init( es_format_t *fmt,
+                                   int i_cat, vlc_fourcc_t i_codec )
+{
+    fmt->i_cat                  = i_cat;
+    fmt->i_codec                = i_codec;
+    fmt->i_group                = -1;
+    fmt->i_priority             = 0;
+    fmt->psz_language           = NULL;
+    fmt->psz_description        = NULL;
+
+    fmt->audio.i_samplerate     = 0;
+    fmt->audio.i_channels       = 0;
+    fmt->audio.i_bitrate        = 0;
+    fmt->audio.i_blockalign     = 0;
+    fmt->audio.i_bitspersample  = 0;
+
+    fmt->video.i_width          = 0;
+    fmt->video.i_height         = 0;
+    fmt->video.i_display_width  = 0;
+    fmt->video.i_display_height = 0;
+
+    fmt->subs.psz_encoding      = NULL;
+
+    fmt->i_extra_type           = ES_EXTRA_TYPE_UNKNOWN;
+    fmt->i_extra                = 0;
+    fmt->p_extra                = NULL;
+}
+
+enum es_out_query_e
+{
+    ES_OUT_SET_SELECT,  /* arg1= es_out_id_t* arg2=vlc_bool_t   */
+    ES_OUT_GET_SELECT   /* arg1= es_out_id_t* arg2=vlc_bool_t*  */
+};
+
+typedef struct es_out_t     es_out_t;
+typedef struct es_out_id_t  es_out_id_t;
+typedef struct es_out_sys_t es_out_sys_t;
+
+struct es_out_t
+{
+    es_out_id_t (*pf_add)    ( es_out_t *, es_format_t * );
+    int         (*pf_send)   ( es_out_t *, es_out_id_t *, pes_packet_t * );
+    void        (*pf_del)    ( es_out_t *, es_out_id_t * );
+    int         (*pf_control)( es_out_t *, int i_query, va_list );
+
+    es_out_sys_t    *p_sys;
+};
+
+static inline es_out_id_t * es_out_Add( es_out_t *out, es_format_t *fmt )
+{
+    return out->pf_add( out, fmt );
+}
+static inline void es_out_Del( es_out_t *out, es_out_id_t *id )
+{
+    out->pf_del( out, id );
+}
+static inline int es_out_Send( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
+{
+    return out->pf_send( out, id, p_pes );
+}
+static inline int es_out_vaControl( es_out_t *out, int i_query, va_list args )
+{
+    return out->pf_control( out, i_query, args );
+}
+static inline int es_out_Control( es_out_t *out, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    i_result = es_out_vaControl( out, i_query, args );
+    va_end( args );
+    return i_result;
+}
+#endif
 
 /**
  * \defgroup stream Stream
@@ -83,7 +209,6 @@ static int inline stream_Seek( stream_t *s, int64_t i_pos )
 
 /**
  * \defgroup demux Demux
- * XXX: don't look at it yet.
  * @{
  */
 enum demux_query_e

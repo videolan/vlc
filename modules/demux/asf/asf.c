@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.37 2003/09/07 22:48:29 fenrir Exp $
+ * $Id: asf.c,v 1.38 2003/09/12 16:26:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -76,8 +76,6 @@ struct demux_sys_t
 
     int64_t             i_data_begin;
     int64_t             i_data_end;
-
-    stream_t            *s;
 };
 
 static mtime_t  GetMoviePTS( demux_sys_t * );
@@ -123,20 +121,11 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_time = -1;
     p_sys->i_length = 0;
 
-    /* Create stream facilities */
-    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot create stream" );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
     /* Now load all object ( except raw data ) */
-    stream_Control( p_sys->s, STREAM_CAN_FASTSEEK, &b_seekable );
-    if( (p_sys->p_root = ASF_ReadObjectRoot( p_sys->s, b_seekable )) == NULL )
+    stream_Control( p_input->s, STREAM_CAN_FASTSEEK, &b_seekable );
+    if( (p_sys->p_root = ASF_ReadObjectRoot( p_input->s, b_seekable )) == NULL )
     {
         msg_Warn( p_input, "ASF plugin discarded (not a valid file)" );
-        stream_Release( p_sys->s );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -328,13 +317,13 @@ static int Open( vlc_object_t * p_this )
 
 
     /* go to first packet */
-    stream_Seek( p_sys->s, p_sys->i_data_begin );
+    stream_Seek( p_input->s, p_sys->i_data_begin );
 
     /* try to calculate movie time */
     if( p_sys->p_fp->i_data_packets_count > 0 )
     {
         int64_t i_count;
-        int64_t i_size = stream_Size( p_sys->s );
+        int64_t i_size = stream_Size( p_input->s );
 
         if( p_sys->i_data_end > 0 && i_size > p_sys->i_data_end )
         {
@@ -446,8 +435,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    ASF_FreeObjectRoot( p_sys->s, p_sys->p_root );
-    stream_Release( p_sys->s );
+    ASF_FreeObjectRoot( p_input->s, p_sys->p_root );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -486,7 +474,7 @@ static int Demux( input_thread_t *p_input )
 
         msleep( p_input->i_pts_delay );
 
-        i_offset = stream_Tell( p_sys->s ) - p_sys->i_data_begin;
+        i_offset = stream_Tell( p_input->s ) - p_sys->i_data_begin;
         if( i_offset  < 0 )
         {
             i_offset = 0;
@@ -496,7 +484,7 @@ static int Demux( input_thread_t *p_input )
             i_offset -= i_offset % p_sys->p_fp->i_min_data_packet_size;
         }
 
-        if( stream_Seek( p_sys->s, i_offset + p_sys->i_data_begin ) )
+        if( stream_Seek( p_input->s, i_offset + p_sys->i_data_begin ) )
         {
             msg_Warn( p_input, "cannot resynch after seek (EOF?)" );
             return -1;
@@ -568,7 +556,7 @@ static void Close( vlc_object_t * p_this )
 
     msg_Dbg( p_input, "Freeing all memory" );
 
-    ASF_FreeObjectRoot( p_sys->s, p_sys->p_root );
+    ASF_FreeObjectRoot( p_input->s, p_sys->p_root );
     for( i_stream = 0; i_stream < 128; i_stream++ )
     {
 #define p_stream p_sys->stream[i_stream]
@@ -582,7 +570,6 @@ static void Close( vlc_object_t * p_this )
         }
 #undef p_stream
     }
-    stream_Release( p_sys->s );
     free( p_sys );
 }
 
@@ -649,7 +636,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
     int         i_payload_length_type;
 
 
-    if( stream_Peek( p_sys->s, &p_peek, i_data_packet_min ) < i_data_packet_min )
+    if( stream_Peek( p_input->s, &p_peek,i_data_packet_min)<i_data_packet_min )
     {
         // EOF ?
         msg_Warn( p_input, "cannot peek while getting new packet, EOF ?" );
@@ -881,7 +868,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
             }
 
             i_read = i_sub_payload_data_length + i_skip;
-            if((p_data = stream_DataPacket( p_sys->s,i_read,VLC_TRUE)) == NULL)
+            if((p_data = stream_DataPacket( p_input->s,i_read,VLC_TRUE))==NULL)
             {
                 msg_Warn( p_input, "cannot read data" );
                 return( 0 );
@@ -905,7 +892,8 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
             i_skip = 0;
             if( i_packet_size_left > 0 )
             {
-                if( stream_Peek( p_sys->s, &p_peek, i_packet_size_left ) < i_packet_size_left )
+                if( stream_Peek( p_input->s, &p_peek, i_packet_size_left )
+                                                         < i_packet_size_left )
                 {
                     // EOF ?
                     msg_Warn( p_input, "cannot peek, EOF ?" );
@@ -917,7 +905,8 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
 
     if( i_packet_size_left > 0 )
     {
-        if( stream_Read( p_sys->s, NULL, i_packet_size_left ) < i_packet_size_left )
+        if( stream_Read( p_input->s, NULL, i_packet_size_left )
+                                                         < i_packet_size_left )
         {
             msg_Warn( p_input, "cannot skip data, EOF ?" );
             return( 0 );
@@ -933,7 +922,7 @@ loop_error_recovery:
         msg_Err( p_input, "unsupported packet header, fatal error" );
         return( -1 );
     }
-    stream_Read( p_sys->s, NULL, i_data_packet_min );
+    stream_Read( p_input->s, NULL, i_data_packet_min );
 
     return( 1 );
 }
