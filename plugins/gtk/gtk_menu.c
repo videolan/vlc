@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.7 2001/05/30 23:02:04 stef Exp $
+ * $Id: gtk_menu.c,v 1.8 2001/05/31 16:10:05 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -176,7 +176,9 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
         input_ChangeArea( p_intf->p_input, (input_area_t*)p_area );
 
         p_intf->p_sys->b_chapter_update = 1;
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
@@ -197,7 +199,9 @@ void GtkMenubarTitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
                           p_intf->p_input->stream.pp_areas[i_title] );
 
         p_intf->p_sys->b_title_update = 1;
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
         p_intf->p_sys->b_title_update = 0;
 
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );

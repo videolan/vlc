@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.10 2001/05/31 03:12:49 sam Exp $
+ * $Id: aout_spdif.c,v 1.11 2001/05/31 16:10:05 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -41,7 +41,7 @@
 #include "audio_output.h"
 #include "aout_common.h"
 
-#define BLANK_FRAME_MAX 100
+#define BLANK_FRAME_MAX 1000
 #define SLEEP_TIME      16000
 
 /*****************************************************************************

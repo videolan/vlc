@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.65 2001/05/31 03:57:54 sam Exp $
+ * $Id: input_dvd.c,v 1.66 2001/05/31 16:10:05 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -95,6 +95,13 @@
 #include "debug.h"
 
 #include "modules.h"
+
+/* how many blocks DVDRead will read in each loop */
+#define DVD_BLOCK_READ_ONCE 32
+#define DVD_DATA_READ_ONCE  4*DVD_BLOCK_READ_ONCE
+
+/* Size of netlist */
+#define DVD_NETLIST_SIZE    2048
 
 /*****************************************************************************
  * Local prototypes
@@ -223,11 +230,11 @@ static void DVDInit( input_thread_t * p_input )
 
     p_dvd->i_fd = p_input->i_handle;
 
-    /* reading several block once seems to cause lock-up
-     * when using input_ToggleES
-     * who wrote thez damn buggy piece of shit ??? --stef */
-    p_dvd->i_block_once = 32;
-    p_input->i_read_once = 128;
+    /* We read DVD_BLOCK_READ_ONCE in each loop, so the input will receive
+     * DVD_DATA_READ_ONCE at most */
+    p_dvd->i_block_once = DVD_BLOCK_READ_ONCE;
+    /* this value mustn't be modifed */
+    p_input->i_read_once = DVD_DATA_READ_ONCE;
 
     i = CSSTest( p_input->i_handle );
 
@@ -249,7 +256,8 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Reading structures initialisation */
     p_input->p_method_data =
-        DVDNetlistInit( 2048, 4096, 2048, DVD_LB_SIZE, p_dvd->i_block_once );
+        DVDNetlistInit( DVD_NETLIST_SIZE, 2*DVD_NETLIST_SIZE,
+                        DVD_NETLIST_SIZE, DVD_LB_SIZE, p_dvd->i_block_once );
     intf_WarnMsg( 2, "dvd info: netlist initialized" );
 
     /* Ifo allocation & initialisation */
@@ -818,7 +826,7 @@ static int DVDRead( input_thread_t * p_input,
     thread_dvd_data_t *     p_dvd;
     dvd_netlist_t *         p_netlist;
     struct iovec *          p_vec;
-    struct data_packet_s ** pp_data;
+    struct data_packet_s *  pp_data[DVD_DATA_READ_ONCE];
     u8 *                    pi_cur;
     int                     i_block_once;
     int                     i_packet_size;
@@ -831,22 +839,6 @@ static int DVDRead( input_thread_t * p_input,
     boolean_t               b_eof;
     boolean_t               b_eot;
 
-    pp_data = (struct data_packet_s **) malloc( p_input->i_read_once *
-                                        sizeof( struct data_packet_s * ) );
-    if( pp_data == NULL )
-    {
-        intf_ErrMsg( "dvd error: out of memory" );
-        return -1;
-    }
-
-    pp_data = (struct data_packet_s **) malloc( p_input->i_read_once *
-                                        sizeof( struct data_packet_s * ) );
-    if( pp_data == NULL )
-    {
-        intf_ErrMsg( "dvd error: out of memory" );
-        return -1;
-    }
-
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
 
@@ -854,7 +846,6 @@ static int DVDRead( input_thread_t * p_input,
     if( ( p_vec = DVDGetiovec( p_netlist ) ) == NULL )
     {
         intf_ErrMsg( "dvd error: can't get iovec" );
-        free( pp_data );
         return -1;
     }
 
@@ -873,7 +864,6 @@ static int DVDRead( input_thread_t * p_input,
         {
             pp_packets[0] = NULL;
             intf_ErrMsg( "dvd error: can't find next cell" );
-            free( pp_data );
             return 1;
         }
 
@@ -980,7 +970,6 @@ static int DVDRead( input_thread_t * p_input,
                 else
                 {
                     intf_ErrMsg( "Unable to determine stream type" );
-                    free( pp_data );
                     return( -1 );
                 }
 
@@ -1017,10 +1006,6 @@ static int DVDRead( input_thread_t * p_input,
     b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    free( pp_data );
-
-    free( pp_data );
 
     if( b_eof )
     {

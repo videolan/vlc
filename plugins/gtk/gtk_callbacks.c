@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.23 2001/05/30 23:02:03 stef Exp $
+ * $Id: gtk_callbacks.c,v 1.24 2001/05/31 16:10:05 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -205,7 +205,9 @@ void GtkTitlePrev( GtkButton * button, gpointer user_data )
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
     }
 }
 
@@ -227,7 +229,9 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_title_update = 1;
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
     }
 
 }
@@ -249,7 +253,9 @@ void GtkChapterPrev( GtkButton * button, gpointer user_data )
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
     }
 }
 
@@ -270,7 +276,9 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
         input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
 
         p_intf->p_sys->b_chapter_update = 1;
+        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
         GtkSetupMenus( p_intf );
+        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
     }
 }
 
