@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.12 2002/05/04 15:49:56 sam Exp $
+ * $Id: ipv4.c,v 1.12.2.1 2002/07/19 21:12:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -56,10 +56,6 @@
 #endif
 
 #include "network.h"
-
-/* Default MTU used for UDP socket. FIXME: we should issue some ioctl()
- * call to get that value from the interface driver. */
-#define DEFAULT_MTU 1500
 
 /*****************************************************************************
  * Local prototypes
@@ -309,7 +305,7 @@ static int OpenUDP( network_socket_t * p_socket )
     }
 
     p_socket->i_handle = i_handle;
-    p_socket->i_mtu = DEFAULT_MTU;
+    p_socket->i_mtu = config_GetIntVariable( "mtu" );
     return( 0 );
 }
 
