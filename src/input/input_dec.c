@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: input_dec.c,v 1.91 2004/02/25 12:38:33 fenrir Exp $
+ * $Id: input_dec.c,v 1.92 2004/02/25 18:47:02 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -257,7 +257,8 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
             }
             p_block->i_pts = p_pes->i_pts;
             p_block->i_dts = p_pes->i_dts;
-            p_block->b_discontinuity = p_pes->b_discontinuity;
+            if( p_pes->b_discontinuity )
+                p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
             p_block->i_rate = p_pes->i_rate;
 
             input_DecodeBlock( p_dec, p_block );
@@ -306,7 +307,7 @@ static void input_NullPacket( input_thread_t * p_input,
     if( p_block )
     {
         memset( p_block->p_buffer, 0, PADDING_PACKET_SIZE );
-        p_block->b_discontinuity = 1;
+        p_block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
 
         block_FifoPut( p_es->p_dec->p_owner->p_fifo, p_block );
     }
