@@ -22,16 +22,18 @@
  *****************************************************************************/
 
 
-@interface VLCConfigControl : NSBox
+@interface VLCConfigControl : NSView
 {
     vlc_object_t    *p_this;
+    module_config_t *p_item;
     char            *psz_name;
     NSTextField     *o_label;
     int             i_type;
     vlc_bool_t      b_advanced;
+    NSView          *contentView;
 }
 
-+ (VLCConfigControl *)newControl: (module_config_t *)p_item withView: (NSView *)o_parent_view withObject: (vlc_object_t *)p_this;
++ (VLCConfigControl *)newControl: (module_config_t *)p_item withView: (NSView *)o_parent_view withObject: (vlc_object_t *)p_this offset:(NSPoint) offset;
 - (id)initWithFrame: (NSRect)frame item: (module_config_t *)p_item withObject: (vlc_object_t *)_p_this;
 - (NSString *)getName;
 - (int)getType;
@@ -50,6 +52,7 @@
 }
 
 @end
+#if 0
 
 @interface ModuleConfigControl : VLCConfigControl
 {
@@ -57,7 +60,7 @@
 }
 
 @end
-
+#endif
 @interface StringConfigControl : VLCConfigControl
 {
     NSTextField     *o_textfield;
@@ -71,7 +74,6 @@
 }
 
 @end
-
 @interface FileConfigControl : VLCConfigControl
 {
     NSTextField     *o_textfield;
@@ -114,6 +116,7 @@
 - (void)textfieldChanged:(NSNotification *)o_notification;
 
 @end
+#if 0
 
 @interface FloatConfigControl : VLCConfigControl
 {
@@ -142,3 +145,4 @@
 }
 
 @end
+#endif

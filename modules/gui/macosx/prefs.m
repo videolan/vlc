@@ -46,8 +46,12 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 
+#include <vlc/vlc.h>
+#include <vlc_config_cat.h>
+
 #include "intf.h"
 #include "prefs.h"
+#include "prefs_widgets.h"
 #include "vlc_keys.h"
 
 /*****************************************************************************
@@ -144,8 +148,10 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     if( i_return == NSAlertAlternateReturn )
     {
         config_ResetAll( p_intf );
-        [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
+        [[o_tree itemAtRow:[o_tree selectedRow]] showView:o_prefs_view];
+/*        [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
             andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
+*/
     }
 }
 
@@ -154,8 +160,10 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     b_advanced = !b_advanced;
     [o_advanced_ckb setState: b_advanced];
     /* refresh the view of the current treeitem */
-    /* [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
-        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]]; */
+    [[o_tree itemAtRow:[o_tree selectedRow]] showView:o_prefs_view];
+/*    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
+        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
+*/
 }
 
 - (void)loadConfigTree
@@ -169,9 +177,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 /* update the document view to the view of the selected tree item */
 - (void)outlineViewSelectionDidChange:(NSNotification *)o_notification
 {
-    /*
-    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
-        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];*/
+    [[o_tree itemAtRow:[o_tree selectedRow]] showView: o_prefs_view];
 }
 
 @end
@@ -202,7 +208,7 @@ static VLCTreeItem *o_root_item = nil;
 
 #define IsALeafNode ((id)-1)
 
-- (id)initWithName: (NSString *)o_item_name ID: (int)i_id parent:(VLCTreeItem *)o_parent_item
+- (id)initWithName: (NSString *)o_item_name ID: (int)i_id parent:(VLCTreeItem *)o_parent_item children:(NSMutableArray *)o_children_array whithCategory: (int) i_category
 {
     self = [super init];
 
@@ -211,12 +217,14 @@ static VLCTreeItem *o_root_item = nil;
         o_name = [o_item_name copy];
         i_object_id = i_id;
         o_parent = o_parent_item;
+        o_children = o_children_array;
+        i_object_category = i_category;
     }
     return( self );
 }
 
 + (VLCTreeItem *)rootItem {
-   if (o_root_item == nil) o_root_item = [[VLCTreeItem alloc] initWithName:@"main" ID: 0 parent:nil];
+   if (o_root_item == nil) o_root_item = [[VLCTreeItem alloc] initWithName:@"main" ID: 0 parent:nil children:[[NSMutableArray alloc] initWithCapacity:10] whithCategory: -1];
    return o_root_item;       
 }
 
@@ -231,13 +239,15 @@ static VLCTreeItem *o_root_item = nil;
  * Loads children incrementally */
 - (NSArray *)children
 {
-    if( o_children == NULL )
+    if( o_children == IsALeafNode )
+        return o_children;
+    if( [ o_children count] == 0 )
     {
         intf_thread_t *p_intf = VLCIntf;
         vlc_list_t      *p_list;
         module_t        *p_module = NULL;
         module_config_t *p_item;
-        int i_index,j;
+        int i_index;
 
         /* List the modules */
         p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -262,163 +272,110 @@ static VLCTreeItem *o_root_item = nil;
             if( i_index < p_list->i_count )
             {
                 /* We found the main module */
-        
                 /* Enumerate config categories and store a reference so we can
                  * generate their config panel them when it is asked by the user. */
+                VLCTreeItem *p_last_category = NULL;
                 p_item = p_module->p_config;
                 o_children = [[NSMutableArray alloc] initWithCapacity:10];
-
                 if( p_item ) do
                 {
                     NSString *o_child_name;
-                    
                     switch( p_item->i_type )
                     {
-                    case CONFIG_HINT_CATEGORY:
-                        o_child_name = [[VLCMain sharedInstance] localizedString: p_item->psz_text];
-                        [o_children addObject:[[VLCTreeItem alloc] initWithName: o_child_name
-                            ID: p_module->i_object_id parent:self]];
+                    case CONFIG_CATEGORY:
+                        o_child_name = [[VLCMain sharedInstance] localizedString: config_CategoryNameGet(p_item->i_value ) ];
+                        p_last_category = [VLCTreeItem alloc];
+                        [o_children addObject:[p_last_category initWithName: o_child_name
+                            ID: p_item->i_value parent:self children:[[NSMutableArray alloc] initWithCapacity:10] whithCategory: p_item - p_module->p_config]];
+                        break;
+                    case CONFIG_SUBCATEGORY:
+                        o_child_name = [[VLCMain sharedInstance] localizedString: config_CategoryNameGet(p_item->i_value ) ];
+                        [p_last_category->o_children addObject:[[VLCTreeItem alloc] initWithName: o_child_name
+                            ID: p_item->i_value parent:p_last_category children:[[NSMutableArray alloc] initWithCapacity:10] whithCategory: p_item - p_module->p_config]];
+                        break;
+                    default:
                         break;
                     }
-                }
-                while( p_item->i_type != CONFIG_HINT_END && p_item++ );
-                
-                /* Add the modules item */
-                [o_children addObject:[[VLCTreeItem alloc] initWithName: _NS("Modules")
-                    ID: 0 parent:self]];
+                } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
             }
-            else
-            {
-                o_children = IsALeafNode;
-            }
-        }
-        else if( [[self getName] isEqualToString: _NS("Modules")] )
-        {
+
+            /* Build a tree of the plugins */
             /* Add the capabilities */
-            o_children = [[NSMutableArray alloc] initWithCapacity:10];
             for( i_index = 0; i_index < p_list->i_count; i_index++ )
             {
                 p_module = (module_t *)p_list->p_values[i_index].p_object;
-        
+
                 /* Exclude the main module */
                 if( !strcmp( p_module->psz_object_name, "main" ) )
                     continue;
-        
-                /* Exclude empty modules */
-                p_item = p_module->p_config;
+
+                /* Exclude empty plugins (submodules don't have config options, they
+                 * are stored in the parent module) */
+                if( p_module->b_submodule )
+                    continue;
+                else
+                    p_item = p_module->p_config;
+
                 if( !p_item ) continue;
+                int i_category = -1;
+                int i_subcategory = -1;
+                int i_options = 0;
                 do
                 {
-                    if( p_item->i_type & CONFIG_ITEM )
-                        break;
-                }
-                while( p_item->i_type != CONFIG_HINT_END && p_item++ );
-                if( p_item->i_type == CONFIG_HINT_END ) continue;
-        
-                /* Create the capability tree if it doesn't already exist */
-                NSString *o_capability;
-                o_capability = [[VLCMain sharedInstance] localizedString: p_module->psz_capability];
-                if( !p_module->psz_capability || !*p_module->psz_capability )
-                {
-                    /* Empty capability ? Let's look at the submodules */
-                    module_t * p_submodule;
-                    for( j = 0; j < p_module->i_children; j++ )
+                    if( p_item->i_type == CONFIG_CATEGORY )
                     {
-                        p_submodule = (module_t*)p_module->pp_children[ j ];
-                        if( p_submodule->psz_capability && *p_submodule->psz_capability )
-                        {
-                            o_capability = [[VLCMain sharedInstance] localizedString: p_submodule->psz_capability];
-                            BOOL b_found = FALSE;
-                            for( j = 0; j < (int)[o_children count]; j++ )
-                            {
-                                if( [[[o_children objectAtIndex:j] getName] isEqualToString: o_capability] )
-                                {
-                                    b_found = TRUE;
-                                    break;
-                                }
-                            }
-                            if( !b_found )
-                            {
-                                [o_children addObject:[[VLCTreeItem alloc] initWithName: o_capability
-                                ID: 0 parent:self]];
-                            }
-                        }
+                        i_category = p_item->i_value;
+                    }
+                    else if( p_item->i_type == CONFIG_SUBCATEGORY )
+                    {
+                        i_subcategory = p_item->i_value;
+                    }
+                    if( p_item->i_type & CONFIG_ITEM )
+                        i_options ++;
+                    if( i_options > 0 && i_category >= 0 && i_subcategory >= 0 )
+                    {
+                        break;
+                    }
+                } while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+                if( !i_options ) continue;
+
+                /* Find the right category item */
+
+                long cookie;
+                vlc_bool_t b_found = VLC_FALSE;
+                int i;
+                VLCTreeItem* p_category_item, * p_subcategory_item;
+                for (i = 0 ; i < [o_children count] ; i++)
+                {
+                    p_category_item = [o_children objectAtIndex: i];
+                    if( p_category_item->i_object_id == i_category )
+                    {
+                        b_found = VLC_TRUE;
+                        break;
                     }
                 }
-
-                BOOL b_found = FALSE;
-                for( j = 0; j < (int)[o_children count]; j++ )
+                if( !b_found ) continue;
+                
+                /* Find subcategory item */
+                b_found = VLC_FALSE;
+                cookie = -1;
+                for (i = 0 ; i < [p_category_item->o_children count] ; i++)
                 {
-                    if( [[[o_children objectAtIndex:j] getName] isEqualToString: o_capability] )
+                    p_subcategory_item = [p_category_item->o_children objectAtIndex: i];
+                    if( p_subcategory_item->i_object_id == i_subcategory )
                     {
-                        b_found = TRUE;
+                        b_found = VLC_TRUE;
                         break;
                     }
                 }
                 if( !b_found )
-                {
-                    [o_children addObject:[[VLCTreeItem alloc] initWithName: o_capability
-                    ID: 0 parent:self]];
-                }
+                    p_subcategory_item = p_category_item;
+
+                [p_subcategory_item->o_children addObject:[[VLCTreeItem alloc] initWithName:
+                    [[VLCMain sharedInstance] localizedString: p_module->psz_object_name ]
+                    ID: p_module->i_object_id parent:p_subcategory_item children:IsALeafNode whithCategory: -1]];
+
             }
-        }
-        else if( [[o_parent getName] isEqualToString: _NS("Modules")] )
-        {
-            /* Now add the modules */
-            o_children = [[NSMutableArray alloc] initWithCapacity:10];
-            for( i_index = 0; i_index < p_list->i_count; i_index++ )
-            {
-                p_module = (module_t *)p_list->p_values[i_index].p_object;
-        
-                /* Exclude the main module */
-                if( !strcmp( p_module->psz_object_name, "main" ) )
-                    continue;
-        
-                /* Exclude empty modules */
-                p_item = p_module->p_config;
-                if( !p_item ) continue;
-                do
-                {
-                    if( p_item->i_type & CONFIG_ITEM )
-                        break;
-                }
-                while( p_item->i_type != CONFIG_HINT_END && p_item++ );
-                if( p_item->i_type == CONFIG_HINT_END ) continue;
-        
-                /* Check the capability */
-                NSString *o_capability;
-                o_capability = [[VLCMain sharedInstance] localizedString: p_module->psz_capability];
-                if( !p_module->psz_capability || !*p_module->psz_capability )
-                {
-                    /* Empty capability ? Let's look at the submodules */
-                    module_t * p_submodule;
-                    for( j = 0; j < p_module->i_children; j++ )
-                    {
-                        p_submodule = (module_t*)p_module->pp_children[ j ];
-                        if( p_submodule->psz_capability && *p_submodule->psz_capability )
-                        {
-                            o_capability = [[VLCMain sharedInstance] localizedString: p_submodule->psz_capability];
-                            if( [o_capability isEqualToString: [self getName]] )
-                            {
-                            [o_children addObject:[[VLCTreeItem alloc] initWithName:
-                                [[VLCMain sharedInstance] localizedString: p_module->psz_object_name ]
-                                ID: p_module->i_object_id parent:self]];
-                            }
-                        }
-                    }
-                }
-                else if( [o_capability isEqualToString: [self getName]] )
-                {
-                    [o_children addObject:[[VLCTreeItem alloc] initWithName:
-                        [[VLCMain sharedInstance] localizedString: p_module->psz_object_name ]
-                        ID: p_module->i_object_id parent:self]];
-                }
-            }
-        }
-        else
-        {
-            /* all the other stuff are leafs */
-            o_children = IsALeafNode;
         }
         vlc_list_release( p_list );
     }
@@ -472,6 +429,159 @@ static VLCTreeItem *o_root_item = nil;
     vlc_list_release( p_list );
 
     return( NO );
+}
+
+- (NSView *)showView:(NSScrollView *)o_prefs_view
+{
+fprintf( stderr, "[%s] showView\n", [o_name UTF8String] );
+    vlc_list_t *p_list;
+    intf_thread_t *p_intf = VLCIntf;
+    module_t *p_parser;
+    module_config_t *p_item, *p_first_item;
+    NSView *o_view;
+    NSRect s_rc;                        /* rect                         */
+    NSTextField *o_text_field;         /* input field / label          */
+    NSRect s_vrc;                       /* view rect                    */
+    NSString *o_module_name;
+    int i_pos, i_module_tag;
+    NSPoint o_pos;
+    vlc_bool_t b_advanced = VLC_TRUE;
+    s_vrc = [[o_prefs_view contentView] bounds];
+    s_vrc.size.height -= 4;
+    
+    o_view = [[NSView alloc] initWithFrame: s_vrc];
+
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    
+    /* Get a pointer to the module */
+    if( i_object_category == -1 )
+    {
+        p_parser = (module_t *) vlc_object_get( p_intf, i_object_id );
+        if( !p_parser || p_parser->i_object_type != VLC_OBJECT_MODULE )
+        {
+            /* 0OOoo something went really bad */
+            vlc_list_release( p_list );
+            return o_view;
+        }
+        o_module_name = [NSString stringWithUTF8String: p_parser->psz_object_name];    
+fprintf( stderr, "showView: going to show [%d] %s\n", i_object_id, p_parser->psz_object_name );
+        p_first_item = p_item = p_parser->p_config;
+    }
+    else
+    {
+        int i_index;
+        if( !p_list ) return o_view;
+
+        /*
+        * Find the main module
+        */
+        for( i_index = 0; i_index < p_list->i_count; i_index++ )
+        {
+            p_parser = (module_t *)p_list->p_values[i_index].p_object;
+            if( !strcmp( p_parser->psz_object_name, "main" ) )
+                break;
+        }
+        if( p_parser == NULL )
+        {
+            msg_Err( p_intf, "could not find the main module in our preferences" );
+            return o_view;
+        }
+        p_first_item = p_item = (p_parser->p_config + i_object_category);
+    }
+    o_view = nil;
+    i_module_tag = 3;
+
+/* These defines should come from "Apple Human Interface Guidelines" */
+#define X_ORIGIN 20
+#define Y_ORIGIN 17
+#define Y_INTER 8
+    /* Init View */
+    s_vrc = [[o_prefs_view contentView] bounds]; s_vrc.size.height -= 4;
+    o_view = [[VLCFlippedView alloc] initWithFrame: s_vrc];
+    [o_view setAutoresizingMask: NSViewWidthSizable];
+
+    o_pos.x = X_ORIGIN;
+    o_pos.y = Y_ORIGIN;
+    BOOL b_right_cat = TRUE;
+
+    if( p_item ) do ; while ( ( p_item->i_type == CONFIG_CATEGORY || p_item->i_type == CONFIG_SUBCATEGORY ) && p_item++ ); 
+
+    if( p_item ) do
+    {
+fprintf( stderr, "Category: %d\n", p_item->i_type );
+        if( p_item->i_type == CONFIG_HINT_CATEGORY )
+        {
+            if( !strcmp( p_parser->psz_object_name, "main" ) &&
+                [o_name isEqualToString: [[VLCMain sharedInstance] localizedString: p_item->psz_text]] )
+                b_right_cat = TRUE;
+            else if( strcmp( p_parser->psz_object_name, "main" ) )
+                 b_right_cat = TRUE;
+            else b_right_cat = FALSE;
+        }
+        else if( p_item->i_type == CONFIG_HINT_END && !strcmp( p_parser->psz_object_name, "main" ) )
+            b_right_cat = FALSE;
+
+        if( (p_item->b_advanced && !b_advanced ) || !b_right_cat )
+        {
+            continue;
+        }
+fprintf( stderr, "Creating view for: %s\n", p_item->psz_name );
+        VLCConfigControl *o_control = nil;
+        switch( p_item->i_type )
+        {
+            case CONFIG_ITEM_STRING:
+            {
+                if( !p_item->i_list )
+                    o_control = [StringConfigControl newControl:p_item
+                                                      withView:o_view withObject:p_intf offset: o_pos];
+                else
+                    o_control = [StringListConfigControl newControl:p_item
+                                                                withView:o_view withObject:p_intf offset: o_pos];
+            }
+            break;
+            case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_DIRECTORY:
+            {
+                o_control = [FileConfigControl newControl: p_item withView: o_view
+                                                    withObject: p_intf offset: o_pos];
+            }
+            break;
+            case CONFIG_ITEM_INTEGER:
+            {
+                if( !p_item->i_list )
+                    o_control = [IntegerConfigControl newControl:p_item
+                                                            withView:o_view withObject:p_intf offset: o_pos];
+
+                else if( p_item->i_min != 0 || p_item->i_max != 0 )
+                    o_control = [RangedIntegerConfigControl newControl:p_item
+                                                            withView:o_view withObject:p_intf offset: o_pos];
+                else
+                    o_control = [IntegerListConfigControl newControl:p_item
+                                                                withView:o_view withObject:p_intf offset: o_pos];
+            }
+            break;
+            case CONFIG_ITEM_KEY:
+            {
+                o_control = [KeyConfigControl newControl:p_item withView:o_view withObject:p_intf offset: o_pos];
+            }
+            break;
+        }
+        if( o_control != nil )
+        {
+            [o_view addSubview: o_control];
+            o_pos.y += [o_control frame].size.height + Y_INTER;
+        }
+    #undef Y_ORIGIN
+    #undef X_ORIGIN
+    }
+    while( p_item->i_type != CONFIG_HINT_END && p_item->i_type != CONFIG_CATEGORY && p_item->i_type != CONFIG_SUBCATEGORY && p_item++ );
+
+    vlc_object_release( p_parser );
+    vlc_list_release( p_list );
+
+    [o_prefs_view setDocumentView: o_view];
+    [o_prefs_view setNeedsDisplay: TRUE];
+    return o_view;
 }
 
 @end

@@ -27,6 +27,7 @@
     int i_object_id;
     VLCTreeItem *o_parent;
     NSMutableArray *o_children;
+    int i_object_category;
 }
 
 + (VLCTreeItem *)rootItem;
@@ -35,6 +36,7 @@
 - (int)getObjectID;
 - (NSString *)getName;
 - (BOOL)hasPrefs:(NSString *)o_module_name;
+- (NSView *)showView:(NSScrollView *)o_prefs_view;
 
 @end
 

@@ -35,7 +35,7 @@
 
 #define PREFS_WRAP 300
 #define OFFSET_RIGHT 20
-#define OFFSET_BETWEEN 10
+#define OFFSET_BETWEEN 2
 
 @implementation VLCConfigControl
 
@@ -47,7 +47,7 @@
 }
 
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
     self = [super initWithFrame: frame];
@@ -55,6 +55,7 @@
     if( self != nil )
     {
         p_this = _p_this;
+        p_item = _p_item;
         o_label = NULL;
         psz_name = strdup( p_item->psz_name );
         i_type = p_item->i_type;
@@ -72,67 +73,68 @@
 }
 
 
-+ (VLCConfigControl *)newControl: (module_config_t *)p_item withView: (NSView *)o_parent_view withObject: (vlc_object_t *)_p_this
++ (VLCConfigControl *)newControl: (module_config_t *)_p_item withView: (NSView *)o_parent_view withObject: (vlc_object_t *)_p_this offset:(NSPoint) offset
 {
     VLCConfigControl *p_control = NULL;
-    NSRect frame = [o_parent_view bounds];
-    
-    switch( p_item->i_type )
+    NSRect frame = [o_parent_view frame];
+/*FIXME: Why do we need to divide by two ??? */
+    frame.origin.x=offset.x;
+    frame.origin.y=offset.y;
+    frame.size.width-=OFFSET_RIGHT;
+    switch( _p_item->i_type )
     {
+#if 0
     case CONFIG_ITEM_MODULE:
-        p_control = [[ModuleConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+        p_control = [[ModuleConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         break;
-
+#endif
     case CONFIG_ITEM_STRING:
-        if( !p_item->i_list )
+        if( !_p_item->i_list )
         {
-            p_control = [[StringConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+            p_control = [[StringConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         }
         else
         {
-            p_control = [[StringListConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+            p_control = [[StringListConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         }
         break;
-        
     case CONFIG_ITEM_FILE:
     case CONFIG_ITEM_DIRECTORY:
-        p_control = [[FileConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+        p_control = [[FileConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         break;
-
     case CONFIG_ITEM_INTEGER:
-        if( p_item->i_list )
+        if( _p_item->i_list )
         {
-            p_control = [[IntegerListConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+            p_control = [[IntegerListConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         }
-        else if( p_item->i_min != 0 || p_item->i_max != 0 )
+        else if( _p_item->i_min != 0 || _p_item->i_max != 0 )
         {
-            p_control = [[RangedIntegerConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+            p_control = [[RangedIntegerConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         }
         else
         {
-            p_control = [[IntegerConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+            p_control = [[IntegerConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         }
         break;
-
     case CONFIG_ITEM_KEY:
-        p_control = [[KeyConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+        p_control = [[KeyConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         break;
-
+#if 0
     case CONFIG_ITEM_FLOAT:
-        if( p_item->f_min != 0 || p_item->f_max != 0 )
+        if( _p_item->f_min != 0 || _p_item->f_max != 0 )
         {
-            p_control = [[RangedFloatConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+            p_control = [[RangedFloatConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         }
         else
         {
-            p_control = [[FloatConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+            p_control = [[FloatConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         }
         break;
 
     case CONFIG_ITEM_BOOL:
-        p_control = [[BoolConfigControl alloc] initWithFrame: frame item: p_item withObject: _p_this ];
+        p_control = [[BoolConfigControl alloc] initWithFrame: frame item: _p_item withObject: _p_this ];
         break;
-        
+#endif        
     default:
         break;
     }
@@ -141,7 +143,7 @@
 
 - (NSString *)getName
 {
-    return [NSApp localizedString: psz_name];
+    return [[VLCMain sharedInstance] localizedString: psz_name];
 }
 
 - (int)getType
@@ -171,16 +173,15 @@
 
 @end
 
-
 @implementation KeyConfigControl
 
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
     frame.size.height = 80;
-    if( self = [super initWithFrame: frame item: p_item
-                withObject: _p_this] )
+    if( ( self = [super initWithFrame: frame item: _p_item
+                withObject: _p_this] ) )
     {
         NSRect s_rc = frame;
         unsigned int i;
@@ -192,7 +193,7 @@
             NSButtonCell *o_current_cell = [o_cells objectAtIndex:i];
             [o_current_cell setButtonType: NSSwitchButton];
             [o_current_cell setControlSize: NSSmallControlSize];
-            [o_matrix setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext] toWidth: PREFS_WRAP] forCell: o_current_cell];
+            [o_matrix setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext] toWidth: PREFS_WRAP] forCell: o_current_cell];
 
             switch( i )
             {
@@ -216,7 +217,7 @@
         }
         [o_matrix sizeToCells];
         [o_matrix setAutoresizingMask:NSViewMaxXMargin ];
-        [[self contentView] addSubview: o_matrix];
+        [self addSubview: o_matrix];
 
         /* add the combo box */
         s_rc.origin.x += [o_matrix frame].size.width + OFFSET_BETWEEN;
@@ -225,17 +226,17 @@
 
         o_combo = [[[NSComboBox alloc] initWithFrame: s_rc] retain];
         [o_combo setAutoresizingMask:NSViewMaxXMargin ];
-        [o_combo setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext] toWidth: PREFS_WRAP]];
+        [o_combo setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext] toWidth: PREFS_WRAP]];
         
         for( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++ )
         {
             
             if( vlc_keys[i].psz_key_string && *vlc_keys[i].psz_key_string )
-            [o_combo addItemWithObjectValue: [NSApp localizedString:vlc_keys[i].psz_key_string]];
+            [o_combo addItemWithObjectValue: [[VLCMain sharedInstance] localizedString:vlc_keys[i].psz_key_string]];
         }
         
-        [o_combo setStringValue: [NSApp localizedString:KeyToString(( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ))]];
-        [[self contentView] addSubview: o_combo];
+        [o_combo setStringValue: [[VLCMain sharedInstance] localizedString:KeyToString(( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ))]];
+        [self addSubview: o_combo];
         
         /* add the label */
         s_rc.origin.y += 50;
@@ -246,10 +247,10 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if ( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
     }
     return self;
@@ -298,6 +299,7 @@
 
 
 @end
+#if 0
 
 @implementation ModuleConfigControl
 
@@ -321,10 +323,10 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if ( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
         
         /* build the popup */
@@ -332,10 +334,10 @@
         s_rc.size.width = 200;
         
         o_popup = [[[NSPopUpButton alloc] initWithFrame: s_rc] retain];
-        [[self contentView] addSubview: o_popup];
+        [self addSubview: o_popup];
         [o_popup setAutoresizingMask:NSViewMinXMargin ];
 
-        [o_popup setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [o_popup setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
         [o_popup addItemWithTitle: _NS("Default")];
         [[o_popup lastItem] setTag: -1];
         [o_popup selectItem: [o_popup lastItem]];
@@ -404,18 +406,20 @@
 }
 
 @end
-
+#endif
 @implementation StringConfigControl
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
     frame.size.height = 22;
-    if( self = [super initWithFrame: frame item: p_item
-                withObject: _p_this] )
+    if( ( self = [super initWithFrame: frame item: _p_item
+                withObject: _p_this] ) )
     {
         NSRect s_rc = frame;
-
+        s_rc.size.height = 17;
+        s_rc.origin.x = 0;
+        s_rc.origin.y = 3;
         /* add the label */
         o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_label setDrawsBackground: NO];
@@ -423,22 +427,25 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
         
         /* build the textfield */
         s_rc.origin.x = s_rc.size.width - 200 - OFFSET_RIGHT;
+        s_rc.origin.y = 0;
+        s_rc.size.height = 22;
         s_rc.size.width = 200;
         
         o_textfield = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_textfield setAutoresizingMask:NSViewMinXMargin | NSViewWidthSizable ];
 
-        [o_textfield setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [o_textfield setStringValue: [NSApp localizedString: p_item->psz_value]];
-        [[self contentView] addSubview: o_textfield];
+        [o_textfield setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        if( p_item->psz_value )
+            [o_textfield setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_value]];
+        [self addSubview: o_textfield];
     }
     return self;
 }
@@ -459,15 +466,18 @@
 @implementation StringListConfigControl
 
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
-    frame.size.height = 20;
-    if( self = [super initWithFrame: frame item: p_item
-                withObject: _p_this] )
+    frame.size.height = 24;
+    if( ( self = [super initWithFrame: frame item: _p_item
+                withObject: _p_this] ) )
     {
         NSRect s_rc = frame;
         int i_index;
+        s_rc.size.height = 17;
+        s_rc.origin.x = 0;
+        s_rc.origin.y = 5;
 
         /* add the label */
         o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];
@@ -476,14 +486,16 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
         
         /* build the textfield */
         s_rc.origin.x = s_rc.size.width - 200 - OFFSET_RIGHT;
+        s_rc.origin.y = 0;
+        s_rc.size.height = 26;
         s_rc.size.width = 200;
         
         o_combo = [[[NSComboBox alloc] initWithFrame: s_rc] retain];
@@ -492,6 +504,7 @@
         [o_combo setUsesDataSource:TRUE];
         [o_combo setDataSource:self];
         [o_combo setNumberOfVisibleItems:10];
+        [o_combo setCompletes:YES];
         for( i_index = 0; i_index < p_item->i_list; i_index++ )
         {
             if( p_item->psz_value && !strcmp( p_item->psz_value, p_item->ppsz_list[i_index] ) )
@@ -500,8 +513,8 @@
             }
         }
 
-        [o_combo setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_combo];
+        [o_combo setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_combo];
     }
     return self;
 }
@@ -514,9 +527,6 @@
 
 - (char *)stringValue
 {
-    module_config_t *p_item;
-    p_item = config_FindConfig( p_this, psz_name );
-
     if( [o_combo indexOfSelectedItem] >= 0 )
         return strdup( p_item->ppsz_list[[o_combo indexOfSelectedItem]] );
     else
@@ -529,38 +539,32 @@
 
 - (int)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-    module_config_t *p_item;
-    p_item = config_FindConfig( p_this, psz_name );
-
-    return p_item->i_list;
+        return p_item->i_list;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)i_index
 {
-    module_config_t *p_item;
-    p_item = config_FindConfig( p_this, psz_name );
-
     if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
     {
-        return [NSApp localizedString: p_item->ppsz_list_text[i_index]];
-    } else return [NSApp localizedString: p_item->ppsz_list[i_index]];
+        return [[VLCMain sharedInstance] localizedString: p_item->ppsz_list_text[i_index]];
+    } else return [[VLCMain sharedInstance] localizedString: p_item->ppsz_list[i_index]];
 }
 
 @end
-
 @implementation FileConfigControl
 
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
-    frame.size.height = 49;
-    if( self = [super initWithFrame: frame item: p_item
-                withObject: _p_this] )
+    frame.size.height = 53;
+    if( ( self = [super initWithFrame: frame item: _p_item
+                withObject: _p_this] ) )
     {
         NSRect s_rc = frame;
-        s_rc.origin.y = 29;
-        s_rc.size.height = 20;
+        s_rc.size.height = 17;
+        s_rc.origin.x = 0;
+        s_rc.origin.y = 36;
 
         /* is it a directory */
         b_directory = ( [self getType] == CONFIG_ITEM_DIRECTORY ) ? YES : NO;
@@ -572,41 +576,45 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
-        [[self contentView] addSubview: o_label];
         
         /* build the button */
-        s_rc.origin.y = s_rc.origin.x = 0;
-        s_rc.size.height = 22;
+        s_rc.origin.y = 0;
+        s_rc.size.height = 32;
 
         o_button = [[[NSButton alloc] initWithFrame: s_rc] retain];
         [o_button setButtonType: NSMomentaryPushInButton];
         [o_button setBezelStyle: NSRoundedBezelStyle];
         [o_button setTitle: _NS("Browse...")];
+/*TODO: enlarge a bit the button...*/
         [o_button sizeToFit];
         [o_button setAutoresizingMask:NSViewMinXMargin];
         [o_button setFrameOrigin: NSMakePoint( s_rc.size.width - 
-                    [o_button frame].size.width - OFFSET_RIGHT, s_rc.origin.y)];
-        [o_button setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+                    [o_button frame].size.width - OFFSET_RIGHT / 2, s_rc.origin.y)];
+        [o_button setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
 
         [o_button setTarget: self];
         [o_button setAction: @selector(openFileDialog:)];
 
+        s_rc.origin.x = 15;
+        s_rc.origin.y = 6;
         s_rc.size.height = 22;
-        s_rc.size.width = s_rc.size.width - OFFSET_BETWEEN - [o_button frame].size.width - OFFSET_RIGHT;
+        s_rc.size.width = s_rc.size.width - OFFSET_BETWEEN - [o_button frame].size.width - OFFSET_RIGHT / 2 - s_rc.origin.x;
         
         o_textfield = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         
-        [o_textfield setStringValue: [NSApp localizedString: p_item->psz_value]];
-        [o_textfield setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        if( p_item->psz_value )
+            [o_textfield setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_value]];
+        [o_textfield setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
 
         [o_textfield setAutoresizingMask:NSViewWidthSizable];
                
-        [[self contentView] addSubview: o_textfield];
-        [[self contentView] addSubview: o_button];
+        [self addSubview: o_textfield];
+        [self addSubview: o_button];
     }
     return self;
 }
@@ -622,11 +630,11 @@
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     
-    [o_open_panel setTitle: _NS("Select a file or directory")];
+    [o_open_panel setTitle: (b_directory)?_NS("Select a directory"):_NS("Select a file")];
     [o_open_panel setPrompt: _NS("Select")];
     [o_open_panel setAllowsMultipleSelection: NO];
-    [o_open_panel setCanChooseFiles: YES];
-    [o_open_panel setCanChooseDirectories: b_advanced];
+    [o_open_panel setCanChooseFiles: !b_directory];
+    [o_open_panel setCanChooseDirectories: b_directory];
     [o_open_panel beginSheetForDirectory:nil
         file:nil
         types:nil
@@ -656,15 +664,17 @@
 
 @implementation IntegerConfigControl
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
-    frame.size.height = 22;
-    if( self = [super initWithFrame: frame item: p_item
-                withObject: _p_this] )
+    frame.size.height = 25;
+    if( ( self = [super initWithFrame: frame item: _p_item
+                withObject: _p_this] ) )
     {
         NSRect s_rc = frame;
-
+        s_rc.size.height = 17;
+        s_rc.origin.x = 0;
+        s_rc.origin.y = 6;
         /* add the label */
         o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_label setDrawsBackground: NO];
@@ -672,14 +682,16 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
         
         /* build the stepper */
-        s_rc.origin.x = s_rc.size.width - 13 - OFFSET_RIGHT;
+        s_rc.origin.x = s_rc.size.width - 16 - OFFSET_RIGHT;
+        s_rc.origin.y = 0;
+        s_rc.size.height = 21;
         
         o_stepper = [[[NSStepper alloc] initWithFrame: s_rc] retain];
         [o_stepper sizeToFit];
@@ -691,24 +703,26 @@
         [o_stepper setTarget: self];
         [o_stepper setAction: @selector(stepperChanged:)];
         [o_stepper sendActionOn:NSLeftMouseUpMask|NSLeftMouseDownMask|NSLeftMouseDraggedMask];
-        [o_stepper setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_stepper];
+        [o_stepper setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_stepper];
     
         /* build the textfield */
-        s_rc.origin.x = s_rc.size.width - 60 - OFFSET_BETWEEN - 13 - OFFSET_RIGHT;
-        s_rc.size.width = 60;
+        s_rc.origin.x = s_rc.size.width - 42 - OFFSET_BETWEEN - 19 - OFFSET_RIGHT;
+        s_rc.origin.y = 3;
+        s_rc.size.width = 42;
+        s_rc.size.height = 22;
         
         o_textfield = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_textfield setAutoresizingMask:NSViewMinXMargin | NSViewWidthSizable ];
 
         [o_textfield setIntValue: p_item->i_value];
-        [o_textfield setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [o_textfield setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
             selector: @selector(textfieldChanged:)
             name: NSControlTextDidChangeNotification
             object: o_textfield];
-        [[self contentView] addSubview: o_textfield];
+        [self addSubview: o_textfield];
     }
     return self;
 }
@@ -740,15 +754,18 @@
 @implementation IntegerListConfigControl
 
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
-    frame.size.height = 20;
-    if( self = [super initWithFrame: frame item: p_item
-                withObject: _p_this] )
+    frame.size.height = 24;
+    if( ( self = [super initWithFrame: frame item: _p_item
+                withObject: _p_this] ) )
     {
         NSRect s_rc = frame;
         int i_index;
+        s_rc.size.height = 17;
+        s_rc.origin.x = 0;
+        s_rc.origin.y = 5;
 
         /* add the label */
         o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];
@@ -757,14 +774,16 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
         
         /* build the textfield */
         s_rc.origin.x = s_rc.size.width - 200 - OFFSET_RIGHT;
+        s_rc.origin.y = 0;
+        s_rc.size.height = 26;
         s_rc.size.width = 200;
         
         o_combo = [[[NSComboBox alloc] initWithFrame: s_rc] retain];
@@ -773,6 +792,7 @@
         [o_combo setUsesDataSource:TRUE];
         [o_combo setDataSource:self];
         [o_combo setNumberOfVisibleItems:10];
+        [o_combo setCompletes:YES];
         for( i_index = 0; i_index < p_item->i_list; i_index++ )
         {
             if( p_item->i_value == p_item->pi_list[i_index] )
@@ -781,8 +801,8 @@
             }
         }
 
-        [o_combo setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_combo];
+        [o_combo setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_combo];
     }
     return self;
 }
@@ -795,9 +815,6 @@
 
 - (int)intValue
 {
-    module_config_t *p_item;
-    p_item = config_FindConfig( p_this, psz_name );
-
     if( [o_combo indexOfSelectedItem] >= 0 )
         return p_item->pi_list[[o_combo indexOfSelectedItem]];
     else
@@ -810,20 +827,14 @@
 
 - (int)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
-    module_config_t *p_item;
-    p_item = config_FindConfig( p_this, psz_name );
-
     return p_item->i_list;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)i_index
 {
-    module_config_t *p_item;
-    p_item = config_FindConfig( p_this, psz_name );
-
     if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
     {
-        return [NSApp localizedString: p_item->ppsz_list_text[i_index]];
+        return [[VLCMain sharedInstance] localizedString: p_item->ppsz_list_text[i_index]];
     } else return [NSString stringWithFormat: @"%i", p_item->pi_list[i_index]];
 }
 
@@ -832,17 +843,17 @@
 @implementation RangedIntegerConfigControl
 
 - (id)initWithFrame: (NSRect)frame
-        item: (module_config_t *)p_item
+        item: (module_config_t *)_p_item
         withObject: (vlc_object_t *)_p_this
 {
-    frame.size.height = 50;
-    if( self = [super initWithFrame: frame item: p_item
-                withObject: _p_this] )
+    frame.size.height = 51;
+    if( ( self = [super initWithFrame: frame item: _p_item
+                withObject: _p_this] ) )
     {
         NSRect s_rc = frame;
-        s_rc.size.height = 20;
-        s_rc.origin.y = 30;
-    
+        s_rc.size.height = 17;
+        s_rc.origin.x = 0;
+        s_rc.origin.y = 32;
         /* add the label */
         o_label = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_label setDrawsBackground: NO];
@@ -850,16 +861,33 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
+
+        /* current value textfield */
+        s_rc.size.height = 22;
+        s_rc.size.width = 40;
+        s_rc.origin.x = [o_label frame].size.width + OFFSET_RIGHT;
+        s_rc.origin.y = 29;
+        o_textfield = [[[NSTextField alloc] initWithFrame: s_rc] retain];
+        [o_textfield setAutoresizingMask:NSViewMinXMargin];
+
+        [o_textfield setIntValue: p_item->i_value];
+        [o_textfield setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [o_textfield setDelegate: self];
+        [[NSNotificationCenter defaultCenter] addObserver: self
+            selector: @selector(textfieldChanged:)
+            name: NSControlTextDidChangeNotification
+            object: o_textfield];
+        [self addSubview: o_textfield];
 
         /* build the slider */
         /* min value textfield */
+        s_rc.origin.x = 15;
         s_rc.origin.y = 0;
-        s_rc.origin.x = 0;
         s_rc.size.width = 40;
 
         o_textfield_min = [[[NSTextField alloc] initWithFrame: s_rc] retain];
@@ -868,30 +896,13 @@
         [o_textfield_min setBordered: NO];
         [o_textfield_min setEditable: NO];
         [o_textfield_min setSelectable: NO];
-
         [o_textfield_min setIntValue: p_item->i_min];
-        [o_textfield_min setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_textfield_min];
+        [o_textfield_min setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_textfield_min];
 
-        /* the slider */
-        s_rc.size.width = [[self contentView] bounds].size.width - OFFSET_RIGHT - 2*OFFSET_BETWEEN - 3*40;
-        s_rc.origin.x = 40 + OFFSET_BETWEEN;
-
-        o_slider = [[[NSStepper alloc] initWithFrame: s_rc] retain];
-        [o_slider setAutoresizingMask:NSViewWidthSizable];
-
-        [o_slider setMaxValue: p_item->i_max];
-        [o_slider setMinValue: p_item->i_min];
-        [o_slider setIntValue: p_item->i_value];
-        [o_slider setTarget: self];
-        [o_slider setAction: @selector(sliderChanged:)];
-        [o_slider sendActionOn:NSLeftMouseUpMask|NSLeftMouseDownMask|NSLeftMouseDraggedMask];
-        [o_slider setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_slider];
-        
         /* max value textfield */
         s_rc.size.width = 40;
-        s_rc.origin.x = [[self contentView] bounds].size.width - OFFSET_RIGHT - OFFSET_BETWEEN - 2*40;
+        s_rc.origin.x = [self bounds].size.width - OFFSET_RIGHT - 40;
         
         o_textfield_max = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_textfield_max setAutoresizingMask:NSViewMinXMargin ];
@@ -900,27 +911,30 @@
         [o_textfield_max setBordered: NO];
         [o_textfield_max setEditable: NO];
         [o_textfield_max setSelectable: NO];
+        [o_textfield_max setAlignment: NSRightTextAlignment];
 
         [o_textfield_max setIntValue: p_item->i_max];
-        [o_textfield_max setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_textfield_max];
+        [o_textfield_max setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_textfield_max];
         
-        /* current value textfield */
-        s_rc.size.width = 40;
-        s_rc.origin.x = [[self contentView] bounds].size.width - OFFSET_RIGHT - 40;
+        /* the slider */
+        s_rc.size.height = 21;
+        s_rc.size.width = [self bounds].size.width - OFFSET_RIGHT - 2*OFFSET_BETWEEN - 2 * 40;
+        s_rc.origin.x = 40 + OFFSET_BETWEEN;
+        s_rc.origin.y = 1;
 
-        o_textfield = [[[NSTextField alloc] initWithFrame: s_rc] retain];
-        [o_textfield setAutoresizingMask:NSViewMinXMargin];
+        o_slider = [[[NSSlider alloc] initWithFrame: s_rc] retain];
+        [o_slider setAutoresizingMask:NSViewWidthSizable];
 
-        [o_textfield setIntValue: p_item->i_value];
-        [o_textfield setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [o_textfield setDelegate: self];
-        [[NSNotificationCenter defaultCenter] addObserver: self
-            selector: @selector(textfieldChanged:)
-            name: NSControlTextDidChangeNotification
-            object: o_textfield];
-        [[self contentView] addSubview: o_textfield];
-
+        [o_slider setMaxValue: p_item->i_max];
+        [o_slider setMinValue: p_item->i_min];
+        [o_slider setIntValue: p_item->i_value];
+        [o_slider setTarget: self];
+        [o_slider setAction: @selector(sliderChanged:)];
+        [o_slider sendActionOn:NSLeftMouseUpMask|NSLeftMouseDownMask|NSLeftMouseDraggedMask];
+        [o_slider setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_slider];
+       
     }
     return self;
 }
@@ -950,6 +964,7 @@
 }
 
 @end
+#if 0
 
 @implementation FloatConfigControl
 
@@ -970,10 +985,10 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
 
         /* build the textfield */
@@ -984,8 +999,8 @@
         [o_textfield setAutoresizingMask:NSViewMinXMargin | NSViewWidthSizable ];
 
         [o_textfield setFloatValue: p_item->f_value];
-        [o_textfield setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_textfield];
+        [o_textfield setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_textfield];
     }
     return self;
 }
@@ -1024,10 +1039,10 @@
         [o_label setEditable: NO];
         [o_label setSelectable: NO];
         if( p_item->psz_text )
-            [o_label setStringValue: [NSApp localizedString: p_item->psz_text]];
+            [o_label setStringValue: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
 
         [o_label sizeToFit];
-        [[self contentView] addSubview: o_label];
+        [self addSubview: o_label];
         [o_label setAutoresizingMask:NSViewMaxXMargin ];
 
         /* build the slider */
@@ -1044,11 +1059,11 @@
         [o_textfield_min setSelectable: NO];
 
         [o_textfield_min setFloatValue: p_item->f_min];
-        [o_textfield_min setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_textfield_min];
+        [o_textfield_min setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_textfield_min];
 
         /* the slider */
-        s_rc.size.width = [[self contentView] bounds].size.width - OFFSET_RIGHT - 2*OFFSET_BETWEEN - 3*40;
+        s_rc.size.width = [self bounds].size.width - OFFSET_RIGHT - 2*OFFSET_BETWEEN - 3*40;
         s_rc.origin.x = 40 + OFFSET_BETWEEN;
 
         o_slider = [[[NSStepper alloc] initWithFrame: s_rc] retain];
@@ -1060,12 +1075,12 @@
         [o_slider setTarget: self];
         [o_slider setAction: @selector(sliderChanged:)];
         [o_slider sendActionOn:NSLeftMouseUpMask|NSLeftMouseDownMask|NSLeftMouseDraggedMask];
-        [o_slider setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_slider];
+        [o_slider setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_slider];
         
         /* max value textfield */
         s_rc.size.width = 40;
-        s_rc.origin.x = [[self contentView] bounds].size.width - OFFSET_RIGHT - OFFSET_BETWEEN - 2*40;
+        s_rc.origin.x = [self bounds].size.width - OFFSET_RIGHT - OFFSET_BETWEEN - 2*40;
         
         o_textfield_max = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_textfield_max setAutoresizingMask:NSViewMinXMargin ];
@@ -1076,24 +1091,24 @@
         [o_textfield_max setSelectable: NO];
 
         [o_textfield_max setFloatValue: p_item->f_max];
-        [o_textfield_max setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_textfield_max];
+        [o_textfield_max setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_textfield_max];
         
         /* current value textfield */
         s_rc.size.width = 40;
-        s_rc.origin.x = [[self contentView] bounds].size.width - OFFSET_RIGHT - 40;
+        s_rc.origin.x = [self bounds].size.width - OFFSET_RIGHT - 40;
 
         o_textfield = [[[NSTextField alloc] initWithFrame: s_rc] retain];
         [o_textfield setAutoresizingMask:NSViewMinXMargin];
 
         [o_textfield setFloatValue: p_item->f_value];
-        [o_textfield setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [o_textfield setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
             selector: @selector(textfieldChanged:)
             name: NSControlTextDidChangeNotification
             object: o_textfield];
-        [[self contentView] addSubview: o_textfield];
+        [self addSubview: o_textfield];
 
     }
     return self;
@@ -1142,9 +1157,9 @@
         o_checkbox = [[[NSButton alloc] initWithFrame: s_rc] retain];
         [o_checkbox setButtonType: NSSwitchButton];
         [o_checkbox setIntValue: p_item->i_value];
-        [o_checkbox setTitle: [NSApp localizedString: p_item->psz_text]];
-        [o_checkbox setToolTip: [NSApp wrapString: [NSApp localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
-        [[self contentView] addSubview: o_checkbox];
+        [o_checkbox setTitle: [[VLCMain sharedInstance] localizedString: p_item->psz_text]];
+        [o_checkbox setToolTip: [[VLCMain sharedInstance] wrapString: [[VLCMain sharedInstance] localizedString: p_item->psz_longtext ] toWidth: PREFS_WRAP]];
+        [self addSubview: o_checkbox];
     }
     return self;
 }
@@ -1161,3 +1176,5 @@
 }
 
 @end
+#endif
+
