@@ -45,6 +45,10 @@
 #include "vlc_keys.h"
 #include "iso_lang.h"
 
+/* FIXME we should find a better way than including that */
+#include "../../src/misc/iso-639_def.h"
+
+
 #include <dvdnav/dvdnav.h>
 
 #include "../demux/ps.h"
@@ -64,6 +68,8 @@
 #define MENU_LONGTEXT N_( \
     "Allows you to start the DVD directly in the main menu. This "\
     "will try to skip all the useless warnings introductions." )
+
+#define LANGUAGE_DEFAULT ("en")
 
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
@@ -145,6 +151,8 @@ static void ButtonUpdate( demux_t * );
 static void ESNew( demux_t *, int );
 static int ProbeDVD( demux_t *, char * );
 
+static char *DemuxGetLanguageCode( demux_t *p_demux, char *psz_var );
+
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
@@ -155,6 +163,7 @@ static int Open( vlc_object_t *p_this )
     dvdnav_t    *p_dvdnav;
     int         i_angle;
     char        *psz_name;
+    char        *psz_code;
     vlc_value_t val;
 
     if( !p_demux->psz_path || !*p_demux->psz_path )
@@ -233,13 +242,40 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_demux, "cannot set PGC positioning flag" );
     }
 
-    if( dvdnav_menu_language_select (p_sys->dvdnav,"en") != DVDNAV_STATUS_OK ||
-        dvdnav_audio_language_select(p_sys->dvdnav,"en") != DVDNAV_STATUS_OK ||
-        dvdnav_spu_language_select  (p_sys->dvdnav,"en") != DVDNAV_STATUS_OK )
+    /* Set menu language ("en")
+     * XXX: maybe it would be better to set it like audio/spu or to create a --menu-language option */
+    if( dvdnav_menu_language_select( p_sys->dvdnav,LANGUAGE_DEFAULT ) != DVDNAV_STATUS_OK )
     {
-        msg_Warn( p_demux, "something failed while setting en language (%s)",
+        msg_Warn( p_demux, "something failed while setting menu '%s' language (%s)",
+                  LANGUAGE_DEFAULT,
                   dvdnav_err_to_string( p_sys->dvdnav ) );
     }
+
+    /* Set audio language */
+    psz_code = DemuxGetLanguageCode( p_demux, "audio-language" );
+    if( dvdnav_audio_language_select(p_sys->dvdnav, psz_code ) != DVDNAV_STATUS_OK )
+    {
+        msg_Warn( p_demux, "something failed while setting audio '%s' language (%s)",
+                  psz_code,
+                  dvdnav_err_to_string( p_sys->dvdnav ) );
+        /* We try to fall back to 'en' */
+        if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
+            dvdnav_audio_language_select(p_sys->dvdnav, LANGUAGE_DEFAULT );
+    }
+    free( psz_code );
+
+    /* Set spu language */
+    psz_code = DemuxGetLanguageCode( p_demux, "spu-language" );
+    if( dvdnav_spu_language_select( p_sys->dvdnav,psz_code ) != DVDNAV_STATUS_OK )
+    {
+        msg_Warn( p_demux, "something failed while setting spu '%s' language (%s)",
+                  psz_code,
+                  dvdnav_err_to_string( p_sys->dvdnav ) );
+        /* We try to fall back to 'en' */
+        if( strcmp( psz_code, LANGUAGE_DEFAULT ) )
+            dvdnav_spu_language_select(p_sys->dvdnav, LANGUAGE_DEFAULT );
+    }
+    free( psz_code );
 
     DemuxTitles( p_demux );
 
@@ -730,6 +766,38 @@ static int Demux( demux_t *p_demux )
 #endif
 
     return 1;
+}
+
+/* Get a 2 char code
+ * FIXME: partiallyy duplicated from src/input/es_out.c
+ */
+static char *DemuxGetLanguageCode( demux_t *p_demux, char *psz_var )
+{
+    const iso639_lang_t *pl;
+    char *psz_lang;
+    char *p;
+
+    psz_lang = var_CreateGetString( p_demux, psz_var );
+    /* XXX: we will use only the first value (and ignore other ones in case of a list) */
+    if( ( p = strchr( psz_lang, "," ) ) )
+        *p = '\0';
+
+    for( pl = p_languages; pl->psz_iso639_1 != NULL; pl++ )
+    {
+        if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
+            !strcasecmp( pl->psz_native_name, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
+            break;
+    }
+
+    free( psz_lang );
+
+    if( pl->psz_iso639_1 != NULL )
+        return strdup( pl->psz_iso639_1 );
+
+    return strdup(LANGUAGE_DEFAULT);
 }
 
 static void DemuxTitles( demux_t *p_demux )

@@ -327,6 +327,16 @@ static char *ppsz_align_descriptions[] =
     "(from 0 to n).")
 
 #define INPUT_SUB_TEXT N_("Choose subtitles track")
+#define INPUT_CHAN_LANG_TEXT N_("Choose audio language")
+#define INPUT_CHAN_LANG_LONGTEXT N_( \
+    "Give the language of the audio channel you want to use " \
+    "(comma separted, two or tree letter country code).")
+#define INPUT_SUB_LANG_TEXT N_("Choose subtitle track")
+#define INPUT_SUB_LANG_LONGTEXT N_( \
+    "Give the language of the subtitle channel you want to use " \
+    "(comma separted, two or tree letter country code).")
+
+
 #define INPUT_SUB_LONGTEXT N_( \
     "Give the stream number of the subtitle channel you want to use " \
     "(from 0 to n).")
@@ -979,6 +989,11 @@ vlc_module_begin();
                  INPUT_CHAN_TEXT, INPUT_CHAN_LONGTEXT, VLC_FALSE );
     add_integer( "spu-channel", -1, NULL,
                  INPUT_SUB_TEXT, INPUT_SUB_LONGTEXT, VLC_FALSE );
+    add_string( "audio-language", "", NULL,
+                 INPUT_CHAN_LANG_TEXT, INPUT_CHAN_LANG_LONGTEXT, VLC_FALSE );
+    add_string( "spu-language", "", NULL,
+                 INPUT_SUB_LANG_TEXT, INPUT_SUB_LANG_LONGTEXT, VLC_FALSE );
+
 
     set_section( N_( "Playback control" ) , NULL);
     add_integer( "input-repeat", 0, NULL,

@@ -1,4 +1,3 @@
-
 /*****************************************************************************
  * es_out.c: Es Out handler for input.
  *****************************************************************************
@@ -35,6 +34,8 @@
 
 #include "vlc_playlist.h"
 #include "iso_lang.h"
+/* FIXME we should find a better way than including that */
+#include "../misc/iso-639_def.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -64,6 +65,7 @@ struct es_out_id_t
     int         i_channel;
     es_format_t fmt;
     char        *psz_language;
+    char        *psz_language_code;
     decoder_t   *p_dec;
 };
 
@@ -94,6 +96,8 @@ struct es_out_sys_t
     /* es to select */
     int         i_audio_last;
     int         i_sub_last;
+    char        **ppsz_audio_language;
+    char        **ppsz_sub_language;
 
     /* current main es */
     es_out_id_t *p_es_audio;
@@ -116,6 +120,9 @@ static void         EsOutAddInfo( es_out_t *, es_out_id_t *es );
 static void EsSelect( es_out_t *out, es_out_id_t *es );
 static void EsUnselect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_update );
 static char *LanguageGetName( const char *psz_code );
+static char *LanguageGetCode( const char *psz_lang );
+static char **LanguageSplit( const char *psz_langs );
+static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang );
 
 /*****************************************************************************
  * input_EsOutNew:
@@ -125,6 +132,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     es_out_t     *out = malloc( sizeof( es_out_t ) );
     es_out_sys_t *p_sys = malloc( sizeof( es_out_sys_t ) );
     vlc_value_t  val;
+    int i;
 
     out->pf_add     = EsOutAdd;
     out->pf_send    = EsOutSend;
@@ -150,12 +158,32 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     p_sys->i_video = 0;
     p_sys->i_sub   = 0;
 
+    /* */
     var_Get( p_input, "audio-channel", &val );
     p_sys->i_audio_last = val.i_int;
 
     var_Get( p_input, "spu-channel", &val );
     p_sys->i_sub_last = val.i_int;
 
+    var_Get( p_input, "audio-language", &val );
+    p_sys->ppsz_audio_language = LanguageSplit(val.psz_string);
+    if( p_sys->ppsz_audio_language )
+    {
+        for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
+            msg_Dbg( p_input, "Select audio in language[%d] %s",
+                     i, p_sys->ppsz_audio_language[i] );
+    }
+
+    var_Get( p_input, "spu-language", &val );
+    p_sys->ppsz_sub_language = LanguageSplit(val.psz_string);
+    if( p_sys->ppsz_sub_language )
+    {
+        for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
+            msg_Dbg( p_input, "Select subtitle in language[%d] %s",
+                     i, p_sys->ppsz_sub_language[i] );
+    }
+
+    /* */
     p_sys->p_es_audio = NULL;
     p_sys->p_es_video = NULL;
     p_sys->p_es_sub   = NULL;
@@ -182,10 +210,25 @@ void input_EsOutDelete( es_out_t *out )
         }
         if( p_sys->es[i]->psz_language )
             free( p_sys->es[i]->psz_language );
+        if( p_sys->es[i]->psz_language_code )
+            free( p_sys->es[i]->psz_language_code );
         es_format_Clean( &p_sys->es[i]->fmt );
 
         free( p_sys->es[i] );
     }
+    if( p_sys->ppsz_audio_language )
+    {
+        for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
+            free( p_sys->ppsz_audio_language[i] );
+        free( p_sys->ppsz_audio_language );
+    }
+    if( p_sys->ppsz_sub_language )
+    {
+        for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
+            free( p_sys->ppsz_sub_language[i] );
+        free( p_sys->ppsz_sub_language );
+    }
+
     if( p_sys->es )
         free( p_sys->es );
 
@@ -305,11 +348,11 @@ static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
     if( es->fmt.psz_description && *es->fmt.psz_description )
     {
         if( es->psz_language && *es->psz_language )
-	{
-	    text.psz_string = malloc( strlen( es->fmt.psz_description) + strlen( es->psz_language ) + 10 );
-	    sprintf( text.psz_string, "%s - [%s]", es->fmt.psz_description, es->psz_language );
-	}
-	else text.psz_string = strdup( es->fmt.psz_description );
+        {
+            text.psz_string = malloc( strlen( es->fmt.psz_description) + strlen( es->psz_language ) + 10 );
+            sprintf( text.psz_string, "%s - [%s]", es->fmt.psz_description, es->psz_language );
+        }
+        else text.psz_string = strdup( es->fmt.psz_description );
     }
     else
     {
@@ -493,6 +536,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         break;
     }
     es->psz_language = LanguageGetName( fmt->psz_language ); /* remember so we only need to do it once */
+    es->psz_language_code = LanguageGetCode( fmt->psz_language );
     es->p_dec = NULL;
 
     if( es->p_pgrm == p_sys->p_pgrm )
@@ -667,23 +711,63 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
 
         if( i_cat == AUDIO_ES )
         {
+            int idx1 = LanguageArrayIndex( p_sys->ppsz_audio_language,
+                                     es->psz_language_code );
+
             if( p_sys->p_es_audio &&
                 p_sys->p_es_audio->fmt.i_priority >= es->fmt.i_priority )
             {
-                return;
+                int idx2 = LanguageArrayIndex( p_sys->ppsz_audio_language,
+                                         p_sys->p_es_audio->psz_language_code );
+
+                if( idx1 < 0 || ( idx2 >= 0 && idx2 <= idx1 ) )
+                    return;
+                i_wanted = es->i_channel;
             }
-            i_wanted  = p_sys->i_audio_last >= 0 ?
-                            p_sys->i_audio_last : es->i_channel;
+            else
+            {
+                /* Select audio if (no audio selected yet)
+                 * - no audio-language
+                 * - no audio code for the ES
+                 * - audio code in the requested list */
+                if( idx1 >= 0 ||
+                    !strcmp( es->psz_language_code, "??" ) ||
+                    !p_sys->ppsz_audio_language )
+                    i_wanted = es->i_channel;
+            }
+
+            if( p_sys->i_audio_last >= 0 )
+                i_wanted = p_sys->i_audio_last;
         }
         else if( i_cat == SPU_ES )
         {
+            int idx1 = LanguageArrayIndex( p_sys->ppsz_sub_language,
+                                     es->psz_language_code );
+
             if( p_sys->p_es_sub &&
-                p_sys->p_es_sub->fmt.i_priority >=
-                    es->fmt.i_priority )
+                p_sys->p_es_sub->fmt.i_priority >= es->fmt.i_priority )
             {
-                return;
+                int idx2 = LanguageArrayIndex( p_sys->ppsz_sub_language,
+                                         p_sys->p_es_sub->psz_language_code );
+
+                msg_Dbg( p_sys->p_input, "idx1=%d(%s) idx2=%d(%s)",
+                        idx1, es->psz_language_code, idx2,
+                        p_sys->p_es_sub->psz_language_code );
+
+                if( idx1 < 0 || ( idx2 >= 0 && idx2 <= idx1 ) )
+                    return;
+                /* We found a SPU that matches our language request */
+                i_wanted  = es->i_channel;
             }
-            i_wanted  = p_sys->i_sub_last;
+            else if( idx1 >= 0 )
+            {
+                msg_Dbg( p_sys->p_input, "idx1=%d(%s)",
+                        idx1, es->psz_language_code );
+
+                i_wanted  = es->i_channel;
+            }
+            if( p_sys->i_sub_last >= 0 )
+                i_wanted  = p_sys->i_sub_last;
         }
         else if( i_cat == VIDEO_ES )
         {
@@ -832,6 +916,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 
     if( es->psz_language )
         free( es->psz_language );
+    if( es->psz_language_code )
+        free( es->psz_language_code );
 
     es_format_Clean( &es->fmt );
 
@@ -1130,6 +1216,84 @@ static char *LanguageGetName( const char *psz_code )
         }
         return strdup( pl->psz_eng_name );
     }
+}
+
+/* Get a 2 char code */
+static char *LanguageGetCode( const char *psz_lang )
+{
+    const iso639_lang_t *pl;
+
+    if( psz_lang == NULL || *psz_lang == '\0' )
+        return strdup("??");
+
+    for( pl = p_languages; pl->psz_iso639_1 != NULL; pl++ )
+    {
+        if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
+            !strcasecmp( pl->psz_native_name, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_1, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_2T, psz_lang ) ||
+            !strcasecmp( pl->psz_iso639_2B, psz_lang ) )
+            break;
+    }
+
+    if( pl->psz_iso639_1 != NULL )
+        return strdup( pl->psz_iso639_1 );
+
+    return strdup("??");
+}
+
+static char **LanguageSplit( const char *psz_langs )
+{
+    char *psz_dup;
+    char *psz_parser;
+    char **ppsz = NULL;
+    int i_psz = 0;
+
+    if( psz_langs == NULL )
+        return NULL;
+
+    psz_parser = psz_dup = strdup(psz_langs);
+
+    while( psz_parser && *psz_parser )
+    {
+        char *psz;
+        char *psz_code;
+
+        psz = strchr(psz_parser, ',' );
+        if( psz )
+        {
+            *psz++ = '\0';
+        }
+
+        psz_code = LanguageGetCode( psz_parser );
+        if( strcmp( psz_code, "??" ) )
+        {
+            TAB_APPEND( i_psz, ppsz, psz_code );
+        }
+
+        psz_parser = psz;
+    }
+
+    if( i_psz )
+    {
+        TAB_APPEND( i_psz, ppsz, NULL );
+    }
+
+    return ppsz;
+}
+
+static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang )
+{
+    int i;
+
+    if( !ppsz_langs || !psz_lang )
+        return -1;
+
+    for( i = 0; ppsz_langs[i]; i++ )
+        if( !strcasecmp( ppsz_langs[i], psz_lang ) )
+            return i;
+
+    return -1;
 }
 
 /****************************************************************************
