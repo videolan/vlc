@@ -4,6 +4,8 @@
 
 HEAD
 
+  * ./plugins/aa/aa.c: we now parse the AAOPTS environment variable.
+  * ./plugins/aa/aa.c: a few simplifications in the code.
   * ./configure.in: wrote a better test for libdvdread detection.
   * ./plugins/gtk/gtk.glade: added lines this #@%$! Glade had munched, fixes
     a segfault in the Gtk+ popup menu when toggling the interface.
