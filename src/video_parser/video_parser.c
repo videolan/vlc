@@ -66,7 +66,6 @@ static int      InitThread          ( vpar_thread_t *p_vpar );
 static void     RunThread           ( vpar_thread_t *p_vpar );
 static void     ErrorThread         ( vpar_thread_t *p_vpar );
 static void     EndThread           ( vpar_thread_t *p_vpar );
-static int      SynchroType         ( );
 
 /*****************************************************************************
  * vpar_CreateThread: create a generic parser thread
@@ -78,7 +77,8 @@ static int      SynchroType         ( );
  *****************************************************************************/
 #include "main.h"
 #include "interface.h"
-extern main_t* p_main;
+extern main_t *     p_main;
+
 vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
                                    vout_thread_t *p_vout, int *pi_status */ )
 {
@@ -277,54 +277,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Initialize the synchro properties
      */
-#ifdef SAM_SYNCHRO
-    /* Get an possible synchro algorithm */
-    p_vpar->synchro.i_type = SynchroType();
-
-    /* last seen PTS */
-    p_vpar->synchro.i_last_pts = 0;
-
-    /* for i frames */
-    p_vpar->synchro.i_last_seen_I_pts = 0;
-    p_vpar->synchro.i_last_kept_I_pts = 0;
-
-    /* the fifo */
-    p_vpar->synchro.i_start  = 0;
-    p_vpar->synchro.i_stop   = 0;
-
-    /* mean decoding time - at least 200 ms for a slow machine */
-    p_vpar->synchro.i_delay            = 200000;
-    p_vpar->synchro.i_theorical_delay  = 40000; /* 25 fps */
-    /* assume we can display all Is and 2 Ps */
-    p_vpar->synchro.b_all_I = 1 << 10;
-    p_vpar->synchro.b_all_P = 0;
-    p_vpar->synchro.displayable_p = 2 << 10;
-    p_vpar->synchro.b_all_B = 0;
-    p_vpar->synchro.displayable_b = 0;
-    p_vpar->synchro.b_dropped_last = 0;
-    /* assume there were about 3 P and 6 B images between I's */
-    p_vpar->synchro.i_P_seen = p_vpar->synchro.i_P_kept = 1 << 10;
-    p_vpar->synchro.i_B_seen = p_vpar->synchro.i_B_kept = 1 << 10;
-#endif
-
-#ifdef MEUUH_SYNCHRO
-    p_vpar->synchro.kludge_level = 5;
-    p_vpar->synchro.kludge_nbp = p_vpar->synchro.kludge_p = 5;
-    p_vpar->synchro.kludge_nbb = p_vpar->synchro.kludge_b = 6;
-    p_vpar->synchro.kludge_b = 0;
-    p_vpar->synchro.kludge_prevdate = 0;
-#endif
-
-#ifdef POLUX_SYNCHRO
-    p_vpar->synchro.i_current_frame_date = 0;
-    p_vpar->synchro.i_backward_frame_date = 0;
-
-    p_vpar->synchro.r_p_average = p_vpar->synchro.i_p_nb = 6;
-    p_vpar->synchro.r_b_average = p_vpar->synchro.i_b_nb = 6;
-    p_vpar->synchro.i_p_count = 0;
-    p_vpar->synchro.i_b_count = 0;
-    p_vpar->synchro.i_i_count = 0;
-#endif
+    vpar_SynchroInit( p_vpar );
 
     /* Mark thread as running and return */
     intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
@@ -476,61 +429,3 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     intf_DbgMsg("vpar debug: EndThread(%p)\n", p_vpar);
 }
-
-/*****************************************************************************
- * SynchroType: Get the user's synchro type
- *****************************************************************************
- * This function is called at initialization.
- *****************************************************************************/
-static int SynchroType( )
-{
-    char * psz_synchro = main_GetPszVariable( VPAR_SYNCHRO_VAR, NULL );
-
-    if( psz_synchro == NULL )
-    {
-        return VPAR_SYNCHRO_DEFAULT;
-    }
-
-    switch( *psz_synchro++ )
-    {
-      case 'i':
-      case 'I':
-        switch( *psz_synchro++ )
-        {
-          case '\0':
-            return VPAR_SYNCHRO_I;
-
-          case '+':
-            if( *psz_synchro ) return 0;
-            return VPAR_SYNCHRO_Iplus;
-
-          case 'p':
-          case 'P':
-            switch( *psz_synchro++ )
-            {
-              case '\0':
-                return VPAR_SYNCHRO_IP;
-
-              case '+':
-                if( *psz_synchro ) return 0;
-                return VPAR_SYNCHRO_IPplus;
-
-              case 'b':
-              case 'B':
-                if( *psz_synchro ) return 0;
-                return VPAR_SYNCHRO_IPB;
-
-              default:
-                return VPAR_SYNCHRO_DEFAULT;
-                
-            }
-
-          default:
-            return VPAR_SYNCHRO_DEFAULT;
-        }
-    }
-
-    return VPAR_SYNCHRO_DEFAULT;
-
-}
-

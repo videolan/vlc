@@ -135,7 +135,7 @@ typedef struct vout_thread_s
     p_vout_sys_t        p_sys;                       /* system output method */
     vdec_DecodeMacroblock_t *
                         vdec_DecodeMacroblock;    /* decoder function to use */
-
+                                                                   
     /* Current display properties */
     u16                 i_changes;             /* changes made to the thread */
     int                 i_width;              /* current output method width */
@@ -181,6 +181,7 @@ typedef struct vout_thread_s
     boolean_t           b_info;              /* print additional information */
     boolean_t           b_interface;                     /* render interface */
     boolean_t           b_scale;                    /* allow picture scaling */
+    mtime_t             render_time;             /* last picture render time */
 
     /* Idle screens management */
     mtime_t             last_display_date;     /* last non idle display date */
@@ -190,7 +191,6 @@ typedef struct vout_thread_s
 #ifdef STATS
     /* Statistics - these numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
-    mtime_t             render_time;             /* last picture render time */
     count_t             c_fps_samples;                     /* picture counts */
     mtime_t             p_fps_sample[VOUT_FPS_SAMPLES]; /* FPS samples dates */
 #endif
@@ -208,10 +208,6 @@ typedef struct vout_thread_s
     /* Bitmap fonts */
     p_vout_font_t       p_default_font;                      /* default font */
     p_vout_font_t       p_large_font;                          /* large font */
-
-    /* Synchronization informations - synchro level is updated by the vout
-     * thread and read by decoder threads */
-    int                 i_synchro_level;                   /* trashing level */
 } vout_thread_t;
 
 /* Flags for changes - these flags are set in the i_changes field when another
@@ -224,7 +220,9 @@ typedef struct vout_thread_s
 #define VOUT_DEPTH_CHANGE       0x0400                      /* depth changed */
 #define VOUT_GAMMA_CHANGE       0x0010                      /* gamma changed */
 #define VOUT_YUV_CHANGE         0x0800                  /* change yuv tables */
-#define VOUT_NODISPLAY_CHANGE   0xff00    /* changes which forbidden display */
+
+/* Disabled for thread deadlocks issues --Meuuh */
+//#define VOUT_NODISPLAY_CHANGE   0xff00    /* changes which forbidden display */
 
 /*****************************************************************************
  * Macros

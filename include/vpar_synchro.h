@@ -3,9 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors: Samuel Hocevar <sam@via.ecp.fr>
- *          Jean-Marc Dressler <polux@via.ecp.fr>
- *          Christophe Massiot <massiot@via.ecp.fr>
+ * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,102 +33,58 @@
  *  "video_fifo.h"
  *****************************************************************************/
 
-#define SAM_SYNCHRO
-//#define POLUX_SYNCHRO
-//#define MEUUH_SYNCHRO
-
 /*****************************************************************************
  * video_synchro_t and video_synchro_tab_s : timers for the video synchro
  *****************************************************************************/
-#ifdef SAM_SYNCHRO
+#define MAX_DECODING_PIC        16
+#define MAX_PIC_AVERAGE         8
+
+/* Read the discussion on top of vpar_synchro.c for more information. */
 typedef struct video_synchro_s
 {
     /* synchro algorithm */
-    int          i_type;
+    int             i_type;
 
     /* fifo containing decoding dates */
-    mtime_t      i_date_fifo[16];
-    unsigned int i_start;
-    unsigned int i_stop;
+    mtime_t         p_date_fifo[MAX_DECODING_PIC];
+    int             pi_coding_types[MAX_DECODING_PIC];
+    unsigned int    i_start, i_end;
+    vlc_mutex_t     fifo_lock;
 
-    /* mean decoding time */
-    mtime_t i_delay;
-    mtime_t i_theorical_delay;
+    /* stream properties */
+    unsigned int    i_n_p, i_n_b;
 
-    /* dates */
-    mtime_t i_last_pts;                   /* pts of the last displayed image */
-    mtime_t i_last_seen_I_pts;              /* date of the last I we decoded */
-    mtime_t i_last_kept_I_pts;            /* pts of last non-dropped I image */
+    /* decoding values */
+    mtime_t         p_tau[4];                  /* average decoding durations */
+    unsigned int    pi_meaningful[4];            /* number of durations read */
+    /* and p_vout->render_time (read with p_vout->change_lock) */
 
-    /* P images since the last I */
-    unsigned int i_P_seen;
-    unsigned int i_P_kept;
-    /* B images since the last I */
-    unsigned int i_B_seen;
-    unsigned int i_B_kept;
+    /* stream context */
+    unsigned int    i_eta_p, i_eta_b;
+    boolean_t       b_dropped_last;            /* for special synchros below */
+    mtime_t         backward_pts, current_pts;
 
-    /* can we display pictures ? */
-    boolean_t     b_all_I;
-    boolean_t     b_all_P;
-    int           displayable_p;
-    boolean_t     b_all_B;
-    int           displayable_b;
-    boolean_t     b_dropped_last;
-
+#ifdef STATS
+    unsigned int    i_B_self, i_B_next, i_B_last, i_B_I;
+#endif
 } video_synchro_t;
 
-#define FIFO_INCREMENT( i_counter ) \
-    p_vpar->synchro.i_counter = (p_vpar->synchro.i_counter + 1) & 0xf;
+#define FIFO_INCREMENT( i_counter )                                         \
+    p_vpar->synchro.i_counter =                                             \
+        (p_vpar->synchro.i_counter + 1) % MAX_DECODING_PIC;
 
-#define VPAR_SYNCHRO_DEFAULT   0
-#define VPAR_SYNCHRO_I         1
-#define VPAR_SYNCHRO_Iplus     2
-#define VPAR_SYNCHRO_IP        3
-#define VPAR_SYNCHRO_IPplus    4
-#define VPAR_SYNCHRO_IPB       5
-
-#endif
-
-#ifdef MEUUH_SYNCHRO
-typedef struct video_synchro_s
-{
-    int         kludge_level, kludge_p, kludge_b, kludge_nbp, kludge_nbb;
-    int         kludge_nbframes;
-    mtime_t     kludge_date, kludge_prevdate;
-    int         i_coding_type;
-} video_synchro_t;
-
-#define SYNC_TOLERATE   ((int)(0.010*CLOCK_FREQ))                   /* 10 ms */
-#define SYNC_DELAY      ((int)(0.500*CLOCK_FREQ))                  /* 500 ms */
-#endif
-
-#ifdef POLUX_SYNCHRO
-
-#define SYNC_AVERAGE_COUNT 10
-
-typedef struct video_synchro_s
-{
-    /* Date Section */
-
-    /* Dates needed to compute the date of the current frame
-     * We also use the stream frame rate (sequence.i_frame_rate) */
-    mtime_t     i_current_frame_date;
-    mtime_t     i_backward_frame_date;
-
-    /* Frame Trashing Section */
-
-    int         i_b_nb, i_p_nb;   /* number of decoded P and B between two I */
-    float       r_b_average, r_p_average;
-    int         i_b_count, i_p_count, i_i_count;
-    int         i_b_trasher;                /* used for brensenham algorithm */
-
-} video_synchro_t;
-
-#endif
+/* Synchro algorithms */
+#define VPAR_SYNCHRO_DEFAULT    0
+#define VPAR_SYNCHRO_I          1
+#define VPAR_SYNCHRO_Iplus      2
+#define VPAR_SYNCHRO_IP         3
+#define VPAR_SYNCHRO_IPplus     4
+#define VPAR_SYNCHRO_IPB        5
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+void vpar_SynchroInit           ( struct vpar_thread_s * p_vpar );
 boolean_t vpar_SynchroChoose    ( struct vpar_thread_s * p_vpar,
                                   int i_coding_type, int i_structure );
 void vpar_SynchroTrash          ( struct vpar_thread_s * p_vpar,
@@ -139,7 +93,3 @@ void vpar_SynchroDecode         ( struct vpar_thread_s * p_vpar,
                                   int i_coding_type, int i_structure );
 void vpar_SynchroEnd            ( struct vpar_thread_s * p_vpar );
 mtime_t vpar_SynchroDate        ( struct vpar_thread_s * p_vpar );
-
-#ifndef SAM_SYNCHRO
-void vpar_SynchroKludge         ( struct vpar_thread_s *, mtime_t );
-#endif

@@ -3,9 +3,9 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors: Samuel Hocevar <sam@via.ecp.fr>
- *          Jean-Marc Dressler <polu@via.ecp.fr>
- *          Christophe Massiot <massiot@via.ecp.fr>
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Samuel Hocevar <sam@via.ecp.fr>
+ *          Jean-Marc Dressler <polux@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,80 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*
+ * DISCUSSION : How to Write an efficient Frame-Dropping Algorithm
+ * ==========
+ *
+ * This implementation is based on mathematical and statistical
+ * developments. Older implementations used an enslavement, considering
+ * that if we're late when reading an I picture, we will decode one frame
+ * less. It had a tendancy to derive, and wasn't responsive enough, which
+ * would have caused trouble with the stream control stuff.
+ *
+ * 1. Structure of a picture stream
+ *    =============================
+ * Between 2 I's, we have for instance :
+ *    I   B   P   B   P   B   P   B   P   B   P   B   I
+ *    t0  t1  t2  t3  t4  t5  t6  t7  t8  t9  t10 t11 t12
+ * Please bear in mind that B's and IP's will be inverted when displaying
+ * (decoding order != presentation order). Thus, t1 < t0.
+ *
+ * 2. Definitions
+ *    ===========
+ * t[0..12]     : Presentation timestamps of pictures 0..12.
+ * t            : Current timestamp, at the moment of the decoding.
+ * T            : Picture period, T = 1/frame_rate.
+ * tau[I,P,B]   : Mean time to decode an [I,P,B] picture.
+ * tauYUV       : Mean time to render a picture (given by the video_output).
+ * tau´[I,P,B] = 2 * tau[I,P,B] + tauYUV
+ *              : Mean time + typical difference (estimated to tau, that
+ *                needs to be confirmed) + render time.
+ * DELTA        : A given error margin.
+ *
+ * 3. Decoding of an I picture
+ *    ========================
+ * On fast machines (ie. those who can decode all Is), we decode all I.
+ * Otherwise :
+ * We can decode an I picture if we simply have enough time to decode it 
+ * before displaying :
+ *      t0 - t > tau´I + DELTA
+ *
+ * 4. Decoding of a P picture
+ *    =======================
+ * On fast machines (ie. those who can decode all Ps), we decode all P.
+ * Otherwise :
+ * First criterion : have time to decode it.
+ *      t2 - t > tau´P + DELTA
+ *
+ * Second criterion : it shouldn't prevent us from decoding the forthcoming I
+ * picture, which is more important.
+ *      t12 - t > tau´P + tau´I + DELTA
+ *
+ * 5. Decoding of a B picture
+ *    =======================
+ * First criterion : have time to decode it.
+ *      t1 - t > tau´B + DELTA
+ *
+ * Second criterion : it shouldn't prevent us from decoding all P pictures
+ * until the next I, which are more important.
+ *      t4 - t > tau´B + tau´P + DELTA
+ *      [...]
+ *      t10 - t > tau´B + 4 * tau´P + DELTA
+ * It is possible to demonstrate that if the first and the last inequations
+ * are verified, the inequations in between will be verified too.
+ *
+ * Third criterion : it shouldn't prevent us from decoding the forthcoming I
+ * picture, which is more important.
+ *      t12 - t > tau´B + 4 * tau´P + tau´I + DELTA
+ *
+ * If STATS is defined, the counters in p_vpar->synchro will refer to the
+ * number of failures of these inequations.
+ *
+ * I hope you will have a pleasant flight and do not forget your life
+ * jacket.
+ *                                                  --Meuuh (2000-11-09)
+ */
 
 /*****************************************************************************
  * Preamble
@@ -53,151 +127,39 @@
 #include "vpar_synchro.h"
 #include "video_parser.h"
 
-#define MAX_COUNT 3
+#include "main.h"
 
 /*
  * Local prototypes
  */
+static int  SynchroType( void );
+static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type );
 
-#ifdef SAM_SYNCHRO
+/* Error margins */
+#define DELTA_I                 (int)(0.010*CLOCK_FREQ)
+#define DELTA_P                 (int)(0.010*CLOCK_FREQ)
+#define DELTA_B                 (int)(0.060*CLOCK_FREQ)
+
+#define DEFAULT_NB_P            5
+#define DEFAULT_NB_B            1
 
 /*****************************************************************************
- * vpar_SynchroUpdateStructures : Update the synchro structures
+ * vpar_SynchroInit : You know what ?
  *****************************************************************************/
-void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
-                                   int i_coding_type, boolean_t b_kept )
+void vpar_SynchroInit( vpar_thread_t * p_vpar )
 {
-    int             i_can_display;
-    mtime_t         i_pts;
-    pes_packet_t *  p_pes = p_vpar->bit_stream.p_decoder_fifo->buffer[
-                               p_vpar->bit_stream.p_decoder_fifo->i_start ];
+    p_vpar->synchro.i_type = SynchroType();
+    p_vpar->synchro.i_start = p_vpar->synchro.i_end = 0;
+    vlc_mutex_init( &p_vpar->synchro.fifo_lock );
 
-    /* try to guess the current DTS and PTS */
-    if( p_pes->b_has_pts )
-    {
-        i_pts = p_pes->i_pts;
-
-        /* if the image is I type, then the presentation timestamp is
-         * the PTS of the PES. Otherwise, we calculate it with the
-         * theorical framerate value */
-        if( i_coding_type == I_CODING_TYPE )
-        {
-            p_vpar->synchro.i_last_pts = p_pes->i_pts;
-        }
-        else
-        {
-            p_vpar->synchro.i_last_pts += p_vpar->synchro.i_theorical_delay;
-        }
-
-        p_pes->b_has_pts = 0;
-    }
-    else
-    {
-        p_vpar->synchro.i_last_pts += p_vpar->synchro.i_theorical_delay;
-        i_pts = p_vpar->synchro.i_last_pts;
-    }
-
-    /* update structures */
-    switch(i_coding_type)
-    {
-        case P_CODING_TYPE:
-
-            p_vpar->synchro.i_P_seen += 1024;
-            if( b_kept ) p_vpar->synchro.i_P_kept += 1024;
-            break;
-
-        case B_CODING_TYPE:
-            p_vpar->synchro.i_B_seen += 1024;
-            if( b_kept ) p_vpar->synchro.i_B_kept += 1024;
-            break;
-
-        case I_CODING_TYPE:
-
-            /* update the last I PTS we have, we need it to
-             * calculate the theorical framerate */
-            if (i_pts != p_vpar->synchro.i_last_seen_I_pts)
-            {
-                if ( p_vpar->synchro.i_last_seen_I_pts )
-                {
-                    p_vpar->synchro.i_theorical_delay =
-                      1024 * ( i_pts - p_vpar->synchro.i_last_seen_I_pts )
-                          / ( 1024 + p_vpar->synchro.i_B_seen
-                                + p_vpar->synchro.i_P_seen);
-                }
-                p_vpar->synchro.i_last_seen_I_pts = i_pts;
-            }
-
-            /* now we calculated all statistics, it's time to
-             * decide what we have the time to display */
-            i_can_display = 
-                ( (i_pts - p_vpar->synchro.i_last_kept_I_pts) << 10 )
-                                / p_vpar->synchro.i_delay;
-
-            p_vpar->synchro.b_all_I = 0;
-            p_vpar->synchro.b_all_B = 0;
-            p_vpar->synchro.b_all_P = 0;
-            p_vpar->synchro.displayable_p = 0;
-            p_vpar->synchro.displayable_b = 0;
-
-            if( ( p_vpar->synchro.b_all_I = ( i_can_display >= 1024 ) ) )
-            {
-                i_can_display -= 1024;
-
-                if( !( p_vpar->synchro.b_all_P
-                        = ( i_can_display > p_vpar->synchro.i_P_seen ) ) )
-                {
-                    p_vpar->synchro.displayable_p = i_can_display;
-                }
-                else
-                {
-                    i_can_display -= p_vpar->synchro.i_P_seen;
-
-                    if( !( p_vpar->synchro.b_all_B
-                            = ( i_can_display > p_vpar->synchro.i_B_seen ) ) )
-                    {
-                        p_vpar->synchro.displayable_b = i_can_display;
-                    }
-                }
-            }
-
-#if 0
-            if( p_vpar->synchro.b_all_I )
-                intf_ErrMsg( "  I: 1024/1024  " );
-
-            if( p_vpar->synchro.b_all_P )
-                intf_ErrMsg( "P: %i/%i  ", p_vpar->synchro.i_P_seen,
-                                           p_vpar->synchro.i_P_seen );
-            else if( p_vpar->synchro.displayable_p > 0 )
-                intf_ErrMsg( "P: %i/%i  ", p_vpar->synchro.displayable_p,
-                                             p_vpar->synchro.i_P_seen );
-            else
-                intf_ErrMsg( "                " );
-
-            if( p_vpar->synchro.b_all_B )
-                intf_ErrMsg( "B: %i/%i", p_vpar->synchro.i_B_seen,
-                                         p_vpar->synchro.i_B_seen );
-            else if( p_vpar->synchro.displayable_b > 0 )
-                intf_ErrMsg( "B: %i/%i", p_vpar->synchro.displayable_b,
-                                           p_vpar->synchro.i_B_seen );
-            else
-                intf_ErrMsg( "                " );
-
-            intf_ErrMsg( "Decoding: " );
-            /*intf_ErrMsg( "\n" );*/
-#endif
-            p_vpar->synchro.i_P_seen = 0;
-            p_vpar->synchro.i_B_seen = 0;
-
-            /* update some values */
-            if( b_kept )
-            {
-                p_vpar->synchro.i_last_kept_I_pts = i_pts;
-                p_vpar->synchro.i_P_kept = 0;
-                p_vpar->synchro.i_B_kept = 0;
-            }
-
-            break;
-    }
+    /* We use a fake stream pattern, which is often right. */
+    p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p = DEFAULT_NB_P;
+    p_vpar->synchro.i_n_b = p_vpar->synchro.i_eta_b = DEFAULT_NB_B;
+    memset( p_vpar->synchro.p_tau, 0, 4 * sizeof(mtime_t) );
+    memset( p_vpar->synchro.pi_meaningful, 0, 4 * sizeof(unsigned int) );
+    p_vpar->synchro.b_dropped_last = 0;
+    p_vpar->synchro.current_pts = mdate() + INPUT_PTS_DELAY;
+    p_vpar->synchro.backward_pts = 0;
 }
 
 /*****************************************************************************
@@ -206,26 +168,22 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                               int i_structure )
 {
-    mtime_t i_delay = p_vpar->synchro.i_last_pts - mdate();
+    /* For clarity reasons, we separated the special synchros code from the
+     * mathematical synchro */
 
-    switch( i_coding_type )
+    if( p_vpar->synchro.i_type != VPAR_SYNCHRO_DEFAULT )
     {
+        switch( i_coding_type )
+        {
         case I_CODING_TYPE:
-
-            if( p_vpar->synchro.i_type != VPAR_SYNCHRO_DEFAULT )
+            /* I, IP, IP+, IPB */
+            if( p_vpar->synchro.i_type == VPAR_SYNCHRO_Iplus )
             {
-                /* I, IP, IP+, IPB */
-                if( p_vpar->synchro.i_type == VPAR_SYNCHRO_Iplus )
-                {
-                    p_vpar->synchro.b_dropped_last = 1;
-                }
-                return( 1 );
+                p_vpar->synchro.b_dropped_last = 1;
             }
-
-            return( p_vpar->synchro.b_all_I );
+            return( 1 );
 
         case P_CODING_TYPE:
-
             if( p_vpar->synchro.i_type == VPAR_SYNCHRO_I ) /* I */
             {
                 return( 0 );
@@ -244,71 +202,161 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 }
             }
 
-            if( p_vpar->synchro.i_type >= VPAR_SYNCHRO_IP ) /* IP, IP+, IPB */
-            {
-                return( 1 );
-            }
-
-            if( p_vpar->synchro.b_all_P )
-            {
-                return( 1 );
-            }
-
-            if( p_vpar->synchro.displayable_p * i_delay
-                < p_vpar->synchro.i_delay )
-            {
-                return( 0 );
-            }
-
-            p_vpar->synchro.displayable_p -= 1024;
-
-            return( 1 );
+            return( 1 ); /* IP, IP+, IPB */
 
         case B_CODING_TYPE:
-
-            if( p_vpar->synchro.i_type != VPAR_SYNCHRO_DEFAULT )
+            if( p_vpar->synchro.i_type <= VPAR_SYNCHRO_IP ) /* I, IP */
             {
-                if( p_vpar->synchro.i_type <= VPAR_SYNCHRO_IP ) /* I, IP */
-                {
-                    return( 0 );
-                }
-                else if( p_vpar->synchro.i_type == VPAR_SYNCHRO_IPB ) /* IPB */
-                {
-                    return( 1 );
-                }
-
-                if( p_vpar->synchro.b_dropped_last ) /* IP+ */
-                {
-                    p_vpar->synchro.b_dropped_last = 0;
-                    return( 1 );
-                }
-
-                p_vpar->synchro.b_dropped_last = 1;
                 return( 0 );
             }
-
-            if( p_vpar->synchro.b_all_B )
+            else if( p_vpar->synchro.i_type == VPAR_SYNCHRO_IPB ) /* IPB */
             {
                 return( 1 );
             }
 
-            if( p_vpar->synchro.displayable_b <= 0 )
-            {
-                return( 0 );
-            }
-
-            if( i_delay < 0 )
-            {
-                p_vpar->synchro.displayable_b -= 512;
-                return( 0 );
-            }
-
-            p_vpar->synchro.displayable_b -= 1024;
-            return( 1 );
+            p_vpar->synchro.b_dropped_last ^= 1; /* IP+ */
+            return( !p_vpar->synchro.b_dropped_last );
+        }
+        return( 0 ); /* never reached but gcc yells at me */
     }
+    else
+    {
+#define TAU_PRIME( coding_type )    (p_vpar->synchro.p_tau[(coding_type)] \
+                                 + (p_vpar->synchro.p_tau[(coding_type)] >> 1) \
+                                            + tau_yuv)
+#define S                           p_vpar->synchro
+        /* VPAR_SYNCHRO_DEFAULT */
+        mtime_t         now, pts, period, tau_yuv;
+        boolean_t       b_decode = 0, b_decode2;
 
-    return( 0 );
+        now = mdate();
+        period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
 
+        //vlc_mutex_lock( &p_vpar->p_vout->change_lock );
+        tau_yuv = p_vpar->p_vout->render_time;
+        //vlc_mutex_unlock( &p_vpar->p_vout->change_lock );
+
+        vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
+
+        switch( i_coding_type )
+        {
+        case I_CODING_TYPE:
+            /* Stream structure changes */
+            S.i_n_p = S.i_eta_p || DEFAULT_NB_P;
+
+            if( S.backward_pts )
+            {
+                pts = S.backward_pts;
+            }
+            else
+            {
+                pts = S.current_pts + period * S.i_n_b;
+            }
+
+            b_decode = ( (1 + S.i_n_p * (S.i_n_b + 1)) * period > 
+                           S.p_tau[I_CODING_TYPE] ) ||
+                       ( (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA_I) );
+            if( !b_decode )
+                intf_Msg("vpar synchro: trashing I\n");
+            break;
+
+        case P_CODING_TYPE:
+            /* Stream structure changes */
+            S.i_n_b = S.i_eta_b || DEFAULT_NB_B;
+            if( S.i_eta_p + 1 > S.i_n_p )
+                S.i_n_p++;
+
+            if( S.backward_pts )
+            {
+                pts = S.backward_pts;
+            }
+            else
+            {
+                pts = S.current_pts + period * S.i_n_b;
+            }
+
+            if( (S.i_n_b + 1) * period > S.p_tau[P_CODING_TYPE] )
+            {
+                b_decode = (pts - now > 0);
+            }
+            else
+            {
+                b_decode = (pts - now) > (TAU_PRIME(P_CODING_TYPE) + DELTA_P);
+                /* next I */
+                b_decode &= (pts - now
+                              + period
+                          * ( (S.i_n_p - S.i_eta_p - 1) * (1 + S.i_n_b) - 1 ))
+                            > (TAU_PRIME(P_CODING_TYPE)
+                                + TAU_PRIME(I_CODING_TYPE) + DELTA_P);
+            }
+            break;
+
+        case B_CODING_TYPE:
+            /* Stream structure changes */
+            if( S.i_eta_b + 1 > S.i_n_b )
+                S.i_n_b++;
+
+            pts = S.current_pts;
+
+            if( (S.i_n_b + 1) * period > S.p_tau[P_CODING_TYPE] )
+            {
+                b_decode = (pts - now) > (TAU_PRIME(B_CODING_TYPE) + DELTA_B);
+#ifdef STATS
+                S.i_B_self += !b_decode;
+#endif
+                /* Remember that S.i_eta_b is for the moment only eta_b - 1. */
+                if( S.i_eta_p != S.i_n_p ) /* next P */
+                {
+                    b_decode2 = (pts - now
+                                  + period
+                                  * ( 2 * S.i_n_b - S.i_eta_b - 1))
+                                    > (TAU_PRIME(B_CODING_TYPE)
+                                        + TAU_PRIME(P_CODING_TYPE) + DELTA_B);
+                    b_decode &= b_decode2;
+#ifdef STATS
+                    S.i_B_next += !b_decode2;
+#endif
+                }
+                if( S.i_eta_p < S.i_n_p - 1 ) /* last P */
+                {
+                    b_decode2 = (pts - now
+                                  + period
+                                  * ( (S.i_n_p - S.i_eta_p) * (1 + S.i_n_b)
+                                        + S.i_n_b - (S.i_eta_b + 1) + 1))
+                                    > (TAU_PRIME(B_CODING_TYPE)
+                                        + (S.i_n_p - S.i_eta_p)
+                                        * TAU_PRIME(P_CODING_TYPE)
+                                        + DELTA_B);
+                    b_decode &= b_decode2;
+#ifdef STATS
+                    S.i_B_last += !b_decode2;
+#endif
+                }
+                b_decode2 = (pts - now
+                              + period
+                              * ( (S.i_n_p - S.i_eta_p + 1) * (1 + S.i_n_b)
+                                        + S.i_n_b - (S.i_eta_b + 1) + 1 ))
+                                    > (TAU_PRIME(B_CODING_TYPE)
+                                        + (S.i_n_p - S.i_eta_p)
+                                        * TAU_PRIME(P_CODING_TYPE)
+                                        + TAU_PRIME(I_CODING_TYPE)
+                                        + DELTA_B);
+                b_decode &= b_decode2;
+#ifdef STATS
+                S.i_B_I += !b_decode2;
+#endif
+            }
+            else
+            {
+                b_decode = 0;
+            }
+        }
+
+        vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
+        return( b_decode );
+#undef S
+#undef TAU_PRIME
+    }
 }
 
 /*****************************************************************************
@@ -317,22 +365,33 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
                         int i_structure )
 {
-    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, 0);
-
+    SynchroNewPicture( p_vpar, i_coding_type );
 }
 
 /*****************************************************************************
  * vpar_SynchroDecode : Update timers when we decide to decode a picture
  *****************************************************************************/
 void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
-                            int i_structure )
+                         int i_structure )
 {
-    vpar_SynchroUpdateStructures (p_vpar, i_coding_type, 1);
+    vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
 
-    p_vpar->synchro.i_date_fifo[p_vpar->synchro.i_stop] = mdate();
+    if( ((p_vpar->synchro.i_end + 1 - p_vpar->synchro.i_start)
+            % MAX_DECODING_PIC) )
+    {
+        p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_end] = mdate();
+        p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_end] = i_coding_type;
 
-    FIFO_INCREMENT( i_stop );
+        FIFO_INCREMENT( i_end );
+    }
+    else
+    {
+        /* FIFO full, panic() */
+        intf_ErrMsg("vpar error: synchro fifo full, estimations will be biased\n");
+    }
+    vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
 
+    SynchroNewPicture( p_vpar, i_coding_type );
 }
 
 /*****************************************************************************
@@ -340,29 +399,27 @@ void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
  *****************************************************************************/
 void vpar_SynchroEnd( vpar_thread_t * p_vpar )
 {
-    if( p_vpar->synchro.i_stop != p_vpar->synchro.i_start )
+    mtime_t     tau;
+    int         i_coding_type;
+
+    vlc_mutex_lock( &p_vpar->synchro.fifo_lock );
+
+    tau = mdate() - p_vpar->synchro.p_date_fifo[p_vpar->synchro.i_start];
+    i_coding_type = p_vpar->synchro.pi_coding_types[p_vpar->synchro.i_start];
+
+    /* Mean with average tau, to ensure stability. */
+    p_vpar->synchro.p_tau[i_coding_type] =
+        (p_vpar->synchro.pi_meaningful[i_coding_type]
+          * p_vpar->synchro.p_tau[i_coding_type] + tau)
+        / (p_vpar->synchro.pi_meaningful[i_coding_type] + 1);
+    if( p_vpar->synchro.pi_meaningful[i_coding_type] < MAX_PIC_AVERAGE )
     {
-        mtime_t i_delay;
-
-        i_delay = ( mdate() -
-            p_vpar->synchro.i_date_fifo[p_vpar->synchro.i_start] )
-              / ( (p_vpar->synchro.i_stop - p_vpar->synchro.i_start) & 0x0f );
-
-        p_vpar->synchro.i_delay =
-            ( 7 * p_vpar->synchro.i_delay + i_delay ) >> 3;
-
-#if 0
-        intf_ErrMsg( "decode %lli (mean %lli, theorical %lli)\n",
-                     i_delay, p_vpar->synchro.i_delay,
-                     p_vpar->synchro.i_theorical_delay );
-#endif
-    }
-    else
-    {
-        intf_ErrMsg( "vpar error: critical ! fifo full\n" );
+        p_vpar->synchro.pi_meaningful[i_coding_type]++;
     }
 
     FIFO_INCREMENT( i_start );
+
+    vlc_mutex_unlock( &p_vpar->synchro.fifo_lock );
 }
 
 /*****************************************************************************
@@ -370,174 +427,137 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar )
  *****************************************************************************/
 mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 {
-#if 0
-
-    mtime_t i_displaydate = p_vpar->synchro.i_last_pts;
-
-    static mtime_t i_delta = 0;
-
-    intf_ErrMsg( "displaying image with delay %lli and delta %lli\n",
-        i_displaydate - mdate(),
-        i_displaydate - i_delta );
-
-    intf_ErrMsg ( "theorical fps: %f - actual fps: %f \n",
-        1000000.0 / p_vpar->synchro.i_theorical_delay, 1000000.0 / p_vpar->synchro.i_delay );
-
-    i_delta = i_displaydate;
-
-    return i_displaydate;
-#else
-    static s64 i_last_date = 0;
-//printf("%d: %lld\n", p_vpar->picture.i_coding_type, p_vpar->synchro.i_last_pts - i_last_date);
-//i_last_date = p_vpar->synchro.i_last_pts;
-    return p_vpar->synchro.i_last_pts;
-
-#endif
+    /* No need to lock, since PTS are only used by the video parser. */
+    return( p_vpar->synchro.current_pts );
 }
 
-#endif
-
-
-#ifdef POLUX_SYNCHRO
-
-void vpar_SynchroSetCurrentDate( vpar_thread_t * p_vpar, int i_coding_type )
+/*****************************************************************************
+ * SynchroType: Get the user's synchro type
+ *****************************************************************************
+ * This function is called at initialization.
+ *****************************************************************************/
+static int SynchroType( void )
 {
-    pes_packet_t * p_pes =
-        p_vpar->bit_stream.p_decoder_fifo->buffer[p_vpar->bit_stream.p_decoder_fifo->i_start];
+    char * psz_synchro = main_GetPszVariable( VPAR_SYNCHRO_VAR, NULL );
 
-
-    switch( i_coding_type )
+    if( psz_synchro == NULL )
     {
-    case B_CODING_TYPE:
-        if( p_pes->b_has_pts )
-        {
-            if( p_pes->i_pts < p_vpar->synchro.i_current_frame_date )
-            {
-                intf_ErrMsg( "vpar warning: pts_date < current_date\n" );
-            }
-            p_vpar->synchro.i_current_frame_date = p_pes->i_pts;
-            p_pes->b_has_pts = 0;
-        }
-        else
-        {
-            p_vpar->synchro.i_current_frame_date += 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
-        }
-        break;
-
-    default:
-
-        if( p_vpar->synchro.i_backward_frame_date == 0 )
-        {
-            p_vpar->synchro.i_current_frame_date += 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
-        }
-        else
-        {
-            if( p_vpar->synchro.i_backward_frame_date < p_vpar->synchro.i_current_frame_date )
-            {
-                intf_ErrMsg( "vpar warning: backward_date < current_date (%Ld)\n",
-                         p_vpar->synchro.i_backward_frame_date - p_vpar->synchro.i_current_frame_date );
-            }
-            p_vpar->synchro.i_current_frame_date = p_vpar->synchro.i_backward_frame_date;
-            p_vpar->synchro.i_backward_frame_date = 0;
-        }
-
-        if( p_pes->b_has_pts )
-        {
-            p_vpar->synchro.i_backward_frame_date = p_pes->i_pts;
-            p_pes->b_has_pts = 0;
-        }
-       break;
+        return VPAR_SYNCHRO_DEFAULT;
     }
+
+    switch( *psz_synchro++ )
+    {
+      case 'i':
+      case 'I':
+        switch( *psz_synchro++ )
+        {
+          case '\0':
+            return VPAR_SYNCHRO_I;
+
+          case '+':
+            if( *psz_synchro ) return 0;
+            return VPAR_SYNCHRO_Iplus;
+
+          case 'p':
+          case 'P':
+            switch( *psz_synchro++ )
+            {
+              case '\0':
+                return VPAR_SYNCHRO_IP;
+
+              case '+':
+                if( *psz_synchro ) return 0;
+                return VPAR_SYNCHRO_IPplus;
+
+              case 'b':
+              case 'B':
+                if( *psz_synchro ) return 0;
+                return VPAR_SYNCHRO_IPB;
+
+              default:
+                return VPAR_SYNCHRO_DEFAULT;
+                
+            }
+
+          default:
+            return VPAR_SYNCHRO_DEFAULT;
+        }
+    }
+
+    return VPAR_SYNCHRO_DEFAULT;
 }
 
-boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
-                              int i_structure )
+/*****************************************************************************
+ * SynchroNewPicture: Update stream structure and PTS
+ *****************************************************************************/
+static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
 {
-    boolean_t b_result = 1;
-    int i_synchro_level = p_vpar->p_vout->i_synchro_level;
-
-    vpar_SynchroSetCurrentDate( p_vpar, i_coding_type );
-
-    /*
-     * The synchro level is updated by the video input (see SynchroLevelUpdate)
-     * so we just use the synchro_level to decide which frame to trash
-     */
+    pes_packet_t * p_pes;
 
     switch( i_coding_type )
     {
     case I_CODING_TYPE:
-
-        p_vpar->synchro.r_p_average =
-            (p_vpar->synchro.r_p_average*(SYNC_AVERAGE_COUNT-1)+p_vpar->synchro.i_p_count)/SYNC_AVERAGE_COUNT;
-        p_vpar->synchro.r_b_average =
-            (p_vpar->synchro.r_b_average*(SYNC_AVERAGE_COUNT-1)+p_vpar->synchro.i_b_count)/SYNC_AVERAGE_COUNT;
-
-        p_vpar->synchro.i_p_nb = (int)(p_vpar->synchro.r_p_average+0.5);
-        p_vpar->synchro.i_b_nb = (int)(p_vpar->synchro.r_b_average+0.5);
-
-        p_vpar->synchro.i_p_count = p_vpar->synchro.i_b_count = 0;
-        p_vpar->synchro.i_b_trasher = p_vpar->synchro.i_b_nb / 2;
-        p_vpar->synchro.i_i_count++;
-       break;
-
-    case P_CODING_TYPE:
-        p_vpar->synchro.i_p_count++;
-        if( p_vpar->synchro.i_p_count > i_synchro_level )
-        {
-            b_result = 0;
-        }
+        p_vpar->synchro.i_eta_p = p_vpar->synchro.i_eta_b = 0;
+#ifdef STATS
+        intf_Msg( "vpar synchro stats: I(%lld) P(%lld) B(%lld)[%d:%d:%d:%d] YUV(%lld)\n",
+                  p_vpar->synchro.p_tau[I_CODING_TYPE],
+                  p_vpar->synchro.p_tau[P_CODING_TYPE],
+                  p_vpar->synchro.p_tau[B_CODING_TYPE],
+                  p_vpar->synchro.i_B_self, p_vpar->synchro.i_B_next,
+                  p_vpar->synchro.i_B_last, p_vpar->synchro.i_B_I,
+                  p_vpar->p_vout->render_time );
+        p_vpar->synchro.i_B_self = p_vpar->synchro.i_B_next =
+            p_vpar->synchro.i_B_last = p_vpar->synchro.i_B_I = 0;
+#endif
         break;
-
+    case P_CODING_TYPE:
+        p_vpar->synchro.i_eta_b = 0;
+        p_vpar->synchro.i_eta_p++;
+        break;
     case B_CODING_TYPE:
-        p_vpar->synchro.i_b_count++;
-        if( p_vpar->synchro.i_p_nb >= i_synchro_level )
-        {
-            /* We must trash all the B */
-            b_result = 0;
-        }
-        else
-        {
-            /* We use the brensenham algorithm to decide which B to trash */
-            p_vpar->synchro.i_b_trasher +=
-                p_vpar->synchro.i_b_nb - (i_synchro_level-p_vpar->synchro.i_p_nb);
-            if( p_vpar->synchro.i_b_trasher >= p_vpar->synchro.i_b_nb )
-            {
-                b_result = 0;
-                p_vpar->synchro.i_b_trasher -= p_vpar->synchro.i_b_nb;
-            }
-        }
+        p_vpar->synchro.i_eta_b++;
         break;
     }
 
-    return( b_result );
+    p_pes = DECODER_FIFO_START( *p_vpar->bit_stream.p_decoder_fifo );
+
+    if( i_coding_type == B_CODING_TYPE )
+    {
+        if( p_pes->b_has_pts )
+        {
+            if( p_pes->i_pts < p_vpar->synchro.current_pts )
+            {
+                intf_ErrMsg("vpar warning: pts_date < current_date\n");
+            }
+            p_vpar->synchro.current_pts = p_pes->i_pts;
+            p_pes->b_has_pts = 0;
+        }
+        else
+        {
+            p_vpar->synchro.current_pts += 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
+        }
+    }
+    else
+    {
+        if( p_vpar->synchro.backward_pts == 0 )
+        {
+            p_vpar->synchro.current_pts += 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
+        }
+        else
+        {
+            if( p_vpar->synchro.backward_pts < p_vpar->synchro.current_pts )
+            {
+                intf_ErrMsg("vpar warning: backward_date < current_date\n");
+            }
+            p_vpar->synchro.current_pts = p_vpar->synchro.backward_pts;
+            p_vpar->synchro.backward_pts = 0;
+        }
+
+        if( p_pes->b_has_pts )
+        {
+            /* Store the PTS for the next time we have to date an I picture. */
+            p_vpar->synchro.backward_pts = p_pes->i_pts;
+            p_pes->b_has_pts = 0;
+        }
+    }
 }
-
-void vpar_SynchroTrash( vpar_thread_t * p_vpar, int i_coding_type,
-                        int i_structure )
-{
-    vpar_SynchroChoose( p_vpar, i_coding_type, i_structure );
-}
-
-void vpar_SynchroUpdateLevel()
-{
-    //vlc_mutex_lock( &level_lock );
-    //vlc_mutex_unlock( &level_lock );
-}
-
-mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
-{
-    return( p_vpar->synchro.i_current_frame_date );
-}
-
-/* functions with no use */
-
-void vpar_SynchroEnd( vpar_thread_t * p_vpar )
-{
-}
-
-void vpar_SynchroDecode( vpar_thread_t * p_vpar, int i_coding_type,
-                            int i_structure )
-{
-}
-
-#endif

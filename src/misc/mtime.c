@@ -118,7 +118,9 @@ void mwait( mtime_t date )
     gettimeofday( &tv_date, NULL );
 
     /* calculate delay and check if current date is before wished date */
-    delay = date - (mtime_t) tv_date.tv_sec * 1000000 - (mtime_t) tv_date.tv_usec;
+    delay = date - (mtime_t) tv_date.tv_sec * 1000000 - (mtime_t) tv_date.tv_usec - 10000;
+    /* Linux/i386 has a granularity of 10 ms. It's better to be in advance
+     * than to be late. */
     if( delay <= 0 )                 /* wished date is now or already passed */
     {
         return;

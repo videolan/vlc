@@ -343,6 +343,9 @@
 /* Number of pictures required to computes the FPS rate */
 #define VOUT_FPS_SAMPLES                20
 
+/* Better be in advance when awakening than late... */
+#define VOUT_MWAIT_TOLERANCE            ((int)(0.020*CLOCK_FREQ))
+
 /*
  * Framebuffer settings
  */
@@ -361,7 +364,7 @@
  * It should be approximately the time needed to perform a complete picture
  * loop. Since it only happens when the video heap is full, it does not need
  * to be too low, even if it blocks the decoder. */
-#define VPAR_OUTMEM_SLEEP               ((int)(0.050*CLOCK_FREQ))
+#define VPAR_OUTMEM_SLEEP               ((int)(0.020*CLOCK_FREQ))
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */
@@ -437,12 +440,4 @@
 
 /* Maximal number of commands which can be saved in history list */
 #define INTF_CONSOLE_MAX_HISTORY        20
-
-/*****************************************************************************
- * Synchro configuration
- *****************************************************************************/
-
-#define VOUT_SYNCHRO_LEVEL_START        5 << 10
-#define VOUT_SYNCHRO_LEVEL_MAX          15 << 10
-#define VOUT_SYNCHRO_HEAP_IDEAL_SIZE    5
 

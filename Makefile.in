@@ -106,10 +106,6 @@ endif
 else
 CFLAGS += -march=pentium
 endif
-# Eventual MMX optimizations for x86
-ifneq (,$(findstring mmx,$(ARCH)))
-CFLAGS += -DHAVE_MMX
-endif
 endif
 
 # Optimizations for PowerPC
@@ -127,8 +123,15 @@ ifneq (,$(findstring sparc,$(ARCH)))
 CFLAGS += -mhard-float
 endif
 
-# End of optimizations
+# /debug
 endif
+
+# Eventual MMX optimizations for x86
+ifneq (,$(findstring mmx,$(ARCH)))
+CFLAGS += -DHAVE_MMX
+endif
+
+# End of optimizations
 
 #
 # C compiler flags: dependancies

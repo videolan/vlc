@@ -74,7 +74,6 @@ static void     RenderInterface   ( vout_thread_t *p_vout );
 static int      RenderIdle        ( vout_thread_t *p_vout );
 static int      RenderSplash      ( vout_thread_t *p_vout );
 static void     RenderInfo        ( vout_thread_t *p_vout );
-static void     Synchronize       ( vout_thread_t *p_vout, s64 i_delay );
 static int      Manage            ( vout_thread_t *p_vout );
 static int      Align             ( vout_thread_t *p_vout, int *pi_x,
                                     int *pi_y, int i_width, int i_height,
@@ -175,10 +174,10 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout->last_display_date   = 0;
     p_vout->last_idle_date      = 0;
     p_vout->init_display_date   = mdate();
+    p_vout->render_time         = 10000;
 
 #ifdef STATS
     /* Initialize statistics fields */
-    p_vout->render_time         = 0;
     p_vout->c_fps_samples       = 0;
 #endif
 
@@ -198,9 +197,6 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         p_vout->p_subpicture[i_index].i_status= FREE_SUBPICTURE;
     }
     p_vout->i_pictures = 0;
-
-    /* Initialize synchronization information */
-    p_vout->i_synchro_level     = VOUT_SYNCHRO_LEVEL_START;
 
     /* Create and initialize system-dependant method - this function issues its
      * own error messages */
@@ -950,10 +946,6 @@ static int InitThread( vout_thread_t *p_vout )
  *****************************************************************************/
 static void RunThread( vout_thread_t *p_vout)
 {
-    /* XXX?? welcome to gore land */
-    static int i_trash_count = 0;
-    static mtime_t last_display_date = 0;
-
     int             i_index;                                /* index in heap */
     mtime_t         current_date;                            /* current date */
     mtime_t         display_date;                            /* display date */
@@ -1005,12 +997,7 @@ static void RunThread( vout_thread_t *p_vout)
             /* Computes FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 #endif
-/* XXX?? */
-i_trash_count++;
-//fprintf( stderr, "gap : %Ld\n", display_date-last_display_date );
-last_display_date = display_date;
-#if 1
-            if( display_date < current_date && i_trash_count > 4 )
+            if( display_date < current_date )
             {
                 /* Picture is late: it will be destroyed and the thread
                  * will sleep and go to next picture */
@@ -1025,20 +1012,12 @@ last_display_date = display_date;
                     p_pic->i_status = DESTROYED_PICTURE;
                     p_vout->i_pictures--;
                 }
-                intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
+                intf_ErrMsg( "warning: late picture skipped (%p)\n", p_pic );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
-                /* Update synchronization information as if display delay
-                 * was 0 */
-                Synchronize( p_vout, display_date - current_date );
-
-                p_pic =         NULL;
-                display_date =  0;
-                i_trash_count = 0;
+		continue;
             }
-            else
-#endif
-                if( display_date > current_date + VOUT_DISPLAY_DELAY )
+            else if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
                 /* A picture is ready to be rendered, but its rendering date
                  * is far from the current one so the thread will perform an
@@ -1046,12 +1025,6 @@ last_display_date = display_date;
                  * is unchanged */
                 p_pic =         NULL;
                 display_date =  0;
-            }
-            else
-            {
-                /* Picture will be displayed, update synchronization
-                 * information */
-                Synchronize( p_vout, display_date - current_date );
             }
         }
         /*
@@ -1070,11 +1043,9 @@ last_display_date = display_date;
             }
         }
 
-
         /*
          * Perform rendering, sleep and display rendered picture
          */
-        
         if( p_pic )                        /* picture and perhaps subpicture */
         {
             b_display = p_vout->b_active;
@@ -1173,18 +1144,28 @@ last_display_date = display_date;
          * Sleep, wake up and display rendered picture
          */
 
-#ifdef STATS
-        /* Store render time */
-        p_vout->render_time = mdate() - current_date;
-#endif
+        if( display_date != 0 )
+        {
+            /* Store render time */
+            p_vout->render_time += mdate() - current_date;
+            p_vout->render_time >>= 1;
+        }
 
         /* Give back change lock */
         vlc_mutex_unlock( &p_vout->change_lock );
 
+#ifdef DEBUG_VIDEO
+        {
+            char        psz_date[MSTRTIME_MAX_SIZE];
+            intf_DbgMsg( "picture %p waiting until %s\n", p_pic,
+                    mstrtime(psz_date, display_date),
+        }
+#endif
+
         /* Sleep a while or until a given date */
         if( display_date != 0 )
         {
-            mwait( display_date );
+            mwait( display_date - VOUT_MWAIT_TOLERANCE );
         }
         else
         {
@@ -1196,9 +1177,9 @@ last_display_date = display_date;
         vlc_mutex_lock( &p_vout->change_lock );
 #ifdef DEBUG_VIDEO
         intf_DbgMsg( "picture %p, subpicture %p in buffer %d, display=%d\n", p_pic, p_subpic,
-                     p_vout->i_buffer_index, b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) );
+                     p_vout->i_buffer_index, b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ );
 #endif
-        if( b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
+        if( b_display /* && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) */ )
         {
             p_vout->p_sys_display( p_vout );
 #ifndef SYS_BEOS
@@ -2018,81 +1999,6 @@ static void RenderInterface( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * Synchronize: update synchro level depending of heap state
- *****************************************************************************
- * This function is called during the main vout loop.
- *****************************************************************************/
-static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
-{
-    int i_synchro_inc = 0;
-    /* XXX?? gore following */
-    static int i_panic_count = 0;
-    static int i_last_synchro_inc = 0;
-    static int i_synchro_level = VOUT_SYNCHRO_LEVEL_START;
-    static int i_truc = 10;
-
-    if( i_delay < 0 )
-    {
-        //fprintf( stderr, "PANIC %d\n", i_panic_count );
-        i_panic_count++;
-    }
-
-    i_truc *= 2;
-
-    if( p_vout->i_pictures > VOUT_SYNCHRO_HEAP_IDEAL_SIZE+1 )
-    {
-        i_truc = 40;
-        i_synchro_inc += p_vout->i_pictures - VOUT_SYNCHRO_HEAP_IDEAL_SIZE - 1;
-
-    }
-    else
-    {
-        if( p_vout->i_pictures < VOUT_SYNCHRO_HEAP_IDEAL_SIZE )
-        {
-            i_truc = 32;
-            i_synchro_inc += p_vout->i_pictures - VOUT_SYNCHRO_HEAP_IDEAL_SIZE;
-        }
-    }
-
-    if( i_truc > VOUT_SYNCHRO_LEVEL_MAX >> 5 ||
-        i_synchro_inc*i_last_synchro_inc < 0 )
-    {
-        i_truc = 32;
-    }
-
-    if( i_delay < 6000 )
-    {
-        i_truc = 16;
-        i_synchro_inc -= 2;
-    }
-    else if( i_delay < 70000 )
-    {
-        i_truc = 24+(24*i_delay)/70000;
-        if( i_truc < 16 )
-            i_truc = 16;
-        i_synchro_inc -= 1+(5*(70000-i_delay))/70000;
-    }
-    else if( i_delay > 100000 )
-    {
-        i_synchro_level += 1 << 10;
-        if( i_delay > 130000 )
-            i_synchro_level += 1 << 10;
-    }
-
-    i_synchro_level += ( i_synchro_inc << 10 ) / i_truc;
-    p_vout->i_synchro_level = ( i_synchro_level + (1 << 9) );
-
-    if( i_synchro_level > VOUT_SYNCHRO_LEVEL_MAX )
-    {
-        i_synchro_level = VOUT_SYNCHRO_LEVEL_MAX;
-    }
-
-    //fprintf( stderr, "synchro level : %d, heap : %d (%d, %d) (%d, %f) - %Ld\n", p_vout->i_synchro_level,
-    //        p_vout->i_pictures, i_last_synchro_inc, i_synchro_inc, i_truc, r_synchro_level, i_delay );
-    i_last_synchro_inc = i_synchro_inc;
-}
-
-/*****************************************************************************
  * Manage: manage thread
  *****************************************************************************
  * This function will handle changes in thread configuration.
@@ -2103,7 +2009,7 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes )
     {
         intf_DbgMsg("changes: 0x%x (no display: 0x%x)\n", p_vout->i_changes,
-                    p_vout->i_changes & VOUT_NODISPLAY_CHANGE );
+                    0 /* p_vout->i_changes & VOUT_NODISPLAY_CHANGE */ );
     }
 #endif
 
