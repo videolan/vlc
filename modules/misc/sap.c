@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.11 2003/05/25 18:02:20 nitrox Exp $
+ * $Id: sap.c,v 1.12 2003/06/16 15:39:11 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -668,7 +668,7 @@ static void free_sd( sess_descr_t * p_sd )
 }
 
 /***********************************************************************
- * ismult
+ * ismult: returns true if we have a multicast address
  ***********************************************************************/
 
 static int ismult( char *psz_uri )
@@ -678,10 +678,11 @@ static int ismult( char *psz_uri )
 
     i_value = strtol( psz_uri, &psz_end, 0 );
 
-    if( *psz_end != '.' )
-    {
-        return( VLC_FALSE );
-    }
+    /* FIXME: This is an ugly way to detect IPv6 and to say that this is
+multicast */
+    if( psz_uri[0] == '[') { return( VLC_TRUE ); } 
+
+    if( *psz_end != '.' ) { return( VLC_FALSE ); }
 
     return( i_value < 224 ? VLC_FALSE : VLC_TRUE );
 }
