@@ -1,5 +1,52 @@
 $Id$
 
+Changes between 0.7.2 and 0.7.3:
+--------------------------------
+
+Core support:
+ * Major work on libvlc. Changed/renamed/added funtionality
+ * Complete switch to the new access2 and demux2 systems
+ * New plugins cache to speed up launch time
+ * Fix crash with deinterlace switching
+ * New --play-and-stop feature which stops the playlist after each played item
+
+Demux:
+ * Support iTunes Music Store previews
+ * Support for MJPEG webcams (i.e. AXIS cams)
+ * Added initial mp4 and mpeg-ts text track support
+
+Codecs:
+ * G.726 audio support
+ * 14496-17 MPEG TS text support
+ * MPEG-4 text support
+
+Stream Output:
+ * text track muxing for mp4
+ * 14496-17 text track muxing for MPEG TS
+ * H.263 RTP streaming support
+
+Interfaces:
+ * added search, volume, loop and random functions to the ncurses interface
+ * added a filesystem browser to the ncurses interface
+ * OSD sliders for volume and postition information
+ * OSD icons for Play and Pause
+ * New Streaming Wizard for Windows and Linux default interfaces
+
+Mac OS X port:
+ * Fixed the "cannot set buffersize:[nope]" coreaudio problem
+
+Mozilla plugin:
+ * added a lot of javascript accessible funtionality
+ * volume, position, length, seek etc etc etc.
+
+Misc:
+ * Roku HD1000 Video output
+ * Experimental network synchronization module
+ * Experimental SVG rendering module
+ * VBrick streams fully supported
+ * Kasenna MediaBase streams largely supported
+ * Cisco IP/TV streams supported
+
 Changes between 0.7.1 and 0.7.2:
 --------------------------------
 

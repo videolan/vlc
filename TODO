@@ -24,7 +24,7 @@ Difficulty: Easy
 Platform: any
 Urgency: Urgent
 Description: proper DVD controls
-Most importantly a proper button that will take you straight to the DVD menu.
+Most importantly a proper button that will take you straight to the DVD menu. But also, next/prev chapter should be integrated with next/prev playlistitem.
 Status: Todo
 
 Task
@@ -32,7 +32,7 @@ Difficulty: Easy
 Platform: Linux, Win32
 Urgency: Normal
 Description: Streaming wizard
- Finish the streaming wizard
+ Finish the streaming wizard (85% finished)
 Status: Assigned to zorglub
 
 Task
@@ -72,7 +72,7 @@ Difficulty: Guru
 Platform: any
 Urgency: Normal
 Description: Demux2 transition
- Complete the transition to demux2, changing what is needed in dvd and dvb
+ Complete the transition to demux2. Bughunting and finishing chapter support (80% done)
 Status: Assigned to fenrir
 
 Task
@@ -80,7 +80,7 @@ Difficulty: Guru
 Urgency: Normal
 Platform: any
 Description: Multi-acccess
- Allow several access from an input thread to allow for multi-input
+ Allow several access from an input thread to allow for multi-input (30% done)
 Status: Assigned to fenrir
 
 Task
@@ -96,7 +96,7 @@ Difficulty: Medium
 Urgency: Wishlist
 Platform: any
 Description: OSD Icons
- Make OSD Icons for Play/Pause/Stop
+ Make OSD Icons for Play/Pause/Stop. Integrate them better into the core system.
 Status: Assigned to yoann
 
 Task
@@ -114,7 +114,6 @@ Platform: any
 Description: Rewrite the SAP parser
  The SAP parser is very dirty at the moment, and needs a complete rewrite.
  - caching support
- - sdp file support? (because live.com doesn't handle udp announces)
 Status: Todo
 
 Task
@@ -123,7 +122,7 @@ Urgency: Normal
 Platform: any
 Description: Tree playlist
  A hierarchized playlist structure, eventually using a media library.
-Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc.
+Think playlist within playlist, directory structures, SAP section, TV channels list, iTunes library like stuff etc. <a href="http://sierra.via.ecp.fr/~zorglub/vlc/playlist.txt">Thoughts and ideas</a>
 Status: Todo
 
 Task
@@ -138,8 +137,8 @@ Task
 Difficulty: Easy
 Urgency: Wishlist
 Platform: any
-Description: MusePack  decoder
-Need I say more?
+Description: MusePack decoder
+Need I say more? <a href="http://www.hydrogenaudio.org/index.php?showtopic=21775&">MPCdec</a>
 Status: Todo
 
 Task
@@ -147,7 +146,8 @@ Difficulty: Easy
 Urgency: Normal
 Platform: any
 Description: 24 bit LPCM
-Increasingly more DVDs use 24 bit LPCM sound. We should support it.
+- Increasingly more DVDs use 24 bit LPCM sound. We should support it.
+
 Status: Todo
 
 Task
@@ -184,6 +184,10 @@ Platform: OSX
 Description: CoreAudio multichannel audio output. Convert to 
 <a href="http://www.mat.ucsb.edu:8000/CoreAudio/108">AUHAL</a> based sytem.
 Still no info over S/PDIF output available.
+Outstanding issues:
+ - G5 S/PDIF not working
+ - G5 PCM not working because S/PDIF is selected by default, even if not connected.
+ - Coreaudio resampler doesn't handle input from lpcm decoder (the samples are too small).
 Status: Todo
 
 Task
@@ -194,7 +198,8 @@ Description: Stream text subtitles
  Find a a way to stream text subtitles, in TS and in RTP.
   - Find an existing norm
   - Implement it
-Status: Todo
+(40% done) needs to be tested and validated
+Status: Assigned to fenrir
 
 Task
 Difficulty: Hard
@@ -255,7 +260,8 @@ Urgency: Wishlist
 Platform: Mac OS X
 Description: intf / vout dependency
 The application specific parts of the intf need to be brougth to the VLC application core. A valid NSApplication needs to be created on VLC opening, with the dock and menu hidden/disabled, only being generated on VLC intf loading.
-Status: Todo
+(70% done) need to fix the interfaces again.
+Status: Assigned to DJ
 
 Task
 Difficulty: Guru
@@ -325,8 +331,12 @@ Description: Controlling the mozilla plugin
 The mozilla plugin needs to be better controllable (via javascript). 
 - retrieve variable values.
 - open VLC media player
-- (look at fen-php?)
-Status: Todo
+- default html page to control the plugin
+- XUL controls
+(80% done) see:
+<a href="http://sierra.via.ecp.fr/~zorglub/vlc/plugin/vlc.html">Javascript controls</a>
+<a href="http://sierra.via.ecp.fr/~zorglub/vlc/xul/">XUL controls</a>
+Status: Assigned to zorglub
 
 Task
 Difficulty: Hard
@@ -413,6 +423,15 @@ Platform: any
 Description: a Time Shifting module
 This module should create TiVo like capabilities for VLC.
 Status: Todo (CryHavoc)
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: UDP packet reordering
+Currently we ignore every packet that is too late and just wait for a fresh one.
+It would be nice to be able to reorder the packets in the buffer to prevent degredation of the signal.
+Status: Todo
 
 # Do not remove me
 Task
