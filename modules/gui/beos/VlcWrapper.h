@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.12 2003/01/12 02:08:39 titer Exp $
+ * $Id: VlcWrapper.h,v 1.13 2003/01/14 14:48:55 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -71,6 +71,7 @@ public:
     void openFiles( BList *o_files, bool replace = true );
     void openDisc( BString o_type, BString o_device,
                    int i_title, int i_chapter );
+    void LoadSubFile( char * psz_file );
     void ToggleLanguage( int i_language );
     void ToggleSubtitle( int i_subtitle );
     const char* getTimeAsString();

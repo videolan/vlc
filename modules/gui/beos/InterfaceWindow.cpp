@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.15 2003/01/12 02:08:38 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.16 2003/01/14 14:48:55 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,6 +63,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 			   B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
 	  p_intf( p_interface ),
 	  fFilePanel( NULL ),
+	  fSubtitlesPanel( NULL ),
 	  fLastUpdateTime( system_time() ),
 	  fSettings( new BMessage( 'sett' ) )
 {
@@ -123,6 +124,9 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 									  new BMessage( OPEN_FILE ), 'O') );
 	
 	fileMenu->AddItem( new CDMenu( "Open Disc" ) );
+
+	fileMenu->AddItem( new BMenuItem( "Load a subtitle file" B_UTF8_ELLIPSIS,
+									  new BMessage( LOAD_SUBFILE ) ) );
 	
 	fileMenu->AddSeparatorItem();
 	fileMenu->AddItem( new BMenuItem( "Play List" B_UTF8_ELLIPSIS,
@@ -260,6 +264,30 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				_UpdatePlaylist();
 			}
 			break;
+		
+		case LOAD_SUBFILE:
+			if( fSubtitlesPanel )
+			{
+				fSubtitlesPanel->Show();
+				break;
+			}
+			fSubtitlesPanel = new BFilePanel();
+			fSubtitlesPanel->SetTarget( this );
+			fSubtitlesPanel->SetMessage( new BMessage( SUBFILE_RECEIVED ) );
+			fSubtitlesPanel->Show();
+			break;
+
+		case SUBFILE_RECEIVED:
+		{
+			entry_ref ref;
+			if( p_message->FindRef( "refs", 0, &ref ) == B_OK )
+			{
+				BPath path( &ref );
+				if ( path.InitCheck() == B_OK )
+					p_wrapper->LoadSubFile( (char*)path.Path() );
+			}
+			break;
+		}
 	
 		case STOP_PLAYBACK:
 			// this currently stops playback not nicely

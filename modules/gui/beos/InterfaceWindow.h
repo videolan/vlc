@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.7 2003/01/08 02:09:15 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.8 2003/01/14 14:48:55 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -128,6 +128,7 @@ class InterfaceWindow : public BWindow
 
 	bool					fPlaylistIsEmpty;
 	BFilePanel*				fFilePanel;
+	BFilePanel*				fSubtitlesPanel;
 	PlayListWindow*			fPlaylistWindow;
 	PreferencesWindow*		fPreferencesWindow;
 	BMenuBar*				fMenuBar;

@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.17 2003/01/12 02:08:39 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.18 2003/01/14 14:48:55 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -241,7 +241,10 @@ void VlcWrapper::openDisc(BString o_type, BString o_device, int i_title, int i_c
                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 }
 
-
+void VlcWrapper::LoadSubFile( char * psz_file )
+{
+    config_PutPsz( p_intf, "sub-file", strdup( psz_file ) );
+}
 
 void VlcWrapper::ToggleLanguage( int i_language )
 {
