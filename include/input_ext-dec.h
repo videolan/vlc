@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.47 2001/12/27 03:47:08 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.48 2001/12/29 03:07:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -40,21 +40,25 @@
  *****************************************************************************
  * Describe a data packet.
  *****************************************************************************/
+#define DATA_PACKET                                                         \
+    /* start of the PS or TS packet */                                      \
+    byte_t *                p_demux_start;                                  \
+    /* start of the PES payload in this packet */                           \
+    byte_t *                p_payload_start;                                \
+    byte_t *                p_payload_end; /* guess ? :-) */                \
+    /* is the packet messed up ? */                                         \
+    boolean_t               b_discard_payload;
+
 typedef struct data_packet_s
 {
-    /* Decoders information */
-    byte_t *                p_demux_start;   /* start of the PS or TS packet */
-    byte_t *                p_payload_start;
-                                  /* start of the PES payload in this packet */
-    byte_t *                p_payload_end;                    /* guess ? :-) */
-    boolean_t               b_discard_payload;  /* is the packet messed up ? */
-
-    /* Used to chain the TS packets that carry data for a same PES or PSI */
+    /* Used to chain the packets that carry data for a same PES or PSI */
     struct data_packet_s *  p_next;
 
-    /* Buffer manager information */ 
-    byte_t *                p_buffer;                     /* raw data packet */
-    unsigned int            i_size;                           /* buffer size */
+    DATA_PACKET
+
+    /* Please note that at least one buffer allocator (in particular, the
+     * Next Generation Buffer Allocator) extends this structure with
+     * private data after DATA_PACKET. */
 } data_packet_t;
 
 /*****************************************************************************
@@ -65,6 +69,9 @@ typedef struct data_packet_s
  *****************************************************************************/
 typedef struct pes_packet_s
 {
+    /* Chained list to the next PES packet (depending on the context) */
+    struct pes_packet_s *   p_next;
+
     /* PES properties */
     boolean_t               b_data_alignment;  /* used to find the beginning of
                                                 * a video or audio unit      */
@@ -76,18 +83,15 @@ typedef struct pes_packet_s
     int                     i_rate;                /* current pace of reading
                                                     * (see stream_control.h) */
 
-    int                     i_pes_size;    /* size of the current PES packet */
+    unsigned int            i_pes_size;    /* size of the current PES packet */
 
     /* Chained list to packets */
     data_packet_t *         p_first;      /* The first packet contained by this
                                            * PES (used by decoders). */
     data_packet_t *         p_last;    /* The last packet contained by this
                                           PES (used by the buffer allocator) */
-    int                     i_nb_data; /* Number of data packets in the chained
+    unsigned int            i_nb_data; /* Number of data packets in the chained
                                                                         list */
-
-    /* Chained list used by the input buffers manager */
-    struct pes_packet_s *   p_next;
 } pes_packet_t;
 
 /*****************************************************************************

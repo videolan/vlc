@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.7 2001/12/27 03:47:09 massiot Exp $
+ * $Id: input_ts.c,v 1.8 2001/12/29 03:07:51 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -101,7 +101,7 @@ DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 1000 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 1000, 150 );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_TOIO( FLAGS, TS_PACKET_SIZE );
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.8 2001/12/27 03:47:09 massiot Exp $
+ * $Id: input_ps.c,v 1.9 2001/12/29 03:07:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -100,9 +100,9 @@ DECLARE_BUFFERS_EMBEDDED( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 300 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150, 150 );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 300 );
 
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.8 2001/12/27 03:47:08 massiot Exp $
+ * $Id: input_es.c,v 1.9 2001/12/29 03:07:51 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,7 +98,7 @@ DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150, 150 );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_TOIO( FLAGS, ES_PACKET_SIZE );
 
 /*****************************************************************************
