@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.27 2003/08/23 16:15:47 fenrir Exp $
+ * $Id: decoder.c,v 1.28 2003/08/24 00:34:13 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -393,8 +393,11 @@ static void DecodeThread( adec_thread_t *p_adec )
 
         /* **** First check if we have a valid output **** */
         if( ( !p_adec->p_aout_input )||
-            ( p_adec->output_format.i_original_channels != pi_channels_maps[faad_frame.channels] ) ||
-            ( p_adec->output_format.i_rate != faad_frame.samplerate ) )
+            ( p_adec->output_format.i_original_channels != pi_channels_maps[faad_frame.channels] ) 
+#ifndef HAVE_OLD_FAAD2
+            || ( p_adec->output_format.i_rate != faad_frame.samplerate )
+#endif
+            )
         {
             if( p_adec->p_aout_input )
             {
@@ -406,7 +409,9 @@ static void DecodeThread( adec_thread_t *p_adec )
             p_adec->output_format.i_physical_channels =
                 p_adec->output_format.i_original_channels =
                     pi_channels_maps[faad_frame.channels];
+#ifndef HAVE_OLD_FAAD2
             p_adec->output_format.i_rate = faad_frame.samplerate;
+#endif
 
             aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
             p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
