@@ -34,10 +34,11 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-mad-tree=/home/jpsaman/iPaq/src/mad-0.14.2b \
 	--with-gtk-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
 	--with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-	--with-gpe-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
+
+#  --with-gpe-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 
 export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"

@@ -3,7 +3,7 @@
  section="Graphics" \
  logtitle="VideoLAN Client" \
  title="VideoLAN Client" \
- command=vlc \
+ command="vlc -V sdl"\
  icon48=/usr/share/vlc/vlc48x48.png \
  windowtitle="VideoLAN Client"
 
