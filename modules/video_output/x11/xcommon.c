@@ -431,6 +431,13 @@ static int InitVideo( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
+    if( p_vout->output.i_chroma == VLC_FOURCC('Y','V','1','2') )
+    {
+        /* U and V inverted compared to I420
+         * Fixme: this should be handled by the vout core */
+        p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -1238,7 +1245,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             {
                 /* U and V inverted compared to I420
                  * Fixme: this should be handled by the vout core */
-                p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
                 p_pic->U_PIXELS = p_pic->p_sys->p_image->data
                     + p_pic->p_sys->p_image->offsets[2];
                 p_pic->V_PIXELS = p_pic->p_sys->p_image->data
