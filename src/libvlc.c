@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.105 2003/12/04 16:49:45 sam Exp $
+ * $Id: libvlc.c,v 1.106 2003/12/24 10:06:53 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -317,7 +317,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     /* Check for short help option */
     if( config_GetInt( p_vlc, "help" ) )
     {
-        fprintf( stdout, _("Usage: %s [options] [items]...\n\n"),
+        fprintf( stdout, _("Usage: %s [options] [items]...\n"),
                          p_vlc->psz_object_name );
         Usage( p_vlc, "main" );
         Usage( p_vlc, "help" );
@@ -1259,11 +1259,12 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
             {
             case CONFIG_HINT_CATEGORY:
             case CONFIG_HINT_USAGE:
-                fprintf( stdout, " %s\n", p_item->psz_text );
+                fprintf( stdout, "\n %s\n", p_item->psz_text );
                 break;
 
             case CONFIG_ITEM_STRING:
             case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_DIRECTORY:
             case CONFIG_ITEM_MODULE: /* We could also have "=<" here */
                 if( !p_item->ppsz_list )
                 {
@@ -1284,6 +1285,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
                     break;
                 }
             case CONFIG_ITEM_INTEGER:
+            case CONFIG_ITEM_KEY: /* FIXME: do something a bit more clever */
                 psz_bra = " <"; psz_type = _("integer"); psz_ket = ">";
                 break;
             case CONFIG_ITEM_FLOAT:
