@@ -3619,8 +3619,15 @@ then
       then
         WXWINDOWS_PATH="${with_wx_config_path}:${PATH}"
       fi ])
+  WXWINDOWS_NAME="wx-config"
+  AC_ARG_WITH(wx-config,
+    [    --with-wx-config=NAME      wx-config name (default is wx-config)],
+    [ if test "${with_wx_config}" != "no"
+      then
+        WXWINDOWS_NAME="${with_wx_config}"
+      fi ])
   # look for wx-config
-  AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWINDOWS_PATH})
+  AC_PATH_PROG(WX_CONFIG, ${WXWINDOWS_NAME}, no, ${WXWINDOWS_PATH})
   if test "${WX_CONFIG}" != "no" -a "${CXX}" != ""
   then
     if expr 2.3.0 \> `${WX_CONFIG} --version` >/dev/null
