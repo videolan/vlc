@@ -2,7 +2,7 @@
  * asf.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: asf.h,v 1.3 2002/11/22 18:35:57 sam Exp $
+ * $Id: asf.h,v 1.4 2003/03/02 18:17:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,11 +29,11 @@
  ****************************************************************************/
 
 typedef struct guid_s
-{   
-    u32 v1; /* le */
-    u16 v2; /* le */
-    u16 v3; /* le */
-    u8  v4[8];
+{
+    uint32_t v1; /* le */
+    uint16_t v2; /* le */
+    uint16_t v3; /* le */
+    uint8_t  v4[8];
 } guid_t;
 
 static inline int CmpGuid( const guid_t *p_guid1, const guid_t *p_guid2 )
@@ -56,14 +56,14 @@ static void GenerateGuid( guid_t *p_guid )
     int i;
 
     srand( mdate() & 0xffffffff );
-    
+
     /* FIXME should be generated using random data */
     p_guid->v1 = 0xbabac001;
-    p_guid->v2 = ( (u64)rand() << 16 ) / RAND_MAX;
-    p_guid->v3 = ( (u64)rand() << 16 ) / RAND_MAX;
+    p_guid->v2 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
+    p_guid->v3 = ( (uint64_t)rand() << 16 ) / RAND_MAX;
     for( i = 0; i < 8; i++ )
     {
-        p_guid->v4[i] = ( (u64)rand() * 256 ) / RAND_MAX;
+        p_guid->v4[i] = ( (uint64_t)rand() * 256 ) / RAND_MAX;
     }
 }
 
@@ -81,6 +81,14 @@ static const guid_t asf_object_header_guid =
     0x668E,
     0x11CF,
     { 0xA6,0xD9, 0x00,0xAA,0x00,0x62,0xCE,0x6C }
+};
+
+static const guid_t asf_object_file_properties_guid =
+{
+    0x8cabdca1,
+    0xa947,
+    0x11cf,
+    { 0x8e,0xe4, 0x00,0xC0,0x0C,0x20,0x53,0x65 }
 };
 
 static const guid_t asf_object_stream_properties_guid =

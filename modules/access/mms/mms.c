@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.19 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: mms.c,v 1.20 2003/03/02 18:17:58 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -69,6 +69,8 @@
 #include "asf.h"
 #include "buffer.h"
 #include "mms.h"
+
+#undef MMS_DEBUG
 
 /****************************************************************************
  * NOTES:
@@ -261,7 +263,13 @@ static int Open( vlc_object_t *p_this )
         p_input->stream.b_connected = 1;
     }
     p_input->stream.p_selected_area->i_tell = 0;
-    if( p_access->i_packet_count <= 0 )
+    /*
+     * i_flags_broadcast
+     *  yy xx ?? ??
+     *  broadcast    yy=0x02, xx= 0x00
+     *  pre-recorded yy=0x01, xx= 0x80 if video, 0x00 no video
+     */
+    if( p_access->i_packet_count <= 0 || ( p_access->i_flags_broadcast >> 24 ) == 0x02 )
     {
         p_input->stream.b_seekable = 0;
         p_input->stream.p_selected_area->i_size = 0;
@@ -867,7 +875,13 @@ static int MMSOpen( input_thread_t  *p_input,
                      buffer.p_data,
                      buffer.i_data );
 
-    mms_CommandRead( p_input, 0x01, 0 );
+    if( mms_CommandRead( p_input, 0x01, 0 ) < 0 )
+    {
+        var_buffer_free( &buffer );
+        MMSClose( p_input );
+        return( -1 );
+    }
+
     i_server_version = GetDWLE( p_access->p_cmd + MMS_CMD_HEADERSIZE + 32 );
     i_tool_version = GetDWLE( p_access->p_cmd + MMS_CMD_HEADERSIZE + 36 );
     i_update_player_url = GetDWLE( p_access->p_cmd + MMS_CMD_HEADERSIZE + 40 );
@@ -1483,7 +1497,7 @@ static int  NetFillBuffer( input_thread_t *p_input )
         i_udp_read = 0;
     }
 
-#if 1
+#if MMS_DEBUG
     if( p_access->i_proto == MMS_PROTO_UDP )
     {
         msg_Dbg( p_input,
