@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: araw.c,v 1.21 2003/11/04 01:27:33 fenrir Exp $
+ * $Id: araw.c,v 1.22 2003/11/05 01:47:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -217,7 +217,6 @@ static int DecoderInit( decoder_t *p_dec )
     {
         msg_Err( p_dec, "bad samplerate" );
         return VLC_EGENERIC;
-
     }
 
     p_sys->p_wf = p_wf;
@@ -364,6 +363,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     }
     if( i_size < p_sys->p_wf->nBlockAlign )
     {
+        block_Release( p_block );
         return VLC_SUCCESS;
     }
     i_samples = i_size / ( ( p_sys->p_wf->wBitsPerSample + 7 ) / 8 ) /
@@ -375,6 +375,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
     }
     else if( !aout_DateGet( &p_sys->date ) )
     {
+        block_Release( p_block );
         return VLC_SUCCESS;
     }
 
@@ -387,6 +388,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
         if( out == NULL )
         {
             msg_Err( p_dec, "cannot get aout buffer" );
+            block_Release( p_block );
             return VLC_EGENERIC;
         }
 
@@ -414,6 +416,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
         i_samples -= i_copy;
     }
+    block_Release( p_block );
     return VLC_SUCCESS;
 }
 

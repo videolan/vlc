@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.14 2003/11/04 14:51:51 fenrir Exp $
+ * $Id: adpcm.c,v 1.15 2003/11/05 01:47:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -286,6 +286,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         }
         else if( !aout_DateGet( &p_sys->date ) )
         {
+            block_Release( p_block );
             return VLC_SUCCESS;
         }
         i_pts = 0;
@@ -296,6 +297,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         if( out == NULL )
         {
             msg_Err( p_dec, "cannot get aout buffer" );
+            block_Release( p_block );
             return VLC_EGENERIC;
         }
         out->start_date = aout_DateGet( &p_sys->date );
@@ -328,6 +330,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         i_data -= p_sys->i_block;
     }
 
+    block_Release( p_block );
     return VLC_SUCCESS;
 }
 

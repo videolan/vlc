@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.2 2003/11/04 02:23:11 fenrir Exp $
+ * $Id: faad.c,v 1.3 2003/11/05 01:47:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -195,6 +195,7 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
                          p_sys->p_buffer, p_sys->i_buffer,
                          &i_rate, &i_channels ) < 0 )
         {
+            block_Release( p_block );
             return VLC_EGENERIC;
         }
         p_sys->output_format.i_rate = i_rate;
@@ -218,6 +219,7 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
             msg_Warn( p_dec, "%s", faacDecGetErrorMessage( frame.error ) );
             /* flush the buffer */
             p_sys->i_buffer = 0;
+            block_Release( p_block );
             return VLC_SUCCESS;
         }
         if( frame.channels <= 0 || frame.channels > 6 )
@@ -225,6 +227,7 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
             msg_Warn( p_dec, "invalid channels count" );
             /* flush the buffer */
             p_sys->i_buffer = 0;
+            block_Release( p_block );
             return VLC_SUCCESS;
         }
         if( frame.samples <= 0 )
@@ -232,6 +235,7 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
             msg_Warn( p_dec, "decoded zero samples" );
             /* flush the buffer */
             p_sys->i_buffer = 0;
+            block_Release( p_block );
             return VLC_SUCCESS;
         }
 
@@ -264,6 +268,7 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
         if( p_sys->p_aout_input == NULL )
         {
             msg_Err( p_dec, "cannot create aout" );
+            block_Release( p_block );
             return VLC_EGENERIC;
         }
 
@@ -284,6 +289,7 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
                                        frame.samples / frame.channels ) ) == NULL )
         {
             msg_Err( p_dec, "cannot get a new buffer" );
+            block_Release( p_block );
             return VLC_EGENERIC;
         }
         out->start_date = aout_DateGet( &p_sys->date );
@@ -300,6 +306,7 @@ static int  RunDecoder    ( decoder_t *p_dec, block_t *p_block )
         memmove( &p_sys->p_buffer[0], &p_sys->p_buffer[i_used], p_sys->i_buffer );
     }
 
+    block_Release( p_block );
     return VLC_SUCCESS;
 }
 
