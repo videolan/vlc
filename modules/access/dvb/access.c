@@ -61,6 +61,9 @@ static void Close( vlc_object_t *p_this );
 #define DEVICE_TEXT N_("Device number to use on adapter")
 #define DEVICE_LONGTEXT ""
 
+#define CAM_TEXT N_("Use CAM")
+#define CAM_LONGTEXT ""
+
 #define FREQ_TEXT N_("Transponder/multiplex frequency")
 #define FREQ_LONGTEXT N_("In kHz for DVB-S or Hz for DVB-C/T")
 
@@ -131,6 +134,7 @@ vlc_module_begin();
                  VLC_FALSE );
     add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                  VLC_TRUE );
+    add_bool( "dvb-cam", 0, NULL, CAM_TEXT, CAM_LONGTEXT, VLC_FALSE );
     add_integer( "dvb-frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  VLC_FALSE );
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
@@ -273,6 +277,14 @@ static int Open( vlc_object_t *p_this )
         FilterSet( p_access, 0x0, OTHER_TYPE );
     }
 
+    p_sys->b_cam = var_GetBool( p_access, "dvb-cam" );
+    if ( p_sys->b_cam )
+    {
+        msg_Dbg( p_access, "initing CAM..." );
+        if ( E_(CAMOpen)( p_access ) < 0 )
+            p_sys->b_cam = VLC_FALSE;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -288,6 +300,10 @@ static void Close( vlc_object_t *p_this )
 
     E_(DVRClose)( p_access );
     E_(FrontendClose)( p_access );
+
+    if ( p_sys->b_cam )
+        E_(CAMClose)( p_access );
+
     free( p_sys );
 }
 
@@ -391,6 +407,27 @@ static int Control( access_t *p_access, int i_query, va_list args )
             }
             break;
 
+        case ACCESS_SET_PRIVATE_ID_CA:
+            if ( p_sys->b_cam )
+            {
+                int i_program;
+                uint16_t i_vpid, i_apid1, i_apid2, i_apid3;
+                uint8_t i_cad_length;
+                uint8_t *p_cad;
+
+                i_program = (int)va_arg( args, int );
+                i_vpid = (int16_t)va_arg( args, int );
+                i_apid1 = (uint16_t)va_arg( args, int );
+                i_apid2 = (uint16_t)va_arg( args, int );
+                i_apid3 = (uint16_t)va_arg( args, int );
+                i_cad_length = (uint8_t)va_arg( args, int );
+                p_cad = (uint8_t *)va_arg( args, uint8_t * );
+
+                E_(CAMSet)( p_access, i_program, i_vpid, i_apid1, i_apid2,
+                            i_apid3, i_cad_length, p_cad );
+            }
+            break;
+
         default:
             msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
@@ -475,6 +512,7 @@ static void VarInit( access_t *p_access )
     /* */
     var_Create( p_access, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_access, "dvb-cam", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-inversion", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_access, "dvb-probe", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -513,8 +551,9 @@ static int ParseMRL( access_t *p_access )
 #define GET_OPTION_INT( option )                                            \
     if ( !strncmp( psz_parser, option "=", strlen(option "=") ) )           \
     {                                                                       \
-        val.i_int = strtol( psz_parser+strlen(option "="), &psz_parser, 0 );\
-        var_Set( p_access, "dvb-" option, val );                             \
+        val.i_int = strtol( psz_parser + strlen(option "="), &psz_parser,   \
+                            0 );                                            \
+        var_Set( p_access, "dvb-" option, val );                            \
     }
 
 #define GET_OPTION_BOOL( option )                                           \
@@ -522,7 +561,7 @@ static int ParseMRL( access_t *p_access )
     {                                                                       \
         val.b_bool = strtol( psz_parser + strlen(option "="), &psz_parser,  \
                              0 );                                           \
-        var_Set( p_access, "dvb-" option, val );                             \
+        var_Set( p_access, "dvb-" option, val );                            \
     }
 
     /* Test for old syntax */
@@ -539,6 +578,7 @@ static int ParseMRL( access_t *p_access )
     {
         GET_OPTION_INT("adapter")
         else GET_OPTION_INT("device")
+        else GET_OPTION_BOOL("cam")
         else GET_OPTION_INT("frequency")
         else GET_OPTION_INT("inversion")
         else GET_OPTION_BOOL("probe")

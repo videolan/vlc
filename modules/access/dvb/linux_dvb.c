@@ -46,6 +46,9 @@
 #include <linux/errno.h>
 
 #include "dvb.h"
+#include "network.h"
+
+#define DMX_BUFFER_SIZE (1024 * 1024)
 
 /*
  * Frontends
@@ -1083,6 +1086,12 @@ int E_(DVROpen)( access_t * p_access )
         return VLC_EGENERIC;
     }
 
+    if ( ioctl( p_sys->i_handle, DMX_SET_BUFFER_SIZE, DMX_BUFFER_SIZE ) < 0 )
+    {
+        msg_Warn( p_access, "couldn't set DMX_BUFFER_SIZE (%s)",
+                  strerror(errno) );
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -1094,5 +1103,78 @@ void E_(DVRClose)( access_t * p_access )
     access_sys_t *p_sys = p_access->p_sys;
 
     close( p_sys->i_handle );
+}
+
+
+/*
+ * CAM device
+ *
+ * This uses the external cam_set program from libdvb-0.5.4
+ */
+
+/*****************************************************************************
+ * CAMOpen :
+ *****************************************************************************/
+int E_(CAMOpen)( access_t * p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    p_sys->i_cam_handle = net_OpenTCP( p_access, "localhost", 4711 );
+    if ( p_sys->i_cam_handle < 0 )
+    {
+        return -VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CAMSet :
+ *****************************************************************************/
+int E_(CAMSet)( access_t * p_access, uint16_t i_program, uint16_t i_vpid,
+                uint16_t i_apid1, uint16_t i_apid2, uint16_t i_apid3,
+                uint16_t i_cad_length, uint8_t *p_cad )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    uint8_t p_str[12];
+
+    memcpy( p_str, &i_program, 2 );
+    memcpy( p_str + 2, &i_vpid, 2 );
+    memcpy( p_str + 4, &i_apid1, 2 );
+    memcpy( p_str + 6, &i_apid2, 2 );
+    memcpy( p_str + 8, &i_apid3, 2 );
+    memcpy( p_str + 10, &i_cad_length, 2 );
+
+    if ( net_Write( p_access, p_sys->i_cam_handle, p_str, 12 ) != 12 )
+    {
+        msg_Err( p_access, "write 1 failed (%s)", strerror(errno) );
+        return -VLC_EGENERIC;
+    }
+
+    if ( i_cad_length )
+    {
+        if ( net_Write( p_access, p_sys->i_cam_handle, p_cad, i_cad_length )
+              != i_cad_length )
+        {
+            msg_Err( p_access, "write 2 failed (%s) %d", strerror(errno),
+                     i_cad_length );
+            return -VLC_EGENERIC;
+        }
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CAMClose :
+ *****************************************************************************/
+void E_(CAMClose)( access_t * p_access )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+
+    if ( p_sys->i_cam_handle )
+    {
+        close( p_sys->i_cam_handle );
+    }
 }
 

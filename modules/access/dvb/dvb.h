@@ -51,6 +51,8 @@ struct access_sys_t
     demux_handle_t p_demux_handles[MAX_DEMUX];
     frontend_t *p_frontend;
     vlc_bool_t b_budget_mode;
+    vlc_bool_t b_cam;
+    int i_cam_handle;
 };
 
 #define VIDEO0_TYPE     1
@@ -74,3 +76,7 @@ int E_(DMXUnsetFilter)( access_t *, int i_fd );
 int  E_(DVROpen)( access_t * );
 void E_(DVRClose)( access_t * );
 
+int  E_(CAMOpen)( access_t * );
+int  E_(CAMSet)( access_t *, uint16_t, uint16_t, uint16_t, uint16_t, uint16_t,
+		 uint16_t, uint8_t * );
+void E_(CAMClose)( access_t * );
