@@ -129,7 +129,6 @@ case "x${target_os}" in
         LDFLAGS_access_udp="${LDFLAGS_access_udp} -lws2_32"
         LDFLAGS_access_ftp="${LDFLAGS_access_ftp} -lws2_32"
         LDFLAGS_access_output_udp="${LDFLAGS_access_output_udp} -lws2_32"
-        LDFLAGS_rc="${LDFLAGS_rc} -lws2_32"
         LDFLAGS_sap="${LDFLAGS_sap} -lws2_32"
     fi
     ;;

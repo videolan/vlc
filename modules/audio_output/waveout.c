@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.16 2003/02/14 17:00:02 ipkiss Exp $
+ * $Id: waveout.c,v 1.17 2003/02/17 22:19:24 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -343,15 +343,15 @@ static void Probe( aout_instance_t * p_aout )
         {
             val.psz_string = N_("5.1");
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
-        }
-        else
             msg_Dbg( p_aout, "device supports 5.1 channels" );
+        }
     }
 
     /* Test for 2 Front 2 Rear support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                           AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-    if( p_aout->output.output.i_physical_channels & i_physical_channels )
+    if( ( p_aout->output.output.i_physical_channels & i_physical_channels )
+        == i_physical_channels )
     {
         if( OpenWaveOutPCM( p_aout, &i_format,
                             i_physical_channels, 4,
@@ -360,9 +360,8 @@ static void Probe( aout_instance_t * p_aout )
         {
             val.psz_string = N_("2 Front 2 Rear");
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
-        }
-        else
             msg_Dbg( p_aout, "device supports 4 channels" );
+        }
     }
 
     /* Test for stereo support */
@@ -375,9 +374,8 @@ static void Probe( aout_instance_t * p_aout )
         val.psz_string = N_("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
         var_Set( p_aout, "audio-device", val );
-    }
-    else
         msg_Dbg( p_aout, "device supports 2 channels" );
+    }
 
     /* Test for mono support */
     i_physical_channels = AOUT_CHAN_CENTER;
@@ -388,9 +386,8 @@ static void Probe( aout_instance_t * p_aout )
     {
         val.psz_string = N_("Mono");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );        
-    }
-    else
         msg_Dbg( p_aout, "device supports 1 channel" );
+    }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
 
@@ -746,6 +743,9 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
     }
 }
 
+/*****************************************************************************
+ * InterleaveFloat32/S16: change the channel order to the Microsoft one.
+ *****************************************************************************/
 static void InterleaveFloat32( float *p_buf, int *pi_chan_table,
                                int i_nb_channels )
 {
