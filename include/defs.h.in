@@ -1,4 +1,4 @@
-/* include/defs.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+/* include/defs.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define if using alloca.c.  */
 #undef C_ALLOCA
