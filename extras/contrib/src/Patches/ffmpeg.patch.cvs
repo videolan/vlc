@@ -1,15 +1,3 @@
-diff -ru ffmpeg.old/libavcodec/dsputil.h ffmpeg/libavcodec/dsputil.h
---- ffmpeg.old/libavcodec/dsputil.h	Sat Oct 25 02:32:54 2003
-+++ ffmpeg/libavcodec/dsputil.h	Sun Nov  2 02:04:09 2003
-@@ -487,6 +487,8 @@
-           +name8(s, dst+8+8*stride, src+8+8*stride, stride);\
- }
- 
-+/* Meuuh power */
-+#undef HAVE_LRINTF
- #ifndef HAVE_LRINTF
- /* XXX: add ISOC specific test to avoid specific BSD testing. */
- /* better than nothing implementation. */
 diff -ru ffmpeg.old/libavcodec/eval.c ffmpeg/libavcodec/eval.c
 --- ffmpeg.old/libavcodec/eval.c	Thu Mar  6 12:32:01 2003
 +++ ffmpeg/libavcodec/eval.c	Sun Nov  2 02:04:09 2003
@@ -22,19 +10,6 @@ diff -ru ffmpeg.old/libavcodec/eval.c ffmpeg/libavcodec/eval.c
  #ifndef NAN
    #define NAN 0
  #endif
-diff -ru ffmpeg.old/libavcodec/libpostproc/Makefile ffmpeg/libavcodec/libpostproc/Makefile
---- ffmpeg.old/libavcodec/libpostproc/Makefile	Sun May 11 13:26:35 2003
-+++ ffmpeg/libavcodec/libpostproc/Makefile	Sun Nov  2 19:20:31 2003
-@@ -55,6 +55,9 @@
- 	ldconfig || true
- 	mkdir -p $(prefix)/include/postproc
- 	install -m 644 postprocess.h $(prefix)/include/postproc/postprocess.h
-+else
-+	mkdir -p $(prefix)/include/postproc
-+	install -m 644 postprocess.h $(prefix)/include/postproc/postprocess.h
- endif
- 
- 
 diff -ru ffmpeg.old/libavformat/rtsp.c ffmpeg/libavformat/rtsp.c
 --- ffmpeg.old/libavformat/rtsp.c	Wed Oct 29 15:25:27 2003
 +++ ffmpeg/libavformat/rtsp.c	Sun Nov  2 02:04:09 2003
