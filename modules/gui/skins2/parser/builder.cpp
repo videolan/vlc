@@ -144,7 +144,7 @@ void Builder::addBitmapFont( const BuilderData::BitmapFont &rData )
     GenericBitmap *pBmp = new PngBitmap( getIntf(), rData.m_file, 0 );
     m_pTheme->m_bitmaps[rData.m_id] = GenericBitmapPtr( pBmp );
 
-    GenericFont *pFont = new BitmapFont( getIntf(), *pBmp );
+    GenericFont *pFont = new BitmapFont( getIntf(), *pBmp, rData.m_type );
     if( pFont->init() )
     {
         m_pTheme->m_fonts[rData.m_id] = GenericFontPtr( pFont );

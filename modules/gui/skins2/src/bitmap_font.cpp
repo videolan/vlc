@@ -26,11 +26,39 @@
 #include "../utils/ustring.hpp"
 
 
-BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap ):
+BitmapFont::BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
+                        const string &rType ):
     GenericFont( pIntf ), m_rBitmap( rBitmap )
 {
-    m_width = 9;
-    m_height = 13;
+    if( rType == "digits" )
+    {
+        m_width = 9;
+        m_height = 13;
+        m_advance = 12;
+        m_skip = 6;
+        for( int i = 0; i <= 9; i++ )
+        {
+            m_table['0'+i].m_xPos = i * m_width;
+        }
+        m_table[(size_t)'-'].m_xPos = 11 * m_width;
+    }
+    else if( rType == "text" )
+    {
+        m_width = 5;
+        m_height = 6;
+        m_advance = 5;
+        m_skip = 5;
+        for( int i = 0; i < 26; i++ )
+        {
+            m_table['A'+i].m_xPos = i * m_width;
+            m_table['a'+i].m_xPos = i * m_width;
+        }
+        for( int i = 0; i <= 9; i++ )
+        {
+            m_table['0'+i].m_xPos = i * m_width;
+            m_table['0'+i].m_yPos = m_height;
+        }
+    }
 }
 
 
@@ -43,13 +71,13 @@ GenericBitmap *BitmapFont::drawString( const UString &rString,
     for( uint32_t *ptr = pString; *ptr; ptr++ )
     {
         uint32_t c = *ptr;
-        if( (c >= '0' && c <= '9') || c == '-' )
+        if( c < 256 && m_table[c].m_xPos != -1 )
         {
-            width += m_width + 3;
+            width += m_advance;
         }
         else
         {
-            width += 6;
+            width += m_skip;
         }
     }
     // Create a bitmap
@@ -58,24 +86,15 @@ GenericBitmap *BitmapFont::drawString( const UString &rString,
     while( *pString )
     {
         uint32_t c = *(pString++);
-        int xSrc = -1;
-        if( c >= '0' && c <= '9' )
+        if( c < 256 && m_table[c].m_xPos != -1 )
         {
-            xSrc = (c - '0') * m_width;
-        }
-        else if( c == '-' )
-        {
-            xSrc = 11 * m_width;
-        }
-        if( xSrc != -1 )
-        {
-            pBmp->drawBitmap( m_rBitmap, xSrc, 0, xDest, 0, m_width,
-                              m_height );
-            xDest += m_width + 3;
+            pBmp->drawBitmap( m_rBitmap, m_table[c].m_xPos, m_table[c].m_yPos,
+                              xDest, 0, m_width, m_height );
+            xDest += m_advance;
         }
         else
         {
-            xDest += 6;
+            xDest += m_skip;
         }
     }
     return pBmp;
