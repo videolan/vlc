@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.11 2003/05/03 01:52:43 fenrir Exp $
+ * $Id: v4l.c,v 1.12 2003/05/03 12:36:17 fenrir Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -175,10 +175,20 @@ static void    SetDWBE( uint8_t *p, uint32_t dw )
     p[3] = (dw      )&0xff;
 }
 
+static void    SetQWBE( uint8_t *p, uint64_t qw )
+{
+    SetDWBE( p,     (qw >> 32)&0xffffffff );
+    SetDWBE( &p[4], qw&0xffffffff);
+}
+
 static uint32_t GetDWBE( uint8_t *p_buff )
 {
     return( ( p_buff[0] << 24 ) + ( p_buff[1] << 16 ) +
             ( p_buff[2] <<  8 ) + p_buff[3] );
+}
+static uint64_t GetQWBE( uint8_t *p )
+{
+    return( ( (uint64_t)GetDWBE( p ) << 32) | (uint64_t)GetDWBE( &p[4] ) );
 }
 
 /*****************************************************************************
@@ -920,10 +930,13 @@ static void AccessClose( vlc_object_t *p_this )
 #ifdef _V4L_AUDIO_
 static int GrabAudio( input_thread_t * p_input,
                       uint8_t **pp_data,
-                      int      *pi_data )
+                      int      *pi_data,
+                      mtime_t  *pi_pts )
 {
     access_sys_t    *p_sys   = p_input->p_access_data;
+    struct audio_buf_info buf_info;
     int i_read;
+    int i_correct;
 
     i_read = read( p_sys->fd_audio, p_sys->p_audio_frame,
                    p_sys->i_audio_frame_size_allocated );
@@ -935,15 +948,26 @@ static int GrabAudio( input_thread_t * p_input,
 
     p_sys->i_audio_frame_size = i_read;
 
+    /* from vls : correct the date because of kernel buffering */
+    i_correct = i_read;
+    if( ioctl( p_sys->fd_audio, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
+    {
+        i_correct += buf_info.bytes;
+    }
+
 
     *pp_data = p_sys->p_audio_frame;
     *pi_data = p_sys->i_audio_frame_size;
+    *pi_pts  = mdate() - (mtime_t)1000000 * (mtime_t)i_correct /
+                         2 / ( p_sys->b_stereo ? 2 : 1) / p_sys->i_sample_rate;
     return VLC_SUCCESS;
 }
 #endif
 
-static int GrabVideo( input_thread_t * p_input, uint8_t **pp_data,
-                      int *pi_data )
+static int GrabVideo( input_thread_t * p_input,
+                      uint8_t **pp_data,
+                      int *pi_data,
+                      mtime_t  *pi_pts )
 {
     access_sys_t *p_sys   = p_input->p_access_data;
 
@@ -998,6 +1022,7 @@ static int GrabVideo( input_thread_t * p_input, uint8_t **pp_data,
 
     *pp_data = p_sys->p_video_frame;
     *pi_data = p_sys->i_video_frame_size;
+    *pi_pts  = mdate();
     return VLC_SUCCESS;
 }
 
@@ -1010,8 +1035,9 @@ static int GrabVideo( input_thread_t * p_input, uint8_t **pp_data,
 static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_input->p_access_data;
-    int i_data = 0;
-    int i_stream;
+    int          i_data = 0;
+    int          i_stream;
+    mtime_t      i_pts;
 
     //msg_Info( p_input, "access read data_size %i, data_pos %i",
                 //p_sys->i_data_size, p_sys->i_data_pos );
@@ -1069,11 +1095,11 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 #ifdef _V4L_AUDIO_
         i_stream = 1;
         if( p_sys->fd_audio < 0 ||
-            GrabAudio( p_input, &p_sys->p_data, &p_sys->i_data_size ) )
+            GrabAudio( p_input, &p_sys->p_data, &p_sys->i_data_size, &i_pts ) )
         {
             /* and then get video frame if no audio */
             i_stream = 0;
-            if( GrabVideo( p_input, &p_sys->p_data, &p_sys->i_data_size ) )
+            if( GrabVideo( p_input, &p_sys->p_data, &p_sys->i_data_size, &i_pts ) )
             {
                 return -1;
             }
@@ -1081,17 +1107,18 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 #else
         /* and then get video frame if no audio */
         i_stream = 0;
-        if( GrabVideo( p_input, &p_sys->p_data, &p_sys->i_data_size ) )
+        if( GrabVideo( p_input, &p_sys->p_data, &p_sys->i_data_size, &i_pts ) )
         {
             return -1;
         }
 #endif
 
         /* create pseudo header */
-        p_sys->i_header_size = 8;
+        p_sys->i_header_size = 16;
         p_sys->i_header_pos  = 0;
         SetDWBE( &p_sys->p_header[0], i_stream );
         SetDWBE( &p_sys->p_header[4], p_sys->i_data_size );
+        SetQWBE( &p_sys->p_header[8], i_pts );
     }
 
     return i_data;
@@ -1246,8 +1273,9 @@ static int Demux( input_thread_t *p_input )
     int i_stream;
     int i_size;
     uint8_t *p_peek;
+    mtime_t        i_pts;
 
-    if( input_Peek( p_input, &p_peek, 8 ) < 8 )
+    if( input_Peek( p_input, &p_peek, 16 ) < 16 )
     {
         msg_Warn( p_input, "cannot peek (EOF ?)" );
         return( 0 );
@@ -1255,6 +1283,7 @@ static int Demux( input_thread_t *p_input )
 
     i_stream = GetDWBE( &p_peek[0] );
     i_size   = GetDWBE( &p_peek[4] );
+    i_pts    = GetQWBE( &p_peek[8] );
 
     //msg_Dbg( p_input, "stream=%d size=%d", i_stream, i_size );
 //    p_es = input_FindES( p_input, i_stream );
@@ -1277,7 +1306,7 @@ static int Demux( input_thread_t *p_input )
         msleep( 1000 );
         return( 1 );
     }
-    i_size += 8;
+    i_size += 16;
     while( i_size > 0 )
     {
         data_packet_t   *p_data;
@@ -1305,8 +1334,8 @@ static int Demux( input_thread_t *p_input )
         i_size -= i_read;
     }
 //    input_SplitBuffer( p_input, &p_pk, i_size + 8 );
-    p_pes->p_first->p_payload_start += 8;
-    p_pes->i_pes_size               -= 8;
+    p_pes->p_first->p_payload_start += 16;
+    p_pes->i_pes_size               -= 16;
     if( p_es && p_es->p_decoder_fifo )
     {
         vlc_mutex_lock( &p_es->p_decoder_fifo->data_lock );
@@ -1317,8 +1346,8 @@ static int Demux( input_thread_t *p_input )
                            &p_es->p_decoder_fifo->data_lock );
         }
         vlc_mutex_unlock( &p_es->p_decoder_fifo->data_lock );
-        p_pes->i_pts = mdate() + p_input->i_pts_delay;
-
+        //p_pes->i_pts = mdate() + p_input->i_pts_delay;
+        p_pes->i_pts = p_pes->i_dts = i_pts + p_input->i_pts_delay;
         input_DecodePES( p_es->p_decoder_fifo, p_pes );
     }
     else
