@@ -266,6 +266,9 @@ struct demux_sys_t
     vlc_bool_t  b_udp_out;
     int         fd; /* udp socket */
     uint8_t     *buffer;
+
+    vlc_bool_t  b_dvb_control;
+    int         i_dvb_program;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -376,6 +379,8 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( demux_sys_t ) );
 
     /* Init p_sys field */
+    p_sys->b_dvb_control = VLC_TRUE;
+    p_sys->i_dvb_program = 0;
     for( i = 0; i < 8192; i++ )
     {
         ts_pid_t *pid = &p_sys->pid[i];
@@ -599,6 +604,13 @@ static void Close( vlc_object_t *p_this )
         {
             msg_Dbg( p_demux, "  - pid[0x%x] seen", pid->i_pid );
         }
+
+        if( p_sys->b_dvb_control && pid->i_pid > 0 )
+        {
+            /* too much */
+            stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, pid->i_pid, VLC_FALSE );
+        }
+
     }
 
     if( p_sys->b_udp_out )
@@ -753,9 +765,10 @@ static int Demux( demux_t *p_demux )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    /* demux_sys_t *p_sys = p_demux->p_sys; */
+    demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
     int64_t i64;
+    int i_int;
 
     switch( i_query )
     {
@@ -804,6 +817,95 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi64 = 0;
             return VLC_EGENERIC;
 #endif
+        case DEMUX_SET_GROUP:
+            i_int = (int)va_arg( args, int );
+            if( p_sys->b_dvb_control && i_int > 0 && i_int != p_sys->i_dvb_program )
+            {
+                int i_pmt_pid = -1;
+                int i;
+
+                /* Search pmt to be unselected */
+                for( i = 0; i < p_sys->i_pmt; i++ )
+                {
+                    ts_pid_t *pmt = p_sys->pmt[i];
+                    int i_prg;
+
+                    for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                    {
+                        if( pmt->psi->prg[i_prg]->i_number == p_sys->i_dvb_program)
+                        {
+                            i_pmt_pid = p_sys->pmt[i]->i_pid;
+                            break;
+                        }
+                    }
+                    if( i_pmt_pid > 0 ) break;
+                }
+
+                if( i_pmt_pid > 0 )
+                {
+                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid, VLC_FALSE );
+                    /* All ES */
+                    for( i = 2; i < 8192; i++ )
+                    {
+                        ts_pid_t *pid = &p_sys->pid[i];
+
+                        if( !pid->b_valid || pid->psi ) continue;
+
+                        int i_prg;
+                        for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+                        {
+                            if( pid->p_owner->prg[i_prg]->i_pid_pcr == i_pmt_pid && pid->es->id )
+                            {
+                                /* We only remove es that aren't defined by extra pmt */
+                                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i, VLC_FALSE );
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                /* select new program */
+                p_sys->i_dvb_program = i_int;
+                i_pmt_pid = -1;
+                for( i = 0; i < p_sys->i_pmt; i++ )
+                {
+                    ts_pid_t *pmt = p_sys->pmt[i];
+                    int i_prg;
+
+                    for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                    {
+                        if( pmt->psi->prg[i_prg]->i_number == i_int )
+                        {
+                            i_pmt_pid = p_sys->pmt[i]->i_pid;
+                            break;
+                        }
+                    }
+                    if( i_pmt_pid > 0 ) break;
+                }
+                if( i_pmt_pid > 0 )
+                {
+                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid, VLC_TRUE );
+                    for( i = 2; i < 8192; i++ )
+                    {
+                        ts_pid_t *pid = &p_sys->pid[i];
+
+                        if( !pid->b_valid || pid->psi ) continue;
+
+                        int i_prg;
+                        for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+                        {
+                            if( pid->p_owner->prg[i_prg]->i_pid_pcr == i_pmt_pid && pid->es->id )
+                            {
+                                /* We only remove es that aren't defined by extra pmt */
+                                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i, VLC_TRUE );
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return VLC_SUCCESS;
+
         case DEMUX_GET_FPS:
         case DEMUX_SET_TIME:
         default:
@@ -1799,6 +1901,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         if( pid->b_valid && pid->p_owner == pmt->psi &&
             pid->i_owner_number == prg->i_number && pid->psi == NULL )
         {
+            if( p_sys->b_dvb_control &&
+                ( p_sys->i_dvb_program < 0 || p_sys->i_dvb_program == prg->i_number ) )
+            {
+                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i, VLC_FALSE );
+            }
+
             PIDClean( p_demux->out, pid );
         }
     }
@@ -2133,6 +2241,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                     es_out_Add( p_demux->out, &pid->extra_es[i]->fmt);
             }
         }
+        if( p_sys->b_dvb_control &&
+            ( p_sys->i_dvb_program < 0 || p_sys->i_dvb_program == prg->i_number ) )
+        {
+            stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, p_es->i_pid, VLC_FALSE );
+        }
     }
     dvbpsi_DeletePMT(p_pmt);
 }
@@ -2210,6 +2323,12 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                         pmt_rm[j]->i_pid && pid->es->id )
                     {
                         /* We only remove es that aren't defined by extra pmt */
+                        if( p_sys->b_dvb_control )
+                        {
+                            if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i, VLC_FALSE ) )
+                                p_sys->b_dvb_control = VLC_FALSE;
+                        }
+
                         PIDClean( p_demux->out, pid );
                         break;
                     }
@@ -2222,6 +2341,12 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         /* Delete PMT pid */
         for( i = 0; i < i_pmt_rm; i++ )
         {
+            if( p_sys->b_dvb_control )
+            {
+                if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, pmt_rm[i]->i_pid, VLC_FALSE ) )
+                    p_sys->b_dvb_control = VLC_FALSE;
+            }
+
             PIDClean( p_demux->out, &p_sys->pid[pmt_rm[i]->i_pid] );
             TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pmt_rm[i] );
         }
@@ -2268,6 +2393,24 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                                       p_demux );
                 pmt->psi->prg[pmt->psi->i_prg-1]->i_number =
                     p_program->i_number;
+
+                /* Now select PID at access level */
+                if( p_sys->b_dvb_control )
+                {
+                    if( p_sys->i_dvb_program <= 0 || p_sys->i_dvb_program == p_program->i_number )
+                    {
+                        if( p_sys->i_dvb_program == 0 )
+                            p_sys->i_dvb_program = p_program->i_number;
+
+                        if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, p_program->i_pid, VLC_TRUE ) )
+                            p_sys->b_dvb_control = VLC_FALSE;
+                    }
+                    else
+                    {
+                        if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, p_program->i_pid, VLC_FALSE ) )
+                            p_sys->b_dvb_control = VLC_FALSE;
+                    }
+                }
             }
         }
     }
