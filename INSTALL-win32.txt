@@ -43,7 +43,7 @@ Configuring VideoLAN
 
 A typical way to configure vlc is:
 
-   ./configure --disable-x11 --disable-xvideo --disable-dsp --without-sdl \
+   ./configure --disable-x11 --disable-xvideo --disable-dsp --disable-sdl \
       --with-directx=/usr/local/cross-compile/i386-mingw32msvc
 
 See `./configure --help' for more information.
