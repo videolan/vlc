@@ -254,7 +254,7 @@ input_obj =         		input/input_vlan.o \
 						input/input.o
 
 audio_output_obj = 		audio_output/audio_output.o \
-						audio_output/audio_dsp.o
+						$(aout_method)
 
 video_output_obj = 		video_output/video_output.o \
 						video_output/video_text.o \
@@ -382,13 +382,13 @@ vlc: $(C_OBJ) $(ASM_OBJ)
 $(dependancies): %.d: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
-$(C_OBJ): %.o: Makefile Makefile.dep
+$(C_OBJ): %.o: Makefile.dep
 $(C_OBJ): %.o: dep/%.d
 $(C_OBJ): %.o: %.c
 	@echo "compiling $*.c"
 	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
-$(ASM_OBJ): %.o: Makefile Makefile.dep
+$(ASM_OBJ): %.o: Makefile.dep
 $(ASM_OBJ): %.o: %.S
 	@echo "assembling $*.S"
 	@$(CC) $(CFLAGS) -c -o $@ $<
