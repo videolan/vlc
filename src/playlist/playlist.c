@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.38 2003/06/24 22:26:01 asmax Exp $
+ * $Id: playlist.c,v 1.39 2003/06/27 10:31:02 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -132,6 +132,32 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
 }
 
+/*****************************************************************************
+ * playlist_AddName: add an item to the playlist with his name
+ *****************************************************************************
+ * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
+ * add it at the end regardless of the playlist current size.
+ *****************************************************************************/
+int playlist_AddName( playlist_t *p_playlist, const char * psz_name, 
+                                          const char *psz_uri,
+                                          int i_mode, int i_pos )
+{
+    playlist_item_t * p_item;
+
+    p_item = malloc( sizeof( playlist_item_t ) );
+    if( p_item == NULL )
+    {
+        msg_Err( p_playlist, "out of memory" );
+    }
+
+    p_item->psz_name = strdup( psz_name );
+    p_item->psz_uri  = strdup( psz_uri );
+    p_item->i_type = 0;
+    p_item->i_status = 0;
+    p_item->b_autodeletion = VLC_FALSE;
+
+    return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
+}
 
 int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
                 int i_mode, int i_pos)
@@ -173,7 +199,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
     }
 
 
-    msg_Dbg( p_playlist, "adding playlist item « %s »", p_item->psz_name );
+    msg_Dbg( p_playlist, "adding playlist item « %s » ( %s )", p_item->psz_name, p_item->psz_uri);
 
     /* Create the new playlist item */
 
