@@ -1,3 +1,4 @@
 SOURCES_trivial_resampler = modules/audio_filter/resampler/trivial.c
 SOURCES_ugly_resampler = modules/audio_filter/resampler/ugly.c
+SOURCES_linear_resampler = modules/audio_filter/resampler/linear.c
 #SOURCES_fast = modules/audio_filter/resampler/fast.c
