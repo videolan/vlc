@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.9 2002/05/18 17:47:47 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.10 2002/05/21 00:23:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -790,13 +790,25 @@ ssize_t input_FDNetworkRead( input_thread_t * p_input, byte_t * p_buffer,
  *****************************************************************************/
 void input_FDSeek( input_thread_t * p_input, off_t i_pos )
 {
+#define S p_input->stream
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
 
     lseek( p_access_data->i_handle, i_pos, SEEK_SET );
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.p_selected_area->i_tell = i_pos;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    vlc_mutex_lock( &S.stream_lock );
+    S.p_selected_area->i_tell = i_pos;
+    if( S.p_selected_area->i_tell > S.p_selected_area->i_size )
+    {
+        intf_ErrMsg( "input error: seeking too far" );
+        S.p_selected_area->i_tell = S.p_selected_area->i_size;
+    }
+    else if( S.p_selected_area->i_tell < 0 )
+    {
+        intf_ErrMsg( "input error: seeking too early" );
+        S.p_selected_area->i_tell = 0;
+    }
+    vlc_mutex_unlock( &S.stream_lock );
+#undef S
 }
 
 

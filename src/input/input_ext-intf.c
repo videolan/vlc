@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.35 2002/03/05 17:46:33 stef Exp $
+ * $Id: input_ext-intf.c,v 1.36 2002/05/21 00:23:37 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -130,10 +130,18 @@ void input_Seek( input_thread_t * p_input, off_t i_position )
     char        psz_time2[OFFSETTOTIME_MAX_SIZE];
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.p_selected_area->i_seek = i_position;
+    if( i_position < 0 )
+    {
+        i_position = 0;
+    }
+    else if( i_position >= p_input->stream.p_selected_area->i_size )
+    {
+        i_position = p_input->stream.p_selected_area->i_size;
+    }
 
-    intf_WarnMsg( 3, "input: seeking position %lld/%lld (%s/%s)", i_position,
-                  p_input->stream.p_selected_area->i_size,
+    p_input->stream.p_selected_area->i_seek = i_position;
+    intf_WarnMsg( 3, "input: seeking position %lld/%lld (%s/%s)",
+                  i_position, p_input->stream.p_selected_area->i_size,
                   input_OffsetToTime( p_input, psz_time1, i_position ),
                   input_OffsetToTime( p_input, psz_time2,
                               p_input->stream.p_selected_area->i_size ) );
