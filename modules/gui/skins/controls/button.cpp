@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.11 2003/04/21 21:51:16 asmax Exp $
+ * $Id: button.cpp,v 1.12 2003/05/02 15:53:32 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -76,7 +76,7 @@ ControlButton::~ControlButton()
 void ControlButton::Init()
 {
     // Init bitmaps
-    Img = new (Bitmap*)[3];
+    Img = new (Bitmap *[3]);
     Img[0] = p_intf->p_sys->p_theme->BmpBank->Get( Up );
     Img[1] = p_intf->p_sys->p_theme->BmpBank->Get( Down );
     if( Disabled == "none" )

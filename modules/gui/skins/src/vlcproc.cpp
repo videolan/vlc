@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.17 2003/04/30 19:22:27 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.18 2003/05/02 15:53:32 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -23,15 +23,15 @@
  * USA.
  *****************************************************************************/
 
-#ifndef BASIC_SKINS
-#include <wx/wx.h>
-#endif
-
 //--- VLC -------------------------------------------------------------------
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
+
+#ifndef BASIC_SKINS
+#include <wx/wx.h>
+#endif
 
 extern "C" {
 #include "netutils.h"

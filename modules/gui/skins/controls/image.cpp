@@ -2,7 +2,7 @@
  * image.cpp: Image control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: image.cpp,v 1.6 2003/04/21 21:51:16 asmax Exp $
+ * $Id: image.cpp,v 1.7 2003/05/02 15:53:32 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -25,6 +25,7 @@
 
 
 //--- VLC -------------------------------------------------------------------
+#include <vlc/vlc.h>
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
@@ -59,7 +60,7 @@ ControlImage::~ControlImage()
 //---------------------------------------------------------------------------
 void ControlImage::Init()
 {
-    Img    = new (Bitmap*)[1];
+    Img    = new (Bitmap *[1]);
     Img[0] = p_intf->p_sys->p_theme->BmpBank->Get( Bg );
     Img[0]->GetSize( Width, Height );
 

@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.11 2003/04/29 12:54:57 gbazin Exp $
+ * $Id: win32_window.cpp,v 1.12 2003/05/02 15:53:32 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -25,6 +25,12 @@
 
 #ifdef WIN32
 
+/* For TrackMouseEvent, WM_MOUSEWHEEL and GET_WHEEL_DELTA_WPARAM */
+#undef WINVER
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#define WINVER 0x0500
+
 //--- GENERAL ---------------------------------------------------------------
 //#include <math.h>
 
@@ -46,8 +52,6 @@
 #include "../os_graphics.h"
 #include "../src/skin_common.h"
 #include "../src/theme.h"
-
-
 
 //---------------------------------------------------------------------------
 // Fading API

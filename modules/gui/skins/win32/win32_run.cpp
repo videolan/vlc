@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.13 2003/04/30 19:22:27 ipkiss Exp $
+ * $Id: win32_run.cpp,v 1.14 2003/05/02 15:53:32 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -25,14 +25,15 @@
 
 #ifdef WIN32
 
+//--- VLC -------------------------------------------------------------------
+#include <vlc/vlc.h>
+#include <vlc/intf.h>
+
 //--- GENERAL ---------------------------------------------------------------
 #ifndef BASIC_SKINS
 #include <wx/wx.h>
 #endif
 #include <windows.h>
-
-//--- VLC -------------------------------------------------------------------
-#include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"

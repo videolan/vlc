@@ -2,7 +2,7 @@
  * checkbox.cpp: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.cpp,v 1.5 2003/04/21 21:51:16 asmax Exp $
+ * $Id: checkbox.cpp,v 1.6 2003/05/02 15:53:32 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -25,6 +25,7 @@
 
 
 //--- VLC -------------------------------------------------------------------
+#include <vlc/vlc.h>
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
@@ -98,7 +99,7 @@ ControlCheckBox::~ControlCheckBox()
 //---------------------------------------------------------------------------
 void ControlCheckBox::Init()
 {
-    Img = new (Bitmap*)[6];
+    Img = new (Bitmap *[6]);
 
     // Images for position 1
     Img[0] = p_intf->p_sys->p_theme->BmpBank->Get( Img1 );

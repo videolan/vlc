@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.8 2003/04/24 15:57:50 gbazin Exp $
+ * $Id: themeloader.cpp,v 1.9 2003/05/02 15:53:32 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -27,13 +27,13 @@
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
 #include <fcntl.h>
-#if !defined WIN32
+#if !defined( WIN32 )
 #   include <unistd.h>
-#   ifndef PATH_MAX
-#       define MAX_PATH PATH_MAX;
-#   endif
 #else
 #   include <direct.h>
+#   ifndef PATH_MAX
+#       define PATH_MAX MAX_PATH
+#   endif
 #endif
 
 //--- VLC -------------------------------------------------------------------
