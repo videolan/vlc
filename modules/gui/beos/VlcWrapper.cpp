@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.39 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: VlcWrapper.cpp,v 1.40 2003/12/04 10:25:47 gbazin Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -270,7 +270,7 @@ void VlcWrapper::ToggleSubtitle( int i_subtitle )
 
 const char * VlcWrapper::GetTimeAsString()
 {
-    static char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+    static char psz_time[ MSTRTIME_MAX_SIZE ];
         
     if( !p_input )
     {

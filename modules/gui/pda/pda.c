@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.15 2003/12/03 20:47:06 jpsaman Exp $
+ * $Id: pda.c,v 1.16 2003/12/04 10:25:47 gbazin Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -564,7 +564,7 @@ void E_(GtkDisplayDate)( GtkAdjustment *p_adj )
     if( p_intf->p_sys->p_input )
     {
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
-        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+        char psz_time[ MSTRTIME_MAX_SIZE ];
 
         gtk_label_set_text( GTK_LABEL( p_intf->p_sys->p_slider_label ),
                         input_OffsetToTime( p_intf->p_sys->p_input, psz_time,

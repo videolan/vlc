@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.75 2003/12/03 13:41:49 rocky Exp $
+ * $Id: interface.cpp,v 1.76 2003/12/04 10:25:47 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1167,7 +1167,7 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
         {
             /* Update stream date */
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
-            char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+            char psz_time[ MSTRTIME_MAX_SIZE ];
 
             slider_box->SetLabel(
                 wxU(input_OffsetToTime( p_intf->p_sys->p_input,

@@ -502,7 +502,7 @@ void KInterface::slotSliderChanged( int position )
 {
     if( p_intf->p_sys->p_input != NULL )
     {
-        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+        char psz_time[ MSTRTIME_MAX_SIZE ];
 
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
 

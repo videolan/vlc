@@ -2,7 +2,7 @@
  * intf.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf.cpp,v 1.4 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: intf.cpp,v 1.5 2003/12/04 10:25:47 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -264,7 +264,7 @@ void IntfWindow::DateDisplay( int i_range )
 {
     if( p_intf->p_sys->p_input )
     {
-        char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+        char psz_time[ MSTRTIME_MAX_SIZE ];
 
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
         p_date->setText( input_OffsetToTime( p_intf->p_sys->p_input, psz_time,
