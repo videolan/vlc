@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.28 2003/07/29 21:14:10 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.29 2003/08/08 16:50:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -223,7 +223,11 @@ static void Init( intf_thread_t *p_intf )
 #endif
 
     /* Hack to pass the p_intf pointer to the new wxWindow Instance object */
+#ifdef wxTheApp
+    wxApp::SetInstance( new Instance( p_intf ) );
+#else
     wxTheApp = new Instance( p_intf );
+#endif
 
 #if defined( WIN32 )
 #if !defined(__BUILTIN__)

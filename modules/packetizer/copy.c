@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.12 2003/07/31 19:02:23 fenrir Exp $
+ * $Id: copy.c,v 1.13 2003/08/08 16:50:27 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -93,8 +93,10 @@ static int Open( vlc_object_t *p_this )
 static int Run( decoder_fifo_t *p_fifo )
 {
     packetizer_thread_t *p_pack;
+    int i_ret;
 
-    msg_Dbg( p_fifo, "Running copy packetizer (fcc=%4.4s)", (char*)&p_fifo->i_fourcc );
+    msg_Dbg( p_fifo, "Running copy packetizer (fcc=%4.4s)",
+             (char*)&p_fifo->i_fourcc );
 
     p_pack = malloc( sizeof( packetizer_thread_t ) );
     memset( p_pack, 0, sizeof( packetizer_thread_t ) );
@@ -117,9 +119,10 @@ static int Run( decoder_fifo_t *p_fifo )
         DecoderError( p_pack->p_fifo );
     }
 
+    i_ret = p_pack->p_fifo->b_error ? VLC_EGENERIC : VLC_SUCCESS;
     End( p_pack );
 
-    return( p_pack->p_fifo->b_error ? VLC_EGENERIC : VLC_SUCCESS );
+    return( i_ret );
 }
 
 /*****************************************************************************
