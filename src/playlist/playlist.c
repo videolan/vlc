@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.73 2004/01/10 14:24:33 hartman Exp $
+ * $Id: playlist.c,v 1.74 2004/01/11 00:11:56 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -378,13 +378,6 @@ static void RunThread ( playlist_t *p_playlist )
                     input_StopThread( p_playlist->p_input );
                     vlc_mutex_unlock( &p_playlist->object_lock );
                 }
-
-                val.i_int = p_playlist->i_index;
-                var_Set( p_playlist, "playlist-current", val);
-#if 0
-                val.b_bool = VLC_TRUE;
-                var_Set( p_playlist, "intf-change", val );
-#endif
                 continue;
             }
             else if( p_playlist->p_input->stream.control.i_status != INIT_S )
@@ -595,5 +588,5 @@ static void PlayItem( playlist_t *p_playlist )
                                   p_playlist->pp_items[p_playlist->i_index] );
 
     val.i_int = p_playlist->i_index;
-    var_Set( p_playlist, "item-change", val );
+    var_Set( p_playlist, "playlist-current", val);
 }
