@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.4 2001/02/07 17:56:21 massiot Exp $
+ * $Id: input_clock.c,v 1.5 2001/02/08 13:08:03 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -217,15 +217,23 @@ void input_ClockManageRef( input_thread_t * p_input,
             vlc_mutex_lock( &p_input->stream.stream_lock );
             if( p_input->stream.i_new_status != UNDEF_S )
             {
-                /* For the moment, only PLAYING_S and FORWARD_S are
-                 * supported. */
-                input_ClockNewRef( p_input, p_pgrm, i_clock,
-                                   ClockToSysdate( p_input, p_pgrm, i_clock ) );
+                if( p_input->stream.i_new_status == PAUSE_S )
+                {
+                    vlc_cond_wait( &p_input->stream.stream_wait,
+                                   &p_input->stream.stream_lock );
+                    input_ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
+                }
+                else
+                {
+                    input_ClockNewRef( p_input, p_pgrm, i_clock,
+                               ClockToSysdate( p_input, p_pgrm, i_clock ) );
+                }
 
                 vlc_mutex_lock( &p_input->stream.control.control_lock );
                 p_input->stream.control.i_status = p_input->stream.i_new_status;
 
-                if( p_input->stream.control.i_status != PLAYING_S )
+                if( p_input->stream.control.i_status != PLAYING_S
+                     && p_input->stream.control.i_status != PAUSE_S )
                 {
                     p_input->stream.control.i_rate = p_input->stream.i_new_rate;
                     p_input->stream.control.b_mute = 1;

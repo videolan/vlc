@@ -46,6 +46,7 @@ void input_Play( input_thread_t * p_input )
     intf_Msg( "input: playing at normal rate" );
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_new_status = PLAYING_S;
+    vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
@@ -74,6 +75,17 @@ void input_Forward( input_thread_t * p_input, int i_rate )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_new_status = FORWARD_S;
     p_input->stream.i_new_rate = i_rate;
+    vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
+/*****************************************************************************
+ * input_Pause: temporarily stops the reading of the stream
+ *****************************************************************************/
+void input_Pause( input_thread_t * p_input )
+{
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.i_new_status = PAUSE_S;
+    vlc_cond_signal( &p_input->stream.stream_wait );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+}

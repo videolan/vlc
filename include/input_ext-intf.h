@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.15 2001/02/08 07:24:25 sam Exp $
+ * $Id: input_ext-intf.h,v 1.16 2001/02/08 13:08:02 massiot Exp $
  *
  * Authors:
  *
@@ -158,6 +158,8 @@ typedef struct stream_descriptor_s
 
     /* New status and rate requested by the interface */
     int                     i_new_status, i_new_rate;
+    vlc_cond_t              stream_wait; /* interface -> input in case of a
+                                          * status change request            */
 
     /* Demultiplexer data */
     void *                  p_demux_data;
@@ -299,7 +301,7 @@ typedef struct input_config_s
  *****************************************************************************/
 struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
                                              int *pi_status );
-void                    input_DestroyThread( struct input_thread_s *,
-                                             int *pi_status );
+void input_DestroyThread( struct input_thread_s *, int *pi_status );
 void input_Play   ( struct input_thread_s * );
+void input_Pause  ( struct input_thread_s * );
 void input_Forward( struct input_thread_s *, int );

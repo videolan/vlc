@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.76 2001/02/08 07:24:25 sam Exp $
+ * $Id: input.c,v 1.77 2001/02/08 13:08:02 massiot Exp $
  *
  * Authors: 
  *
@@ -119,6 +119,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
 
     /* Create thread and set locks. */
     vlc_mutex_init( &p_input->stream.stream_lock );
+    vlc_cond_init( &p_input->stream.stream_wait );
     vlc_mutex_init( &p_input->stream.control.control_lock );
     if( vlc_thread_create( &p_input->thread_id, "input", (void *) RunThread,
                            (void *) p_input ) )
@@ -160,6 +161,11 @@ void input_DestroyThread( input_thread_t *p_input, int *pi_status )
 
     /* Request thread destruction */
     p_input->b_die = 1;
+
+    /* Make the thread exit of an eventual vlc_cond_wait() */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    vlc_cond_signal( &p_input->stream.stream_wait );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* If status is NULL, wait until thread has been destroyed */
     if( pi_status == NULL )
