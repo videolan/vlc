@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003-2004 VideoLAN
-# $Id: vlc.ebuild,v 1.25 2004/01/09 22:11:04 hartman Exp $
+# $Id$
 #
 # Authors: Derk-Jan Hartman <hartman at videolan dot org>
 #
@@ -24,32 +24,22 @@
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
 
-inherit libtool
+inherit libtool gcc eutils
 
 # Missing support for...
 #	tarkin - package not in portage yet - experimental
 #	theora - package not in portage yet - experimental
 #	tremor - package not in portage yet - experimental
 
-inherit gcc
-
 IUSE="arts ncurses dvd gtk nls 3dfx svga fbcon esd X alsa ggi speex
       oggvorbis gnome xv oss sdl aalib slp bidi truetype v4l lirc 
-	  wxwindows imlib matroska dvb mozilla debug faad xosd altivec png"
-
-# Change these to correspond with the
-# unpacked dirnames of the CVS snapshots.
-PFFM=ffmpeg-20040103
-PLIVE=live
+	  wxwindows imlib matroska dvb pvr satellite mozilla debug faad
+	  xosd altivec png dts"
 
 S=${WORKDIR}/${P}
-SFFM=${WORKDIR}/${PFFM}
-SLIVE=${WORKDIR}/${PLIVE}
 
 DESCRIPTION="VLC media player - Video player and streamer"
-SRC_URI="http://download.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
-		 http://download.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20040103.tar.bz2
-		 http://download.videolan.org/pub/${PN}/${PV}/contrib/live.2003.11.06.tar.gz"
+SRC_URI="http://download.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2"
 
 HOMEPAGE="http://www.videolan.org/vlc"
 
@@ -57,17 +47,18 @@ SLOT="0"
 LICENSE="GPL-2"
 KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa ~amd64 ~ia64 ~ppc64"
 
-DEPEND="X? ( virtual/x11 )
+RDEPEND="X? ( virtual/x11 )
 	aalib? ( >=media-libs/aalib-1.4_rc4-r2 
-			>=media-libs/libcaca-0.2 )
+			=media-libs/libcaca-0.9 )
 	alsa? ( >=media-libs/alsa-lib-0.9_rc2 )
 	dvb? ( media-libs/libdvb
 		media-tv/linuxtv-dvb )
 	dvd? ( >=media-libs/libdvdread-0.9.4
 		>=media-libs/libdvdcss-1.2.8
+		>=media-libs/libdvdnav-0.1.9
 		>=media-libs/libdvdplay-1.0.1 )
 	esd? ( >=media-sound/esound-0.2.22 )
-	faad? ( >=media-libs/faad2-2.0-rc3 )
+	faad? ( >=media-libs/faad2-2.0_rc3 )
 	ggi? ( >=media-libs/libggi-2.0_beta3 )
 	gnome? ( >=gnome-base/gnome-libs-1.4.1.2-r1 )
 	gtk? ( =x11-libs/gtk+-1.2* )
@@ -75,7 +66,6 @@ DEPEND="X? ( virtual/x11 )
 	lirc? ( app-misc/lirc )
 	mad? ( media-libs/libmad
 		media-libs/libid3tag )
-	matroska? ( >=media-libs/libmatroska-0.6.2 )
 	mozilla? ( >=net-www/mozilla-1.4 )
 	ncurses? ( sys-libs/ncurses )
 	nls? ( >=sys-devel/gettext-0.12.1 )
@@ -90,18 +80,16 @@ DEPEND="X? ( virtual/x11 )
 	3dfx? ( media-libs/glide-v3 )
 	png? ( >=media-libs/libpng-1.2.5 )
 	speex? ( >=media-libs/speex-1.0.3 )
+	dts? ( >=media-libs/libdts-0.0.2 )
 	>=media-sound/lame-3.93.1
 	>=media-libs/libdvbpsi-0.1.3
 	>=media-libs/a52dec-0.7.4
 	>=media-libs/libmpeg2-0.4.0
+	>=media-video/ffmpeg-0.4.8.20040222
+	>=media-plugins/live-2004.03.05
 	>=media-libs/flac-1.1.0"
 
-# mplayer is a required depandancy until the libpostproc code becomes
-# a seperate package or until ffmpeg gets support for installing 
-# the library
-
-# liveMedia (live.com) is not a true library but needs to be 'imported'
-# into your own sourcetree. This is against VLC coding policy.
+DEPEND="$RDEPEND >=sys-devel/autoconf-2.5.8"
 
 src_unpack() {
 	
@@ -118,38 +106,18 @@ src_unpack() {
 	epatch ${FILESDIR}/glide.patch
 	cd ${S}
 
-	# Avoid timestamp skews with autotools
-	touch configure.ac
-	touch aclocal.m4
-	touch configure
-	touch config.h.in
-	touch `find . -name Makefile.in`
 }
 
 src_compile(){
-	# configure and building of livedotcom
-	cd ${SLIVE}
-	./genMakefiles linux || die "Creating liveMedia Makefiles failed."
-	make || die "liveMedia code failed to compile."
-	
-	# configure and building of ffmpeg
-	cd ${SFFM}
-	./configure \
-		--enable-mp3lame \
-		--enable-pp \
-		--disable-vorbis || die "ffmpeg failed to configure"
-	
-	cd libavcodec
-	make || die "ffmpeg->libavcodec failed to compile"
-	cd libpostproc
-	make || die "ffmpeg->libpostproc failed to compile"
-
 	# Configure and build VLC
 	cd ${S}
 	local myconf
 	myconf="--disable-mga --enable-flac --with-gnu-ld \
 			--enable-a52 --enable-dvbpsi --enable-libmpeg2 \
-			--disable-qt --disable-kde"
+			--disable-qt --disable-kde --disable-libcdio --disable-libcddb \
+			--disable-vcdx --enable-ffmpeg --with-ffmpeg-mp3lame \
+			--enable-livedotcom --with-livedotcom-tree=/usr/lib/live \
+			--disable-skins2" #keep the new skins disabled for now
 
     #--enable-pth				GNU Pth support (default disabled)
 	#--enable-st				State Threads (default disabled)
@@ -177,47 +145,54 @@ src_compile(){
 	export WANT_AUTOCONF_2_5=1
 	export WANT_AUTOMAKE_1_6=1
 
-	myconf="${myconf} --enable-ffmpeg \
-		--with-ffmpeg-tree=${SFFM} \
-		--with-ffmpeg-mp3lame \
-		--enable-livedotcom \
-		--with-livedotcom-tree=${SLIVE}"
+	# Avoid timestamp skews with autotools
+	touch configure.ac
+	touch aclocal.m4
+	touch configure
+	touch config.h.in
+	touch `find . -name Makefile.in`
 
 	econf \
-		`use_enable nls` \
-		`use_enable slp` \
-		`use_enable xosd` \
-		`use_enable ncurses` \
-		`use_enable alsa` \
-		`use_enable esd` \
-		`use_enable oss` \
-		`use_enable ggi` \
-		`use_enable sdl` \
-		`use_enable mad` \
-		`use_enable faad` \
-		`use_enable v4l` \
-		`use_enable dvd` \
-		`use_enable dvd vcd` `use_enable dvdread` `use_enable dvd dvdplay` \
-		`use_enable dvb satellite` `use_enable dvb pvr` \
-		`use_enable joystick` `use_enable lirc` \
-		`use_enable arts` \
-		`use_enable gtk` `use_enable gnome` \
-		`use_enable oggvorbis ogg` `use_enable oggvorbis vorbis` \
-		`use_enable speex` \
-		`use_enable matroska mkv` \
-		`use_enable truetype freetype` \
-		`use_enable bidi fribidi` \
-		`use_enable svga svgalib` \
-		`use_enable fbcon fb` \
-		`use_enable aalib aa` `use_enable aalib caca` \
-		`use_enable xv xvideo` \
-		`use_enable X x11 ` \
-		`use_enable 3dfx glide` \
-		`use_enable altivec` \
+		$(use_enable nls) \
+		$(use_enable slp) \
+		$(use_enable xosd) \
+		$(use_enable ncurses) \
+		$(use_enable alsa) \
+		$(use_enable esd) \
+		$(use_enable oss) \
+		$(use_enable ggi) \
+		$(use_enable sdl) \
+		$(use_enable mad) \
+		$(use_enable faad) \
+		$(use_enable v4l) \
+		$(use_enable dvd) \
+		$(use_enable dvd vcd) \
+		$(use_enable dvdread) \
+		$(use_enable dvd dvdplay) \
+		$(use_enable dvd dvdnav) \
+		$(use_enable dvb) \
+		$(use_enable pvr) \
+		$(use_enable satellite) \
+		$(use_enable joystick) $(use_enable lirc) \
+		$(use_enable arts) \
+		$(use_enable gtk) $(use_enable gnome) \
+		$(use_enable oggvorbis ogg) $(use_enable oggvorbis vorbis) \
+		$(use_enable speex) \
+		$(use_enable matroska mkv) \
+		$(use_enable truetype freetype) \
+		$(use_enable bidi fribidi) \
+		$(use_enable svga svgalib) \
+		$(use_enable fbcon fb) \
+		$(use_enable aalib aa) $(use_enable aalib caca) \
+		$(use_enable xv xvideo) \
+		$(use_enable X x11) \
+		$(use_enable 3dfx glide) \
+		$(use_enable altivec) \
+		$(use_enable dts) \
 		${myconf} || die "configure of VLC failed"
 
-	if [ `gcc-major-version` -eq 2 ]; then
-		sed -i s:"-fomit-frame-pointer":: vlc-config
+	if [[ $(gcc-major-version) == 2 ]]; then
+		sed -i -e s:"-fomit-frame-pointer":: vlc-config || die "-fomit-frame-pointer patching failed"
 	fi
 
 	# parallel make doesn't work with our complicated makefile
