@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.12 2003/05/22 12:00:57 gbazin Exp $
+ * $Id: cdrom.c,v 1.13 2003/05/27 20:43:20 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -680,7 +680,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             /* Initialize CDROM_RAW_READ structure */
             cdrom_raw.DiskOffset.QuadPart = CD_SECTOR_SIZE * i_sector;
             cdrom_raw.SectorCount = i_nb;
-            cdrom_raw.TrackMode =  i_type == VCD_TYPE ? XAForm2 : CDDA;
+            cdrom_raw.TrackMode =  i_type == VCD_TYPE ? YellowMode2 : CDDA;
 
             if( DeviceIoControl( p_vcddev->h_device_handle,
                                  IOCTL_CDROM_RAW_READ, &cdrom_raw,
