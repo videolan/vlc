@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.7 2003/04/14 20:07:49 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.8 2003/04/14 20:17:33 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -268,11 +268,9 @@ void GTK2Window::WindowManualMoveInit()
 //---------------------------------------------------------------------------
 void GTK2Window::Move( int left, int top )
 {
-/*    Left = left;
+    Left = left;
     Top  = top;
-    //SetWindowPos( hWnd, HWND_TOP, Left, Top, Width, Height,
-    //              SWP_NOSIZE|SWP_NOREDRAW|SWP_NOZORDER );
-    MoveWindow( hWnd, Left, Top, Width, Height, false );*/
+    gdk_window_move( gWnd, left, top );
 }
 //---------------------------------------------------------------------------
 void GTK2Window::Size( int width, int height )

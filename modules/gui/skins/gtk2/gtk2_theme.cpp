@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.8 2003/04/14 20:07:49 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.9 2003/04/14 20:17:33 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -324,8 +324,9 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
     attr.height = 0;
     attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.wclass = GDK_INPUT_OUTPUT;
+    attr.override_redirect = TRUE;
     
-    gint mask =0;
+    gint mask = GDK_WA_NOREDIR;
     
     // Create the window
     GdkWindow *gwnd = gdk_window_new( NULL, &attr, mask );
