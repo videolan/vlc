@@ -51,14 +51,14 @@ endif
 # ***************************************************************************
 
 ifeq ($(SYS),DARWIN)
-all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
+all: .autoconf .libtool .automake .intl .iconv .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpgerror .gcrypt .gnutls
 endif
 ifeq ($(SYS),BEOS)
-all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
+all: .perl .autoconf .libtool .automake .intl .iconv .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdread .dvdnav .dvbpsi
@@ -216,6 +216,50 @@ CLEAN_PKG += automake
 DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 
 # ***************************************************************************
+# pkgconfig
+# ***************************************************************************
+
+pkgconfig-$(PKGCFG_VERSION).tar.gz:
+	$(WGET) $(PKGCFG_URL)
+
+pkgconfig: pkgconfig-$(PKGCFG_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.pkgcfg: pkgconfig
+	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	touch $@
+
+CLEAN_FILE += .pkgcfg
+CLEAN_PKG += pkgconfig
+DISTCLEAN_PKG += pkgconfig-$(PKGCFG_VERSION).tar.gz
+
+# ***************************************************************************
+# gettext
+# ***************************************************************************
+
+gettext-$(GETTEXT_VERSION).tar.gz:
+	$(WGET) $(GETTEXT_URL)
+
+gettext: gettext-$(GETTEXT_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/gettext.patch
+
+.intl: gettext
+	( cd $< && ./configure --prefix=$(PREFIX) )
+ifeq ($(SYS),BEOS)
+# The ugliest kludge ever - so libtool correctly links shared libraries
+# on BeOS. Sorry, I just can't figure out how libtool works
+	( cd $< && for f in `find . -name libtool`; do mv $$f $$f.orig; sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' < $$f.orig > $$f; chmod +x $$f; rm $$f.orig; done )
+endif
+	( cd $< && make && make install )
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .intl
+CLEAN_PKG += gettext
+DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
+
+# ***************************************************************************
 # libiconv
 # ***************************************************************************
 
@@ -233,49 +277,6 @@ libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 CLEAN_FILE += .iconv
 CLEAN_PKG += libiconv
 DISTCLEAN_PKG += libiconv-$(LIBICONV_VERSION).tar.gz
-
-# ***************************************************************************
-# pkgconfig
-# ***************************************************************************
-
-pkgconfig-$(PKGCFG_VERSION).tar.gz:
-	$(WGET) $(PKGCFG_URL)
-
-pkgconfig: pkgconfig-$(PKGCFG_VERSION).tar.gz
-	$(EXTRACT_GZ)
-
-.pkgcfg: pkgconfig
-	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
-	touch $@
-
-CLEAN_FILE += .pkgcfg
-CLEAN_PKG += pkgconfig
-DISTCLEAN_PKG += pkgconfig-$(PKGCFG_VERSION).tar.gz
-# ***************************************************************************
-# gettext
-# ***************************************************************************
-
-gettext-$(GETTEXT_VERSION).tar.gz:
-	$(WGET) $(GETTEXT_URL)
-
-gettext: gettext-$(GETTEXT_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -p 0 < Patches/gettext.patch
-
-.intl: gettext .iconv
-	( cd $< && ./configure --prefix=$(PREFIX) )
-ifeq ($(SYS),BEOS)
-# The ugliest kludge ever - so libtool correctly links shared libraries
-# on BeOS. Sorry, I just can't figure out how libtool works
-	( cd $< && for f in `find . -name libtool`; do mv $$f $$f.orig; sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' < $$f.orig > $$f; chmod +x $$f; rm $$f.orig; done )
-endif
-	( cd $< && make && make install )
-	$(INSTALL_NAME)
-	touch $@
-
-CLEAN_FILE += .intl
-CLEAN_PKG += gettext
-DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
 
 # ***************************************************************************
 # freetype2
