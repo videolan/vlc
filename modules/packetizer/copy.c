@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.20 2003/11/22 20:17:14 fenrir Exp $
+ * $Id: copy.c,v 1.21 2003/11/27 19:39:53 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -260,6 +260,15 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     }
     p_block = *pp_block;
     *pp_block = NULL;
+
+    if( p_block->i_pts <= 0 )
+    {
+        p_block->i_pts = p_block->i_dts;
+    }
+    else if( p_block->i_dts <= 0 )
+    {
+        p_block->i_dts = p_block->i_pts;
+    }
 
     if( p_block->i_pts <= 0 )
     {

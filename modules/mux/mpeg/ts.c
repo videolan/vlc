@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.39 2003/11/22 20:25:01 fenrir Exp $
+ * $Id: ts.c,v 1.40 2003/11/27 19:39:53 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -185,9 +185,6 @@ struct sout_mux_sys_t
     int             i_pcr_pid;
     sout_input_t    *p_pcr_input;
 
-    int             i_stream_id_mpga;
-    int             i_stream_id_mpgv;
-
     int             i_audio_bound;
     int             i_video_bound;
 
@@ -268,9 +265,6 @@ static int Open( vlc_object_t *p_this )
     p_mux->i_preheader  = 30; // really enough for a pes header
 
     srand( (uint32_t)mdate() );
-
-    p_sys->i_stream_id_mpga = 0xc0;
-    p_sys->i_stream_id_mpgv = 0xe0;
 
     p_sys->i_audio_bound = 0;
     p_sys->i_video_bound = 0;
@@ -430,8 +424,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 case VLC_FOURCC( 'm', 'p','g', 'v' ):
                     /* TODO: do we need to check MPEG-I/II ? */
                     p_stream->i_stream_type = 0x02;
-                    p_stream->i_stream_id = p_sys->i_stream_id_mpgv;
-                    p_sys->i_stream_id_mpgv++;
+                    p_stream->i_stream_id = 0xe0;
                     break;
                 case VLC_FOURCC( 'm', 'p','4', 'v' ):
                     p_stream->i_stream_type = 0x10;
@@ -467,8 +460,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 case VLC_FOURCC( 'm', 'p','g', 'a' ):
                     p_stream->i_stream_type = p_input->p_fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
-                    p_stream->i_stream_id = p_sys->i_stream_id_mpga;
-                    p_sys->i_stream_id_mpga++;
+                    p_stream->i_stream_id = 0xc0;
                     break;
                 case VLC_FOURCC( 'a', '5','2', ' ' ):
                     p_stream->i_stream_type = 0x81;
