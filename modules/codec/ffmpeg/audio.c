@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.14 2003/02/07 01:22:55 fenrir Exp $
+ * $Id: audio.c,v 1.15 2003/04/17 10:58:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -105,9 +105,7 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
     /* ***** Fill p_context with init values ***** */
     p_adec->p_context->sample_rate = p_wf->nSamplesPerSec;
     p_adec->p_context->channels = p_wf->nChannels;
-#if LIBAVCODEC_BUILD >= 4618
     p_adec->p_context->block_align = p_wf->nBlockAlign;
-#endif
     p_adec->p_context->bit_rate = p_wf->nAvgBytesPerSec * 8;
 
     if( ( p_adec->p_context->extradata_size = p_wf->cbSize ) > 0 )

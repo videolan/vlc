@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.29 2003/04/16 00:12:36 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.30 2003/04/17 10:58:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -38,11 +38,21 @@
 #   include <sys/times.h>
 #endif
 
-#include "avcodec.h"                                            /* ffmpeg */
+#include "avcodec.h" /* ffmpeg */
 
-#include "postprocessing/postprocessing.h"
+#if LIBAVCODEC_BUILD < 4655
+#   error You must have a libavcodec >= 4655 (get CVS)
+#endif
+
 
 #include "ffmpeg.h"
+
+#ifdef LIBAVCODEC_PP
+#   include "libpostproc/postprocess.h"
+#else
+#   include "postprocessing/postprocessing.h"
+#endif
+
 #include "video.h" // video ffmpeg specific
 #include "audio.h" // audio ffmpeg specific
 
@@ -77,8 +87,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 
 #define POSTPROCESSING_Q_LONGTEXT \
     "Quality of post processing\n"\
-    "Valid range is 0 to 6\n" \
-    "(Overridden by others setting)"
+    "Valid range is 0 to 6"
 
 #define POSTPROCESSING_AQ_LONGTEXT \
     "Post processing quality is selected upon time left " \
@@ -95,26 +104,63 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
     "32 ac vlc" \
     "64 Qpel chroma"
 
+/* FIXME (cut/past from ffmpeg */
+#define LIBAVCODEC_PP_LONGHELP \
+"<filterName>[:<option>[:<option>...]][[,|/][-]<filterName>[:<option>...]]...\n" \
+"long form example:\n" \
+"vdeblock:autoq/hdeblock:autoq/linblenddeint    default,-vdeblock\n" \
+"short form example:\n" \
+"vb:a/hb:a/lb                                   de,-vb\n" \
+"more examples:\n" \
+"tn:64:128:256\n" \
+"Filters                        Options\n" \
+"short  long name       short   long option     Description\n" \
+"*      *               a       autoq           cpu power dependant enabler\n" \
+"                       c       chrom           chrominance filtring enabled\n" \
+"                       y       nochrom         chrominance filtring disabled\n" \
+"hb     hdeblock        (2 Threshold)           horizontal deblocking filter\n" \
+"       1. difference factor: default=64, higher -> more deblocking\n" \
+"       2. flatness threshold: default=40, lower -> more deblocking\n" \
+"                       the h & v deblocking filters share these\n" \
+"                       so u cant set different thresholds for h / v\n" \
+"vb     vdeblock        (2 Threshold)           vertical deblocking filter\n" \
+"h1     x1hdeblock                              Experimental h deblock filter 1\n" \
+"v1     x1vdeblock                              Experimental v deblock filter 1\n" \
+"dr     dering                                  Deringing filter\n" \
+"al     autolevels                              automatic brightness / contrast\n" \
+"                       f       fullyrange      stretch luminance to (0..255)\n" \
+"lb     linblenddeint                           linear blend deinterlacer\n" \
+"li     linipoldeint                            linear interpolating deinterlace\n" \
+"ci     cubicipoldeint                          cubic interpolating deinterlacer\n" \
+"md     mediandeint                             median deinterlacer\n" \
+"fd     ffmpegdeint                             ffmpeg deinterlacer\n" \
+"de     default                                 hb:a,vb:a,dr:a,al\n" \
+"fa     fast                                    h1:a,v1:a,dr:a,al\n" \
+"tn     tmpnoise        (3 Thresholds)          Temporal Noise Reducer\n" \
+"                       1. <= 2. <= 3.          larger -> stronger filtering\n" \
+"fq     forceQuant      <quantizer>             Force quantizer\n"
+
 vlc_module_begin();
     add_category_hint( N_("ffmpeg"), NULL, VLC_FALSE );
-#if LIBAVCODEC_BUILD >= 4615
     add_bool( "ffmpeg-dr", 0, NULL,
               "direct rendering",
               "direct rendering", VLC_TRUE );
-#endif
-#if LIBAVCODEC_BUILD >= 4611
     add_integer ( "ffmpeg-error-resilience", -1, NULL,
                   "error resilience", ERROR_RESILIENCE_LONGTEXT, VLC_TRUE );
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL,
                   "workaround bugs", WORKAROUND_BUGS_LONGTEXT, VLC_FALSE );
-#endif
     add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT, VLC_FALSE );
 
     add_category_hint( N_("Post processing"), NULL, VLC_FALSE );
-    add_module( "ffmpeg-pp", "postprocessing",NULL, NULL,
-                N_( "ffmpeg postprocessing module" ), NULL, VLC_FALSE );
+
     add_integer( "ffmpeg-pp-q", 0, NULL,
                  "post processing quality", POSTPROCESSING_Q_LONGTEXT, VLC_FALSE );
+#ifdef LIBAVCODEC_PP
+    add_string( "ffmpeg-pp-name", "default", NULL,
+                "ffmpeg postproc filter chains", LIBAVCODEC_PP_LONGHELP, VLC_TRUE );
+#else
+    add_module( "ffmpeg-pp", "postprocessing",NULL, NULL,
+                N_( "ffmpeg postprocessing module" ), NULL, VLC_FALSE );
     add_bool( "ffmpeg-pp-auto", 0, NULL,
               "auto-level Post processing quality", POSTPROCESSING_AQ_LONGTEXT, VLC_FALSE );
     add_bool( "ffmpeg-db-yv", 0, NULL,
@@ -135,7 +181,7 @@ vlc_module_begin();
     add_bool( "ffmpeg-dr-c", 0, NULL,
               "force chrominance deringing",
               "force chrominance deringing (override other settings)", VLC_TRUE );
-
+#endif
     set_description( _("ffmpeg audio/video decoder((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
     set_capability( "decoder", 70 );
     set_callbacks( OpenDecoder, NULL );
@@ -275,12 +321,7 @@ static int InitThread( generic_thread_t *p_decoder )
     }
 
      /* *** Get a p_context *** */
-#if LIBAVCODEC_BUILD >= 4624
     p_decoder->p_context = avcodec_alloc_context();
-#else
-    p_decoder->p_context = malloc( sizeof( AVCodecContext ) );
-    memset( p_decoder->p_context, 0, sizeof( AVCodecContext ) );
-#endif
 
     switch( p_decoder->i_cat )
     {
@@ -399,7 +440,6 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name = "MPEG-1/2 Video";
             break;
 #endif
-#if LIBAVCODEC_BUILD >= 4608
         case FOURCC_DIV1:
         case FOURCC_div1:
         case FOURCC_MPG4:
@@ -417,7 +457,6 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec = CODEC_ID_MSMPEG4V2;
             psz_name = "MS MPEG-4 v2";
             break;
-#endif
 
         case FOURCC_MPG3:
         case FOURCC_mpg3:
@@ -433,25 +472,19 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_div6:
         case FOURCC_AP41:
         case FOURCC_3VID:
-	case FOURCC_3vid:
+        case FOURCC_3vid:
         case FOURCC_3IVD:
         case FOURCC_3ivd:
             i_cat = VIDEO_ES;
-#if LIBAVCODEC_BUILD >= 4608
             i_codec = CODEC_ID_MSMPEG4V3;
-#else
-            i_codec = CODEC_ID_MSMPEG4;
-#endif
             psz_name = "MS MPEG-4 v3";
             break;
 
-#if LIBAVCODEC_BUILD >= 4615
         case FOURCC_SVQ1:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_SVQ1;
             psz_name = "SVQ-1 (Sorenson Video v1)";
             break;
-#endif
 
         case FOURCC_DIVX:
         case FOURCC_divx:
@@ -465,10 +498,10 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_DX50:
         case FOURCC_mp4v:
         case FOURCC_4:
-	/* 3iv1 is unsupported by ffmpeg
+        /* 3iv1 is unsupported by ffmpeg
            putting it here gives extreme distorted images
-	case FOURCC_3IV1:
-	case FOURCC_3iv1:
+        case FOURCC_3IV1:
+        case FOURCC_3iv1:
         */
         case FOURCC_3IV2:
         case FOURCC_3iv2:
@@ -512,13 +545,11 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec = CODEC_ID_MJPEG;
             psz_name = "Motion JPEG";
             break;
-#if LIBAVCODEC_BUILD >= 4640
         case FOURCC_mjpb:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_MJPEGB;
             psz_name = "Motion JPEG B";
             break;
-#endif
         case FOURCC_dvsl:
         case FOURCC_dvsd:
         case FOURCC_DVSD:
@@ -530,7 +561,6 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name = "DV video";
             break;
 
-#if LIBAVCODEC_BUILD >= 4655
         case FOURCC_MAC3:
             i_cat = AUDIO_ES;
             i_codec = CODEC_ID_MACE3;
@@ -546,9 +576,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec = CODEC_ID_DVAUDIO;
             psz_name = "DV audio";
             break;
-#endif
 
-#if LIBAVCODEC_BUILD >= 4632
         case FOURCC_WMA1:
         case FOURCC_wma1:
             i_cat = AUDIO_ES;
@@ -561,7 +589,6 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             i_codec = CODEC_ID_WMAV2;
             psz_name ="Windows Media Audio 2";
             break;
-#endif
 
 #if LIBAVCODEC_BUILD >= 4663
         case FOURCC_IV31:

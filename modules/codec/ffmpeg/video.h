@@ -2,7 +2,7 @@
  * video.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.h,v 1.6 2002/12/10 10:22:04 fenrir Exp $
+ * $Id: video.h,v 1.7 2003/04/17 10:58:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,25 +20,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#if LIBAVCODEC_BUILD >= 4641 && LIBAVCODEC_BUILD < 4645
-#   define AVFrame AVVideoFrame
-#endif
 
 typedef struct vdec_thread_s
 {
     DECODER_THREAD_COMMON
-#if LIBAVCODEC_BUILD >= 4641
+
     AVFrame        *p_ff_pic;
-#else
-    AVPicture           ff_pic, *p_ff_pic;
-#endif
     BITMAPINFOHEADER    *p_format;
 
-    vout_thread_t       *p_vout; 
+    vout_thread_t       *p_vout;
 
     /* for post processing */
-    u32                 i_pp_mode; /* valid only with I420 and YV12 */
+#ifdef LIBAVCODEC_PP
+    pp_context_t        *pp_context;
+    pp_mode_t           *pp_mode;
+#else
+    uint32_t            i_pp_mode; /* valid only with I420 and YV12 */
     postprocessing_t    *p_pp;
+#endif
 
     /* for frame skipping algo */
     int b_hurry_up;

@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.19 2003/03/24 13:50:55 hartman Exp $
+ * $Id: video.c,v 1.20 2003/04/17 10:58:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -40,27 +40,29 @@
 #endif
 
 #include "avcodec.h"                                               /* ffmpeg */
-
-#include "postprocessing/postprocessing.h"
-
 #include "ffmpeg.h"
+
+#ifdef LIBAVCODEC_PP
+#   include "libpostproc/postprocess.h"
+#else
+#   include "postprocessing/postprocessing.h"
+#endif
+
 #include "video.h"
+
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#if LIBAVCODEC_BUILD >= 4641
 static void ffmpeg_CopyPicture( picture_t *, AVFrame *, vdec_thread_t * );
-#else
-static void ffmpeg_CopyPicture( picture_t *, AVPicture *, vdec_thread_t * );
-#endif
 
+#ifndef LIBAVCODEC_PP
 static void ffmpeg_PostProcPicture( vdec_thread_t *, picture_t * );
-
-#if LIBAVCODEC_BUILD >= 4641
-static int  ffmpeg_GetFrameBuf( struct AVCodecContext *, AVFrame *);
-static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame *);
 #endif
+
+/* direct rendering */
+static int  ffmpeg_GetFrameBuf      ( struct AVCodecContext *, AVFrame *);
+static void ffmpeg_ReleaseFrameBuf  ( struct AVCodecContext *, AVFrame *);
 
 /*****************************************************************************
  * Local Functions
@@ -81,10 +83,8 @@ static inline uint32_t ffmpeg_PixFmtToChroma( int i_ff_chroma )
             return( VLC_FOURCC('I','4','2','2') );
         case PIX_FMT_YUV444P:
             return( VLC_FOURCC('I','4','4','4') );
-#if LIBAVCODEC_BUILD >= 4615
         case PIX_FMT_YUV410P:
         case PIX_FMT_YUV411P:
-#endif
         case PIX_FMT_BGR24:
         default:
             return( 0 );
@@ -111,34 +111,55 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
         /* we make conversion if possible*/
         i_chroma = VLC_FOURCC('I','4','2','0');
     }
-#if LIBAVCODEC_BUILD >= 4640
+
     i_aspect = VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
     if( i_aspect == 0 )
     {
         i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
     }
-#else
-    switch( p_context->aspect_ratio_info )
-    {
-        case( FF_ASPECT_4_3_625 ):
-        case( FF_ASPECT_4_3_525 ):
-            i_aspect = VOUT_ASPECT_FACTOR * 4 / 3;
-            break;
-        case( FF_ASPECT_16_9_625 ):
-        case( FF_ASPECT_16_9_525 ):
-            i_aspect = VOUT_ASPECT_FACTOR * 16 / 9 ;
-            break;
-        case( FF_ASPECT_SQUARE ):
-        default:
-            i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
-            break;
-        }
-#endif
 
     /* Spawn a video output if there is none. First we look for our children,
      * then we look for any other vout that might be available. */
     p_vout = vout_Request( p_vdec->p_fifo, NULL,
                            i_width, i_height, i_chroma, i_aspect );
+#ifdef LIBAVCODEC_PP
+    if( p_vdec->pp_mode && !p_vdec->pp_context )
+    {
+        int32_t i_cpu = p_vdec->p_fifo->p_libvlc->i_cpu;
+        int i_flags = 0;
+
+        if( i_cpu & CPU_CAPABILITY_MMX )
+        {
+            i_flags |= PP_CPU_CAPS_MMX;
+        }
+        if( i_cpu & CPU_CAPABILITY_MMXEXT )
+        {
+            i_flags |= PP_CPU_CAPS_MMX2;
+        }
+        if( i_cpu & CPU_CAPABILITY_3DNOW )
+        {
+            i_flags |= PP_CPU_CAPS_3DNOW;
+        }
+
+        switch( p_context->pix_fmt )
+        {
+            case PIX_FMT_YUV444P:
+                i_flags |= PP_FORMAT_444;
+                break;
+            case PIX_FMT_YUV422P:
+                i_flags |= PP_FORMAT_422;
+                break;
+            case PIX_FMT_YUV411P:
+                i_flags |= PP_FORMAT_411;
+                break;
+            default:
+                i_flags |= PP_FORMAT_420;
+                break;
+        }
+
+        p_vdec->pp_context = pp_get_context( i_width, i_height, i_flags );
+    }
+#endif
 
     return p_vout;
 }
@@ -166,20 +187,13 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
 int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 {
     int i_tmp;
-#if LIBAVCODEC_BUILD >= 4645
     p_vdec->p_ff_pic = avcodec_alloc_frame();
-#elif LIBAVCODEC_BUILD >= 4641
-    p_vdec->p_ff_pic = avcodec_alloc_picture();
-#else
-    p_vdec->p_ff_pic = &p_vdec->ff_pic;
-#endif
 
     if( ( p_vdec->p_format = (BITMAPINFOHEADER *)p_vdec->p_fifo->p_bitmapinfoheader) != NULL )
     {
         /* ***** Fill p_context with init values ***** */
         p_vdec->p_context->width  = p_vdec->p_format->biWidth;
         p_vdec->p_context->height = p_vdec->p_format->biHeight;
-
     }
     else
     {
@@ -189,33 +203,20 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
-#if LIBAVCODEC_BUILD >= 4611
     i_tmp = config_GetInt( p_vdec->p_fifo, "ffmpeg-workaround-bugs" );
     p_vdec->p_context->workaround_bugs  = __MAX( __MIN( i_tmp, 99 ), 0 );
 
     i_tmp = config_GetInt( p_vdec->p_fifo, "ffmpeg-error-resilience" );
     p_vdec->p_context->error_resilience = __MAX( __MIN( i_tmp, 99 ), -1 );
-#endif
-#if LIBAVCODEC_BUILD >= 4614
+
     if( config_GetInt( p_vdec->p_fifo, "grayscale" ) )
     {
         p_vdec->p_context->flags|= CODEC_FLAG_GRAY;
     }
-#endif
 
     p_vdec->b_hurry_up = config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up");
 
     p_vdec->b_direct_rendering = 0;
-
-#if 0
-    /* check if codec support truncated frames */
-//    if( p_vdec->p_codec->capabilities & CODEC_FLAG_TRUNCATED )
-    if( p_vdec->i_codec_id == CODEC_ID_MPEG1VIDEO)
-    {
-        msg_Dbg( p_vdec->p_fifo, "CODEC_FLAG_TRUNCATED supported" );
-        p_vdec->p_context->flags |= CODEC_FLAG_TRUNCATED;
-    }
-#endif
 
     /* CODEC_FLAG_TRUNCATED */
 
@@ -231,7 +232,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     {
         msg_Err( p_vdec->p_fifo, "cannot open codec (%s)",
                                  p_vdec->psz_namecodec );
-        return( -1 );
+        return( VLC_EGENERIC );
     }
     else
     {
@@ -239,7 +240,6 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
                                  p_vdec->psz_namecodec );
     }
 
-#if LIBAVCODEC_BUILD >= 4641
     if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr" ) &&
         p_vdec->p_codec->capabilities & CODEC_CAP_DR1 &&
         ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) )
@@ -255,52 +255,72 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         p_vdec->p_context->opaque = p_vdec;
 
     }
-#endif
 
     /* ***** init this codec with special data ***** */
     if( p_vdec->p_format &&
             p_vdec->p_format->biSize > sizeof(BITMAPINFOHEADER) )
     {
         int b_gotpicture;
+        int i_size = p_vdec->p_format->biSize - sizeof(BITMAPINFOHEADER);
 
-        switch( p_vdec->i_codec_id )
+        if( p_vdec->i_codec_id == CODEC_ID_MPEG4 )
         {
-            case( CODEC_ID_MPEG4 ):
-#if 1
-                avcodec_decode_video( p_vdec->p_context, p_vdec->p_ff_pic,
-                                      &b_gotpicture,
-                                      (void *)&p_vdec->p_format[1],
-                                      p_vdec->p_format->biSize
-                                        - sizeof(BITMAPINFOHEADER) );
-#endif
-                break;
-            default:
-                if( p_vdec->p_fifo->i_fourcc == FOURCC_MP4S ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_mp4s ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_M4S2 ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_m4s2 ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_WMV2 ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_MSS1 ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_MJPG ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_mjpg ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_mjpa ||
-                    p_vdec->p_fifo->i_fourcc == FOURCC_mjpb )
-                {
-                    p_vdec->p_context->extradata_size =
-                        p_vdec->p_format->biSize - sizeof(BITMAPINFOHEADER);
-                    p_vdec->p_context->extradata =
-                        malloc( p_vdec->p_context->extradata_size );
-                    memcpy( p_vdec->p_context->extradata,
-                            &p_vdec->p_format[1],
-                            p_vdec->p_context->extradata_size );
-                }
-
-                break;
+            avcodec_decode_video( p_vdec->p_context, p_vdec->p_ff_pic,
+                                  &b_gotpicture,
+                                  (void *)&p_vdec->p_format[1],
+                                  i_size );
+        }
+        else
+        {
+            p_vdec->p_context->extradata_size = i_size;
+            p_vdec->p_context->extradata      = malloc( i_size );
+            memcpy( p_vdec->p_context->extradata,
+                    &p_vdec->p_format[1],
+                    i_size );
         }
     }
 
     /* ***** Load post processing ***** */
+#ifdef LIBAVCODEC_PP
+    p_vdec->pp_context = NULL;
+    p_vdec->pp_mode    = NULL;
 
+    /* for now we cannot do postproc and dr */
+    if( config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-q" ) > 0 && !p_vdec->b_direct_rendering )
+    {
+        int  i_quality = config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-q" );
+        char *psz_name = config_GetPsz( p_vdec->p_fifo, "ffmpeg-pp-name" );
+
+
+        if( !psz_name )
+        {
+            psz_name = strdup( "default" );
+        }
+        else if( *psz_name == '\0' )
+        {
+            free( psz_name );
+            psz_name = strdup( "default" );
+        }
+
+
+        p_vdec->pp_mode = pp_get_mode_by_name_and_quality( psz_name, i_quality );
+
+        if( !p_vdec->pp_mode )
+        {
+            msg_Err( p_vdec->p_fifo, "failed geting mode for postproc" );
+        }
+        else
+        {
+            msg_Info( p_vdec->p_fifo, "postproc activated" );
+        }
+        free( psz_name );
+    }
+    else
+    {
+        msg_Dbg( p_vdec->p_fifo, "no postproc" );
+    }
+
+#else
     /* get overridding settings */
     p_vdec->i_pp_mode = 0;
     if( config_GetInt( p_vdec->p_fifo, "ffmpeg-db-yv" ) )
@@ -323,20 +343,15 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         /* check if the codec support postproc. */
         switch( p_vdec->i_codec_id )
         {
-#if LIBAVCODEC_BUILD > 4608
             case( CODEC_ID_MSMPEG4V1 ):
             case( CODEC_ID_MSMPEG4V2 ):
             case( CODEC_ID_MSMPEG4V3 ):
-#else
-            case( CODEC_ID_MSMPEG4 ):
-#endif
             case( CODEC_ID_MPEG4 ):
             case( CODEC_ID_H263 ):
 //            case( CODEC_ID_H263P ): I don't use it up to now
             case( CODEC_ID_H263I ):
                 /* Ok we can make postprocessing :)) */
                 /* first try to get a postprocess module */
-#if LIBAVCODEC_BUILD >= 4633
                 p_vdec->p_pp = vlc_object_create( p_vdec->p_fifo,
                                                   sizeof( postprocessing_t ) );
                 p_vdec->p_pp->psz_object_name = "postprocessing";
@@ -360,11 +375,6 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
                               config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-auto" )
                                                 );
                 }
-#else
-                p_vdec->i_pp_mode = 0;
-                msg_Warn( p_vdec->p_fifo,
-                          "post-processing not supported, upgrade ffmpeg" );
-#endif
                 break;
             default:
                 p_vdec->i_pp_mode = 0;
@@ -372,11 +382,10 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
                           "Post processing unsupported for this codec" );
                 break;
         }
-
     }
-//    memset( &p_vdec->statistic, 0, sizeof( statistic_t ) );
+#endif
 
-    return( 0 );
+    return( VLC_SUCCESS );
 }
 
 /*****************************************************************************
@@ -394,6 +403,7 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
     int     b_gotpicture;
     picture_t *p_pic;                                    /* videolan picture */
     mtime_t   i_pts;
+
 
     /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
@@ -421,7 +431,7 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
 
     if( !p_vdec->p_context->width || !p_vdec->p_context->height )
     {
-        p_vdec->p_context->hurry_up = 5;
+        p_vdec->p_context->hurry_up = 5; 
     }
 
     do
@@ -511,10 +521,6 @@ usenextdata:
     }
     else if( i_used < i_frame_size )
     {
-#if 0
-        msg_Dbg( p_vdec->p_fifo,
-                 "didn't use all memory(%d  < %d)", i_used, i_frame_size );
-#endif
         memmove( p_vdec->p_buffer,
                  p_vdec->p_buffer + i_used,
                  p_vdec->i_buffer_size - i_used );
@@ -535,8 +541,7 @@ usenextdata:
     i_frame_size -= i_used;
 
    /* Update frame late count*/
-    /* I don't make statistic on decoding time */
-    if( p_vdec->pts <= mdate())
+    if( p_vdec->pts <= mdate() )
     {
         p_vdec->i_frame_late++;
     }
@@ -573,20 +578,28 @@ usenextdata:
         /* fill p_picture_t from AVVideoFrame and do chroma conversion
          * if needed */
         ffmpeg_CopyPicture( p_pic, p_vdec->p_ff_pic, p_vdec );
+
+#ifndef LIBAVCODEC_PP
+        /* Do post-processing if requested (with old code)*/
+        /* XXX: no dr */
+        if( ( p_vdec->i_pp_mode )&&
+            ( ( p_vdec->p_vout->render.i_chroma ==
+                VLC_FOURCC( 'I','4','2','0' ) )||
+              ( p_vdec->p_vout->render.i_chroma ==
+                VLC_FOURCC( 'Y','V','1','2' ) ) ) )
+        {
+            p_vdec->p_pp->pf_postprocess( p_pic,
+                                          p_vdec->p_ff_pic->qscale_table,
+                                          p_vdec->p_ff_pic->qstride,
+                                          p_vdec->i_pp_mode );
+        }
+#endif
+
     }
     else
     {
-#if LIBAVCODEC_BUILD >= 4641
         p_pic = (picture_t *)p_vdec->p_ff_pic->opaque;
-#else
-        p_pic = NULL; /*  f**ck gcc warning */
-#endif
     }
-
-    /* Do post-processing if requested */
-    /* XXX: with dr it is not a good thing if the picture will be used as
-       reference... */
-    ffmpeg_PostProcPicture( p_vdec, p_pic );
 
     /* fix date calculation */
     if( p_vdec->pts > 0 )
@@ -635,6 +648,16 @@ usenextdata:
 void E_( EndThread_Video )( vdec_thread_t *p_vdec )
 {
 
+#ifdef LIBAVCODEC_PP
+    if( p_vdec->pp_mode )
+    {
+        pp_free_mode( p_vdec->pp_mode );
+        if( p_vdec->pp_context )
+        {
+            pp_free_context( p_vdec->pp_context );
+        }
+    }
+#else
     if( p_vdec->p_pp )
     {
         /* release postprocessing module */
@@ -642,13 +665,12 @@ void E_( EndThread_Video )( vdec_thread_t *p_vdec )
         vlc_object_destroy( p_vdec->p_pp );
         p_vdec->p_pp = NULL;
     }
+#endif
 
-#if LIBAVCODEC_BUILD >= 4641
     if( p_vdec->p_ff_pic )
     {
         free( p_vdec->p_ff_pic );
     }
-#endif
 
     /* We are about to die. Reattach video output to p_vlc. */
     vout_Request( p_vdec->p_fifo, p_vdec->p_vout, 0, 0, 0, 0 );
@@ -658,15 +680,9 @@ void E_( EndThread_Video )( vdec_thread_t *p_vdec )
  * ffmpeg_CopyPicture: copy a picture from ffmpeg internal buffers to a
  *                     picture_t structure (when not in direct rendering mode).
  *****************************************************************************/
-#if LIBAVCODEC_BUILD >= 4641
 static void ffmpeg_CopyPicture( picture_t    *p_pic,
                                 AVFrame *p_ff_pic,
                                 vdec_thread_t *p_vdec )
-#else
-static void ffmpeg_CopyPicture( picture_t    *p_pic,
-                                AVPicture *p_ff_pic,
-                                vdec_thread_t *p_vdec )
-#endif
 {
     int i_plane;
     int i_size;
@@ -679,21 +695,48 @@ static void ffmpeg_CopyPicture( picture_t    *p_pic,
 
     if( ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) )
     {
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+#ifdef LIBAVCODEC_PP
+        if( p_vdec->pp_mode && p_vdec->pp_context )
         {
-            p_src  = p_ff_pic->data[i_plane];
-            p_dst = p_pic->p[i_plane].p_pixels;
-            i_src_stride = p_ff_pic->linesize[i_plane];
-            i_dst_stride = p_pic->p[i_plane].i_pitch;
+            uint8_t *src[3], *dst[3];
+            int     i_src_stride[3], i_dst_stride[3];
 
-            i_size = __MIN( i_src_stride, i_dst_stride );
-            for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+            for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
             {
-                p_vdec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_size );
-                p_src += i_src_stride;
-                p_dst += i_dst_stride;
+                src[i_plane] = p_ff_pic->data[i_plane];
+                dst[i_plane] = p_pic->p[i_plane].p_pixels;
+
+                i_src_stride[i_plane] = p_ff_pic->linesize[i_plane];
+                i_dst_stride[i_plane] = p_pic->p[i_plane].i_pitch;
             }
+            pp_postprocess( src, i_src_stride,
+                            dst, i_dst_stride,
+                            p_vdec->p_context->width, p_vdec->p_context->height,
+                            p_ff_pic->qscale_table, p_ff_pic->qstride,
+                            p_vdec->pp_mode, p_vdec->pp_context,
+                            p_ff_pic->pict_type );
         }
+        else
+        {
+#endif
+            for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+            {
+                p_src  = p_ff_pic->data[i_plane];
+                p_dst = p_pic->p[i_plane].p_pixels;
+                i_src_stride = p_ff_pic->linesize[i_plane];
+                i_dst_stride = p_pic->p[i_plane].i_pitch;
+
+                i_size = __MIN( i_src_stride, i_dst_stride );
+                for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+                {
+                    p_vdec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_size );
+                    p_src += i_src_stride;
+                    p_dst += i_dst_stride;
+                }
+            }
+#ifdef LIBAVCODEC_PP
+        }
+#endif
     }
     else
     {
@@ -703,7 +746,6 @@ static void ffmpeg_CopyPicture( picture_t    *p_pic,
             AVPicture dest_pic;
             int i;
 
-#if LIBAVCODEC_BUILD >= 4615
             case( PIX_FMT_YUV410P ):
             case( PIX_FMT_YUV411P ):
                 for( i = 0; i < p_pic->i_planes; i++ )
@@ -717,7 +759,6 @@ static void ffmpeg_CopyPicture( picture_t    *p_pic,
                              p_vdec->p_context->width,
                              p_vdec->p_context->height );
                 break;
-#endif
             default:
                 msg_Err( p_vdec->p_fifo, "don't know how to convert chroma %i",
                          p_vdec->p_context->pix_fmt );
@@ -728,37 +769,9 @@ static void ffmpeg_CopyPicture( picture_t    *p_pic,
 }
 
 /*****************************************************************************
- * ffmpeg_PostProcPicture: Postprocessing is done here.
- *****************************************************************************/
-static void ffmpeg_PostProcPicture( vdec_thread_t *p_vdec, picture_t *p_pic )
-{
-    if( ( p_vdec->i_pp_mode )&&
-        ( ( p_vdec->p_vout->render.i_chroma ==
-            VLC_FOURCC( 'I','4','2','0' ) )||
-          ( p_vdec->p_vout->render.i_chroma ==
-            VLC_FOURCC( 'Y','V','1','2' ) ) ) )
-    {
-#if LIBAVCODEC_BUILD >= 4641
-       /* Make postproc */
-        p_vdec->p_pp->pf_postprocess( p_pic,
-                                      p_vdec->p_ff_pic->qscale_table,
-                                      p_vdec->p_ff_pic->qstride,
-                                      p_vdec->i_pp_mode );
-#elif LIBAVCODEC_BUILD >= 4633
-        p_vdec->p_pp->pf_postprocess( p_pic,
-                                      p_vdec->p_context->display_qscale_table,
-                                      p_vdec->p_context->qstride,
-                                      p_vdec->i_pp_mode );
-#endif
-    }
-}
-
-#if LIBAVCODEC_BUILD >= 4641
-/*****************************************************************************
  * ffmpeg_GetFrameBuf: callback used by ffmpeg to get a frame buffer.
  *                     (used for direct rendering)
  *****************************************************************************/
-
 static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
                                AVFrame *p_ff_pic )
 {
@@ -787,9 +800,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_vdec->p_context->draw_horiz_band= NULL;
 
     p_ff_pic->opaque = (void*)p_pic;
-#if LIBAVCODEC_BUILD >= 4645
     p_ff_pic->type = FF_BUFFER_TYPE_USER;
-#endif
     p_ff_pic->data[0] = p_pic->p[0].p_pixels;
     p_ff_pic->data[1] = p_pic->p[1].p_pixels;
     p_ff_pic->data[2] = p_pic->p[2].p_pixels;
@@ -827,4 +838,3 @@ static void  ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
     vout_UnlinkPicture( p_vdec->p_vout, p_pic );
 }
 
-#endif

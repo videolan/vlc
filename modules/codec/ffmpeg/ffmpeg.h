@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.16 2003/04/16 00:12:36 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.17 2003/04/17 10:58:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -39,13 +39,19 @@
     u8      *p_buffer;      /* buffer for gather pes */  \
     int     i_buffer_size;  /* size of allocated p_buffer */ \
     int     i_buffer;       /* bytes already present in p_buffer */
-        
+
 
 typedef struct generic_thread_s
 {
     DECODER_THREAD_COMMON
 
 } generic_thread_t;
+
+#if LIBAVCODEC_BUILD >= 4663
+#   define LIBAVCODEC_PP
+#else
+#   undef  LIBAVCODEC_PP
+#endif
 
 #define GetWLE( p ) \
     ( *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) )
@@ -124,7 +130,7 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 #define FOURCC_3VID         VLC_FOURCC('3','V','I','D')
 #define FOURCC_3vid         VLC_FOURCC('3','v','i','d')
 
-/* H263 and H263i */        
+/* H263 and H263i */
 #define FOURCC_H263         VLC_FOURCC('H','2','6','3')
 #define FOURCC_h263         VLC_FOURCC('h','2','6','3')
 #define FOURCC_U263         VLC_FOURCC('U','2','6','3')
