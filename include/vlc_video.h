@@ -35,13 +35,14 @@ typedef struct plane_t
     uint8_t *p_pixels;                        /**< Start of the plane's data */
 
     /* Variables used for fast memcpy operations */
-    int i_lines;                                        /**< Number of lines */
+    int i_lines;           /**< Number of lines, including margins */
     int i_pitch;           /**< Number of bytes in a line, including margins */
 
     /** Size of a macropixel, defaults to 1 */
     int i_pixel_pitch;
 
     /* Variables used for pictures with margins */
+    int i_visible_lines;            /**< How many visible lines are there ? */
     int i_visible_pitch;            /**< How many visible pixels are there ? */
 
 } plane_t;
