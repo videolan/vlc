@@ -50,17 +50,16 @@ __fastcall TGroupBoxPref::TGroupBoxPref( TComponent* Owner,
     Caption = p_config->psz_text;
 }
 //---------------------------------------------------------------------------
-TListView * __fastcall TGroupBoxPref::CreateListView( TWinControl *Parent,
-            int Left, int Width, int Top, int Height, TViewStyle ViewStyle )
+TCheckListBox * __fastcall TGroupBoxPref::CreateCheckListBox(
+    TWinControl *Parent, int Left, int Width, int Top, int Height )
 {
-    TListView *ListView = new TListView( Parent );
-    ListView->Parent = Parent;
-    ListView->ViewStyle = ViewStyle;
-    ListView->Left = Left;
-    ListView->Width = Width;
-    ListView->Top = Top;
-    ListView->Height = Height;
-    return ListView;
+    TCheckListBox *CheckListBox = new TCheckListBox( Parent );
+    CheckListBox->Parent = Parent;
+    CheckListBox->Left = Left;
+    CheckListBox->Width = Width;
+    CheckListBox->Top = Top;
+    CheckListBox->Height = Height;
+    return CheckListBox;
 }
 //---------------------------------------------------------------------------
 TButton * __fastcall TGroupBoxPref::CreateButton( TWinControl *Parent,
@@ -144,13 +143,10 @@ void __fastcall TGroupBoxPref::UpdateChanges()
 __fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
             module_config_t *p_config ) : TGroupBoxPref( Owner, p_config )
 {
-    /* init listview */
-    ListView = CreateListView( this, 16, 164, 24, 160, vsReport );
-    ListView->ReadOnly = true;
-    ListView->Columns->Add();
-    ListView->Columns->Items[0]->Width = 160;
-    ListView->Columns->Items[0]->Caption = "Name";//p_config->psz_text;
-    ListView->OnSelectItem = ListViewSelectItem;
+    /* init checklistbox */
+    CheckListBox = CreateCheckListBox( this, 16, 164, 24, 160 );
+    CheckListBox->OnClick = CheckListBoxClick;
+    CheckListBox->OnClickCheck = CheckListBoxClickCheck;
 
     /* init description label */
     LabelDesc = CreateLabel( this, 230, 225, 50, 52,
@@ -164,34 +160,22 @@ __fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
     ButtonConfig->Enabled = false;
     ButtonConfig->OnClick = ButtonConfigClick;
 
-    /* init select button */
-    ButtonSelect = CreateButton( this, 110, 70, 192, 25, "Select" );
-    ButtonSelect->OnClick = ButtonSelectClick;
-
-    /* init 'Selected' label */
-    LabelSelected = CreateLabel( this, 230, 45, 198, 13, "Selected", false );
-
-    /* init 'Selected' edit */
-    Edit = CreateEdit( this, 280, 164, 194, 21, "" );
-    vlc_mutex_lock( p_config->p_lock );
-    Edit->Text = p_config->psz_value ? p_config->psz_value : "";
-    vlc_mutex_unlock( p_config->p_lock );
-
     Height = 233;
 };
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
-        TListItem *Item, bool Selected )
+void __fastcall TGroupBoxPlugin::CheckListBoxClick( TObject *Sender )
 {
     module_t **pp_parser;
     vlc_list_t *p_list;
-    AnsiString Name;
 
-    Name = Item->Caption;
-    if( Name == "" )
-    {
+    /* check that the click is valid (we are on an item, and the click
+     * started on an item */
+    if( CheckListBox->ItemIndex == -1 )
         return;
-    }
+
+    AnsiString Name = CheckListBox->Items->Strings[CheckListBox->ItemIndex];
+    if( Name == "" )
+        return;
 
     /* look for module 'Name' */
     p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -205,17 +189,27 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
             ModuleSelected = (*pp_parser);
             LabelHint->Caption = (*pp_parser)->psz_longname ?
                                  (*pp_parser)->psz_longname : "";
-            ButtonConfig->Enabled = (*pp_parser)->i_config_items ? true : false;
+            ButtonConfig->Enabled =
+                (*pp_parser)->i_config_items ? true : false;
 
             break;
         }
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TGroupBoxPlugin::ButtonSelectClick( TObject *Sender )
+void __fastcall TGroupBoxPlugin::CheckListBoxClickCheck( TObject *Sender )
 {
-    if( !ModuleSelected ) return;
-    Edit->Text = ModuleSelected->psz_object_name;
+    /* one item maximum must be checked */
+    if( CheckListBox->Checked[CheckListBox->ItemIndex] )
+    {
+        for( int item = 0; item < CheckListBox->Items->Count; item++ )
+        {
+            if( item != CheckListBox->ItemIndex )
+            {
+                CheckListBox->Checked[item] = false;
+            }
+        }
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPlugin::ButtonConfigClick( TObject *Sender )
@@ -226,10 +220,22 @@ void __fastcall TGroupBoxPlugin::ButtonConfigClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPlugin::UpdateChanges()
 {
+    AnsiString Name = "";
+
+    /* find the selected plugin (if any) */
+    for( int item = 0; item < CheckListBox->Items->Count; item++ )
+    {
+        if( CheckListBox->Checked[item] )
+        {
+            Name = CheckListBox->Items->Strings[item];
+            break;
+        }
+    }
+
     /* XXX: Necessary, since c_str() returns only a temporary pointer... */
     free( p_config->psz_value );
-    p_config->psz_value = (char *)malloc( Edit->Text.Length() + 1 );
-    strcpy( p_config->psz_value, Edit->Text.c_str() );
+    p_config->psz_value = (char *)malloc( Name.Length() + 1 );
+    strcpy( p_config->psz_value, Name.c_str() );
 }
 
 
@@ -320,7 +326,6 @@ void __fastcall TGroupBoxBool::UpdateChanges()
 /****************************************************************************
  * Callbacks for the dialog
  ****************************************************************************/
-//---------------------------------------------------------------------------
 __fastcall TPreferencesDlg::TPreferencesDlg( TComponent* Owner )
         : TForm( Owner )
 {
@@ -331,20 +336,6 @@ void __fastcall TPreferencesDlg::FormClose( TObject *Sender,
       TCloseAction &Action )
 {
     Action = caHide;
-}
-//---------------------------------------------------------------------------
-void __fastcall TPreferencesDlg::FormShow( TObject *Sender )
-{
-/*
-    p_intfGlobal->p_sys->p_window->PreferencesAction->Checked = true;
-*/
-}
-//---------------------------------------------------------------------------
-void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
-{
-/*
-    p_intfGlobal->p_sys->p_window->PreferencesAction->Checked = false;
-*/
 }
 
 
@@ -368,7 +359,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
     module_config_t    *p_item;
     int                 i_pages, i_ctrl;
-    
+
     TTabSheet          *TabSheet;
     TScrollBox         *ScrollBox;
     TPanel             *Panel;
@@ -376,7 +367,6 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TGroupBoxString    *GroupBoxString;
     TGroupBoxInteger   *GroupBoxInteger;
     TGroupBoxBool      *GroupBoxBool;
-    TListItem          *ListItem;
 
     /* Look for the selected module */
     p_list = vlc_list_find( p_intfGlobal, VLC_OBJECT_MODULE, FIND_ANYWHERE );
@@ -441,8 +431,16 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             {
                 if( !strcmp( (*pp_parser)->psz_capability, p_item->psz_type ) )
                 {
-                    ListItem = GroupBoxPlugin->ListView->Items->Add();
-                    ListItem->Caption = (*pp_parser)->psz_object_name;
+                    int item = GroupBoxPlugin->CheckListBox->Items->Add(
+                        (*pp_parser)->psz_object_name );
+
+                    /* check the box if it's the default module */
+                    AnsiString Name = p_item->psz_value ?
+                        p_item->psz_value : "";
+                    if( !strcmp( (*pp_parser)->psz_object_name, Name.c_str()) )
+                    {
+                        GroupBoxPlugin->CheckListBox->Checked[item] = true;
+                    }
                 }
             }
 
@@ -483,7 +481,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
             break;
         }
-        
+
         p_item++;
     }
     while( p_item->i_type != CONFIG_HINT_END );

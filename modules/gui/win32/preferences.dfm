@@ -244,8 +244,6 @@ object PreferencesDlg: TPreferencesDlg
   OldCreateOrder = False
   Position = poDefaultPosOnly
   OnClose = FormClose
-  OnHide = FormHide
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object PageControlPref: TPageControl

@@ -29,6 +29,7 @@
 #include <Forms.hpp>
 #include <Buttons.hpp>
 #include <ComCtrls.hpp>
+#include <CheckLst.hpp>
 #include <ExtCtrls.hpp>
 #include "CSPIN.h"
 //---------------------------------------------------------------------------
@@ -38,8 +39,8 @@ public:
     __fastcall TGroupBoxPref( TComponent* Owner, module_config_t *p_config_arg );
     module_config_t *p_config;
     virtual void __fastcall UpdateChanges();
-    TListView * __fastcall CreateListView( TWinControl *Parent,
-            int Left, int Width, int Top, int Height, TViewStyle ViewStyle );
+    TCheckListBox * __fastcall CreateCheckListBox( TWinControl *Parent,
+            int Left, int Width, int Top, int Height );
     TButton * __fastcall CreateButton( TWinControl *Parent,
             int Left, int Width, int Top, int Height, AnsiString Caption );
     TCheckBox * __fastcall CreateCheckBox( TWinControl *Parent,
@@ -58,18 +59,14 @@ class TGroupBoxPlugin : public TGroupBoxPref
 {
 public:
     __fastcall TGroupBoxPlugin( TComponent* Owner, module_config_t *p_config );
-    TListView *ListView;
+    TCheckListBox *CheckListBox;
     TButton *ButtonConfig;
-    TButton *ButtonSelect;
     TLabel *LabelDesc;
     TLabel *LabelHint;
-    TLabel *LabelSelected;
-    TEdit *Edit;
     module_t *ModuleSelected;
     void __fastcall UpdateChanges();
-    void __fastcall ListViewSelectItem( TObject *Sender, TListItem *Item,
-                                        bool Selected );
-    void __fastcall ButtonSelectClick( TObject *Sender );
+    void __fastcall CheckListBoxClick( TObject *Sender );
+    void __fastcall CheckListBoxClickCheck( TObject *Sender );
     void __fastcall ButtonConfigClick( TObject *Sender );
 };
 //---------------------------------------------------------------------------
@@ -108,8 +105,6 @@ __published:	// IDE-managed Components
     TButton *ButtonSave;
     TButton *ButtonOK;
     TButton *ButtonCancel;
-    void __fastcall FormShow( TObject *Sender );
-    void __fastcall FormHide( TObject *Sender );
     void __fastcall ButtonOkClick( TObject *Sender );
     void __fastcall ButtonApplyClick( TObject *Sender );
     void __fastcall ButtonSaveClick( TObject *Sender );
