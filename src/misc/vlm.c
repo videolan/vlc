@@ -1130,6 +1130,7 @@ static int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
     {
         schedule->b_enabled = VLC_FALSE;
     }
+#if !defined( UNDER_CE )
     else if( strcmp( psz_cmd, "date" ) == 0 )
     {
         struct tm time;
@@ -1281,6 +1282,7 @@ static int vlm_ScheduleSetup( vlm_schedule_t *schedule, char *psz_cmd,
         date = (((( time.tm_year * 12 + time.tm_mon ) * 30 + time.tm_mday ) * 24 + time.tm_hour ) * 60 + time.tm_min ) * 60 + time.tm_sec ;
         schedule->i_period = ((mtime_t) date) * 1000000;
     }
+#endif /* UNDER_CE */
     else if( strcmp( psz_cmd, "repeat" ) == 0 )
     {
         int i;
@@ -1452,6 +1454,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
                         vlm_MessageNew( "enabled", schedule->b_enabled ?
                                         "yes" : "no" ) );
 
+#if !defined( UNDER_CE )
         if( schedule->i_date != 0 )
         {
             struct tm date;
@@ -1505,6 +1508,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
         {
             vlm_MessageAdd( msg_schedule, vlm_MessageNew("period", "0") );
         }
+#endif /* UNDER_CE */
 
         sprintf( buffer, "%d", schedule->i_repeat );
         vlm_MessageAdd( msg_schedule, vlm_MessageNew( "repeat", buffer ) );
@@ -1617,6 +1621,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
             {
                 time_t i_date = (time_t) (i_next_date / 1000000) ;
 
+#if !defined( UNDER_CE )
 #ifdef HAVE_CTIME_R
                 char psz_date[500];
                 ctime_r( &i_date, psz_date );
@@ -1626,6 +1631,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
 
                 vlm_MessageAdd( msg_schedule,
                                 vlm_MessageNew( "next launch", psz_date ) );
+#endif
             }
         }
 
@@ -1892,7 +1898,7 @@ static char *vlm_Save( vlm_t *vlm )
     }
 
     /* and now, the schedule scripts */
-
+#if !defined( UNDER_CE )
     for( i = 0; i < vlm->i_schedule; i++ )
     {
         vlm_schedule_t *schedule = vlm->schedule[i];
@@ -1962,6 +1968,7 @@ static char *vlm_Save( vlm_t *vlm )
         }
 
     }
+#endif /* UNDER_CE */
 
     return save;
 }

@@ -188,14 +188,18 @@ int __net_Accept( vlc_object_t *p_this, int fd, mtime_t i_wait )
         timeout.tv_usec = b_block ? 500000 : i_wait;
 
         i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
+#ifdef HAVE_ERRNO_H
         if( (i_ret < 0 && errno == EINTR) || i_ret == 0 )
+#else
+        if( i_ret == 0 )
+#endif
         {
             if( b_block ) continue;
             else return -1;
         }
         else if( i_ret < 0 )
         {
-#ifdef WIN32
+#if defined(WIN32) || defined(UNDER_CE)
             msg_Err( p_this, "network select error (%i)", WSAGetLastError() );
 #else
             msg_Err( p_this, "network select error (%s)", strerror(errno) );
@@ -205,7 +209,7 @@ int __net_Accept( vlc_object_t *p_this, int fd, mtime_t i_wait )
 
         if( ( i_ret = accept( fd, 0, 0 ) ) <= 0 )
         {
-#ifdef WIN32
+#if defined(WIN32) || defined(UNDER_CE)
             msg_Err( p_this, "accept failed (%i)", WSAGetLastError() );
 #else
             msg_Err( p_this, "accept failed (%s)", strerror(errno) );
@@ -329,17 +333,25 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
             timeout.tv_usec = 500000;
 
         } while( (i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout)) == 0
+#ifdef HAVE_ERRNO_H
                  || ( i_ret < 0 && errno == EINTR ) );
+#else
+                 );
+#endif
 
         if( i_ret < 0 )
         {
+#if defined(WIN32) || defined(UNDER_CE)
+            msg_Err( p_this, "network select error" );
+#else
             msg_Err( p_this, "network select error (%s)", strerror(errno) );
+#endif
             return i_total > 0 ? i_total : -1;
         }
 
         if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) < 0 )
         {
-#ifdef WIN32
+#if defined(WIN32) || defined(UNDER_CE)
             /* For udp only */
             /* On win32 recv() will fail if the datagram doesn't fit inside
              * the passed buffer, even though the buffer will be filled with
@@ -398,13 +410,21 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
 
     i_ret = select(fd + 1, &fds_r, NULL, &fds_e, &timeout);
 
+#ifdef HAVE_ERRNO_H
     if( i_ret < 0 && errno == EINTR )
+#else
+    if( 0 )
+#endif
     {
         return 0;
     }
     else if( i_ret < 0 )
     {
+#if defined(WIN32) || defined(UNDER_CE)
+        msg_Err( p_this, "network select error" );
+#else
         msg_Err( p_this, "network select error (%s)", strerror(errno) );
+#endif
         return -1;
     }
     else if( i_ret == 0)
@@ -413,10 +433,12 @@ int __net_ReadNonBlock( vlc_object_t *p_this, int fd, uint8_t *p_data,
     }
     else
     {
-        if( fd == 0 /*STDIN_FILENO*/ ) i_recv = read( fd, p_data, i_data ); else
+#if !defined(UNDER_CE)
+        if( fd == 0/*STDIN_FILENO*/ ) i_recv = read( fd, p_data, i_data ); else
+#endif
         if( ( i_recv = recv( fd, p_data, i_data, 0 ) ) <= 0 )
         {
-#ifdef WIN32
+#if defined(WIN32) || defined(UNDER_CE)
             /* For udp only */
             /* On win32 recv() will fail if the datagram doesn't fit inside
              * the passed buffer, even though the buffer will be filled with
@@ -472,11 +494,19 @@ int __net_Write( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data )
             timeout.tv_usec = 500000;
 
         } while( (i_ret = select(fd + 1, NULL, &fds_w, &fds_e, &timeout)) == 0
+#ifdef HAVE_ERRNO_H
                  || ( i_ret < 0 && errno == EINTR ) );
+#else
+                 );
+#endif
 
         if( i_ret < 0 )
         {
+#if defined(WIN32) || defined(UNDER_CE)
+            msg_Err( p_this, "network select error" );
+#else
             msg_Err( p_this, "network select error (%s)", strerror(errno) );
+#endif
             return i_total > 0 ? i_total : -1;
         }
 

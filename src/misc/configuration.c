@@ -922,7 +922,7 @@ int config_CreateDir( vlc_object_t *p_this, char *psz_dirname )
         MultiByteToWideChar( CP_ACP, 0, psz_dirname, -1, psz_new, MAX_PATH );
         if( CreateDirectory( psz_new, NULL ) )
         {
-            msg_Err( p_this, "could not create %s", psz_filename );
+            msg_Err( p_this, "could not create %s", psz_dirname );
         }
     }
 
@@ -1554,9 +1554,15 @@ char *config_GetHomeDir( void )
 #if defined(WIN32) || defined(UNDER_CE)
     typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
                                                LPSTR );
+#ifndef CSIDL_FLAG_CREATE
 #   define CSIDL_FLAG_CREATE 0x8000
+#endif
+#ifndef CSIDL_APPDATA
 #   define CSIDL_APPDATA 0x1A
+#endif
+#ifndef SHGFP_TYPE_CURRENT
 #   define SHGFP_TYPE_CURRENT 0
+#endif
 
     HINSTANCE shfolder_dll;
     SHGETFOLDERPATH SHGetFolderPath ;
