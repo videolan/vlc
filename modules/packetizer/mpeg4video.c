@@ -6,7 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,9 +59,13 @@ struct decoder_sys_t
     /*
      * Common properties
      */
-    mtime_t i_pts;
-    mtime_t i_dts;
-
+    mtime_t i_interpolated_pts;
+    mtime_t i_interpolated_dts;
+    mtime_t i_last_ref_pts;
+    mtime_t i_last_time_ref;
+    mtime_t i_time_ref;
+    mtime_t i_last_time;
+    mtime_t i_last_timeincr;
 
     vlc_bool_t  b_vop;
     int         i_buffer;
@@ -69,11 +73,17 @@ struct decoder_sys_t
     uint8_t     *p_buffer;
     unsigned int i_flags;
 
+    int         i_fps_num;
+    int         i_fps_den;
+    int         i_last_incr;
+    int         i_last_incr_diff;
+
     vlc_bool_t  b_frame;
 };
 
-static int m4v_FindStartCode( uint8_t **pp_start, uint8_t *p_end );
-static int m4v_VOLParse( es_format_t *fmt, uint8_t *p_vol, int i_vol );
+static int m4v_FindStartCode( uint8_t **, uint8_t * );
+static int m4v_VOLParse( decoder_t *, es_format_t *, uint8_t *, int );
+static int vlc_log2( unsigned int );
 
 #define VIDEO_OBJECT_MASK                       0x01f
 #define VIDEO_OBJECT_LAYER_MASK                 0x00f
@@ -133,14 +143,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_dec, "out of memory" );
         return VLC_EGENERIC;
     }
-    p_sys->i_pts = 0;
-    p_sys->i_dts = 0;
-    p_sys->b_vop = VLC_FALSE;
-    p_sys->i_buffer = 0;
-    p_sys->i_buffer_size = 0;
-    p_sys->p_buffer = 0;
-    p_sys->i_flags = 0;
-    p_sys->b_frame = VLC_FALSE;
+    memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -155,7 +158,7 @@ static int Open( vlc_object_t *p_this )
                 p_dec->fmt_in.i_extra );
 
         msg_Dbg( p_dec, "opening with vol size:%d", p_dec->fmt_in.i_extra );
-        m4v_VOLParse( &p_dec->fmt_out,
+        m4v_VOLParse( p_dec, &p_dec->fmt_out,
                       p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
     }
     else
@@ -237,7 +240,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_dec->fmt_out.p_extra =
                 realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
             memcpy( p_dec->fmt_out.p_extra, p_vol, p_dec->fmt_out.i_extra );
-            m4v_VOLParse( &p_dec->fmt_out,
+            m4v_VOLParse( p_dec, &p_dec->fmt_out,
                           p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
 
             p_vol = NULL;
@@ -259,14 +262,13 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_start -= i_out;
 
             p_out->i_flags = p_sys->i_flags;
+            p_out->i_pts = p_sys->i_interpolated_pts;
+            p_out->i_dts = p_sys->i_interpolated_dts;
 
-            /* FIXME do proper dts/pts */
-            p_out->i_pts = p_sys->i_pts;
-            p_out->i_dts = p_sys->i_dts;
             /* FIXME doesn't work when there is multiple VOP in one block */
-            if( p_block->i_dts > p_sys->i_dts )
+            if( p_block->i_dts > p_sys->i_interpolated_dts )
             {
-                p_out->i_length = p_block->i_dts - p_sys->i_dts;
+                p_out->i_length = p_block->i_dts - p_sys->i_interpolated_dts;
             }
 
             if( p_dec->fmt_out.i_extra > 0 )
@@ -279,11 +281,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                 block_Release( p_out );
             }
 
-#if 0
-            fprintf( stderr, "pts=%lld dts=%lld length=%lldms\n",
-                     p_out->i_pts, p_out->i_dts,
-                     p_out->i_length / 1000 );
-#endif
             p_sys->b_vop = VLC_FALSE;
         }
 
@@ -292,10 +289,24 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             /* Start of the VOL */
             p_vol = p_start;
         }
+        else if( p_start[3] == 0xb3 )
+        {
+            /* GOP header */
+        }
         else if( p_start[3] == 0xb6 )
         {
-            p_sys->b_vop = VLC_TRUE;
-            switch( p_start[4] >> 6 )
+            /* Parse the VOP */
+            bs_t s;
+            int i_modulo_time_base = 0;
+            int i_time_increment_bits;
+            int64_t i_time_increment, i_time_ref;
+
+            /* FIXME: we don't actually check we received enough data to read
+             * the VOP time increment. */
+            bs_init( &s, &p_start[4],
+                     p_sys->i_buffer - (p_start - p_sys->p_buffer) - 4 );
+
+            switch( bs_read( &s, 2 ) )
             {
                 case 0:
                     p_sys->i_flags = BLOCK_FLAG_TYPE_I;
@@ -312,30 +323,67 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     break;
             }
 
-            /* The pts information is not available in all the containers.
-             * FIXME: calculate the pts correctly */
-            if( p_block->i_pts > 0 )
+            while( bs_read( &s, 1 ) ) i_modulo_time_base++;
+            if( !bs_read1( &s ) ) continue; /* Marker */
+
+            /* VOP time increment */
+            i_time_increment_bits = vlc_log2(p_dec->p_sys->i_fps_num - 1) + 1;
+            if( i_time_increment_bits < 1 ) i_time_increment_bits = 1;
+            i_time_increment = bs_read( &s, i_time_increment_bits );
+
+            /* Interpolate PTS/DTS */
+            if( !(p_sys->i_flags & BLOCK_FLAG_TYPE_B) )
             {
-                p_sys->i_pts = p_block->i_pts;
-            }
-            else if( (p_sys->i_flags&BLOCK_FLAG_TYPE_B) || !p_sys->b_frame )
-            {
-                p_sys->i_pts = p_block->i_dts;
+                p_sys->i_last_time_ref = p_sys->i_time_ref;
+                p_sys->i_time_ref +=
+                    (i_modulo_time_base * p_dec->p_sys->i_fps_num);
+                i_time_ref = p_sys->i_time_ref;
             }
             else
             {
-                p_sys->i_pts = 0;
+                i_time_ref = p_sys->i_last_time_ref +
+                    (i_modulo_time_base * p_dec->p_sys->i_fps_num);
             }
+
+            p_sys->i_interpolated_pts +=
+                ( (i_time_ref + i_time_increment -
+                   p_sys->i_last_time - p_sys->i_last_timeincr) *
+                  I64C(1000000) / p_dec->p_sys->i_fps_num );
+
+            p_sys->i_last_time = i_time_ref;
+            p_sys->i_last_timeincr = i_time_increment;
+
+            /* Correct interpolated dts when we receive a new pts/dts */
+            if( p_block->i_pts > 0 )
+                p_sys->i_interpolated_pts = p_block->i_pts;
             if( p_block->i_dts > 0 )
+                p_sys->i_interpolated_dts = p_block->i_dts;
+
+            if( (p_sys->i_flags & BLOCK_FLAG_TYPE_B) || !p_sys->b_frame )
             {
-                p_sys->i_dts = p_block->i_dts;
+                /* Trivial case (DTS == PTS) */
+
+                p_sys->i_interpolated_dts = p_sys->i_interpolated_pts;
+
+                if( p_block->i_pts > 0 )
+                    p_sys->i_interpolated_dts = p_block->i_pts;
+
+                p_sys->i_interpolated_pts = p_sys->i_interpolated_dts;
             }
-            else if( p_sys->i_dts > 0 )
+            else
             {
-                /* XXX KLUDGE immonde, else transcode won't work */
-                p_sys->i_dts += 1000;
+                if( p_sys->i_last_ref_pts > 0 )
+                    p_sys->i_interpolated_dts = p_sys->i_last_ref_pts;
+
+                p_sys->i_last_ref_pts = p_sys->i_interpolated_pts;
             }
+
+            p_sys->b_vop = VLC_TRUE;
+
+            /* Don't re-use the same PTS/DTS twice */
+            p_block->i_pts = p_block->i_dts = 0;
         }
+
         p_start += 4; /* Next */
     }
 }
@@ -395,14 +443,14 @@ static int vlc_log2( unsigned int v )
  *  TODO:
  *      - support aspect ratio
  */
-static int m4v_VOLParse( es_format_t *fmt, uint8_t *p_vol, int i_vol )
+static int m4v_VOLParse( decoder_t *p_dec, es_format_t *fmt,
+                         uint8_t *p_vol, int i_vol )
 {
     bs_t s;
     int i_vo_type;
     int i_vo_ver_id;
     int i_ar;
     int i_shape;
-    int i_time_increment_resolution;
 
     for( ;; )
     {
@@ -469,26 +517,21 @@ static int m4v_VOLParse( es_format_t *fmt, uint8_t *p_vol, int i_vol )
         bs_skip( &s, 4 );
     }
 
-    if( !bs_read1( &s ) )
-    {
-        /* marker */
-        return VLC_EGENERIC;
-    }
-    i_time_increment_resolution = bs_read( &s, 16 );
-    if( !bs_read1( &s ) )
-    {
-        /* marker */
-        return VLC_EGENERIC;
-    }
+    if( !bs_read1( &s ) ) return VLC_EGENERIC; /* Marker */
+
+    p_dec->p_sys->i_fps_num = bs_read( &s, 16 ); /* Time increment resolution*/
+    if( !p_dec->p_sys->i_fps_num ) p_dec->p_sys->i_fps_num = 1;
+
+    if( !bs_read1( &s ) ) return VLC_EGENERIC; /* Marker */
 
     if( bs_read1( &s ) )
     {
-        int i_time_increment_bits = vlc_log2( i_time_increment_resolution - 1 ) + 1;
-        if( i_time_increment_bits < 1 )
-        {
-            i_time_increment_bits = 1;
-        }
-        bs_skip( &s, i_time_increment_bits );
+        int i_time_increment_bits =
+            vlc_log2( p_dec->p_sys->i_fps_num - 1 ) + 1;
+
+        if( i_time_increment_bits < 1 ) i_time_increment_bits = 1;
+
+        p_dec->p_sys->i_fps_den = bs_read( &s, i_time_increment_bits );
     }
     if( i_shape == 0 )
     {
