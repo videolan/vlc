@@ -31,7 +31,7 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
-#include "../filter_common.h"
+#include "filter_common.h"
 
 #define DEINTERLACE_DISCARD 1
 #define DEINTERLACE_MEAN    2
