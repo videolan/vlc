@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.4 2002/08/14 21:50:01 jpsaman Exp $
+ * $Id: callbacks.c,v 1.5 2002/08/17 13:33:00 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -31,9 +31,11 @@
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 
-#include <unistd.h>
+#include <stdio.h>
 #include <string.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
@@ -50,6 +52,7 @@
 
 static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
 static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data );
+static char* get_file_type(const char *path);
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -122,6 +125,7 @@ static void PreferencesURLOpenChanged( GtkEditable *editable, gpointer user_data
  ****************************************************************/
 void ReadDirectory( GtkCList *clist, char *psz_dir)
 {
+    intf_thread_t *p_intf = GtkGetIntf( clist );
     struct dirent **namelist;
     int n,i;
 
@@ -143,10 +147,9 @@ void ReadDirectory( GtkCList *clist, char *psz_dir)
         {
             /* This is a list of strings. */
             ppsz_text[0] = namelist[i]->d_name;
-            if (namelist[i]->d_type)
-                ppsz_text[1] = "dir";
-            else
-                ppsz_text[1] = "file";
+            ppsz_text[1] = get_file_type(namelist[i]->d_name);
+            if (strcmp(ppsz_text[1],"") == 0)
+                msg_Err( p_intf->p_sys->p_input, "File system error unknown filetype encountered.");
             gtk_clist_insert( clist, i, ppsz_text );
             free(namelist[i]);
         }
@@ -155,6 +158,31 @@ void ReadDirectory( GtkCList *clist, char *psz_dir)
     }
 }
 
+static char* get_file_type(const char *path)
+{
+    struct stat st;
+
+    if (lstat(path, &st)==0)
+    {
+        if (S_ISLNK(st.st_mode))
+           return "link";
+        else if (S_ISDIR(st.st_mode))
+           return "dir";
+        else if (S_ISCHR(st.st_mode))
+           return "char device";
+        else if (S_ISBLK(st.st_mode))
+           return "block device";
+        else if (S_ISFIFO(st.st_mode))
+           return "fifo";
+        else if (S_ISSOCK(st.st_mode))
+           return "socket";
+        else if (S_ISREG(st.st_mode))
+           return "file";
+        else /* Unknown type is an error */
+           return "";
+    }
+    return "";
+}
 
 /*
  * Main interface callbacks
