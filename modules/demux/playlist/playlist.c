@@ -40,26 +40,31 @@ vlc_module_begin();
 
     set_description( _("Old playlist open") );
     add_shortcut( "old-open" );
-    set_capability( "demux2" , 10 );
-    set_callbacks( Import_Old , NULL );
+    set_capability( "demux2", 10 );
+    set_callbacks( Import_Old, NULL );
 #if 0
     add_submodule();
         set_description( _("Native playlist import") );
         add_shortcut( "playlist" );
         add_shortcut( "native-open" );
-        set_capability( "demux2" , 10 );
-        set_callbacks( Import_Native , Close_Native );
+        set_capability( "demux2", 10 );
+        set_callbacks( Import_Native, Close_Native );
 #endif
     add_submodule();
         set_description( _("M3U playlist import") );
         add_shortcut( "m3u-open" );
-        set_capability( "demux2" , 10 );
-        set_callbacks( Import_M3U , Close_M3U );
+        set_capability( "demux2", 10 );
+        set_callbacks( Import_M3U, Close_M3U );
     add_submodule();
         set_description( _("PLS playlist import") );
         add_shortcut( "pls-open" );
-        set_capability( "demux2" , 10 );
-        set_callbacks( Import_PLS , Close_PLS );
+        set_capability( "demux2", 10 );
+        set_callbacks( Import_PLS, Close_PLS );
+    add_submodule();
+        set_description( _("B4S playlist import") );
+        add_shortcut( "b4s-open" );
+        set_capability( "demux2", 10 );
+        set_callbacks( Import_B4S, Close_B4S );
 vlc_module_end();
 
 

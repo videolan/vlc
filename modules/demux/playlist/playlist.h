@@ -27,11 +27,15 @@ char *FindPrefix( demux_t * );
 vlc_bool_t FindItem( demux_t *, playlist_t *, playlist_item_t **);
 
 int Import_Old ( vlc_object_t * );
-int Import_M3U ( vlc_object_t * );
 
 int Import_Native ( vlc_object_t * );
 int Close_Native ( vlc_object_t * );
 
+int Import_M3U ( vlc_object_t * );
 void Close_M3U ( vlc_object_t * );
+
 int Import_PLS ( vlc_object_t * );
 void Close_PLS ( vlc_object_t * );
+
+int Import_B4S ( vlc_object_t * );
+void Close_B4S ( vlc_object_t * );
