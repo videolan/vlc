@@ -75,6 +75,8 @@ static int RenderText( filter_t *, subpicture_region_t *,
                        subpicture_region_t * );
 static line_desc_t *NewLine( byte_t * );
 
+static int SetFontSize( filter_t *, int );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -170,6 +172,9 @@ struct filter_sys_t
     uint8_t        i_font_opacity;
     int            i_font_color;
     int            i_font_size;
+
+    int            i_default_font_size;
+    int            i_display_height;
 };
 
 /*****************************************************************************
@@ -186,7 +191,7 @@ static int Create( vlc_object_t *p_this )
     vlc_value_t val;
 
     /* Allocate structure */
-    p_sys = malloc( sizeof( filter_sys_t ) );
+    p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
     {
         msg_Err( p_filter, "out of memory" );
@@ -195,6 +200,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_face = 0;
     p_sys->p_library = 0;
     p_sys->i_font_size = 0;
+    p_sys->i_display_height = 0;
 
     var_Create( p_filter, "freetype-font",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -258,34 +264,12 @@ static int Create( vlc_object_t *p_this )
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
 
-    
     var_Get( p_filter, "freetype-fontsize", &val );
-    if( val.i_int )
-    {
-        p_sys->i_font_size = val.i_int;
-    }
-    else
-    {
-        var_Get( p_filter, "freetype-rel-fontsize", &val );
-        p_sys->i_font_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
-    }
-    if( p_sys->i_font_size <= 0 )
-    {
-        msg_Warn( p_filter, "Invalid fontsize, using 12" );
-        p_sys->i_font_size = 12;
-    }
-    msg_Dbg( p_filter, "Using fontsize: %i", p_sys->i_font_size );
-
-    i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
-    if( i_error )
-    {
-        msg_Err( p_filter, "couldn't set font size to %d", p_sys->i_font_size );
-        goto error;
-    }
+    p_sys->i_default_font_size = val.i_int;
+    if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
     if( psz_fontfile ) free( psz_fontfile );
     p_filter->pf_render_text = RenderText;
-    p_filter->p_sys = p_sys;
     return VLC_SUCCESS;
 
  error:
@@ -467,7 +451,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !i_font_alpha ) i_font_alpha = 255 - p_sys->i_font_opacity;
 
     i_font_size  = __MAX( __MIN( p_region_in->i_text_size, 255 ), 0 );
-    if( !i_font_size ) i_font_size  = p_sys->i_font_size;
+    SetFontSize( p_filter, i_font_size );
 
     i_red   = ( i_font_color & 0x00FF0000 ) >> 16;
     i_green = ( i_font_color & 0x0000FF00 ) >>  8;
@@ -492,24 +476,6 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     {
         msg_Warn( p_filter, "unable to do conversion" );
         goto error;
-    }
-
-    /* Set up the glyphs for the desired font size.  By definition,
-       p_sys->i_font_size is a valid value, else the initial Create would
-       have failed. Using -1 as a flag to use the freetype-fontsize */
-    if ( i_font_size < 0 )  
-    {
-            FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
-    }
-    else
-    {
-        i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_font_size );
-        if( i_error )
-        {
-            msg_Warn( p_filter, "Invalid font size to RenderText, using %d", 
-                      p_sys->i_font_size );
-            FT_Set_Pixel_Sizes( p_sys->p_face, 0, p_sys->i_font_size );
-        }
     }
 
     {
@@ -752,4 +718,49 @@ static line_desc_t *NewLine( byte_t *psz_string )
     }
 
     return p_line;
+}
+
+static int SetFontSize( filter_t *p_filter, int i_size )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( i_size && i_size == p_sys->i_font_size ) return VLC_SUCCESS;
+
+    if( !i_size )
+    {
+        vlc_value_t val;
+
+        if( !p_sys->i_default_font_size &&
+            p_sys->i_display_height == (int)p_filter->fmt_out.video.i_height )
+            return VLC_SUCCESS;
+
+        if( p_sys->i_default_font_size )
+        {
+            i_size = p_sys->i_default_font_size;
+        }
+        else
+        {
+            var_Get( p_filter, "freetype-rel-fontsize", &val );
+            i_size = (int)p_filter->fmt_out.video.i_height / val.i_int;
+            p_filter->p_sys->i_display_height =
+                p_filter->fmt_out.video.i_height;
+        }
+        if( i_size <= 0 )
+        {
+            msg_Warn( p_filter, "Invalid fontsize, using 12" );
+            i_size = 12;
+        }
+
+        msg_Dbg( p_filter, "Using fontsize: %i", i_size );
+    }
+
+    p_sys->i_font_size = i_size;
+
+    if( FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_size ) )
+    {
+        msg_Err( p_filter, "couldn't set font size to %d", i_size );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
 }
