@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.11 2002/11/15 16:27:10 gbazin Exp $
+ * $Id: waveout.c,v 1.12 2002/11/20 16:43:33 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -24,10 +24,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
-#include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <string.h>                                            /* strerror() */
-
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
 #include <vlc/vlc.h>
@@ -152,13 +149,22 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.p_sys->i_buffer_size = FRAME_SIZE *
                                       p_aout->output.output.i_bytes_per_frame;
     /* Allocate silence buffer */
+#ifndef UNDER_CE
     p_aout->output.p_sys->p_silence_buffer =
         calloc( p_aout->output.p_sys->i_buffer_size, 1 );
+#else
+    p_aout->output.p_sys->p_silence_buffer =
+        malloc( p_aout->output.p_sys->i_buffer_size );
+#endif
     if( p_aout->output.p_sys->p_silence_buffer == NULL )
     {
         msg_Err( p_aout, "out of memory" );
         return 1;
     }
+#ifdef UNDER_CE
+    memset( p_aout->output.p_sys->p_silence_buffer, 0,
+            p_aout->output.p_sys->i_buffer_size );
+#endif
 
     /* We need to kick off the playback in order to have the callback properly
      * working */
@@ -243,7 +249,11 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
     /* Open the device */
     result = waveOutOpen( &p_aout->output.p_sys->h_waveout, WAVE_MAPPER,
                           &p_aout->output.p_sys->waveformat,
+#ifndef UNDER_CE
                           (DWORD_PTR)WaveOutCallback, (DWORD_PTR)p_aout,
+#else
+                          (DWORD)WaveOutCallback, (DWORD)p_aout,
+#endif
                           CALLBACK_FUNCTION );
     if( result == WAVERR_BADFORMAT )
     {
@@ -274,7 +284,11 @@ static int PlayWaveOut( aout_instance_t *p_aout, HWAVEOUT h_waveout,
         /* Use silence buffer instead */
         p_waveheader->lpData = p_aout->output.p_sys->p_silence_buffer;
 
+#ifndef UNDER_CE
     p_waveheader->dwUser = (DWORD_PTR)p_buffer;
+#else
+    p_waveheader->dwUser = (DWORD)p_buffer;
+#endif
     p_waveheader->dwBufferLength = p_aout->output.p_sys->i_buffer_size;
     p_waveheader->dwFlags = 0;
 

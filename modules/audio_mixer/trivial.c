@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.10 2002/10/15 23:10:54 massiot Exp $
+ * $Id: trivial.c,v 1.11 2002/11/20 16:43:33 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -24,7 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 

@@ -2,7 +2,7 @@
  * float32tos16.c : converter from float32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.11 2002/10/15 23:10:54 massiot Exp $
+ * $Id: float32tos16.c,v 1.12 2002/11/20 16:43:32 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -24,7 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 

@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.30 2002/11/20 08:58:20 sam Exp $
+##  $Id: bootstrap,v 1.31 2002/11/20 16:43:32 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -204,7 +204,7 @@ EOF
     # this is an attempt at getting a list of plugin sources... we take the
     # production and remove everything that does not contain "module", which
     # means you miss $(NULL), but other variables too.
-    cfiles=`awk 'BEGIN{a=0}{if(!a&&/^SOURCES_'${plugin}'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < ${makefile} | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p'`
+    cfiles=`grep -v '[^-_a-zA-Z0-9]*#' ${makefile} | awk 'BEGIN{a=0}{if(!a&&/^SOURCES_'${plugin}'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p'`
     hfiles=`for i in ${cfiles} ; do echo $i ; done | grep '\.h$'`
     cfiles=`for i in ${cfiles} ; do echo $i ; done | grep -v '\.h$'`
     for dir in evc msvc

@@ -75,6 +75,30 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_fixed32tofloat32"=.\plugin_fixed32tofloat32.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_fixed32tos16"=.\plugin_fixed32tos16.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_i420_rgb"=.\plugin_i420_rgb.vcp - Package Owner=<4>
 
 Package=<5>
@@ -136,6 +160,18 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_ipv4"=.\plugin_ipv4.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_linear_resampler"=.\plugin_linear_resampler.vcp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -231,7 +267,67 @@ Package=<4>
 
 ###############################################################################
 
+Project: "plugin_trivial_channel_mixer"=.\plugin_trivial_channel_mixer.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_trivial_mixer"=.\plugin_trivial_mixer.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_trivial_resampler"=.\plugin_trivial_resampler.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "plugin_ts"=.\plugin_ts.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_vout_directx"=.\plugin_vout_directx.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_waveout"=.\plugin_waveout.vcp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -58,20 +58,35 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Menubar
+// Menu
 //
 
 IDM_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
+        MENUITEM "Open File...",                ID_FILE_OPENFILE, GRAYED
+        MENUITEM "Network Stream...",           ID_FILE_NETWORKSTREAM
+        , GRAYED
+        MENUITEM SEPARATOR
         MENUITEM "E&xit",                       IDM_FILE_EXIT
     END
-    MENUITEM "View",                        65535
-    MENUITEM "Settings",                    65535
+    POPUP "View"
+    BEGIN
+        MENUITEM "Playlist...",                 ID_VIEW_PLAYLIST, GRAYED
+        MENUITEM "Messages...",                 ID_VIEW_MESSAGES, GRAYED
+    END
+    POPUP "Settings"
+    BEGIN
+        MENUITEM "Audio",                       ID_SETTINGS_AUDIO, GRAYED
+        MENUITEM "Subtitles",                   ID_SETTINGS_SUBTITLES
+        , GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Preferences...",              ID_SETTINGS, GRAYED
+    END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About",                      IDM_HELP_ABOUT
+        MENUITEM "&About...",                   IDM_HELP_ABOUT
     END
 END
 
@@ -81,7 +96,7 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 127, 42
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 127, 42
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE 0x80000000L
 CAPTION "About PocketVLC"

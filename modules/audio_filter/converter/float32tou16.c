@@ -2,7 +2,7 @@
  * float32tou16.c : converter from float32 to unsigned 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tou16.c,v 1.6 2002/10/15 23:10:54 massiot Exp $
+ * $Id: float32tou16.c,v 1.7 2002/11/20 16:43:32 sam Exp $
  *
  * Authors: Xavier Maillard <zedek@fxgsproject.org>
  *
@@ -24,7 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
