@@ -1,3 +1,12 @@
+2003-07-29 Tuesday 23:50  gbazin
+
+ * configure.ac: added the svlc shortcut for the skins.
+ * install-win32: removed the custom link in the start menu.
+
+2003-07-29 Tuesday 23:01  gbazin
+
+ * ChangeLog: updated the changelog for the release
+
 2003-07-29 Tuesday 22:25  gbazin
 
  * modules/codec/spudec/parse.c: fixed typo found by Meuuh.
