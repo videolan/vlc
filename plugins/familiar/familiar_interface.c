@@ -24,13 +24,15 @@ create_familiar (void)
   GtkWidget *familiar;
   GtkWidget *vbox;
   GtkWidget *toolbar;
-  GtkWidget *xpm_open;
-  GtkWidget *xpm_preferences;
-  GtkWidget *xpm_rewind;
-  GtkWidget *xpm_pause;
-  GtkWidget *xpm_play;
-  GtkWidget *xpm_stop;
-  GtkWidget *xpm_forward;
+  GtkWidget *tmp_toolbar_icon;
+  GtkWidget *toolbar_open;
+  GtkWidget *toolbar_preferences;
+  GtkWidget *toolbar_rewind;
+  GtkWidget *toolbar_pause;
+  GtkWidget *toolbar_play;
+  GtkWidget *toolbar_stop;
+  GtkWidget *toolbar_forward;
+  GtkWidget *toolbar_about;
   GtkWidget *progress;
   GtkWidget *notebook;
   GtkWidget *fixedMedia;
@@ -84,66 +86,108 @@ create_familiar (void)
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar", toolbar,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar);
-  gtk_box_pack_start (GTK_BOX (vbox), toolbar, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox), toolbar, TRUE, TRUE, 0);
   gtk_widget_set_usize (toolbar, 112, 16);
 
-  xpm_open = create_pixmap (familiar, "familiar-openb16x16.xpm");
-  gtk_widget_ref (xpm_open);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "xpm_open", xpm_open,
+  tmp_toolbar_icon = create_pixmap (familiar, "familiar-openb16x16.xpm");
+  toolbar_open = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Open"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_open);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_open", toolbar_open,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (xpm_open);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), xpm_open, NULL, NULL);
-  GTK_WIDGET_SET_FLAGS (xpm_open, GTK_CAN_FOCUS);
+  gtk_widget_show (toolbar_open);
 
-  xpm_preferences = create_pixmap (familiar, "familiar-preferencesb16x16.xpm");
-  gtk_widget_ref (xpm_preferences);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "xpm_preferences", xpm_preferences,
+  tmp_toolbar_icon = create_pixmap (familiar, "familiar-preferencesb16x16.xpm");
+  toolbar_preferences = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Preferences"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_preferences);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_preferences", toolbar_preferences,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (xpm_preferences);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), xpm_preferences, NULL, NULL);
-  GTK_WIDGET_SET_FLAGS (xpm_preferences, GTK_CAN_FOCUS);
+  gtk_widget_show (toolbar_preferences);
 
-  xpm_rewind = create_pixmap (familiar, "familiar-rewindb16x16.xpm");
-  gtk_widget_ref (xpm_rewind);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "xpm_rewind", xpm_rewind,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (xpm_rewind);
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), xpm_rewind, NULL, NULL);
-  GTK_WIDGET_SET_FLAGS (xpm_rewind, GTK_CAN_FOCUS);
-
-  xpm_pause = create_pixmap (familiar, "familiar-pauseb16x16.xpm");
-  gtk_widget_ref (xpm_pause);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "xpm_pause", xpm_pause,
+  tmp_toolbar_icon = create_pixmap (familiar, "familiar-rewindb16x16.xpm");
+  toolbar_rewind = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Rewind"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_rewind);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_rewind", toolbar_rewind,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (xpm_pause);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), xpm_pause, NULL, NULL);
-  GTK_WIDGET_SET_FLAGS (xpm_pause, GTK_CAN_FOCUS);
+  gtk_widget_show (toolbar_rewind);
 
-  xpm_play = create_pixmap (familiar, "familiar-playb16x16.xpm");
-  gtk_widget_ref (xpm_play);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "xpm_play", xpm_play,
+  tmp_toolbar_icon = create_pixmap (familiar, "familiar-pauseb16x16.xpm");
+  toolbar_pause = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Pause"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_pause);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_pause", toolbar_pause,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (xpm_play);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), xpm_play, NULL, NULL);
-  GTK_WIDGET_SET_FLAGS (xpm_play, GTK_CAN_FOCUS);
+  gtk_widget_show (toolbar_pause);
 
-  xpm_stop = create_pixmap (familiar, "familiar-stopb16x16.xpm");
-  gtk_widget_ref (xpm_stop);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "xpm_stop", xpm_stop,
+  tmp_toolbar_icon = create_pixmap (familiar, "familiar-playb16x16.xpm");
+  toolbar_play = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Play"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_play);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_play", toolbar_play,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (xpm_stop);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), xpm_stop, NULL, NULL);
-  GTK_WIDGET_SET_FLAGS (xpm_stop, GTK_CAN_FOCUS);
+  gtk_widget_show (toolbar_play);
 
-  xpm_forward = create_pixmap (familiar, "familiar-forwardb16x16.xpm");
-  gtk_widget_ref (xpm_forward);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "xpm_forward", xpm_forward,
+  tmp_toolbar_icon = create_pixmap (familiar, "familiar-stopb16x16.xpm");
+  toolbar_stop = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Stop"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_stop);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_stop", toolbar_stop,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (xpm_forward);
-  gtk_toolbar_append_widget (GTK_TOOLBAR (toolbar), xpm_forward, NULL, NULL);
-  GTK_WIDGET_SET_FLAGS (xpm_forward, GTK_CAN_FOCUS);
+  gtk_widget_show (toolbar_stop);
+
+  tmp_toolbar_icon = create_pixmap (familiar, "familiar-forwardb16x16.xpm");
+  toolbar_forward = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Forward"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_forward);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_forward", toolbar_forward,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (toolbar_forward);
+
+  gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
+
+  tmp_toolbar_icon = create_pixmap (familiar, "vlc16x16.xpm");
+  toolbar_about = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("About"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_about);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_about", toolbar_about,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (toolbar_about);
 
   progress = gtk_progress_bar_new ();
   gtk_widget_ref (progress);
@@ -400,27 +444,6 @@ create_familiar (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (familiar), "destroy",
                       GTK_SIGNAL_FUNC (gtk_main_quit),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (xpm_open), "button_press_event",
-                      GTK_SIGNAL_FUNC (on_xpm_open_button_press_event),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (xpm_preferences), "button_press_event",
-                      GTK_SIGNAL_FUNC (on_xpm_preferences_button_press_event),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (xpm_rewind), "button_press_event",
-                      GTK_SIGNAL_FUNC (on_xpm_rewind_button_press_event),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (xpm_pause), "button_press_event",
-                      GTK_SIGNAL_FUNC (on_xpm_pause_button_press_event),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (xpm_play), "button_press_event",
-                      GTK_SIGNAL_FUNC (on_xpm_play_button_press_event),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (xpm_stop), "button_press_event",
-                      GTK_SIGNAL_FUNC (on_xpm_stop_button_press_event),
-                      NULL);
-  gtk_signal_connect (GTK_OBJECT (xpm_forward), "button_press_event",
-                      GTK_SIGNAL_FUNC (on_xpm_forward_button_press_event),
                       NULL);
 
   gtk_object_set_data (GTK_OBJECT (familiar), "tooltips", tooltips);

@@ -60,130 +60,78 @@
       <tooltips>True</tooltips>
       <child>
 	<padding>0</padding>
-	<expand>False</expand>
+	<expand>True</expand>
 	<fill>True</fill>
       </child>
 
       <widget>
-	<class>GtkPixmap</class>
-	<name>xpm_open</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>button_press_event</name>
-	  <handler>on_xpm_open_button_press_event</handler>
-	  <last_modification_time>Mon, 22 Jul 2002 13:18:11 GMT</last_modification_time>
-	</signal>
-	<filename>familiar-openb16x16.xpm</filename>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<build_insensitive>True</build_insensitive>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_open</name>
+	<label>Open</label>
+	<icon>familiar-openb16x16.xpm</icon>
       </widget>
 
       <widget>
-	<class>GtkPixmap</class>
-	<name>xpm_preferences</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>button_press_event</name>
-	  <handler>on_xpm_preferences_button_press_event</handler>
-	  <last_modification_time>Mon, 22 Jul 2002 13:17:55 GMT</last_modification_time>
-	</signal>
-	<filename>familiar-preferencesb16x16.xpm</filename>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<build_insensitive>True</build_insensitive>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_preferences</name>
+	<label>Preferences</label>
+	<icon>familiar-preferencesb16x16.xpm</icon>
       </widget>
 
       <widget>
-	<class>GtkPixmap</class>
-	<name>xpm_rewind</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>button_press_event</name>
-	  <handler>on_xpm_rewind_button_press_event</handler>
-	  <last_modification_time>Mon, 22 Jul 2002 13:18:17 GMT</last_modification_time>
-	</signal>
-	<filename>familiar-rewindb16x16.xpm</filename>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<build_insensitive>True</build_insensitive>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_rewind</name>
+	<label>Rewind</label>
+	<icon>familiar-rewindb16x16.xpm</icon>
 	<child>
 	  <new_group>True</new_group>
 	</child>
       </widget>
 
       <widget>
-	<class>GtkPixmap</class>
-	<name>xpm_pause</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>button_press_event</name>
-	  <handler>on_xpm_pause_button_press_event</handler>
-	  <last_modification_time>Mon, 22 Jul 2002 13:18:29 GMT</last_modification_time>
-	</signal>
-	<filename>familiar-pauseb16x16.xpm</filename>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<build_insensitive>True</build_insensitive>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_pause</name>
+	<label>Pause</label>
+	<icon>familiar-pauseb16x16.xpm</icon>
       </widget>
 
       <widget>
-	<class>GtkPixmap</class>
-	<name>xpm_play</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>button_press_event</name>
-	  <handler>on_xpm_play_button_press_event</handler>
-	  <last_modification_time>Mon, 22 Jul 2002 13:18:36 GMT</last_modification_time>
-	</signal>
-	<filename>familiar-playb16x16.xpm</filename>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<build_insensitive>True</build_insensitive>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_play</name>
+	<label>Play</label>
+	<icon>familiar-playb16x16.xpm</icon>
       </widget>
 
       <widget>
-	<class>GtkPixmap</class>
-	<name>xpm_stop</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>button_press_event</name>
-	  <handler>on_xpm_stop_button_press_event</handler>
-	  <last_modification_time>Mon, 22 Jul 2002 13:18:43 GMT</last_modification_time>
-	</signal>
-	<filename>familiar-stopb16x16.xpm</filename>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<build_insensitive>True</build_insensitive>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_stop</name>
+	<label>Stop</label>
+	<icon>familiar-stopb16x16.xpm</icon>
       </widget>
 
       <widget>
-	<class>GtkPixmap</class>
-	<name>xpm_forward</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>button_press_event</name>
-	  <handler>on_xpm_forward_button_press_event</handler>
-	  <last_modification_time>Mon, 22 Jul 2002 13:18:55 GMT</last_modification_time>
-	</signal>
-	<filename>familiar-forwardb16x16.xpm</filename>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
-	<build_insensitive>True</build_insensitive>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_forward</name>
+	<label>Forward</label>
+	<icon>familiar-forwardb16x16.xpm</icon>
+      </widget>
+
+      <widget>
+	<class>GtkButton</class>
+	<child_name>Toolbar:button</child_name>
+	<name>toolbar_about</name>
+	<label>About</label>
+	<icon>vlc16x16.xpm</icon>
+	<child>
+	  <new_group>True</new_group>
+	</child>
       </widget>
     </widget>
 
