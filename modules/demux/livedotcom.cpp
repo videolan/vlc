@@ -575,7 +575,8 @@ static int  DemuxOpen ( vlc_object_t *p_this )
                 tk->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v' );
             }
             else if( !strcmp( sub->codecName(), "H263" ) ||
-                     !strcmp( sub->codecName(), "H263-1998" ) )
+                     !strcmp( sub->codecName(), "H263-1998" ) ||
+                     !strcmp( sub->codecName(), "H263-2000" ) )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '3' );
             }
