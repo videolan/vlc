@@ -7,7 +7,7 @@ Architecture: arm
 Source: http://www.videolan.org/vlc/download-sources.html
 Conflicts: gpe-vlc, opie-vlc, opie-libsdl, opie-base
 Maintainer: Jean-Paul Saman <jpsaman@wxs.nl>
-Depends: libc6, libsdl, libgtk1.2, esddsp
+Depends: libc6, libgtk2.0-0, esddsp
 Copyright: GPL
 Description: VideoLAN Client is a free network-aware MPEG and DVD player.
  VideoLAN is a free MPEG1/2 software solution licensed under GPL. The original 

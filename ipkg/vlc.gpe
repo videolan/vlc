@@ -1,9 +1,7 @@
-?package(vlc): \
- needs=x11 \
- section="Graphics" \
- logtitle="VideoLAN Client" \
- title="VideoLAN Client" \
- command="vlc"\
- icon48=/usr/share/vlc/vlc48x48.png \
- windowtitle="VideoLAN Client"
+[Desktop Entry]
+Name=VLC MediaPlayer
+Comment=Media Player with network and multiple codec support
+Exec=vlc
+Type=Application
+Icon=/usr/share/vlc/vlc48x48.png
 

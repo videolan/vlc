@@ -11,6 +11,11 @@ export AR=arm-linux-ar
 export RANLIB=arm-linux-ranlib
 export STRIP=arm-linux-strip
 
+export VIDDIR="usr/share/vlc"
+export PIXDIR="usr/share/pixmaps"
+export DESTDIR=/home/samba/jpsaman/src/ipaq/arm-linux
+export PKGDIR=/home/samba/jpsaman/src/ipaq/packages/vlc-$(VERSION)
+
 export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-plugins \
 	--disable-gtk \
@@ -25,47 +30,47 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-tarkin \
 	--disable-tremor \
 	--disable-theorea \
+	--disable-skins \
+	--disable-sdl \
 	--enable-v4l \
 	--enable-sout \
 	--enable-dummy \
 	--enable-fb \
-	--enable-sdl \
 	--enable-oss \
 	--disable-alsa \
 	--enable-x11 \
 	--disable-xvideo \
 	--disable-dvd \
+	--disable-dvdplay \
 	--disable-dvdread \
 	--disable-vcd \
 	--disable-maxosx \
-	--disable-freetype \
+	--enable-freetype \
 	--enable-a52 \
-	--enable-faad2 \
+	--enable-faad \
 	--enable-flac \
 	--enable-libmpeg2 \
 	--enable-libdvbpsi \
 	--disable-mkv \
 	--enable-mad \
 	--enable-ffmpeg \
+	--enable-slp \
 	--enable-pda \
+	--x-includes=/skiff/local/arm-linux/include/X11 \
+	--x-libraries=/skiff/local/arm-linux/lib/X11 \
 	--with-tuning=strongarm1100 \
-	--x-includes=/skiff/local/arm-linux/include \
-	--x-libraries=/usr/local/arm/2.95.3/arm-linux/usr/X11R6/lib \
-	--with-libiconv-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-	--with-mad-tree=/home/jpsaman/iPaq/src/libmad-0.15.0b \
-	--with-a52-tree=/home/jpsaman/iPaq/src/a52dec-0.7.4 \
-	--with-faad2-tree=/home/jpsaman/iPaq/src/faad2-20030612 \
-	--with-flac-tree=/home/jpsaman/iPaq/src/flac-1.1.0 \
-	--with-libmpeg2-tree=/home/jpsaman/iPaq/src/mpeg2dec-20030612 \
-	--with-libdvbpsi-tree=/home/jpsaman/iPaq/src/libdvbpsi-0.1.2 \
-	--with-sdl-config-path=/usr/local/arm/2.95.3/arm-linux/usr/bin \
-	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
-	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg-20030622"
-
-export VIDDIR="usr/share/vlc"
-export PIXDIR="usr/share/pixmaps"
-export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/vlc-$(VERSION)
+	--with-libdvbpsi-tree=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/libdvbpsi-0.1.3 \
+	--with-libiconv-prefix=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/libiconv-1.9.1 \
+	--with-mad-tree=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/libmad-0.15.0b \
+	--with-a52-tree=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/a52dec-0.7.4 \
+	--with-faad-tree=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/faad2-2.0rc2 \
+	--with-flac-tree=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/flac-1.1.0 \
+	--with-libmpeg2-tree=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/mpeg2dec-20030612 \
+	--with-slp=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/openslp-1.0.11/libslp \
+	--with-included-gettext=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/gettext-0.12.1 \
+	--with-v4l=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/linux/kernel \
+	--with-ffmpeg-mp3lame \
+	--with-ffmpeg-tree=/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/ffmpeg-20030813"
 
 config:
 	./configure --mandir=$${prefix}/share/man \
@@ -73,15 +78,27 @@ config:
 		--host=arm-linux \
 		--target=arm-linux \
 		$(shell echo $(CONFIG_FLAGS)) \
-	LDFLAGS="-L/usr/local/arm/2.95.3/arm-linux/lib -L/usr/local/arm/2.95.3/arm-linux/usr/lib" \
-	CPPFLAGS="-I/usr/local/arm/2.95.3/arm-linux/include -I/usr/local/arm/2.95.3/arm-linux/usr/include"
+	LDFLAGS="-L/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/openslp-1.0.11/libslp/.libs \
+		 -L/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/libpng-1.2.5 \
+		 -L/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/lame-3.93.1/libmp3lame/.libs \
+		 -L/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/zlib-1.1.4 \
+		 -L/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/freetype-2.1.4/objs \
+		 -L/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/libid3-0.15.0b" \
+	CPPFLAGS="-I/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/openslp-1.0.11/libslp \
+		-I/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/libpng-1.2.5 \
+		-I/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/lame-3.93.1/include \
+		-I/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/zlib-1.1.4 \
+		-I/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/freetype-2.1.4/include \
+		-I/home/samba/jpsaman/src/ipaq/vlc-$(VERSION)/libid3-0.15.0b"
+# park here ;-)
+#  -I/home/samba/jpsaman/src/ipaq/linux/kernel/include \
 
 #patch:
 # This is ugly -- I know
 #	patch -p 0 < ipkg/patch
 
 build:
-	$(MAKE)
+	$(MAKE) LDFLAGS="-L/skiff/local/arm-linux/libs" CFLAGS="-I/skiff/local/arm-linux/include"
 
 clean:
 	-$(MAKE) distclean
@@ -91,18 +108,27 @@ install: build
 	mkdir -p ${PKGDIR}/CONTROL
 	mkdir -p $(PKGDIR)/usr/bin
 	mkdir -p ${PKGDIR}/usr/share/vlc
-#	mkdir -p ${PKGDIR}/usr/lib/menu
+	mkdir -p ${PKGDIR}/usr/share/locale
+	for loc in de en_GB fr it ja nl no ru sv ; do
+	  mkdir -p ${PKGDIR}/usr/share/locale/$loc/LC_MESSAGES
+	done
+	mkdir -p ${PKGDIR}/usr/share/applications
+	mkdir -p ${PKGDIR}/usr/share/http/admin
+	mkdir -p ${PKGDIR}/usr/share/skins/default
+	mkdir -p ${PKGDIR}/usr/lib/menu
 	mkdir -p ${PKGDIR}/usr/lib/vlc
 	$(STRIP) vlc
 	cp ipkg/control $(PKGDIR)/CONTROL/control
 	cp ipkg/postinst ${PKGDIR}/CONTROL/postinst
 	cp ipkg/postrm ${PKGDIR}/CONTROL/postrm
-	cp share/familiar-* ${PKGDIR}/usr/share/vlc
-	cp share/vlc32x32.xpm ${PKGDIR}/usr/share/vlc
-	cp share/vlc16x16.xpm  ${PKGDIR}/usr/share/vlc
-	cp share/vlc48x48.png  ${PKGDIR}/usr/share/vlc
+	cp share/pda-* ${PKGDIR}/usr/share/vlc
+	cp share/vlc*  ${PKGDIR}/usr/share/vlc
+	cp share/http/* ${PKGDIR}/usr/share/http
+	cp share/http/admin/* ${PKGDIR}/usr/share/http/admin
+	cp share/skins/default/* ${PKGDIR}/usr/share/skins/default
 	cp vlc $(PKGDIR)/usr/bin
-#	cp ipkg/vlc.gpe ${PKGDIR}/usr/lib/menu/vlc
+	cp ipkg/vlc.gpe ${PKGDIR}/usr/share/applications/vlc.desktop
+	make -C po DESTDIR=${PKGDIR} install
 
 install-plugins: install
 	find ./ -name *.so | xargs cp ${PKGDIR}/usr/lib/vlc
