@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: cdda.c,v 1.11 2003/12/11 12:56:25 rocky Exp $
+ * $Id: cdda.c,v 1.12 2003/12/11 13:20:20 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -68,10 +68,6 @@ int  E_(CDDBEnabledCB)( vlc_object_t *p_this, const char *psz_name,
     "seek      (40)  64\n" \
     "libcdio   (80) 128\n" \
     "libcddb  (100) 256\n" )
-
-#define DEV_LONGTEXT N_( \
-    "Specify the name of the CD-ROM device that will be used by default. " \
-    "If you don't specify anything, we'll scan for a suitable CD-ROM device.")
 
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for CDDA streams. This " \
