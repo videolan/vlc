@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.62 2001/08/06 20:45:55 gbazin Exp $
+ * $Id: vout_sdl.c,v 1.63 2001/09/26 12:32:25 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -193,10 +193,8 @@ static int vout_Create( vout_thread_t *p_vout )
                                 VOUT_FULLSCREEN_DEFAULT );
     p_vout->p_sys->b_overlay = main_GetIntVariable( VOUT_OVERLAY_VAR,
                                 VOUT_OVERLAY_DEFAULT );
-    p_vout->p_sys->i_width = main_GetIntVariable( VOUT_WIDTH_VAR, 
-                                VOUT_WIDTH_DEFAULT );
-    p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
-                                VOUT_HEIGHT_DEFAULT );
+    p_vout->p_sys->i_width = p_vout->i_width;
+    p_vout->p_sys->i_height = p_vout->i_height;
 
     p_vout->p_sys->p_display = NULL;
     p_vout->p_sys->p_overlay = NULL;

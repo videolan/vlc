@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.30 2001/08/03 16:04:17 gbazin Exp $
+ * $Id: vout_x11.c,v 1.31 2001/09/26 12:32:25 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -794,12 +794,8 @@ static int X11CreateWindow( vout_thread_t *p_vout )
     else
     {
         /* Set main window's size */
-        p_vout->p_sys->i_width =  main_GetIntVariable( VOUT_WIDTH_VAR,
-                                                       VOUT_WIDTH_DEFAULT );
-        p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
-                                                       VOUT_HEIGHT_DEFAULT );
-        p_vout->i_width =  p_vout->p_sys->i_width;
-        p_vout->i_height = p_vout->p_sys->i_height;
+        p_vout->p_sys->i_width = p_vout->i_width;
+        p_vout->p_sys->i_height = p_vout->i_height;
     }
 
     /* Prepare window manager hints and properties */

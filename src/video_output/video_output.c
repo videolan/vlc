@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.139 2001/09/25 11:46:14 massiot Exp $
+ * $Id: video_output.c,v 1.140 2001/09/26 12:32:25 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -120,7 +120,7 @@ void vout_EndBank ( void )
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-vout_thread_t * vout_CreateThread   ( int *pi_status )
+vout_thread_t * vout_CreateThread   ( int *pi_status, int i_width, int i_height )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_status;                               /* thread status */
@@ -174,26 +174,32 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     /* Initialize some fields used by the system-dependant method - these
      * fields will probably be modified by the method, and are only
      * preferences */
-    p_vout->i_changes             = 0;
-    p_vout->i_width               = main_GetIntVariable( VOUT_WIDTH_VAR,
-                                                         VOUT_WIDTH_DEFAULT );
-    p_vout->i_height              = main_GetIntVariable( VOUT_HEIGHT_VAR,
-                                                         VOUT_HEIGHT_DEFAULT );
-    p_vout->i_bytes_per_line      = p_vout->i_width * 2;
-    p_vout->i_screen_depth        = main_GetIntVariable( VOUT_DEPTH_VAR,
+    p_vout->i_changes           = 0;
+    p_vout->i_width             = main_GetIntVariable( VOUT_WIDTH_VAR, 0 );
+    if( !p_vout->i_width )
+    {
+        p_vout->i_width         = i_width ? i_width : VOUT_WIDTH_DEFAULT;
+    }
+    p_vout->i_height            = main_GetIntVariable( VOUT_HEIGHT_VAR, 0 );
+    if( !p_vout->i_height )
+    {
+        p_vout->i_height        = i_height ? i_height : VOUT_HEIGHT_DEFAULT;
+    }
+    p_vout->i_bytes_per_line    = p_vout->i_width * 2;
+    p_vout->i_screen_depth      = main_GetIntVariable( VOUT_DEPTH_VAR,
                                                          VOUT_DEPTH_DEFAULT );
-    p_vout->i_bytes_per_pixel     = 2;
-    p_vout->f_gamma               = VOUT_GAMMA_DEFAULT; // FIXME: replace with
-                                                        // variable
-    p_vout->b_need_render         = 1;
-    p_vout->b_YCbr                = 0;
+    p_vout->i_bytes_per_pixel   = 2;
+    p_vout->f_gamma             = VOUT_GAMMA_DEFAULT; // FIXME: replace with
+                                                      // variable
+    p_vout->b_need_render       = 1;
+    p_vout->b_YCbr              = 0;
 
-    p_vout->b_grayscale           = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
-                                                     VOUT_GRAYSCALE_DEFAULT );
-    p_vout->b_info                = 0;
-    p_vout->b_interface           = 0;
-    p_vout->b_scale               = 1;
-    p_vout->b_fullscreen          = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
+    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
+                                                       VOUT_GRAYSCALE_DEFAULT );
+    p_vout->b_info              = 0;
+    p_vout->b_interface         = 0;
+    p_vout->b_scale             = 1;
+    p_vout->b_fullscreen        = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                                      VOUT_FULLSCREEN_DEFAULT );
 
     intf_WarnMsg( 3, "vout info: asking for %dx%d, %d/%d bpp (%d Bpl)",

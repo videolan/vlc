@@ -120,10 +120,10 @@ void foo() { int meuh; ntohl(meuh); }],,
  AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl Check for inline function size limit
-CFLAGS="${save_CFLAGS} -finline-limit-20000"
+CFLAGS="${save_CFLAGS} -finline-limit-30000"
 AC_MSG_CHECKING([if \$CC accepts -finline-limit])
 AC_TRY_COMPILE([],,
- save_CFLAGS="${save_CFLAGS} -finline-limit-20000"; AC_MSG_RESULT(yes),
+ save_CFLAGS="${save_CFLAGS} -finline-limit-30000"; AC_MSG_RESULT(yes),
  AC_MSG_RESULT(no))
 
 dnl Check for Darwin plugin linking flags

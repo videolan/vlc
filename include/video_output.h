@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppenned video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.61 2001/05/30 17:03:11 sam Exp $
+ * $Id: video_output.h,v 1.62 2001/09/26 12:32:25 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -278,7 +278,7 @@ typedef struct vout_thread_s
 void            vout_InitBank           ( void );
 void            vout_EndBank            ( void );
 
-vout_thread_t * vout_CreateThread   ( int *pi_status );
+vout_thread_t * vout_CreateThread   ( int *pi_status, int i_width, int i_height );
 void            vout_DestroyThread  ( vout_thread_t *p_vout, int *pi_status );
 
 vout_fifo_t *   vout_CreateFifo         ( void );

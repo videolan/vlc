@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.48 2001/08/06 13:13:06 sam Exp $
+ * $Id: spu_decoder.c,v 1.49 2001/09/26 12:32:25 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -96,7 +96,7 @@ vlc_thread_t spudec_CreateThread( vdec_config_t * p_config )
     {
         intf_WarnMsg( 1, "spudec: no vout present, spawning one" );
 
-        p_spudec->p_vout = vout_CreateThread( NULL );
+        p_spudec->p_vout = vout_CreateThread( NULL, 0, 0 );
 
         /* Everything failed */
         if( p_spudec->p_vout == NULL )

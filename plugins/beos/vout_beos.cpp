@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.29 2001/09/12 01:30:07 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.30 2001/09/26 12:32:25 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -350,10 +350,6 @@ int vout_Create( vout_thread_t *p_vout )
     }
     
     /* Set video window's size */
-    p_vout->i_width =  main_GetIntVariable( VOUT_WIDTH_VAR,
-                                            VOUT_WIDTH_DEFAULT );
-    p_vout->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
-                                            VOUT_HEIGHT_DEFAULT );
 	p_vout->b_scale = true;
 	                                            
     intf_Msg("Initial Width: %d Height: %d", 

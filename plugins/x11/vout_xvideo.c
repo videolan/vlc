@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.26 2001/08/22 14:23:57 sam Exp $
+ * $Id: vout_xvideo.c,v 1.27 2001/09/26 12:32:25 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -802,10 +802,8 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
     }
     else
     {
-        p_vout->p_sys->i_window_width =  main_GetIntVariable( VOUT_WIDTH_VAR,
-                                                       VOUT_WIDTH_DEFAULT );
-        p_vout->p_sys->i_window_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
-                                                       VOUT_HEIGHT_DEFAULT );
+        p_vout->p_sys->i_window_width =  p_vout->i_width;
+        p_vout->p_sys->i_window_height = p_vout->i_height;
     }
 
     /* Prepare window manager hints and properties */
