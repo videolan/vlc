@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.53 2003/11/22 13:49:12 gbazin Exp $
+ * $Id: transcode.c,v 1.54 2003/11/27 10:34:51 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -155,7 +155,7 @@ static int Open( vlc_object_t *p_this )
         char fcc[4] = "    ";
         char *val;
 
-        memcpy( fcc, codec, strlen( codec ) );
+        memcpy( fcc, codec, __MIN( strlen( codec ), 4 ) );
 
         p_sys->i_acodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
 
@@ -186,7 +186,7 @@ static int Open( vlc_object_t *p_this )
         char fcc[4] = "    ";
         char *val;
 
-        memcpy( fcc, codec, strlen( codec ) );
+        memcpy( fcc, codec, __MIN( strlen( codec ), 4 ) );
 
         p_sys->i_vcodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
 

@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.36 2003/11/23 20:37:04 gbazin Exp $
+ * $Id: streamout.cpp,v 1.37 2003/11/27 10:34:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -659,8 +659,8 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
         wxT("mpga"),
         wxT("mp3"),
         wxT("a52"),
-        wxT("vorb")
-        wxT("flac")
+        wxT("vorb"),
+        wxT("flac"),
         wxT("spx")
     };
     static const wxString abitrates_array[] =
