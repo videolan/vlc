@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.7 2004/01/22 00:00:34 fenrir Exp $
+ * $Id: net.c,v 1.8 2004/01/22 17:03:44 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -115,7 +115,8 @@ int __net_OpenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
  *****************************************************************************
  * Open a UDP connection and return a handle
  *****************************************************************************/
-int __net_OpenUDP( vlc_object_t *p_this, char *psz_bind, int i_bind, char *psz_server, int i_server )
+int __net_OpenUDP( vlc_object_t *p_this, char *psz_bind, int i_bind,
+                   char *psz_server, int i_server )
 {
     vlc_value_t      val;
     void            *private;
@@ -189,7 +190,8 @@ void net_Close( int fd )
  * If b_rety is true, then we repeat until we have read the right amount of
  * data
  *****************************************************************************/
-int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, vlc_bool_t b_retry )
+int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
+                vlc_bool_t b_retry )
 {
     struct timeval  timeout;
     fd_set          fds;
@@ -232,9 +234,9 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data, vlc_b
              * the first part of the datagram. */
             if( WSAGetLastError() == WSAEMSGSIZE ) 
             {
-                msg_Err( p_input, "recv() failed. "
+                msg_Err( p_this, "recv() failed. "
                          "Increase the mtu size (--mtu option)" );
-                i_recv = i_len;
+                i_recv = i_data;
             }
             else
 #endif
@@ -365,6 +367,3 @@ int net_Printf( vlc_object_t *p_this, int fd, char *psz_fmt, ... )
 
     return i_ret;
 }
-
-
-
