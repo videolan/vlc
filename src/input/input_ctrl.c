@@ -30,7 +30,7 @@
 
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
-
+#include <stdio.h>
 #include <netinet/in.h>                                             /* ntohs */
 
 #include "config.h"
@@ -52,6 +52,9 @@
 
 #include "ac3_decoder.h"              /* ac3dec_t (for ac3_decoder_thread.h) */
 #include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
+
+#include "lpcm_decoder.h"
+#include "lpcm_decoder_thread.h"
 
 #include "video.h"                          /* picture_t (for video_output.h) */
 #include "video_output.h"                                   /* vout_thread_t */
@@ -122,7 +125,9 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                 /* Spawn the decoder. */
                 switch( p_input->p_es[i_es_loop].i_type )
                 {
+                    
                     case AC3_AUDIO_ES:
+                        fprintf (stderr, "Start an AC3 decoder\n");
                         /* Spawn ac3 thread */
                         if ( ((ac3dec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
                             ac3dec_CreateThread(p_input)) == NULL )
@@ -132,6 +137,19 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                             return( -1 );
                         }
                         break;
+
+		             case LPCM_AUDIO_ES:
+                        /* Spawn lpcm thread */
+                        fprintf (stderr, "Start a LPCM decoder\n");
+                        if ( ((lpcmdec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
+                            lpcmdec_CreateThread(p_input)) == NULL )
+                        {
+                            intf_ErrMsg( "LPCM Debug: Could not start lpcm decoder\n" );
+                            vlc_mutex_unlock( &p_input->es_lock );
+                            return( -1 );
+                        }
+                        break;
+
 
                     case DVD_SPU_ES:
                         /* Spawn spu thread */
@@ -247,6 +265,10 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
                 {
                     case AC3_AUDIO_ES:
                         ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) );
+                        break;
+			
+                    case LPCM_AUDIO_ES:
+                        lpcmdec_DestroyThread( (lpcmdec_thread_t *)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) );
                         break;
 
                     case DVD_SPU_ES:

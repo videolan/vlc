@@ -240,6 +240,9 @@ ac3_decoder_obj =		ac3_decoder/ac3_decoder_thread.o \
 						ac3_decoder/ac3_rematrix.o \
 						ac3_decoder/ac3_imdct.o \
 						ac3_decoder/ac3_downmix.o
+						
+lpcm_decoder_obj =		lpcm_decoder/lpcm_decoder_thread.o \
+						lpcm_decoder/lpcm_decoder.o
 
 audio_decoder_obj =		audio_decoder/audio_decoder_thread.o \
 						audio_decoder/audio_decoder.o \
@@ -288,6 +291,7 @@ C_OBJ = $(interface_obj) \
 		$(audio_output_obj) \
 		$(video_output_obj) \
 		$(ac3_decoder_obj) \
+		$(lpcm_decoder_obj) \
 		$(audio_decoder_obj) \
 		$(spu_decoder_obj) \
 		$(generic_decoder_obj) \

@@ -60,6 +60,9 @@
 #include "ac3_decoder.h"              /* ac3dec_t (for ac3_decoder_thread.h) */
 #include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */
 
+#include "lpcm_decoder.h"
+#include "lpcm_decoder_thread.h"
+
 #include "video.h"                          /* picture_t (for video_output.h) */
 #include "video_output.h"                                   /* vout_thread_t */
 
@@ -443,6 +446,9 @@ static void EndThread( input_thread_t * p_input )
             break;
         case AC3_AUDIO_ES:
             ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
+            break;
+        case LPCM_AUDIO_ES:
+            lpcmdec_DestroyThread((lpcmdec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
             break;
         case DVD_SPU_ES:
             spudec_DestroyThread( (spudec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
@@ -1223,6 +1229,10 @@ static __inline__ void input_ParsePES( input_thread_t *p_input,
                 /* we skip 4 bytes at the beginning of the AC3 payload */
                 //p_ts->i_payload_start += 4;
                 p_fifo = &(((ac3dec_thread_t *)(p_es_descriptor->p_dec))->fifo);
+                break;
+
+	    case LPCM_AUDIO_ES:
+                p_fifo = &(((lpcmdec_thread_t *)(p_es_descriptor->p_dec))->fifo);
                 break;
 
             case DVD_SPU_ES:
