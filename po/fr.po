@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-06-26 15:42+0200\n"
+"POT-Creation-Date: 2003-07-01 15:53+0200\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be>\n"
 "Language-Team: \n"
@@ -16,7 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8-bit\n"
 
 #: include/vlc_interface.h:72
-#, fuzzy
 msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a dos command box, go to "
@@ -25,7 +24,7 @@ msgstr ""
 "\n"
 "Attention : si vous n'avez plus accès à l'interface graphique, ouvrez une "
 "invite de commande DOS, ouvrez le répertoire où vous avez installé VLC, et "
-"lancez \"vlc -I win32\"\n"
+"lancez \"vlc -I wxwin\"\n"
 
 #: src/audio_output/output.c:104 src/audio_output/output.c:131
 #: modules/gui/macosx/intf.m:384 modules/gui/macosx/intf.m:385
@@ -125,7 +124,7 @@ msgid "Program"
 msgstr "Programme"
 
 #: src/input/input_programs.c:98 modules/demux/asf/libasf.c:696
-#: modules/demux/mkv.cpp:2265 modules/gui/beos/MediaControlView.cpp:1258
+#: modules/demux/mkv.cpp:2392 modules/gui/beos/MediaControlView.cpp:1258
 #: modules/gui/gtk/gnome_interface.c:1650 modules/gui/gtk/gtk_interface.c:1956
 #: modules/gui/gtk/menu.c:1402 modules/gui/gtk/menu.c:1423
 #: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:373
@@ -188,7 +187,7 @@ msgstr "Chapitre suivant"
 msgid "Previous Chapter"
 msgstr "Chapitre précédent"
 
-#: src/input/input_programs.c:668 src/video_output/video_output.c:397
+#: src/input/input_programs.c:668 src/video_output/video_output.c:401
 msgid "Disable"
 msgstr "Désactiver"
 
@@ -1089,7 +1088,7 @@ msgstr "Interface"
 
 #: src/libvlc.h:458 modules/audio_output/coreaudio.c:227
 #: modules/audio_output/file.c:108 modules/demux/asf/asf.c:228
-#: modules/demux/mkv.cpp:2295 modules/demux/ogg.c:557 modules/demux/ogg.c:829
+#: modules/demux/mkv.cpp:2443 modules/demux/ogg.c:557 modules/demux/ogg.c:829
 #: modules/demux/ogg.c:1002 modules/gui/beos/InterfaceWindow.cpp:259
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
 #: modules/gui/macosx/intf.m:378 modules/gui/macosx/output.m:155
@@ -1097,7 +1096,7 @@ msgid "Audio"
 msgstr "Audio"
 
 #: src/libvlc.h:477 modules/demux/asf/asf.c:302 modules/demux/avi/avi.c:1208
-#: modules/demux/mkv.cpp:2311 modules/demux/ogg.c:629 modules/demux/ogg.c:669
+#: modules/demux/mkv.cpp:2459 modules/demux/ogg.c:629 modules/demux/ogg.c:669
 #: modules/demux/ogg.c:734 modules/demux/ogg.c:909
 #: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
 #: modules/gui/macosx/intf.m:389 modules/gui/macosx/macosx.m:68
@@ -1176,13 +1175,13 @@ msgstr "Afficher le nom et la version du logiciel"
 msgid "boolean"
 msgstr "Booléen"
 
-#: src/video_output/video_output.c:384 modules/gui/beos/VideoOutput.cpp:1151
-#: modules/gui/macosx/applescript.m:122 modules/gui/macosx/controls.m:342
-#: modules/gui/macosx/controls.m:684 modules/gui/macosx/intf.m:394
+#: src/video_output/video_output.c:388 modules/gui/beos/VideoOutput.cpp:1151
+#: modules/gui/macosx/applescript.m:122 modules/gui/macosx/controls.m:356
+#: modules/gui/macosx/controls.m:698 modules/gui/macosx/intf.m:394
 msgid "Fullscreen"
 msgstr "Plein écran"
 
-#: src/video_output/video_output.c:395 modules/gui/gtk/gnome_interface.c:183
+#: src/video_output/video_output.c:399 modules/gui/gtk/gnome_interface.c:183
 #: modules/gui/gtk/gnome_interface.c:966 modules/gui/gtk/gtk_interface.c:553
 #: modules/gui/gtk/gtk_interface.c:1349 modules/gui/macosx/intf.m:402
 #: modules/gui/macosx/intf.m:403
@@ -1190,24 +1189,23 @@ msgstr "Plein écran"
 msgid "Deinterlace"
 msgstr "Désentrelacer"
 
-#: src/video_output/video_output.c:399
+#: src/video_output/video_output.c:403
 msgid "Discard"
 msgstr "Négliger"
 
-#: src/video_output/video_output.c:401
-msgid "Blend"
-msgstr ""
-
-#: src/video_output/video_output.c:403
-#, fuzzy
-msgid "Mean"
-msgstr "Verticale"
-
 #: src/video_output/video_output.c:405
+msgid "Blend"
+msgstr "Fondu"
+
+#: src/video_output/video_output.c:407
+msgid "Mean"
+msgstr "Moyenne"
+
+#: src/video_output/video_output.c:409
 msgid "Bob"
 msgstr ""
 
-#: src/video_output/video_output.c:407
+#: src/video_output/video_output.c:411
 msgid "Linear"
 msgstr "Linéaire"
 
@@ -1472,9 +1470,8 @@ msgid "UDP stream ouput"
 msgstr "Flux de sortie UDP"
 
 #: modules/access_output/udp.c:81
-#, fuzzy
 msgid "udp stream output"
-msgstr "Activer le flux de sortie"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:48
 msgid "Characteristic dimension"
@@ -1923,9 +1920,8 @@ msgid "MPEG audio layer I/II/III parser"
 msgstr "Parseur MPEG audio couches I/II/III"
 
 #: modules/codec/mpeg_audio/decoder.c:55
-#, fuzzy
 msgid "MPEG I/II layer 1/2 audio decoder"
-msgstr "Décodeur vidéo MPEG I/II"
+msgstr "Décodeur audio MPEG I/II layer 1/2"
 
 #: modules/codec/mpeg_video/idct/idct.c:41
 msgid "IDCT"
@@ -2002,9 +1998,9 @@ msgstr "Utiliser des processeurs supplémentaires"
 msgid ""
 "This video decoder can benefit from a multiprocessor computer. If you have "
 "one, you can specify the number of processors here."
-msgstr "iCe décodeur vidéo peut tirer partie d'un ordinateur "
-"multi-processeurs. Si vous en avez un, vous pouvez indiquer le nombre de "
-"procésseurs ici."
+msgstr ""
+"iCe décodeur vidéo peut tirer partie d'un ordinateur multi-processeurs. Si "
+"vous en avez un, vous pouvez indiquer le nombre de procésseurs ici."
 
 #: modules/codec/mpeg_video/parser.c:76
 msgid "Force synchro algorithm {I|I+|IP|IP+|IPB}"
@@ -2143,7 +2139,7 @@ msgstr "Suspendre"
 #: modules/gui/macosx/intf.m:324 modules/gui/macosx/intf.m:362
 #: modules/gui/macosx/intf.m:423 modules/gui/macosx/intf.m:931
 #: modules/gui/macosx/intf.m:932 modules/gui/macosx/intf.m:933
-#: modules/gui/macosx/playlist.m:178 modules/gui/wxwindows/interface.cpp:371
+#: modules/gui/macosx/playlist.m:194 modules/gui/wxwindows/interface.cpp:371
 #: modules/gui/wxwindows/interface.cpp:848
 msgid "Play"
 msgstr "Lire"
@@ -2196,7 +2192,7 @@ msgid "Layer"
 msgstr "Couche"
 
 #: modules/demux/aac/demux.c:562 modules/demux/asf/asf.c:275
-#: modules/demux/avi/avi.c:1176 modules/demux/mkv.cpp:2299
+#: modules/demux/avi/avi.c:1176 modules/demux/mkv.cpp:2447
 #: modules/demux/ogg.c:561 modules/demux/ogg.c:837 modules/demux/ogg.c:1010
 #: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:931
 #: modules/gui/gtk/gtk_interface.c:481 modules/gui/gtk/gtk_interface.c:1282
@@ -2204,7 +2200,7 @@ msgid "Channels"
 msgstr "Canaux"
 
 #: modules/demux/aac/demux.c:564 modules/demux/asf/asf.c:277
-#: modules/demux/avi/avi.c:1178 modules/demux/mkv.cpp:2303
+#: modules/demux/avi/avi.c:1178 modules/demux/mkv.cpp:2451
 #: modules/demux/mpeg/audio.c:632 modules/demux/ogg.c:559
 #: modules/demux/ogg.c:671 modules/demux/ogg.c:832 modules/demux/ogg.c:1005
 msgid "Sample Rate"
@@ -2214,14 +2210,14 @@ msgstr "Débit"
 msgid "ASF v1.0 demuxer (file only)"
 msgstr ""
 
-#: modules/demux/asf/asf.c:165 modules/demux/mkv.cpp:2283
+#: modules/demux/asf/asf.c:165 modules/demux/mkv.cpp:2410
 msgid "Number of streams"
 msgstr "Nombre de flux"
 
 #: modules/demux/asf/asf.c:228 modules/demux/asf/asf.c:302
 #: modules/demux/avi/avi.c:1172 modules/demux/avi/avi.c:1208
-#: modules/demux/avi/avi.c:1239 modules/demux/mkv.cpp:2295
-#: modules/demux/mkv.cpp:2311 modules/demux/mkv.cpp:2327
+#: modules/demux/avi/avi.c:1239 modules/demux/mkv.cpp:2443
+#: modules/demux/mkv.cpp:2459 modules/demux/mkv.cpp:2475
 #: modules/demux/ogg.c:557 modules/demux/ogg.c:629 modules/demux/ogg.c:669
 #: modules/demux/ogg.c:734 modules/demux/ogg.c:829 modules/demux/ogg.c:909
 #: modules/demux/ogg.c:1002 modules/gui/familiar/interface.c:370
@@ -2231,8 +2227,8 @@ msgstr ""
 
 #: modules/demux/asf/asf.c:260 modules/demux/asf/asf.c:318
 #: modules/demux/avi/avi.c:1174 modules/demux/avi/avi.c:1209
-#: modules/demux/mkv.cpp:2296 modules/demux/mkv.cpp:2312
-#: modules/demux/mkv.cpp:2328 modules/demux/ogg.c:558 modules/demux/ogg.c:630
+#: modules/demux/mkv.cpp:2444 modules/demux/mkv.cpp:2460
+#: modules/demux/mkv.cpp:2476 modules/demux/ogg.c:558 modules/demux/ogg.c:630
 #: modules/demux/ogg.c:670 modules/demux/ogg.c:735 modules/demux/ogg.c:830
 #: modules/demux/ogg.c:910 modules/demux/ogg.c:1003
 msgid "Codec"
@@ -2243,7 +2239,7 @@ msgid "Avg. byterate"
 msgstr ""
 
 #: modules/demux/asf/asf.c:282 modules/demux/avi/avi.c:1180
-#: modules/demux/mkv.cpp:2307
+#: modules/demux/mkv.cpp:2455
 msgid "Bits Per Sample"
 msgstr ""
 
@@ -2252,7 +2248,7 @@ msgid "Size"
 msgstr "Taille"
 
 #: modules/demux/asf/asf.c:335 modules/demux/avi/avi.c:1211
-#: modules/demux/mkv.cpp:2315
+#: modules/demux/mkv.cpp:2463
 msgid "Resolution"
 msgstr "Résolution"
 
@@ -2362,58 +2358,74 @@ msgstr ""
 msgid "flac demuxer"
 msgstr "Démultiplexeur flac"
 
-#: modules/demux/m3u.c:65
+#: modules/demux/m3u.c:63
 msgid "playlist metademux"
 msgstr "Liste de lecture (meta-demultiplexeur)"
 
-#: modules/demux/mkv.cpp:91
-#, fuzzy
+#: modules/demux/mkv.cpp:94
 msgid "mkv-demuxer"
-msgstr "Démultiplexeur WAV"
+msgstr "Démultiplexeur mkv"
 
-#: modules/demux/mkv.cpp:93 modules/demux/mkv.cpp:94
+#: modules/demux/mkv.cpp:96 modules/demux/mkv.cpp:97
 msgid "Seek based on percent not time"
 msgstr ""
 
-#: modules/demux/mkv.cpp:96
-#, fuzzy
+#: modules/demux/mkv.cpp:99
 msgid "mka/mkv stream demuxer"
-msgstr "Démultiplexeur de flux AAC"
+msgstr "Démultiplexeur de flux mka/mkv"
 
-#: modules/demux/mkv.cpp:2260 modules/gui/gtk/gnome_interface.c:2436
+#: modules/demux/mkv.cpp:2387 modules/gui/gtk/gnome_interface.c:2436
 #: modules/gui/gtk/gtk_interface.c:2857 modules/gui/wxwindows/playlist.cpp:148
 msgid "Duration"
 msgstr "Durée"
 
-#: modules/demux/mkv.cpp:2269
+#: modules/demux/mkv.cpp:2396
 msgid "Date UTC"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2273
-#, fuzzy
+#: modules/demux/mkv.cpp:2400
 msgid "Segment Filename"
-msgstr "Nom de fichier"
+msgstr ""
 
-#: modules/demux/mkv.cpp:2277
-#, fuzzy
+#: modules/demux/mkv.cpp:2404
 msgid "Muxing Application"
-msgstr "À propos de cette application"
+msgstr ""
 
-#: modules/demux/mkv.cpp:2281
-#, fuzzy
+#: modules/demux/mkv.cpp:2408
 msgid "Writing Application"
-msgstr "Position de départ"
+msgstr ""
 
-#: modules/demux/mkv.cpp:2319
+#: modules/demux/mkv.cpp:2421 modules/gui/beos/PlayListWindow.cpp:144
+#: modules/gui/familiar/interface.c:362 modules/gui/gtk/preferences.c:325
+#: modules/gui/kde/pluginsbox.cpp:45
+msgid "Name"
+msgstr "Nom"
+
+#: modules/demux/mkv.cpp:2425
+msgid "Codec Name"
+msgstr ""
+
+#: modules/demux/mkv.cpp:2429
+msgid "Codec Setting"
+msgstr ""
+
+#: modules/demux/mkv.cpp:2433
+msgid "Codec Info"
+msgstr ""
+
+#: modules/demux/mkv.cpp:2437
+msgid "Codec Download"
+msgstr ""
+
+#: modules/demux/mkv.cpp:2467
 msgid "Display Resolution"
 msgstr "Résolution d'affichage"
 
-#: modules/demux/mkv.cpp:2323
-#, fuzzy
+#: modules/demux/mkv.cpp:2471
 msgid "Frame Per Second"
 msgstr "Images par seconde"
 
-#: modules/demux/mkv.cpp:2327 modules/gui/gtk/gnome_interface.c:1963
+#: modules/demux/mkv.cpp:2475 modules/gui/gtk/gnome_interface.c:1963
 #: modules/gui/gtk/gtk_interface.c:2278
 msgid "Subtitle"
 msgstr "Sous-titre"
@@ -2478,8 +2490,9 @@ msgstr "PSI pépiné"
 msgid ""
 "If you have a stream whose PSI packets do not feature incremented continuity "
 "counters, select this option."
-msgstr "Cochez cette option si les packets PSI de votre flux ne possèdent pas "
-"de compteurs de continuité."
+msgstr ""
+"Cochez cette option si les packets PSI de votre flux ne possèdent pas de "
+"compteurs de continuité."
 
 #: modules/demux/mpeg/ts.c:110
 msgid "ISO 13818-1 MPEG Transport Stream input"
@@ -2941,9 +2954,8 @@ msgid "Open Disc"
 msgstr "Ouvrir disque"
 
 #: modules/gui/beos/InterfaceWindow.cpp:245
-#, fuzzy
 msgid "Open Subtitles"
-msgstr "Sous-titres"
+msgstr ""
 
 #: modules/gui/beos/InterfaceWindow.cpp:249
 #: modules/gui/familiar/interface.c:231 modules/gui/familiar/interface.c:232
@@ -3027,14 +3039,13 @@ msgid "Edit"
 msgstr "Édition"
 
 #: modules/gui/beos/PlayListWindow.cpp:100 modules/gui/macosx/intf.m:359
-#: modules/gui/macosx/playlist.m:180
+#: modules/gui/macosx/playlist.m:196
 msgid "Select All"
 msgstr "Tout sélectionner"
 
 #: modules/gui/beos/PlayListWindow.cpp:103
-#, fuzzy
 msgid "Select None"
-msgstr "Sélection"
+msgstr ""
 
 #: modules/gui/beos/PlayListWindow.cpp:108
 msgid "Sort Reverse"
@@ -3067,12 +3078,6 @@ msgstr "Présentation"
 #: modules/gui/beos/PlayListWindow.cpp:138
 msgid "Path"
 msgstr "Chemin d'accès"
-
-#: modules/gui/beos/PlayListWindow.cpp:144
-#: modules/gui/familiar/interface.c:362 modules/gui/gtk/preferences.c:325
-#: modules/gui/kde/pluginsbox.cpp:45
-msgid "Name"
-msgstr "Nom"
 
 #: modules/gui/beos/PreferencesWindow.cpp:44
 #: modules/gui/beos/PreferencesWindow.cpp:46
@@ -3119,9 +3124,8 @@ msgid "Vertical Sync"
 msgstr "Synchronisation erticale"
 
 #: modules/gui/beos/VideoOutput.cpp:1162
-#, fuzzy
 msgid "Correct Aspect Ratio"
-msgstr "Format d'écran de la source"
+msgstr ""
 
 #: modules/gui/beos/VideoOutput.cpp:1191
 msgid "Stay On Top"
@@ -3140,9 +3144,8 @@ msgid "<unknown>"
 msgstr ""
 
 #: modules/gui/familiar/familiar.c:62
-#, fuzzy
 msgid "Autoplay selected file"
-msgstr "Jouer le flux sélectionné"
+msgstr ""
 
 #: modules/gui/familiar/familiar.c:63
 msgid "Automatically play a file when selected in the file selection list"
@@ -3182,7 +3185,7 @@ msgstr "Jouer le flux"
 
 #: modules/gui/familiar/interface.c:203 modules/gui/gtk/gnome_interface.c:566
 #: modules/gui/gtk/gnome_interface.c:1027 modules/gui/gtk/gtk_interface.c:676
-#: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:633
+#: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:647
 #: modules/gui/macosx/intf.m:325 modules/gui/macosx/intf.m:363
 #: modules/gui/macosx/intf.m:424 modules/gui/wxwindows/interface.cpp:369
 msgid "Stop"
@@ -3201,7 +3204,7 @@ msgid "Forward stream"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:285 modules/gui/gtk/gnome_interface.c:2345
-#: modules/gui/gtk/gtk_interface.c:2712 modules/gui/macosx/playlist.m:182
+#: modules/gui/gtk/gtk_interface.c:2712 modules/gui/macosx/playlist.m:198
 msgid "Add"
 msgstr "Ajouter"
 
@@ -3479,7 +3482,7 @@ msgstr "Baisser le volume"
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:923
 #: modules/gui/gtk/gtk_interface.c:466 modules/gui/gtk/gtk_interface.c:1267
-#: modules/gui/macosx/controls.m:680 modules/gui/macosx/intf.m:381
+#: modules/gui/macosx/controls.m:694 modules/gui/macosx/intf.m:381
 msgid "Mute"
 msgstr "Muet"
 
@@ -3606,7 +3609,7 @@ msgstr "Fichier précédent"
 #: modules/gui/gtk/gnome_interface.c:667
 #: modules/gui/gtk/gnome_interface.c:1056 modules/gui/gtk/gtk_interface.c:769
 #: modules/gui/gtk/gtk_interface.c:852 modules/gui/gtk/gtk_interface.c:896
-#: modules/gui/gtk/gtk_interface.c:1166 modules/gui/macosx/controls.m:641
+#: modules/gui/gtk/gtk_interface.c:1166 modules/gui/macosx/controls.m:655
 #: modules/gui/macosx/intf.m:327 modules/gui/macosx/intf.m:367
 #: modules/gui/macosx/intf.m:425 modules/gui/wxwindows/interface.cpp:378
 msgid "Next"
@@ -3847,7 +3850,7 @@ msgid "Select"
 msgstr "Sélectionner"
 
 #: modules/gui/gtk/gnome_interface.c:2352 modules/gui/gtk/gtk_interface.c:2754
-#: modules/gui/macosx/playlist.m:179 modules/gui/macosx/playlist.m:183
+#: modules/gui/macosx/playlist.m:195 modules/gui/macosx/playlist.m:199
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -4084,9 +4087,8 @@ msgid "Gtk2 interface"
 msgstr "Interface Gtk+"
 
 #: modules/gui/gtk2/gnome2_interface.c:31
-#, fuzzy
 msgid "_New"
-msgstr "_Vue"
+msgstr "_Nouveau"
 
 #: modules/gui/gtk2/gnome2_interface.c:87
 msgid "gnome2"
@@ -4106,19 +4108,16 @@ msgid "Save File"
 msgstr "Enregistrer le fichier"
 
 #: modules/gui/gtk2/gtk2_interface.c:67
-#, fuzzy
 msgid "window1"
-msgstr "Fenêtre"
+msgstr ""
 
 #: modules/gui/gtk2/gtk2_interface.c:109
-#, fuzzy
 msgid "_Edit"
-msgstr "Édition"
+msgstr "_Édition"
 
 #: modules/gui/gtk2/gtk2_interface.c:146
-#, fuzzy
 msgid "_About"
-msgstr "À propos"
+msgstr "_À propos"
 
 #: modules/gui/gtk2/gtk2_interface.c:163
 msgid "button1"
@@ -4161,55 +4160,55 @@ msgstr "Modules"
 msgid "About VLC media player"
 msgstr "À propos du lecteur multimédia VLC"
 
-#: modules/gui/macosx/controls.m:344 modules/gui/macosx/controls.m:685
+#: modules/gui/macosx/controls.m:358 modules/gui/macosx/controls.m:699
 #: modules/gui/macosx/intf.m:390
 msgid "Half Size"
 msgstr "Taille 50 %"
 
-#: modules/gui/macosx/controls.m:346 modules/gui/macosx/controls.m:686
+#: modules/gui/macosx/controls.m:360 modules/gui/macosx/controls.m:700
 #: modules/gui/macosx/intf.m:391
 msgid "Normal Size"
 msgstr "Taille 100 %"
 
-#: modules/gui/macosx/controls.m:348 modules/gui/macosx/controls.m:687
+#: modules/gui/macosx/controls.m:362 modules/gui/macosx/controls.m:701
 #: modules/gui/macosx/intf.m:392
 msgid "Double Size"
 msgstr "Taille 200 %"
 
-#: modules/gui/macosx/controls.m:350 modules/gui/macosx/controls.m:689
-#: modules/gui/macosx/controls.m:696 modules/gui/macosx/intf.m:395
+#: modules/gui/macosx/controls.m:364 modules/gui/macosx/controls.m:703
+#: modules/gui/macosx/controls.m:710 modules/gui/macosx/intf.m:395
 msgid "Float On Top"
 msgstr "Flotter au-dessus"
 
-#: modules/gui/macosx/controls.m:352 modules/gui/macosx/controls.m:688
+#: modules/gui/macosx/controls.m:366 modules/gui/macosx/controls.m:702
 #: modules/gui/macosx/intf.m:393
 msgid "Fit To Screen"
 msgstr "Ajuster à l'écran"
 
-#: modules/gui/macosx/controls.m:619 modules/gui/macosx/intf.m:326
+#: modules/gui/macosx/controls.m:633 modules/gui/macosx/intf.m:326
 #: modules/gui/macosx/intf.m:364 modules/gui/wxwindows/interface.cpp:382
 msgid "Faster"
 msgstr "Accélérer"
 
-#: modules/gui/macosx/controls.m:620 modules/gui/macosx/intf.m:323
+#: modules/gui/macosx/controls.m:634 modules/gui/macosx/intf.m:323
 #: modules/gui/macosx/intf.m:365 modules/gui/wxwindows/interface.cpp:380
 msgid "Slower"
 msgstr "Ralentir"
 
-#: modules/gui/macosx/controls.m:640 modules/gui/macosx/intf.m:322
+#: modules/gui/macosx/controls.m:654 modules/gui/macosx/intf.m:322
 #: modules/gui/macosx/intf.m:366 modules/gui/macosx/intf.m:426
 msgid "Previous"
 msgstr "Précédent"
 
-#: modules/gui/macosx/controls.m:659 modules/gui/macosx/intf.m:368
+#: modules/gui/macosx/controls.m:673 modules/gui/macosx/intf.m:368
 msgid "Loop"
 msgstr "Tout répéter"
 
-#: modules/gui/macosx/controls.m:666 modules/gui/macosx/intf.m:369
+#: modules/gui/macosx/controls.m:680 modules/gui/macosx/intf.m:369
 msgid "Step Forward"
 msgstr "Avancer"
 
-#: modules/gui/macosx/controls.m:667 modules/gui/macosx/intf.m:370
+#: modules/gui/macosx/controls.m:681 modules/gui/macosx/intf.m:370
 msgid "Step Backward"
 msgstr "Reculer"
 
@@ -4333,9 +4332,8 @@ msgid "ReadMe..."
 msgstr "Lisez-moi..."
 
 #: modules/gui/macosx/intf.m:417
-#, fuzzy
 msgid "Online Documentation"
-msgstr "Compensation de mouvement"
+msgstr ""
 
 #: modules/gui/macosx/intf.m:418
 msgid "Report a Bug"
@@ -4432,9 +4430,8 @@ msgstr "Dossier VIDEO_TS"
 
 #: modules/gui/macosx/open.m:157 modules/gui/macosx/open.m:389
 #: modules/gui/macosx/open.m:480
-#, fuzzy
 msgid "Audio CD"
-msgstr "Audio"
+msgstr ""
 
 #: modules/gui/macosx/open.m:171
 msgid "Load subtitles file:"
@@ -4459,9 +4456,8 @@ msgid "Open VIDEO_TS Directory"
 msgstr "Ouvrir un dossier VIDEO_TS"
 
 #: modules/gui/macosx/output.m:119
-#, fuzzy
 msgid "Advanced output:"
-msgstr "Sortie audio ALSA"
+msgstr ""
 
 #: modules/gui/macosx/output.m:123
 msgid "Output Options"
@@ -4495,9 +4491,8 @@ msgid "Ogg"
 msgstr ""
 
 #: modules/gui/macosx/output.m:143
-#, fuzzy
 msgid "Transcode options"
-msgstr "Suspendre le flux"
+msgstr ""
 
 #: modules/gui/macosx/output.m:153 modules/gui/macosx/output.m:158
 #: modules/gui/wxwindows/streamout.cpp:521
@@ -4651,9 +4646,8 @@ msgid "&Playlist..."
 msgstr "Liste de lecture..."
 
 #: modules/gui/wxwindows/interface.cpp:292
-#, fuzzy
 msgid "&Messages..."
-msgstr "Messages..."
+msgstr "&Messages..."
 
 #: modules/gui/wxwindows/interface.cpp:293
 msgid "&File info..."
@@ -4785,9 +4779,8 @@ msgid "Input menu"
 msgstr "Entrée"
 
 #: modules/gui/wxwindows/menus.cpp:173
-#, fuzzy
 msgid "Close Menu"
-msgstr "Tout effacer"
+msgstr ""
 
 #: modules/gui/wxwindows/menus.cpp:337
 msgid "Empty"
@@ -4805,9 +4798,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:195 modules/gui/wxwindows/subtitles.cpp:98
-#, fuzzy
 msgid "Subtitles file"
-msgstr "Sous-titres"
+msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:196
 msgid "Load an additional subtitles file. Currently only works with AVI files."
@@ -4890,9 +4882,8 @@ msgid "No configuration options available"
 msgstr "Pas d'option de configuration disponible"
 
 #: modules/gui/wxwindows/preferences.cpp:919
-#, fuzzy
 msgid "Advanced options"
-msgstr "Afficher les options avancées"
+msgstr "Options avancées"
 
 #: modules/gui/wxwindows/streamout.cpp:170
 msgid "Stream output MRL"
@@ -4910,7 +4901,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/wxwindows/streamout.cpp:340
-#, fuzzy
 msgid "Output Methods"
 msgstr "Méthode de sortie"
 
@@ -4923,9 +4913,8 @@ msgid "Filename"
 msgstr "Nom de fichier"
 
 #: modules/gui/wxwindows/streamout.cpp:484
-#, fuzzy
 msgid "Transcoding options"
-msgstr "Afficher les options avancées"
+msgstr ""
 
 #: modules/gui/wxwindows/streamout.cpp:515
 msgid "Video codec"
@@ -4986,34 +4975,28 @@ msgid ""
 msgstr ""
 
 #: modules/misc/dummy/dummy.c:53
-#, fuzzy
 msgid "dummy interface function"
-msgstr "Fonctions qui ne font rien"
+msgstr "fonctions d'interface qui ne fint rien"
 
 #: modules/misc/dummy/dummy.c:62
-#, fuzzy
 msgid "dummy access function"
-msgstr "Fonctions qui ne font rien"
+msgstr "fonctions d'accès qui ne font rien"
 
 #: modules/misc/dummy/dummy.c:66
-#, fuzzy
 msgid "dummy demux function"
-msgstr "Fonctions qui ne font rien"
+msgstr "fonctions de démultiplexage qui ne font rien"
 
 #: modules/misc/dummy/dummy.c:70
-#, fuzzy
 msgid "dummy decoder function"
-msgstr "Fonctions qui ne font rien"
+msgstr "fonctions de décodage qui ne font rien"
 
 #: modules/misc/dummy/dummy.c:74
-#, fuzzy
 msgid "dummy audio output function"
-msgstr "Fonctions qui ne font rien"
+msgstr "fonctions de sortie audio qui ne font rien"
 
 #: modules/misc/dummy/dummy.c:78
-#, fuzzy
 msgid "dummy video output function"
-msgstr "Fonctions qui ne font rien"
+msgstr "fonctions de sortie vidéo qui ne font rien"
 
 #: modules/misc/dummy/interface.c:52
 msgid "Using the dummy interface plugin..."
@@ -5092,18 +5075,16 @@ msgid ""
 msgstr ""
 
 #: modules/misc/qte_main.cpp:71
-#, fuzzy
 msgid "Qt Embedded GUI helper"
-msgstr "Module vidéo Qt Embedded"
+msgstr ""
 
 #: modules/misc/sap.c:161
 msgid "SAP interface"
 msgstr "Interface SAP"
 
 #: modules/misc/screensaver.c:44
-#, fuzzy
 msgid "screensaver disabling helper"
-msgstr "Module de désentrelacement"
+msgstr ""
 
 #: modules/misc/testsuite/test1.c:33
 msgid "C module that does nothing"
@@ -5158,49 +5139,40 @@ msgid "MPEG4 Video packetizer"
 msgstr ""
 
 #: modules/packetizer/mpegaudio.c:70
-#, fuzzy
 msgid "MPEG-I/II audio packetizer"
-msgstr "Démultiplexeur MPEG I/II layer 1/2"
+msgstr ""
 
 #: modules/packetizer/mpegvideo.c:88
-#, fuzzy
 msgid "MPEG-I/II video packetizer"
-msgstr "Module décodeur vidéo MPEG I/II"
+msgstr ""
 
 #: modules/packetizer/vorbis.c:89
-#, fuzzy
 msgid "Vorbis audio packetizer"
-msgstr "Décodeur audio Vorbis"
+msgstr ""
 
 #: modules/stream_out/display.c:50
-#, fuzzy
 msgid "Display stream"
-msgstr "Jouer le flux"
+msgstr ""
 
 #: modules/stream_out/dummy.c:47
-#, fuzzy
 msgid "Dummy stream"
-msgstr "Flux de sortie muet"
+msgstr ""
 
 #: modules/stream_out/duplicate.c:48
-#, fuzzy
 msgid "Duplicate stream"
-msgstr "Jouer le flux"
+msgstr ""
 
 #: modules/stream_out/es.c:49
-#, fuzzy
 msgid "ES stream"
-msgstr "Arrêter le flux"
+msgstr ""
 
 #: modules/stream_out/standard.c:51
-#, fuzzy
 msgid "Standard stream"
-msgstr "Arrêter le flux"
+msgstr ""
 
-#: modules/stream_out/transcode.c:63
-#, fuzzy
+#: modules/stream_out/transcode.c:68
 msgid "Transcode stream"
-msgstr "Suspendre le flux"
+msgstr ""
 
 #: modules/video_chroma/i420_rgb.c:67
 msgid "I420,IYUV,YV12 to RGB2,RV15,RV16,RV24,RV32 conversions"
@@ -5453,9 +5425,8 @@ msgstr ""
 "Cette option reste sans effet en cas de recouvrements."
 
 #: modules/video_output/directx/directx.c:100
-#, fuzzy
 msgid "Use video buffers in system memory"
-msgstr "Utiliser les tampons vidéo dans la mémoire du système"
+msgstr "Utiliser les tampons vidéo dans la mémoire système"
 
 #: modules/video_output/directx/directx.c:102
 msgid ""
@@ -5471,7 +5442,6 @@ msgstr ""
 "option reste sans effet en cas de recouvrements."
 
 #: modules/video_output/directx/directx.c:106
-#, fuzzy
 msgid "Use triple buffering for overlays"
 msgstr "Utiliser trois buffers vidéo pour l'overlay"
 
@@ -5486,9 +5456,8 @@ msgid "DirectX video output"
 msgstr "Sortie vidéo DirectX"
 
 #: modules/video_output/encoder.c:53
-#, fuzzy
 msgid "Encoder wrapper"
-msgstr "Encodeurs"
+msgstr ""
 
 #: modules/video_output/fb.c:68
 msgid "Frame Buffer"
@@ -5525,7 +5494,6 @@ msgstr "Sortie vidéo Matrox Graphic Array"
 
 #: modules/video_output/mga/xmga.c:87 modules/video_output/x11/x11.c:43
 #: modules/video_output/x11/xvideo.c:49
-#, fuzzy
 msgid "Alternate fullscreen method"
 msgstr "Mode plein écran spécial"
 
@@ -5651,7 +5619,6 @@ msgid "scope effect"
 msgstr "Module d'oscilloscope"
 
 #: modules/visualization/xosd/xosd.c:61
-#, fuzzy
 msgid "Flip vertical position"
 msgstr "Inverser la position verticale"
 
@@ -5679,14 +5646,13 @@ msgstr ""
 msgid "Font used to display text in the xosd output"
 msgstr "Police utilisée pour afficher le texte dans la sortie xosd"
 
-#: modules/visualization/xosd/xosd.c:76
+#: modules/visualization/xosd/xosd.c:75
 msgid "XOSD module"
 msgstr "Module XOSD"
 
-#: modules/visualization/xosd/xosd.c:83
-#, fuzzy
+#: modules/visualization/xosd/xosd.c:82
 msgid "xosd interface"
-msgstr "Module d'interface xosd"
+msgstr "interface xosd"
 
 #~ msgid "Ffmpeg postprocessing module"
 #~ msgstr "Module de post-traitement ffmpeg"
@@ -5822,9 +5788,6 @@ msgstr "Module d'interface xosd"
 
 #~ msgid "Audio settings"
 #~ msgstr "Paramètres audio"
-
-#~ msgid "Video settings"
-#~ msgstr "Paramètres vidéo"
 
 #~ msgid "New stream"
 #~ msgstr "Nouveau flux"

@@ -1,5 +1,5 @@
 dnl  Macros needed for VLC
-dnl  $Id: vlc.m4,v 1.4 2003/06/29 14:57:49 sam Exp $
+dnl  $Id: vlc.m4,v 1.5 2003/07/01 14:25:47 sam Exp $
 
 dnl  Add plugins or builtins
 AC_DEFUN([AX_ADD_BUILTINS], [
@@ -31,41 +31,43 @@ dnl  Special cases: vlc, pics, plugins, save
 AC_DEFUN([AX_ADD_CPPFLAGS], [
   for element in [$1]; do
     eval "CPPFLAGS_${element}="'"$'"{CPPFLAGS_${element}} $2"'"'
-    am_plugins_with_cppflags="${am_plugins_with_cppflags} ${element}"
+    am_modules_with_cppflags="${am_modules_with_cppflags} ${element}"
   done
 ])
 
 AC_DEFUN([AX_ADD_CFLAGS], [
   for element in [$1]; do
     eval "CFLAGS_${element}="'"$'"{CFLAGS_${element}} $2"'"'
-    am_plugins_with_cflags="${am_plugins_with_cflags} ${element}"
+    am_modules_with_cflags="${am_modules_with_cflags} ${element}"
   done
 ])
 
 AC_DEFUN([AX_ADD_CXXFLAGS], [
   for element in [$1]; do
     eval "CXXFLAGS_${element}="'"$'"{CXXFLAGS_${element}} $2"'"'
-    am_plugins_with_cxxflags="${am_plugins_with_cxxflags} ${element}"
+    am_modules_with_cxxflags="${am_modules_with_cxxflags} ${element}"
   done
 ])
 
 AC_DEFUN([AX_ADD_OBJCFLAGS], [
   for element in [$1]; do
     eval "OBJCFLAGS_${element}="'"$'"{OBJCFLAGS_${element}} $2"'"'
-    am_plugins_with_objcflags="${am_plugins_with_objcflags} ${element}"
+    am_modules_with_objcflags="${am_modules_with_objcflags} ${element}"
   done
 ])
 
 AC_DEFUN([AX_ADD_LDFLAGS], [
   for element in [$1]; do
     eval "LDFLAGS_${element}="'"'"$2 "'$'"{LDFLAGS_${element}} "'"'
-    am_plugins_with_ldflags="${am_plugins_with_ldflags} ${element}"
+    am_modules_with_ldflags="${am_modules_with_ldflags} ${element}"
   done
 ])
 
 AC_DEFUN([AX_OUTPUT_VLC_CONFIG_IN], [
 
   AC_MSG_RESULT(configure: creating ./vlc-config.in)
+
+  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags}; do echo $x; done | sort | uniq`"
 
   rm -f vlc-config.in
   sed -ne '/#@1@#/q;p' < "${srcdir}/vlc-config.in.in" \
@@ -83,7 +85,7 @@ AC_DEFUN([AX_OUTPUT_VLC_CONFIG_IN], [
     > vlc-config.in
 
   dnl  Switch/case loop
-  for x in `echo ${am_plugins_with_ldflags}`
+  for x in `echo ${am_all_modules}`
   do [
     echo "    ${x})" >> vlc-config.in
     if test -n "`eval echo '$'CPPFLAGS_${x}`"; then
