@@ -221,8 +221,8 @@ AutoBuiltPanel::AutoBuiltPanel( wxWindow *parent, OpenDialog *dialog,
 
         /* Build the advanced dialog */
         p_advanced_dialog =
-            new wxDialog( this, -1, wxU(_("Advanced options")) + wxT(" (") +
-                          wxU( p_module->psz_longname ) + wxT(")"),
+            new wxDialog( this, -1, ((wxString)wxU(_("Advanced options"))) +
+                          wxT(" (") + wxU( p_module->psz_longname ) + wxT(")"),
                           wxDefaultPosition, wxDefaultSize,
                           wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
 
