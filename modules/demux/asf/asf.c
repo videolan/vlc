@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.24 2003/03/16 13:11:28 fenrir Exp $
+ * $Id: asf.c,v 1.25 2003/03/31 23:32:44 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -323,9 +323,8 @@ static int Activate( vlc_object_t * p_this )
                 p_bih->biPlanes     = GetDWLE( p_data + 12 );
                 input_AddInfo( p_cat, _("Planes"), "%d", p_bih->biPlanes );
                 p_bih->biBitCount   = GetDWLE( p_data + 14 );
-                input_AddInfo( p_cat, _("Bits per pixel"), "%d", p_bih->biBitCount );
+                input_AddInfo( p_cat, _("Bits Per Pixel"), "%d", p_bih->biBitCount );
                 p_bih->biCompression= GetDWLE( p_data + 16 );
-                input_AddInfo( p_cat, _("Compression Rate"), "%d", p_bih->biCompression );
                 p_bih->biSizeImage  = GetDWLE( p_data + 20 );
                 input_AddInfo( p_cat, _("Image Size"), "%d", p_bih->biSizeImage );
                 p_bih->biXPelsPerMeter = GetDWLE( p_data + 24 );
@@ -796,7 +795,7 @@ static int Demux( input_thread_t *p_input )
     {
         off_t i_offset;
 
-        msleep( DEFAULT_PTS_DELAY );
+        msleep( p_input->i_pts_delay );
         i_offset = ASF_TellAbsolute( p_input ) - p_demux->i_data_begin;
 
         if( i_offset  < 0 )
