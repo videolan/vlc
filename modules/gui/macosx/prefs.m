@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.16 2003/02/23 05:53:53 jlj Exp $
+ * $Id: prefs.m,v 1.17 2003/03/06 10:15:37 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -236,8 +236,11 @@
         [o_text_field setBordered: NO]; \
         [o_text_field setEditable: NO]; \
         [o_text_field setSelectable: NO]; \
-        [o_text_field setStringValue: \
-            [NSApp localizedString: label]]; \
+        if ( label ) \
+        { \
+            [o_text_field setStringValue: \
+                [NSApp localizedString: label]]; \
+        } \
         [o_text_field sizeToFit]; \
         [o_view addSubview: [o_text_field autorelease]]; \
     }
