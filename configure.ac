@@ -2116,7 +2116,7 @@ dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
-  VLC_ADD_LDFLAGS([mp4 skins2 sap],[-lz])
+  VLC_ADD_LDFLAGS([mp4 skins2 sap mkv],[-lz])
 ] )
 
 AC_CHECK_HEADERS(sysfs/libsysfs.h, [

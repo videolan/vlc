@@ -71,8 +71,16 @@
 #include "matroska/KaxTrackAudio.h"
 #include "matroska/KaxTrackVideo.h"
 #include "matroska/KaxTrackEntryData.h"
+#include "matroska/KaxContentEncoding.h"
 
 #include "ebml/StdIOCallback.h"
+
+#ifdef HAVE_ZLIB_H
+#   include <zlib.h>
+#endif
+
+#define MATROSKA_COMPRESSION_NONE 0
+#define MATROSKA_COMPRESSION_ZLIB 1
 
 using namespace LIBMATROSKA_NAMESPACE;
 using namespace std;
@@ -103,6 +111,50 @@ static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
 static void Seek   ( demux_t *, mtime_t i_date, int i_percent );
 
+#ifdef HAVE_ZLIB_H
+int do_zlib_decompress( unsigned char *src, unsigned char **_dst, int slen ) {
+    int result, dstsize, n;
+    unsigned char *dst;
+    z_stream d_stream;
+
+    d_stream.zalloc = (alloc_func)0;
+    d_stream.zfree = (free_func)0;
+    d_stream.opaque = (voidpf)0;
+    result = inflateInit(&d_stream);
+    if( result != Z_OK )
+    {
+        printf( "inflateInit() failed. Result: %d\n", result );
+        return( -1 );
+    }
+
+    d_stream.next_in = (Bytef *)src;
+    d_stream.avail_in = slen;
+    n = 0;
+    dst = NULL;
+    do
+    {
+        n++;
+        dst = (unsigned char *)realloc(dst, n * 1000);
+        d_stream.next_out = (Bytef *)&dst[(n - 1) * 1000];
+        d_stream.avail_out = 1000;
+        result = inflate(&d_stream, Z_NO_FLUSH);
+        if( ( result != Z_OK ) && ( result != Z_STREAM_END ) )
+        {
+            printf( "Zlib decompression failed. Result: %d\n", result );
+            return( -1 );
+        }
+    }
+    while( ( d_stream.avail_out == 0 ) && ( d_stream.avail_in != 0 ) &&
+           ( result != Z_STREAM_END ) );
+
+    dstsize = d_stream.total_out;
+    inflateEnd( &d_stream );
+
+    *_dst = (unsigned char *)realloc( dst, dstsize );
+
+    return dstsize;
+}
+#endif
 
 /*****************************************************************************
  * Stream managment
@@ -195,6 +247,9 @@ typedef struct
     char         *psz_codec_settings;
     char         *psz_codec_info_url;
     char         *psz_codec_download_url;
+    
+    /* encryption/compression */
+    vlc_bool_t   b_compression_zlib;
 
 } mkv_track_t;
 
@@ -1773,6 +1828,8 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
     tk->psz_codec_settings = NULL;
     tk->psz_codec_info_url = NULL;
     tk->psz_codec_download_url = NULL;
+    
+    tk->b_compression_zlib = MATROSKA_COMPRESSION_NONE;
 
     for( i = 0; i < m->ListSize(); i++ )
     {
@@ -1905,6 +1962,11 @@ static void ParseTrackEntry( demux_t *p_demux, EbmlMaster *m )
 
             tk->psz_codec_name = UTF8ToStr( UTFstring( cname ) );
             msg_Dbg( p_demux, "|   |   |   + Track Codec Name=%s", tk->psz_codec_name );
+        }
+        else if( MKV_IS_ID( l, KaxContentEncoding ) )
+        {
+            KaxContentEncoding &cenc = *(KaxContentEncoding*)l;
+            msg_Dbg( p_demux, "|   |   |   + Track Content Compression: ZLIB" );
         }
 //        else if( EbmlId( *l ) == KaxCodecSettings::ClassInfos.GlobalId )
 //        {
