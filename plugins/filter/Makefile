@@ -9,12 +9,14 @@
 
 PLUGIN_BOB = bob.o
 PLUGIN_INVERT = invert.o
+PLUGIN_WALL = wall.o
 
 BUILTIN_BOB = $(PLUGIN_BOB:%.o=BUILTIN_%.o)
 BUILTIN_INVERT = $(PLUGIN_INVERT:%.o=BUILTIN_%.o)
+BUILTIN_WALL = $(PLUGIN_WALL:%.o=BUILTIN_%.o)
 
-PLUGIN_C = $(PLUGIN_BOB) $(PLUGIN_INVERT)
-BUILTIN_C = $(BUILTIN_BOB) $(BUILTIN_INVERT)
+PLUGIN_C = $(PLUGIN_BOB) $(PLUGIN_INVERT) $(PLUGIN_WALL)
+BUILTIN_C = $(BUILTIN_BOB) $(BUILTIN_INVERT) $(BUILTIN_WALL)
 ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 #
@@ -38,6 +40,13 @@ include ../../Makefile.modules
 	$(CC) -o $@ $^ $(PLCFLAGS) 
 
 ../filter_invert.a: $(BUILTIN_INVERT)
+	ar r $@ $^
+	$(RANLIB) $@
+
+../filter_wall.so: $(PLUGIN_WALL)
+	$(CC) -o $@ $^ $(PLCFLAGS) 
+
+../filter_wall.a: $(BUILTIN_WALL)
 	ar r $@ $^
 	$(RANLIB) $@
 

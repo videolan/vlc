@@ -310,7 +310,7 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} ac3_spdif spudec chroma_yv12_rgb8 filter_bob filter_invert"
+PLUGINS="${PLUGINS} ac3_spdif spudec chroma_yv12_rgb8 filter_bob filter_invert filter_wall"
 
 dnl
 dnl  Accelerated modules

@@ -66,6 +66,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		fb/fb \
 		filter/filter_bob \
 		filter/filter_invert \
+		filter/filter_wall \
 		ggi/ggi \
 		glide/glide \
 		gtk/gnome \

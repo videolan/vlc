@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.138 2001/12/16 16:18:36 sam Exp $
+ * $Id: main.c,v 1.139 2001/12/17 03:38:21 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -155,16 +155,6 @@
 #define SHORT_HELP                1
 #define LONG_HELP                 2
 
-/* Needed for x86 CPU capabilities detection */
-#define cpuid( a )                 \
-    asm volatile ( "cpuid"         \
-                 : "=a" ( i_eax ), \
-                   "=b" ( i_ebx ), \
-                   "=c" ( i_ecx ), \
-                   "=d" ( i_edx )  \
-                 : "a"  ( a )      \
-                 : "cc" );
-
 /* Long options */
 static const struct option longopts[] =
 {
@@ -218,7 +208,7 @@ static const struct option longopts[] =
     {   "dvdsubtitle",      1,          0,      's' },
     {   "dvdcss-method",    1,          0,      OPT_DVDCSS_METHOD },
     {   "dvdcss-verbose",   1,          0,      OPT_DVDCSS_VERBOSE },
-    
+
     /* Input options */
     {   "input",            1,          0,      OPT_INPUT },
     {   "channels",         0,          0,      OPT_CHANNELS },
@@ -289,7 +279,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_vout_bank   = &vout_bank;
 
 #ifdef ENABLE_NLS
-    /* 
+    /*
      * Support for getext
      */
 #if defined( HAVE_LOCALE_H ) && defined( HAVE_LC_MESSAGES )
@@ -307,17 +297,17 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     textdomain( PACKAGE );
 #endif
-        
+
     /*
      * Initialize threads system
      */
     vlc_threads_init( );
 
     /*
-     * Test if our code is likely to run on this CPU 
+     * Test if our code is likely to run on this CPU
      */
     p_main->i_cpu_capabilities = CPUCapabilities();
-    
+
     /*
      * System specific initialization code
      */
@@ -856,13 +846,13 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
 
         /* Misc options */
-        case OPT_SYNCHRO:                                      
+        case OPT_SYNCHRO:
             main_PutPszVariable( VPAR_SYNCHRO_VAR, optarg );
             break;
-        case OPT_MEMCPY:                                      
+        case OPT_MEMCPY:
             main_PutPszVariable( MEMCPY_METHOD_VAR, optarg );
             break;
-            
+
         /* Decoder options */
         case OPT_MPEG_ADEC:
             main_PutPszVariable( ADEC_MPEG_VAR, optarg );
@@ -1144,7 +1134,7 @@ static void InstructionSignalHandler( int i_signal )
 
     /* Acknowledge the signal received */
     i_illegal = 1;
-    
+
 #ifdef HAVE_SIGRELSE
     sigrelse( i_signal );
 #endif
@@ -1160,15 +1150,7 @@ static int CPUCapabilities( void )
 {
     volatile int i_capabilities = CPU_CAPABILITY_NONE;
 
-#if defined( SYS_BEOS )
-    i_capabilities |= CPU_CAPABILITY_FPU
-                      | CPU_CAPABILITY_486
-                      | CPU_CAPABILITY_586
-                      | CPU_CAPABILITY_MMX;
-
-    return( i_capabilities );
-
-#elif defined( SYS_DARWIN )
+#if defined( SYS_DARWIN )
     struct host_basic_info hi;
     kern_return_t          ret;
     host_name_port_t       host;
@@ -1204,27 +1186,43 @@ static int CPUCapabilities( void )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
     volatile boolean_t     b_amd;
 
+    /* Needed for x86 CPU capabilities detection */
+#   define cpuid( a )                      \
+        asm volatile ( "pushl %%ebx\n\t"   \
+                       "cpuid\n\t"         \
+                       "movl %%ebx,%1\n\t" \
+                       "popl %%ebx\n\t"    \
+                     : "=a" ( i_eax ),     \
+                       "=r" ( i_ebx ),     \
+                       "=c" ( i_ecx ),     \
+                       "=d" ( i_edx )      \
+                     : "a"  ( a )          \
+                     : "cc" );
+
     i_capabilities |= CPU_CAPABILITY_FPU;
 
     signal( SIGILL, InstructionSignalHandler );
-    
+
     /* test for a 486 CPU */
-    asm volatile ( "pushfl\n\t"
+    asm volatile ( "pushl %%ebx\n\t"
+                   "pushfl\n\t"
                    "popl %%eax\n\t"
                    "movl %%eax, %%ebx\n\t"
                    "xorl $0x200000, %%eax\n\t"
                    "pushl %%eax\n\t"
                    "popfl\n\t"
                    "pushfl\n\t"
-                   "popl %%eax"
+                   "popl %%eax\n\t"
+                   "movl %%ebx,%1\n\t"
+                   "popl %%ebx\n\t"
                  : "=a" ( i_eax ),
-                   "=b" ( i_ebx )
+                   "=r" ( i_ebx )
                  :
                  : "cc" );
 
     if( i_eax == i_ebx )
     {
-        signal( SIGILL, NULL );     
+        signal( SIGILL, NULL );
         return( i_capabilities );
     }
 
@@ -1235,7 +1233,7 @@ static int CPUCapabilities( void )
 
     if( !i_eax )
     {
-        signal( SIGILL, NULL );     
+        signal( SIGILL, NULL );
         return( i_capabilities );
     }
 
@@ -1251,7 +1249,7 @@ static int CPUCapabilities( void )
 
     if( ! (i_edx & 0x00800000) )
     {
-        signal( SIGILL, NULL );     
+        signal( SIGILL, NULL );
         return( i_capabilities );
     }
 
@@ -1285,13 +1283,13 @@ static int CPUCapabilities( void )
         }
 #endif
     }
-    
+
     /* test for additional capabilities */
     cpuid( 0x80000000 );
 
     if( i_eax < 0x80000001 )
     {
-        signal( SIGILL, NULL );     
+        signal( SIGILL, NULL );
         return( i_capabilities );
     }
 
@@ -1308,7 +1306,7 @@ static int CPUCapabilities( void )
             __asm__ __volatile__ ( "pfadd %%mm0,%%mm0\n" "femms\n" : : );
         }
 
-        if( i_illegal == 0 ) 
+        if( i_illegal == 0 )
         {
             i_capabilities |= CPU_CAPABILITY_3DNOW;
         }
@@ -1320,7 +1318,7 @@ static int CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
 
-    signal( SIGILL, NULL );     
+    signal( SIGILL, NULL );
     return( i_capabilities );
 
 #elif defined( __powerpc__ )
@@ -1346,7 +1344,7 @@ static int CPUCapabilities( void )
     }
 #endif
 
-    signal( SIGILL, NULL );     
+    signal( SIGILL, NULL );
     return( i_capabilities );
 
 #else
