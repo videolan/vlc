@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.2 2003/08/24 22:20:43 fenrir Exp $
+ * $Id: asf.c,v 1.3 2003/08/25 01:31:25 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,6 +42,7 @@ vlc_module_begin();
     set_description( _("Asf muxer") );
     set_capability( "sout mux", 5 );
     add_shortcut( "asf" );
+    add_shortcut( "asfh" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -89,6 +90,9 @@ struct sout_mux_sys_t
     int             i_pk_used;
     int             i_pk_frame;
     mtime_t         i_pk_dts;
+
+    vlc_bool_t      b_asf_http;
+    int             i_seq;
 };
 
 static int MuxGetStream( sout_mux_t *, int *pi_stream, mtime_t *pi_dts );
@@ -96,6 +100,7 @@ static int MuxGetStream( sout_mux_t *, int *pi_stream, mtime_t *pi_dts );
 static sout_buffer_t *asf_header_create( sout_mux_t *, vlc_bool_t b_broadcast );
 static sout_buffer_t *asf_packet_create( sout_mux_t *,
                                          asf_track_t *, sout_buffer_t * );
+static sout_buffer_t *asf_stream_end_create( sout_mux_t *);
 
 typedef struct
 {
@@ -129,12 +134,18 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_mux       = Mux;
 
     p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
+    p_sys->b_asf_http = p_mux->psz_mux && !strcmp( p_mux->psz_mux, "asfh" );
+    if( p_sys->b_asf_http )
+    {
+        msg_Dbg( p_mux, "creating asf stream to be used with mmsh" );
+    }
     p_sys->pk = NULL;
     p_sys->i_pk_used    = 0;
     p_sys->i_pk_frame   = 0;
     p_sys->i_dts_first  = -1;
     p_sys->i_dts_last   = 0;
     p_sys->i_bitrate    = 0;
+    p_sys->i_seq        = 0;
 
     p_sys->b_write_header = VLC_TRUE;
     p_sys->i_track = 1;
@@ -150,6 +161,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->fid.v4[i] = ( (uint64_t)rand() << 8 ) / RAND_MAX;
     }
 
+
     return VLC_SUCCESS;
 }
 
@@ -160,15 +172,21 @@ static void Close( vlc_object_t * p_this )
 {
     sout_mux_t     *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
+    sout_buffer_t  *out;
     int i;
 
     msg_Dbg( p_mux, "Asf muxer closed" );
 
+    if( ( out = asf_stream_end_create( p_mux ) ) )
+    {
+        sout_AccessOutWrite( p_mux->p_access, out );
+    }
+
     /* rewrite header */
     if( !sout_AccessOutSeek( p_mux->p_access, 0 ) )
     {
-        sout_buffer_t *h = asf_header_create( p_mux, VLC_FALSE );
-        sout_AccessOutWrite( p_mux->p_access, h );
+        out = asf_header_create( p_mux, VLC_FALSE );
+        sout_AccessOutWrite( p_mux->p_access, out );
     }
 
     for( i = 1; i < p_sys->i_track; i++ )
@@ -222,6 +240,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             uint16_t i_tag;
             int      i_blockalign = p_input->p_fmt->i_block_align;
             int      i_bitspersample = 0;
+            int      i_extra = 0;
 
             switch( p_input->p_fmt->i_fourcc )
             {
@@ -230,6 +249,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     break;
                 case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
                     i_tag = WAVE_FORMAT_MPEGLAYER3;
+                    i_extra = 12;
                     break;
                 case VLC_FOURCC( 'w', 'm', 'a', '1' ):
                     i_tag = WAVE_FORMAT_WMA1;
@@ -274,12 +294,25 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             bo_addle_u32( &bo, p_input->p_fmt->i_bitrate / 8 );
             bo_addle_u16( &bo, i_blockalign );
             bo_addle_u16( &bo, i_bitspersample );
-            bo_addle_u16( &bo, p_input->p_fmt->i_extra_data );
             if( p_input->p_fmt->i_extra_data > 0 )
             {
+                bo_addle_u16( &bo, p_input->p_fmt->i_extra_data );
                 bo_add_mem  ( &bo, p_input->p_fmt->p_extra_data,
                               p_input->p_fmt->i_extra_data );
             }
+            else
+            {
+                bo_addle_u16( &bo, i_extra );
+                if( i_tag == WAVE_FORMAT_MPEGLAYER3 )
+                {
+                    bo_addle_u16( &bo, 1 );     /* wId */
+                    bo_addle_u32( &bo, 2 );     /* fdwFlags */
+                    bo_addle_u16( &bo, 1152 );  /* nBlockSize */
+                    bo_addle_u16( &bo, 1 );     /* nFramesPerBlock */
+                    bo_addle_u16( &bo, 1393 );  /* nCodecDelay */
+                }
+            }
+
             if( p_input->p_fmt->i_bitrate > 24000 )
             {
                 p_sys->i_bitrate += p_input->p_fmt->i_bitrate;
@@ -330,7 +363,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                               p_input->p_fmt->i_extra_data );
             }
 
-            p_sys->i_bitrate += 2000000;
+            p_sys->i_bitrate += 1000000;
             break;
         }
         default:
@@ -589,6 +622,16 @@ static const guid_t asf_guid_reserved_1 =
     { 0x8E, 0xE6,0x00, 0xC0, 0x0C ,0x20, 0x53, 0x65 }
 };
 
+static void asf_chunk_add( bo_t *bo,
+                           int i_type, int i_len, int i_flags, int i_seq )
+{
+    bo_addle_u16( bo, i_type );
+    bo_addle_u16( bo, i_len + 8 );
+    bo_addle_u32( bo, i_seq );
+    bo_addle_u16( bo, i_flags );
+    bo_addle_u16( bo, i_len + 8 );
+}
+
 static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
                                          vlc_bool_t b_broadcast )
 {
@@ -616,9 +659,18 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     {
         i_size += 78 + p_sys->track[i].i_extra;
     }
-    out = sout_BufferNew( p_mux->p_sout, i_size + 50 );
-    bo_init( &bo, out->p_buffer, i_size + 50 );
 
+    if( p_sys->b_asf_http )
+    {
+        out = sout_BufferNew( p_mux->p_sout, i_size + 50 + 12 );
+        bo_init( &bo, out->p_buffer, i_size + 50 + 12 );
+        asf_chunk_add( &bo, 0x4824, i_size + 50, 0xc00, p_sys->i_seq++ );
+    }
+    else
+    {
+        out = sout_BufferNew( p_mux->p_sout, i_size + 50 );
+        bo_init( &bo, out->p_buffer, i_size + 50 );
+    }
     /* header object */
     bo_add_guid ( &bo, &asf_object_header_guid );
     bo_addle_u64( &bo, i_size );
@@ -698,6 +750,7 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
     int     i_pos  = 0;
     uint8_t *p_data= data->p_buffer;
     sout_buffer_t *first = NULL, **last = &first;
+    int     i_preheader = p_sys->b_asf_http ? 12 : 0;
 
     while( i_pos < i_data )
     {
@@ -706,9 +759,10 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
 
         if( p_sys->pk == NULL )
         {
-            p_sys->pk = sout_BufferNew( p_mux->p_sout, p_sys->i_packet_size );
+            p_sys->pk = sout_BufferNew( p_mux->p_sout,
+                                        p_sys->i_packet_size + i_preheader);
             /* reserve 14 bytes for the packet header */
-            p_sys->i_pk_used = 14;
+            p_sys->i_pk_used = 14 + i_preheader;
             p_sys->i_pk_frame = 0;
             p_sys->i_pk_dts = data->i_dts;
         }
@@ -738,7 +792,13 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
             /* not enough data for another payload, flush the packet */
             int i_pad = p_sys->i_packet_size - p_sys->i_pk_used;
 
-            bo_init( &bo, p_sys->pk->p_buffer, 14 );
+            bo_init( &bo, p_sys->pk->p_buffer, 14 + i_preheader );
+
+            if( p_sys->b_asf_http )
+            {
+                asf_chunk_add( &bo, 0x4424,
+                               p_sys->i_packet_size, 0x00, p_sys->i_seq++);
+            }
             bo_add_u8   ( &bo, 0x82 );
             bo_addle_u16( &bo, 0 );
             bo_add_u8( &bo, 0x11 );
@@ -764,4 +824,18 @@ static sout_buffer_t *asf_packet_create( sout_mux_t *p_mux,
     return first;
 }
 
+static sout_buffer_t *asf_stream_end_create( sout_mux_t *p_mux )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
 
+    sout_buffer_t *out = NULL;
+    bo_t          bo;
+
+    if( p_sys->b_asf_http )
+    {
+        out = sout_BufferNew( p_mux->p_sout, 12 );
+        bo_init( &bo, out->p_buffer, 12 );
+        asf_chunk_add( &bo, 0x4524, 0, 0x00, p_sys->i_seq++ );
+    }
+    return out;
+}
