@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: mtime.c,v 1.43 2004/01/25 17:16:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -323,3 +323,94 @@ void msleep( mtime_t delay )
 #endif
 }
 
+/*
+ * Date management (internal and external)
+ */
+
+/**
+ * Initialize a date_t.
+ *
+ * \param date to initialize
+ * \param divider (sample rate) numerator
+ * \param divider (sample rate) denominator
+ */
+
+void date_Init( date_t *p_date, uint32_t i_divider_n, uint32_t i_divider_d )
+{
+    p_date->date = 0;
+    p_date->i_divider_num = i_divider_n;
+    p_date->i_divider_den = i_divider_d;
+    p_date->i_remainder = 0;
+}
+
+/**
+ * Change a date_t.
+ *
+ * \param date to change
+ * \param divider (sample rate) numerator
+ * \param divider (sample rate) denominator
+ */
+
+void date_Change( date_t *p_date, uint32_t i_divider_n, uint32_t i_divider_d )
+{
+    p_date->i_divider_num = i_divider_n;
+    p_date->i_divider_den = i_divider_d;
+}
+
+/**
+ * Set the date value of a date_t.
+ *
+ * \param date to set
+ * \param date value
+ */
+void date_Set( date_t *p_date, mtime_t i_new_date )
+{
+    p_date->date = i_new_date;
+    p_date->i_remainder = 0;
+}
+
+/**
+ * Get the date of a date_t
+ *
+ * \param date to get
+ * \return date value
+ */
+mtime_t date_Get( const date_t *p_date )
+{
+    return p_date->date;
+}
+
+/**
+ * Move forwards or backwards the date of a date_t.
+ *
+ * \param date to move
+ * \param difference value
+ */
+void date_Move( date_t *p_date, mtime_t i_difference )
+{
+    p_date->date += i_difference;
+}
+
+/**
+ * Increment the date and return the result, taking into account
+ * rounding errors.
+ *
+ * \param date to increment
+ * \param incrementation in number of samples
+ * \return date value
+ */
+mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
+{
+    mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000;
+    p_date->date += i_dividend / p_date->i_divider_num * p_date->i_divider_den;
+    p_date->i_remainder += (int)(i_dividend % p_date->i_divider_num);
+
+    if( p_date->i_remainder >= p_date->i_divider_num )
+    {
+        /* This is Bresenham algorithm. */
+        p_date->date += p_date->i_divider_den;
+        p_date->i_remainder -= p_date->i_divider_num;
+    }
+
+    return p_date->date;
+}

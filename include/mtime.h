@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.14 2003/12/02 01:54:30 rocky Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -59,3 +59,20 @@ VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
 VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
 VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 
+/*****************************************************************************
+ * date_t: date incrementation without long-term rounding errors
+ *****************************************************************************/
+struct date_t
+{
+    mtime_t  date;
+    uint32_t i_divider_num;
+    uint32_t i_divider_den;
+    uint32_t i_remainder;
+};
+
+VLC_EXPORT( void,    date_Init,      ( date_t *, uint32_t, uint32_t ) );
+VLC_EXPORT( void,    date_Change,    ( date_t *, uint32_t, uint32_t ) );
+VLC_EXPORT( void,    date_Set,       ( date_t *, mtime_t ) );
+VLC_EXPORT( mtime_t, date_Get,       ( const date_t * ) );
+VLC_EXPORT( void,    date_Move,      ( date_t *, mtime_t ) );
+VLC_EXPORT( mtime_t, date_Increment, ( date_t *, uint32_t ) );

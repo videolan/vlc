@@ -183,6 +183,7 @@ typedef uint32_t vlc_fourcc_t;
 typedef struct libvlc_t libvlc_t;
 typedef struct vlc_t vlc_t;
 typedef struct variable_t variable_t;
+typedef struct date_t date_t;
 
 /* Messages */
 typedef struct msg_bank_t msg_bank_t;
