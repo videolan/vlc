@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.1 2002/08/12 22:12:51 massiot Exp $
+ * $Id: stream_output.c,v 1.2 2002/08/12 22:48:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -170,6 +170,8 @@ static int InitInstance( sout_instance_t * p_sout )
         module_Unneed( p_sout, p_sout->p_access );
         return -1;
     }
+
+    return 0;
 }
 
 

@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.2 2002/08/07 21:36:56 massiot Exp $
+ * $Id: aout.m,v 1.3 2002/08/12 22:48:18 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -157,7 +157,7 @@ static int SetFormat( aout_instance_t * p_aout )
 msg_Dbg( p_aout, "toto : %d", p_sys->i_buffer_size );
 #else
     p_sys->i_buffer_size = sizeof(float) * p_aout->output.output.i_channels
-                            * 1536;
+                            * 4096;
     err = AudioDeviceSetProperty( p_sys->device, 0, 0, false,
                                   kAudioDevicePropertyBufferSize,
                                   i_param_size, &p_sys->i_buffer_size );
