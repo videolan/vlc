@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.12 2003/03/11 06:14:16 fenrir Exp $
+ * $Id: araw.c,v 1.13 2003/03/11 06:58:06 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -501,7 +501,7 @@ static void DecodeThread( adec_thread_t *p_adec )
         {
             int16_t *s = (int16_t*)p_aout_buffer->p_buffer;
 
-            int     i;
+            unsigned int     i;
 
             for( i = 0; i < p_aout_buffer->i_nb_bytes; i++ )
             {
