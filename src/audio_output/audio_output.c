@@ -422,9 +422,6 @@ void aout_DestroyFifo( aout_fifo_t * p_fifo )
 
 /* Here are the local macros */
 
-#define S32_TO_S16( sample ) \
-    (s16)( (sample) )
-
 #define UPDATE_INCREMENT( increment, integer ) \
     if ( ((increment).l_remainder += (increment).l_euclidean_remainder) >= 0 ) \
     { \
@@ -844,7 +841,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
 	{
-            ((s16 *)p_aout->buffer)[l_buffer] = S32_TO_S16( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS );
+            ((s16 *)p_aout->buffer)[l_buffer] = (s16)( p_aout->s32_buffer[l_buffer] / AOUT_MAX_FIFOS );
             p_aout->s32_buffer[l_buffer] = 0;
         }
 
