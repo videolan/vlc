@@ -2,7 +2,7 @@
  * gtk2_bitmap.h: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.h,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_bitmap.h,v 1.2 2003/04/13 20:07:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -27,7 +27,7 @@
 #define VLC_GTK2_BITMAP
 
 //--- GTK2 -----------------------------------------------------------------
-//#include <windows.h>
+#include <gdk/gdk.h>
 
 //--- GENERAL ---------------------------------------------------------------
 #include <string>
@@ -42,7 +42,7 @@ class Graphics;
 class GTK2Bitmap : public Bitmap
 {
     private:
-//        HDC bmpDC;
+        GdkBitmap *bmpDC;
 
     public:
         // Constructors
@@ -61,7 +61,7 @@ class GTK2Bitmap : public Bitmap
         virtual int  GetBmpPixel( int x, int y );
         virtual void SetBmpPixel( int x, int y, int color );
 
-//        HDC GetBmpDC() { return bmpDC; }
+        GdkBitmap *GetBmpDC() { return bmpDC; }
 };
 //---------------------------------------------------------------------------
 

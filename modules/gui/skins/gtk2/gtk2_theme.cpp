@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.3 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.4 2003/04/13 20:07:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -263,15 +263,20 @@ void GTK2Theme::OnLoadTheme()
     GdkWindowAttr attr;
     attr.title = "VLC Media Player";
     attr.event_mask = GDK_ALL_EVENTS_MASK;
-    attr.width = 100;
-    attr.height = 100;
+    attr.x = 100;
+    attr.y = 100;
+    attr.window_type = GDK_WINDOW_TOPLEVEL;
+    attr.width = 400;
+    attr.height = 200;
     attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.wclass = GDK_INPUT_OUTPUT;
+    attr.override_redirect = FALSE;
     
-    gint mask = GDK_WA_TITLE;
+    gint mask = GDK_WA_TITLE|GDK_WA_X|GDK_WA_Y|GDK_WA_NOREDIR;
     
     // Create the parent window
     ParentWindow = gdk_window_new( NULL, &attr, mask);
+    gdk_window_show( ParentWindow );
 }
 //---------------------------------------------------------------------------
 void GTK2Theme::AddSystemMenu( string name, Event *event )
@@ -316,25 +321,23 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
     attr.event_mask = GDK_ALL_EVENTS_MASK;
     attr.width = 100;
     attr.height = 100;
-    //attr.window_type = GDK_WINDOW_CHILD;
-    attr.window_type = GDK_WINDOW_TOPLEVEL;
+    attr.window_type = GDK_WINDOW_CHILD;
     attr.wclass = GDK_INPUT_OUTPUT;
     
     gint mask =0;
     
     // Create the parent window
- //   GdkWindow *gwnd = gdk_window_new( ParentWindow, &attr, mask);
-    GdkWindow *gwnd = gdk_window_new( NULL, &attr, mask);
+    GdkWindow *gwnd = gdk_window_new( ParentWindow, &attr, mask);
     if( !gwnd )
     {
         msg_Err( p_intf, "CreateWindow failed" );
         return;
     }
     
+    gdk_window_show( gwnd );
+    
     WindowList.push_back( (Window *)new OSWindow( p_intf, gwnd, x, y, visible,
         fadetime, alpha, movealpha, dragdrop ) ) ;
-  
-    gdk_window_show( ParentWindow );
 
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.2 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.3 2003/04/13 20:07:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -25,8 +25,7 @@
 #if !defined WIN32
 
 //--- GTK2 -----------------------------------------------------------------
-//#define WINVER  0x0500
-//#include <windows.h>
+#include <gdk/gdk.h>
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -98,6 +97,7 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
 
     // Delete objects
     DeleteObject( HBitmap );*/
+    
 }
 //---------------------------------------------------------------------------
 GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, Graphics *from, int x, int y,

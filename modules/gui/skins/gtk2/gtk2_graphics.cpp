@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.4 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.5 2003/04/13 20:07:34 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -33,7 +33,6 @@
 #include "os_window.h"
 #include "gtk2_graphics.h"
 
-
 //---------------------------------------------------------------------------
 // GTK2 GRAPHICS
 //---------------------------------------------------------------------------
@@ -54,8 +53,8 @@ GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
     SelectObject( Image, HImage );
     DeleteObject( HImage );*/
     
-/*    Image = ( GdkDrawable* )( (GTK2Window *)from )->GetHandle();
-    Gc = gdk_gc_new( Image );*/
+    Image = ( GdkDrawable* )( (GTK2Window *)from )->GetHandle();
+    Gc = gdk_gc_new( Image );
 }
 //---------------------------------------------------------------------------
 GTK2Graphics::~GTK2Graphics()
@@ -80,7 +79,7 @@ void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
 //---------------------------------------------------------------------------
 void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
 {
-//    gdk_draw_rectangle( Image, Gc, TRUE, x, y, w, h);
+    gdk_draw_rectangle( Image, Gc, TRUE, x, y, w, h);
 }
 //---------------------------------------------------------------------------
 void GTK2Graphics::SetClipRegion( Region *rgn )
@@ -97,12 +96,17 @@ void GTK2Graphics::SetClipRegion( Region *rgn )
 //---------------------------------------------------------------------------
 GTK2Region::GTK2Region()
 {
-/*    Rgn = CreateRectRgn( 0, 0, 0, 0 );*/
+    Rgn = gdk_region_new();
 }
 //---------------------------------------------------------------------------
 GTK2Region::GTK2Region( int x, int y, int w, int h )
 {
-/*    Rgn = CreateRectRgn( x, y, x + w, y + h );*/
+    GdkRectangle rect;
+    rect.x = x;
+    rect.y = y;
+    rect.width = w;
+    rect.height = h;
+    Rgn = gdk_region_rectangle( &rect );
 }
 //---------------------------------------------------------------------------
 GTK2Region::~GTK2Region()
@@ -117,10 +121,13 @@ void GTK2Region::AddPoint( int x, int y )
 //---------------------------------------------------------------------------
 void GTK2Region::AddRectangle( int x, int y, int w, int h )
 {
-/*    HRGN Buffer;
-    Buffer = CreateRectRgn( x, y, x + w, y + h );
-    CombineRgn( Rgn, Buffer, Rgn, 0x2 );
-    DeleteObject( Buffer );*/
+    GdkRectangle rect;
+    rect.x = x;
+    rect.y = y;
+    rect.width = w;
+    rect.height = h;
+    GdkRegion *Buffer = gdk_region_rectangle( &rect );
+    gdk_region_union( Rgn, Buffer );
 }
 //---------------------------------------------------------------------------
 void GTK2Region::AddElipse( int x, int y, int w, int h )
@@ -129,6 +136,7 @@ void GTK2Region::AddElipse( int x, int y, int w, int h )
     Buffer = CreateEllipticRgn( x, y, x + w, y + h );
     CombineRgn( Rgn, Buffer, Rgn, 0x2 );
     DeleteObject( Buffer );*/
+    /*FIXME*/
 }
 //---------------------------------------------------------------------------
 void GTK2Region::Move( int x, int y )
@@ -138,7 +146,7 @@ void GTK2Region::Move( int x, int y )
 //---------------------------------------------------------------------------
 bool GTK2Region::Hit( int x, int y )
 {
-/*    return PtInRegion( Rgn, x, y );*/
+    return gdk_region_point_in( Rgn, x, y );
 }
 //---------------------------------------------------------------------------
 
