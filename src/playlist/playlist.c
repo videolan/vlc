@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.3 2002/06/02 09:03:54 sam Exp $
+ * $Id: playlist.c,v 1.4 2002/06/02 11:59:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -158,7 +158,7 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 /*****************************************************************************
  * playlist_Command: do a playlist action
  *****************************************************************************
- * Delete the item in the playlist with position i_pos.
+ * 
  *****************************************************************************/
 void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
 {   
@@ -199,7 +199,7 @@ static void RunThread ( playlist_t *p_playlist )
         /* If there is an input, check that it doesn't need to die. */
         if( p_playlist->p_input )
         {
-            if( p_playlist->p_input->i_status == THREAD_OVER )
+            if( p_playlist->p_input->b_dead )
             {
                 input_thread_t *p_input;
 
@@ -213,13 +213,12 @@ static void RunThread ( playlist_t *p_playlist )
                 vlc_object_detach_all( p_input );
                 vlc_object_release( p_input );
                 input_DestroyThread( p_input );
+                vlc_object_destroy( p_input );
             }
-            else if(    ( p_playlist->p_input->i_status == THREAD_READY
-                           || p_playlist->p_input->i_status == THREAD_ERROR )
-                     && ( p_playlist->p_input->b_error
-                           || p_playlist->p_input->b_eof ) )
+            else if( p_playlist->p_input->b_error
+                      || p_playlist->p_input->b_eof )
             {
-                input_StopThread( p_playlist->p_input, NULL );
+                input_StopThread( p_playlist->p_input );
             }
         }
         else if( p_playlist->i_status != PLAYLIST_STOPPED )
@@ -257,7 +256,7 @@ static void RunThread ( playlist_t *p_playlist )
     /* If there is an input, kill it */
     while( p_playlist->p_input )
     {
-        if( p_playlist->p_input->i_status == THREAD_OVER )
+        if( p_playlist->p_input->b_dead )
         {
             input_thread_t *p_input;
 
@@ -271,13 +270,11 @@ static void RunThread ( playlist_t *p_playlist )
             vlc_object_detach_all( p_input );
             vlc_object_release( p_input );
             input_DestroyThread( p_input );
+            vlc_object_destroy( p_input );
         }
-        else if(    ( p_playlist->p_input->i_status == THREAD_READY
-                       || p_playlist->p_input->i_status == THREAD_ERROR )
-                 && ( p_playlist->p_input->b_error
-                       || p_playlist->p_input->b_eof ) )
+        else if( p_playlist->p_input->b_error || p_playlist->p_input->b_eof )
         {
-            input_StopThread( p_playlist->p_input, NULL );
+            input_StopThread( p_playlist->p_input );
         }
         else
         {

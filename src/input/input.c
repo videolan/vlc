@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.199 2002/06/01 18:04:49 sam Exp $
+ * $Id: input.c,v 1.200 2002/06/02 11:59:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -57,7 +57,6 @@ static  int RunThread       ( input_thread_t *p_input );
 static  int InitThread      ( input_thread_t *p_input );
 static void ErrorThread     ( input_thread_t *p_input );
 static void CloseThread     ( input_thread_t *p_input );
-static void DestroyThread   ( input_thread_t *p_input );
 static void EndThread       ( input_thread_t *p_input );
 
 /*****************************************************************************
@@ -86,9 +85,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     /* Set target */
     p_input->psz_source = strdup( p_item->psz_name );
-
-    /* Set status */
-    p_input->i_status   = THREAD_CREATE;
 
     /* Demux */
     p_input->p_demux_module = NULL;
@@ -156,25 +152,13 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     vlc_object_attach( p_input, p_parent );
 
-    /* Create thread. */
+    /* Create thread and wait for its readiness. */
     if( vlc_thread_create( p_input, "input", RunThread, 1 ) )
     {
         msg_Err( p_input, "cannot create input thread (%s)", strerror(errno) );
         free( p_input );
         return NULL;
     }
-
-#if 0
-    /* If status is NULL, wait until the thread is created */
-    if( pi_status == NULL )
-    {
-        do
-        {
-            msleep( THREAD_SLEEP );
-        } while( (i_status != THREAD_READY) && (i_status != THREAD_ERROR)
-                && (i_status != THREAD_FATAL) );
-    }
-#endif
 
     return p_input;
 }
@@ -184,7 +168,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
  *****************************************************************************
  * This function should not return until the thread is effectively cancelled.
  *****************************************************************************/
-void input_StopThread( input_thread_t *p_input, int *pi_status )
+void input_StopThread( input_thread_t *p_input )
 {
     /* Make the thread exit from a possible vlc_cond_wait() */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -193,18 +177,6 @@ void input_StopThread( input_thread_t *p_input, int *pi_status )
 
     vlc_cond_signal( &p_input->stream.stream_wait );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    /* If status is NULL, wait until thread has been destroyed */
-#if 0
-    if( pi_status == NULL )
-    {
-        do
-        {
-            msleep( THREAD_SLEEP );
-        } while ( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR)
-                  && (i_status != THREAD_FATAL) );
-    }
-#endif
 }
 
 /*****************************************************************************
@@ -221,9 +193,6 @@ void input_DestroyThread( input_thread_t *p_input )
     vlc_mutex_destroy( &p_input->stream.control.control_lock );
     vlc_cond_destroy( &p_input->stream.stream_wait );
     vlc_mutex_destroy( &p_input->stream.stream_lock );
-    
-    /* Free input structure */
-    free( p_input );
 }
 
 /*****************************************************************************
@@ -236,17 +205,13 @@ static int RunThread( input_thread_t *p_input )
     if( InitThread( p_input ) )
     {
         /* If we failed, wait before we are killed, and exit */
-        p_input->i_status = THREAD_ERROR;
         p_input->b_error = 1;
         vlc_thread_ready( p_input );
         ErrorThread( p_input );
-        DestroyThread( p_input );
         return 0;
     }
 
     vlc_thread_ready( p_input );
-
-    p_input->i_status = THREAD_READY;
 
     /* initialization is complete */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -392,8 +357,6 @@ static int RunThread( input_thread_t *p_input )
     }
 
     EndThread( p_input );
-
-    DestroyThread( p_input );
 
     return 0;
 }
@@ -583,8 +546,8 @@ static void EndThread( input_thread_t * p_input )
 
     input_DumpStream( p_input );
 
-    /* Store status */
-    p_input->i_status = THREAD_END;
+    /* Tell we're dead */
+    p_input->b_dead = 1;
 
     /* Free all ES and destroy all decoder threads */
     input_EndStream( p_input );
@@ -608,14 +571,5 @@ static void CloseThread( input_thread_t * p_input )
     input_AccessEnd( p_input );
 
     free( p_input->psz_source );
-}
-
-/*****************************************************************************
- * DestroyThread: destroy the input thread
- *****************************************************************************/
-static void DestroyThread( input_thread_t * p_input )
-{
-    /* Update status */
-    p_input->i_status = THREAD_OVER;
 }
 

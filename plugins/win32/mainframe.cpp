@@ -667,17 +667,17 @@ void __fastcall TMainFrameDlg::ModeManage()
             /* add space between tolbar and statusbar when
              * nothing is displayed; isn't it nicer ? :) */ 
             i_Height += 17;
-
-            /* unsensitize menus */
-            MenuProgram->Enabled = false;
-            MenuTitle->Enabled = false;
-            MenuChapter->Enabled = false;
-            MenuAudio->Enabled = false;
-            MenuSubtitles->Enabled = false;
-            PopupNavigation->Enabled = false;
-            PopupAudio->Enabled = false;
-            PopupSubtitles->Enabled = false;
         }
+
+        /* unsensitize menus */
+        MenuProgram->Enabled = false;
+        MenuTitle->Enabled = false;
+        MenuChapter->Enabled = false;
+        MenuAudio->Enabled = false;
+        MenuSubtitles->Enabled = false;
+        PopupNavigation->Enabled = false;
+        PopupAudio->Enabled = false;
+        PopupSubtitles->Enabled = false;
     }
 
     /* resize main window */

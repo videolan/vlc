@@ -4,6 +4,8 @@
 
 HEAD
 
+  * ./src/playlist/playlist.c, src/input/input.c: added safety checks to
+    prevent crashes on next file.
   * ./src/misc/objects.c: commented all functions.
   * ./src/misc/objects.c: implemented vlc_object_find( , , FIND_ANYWHERE).
   * ./src/misc/objects.c: renamed vlc_object_unlink to vlc_object_detach.
@@ -30,7 +32,11 @@ HEAD
   * ALL: the first libvlc commit.
 
 0.4.1
+Not released yet
 
+  * ./plugins/gtk/gtk_display.c, ./plugins/win32/mainframe.cpp: we deactivate
+    popup menus when no stream is being played, even in network mode.
+  * ./src/input/mpeg_system.c: removed unnecessarily verbose message.
   * ./src/video_output/video_output.c: fixed the "picture has invalid status"
     bug which might have been the cause of crashes.
   * ./plugins/filter/crop.c: attempt at an automatic border cropping filter,
