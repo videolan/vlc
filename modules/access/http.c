@@ -315,7 +315,10 @@ static int Open( vlc_object_t *p_this )
         msg_Info( p_access, "ICY server found, %s demuxer selected",
                   p_access->psz_demux );
 
+#if 0   /* Doesn't work really well because of the pre-buffering in shoutcast
+         * servers (the buffer content will be sent as fast as possible). */
         p_sys->b_pace_control = VLC_FALSE;
+#endif
     }
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
