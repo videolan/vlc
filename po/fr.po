@@ -3603,9 +3603,8 @@ msgstr ""
 "du flux."
 
 #: modules/access/dshow/dshow.cpp:143
-#, fuzzy
 msgid "DirectShow"
-msgstr "Entrée DirectShow"
+msgstr "DirectShow"
 
 #: modules/access/dshow/dshow.cpp:144
 msgid "DirectShow input"
@@ -3626,22 +3625,20 @@ msgid "DirectShow demuxer"
 msgstr "Démultiplexeur DirectShow"
 
 #: modules/access/dvb/access.c:76
-#, fuzzy
 msgid ""
 "Allows you to modify the default caching value for dvb streams. This value "
 "should be set in millisecond units."
 msgstr ""
-"Cette option permet de modifier la taille du cache pour les flux UDP. Cette "
+"Cette option permet de modifier la taille du cache pour les flux dvb. Cette "
 "valeur est en millisecondes."
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "Program to decode"
-msgstr "Décodeur vidéo Theora"
+msgstr "Pogramme à décoder"
 
 #: modules/access/dvb/access.c:80
 msgid "This is a workaround for a bug in the input"
-msgstr ""
+msgstr "Cela sert à contourner un bug de l'entrée"
 
 #: modules/access/dvb/access.c:82
 msgid "Adapter card to tune"
@@ -3661,20 +3658,19 @@ msgstr "Numéro du périphérique à utiliser sur la carte"
 
 #: modules/access/dvb/access.c:88
 msgid "Transponder/multiplex frequency"
-msgstr ""
+msgstr "Fréquence du transpondeur/multiplexeur"
 
 #: modules/access/dvb/access.c:89
 msgid "In kHz for DVB-S or Hz for DVB-C/T"
-msgstr ""
+msgstr "En kHz pour le DVB-S ou Hz pour le DVB-C/T"
 
 #: modules/access/dvb/access.c:91
-#, fuzzy
 msgid "Inversion mode"
-msgstr "Conversions de "
+msgstr "Mode d'inversion"
 
 #: modules/access/dvb/access.c:92
 msgid "Inversion mode [0=off, 1=on, 2=auto]"
-msgstr ""
+msgstr "Mode d'inversion [0=off, 1=on, 2=auto]"
 
 #: modules/access/dvb/access.c:94
 msgid "Probe DVB card for capabilities"
@@ -3699,52 +3695,51 @@ msgstr "lnb_lof1 de l'antenne (kHz)"
 
 #: modules/access/dvb/access.c:107
 msgid "Budget mode"
-msgstr ""
+msgstr "Mode \"budget\""
 
 #: modules/access/dvb/access.c:108
 msgid ""
 "This allows you to stream an entire transponder with a budget card. Budget "
 "mode is compatible with the ts2 demux."
 msgstr ""
+"Ceci permet de diffuser un transpondeur entier avec une carte \"budget\"."
+"Le mode \"budget\" est compatible avec le nouveau démultiplexeur MPEG-TS."
 
 #: modules/access/dvb/access.c:110
 msgid "Satellite number in the Diseqc system"
-msgstr ""
+msgstr "Numéro du satellite dans le système Diseqc"
 
 #: modules/access/dvb/access.c:111
 msgid "[0=no diseqc, 1-4=normal diseqc, -1=A, -2=B simple diseqc"
-msgstr ""
+msgstr "[0=diseqc désactivé, 1-4=diseqc normal, -1=A, -2=B diseqc simple"
 
 #: modules/access/dvb/access.c:113
 msgid "LNB voltage"
-msgstr ""
+msgstr "Voltage LNB"
 
 #: modules/access/dvb/access.c:114
 msgid "In Volts [0, 13=vertical, 18=horizontal]"
-msgstr ""
+msgstr "En Volts [0, 13=vertival, 18=horizontal]"
 
 #: modules/access/dvb/access.c:116
 msgid "22 kHz tone"
-msgstr ""
+msgstr "Signal à 22 kHz"
 
 #: modules/access/dvb/access.c:117
 msgid "[0=off, 1=on, -1=auto]"
-msgstr ""
+msgstr "[0=off, 1=on, -1=auto]"
 
 #: modules/access/dvb/access.c:119
-#, fuzzy
 msgid "Transponder FEC"
-msgstr "FEC du transpondeur satellite"
+msgstr "FEC du transpondeur"
 
 #: modules/access/dvb/access.c:120
-#, fuzzy
 msgid "FEC=Forward Error Correction mode [9=auto]"
-msgstr "FEC=Forward Error Correction mode"
+msgstr "FEC=Forward Error Correction mode [9=auto]"
 
 #: modules/access/dvb/access.c:122
-#, fuzzy
 msgid "Transponder symbol rate in kHz"
-msgstr "Débit de symbole du transpondeur satellite en kHz"
+msgstr "Débit de symbole du transpondeur en kHz"
 
 #: modules/access/dvb/access.c:126
 msgid "Modulation type"
@@ -3783,9 +3778,8 @@ msgid "Terrestrial hierarchy mode"
 msgstr "Mode de hiérarchie terrestre"
 
 #: modules/access/dvb/access.c:149
-#, fuzzy
 msgid "DVB"
-msgstr "DVD"
+msgstr "DVB"
 
 #: modules/access/dvb/access.c:150
 msgid "DVB input with v4l2 support"
@@ -4193,9 +4187,8 @@ msgstr ""
 "(par exemple I420 (défaut), RV24, etc.)"
 
 #: modules/access/v4l/v4l.c:93
-#, fuzzy
 msgid "Video4Linux"
-msgstr "Lecture Video4Linux"
+msgstr "Video4Linux"
 
 #: modules/access/v4l/v4l.c:94
 msgid "Video4Linux input"
@@ -4880,7 +4873,6 @@ msgid "Error resilience"
 msgstr "Résilience d'erreur"
 
 #: modules/codec/ffmpeg/ffmpeg.h:83
-#, fuzzy
 msgid ""
 "ffmpeg can do error resilience.\n"
 "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) this "
@@ -4890,7 +4882,7 @@ msgstr ""
 "ffmpeg est capable de résister aux erreurs.\n"
 "Néanmoins, avec un encodeur buggé (comme l'encodeur ISO MPEG-4 de M$) cela "
 "peut produire une flopée d'erreurs.\n"
-"Valeurs posiibles : de -1 à 99 (-1 désactive toute résilience d'erreurs)."
+"Valeurs posiibles : de 0 à 4 (0 désactive toute résilience d'erreurs)."
 
 #: modules/codec/ffmpeg/ffmpeg.h:88
 msgid "Workaround bugs"
@@ -4953,9 +4945,8 @@ msgid "Set ffmpeg debug mask"
 msgstr "Régler le masque de déboggage de ffmpeg"
 
 #: modules/codec/ffmpeg/ffmpeg.h:114
-#, fuzzy
 msgid "Visualize motion vectors"
-msgstr "Visualisations"
+msgstr "Afficher les vecteurs de déplacement"
 
 #: modules/codec/ffmpeg/ffmpeg.h:115
 msgid ""
@@ -4964,6 +4955,10 @@ msgid ""
 "2 - visualize forward predicted MVs of B frames\n"
 "4 - visualize backward predicted MVs of B frames"
 msgstr ""
+"Régler le masque d'affichage des vecteurs de déplacement.\n"
+"1 - affiche les vecteurs de mouvement des images P calculés en avant\n"
+"2 - affiche les vecteurs de mouvement des images B calculés en avant\n"
+"4 - affiche les vecteurs de mouvement des images B calculés en arrière"
 
 #: modules/codec/ffmpeg/ffmpeg.h:120
 msgid "ffmpeg post processing filter chains"
@@ -9213,7 +9208,7 @@ msgstr "DVD (support des menus)"
 
 #: modules/gui/wxwindows/open.cpp:615
 msgid "DVD (experimental)"
-msgstr ""
+msgstr "DVD (expérimental)"
 
 #: modules/gui/wxwindows/open.cpp:664
 msgid "RTSP"
@@ -9676,16 +9671,15 @@ msgstr "Module de memcpy optimisé AltiVec"
 
 #: modules/misc/network/ipv4.c:86
 msgid "TCP connection timeout in ms"
-msgstr ""
+msgstr "Temps d'expiration de la connection TCP en ms"
 
 #: modules/misc/network/ipv4.c:88
-#, fuzzy
 msgid ""
 "Allows you to modify the default TCP connection timeout. This value should "
 "be set in millisecond units."
 msgstr ""
-"Cette option permet de modifier la taille du cache pour les flux UDP. Cette "
-"valeur est en millisecondes."
+"Cette option permet de modifier le temps d'expiration de la connection TCP."
+"Cette valeur est en millisecondes."
 
 #: modules/misc/network/ipv4.c:92
 msgid "IPv4 network abstraction layer"
