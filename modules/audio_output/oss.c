@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.28 2002/10/01 22:34:43 massiot Exp $
+ * $Id: oss.c,v 1.29 2002/10/02 15:37:58 sigmunau Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -100,7 +100,7 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     char * psz_device;
-    int i_format;
+    int i_format, i_format_orig;
     int i_rate;
     int i_frame_size;
     int i_fragments;
@@ -161,6 +161,7 @@ static int Open( vlc_object_t *p_this )
     if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
     {
         i_format = AFMT_AC3;
+        i_format_orig = AFMT_AC3;
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
@@ -171,32 +172,34 @@ static int Open( vlc_object_t *p_this )
     {
         p_aout->output.output.i_format = AOUT_FMT_S16_NE;
         i_format = AFMT_S16_NE;
+        i_format_orig = AFMT_S16_NE;
         p_aout->output.i_nb_samples = FRAME_SIZE;
 
         aout_VolumeSoftInit( p_aout );
     }
 
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
-         || i_format != p_aout->output.output.i_format )
+         || i_format != i_format_orig )
     {
-        if ( i_format == AFMT_AC3 )
+        if ( i_format_orig == AFMT_AC3 )
         {
             /* Retry with S16 */
-            msg_Warn( p_aout, "cannot set audio output format (%i)", i_format );
+            msg_Warn( p_aout, "cannot set audio output format (%i)", i_format_orig );
             p_aout->output.output.i_format = AOUT_FMT_S16_NE;
             i_format = AFMT_S16_NE;
+            i_format_orig = AFMT_S16_NE;
             p_aout->output.i_nb_samples = FRAME_SIZE;
             if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
-                 || i_format != p_aout->output.output.i_format )
+                 || i_format != i_format_orig )
             {
                 msg_Err( p_aout, "cannot set audio output format (%i)",
-                         i_format );
+                         i_format_orig );
                 return VLC_EGENERIC;
             }
         }
         else
         {
-            msg_Err( p_aout, "cannot set audio output format (%i)", i_format );
+            msg_Err( p_aout, "cannot set audio output format (%i)", i_format_orig );
             return VLC_EGENERIC;
         }
     }
