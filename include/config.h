@@ -105,7 +105,7 @@
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
-#define DEFAULT_PTS_DELAY               (mtime_t)(.35*CLOCK_FREQ)
+#define DEFAULT_PTS_DELAY               (mtime_t)(.45*CLOCK_FREQ)
 
 /*****************************************************************************
  * Audio configuration

@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.m,v 1.1 2002/05/12 20:56:33 massiot Exp $
+ * $Id: aout_macosx.m,v 1.2 2002/05/19 00:34:54 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -326,13 +326,13 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
 {
     aout_thread_t *p_aout = (aout_thread_t *)threadGlobals;
     aout_sys_t *p_sys = p_aout->p_sys;
-#if 0
+
     AudioTimeStamp host_time;
 
     host_time.mFlags = kAudioTimeStampHostTimeValid;
     AudioDeviceTranslateTime( inDevice, inOutputTime, &host_time );
-    intf_Msg( "%lld", AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000 + p_aout->p_sys->clock_diff - p_aout->date );
-#endif
+    //intf_Msg( "%lld", AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000 + p_aout->p_sys->clock_diff - p_aout->date );
+    p_aout->date = p_aout->p_sys->clock_diff + AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000;
 
     /* move data into output data buffer */
     if( p_sys->b_buffer_data )
@@ -430,7 +430,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
                                   kAudioDevicePropertyBufferSize, 
                                   ui_param_size,
                                   &p_aout->p_sys->ui_buffer_size );
-    p_aout->i_latency = p_aout->p_sys->ui_buffer_size / 2;
+    //p_aout->i_latency = p_aout->p_sys->ui_buffer_size / 2;
 
     if( err != noErr )
     {
@@ -486,7 +486,9 @@ static int CABeginFormat( aout_thread_t *p_aout )
 
     /* Let's pray for the following operation to be atomic... */
     p_aout->p_sys->clock_diff = mdate()
-         - AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000;
+         - AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000
+         + (mtime_t)p_aout->p_sys->ui_buffer_size / 4 * 1000000 / (mtime_t)p_aout->i_rate
+         + p_main->i_desync;
 
     p_aout->p_sys->b_format = 1;
 

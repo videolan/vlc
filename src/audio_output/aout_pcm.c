@@ -2,7 +2,7 @@
  * aout_pcm.c: PCM audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: aout_pcm.c,v 1.6 2002/05/18 17:47:47 sam Exp $
+ * $Id: aout_pcm.c,v 1.7 2002/05/19 00:34:54 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -36,7 +36,7 @@
 
 /* Biggest difference allowed between scheduled playing date and actual date 
    (in microseconds) */
-#define MAX_DELTA 10000
+#define MAX_DELTA 50000
 
 /*****************************************************************************
  * Local prototypes
@@ -130,7 +130,7 @@ void aout_PCMThread( aout_thread_t * p_aout )
         case AOUT_FMT_S8:
             i_units = p_aout->pf_getbufinfo( p_aout, i_buffer_limit );
 
-            p_aout->date = mdate() + ((((mtime_t)((i_units + 4 *
+            p_aout->date = mdate() + ((((mtime_t)((i_units +
                 p_aout->i_latency) / p_aout->i_channels)) * 1000000) /
                 ((mtime_t)p_aout->i_rate)) + p_main->i_desync;
 
@@ -144,8 +144,8 @@ void aout_PCMThread( aout_thread_t * p_aout )
         case AOUT_FMT_S16_BE:
             i_units = p_aout->pf_getbufinfo( p_aout, i_buffer_limit * 2 ) / 2;
 
-            p_aout->date = mdate() + ((((mtime_t)((i_units + 4 *
-                p_aout->i_latency) / (2 * p_aout->i_channels))) * 1000000) /
+            p_aout->date = mdate() + ((((mtime_t)((i_units +
+                p_aout->i_latency / 2) / p_aout->i_channels)) * 1000000) /
                 ((mtime_t)p_aout->i_rate)) + p_main->i_desync;
 
             p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
@@ -159,7 +159,6 @@ void aout_PCMThread( aout_thread_t * p_aout )
         if( i_units > (i_buffer_limit/2) )
             msleep( (i_units - i_buffer_limit/2) * AOUT_BUFFER_DURATION
                     / i_buffer_limit );
-
     }
 
     vlc_mutex_lock( &p_aout->fifos_lock );
@@ -295,7 +294,7 @@ static int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
                       mtime_t aout_date )
 {
     int i_units, i_units_dist, i_rate;
-    u64 i_delta;    
+    mtime_t i_delta;    
 
     /* We take the lock */
     vlc_mutex_lock( &p_fifo->data_lock );

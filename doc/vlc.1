@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH VLC 1 "March 10, 2001"
+.TH VLC 1 "May 19, 2002"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -32,6 +32,8 @@ recognizes several URL-style items:
 .TP
 .B *.mpg, *.vob
 Plain MPEG-1/2 files
+.B *.avi
+AVI files, such as DivX movies
 .TP
 .B dvd:[<device>][@<raw device>][@[<title>][,[<chapter>][,<angle>]]]
 DVD device (for instance dvd:/dev/dvd). The raw device is optional and
@@ -40,7 +42,7 @@ must have been prepared beforehands.
 .B vcd:<device>
 VCD device (for instance dvd:/dev/cdrom).
 .TP
-.B udpstream:[<server>[:<server port>]][@[<bind address>][:<bind port>]]
+.B udpstream:[@[<multicast address>][:<local port>]]
 UDP stream, such as one sent by VideoLAN Server or VideoLAN miniserver.
 Usually "udpstream:" is enough.
 .TP
@@ -56,161 +58,7 @@ Execute a play-list command. Commands are :
 .B vlc
 follows the usual GNU command line syntax, with long
 options starting with two dashes (`-').
-A summary of options is included below.
-.TP
-.B \-I, \-\-intf <module>
-Specify an interface module: "gnome", "curses", "qt", for instance.
-.TP
-.B \-v, \-\-verbose
-Set
-.B vlc
-verbosity. This command is cumulative, you can use "-vv" or "-vvvv" for increased verbosity.
-.TP
-.B \-\-memcpy <module>
-Specify a module for performing heavy memory copies: "memcpy", "sse" for instance.
-.TP
-.B \-\-noaudio
-Disable audio output.
-.TP
-.B \-A, \-\-aout <module>
-Specify an audio output module: "dsp", "esd", for instance.
-.TP
-.B \-\-stereo, \-\-mono
-Choose stereo or mono audio output.
-.TP
-.B \-\-spdif
-Activate hardware AC3 pass-through mode.
-.TP
-.B \-\-downmix <module>
-Specify a module for AC3 downmix: "downmix", "sse" or "3dn" for instance.
-.TP
-.B \-\-imdct <module>
-Specify a module for AC3 IMDCT: "imdct", sse" or "3dn"  for instance.
-.TP
-.B \-\-volume [1..1024]
-Change VLC output volume (default: 512).
-.TP
-.B \-\-desync <time in ms>
-Compensate desynchronization of the audio (default: 0).
-.TP
-.B \-\-novideo
-Disable video output.
-.TP
-.B \-V, \-\-vout <module>
-Specify a video output module: "x11", "sdl", "fb", for instance.
-.TP
-.B \-\-motion <module>
-Specify a module for motion compensation: "motion", "motionmmx", for instance.
-.TP
-.B \-\-idct <module>
-Specify a module for IDCT: "idct", "idctmmx", for instance.
-.TP
-.B \-\-yuv <module>
-Specify a YUV module: "yuv", "yuvmmx", for instance.
-.TP
-.B \-\-display <display>
-Specify the display name.
-.TP
-.B \-\-width <w>, \-\-height <h>
-Choose the display coordinates.
-.TP
-.B \-g, \-\-grayscale
-Grayscale output.
-.TP
-.B \-\-fullscreen
-Full screen output.
-.TP
-.B \-\-overlay
-Overlay (hardware accelerated output), if available.
-.TP
-.B \-\-xvadaptor <port>
-Select XVideo adaptor, if XVideo output is used.
-.TP
-.B \-\-color
-Color output.
-.TP
-.B \-\-synchro <type>
-Choose a fixed synchro value instead of the internal auto-adaptative
-heuristics based on CPU usage.
-
-`I' displays only I images, `IP' displays I and P images, `IP+'
-displays I and P images and every second B image, and `IPB' forces
-displaying of all images.
-
-Note that vlc is not guaranteed to behave properly if you ask it to
-display more images than your CPU can cope with.
-.TP
-.B \-a, \-\-input_audio [ ac3 | lpcm | mpeg | off ]
-Choose the audio channel type. Most DVDs have AC3 audio channels, but
-you can also have Linear PCM or MPEG layer 2 sound. Also, one might decide
-not to activate the audio channel.
-.TP
-.B \-c, \-\-input_channel [ 0\-15 ]
-Select the audio channel. Most DVDs only have one or two audio channels,
-but some of them have a great number of available languages. Note that the
-audio channel will also depend on the channel type.
-.TP
-.B \-s, \-\-input_subtitle [ 0\-31 ]
-Select the subtitle channel, if there is one in the stream.
-.TP
-.B \-\-input <method>
-Choose the input method, "dvd", "ps", "ts" for instance.
-.TP
-.B \-\-nommx, \-\-no3dnow, \-\-nommxext, \-\-nosse, \-\-noaltivec
-Disable the CPU's MMX, 3D Now!, MMX EXT, SSE or AltiVec support. This may
-be useful when you suspect a bug in an accelerated module.
-.TP
-.B \-h, \-\-help
-Print help and exit.
-.TP
-.B \-H, \-\-longhelp
-Print long help and exit.
-.TP
-.B \-\-version
-Output version information and exit.
-.SH PARAMETERS
-.B vlc
-also accepts a lot of parameters to customize its behaviour.
-.TP
-.B Interface parameters:
- vlc_intf=<method name>   interface method
-.TP
-.B Audio parameters:
- vlc_aout=<method name>  	audio method
- vlc_dsp=<filename>      	dsp device path
- vlc_stereo={1|0}        	stereo or mono output
- vlc_spdif={1|0}         	AC3 pass-through mode
- vlc_downmix=<method name>      AC3 downmix method
- vlc_imdct=<method name>        AC3 IMDCT method
- vlc_volume=[0..1024]		VLC output volume
- vlc_audio_rate=<rate>    	output rate
-.TP
-.B Video parameters:
- vlc_vout=<method name>        display method
- vlc_display=<display>         display used
- vlc_width=<width>             display width
- vlc_height=<height>           dislay height
- vlc_fb_dev=<filename>         framebuffer device
- vlc_grayscale={1|0}           grayscale or color
- vlc_fullscreen={1|0}          full screen
- vlc_overlay={1|0}             overlay
- vlc_xvport=<port>             XVideo port
- vlc_motion=<method name>      motion compensation method
- vlc_idct=<method name>        IDCT method
- vlc_yuv=<method name>         YUV method
- vlc_synchro={I|I+|IP|IP+|IPB} synchro algorithm
-.TP
-.B DVD parameters:
- vlc_dvd_device=<device>           DVD device
- vlc_input_title=<title>           title number
- vlc_input_chapter=<chapter>       chapter number
- vlc_input_angle=<angle>           angle number
- vlc_input_audio={ac3|lpcm|mpeg|off} audio type
- vlc_input_channel=[0-15]          audio channel
- vlc_input_subtitle=[0-31]         subtitle channel
-.TP
-.B Input parameters:
- vlc_iface=<interface>    network interface
+For a precise description of options, please use "vlc --help".
 
 .SH SEE ALSO
 .BR vls (1), vlms (1)

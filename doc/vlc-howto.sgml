@@ -19,11 +19,11 @@
   <heading>What is VideoLAN ?</heading>
   <p>
    VideoLAN is a project of sudents of the École Centrale Paris which aims 
-   to broadcast video on the campus, and provide the students with a MPEG2 
+   at broadcasting video on the campus, and providing the students with an MPEG-2 
    software-only decoder. VideoLAN is an OpenSource project which will thus 
    allow anyone to watch DVD movies under Linux, BeOS, MacOS X, Windows 
-   and most Unix 
-   systems
+   and most UNIX systems. Recent additions allow to read .avi files,
+   and MPEG-4/DivX-encoded movies.
   </p>
   <p>
     You may want to look at the port section on our website : 
@@ -120,17 +120,17 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    </p>
    <p>
     Please note that the Linux, Windows and MacOS X are generally the most
-    uptodate versions.
+    up-to-date versions.
   </p>
    </sect2>
    <sect2>
    <heading>Software requirements</heading>
    <p>
     Depending on the outputs and inputs you are using, you may need 
-    additionnal libraries. Please see <ref id="modules" name="description">.
+    additional libraries. Please see <ref id="modules" name="description">.
    </p>
    <p>
-    For playing encrypted DVDs, you will need libdvdcss, which you can found
+    For playing encrypted DVDs, you will need libdvdcss, which you can find
     on this page :
     <htmlurl name="http://www.videolan.org/libdvdcss/download.html"
     url="http://www.videolan.org/libdvdcss/download.html">.
@@ -168,7 +168,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
  <sect1> 
   <heading>Legal</heading> 
   <p> 
-   Copyright (©) 2001 by the VideoLAN project. This document may be
+   Copyright (©) 2001-2002 by the VideoLAN project. This document may be
    distributed only subject to the terms and conditions set forth in
    <htmlurl url="http://metalab.unc.edu/LDP/LDP-COPYRIGHT.html" 
    name="the LDP license">.
@@ -227,7 +227,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
   <sect2>
     <heading>RPM package</heading>
    <p>
-    Install vlc just as you would install any rpm package : 
+    Install vlc just as you would install any RPM package : 
     <verb>
      rpm -i vlc-x.x.x.rpm
     </verb>
@@ -248,9 +248,10 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
   </sect2>
   
   <sect2>
-   <heading>MacOS X users</heading>
+   <heading>Mac OS X users</heading>
    <p>
-    To be completed
+    Double-click on the archive, and copy the vlc file to your Applications
+    folder.
    </p>
   </sect2> 
   <sect2>
@@ -258,7 +259,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <p>
     Launch the installer by double-clicking on it, and follow the installation
     instructions. Please note that in most cases you will need administrator
-    rights to install it under Windows NT, 2000 and XP
+    rights to install it under Windows NT, 2000 and XP.
    </p>
   </sect2>
  </sect1>
@@ -273,7 +274,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    url="http://www.videolan.org/libdvdcss/download.html">
   </p>
   <p>
-   For Windows users, libdvdcss is statically linked in the 
+   For Windows, BeOS and Mac OS X users, libdvdcss is statically linked in the 
    Windows binary, so you don't have to install it.
   </p>
  </sect1>
@@ -293,7 +294,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <sect2>
     <heading>Linux users</heading>
     <p>
-     Usually, you dvd device is /dev/hd? (if you have an ide drive).
+     Usually, your dvd device is /dev/hd? (if you have an ide drive).
      For instance, if you DVD player is master on the second IDE device,
      it will be /dev/hdc.
     </p>
@@ -355,14 +356,14 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
      <p>
       If nothing appears and you are sure that a program is streamed in
       this channel, you may try once again, because a problem of communication
-      with the channel server could have occured (in you launched vlc from
+      with the channel server could have occurred (if you launched vlc from
       a terminal, you should see "Network error: no answer from vlcs").
      </p>
     </sect2>
     <sect2>
      <heading>Without VideoLAN Channel Server</heading>
      <p>
-      Simply choose clicking on the network button, then on ok should be 
+      Simply clicking on the network button, then on ok should be 
       sufficient in most cases.
      </p>
      <p>
@@ -495,7 +496,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
 <sect>
  <heading>Command line options</heading>
  <p>
- Many options are only available through command line. They are detailled here.
+ Many options are only available through command line. They are detailed here.
  </p>
  <sect1>
   <heading>Opening streams</heading>
@@ -556,9 +557,6 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <p> <verb>--intf &lt;interface module&gt;</verb>
    allows you to select the interface module </p>
 
-   <p> <verb>--input &lt;input module&gt;</verb>
-   allows you to select the input module.</p>
-
    <p> <verb>--vout &lt;video output module&gt;</verb>
    allows you to select the video output.</p>
 
@@ -568,10 +566,10 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <p> <verb>--filter &lt;video filter module&gt;</verb>
    allows you to add a video filter module.</p>
 
-   <p> <verb>--mpeg_adec &lt;MPEG audio decoder module&gt;</verb>
+   <p> <verb>--mpeg-adec &lt;MPEG audio decoder module&gt;</verb>
    allows you to select the audio MPEG decoder.</p>
 
-   <p> <verb>--ac3_adec &lt;AC3 audio decoder module&gt;</verb>
+   <p> <verb>--ac3-adec &lt;AC3 audio decoder module&gt;</verb>
    allows you to select the audio AC3 decoder.</p>
   
  </sect1>
@@ -588,9 +586,9 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    gives you information about the current version.</p>  
    <p> <verb>--list</verb>
    gives you the list of all available plugins.</p>
-   <p> <verb>--warning X or -vvvv (X times)</verb>
+   <p> <verb>-vvvv (X times)</verb>
    set the level of warning messages.</p>
-   <p> <verb>--stat</verb>
+   <p> <verb>--stats</verb>
    gives statistic outputs.</p>
   </sect2>
   
@@ -634,28 +632,28 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
 
    <p> <verb>--network-channel</verb>
    Start with channel server enabled.</p>
-   <p> <verb>--channel_server &lt;string&gt;</verb>
+   <p> <verb>--channel-server &lt;string&gt;</verb>
    Specify the channel server address.</p>
-   <p> <verb>--channel_port &lt;integer&gt;</verb>
+   <p> <verb>--channel-port &lt;integer&gt;</verb>
    Specify the channel server port.</p>
    <p> <verb>--iface &lt;string&gt;</verb>
    Select the network interface to use.</p>
-   <p> <verb>--input_program &lt;integer&gt;</verb>
+   <p> <verb>--input-program &lt;integer&gt;</verb>
    Select the program to use (for streams with 
    several programs, as those coming from satellite).</p>
-   <p> <verb>--input_audio &lt;integer&gt;</verb>
+   <p> <verb>--audio-type &lt;integer&gt;</verb>
    Select the audio channel to use.</p>
-   <p> <verb>--input_subtitle &lt;integer&gt;</verb>
+   <p> <verb>--subtitle-channel &lt;integer&gt;</verb>
    Select the subtitle.</p>
-   <p> <verb>--input_channel &lt;integer&gt;</verb>
+   <p> <verb>--audio_channel &lt;integer&gt;</verb>
    Select the channel number.</p>
-   <p> <verb>--dvd_device &lt;string&gt;</verb>
+   <p> <verb>--dvd &lt;string&gt;</verb>
    Specify the default dvd device.</p>
-   <p> <verb>--vcd_device &lt;string&gt;</verb>
+   <p> <verb>--vcd &lt;string&gt;</verb>
    Specify the default vcd device.</p>
-   <p> <verb>--ipv4</verb>
+   <p> <verb>-4, --ipv4</verb>
    Force IPv4.</p>
-   <p> <verb>--ipv6</verb>
+   <p> <verb>-6, --ipv6</verb>
    Force IPv6.</p>
   </sect2>
   
@@ -716,7 +714,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
   <sect2>
    <heading>Directly from CVS</heading>
    <p> <label id="cvs">
-    Firs log in as suer anonymous with an empty password :
+    First log in as user anonymous with an empty password :
     <verb>
      cvs -d :pserver:anonymous@anoncvs.videolan.org:/var/cvs/videolan login
     </verb>
@@ -925,7 +923,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <heading>deinterlace</heading>
    <p>default: enabled</p>
    <p>
-    This filter deinterlaces video. It is usefull with streams coming 
+    This filter deinterlaces video. It is useful with streams coming 
     from a satellite broadcast.
    </p>
   </sect2>
@@ -1057,6 +1055,14 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <htmlurl url="http://www.linuxtv.org/" name="linuxtv.org">.
    </p>
   </sect2>
+  <sect2>
+   <heading>avi</heading>
+   <p>default: enabled</p>
+   <p>
+    This input module allows to read .avi files.
+   </p>
+  </sect2>
+
  </sect1>
  
  <sect1>
@@ -1135,6 +1141,28 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    </p>
   </sect2>
  </sect1>
+ <sect1>
+  <heading>Codec modules</heading>
+  <p> The following modules add codec support. </p>
+  <sect2>
+   <heading>a52</heading>
+   <p>default: disabled</p>
+   <p>
+    This is a better AC3/A52 decoder than the built-in one, based on
+    liba52 : 
+   <htmlurl url="http://liba52.sf.net/" name="liba52">.
+   </p>
+  </sect2>
+  <sect2> 
+   <heading>ffmpeg</heading>
+   <p>default: disabled</p>
+   <p>
+    This is a free MPEG-4/DivX/OpenDivX codec :
+   <htmlurl url="http://ffmpeg.sf.net/" name="ffmpeg">.        
+   </p>
+  </sect2>
+ </sect1>
+
  <sect1>
   <heading>OS support modules</heading>
   <p> The following modules add support or different OSs. </p>
@@ -1256,7 +1284,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
    <htmlurl url="mailto:videolan@videolan.org" name="videolan@videolan.org">
   </p>
   <p>
-   Finally, there's a users mailing list (English speaking). To subscribe, send a mail to 
+   Finally, there's a users mailing list (English-speaking). To subscribe, send a mail to 
    <htmlurl url="mailto:listar@videlan.org" name="listar@videlan.org"> containing
    "subscribe vlc" as message body.
   </p>
