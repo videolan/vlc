@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.2 2002/01/09 10:22:37 sam Exp $
+ * $Id: intf_eject.c,v 1.3 2002/01/11 03:07:36 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -29,6 +29,10 @@
 
 #include <videolan/vlc.h>
 
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+
 #ifdef HAVE_DVD_H
 #   include <dvd.h>
 #endif
@@ -43,7 +47,6 @@
 #   include <sys/types.h>
 #   include <sys/stat.h>
 #   include <sys/ioctl.h>
-#   include <fcntl.h>
 
 #   include <sys/ioctl.h>
 #   include <linux/cdrom.h>
