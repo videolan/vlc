@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.34 2003/07/01 11:58:33 sam Exp $
+##  $Id: toolbox,v 1.35 2003/07/01 12:01:22 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -37,7 +37,7 @@ EOF
 ##
 getfiles()
 {
-  nawk 'BEGIN{a=0}{if(!a&&/^'"$1"'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < "${srcdir}/Makefile.am" | \
+  awk 'BEGIN{a=0}{if(!a&&$0~/^'"$1"'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if($0~/^[a-zA-Z]/){exit;}print $0}}' < "${srcdir}/Makefile.am" | \
     tr '\\ ' '\n\n' | \
     sed -ne 's/[^-$()_a-zA-Z0-9][^-$()_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p' | \
     sed -e "s,^,${srcdir}/,"
@@ -263,7 +263,7 @@ EOF
     # this is an attempt at getting a list of plugin sources... we take the
     # production and remove everything that does not contain "module", which
     # means you miss $(NULL), but other variables too.
-    cfiles=`grep -v '[^-_a-zA-Z0-9]*#' ${makefile} | nawk 'BEGIN{a=0}{if(!a&&/^SOURCES_'${plugin}'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p'`
+    cfiles=`grep -v '[^-_a-zA-Z0-9]*#' ${makefile} | awk 'BEGIN{a=0}{if(!a&&$0~/^SOURCES_'${plugin}'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if($0~/^[a-zA-Z]/){exit;}print $0}}' | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p'`
     hfiles=`for i in ${cfiles} ; do echo $i ; done | grep '\.h$'`
     cfiles=`for i in ${cfiles} ; do echo $i ; done | grep -v '\.h$'`
     for dir in evc msvc
