@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.5 2002/10/02 19:58:45 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.6 2002/10/02 20:12:02 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -108,15 +108,16 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, (char*)psz_url );
     }
 
-    /* end current item, select added item  */
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        p_input_bank->pp_input[0]->b_eof = 1;
-    }
-    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
-
     if (p_intf->p_sys->b_autoplayfile)
     {
+       intf_ErrMsg("autoplay selected");
+       /* end current item, select added item  */
+       if( p_input_bank->pp_input[0] != NULL )
+       {
+           p_input_bank->pp_input[0]->b_eof = 1;
+       }
+       intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+
        if( p_input_bank->pp_input[0] != NULL )
        {
            input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
@@ -482,9 +483,15 @@ on_cbautoplay_toggled                  (GtkToggleButton *togglebutton,
     intf_thread_t * p_intf = GtkGetIntf( togglebutton );
 
     if (p_intf->p_sys->b_autoplayfile == 1)
+    {
        p_intf->p_sys->b_autoplayfile = 0;
+       intf_ErrMsg("autoplay not selected");
+    }
     else
+    {
        p_intf->p_sys->b_autoplayfile = 1;
+       intf_ErrMsg("autoplay selected");
+    }
 }
 
 

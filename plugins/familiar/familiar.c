@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.8.2.4 2002/10/02 19:58:45 jpsaman Exp $
+ * $Id: familiar.c,v 1.8.2.5 2002/10/02 20:12:02 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -180,7 +180,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* Create some useful widgets that will certainly be used */
 // FIXME: magic path
-    add_pixmap_directory("share");
+    add_pixmap_directory("/usr/share/videolan");
 
     p_intf->p_sys->p_window = create_familiar();
     if (p_intf->p_sys->p_window == NULL)
