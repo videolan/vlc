@@ -2,7 +2,7 @@
  * MessagesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.h,v 1.2 2003/01/26 08:28:20 titer Exp $
+ * $Id: MessagesWindow.h,v 1.3 2003/02/10 15:23:46 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -36,11 +36,8 @@ class MessagesWindow : public BWindow
         virtual bool         QuitRequested();
         
         void                 ReallyQuit();
-        void                 UpdateMessages();
 
-    private:
         intf_thread_t *      p_intf;
-        msg_subscription_t * p_sub;
         
         BView *              fBackgroundView;
         BTextView *          fMessagesView;

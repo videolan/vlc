@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.29 2003/02/09 17:10:52 stippi Exp $
+ * $Id: InterfaceWindow.cpp,v 1.30 2003/02/10 15:23:46 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -790,11 +790,6 @@ void InterfaceWindow::UpdateInterface()
             Unlock();
         }
     }
-
-	// strangly, someone is calling this function even after the object has been destructed!
-	// even more strangly, this workarround seems to work
-	if (fMessagesWindow)
-	    fMessagesWindow->UpdateMessages();
 
     fLastUpdateTime = system_time();
 }

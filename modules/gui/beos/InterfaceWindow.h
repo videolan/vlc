@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.12 2003/02/09 17:10:52 stippi Exp $
+ * $Id: InterfaceWindow.h,v 1.13 2003/02/10 15:23:46 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -106,6 +106,7 @@ class InterfaceWindow : public BWindow
             bool            IsStopped() const;
         
     MediaControlView*        p_mediaControl;
+    MessagesWindow*         fMessagesWindow;
 
  private:    
             void            _UpdatePlaylist();
@@ -126,7 +127,6 @@ class InterfaceWindow : public BWindow
     BFilePanel*             fFilePanel;
     PlayListWindow*         fPlaylistWindow;
     PreferencesWindow*      fPreferencesWindow;
-    MessagesWindow*         fMessagesWindow;
     BMenuBar*               fMenuBar;
     BMenuItem*				fGotoMenuMI;
     BMenuItem*              fNextTitleMI;
