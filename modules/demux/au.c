@@ -1,8 +1,9 @@
 /*****************************************************************************
  * au.c : au file input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: au.c,v 1.2 2003/05/05 22:23:34 gbazin Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: au.c,v 1.3 2003/08/01 00:05:57 fenrir Exp $
+ *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,46 +25,70 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
 #include <codecs.h>
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int    AUInit       ( vlc_object_t * );
-static void   AUEnd        ( vlc_object_t * );
-static int    AUDemux      ( input_thread_t * );
-
-static int    AUDemuxPCM   ( input_thread_t * );
+#include <ninput.h>
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open    ( vlc_object_t * );
+static void Close  ( vlc_object_t * );
+
 vlc_module_begin();
     set_description( _("AU demuxer") );
     set_capability( "demux", 142 );
-    set_callbacks( AUInit, AUEnd );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
+/*
+ * TODO:
+ *  - all adpcm things (I _NEED_ samples)
+ */
 
-#define AUDIO_FILE_ENCODING_MULAW_8         1  /* 8-bit ISDN u-law */
-#define AUDIO_FILE_ENCODING_LINEAR_8        2  /* 8-bit linear PCM */
-#define AUDIO_FILE_ENCODING_LINEAR_16       3  /* 16-bit linear PCM */
-#define AUDIO_FILE_ENCODING_LINEAR_24       4  /* 24-bit linear PCM */
-#define AUDIO_FILE_ENCODING_LINEAR_32       5  /* 32-bit linear PCM */
-#define AUDIO_FILE_ENCODING_FLOAT           6  /* 32-bit IEEE floating point */
-#define AUDIO_FILE_ENCODING_DOUBLE          7  /* 64-bit IEEE floating point */
-#define AUDIO_FILE_ENCODING_ADPCM_G721      23 /* 4-bit CCITT g.721 ADPCM */
-#define AUDIO_FILE_ENCODING_ADPCM_G722      24 /* CCITT g.722 ADPCM */
-#define AUDIO_FILE_ENCODING_ADPCM_G723_3    25 /* CCITT g.723 3-bit ADPCM */
-#define AUDIO_FILE_ENCODING_ADPCM_G723_5    26 /* CCITT g.723 5-bit ADPCM */
-#define AUDIO_FILE_ENCODING_ALAW_8          27 /* 8-bit ISDN A-law */
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int    DemuxPCM   ( input_thread_t * );
+/* TODO static int    DemuxADPCM   ( input_thread_t * ); */
+
+#define GetDWBE( p ) __GetDWBE( (uint8_t*)(p) )
+static inline uint32_t __GetDWBE( uint8_t *p )
+{
+    return( ( p[0] << 24 ) + ( p[1] << 16 ) + ( p[2] << 8 ) + p[3] );
+}
+
+enum AuType_e
+{
+    AU_UNKNOWN      =  0,
+    AU_MULAW_8      =  1,  /* 8-bit ISDN u-law */
+    AU_LINEAR_8     =  2,  /* 8-bit linear PCM */
+    AU_LINEAR_16    =  3,  /* 16-bit linear PCM */
+    AU_LINEAR_24    =  4,  /* 24-bit linear PCM */
+    AU_LINEAR_32    =  5,  /* 32-bit linear PCM */
+    AU_FLOAT        =  6,  /* 32-bit IEEE floating point */
+    AU_DOUBLE       =  7,  /* 64-bit IEEE floating point */
+    AU_ADPCM_G721   =  23, /* 4-bit CCITT g.721 ADPCM */
+    AU_ADPCM_G722   =  24, /* CCITT g.722 ADPCM */
+    AU_ADPCM_G723_3 =  25, /* CCITT g.723 3-bit ADPCM */
+    AU_ADPCM_G723_5 =  26, /* CCITT g.723 5-bit ADPCM */
+    AU_ALAW_8       =  27  /* 8-bit ISDN A-law */
+};
+
+enum AuCat_e
+{
+    AU_CAT_UNKNOWN  = 0,
+    AU_CAT_PCM      = 1,
+    AU_CAT_ADPCM    = 2
+};
 
 typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
 {
     uint32_t    i_header_size;
     uint32_t    i_data_size;
@@ -72,10 +97,10 @@ typedef struct
     uint32_t    i_channels;
 } au_t;
 
-#define AU_DEMUX_PCM        0x01
-#define AU_DEMUX_ADPCM      0x02
 struct demux_sys_t
 {
+    stream_t        *s;
+
     au_t            au;
     WAVEFORMATEX    wf;
 
@@ -83,310 +108,225 @@ struct demux_sys_t
 
     es_descriptor_t *p_es;
 
-    int             i_demux;
+    int             i_frame_size;
+    mtime_t         i_frame_length;
 };
 
-/*****************************************************************************
- * Declaration of local function
- *****************************************************************************/
-
-#define FREE( p ) if( p ) { free( p ); (p) = NULL; }
-
-static uint32_t GetDWBE( uint8_t *p_buff )
-{
-    return( ( p_buff[0] << 24 ) + ( p_buff[1] << 16 ) +
-            ( p_buff[2] <<  8 ) + p_buff[3] );
-}
-
-
-static off_t TellAbsolute( input_thread_t *p_input )
-{
-    off_t i_pos;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    i_pos= p_input->stream.p_selected_area->i_tell;
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    return( i_pos );
-}
-
-/* return 1 if success, 0 if fail */
-static int ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
-{
-    data_packet_t *p_data;
-
-    int i_count = 0;
-
-    if( !i_size )
-    {
-        return( 0 );
-    }
-
-    do
-    {
-        int i_read;
-
-        i_read = input_SplitBuffer(p_input, &p_data, __MIN( i_size, 1024 ) );
-        if( i_read <= 0 )
-        {
-            return( i_count );
-        }
-        memcpy( p_buff, p_data->p_payload_start, i_read );
-        input_DeletePacket( p_input->p_method_data, p_data );
-
-        p_buff += i_read;
-        i_size -= i_read;
-        i_count += i_read;
-
-    } while( i_size );
-
-    return( i_count );
-}
-
-static int SeekAbsolute( input_thread_t *p_input,
-                         off_t i_pos)
-{
-    int         i_skip;
-
-    i_skip    = i_pos - TellAbsolute( p_input );
-    if( i_skip == 0 )
-    {
-        return( VLC_SUCCESS );
-    }
-    if( i_skip < 0 && !p_input->stream.b_seekable )
-    {
-        return( VLC_EGENERIC );
-    }
-    else if( !p_input->stream.b_seekable ||
-             ( i_skip > 0 && i_skip < 1024 && p_input->stream.i_method != INPUT_METHOD_FILE ) )
-    {
-        while( i_skip > 0 )
-        {
-            uint8_t dummy[1024];
-            int     i_read;
-
-            i_read = ReadData( p_input, dummy, __MIN( i_skip, 1024 ) );
-            if( i_read <= 0 )
-            {
-                return( VLC_EGENERIC );
-            }
-            i_skip -= i_read;
-        }
-        return( VLC_SUCCESS );
-    }
-    else
-    {
-            input_AccessReinit( p_input );
-            p_input->pf_seek( p_input, i_pos );
-            return( VLC_SUCCESS );
-    }
-}
-
-static int SkipBytes( input_thread_t *p_input, int i_skip )
-{
-    return( SeekAbsolute( p_input, TellAbsolute( p_input ) + i_skip ) );
-}
-
-static int ReadPES( input_thread_t *p_input,
-                    pes_packet_t **pp_pes,
-                    int i_size )
-{
-    pes_packet_t *p_pes;
-
-    *pp_pes = NULL;
-
-    if( !(p_pes = input_NewPES( p_input->p_method_data )) )
-    {
-        msg_Err( p_input, "cannot allocate new PES" );
-        return( VLC_EGENERIC );
-    }
-
-    while( i_size > 0 )
-    {
-        data_packet_t   *p_data;
-        int i_read;
-
-        if( (i_read = input_SplitBuffer( p_input,
-                                         &p_data,
-                                         __MIN( i_size, 1024 ) ) ) <= 0 )
-        {
-            input_DeletePES( p_input->p_method_data, p_pes );
-            return( VLC_EGENERIC );
-        }
-        if( !p_pes->p_first )
-        {
-            p_pes->p_first = p_data;
-            p_pes->i_nb_data = 1;
-            p_pes->i_pes_size = i_read;
-        }
-        else
-        {
-            p_pes->p_last->p_next  = p_data;
-            p_pes->i_nb_data++;
-            p_pes->i_pes_size += i_read;
-        }
-        p_pes->p_last  = p_data;
-        i_size -= i_read;
-    }
-    *pp_pes = p_pes;
-    return( VLC_SUCCESS );
-}
 
 /*****************************************************************************
- * AUInit: check file and initializes structures
+ * Open: check file and initializes structures
  *****************************************************************************/
-static int AUInit( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    uint8_t  *p_peek;
+    demux_sys_t    *p_sys;
 
-    au_t            au;
-    WAVEFORMATEX    wf;
-    vlc_fourcc_t    i_codec;
+    uint8_t         *p_peek;
 
-    demux_sys_t     *p_demux;
-    es_descriptor_t *p_es;
+    vlc_fourcc_t    i_fourcc;
 
+    int             i_cat;
 
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
+    /* a little test to see if it's a au file */
+    if( input_Peek( p_input, &p_peek, 4 ) < 4 )
     {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE ;
+        msg_Warn( p_input, "AU module discarded (cannot peek)" );
+        return VLC_EGENERIC;
+    }
+    if( strncmp( p_peek, ".snd", 4 ) )
+    {
+        msg_Warn( p_input, "AU module discarded (not a valid file)" );
+        return VLC_EGENERIC;
     }
 
-    /* a little test to see if it's a wav file */
-    if( input_Peek( p_input, &p_peek, 24 ) < 24 )
+    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_sys->i_time = 0;
+
+
+    if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
     {
-        msg_Warn( p_input, "AU plugin discarded (cannot peek)" );
-        return( -1 );
+        msg_Err( p_input, "cannot create stream" );
+        goto error;
     }
+
+    /* skip signature */
+    stream_Read( p_sys->s, NULL, 4 );   /* cannot fail */
 
     /* read header */
-    if( strcmp( p_peek, ".snd" ) )
+    if( stream_Read( p_sys->s, &p_sys->au, sizeof( au_t ) ) < (int)sizeof( au_t ) )
     {
-        msg_Warn( p_input, "AU plugin discarded (not a valid file)" );
-        return( VLC_EGENERIC );
+        msg_Err( p_input, "cannot load header" );
+        goto error;
     }
-    au.i_header_size   = GetDWBE( &p_peek[0x04] );
-    au.i_data_size     = GetDWBE( &p_peek[0x08] );
-    au.i_encoding      = GetDWBE( &p_peek[0x0c] );
-    au.i_sample_rate   = GetDWBE( &p_peek[0x10] );
-    au.i_channels      = GetDWBE( &p_peek[0x14] );
+    p_sys->au.i_header_size   = GetDWBE( &p_sys->au.i_header_size );
+    p_sys->au.i_data_size     = GetDWBE( &p_sys->au.i_data_size );
+    p_sys->au.i_encoding      = GetDWBE( &p_sys->au.i_encoding );
+    p_sys->au.i_sample_rate   = GetDWBE( &p_sys->au.i_sample_rate );
+    p_sys->au.i_channels      = GetDWBE( &p_sys->au.i_channels );
+
     msg_Dbg( p_input,
              "au file: header_size=%d data_size=%d encoding=0x%x sample_rate=%d channels=%d",
-             au.i_header_size,
-             au.i_data_size,
-             au.i_encoding,
-             au.i_sample_rate,
-             au.i_channels );
-    if( au.i_header_size < 24 )
+             p_sys->au.i_header_size,
+             p_sys->au.i_data_size,
+             p_sys->au.i_encoding,
+             p_sys->au.i_sample_rate,
+             p_sys->au.i_channels );
+
+    if( p_sys->au.i_header_size < 24 )
     {
-        msg_Warn( p_input, "AU plugin discarded (not a valid file)" );
-        return( VLC_EGENERIC );
+        msg_Warn( p_input, "AU module discarded (not a valid file)" );
+        goto error;
+    }
+
+    /* skip extra header data */
+    if( p_sys->au.i_header_size > 4 + sizeof( au_t ) )
+    {
+        stream_Read( p_sys->s, NULL, p_sys->au.i_header_size - 4 - sizeof( au_t ) );
     }
 
     /* Create WAVEFORMATEX structure */
-    wf.nChannels     = au.i_channels;
-    wf.nSamplesPerSec= au.i_sample_rate;
-    wf.cbSize        = 0;
+    p_sys->wf.nChannels     = p_sys->au.i_channels;
+    p_sys->wf.nSamplesPerSec= p_sys->au.i_sample_rate;
+    p_sys->wf.cbSize        = 0;
 
-    switch( au.i_encoding )
+    switch( p_sys->au.i_encoding )
     {
-        case AUDIO_FILE_ENCODING_MULAW_8:       /* 8-bit ISDN u-law */
-            wf.wFormatTag     = WAVE_FORMAT_MULAW;   // FIXME ??
-            wf.wBitsPerSample = 8;
-            wf.nBlockAlign    = 1 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'u','l','a','w' );
-            break;
-        case AUDIO_FILE_ENCODING_LINEAR_8:      /* 8-bit linear PCM */
-            wf.wFormatTag     = WAVE_FORMAT_PCM;
-            wf.wBitsPerSample = 8;
-            wf.nBlockAlign    = 1 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 't','w','o','s' );
+        case AU_ALAW_8:        /* 8-bit ISDN A-law */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_ALAW;   // FIXME ??
+            p_sys->wf.wBitsPerSample = 8;
+            p_sys->wf.nBlockAlign    = 1 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 'a','l','a','w' );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_LINEAR_16:     /* 16-bit linear PCM */
-            wf.wFormatTag     = WAVE_FORMAT_PCM;
-            wf.wBitsPerSample = 16;
-            wf.nBlockAlign    = 2 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 't','w','o','s' );
+        case AU_MULAW_8:       /* 8-bit ISDN u-law */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_MULAW;   // FIXME ??
+            p_sys->wf.wBitsPerSample = 8;
+            p_sys->wf.nBlockAlign    = 1 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 'u','l','a','w' );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_LINEAR_24:     /* 24-bit linear PCM */
-            wf.wFormatTag     = WAVE_FORMAT_PCM;
-            wf.wBitsPerSample = 24;
-            wf.nBlockAlign    = 3 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 't','w','o','s' );
+        case AU_LINEAR_8:      /* 8-bit linear PCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_PCM;
+            p_sys->wf.wBitsPerSample = 8;
+            p_sys->wf.nBlockAlign    = 1 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 't','w','o','s' );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_LINEAR_32:     /* 32-bit linear PCM */
-            wf.wFormatTag     = WAVE_FORMAT_PCM;
-            wf.wBitsPerSample = 32;
-            wf.nBlockAlign    = 4 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 't','w','o','s' );
+        case AU_LINEAR_16:     /* 16-bit linear PCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_PCM;
+            p_sys->wf.wBitsPerSample = 16;
+            p_sys->wf.nBlockAlign    = 2 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 't','w','o','s' );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_FLOAT:         /* 32-bit IEEE floating point */
-            wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            wf.wBitsPerSample = 32;
-            wf.nBlockAlign    = 4 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a', 'u', 0, AUDIO_FILE_ENCODING_FLOAT );
+        case AU_LINEAR_24:     /* 24-bit linear PCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_PCM;
+            p_sys->wf.wBitsPerSample = 24;
+            p_sys->wf.nBlockAlign    = 3 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 't','w','o','s' );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_DOUBLE:        /* 64-bit IEEE floating point */
-            wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            wf.wBitsPerSample = 64;
-            wf.nBlockAlign    = 8 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a', 'u', 0, AUDIO_FILE_ENCODING_DOUBLE );
+        case AU_LINEAR_32:     /* 32-bit linear PCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_PCM;
+            p_sys->wf.wBitsPerSample = 32;
+            p_sys->wf.nBlockAlign    = 4 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 't','w','o','s' );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_ADPCM_G721:    /* 4-bit CCITT g.721 ADPCM */
-            wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            wf.wBitsPerSample = 0;
-            wf.nBlockAlign    = 0 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a', 'u', 0, AUDIO_FILE_ENCODING_ADPCM_G721 );
+        case AU_FLOAT:         /* 32-bit IEEE floating point */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
+            p_sys->wf.wBitsPerSample = 32;
+            p_sys->wf.nBlockAlign    = 4 * p_sys->wf.nChannels;
+            i_fourcc                  = VLC_FOURCC( 'a', 'u', 0, AU_FLOAT );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_ADPCM_G722:    /* CCITT g.722 ADPCM */
-            wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            wf.wBitsPerSample = 0;
-            wf.nBlockAlign    = 0 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a', 'u', 0, AUDIO_FILE_ENCODING_ADPCM_G722 );
+        case AU_DOUBLE:        /* 64-bit IEEE floating point */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
+            p_sys->wf.wBitsPerSample = 64;
+            p_sys->wf.nBlockAlign    = 8 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 'a', 'u', 0, AU_DOUBLE );
+            i_cat                    = AU_CAT_PCM;
             break;
 
-        case AUDIO_FILE_ENCODING_ADPCM_G723_3:  /* CCITT g.723 3-bit ADPCM */
-            wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            wf.wBitsPerSample = 0;
-            wf.nBlockAlign    = 0 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a', 'u', 0, AUDIO_FILE_ENCODING_ADPCM_G723_3 );
+        case AU_ADPCM_G721:    /* 4-bit CCITT g.721 ADPCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
+            p_sys->wf.wBitsPerSample = 0;
+            p_sys->wf.nBlockAlign    = 0 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 'a', 'u', 0, AU_ADPCM_G721 );
+            i_cat                    = AU_CAT_ADPCM;
             break;
 
-        case AUDIO_FILE_ENCODING_ADPCM_G723_5:  /* CCITT g.723 5-bit ADPCM */
-            wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            wf.wBitsPerSample = 0;
-            wf.nBlockAlign    = 0 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a', 'u', 0, AUDIO_FILE_ENCODING_ADPCM_G723_5 );
+        case AU_ADPCM_G722:    /* CCITT g.722 ADPCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
+            p_sys->wf.wBitsPerSample = 0;
+            p_sys->wf.nBlockAlign    = 0 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 'a', 'u', 0, AU_ADPCM_G722 );
+            i_cat                    = AU_CAT_ADPCM;
             break;
 
-        case AUDIO_FILE_ENCODING_ALAW_8:        /* 8-bit ISDN A-law */
-            wf.wFormatTag     = WAVE_FORMAT_ALAW;   // FIXME ??
-            wf.wBitsPerSample = 8;
-            wf.nBlockAlign    = 1 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a','l','a','w' );
+        case AU_ADPCM_G723_3:  /* CCITT g.723 3-bit ADPCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
+            p_sys->wf.wBitsPerSample = 0;
+            p_sys->wf.nBlockAlign    = 0 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 'a', 'u', 0, AU_ADPCM_G723_3 );
+            i_cat                    = AU_CAT_ADPCM;
+            break;
+
+        case AU_ADPCM_G723_5:  /* CCITT g.723 5-bit ADPCM */
+            p_sys->wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
+            p_sys->wf.wBitsPerSample = 0;
+            p_sys->wf.nBlockAlign    = 0 * p_sys->wf.nChannels;
+            i_fourcc                 = VLC_FOURCC( 'a', 'u', 0, AU_ADPCM_G723_5 );
+            i_cat                    = AU_CAT_ADPCM;
             break;
 
         default:
-            msg_Warn( p_input, "unknow encoding=0x%x", au.i_encoding );
-            wf.wFormatTag     = WAVE_FORMAT_UNKNOWN;
-            wf.wBitsPerSample = 0;
-            wf.nBlockAlign    = 0 * wf.nChannels;
-            i_codec              = VLC_FOURCC( 'a','u', 0, au.i_encoding );
-            break;
+            msg_Warn( p_input, "unknow encoding=0x%x", p_sys->au.i_encoding );
+            i_cat                    = AU_CAT_UNKNOWN;
+            goto error;
     }
-    wf.nAvgBytesPerSec        = wf.nSamplesPerSec * wf.nChannels * wf.wBitsPerSample / 8;
+    p_sys->wf.nAvgBytesPerSec        = p_sys->wf.nSamplesPerSec * p_sys->wf.nChannels * p_sys->wf.wBitsPerSample / 8;
+
+
+
+    if( i_cat == AU_CAT_UNKNOWN || i_cat == AU_CAT_ADPCM )
+    {
+        p_sys->i_frame_size = 0;
+        p_sys->i_frame_length = 0;
+
+        msg_Err( p_input, "unsupported codec/type (Please report it)" );
+        goto error;
+    }
+    else
+    {
+        int i_samples, i_modulo;
+
+        /* read samples for 50ms of */
+        i_samples = __MAX( p_sys->wf.nSamplesPerSec / 20, 1 );
+
+        p_sys->i_frame_size = i_samples * p_sys->wf.nChannels * ( (p_sys->wf.wBitsPerSample + 7) / 8 );
+
+        if( p_sys->wf.nBlockAlign > 0 )
+        {
+            if( ( i_modulo = p_sys->i_frame_size % p_sys->wf.nBlockAlign ) != 0 )
+            {
+                p_sys->i_frame_size += p_sys->wf.nBlockAlign - i_modulo;
+            }
+        }
+
+        p_sys->i_frame_length = (mtime_t)1000000 *
+                                (mtime_t)i_samples /
+                                (mtime_t)p_sys->wf.nSamplesPerSec;
+
+        p_input->pf_demux = DemuxPCM;
+    }
 
     /*  create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -394,177 +334,102 @@ static int AUInit( vlc_object_t * p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
-        return( VLC_EGENERIC );
+        goto error;
     }
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot add program" );
-        return( VLC_EGENERIC );
+        goto error;
     }
 
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    p_input->stream.i_mux_rate =  wf.nAvgBytesPerSec / 50;
+    p_input->stream.i_mux_rate =  p_sys->wf.nAvgBytesPerSec / 50;
 
-    p_es = input_AddES( p_input, p_input->stream.p_selected_program,
-                        0x01, AUDIO_ES, NULL, 0 );
+    p_sys->p_es = input_AddES( p_input, p_input->stream.p_selected_program,
+                               0x01, AUDIO_ES, NULL, 0 );
 
-    p_es->i_stream_id   = 0x01;
-    p_es->i_fourcc      = i_codec;
-    p_es->p_waveformatex= malloc( sizeof( WAVEFORMATEX ) );
-    memcpy( p_es->p_waveformatex,
-            &wf,
-            sizeof( WAVEFORMATEX ) );
+    p_sys->p_es->i_stream_id   = 0x01;
+    p_sys->p_es->i_fourcc      = i_fourcc;
+    p_sys->p_es->p_waveformatex= malloc( sizeof( WAVEFORMATEX ) );
+    memcpy( p_sys->p_es->p_waveformatex, &p_sys->wf, sizeof( WAVEFORMATEX ) );
 
-    input_SelectES( p_input, p_es );
+    input_SelectES( p_input, p_sys->p_es );
+
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* create our structure that will contains all data */
-    if( ( p_demux = malloc( sizeof( demux_sys_t ) ) ) == NULL )
+    return VLC_SUCCESS;
+
+error:
+    if( p_sys->s )
     {
-        msg_Err( p_input, "out of memory" );
-        return( VLC_EGENERIC );
+        stream_Release( p_sys->s );
     }
-    p_demux->p_es   = p_es;
-    p_demux->i_time = 0;
-    memcpy( &p_demux->au, &au, sizeof( au_t ) );
-    memcpy( &p_demux->wf, &wf, sizeof( WAVEFORMATEX ) );
-    switch( au.i_encoding )
-    {
-        case AUDIO_FILE_ENCODING_MULAW_8:
-        case AUDIO_FILE_ENCODING_LINEAR_8:
-        case AUDIO_FILE_ENCODING_LINEAR_16:
-        case AUDIO_FILE_ENCODING_LINEAR_24:
-        case AUDIO_FILE_ENCODING_LINEAR_32:
-        case AUDIO_FILE_ENCODING_FLOAT:
-        case AUDIO_FILE_ENCODING_DOUBLE:
-        case AUDIO_FILE_ENCODING_ALAW_8:
-            p_demux->i_demux = AU_DEMUX_PCM;
-            break;
-
-        case AUDIO_FILE_ENCODING_ADPCM_G721:
-        case AUDIO_FILE_ENCODING_ADPCM_G722:
-        case AUDIO_FILE_ENCODING_ADPCM_G723_3:
-        case AUDIO_FILE_ENCODING_ADPCM_G723_5:
-            p_demux->i_demux = AU_DEMUX_ADPCM;
-            break;
-
-        default:
-            p_demux->i_demux = 0;
-            break;
-    }
-
-    p_input->p_demux_data = p_demux;
-    p_input->pf_demux = AUDemux;
-
-    /* skip header*/
-    SkipBytes( p_input, au.i_header_size );
-
-    return( VLC_SUCCESS );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
- * AUDemux: read packet and send them to decoders
+ * DemuxPCM: read packet and send them to decoders
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int AUDemux( input_thread_t *p_input )
+static int DemuxPCM( input_thread_t *p_input )
 {
-    demux_sys_t  *p_demux = p_input->p_demux_data;
+    demux_sys_t  *p_sys = p_input->p_demux_data;
+    pes_packet_t *p_pes;
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
-        off_t   i_offset;
+        int64_t i_pos;
 
-        i_offset = TellAbsolute( p_input ) - p_demux->au.i_header_size;
-        if( i_offset < 0 )
+        stream_Control( p_sys->s, STREAM_GET_POSITION, &i_pos );
+        if( p_sys->wf.nBlockAlign != 0 )
         {
-            i_offset = 0;
+            i_pos += p_sys->wf.nBlockAlign - i_pos % p_sys->wf.nBlockAlign;
+            if( stream_Control( p_sys->s, STREAM_SET_POSITION, i_pos ) )
+            {
+                msg_Err( p_input, "STREAM_SET_POSITION failed (cannot resync)" );
+            }
         }
-        if( p_demux->wf.nBlockAlign != 0 )
-        {
-            i_offset += p_demux->wf.nBlockAlign -
-                                i_offset % p_demux->wf.nBlockAlign;
-        }
-        SeekAbsolute( p_input, p_demux->au.i_header_size + i_offset );
     }
 
     input_ClockManageRef( p_input,
                           p_input->stream.p_selected_program,
-                          p_demux->i_time * 9 / 100 );
+                          p_sys->i_time * 9 / 100 );
 
-    switch( p_demux->i_demux )
+    if( ( p_pes = stream_PesPacket( p_sys->s, p_sys->i_frame_size ) ) == NULL )
     {
-        case AU_DEMUX_PCM:
-            return( AUDemuxPCM( p_input ) );
-        case AU_DEMUX_ADPCM:
-        default:
-            msg_Err( p_input, "Internal error (p_demux->i_demux invalid/unsported)" );
-            return( 0 );
+        msg_Warn( p_input, "cannot read data" );
+        return 0;
     }
-}
-static int AUDemuxPCM( input_thread_t *p_input )
-{
-    demux_sys_t  *p_demux = p_input->p_demux_data;
-    pes_packet_t *p_pes;
-
-    int i_samples;
-
-    int i_bytes;
-    int i_modulo;
-
-    /* read samples for 50ms of */
-    i_samples = __MAX( p_demux->wf.nSamplesPerSec / 20, 1 );
-
-
-
-    i_bytes = i_samples * p_demux->wf.nChannels * ( (p_demux->wf.wBitsPerSample + 7) / 8 );
-
-    if( p_demux->wf.nBlockAlign > 0 )
-    {
-        if( ( i_modulo = i_bytes % p_demux->wf.nBlockAlign ) != 0 )
-        {
-            i_bytes += p_demux->wf.nBlockAlign - i_modulo;
-        }
-    }
-
-    if( ReadPES( p_input, &p_pes, i_bytes ) )
-    {
-        msg_Warn( p_input, "failed to get one frame" );
-        return( 0 );
-    }
-
     p_pes->i_dts =
-        p_pes->i_pts = input_ClockGetTS( p_input,
-                                         p_input->stream.p_selected_program,
-                                         p_demux->i_time * 9 / 100 );
+    p_pes->i_pts = input_ClockGetTS( p_input,
+                                     p_input->stream.p_selected_program,
+                                     p_sys->i_time * 9 / 100 );
 
-    if( !p_demux->p_es->p_decoder_fifo )
+    if( !p_sys->p_es->p_decoder_fifo )
     {
         msg_Err( p_input, "no audio decoder" );
         input_DeletePES( p_input->p_method_data, p_pes );
         return( -1 );
     }
-    else
-    {
-        input_DecodePES( p_demux->p_es->p_decoder_fifo, p_pes );
-    }
 
-    p_demux->i_time += (mtime_t)1000000 *
-                       (mtime_t)i_samples /
-                       (mtime_t)p_demux->wf.nSamplesPerSec;
-
+    input_DecodePES( p_sys->p_es->p_decoder_fifo, p_pes );
+    p_sys->i_time += p_sys->i_frame_length;
     return( 1 );
 }
 
 /*****************************************************************************
- * AUEnd: frees unused data
+ * Close: frees unused data
  *****************************************************************************/
-static void AUEnd ( vlc_object_t * p_this )
+static void Close( vlc_object_t * p_this )
 {
-    input_thread_t *  p_input = (input_thread_t *)p_this;
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
 
-    FREE( p_input->p_demux_data );
+    stream_Release( p_sys->s );
+    free( p_sys );
 }
 
