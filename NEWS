@@ -1,4 +1,22 @@
-$Id: NEWS,v 1.78 2003/12/13 15:28:41 rocky Exp $
+$Id: NEWS,v 1.79 2004/01/17 13:47:57 sigmunau Exp $
+Changes between 0.7.0 and 0.7.1:
+---------------------------------
+
+Core support:
+ * Fixed a nasty bug that causes preferences not to be saved some times.
+
+Playlist:
+ * Internal improvments
+ * Improved import/export
+
+Input:
+ * Experimental support for Nullsoft streaming video(.nsv) and real media(.rm)
+   container formars.
+ * New demux module that uses libavformat from ffmpeg. Adds support for many
+   small and strange formats.
+
+Service discovery:
+ * Fixed sdp in SAP
 
 Changes between 0.6.2 and 0.7.0:
 ---------------------------------
@@ -10,7 +28,8 @@ Core support:
  * Video outputs are recycled if possible.
    This removes any 'flicker' between two similiar video files.
  * Fixed the video filters. Video should no longer go black when using filters.
- * New input core. Advantages are: better seeking, more responsive, support for subtitle files at the core, and much much more.
+ * New input core. Advantages are: better seeking, more responsive, support for
+   subtitle files at the core, and much much more.
 
 Playlist:
  * Added a repeat mode to repeat a single file over and over.
