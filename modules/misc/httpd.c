@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.16 2003/06/28 23:56:30 fenrir Exp $
+ * $Id: httpd.c,v 1.17 2003/07/01 08:30:49 adn Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -210,6 +210,15 @@ typedef struct httpd_connection_s
     int64_t i_stream_pos;   /* absolute pos in stream */
 } httpd_connection_t;
 
+/* Linked List of banned IP */
+typedef struct httpd_banned_ip_s
+{
+    struct httpd_banned_ip_s *p_next;
+    struct httpd_banned_ip_s *p_prev;
+    
+    char *psz_ip;
+
+} httpd_banned_ip_t;
 /*
  * The httpd thread
  */
@@ -228,12 +237,18 @@ struct httpd_sys_t
     vlc_mutex_t             connection_lock;
     int                     i_connection_count;
     httpd_connection_t      *p_first_connection;
+
+    vlc_mutex_t             ban_lock;
+    int                     i_banned_ip_count;
+    httpd_banned_ip_t       *p_first_banned_ip;           
 };
 
 static void httpd_Thread( httpd_sys_t *p_httpt );
 static void httpd_ConnnectionNew( httpd_sys_t *, int , struct sockaddr_in * );
 static void httpd_ConnnectionClose( httpd_sys_t *, httpd_connection_t * );
-
+static int httpd_UnbanIP( httpd_sys_t *, httpd_banned_ip_t *);
+static int httpd_BanIP( httpd_sys_t *, char *);
+static httpd_banned_ip_t *httpd_GetbannedIP( httpd_sys_t *, char * );
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -266,6 +281,10 @@ static int Open( vlc_object_t *p_this )
     p_httpt->i_connection_count = 0;
     p_httpt->p_first_connection = NULL;
 
+    vlc_mutex_init( p_httpd, &p_httpt->ban_lock );
+    p_httpt->i_banned_ip_count = 0;
+    p_httpt->p_first_banned_ip = NULL;
+                
     /* start the thread */
     if( vlc_thread_create( p_httpt, "httpd thread",
                            httpd_Thread, VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
@@ -275,6 +294,7 @@ static int Open( vlc_object_t *p_this )
         vlc_mutex_destroy( &p_httpt->host_lock );
         vlc_mutex_destroy( &p_httpt->file_lock );
         vlc_mutex_destroy( &p_httpt->connection_lock );
+        vlc_mutex_destroy( &p_httpt->ban_lock );                
 
         vlc_object_destroy( p_httpt );
         return( VLC_EGENERIC );
@@ -304,6 +324,8 @@ static void Close( vlc_object_t * p_this )
     httpd_sys_t *p_httpt = p_httpd->p_sys;
 
     httpd_connection_t *p_con;
+    httpd_banned_ip_t *p_banned_ip;
+    
     int i;
 
     p_httpt->b_die = 1;
@@ -359,7 +381,14 @@ static void Close( vlc_object_t * p_this )
     {
         httpd_ConnnectionClose( p_httpt, p_con );
     }
-
+    
+    /* Free all banned IP */   
+    vlc_mutex_destroy( &p_httpt->ban_lock );
+    while( ( p_banned_ip = p_httpt->p_first_banned_ip))
+    {
+        httpd_UnbanIP(p_httpt,p_banned_ip);
+    }
+            
     msg_Info( p_httpd, "httpd instance closed" );
     vlc_object_destroy( p_httpt );
 }
@@ -436,8 +465,7 @@ static httpd_host_t *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_addr, i
     for( i = 0; i < p_httpt->i_host_count; i++ )
     {
         if( p_httpt->host[i]->sock.sin_port == sock.sin_port &&
-            ( p_httpt->host[i]->sock.sin_addr.s_addr == INADDR_ANY ||
-              p_httpt->host[i]->sock.sin_addr.s_addr == sock.sin_addr.s_addr ) )
+            p_httpt->host[i]->sock.sin_addr.s_addr == sock.sin_addr.s_addr )
         {
             break;
         }
@@ -968,6 +996,8 @@ static int _httpd_page_admin_get_status( httpd_file_callback_args_t *p_args,
 {
     httpd_sys_t *p_httpt = (httpd_sys_t*)p_args;
     httpd_connection_t *p_con;
+    httpd_banned_ip_t *p_ip;
+        
     int i;
     char *p;
 
@@ -988,7 +1018,31 @@ static int _httpd_page_admin_get_status( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<li>Connection count: %d</li>\n", p_httpt->i_connection_count );
     //p += sprintf( p, "<li>Total bandwith: %d</li>\n", -1 );
     /*p += sprintf( p, "<li></li>\n" );*/
+    p += sprintf( p, "<li>Ban count: %d</li>\n", p_httpt->i_banned_ip_count );
     p += sprintf( p, "</ul>\n" );
+    
+    /* ban list */
+    /* XXX do not lock on ban_lock */
+    p += sprintf( p, "<h3>Ban list</h3>\n" );
+    p += sprintf( p, "<table border=\"1\" cellspacing=\"0\" >\n" );
+    p += sprintf( p, "<tr>\n<th>IP</th>\n<th>Action</th></tr>\n" );
+    for( p_ip = p_httpt->p_first_banned_ip;p_ip != NULL; p_ip = p_ip->p_next )
+    {
+        p += sprintf( p, "<tr>\n" );
+        p += sprintf( p, "<td>%s</td>\n", p_ip->psz_ip );
+        p += sprintf( p, "<td><form method=\"get\" action=\"\">"
+                         "<select name=\"action\">"
+                         "<option selected>unban_ip</option>"
+                         "</select>"
+                         "<input type=\"hidden\" name=\"id\" value=\"%s\"/>"                         
+                         "<input type=\"submit\" value=\"Do it\" />"
+                         "</form></td>\n", p_ip->psz_ip);        
+        p += sprintf( p, "</tr>\n" );
+    }
+    p += sprintf( p, "</table>\n" );
+
+    
+    
     /* host list */
     vlc_mutex_lock( &p_httpt->host_lock );
     p += sprintf( p, "<h3>Host list</h3>\n" );
@@ -1062,6 +1116,7 @@ static int _httpd_page_admin_get_status( httpd_file_callback_args_t *p_args,
                          "<select name=\"action\">"
                          "<option selected>close_connection</option>"
                          "<option>ban_ip</option>"
+                         "<option>close_connection_and_ban_ip</option>"
                          "</select>"
                          "<input type=\"hidden\" name=\"id\" value=\"%p\"/>"
                          "<input type=\"submit\" value=\"Do it\" />"
@@ -1098,7 +1153,8 @@ static int _httpd_page_admin_get_success( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
 
     p += sprintf( p, "<p>Success=`%s'</p>", psz_msg );
-
+    p += sprintf( p, "<a href=\"admin.html\">Retour a la page d'administration</a>\n" );
+    
     p += sprintf( p, "<hr />\n" );
     p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
     p += sprintf( p, "</body>\n" );
@@ -1125,6 +1181,7 @@ static int _httpd_page_admin_get_error( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<h1><center>VideoLAN Client Stream Output</center></h1>\n" );
 
     p += sprintf( p, "<p>Error=`%s'</p>", psz_error );
+    p += sprintf( p, "<a href=\"admin.html\">Retour a la page d'administration</a>\n" );
 
     p += sprintf( p, "<hr />\n" );
     p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
@@ -1208,9 +1265,66 @@ static int  httpd_page_admin_get( httpd_file_callback_args_t *p_args,
         }
         else if( !strcmp( action, "ban_ip" ) )
         {
-            msg_Dbg( p_httpt, "requested banning ip" );
-            return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "ip banned" ) );
+            char id[128];
+            void *i_id;
+            
+            _httpd_uri_extract_value( p_request, "id", id, 512 );
+            i_id = (void*)strtol( id, NULL, 0 );
+            
+            msg_Dbg( p_httpt, "requested banning ip id=%s %p", id, i_id );
+            
+            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
+            {
+                if( (void*)p_con == i_id )
+                {
+                    if( httpd_BanIP( p_httpt,inet_ntoa( p_con->sock.sin_addr ) ) == 0)
+                        return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "IP banned" ) );
+                    else
+                        break;
+                }
+            }
+            
+            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
         }
+        else if( !strcmp( action, "unban_ip" ) )
+        {
+            char id[128];
+            
+            _httpd_uri_extract_value( p_request, "id", id, 512 );
+            msg_Dbg( p_httpt, "requested unbanning ip %s", id);
+            
+            if( httpd_UnbanIP( p_httpt, httpd_GetbannedIP ( p_httpt, id ) ) == 0)
+                return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "IP Unbanned" ) );
+            else
+                return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
+        }
+        else if( !strcmp( action, "close_connection_and_ban_ip" ) )           
+        {
+            char id[128];
+            void *i_id;
+            
+            _httpd_uri_extract_value( p_request, "id", id, 512 );
+            i_id = (void*)strtol( id, NULL, 0 );
+            msg_Dbg( p_httpt, "requested closing connection and banning ip id=%s %p", id, i_id );
+            for( p_con = p_httpt->p_first_connection;p_con != NULL; p_con = p_con->p_next )
+            {
+                if( (void*)p_con == i_id )
+                {
+                    /* XXX don't free p_con as it could be the one that it is sending ... */
+                    p_con->i_state = HTTPD_CONNECTION_TO_BE_CLOSED;
+                    
+                    if( httpd_BanIP( p_httpt,inet_ntoa( p_con->sock.sin_addr ) ) == 0)
+                        return( _httpd_page_admin_get_success( p_args, pp_data, pi_data, "Connection closed and IP banned" ) );
+                    else
+                        break;
+                }
+
+            }
+            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, "invalid id" ) );
+            
+            
+            return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
+        }       
         else
         {
             return( _httpd_page_admin_get_error( p_args, pp_data, pi_data, action ) );
@@ -1224,13 +1338,115 @@ static int  httpd_page_admin_get( httpd_file_callback_args_t *p_args,
     return VLC_SUCCESS;
 }
 
+static int httpd_BanIP( httpd_sys_t *p_httpt, char * psz_new_banned_ip)
+{
+    httpd_banned_ip_t *p_new_banned_ip ;
+    
+    p_new_banned_ip = malloc( sizeof( httpd_banned_ip_t ) );    
+    if( !p_new_banned_ip )
+    {
+        return -1;
+    }
+    p_new_banned_ip->p_next=NULL;
+    p_new_banned_ip->psz_ip = malloc( strlen( psz_new_banned_ip ) + 1 );
+    if( !p_new_banned_ip->psz_ip )
+    {
+        return -2;
+    }
+    
+    strcpy( p_new_banned_ip->psz_ip, psz_new_banned_ip );
+    
+    msg_Dbg( p_httpt, "Banning IP %s", psz_new_banned_ip );
+    
+    if( p_httpt->p_first_banned_ip )
+    {
+        httpd_banned_ip_t *p_last;
+        
+        p_last = p_httpt->p_first_banned_ip;
+        while( p_last->p_next )
+        {
+            p_last = p_last->p_next;
+        }
+        
+        p_last->p_next = p_new_banned_ip;
+        p_new_banned_ip->p_prev = p_last;
+    }
+    else
+    {
+        p_new_banned_ip->p_prev = NULL;
+        
+        p_httpt->p_first_banned_ip = p_new_banned_ip;
+    }
+    
+    p_httpt->i_banned_ip_count++;
+    return 0;
+}
+
+static httpd_banned_ip_t *httpd_GetbannedIP( httpd_sys_t *p_httpt, char *psz_ip )
+{
+    httpd_banned_ip_t *p_ip;
+    
+    p_ip = p_httpt->p_first_banned_ip;
+    
+    while( p_ip)
+    {
+        if( strcmp( psz_ip, p_ip->psz_ip ) == 0 )
+        {
+            return p_ip;
+        }
+        p_ip = p_ip->p_next;
+    }
+    
+    return NULL;
+}
+
+static int httpd_UnbanIP( httpd_sys_t *p_httpt, httpd_banned_ip_t *p_banned_ip )
+{
+    if(!p_banned_ip)
+    {
+        return -1;
+    }
+    
+    msg_Dbg( p_httpt, "Unbanning IP %s",p_banned_ip->psz_ip);
+    
+    /* first cut out from list */
+    if( p_banned_ip->p_prev )
+    {
+        p_banned_ip->p_prev->p_next = p_banned_ip->p_next;
+    }
+    else
+    {
+        p_httpt->p_first_banned_ip = p_banned_ip->p_next;
+    }
+    
+    if( p_banned_ip->p_next )
+    {
+        p_banned_ip->p_next->p_prev = p_banned_ip->p_prev;
+    }
+    
+    FREE( p_banned_ip->psz_ip );
+    FREE( p_banned_ip );
+    
+    p_httpt->i_banned_ip_count--;
+    
+    return 0;
+    
+}
 
 static void httpd_ConnnectionNew( httpd_sys_t *p_httpt, int fd, struct sockaddr_in *p_sock )
 {
     httpd_connection_t *p_con;
 
     msg_Dbg( p_httpt, "new connection from %s", inet_ntoa( p_sock->sin_addr ) );
-
+    
+    /* verify if it's a banned ip */
+    if(httpd_GetbannedIP( p_httpt,inet_ntoa( p_sock->sin_addr ) ) )
+    {
+        msg_Dbg( p_httpt, "Ip %s banned : closing connection", inet_ntoa( p_sock->sin_addr ) );
+        close(fd);
+        return;
+    }
+        
     /* create a new connection and link it */
     p_con = malloc( sizeof( httpd_connection_t ) );
     p_con->i_state  = HTTPD_CONNECTION_RECEIVING_REQUEST;
@@ -1613,15 +1829,14 @@ search_file:
 
     p_con->i_state = HTTPD_CONNECTION_SENDING_HEADER;
 
-    p_con->i_buffer_size = 4096;
-    p_con->i_buffer = 0;
-
     /* we send stream header with this one */
     if( p_con->i_http_error == 200 && p_con->p_file->b_stream )
     {
-        p_con->i_buffer_size += p_con->p_file->i_header_size;
+        p_con->i_buffer_size = 4096 + p_con->p_file->i_header_size;
     }
 
+    p_con->i_buffer_size = 4096;
+    p_con->i_buffer = 0;  
     p = p_con->p_buffer = malloc( p_con->i_buffer_size );
 
     p += sprintf( p, "HTTP/1.0 %d %s\r\n", p_con->i_http_error, psz_status );
@@ -1635,8 +1850,7 @@ search_file:
 
     p_con->i_buffer_size = strlen( p_con->p_buffer );// + 1;
 
-    if( p_con->i_http_error == 200 && p_con->p_file->b_stream &&
-        p_con->p_file->i_header_size > 0 )
+    if( p_con->i_http_error == 200 && p_con->p_file->b_stream && p_con->p_file->i_header_size > 0 )
     {
         /* add stream header */
         memcpy( &p_con->p_buffer[p_con->i_buffer_size],
@@ -1752,7 +1966,8 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
             msleep( 1000 );
             continue;
         }
-        if( i_ret <= 0 )
+        /*FIXME : < 0 is necessary for medialive plugin (it was <=0 before), but why ?*/       
+        if( i_ret < 0 )
         {
 //            msg_Dbg( p_httpt, "waiting..." );
             continue;
@@ -1974,6 +2189,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                     }
                     else if( i_send > 0 )
                     {
+                        msg_Dbg( p_httpt, "Sending %d bytes",i_send );
                         p_con->i_last_activity_date = mdate();
                         p_con->i_stream_pos += i_send;
                     }
