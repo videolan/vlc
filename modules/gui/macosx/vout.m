@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.39 2003/03/06 14:40:43 hartman Exp $
+ * $Id: vout.m,v 1.40 2003/03/18 04:07:23 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -37,6 +37,7 @@
 #include "vout.h"
 
 #define QT_MAX_DIRECTBUFFERS 10
+#define VL_MAX_DISPLAYS 16
 
 struct picture_sys_t
 {
@@ -59,6 +60,8 @@ static int  CoSendRequest      ( vout_thread_t *, SEL );
 static int  CoCreateWindow     ( vout_thread_t * );
 static int  CoDestroyWindow    ( vout_thread_t * );
 static int  CoToggleFullscreen ( vout_thread_t * );
+
+static void VLShowHideCursors  ( vout_thread_t *, BOOL );
 
 static void QTScaleMatrix      ( vout_thread_t * );
 static int  QTCreateSequence   ( vout_thread_t * );
@@ -365,15 +368,13 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         if( !p_vout->p_sys->b_mouse_pointer_visible )
         {
-            CGDisplayShowCursor( kCGDirectMainDisplay );
-            p_vout->p_sys->b_mouse_pointer_visible = 1;
+            VLShowHideCursors( p_vout, NO );
             b_change = 1;
         }
         else if( mdate() - p_vout->p_sys->i_time_mouse_last_moved > 2000000 && 
                    p_vout->p_sys->b_mouse_pointer_visible )
         {
-            CGDisplayHideCursor( kCGDirectMainDisplay );
-            p_vout->p_sys->b_mouse_pointer_visible = 0;
+            VLShowHideCursors( p_vout, YES );
             b_change = 1;
         }
 
@@ -382,8 +383,7 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         if( !p_vout->p_sys->b_mouse_pointer_visible )
         {
-            CGDisplayShowCursor( kCGDirectMainDisplay );
-            p_vout->p_sys->b_mouse_pointer_visible = 1;
+            VLShowHideCursors( p_vout, NO );
             b_change = 1;
         }
         else if( p_vout->p_sys->b_mouse_pointer_visible )
@@ -472,7 +472,7 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
 {
     if( !p_vout->p_sys->b_mouse_pointer_visible )
     {
-        CGDisplayShowCursor( kCGDirectMainDisplay );
+        VLShowHideCursors( p_vout, NO );
         p_vout->p_sys->b_mouse_pointer_visible = 1;
     }
 
@@ -520,6 +520,48 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
     } 
 
     return( 0 );
+}
+
+/*****************************************************************************
+ * VLShowHideCursors: if b_hide then hide the cursors on every display
+ * that contains p_vout, else show the cursors instead.
+ *****************************************************************************
+ * We cannot use kCGDirectMainDisplay, because this is always the display with
+ * the menubar.
+ *****************************************************************************/
+static void VLShowHideCursors ( vout_thread_t *p_vout, BOOL b_hide )
+{
+    NSRect frame;
+    NSScreen *o_screen;
+    CGDirectDisplayID displays[VL_MAX_DISPLAYS];
+    CGDisplayCount displayCount;
+    
+    o_screen = [p_vout->p_sys->o_window screen];
+    frame = [o_screen frame];
+    
+    int err = CGGetDisplaysWithRect( CGRectMake( NSMinX( frame ), NSMinY( frame ), 
+    NSWidth( frame ), NSHeight( frame ) ), VL_MAX_DISPLAYS, displays, &displayCount );
+    
+    if ( displayCount > 0 && !err )
+    {
+        unsigned int i;
+        /* multiple displays are possible, because of mirroring.
+         * mirroring is essential one screen on mult. displays. */
+        for ( i=0 ; i < displayCount ; i++ )
+        {
+            if ( b_hide )
+            {
+                CGDisplayHideCursor( displays[i] );
+                p_vout->p_sys->b_mouse_pointer_visible = 0;
+            }
+            else
+            {
+                CGDisplayShowCursor( displays[i] );
+                p_vout->p_sys->b_mouse_pointer_visible = 1;
+            }
+        }
+    }
+    return;
 }
 
 /*****************************************************************************
