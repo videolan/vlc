@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.147 2001/10/30 10:57:37 massiot Exp $
+ * $Id: input.c,v 1.148 2001/11/01 15:30:50 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -415,17 +415,18 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_delete_pes    = f.pf_delete_pes;
     p_input->pf_rewind        = f.pf_rewind;
     p_input->pf_seek          = f.pf_seek;
-#undef f
 
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* FIXME : this is waaaay too kludgy */
-    if( (strlen( p_input->p_source ) > 3) && !strncasecmp( p_input->p_source, "ts:", 3 ) )
+    if( ( strlen( p_input->p_source ) > 3)
+          && !strncasecmp( p_input->p_source, "ts:", 3 ) )
     {
         /* Network stream */
         NetworkOpen( p_input );
         p_input->stream.i_method = INPUT_METHOD_NETWORK;
     }
-    else if( ( strlen( p_input->p_source ) > 5 ) && !strncasecmp( p_input->p_source, "http:", 5 ) )
+    else if( ( strlen( p_input->p_source ) > 5 )
+               && !strncasecmp( p_input->p_source, "http:", 5 ) )
     {
         /* HTTP stream */
         HTTPOpen( p_input );
@@ -433,18 +434,21 @@ static int InitThread( input_thread_t * p_input )
     }
     else 
 #endif
-        if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+        if( ( strlen( p_input->p_source ) > 4 )
+              && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
         /* DVD - this is THE kludge */
-        p_input->p_input_module->p_functions->input.functions.input.pf_open( p_input );
+        f.pf_open( p_input );
         p_input->stream.i_method = INPUT_METHOD_DVD;
     }
-    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
+    else if( ( strlen( p_input->p_source ) > 4 )
+               && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
     {
         /* Dummy input - very kludgy */
-        p_input->p_input_module->p_functions->input.functions.input.pf_open( p_input );
+        f.pf_open( p_input );
     }
-    else if( ( strlen( p_input->p_source ) == 1 ) && *p_input->p_source == '-' )
+    else if( ( strlen( p_input->p_source ) == 1 )
+               && *p_input->p_source == '-' )
     {
         /* Stdin */
         StdOpen( p_input );
@@ -455,6 +459,7 @@ static int InitThread( input_thread_t * p_input )
         FileOpen( p_input );
         p_input->stream.i_method = INPUT_METHOD_FILE;
     }
+#undef f
 
     if( p_input->b_error )
     {
@@ -468,7 +473,7 @@ static int InitThread( input_thread_t * p_input )
     if( p_input->b_error )
     {
         /* We barfed -- exit nicely */
-        p_input->pf_close( p_input );
+        CloseThread( p_input );
         module_Unneed( p_input->p_input_module );
         return( -1 );
     }
@@ -526,34 +531,50 @@ static void EndThread( input_thread_t * p_input )
     /* Free demultiplexer's data */
     p_input->pf_end( p_input );
 
+    /* Close the input method */
+    CloseThread( p_input );
+
+    /* Release modules */
+    module_Unneed( p_input->p_input_module );
+
+}
+
+/*****************************************************************************
+ * CloseThread: close the target
+ *****************************************************************************/
+static void CloseThread( input_thread_t * p_input )
+{
+#define f p_input->p_input_module->p_functions->input.functions.input
+
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
     /* Close stream */
-    if( (strlen( p_input->p_source ) > 3) && !strncasecmp( p_input->p_source, "ts:", 3 ) )
+    if( ( strlen( p_input->p_source ) > 3)
+          && !strncasecmp( p_input->p_source, "ts:", 3 ) )
     {
         NetworkClose( p_input );
     }
-    else if( ( strlen( p_input->p_source ) > 5 ) && !strncasecmp( p_input->p_source, "http:", 5 ) )
+    else if( ( strlen( p_input->p_source ) > 5 )
+               && !strncasecmp( p_input->p_source, "http:", 5 ) )
     {
         NetworkClose( p_input );
     }
     else 
 #endif
-    if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    if( ( strlen( p_input->p_source ) > 4 )
+          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
-        p_input->p_input_module->p_functions->input.functions.input.pf_close( p_input );
+        f.pf_close( p_input );
     }
-    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
+    else if( ( strlen( p_input->p_source ) > 4 )
+               && !strncasecmp( p_input->p_source, "vlc:", 4 ) )
     {
-        p_input->p_input_module->p_functions->input.functions.input.pf_close( p_input );
+        f.pf_close( p_input );
     }
     else
     {
         FileClose( p_input );
     }
-
-    /* Release modules */
-    module_Unneed( p_input->p_input_module );
-
+#undef f
 }
 
 /*****************************************************************************
