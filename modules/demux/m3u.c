@@ -44,6 +44,7 @@
 #define TYPE_PLS 4
 #define TYPE_B4S 5
 #define TYPE_WMP 6
+#define TYPE_RTSP 7
 
 struct demux_sys_t
 {
@@ -56,7 +57,7 @@ struct demux_sys_t
 static int  Activate  ( vlc_object_t * );
 static void Deactivate( vlc_object_t * );
 static int  Demux     ( demux_t * );
-static int Control    ( demux_t *, int, va_list );
+static int  Control   ( demux_t *, int, va_list );
 
 /*****************************************************************************
  * Module descriptor
@@ -134,6 +135,7 @@ static int Activate( vlc_object_t * p_this )
                    && strncasecmp( p_peek, "[Reference]", sizeof("[Reference]") - 1 )
                    && strncasecmp( p_peek, "<html>", sizeof("<html>") - 1 )
                    && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 )
+                   && strncasecmp( p_peek, "rtsptext", sizeof("rtsptext") - 1 )
                    && strncasecmp( p_peek, "<?xml", sizeof("<?xml") -1 ) )
             {
                 p_peek++;
@@ -159,6 +161,10 @@ static int Activate( vlc_object_t * p_this )
             {
                 i_type2 = TYPE_ASX;
             }
+            else if( !strncasecmp( p_peek, "rtsptext", sizeof("rtsptext") -1 ) )
+            {
+                i_type2 = TYPE_RTSP;
+            }
 #if 0
             else if( !strncasecmp( p_peek, "<?xml", sizeof("<?xml") -1 ) )
             {
@@ -183,6 +189,7 @@ static int Activate( vlc_object_t * p_this )
     /* Allocate p_m3u */
     p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
     p_demux->p_sys->i_type = i_type;
+    msg_Dbg( p_this, "Playlist type: %d - %d", i_type, i_type2 );
 
     return VLC_SUCCESS;
 }
@@ -292,7 +299,7 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
         }
         /* If we don't have a comment, the line is directly the URI */
     }
-    else if ( p_m3u->i_type == TYPE_PLS )
+    else if( p_m3u->i_type == TYPE_PLS )
     {
         /* We are dealing with .pls files from shoutcast
          * We are looking for lines like "File1=http://..." */
@@ -308,7 +315,7 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
             return 0;
         }
     }
-    else if ( p_m3u->i_type == TYPE_WMP )
+    else if( p_m3u->i_type == TYPE_WMP )
     {
         /* We are dealing with some weird WMP stream playlist format
          * Hurray for idiotic M$. Lines look like: "Ref1=http://..." */
@@ -328,7 +335,7 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
             return 0;
         }
     }
-    else if ( p_m3u->i_type == TYPE_ASX )
+    else if( p_m3u->i_type == TYPE_ASX )
     {
         /* We are dealing with ASX files.
          * We are looking for "<ref href=" xml markups that
@@ -368,7 +375,7 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
 
         *psz_eol = '\0';
     }
-    else if ( p_m3u->i_type == TYPE_HTML )
+    else if( p_m3u->i_type == TYPE_HTML )
     {
         /* We are dealing with a html file with embedded
          * video.  We are looking for "<param name="filename"
@@ -401,7 +408,7 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
         *psz_eol = '\0';
 
     }
-    else if ( p_m3u->i_type == TYPE_B4S )
+    else if( p_m3u->i_type == TYPE_B4S )
     {
 
         char *psz_eol;
@@ -464,6 +471,13 @@ static int ParseLine( demux_t *p_demux, char *psz_line, char *psz_data,
 
         /* Handle the XML special characters */
         XMLSpecialChars( psz_bol );
+    }
+    else if( p_m3u->i_type == TYPE_RTSP )
+    {
+        /* We are dealing with rtsptext reference files
+         * Ignore anthying that doesn't start with rtsp://..." */
+        if( strncasecmp( psz_bol, "rtsp://", sizeof("rtsp://") - 1 ) )
+        /* ignore */ return 0;
     }
     else
     {
