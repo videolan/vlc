@@ -55,12 +55,12 @@ void __fastcall TDiscDlg::FormHide( TObject *Sender )
     p_intf->p_sys->p_window->OpenDiscAction->Checked = false;
 }
 //---------------------------------------------------------------------------
-void __fastcall TDiscDlg::BitBtnCancelClick( TObject *Sender )
+void __fastcall TDiscDlg::ButtonCancelClick( TObject *Sender )
 {
     Hide();
 }
 //---------------------------------------------------------------------------
-void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
+void __fastcall TDiscDlg::ButtonOkClick( TObject *Sender )
 {
     AnsiString  Device, Source, Method, Title, Chapter;
 
@@ -79,7 +79,14 @@ void __fastcall TDiscDlg::BitBtnOkClick( TObject *Sender )
     Chapter.sprintf( "%d", SpinEditChapter->Value );
 
     /* Build source name and add it to playlist */
-    Source = Method + ":" + Device + "@" + Title + "," + Chapter;
+    if ( CheckBoxMenus->Checked )
+    {
+        Source = Method + ":" + Device;
+    }
+    else
+    {
+        Source = Method + ":" + Device + "@" + Title + "," + Chapter;
+    }
 
     p_intf->p_sys->p_playwin->Add( Source, PLAYLIST_APPEND
             | ( p_intf->p_sys->b_play_when_adding ? PLAYLIST_GO : 0 ),
@@ -94,16 +101,43 @@ void __fastcall TDiscDlg::RadioGroupTypeClick( TObject *Sender )
     if( RadioGroupType->ItemIndex == 0 )
     {
         psz_device = config_GetPsz( p_intf, "dvd" );
+        CheckBoxMenus->Enabled = true;
+        CheckBoxMenus->Checked = true;
     }
     else
     {
         psz_device = config_GetPsz( p_intf, "vcd" );
+        CheckBoxMenus->Checked = false;
+        CheckBoxMenus->Enabled = false;
     }
 
     if( psz_device )
     {
         EditDevice->Text = psz_device;
         free( psz_device );
+    }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TDiscDlg::CheckBoxMenusClick(TObject *Sender)
+{
+    if ( CheckBoxMenus->Checked )
+    {
+        LabelTitle->Enabled = false;
+        LabelChapter->Enabled = false;
+        SpinEditTitle->Enabled = false;
+        SpinEditTitle->Color = clBtnFace;
+        SpinEditChapter->Enabled = false;
+        SpinEditChapter->Color = clBtnFace;
+    }
+    else
+    {
+        LabelTitle->Enabled = true;
+        LabelChapter->Enabled = true;
+        SpinEditTitle->Enabled = true;
+        SpinEditTitle->Color = clWindow;
+        SpinEditChapter->Enabled = true;
+        SpinEditChapter->Color = clWindow;
     }
 }
 //---------------------------------------------------------------------------

@@ -40,16 +40,19 @@ __published:	// IDE-managed Components
     TLabel *LabelTitle;
     TLabel *LabelChapter;
     TRadioGroup *RadioGroupType;
-    TBitBtn *BitBtnOk;
-    TBitBtn *BitBtnCancel;
+    TButton *ButtonOk;
+    TButton *ButtonCancel;
     TEdit *EditDevice;
     TCSpinEdit *SpinEditTitle;
     TCSpinEdit *SpinEditChapter;
+    TCheckBox *CheckBoxMenus;
+    TBevel *Bevel1;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
-    void __fastcall BitBtnCancelClick( TObject *Sender );
-    void __fastcall BitBtnOkClick( TObject *Sender);
+    void __fastcall ButtonCancelClick( TObject *Sender );
+    void __fastcall ButtonOkClick( TObject *Sender);
     void __fastcall RadioGroupTypeClick( TObject *Sender );
+    void __fastcall CheckBoxMenusClick(TObject *Sender);
 private:	// User declarations
     intf_thread_t *p_intf;
 public:		// User declarations

@@ -253,6 +253,7 @@ object PreferencesDlg: TPreferencesDlg
     Width = 433
     Height = 511
     Anchors = [akLeft, akTop, akRight, akBottom]
+    MultiLine = True
     TabOrder = 0
   end
   object ButtonApply: TButton
