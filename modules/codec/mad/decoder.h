@@ -50,8 +50,17 @@ typedef struct mad_adec_thread_s
     /*
      * Output properties
      */
-    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-    enum mad_scaling	  audio_scaling;
+//old way    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
+
+    /*
+     * Output properties
+     */
+    aout_instance_t *   p_aout; /* opaque */
+    aout_input_t *      p_aout_input; /* opaque */
+    audio_sample_format_t output_format;
+
+    mtime_t             last_date;
+    enum mad_scaling	audio_scaling;
 
 } mad_adec_thread_t;
 

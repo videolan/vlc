@@ -142,11 +142,17 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     decoder_fifo_t * p_fifo = p_mad_adec->p_fifo;
     char *psz_downscale = NULL;
 
+    /* Initialize the thread properties */
+    p_mad_adec->p_aout = NULL;
+    p_mad_adec->p_aout_input = NULL;
+    p_mad_adec->output_format.i_format = AOUT_FMT_FIXED32;
+    p_mad_adec->output_format.i_channels = 2; /* FIXME ! */
+
     /*
      * Properties of audio for libmad
      */
-		
-		/* Look what scaling method was requested by the user */
+
+    /* Look what scaling method was requested by the user */
     psz_downscale = config_GetPsz( p_fifo, "downscale" );
 
     if ( strncmp(psz_downscale,"fast",4)==0 )
@@ -165,7 +171,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
         msg_Dbg( p_fifo, "downscale default fast selected" );
     }
 
-	if (psz_downscale) free(psz_downscale);
+    if (psz_downscale) free(psz_downscale);
 
     /* Initialize the libmad decoder structures */
     p_mad_adec->libmad_decoder = (struct mad_decoder*) malloc(sizeof(struct mad_decoder));
@@ -177,21 +183,15 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
     p_mad_adec->i_current_pts = p_mad_adec->i_next_pts = 0;
 
     mad_decoder_init( p_mad_adec->libmad_decoder,
-                      p_mad_adec,         /* vlc's thread structure and p_fifo playbuffer */
-                      libmad_input,          /* input_func */
+                      p_mad_adec,       /* vlc's thread structure and p_fifo playbuffer */
+                      libmad_input,     /* input_func */
                       0,                /* header_func */
                       0,                /* filter */
-                      libmad_output,         /* output_func */
-                      0,                  /* error */
-                      0);                    /* message */
+                      libmad_output3,   /* output_func */
+                      0,                /* error */
+                      0);               /* message */
 
     mad_decoder_options(p_mad_adec->libmad_decoder, MAD_OPTION_IGNORECRC);
-//    mad_timer_reset(&p_mad_adec->libmad_timer);
-
-    /*
-     * Initialize the output properties
-     */
-    p_mad_adec->p_aout_fifo = NULL;
 
     /*
      * Initialize the input properties
@@ -221,7 +221,7 @@ static void EndThread (mad_adec_thread_t * p_mad_adec)
     /* If the audio output fifo was created, we destroy it */
     if (p_mad_adec->p_aout_fifo != NULL)
     {
-        aout_DestroyFifo (p_mad_adec->p_aout_fifo);
+        aout_InputDelete( p_mad_adec->p_aout, p_mad_adec->p_aout_input );
 
         /* Make sure the output thread leaves the NextFrame() function */
         vlc_mutex_lock (&(p_mad_adec->p_aout_fifo->data_lock));

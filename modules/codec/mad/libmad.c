@@ -271,116 +271,217 @@ static inline mad_fixed_t s24_to_s16_pcm(mad_fixed_t sample)
 /*****************************************************************************
  * libmad_ouput: this function is called just after the frame is decoded
  *****************************************************************************/
-enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header, struct mad_pcm *p_libmad_pcm)
+//enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header, struct mad_pcm *p_libmad_pcm)
+//{
+//    mad_adec_thread_t *p_mad_adec= (mad_adec_thread_t *) data;
+//    byte_t *buffer=NULL;
+//    mad_fixed_t const *left_ch = p_libmad_pcm->samples[0], *right_ch = p_libmad_pcm->samples[1];
+//    register int nsamples = p_libmad_pcm->length;
+//    mad_fixed_t sample;
+//    static struct audio_dither dither;
+//
+//    /* Creating the audio output fifo.
+//     * Assume the samplerate and nr of channels from the first decoded frame is right for the entire audio track.
+//     */
+//    if (p_mad_adec->p_aout_fifo==NULL)
+//    {
+//    	p_mad_adec->p_aout_fifo = aout_CreateFifo(
+//                p_mad_adec->p_fifo,
+//                AOUT_FIFO_PCM,              /* fifo type */
+//                2, /*p_libmad_pcm->channels,*/     /* nr. of channels */
+//                p_libmad_pcm->samplerate,   /* frame rate in Hz ?*/
+//                p_libmad_pcm->length*2,     /* length of output buffer *2 channels*/
+//                NULL  );                    /* buffer */
+//
+//    	if ( p_mad_adec->p_aout_fifo == NULL )
+//    	{
+//        	return MAD_FLOW_BREAK;
+//    	}
+//
+//        msg_Dbg( p_mad_adec->p_fifo, "aout fifo created");
+//    }
+//
+//    if (p_mad_adec->p_aout_fifo->i_rate != p_libmad_pcm->samplerate)
+//    {
+//	msg_Warn( p_mad_adec->p_fifo, "samplerate is changing from [%d] Hz "
+//                  "to [%d] Hz, sample size [%d], error_code [%0x]",
+//                  p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
+//                  p_libmad_pcm->length,
+//                  p_mad_adec->libmad_decoder->sync->stream.error );
+//	p_mad_adec->p_aout_fifo->i_rate = p_libmad_pcm->samplerate;
+//    }
+//
+//    if( p_mad_adec->i_current_pts )
+//    {
+//        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->i_end_frame]
+//                = p_mad_adec->i_current_pts;
+//    }
+//    else
+//    {
+//        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->i_end_frame]
+//                = LAST_MDATE;
+//    }
+////    mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
+//
+//    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->i_end_frame * (p_libmad_pcm->length*4));
+//
+//    while (nsamples--)
+//    {
+//        switch (p_mad_adec->audio_scaling)
+//        {
+//          case MPG321_SCALING:
+//               sample = mpg321_s24_to_s16_pcm(16, *left_ch++, &dither);
+//          break;
+//          case FAST_SCALING: /* intended fall through */
+//          default:
+//               sample = s24_to_s16_pcm(*left_ch++);
+//          break;
+//			  }
+//
+//        /* left audio channel */
+//#ifndef WORDS_BIGENDIAN
+//        *buffer++ = (byte_t) (sample >> 0);
+//        *buffer++ = (byte_t) (sample >> 8);
+//#else
+//     	  *buffer++ = (byte_t) (sample >> 8);
+//    	  *buffer++ = (byte_t) (sample >> 0);
+//#endif
+//      	if (p_libmad_pcm->channels == 2)
+//        {
+//       	    /* right audio channel */
+//            switch (p_mad_adec->audio_scaling)
+//            {
+//              case MPG321_SCALING:
+//                   sample = mpg321_s24_to_s16_pcm(16, *right_ch++, &dither);
+//              break;
+//              case FAST_SCALING: /* intended fall through */
+//              default:
+//                   sample = s24_to_s16_pcm(*right_ch++);
+//              break;
+//    			  }
+//        }
+//        /* else reuse left_ch */
+//#ifndef WORDS_BIGENDIAN
+//        *buffer++ = (byte_t) (sample >> 0);
+//        *buffer++ = (byte_t) (sample >> 8);
+//#else
+//        *buffer++ = (byte_t) (sample >> 8);
+//        *buffer++ = (byte_t) (sample >> 0);
+//#endif						
+//    }
+//
+//    /* DEBUG */
+//    /*
+//    if (p_libmad_pcm->channels == 1) {
+//       msg_Dbg( p_mad_adec->p_fifo, "libmad_output channels [%d]", p_libmad_pcm->channels);
+//    }
+//    */
+//
+//    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
+//    p_mad_adec->p_aout_fifo->i_end_frame = (p_mad_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
+//    vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
+//    vlc_mutex_unlock (&p_mad_adec->p_aout_fifo->data_lock);
+//
+//    return MAD_FLOW_CONTINUE;
+//}
+
+/*****************************************************************************
+ * libmad_ouput3: this function is called just after the frame is decoded
+ *****************************************************************************/
+enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_header, struct mad_pcm *p_libmad_pcm)
 {
     mad_adec_thread_t *p_mad_adec= (mad_adec_thread_t *) data;
-    byte_t *buffer=NULL;
+    aout_buffer_t * p_buffer;
     mad_fixed_t const *left_ch = p_libmad_pcm->samples[0], *right_ch = p_libmad_pcm->samples[1];
     register int nsamples = p_libmad_pcm->length;
     mad_fixed_t sample;
-    static struct audio_dither dither;
 
     /* Creating the audio output fifo.
-     * Assume the samplerate and nr of channels from the first decoded frame is right for the entire audio track.
+     * Assume the samplerate and nr of channels from the first decoded frame
+     * is right for the entire audio track.
      */
-    if (p_mad_adec->p_aout_fifo==NULL)
+    if( (p_mad_adec->p_aout_input != NULL) &&
+        ( (p_mad_adec->output_format.i_rate != p_libmad_pcm->samplerate)
     {
-    	p_mad_adec->p_aout_fifo = aout_CreateFifo(
-                p_mad_adec->p_fifo,
-                AOUT_FIFO_PCM,              /* fifo type */
-                2, /*p_libmad_pcm->channels,*/     /* nr. of channels */
-                p_libmad_pcm->samplerate,   /* frame rate in Hz ?*/
-                p_libmad_pcm->length*2,     /* length of output buffer *2 channels*/
-                NULL  );                    /* buffer */
-
-    	if ( p_mad_adec->p_aout_fifo == NULL )
-    	{
-        	return MAD_FLOW_BREAK;
-    	}
-
-        msg_Dbg( p_mad_adec->p_fifo, "aout fifo created");
+        /* Parameters changed - this should not happen. */
+        aout_InputDelete( p_mad_adec->p_aout, p_mad_adec->p_aout_input );
+        p_mad_adec->p_aout_input = NULL;
     }
 
-    if (p_mad_adec->p_aout_fifo->i_rate != p_libmad_pcm->samplerate)
+    /* Creating the audio input if not created yet. */
+    if( p_mad_adec->p_aout_input == NULL )
     {
-	msg_Warn( p_mad_adec->p_fifo, "samplerate is changing from [%d] Hz "
+        p_mad_adec->output_format.i_rate = p_libmad_pcm->samplerate;
+        /* p_mad_adec->output_format.i_channels = p_libmad_pcm->channels; */
+        p_mad_adec->p_aout_input = aout_InputNew( p_mad_adec->p_fifo,
+                                               &p_mad_adec->p_aout,
+                                               &p_mad_adec->output_format );
+
+        if ( p_mad_adec->p_aout_input == NULL )
+        {
+           p_mad_adec->p_fifo->b_error = 1;
+           return MAD_FLOW_BREAK;
+        }
+        msg_Dbg( p_mad_adec->p_fifo, "aout3 buffer created");
+    }
+
+    if (p_mad_adec->output_format->i_rate != p_libmad_pcm->samplerate)
+    {
+        msg_Warn( p_mad_adec->p_fifo, "samplerate is changing from [%d] Hz "
                   "to [%d] Hz, sample size [%d], error_code [%0x]",
                   p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
                   p_libmad_pcm->length,
                   p_mad_adec->libmad_decoder->sync->stream.error );
-	p_mad_adec->p_aout_fifo->i_rate = p_libmad_pcm->samplerate;
+        p_mad_adec->output_format.i_rate = p_libmad_pcm->samplerate;
     }
 
-    if( p_mad_adec->i_current_pts )
+    /* Set the Presentation Time Stamp */
+    p_buffer = aout_BufferNew( p_mad_adec->p_aout, p_mad_adec->p_aout_input,
+                               (p_libmad_pcm->length*4) );
+    if ( p_buffer == NULL )
     {
-        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->i_end_frame]
-                = p_mad_adec->i_current_pts;
+        return MAD_FLOW_BREAK;
+    }
+    /* Add accurate PTS to buffer. */
+    if ( p_mad_adec->i_current_pts )
+    {
+        p_buffer->start_date = p_mad_adec->i_current_pts;
     }
     else
     {
-        p_mad_adec->p_aout_fifo->date[p_mad_adec->p_aout_fifo->i_end_frame]
-                = LAST_MDATE;
+        p_buffer->start_date = LAST_MDATE;
     }
-//    mad_timer_add(&p_mad_adec->libmad_timer,p_libmad_header->duration);
+    p_mad_adec->last_date += (mtime_t)(p_libmad_pcm->length*4)
+                             / p_mad_adec->output_format.i_rate;
+    p_buffer->end_date = p_mad_adec->last_date;
 
-    buffer = ((byte_t *)p_mad_adec->p_aout_fifo->buffer) + (p_mad_adec->p_aout_fifo->i_end_frame * (p_libmad_pcm->length*4));
-
+    /* Interleave and keep buffers in mad_fixed_t format */
     while (nsamples--)
     {
-        switch (p_mad_adec->audio_scaling)
-        {
-          case MPG321_SCALING:
-               sample = mpg321_s24_to_s16_pcm(16, *left_ch++, &dither);
-          break;
-          case FAST_SCALING: /* intended fall through */
-          default:
-               sample = s24_to_s16_pcm(*left_ch++);
-          break;
-			  }
-
         /* left audio channel */
+        sample = *left_ch++;
 #ifndef WORDS_BIGENDIAN
-        *buffer++ = (byte_t) (sample >> 0);
-        *buffer++ = (byte_t) (sample >> 8);
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
 #else
-     	  *buffer++ = (byte_t) (sample >> 8);
-    	  *buffer++ = (byte_t) (sample >> 0);
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
 #endif
-      	if (p_libmad_pcm->channels == 2)
+        /* right audio channel */
+        if (p_libmad_pcm->channels == 2)
         {
-       	    /* right audio channel */
-            switch (p_mad_adec->audio_scaling)
-            {
-              case MPG321_SCALING:
-                   sample = mpg321_s24_to_s16_pcm(16, *right_ch++, &dither);
-              break;
-              case FAST_SCALING: /* intended fall through */
-              default:
-                   sample = s24_to_s16_pcm(*right_ch++);
-              break;
-    			  }
-        }
-        /* else reuse left_ch */
+           sample = *right_ch++;
+        } /* else reuse left audio channel */
 #ifndef WORDS_BIGENDIAN
-        *buffer++ = (byte_t) (sample >> 0);
-        *buffer++ = (byte_t) (sample >> 8);
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
 #else
-        *buffer++ = (byte_t) (sample >> 8);
-        *buffer++ = (byte_t) (sample >> 0);
-#endif						
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
+        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
+#endif
     }
 
-    /* DEBUG */
-    /*
-    if (p_libmad_pcm->channels == 1) {
-       msg_Dbg( p_mad_adec->p_fifo, "libmad_output channels [%d]", p_libmad_pcm->channels);
-    }
-    */
-
-    vlc_mutex_lock (&p_mad_adec->p_aout_fifo->data_lock);
-    p_mad_adec->p_aout_fifo->i_end_frame = (p_mad_adec->p_aout_fifo->i_end_frame + 1) & AOUT_FIFO_SIZE;
-    vlc_cond_signal (&p_mad_adec->p_aout_fifo->data_wait);
-    vlc_mutex_unlock (&p_mad_adec->p_aout_fifo->data_lock);
+    aout_BufferPlay( p_mad_adec->p_aout, p_mad_adec->p_aout_input, p_buffer );
 
     return MAD_FLOW_CONTINUE;
 }
@@ -395,88 +496,88 @@ enum mad_flow libmad_error(void *data, struct mad_stream *p_libmad_stream, struc
     switch (p_libmad_stream->error)
     {             
     case MAD_ERROR_BUFLEN:                /* input buffer too small (or EOF) */
-//X        intf_ErrMsg("libmad error: input buffer too small (or EOF)");
+//X        msg_Err("libmad error: input buffer too small (or EOF)");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BUFPTR:                /* invalid (null) buffer pointer */
-//X        intf_ErrMsg("libmad error: invalid (null) buffer pointer");
+//X        msg_Err("libmad error: invalid (null) buffer pointer");
         result = MAD_FLOW_STOP;
         break;
     case MAD_ERROR_NOMEM:                 /* not enough memory */
-//X        intf_ErrMsg("libmad error: invalid (null) buffer pointer");
+//X        msg_Err("libmad error: invalid (null) buffer pointer");
         result = MAD_FLOW_STOP;
         break;
     case MAD_ERROR_LOSTSYNC:            /* lost synchronization */
-//X        intf_ErrMsg("libmad error: lost synchronization");
+//X        msg_Err("libmad error: lost synchronization");
         mad_stream_sync(p_libmad_stream);
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADLAYER:            /* reserved header layer value */
-//X        intf_ErrMsg("libmad error: reserved header layer value");
+//X        msg_Err("libmad error: reserved header layer value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADBITRATE:        /* forbidden bitrate value */
-//X        intf_ErrMsg("libmad error: forbidden bitrate value");
+//X        msg_Err("libmad error: forbidden bitrate value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADSAMPLERATE: /* reserved sample frequency value */
-//X        intf_ErrMsg("libmad error: reserved sample frequency value");
+//X        msg_Err("libmad error: reserved sample frequency value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADEMPHASIS:     /* reserved emphasis value */
-//X        intf_ErrMsg("libmad error: reserverd emphasis value");
+//X        msg_Err("libmad error: reserverd emphasis value");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADCRC:                /* CRC check failed */
-//X        intf_ErrMsg("libmad error: CRC check failed");
+//X        msg_Err("libmad error: CRC check failed");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADBITALLOC:     /* forbidden bit allocation value */
-//X        intf_ErrMsg("libmad error: forbidden bit allocation value");
+//X        msg_Err("libmad error: forbidden bit allocation value");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADSCALEFACTOR:/* bad scalefactor index */
-//X        intf_ErrMsg("libmad error: bad scalefactor index");
+//X        msg_Err("libmad error: bad scalefactor index");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADFRAMELEN:     /* bad frame length */
-//X        intf_ErrMsg("libmad error: bad frame length");
+//X        msg_Err("libmad error: bad frame length");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADBIGVALUES:    /* bad big_values count */
-//X        intf_ErrMsg("libmad error: bad big values count");
+//X        msg_Err("libmad error: bad big values count");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADBLOCKTYPE:    /* reserved block_type */
-//X        intf_ErrMsg("libmad error: reserverd block_type");
+//X        msg_Err("libmad error: reserverd block_type");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADSCFSI:            /* bad scalefactor selection info */
-//X        intf_ErrMsg("libmad error: bad scalefactor selection info");
+//X        msg_Err("libmad error: bad scalefactor selection info");
         result = MAD_FLOW_CONTINUE;
         break;
     case MAD_ERROR_BADDATAPTR:        /* bad main_data_begin pointer */
-//X        intf_ErrMsg("libmad error: bad main_data_begin pointer");
+//X        msg_Err("libmad error: bad main_data_begin pointer");
         result = MAD_FLOW_STOP;
         break;
     case MAD_ERROR_BADPART3LEN:     /* bad audio data length */
-//X        intf_ErrMsg("libmad error: bad audio data length");
+//X        msg_Err("libmad error: bad audio data length");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADHUFFTABLE:    /* bad Huffman table select */
-//X        intf_ErrMsg("libmad error: bad Huffman table select");
+//X        msg_Err("libmad error: bad Huffman table select");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADHUFFDATA:     /* Huffman data overrun */
-//X        intf_ErrMsg("libmad error: Huffman data overrun");
+//X        msg_Err("libmad error: Huffman data overrun");
         result = MAD_FLOW_IGNORE;
         break;
     case MAD_ERROR_BADSTEREO:         /* incompatible block_type for JS */
-//X        intf_ErrMsg("libmad error: incompatible block_type for JS");
+//X        msg_Err("libmad error: incompatible block_type for JS");
         result = MAD_FLOW_IGNORE;
         break;
     default:
-//X        intf_ErrMsg("libmad error: unknown error occured stopping decoder");
+//X        msg_Err("libmad error: unknown error occured stopping decoder");
         result = MAD_FLOW_STOP;
         break;
     }
@@ -559,7 +660,7 @@ static void PrintFrameInfo(struct mad_header *Header)
 			break;
 	}
 
-//X	intf_ErrMsg("statistics: %lu kb/s audio mpeg layer %s stream %s crc, "
+//X	msg_Err("statistics: %lu kb/s audio mpeg layer %s stream %s crc, "
 //X			"%s with %s emphasis at %d Hz sample rate\n",
 //X			Header->bitrate,Layer,
 //X			Header->flags&MAD_FLAG_PROTECTION?"with":"without",
