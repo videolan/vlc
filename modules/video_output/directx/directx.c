@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.19 2003/05/15 22:27:37 massiot Exp $
+ * $Id: directx.c,v 1.20 2003/05/21 13:27:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -84,6 +84,10 @@ static void DirectXGetDDrawCaps   ( vout_thread_t *p_vout );
 static int  DirectXLockSurface    ( vout_thread_t *p_vout, picture_t *p_pic );
 static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
 
+/* Object variables callbacks */
+static int OnTopCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -132,7 +136,7 @@ vlc_module_end();
 static int OpenVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
+    vlc_value_t val, text;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -218,8 +222,12 @@ static int OpenVideo( vlc_object_t *p_this )
 
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "directx-on-top", VLC_VAR_BOOL );
+    text.psz_string = _("Always on top");
+    var_Change( p_vout, "directx-on-top", VLC_VAR_SETTEXT, &text, NULL );
     val.b_bool = config_GetInt( p_vout, "directx-on-top" );
     var_Set( p_vout, "directx-on-top", val );
+    p_vout->p_sys->b_on_top_change = val.b_bool; 
+    var_AddCallback( p_vout, "directx-on-top", OnTopCallback, NULL );
 
     return VLC_SUCCESS;
 
@@ -375,9 +383,6 @@ static void CloseVideo( vlc_object_t *p_this )
 static int Manage( vout_thread_t *p_vout )
 {
     WINDOWPLACEMENT window_placement;
-    HWND hwnd;
-    HMENU hMenu;
-    vlc_value_t val;
 
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
@@ -427,6 +432,8 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE
         || p_vout->p_sys->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
+        vlc_value_t val;
+
         p_vout->b_fullscreen = ! p_vout->b_fullscreen;
 
         /* We need to switch between Maximized and Normal sized window */
@@ -453,6 +460,10 @@ static int Manage( vout_thread_t *p_vout )
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
         p_vout->p_sys->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
+
+        /* Update the object variable without triggering a callback */
+        val.b_bool = p_vout->b_fullscreen;
+        var_Change( p_vout, "fullscreen", VLC_VAR_SETVALUE, &val, NULL );
     }
 
     /*
@@ -472,30 +483,34 @@ static int Manage( vout_thread_t *p_vout )
     /*
      * "Always on top" status change
      */
-    hwnd = p_vout->p_sys->hwnd;
-    hMenu = GetSystemMenu( hwnd , FALSE );
-    var_Get( p_vout, "directx-on-top", &val );
-    if( val.b_bool )
+    if( p_vout->p_sys->b_on_top_change )
     {
+        vlc_value_t val;
+        HMENU hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
+
+        var_Get( p_vout, "directx-on-top", &val );
+ 
         /* Set the window on top if necessary */
-        if( !( GetWindowLong( hwnd, GWL_EXSTYLE ) & WS_EX_TOPMOST ) )
+        if( val.b_bool && !( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
+                           & WS_EX_TOPMOST ) )
         {
             CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
                            MF_BYCOMMAND | MFS_CHECKED );
-            SetWindowPos( hwnd, HWND_TOPMOST, 0, 0, 0, 0,
-                           SWP_NOSIZE | SWP_NOMOVE );
+            SetWindowPos( p_vout->p_sys->hwnd, HWND_TOPMOST, 0, 0, 0, 0,
+                          SWP_NOSIZE | SWP_NOMOVE );
         }
-    }
-    else
-    {
+        else
         /* The window shouldn't be on top */
-        if( GetWindowLong( hwnd, GWL_EXSTYLE ) & WS_EX_TOPMOST )
+        if( !val.b_bool && ( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
+                           & WS_EX_TOPMOST ) )
         {
             CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
                            MF_BYCOMMAND | MFS_UNCHECKED );
-            SetWindowPos( hwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+            SetWindowPos( p_vout->p_sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
                           SWP_NOSIZE | SWP_NOMOVE );
         }
+
+        p_vout->p_sys->b_on_top_change = VLC_FALSE;
     }
 
     /* Check if the event thread is still running */
@@ -1517,4 +1532,16 @@ static int DirectXUnlockSurface( vout_thread_t *p_vout, picture_t *p_pic )
         return VLC_SUCCESS;
     else
         return VLC_EGENERIC;
+}
+
+/*****************************************************************************
+ * object variables callbacks: a bunch of object variables are used by the
+ * interfaces to interact with the vout.
+ *****************************************************************************/
+static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    p_vout->p_sys->b_on_top_change = VLC_TRUE;
+    return VLC_SUCCESS;
 }

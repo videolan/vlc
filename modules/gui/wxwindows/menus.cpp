@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.11 2003/05/17 22:48:09 gbazin Exp $
+ * $Id: menus.cpp,v 1.12 2003/05/21 13:27:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -96,12 +96,12 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
                 const wxPoint& pos )
 {
     vlc_object_t *p_object;
-    char *ppsz_varnames[19];
-    int pi_objects[19];
+    char *ppsz_varnames[29];
+    int pi_objects[29];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 19 * sizeof(int) );
+    memset( pi_objects, 0, 29 * sizeof(int) );
 
     /* Audio menu */
     ppsz_varnames[i++] = _("Audio menu");
@@ -128,6 +128,8 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface,
     if( p_object != NULL )
     {
         ppsz_varnames[i] = "fullscreen";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "directx-on-top";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }
@@ -210,18 +212,20 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 {
     vlc_object_t *p_object;
-    char *ppsz_varnames[4];
-    int pi_objects[4];
+    char *ppsz_varnames[6];
+    int pi_objects[6];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 4 * sizeof(int) );
+    memset( pi_objects, 0, 6 * sizeof(int) );
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_VOUT,
                                                 FIND_ANYWHERE );
     if( p_object != NULL )
     {
         ppsz_varnames[i] = "fullscreen";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "directx-on-top";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }
@@ -373,6 +377,8 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
 
+    var_Get( p_object, psz_var, &val );
+
     if( i_type & VLC_VAR_HASCHOICE )
     {
         menu->Append( MenuDummy_Event,
@@ -397,13 +403,14 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
         break;
 
     case VLC_VAR_BOOL:
+        val.b_bool = !val.b_bool;
         menuitem = new wxMenuItemExt( menu, ++i_item_id,
                                       wxU(text.psz_string ?
                                         text.psz_string : psz_var),
                                       wxT(""), wxITEM_CHECK, strdup(psz_var),
                                       p_object->i_object_id, val, i_type );
         menu->Append( menuitem );
-        Check( i_item_id -1, val.b_bool ? FALSE : TRUE );
+        Check( i_item_id, val.b_bool ? FALSE : TRUE );
         break;
 
     default:
@@ -411,6 +418,7 @@ void Menu::CreateMenuItem( wxMenu *menu, char *psz_var,
         return;
     }
 
+    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
     if( text.psz_string ) free( text.psz_string );
 }
 
@@ -519,7 +527,7 @@ wxMenu *Menu::CreateChoicesMenu( char *psz_var, vlc_object_t *p_object )
     }
 
     /* clean up everything */
-    if( i_type == VLC_VAR_STRING ) free( val.psz_string );
+    if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
     var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, &text_list );
 
     return menu;

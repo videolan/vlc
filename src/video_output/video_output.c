@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.221 2003/05/11 18:40:11 hartman Exp $
+ * $Id: video_output.c,v 1.222 2003/05/21 13:27:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -56,6 +56,10 @@ static int      ReduceHeight      ( int );
 static int      BinaryLog         ( uint32_t );
 static void     MaskToShift       ( int *, int *, uint32_t );
 static void     InitWindowSize    ( vout_thread_t *, int *, int * );
+
+/* Object variables callbacks */
+static int FullscreenCallback( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
@@ -196,7 +200,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     input_thread_t * p_input_thread;
     int              i_index;                               /* loop variable */
     char           * psz_plugin;
-    vlc_value_t      val;
+    vlc_value_t      val, text;
 
     /* Allocate descriptor */
     p_vout = vlc_object_create( p_parent, VLC_OBJECT_VOUT );
@@ -372,6 +376,12 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
         vlc_object_destroy( p_vout );
         return NULL;
     }
+
+    /* Create a few object variables for interface interaction */
+    var_Create( p_vout, "fullscreen", VLC_VAR_BOOL );
+    text.psz_string = _("Fullscreen");
+    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
 
     /* Calculate delay created by internal caching */
     p_input_thread = (input_thread_t *)vlc_object_find( p_vout,
@@ -1148,5 +1158,20 @@ int vout_VarCallback( vlc_object_t * p_this, const char * psz_variable,
     vlc_value_t val;
     val.b_bool = VLC_TRUE;
     var_Set( p_vout, "intf-change", val );
-    return 0;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * object variables callbacks: a bunch of object variables are used by the
+ * interfaces to interact with the vout.
+ *****************************************************************************/
+static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vlc_value_t val;
+    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
+    return VLC_SUCCESS;
 }

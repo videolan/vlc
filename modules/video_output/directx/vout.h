@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.4 2003/03/28 17:02:25 gbazin Exp $
+ * $Id: vout.h,v 1.5 2003/05/21 13:27:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -83,6 +83,9 @@ struct vout_sys_t
     /* Mouse */
     volatile vlc_bool_t b_cursor_hidden;
     volatile mtime_t    i_lastmoved;
+
+    /* Misc */
+    vlc_bool_t          b_on_top_change;
 
     event_thread_t *    p_event;
 };
