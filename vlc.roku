@@ -2,7 +2,7 @@
 make distclean
 ./bootstrap
 CC=mipsel-linux-gcc CXX=mipsel-linux-g++ AR=mipsel-linux-ar LD=mipsel-linux-ld RANLIB=mipsel-linux-ranlib STRIP=mipsel-linux-strip \
- ./configure --host=mipsel --enable-release --enable-static --disable-shared --enable-plugins \
+ ./configure --host=mipsel --enable-release --enable-static --disable-shared --disable-plugins \
   --prefix=/home/jpsaman/src/roku-dev/usr \
   --disable-sdl \
   --enable-mad --with-mad-tree=/home/jpsaman/src/libmad-0.15.0b \
@@ -49,5 +49,5 @@ CC=mipsel-linux-gcc CXX=mipsel-linux-g++ AR=mipsel-linux-ar LD=mipsel-linux-ld R
   --enable-hd1000a --enable-hd1000v \
   CFLAGS="-I/home/jpsaman/src/roku-dev/usr/include -I/home/jpsaman/src/roku-dev/usr/local/include/roku" \
   CXXFLAGS="-I/usr/tools/roku/include " \
-  LDFLAGS="-L/usr/tools/roku/mipsel-linux/lib -L/home/jpsaman/src/roku-dev/lib -L/home/jpsaman/src/roku/usr/lib -L/home/jpsaman/src/roku-dev/usr/local/lib" && \
+  LDFLAGS="-L/usr/tools/roku/mipsel-linux/lib -L/home/jpsaman/src/roku-dev/lib -L/home/jpsaman/src/roku-dev/usr/local/lib -Wl,-rpath-link -Wl,/home/jpsaman/src/roku-dev/usr/local/lib" && \
   make
