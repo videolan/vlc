@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.1 2002/01/09 02:01:14 sam Exp $
+ * $Id: intf_eject.c,v 1.2 2002/01/09 10:22:37 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -29,9 +29,11 @@
 
 #include <videolan/vlc.h>
 
-#ifdef SYS_LINUX
+#ifdef HAVE_DVD_H
+#   include <dvd.h>
+#endif
 
-/* This code could be extended to support CD/DVD-ROM chargers */
+#ifdef SYS_LINUX
 #   include <linux/version.h>
     /* handy macro found in 2.1 kernels, but not in older ones */
 #   ifndef KERNEL_VERSION
@@ -53,29 +55,71 @@
 #   include <scsi/scsi.h>
 #   include <scsi/sg.h>
 #   include <scsi/scsi_ioctl.h>
-
 #endif
 
-static int EjectCdrom( int i_fd );
-static int EjectScsi ( int i_fd );
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+#ifdef SYS_LINUX
+static int EjectSCSI ( int i_fd );
+#endif
 
-/*
- * Eject using CDROMEJECT ioctl. Return 0 if successful
- */
-static int EjectCdrom( int i_fd )
+/*****************************************************************************
+ * intf_Eject: eject the CDRom
+ *****************************************************************************
+ * returns 0 on success
+ * returns 1 on failure
+ * returns -1 if not implemented
+ *****************************************************************************/
+int intf_Eject( const char *psz_device )
 {
-    int i_status;
-  
-    i_status = ioctl( i_fd, CDROMEJECT );
-  
-    return i_status;
+    int i_ret;
+
+    /* This code could be extended to support CD/DVD-ROM chargers */
+    int i_fd = 0;
+
+    i_fd = open( psz_device, O_RDONLY | O_NONBLOCK );
+   
+    if( i_fd == -1 )
+    {
+        intf_ErrMsg( "intf error: couldn't open device %s", psz_device );
+        return 1;
+    }
+
+#ifdef SYS_LINUX
+    /* Try a simple ATAPI eject */
+    i_ret = ioctl( i_fd, CDROMEJECT, 0 );
+
+    if( i_ret != 0 )
+    {
+        i_ret = EjectSCSI( i_fd );
+    }
+
+    if( i_ret != 0 )
+    {
+        intf_ErrMsg( "intf error: couldn't eject %s", psz_device );
+    }
+
+#elif defined (HAVE_DVD_H)
+    i_ret = ioctl( i_fd, CDROMEJECT, 0 );
+
+#else
+    intf_ErrMsg( "intf error: CD-Rom ejection unsupported on this platform" );
+    i_ret = -1;
+
+#endif
+    close( i_fd );
+
+    return i_ret;
 }
 
+/* The following functions are local */
 
-/*
+#ifdef SYS_LINUX
+/*****************************************************************************
  * Eject using SCSI commands. Return 0 if successful
- */
-static int EjectScsi( int i_fd )
+ *****************************************************************************/
+static int EjectSCSI( int i_fd )
 {
     int i_status;
 
@@ -133,50 +177,5 @@ static int EjectScsi( int i_fd )
   
     return i_status;
 }
-
-/*
- * returns 0 on success
- * returns 1 on failure
- * returns -1 if not implemented
- *
- * Modify eject_disc() prototype as needed for portability
- */
-
-int intf_Eject( const char *psz_device )
-{
-  int i_ret;
-
-#ifdef SYS_LINUX
-  int i_fd = 0;
-
-   i_fd = open( psz_device, O_RDONLY | O_NONBLOCK );
-   
-   if( i_fd == -1 )
-   {
-       intf_ErrMsg( "intf error: couldn't open device %s", psz_device );
-       return 1;
-   }
-
-   if( EjectCdrom(i_fd) == 0 )
-   {
-       i_ret = 0;
-   }
-   else if( EjectScsi(i_fd) == 0 )
-   {
-       i_ret = 0;
-   }
-   else
-   {
-       intf_ErrMsg( "intf error: couldn't eject %s", psz_device );
-       i_ret = 1;
-   }
-
-   close( i_fd );
-
-#else
-   i_ret = -1;
-
 #endif
-   return i_ret;
-}
 

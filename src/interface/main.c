@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.143 2002/01/07 02:12:30 sam Exp $
+ * $Id: main.c,v 1.144 2002/01/09 10:22:37 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1307,16 +1307,6 @@ static u32 CPUCapabilities( void )
         if( i_illegal == 0 )
         {
             i_capabilities |= CPU_CAPABILITY_SSE;
-        }
-        else
-        {
-            fprintf( stderr, "warning: your OS doesn't have support for "
-                             "SSE instructions, some optimizations\n"
-                             "will be disabled"
-#      ifdef SYS_LINUX
-                             " (you will need Linux kernel 2.4.x or later)"
-#      endif
-                             "\n" );
         }
 #   endif
     }
