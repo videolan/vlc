@@ -26,6 +26,7 @@
  *****************************************************************************/
 #include "plugin.h"
 #include "glx.h"
+#include "main.h"
 
 #include <vlc/input.h>
 #include <vlc/vout.h>
@@ -93,7 +94,6 @@ static int Open( vlc_object_t *p_this )
         vlc_object_create( p_filter, sizeof( galaktos_thread_t ) );
     vlc_object_attach( p_thread, p_this );
 
-    galaktos_glx_init( p_thread, 512, 512 );
 /*
     var_Create( p_thread, "galaktos-width", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
     var_Get( p_thread, "galaktos-width", &width );
@@ -240,11 +240,34 @@ static void Thread( vlc_object_t *p_this )
     audio_date_t i_pts;
     int16_t p_data[2][512];
     int i_data = 0, i_count = 0;
+    int i;
+
+    galaktos_glx_init( p_thread, 512, 512 );
 
     while( !p_thread->b_die )
     {
+        /* goom_update is damn slow, so just copy data and release the lock */
+        vlc_mutex_lock( &p_thread->lock );
+        if( FillBuffer( (int16_t *)p_data, &i_data, &i_pts,
+                        &p_thread->date, p_thread ) != VLC_SUCCESS )
+            vlc_cond_wait( &p_thread->wait, &p_thread->lock );
+        vlc_mutex_unlock( &p_thread->lock );
+
+        if( galaktos_update( p_thread, p_data ) == 1 )
+        {
+            p_thread->b_die = 1;
+        }
+
+        if( p_thread->psz_title )
+        {
+            free( p_thread->psz_title );
+            p_thread->psz_title = NULL;
+        }
+
         msleep( VOUT_OUTMEM_SLEEP );
     }
+
+    galaktos_glx_done( p_thread );
 }
 
 /*****************************************************************************

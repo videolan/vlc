@@ -1,5 +1,5 @@
 /*****************************************************************************
- * plugin.h:
+ * main.h:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
  * $Id$
@@ -21,14 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef _GALAKTOS_GLX_H_
-#define _GALAKTOS_GLX_H_
+#ifndef _GALAKTOS_MAIN_H_
+#define _GALAKTOS_MAIN_H_
 
-#include "plugin.h"
-
-int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height );
-void galaktos_glx_done( galaktos_thread_t *p_thread );
-int galaktos_glx_handle_events( galaktos_thread_t *p_thread );
-void galaktos_glx_swap( galaktos_thread_t *p_thread );
+int galaktos_update( galaktos_thread_t *p_thread, int16_t p_data[2][512] );
 
 #endif

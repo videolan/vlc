@@ -1,5 +1,5 @@
 /*****************************************************************************
- * plugin.h:
+ * main.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
  * $Id$
@@ -21,14 +21,46 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef _GALAKTOS_GLX_H_
-#define _GALAKTOS_GLX_H_
+#include "glx.h"
+#include <GL/gl.h>
+#include <unistd.h>
+#include <math.h>
 
-#include "plugin.h"
+int galaktos_update( galaktos_thread_t *p_thread, int16_t p_data[2][512] )
+{
+    int j;
 
-int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height );
-void galaktos_glx_done( galaktos_thread_t *p_thread );
-int galaktos_glx_handle_events( galaktos_thread_t *p_thread );
-void galaktos_glx_swap( galaktos_thread_t *p_thread );
+    /* Process X11 events */
+    if( galaktos_glx_handle_events( p_thread ) == 1 )
+    {
+        return 1;
+    }
 
-#endif
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glBegin(GL_TRIANGLE_STRIP);
+        glColor3f( 0.5f, 0.0f, 0.0f);
+        glVertex2f(  -1.0f,  1.0f);
+        glColor3f( 0.2f, 0.2f, 0.0f);
+        glVertex2f(  1.0f,  1.0f);
+        glColor3f( 0.0f, 0.2f, 0.2f);
+        glVertex2f(  -1.0f,  -1.0f);
+        glColor3f( 0.0f, 0.0f, 0.5f);
+        glVertex2f(  1.0f,  -1.0f);
+    glEnd();
+    glBegin(GL_LINE_STRIP);
+        glColor3f( 1.0f, 1.0f, 1.0f);
+        glVertex2f( -1.0f, 0.0f);
+        for(j=0; j<512; j++)
+        {
+            glVertex2f( (float)j/256-1.0f, (float)p_data[0][j]/32000);
+        }
+    glEnd();
+
+    galaktos_glx_swap( p_thread );
+
+    return 0;
+}
+
+
