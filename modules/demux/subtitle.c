@@ -232,7 +232,7 @@ static int Open ( vlc_object_t *p_this )
     if( p_sys->i_type == SUB_TYPE_UNKNOWN )
     {
         int     i_try;
-        char    *s;
+        char    *s = NULL;
 
         msg_Dbg( p_demux, "autodetecting subtitle format" );
         for( i_try = 0; i_try < 256; i_try++ )
@@ -301,7 +301,12 @@ static int Open ( vlc_object_t *p_this )
                 p_sys->i_type = SUB_TYPE_VOBSUB;
                 break;
             }
+
+            free( s );
+            s = NULL;
         }
+
+        if( s ) free( s );
 
         /* It will nearly always work even for non seekable stream thanks the
          * caching system, and if it fails we loose just a few sub */
@@ -464,6 +469,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 p_sys->i_subtitle++;
             }
+
             if( p_sys->i_subtitle >= p_sys->i_subtitles )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
