@@ -45,7 +45,7 @@ typedef struct macroblock_s
    
     /* AddBlock information */
     f_addb_t                pf_addb[12];      /* pointer to the Add function */
-    data_t *                p_data[12];              /* pointer to the position
+    data_t                  p_data[12];              /* pointer to the position
 					              * in the final picture */
     int                     i_addb_l_stride, i_addb_c_stride;
 } macroblock_t;
@@ -67,15 +67,26 @@ typedef struct
     int                     i_l_x, i_l_y, i_c_x, i_c_y;
 } macroblock_parsing_t;
 
-/******************************************************************************
- * lookup_t : entry type for lookup tables                                    *
- ******************************************************************************/
+/*****************************************************************************
+ * lookup_t : entry type for lookup tables                                   *
+ *****************************************************************************/
 
 typedef struct lookup_s
 {
     int    i_value;
     int    i_length;
 } lookup_t;
+
+/******************************************************************************
+ * ac_lookup_t : special entry type for lookup tables about ac coefficients
+ *****************************************************************************/ 
+
+typedef struct dct_lookup_s
+{
+    int    i_run;
+    int    i_level;
+    int    i_length;
+} dct_lookup_t;
 
 /*****************************************************************************
  * Standard codes
@@ -103,6 +114,17 @@ typedef struct lookup_s
 /* Scan */
 #define SCAN_ZIGZAG                         0
 #define SCAN_ALT                            1
+
+/* Constant for block decoding */
+#define DCT_EOB                                 64
+#define DCT_ESCAPE                              65
+
+/*****************************************************************************
+ * Constants
+ *****************************************************************************/
+extern int *    pi_default_intra_quant;
+extern int *    pi_default_nonintra_quant;
+extern u8       pi_scan[2][64];
 
 /*****************************************************************************
  * Prototypes

@@ -56,8 +56,9 @@ static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, 
 /*
  * Initialisation tables
  */
-lookup_t pl_coded_pattern_init_table[512] = 
-    { {MB_ERROR, 0}, {MB_ERROR, 0}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
+    /* Table for coded_block_pattern resolution */
+lookup_t     pl_coded_pattern_init_table[512] = 
+    { {MB_ERROR, 0}, {0, 9}, {39, 9}, {27, 9}, {59, 9}, {55, 9}, {47, 9}, {31, 9},
     {58, 8}, {58, 8}, {54, 8}, {54, 8}, {46, 8}, {46, 8}, {30, 8}, {30, 8},
     {57, 8}, {57, 8}, {53, 8}, {53, 8}, {45, 8}, {45, 8}, {29, 8}, {29, 8},
     {38, 8}, {38, 8}, {26, 8}, {26, 8}, {37, 8}, {37, 8}, {25, 8}, {25, 8},
@@ -122,7 +123,230 @@ lookup_t pl_coded_pattern_init_table[512] =
     {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, 
     {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3}, {60, 3} };
 
+    /* Tables for dc DCT coefficients 
+     * Tables are cut in two parts to reduce memory occupation
+     */
+    
+    /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
+lookup_t     pl_dct_dc_lum_init_table_1[32] =
+    { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {0, 3}, {0, 3}, {0, 3}, {0, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3},
+      {4, 3}, {4, 3}, {4, 3}, {4, 3}, {5, 4}, {5, 4}, {6, 5}, {MB_ERROR, 0}
+    };
 
+    /* Table B-12, dct_dc_size_luminance, codes 111110xxx ... 111111111 */
+lookup_t     pl_dct_dc_lum_init_table_2[32] =
+    { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
+      {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
+      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}
+    };
+
+    /* Table B-13, dct_dc_size_chrominance, codes 00xxx ... 11110 */
+lookup_t     pl_dct_dc_chrom_init_table_1[32] =
+    { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
+      {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
+      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
+      {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
+    };
+
+    /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
+lookup_t     pl_dct_dc_chrom_init_table_2[32] =
+    { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
+      {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
+      {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
+    };
+
+/* Tables for ac DCT coefficients. There are cut in many parts to save space */
+    /* Table B-14, DCT coefficients table zero,
+     * codes 0100 ... 1xxx (used for first (DC) coefficient)
+     */
+dct_lookup_t pl_DCT_tab_dc[12] =
+    {
+        {0,2,4}, {2,1,4}, {1,1,3}, {1,1,3},
+        {0,1,1}, {0,1,1}, {0,1,1}, {0,1,1},
+        {0,1,1}, {0,1,1}, {0,1,1}, {0,1,1}
+    };
+
+    /* Table B-14, DCT coefficients table zero,
+     * codes 0100 ... 1xxx (used for all other coefficients)
+     */
+dct_lookup_t pl_DCT_tab_ac[12] =
+    {
+        {0,2,4},  {2,1,4},  {1,1,3},  {1,1,3},
+        {DCT_EOB,0,2}, {DCT_EOB,0,2}, {DCT_EOB,0,2}, {DCT_EOB,0,2}, /* EOB */
+        {0,1,2},  {0,1,2},  {0,1,2},  {0,1,2}
+    };
+
+    /* Table B-14, DCT coefficients table zero,
+     * codes 000001xx ... 00111xxx
+     */
+dct_lookup_t pl_DCT_tab0[60] =
+    {
+        {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6},
+        /* Escape */
+        {2,2,7}, {2,2,7}, {9,1,7}, {9,1,7},
+        {0,4,7}, {0,4,7}, {8,1,7}, {8,1,7},
+        {7,1,6}, {7,1,6}, {7,1,6}, {7,1,6},
+        {6,1,6}, {6,1,6}, {6,1,6}, {6,1,6},
+        {1,2,6}, {1,2,6}, {1,2,6}, {1,2,6},
+        {5,1,6}, {5,1,6}, {5,1,6}, {5,1,6},
+        {13,1,8}, {0,6,8}, {12,1,8}, {11,1,8},
+        {3,2,8}, {1,3,8}, {0,5,8}, {10,1,8},
+        {0,3,5}, {0,3,5}, {0,3,5}, {0,3,5},
+        {0,3,5}, {0,3,5}, {0,3,5}, {0,3,5},
+        {4,1,5}, {4,1,5}, {4,1,5}, {4,1,5},
+        {4,1,5}, {4,1,5}, {4,1,5}, {4,1,5},
+        {3,1,5}, {3,1,5}, {3,1,5}, {3,1,5},
+        {3,1,5}, {3,1,5}, {3,1,5}, {3,1,5}
+    };
+
+    /* Table B-15, DCT coefficients table one,
+     * codes 000001xx ... 11111111
+     */
+dct_lookup_t pl_DCT_tab0a[252] =
+    {
+        {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6}, {DCT_ESCAPE,0,6},
+        /* Escape */
+        {7,1,7}, {7,1,7}, {8,1,7}, {8,1,7},
+        {6,1,7}, {6,1,7}, {2,2,7}, {2,2,7},
+        {0,7,6}, {0,7,6}, {0,7,6}, {0,7,6},
+        {0,6,6}, {0,6,6}, {0,6,6}, {0,6,6},
+        {4,1,6}, {4,1,6}, {4,1,6}, {4,1,6},
+        {5,1,6}, {5,1,6}, {5,1,6}, {5,1,6},
+        {1,5,8}, {11,1,8}, {0,11,8}, {0,10,8},
+        {13,1,8}, {12,1,8}, {3,2,8}, {1,4,8},
+        {2,1,5}, {2,1,5}, {2,1,5}, {2,1,5},
+        {2,1,5}, {2,1,5}, {2,1,5}, {2,1,5},
+        {1,2,5}, {1,2,5}, {1,2,5}, {1,2,5},
+        {1,2,5}, {1,2,5}, {1,2,5}, {1,2,5},
+        {3,1,5}, {3,1,5}, {3,1,5}, {3,1,5},
+        {3,1,5}, {3,1,5}, {3,1,5}, {3,1,5},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {1,1,3}, {1,1,3}, {1,1,3}, {1,1,3},
+        {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4}, /* EOB */
+        {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4},
+        {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4},
+        {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4}, {DCT_EOB,0,4},
+        {0,3,4}, {0,3,4}, {0,3,4}, {0,3,4},
+        {0,3,4}, {0,3,4}, {0,3,4}, {0,3,4},
+        {0,3,4}, {0,3,4}, {0,3,4}, {0,3,4},
+        {0,3,4}, {0,3,4}, {0,3,4}, {0,3,4},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,1,2}, {0,1,2}, {0,1,2}, {0,1,2},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,2,3}, {0,2,3}, {0,2,3}, {0,2,3},
+        {0,4,5}, {0,4,5}, {0,4,5}, {0,4,5},
+        {0,4,5}, {0,4,5}, {0,4,5}, {0,4,5},
+        {0,5,5}, {0,5,5}, {0,5,5}, {0,5,5},
+        {0,5,5}, {0,5,5}, {0,5,5}, {0,5,5},
+        {9,1,7}, {9,1,7}, {1,3,7}, {1,3,7},
+        {10,1,7}, {10,1,7}, {0,8,7}, {0,8,7},
+        {0,9,7}, {0,9,7}, {0,12,8}, {0,13,8},
+        {2,3,8}, {4,2,8}, {0,14,8}, {0,15,8}
+    };
+
+    /* Table B-14, DCT coefficients table zero,
+     * codes 0000001000 ... 0000001111
+     */
+dct_lookup_t pl_DCT_tab1[8] =
+    {
+        {16,1,10}, {5,2,10}, {0,7,10}, {2,3,10},
+        {1,4,10}, {15,1,10}, {14,1,10}, {4,2,10}
+    };
+
+    /* Table B-15, DCT coefficients table one,
+     * codes 000000100x ... 000000111x
+     */
+dct_lookup_t pl_DCT_tab1a[8] =
+    {
+        {5,2,9}, {5,2,9}, {14,1,9}, {14,1,9},
+        {2,4,10}, {16,1,10}, {15,1,9}, {15,1,9}
+    };
+
+    /* Table B-14/15, DCT coefficients table zero / one,
+     * codes 000000010000 ... 000000011111
+     */
+dct_lookup_t pl_DCT_tab2[16] =
+    {
+        {0,11,12}, {8,2,12}, {4,3,12}, {0,10,12},
+        {2,4,12}, {7,2,12}, {21,1,12}, {20,1,12},
+        {0,9,12}, {19,1,12}, {18,1,12}, {1,5,12},
+        {3,3,12}, {0,8,12}, {6,2,12}, {17,1,12}
+    };
+
+    /* Table B-14/15, DCT coefficients table zero / one,
+     * codes 0000000010000 ... 0000000011111
+     */
+dct_lookup_t pl_DCT_tab3[16] =
+    {
+        {10,2,13}, {9,2,13}, {5,3,13}, {3,4,13},
+        {2,5,13}, {1,7,13}, {1,6,13}, {0,15,13},
+        {0,14,13}, {0,13,13}, {0,12,13}, {26,1,13},
+        {25,1,13}, {24,1,13}, {23,1,13}, {22,1,13}
+    };
+
+    /* Table B-14/15, DCT coefficients table zero / one,
+     * codes 00000000010000 ... 00000000011111
+     */
+dct_lookup_t pl_DCT_tab4[16] =
+    {
+        {0,31,14}, {0,30,14}, {0,29,14}, {0,28,14},
+        {0,27,14}, {0,26,14}, {0,25,14}, {0,24,14},
+        {0,23,14}, {0,22,14}, {0,21,14}, {0,20,14},
+        {0,19,14}, {0,18,14}, {0,17,14}, {0,16,14}
+    };
+
+    /* Table B-14/15, DCT coefficients table zero / one,
+     *   codes 000000000010000 ... 000000000011111
+     */
+dct_lookup_t pl_DCT_tab5[16] =
+    {
+    {0,40,15}, {0,39,15}, {0,38,15}, {0,37,15},
+    {0,36,15}, {0,35,15}, {0,34,15}, {0,33,15},
+    {0,32,15}, {1,14,15}, {1,13,15}, {1,12,15},
+    {1,11,15}, {1,10,15}, {1,9,15}, {1,8,15}
+    };
+
+    /* Table B-14/15, DCT coefficients table zero / one,
+     * codes 0000000000010000 ... 0000000000011111
+     */
+dct_lookup_t pl_DCT_tab6[16] =
+    {
+        {1,18,16}, {1,17,16}, {1,16,16}, {1,15,16},
+        {6,3,16}, {16,2,16}, {15,2,16}, {14,2,16},
+        {13,2,16}, {12,2,16}, {11,2,16}, {31,1,16},
+        {30,1,16}, {29,1,16}, {28,1,16}, {27,1,16}
+    };
 /*
  * Initialization of lookup tables
  */
@@ -154,7 +378,7 @@ void vpar_InitCrop( vpar_thread_t * p_vpar )
 #endif
 
 /*****************************************************************************
- * InitMbAddrInc : Initialize the lookup table for mb_addr_inc               *
+ * InitMbAddrInc : Initialize the lookup table for mb_addr_inc
  *****************************************************************************/
 
 /* Fonction for filling up the lookup table for mb_addr_inc */
@@ -211,55 +435,10 @@ void InitMbAddrInc( vpar_thread_t * p_vpar )
     FillMbAddrIncTable( p_vpar, 36, 48, 2, pi_value, 10 );
     FillMbAddrIncTable( p_vpar, 24, 36, 1, pi_value, 11 );
 }
-/*****************************************************************************
- * InitDCT : Initialize tables giving the length of the dct coefficient
- *           from the vlc code
- *****************************************************************************/
-
-void InitDCTTables( vpar_thread_t * p_vpar )
-{
-#if 0
-    /* Tables are cut in two parts to reduce memory occupation */
-    
-    /* Table B-12, dct_dc_size_luminance, codes 00xxx ... 11110 */
-    p_vpar->pppl_dct_dc_size[0][0] =
-    { {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
-      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
-      {0, 3}, {0, 3}, {0, 3}, {0, 3}, {3, 3}, {3, 3}, {3, 3}, {3, 3},
-      {4, 3}, {4, 3}, {4, 3}, {4, 3}, {5, 4}, {5, 4}, {6, 5}, {MB_ERROR, 0}
-    };
-
-    /* Table B-12, dct_dc_size_luminance, codes 111110xxx ... 111111111 */
-    p_vpar->pppl_dct_dc_lum_size[1][0] =
-    { {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6}, {7, 6},
-      {8, 7}, {8, 7}, {8, 7}, {8, 7}, {9, 8}, {9, 8}, {10,9}, {11,9}
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0},
-      {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}, {MB_ERROR, 0}
-    };
-
-    /* Table B-13, dct_dc_size_chrominance, codes 00xxx ... 11110 */
-    p_vpar->pppl_dct_dc_chrom_size[0][1] =
-    { {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2}, {0, 2},
-      {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2}, {1, 2},
-      {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2}, {2, 2},
-      {3, 3}, {3, 3}, {3, 3}, {3, 3}, {4, 4}, {4, 4}, {5, 5}, {MB_ERROR, 0}
-    };
-
-    /* Table B-13, dct_dc_size_chrominance, codes 111110xxxx ... 1111111111 */
-    p_vpar->pppl_dct_dc_size[1][1] =
-    { {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
-      {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},
-      {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7}, {7, 7},
-      {8, 8}, {8, 8}, {8, 8}, {8, 8}, {9, 9}, {9, 9}, {10,10}, {11,10}
-    };
-#endif
-}
 
 /*****************************************************************************
  * Init*MBType : Initialize lookup table for the Macroblock type
- * ***************************************************************************/
+ *****************************************************************************/
 
 /* Fonction for filling up the tables */
 static void __inline__ FillMBType( vpar_thread_t * p_vpar,
@@ -273,8 +452,8 @@ static void __inline__ FillMBType( vpar_thread_t * p_vpar,
     
     for( i_dummy = i_start ; i_dummy < i_end ; i_dummy++ )
     {
-        p_vpar->pl_mb_type[i_mb_type][i_dummy].i_value = i_value;
-        p_vpar->pl_mb_type[i_mb_type][i_dummy].i_length = i_length;
+        p_vpar->ppl_mb_type[i_mb_type][i_dummy].i_value = i_value;
+        p_vpar->ppl_mb_type[i_mb_type][i_dummy].i_length = i_length;
     }
 }
 
@@ -287,10 +466,10 @@ void InitPMBType( vpar_thread_t * p_vpar )
     FillMBType( p_vpar, 0, 6, 8, MB_INTRA, 5 );
     FillMBType( p_vpar, 0, 4, 6, MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN, 5 );
     FillMBType( p_vpar, 0, 2, 4, MB_QUANT|MB_PATTERN, 5 );
-    p_vpar->pl_mb_type[0][1].i_value = MB_QUANT|MB_INTRA;
-    p_vpar->pl_mb_type[0][1].i_length = 6;
-    p_vpar->pl_mb_type[0][0].i_value = MB_ERROR;
-    p_vpar->pl_mb_type[0][0].i_length = 0;
+    p_vpar->ppl_mb_type[0][1].i_value = MB_QUANT|MB_INTRA;
+    p_vpar->ppl_mb_type[0][1].i_length = 6;
+    p_vpar->ppl_mb_type[0][0].i_value = MB_ERROR;
+    p_vpar->ppl_mb_type[0][0].i_length = 0;
 }
 
 /* Fonction that fills the table for B MB_Type */
@@ -306,14 +485,14 @@ void InitBMBType( vpar_thread_t * p_vpar )
     FillMBType( p_vpar, 1, 6, 8, MB_INTRA, 5 );
     FillMBType( p_vpar, 1, 4, 6, MB_QUANT|MB_MOTION_FORWARD
                                 |MB_MOTION_BACKWARD|MB_PATTERN, 5 );
-    p_vpar->pl_mb_type[1][3].i_value = MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN;
-    p_vpar->pl_mb_type[1][3].i_length = 6;
-    p_vpar->pl_mb_type[1][2].i_value = MB_QUANT|MB_MOTION_BACKWARD|MB_PATTERN;
-    p_vpar->pl_mb_type[1][2].i_length = 6;
-    p_vpar->pl_mb_type[1][1].i_value = MB_QUANT|MB_INTRA;
-    p_vpar->pl_mb_type[1][1].i_length = 6;
-    p_vpar->pl_mb_type[1][0].i_value =MB_ERROR;
-    p_vpar->pl_mb_type[1][0].i_length = 0;
+    p_vpar->ppl_mb_type[1][3].i_value = MB_QUANT|MB_MOTION_FORWARD|MB_PATTERN;
+    p_vpar->ppl_mb_type[1][3].i_length = 6;
+    p_vpar->ppl_mb_type[1][2].i_value = MB_QUANT|MB_MOTION_BACKWARD|MB_PATTERN;
+    p_vpar->ppl_mb_type[1][2].i_length = 6;
+    p_vpar->ppl_mb_type[1][1].i_value = MB_QUANT|MB_INTRA;
+    p_vpar->ppl_mb_type[1][1].i_length = 6;
+    p_vpar->ppl_mb_type[1][0].i_value =MB_ERROR;
+    p_vpar->ppl_mb_type[1][0].i_length = 0;
 }
 
 /*****************************************************************************
@@ -322,8 +501,40 @@ void InitBMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 void InitCodedPattern( vpar_thread_t * p_vpar )
 {
-    memcpy( p_vpar->pl_coded_pattern, pl_coded_pattern_init_table ,
+   memcpy( p_vpar->pl_coded_pattern, pl_coded_pattern_init_table ,
             sizeof(pl_coded_pattern_init_table) );
+}
+
+/*****************************************************************************
+ * InitDCT : Initialize tables giving the length of the dct coefficient
+ *           from the vlc code
+ *****************************************************************************/
+
+void InitDCTTables( vpar_thread_t * p_vpar )
+{
+    /* Tables are cut in two parts to reduce memory occupation */
+    memcpy( p_vpar->pppl_dct_dc_size[0][0], pl_dct_dc_lum_init_table_1,
+            sizeof( pl_dct_dc_lum_init_table_1 ) );
+    memcpy( p_vpar->pppl_dct_dc_size[0][1], pl_dct_dc_lum_init_table_2,
+            sizeof( pl_dct_dc_lum_init_table_2 ) );
+    memcpy( p_vpar->pppl_dct_dc_size[1][0], pl_dct_dc_chrom_init_table_1,
+            sizeof( pl_dct_dc_chrom_init_table_1 ) );
+    memcpy( p_vpar->pppl_dct_dc_size[1][1], pl_dct_dc_chrom_init_table_2,
+            sizeof( pl_dct_dc_chrom_init_table_2 ) );
+    /* For table B14 & B15, we have a pointer to tables */
+    memcpy( p_vpar->ppl_dct_coef[0], pl_DCT_tab_dc, sizeof( pl_DCT_tab_dc ) );
+    memcpy( p_vpar->ppl_dct_coef[1], pl_DCT_tab_ac, sizeof( pl_DCT_tab_ac ) );
+    memcpy( p_vpar->ppl_dct_coef[2], pl_DCT_tab0, sizeof( pl_DCT_tab0 ) );
+    memcpy( p_vpar->ppl_dct_coef[3], pl_DCT_tab1, sizeof( pl_DCT_tab1 ) );
+    memcpy( p_vpar->ppl_dct_coef[4], pl_DCT_tab2, sizeof( pl_DCT_tab2 ) );
+    memcpy( p_vpar->ppl_dct_coef[5], pl_DCT_tab3, sizeof( pl_DCT_tab3 ) );
+    memcpy( p_vpar->ppl_dct_coef[6], pl_DCT_tab4, sizeof( pl_DCT_tab4 ) );
+    memcpy( p_vpar->ppl_dct_coef[7], pl_DCT_tab5, sizeof( pl_DCT_tab5 ) );
+    memcpy( p_vpar->ppl_dct_coef[8], pl_DCT_tab6, sizeof( pl_DCT_tab6 ) );
+    memcpy( p_vpar->ppl_dct_coef[9], pl_DCT_tab0a, sizeof( pl_DCT_tab0a ) );
+    memcpy( p_vpar->ppl_dct_coef[10], pl_DCT_tab1a, sizeof( pl_DCT_tab1a ) );
+
+
 }
 
 /*
@@ -684,9 +895,9 @@ int vpar_IMBType( vpar_thread_t * p_vpar )
     int                 i_type = ShowBits( &p_vpar->bit_stream, 2 );
     /* Lookup table for macroblock_type */
     static lookup_t     pl_mb_Itype[4] = { {MB_ERROR, 0},
-                                          {MB_QUANT|MB_INTRA, 2},
-                                          {MB_INTRA, 1},
-                                          {MB_INTRA, 2} };
+                                           {MB_QUANT|MB_INTRA, 2},
+                                           {MB_INTRA, 1},
+                                           {MB_INTRA, 2} };
     /* Dump the good number of bits */
     DumpBits( &p_vpar->bit_stream, pl_mb_Itype[i_type].i_length );
     return pl_mb_Itype[i_type].i_value;
@@ -700,9 +911,9 @@ int vpar_PMBType( vpar_thread_t * p_vpar )
     /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
     /* Dump the good number of bits */
-    DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_type[0][i_type].i_length );
+    DumpBits( &p_vpar->bit_stream, p_vpar->ppl_mb_type[0][i_type].i_length );
     /* return the value from the lookup table for P type */
-    return p_vpar->pl_mb_type[0][i_type].i_value;
+    return p_vpar->ppl_mb_type[0][i_type].i_value;
 }
 
 /*****************************************************************************
@@ -713,9 +924,9 @@ int vpar_BMBType( vpar_thread_t * p_vpar )
      /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
     /* Dump the good number of bits */
-    DumpBits( &p_vpar->bit_stream, p_vpar->pl_mb_type[1][i_type].i_length );
+    DumpBits( &p_vpar->bit_stream, p_vpar->ppl_mb_type[1][i_type].i_length );
     /* return the value from the lookup table for B type */
-    return p_vpar->pl_mb_type[1][i_type].i_value;
+    return p_vpar->ppl_mb_type[1][i_type].i_value;
 }
 
 /*****************************************************************************
@@ -735,8 +946,11 @@ int vpar_DMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_CodedPattern420( vpar_thread_t * p_vpar )
 {
+    /* Take the max 9 bits length vlc code for testing */
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
+    /* Trash the good number of bits read in  the lookup table */
     DumpBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    /* return the value from the vlc table */
     return p_vpar->pl_coded_pattern[i_vlc].i_value;
 }
 
@@ -745,7 +959,14 @@ int vpar_CodedPattern420( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_CodedPattern422( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley + attention ! y'a 2 bits en plus en MPEG2 */
+    int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
+    /* Supplementary 2 bits long code for 422 format */
+    int      i_coded_block_pattern_1;
+    DumpBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    i_coded_block_pattern_1 = GetBits( &p_vpar->bit_stream, 2 );
+    /* the code is just to be added to the value found in the table */
+    return p_vpar->pl_coded_pattern[i_vlc].i_value |
+           (i_coded_block_pattern_1 << 6);
 }
 
 /*****************************************************************************
@@ -753,7 +974,12 @@ int vpar_CodedPattern422( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_CodedPattern444( vpar_thread_t * p_vpar )
 {
-    /* À pomper dans Berkeley + attention ! y'a 4 bits en plus en MPEG2 */
+    int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
+    int      i_coded_block_pattern_2;
+    DumpBits( &p_vpar->bit_stream, p_vpar->pl_coded_pattern[i_vlc].i_length );
+    i_coded_block_pattern_2 = GetBits( &p_vpar->bit_stream, 6 );
+    return p_vpar->pl_coded_pattern[i_vlc].i_value |
+           ( i_coded_block_pattern_2 << 6 );
 }
 
 /*****************************************************************************
@@ -804,34 +1030,115 @@ static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, in
  *****************************************************************************/
 static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
+    int         i_dummy;
+    int         i_nc;
+    int         i_cc;
+    int         i_coef;
+    int         i_type;
+    int         i_code;
+    int         i_code5;
+    int         i_select;
+    int         i_offset;
+    int         i_pos;
+    int         i_dct_dc_size;
+    int         i_dct_dc_diff;
+    int         i_run;
+    int         i_level;
+    int         i_2b;
+    int         i_4b;
+    boolean_t   b_sign;
     /* Lookup Table for the chromatic component */
     static int pi_cc_index[12] = { 0, 0, 0, 0, 1, 2, 1, 2, 1, 2 };
-    int        i_cc = pi_cc_index[i_b];
+    /* Lookup table for the offset in the tables for ac coef decoding */
+    static lookup_t pl_offset_table[8] = { { 12, 4 }, { 8, 4 }, { 6, 8 },
+                                           { 4, 16 }, { 3, 16 }, { 2, 16 },
+                                           { 1, 16 }, { 0, 16 } };
+    
+    i_cc = pi_cc_index[i_b];
     /* Determine whether it is luminance or not (chrominance) */
-    int        i_type = ( i_cc + 1 ) / 2;
+    i_type = ( i_cc + 1 ) >> 1;
 
     /* Decoding of the DC intra coefficient */
     /* The nb of bits to parse depends on i_type */
-    int        i_code = ShowBits( &p_vpar->bit_stream, 9 + i_type );
+    i_code = ShowBits( &p_vpar->bit_stream, 9 + i_type );
     /* To reduce memory occupation, there are two lookup tables
      * See InitDCT above */
-    int        i_code5 = i_code >> 4;
+    i_code5 = i_code >> 4;
     /* Shall we lookup in the first or in the second table ? */
-    int        i_select = ( i_code5 - 1 ) / 31;
+    i_select = ( i_code5 - 1 ) / 31;
     /* Offset value for looking in the second table */
-    int        i_offset = 0x1f0 + ( i_type * 0x1f0 );
-    int        i_pos = i_code5 * ( ! i_select ) +
-                       ( i_code - i_offset ) * i_select;
-    int        i_dct_dc_size;
-    int        i_dct_dc_diff;
-    i_dct_dc_size = p_vpar->pppl_dct_dc_size[i_select][i_type][i_pos].i_value;
+    i_offset = 0x1f0 + ( i_type * 0x1f0 );
+    i_pos = ( i_code5 * ( ! i_select ) ) + ( ( i_code - i_offset ) * i_select );
+    i_dct_dc_size = p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_value;
     /* Dump the variable length code */
     DumpBits( &p_vpar->bit_stream, 
-              p_vpar->pppl_dct_dc_size[i_select][i_type][i_pos].i_length );
+              p_vpar->pppl_dct_dc_size[i_type][i_select][i_pos].i_length );
+    /* Read the actual code with the good length */
     i_dct_dc_diff = GetBits( &p_vpar->bit_stream, i_dct_dc_size );
     p_vpar->slice.pi_dc_dct_pred[i_cc] += i_dct_dc_diff;
-    
+#ifndef VDEC_DFT
+    p_mb->ppi_blocks[i_b][0] = ( p_vpar->slice.pi_dc_dct_pred[i_cc] <<
+                               ( 3 - p_vpar->picture.i_intra_dc_precision ) );
+    i_nc = 1;
+#else
+    p_mb->ppi_blocks[i_b][0] = ( p_vpar->slice.pi_dc_dct_pred[i_cc] <<
+                               ( 11 - p_vpar->picture.i_intra_dc_precision ) );
+    i_nc = ( p_vpar->slice.pi_dc_dct_pred[i_cc] != 0 );
+#endif
+
     /* Decoding of the AC coefficients */
-    //int        i_dummy = 1;
-    
+    i_coef = 0;
+    for( i_dummy = 1; i_dummy < 64; i_dummy++ )
+    {
+        i_code = ShowBits( &p_vpar->bit_stream, 16 );
+        i_2b = ! ( i_code >> 14 );
+        i_4b = ! ( ( i_code & 0x3C00 ) >> 10 );
+        /* Will contain the number of table to use in ppl_dct_coef */
+        i_select = i_2b + i_4b + ( i_code & 0x0200 ) + ( i_code & 0x0100 ) + 
+                                 ( i_code & 0x0080 ) + ( i_code & 0x0040 ) +
+                                 ( i_code & 0x0020 ) + ( i_code & 0x0010 );
+        /* Shall we use B15 table or not */
+        i_type = p_vpar->picture.b_intra_vlc_format & ( ( i_select & 3 ) >> 1 );
+        i_select += (i_type * 7 );
+        i_offset = ( i_code >> pl_offset_table[i_select].i_value ) - 
+                               pl_offset_table[i_select].i_length;
+        i_run = ( * ( p_vpar->ppl_dct_coef[i_select]
+                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_run;
+        DumpBits( &p_vpar->bit_stream, 
+                  ( * ( p_vpar->ppl_dct_coef[i_select]
+                    + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_length );
+        switch( i_run )
+        {
+            case DCT_ESCAPE:
+                i_run = GetBits( &p_vpar->bit_stream, 6 );
+                i_level = GetBits( &p_vpar->bit_stream, 12 );
+                p_mb->ppi_blocks[i_b][i_dummy] = ( b_sign = ( i_level > 2047 ) ) 
+                                                          ? ( -4096 + i_level )
+                                                          : i_level;
+                i_coef = i_dummy;
+                i_dummy += i_run;
+                i_nc ++;
+                break;
+            case DCT_EOB:
+                i_dummy = 64;
+                break;
+            default:
+                i_level = ( * ( p_vpar->ppl_dct_coef[i_select]
+                              + ( i_offset * sizeof(dct_lookup_t) ) ) ).i_level;
+                b_sign = Getbits( &p_vpar->bit_stream, 1 );
+                p_mb->ppi_blocks[i_b][i_dummy] = b_sign ? -i_level : i_level;
+                i_coef = i_dummy;
+                i_dummy += i_run;
+                i_nc ++;
+        }
+    }
+    if( i_nc == 1 )
+    {
+        p_mb->pf_idct[i_b] = vdec_SparseIDCT;
+        p_mb->pi_sparse_pos[i_b] = i_coef;
+    }
+    else
+    {
+        p_mb->pf_idct[i_b] = vdec_IDCT;
+    }
 }

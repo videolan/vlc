@@ -65,12 +65,14 @@ typedef struct vpar_thread_s
 #endif
     lookup_t                pl_mb_addr_inc[2048];    /* for macroblock
                                                         address increment */
-    /* variable length codes for the structure dct_dc_size */
-    lookup_t                pppl_dct_dc_size[2][2][32];  
-    /* tables for macroblock types 0=P 1=B */
-    lookup_t                pl_mb_type[2][64];
+   /* tables for macroblock types 0=P 1=B */
+    lookup_t                ppl_mb_type[2][64];
     /* table for coded_block_pattern */
     lookup_t                pl_coded_pattern[512];
+    /* variable length codes for the structure dct_dc_size for intra blocks */
+    lookup_t                pppl_dct_dc_size[2][2][32];
+    /* structure to store the tables B14 & B15 */
+    dct_lookup_t            *ppl_dct_coef[10];
 
 #ifdef STATS
     /* Statistics */
