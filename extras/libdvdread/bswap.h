@@ -20,7 +20,6 @@
 #ifndef BSWAP_H_INCLUDED
 #define BSWAP_H_INCLUDED
 
-#include <defs.h>
 #include <config.h>
 
 #if defined(WORDS_BIGENDIAN)

@@ -21,8 +21,7 @@
 #define NAV_PRINT_H_INCLUDED
 
 #include <stdio.h>
-//#include <dvdread/nav_types.h>
-#include "nav_types.h"
+#include <dvdread/nav_types.h>
 
 #ifdef __cplusplus
 extern "C" {

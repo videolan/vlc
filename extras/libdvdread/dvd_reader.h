@@ -112,6 +112,12 @@ ssize_t DVDReadBlocks( dvd_file_t *dvd_file, int offset,
 		       size_t block_count, unsigned char *data );
 
 /**
+ * The same calling a readv-like function to fill a struct iovec.
+ */
+struct iovec;
+ssize_t DVDReadVBlocks( dvd_file_t *dvd_file, int offset,
+                       size_t block_count, struct iovec * vector );
+/**
  * Seek to the given position in the file.  Returns the resulting position in
  * bytes from the beginning of the file.  The seek position is only used for
  * byte reads from the file, the block read call always reads from the given

@@ -19,8 +19,7 @@
 #ifndef NAV_READ_H_INCLUDED
 #define NAV_READ_H_INCLUDED
 
-//#include <dvdread/nav_types.h>
-#include "nav_types.h"
+#include <dvdread/nav_types.h>
 
 #ifdef __cplusplus
 extern "C" {

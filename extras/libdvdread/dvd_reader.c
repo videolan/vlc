@@ -18,7 +18,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/time.h> /* For the timing of dvdcss_title crack. */
+#include <sys/uio.h> /* readv() */
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,7 +26,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
-#include <dlfcn.h>
 #include <dirent.h>
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)
@@ -47,45 +46,17 @@ typedef off_t off64_t;
 #define stat64 stat
 #endif
 
-/* #include "dvdcss.h" */
-typedef struct dvdcss_s* dvdcss_handle;
-#define DVDCSS_NOFLAGS         0
-#define DVDCSS_INIT_QUIET      (1 << 0)
-#define DVDCSS_INIT_DEBUG      (1 << 1)
-#define DVDCSS_READ_DECRYPT    (1 << 0)
-
 #include "dvd_udf.h"
 #include "dvd_reader.h"
 
-/**
- * Handle to the loaded dvdcss library.
- */
-void *dvdcss_library = 0;
-
-/**
- * libdvdcss functions.
- */
-static dvdcss_handle (*dvdcss_open)  ( char *psz_target,
-                                       int i_flags );
-static int           (*dvdcss_close) ( dvdcss_handle );
-static int           (*dvdcss_title) ( dvdcss_handle,
-                                       int i_block );
-static int           (*dvdcss_seek)  ( dvdcss_handle,
-                                       int i_blocks );
-static int           (*dvdcss_read)  ( dvdcss_handle,
-                                       void *p_buffer,
-                                       int i_blocks,
-                                       int i_title );
-static char *        (*dvdcss_error) ( dvdcss_handle );
+#include "dvd_setup.h"
 
 struct dvd_reader_s {
     /* Basic information. */
     int isImageFile;
 
     /* Information required for an image file. */
-    dvdcss_handle dev;
-    int init_keys;
-    int fd;
+    dvd_handle dev;
 
     /* Information required for a directory path drive. */
     char *path_root;
@@ -100,134 +71,12 @@ struct dvd_file_s {
     uint32_t seek_pos;
 
     /* Information required for a directory path drive. */
+    dvd_handle title_devs[9];
     size_t title_sizes[ 9 ];
-    int title_fds[ 9 ];
 
     /* Calculated at open-time, size in blocks. */
     ssize_t filesize;
 };
-
-static void setupCSS( void )
-{
-    if( !dvdcss_library ) {
-	dvdcss_library = dlopen( "libdvdcss.so.0", RTLD_LAZY );
-
-	if( !dvdcss_library ) {
-            fprintf( stderr, "libdvdread: Can't open libdvdcss: %s.\n",
-                     dlerror() );
-        } else {
-#if defined(__OpenBSD__)
-#define U_S "_"
-#else
-#define U_S
-#endif
-            dvdcss_open = (dvdcss_handle (*)(char*, int))
-                                dlsym( dvdcss_library, U_S "dvdcss_open" );
-            dvdcss_close = (int (*)(dvdcss_handle))
-                                dlsym( dvdcss_library, U_S "dvdcss_close" );
-            dvdcss_title = (int (*)(dvdcss_handle, int))
-                                dlsym( dvdcss_library, U_S "dvdcss_title" );
-            dvdcss_seek = (int (*)(dvdcss_handle, int))
-                                dlsym( dvdcss_library, U_S "dvdcss_seek" );
-            dvdcss_read = (int (*)(dvdcss_handle, void*, int, int))
-                                dlsym( dvdcss_library, U_S "dvdcss_read" );
-            dvdcss_error = (char* (*)(dvdcss_handle))
-                                dlsym( dvdcss_library, U_S "dvdcss_error" );
-
-            if( dlsym( dvdcss_library, U_S "dvdcss_crack" ) ) {
-                fprintf( stderr, "libdvdread: Old (pre-0.0.2) version of "
-                                 "libdvdcss found.\n"
-                                 "libdvdread: You should get the "
-                                 "latest version from "
-                                 "http://www.videolan.org/\n" );
-                dlclose( dvdcss_library );
-                dvdcss_library = 0;
-            } else if( !dvdcss_open  || !dvdcss_close || !dvdcss_seek ||
-                       !dvdcss_title || !dvdcss_read  || !dvdcss_error ) {
-
-                fprintf( stderr, "libdvdread: Unknown incompatible version "
-                                 "of libdvdcss found.\n"
-                                 "libdvdread: Try to find a "
-                                 "newer version of libdvdread?\n" );
-                dlclose( dvdcss_library );
-                dvdcss_library = 0;
-            }
-        }
-    }
-
-    if( !dvdcss_library ) {
-        fprintf( stderr, "libdvdread: Encrypted DVD support unavailable.\n" );
-    }
-}
-
-
-/* Loop over all titles and call dvdcss_title to crack the keys. */
-static int initAllCSSKeys( dvd_reader_t *dvd )
-{
-    
-    if( dvdcss_library ) {
-        struct timeval all_s, all_e;
-	struct timeval t_s, t_e;
-	char filename[ MAX_UDF_FILE_NAME_LEN ];
-	uint32_t start, len;
-	int title;
-	
-	fprintf( stderr, "\n" );
-	fprintf( stderr, "libdvdread: Attempting to retrieve all CSS keys\n" );
-	fprintf( stderr, "libdvdread: This can take a _long_ time, "
-		 "please be patient\n\n" );
-	
-	gettimeofday(&all_s, NULL);
-	
-	for( title = 0; title < 100; title++ ) {
-	    gettimeofday( &t_s, NULL );
-	    if( title == 0 ) {
-	        sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
-	    } else {
-	        sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, 0 );
-	    }
-	    start = UDFFindFile( dvd, filename, &len );
-	    if( start != 0 && len != 0 ) {
-	        /* Perform CSS key cracking for this title. */
-	        fprintf( stderr, "libdvdread: Get key for %s at 0x%08x\n", 
-			 filename, start );
-		if( dvdcss_title( dvd->dev, (int)start ) < 0 ) {
-		    fprintf( stderr, "libdvdread: Error cracking CSS key!!\n");
-		}
-		gettimeofday( &t_e, NULL );
-		fprintf( stderr, "libdvdread: Elapsed time %ld\n",  
-			 (long int) t_e.tv_sec - t_s.tv_sec );
-	    }
-	    
-	    if( title == 0 ) continue;
-	    
-	    gettimeofday( &t_s, NULL );
-	    sprintf( filename, "/VIDEO_TS/VTS_%02d_%d.VOB", title, 1 );
-	    start = UDFFindFile( dvd, filename, &len );
-	    if( start == 0 || len == 0 ) break;
-	    
-	    /* Perform CSS key cracking for this title. */
-	    fprintf( stderr, "libdvdread: Get key for %s at 0x%08x\n", 
-		     filename, start );
-	    if( dvdcss_title( dvd->dev, (int)start ) < 0 ) {
-	        fprintf( stderr, "libdvdread: Error cracking CSS key!!\n");
-	    }
-	    gettimeofday( &t_e, NULL );
-	    fprintf( stderr, "libdvdread: Elapsed time %ld\n",  
-		     (long int) t_e.tv_sec - t_s.tv_sec );
-	}
-	title--;
-	
-	fprintf( stderr, "libdvdread: Found %d VTS's\n", title );
-	gettimeofday(&all_e, NULL);
-	fprintf( stderr, "libdvdread: Elapsed time %ld\n",  
-		 (long int) all_e.tv_sec - all_s.tv_sec );
-    }
-    
-    return 0;
-}
-
-
 
 /**
  * Open a DVD image or block device file.
@@ -235,33 +84,19 @@ static int initAllCSSKeys( dvd_reader_t *dvd )
 static dvd_reader_t *DVDOpenImageFile( const char *location )
 {
     dvd_reader_t *dvd;
-    dvdcss_handle dev = 0;
-    int fd = -1;
+    dvd_handle dev = 0;
 
-    setupCSS();
-    
-    if( dvdcss_library ) {
-        dev = dvdcss_open( (char *) location, DVDCSS_INIT_DEBUG );
-        if( !dev ) {
-            fprintf( stderr, "libdvdread: Can't open %s for reading.\n",
-                     location );
-            return 0;
-        }
-    } else {
-        fd = open( location, O_RDONLY );
-        if( fd < 0 ) {
-            fprintf( stderr, "libdvdread: Can't open %s for reading.\n",
-                     location );
-            return 0;
-        }
+    dev = pf_dvd_open( (char *) location );
+    if( !dev ) {
+        fprintf( stderr, "libdvdread: Can't open %s for reading.\n",
+                         location );
+        return 0;
     }
 
     dvd = (dvd_reader_t *) malloc( sizeof( dvd_reader_t ) );
     if( !dvd ) return 0;
     dvd->isImageFile = 1;
     dvd->dev = dev;
-    dvd->init_keys = 0;
-    dvd->fd = fd;
     dvd->path_root = 0;
     
     return dvd;
@@ -271,12 +106,11 @@ static dvd_reader_t *DVDOpenPath( const char *path_root )
 {
     dvd_reader_t *dvd;
 
+    fprintf(stderr, "libdvdread: opening %s as folder\n", path_root );
     dvd = (dvd_reader_t *) malloc( sizeof( dvd_reader_t ) );
     if( !dvd ) return 0;
     dvd->isImageFile = 0;
     dvd->dev = 0;
-    dvd->init_keys = 0;
-    dvd->fd = -1;
     dvd->path_root = strdup( path_root );
 
     return dvd;
@@ -335,106 +169,110 @@ dvd_reader_t *DVDOpen( const char *path )
 
     ret = stat64( path, &fileinfo );
     if( ret < 0 ) {
-	/* If we can't stat the file, give up */
-	fprintf( stderr, "libdvdread: Can't stat %s\n", path );
-	perror("");
-	return 0;
+        /* If we can't stat the file, give up */
+        fprintf( stderr, "libdvdread: Can't stat %s\n", path );
+        perror("");
+        return 0;
     }
 
-    /* First check if this is a block/char device or a file*/
-    if( S_ISBLK( fileinfo.st_mode ) || 
-	S_ISCHR( fileinfo.st_mode ) || 
-	S_ISREG( fileinfo.st_mode ) ) {
+    /* Try to open libdvdcss or fall back to standard functions */
+    DVDSetupRead();
 
-	/**
-	 * Block devices and regular files are assumed to be DVD-Video images.
-	 */
+    /* First check if this is a block/char device or a file */
+    if( S_ISBLK( fileinfo.st_mode ) || 
+    S_ISCHR( fileinfo.st_mode ) || 
+    S_ISREG( fileinfo.st_mode ) ) {
+
+        /**
+         * Block devices and regular files are assumed to be DVD-Video images.
+         */
 #if defined(__sun)
-	return DVDOpenImageFile( sun_block2char( path ) );
+        return DVDOpenImageFile( sun_block2char( path ) );
 #elif defined(SYS_BSD)
-	return DVDOpenImageFile( bsd_block2char( path ) );
+        return DVDOpenImageFile( bsd_block2char( path ) );
 #else
-	return DVDOpenImageFile( path );
+        return DVDOpenImageFile( path );
 #endif
 
     } else if( S_ISDIR( fileinfo.st_mode ) ) {
-	dvd_reader_t *auth_drive = 0;
-	char *path_copy;
+        dvd_reader_t *auth_drive = 0;
+        char *path_copy;
 #if defined(SYS_BSD)
-	struct fstab* fe;
+        struct fstab* fe;
 #elif defined(__sun) || defined(__linux__)
-	FILE *mntfile;
+        FILE *mntfile;
 #endif
 
-	/* XXX: We should scream real loud here. */
-	if( !(path_copy = strdup( path ) ) ) return 0;
+        fprintf(stderr, "libdvdread: file is directory\n" );
+        /* XXX: We should scream real loud here. */
+        if( !(path_copy = strdup( path ) ) ) return 0;
 
-	/* Resolve any symlinks and get the absolut dir name. */
-	{
-	    char *new_path;
-	    int cdir = open( ".", O_RDONLY );
-	    
-	    if( cdir >= 0 ) {
-		chdir( path_copy );
-		new_path = getcwd( NULL, PATH_MAX );
-		fchdir( cdir );
-		close( cdir );
-		if( new_path ) {
-		    free( path_copy );
-		    path_copy = new_path;
-		}
-	    }
-	}
+        /* Resolve any symlinks and get the absolut dir name. */
+        {
+            char *new_path;
+            int cdir = open( ".", O_RDONLY );
+    
+            if( cdir >= 0 ) {
+                chdir( path_copy );
+                new_path = getcwd( NULL, PATH_MAX );
+                fchdir( cdir );
+                close( cdir );
+                if( new_path ) {
+                    free( path_copy );
+                    path_copy = new_path;
+                }
+            }
+        }
 
-	/**
-	 * If we're being asked to open a directory, check if that directory
-	 * is the mountpoint for a DVD-ROM which we can use instead.
-	 */
+        /**
+         * If we're being asked to open a directory, check if that directory
+         * is the mountpoint for a DVD-ROM which we can use instead.
+         */
 
-	if( strlen( path_copy ) > 1 ) {
-	    if( path[ strlen( path_copy ) - 1 ] == '/' ) 
-		path_copy[ strlen( path_copy ) - 1 ] = '\0';
-	}
+        if( strlen( path_copy ) > 1 ) {
+            if( path[ strlen( path_copy ) - 1 ] == '/' ) 
+                path_copy[ strlen( path_copy ) - 1 ] = '\0';
+        }
 
-	if( strlen( path_copy ) > 9 ) {
-	    if( !strcasecmp( &(path_copy[ strlen( path_copy ) - 9 ]), 
-			     "/video_ts" ) ) {
-	      path_copy[ strlen( path_copy ) - 9 ] = '\0';
-	    }
-	}
+        if( strlen( path_copy ) > 9 ) {
+            if( !strcasecmp( &(path_copy[ strlen( path_copy ) - 9 ]), 
+                 "/video_ts" ) ) {
+                path_copy[ strlen( path_copy ) - 9 ] = '\0';
+            }
+        }
 
 #if defined(SYS_BSD)
-	if( ( fe = getfsfile( path_copy ) ) ) {
-	    char *dev_name = bsd_block2char( fe->fs_spec );
-	    fprintf( stderr,
-		     "libdvdread: Attempting to use device %s"
-		     " mounted on %s for CSS authentication\n",
-		     dev_name,
-		     fe->fs_file );
-	    auth_drive = DVDOpenImageFile( dev_name );
-	    free( dev_name );
-	}
+        if( ( fe = getfsfile( path_copy ) ) ) {
+            char *dev_name = bsd_block2char( fe->fs_spec );
+            fprintf( stderr,
+                     "libdvdread: Attempting to use device %s"
+                     " mounted on %s for CSS authentication\n",
+                     dev_name,
+                     fe->fs_file );
+            auth_drive = DVDOpenImageFile( dev_name );
+            free( dev_name );
+        }
 #elif defined(__sun)
-	mntfile = fopen( MNTTAB, "r" );
-	if( mntfile ) {
-	    struct mnttab mp;
-	    int res;
+        mntfile = fopen( MNTTAB, "r" );
+        if( mntfile ) {
+            struct mnttab mp;
+            int res;
 
-	    while( ( res = getmntent( mntfile, &mp ) ) != -1 ) {
-		if( res == 0 && !strcmp( mp.mnt_mountp, path_copy ) ) {
-		    char *dev_name = sun_block2char( mp.mnt_special );
-		    fprintf( stderr, 
-			     "libdvdread: Attempting to use device %s"
-			     " mounted on %s for CSS authentication\n",
-			     dev_name,
-			     mp.mnt_mountp );
-		    auth_drive = DVDOpenImageFile( dev_name );
-		    free( dev_name );
-		    break;
-		}
-	    }
-	    fclose( mntfile );
-	}
+            while( ( res = getmntent( mntfile, &mp ) ) != -1 ) {
+                if( res == 0 && !strcmp( mp.mnt_mountp, path_copy ) ) {
+                    char *dev_name = sun_block2char( mp.mnt_special );
+                    fprintf( stderr, 
+                             "libdvdread: Attempting to use device %s"
+                             " mounted on %s for CSS authentication\n",
+                             dev_name,
+                             mp.mnt_mountp );
+                    auth_drive = DVDOpenImageFile( dev_name );
+                    free( dev_name );
+                    break;
+                }
+            }
+            fclose( mntfile );
+        }
 #elif defined(__linux__)
         mntfile = fopen( MOUNTED, "r" );
         if( mntfile ) {
@@ -442,24 +280,25 @@ dvd_reader_t *DVDOpen( const char *path )
  
             while( ( me = getmntent( mntfile ) ) ) {
                 if( !strcmp( me->mnt_dir, path_copy ) ) {
-		    fprintf( stderr, 
-			     "libdvdread: Attempting to use device %s"
+                    fprintf( stderr, 
+                             "libdvdread: Attempting to use device %s"
                              " mounted on %s for CSS authentication\n",
                              me->mnt_fsname,
-			     me->mnt_dir );
+                             me->mnt_dir );
                     auth_drive = DVDOpenImageFile( me->mnt_fsname );
                     break;
                 }
             }
+            fprintf(stderr, "libdvdread: mounted device %p\n", me );
             fclose( mntfile );
-	}
+        }
 #endif
-	if( !auth_drive ) {
-	    fprintf( stderr, "libdvdread: Device inaccessible, "
-		     "CSS authentication not available.\n" );
-	}
+        if( !auth_drive ) {
+            fprintf( stderr, "libdvdread: Device inaccessible, "
+                     "CSS authentication not available.\n" );
+        }
 
-	free( path_copy );
+        free( path_copy );
 
         /**
          * If we've opened a drive, just use that.
@@ -469,7 +308,7 @@ dvd_reader_t *DVDOpen( const char *path )
         /**
          * Otherwise, we now try to open the directory tree instead.
          */
-	fprintf( stderr, "libdvdread: Using normal filesystem access.\n" );
+        fprintf( stderr, "libdvdread: Using normal filesystem access.\n" );
         return DVDOpenPath( path );
     }
 
@@ -481,8 +320,7 @@ dvd_reader_t *DVDOpen( const char *path )
 void DVDClose( dvd_reader_t *dvd )
 {
     if( dvd ) {
-        if( dvd->dev ) dvdcss_close( dvd->dev );
-        if( dvd->fd >= 0 ) close( dvd->fd );
+        if( dvd->dev ) pf_dvd_close( dvd->dev );
         if( dvd->path_root ) free( dvd->path_root );
         free( dvd );
         dvd = 0;
@@ -500,12 +338,13 @@ static dvd_file_t *DVDOpenFileUDF( dvd_reader_t *dvd, char *filename )
     start = UDFFindFile( dvd, filename, &len );
     if( !start ) return 0;
 
+    fprintf( stderr, "libdvdread: opening %s as image\n", filename );
     dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
     if( !dvd_file ) return 0;
     dvd_file->dvd = dvd;
     dvd_file->lb_start = start;
     dvd_file->seek_pos = 0;
-    memset( dvd_file->title_fds, -1, sizeof( dvd_file->title_fds ) );
+    //memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
 
     return dvd_file;
@@ -576,13 +415,14 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     char full_path[ PATH_MAX + 1 ];
     dvd_file_t *dvd_file;
     struct stat fileinfo;
-    int fd;
+    dvd_handle dev;
 
     /* Get the full path of the file. */
     if( !findDVDFile( dvd, filename, full_path ) ) return 0;
 
-    fd = open( full_path, O_RDONLY );
-    if( fd < 0 ) return 0;
+    fprintf( stderr, "libdvdread: opening %s as file\n", full_path );
+    dev = pf_dvd_open( full_path );
+    if( dev == NULL ) return 0;
 
     dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
     if( !dvd_file ) return 0;
@@ -590,7 +430,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     dvd_file->lb_start = 0;
     dvd_file->seek_pos = 0;
     memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-    memset( dvd_file->title_fds, -1, sizeof( dvd_file->title_fds ) );
+    memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = 0;
 
     if( stat( full_path, &fileinfo ) < 0 ) {
@@ -599,19 +439,19 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
         return 0;
     }
     dvd_file->title_sizes[ 0 ] = fileinfo.st_size / DVD_VIDEO_LB_LEN;
-    dvd_file->title_fds[ 0 ] = fd;
+    dvd_file->title_devs[ 0 ] = dev;
     dvd_file->filesize = dvd_file->title_sizes[ 0 ];
 
     return dvd_file;
 }
 
-static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, 
-				  int title, int menu )
+static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd, int title, int menu )
 {
     char filename[ MAX_UDF_FILE_NAME_LEN ];
     uint32_t start, len;
     dvd_file_t *dvd_file;
 
+    fprintf( stderr, "libdvdread: opening VOB as image\n" );
     if( title == 0 ) {
         sprintf( filename, "/VIDEO_TS/VIDEO_TS.VOB" );
     } else {
@@ -626,7 +466,7 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd,
     dvd_file->lb_start = start;
     dvd_file->seek_pos = 0;
     memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-    memset( dvd_file->title_fds, -1, sizeof( dvd_file->title_fds ) );
+    memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = len / DVD_VIDEO_LB_LEN;
 
     /* Calculate the complete file size for every file in the VOBS */
@@ -640,27 +480,15 @@ static dvd_file_t *DVDOpenVOBUDF( dvd_reader_t *dvd,
         }
     }
     
-    /* Hack to crack all the keys on the first open. */
-    if( dvdcss_library ) {
-        if( !dvd_file->dvd->init_keys ) {
-	    initAllCSSKeys( dvd_file->dvd );
-	    dvd_file->dvd->init_keys = 1;
-	}
-    }
-    
-    /* Perform CSS key cracking for this title. */
-    if( dvdcss_library ) {
-	if( dvdcss_title( dvd_file->dvd->dev, (int)start ) < 0 ) {
+    if( pf_dvd_seek( dvd_file->dvd->dev, (int)start, DVDCSS_SEEK_KEY ) < 0 ) {
             fprintf( stderr, "libdvdread: Error cracking CSS key for %s\n",
                      filename );
-        }
     }
 
     return dvd_file;
 }
 
-static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, 
-				   int title, int menu )
+static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd, int title, int menu )
 {
     char filename[ MAX_UDF_FILE_NAME_LEN ];
     char full_path[ PATH_MAX + 1 ];
@@ -668,17 +496,18 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd,
     dvd_file_t *dvd_file;
     int i;
 
+    fprintf( stderr, "libdvdread: opening VOB as file\n" );
     dvd_file = (dvd_file_t *) malloc( sizeof( dvd_file_t ) );
     if( !dvd_file ) return 0;
     dvd_file->dvd = dvd;
     dvd_file->lb_start = 0;
     dvd_file->seek_pos = 0;
     memset( dvd_file->title_sizes, 0, sizeof( dvd_file->title_sizes ) );
-    memset( dvd_file->title_fds, -1, sizeof( dvd_file->title_fds ) );
+    memset( dvd_file->title_devs, -1, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = 0;
 
     if( menu ) {
-        int fd;
+        dvd_handle dev;
 
         if( title == 0 ) {
             sprintf( filename, "VIDEO_TS.VOB" );
@@ -690,8 +519,8 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd,
             return 0;
         }
 
-        fd = open( full_path, O_RDONLY );
-        if( fd < 0 ) {
+        dev = pf_dvd_open( full_path );
+        if( dev == NULL ) {
             free( dvd_file );
             return 0;
         }
@@ -702,7 +531,8 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd,
             return 0;
         }
         dvd_file->title_sizes[ 0 ] = fileinfo.st_size / DVD_VIDEO_LB_LEN;
-        dvd_file->title_fds[ 0 ] = fd;
+        dvd_file->title_devs[ 0 ] = dev;
+        pf_dvd_title( dvd_file->title_devs[0], 0 );
         dvd_file->filesize = dvd_file->title_sizes[ 0 ];
 
     } else {
@@ -719,7 +549,8 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd,
             }
 
             dvd_file->title_sizes[ i ] = fileinfo.st_size / DVD_VIDEO_LB_LEN;
-            dvd_file->title_fds[ i ] = open( full_path, O_RDONLY );
+            dvd_file->title_devs[ i ] = pf_dvd_open( full_path );
+            pf_dvd_title( dvd_file->title_devs[i], 0 );
             dvd_file->filesize += dvd_file->title_sizes[ i ];
         }
         if( !(dvd_file->title_sizes[ 0 ]) ) {
@@ -732,7 +563,7 @@ static dvd_file_t *DVDOpenVOBPath( dvd_reader_t *dvd,
 }
 
 dvd_file_t *DVDOpenFile( dvd_reader_t *dvd, int titlenum, 
-			 dvd_read_domain_t domain )
+                         dvd_read_domain_t domain )
 {
     char filename[ MAX_UDF_FILE_NAME_LEN ];
 
@@ -785,8 +616,9 @@ void DVDCloseFile( dvd_file_t *dvd_file )
     if( dvd_file ) {
         if( !dvd_file->dvd->isImageFile ) {
             for( i = 0; i < 9; ++i ) {
-                if( dvd_file->title_fds[ i ] >= 0 )
-		    close( dvd_file->title_fds[ i ] );
+                if( dvd_file->title_devs[ i ] ) {
+                    pf_dvd_close( dvd_file->title_devs[i] );
+                }
             }
         }
 
@@ -796,56 +628,37 @@ void DVDCloseFile( dvd_file_t *dvd_file )
 }
 
 int64_t DVDReadLBUDF( dvd_reader_t *device, uint32_t lb_number,
-		      size_t block_count, unsigned char *data, 
-		      int encrypted )
+                      size_t block_count, unsigned char *data, 
+                      int encrypted )
 {
-    if( dvdcss_library ) {
-        int ret;
+    int ret;
 
-        if( !device->dev ) {
-            fprintf( stderr, "libdvdread: Fatal error in block read.\n" );
-            return 0;
-        }
-
-        ret = dvdcss_seek( device->dev, (int) lb_number );
-        if( ret != (int) lb_number ) {
-	    fprintf( stderr, "libdvdread: Can't seek to block %u\n", 
-		     lb_number );
-            return 0;
-        }
-
-        return (int64_t) ( dvdcss_read( device->dev, (char *) data, 
-					(int) block_count, encrypted ) 
-			   * (uint64_t) DVD_VIDEO_LB_LEN );
-    } else {
-        off64_t off;
-
-        if( device->fd < 0) {
-            fprintf( stderr, "libdvdread: Fatal error in block read.\n" );
-            return 0;
-        }
-
-        off = lseek64( device->fd, lb_number * (int64_t) DVD_VIDEO_LB_LEN, 
-		       SEEK_SET );
-        if( off != ( lb_number * (int64_t) DVD_VIDEO_LB_LEN ) ) {
-	    fprintf( stderr, "libdvdread: Can't seek to block %u\n", 
-		     lb_number );
-            return 0;
-        }
-        return (int64_t) ( read( device->fd, data, 
-				 block_count * DVD_VIDEO_LB_LEN ) );
+    if( !device->dev ) {
+        fprintf( stderr, "libdvdread: Fatal error in block read.\n" );
+        return 0;
     }
+
+    ret = pf_dvd_seek( device->dev, (int) lb_number, DVDCSS_NOFLAGS );
+    if( ret != (int) lb_number ) {
+        fprintf( stderr, "libdvdread: Can't seek to block %u\n", 
+                         lb_number );
+        return 0;
+    }
+
+    return (int64_t) ( pf_dvd_read( device->dev, (char *) data, 
+                           (int) block_count, encrypted ) 
+                  * (uint64_t) DVD_VIDEO_LB_LEN );
 }
 
 static int64_t DVDReadBlocksUDF( dvd_file_t *dvd_file, uint32_t offset,
-				 size_t block_count, unsigned char *data )
+                                 size_t block_count, unsigned char *data )
 {
     return DVDReadLBUDF( dvd_file->dvd, dvd_file->lb_start + offset,
                          block_count, data, DVDCSS_READ_DECRYPT );
 }
 
 static int64_t DVDReadBlocksPath( dvd_file_t *dvd_file, size_t offset,
-				  size_t block_count, unsigned char *data )
+                                  size_t block_count, unsigned char *data )
 {
     int i;
     ssize_t ret, ret2;
@@ -858,70 +671,71 @@ static int64_t DVDReadBlocksPath( dvd_file_t *dvd_file, size_t offset,
 
         if( offset < dvd_file->title_sizes[ i ] ) {
             if( ( offset + block_count ) <= dvd_file->title_sizes[ i ] ) {
-	        off = lseek64( dvd_file->title_fds[ i ], 
-			       offset * (int64_t) DVD_VIDEO_LB_LEN, SEEK_SET );
-		if( off != ( offset * (int64_t) DVD_VIDEO_LB_LEN ) ) {
-		    fprintf( stderr, "libdvdread: Can't seek to block %d\n", 
-			     offset );
-		    return 0;
-		}
-                ret = read( dvd_file->title_fds[ i ], data,
-                            block_count * DVD_VIDEO_LB_LEN );
+                off = pf_dvd_seek( dvd_file->title_devs[ i ], (int)offset, 0 );
+                if( off != (int)offset ) {
+                    fprintf( stderr, "libdvdread: Can't seek to block %d\n", 
+                                     offset );
+                    return 0;
+                }
+                ret = pf_dvd_read( dvd_file->title_devs[ i ], data,
+                                   (int)block_count, DVDCSS_READ_DECRYPT );
                 break;
             } else {
-		size_t part1_size 
-		  = ( dvd_file->title_sizes[ i ] - offset ) * DVD_VIDEO_LB_LEN;
-		/* FIXME: Really needs to be a while loop.
-		   (This is only true if you try and read >1GB at a time) */
-		
+                size_t part1_size = dvd_file->title_sizes[ i ] - offset;
+                /* FIXME: Really needs to be a while loop.
+                 * (This is only true if you try and read >1GB at a time) */
+
                 /* Read part 1 */
-                off = lseek64( dvd_file->title_fds[ i ], 
-			       offset * (int64_t) DVD_VIDEO_LB_LEN, SEEK_SET );
-		if( off != ( offset * (int64_t) DVD_VIDEO_LB_LEN ) ) {
-		    fprintf( stderr, "libdvdread: Can't seek to block %d\n", 
-			     offset );
-		    return 0;
-		}
-                ret = read( dvd_file->title_fds[ i ], data, part1_size );
-		if( ret < 0 ) return ret;
-		/* FIXME: This is wrong if i is the last file in the set. 
-		          also error from this read will not show in ret. */
-		
+                off = pf_dvd_seek( dvd_file->title_devs[ i ], offset, 0 );
+                if( off != offset ) {
+                    fprintf( stderr, "libdvdread: Can't seek to block %d\n", 
+                                     offset );
+                    return 0;
+                }
+                ret = pf_dvd_read( dvd_file->title_devs[ i ], data,
+                                   part1_size, DVDCSS_READ_DECRYPT );
+                if( ret < 0 ) return ret;
+                /* FIXME: This is wrong if i is the last file in the set. 
+                 * also error from this read will not show in ret. */
+
                 /* Read part 2 */
-                lseek64( dvd_file->title_fds[ i + 1 ], (off64_t)0, SEEK_SET );
-                ret2 = read( dvd_file->title_fds[ i + 1 ], data + part1_size,
-                             block_count * DVD_VIDEO_LB_LEN - part1_size );
+                pf_dvd_seek( dvd_file->title_devs[ i + 1 ], 0, 0 );
+                ret2 = pf_dvd_read( dvd_file->title_devs[ i + 1 ], data +
+                                    ( part1_size * (int64_t)DVD_VIDEO_LB_LEN ),
+                                    block_count - part1_size,
+                                    DVDCSS_READ_DECRYPT );
                 if( ret2 < 0 ) return ret2;
-		break;
+                break;
             }
         } else {
             offset -= dvd_file->title_sizes[ i ];
         }
     }
 
-    return ( (int64_t) ret + (int64_t) ret2 );
+    return ( (int64_t) ret + (int64_t) ret2 ) * DVD_VIDEO_LB_LEN;
 }
 
 /* These are broken for some cases reading more than 2Gb at a time. */
 ssize_t DVDReadBlocks( dvd_file_t *dvd_file, int offset, 
-		       size_t block_count, unsigned char *data )
+                       size_t block_count, unsigned char *data )
 {
     int64_t ret;
   
     if( dvd_file->dvd->isImageFile ) {
-	ret = DVDReadBlocksUDF( dvd_file, (uint32_t)offset, 
-				block_count, data );
+        ret = DVDReadBlocksUDF( dvd_file, (uint32_t)offset, 
+                                block_count, data );
     } else {
-	ret = DVDReadBlocksPath( dvd_file, (size_t) offset, 
-				 block_count, data );
+        ret = DVDReadBlocksPath( dvd_file, (size_t) offset, 
+                                 block_count, data );
     }
     if( ret <= 0 ) {
         return (ssize_t) ret;
     }
+
     {
       ssize_t sret = (ssize_t) (ret / (int64_t)DVD_VIDEO_LB_LEN );
       if( sret == 0 ) {
-	fprintf(stderr, "libdvdread: DVDReadBlocks got %d bytes\n", (int)ret );
+        fprintf(stderr, "libdvdread: DVDReadBlocks got %d bytes\n", (int)ret );
       }
       return sret;
     }
@@ -933,13 +747,13 @@ int32_t DVDFileSeek( dvd_file_t *dvd_file, int32_t offset )
         dvd_file->seek_pos = (uint32_t) offset;
         return offset;
     } else {
-        return (int32_t) ( lseek( dvd_file->title_fds[ 0 ], 
-				  (off_t) offset, SEEK_SET ) );
+        return (int32_t) ( lseek( dvd_file->title_devs[0]->i_fd,
+                            (off_t)offset, SEEK_SET ) );
     }
 }
 
 static ssize_t DVDReadBytesUDF( dvd_file_t *dvd_file, void *data, 
-				size_t byte_size )
+                                size_t byte_size )
 {
     unsigned char *secbuf;
     unsigned int numsec, seek_sector, seek_byte;
@@ -951,8 +765,8 @@ static ssize_t DVDReadBytesUDF( dvd_file_t *dvd_file, void *data,
     numsec = ( ( seek_byte + byte_size ) / DVD_VIDEO_LB_LEN ) + 1;
     secbuf = (unsigned char *) malloc( numsec * DVD_VIDEO_LB_LEN );
     if( !secbuf ) {
-	fprintf( stderr, "libdvdread: Can't allocate memory " 
-		 "for file read!\n" );
+        fprintf( stderr, "libdvdread: Can't allocate memory " 
+                         "for file read!\n" );
         return 0;
     }
 
@@ -972,9 +786,9 @@ static ssize_t DVDReadBytesUDF( dvd_file_t *dvd_file, void *data,
 }
 
 static ssize_t DVDReadBytesPath( dvd_file_t *dvd_file, void *data, 
-				 size_t byte_size )
+                                 size_t byte_size )
 {
-    return read( dvd_file->title_fds[ 0 ], data, byte_size );
+    return read( dvd_file->title_devs[0]->i_fd, data, byte_size );
 }
 
 ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
@@ -989,5 +803,123 @@ ssize_t DVDReadBytes( dvd_file_t *dvd_file, void *data, size_t byte_size )
 ssize_t DVDFileSize( dvd_file_t *dvd_file )
 {
     return dvd_file->filesize;
+}
+
+int64_t DVDReadVLBUDF( dvd_reader_t *device, uint32_t lb_number,
+               size_t block_count, struct iovec * vector, int encrypted )
+{
+    int ret;
+
+    if( !device->dev ) {
+        fprintf( stderr, "libdvdread: Fatal error in block read.\n" );
+        return 0;
+    }
+
+    ret = pf_dvd_seek( device->dev, (int) lb_number, 0 );
+    if( ret != (int) lb_number ) {
+        fprintf( stderr, "libdvdread: Can't seek to block %u\n",
+                 lb_number );
+        return 0;
+    }
+
+    return (int64_t) ( pf_dvd_readv( device->dev, vector,
+                                     (int)block_count, encrypted )
+         * (uint64_t) DVD_VIDEO_LB_LEN );
+}
+
+static int64_t DVDReadVBlocksUDF( dvd_file_t *dvd_file, uint32_t offset,
+                 size_t block_count, struct iovec *vector )
+{
+    return DVDReadVLBUDF( dvd_file->dvd, dvd_file->lb_start + offset,
+                         block_count, vector, DVDCSS_READ_DECRYPT );
+}
+
+static int64_t DVDReadVBlocksPath( dvd_file_t *dvd_file, size_t offset,
+                                   size_t block_count, struct iovec *vector )
+{
+    int i;
+    int ret, ret2;
+    int off;
+
+    ret = 0;
+    ret2 = 0;
+    for( i = 0 ; i < 9 ; ++i ) {
+        if( !dvd_file->title_sizes[ i ] ) {
+            return 0;
+        }
+
+        if( offset < dvd_file->title_sizes[ i ] ) {
+            if( ( offset + block_count ) <= dvd_file->title_sizes[ i ] ) {
+                off = pf_dvd_seek( dvd_file->title_devs[ i ],
+                                   (int)offset, 0 );
+                if( off != (int)offset ) {
+                    fprintf( stderr, "libdvdread: Can't seek to block %d\n", 
+                                     offset );
+                    return 0;
+                }
+                ret = pf_dvd_readv( dvd_file->title_devs[ i ], vector,
+                            (int)block_count, DVDCSS_READ_DECRYPT );
+                break;
+            } else {
+                int part1_size = dvd_file->title_sizes[ i ] - offset;
+                /* FIXME: Really needs to be a while loop.
+                 * (This is only true if you try and read >1GB at a time) */
+
+                /* Read part 1 */
+                off = pf_dvd_seek( dvd_file->title_devs[ i ], offset, 0 );
+                if( off != offset ) {
+                    fprintf( stderr, "libdvdread: Can't seek to block %d\n", 
+                                     offset );
+                    return 0;
+                }
+                ret = pf_dvd_readv( dvd_file->title_devs[ i ], vector,
+                                    part1_size, DVDCSS_READ_DECRYPT );
+                
+                if( ret < 0 ) return ret;
+                /* FIXME: This is wrong if i is the last file in the set. 
+                 * also error from this read will not show in ret. */
+
+                /* Read part 2 */
+                pf_dvd_seek( dvd_file->title_devs[ i + 1 ], 0, 0 );
+                ret2 = pf_dvd_readv( dvd_file->title_devs[ i + 1 ],
+                                     vector + part1_size,
+                                     (int)(block_count - part1_size),
+                                     DVDCSS_READ_DECRYPT );
+                if( ret2 < 0 ) return ret2;
+                break;
+            }
+        } else {
+            offset -= dvd_file->title_sizes[ i ];
+        }
+    }
+
+    return ( ret + ret2 ) * (int64_t) DVD_VIDEO_LB_LEN;
+}
+
+
+ssize_t DVDReadVBlocks( dvd_file_t *dvd_file, int offset,
+                        size_t block_count, struct iovec * vector )
+{
+    int64_t ret;
+
+    if( dvd_file->dvd->isImageFile ) {
+        ret = DVDReadVBlocksUDF( dvd_file, (uint32_t)offset,
+                                 block_count, vector );
+    } else {
+        ret = DVDReadVBlocksPath( dvd_file, (size_t) offset, 
+                                  block_count, vector );
+    }
+    if( ret <= 0 ) {
+        return (ssize_t) ret;
+    }
+    
+    {
+      ssize_t sret = (ssize_t) (ret / (int64_t)DVD_VIDEO_LB_LEN );
+      if( sret == 0 )
+      {
+        fprintf(stderr, "libdvdread: DVDReadVBlocks got %d bytes\n", (int)ret );
+      }
+      return sret;
+    }
 }
 

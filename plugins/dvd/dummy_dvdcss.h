@@ -2,7 +2,7 @@
  * dummy_dvdcss.h: Dummy libdvdcss header.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dummy_dvdcss.h,v 1.6 2002/01/07 02:12:29 sam Exp $
+ * $Id: dummy_dvdcss.h,v 1.7 2002/01/23 03:15:31 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -51,6 +51,14 @@ char *        dummy_dvdcss_error ( dvdcss_handle );
  * Pointers which will be filled either with dummy_dvdcss functions or
  * with the dlopen()ed ones.
  *****************************************************************************/
+#define ____dvdcss_open  dvdcss_open
+#define ____dvdcss_close dvdcss_close
+#define ____dvdcss_title dvdcss_title
+#define ____dvdcss_seek  dvdcss_seek
+#define ____dvdcss_read  dvdcss_read
+#define ____dvdcss_readv dvdcss_readv
+#define ____dvdcss_error dvdcss_error
+
 dvdcss_handle (* ____dvdcss_open )   ( char * );
 int           (* ____dvdcss_close )  ( dvdcss_handle );
 int           (* ____dvdcss_title )  ( dvdcss_handle, int );
@@ -59,11 +67,4 @@ int           (* ____dvdcss_read )   ( dvdcss_handle, void *, int, int );
 int           (* ____dvdcss_readv )  ( dvdcss_handle, void *, int, int );
 char *        (* ____dvdcss_error )  ( dvdcss_handle );
 
-#define ____dvdcss_open  dvdcss_open
-#define ____dvdcss_close dvdcss_close
-#define ____dvdcss_title dvdcss_title
-#define ____dvdcss_seek  dvdcss_seek
-#define ____dvdcss_read  dvdcss_read
-#define ____dvdcss_readv dvdcss_readv
-#define ____dvdcss_error dvdcss_error
 

@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.29 2002/01/21 07:00:21 gbazin Exp $
+ * $Id: libdvdcss.c,v 1.30 2002/01/23 03:15:31 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -191,7 +191,6 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
         dvdcss->i_method = DVDCSS_METHOD_TITLE;
         dvdcss->b_ioctls = 0;
         dvdcss->b_encrypted = 1;
-        memset( &dvdcss->css.disc, 0, sizeof(dvdcss->css.disc) );
     }
 
     /* If disc is CSS protected and the ioctls work, authenticate the drive */
@@ -208,6 +207,7 @@ extern dvdcss_handle dvdcss_open ( char *psz_target )
         
         memset( dvdcss->css.p_unenc_key, 0, KEY_SIZE );
     }
+    memset( dvdcss->css.p_title_key, 0, KEY_SIZE );
 
 #ifndef WIN32
     if( psz_raw_device != NULL )

@@ -25,7 +25,7 @@ CFLAGS := -I../../include -I../../extras $(CFLAGS)
 # Objects
 #
 
-OBJ_C = dvdread.o dvd_udf.o nav_print.o nav_read.o ifo_print.o ifo_read.o
+OBJ_C = dvd_setup.o dvd_reader.o dvd_udf.o nav_print.o nav_read.o ifo_print.o ifo_read.o
 ALL_OBJ = $(OBJ_C) $(OBJ_LIBDVDREAD)
 
 #
@@ -52,7 +52,7 @@ $(C_DEP): %.d: FORCE
 
 $(OBJ_C): %.o: .dep/%.d
 $(OBJ_C): %.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDREAD) $(PCFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_DVDREAD) $(CFLAGS_LIBDVDREAD) $(PCFLAGS) -c -o $@ $<
 
 ../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDREAD)
 	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_LIBDVDREAD)
