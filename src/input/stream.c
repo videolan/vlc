@@ -44,7 +44,7 @@ char *stream_ReadLine( stream_t *s )
     int      i_data;
     int      i = 0;
     i_data = stream_Peek( s, &p_data, MAX_LINE );
-    msg_Dbg( s, "i_data %d", i_data );
+
     while( i < i_data && p_data[i] != '\n' )
     {
         i++;
@@ -63,7 +63,7 @@ char *stream_ReadLine( stream_t *s )
         }
         i = stream_Read( s, p_line, i + 1 );
         p_line[ i - 1 ] = '\0';
-        msg_Dbg( s, "found %d chars long line", i );
+
         return p_line;
     }
 }
