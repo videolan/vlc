@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.6 2003/03/30 14:24:20 gbazin Exp $
+ * $Id: preferences.cpp,v 1.7 2003/03/30 15:05:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -374,6 +374,17 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
         if( !strcmp( p_module->psz_object_name, "main" ) )
             continue;
 
+        /* Exclude empty plugins */
+        p_item = p_module->p_config;
+        if( !p_item ) continue;
+        do
+        {
+            if( p_item->i_type & CONFIG_ITEM )
+                break;
+        }
+        while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+        if( p_item->i_type == CONFIG_HINT_END ) continue;
+
         /* Find the capability child item */
         long cookie; size_t i_child_index;
         wxTreeItemId capability_item = GetFirstChild( plugins_item, cookie);
@@ -596,7 +607,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                                    p_parser->psz_object_name );
                     if( p_item->psz_value &&
                         !strcmp(p_item->psz_value, p_parser->psz_object_name) )
-                        combo->SetSelection( combo->GetCount() - 1 );
+                        combo->SetValue( p_parser->psz_longname );
                 }
             }
 
@@ -633,6 +644,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                     combo->Append( p_item->ppsz_list[i_index] );
                 }
 
+		if( p_item->psz_value ) combo->SetValue( p_item->psz_value );
                 combo->SetToolTip( p_item->psz_longtext );
                 config_data->control.combobox = combo;
                 config_data->b_config_list = VLC_TRUE;
