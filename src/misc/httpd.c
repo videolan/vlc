@@ -2356,7 +2356,7 @@ static void httpd_HostThread( httpd_host_t *host )
             int     fd;
 
             fd = accept( host->fd, (struct sockaddr *)&sock, &i_sock_size );
-            if( fd > 0 )
+            if( fd >= 0 )
             {
                 char *ip;
 
