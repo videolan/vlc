@@ -2,7 +2,7 @@
  * info.c : Playlist info management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: info.c,v 1.3 2004/01/07 19:20:30 gbazin Exp $
+ * $Id: info.c,v 1.4 2004/01/15 19:23:14 sigmunau Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -241,8 +241,7 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
                       const char * psz_format, ...)
 {
     va_list args;
-    int i, i_ret;
-    int i_new = VLC_TRUE;
+    int i_ret;
     playlist_item_t *p_item;
     char *psz_value;
 
@@ -455,7 +454,6 @@ int playlist_AddItemOption( playlist_item_t *p_item,
                       const char *psz_format, ... )
 {
     va_list args;
-    int i_new = VLC_TRUE;
     item_info_t *p_info = NULL;
     item_info_category_t *p_cat;
 
